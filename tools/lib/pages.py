@@ -878,6 +878,13 @@ def minimap(data, t, span=3.2):
     see the shape of the onward journey rather than read distances."""
     cx, cy = project(t["lat"], t["lon"])
     w, h = 900, 320
+    # The caption used to claim "within about 192 kilometres", which was
+    # span x 60 and meant nothing. Derive it from the projection instead:
+    # the frame is far wider than it is deep, and both shrink with latitude.
+    deg_per_px_lon = (LON1 - LON0) / MAP_W
+    deg_per_px_lat = (LAT1 - LAT0) / MAP_H
+    km_w = int(round(w / span * deg_per_px_lon * 111 * math.cos(math.radians(t["lat"])) / 10) * 10)
+    km_h = int(round(h / span * deg_per_px_lat * 111 / 10) * 10)
     dots, labels = [], []
     for cid, n in sorted(data["cities"].items()):
         x, y = project(n["city"]["lat"], n["city"]["lon"])
@@ -900,8 +907,9 @@ def minimap(data, t, span=3.2):
         f'<figure class="minimap"><svg viewBox="0 0 {w} {h}" role="img" '
         f'aria-label="Map of {esc(t["name"])} and the places around it">'
         f'{"".join(dots)}{"".join(labels)}</svg>'
-        f'<figcaption>{esc(t["name"])} and everything within about '
-        f'{int(span * 60)} kilometres in the Atlas. <a href="/map">The full map →</a></figcaption></figure>'
+        f'<figcaption>{esc(t["name"])} and its neighbours in the Atlas — the frame is about '
+        f'{km_w:,} km across and {km_h:,} km deep at this latitude. '
+        f'<a href="/map">The full map →</a></figcaption></figure>'
     )
 
 
