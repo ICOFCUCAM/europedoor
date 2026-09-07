@@ -140,6 +140,41 @@ async function main() {
     ok(!coast.includes(banned) && !alps.includes(banned), `planner routed into ${banned}`);
   }
 
+  // ── search ─────────────────────────────────────────────────────────
+  await page.goto(base + "/search", { waitUntil: "networkidle" });
+  await page.fill("#q", "bergen");
+  await page.waitForSelector("#results .row");
+  const first = await page.locator("#results .row h3").first().textContent();
+  ok(first.trim() === "Bergen", `searching "bergen" put ${first!==null?first.trim():"nothing"} first`);
+
+  // Accent folding: the index holds Malmö, the visitor types Malmo.
+  await page.fill("#q", "malmo");
+  await page.waitForTimeout(200);
+  const folded = await page.locator("#results .row h3").first().textContent();
+  ok(folded.trim() === "Malmö", `accent folding failed: got ${folded}`);
+
+  // A thematic word must reach more than one kind of thing.
+  await page.fill("#q", "medieval");
+  await page.waitForTimeout(200);
+  const kinds = new Set(await page.locator("#results .rowmeta").allTextContents());
+  ok(kinds.size >= 2, `"medieval" returned only ${[...kinds].join(", ")}`);
+
+  // Every result must resolve.
+  await page.fill("#q", "wine");
+  await page.waitForTimeout(200);
+  const shrefs = await page.locator("#results .row").evaluateAll((as) =>
+    as.slice(0, 8).map((a) => a.getAttribute("href")));
+  for (const h of shrefs) {
+    const r = await page.request.get(base + h);
+    ok(r.status() === 200, `search linked to ${h}, which returned ${r.status()}`);
+  }
+
+  // Nonsense must say so rather than guessing.
+  await page.fill("#q", "qqzzxx");
+  await page.waitForTimeout(200);
+  ok((await page.locator("#results").textContent()).includes("Nothing for"),
+     "an unmatched search did not say it found nothing");
+
   // ── the map ────────────────────────────────────────────────────────
   await page.goto(base + "/map", { waitUntil: "networkidle" });
   const dots = await page.locator("#dots .dot").count();
@@ -165,7 +200,7 @@ async function main() {
     "/journeys", "/journeys/the-alpine-grand-tour", "/plan", "/themes/sacred-europe",
     "/stories", "/stories/the-last-forest", "/experiences", "/experiences/join",
     "/fund", "/fund/qvevri-apprenticeship", "/events", "/method", "/beyond-the-obvious",
-    "/about", "/how-it-works", "/sources", "/business", "/my-europe",
+    "/about", "/how-it-works", "/sources", "/business", "/my-europe", "/search",
   ];
   for (const url of sample) {
     await phone.goto(base + url, { waitUntil: "domcontentloaded" });

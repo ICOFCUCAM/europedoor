@@ -83,6 +83,7 @@ Everything in the brief's tree exists. It is reached from a shorter nav.
 | Journeys (by length) | `/journeys`, filterable by days in `/plan` |
 | Plan | `/plan` |
 | Stories | `/stories` |
+| Search | `/search` |
 | Business | `/business`, `/experiences/join` |
 | Community | `/fund`, `/my-europe` |
 
@@ -595,6 +596,10 @@ Public, read-only, cacheable, no key:
 GET /api/atlas.json          the planner index: every city with interests,
                              nights, cost band, season and url. ~400 KB.
                              Advisory countries are absent from it.
+GET /api/search.json         one flat row per findable thing: name, kind,
+                             url and a lowercased text blob. Advisory
+                             countries ARE present — a page nobody can
+                             search for is a page that does not exist.
 GET /api/countries.json      country-level facts (Stage 2)
 GET /api/journeys.json       curated routes (Stage 2)
 ```
@@ -853,20 +858,24 @@ run.
 
 ## 3.1 MVP — what is already true
 
-Built and passing checks: the Atlas (50/121/244), the Planner, 8 Journeys, 9
-Themes, 8 Stories, the Map, Experiences with a verification model, the Fund
-register, the Experience Score with a published method, My Europe, Events,
-and an honest status page.
+Built and passing checks: the Atlas (50/121/244), the Planner, Search, 8
+Journeys, 9 Themes, 8 Stories, the Map, Experiences with a verification
+model, the Fund register, the Experience Score with a published method, My
+Europe, Events, and an honest status page.
+
+Search shipped as part of this pass: one flat index of every findable thing,
+fetched once and filtered in the browser, with accent folding so "malmo"
+finds Malmö. Ranking is exact name, then prefix, then substring, then body
+position, weighted by kind — explainable, and with no field that could carry
+a paid position.
 
 Not built and next, in order:
 
-1. **Search.** A client-side index over the 244 cities. Half a day's work and
-   the single most-missed feature.
-2. **Depth tier A.** Norway, France, Italy, Spain, Greece to 25+ cities each.
-3. **Fact verification pass** with `facts_checked_on` dates surfaced.
-4. **Twenty more stories**, because organic traffic comes from those and not
+1. **Depth tier A.** Norway, France, Italy, Spain, Greece to 25+ cities each.
+2. **Fact verification pass** with `facts_checked_on` dates surfaced.
+3. **Twenty more stories**, because organic traffic comes from those and not
    from the Atlas.
-5. **The AI layer**, as specified in 2.4, once 1–4 are done.
+4. **The AI layer**, as specified in 2.4, once 1–3 are done.
 
 ## 3.2 Roadmap, twelve months
 

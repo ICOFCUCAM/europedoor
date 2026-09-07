@@ -1,6 +1,6 @@
 # Europedoor — working notes
 
-A static site: 507 generated HTML files, no dependencies, no database. Every
+A static site: 508 generated HTML files, no dependencies, no database. Every
 page comes from `data/` via `tools/build.py`. Nothing in `site/` was written
 by a human and nothing ever should be.
 
@@ -62,9 +62,9 @@ worth making.
 Run all four before claiming anything is done.
 
     python3 tools/build.py check       validate the data
-    python3 tools/build.py            507 pages
-    python3 tools/checks.py            21 checks, ~24,000 things examined
-    node tools/browser-checks.js       71 checks in Chromium
+    python3 tools/build.py            508 pages
+    python3 tools/checks.py            22 checks, ~28,000 things examined
+    node tools/browser-checks.js       85 checks in Chromium
 
 The browser checks need `npm install playwright` and take about thirty
 seconds. They earn their place: they caught a 47-pixel mobile overflow on

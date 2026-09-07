@@ -70,6 +70,7 @@ def build():
     for s in d["stories"]:
         emit(P.story_page(d, s))
     emit(P.planner_page(d))
+    emit(P.search_page(d))
     emit(P.experiences_index(d))
     for kind, name in d["taxonomy"]["experience_kinds"].items():
         emit(P.experience_kind_page(d, kind, name))
@@ -88,8 +89,8 @@ def build():
     emit(P.sources_page(d))
     emit(P.not_found(d))
 
-    api_path, api = P.planner_api(d)
-    write(api_path, json.dumps(api, ensure_ascii=False, separators=(",", ":")))
+    for path, payload in (P.planner_api(d), P.search_api(d)):
+        write(path, json.dumps(payload, ensure_ascii=False, separators=(",", ":")))
 
     # Static assets are copied, never symlinked: the output directory has to
     # stand up on its own on any static host.

@@ -131,7 +131,7 @@ def c_built():
     expect += 1 + len(d["journeys"])
     expect += 1 + len(d["themes"])
     expect += 1 + len(d["stories"])
-    expect += 1                                   # /plan
+    expect += 2                                   # /plan, /search
     expect += 1 + len(d["taxonomy"]["experience_kinds"]) + 1 + 1   # experiences, kinds, join, business
     expect += 1 + len(d["fund"])
     expect += 6                                   # map, events, quiet, my-europe, method, about
@@ -209,8 +209,8 @@ def c_links():
     for f in site_files():
         served.add(canonical_of(f))
     for extra in ("/assets/css/europedoor.css", "/assets/js/planner.js", "/assets/js/map.js",
-                  "/assets/js/my-europe.js", "/assets/door.svg", "/api/atlas.json",
-                  "/sitemap.xml", "/robots.txt"):
+                  "/assets/js/my-europe.js", "/assets/js/search.js", "/assets/door.svg",
+                  "/api/atlas.json", "/api/search.json", "/sitemap.xml", "/robots.txt"):
         if os.path.exists(os.path.join(OUT, extra.lstrip("/"))):
             served.add(extra)
     n = 0
@@ -402,6 +402,25 @@ def c_api():
                 # only if we ever add one; today that would be a bug.
                 fail(f"api: journey {j['slug']} leg {leg['id']} is not in the planner index")
     return len(api["cities"])
+
+
+@check("the search index points only at pages that exist")
+def c_search():
+    idx = json.load(open(os.path.join(OUT, "api", "search.json"), encoding="utf-8"))
+    served = {canonical_of(f) for f in site_files()}
+    d = D.load()
+    advisory = {c["slug"] for c in d["countries"].values() if c.get("advisory")}
+    for row in idx["rows"]:
+        if row["u"] not in served:
+            fail(f"search index: {row['n']!r} points at {row['u']}, which is not built")
+    # Advisory countries stay findable — a page nobody can search for is a
+    # page that does not exist, and the warning is the point of keeping it.
+    names = {r["n"] for r in idx["rows"]}
+    for slug in advisory:
+        c = d["countries"][slug]
+        if c["name"] not in names:
+            fail(f"search index is missing {c['name']}, which still has a page")
+    return len(idx["rows"])
 
 
 @check("no photographs, and every illustration is generated")

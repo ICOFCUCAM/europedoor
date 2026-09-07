@@ -14,20 +14,19 @@ Kept current. The reasoning is in
 * Europe Fund register, 12 projects, holding nothing
 * Europe Experience Score with the formula published at `/method`
 * My Europe (browser-local saves), Events, `/beyond-the-obvious`
+* Search: the whole index filtered in the browser, with accent folding
 * An honest status page separating built / designed / blocked
-* 21 static checks and 71 browser checks, in CI
+* 22 static checks and 85 browser checks, in CI
 
 ## Next, in order
 
-1. **Search.** Client-side index over the 244 cities. The most-missed
-   feature and about half a day's work.
-2. **Depth tier A** — Norway, France, Italy, Spain, Greece to 25+ cities
+1. **Depth tier A** — Norway, France, Italy, Spain, Greece to 25+ cities
    each, 40+ experiences, 5 stories apiece.
-3. **Fact verification pass**, with `facts_checked_on` per country and city,
+2. **Fact verification pass**, with `facts_checked_on` per country and city,
    surfaced on the page. Anything unverified says so.
-4. **Twenty more stories.** Organic traffic comes from these, not from the
+3. **Twenty more stories.** Organic traffic comes from these, not from the
    Atlas.
-5. **Accessibility notes** per city and experience.
+4. **Accessibility notes** per city and experience.
 
 ## Blocked, and by what
 
@@ -44,7 +43,7 @@ Kept current. The reasoning is in
 
 | months | focus | ships |
 |---|---|---|
-| 1–2 | Foundation | Entity; trademark clearance; privacy notice; search; the depth-tier-A editorial plan |
+| 1–2 | Foundation | Entity; trademark clearance; privacy notice; the depth-tier-A editorial plan |
 | 3–4 | Depth | Tier A to full depth; verification pass with dates; 10 more stories |
 | 5–6 | Reach | i18n mechanism plus French and German for tier A; events feed; structured data |
 | 7–8 | Intelligence | AI planner with the citation check; `POST /api/plan`; accounts and saved-list sync |

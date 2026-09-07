@@ -280,3 +280,7 @@ main.wide { max-width: 92rem; }
 main ul.stack, main ol.stack { max-width: var(--measure); padding-left: var(--s5); }
 main ul.stack li, main ol.stack li { margin-bottom: var(--s3); }
 main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
+
+/* ── the search link in the masthead ──────────────────────────────── */
+.navsearch { color: var(--door); }
+.navsearch span { font-size: 1.1em; line-height: 1; }

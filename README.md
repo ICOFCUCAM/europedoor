@@ -22,7 +22,7 @@ of a trip happens *before* the transaction, and almost nobody serves it well.
 | Themes | 9 |
 | Stories | 8 |
 | Fund projects | 12 (holding nothing — deliberately) |
-| Generated pages | 507 |
+| Generated pages | 508 |
 | Runtime dependencies | 0 |
 
 ## Run it
@@ -32,8 +32,8 @@ python3 tools/build.py            # build site/
 python3 tools/build.py check      # validate the data, render nothing
 python3 tools/build.py stats      # what is in the dataset
 
-python3 tools/checks.py           # 21 checks over the built HTML
-node tools/browser-checks.js      # 71 checks in Chromium (needs playwright)
+python3 tools/checks.py           # 22 checks over the built HTML
+node tools/browser-checks.js      # 85 checks in Chromium (needs playwright)
 
 python3 -m http.server -d site 8000   # then open http://localhost:8000
 ```

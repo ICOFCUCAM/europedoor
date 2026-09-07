@@ -121,7 +121,7 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
       <span class="door" aria-hidden="true"></span>
       <span class="wordmark-text">europedoor</span>
     </a>
-    <nav class="nav" aria-label="Primary">{"".join(nav)}</nav>
+    <nav class="nav" aria-label="Primary">{"".join(nav)}<a class="navsearch" href="/search"><span aria-hidden="true">⌕</span> Search</a></nav>
   </div>
 </header>
 <main id="main" class="{'wide' if wide else ''}">
@@ -132,6 +132,8 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
     <p class="footer-lede">{esc(SITE_TAGLINE)} — discover it, plan it, and leave it better than you found it.</p>
     <nav class="footer-nav" aria-label="Footer">
       <a href="/atlas">Atlas</a><a href="/journeys">Journeys</a><a href="/plan">Plan</a>
+      <a href="/search">Search</a><a href="/map">Map</a><a href="/themes">Themes</a><a href="/stories">Stories</a>
+      <a href="/events">Events</a><a href="/beyond-the-obvious">Beyond the obvious</a><a href="/my-europe">My Europe</a>
       <a href="/experiences">Experiences</a><a href="/experiences/join">List your experience</a>
       <a href="/fund">Fund</a><a href="/about">About</a><a href="/how-it-works">How it works</a>
       <a href="/sources">Sources &amp; corrections</a>

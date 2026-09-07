@@ -107,6 +107,7 @@ def home(data):
   <div class="hero-actions">
     <a class="btn" href="/plan">Plan a journey</a>
     <a class="btn ghost" href="/atlas">Open the Atlas</a>
+    <a class="btn ghost" href="/search">Search everything</a>
   </div>
   <p class="small" style="margin-top:var(--s6)">{ncountries} countries · {nregions} travel regions ·
   {ncities} cities · {len(data['journeys'])} curated journeys</p>
@@ -1329,6 +1330,7 @@ def how_it_works_page(data):
         ("Stories", "Editorial desk with pieces linked into the Atlas", "built"),
         ("My Europe", "Saved places, in your browser only", "built"),
         ("Events", "The recurring European year, by month", "built"),
+        ("Search", "The whole index, filtered in your browser; nothing you type is sent anywhere", "built"),
     ])
     designed = table([
         ("AI planner", "Retrieval over this dataset only, with citations and a refusal when the data is silent — never free-form generation about Europe", "designed, not built"),
@@ -1453,4 +1455,81 @@ def sitemap(paths):
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
         + urlset + "</urlset>\n"
+    )
+
+# ── search ────────────────────────────────────────────────────────────
+
+def search_api(data):
+    """One flat index of everything findable, built once and filtered in the
+    browser. Small enough (a few hundred KB) that shipping it whole beats
+    running a search service, and it works offline."""
+    rows = []
+
+    def add(kind, name, sub, url, text, weight=1.0):
+        rows.append({"k": kind, "n": name, "s": sub, "u": url,
+                     "t": " ".join(text).lower(), "w": weight})
+
+    for m in data["macros"]:
+        add("Region of Europe", m["name"], f"{len(m['countries'])} countries",
+            urls.macro(m), [m["name"], m["blurb"]], 1.4)
+    for c in data["countries"].values():
+        add("Country", c["name"], c["macro_name"], urls.country(c),
+            [c["name"], c.get("official", ""), c["capital"], c["tagline"],
+             c["summary"], " ".join(c["interests"])], 2.0)
+        for r in c["regions"]:
+            add("Region", r["name"], c["name"], urls.region(c, r),
+                [r["name"], r["summary"], " ".join(r["interests"])], 1.2)
+            for t in r["cities"]:
+                add("City", t["name"], f"{r['name']}, {c['name']}", urls.city(c, r, t),
+                    [t["name"], t["summary"], " ".join(t["highlights"]),
+                     " ".join(t["interests"]), c["name"], r["name"]], 1.6)
+                for e in t.get("experiences", []):
+                    add("Experience", e["name"], f"{t['name']}, {c['name']}",
+                        urls.city(c, r, t), [e["name"], e["summary"], e["kind"]], 0.9)
+    for j in data["journeys"]:
+        add("Journey", j["name"], f"{j['days']} days", urls.journey(j),
+            [j["name"], j["strapline"], j["summary"]], 1.5)
+    for t in data["themes"]:
+        add("Theme", t["name"], t["strapline"], f"/themes/{t['slug']}",
+            [t["name"], t["strapline"], t["summary"]], 1.5)
+    for st in data["stories"]:
+        add("Story", st["title"], st["section"], f"/stories/{st['slug']}",
+            [st["title"], st["standfirst"], st["section"]], 1.1)
+    for f in data["fund"]:
+        add("Fund project", f["name"], f["theme"], urls.fund_project(f),
+            [f["name"], f["summary"], f["need"]], 0.8)
+    for i in data["taxonomy"]["interests"]:
+        add("Interest", i["name"], "Everywhere tagged for it", urls.interest(i["slug"]),
+            [i["name"], i["slug"]], 1.3)
+    return "/api/search.json", {"rows": rows}
+
+
+def search_page(data):
+    n = (len(data["countries"]) + sum(len(c["regions"]) for c in data["countries"].values())
+         + len(data["cities"]) + len(data["journeys"]) + len(data["themes"])
+         + len(data["stories"]) + len(data["fund"]))
+    body = f"""
+{crumbs([("Europe", "/atlas"), ("Search", None)])}
+<div class="pagehead">
+  <p class="kicker">Search</p>
+  <h1>Find it.</h1>
+  <p class="lede">Everything on Europedoor — {n} countries, regions, cities,
+  journeys, themes, stories and projects — in one index that runs in your browser.
+  Nothing you type is sent anywhere.</p>
+</div>
+<form class="form" id="searchform" role="search">
+  <div class="field">
+    <label for="q">Search Europe</label>
+    <input type="text" id="q" name="q" autocomplete="off" autofocus
+           placeholder="bergen, medieval, truffle, twelve days, sacred…">
+  </div>
+</form>
+<div id="results" aria-live="polite"></div>
+<noscript><p class="small">Search needs JavaScript. The
+<a href="/atlas">Atlas</a> is fully browsable without it.</p></noscript>
+"""
+    return "/search/index.html", page(
+        "Search", body, path="/search", area=None,
+        description="Search every country, region, city, journey, theme, story and project on Europedoor — in your browser, with nothing sent anywhere.",
+        scripts=["/assets/js/search.js"],
     )
