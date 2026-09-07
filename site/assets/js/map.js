@@ -67,4 +67,71 @@
 
   sel.addEventListener("change", drawJourney);
   drawJourney();
+
+  /* Popups. The specification wants a card on click: name, category, a
+   * sentence, the distance, and a way in. The dots stay real links so the
+   * map still works with JavaScript off — the click is intercepted, not
+   * replaced. */
+  var INFO = window.EUROPEDOOR_MAPINFO || {};
+  var popup = document.getElementById("mappopup");
+  var fromSel = document.getElementById("mapfrom");
+  var placesLayer = document.getElementById("places");
+  var extra = box.querySelector('input[name="extra"][value="places"]');
+
+  function kmBetween(a, b) {
+    var R = 6371, p1 = a.la * Math.PI / 180, p2 = b.la * Math.PI / 180;
+    var dp = p2 - p1, dl = (b.lo - a.lo) * Math.PI / 180;
+    var h = Math.sin(dp / 2) * Math.sin(dp / 2) +
+            Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) * Math.sin(dl / 2);
+    return Math.round(2 * R * Math.asin(Math.sqrt(h)));
+  }
+
+  function esc(x) {
+    return String(x).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+
+  function showPopup(id) {
+    var d = INFO[id];
+    if (!d) return;
+    var origin = fromSel && fromSel.value ? INFO[fromSel.value] : null;
+    var dist = origin && origin !== d
+      ? "<p class=\"small\">" + kmBetween(origin, d) + " km from " + esc(origin.n) + "</p>" : "";
+    var counts = [];
+    if (d.p) counts.push(d.p + (d.p === 1 ? " place" : " places"));
+    if (d.e) counts.push(d.e + (d.e === 1 ? " experience" : " experiences"));
+    popup.innerHTML =
+      '<button class="mappopup-close" type="button" aria-label="Close">×</button>' +
+      "<p class=\"kicker\">" + esc(d.r) + " · " + esc(d.c) + "</p>" +
+      "<h2 class=\"mini\">" + esc(d.n) + "</h2>" +
+      "<p>" + esc(d.s) + "</p>" +
+      (counts.length ? '<p class="small">' + counts.join(" · ") + "</p>" : "") +
+      dist +
+      (d.adv ? '<p class="small">This country is under a travel advisory.</p>' : "") +
+      '<p><a class="btn ghost" href="' + d.u + '">Open ' + esc(d.n) + "</a></p>";
+    popup.hidden = false;
+    popup.querySelector(".mappopup-close").addEventListener("click", function () {
+      popup.hidden = true;
+    });
+  }
+
+  dots.forEach(function (a) {
+    a.addEventListener("click", function (ev) {
+      // Modified clicks and middle clicks keep the plain-link behaviour.
+      if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button !== 0) return;
+      ev.preventDefault();
+      showPopup(a.getAttribute("data-id"));
+    });
+  });
+  if (fromSel) fromSel.addEventListener("change", function () { popup.hidden = true; });
+  if (extra && placesLayer) {
+    extra.addEventListener("change", function () {
+      // `.hidden` is an HTMLElement property. This is an SVG <g>, so setting
+      // it defines a JS property nobody reads and the layer never appears —
+      // the attribute has to be set and removed by hand.
+      if (extra.checked) placesLayer.removeAttribute("hidden");
+      else placesLayer.setAttribute("hidden", "");
+    });
+  }
 })();

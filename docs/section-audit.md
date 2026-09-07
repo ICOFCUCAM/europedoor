@@ -7,7 +7,7 @@ generated HTML as they stand. A section is BUILT only if every assertion
 under it holds right now — which means this file cannot drift from the
 product without CI noticing.
 
-**28 built · 4 partial · 4 deferred · 212 assertions · 0 failing**
+**28 built · 4 partial · 4 deferred · 212 assertions · 1 failing**
 
 Section 36 is the architecture diagram rather than a feature, and is
 reflected in the repository layout rather than audited here.
@@ -28,7 +28,7 @@ reflected in the repository layout rather than audited here.
 | 12 | Faith and heritage layer | BUILT | 3 | Sacred and Jewish Europe as themes, plus a sacred tag across the Atlas. |
 | 13 | Events engine | BUILT | 14 | The recurring year, with a page per month that also answers where to go. Dated per-year listings need a feed and are Stage 2. |
 | 14 | Map | BUILT | 4 | Every city, sixteen togglable layers and a journey overlay. No third-party tiles, by design. |
-| 15 | The Europe Experience Score | BUILT | 4 | Six dimensions, formula published, recomputed every build. |
+| 15 | The Europe Experience Score | **FAILING** (1) | 4 | Six dimensions, formula published, recomputed every build. |
 | 16 | Responsible tourism | BUILT | 4 | In the mechanism, not only the copy. |
 | 17 | Hidden Europe | BUILT | 2 | A quiet tag, collected and argued for. |
 | 18 | The user account — My Europe | PARTIAL | 7 | Saving works for four kinds of thing, in the browser. Accounts and sync are blocked on a data controller and a privacy notice. |

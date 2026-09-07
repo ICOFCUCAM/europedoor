@@ -34,11 +34,40 @@ BASE = 34
 CAP = 97          # nothing scores 100; there is always somewhere better at something
 FLOOR = 12
 
-DIMENSIONS = ["nature", "history", "food", "culture", "adventure", "value"]
+DIMENSIONS = ["nature", "history", "food", "culture", "adventure", "family",
+              "authenticity", "value"]
 LABELS = {
     "nature": "Nature", "history": "History", "food": "Food & table",
-    "culture": "Culture", "adventure": "Adventure", "value": "Value",
+    "culture": "Culture", "adventure": "Adventure", "family": "Family",
+    "authenticity": "Authenticity", "value": "Value",
 }
+
+# The specification lists ten dimensions. Two of them are refused rather than
+# approximated, and the refusal is published on /method:
+#
+#   Accessibility — we hold no step-free access, hearing-loop or accessible-
+#     toilet data for any place in the Atlas. A score derived from anything
+#     else would be a guess about whether a disabled traveller can get in,
+#     which is the worst possible thing to guess about.
+#   Romance — not measurable from anything in this dataset without inventing
+#     a proxy and calling it evidence.
+REFUSED = {
+    "Accessibility": (
+        "We hold no step-free access, hearing-loop or accessible-toilet data for any place "
+        "in the Atlas. Deriving a number from something else would be a guess about whether "
+        "a disabled traveller can get in, and that is the worst thing on this list to guess "
+        "about. The gap is stated on every place page and on /accessibility."),
+    "Romance": (
+        "Not measurable from anything in this dataset. Any formula would be a proxy — sunsets, "
+        "coastlines, small hotels — dressed up as evidence, and the number would be doing "
+        "persuasion rather than description."),
+}
+
+# Family: kinds a child can be handed, and the words that rule one out. This
+# mirrors the rule the /experiences/family page publishes.
+FAMILY_TAGS = {"nature": 14, "coast": 14, "history": 8, "islands": 8, "wild": 12, "winter": 6}
+FAMILY_MINUS = {"music": 10}
+AUTHENTIC_KINDS = ("workshop", "table", "wild", "cellar")
 
 
 def _clamp(v):
@@ -51,6 +80,37 @@ def value_score(daily_eur):
     return _clamp(110 - (mid - 40) * (84.0 / 220.0))
 
 
+def family_score(country, region, city):
+    """What a child would get out of it, from tags and from the experiences
+    that pass the family rule published at /experiences/family."""
+    from . import categories as C
+    tags = set(city["interests"]) | set(region["interests"])
+    v = BASE + sum(p for t, p in FAMILY_TAGS.items() if t in tags)
+    v -= sum(p for t, p in FAMILY_MINUS.items() if t in tags)
+    ok_exp = sum(1 for e in city.get("experiences", []) if C.is_family(e))
+    v += min(ok_exp, 3) * 5
+    return _clamp(v)
+
+
+def authenticity_score(country, region, city):
+    """How much of the place is still for the people who live there.
+
+    Derived, and arguable: the quiet tag, not being the capital, and
+    experiences that are somebody's actual trade rather than a performance.
+    Published on /method so it can be argued with rather than trusted."""
+    v = BASE + 10
+    if city.get("quiet"):
+        v += 22
+    if city["name"] != country["capital"]:
+        v += 8
+    if "cities" in city["interests"]:
+        v -= 8
+    trades = sum(1 for e in city.get("experiences", []) if e["kind"] in AUTHENTIC_KINDS)
+    v += min(trades, 3) * 6
+    v += min(len(city.get("places", [])), 4) * 2
+    return _clamp(v)
+
+
 def city_scores(country, region, city):
     tags = set(city["interests"]) | set(region["interests"])
     kinds = [e["kind"] for e in city.get("experiences", [])]
@@ -60,6 +120,8 @@ def city_scores(country, region, city):
         support = sum(1 for k in kinds if k in KIND_SUPPORT[dim])
         v += min(support, 3) * 4
         out[dim] = _clamp(v)
+    out["family"] = family_score(country, region, city)
+    out["authenticity"] = authenticity_score(country, region, city)
     out["value"] = value_score(country["daily_eur"])
     return out
 
@@ -83,5 +145,13 @@ def methodology_rows():
         parts = ", ".join(f"{t} +{p}" for t, p in sorted(WEIGHTS[dim].items(), key=lambda kv: -kv[1]))
         support = ", ".join(KIND_SUPPORT[dim])
         rows.append((LABELS[dim], f"base {BASE}; {parts}; +4 per matching experience (max 3), kinds: {support}"))
+    fam = ", ".join(f"{t} +{p}" for t, p in sorted(FAMILY_TAGS.items(), key=lambda kv: -kv[1]))
+    rows.append((LABELS["family"],
+                 f"base {BASE}; {fam}; music & nightlife −10; +5 per experience (max 3) that "
+                 f"passes the family rule published at /experiences/family"))
+    rows.append((LABELS["authenticity"],
+                 f"base {BASE} + 10; quiet +22; not the capital +8; tagged big-city −8; "
+                 f"+6 per experience (max 3) of kind {', '.join(AUTHENTIC_KINDS)}; "
+                 f"+2 per recorded place (max 4)"))
     rows.append((LABELS["value"], "110 − (midpoint of the country's daily cost band − €40) × 0.382"))
     return rows

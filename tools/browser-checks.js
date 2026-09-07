@@ -320,12 +320,42 @@ async function main() {
   const lit = await page.locator("#dots .dot:not(.off)").count();
   ok(lit > 0 && lit < dots, `winter layer lit ${lit} of ${dots} — filtering is not working`);
 
+  // Map popups, the places layer and distance from a chosen origin.
+  await page.goto(base + "/map", { waitUntil: "networkidle" });
+  await page.selectOption("#mapfrom", { index: 5 });
+  await page.locator("#dots .dot").nth(40).click();
+  await page.waitForSelector("#mappopup:not([hidden])");
+  const popup = await page.locator("#mappopup").textContent();
+  ok(/km from/.test(popup), "the popup does not give a distance from the chosen origin");
+  ok(/Open /.test(popup), "the popup has no way into the page");
+  await page.locator(".mappopup-close").click();
+  ok(await page.locator("#mappopup").isHidden(), "the popup will not close");
+  ok(await page.locator("#places").isHidden(), "the places layer starts visible");
+  await page.check('#layers input[value="places"]');
+  ok(!(await page.locator("#places").isHidden()), "the places layer will not turn on");
+
+
   // ── saved places ───────────────────────────────────────────────────
   await page.goto(base + "/europe/norway/fjord-norway/bergen", { waitUntil: "networkidle" });
   await page.click("[data-save]");
   ok((await page.locator("[data-save]").textContent()).includes("✓"), "save button did not confirm");
   await page.goto(base + "/my-europe", { waitUntil: "networkidle" });
   ok((await page.locator("#mine").textContent()).includes("Bergen"), "saved place did not appear in My Europe");
+
+  // Collections — the specification's bucket lists.
+  await page.fill("#collname", "My European Summer");
+  await page.click("#newcoll button[type=submit]");
+  await page.waitForTimeout(120);
+  ok(/My European Summer/.test(await page.locator("#mine").textContent()),
+     "a new collection did not appear");
+  await page.selectOption("[data-move]", "My European Summer");
+  await page.waitForTimeout(120);
+  const mineText = await page.locator("#mine").textContent();
+  ok(mineText.indexOf("My European Summer") < mineText.indexOf("Everything else"),
+     "a saved item did not move into its collection");
+  await page.reload({ waitUntil: "networkidle" });
+  ok(/My European Summer/.test(await page.locator("#mine").textContent()),
+     "the collection did not survive a reload");
 
   // ── no horizontal overflow at phone width ──────────────────────────
   const phone = await browser.newPage({ viewport: { width: 390, height: 844 } });

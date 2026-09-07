@@ -52,24 +52,99 @@
       'there is no copy anywhere else, which is the point.</p></div>';
     return;
   }
-  // Group by kind, so a list of thirty is still readable. Order is fixed
-  // rather than by count, so the page does not rearrange itself under you.
+  /* Collections — the specification's bucket lists. A saved item carries a
+   * list name or nothing; "Everything else" is the absence of one rather
+   * than a real collection, so nobody has to create one to save something.
+   * All of it is still this browser's localStorage and nothing else. */
+  var COLL_KEY = "europedoor.collections.v1";
+  function readColls() {
+    try { return JSON.parse(localStorage.getItem(COLL_KEY) || "[]"); } catch (e) { return []; }
+  }
+  function writeColls(c) {
+    try { localStorage.setItem(COLL_KEY, JSON.stringify(c)); return true; } catch (e) { return false; }
+  }
+  var colls = readColls();
+
   var ORDER = ["Itinerary", "Place", "Journey", "Theme", "Story"];
-  var groups = {};
-  list.forEach(function (x) { (groups[x.kind || "Place"] = groups[x.kind || "Place"] || []).push(x); });
-  var html = "<h2>" + list.length + (list.length === 1 ? " saved item" : " saved items") + "</h2>";
-  ORDER.concat(Object.keys(groups).filter(function (k) { return ORDER.indexOf(k) < 0; }))
-    .forEach(function (k) {
-      if (!groups[k] || !groups[k].length) return;
-      html += "<h3>" + k + (groups[k].length === 1 ? "" : "s") + "</h3><div class=\"rows\">" +
-        groups[k].map(function (x) {
-          return '<a class="row" href="' + x.url + '"><div><h3>' + x.label +
-            '</h3></div><p class="rowmeta">saved</p></a>';
-        }).join("") + "</div>";
+
+  function rowHtml(x, i) {
+    var opts = ['<option value="">Everything else</option>'].concat(
+      colls.map(function (c) {
+        return '<option value="' + esc(c) + '"' + (x.list === c ? " selected" : "") + ">" +
+          esc(c) + "</option>";
+      })
+    ).join("");
+    return '<div class="row saved"><div><h3><a href="' + x.url + '">' + esc(x.label) + "</a></h3>" +
+      '<p class="rowsub">' + esc(x.kind || "Place") + "</p></div>" +
+      '<p class="rowmeta"><label class="visually-hidden" for="coll' + i + '">Collection for ' +
+      esc(x.label) + "</label>" +
+      '<select id="coll' + i + '" data-move="' + i + '">' + opts + "</select> " +
+      '<button type="button" class="linkish" data-drop="' + i + '">remove</button></p></div>';
+  }
+
+  function esc(x) {
+    return String(x).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
     });
-  mine.innerHTML = html +
-    '<p style="margin-top:var(--s5)"><button class="btn ghost" id="clearmine">Clear the list</button></p>';
-  document.getElementById("clearmine").addEventListener("click", function () {
-    if (write([])) location.reload();
-  });
+  }
+
+  function render() {
+    var html = "<h2>" + list.length + (list.length === 1 ? " saved item" : " saved items") +
+      (colls.length ? " in " + colls.length + (colls.length === 1 ? " collection" : " collections") : "") +
+      "</h2>";
+
+    html += '<form class="form" id="newcoll"><div class="field">' +
+      '<label for="collname">Start a collection</label>' +
+      '<input type="text" id="collname" placeholder="My European Summer" autocomplete="off">' +
+      "</div><div class=\"hero-actions\" style=\"margin-top:0\">" +
+      '<button class="btn ghost" type="submit">Create it</button></div></form>';
+
+    var buckets = {};
+    list.forEach(function (x, i) { (buckets[x.list || ""] = buckets[x.list || ""] || []).push([x, i]); });
+    var names = colls.slice();
+    if (buckets[""]) names.push("");
+    names.forEach(function (name) {
+      var items = buckets[name] || [];
+      html += "<h3>" + esc(name || "Everything else") + " <span class=\"small\">" +
+        items.length + "</span></h3>";
+      if (!items.length) {
+        html += '<p class="small">Nothing in this one yet — move something into it below.</p>';
+        return;
+      }
+      items.sort(function (a, b) {
+        return ORDER.indexOf(a[0].kind || "Place") - ORDER.indexOf(b[0].kind || "Place");
+      });
+      html += '<div class="rows">' + items.map(function (pair) {
+        return rowHtml(pair[0], pair[1]);
+      }).join("") + "</div>";
+    });
+
+    mine.innerHTML = html +
+      '<p style="margin-top:var(--s5)"><button class="btn ghost" id="clearmine">Clear everything</button></p>';
+
+    document.getElementById("clearmine").addEventListener("click", function () {
+      if (write([]) && writeColls([])) location.reload();
+    });
+    document.getElementById("newcoll").addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var name = document.getElementById("collname").value.trim();
+      if (!name || colls.indexOf(name) >= 0) return;
+      colls.push(name);
+      if (writeColls(colls)) render();
+    });
+    mine.querySelectorAll("[data-move]").forEach(function (sel) {
+      sel.addEventListener("change", function () {
+        list[Number(sel.getAttribute("data-move"))].list = sel.value || undefined;
+        if (write(list)) render();
+      });
+    });
+    mine.querySelectorAll("[data-drop]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        list.splice(Number(b.getAttribute("data-drop")), 1);
+        if (write(list)) render();
+      });
+    });
+  }
+
+  render();
 })();

@@ -52,6 +52,25 @@ def advisory_note(c):
 </div>"""
 
 
+def daily_line(data, c):
+    """The daily band in euros and, where the country does not use the euro,
+    in its own money — because "€90 a day" in Norway means nothing until you
+    have seen it as kroner."""
+    lo, hi = c["daily_eur"]
+    cur = c["currency"].split(" ")[0]
+    cx = data["taxonomy"].get("currencies", {})
+    rate = cx.get("rates", {}).get(cur)
+    line = f"€{lo}–{hi} per person"
+    if rate and cur != "EUR":
+        sym = cx.get("symbols", {}).get(cur, cur + " ")
+        step = 10 if rate * lo < 2000 else 100
+        rlo = int(round(lo * rate / step) * step)
+        rhi = int(round(hi * rate / step) * step)
+        line += (f' <span class="small">≈ {esc(sym)}{rlo:,}–{rhi:,} '
+                 f'<a href="/help#currency">indicative</a></span>')
+    return line
+
+
 def checked_line(c):
     """Every country page says when its practical facts were last verified.
     For almost all of them the honest answer is "never", and printing that is
@@ -293,7 +312,7 @@ def country_page(data, c):
         ("Currency", esc(c["currency"])),
         ("Languages", esc(", ".join(c["languages"]))),
         ("Membership", esc(bloc_line(data, c))),
-        ("Typical day", f"€{c['daily_eur'][0]}–{c['daily_eur'][1]} per person"),
+        ("Typical day", daily_line(data, c)),
         ("Best months", esc(months_line(data, c["season"]["peak"]))),
         ("Quieter months", esc(months_line(data, c["season"].get("shoulder", [])))),
         ("Facts checked", checked_line(c)),
@@ -1585,18 +1604,36 @@ def project(lat, lon):
 
 
 def map_page(data):
-    dots = []
+    dots, info, placedots = [], {}, []
     for cid, n in sorted(data["cities"].items()):
         c, r, t = n["country"], n["region"], n["city"]
         x, y = project(t["lat"], t["lon"])
         tags = " ".join(sorted(set(t["interests"]) | set(r["interests"])))
         adv = " advisory" if c.get("advisory") else ""
         dots.append(
-            f'<a class="dot{adv}" href="{urls.city(c, r, t)}" data-tags="{esc(tags)}" '
+            f'<a class="dot{adv}" id="dot-{esc(cid.replace("/", "-"))}" '
+            f'href="{urls.city(c, r, t)}" data-tags="{esc(tags)}" data-id="{esc(cid)}" '
             f'data-name="{esc(t["name"])}" data-country="{esc(c["name"])}">'
             f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.2"></circle>'
             f'<title>{esc(t["name"])}, {esc(c["name"])}</title></a>'
         )
+        # What the popup shows. Sent as data rather than read out of the DOM
+        # so the summary can be a sentence rather than a title attribute.
+        info[cid] = {
+            "n": t["name"], "c": c["name"], "r": r["name"],
+            "s": t["summary"], "u": urls.city(c, r, t),
+            "i": sorted(set(t["interests"]) | set(r["interests"])),
+            "la": t["lat"], "lo": t["lon"],
+            "p": len(t.get("places", [])), "e": len(t.get("experiences", [])),
+            "adv": bool(c.get("advisory")),
+        }
+        for pl in t.get("places", []):
+            px, py = project(pl["lat"], pl["lon"])
+            placedots.append(
+                f'<a class="placedot" href="{urls.place(c, r, t, pl)}">'
+                f'<circle cx="{px:.1f}" cy="{py:.1f}" r="2.6"></circle>'
+                f'<title>{esc(pl["name"])} · {esc(PLACE_KIND_NAMES[pl["kind"]])}</title></a>'
+            )
     filters = "".join(
         f'<label><input type="checkbox" name="layer" value="{esc(i["slug"])}">'
         f'<span aria-hidden="true">{esc(i["icon"])}</span> {esc(i["name"])}</label>'
@@ -1614,6 +1651,11 @@ def map_page(data):
                         "name": n["city"]["name"]})
         jdata.append({"slug": j["slug"], "name": j["name"], "days": j["days"],
                       "url": urls.journey(j), "pts": pts})
+    fromoptions = "".join(
+        f'<option value="{esc(cid)}">{esc(n["city"]["name"])}, {esc(n["country"]["name"])}</option>'
+        for cid, n in sorted(data["cities"].items(),
+                             key=lambda kv: (kv[1]["country"]["name"], kv[1]["city"]["name"]))
+    )
     joptions = "".join(
         f'<option value="{esc(j["slug"])}">{esc(j["name"])} — {j["days"]} days</option>'
         for j in data["journeys"]
@@ -1627,11 +1669,17 @@ def map_page(data):
   third-party map service, nothing loaded from anyone else's server. Turn on a layer to see
   where in Europe that thing actually is.</p>
 </div>
-<div class="checks" id="layers">{filters}</div>
+<div class="checks" id="layers">{filters}
+  <label><input type="checkbox" name="extra" value="places"> ◦ Places ({len(placedots)})</label>
+</div>
 <div class="form-row" style="margin:var(--s4) 0;max-width:34rem">
   <div class="field">
     <label for="journeylayer">Draw a journey over it</label>
     <select id="journeylayer"><option value="">None</option>{joptions}</select>
+  </div>
+  <div class="field">
+    <label for="mapfrom">Measure distances from</label>
+    <select id="mapfrom"><option value="">Nowhere in particular</option>{fromoptions}</select>
   </div>
 </div>
 <p class="small" id="mapcount"></p>
@@ -1639,11 +1687,14 @@ def map_page(data):
 <svg viewBox="0 0 {MAP_W} {MAP_H}" class="europemap" role="img" aria-label="Map of European cities in the Atlas">
 <rect width="{MAP_W}" height="{MAP_H}" fill="none"/>
 <g id="route"></g>
+<g id="places" hidden>{''.join(placedots)}</g>
 <g id="dots">{''.join(dots)}</g>
 </svg>
 </div>
+<div id="mappopup" class="mappopup" hidden aria-live="polite"></div>
 <p class="small" id="routenote"></p>
 {jsonscript("EUROPEDOOR_JOURNEYS", jdata)}
+{jsonscript("EUROPEDOOR_MAPINFO", info)}
 <div class="note">
   <h2 class="mini">What this drawing is and is not</h2>
   <p>It is a point map on an equirectangular projection, corrected at 52°N. There are no
@@ -1865,10 +1916,16 @@ def my_europe_page(data):
 
 def method_page(data):
     from .score import methodology_rows
+    from .score import REFUSED
     rows = "".join(
         f'<div class="row"><div><h3>{esc(name)}</h3><p class="rowsub">{esc(formula)}</p></div>'
         f'<p class="rowmeta">0–97</p></div>'
         for name, formula in methodology_rows()
+    )
+    refused = "".join(
+        f'<div class="row"><div><h3>{esc(name)}</h3><p class="rowsub">{esc(why)}</p></div>'
+        f'<p class="rowmeta">not computed</p></div>'
+        for name, why in REFUSED.items()
     )
     body = f"""
 {crumbs([("Europe", "/discover"), ("Method", None)])}
@@ -1880,6 +1937,10 @@ def method_page(data):
   are how travel sites lose their readers.</p>
 </div>
 <div class="rows">{rows}</div>
+
+{section("Two dimensions this refuses to compute", f'<div class="rows">{refused}</div>',
+         lede="The specification this came from lists ten. Eight are computable from the dataset. These two are not, and an approximation would be worse than the gap.")}
+
 <div class="split" style="margin-top:var(--s7)">
   <div>
     <h2>What the scores are not</h2>
@@ -2590,7 +2651,10 @@ def accessibility_page(data):
 
 
 def help_page(data):
-    blocks = """
+    cx = data["taxonomy"].get("currencies", {})
+    rates_note = (f"Indicative, recorded by hand on {esc(cx.get('as_of', '—'))}, covering "
+                  f"{len(cx.get('rates', {}))} currencies. Rounded hard on purpose.")
+    blocks = f"""
 <div class="split">
   <div>
     <h2>How to use this site</h2>
@@ -2616,6 +2680,12 @@ def help_page(data):
     <h3>Why are there no photographs?</h3>
     <p>Every illustration is generated from the place's own name. No licence to expire, no
     stock library, and no risk of publishing somebody's holiday photograph.</p>
+    <h3 id="currency">Why are the local-currency figures marked indicative?</h3>
+    <p>Because they are. The rates are recorded by hand, dated on this page, rounded hard, and
+    not refreshed automatically. They exist so that "€90 a day" in Norway means something to
+    you before you arrive — not so that you can budget to the krone. Your bank's rate will be
+    worse than the one used here, and the date will keep getting older until there is a live
+    feed and somebody paying for it.</p>
     <h3>Where did my saved places go?</h3>
     <p>They live in the browser you saved them in and nowhere else. A different browser, a
     private window or cleared site data means an empty list — which is the cost of not having
@@ -2625,6 +2695,8 @@ def help_page(data):
     <a href="/countries">Which is which →</a></p>
   </div>
   <aside class="rail">
+    <h2 class="mini">Currency rates</h2>
+    <p>{rates_note}</p>
     <h2 class="mini">Something is wrong</h2>
     <p>Corrections are wanted. <a href="/sources">Sources and corrections →</a></p>
     <h2 class="mini">You run a business here</h2>

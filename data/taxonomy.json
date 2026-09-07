@@ -794,5 +794,49 @@
       "derived": "luxury",
       "subs": []
     }
-  ]
+  ],
+  "currencies": {
+    "as_of": "2026-09-01",
+    "note": "Indicative mid-market rates, rounded, recorded by hand on the date above. They are here so a price band means something in your own currency — not so you can budget to the euro. Your bank's rate will be worse and the date above will get older.",
+    "base": "EUR",
+    "rates": {
+      "EUR": 1,
+      "GBP": 0.85,
+      "CHF": 0.94,
+      "NOK": 11.5,
+      "SEK": 11.0,
+      "DKK": 7.46,
+      "ISK": 145,
+      "PLN": 4.3,
+      "CZK": 25.0,
+      "HUF": 395,
+      "RON": 5.0,
+      "BGN": 1.96,
+      "RSD": 117,
+      "BAM": 1.96,
+      "MKD": 61.5,
+      "ALL": 99,
+      "TRY": 41,
+      "GEL": 2.7,
+      "AMD": 385,
+      "AZN": 1.7,
+      "MDL": 17.5,
+      "UAH": 43,
+      "RUB": 95,
+      "BYN": 3.3
+    },
+    "symbols": {
+      "EUR": "€",
+      "GBP": "£",
+      "CHF": "CHF",
+      "NOK": "kr",
+      "SEK": "kr",
+      "DKK": "kr",
+      "ISK": "kr",
+      "PLN": "zł",
+      "CZK": "Kč",
+      "HUF": "Ft",
+      "TRY": "₺"
+    }
+  }
 }

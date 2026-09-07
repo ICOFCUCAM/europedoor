@@ -348,3 +348,24 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .note h2.mini, .rail h2.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1.25; }
 .rail h2.mini + p { margin-top: 0; }
 .rail h2.mini:not(:first-child) { margin-top: var(--s4); }
+
+/* ── the map popup ────────────────────────────────────────────────── */
+.mappopup { position: relative; max-width: 30rem; margin: var(--s4) 0; padding: var(--s5); border: 1px solid var(--ink-3); border-radius: var(--radius); background: var(--paper-2); box-shadow: var(--shadow-lift); }
+.mappopup h2.mini { margin-bottom: var(--s2); }
+.mappopup p { max-width: none; }
+.mappopup p:last-child { margin-bottom: 0; }
+.mappopup-close { position: absolute; top: var(--s2); right: var(--s3); border: 0; background: none; font-size: var(--t-lg); line-height: 1; cursor: pointer; color: var(--ink-3); }
+.mappopup-close:hover { color: var(--door); }
+.europemap .placedot circle { fill: var(--door); opacity: .5; }
+.europemap .placedot:hover circle { opacity: 1; }
+
+/* ── saved rows with a collection picker ──────────────────────────── */
+.row.saved { grid-template-columns: minmax(0,1fr) auto; }
+.row.saved select { font: inherit; font-size: var(--t-sm); padding: 2px var(--s2); border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper); color: var(--ink); }
+.linkish { border: 0; background: none; padding: 0 0 0 var(--s2); color: var(--ink-3); cursor: pointer; font: inherit; font-size: var(--t-xs); text-decoration: underline; }
+.linkish:hover { color: var(--warn); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* The hidden attribute has no effect on an SVG <g> without this, which is
+   how the map's places layer shipped visible when it was marked hidden. */
+[hidden] { display: none !important; }
