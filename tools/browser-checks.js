@@ -232,6 +232,54 @@ async function main() {
      `favouring a saved place did not put it in the route: ${withSaved.route}`);
   await page.evaluate(() => localStorage.removeItem("europedoor.saved.v1"));
 
+  // ── refusing, instead of fabricating ───────────────────────────────
+  // The UI specification's sharpest line: "Do not fabricate a result just to
+  // avoid an error." This planner scores every city in the Atlas, so it can
+  // always return SOMETHING — which is exactly the failure being described.
+  await page.goto(base + "/plan", { waitUntil: "networkidle" });
+  await page.fill("#days", "21");
+  await page.fill("#budget", "300");
+  await page.selectOption("#style", "high");
+  await page.selectOption("#accommodation", "hotel");
+  await page.click('#planner button[type="submit"]');
+  await page.waitForSelector("#result .note.warn");
+  const refused = await page.locator("#result").innerHTML();
+  ok(/could not build a journey we would stand behind/.test(refused),
+     "a hopeless budget produced a confident itinerary instead of a refusal");
+  ok(/against a budget of/.test(refused), "the refusal did not name the constraint");
+  ok(/data-focus="budget"/.test(refused),
+     "the refusal did not offer the control that would fix it");
+  ok(await page.locator("#result .leg").count() === 0,
+     "the refusal rendered the rejected itinerary as if it were an answer");
+  // Never a dead end: the rejected plan is available, marked as rejected.
+  await page.click("#result details summary");
+  await page.waitForSelector("#result details .leg");
+  ok(await page.locator("#result details .leg").count() > 0,
+     "the rejected plan could not be inspected at all");
+
+  // And the refusal must not fire on a budget the reader never gave. The
+  // first version refused "three weeks in the Alps, luxury" against our own
+  // €2,500 default, which is refusing our own assumption.
+  await page.goto(base + "/plan", { waitUntil: "networkidle" });
+  await page.fill("#ask", "three weeks by train through the alps in winter, luxury");
+  await page.click('#askform button[type="submit"]');
+  await page.waitForSelector("#result .leg");
+  const assumed = await page.locator("#result").innerHTML();
+  ok(!/could not build a journey/.test(assumed),
+     "the planner refused against a budget the sentence never stated");
+  ok(/over budget/.test(assumed),
+     "an expensive plan on an assumed budget said nothing about the cost");
+
+  // ── the staged wait ────────────────────────────────────────────────
+  // Never a bare "Loading…". Each step is ticked when its work has actually
+  // finished, so a failure marks where it stopped.
+  const js = await (await page.request.get(base + "/assets/js/planner.js")).text();
+  ok(/Building your journey/.test(js), "there is no staged wait");
+  ok(/Understanding what you asked for/.test(js), "the wait does not say what it is doing");
+  ok(!/>Loading\.\.\.</.test(js) && !/>Loading…</.test(js),
+     "a bare Loading… survived somewhere");
+  ok(/role="status"/.test(js), "the staged wait is not announced to a screen reader");
+
   // ── My Europe: moving a saved list between browsers ────────────────
   // The specification files "a saved journey follows you between devices"
   // under authentication. It needs authentication only if the copy happens
@@ -548,8 +596,18 @@ async function main() {
 
   // ── saved places ───────────────────────────────────────────────────
   await page.goto(base + "/europe/norway/fjord-norway/bergen", { waitUntil: "networkidle" });
-  await page.click("[data-save]");
-  ok((await page.locator("[data-save]").textContent()).includes("✓"), "save button did not confirm");
+  // A destination carries the save action twice: the rail, and the sticky bar
+  // a phone shows. Pressing one must relabel both — the first version
+  // relabelled only the button that was clicked, so the other went on
+  // offering to save something already saved. (The phone block below clicks
+  // the other one; this is the desktop half of the same assertion.)
+  await page.click("[data-save]:not([data-short])");
+  ok((await page.locator("[data-save]:not([data-short])").textContent()).includes("✓"),
+     "save button did not confirm");
+  ok((await page.locator("[data-save][data-short]").textContent()).includes("✓"),
+     "saving from the rail did not update the sticky bar's button");
+  ok(await page.locator('[data-save][aria-pressed="true"]').count() === 2,
+     "the save buttons did not report their pressed state to assistive tech");
   await page.goto(base + "/my-europe", { waitUntil: "networkidle" });
   ok((await page.locator("#mine").textContent()).includes("Bergen"), "saved place did not appear in My Europe");
 
@@ -588,6 +646,86 @@ async function main() {
     const h1 = await phone.locator("h1").count();
     ok(h1 === 1, `${url} has ${h1} h1 elements`);
   }
+
+  // ── the thumb bar and the sticky action, on a phone ────────────────
+  // Both are display:none above 44rem, so they can only be tested here.
+  await phone.goto(base + "/europe/norway/fjord-norway/bergen", { waitUntil: "networkidle" });
+  const bottomLinks = phone.locator(".bottomnav a");
+  ok(await bottomLinks.count() === 5, "the thumb bar does not carry five items");
+  for (let i = 0; i < 5; i++) {
+    const box = await bottomLinks.nth(i).boundingBox();
+    // WCAG 2.2 AA sets a 24x24 floor for a target; 44 is the comfortable
+    // version, and a bar meant for a thumb has no excuse for less.
+    ok(box && box.height >= 44 && box.width >= 44,
+       `thumb bar item ${i} is ${box && Math.round(box.width)}x${box && Math.round(box.height)}, under 44px`);
+  }
+  ok(await phone.locator('.bottomnav a[aria-current="page"]').count() === 1,
+     "the thumb bar does not say where you are");
+  ok(/Explore/.test(await phone.locator('.bottomnav a[aria-current="page"]').textContent()),
+     "a destination page did not light Explore in the thumb bar");
+
+  // "Add to my journey", never "Book now". There is nothing to book.
+  const cta = phone.locator(".stickycta");
+  ok(await cta.isVisible(), "the sticky action is not shown on a destination page");
+  const ctaText = await cta.textContent();
+  ok(/Add to my journey/.test(ctaText), "the sticky action does not offer the journey");
+  ok(!/Book/i.test(ctaText), "a booking button appeared on a site with nothing to book");
+  const ctaBox = await cta.boundingBox();
+  const navBox = await phone.locator(".bottomnav").boundingBox();
+  ok(ctaBox.y + ctaBox.height <= navBox.y + 1,
+     "the sticky action overlaps the thumb bar");
+
+  // Saving from the sticky bar must relabel the button in the rail too.
+  await phone.click("[data-save][data-short]");
+  ok((await phone.locator("[data-save][data-short]").textContent()).includes("✓"),
+     "the compact save button did not confirm");
+  ok((await phone.locator("[data-save]:not([data-short])").textContent()).includes("✓"),
+     "saving from the sticky bar did not update the button in the rail");
+  await phone.evaluate(() => localStorage.clear());
+
+  // The bars must not cover the end of the page.
+  await phone.goto(base + "/europe/norway/fjord-norway/bergen", { waitUntil: "networkidle" });
+  const covered = await phone.evaluate(() => {
+    window.scrollTo(0, document.body.scrollHeight);
+    const links = Array.from(document.querySelectorAll(".footer-nav a"));
+    const last = links[links.length - 1].getBoundingClientRect();
+    const bar = document.querySelector(".stickycta").getBoundingClientRect();
+    return last.bottom > bar.top;
+  });
+  ok(!covered, "the sticky bars cover the last link on the page");
+
+  // And they must not appear where they do not belong.
+  await phone.goto(base + "/plan", { waitUntil: "networkidle" });
+  ok(await phone.locator(".stickycta").count() === 0,
+     "the destination action appeared on a page with no destination");
+  ok(await phone.locator(".bottomnav").isVisible(), "the thumb bar is missing on /plan");
+
+  // ── the destination page's own contents ────────────────────────────
+  await phone.goto(base + "/europe/norway/fjord-norway/bergen", { waitUntil: "networkidle" });
+  const tabs = phone.locator(".sectionnav a");
+  ok(await tabs.count() >= 3, "the section nav did not render");
+  // A tab pointing at an anchor that is not on the page is worse than no tab.
+  const anchors = await tabs.evaluateAll((as) => as.map((a) => a.getAttribute("href")));
+  for (const a of anchors) {
+    ok(await phone.locator(a).count() === 1, `section nav links to ${a}, which is not on the page`);
+  }
+  // It scrolls sideways rather than wrapping, so the page below it does not
+  // move by a different amount on every destination.
+  const wraps = await phone.evaluate(() => {
+    const n = document.querySelector(".sectionnav");
+    return n.scrollHeight > n.clientHeight + 4;
+  });
+  ok(!wraps, "the section nav wraps instead of scrolling");
+
+  // ── the map, as a list ─────────────────────────────────────────────
+  // A point map is a picture; role="img" says what it is of and nothing more.
+  await phone.goto(base + "/map", { waitUntil: "networkidle" });
+  const described = await phone.getAttribute(".europemap", "aria-describedby");
+  ok(described === "maplist", "the map does not point at its text alternative");
+  ok(await phone.locator("#maplist").count() === 1, "there is no text alternative to the map");
+  const listed = await phone.locator("#maplist li a").count();
+  const dotted = await phone.locator("#dots .dot").count();
+  ok(listed === dotted, `the map draws ${dotted} places and lists ${listed}`);
 
   // The map is allowed to scroll inside its own container, and must not
   // make the page scroll.

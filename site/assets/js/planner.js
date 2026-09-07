@@ -415,11 +415,121 @@
     return days;
   }
 
-  function render(route, opts) {
+  /* The UI specification's rule for the error state, and the sharpest
+   * sentence in it: "Do not fabricate a result just to avoid an error."
+   *
+   * This planner will always return SOMETHING — it scores every city in the
+   * Atlas, so there is always a best one — and that is exactly the failure
+   * mode being described. A three-day request that names two interests
+   * nothing carries still gets a route; it is just a route that answers a
+   * different question from the one asked, presented with the same
+   * confidence as a good one.
+   *
+   * So the refusal is a real check, made after planning and before
+   * rendering, and it names the constraint rather than saying "no results".
+   * Each reason carries the field that would fix it. */
+  function whyUnreliable(route, opts) {
     if (!route.length) {
-      result.innerHTML = '<div class="note warn"><p>Nothing in the Atlas fits that yet. Try more days, or fewer interests at once.</p></div>';
-      return;
+      return ["Nothing in the Atlas fits that yet.",
+              "That usually means several interests at once that no one place carries.",
+              "interest"];
     }
+    // A trip whose stops do not fill the days is not an itinerary; it is a
+    // list with gaps we would be papering over.
+    var nights = 0;
+    for (var i = 0; i < route.length; i++) nights += route[i].nights;
+    if (opts.days >= 4 && nights < Math.ceil((opts.days - 1) * 0.6)) {
+      return ["We could only fill " + nights + " of your " + opts.days + " days.",
+              "The constraints rule out too much of the Atlas to build the rest honestly.",
+              "days"];
+    }
+    // Interests that scored nothing anywhere. Returning a route built on the
+    // ones that did match, without saying so, is answering a question the
+    // reader did not ask.
+    if (opts.wants && opts.wants.length) {
+      var covered = {};
+      route.forEach(function (st) {
+        (st.city.interests || []).forEach(function (i) { covered[i] = true; });
+      });
+      var missed = opts.wants.filter(function (w) { return !covered[w]; });
+      if (missed.length >= Math.ceil(opts.wants.length / 2)) {
+        return ["This route does not actually deliver " + missed.join(", ") + ".",
+                "Those are half or more of what you asked for, so calling it your itinerary " +
+                "would be overstating it.",
+                "interest"];
+      }
+    }
+    /* The budget check is a refusal only when it is hopeless, and only when
+     * the budget is the reader's rather than ours.
+     *
+     * The first version of this refused "three weeks by train through the
+     * Alps in winter, luxury" at €4,686 against €2,500 — a budget that
+     * sentence never mentioned and that we had filled in as a default. That
+     * is refusing our own assumption and telling the reader they asked for
+     * something impossible. If they did not state a budget, show the plan
+     * and let the over-budget verdict do its quieter job. */
+    var c = costing(route, opts);
+    if (opts.budgetStated && opts.budget && c.total > opts.budget * 1.8) {
+      return [money(c.total) + " against a budget of " + money(opts.budget) + ".",
+              "That is not a plan you can take. Widen the budget, shorten the trip, or " +
+              "choose guesthouses and rail.",
+              "budget"];
+    }
+    return null;
+  }
+
+  function renderRefusal(why, route, opts) {
+    /* Never a dead end: it says what went wrong, which control fixes it, and
+     * offers the nearest thing that would work — because "adjust your
+     * preferences" with nothing behind it is the same as no answer. */
+    var suggestions = [];
+    if (opts.days < 10) suggestions.push(["days", (opts.days + 4) + " days instead of " + opts.days]);
+    if (opts.wants && opts.wants.length > 2) suggestions.push(["interest", "fewer interests at once"]);
+    if (opts.budget) suggestions.push(["budget", "a wider budget"]);
+    if (opts.transport === "rail") suggestions.push(["transport", "allowing flights"]);
+    result.innerHTML =
+      '<div class="note warn">' +
+      '<h2 class="mini">We could not build a journey we would stand behind</h2>' +
+      "<p><strong>" + why[0] + "</strong> " + why[1] + "</p>" +
+      (suggestions.length
+        ? "<p>Any of these would probably work: " + suggestions.map(function (x) {
+            return '<a href="#' + x[0] + '" data-focus="' + x[0] + '">' + x[1] + "</a>";
+          }).join(", ") + ".</p>"
+        : "") +
+      '<p class="small">We would rather say this than hand you a route that answers a ' +
+      'different question and let you find out in Europe.</p></div>' +
+      (route.length
+        ? '<details class="mt5"><summary>Show it anyway (' + route.length +
+          " stops, and we do not recommend it)</summary><div id=\"anyway\"></div></details>"
+        : "");
+    result.querySelectorAll("[data-focus]").forEach(function (a) {
+      a.addEventListener("click", function (ev) {
+        ev.preventDefault();
+        var f = document.getElementById(a.getAttribute("data-focus"));
+        if (f) { f.scrollIntoView({ behavior: "smooth", block: "center" }); f.focus(); }
+      });
+    });
+    var det = result.querySelector("details");
+    if (det) {
+      det.addEventListener("toggle", function () {
+        if (det.open && !det.dataset.done) { det.dataset.done = "1"; drawPlan(route, opts, det.querySelector("#anyway")); }
+      });
+    }
+  }
+
+  function render(route, opts) {
+    var why = whyUnreliable(route, opts);
+    if (why) { renderRefusal(why, route, opts); return; }
+    drawPlan(route, opts, result);
+  }
+
+  /* `into` exists so the refusal can render the rejected plan inside its own
+   * <details> without touching the main result element. Never reassign the
+   * module-level `result` here: a previous version did, and every subsequent
+   * plan then rendered inside a collapsed details block from a request two
+   * screens ago. */
+  function drawPlan(route, opts, into) {
+    var out = into || result;
     CUR = opts.currency || "EUR";
     var c = costing(route, opts);
     var day = 1, legs = "", i, hop, countries = [];
@@ -491,7 +601,7 @@
     var totalKm = 0;
     for (i = 1; i < route.length; i++) totalKm += km(route[i - 1].city, route[i].city);
 
-    result.innerHTML =
+    out.innerHTML =
       '<h2 class="mt7">' + opts.days + " days, " + route.length +
         " stops, " + countries.length + (countries.length === 1 ? " country" : " countries") + "</h2>" +
       '<dl class="result-summary">' +
@@ -521,7 +631,7 @@
       money(ACTIVITY_PER_DAY[opts.style]) + ' a day for this spending style. ' +
       '<a href="/sources">How these numbers are made</a>.</p>';
 
-    wireSaveAndShare(route, opts);
+    wireSaveAndShare(route, opts, out);
   }
 
 
@@ -838,11 +948,15 @@
     return out.length ? out : null;
   }
 
-  function wireSaveAndShare(route, opts) {
+  /* Scoped to the container the plan was drawn into: getElementById would
+   * find the first #saveplan on the page, which is the wrong one whenever a
+   * rejected plan is open in its own details block below a good one. */
+  function wireSaveAndShare(route, opts, out) {
+    var scope = out || document;
     var url = planUrl(route, opts);
-    var state = document.getElementById("planstate");
-    var save = document.getElementById("saveplan");
-    var share = document.getElementById("shareplan");
+    var state = scope.querySelector("#planstate");
+    var save = scope.querySelector("#saveplan");
+    var share = scope.querySelector("#shareplan");
     if (!save || !share) return;
 
     var label = opts.days + " days: " + route.map(function (s) { return s.city.name; }).join(" → ");
@@ -977,7 +1091,13 @@
     if (e) e.preventDefault();
     currentGeo = [];
     var opts = readForm();
-    render(plan(opts), opts);
+    // Submitting the form is stating the budget: the number is on screen in
+    // a field the reader just used.
+    opts.budgetStated = true;
+    stage(2);
+    var route = plan(opts);
+    stage(4);
+    render(route, opts);
     result.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -1008,11 +1128,15 @@
     if (e) e.preventDefault();
     var text = document.getElementById("ask").value;
     if (!text.trim()) { go(); return; }
+    stage(1);
     var got = parseAsk(text, ATLAS.cities);
     applyAsk(got);
     currentGeo = got.geo || [];
     var opts = readForm();
+    opts.budgetStated = !!got.budget;
+    stage(2);
     var route = plan(opts);
+    stage(4);
     render(route, opts);
     result.insertAdjacentHTML("afterbegin", readbackHtml(got) + followUps(got));
     result.querySelectorAll("[data-focus]").forEach(function (a) {
@@ -1025,10 +1149,49 @@
     result.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  /* The staged wait, from the UI specification: never a bare "Loading…".
+   *
+   * The steps are real. Each one is ticked when the work it names has
+   * actually finished, so this is a progress report rather than a stalling
+   * animation — the difference matters the day something is slow, because a
+   * fake sequence stops at a step that already completed and tells the
+   * reader nothing about where it stuck.
+   *
+   * The planner itself runs in single-digit milliseconds, so the honest
+   * thing on a fast connection is for this to be gone before it is read.
+   * There is no minimum display time: padding a wait to show off the
+   * animation is exactly the trick this is supposed to replace.
+   */
+  var STEPS = [
+    "Loading the Atlas",
+    "Understanding what you asked for",
+    "Scoring every destination",
+    "Building the route",
+    "Estimating what it costs",
+  ];
+
+  function stage(done, failedAt) {
+    var html = '<div class="note staged" role="status"><h2 class="mini">Building your journey</h2><ul class="stages">';
+    for (var i = 0; i < STEPS.length; i++) {
+      var mark = i < done ? "done" : (i === done ? "now" : "todo");
+      if (failedAt === i) mark = "failed";
+      var glyph = mark === "done" ? "✓" : mark === "failed" ? "✕" : mark === "now" ? "●" : "○";
+      html += '<li class="' + mark + '"><span aria-hidden="true">' + glyph + "</span> " +
+              STEPS[i] + (mark === "failed" ? " — this is where it stopped" : "") + "</li>";
+    }
+    result.innerHTML = html + "</ul></div>";
+  }
+
+  stage(0);
+
   fetch("/api/atlas.json")
-    .then(function (r) { return r.json(); })
+    .then(function (r) {
+      if (!r.ok) throw new Error(r.status);
+      return r.json();
+    })
     .then(function (json) {
       ATLAS = json;
+      stage(1);
       fillStarts();
       applyUrlState();
       form.addEventListener("submit", go);
@@ -1042,7 +1205,14 @@
       }
     })
     .catch(function () {
-      result.innerHTML = '<div class="note warn"><p>The Atlas index did not load, so the planner ' +
-        'cannot run. <a href="/atlas">Browse the Atlas directly</a>.</p></div>';
+      /* Name the step it died on rather than replacing everything with a
+       * generic apology: "the index did not load" is a different problem
+       * from "the planner crashed", and the reader can tell which from
+       * this. */
+      stage(0, 0);
+      result.insertAdjacentHTML("beforeend",
+        '<div class="note warn"><p>The Atlas index did not load, so the planner ' +
+        'cannot run. That is our end, not yours — reloading often fixes it. ' +
+        '<a href="/countries">Browse the Atlas directly</a> in the meantime.</p></div>');
     });
 })();

@@ -21,6 +21,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | naming, branding, domains | **`docs/brand-lock.md`** — settled, and enforced |
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
 | **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,250 assertions against the real build, and CI fails if any of them stops being true |
+| **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence: 37 sections, 168 assertions |
 
 ## The rules that catch people out
 
@@ -62,6 +63,13 @@ style attributes, so one of them would force `style-src` open on all 987
 pages). `checks.py` fails on either. `frame-ancestors` lives in `site/_headers`
 only, because a browser ignores it in a meta tag and logs that it did.
 
+**Two fixed bars on a phone, one token.** `--thumbbar` is the height of the
+bottom navigation, and the sticky destination action, the footer padding and
+the destination-page footer padding all derive their offsets from it. The
+first version hard-coded 44px in those offsets while the bar rendered at 63,
+so the action sat on top of the navigation. Only measuring both boxes in
+Chromium finds that.
+
 **A verification record expires.** A check is good for `REVIEW_DAYS` and then
 reads as *due for review* again. Confidence is derived from the source kind
 and the age of the check — the validator refuses an authored `confidence`
@@ -75,13 +83,14 @@ worth making.
 
 ## Gates
 
-Run all six before claiming anything is done.
+Run all seven before claiming anything is done.
 
     python3 tools/build.py check       validate the data
     python3 tools/build.py            987 pages
     python3 tools/checks.py            25 checks, ~74,700 things examined
-    node tools/browser-checks.js       347 checks in Chromium, incl. accessibility
+    node tools/browser-checks.js       389 checks in Chromium, incl. accessibility
     python3 tools/section-audit.py --check   the 99 spec sections, 1,250 assertions
+    python3 tools/ux-audit.py --check        the 37 UI/UX sections, 168 assertions
     python3 tools/content-report.py --write  what is missing, against the spec's targets
 
 The browser checks need `npm install playwright` and take a couple of
@@ -94,8 +103,8 @@ and calling it an itinerary. None of those was findable by reading the code.
 They launch the sandbox's own Chromium via `executablePath` because the npm
 package version will not match the installed browser build.
 
-**Two of the gates write files.** `section-audit.py --write` and
-`content-report.py --write` regenerate documents that CI then checks for
+**Three of the gates write files.** `section-audit.py --write`, `ux-audit.py --write`
+and `content-report.py --write` regenerate documents that CI then checks for
 staleness, exactly like `site/`. Run them and commit the result.
 
 ## Adding a country

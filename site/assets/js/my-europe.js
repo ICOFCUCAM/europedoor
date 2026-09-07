@@ -19,8 +19,25 @@
     catch (e) { return false; }
   }
 
+  /* A destination page carries the same save action twice — once in the rail
+   * and once in the sticky bar a phone shows — so relabelling only the
+   * button that was pressed leaves the other one saying "Save" for something
+   * already saved. Every button for an id is relabelled together.
+   *
+   * data-short lets the compact one say "Save" / "Saved ✓" without the
+   * full wording, which does not fit a thumb bar. */
   function label(btn, saved) {
-    btn.textContent = saved ? "Saved to My Europe ✓" : "Save to My Europe";
+    if (btn.hasAttribute("data-short")) {
+      btn.textContent = saved ? "Saved ✓" : "Save";
+    } else {
+      btn.textContent = saved ? "Saved to My Europe ✓" : "Save to My Europe";
+    }
+    btn.setAttribute("aria-pressed", saved ? "true" : "false");
+  }
+
+  function labelAll(id, saved) {
+    document.querySelectorAll('[data-save="' + id.replace(/"/g, '\\"') + '"]')
+      .forEach(function (b) { label(b, saved); });
   }
 
   document.querySelectorAll("[data-save]").forEach(function (btn) {
@@ -38,7 +55,7 @@
         btn.textContent = "This browser will not let us save";
         return;
       }
-      label(btn, at < 0);
+      labelAll(id, at < 0);
     });
   });
 

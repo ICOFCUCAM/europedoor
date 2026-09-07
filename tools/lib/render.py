@@ -189,6 +189,48 @@ def headers_file():
     return "\n".join(lines) + "\n"
 
 
+# The mobile bottom bar, from the UI specification: Home, Explore, Map, Plan,
+# Me. Five items and no more — a sixth turns a bar you can hit with a thumb
+# into a row of targets you have to aim at.
+#
+# It is not a second navigation. Every destination here is already in the
+# masthead or the footer; this is the same site reachable from where a thumb
+# actually is. That matters because the masthead is sticky and the seven
+# primary items wrap on a phone, which puts the important ones off the first
+# line.
+BOTTOM_NAV = [
+    ("/", "Home", "M3 10.5 12 3l9 7.5V21H3z"),
+    ("/discover", "Explore", "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm3.5 5.5-2 5-5 2 2-5z"),
+    ("/map", "Map", "M9 3 3 5.5v15L9 18l6 3 6-2.5v-15L15 6zM9 3v15M15 6v15"),
+    ("/plan", "Plan", "M4 5h16M4 12h16M4 19h10"),
+    ("/my-europe", "Me", "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0"),
+]
+
+
+def bottom_nav(path):
+    """The five-item thumb bar. Marked current by prefix, not by equality,
+    so a city page lights Explore rather than nothing."""
+    out = []
+    for href, label, d in BOTTOM_NAV:
+        if href == "/":
+            here = path == "/"
+        else:
+            here = path == href or path.startswith(href + "/")
+        # /europe/... is the Atlas, which is what Explore leads to.
+        if href == "/discover" and (path.startswith("/europe/") or path.startswith("/countries")):
+            here = True
+        mark = ' aria-current="page"' if here else ""
+        out.append(
+            f'<a href="{href}"{mark}>'
+            f'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
+            f'<path d="{d}" fill="none" stroke="currentColor" stroke-width="1.6" '
+            f'stroke-linecap="round" stroke-linejoin="round"/></svg>'
+            f'<span>{esc(label)}</span></a>'
+        )
+    return (f'<nav class="bottomnav" aria-label="{esc(T("nav.aria.bottom"))}">'
+            + "".join(out) + "</nav>")
+
+
 def page(title, body, *, path, description, trail=None, area=None, head_extra="", scripts=(), wide=False):
     nav = []
     for href, label, _blurb in NAV:
@@ -231,6 +273,7 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 <main id="main" class="{'wide' if wide else ''}">
 {body}
 </main>
+{bottom_nav(path)}
 <footer class="footer">
   <div class="footer-in">
     <p class="footer-lede">{esc(T("footer.lede"))}</p>

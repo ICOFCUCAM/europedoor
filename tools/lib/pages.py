@@ -695,6 +695,15 @@ def city_page(data, c, r, t):
 <div class="card-art frame">
 {plate(f"city:{c['slug']}:{t['slug']}", 1260, 540, t['name'])}
 </div>
+{sectionnav([
+    ("Overview", "why-visit"),
+    ("Places", "places" if placerows else ""),
+    ("Things to do", "things-to-do" if exps else ""),
+    ("Events", "events" if festrows else ""),
+    ("Travel tips", "tips"),
+    ("Stay & eat", "stay"),
+    ("Onward", "onward"),
+])}
 {minimap(data, t)}
 <div class="split mt7">
   <div>
@@ -735,14 +744,58 @@ def city_page(data, c, r, t):
 {section("Accommodation & restaurants", STAY_NOTE, id="stay")}
 
 {section("Nearest onward stops", f'<div class="rows">{nearrows}</div>',
+         id="onward",
          lede="Straight-line distance, and what that usually means in practice.")}
 {edges}
+{stickycta(data, c, r, t)}
 """
     return f"/europe/{c['slug']}/{r['slug']}/{t['slug']}/index.html", page(
         f"{t['name']}, {c['name']}", body, path=urls.city(c, r, t), area="countries",
         description=t["summary"][:180],
         scripts=["/assets/js/my-europe.js"],
     )
+
+
+def stickycta(data, c, r, t):
+    """The persistent action on a destination page, on a phone.
+
+    The UI specification says this should be "Add to my journey" rather than
+    "Book now", and is right for a reason worth writing down: a booking
+    button that cannot book is a lie, and this product has nothing to sell.
+    What a reader can actually do here is save the place and start a route
+    from it, so those are the two actions.
+
+    Phone only, and only on a destination page. A bar pinned over every page
+    at every width is a bar that is in the way most of the time.
+    """
+    return f'''<div class="stickycta">
+  <span class="stickycta-where">{esc(t["name"])}</span>
+  <button class="btn ghost" type="button" data-short
+          data-save="city:{esc(c['slug'])}/{esc(r['slug'])}/{esc(t['slug'])}"
+          data-kind="Place" data-label="{esc(t['name'])}, {esc(c['name'])}"
+          data-url="{urls.city(c, r, t)}">Save</button>
+  <a class="btn" href="/plan?from={esc(c['slug'])}%2F{esc(r['slug'])}%2F{esc(t['slug'])}">Add to my journey</a>
+</div>'''
+
+
+def sectionnav(items):
+    """The destination page's own contents, from the UI specification.
+
+    Horizontally scrolling on a phone, a plain row on a desktop. Only
+    sections that actually exist on this page are listed: a tab leading to an
+    anchor that is not there is worse than no tab, because the page silently
+    does not move and the reader assumes they mis-tapped.
+
+    It is a <nav> with real in-page links, so it works with the keyboard,
+    with a screen reader's landmark list, and with JavaScript off — which is
+    the whole reason it is not a JS tab widget.
+    """
+    live = [(label, anchor) for label, anchor in items if anchor]
+    if len(live) < 3:
+        return ""
+    links = "".join(f'<a href="#{esc(a)}">{esc(l)}</a>' for l, a in live)
+    return (f'<nav class="sectionnav" aria-label="On this page">{links}</nav>')
+
 
 
 # ── interests ─────────────────────────────────────────────────────────
@@ -1931,6 +1984,44 @@ def project(lat, lon):
     return x, y
 
 
+def maplist(data):
+    """The map, as a list — the accessible alternative the UI specification
+    asks for.
+
+    A point map is a picture. `role="img"` with a label says what the picture
+    is *of*, and that is all it can do: it cannot tell a screen-reader user
+    that Bergen exists, where it is, or how to open it. So the same 319
+    places are here as text, grouped by macro region and giving each one's
+    coordinates, and the map's `aria-describedby` points at it.
+
+    This is deliberately not `display:none`. It is a <details> that anyone can
+    open, because a "text version" nobody sighted ever sees is a text version
+    that rots — the same reason alt text on a decorative image is worse than
+    no image. It also answers the flat question the map cannot: what is
+    actually in the Atlas, in a form you can search with ctrl-F.
+    """
+    by_macro = {}
+    for cid, n in sorted(data["cities"].items(), key=lambda kv: kv[1]["city"]["name"]):
+        by_macro.setdefault(n["country"]["macro_name"], []).append(n)
+    blocks = []
+    for macro in sorted(by_macro):
+        items = "".join(
+            f'<li><a href="{urls.city(n["country"], n["region"], n["city"])}">'
+            f'{esc(n["city"]["name"])}</a> — {esc(n["country"]["name"])}, '
+            f'{esc(n["region"]["name"])}. '
+            f'<span class="mono">{n["city"]["lat"]:.2f}°N, {n["city"]["lon"]:.2f}°E</span></li>'
+            for n in by_macro[macro]
+        )
+        blocks.append(f'<h3>{esc(macro)} <span class="small">{len(by_macro[macro])}</span></h3>'
+                      f'<ul class="stack cols">{items}</ul>')
+    return (f'<details class="maplist" id="maplist">'
+            f'<summary>Every place on this map, as a list '
+            f'({len(data["cities"])} places, grouped by region)</summary>'
+            f'<p class="small">The map above is a picture and cannot be read out. This is the '
+            f'same data as text, with coordinates, and it is the accessible alternative — not '
+            f'a reduced version of it.</p>{"".join(blocks)}</details>')
+
+
 def map_page(data):
     dots, info, placedots = [], {}, []
     for cid, n in sorted(data["cities"].items()):
@@ -2012,7 +2103,7 @@ def map_page(data):
 </div>
 <p class="small" id="mapcount"></p>
 <div class="mapwrap">
-<svg viewBox="0 0 {MAP_W} {MAP_H}" class="europemap" role="img" aria-label="Map of European cities in the Atlas">
+<svg viewBox="0 0 {MAP_W} {MAP_H}" class="europemap" role="img" aria-describedby="maplist" aria-label="Map of European cities in the Atlas">
 <rect width="{MAP_W}" height="{MAP_H}" fill="none"/>
 <g id="route"></g>
 <g id="places" hidden>{''.join(placedots)}</g>
@@ -2030,6 +2121,8 @@ def map_page(data):
   cities describing Europe's outline by themselves, which is a fair picture of where people
   live. A tiled basemap is a Stage 2 job with a vendor and a bill attached.</p>
 </div>
+
+{maplist(data)}
 """
     return "/map/index.html", page(
         "Map", body, path="/map", area="countries",

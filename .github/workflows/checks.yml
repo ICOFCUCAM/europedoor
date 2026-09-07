@@ -58,6 +58,18 @@ jobs:
             exit 1
           fi
 
+      - name: Audit the UI/UX brief, section by section
+        run: python3 tools/ux-audit.py --check
+
+      - name: Fail if the UX audit document is stale
+        run: |
+          python3 tools/ux-audit.py --write
+          if ! git diff --quiet -- docs/ux-audit.md; then
+            echo "docs/ux-audit.md is out of date. Run: python3 tools/ux-audit.py --write"
+            git diff -- docs/ux-audit.md
+            exit 1
+          fi
+
       - uses: actions/setup-node@v4
         with:
           node-version: "22"

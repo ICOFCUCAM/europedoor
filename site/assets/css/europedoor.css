@@ -518,3 +518,135 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .w98 { width: 98%; }
 .w99 { width: 99%; }
 .w100 { width: 100%; }
+
+/* ── the thumb bar ────────────────────────────────────────────
+ *
+ * From the UI specification: Home, Explore, Map, Plan, Me, on a phone only.
+ * Above 44rem it is display:none and the masthead does the whole job — two
+ * navigations visible at once is two things to keep in step, and the
+ * masthead is the one with room for all seven primary items.
+ *
+ * The 44px minimum is not decoration. WCAG 2.2 AA added a 24x24 target-size
+ * floor and 44 is the comfortable version of it; the browser suite measures
+ * every one of these five and fails below 44.
+ *
+ * env(safe-area-inset-bottom) keeps the labels off the home indicator on a
+ * notched phone, where they otherwise sit underneath it and cannot be read
+ * or tapped.
+ */
+/* One token for the bar's height, because three other rules have to agree
+ * with it: the sticky action sits directly on top of it, and both the footer
+ * and the destination footer have to clear them. The first version hard-coded
+ * 44px in those offsets while the bar actually rendered at 63, so the action
+ * sat on top of the navigation — caught by measuring both boxes in Chromium,
+ * which is the only way that kind of mistake ever shows up. */
+:root { --thumbbar: 3.5rem; }
+.bottomnav { display: none; }
+@media (max-width: 44rem) {
+  .bottomnav {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 45;
+    height: calc(var(--thumbbar) + env(safe-area-inset-bottom, 0));
+    background: color-mix(in srgb, var(--paper) 94%, transparent);
+    backdrop-filter: saturate(1.4) blur(10px);
+    border-top: 1px solid var(--rule);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .bottomnav a {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px; height: 100%; min-height: 44px;
+    text-decoration: none; color: var(--ink-2); font-size: var(--t-xs);
+  }
+  .bottomnav svg { width: 22px; height: 22px; }
+  .bottomnav a[aria-current="page"] { color: var(--door); }
+  /* The bar sits over the page, so the footer needs room to clear it or the
+   * last link on every page is permanently under the thumb bar. */
+  .footer { padding-bottom: calc(var(--s7) + var(--thumbbar) + env(safe-area-inset-bottom, 0)); }
+}
+
+/* ── the destination page's own contents ──────────────────────
+ *
+ * A row of anchors on a desktop; a horizontally scrolling strip on a phone,
+ * as the UI specification asks. It scrolls rather than wraps because a
+ * wrapped tab bar changes height as the label set changes per page, and the
+ * hero below it then moves by a different amount on every destination.
+ *
+ * scroll-padding-top on the root is what makes these anchors land correctly:
+ * without it the sticky masthead covers the heading you just jumped to, and
+ * the page looks like it went to the wrong place.
+ */
+.sectionnav {
+  display: flex; gap: var(--s4); margin: var(--s5) 0;
+  padding-bottom: var(--s2); border-bottom: 1px solid var(--rule);
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.sectionnav a {
+  white-space: nowrap; text-decoration: none; color: var(--ink-2);
+  font-size: var(--t-sm); padding: var(--s2) 0; min-height: 24px;
+  border-bottom: 2px solid transparent;
+}
+.sectionnav a:hover { color: var(--ink); border-bottom-color: var(--door); }
+
+/* ── the persistent action on a destination ───────────────────
+ *
+ * "Add to my journey", not "Book now". There is nothing to book, and a
+ * booking button that cannot book is the single most dishonest control a
+ * travel site can ship.
+ *
+ * It sits above the thumb bar rather than replacing it — both are fixed, so
+ * the offset has to account for the bar's height and the safe area, or the
+ * two overlap on a notched phone.
+ */
+.stickycta { display: none; }
+@media (max-width: 44rem) {
+  .stickycta {
+    display: flex; align-items: center; gap: var(--s3);
+    position: fixed; left: 0; right: 0; z-index: 44;
+    bottom: calc(var(--thumbbar) + env(safe-area-inset-bottom, 0));
+    padding: var(--s3) var(--s4);
+    background: color-mix(in srgb, var(--paper) 94%, transparent);
+    backdrop-filter: saturate(1.4) blur(10px);
+    border-top: 1px solid var(--rule);
+  }
+  .stickycta-where { flex: 1; font-weight: 600; font-size: var(--t-sm);
+                     overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .stickycta .btn { min-height: 44px; display: inline-flex; align-items: center; }
+  /* Room for both bars, or the last section of every destination page is
+   * permanently underneath them. */
+  body.area-countries .footer {
+    padding-bottom: calc(var(--s7) + var(--thumbbar) + 5rem + env(safe-area-inset-bottom, 0));
+  }
+}
+
+/* The sticky masthead would otherwise cover any heading an in-page link
+ * jumps to. This is the one line that makes every anchor on the site land
+ * where the reader expects. */
+html { scroll-padding-top: 5rem; }
+
+/* ── the map, as a list ───────────────────────────────────────
+ * The accessible alternative to a picture that cannot be read out. Two or
+ * three columns where there is room; one where there is not, because a
+ * multi-column list on a phone is a list you scroll past sideways.
+ */
+.maplist { margin: var(--s6) 0; padding: var(--s5); border: 1px solid var(--rule);
+           border-radius: var(--radius); background: var(--paper-2); }
+.maplist summary { cursor: pointer; font-weight: 600; min-height: 24px; }
+.maplist h3 { margin: var(--s5) 0 var(--s2); font-size: var(--t-md); }
+.maplist .cols { columns: 1; }
+@media (min-width: 44rem) { .maplist .cols { columns: 2; column-gap: var(--s6); } }
+@media (min-width: 64rem) { .maplist .cols { columns: 3; } }
+.maplist .cols li { break-inside: avoid; margin-bottom: var(--s2); }
+
+/* ── the staged wait ──────────────────────────────────────────
+ * Not decoration: each line is ticked when the work it names has actually
+ * finished, and a failure marks the step it stopped on. role="status" means
+ * a screen reader hears the change without the focus being stolen.
+ */
+.staged .stages { list-style: none; padding: 0; margin: var(--s3) 0 0; }
+.staged .stages li { display: flex; gap: var(--s3); align-items: baseline;
+                     margin-bottom: var(--s2); font-size: var(--t-sm); }
+.staged .todo { color: var(--ink-3); }
+.staged .now { color: var(--ink); font-weight: 600; }
+.staged .done { color: var(--ink-2); }
+.staged .failed { color: var(--warn); font-weight: 600; }
