@@ -17,7 +17,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 4 | Core product principle | BUILT | 2 | Inspire → discover → understand → plan is built; book → experience → share is where the blocked half sits. |
 | 5 | Primary navigation | BUILT | 25 | The specification's seven items exactly, plus search and My Europe, plus every secondary link it lists. |
 | 6 | Homepage | BUILT | 4 | The hero, the question in the hero itself, and the calls to action. The AI box is a sentence box that works rather than a promise that does not, and it says so under the field. |
-| 7 | Homepage sections | BUILT | 5 | Explore the continent, explore by experience, featured journeys — in that order. |
+| 7 | Homepage sections | BUILT | 5 | Explore the continent, explore by experience, featured journeys — in that order, over a hero map carrying the specification's filters as links into the real map rather than a second one. |
 | 8 | Hidden Europe | BUILT | 2 | A quiet tag, a page that collects it, and a rule that we never call anywhere undiscovered. |
 | 9 | Stories | PARTIAL | 71 | The desk exists, the index is grouped by desk, every article carries a byline, a publication date and tags, and every story links into the Atlas both ways. Nine of the specification's hundred are written. |
 | 10 | Plan your Europe | PARTIAL | 8 | Ten of the eleven inputs are taken and every one of them moves the answer. Mobility requirements are the eleventh, and are named as unsupported rather than silently dropped — we hold no step-free access data, so a field for it would be a field that lies. |
@@ -28,9 +28,9 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 15 | Experience system | BUILT | 13 | The specification's eight categories, now with 30 sub-categories — Renaissance was the one it named that we did not have — each page printing the rule that built its list. |
 | 16 | Journey system | BUILT | 188 | Every field on the specification's journey object except booking links, which are blocked with everything else commercial. |
 | 17 | Journey page | BUILT | 2 | Overview, map, route, transport, accommodation, budget, season, packing, the experiences the route passes and what you will be eating — plus a named curator and a way into the planner. |
-| 18 | Multi-country journeys | BUILT | 5 | Three of the four the specification names, plus five more. |
+| 18 | Multi-country journeys | BUILT | 5 | All four the specification names, plus thirteen more, the widest crossing seven countries. |
 | 19 | AI journey planner — input | PARTIAL | 11 | The extraction the specification describes is built and runs on rules in the browser. The model is specified, with its prompts, and not built — the discipline had to exist first. |
-| 20 | AI planner output | BUILT | 9 | Summary, route, the five-line expenditure breakdown, and a day-by-day with alternatives. |
+| 20 | AI planner output | BUILT | 9 | Summary, route, the five-line expenditure breakdown, and a day-by-day with alternatives — plus, on every hop, how long it takes and by what, because a distance is not a travel time. |
 | 21 | AI safety and reliability | PARTIAL | 4 | The refusals are built; the model that would need them is not. Volatile fields are refused at the schema level, which is stronger than a prompt. |
 | 22 | AI travel assistant | DEFERRED | 2 | Needs accounts, a saved itinerary on a server and a model. All three are blocked; none is pretended. |
 | 23 | Map system | BUILT | 5 | Every destination, seventeen togglable layers, a places layer, a journey overlay, and the popup card the specification describes. |
@@ -55,7 +55,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 42 | Technical architecture | BUILT (deliberately smaller) | 4 | Python standard library and static output. Each proposed component has a named trigger rather than a date. |
 | 43 | API architecture | PARTIAL | 3 | Two public read endpoints ship and are used by the product itself. The rest are specified and need a backend. |
 | 44 | AI services | PARTIAL | 3 | Semantic-ish search and the journey generator exist without a model. The five that need one are specified. |
-| 45 | Recommendation engine | PARTIAL | 8 | Interests, budget, season, duration, location and trip length all feed the score. Travel history, weather and crowding do not: two need accounts, one needs a licence. |
+| 45 | Recommendation engine | PARTIAL | 8 | Interests, budget, season, duration, location, trip length and the places you saved all feed the score. Travel history, weather and crowding do not: two need accounts, one needs a licence. |
 | 46 | Personalisation | DEFERRED | 2 | Learning from saved places needs a profile that persists across devices, which needs an account. Saving works; learning does not. |
 | 47 | Transport engine | PARTIAL | 3 | Distance and mode are computed and stated for every hop and every journey. Live timetables and fares need providers. |
 | 48 | Booking architecture | DEFERRED | 2 | Affiliate first, then API, then marketplace — in that order and none of them yet, because there is no entity to contract. |

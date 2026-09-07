@@ -189,7 +189,8 @@ def s6():
 
 @section(7, "Homepage sections", "BUILT",
          "Explore the continent, explore by experience, featured journeys — "
-         "in that order.")
+         "in that order, over a hero map carrying the specification's "
+         "filters as links into the real map rather than a second one.")
 def s7():
     h = page("/")
     yield has("/", "Nine regions of Europe", "Find your kind of Europe", "Journeys across borders")
@@ -357,7 +358,8 @@ def s17():
 
 
 @section(18, "Multi-country journeys", "BUILT",
-         "Three of the four the specification names, plus five more.")
+         "All four the specification names, plus thirteen more, the widest "
+         "crossing seven countries.")
 def s18():
     slugs = {j["slug"] for j in DATA["journeys"]}
     yield "atlantic-to-the-mediterranean" in slugs, "Atlantic to Mediterranean"
@@ -391,7 +393,8 @@ def s19():
 
 @section(20, "AI planner output", "BUILT",
          "Summary, route, the five-line expenditure breakdown, and a "
-         "day-by-day with alternatives.")
+         "day-by-day with alternatives — plus, on every hop, how long it "
+         "takes and by what, because a distance is not a travel time.")
 def s20():
     js = src("assets/js/planner.js")
     for line in ("beds", "food", "transport", "activities", "buffer"):
@@ -691,9 +694,9 @@ def s44():
 
 
 @section(45, "Recommendation engine", "PARTIAL",
-         "Interests, budget, season, duration, location and trip length all "
-         "feed the score. Travel history, weather and crowding do not: two "
-         "need accounts, one needs a licence.")
+         "Interests, budget, season, duration, location, trip length and the "
+         "places you saved all feed the score. Travel history, weather and "
+         "crowding do not: two need accounts, one needs a licence.")
 def s45():
     js = src("assets/js/planner.js")
     for signal in ("wants", "budget", "month", "days", "start"):
