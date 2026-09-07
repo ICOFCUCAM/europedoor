@@ -16,13 +16,15 @@ of a trip happens *before* the transaction, and almost nobody serves it well.
 |---|---|
 | Countries | 50 |
 | Travel regions | 130 |
-| Cities | 319 |
+| Destinations | 319 |
+| Places | 192 |
 | Experiences | 197 |
-| Curated journeys | 8 |
+| Curated journeys | 16 |
 | Themes | 13 |
+| Experience categories | 8 (+29 sub) |
 | Stories | 8 |
 | Fund projects | 12 (holding nothing — deliberately) |
-| Generated pages | 609 |
+| Generated pages | 981 |
 | Runtime dependencies | 0 |
 
 ## Run it
@@ -33,8 +35,9 @@ python3 tools/build.py check      # validate the data, render nothing
 python3 tools/build.py stats      # what is in the dataset
 
 python3 tools/checks.py           # 23 checks over the built HTML
-node tools/browser-checks.js      # 102 checks in Chromium (needs playwright)
-python3 tools/section-audit.py    # the brief, section by section, against the build
+node tools/browser-checks.js      # 320 checks in Chromium, including accessibility
+python3 tools/content-report.py   # what is in the dataset, and what is missing
+python3 tools/section-audit.py    # all 99 specification sections, against the build
 
 python3 -m http.server -d site 8000   # then open http://localhost:8000
 ```
@@ -52,7 +55,8 @@ prompts, dashboards, monetisation, roadmap and risks.
 | you are doing | read |
 |---|---|
 | **anything at all** | [`docs/product-specification.md`](docs/product-specification.md) |
-| checking a claim about what is built | [`docs/section-audit.md`](docs/section-audit.md) — 35 sections, 204 machine-checked assertions |
+| checking a claim about what is built | [`docs/section-audit.md`](docs/section-audit.md) — 100 sections, 1,080 machine-checked assertions |
+| how far the content is from target | [`docs/content-report.md`](docs/content-report.md) — generated, and unflattering on purpose |
 | changing how the site is generated | [`docs/architecture.md`](docs/architecture.md) |
 | adding or editing places | [`docs/data-model.md`](docs/data-model.md) |
 | touching the scores | [`docs/scoring-method.md`](docs/scoring-method.md) |

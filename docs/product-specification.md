@@ -946,3 +946,103 @@ Budget shape for year one, if building in-house:
 * [`legal-position.md`](legal-position.md) — originality, entity, data
 * [`brand-lock.md`](brand-lock.md) — the name, and why it does not change
 * [`roadmap.md`](roadmap.md) — the same roadmap, kept current
+
+---
+
+# Part 4 — the 99-section specification, absorbed
+
+A second, much longer product specification arrived after Parts 1–3 were
+written. Most of it is compatible; the parts that changed the build are
+recorded here, and every section of it is audited in
+[`section-audit.md`](section-audit.md).
+
+## 4.1 What it changed
+
+* **Information architecture.** Its URL shape (`/europe/<country>/<region>/
+  <destination>`) and its seven-item navigation replaced ours. The macro
+  region left the path: "Nordic" is a way of grouping Norway, not part of
+  Norway's address.
+* **Places.** It puts a `place` entity below a destination. Built, with 192
+  records — and with opening hours, price and official website refused
+  rather than invented, because those three go stale fastest and a traveller
+  is most damaged by being wrong about them.
+* **Experience taxonomy.** Eight categories, 29 sub-categories, each page
+  printing the rule that built its list.
+* **Scoring.** Its §77 weighting is now the planner's, and its §76 dimension
+  list took the Experience Score from six to eight.
+* **Search.** Its five query shapes — exact, category, intent, natural
+  language, proximity — all answer now.
+
+## 4.2 The one place it is overridden
+
+§1.1 proposes *Europe Atlas* as the product name. The name is **Europedoor**,
+fixed by an instruction that predates the document and enforced in code. See
+[`brand-lock.md`](brand-lock.md). Everything else in that section — that a
+working name is provisional until trademark clearance — is adopted.
+
+## 4.3 Reviews, moderation and fraud (§27, §55, §56)
+
+Deferred together, because they are one problem. A review system without
+anti-fraud is a review system for whoever wants to game it, and the
+specification says so itself.
+
+The order, when it comes: accounts → reviews visible but not ranking →
+anti-fraud (rate limits, verified-stay signals, duplicate detection, manual
+review queue) → reviews influencing ranking. Never the last step before the
+third.
+
+What is already true: no star ratings anywhere, and **no field on any place
+that a payment could touch** — no `rank`, `boost`, `featured` or `sponsored`.
+That is the schema-level half of fraud prevention and it is in place before
+the surface it protects.
+
+## 4.4 Contributor and creator programmes (§70, §71)
+
+Both need accounts, moderation capacity and an attribution model, in that
+order. The journey format is already the thing a creator would publish into —
+a record with legs, nights and reasons — so the data work is done and the
+people work is not.
+
+Attribution is the part to decide early: a contributor's name on a place is a
+claim about a person, and it needs a policy about removal, correction and
+what happens when they leave.
+
+## 4.5 North star metric (§64)
+
+**Meaningfully planned journeys per active user.** Not page views, not
+sessions, not time on site.
+
+The event that would measure it — `plan_returned`, with stops, countries and
+whether it came in over budget — is already in the schema in §2.7, unshipped,
+so that the metric is not retrofitted onto whatever we happened to log.
+
+Supporting: itinerary creation rate, return-user rate, saves per user,
+planner completion rate, business leads. Notably absent: bounce rate, which
+measures whether a page answered a question quickly, and punishes it.
+
+## 4.6 The knowledge graph (§24, §37, §93)
+
+The `back` index in `tools/lib/data.py` is the graph made bidirectional: a
+destination knows the journeys, themes and stories that name it, not only its
+own parents. 124 of 319 destinations currently carry a non-hierarchical edge,
+and closing that gap is editorial work rather than engineering.
+
+Edges that exist today:
+
+```
+country → region → destination → place
+destination → experience        destination ← journey leg
+destination ← theme stop        destination ← story
+country → festival              country → advisory
+```
+
+Edges specified and not built: business → experience, destination →
+accommodation, place → event. All three need the business platform.
+
+## 4.7 Crowd data (§80)
+
+The specification says: do not manufacture crowd data. We have not. The
+`quiet` tag is editorial, labelled as editorial, and there is no
+busy/moderate/quiet indicator anywhere pretending to be measured. When a
+licensed source exists it becomes a field with a date on it, like every other
+verifiable fact here.

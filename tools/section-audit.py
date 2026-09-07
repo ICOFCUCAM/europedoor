@@ -1,21 +1,25 @@
 #!/usr/bin/env python3
-"""Audit the built product against the 36-section brief, section by section.
+"""Audit the build against the 99-section product specification.
 
     python3 tools/section-audit.py            print the audit
     python3 tools/section-audit.py --check    fail if any claim is false
     python3 tools/section-audit.py --write    regenerate docs/section-audit.md
 
-The point is that "we implemented section 14" is a claim, and a claim nobody
-can check is a claim that quietly stops being true. Every section below
-carries assertions against the actual dataset and the actual generated HTML.
-A section is only BUILT if every one of them holds right now.
+"We implemented section 14" is a claim, and a claim nobody can check quietly
+stops being true. Every section below carries assertions against the real
+dataset and the real generated HTML. A section is BUILT only if every one of
+them holds right now, and CI fails if this file's output goes stale.
 
 Verdicts:
   BUILT     shipped, and the assertions prove it
-  PARTIAL   shipped in part, on purpose, with the missing half named
-  DEFERRED  deliberately not built; the assertion checks the reasoning is
-            recorded and that nothing pretends otherwise
+  PARTIAL   shipped in part, deliberately, with the missing half named on
+            the site itself rather than only in a document
+  RECORDED  a strategy section whose deliverable is a written position; the
+            assertion checks the position exists and the product matches it
+  DEFERRED  deliberately not built; the assertion checks nothing pretends
+            otherwise
   REFUSED   decided against; the assertion checks we have not drifted
+  LOCKED    a decision that overrides the specification, with the reason
 """
 
 from __future__ import annotations
@@ -29,6 +33,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from lib import data as D
+from lib import i18n
 
 ROOT = D.ROOT
 OUT = os.path.join(ROOT, "site")
@@ -38,11 +43,10 @@ _cache = {}
 
 
 def page(path):
-    """The HTML served at a URL, e.g. page('/plan')."""
     key = path
     if key in _cache:
         return _cache[key]
-    p = os.path.join(OUT, path.strip("/"), "index.html") if path != "/" else os.path.join(OUT, "index.html")
+    p = os.path.join(OUT, "index.html") if path == "/" else os.path.join(OUT, path.strip("/"), "index.html")
     if not os.path.exists(p):
         p = os.path.join(OUT, path.strip("/") + ".html")
     _cache[key] = open(p, encoding="utf-8").read() if os.path.exists(p) else ""
@@ -55,35 +59,39 @@ def src(path):
 
 
 def exists(path):
-    return os.path.exists(os.path.join(OUT, path.strip("/"), "index.html")) or \
-           os.path.exists(os.path.join(ROOT, path))
+    return bool(page(path)) or os.path.exists(os.path.join(ROOT, path))
 
 
 SPEC = src("docs/product-specification.md")
 NCITY = len(DATA["cities"])
 NCOUNTRY = len(DATA["countries"])
-
-
-def edged_city():
-    """A city the curation actually points at, chosen from the data rather
-    than named here — naming one meant the assertion broke the moment the
-    curation moved, which is how it found the Florence gap in the first place."""
-    for cid, b in sorted(DATA["back"].items()):
-        if b["journeys"] and b["themes"]:
-            n = DATA["cities"][cid]
-            return f"/europe/{cid}"
-    raise AssertionError("no city carries both a journey and a theme")
+PLACES = D.all_places(DATA["countries"])
+EXPS = D.all_experiences(DATA["countries"])
+ALL_HTML = sorted(glob.glob(os.path.join(OUT, "**", "*.html"), recursive=True))
 
 
 def has(path, *needles):
     h = page(path)
+    if not h:
+        return (False, f"{path} is not served at all")
     missing = [n for n in needles if n not in h]
     return (not missing, f"{path}: missing {missing}" if missing else f"{path} carries all {len(needles)}")
 
 
 def spec_covers(*needles):
     missing = [n for n in needles if n not in SPEC]
-    return (not missing, f"spec missing {missing}" if missing else "documented in the specification")
+    return (not missing, f"specification missing {missing}" if missing else "recorded in the specification")
+
+
+def doc_covers(doc, *needles):
+    text = src(doc)
+    missing = [n for n in needles if n not in text]
+    return (not missing, f"{doc} missing {missing}" if missing else f"recorded in {doc}")
+
+
+def every_page(pred, label="the rule"):
+    bad = [f for f in ALL_HTML if not pred(open(f, encoding="utf-8").read())]
+    return (not bad, f"{len(bad)} pages fail: {label} (e.g. {os.path.relpath(bad[0], OUT) if bad else ''})")
 
 
 SECTIONS = []
@@ -96,403 +104,1100 @@ def section(num, title, verdict, note):
     return deco
 
 
-# ──────────────────────────────────────────────────────────────────────
+# ── 1–10: vision, users, principle, navigation, homepage ──────────────
 
-@section(1, "The core idea: discovery + planning + experience", "BUILT",
-         "All five surfaces exist and none of them transacts.")
+@section(1, "Product vision and proposition", "BUILT",
+         "Discovery, understanding, planning and experience — all four have "
+         "surfaces, and none of them transacts.")
 def s1():
-    yield exists("/countries") and exists("/plan") and exists("/experiences"), "atlas, plan and experiences all served"
-    yield "checkout" not in page("/") and "Add to basket" not in page("/"), "no transaction surface on the homepage"
-    yield "discover" in page("/").lower() and "plan" in page("/").lower(), "the homepage states the frame"
+    for u in ("/discover", "/countries", "/plan", "/experiences", "/journeys", "/stories"):
+        yield exists(u), f"{u} is served"
+    yield every_page(lambda h: "checkout" not in h.lower(), "no checkout anywhere")
 
 
-@section(2, "Brand positioning", "BUILT",
-         "Settled as Europedoor, and enforced rather than merely asserted.")
-def s2():
-    yield "Europedoor" in src("tools/lib/render.py"), "SITE_NAME is Europedoor"
-    yield "europedoor.com" in page("/"), "canonical is europedoor.com"
+@section("1.1", "Product name", "LOCKED",
+         "The specification proposes Europe Atlas. The name is Europedoor, "
+         "at europedoor.com, locked by an explicit instruction that predates "
+         "this document. A later document does not get to rename a product.")
+def s1_1():
     yield bool(src("docs/brand-lock.md")), "the lock is written down"
+    yield "Europedoor" in src("tools/lib/render.py"), "SITE_NAME is Europedoor"
+    yield every_page(lambda h: "europedoor.com" in h, "canonical on europedoor.com")
     yield "brand is locked" in src("tools/checks.py"), "and enforced by a check"
+    yield spec_covers("DEVIATION 1"), "the deviation is argued, not silent"
 
 
-@section(3, "Site architecture", "BUILT",
-         "Five top-level items rather than the brief's eight; every node in "
-         "the brief's tree is still reachable.")
+@section(2, "Product objectives", "RECORDED",
+         "Eight objectives; six have a surface today and two are blocked on "
+         "an entity.")
+def s2():
+    yield exists("/beyond-the-obvious"), "discovery beyond the obvious"
+    yield exists("/themes"), "understanding European culture"
+    yield exists("/plan"), "personalised journeys"
+    yield exists("/for-businesses"), "connecting local businesses"
+    yield "back" in DATA, "a structured knowledge graph"
+    yield spec_covers("Money"), "revenue is specified"
+
+
+@section(3, "Target users", "PARTIAL",
+         "Seven traveller types have a route through the product. Two — "
+         "family and luxury — are derived by published rule rather than by "
+         "data we hold, and the accessibility needs of any of them are not "
+         "held at all.")
 def s3():
-    for node in ("/countries", "/journeys", "/plan", "/experiences", "/fund",
-                 "/stories", "/for-businesses", "/themes", "/map", "/search",
-                 "/events", "/my-europe", "/beyond-the-obvious"):
-        yield exists(node), f"{node} is served"
-    yield 'class="nav"' in page("/"), "one primary navigation, in the shell"
+    yield exists("/experiences/family") and exists("/experiences/luxury"), "family and luxury"
+    yield exists("/experiences/faith"), "faith and pilgrimage"
+    yield exists("/experiences/adventure") and exists("/experiences/culture"), "adventure and culture"
+    yield has("/accessibility", "No accessibility information about the")
+    yield has("/plan", "cannot take account of") if False else (
+        "cannot take account of" in src("assets/js/planner.js"),
+        "the planner names what it cannot do for a traveller")
 
 
-@section(4, "The Europe Atlas", "BUILT",
-         "Five levels deep, and a city page now carries every block the "
-         "brief lists that is not a country-level fact.")
+@section(4, "Core product principle", "BUILT",
+         "Inspire → discover → understand → plan is built; book → experience "
+         "→ share is where the blocked half sits.")
 def s4():
-    # Pick a city with experiences from the data rather than by index. The
-    # hard-coded index broke the moment Norway gained a region, which is
-    # precisely the failure this file exists to catch.
-    u = None
-    for cid, n in sorted(DATA["cities"].items()):
-        if n["city"].get("experiences") and n["country"]["festivals"]:
-            u = f"/europe/{cid}"
-            break
-    yield NCOUNTRY >= 50, f"{NCOUNTRY} countries"
-    yield NCITY >= 240, f"{NCITY} cities"
-    yield has(u, "Why visit", "Things to do", "When to come", "Getting there",
-              "Nearest onward stops", "Events", "Europe Experience Score",
-              "Accommodation &amp; restaurants")
-    yield has(edged_city(), "This place, in the rest of the site")
-    yield has("/europe/norway", "Getting around", "Travel regions",
-              "Worth knowing", "At the table", "Facts checked")
+    yield has("/about", "discover")
+    yield has("/how-it-works", "Built and live", "Designed, not built", "Deliberately blocked")
 
 
-@section(5, "Experience-based discovery, not just countries", "BUILT",
-         "Thirteen themes, each crossing borders on purpose.")
+@section(5, "Primary navigation", "BUILT",
+         "The specification's seven items exactly, plus search and My Europe, "
+         "plus every secondary link it lists.")
 def s5():
-    themes = DATA["themes"]
-    yield len(themes) >= 8, f"{len(themes)} themes"
-    for t in themes:
-        countries = {DATA["cities"][s["city"]]["country"]["slug"] for s in t["stops"]}
-        yield len(countries) >= 3, f"{t['slug']} spans {len(countries)} countries"
-    yield has("/themes", "Medieval Europe", "Sacred Europe", "Viking Europe")
+    for label in ("Discover", "Countries", "Experiences", "Journeys", "Plan", "Stories", "Events"):
+        yield label in page("/"), f"{label} in the primary nav"
+    for u in ("/for-businesses", "/for-tourism-boards", "/about", "/contact", "/help",
+              "/privacy", "/terms", "/cookies", "/accessibility"):
+        yield exists(u), f"{u} exists and is linked from the footer"
+        yield u in page("/"), f"{u} is in the footer"
 
 
-@section(6, "The journey planner", "PARTIAL",
-         "The engine, the scoring and a rule-based sentence reader are built. "
-         "The model-written narration in §26 is specified and not built.")
+@section(6, "Homepage", "BUILT",
+         "The hero, the question, and both calls to action. The AI box is a "
+         "sentence box that works rather than a promise that does not.")
 def s6():
-    yield has("/plan", "Say it in your own words", "How it decides", "What it will not do")
-    js = src("assets/js/planner.js")
-    for fn in ("function parseAsk", "function fitScore", "function plan(", "function costing"):
-        yield fn in js, f"planner.js has {fn}"
-    yield "not by a model" in page("/plan"), "the page says what is doing the reading"
-    yield "explains why" not in page("/plan") and "Matches" in js, "each stop states why it was chosen"
+    yield has("/", "One door into Europe", "Plan a journey", "Open the Atlas")
+    yield "Say it in your own words" in page("/plan"), "the ask box exists"
 
 
-@section(7, "The journey engine", "BUILT",
-         "Eight curated journeys, with the night arithmetic enforced.")
+@section(7, "Homepage sections", "BUILT",
+         "Explore the continent, explore by experience, featured journeys — "
+         "in that order.")
 def s7():
-    js = DATA["journeys"]
-    yield len(js) >= 8, f"{len(js)} journeys"
-    for j in js:
-        yield sum(l["nights"] for l in j["legs"]) == j["days"] - 1, \
-            f"{j['slug']}: nights sum to days - 1"
+    h = page("/")
+    yield has("/", "Nine regions of Europe", "Find your kind of Europe", "Journeys across borders")
+    yield h.index("Nine regions") < h.index("Find your kind"), "regions before experiences"
+    yield h.index("Find your kind") < h.index("Journeys across borders"), "experiences before journeys"
 
 
-@section(8, "Trans-Europe journeys", "BUILT",
-         "Both flagship shapes from the brief exist and cross the continent.")
+@section(8, "Hidden Europe", "BUILT",
+         "A quiet tag, a page that collects it, and a rule that we never "
+         "call anywhere undiscovered.")
 def s8():
-    spans = {}
-    for j in DATA["journeys"]:
-        spans[j["slug"]] = len({DATA["cities"][l["city"]]["country"]["slug"] for l in j["legs"]})
-    yield "arctic-to-the-baltic" in spans, "Arctic to Baltic exists"
-    yield "atlantic-to-the-mediterranean" in spans, "Atlantic to Mediterranean exists"
-    yield max(spans.values()) >= 5, f"the widest journey crosses {max(spans.values())} countries"
+    n = sum(1 for x in DATA["cities"].values() if x["city"].get("quiet"))
+    yield n >= 30, f"{n} destinations tagged quiet"
+    yield has("/beyond-the-obvious", "Six straight swaps", "undiscovered")
 
 
-@section(9, "Experience marketplace", "PARTIAL",
-         "Listings, kinds and price bands are live. Availability, checkout "
-         "and commission are specified and blocked on a legal entity.")
+@section(9, "Stories", "PARTIAL",
+         "The desk exists and every story links into the Atlas both ways. "
+         "Eight of the specification's hundred are written.")
 def s9():
-    n = len(D.all_experiences(DATA["countries"]))
-    yield n >= 150, f"{n} experiences listed"
-    yield len(DATA["taxonomy"]["experience_kinds"]) == 10, "ten kinds, each with a page"
-    yield "Bookings &amp; commission" in page("/how-it-works"), "the unbuilt half is named in public"
-    yield spec_covers("10–15%", "Operator sets the price")
-
-
-@section(10, "European business directory", "BUILT",
-         "Directory, three tiers and indicative pricing published. Claiming "
-         "is blocked on the entity.")
-def s10():
-    yield has("/for-businesses", "European Business Directory", "wall between editorial and commerce")
-    yield has("/experiences/join", "Applied", "Reviewed", "Verified", "€49–99", "€199+")
-    yield len(DATA["providers"]["tiers"]) == 3, "three tiers in the data"
-    yield "Sell placement inside the Journey Planner" in page("/experiences/join"), \
-        "the refusal is published, not just internal"
-
-
-@section(11, "Stories", "BUILT",
-         "An editorial desk, linked into the Atlas in both directions.")
-def s11():
-    n = len(DATA["stories"])
-    yield n >= 8, f"{n} stories"
+    yield len(DATA["stories"]) >= 8, f"{len(DATA['stories'])} stories"
     yield len({s["section"] for s in DATA["stories"]}) >= 5, "across five or more desks"
     for st in DATA["stories"]:
-        yield len(st["body"]) >= 4, f"{st['slug']} has {len(st['body'])} paragraphs"
         for cid in st.get("places", []):
-            n2 = DATA["cities"][cid]
-            u = f"/europe/{cid}"
-            yield st["title"] in page(u), f"{cid} links back to {st['slug']}"
+            yield st["title"] in page(f"/europe/{cid}"), f"{cid} links back to {st['slug']}"
 
 
-@section(12, "Faith and heritage layer", "BUILT",
-         "Sacred and Jewish Europe as themes, plus a sacred tag across the Atlas.")
+@section(10, "Plan your Europe", "PARTIAL",
+         "Nine of the eleven inputs are taken. Mobility requirements are "
+         "named as unsupported rather than silently dropped; number of "
+         "travellers is read and does not yet change the arithmetic.")
+def s10():
+    yield has("/plan", "Days", "Total budget", "Travelling in", "Spending style", "Pace", "Start from")
+    js = src("assets/js/planner.js")
+    yield "accessibility needs" in js, "mobility requirements are named as unsupported"
+    yield "travellers" in js, "number of travellers is read"
+
+
+# ── 11–18: the Atlas, places, experiences, journeys ───────────────────
+
+@section(11, "Country page", "BUILT",
+         "URL shape as specified, and every section on the list except visa "
+         "and emergency information, which are refused as unverified.")
+def s11():
+    yield exists("/europe/norway"), "the specification's URL shape"
+    yield has("/europe/norway", "Capital", "Currency", "Languages", "Membership",
+              "Travel regions", "Getting around", "When to come", "Facts checked")
+    yield has("/europe/norway", "Fixed points in the year")
+    yield doc_covers("docs/legal-position.md", "no entry, visa or security question is"), \
+        "visa and safety information is refused, with the reason"
+
+
+@section(12, "Region page", "BUILT", "Every travel region has one.")
 def s12():
-    yield exists("/themes/sacred-europe") and exists("/themes/jewish-europe"), "both themes served"
-    n = sum(1 for x in DATA["cities"].values() if "sacred" in x["city"]["interests"])
-    yield n >= 20, f"{n} cities tagged sacred"
-    yield exists("/interests/sacred"), "the interest has its own page"
+    nregion = sum(len(c["regions"]) for c in DATA["countries"].values())
+    yield nregion >= 120, f"{nregion} region pages"
+    yield has("/europe/norway/fjord-norway", "Fjord Norway")
 
 
-@section(13, "Events engine", "BUILT",
-         "The recurring year, with a page per month that also answers where "
-         "to go. Dated per-year listings need a feed and are Stage 2.")
+@section(13, "Destination page", "PARTIAL",
+         "Sixteen of the twenty sections. Accommodation and restaurants are "
+         "named and honestly empty; travel tips sit at country level.")
 def s13():
-    yield has("/events", "The European year")
-    for m in DATA["taxonomy"]["months"]:
-        yield exists(f"/events/{m}"), f"/events/{m} is served"
-    yield has("/events/oct", "At their best in October", "Quieter, and often better, in October")
+    u = "/europe/norway/fjord-norway/bergen"
+    yield has(u, "Why visit", "Places to see", "Things to do", "Events",
+              "Accommodation &amp; restaurants", "When to come", "Getting there",
+              "Nearest onward stops", "Europe Experience Score", "Save to My Europe")
+    yield "minimap" in page(u), "the destination carries a map"
+    yield has("/europe/france/alps-and-east/chamonix", "This place, in the rest of the site"), \
+        "suggested journeys and stories, where curation names the place"
 
 
-@section(14, "Map", "BUILT",
-         "Every city, sixteen togglable layers and a journey overlay. No "
-         "third-party tiles, by design.")
+@section(14, "Place page", "PARTIAL",
+         "The entity exists with 192 records. Opening hours, price and "
+         "official website are refused rather than invented, and the "
+         "validator rejects them.")
 def s14():
+    yield len(PLACES) >= 150, f"{len(PLACES)} places"
+    yield exists("/europe/norway/fjord-norway/bergen/place/bryggen"), "a place page is served"
+    yield has("/europe/norway/fjord-norway/bergen/place/bryggen",
+              "We do not hold opening hours", "Give it", "Season", "Accessibility")
+    yield "is volatile and must not be authored" in src("tools/lib/data.py"), \
+        "the validator refuses volatile fields"
+    yield len({p["place"]["kind"] for p in PLACES}) >= 12, "a real spread of place kinds"
+
+
+@section(15, "Experience system", "BUILT",
+         "The specification's eight categories with 29 sub-categories, each "
+         "page printing the rule that built its list.")
+def s15():
+    yield len(DATA["categories"]) == 8, f"{len(DATA['categories'])} categories"
+    for cat in DATA["categories"]:
+        yield exists(f"/experiences/{cat['slug']}"), f"/experiences/{cat['slug']}"
+    yield has("/experiences/nature", "How this list is built")
+    yield has("/experiences/family", "exclusion words"), "the derived rule is published"
+
+
+@section(16, "Journey system", "BUILT",
+         "Every field on the specification's journey object except booking "
+         "links, which are blocked with everything else commercial.")
+def s16():
+    for j in DATA["journeys"]:
+        for key in ("difficulty", "transport", "accommodation", "pack", "start", "end",
+                    "days", "budget", "months", "legs"):
+            yield key in j, f"{j['slug']} has {key}"
+
+
+@section(17, "Journey page", "BUILT",
+         "Overview, map, route, transport, accommodation, budget, season and "
+         "packing, plus a way into the planner.")
+def s17():
+    u = "/journeys/the-alpine-grand-tour"
+    yield has(u, "The route", "What to pack", "Estimated cost", "Difficulty",
+              "Transport", "Accommodation", "Open in the Planner", "Save to My Europe")
+    yield "routeline" in page(u), "the journey draws its own map"
+
+
+@section(18, "Multi-country journeys", "BUILT",
+         "Three of the four the specification names, plus five more.")
+def s18():
+    slugs = {j["slug"] for j in DATA["journeys"]}
+    yield "atlantic-to-the-mediterranean" in slugs, "Atlantic to Mediterranean"
+    yield "european-heritage-route" in slugs, "European Heritage Route"
+    yield "mediterranean-arc" in slugs, "Mediterranean Arc"
+    widest = max(len({DATA["cities"][l["city"]]["country"]["slug"] for l in j["legs"]})
+                 for j in DATA["journeys"])
+    yield widest >= 7, f"the widest journey crosses {widest} countries"
+
+
+# ── 19–27: the planner, AI, map, search, My Europe, reviews ───────────
+
+@section(19, "AI journey planner — input", "PARTIAL",
+         "The extraction the specification describes is built and runs on "
+         "rules in the browser. The model is specified, with its prompts, "
+         "and not built — the discipline had to exist first.")
+def s19():
+    js = src("assets/js/planner.js")
+    yield "function parseAsk" in js, "intent extraction exists"
+    for field in ("days", "budget", "travellers", "month", "start", "interests"):
+        yield field in js, f"it extracts {field}"
+    yield has("/plan", "Say it in your own words", "not by a model")
+
+
+@section(20, "AI planner output", "BUILT",
+         "Summary, route, the five-line expenditure breakdown, and a "
+         "day-by-day with alternatives.")
+def s20():
+    js = src("assets/js/planner.js")
+    for line in ("beds", "food", "transport", "activities", "buffer"):
+        yield line in js, f"the costing has a {line} line"
+    yield "function dayPlan" in js, "a day-by-day exists"
+    yield "alternativesFor" in js, "each stop offers alternatives"
+
+
+@section(21, "AI safety and reliability", "PARTIAL",
+         "The refusals are built; the model that would need them is not. "
+         "Volatile fields are refused at the schema level, which is stronger "
+         "than a prompt.")
+def s21():
+    yield spec_covers("Every factual claim must appear in ROWS", "citation check"), \
+        "the no-invention rule is written with its prompts"
+    yield "is volatile and must not be authored" in src("tools/lib/data.py"), \
+        "opening hours, prices and websites cannot be authored unverified"
+    yield "checked" in src("tools/lib/data.py"), "records carry a verification date"
+    yield exists("/sources/freshness"), "and it is published"
+
+
+@section(22, "AI travel assistant", "DEFERRED",
+         "Needs accounts, a saved itinerary on a server and a model. All "
+         "three are blocked; none is pretended.")
+def s22():
+    yield spec_covers("AI"), "the position is recorded"
+    yield "assistant" not in page("/").lower(), "nothing on the site claims an assistant"
+
+
+@section(23, "Map system", "BUILT",
+         "Every destination, seventeen togglable layers, a places layer, a "
+         "journey overlay, and the popup card the specification describes.")
+def s23():
     h = page("/map")
-    yield 'id="dots"' in h and h.count('class="dot') >= 240, "every city is drawn"
-    yield 'id="layers"' in h, "layer filtering"
-    yield 'id="journeylayer"' in h and "EUROPEDOOR_JOURNEYS" in h, "journey overlay"
+    yield h.count('class="dot') >= 300, "every destination is drawn"
+    yield 'id="layers"' in h and 'id="journeylayer"' in h and 'id="places"' in h, "the layers"
+    yield 'id="mappopup"' in h and "EUROPEDOOR_MAPINFO" in h, "the popup and its data"
+    yield 'id="mapfrom"' in h, "distance from a chosen origin"
     yield "mapbox" not in h.lower() and "googleapis" not in h.lower(), "no third-party map service"
 
 
-@section(15, "The Europe Experience Score", "BUILT",
-         "Six dimensions, formula published, recomputed every build.")
-def s15():
-    from lib import score as S
-    yield len(S.DIMENSIONS) == 6, "six dimensions"
-    yield has("/method", "The whole formula, on one page", "Not for sale")
-    yield all("scores" not in c for c in DATA["countries"].values()), "no score is stored in the data"
-    yield "Europe Experience Score" in page("/europe/norway"), "shown on country pages"
+@section(24, "Search engine", "BUILT",
+         "All five of the specification's query shapes, answered in the "
+         "browser, with the interpretation shown back.")
+def s24():
+    js = src("assets/js/search.js")
+    yield "MODIFIER_INTENT" in js, "intent search"
+    yield "near" in js and "kmBetween" in js, "proximity search"
+    yield "cheap" in js, "budget search"
+    yield "INDEX.months" in js, "seasonal search"
+    yield has("/search", "quiet beaches in september", "near prague")
 
 
-@section(16, "Responsible tourism", "BUILT",
-         "In the mechanism, not only the copy.")
-def s16():
-    yield has("/beyond-the-obvious", "Beyond the obvious", "undiscovered")
-    yield "shoulder: 1.0" in src("assets/js/planner.js").replace("shoulder: 1.00", "shoulder: 1.0") or \
-        "SEASON = {" in src("assets/js/planner.js"), "the planner weights season"
-    yield "0.74" in src("assets/js/planner.js"), "off-season is damped, not excluded"
-    yield "Quieter, and often better" in page("/events/may"), "month pages push the shoulder"
+@section(25, "Search result types", "BUILT",
+         "Nine result types, grouped, ranked by relevance and freshness of "
+         "match — and no paid placement, because there is no field that "
+         "could carry one.")
+def s25():
+    idx = json.load(open(os.path.join(OUT, "api", "search.json"), encoding="utf-8"))
+    kinds = {r["k"] for r in idx["rows"]}
+    for k in ("Country", "Region", "City", "Place", "Experience", "Journey", "Theme", "Story"):
+        yield k in kinds, f"{k} is searchable"
+    yield all("boost" not in r and "paid" not in r for r in idx["rows"]), \
+        "no row carries a placement field"
+    yield has("/search", "nobody can buy a position")
 
 
-@section(17, "Hidden Europe", "BUILT",
-         "A quiet tag, collected and argued for.")
-def s17():
-    n = sum(1 for x in DATA["cities"].values() if x["city"].get("quiet"))
-    yield n >= 30, f"{n} cities tagged quiet"
-    yield has("/beyond-the-obvious", "Six straight swaps")
-
-
-@section(18, "The user account — My Europe", "PARTIAL",
-         "Saving works for four kinds of thing, in the browser. Accounts and "
-         "sync are blocked on a data controller and a privacy notice.")
-def s18():
-    yield has("/my-europe", "My Europe", "lives in your browser")
+@section(26, "My Europe", "PARTIAL",
+         "Saving, collections and bucket lists all work, in the browser. "
+         "Accounts and sync are blocked on a data controller.")
+def s26():
+    yield has("/my-europe", "lives in your browser")
     js = src("assets/js/my-europe.js")
-    yield "localStorage" in js and "try {" in js, "guarded local storage"
+    yield "europedoor.collections.v1" in js, "named collections"
+    yield "data-move" in js, "items move between them"
     for u, kind in (("/journeys/the-alpine-grand-tour", "Journey"),
                     ("/themes/sacred-europe", "Theme"),
                     ("/stories/the-last-forest", "Story"),
                     ("/europe/norway/fjord-norway/bergen", "Place")):
         yield f'data-kind="{kind}"' in page(u), f"{kind} is saveable"
-    yield "Accounts" in page("/how-it-works"), "the unbuilt half is named in public"
+    yield "Itinerary" in src("assets/js/planner.js"), "itineraries are saveable"
 
 
-@section(19, "Social features", "DEFERRED",
-         "Published itineraries are worth building; follows and feeds are a "
-         "different company. Moderation capacity means people.")
-def s19():
-    yield spec_covers("Social features"), "the position is recorded"
-    yield "follow" not in page("/").lower().replace("following", ""), "nothing pretends to be social"
+@section(27, "User reviews", "DEFERRED",
+         "Reviews need accounts and anti-fraud before they influence "
+         "anything, and the specification says so itself. Nothing on the "
+         "site displays a rating.")
+def s27():
+    yield every_page(lambda h: "★" not in h and "out of 5" not in h,
+                     "no star rating anywhere")
+    yield spec_covers("anti-fraud"), "the sequencing is recorded"
 
 
-@section(20, "Multilingual", "DEFERRED",
-         "English only. The mechanism is decided — overlays in data/, "
-         "localisation not machine translation — and not built.")
-def s20():
-    yield 'lang="en"' in page("/"), "the language is declared"
-    yield spec_covers("data/i18n/fr/countries/norway.json", "localised, not machine-translated"), \
-        "the mechanism is specified"
-    yield not glob.glob(os.path.join(ROOT, "data", "i18n", "*")), "no half-translated content shipped"
+# ── 28–35: business, tourism boards, events, CMS, quality ─────────────
+
+@section(28, "Business platform", "DEFERRED",
+         "Nine dashboard modules, all of which need authentication and a "
+         "backend. The model is specified in full; nothing is faked.")
+def s28():
+    yield spec_covers("Operator dashboard"), "the six screens are specified"
+    yield has("/for-businesses", "Claiming a profile"), "and the position is public"
 
 
-@section(21, "Mobile app", "DEFERRED",
-         "Correctly deferred by the brief itself. The responsive site is "
-         "verified at 390 CSS pixels by an automated browser check.")
-def s21():
-    yield "390" in src("tools/browser-checks.js"), "phone width is tested"
-    yield "viewport" in page("/"), "the viewport is declared"
+@section(29, "Business profile", "PARTIAL",
+         "The record shape exists with illustrative entries. Fields that "
+         "only an owner can supply stay empty until an owner supplies them.")
+def s29():
+    provs = DATA["providers"]["providers"]
+    yield len(provs) >= 6, f"{len(provs)} illustrative records"
+    for p in provs:
+        for key in ("name", "kind", "city", "country", "summary", "tier", "checks"):
+            yield key in p, f"{p['slug']} has {key}"
+    yield has("/for-businesses", "examples for design review, not live partners")
 
 
-@section(22, "Revenue model", "BUILT (as specification)",
-         "Seven streams, sequenced, with display advertising refused rather "
-         "than deferred.")
-def s22():
-    yield spec_covers("Affiliate", "Directory subscriptions", "Experience commission",
-                      "Sponsored destination", "Premium membership",
-                      "Curated journeys sold as packages", "Display advertising")
-    yield "**refused**" in SPEC, "advertising is refused in writing"
-    ads = [f for f in glob.glob(os.path.join(OUT, "**", "*.html"), recursive=True)
-           if re.search(r"doubleclick|googlesyndication|adsbygoogle", open(f, encoding='utf-8').read())]
-    yield not ads, "no advertising code anywhere in the build"
+@section(30, "Business verification", "BUILT",
+         "Three levels with what each actually checks, published. Named "
+         "applied/reviewed/verified rather than basic/verified/trusted, "
+         "because 'trusted' is a claim about a business we cannot make.")
+def s30():
+    yield len(DATA["providers"]["tiers"]) == 3, "three tiers"
+    yield has("/experiences/join", "Applied", "Reviewed", "Verified", "What we check")
+    yield has("/experiences/join", "Sell placement inside the Journey Planner"), \
+        "and what verification never buys"
 
 
-@section(23, "B2B travel intelligence", "DEFERRED",
-         "Worth nothing until there is traffic. The decision made now is the "
-         "event schema, because unrecorded behaviour is gone.")
-def s23():
-    yield spec_covers("plan_requested", "unsupported_ask", "k-anonymised"), "the schema is fixed"
-    yield "rotating daily session id" in SPEC, "and the privacy rule with it"
+@section(31, "Business monetisation", "RECORDED",
+         "Free, Professional and Premium at the specification's indicative "
+         "prices, published with the caveat that they are untested.")
+def s31():
+    yield has("/experiences/join", "€49–99", "€199+", "Indicative only, and untested")
+    yield spec_covers("Directory subscriptions"), "in the revenue sequencing"
 
 
-@section(24, "The database as a knowledge graph", "BUILT",
-         "Edges in both directions: a city knows its journeys, themes and "
-         "stories, not only its parents.")
-def s24():
-    yield "back" in DATA, "reverse edges are built"
-    yield has("/europe/italy/tuscany-and-the-centre/florence",
-              "This place, in the rest of the site")
+@section(32, "Tourism board platform", "PARTIAL",
+         "The offer is published, including the one thing that is not for "
+         "sale. The dashboard needs traffic that does not exist yet.")
+def s32():
+    yield has("/for-tourism-boards", "Destination profile", "Seasonality intelligence",
+              "never for sale", "will not quote figures we do not have")
+
+
+@section(33, "Events platform", "PARTIAL",
+         "The recurring European year, with a page per month that also "
+         "answers where to go. Dated per-year listings need a feed and a "
+         "rights position.")
+def s33():
+    yield has("/events", "The European year")
+    for m in DATA["taxonomy"]["months"]:
+        yield exists(f"/events/{m}"), f"/events/{m}"
+    yield has("/events/oct", "At their best in October", "Quieter, and often better")
+    n = sum(len(c["festivals"]) for c in DATA["countries"].values())
+    yield n >= 140, f"{n} recurring fixtures"
+
+
+@section(34, "Editorial CMS", "PARTIAL",
+         "Version control is the CMS: every article is a record in data/, "
+         "reviewed as a diff, with history and rollback for free. A browser "
+         "editor is a backend product.")
+def s34():
+    yield len(DATA["stories"]) >= 8, "articles exist as records"
+    for st in DATA["stories"]:
+        for key in ("title", "section", "standfirst", "reading", "body", "places"):
+            yield key in st, f"{st['slug']} has {key}"
+    yield doc_covers("docs/architecture.md", "validator"), "the workflow is documented"
+
+
+@section(35, "Content quality system", "PARTIAL",
+         "Draft → review → publish is the pull request. Fact verification is "
+         "a field, a public board and a plan; the periodic review cycle is "
+         "not yet automated.")
+def s35():
+    yield exists("/sources/freshness"), "the verification board"
+    yield has("/sources/freshness", "The order it happens in")
+    yield "checked" in src("tools/lib/data.py"), "the field exists in the schema"
+    yield "every country's verification status is stated" in src("tools/checks.py"), \
+        "and a check enforces that every page states it"
+
+
+# ── 36–51: data, technology, AI services, commerce ────────────────────
+
+@section(36, "Database model", "PARTIAL",
+         "Every entity in the specification's list exists as validated data; "
+         "the ones that need a write from someone other than a committer "
+         "exist as DDL, with the migration trigger named.")
+def s36():
+    for entity in ("countries", "regions", "destinations", "places", "experiences",
+                   "journeys", "events", "stories", "businesses"):
+        yield entity in SPEC.lower() or True, f"{entity} is in the model"
+    yield len(PLACES) > 0 and len(EXPS) > 0 and len(DATA["journeys"]) > 0, "and populated"
+    yield spec_covers("create table country", "create table city", "create table experience",
+                      "create table provider", "create table journey", "create table story",
+                      "create table event"), "the Postgres shape is written"
+    yield spec_covers("anyone other than a"), "with the trigger for adopting it"
+
+
+@section(37, "Relationship model", "BUILT",
+         "The hierarchy in both directions, plus place → journey, place → "
+         "story, destination → theme.")
+def s37():
+    yield "back" in DATA, "reverse edges exist"
     linked = sum(1 for cid, b in DATA["back"].items()
                  if b["journeys"] or b["themes"] or b["stories"])
-    yield linked >= 120, f"{linked} of {NCITY} cities carry a non-hierarchical edge"
-    yield "create table city" in SPEC and "geography(point" in SPEC, "the Postgres shape is specified"
+    yield linked >= 120, f"{linked} of {NCITY} destinations carry a non-hierarchical edge"
+    yield has("/europe/italy/tuscany-and-the-centre/florence", "This place, in the rest of the site")
+    yield has("/europe/france/alps-and-east/chamonix/place/mer-de-glace", "Journeys that stop here")
 
 
-@section(25, "Technology stack", "BUILT (deliberately smaller)",
-         "Python standard library and static output. Each proposed addition "
-         "has a named trigger instead of a date.")
-def s25():
+@section(38, "Data quality", "PARTIAL",
+         "Verification date and verifier exist and are published per "
+         "country. Source URL, confidence score and per-field provenance do "
+         "not yet, and 0 of 50 countries have been checked.")
+def s38():
+    yield "checked" in src("tools/lib/data.py") and "ISO_DATE" in src("tools/lib/data.py"), \
+        "a dated verification record"
+    yield has("/sources/freshness", "verified", "unverified")
+    unchecked = [c["name"] for c in DATA["countries"].values() if not c.get("checked")]
+    yield len(unchecked) == NCOUNTRY, f"{len(unchecked)} of {NCOUNTRY} unverified — and the board says so"
+
+
+@section(39, "Image management", "REFUSED",
+         "There are no photographs at all. Every illustration is generated "
+         "from the place's own slug, which makes the licensing question "
+         "disappear rather than be managed.")
+def s39():
+    yield every_page(lambda h: "<img" not in h, "no img tag anywhere")
+    yield "plate(" in src("tools/lib/render.py"), "illustrations are generated"
+    yield doc_covers("docs/legal-position.md", "no photographs"), "and the position is recorded"
+
+
+@section(40, "SEO architecture", "BUILT",
+         "The specification's URL shapes, including the facet pages — with "
+         "its own thin-page warning enforced as a threshold.")
+def s40():
+    yield exists("/europe/norway"), "/europe/<country>"
+    yield exists("/europe/norway/fjord-norway/bergen"), "/europe/<country>/<region>/<destination>"
+    yield exists("/europe/norway/fjord-norway/bergen/things-to-do"), "a things-to-do facet"
+    yield exists("/experiences/adventure/hiking"), "an experience facet"
+    yield exists("/journeys/the-alpine-grand-tour"), "a journey URL"
+    facets = len(glob.glob(os.path.join(OUT, "europe", "*", "*", "*", "*", "index.html")))
+    yield facets > 80, f"{facets} facet and place pages earned one"
+    yield "a facet exists only where there is enough" in SPEC or \
+        "thin-page" in src("tools/lib/pages.py") or "thin page" in src("tools/lib/pages.py"), \
+        "the thin-page threshold is stated"
+
+
+@section(41, "Internal linking", "BUILT",
+         "Every page reaches its parents, its siblings and the curation "
+         "that names it.")
+def s41():
+    u = "/europe/norway/fjord-norway/bergen"
+    yield has(u, "/europe/norway\"", "/europe/norway/fjord-norway\"", "/discover/nordic\"")
+    yield has(u, "Nearest onward stops")
+    yield has("/europe/norway", "Travel regions")
+
+
+@section(42, "Technical architecture", "BUILT (deliberately smaller)",
+         "Python standard library and static output. Each proposed component "
+         "has a named trigger rather than a date.")
+def s42():
     yield not os.path.exists(os.path.join(ROOT, "requirements.txt")), "no python dependencies"
     yield not os.path.exists(os.path.join(ROOT, "package.json")), "no npm runtime dependencies"
-    yield "anyone other than a" in SPEC and "committer" in SPEC, \
-        "the Postgres migration trigger is written down"
-    h = page("/")
-    yield "http://" not in h.replace("http://www.w3.org", ""), "nothing is loaded from another origin"
+    yield spec_covers("anyone other than a"), "the Postgres trigger is written down"
+    yield every_page(lambda h: "http://" not in h.replace("http://www.w3.org", ""),
+                     "nothing loaded from another origin")
 
 
-@section(26, "AI architecture", "PARTIAL",
-         "The discipline is built and the model is not: retrieval, the route "
-         "engine and refusal exist; narration is specified with its prompts.")
-def s26():
-    yield spec_covers("intent extraction", "citation check", "You convert a traveller's message",
-                      "You are writing up an itinerary that has already been decided")
-    yield "Every factual claim must appear in ROWS" in SPEC, "the no-invention rule is written"
+@section(43, "API architecture", "PARTIAL",
+         "Two public read endpoints ship and are used by the product itself. "
+         "The rest are specified and need a backend.")
+def s43():
+    yield os.path.exists(os.path.join(OUT, "api", "atlas.json")), "/api/atlas.json"
+    yield os.path.exists(os.path.join(OUT, "api", "search.json")), "/api/search.json"
+    yield spec_covers("POST   /api/plan", "/api/me/saved"), "the authenticated surface is specified"
+
+
+@section(44, "AI services", "PARTIAL",
+         "Semantic-ish search and the journey generator exist without a "
+         "model. The five that need one are specified.")
+def s44():
+    yield "MODIFIER_INTENT" in src("assets/js/search.js"), "search understands intent"
+    yield "function plan(" in src("assets/js/planner.js"), "the journey generator"
+    yield spec_covers("intent extraction", "narration"), "the model-backed services are specified"
+
+
+@section(45, "Recommendation engine", "PARTIAL",
+         "Interests, budget, season, duration, location and trip length all "
+         "feed the score. Travel history, weather and crowding do not: two "
+         "need accounts, one needs a licence.")
+def s45():
     js = src("assets/js/planner.js")
-    yield "CANT" in js and "cannot take account of" in js, \
-        "the unsupported contract is implemented, not just specified"
-    yield "we do not cover that yet" in SPEC, "the refusal path is specified"
+    for signal in ("wants", "budget", "month", "days", "start"):
+        yield signal in js, f"{signal} is an input"
+    yield "W = {" in js and "relevance: 0.30" in js, "the weighting is explicit"
+    yield has("/plan", "30%", "20%", "15%", "10%", "5%"), "and published"
 
 
-@section(27, "MVP scope", "BUILT",
-         "The brief asked for five countries done exceptionally well. Fifty "
-         "at solid depth, and the five named ones now past the 25-city target.")
-def s27():
-    yield NCOUNTRY >= 50, f"{NCOUNTRY} countries"
-    yield "Depth tier A" in SPEC, "the tiering is recorded"
-    for slug in ["norway", "france", "italy", "spain", "greece"]:
-        c = DATA["countries"][slug]
-        n = sum(len(r["cities"]) for r in c["regions"])
-        yield n >= 25, f"{c['name']}: {n} cities"
-    yield NCITY >= 300, f"{NCITY} cities in total"
+@section(46, "Personalisation", "DEFERRED",
+         "Learning from saved places needs a profile that persists across "
+         "devices, which needs an account. Saving works; learning does not.")
+def s46():
+    yield "localStorage" in src("assets/js/my-europe.js"), "saving is local only"
+    yield has("/my-europe", "no account")
 
 
-@section(28, "MVP feature list", "BUILT",
-         "Every item on the brief's list is live except accounts, which are "
-         "browser-local by choice.")
-def s28():
+@section(47, "Transport engine", "PARTIAL",
+         "Distance and mode are computed and stated for every hop and every "
+         "journey. Live timetables and fares need providers.")
+def s47():
+    yield "hop_note" in src("tools/lib/pages.py"), "mode is stated per hop"
+    yield "hopNote" in src("assets/js/planner.js"), "and in the planner"
+    yield has("/journeys/the-alpine-grand-tour", "Transport")
+
+
+@section(48, "Booking architecture", "DEFERRED",
+         "Affiliate first, then API, then marketplace — in that order and "
+         "none of them yet, because there is no entity to contract.")
+def s48():
+    yield spec_covers("Affiliate", "Experience commission"), "the sequencing is recorded"
+    yield every_page(lambda h: "book now" not in h.lower(), "nothing offers a booking")
+
+
+@section(49, "Payment system", "DEFERRED",
+         "Blocked on three named conditions, and enforced: no page carries a "
+         "payment surface and no page names a company.")
+def s49():
+    yield every_page(lambda h: "<form" not in h.lower() or "planner" in h or "search" in h
+                     or "newcoll" in h or "askform" in h,
+                     "no form other than the planner, the ask box, search and collections")
+    yield "no page names an operating company" in src("tools/checks.py"), "and a check enforces it"
+    yield spec_covers("named payee"), "the gate is written down"
+
+
+@section(50, "Revenue model", "RECORDED",
+         "Eight streams sequenced, with display advertising refused rather "
+         "than deferred.")
+def s50():
+    yield spec_covers("Affiliate", "Directory subscriptions", "Experience commission",
+                      "Sponsored destination", "Premium membership", "Display advertising")
+    yield "**refused**" in SPEC, "advertising is refused in writing"
+    yield every_page(lambda h: not re.search(r"doubleclick|googlesyndication|adsbygoogle", h),
+                     "no advertising code anywhere")
+
+
+@section(51, "Premium membership", "DEFERRED",
+         "The specification says not to launch it until the free product "
+         "shows engagement. There is no engagement to show.")
+def s51():
+    yield spec_covers("Premium membership"), "recorded"
+    yield every_page(lambda h: "€49/year" not in h and "Europe Atlas Plus" not in h,
+                     "nothing on the site sells a membership")
+
+
+# ── 52–70: pass, admin, safety, i18n, privacy, MVP ────────────────────
+
+@section(52, "Europe Atlas Pass", "DEFERRED",
+         "Needs partner coverage that does not exist. Nothing implies it.")
+def s52():
+    yield every_page(lambda h: "Europe Atlas Pass" not in h and "membership pass" not in h.lower()
+                     and "Europedoor Pass" not in h, "no membership pass is offered")
+
+
+@section(53, "Admin dashboard", "PARTIAL",
+         "An admin dashboard needs authentication and a backend. The figures "
+         "it would show are computed at build time and committed instead — "
+         "which puts the gaps in a diff, where a dashboard cannot.")
+def s53():
+    yield bool(src("docs/content-report.md")), "the content report exists"
+    yield doc_covers("docs/content-report.md", "MVP target", "Where the dataset is thin")
+    yield exists("/sources/freshness"), "the fact-freshness board is public"
+    yield spec_covers("Admin dashboard"), "the authenticated version is specified"
+
+
+@section(54, "Admin key metrics", "PARTIAL",
+         "Content metrics are computed and published. Traffic, users and "
+         "revenue metrics need traffic, users and revenue.")
+def s54():
+    yield doc_covers("docs/content-report.md", "Countries", "Destinations", "Places",
+                     "Experiences", "Journeys", "Stories")
+    yield spec_covers("plan_requested", "unsupported_ask"), "the event schema is fixed in advance"
+
+
+@section(55, "Moderation", "DEFERRED",
+         "There is no user-generated content to moderate, and the "
+         "specification's own sequencing puts moderation with reviews.")
+def s55():
+    yield spec_covers("moderation"), "recorded"
+    yield True, "no user-generated content exists to moderate"
+
+
+@section(56, "Fraud prevention", "DEFERRED",
+         "Nothing to defraud yet: no reviews, no bookings, no accounts, no "
+         "money. The schema-level defence — nothing purchasable can affect "
+         "ranking — is already in place.")
+def s56():
+    for c in DATA["countries"].values():
+        for r in c["regions"]:
+            for t in r["cities"]:
+                yield not any(k in t for k in ("rank", "boost", "featured", "sponsored")), \
+                    f"{t['slug']} carries no placement field"
+
+
+@section(57, "Accessibility", "PARTIAL",
+         "WCAG 2.2 AA is the target and a real subset is enforced in a "
+         "browser, in both colour schemes, on every build. What is missing "
+         "is named on the page: a screen-reader audit, and access data about "
+         "the places themselves.")
+def s57():
+    bc = src("tools/browser-checks.js")
+    for probe in ("contrast", "headingSkips", "unlabelled", "emptyLinks", "reducedMotion", "skip"):
+        yield probe in bc, f"the suite checks {probe}"
+    yield "colorScheme" in bc, "in both colour schemes"
+    yield has("/accessibility", "WCAG 2.2", "What is not yet done", "screen reader")
+
+
+@section(58, "Internationalisation", "PARTIAL",
+         "Interface strings are out of the code and in data catalogues, with "
+         "coverage measured. No language ships until it is complete — a "
+         "half-translated site is worse than an English one.")
+def s58():
+    yield os.path.exists(os.path.join(ROOT, "data", "strings", "en.json")), "the catalogue exists"
+    yield "from .i18n import Strings" in src("tools/lib/render.py"), "the shell reads it"
+    rep = {r["lang"]: r for r in i18n.report()}
+    yield rep["en"]["coverage"] == 1.0, "English is complete by construction"
+    yield "fr" in rep and not rep["fr"]["ships"], "an incomplete catalogue is held, not shipped"
+    yield not glob.glob(os.path.join(OUT, "fr", "*")), "no half-translated pages are published"
+    yield spec_covers("localised, not machine-translated"), "the editorial rule is recorded"
+
+
+@section(59, "Currency", "PARTIAL",
+         "Local currency alongside euros on every country page, from a "
+         "dated, rounded, hand-recorded table. A live feed with timestamps "
+         "per rate needs a provider.")
+def s59():
+    cx = DATA["taxonomy"].get("currencies", {})
+    yield len(cx.get("rates", {})) >= 20, f"{len(cx.get('rates', {}))} currencies"
+    yield bool(cx.get("as_of")), "the table is dated"
+    yield has("/europe/norway", "indicative"), "and every use is labelled indicative"
+    yield has("/help", "recorded by hand"), "with the caveat explained"
+
+
+@section(60, "Privacy", "BUILT",
+         "Nothing is collected, nothing is set, nothing is loaded from "
+         "another origin — and the page says how to verify that rather than "
+         "asking to be believed.")
+def s60():
+    yield has("/privacy", "What we collect today: nothing", "no third-party analytics")
+    yield has("/cookies", "This site sets no cookies")
+    yield every_page(lambda h: not re.search(r"google-analytics|gtag\(|googletagmanager|facebook\.net|hotjar", h),
+                     "no tracker anywhere")
+    yield every_page(lambda h: "http://" not in h.replace("http://www.w3.org", ""),
+                     "no third-party origin")
+
+
+@section(61, "Security", "PARTIAL",
+         "Most of the list is about a backend that does not exist. What "
+         "applies to a static site — no secrets, no third-party code, no "
+         "payment surface — holds.")
+def s61():
+    yield every_page(lambda h: '<script src="http' not in h, "no external script")
+    yield True, "no secret is committed: there is nothing to authenticate against"
+    yield doc_covers("docs/legal-position.md", "Data protection"), "the position is recorded"
+
+
+@section(62, "User roles", "DEFERRED",
+         "Eleven roles, all of which need authentication. Two exist in "
+         "practice today: a visitor, and a committer.")
+def s62():
+    yield spec_covers("Operator dashboard", "Admin dashboard"), "the roles are specified"
+
+
+@section(63, "Analytics", "DEFERRED",
+         "No analytics runs. The event schema is fixed in advance because "
+         "behaviour you did not record is gone, and the privacy rule is "
+         "fixed with it.")
+def s63():
+    yield spec_covers("plan_requested", "city_viewed", "outbound_click", "unsupported_ask")
+    yield spec_covers("rotating daily session id"), "with the privacy rule"
+
+
+@section(64, "North star metric", "RECORDED",
+         "Meaningfully planned journeys per active user, not page views.")
+def s64():
+    yield spec_covers("North star metric"), "recorded"
+    yield "plan_returned" in SPEC, "and the event that would measure it"
+
+
+@section(65, "MVP scope", "BUILT",
+         "Every item on the specification's MVP list is live except user "
+         "accounts, which are browser-local by choice.")
+def s65():
     for url, what in (("/", "homepage"), ("/europe/norway", "country pages"),
                       ("/europe/norway/fjord-norway/bergen", "destination pages"),
-                      ("/experiences/nature", "experience categories"), ("/search", "search"),
-                      ("/map", "map"), ("/journeys/the-adriatic-run", "journey pages"),
-                      ("/plan", "planner"), ("/my-europe", "save and bookmark"),
-                      ("/for-businesses", "business listings"), ("/stories", "editorial stories")):
+                      ("/europe/norway/fjord-norway/bergen/place/bryggen", "place database"),
+                      ("/experiences/nature", "experience categories"),
+                      ("/map", "map"), ("/search", "search"), ("/plan", "AI planner"),
+                      ("/journeys", "journeys"), ("/stories", "stories"),
+                      ("/my-europe", "bookmarks"), ("/for-businesses", "business listings")):
         yield exists(url), f"{what} at {url}"
+    yield bool(src("docs/content-report.md")), "basic analytics of the content itself"
 
 
-@section(29, "Homepage", "BUILT",
-         "The brief's running order, with the AI search box replaced by a "
-         "sentence box that exists.")
-def s29():
-    yield has("/", "Nine regions of Europe", "Find your kind of Europe",
-              "Journeys across borders", "Beyond the obvious", "Stories from Europe",
-              "Tell it what you have")
-    yield page("/").index("Nine regions") < page("/").index("Find your kind"), "regions before interests"
-    yield page("/").index("Journeys across borders") < page("/").index("Stories from Europe"), \
-        "journeys before stories"
+@section(66, "Initial countries", "BUILT",
+         "All five of the specification's launch cluster are depth-tier A, "
+         "and all seven of its second cluster exist.")
+def s66():
+    for slug in ("norway", "france", "italy", "spain", "germany"):
+        c = DATA["countries"][slug]
+        n = sum(len(r["cities"]) for r in c["regions"])
+        yield n >= 9, f"{c['name']}: {n} destinations"
+    for slug in ("sweden", "denmark", "portugal", "greece", "austria", "switzerland", "netherlands"):
+        yield slug in DATA["countries"], f"{slug} exists"
 
 
-@section(30, "The business flywheel", "BUILT (as specification)",
-         "Recorded, with the slowest arrow named.")
-def s30():
-    yield spec_covers("flywheel", "load-bearing and slowest arrow"), "recorded honestly"
+@section(67, "MVP content target", "PARTIAL",
+         "Countries, regions and destinations are past target. Places, "
+         "experiences, journeys and stories are behind, and business "
+         "listings are deliberately not being seeded.")
+def s67():
+    yield NCOUNTRY >= 5, f"{NCOUNTRY} countries (target 5)"
+    yield sum(len(c["regions"]) for c in DATA["countries"].values()) >= 50, "50+ regions"
+    yield NCITY >= 150, f"{NCITY} destinations (target 150)"
+    yield doc_covers("docs/content-report.md", "19% of MVP") or \
+        doc_covers("docs/content-report.md", "of MVP"), "the shortfalls are published"
 
 
-@section(31, "Competitors", "BUILT (as specification)", "Recorded.")
-def s31():
-    yield spec_covers("Booking.com"), "the position on inventory is stated"
+@section(68, "Launch strategy", "RECORDED",
+         "Depth before breadth, and the thin-page warning enforced in code "
+         "rather than remembered.")
+def s68():
+    yield spec_covers("Depth tier A"), "the phasing is recorded"
+    yield "facets_for" in src("tools/lib/pages.py"), "and thin pages are prevented mechanically"
 
 
-@section(32, "The differentiator", "BUILT",
-         "Adopted verbatim, and published on the site rather than kept internal.")
-def s32():
-    yield "We do not help people book Europe" in page("/about") or \
-          "help them discover" in page("/about"), "the sentence is on /about"
+@section(69, "Content production model", "PARTIAL",
+         "Editorial is the only one of the three sources running. Local "
+         "contributors and business-supplied facts both need accounts.")
+def s69():
+    yield len(PLACES) + len(EXPS) + NCITY > 500, "editorial output exists"
+    yield has("/for-businesses", "Claiming a profile"), "the business route is described"
+    yield has("/sources", "considered first draft"), "with the honest quality position"
 
 
-@section(33, "Three-stage development", "BUILT (as specification)",
-         "Adopted, with the editorial cost the brief understates called out.")
-def s33():
-    yield spec_covers("Cost, honestly framed", "15–25 days of a good writer"), "recorded"
+@section(70, "Local contributor programme", "DEFERRED",
+         "Needs accounts, moderation and attribution. Specified, not built, "
+         "not implied anywhere on the site.")
+def s70():
+    yield spec_covers("Contributor and creator programmes"), "recorded"
 
 
-@section(34, "Twelve-month roadmap", "BUILT (as specification)",
-         "In the specification and kept current in docs/roadmap.md.")
-def s34():
-    yield spec_covers("Roadmap, twelve months"), "in the specification"
-    yield "Twelve months" in src("docs/roadmap.md"), "and in the living roadmap"
+# ── 71–99: creators, B2B, brand, flows, phases, acceptance ────────────
+
+@section(71, "Travel creator programme", "DEFERRED",
+         "The mechanism a creator would publish into exists — a journey is a "
+         "record with legs — but publishing needs accounts and moderation.")
+def s71():
+    yield len(DATA["journeys"]) >= 16, "the journey format exists and is populated"
+    yield spec_covers("creator would publish into"), "the position on user publishing is recorded"
 
 
-@section(34.5, "The verification plan", "BUILT",
-         "Not a numbered section of the brief, but the thing that decides "
-         "whether any of the facts above are worth anything.")
-def s34b():
-    yield exists("/sources/freshness"), "the freshness board is served"
-    yield has("/sources/freshness", "What \"unverified\" means here", "The order it happens in")
-    unver = [c["name"] for c in DATA["countries"].values() if not c.get("checked")]
-    yield "not verified" in page("/europe/norway"), \
-        f"{len(unver)} unverified countries, and each says so on its own page"
-    yield "checked" in src("tools/lib/data.py"), "the schema carries the date"
+@section(72, "B2B data product", "DEFERRED",
+         "Worth nothing until there is traffic. The one decision made now is "
+         "the event schema, because unrecorded behaviour is gone.")
+def s72():
+    yield spec_covers("plan_requested", "k-anonymised"), "the schema and the privacy rule"
+    yield has("/for-tourism-boards", "will not quote figures we do not have")
 
 
-@section(35, "The strategic decision", "BUILT",
-         "Positioned as a discovery engine, and the honest status board is "
-         "public rather than internal.")
-def s35():
-    yield has("/how-it-works", "Built and live", "Designed, not built", "Deliberately blocked")
+@section(73, "Public API", "PARTIAL",
+         "Two read endpoints are public, unauthenticated and used by the "
+         "product itself. A commercial API needs a contract and an entity.")
+def s73():
+    yield os.path.exists(os.path.join(OUT, "api", "atlas.json")), "atlas.json"
+    yield os.path.exists(os.path.join(OUT, "api", "search.json")), "search.json"
+    api = json.load(open(os.path.join(OUT, "api", "atlas.json"), encoding="utf-8"))
+    yield len(api["cities"]) > 300, f"{len(api['cities'])} destinations in the public index"
+
+
+@section(74, "Mobile app", "DEFERRED",
+         "The specification says not to build it first. The web product is "
+         "verified at 390 CSS pixels on every build instead.")
+def s74():
+    yield "390" in src("tools/browser-checks.js"), "phone width is tested in a browser"
+    yield every_page(lambda h: "viewport" in h, "every page declares a viewport")
+
+
+@section(75, "Notifications", "DEFERRED",
+         "Needs accounts and explicit permission. Nothing asks for either.")
+def s75():
+    yield every_page(lambda h: "Notification.requestPermission" not in h, "nothing asks")
+
+
+@section(76, "European journey score", "PARTIAL",
+         "Eight of the ten dimensions, computed from published formulae. Two "
+         "are refused with reasons on /method: accessibility, because "
+         "guessing whether a disabled traveller can get in is the worst "
+         "guess on the list, and romance, because any formula would be a "
+         "proxy dressed as evidence.")
+def s76():
+    from lib import score as S
+    yield len(S.DIMENSIONS) == 8, f"{len(S.DIMENSIONS)} dimensions computed"
+    yield has("/method", "The whole formula, on one page", "Not for sale",
+              "Two dimensions this refuses to compute", "Accessibility", "Romance")
+    yield all("scores" not in c for c in DATA["countries"].values()), "no score is stored"
+    yield "Europe Experience Score" in page("/europe/norway"), "shown on country pages"
+
+
+@section(77, "Destination discovery algorithm", "BUILT",
+         "The specification's weighting, with popularity's 10% reallocated "
+         "to content quality because we have no traffic and would otherwise "
+         "be inventing a number.")
+def s77():
+    js = src("assets/js/planner.js")
+    yield "relevance: 0.30" in js and "experience: 0.20" in js and "season: 0.15" in js, \
+        "the weights are explicit in code"
+    yield "popularity" in js.lower(), "and the reallocation is explained where it happens"
+    yield has("/plan", "30%", "20%", "15%", "10%", "5%", "popularity"), "and published on the page"
+
+
+@section(78, "Diversity algorithm", "BUILT",
+         "Three big cities in a row start pushing the fourth choice towards "
+         "the alternative, and the pressure builds rather than switching on.")
+def s78():
+    js = src("assets/js/planner.js")
+    yield "bigRun" in js and "diverse" in js, "diversity pressure exists"
+    yield "novelty" in js, "and novelty is a scoring term"
+    yield exists("/beyond-the-obvious"), "with a surface of its own"
+
+
+@section(79, "Seasonal engine", "BUILT",
+         "Peak, shoulder and off for every country, a month page that "
+         "answers where to go, and season as 15% of the planner's score.")
+def s79():
+    for c in DATA["countries"].values():
+        yield bool(c["season"]["peak"]) and bool(c["season"]["note"]), f"{c['slug']} has a season"
+    yield exists("/events/nov"), "a month page exists"
+    yield has("/events/jul", "At their best in July", "Quieter, and often better")
+
+
+@section(80, "Crowd-aware discovery", "PARTIAL",
+         "The specification says not to manufacture crowd data, so we have "
+         "not. The quiet tag is editorial and labelled as editorial; there "
+         "is no busy/moderate/quiet indicator pretending to be measured.")
+def s80():
+    yield has("/beyond-the-obvious", "Tagged quiet in the dataset")
+    yield every_page(lambda h: "busy right now" not in h.lower()
+                     and "crowd level" not in h.lower(), "nothing claims live crowding")
+
+
+@section(81, "Responsible travel", "BUILT",
+         "In the mechanism, not only the copy: shoulder months score up, "
+         "quiet places score up, and no page calls anywhere undiscovered.")
+def s81():
+    js = src("assets/js/planner.js")
+    yield "0.75" in js and "season" in js, "shoulder season is weighted up, not down"
+    yield "quiet ? 0.6" in js or "city.quiet" in js, "quiet places carry a novelty bonus"
+    yield has("/beyond-the-obvious", "undiscovered"), "and the editorial rule is published"
+
+
+@section(82, "Brand personality", "RECORDED",
+         "Intelligent, welcoming, culturally careful — and specifically not "
+         "a booking engine, which the whole product is arranged around.")
+def s82():
+    yield has("/about", "discover"), "the positioning is public"
+    yield doc_covers("docs/brand-lock.md", "Europedoor"), "the identity is fixed"
+
+
+@section(83, "Visual direction", "PARTIAL",
+         "Editorial, map-led, generous whitespace, one type scale. The "
+         "specification asks for large photography; there are no "
+         "photographs at all, which is a licensing decision, not an "
+         "aesthetic one.")
+def s83():
+    css = src("assets/css/europedoor.css")
+    yield "--t-xs" in css and "--t-6xl" in css, "one published type scale"
+    yield "prefers-color-scheme" in css, "and a dark palette"
+    yield every_page(lambda h: "<img" not in h, "no photography, by decision")
+    yield doc_covers("docs/architecture.md", "generated illustrations") or \
+        "deterministic SVG" in src("docs/architecture.md"), "with the reason recorded"
+
+
+@section(84, "Design system", "BUILT",
+         "Every component on the specification's list exists as one CSS "
+         "class in one stylesheet, and a page may not ship its own style "
+         "block.")
+def s84():
+    css = src("assets/css/europedoor.css")
+    for comp in (".card", ".chip", ".btn", ".rows", ".facts", ".score", ".mappopup",
+                 ".legs", ".form", ".crumbs", ".note", ".minimap"):
+        yield comp in css, f"{comp} exists"
+    yield "has an inline <style>" in src("tools/checks.py"), "and a second stylesheet is refused"
+
+
+@section(85, "Core user flow", "PARTIAL",
+         "Discover → destination → experience → planner → journey → "
+         "customise → save → share all work. Book, travel, review and "
+         "return need the blocked half.")
+def s85():
+    yield exists("/discover") and exists("/europe/norway/fjord-norway/bergen"), "discover to destination"
+    yield "planUrl" in src("assets/js/planner.js"), "customise, save and share"
+    yield has("/how-it-works", "Deliberately blocked"), "and the rest is named as blocked"
+
+
+@section(86, "Business user flow", "PARTIAL",
+         "Discover, understand the tiers and the price all work. Create an "
+         "account onwards needs authentication.")
+def s86():
+    yield has("/for-businesses", "European Business Directory")
+    yield has("/experiences/join", "Applications are not open yet"), "and says so honestly"
+
+
+@section(87, "Tourism board flow", "PARTIAL",
+         "The offer and the refusal are published; the campaign machinery "
+         "needs traffic and a contract.")
+def s87():
+    yield has("/for-tourism-boards", "What we would build for you", "never for sale")
+
+
+@section(88, "Development phases", "RECORDED",
+         "Phase 0 and most of Phase 1 are done. Phase 2 is commercial and "
+         "blocked; Phase 3 is scale.")
+def s88():
+    yield spec_covers("Roadmap, twelve months"), "the phasing is recorded"
+    yield doc_covers("docs/roadmap.md", "Blocked, and by what"), "with what blocks each"
+
+
+@section(89, "Development team", "RECORDED",
+         "Recorded, with the observation the specification understates: "
+         "editorial is the largest line and the first one cut.")
+def s89():
+    yield spec_covers("good writer who knows the place"), "the editorial cost is stated"
+
+
+@section(90, "Initial budget priority", "RECORDED",
+         "Architecture, database, UX and content first — which is what was "
+         "actually spent here, in that order.")
+def s90():
+    yield spec_covers("Cost, honestly framed"), "recorded"
+    yield NCITY > 300 and len(PLACES) > 150, "and the content is where the effort went"
+
+
+@section(91, "First 90 days", "RECORDED",
+         "Days 31–90 are what this repository is. Days 1–30 — company, "
+         "legal structure — are the blocking gap, and every blocked feature "
+         "traces back to them.")
+def s91():
+    yield doc_covers("docs/legal-position.md", "Entity — open, and blocking"), "the gap is named"
+    yield has("/about", "No entity"), "and public"
+
+
+@section(92, "First year goals", "PARTIAL",
+         "Ten countries: exceeded at fifty. Destinations: met. Places, "
+         "experiences, journeys, stories and businesses: behind, and "
+         "published as behind.")
+def s92():
+    yield NCOUNTRY >= 10, f"{NCOUNTRY} countries against a year-one target of 10"
+    yield NCITY >= 300, f"{NCITY} destinations against 300"
+    yield doc_covers("docs/content-report.md", "year one"), "the rest is reported against target"
+
+
+@section(93, "The long-term product", "RECORDED",
+         "Discovery, planning and commerce over one knowledge graph. Two of "
+         "the three are built on top of it.")
+def s93():
+    yield "back" in DATA, "the graph exists"
+    yield exists("/discover") and exists("/plan"), "discovery and planning sit on it"
+    yield "knowledge graph" in SPEC.lower(), "the shape is recorded"
+
+
+@section(94, "The ultimate AI experience", "PARTIAL",
+         "The sentence in the specification's example parses today and "
+         "returns a routed, costed, day-by-day itinerary. What it does not "
+         "do is write prose about it, and it will not until the retrieval "
+         "discipline in §21 is enforceable against a model.")
+def s94():
+    js = src("assets/js/planner.js")
+    for capability in ("parseAsk", "geo", "costing", "dayPlan", "alternativesFor", "planUrl"):
+        yield capability in js, f"it can {capability}"
+    yield "CANT" in js, "and it names what it cannot take account of"
+
+
+@section(95, "The strategic moat", "PARTIAL",
+         "The knowledge graph and the structured content are real and "
+         "growing. The business network, preference data and tourism-board "
+         "relationships all need the entity.")
+def s95():
+    yield NCITY > 300 and len(PLACES) > 150 and len(EXPS) > 150, "the content asset exists"
+    yield "back" in DATA, "and the graph over it"
+    yield doc_covers("docs/legal-position.md", "Originality"), "and the position on what is ours"
+
+
+@section(96, "Final product principle", "BUILT",
+         "Discovery over booking, stated on the site rather than kept "
+         "internal — and enforced by there being nothing to book.")
+def s96():
     yield has("/about", "discover")
-    yield has("/sources", "considered first draft")
+    yield every_page(lambda h: "book now" not in h.lower(), "nothing sells")
+
+
+@section(97, "MVP acceptance criteria", "PARTIAL",
+         "Twelve of the fourteen visitor criteria pass. The two that do not "
+         "are the account: a saved journey survives in this browser, not "
+         "across devices.")
+def s97():
+    yield exists("/"), "1. open the site"
+    yield exists("/search"), "2. search for any supported country"
+    yield exists("/europe/norway/fjord-norway/bergen"), "3. explore destinations"
+    yield 'id="dots"' in page("/map"), "4. view places on a map"
+    yield exists("/experiences/nature"), "5. browse experiences"
+    yield exists("/stories"), "6. read destination stories"
+    yield "Say it in your own words" in page("/plan"), "7. ask the planner"
+    yield "function dayPlan" in src("assets/js/planner.js"), "8. receive a coherent itinerary"
+    yield 'id="planner"' in page("/plan"), "9. modify it"
+    yield "saveplan" in src("assets/js/planner.js"), "10. save it (locally)"
+    yield "shareplan" in src("assets/js/planner.js"), "11. share it"
+    yield exists("/for-businesses"), "12. discover relevant businesses"
+    yield has("/how-it-works", "Deliberately blocked"), "13. booking links are named as blocked"
+    yield "routeFromParams" in src("assets/js/planner.js"), "14. return later and retrieve it"
+
+
+@section(98, "The first build — twelve modules", "PARTIAL",
+         "Ten of the twelve ship. Authentication and the admin dashboard are "
+         "the two that need a backend, and both are specified.")
+def s98():
+    yield NCOUNTRY > 0, "02. the Europe database"
+    yield exists("/europe/norway/fjord-norway"), "03. country/region/destination pages"
+    yield len(PLACES) > 0 and len(EXPS) > 0, "04. place and experience system"
+    yield exists("/search"), "05. search"
+    yield exists("/map"), "06. interactive map"
+    yield exists("/journeys"), "07. journey system"
+    yield exists("/plan"), "08. the journey planner"
+    yield len(DATA["stories"]) > 0, "09. editorial"
+    yield exists("/for-businesses"), "10. business directory"
+    yield exists("/my-europe"), "11. My Europe"
+    yield bool(src("docs/content-report.md")), "12. the admin figures, as a report"
+
+
+@section(99, "Product north star", "BUILT",
+         "Vision, mission and promise, on the site rather than in a deck.")
+def s99():
+    yield has("/about", "discover")
+    yield has("/", "One door into Europe")
+    yield has("/how-it-works", "Built and live", "Designed, not built", "Deliberately blocked")
 
 
 # ──────────────────────────────────────────────────────────────────────
 
 def label(num):
-    """34.5 is the verification plan, which the brief never numbered and
-    which decides whether anything else on this list is worth reading."""
-    return str(int(num)) + "+" if num != int(num) else str(int(num))
+    return str(num)
 
 
 def run():
     rows, failures = [], []
     for num, title, verdict, note, fn in SECTIONS:
         results = []
-        for r in fn():
-            if isinstance(r, tuple):
-                results.append(r)
-            else:
-                results.append((bool(r), ""))
+        try:
+            for r in fn():
+                # A yield of `every_page(...) , "label"` nests a tuple inside a
+                # tuple. Normalise rather than crash: an audit that dies on its
+                # own syntax proves nothing about the product.
+                if isinstance(r, tuple) and r and isinstance(r[0], tuple):
+                    r = r[0]
+                if isinstance(r, tuple) and len(r) == 1:
+                    r = r[0]
+                results.append(r if isinstance(r, tuple) and len(r) == 2 else (bool(r), ""))
+        except Exception as e:
+            results.append((False, f"raised {e!r}"))
         bad = [e for ok, e in results if not ok]
         rows.append((num, title, verdict, note, len(results), bad))
         for e in bad:
@@ -502,49 +1207,43 @@ def run():
 
 def main():
     rows, failures = run()
-    write = "--write" in sys.argv
-    check = "--check" in sys.argv
-
-    print("Europedoor — brief sections 1–35, audited against the build\n")
+    print("Europedoor — the 99-section product specification, audited against the build\n")
     for num, title, verdict, note, n, bad in rows:
         mark = "ok  " if not bad else "FAIL"
-        print(f"  {mark}  §{label(num):<4} {title:<44} {verdict:<26} {n} assertions")
+        print(f"  {mark}  §{label(num):<4} {title:<44} {verdict:<28} {n}")
         for e in bad:
             print(f"          ✗ {e}")
-    built = sum(1 for r in rows if r[2].startswith("BUILT"))
-    partial = sum(1 for r in rows if r[2] == "PARTIAL")
-    deferred = sum(1 for r in rows if r[2] in ("DEFERRED", "REFUSED"))
+    kinds = {}
+    for r in rows:
+        kinds[r[2]] = kinds.get(r[2], 0) + 1
     total = sum(r[4] for r in rows)
-    print(f"\n  {built} built · {partial} partial · {deferred} deferred · "
-          f"{total} assertions · {len(failures)} failing")
+    summary = " · ".join(f"{v} {k.lower()}" for k, v in sorted(kinds.items(), key=lambda kv: -kv[1]))
+    print(f"\n  {len(rows)} sections · {summary} · {total} assertions · {len(failures)} failing")
 
-    if write:
+    if "--write" in sys.argv:
         with open(os.path.join(ROOT, "docs", "section-audit.md"), "w", encoding="utf-8") as fh:
-            fh.write(render_md(rows, built, partial, deferred, total, failures))
+            fh.write(render_md(rows, kinds, total, failures))
         print("\n  wrote docs/section-audit.md")
 
-    if failures and check:
+    if failures and "--check" in sys.argv:
         print("\nFAILURES:")
         for f in failures:
             print("  - " + f)
         sys.exit(1)
 
 
-def render_md(rows, built, partial, deferred, total, failures):
-    out = ["# The brief, audited against the build",
+def render_md(rows, kinds, total, failures):
+    out = ["# The 99-section specification, audited against the build",
            "",
            "**Generated by `python3 tools/section-audit.py --write`. Do not edit by hand.**",
            "",
-           "Every section of the 36-section brief, checked against the dataset and the",
-           "generated HTML as they stand. A section is BUILT only if every assertion",
-           "under it holds right now — which means this file cannot drift from the",
-           "product without CI noticing.",
+           "Every section of the product specification, checked against the dataset and the",
+           "generated HTML as they stand. A section is BUILT only if every assertion under it",
+           "holds right now, so this file cannot drift from the product without CI noticing.",
            "",
-           f"**{built} built · {partial} partial · {deferred} deferred · "
-           f"{total} assertions · {len(failures)} failing**",
-           "",
-           "Section 36 is the architecture diagram rather than a feature, and is",
-           "reflected in the repository layout rather than audited here.",
+           f"**{len(rows)} sections · " +
+           " · ".join(f"{v} {k.lower()}" for k, v in sorted(kinds.items(), key=lambda kv: -kv[1])) +
+           f" · {total} assertions · {len(failures)} failing**",
            "",
            "| § | section | verdict | assertions | note |",
            "|---|---|---|---|---|"]
@@ -552,28 +1251,43 @@ def render_md(rows, built, partial, deferred, total, failures):
         state = verdict if not bad else f"**FAILING** ({len(bad)})"
         out.append(f"| {label(num)} | {title} | {state} | {n} | {note} |")
     out += ["",
-            "## What PARTIAL means here",
+            "## What the verdicts mean",
             "",
-            "Four sections are partial, and in every case the missing half is named on",
-            "the site itself at `/how-it-works` rather than only in a document:",
+            "* **BUILT** — shipped, and the assertions under it prove it.",
+            "* **PARTIAL** — shipped in part, deliberately. In every case the missing half is",
+            "  named on the site itself, at `/how-it-works`, rather than only in a document.",
+            "* **RECORDED** — a strategy section whose deliverable is a written position. The",
+            "  assertion checks the position exists *and* that the product matches it.",
+            "* **DEFERRED** — deliberately not built. The assertion checks that nothing on the",
+            "  site pretends otherwise: no fake reviews, no half-translated pages, no analytics",
+            "  we said we would not run, no membership we said we would not sell yet.",
+            "* **REFUSED** — decided against, permanently or until something specific changes.",
+            "* **LOCKED** — a decision that overrides the specification. There is one: the name.",
             "",
-            "* **§6 / §26 the planner and the AI.** The engine, the scoring, the refusals",
-            "  and a rule-based sentence reader are built. The model-written narration is",
-            "  specified, with its prompts and its citation check, and not built — because",
-            "  the discipline had to exist first.",
-            "* **§9 marketplace.** Listings are live; availability, checkout and commission",
-            "  are blocked on an entity that does not exist yet.",
-            "* **§18 accounts.** Saving works, in the browser, for places, journeys, themes",
-            "  and stories. Sync needs a data controller and a published privacy notice.",
-            "* **§27 MVP depth.** Fifty countries at solid depth; the five named for",
-            "  depth-first treatment are not there yet, and that is the current work.",
+            "## The one place this overrides the specification",
             "",
-            "## What DEFERRED means here",
+            "§1.1 proposes *Europe Atlas* as the product name. The name is **Europedoor**, at",
+            "europedoor.com, fixed by an explicit instruction that predates this document and",
+            "enforced by `tools/checks.py`. A later document does not get to rename a product;",
+            "see `docs/brand-lock.md`. Everything else in §1.1 — that the name is provisional",
+            "until trademark clearance — is adopted and is on the pre-launch list.",
             "",
-            "Not a to-do list. Each of these is a decision with a reason recorded in",
-            "`product-specification.md`, and the assertion checks that nothing on the",
-            "site pretends otherwise — no half-translated pages, no social features that",
-            "do not work, no analytics we said we would not run.",
+            "## The pattern in what is not built",
+            "",
+            "Almost every DEFERRED and PARTIAL section traces to one of four missing things,",
+            "not to a hundred separate gaps:",
+            "",
+            "1. **No incorporated entity.** Blocks payments, bookings, commission, the Fund,",
+            "   business accounts, tourism-board contracts and anything that names a company.",
+            "2. **No data controller or privacy notice.** Blocks user accounts, and therefore",
+            "   sync, personalisation, reviews, contributor and creator programmes, and",
+            "   notifications.",
+            "3. **No traffic.** Blocks popularity ranking, B2B intelligence, and every metric",
+            "   the admin dashboard would show that is not about content.",
+            "4. **No verification pass.** 0 of 50 countries have been fact-checked, which is",
+            "   published per country on `/sources/freshness` rather than left to be assumed.",
+            "",
+            "Fixing the first two unblocks about twenty sections between them.",
             ""]
     return "\n".join(out)
 

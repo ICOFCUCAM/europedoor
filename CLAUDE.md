@@ -1,6 +1,6 @@
 # Europedoor — working notes
 
-A static site: 609 generated HTML files, no dependencies, no database. Every
+A static site: 981 generated HTML files, no dependencies, no database. Every
 page comes from `data/` via `tools/build.py`. Nothing in `site/` was written
 by a human and nothing ever should be.
 
@@ -19,8 +19,8 @@ Via Europa. Take their architecture and drop their branding section. See
 | the scores | **`docs/scoring-method.md`** — and note the formula is published at `/method`, so changing `score.py` changes a public page |
 | anything involving money | **`docs/europe-fund.md`** and **`docs/legal-position.md`** — three gates, all currently shut |
 | naming, branding, domains | **`docs/brand-lock.md`** — settled, and enforced |
-| what to build next | **`docs/roadmap.md`** |
-| **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 35 sections, 204 assertions against the real build, and CI fails if any of them stops being true |
+| what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
+| **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,080 assertions against the real build, and CI fails if any of them stops being true |
 
 ## The rules that catch people out
 
@@ -63,10 +63,11 @@ worth making.
 Run all four before claiming anything is done.
 
     python3 tools/build.py check       validate the data
-    python3 tools/build.py            609 pages
+    python3 tools/build.py            981 pages
     python3 tools/checks.py            23 checks, ~36,000 things examined
-    node tools/browser-checks.js       102 checks in Chromium
-    python3 tools/section-audit.py --check   the 35 brief sections, 204 assertions
+    node tools/browser-checks.js       320 checks in Chromium, incl. accessibility
+    python3 tools/section-audit.py --check   the 99 spec sections, 1,080 assertions
+    python3 tools/content-report.py --check  what is missing, against the spec's targets
 
 The browser checks need `npm install playwright` and take about thirty
 seconds. They earn their place: they caught a 47-pixel mobile overflow on

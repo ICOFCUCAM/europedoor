@@ -16,6 +16,12 @@ import hashlib
 import html
 import json
 
+from .i18n import Strings
+
+# One catalogue, loaded once. Adding a language means adding a file, not
+# editing this one — which is the whole point of the exercise.
+T = Strings("en")
+
 SITE_NAME = "Europedoor"
 SITE_TAGLINE = "One door into Europe"
 # The operating company is not incorporated yet. Nothing on this site may
@@ -80,7 +86,7 @@ def crumbs(trail):
             parts.append(f'<a href="{esc(href)}">{esc(label)}</a>')
         else:
             parts.append(f'<span aria-current="page">{esc(label)}</span>')
-    return '<nav class="crumbs" aria-label="Breadcrumb">' + '<span class="sep" aria-hidden="true">/</span>'.join(parts) + "</nav>"
+    return f'<nav class="crumbs" aria-label="{esc(T("nav.aria.breadcrumb"))}">' + '<span class="sep" aria-hidden="true">/</span>'.join(parts) + "</nav>"
 
 
 # Primary navigation, from the product specification. Seven items plus the
@@ -88,35 +94,35 @@ def crumbs(trail):
 # arrived: it is a community surface rather than a way into the continent,
 # and giving it a seventh of the masthead was overstating it.
 NAV = [
-    ("/discover", "Discover", "The map, the regions, the ways in."),
-    ("/countries", "Countries", "Every country, region and destination."),
-    ("/experiences", "Experiences", "What people actually do here."),
-    ("/journeys", "Journeys", "Curated routes across the continent."),
-    ("/plan", "Plan", "Days, budget, interests — an itinerary."),
-    ("/stories", "Stories", "People, places, history, food, faith."),
-    ("/events", "Events", "The European year, month by month."),
+    ("/discover", T("nav.discover"), "The map, the regions, the ways in."),
+    ("/countries", T("nav.countries"), "Every country, region and destination."),
+    ("/experiences", T("nav.experiences"), "What people actually do here."),
+    ("/journeys", T("nav.journeys"), "Curated routes across the continent."),
+    ("/plan", T("nav.plan"), "Days, budget, interests — an itinerary."),
+    ("/stories", T("nav.stories"), "People, places, history, food, faith."),
+    ("/events", T("nav.events"), "The European year, month by month."),
 ]
 
 # Secondary navigation, also from the specification: everything a visitor may
 # need to find and never has to see.
 FOOTER_NAV = [
-    ("/for-businesses", "For businesses"),
-    ("/for-tourism-boards", "For tourism boards"),
-    ("/fund", "Europe Fund"),
-    ("/map", "Map"),
-    ("/themes", "Themes"),
-    ("/beyond-the-obvious", "Beyond the obvious"),
-    ("/my-europe", "My Europe"),
-    ("/about", "About"),
-    ("/how-it-works", "How it works"),
-    ("/method", "Method"),
-    ("/sources", "Sources & corrections"),
-    ("/contact", "Contact"),
-    ("/help", "Help"),
-    ("/accessibility", "Accessibility"),
-    ("/privacy", "Privacy"),
-    ("/terms", "Terms"),
-    ("/cookies", "Cookies"),
+    ("/for-businesses", T("footer.for-businesses")),
+    ("/for-tourism-boards", T("footer.for-tourism-boards")),
+    ("/fund", T("footer.fund")),
+    ("/map", T("footer.map")),
+    ("/themes", T("footer.themes")),
+    ("/beyond-the-obvious", T("footer.beyond")),
+    ("/my-europe", T("footer.myeurope")),
+    ("/about", T("footer.about")),
+    ("/how-it-works", T("footer.how-it-works")),
+    ("/method", T("footer.method")),
+    ("/sources", T("footer.sources")),
+    ("/contact", T("footer.contact")),
+    ("/help", T("footer.help")),
+    ("/accessibility", T("footer.accessibility")),
+    ("/privacy", T("footer.privacy")),
+    ("/terms", T("footer.terms")),
+    ("/cookies", T("footer.cookies")),
 ]
 
 
@@ -143,17 +149,17 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 <link rel="icon" href="/assets/door.svg" type="image/svg+xml">
 {head_extra}</head>
 <body class="area-{esc(area or 'none')}">
-<a class="skip" href="#main">Skip to content</a>
+<a class="skip" href="#main">{esc(T("skip"))}</a>
 <header class="masthead">
   <div class="masthead-in">
     <a class="wordmark" href="/">
       <span class="door" aria-hidden="true"></span>
       <span class="wordmark-text">europedoor</span>
     </a>
-    <nav class="nav" aria-label="Primary">{"".join(nav)}</nav>
+    <nav class="nav" aria-label="{esc(T("nav.aria.primary"))}">{"".join(nav)}</nav>
     <div class="navutil">
-      <a class="navsearch" href="/search"><span aria-hidden="true">⌕</span> Search</a>
-      <a class="navmine" href="/my-europe">My Europe</a>
+      <a class="navsearch" href="/search"><span aria-hidden="true">⌕</span> {esc(T("nav.search"))}</a>
+      <a class="navmine" href="/my-europe">{esc(T("nav.myeurope"))}</a>
     </div>
   </div>
 </header>
@@ -162,14 +168,9 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 </main>
 <footer class="footer">
   <div class="footer-in">
-    <p class="footer-lede">{esc(SITE_TAGLINE)} — discover it, plan it, and leave it better than you found it.</p>
-    <nav class="footer-nav" aria-label="Footer">{footer_nav}</nav>
-    <p class="footer-legal">
-      Editorial project, pre-launch. Operated by {esc(OPERATOR)}. Nothing here is a booking,
-      an offer, or financial advice; nothing on this site takes a payment.
-      Country facts are editorial and may be out of date — check official
-      government advice before you travel.
-    </p>
+    <p class="footer-lede">{esc(T("footer.lede"))}</p>
+    <nav class="footer-nav" aria-label="{esc(T("nav.aria.footer"))}">{footer_nav}</nav>
+    <p class="footer-legal">{esc(T("footer.legal", operator=OPERATOR))}</p>
   </div>
 </footer>
 {scripts_html}</body>

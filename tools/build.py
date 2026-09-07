@@ -151,6 +151,17 @@ def stats():
     print(f"advisory    {len(advisory)}: {', '.join(advisory) or '—'}")
 
 
+def strings_report():
+    """Which languages exist, how complete each is, and which would ship."""
+    from lib import i18n
+    print("interface string catalogues\n")
+    for r in i18n.report():
+        mark = "ships" if r["ships"] else "held"
+        print(f"  {r['lang']:<4} {r['coverage']*100:5.1f}%  {r['have']:>3}/{r['total']:<3} {mark}")
+    print("\n  A catalogue ships at 100% of the interface AND localised destination copy.")
+    print("  Half-translated pages are worse than English ones; see docs/product-specification.md.")
+
+
 def main():
     cmd = sys.argv[1] if len(sys.argv) > 1 else "build"
     if cmd == "check":
@@ -158,6 +169,8 @@ def main():
         print("data ok")
     elif cmd == "stats":
         stats()
+    elif cmd == "strings":
+        strings_report()
     elif cmd == "build":
         build()
     else:

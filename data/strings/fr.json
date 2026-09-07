@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "lang": "fr",
+    "name": "Français",
+    "coverage_note": "Chrome only, and not reviewed by a French speaker. Below the shipping threshold on purpose — see docs/product-specification.md §2.8."
+  },
+  "skip": "Aller au contenu",
+  "nav.discover": "Découvrir",
+  "nav.countries": "Pays",
+  "nav.experiences": "Expériences",
+  "nav.journeys": "Itinéraires",
+  "nav.plan": "Planifier",
+  "nav.stories": "Récits",
+  "nav.events": "Événements",
+  "nav.search": "Rechercher",
+  "nav.myeurope": "Mon Europe",
+  "nav.aria.primary": "Navigation principale",
+  "nav.aria.footer": "Pied de page",
+  "nav.aria.breadcrumb": "Fil d'Ariane",
+  "crumb.europe": "Europe",
+  "action.save": "Enregistrer dans Mon Europe",
+  "action.plan": "Planifier un voyage"
+}

@@ -40,6 +40,15 @@ jobs:
       - name: Audit the brief, section by section
         run: python3 tools/section-audit.py --check
 
+      - name: Fail if the content report is stale
+        run: |
+          python3 tools/content-report.py --write
+          if ! git diff --quiet -- docs/content-report.md; then
+            echo "docs/content-report.md is out of date. Run: python3 tools/content-report.py --write"
+            git diff -- docs/content-report.md
+            exit 1
+          fi
+
       - name: Fail if the audit document is stale
         run: |
           python3 tools/section-audit.py --write

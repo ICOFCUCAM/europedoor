@@ -27,6 +27,19 @@ Kept current. The reasoning is in
 * 23 static checks, 102 browser checks and a 204-assertion audit of the
   brief's 35 sections, all in CI
 
+## Also done, from the 99-section specification
+
+* The specification's IA: `/europe/<country>/<region>/<destination>`, seven-item
+  navigation, and the nine pages the footer had been promising
+* Places — 192 of them — with opening hours, price and website refused
+* Eight experience categories with 29 sub-categories, each printing its rule
+* Search that reads intent, budget, month and proximity
+* Map popups, a places layer, distance from a chosen origin
+* Collections in My Europe, and shareable, saveable itineraries
+* Currency conversion, dated and labelled indicative
+* Interface strings in data catalogues, with coverage measured
+* An accessibility suite in both colour schemes on every build
+
 ## Next, in order
 
 1. **Actually verify the facts.** The mechanism is built and the board reads
