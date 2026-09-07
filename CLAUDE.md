@@ -13,7 +13,7 @@ Via Europa. Take their architecture and drop their branding section. See
 
 | doing | read |
 |---|---|
-| **anything substantial — start here** | **`docs/product-specification.md`** — the 36-section brief answered, plus the Postgres schema, the API, the AI pipeline with actual prompts, the dashboards, the money and the risks. Four marked DEVIATIONs from the brief, each with its reasoning |
+| **anything substantial — start here** | **`docs/product-specification.md`** — both specifications answered: the 36-section brief in Parts 1–3, the 99-section one in Part 4. Plus the Postgres schema, the API, the AI pipeline with actual prompts, the dashboards, the money and the risks |
 | changing how pages are generated | **`docs/architecture.md`** — the four rules the build depends on |
 | adding or editing a place | **`docs/data-model.md`** — every field, and what the validator rejects |
 | the scores | **`docs/scoring-method.md`** — and note the formula is published at `/method`, so changing `score.py` changes a public page |
@@ -60,20 +60,27 @@ worth making.
 
 ## Gates
 
-Run all four before claiming anything is done.
+Run all six before claiming anything is done.
 
     python3 tools/build.py check       validate the data
     python3 tools/build.py            981 pages
-    python3 tools/checks.py            23 checks, ~36,000 things examined
+    python3 tools/checks.py            23 checks, ~69,000 things examined
     node tools/browser-checks.js       320 checks in Chromium, incl. accessibility
     python3 tools/section-audit.py --check   the 99 spec sections, 1,080 assertions
-    python3 tools/content-report.py --check  what is missing, against the spec's targets
+    python3 tools/content-report.py --write  what is missing, against the spec's targets
 
-The browser checks need `npm install playwright` and take about thirty
-seconds. They earn their place: they caught a 47-pixel mobile overflow on
-every city page that no amount of reading the CSS would have found. They
-launch the sandbox's own Chromium via `executablePath` because the npm
-package version will not match the installed browser build.
+The browser checks need `npm install playwright` and take a couple of
+minutes. They earn their place repeatedly: a 47-pixel mobile overflow on
+every city page, two colour tokens below the WCAG contrast line, a places
+layer that could never be turned on because `.hidden` is not a property of an
+SVG element, and a €700 fortnight routed through Switzerland. None of those
+was findable by reading the code. They launch the sandbox's own Chromium via
+`executablePath` because the npm package version will not match the
+installed browser build.
+
+**Two of the gates write files.** `section-audit.py --write` and
+`content-report.py --write` regenerate documents that CI then checks for
+staleness, exactly like `site/`. Run them and commit the result.
 
 ## Adding a country
 
