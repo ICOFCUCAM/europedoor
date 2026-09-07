@@ -50,7 +50,7 @@ Aarhus, Albarracín, Alghero, Sardinia, Alta, Amiens, Andorra la Vella, Annecy, 
 | language | coverage | ships |
 |---|---:|---|
 | en | 100% | yes |
-| fr | 31% | held |
+| fr | 30% | held |
 
 A catalogue ships at 100% of the interface **and** localised destination copy.
 A half-translated site is worse than an English one.

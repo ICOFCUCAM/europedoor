@@ -11,10 +11,70 @@ import math
 
 from . import urls
 from .render import (SITE_NAME, card, chips, crumbs, esc, factlist, grid,
-                     jsonscript, page, plate, section)
+                     jsondata, page, plate, section)
 from .score import city_scores, country_scores
 
 HOME = ("Europe", "/discover")
+
+# What a consumer of the public API may do with it. Stated in the document
+# itself rather than only on a page, because a JSON file gets copied and the
+# page it was linked from does not travel with it.
+API_LICENCE = {
+    "terms": "https://europedoor.com/terms",
+    "use": "Free to read, cache and build on, with attribution to Europedoor. "
+           "Estimates are planning arithmetic, not quotes. Nothing here is "
+           "entry, visa or safety advice.",
+    "attribution": "Europedoor — europedoor.com",
+}
+
+# How long a checked fact stays checked. Currencies, cost bands and seasons
+# move slowly; opening arrangements move fast. 365 days is the outer bound
+# for the slow ones, and the fast ones are refused by the validator rather
+# than reviewed, so this interval only ever has to hold the slow ones.
+#
+# The number exists so that "verified" cannot quietly become a permanent
+# badge earned once. A check has an expiry date from the moment it is made.
+REVIEW_DAYS = 365
+
+
+def verification_of(c, today=None):
+    """The verification state of one country, as data.
+
+    Four states, not two. "Never checked" and "checked, and now due again"
+    are different problems with different fixes, and collapsing them into
+    "unverified" loses the distinction exactly when it starts to matter.
+    """
+    import datetime
+
+    ch = c.get("checked")
+    if not ch:
+        return {"status": "unverified", "state": "never", "on": None, "by": None,
+                "confidence": "low", "sources": [], "dueIn": None}
+    today = today or datetime.date.today()
+    on = datetime.date.fromisoformat(ch["on"])
+    age = (today - on).days
+    due = age >= REVIEW_DAYS
+    srcs = ch.get("sources", [])
+    # Confidence is derived, never authored: a field somebody can type is a
+    # field somebody will type "high" into. Official sources and a recent
+    # check earn it; nothing else does.
+    official = sum(1 for x in srcs if x.get("kind") == "official")
+    if due or not srcs:
+        confidence = "low"
+    elif official and ch.get("status") in ("officially-sourced", "business-verified"):
+        confidence = "high"
+    else:
+        confidence = "medium"
+    return {
+        "status": ch.get("status", "editor-reviewed"),
+        "state": "due" if due else "current",
+        "on": ch["on"],
+        "by": ch["by"],
+        "confidence": confidence,
+        "sources": [{"what": x["what"], "where": x["where"], "kind": x["kind"],
+                     "url": x.get("url")} for x in srcs],
+        "dueIn": REVIEW_DAYS - age,
+    }
 
 
 def haversine(a, b):
@@ -75,11 +135,46 @@ def checked_line(c):
     """Every country page says when its practical facts were last verified.
     For almost all of them the honest answer is "never", and printing that is
     the point: an unmarked page reads as a checked page."""
-    ch = c.get("checked")
-    if not ch:
+    v = verification_of(c)
+    if v["state"] == "never":
         return ('<span class="tag advisory">not verified</span> '
                 '<a href="/sources/freshness">why this matters</a>')
-    return f'{esc(ch["on"])} by {esc(ch["by"])}'
+    when = f'{esc(v["on"])} by {esc(v["by"])}'
+    if v["state"] == "due":
+        return (f'{when} <span class="tag advisory">due for review</span> '
+                '<a href="/sources/freshness">what that means</a>')
+    return f'{when} · {esc(v["confidence"])} confidence'
+
+
+def provenance_block(c):
+    """Per-field provenance: which fact, checked where, and what kind of
+    source that is.
+
+    The specification asks for a source URL and a confidence score. A URL on
+    its own is the weaker half — it says a page was consulted, not which
+    claim it supports. So the unit here is the claim: this fact, against this
+    body, of this kind. The URL is optional because some of the best sources
+    for a cost band are not addressable (a price list in a window), and
+    requiring one would push a checker towards whatever happened to have a
+    link.
+    """
+    v = verification_of(c)
+    if not v["sources"]:
+        return ""
+    kinds = {"official": "official body", "operator": "the operator",
+             "municipal": "the municipality", "press": "published reporting",
+             "editorial": "our own editor on the ground"}
+    items = []
+    for src in v["sources"]:
+        where = (f'<a href="{esc(src["url"])}" rel="nofollow noopener">{esc(src["where"])}</a>'
+                 if src.get("url") else esc(src["where"]))
+        items.append(f'<li><strong>{esc(src["what"])}</strong> — {where} '
+                     f'<span class="small">({esc(kinds.get(src["kind"], src["kind"]))})</span></li>')
+    return (f'<h2 id="provenance" class="mt7">What was checked, and against what</h2>'
+            f'<ul class="stack">{"".join(items)}</ul>'
+            f'<p class="small">Checked {esc(v["on"])} by {esc(v["by"])}. This record expires '
+            f'after {REVIEW_DAYS} days and then reads as due for review again — '
+            f'<a href="/sources/freshness">the board</a>.</p>')
 
 
 def bloc_line(data, c):
@@ -198,7 +293,7 @@ def home(data):
     <a class="btn ghost" href="/countries">Every country</a>
     <a class="btn ghost" href="/search">Search everything</a>
   </div>
-  <p class="small" style="margin-top:var(--s6)">{ncountries} countries · {nregions} travel regions ·
+  <p class="small mt6">{ncountries} countries · {nregions} travel regions ·
   {ncities} cities · {len(data['journeys'])} curated journeys</p>
   </div>
   {heromap}
@@ -232,7 +327,7 @@ def home(data):
   <p class="lede">Twelve days, €2,500, history and mountains — in your own words or in a form.
   The planner reads the whole Atlas, scores every city against you, respects distance, and
   runs entirely in your browser.</p></div>
-  <div class="hero-actions" style="margin-top:0">
+  <div class="hero-actions mt0">
     <a class="btn" href="/plan">Plan a journey</a>
     <a class="btn ghost" href="/map">See all {ncities} on the map</a>
   </div>
@@ -270,7 +365,7 @@ def countries_index(data):
         blocks.append(
             f"""<section class="band" id="{esc(m['slug'])}">
             <div class="band-head"><p class="kicker">{len(m['countries'])} countries</p>
-            <h2><a href="{urls.macro(m)}" style="text-decoration:none">{esc(m['name'])}</a></h2>
+            <h2><a href="{urls.macro(m)}" class="nodec">{esc(m['name'])}</a></h2>
             <p class="lede">{esc(m['blurb'])}</p></div>
             <div class="rows">{''.join(rows)}</div></section>"""
         )
@@ -402,10 +497,11 @@ def country_page(data, c):
     {chips(c["interests"], data["interests"])}
     {facts}
     {scorebars(country_scores(c))}
-    <h2 id="getting-around" style="margin-top:var(--s7)">Getting around</h2>
+    <h2 id="getting-around" class="mt7">Getting around</h2>
     <p>{esc(c['getting_around'])}</p>
-    <h2 id="when" style="margin-top:var(--s7)">When to come</h2>
+    <h2 id="when" class="mt7">When to come</h2>
     <p>{esc(c['season']['note'])}</p>
+    {provenance_block(c)}
   </div>
   <aside class="rail">
     <h2 class="mini">Worth knowing</h2>
@@ -596,11 +692,11 @@ def city_page(data, c, r, t):
   <p class="lede">{esc(t['summary'])}</p>
   {chips(t["interests"], data["interests"])}
 </div>
-<div class="card-art" style="max-width:100%;border:1px solid var(--rule);border-radius:var(--radius);aspect-ratio:21/9;overflow:hidden">
+<div class="card-art frame">
 {plate(f"city:{c['slug']}:{t['slug']}", 1260, 540, t['name'])}
 </div>
 {minimap(data, t)}
-<div class="split" style="margin-top:var(--s7)">
+<div class="split mt7">
   <div>
     <h2 id="why-visit">Why visit</h2>
     <ul class="stack">{highlights}</ul>
@@ -797,10 +893,10 @@ def journey_page(data, j):
   <p class="kicker">{esc(j['strapline'])}</p>
   <h1>{esc(j['name'])}</h1>
 </div>
-<div class="card-art" style="border:1px solid var(--rule);border-radius:var(--radius);aspect-ratio:21/9;overflow:hidden">
+<div class="card-art frame">
 {plate("journey:" + j["slug"], 1260, 540, j["name"])}
 </div>
-<div class="split" style="margin-top:var(--s7)">
+<div class="split mt7">
   <div>
     <p class="lede">{esc(j['summary'])}</p>
     {chips(j["interests"], data["interests"])}
@@ -809,16 +905,16 @@ def journey_page(data, j):
     {routemap(data, j)}
     <ul class="legs">{''.join(legs)}</ul>
 
-    <h2 style="margin-top:var(--s7)">Experiences along the way</h2>
+    <h2 class="mt7">Experiences along the way</h2>
     {f'<div class="rows">{jexps}</div>' if jexps else '<p class="small">Nothing listed on this route yet.</p>'}
 
-    <h2 style="margin-top:var(--s7)">What you will be eating</h2>
+    <h2 class="mt7">What you will be eating</h2>
     <ul class="stack">{jfood}</ul>
 
-    <h2 style="margin-top:var(--s7)">What to pack</h2>
+    <h2 class="mt7">What to pack</h2>
     <ul class="stack">{packlist}</ul>
 
-    <h2 style="margin-top:var(--s7)">What this estimate covers</h2>
+    <h2 class="mt7">What this estimate covers</h2>
     <p>About €{est:,} per person: {j['days'] - 1} nights at the {esc(j['budget'])} daily band for
     each country on the route, plus a distance-based transport figure between stops, plus 12%.
     It excludes getting to the start and home from the end, and it is planning arithmetic from
@@ -939,10 +1035,10 @@ def planner_page(data):
     <textarea id="ask" name="ask" rows="2"
       placeholder="I have 12 days and €2,500, starting in Lisbon, and I love history, mountains and food."></textarea>
   </div>
-  <div class="hero-actions" style="margin-top:0">
+  <div class="hero-actions mt0">
     <button class="btn" type="submit">Read that and build it</button>
   </div>
-  <p class="small" style="margin-bottom:0">Read by rules in your browser — not by a model, and
+  <p class="small mb0">Read by rules in your browser — not by a model, and
   not sent anywhere. It shows you exactly what it understood, and names anything it could not
   take account of rather than quietly dropping it.</p>
 </form>
@@ -1022,7 +1118,7 @@ def planner_page(data):
         <legend>What are you travelling for?</legend>
         <div class="checks">{interests}</div>
       </fieldset>
-      <div class="hero-actions" style="margin-top:0">
+      <div class="hero-actions mt0">
         <button class="btn" type="submit">Build the itinerary</button>
         <button class="btn ghost" type="button" id="again">Give me a different one</button>
       </div>
@@ -1240,7 +1336,7 @@ def facet_page(data, c, r, t, key, payload):
 </div>
 <div class="rows">{rowhtml}</div>
 {extra}
-<div class="note" style="margin-top:var(--s7)">
+<div class="note mt7">
   <p>This page exists because {t['name']} has enough in the Atlas to fill it. Destinations
   that do not have a page for this, on purpose — a facet with two entries is a thin page
   wearing a heading. <a href="{urls.city(c, r, t)}">Back to {esc(t['name'])}</a>.</p>
@@ -1313,10 +1409,10 @@ def place_page(data, c, r, t, pl):
   <h1>{esc(pl['name'])}</h1>
   <p class="lede">{esc(pl['summary'])}</p>
 </div>
-<div class="card-art" style="border:1px solid var(--rule);border-radius:var(--radius);aspect-ratio:21/9;overflow:hidden">
+<div class="card-art frame">
 {plate(f"place:{c['slug']}:{t['slug']}:{pl['slug']}", 1260, 540, pl['name'])}
 </div>
-<div class="split" style="margin-top:var(--s7)">
+<div class="split mt7">
   <div>
     {facts}
     <div class="note warn">
@@ -1360,7 +1456,7 @@ def scorebars(scores):
     from .score import DIMENSIONS, LABELS
     rows = "".join(
         f"""<div class="scorerow"><span class="scorelabel">{esc(LABELS[d])}</span>
-        <span class="scorebar"><span style="width:{scores[d]}%"></span></span>
+        <span class="scorebar"><span class="w{scores[d]}"></span></span>
         <span class="scorenum">{scores[d]}</span></div>"""
         for d in DIMENSIONS
     )
@@ -1415,7 +1511,7 @@ def category_page(data, cat, sub=None):
   {len(chosen)} experiences across {len(countries)} countries.</p>
 </div>
 {section("Sub-categories", subcards) if subcards else ""}
-{section("How this list is built", f'<p class="small" style="max-width:44rem">{esc(C.rule_text(cat))}</p>') if not sub else ""}
+{section("How this list is built", f'<p class="small mw44">{esc(C.rule_text(cat))}</p>') if not sub else ""}
 <div class="rows">{rows or '<p class="small">Nothing matches this rule yet, and an empty list is better than a padded one.</p>'}</div>
 """
     return f"{path}/index.html", page(
@@ -1517,14 +1613,14 @@ def join_page(data):
   <div>
     <h2>Three tiers, and what each one means</h2>
     {grid([tiers], 3) if False else '<div class="grid cols-3">' + tiers + '</div>'}
-    <h2 style="margin-top:var(--s7)">What we check</h2>
+    <h2 class="mt7">What we check</h2>
     <ul class="stack">
       <li><strong>You exist.</strong> A registered business or a licensed guide number in the country you operate in.</li>
       <li><strong>You are there.</strong> An address, a phone that answers, and a person whose name goes on the listing.</li>
       <li><strong>You are insured</strong> where the activity requires it — water, height, vehicles, food service.</li>
       <li><strong>You said what it costs</strong>, including what is not included.</li>
     </ul>
-    <h2 style="margin-top:var(--s7)">What we will not do</h2>
+    <h2 class="mt7">What we will not do</h2>
     <ul class="stack">
       <li>Sell placement inside the Journey Planner. The planner scores on fit and distance; money does not enter it.</li>
       <li>Publish a listing whose owner we could not reach.</li>
@@ -1804,10 +1900,10 @@ def story_page(data, s):
   <time datetime="{esc(s['published'])}">{esc(s['published'])}</time>{updated}</p>
   <div class="chips">{tagchips}</div>
 </div>
-<div class="card-art" style="border:1px solid var(--rule);border-radius:var(--radius);aspect-ratio:21/9;overflow:hidden">
+<div class="card-art frame">
 {plate("story:" + s["slug"], 1260, 540, s["title"])}
 </div>
-<div style="max-width:var(--measure);margin:var(--s7) 0">{paras}</div>
+<div class="measure">{paras}</div>
 <p><button class="btn ghost" type="button" data-save="story:{esc(s['slug'])}" data-kind="Story"
    data-label="{esc(s['title'])}" data-url="/stories/{esc(s['slug'])}">Save to My Europe</button></p>
 </article>
@@ -1904,7 +2000,7 @@ def map_page(data):
 <div class="checks" id="layers">{filters}
   <label><input type="checkbox" name="extra" value="places"> ◦ Places ({len(placedots)})</label>
 </div>
-<div class="form-row" style="margin:var(--s4) 0;max-width:34rem">
+<div class="form-row mw34">
   <div class="field">
     <label for="journeylayer">Draw a journey over it</label>
     <select id="journeylayer"><option value="">None</option>{joptions}</select>
@@ -1925,8 +2021,8 @@ def map_page(data):
 </div>
 <div id="mappopup" class="mappopup" hidden aria-live="polite"></div>
 <p class="small" id="routenote"></p>
-{jsonscript("EUROPEDOOR_JOURNEYS", jdata)}
-{jsonscript("EUROPEDOOR_MAPINFO", info)}
+{jsondata("europedoor-journeys", jdata)}
+{jsondata("europedoor-mapinfo", info)}
 <div class="note">
   <h2 class="mini">What this drawing is and is not</h2>
   <p>It is a point map on an equirectangular projection, corrected at 52°N. There are no
@@ -1963,7 +2059,7 @@ def events_page(data):
         )
         blocks.append(
             f'<section class="band" id="{esc(m)}"><div class="band-head">'
-            f'<h2><a href="/events/{esc(m)}" style="text-decoration:none">{esc(names[m])}</a></h2>'
+            f'<h2><a href="/events/{esc(m)}" class="nodec">{esc(names[m])}</a></h2>'
             f'<p class="lede">{len(items)} fixed points across Europe. '
             f'<a href="/events/{esc(m)}">Where to go in {esc(names[m])} →</a></p></div>'
             f'<div class="rows">{rows}</div></section>'
@@ -2185,7 +2281,7 @@ def method_page(data):
 {section("Two dimensions this refuses to compute", f'<div class="rows">{refused}</div>',
          lede="The specification this came from lists ten. Eight are computable from the dataset. These two are not, and an approximation would be worse than the gap.")}
 
-<div class="split" style="margin-top:var(--s7)">
+<div class="split mt7">
   <div>
     <h2>What the scores are not</h2>
     <ul class="stack">
@@ -2199,7 +2295,7 @@ def method_page(data):
       <li><strong>Not capped at 100.</strong> The ceiling is 97 and the floor is 12, so nothing
       is ever perfect and nothing is ever worthless.</li>
     </ul>
-    <h2 style="margin-top:var(--s7)">Why value is different</h2>
+    <h2 class="mt7">Why value is different</h2>
     <p>Five dimensions are structural — they come from tags. Value is the only one anchored to
     something outside our own judgement: the midpoint of the country's daily cost band, which is
     published on every country page and can be argued with directly.</p>
@@ -2241,7 +2337,7 @@ def about_page(data):
     <a href="/plan">planner</a> that turns days and money into a route, and
     <a href="/stories">stories</a> that give the whole thing a reason to be read rather than queried.</p>
 
-    <h2 style="margin-top:var(--s7)">What we are not doing</h2>
+    <h2 class="mt7">What we are not doing</h2>
     <ul class="stack">
       <li><strong>Not an OTA.</strong> We are not going to out-inventory Booking.com and would be
       foolish to try. Discovery first; commerce arrives afterwards, on top of an audience.</li>
@@ -2252,7 +2348,7 @@ def about_page(data):
       is silent. See <a href="/how-it-works">how it works</a>.</li>
     </ul>
 
-    <h2 style="margin-top:var(--s7)">On the inspiration, and the line</h2>
+    <h2 class="mt7">On the inspiration, and the line</h2>
     <p>The idea of a continental discovery platform is not ours and is not anybody's to own —
     tourism boards, atlases and travel magazines have organised continents this way for a century.
     What is owned is expression: another platform's words, photographs, code, layout and brand.
@@ -2341,6 +2437,115 @@ def how_it_works_page(data):
     )
 
 
+def api_page(data):
+    """Documentation for the public read API.
+
+    An undocumented endpoint is an endpoint nobody can rely on, and an
+    endpoint nobody can rely on may as well not be public. This page says
+    what each one holds, what it deliberately does not, what may be done with
+    it, and — the part most API pages leave out — where it will change.
+    """
+    ncity = len(data["cities"])
+    nadv = sum(1 for c in data["countries"].values() if c.get("advisory"))
+    rows = [
+        ("/api/atlas.json",
+         "The planner index: every destination with its interests, nights, "
+         "cost band, season, coordinates and URL. This is the document the "
+         "Journey Planner in your browser actually runs on.",
+         f"{ncity - sum(len(r['cities']) for c in data['countries'].values() if c.get('advisory') for r in c['regions'])} destinations",
+         f"Countries under a travel advisory ({nadv} of them) are absent. That "
+         "is a build-time exclusion, not a UI filter, so no consumer of this "
+         "file can route a traveller into one by accident."),
+        ("/api/search.json",
+         "One flat row per findable thing — country, region, destination, "
+         "place, experience, journey, story, theme, event — with a name, a "
+         "kind, a URL and a lowercased text blob to match against.",
+         "every findable thing",
+         "Advisory countries ARE present here. A page nobody can search for "
+         "is a page that does not exist, and hiding a country from search "
+         "does not make anyone safer."),
+        ("/api/countries.json",
+         "Country-level facts: capital, currency, time zone, languages, "
+         "membership, daily cost band, seasons, and the full region and "
+         "destination tree beneath each one.",
+         f"{len(data['countries'])} countries",
+         "Advisory countries are present, with the advisory attached. Every "
+         "country carries its verification record, so a consumer can tell a "
+         "checked fact from an unchecked one."),
+        ("/api/journeys.json",
+         "The curated routes, with every leg resolved to a real destination: "
+         "coordinates, nights, the note for that stop, and the countries the "
+         "route crosses.",
+         f"{len(data['journeys'])} journeys",
+         "Estimated costs are planning arithmetic from published daily bands "
+         "and straight-line distances. They are not quotes and there is "
+         "nothing to book."),
+    ]
+    cards = "".join(
+        f"""<div class="row db">
+        <h3><code>{esc(u)}</code></h3>
+        <p class="rowsub">{esc(what)}</p>
+        <p class="small"><strong>Holds:</strong> {esc(size)}</p>
+        <p class="small"><strong>Note:</strong> {esc(note)}</p>
+        <p class="small"><a href="{esc(u)}">Open it →</a></p></div>"""
+        for u, what, size, note in rows
+    )
+    body = f"""
+{crumbs([("Europe", "/discover"), ("Sources & corrections", "/sources"), ("The public API", None)])}
+<div class="pagehead">
+  <p class="kicker">The public API</p>
+  <h1>Four read-only endpoints. No key, no quota, no sign-up.</h1>
+  <p class="lede">Everything the site knows is published as static JSON on the same domain,
+  cacheable and versionless. They are the same documents this site's own planner, search and
+  map run on — not a reduced copy of them, which is the only way an API stays true.</p>
+</div>
+
+<div class="rows">{cards}</div>
+
+<div class="split mt7">
+  <div>
+    <h2>What you may do with them</h2>
+    <p>Read them, cache them, and build on them, with attribution to Europedoor. That
+    permission is written into each document as a <code>licence</code> field rather than left
+    on this page, because a JSON file gets copied and the page it was linked from does not
+    travel with it.</p>
+
+    <h2 class="mt7">What they are not</h2>
+    <ul class="stack">
+      <li><strong>Not advice.</strong> Nothing here is entry, visa, border or safety
+      information. Those are refused across the whole product and
+      <a href="/sources">the reason is on the sources page</a>.</li>
+      <li><strong>Not quotes.</strong> Every cost is a band or a computed estimate. There is
+      nothing to book on this site and no price came from a supplier.</li>
+      <li><strong>Not verified, mostly.</strong> Each country carries a verification record
+      saying when a person last checked it and against what. For most of them the answer is
+      still "never", and <a href="/sources/freshness">that board is public</a>.</li>
+      <li><strong>Not stable yet.</strong> There is no version number in these URLs on
+      purpose: pretending to a stability guarantee before anyone depends on it is worse than
+      saying plainly that the shape may still move.</li>
+    </ul>
+  </div>
+  <aside class="rail">
+    <h2 class="mini">Why these four and not more</h2>
+    <p>These are read-only projections of data already committed to this repository, so they
+    cost nothing to serve and cannot fall out of step with the site.</p>
+    <p>The specification also lists endpoints that write — saving to an account, claiming a
+    business listing, registering interest in the Fund. Every one of those needs somebody to
+    be logged in, which needs an account, which needs a data controller, which needs a
+    company. <a href="/how-it-works">None of that exists yet</a>, so none of it is published as a
+    stub that returns nothing.</p>
+    <h2 class="mini mt7">Attribution</h2>
+    <p class="small">Europedoor — europedoor.com. A link back is enough.</p>
+  </aside>
+</div>
+"""
+    return "/api-docs/index.html", page(
+        "The public API", body, path="/api-docs",
+        description="Four public, read-only, key-free JSON endpoints: the Atlas index, "
+                    "the search index, country facts and the curated journeys.",
+        trail=None)
+
+
 def sources_page(data):
     body = f"""
 {crumbs([("Europe", "/discover"), ("Sources & corrections", None)])}
@@ -2359,7 +2564,7 @@ def sources_page(data):
     travel advice, the destination country's border authority, and the operator's own site for
     anything you intend to turn up for.</p>
 
-    <h2 style="margin-top:var(--s7)">What is derived rather than claimed</h2>
+    <h2 class="mt7">What is derived rather than claimed</h2>
     <ul class="stack">
       <li><strong>Distances</strong> are computed great-circle kilometres between the coordinates
       on each city page. They are honest as straight lines and misleading as travel times — the
@@ -2370,7 +2575,7 @@ def sources_page(data):
       <li><strong>Nearby stops</strong> are computed, never curated, so they cannot flatter a partner.</li>
     </ul>
 
-    <h2 style="margin-top:var(--s7)">The verification plan</h2>
+    <h2 class="mt7">The verification plan</h2>
     <ol class="stack">
       <li>Every country's practical facts — currency, blocs, entry, costs — checked against the
       relevant official body and dated in the data file.</li>
@@ -2406,30 +2611,42 @@ def freshness_page(data):
     identically. This page is the alternative: every country, the date its
     practical facts were last checked, and — for now — a column of the word
     "never", because that is the truth."""
+    # Four states, not two. "Never checked" and "checked a year ago and now
+    # due again" are different problems with different fixes, and the older
+    # version of this board collapsed both into "unverified" — which meant
+    # that the day a check was finally made, the record would have silently
+    # become permanent. A check has an expiry from the moment it is made.
+    STATE_ORDER = {"never": 0, "due": 1, "current": 2}
     rows = []
-    checked = 0
-    for c in sorted(data["countries"].values(), key=lambda c: (bool(c.get("checked")), c["name"])):
-        ch = c.get("checked")
-        if ch:
-            checked += 1
-            meta = f'{esc(ch["on"])} · {esc(ch["by"])}'
-            tag = ""
+    tally = {"never": 0, "due": 0, "current": 0}
+    for c in sorted(data["countries"].values(),
+                    key=lambda c: (STATE_ORDER[verification_of(c)["state"]], c["name"])):
+        v = verification_of(c)
+        tally[v["state"]] += 1
+        if v["state"] == "never":
+            meta, tag = "never", ' <span class="tag advisory">unverified</span>'
+        elif v["state"] == "due":
+            meta = f'{esc(v["on"])} · {esc(v["by"])}'
+            tag = ' <span class="tag advisory">due for review</span>'
         else:
-            meta = "never"
-            tag = ' <span class="tag advisory">unverified</span>'
+            meta = f'{esc(v["on"])} · {esc(v["by"])} · due in {v["dueIn"]} days'
+            tag = f' <span class="tag">{esc(v["confidence"])} confidence</span>'
+        nsrc = len(v["sources"])
+        prov = f" · {nsrc} source{'s' if nsrc != 1 else ''}" if nsrc else ""
         ncity = sum(len(r["cities"]) for r in c["regions"])
         rows.append(
             f"""<a class="row" href="{urls.country(c)}">
             <div><h3>{esc(c['name'])}{tag}</h3>
-            <p class="rowsub">{ncity} cities · {esc(c['currency'])} · €{c['daily_eur'][0]}–{c['daily_eur'][1]} a day</p></div>
+            <p class="rowsub">{ncity} cities · {esc(c['currency'])} · €{c['daily_eur'][0]}–{c['daily_eur'][1]} a day{prov}</p></div>
             <p class="rowmeta">{meta}</p></a>"""
         )
     n = len(data["countries"])
+    checked = tally["current"] + tally["due"]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Sources & corrections", "/sources"), ("Fact freshness", None)])}
 <div class="pagehead">
   <p class="kicker">Fact freshness</p>
-  <h1>{checked} of {n} countries verified.</h1>
+  <h1>{tally["current"]} of {n} countries verified and current.</h1>
   <p class="lede">Currencies, costs, seasons, entry rules and opening arrangements all move.
   This page says, for every country, when a person last checked the practical facts against a
   source — and for most of them the answer is still "never", which is why it is written down
@@ -2445,6 +2662,13 @@ def freshness_page(data):
   government source instead of us.</p>
 </div>
 
+<dl class="facts">
+  <div class="fact"><dt>Never checked</dt><dd>{tally["never"]}</dd></div>
+  <div class="fact"><dt>Checked and current</dt><dd>{tally["current"]}</dd></div>
+  <div class="fact"><dt>Checked but now due again</dt><dd>{tally["due"]}</dd></div>
+  <div class="fact"><dt>Review interval</dt><dd>{REVIEW_DAYS} days</dd></div>
+</dl>
+
 <div class="split">
   <div><div class="rows">{''.join(rows)}</div></div>
   <aside class="rail">
@@ -2458,7 +2682,19 @@ def freshness_page(data):
     <h2 class="mini">Why the date and not a tick</h2>
     <p>A tick says "correct". A date says "correct on this day, and you can judge how much
     that is worth now". Only the second one is true.</p>
-    <p><a href="/sources">Sources and corrections →</a></p>
+
+    <h2 class="mini mt7">And why the date expires</h2>
+    <p>A check is good for {REVIEW_DAYS} days and then this board says <em>due for review</em>
+    again, whoever made it and however carefully. Without that, the first country anybody
+    checks would carry a verified badge for ever — which is how a date quietly turns back
+    into a tick.</p>
+
+    <h2 class="mini mt7">Confidence is derived, not typed</h2>
+    <p>High confidence needs an official source <em>and</em> a check inside the interval.
+    Anything else is medium, and no sources at all is low. Nobody can write
+    <code>confidence: high</code> into a data file, because a field a person can type is a
+    field a person will type that into.</p>
+    <p><a href="/sources">Sources and corrections →</a> · <a href="/api-docs">the same record in the API →</a></p>
   </aside>
 </div>
 """
@@ -2497,6 +2733,97 @@ def sitemap(paths):
     )
 
 # ── search ────────────────────────────────────────────────────────────
+
+def countries_api(data):
+    """Country-level facts, as one flat document.
+
+    The specification files this and /api/journeys.json under "Stage 2",
+    alongside the endpoints that need authentication. That grouping was wrong
+    and it took a re-read to notice: these two are read-only projections of
+    data already committed to this repository. Nothing about them needs a
+    backend, so the only thing keeping them unshipped was the label.
+
+    Advisory countries ARE present, with the advisory on them. A consumer
+    deciding what to do about Belarus needs to be told there is an advisory,
+    not handed a document in which the country silently does not exist. That
+    is the opposite of the rule for /api/atlas.json, and deliberately: the
+    planner index is a list of places to route through, and this is a
+    description of the continent.
+    """
+    out = []
+    for slug, c in sorted(data["countries"].items()):
+        regions = []
+        for r in c["regions"]:
+            regions.append({
+                "slug": r["slug"], "name": r["name"], "url": urls.region(c, r),
+                "interests": r["interests"],
+                "destinations": [{"slug": t["slug"], "name": t["name"],
+                                  "url": urls.city(c, r, t)} for t in r["cities"]],
+            })
+        row = {
+            "slug": slug,
+            "name": c["name"],
+            "url": urls.country(c),
+            "macro": c["macro_slug"],
+            "capital": c["capital"],
+            "currency": c["currency"],
+            "timezone": c["timezone"],
+            "languages": c["languages"],
+            "membership": c.get("blocs", []),
+            "budget": c["budget"],
+            "dailyEur": c["daily_eur"],
+            "season": {"peak": c["season"]["peak"],
+                       "shoulder": c["season"].get("shoulder", [])},
+            "regions": regions,
+            # Verification, in the document rather than only on the page. A
+            # consumer that cannot see whether a fact was checked will assume
+            # it was.
+            "verification": verification_of(c),
+        }
+        if c.get("advisory"):
+            row["advisory"] = {"level": c["advisory"]["level"], "note": c["advisory"]["note"]}
+        out.append(row)
+    return "/api/countries.json", {
+        "generated": "build",
+        "licence": API_LICENCE,
+        "note": "Country-level facts. Advisory countries are present, with the advisory.",
+        "countries": out,
+    }
+
+
+def journeys_api(data):
+    """The curated routes, with their legs resolved to real destinations."""
+    out = []
+    for j in data["journeys"]:
+        legs = []
+        for leg in j["legs"]:
+            n = data["cities"][leg["city"]]
+            legs.append({
+                "city": leg["city"],
+                "name": n["city"]["name"],
+                "country": n["country"]["name"],
+                "url": urls.city(n["country"], n["region"], n["city"]),
+                "nights": leg["nights"],
+                "note": leg.get("note", ""),
+                "lat": n["city"]["lat"], "lon": n["city"]["lon"],
+            })
+        out.append({
+            "slug": j["slug"], "name": j["name"], "url": urls.journey(j),
+            "strapline": j["strapline"], "summary": j["summary"],
+            "days": j["days"], "budget": j["budget"], "difficulty": j["difficulty"],
+            "transport": j["transport"], "accommodation": j["accommodation"],
+            "months": j["months"], "interests": j["interests"],
+            "creator": j["creator"], "pack": j["pack"],
+            "countries": sorted({data["cities"][l["city"]]["country"]["name"] for l in j["legs"]}),
+            "legs": legs,
+        })
+    return "/api/journeys.json", {
+        "generated": "build",
+        "licence": API_LICENCE,
+        "note": "Curated routes. Estimates are planning arithmetic, not quotes.",
+        "journeys": out,
+    }
+
 
 def search_api(data):
     """One flat index of everything findable, built once and filtered in the
@@ -3013,7 +3340,7 @@ def tourism_boards_page(data):
     <h2>What we would build for you</h2>
     <div class="rows">{body_rows}</div>
 
-    <h2 style="margin-top:var(--s7)">The line, before the conversation rather than after</h2>
+    <h2 class="mt7">The line, before the conversation rather than after</h2>
     <p>A tourism board's money can buy attention. It cannot buy the impression of independent
     editorial judgement, because that impression is the only thing we have to sell to anybody
     else. So: campaigns are labelled, time-boxed and confined to directory and discovery
@@ -3023,7 +3350,7 @@ def tourism_boards_page(data):
     <p>If that makes us less useful to you than a publisher who will sell the front page, that
     is the correct outcome for both of us.</p>
 
-    <h2 style="margin-top:var(--s7)">What exists today</h2>
+    <h2 class="mt7">What exists today</h2>
     <p>{len(data['countries'])} countries and {len(data['cities'])} destinations, written
     editorially, with the verification status of each country published on
     <a href="/sources/freshness">the freshness board</a>. No traffic to report yet, and we

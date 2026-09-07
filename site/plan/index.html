@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27;; style-src &#x27;self&#x27;; img-src &#x27;self&#x27; data:; font-src &#x27;self&#x27;; connect-src &#x27;self&#x27;; form-action &#x27;self&#x27;; base-uri &#x27;none&#x27;">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Plan a journey · Europedoor</title>
 <meta name="description" content="Tell Europedoor your days, budget and interests and it builds a European itinerary with real distances, real night counts and a cost estimate.">
 <link rel="canonical" href="https://europedoor.com/plan">
@@ -45,10 +47,10 @@
     <textarea id="ask" name="ask" rows="2"
       placeholder="I have 12 days and €2,500, starting in Lisbon, and I love history, mountains and food."></textarea>
   </div>
-  <div class="hero-actions" style="margin-top:0">
+  <div class="hero-actions mt0">
     <button class="btn" type="submit">Read that and build it</button>
   </div>
-  <p class="small" style="margin-bottom:0">Read by rules in your browser — not by a model, and
+  <p class="small mb0">Read by rules in your browser — not by a model, and
   not sent anywhere. It shows you exactly what it understood, and names anything it could not
   take account of rather than quietly dropping it.</p>
 </form>
@@ -145,7 +147,7 @@
         <span aria-hidden="true">═</span> Slow travel by rail</label><label><input type="checkbox" name="interest" value="festivals">
         <span aria-hidden="true">✵</span> Festivals</label></div>
       </fieldset>
-      <div class="hero-actions" style="margin-top:0">
+      <div class="hero-actions mt0">
         <button class="btn" type="submit">Build the itinerary</button>
         <button class="btn ghost" type="button" id="again">Give me a different one</button>
       </div>
@@ -184,7 +186,7 @@
 <footer class="footer">
   <div class="footer-in">
     <p class="footer-lede">One door into Europe — discover it, plan it, and leave it better than you found it.</p>
-    <nav class="footer-nav" aria-label="Footer"><a href="/for-businesses">For businesses</a><a href="/for-tourism-boards">For tourism boards</a><a href="/fund">Europe Fund</a><a href="/map">Map</a><a href="/themes">Themes</a><a href="/beyond-the-obvious">Beyond the obvious</a><a href="/my-europe">My Europe</a><a href="/about">About</a><a href="/how-it-works">How it works</a><a href="/method">Method</a><a href="/sources">Sources &amp; corrections</a><a href="/contact">Contact</a><a href="/help">Help</a><a href="/accessibility">Accessibility</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/cookies">Cookies</a></nav>
+    <nav class="footer-nav" aria-label="Footer"><a href="/for-businesses">For businesses</a><a href="/for-tourism-boards">For tourism boards</a><a href="/fund">Europe Fund</a><a href="/map">Map</a><a href="/themes">Themes</a><a href="/beyond-the-obvious">Beyond the obvious</a><a href="/my-europe">My Europe</a><a href="/about">About</a><a href="/how-it-works">How it works</a><a href="/method">Method</a><a href="/sources">Sources &amp; corrections</a><a href="/api-docs">The public API</a><a href="/contact">Contact</a><a href="/help">Help</a><a href="/accessibility">Accessibility</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/cookies">Cookies</a></nav>
     <p class="footer-legal">Editorial project, pre-launch. Operated by [OPERATOR ENTITY — NOT YET INCORPORATED]. Nothing here is a booking, an offer, or financial advice; nothing on this site takes a payment. Country facts are editorial and may be out of date — check official government advice before you travel.</p>
   </div>
 </footer>

@@ -41,7 +41,16 @@
   var sel = document.getElementById("journeylayer");
   var route = document.getElementById("route");
   var note = document.getElementById("routenote");
-  var JOURNEYS = window.EUROPEDOOR_JOURNEYS || [];
+  /* Page data arrives as an inert application/json block rather than an
+   * inline script, so the site can run script-src 'self' with no
+   * 'unsafe-inline'. Guarded because a missing block must degrade to an
+   * empty map, not a thrown exception that takes the rest of the page. */
+  function pageData(id) {
+    var el = document.getElementById(id);
+    if (!el) return null;
+    try { return JSON.parse(el.textContent); } catch (e) { return null; }
+  }
+  var JOURNEYS = pageData("europedoor-journeys") || [];
   if (!sel || !route) return;
 
   function drawJourney() {
@@ -79,7 +88,7 @@
    * sentence, the distance, and a way in. The dots stay real links so the
    * map still works with JavaScript off — the click is intercepted, not
    * replaced. */
-  var INFO = window.EUROPEDOOR_MAPINFO || {};
+  var INFO = pageData("europedoor-mapinfo") || {};
   var popup = document.getElementById("mappopup");
   var fromSel = document.getElementById("mapfrom");
   var placesLayer = document.getElementById("places");

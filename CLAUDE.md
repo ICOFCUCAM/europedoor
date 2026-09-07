@@ -1,6 +1,6 @@
 # Europedoor — working notes
 
-A static site: 986 generated HTML files, no dependencies, no database. Every
+A static site: 987 generated HTML files, no dependencies, no database. Every
 page comes from `data/` via `tools/build.py`. Nothing in `site/` was written
 by a human and nothing ever should be.
 
@@ -20,7 +20,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | anything involving money | **`docs/europe-fund.md`** and **`docs/legal-position.md`** — three gates, all currently shut |
 | naming, branding, domains | **`docs/brand-lock.md`** — settled, and enforced |
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
-| **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,218 assertions against the real build, and CI fails if any of them stops being true |
+| **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,250 assertions against the real build, and CI fails if any of them stops being true |
 
 ## The rules that catch people out
 
@@ -53,6 +53,21 @@ thing for a well-meaning person to break.
 of a slug. `checks.py` fails on any `<img>`. This keeps the licensing
 position simple and it is not an aesthetic preference.
 
+**The Content-Security-Policy is strict, and the pages are what make it
+possible.** `default-src 'none'`, no `'unsafe-inline'` in any directive. That
+holds only because there is no inline `<script>` anywhere (page data goes in
+an inert `application/json` block — see `render.jsondata`) and no `style="..."`
+attribute anywhere (utility classes instead; CSP hashes do **not** apply to
+style attributes, so one of them would force `style-src` open on all 987
+pages). `checks.py` fails on either. `frame-ancestors` lives in `site/_headers`
+only, because a browser ignores it in a meta tag and logs that it did.
+
+**A verification record expires.** A check is good for `REVIEW_DAYS` and then
+reads as *due for review* again. Confidence is derived from the source kind
+and the age of the check — the validator refuses an authored `confidence`
+field, because a field a person can type is a field somebody will type "high"
+into.
+
 **No `rank`, `boost`, `featured` or `sponsored` field on a place.**
 Sponsorship attaches to a provider and affects directory surfaces only. That
 wall is enforced in the schema, which is the only version of the promise
@@ -63,10 +78,10 @@ worth making.
 Run all six before claiming anything is done.
 
     python3 tools/build.py check       validate the data
-    python3 tools/build.py            986 pages
-    python3 tools/checks.py            23 checks, ~72,000 things examined
-    node tools/browser-checks.js       341 checks in Chromium, incl. accessibility
-    python3 tools/section-audit.py --check   the 99 spec sections, 1,218 assertions
+    python3 tools/build.py            987 pages
+    python3 tools/checks.py            25 checks, ~74,700 things examined
+    node tools/browser-checks.js       347 checks in Chromium, incl. accessibility
+    python3 tools/section-audit.py --check   the 99 spec sections, 1,250 assertions
     python3 tools/content-report.py --write  what is missing, against the spec's targets
 
 The browser checks need `npm install playwright` and take a couple of

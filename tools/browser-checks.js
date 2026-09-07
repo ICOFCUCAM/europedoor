@@ -232,6 +232,74 @@ async function main() {
      `favouring a saved place did not put it in the route: ${withSaved.route}`);
   await page.evaluate(() => localStorage.removeItem("europedoor.saved.v1"));
 
+  // ── My Europe: moving a saved list between browsers ────────────────
+  // The specification files "a saved journey follows you between devices"
+  // under authentication. It needs authentication only if the copy happens
+  // on our side. This does it as text, so we still hold nothing.
+  await page.goto(base + "/my-europe", { waitUntil: "networkidle" });
+  await page.evaluate(() => {
+    localStorage.setItem("europedoor.saved.v1", JSON.stringify([
+      { id: "city:norway/fjord-norway/bergen", kind: "City", label: "Bergen",
+        url: "/europe/norway/fjord-norway/bergen" },
+    ]));
+    localStorage.setItem("europedoor.collections.v1", JSON.stringify(["Summer"]));
+  });
+  await page.reload({ waitUntil: "networkidle" });
+  const exported = await page.locator("#portable").inputValue();
+  const parsed = JSON.parse(exported);
+  ok(parsed.saved.length === 1 && parsed.saved[0].label === "Bergen",
+     "the saved list did not export as text");
+  ok(parsed.collections.includes("Summer"), "collections were not carried in the export");
+
+  // A second browser: clear everything, paste the text back, expect the list.
+  await page.evaluate(() => { localStorage.clear(); });
+  await page.reload({ waitUntil: "networkidle" });
+  ok(await page.locator("#portable").count() === 0,
+     "the empty state should not offer a transfer box with nothing in it");
+  await page.evaluate(() => {
+    localStorage.setItem("europedoor.saved.v1", JSON.stringify([
+      { id: "city:italy/rome-and-lazio/rome", kind: "City", label: "Rome",
+        url: "/europe/italy/rome-and-lazio/rome" },
+    ]));
+  });
+  await page.reload({ waitUntil: "networkidle" });
+  await page.fill("#portable", exported);
+  await page.click('#transfer button[type="submit"]');
+  await page.waitForFunction(() => /item.? added/.test(
+    document.getElementById("transferstate").textContent));
+  const imported = await page.locator("#mine .saved h3").allTextContents();
+  ok(imported.some((t) => /Bergen/.test(t)), "the imported item did not appear");
+  ok(imported.some((t) => /Rome/.test(t)),
+     "importing replaced the list that was already there instead of merging into it");
+
+  // Pasted text is untrusted: it arrived by being pasted and could be
+  // anything. An off-site url must not end up as a link on the reader's own
+  // page.
+  await page.evaluate(() => { localStorage.clear(); });
+  await page.reload({ waitUntil: "networkidle" });
+  await page.evaluate(() => {
+    localStorage.setItem("europedoor.saved.v1", JSON.stringify([
+      { id: "city:italy/rome-and-lazio/rome", kind: "City", label: "Rome",
+        url: "/europe/italy/rome-and-lazio/rome" },
+    ]));
+  });
+  await page.reload({ waitUntil: "networkidle" });
+  await page.fill("#portable", JSON.stringify({ v: 1, saved: [
+    { id: "evil", kind: "City", label: "Elsewhere", url: "https://example.invalid/" },
+    { id: "evil2", kind: "City", label: "Protocol", url: "javascript:alert(1)" },
+    { id: "evil3", kind: "City", label: "Schemeless", url: "//example.invalid/" },
+  ] }));
+  await page.click('#transfer button[type="submit"]');
+  await page.waitForFunction(() => /ignored/.test(
+    document.getElementById("transferstate").textContent));
+  const links = await page.locator("#mine .saved h3 a").evaluateAll(
+    (as) => as.map((a) => a.getAttribute("href")));
+  for (const h of links) {
+    ok(h.startsWith("/") && !h.startsWith("//"),
+       `an imported list put an off-site link on the page: ${h}`);
+  }
+  await page.evaluate(() => { localStorage.clear(); });
+
   // ── the follow-up questions ────────────────────────────────────────
   // §19: ask only what changes the answer, and answer anyway. A sentence
   // with no length and no budget must still produce a plan AND put both

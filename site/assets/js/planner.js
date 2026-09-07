@@ -470,7 +470,7 @@
               '<h3><a href="' + city.url + '">' + city.name + "</a> <span class=\"small\">· " +
               city.country + " · " + city.region + "</span></h3>" +
               "<p>" + city.why + "</p>" +
-              '<p class="small" style="margin-top:.4rem">' + whyLine(city, opts.wants) +
+              '<p class="small mt-tight">' + whyLine(city, opts.wants) +
               " " + money(dailyRate(city, opts.style)) + " a day here." + "</p>" +
               '<ul class="daylist">' + dayHtml + "</ul>" + forcedNote + altHtml + hop +
               "</div></li>";
@@ -492,7 +492,7 @@
     for (i = 1; i < route.length; i++) totalKm += km(route[i - 1].city, route[i].city);
 
     result.innerHTML =
-      '<h2 style="margin-top:var(--s7)">' + opts.days + " days, " + route.length +
+      '<h2 class="mt7">' + opts.days + " days, " + route.length +
         " stops, " + countries.length + (countries.length === 1 ? " country" : " countries") + "</h2>" +
       '<dl class="result-summary">' +
         "<div><dt>Estimated total</dt><dd>" + money(c.total) + "</dd></div>" +
@@ -505,7 +505,7 @@
       "</dl>" +
       verdict +
       '<ul class="legs">' + legs + "</ul>" +
-      '<div class="hero-actions" style="margin-top:0">' +
+      '<div class="hero-actions mt0">' +
         '<button class="btn ghost" type="button" id="saveplan">Save this to My Europe</button>' +
         '<button class="btn ghost" type="button" id="shareplan">Copy a link to it</button>' +
       "</div>" +

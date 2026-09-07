@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**100 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 1 locked · 1 refused · 1 built (deliberately smaller) · 1218 assertions · 0 failing**
+**100 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 1 locked · 1 refused · 1 built (deliberately smaller) · 1250 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -36,7 +36,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 23 | Map system | BUILT | 5 | Every destination, seventeen togglable layers, a places layer, a journey overlay, and the popup card the specification describes. |
 | 24 | Search engine | BUILT | 5 | All five of the specification's query shapes, answered in the browser, with the interpretation shown back. |
 | 25 | Search result types | BUILT | 10 | Nine result types, grouped, ranked by relevance and freshness of match — and no paid placement, because there is no field that could carry one. |
-| 26 | My Europe | PARTIAL | 8 | Saving, collections and bucket lists all work, in the browser. Accounts and sync are blocked on a data controller. |
+| 26 | My Europe | PARTIAL | 11 | Saving, collections and bucket lists all work, in the browser — and a saved list moves between devices as text, which the specification files under authentication and which turns out not to need it. Accounts remain blocked on a data controller. |
 | 27 | User reviews | DEFERRED | 2 | Reviews need accounts and anti-fraud before they influence anything, and the specification says so itself. Nothing on the site displays a rating. |
 | 28 | Business platform | DEFERRED | 2 | Nine dashboard modules, all of which need authentication and a backend. The model is specified in full; nothing is faked. |
 | 29 | Business profile | PARTIAL | 58 | The record shape exists with illustrative entries. Fields that only an owner can supply stay empty until an owner supplies them. |
@@ -45,15 +45,15 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 32 | Tourism board platform | PARTIAL | 1 | The offer is published, including the one thing that is not for sale. The dashboard needs traffic that does not exist yet. |
 | 33 | Events platform | PARTIAL | 19 | The recurring European year, with a page per month that also answers where to go, and the specification's event categories as a filter on every one of them. Dated per-year listings need a feed and a rights position, which is why no year is printed. |
 | 34 | Editorial CMS | PARTIAL | 93 | Version control is the CMS: every article is a record in data/, reviewed as a diff, with history and rollback for free. A browser editor is a backend product. |
-| 35 | Content quality system | PARTIAL | 4 | Draft → review → publish is the pull request. Fact verification is a field, a public board and a plan; the periodic review cycle is not yet automated. |
+| 35 | Content quality system | PARTIAL | 7 | Draft → review → publish is the pull request, and the periodic review cycle is now automated: a check expires after a fixed interval and the board says so, so nothing can earn a verified badge once and keep it. What is still missing is the checking. |
 | 36 | Database model | PARTIAL | 12 | Every entity in the specification's list exists as validated data; the ones that need a write from someone other than a committer exist as DDL, with the migration trigger named. |
 | 37 | Relationship model | BUILT | 4 | The hierarchy in both directions, plus place → journey, place → story, destination → theme. |
-| 38 | Data quality | PARTIAL | 3 | Verification date and verifier exist and are published per country. Source URL, confidence score and per-field provenance do not yet, and 0 of 50 countries have been checked. |
+| 38 | Data quality | PARTIAL | 8 | All four exist now: a dated verification record, per-field provenance naming which claim was checked against what, an optional source URL, and a confidence score derived from the source kind and the age of the check rather than typed by hand. What has not happened is the checking — 0 of 50 countries, and the board says so on the site. |
 | 39 | Image management | REFUSED | 3 | There are no photographs at all. Every illustration is generated from the place's own slug, which makes the licensing question disappear rather than be managed. |
 | 40 | SEO architecture | BUILT | 7 | The specification's URL shapes, including the facet pages — with its own thin-page warning enforced as a threshold. |
 | 41 | Internal linking | BUILT | 3 | Every page reaches its parents, its siblings and the curation that names it. |
 | 42 | Technical architecture | BUILT (deliberately smaller) | 4 | Python standard library and static output. Each proposed component has a named trigger rather than a date. |
-| 43 | API architecture | PARTIAL | 3 | Two public read endpoints ship and are used by the product itself. The rest are specified and need a backend. |
+| 43 | API architecture | PARTIAL | 9 | All four public read endpoints ship, documented, and are the same documents the site itself runs on. The specification filed two of them under Stage 2 alongside the authenticated ones; that grouping was wrong and only a re-read caught it — a read-only projection of committed data needs no backend. What genuinely does is every endpoint that writes. |
 | 44 | AI services | PARTIAL | 3 | Semantic-ish search and the journey generator exist without a model. The five that need one are specified. |
 | 45 | Recommendation engine | PARTIAL | 8 | Interests, budget, season, duration, location, trip length and the places you saved all feed the score. Travel history, weather and crowding do not: two need accounts, one needs a licence. |
 | 46 | Personalisation | DEFERRED | 2 | Learning from saved places needs a profile that persists across devices, which needs an account. Saving works; learning does not. |
@@ -71,7 +71,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 58 | Internationalisation | PARTIAL | 6 | Interface strings are out of the code and in data catalogues, with coverage measured. No language ships until it is complete — a half-translated site is worse than an English one. |
 | 59 | Currency | PARTIAL | 6 | Local currency alongside euros on every country page, from a dated, rounded, hand-recorded table. A live feed with timestamps per rate needs a provider. |
 | 60 | Privacy | BUILT | 4 | Nothing is collected, nothing is set, nothing is loaded from another origin — and the page says how to verify that rather than asking to be believed. |
-| 61 | Security | PARTIAL | 3 | Most of the list is about a backend that does not exist. What applies to a static site — no secrets, no third-party code, no payment surface — holds. |
+| 61 | Security | PARTIAL | 13 | Much of the list is about a backend that does not exist. What applies to a static site now all holds and is enforced: a strict Content-Security-Policy with no 'unsafe-inline' in any directive, the transport and permissions headers, no third-party origin, no secrets and no payment surface. |
 | 62 | User roles | DEFERRED | 1 | Eleven roles, all of which need authentication. Two exist in practice today: a visitor, and a committer. |
 | 63 | Analytics | DEFERRED | 2 | No analytics runs. The event schema is fixed in advance because behaviour you did not record is gone, and the privacy rule is fixed with it. |
 | 64 | North star metric | RECORDED | 2 | Meaningfully planned journeys per active user, not page views. |
@@ -83,7 +83,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 70 | Local contributor programme | DEFERRED | 1 | Needs accounts, moderation and attribution. Specified, not built, not implied anywhere on the site. |
 | 71 | Travel creator programme | DEFERRED | 2 | The mechanism a creator would publish into exists — a journey is a record with legs — but publishing needs accounts and moderation. |
 | 72 | B2B data product | DEFERRED | 2 | Worth nothing until there is traffic. The one decision made now is the event schema, because unrecorded behaviour is gone. |
-| 73 | Public API | PARTIAL | 3 | Two read endpoints are public, unauthenticated and used by the product itself. A commercial API needs a contract and an entity. |
+| 73 | Public API | PARTIAL | 8 | Four read endpoints are public, unauthenticated, documented and used by the product itself. A commercial API — keys, quotas, a support commitment — needs a contract and an entity. |
 | 74 | Mobile app | DEFERRED | 2 | The specification says not to build it first. The web product is verified at 390 CSS pixels on every build instead. |
 | 75 | Notifications | DEFERRED | 1 | Needs accounts and explicit permission. Nothing asks for either. |
 | 76 | European journey score | PARTIAL | 4 | Eight of the ten dimensions, computed from published formulae. Two are refused with reasons on /method: accessibility, because guessing whether a disabled traveller can get in is the worst guess on the list, and romance, because any formula would be a proxy dressed as evidence. |

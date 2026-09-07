@@ -117,6 +117,7 @@ FOOTER_NAV = [
     ("/how-it-works", T("footer.how-it-works")),
     ("/method", T("footer.method")),
     ("/sources", T("footer.sources")),
+    ("/api-docs", T("footer.api")),
     ("/contact", T("footer.contact")),
     ("/help", T("footer.help")),
     ("/accessibility", T("footer.accessibility")),
@@ -124,6 +125,68 @@ FOOTER_NAV = [
     ("/terms", T("footer.terms")),
     ("/cookies", T("footer.cookies")),
 ]
+
+
+# The Content-Security-Policy, in one place because there is one shell.
+#
+# Every directive is the most restrictive value the site can actually run
+# under, and the reason each one holds is the architecture rather than
+# discipline:
+#
+#   default-src 'none'  nothing is allowed that is not named below
+#   script-src 'self'   there is no inline executable script anywhere. Page
+#                       data is an inert application/json block instead; see
+#                       jsondata(). This is the directive that pays for that.
+#   style-src 'self'    checks.py fails the build on an inline <style>, so
+#                       'unsafe-inline' is not needed for styles either
+#   img-src 'self' data: there are no photographs; every illustration is an
+#                       inline SVG element, and the favicon is a file
+#   connect-src 'self'  the only fetch is /api/atlas.json, same origin
+#   form-action 'self'  the two forms both submit to /plan
+#   frame-ancestors 'none'  nothing here is meant to be framed. Header only:
+#                       a browser ignores this directive in a meta tag
+#   base-uri 'none'     a <base> tag would repoint every relative URL
+#
+# It ships as a meta tag because the site is static and the host is not
+# chosen yet. site/_headers carries the same policy for a host that reads
+# one, and checks.py asserts the two do not drift apart — a header and a
+# meta tag saying different things is worse than either alone.
+_CSP_COMMON = ("default-src 'none'; "
+               "script-src 'self'; "
+               "style-src 'self'; "
+               "img-src 'self' data:; "
+               "font-src 'self'; "
+               "connect-src 'self'; "
+               "form-action 'self'; "
+               "base-uri 'none'")
+
+# frame-ancestors is deliberately absent from the meta version. A browser
+# ignores it there and says so in the console, and a directive that is
+# ignored is worse than a missing one: it reads as protection in a source
+# view while doing nothing. It lives in _headers only, where it works.
+CSP_META = _CSP_COMMON
+CSP_HEADER = _CSP_COMMON + "; frame-ancestors 'none'"
+
+# Sent alongside it by any host that reads _headers. These cannot be set from
+# a meta tag at all, which is why the file exists as well.
+HEADERS = {
+    "Content-Security-Policy": CSP_HEADER,
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "X-Content-Type-Options": "nosniff",
+    "Cross-Origin-Opener-Policy": "same-origin",
+    # Nothing on this site asks for a device capability, so every one of them
+    # is refused rather than left at the browser's default.
+    "Permissions-Policy": "geolocation=(), camera=(), microphone=(), payment=(), usb=(), interest-cohort=()",
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+}
+
+
+def headers_file():
+    """The same policy, for a host that reads a _headers file."""
+    lines = ["/*"]
+    for k, v in HEADERS.items():
+        lines.append(f"  {k}: {v}")
+    return "\n".join(lines) + "\n"
 
 
 def page(title, body, *, path, description, trail=None, area=None, head_extra="", scripts=(), wide=False):
@@ -139,6 +202,8 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="{esc(CSP_META)}">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>{esc(full_title)}</title>
 <meta name="description" content="{esc(description)}">
 <link rel="canonical" href="https://europedoor.com{esc(path)}">
@@ -213,7 +278,20 @@ def factlist(pairs):
     return f'<dl class="facts">{rows}</dl>'
 
 
-def jsonscript(var, obj):
+def jsondata(id, obj):
+    """Page data as an inert JSON block, read by the script that needs it.
+
+    This used to be `<script>window.X = {...}</script>`. It worked, and it
+    cost the site its Content-Security-Policy: one inline executable script
+    anywhere means `script-src` has to allow `'unsafe-inline'`, which allows
+    every injected script too — so a single convenience on one page disabled
+    the defence on all 987.
+
+    `type="application/json"` is not executed by the browser at all. The
+    consumer does `JSON.parse(el.textContent)`. Same data, no execution, and
+    `script-src 'self'` now holds with nothing to except.
+    """
     payload = json.dumps(obj, separators=(",", ":"), ensure_ascii=False)
+    # Only `</` can end the block early; escaping it is the whole requirement.
     payload = payload.replace("</", "<\\/")
-    return f'<script>window.{var}={payload};</script>'
+    return f'<script type="application/json" id="{esc(id)}">{payload}</script>'

@@ -31,6 +31,11 @@ EVENT_KINDS = ("festival", "concert", "sport", "exhibition", "religious",
                "cultural", "food", "market", "seasonal")
 # The specification's verification ladder (§38). Absent means unverified,
 # which is the honest state of every record today.
+# What kind of thing was consulted. The distinction that matters is whether
+# the source is answerable for the fact: a border authority is answerable for
+# its own entry rules in a way that a newspaper reporting them is not.
+SOURCE_KINDS = ("official", "operator", "municipal", "press", "editorial")
+
 VERIFICATION_STATUS = ("unverified", "machine-reviewed", "editor-reviewed",
                        "business-verified", "officially-sourced")
 BLOCS = ("eu", "schengen", "eurozone", "eea", "cta")
@@ -127,6 +132,21 @@ def load():
                 for k in ("what", "where", "kind"):
                     p.require(bool(src.get(k)), where,
                               f"each source needs {k} — what was checked, where, and what kind of source")
+                p.require(src.get("kind") in SOURCE_KINDS, where,
+                          f"source kind must be one of {'/'.join(SOURCE_KINDS)}")
+                # A URL is optional: the best source for a cost band is
+                # sometimes a price list in a window, and demanding a link
+                # would push a checker towards whatever happened to have one.
+                # But if there is one it has to be a real one.
+                if src.get("url"):
+                    p.require(src["url"].startswith("https://"), where,
+                              f"source url must be https:// — got {src['url']!r}")
+            # Confidence is derived from the status and the sources, never
+            # authored. A field somebody can type is a field somebody will
+            # type "high" into.
+            p.require("confidence" not in ch, where,
+                      "confidence is derived from status and sources, not authored — "
+                      "see verification_of() in tools/lib/pages.py")
 
         adv = c.get("advisory")
         if adv:

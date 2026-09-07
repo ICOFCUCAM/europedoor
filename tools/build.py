@@ -22,6 +22,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from lib import data as D
 from lib import pages as P
+from lib import render as R
 from lib import urls
 
 ROOT = D.ROOT
@@ -98,6 +99,7 @@ def build():
     emit(P.about_page(d))
     emit(P.how_it_works_page(d))
     emit(P.sources_page(d))
+    emit(P.api_page(d))
     emit(P.freshness_page(d))
     emit(P.privacy_page(d))
     emit(P.cookies_page(d))
@@ -108,7 +110,8 @@ def build():
     emit(P.tourism_boards_page(d))
     emit(P.not_found(d))
 
-    for path, payload in (P.planner_api(d), P.search_api(d)):
+    for path, payload in (P.planner_api(d), P.search_api(d),
+                          P.countries_api(d), P.journeys_api(d)):
         write(path, json.dumps(payload, ensure_ascii=False, separators=(",", ":")))
 
     # Static assets are copied, never symlinked: the output directory has to
@@ -125,6 +128,7 @@ def build():
         if p.endswith("index.html")
     ]
     write("/sitemap.xml", P.sitemap(canonical))
+    write("/_headers", R.headers_file())
     write("/robots.txt", "User-agent: *\nAllow: /\nSitemap: https://europedoor.com/sitemap.xml\n")
 
     print(f"{len(written)} pages + api + sitemap → site/")

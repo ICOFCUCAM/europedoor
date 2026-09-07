@@ -27,6 +27,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lib import data as D
 from lib import pages as P
 from lib import score as S
+from lib import render as R
 from lib.render import OPERATOR, SITE_NAME, esc
 
 ROOT = D.ROOT
@@ -140,7 +141,7 @@ def c_built():
     expect += 1 + len(d["fund"])
     expect += 6                                   # map, events, quiet, my-europe, method, about
     expect += len(d["taxonomy"]["months"])        # /events/<month>
-    expect += 3                                   # how-it-works, sources, freshness
+    expect += 4                                   # how-it-works, sources, freshness, api-docs
     expect += 1                                   # /discover
     expect += 7                                   # privacy, cookies, terms, accessibility,
                                                   # help, contact, for-tourism-boards
@@ -478,6 +479,148 @@ def c_freshness():
         if not c.get("checked") and "not verified" not in s:
             fail(f"{c['name']}: unverified, but the page does not say so")
     return len(d["countries"])
+
+
+@check("a verification record expires, and confidence cannot be authored")
+def c_verification_expiry():
+    """Exercise all four verification states against synthetic records.
+
+    No country has been checked yet, so every real record takes the same
+    branch and the other three would rot untested until the first check was
+    made — which is exactly the wrong moment to discover that "due for
+    review" never fires. These are fixtures, not data: they are constructed
+    here and never written to a file, so nothing on the site claims a check
+    that did not happen.
+    """
+    import datetime
+    today = datetime.date(2026, 1, 1)
+    n = 0
+
+    def v(checked):
+        return P.verification_of({"checked": checked} if checked else {}, today=today)
+
+    never = v(None)
+    if never["state"] != "never" or never["confidence"] != "low":
+        fail(f"an unchecked country did not read as never/low: {never}")
+    n += 1
+
+    official = [{"what": "Currency and blocs", "where": "Norges Bank",
+                 "kind": "official", "url": "https://example.invalid/"}]
+
+    fresh = v({"on": "2025-12-01", "by": "A. Editor",
+               "status": "officially-sourced", "sources": official})
+    if fresh["state"] != "current" or fresh["confidence"] != "high":
+        fail(f"a recent officially-sourced check did not read as current/high: {fresh}")
+    n += 1
+
+    # One day past the interval, the same record must stop reading as
+    # verified. This is the assertion the whole mechanism exists for.
+    stale = v({"on": "2024-12-31", "by": "A. Editor",
+               "status": "officially-sourced", "sources": official})
+    if stale["state"] != "due":
+        fail(f"a check {P.REVIEW_DAYS + 1} days old still read as current: {stale}")
+    if stale["confidence"] != "low":
+        fail("a check past its review interval kept its confidence")
+    n += 2
+
+    # Recent, but nobody wrote down what they checked it against.
+    thin = v({"on": "2025-12-01", "by": "A. Editor", "status": "editor-reviewed"})
+    if thin["confidence"] != "low":
+        fail(f"a check with no sources did not read as low confidence: {thin}")
+    n += 1
+
+    # Recent and sourced, but not to a body answerable for the fact.
+    mid = v({"on": "2025-12-01", "by": "A. Editor", "status": "editor-reviewed",
+             "sources": [{"what": "Cost bands", "where": "our own editor",
+                          "kind": "editorial"}]})
+    if mid["confidence"] != "medium":
+        fail(f"a recent non-official check did not read as medium: {mid}")
+    n += 1
+
+    # And the schema must refuse an authored confidence outright.
+    if "confidence is derived" not in open(
+            os.path.join(ROOT, "tools", "lib", "data.py"), encoding="utf-8").read():
+        fail("the validator no longer refuses an authored confidence field")
+    n += 1
+
+    board = open(os.path.join(OUT, "sources", "freshness", "index.html"), encoding="utf-8").read()
+    for phrase in ("Never checked", "Checked and current", "Checked but now due again",
+                   "Review interval"):
+        if phrase not in board:
+            fail(f"the freshness board no longer reports {phrase!r}")
+        n += 1
+    return n
+
+
+@check("the content security policy is strict, and nothing on any page needs it loosened")
+def c_csp():
+    """The policy is only worth what the pages let it be.
+
+    A single inline <script> or a single style="..." attribute anywhere
+    forces 'unsafe-inline' into the corresponding directive, and that keyword
+    allows every injected script or style too — so the weakest page sets the
+    policy for all 987. This check is the thing that stops one convenience
+    from quietly doing that.
+
+    Style ATTRIBUTES are the trap: Chromium's own console message says CSP
+    hashes do not apply to them, so unlike an inline <style> block they
+    cannot be excepted individually. They have to be gone.
+    """
+    n = 0
+    for keyword in ("'unsafe-inline'", "'unsafe-eval'", "'unsafe-hashes'", "*"):
+        if keyword in R.CSP_HEADER.replace("data:", ""):
+            fail(f"the policy has been loosened with {keyword}")
+        n += 1
+    # frame-ancestors does nothing in a meta tag and Chromium logs that it is
+    # ignored. It belongs in the header only.
+    if "frame-ancestors" in R.CSP_META:
+        fail("frame-ancestors is in the meta policy, where browsers ignore it")
+    if "frame-ancestors" not in R.CSP_HEADER:
+        fail("frame-ancestors is missing from the header policy, where it works")
+    n += 2
+
+    inline_style = re.compile(r'\sstyle="')
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        rel = os.path.relpath(f, OUT)
+        # An inline <script> with no src. type="application/json" is data,
+        # not script, and is exactly how page data is passed instead.
+        for m in re.finditer(r"<script([^>]*)>", h):
+            attrs = m.group(1)
+            if "src=" in attrs:
+                continue
+            if 'type="application/json"' in attrs:
+                continue
+            fail(f"{rel}: an inline script would force script-src 'unsafe-inline'")
+        if inline_style.search(h):
+            fail(f"{rel}: a style attribute would force style-src 'unsafe-inline' "
+                 "— use a utility class; CSP hashes do not apply to style attributes")
+        if "Content-Security-Policy" not in h:
+            fail(f"{rel}: no content security policy")
+        n += 1
+
+    # The two copies of the policy must not drift. A header and a meta tag
+    # saying different things is worse than either one alone, because which
+    # applies depends on the host.
+    hdr = open(os.path.join(OUT, "_headers"), encoding="utf-8").read()
+    for directive in R.CSP_META.split("; "):
+        if directive not in hdr:
+            fail(f"_headers is missing {directive!r} that the meta policy carries")
+        n += 1
+    for name in ("Referrer-Policy", "X-Content-Type-Options", "Permissions-Policy",
+                 "Strict-Transport-Security"):
+        if name not in hdr:
+            fail(f"_headers no longer sets {name}")
+        n += 1
+
+    # And no third-party origin, which is what makes default-src 'none' hold.
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        for m in re.finditer(r'(?:src|href)="(https?://[^"]+)"', h):
+            if not m.group(1).startswith("https://europedoor.com"):
+                fail(f"{os.path.relpath(f, OUT)}: loads from {m.group(1)}")
+        n += 1
+    return n
 
 
 @check("the honest-status page still distinguishes built from designed")

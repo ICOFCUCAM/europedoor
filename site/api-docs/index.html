@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27;; style-src &#x27;self&#x27;; img-src &#x27;self&#x27; data:; font-src &#x27;self&#x27;; connect-src &#x27;self&#x27;; form-action &#x27;self&#x27;; base-uri &#x27;none&#x27;">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>The public API · Europedoor</title>
+<meta name="description" content="Four public, read-only, key-free JSON endpoints: the Atlas index, the search index, country facts and the curated journeys.">
+<link rel="canonical" href="https://europedoor.com/api-docs">
+<meta property="og:title" content="The public API · Europedoor">
+<meta property="og:description" content="Four public, read-only, key-free JSON endpoints: the Atlas index, the search index, country facts and the curated journeys.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="/assets/css/europedoor.css">
+<link rel="icon" href="/assets/door.svg" type="image/svg+xml">
+</head>
+<body class="area-none">
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+  <div class="masthead-in">
+    <a class="wordmark" href="/">
+      <span class="door" aria-hidden="true"></span>
+      <span class="wordmark-text">europedoor</span>
+    </a>
+    <nav class="nav" aria-label="Primary"><a href="/discover">Discover</a><a href="/countries">Countries</a><a href="/experiences">Experiences</a><a href="/journeys">Journeys</a><a href="/plan">Plan</a><a href="/stories">Stories</a><a href="/events">Events</a></nav>
+    <div class="navutil">
+      <a class="navsearch" href="/search"><span aria-hidden="true">⌕</span> Search</a>
+      <a class="navmine" href="/my-europe">My Europe</a>
+    </div>
+  </div>
+</header>
+<main id="main" class="">
+
+<nav class="crumbs" aria-label="Breadcrumb"><a href="/discover">Europe</a><span class="sep" aria-hidden="true">/</span><a href="/sources">Sources &amp; corrections</a><span class="sep" aria-hidden="true">/</span><span aria-current="page">The public API</span></nav>
+<div class="pagehead">
+  <p class="kicker">The public API</p>
+  <h1>Four read-only endpoints. No key, no quota, no sign-up.</h1>
+  <p class="lede">Everything the site knows is published as static JSON on the same domain,
+  cacheable and versionless. They are the same documents this site's own planner, search and
+  map run on — not a reduced copy of them, which is the only way an API stays true.</p>
+</div>
+
+<div class="rows"><div class="row db">
+        <h3><code>/api/atlas.json</code></h3>
+        <p class="rowsub">The planner index: every destination with its interests, nights, cost band, season, coordinates and URL. This is the document the Journey Planner in your browser actually runs on.</p>
+        <p class="small"><strong>Holds:</strong> 313 destinations</p>
+        <p class="small"><strong>Note:</strong> Countries under a travel advisory (3 of them) are absent. That is a build-time exclusion, not a UI filter, so no consumer of this file can route a traveller into one by accident.</p>
+        <p class="small"><a href="/api/atlas.json">Open it →</a></p></div><div class="row db">
+        <h3><code>/api/search.json</code></h3>
+        <p class="rowsub">One flat row per findable thing — country, region, destination, place, experience, journey, story, theme, event — with a name, a kind, a URL and a lowercased text blob to match against.</p>
+        <p class="small"><strong>Holds:</strong> every findable thing</p>
+        <p class="small"><strong>Note:</strong> Advisory countries ARE present here. A page nobody can search for is a page that does not exist, and hiding a country from search does not make anyone safer.</p>
+        <p class="small"><a href="/api/search.json">Open it →</a></p></div><div class="row db">
+        <h3><code>/api/countries.json</code></h3>
+        <p class="rowsub">Country-level facts: capital, currency, time zone, languages, membership, daily cost band, seasons, and the full region and destination tree beneath each one.</p>
+        <p class="small"><strong>Holds:</strong> 50 countries</p>
+        <p class="small"><strong>Note:</strong> Advisory countries are present, with the advisory attached. Every country carries its verification record, so a consumer can tell a checked fact from an unchecked one.</p>
+        <p class="small"><a href="/api/countries.json">Open it →</a></p></div><div class="row db">
+        <h3><code>/api/journeys.json</code></h3>
+        <p class="rowsub">The curated routes, with every leg resolved to a real destination: coordinates, nights, the note for that stop, and the countries the route crosses.</p>
+        <p class="small"><strong>Holds:</strong> 17 journeys</p>
+        <p class="small"><strong>Note:</strong> Estimated costs are planning arithmetic from published daily bands and straight-line distances. They are not quotes and there is nothing to book.</p>
+        <p class="small"><a href="/api/journeys.json">Open it →</a></p></div></div>
+
+<div class="split mt7">
+  <div>
+    <h2>What you may do with them</h2>
+    <p>Read them, cache them, and build on them, with attribution to Europedoor. That
+    permission is written into each document as a <code>licence</code> field rather than left
+    on this page, because a JSON file gets copied and the page it was linked from does not
+    travel with it.</p>
+
+    <h2 class="mt7">What they are not</h2>
+    <ul class="stack">
+      <li><strong>Not advice.</strong> Nothing here is entry, visa, border or safety
+      information. Those are refused across the whole product and
+      <a href="/sources">the reason is on the sources page</a>.</li>
+      <li><strong>Not quotes.</strong> Every cost is a band or a computed estimate. There is
+      nothing to book on this site and no price came from a supplier.</li>
+      <li><strong>Not verified, mostly.</strong> Each country carries a verification record
+      saying when a person last checked it and against what. For most of them the answer is
+      still "never", and <a href="/sources/freshness">that board is public</a>.</li>
+      <li><strong>Not stable yet.</strong> There is no version number in these URLs on
+      purpose: pretending to a stability guarantee before anyone depends on it is worse than
+      saying plainly that the shape may still move.</li>
+    </ul>
+  </div>
+  <aside class="rail">
+    <h2 class="mini">Why these four and not more</h2>
+    <p>These are read-only projections of data already committed to this repository, so they
+    cost nothing to serve and cannot fall out of step with the site.</p>
+    <p>The specification also lists endpoints that write — saving to an account, claiming a
+    business listing, registering interest in the Fund. Every one of those needs somebody to
+    be logged in, which needs an account, which needs a data controller, which needs a
+    company. <a href="/how-it-works">None of that exists yet</a>, so none of it is published as a
+    stub that returns nothing.</p>
+    <h2 class="mini mt7">Attribution</h2>
+    <p class="small">Europedoor — europedoor.com. A link back is enough.</p>
+  </aside>
+</div>
+
+</main>
+<footer class="footer">
+  <div class="footer-in">
+    <p class="footer-lede">One door into Europe — discover it, plan it, and leave it better than you found it.</p>
+    <nav class="footer-nav" aria-label="Footer"><a href="/for-businesses">For businesses</a><a href="/for-tourism-boards">For tourism boards</a><a href="/fund">Europe Fund</a><a href="/map">Map</a><a href="/themes">Themes</a><a href="/beyond-the-obvious">Beyond the obvious</a><a href="/my-europe">My Europe</a><a href="/about">About</a><a href="/how-it-works">How it works</a><a href="/method">Method</a><a href="/sources">Sources &amp; corrections</a><a href="/api-docs">The public API</a><a href="/contact">Contact</a><a href="/help">Help</a><a href="/accessibility">Accessibility</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/cookies">Cookies</a></nav>
+    <p class="footer-legal">Editorial project, pre-launch. Operated by [OPERATOR ENTITY — NOT YET INCORPORATED]. Nothing here is a booking, an offer, or financial advice; nothing on this site takes a payment. Country facts are editorial and may be out of date — check official government advice before you travel.</p>
+  </div>
+</footer>
+</body>
+</html>

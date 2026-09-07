@@ -436,7 +436,10 @@ def s23():
     h = page("/map")
     yield h.count('class="dot') >= 300, "every destination is drawn"
     yield 'id="layers"' in h and 'id="journeylayer"' in h and 'id="places"' in h, "the layers"
-    yield 'id="mappopup"' in h and "EUROPEDOOR_MAPINFO" in h, "the popup and its data"
+    # The data used to be an inline script assigning window.EUROPEDOOR_MAPINFO.
+    # It is an inert application/json block now, so the whole site can run
+    # script-src 'self' — see §61.
+    yield 'id="mappopup"' in h and 'id="europedoor-mapinfo"' in h, "the popup and its data"
     yield 'id="mapfrom"' in h, "distance from a chosen origin"
     yield "mapbox" not in h.lower() and "googleapis" not in h.lower(), "no third-party map service"
 
@@ -468,8 +471,10 @@ def s25():
 
 
 @section(26, "My Europe", "PARTIAL",
-         "Saving, collections and bucket lists all work, in the browser. "
-         "Accounts and sync are blocked on a data controller.")
+         "Saving, collections and bucket lists all work, in the browser — and "
+         "a saved list moves between devices as text, which the "
+         "specification files under authentication and which turns out not "
+         "to need it. Accounts remain blocked on a data controller.")
 def s26():
     yield has("/my-europe", "lives in your browser")
     js = src("assets/js/my-europe.js")
@@ -481,6 +486,12 @@ def s26():
                     ("/europe/norway/fjord-norway/bergen", "Place")):
         yield f'data-kind="{kind}"' in page(u), f"{kind} is saveable"
     yield "Itinerary" in src("assets/js/planner.js"), "itineraries are saveable"
+    # Between devices without an account. The copy happens in the reader's
+    # hands, so we still hold nothing and cannot lose it on their behalf.
+    yield "Move this to another browser" in js, "a saved list is portable"
+    yield "x.url.charAt(0)" in js, "and pasted text is validated, not trusted"
+    yield "moving a saved list between browsers" in src("tools/browser-checks.js"), \
+        "including a browser check that an off-site link cannot be imported"
 
 
 @section(27, "User reviews", "DEFERRED",
@@ -576,13 +587,19 @@ def s34():
 
 
 @section(35, "Content quality system", "PARTIAL",
-         "Draft → review → publish is the pull request. Fact verification is "
-         "a field, a public board and a plan; the periodic review cycle is "
-         "not yet automated.")
+         "Draft → review → publish is the pull request, and the periodic "
+         "review cycle is now automated: a check expires after a fixed "
+         "interval and the board says so, so nothing can earn a verified "
+         "badge once and keep it. What is still missing is the checking.")
 def s35():
     yield exists("/sources/freshness"), "the verification board"
     yield has("/sources/freshness", "The order it happens in")
     yield "checked" in src("tools/lib/data.py"), "the field exists in the schema"
+    yield "REVIEW_DAYS" in src("tools/lib/pages.py"), "a check has an expiry"
+    yield has("/sources/freshness", "Review interval", "due for review"), \
+        "and the board reports the cycle, not just the last date"
+    yield "a verification record expires" in src("tools/checks.py"), \
+        "with a check exercising all four states against fixtures"
     yield "every country's verification status is stated" in src("tools/checks.py"), \
         "and a check enforces that every page states it"
 
@@ -617,13 +634,27 @@ def s37():
 
 
 @section(38, "Data quality", "PARTIAL",
-         "Verification date and verifier exist and are published per "
-         "country. Source URL, confidence score and per-field provenance do "
-         "not yet, and 0 of 50 countries have been checked.")
+         "All four exist now: a dated verification record, per-field "
+         "provenance naming which claim was checked against what, an "
+         "optional source URL, and a confidence score derived from the "
+         "source kind and the age of the check rather than typed by hand. "
+         "What has not happened is the checking — 0 of 50 countries, and "
+         "the board says so on the site.")
 def s38():
     yield "checked" in src("tools/lib/data.py") and "ISO_DATE" in src("tools/lib/data.py"), \
         "a dated verification record"
     yield has("/sources/freshness", "verified", "unverified")
+    pg = src("tools/lib/pages.py")
+    yield "def provenance_block" in pg, "per-field provenance is published per claim"
+    yield "SOURCE_KINDS" in src("tools/lib/data.py"), "a source is typed by how answerable it is"
+    yield "source url must be https" in src("tools/lib/data.py"), "a source url is validated"
+    # The one field that must never be authored. Confidence a person can type
+    # is confidence a person will type "high" into.
+    yield "confidence is derived from status and sources, not authored" in src("tools/lib/data.py"), \
+        "and confidence is derived, refused as an authored field"
+    api = json.load(open(os.path.join(OUT, "api", "countries.json"), encoding="utf-8"))
+    yield all("verification" in c for c in api["countries"]), \
+        "and the record travels with the data, not only the page"
     unchecked = [c["name"] for c in DATA["countries"].values() if not c.get("checked")]
     yield len(unchecked) == NCOUNTRY, f"{len(unchecked)} of {NCOUNTRY} unverified — and the board says so"
 
@@ -676,11 +707,21 @@ def s42():
 
 
 @section(43, "API architecture", "PARTIAL",
-         "Two public read endpoints ship and are used by the product itself. "
-         "The rest are specified and need a backend.")
+         "All four public read endpoints ship, documented, and are the same "
+         "documents the site itself runs on. The specification filed two of "
+         "them under Stage 2 alongside the authenticated ones; that grouping "
+         "was wrong and only a re-read caught it — a read-only projection of "
+         "committed data needs no backend. What genuinely does is every "
+         "endpoint that writes.")
 def s43():
-    yield os.path.exists(os.path.join(OUT, "api", "atlas.json")), "/api/atlas.json"
-    yield os.path.exists(os.path.join(OUT, "api", "search.json")), "/api/search.json"
+    for f in ("atlas.json", "search.json", "countries.json", "journeys.json"):
+        yield os.path.exists(os.path.join(OUT, "api", f)), f"/api/{f}"
+    yield exists("/api-docs"), "and they are documented rather than merely served"
+    yield has("/api-docs", "No key, no quota", "Not stable yet"), \
+        "including where the shape may still move"
+    for f in ("countries.json", "journeys.json"):
+        doc = json.load(open(os.path.join(OUT, "api", f), encoding="utf-8"))
+        yield "licence" in doc, f"{f} carries its own licence, because a JSON file gets copied"
     yield spec_covers("POST   /api/plan", "/api/me/saved"), "the authenticated surface is specified"
 
 
@@ -869,11 +910,31 @@ def s60():
 
 
 @section(61, "Security", "PARTIAL",
-         "Most of the list is about a backend that does not exist. What "
-         "applies to a static site — no secrets, no third-party code, no "
-         "payment surface — holds.")
+         "Much of the list is about a backend that does not exist. What "
+         "applies to a static site now all holds and is enforced: a strict "
+         "Content-Security-Policy with no 'unsafe-inline' in any directive, "
+         "the transport and permissions headers, no third-party origin, no "
+         "secrets and no payment surface.")
 def s61():
     yield every_page(lambda h: '<script src="http' not in h, "no external script")
+    r = src("tools/lib/render.py")
+    yield "default-src 'none'" in r, "the policy denies by default"
+    # In the policy itself. The word appears in this file's comments
+    # explaining why it is absent, which is not the same thing.
+    yield "'unsafe-inline'" not in r.split("_CSP_COMMON = ")[1].split("CSP_META")[0], \
+        "and nothing on the site forces it open"
+    yield every_page(lambda h: "Content-Security-Policy" in h, "a policy on every page")
+    # A style attribute cannot be excepted by a hash, so one of them anywhere
+    # would have forced style-src open on all 987 pages. The browser suite
+    # caught exactly that the first time the policy shipped.
+    yield every_page(lambda h: ' style="' not in h, "no style attribute anywhere")
+    yield os.path.exists(os.path.join(OUT, "_headers")), "and the headers a meta tag cannot set"
+    hdr = open(os.path.join(OUT, "_headers"), encoding="utf-8").read()
+    for name in ("Strict-Transport-Security", "Permissions-Policy",
+                 "X-Content-Type-Options", "frame-ancestors"):
+        yield name in hdr, f"_headers sets {name}"
+    yield "frame-ancestors" not in r.split("CSP_META = ")[1].split("\n")[0], \
+        "and frame-ancestors is not in the meta policy, where browsers ignore it"
     yield True, "no secret is committed: there is nothing to authenticate against"
     yield doc_covers("docs/legal-position.md", "Data protection"), "the position is recorded"
 
@@ -983,13 +1044,24 @@ def s72():
 
 
 @section(73, "Public API", "PARTIAL",
-         "Two read endpoints are public, unauthenticated and used by the "
-         "product itself. A commercial API needs a contract and an entity.")
+         "Four read endpoints are public, unauthenticated, documented and "
+         "used by the product itself. A commercial API — keys, quotas, a "
+         "support commitment — needs a contract and an entity.")
 def s73():
-    yield os.path.exists(os.path.join(OUT, "api", "atlas.json")), "atlas.json"
-    yield os.path.exists(os.path.join(OUT, "api", "search.json")), "search.json"
+    for f in ("atlas.json", "search.json", "countries.json", "journeys.json"):
+        yield os.path.exists(os.path.join(OUT, "api", f)), f
     api = json.load(open(os.path.join(OUT, "api", "atlas.json"), encoding="utf-8"))
     yield len(api["cities"]) > 300, f"{len(api['cities'])} destinations in the public index"
+    cy = json.load(open(os.path.join(OUT, "api", "countries.json"), encoding="utf-8"))
+    yield len(cy["countries"]) == NCOUNTRY, f"{len(cy['countries'])} countries"
+    # Advisory countries are absent from the planner index and present here,
+    # deliberately: one is a list of places to route through, the other is a
+    # description of the continent.
+    yield any(c.get("advisory") for c in cy["countries"]), \
+        "advisory countries are present here, with the advisory"
+    jy = json.load(open(os.path.join(OUT, "api", "journeys.json"), encoding="utf-8"))
+    yield all(l.get("url") for j in jy["journeys"] for l in j["legs"]), \
+        "every journey leg resolves to a real page"
 
 
 @section(74, "Mobile app", "DEFERRED",
