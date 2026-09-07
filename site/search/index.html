@@ -33,17 +33,21 @@
 <div class="pagehead">
   <p class="kicker">Search</p>
   <h1>Find it.</h1>
-  <p class="lede">Everything on Europedoor — 548 countries, regions, cities,
+  <p class="lede">Everything on Europedoor — 548 countries, regions, destinations, places,
   journeys, themes, stories and projects — in one index that runs in your browser.
-  Nothing you type is sent anywhere.</p>
+  Nothing you type is sent anywhere, and nobody can buy a position in it.</p>
+  <p class="small">It reads more than words: <em>cheap</em> and <em>quiet</em> filter,
+  a month narrows to places that are good in it, and <em>near Prague</em> means within
+  300 kilometres of Prague. Whatever it understood is shown back to you as chips.</p>
 </div>
 <form class="form" id="searchform" role="search">
   <div class="field">
     <label for="q">Search Europe</label>
     <input type="text" id="q" name="q" autocomplete="off" autofocus
-           placeholder="bergen, medieval, truffle, twelve days, sacred…">
+           placeholder="quiet beaches in september · medieval castles near prague · cheap mountains">
   </div>
 </form>
+<div class="chips" id="searchunderstood" aria-live="polite"></div>
 <div id="results" aria-live="polite"></div>
 <noscript><p class="small">Search needs JavaScript. The
 <a href="/countries">Atlas</a> is fully browsable without it.</p></noscript>

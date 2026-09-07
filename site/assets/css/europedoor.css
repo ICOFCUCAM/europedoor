@@ -12,12 +12,17 @@
   --paper-3:      #e8e1d5;
   --ink:          #161a22;
   --ink-2:        #3c4350;
-  --ink-3:        #6b7280;
+  /* Same reason: #6b7280 was 3.72:1 on the darkest card ground, and it is
+     the colour every card's meta line and the footer's legal text uses. */
+  --ink-3:        #585f6a;
   --rule:         #ddd5c7;
 
   /* the three signals: a door, a sea, a warning */
-  --door:         #b4632a;
-  --door-dark:    #8e4c1d;
+  /* Darkened from #b4632a after the automated contrast check: the old value
+     was 4.13:1 on paper and 3.40:1 on the darkest card, and small text at
+     4.5:1 is the WCAG AA line. This passes on all three paper tones. */
+  --door:         #96501f;
+  --door-dark:    #7f4318;
   --sea:          #1c5f77;
   --sea-dark:     #14485a;
   --warn:         #8a3324;
@@ -335,3 +340,11 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .daylist li strong { color: var(--ink); font-weight: 600; }
 .leg .alt { margin-top: var(--s3); color: var(--ink-3); }
 .leg .alt a { color: var(--ink-2); }
+
+/* Notes and rails carry section-level headings, so they are <h2>. They are
+   small because they are asides, not because they are subordinate — styling
+   reasoning applied to heading levels produced h1 → h3 skips on every page
+   with a note above the first real section. */
+.note h2.mini, .rail h2.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1.25; }
+.rail h2.mini + p { margin-top: 0; }
+.rail h2.mini:not(:first-child) { margin-top: var(--s4); }

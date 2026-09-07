@@ -44,7 +44,7 @@ def advisory_note(c):
         return ""
     heading = "Check government travel advice before planning anything here"
     return f"""<div class="note warn">
-  <h3>{esc(heading)}</h3>
+  <h2 class="mini">{esc(heading)}</h2>
   <p>{esc(a['note'])}</p>
   <p class="small">Europedoor keeps a page for every country in Europe, including the ones nobody
   should be travelling to right now. A page here is a record, not a recommendation, and
@@ -198,7 +198,7 @@ def home(data):
 </div>
 
 <div class="note">
-  <h3>What this is, honestly</h3>
+  <h2 class="mini">What this is, honestly</h2>
   <p>Europedoor is pre-launch and editorial. Nothing here takes a payment, holds money or
   makes a booking, and the Europe Fund deliberately carries no balances yet — see
   <a href="/how-it-works">how it works</a> for exactly which parts are built, which are
@@ -318,9 +318,9 @@ def country_page(data, c):
     <p>{esc(c['season']['note'])}</p>
   </div>
   <aside class="rail">
-    <h3>Worth knowing</h3>
+    <h2 class="mini">Worth knowing</h2>
     <ul>{know}</ul>
-    <h3>At the table</h3>
+    <h2 class="mini">At the table</h2>
     <ul>{food}</ul>
   </aside>
 </div>
@@ -460,19 +460,19 @@ def city_page(data, c, r, t):
              lede=f"Nationwide fixtures in {c['name']}. See the whole European year on /events.") if festrows else ""}
   </div>
   <aside class="rail">
-    <h3>Give it {esc(stay)}</h3>
+    <h2 class="mini">Give it {esc(stay)}</h2>
     <p>Enough to see the list on the left without spending the trip on trains. The Journey
     Planner uses exactly this range when it builds an itinerary.</p>
-    <h3>When to come</h3>
+    <h2 class="mini">When to come</h2>
     <p>Best: {esc(months_line(data, c["season"]["peak"]))}. Quieter:
     {esc(months_line(data, c["season"].get("shoulder", [])) or "—")}.
     <a href="{urls.country(c)}#when">Why, and what that means →</a></p>
 
-    <h3>Getting there</h3>
+    <h2 class="mini">Getting there</h2>
     <p>{esc(c['getting_around'][:150])}…
     <a href="{urls.country(c)}#getting-around">All of {esc(c['name'])} →</a></p>
 
-    <h3>Where you are</h3>
+    <h2 class="mini">Where you are</h2>
     <p class="mono">{t['lat']:.2f}°N, {t['lon']:.2f}°E</p>
     <p><a href="/plan?from={esc(c['slug'])}%2F{esc(r['slug'])}%2F{esc(t['slug'])}">Start a journey here →</a></p>
     {facetlinks}
@@ -643,13 +643,13 @@ def journey_page(data, j):
     published bands rather than a quote. <a href="/sources">How these numbers are made →</a></p>
   </div>
   <aside class="rail">
-    <h3>Make it yours</h3>
+    <h2 class="mini">Make it yours</h2>
     <p>Fewer days than this? The Planner will keep the stops that match what you said you
     care about and drop the rest, rather than shortening every night.</p>
     <p><a class="btn" href="/plan#journey={esc(j['slug'])}">Open in the Planner</a></p>
     <p><button class="btn ghost" type="button" data-save="journey:{esc(j['slug'])}" data-kind="Journey"
        data-label="{esc(j['name'])}" data-url="{urls.journey(j)}">Save to My Europe</button></p>
-    <h3>How to read a leg</h3>
+    <h2 class="mini">How to read a leg</h2>
     <p>Distances are straight-line between stops. Rail beats the straight line in the Alps and
     loses badly across the Adriatic — the note under each hop says which.</p>
   </aside>
@@ -806,7 +806,7 @@ def planner_page(data):
     <div id="result" aria-live="polite"></div>
   </div>
   <aside class="rail">
-    <h3>How it decides</h3>
+    <h2 class="mini">How it decides</h2>
     <p>Every destination is scored out of one, on a published weighting:</p>
     <ul>
       <li><strong>30%</strong> how many of your interests it carries</li>
@@ -825,7 +825,7 @@ def planner_page(data):
     in a row start to push the fourth choice towards the alternative; nights come from the
     range on each destination page; and anything above what your budget can afford per day is
     damped.</p>
-    <h3>What it will not do</h3>
+    <h2 class="mini">What it will not do</h2>
     <p>It will not book anything, price a real hotel, or route you into a country under a
     travel advisory — those are excluded from the planning index entirely.</p>
     <p class="small">Estimates are editorial, not quotes. Check <a href="/sources">sources and
@@ -1082,7 +1082,7 @@ def place_page(data, c, r, t, pl):
   <div>
     {facts}
     <div class="note warn">
-      <h3>We do not hold opening hours, prices or a website for this</h3>
+      <h2 class="mini">We do not hold opening hours, prices or a website for this</h2>
       <p>Those are the three fields that go stale fastest and the three you are most damaged
       by being wrong about, so this site does not carry them at all rather than carrying an
       unverified version. Check the operator or the municipality on the day. The estimate of
@@ -1095,14 +1095,14 @@ def place_page(data, c, r, t, pl):
     {section("Journeys that stop here", f'<div class="rows">{jrows}</div>') if jrows else ""}
   </div>
   <aside class="rail">
-    <h3>Accessibility</h3>
+    <h2 class="mini">Accessibility</h2>
     <p>Not documented. Europedoor holds no step-free access, hearing loop or accessible
     toilet information for any place, and inventing it would be worse than the gap —
     <a href="/accessibility">the position in full</a>.</p>
-    <h3>Getting there</h3>
+    <h2 class="mini">Getting there</h2>
     <p>{esc(c['getting_around'][:140])}…
     <a href="{urls.country(c)}#getting-around">All of {esc(c['name'])} →</a></p>
-    <h3>Up a level</h3>
+    <h2 class="mini">Up a level</h2>
     <p><a href="{urls.city(c, r, t)}">{esc(t['name'])}</a> ·
     <a href="{urls.region(c, r)}">{esc(r['name'])}</a> ·
     <a href="{urls.country(c)}">{esc(c['name'])}</a></p>
@@ -1176,7 +1176,7 @@ def category_page(data, cat, sub=None):
   <p class="lede">{esc(cat['blurb']) if not sub else ''}
   {len(chosen)} experiences across {len(countries)} countries.</p>
 </div>
-{subcards}
+{section("Sub-categories", subcards) if subcards else ""}
 {section("How this list is built", f'<p class="small" style="max-width:44rem">{esc(C.rule_text(cat))}</p>') if not sub else ""}
 <div class="rows">{rows or '<p class="small">Nothing matches this rule yet, and an empty list is better than a padded one.</p>'}</div>
 """
@@ -1294,18 +1294,18 @@ def join_page(data):
       <a href="/how-it-works">how it works</a> is finished and reviewed.</li>
     </ul>
     <div class="note">
-      <h3>Applications are not open yet</h3>
+      <h2 class="mini">Applications are not open yet</h2>
       <p>This page describes the model so operators can tell whether it is worth their time.
       There is no form here on purpose: we will not collect business details before there is
       an entity to hold them and a published privacy notice to hold them under.</p>
     </div>
   </div>
   <aside class="rail">
-    <h3>Directory tiers &amp; indicative pricing</h3>
+    <h2 class="mini">Directory tiers &amp; indicative pricing</h2>
     <p>Free listing · Professional €49–99 per month · Premium €199+ per month.</p>
     <p class="small">Indicative only, and untested. Pricing gets set after a hundred conversations
     with operators, not before.</p>
-    <h3>Commission</h3>
+    <h2 class="mini">Commission</h2>
     <p>When bookings exist, the intended range is 10–15% on experiences sold through the platform,
     with the operator setting the price and keeping the customer relationship.</p>
   </aside>
@@ -1343,11 +1343,11 @@ def business_page(data):
     <div class="rows">{rows}</div>
   </div>
   <aside class="rail">
-    <h3>The wall between editorial and commerce</h3>
+    <h2 class="mini">The wall between editorial and commerce</h2>
     <p>Paid tiers buy presentation on directory surfaces. They never buy Atlas ranking,
     Journey Planner weighting, or a place in a curated journey. If that wall ever moves, it
     moves in public, on this page.</p>
-    <h3>Claiming a profile</h3>
+    <h2 class="mini">Claiming a profile</h2>
     <p>Not open yet — same reason as <a href="/experiences/join">listings</a>.</p>
   </aside>
 </div>
@@ -1380,7 +1380,7 @@ def fund_index(data):
 </div>
 
 <div class="note warn">
-  <h3>The Fund holds no money, and will not until three things are true</h3>
+  <h2 class="mini">The Fund holds no money, and will not until three things are true</h2>
   <p>There is an operating entity; a regulated payment path with a named payee; and a written
   answer on how contributions are treated in each country we would collect in. Until then this
   is a register of projects and nothing else — there is no balance, no total raised, and no
@@ -1421,7 +1421,7 @@ def fund_page(data, p):
                ("Money held by Europedoor", "None — see the note")])}
   </div>
   <aside class="rail">
-    <h3>No balance shown, on purpose</h3>
+    <h2 class="mini">No balance shown, on purpose</h2>
     <p>A progress bar implies custody of funds. We have none, so there is none. When the Fund
     becomes operational, every project page will show what was received, what was paid to the
     partner, and what was kept for running costs — in that order.</p>
@@ -1489,11 +1489,11 @@ def theme_page(data, t):
     <div class="rows">{''.join(rows)}</div>
   </div>
   <aside class="rail">
-    <h3>Not an itinerary</h3>
+    <h2 class="mini">Not an itinerary</h2>
     <p>A theme is a way of seeing, not a route: these places are not in travelling order and
     most people take three or four of them, not all. For an order that respects distance,
     put the ones you want into the <a href="/plan">Planner</a>.</p>
-    <h3>Countries</h3>
+    <h2 class="mini">Countries</h2>
     <p>{esc(", ".join(countries))}</p>
     <p><button class="btn ghost" type="button" data-save="theme:{esc(t['slug'])}" data-kind="Theme"
        data-label="{esc(t['name'])}" data-url="/themes/{esc(t['slug'])}">Save to My Europe</button></p>
@@ -1645,7 +1645,7 @@ def map_page(data):
 <p class="small" id="routenote"></p>
 {jsonscript("EUROPEDOOR_JOURNEYS", jdata)}
 <div class="note">
-  <h3>What this drawing is and is not</h3>
+  <h2 class="mini">What this drawing is and is not</h2>
   <p>It is a point map on an equirectangular projection, corrected at 52°N. There are no
   coastlines because we do not have a licence to draw any — the shape you see is Europe's
   cities describing Europe's outline by themselves, which is a fair picture of where people
@@ -1824,7 +1824,7 @@ def quiet_page(data):
 {section("Six straight swaps", f'<div class="rows">{swaps}</div>',
          lede="Same idea, different pressure.")}
 <div class="note">
-  <h3>The rule we hold ourselves to</h3>
+  <h2 class="mini">The rule we hold ourselves to</h2>
   <p>No page on this site tells you a place is undiscovered. Publishing that sentence is what
   ends it. What we will say is when to come, how to arrive without a car where that is possible,
   and who locally is worth your money.</p>
@@ -1850,7 +1850,7 @@ def my_europe_page(data):
 </div>
 <div id="mine" aria-live="polite"></div>
 <div class="note">
-  <h3>Where this goes next</h3>
+  <h2 class="mini">Where this goes next</h2>
   <p>The account version adds sync across devices, a shareable public list, and the ability to
   hand a saved list straight to the Planner as a set of must-visit stops. All three need a
   backend, a privacy notice and a data controller — see <a href="/how-it-works">how it works</a>.</p>
@@ -1900,7 +1900,7 @@ def method_page(data):
     published on every country page and can be argued with directly.</p>
   </div>
   <aside class="rail">
-    <h3>Recomputed, never stored</h3>
+    <h2 class="mini">Recomputed, never stored</h2>
     <p>No score is written into the data files. Every number on the site is derived at build
     time from the tags, so a score and its explanation cannot drift apart.</p>
   </aside>
@@ -1957,13 +1957,13 @@ def about_page(data):
     built our own version of it, which is the part the law leaves open.</p>
   </div>
   <aside class="rail">
-    <h3>Status</h3>
+    <h2 class="mini">Status</h2>
     <p>Pre-launch. No entity, no payments, no accounts, no bookings, no partners. What exists is
     the Atlas, the Planner, the Journeys, the register and the editorial.</p>
-    <h3>The name</h3>
+    <h2 class="mini">The name</h2>
     <p>Europedoor, at europedoor.com. Settled — the Atlas is the name of the discovery layer
     inside it, not an alternative name for the product.</p>
-    <h3>Corrections</h3>
+    <h2 class="mini">Corrections</h2>
     <p>Everything here can be wrong. <a href="/sources">How to tell us →</a></p>
   </aside>
 </div>
@@ -2021,7 +2021,7 @@ def how_it_works_page(data):
 {section("Designed, not built", designed, lede="Specified in docs/product-specification.md in the repository, with schemas and flows. Not shipped.")}
 {section("Deliberately blocked", gated, lede="Each of these is one decision away from possible and is being held shut on purpose until the thing in the middle column exists.")}
 <div class="note">
-  <h3>The AI rule, in one paragraph</h3>
+  <h2 class="mini">The AI rule, in one paragraph</h2>
   <p>When the AI planner ships, it will not be a chat window with a model behind it. The pipeline
   is: intent extraction from what you typed → a query against this dataset → a route computed by
   the same distance code that runs the planner today → and only then a model, whose job is to
@@ -2075,13 +2075,13 @@ def sources_page(data):
     </ol>
   </div>
   <aside class="rail">
-    <h3>Fact freshness</h3>
+    <h2 class="mini">Fact freshness</h2>
     <p>Every country, and the date its practical facts were last checked.
     <a href="/sources/freshness">The board →</a></p>
-    <h3>Tell us</h3>
+    <h2 class="mini">Tell us</h2>
     <p>Corrections are wanted, including blunt ones. A correction channel goes up with the entity;
     until then, the repository's issue tracker is the honest answer.</p>
-    <h3>No photographs</h3>
+    <h2 class="mini">No photographs</h2>
     <p>Every illustration on this site is generated from the place's own name — a deterministic
     drawing, unique per place, owned outright. No stock library, no licence expiry, no
     accidental use of somebody's holiday photograph.</p>
@@ -2132,7 +2132,7 @@ def freshness_page(data):
 </div>
 
 <div class="note warn">
-  <h3>What "unverified" means here</h3>
+  <h2 class="mini">What "unverified" means here</h2>
   <p>The entry was written editorially by someone who knows the place. It is a considered
   first draft, not a citation-backed reference, and no one has yet gone back through it
   against an official source. Treat cost bands as indicative, seasons as typical rather than
@@ -2143,14 +2143,14 @@ def freshness_page(data):
 <div class="split">
   <div><div class="rows">{''.join(rows)}</div></div>
   <aside class="rail">
-    <h3>The order it happens in</h3>
+    <h2 class="mini">The order it happens in</h2>
     <ol>
       <li>Currency, blocs, entry arrangements — against the relevant official body.</li>
       <li>Cost bands — against current published prices in three cities per country.</li>
       <li>Seasons and opening — against operators and municipalities.</li>
       <li>The date lands on the country page, in public, next to the facts it covers.</li>
     </ol>
-    <h3>Why the date and not a tick</h3>
+    <h2 class="mini">Why the date and not a tick</h2>
     <p>A tick says "correct". A date says "correct on this day, and you can judge how much
     that is worth now". Only the second one is true.</p>
     <p><a href="/sources">Sources and corrections →</a></p>
@@ -2199,29 +2199,42 @@ def search_api(data):
     running a search service, and it works offline."""
     rows = []
 
-    def add(kind, name, sub, url, text, weight=1.0):
-        rows.append({"k": kind, "n": name, "s": sub, "u": url,
-                     "t": " ".join(text).lower(), "w": weight})
+    def add(kind, name, sub, url, text, weight=1.0, **extra):
+        row = {"k": kind, "n": name, "s": sub, "u": url,
+               "t": " ".join(text).lower(), "w": weight}
+        row.update({k: v for k, v in extra.items() if v is not None})
+        rows.append(row)
 
     for m in data["macros"]:
         add("Region of Europe", m["name"], f"{len(m['countries'])} countries",
             urls.macro(m), [m["name"], m["blurb"]], 1.4)
     for c in data["countries"].values():
         add("Country", c["name"], c["macro_name"], urls.country(c),
-            [c["name"], c.get("official", ""), c["capital"], c["tagline"],
-             c["summary"], " ".join(c["interests"])], 2.0)
+            [c["name"], c.get("official", ""), c["capital"], c["tagline"], c["summary"],
+             " ".join(c["interests"]),
+             " ".join(data["interests"][i]["name"] for i in c["interests"])], 2.0,
+            b=c["budget"], m=c["season"]["peak"] + c["season"].get("shoulder", []),
+            i=c["interests"])
         for r in c["regions"]:
             add("Region", r["name"], c["name"], urls.region(c, r),
                 [r["name"], r["summary"], " ".join(r["interests"])], 1.2)
             for t in r["cities"]:
+                # The extra fields are what make "cheap quiet beaches near
+                # Prague in September" answerable without a search service.
                 add("City", t["name"], f"{r['name']}, {c['name']}", urls.city(c, r, t),
                     [t["name"], t["summary"], " ".join(t["highlights"]),
-                     " ".join(t["interests"]), c["name"], r["name"]], 1.6)
+                     " ".join(t["interests"]),
+                     " ".join(data["interests"][i]["name"] for i in t["interests"]),
+                     c["name"], r["name"]], 1.6,
+                    b=c["budget"], q=(1 if t.get("quiet") else None),
+                    m=c["season"]["peak"] + c["season"].get("shoulder", []),
+                    la=t["lat"], lo=t["lon"], cs=c["slug"],
+                    i=sorted(set(t["interests"]) | set(r["interests"])))
                 for pl in t.get("places", []):
                     add("Place", pl["name"], f"{t['name']}, {c['name']}",
                         urls.place(c, r, t, pl),
                         [pl["name"], pl["summary"], PLACE_KIND_NAMES[pl["kind"]], t["name"], c["name"]],
-                        1.5)
+                        1.5, b=c["budget"], la=pl["lat"], lo=pl["lon"], cs=c["slug"])
                 for e in t.get("experiences", []):
                     add("Experience", e["name"], f"{t['name']}, {c['name']}",
                         urls.city(c, r, t), [e["name"], e["summary"], e["kind"]], 0.9)
@@ -2247,7 +2260,11 @@ def search_api(data):
             add("Category", sub["name"], cat["name"],
                 urls.subcategory(cat["slug"], sub["slug"]),
                 [sub["name"]] + sub["keywords"], 1.1)
-    return "/api/search.json", {"rows": rows}
+    return "/api/search.json", {
+        "rows": rows,
+        "monthNames": data["taxonomy"]["month_names"],
+        "interests": {i["slug"]: i["name"] for i in data["taxonomy"]["interests"]},
+    }
 
 
 def search_page(data):
@@ -2259,17 +2276,21 @@ def search_page(data):
 <div class="pagehead">
   <p class="kicker">Search</p>
   <h1>Find it.</h1>
-  <p class="lede">Everything on Europedoor — {n} countries, regions, cities,
+  <p class="lede">Everything on Europedoor — {n} countries, regions, destinations, places,
   journeys, themes, stories and projects — in one index that runs in your browser.
-  Nothing you type is sent anywhere.</p>
+  Nothing you type is sent anywhere, and nobody can buy a position in it.</p>
+  <p class="small">It reads more than words: <em>cheap</em> and <em>quiet</em> filter,
+  a month narrows to places that are good in it, and <em>near Prague</em> means within
+  300 kilometres of Prague. Whatever it understood is shown back to you as chips.</p>
 </div>
 <form class="form" id="searchform" role="search">
   <div class="field">
     <label for="q">Search Europe</label>
     <input type="text" id="q" name="q" autocomplete="off" autofocus
-           placeholder="bergen, medieval, truffle, twelve days, sacred…">
+           placeholder="quiet beaches in september · medieval castles near prague · cheap mountains">
   </div>
 </form>
+<div class="chips" id="searchunderstood" aria-live="polite"></div>
 <div id="results" aria-live="polite"></div>
 <noscript><p class="small">Search needs JavaScript. The
 <a href="/countries">Atlas</a> is fully browsable without it.</p></noscript>
@@ -2343,7 +2364,7 @@ def discover_page(data):
          more=("The whole European year", "/events"))}
 
 <div class="note">
-  <h3>The other way to use this</h3>
+  <h2 class="mini">The other way to use this</h2>
   <p>{quiet} places in the Atlas are tagged quiet: the goods without the crowd.
   <a href="/beyond-the-obvious">Beyond the obvious</a> collects them, and the planner
   scores shoulder-season months upward rather than downward.</p>
@@ -2371,7 +2392,7 @@ def _plain(title, kicker, lede, blocks, *, path, description, crumb):
 
 
 PRELAUNCH = """<div class="note warn">
-  <h3>This is a pre-launch draft, and it says so rather than pretending</h3>
+  <h2 class="mini">This is a pre-launch draft, and it says so rather than pretending</h2>
   <p>There is no incorporated company behind Europedoor yet, so there is no legal person to
   be bound by this document and no data controller to be accountable under it. What follows
   is the position we intend to take, published early so it can be argued with — it is not a
@@ -2420,13 +2441,13 @@ def privacy_page(data):
     email a mailbox nobody reads.</p>
   </div>
   <aside class="rail">
-    <h3>Cookies</h3>
+    <h2 class="mini">Cookies</h2>
     <p>This site sets none. Not a consent banner's worth, not one. <a href="/cookies">The
     detail →</a></p>
-    <h3>Local storage</h3>
+    <h2 class="mini">Local storage</h2>
     <p>My Europe uses <code>localStorage</code> under this origin. It never leaves your
     device and clearing site data removes it. <a href="/my-europe">Your list →</a></p>
-    <h3>Children</h3>
+    <h2 class="mini">Children</h2>
     <p>The site is not directed at children and collects nothing from anyone.</p>
   </aside>
 </div>"""
@@ -2460,7 +2481,7 @@ def cookies_page(data):
     with a working reject button rather than a wall.</p>
   </div>
   <aside class="rail">
-    <h3>Verify it</h3>
+    <h2 class="mini">Verify it</h2>
     <p>Open your browser's developer tools, look at Application → Cookies for this domain,
     and confirm the list is empty. That is worth more than this page.</p>
   </aside>
@@ -2505,9 +2526,9 @@ def terms_page(data):
     disagree, the official source is right and we would like to be told.</p>
   </div>
   <aside class="rail">
-    <h3>Corrections</h3>
+    <h2 class="mini">Corrections</h2>
     <p>Wanted, including blunt ones. <a href="/sources">How to tell us →</a></p>
-    <h3>Not yet in force</h3>
+    <h2 class="mini">Not yet in force</h2>
     <p>These terms bind nobody until there is a company to be bound. See
     <a href="/about">about</a>.</p>
   </aside>
@@ -2554,11 +2575,11 @@ def accessibility_page(data):
     <a href="/contact">How to reach us →</a></p>
   </div>
   <aside class="rail">
-    <h3>Why no photographs</h3>
+    <h2 class="mini">Why no photographs</h2>
     <p>Every illustration on this site is generated from the place's own name and carries a
     text alternative automatically. There is no library of stock images with missing alt
     text, because there is no library.</p>
-    <h3>Tested in a browser</h3>
+    <h2 class="mini">Tested in a browser</h2>
     <p>The accessibility checks run in Chromium on every build, not as a checklist somebody
     ticks. If one fails, the build fails.</p>
   </aside>
@@ -2604,9 +2625,9 @@ def help_page(data):
     <a href="/countries">Which is which →</a></p>
   </div>
   <aside class="rail">
-    <h3>Something is wrong</h3>
+    <h2 class="mini">Something is wrong</h2>
     <p>Corrections are wanted. <a href="/sources">Sources and corrections →</a></p>
-    <h3>You run a business here</h3>
+    <h2 class="mini">You run a business here</h2>
     <p><a href="/for-businesses">How listings work →</a></p>
   </aside>
 </div>"""
@@ -2645,7 +2666,7 @@ def contact_page(data):
     for what it needs. In that order.</p>
   </div>
   <aside class="rail">
-    <h3>Why this reads oddly</h3>
+    <h2 class="mini">Why this reads oddly</h2>
     <p>Most sites put a form here whether or not anyone reads it. This is what it looks like
     when a product refuses to collect something it cannot yet look after.</p>
   </aside>
@@ -2694,10 +2715,10 @@ def tourism_boards_page(data):
     is described above in the conditional.</p>
   </div>
   <aside class="rail">
-    <h3>Where your region already is</h3>
+    <h2 class="mini">Where your region already is</h2>
     <p>Every country has a page, every travel region has a page, and every destination links
     to the region and country above it. <a href="/countries">Find yours →</a></p>
-    <h3>Corrections first</h3>
+    <h2 class="mini">Corrections first</h2>
     <p>If something about your region is wrong here, that is worth more to us than a campaign
     and costs you nothing. <a href="/sources">Tell us →</a></p>
   </aside>

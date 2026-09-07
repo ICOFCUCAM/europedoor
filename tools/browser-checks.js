@@ -285,6 +285,32 @@ async function main() {
   ok(/Itinerar/i.test(await page.locator("#mine").textContent()),
      "a saved itinerary did not reach My Europe");
 
+  // The specification's four search intents, each of which returned nothing
+  // before the query was read for modifiers rather than matched as a string.
+  async function searchFor(q) {
+    await page.goto(base + "/search", { waitUntil: "networkidle" });
+    await page.fill("#q", q);
+    await page.waitForTimeout(260);
+    return {
+      understood: (await page.locator("#searchunderstood").textContent()).replace(/\s+/g, " "),
+      count: await page.locator("#results .row").count(),
+      heads: (await page.locator("#results h3").allTextContents()).join(" | "),
+    };
+  }
+  const s1 = await searchFor("quiet beaches in september");
+  ok(s1.count > 0, "\"quiet beaches in september\" returned nothing");
+  ok(/quiet/.test(s1.understood) && /September/.test(s1.understood),
+     `the modifiers were not read back: ${s1.understood}`);
+  const s2 = await searchFor("medieval castles near prague");
+  ok(s2.count > 0, "\"medieval castles near prague\" returned nothing");
+  ok(/near Prague/.test(s2.understood), "the proximity was not understood");
+  const s3 = await searchFor("cheap mountains");
+  ok(s3.count > 0 && /cheap/.test(s3.understood), "a budget query was not understood");
+  const s4 = await searchFor("romantic places");
+  ok(s4.count > 0 && /reading that as/.test(s4.understood), "an intent query was not understood");
+  const s5 = await searchFor("bergen");
+  ok(/Cit|Region|Place/.test(s5.heads), "results are not grouped by type");
+
   // ── the map ────────────────────────────────────────────────────────
   await page.goto(base + "/map", { waitUntil: "networkidle" });
   const dots = await page.locator("#dots .dot").count();
@@ -329,6 +355,137 @@ async function main() {
     document.documentElement.scrollWidth - document.documentElement.clientWidth
   );
   ok(mapOver <= 1, `/map overflows the page by ${mapOver}px instead of scrolling its own wrapper`);
+
+  // ── accessibility: WCAG 2.2 AA, the part a machine can hold ─────────
+  //
+  // Not a conformance claim. These are the failures a build can catch, run
+  // on every page shape, in both colour schemes. The audit that matters —
+  // somebody using a screen reader daily — is named as missing on
+  // /accessibility rather than implied by a green tick here.
+  const a11yPages = [
+    "/", "/discover", "/countries", "/europe/norway", "/europe/norway/fjord-norway/bergen",
+    "/europe/norway/fjord-norway/bergen/place/bryggen", "/plan", "/search", "/map",
+    "/journeys/the-alpine-grand-tour", "/experiences", "/experiences/nature",
+    "/stories/the-last-forest", "/events/oct", "/fund", "/privacy", "/accessibility",
+    "/my-europe", "/sources/freshness",
+  ];
+
+  const a11yProbe = () => {
+    const out = { headingSkips: [], unlabelled: [], emptyLinks: [], noAlt: [], issues: [] };
+
+    // Contrast, computed from what the browser actually paints.
+    const lum = (c) => {
+      // Chromium reports color-mix() as color(srgb 0.07 0.08 0.1 / .88) —
+      // components 0–1 rather than 0–255. Reading those as 8-bit made the
+      // masthead look like it had a contrast failure it did not have.
+      const nums = (c.match(/-?\d*\.?\d+/g) || []).map(Number);
+      const scale = /^color\(/.test(c) ? 255 : 1;
+      const [r, g, b] = nums.slice(0, 3).map((v) => {
+        const s = (v * scale) / 255;
+        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    const bgOf = (el) => {
+      let n = el;
+      while (n && n !== document.documentElement) {
+        const bg = getComputedStyle(n).backgroundColor;
+        if (bg && !/rgba\(0, 0, 0, 0\)|transparent/.test(bg)) return bg;
+        n = n.parentElement;
+      }
+      return getComputedStyle(document.body).backgroundColor;
+    };
+    const ratio = (a, b) => {
+      const [l1, l2] = [lum(a), lum(b)].sort((x, y) => y - x);
+      return (l1 + 0.05) / (l2 + 0.05);
+    };
+
+    const sample = [...document.querySelectorAll("p, li, a, h1, h2, h3, dt, dd, button, label, span.chip, .rowmeta, .kicker, .footer-legal")]
+      .filter((el) => el.textContent.trim().length > 3)
+      .slice(0, 220);
+    for (const el of sample) {
+      const cs = getComputedStyle(el);
+      if (cs.visibility === "hidden" || cs.display === "none") continue;
+      const size = parseFloat(cs.fontSize);
+      const bold = parseInt(cs.fontWeight, 10) >= 700;
+      const large = size >= 24 || (size >= 18.66 && bold);
+      const need = large ? 3 : 4.5;
+      const r = ratio(cs.color, bgOf(el));
+      if (r < need) {
+        out.issues.push(`contrast ${r.toFixed(2)}:1 (needs ${need}) on <${el.tagName.toLowerCase()}> "${el.textContent.trim().slice(0, 40)}"`);
+      }
+    }
+
+    // Heading order.
+    let prev = 0;
+    for (const h of document.querySelectorAll("h1,h2,h3,h4,h5,h6")) {
+      const lvl = Number(h.tagName[1]);
+      if (prev && lvl > prev + 1) out.headingSkips.push(`h${prev} → h${lvl} at "${h.textContent.trim().slice(0, 40)}"`);
+      prev = lvl;
+    }
+
+    // Labels, link text, image alternatives, landmarks.
+    for (const f of document.querySelectorAll("input, select, textarea")) {
+      const id = f.getAttribute("id");
+      const labelled = (id && document.querySelector(`label[for="${id}"]`)) ||
+        f.closest("label") || f.getAttribute("aria-label") || f.getAttribute("aria-labelledby");
+      if (!labelled) out.unlabelled.push(f.outerHTML.slice(0, 60));
+    }
+    for (const a of document.querySelectorAll("a")) {
+      const text = (a.textContent || "").trim() || a.getAttribute("aria-label") || a.querySelector("svg[aria-label]");
+      if (!text) out.emptyLinks.push(a.getAttribute("href") || "(no href)");
+    }
+    for (const g of document.querySelectorAll('svg[role="img"]')) {
+      if (!g.getAttribute("aria-label") && !g.querySelector("title")) out.noAlt.push("svg without a name");
+    }
+    if (!document.querySelector("main")) out.issues.push("no <main> landmark");
+    if (!document.querySelector('nav[aria-label]')) out.issues.push("no labelled nav");
+    if (!document.documentElement.getAttribute("lang")) out.issues.push("no lang on <html>");
+    if (!document.querySelector('a.skip')) out.issues.push("no skip link");
+    return out;
+  };
+
+  for (const scheme of ["light", "dark"]) {
+    const a11y = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await a11y.emulateMedia({ colorScheme: scheme });
+    for (const url of a11yPages) {
+      await a11y.goto(base + url, { waitUntil: "load" });
+      const r = await a11y.evaluate(a11yProbe);
+      ok(r.issues.length === 0, `${scheme} ${url}: ${r.issues.slice(0, 2).join("; ")}`);
+      ok(r.headingSkips.length === 0, `${scheme} ${url}: heading level skipped — ${r.headingSkips[0]}`);
+      ok(r.unlabelled.length === 0, `${scheme} ${url}: unlabelled form control ${r.unlabelled[0]}`);
+      ok(r.emptyLinks.length === 0, `${scheme} ${url}: link with no discernible text (${r.emptyLinks[0]})`);
+      ok(r.noAlt.length === 0, `${scheme} ${url}: ${r.noAlt[0]}`);
+    }
+    await a11y.close();
+  }
+
+  // Keyboard: the skip link must be the first stop and must actually move focus.
+  const kb = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  await kb.goto(base + "/europe/norway/fjord-norway/bergen", { waitUntil: "domcontentloaded" });
+  await kb.keyboard.press("Tab");
+  const firstStop = await kb.evaluate(() => document.activeElement.className);
+  ok(/skip/.test(firstStop), `the first tab stop is "${firstStop}", not the skip link`);
+  const focusVisible = await kb.evaluate(() => {
+    const el = document.activeElement;
+    const cs = getComputedStyle(el);
+    return cs.outlineStyle !== "none" || cs.boxShadow !== "none";
+  });
+  ok(focusVisible, "the focused skip link has no visible focus indicator");
+  await kb.close();
+
+  // Reduced motion must actually remove motion, not merely shorten it.
+  const rm = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  await rm.emulateMedia({ reducedMotion: "reduce" });
+  await rm.goto(base + "/countries", { waitUntil: "domcontentloaded" });
+  const anyTransition = await rm.evaluate(() =>
+    [...document.querySelectorAll(".card, .chip, .btn, a")].some((el) => {
+      const d = getComputedStyle(el).transitionDuration;
+      return d && d !== "0s" && !/^0s(, 0s)*$/.test(d);
+    })
+  );
+  ok(!anyTransition, "transitions still run under prefers-reduced-motion");
+  await rm.close();
 
   ok(errors.length === 0, `console errors:\n    ${errors.slice(0, 5).join("\n    ")}`);
 

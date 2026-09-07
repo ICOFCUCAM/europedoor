@@ -14,7 +14,105 @@
 (function () {
   "use strict";
 
-  var ROWS = null;
+  var ROWS = null, INDEX = null;
+
+  /* The specification asks search to understand more than a word: an intent
+   * ("romantic places"), a budget ("cheap European destinations"), a season
+   * ("quiet beaches in September") and a proximity ("castles near Prague").
+   *
+   * None of that needs a language model or a search service. It needs the
+   * query read for modifiers, the modifiers applied as filters, and — the
+   * part most search boxes skip — the interpretation shown back, so a wrong
+   * guess is visible rather than mysterious.
+   */
+  var MODIFIER_INTENT = {
+    romantic: ["coast", "islands", "wine", "architecture"],
+    family: ["nature", "coast", "history"],
+    adventurous: ["mountains", "winter", "nature"],
+    adventure: ["mountains", "winter", "nature"],
+    cultural: ["art", "architecture", "history", "music"],
+    culture: ["art", "architecture", "history", "music"],
+    foodie: ["food", "wine"],
+    scenic: ["mountains", "coast", "nature"],
+    // Ordinary nouns are the ones people actually type. Mapping them to a
+    // tag and REMOVING them from the search term is the difference between
+    // "quiet beaches in September" returning nothing and returning beaches.
+    beach: ["coast"], beaches: ["coast"], coast: ["coast"], seaside: ["coast"],
+    castle: ["history"], castles: ["history"], medieval: ["history"],
+    ruins: ["history"], history: ["history"], historic: ["history"],
+    museum: ["art"], museums: ["art"], gallery: ["art"], galleries: ["art"], art: ["art"],
+    church: ["sacred"], churches: ["sacred"], cathedral: ["sacred"], cathedrals: ["sacred"],
+    monastery: ["sacred"], monasteries: ["sacred"], pilgrimage: ["sacred"], sacred: ["sacred"],
+    mountain: ["mountains"], mountains: ["mountains"], hiking: ["mountains"], alps: ["mountains"],
+    island: ["islands"], islands: ["islands"],
+    wine: ["wine"], vineyards: ["wine"], food: ["food"], restaurants: ["food"],
+    snow: ["winter"], ski: ["winter"], skiing: ["winter"], aurora: ["winter"],
+    wildlife: ["wild"], nature: ["nature"], forest: ["nature"], forests: ["nature"],
+    festival: ["festivals"], festivals: ["festivals"],
+    train: ["rail"], trains: ["rail"], rail: ["rail"], railway: ["rail"],
+    music: ["music"], nightlife: ["music"], design: ["design"],
+    architecture: ["architecture"], city: ["cities"], cities: ["cities"]
+  };
+
+  // Words that carry no signal in a travel search and swallow every result
+  // if they are left in the term.
+  var STOP = ["place", "places", "destination", "destinations", "europe", "european",
+              "spot", "spots", "somewhere", "anywhere", "best", "top", "good", "nice",
+              "holiday", "holidays", "trip", "trips", "travel", "visit", "go", "to",
+              "the", "in", "for", "with", "and", "a", "of", "on", "at", "some", "my",
+              "i", "want", "looking", "find", "show", "me"];
+
+  function parseQuery(q) {
+    var mods = { cheap: false, quiet: false, month: null, near: null, interests: [], rest: q };
+    var t = " " + q + " ";
+
+    if (/\b(cheap|cheapest|budget|affordable|inexpensive)\b/.test(t)) {
+      mods.cheap = true; t = t.replace(/\b(cheap|cheapest|budget|affordable|inexpensive)\b/g, " ");
+    }
+    if (/\b(quiet|quieter|uncrowded|empty|off the beaten|hidden|undiscovered)\b/.test(t)) {
+      mods.quiet = true;
+      t = t.replace(/\b(quiet|quieter|uncrowded|empty|off the beaten|track|hidden|undiscovered)\b/g, " ");
+    }
+    for (var m in INDEX.months) {
+      var name = INDEX.months[m].toLowerCase();
+      if (t.indexOf(" " + name) >= 0 || new RegExp("\\b" + m + "\\b").test(t)) {
+        mods.month = m;
+        t = t.replace(new RegExp(name + "|\\b" + m + "\\b", "g"), " ");
+        break;
+      }
+    }
+    var near = t.match(/\bnear\s+([a-zàâäçéèêëîïôöùûüÿñæœ' -]{3,30})/);
+    if (near) {
+      var wanted = norm(near[1].trim());
+      for (var i = 0; i < ROWS.length; i++) {
+        if (ROWS[i].la === undefined) continue;
+        var n = norm(ROWS[i].n);
+        if (n === wanted || wanted.indexOf(n) === 0) { mods.near = ROWS[i]; break; }
+      }
+      if (mods.near) t = t.replace(near[0], " ");
+    }
+    for (var word in MODIFIER_INTENT) {
+      if (new RegExp("\\b" + word + "\\b").test(t)) {
+        mods.interests = mods.interests.concat(MODIFIER_INTENT[word]);
+        t = t.replace(new RegExp("\\b" + word + "\\b", "g"), " ");
+      }
+    }
+    for (var si = 0; si < STOP.length; si++) {
+      t = t.replace(new RegExp("\\b" + STOP[si] + "\\b", "g"), " ");
+    }
+    // De-duplicate the interests we collected.
+    mods.interests = mods.interests.filter(function (v, i, a) { return a.indexOf(v) === i; });
+    mods.rest = t.replace(/\s+/g, " ").trim();
+    return mods;
+  }
+
+  function kmBetween(a, b) {
+    var R = 6371, p1 = a.la * Math.PI / 180, p2 = b.la * Math.PI / 180;
+    var dp = p2 - p1, dl = (b.lo - a.lo) * Math.PI / 180;
+    var h = Math.sin(dp / 2) * Math.sin(dp / 2) +
+            Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) * Math.sin(dl / 2);
+    return Math.round(2 * R * Math.asin(Math.sqrt(h)));
+  }
   var form = document.getElementById("searchform");
   var input = document.getElementById("q");
   var out = document.getElementById("results");
@@ -25,7 +123,7 @@
     return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
   }
 
-  function score(row, q) {
+  function scoreOne(row, q) {
     var n = norm(row.n);
     if (n === q) return 1000 * row.w;
     if (n.indexOf(q) === 0) return 500 * row.w;
@@ -37,6 +135,52 @@
     return (60 - Math.min(50, at / 20)) * row.w;
   }
 
+  function score(row, q) {
+    // Multi-word queries are an AND over the words. "medieval castles"
+    // matched nothing until this existed, because no row contains that
+    // exact string.
+    var words = q.split(/\s+/).filter(function (w) { return w.length >= 2; });
+    if (!words.length) return 0;
+    var total = 0;
+    for (var i = 0; i < words.length; i++) {
+      var sc = scoreOne(row, words[i]);
+      if (!sc) return 0;
+      total += sc;
+    }
+    return total / words.length;
+  }
+
+  function understoodHtml(mods) {
+    var chips = [];
+    if (mods.cheap) chips.push("cheap: low-cost countries only");
+    if (mods.quiet) chips.push("quiet: places tagged uncrowded");
+    if (mods.month) chips.push("in " + INDEX.months[mods.month] + ": good that month");
+    if (mods.near) chips.push("near " + mods.near.n + ": within 300 km");
+    if (mods.interests.length) {
+      var names = mods.interests.map(function (i) { return INDEX.interests[i] || i; });
+      chips.push("reading that as: " + names.join(", ").toLowerCase());
+    }
+    var box = document.getElementById("searchunderstood");
+    if (!box) return;
+    box.innerHTML = chips.map(function (c) { return '<span class="chip">' + escape_(c) + "</span>"; }).join("");
+  }
+
+  function passesModifiers(row, mods) {
+    if (mods.cheap && row.b && row.b !== "low") return false;
+    if (mods.quiet && !row.q) return false;
+    if (mods.month && row.m && row.m.indexOf(mods.month) < 0) return false;
+    if (mods.month && !row.m && row.k !== "City" && row.k !== "Place") return true;
+    if (mods.near) {
+      if (row.la === undefined) return false;
+      if (kmBetween(mods.near, row) > 300) return false;
+    }
+    if (mods.interests.length && row.i) {
+      var hit = mods.interests.some(function (i) { return row.i.indexOf(i) >= 0; });
+      if (!hit) return false;
+    }
+    return true;
+  }
+
   function run(qraw) {
     var q = norm(qraw.trim());
     if (q.length < 2) {
@@ -44,9 +188,37 @@
         'a kind of trip ("medieval", "wine", "rail"), or something you want to eat.</p>';
       return;
     }
+    var mods = parseQuery(q);
+    understoodHtml(mods);
+    var anyMod = mods.cheap || mods.quiet || mods.month || mods.near || mods.interests.length;
+    var term = mods.rest;
+
     var hits = [];
     for (var i = 0; i < ROWS.length; i++) {
-      var s = score(ROWS[i], q);
+      if (anyMod && !passesModifiers(ROWS[i], mods)) continue;
+      var s;
+      if (term.length >= 2) {
+        s = score(ROWS[i], term);
+      } else if (anyMod) {
+        // A query that is all modifiers still has to rank. How much of what
+        // you asked for a row actually carries, weighted by kind — otherwise
+        // "romantic places" returns 900 rows in alphabetical order, which is
+        // a database dump rather than an answer.
+        var overlap = 1;
+        if (mods.interests.length && ROWS[i].i) {
+          // Named `matched`, not `hits`: `var hits` in here hoists and
+          // shadows the results array outside it, and the page died with
+          // "hits.push is not a function".
+          var matched = 0;
+          for (var w = 0; w < mods.interests.length; w++) {
+            if (ROWS[i].i.indexOf(mods.interests[w]) >= 0) matched++;
+          }
+          overlap = matched / mods.interests.length;
+        }
+        s = ROWS[i].w * (10 + 60 * overlap) + (ROWS[i].q ? 8 : 0);
+      } else {
+        s = 0;
+      }
       if (s > 0) hits.push({ r: ROWS[i], s: s });
     }
     hits.sort(function (a, b) { return b.s - a.s || a.r.n.localeCompare(b.r.n); });
@@ -67,9 +239,40 @@
         '<p class="rowmeta">' + escape_(h.r.k) + "</p></a>";
     }).join("");
 
+    // Grouped by type, in a fixed order, so a page of results reads as an
+    // answer rather than a list. Nothing here is ranked by money: there is
+    // no field in the index that a payment could touch.
+    var ORDER = ["Country", "Region of Europe", "Region", "City", "Place", "Experience",
+                 "Journey", "Theme", "Category", "Interest", "Story", "Fund project"];
+    var groups = {};
+    shown.forEach(function (h) { (groups[h.r.k] = groups[h.r.k] || []).push(h); });
+
+    // With a typed term, the group holding the best match goes first —
+    // searching "bergen" and getting "Regions: Fjord Norway" above
+    // "Cities: Bergen" is the kind of correctness nobody forgives. With only
+    // modifiers there is no best match, so the fixed order reads better.
+    var keys = Object.keys(groups);
+    if (term.length >= 2) {
+      keys.sort(function (a, b) { return groups[b][0].s - groups[a][0].s; });
+    } else {
+      keys = ORDER.concat(keys.filter(function (k) { return ORDER.indexOf(k) < 0; }));
+    }
+    var body = "";
+    keys.forEach(function (k) {
+        if (!groups[k] || !groups[k].length) return;
+        body += "<h3>" + escape_(k) + (groups[k].length > 1 ? "s" : "") + "</h3>" +
+          '<div class="rows">' + groups[k].map(function (h) {
+            var extra = mods.near && h.r.la !== undefined
+              ? kmBetween(mods.near, h.r) + " km" : escape_(h.r.k);
+            return '<a class="row" href="' + h.r.u + '"><div><h3>' + escape_(h.r.n) +
+              '</h3><p class="rowsub">' + escape_(h.r.s) + '</p></div>' +
+              '<p class="rowmeta">' + extra + "</p></a>";
+          }).join("") + "</div>";
+      });
+
     out.innerHTML = "<h2>" + hits.length + (hits.length === 1 ? " result" : " results") +
       (hits.length > shown.length ? " — showing the first " + shown.length : "") +
-      '</h2><div class="rows">' + rows + "</div>";
+      "</h2>" + body;
   }
 
   function escape_(s) {
@@ -96,6 +299,7 @@
     .then(function (r) { return r.json(); })
     .then(function (j) {
       ROWS = j.rows;
+      INDEX = { months: j.monthNames || j.months || {}, interests: j.interests || {} };
       var q = new URLSearchParams(location.search).get("q");
       if (q) input.value = q;
       run(input.value || "");
