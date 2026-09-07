@@ -310,3 +310,11 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 /* ── a journey drawn over the map ─────────────────────────────────── */
 .routeline { fill: none; stroke: var(--door); stroke-width: 2.5; stroke-linejoin: round; stroke-dasharray: 7 5; opacity: .9; }
 .routedot { fill: var(--door); stroke: var(--paper); stroke-width: 2; }
+
+/* ── masthead utilities: search and My Europe sit apart from the nav ── */
+.navutil { display: flex; gap: var(--s4); align-items: center; font-size: var(--t-sm); letter-spacing: .04em; text-transform: uppercase; }
+.navutil a { text-decoration: none; color: var(--ink-2); border-bottom: 1.5px solid transparent; padding-bottom: 2px; }
+.navutil a:hover { color: var(--door); border-bottom-color: var(--door); }
+.navsearch { color: var(--door); }
+.navsearch span { font-size: 1.1em; line-height: 1; }
+@media (max-width: 60rem) { .masthead-in { flex-wrap: wrap; } }

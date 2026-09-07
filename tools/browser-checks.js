@@ -9,8 +9,8 @@
  * console error.
  *
  * It serves site/ over a local static server with cleanUrls semantics, the
- * same way the host will, because a link to /atlas that only works as
- * /atlas/index.html is a bug that never shows up locally.
+ * same way the host will, because a link to /countries that only works as
+ * /countries/index.html is a bug that never shows up locally.
  */
 
 const http = require("http");
@@ -256,7 +256,7 @@ async function main() {
   ok(lit > 0 && lit < dots, `winter layer lit ${lit} of ${dots} — filtering is not working`);
 
   // ── saved places ───────────────────────────────────────────────────
-  await page.goto(base + "/atlas/nordic/norway/fjord-norway/bergen", { waitUntil: "networkidle" });
+  await page.goto(base + "/europe/norway/fjord-norway/bergen", { waitUntil: "networkidle" });
   await page.click("[data-save]");
   ok((await page.locator("[data-save]").textContent()).includes("✓"), "save button did not confirm");
   await page.goto(base + "/my-europe", { waitUntil: "networkidle" });
@@ -265,13 +265,13 @@ async function main() {
   // ── no horizontal overflow at phone width ──────────────────────────
   const phone = await browser.newPage({ viewport: { width: 390, height: 844 } });
   const sample = [
-    "/", "/atlas", "/atlas/mediterranean", "/atlas/mediterranean/italy",
-    "/atlas/mediterranean/italy/tuscany-and-the-centre",
-    "/atlas/mediterranean/italy/tuscany-and-the-centre/florence",
+    "/", "/countries", "/discover/mediterranean", "/europe/italy",
+    "/europe/italy/tuscany-and-the-centre",
+    "/europe/italy/tuscany-and-the-centre/florence",
     "/journeys", "/journeys/the-alpine-grand-tour", "/plan", "/themes/sacred-europe",
     "/stories", "/stories/the-last-forest", "/experiences", "/experiences/join",
     "/fund", "/fund/qvevri-apprenticeship", "/events", "/method", "/beyond-the-obvious",
-    "/about", "/how-it-works", "/sources", "/business", "/my-europe", "/search",
+    "/about", "/how-it-works", "/sources", "/for-businesses", "/my-europe", "/search",
   ];
   for (const url of sample) {
     await phone.goto(base + url, { waitUntil: "domcontentloaded" });

@@ -264,5 +264,535 @@
     "stage": "Music & performance",
     "wild": "Wildlife & nature",
     "cellar": "Cellar & vineyard"
-  }
+  },
+  "categories": [
+    {
+      "slug": "nature",
+      "name": "Nature",
+      "icon": "♣",
+      "blurb": "Waterfalls, fjords, forest, lakes, wildlife and the national parks that hold them.",
+      "interests": [
+        "nature",
+        "wild",
+        "islands",
+        "coast"
+      ],
+      "subs": [
+        {
+          "slug": "waterfalls",
+          "name": "Waterfalls",
+          "keywords": [
+            "waterfall",
+            "falls",
+            "cascade"
+          ]
+        },
+        {
+          "slug": "fjords",
+          "name": "Fjords & sea inlets",
+          "keywords": [
+            "fjord",
+            "inlet",
+            "calanque",
+            "ria",
+            "sea loch"
+          ]
+        },
+        {
+          "slug": "forests",
+          "name": "Forests",
+          "keywords": [
+            "forest",
+            "woods",
+            "woodland",
+            "pine",
+            "birch",
+            "oak"
+          ]
+        },
+        {
+          "slug": "wildlife",
+          "name": "Wildlife",
+          "keywords": [
+            "bear",
+            "bison",
+            "whale",
+            "puffin",
+            "seal",
+            "eagle",
+            "reindeer",
+            "bird",
+            "ibex",
+            "wolf",
+            "turtle",
+            "flamingo",
+            "olm",
+            "marmot"
+          ]
+        },
+        {
+          "slug": "lakes",
+          "name": "Lakes & rivers",
+          "keywords": [
+            "lake",
+            "lagoon",
+            "river",
+            "gorge",
+            "canyon"
+          ]
+        },
+        {
+          "slug": "national-parks",
+          "name": "National parks",
+          "keywords": [
+            "national park",
+            "nature reserve",
+            "biosphere",
+            "unesco site",
+            "reserve"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "adventure",
+      "name": "Adventure",
+      "icon": "▲",
+      "blurb": "Hiking, cycling, skiing, paddling, climbing and cold water.",
+      "interests": [
+        "mountains",
+        "winter",
+        "nature",
+        "coast"
+      ],
+      "subs": [
+        {
+          "slug": "hiking",
+          "name": "Hiking & trails",
+          "keywords": [
+            "walk",
+            "hike",
+            "trail",
+            "trek",
+            "path",
+            "ridge",
+            "gr20",
+            "camino",
+            "kungsleden",
+            "via ferrata"
+          ]
+        },
+        {
+          "slug": "cycling",
+          "name": "Cycling",
+          "keywords": [
+            "cycle",
+            "cycling",
+            "bicycle",
+            "bike",
+            "velo"
+          ]
+        },
+        {
+          "slug": "skiing",
+          "name": "Snow & ice",
+          "keywords": [
+            "ski",
+            "snow",
+            "ice",
+            "glacier",
+            "sled",
+            "snowshoe",
+            "aurora",
+            "bobsleigh"
+          ]
+        },
+        {
+          "slug": "water",
+          "name": "On the water",
+          "keywords": [
+            "kayak",
+            "raft",
+            "boat",
+            "ferry",
+            "swim",
+            "surf",
+            "sail",
+            "dive",
+            "snorkel",
+            "row",
+            "paddle"
+          ]
+        },
+        {
+          "slug": "climbing",
+          "name": "Heights & climbing",
+          "keywords": [
+            "climb",
+            "cliff",
+            "summit",
+            "ferrata",
+            "tower",
+            "steps",
+            "funicular",
+            "cable car"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "culture",
+      "name": "Culture",
+      "icon": "◈",
+      "blurb": "Traditions, music, craft, design and the festivals that carry them.",
+      "interests": [
+        "art",
+        "music",
+        "design",
+        "festivals",
+        "architecture"
+      ],
+      "subs": [
+        {
+          "slug": "music",
+          "name": "Music & performance",
+          "keywords": [
+            "music",
+            "concert",
+            "opera",
+            "jazz",
+            "fado",
+            "song",
+            "band",
+            "festival",
+            "theatre",
+            "dance",
+            "chant"
+          ]
+        },
+        {
+          "slug": "crafts",
+          "name": "Craft & making",
+          "keywords": [
+            "craft",
+            "workshop",
+            "artisan",
+            "weaving",
+            "smith",
+            "glass",
+            "pottery",
+            "boat building",
+            "shebeke",
+            "lace",
+            "silver"
+          ]
+        },
+        {
+          "slug": "museums",
+          "name": "Museums & collections",
+          "keywords": [
+            "museum",
+            "gallery",
+            "collection",
+            "exhibition",
+            "library",
+            "archive"
+          ]
+        },
+        {
+          "slug": "architecture",
+          "name": "Architecture",
+          "keywords": [
+            "architecture",
+            "facade",
+            "palace",
+            "modernist",
+            "baroque",
+            "gothic",
+            "art nouveau",
+            "bauhaus",
+            "villa"
+          ]
+        },
+        {
+          "slug": "traditions",
+          "name": "Living traditions",
+          "keywords": [
+            "tradition",
+            "procession",
+            "carnival",
+            "market",
+            "ritual",
+            "panigiri",
+            "fika",
+            "supra",
+            "sauna"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "history",
+      "name": "History",
+      "icon": "⚑",
+      "blurb": "Ancient, medieval, imperial and very recent — including the parts nobody enjoys.",
+      "interests": [
+        "history",
+        "architecture"
+      ],
+      "subs": [
+        {
+          "slug": "ancient",
+          "name": "Ancient & classical",
+          "keywords": [
+            "roman",
+            "greek",
+            "etruscan",
+            "hellenistic",
+            "amphitheatre",
+            "temple",
+            "aqueduct",
+            "mosaic",
+            "bc"
+          ]
+        },
+        {
+          "slug": "prehistoric",
+          "name": "Prehistoric",
+          "keywords": [
+            "megalith",
+            "neolithic",
+            "bronze age",
+            "dolmen",
+            "cromlech",
+            "petroglyph",
+            "rock art",
+            "cave painting",
+            "nuraghe",
+            "stone ship"
+          ]
+        },
+        {
+          "slug": "medieval",
+          "name": "Medieval",
+          "keywords": [
+            "medieval",
+            "castle",
+            "citadel",
+            "fortress",
+            "monastery",
+            "abbey",
+            "wall",
+            "rampart",
+            "viking",
+            "hanseatic",
+            "crusader"
+          ]
+        },
+        {
+          "slug": "modern",
+          "name": "The twentieth century",
+          "keywords": [
+            "war",
+            "1914",
+            "1918",
+            "1939",
+            "1940",
+            "1944",
+            "1945",
+            "soviet",
+            "communist",
+            "wall",
+            "siege",
+            "occupation",
+            "1989",
+            "genocide",
+            "holocaust",
+            "cold war",
+            "bunker"
+          ]
+        },
+        {
+          "slug": "archaeology",
+          "name": "Archaeology",
+          "keywords": [
+            "excavat",
+            "dig",
+            "archaeolog",
+            "ruins",
+            "tomb",
+            "necropolis",
+            "burial",
+            "settlement"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "food",
+      "name": "Food & drink",
+      "icon": "●",
+      "blurb": "Markets, tables, cellars, vineyards and the dishes that belong to one valley.",
+      "interests": [
+        "food",
+        "wine"
+      ],
+      "subs": [
+        {
+          "slug": "markets",
+          "name": "Markets",
+          "keywords": [
+            "market",
+            "hall",
+            "stall",
+            "fish market",
+            "bazaar",
+            "produce"
+          ]
+        },
+        {
+          "slug": "tables",
+          "name": "Eating out",
+          "keywords": [
+            "restaurant",
+            "taverna",
+            "konoba",
+            "kafana",
+            "meyhane",
+            "pintxo",
+            "tapas",
+            "meze",
+            "lunch",
+            "dinner",
+            "breakfast",
+            "kahvalti",
+            "cicchetti",
+            "smørrebrød"
+          ]
+        },
+        {
+          "slug": "cellars",
+          "name": "Wine & cellars",
+          "keywords": [
+            "wine",
+            "cellar",
+            "vineyard",
+            "qvevri",
+            "port",
+            "champagne",
+            "riesling",
+            "harvest",
+            "vintage",
+            "distiller",
+            "brewery",
+            "beer",
+            "rakija",
+            "vermouth"
+          ]
+        },
+        {
+          "slug": "cooking",
+          "name": "Cooking & producers",
+          "keywords": [
+            "cooking",
+            "kitchen",
+            "cheese",
+            "salt pan",
+            "bake",
+            "bakery",
+            "oven",
+            "smokehouse",
+            "farm",
+            "olive"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "faith",
+      "name": "Faith & heritage",
+      "icon": "✝",
+      "blurb": "Pilgrimage routes, cathedrals, monasteries and sacred sites of several traditions.",
+      "interests": [
+        "sacred"
+      ],
+      "subs": [
+        {
+          "slug": "pilgrimage",
+          "name": "Pilgrimage routes",
+          "keywords": [
+            "pilgrim",
+            "camino",
+            "way",
+            "route",
+            "compostela",
+            "procession",
+            "via podiensis"
+          ]
+        },
+        {
+          "slug": "cathedrals",
+          "name": "Cathedrals & churches",
+          "keywords": [
+            "cathedral",
+            "church",
+            "basilica",
+            "chapel",
+            "minster",
+            "dom",
+            "nave",
+            "fresco"
+          ]
+        },
+        {
+          "slug": "monasteries",
+          "name": "Monasteries",
+          "keywords": [
+            "monaster",
+            "abbey",
+            "convent",
+            "hermitage",
+            "cell",
+            "monk",
+            "tekke",
+            "lavra"
+          ]
+        },
+        {
+          "slug": "sacred-sites",
+          "name": "Sacred sites",
+          "keywords": [
+            "sacred",
+            "shrine",
+            "mosque",
+            "synagogue",
+            "temple",
+            "holy",
+            "relic",
+            "icon",
+            "cemetery",
+            "crosses"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "family",
+      "name": "Family",
+      "icon": "◐",
+      "blurb": "Experiences we would take a child to — and the rule that decides which those are.",
+      "interests": [],
+      "derived": "family",
+      "subs": []
+    },
+    {
+      "slug": "luxury",
+      "name": "Luxury",
+      "icon": "◆",
+      "blurb": "The expensive end, listed as expensive rather than as special.",
+      "interests": [],
+      "derived": "luxury",
+      "subs": []
+    }
+  ]
 }

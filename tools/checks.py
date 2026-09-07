@@ -133,10 +133,14 @@ def c_built():
     expect += 1 + len(d["stories"])
     expect += 2                                   # /plan, /search
     expect += 1 + len(d["taxonomy"]["experience_kinds"]) + 1 + 1   # experiences, kinds, join, business
+    expect += len(d["categories"]) + sum(len(c.get("subs", [])) for c in d["categories"])
     expect += 1 + len(d["fund"])
     expect += 6                                   # map, events, quiet, my-europe, method, about
     expect += len(d["taxonomy"]["months"])        # /events/<month>
     expect += 3                                   # how-it-works, sources, freshness
+    expect += 1                                   # /discover
+    expect += 7                                   # privacy, cookies, terms, accessibility,
+                                                  # help, contact, for-tourism-boards
     expect += 1                                   # 404
     got = len(site_files())
     if got != expect:
@@ -262,7 +266,7 @@ def c_advisory_pages():
     for c in d["countries"].values():
         if not c.get("advisory"):
             continue
-        f = os.path.join(OUT, "atlas", c["macro_slug"], c["slug"], "index.html")
+        f = os.path.join(OUT, "europe", c["slug"], "index.html")
         s = open(f, encoding="utf-8").read()
         if "note warn" not in s or "government travel advice" not in s.lower():
             fail(f"{c['name']}: advisory page does not carry the advisory note")
@@ -362,10 +366,10 @@ def c_hierarchy():
     for c in d["countries"].values():
         for r in c["regions"]:
             for t in r["cities"]:
-                f = os.path.join(OUT, "atlas", c["macro_slug"], c["slug"], r["slug"], t["slug"], "index.html")
+                f = os.path.join(OUT, "europe", c["slug"], r["slug"], t["slug"], "index.html")
                 s = open(f, encoding="utf-8").read()
-                for up in (f"/atlas/{c['macro_slug']}\"", f"/atlas/{c['macro_slug']}/{c['slug']}\"",
-                           f"/atlas/{c['macro_slug']}/{c['slug']}/{r['slug']}\""):
+                for up in (f"/europe/{c['slug']}\"", f"/europe/{c['slug']}/{r['slug']}\"",
+                           f"/discover/{c['macro_slug']}\""):
                     if up not in s:
                         fail(f"{t['slug']}: no link up to {up}")
                 n += 1
@@ -444,11 +448,11 @@ def c_experiences():
     d = D.load()
     kinds = d["taxonomy"]["experience_kinds"]
     for k in kinds:
-        if not os.path.exists(os.path.join(OUT, "experiences", k, "index.html")):
+        if not os.path.exists(os.path.join(OUT, "experiences", "kind", k, "index.html")):
             fail(f"no page for experience kind {k}")
     items = D.all_experiences(d["countries"])
     for it in items:
-        f = os.path.join(OUT, "experiences", it["exp"]["kind"], "index.html")
+        f = os.path.join(OUT, "experiences", "kind", it["exp"]["kind"], "index.html")
         s = open(f, encoding="utf-8").read()
         if esc(it["exp"]["name"]) not in s:
             fail(f"experience {it['exp']['slug']} missing from its kind page")
@@ -464,7 +468,7 @@ def c_freshness():
     for c in d["countries"].values():
         if c["name"] not in board:
             fail(f"freshness board omits {c['name']}")
-        f = os.path.join(OUT, "atlas", c["macro_slug"], c["slug"], "index.html")
+        f = os.path.join(OUT, "europe", c["slug"], "index.html")
         s = open(f, encoding="utf-8").read()
         if "Facts checked" not in s:
             fail(f"{c['name']}: country page does not state its verification status")

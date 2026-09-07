@@ -58,6 +58,7 @@ def load():
     interests = {i["slug"]: i for i in tax["interests"]}
     months = set(tax["months"])
     kinds = tax["experience_kinds"]
+    categories = {c["slug"]: c for c in tax.get("categories", [])}
 
     p = Problems()
 
@@ -239,6 +240,20 @@ def load():
         p.require(prov.get("tier") in ("applied", "reviewed", "verified"), pw, "bad tier")
         p.require(prov.get("country") in countries, pw, f"unknown country {prov.get('country')!r}")
 
+    for cat in categories.values():
+        cw = "taxonomy/categories/" + cat["slug"]
+        for i in cat.get("interests", []):
+            p.require(i in interests, cw, f"unknown interest {i!r}")
+        seen_sub = set()
+        for sub in cat.get("subs", []):
+            p.require(SLUG.match(sub.get("slug", "")), cw, "subcategory slug is not a slug")
+            p.require(sub["slug"] not in seen_sub, cw, "duplicate subcategory")
+            seen_sub.add(sub["slug"])
+            p.require(len(sub.get("keywords", [])) >= 2, cw,
+                      f"{sub['slug']}: a keyword rule needs at least two terms")
+        p.require(bool(cat.get("subs")) or bool(cat.get("derived")), cw,
+                  "a category needs sub-categories or a derivation rule")
+
     p.raise_if_any()
 
     # Reverse edges. The brief calls the dataset a knowledge graph, and a
@@ -269,6 +284,7 @@ def load():
         "providers": providers,
         "cities": index,
         "back": back,
+        "categories": tax.get("categories", []),
     }
 
 

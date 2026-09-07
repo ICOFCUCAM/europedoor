@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accessibility · Europedoor</title>
+<meta name="description" content="Europedoor&#x27;s accessibility position: what is automatically enforced on every build, what has not been audited, and the place data that is missing.">
+<link rel="canonical" href="https://europedoor.com/accessibility">
+<meta property="og:title" content="Accessibility · Europedoor">
+<meta property="og:description" content="Europedoor&#x27;s accessibility position: what is automatically enforced on every build, what has not been audited, and the place data that is missing.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="/assets/css/europedoor.css">
+<link rel="icon" href="/assets/door.svg" type="image/svg+xml">
+</head>
+<body class="area-none">
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+  <div class="masthead-in">
+    <a class="wordmark" href="/">
+      <span class="door" aria-hidden="true"></span>
+      <span class="wordmark-text">europedoor</span>
+    </a>
+    <nav class="nav" aria-label="Primary"><a href="/discover">Discover</a><a href="/countries">Countries</a><a href="/experiences">Experiences</a><a href="/journeys">Journeys</a><a href="/plan">Plan</a><a href="/stories">Stories</a><a href="/events">Events</a></nav>
+    <div class="navutil">
+      <a class="navsearch" href="/search"><span aria-hidden="true">⌕</span> Search</a>
+      <a class="navmine" href="/my-europe">My Europe</a>
+    </div>
+  </div>
+</header>
+<main id="main" class="">
+
+<nav class="crumbs" aria-label="Breadcrumb"><a href="/discover">Europe</a><span class="sep" aria-hidden="true">/</span><span aria-current="page">Accessibility</span></nav>
+<div class="pagehead">
+  <p class="kicker">Accessibility</p>
+  <h1>Accessibility</h1>
+  <p class="lede">The target is WCAG 2.2 AA. Here is what is enforced on every build, and what is still missing.</p>
+</div>
+
+<div class="split">
+  <div>
+    <h2>The target</h2>
+    <p>WCAG 2.2 Level AA, and the honest position is that we test a subset of it
+    automatically on every build rather than claiming conformance we have not audited.</p>
+
+    <h2>What is checked automatically, on every page</h2>
+    <ul class="stack">
+      <li>Every page has one <code>h1</code>, and headings descend without skipping a level.</li>
+      <li>Every page has a skip link, a <code>main</code> landmark and a language declared.</li>
+      <li>Body text and interface text meet the 4.5:1 contrast ratio in both the light and
+      dark palettes, computed from the tokens rather than eyeballed.</li>
+      <li>Every form control has a label, every link has discernible text, and every
+      generated illustration carries a role and an accessible name.</li>
+      <li>Nothing relies on colour alone to convey state.</li>
+      <li>No page overflows horizontally at 390 CSS pixels, tested in a real browser.</li>
+      <li><code>prefers-reduced-motion</code> disables every transition and hover movement.</li>
+    </ul>
+
+    <h2>What is not yet done</h2>
+    <ul class="stack">
+      <li>No audit with a screen reader by a person who uses one daily. That is the gap that
+      matters most and cannot be automated away.</li>
+      <li>No keyboard-only walkthrough of the planner by an independent tester.</li>
+      <li>No accessibility information about the <em>places themselves</em> — step-free
+      access, hearing loops, accessible toilets. The planner already tells you it cannot take
+      account of accessibility needs; the honest fix is data we do not have yet, and inventing
+      it would be worse than the gap.</li>
+    </ul>
+
+    <h2>If something here excludes you</h2>
+    <p>That is a defect, not a preference, and we would rather hear it bluntly.
+    <a href="/contact">How to reach us →</a></p>
+  </div>
+  <aside class="rail">
+    <h3>Why no photographs</h3>
+    <p>Every illustration on this site is generated from the place's own name and carries a
+    text alternative automatically. There is no library of stock images with missing alt
+    text, because there is no library.</p>
+    <h3>Tested in a browser</h3>
+    <p>The accessibility checks run in Chromium on every build, not as a checklist somebody
+    ticks. If one fails, the build fails.</p>
+  </aside>
+</div>
+
+</main>
+<footer class="footer">
+  <div class="footer-in">
+    <p class="footer-lede">One door into Europe — discover it, plan it, and leave it better than you found it.</p>
+    <nav class="footer-nav" aria-label="Footer"><a href="/for-businesses">For businesses</a><a href="/for-tourism-boards">For tourism boards</a><a href="/fund">Europe Fund</a><a href="/map">Map</a><a href="/themes">Themes</a><a href="/beyond-the-obvious">Beyond the obvious</a><a href="/my-europe">My Europe</a><a href="/about">About</a><a href="/how-it-works">How it works</a><a href="/method">Method</a><a href="/sources">Sources &amp; corrections</a><a href="/contact">Contact</a><a href="/help">Help</a><a href="/accessibility">Accessibility</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/cookies">Cookies</a></nav>
+    <p class="footer-legal">
+      Editorial project, pre-launch. Operated by [OPERATOR ENTITY — NOT YET INCORPORATED]. Nothing here is a booking,
+      an offer, or financial advice; nothing on this site takes a payment.
+      Country facts are editorial and may be out of date — check official
+      government advice before you travel.
+    </p>
+  </div>
+</footer>
+</body>
+</html>

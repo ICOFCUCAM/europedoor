@@ -49,7 +49,8 @@ def build():
         written.append(path)
 
     emit(P.home(d))
-    emit(P.atlas(d))
+    emit(P.discover_page(d))
+    emit(P.countries_index(d))
     for m in d["macros"]:
         emit(P.macro_page(d, m))
     for c in d["countries"].values():
@@ -74,6 +75,10 @@ def build():
     emit(P.experiences_index(d))
     for kind, name in d["taxonomy"]["experience_kinds"].items():
         emit(P.experience_kind_page(d, kind, name))
+    for cat in d["categories"]:
+        emit(P.category_page(d, cat))
+        for sub in cat.get("subs", []):
+            emit(P.category_page(d, cat, sub))
     emit(P.join_page(d))
     emit(P.business_page(d))
     emit(P.fund_index(d))
@@ -90,6 +95,13 @@ def build():
     emit(P.how_it_works_page(d))
     emit(P.sources_page(d))
     emit(P.freshness_page(d))
+    emit(P.privacy_page(d))
+    emit(P.cookies_page(d))
+    emit(P.terms_page(d))
+    emit(P.accessibility_page(d))
+    emit(P.help_page(d))
+    emit(P.contact_page(d))
+    emit(P.tourism_boards_page(d))
     emit(P.not_found(d))
 
     for path, payload in (P.planner_api(d), P.search_api(d)):

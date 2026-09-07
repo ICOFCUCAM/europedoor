@@ -7,11 +7,58 @@
   "headers": [
     {
       "source": "/assets/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     },
     {
       "source": "/api/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=600" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=600"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/atlas",
+      "destination": "/countries",
+      "permanent": true
+    },
+    {
+      "source": "/atlas/:macro",
+      "destination": "/discover/:macro",
+      "permanent": true
+    },
+    {
+      "source": "/atlas/:macro/:country",
+      "destination": "/europe/:country",
+      "permanent": true
+    },
+    {
+      "source": "/atlas/:macro/:country/:region",
+      "destination": "/europe/:country/:region",
+      "permanent": true
+    },
+    {
+      "source": "/atlas/:macro/:country/:region/:city",
+      "destination": "/europe/:country/:region/:city",
+      "permanent": true
+    },
+    {
+      "source": "/business",
+      "destination": "/for-businesses",
+      "permanent": true
+    },
+    {
+      "source": "/experiences/:kind(walk|table|workshop|water|museum|sacred|ride|stage|wild|cellar)",
+      "destination": "/experiences/kind/:kind",
+      "permanent": true
     }
   ]
 }

@@ -83,12 +83,40 @@ def crumbs(trail):
     return '<nav class="crumbs" aria-label="Breadcrumb">' + '<span class="sep" aria-hidden="true">/</span>'.join(parts) + "</nav>"
 
 
+# Primary navigation, from the product specification. Seven items plus the
+# two persistent utilities. The Fund moved to the footer when that spec
+# arrived: it is a community surface rather than a way into the continent,
+# and giving it a seventh of the masthead was overstating it.
 NAV = [
-    ("/atlas", "Atlas", "Every country, region and city."),
+    ("/discover", "Discover", "The map, the regions, the ways in."),
+    ("/countries", "Countries", "Every country, region and destination."),
+    ("/experiences", "Experiences", "What people actually do here."),
     ("/journeys", "Journeys", "Curated routes across the continent."),
     ("/plan", "Plan", "Days, budget, interests — an itinerary."),
-    ("/experiences", "Experiences", "What people actually do here."),
-    ("/fund", "Fund", "What travel leaves behind."),
+    ("/stories", "Stories", "People, places, history, food, faith."),
+    ("/events", "Events", "The European year, month by month."),
+]
+
+# Secondary navigation, also from the specification: everything a visitor may
+# need to find and never has to see.
+FOOTER_NAV = [
+    ("/for-businesses", "For businesses"),
+    ("/for-tourism-boards", "For tourism boards"),
+    ("/fund", "Europe Fund"),
+    ("/map", "Map"),
+    ("/themes", "Themes"),
+    ("/beyond-the-obvious", "Beyond the obvious"),
+    ("/my-europe", "My Europe"),
+    ("/about", "About"),
+    ("/how-it-works", "How it works"),
+    ("/method", "Method"),
+    ("/sources", "Sources & corrections"),
+    ("/contact", "Contact"),
+    ("/help", "Help"),
+    ("/accessibility", "Accessibility"),
+    ("/privacy", "Privacy"),
+    ("/terms", "Terms"),
+    ("/cookies", "Cookies"),
 ]
 
 
@@ -98,6 +126,7 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
         mark = ' aria-current="page"' if area == label.lower() else ''
         nav.append(f'<a href="{href}"{mark}>{esc(label)}</a>')
     scripts_html = "".join(f'<script src="{esc(s)}" defer></script>' for s in scripts)
+    footer_nav = "".join(f'<a href="{href}">{esc(label)}</a>' for href, label in FOOTER_NAV)
     full_title = title if title == SITE_NAME else f"{title} · {SITE_NAME}"
     return f"""<!doctype html>
 <html lang="en">
@@ -121,7 +150,11 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
       <span class="door" aria-hidden="true"></span>
       <span class="wordmark-text">europedoor</span>
     </a>
-    <nav class="nav" aria-label="Primary">{"".join(nav)}<a class="navsearch" href="/search"><span aria-hidden="true">⌕</span> Search</a></nav>
+    <nav class="nav" aria-label="Primary">{"".join(nav)}</nav>
+    <div class="navutil">
+      <a class="navsearch" href="/search"><span aria-hidden="true">⌕</span> Search</a>
+      <a class="navmine" href="/my-europe">My Europe</a>
+    </div>
   </div>
 </header>
 <main id="main" class="{'wide' if wide else ''}">
@@ -130,14 +163,7 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 <footer class="footer">
   <div class="footer-in">
     <p class="footer-lede">{esc(SITE_TAGLINE)} — discover it, plan it, and leave it better than you found it.</p>
-    <nav class="footer-nav" aria-label="Footer">
-      <a href="/atlas">Atlas</a><a href="/journeys">Journeys</a><a href="/plan">Plan</a>
-      <a href="/search">Search</a><a href="/map">Map</a><a href="/themes">Themes</a><a href="/stories">Stories</a>
-      <a href="/events">Events</a><a href="/beyond-the-obvious">Beyond the obvious</a><a href="/my-europe">My Europe</a>
-      <a href="/experiences">Experiences</a><a href="/experiences/join">List your experience</a>
-      <a href="/fund">Fund</a><a href="/about">About</a><a href="/how-it-works">How it works</a>
-      <a href="/sources">Sources &amp; corrections</a>
-    </nav>
+    <nav class="footer-nav" aria-label="Footer">{footer_nav}</nav>
     <p class="footer-legal">
       Editorial project, pre-launch. Operated by {esc(OPERATOR)}. Nothing here is a booking,
       an offer, or financial advice; nothing on this site takes a payment.

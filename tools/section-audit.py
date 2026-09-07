@@ -71,7 +71,7 @@ def edged_city():
     for cid, b in sorted(DATA["back"].items()):
         if b["journeys"] and b["themes"]:
             n = DATA["cities"][cid]
-            return f"/atlas/{n['country']['macro_slug']}/{cid}"
+            return f"/europe/{cid}"
     raise AssertionError("no city carries both a journey and a theme")
 
 
@@ -101,7 +101,7 @@ def section(num, title, verdict, note):
 @section(1, "The core idea: discovery + planning + experience", "BUILT",
          "All five surfaces exist and none of them transacts.")
 def s1():
-    yield exists("/atlas") and exists("/plan") and exists("/experiences"), "atlas, plan and experiences all served"
+    yield exists("/countries") and exists("/plan") and exists("/experiences"), "atlas, plan and experiences all served"
     yield "checkout" not in page("/") and "Add to basket" not in page("/"), "no transaction surface on the homepage"
     yield "discover" in page("/").lower() and "plan" in page("/").lower(), "the homepage states the frame"
 
@@ -119,8 +119,8 @@ def s2():
          "Five top-level items rather than the brief's eight; every node in "
          "the brief's tree is still reachable.")
 def s3():
-    for node in ("/atlas", "/journeys", "/plan", "/experiences", "/fund",
-                 "/stories", "/business", "/themes", "/map", "/search",
+    for node in ("/countries", "/journeys", "/plan", "/experiences", "/fund",
+                 "/stories", "/for-businesses", "/themes", "/map", "/search",
                  "/events", "/my-europe", "/beyond-the-obvious"):
         yield exists(node), f"{node} is served"
     yield 'class="nav"' in page("/"), "one primary navigation, in the shell"
@@ -136,7 +136,7 @@ def s4():
     u = None
     for cid, n in sorted(DATA["cities"].items()):
         if n["city"].get("experiences") and n["country"]["festivals"]:
-            u = f"/atlas/{n['country']['macro_slug']}/{cid}"
+            u = f"/europe/{cid}"
             break
     yield NCOUNTRY >= 50, f"{NCOUNTRY} countries"
     yield NCITY >= 240, f"{NCITY} cities"
@@ -144,7 +144,7 @@ def s4():
               "Getting there", "Nearest onward stops", "Fixed points in the year",
               "Europe Experience Score")
     yield has(edged_city(), "This place, in the rest of the site")
-    yield has("/atlas/nordic/norway", "Getting around", "Travel regions",
+    yield has("/europe/norway", "Getting around", "Travel regions",
               "Worth knowing", "At the table", "Facts checked")
 
 
@@ -207,7 +207,7 @@ def s9():
          "Directory, three tiers and indicative pricing published. Claiming "
          "is blocked on the entity.")
 def s10():
-    yield has("/business", "European Business Directory", "wall between editorial and commerce")
+    yield has("/for-businesses", "European Business Directory", "wall between editorial and commerce")
     yield has("/experiences/join", "Applied", "Reviewed", "Verified", "€49–99", "€199+")
     yield len(DATA["providers"]["tiers"]) == 3, "three tiers in the data"
     yield "Sell placement inside the Journey Planner" in page("/experiences/join"), \
@@ -224,7 +224,7 @@ def s11():
         yield len(st["body"]) >= 4, f"{st['slug']} has {len(st['body'])} paragraphs"
         for cid in st.get("places", []):
             n2 = DATA["cities"][cid]
-            u = f"/atlas/{n2['country']['macro_slug']}/{cid}"
+            u = f"/europe/{cid}"
             yield st["title"] in page(u), f"{cid} links back to {st['slug']}"
 
 
@@ -265,7 +265,7 @@ def s15():
     yield len(S.DIMENSIONS) == 6, "six dimensions"
     yield has("/method", "The whole formula, on one page", "Not for sale")
     yield all("scores" not in c for c in DATA["countries"].values()), "no score is stored in the data"
-    yield "Europe Experience Score" in page("/atlas/nordic/norway"), "shown on country pages"
+    yield "Europe Experience Score" in page("/europe/norway"), "shown on country pages"
 
 
 @section(16, "Responsible tourism", "BUILT",
@@ -296,7 +296,7 @@ def s18():
     for u, kind in (("/journeys/the-alpine-grand-tour", "Journey"),
                     ("/themes/sacred-europe", "Theme"),
                     ("/stories/the-last-forest", "Story"),
-                    ("/atlas/nordic/norway/fjord-norway/bergen", "Place")):
+                    ("/europe/norway/fjord-norway/bergen", "Place")):
         yield f'data-kind="{kind}"' in page(u), f"{kind} is saveable"
     yield "Accounts" in page("/how-it-works"), "the unbuilt half is named in public"
 
@@ -353,7 +353,7 @@ def s23():
          "stories, not only its parents.")
 def s24():
     yield "back" in DATA, "reverse edges are built"
-    yield has("/atlas/mediterranean/italy/tuscany-and-the-centre/florence",
+    yield has("/europe/italy/tuscany-and-the-centre/florence",
               "This place, in the rest of the site")
     linked = sum(1 for cid, b in DATA["back"].items()
                  if b["journeys"] or b["themes"] or b["stories"])
@@ -403,12 +403,12 @@ def s27():
          "Every item on the brief's list is live except accounts, which are "
          "browser-local by choice.")
 def s28():
-    for url, what in (("/", "homepage"), ("/atlas/nordic/norway", "country pages"),
-                      ("/atlas/nordic/norway/fjord-norway/bergen", "destination pages"),
-                      ("/experiences/walk", "experience categories"), ("/search", "search"),
+    for url, what in (("/", "homepage"), ("/europe/norway", "country pages"),
+                      ("/europe/norway/fjord-norway/bergen", "destination pages"),
+                      ("/experiences/nature", "experience categories"), ("/search", "search"),
                       ("/map", "map"), ("/journeys/the-adriatic-run", "journey pages"),
                       ("/plan", "planner"), ("/my-europe", "save and bookmark"),
-                      ("/business", "business listings"), ("/stories", "editorial stories")):
+                      ("/for-businesses", "business listings"), ("/stories", "editorial stories")):
         yield exists(url), f"{what} at {url}"
 
 
@@ -462,7 +462,7 @@ def s34b():
     yield exists("/sources/freshness"), "the freshness board is served"
     yield has("/sources/freshness", "What \"unverified\" means here", "The order it happens in")
     unver = [c["name"] for c in DATA["countries"].values() if not c.get("checked")]
-    yield "not verified" in page("/atlas/nordic/norway"), \
+    yield "not verified" in page("/europe/norway"), \
         f"{len(unver)} unverified countries, and each says so on its own page"
     yield "checked" in src("tools/lib/data.py"), "the schema carries the date"
 

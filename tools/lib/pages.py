@@ -14,7 +14,7 @@ from .render import (SITE_NAME, card, chips, crumbs, esc, factlist, grid,
                      jsonscript, page, plate, section)
 from .score import city_scores, country_scores
 
-HOME = ("Europe", "/atlas")
+HOME = ("Europe", "/discover")
 
 
 def haversine(a, b):
@@ -154,7 +154,7 @@ def home(data):
   the same itinerary without either being flattened into a listicle.</p>
   <div class="hero-actions">
     <a class="btn" href="/plan">Plan a journey</a>
-    <a class="btn ghost" href="/atlas">Open the Atlas</a>
+    <a class="btn ghost" href="/countries">Open the Atlas</a>
     <a class="btn ghost" href="/search">Search everything</a>
   </div>
   <p class="small" style="margin-top:var(--s6)">{ncountries} countries · {nregions} travel regions ·
@@ -165,7 +165,7 @@ def home(data):
 
 {section("Nine regions of Europe", grid(cards, 3),
          lede="Europe organised the way people actually travel it — by shared coast, shared mountain range and shared history, not by alphabet.",
-         more=("All nine regions of Europe", "/atlas"))}
+         more=("All nine regions of Europe", "/discover"))}
 
 {section("Five things this is for", grid([pillars], 3) if False else '<div class="grid cols-3">' + pillars + "</div>",
          lede="Not a booking engine with articles bolted on. A structure first, and everything else hung off it.")}
@@ -213,7 +213,7 @@ def home(data):
 
 # ── atlas ─────────────────────────────────────────────────────────────
 
-def atlas(data):
+def countries_index(data):
     blocks = []
     for m in data["macros"]:
         rows = []
@@ -234,9 +234,9 @@ def atlas(data):
             <div class="rows">{''.join(rows)}</div></section>"""
         )
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Atlas", None)])}
+{crumbs([("Europe", "/discover"), ("Atlas", None)])}
 <div class="pagehead">
-  <p class="kicker">The Atlas</p>
+  <p class="kicker">Every country in Europe</p>
   <h1>Europe, all the way down.</h1>
   <p class="lede">Nine regions, {len(data['countries'])} countries, {sum(len(c['regions']) for c in data['countries'].values())}
   travel regions and {len(data['cities'])} cities. The regions below are editorial travel regions,
@@ -244,8 +244,8 @@ def atlas(data):
 </div>
 {''.join(blocks)}
 """
-    return "/atlas/index.html", page(
-        "Atlas", body, path="/atlas", area="atlas",
+    return "/countries/index.html", page(
+        "Countries", body, path="/countries", area="countries",
         description="Every country in Europe, grouped into nine travel regions, each opening onto its regions, cities and experiences.",
     )
 
@@ -258,7 +258,7 @@ def macro_page(data, m):
         meta = f'<p class="cardmeta">{len(c["regions"])} regions · {ncity} cities · {esc(c["budget"])} cost</p>'
         cards.append(card(urls.country(c), c["capital"], c["name"], c["tagline"], seed="country:" + c["slug"], meta=meta))
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Atlas", "/atlas"), (m["name"], None)])}
+{crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], None)])}
 <div class="pagehead">
   <p class="kicker">Region of Europe</p>
   <h1>{esc(m['name'])}</h1>
@@ -266,8 +266,8 @@ def macro_page(data, m):
 </div>
 {grid(cards, 3)}
 """
-    return f"/atlas/{m['slug']}/index.html", page(
-        m["name"], body, path=urls.macro(m), area="atlas",
+    return f"/discover/{m['slug']}/index.html", page(
+        m["name"], body, path=urls.macro(m), area="countries",
         description=m["blurb"],
     )
 
@@ -299,7 +299,7 @@ def country_page(data, c):
         ("Facts checked", checked_line(c)),
     ])
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Atlas", "/atlas"), (m["name"], urls.macro(m)), (c["name"], None)])}
+{crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)), (c["name"], None)])}
 <div class="pagehead">
   <p class="kicker">{esc(m['name'])}</p>
   <h1>{esc(c['name'])}</h1>
@@ -330,8 +330,8 @@ def country_page(data, c):
 
 {section("Fixed points in the year", f'<div class="rows">{festivals}</div>') if festivals else ""}
 """
-    return f"/atlas/{c['macro_slug']}/{c['slug']}/index.html", page(
-        c["name"], body, path=urls.country(c), area="atlas",
+    return f"/europe/{c['slug']}/index.html", page(
+        c["name"], body, path=urls.country(c), area="countries",
         description=c["summary"][:180],
     )
 
@@ -345,7 +345,7 @@ def region_page(data, c, r):
         meta = f'<p class="cardmeta">{n}</p>'
         cards.append(card(urls.city(c, r, t), c["name"], t["name"], t["summary"], seed=f"city:{c['slug']}:{t['slug']}", meta=meta))
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Atlas", "/atlas"), (m["name"], urls.macro(m)),
+{crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)),
          (c["name"], urls.country(c)), (r["name"], None)])}
 <div class="pagehead">
   <p class="kicker">{esc(c['name'])}</p>
@@ -355,8 +355,8 @@ def region_page(data, c, r):
 </div>
 {grid(cards, 3)}
 """
-    return f"/atlas/{c['macro_slug']}/{c['slug']}/{r['slug']}/index.html", page(
-        f"{r['name']}, {c['name']}", body, path=urls.region(c, r), area="atlas",
+    return f"/europe/{c['slug']}/{r['slug']}/index.html", page(
+        f"{r['name']}, {c['name']}", body, path=urls.region(c, r), area="countries",
         description=r["summary"][:180],
     )
 
@@ -425,7 +425,7 @@ def city_page(data, c, r, t):
         for f in fest
     )
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Atlas", "/atlas"), (m["name"], urls.macro(m)),
+{crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)),
          (c["name"], urls.country(c)), (r["name"], urls.region(c, r)), (t["name"], None)])}
 <div class="pagehead">
   <p class="kicker">{esc(r['name'])}, {esc(c['name'])}</p>
@@ -468,8 +468,8 @@ def city_page(data, c, r, t):
          lede="Straight-line distance, and what that usually means in practice.")}
 {edges}
 """
-    return f"/atlas/{c['macro_slug']}/{c['slug']}/{r['slug']}/{t['slug']}/index.html", page(
-        f"{t['name']}, {c['name']}", body, path=urls.city(c, r, t), area="atlas",
+    return f"/europe/{c['slug']}/{r['slug']}/{t['slug']}/index.html", page(
+        f"{t['name']}, {c['name']}", body, path=urls.city(c, r, t), area="countries",
         description=t["summary"][:180],
         scripts=["/assets/js/my-europe.js"],
     )
@@ -492,7 +492,7 @@ def interest_page(data, i):
         for n in cities[:60]
     ]
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Interests", "/atlas"), (i["name"], None)])}
+{crumbs([("Europe", "/discover"), ("Experiences", "/experiences"), (i["name"], None)])}
 <div class="pagehead">
   <p class="kicker">Travelling for</p>
   <h1>{esc(i['name'])}</h1>
@@ -502,7 +502,7 @@ def interest_page(data, i):
 {grid(cards, 3) if cards else '<p class="small">Nothing tagged yet.</p>'}
 """
     return f"/interests/{slug}/index.html", page(
-        i["name"], body, path=urls.interest(slug), area="atlas",
+        i["name"], body, path=urls.interest(slug), area="countries",
         description=f"Where in Europe to go for {i['name'].lower()}: {len(cities)} cities across {len(countries)} countries.",
     )
 
@@ -521,7 +521,7 @@ def journeys_index(data):
         cards.append(card(urls.journey(j), j["strapline"], j["name"], j["summary"][:150] + "…",
                           seed="journey:" + j["slug"], meta=meta))
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Journeys", None)])}
+{crumbs([("Europe", "/discover"), ("Journeys", None)])}
 <div class="pagehead">
   <p class="kicker">European Journeys</p>
   <h1>Routes that cross borders on purpose.</h1>
@@ -577,7 +577,7 @@ def journey_page(data, j):
         ("Months that work", esc(months_line(data, j["months"]))),
     ])
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Journeys", "/journeys"), (j["name"], None)])}
+{crumbs([("Europe", "/discover"), ("Journeys", "/journeys"), (j["name"], None)])}
 <div class="pagehead">
   <p class="kicker">{esc(j['strapline'])}</p>
   <h1>{esc(j['name'])}</h1>
@@ -677,7 +677,7 @@ def planner_page(data):
         for b in data["taxonomy"]["budgets"]
     )
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Plan", None)])}
+{crumbs([("Europe", "/discover"), ("Plan", None)])}
 <div class="pagehead">
   <p class="kicker">Journey Planner</p>
   <h1>Twelve days, €2,500, history and mountains.</h1>
@@ -789,6 +789,58 @@ def scorebars(scores):
 
 # ── experiences & the marketplace ─────────────────────────────────────
 
+def category_page(data, cat, sub=None):
+    """A category or sub-category of experience, with its selection rule
+    printed on it. A list nobody can reproduce is a list nobody can argue
+    with."""
+    from . import categories as C
+    from .data import all_experiences
+    items = all_experiences(data["countries"])
+    chosen = C.select(items, cat, sub)
+    chosen.sort(key=lambda it: (it["country"]["name"], it["city"]["name"]))
+
+    rows = "".join(
+        f"""<a class="row" href="{urls.city(it['country'], it['region'], it['city'])}">
+        <div><h3>{esc(it['exp']['name'])}</h3><p class="rowsub">{esc(it['exp']['summary'])}</p></div>
+        <p class="rowmeta">{esc(it['city']['name'])}, {esc(it['country']['name'])} · {esc(it['exp']['band'])}</p></a>"""
+        for it in chosen
+    )
+    subcards = ""
+    if not sub and cat.get("subs"):
+        counts = {sb["slug"]: len(C.select(items, cat, sb)) for sb in cat["subs"]}
+        subcards = '<div class="grid cols-4">' + "".join(
+            f"""<a class="card" href="{urls.subcategory(cat['slug'], sb['slug'])}">
+            <div class="card-body"><p class="kicker">{counts[sb['slug']]} listed</p>
+            <h3>{esc(sb['name'])}</h3></div></a>"""
+            for sb in cat["subs"]
+        ) + "</div>"
+
+    countries = sorted({it["country"]["name"] for it in chosen})
+    title = sub["name"] if sub else cat["name"]
+    path = urls.subcategory(cat["slug"], sub["slug"]) if sub else urls.category(cat["slug"])
+    trail = [("Europe", "/discover"), ("Experiences", "/experiences")]
+    if sub:
+        trail.append((cat["name"], urls.category(cat["slug"])))
+    trail.append((title, None))
+
+    body = f"""
+{crumbs(trail)}
+<div class="pagehead">
+  <p class="kicker">{esc(cat['name']) if sub else 'Experience category'}</p>
+  <h1>{esc(title)}</h1>
+  <p class="lede">{esc(cat['blurb']) if not sub else ''}
+  {len(chosen)} experiences across {len(countries)} countries.</p>
+</div>
+{subcards}
+{section("How this list is built", f'<p class="small" style="max-width:44rem">{esc(C.rule_text(cat))}</p>') if not sub else ""}
+<div class="rows">{rows or '<p class="small">Nothing matches this rule yet, and an empty list is better than a padded one.</p>'}</div>
+"""
+    return f"{path}/index.html", page(
+        title, body, path=path, area="experiences",
+        description=f"{title}: {len(chosen)} experiences across {len(countries)} European countries, selected by a published rule.",
+    )
+
+
 def experiences_index(data):
     from .data import all_experiences
     kinds = data["taxonomy"]["experience_kinds"]
@@ -796,9 +848,15 @@ def experiences_index(data):
     counts = {}
     for it in items:
         counts[it["exp"]["kind"]] = counts.get(it["exp"]["kind"], 0) + 1
+    from . import categories as C
+    catcards = [
+        card(urls.category(cat["slug"]), f"{len(C.select(items, cat))} listed", cat["name"],
+             cat["blurb"], seed="cat:" + cat["slug"])
+        for cat in data["categories"]
+    ]
     cards = [
         card(urls.experience_kind(k), f"{counts.get(k, 0)} listed", name,
-             "Things people do here, written up by the people who run them or by us, and checked before they appear.",
+             "Grouped by what you actually do rather than by what it is about.",
              seed="kind:" + k)
         for k, name in kinds.items()
     ]
@@ -810,7 +868,7 @@ def experiences_index(data):
         for it in items[:24]
     )
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Experiences", None)])}
+{crumbs([("Europe", "/discover"), ("Experiences", None)])}
 <div class="pagehead">
   <p class="kicker">Local Experiences</p>
   <h1>What people actually do here.</h1>
@@ -818,9 +876,12 @@ def experiences_index(data):
   lists carries the name of who runs it and the tier of checking it has passed — an unchecked
   listing says so on its face rather than hiding behind a star rating.</p>
   <div class="hero-actions"><a class="btn" href="/experiences/join">List your experience</a>
-  <a class="btn ghost" href="/business">For businesses</a></div>
+  <a class="btn ghost" href="/for-businesses">For businesses</a></div>
 </div>
-{grid(cards, 4)}
+{section("Eight categories", grid(catcards, 4),
+         lede="The specification's taxonomy: what an experience is about. Each category page prints the rule that built its list.")}
+{section("Ten kinds", grid(cards, 4),
+         lede="The other axis: what you physically do. A cellar visit and a cathedral are both sacred to somebody; only one of them is a walk.")}
 {section("Recently added", f'<div class="rows">{rows}</div>')}
 """
     return "/experiences/index.html", page(
@@ -840,14 +901,14 @@ def experience_kind_page(data, kind, name):
         for it in items
     )
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Experiences", "/experiences"), (name, None)])}
+{crumbs([("Europe", "/discover"), ("Experiences", "/experiences"), (name, None)])}
 <div class="pagehead">
   <p class="kicker">{len(items)} across Europe</p>
   <h1>{esc(name)}</h1>
 </div>
 <div class="rows">{rows or '<p class="small">Nothing listed yet.</p>'}</div>
 """
-    return f"/experiences/{kind}/index.html", page(
+    return f"/experiences/kind/{kind}/index.html", page(
         name, body, path=urls.experience_kind(kind), area="experiences",
         description=f"{name} experiences across Europe, by city and country.",
     )
@@ -861,7 +922,7 @@ def join_page(data):
         for t in data["providers"]["tiers"]
     )
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Experiences", "/experiences"), ("List your experience", None)])}
+{crumbs([("Europe", "/discover"), ("Experiences", "/experiences"), ("List your experience", None)])}
 <div class="pagehead">
   <p class="kicker">For guides, kitchens, museums and operators</p>
   <h1>List what you do.</h1>
@@ -921,7 +982,7 @@ def business_page(data):
         for p in provs
     )
     body = f"""
-{crumbs([("Europe", "/atlas"), ("For business", None)])}
+{crumbs([("Europe", "/discover"), ("For businesses", None)])}
 <div class="pagehead">
   <p class="kicker">European Business Directory</p>
   <h1>The businesses behind the experiences.</h1>
@@ -946,8 +1007,8 @@ def business_page(data):
   </aside>
 </div>
 """
-    return "/business/index.html", page(
-        "For business", body, path="/business", area="experiences",
+    return "/for-businesses/index.html", page(
+        "For businesses", body, path="/for-businesses", area=None,
         description="Europedoor's European business directory: profiles for hotels, operators, guides and institutions, three verification tiers, and a stated wall between paid placement and editorial.",
     )
 
@@ -964,7 +1025,7 @@ def fund_index(data):
         for p in data["fund"]
     ]
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Fund", None)])}
+{crumbs([("Europe", "/discover"), ("Fund", None)])}
 <div class="pagehead">
   <p class="kicker">Europe Fund</p>
   <h1>What travel leaves behind.</h1>
@@ -999,7 +1060,7 @@ def fund_index(data):
 def fund_page(data, p):
     c = data["countries"][p["country"]]
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Fund", "/fund"), (p["name"], None)])}
+{crumbs([("Europe", "/discover"), ("Fund", "/fund"), (p["name"], None)])}
 <div class="pagehead">
   <p class="kicker">{esc(p['theme'])} · {esc(c['name'])}</p>
   <h1>{esc(p['name'])}</h1>
@@ -1038,7 +1099,7 @@ def themes_index(data):
         for t in data["themes"]
     ]
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Themes", None)])}
+{crumbs([("Europe", "/discover"), ("Themes", None)])}
 <div class="pagehead">
   <p class="kicker">Discovery without a map of borders</p>
   <h1>Europe, organised by what you came for.</h1>
@@ -1049,7 +1110,7 @@ def themes_index(data):
 {grid(cards, 3)}
 """
     return "/themes/index.html", page(
-        "Themes", body, path="/themes", area="atlas",
+        "Themes", body, path="/themes", area="countries",
         description="Cross-border ways into Europe: medieval, sacred, Viking, alpine, maritime and rail Europe, each a real sequence of places.",
     )
 
@@ -1070,7 +1131,7 @@ def theme_page(data, t):
         if cn not in countries:
             countries.append(cn)
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Themes", "/themes"), (t["name"], None)])}
+{crumbs([("Europe", "/discover"), ("Themes", "/themes"), (t["name"], None)])}
 <div class="pagehead">
   <p class="kicker">{esc(t['strapline'])}</p>
   <h1>{esc(t['name'])}</h1>
@@ -1095,7 +1156,7 @@ def theme_page(data, t):
 </div>
 """
     return f"/themes/{t['slug']}/index.html", page(
-        t["name"], body, path=f"/themes/{t['slug']}", area="atlas",
+        t["name"], body, path=f"/themes/{t['slug']}", area="countries",
         description=t["summary"][:180],
         scripts=["/assets/js/my-europe.js"],
     )
@@ -1111,7 +1172,7 @@ def stories_index(data):
     ]
     sections = sorted({s["section"] for s in data["stories"]})
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Stories", None)])}
+{crumbs([("Europe", "/discover"), ("Stories", None)])}
 <div class="pagehead">
   <p class="kicker">Stories</p>
   <h1>A continent is people before it is places.</h1>
@@ -1140,7 +1201,7 @@ def story_page(data, s):
         )
         links = section("Where this happens", f'<div class="rows">{rows}</div>')
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Stories", "/stories"), (s["title"], None)])}
+{crumbs([("Europe", "/discover"), ("Stories", "/stories"), (s["title"], None)])}
 <article>
 <div class="pagehead">
   <p class="kicker">{esc(s['section'])} · {esc(s['reading'])}</p>
@@ -1213,7 +1274,7 @@ def map_page(data):
         for j in data["journeys"]
     )
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Map", None)])}
+{crumbs([("Europe", "/discover"), ("Map", None)])}
 <div class="pagehead">
   <p class="kicker">The map</p>
   <h1>Every city in the Atlas, at once.</h1>
@@ -1247,7 +1308,7 @@ def map_page(data):
 </div>
 """
     return "/map/index.html", page(
-        "Map", body, path="/map", area="atlas",
+        "Map", body, path="/map", area="countries",
         description="A point map of every city in the Europedoor Atlas, filterable by what you travel for. No third-party tiles.",
         scripts=["/assets/js/map.js"], wide=True,
     )
@@ -1285,7 +1346,7 @@ def events_page(data):
     )
     total = sum(len(v) for v in by_month.values())
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Events", None)])}
+{crumbs([("Europe", "/discover"), ("Events", None)])}
 <div class="pagehead">
   <p class="kicker">The European year</p>
   <h1>What is on, and when.</h1>
@@ -1353,7 +1414,7 @@ def events_month_page(data, month):
     prev_m, next_m = ms[(i - 1) % 12], ms[(i + 1) % 12]
 
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Events", "/events"), (name, None)])}
+{crumbs([("Europe", "/discover"), ("Events", "/events"), (name, None)])}
 <div class="pagehead">
   <p class="kicker">The European year</p>
   <h1>{esc(name)} in Europe</h1>
@@ -1404,7 +1465,7 @@ def quiet_page(data):
         ]
     )
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Beyond the obvious", None)])}
+{crumbs([("Europe", "/discover"), ("Beyond the obvious", None)])}
 <div class="pagehead">
   <p class="kicker">Responsible travel, stated plainly</p>
   <h1>Beyond the obvious.</h1>
@@ -1434,7 +1495,7 @@ def quiet_page(data):
 
 def my_europe_page(data):
     body = f"""
-{crumbs([("Europe", "/atlas"), ("My Europe", None)])}
+{crumbs([("Europe", "/discover"), ("My Europe", None)])}
 <div class="pagehead">
   <p class="kicker">My Europe</p>
   <h1>The list you are building.</h1>
@@ -1465,7 +1526,7 @@ def method_page(data):
         for name, formula in methodology_rows()
     )
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Method", None)])}
+{crumbs([("Europe", "/discover"), ("Method", None)])}
 <div class="pagehead">
   <p class="kicker">Europe Experience Score</p>
   <h1>The whole formula, on one page.</h1>
@@ -1510,7 +1571,7 @@ def method_page(data):
 
 def about_page(data):
     body = f"""
-{crumbs([("Europe", "/atlas"), ("About", None)])}
+{crumbs([("Europe", "/discover"), ("About", None)])}
 <div class="pagehead">
   <p class="kicker">About</p>
   <h1>We do not help people book Europe. We help them discover it.</h1>
@@ -1603,7 +1664,7 @@ def how_it_works_page(data):
         ("Naming an operating company anywhere on the site", "There is not one yet, so no page names one", "blocked"),
     ])
     body = f"""
-{crumbs([("Europe", "/atlas"), ("How it works", None)])}
+{crumbs([("Europe", "/discover"), ("How it works", None)])}
 <div class="pagehead">
   <p class="kicker">How it works</p>
   <h1>What is built, what is designed, and what is deliberately blocked.</h1>
@@ -1632,7 +1693,7 @@ def how_it_works_page(data):
 
 def sources_page(data):
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Sources & corrections", None)])}
+{crumbs([("Europe", "/discover"), ("Sources & corrections", None)])}
 <div class="pagehead">
   <p class="kicker">Sources &amp; corrections</p>
   <h1>Where these facts come from, and how to tell us we are wrong.</h1>
@@ -1715,7 +1776,7 @@ def freshness_page(data):
         )
     n = len(data["countries"])
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Sources & corrections", "/sources"), ("Fact freshness", None)])}
+{crumbs([("Europe", "/discover"), ("Sources & corrections", "/sources"), ("Fact freshness", None)])}
 <div class="pagehead">
   <p class="kicker">Fact freshness</p>
   <h1>{checked} of {n} countries verified.</h1>
@@ -1764,7 +1825,7 @@ def not_found(data):
   <h1>That door does not open.</h1>
   <p class="lede">The page is not here. The continent still is.</p>
   <div class="hero-actions">
-    <a class="btn" href="/atlas">Open the Atlas</a>
+    <a class="btn" href="/countries">Open the Atlas</a>
     <a class="btn ghost" href="/plan">Plan a journey</a>
   </div>
 </div>
@@ -1837,7 +1898,7 @@ def search_page(data):
          + len(data["cities"]) + len(data["journeys"]) + len(data["themes"])
          + len(data["stories"]) + len(data["fund"]))
     body = f"""
-{crumbs([("Europe", "/atlas"), ("Search", None)])}
+{crumbs([("Europe", "/discover"), ("Search", None)])}
 <div class="pagehead">
   <p class="kicker">Search</p>
   <h1>Find it.</h1>
@@ -1854,10 +1915,437 @@ def search_page(data):
 </form>
 <div id="results" aria-live="polite"></div>
 <noscript><p class="small">Search needs JavaScript. The
-<a href="/atlas">Atlas</a> is fully browsable without it.</p></noscript>
+<a href="/countries">Atlas</a> is fully browsable without it.</p></noscript>
 """
     return "/search/index.html", page(
         "Search", body, path="/search", area=None,
         description="Search every country, region, city, journey, theme, story and project on Europedoor — in your browser, with nothing sent anywhere.",
         scripts=["/assets/js/search.js"],
     )
+
+# ── discover: the entry point ─────────────────────────────────────────
+
+def discover_page(data):
+    """The specification's first navigation item, and the honest answer to
+    "where do I start". Four ways in — by region, by what you travel for, by
+    a curated route, and by month — plus the map, because most people mean
+    the map when they say discover."""
+    macro_cards = [
+        card(urls.macro(m), f"{len(m['countries'])} countries", m["name"], m["blurb"],
+             seed="macro:" + m["slug"])
+        for m in data["macros"]
+    ]
+    n_by_interest = {
+        i["slug"]: sum(1 for n in data["cities"].values() if i["slug"] in n["city"]["interests"])
+        for i in data["taxonomy"]["interests"]
+    }
+    interest_cards = "".join(
+        f"""<a class="card" href="{urls.interest(i['slug'])}"><div class="card-body">
+        <p class="kicker"><span aria-hidden="true">{esc(i['icon'])}</span> {n_by_interest[i['slug']]} places</p>
+        <h3>{esc(i['name'])}</h3></div></a>"""
+        for i in data["taxonomy"]["interests"]
+    )
+    months = data["taxonomy"]["months"]
+    names = data["taxonomy"]["month_names"]
+    month_chips = "".join(
+        f'<a class="chip" href="{urls.month(m)}">{esc(names[m])}</a>' for m in months
+    )
+    dots = []
+    for cid, n in sorted(data["cities"].items()):
+        x, y = project(n["city"]["lat"], n["city"]["lon"])
+        cls = " advisory" if n["country"].get("advisory") else ""
+        dots.append(f'<circle class="herodot{cls}" cx="{x:.1f}" cy="{y:.1f}" r="4"/>')
+    quiet = sum(1 for n in data["cities"].values() if n["city"].get("quiet"))
+
+    body = f"""
+{crumbs([("Europe", "/discover"), ("Discover", None)])}
+<div class="pagehead">
+  <p class="kicker">Discover</p>
+  <h1>Where would you like to go?</h1>
+  <p class="lede">Four ways into {len(data['cities'])} places across {len(data['countries'])} countries:
+  by where they are, by what you travel for, by a route somebody has already thought about,
+  or by the month you happen to be free. If you would rather just say it in a sentence,
+  <a href="/plan">the planner reads sentences</a>.</p>
+</div>
+
+<a class="heromap wide-map" href="/map" aria-label="Map of all {len(data['cities'])} places">
+  <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true">{''.join(dots)}</svg>
+  <span class="heromap-cap">Open the full map, with layers →</span>
+</a>
+
+{section("By where it is", grid(macro_cards, 3),
+         lede="Nine regions of Europe, grouped by shared coast, shared mountain range and shared history rather than by alphabet.",
+         more=("Every country, A to Z", "/countries"))}
+
+{section("By what you travel for", '<div class="grid cols-4">' + interest_cards + "</div>",
+         lede="Seventeen tags. The Journey Planner weights the same ones, so what you see here is what it will build from.",
+         more=("Cross-border themes", "/themes"))}
+
+{section("By month", f'<div class="chips">{month_chips}</div>',
+         lede="What is on, which countries are at their best, and which are in the quieter shoulder — which is usually where you should be going.",
+         more=("The whole European year", "/events"))}
+
+<div class="note">
+  <h3>The other way to use this</h3>
+  <p>{quiet} places in the Atlas are tagged quiet: the goods without the crowd.
+  <a href="/beyond-the-obvious">Beyond the obvious</a> collects them, and the planner
+  scores shoulder-season months upward rather than downward.</p>
+</div>
+"""
+    return "/discover/index.html", page(
+        "Discover Europe", body, path="/discover", area="discover",
+        description=f"Four ways into Europe: by region, by what you travel for, by curated journey, or by month — across {len(data['cities'])} places in {len(data['countries'])} countries.",
+    )
+
+
+# ── the pages the footer promises ─────────────────────────────────────
+
+def _plain(title, kicker, lede, blocks, *, path, description, crumb):
+    body = f"""
+{crumbs([("Europe", "/discover"), (crumb, None)])}
+<div class="pagehead">
+  <p class="kicker">{esc(kicker)}</p>
+  <h1>{esc(title)}</h1>
+  <p class="lede">{esc(lede)}</p>
+</div>
+{blocks}
+"""
+    return f"{path}/index.html", page(title, body, path=path, area=None, description=description)
+
+
+PRELAUNCH = """<div class="note warn">
+  <h3>This is a pre-launch draft, and it says so rather than pretending</h3>
+  <p>There is no incorporated company behind Europedoor yet, so there is no legal person to
+  be bound by this document and no data controller to be accountable under it. What follows
+  is the position we intend to take, published early so it can be argued with — it is not a
+  contract, and it will be reviewed by a lawyer and re-issued in the name of a real entity
+  before anything on this site collects a payment or a personal detail.</p>
+</div>"""
+
+
+def privacy_page(data):
+    blocks = PRELAUNCH + """
+<div class="split">
+  <div>
+    <h2>What we collect today: nothing</h2>
+    <p>No account system, no sign-in, no email capture, no contact form, no comments. The
+    Journey Planner runs in your browser and the plan is never sent anywhere. My Europe
+    stores your saved places in your own browser's local storage, which we cannot read.</p>
+    <p>There is no third-party analytics script on this site, no advertising network, no
+    social tracking pixel, no embedded video, no web font loaded from someone else's server
+    and no map tile provider. Every byte served comes from this domain. You can verify that
+    in your browser's network tab in about ten seconds, which is a better assurance than this
+    paragraph.</p>
+
+    <h2>What a server necessarily sees</h2>
+    <p>Serving a page means the host receives the request: an IP address, a user agent, the
+    path, a timestamp. That is true of every website and cannot be opted out of by us or by
+    you. Our intent is that these logs are kept short and never joined to anything.</p>
+
+    <h2>What will change, and what will not</h2>
+    <ul class="stack">
+      <li><strong>Accounts</strong> will need an email address and a password hash, a lawful
+      basis, a retention period and working access, export and erasure. None of that exists
+      yet, which is the reason accounts do not.</li>
+      <li><strong>Analytics</strong>, when it exists, will use a session identifier that
+      rotates daily and is never joined to a person, with no cross-site identifier. The event
+      list is published in the specification in the repository before any of it is collected.</li>
+      <li><strong>Business accounts</strong> will hold company details, which are commercial
+      rather than personal data for the most part — but the named contact is a person.</li>
+      <li><strong>We will not</strong> sell personal data, run behavioural advertising, or
+      load a third-party tracker. That is a product decision, not a legal minimum.</li>
+    </ul>
+
+    <h2>Your rights under the GDPR</h2>
+    <p>Access, rectification, erasure, restriction, portability and objection. They apply to
+    a controller; there is not one yet. When there is, this page will name it, give an
+    address, and give a working route to exercise each right rather than an invitation to
+    email a mailbox nobody reads.</p>
+  </div>
+  <aside class="rail">
+    <h3>Cookies</h3>
+    <p>This site sets none. Not a consent banner's worth, not one. <a href="/cookies">The
+    detail →</a></p>
+    <h3>Local storage</h3>
+    <p>My Europe uses <code>localStorage</code> under this origin. It never leaves your
+    device and clearing site data removes it. <a href="/my-europe">Your list →</a></p>
+    <h3>Children</h3>
+    <p>The site is not directed at children and collects nothing from anyone.</p>
+  </aside>
+</div>"""
+    return _plain("Privacy", "Privacy", "What Europedoor collects: nothing. What it will collect, and under what conditions.",
+                  blocks, path="/privacy", crumb="Privacy",
+                  description="Europedoor collects no personal data, sets no cookies and loads no third-party scripts. What that means, and what will change when accounts exist.")
+
+
+def cookies_page(data):
+    blocks = PRELAUNCH + """
+<div class="split">
+  <div>
+    <h2>This site sets no cookies</h2>
+    <p>Not analytics cookies, not preference cookies, not a consent cookie to remember that
+    you dismissed a consent banner. There is no banner because there is nothing to consent
+    to, and a banner that appears anyway is a dark pattern with a legal costume on.</p>
+
+    <h2>What is used instead</h2>
+    <p><code>localStorage</code>, for one thing only: the list of places you save in My
+    Europe. It is stored by your browser under this domain, it is never transmitted, and
+    it is not a cookie — it is not attached to requests and cannot be read by anyone else.
+    Clearing site data deletes it, and there is no copy anywhere.</p>
+
+    <h2>What would require a banner</h2>
+    <ul class="stack">
+      <li>Any analytics that stores or reads an identifier on your device.</li>
+      <li>Embedded third-party content — a video, a map tile provider, a social widget.</li>
+      <li>Advertising of any kind, which we have refused outright rather than deferred.</li>
+    </ul>
+    <p>If any of those ever ship, this page changes first, and the banner is a real choice
+    with a working reject button rather than a wall.</p>
+  </div>
+  <aside class="rail">
+    <h3>Verify it</h3>
+    <p>Open your browser's developer tools, look at Application → Cookies for this domain,
+    and confirm the list is empty. That is worth more than this page.</p>
+  </aside>
+</div>"""
+    return _plain("Cookies", "Cookies", "There are none. Here is what is used instead, and what would have to change.",
+                  blocks, path="/cookies", crumb="Cookies",
+                  description="Europedoor sets no cookies at all — no analytics, no preferences, no consent cookie. What it uses instead and what would require a banner.")
+
+
+def terms_page(data):
+    blocks = PRELAUNCH + """
+<div class="split">
+  <div>
+    <h2>What this site is</h2>
+    <p>An editorial reference work about travel in Europe, published free of charge. It is
+    not a travel agent, not a tour operator, not a booking service and not a financial
+    service. Nothing on it constitutes an offer, and no contract can be formed here because
+    there is nothing to buy.</p>
+
+    <h2>Accuracy, stated plainly</h2>
+    <p>The dataset behind this site was written editorially and has not been through a
+    source-by-source verification pass. <a href="/sources/freshness">The freshness board</a>
+    publishes, per country, when a person last checked the practical facts — and today the
+    answer for most of them is "never". Costs are estimates from published bands, not quotes.
+    Distances are straight lines. Scores are computed from our own tags by
+    <a href="/method">a published formula</a>.</p>
+    <p><strong>Check the official source</strong> for anything that matters: your government's
+    travel advice, the destination's border authority, and the operator's own site for
+    anything you intend to turn up for.</p>
+
+    <h2>What you may do with it</h2>
+    <ul class="stack">
+      <li>Read it, quote it with attribution, link to it, and print it for your own trip.</li>
+      <li>Not scrape it wholesale to reconstitute the dataset elsewhere. The writing is the
+      work; the structure is the product.</li>
+      <li>Not present it as your own, or as verified, or as advice.</li>
+    </ul>
+
+    <h2>Liability</h2>
+    <p>To the extent the law allows once there is an entity to be liable, this material is
+    provided as it is. Travel decisions are yours. Where a page and an official source
+    disagree, the official source is right and we would like to be told.</p>
+  </div>
+  <aside class="rail">
+    <h3>Corrections</h3>
+    <p>Wanted, including blunt ones. <a href="/sources">How to tell us →</a></p>
+    <h3>Not yet in force</h3>
+    <p>These terms bind nobody until there is a company to be bound. See
+    <a href="/about">about</a>.</p>
+  </aside>
+</div>"""
+    return _plain("Terms", "Terms of use", "What this site is, what it is not, and what its facts are worth.",
+                  blocks, path="/terms", crumb="Terms",
+                  description="Europedoor's terms: an editorial reference, not a booking service; unverified facts marked as such; and no contract until there is a company.")
+
+
+def accessibility_page(data):
+    blocks = """
+<div class="split">
+  <div>
+    <h2>The target</h2>
+    <p>WCAG 2.2 Level AA, and the honest position is that we test a subset of it
+    automatically on every build rather than claiming conformance we have not audited.</p>
+
+    <h2>What is checked automatically, on every page</h2>
+    <ul class="stack">
+      <li>Every page has one <code>h1</code>, and headings descend without skipping a level.</li>
+      <li>Every page has a skip link, a <code>main</code> landmark and a language declared.</li>
+      <li>Body text and interface text meet the 4.5:1 contrast ratio in both the light and
+      dark palettes, computed from the tokens rather than eyeballed.</li>
+      <li>Every form control has a label, every link has discernible text, and every
+      generated illustration carries a role and an accessible name.</li>
+      <li>Nothing relies on colour alone to convey state.</li>
+      <li>No page overflows horizontally at 390 CSS pixels, tested in a real browser.</li>
+      <li><code>prefers-reduced-motion</code> disables every transition and hover movement.</li>
+    </ul>
+
+    <h2>What is not yet done</h2>
+    <ul class="stack">
+      <li>No audit with a screen reader by a person who uses one daily. That is the gap that
+      matters most and cannot be automated away.</li>
+      <li>No keyboard-only walkthrough of the planner by an independent tester.</li>
+      <li>No accessibility information about the <em>places themselves</em> — step-free
+      access, hearing loops, accessible toilets. The planner already tells you it cannot take
+      account of accessibility needs; the honest fix is data we do not have yet, and inventing
+      it would be worse than the gap.</li>
+    </ul>
+
+    <h2>If something here excludes you</h2>
+    <p>That is a defect, not a preference, and we would rather hear it bluntly.
+    <a href="/contact">How to reach us →</a></p>
+  </div>
+  <aside class="rail">
+    <h3>Why no photographs</h3>
+    <p>Every illustration on this site is generated from the place's own name and carries a
+    text alternative automatically. There is no library of stock images with missing alt
+    text, because there is no library.</p>
+    <h3>Tested in a browser</h3>
+    <p>The accessibility checks run in Chromium on every build, not as a checklist somebody
+    ticks. If one fails, the build fails.</p>
+  </aside>
+</div>"""
+    return _plain("Accessibility", "Accessibility", "The target is WCAG 2.2 AA. Here is what is enforced on every build, and what is still missing.",
+                  blocks, path="/accessibility", crumb="Accessibility",
+                  description="Europedoor's accessibility position: what is automatically enforced on every build, what has not been audited, and the place data that is missing.")
+
+
+def help_page(data):
+    blocks = """
+<div class="split">
+  <div>
+    <h2>How to use this site</h2>
+    <ul class="stack">
+      <li><strong>If you know where you are going</strong> — search, or go straight to
+      <a href="/countries">countries</a>. Every place is four clicks from the homepage.</li>
+      <li><strong>If you know what you want but not where</strong> —
+      <a href="/discover">discover</a> sorts Europe by what you travel for, and
+      <a href="/themes">themes</a> ignore borders entirely.</li>
+      <li><strong>If you know when you are free</strong> — <a href="/events">the European
+      year</a> has a page per month that also says where is good in it.</li>
+      <li><strong>If you have days and a budget</strong> — <a href="/plan">the planner</a>
+      takes a sentence or a form and returns a route with a cost estimate.</li>
+    </ul>
+
+    <h2>Common questions</h2>
+    <h3>Can I book anything here?</h3>
+    <p>No, and not by accident: there is no payment surface anywhere on the site and no
+    company behind it yet. <a href="/how-it-works">What is built, designed and blocked →</a></p>
+    <h3>How accurate is this?</h3>
+    <p>It is a considered editorial first draft that has not been verified source by source.
+    <a href="/sources/freshness">The board says so per country →</a></p>
+    <h3>Why are there no photographs?</h3>
+    <p>Every illustration is generated from the place's own name. No licence to expire, no
+    stock library, and no risk of publishing somebody's holiday photograph.</p>
+    <h3>Where did my saved places go?</h3>
+    <p>They live in the browser you saved them in and nowhere else. A different browser, a
+    private window or cleared site data means an empty list — which is the cost of not having
+    an account system, and we think it is the right trade for now.</p>
+    <h3>Why is my country's page thin?</h3>
+    <p>Five countries have been taken to depth so far. The rest are at a solid first pass.
+    <a href="/countries">Which is which →</a></p>
+  </div>
+  <aside class="rail">
+    <h3>Something is wrong</h3>
+    <p>Corrections are wanted. <a href="/sources">Sources and corrections →</a></p>
+    <h3>You run a business here</h3>
+    <p><a href="/for-businesses">How listings work →</a></p>
+  </aside>
+</div>"""
+    return _plain("Help", "Help", "How to use the site, and the questions people actually ask.",
+                  blocks, path="/help", crumb="Help",
+                  description="How to use Europedoor: finding a place, planning a journey, what the facts are worth, and where saved places live.")
+
+
+def contact_page(data):
+    blocks = PRELAUNCH + """
+<div class="split">
+  <div>
+    <h2>There is no contact form, on purpose</h2>
+    <p>A form collects a name, an email address and a message. That is personal data, and
+    holding it requires a controller, a lawful basis, a retention period and a published
+    privacy notice. None of those exist yet, so collecting it would be the first thing on
+    this site to break its own rules.</p>
+
+    <h2>What to do instead</h2>
+    <ul class="stack">
+      <li><strong>A correction</strong> — a wrong fact, a closed museum, a price that moved.
+      The repository's issue tracker is the honest channel while this is a pre-launch
+      editorial project, and every correction is public that way, which is better.</li>
+      <li><strong>You run a business we list, or should</strong> — read
+      <a href="/for-businesses">how listings work</a> first. Applications are not open, and
+      the page says why.</li>
+      <li><strong>You are a tourism organisation</strong> —
+      <a href="/for-tourism-boards">what we would and would not sell you</a>.</li>
+      <li><strong>Press</strong> — everything we would say is already written down:
+      <a href="/about">about</a>, <a href="/how-it-works">how it works</a>,
+      <a href="/method">the scoring method</a>.</li>
+    </ul>
+
+    <h2>What arrives with the company</h2>
+    <p>A named address, a real inbox with a stated response time, and a form that only asks
+    for what it needs. In that order.</p>
+  </div>
+  <aside class="rail">
+    <h3>Why this reads oddly</h3>
+    <p>Most sites put a form here whether or not anyone reads it. This is what it looks like
+    when a product refuses to collect something it cannot yet look after.</p>
+  </aside>
+</div>"""
+    return _plain("Contact", "Contact", "No form, and the reason is the same reason there are no accounts.",
+                  blocks, path="/contact", crumb="Contact",
+                  description="How to reach Europedoor before it has a company: corrections, business listings, tourism organisations and press.")
+
+
+def tourism_boards_page(data):
+    counts = {}
+    for n in data["cities"].values():
+        counts[n["country"]["name"]] = counts.get(n["country"]["name"], 0) + 1
+    body_rows = "".join(
+        f"""<div class="row"><div><h3>{esc(a)}</h3><p class="rowsub">{esc(b)}</p></div>
+        <p class="rowmeta">{esc(c)}</p></div>"""
+        for a, b, c in [
+            ("Destination profile", "A verified, editorially written presence for a region — written by us, corrected by you, never ghostwritten by you.", "would build"),
+            ("Seasonality intelligence", "Which months travellers plan for, by interest, for your region against its neighbours.", "would build"),
+            ("Search and planner demand", "What people ask for that your region answers, including the requests we could not fulfil.", "would build"),
+            ("Campaign placement", "Time-boxed, labelled promotion on directory and discovery surfaces.", "would build"),
+            ("Ranking in the Atlas", "Editorial position, the Journey Planner, curated journeys, the Experience Score.", "never for sale"),
+        ]
+    )
+    blocks = f"""
+<div class="split">
+  <div>
+    <h2>What we would build for you</h2>
+    <div class="rows">{body_rows}</div>
+
+    <h2 style="margin-top:var(--s7)">The line, before the conversation rather than after</h2>
+    <p>A tourism board's money can buy attention. It cannot buy the impression of independent
+    editorial judgement, because that impression is the only thing we have to sell to anybody
+    else. So: campaigns are labelled, time-boxed and confined to directory and discovery
+    surfaces. The <a href="/method">Experience Score</a> is computed from tags by a published
+    formula and has no field a payment could touch. The <a href="/plan">Journey Planner</a>
+    scores fit and distance, and there is nothing in its index that could carry a boost.</p>
+    <p>If that makes us less useful to you than a publisher who will sell the front page, that
+    is the correct outcome for both of us.</p>
+
+    <h2 style="margin-top:var(--s7)">What exists today</h2>
+    <p>{len(data['countries'])} countries and {len(data['cities'])} destinations, written
+    editorially, with the verification status of each country published on
+    <a href="/sources/freshness">the freshness board</a>. No traffic to report yet, and we
+    will not quote figures we do not have — which is the same reason the intelligence product
+    is described above in the conditional.</p>
+  </div>
+  <aside class="rail">
+    <h3>Where your region already is</h3>
+    <p>Every country has a page, every travel region has a page, and every destination links
+    to the region and country above it. <a href="/countries">Find yours →</a></p>
+    <h3>Corrections first</h3>
+    <p>If something about your region is wrong here, that is worth more to us than a campaign
+    and costs you nothing. <a href="/sources">Tell us →</a></p>
+  </aside>
+</div>"""
+    return _plain("For tourism boards", "For tourism organisations",
+                  "What a national board, region or municipality could buy here — and the one thing that is not for sale.",
+                  blocks, path="/for-tourism-boards", crumb="For tourism boards",
+                  description="What Europedoor would offer tourism boards: destination profiles, seasonality and demand intelligence, labelled campaigns — and why editorial ranking is never for sale.")
