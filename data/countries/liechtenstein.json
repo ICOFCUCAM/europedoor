@@ -1,0 +1,36 @@
+{
+  "code": "li", "slug": "liechtenstein", "name": "Liechtenstein", "official": "Principality of Liechtenstein",
+  "macro": "alpine-central", "capital": "Vaduz", "currency": "CHF — Swiss franc",
+  "languages": ["German"],
+  "blocs": ["schengen", "eea"],
+  "tagline": "Twenty-five kilometres long, ruled from a castle on the hill, and walkable end to end in a day.",
+  "summary": "Liechtenstein has 40,000 people, no airport, no army, and more registered companies than citizens. It uses the Swiss franc, shares Switzerland's customs and is in the EEA but not the EU. For a visitor it is a mountain principality with an excellent modern art museum, a princely wine cellar, and a hiking trail that crosses the whole country.",
+  "interests": ["mountains", "art", "wine", "nature"],
+  "budget": "high", "daily_eur": [110, 230],
+  "season": { "peak": ["jun", "jul", "aug", "sep"], "shoulder": ["may", "oct"],
+    "note": "Summer for the high trail and the alpine huts; the mountain section is snow-free from late June. The National Day on 15 August includes the entire country being invited to the castle garden." },
+  "getting_around": "Buses run to every village and connect to Swiss trains at Sargans and Buchs. There is no railway station of consequence and no airport at all.",
+  "food": ["Käsknöpfle, cheese dumplings with apple sauce, which is the national dish", "Wine from the princely estate below the castle", "Ribel, a maize porridge shared with the neighbouring Rhine valley"],
+  "festivals": [
+    { "name": "National Day — fireworks and an open castle garden", "month": "aug", "where": "Vaduz" },
+    { "name": "Alpine cattle descent", "month": "sep", "where": "Malbun and Steg" },
+    { "name": "Vaduz Christmas market", "month": "dec", "where": "Vaduz" }
+  ],
+  "know": ["Passport stamps are available as a souvenir at the tourist office; the border itself is unmanned.", "Swiss francs everywhere; euros usually accepted at a poor rate.", "The Liechtenstein Trail runs 75 km through all eleven municipalities."],
+  "regions": [
+    { "slug": "rhine-valley-and-mountains", "name": "The Rhine Valley & the Mountains",
+      "summary": "Vaduz on the valley floor, and the ski village of Malbun in a bowl above it.",
+      "interests": ["art", "mountains", "wine", "nature"],
+      "cities": [
+        { "slug": "vaduz", "name": "Vaduz", "lat": 47.14, "lon": 9.52,
+          "summary": "A capital of 5,700 people under a castle the prince actually lives in, with a black concrete art museum on the main street.",
+          "interests": ["art", "wine", "mountains"], "nights": [1, 2],
+          "highlights": ["Kunstmuseum Liechtenstein and the princely collections", "The vineyard walk below the castle", "Walking up to the castle gate, which is as close as anyone gets"],
+          "experiences": [{ "slug": "liechtenstein-trail-day", "name": "A day on the Liechtenstein Trail", "kind": "walk", "band": "low", "summary": "75 km through all eleven municipalities; the Vaduz-to-Balzers section takes an afternoon and crosses a quarter of the country." }] },
+        { "slug": "malbun", "name": "Malbun", "lat": 47.10, "lon": 9.61, "quiet": true,
+          "summary": "The country's only ski area, in a high bowl at 1,600 metres, with marmots and a chairlift.",
+          "interests": ["mountains", "winter", "nature"], "nights": [1, 2],
+          "highlights": ["The Fürstensteig, a wired cliff path with real exposure", "Small, cheap, uncrowded skiing in winter", "Ibex on the ridges above Sareis"] }
+      ] }
+  ]
+}

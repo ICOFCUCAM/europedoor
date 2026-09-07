@@ -118,7 +118,7 @@ def load():
                 seen_cities.add(t.get("slug"))
                 for key in ("name", "lat", "lon", "summary", "interests", "nights", "highlights"):
                     p.require(key in t, tw, f"missing key {key!r}")
-                p.require(35.0 <= t.get("lat", 0) <= 72.0, tw, "lat looks off the map for Europe")
+                p.require(34.0 <= t.get("lat", 0) <= 72.0, tw, "lat looks off the map for Europe")
                 p.require(-26.0 <= t.get("lon", 0) <= 50.0, tw, "lon looks off the map for Europe")
                 n = t.get("nights")
                 p.require(

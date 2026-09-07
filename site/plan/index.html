@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plan a journey · Europedoor</title>
+<meta name="description" content="Tell Europedoor your days, budget and interests and it builds a European itinerary with real distances, real night counts and a cost estimate.">
+<link rel="canonical" href="https://europedoor.com/plan">
+<meta property="og:title" content="Plan a journey · Europedoor">
+<meta property="og:description" content="Tell Europedoor your days, budget and interests and it builds a European itinerary with real distances, real night counts and a cost estimate.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="/assets/css/europedoor.css">
+<link rel="icon" href="/assets/door.svg" type="image/svg+xml">
+</head>
+<body class="area-plan">
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+  <div class="masthead-in">
+    <a class="wordmark" href="/">
+      <span class="door" aria-hidden="true"></span>
+      <span class="wordmark-text">europedoor</span>
+    </a>
+    <nav class="nav" aria-label="Primary"><a href="/atlas">Atlas</a><a href="/journeys">Journeys</a><a href="/plan" aria-current="page">Plan</a><a href="/experiences">Experiences</a><a href="/fund">Fund</a></nav>
+  </div>
+</header>
+<main id="main" class="">
+
+<nav class="crumbs" aria-label="Breadcrumb"><a href="/atlas">Europe</a><span class="sep" aria-hidden="true">/</span><span aria-current="page">Plan</span></nav>
+<div class="pagehead">
+  <p class="kicker">Journey Planner</p>
+  <h1>Twelve days, €2,500, history and mountains.</h1>
+  <p class="lede">Say what you have and what you like. The planner reads the whole Atlas —
+  244 cities across 50 countries — scores every one against
+  you, then builds a route that respects distance instead of teleporting between highlights.
+  It runs entirely in your browser; nothing you type is sent anywhere.</p>
+</div>
+
+<div class="split">
+  <div>
+    <form class="form" id="planner">
+      <div class="form-row">
+        <div class="field">
+          <label for="days">Days</label>
+          <input type="number" id="days" name="days" min="3" max="45" value="12" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="budget">Total budget (€, per person)</label>
+          <input type="number" id="budget" name="budget" min="200" step="50" value="2500" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="month">Travelling in</label>
+          <select id="month" name="month"><option value="jan">January</option><option value="feb">February</option><option value="mar">March</option><option value="apr">April</option><option value="may">May</option><option value="jun">June</option><option value="jul">July</option><option value="aug">August</option><option value="sep">September</option><option value="oct">October</option><option value="nov">November</option><option value="dec">December</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label for="style">Spending style</label>
+          <select id="style" name="style"><option value="low">Frugal — Hostels, guesthouses, self-catering, regional trains and buses.</option><option value="moderate">Comfortable — Three-star hotels or good apartments, one restaurant meal a day, some fast trains.</option><option value="high">Generous — Well-reviewed hotels, restaurants that book out, flights and first-class rail where it saves a day.</option></select>
+        </div>
+        <div class="field">
+          <label for="pace">Pace</label>
+          <select id="pace" name="pace">
+            <option value="slow">Slow — fewer places, longer stays</option>
+            <option value="balanced" selected>Balanced</option>
+            <option value="fast">Fast — see as much as possible</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="start">Start from</label>
+          <select id="start" name="start"><option value="">Anywhere that fits</option></select>
+        </div>
+      </div>
+      <fieldset class="fieldset">
+        <legend>What are you travelling for?</legend>
+        <div class="checks"><label><input type="checkbox" name="interest" value="history">
+        <span aria-hidden="true">⚑</span> History &amp; ruins</label><label><input type="checkbox" name="interest" value="art">
+        <span aria-hidden="true">◈</span> Art &amp; museums</label><label><input type="checkbox" name="interest" value="architecture">
+        <span aria-hidden="true">⌂</span> Architecture</label><label><input type="checkbox" name="interest" value="sacred">
+        <span aria-hidden="true">✝</span> Sacred places</label><label><input type="checkbox" name="interest" value="food">
+        <span aria-hidden="true">●</span> Food</label><label><input type="checkbox" name="interest" value="wine">
+        <span aria-hidden="true">◑</span> Wine &amp; drink</label><label><input type="checkbox" name="interest" value="mountains">
+        <span aria-hidden="true">▲</span> Mountains</label><label><input type="checkbox" name="interest" value="coast">
+        <span aria-hidden="true">≈</span> Coast &amp; beaches</label><label><input type="checkbox" name="interest" value="islands">
+        <span aria-hidden="true">○</span> Islands</label><label><input type="checkbox" name="interest" value="nature">
+        <span aria-hidden="true">♣</span> Wild nature</label><label><input type="checkbox" name="interest" value="wild">
+        <span aria-hidden="true">❦</span> Wildlife watching</label><label><input type="checkbox" name="interest" value="winter">
+        <span aria-hidden="true">❄</span> Snow &amp; winter</label><label><input type="checkbox" name="interest" value="cities">
+        <span aria-hidden="true">▦</span> Big cities</label><label><input type="checkbox" name="interest" value="music">
+        <span aria-hidden="true">♫</span> Music &amp; nightlife</label><label><input type="checkbox" name="interest" value="design">
+        <span aria-hidden="true">◧</span> Design &amp; making</label><label><input type="checkbox" name="interest" value="rail">
+        <span aria-hidden="true">═</span> Slow travel by rail</label><label><input type="checkbox" name="interest" value="festivals">
+        <span aria-hidden="true">✵</span> Festivals</label></div>
+      </fieldset>
+      <div class="hero-actions" style="margin-top:0">
+        <button class="btn" type="submit">Build the itinerary</button>
+        <button class="btn ghost" type="button" id="again">Give me a different one</button>
+      </div>
+    </form>
+    <div id="result" aria-live="polite"></div>
+  </div>
+  <aside class="rail">
+    <h3>How it decides</h3>
+    <ul>
+      <li>Every city is scored on how many of your interests it carries, at region and city level.</li>
+      <li>The month you pick moves the score: peak season up, off season down, never to zero.</li>
+      <li>Each next stop is penalised by distance, so the route stops wandering.</li>
+      <li>Nights come from the range on each city page, stretched or squeezed by your pace.</li>
+      <li>Cost is nights × the country's daily band, plus a distance-based transport estimate.</li>
+    </ul>
+    <h3>What it will not do</h3>
+    <p>It will not book anything, price a real hotel, or route you into a country under a
+    travel advisory — those are excluded from the planning index entirely.</p>
+    <p class="small">Estimates are editorial, not quotes. Check <a href="/sources">sources and
+    corrections</a>.</p>
+  </aside>
+</div>
+
+</main>
+<footer class="footer">
+  <div class="footer-in">
+    <p class="footer-lede">One door into Europe — discover it, plan it, and leave it better than you found it.</p>
+    <nav class="footer-nav" aria-label="Footer">
+      <a href="/atlas">Atlas</a><a href="/journeys">Journeys</a><a href="/plan">Plan</a>
+      <a href="/experiences">Experiences</a><a href="/experiences/join">List your experience</a>
+      <a href="/fund">Fund</a><a href="/about">About</a><a href="/how-it-works">How it works</a>
+      <a href="/sources">Sources &amp; corrections</a>
+    </nav>
+    <p class="footer-legal">
+      Editorial project, pre-launch. Operated by [OPERATOR ENTITY — NOT YET INCORPORATED]. Nothing here is a booking,
+      an offer, or financial advice; nothing on this site takes a payment.
+      Country facts are editorial and may be out of date — check official
+      government advice before you travel.
+    </p>
+  </div>
+</footer>
+<script src="/assets/js/planner.js" defer></script></body>
+</html>

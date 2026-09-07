@@ -1,1 +1,453 @@
-{ "journeys": [] }
+{
+  "journeys": [
+    {
+      "slug": "arctic-to-the-baltic",
+      "name": "Arctic to the Baltic",
+      "strapline": "Midnight sun to hanseatic brick",
+      "summary": "Start where the sun does not set and end where medieval merchants counted their money. This is the long north: an Arctic city, an island chain of granite peaks, a night train down the spine of Sweden, and then the three old trading capitals of the Baltic — each of which was rich, then occupied, and is now itself again. Long legs, and the train is the point rather than the cost.",
+      "days": 19,
+      "budget": "moderate",
+      "interests": [
+        "nature",
+        "mountains",
+        "islands",
+        "history",
+        "rail",
+        "winter"
+      ],
+      "months": [
+        "jun",
+        "jul",
+        "aug"
+      ],
+      "legs": [
+        {
+          "city": "norway/nord-norge/tromso",
+          "nights": 3,
+          "why": "Above the Arctic Circle: whales in winter, no darkness at all in June, and the best base in the north."
+        },
+        {
+          "city": "norway/nord-norge/lofoten",
+          "nights": 4,
+          "why": "Peaks straight out of the sea and cod on racks. The one stop nobody regrets lengthening."
+        },
+        {
+          "city": "sweden/swedish-lapland/abisko",
+          "nights": 2,
+          "why": "Over the border into Sweden's rain shadow, for the clearest skies in Lapland and the top of the Kungsleden."
+        },
+        {
+          "city": "sweden/stockholm-and-the-archipelago/stockholm",
+          "nights": 3,
+          "why": "The night train south delivers you to a capital on fourteen islands. Take the archipelago ferry."
+        },
+        {
+          "city": "finland/helsinki-and-the-coast/helsinki",
+          "nights": 2,
+          "why": "Overnight boat across the gulf. Granite, design, and a public sauna on the water."
+        },
+        {
+          "city": "estonia/tallinn-and-the-north/tallinn",
+          "nights": 2,
+          "why": "Two hours south by fast ferry into an intact medieval town wall."
+        },
+        {
+          "city": "latvia/riga-and-around/riga",
+          "nights": 2,
+          "why": "The last leg by bus, into the largest Art Nouveau quarter in Europe."
+        }
+      ]
+    },
+    {
+      "slug": "atlantic-to-the-mediterranean",
+      "name": "Atlantic to the Mediterranean",
+      "strapline": "Across Iberia and along the coast",
+      "summary": "The classic west-to-east traverse, taken slowly enough to notice the change: Atlantic light and salt cod in the northwest, the Moorish south in the middle, then the Mediterranean proper from Barcelona onward. Every leg on this route can be done by train, which is unusual for a journey of this length and is half the pleasure of it.",
+      "days": 23,
+      "budget": "moderate",
+      "interests": [
+        "food",
+        "wine",
+        "history",
+        "architecture",
+        "coast",
+        "art"
+      ],
+      "months": [
+        "apr",
+        "may",
+        "sep",
+        "oct"
+      ],
+      "legs": [
+        {
+          "city": "portugal/porto-and-the-douro/porto",
+          "nights": 3,
+          "why": "Granite, port lodges and the Douro. Begin on the Atlantic, facing the wrong way on purpose."
+        },
+        {
+          "city": "portugal/lisbon-and-the-west/lisbon",
+          "nights": 3,
+          "why": "Down the coast to tile, fado and the Gulbenkian. Three days is the minimum here."
+        },
+        {
+          "city": "portugal/alentejo-and-the-south/evora",
+          "nights": 2,
+          "why": "Inland into the Alentejo: a Roman temple, a chapel of bones, and cork oaks in every direction."
+        },
+        {
+          "city": "spain/andalusia/seville",
+          "nights": 3,
+          "why": "Across the border into Andalusia. Orange trees, the Alcázar, and flamenco in a room of thirty."
+        },
+        {
+          "city": "spain/andalusia/granada",
+          "nights": 3,
+          "why": "East to the Alhambra, with the Sierra Nevada behind it and free tapas beneath it."
+        },
+        {
+          "city": "spain/catalonia-and-the-east/barcelona",
+          "nights": 3,
+          "why": "The long leg north by high-speed rail, into Gaudí's grid and the Mediterranean."
+        },
+        {
+          "city": "france/provence-and-the-south/nice",
+          "nights": 2,
+          "why": "Over the border along the coast, for the light the painters came for."
+        },
+        {
+          "city": "italy/rome-and-lazio/rome",
+          "nights": 3,
+          "why": "The last hop east. Three thousand years, stacked, and the best street food of the trip."
+        }
+      ]
+    },
+    {
+      "slug": "the-alpine-grand-tour",
+      "name": "The Alpine Grand Tour",
+      "strapline": "Six valleys, four countries, one mountain range",
+      "summary": "The Alps are a single range and five nationalities, and the way to feel that is to cross them slowly by train and cable car rather than fly over. This route runs west to east from Mont Blanc to the Dolomites, staying high, and every leg is on a scheduled public service. Book the mountain huts before you book the hotels.",
+      "days": 17,
+      "budget": "high",
+      "interests": [
+        "mountains",
+        "rail",
+        "nature",
+        "winter",
+        "food"
+      ],
+      "months": [
+        "jun",
+        "jul",
+        "aug",
+        "sep"
+      ],
+      "legs": [
+        {
+          "city": "france/alps-and-east/chamonix",
+          "nights": 3,
+          "why": "Under the highest mountain in western Europe, where alpinism was invented."
+        },
+        {
+          "city": "switzerland/valais-and-the-south/zermatt",
+          "nights": 3,
+          "why": "Car-free, under the Matterhorn, and reached by a rack railway from the valley."
+        },
+        {
+          "city": "switzerland/bernese-oberland/lauterbrunnen",
+          "nights": 3,
+          "why": "Seventy-two waterfalls, cliff-shelf villages, and the Eiger across the valley."
+        },
+        {
+          "city": "switzerland/graubunden/st-moritz",
+          "nights": 2,
+          "why": "East over the passes to the Engadin: sgraffito villages and 322 days of sun."
+        },
+        {
+          "city": "austria/tyrol/innsbruck",
+          "nights": 2,
+          "why": "The Bernina and the Arlberg deliver you to a city with a 2,300-metre mountain at the tram stop."
+        },
+        {
+          "city": "italy/north-italy/ortisei",
+          "nights": 3,
+          "why": "South into the Dolomites and Ladin-speaking valleys, for the pink light on limestone at dawn."
+        }
+      ]
+    },
+    {
+      "slug": "scandinavia-to-central-europe",
+      "name": "Scandinavia to Central Europe",
+      "strapline": "Copenhagen to Budapest, all by rail",
+      "summary": "A north-south line down the middle of the continent, from a harbour you can swim in to a capital built on hot springs. It crosses the old inner-German border, the old iron curtain, and three empires' worth of architecture, without ever needing a flight or a car. The stretch from Berlin to Budapest is the densest run of great cities in Europe.",
+      "days": 21,
+      "budget": "moderate",
+      "interests": [
+        "cities",
+        "history",
+        "architecture",
+        "music",
+        "food"
+      ],
+      "months": [
+        "may",
+        "jun",
+        "sep",
+        "oct"
+      ],
+      "legs": [
+        {
+          "city": "denmark/zealand/copenhagen",
+          "nights": 3,
+          "why": "Design, harbour swimming and smørrebrød. The northern end of the line."
+        },
+        {
+          "city": "germany/north-germany/hamburg",
+          "nights": 2,
+          "why": "Across the bridges into Germany's port city, and the Elbphilharmonie's free plaza."
+        },
+        {
+          "city": "germany/berlin-and-the-east/berlin",
+          "nights": 4,
+          "why": "Three hours south. The twentieth century, in the city that carried most of it."
+        },
+        {
+          "city": "germany/berlin-and-the-east/dresden",
+          "nights": 2,
+          "why": "Baroque rebuilt from rubble, on a river bend, with sandstone towers upstream."
+        },
+        {
+          "city": "czechia/prague-and-bohemia/prague",
+          "nights": 3,
+          "why": "Over the mountains into Bohemia: gothic, baroque, cubist, and the beer that explains the rest."
+        },
+        {
+          "city": "austria/vienna-and-the-east/vienna",
+          "nights": 3,
+          "why": "South to the imperial capital. Standing tickets at the opera, coffee house afternoons."
+        },
+        {
+          "city": "hungary/budapest-and-the-danube-bend/budapest",
+          "nights": 3,
+          "why": "The last leg down the Danube, ending in a thermal bath in the snow if you time it right."
+        }
+      ]
+    },
+    {
+      "slug": "the-adriatic-run",
+      "name": "The Adriatic Run",
+      "strapline": "Venice to Dubrovnik the long way round",
+      "summary": "Down the eastern Adriatic, which has the Mediterranean's clearest water and its least developed coastline. The route leaves the sea twice on purpose — into Slovenia's karst and into Bosnia — because the interior is where the layers are: Venetian, Ottoman, Habsburg and Yugoslav, sometimes in the same street. Ferries and buses, not trains, from Split onward.",
+      "days": 19,
+      "budget": "moderate",
+      "interests": [
+        "coast",
+        "islands",
+        "history",
+        "food",
+        "sacred"
+      ],
+      "months": [
+        "may",
+        "jun",
+        "sep",
+        "oct"
+      ],
+      "legs": [
+        {
+          "city": "italy/north-italy/venice",
+          "nights": 2,
+          "why": "Begin on the wrong side of the sea, in the city that ruled the rest of this coast."
+        },
+        {
+          "city": "slovenia/ljubljana-karst-coast/ljubljana",
+          "nights": 2,
+          "why": "Inland to a small green capital, and the caves an hour beyond it."
+        },
+        {
+          "city": "slovenia/ljubljana-karst-coast/piran",
+          "nights": 2,
+          "why": "Slovenia's 46 kilometres of coast, and a Venetian town on a spit with salt pans beside it."
+        },
+        {
+          "city": "croatia/istria-and-kvarner/rovinj",
+          "nights": 2,
+          "why": "Into Istria: truffles, olive oil and a campanile copied from San Marco."
+        },
+        {
+          "city": "croatia/dalmatia/split",
+          "nights": 3,
+          "why": "South to a Roman emperor's palace that people still live inside."
+        },
+        {
+          "city": "bosnia-and-herzegovina/herzegovina/mostar",
+          "nights": 2,
+          "why": "Inland into Herzegovina, for a bridge that was destroyed and rebuilt from its own river."
+        },
+        {
+          "city": "montenegro/bay-of-kotor/kotor",
+          "nights": 3,
+          "why": "Back to the water, at the head of a drowned canyon, with 1,350 steps up the wall behind it."
+        },
+        {
+          "city": "croatia/dalmatia/dubrovnik",
+          "nights": 2,
+          "why": "The last two hours north up the coast, into the walls. Walk them at opening."
+        }
+      ]
+    },
+    {
+      "slug": "camino-and-sacred-europe",
+      "name": "Camino & Sacred Europe",
+      "strapline": "Six places people have walked to for a thousand years",
+      "summary": "Not a religious journey unless you want it to be — a route through the buildings and landscapes that pilgrimage produced, which is most of what Europe built before it built anything else. It ends where it should, on foot, in the rain, in Galicia. Two of these stops are still working monastic communities and one is a sovereign state.",
+      "days": 15,
+      "budget": "moderate",
+      "interests": [
+        "sacred",
+        "history",
+        "architecture",
+        "art"
+      ],
+      "months": [
+        "apr",
+        "may",
+        "sep",
+        "oct"
+      ],
+      "legs": [
+        {
+          "city": "united-kingdom/london-and-the-south-east/canterbury",
+          "nights": 2,
+          "why": "The English end: a cathedral, a murder in it, and a pilgrims' road out of London."
+        },
+        {
+          "city": "france/paris-and-ile-de-france/chartres",
+          "nights": 2,
+          "why": "Across the Channel to 172 windows of twelfth-century glass and a labyrinth in the floor."
+        },
+        {
+          "city": "italy/rome-and-lazio/rome",
+          "nights": 3,
+          "why": "South to the city everything else was measured against, and the necropolis under the basilica."
+        },
+        {
+          "city": "greece/northern-greece/meteora",
+          "nights": 3,
+          "why": "East to six working monasteries on top of sandstone pillars, linked by monks' footpaths."
+        },
+        {
+          "city": "spain/green-spain/santiago-de-compostela",
+          "nights": 4,
+          "why": "The long jump west, and the last hundred kilometres walked in from Sarria."
+        }
+      ]
+    },
+    {
+      "slug": "the-hanseatic-arc",
+      "name": "The Hanseatic Arc",
+      "strapline": "The medieval trading league, in order",
+      "summary": "Between the 13th and 17th centuries a network of merchant towns ran the northern seas, and they all built with the same brick and the same confidence. This route follows them from Flanders to the Gulf of Finland. What the League left behind is a very specific pleasure: gabled warehouses, town halls larger than the towns needed, and a shared idea of what a rich city should look like.",
+      "days": 16,
+      "budget": "moderate",
+      "interests": [
+        "history",
+        "architecture",
+        "coast",
+        "food"
+      ],
+      "months": [
+        "may",
+        "jun",
+        "jul",
+        "aug",
+        "sep"
+      ],
+      "legs": [
+        {
+          "city": "belgium/flanders/bruges",
+          "nights": 2,
+          "why": "The southern end: a city that got rich, silted up, and was preserved by the accident."
+        },
+        {
+          "city": "netherlands/randstad/amsterdam",
+          "nights": 3,
+          "why": "North to the canal ring that came after the League and outdid it."
+        },
+        {
+          "city": "germany/north-germany/lubeck",
+          "nights": 2,
+          "why": "East to the queen of the Hanse herself, on an island, in brick gothic."
+        },
+        {
+          "city": "poland/pomerania-and-the-east/gdansk",
+          "nights": 3,
+          "why": "Along the Baltic to the Polish end of the network — and to 1939 and 1980."
+        },
+        {
+          "city": "latvia/riga-and-around/riga",
+          "nights": 2,
+          "why": "Across the sea to the largest Art Nouveau quarter in Europe, built on the same trade."
+        },
+        {
+          "city": "estonia/tallinn-and-the-north/tallinn",
+          "nights": 3,
+          "why": "The last stop: the wall, the towers and the guild halls, all still standing."
+        }
+      ]
+    },
+    {
+      "slug": "the-classical-mediterranean",
+      "name": "The Classical Mediterranean",
+      "strapline": "Greek and Roman cities, on both shores",
+      "summary": "Three thousand years of the same sea. This route takes in the best-preserved classical cities on either side of the Mediterranean — a Sicilian cathedral built inside a Doric temple, a Roman arena still hosting events, and the Anatolian coast where more of the Greek world survives than in Greece. Two flights or ferries are unavoidable and are worth it.",
+      "days": 18,
+      "budget": "moderate",
+      "interests": [
+        "history",
+        "coast",
+        "food",
+        "sacred",
+        "architecture"
+      ],
+      "months": [
+        "apr",
+        "may",
+        "sep",
+        "oct"
+      ],
+      "legs": [
+        {
+          "city": "italy/rome-and-lazio/rome",
+          "nights": 3,
+          "why": "The obvious beginning, and still the right one."
+        },
+        {
+          "city": "italy/south-italy-and-islands/naples",
+          "nights": 3,
+          "why": "South for the archaeological museum, which holds everything good from Pompeii, and the pizza."
+        },
+        {
+          "city": "italy/south-italy-and-islands/palermo",
+          "nights": 2,
+          "why": "Across to Sicily: Norman, Arab and Byzantine in one chapel ceiling."
+        },
+        {
+          "city": "italy/south-italy-and-islands/syracuse",
+          "nights": 3,
+          "why": "Down the coast to the most powerful Greek city in the world, and a temple inside a cathedral."
+        },
+        {
+          "city": "greece/athens-and-the-peloponnese/athens",
+          "nights": 3,
+          "why": "East across the sea, for the Acropolis at opening and the museum afterwards."
+        },
+        {
+          "city": "turkiye/aegean-and-mediterranean/selcuk",
+          "nights": 3,
+          "why": "On to Anatolia and Ephesus, where the library facade and the marble street still stand."
+        }
+      ]
+    }
+  ]
+}

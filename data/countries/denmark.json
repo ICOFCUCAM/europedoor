@@ -1,0 +1,54 @@
+{
+  "code": "dk", "slug": "denmark", "name": "Denmark", "official": "Kingdom of Denmark",
+  "macro": "nordic", "capital": "Copenhagen", "currency": "DKK — Danish krone",
+  "languages": ["Danish"],
+  "blocs": ["eu", "schengen", "eea"],
+  "tagline": "Small, flat, bicycled, and disproportionately good at deciding how things should look.",
+  "summary": "Denmark is a peninsula and four hundred islands, none of them far from the sea and none of them high. What it lacks in landscape it returns in design, food and a kind of practised ease — the country invented a word for it and then exported the word. Everything is close: you can cross the whole country by train in four hours.",
+  "interests": ["design", "food", "coast", "cities", "history", "islands"],
+  "budget": "high", "daily_eur": [100, 215],
+  "season": { "peak": ["jun", "jul", "aug"], "shoulder": ["may", "sep"],
+    "note": "Summer is long-evening weather, and the whole country moves outdoors. April and May are bright and cold. Danish winter is not dark in the Norwegian sense, but it is grey for four months and the country compensates with candles." },
+  "getting_around": "The train network is dense and the bridges are spectacular — the Great Belt and the Øresund both. Copenhagen is genuinely faster by bicycle than by car, and rental is everywhere. Ferries reach the islands the bridges skipped.",
+  "food": ["Smørrebrød: open sandwiches taken seriously, with rules about order", "New Nordic cooking, which started here and changed restaurants everywhere", "A hot dog from a pølsevogn at two in the morning, remorselessly"],
+  "festivals": [
+    { "name": "Roskilde Festival", "month": "jun", "where": "Roskilde" },
+    { "name": "Copenhagen Jazz Festival", "month": "jul", "where": "Copenhagen" },
+    { "name": "Christmas markets and Tivoli lights", "month": "dec", "where": "Copenhagen and Aarhus" }
+  ],
+  "know": ["Cash is nearly extinct; MobilePay and cards run the country.", "Cycle lanes have their own rules and Danes enforce them by glare — signal, and keep right.", "Almost everything closes on Sundays outside the big cities."],
+  "regions": [
+    { "slug": "zealand", "name": "Zealand & Copenhagen",
+      "summary": "The eastern island: the capital, the royal castles, and a coast of white cliffs.",
+      "interests": ["cities", "design", "history", "coast"],
+      "cities": [
+        { "slug": "copenhagen", "name": "Copenhagen", "lat": 55.68, "lon": 12.57,
+          "summary": "A harbour city clean enough to swim in the middle of, with the densest good eating in the Nordics.",
+          "interests": ["design", "food", "cities", "architecture", "music"], "nights": [3, 4],
+          "highlights": ["Harbour baths at Islands Brygge — municipal swimming in the harbour", "Designmuseum Danmark and the chairs everyone else copied", "Torvehallerne and the bakeries of Nørrebro", "Tivoli after dark, which is better than its reputation"],
+          "experiences": [
+            { "slug": "copenhagen-harbour-swim", "name": "Swim in the harbour", "kind": "water", "band": "low", "summary": "Free, supervised in summer, and the result of thirty years of cleaning up a working port." },
+            { "slug": "copenhagen-smorrebrod-order", "name": "Smørrebrød in the correct order", "kind": "table", "band": "moderate", "summary": "Herring first, then fish, then meat, then cheese, with aquavit between — a lunch that takes three hours and is meant to." }
+          ] },
+        { "slug": "roskilde", "name": "Roskilde", "lat": 55.64, "lon": 12.08, "quiet": true,
+          "summary": "Viking ships raised from the fjord, thirty-nine Danish monarchs in one cathedral, and a festival in a field.",
+          "interests": ["history", "sacred", "music"], "nights": [1, 1],
+          "highlights": ["Five 11th-century ships, scuttled to block the fjord and dug out in 1962", "The cathedral: Denmark's royal burial church since 1413", "Reconstructed longships you can row on the fjord"],
+          "experiences": [{ "slug": "roskilde-longship-row", "name": "Row a reconstructed longship", "kind": "water", "band": "moderate", "summary": "Built with period tools from the excavated hulls; you supply the arms and learn quickly why Vikings were fit." }] }
+      ] },
+    { "slug": "jutland", "name": "Jutland",
+      "summary": "The mainland: dunes, a moving desert, Denmark's second city, and the oldest bog bodies in Europe.",
+      "interests": ["coast", "nature", "history", "design"],
+      "cities": [
+        { "slug": "aarhus", "name": "Aarhus", "lat": 56.16, "lon": 10.20,
+          "summary": "A student city with a rainbow walkway on its art museum and a reconstructed old town beneath it.",
+          "interests": ["art", "design", "cities", "food"], "nights": [1, 2],
+          "highlights": ["ARoS and Olafur Eliasson's circular rainbow panorama", "Den Gamle By: 75 relocated buildings staged in three different decades", "Moesgaard's Grauballe Man, 2,300 years old and still recognisably a person"],
+          "experiences": [{ "slug": "aarhus-rainbow-panorama", "name": "Walk the rainbow", "kind": "museum", "band": "moderate", "summary": "150 metres of coloured glass on the roof; the city changes hue as you walk, which is the entire idea." }] },
+        { "slug": "skagen", "name": "Skagen", "lat": 57.72, "lon": 10.58, "quiet": true,
+          "summary": "The country's northern tip, where two seas meet visibly and a school of painters came for the light.",
+          "interests": ["coast", "art", "nature"], "nights": [1, 2],
+          "highlights": ["Grenen: stand with one foot in the Skagerrak and one in the Kattegat", "The Skagen painters' museum and Anchers' house", "Råbjerg Mile, a migrating dune moving 15 metres a year"] }
+      ] }
+  ]
+}

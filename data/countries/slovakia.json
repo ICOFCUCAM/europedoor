@@ -1,0 +1,46 @@
+{
+  "code": "sk", "slug": "slovakia", "name": "Slovakia", "official": "Slovak Republic",
+  "macro": "alpine-central", "capital": "Bratislava", "currency": "EUR — euro",
+  "languages": ["Slovak"],
+  "blocs": ["eu", "schengen", "eurozone", "eea"],
+  "tagline": "The smallest high mountains in Europe, more castles per head than anywhere, and hardly anyone looking.",
+  "summary": "Slovakia was half of a country until 1993 and is still routinely confused with the other half. It has the High Tatras — a genuine alpine range compressed into 26 kilometres — over a hundred and eighty castles, wooden churches built without a single nail, and some of the best-value mountain travel in Europe. Bratislava is an hour from Vienna and nothing like it.",
+  "interests": ["mountains", "history", "nature", "sacred", "food"],
+  "budget": "moderate", "daily_eur": [40, 100],
+  "season": { "peak": ["jun", "jul", "aug", "sep"], "shoulder": ["may", "oct"],
+    "note": "The High Tatra ridge routes need July to September; some are closed by law from November to mid-June to protect wildlife. Winter is good, cheap skiing. Bratislava is pleasant from April." },
+  "getting_around": "Trains link Bratislava, Žilina, Poprad and Košice along the spine of the country. Poprad is the gateway to the Tatras, with an electric railway up to the resorts. Buses reach the wooden church villages.",
+  "food": ["Bryndzové halušky: potato dumplings with sheep cheese and bacon", "Sheep's cheese in all forms, from the mountain huts that make it", "Slovak wine from the Small Carpathians, drunk entirely domestically"],
+  "festivals": [
+    { "name": "Východná folklore festival", "month": "jul", "where": "Východná" },
+    { "name": "Bratislava Coronation festivities", "month": "sep", "where": "Bratislava" },
+    { "name": "Christmas markets", "month": "dec", "where": "Bratislava, Košice" }
+  ],
+  "know": ["Mountain rescue in the Tatras is charged to the rescued; insurance is essential.", "Wooden churches in the northeast are UNESCO-listed and often need a key from a neighbour.", "Euro since 2009, unlike its neighbours."],
+  "regions": [
+    { "slug": "tatras-and-the-north", "name": "The Tatras & the North",
+      "summary": "A compressed alpine range, wooden churches, and the largest castle ruin in central Europe.",
+      "interests": ["mountains", "nature", "sacred", "history"],
+      "cities": [
+        { "slug": "poprad", "name": "Poprad & the High Tatras", "lat": 49.06, "lon": 20.30,
+          "summary": "The gateway town to a 26-kilometre range that reaches 2,655 metres and behaves like the Alps.",
+          "interests": ["mountains", "winter", "nature"], "nights": [2, 4],
+          "highlights": ["Chata pri Zelenom plese and the hut network above the tree line", "The electric railway from Poprad to Štrbské Pleso", "Aqua City's thermal water, which is what the town runs on"],
+          "experiences": [{ "slug": "tatra-hut-to-hut", "name": "Hut to hut in the High Tatras", "kind": "walk", "band": "moderate", "summary": "Beds, soup and beer at 1,500 metres, carried up by porters on wooden frames — a practice still going and worth watching." }] },
+        { "slug": "levoca", "name": "Levoča & the Spiš", "lat": 49.02, "lon": 20.59, "quiet": true,
+          "summary": "A walled medieval town with the tallest wooden altar in the world, under the ruins of Spiš castle.",
+          "interests": ["history", "sacred", "architecture"], "nights": [1, 2],
+          "highlights": ["Master Pavol's altar, 18.6 metres of carved lime wood", "Spiš castle, four hectares of ruin on a limestone hill", "The town walls and the wooden cage of shame in the square"] }
+      ] },
+    { "slug": "bratislava-and-the-southwest", "name": "Bratislava & the Southwest",
+      "summary": "The capital on the Danube, the Small Carpathian wine road, and the Austrian and Hungarian borders within sight.",
+      "interests": ["wine", "cities", "history"],
+      "cities": [
+        { "slug": "bratislava", "name": "Bratislava", "lat": 48.15, "lon": 17.11,
+          "summary": "A compact old town under a white castle, with a communist-era bridge and a UFO on top of it.",
+          "interests": ["history", "wine", "food", "cities"], "nights": [1, 2],
+          "highlights": ["The castle and the view down the Danube into Austria", "The blue church, Art Nouveau and genuinely blue", "Devín castle at the confluence, where the Iron Curtain ran"],
+          "experiences": [{ "slug": "small-carpathians-wine-road", "name": "The Small Carpathian wine road", "kind": "cellar", "band": "low", "summary": "Twenty minutes from the capital: family cellars in Pezinok and Modra that sell almost nothing beyond the region." }] }
+      ] }
+  ]
+}

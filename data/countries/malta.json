@@ -1,0 +1,51 @@
+{
+  "code": "mt", "slug": "malta", "name": "Malta", "official": "Republic of Malta",
+  "macro": "mediterranean", "capital": "Valletta", "currency": "EUR — euro",
+  "languages": ["Maltese", "English"],
+  "blocs": ["eu", "schengen", "eurozone", "eea"],
+  "tagline": "Three inhabited islands of limestone, holding temples older than the pyramids and a city built by knights.",
+  "summary": "Malta is 316 square kilometres, the most densely populated country in the EU, and has been fought over by everyone with a navy since the Bronze Age. Its megalithic temples predate Stonehenge and Giza. Valletta was built from scratch in the 1560s as a fortress city and is still walkable in twenty minutes. English is an official language, which makes it unusually easy going.",
+  "interests": ["history", "coast", "architecture", "sacred", "islands"],
+  "budget": "moderate", "daily_eur": [60, 145],
+  "season": { "peak": ["may", "jun", "sep", "oct"], "shoulder": ["apr", "nov"],
+    "note": "July and August are very hot and very full. Spring is green and brief — the island is brown by June. Winter is mild, swimmable on warm days, and almost empty." },
+  "getting_around": "Buses reach everywhere slowly and cheaply from Valletta. Ferries link Valletta, Sliema and the Three Cities, and Ċirkewwa to Gozo. Distances are tiny; traffic is not.",
+  "food": ["Rabbit stew (fenkata), the national meal, eaten in company", "Pastizzi — flaky pastry with ricotta or peas, from a hole in the wall", "Ftira: sourdough with tuna, capers and tomato, and a UNESCO listing"],
+  "festivals": [
+    { "name": "Carnival", "month": "feb", "where": "Valletta and Nadur" },
+    { "name": "Village festas with fireworks, all summer", "month": "jul", "where": "Every parish" },
+    { "name": "Notte Bianca", "month": "oct", "where": "Valletta" }
+  ],
+  "know": ["Driving is on the left, a British legacy along with the letterboxes.", "The temples require timed tickets and Ħaġar Qim is roofed for protection.", "Swimming is off rocks and platforms more often than sand; the Blue Lagoon is beautiful and mobbed."],
+  "regions": [
+    { "slug": "malta-island", "name": "Malta",
+      "summary": "The main island: the fortress capital, the old silent city, and the temples on the southern cliffs.",
+      "interests": ["history", "architecture", "sacred", "coast"],
+      "cities": [
+        { "slug": "valletta", "name": "Valletta", "lat": 35.90, "lon": 14.51,
+          "summary": "A planned fortress city of 1566, on a peninsula between two harbours, with Caravaggio's largest painting in its cathedral.",
+          "interests": ["history", "architecture", "art", "coast"], "nights": [2, 3],
+          "highlights": ["St John's Co-Cathedral, plain outside and overwhelming inside", "Caravaggio's Beheading of St John, the only work he signed", "The Upper Barrakka gardens and the noon gun over the Grand Harbour", "The Three Cities across the water, by traditional dgħajsa boat"],
+          "experiences": [{ "slug": "valletta-harbour-dghajsa", "name": "Across the Grand Harbour by dgħajsa", "kind": "water", "band": "low", "summary": "A rowed and now motorised water taxi in the old harbour shape; the cheapest and best view of the bastions." }] },
+        { "slug": "mdina", "name": "Mdina & Rabat", "lat": 35.89, "lon": 14.40, "quiet": true,
+          "summary": "The old walled capital on a hill, with about 250 residents and no traffic — called the silent city for a reason.",
+          "interests": ["history", "architecture", "sacred"], "nights": [1, 1],
+          "highlights": ["The bastion walls over the whole island at dusk", "St Paul's catacombs, cut in the 3rd century", "Evening, when the day visitors leave and it earns its name"] },
+        { "slug": "hagar-qim", "name": "Ħaġar Qim & the South Cliffs", "lat": 35.83, "lon": 14.44,
+          "summary": "Megalithic temples on a cliff over the sea, built between 3600 and 3200 BC.",
+          "interests": ["history", "sacred", "coast"], "nights": [1, 1],
+          "highlights": ["Some of the oldest free-standing structures on earth", "The solstice alignment through a small oval port", "The Blue Grotto below, by boat in calm weather"]
+        }
+      ] },
+    { "slug": "gozo", "name": "Gozo & Comino",
+      "summary": "The green sister island, slower and more agricultural, with a Neolithic temple and a lagoon.",
+      "interests": ["islands", "coast", "history", "nature"],
+      "cities": [
+        { "slug": "victoria-gozo", "name": "Victoria, Gozo", "lat": 36.04, "lon": 14.24, "quiet": true,
+          "summary": "A citadel town in the middle of an island where the pace drops noticeably the moment the ferry docks.",
+          "interests": ["islands", "history", "coast", "food"], "nights": [2, 3],
+          "highlights": ["The Ċittadella walls, and the whole island visible from them", "Ġgantija: temples older than Ħaġar Qim, and older than the pyramids", "Salt pans at Xwejni, cut into the rock and still worked by one family"],
+          "experiences": [{ "slug": "gozo-salt-pans", "name": "The Xwejni salt pans", "kind": "workshop", "band": "low", "summary": "Rock-cut pans worked by the same family for five generations; they harvest by hand in summer and will explain it if you ask." }] }
+      ] }
+  ]
+}

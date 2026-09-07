@@ -1,0 +1,57 @@
+{
+  "code": "cz", "slug": "czechia", "name": "Czechia", "official": "Czech Republic",
+  "macro": "alpine-central", "capital": "Prague", "currency": "CZK — Czech koruna",
+  "languages": ["Czech"],
+  "blocs": ["eu", "schengen", "eea"],
+  "tagline": "The most beautiful city in central Europe, and a country that drinks more beer per head than any other.",
+  "summary": "Bohemia and Moravia were the industrial heart of the Habsburg empire and came through the twentieth century with their architecture largely intact — Prague was not bombed. Outside it, spa towns, sandstone rock cities, Moravian vineyards and a chateau in every second valley go almost unvisited. Beer is a food group here and has been brewed in Plzeň since 1842.",
+  "interests": ["architecture", "history", "food", "music", "nature", "wine"],
+  "budget": "moderate", "daily_eur": [45, 115],
+  "season": { "peak": ["may", "jun", "jul", "aug", "sep"], "shoulder": ["apr", "oct"],
+    "note": "Prague is busy from April to October and at Christmas. May and September are the best compromise. Winter is cold, cheap and atmospheric, and the beer halls are the point." },
+  "getting_around": "Trains and buses are cheap, frequent and comfortable; RegioJet and České dráhy both serve the main routes. Prague's metro and trams are excellent and the night trams run all night.",
+  "food": ["Roast pork, dumplings and cabbage — vepřo knedlo zelo, the national plate", "Svíčková: beef in a cream root-vegetable sauce with cranberry", "Pilsner, drawn slowly with a thick head, at 4°C"],
+  "festivals": [
+    { "name": "Prague Spring music festival", "month": "may", "where": "Prague" },
+    { "name": "Wine harvest festivals in Moravia", "month": "sep", "where": "Mikulov, Znojmo" },
+    { "name": "Christmas markets", "month": "dec", "where": "Prague, Brno, Olomouc" }
+  ],
+  "know": ["Beer is often cheaper than water in a pub and ordering is done by putting a mat on the table.", "The koruna, not the euro; card acceptance is near-universal in cities.", "Prague's centre has aggressive currency-exchange scams — use a bank or an ATM from a real bank."],
+  "regions": [
+    { "slug": "prague-and-bohemia", "name": "Prague & Bohemia",
+      "summary": "The capital on its river, spa towns to the west, and sandstone rock towns to the north.",
+      "interests": ["architecture", "history", "music", "nature"],
+      "cities": [
+        { "slug": "prague", "name": "Prague", "lat": 50.09, "lon": 14.42,
+          "summary": "Romanesque, gothic, baroque and cubist stacked on top of each other, with a castle above and a bridge in between.",
+          "interests": ["architecture", "history", "music", "food", "cities"], "nights": [3, 4],
+          "highlights": ["Charles Bridge at six in the morning — genuinely worth the alarm", "The castle complex and St Vitus's stained glass by Mucha", "Vyšehrad, the other castle, with almost nobody on it", "A pub where they draw a mlíko, a glass of pure foam, and mean it"],
+          "experiences": [
+            { "slug": "prague-beer-hall", "name": "A pub with a tapster, not a menu", "kind": "table", "band": "low", "summary": "The good places pour continuously and mark your tab in pencil; you say when to stop, and the pour type is a real choice." },
+            { "slug": "prague-vysehrad-walk", "name": "Vyšehrad and the river bend", "kind": "walk", "band": "low", "summary": "The city's first castle, a cemetery of composers, and the whole of Prague from the ramparts without a crowd." }
+          ] },
+        { "slug": "cesky-krumlov", "name": "Český Krumlov", "lat": 48.81, "lon": 14.32,
+          "summary": "A castle town in a tight loop of the Vltava, essentially unchanged since the 18th century.",
+          "interests": ["architecture", "history", "nature"], "nights": [1, 2],
+          "highlights": ["The baroque theatre, with original 1766 machinery still working", "The bear moat, which has had bears since the 1700s", "Canoeing the river loop around the town"] },
+        { "slug": "cesky-raj", "name": "Český ráj (Turnov)", "lat": 50.59, "lon": 15.16, "quiet": true,
+          "summary": "'Bohemian Paradise': sandstone towers, rock cities and castles on pinnacles, ninety minutes from Prague.",
+          "interests": ["nature", "mountains", "history"], "nights": [1, 2],
+          "highlights": ["Prachovské skály's maze of rock corridors", "Trosky castle on two volcanic plugs", "Sandstone climbing where the rules ban metal protection"] }
+      ] },
+    { "slug": "moravia", "name": "Moravia",
+      "summary": "The eastern half: vineyards, an astronomical clock nobody queues for, and a functionalist villa that changed architecture.",
+      "interests": ["wine", "architecture", "food"],
+      "cities": [
+        { "slug": "brno", "name": "Brno", "lat": 49.20, "lon": 16.61, "quiet": true,
+          "summary": "Czechia's second city: student, modernist and self-deprecating, with an ossuary of 50,000 under the square.",
+          "interests": ["architecture", "food", "history", "music"], "nights": [1, 2],
+          "highlights": ["Villa Tugendhat, Mies van der Rohe, 1930, bookable in advance only", "The second-largest ossuary in Europe, found in 2001", "A cannonball fired at 11 am, which is why the cathedral rings noon an hour early"] },
+        { "slug": "mikulov", "name": "Mikulov", "lat": 48.81, "lon": 16.64, "quiet": true,
+          "summary": "A chateau town on the Austrian border, surrounded by the country's best vineyards and a limestone ridge.",
+          "interests": ["wine", "nature", "history"], "nights": [1, 2],
+          "highlights": ["Wine cellars cut into the rock, open at harvest", "The Jewish quarter and cemetery, one of central Europe's most important", "Pálava's limestone hills and their orchids"],
+          "experiences": [{ "slug": "moravia-cellar-tasting", "name": "A Moravian cellar at harvest", "kind": "cellar", "band": "low", "summary": "Burčák — half-fermented, cloudy and briefly available each September — is drunk cold from the barrel and does not travel." }] }
+      ] }
+  ]
+}

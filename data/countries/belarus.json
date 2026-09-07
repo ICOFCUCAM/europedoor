@@ -1,0 +1,44 @@
+{
+  "code": "by", "slug": "belarus", "name": "Belarus", "official": "Republic of Belarus",
+  "macro": "eastern", "capital": "Minsk", "currency": "BYN — Belarusian rouble",
+  "languages": ["Belarusian", "Russian"],
+  "blocs": [],
+  "advisory": {
+    "level": "avoid",
+    "note": "Many European governments advise against all or all but essential travel to Belarus, citing the security situation and the risk of arbitrary detention. This page records the country; it does not recommend visiting it. Check your own government's current advice."
+  },
+  "tagline": "Half forest, with the last primeval woodland in Europe and a capital rebuilt entirely in Stalinist stone.",
+  "summary": "Belarus is flat, forested and thinly populated, with the Belarusian half of Białowieża — the last primeval lowland forest on the continent — along its southwestern border. Minsk was almost completely destroyed in the Second World War and rebuilt as a planned socialist city, which makes it one of the most coherent examples of that architecture anywhere.",
+  "interests": ["nature", "wild", "history", "architecture"],
+  "budget": "low", "daily_eur": [25, 65],
+  "season": { "peak": ["jun", "jul", "aug"], "shoulder": ["may", "sep"],
+    "note": "Historically summer for the forests and lakes. This is context rather than a recommendation — see the advisory above." },
+  "getting_around": "Rail and long-distance buses historically linked all regional centres. Current practicalities are governed by border and visa conditions that change often.",
+  "food": ["Draniki, potato pancakes, at every table", "Machanka with pancakes, a pork gravy dish", "Rye bread and kvass"],
+  "festivals": [
+    { "name": "Kupalle, midsummer fire and water rites", "month": "jul", "where": "Rural regions" },
+    { "name": "Slavianski Bazaar", "month": "jul", "where": "Vitebsk" },
+    { "name": "Kolyady, the winter cycle", "month": "jan", "where": "Rural regions" }
+  ],
+  "know": ["Check your own government's current travel advice before considering any journey.", "This country is excluded from the Journey Planner.", "Border crossings and visa arrangements have changed repeatedly and current information ages fast."],
+  "regions": [
+    { "slug": "minsk-and-the-centre", "name": "Minsk & the Centre",
+      "summary": "The rebuilt capital and the castles west of it.",
+      "interests": ["architecture", "history"],
+      "cities": [
+        { "slug": "minsk", "name": "Minsk", "lat": 53.90, "lon": 27.57,
+          "summary": "A city rebuilt from almost nothing after 1944 along one monumental avenue, and unusually complete as a piece of urban design.",
+          "interests": ["architecture", "history", "cities"], "nights": [1, 2],
+          "highlights": ["Independence Avenue, 15 kilometres of Stalinist ensemble", "The Great Patriotic War museum", "Mir and Nesvizh castles, both UNESCO-listed, west of the city"] }
+      ] },
+    { "slug": "the-forests", "name": "The Forests",
+      "summary": "The Belarusian side of the primeval forest, and the lake district in the north.",
+      "interests": ["nature", "wild"],
+      "cities": [
+        { "slug": "belovezhskaya", "name": "Belovezhskaya Pushcha", "lat": 52.70, "lon": 23.85, "quiet": true,
+          "summary": "The Belarusian half of Europe's last primeval lowland forest, with bison and trees that have never been cut.",
+          "interests": ["wild", "nature"], "nights": [1, 2],
+          "highlights": ["European bison, reintroduced from captive stock after the species died out here", "Oaks over 500 years old", "A UNESCO site shared across the Polish border"] }
+      ] }
+  ]
+}

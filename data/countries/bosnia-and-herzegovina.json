@@ -1,0 +1,54 @@
+{
+  "code": "ba", "slug": "bosnia-and-herzegovina", "name": "Bosnia and Herzegovina",
+  "official": "Bosnia and Herzegovina",
+  "macro": "adriatic-balkans", "capital": "Sarajevo", "currency": "BAM — convertible mark",
+  "languages": ["Bosnian", "Croatian", "Serbian"],
+  "blocs": [],
+  "tagline": "Where the Ottoman and Austro-Hungarian worlds meet in one street, and the 1990s are still within touching distance.",
+  "summary": "Bosnia is mountainous, green and river-cut, with a capital where a mosque, a synagogue, an Orthodox and a Catholic church stand within a few hundred metres. The war of 1992–95 is visible in the buildings and unavoidable in conversation, and Bosnians discuss it more openly than visitors expect. It is one of the cheapest and most hospitable countries in Europe.",
+  "interests": ["history", "sacred", "mountains", "food", "nature"],
+  "budget": "low", "daily_eur": [30, 80],
+  "season": { "peak": ["may", "jun", "sep"], "shoulder": ["apr", "jul", "aug", "oct"],
+    "note": "Spring and early autumn are ideal. Sarajevo is hot and hazy in midsummer and snowy in winter — it hosted the 1984 Winter Olympics and still skis. Mostar in August is very hot and very full." },
+  "getting_around": "Buses are the network and they are frequent and cheap. The Sarajevo–Mostar railway is one of the most scenic short rides in Europe. A car reaches the mountain villages and the river canyons.",
+  "food": ["Ćevapi: small grilled minced-meat rolls in somun bread with raw onion", "Burek from a pekara, sold by weight, and never containing anything but meat — the others have other names", "Bosnian coffee, served with rahat lokum and a copper set, and drunk slowly"],
+  "festivals": [
+    { "name": "Sarajevo Film Festival", "month": "aug", "where": "Sarajevo" },
+    { "name": "Mostar Old Bridge diving competition", "month": "jul", "where": "Mostar" },
+    { "name": "Baščaršija Nights", "month": "jul", "where": "Sarajevo" }
+  ],
+  "know": ["Landmines still exist in some rural areas; stay on marked paths and heed the signs.", "The convertible mark is pegged to the euro and euros are often accepted in tourist areas.", "The country has two entities and three presidencies; flags and signage change meaningfully between towns."],
+  "regions": [
+    { "slug": "sarajevo-and-central-bosnia", "name": "Sarajevo & Central Bosnia",
+      "summary": "The capital in its valley, the Olympic mountains above, and the Ottoman towns north of it.",
+      "interests": ["history", "sacred", "food", "mountains"],
+      "cities": [
+        { "slug": "sarajevo", "name": "Sarajevo", "lat": 43.86, "lon": 18.41,
+          "summary": "An Ottoman bazaar at one end of a street and Habsburg apartment blocks at the other, in a valley ringed by mountains.",
+          "interests": ["history", "sacred", "food", "cities"], "nights": [2, 3],
+          "highlights": ["Baščaršija's coppersmiths, still hammering", "The Tunnel of Hope, dug under the airport runway during the siege", "The line marking east and west on Ferhadija street", "Trebević, the Olympic bobsleigh track, abandoned in the forest"],
+          "experiences": [
+            { "slug": "sarajevo-siege-tunnel", "name": "The Tunnel of Hope", "kind": "museum", "band": "low", "summary": "800 metres dug by hand under the runway; it kept the city alive for three years and is explained by people who used it." },
+            { "slug": "sarajevo-coffee-ritual", "name": "Bosnian coffee, properly", "kind": "table", "band": "low", "summary": "Džezva, fildžan, a sugar cube held in the teeth, and an hour of not being in a hurry." }
+          ] },
+        { "slug": "travnik", "name": "Travnik", "lat": 44.23, "lon": 17.67, "quiet": true,
+          "summary": "The Ottoman viziers' capital for 150 years, under a fortress, with a coloured mosque and a spring beneath it.",
+          "interests": ["history", "sacred", "food"], "nights": [1, 1],
+          "highlights": ["The Many-Coloured Mosque, painted rather than tiled", "Ivo Andrić's birthplace, and the novel he set here", "Vlašić cheese from the mountain above"] }
+      ] },
+    { "slug": "herzegovina", "name": "Herzegovina",
+      "summary": "The dry south: Mostar's bridge, a dervish house at a spring, and karst rivers.",
+      "interests": ["history", "sacred", "nature", "wine"],
+      "cities": [
+        { "slug": "mostar", "name": "Mostar", "lat": 43.34, "lon": 17.81,
+          "summary": "A 16th-century Ottoman bridge, destroyed in 1993 and rebuilt from the river stones, over a green-blue river.",
+          "interests": ["history", "architecture", "sacred"], "nights": [1, 2],
+          "highlights": ["Stari Most, and the divers who jump 24 metres from it", "The old bazaar, at seven in the morning before the day trips", "The front line street, still ruined, one block back"],
+          "experiences": [{ "slug": "mostar-bridge-dawn", "name": "The bridge before the buses", "kind": "walk", "band": "low", "summary": "Between six and nine the bazaar is a town rather than a market, and the bridge is a bridge." }] },
+        { "slug": "blagaj", "name": "Blagaj", "lat": 43.26, "lon": 17.89, "quiet": true,
+          "summary": "A dervish monastery built against a cliff at the source of the Buna, where a river comes out of a cave at full size.",
+          "interests": ["sacred", "nature"], "nights": [1, 1],
+          "highlights": ["The tekke, a Sufi lodge from around 1520, still in use", "The spring, one of Europe's largest karst sources", "Trout restaurants over the water below it"] }
+      ] }
+  ]
+}

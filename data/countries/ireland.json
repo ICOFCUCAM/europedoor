@@ -1,0 +1,55 @@
+{
+  "code": "ie", "slug": "ireland", "name": "Ireland", "official": "Ireland",
+  "macro": "british-isles", "capital": "Dublin", "currency": "EUR — euro",
+  "languages": ["English", "Irish"],
+  "blocs": ["eu", "eurozone", "eea", "cta"],
+  "tagline": "A small wet island that exported its writers, its music and a third of its people, and kept the landscape.",
+  "summary": "Ireland is green because it rains, and the rain arrives from the Atlantic in bands with sun between them. The west is the draw: limestone pavement, sea cliffs, a language still spoken daily, and traditional music played in pubs for the players rather than the audience. Dublin is small for a capital and dense with literary ghosts.",
+  "interests": ["coast", "music", "history", "nature", "sacred"],
+  "budget": "high", "daily_eur": [90, 200],
+  "season": { "peak": ["jun", "jul", "aug"], "shoulder": ["may", "sep"],
+    "note": "May and September give the best odds of dry days and the roads are passable. Summer is busy on the Wild Atlantic Way and accommodation in Kerry books out months ahead. Winter is dark, cheap and atmospheric if you want fires and sessions." },
+  "getting_around": "Dublin to Galway and Cork by train is easy; everything else really wants a car, and the small roads are small. Buses reach the peninsulas slowly. Ferries serve the Aran Islands from Rossaveel and Doolin.",
+  "food": ["Brown soda bread with butter and smoked salmon", "Oysters from Galway Bay, September onwards", "Seafood chowder, which is a meal and a test of a pub"],
+  "festivals": [
+    { "name": "St Patrick's Day", "month": "mar", "where": "Nationwide" },
+    { "name": "Galway International Arts Festival", "month": "jul", "where": "Galway" },
+    { "name": "Fleadh Cheoil, the traditional music championship", "month": "aug", "where": "A different town each year" }
+  ],
+  "know": ["Ireland is in the EU but not Schengen; the Common Travel Area with the UK works separately.", "Traditional sessions are for the musicians — sit, listen, and do not clap over the tune's end.", "Rural addresses often have no street numbers; Eircodes work where satnav does not."],
+  "regions": [
+    { "slug": "dublin-and-the-east", "name": "Dublin & the East",
+      "summary": "The capital, its literature, and a monastic valley in the mountains behind it.",
+      "interests": ["cities", "history", "music", "sacred"],
+      "cities": [
+        { "slug": "dublin", "name": "Dublin", "lat": 53.35, "lon": -6.26,
+          "summary": "Georgian squares, a 1,200-year-old river crossing, and four Nobel laureates in literature from one small city.",
+          "interests": ["cities", "history", "music", "food", "art"], "nights": [2, 3],
+          "highlights": ["The Book of Kells and the Long Room at Trinity", "Kilmainham Gaol, where the 1916 leaders were executed", "The National Gallery and the Hugh Lane, both free", "A session in the Cobblestone rather than Temple Bar"],
+          "experiences": [{ "slug": "dublin-trad-session", "name": "A real session, not a show", "kind": "stage", "band": "low", "summary": "Musicians sit in a circle facing each other, not the room; the etiquette is quiet during tunes and buy the round." }] },
+        { "slug": "glendalough", "name": "Glendalough", "lat": 53.01, "lon": -6.33, "quiet": true,
+          "summary": "A 6th-century monastic city in a glacial valley with two lakes, an hour from Dublin.",
+          "interests": ["sacred", "nature", "history"], "nights": [1, 1],
+          "highlights": ["The round tower, 30 metres, built as a bell tower and a refuge", "The Spinc ridge walk above the upper lake", "Early morning, before the coaches from Dublin"] }
+      ] },
+    { "slug": "the-west", "name": "The West & the Atlantic",
+      "summary": "Galway, the Burren's limestone, the Aran Islands and the cliffs.",
+      "interests": ["coast", "music", "nature", "islands"],
+      "cities": [
+        { "slug": "galway", "name": "Galway", "lat": 53.27, "lon": -9.06,
+          "summary": "A small port city that plays music every night of the week and treats a festival as its natural state.",
+          "interests": ["music", "food", "coast", "cities"], "nights": [2, 3],
+          "highlights": ["Music in the Latin Quarter, from about nine", "Oysters and Guinness at a bar that shucks them in front of you", "The Salthill prom walk, and kicking the wall at the end"],
+          "experiences": [{ "slug": "galway-oyster-bar", "name": "Oysters at the counter", "kind": "table", "band": "moderate", "summary": "Native flat oysters from the bay outside, September to April; a dozen, brown bread, and no ceremony." }] },
+        { "slug": "aran-islands", "name": "The Aran Islands (Inis Mór)", "lat": 53.11, "lon": -9.75, "quiet": true,
+          "summary": "Three limestone islands where Irish is the daily language and stone walls divide fields the size of rooms.",
+          "interests": ["islands", "history", "nature", "coast"], "nights": [1, 2],
+          "highlights": ["Dún Aonghasa, a prehistoric fort on an 87-metre cliff with no railing", "1,600 km of dry stone wall on an island 14 km long", "Bicycles, because there is almost nothing else"],
+          "experiences": [{ "slug": "inis-mor-bicycle-day", "name": "The island by bicycle", "kind": "ride", "band": "low", "summary": "Hire at the pier, ride the length of it, and be back for the last ferry — the island's whole scale in one day." }] },
+        { "slug": "dingle", "name": "Dingle", "lat": 52.14, "lon": -10.27,
+          "summary": "A fishing town on a peninsula of beehive huts, empty beaches and the westernmost point of Europe's mainland fringe.",
+          "interests": ["coast", "music", "food", "sacred"], "nights": [2, 3],
+          "highlights": ["The Slea Head drive, and stopping at the clocháin", "Gallarus Oratory, dry-stone and watertight after 1,200 years", "Music in pubs that are also hardware shops"] }
+      ] }
+  ]
+}

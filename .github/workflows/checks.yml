@@ -1,0 +1,48 @@
+name: checks
+
+# The generated site is committed, so the first thing CI does is rebuild it
+# and fail if the result differs from what is in the repository. Everything
+# else is downstream of that: a stale site/ means the checks below are
+# validating output nobody is going to serve.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate the dataset
+        run: python3 tools/build.py check
+
+      - name: Rebuild the site
+        run: python3 tools/build.py
+
+      - name: Fail if the committed site is stale
+        run: |
+          if ! git diff --quiet -- site/; then
+            echo "site/ is out of date. Run: python3 tools/build.py && git add site/"
+            git diff --stat -- site/
+            exit 1
+          fi
+
+      - name: Checks
+        run: python3 tools/checks.py
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Browser checks
+        run: |
+          npm install --no-save playwright@1.49.0
+          npx playwright install --with-deps chromium
+          node tools/browser-checks.js

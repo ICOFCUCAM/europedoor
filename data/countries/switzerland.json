@@ -1,0 +1,62 @@
+{
+  "code": "ch", "slug": "switzerland", "name": "Switzerland", "official": "Swiss Confederation",
+  "macro": "alpine-central", "capital": "Bern", "currency": "CHF — Swiss franc",
+  "languages": ["German", "French", "Italian", "Romansh"],
+  "blocs": ["schengen"],
+  "tagline": "The most expensive country in Europe and the one that most reliably justifies it.",
+  "summary": "Switzerland is four language regions, twenty-six cantons and a public transport system that works so well it changes how you travel: a postbus meets the train, the train meets the boat, and all three are punctual to the minute. The Alps take up 60% of the land and are threaded with cable cars and mountain huts. Nothing is cheap and almost nothing is broken.",
+  "interests": ["mountains", "rail", "winter", "nature", "food", "design"],
+  "budget": "high", "daily_eur": [140, 300],
+  "season": { "peak": ["jun", "jul", "aug", "dec", "jan", "feb"], "shoulder": ["may", "sep", "oct"],
+    "note": "High mountain trails open from late June and close with the first snow in October. September is the best month up high: stable weather, clear air, cows coming down. May and November are between seasons and many lifts simply stop." },
+  "getting_around": "The rail network is the product. A Swiss Travel Pass covers trains, buses, boats and most mountain railways; without one, individual tickets are eye-watering. Timetables interlock, so a four-minute connection is a real connection.",
+  "food": ["Cheese in its own right — Gruyère, Appenzeller, raclette scraped off the wheel", "Rösti, and the Röstigraben that divides German from French Switzerland", "Chocolate, bought from a maker rather than an airport"],
+  "festivals": [
+    { "name": "Fasnacht, Basel's carnival, starting at 4 am", "month": "feb", "where": "Basel" },
+    { "name": "Alpabzug — cattle descending in flowers", "month": "sep", "where": "Alpine valleys" },
+    { "name": "Montreux Jazz Festival", "month": "jul", "where": "Montreux" }
+  ],
+  "know": ["Not in the EU; in Schengen. The franc is the currency and euros are accepted at a poor rate.", "Mountain weather turns fast and huts must be booked; the SAC app carries conditions.", "Tap water in villages and from most fountains is drinkable unless marked otherwise."],
+  "regions": [
+    { "slug": "bernese-oberland", "name": "The Bernese Oberland",
+      "summary": "The classic Alps: Eiger, Mönch and Jungfrau above green valleys full of cog railways.",
+      "interests": ["mountains", "rail", "winter", "nature"],
+      "cities": [
+        { "slug": "lauterbrunnen", "name": "Lauterbrunnen", "lat": 46.59, "lon": 7.91,
+          "summary": "A valley with vertical walls and seventy-two waterfalls, and car-free villages on the shelves above it.",
+          "interests": ["mountains", "nature", "rail"], "nights": [2, 4],
+          "highlights": ["Mürren and Gimmelwald, reachable only by cable car or on foot", "Trümmelbach: ten glacier waterfalls inside the mountain", "The Schilthorn, and the Eiger north face opposite"],
+          "experiences": [
+            { "slug": "north-face-trail", "name": "The North Face trail from Mürren", "kind": "walk", "band": "moderate", "summary": "Two hours on a balcony path with the Eiger, Mönch and Jungfrau directly across the valley the whole way." }
+          ] },
+        { "slug": "bern", "name": "Bern", "lat": 46.95, "lon": 7.45,
+          "summary": "The federal capital: six kilometres of arcades, a river you swim down, and Einstein's flat above a café.",
+          "interests": ["architecture", "history", "cities"], "nights": [1, 2],
+          "highlights": ["Swimming the Aare with the current, as the city does all summer", "The Zytglogge clock's mechanism, from 1530", "Paul Klee's collection in a Renzo Piano wave"],
+          "experiences": [{ "slug": "bern-aare-swim", "name": "Float the Aare", "kind": "water", "band": "low", "summary": "Walk upstream, get in, and let the river carry you back through the city — with a dry bag and a firm plan for getting out." }] }
+      ] },
+    { "slug": "valais-and-the-south", "name": "Valais, Ticino & the South",
+      "summary": "The Matterhorn, the highest vineyards in Europe, and an Italian-speaking canton over the pass.",
+      "interests": ["mountains", "wine", "winter", "food"],
+      "cities": [
+        { "slug": "zermatt", "name": "Zermatt", "lat": 46.02, "lon": 7.75,
+          "summary": "A car-free village under the most photographed mountain on earth, with skiing possible in July.",
+          "interests": ["mountains", "winter", "rail"], "nights": [2, 4],
+          "highlights": ["The Matterhorn from the Riffelsee at sunrise, reflected", "Gornergrat railway to 3,089 metres", "The Haute Route, ending here from Chamonix"] },
+        { "slug": "lugano", "name": "Lugano", "lat": 46.00, "lon": 8.95,
+          "summary": "Palm trees, a glacial lake and Italian spoken everywhere, twenty minutes from the Alps.",
+          "interests": ["coast", "food", "art", "nature"], "nights": [1, 2],
+          "highlights": ["Monte Brè and Monte San Salvatore by funicular", "The lakeside promenade and the ferries to Gandria", "Italian food at Swiss standards of execution"] }
+      ] },
+    { "slug": "graubunden", "name": "Graubünden & the East",
+      "summary": "Romansh country, the Rhaetian Railway's viaducts, and the highest mainline pass in the Alps.",
+      "interests": ["rail", "mountains", "winter", "nature"],
+      "cities": [
+        { "slug": "st-moritz", "name": "St. Moritz & the Engadin", "lat": 46.50, "lon": 9.84,
+          "summary": "A high valley of lakes at 1,800 metres, with sgraffito villages and 322 days of sun a year.",
+          "interests": ["winter", "mountains", "design", "rail"], "nights": [2, 3],
+          "highlights": ["The Bernina Express over a UNESCO-listed railway to Italy", "Segantini's paintings where he painted them", "Cross-country skiing on frozen lakes in February"],
+          "experiences": [{ "slug": "bernina-express", "name": "The Bernina line to Tirano", "kind": "ride", "band": "moderate", "summary": "From glacier to palm trees in four hours, over the Landwasser viaduct and around the Brusio spiral — booked as a normal train, not a tour." }] }
+      ] }
+  ]
+}

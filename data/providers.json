@@ -1,1 +1,44 @@
-{ "tiers": [], "providers": [] }
+{
+  "tiers": [
+    { "name": "Applied", "who": "Listed, unverified", "badge": "Shown as unverified on every surface",
+      "means": "You have submitted a listing and we have not yet checked it. It appears with that stated plainly, and it does not appear in any recommendation." },
+    { "name": "Reviewed", "who": "Business confirmed", "badge": "Registration and contact confirmed",
+      "means": "We have confirmed you exist: a registration number or a guide licence, an address, and a person who answered the phone." },
+    { "name": "Verified", "who": "Checked in person or by a partner", "badge": "Visited, or vouched for by a named local partner",
+      "means": "Someone has been, or a partner organisation we name has vouched for you. Insurance is confirmed where the activity needs it, and prices published here are the prices you charge." }
+  ],
+  "providers": [
+    { "slug": "example-fjord-guide", "name": "Example: a licensed fjord walking guide", "kind": "Guide",
+      "city": "Bergen", "country": "norway", "tier": "verified",
+      "summary": "Illustrative record showing a single-person guiding business: licence number, insurance for mountain terrain, group size cap and a published price.",
+      "checks": ["Guide certification", "Public liability insurance", "Group size cap stated", "Price includes transfer"] },
+    { "slug": "example-cellar", "name": "Example: a family wine cellar", "kind": "Cellar",
+      "city": "Sighnaghi", "country": "georgia", "tier": "reviewed",
+      "summary": "Illustrative record for a small producer offering tastings: registration confirmed, address confirmed, no in-person visit yet.",
+      "checks": ["Business registration", "Address confirmed", "Named contact"] },
+    { "slug": "example-guesthouse", "name": "Example: a mountain guesthouse", "kind": "Accommodation",
+      "city": "Theth", "country": "albania", "tier": "reviewed",
+      "summary": "Illustrative record for a family guesthouse on a walking route, showing capacity, meal arrangements and access.",
+      "checks": ["Business registration", "Named contact", "Capacity stated"] },
+    { "slug": "example-museum", "name": "Example: a municipal museum", "kind": "Museum",
+      "city": "Plovdiv", "country": "bulgaria", "tier": "verified",
+      "summary": "Illustrative record for a public institution: opening hours, accessibility, and free-entry days published rather than hidden.",
+      "checks": ["Public institution", "Opening hours confirmed", "Accessibility stated", "Free days published"] },
+    { "slug": "example-kitchen", "name": "Example: a cooking table", "kind": "Food experience",
+      "city": "Palermo", "country": "italy", "tier": "applied",
+      "summary": "Illustrative record for a home cooking table that has applied and has not yet been checked — shown as unverified, and excluded from recommendations.",
+      "checks": [] },
+    { "slug": "example-boat", "name": "Example: a licensed passenger boat", "kind": "Operator",
+      "city": "Húsavík", "country": "iceland", "tier": "verified",
+      "summary": "Illustrative record for a wildlife boat operator: passenger licence, safety equipment, and a stated policy on approach distance to animals.",
+      "checks": ["Passenger vessel licence", "Safety equipment", "Wildlife approach policy", "No-sighting refund policy"] },
+    { "slug": "example-rail-operator", "name": "Example: a heritage railway", "kind": "Transport",
+      "city": "Mokra Gora", "country": "serbia", "tier": "reviewed",
+      "summary": "Illustrative record for a scheduled heritage rail service, showing timetable, seasonality and ticketing.",
+      "checks": ["Operator registration", "Published timetable", "Named contact"] },
+    { "slug": "example-workshop", "name": "Example: a craft workshop", "kind": "Workshop",
+      "city": "Sheki", "country": "azerbaijan", "tier": "applied",
+      "summary": "Illustrative record for a shebeke lattice workshop that has applied for a listing. Unverified, and shown as such.",
+      "checks": [] }
+  ]
+}

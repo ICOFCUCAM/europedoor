@@ -1,0 +1,69 @@
+{
+  "code": "ro", "slug": "romania", "name": "Romania", "official": "Romania",
+  "macro": "adriatic-balkans", "capital": "Bucharest", "currency": "RON — Romanian leu",
+  "languages": ["Romanian", "Hungarian", "German"],
+  "blocs": ["eu", "schengen", "eea"],
+  "tagline": "Saxon fortified churches, painted monasteries, and the largest population of brown bears in Europe.",
+  "summary": "Romania is a Latin language surrounded by Slavic ones, with a German-founded Transylvania in the middle and an Orthodox monastic north. It has Europe's largest remaining virgin forest, some 6,000 brown bears, and hay meadows farmed by scythe in villages where that never stopped. Bucharest carries the marks of Ceaușescu's demolitions and the Belle Époque city he demolished.",
+  "interests": ["history", "sacred", "mountains", "nature", "wild", "architecture"],
+  "budget": "low", "daily_eur": [30, 85],
+  "season": { "peak": ["may", "jun", "sep"], "shoulder": ["apr", "jul", "aug", "oct"],
+    "note": "May and June for hay meadows and wildflowers, September for the light and the food. The Transfăgărășan road opens roughly July to October and is closed by snow the rest of the year. Winter is cold and the Carpathian ski areas are cheap." },
+  "getting_around": "Trains are slow but reach the Transylvanian towns and the Danube. Buses and minibuses fill the gaps. A car is close to essential for the Saxon villages and the painted monasteries.",
+  "food": ["Sarmale: cabbage rolls with polenta and sour cream", "Ciorbă, a sour soup, in dozens of versions", "Țuică and pălincă, plum spirits, home-distilled and strong"],
+  "festivals": [
+    { "name": "Easter in Bucovina, with painted eggs", "month": "apr", "where": "Bucovina" },
+    { "name": "Sighișoara Medieval Festival", "month": "jul", "where": "Sighișoara" },
+    { "name": "George Enescu Festival, odd-numbered years", "month": "sep", "where": "Bucharest" }
+  ],
+  "know": ["Bears are genuinely present in the Carpathians; do not feed them from a car, which is both illegal and how people get hurt.", "The leu, not the euro.", "Village guesthouses (pensiuni) are the best accommodation in the country and cost very little."],
+  "regions": [
+    { "slug": "transylvania", "name": "Transylvania",
+      "summary": "Saxon fortified churches, walled towns, and the Carpathian ridge behind them.",
+      "interests": ["history", "architecture", "mountains", "wild"],
+      "cities": [
+        { "slug": "brasov", "name": "Brașov", "lat": 45.65, "lon": 25.61,
+          "summary": "A Saxon town under a wooded mountain, with the largest gothic church between Vienna and Istanbul.",
+          "interests": ["history", "mountains", "architecture", "food"], "nights": [2, 3],
+          "highlights": ["The Black Church, and its collection of Anatolian carpets", "Tâmpa mountain, straight up behind the square", "Bran and Râșnov castles nearby — the first has little to do with Dracula"],
+          "experiences": [{ "slug": "carpathian-bear-hide", "name": "A bear hide in the Carpathians", "kind": "wild", "band": "moderate", "summary": "Licensed hides run by biologists at dusk; Romania holds most of Europe's brown bears and this is the ethical way to see one." }] },
+        { "slug": "sighisoara", "name": "Sighișoara", "lat": 46.22, "lon": 24.79,
+          "summary": "A walled Saxon citadel still lived in, with a clock tower and a covered stairway to a hilltop school.",
+          "interests": ["history", "architecture"], "nights": [1, 2],
+          "highlights": ["The clock tower's figures, turning since 1648", "The covered stairway, 175 steps, built so children could get to school in snow", "Painted guild houses inside the walls"] },
+        { "slug": "viscri", "name": "Viscri", "lat": 46.06, "lon": 25.09, "quiet": true,
+          "summary": "A single-street Saxon village with a fortified church, horses on the road, and no through traffic.",
+          "interests": ["history", "nature", "food", "sacred"], "nights": [1, 2],
+          "highlights": ["The fortified church, whitewashed, on the UNESCO list", "Hay meadows with some of the richest plant diversity in Europe", "Guesthouses in restored Saxon houses with blue-painted gates"],
+          "experiences": [{ "slug": "saxon-village-haymaking", "name": "Haymaking with a scythe", "kind": "workshop", "band": "low", "summary": "The meadows are cut by hand because machines would destroy them; in June the villages will show you how and it is harder than it looks." }] }
+      ] },
+    { "slug": "bucovina-and-maramures", "name": "Bucovina & Maramureș",
+      "summary": "The painted monasteries of the north, and wooden churches with shingle spires.",
+      "interests": ["sacred", "history", "nature"],
+      "cities": [
+        { "slug": "gura-humorului", "name": "Gura Humorului & the painted monasteries", "lat": 47.55, "lon": 25.90, "quiet": true,
+          "summary": "The base for a group of 15th- and 16th-century monasteries frescoed on the outside walls and still bright.",
+          "interests": ["sacred", "history", "art"], "nights": [1, 2],
+          "highlights": ["Voroneț's blue, a pigment nobody has fully reproduced", "Sucevița's Ladder of Virtue, thirty rungs across a wall", "Exterior frescoes that have survived five centuries of Carpathian weather"],
+          "experiences": [{ "slug": "voronet-blue", "name": "The blue at Voroneț", "kind": "sacred", "band": "low", "summary": "A 1547 exterior fresco whose blue has not faded in five hundred winters, and whose recipe is still not known." }] },
+        { "slug": "sapanta", "name": "Săpânța & Maramureș", "lat": 47.97, "lon": 23.70, "quiet": true,
+          "summary": "Wooden churches with tall shingled spires, and a cemetery where every headstone is painted, rhymed and often rude.",
+          "interests": ["sacred", "history", "food"], "nights": [1, 2],
+          "highlights": ["The Merry Cemetery: 800 carved oak crosses with verses about the dead", "Wooden churches on the UNESCO list, built without nails", "Horse carts, which are transport rather than heritage"] }
+      ] },
+    { "slug": "bucharest-and-the-danube", "name": "Bucharest & the Danube Delta",
+      "summary": "The capital, and Europe's largest wetland where the river reaches the Black Sea.",
+      "interests": ["architecture", "wild", "nature", "food"],
+      "cities": [
+        { "slug": "bucharest", "name": "Bucharest", "lat": 44.43, "lon": 26.10,
+          "summary": "Belle Époque boulevards, communist megastructures, and the second-largest administrative building on earth.",
+          "interests": ["architecture", "history", "food", "cities"], "nights": [1, 2],
+          "highlights": ["The Palace of the Parliament, which required demolishing a fifth of the old city", "The Village Museum: 300 relocated buildings in a park", "Lipscani's bars, in the old merchant quarter"] },
+        { "slug": "tulcea", "name": "Tulcea & the Danube Delta", "lat": 45.18, "lon": 28.80, "quiet": true,
+          "summary": "The gateway to 5,800 square kilometres of reed, channel and lake, with 300 bird species and villages reachable only by boat.",
+          "interests": ["wild", "nature", "food"], "nights": [2, 3],
+          "highlights": ["Pelican colonies, the largest outside Africa", "Fishing villages with no road access at all", "Fish soup cooked on the boat, in the delta, by the person who caught it"],
+          "experiences": [{ "slug": "danube-delta-boat", "name": "Into the delta by small boat", "kind": "wild", "band": "moderate", "summary": "The big tour boats stay in the main channels; a local with a small engine gets you into the reed corridors where the birds are." }] }
+      ] }
+  ]
+}

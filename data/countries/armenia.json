@@ -1,0 +1,50 @@
+{
+  "code": "am", "slug": "armenia", "name": "Armenia", "official": "Republic of Armenia",
+  "macro": "caucasus-bosphorus", "capital": "Yerevan", "currency": "AMD — Armenian dram",
+  "languages": ["Armenian"],
+  "blocs": [],
+  "tagline": "The first state to adopt Christianity, in 301, with monasteries in gorges and a mountain it can see but not reach.",
+  "summary": "Armenia is high, dry and volcanic, with an alphabet invented in 405 and a monastic architecture of grey tufa that sits in landscapes chosen for isolation. Mount Ararat dominates the skyline from Yerevan and stands across the closed Turkish border. The country is landlocked with two of its four borders shut, which shapes everything about how you get in and out.",
+  "interests": ["sacred", "history", "mountains", "food", "wine"],
+  "budget": "low", "daily_eur": [25, 70],
+  "season": { "peak": ["may", "jun", "sep", "oct"], "shoulder": ["apr", "jul", "aug"],
+    "note": "Spring and autumn; Yerevan is very hot in July and August and the high monasteries are snowbound in winter. Lake Sevan is swimmable, briefly, in August." },
+  "getting_around": "Marshrutkas from Yerevan reach the regions. A hired car and driver is affordable and makes the monasteries practical. Borders with Türkiye and Azerbaijan are closed; entry is via Georgia or by air.",
+  "food": ["Lavash, baked on the wall of a tonir oven and UNESCO-listed", "Khorovats, barbecue, which is the centre of any gathering", "Areni wine, from a valley with a 6,100-year-old winery in a cave"],
+  "festivals": [
+    { "name": "Vardavar, when everyone throws water at everyone", "month": "jul", "where": "Nationwide" },
+    { "name": "Areni wine festival", "month": "oct", "where": "Areni" },
+    { "name": "Genocide Remembrance Day", "month": "apr", "where": "Yerevan" }
+  ],
+  "know": ["The borders with Türkiye and Azerbaijan are closed; overland routes go through Georgia or Iran.", "The genocide of 1915 is central to national memory and the memorial is treated with real solemnity.", "Monasteries are working churches; women are not required to cover but modest dress is expected."],
+  "regions": [
+    { "slug": "yerevan-and-ararat", "name": "Yerevan & the Ararat Plain",
+      "summary": "The pink tufa capital, the cathedral that founded a church, and the temple that predates it.",
+      "interests": ["sacred", "history", "food", "cities"],
+      "cities": [
+        { "slug": "yerevan", "name": "Yerevan", "lat": 40.18, "lon": 44.51,
+          "summary": "A capital rebuilt in pink volcanic stone to a 1924 plan, with Ararat filling the southern horizon.",
+          "interests": ["history", "food", "art", "cities"], "nights": [2, 3],
+          "highlights": ["The Cascade, a stairway of terraces and sculpture", "Matenadaran, a library of 17,000 medieval manuscripts", "The Vernissage market at weekends", "Echmiadzin cathedral, from 301, twenty minutes west"],
+          "experiences": [{ "slug": "yerevan-matenadaran", "name": "The manuscript library", "kind": "museum", "band": "low", "summary": "Illuminated books rescued repeatedly over centuries, some buried during massacres and dug up afterwards." }] },
+        { "slug": "garni", "name": "Garni & Geghard", "lat": 40.11, "lon": 44.73,
+          "summary": "A Hellenistic temple on a gorge, and a monastery partly carved out of the rock face next door.",
+          "interests": ["history", "sacred", "nature"], "nights": [1, 1],
+          "highlights": ["Garni: the only Greco-Roman colonnaded temple left in the former Soviet Union", "Geghard's rock-cut chambers and their acoustics", "The basalt 'symphony of stones' columns in the gorge below"],
+          "experiences": [{ "slug": "geghard-chant", "name": "Chant in a rock-cut chamber", "kind": "sacred", "band": "low", "summary": "Singers perform in the carved chambers because the acoustics are extraordinary; the sound arrives from the stone itself." }] }
+      ] },
+    { "slug": "north-and-south", "name": "The North & South",
+      "summary": "Forested monasteries in the north, Lake Sevan in the middle, and a cable car to a monastery in the south.",
+      "interests": ["sacred", "mountains", "nature", "wine"],
+      "cities": [
+        { "slug": "dilijan", "name": "Dilijan", "lat": 40.74, "lon": 44.87, "quiet": true,
+          "summary": "A forested spa town called 'Armenian Switzerland', with two of the country's finest monasteries in the woods nearby.",
+          "interests": ["nature", "sacred", "mountains"], "nights": [1, 2],
+          "highlights": ["Haghartsin and Goshavank monasteries in deep forest", "The Transcaucasian Trail through the national park", "Lake Sevan, thirty minutes away at 1,900 metres"] },
+        { "slug": "tatev", "name": "Tatev", "lat": 39.38, "lon": 46.25, "quiet": true,
+          "summary": "A 9th-century monastery on a cliff in the far south, reached by the world's longest reversible cable car.",
+          "interests": ["sacred", "mountains", "history"], "nights": [1, 1],
+          "highlights": ["The Wings of Tatev cable car, 5.7 km over a gorge", "The monastery's swinging pillar, an early seismograph", "The Vorotan gorge below"] }
+      ] }
+  ]
+}

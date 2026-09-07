@@ -1,0 +1,46 @@
+{
+  "code": "mk", "slug": "north-macedonia", "name": "North Macedonia", "official": "Republic of North Macedonia",
+  "macro": "adriatic-balkans", "capital": "Skopje", "currency": "MKD — Macedonian denar",
+  "languages": ["Macedonian", "Albanian"],
+  "blocs": [],
+  "tagline": "One of the oldest lakes on earth, a bazaar that never stopped trading, and a capital that rebuilt itself in marble.",
+  "summary": "North Macedonia is landlocked, mountainous, and centred on Lake Ohrid — between three and five million years old, with sixty endemic species and a town of churches on its shore. Skopje was flattened by an earthquake in 1963, rebuilt in concrete, and then rebuilt again in the 2010s in a neoclassical style that its own citizens argue about constantly.",
+  "interests": ["sacred", "history", "nature", "food", "mountains"],
+  "budget": "low", "daily_eur": [25, 70],
+  "season": { "peak": ["may", "jun", "sep"], "shoulder": ["apr", "jul", "aug", "oct"],
+    "note": "Ohrid is warm and swimmable from June to September and the town is busy in August. Spring and early autumn are best for the mountains and the monasteries. Winter is cold and there is decent cheap skiing at Mavrovo." },
+  "getting_around": "Buses connect Skopje, Ohrid and Bitola; the roads through the mountains are slow. Trains exist and are slower still. A car opens up the monasteries and Mavrovo.",
+  "food": ["Tavče gravče: baked beans in a clay dish, the national dish", "Ajvar, made in vast quantities every September", "Ohrid trout — check it is farmed, as the endemic wild one is protected"],
+  "festivals": [
+    { "name": "Ohrid Summer Festival", "month": "jul", "where": "Ohrid" },
+    { "name": "Galičnik wedding, a village wedding staged as a festival", "month": "jul", "where": "Galičnik" },
+    { "name": "Skopje Jazz Festival", "month": "oct", "where": "Skopje" }
+  ],
+  "know": ["The name changed in 2019 after a long dispute with Greece; both the old and new forms are still heard.", "Wild Ohrid trout is protected and should not be ordered.", "Cash is common outside the cities."],
+  "regions": [
+    { "slug": "ohrid-and-the-southwest", "name": "Ohrid & the Southwest",
+      "summary": "The ancient lake, its churches, and the mountains between here and Albania.",
+      "interests": ["sacred", "nature", "history", "coast"],
+      "cities": [
+        { "slug": "ohrid", "name": "Ohrid", "lat": 41.12, "lon": 20.80,
+          "summary": "A town of Byzantine churches on a cliff over one of the world's oldest lakes, with a Slavic literary tradition that began here.",
+          "interests": ["sacred", "nature", "history", "coast"], "nights": [2, 3],
+          "highlights": ["Sveti Jovan Kaneo, on a cliff over the water", "The lake itself: 3–5 million years old, 288 metres deep", "Plaošnik, where Cyrillic literacy was taught in the 9th century", "Swimming from the town beaches in July and August"],
+          "experiences": [{ "slug": "ohrid-lake-boat", "name": "Across the lake to Sveti Naum", "kind": "water", "band": "low", "summary": "An hour and a half by boat to a monastery at the springs on the Albanian border, past cliffs with nothing else on them." }] },
+        { "slug": "bitola", "name": "Bitola", "lat": 41.03, "lon": 21.34, "quiet": true,
+          "summary": "A former consular city with a wide pedestrian avenue, and the Roman ruins of Heraclea on its edge.",
+          "interests": ["history", "food", "architecture"], "nights": [1, 2],
+          "highlights": ["Širok Sokak, built for nineteenth-century diplomats and still promenaded", "Heraclea Lyncestis's mosaic floors", "Pelister national park's pines and glacial lakes above the town"] }
+      ] },
+    { "slug": "skopje-and-the-north", "name": "Skopje & the North",
+      "summary": "The rebuilt capital, its Ottoman bazaar, and the canyon at the edge of it.",
+      "interests": ["history", "food", "nature", "architecture"],
+      "cities": [
+        { "slug": "skopje", "name": "Skopje", "lat": 41.99, "lon": 21.43,
+          "summary": "A capital with the largest Ottoman bazaar in the Balkans on one bank and a marble-clad neoclassical rebuild on the other.",
+          "interests": ["history", "food", "architecture", "cities"], "nights": [1, 2],
+          "highlights": ["The Old Bazaar, trading continuously since the 12th century", "The Stone Bridge, and the argument in stone on either side of it", "Matka canyon, twenty minutes out, with caves and a kayak club"],
+          "experiences": [{ "slug": "skopje-old-bazaar", "name": "The Old Bazaar at working hours", "kind": "walk", "band": "low", "summary": "Coppersmiths, filigree, tea houses and mosques — a working market rather than a preserved one, best before noon." }] }
+      ] }
+  ]
+}

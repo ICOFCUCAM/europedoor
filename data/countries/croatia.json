@@ -1,0 +1,68 @@
+{
+  "code": "hr", "slug": "croatia", "name": "Croatia", "official": "Republic of Croatia",
+  "macro": "adriatic-balkans", "capital": "Zagreb", "currency": "EUR — euro",
+  "languages": ["Croatian"],
+  "blocs": ["eu", "schengen", "eurozone", "eea"],
+  "tagline": "A thousand islands, a Roman emperor's palace still lived in, and lakes that fall into each other.",
+  "summary": "Croatia is shaped like a pair of tongs around Bosnia, with a long limestone coast and a flat continental interior that visitors skip. The Adriatic islands — 1,244 of them, 48 inhabited — are the draw, along with two Roman-founded cities that never stopped being used. It joined Schengen and the euro in 2023, which changed the practicalities considerably.",
+  "interests": ["coast", "islands", "history", "nature", "food", "wine"],
+  "budget": "moderate", "daily_eur": [55, 140],
+  "season": { "peak": ["jun", "jul", "aug", "sep"], "shoulder": ["may", "oct"],
+    "note": "June and September are the best months: warm sea, open ferries, tolerable Dubrovnik. August is the Adriatic at capacity. Plitvice is at its best in October colour or under May snowmelt. Winter closes most island infrastructure." },
+  "getting_around": "Jadrolinija ferries and catamarans link the islands and run reduced schedules out of season. Buses beat trains everywhere. The coastal road is beautiful and slow; the inland motorway is fast.",
+  "food": ["Peka: meat or octopus baked under a bell with embers on top, ordered hours ahead", "Istrian truffles and olive oil, both world class and cheaper here", "Pošip and plavac mali — white and red from the Dalmatian islands"],
+  "festivals": [
+    { "name": "Dubrovnik Summer Festival", "month": "jul", "where": "Dubrovnik" },
+    { "name": "Rijeka Carnival", "month": "feb", "where": "Rijeka" },
+    { "name": "Truffle season and fairs", "month": "oct", "where": "Motovun, Istria" }
+  ],
+  "know": ["Euro and Schengen since 2023 — the old kuna is gone and the Slovenian border is open.", "Water shoes are genuinely useful; most beaches are pebble or rock.", "Dubrovnik's old town has cruise-ship peaks; check the arrivals calendar and go on a light day."],
+  "regions": [
+    { "slug": "dalmatia", "name": "Dalmatia",
+      "summary": "The southern coast: Split's palace, Dubrovnik's walls, and the islands between them.",
+      "interests": ["coast", "islands", "history", "food"],
+      "cities": [
+        { "slug": "split", "name": "Split", "lat": 43.51, "lon": 16.44,
+          "summary": "A Roman emperor's retirement palace that became a town — people live inside the walls and always have.",
+          "interests": ["history", "coast", "food", "cities"], "nights": [2, 3],
+          "highlights": ["Diocletian's Palace, occupied continuously since 305 AD", "The Riva at passeggiata hour", "Marjan hill's pine woods and swimming coves, walkable from the centre", "Ferries to Hvar, Brač and Vis from the door"],
+          "experiences": [{ "slug": "split-palace-cellars", "name": "The palace substructures", "kind": "walk", "band": "low", "summary": "The cellars survive because they were filled with rubbish for centuries; they map the imperial floor plan above exactly." }] },
+        { "slug": "dubrovnik", "name": "Dubrovnik", "lat": 42.65, "lon": 18.09,
+          "summary": "A maritime republic in near-perfect limestone, walled, car-free, and under real pressure from its own popularity.",
+          "interests": ["history", "coast", "architecture"], "nights": [2, 3],
+          "highlights": ["The walls, walked at opening or in the last hour", "Lokrum island, ten minutes by boat, with a monastery and peacocks", "The Rector's Palace and the 1317 pharmacy still trading"] },
+        { "slug": "vis", "name": "Vis", "lat": 43.06, "lon": 16.18, "quiet": true,
+          "summary": "The furthest inhabited Dalmatian island, closed to foreigners as a military base until 1989 and undeveloped because of it.",
+          "interests": ["islands", "coast", "food", "wine"], "nights": [2, 3],
+          "highlights": ["Stiniva cove, reached down a scree gully or by boat", "Komiža's fishing harbour and the Blue Cave on Biševo", "Vugava and plavac from vines behind the town"],
+          "experiences": [{ "slug": "vis-fisherman-peka", "name": "Peka in a village konoba", "kind": "table", "band": "moderate", "summary": "Ordered by phone that morning: octopus and potatoes under an iron bell buried in embers for three hours." }] }
+      ] },
+    { "slug": "istria-and-kvarner", "name": "Istria & Kvarner",
+      "summary": "A truffle-and-olive peninsula with Venetian hill towns, and the islands of the northern gulf.",
+      "interests": ["food", "wine", "coast", "history"],
+      "cities": [
+        { "slug": "rovinj", "name": "Rovinj", "lat": 45.08, "lon": 13.64,
+          "summary": "A Venetian fishing town on a former island, with a campanile copied from San Marco and houses straight into the sea.",
+          "interests": ["coast", "food", "architecture"], "nights": [2, 3],
+          "highlights": ["The old town's stepped lanes, all of them ending at water", "Golden Cape forest park, cycled or walked", "Istrian tables — truffle, prosciutto, malvazija — at half Italian prices"] },
+        { "slug": "motovun", "name": "Motovun", "lat": 45.34, "lon": 13.83, "quiet": true,
+          "summary": "A walled hill town over a truffle forest, with a walkable rampart and a view of the whole Mirna valley.",
+          "interests": ["food", "wine", "history"], "nights": [1, 2],
+          "highlights": ["Truffle hunting in the Motovun forest with dogs, October and November", "The Parenzana, a disused railway turned cycle path", "Istrian malvazija from cellars in the villages below"] }
+      ] },
+    { "slug": "inland-croatia", "name": "Inland Croatia",
+      "summary": "Zagreb's Austro-Hungarian centre, and the lakes and waterfalls of the karst interior.",
+      "interests": ["nature", "cities", "architecture"],
+      "cities": [
+        { "slug": "zagreb", "name": "Zagreb", "lat": 45.81, "lon": 15.98,
+          "summary": "A central European capital of coffee terraces and museums, with almost nothing Mediterranean about it.",
+          "interests": ["cities", "art", "food", "architecture"], "nights": [1, 2],
+          "highlights": ["The Museum of Broken Relationships, which is much better than the joke", "Dolac market above the main square", "The Upper Town, and the gas lamps still lit by hand each evening"] },
+        { "slug": "plitvice", "name": "Plitvice Lakes", "lat": 44.88, "lon": 15.62,
+          "summary": "Sixteen terraced lakes falling into each other over travertine barriers that are still growing.",
+          "interests": ["nature", "mountains"], "nights": [1, 2],
+          "highlights": ["Boardwalks directly over the water — swimming is banned and enforced", "The upper lakes, which most day visitors miss", "First entry of the day, in autumn, with the mist on the water"],
+          "experiences": [{ "slug": "plitvice-early-entry", "name": "Plitvice at opening", "kind": "walk", "band": "moderate", "summary": "Timed entry tickets sell out; the 7 am slot gives you an hour of empty boardwalk before the coaches from the coast arrive." }] }
+      ] }
+  ]
+}

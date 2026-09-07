@@ -1,1 +1,63 @@
-{ "projects": [] }
+{
+  "projects": [
+    { "slug": "saxon-fortified-churches", "name": "Saxon fortified churches, Transylvania",
+      "theme": "Heritage repair", "country": "romania", "partner": "Village church foundations in Viscri, Biertan and Mălâncrav", "status": "listed",
+      "summary": "Around 150 fortified churches were built by German-speaking settlers in Transylvania between the 13th and 16th centuries. Most of the community that maintained them left after 1990, and the roofs are the first thing to go.",
+      "need": "Roof and gutter work on the smaller village churches that no tour reaches, and salaries for the local key-holders who open them. Shingle, tile and lime mortar, applied by masons from the same villages." },
+
+    { "slug": "hay-meadow-scything", "name": "Hay meadows and the people who cut them",
+      "theme": "Landscape", "country": "romania", "partner": "Smallholder associations in the Târnava valley", "status": "listed",
+      "summary": "Transylvania's hay meadows hold some of the richest plant diversity in Europe, and they hold it because they are cut by hand at the right time each year. Mechanised cutting destroys them within a decade.",
+      "need": "Scythe blades, peening tools and training weeks, plus a small per-hectare payment that makes hand cutting survivable for families who would otherwise stop." },
+
+    { "slug": "wooden-churches-maramures", "name": "Wooden churches of Maramureș",
+      "theme": "Heritage repair", "country": "romania", "partner": "Parish councils and the Maramureș heritage office", "status": "listed",
+      "summary": "Shingle-roofed oak churches built without nails, some from the 1600s, in villages of a few hundred people. Shingles last about thirty years and the craft of splitting them is held by a handful of people.",
+      "need": "Apprenticeships in shingle splitting, and materials for two roofs a year." },
+
+    { "slug": "sami-language-media", "name": "Sámi-language media and youth programmes",
+      "theme": "Language", "country": "norway", "partner": "Sámi-owned cultural organisations in Finnmark", "status": "listed",
+      "summary": "There are ten Sámi languages and several have fewer than a thousand speakers. Media and youth programming in the language does more for its survival than any monument.",
+      "need": "Production support for Sámi-language youth media, and residential language weeks for teenagers." },
+
+    { "slug": "dry-stone-walls-aran", "name": "Dry stone walls, Inis Mór",
+      "theme": "Landscape", "country": "ireland", "partner": "Islanders' co-operative, Aran Islands", "status": "listed",
+      "summary": "Sixteen hundred kilometres of dry stone wall on an island fourteen kilometres long, built to clear the ground and to make soil out of sand and seaweed. They fall down and are rebuilt by hand or not at all.",
+      "need": "Wall-building weeks with island masons, and a small fund for the sections along public paths that visitors damage." },
+
+    { "slug": "coast-path-erosion", "name": "Coast path erosion, the Lycian Way",
+      "theme": "Trails", "country": "turkiye", "partner": "Local trail associations along the Lycian coast", "status": "in-progress",
+      "summary": "540 kilometres of waymarked path opened in 1999, now carrying far more feet than it was built for, across soft limestone and through villages with no maintenance budget.",
+      "need": "Waymark repainting, drainage work on the eroded sections above Kabak, and payment to the village households who maintain the stages nearest them." },
+
+    { "slug": "ohrid-lake-monitoring", "name": "Lake Ohrid endemic species monitoring",
+      "theme": "Landscape", "country": "north-macedonia", "partner": "Hydrobiological institute, Ohrid", "status": "listed",
+      "summary": "Between three and five million years old, with over sixty species found nowhere else, and under pressure from sewage, water abstraction and shoreline building.",
+      "need": "Monitoring equipment and student stipends, and support for the enforcement of the wild trout ban that restaurants routinely ignore." },
+
+    { "slug": "albanian-alps-guesthouses", "name": "Guesthouse training in the Albanian Alps",
+      "theme": "Community", "country": "albania", "partner": "Valbona and Theth guesthouse association", "status": "in-progress",
+      "summary": "The Valbona-Theth crossing has gone from almost no visitors to thousands a season within a decade, and the money mostly stays local because the beds are family-run. That is fragile and worth protecting.",
+      "need": "Water and waste systems for village guesthouses, first aid and mountain safety training, and a shared booking system that is not owned by a platform." },
+
+    { "slug": "sephardic-thessaloniki", "name": "Sephardic Thessaloniki, documented",
+      "theme": "Memory", "country": "greece", "partner": "Jewish Museum of Thessaloniki", "status": "listed",
+      "summary": "Thessaloniki was a majority-Sephardic city for four centuries. Almost the entire community was deported in 1943. The documentation of what was there is held in fragments across several countries.",
+      "need": "Archival digitisation, translation of Ladino material, and school programmes in the city itself." },
+
+    { "slug": "qvevri-apprenticeship", "name": "Qvevri makers, Kakheti",
+      "theme": "Craft", "country": "georgia", "partner": "Qvevri makers' guild, Kakheti", "status": "listed",
+      "summary": "The clay vessels Georgian wine ferments in are made by a handful of families. The technique is on the UNESCO intangible heritage list and the number of working makers is in single figures.",
+      "need": "Apprentice stipends, kiln repair, and a survey of the surviving clay sources." },
+
+    { "slug": "wadden-sea-mudflat-guides", "name": "Wadden Sea mudflat guiding",
+      "theme": "Trails", "country": "netherlands", "partner": "Licensed wadlopen guides, Friesland", "status": "listed",
+      "summary": "Walking the exposed sea floor at low tide requires a guide who knows the channels and the tide tables, and the licensing and training of those guides is entirely voluntary work.",
+      "need": "Training and licensing costs for new guides, and safety equipment for the routes to Ameland and Schiermonnikoog." },
+
+    { "slug": "bear-coexistence-carpathians", "name": "Bear coexistence in the Carpathians",
+      "theme": "Landscape", "country": "romania", "partner": "Carpathian large carnivore research groups", "status": "listed",
+      "summary": "Romania holds most of Europe's brown bears. Conflict with people rises every year, driven largely by roadside feeding and unsecured rubbish, and the animals lose that argument.",
+      "need": "Bear-proof bins in mountain villages, electric fencing for smallholders' orchards, and the field staff who install both." }
+  ]
+}

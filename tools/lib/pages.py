@@ -1297,9 +1297,9 @@ def about_page(data):
     <h3>Status</h3>
     <p>Pre-launch. No entity, no payments, no accounts, no bookings, no partners. What exists is
     the Atlas, the Planner, the Journeys, the register and the editorial.</p>
-    <h3>Working name</h3>
-    <p>Europedoor is a working name and the Atlas is the working name of the discovery layer.
-    Both are subject to a trademark and domain search before anything is spent on brand.</p>
+    <h3>The name</h3>
+    <p>Europedoor, at europedoor.com. Settled — the Atlas is the name of the discovery layer
+    inside it, not an alternative name for the product.</p>
     <h3>Corrections</h3>
     <p>Everything here can be wrong. <a href="/sources">How to tell us →</a></p>
   </aside>
@@ -1439,13 +1439,15 @@ def not_found(data):
   </div>
 </div>
 """
-    return "/404.html", page("Not found", body, path="/404", area=None,
-                             description="Page not found.")
+    return "/404.html", page(
+        "Not found", body, path="/404", area=None,
+        description="That page is not on Europedoor. The Atlas, the curated journeys and the Journey Planner all still are.",
+    )
 
 
 def sitemap(paths):
     urlset = "".join(
-        f"<url><loc>https://europedoor.example{p}</loc></url>" for p in sorted(paths)
+        f"<url><loc>https://europedoor.com{p}</loc></url>" for p in sorted(paths)
     )
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'

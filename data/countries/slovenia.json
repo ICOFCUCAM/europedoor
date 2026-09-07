@@ -1,0 +1,55 @@
+{
+  "code": "si", "slug": "slovenia", "name": "Slovenia", "official": "Republic of Slovenia",
+  "macro": "alpine-central", "capital": "Ljubljana", "currency": "EUR — euro",
+  "languages": ["Slovene"],
+  "blocs": ["eu", "schengen", "eurozone", "eea"],
+  "tagline": "Alps, karst caves, vineyards and 46 kilometres of coast, all within two hours of each other.",
+  "summary": "Slovenia is the size of Wales and contains a proper alpine range, one of the world's great cave systems, Mediterranean coast, and more forest cover than almost any country in Europe. It has been quietly excellent at sustainable tourism for a decade and the capital pedestrianised its centre in 2007 without much fuss. Everything is close, which is the whole point.",
+  "interests": ["mountains", "nature", "coast", "food", "wine", "cities"],
+  "budget": "moderate", "daily_eur": [55, 130],
+  "season": { "peak": ["jun", "jul", "aug", "sep"], "shoulder": ["may", "oct"],
+    "note": "June and September are ideal: the high trails are open, the lakes are swimmable and Bled is not solid. Winter gives cheap alpine skiing and thermal spas in the east." },
+  "getting_around": "Distances are tiny — Ljubljana to the coast is 90 minutes, to the Alps one hour. Buses beat trains for the mountains. A car helps in the Soča valley and the Karst.",
+  "food": ["Potica: a rolled nut cake, at every celebration", "Štruklji, dumplings rolled with anything from tarragon to cottage cheese", "Wine from three distinct regions, almost none of it exported"],
+  "festivals": [
+    { "name": "Ljubljana Festival", "month": "jul", "where": "Ljubljana" },
+    { "name": "Kurentovanje, a masked winter-driving-out rite", "month": "feb", "where": "Ptuj" },
+    { "name": "Wine harvest and St Martin's Day", "month": "nov", "where": "Maribor, Goriška Brda" }
+  ],
+  "know": ["A vignette is required for motorways and checked automatically.", "Cave temperatures sit around 8°C year-round; bring a layer even in August.", "The Julian Alps are limestone — via ferrata is common and needs real equipment."],
+  "regions": [
+    { "slug": "julian-alps", "name": "The Julian Alps",
+      "summary": "Triglav, two famous lakes, and the turquoise Soča river running to Italy.",
+      "interests": ["mountains", "nature", "winter", "history"],
+      "cities": [
+        { "slug": "bled", "name": "Bled", "lat": 46.37, "lon": 14.11,
+          "summary": "An island church in a glacial lake under a cliff-top castle — the most photographed thing in the country and still lovely at 7 am.",
+          "interests": ["nature", "mountains", "food"], "nights": [1, 2],
+          "highlights": ["Rowing to the island in a pletna, and ringing the wishing bell", "The 6 km lakeside path, flat and swimmable at intervals", "Vintgar gorge, on boardwalks over the water"],
+          "experiences": [{ "slug": "bled-pletna-boat", "name": "The pletna, rowed standing", "kind": "water", "band": "moderate", "summary": "A boat design and a rowing licence handed down through the same families since 1740; there is no engine on the lake by law." }] },
+        { "slug": "bovec", "name": "Bovec & the Soča", "lat": 46.34, "lon": 13.55, "quiet": true,
+          "summary": "An alpine valley on an unreally turquoise river, and the front line of the Isonzo battles above it.",
+          "interests": ["mountains", "nature", "history", "wild"], "nights": [2, 3],
+          "highlights": ["Rafting and kayaking on the Soča in early summer", "The Walk of Peace: open-air museums along the 1915–17 front", "The Vršič pass, 50 hairpins built by Russian prisoners of war"],
+          "experiences": [{ "slug": "soca-walk-of-peace", "name": "The Walk of Peace", "kind": "walk", "band": "low", "summary": "Trenches, chapels and cemeteries left in place along the mountain front where 300,000 died; the signage is unusually honest." }] }
+      ] },
+    { "slug": "ljubljana-karst-coast", "name": "Ljubljana, the Karst & the Coast",
+      "summary": "A small green capital, the caves that gave 'karst' its name, and a Venetian coastal town.",
+      "interests": ["cities", "nature", "coast", "wine", "food"],
+      "cities": [
+        { "slug": "ljubljana", "name": "Ljubljana", "lat": 46.06, "lon": 14.51,
+          "summary": "A capital of 300,000 with a car-free centre, a castle on the hill and Plečnik's architecture holding it together.",
+          "interests": ["cities", "architecture", "food", "design"], "nights": [1, 2],
+          "highlights": ["Plečnik's bridges, market colonnade and library — one architect's whole city", "The riverside bars on summer evenings", "Metelkova, a squatted former barracks turned art complex"] },
+        { "slug": "postojna", "name": "Postojna & Škocjan", "lat": 45.78, "lon": 14.21,
+          "summary": "Twenty-four kilometres of cave entered by underground train, and a canyon inside a mountain nearby.",
+          "interests": ["nature", "history"], "nights": [1, 1],
+          "highlights": ["The cave railway, running since 1872", "Olms — blind cave salamanders that live a century", "Škocjan's underground gorge, 146 metres deep, on a footbridge"],
+          "experiences": [{ "slug": "skocjan-underground-canyon", "name": "The bridge over the Škocjan gorge", "kind": "walk", "band": "moderate", "summary": "A river 100 metres below you, inside a mountain, crossed on a suspended footbridge. Quieter and more astonishing than its famous neighbour." }] },
+        { "slug": "piran", "name": "Piran", "lat": 45.53, "lon": 13.57, "quiet": true,
+          "summary": "A Venetian town on a spit, with a salt pan beside it worked the same way since the 14th century.",
+          "interests": ["coast", "food", "history", "architecture"], "nights": [1, 2],
+          "highlights": ["Tartini square, and the campanile modelled on San Marco", "Sečovlje salt pans, harvested by hand", "Swimming off the rocks below the walls"] }
+      ] }
+  ]
+}

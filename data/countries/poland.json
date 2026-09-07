@@ -1,0 +1,64 @@
+{
+  "code": "pl", "slug": "poland", "name": "Poland", "official": "Republic of Poland",
+  "macro": "alpine-central", "capital": "Warsaw", "currency": "PLN — Polish złoty",
+  "languages": ["Polish"],
+  "blocs": ["eu", "schengen", "eea"],
+  "tagline": "A country that was erased from the map for 123 years and rebuilt its capital from paintings.",
+  "summary": "Poland is large, flat in the middle, mountainous in the south and forested in the east, where Europe's last primeval woodland still stands. Its cities carry the twentieth century openly: Warsaw was destroyed and reconstructed, Kraków survived intact, Gdańsk was rebuilt as a Hanseatic port. It is one of the best-value countries in Europe and the food has become genuinely interesting in the last decade.",
+  "interests": ["history", "food", "mountains", "nature", "sacred", "cities"],
+  "budget": "moderate", "daily_eur": [40, 105],
+  "season": { "peak": ["jun", "jul", "aug"], "shoulder": ["may", "sep"],
+    "note": "Summer for the lakes, the coast and the Tatras. September is warm and empty. Winter is properly cold and Kraków's Christmas market is one of the oldest in Europe." },
+  "getting_around": "Intercity trains between the main cities are fast and cheap; regional services are slow but reach everywhere. FlixBus and domestic operators fill the gaps. Kraków, Wrocław and Gdańsk are all walkable.",
+  "food": ["Pierogi, boiled or fried, in a dozen fillings and never just one", "Żurek: sour rye soup with sausage and egg, served in bread", "Vodka, which is a category here rather than a drink"],
+  "festivals": [
+    { "name": "Wianki, midsummer wreaths on the Vistula", "month": "jun", "where": "Kraków" },
+    { "name": "Pierogi festival", "month": "aug", "where": "Kraków" },
+    { "name": "Christmas markets and Wigilia", "month": "dec", "where": "Nationwide" }
+  ],
+  "know": ["Auschwitz-Birkenau is a memorial and a cemetery; visits are free, timed, and behaviour there matters.", "Milk bars (bar mleczny) are subsidised canteens serving a full meal for a few euros.", "The złoty, not the euro, though cards work nearly everywhere."],
+  "regions": [
+    { "slug": "lesser-poland", "name": "Lesser Poland & the South",
+      "summary": "Kraków, the salt mine, the memorial at Oświęcim, and the Tatra mountains beyond.",
+      "interests": ["history", "sacred", "mountains", "food"],
+      "cities": [
+        { "slug": "krakow", "name": "Kraków", "lat": 50.06, "lon": 19.94,
+          "summary": "The royal capital that survived the war, with Europe's largest medieval square and a Jewish quarter that is now a district again.",
+          "interests": ["history", "architecture", "food", "sacred", "music"], "nights": [3, 4],
+          "highlights": ["The Rynek and the hourly trumpet call that stops mid-note", "Wawel castle and cathedral, where Polish kings are buried", "Kazimierz: synagogues, bars and Schindler's factory museum", "Wieliczka's salt mine, carved into chapels 135 metres down"],
+          "experiences": [
+            { "slug": "krakow-milk-bar", "name": "Lunch in a milk bar", "kind": "table", "band": "low", "summary": "A communist-era subsidised canteen, still running, still cheap; queue, point, pay, and eat what Poland actually eats." },
+            { "slug": "wieliczka-salt-chapel", "name": "The salt cathedral at Wieliczka", "kind": "museum", "band": "moderate", "summary": "A chapel 101 metres underground with chandeliers of salt crystal, carved by miners over decades in their own time." }
+          ] },
+        { "slug": "zakopane", "name": "Zakopane & the Tatras", "lat": 49.30, "lon": 19.95,
+          "summary": "A wooden mountain town under the only alpine range in Poland, with its own architectural style.",
+          "interests": ["mountains", "winter", "nature", "food"], "nights": [2, 3],
+          "highlights": ["Morskie Oko, a lake under a wall of granite", "The Zakopane style — timber villas designed as a national architecture", "Oscypek, smoked sheep cheese, grilled and sold from carts"],
+          "experiences": [{ "slug": "tatra-morskie-oko", "name": "The walk to Morskie Oko", "kind": "walk", "band": "low", "summary": "Nine kilometres of asphalt road that everyone does, then a steep hour above it that almost nobody does — take the second part." }] }
+      ] },
+    { "slug": "masovia-and-the-centre", "name": "Masovia & the Centre",
+      "summary": "The rebuilt capital, and the low country of the Vistula around it.",
+      "interests": ["history", "art", "music", "cities"],
+      "cities": [
+        { "slug": "warsaw", "name": "Warsaw", "lat": 52.23, "lon": 21.01,
+          "summary": "Eighty-five per cent destroyed in 1944 and rebuilt from Canaletto's paintings, with a Stalinist tower and glass towers around it.",
+          "interests": ["history", "architecture", "music", "food", "cities"], "nights": [2, 3],
+          "highlights": ["POLIN, the museum of a thousand years of Polish Jews", "The Warsaw Rising Museum, loud and unsparing", "The reconstructed Old Town, itself a UNESCO site for how it was rebuilt", "Chopin concerts in Łazienki park on summer Sundays"],
+          "experiences": [{ "slug": "warsaw-polin-museum", "name": "POLIN, a thousand years", "kind": "museum", "band": "moderate", "summary": "The museum deliberately spends most of its space on Jewish life rather than its destruction, which is what makes it unlike any other." }] }
+      ] },
+    { "slug": "pomerania-and-the-east", "name": "Pomerania & the East",
+      "summary": "The Baltic coast and Gdańsk, and the primeval forest on the Belarusian border.",
+      "interests": ["coast", "history", "nature", "wild"],
+      "cities": [
+        { "slug": "gdansk", "name": "Gdańsk", "lat": 54.35, "lon": 18.65,
+          "summary": "A Hanseatic port of narrow gabled houses, where the war began and Solidarity ended it.",
+          "interests": ["history", "coast", "architecture", "food"], "nights": [2, 3],
+          "highlights": ["Długi Targ and the crane on the waterfront", "The European Solidarity Centre at the shipyard gate", "Westerplatte, where the first shots of 1939 were fired", "Amber, worked here for a thousand years"] },
+        { "slug": "bialowieza", "name": "Białowieża", "lat": 52.70, "lon": 23.87, "quiet": true,
+          "summary": "The last primeval lowland forest in Europe, with wild bison in it, on the Belarusian border.",
+          "interests": ["wild", "nature", "history"], "nights": [1, 2],
+          "highlights": ["The strict reserve, entered only with a licensed guide", "European bison — some 600 of them, wild", "Trees that have never been felled, some 400 years old"],
+          "experiences": [{ "slug": "bialowieza-bison-dawn", "name": "Bison at first light", "kind": "wild", "band": "moderate", "summary": "A guide, a hide and a 4 am start; the forest's edge meadows are where the herds actually come out." }] }
+      ] }
+  ]
+}

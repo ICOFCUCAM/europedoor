@@ -1,0 +1,54 @@
+{
+  "code": "lt", "slug": "lithuania", "name": "Lithuania", "official": "Republic of Lithuania",
+  "macro": "baltic", "capital": "Vilnius", "currency": "EUR — euro",
+  "languages": ["Lithuanian"],
+  "blocs": ["eu", "schengen", "eurozone", "eea"],
+  "tagline": "A baroque capital, a sand spit shared with Russia, and a hill of a hundred thousand crosses.",
+  "summary": "Lithuania was once the largest state in Europe, and the memory of it sits oddly on a country of under three million. Vilnius has the biggest baroque old town in the region, full of courtyards you walk into by accident. The Curonian Spit is a 98-kilometre dune of shifting sand, and the Hill of Crosses is one of the strangest and most moving places on the continent.",
+  "interests": ["history", "sacred", "architecture", "coast", "nature"],
+  "budget": "moderate", "daily_eur": [50, 120],
+  "season": { "peak": ["jun", "jul", "aug"], "shoulder": ["may", "sep"],
+    "note": "Summer for the coast and the long evenings. September is warm, cheap and empty. Vilnius is at its best in the first week of March, when the Kaziukas craft fair takes over the old town." },
+  "getting_around": "Vilnius, Kaunas and Klaipėda are linked by frequent buses; the coast needs a ferry from Klaipėda to the spit. The old town is entirely walkable and mostly cobbled.",
+  "food": ["Cepelinai: potato dumplings the size and shape of a zeppelin", "Cold beetroot soup, shocking pink, served with a hot potato", "Dark rye bread with garlic, fried, eaten with beer"],
+  "festivals": [
+    { "name": "Kaziukas craft fair, since 1604", "month": "mar", "where": "Vilnius" },
+    { "name": "Joninės, midsummer on the coast", "month": "jun", "where": "Nationwide" },
+    { "name": "Song Celebration, every four years", "month": "jul", "where": "Vilnius" }
+  ],
+  "know": ["The Hill of Crosses is an active devotional site, not a photo opportunity — leave one or leave it alone.", "Užupis, in Vilnius, declared itself a republic in 1997 and has a constitution on a wall in twenty languages.", "The Curonian Spit is shared with the Russian exclave of Kaliningrad; the border is real and closed to casual crossing."],
+  "regions": [
+    { "slug": "vilnius-and-the-east", "name": "Vilnius & the East",
+      "summary": "The baroque capital, an artists' republic across a bridge, and a lake castle an hour away.",
+      "interests": ["history", "architecture", "sacred", "cities"],
+      "cities": [
+        { "slug": "vilnius", "name": "Vilnius", "lat": 54.69, "lon": 25.28,
+          "summary": "Forty churches, endless courtyards, and a self-declared republic of artists over the river.",
+          "interests": ["architecture", "sacred", "history", "cities", "art"], "nights": [2, 3],
+          "highlights": ["St Anne's, which Napoleon reportedly wanted to carry to Paris", "The Gate of Dawn and its silver icon, still a pilgrimage", "Užupis, its constitution and its angel", "The KGB museum in the building where it happened"],
+          "experiences": [
+            { "slug": "vilnius-courtyard-walk", "name": "The courtyards nobody signposts", "kind": "walk", "band": "low", "summary": "The old town's real geography is behind the street doors; push the unlocked ones and keep going." },
+            { "slug": "vilnius-uzupis-constitution", "name": "Read the Užupis constitution", "kind": "walk", "band": "low", "summary": "Forty-one articles on mirrored plaques, including a dog's right to be a dog and everyone's right to be happy — and not to be." }
+          ] },
+        { "slug": "trakai", "name": "Trakai", "lat": 54.64, "lon": 24.93, "quiet": true,
+          "summary": "A red brick island castle in a lake, and the Karaim community that has lived beside it since the 14th century.",
+          "interests": ["history", "nature", "food"], "nights": [1, 1],
+          "highlights": ["The island castle, reachable by footbridge", "Kibinai pastries in Karaim wooden houses", "Rowing boats and swimming in the same lake"] }
+      ] },
+    { "slug": "coast-and-centre", "name": "The Coast & Centre",
+      "summary": "The Curonian dunes, the port at Klaipėda, and the hill outside Šiauliai.",
+      "interests": ["coast", "sacred", "nature"],
+      "cities": [
+        { "slug": "nida", "name": "Nida, Curonian Spit", "lat": 55.30, "lon": 21.01, "quiet": true,
+          "summary": "Wooden fishermen's houses under a moving dune, on a sand spit between lagoon and sea.",
+          "interests": ["coast", "nature", "islands"], "nights": [2, 3],
+          "highlights": ["Parnidis dune and its sundial, with the Russian border visible south", "Thomas Mann's summer house, where he wrote in 1930–32", "Amber, smoked fish, and no cars to speak of"],
+          "experiences": [{ "slug": "nida-dune-walk", "name": "The grey dunes at first light", "kind": "walk", "band": "low", "summary": "Sand that buried four villages in the 19th century; the boardwalk exists because walking on it directly would start it moving again." }] },
+        { "slug": "siauliai", "name": "Šiauliai", "lat": 55.93, "lon": 23.32,
+          "summary": "An industrial town whose reason to visit stands in a field twelve kilometres north.",
+          "interests": ["sacred", "history"], "nights": [1, 1],
+          "highlights": ["The Hill of Crosses: over 100,000 crosses, bulldozed three times by the Soviets and rebuilt each night", "The sound the small crosses make in wind", "A cathedral with a sundial column"],
+          "experiences": [{ "slug": "hill-of-crosses", "name": "The Hill of Crosses", "kind": "sacred", "band": "low", "summary": "Not a monument — an act repeated by hundreds of thousands of people, most of them anonymous, over two centuries." }] }
+      ] }
+  ]
+}

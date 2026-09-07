@@ -1,0 +1,50 @@
+{
+  "code": "lu", "slug": "luxembourg", "name": "Luxembourg", "official": "Grand Duchy of Luxembourg",
+  "macro": "western", "capital": "Luxembourg City", "currency": "EUR — euro",
+  "languages": ["Luxembourgish", "French", "German"],
+  "blocs": ["eu", "schengen", "eurozone", "eea"],
+  "tagline": "A fortress city on a gorge, a wine river, and free public transport across the whole country.",
+  "summary": "Luxembourg is 2,586 square kilometres, trilingual by default, and richer per head than almost anywhere. The capital sits on a rock split by two river valleys, with casemates tunnelled through it. In 2020 it made all public transport free nationwide, which turns out to be the single best reason to travel around it slowly.",
+  "interests": ["history", "wine", "nature", "architecture"],
+  "budget": "high", "daily_eur": [90, 190],
+  "season": { "peak": ["may", "jun", "jul", "aug", "sep"], "shoulder": ["apr", "oct"],
+    "note": "The Moselle harvest in September and October is the highlight of the year. Summer is green and walkable in the Mullerthal. The capital empties at weekends, which makes it pleasant." },
+  "getting_around": "All public transport — train, tram, bus — is free for everyone, resident or not. The country is crossable in ninety minutes.",
+  "food": ["Judd mat Gaardebounen: smoked pork collar with broad beans", "Moselle Riesling and Crémant, both underrated because nobody exports them", "Gromperekichelcher, potato fritters, from a market stall"],
+  "festivals": [
+    { "name": "Éimaischen pottery market", "month": "apr", "where": "Luxembourg City and Nospelt" },
+    { "name": "Schueberfouer funfair, running since 1340", "month": "aug", "where": "Luxembourg City" },
+    { "name": "Moselle wine harvest festivals", "month": "sep", "where": "The Moselle valley" }
+  ],
+  "know": ["Free public transport applies to second class on every line in the country.", "Luxembourgish is the national language; French runs administration and German runs the press.", "Cross-border commuters nearly double the capital's population on weekdays."],
+  "regions": [
+    { "slug": "capital-and-moselle", "name": "The Capital & the Moselle",
+      "summary": "The fortress city, and the vineyard river that forms the German border.",
+      "interests": ["history", "wine", "architecture"],
+      "cities": [
+        { "slug": "luxembourg-city", "name": "Luxembourg City", "lat": 49.61, "lon": 6.13,
+          "summary": "A UNESCO-listed fortress on cliffs, with 17 kilometres of tunnels underneath and a modern quarter on the plateau above.",
+          "interests": ["history", "architecture", "cities"], "nights": [1, 2],
+          "highlights": ["The Bock casemates, cut into the rock from 1644", "The Chemin de la Corniche, called Europe's most beautiful balcony", "The Grund at the bottom of the gorge, reached by a free lift"],
+          "experiences": [{ "slug": "luxembourg-casemates", "name": "Into the Bock casemates", "kind": "walk", "band": "low", "summary": "Kilometres of gun galleries in the cliff; they sheltered 35,000 people in 1944 and are cold in any weather." }] },
+        { "slug": "remich", "name": "Remich & the Moselle", "lat": 49.55, "lon": 6.37, "quiet": true,
+          "summary": "Terraced vineyards on a slow river, with Germany on the far bank and Crémant cellars on this one.",
+          "interests": ["wine", "nature", "food"], "nights": [1, 2],
+          "highlights": ["Crémant tasting where it is bottled", "The riverside cycle path along both banks", "Harvest weekends in late September"] }
+      ] },
+    { "slug": "mullerthal-and-ardennes", "name": "Mullerthal & the Ardennes",
+      "summary": "Sandstone ravines in the east, and castle country in the wooded north.",
+      "interests": ["nature", "history", "mountains"],
+      "cities": [
+        { "slug": "echternach", "name": "Echternach", "lat": 49.81, "lon": 6.42, "quiet": true,
+          "summary": "The country's oldest town, with a 7th-century abbey and a hopping procession on the UNESCO list.",
+          "interests": ["sacred", "nature", "history"], "nights": [1, 2],
+          "highlights": ["The Mullerthal Trail through sandstone clefts and moss", "The basilica and its crypt", "The dancing procession, every Whit Tuesday since the Middle Ages"],
+          "experiences": [{ "slug": "mullerthal-trail", "name": "Little Switzerland on foot", "kind": "walk", "band": "low", "summary": "112 km of waymarked trail through gorges narrow enough to touch both walls; a day section is easy and free." }] },
+        { "slug": "vianden", "name": "Vianden", "lat": 49.93, "lon": 6.21, "quiet": true,
+          "summary": "A restored hilltop castle above a river village, where Victor Hugo spent his exile.",
+          "interests": ["history", "nature"], "nights": [1, 1],
+          "highlights": ["The castle, one of the largest west of the Rhine", "Hugo's house on the bridge, kept as it was", "The chairlift up for the view back"] }
+      ] }
+  ]
+}

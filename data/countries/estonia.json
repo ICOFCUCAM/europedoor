@@ -1,0 +1,52 @@
+{
+  "code": "ee", "slug": "estonia", "name": "Estonia", "official": "Republic of Estonia",
+  "macro": "baltic", "capital": "Tallinn", "currency": "EUR — euro",
+  "languages": ["Estonian"],
+  "blocs": ["eu", "schengen", "eurozone", "eea"],
+  "tagline": "A medieval hanseatic capital run by the most digital state in Europe.",
+  "summary": "Estonia is closer to Finland than to its Baltic neighbours in language and temperament, and closer to nobody at all in how thoroughly it moved government online. Half the country is forest, a fifth is bog, and the whole coast is shallow, islanded and quiet. It sang its way out of occupation in 1988, and the choral festival that did it still fills a stadium every five years.",
+  "interests": ["history", "architecture", "nature", "design", "music"],
+  "budget": "moderate", "daily_eur": [55, 130],
+  "season": { "peak": ["jun", "jul", "aug"], "shoulder": ["may", "sep"],
+    "note": "Summer is short, bright and social; midsummer empties the cities into the countryside. Winter is dark and properly cold, which is when the bog walks are best because the ground is finally solid." },
+  "getting_around": "Tallinn is walkable and its public transport is free to residents. Buses reach everywhere cheaply; ferries serve the western islands. Helsinki is two hours away across the gulf.",
+  "food": ["Black bread, dense and slightly sweet, served with everything", "Smoked Baltic sprats and lake perch", "Kama — a toasted grain mix stirred into buttermilk, which sounds worse than it is"],
+  "festivals": [
+    { "name": "Laulupidu, the song festival — 30,000 singers, every five years", "month": "jul", "where": "Tallinn" },
+    { "name": "Jaanipäev, midsummer bonfires", "month": "jun", "where": "Nationwide" },
+    { "name": "Christmas market in the Town Hall Square", "month": "dec", "where": "Tallinn" }
+  ],
+  "know": ["Almost every public service is digital, including e-residency for non-citizens.", "Bogs are a national landscape: boardwalks make them accessible without wrecking them.", "The Russian border area requires care and current advice."],
+  "regions": [
+    { "slug": "tallinn-and-the-north", "name": "Tallinn & the North Coast",
+      "summary": "The best-preserved medieval town in northern Europe, with limestone cliffs and Soviet ruins along the shore.",
+      "interests": ["history", "architecture", "cities", "coast"],
+      "cities": [
+        { "slug": "tallinn", "name": "Tallinn", "lat": 59.44, "lon": 24.75,
+          "summary": "A walled hanseatic town where the merchants' houses, the guild halls and the city wall all survived, and a startup district grew up beside them.",
+          "interests": ["history", "architecture", "cities", "design", "food"], "nights": [2, 3],
+          "highlights": ["The intact town wall and twenty of its towers", "Telliskivi's converted rail yards, where the country's design lives now", "Kadriorg palace and the KUMU art museum behind it", "The Seaplane Harbour, a 1917 concrete hangar full of ships"],
+          "experiences": [
+            { "slug": "tallinn-city-wall-walk", "name": "Walk the wall, tower to tower", "kind": "walk", "band": "low", "summary": "Two kilometres of it still stand; the sections you can climb give the roofline the postcards use." },
+            { "slug": "tallinn-bog-shoe-walk", "name": "Bog shoes in Lahemaa", "kind": "walk", "band": "moderate", "summary": "Snowshoe-like frames let you cross raised bog off the boardwalk — an hour from the capital and utterly silent." }
+          ] },
+        { "slug": "lahemaa", "name": "Lahemaa", "lat": 59.55, "lon": 25.90, "quiet": true,
+          "summary": "A national park of bog, forest, manor houses and abandoned Soviet submarine bases, an hour east of the capital.",
+          "interests": ["nature", "history", "coast"], "nights": [1, 2],
+          "highlights": ["Viru bog boardwalk at dawn", "Palmse and Sagadi manors, restored", "Hara's derelict submarine base, slowly returning to the sea"] }
+      ] },
+    { "slug": "islands-and-south", "name": "The Islands & the South",
+      "summary": "Saaremaa's windmills and juniper, and Tartu's university town intelligence.",
+      "interests": ["islands", "history", "nature"],
+      "cities": [
+        { "slug": "tartu", "name": "Tartu", "lat": 58.38, "lon": 26.72,
+          "summary": "Estonia's intellectual capital since 1632, small, brick and argumentative.",
+          "interests": ["history", "cities", "art"], "nights": [1, 2],
+          "highlights": ["The university's neoclassical main building and its student lock-up", "Estonian National Museum, built on a Soviet runway", "Supilinn — 'soup town' — of wooden houses on streets named after vegetables"] },
+        { "slug": "kuressaare", "name": "Kuressaare, Saaremaa", "lat": 58.25, "lon": 22.49, "quiet": true,
+          "summary": "An island town around a moated bishop's castle, on Estonia's largest and slowest island.",
+          "interests": ["islands", "history", "nature"], "nights": [1, 2],
+          "highlights": ["The 14th-century castle, complete with its moat", "Kaali meteorite crater, formed within human memory", "Juniper, windmills, and roads with no traffic on them"] }
+      ] }
+  ]
+}

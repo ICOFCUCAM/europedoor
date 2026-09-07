@@ -105,7 +105,7 @@ def build():
         if p.endswith("index.html")
     ]
     write("/sitemap.xml", P.sitemap(canonical))
-    write("/robots.txt", "User-agent: *\nAllow: /\nSitemap: https://europedoor.example/sitemap.xml\n")
+    write("/robots.txt", "User-agent: *\nAllow: /\nSitemap: https://europedoor.com/sitemap.xml\n")
 
     print(f"{len(written)} pages + api + sitemap → site/")
     return d, written

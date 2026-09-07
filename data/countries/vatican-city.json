@@ -1,0 +1,35 @@
+{
+  "code": "va", "slug": "vatican-city", "name": "Vatican City", "official": "Vatican City State",
+  "macro": "mediterranean", "capital": "Vatican City", "currency": "EUR — euro",
+  "languages": ["Italian", "Latin"],
+  "blocs": ["eurozone"],
+  "tagline": "The smallest state in the world, at 0.49 square kilometres, and one of its largest art collections.",
+  "summary": "Vatican City is an independent state inside Rome, created by treaty in 1929, with around 800 residents and no tourism industry of its own — visitors come for the basilica and the museums. It holds the Sistine Chapel, Raphael's rooms, and a collection assembled over five centuries. It is entered freely on foot from St Peter's Square; there is no border post.",
+  "interests": ["sacred", "art", "architecture", "history"],
+  "budget": "moderate", "daily_eur": [60, 150],
+  "season": { "peak": ["apr", "may", "sep", "oct"], "shoulder": ["mar", "nov"],
+    "note": "The museums are least crowded on a Tuesday or Thursday afternoon and worst on Mondays and rainy days. Papal audiences on Wednesday mornings fill St Peter's Square and make the basilica difficult." },
+  "getting_around": "On foot. Ottaviano and Cipro on Rome's metro line A are the nearest stations; the museum entrance and the basilica entrance are on opposite sides of the walls, a fifteen-minute walk apart.",
+  "food": ["Nothing of its own — eat in Prati, one street back, where Roman office workers do", "Avoid the restaurants directly facing the colonnade", "Supplì from a Prati fry shop before you queue"],
+  "festivals": [
+    { "name": "Easter Mass and Urbi et Orbi", "month": "apr", "where": "St Peter's Square" },
+    { "name": "Feast of Saints Peter and Paul", "month": "jun", "where": "St Peter's Basilica" },
+    { "name": "Midnight Mass at Christmas", "month": "dec", "where": "St Peter's Basilica" }
+  ],
+  "know": ["Covered shoulders and knees are required and enforced at the door, in any weather.", "The basilica is free; the museums are ticketed and should be booked online.", "Photography is banned inside the Sistine Chapel, which is stated repeatedly and ignored constantly."],
+  "regions": [
+    { "slug": "vatican", "name": "Vatican City",
+      "summary": "The basilica, the square, the museums and the gardens behind them.",
+      "interests": ["sacred", "art", "architecture"],
+      "cities": [
+        { "slug": "vatican-city", "name": "Vatican City", "lat": 41.90, "lon": 12.45,
+          "summary": "A state the size of a large park, holding Michelangelo's ceiling, his dome and his Pietà.",
+          "interests": ["sacred", "art", "architecture", "history"], "nights": [1, 1],
+          "highlights": ["The Sistine Chapel, best at the first entry slot of the day", "St Peter's dome, 551 steps, with the last stretch leaning inward", "Raphael's School of Athens, on the way to the chapel and often rushed past", "The necropolis under the basilica, booked separately and months ahead"],
+          "experiences": [
+            { "slug": "vatican-dome-climb", "name": "Up the dome of St Peter's", "kind": "sacred", "band": "low", "summary": "The staircase follows the curve of the dome and tilts with it; the reward is the whole of Rome and the gardens nobody else sees." },
+            { "slug": "vatican-scavi-necropolis", "name": "The scavi, under the basilica", "kind": "sacred", "band": "moderate", "summary": "A Roman street of tombs beneath the church, ending at what may be St Peter's grave. Twelve people at a time, booked by email, months ahead." }
+          ] }
+      ] }
+  ]
+}

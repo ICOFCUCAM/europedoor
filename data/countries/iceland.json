@@ -1,0 +1,65 @@
+{
+  "code": "is", "slug": "iceland", "name": "Iceland", "official": "Republic of Iceland",
+  "macro": "nordic", "capital": "Reykjavík", "currency": "ISK — Icelandic króna",
+  "languages": ["Icelandic"],
+  "blocs": ["schengen", "eea"],
+  "tagline": "A geological work in progress, with a literary tradition older than most European states.",
+  "summary": "Iceland sits on the seam between two continental plates, which is why it steams, erupts and rearranges itself. Three hundred and eighty thousand people live around the edge; the interior is uninhabited and closed by snow for most of the year. The sagas were written here in the 13th century and the language has changed so little that schoolchildren still read them.",
+  "interests": ["nature", "mountains", "coast", "wild", "history"],
+  "budget": "high", "daily_eur": [120, 260],
+  "season": { "peak": ["jun", "jul", "aug"], "shoulder": ["may", "sep"],
+    "note": "June and July give near-permanent daylight and open highland roads. September is cheaper, emptier, and the aurora returns. Winter is workable on the south coast and unwise in the interior — the weather changes faster than the forecast." },
+  "getting_around": "Ring Road 1 circles the island in 1,330 km and most visitors drive it. F-roads into the interior need a genuine 4x4 and are closed until late June. Check road.is and vedur.is every morning; Icelanders do.",
+  "food": ["Lamb that has spent the summer eating wild herbs on a mountain", "Skyr, which is a cheese pretending to be a yoghurt", "Hot dogs with crispy onions, defensible at any hour"],
+  "festivals": [
+    { "name": "Secret Solstice and the near-endless June light", "month": "jun", "where": "Reykjavík" },
+    { "name": "Réttir — the autumn sheep round-up, done on horseback", "month": "sep", "where": "Rural valleys" },
+    { "name": "Iceland Airwaves", "month": "nov", "where": "Reykjavík" }
+  ],
+  "know": ["Weather closes roads with little warning; a rental booked in July can still be stuck in a storm.", "Off-road driving is illegal and damages moss that takes decades to regrow.", "Tap water is glacial and free; buying it bottled is the most conspicuous tourist error in the country."],
+  "regions": [
+    { "slug": "reykjavik-and-the-southwest", "name": "Reykjavík & the Southwest",
+      "summary": "The capital, the tectonic rift you can walk into, and the geysers everyone drives to on day one.",
+      "interests": ["cities", "nature", "history"],
+      "cities": [
+        { "slug": "reykjavik", "name": "Reykjavík", "lat": 64.15, "lon": -21.94,
+          "summary": "The northernmost capital of a sovereign state, small enough to cross on foot and loud on Friday nights.",
+          "interests": ["cities", "music", "design", "food"], "nights": [2, 3],
+          "highlights": ["Hallgrímskirkja's basalt-column tower, and the view from the top", "The Settlement Exhibition, built around a 10th-century longhouse found under the street", "Neighbourhood geothermal pools — where Reykjavík actually socialises"],
+          "experiences": [{ "slug": "reykjavik-neighbourhood-pool", "name": "The local pool, not the lagoon", "kind": "water", "band": "low", "summary": "Every district has one: hot pots at different temperatures, a strict pre-shower rule, and the day's arguments happening in them." }] },
+        { "slug": "thingvellir", "name": "Þingvellir", "lat": 64.26, "lon": -21.13,
+          "summary": "A rift valley where the Atlantic plates pull apart, and where Iceland's parliament met in the open air from 930.",
+          "interests": ["history", "nature"], "nights": [1, 1],
+          "highlights": ["Walk the Almannagjá fissure between two continents", "The Law Rock, where the Althing was proclaimed for eight centuries", "Silfra: snorkelling in glacial meltwater with 100-metre visibility"],
+          "experiences": [{ "slug": "silfra-fissure-snorkel", "name": "Snorkel the Silfra fissure", "kind": "water", "band": "high", "summary": "Two degrees, a dry suit, and water filtered through lava for decades — the clearest you will ever swim in." }] }
+      ] },
+    { "slug": "south-coast-and-east", "name": "The South Coast & East",
+      "summary": "Waterfalls, black beaches, a glacier lagoon, and fjords that most Ring Road drivers rush.",
+      "interests": ["nature", "coast", "mountains", "wild"],
+      "cities": [
+        { "slug": "vik", "name": "Vík í Mýrdal", "lat": 63.42, "lon": -19.01,
+          "summary": "A village of three hundred under a glacier, with black sand and dangerous surf.",
+          "interests": ["coast", "nature"], "nights": [1, 2],
+          "highlights": ["Reynisfjara's basalt columns — and the sneaker waves that kill people who turn their backs", "Dyrhólaey's arch and puffin colony in early summer", "Katla under the ice, overdue and monitored"] },
+        { "slug": "hofn", "name": "Höfn & Jökulsárlón", "lat": 64.25, "lon": -15.21, "quiet": true,
+          "summary": "A langoustine port beside Europe's largest ice cap, where icebergs float out to sea past a car park.",
+          "interests": ["nature", "food", "mountains"], "nights": [1, 2],
+          "highlights": ["Jökulsárlón lagoon and the Diamond Beach opposite", "Vatnajökull: 8% of the country, under ice", "Langoustine, landed here and cooked simply"],
+          "experiences": [{ "slug": "vatnajokull-ice-cave", "name": "Into a glacier, in winter only", "kind": "walk", "band": "high", "summary": "The blue caves form and collapse each year; go with a guide who checks them that morning, and only from November to March." }] }
+      ] },
+    { "slug": "westfjords-and-north", "name": "The Westfjords & North",
+      "summary": "The part almost nobody drives: bird cliffs, hot pots on empty shores, and whales off Skjálfandi.",
+      "interests": ["wild", "coast", "nature"],
+      "cities": [
+        { "slug": "isafjordur", "name": "Ísafjörður", "lat": 66.07, "lon": -23.13, "quiet": true,
+          "summary": "The Westfjords' capital: 2,700 people at the end of a fjord under a flat-topped mountain.",
+          "interests": ["coast", "nature", "wild"], "nights": [2, 3],
+          "highlights": ["Hornstrandir, a roadless nature reserve reached by boat", "Dynjandi, the waterfall that falls in seven tiers", "Arctic foxes, which were here before anything else"] },
+        { "slug": "husavik", "name": "Húsavík", "lat": 66.05, "lon": -17.34, "quiet": true,
+          "summary": "A wooden church, a whale museum, and the most reliable whale watching in Europe.",
+          "interests": ["wild", "coast"], "nights": [1, 2],
+          "highlights": ["Humpbacks in Skjálfandi bay, April to October", "The whale museum, built by the people who stopped hunting them", "GeoSea's cliff-top seawater baths"],
+          "experiences": [{ "slug": "husavik-whale-watch", "name": "Whales from an old oak boat", "kind": "wild", "band": "moderate", "summary": "The refitted fishing schooners cut their engines and drift; the silence is half of what you came for." }] }
+      ] }
+  ]
+}

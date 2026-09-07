@@ -1,1 +1,412 @@
-{ "themes": [] }
+{
+  "themes": [
+    {
+      "slug": "medieval-europe",
+      "name": "Medieval Europe",
+      "strapline": "Walls, guilds and the towns that stopped changing",
+      "summary": "A medieval town survives for one of two reasons: it stayed poor, or it stayed useful. These did one or the other. Look for the shape rather than the set pieces — a market square where the roads meet, a wall that a rich century paid for, and a church larger than the population ever justified.",
+      "interests": [
+        "history",
+        "architecture",
+        "sacred"
+      ],
+      "stops": [
+        {
+          "city": "belgium/flanders/bruges",
+          "why": "Rich in 1400, silted up by 1500, and preserved by five centuries of not mattering."
+        },
+        {
+          "city": "italy/tuscany-and-the-centre/siena",
+          "why": "A city that lost to Florence and was frozen by losing; the Palio still runs on the old rivalries."
+        },
+        {
+          "city": "estonia/tallinn-and-the-north/tallinn",
+          "why": "The most complete town wall in northern Europe, with twenty towers still standing."
+        },
+        {
+          "city": "romania/transylvania/sighisoara",
+          "why": "A Saxon citadel in Transylvania, still lived in rather than staged."
+        },
+        {
+          "city": "united-kingdom/the-north/york",
+          "why": "Roman, Viking and medieval in one square mile, walkable on the walls."
+        },
+        {
+          "city": "greece/the-islands/rhodes",
+          "why": "The largest inhabited medieval town in Europe, built by crusader knights."
+        },
+        {
+          "city": "czechia/prague-and-bohemia/prague",
+          "why": "Gothic on a scale nothing else north of the Alps managed, and never bombed."
+        },
+        {
+          "city": "montenegro/bay-of-kotor/kotor",
+          "why": "Venetian walls climbing 260 metres up a cliff behind a walled town."
+        }
+      ]
+    },
+    {
+      "slug": "sacred-europe",
+      "name": "Sacred Europe",
+      "strapline": "Where people have gone on purpose for a thousand years",
+      "summary": "Pilgrimage built more of Europe than any king did: the roads, the bridges, the hostels, the towns that grew where walkers stopped. These places span four Christian traditions and are all still in use — which means visiting them means visiting somebody's church rather than a monument.",
+      "interests": [
+        "sacred",
+        "history",
+        "architecture"
+      ],
+      "stops": [
+        {
+          "city": "spain/green-spain/santiago-de-compostela",
+          "why": "The end of the Camino, where people still arrive on foot every afternoon."
+        },
+        {
+          "city": "vatican-city/vatican/vatican-city",
+          "why": "The smallest state in the world and the largest church in it."
+        },
+        {
+          "city": "united-kingdom/london-and-the-south-east/canterbury",
+          "why": "A murder in 1170 made this the most walked-to place in medieval England."
+        },
+        {
+          "city": "greece/northern-greece/meteora",
+          "why": "Six monasteries on sandstone pillars, once reached only by rope and net."
+        },
+        {
+          "city": "bulgaria/sofia-and-the-mountains/rila-monastery",
+          "why": "Bulgaria's fortified monastery, which kept the language alive under Ottoman rule."
+        },
+        {
+          "city": "serbia/western-serbia/studenica",
+          "why": "White marble and frescoes from 1209, in a Serbian valley with nothing else in it."
+        },
+        {
+          "city": "ireland/dublin-and-the-east/glendalough",
+          "why": "A 6th-century monastic city in a Wicklow valley with two lakes."
+        },
+        {
+          "city": "armenia/yerevan-and-ararat/garni",
+          "why": "A monastery carved into the rock face, where singers use the stone as the instrument."
+        }
+      ]
+    },
+    {
+      "slug": "viking-europe",
+      "name": "Viking Europe",
+      "strapline": "Ships, settlements and the places they reached",
+      "summary": "The Norse were traders and settlers more often than raiders, and the archaeology says so: ships built for cargo, parliaments held in the open air, and towns founded from Dublin to Kyiv. These are the places where you can see the evidence rather than the reputation.",
+      "interests": [
+        "history",
+        "coast",
+        "islands",
+        "nature"
+      ],
+      "stops": [
+        {
+          "city": "denmark/zealand/roskilde",
+          "why": "Five ships scuttled to block a fjord in 1070, raised whole and reconstructed."
+        },
+        {
+          "city": "iceland/reykjavik-and-the-southwest/thingvellir",
+          "why": "Where the Icelandic Althing met in the open air from 930 — a parliament in a rift valley."
+        },
+        {
+          "city": "norway/nord-norge/lofoten",
+          "why": "The cod that funded the whole thing, still dried on racks every spring."
+        },
+        {
+          "city": "norway/ostlandet/oslo",
+          "why": "The polar and Viking ship collections, and the fjord they were built for."
+        },
+        {
+          "city": "france/normandy-brittany/bayeux",
+          "why": "Normandy: Norse settlers within a century of arriving, and the embroidery that records what they did next."
+        },
+        {
+          "city": "ireland/dublin-and-the-east/dublin",
+          "why": "Founded as a Norse longphort in 841, and the excavations under the modern city."
+        },
+        {
+          "city": "united-kingdom/the-north/york",
+          "why": "Jorvik: the Danish capital of northern England for nearly a century."
+        },
+        {
+          "city": "iceland/reykjavik-and-the-southwest/reykjavik",
+          "why": "The Settlement Exhibition, built around a 10th-century longhouse found under the street."
+        }
+      ]
+    },
+    {
+      "slug": "mountain-europe",
+      "name": "Mountain Europe",
+      "strapline": "Eight ranges, one continent",
+      "summary": "Europe's mountains are not one thing. The Alps are high and serviced; the Caucasus is higher and barely; the Tatras are compressed; the Picos end in the sea; the Accursed Mountains have a blood-feud memory and a trail through three countries. This is the case for treating them as different places rather than one activity.",
+      "interests": [
+        "mountains",
+        "nature",
+        "winter",
+        "wild"
+      ],
+      "stops": [
+        {
+          "city": "france/alps-and-east/chamonix",
+          "why": "The Alps at their most vertical, and the birthplace of the sport."
+        },
+        {
+          "city": "switzerland/bernese-oberland/lauterbrunnen",
+          "why": "Cliff-shelf villages reachable only by cable car, under the Eiger."
+        },
+        {
+          "city": "italy/north-italy/ortisei",
+          "why": "The Dolomites: pale limestone towers over meadows, with wartime via ferrata still bolted in."
+        },
+        {
+          "city": "poland/lesser-poland/zakopane",
+          "why": "Poland's only alpine range, compressed into a few valleys and thoroughly loved."
+        },
+        {
+          "city": "georgia/the-caucasus/mestia",
+          "why": "The Caucasus, higher than the Alps, with defensive towers in every village."
+        },
+        {
+          "city": "spain/green-spain/picos-de-europa",
+          "why": "Limestone peaks twenty kilometres from the Atlantic, with cheese aged in the caves."
+        },
+        {
+          "city": "montenegro/durmitor-and-the-north/zabljak",
+          "why": "Durmitor's plateau and the second-deepest canyon in the world."
+        },
+        {
+          "city": "albania/the-albanian-alps/theth",
+          "why": "The Accursed Mountains, and a six-hour pass between two valleys that had no road."
+        }
+      ]
+    },
+    {
+      "slug": "roman-europe",
+      "name": "Roman Europe",
+      "strapline": "The empire, where it is still standing up",
+      "summary": "Rome's best surviving buildings are mostly not in Rome. They are in the provinces, where a later city did not need the stone, or where a cathedral was built inside the temple instead of on top of it. These are the places where the engineering is still doing its job.",
+      "interests": [
+        "history",
+        "architecture",
+        "coast"
+      ],
+      "stops": [
+        {
+          "city": "italy/rome-and-lazio/rome",
+          "why": "The Pantheon's dome: still the largest unreinforced concrete span ever built."
+        },
+        {
+          "city": "france/provence-and-the-south/arles",
+          "why": "An amphitheatre from 90 AD that is still used for events."
+        },
+        {
+          "city": "croatia/dalmatia/split",
+          "why": "A retirement palace that became a town and never stopped being lived in."
+        },
+        {
+          "city": "turkiye/aegean-and-mediterranean/selcuk",
+          "why": "Ephesus: the library facade, the marble street and the terrace-house mosaics."
+        },
+        {
+          "city": "united-kingdom/west-country/bath",
+          "why": "The only hot spring in Britain, plumbed by Romans and still running through their lead."
+        },
+        {
+          "city": "bulgaria/thrace-and-the-black-sea/plovdiv",
+          "why": "A theatre for 6,000, rediscovered by a landslide in 1972 and back in use."
+        },
+        {
+          "city": "italy/south-italy-and-islands/syracuse",
+          "why": "Greek first, then Roman, with the temple columns embedded in the cathedral wall."
+        },
+        {
+          "city": "cyprus/south-coast-and-nicosia/nicosia",
+          "why": "Cyprus's museums hold the province's mosaics; Paphos has them still on the floor."
+        }
+      ]
+    },
+    {
+      "slug": "wine-europe",
+      "name": "Wine Europe",
+      "strapline": "Eight regions that do not taste like each other",
+      "summary": "The interesting wine map of Europe is not the famous one. It includes clay vessels buried in Georgian courtyards, volcanic vines woven into baskets against Aegean wind, and slate slopes on the Rhine at sixty degrees. Every one of these places will let you taste in the cellar where it was made.",
+      "interests": [
+        "wine",
+        "food",
+        "nature"
+      ],
+      "stops": [
+        {
+          "city": "france/loire-and-the-southwest/bordeaux",
+          "why": "The reference point, and Saint-Émilion's small growers behind it."
+        },
+        {
+          "city": "france/alps-and-east/beaune",
+          "why": "Burgundy's slope, where the parcels have names and the walls are older than the borders."
+        },
+        {
+          "city": "portugal/porto-and-the-douro/pinhao",
+          "why": "The Douro: schist terraces too steep for machines, and treading still done by foot."
+        },
+        {
+          "city": "hungary/balaton-and-the-wine-country/tokaj",
+          "why": "The first classified region in the world, from 1737, in cellars furred with black mould."
+        },
+        {
+          "city": "georgia/tbilisi-and-kakheti/sighnaghi",
+          "why": "Georgia: eight thousand years of fermenting in buried qvevri, skins and all."
+        },
+        {
+          "city": "czechia/moravia/mikulov",
+          "why": "Moravia at harvest, when half-fermented burčák appears for three weeks and then vanishes."
+        },
+        {
+          "city": "greece/the-islands/santorini",
+          "why": "Assyrtiko from vines trained into wreaths on the ground against the wind."
+        },
+        {
+          "city": "germany/rhine-and-the-west/bacharach",
+          "why": "The Rhine gorge, where the good slopes are steep enough to need a winch."
+        }
+      ]
+    },
+    {
+      "slug": "rail-europe",
+      "name": "Rail Europe",
+      "strapline": "Journeys where the train is the destination",
+      "summary": "Some lines were built to move slate, ore or salt and are now worth the fare on their own. Others were engineering arguments. All of these are scheduled public services rather than tourist excursions, which means you can use them as transport and get the spectacle for the price of a ticket.",
+      "interests": [
+        "rail",
+        "mountains",
+        "nature"
+      ],
+      "stops": [
+        {
+          "city": "norway/fjord-norway/flam",
+          "why": "865 metres of descent in twenty kilometres, and a gravel road to ride back down."
+        },
+        {
+          "city": "switzerland/graubunden/st-moritz",
+          "why": "The Bernina line: glacier to palm trees in four hours, over a UNESCO-listed railway."
+        },
+        {
+          "city": "germany/rhine-and-the-west/bacharach",
+          "why": "The Rhine gorge line, forty castles in sixty-five kilometres, on an ordinary regional train."
+        },
+        {
+          "city": "serbia/western-serbia/mokra-gora",
+          "why": "The Šargan Eight: a narrow-gauge line that loops over itself to climb."
+        },
+        {
+          "city": "united-kingdom/wales/snowdonia",
+          "why": "Slate railways built to run downhill by gravity, now running for the view."
+        },
+        {
+          "city": "portugal/porto-and-the-douro/pinhao",
+          "why": "The Douro line, hugging the water past terraces the whole way."
+        },
+        {
+          "city": "sweden/swedish-lapland/abisko",
+          "why": "The Iron Ore Line to the Norwegian coast, through Lapland and above the tree line."
+        },
+        {
+          "city": "switzerland/bernese-oberland/lauterbrunnen",
+          "why": "Cog railways and cable cars as public transport, timed to the minute."
+        }
+      ]
+    },
+    {
+      "slug": "island-europe",
+      "name": "Island Europe",
+      "strapline": "Where the ferry timetable is the itinerary",
+      "summary": "An island changes the pace before you arrive, because you have to wait for a boat. These eight are chosen for being genuinely themselves rather than resort annexes — a Baltic sand spit, a Hebridean distillery island, an Adriatic island closed to outsiders until 1989, and a Cycladic island that farms.",
+      "interests": [
+        "islands",
+        "coast",
+        "nature",
+        "food"
+      ],
+      "stops": [
+        {
+          "city": "greece/the-islands/naxos",
+          "why": "The Cyclades' agricultural heart: mountain villages, marble quarries and long beaches."
+        },
+        {
+          "city": "croatia/dalmatia/vis",
+          "why": "Closed as a military base until 1989 and undeveloped because of it."
+        },
+        {
+          "city": "ireland/the-west/aran-islands",
+          "why": "Irish as a daily language, 1,600 km of dry stone wall, and a fort on an 87-metre cliff."
+        },
+        {
+          "city": "netherlands/north-and-islands/texel",
+          "why": "Dutch Wadden: dunes, seals, and mudflats you can walk across at low tide."
+        },
+        {
+          "city": "united-kingdom/scotland/islay",
+          "why": "Nine distilleries, 3,000 people, and 50,000 wintering geese."
+        },
+        {
+          "city": "malta/gozo/victoria-gozo",
+          "why": "Malta's slower sister, with temples older than the pyramids."
+        },
+        {
+          "city": "lithuania/coast-and-centre/nida",
+          "why": "A sand spit shared with Russia, where the dunes buried four villages."
+        },
+        {
+          "city": "norway/nord-norge/lofoten",
+          "why": "Granite peaks straight out of the Norwegian Sea, above red fishing cabins."
+        }
+      ]
+    },
+    {
+      "slug": "jewish-europe",
+      "name": "Jewish Europe",
+      "strapline": "A thousand years, and what remains of it",
+      "summary": "Jewish communities shaped European cities for a millennium before most of them were destroyed in the twentieth century. These places hold both halves of that: living communities and institutions, and the sites of what happened. They are visited best slowly, with the museums that were built by the communities themselves rather than about them.",
+      "interests": [
+        "history",
+        "sacred",
+        "architecture"
+      ],
+      "stops": [
+        {
+          "city": "poland/lesser-poland/krakow",
+          "why": "Kazimierz: seven synagogues in a district that is a neighbourhood again, and Auschwitz an hour away."
+        },
+        {
+          "city": "czechia/prague-and-bohemia/prague",
+          "why": "Six synagogues and a cemetery with twelve layers of graves, preserved by a terrible irony."
+        },
+        {
+          "city": "spain/madrid-and-the-centre/toledo",
+          "why": "Synagogues built by Muslim craftsmen for Jewish congregations under Christian kings."
+        },
+        {
+          "city": "greece/northern-greece/thessaloniki",
+          "why": "A city that was majority Sephardic until 1943; the museum tells it without flinching."
+        },
+        {
+          "city": "lithuania/vilnius-and-the-east/vilnius",
+          "why": "The 'Jerusalem of the North', and the Gaon's city, almost entirely erased in 1941–44."
+        },
+        {
+          "city": "spain/catalonia-and-the-east/girona",
+          "why": "One of Europe's best-preserved medieval Jewish quarters, with a museum in it."
+        },
+        {
+          "city": "poland/masovia-and-the-centre/warsaw",
+          "why": "POLIN, which spends most of its space on a thousand years of life rather than its ending."
+        },
+        {
+          "city": "czechia/moravia/mikulov",
+          "why": "A Moravian rabbinical seat, with a hillside cemetery of four thousand graves."
+        }
+      ]
+    }
+  ]
+}

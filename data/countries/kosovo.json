@@ -1,0 +1,46 @@
+{
+  "code": "xk", "slug": "kosovo", "name": "Kosovo", "official": "Republic of Kosovo",
+  "macro": "adriatic-balkans", "capital": "Pristina", "currency": "EUR — euro",
+  "languages": ["Albanian", "Serbian"],
+  "blocs": ["eurozone"],
+  "tagline": "Europe's youngest country by both age and population, with medieval monasteries and a mountain trail into two neighbours.",
+  "summary": "Kosovo declared independence in 2008 and is recognised by around half the world's states, not including Serbia — a fact that shapes travel logistics more than daily experience. It is the youngest population in Europe, with an energetic café culture in Pristina, four UNESCO-listed Serbian Orthodox monasteries, and a share of the Peaks of the Balkans trail through the Accursed Mountains.",
+  "interests": ["history", "sacred", "mountains", "food", "nature"],
+  "budget": "low", "daily_eur": [25, 65],
+  "season": { "peak": ["may", "jun", "sep"], "shoulder": ["apr", "jul", "aug", "oct"],
+    "note": "Late spring and early autumn are best. The Rugova mountains are walkable from June to early October. Winters are cold and Brezovica offers cheap, basic skiing." },
+  "getting_around": "Buses link Pristina, Prizren and Peja frequently and cheaply. Note the entry rule: if you enter Kosovo from Albania, Montenegro or North Macedonia, Serbia may not accept that as a legal entry into its territory — plan the direction of travel carefully.",
+  "food": ["Flija, layered pancake cooked slowly over embers", "Burek and yoghurt for breakfast, everywhere", "Macchiato culture — Pristina takes coffee extremely seriously"],
+  "festivals": [
+    { "name": "DokuFest documentary film festival", "month": "aug", "where": "Prizren" },
+    { "name": "Prishtina International Film Festival", "month": "jul", "where": "Pristina" },
+    { "name": "Independence Day", "month": "feb", "where": "Nationwide" }
+  ],
+  "know": ["Entering from Serbia and leaving to a third country is straightforward; the reverse can create problems. Check current rules before routing.", "Uses the euro unilaterally.", "Orthodox monasteries are protected sites, sometimes with a police presence; visits are welcome and photography rules are strict."],
+  "regions": [
+    { "slug": "pristina-and-the-plain", "name": "Pristina & the Plain",
+      "summary": "The young capital and the historic battlefield plain around it.",
+      "interests": ["history", "food", "cities"],
+      "cities": [
+        { "slug": "pristina", "name": "Pristina", "lat": 42.66, "lon": 21.17,
+          "summary": "A capital of cafés, brutalist landmarks and a median age under thirty.",
+          "interests": ["history", "food", "cities", "art"], "nights": [1, 2],
+          "highlights": ["The National Library, which everyone has an opinion about", "Newborn, the typographic monument repainted every year", "Gračanica monastery, 14th-century frescoes, ten minutes out"] }
+      ] },
+    { "slug": "prizren-and-the-mountains", "name": "Prizren & the Mountains",
+      "summary": "The Ottoman city under a fortress, and the Rugova valley into the Accursed Mountains.",
+      "interests": ["history", "sacred", "mountains", "nature"],
+      "cities": [
+        { "slug": "prizren", "name": "Prizren", "lat": 42.21, "lon": 20.74,
+          "summary": "A river town of mosques, Orthodox churches and a stone bridge, under a fortress with the whole valley below it.",
+          "interests": ["history", "sacred", "architecture", "food"], "nights": [1, 2],
+          "highlights": ["Sinan Pasha mosque and the Church of Our Lady of Ljeviš, on the same street", "The fortress at sunset, walked up in twenty minutes", "DokuFest, when films are screened on the river and in the castle"],
+          "experiences": [{ "slug": "prizren-fortress-sunset", "name": "Up to Kaljaja at sunset", "kind": "walk", "band": "low", "summary": "Twenty minutes of steps for the whole town, its minarets and its bell towers in one frame." }] },
+        { "slug": "peja", "name": "Peja & Rugova", "lat": 42.66, "lon": 20.29, "quiet": true,
+          "summary": "A bazaar town at the mouth of a limestone gorge, with a patriarchate monastery and the Accursed Mountains behind.",
+          "interests": ["mountains", "sacred", "nature", "wild"], "nights": [2, 3],
+          "highlights": ["The Patriarchate of Peć, a UNESCO site and the seat of the Serbian church", "Rugova canyon, and via ferrata routes in it", "The Peaks of the Balkans trail, crossing into Montenegro and Albania"],
+          "experiences": [{ "slug": "peaks-of-the-balkans", "name": "The Peaks of the Balkans trail", "kind": "walk", "band": "moderate", "summary": "192 km across three countries in ten days, with village guesthouses and border permits arranged in advance." }] }
+      ] }
+  ]
+}

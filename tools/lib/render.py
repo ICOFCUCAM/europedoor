@@ -106,7 +106,7 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(full_title)}</title>
 <meta name="description" content="{esc(description)}">
-<link rel="canonical" href="https://europedoor.example{esc(path)}">
+<link rel="canonical" href="https://europedoor.com{esc(path)}">
 <meta property="og:title" content="{esc(full_title)}">
 <meta property="og:description" content="{esc(description)}">
 <meta property="og:type" content="website">

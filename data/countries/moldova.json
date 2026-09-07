@@ -1,0 +1,41 @@
+{
+  "code": "md", "slug": "moldova", "name": "Moldova", "official": "Republic of Moldova",
+  "macro": "eastern", "capital": "Chișinău", "currency": "MDL — Moldovan leu",
+  "languages": ["Romanian"],
+  "blocs": [],
+  "tagline": "The world's largest wine cellar, measured in kilometres, under one of Europe's least visited countries.",
+  "summary": "Moldova is small, agricultural and almost entirely overlooked, which is precisely the argument for going. It has been making wine for five thousand years and stores it in limestone mines: Mileștii Mici holds two million bottles in 200 kilometres of tunnel. A cave monastery is cut into a cliff over the Răut, and rural guesthouse tourism is genuinely community-run.",
+  "interests": ["wine", "food", "sacred", "nature", "history"],
+  "budget": "low", "daily_eur": [25, 60],
+  "season": { "peak": ["may", "jun", "sep", "oct"], "shoulder": ["apr", "jul", "aug"],
+    "note": "The harvest in late September and early October is the reason to time a visit — National Wine Day is the first weekend of October. Summers are hot and dry; winters are cold and quiet." },
+  "getting_around": "Minibuses (rutiere) reach every village from Chișinău. A driver or a car makes the cellars and monasteries practical. Note that Transnistria operates as a separate de facto administration with its own checks.",
+  "food": ["Plăcinte, filled pastries, at every roadside", "Mămăligă with sheep cheese and sour cream", "Fetească neagră and rară neagră — indigenous grapes grown almost nowhere else"],
+  "festivals": [
+    { "name": "National Wine Day", "month": "oct", "where": "Chișinău" },
+    { "name": "Mărțișor, spring welcome with red-and-white tokens", "month": "mar", "where": "Nationwide" },
+    { "name": "Harvest festivals in the villages", "month": "sep", "where": "Codru and Ștefan Vodă" }
+  ],
+  "know": ["Transnistria is a de facto separate administration; entry involves its own controls and your government's advice may differ for it.", "Village guesthouse networks are well organised and startlingly cheap.", "Cellar visits are usually by car through the tunnels, which is exactly as strange as it sounds."],
+  "regions": [
+    { "slug": "chisinau-and-the-cellars", "name": "Chișinău & the Cellars",
+      "summary": "The capital, and the underground wine cities within an hour of it.",
+      "interests": ["wine", "food", "cities"],
+      "cities": [
+        { "slug": "chisinau", "name": "Chișinău", "lat": 47.01, "lon": 28.86,
+          "summary": "A green, low-rise capital of parks and Soviet-era planning, with the wine country immediately outside it.",
+          "interests": ["wine", "food", "cities"], "nights": [1, 2],
+          "highlights": ["Cricova and Mileștii Mici, driven through by car", "The central market, and the produce of a country that mostly farms", "Soviet mosaics and modernist buildings on the edges"],
+          "experiences": [{ "slug": "milestii-mici-cellars", "name": "Driving through a wine cellar", "kind": "cellar", "band": "low", "summary": "200 km of limestone galleries with street names, and two million bottles. Visitors go in by vehicle because walking would take days." }] }
+      ] },
+    { "slug": "orheiul-vechi", "name": "Orheiul Vechi & the North",
+      "summary": "A cave monastery above a river meander, and the villages around it.",
+      "interests": ["sacred", "nature", "history"],
+      "cities": [
+        { "slug": "orheiul-vechi", "name": "Orheiul Vechi", "lat": 47.31, "lon": 28.98, "quiet": true,
+          "summary": "A monastery dug into a limestone cliff over a loop of the Răut, inhabited on and off since the 13th century.",
+          "interests": ["sacred", "nature", "history"], "nights": [1, 1],
+          "highlights": ["The cave church, reached along the cliff edge", "Butuceni village below, with guesthouses in stone houses", "Getic and Tatar remains in the same valley"] }
+      ] }
+  ]
+}

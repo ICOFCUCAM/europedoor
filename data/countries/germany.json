@@ -1,0 +1,86 @@
+{
+  "code": "de", "slug": "germany", "name": "Germany", "official": "Federal Republic of Germany",
+  "macro": "alpine-central", "capital": "Berlin", "currency": "EUR — euro",
+  "languages": ["German"],
+  "blocs": ["eu", "schengen", "eurozone", "eea"],
+  "tagline": "Sixteen states that were separate countries within living memory, and still behave like it.",
+  "summary": "Germany has no single centre because it was assembled from kingdoms and free cities in 1871, and every one of them kept its own capital, cathedral and beer. That is the country's real pleasure: Bavaria and Hamburg have less in common than France and Spain. Berlin is a city of the twentieth century, still visibly working through it; the Rhine, the Black Forest and the Baltic coast are all quieter than they deserve.",
+  "interests": ["history", "music", "art", "food", "mountains", "cities", "rail", "architecture"],
+  "budget": "moderate", "daily_eur": [70, 165],
+  "season": { "peak": ["may", "jun", "jul", "aug", "sep"], "shoulder": ["apr", "oct"],
+    "note": "May and September are the best of it. December is Christmas market season and genuinely worth the cold — the markets are civic events, not tourist ones. Oktoberfest is in September, which catches people out annually." },
+  "getting_around": "ICE trains link the big cities fast, and the Deutschlandticket gives a month of unlimited regional transport nationwide for a flat fee — the best transport deal in Europe. Regional trains reach almost every valley.",
+  "food": ["Bread: 3,000 registered varieties, and the bakery is the first thing to find", "Wurst, which is regional and non-negotiable — Currywurst in Berlin, Weisswurst before noon only in Munich", "Riesling from the Mosel, which is dry now whatever your grandmother thought"],
+  "festivals": [
+    { "name": "Karneval / Fasching", "month": "feb", "where": "Cologne, Mainz, Düsseldorf" },
+    { "name": "Oktoberfest — which starts in September", "month": "sep", "where": "Munich" },
+    { "name": "Christmas markets", "month": "dec", "where": "Nuremberg, Dresden, and every town square" }
+  ],
+  "know": ["Cash is still king in a surprising number of bakeries, bars and taxis.", "Sunday closing is near-total; buy food on Saturday.", "Jaywalking against a red man is genuinely disapproved of, especially with children present."],
+  "regions": [
+    { "slug": "berlin-and-the-east", "name": "Berlin & the East",
+      "summary": "The capital, Saxony's baroque cities, and the landscape of a country that was two countries.",
+      "interests": ["history", "art", "music", "architecture"],
+      "cities": [
+        { "slug": "berlin", "name": "Berlin", "lat": 52.52, "lon": 13.40,
+          "summary": "Poor, sexy, enormous and unfinished — five museums on one island and a wall memorial that refuses to be comfortable.",
+          "interests": ["history", "art", "music", "cities", "architecture"], "nights": [3, 4],
+          "highlights": ["Museum Island, especially the Pergamon's scale and the Neues Museum's Nefertiti", "The Berlin Wall Memorial at Bernauer Straße — the honest one, not Checkpoint Charlie", "Tempelhof: an airport turned into the largest urban park in the world", "The Stasi Museum, in the ministry's own offices"],
+          "experiences": [
+            { "slug": "berlin-wall-memorial-walk", "name": "The Wall, where it stood", "kind": "walk", "band": "low", "summary": "Bernauer Straße preserves the death strip, the tunnels and the names — an hour that does what no film manages." },
+            { "slug": "berlin-tempelhof-field", "name": "Cycle the runways at Tempelhof", "kind": "ride", "band": "low", "summary": "Two 2,000-metre runways, open to anyone, kept deliberately empty by referendum." }
+          ] },
+        { "slug": "dresden", "name": "Dresden", "lat": 51.05, "lon": 13.74,
+          "summary": "A baroque royal capital burned in 1945 and rebuilt stone by numbered stone, on a river bend.",
+          "interests": ["architecture", "art", "history", "music"], "nights": [1, 2],
+          "highlights": ["The Frauenkirche, reassembled from the rubble and finished in 2005", "The Green Vault's treasury, booked in timed slots", "Saxon Switzerland's sandstone towers, forty minutes upriver"] },
+        { "slug": "leipzig", "name": "Leipzig", "lat": 51.34, "lon": 12.37, "quiet": true,
+          "summary": "Bach's church, a peaceful revolution that started in it, and a cotton mill full of painters.",
+          "interests": ["music", "art", "history"], "nights": [1, 2],
+          "highlights": ["Bach's Thomaskirche, where he was cantor for 27 years", "The Nikolaikirche and the Monday demonstrations of 1989", "Spinnerei: a vast mill turned gallery quarter"] }
+      ] },
+    { "slug": "bavaria-and-the-alps", "name": "Bavaria & the Alps",
+      "summary": "Beer halls, baroque churches, mountain lakes and a mad king's castles.",
+      "interests": ["mountains", "food", "history", "winter", "sacred"],
+      "cities": [
+        { "slug": "munich", "name": "Munich", "lat": 48.14, "lon": 11.58,
+          "summary": "A wealthy southern capital with the Alps an hour away and a river you can surf in the middle of a park.",
+          "interests": ["food", "art", "cities", "mountains"], "nights": [2, 3],
+          "highlights": ["The Eisbach standing wave, surfed year-round in the English Garden", "The Alte Pinakothek's Rubens and Dürer", "A beer garden where you may legally bring your own food", "Day trains to the mountains and the lakes"],
+          "experiences": [{ "slug": "munich-beer-garden-rules", "name": "A beer garden, done correctly", "kind": "table", "band": "low", "summary": "Buy the beer, bring the food, sit at the unmarked communal tables — the marked ones are for served customers and the distinction matters." }] },
+        { "slug": "berchtesgaden", "name": "Berchtesgaden", "lat": 47.63, "lon": 13.00,
+          "summary": "An alpine corner surrounded on three sides by Austria, with a fjord-green lake below the Watzmann.",
+          "interests": ["mountains", "nature", "winter"], "nights": [2, 3],
+          "highlights": ["Königssee, crossed by electric boats since 1909 so the echo carries", "The salt mine, worked since 1517, entered on a wooden slide", "Steep, serious walking on the Watzmann"],
+          "experiences": [{ "slug": "konigssee-echo-boat", "name": "The trumpet on the Königssee", "kind": "water", "band": "moderate", "summary": "The boatman stops mid-lake and plays into the cliff; the echo comes back a full phrase later." }] }
+      ] },
+    { "slug": "rhine-and-the-west", "name": "The Rhine & the West",
+      "summary": "Castles on a gorge, Riesling on impossible slopes, and cathedral cities strung along the river.",
+      "interests": ["wine", "sacred", "history", "rail"],
+      "cities": [
+        { "slug": "cologne", "name": "Cologne", "lat": 50.94, "lon": 6.96,
+          "summary": "A Roman city with a Gothic cathedral that took 632 years and dominates everything.",
+          "interests": ["sacred", "history", "food", "cities"], "nights": [1, 2],
+          "highlights": ["The Dom, and 533 steps up the south tower", "Kölsch served in 200 ml glasses, replaced until you cover it with the mat", "The Roman-Germanic museum's mosaic, found while digging an air-raid shelter"] },
+        { "slug": "bacharach", "name": "Bacharach & the Rhine Gorge", "lat": 50.06, "lon": 7.77, "quiet": true,
+          "summary": "Half-timbered wine village under a ruined chapel, in the 65-kilometre UNESCO stretch of castles.",
+          "interests": ["wine", "history", "rail", "nature"], "nights": [1, 2],
+          "highlights": ["Forty castles in sixty-five kilometres of river", "Riesling from slate slopes at 60 degrees", "The Rheinsteig path along the eastern rim"],
+          "experiences": [{ "slug": "rhine-gorge-slope-walk", "name": "Above the vineyards on the Rheinsteig", "kind": "walk", "band": "low", "summary": "The high path gives you the whole gorge; the trains and boats below give you the way back." }] }
+      ] },
+    { "slug": "north-germany", "name": "The North",
+      "summary": "Hanseatic brick, harbour cities and a Baltic coast of white cliffs and beach chairs.",
+      "interests": ["coast", "architecture", "music", "food"],
+      "cities": [
+        { "slug": "hamburg", "name": "Hamburg", "lat": 53.55, "lon": 9.99,
+          "summary": "A merchant republic and Europe's third port, with more bridges than Venice and Amsterdam together.",
+          "interests": ["architecture", "music", "food", "cities"], "nights": [2, 3],
+          "highlights": ["The Elbphilharmonie, and its free public plaza at 37 metres", "Speicherstadt's brick warehouse city on oak piles", "Fischmarkt at 5 am on a Sunday, with a band"],
+          "experiences": [{ "slug": "hamburg-harbour-ferry", "name": "The 62 ferry, not the tour boat", "kind": "water", "band": "low", "summary": "A public transport ferry down the Elbe past the container terminals; same view, a fraction of the price." }] },
+        { "slug": "lubeck", "name": "Lübeck", "lat": 53.87, "lon": 10.69, "quiet": true,
+          "summary": "The queen of the Hanseatic League, on an island, in brick gothic, and the home of marzipan.",
+          "interests": ["history", "architecture", "food"], "nights": [1, 1],
+          "highlights": ["The Holstentor, leaning and famous and on the old fifty-mark note", "Seven towers on the island skyline", "Thomas Mann's family house, and Buddenbrooks written in it"] }
+      ] }
+  ]
+}

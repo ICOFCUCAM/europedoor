@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://europedoor.com/sitemap.xml

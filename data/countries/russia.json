@@ -1,0 +1,44 @@
+{
+  "code": "ru", "slug": "russia", "name": "Russia", "official": "Russian Federation",
+  "macro": "eastern", "capital": "Moscow", "currency": "RUB — Russian rouble",
+  "languages": ["Russian"],
+  "blocs": [],
+  "advisory": {
+    "level": "avoid",
+    "note": "European governments advise against all or all but essential travel to Russia, citing the security situation, the risk of arbitrary detention, limited consular assistance and severely restricted flight and payment options. This page is a record of the European part of the country and is not a recommendation to travel there."
+  },
+  "tagline": "The European part alone is larger than any other country on the continent, and contains two of its greatest cities.",
+  "summary": "Russia west of the Urals is geographically European and holds Moscow, St Petersburg and the Golden Ring of medieval towns. St Petersburg was built from nothing on a marsh in 1703 as a deliberate window on Europe, and the Hermitage is among the largest art collections in the world. This page records that; the advisory above governs whether any of it is currently reachable.",
+  "interests": ["art", "architecture", "history", "sacred", "music"],
+  "budget": "moderate", "daily_eur": [40, 110],
+  "season": { "peak": ["jun", "jul"], "shoulder": ["may", "sep"],
+    "note": "Historically the White Nights in June for St Petersburg. This is context, not a recommendation." },
+  "getting_around": "Historically an extensive rail network including the overnight Moscow–St Petersburg services. Current air links to Europe are severely limited and Western cards do not work.",
+  "food": ["Blini, with sour cream and whatever is in season", "Pelmeni and borscht, both contested across borders", "Black bread and pickled everything"],
+  "festivals": [
+    { "name": "Maslenitsa, the pancake week before Lent", "month": "feb", "where": "Nationwide" },
+    { "name": "White Nights", "month": "jun", "where": "St Petersburg" },
+    { "name": "Orthodox Easter", "month": "apr", "where": "Nationwide" }
+  ],
+  "know": ["Check your own government's current travel advice; most advise against travel.", "This country is excluded from the Journey Planner.", "Western bank cards do not function and consular assistance is limited."],
+  "regions": [
+    { "slug": "north-west-russia", "name": "The Northwest",
+      "summary": "St Petersburg and the Baltic coast around it.",
+      "interests": ["art", "architecture", "music"],
+      "cities": [
+        { "slug": "saint-petersburg", "name": "Saint Petersburg", "lat": 59.94, "lon": 30.31,
+          "summary": "A planned imperial capital of canals and neoclassical facades, built on piles in a delta from 1703.",
+          "interests": ["art", "architecture", "music", "history"], "nights": [3, 4],
+          "highlights": ["The Hermitage, in the Winter Palace", "The Church of the Saviour on Spilled Blood and its mosaic interior", "White Nights in June, when the bridges lift at night", "Peterhof's fountains, which run without pumps"] }
+      ] },
+    { "slug": "moscow-and-the-golden-ring", "name": "Moscow & the Golden Ring",
+      "summary": "The capital and the medieval towns northeast of it.",
+      "interests": ["history", "sacred", "architecture"],
+      "cities": [
+        { "slug": "moscow", "name": "Moscow", "lat": 55.76, "lon": 37.62,
+          "summary": "A fortress, a cathedral square and a metro system built as underground palaces.",
+          "interests": ["history", "architecture", "sacred", "art"], "nights": [3, 4],
+          "highlights": ["The Kremlin's cathedral square", "Metro stations with chandeliers and mosaics", "The Tretyakov Gallery's icons, including Rublev's Trinity"] }
+      ] }
+  ]
+}

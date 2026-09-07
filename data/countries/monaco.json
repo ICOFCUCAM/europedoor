@@ -1,0 +1,32 @@
+{
+  "code": "mc", "slug": "monaco", "name": "Monaco", "official": "Principality of Monaco",
+  "macro": "western", "capital": "Monaco", "currency": "EUR — euro",
+  "languages": ["French", "Monégasque"],
+  "blocs": ["eurozone"],
+  "tagline": "Two square kilometres of rock, casino and Grand Prix circuit, wedged between France and the sea.",
+  "summary": "Monaco is the second-smallest country in the world and the most densely populated, built vertically up a cliff because there is nowhere else to go. It is not in the EU or Schengen in its own right, though you enter through France and will not notice a border. For a visitor it is a half-day: the old town on the rock, the casino, the harbour, and the fact that a Formula One circuit runs through all three.",
+  "interests": ["coast", "architecture", "cities", "art"],
+  "budget": "high", "daily_eur": [140, 320],
+  "season": { "peak": ["may", "jun", "jul", "aug", "sep"], "shoulder": ["apr", "oct"],
+    "note": "The Grand Prix takes the last weekend in May and doubles every price in the region. Spring and autumn are warm and manageable; August is hot and full." },
+  "getting_around": "Walk, and use the public lifts — a network of them climbs the cliff for free. The train from Nice takes twenty minutes and is by far the best way in.",
+  "food": ["Barbagiuan, a fried chard and ricotta pastry, the actual national dish", "Socca and Niçoise cooking, shared with the coast either side", "A coffee at the Café de Paris, priced as theatre"],
+  "festivals": [
+    { "name": "Monaco Grand Prix", "month": "may", "where": "The streets" },
+    { "name": "Monte-Carlo Rally", "month": "jan", "where": "The principality and the Alps behind" },
+    { "name": "National Day", "month": "nov", "where": "Monaco-Ville" }
+  ],
+  "know": ["Not in the EU or Schengen as a member, but inside the Schengen travel area in practice via France.", "The casino requires ID and refuses entry to Monégasque citizens by law.", "Beach access is largely paid; the free public beach is at Larvotto."],
+  "regions": [
+    { "slug": "the-rock-and-the-harbour", "name": "The Rock & the Harbour",
+      "summary": "The old town on its promontory, the port below, and Monte-Carlo along the bay.",
+      "interests": ["coast", "architecture", "art", "cities"],
+      "cities": [
+        { "slug": "monaco-ville", "name": "Monaco-Ville", "lat": 43.73, "lon": 7.42,
+          "summary": "The medieval quarter on the rock: palace, cathedral, and an oceanographic museum built into the cliff face.",
+          "interests": ["history", "coast", "architecture"], "nights": [1, 1],
+          "highlights": ["The Oceanographic Museum, founded by a prince who was a serious scientist", "The changing of the guard at 11:55, briskly", "The Exotic Garden and the cave beneath it"],
+          "experiences": [{ "slug": "monaco-circuit-walk", "name": "Walk the Grand Prix circuit", "kind": "walk", "band": "low", "summary": "3.3 km of ordinary public road: the tunnel, the hairpin, the harbour chicane. It takes forty minutes and recalibrates what you think those cars are doing." }] }
+      ] }
+  ]
+}

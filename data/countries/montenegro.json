@@ -1,0 +1,46 @@
+{
+  "code": "me", "slug": "montenegro", "name": "Montenegro", "official": "Montenegro",
+  "macro": "adriatic-balkans", "capital": "Podgorica", "currency": "EUR — euro",
+  "languages": ["Montenegrin", "Serbian"],
+  "blocs": ["eurozone"],
+  "tagline": "A drowned river canyon that looks like a fjord, with black mountains straight up behind it.",
+  "summary": "Montenegro is smaller than Wales and rises from sea level to 2,500 metres within twenty kilometres. The Bay of Kotor is a ria — a flooded river valley — walled by cliffs, with Venetian towns around its edge. Behind it, Durmitor's plateau and the Tara canyon are properly wild. It uses the euro without being in the EU or the eurozone formally.",
+  "interests": ["coast", "mountains", "history", "nature"],
+  "budget": "moderate", "daily_eur": [45, 115],
+  "season": { "peak": ["jun", "jul", "aug", "sep"], "shoulder": ["may", "oct"],
+    "note": "The coast is very busy in July and August and the single coast road becomes a queue. June and September are the answer. The mountains hold snow into June and are best from July to early October." },
+  "getting_around": "Buses along the coast and inland to Žabljak. The Belgrade–Bar railway crosses the Mala Rijeka viaduct, one of the highest rail bridges in Europe. A car makes the mountains practical and the coast in August difficult.",
+  "food": ["Njeguški pršut, air-dried ham from a mountain village above Kotor", "Kajmak, a clotted dairy spread served with everything", "Fish from the bay, grilled whole and priced by weight"],
+  "festivals": [
+    { "name": "Kotor Carnival", "month": "feb", "where": "Kotor" },
+    { "name": "Boka Night, with decorated boats", "month": "aug", "where": "Kotor bay" },
+    { "name": "Mimosa Festival", "month": "feb", "where": "Herceg Novi" }
+  ],
+  "know": ["Uses the euro unilaterally; not in the EU.", "The coast road is single carriageway and slow in summer; the Sozina tunnel saves an hour.", "Mountain weather in Durmitor turns fast and rescue is limited."],
+  "regions": [
+    { "slug": "bay-of-kotor", "name": "The Bay of Kotor & the Coast",
+      "summary": "A flooded canyon with Venetian towns around it, and beaches south of the mouth.",
+      "interests": ["coast", "history", "architecture"],
+      "cities": [
+        { "slug": "kotor", "name": "Kotor", "lat": 42.42, "lon": 18.77,
+          "summary": "A walled Venetian town at the head of the bay, with fortifications climbing 260 metres up the cliff behind it.",
+          "interests": ["coast", "history", "mountains", "architecture"], "nights": [2, 3],
+          "highlights": ["The 1,350 steps up the fortress walls, at dawn before the heat", "The old town's cats, which have their own museum", "Our Lady of the Rocks, an artificial island built by sailors dropping stones"],
+          "experiences": [{ "slug": "kotor-fortress-steps", "name": "The city walls at dawn", "kind": "walk", "band": "low", "summary": "Ninety minutes up, the whole bay below, and a small church halfway. Go before eight or don't go in July." }] },
+        { "slug": "perast", "name": "Perast", "lat": 42.49, "lon": 18.70, "quiet": true,
+          "summary": "One street, sixteen baroque palaces, two islands offshore, and no room for a car.",
+          "interests": ["coast", "history", "sacred"], "nights": [1, 2],
+          "highlights": ["The boat to Our Lady of the Rocks, five minutes offshore", "Palaces built by sea captains who served Venice", "Swimming off the town steps at seven in the morning"] }
+      ] },
+    { "slug": "durmitor-and-the-north", "name": "Durmitor & the North",
+      "summary": "A high limestone plateau, glacial lakes, and the second-deepest canyon in the world.",
+      "interests": ["mountains", "nature", "wild"],
+      "cities": [
+        { "slug": "zabljak", "name": "Žabljak", "lat": 43.15, "lon": 19.12, "quiet": true,
+          "summary": "The highest town in the Balkans at 1,450 metres, at the edge of Durmitor national park.",
+          "interests": ["mountains", "nature", "winter", "wild"], "nights": [2, 3],
+          "highlights": ["The Black Lake, twenty minutes' walk from the town", "Bobotov Kuk, 2,523 metres, a long day on rock", "The Tara canyon, 1,300 metres deep, rafted in spring"],
+          "experiences": [{ "slug": "tara-canyon-raft", "name": "Rafting the Tara", "kind": "water", "band": "moderate", "summary": "The deepest canyon in Europe, drinkable water the whole way, and a season from May to October." }] }
+      ] }
+  ]
+}
