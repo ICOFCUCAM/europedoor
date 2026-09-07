@@ -298,3 +298,15 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
   .hero { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); }
   .heromap { display: block; }
 }
+
+/* ── the sentence box on the planner ──────────────────────────────── */
+.form.ask { margin-bottom: var(--s6); border-color: var(--door); }
+.form.ask textarea {
+  width: 100%; font: inherit; font-size: var(--t-md); padding: var(--s3);
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--paper); color: var(--ink); resize: vertical; min-height: 3.4rem;
+}
+
+/* ── a journey drawn over the map ─────────────────────────────────── */
+.routeline { fill: none; stroke: var(--door); stroke-width: 2.5; stroke-linejoin: round; stroke-dasharray: 7 5; opacity: .9; }
+.routedot { fill: var(--door); stroke: var(--paper); stroke-width: 2; }

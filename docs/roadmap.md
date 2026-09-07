@@ -8,15 +8,21 @@ Kept current. The reasoning is in
 * Europe Atlas: 9 macro regions, 50 countries, 121 travel regions, 244
   cities, 166 experiences
 * Journey Planner, browser-side, over the whole Atlas
-* 8 curated cross-border journeys, 9 themes, 8 stories
+* 8 curated cross-border journeys, 13 themes, 8 stories
 * Map of every city, no third-party tiles
 * Experience listings, ten kinds, with the verification model published
 * Europe Fund register, 12 projects, holding nothing
 * Europe Experience Score with the formula published at `/method`
 * My Europe (browser-local saves), Events, `/beyond-the-obvious`
 * Search: the whole index filtered in the browser, with accent folding
+* A sentence box on the planner: rules, not a model, showing what it read
+  and naming what it cannot take account of
+* Month pages for the European year, answering where to go as well as what is on
+* Journey overlays on the map; My Europe saves journeys, themes and stories
+* Reverse edges: every city knows its journeys, themes and stories
 * An honest status page separating built / designed / blocked
-* 22 static checks and 88 browser checks, in CI
+* 22 static checks, 103 browser checks and a 199-assertion audit of the
+  brief's 35 sections, all in CI
 
 ## Next, in order
 

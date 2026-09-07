@@ -227,6 +227,22 @@ def load():
 
     p.raise_if_any()
 
+    # Reverse edges. The brief calls the dataset a knowledge graph, and a
+    # graph you can only traverse in one direction is a tree. Every city
+    # needs to know which journeys pass through it, which themes name it and
+    # which stories are set there, or those relationships exist only in the
+    # curator's head.
+    back = {cid: {"journeys": [], "themes": [], "stories": []} for cid in index}
+    for j in journeys:
+        for leg in j["legs"]:
+            back[leg["city"]]["journeys"].append(j)
+    for t in themes:
+        for stop in t["stops"]:
+            back[stop["city"]]["themes"].append(t)
+    for st in stories:
+        for cid in st.get("places", []):
+            back[cid]["stories"].append(st)
+
     return {
         "taxonomy": tax,
         "interests": interests,
@@ -238,6 +254,7 @@ def load():
         "fund": fund,
         "providers": providers,
         "cities": index,
+        "back": back,
     }
 
 

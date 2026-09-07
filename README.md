@@ -19,10 +19,10 @@ of a trip happens *before* the transaction, and almost nobody serves it well.
 | Cities | 244 |
 | Experiences | 166 |
 | Curated journeys | 8 |
-| Themes | 9 |
+| Themes | 13 |
 | Stories | 8 |
 | Fund projects | 12 (holding nothing — deliberately) |
-| Generated pages | 508 |
+| Generated pages | 524 |
 | Runtime dependencies | 0 |
 
 ## Run it
@@ -33,7 +33,8 @@ python3 tools/build.py check      # validate the data, render nothing
 python3 tools/build.py stats      # what is in the dataset
 
 python3 tools/checks.py           # 22 checks over the built HTML
-node tools/browser-checks.js      # 88 checks in Chromium (needs playwright)
+node tools/browser-checks.js      # 103 checks in Chromium (needs playwright)
+python3 tools/section-audit.py    # the brief, section by section, against the build
 
 python3 -m http.server -d site 8000   # then open http://localhost:8000
 ```
@@ -51,6 +52,7 @@ prompts, dashboards, monetisation, roadmap and risks.
 | you are doing | read |
 |---|---|
 | **anything at all** | [`docs/product-specification.md`](docs/product-specification.md) |
+| checking a claim about what is built | [`docs/section-audit.md`](docs/section-audit.md) — 35 sections, 199 machine-checked assertions |
 | changing how the site is generated | [`docs/architecture.md`](docs/architecture.md) |
 | adding or editing places | [`docs/data-model.md`](docs/data-model.md) |
 | touching the scores | [`docs/scoring-method.md`](docs/scoring-method.md) |

@@ -103,8 +103,9 @@ we can add later without changing the URL shape.
 
 ## 5. Experience-first discovery — **built** as Themes
 
-`/themes` — nine cross-border ways in: medieval, sacred, Viking, mountain,
-Roman, wine, rail, island and Jewish Europe. Each is a real sequence of real
+`/themes` — thirteen cross-border ways in: medieval, sacred, Viking, mountain,
+Roman, wine, rail, island, Jewish, Renaissance, Grand Tour, thermal and
+modernist Europe. Each is a real sequence of real
 places, each place linked back into the Atlas. This is the brief's "I want
 medieval Europe" query, answered as a page rather than a search result,
 because a curated answer with reasons beats a filtered list.
@@ -859,7 +860,7 @@ run.
 ## 3.1 MVP — what is already true
 
 Built and passing checks: the Atlas (50/121/244), the Planner, Search, 8
-Journeys, 9 Themes, 8 Stories, the Map, Experiences with a verification
+Journeys, 13 Themes, 8 Stories, the Map, Experiences with a verification
 model, the Fund register, the Experience Score with a published method, My
 Europe, Events, and an honest status page.
 

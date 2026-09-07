@@ -81,6 +81,8 @@ def build():
         emit(P.fund_page(d, p))
     emit(P.map_page(d))
     emit(P.events_page(d))
+    for month in d["taxonomy"]["months"]:
+        emit(P.events_month_page(d, month))
     emit(P.quiet_page(d))
     emit(P.my_europe_page(d))
     emit(P.method_page(d))

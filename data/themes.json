@@ -407,6 +407,191 @@
           "why": "A Moravian rabbinical seat, with a hillside cemetery of four thousand graves."
         }
       ]
+    },
+    {
+      "slug": "renaissance-europe",
+      "name": "Renaissance Europe",
+      "strapline": "Where the money went",
+      "summary": "The Renaissance happened where banking did, and the buildings are the receipts. These are the city states that funded it and the courts that competed with them — plus the two places that exported the style north and made it something else.",
+      "interests": [
+        "art",
+        "architecture",
+        "history",
+        "cities"
+      ],
+      "stops": [
+        {
+          "city": "italy/tuscany-and-the-centre/florence",
+          "why": "Banking money, and nearly all of it inside a twenty-minute walk."
+        },
+        {
+          "city": "italy/tuscany-and-the-centre/siena",
+          "why": "The rival that lost, and was preserved by losing."
+        },
+        {
+          "city": "italy/north-italy/venice",
+          "why": "A republic that bought its art from everywhere and kept it."
+        },
+        {
+          "city": "italy/rome-and-lazio/rome",
+          "why": "Where the popes outspent the bankers, and Michelangelo worked for both."
+        },
+        {
+          "city": "italy/tuscany-and-the-centre/bologna",
+          "why": "The oldest university in the world, and the arcades built to keep scholars dry."
+        },
+        {
+          "city": "france/loire-and-the-southwest/amboise",
+          "why": "Leonardo's last house, and the château where the style crossed the Alps."
+        },
+        {
+          "city": "france/alps-and-east/colmar",
+          "why": "The Isenheim altarpiece: what the north did with the same century."
+        },
+        {
+          "city": "belgium/flanders/antwerp",
+          "why": "Rubens's own house and studio, in the city that took Venice's trade."
+        }
+      ]
+    },
+    {
+      "slug": "grand-tour-europe",
+      "name": "The Grand Tour",
+      "strapline": "The eighteenth-century route, still walkable",
+      "summary": "For two hundred years a wealthy young northern European was sent south to learn taste, and the itinerary barely changed: Paris, the Alps, the Italian cities, ideally Greece. The route survives, the coaching inns are hotels, and the trains do in hours what took them weeks.",
+      "interests": [
+        "art",
+        "architecture",
+        "history",
+        "rail",
+        "wine"
+      ],
+      "stops": [
+        {
+          "city": "france/paris-and-ile-de-france/paris",
+          "why": "The first stop, then as now, and the one that taught manners rather than antiquity."
+        },
+        {
+          "city": "switzerland/bernese-oberland/lauterbrunnen",
+          "why": "The Alps, which the eighteenth century found terrifying and the nineteenth found sublime."
+        },
+        {
+          "city": "italy/north-italy/milan",
+          "why": "Over the pass and into Italy: the first opera house of the journey."
+        },
+        {
+          "city": "italy/north-italy/venice",
+          "why": "Carnival, Canaletto, and the paintings they took home as souvenirs."
+        },
+        {
+          "city": "italy/tuscany-and-the-centre/florence",
+          "why": "The Uffizi, already a public gallery when the tourists arrived."
+        },
+        {
+          "city": "italy/rome-and-lazio/rome",
+          "why": "The point of the whole thing, and where the drawings were made."
+        },
+        {
+          "city": "italy/south-italy-and-islands/naples",
+          "why": "Vesuvius, Pompeii newly dug, and the furthest most of them got."
+        },
+        {
+          "city": "greece/athens-and-the-peloponnese/athens",
+          "why": "The few who kept going, and came back with the Parthenon in their sketchbooks."
+        }
+      ]
+    },
+    {
+      "slug": "thermal-europe",
+      "name": "Thermal Europe",
+      "strapline": "Where the ground is warm",
+      "summary": "Europe sits on hot water in more places than people realise, and every culture that found some built something around it: Roman baths, Ottoman hammams, Habsburg spa towns, Icelandic municipal pools and a Finnish sauna in every building. Bathing is the oldest continuous European leisure activity there is.",
+      "interests": [
+        "nature",
+        "history",
+        "design",
+        "cities"
+      ],
+      "stops": [
+        {
+          "city": "united-kingdom/west-country/bath",
+          "why": "The only hot spring in Britain, plumbed by Romans and still running through their lead."
+        },
+        {
+          "city": "hungary/budapest-and-the-danube-bend/budapest",
+          "why": "A hundred springs under one city, and outdoor pools that are better in the snow."
+        },
+        {
+          "city": "iceland/reykjavik-and-the-southwest/reykjavik",
+          "why": "Neighbourhood geothermal pools, which is where Reykjavík actually socialises."
+        },
+        {
+          "city": "finland/helsinki-and-the-coast/helsinki",
+          "why": "Public saunas returned to the waterfront, and the Baltic to jump into."
+        },
+        {
+          "city": "bulgaria/sofia-and-the-mountains/bansko",
+          "why": "Balkan mountain spa water, at a tenth of Alpine prices."
+        },
+        {
+          "city": "azerbaijan/baku-and-the-caspian/baku",
+          "why": "Not thermal but geological: fire that comes out of the ground and has for millennia."
+        },
+        {
+          "city": "georgia/tbilisi-and-kakheti/tbilisi",
+          "why": "Sulphur baths under brick domes, an hour that costs less than a meal."
+        },
+        {
+          "city": "iceland/south-coast-and-east/hofn",
+          "why": "Not a spa: glacial water, and the point is how cold it is."
+        }
+      ]
+    },
+    {
+      "slug": "modernist-europe",
+      "name": "Modernist Europe",
+      "strapline": "The twentieth century, built",
+      "summary": "Between about 1920 and 1975 Europe rebuilt itself twice and argued about how the whole time. These are the places where the argument is still standing: social housing that worked, a manifesto in a house, a city rebuilt from nothing, and one that decided not to be rebuilt at all.",
+      "interests": [
+        "architecture",
+        "design",
+        "history",
+        "cities"
+      ],
+      "stops": [
+        {
+          "city": "netherlands/randstad/rotterdam",
+          "why": "Flattened in 1940 and rebuilt as an argument that the past is owed nothing."
+        },
+        {
+          "city": "austria/vienna-and-the-east/vienna",
+          "why": "Red Vienna's housing: Karl-Marx-Hof is a kilometre long and people still live in it."
+        },
+        {
+          "city": "netherlands/randstad/utrecht",
+          "why": "Rietveld's Schröder House — De Stijl as a building rather than a painting."
+        },
+        {
+          "city": "germany/berlin-and-the-east/berlin",
+          "why": "Every phase of it, including the parts that were built to face each other."
+        },
+        {
+          "city": "poland/masovia-and-the-centre/warsaw",
+          "why": "Rebuilt from eighteenth-century paintings, then given a Stalinist tower."
+        },
+        {
+          "city": "belarus/minsk-and-the-centre/minsk",
+          "why": "One monumental avenue, planned whole, and unusually complete as a piece of design."
+        },
+        {
+          "city": "czechia/moravia/brno",
+          "why": "Villa Tugendhat, 1930, and the reason people book months ahead."
+        },
+        {
+          "city": "north-macedonia/skopje-and-the-north/skopje",
+          "why": "Rebuilt in concrete after 1963, then rebuilt again in marble, and argued about daily."
+        }
+      ]
     }
   ]
 }

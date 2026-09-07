@@ -68,6 +68,10 @@ def months_line(data, keys):
 def home(data):
     macros = data["macros"]
     countries = data["countries"]
+    n_by_interest = {
+        i["slug"]: sum(1 for n in data["cities"].values() if i["slug"] in n["city"]["interests"])
+        for i in data["taxonomy"]["interests"]
+    }
     cards = []
     for m in macros[:6]:
         n = len(m["countries"])
@@ -84,6 +88,27 @@ def home(data):
     ncountries = len(countries)
     ncities = len(data["cities"])
     nregions = sum(len(c["regions"]) for c in countries.values())
+
+    interest_grid = '<div class="grid cols-4">' + "".join(
+        f"""<a class="card" href="{urls.interest(i['slug'])}"><div class="card-body">
+        <p class="kicker"><span aria-hidden="true">{esc(i['icon'])}</span> {n_by_interest[i['slug']]} cities</p>
+        <h3>{esc(i['name'])}</h3></div></a>"""
+        for i in data["taxonomy"]["interests"]
+    ) + "</div>"
+
+    quiet = [n for n in data["cities"].values() if n["city"].get("quiet")]
+    nquiet = len(quiet)
+    quietcards = [
+        card(urls.city(n["country"], n["region"], n["city"]),
+             f"{n['country']['name']} · {n['region']['name']}", n["city"]["name"],
+             n["city"]["summary"], seed=f"city:{n['country']['slug']}:{n['city']['slug']}")
+        for n in sorted(quiet, key=lambda n: n["city"]["name"])[:3]
+    ]
+    storycards = [
+        card(f"/stories/{st['slug']}", st["section"], st["title"], st["standfirst"],
+             seed="story:" + st["slug"], meta=f'<p class="cardmeta">{esc(st["reading"])}</p>')
+        for st in data["stories"][:3]
+    ]
 
     pillars = "".join(
         f"""<div class="card"><div class="card-body">
@@ -134,9 +159,32 @@ def home(data):
 {section("Five things this is for", grid([pillars], 3) if False else '<div class="grid cols-3">' + pillars + "</div>",
          lede="Not a booking engine with articles bolted on. A structure first, and everything else hung off it.")}
 
+{section("Find your kind of Europe", interest_grid,
+         lede="Sixteen ways in. Each one is a real list of places tagged for it, and the Journey Planner weights the same tags.",
+         more=("Cross-border themes", "/themes"))}
+
 {section("Journeys across borders", grid(jcards, 3) if jcards else '<p class="small">Curated journeys are being written.</p>',
          lede="A good European trip rarely stays in one country. These do not.",
          more=("Every journey", "/journeys"))}
+
+{section("Beyond the obvious", grid(quietcards, 3),
+         lede=f"{nquiet} places tagged quiet in the dataset — the goods without the crowd. Europe's problem is not the number of visitors; it is that they arrive in the same eleven places in the same six weeks.",
+         more=("Every quiet place, and six straight swaps", "/beyond-the-obvious"))}
+
+{section("Stories from Europe", grid(storycards, 3),
+         lede="A continent is people before it is places. Every story links into the Atlas, and every place it touches links back.",
+         more=("The whole desk", "/stories"))}
+
+<div class="band">
+  <div class="band-head"><h2>Tell it what you have. It builds the route.</h2>
+  <p class="lede">Twelve days, €2,500, history and mountains — in your own words or in a form.
+  The planner reads the whole Atlas, scores every city against you, respects distance, and
+  runs entirely in your browser.</p></div>
+  <div class="hero-actions" style="margin-top:0">
+    <a class="btn" href="/plan">Plan a journey</a>
+    <a class="btn ghost" href="/map">See all {ncities} on the map</a>
+  </div>
+</div>
 
 <div class="note">
   <h3>What this is, honestly</h3>
@@ -252,9 +300,9 @@ def country_page(data, c):
     {chips(c["interests"], data["interests"])}
     {facts}
     {scorebars(country_scores(c))}
-    <h2 style="margin-top:var(--s7)">Getting around</h2>
+    <h2 id="getting-around" style="margin-top:var(--s7)">Getting around</h2>
     <p>{esc(c['getting_around'])}</p>
-    <h2 style="margin-top:var(--s7)">When to come</h2>
+    <h2 id="when" style="margin-top:var(--s7)">When to come</h2>
     <p>{esc(c['season']['note'])}</p>
   </div>
   <aside class="rail">
@@ -324,6 +372,46 @@ def city_page(data, c, r, t):
     )
     nights = t["nights"]
     stay = f"{nights[0]}–{nights[1]} nights" if nights[0] != nights[1] else f"{nights[0]} nights"
+
+    # Everything that points at this city. These are the graph edges: a
+    # journey that stops here, a theme that names it, a story set in it.
+    b = data["back"][cid]
+    edge_rows = []
+    for j in b["journeys"]:
+        leg = next(l for l in j["legs"] if l["city"] == cid)
+        edge_rows.append(
+            f"""<a class="row" href="{urls.journey(j)}">
+            <div><h3>{esc(j['name'])}</h3><p class="rowsub">{esc(leg['why'])}</p></div>
+            <p class="rowmeta">Journey · {leg['nights']} nights here</p></a>"""
+        )
+    for th in b["themes"]:
+        stop = next(x for x in th["stops"] if x["city"] == cid)
+        edge_rows.append(
+            f"""<a class="row" href="/themes/{esc(th['slug'])}">
+            <div><h3>{esc(th['name'])}</h3><p class="rowsub">{esc(stop['why'])}</p></div>
+            <p class="rowmeta">Theme</p></a>"""
+        )
+    for st in b["stories"]:
+        edge_rows.append(
+            f"""<a class="row" href="/stories/{esc(st['slug'])}">
+            <div><h3>{esc(st['title'])}</h3><p class="rowsub">{esc(st['standfirst'])}</p></div>
+            <p class="rowmeta">Story · {esc(st['reading'])}</p></a>"""
+        )
+    edges = section(
+        "This place, in the rest of the site", f'<div class="rows">{"".join(edge_rows)}</div>',
+        lede="Every journey that stops here, every theme that names it and every story set in it.",
+    ) if edge_rows else ""
+
+    # When to come and how to arrive are country-level facts, and repeating
+    # them on 244 city pages would be a maintenance trap. They are summarised
+    # here and linked to the one place they are written.
+    fest = [f for f in c["festivals"]]
+    festrows = "".join(
+        f"""<div class="row"><div><h3>{esc(f['name'])}</h3>
+        <p class="rowsub">{esc(f.get('where', ''))}</p></div>
+        <p class="rowmeta">{esc(data['taxonomy']['month_names'][f['month']])}</p></div>"""
+        for f in fest
+    )
     body = f"""
 {crumbs([("Europe", "/atlas"), ("Atlas", "/atlas"), (m["name"], urls.macro(m)),
          (c["name"], urls.country(c)), (r["name"], urls.region(c, r)), (t["name"], None)])}
@@ -342,19 +430,31 @@ def city_page(data, c, r, t):
     <ul class="stack">{highlights}</ul>
     {scorebars(city_scores(c, r, t))}
     {section("Experiences here", f'<div class="rows">{exps}</div>') if exps else ""}
+    {section("Fixed points in the year", f'<div class="rows">{festrows}</div>',
+             lede=f"Nationwide fixtures in {c['name']}. See the whole European year on /events.") if festrows else ""}
   </div>
   <aside class="rail">
     <h3>Give it {esc(stay)}</h3>
     <p>Enough to see the list on the left without spending the trip on trains. The Journey
     Planner uses exactly this range when it builds an itinerary.</p>
+    <h3>When to come</h3>
+    <p>Best: {esc(months_line(data, c["season"]["peak"]))}. Quieter:
+    {esc(months_line(data, c["season"].get("shoulder", [])) or "—")}.
+    <a href="{urls.country(c)}#when">Why, and what that means →</a></p>
+
+    <h3>Getting there</h3>
+    <p>{esc(c['getting_around'][:150])}…
+    <a href="{urls.country(c)}#getting-around">All of {esc(c['name'])} →</a></p>
+
     <h3>Where you are</h3>
     <p class="mono">{t['lat']:.2f}°N, {t['lon']:.2f}°E</p>
     <p><a href="/plan?from={esc(c['slug'])}%2F{esc(r['slug'])}%2F{esc(t['slug'])}">Start a journey here →</a></p>
-    <p><button class="btn ghost" type="button" data-save="{esc(cid)}" data-label="{esc(t['name'])}, {esc(c['name'])}" data-url="{urls.city(c, r, t)}">Save to My Europe</button></p>
+    <p><button class="btn ghost" type="button" data-save="city:{esc(cid)}" data-kind="Place" data-label="{esc(t['name'])}, {esc(c['name'])}" data-url="{urls.city(c, r, t)}">Save to My Europe</button></p>
   </aside>
 </div>
 {section("Nearest onward stops", f'<div class="rows">{nearrows}</div>',
          lede="Straight-line distance, and what that usually means in practice.")}
+{edges}
 """
     return f"/atlas/{c['macro_slug']}/{c['slug']}/{r['slug']}/{t['slug']}/index.html", page(
         f"{t['name']}, {c['name']}", body, path=urls.city(c, r, t), area="atlas",
@@ -486,6 +586,8 @@ def journey_page(data, j):
     <p>Fewer days than this? The Planner will keep the stops that match what you said you
     care about and drop the rest, rather than shortening every night.</p>
     <p><a class="btn" href="/plan#journey={esc(j['slug'])}">Open in the Planner</a></p>
+    <p><button class="btn ghost" type="button" data-save="journey:{esc(j['slug'])}" data-kind="Journey"
+       data-label="{esc(j['name'])}" data-url="{urls.journey(j)}">Save to My Europe</button></p>
     <h3>How to read a leg</h3>
     <p>Distances are straight-line between stops. Rail beats the straight line in the Alps and
     loses badly across the Adriatic — the note under each hop says which.</p>
@@ -495,6 +597,7 @@ def journey_page(data, j):
     return f"/journeys/{j['slug']}/index.html", page(
         j["name"], body, path=urls.journey(j), area="journeys",
         description=j["summary"][:180],
+        scripts=["/assets/js/my-europe.js"],
     )
 
 
@@ -566,11 +669,25 @@ def planner_page(data):
 <div class="pagehead">
   <p class="kicker">Journey Planner</p>
   <h1>Twelve days, €2,500, history and mountains.</h1>
-  <p class="lede">Say what you have and what you like. The planner reads the whole Atlas —
+  <p class="lede">Say what you have and what you like — in a sentence or in the form. The planner reads the whole Atlas —
   {len(data['cities'])} cities across {len(data['countries'])} countries — scores every one against
   you, then builds a route that respects distance instead of teleporting between highlights.
   It runs entirely in your browser; nothing you type is sent anywhere.</p>
 </div>
+
+<form class="form ask" id="askform">
+  <div class="field">
+    <label for="ask">Say it in your own words</label>
+    <textarea id="ask" name="ask" rows="2"
+      placeholder="I have 12 days and €2,500, starting in Lisbon, and I love history, mountains and food."></textarea>
+  </div>
+  <div class="hero-actions" style="margin-top:0">
+    <button class="btn" type="submit">Read that and build it</button>
+  </div>
+  <p class="small" style="margin-bottom:0">Read by rules in your browser — not by a model, and
+  not sent anywhere. It shows you exactly what it understood, and names anything it could not
+  take account of rather than quietly dropping it.</p>
+</form>
 
 <div class="split">
   <div>
@@ -960,12 +1077,15 @@ def theme_page(data, t):
     put the ones you want into the <a href="/plan">Planner</a>.</p>
     <h3>Countries</h3>
     <p>{esc(", ".join(countries))}</p>
+    <p><button class="btn ghost" type="button" data-save="theme:{esc(t['slug'])}" data-kind="Theme"
+       data-label="{esc(t['name'])}" data-url="/themes/{esc(t['slug'])}">Save to My Europe</button></p>
   </aside>
 </div>
 """
     return f"/themes/{t['slug']}/index.html", page(
         t["name"], body, path=f"/themes/{t['slug']}", area="atlas",
         description=t["summary"][:180],
+        scripts=["/assets/js/my-europe.js"],
     )
 
 
@@ -1019,12 +1139,15 @@ def story_page(data, s):
 {plate("story:" + s["slug"], 1260, 540, s["title"])}
 </div>
 <div style="max-width:var(--measure);margin:var(--s7) 0">{paras}</div>
+<p><button class="btn ghost" type="button" data-save="story:{esc(s['slug'])}" data-kind="Story"
+   data-label="{esc(s['title'])}" data-url="/stories/{esc(s['slug'])}">Save to My Europe</button></p>
 </article>
 {links}
 """
     return f"/stories/{s['slug']}/index.html", page(
         s["title"], body, path=f"/stories/{s['slug']}", area=None,
         description=s["standfirst"][:180],
+        scripts=["/assets/js/my-europe.js"],
     )
 
 
@@ -1061,6 +1184,22 @@ def map_page(data):
         f'<span aria-hidden="true">{esc(i["icon"])}</span> {esc(i["name"])}</label>'
         for i in data["taxonomy"]["interests"]
     )
+    # Journey overlays. The legs are projected here rather than in the
+    # browser so the line and the dots cannot disagree about where a city is.
+    jdata = []
+    for j in data["journeys"]:
+        pts = []
+        for leg in j["legs"]:
+            n = data["cities"][leg["city"]]
+            x, y = project(n["city"]["lat"], n["city"]["lon"])
+            pts.append({"x": round(x, 1), "y": round(y, 1), "id": leg["city"],
+                        "name": n["city"]["name"]})
+        jdata.append({"slug": j["slug"], "name": j["name"], "days": j["days"],
+                      "url": urls.journey(j), "pts": pts})
+    joptions = "".join(
+        f'<option value="{esc(j["slug"])}">{esc(j["name"])} — {j["days"]} days</option>'
+        for j in data["journeys"]
+    )
     body = f"""
 {crumbs([("Europe", "/atlas"), ("Map", None)])}
 <div class="pagehead">
@@ -1071,13 +1210,22 @@ def map_page(data):
   where in Europe that thing actually is.</p>
 </div>
 <div class="checks" id="layers">{filters}</div>
+<div class="form-row" style="margin:var(--s4) 0;max-width:34rem">
+  <div class="field">
+    <label for="journeylayer">Draw a journey over it</label>
+    <select id="journeylayer"><option value="">None</option>{joptions}</select>
+  </div>
+</div>
 <p class="small" id="mapcount"></p>
 <div class="mapwrap">
 <svg viewBox="0 0 {MAP_W} {MAP_H}" class="europemap" role="img" aria-label="Map of European cities in the Atlas">
 <rect width="{MAP_W}" height="{MAP_H}" fill="none"/>
+<g id="route"></g>
 <g id="dots">{''.join(dots)}</g>
 </svg>
 </div>
+<p class="small" id="routenote"></p>
+{jsonscript("EUROPEDOOR_JOURNEYS", jdata)}
 <div class="note">
   <h3>What this drawing is and is not</h3>
   <p>It is a point map on an equirectangular projection, corrected at 52°N. There are no
@@ -1113,12 +1261,15 @@ def events_page(data):
             for f, c in items
         )
         blocks.append(
-            f'<section class="band" id="{esc(m)}"><div class="band-head"><h2>{esc(names[m])}</h2>'
-            f'<p class="lede">{len(items)} fixed points across Europe.</p></div>'
+            f'<section class="band" id="{esc(m)}"><div class="band-head">'
+            f'<h2><a href="/events/{esc(m)}" style="text-decoration:none">{esc(names[m])}</a></h2>'
+            f'<p class="lede">{len(items)} fixed points across Europe. '
+            f'<a href="/events/{esc(m)}">Where to go in {esc(names[m])} →</a></p></div>'
             f'<div class="rows">{rows}</div></section>'
         )
     jump = " ".join(
-        f'<a class="chip" href="#{esc(m)}">{esc(names[m][:3])}</a>' for m in data["taxonomy"]["months"]
+        f'<a class="chip" href="/events/{esc(m)}">{esc(names[m])}</a>'
+        for m in data["taxonomy"]["months"]
     )
     total = sum(len(v) for v in by_month.values())
     body = f"""
@@ -1136,6 +1287,84 @@ def events_page(data):
     return "/events/index.html", page(
         "Events", body, path="/events", area=None,
         description="The recurring European year: festivals, markets, pilgrimages and seasonal events, month by month.",
+    )
+
+
+def events_month_page(data, month):
+    """A month page answers two questions the year page cannot: what is on,
+    and where is actually good right now. The second is the more useful one
+    and comes free from the season data every country already carries."""
+    names = data["taxonomy"]["month_names"]
+    name = names[month]
+    fixtures = []
+    for c in data["countries"].values():
+        for f in c["festivals"]:
+            if f["month"] == month:
+                fixtures.append((f, c))
+    fixtures.sort(key=lambda p: p[1]["name"])
+    rows = "".join(
+        f"""<a class="row" href="{urls.country(c)}">
+        <div><h3>{esc(f['name'])}</h3><p class="rowsub">{esc(f.get('where', ''))}</p></div>
+        <p class="rowmeta">{esc(c['name'])}</p></a>"""
+        for f, c in fixtures
+    )
+
+    peak = sorted((c for c in data["countries"].values()
+                   if month in c["season"]["peak"] and not c.get("advisory")),
+                  key=lambda c: c["name"])
+    shoulder = sorted((c for c in data["countries"].values()
+                       if month in c["season"].get("shoulder", []) and not c.get("advisory")),
+                      key=lambda c: c["name"])
+
+    def country_rows(cs):
+        return "".join(
+            f"""<a class="row" href="{urls.country(c)}">
+            <div><h3>{esc(c['name'])}</h3><p class="rowsub">{esc(c['tagline'])}</p></div>
+            <p class="rowmeta">€{c['daily_eur'][0]}–{c['daily_eur'][1]} a day</p></a>"""
+            for c in cs
+        )
+
+    # The quiet places in a shoulder-season country are the single most
+    # useful recommendation this dataset can make, so the month page makes it.
+    quiet = [n for n in data["cities"].values()
+             if n["city"].get("quiet") and month in n["country"]["season"].get("shoulder", [])]
+    quiet.sort(key=lambda n: (n["country"]["name"], n["city"]["name"]))
+    qcards = [
+        card(urls.city(n["country"], n["region"], n["city"]),
+             f"{n['country']['name']} · {n['region']['name']}", n["city"]["name"],
+             n["city"]["summary"], seed=f"city:{n['country']['slug']}:{n['city']['slug']}")
+        for n in quiet[:6]
+    ]
+
+    ms = data["taxonomy"]["months"]
+    i = ms.index(month)
+    prev_m, next_m = ms[(i - 1) % 12], ms[(i + 1) % 12]
+
+    body = f"""
+{crumbs([("Europe", "/atlas"), ("Events", "/events"), (name, None)])}
+<div class="pagehead">
+  <p class="kicker">The European year</p>
+  <h1>{esc(name)} in Europe</h1>
+  <p class="lede">{len(fixtures)} recurring fixtures, {len(peak)} countries at their best and
+  {len(shoulder)} in the quieter shoulder — which is usually where you should be going.</p>
+  <div class="chips">
+    <a class="chip" href="/events/{esc(prev_m)}">← {esc(names[prev_m])}</a>
+    <a class="chip" href="/events">The whole year</a>
+    <a class="chip" href="/events/{esc(next_m)}">{esc(names[next_m])} →</a>
+  </div>
+</div>
+{section(f"On in {name}", f'<div class="rows">{rows}</div>') if rows else ""}
+{section(f"At their best in {name}", f'<div class="rows">{country_rows(peak)}</div>',
+         lede="Peak season: the weather works, everything is open, and so is everyone else's calendar.") if peak else ""}
+{section(f"Quieter, and often better, in {name}", f'<div class="rows">{country_rows(shoulder)}</div>',
+         lede="Shoulder season. The Journey Planner scores these upward rather than downward for exactly this month.") if shoulder else ""}
+{section("Where we would actually send you", grid(qcards, 3),
+         lede=f"Quiet places in countries that are in shoulder season this month — the intersection of the two things that matter.",
+         more=("Every quiet place", "/beyond-the-obvious")) if qcards else ""}
+"""
+    return f"/events/{month}/index.html", page(
+        f"{name} in Europe", body, path=f"/events/{month}", area=None,
+        description=f"What is on in Europe in {name}, which countries are at their best, which are in the quieter shoulder season, and where to go instead of the obvious.",
     )
 
 

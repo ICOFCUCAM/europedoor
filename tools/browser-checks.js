@@ -195,6 +195,57 @@ async function main() {
   const rich = await routeOnBudget(6000);
   ok(rich.total > lean.total, "a nine-fold budget produced no more expensive a trip");
 
+  // ── the sentence box ───────────────────────────────────────────────
+  async function ask(text) {
+    await page.goto(base + "/plan", { waitUntil: "networkidle" });
+    await page.fill("#ask", text);
+    await page.click('#askform button[type="submit"]');
+    await page.waitForSelector("#result .leg");
+    return {
+      read: (await page.locator("#result .note").first().textContent()).replace(/\s+/g, " "),
+      route: (await page.locator("#result .leg h3 a").allTextContents()).join(" | "),
+      days: await page.inputValue("#days"),
+      budget: await page.inputValue("#budget"),
+      month: await page.inputValue("#month"),
+      style: await page.inputValue("#style"),
+      pace: await page.inputValue("#pace"),
+    };
+  }
+
+  const a1 = await ask("I have 12 days, €2,500, I love history, mountains and food.");
+  ok(a1.days === "12", `"12 days" parsed as ${a1.days}`);
+  ok(a1.budget === "2500", `"€2,500" parsed as ${a1.budget}`);
+  ok(/history/.test(a1.read) && /food/.test(a1.read) && /mountains/.test(a1.read),
+     "the three stated interests were not all read back");
+
+  const a2 = await ask("three weeks by train through the alps in winter, luxury");
+  ok(a2.days === "21", `"three weeks" parsed as ${a2.days}`);
+  ok(a2.style === "high", `"luxury" parsed as ${a2.style}`);
+  ok(a2.month === "jan", `"winter" parsed as ${a2.month}`);
+  ok(!/weather forecast/.test(a2.read),
+     'the word "train" matched the weather keyword "rain" again');
+  ok(/Switzerland|Austria|Italy|Slovenia|France|Germany/.test(a2.read),
+     '"the alps" did not constrain the plan to alpine countries');
+
+  const a3 = await ask("ten days in Portugal and Spain, wine, starting in Oslo");
+  ok(/Oslo is outside/.test(a3.read),
+     "a start outside the named region was silently kept or silently dropped");
+  ok(!/Oslo|Bergen|Norway/.test(a3.route), `named Iberia and routed to ${a3.route}`);
+
+  const a4 = await ask("a fortnight in Greece in May, islands and ruins, moderate budget");
+  ok(a4.style === "moderate", `"moderate budget" parsed as ${a4.style}`);
+  ok(a4.days === "14", `"a fortnight" parsed as ${a4.days}`);
+
+  const a5 = await ask("a week of museums, and my wife uses a wheelchair, we are vegan");
+  ok(/accessibility needs/.test(a5.read) && /dietary requirements/.test(a5.read),
+     "the planner did not name what it cannot take account of");
+
+  const a6 = await ask("£1800 for ten days of coast");
+  ok(/no conversion/.test(a6.read), "a pound figure was silently shown as euros");
+
+  const a7 = await ask("hello");
+  ok(/Nothing I could use/.test(a7.read), "an unparseable sentence did not say so");
+
   // ── the map ────────────────────────────────────────────────────────
   await page.goto(base + "/map", { waitUntil: "networkidle" });
   const dots = await page.locator("#dots .dot").count();

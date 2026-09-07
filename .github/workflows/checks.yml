@@ -37,6 +37,18 @@ jobs:
       - name: Checks
         run: python3 tools/checks.py
 
+      - name: Audit the brief, section by section
+        run: python3 tools/section-audit.py --check
+
+      - name: Fail if the audit document is stale
+        run: |
+          python3 tools/section-audit.py --write
+          if ! git diff --quiet -- docs/section-audit.md; then
+            echo "docs/section-audit.md is out of date. Run: python3 tools/section-audit.py --write"
+            git diff -- docs/section-audit.md
+            exit 1
+          fi
+
       - uses: actions/setup-node@v4
         with:
           node-version: "22"

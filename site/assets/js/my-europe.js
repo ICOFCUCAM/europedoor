@@ -31,7 +31,9 @@
       var current = read();
       var at = current.findIndex(function (x) { return x.id === id; });
       if (at >= 0) current.splice(at, 1);
-      else current.push({ id: id, label: btn.getAttribute("data-label"), url: btn.getAttribute("data-url") });
+      else current.push({ id: id, kind: btn.getAttribute("data-kind") || "Place",
+                          label: btn.getAttribute("data-label"),
+                          url: btn.getAttribute("data-url") });
       if (!write(current)) {
         btn.textContent = "This browser will not let us save";
         return;
@@ -50,12 +52,22 @@
       'there is no copy anywhere else, which is the point.</p></div>';
     return;
   }
-  var rows = list.map(function (x) {
-    return '<a class="row" href="' + x.url + '"><div><h3>' + x.label +
-      '</h3></div><p class="rowmeta">saved</p></a>';
-  }).join("");
-  mine.innerHTML = "<h2>" + list.length + (list.length === 1 ? " saved place" : " saved places") +
-    '</h2><div class="rows">' + rows + "</div>" +
+  // Group by kind, so a list of thirty is still readable. Order is fixed
+  // rather than by count, so the page does not rearrange itself under you.
+  var ORDER = ["Place", "Journey", "Theme", "Story"];
+  var groups = {};
+  list.forEach(function (x) { (groups[x.kind || "Place"] = groups[x.kind || "Place"] || []).push(x); });
+  var html = "<h2>" + list.length + (list.length === 1 ? " saved item" : " saved items") + "</h2>";
+  ORDER.concat(Object.keys(groups).filter(function (k) { return ORDER.indexOf(k) < 0; }))
+    .forEach(function (k) {
+      if (!groups[k] || !groups[k].length) return;
+      html += "<h3>" + k + (groups[k].length === 1 ? "" : "s") + "</h3><div class=\"rows\">" +
+        groups[k].map(function (x) {
+          return '<a class="row" href="' + x.url + '"><div><h3>' + x.label +
+            '</h3></div><p class="rowmeta">saved</p></a>';
+        }).join("") + "</div>";
+    });
+  mine.innerHTML = html +
     '<p style="margin-top:var(--s5)"><button class="btn ghost" id="clearmine">Clear the list</button></p>';
   document.getElementById("clearmine").addEventListener("click", function () {
     if (write([])) location.reload();

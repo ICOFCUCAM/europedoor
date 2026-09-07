@@ -22,6 +22,9 @@
   "use strict";
 
   var ATLAS = null;
+  // Set by the sentence box, cleared by any manual rebuild — the form has no
+  // field for "only in the Alps", so it must not silently persist.
+  var currentGeo = [];
   var form = document.getElementById("planner");
   var result = document.getElementById("result");
   var startSel = document.getElementById("start");
@@ -114,6 +117,14 @@
 
   function plan(opts) {
     var cities = ATLAS.cities.slice();
+    if (opts.geo && opts.geo.length) {
+      var only = cities.filter(function (c) { return opts.geo.indexOf(c.countrySlug) >= 0; });
+      // Honour it only if there is enough there to plan with. Three cities
+      // is not a fortnight, and silently returning a two-stop trip would
+      // look like a bug rather than a constraint.
+      if (only.length >= 4) cities = only;
+      else opts.geoTooNarrow = true;
+    }
     var ceiling = impliedDaily(opts);
     var scored = cities.map(function (c) {
       return { c: c, s: fitScore(c, opts.wants, opts.month, opts.style, ceiling) };
@@ -247,6 +258,293 @@
       'straight-line distances — not quotes. <a href="/sources">How these numbers are made</a>.</p>';
   }
 
+
+  /* ── Reading a sentence ────────────────────────────────────────────
+   *
+   * "I have 12 days, €2,500, I love history, mountains and food."
+   *
+   * This is the natural-language front door from the brief, implemented
+   * with rules rather than a model, and labelled as such on the page. The
+   * reason is not cost: it is that a rule can be shown to the user. Every
+   * field it fills is displayed back — "I read that as…" — and every
+   * request it cannot express is named rather than dropped, which is the
+   * same `unsupported` contract the AI specification insists on.
+   *
+   * When a model does replace this, its job is only to produce the same
+   * object. The scoring, the route and the refusals stay here. */
+
+  var WORDS = {
+    history:    ["history","historic","historical","ruins","ruin","ancient","medieval","roman","greek","viking","castle","castles","fortress","archaeolog*","prehistoric","ottoman*","habsburg"],
+    art:        ["art","gallery","galleries","museum","museums","painting","paintings","renaissance","baroque art"],
+    architecture:["architecture","architectural","buildings","modernist","gothic","art nouveau","brutalis*","design of buildings"],
+    sacred:     ["sacred","church","churches","cathedral","cathedrals","monaster*","monastery","pilgrim*","pilgrimage","abbey","mosque","synagogue","temple","spiritual","religious","camino"],
+    food:       ["food","eat","eating","cuisine","restaurant","restaurants","gastronom*","culinary","cooking","market","markets","cheese","seafood","street food"],
+    wine:       ["wine","wines","vineyard","vineyards","winery","wineries","cellar","cellars","beer","brewery","whisky","distiller*","drink"],
+    mountains:  ["mountain","mountains","alps","alpine","peaks","hiking","hike","trek*","trekking","walking","summit","dolomites","pyrenees","carpathian","caucasus","fjord","fjords"],
+    coast:      ["coast","coastal","beach","beaches","sea","seaside","shore","swim","swimming","sailing","riviera"],
+    islands:    ["island","islands","archipelago","ferry","ferries","cyclades","hebrides"],
+    nature:     ["nature","wilderness","wild places","forest","forests","landscape","national park","parks","outdoors","scenery","scenic"],
+    wild:       ["wildlife","animals","birds","birdwatch*","whale","whales","bears","bison","safari","puffin"],
+    winter:     ["winter","snow","ski","skiing","snowboard*","northern lights","aurora","ice","cold"],
+    cities:     ["city","cities","urban","metropol*","capital","capitals","big city"],
+    music:      ["music","concert","concerts","opera","jazz","nightlife","clubs","clubbing","bars","live music","festival music"],
+    design:     ["design","designer","craft","crafts","artisan","workshop","making","fashion"],
+    rail:       ["train","trains","rail","railway","railways","by rail","slow travel","interrail","sleeper"],
+    festivals:  ["festival","festivals","carnival","celebration*","celebrations","christmas market"]
+  };
+
+  // Named geography. A traveller who says "the Alps" or "Portugal" has given
+  // the strongest constraint in the sentence, and reading it as an interest
+  // and discarding it is the most annoying thing a planner can do.
+  var GEO = {
+    "alps": ["switzerland","austria","france","italy","slovenia","liechtenstein","germany"],
+    "alpine": ["switzerland","austria","france","italy","slovenia","liechtenstein"],
+    "scandinavia": ["norway","sweden","denmark"],
+    "scandinavian": ["norway","sweden","denmark"],
+    "nordics": ["norway","sweden","denmark","finland","iceland"],
+    "nordic": ["norway","sweden","denmark","finland","iceland"],
+    "lapland": ["norway","sweden","finland"],
+    "balkans": ["croatia","bosnia-and-herzegovina","serbia","montenegro","north-macedonia","albania","kosovo","bulgaria","romania"],
+    "baltics": ["estonia","latvia","lithuania"],
+    "baltic states": ["estonia","latvia","lithuania"],
+    "iberia": ["spain","portugal"],
+    "iberian": ["spain","portugal"],
+    "benelux": ["netherlands","belgium","luxembourg"],
+    "low countries": ["netherlands","belgium","luxembourg"],
+    "british isles": ["united-kingdom","ireland"],
+    "adriatic": ["croatia","montenegro","slovenia","italy","albania"],
+    "aegean": ["greece","turkiye"],
+    "mediterranean": ["spain","portugal","italy","greece","malta","cyprus","croatia","france","turkiye"],
+    "caucasus": ["georgia","armenia","azerbaijan"],
+    "pyrenees": ["france","spain","andorra"],
+    "carpathians": ["romania","slovakia","poland","ukraine"],
+    "dolomites": ["italy"],
+    "central europe": ["germany","austria","czechia","poland","slovakia","hungary","slovenia","switzerland"],
+    "eastern europe": ["poland","czechia","slovakia","hungary","romania","bulgaria","moldova"],
+    "western europe": ["france","netherlands","belgium","luxembourg","monaco"],
+    "southern europe": ["spain","portugal","italy","greece","malta","cyprus"],
+    "northern europe": ["norway","sweden","denmark","finland","iceland","estonia","latvia","lithuania"]
+  };
+
+  var MONTHS = {
+    jan:["january","jan"], feb:["february","feb"], mar:["march","mar"], apr:["april","apr"],
+    may:["may"], jun:["june","jun"], jul:["july","jul"], aug:["august","aug"],
+    sep:["september","sept","sep"], oct:["october","oct"], nov:["november","nov"], dec:["december","dec"]
+  };
+  var SEASONS = { summer:"jul", winter:"jan", spring:"apr", autumn:"oct", fall:"oct" };
+
+  // Things people reasonably ask for that this planner cannot express. Named
+  // rather than silently dropped — a plan that ignores a wheelchair is worse
+  // than a plan that says it could not take account of one.
+  var CANT = [
+    [["wheelchair","step-free","step free","accessible","accessibility","mobility"], "accessibility needs"],
+    [["vegan","vegetarian","halal","kosher","gluten","allerg*"], "dietary requirements"],
+    [["dog","cat","pet","pets"], "travelling with an animal"],
+    [["kid","kids","child","children","toddler","baby","family-friendly"], "travelling with children"],
+    [["visa","passport","schengen days","border control"], "visa and entry questions"],
+    [["book","booking","reserve","flight","flights","hotel room","car hire","rental car"], "booking anything"],
+    [["weather","rain","forecast","temperature"], "a weather forecast"],
+    [["cheapest flight","cheap flights","budget airline"], "flight prices"],
+    [["business trip","conference","work trip"], "business travel"],
+    [["honeymoon","anniversary","birthday","proposal"], "the occasion behind a trip"]
+  ];
+
+  function words(t) { return " " + t.toLowerCase().replace(/[^a-z0-9€$£.,\-]+/g, " ") + " "; }
+
+  var HAS = {};
+  function has(t, term) {
+    // "by train" matched the weather keyword "rain" until this existed.
+    // A trailing * is a deliberate stem; anything else must be a whole word.
+    var key = term;
+    if (!HAS[key]) {
+      HAS[key] = term.slice(-1) === "*"
+        ? new RegExp("\\b" + term.slice(0, -1).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+        : new RegExp("\\b" + term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b");
+    }
+    return HAS[key].test(t);
+  }
+
+  function parseAsk(text, cities) {
+    var t = words(text);
+    var got = { days: null, budget: null, month: null, interests: [], start: null,
+                style: null, pace: null, travellers: null, cant: [] };
+
+    // Days. Numerals, spelled-out numbers, and the words for a week.
+    var m = t.match(/(\d+)\s*[- ]?\s*(day|days|night|nights)/);
+    if (m) got.days = parseInt(m[1], 10) + (/night/.test(m[2]) ? 1 : 0);
+    if (!got.days) {
+      var spelled = { one:1, two:2, three:3, four:4, five:5, six:6, seven:7, eight:8,
+                      nine:9, ten:10, eleven:11, twelve:12, fourteen:14, twenty:20 };
+      var sm = t.match(/\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fourteen|twenty)\s+(day|days|week|weeks)/);
+      if (sm) got.days = spelled[sm[1]] * (/week/.test(sm[2]) ? 7 : 1);
+    }
+    if (!got.days) {
+      var wm = t.match(/(\d+)\s*(week|weeks)/);
+      if (wm) got.days = parseInt(wm[1], 10) * 7;
+      else if (/\bfortnight\b/.test(t)) got.days = 14;
+      else if (/\ba week\b/.test(t)) got.days = 7;
+      else if (/\blong weekend\b/.test(t)) got.days = 4;
+      else if (/\bweekend\b/.test(t)) got.days = 3;
+      else if (/\ba month\b/.test(t)) got.days = 30;
+    }
+
+    // Budget. A currency symbol or the word, and thousands written as 2.5k.
+    var bm = t.match(/[€$£]\s*([\d.,]+)\s*(k\b)?/) ||
+             t.match(/([\d.,]+)\s*(k\b)?\s*(euro|euros|eur|pounds|dollars|budget)/);
+    if (bm) {
+      var raw = bm[1].replace(/,/g, "");
+      var v = parseFloat(raw);
+      if (bm[2] === "k" || /\bk\b/.test(bm[0])) v *= 1000;
+      else if (raw.indexOf(".") >= 0 && v < 100) v *= 1000;   // "2.5" means 2,500
+      if (v >= 100) {
+        got.budget = Math.round(v);
+        var sym = (bm[0].match(/[£$]/) || [])[0];
+        if (sym) got.currencyNote = sym;   // shown, never silently converted
+      }
+    }
+
+    for (var k in MONTHS) {
+      for (var i = 0; i < MONTHS[k].length; i++) {
+        if (has(t, MONTHS[k][i])) { got.month = k; break; }
+      }
+      if (got.month) break;
+    }
+    if (!got.month) {
+      for (var sname in SEASONS) if (has(t, sname)) { got.month = SEASONS[sname]; break; }
+    }
+
+    for (var slug in WORDS) {
+      for (var w = 0; w < WORDS[slug].length; w++) {
+        if (has(t, WORDS[slug][w])) { got.interests.push(slug); break; }
+      }
+    }
+
+    // Starting point. Longest city name first, so "saint petersburg" is not
+    // eaten by "bath". Only counts when the sentence says start or from.
+    var byLength = cities.slice().sort(function (a, b) { return b.name.length - a.name.length; });
+    for (var c = 0; c < byLength.length; c++) {
+      var name = byLength[c].name.toLowerCase().split(" (")[0];
+      if (name.length < 4) continue;
+      var at = t.indexOf(" " + name);
+      if (at < 0) continue;
+      var before = t.slice(Math.max(0, at - 24), at);
+      if (/\b(start|starting|from|begin|beginning|leaving|depart|departing)\b/.test(before)) {
+        got.start = byLength[c]; break;
+      }
+      if (!got.start) got.start = byLength[c];      // mentioned, not anchored
+    }
+
+    if (/\b(comfortable|mid-range|midrange|moderate|reasonable|middling)\b/.test(t)) got.style = "moderate";
+    else if (/\b(luxur|five star|5 star|splash|no expense|treat ourselves|generous)/.test(t)) got.style = "high";
+    else if (/\b(cheap|frugal|shoestring|backpack|hostel|as cheaply)|on a budget|tight budget|small budget/.test(t)) got.style = "low";
+
+    if (/\b(slow|slowly|relaxed|unhurried|take our time|one place|few places)/.test(t)) got.pace = "slow";
+    else if (/\b(fast|as much as possible|whistle|pack in|cram|see everything|lots of places)/.test(t)) got.pace = "fast";
+
+    var tm = t.match(/(\d+)\s*(people|adults|travellers|travelers|of us)/) ||
+             t.match(/\b(two|three|four|five)\s*(people|adults|of us)/);
+    if (tm) got.travellers = tm[1];
+    else if (/\b(a couple|my partner|my wife|my husband|the two of us)\b/.test(t)) got.travellers = "2";
+
+    // Geography: named groups first, then any country by its own name.
+    var geo = {};
+    for (var g in GEO) {
+      if (has(t, g)) for (var gi = 0; gi < GEO[g].length; gi++) geo[GEO[g][gi]] = true;
+    }
+    var seenCountry = {};
+    for (var ck = 0; ck < cities.length; ck++) {
+      var cn = cities[ck].country.toLowerCase();
+      if (seenCountry[cn]) continue;
+      seenCountry[cn] = true;
+      if (has(t, cn)) geo[cities[ck].countrySlug] = true;
+    }
+    got.geo = Object.keys(geo);
+    // A start city inside the named geography is not a contradiction; a
+    // start city outside it is, and the geography wins because it is the
+    // bigger statement.
+    if (got.geo.length && got.start && got.geo.indexOf(got.start.countrySlug) < 0) {
+      got.startIgnored = got.start.name;
+      got.start = null;
+    }
+
+    for (var ci = 0; ci < CANT.length; ci++) {
+      for (var cj = 0; cj < CANT[ci][0].length; cj++) {
+        if (has(t, CANT[ci][0][cj])) { got.cant.push(CANT[ci][1]); break; }
+      }
+    }
+    return got;
+  }
+
+  function interestName(slug) {
+    for (var i = 0; i < ATLAS.interests.length; i++) {
+      if (ATLAS.interests[i].slug === slug) return ATLAS.interests[i].name.toLowerCase();
+    }
+    return slug;
+  }
+
+  function applyAsk(got) {
+    if (got.days) form.days.value = Math.max(3, Math.min(45, got.days));
+    if (got.budget) form.budget.value = got.budget;
+    if (got.month) form.month.value = got.month;
+    if (got.style) form.style.value = got.style;
+    if (got.pace) form.pace.value = got.pace;
+    if (got.start) startSel.value = got.start.id;
+    if (got.interests.length) {
+      var boxes = form.querySelectorAll('input[name="interest"]');
+      for (var i = 0; i < boxes.length; i++) {
+        boxes[i].checked = got.interests.indexOf(boxes[i].value) >= 0;
+      }
+    }
+  }
+
+  function readbackHtml(got) {
+    var read = [];
+    if (got.days) read.push("<strong>" + got.days + " days</strong>");
+    if (got.budget) read.push("<strong>" + euro(got.budget) + "</strong>");
+    if (got.travellers) read.push("for <strong>" + got.travellers + "</strong>");
+    if (got.month) read.push("in <strong>" + ATLAS.monthNames[got.month] + "</strong>");
+    if (got.start) read.push("starting in <strong>" + got.start.name + "</strong>");
+    if (got.style) read.push("<strong>" + got.style + "</strong> spending");
+    if (got.pace) read.push("a <strong>" + got.pace + "</strong> pace");
+    if (got.interests.length) {
+      read.push("interested in <strong>" + got.interests.map(interestName).join(", ") + "</strong>");
+    }
+    if (got.geo && got.geo.length) {
+      var names = {};
+      for (var gi = 0; gi < ATLAS.cities.length; gi++) {
+        if (got.geo.indexOf(ATLAS.cities[gi].countrySlug) >= 0) names[ATLAS.cities[gi].country] = true;
+      }
+      var list = Object.keys(names);
+      read.push("within <strong>" + (list.length > 4
+        ? list.length + " countries: " + list.join(", ")
+        : list.join(", ")) + "</strong>");
+    }
+
+    var html = '<div class="note"><h3>I read that as</h3>';
+    html += read.length
+      ? "<p>" + read.join(", ") + ". Everything below is filled in from it — change anything and rebuild.</p>"
+      : "<p>Nothing I could use, so the form below is unchanged. Try naming a number of days, " +
+        "a budget, a month, or what you like — history, mountains, food.</p>";
+    if (got.currencyNote) {
+      html += "<p>You wrote <strong>" + got.currencyNote + "</strong>. Every estimate here is in " +
+        "euros and no conversion has been applied — the number was taken as it stands, so treat " +
+        "the total as approximate in your own currency.</p>";
+    }
+    if (got.startIgnored) {
+      html += "<p><strong>" + got.startIgnored + "</strong> is outside the area you named, so " +
+        "the region won and the start did not. Pick a start below if that was the wrong way round.</p>";
+    }
+    if (got.cant.length) {
+      var uniq = got.cant.filter(function (v, i, a) { return a.indexOf(v) === i; });
+      html += "<p><strong>What this planner cannot take account of:</strong> " +
+        uniq.join(", ") + ". It plans places, nights and rough cost, and nothing else — " +
+        "so check those separately rather than assuming the route allows for them.</p>";
+    }
+    html += '<p class="small">Read by rules in your browser, not by a model, and not sent ' +
+      "anywhere. That is why it can show you exactly what it understood.</p></div>";
+    return html;
+  }
+
   function readForm() {
     var wants = [];
     var boxes = form.querySelectorAll('input[name="interest"]:checked');
@@ -258,7 +556,8 @@
       style: form.style.value,
       pace: form.pace.value,
       start: form.start.value,
-      wants: wants
+      wants: wants,
+      geo: currentGeo
     };
   }
 
@@ -300,8 +599,23 @@
 
   function go(e) {
     if (e) e.preventDefault();
+    currentGeo = [];
     var opts = readForm();
     render(plan(opts), opts);
+    result.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function goFromSentence(e) {
+    if (e) e.preventDefault();
+    var text = document.getElementById("ask").value;
+    if (!text.trim()) { go(); return; }
+    var got = parseAsk(text, ATLAS.cities);
+    applyAsk(got);
+    currentGeo = got.geo || [];
+    var opts = readForm();
+    var route = plan(opts);
+    render(route, opts);
+    result.insertAdjacentHTML("afterbegin", readbackHtml(got));
     result.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -313,6 +627,13 @@
       applyUrlState();
       form.addEventListener("submit", go);
       document.getElementById("again").addEventListener("click", function () { rand(); go(); });
+      var askform = document.getElementById("askform");
+      if (askform) {
+        askform.addEventListener("submit", goFromSentence);
+        document.getElementById("ask").addEventListener("keydown", function (ev) {
+          if (ev.key === "Enter" && (ev.metaKey || ev.ctrlKey)) goFromSentence(ev);
+        });
+      }
     })
     .catch(function () {
       result.innerHTML = '<div class="note warn"><p>The Atlas index did not load, so the planner ' +

@@ -135,6 +135,7 @@ def c_built():
     expect += 1 + len(d["taxonomy"]["experience_kinds"]) + 1 + 1   # experiences, kinds, join, business
     expect += 1 + len(d["fund"])
     expect += 6                                   # map, events, quiet, my-europe, method, about
+    expect += len(d["taxonomy"]["months"])        # /events/<month>
     expect += 2                                   # how-it-works, sources
     expect += 1                                   # 404
     got = len(site_files())
