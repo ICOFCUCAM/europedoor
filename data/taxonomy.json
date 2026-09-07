@@ -590,6 +590,23 @@
           ]
         },
         {
+          "slug": "renaissance",
+          "name": "Renaissance",
+          "keywords": [
+            "renaissance",
+            "medici",
+            "uffizi",
+            "brunelleschi",
+            "leonardo",
+            "michelangelo",
+            "raphael",
+            "botticelli",
+            "palladio",
+            "quattrocento",
+            "humanist"
+          ]
+        },
+        {
           "slug": "modern",
           "name": "The twentieth century",
           "keywords": [

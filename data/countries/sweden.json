@@ -53,17 +53,20 @@
     {
       "name": "Midsummer",
       "month": "jun",
-      "where": "Everywhere, especially the countryside"
+      "where": "Everywhere, especially the countryside",
+      "kind": "seasonal"
     },
     {
       "name": "Crayfish parties (kräftskiva)",
       "month": "aug",
-      "where": "Gardens and jetties nationwide"
+      "where": "Gardens and jetties nationwide",
+      "kind": "food"
     },
     {
       "name": "Lucia processions",
       "month": "dec",
-      "where": "Churches and schools nationwide"
+      "where": "Churches and schools nationwide",
+      "kind": "religious"
     }
   ],
   "know": [
@@ -308,5 +311,6 @@
         }
       ]
     }
-  ]
+  ],
+  "timezone": "CET/CEST (UTC+1/+2)"
 }

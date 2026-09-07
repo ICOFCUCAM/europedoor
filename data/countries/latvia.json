@@ -1,52 +1,207 @@
 {
-  "code": "lv", "slug": "latvia", "name": "Latvia", "official": "Republic of Latvia",
-  "macro": "baltic", "capital": "Riga", "currency": "EUR — euro",
-  "languages": ["Latvian"],
-  "blocs": ["eu", "schengen", "eurozone", "eea"],
+  "code": "lv",
+  "slug": "latvia",
+  "name": "Latvia",
+  "official": "Republic of Latvia",
+  "macro": "baltic",
+  "capital": "Riga",
+  "currency": "EUR — euro",
+  "languages": [
+    "Latvian"
+  ],
+  "blocs": [
+    "eu",
+    "schengen",
+    "eurozone",
+    "eea"
+  ],
   "tagline": "The largest collection of Art Nouveau in Europe, on the edge of a great pine forest.",
   "summary": "Latvia's capital was one of the Baltic's richest ports in 1900, and it spent the money on facades — whole streets of them, with faces and peacocks and screaming stone masks. Outside Riga the country is forest, river and a long white beach, and the folk song tradition is enormous: over a million texts collected, and a festival that fills a stadium to sing them.",
-  "interests": ["architecture", "art", "nature", "music", "coast"],
-  "budget": "moderate", "daily_eur": [50, 120],
-  "season": { "peak": ["jun", "jul", "aug"], "shoulder": ["may", "sep"],
-    "note": "June and July are the point — long light, warm sea at Jūrmala, and the midsummer festivities that stop the country. Winter is grey and cheap, and Riga's covered market is at its best in it." },
-  "getting_around": "Riga is compact and walkable; trains reach Jūrmala and Sigulda in under an hour and cost almost nothing. Long-distance buses beat trains for everywhere else.",
-  "food": ["Rye bread, and rye bread ice cream, which works", "Grey peas with bacon, the national dish and unapologetically heavy", "Smoked fish from the Kurzeme coast, bought at the roadside"],
-  "festivals": [
-    { "name": "Song and Dance Celebration — every five years, tens of thousands of singers", "month": "jul", "where": "Riga" },
-    { "name": "Jāņi, midsummer with wreaths and cheese", "month": "jun", "where": "Nationwide" },
-    { "name": "Riga City Festival", "month": "aug", "where": "Riga" }
+  "interests": [
+    "architecture",
+    "art",
+    "nature",
+    "music",
+    "coast"
   ],
-  "know": ["Riga's Central Market occupies five former Zeppelin hangars.", "The Latvian language is one of only two surviving Baltic languages, and older in structure than most of Europe's.", "Forest covers more than half the country and mushrooming in autumn is a national activity."],
+  "budget": "moderate",
+  "daily_eur": [
+    50,
+    120
+  ],
+  "season": {
+    "peak": [
+      "jun",
+      "jul",
+      "aug"
+    ],
+    "shoulder": [
+      "may",
+      "sep"
+    ],
+    "note": "June and July are the point — long light, warm sea at Jūrmala, and the midsummer festivities that stop the country. Winter is grey and cheap, and Riga's covered market is at its best in it."
+  },
+  "getting_around": "Riga is compact and walkable; trains reach Jūrmala and Sigulda in under an hour and cost almost nothing. Long-distance buses beat trains for everywhere else.",
+  "food": [
+    "Rye bread, and rye bread ice cream, which works",
+    "Grey peas with bacon, the national dish and unapologetically heavy",
+    "Smoked fish from the Kurzeme coast, bought at the roadside"
+  ],
+  "festivals": [
+    {
+      "name": "Song and Dance Celebration — every five years, tens of thousands of singers",
+      "month": "jul",
+      "where": "Riga",
+      "kind": "concert"
+    },
+    {
+      "name": "Jāņi, midsummer with wreaths and cheese",
+      "month": "jun",
+      "where": "Nationwide",
+      "kind": "food"
+    },
+    {
+      "name": "Riga City Festival",
+      "month": "aug",
+      "where": "Riga",
+      "kind": "cultural"
+    }
+  ],
+  "know": [
+    "Riga's Central Market occupies five former Zeppelin hangars.",
+    "The Latvian language is one of only two surviving Baltic languages, and older in structure than most of Europe's.",
+    "Forest covers more than half the country and mushrooming in autumn is a national activity."
+  ],
   "regions": [
-    { "slug": "riga-and-around", "name": "Riga & Around",
+    {
+      "slug": "riga-and-around",
+      "name": "Riga & Around",
       "summary": "The capital, its Art Nouveau quarter, a beach resort down the line and a castle valley up it.",
-      "interests": ["architecture", "art", "coast", "cities"],
+      "interests": [
+        "architecture",
+        "art",
+        "coast",
+        "cities"
+      ],
       "cities": [
-        { "slug": "riga", "name": "Riga", "lat": 56.95, "lon": 24.11,
+        {
+          "slug": "riga",
+          "name": "Riga",
+          "lat": 56.95,
+          "lon": 24.11,
           "summary": "A hanseatic old town wrapped in a boulevard ring, wrapped in the best Art Nouveau streets in Europe.",
-          "interests": ["architecture", "art", "cities", "food", "music"], "nights": [2, 3],
-          "highlights": ["Alberta iela, where Mikhail Eisenstein put faces on every facade", "The Central Market in five Zeppelin hangars", "The wooden architecture of Kalnciema across the river", "The Latvian National Museum of Art, sharp and well-lit"],
+          "interests": [
+            "architecture",
+            "art",
+            "cities",
+            "food",
+            "music"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Alberta iela, where Mikhail Eisenstein put faces on every facade",
+            "The Central Market in five Zeppelin hangars",
+            "The wooden architecture of Kalnciema across the river",
+            "The Latvian National Museum of Art, sharp and well-lit"
+          ],
           "experiences": [
-            { "slug": "riga-art-nouveau-walk", "name": "The facades of Alberta iela", "kind": "walk", "band": "low", "summary": "Ninety minutes and a raised chin: everything worth seeing here is above the first floor." },
-            { "slug": "riga-market-hangars", "name": "Lunch in the Zeppelin hangars", "kind": "table", "band": "low", "summary": "Smoked fish, black bread, curd and pickles bought from four different counters and eaten standing up." }
-          ] },
-        { "slug": "sigulda", "name": "Sigulda", "lat": 57.15, "lon": 24.86, "quiet": true,
+            {
+              "slug": "riga-art-nouveau-walk",
+              "name": "The facades of Alberta iela",
+              "kind": "walk",
+              "band": "low",
+              "summary": "Ninety minutes and a raised chin: everything worth seeing here is above the first floor."
+            },
+            {
+              "slug": "riga-market-hangars",
+              "name": "Lunch in the Zeppelin hangars",
+              "kind": "table",
+              "band": "low",
+              "summary": "Smoked fish, black bread, curd and pickles bought from four different counters and eaten standing up."
+            }
+          ]
+        },
+        {
+          "slug": "sigulda",
+          "name": "Sigulda",
+          "lat": 57.15,
+          "lon": 24.86,
+          "quiet": true,
           "summary": "Three castles above a sandstone river gorge, an hour from Riga by train.",
-          "interests": ["nature", "history"], "nights": [1, 1],
-          "highlights": ["Turaida's red brick castle above the Gauja", "Gūtmanis cave, carved with visitors' names since the 1600s", "The bobsleigh track, open to the public in winter"] }
-      ] },
-    { "slug": "kurzeme", "name": "Kurzeme & the Coast",
+          "interests": [
+            "nature",
+            "history"
+          ],
+          "nights": [
+            1,
+            1
+          ],
+          "highlights": [
+            "Turaida's red brick castle above the Gauja",
+            "Gūtmanis cave, carved with visitors' names since the 1600s",
+            "The bobsleigh track, open to the public in winter"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "kurzeme",
+      "name": "Kurzeme & the Coast",
       "summary": "The western province: empty white beaches, a Soviet ghost town, and Liepāja's wind.",
-      "interests": ["coast", "history", "music"],
+      "interests": [
+        "coast",
+        "history",
+        "music"
+      ],
       "cities": [
-        { "slug": "liepaja", "name": "Liepāja", "lat": 56.51, "lon": 21.01, "quiet": true,
+        {
+          "slug": "liepaja",
+          "name": "Liepāja",
+          "lat": 56.51,
+          "lon": 21.01,
+          "quiet": true,
           "summary": "A wind-blown port with a derelict tsarist naval town at its northern end and a rock music habit.",
-          "interests": ["coast", "history", "music"], "nights": [1, 2],
-          "highlights": ["Karosta: a Russian imperial naval base, half-ruined, still lived in", "The northern forts collapsing into the sea", "Seven kilometres of empty beach"] },
-        { "slug": "kuldiga", "name": "Kuldīga", "lat": 56.97, "lon": 21.97, "quiet": true,
+          "interests": [
+            "coast",
+            "history",
+            "music"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Karosta: a Russian imperial naval base, half-ruined, still lived in",
+            "The northern forts collapsing into the sea",
+            "Seven kilometres of empty beach"
+          ]
+        },
+        {
+          "slug": "kuldiga",
+          "name": "Kuldīga",
+          "lat": 56.97,
+          "lon": 21.97,
+          "quiet": true,
           "summary": "A wooden town on Europe's widest waterfall, which is only two metres high but 249 metres across.",
-          "interests": ["history", "nature"], "nights": [1, 1],
-          "highlights": ["Ventas rumba, where fish jump the falls in spring", "Latvia's longest brick bridge, from 1874", "Timber streets almost untouched since the 18th century"] }
-      ] }
-  ]
+          "interests": [
+            "history",
+            "nature"
+          ],
+          "nights": [
+            1,
+            1
+          ],
+          "highlights": [
+            "Ventas rumba, where fish jump the falls in spring",
+            "Latvia's longest brick bridge, from 1874",
+            "Timber streets almost untouched since the 18th century"
+          ]
+        }
+      ]
+    }
+  ],
+  "timezone": "EET/EEST (UTC+2/+3)"
 }

@@ -1,36 +1,140 @@
 {
-  "code": "ad", "slug": "andorra", "name": "Andorra", "official": "Principality of Andorra",
-  "macro": "mediterranean", "capital": "Andorra la Vella", "currency": "EUR — euro",
-  "languages": ["Catalan"],
-  "blocs": ["eurozone"],
+  "code": "ad",
+  "slug": "andorra",
+  "name": "Andorra",
+  "official": "Principality of Andorra",
+  "macro": "mediterranean",
+  "capital": "Andorra la Vella",
+  "currency": "EUR — euro",
+  "languages": [
+    "Catalan"
+  ],
+  "blocs": [
+    "eurozone"
+  ],
   "tagline": "A Pyrenean co-principality with two heads of state, no airport, and the highest capital in Europe.",
   "summary": "Andorra is 468 square kilometres of Pyrenean valley, jointly headed by the President of France and a Spanish bishop — an arrangement running since 1278. Catalan is the official language. It is best known for duty-free shopping and skiing, and least known for Romanesque chapels and a genuinely wild high valley on the UNESCO list.",
-  "interests": ["mountains", "winter", "nature", "sacred"],
-  "budget": "moderate", "daily_eur": [60, 145],
-  "season": { "peak": ["jan", "feb", "mar", "jul", "aug"], "shoulder": ["jun", "sep"],
-    "note": "Two clear seasons: skiing from December to April, and high walking from late June to September. May and October are between them and much of the mountain infrastructure shuts." },
-  "getting_around": "No airport and no railway. Buses run from Barcelona, Toulouse and the French rail station at L'Hospitalet. Inside the country, buses go up every valley.",
-  "food": ["Trinxat: cabbage, potato and bacon, mountain winter food", "Escudella, a heavy Catalan stew", "Cheese and charcuterie from the valley farms, and Pyrenean lamb"],
-  "festivals": [
-    { "name": "Andorra la Vella winter sports season", "month": "feb", "where": "Grandvalira and Vallnord" },
-    { "name": "Sant Joan bonfires", "month": "jun", "where": "Nationwide" },
-    { "name": "Meritxell Day, the national holiday", "month": "sep", "where": "Meritxell" }
+  "interests": [
+    "mountains",
+    "winter",
+    "nature",
+    "sacred"
   ],
-  "know": ["Not in the EU or Schengen, but there are no routine border controls with France or Spain; customs limits are enforced.", "Fuel, alcohol and electronics are cheaper here, which is why the main road is a queue on Saturdays.", "The Madriu-Perafita-Claror valley has no road at all and is entered on foot."],
+  "budget": "moderate",
+  "daily_eur": [
+    60,
+    145
+  ],
+  "season": {
+    "peak": [
+      "jan",
+      "feb",
+      "mar",
+      "jul",
+      "aug"
+    ],
+    "shoulder": [
+      "jun",
+      "sep"
+    ],
+    "note": "Two clear seasons: skiing from December to April, and high walking from late June to September. May and October are between them and much of the mountain infrastructure shuts."
+  },
+  "getting_around": "No airport and no railway. Buses run from Barcelona, Toulouse and the French rail station at L'Hospitalet. Inside the country, buses go up every valley.",
+  "food": [
+    "Trinxat: cabbage, potato and bacon, mountain winter food",
+    "Escudella, a heavy Catalan stew",
+    "Cheese and charcuterie from the valley farms, and Pyrenean lamb"
+  ],
+  "festivals": [
+    {
+      "name": "Andorra la Vella winter sports season",
+      "month": "feb",
+      "where": "Grandvalira and Vallnord",
+      "kind": "seasonal"
+    },
+    {
+      "name": "Sant Joan bonfires",
+      "month": "jun",
+      "where": "Nationwide",
+      "kind": "seasonal"
+    },
+    {
+      "name": "Meritxell Day, the national holiday",
+      "month": "sep",
+      "where": "Meritxell",
+      "kind": "religious"
+    }
+  ],
+  "know": [
+    "Not in the EU or Schengen, but there are no routine border controls with France or Spain; customs limits are enforced.",
+    "Fuel, alcohol and electronics are cheaper here, which is why the main road is a queue on Saturdays.",
+    "The Madriu-Perafita-Claror valley has no road at all and is entered on foot."
+  ],
   "regions": [
-    { "slug": "the-valleys", "name": "The Valleys",
+    {
+      "slug": "the-valleys",
+      "name": "The Valleys",
       "summary": "The capital in the deepest valley, ski country above, and a roadless UNESCO valley to the southeast.",
-      "interests": ["mountains", "winter", "nature", "sacred"],
+      "interests": [
+        "mountains",
+        "winter",
+        "nature",
+        "sacred"
+      ],
       "cities": [
-        { "slug": "andorra-la-vella", "name": "Andorra la Vella", "lat": 42.51, "lon": 1.52,
+        {
+          "slug": "andorra-la-vella",
+          "name": "Andorra la Vella",
+          "lat": 42.51,
+          "lon": 1.52,
           "summary": "Europe's highest capital at 1,023 metres, in a narrow valley, mostly shops with mountains directly behind them.",
-          "interests": ["mountains", "winter"], "nights": [1, 2],
-          "highlights": ["Casa de la Vall, the 16th-century parliament house", "Caldea thermal spa, fed by hot springs", "Ski areas twenty minutes up the valley in either direction"] },
-        { "slug": "madriu-valley", "name": "Madriu-Perafita-Claror", "lat": 42.47, "lon": 1.58, "quiet": true,
+          "interests": [
+            "mountains",
+            "winter"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Casa de la Vall, the 16th-century parliament house",
+            "Caldea thermal spa, fed by hot springs",
+            "Ski areas twenty minutes up the valley in either direction"
+          ]
+        },
+        {
+          "slug": "madriu-valley",
+          "name": "Madriu-Perafita-Claror",
+          "lat": 42.47,
+          "lon": 1.58,
+          "quiet": true,
           "summary": "A glacial valley with no road into it, on the UNESCO list for a cultural landscape of summer pasture and stone huts.",
-          "interests": ["mountains", "nature", "wild"], "nights": [1, 2],
-          "highlights": ["Nine per cent of the country, entered only on foot", "Shepherds' bordes and dry-stone terraces still standing", "Refuges with no booking and no warden"],
-          "experiences": [{ "slug": "madriu-valley-walk", "name": "Into the roadless valley", "kind": "walk", "band": "low", "summary": "Six hours in from Escaldes; the only sounds are water and cowbells, and the huts are open and free." }] }
-      ] }
-  ]
+          "interests": [
+            "mountains",
+            "nature",
+            "wild"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Nine per cent of the country, entered only on foot",
+            "Shepherds' bordes and dry-stone terraces still standing",
+            "Refuges with no booking and no warden"
+          ],
+          "experiences": [
+            {
+              "slug": "madriu-valley-walk",
+              "name": "Into the roadless valley",
+              "kind": "walk",
+              "band": "low",
+              "summary": "Six hours in from Escaldes; the only sounds are water and cowbells, and the huts are open and free."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "timezone": "CET/CEST (UTC+1/+2)"
 }

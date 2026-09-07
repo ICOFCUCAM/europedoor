@@ -26,6 +26,13 @@ PLACE_KINDS = (
     "lighthouse", "quarter", "ruin", "theatre", "library", "bath",
 )
 PLACE_SEASONS = ("year-round", "summer", "winter", "spring-autumn", "weather-dependent")
+# The specification's event categories (§33).
+EVENT_KINDS = ("festival", "concert", "sport", "exhibition", "religious",
+               "cultural", "food", "market", "seasonal")
+# The specification's verification ladder (§38). Absent means unverified,
+# which is the honest state of every record today.
+VERIFICATION_STATUS = ("unverified", "machine-reviewed", "editor-reviewed",
+                       "business-verified", "officially-sourced")
 BLOCS = ("eu", "schengen", "eurozone", "eea", "cta")
 ADVISORY_LEVELS = ("caution", "avoid")
 
@@ -104,6 +111,9 @@ def load():
                 p.require(m in months, where, f"unknown month {m!r} in season.{band}")
         for f in c.get("festivals", []):
             p.require(f.get("month") in months, where, f"festival {f.get('name')!r}: bad month")
+            p.require(f.get("kind") in EVENT_KINDS, where,
+                      f"festival {f.get('name')!r}: kind must be one of {'/'.join(EVENT_KINDS)}")
+        p.require(bool(c.get("timezone")), where, "a country needs a time zone")
         # Fact verification. Absent means never checked, and that is the
         # truthful state of almost every record — /sources/freshness publishes
         # it rather than letting the silence read as confidence.
@@ -111,9 +121,12 @@ def load():
         if ch:
             p.require(ISO_DATE.match(ch.get("on", "")), where, "checked.on must be YYYY-MM-DD")
             p.require(bool(ch.get("by")), where, "a check needs a name against it")
+            p.require(ch.get("status", "editor-reviewed") in VERIFICATION_STATUS, where,
+                      f"checked.status must be one of {'/'.join(VERIFICATION_STATUS)}")
             for src in ch.get("sources", []):
-                p.require(bool(src.get("what")) and bool(src.get("where")), where,
-                          "each source needs what was checked and where")
+                for k in ("what", "where", "kind"):
+                    p.require(bool(src.get(k)), where,
+                              f"each source needs {k} — what was checked, where, and what kind of source")
 
         adv = c.get("advisory")
         if adv:
@@ -209,7 +222,8 @@ def load():
         p.require(j["slug"] not in seen_j, jw, "duplicate journey slug")
         seen_j.add(j.get("slug"))
         for key in ("name", "strapline", "summary", "days", "budget", "interests", "months",
-                    "legs", "difficulty", "transport", "accommodation", "pack", "start", "end"):
+                    "legs", "difficulty", "transport", "accommodation", "pack", "start", "end",
+                    "creator"):
             p.require(key in j, jw, f"missing key {key!r}")
         p.require(j.get("difficulty") in ("easy", "moderate", "demanding"), jw,
                   "difficulty must be easy/moderate/demanding")
@@ -258,8 +272,12 @@ def load():
         p.require(SLUG.match(st.get("slug", "")), sw, "story slug is not a slug")
         p.require(st["slug"] not in seen_s, sw, "duplicate story slug")
         seen_s.add(st.get("slug"))
-        for key in ("title", "section", "standfirst", "reading", "body"):
+        for key in ("title", "section", "standfirst", "reading", "body",
+                    "author", "tags", "published", "updated"):
             p.require(key in st, sw, f"missing key {key!r}")
+        p.require(ISO_DATE.match(st.get("published", "")), sw, "published must be YYYY-MM-DD")
+        p.require(ISO_DATE.match(st.get("updated", "")), sw, "updated must be YYYY-MM-DD")
+        p.require(len(st.get("tags", [])) >= 2, sw, "a story needs at least two tags")
         p.require(len(st.get("body", [])) >= 4, sw, "a story needs at least four paragraphs")
         for cid in st.get("places", []):
             p.require(cid in index, sw, f"story points at unknown city {cid!r}")

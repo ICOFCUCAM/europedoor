@@ -1,54 +1,232 @@
 {
-  "code": "bg", "slug": "bulgaria", "name": "Bulgaria", "official": "Republic of Bulgaria",
-  "macro": "adriatic-balkans", "capital": "Sofia", "currency": "BGN — Bulgarian lev",
-  "languages": ["Bulgarian"],
-  "blocs": ["eu", "schengen", "eea"],
+  "code": "bg",
+  "slug": "bulgaria",
+  "name": "Bulgaria",
+  "official": "Republic of Bulgaria",
+  "macro": "adriatic-balkans",
+  "capital": "Sofia",
+  "currency": "BGN — Bulgarian lev",
+  "languages": [
+    "Bulgarian"
+  ],
+  "blocs": [
+    "eu",
+    "schengen",
+    "eea"
+  ],
   "tagline": "Thracian gold, Orthodox monasteries, rose fields and the cheapest good skiing in Europe.",
   "summary": "Bulgaria has been continuously inhabited since the Neolithic and holds the oldest processed gold in the world, from a grave at Varna. It is mountainous — two ranges cross it — with a Black Sea coast, a valley that supplies most of the world's rose oil, and a monastery tradition that kept the language alive under five centuries of Ottoman rule. It is one of the best-value countries in the EU.",
-  "interests": ["sacred", "history", "mountains", "coast", "wine", "winter"],
-  "budget": "low", "daily_eur": [30, 80],
-  "season": { "peak": ["jun", "jul", "aug", "sep"], "shoulder": ["may", "oct"],
-    "note": "The Rila and Pirin mountains are walkable July to September. The rose harvest is a few weeks in late May and early June. Winter skiing at Bansko is genuinely cheap. The Black Sea coast is full in August." },
-  "getting_around": "Buses beat the slow railways for most journeys, though the narrow-gauge Rhodope line is worth taking for itself. Sofia has a metro. A car reaches the monasteries and the mountain villages.",
-  "food": ["Shopska salad, with white brine cheese grated over the top", "Banitsa, a filo and cheese pastry, for breakfast with ayran", "Wine from Melnik and the Thracian valley, made here for three thousand years"],
-  "festivals": [
-    { "name": "Kukeri — masked winter rituals with enormous bells", "month": "jan", "where": "Pernik and villages" },
-    { "name": "Rose Festival", "month": "jun", "where": "Kazanlak" },
-    { "name": "Surva and Orthodox Easter", "month": "apr", "where": "Nationwide" }
+  "interests": [
+    "sacred",
+    "history",
+    "mountains",
+    "coast",
+    "wine",
+    "winter"
   ],
-  "know": ["Shaking the head means yes and nodding can mean no — it catches everyone out.", "In the EU but the lev is still the currency, pegged to the euro.", "Mountain huts in Rila and Pirin are basic, cheap and often full at weekends."],
+  "budget": "low",
+  "daily_eur": [
+    30,
+    80
+  ],
+  "season": {
+    "peak": [
+      "jun",
+      "jul",
+      "aug",
+      "sep"
+    ],
+    "shoulder": [
+      "may",
+      "oct"
+    ],
+    "note": "The Rila and Pirin mountains are walkable July to September. The rose harvest is a few weeks in late May and early June. Winter skiing at Bansko is genuinely cheap. The Black Sea coast is full in August."
+  },
+  "getting_around": "Buses beat the slow railways for most journeys, though the narrow-gauge Rhodope line is worth taking for itself. Sofia has a metro. A car reaches the monasteries and the mountain villages.",
+  "food": [
+    "Shopska salad, with white brine cheese grated over the top",
+    "Banitsa, a filo and cheese pastry, for breakfast with ayran",
+    "Wine from Melnik and the Thracian valley, made here for three thousand years"
+  ],
+  "festivals": [
+    {
+      "name": "Kukeri — masked winter rituals with enormous bells",
+      "month": "jan",
+      "where": "Pernik and villages",
+      "kind": "cultural"
+    },
+    {
+      "name": "Rose Festival",
+      "month": "jun",
+      "where": "Kazanlak",
+      "kind": "food"
+    },
+    {
+      "name": "Surva and Orthodox Easter",
+      "month": "apr",
+      "where": "Nationwide",
+      "kind": "religious"
+    }
+  ],
+  "know": [
+    "Shaking the head means yes and nodding can mean no — it catches everyone out.",
+    "In the EU but the lev is still the currency, pegged to the euro.",
+    "Mountain huts in Rila and Pirin are basic, cheap and often full at weekends."
+  ],
   "regions": [
-    { "slug": "sofia-and-the-mountains", "name": "Sofia & the Mountains",
+    {
+      "slug": "sofia-and-the-mountains",
+      "name": "Sofia & the Mountains",
       "summary": "The capital under a 2,290-metre peak, and the Rila and Pirin ranges south of it.",
-      "interests": ["sacred", "mountains", "history", "winter"],
+      "interests": [
+        "sacred",
+        "mountains",
+        "history",
+        "winter"
+      ],
       "cities": [
-        { "slug": "sofia", "name": "Sofia", "lat": 42.70, "lon": 23.32,
+        {
+          "slug": "sofia",
+          "name": "Sofia",
+          "lat": 42.7,
+          "lon": 23.32,
           "summary": "A capital with Roman ruins under the metro stations and a mountain at the end of the tram line.",
-          "interests": ["history", "sacred", "food", "cities"], "nights": [1, 2],
-          "highlights": ["Alexander Nevsky cathedral and its icon crypt", "The Roman Serdica ruins, excavated and left open in the middle of the city", "Vitosha mountain, 2,290 metres, reached by public transport"] },
-        { "slug": "rila-monastery", "name": "Rila Monastery", "lat": 42.13, "lon": 23.34,
+          "interests": [
+            "history",
+            "sacred",
+            "food",
+            "cities"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Alexander Nevsky cathedral and its icon crypt",
+            "The Roman Serdica ruins, excavated and left open in the middle of the city",
+            "Vitosha mountain, 2,290 metres, reached by public transport"
+          ]
+        },
+        {
+          "slug": "rila-monastery",
+          "name": "Rila Monastery",
+          "lat": 42.13,
+          "lon": 23.34,
           "summary": "A fortified monastery in a forested valley, founded in the 10th century, with striped arcades and frescoes over every surface.",
-          "interests": ["sacred", "mountains", "history"], "nights": [1, 1],
-          "highlights": ["The painted porch, with 1,200 scenes and no blank stone", "Hrelyo's Tower, from 1335, the only medieval part left", "Staying overnight in a monastery cell after the day visitors leave"],
-          "experiences": [{ "slug": "rila-monastery-night", "name": "A night in a monastery cell", "kind": "sacred", "band": "low", "summary": "Simple rooms, an early curfew, and the courtyard entirely to yourself at dawn." }] },
-        { "slug": "bansko", "name": "Bansko", "lat": 41.83, "lon": 23.49,
+          "interests": [
+            "sacred",
+            "mountains",
+            "history"
+          ],
+          "nights": [
+            1,
+            1
+          ],
+          "highlights": [
+            "The painted porch, with 1,200 scenes and no blank stone",
+            "Hrelyo's Tower, from 1335, the only medieval part left",
+            "Staying overnight in a monastery cell after the day visitors leave"
+          ],
+          "experiences": [
+            {
+              "slug": "rila-monastery-night",
+              "name": "A night in a monastery cell",
+              "kind": "sacred",
+              "band": "low",
+              "summary": "Simple rooms, an early curfew, and the courtyard entirely to yourself at dawn."
+            }
+          ]
+        },
+        {
+          "slug": "bansko",
+          "name": "Bansko",
+          "lat": 41.83,
+          "lon": 23.49,
           "summary": "A stone-built mountain town under Pirin, with cheap skiing in winter and hut-to-hut walking in summer.",
-          "interests": ["winter", "mountains", "food", "nature"], "nights": [2, 3],
-          "highlights": ["Pirin national park's glacial lakes and the Vihren summit", "Mehanas serving Bansko sausage and heavy red wine", "Lift passes at a fraction of Alpine prices"] }
-      ] },
-    { "slug": "thrace-and-the-black-sea", "name": "Thrace & the Black Sea",
+          "interests": [
+            "winter",
+            "mountains",
+            "food",
+            "nature"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Pirin national park's glacial lakes and the Vihren summit",
+            "Mehanas serving Bansko sausage and heavy red wine",
+            "Lift passes at a fraction of Alpine prices"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "thrace-and-the-black-sea",
+      "name": "Thrace & the Black Sea",
       "summary": "The rose valley, Thracian tombs, an old-town on a hill, and the coast.",
-      "interests": ["history", "wine", "coast", "food"],
+      "interests": [
+        "history",
+        "wine",
+        "coast",
+        "food"
+      ],
       "cities": [
-        { "slug": "plovdiv", "name": "Plovdiv", "lat": 42.14, "lon": 24.75,
+        {
+          "slug": "plovdiv",
+          "name": "Plovdiv",
+          "lat": 42.14,
+          "lon": 24.75,
           "summary": "One of Europe's oldest continuously inhabited cities, on six hills, with a Roman theatre still in use.",
-          "interests": ["history", "art", "food", "architecture"], "nights": [2, 3],
-          "highlights": ["The Roman theatre, hosting opera and rock concerts since restoration", "The Old Town's 19th-century merchant houses with overhanging upper floors", "Kapana, a craft district in the old artisans' quarter"],
-          "experiences": [{ "slug": "plovdiv-roman-theatre", "name": "A concert in a Roman theatre", "kind": "stage", "band": "moderate", "summary": "Built for 6,000 in the 2nd century, rediscovered by a landslide in 1972, and used most summer evenings." }] },
-        { "slug": "nessebar", "name": "Nessebar", "lat": 42.66, "lon": 27.73, "quiet": true,
+          "interests": [
+            "history",
+            "art",
+            "food",
+            "architecture"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The Roman theatre, hosting opera and rock concerts since restoration",
+            "The Old Town's 19th-century merchant houses with overhanging upper floors",
+            "Kapana, a craft district in the old artisans' quarter"
+          ],
+          "experiences": [
+            {
+              "slug": "plovdiv-roman-theatre",
+              "name": "A concert in a Roman theatre",
+              "kind": "stage",
+              "band": "moderate",
+              "summary": "Built for 6,000 in the 2nd century, rediscovered by a landslide in 1972, and used most summer evenings."
+            }
+          ]
+        },
+        {
+          "slug": "nessebar",
+          "name": "Nessebar",
+          "lat": 42.66,
+          "lon": 27.73,
+          "quiet": true,
           "summary": "A rocky peninsula joined by a causeway, with more medieval churches per square metre than anywhere on the Black Sea.",
-          "interests": ["history", "coast", "sacred"], "nights": [1, 2],
-          "highlights": ["Forty churches in a town of a few hundred metres across", "Wooden Ottoman-era houses on stone bases", "Out of season, when it stops being a beach resort annexe"] }
-      ] }
-  ]
+          "interests": [
+            "history",
+            "coast",
+            "sacred"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Forty churches in a town of a few hundred metres across",
+            "Wooden Ottoman-era houses on stone bases",
+            "Out of season, when it stops being a beach resort annexe"
+          ]
+        }
+      ]
+    }
+  ],
+  "timezone": "EET/EEST (UTC+2/+3)"
 }

@@ -51,17 +51,20 @@
     {
       "name": "Bergen International Festival",
       "month": "may",
-      "where": "Bergen"
+      "where": "Bergen",
+      "kind": "cultural"
     },
     {
       "name": "Midnight sun period",
       "month": "jun",
-      "where": "Everywhere north of the Arctic Circle"
+      "where": "Everywhere north of the Arctic Circle",
+      "kind": "seasonal"
     },
     {
       "name": "Northern Lights season begins in earnest",
       "month": "oct",
-      "where": "Tromsø and Finnmark"
+      "where": "Tromsø and Finnmark",
+      "kind": "seasonal"
     }
   ],
   "know": [
@@ -1273,5 +1276,6 @@
         }
       ]
     }
-  ]
+  ],
+  "timezone": "CET/CEST (UTC+1/+2)"
 }

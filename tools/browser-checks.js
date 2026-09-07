@@ -140,6 +140,121 @@ async function main() {
     ok(!coast.includes(banned) && !alps.includes(banned), `planner routed into ${banned}`);
   }
 
+  // ── the planner inputs the specification asks for ──────────────────
+  // Every one of these was added because §10 lists it as an input. An
+  // input that renders but does not change the answer is decoration, so
+  // each check below asserts the *output* moved, not that the field
+  // exists.
+  async function planWith(fill) {
+    await page.goto(base + "/plan", { waitUntil: "networkidle" });
+    await page.fill("#days", "14");
+    await page.fill("#budget", "3000");
+    await page.check('input[name="interest"][value="history"]');
+    await fill();
+    await page.click('#planner button[type="submit"]');
+    await page.waitForSelector("#result .leg");
+    const money = await page.locator("#result .result-summary dd").first().textContent();
+    return {
+      route: (await page.locator("#result .leg h3 a").allTextContents()).join(" > "),
+      cost: parseInt(money.replace(/[^0-9]/g, ""), 10),
+      money: money.trim(),
+      html: await page.locator("#result").innerHTML(),
+    };
+  }
+
+  // "End near" must land the route on the city asked for, or say in words
+  // that it could not. Before this was checked the planner silently
+  // appended a 2,500 km final leg and called it an itinerary.
+  const endOptions = await page.locator("#end option").count();
+  ok(endOptions > 100, `end select carried ${endOptions} options, so it was not populated`);
+  const ended = await planWith(async () => {
+    await page.selectOption("#start", "france/paris-and-ile-de-france/paris");
+    await page.selectOption("#end", "italy/rome-and-lazio/rome");
+  });
+  const lastStop = ended.route.split(" > ").pop();
+  ok(lastStop === "Rome" || /a long way|straight to|forced/i.test(ended.html),
+     `asked to end in Rome, ended in ${lastStop} without saying why`);
+  ok(ended.route.split(" > ")[0] === "Paris", "the start city was not honoured");
+
+  // Travellers: two people cost more than one, and not merely double —
+  // the second bed is cheaper than the first.
+  const one = await planWith(async () => { await page.fill("#travellers", "1"); });
+  const two = await planWith(async () => { await page.fill("#travellers", "2"); });
+  ok(two.cost > one.cost, `two travellers cost ${two.cost}, one cost ${one.cost}`);
+  ok(two.cost < one.cost * 2, "the second traveller was charged a full second trip");
+
+  // Accommodation style must move the number in the direction it claims.
+  const guest = await planWith(async () => { await page.selectOption("#accommodation", "guesthouse"); });
+  const hotel = await planWith(async () => { await page.selectOption("#accommodation", "hotel"); });
+  ok(guest.cost < hotel.cost, `guesthouses (${guest.cost}) did not come in under hotels (${hotel.cost})`);
+
+  // Rail and ferry, no flights: the route must not string together the
+  // long hops that only make sense in the air.
+  const rail = await planWith(async () => {
+    await page.selectOption("#start", "portugal/lisbon-and-the-west/lisbon");
+    await page.selectOption("#transport", "rail");
+  });
+  ok(!/by air/.test(rail.html), "a rail-only trip still offered a flying time");
+
+  // Currency: the figure must change shape, and the page must say the
+  // rate is dated rather than quietly presenting it as live.
+  const inSek = await planWith(async () => { await page.selectOption("#currency", "SEK"); });
+  ok(!inSek.money.startsWith("€"), `asked for SEK and got ${inSek.money}`);
+  ok(/indicative, dated rate/.test(inSek.html),
+     "a converted figure did not say the rate is indicative and dated");
+
+  // Travel time between stops, in words, on every hop after the first.
+  const hopNotes = await page.locator("#result .hop").allTextContents();
+  ok(hopNotes.length >= 2, "the itinerary carried no travel notes between stops");
+  // hoursText writes "3h 20m" and "45 minutes"; a note carrying only a
+  // distance is the thing being ruled out here.
+  ok(hopNotes.every((t) => /\d+h\b|\d+ minutes/.test(t)),
+     "a travel note gave a distance but no travelling time");
+
+  // Saved places: a place saved in My Europe must be favoured. We seed
+  // localStorage on the origin the page will read it from.
+  await page.goto(base + "/plan", { waitUntil: "networkidle" });
+  await page.evaluate(() => {
+    // The same shape My Europe writes: the id is what the planner keys on.
+    localStorage.setItem("europedoor.saved.v1", JSON.stringify([
+      { id: "city:north-macedonia/ohrid-and-the-southwest/ohrid", kind: "City", label: "Ohrid" },
+    ]));
+  });
+  // Started next door to the saved place, so this tests the boost rather
+  // than testing whether one 1.6x multiplier can beat the whole continent:
+  // the boost is a preference, and claiming it is a guarantee would be the
+  // check lying about the code.
+  const withSaved = await planWith(async () => {
+    await page.selectOption("#start", "albania/tirana-and-the-south/tirana");
+    await page.check("#saved");
+  });
+  ok(/Ohrid/.test(withSaved.route),
+     `favouring a saved place did not put it in the route: ${withSaved.route}`);
+  await page.evaluate(() => localStorage.removeItem("europedoor.saved.v1"));
+
+  // ── the follow-up questions ────────────────────────────────────────
+  // §19: ask only what changes the answer, and answer anyway. A sentence
+  // with no length and no budget must still produce a plan AND put both
+  // questions.
+  await page.goto(base + "/plan", { waitUntil: "networkidle" });
+  await page.fill("#ask", "somewhere with good food and old towns");
+  await page.click('#askform button[type="submit"]');
+  await page.waitForSelector("#result .leg");
+  const askHtml = await page.locator("#result").innerHTML();
+  ok(/How many days/.test(askHtml), "an ask with no length did not ask how many days");
+  ok(/can you spend/.test(askHtml), "an ask with no budget did not ask about spending");
+  ok(await page.locator("#result .leg").count() >= 3,
+     "the planner asked the questions but did not answer anyway");
+
+  // And a sentence that says everything must ask nothing.
+  await page.goto(base + "/plan", { waitUntil: "networkidle" });
+  await page.fill("#ask", "10 days in Italy in May, about 2000 euros, art and food");
+  await page.click('#askform button[type="submit"]');
+  await page.waitForSelector("#result .leg");
+  const fullHtml = await page.locator("#result").innerHTML();
+  ok(!/How many days|can you spend/.test(fullHtml),
+     "the planner asked for information the sentence had already given");
+
   // ── search ─────────────────────────────────────────────────────────
   await page.goto(base + "/search", { waitUntil: "networkidle" });
   await page.fill("#q", "bergen");
@@ -194,6 +309,34 @@ async function main() {
      "a €700 budget still routed through Switzerland");
   const rich = await routeOnBudget(6000);
   ok(rich.total > lean.total, "a nine-fold budget produced no more expensive a trip");
+
+  // The specification puts the question on the homepage; it has to reach
+  // the planner and run, or it is a decorative input.
+  await page.goto(base + "/", { waitUntil: "networkidle" });
+  await page.fill("#homeask", "10 days in September, mountains and local food");
+  await page.click(".askhome button[type=submit]");
+  await page.waitForSelector("#result .leg");
+  ok(/plan/.test(page.url()), "the homepage question did not reach the planner");
+  const homeRead = await page.locator("#result .note").first().textContent();
+  ok(/10 days/.test(homeRead) && /September/.test(homeRead),
+     `the homepage question was not read: ${homeRead.slice(0, 80)}`);
+
+  // A homepage map filter must open the map with that layer already on.
+  await page.goto(base + "/map?layer=mountains", { waitUntil: "networkidle" });
+  ok(await page.isChecked('#layers input[value="mountains"]'),
+     "?layer=mountains did not preselect the layer");
+  const litCount = await page.locator("#dots .dot:not(.off)").count();
+  const allCount = await page.locator("#dots .dot").count();
+  ok(litCount > 0 && litCount < allCount, "the preselected layer did not filter anything");
+
+  // Event categories must filter the year.
+  await page.goto(base + "/events", { waitUntil: "networkidle" });
+  const beforeEvents = await page.locator(".row.event:not([hidden])").count();
+  await page.check('#eventkinds input[value="food"]');
+  await page.waitForTimeout(150);
+  const afterEvents = await page.locator(".row.event:not([hidden])").count();
+  ok(afterEvents > 0 && afterEvents < beforeEvents,
+     `event filtering lit ${afterEvents} of ${beforeEvents}`);
 
   // ── the sentence box ───────────────────────────────────────────────
   async function ask(text) {

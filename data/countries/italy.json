@@ -58,17 +58,20 @@
     {
       "name": "Carnevale",
       "month": "feb",
-      "where": "Venice, Viareggio, Ivrea"
+      "where": "Venice, Viareggio, Ivrea",
+      "kind": "cultural"
     },
     {
       "name": "Palio di Siena",
       "month": "jul",
-      "where": "Siena"
+      "where": "Siena",
+      "kind": "sport"
     },
     {
       "name": "Truffle season and its fairs",
       "month": "oct",
-      "where": "Alba, Piedmont"
+      "where": "Alba, Piedmont",
+      "kind": "market"
     }
   ],
   "know": [
@@ -1341,5 +1344,6 @@
         }
       ]
     }
-  ]
+  ],
+  "timezone": "CET/CEST (UTC+1/+2)"
 }

@@ -1,53 +1,211 @@
 {
-  "code": "al", "slug": "albania", "name": "Albania", "official": "Republic of Albania",
-  "macro": "adriatic-balkans", "capital": "Tirana", "currency": "ALL — Albanian lek",
-  "languages": ["Albanian"],
+  "code": "al",
+  "slug": "albania",
+  "name": "Albania",
+  "official": "Republic of Albania",
+  "macro": "adriatic-balkans",
+  "capital": "Tirana",
+  "currency": "ALL — Albanian lek",
+  "languages": [
+    "Albanian"
+  ],
   "blocs": [],
   "tagline": "Closed to the world until 1991, and now the least developed and least expensive coast on the Mediterranean.",
   "summary": "Albania spent forty years as the most isolated country in Europe, and the 173,000 concrete bunkers built during it are still in the fields. Since opening it has become the Balkans' fastest-changing destination: an Ionian coast with genuinely empty beaches, an alpine north with a working blood-feud memory and hospitality codes older than the state, and a capital painted in primary colours.",
-  "interests": ["coast", "mountains", "history", "food", "nature"],
-  "budget": "low", "daily_eur": [25, 75],
-  "season": { "peak": ["jun", "jul", "aug", "sep"], "shoulder": ["may", "oct"],
-    "note": "The Ionian coast works from May to October and is busy with Albanians and Kosovars in August. The northern Alps are walkable from mid-June to early October; the Valbona-Theth pass is snowbound outside that." },
-  "getting_around": "Furgon minibuses run without fixed timetables and leave when full. There is almost no functioning railway. The Koman Lake ferry is the way north and is spectacular. Roads have improved enormously and are still not fast.",
-  "food": ["Byrek, and the argument about whose grandmother's is best", "Tavë kosi: lamb baked in yoghurt, the national dish", "Fresh fish on the coast at prices that will surprise you"],
-  "festivals": [
-    { "name": "Summer Day (Dita e Verës)", "month": "mar", "where": "Elbasan and nationwide" },
-    { "name": "Gjirokastër National Folklore Festival", "month": "may", "where": "Gjirokastër" },
-    { "name": "Coastal season and beach festivals", "month": "aug", "where": "The Riviera" }
+  "interests": [
+    "coast",
+    "mountains",
+    "history",
+    "food",
+    "nature"
   ],
-  "know": ["Cash is still king outside Tirana; the lek is not widely obtainable abroad.", "Hospitality (besa) is a genuine cultural obligation and refusing food can offend.", "Mountain paths in the north are marked but rescue is limited — go with a guide or a good map."],
+  "budget": "low",
+  "daily_eur": [
+    25,
+    75
+  ],
+  "season": {
+    "peak": [
+      "jun",
+      "jul",
+      "aug",
+      "sep"
+    ],
+    "shoulder": [
+      "may",
+      "oct"
+    ],
+    "note": "The Ionian coast works from May to October and is busy with Albanians and Kosovars in August. The northern Alps are walkable from mid-June to early October; the Valbona-Theth pass is snowbound outside that."
+  },
+  "getting_around": "Furgon minibuses run without fixed timetables and leave when full. There is almost no functioning railway. The Koman Lake ferry is the way north and is spectacular. Roads have improved enormously and are still not fast.",
+  "food": [
+    "Byrek, and the argument about whose grandmother's is best",
+    "Tavë kosi: lamb baked in yoghurt, the national dish",
+    "Fresh fish on the coast at prices that will surprise you"
+  ],
+  "festivals": [
+    {
+      "name": "Summer Day (Dita e Verës)",
+      "month": "mar",
+      "where": "Elbasan and nationwide",
+      "kind": "seasonal"
+    },
+    {
+      "name": "Gjirokastër National Folklore Festival",
+      "month": "may",
+      "where": "Gjirokastër",
+      "kind": "cultural"
+    },
+    {
+      "name": "Coastal season and beach festivals",
+      "month": "aug",
+      "where": "The Riviera",
+      "kind": "seasonal"
+    }
+  ],
+  "know": [
+    "Cash is still king outside Tirana; the lek is not widely obtainable abroad.",
+    "Hospitality (besa) is a genuine cultural obligation and refusing food can offend.",
+    "Mountain paths in the north are marked but rescue is limited — go with a guide or a good map."
+  ],
   "regions": [
-    { "slug": "tirana-and-the-south", "name": "Tirana, the Riviera & the South",
+    {
+      "slug": "tirana-and-the-south",
+      "name": "Tirana, the Riviera & the South",
       "summary": "The painted capital, two Ottoman museum-towns, and the Ionian coast.",
-      "interests": ["coast", "history", "food", "architecture"],
+      "interests": [
+        "coast",
+        "history",
+        "food",
+        "architecture"
+      ],
       "cities": [
-        { "slug": "tirana", "name": "Tirana", "lat": 41.33, "lon": 19.82,
+        {
+          "slug": "tirana",
+          "name": "Tirana",
+          "lat": 41.33,
+          "lon": 19.82,
           "summary": "A capital whose mayor painted the grey communist blocks in primary colours, and where a nuclear bunker is now a museum.",
-          "interests": ["history", "food", "cities", "art"], "nights": [1, 2],
-          "highlights": ["Bunk'Art: Hoxha's nuclear bunker, 106 rooms, as a museum", "The Pyramid, a dictator's mausoleum turned tech centre", "Blloku, once closed to all but the party elite, now the bar district"],
-          "experiences": [{ "slug": "tirana-bunkart", "name": "Bunk'Art, underground", "kind": "museum", "band": "low", "summary": "A five-storey bunker built for a leadership expecting invasion that never came; the exhibition does not soften the regime." }] },
-        { "slug": "gjirokaster", "name": "Gjirokastër", "lat": 40.08, "lon": 20.14, "quiet": true,
-          "summary": "A UNESCO-listed Ottoman town of stone-roofed tower houses on a steep hillside under a castle.",
-          "interests": ["history", "architecture", "food"], "nights": [1, 2],
-          "highlights": ["Slate-roofed houses built as fortified homes", "The castle, and the American spy plane parked in it", "Skënduli House, still owned and shown by the family"] },
-        { "slug": "himare", "name": "Himarë & the Riviera", "lat": 40.10, "lon": 19.75,
-          "summary": "Ionian villages between mountain and sea, with beaches that were empty ten years ago and are filling fast.",
-          "interests": ["coast", "food", "nature"], "nights": [2, 3],
-          "highlights": ["Gjipe beach, at the mouth of a canyon, reached on foot", "The Llogara pass, dropping 1,000 metres to the sea", "Fish, olive oil and citrus from the villages behind"] }
-      ] },
-    { "slug": "the-albanian-alps", "name": "The Albanian Alps",
-      "summary": "The 'Accursed Mountains': stone villages, a ferry through a gorge, and a pass between two valleys.",
-      "interests": ["mountains", "nature", "wild"],
-      "cities": [
-        { "slug": "theth", "name": "Theth", "lat": 42.39, "lon": 19.77, "quiet": true,
-          "summary": "A valley village of stone houses with no road in until recently, a lock-in tower, and a waterfall above it.",
-          "interests": ["mountains", "nature", "history"], "nights": [2, 3],
-          "highlights": ["The Valbona-Theth pass, a six-hour crossing on foot", "The kulla, a tower where men under blood feud could shelter", "The Blue Eye of Theth, up the river"],
+          "interests": [
+            "history",
+            "food",
+            "cities",
+            "art"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Bunk'Art: Hoxha's nuclear bunker, 106 rooms, as a museum",
+            "The Pyramid, a dictator's mausoleum turned tech centre",
+            "Blloku, once closed to all but the party elite, now the bar district"
+          ],
           "experiences": [
-            { "slug": "valbona-theth-pass", "name": "The Valbona to Theth pass", "kind": "walk", "band": "low", "summary": "Six to eight hours over 1,800 metres between two valleys, with guesthouses at both ends and mules for bags." },
-            { "slug": "koman-ferry", "name": "The Koman Lake ferry", "kind": "water", "band": "low", "summary": "Three hours through a flooded gorge on a working passenger boat that carries villagers, goats and the occasional car." }
-          ] }
-      ] }
-  ]
+            {
+              "slug": "tirana-bunkart",
+              "name": "Bunk'Art, underground",
+              "kind": "museum",
+              "band": "low",
+              "summary": "A five-storey bunker built for a leadership expecting invasion that never came; the exhibition does not soften the regime."
+            }
+          ]
+        },
+        {
+          "slug": "gjirokaster",
+          "name": "Gjirokastër",
+          "lat": 40.08,
+          "lon": 20.14,
+          "quiet": true,
+          "summary": "A UNESCO-listed Ottoman town of stone-roofed tower houses on a steep hillside under a castle.",
+          "interests": [
+            "history",
+            "architecture",
+            "food"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Slate-roofed houses built as fortified homes",
+            "The castle, and the American spy plane parked in it",
+            "Skënduli House, still owned and shown by the family"
+          ]
+        },
+        {
+          "slug": "himare",
+          "name": "Himarë & the Riviera",
+          "lat": 40.1,
+          "lon": 19.75,
+          "summary": "Ionian villages between mountain and sea, with beaches that were empty ten years ago and are filling fast.",
+          "interests": [
+            "coast",
+            "food",
+            "nature"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Gjipe beach, at the mouth of a canyon, reached on foot",
+            "The Llogara pass, dropping 1,000 metres to the sea",
+            "Fish, olive oil and citrus from the villages behind"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "the-albanian-alps",
+      "name": "The Albanian Alps",
+      "summary": "The 'Accursed Mountains': stone villages, a ferry through a gorge, and a pass between two valleys.",
+      "interests": [
+        "mountains",
+        "nature",
+        "wild"
+      ],
+      "cities": [
+        {
+          "slug": "theth",
+          "name": "Theth",
+          "lat": 42.39,
+          "lon": 19.77,
+          "quiet": true,
+          "summary": "A valley village of stone houses with no road in until recently, a lock-in tower, and a waterfall above it.",
+          "interests": [
+            "mountains",
+            "nature",
+            "history"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The Valbona-Theth pass, a six-hour crossing on foot",
+            "The kulla, a tower where men under blood feud could shelter",
+            "The Blue Eye of Theth, up the river"
+          ],
+          "experiences": [
+            {
+              "slug": "valbona-theth-pass",
+              "name": "The Valbona to Theth pass",
+              "kind": "walk",
+              "band": "low",
+              "summary": "Six to eight hours over 1,800 metres between two valleys, with guesthouses at both ends and mules for bags."
+            },
+            {
+              "slug": "koman-ferry",
+              "name": "The Koman Lake ferry",
+              "kind": "water",
+              "band": "low",
+              "summary": "Three hours through a flooded gorge on a working passenger boat that carries villagers, goats and the occasional car."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "timezone": "CET/CEST (UTC+1/+2)"
 }

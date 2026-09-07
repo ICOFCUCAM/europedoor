@@ -16,8 +16,8 @@ which has one advantage a dashboard does not: the gaps show up in a diff.
 | Destinations | 319 | 150 | 300 | met |
 | Places | 192 | 1000 | 3000 | 19% of MVP |
 | Experiences | 197 | 300 | 1000 | 66% of MVP |
-| Journeys | 16 | 50 | 100 | 32% of MVP |
-| Stories | 8 | 100 | 500 | 8% of MVP |
+| Journeys | 17 | 50 | 100 | 34% of MVP |
+| Stories | 9 | 100 | 500 | 9% of MVP |
 | Business listings | 8 | 500 | 2000 | 2% of MVP |
 
 Two of those gaps are deliberate rather than pending. **Business listings** will
@@ -41,9 +41,9 @@ Albarracín, Spain, Amiens, France, Andorra la Vella, Andorra, Antwerp, Belgium,
 
 Albania, Andorra, Armenia, Austria, Azerbaijan, Belarus, Belgium, Bosnia and Herzegovina, Bulgaria, Croatia, Cyprus, Czechia, Denmark, Estonia, Finland, France, Georgia, Germany, Greece, Hungary, Iceland, Ireland, Italy, Kosovo, and 26 more.
 
-### Cities carrying no curated relationship — 173
+### Cities carrying no curated relationship — 171
 
-Aarhus, Albarracín, Alghero, Sardinia, Alta, Amiens, Andorra la Vella, Annecy, Arezzo, Assisi, Avignon, Balestrand, Belfast, Bellagio & Lake Como, Berchtesgaden, Bergen, Bern, Biarritz & the Basque Coast, Bilbao, Bitola, Bled, Bodø, Bonifacio, Bovec & the Soča, Brussels, and 149 more.
+Aarhus, Albarracín, Alghero, Sardinia, Alta, Amiens, Andorra la Vella, Annecy, Arezzo, Assisi, Avignon, Balestrand, Belfast, Bellagio & Lake Como, Berchtesgaden, Bergen, Bern, Biarritz & the Basque Coast, Bilbao, Bitola, Bled, Bodø, Bonifacio, Brussels, Bucharest, and 147 more.
 
 ## Interface translation
 

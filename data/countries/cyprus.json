@@ -1,46 +1,188 @@
 {
-  "code": "cy", "slug": "cyprus", "name": "Cyprus", "official": "Republic of Cyprus",
-  "macro": "mediterranean", "capital": "Nicosia", "currency": "EUR — euro",
-  "languages": ["Greek", "Turkish"],
-  "blocs": ["eu", "eurozone"],
+  "code": "cy",
+  "slug": "cyprus",
+  "name": "Cyprus",
+  "official": "Republic of Cyprus",
+  "macro": "mediterranean",
+  "capital": "Nicosia",
+  "currency": "EUR — euro",
+  "languages": [
+    "Greek",
+    "Turkish"
+  ],
+  "blocs": [
+    "eu",
+    "eurozone"
+  ],
   "tagline": "The last divided capital in Europe, on an island of Byzantine churches and mountain wine.",
   "summary": "Cyprus is the third-largest Mediterranean island and has been divided since 1974, with a UN buffer zone running through the middle of Nicosia. The Republic controls the south; the north is administered separately and recognised only by Türkiye. Beyond the politics, it holds painted Byzantine churches in the Troodos mountains, Roman mosaics at Paphos, and one of the oldest wine traditions in the world.",
-  "interests": ["history", "coast", "sacred", "wine", "mountains", "food"],
-  "budget": "moderate", "daily_eur": [55, 135],
-  "season": { "peak": ["apr", "may", "jun", "sep", "oct"], "shoulder": ["mar", "nov"],
-    "note": "Spring is the island's best season — green, flowering and warm enough to swim by May. July and August are extremely hot inland. The Troodos mountains hold snow and a small ski area in February." },
-  "getting_around": "No railway at all; buses connect the cities and a car is close to essential for the mountains. Crossing to the north on foot at Ledra Street in Nicosia is straightforward for most visitors with a passport, subject to current rules.",
-  "food": ["Meze, twenty or more small plates, ordered for the table and never finished", "Halloumi, grilled, which is a protected local product and tastes different here", "Commandaria: a sweet wine made the same way since antiquity"],
-  "festivals": [
-    { "name": "Orthodox Easter", "month": "apr", "where": "Nationwide" },
-    { "name": "Kataklysmos, the flood festival, with water thrown at everyone", "month": "jun", "where": "Coastal towns" },
-    { "name": "Limassol wine festival", "month": "sep", "where": "Limassol" }
+  "interests": [
+    "history",
+    "coast",
+    "sacred",
+    "wine",
+    "mountains",
+    "food"
   ],
-  "know": ["Driving is on the left.", "Crossing points between south and north exist and rules change — check current guidance before planning around one.", "The Troodos churches are small, locked and often opened by a neighbour with a key; a donation is expected."],
+  "budget": "moderate",
+  "daily_eur": [
+    55,
+    135
+  ],
+  "season": {
+    "peak": [
+      "apr",
+      "may",
+      "jun",
+      "sep",
+      "oct"
+    ],
+    "shoulder": [
+      "mar",
+      "nov"
+    ],
+    "note": "Spring is the island's best season — green, flowering and warm enough to swim by May. July and August are extremely hot inland. The Troodos mountains hold snow and a small ski area in February."
+  },
+  "getting_around": "No railway at all; buses connect the cities and a car is close to essential for the mountains. Crossing to the north on foot at Ledra Street in Nicosia is straightforward for most visitors with a passport, subject to current rules.",
+  "food": [
+    "Meze, twenty or more small plates, ordered for the table and never finished",
+    "Halloumi, grilled, which is a protected local product and tastes different here",
+    "Commandaria: a sweet wine made the same way since antiquity"
+  ],
+  "festivals": [
+    {
+      "name": "Orthodox Easter",
+      "month": "apr",
+      "where": "Nationwide",
+      "kind": "religious"
+    },
+    {
+      "name": "Kataklysmos, the flood festival, with water thrown at everyone",
+      "month": "jun",
+      "where": "Coastal towns",
+      "kind": "seasonal"
+    },
+    {
+      "name": "Limassol wine festival",
+      "month": "sep",
+      "where": "Limassol",
+      "kind": "food"
+    }
+  ],
+  "know": [
+    "Driving is on the left.",
+    "Crossing points between south and north exist and rules change — check current guidance before planning around one.",
+    "The Troodos churches are small, locked and often opened by a neighbour with a key; a donation is expected."
+  ],
   "regions": [
-    { "slug": "south-coast-and-nicosia", "name": "Nicosia & the South Coast",
+    {
+      "slug": "south-coast-and-nicosia",
+      "name": "Nicosia & the South Coast",
       "summary": "The divided capital inland, and the Roman and Hellenistic coast west of Limassol.",
-      "interests": ["history", "coast", "food"],
+      "interests": [
+        "history",
+        "coast",
+        "food"
+      ],
       "cities": [
-        { "slug": "nicosia", "name": "Nicosia", "lat": 35.17, "lon": 33.36,
+        {
+          "slug": "nicosia",
+          "name": "Nicosia",
+          "lat": 35.17,
+          "lon": 33.36,
           "summary": "A Venetian star-shaped fortress city with a UN buffer zone through the middle and a crossing on the main shopping street.",
-          "interests": ["history", "food", "cities"], "nights": [1, 2],
-          "highlights": ["The Venetian walls, eleven bastions, still tracing the city", "The Cyprus Museum's Neolithic and Bronze Age collections", "The Ledra Street crossing, and the shuttered street either side of it"],
-          "experiences": [{ "slug": "nicosia-buffer-zone-walk", "name": "The Green Line, walked", "kind": "walk", "band": "low", "summary": "Sandbags, oil drums and 1974 shopfronts, visible from the streets that dead-end into them. Sobering and entirely ordinary to residents." }] },
-        { "slug": "paphos", "name": "Paphos", "lat": 34.78, "lon": 32.42,
+          "interests": [
+            "history",
+            "food",
+            "cities"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Venetian walls, eleven bastions, still tracing the city",
+            "The Cyprus Museum's Neolithic and Bronze Age collections",
+            "The Ledra Street crossing, and the shuttered street either side of it"
+          ],
+          "experiences": [
+            {
+              "slug": "nicosia-buffer-zone-walk",
+              "name": "The Green Line, walked",
+              "kind": "walk",
+              "band": "low",
+              "summary": "Sandbags, oil drums and 1974 shopfronts, visible from the streets that dead-end into them. Sobering and entirely ordinary to residents."
+            }
+          ]
+        },
+        {
+          "slug": "paphos",
+          "name": "Paphos",
+          "lat": 34.78,
+          "lon": 32.42,
           "summary": "A harbour town with Roman villa floors that are among the finest mosaics anywhere, and royal tombs cut into the rock.",
-          "interests": ["history", "coast", "art"], "nights": [2, 3],
-          "highlights": ["The House of Dionysos and its mosaic floors", "Tombs of the Kings, Hellenistic and underground", "The Akamas peninsula's empty beaches, north"] }
-      ] },
-    { "slug": "troodos", "name": "The Troodos Mountains",
+          "interests": [
+            "history",
+            "coast",
+            "art"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The House of Dionysos and its mosaic floors",
+            "Tombs of the Kings, Hellenistic and underground",
+            "The Akamas peninsula's empty beaches, north"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "troodos",
+      "name": "The Troodos Mountains",
       "summary": "Painted churches under wooden roofs, vineyards at 1,000 metres, and forest above them.",
-      "interests": ["sacred", "wine", "mountains", "nature"],
+      "interests": [
+        "sacred",
+        "wine",
+        "mountains",
+        "nature"
+      ],
       "cities": [
-        { "slug": "omodos", "name": "Omodos & the wine villages", "lat": 34.85, "lon": 32.79, "quiet": true,
+        {
+          "slug": "omodos",
+          "name": "Omodos & the wine villages",
+          "lat": 34.85,
+          "lon": 32.79,
+          "quiet": true,
           "summary": "Cobbled mountain villages growing indigenous grapes nobody else has, around a 12th-century monastery.",
-          "interests": ["wine", "sacred", "mountains", "food"], "nights": [1, 2],
-          "highlights": ["Xynisteri and mavro, grape varieties grown almost nowhere else", "The painted churches of the Troodos, ten of them UNESCO-listed", "Commandaria, documented since the crusades"],
-          "experiences": [{ "slug": "troodos-painted-churches", "name": "The barn-roofed painted churches", "kind": "sacred", "band": "low", "summary": "Small stone chapels under enormous pitched roofs, frescoed inside floor to ceiling; several need a key fetched from a village house." }] }
-      ] }
-  ]
+          "interests": [
+            "wine",
+            "sacred",
+            "mountains",
+            "food"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Xynisteri and mavro, grape varieties grown almost nowhere else",
+            "The painted churches of the Troodos, ten of them UNESCO-listed",
+            "Commandaria, documented since the crusades"
+          ],
+          "experiences": [
+            {
+              "slug": "troodos-painted-churches",
+              "name": "The barn-roofed painted churches",
+              "kind": "sacred",
+              "band": "low",
+              "summary": "Small stone chapels under enormous pitched roofs, frescoed inside floor to ceiling; several need a key fetched from a village house."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "timezone": "EET/EEST (UTC+2/+3)"
 }

@@ -1,63 +1,259 @@
 {
-  "code": "tr", "slug": "turkiye", "name": "Türkiye", "official": "Republic of Türkiye",
-  "macro": "caucasus-bosphorus", "capital": "Ankara", "currency": "TRY — Turkish lira",
-  "languages": ["Turkish", "Kurdish"],
+  "code": "tr",
+  "slug": "turkiye",
+  "name": "Türkiye",
+  "official": "Republic of Türkiye",
+  "macro": "caucasus-bosphorus",
+  "capital": "Ankara",
+  "currency": "TRY — Turkish lira",
+  "languages": [
+    "Turkish",
+    "Kurdish"
+  ],
   "blocs": [],
   "tagline": "A city on two continents, and a Mediterranean coast with more classical ruins than Greece.",
   "summary": "Türkiye is transcontinental: East Thrace is in Europe, Istanbul straddles the divide, and the rest is Anatolia. It is a Council of Europe member and a candidate for EU accession. It holds more Greek and Roman cities than Greece and Italy, a volcanic landscape in Cappadocia carved into churches and houses, and a food culture that repays a trip on its own.",
-  "interests": ["history", "food", "coast", "sacred", "architecture", "nature"],
-  "budget": "low", "daily_eur": [30, 95],
-  "season": { "peak": ["apr", "may", "sep", "oct"], "shoulder": ["mar", "jun", "nov"],
-    "note": "Spring and autumn. Istanbul is pleasant nearly year-round; the Aegean and Mediterranean coasts are very hot in July and August; Cappadocia is high, cold in winter and best for ballooning in still autumn air." },
-  "getting_around": "High-speed rail links Istanbul, Ankara and Konya. Intercity coaches are comfortable, cheap and go everywhere. Istanbul's ferries between continents are the best transport in the city and cost the price of a bus.",
-  "food": ["Breakfast (kahvaltı), which is a spread of fifteen small plates and takes two hours", "Kebab as a regional category — Adana, Urfa, İskender are different things", "Meze with rakı, at a meyhane, in an order that matters"],
-  "festivals": [
-    { "name": "Ramadan and Eid", "month": "mar", "where": "Nationwide, dates move each year" },
-    { "name": "Istanbul Music Festival", "month": "jun", "where": "Istanbul" },
-    { "name": "Whirling dervish ceremonies for Rumi", "month": "dec", "where": "Konya" }
+  "interests": [
+    "history",
+    "food",
+    "coast",
+    "sacred",
+    "architecture",
+    "nature"
   ],
-  "know": ["Only East Thrace and part of Istanbul are geographically in Europe; the rest is Asia.", "Mosques welcome visitors outside prayer times; shoes off, shoulders and knees covered, heads covered for women.", "Bargaining is expected in bazaars and not in shops."],
+  "budget": "low",
+  "daily_eur": [
+    30,
+    95
+  ],
+  "season": {
+    "peak": [
+      "apr",
+      "may",
+      "sep",
+      "oct"
+    ],
+    "shoulder": [
+      "mar",
+      "jun",
+      "nov"
+    ],
+    "note": "Spring and autumn. Istanbul is pleasant nearly year-round; the Aegean and Mediterranean coasts are very hot in July and August; Cappadocia is high, cold in winter and best for ballooning in still autumn air."
+  },
+  "getting_around": "High-speed rail links Istanbul, Ankara and Konya. Intercity coaches are comfortable, cheap and go everywhere. Istanbul's ferries between continents are the best transport in the city and cost the price of a bus.",
+  "food": [
+    "Breakfast (kahvaltı), which is a spread of fifteen small plates and takes two hours",
+    "Kebab as a regional category — Adana, Urfa, İskender are different things",
+    "Meze with rakı, at a meyhane, in an order that matters"
+  ],
+  "festivals": [
+    {
+      "name": "Ramadan and Eid",
+      "month": "mar",
+      "where": "Nationwide, dates move each year",
+      "kind": "religious"
+    },
+    {
+      "name": "Istanbul Music Festival",
+      "month": "jun",
+      "where": "Istanbul",
+      "kind": "concert"
+    },
+    {
+      "name": "Whirling dervish ceremonies for Rumi",
+      "month": "dec",
+      "where": "Konya",
+      "kind": "religious"
+    }
+  ],
+  "know": [
+    "Only East Thrace and part of Istanbul are geographically in Europe; the rest is Asia.",
+    "Mosques welcome visitors outside prayer times; shoes off, shoulders and knees covered, heads covered for women.",
+    "Bargaining is expected in bazaars and not in shops."
+  ],
   "regions": [
-    { "slug": "istanbul-and-thrace", "name": "Istanbul & Thrace",
+    {
+      "slug": "istanbul-and-thrace",
+      "name": "Istanbul & Thrace",
       "summary": "The city on the Bosphorus, and the European corner of the country behind it.",
-      "interests": ["history", "sacred", "food", "architecture"],
+      "interests": [
+        "history",
+        "sacred",
+        "food",
+        "architecture"
+      ],
       "cities": [
-        { "slug": "istanbul", "name": "Istanbul", "lat": 41.01, "lon": 28.98,
+        {
+          "slug": "istanbul",
+          "name": "Istanbul",
+          "lat": 41.01,
+          "lon": 28.98,
           "summary": "Capital of two empires, on two continents, with a 1,500-year-old church-mosque at the centre of it.",
-          "interests": ["history", "sacred", "food", "architecture", "cities"], "nights": [3, 5],
-          "highlights": ["Hagia Sophia, and the Basilica Cistern under the street outside", "The Süleymaniye mosque, quieter and better proportioned than the Blue Mosque", "A commuter ferry to Kadıköy at dusk, with tea, for the price of a bus ride", "Breakfast in Beşiktaş, which will take the whole morning"],
+          "interests": [
+            "history",
+            "sacred",
+            "food",
+            "architecture",
+            "cities"
+          ],
+          "nights": [
+            3,
+            5
+          ],
+          "highlights": [
+            "Hagia Sophia, and the Basilica Cistern under the street outside",
+            "The Süleymaniye mosque, quieter and better proportioned than the Blue Mosque",
+            "A commuter ferry to Kadıköy at dusk, with tea, for the price of a bus ride",
+            "Breakfast in Beşiktaş, which will take the whole morning"
+          ],
           "experiences": [
-            { "slug": "istanbul-bosphorus-ferry", "name": "Between continents on a commuter ferry", "kind": "water", "band": "low", "summary": "Twenty minutes, a glass of tea, gulls following the stern, and Europe and Asia both in view. The single best thing in the city and nearly free." },
-            { "slug": "istanbul-kahvalti", "name": "A two-hour Turkish breakfast", "kind": "table", "band": "low", "summary": "Fifteen small dishes, endless tea, and no expectation that you leave. Order for the table and clear the morning." }
-          ] },
-        { "slug": "edirne", "name": "Edirne", "lat": 41.68, "lon": 26.56, "quiet": true,
+            {
+              "slug": "istanbul-bosphorus-ferry",
+              "name": "Between continents on a commuter ferry",
+              "kind": "water",
+              "band": "low",
+              "summary": "Twenty minutes, a glass of tea, gulls following the stern, and Europe and Asia both in view. The single best thing in the city and nearly free."
+            },
+            {
+              "slug": "istanbul-kahvalti",
+              "name": "A two-hour Turkish breakfast",
+              "kind": "table",
+              "band": "low",
+              "summary": "Fifteen small dishes, endless tea, and no expectation that you leave. Order for the table and clear the morning."
+            }
+          ]
+        },
+        {
+          "slug": "edirne",
+          "name": "Edirne",
+          "lat": 41.68,
+          "lon": 26.56,
+          "quiet": true,
           "summary": "The Ottoman capital before Istanbul, in the European corner, with Sinan's masterpiece mosque in it.",
-          "interests": ["sacred", "architecture", "history"], "nights": [1, 1],
-          "highlights": ["Selimiye Mosque, which its architect called his best work at 86", "The oil wrestling championship each summer, running since 1362", "A town with almost no visitors, an hour from the Greek and Bulgarian borders"] }
-      ] },
-    { "slug": "aegean-and-mediterranean", "name": "The Aegean & Mediterranean",
+          "interests": [
+            "sacred",
+            "architecture",
+            "history"
+          ],
+          "nights": [
+            1,
+            1
+          ],
+          "highlights": [
+            "Selimiye Mosque, which its architect called his best work at 86",
+            "The oil wrestling championship each summer, running since 1362",
+            "A town with almost no visitors, an hour from the Greek and Bulgarian borders"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "aegean-and-mediterranean",
+      "name": "The Aegean & Mediterranean",
       "summary": "Classical cities, terraces of white travertine, and a long walking path above the sea.",
-      "interests": ["history", "coast", "nature"],
+      "interests": [
+        "history",
+        "coast",
+        "nature"
+      ],
       "cities": [
-        { "slug": "selcuk", "name": "Selçuk & Ephesus", "lat": 37.95, "lon": 27.37,
+        {
+          "slug": "selcuk",
+          "name": "Selçuk & Ephesus",
+          "lat": 37.95,
+          "lon": 27.37,
           "summary": "A market town beside one of the best-preserved classical cities in the Mediterranean.",
-          "interests": ["history", "sacred", "food"], "nights": [1, 2],
-          "highlights": ["Ephesus's library facade and marble street", "The terrace houses, roofed and separately ticketed, with intact mosaics", "Şirince, a hill village of former Greek houses making fruit wine"] },
-        { "slug": "fethiye", "name": "Fethiye & the Lycian coast", "lat": 36.62, "lon": 29.12,
+          "interests": [
+            "history",
+            "sacred",
+            "food"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Ephesus's library facade and marble street",
+            "The terrace houses, roofed and separately ticketed, with intact mosaics",
+            "Şirince, a hill village of former Greek houses making fruit wine"
+          ]
+        },
+        {
+          "slug": "fethiye",
+          "name": "Fethiye & the Lycian coast",
+          "lat": 36.62,
+          "lon": 29.12,
           "summary": "Rock-cut tombs in the cliffs above a harbour, and a 540-kilometre coastal path starting nearby.",
-          "interests": ["coast", "history", "nature", "mountains"], "nights": [2, 4],
-          "highlights": ["The Lycian Way, hugging the coast for 540 km", "Sunken ruins in the shallows off Kekova, seen from a boat", "Butterfly Valley and the beaches reachable only by sea"],
-          "experiences": [{ "slug": "lycian-way-section", "name": "A section of the Lycian Way", "kind": "walk", "band": "low", "summary": "Waymarked in red and white since 1999, through pine, ruins and goat country, with village pensions at the ends of most stages." }] }
-      ] },
-    { "slug": "central-anatolia", "name": "Central Anatolia",
+          "interests": [
+            "coast",
+            "history",
+            "nature",
+            "mountains"
+          ],
+          "nights": [
+            2,
+            4
+          ],
+          "highlights": [
+            "The Lycian Way, hugging the coast for 540 km",
+            "Sunken ruins in the shallows off Kekova, seen from a boat",
+            "Butterfly Valley and the beaches reachable only by sea"
+          ],
+          "experiences": [
+            {
+              "slug": "lycian-way-section",
+              "name": "A section of the Lycian Way",
+              "kind": "walk",
+              "band": "low",
+              "summary": "Waymarked in red and white since 1999, through pine, ruins and goat country, with village pensions at the ends of most stages."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "central-anatolia",
+      "name": "Central Anatolia",
       "summary": "Volcanic valleys carved into churches and homes, and the dervish city of Konya.",
-      "interests": ["nature", "sacred", "history"],
+      "interests": [
+        "nature",
+        "sacred",
+        "history"
+      ],
       "cities": [
-        { "slug": "goreme", "name": "Göreme, Cappadocia", "lat": 38.64, "lon": 34.83,
+        {
+          "slug": "goreme",
+          "name": "Göreme, Cappadocia",
+          "lat": 38.64,
+          "lon": 34.83,
           "summary": "Soft volcanic rock eroded into cones and carved out for a thousand years into churches, houses and underground cities.",
-          "interests": ["nature", "sacred", "history"], "nights": [2, 3],
-          "highlights": ["Rock-cut churches with Byzantine frescoes in the open-air museum", "Derinkuyu, an underground city eighteen storeys deep", "Balloons at dawn, weather permitting, which it often does not", "The Rose and Red valleys, walked at sunset"],
-          "experiences": [{ "slug": "cappadocia-valley-walk", "name": "The valleys on foot, not from the air", "kind": "walk", "band": "low", "summary": "Ihlara, Rose and Pigeon valleys are walked in a morning each, with abandoned rock churches nobody signposts." }] }
-      ] }
-  ]
+          "interests": [
+            "nature",
+            "sacred",
+            "history"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Rock-cut churches with Byzantine frescoes in the open-air museum",
+            "Derinkuyu, an underground city eighteen storeys deep",
+            "Balloons at dawn, weather permitting, which it often does not",
+            "The Rose and Red valleys, walked at sunset"
+          ],
+          "experiences": [
+            {
+              "slug": "cappadocia-valley-walk",
+              "name": "The valleys on foot, not from the air",
+              "kind": "walk",
+              "band": "low",
+              "summary": "Ihlara, Rose and Pigeon valleys are walked in a morning each, with abandoned rock churches nobody signposts."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "timezone": "TRT (UTC+3, no DST)"
 }

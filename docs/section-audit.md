@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**100 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 1 locked · 1 refused · 1 built (deliberately smaller) · 1080 assertions · 0 failing**
+**100 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 1 locked · 1 refused · 1 built (deliberately smaller) · 1218 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -16,21 +16,21 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 3 | Target users | PARTIAL | 5 | Seven traveller types have a route through the product. Two — family and luxury — are derived by published rule rather than by data we hold, and the accessibility needs of any of them are not held at all. |
 | 4 | Core product principle | BUILT | 2 | Inspire → discover → understand → plan is built; book → experience → share is where the blocked half sits. |
 | 5 | Primary navigation | BUILT | 25 | The specification's seven items exactly, plus search and My Europe, plus every secondary link it lists. |
-| 6 | Homepage | BUILT | 2 | The hero, the question, and both calls to action. The AI box is a sentence box that works rather than a promise that does not. |
-| 7 | Homepage sections | BUILT | 3 | Explore the continent, explore by experience, featured journeys — in that order. |
+| 6 | Homepage | BUILT | 4 | The hero, the question in the hero itself, and the calls to action. The AI box is a sentence box that works rather than a promise that does not, and it says so under the field. |
+| 7 | Homepage sections | BUILT | 5 | Explore the continent, explore by experience, featured journeys — in that order. |
 | 8 | Hidden Europe | BUILT | 2 | A quiet tag, a page that collects it, and a rule that we never call anywhere undiscovered. |
-| 9 | Stories | PARTIAL | 31 | The desk exists and every story links into the Atlas both ways. Eight of the specification's hundred are written. |
-| 10 | Plan your Europe | PARTIAL | 3 | Nine of the eleven inputs are taken. Mobility requirements are named as unsupported rather than silently dropped; number of travellers is read and does not yet change the arithmetic. |
-| 11 | Country page | BUILT | 4 | URL shape as specified, and every section on the list except visa and emergency information, which are refused as unverified. |
-| 12 | Region page | BUILT | 2 | Every travel region has one. |
-| 13 | Destination page | PARTIAL | 3 | Sixteen of the twenty sections. Accommodation and restaurants are named and honestly empty; travel tips sit at country level. |
+| 9 | Stories | PARTIAL | 71 | The desk exists, the index is grouped by desk, every article carries a byline, a publication date and tags, and every story links into the Atlas both ways. Nine of the specification's hundred are written. |
+| 10 | Plan your Europe | PARTIAL | 8 | Ten of the eleven inputs are taken and every one of them moves the answer. Mobility requirements are the eleventh, and are named as unsupported rather than silently dropped — we hold no step-free access data, so a field for it would be a field that lies. |
+| 11 | Country page | BUILT | 5 | URL shape as specified, and every section on the list except visa and emergency information, which are refused as unverified. |
+| 12 | Region page | BUILT | 4 | Every travel region has one, and it aggregates the destinations, places, experiences and journeys beneath it rather than being a list of city links. |
+| 13 | Destination page | PARTIAL | 3 | Seventeen of the twenty sections, travel tips now among them. Accommodation and restaurants are named and honestly empty — the listing product is the missing piece, not the heading. |
 | 14 | Place page | PARTIAL | 5 | The entity exists with 192 records. Opening hours, price and official website are refused rather than invented, and the validator rejects them. |
-| 15 | Experience system | BUILT | 11 | The specification's eight categories with 29 sub-categories, each page printing the rule that built its list. |
-| 16 | Journey system | BUILT | 160 | Every field on the specification's journey object except booking links, which are blocked with everything else commercial. |
-| 17 | Journey page | BUILT | 2 | Overview, map, route, transport, accommodation, budget, season and packing, plus a way into the planner. |
-| 18 | Multi-country journeys | BUILT | 4 | Three of the four the specification names, plus five more. |
-| 19 | AI journey planner — input | PARTIAL | 8 | The extraction the specification describes is built and runs on rules in the browser. The model is specified, with its prompts, and not built — the discipline had to exist first. |
-| 20 | AI planner output | BUILT | 7 | Summary, route, the five-line expenditure breakdown, and a day-by-day with alternatives. |
+| 15 | Experience system | BUILT | 13 | The specification's eight categories, now with 30 sub-categories — Renaissance was the one it named that we did not have — each page printing the rule that built its list. |
+| 16 | Journey system | BUILT | 188 | Every field on the specification's journey object except booking links, which are blocked with everything else commercial. |
+| 17 | Journey page | BUILT | 2 | Overview, map, route, transport, accommodation, budget, season, packing, the experiences the route passes and what you will be eating — plus a named curator and a way into the planner. |
+| 18 | Multi-country journeys | BUILT | 5 | Three of the four the specification names, plus five more. |
+| 19 | AI journey planner — input | PARTIAL | 11 | The extraction the specification describes is built and runs on rules in the browser. The model is specified, with its prompts, and not built — the discipline had to exist first. |
+| 20 | AI planner output | BUILT | 9 | Summary, route, the five-line expenditure breakdown, and a day-by-day with alternatives. |
 | 21 | AI safety and reliability | PARTIAL | 4 | The refusals are built; the model that would need them is not. Volatile fields are refused at the schema level, which is stronger than a prompt. |
 | 22 | AI travel assistant | DEFERRED | 2 | Needs accounts, a saved itinerary on a server and a model. All three are blocked; none is pretended. |
 | 23 | Map system | BUILT | 5 | Every destination, seventeen togglable layers, a places layer, a journey overlay, and the popup card the specification describes. |
@@ -43,8 +43,8 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 30 | Business verification | BUILT | 3 | Three levels with what each actually checks, published. Named applied/reviewed/verified rather than basic/verified/trusted, because 'trusted' is a claim about a business we cannot make. |
 | 31 | Business monetisation | RECORDED | 2 | Free, Professional and Premium at the specification's indicative prices, published with the caveat that they are untested. |
 | 32 | Tourism board platform | PARTIAL | 1 | The offer is published, including the one thing that is not for sale. The dashboard needs traffic that does not exist yet. |
-| 33 | Events platform | PARTIAL | 15 | The recurring European year, with a page per month that also answers where to go. Dated per-year listings need a feed and a rights position. |
-| 34 | Editorial CMS | PARTIAL | 50 | Version control is the CMS: every article is a record in data/, reviewed as a diff, with history and rollback for free. A browser editor is a backend product. |
+| 33 | Events platform | PARTIAL | 19 | The recurring European year, with a page per month that also answers where to go, and the specification's event categories as a filter on every one of them. Dated per-year listings need a feed and a rights position, which is why no year is printed. |
+| 34 | Editorial CMS | PARTIAL | 93 | Version control is the CMS: every article is a record in data/, reviewed as a diff, with history and rollback for free. A browser editor is a backend product. |
 | 35 | Content quality system | PARTIAL | 4 | Draft → review → publish is the pull request. Fact verification is a field, a public board and a plan; the periodic review cycle is not yet automated. |
 | 36 | Database model | PARTIAL | 12 | Every entity in the specification's list exists as validated data; the ones that need a write from someone other than a committer exist as DDL, with the migration trigger named. |
 | 37 | Relationship model | BUILT | 4 | The hierarchy in both directions, plus place → journey, place → story, destination → theme. |
@@ -55,7 +55,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 42 | Technical architecture | BUILT (deliberately smaller) | 4 | Python standard library and static output. Each proposed component has a named trigger rather than a date. |
 | 43 | API architecture | PARTIAL | 3 | Two public read endpoints ship and are used by the product itself. The rest are specified and need a backend. |
 | 44 | AI services | PARTIAL | 3 | Semantic-ish search and the journey generator exist without a model. The five that need one are specified. |
-| 45 | Recommendation engine | PARTIAL | 7 | Interests, budget, season, duration, location and trip length all feed the score. Travel history, weather and crowding do not: two need accounts, one needs a licence. |
+| 45 | Recommendation engine | PARTIAL | 8 | Interests, budget, season, duration, location and trip length all feed the score. Travel history, weather and crowding do not: two need accounts, one needs a licence. |
 | 46 | Personalisation | DEFERRED | 2 | Learning from saved places needs a profile that persists across devices, which needs an account. Saving works; learning does not. |
 | 47 | Transport engine | PARTIAL | 3 | Distance and mode are computed and stated for every hop and every journey. Live timetables and fares need providers. |
 | 48 | Booking architecture | DEFERRED | 2 | Affiliate first, then API, then marketplace — in that order and none of them yet, because there is no entity to contract. |
@@ -69,7 +69,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 56 | Fraud prevention | DEFERRED | 319 | Nothing to defraud yet: no reviews, no bookings, no accounts, no money. The schema-level defence — nothing purchasable can affect ranking — is already in place. |
 | 57 | Accessibility | PARTIAL | 8 | WCAG 2.2 AA is the target and a real subset is enforced in a browser, in both colour schemes, on every build. What is missing is named on the page: a screen-reader audit, and access data about the places themselves. |
 | 58 | Internationalisation | PARTIAL | 6 | Interface strings are out of the code and in data catalogues, with coverage measured. No language ships until it is complete — a half-translated site is worse than an English one. |
-| 59 | Currency | PARTIAL | 4 | Local currency alongside euros on every country page, from a dated, rounded, hand-recorded table. A live feed with timestamps per rate needs a provider. |
+| 59 | Currency | PARTIAL | 6 | Local currency alongside euros on every country page, from a dated, rounded, hand-recorded table. A live feed with timestamps per rate needs a provider. |
 | 60 | Privacy | BUILT | 4 | Nothing is collected, nothing is set, nothing is loaded from another origin — and the page says how to verify that rather than asking to be believed. |
 | 61 | Security | PARTIAL | 3 | Most of the list is about a backend that does not exist. What applies to a static site — no secrets, no third-party code, no payment surface — holds. |
 | 62 | User roles | DEFERRED | 1 | Eleven roles, all of which need authentication. Two exist in practice today: a visitor, and a committer. |

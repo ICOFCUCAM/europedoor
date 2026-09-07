@@ -1,54 +1,238 @@
 {
-  "code": "be", "slug": "belgium", "name": "Belgium", "official": "Kingdom of Belgium",
-  "macro": "western", "capital": "Brussels", "currency": "EUR — euro",
-  "languages": ["Dutch", "French", "German"],
-  "blocs": ["eu", "schengen", "eurozone", "eea"],
+  "code": "be",
+  "slug": "belgium",
+  "name": "Belgium",
+  "official": "Kingdom of Belgium",
+  "macro": "western",
+  "capital": "Brussels",
+  "currency": "EUR — euro",
+  "languages": [
+    "Dutch",
+    "French",
+    "German"
+  ],
+  "blocs": [
+    "eu",
+    "schengen",
+    "eurozone",
+    "eea"
+  ],
   "tagline": "Three languages, six governments, the best beer in the world and a genuine talent for not explaining itself.",
   "summary": "Belgium is small, divided and quietly excellent at the things that matter daily: bread, beer, chips, painting and comics. The medieval cloth towns of Flanders — Bruges, Ghent, Antwerp — got rich early and kept the buildings. Brussels is the accidental capital of a continent and much better company than its reputation.",
-  "interests": ["food", "wine", "art", "architecture", "history", "cities"],
-  "budget": "moderate", "daily_eur": [75, 165],
-  "season": { "peak": ["may", "jun", "jul", "aug", "sep"], "shoulder": ["apr", "oct"],
-    "note": "Spring and early autumn are best; Bruges in July is a queue. December brings serious Christmas markets and the beer suits the weather." },
-  "getting_around": "Everything is within ninety minutes by train and the network is dense and cheap. Flemish cities are flat and cycle well. Brussels is bilingual on every sign, which confuses satnavs more than people.",
-  "food": ["Chips, twice fried, from a frituur, with a sauce you choose badly the first time", "Trappist and lambic beer — Westvleteren, Orval, gueuze that tastes of cider and horse", "Waterzooi and moules, and chocolate bought where it is made"],
-  "festivals": [
-    { "name": "Carnival of Binche, with the Gilles and the oranges", "month": "feb", "where": "Binche" },
-    { "name": "Ommegang procession", "month": "jul", "where": "Brussels" },
-    { "name": "Christmas markets and beer festivals", "month": "dec", "where": "Nationwide" }
+  "interests": [
+    "food",
+    "wine",
+    "art",
+    "architecture",
+    "history",
+    "cities"
   ],
-  "know": ["Language boundaries are legally fixed: French in Wallonia, Dutch in Flanders, and Brussels officially both.", "Trappist beer is brewed by monks in six Belgian abbeys and sold to fund them, not for profit.", "Sunday is genuinely closed outside the tourist centres."],
+  "budget": "moderate",
+  "daily_eur": [
+    75,
+    165
+  ],
+  "season": {
+    "peak": [
+      "may",
+      "jun",
+      "jul",
+      "aug",
+      "sep"
+    ],
+    "shoulder": [
+      "apr",
+      "oct"
+    ],
+    "note": "Spring and early autumn are best; Bruges in July is a queue. December brings serious Christmas markets and the beer suits the weather."
+  },
+  "getting_around": "Everything is within ninety minutes by train and the network is dense and cheap. Flemish cities are flat and cycle well. Brussels is bilingual on every sign, which confuses satnavs more than people.",
+  "food": [
+    "Chips, twice fried, from a frituur, with a sauce you choose badly the first time",
+    "Trappist and lambic beer — Westvleteren, Orval, gueuze that tastes of cider and horse",
+    "Waterzooi and moules, and chocolate bought where it is made"
+  ],
+  "festivals": [
+    {
+      "name": "Carnival of Binche, with the Gilles and the oranges",
+      "month": "feb",
+      "where": "Binche",
+      "kind": "cultural"
+    },
+    {
+      "name": "Ommegang procession",
+      "month": "jul",
+      "where": "Brussels",
+      "kind": "cultural"
+    },
+    {
+      "name": "Christmas markets and beer festivals",
+      "month": "dec",
+      "where": "Nationwide",
+      "kind": "market"
+    }
+  ],
+  "know": [
+    "Language boundaries are legally fixed: French in Wallonia, Dutch in Flanders, and Brussels officially both.",
+    "Trappist beer is brewed by monks in six Belgian abbeys and sold to fund them, not for profit.",
+    "Sunday is genuinely closed outside the tourist centres."
+  ],
   "regions": [
-    { "slug": "flanders", "name": "Flanders",
+    {
+      "slug": "flanders",
+      "name": "Flanders",
       "summary": "The rich medieval north: cloth halls, belfries, Flemish primitives and a port that runs on diamonds.",
-      "interests": ["art", "architecture", "history", "food"],
+      "interests": [
+        "art",
+        "architecture",
+        "history",
+        "food"
+      ],
       "cities": [
-        { "slug": "bruges", "name": "Bruges", "lat": 51.21, "lon": 3.22,
+        {
+          "slug": "bruges",
+          "name": "Bruges",
+          "lat": 51.21,
+          "lon": 3.22,
           "summary": "A trading city frozen when its river silted up in the 1500s, which is why it looks like this.",
-          "interests": ["architecture", "history", "art", "food"], "nights": [1, 2],
-          "highlights": ["The belfry's 366 steps and the carillon at the top", "Michelangelo's Madonna, the only sculpture he sold abroad in his lifetime", "The city at seven in the morning, which is a different city"],
-          "experiences": [{ "slug": "bruges-early-canal-walk", "name": "Bruges before the coaches", "kind": "walk", "band": "low", "summary": "Day-trippers arrive from ten. Between six and nine the canals belong to you and the swans." }] },
-        { "slug": "ghent", "name": "Ghent", "lat": 51.05, "lon": 3.72,
+          "interests": [
+            "architecture",
+            "history",
+            "art",
+            "food"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The belfry's 366 steps and the carillon at the top",
+            "Michelangelo's Madonna, the only sculpture he sold abroad in his lifetime",
+            "The city at seven in the morning, which is a different city"
+          ],
+          "experiences": [
+            {
+              "slug": "bruges-early-canal-walk",
+              "name": "Bruges before the coaches",
+              "kind": "walk",
+              "band": "low",
+              "summary": "Day-trippers arrive from ten. Between six and nine the canals belong to you and the swans."
+            }
+          ]
+        },
+        {
+          "slug": "ghent",
+          "name": "Ghent",
+          "lat": 51.05,
+          "lon": 3.72,
           "summary": "Bruges's rival, larger, younger and still a working student city rather than a museum of itself.",
-          "interests": ["art", "history", "food", "music"], "nights": [1, 2],
-          "highlights": ["The Ghent Altarpiece, restored, in the cathedral it was painted for", "The Graslei quays at dusk", "Vegetarian Thursdays, a city policy since 2009"] },
-        { "slug": "antwerp", "name": "Antwerp", "lat": 51.22, "lon": 4.40,
+          "interests": [
+            "art",
+            "history",
+            "food",
+            "music"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Ghent Altarpiece, restored, in the cathedral it was painted for",
+            "The Graslei quays at dusk",
+            "Vegetarian Thursdays, a city policy since 2009"
+          ]
+        },
+        {
+          "slug": "antwerp",
+          "name": "Antwerp",
+          "lat": 51.22,
+          "lon": 4.4,
           "summary": "Rubens's city and the world's diamond exchange, with a fashion school that reset the industry in the 1980s.",
-          "interests": ["art", "design", "food", "cities"], "nights": [1, 2],
-          "highlights": ["Rubens's own house and studio", "The station, which is a cathedral pretending to be a station", "MoMu and the Antwerp Six's continuing influence"] }
-      ] },
-    { "slug": "brussels-and-wallonia", "name": "Brussels & Wallonia",
+          "interests": [
+            "art",
+            "design",
+            "food",
+            "cities"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Rubens's own house and studio",
+            "The station, which is a cathedral pretending to be a station",
+            "MoMu and the Antwerp Six's continuing influence"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "brussels-and-wallonia",
+      "name": "Brussels & Wallonia",
       "summary": "The capital of Europe, and the French-speaking south of forest, castle and old industry.",
-      "interests": ["art", "food", "history", "nature"],
+      "interests": [
+        "art",
+        "food",
+        "history",
+        "nature"
+      ],
       "cities": [
-        { "slug": "brussels", "name": "Brussels", "lat": 50.85, "lon": 4.35,
+        {
+          "slug": "brussels",
+          "name": "Brussels",
+          "lat": 50.85,
+          "lon": 4.35,
           "summary": "Art Nouveau streets, comic-strip walls, a gilded square, and the machinery of a continent in the eastern quarter.",
-          "interests": ["art", "architecture", "food", "cities"], "nights": [2, 3],
-          "highlights": ["The Grand-Place, best at night when it is lit and empty", "Horta's houses, four of them UNESCO-listed", "The comic strip route: fifty painted gables across the centre", "Lambic breweries in Anderlecht, fermenting on wild yeast"],
-          "experiences": [{ "slug": "brussels-lambic-brewery", "name": "A lambic brewery, spontaneously fermented", "kind": "cellar", "band": "moderate", "summary": "Beer left open to the air of one valley, aged three years in barrel — the last place in the world doing this at scale." }] },
-        { "slug": "dinant", "name": "Dinant", "lat": 50.26, "lon": 4.91, "quiet": true,
+          "interests": [
+            "art",
+            "architecture",
+            "food",
+            "cities"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The Grand-Place, best at night when it is lit and empty",
+            "Horta's houses, four of them UNESCO-listed",
+            "The comic strip route: fifty painted gables across the centre",
+            "Lambic breweries in Anderlecht, fermenting on wild yeast"
+          ],
+          "experiences": [
+            {
+              "slug": "brussels-lambic-brewery",
+              "name": "A lambic brewery, spontaneously fermented",
+              "kind": "cellar",
+              "band": "moderate",
+              "summary": "Beer left open to the air of one valley, aged three years in barrel — the last place in the world doing this at scale."
+            }
+          ]
+        },
+        {
+          "slug": "dinant",
+          "name": "Dinant",
+          "lat": 50.26,
+          "lon": 4.91,
+          "quiet": true,
           "summary": "A citadel on a cliff over the Meuse, a bulbous cathedral below, and the birthplace of the saxophone.",
-          "interests": ["nature", "history", "music"], "nights": [1, 1],
-          "highlights": ["408 steps or a cable car to the citadel", "Kayaking the Lesse down to the river", "Adolphe Sax's house, and saxophones on every bridge"] }
-      ] }
-  ]
+          "interests": [
+            "nature",
+            "history",
+            "music"
+          ],
+          "nights": [
+            1,
+            1
+          ],
+          "highlights": [
+            "408 steps or a cable car to the citadel",
+            "Kayaking the Lesse down to the river",
+            "Adolphe Sax's house, and saxophones on every bridge"
+          ]
+        }
+      ]
+    }
+  ],
+  "timezone": "CET/CEST (UTC+1/+2)"
 }

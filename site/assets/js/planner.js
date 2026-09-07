@@ -49,11 +49,35 @@
     return Math.round(2 * R * Math.asin(Math.sqrt(h)));
   }
 
-  function hopNote(d) {
-    if (d < 90) return d + " km — a local train or a short drive";
-    if (d < 400) return d + " km — a comfortable train leg, half a day at most";
-    if (d < 900) return d + " km — a long rail day, or a short flight if the days are tight";
-    return d + " km — fly, or give the overland crossing a day of its own";
+  // Door-to-door, not vehicle speed: a train averages far less than its top
+  // speed once you include getting to the station, and a flight is three
+  // hours of airport wrapped around forty minutes of aeroplane.
+  function travelHours(d, mode) {
+    if (mode === "fly") return Math.round((3 + d / 750) * 10) / 10;
+    if (d < 90) return Math.round((d / 55 + 0.4) * 10) / 10;
+    return Math.round((d / 85 + 0.8) * 10) / 10;
+  }
+
+  function hoursText(h) {
+    if (h < 1) return Math.round(h * 60) + " minutes";
+    var whole = Math.floor(h), mins = Math.round((h - whole) * 60);
+    return whole + "h" + (mins ? " " + mins + "m" : "");
+  }
+
+  function hopNote(d, opts) {
+    var railOnly = opts && opts.transport === "rail";
+    if (d < 90) return d + " km, about " + hoursText(travelHours(d, "ground")) +
+      " — a local train or a short drive";
+    if (d < 400) return d + " km, about " + hoursText(travelHours(d, "ground")) +
+      " — a comfortable train leg";
+    if (d < 900) return d + " km, about " + hoursText(travelHours(d, "ground")) +
+      " by rail" + (railOnly ? " — a long day, and the point of doing it this way"
+                             : ", or " + hoursText(travelHours(d, "fly")) + " door to door by air");
+    return railOnly
+      ? d + " km — more than a day overland. Kept because you asked for no flights; " +
+        "consider a night train or an extra night either side."
+      : d + " km — about " + hoursText(travelHours(d, "fly")) + " door to door by air, " +
+        "or give the overland crossing a day of its own";
   }
 
   function transportCost(d) {
@@ -68,6 +92,11 @@
     if (city.shoulder.indexOf(month) >= 0) return SEASON.shoulder;
     return SEASON.off;
   }
+
+  // Guesthouses come in under the band, hotels above it. The multiplier is
+  // applied to beds only, because the food half of the band does not care
+  // where you slept.
+  var STAY_FACTOR = { guesthouse: 0.82, mixed: 1, hotel: 1.18 };
 
   function dailyRate(city, style) {
     var lo = city.daily[0], hi = city.daily[1];
@@ -166,8 +195,28 @@
     return Math.min(n, remaining);
   }
 
+  function savedIds() {
+    try {
+      var raw = localStorage.getItem("europedoor.saved.v1");
+      if (!raw) return {};
+      var out = {};
+      JSON.parse(raw).forEach(function (x) {
+        var m = /^(city|place):([^/]+\/[^/]+\/[^/]+)/.exec(x.id || "");
+        if (m) out[m[2]] = true;
+      });
+      return out;
+    } catch (e) { return {}; }
+  }
+
   function plan(opts) {
     var cities = ATLAS.cities.slice();
+    var favour = opts.useSaved ? savedIds() : {};
+    var endCity = null;
+    if (opts.end) {
+      for (var q0 = 0; q0 < ATLAS.cities.length; q0++) {
+        if (ATLAS.cities[q0].id === opts.end) { endCity = ATLAS.cities[q0]; break; }
+      }
+    }
     if (opts.geo && opts.geo.length) {
       var only = cities.filter(function (c) { return opts.geo.indexOf(c.countrySlug) >= 0; });
       // Honour it only if there is enough there to plan with. Three cities
@@ -179,7 +228,9 @@
     var ceiling = impliedDaily(opts);
     var context = { perCountry: {} };
     var scored = cities.map(function (c) {
-      return { c: c, s: fitScore(c, opts.wants, opts.month, opts.style, ceiling, context) };
+      var base = fitScore(c, opts.wants, opts.month, opts.style, ceiling, context);
+      // A place you saved is a stronger signal than any tag we assigned it.
+      return { c: c, s: favour[c.id] ? base * 1.6 : base };
     });
     scored.sort(function (a, b) { return b.s - a.s; });
 
@@ -225,17 +276,53 @@
         // Distance is a cost, not a veto. 250 km is nearly free; 1,500 km
         // has to be earned by a much better fit.
         var travel = 1 / (1 + Math.pow(d / 420, 1.55));
+        // Rail and ferry only: a 1,200 km hop is a lost day rather than a
+        // cheap flight, so it costs much more in the scoring.
+        if (opts.transport === "rail" && d > 900) travel *= 0.35;
         var repeat = (perCountry[cand.countrySlug] || 0) >= 3 ? 0.72 : 1;
+        // Pull towards a named end: a candidate that closes the remaining
+        // distance is worth more as the nights run out.
+        var pull = 1;
+        if (endCity) {
+          var here = km(current, endCity) || 1;
+          var there = km(cand, endCity);
+          var urgency = 1 - (remaining / Math.max(1, opts.days));
+          pull = 1 + (0.55 + 0.9 * urgency) * ((here - there) / here);
+          pull = Math.max(0.35, Math.min(2.2, pull));
+        }
         var diverse = 1;
         if (bigRun >= 2) {
           var isBig = cand.interests.indexOf("cities") >= 0 && !cand.quiet;
           diverse = isBig ? 0.78 : 1.18;
         }
-        var v = scored[j].s * travel * repeat * diverse * (0.93 + rand() * 0.14);
+        var v = scored[j].s * travel * repeat * diverse * pull * (0.93 + rand() * 0.14);
         if (v > bestV) { bestV = v; best = cand; }
       }
       if (!best) break;
       current = best;
+    }
+
+    // Substituting the last stop for the named end produced a 2,500 km final
+    // leg and said nothing about it. The end is a pull during selection
+    // instead (see endCity below), and only forced at the finish — with the
+    // route told to say so if the last hop is still absurd.
+    if (endCity) {
+      var already = route.some(function (st) { return st.city.id === endCity.id; });
+      if (!already && route.length) {
+        var lastHop = km(route[route.length - 1].city, endCity);
+        if (lastHop > 900) {
+          // Take a night off the longest stay to pay for the extra stop
+          // rather than silently lengthening the trip.
+          var longest = 0;
+          for (var q = 1; q < route.length; q++) {
+            if (route[q].nights > route[longest].nights) longest = q;
+          }
+          if (route[longest].nights > 1) route[longest].nights -= 1;
+          route.push({ city: endCity, nights: 1, forced: lastHop });
+        } else {
+          route.push({ city: endCity, nights: 1 });
+        }
+      }
     }
     window.__EPD_SCORED = scored;
     window.__EPD_USED = used;
@@ -251,7 +338,7 @@
     for (i = 0; i < route.length; i++) {
       var rate = dailyRate(route[i].city, opts.style);
       // Sixty/forty is the split the daily bands were written against.
-      beds += route[i].nights * rate * 0.6;
+      beds += route[i].nights * rate * 0.6 * (STAY_FACTOR[opts.accommodation] || 1);
       food += route[i].nights * rate * 0.4;
       nights += route[i].nights;
     }
@@ -260,14 +347,36 @@
       transport += transportCost(d);
     }
     var activities = ACTIVITY_PER_DAY[opts.style] * (nights + 1);
-    beds = Math.round(beds); food = Math.round(food);
+    // Per person for everything except the room, which two people share.
+    // A double is not twice a single, so the second traveller adds 55%.
+    var people = opts.travellers || 1;
+    var bedFactor = people === 1 ? 1 : 1 + (people - 1) * 0.55;
+    beds = Math.round(beds * bedFactor);
+    food = Math.round(food * people);
+    transport = Math.round(transport * people);
+    activities = Math.round(activities * people);
     var subtotal = beds + food + transport + activities;
     var buffer = Math.round(subtotal * 0.12);
     return { beds: beds, food: food, transport: transport, activities: activities,
-             buffer: buffer, stay: beds + food, total: subtotal + buffer };
+             buffer: buffer, stay: beds + food, total: subtotal + buffer, people: people };
   }
 
-  function euro(n) { return "€" + n.toLocaleString("en-GB"); }
+  function euro(n) { return "€" + Math.round(n).toLocaleString("en-GB"); }
+
+  // Everything is computed in euros because the daily bands are in euros.
+  // This converts at the end, from the same dated table the country pages
+  // use, and never pretends the result is a rate anybody will be given.
+  var CUR = "EUR";
+  function money(n) {
+    if (CUR === "EUR" || !ATLAS.currencies) return euro(n);
+    var rate = ATLAS.currencies.rates[CUR];
+    if (!rate) return euro(n);
+    var v = Math.round(n * rate);
+    var sym = (ATLAS.currencies.symbols || {})[CUR];
+    var step = v > 20000 ? 100 : 10;
+    v = Math.round(v / step) * step;
+    return (sym ? sym : CUR + " ") + v.toLocaleString("en-GB");
+  }
 
   function whyLine(city, wants) {
     var hits = wants.filter(function (w) { return city.interests.indexOf(w) >= 0; });
@@ -311,6 +420,7 @@
       result.innerHTML = '<div class="note warn"><p>Nothing in the Atlas fits that yet. Try more days, or fewer interests at once.</p></div>';
       return;
     }
+    CUR = opts.currency || "EUR";
     var c = costing(route, opts);
     var day = 1, legs = "", i, hop, countries = [];
     var scoredAll = window.__EPD_SCORED || [];
@@ -320,7 +430,7 @@
       if (countries.indexOf(city.country) < 0) countries.push(city.country);
       hop = "";
       if (i > 0) {
-        hop = '<p class="hop">↳ ' + hopNote(km(route[i - 1].city, city)) +
+        hop = '<p class="hop">↳ ' + hopNote(km(route[i - 1].city, city), opts) +
               " from " + route[i - 1].city.name + "</p>";
       }
       var last = day + st.nights - 1;
@@ -343,6 +453,12 @@
       }
 
       // No alternatives for a start the traveller chose themselves.
+      var forcedNote = st.forced
+        ? '<p class="small alt">You asked to end near ' + city.name + ". It is " + st.forced +
+          " km from the stop before it, which is a travel day rather than a leg — the planner " +
+          "would not have gone there on its own. A night has been taken off the longest stay " +
+          "to pay for it.</p>"
+        : "";
       var alts = (i === 0 && opts.start) ? [] : alternativesFor(scoredAll, route, i, usedAll);
       var altHtml = alts.length
         ? '<p class="small alt">Instead of ' + city.name + ": " + alts.map(function (a) {
@@ -355,8 +471,8 @@
               city.country + " · " + city.region + "</span></h3>" +
               "<p>" + city.why + "</p>" +
               '<p class="small" style="margin-top:.4rem">' + whyLine(city, opts.wants) +
-              " " + euro(dailyRate(city, opts.style)) + " a day here." + "</p>" +
-              '<ul class="daylist">' + dayHtml + "</ul>" + altHtml + hop +
+              " " + money(dailyRate(city, opts.style)) + " a day here." + "</p>" +
+              '<ul class="daylist">' + dayHtml + "</ul>" + forcedNote + altHtml + hop +
               "</div></li>";
       day = last + 1;
     }
@@ -364,10 +480,10 @@
     var over = c.total - opts.budget;
     var verdict;
     if (over <= 0) {
-      verdict = '<div class="note"><p><strong>' + euro(-over) + " under budget.</strong> " +
+      verdict = '<div class="note"><p><strong>' + money(-over) + " under budget.</strong> " +
         "Room for a better hotel in one place, or a day longer.</p></div>";
     } else {
-      verdict = '<div class="note warn"><p><strong>' + euro(over) + " over budget.</strong> " +
+      verdict = '<div class="note warn"><p><strong>' + money(over) + " over budget.</strong> " +
         "Drop the spending style a level, cut the longest hop, or take one night off the most " +
         "expensive stop — the planner will not quietly downgrade the trip for you.</p></div>";
     }
@@ -379,12 +495,12 @@
       '<h2 style="margin-top:var(--s7)">' + opts.days + " days, " + route.length +
         " stops, " + countries.length + (countries.length === 1 ? " country" : " countries") + "</h2>" +
       '<dl class="result-summary">' +
-        "<div><dt>Estimated total</dt><dd>" + euro(c.total) + "</dd></div>" +
-        "<div><dt>Accommodation</dt><dd>" + euro(c.beds) + "</dd></div>" +
-        "<div><dt>Food</dt><dd>" + euro(c.food) + "</dd></div>" +
-        "<div><dt>Transport</dt><dd>" + euro(c.transport) + "</dd></div>" +
-        "<div><dt>Activities</dt><dd>" + euro(c.activities) + "</dd></div>" +
-        "<div><dt>12% buffer</dt><dd>" + euro(c.buffer) + "</dd></div>" +
+        "<div><dt>Estimated total</dt><dd>" + money(c.total) + "</dd></div>" +
+        "<div><dt>Accommodation</dt><dd>" + money(c.beds) + "</dd></div>" +
+        "<div><dt>Food</dt><dd>" + money(c.food) + "</dd></div>" +
+        "<div><dt>Transport</dt><dd>" + money(c.transport) + "</dd></div>" +
+        "<div><dt>Activities</dt><dd>" + money(c.activities) + "</dd></div>" +
+        "<div><dt>12% buffer</dt><dd>" + money(c.buffer) + "</dd></div>" +
         "<div><dt>Ground covered</dt><dd>" + totalKm.toLocaleString("en-GB") + " km</dd></div>" +
       "</dl>" +
       verdict +
@@ -394,9 +510,15 @@
         '<button class="btn ghost" type="button" id="shareplan">Copy a link to it</button>' +
       "</div>" +
       '<p class="small" id="planstate"></p>' +
+      '<p class="small">Each day lists the places and experiences we hold for that stop. ' +
+      'It does not name a hotel or a restaurant: Europedoor lists neither yet, and ' +
+      '<a href="/for-businesses">the reason is on the businesses page</a>. ' +
+      (CUR !== "EUR" ? "Converted from euros at an indicative, dated rate — " +
+        '<a href="/help#currency">what that means</a>. ' : "") +
+      "</p>" +
       '<p class="small">Estimates are planning arithmetic from published daily bands and ' +
       'straight-line distances — not quotes. Activities are estimated at ' +
-      euro(ACTIVITY_PER_DAY[opts.style]) + ' a day for this spending style. ' +
+      money(ACTIVITY_PER_DAY[opts.style]) + ' a day for this spending style. ' +
       '<a href="/sources">How these numbers are made</a>.</p>';
 
     wireSaveAndShare(route, opts);
@@ -768,6 +890,12 @@
       style: form.style.value,
       pace: form.pace.value,
       start: form.start.value,
+      end: form.end.value,
+      travellers: Math.max(1, Math.min(12, parseInt(form.travellers.value, 10) || 1)),
+      accommodation: form.accommodation.value,
+      transport: form.transport.value,
+      currency: form.currency.value,
+      useSaved: form.saved.checked,
       wants: wants,
       geo: currentGeo
     };
@@ -782,6 +910,10 @@
       html += '<option value="' + list[i].id + '">' + list[i].name + ", " + list[i].country + "</option>";
     }
     startSel.innerHTML = html;
+    var endSel = document.getElementById("end");
+    if (endSel) {
+      endSel.innerHTML = html.replace(">Anywhere that fits<", ">Wherever it gets to<");
+    }
   }
 
   function applyUrlState() {
@@ -797,6 +929,18 @@
       var boxes = form.querySelectorAll('input[name="interest"]');
       for (var k = 0; k < boxes.length; k++) boxes[k].checked = want.indexOf(boxes[k].value) >= 0;
     }
+    // The homepage asks the question; this page answers it. Arriving with
+    // ?ask= fills the box and runs it, so the two are one interaction.
+    var asked = q.get("ask");
+    if (asked) {
+      var askBox = document.getElementById("ask");
+      if (askBox) {
+        askBox.value = asked;
+        setTimeout(function () { goFromSentence(); }, 0);
+        return;
+      }
+    }
+
     var shared = routeFromParams(q);
     if (shared) {
       var opts = readForm();
@@ -837,6 +981,29 @@
     result.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  /* The specification says the planner should ask only the necessary
+   * follow-up questions. Two things change the answer enough to be worth
+   * asking about: how long you have, and what you can spend. If the
+   * sentence did not say, the plan is still built — an empty screen is a
+   * worse answer than a provisional one — but the question is put, above
+   * the result, with the field it fills. */
+  function followUps(got) {
+    var asks = [];
+    if (!got.days) asks.push(["days", "How many days do you have?",
+      "Built on " + form.days.value + " for now."]);
+    if (!got.budget) asks.push(["budget", "Roughly what can you spend, per person?",
+      "Built on " + euro(form.budget.value) + " for now."]);
+    if (!got.month && !got.geo.length) asks.push(["month", "Which month?",
+      "Built on " + ATLAS.monthNames[form.month.value] + " for now."]);
+    if (!asks.length) return "";
+    return '<div class="note"><h2 class="mini">' +
+      (asks.length === 1 ? "One thing would change this" : asks.length + " things would change this") +
+      "</h2><ul>" + asks.map(function (a) {
+        return "<li><strong>" + a[1] + "</strong> " + a[2] +
+          ' <a href="#' + a[0] + '" data-focus="' + a[0] + '">set it →</a></li>';
+      }).join("") + "</ul></div>";
+  }
+
   function goFromSentence(e) {
     if (e) e.preventDefault();
     var text = document.getElementById("ask").value;
@@ -847,7 +1014,14 @@
     var opts = readForm();
     var route = plan(opts);
     render(route, opts);
-    result.insertAdjacentHTML("afterbegin", readbackHtml(got));
+    result.insertAdjacentHTML("afterbegin", readbackHtml(got) + followUps(got));
+    result.querySelectorAll("[data-focus]").forEach(function (a) {
+      a.addEventListener("click", function (ev) {
+        ev.preventDefault();
+        var f = document.getElementById(a.getAttribute("data-focus"));
+        if (f) { f.scrollIntoView({ behavior: "smooth", block: "center" }); f.focus(); }
+      });
+    });
     result.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 

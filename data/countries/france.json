@@ -56,17 +56,20 @@
     {
       "name": "Fête de la Musique — free music on every street",
       "month": "jun",
-      "where": "Nationwide"
+      "where": "Nationwide",
+      "kind": "concert"
     },
     {
       "name": "Bastille Day",
       "month": "jul",
-      "where": "Nationwide"
+      "where": "Nationwide",
+      "kind": "cultural"
     },
     {
       "name": "Les Vendanges — the wine harvest",
       "month": "sep",
-      "where": "Every wine region"
+      "where": "Every wine region",
+      "kind": "food"
     }
   ],
   "know": [
@@ -1305,5 +1308,6 @@
         }
       ]
     }
-  ]
+  ],
+  "timezone": "CET/CEST (UTC+1/+2)"
 }

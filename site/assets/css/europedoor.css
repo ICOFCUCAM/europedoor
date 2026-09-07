@@ -369,3 +369,22 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 /* The hidden attribute has no effect on an SVG <g> without this, which is
    how the map's places layer shipped visible when it was marked hidden. */
 [hidden] { display: none !important; }
+
+/* ── a story's byline ─────────────────────────────────────────────── */
+.byline { color: var(--ink-3); margin-top: var(--s3); }
+.byline time { font-variant-numeric: tabular-nums; }
+
+/* ── the question on the homepage ─────────────────────────────────── */
+.askhome { display: grid; gap: var(--s3); margin-top: var(--s6); max-width: 40rem; }
+.askhome label { font-size: var(--t-xs); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+.askhome input { width: 100%; font: inherit; font-size: var(--t-md); padding: var(--s3) var(--s4); border: 1px solid var(--ink-3); border-radius: var(--radius); background: var(--paper); color: var(--ink); }
+.askhome input:focus { border-color: var(--door); }
+.askhome button { justify-self: start; }
+.askhome-note { margin-top: var(--s2); }
+.heromap-filters { margin-top: var(--s4); }
+@media (min-width: 40rem) { .askhome { grid-template-columns: 1fr auto; align-items: end; } .askhome label { grid-column: 1 / -1; margin-bottom: calc(var(--s2) * -1); } }
+
+/* a checkbox that sits inside a field, rather than in a chip row */
+.inlinecheck { display: flex; align-items: center; gap: var(--s2); font-size: var(--t-sm);
+  text-transform: none; letter-spacing: 0; color: var(--ink-2); font-weight: 400; }
+.inlinecheck input { accent-color: var(--door); margin: 0; }

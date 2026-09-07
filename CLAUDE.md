@@ -1,6 +1,6 @@
 # Europedoor — working notes
 
-A static site: 981 generated HTML files, no dependencies, no database. Every
+A static site: 986 generated HTML files, no dependencies, no database. Every
 page comes from `data/` via `tools/build.py`. Nothing in `site/` was written
 by a human and nothing ever should be.
 
@@ -20,7 +20,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | anything involving money | **`docs/europe-fund.md`** and **`docs/legal-position.md`** — three gates, all currently shut |
 | naming, branding, domains | **`docs/brand-lock.md`** — settled, and enforced |
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
-| **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,080 assertions against the real build, and CI fails if any of them stops being true |
+| **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,218 assertions against the real build, and CI fails if any of them stops being true |
 
 ## The rules that catch people out
 
@@ -63,20 +63,21 @@ worth making.
 Run all six before claiming anything is done.
 
     python3 tools/build.py check       validate the data
-    python3 tools/build.py            981 pages
-    python3 tools/checks.py            23 checks, ~69,000 things examined
-    node tools/browser-checks.js       320 checks in Chromium, incl. accessibility
-    python3 tools/section-audit.py --check   the 99 spec sections, 1,080 assertions
+    python3 tools/build.py            986 pages
+    python3 tools/checks.py            23 checks, ~72,000 things examined
+    node tools/browser-checks.js       341 checks in Chromium, incl. accessibility
+    python3 tools/section-audit.py --check   the 99 spec sections, 1,218 assertions
     python3 tools/content-report.py --write  what is missing, against the spec's targets
 
 The browser checks need `npm install playwright` and take a couple of
 minutes. They earn their place repeatedly: a 47-pixel mobile overflow on
 every city page, two colour tokens below the WCAG contrast line, a places
 layer that could never be turned on because `.hidden` is not a property of an
-SVG element, and a €700 fortnight routed through Switzerland. None of those
-was findable by reading the code. They launch the sandbox's own Chromium via
-`executablePath` because the npm package version will not match the
-installed browser build.
+SVG element, and a €700 fortnight routed through Switzerland. They also
+caught the planner producing a 2,500 km final leg to reach a named end city
+and calling it an itinerary. None of those was findable by reading the code.
+They launch the sandbox's own Chromium via `executablePath` because the npm
+package version will not match the installed browser build.
 
 **Two of the gates write files.** `section-audit.py --write` and
 `content-report.py --write` regenerate documents that CI then checks for

@@ -71,7 +71,8 @@
         "A card, not cash — the whole north is cashless"
       ],
       "start": "norway/nord-norge/tromso",
-      "end": "latvia/riga-and-around/riga"
+      "end": "latvia/riga-and-around/riga",
+      "creator": "Europedoor editorial"
     },
     {
       "slug": "atlantic-to-the-mediterranean",
@@ -148,7 +149,8 @@
         "A rail pass, or advance singles booked the day they open"
       ],
       "start": "portugal/porto-and-the-douro/porto",
-      "end": "italy/rome-and-lazio/rome"
+      "end": "italy/rome-and-lazio/rome",
+      "creator": "Europedoor editorial"
     },
     {
       "slug": "the-alpine-grand-tour",
@@ -216,7 +218,8 @@
         "Sun cream — snow at altitude burns"
       ],
       "start": "france/alps-and-east/chamonix",
-      "end": "italy/north-italy/ortisei"
+      "end": "italy/north-italy/ortisei",
+      "creator": "Europedoor editorial"
     },
     {
       "slug": "scandinavia-to-central-europe",
@@ -286,7 +289,8 @@
         "One smart layer for an opera house or a concert hall"
       ],
       "start": "denmark/zealand/copenhagen",
-      "end": "hungary/budapest-and-the-danube-bend/budapest"
+      "end": "hungary/budapest-and-the-danube-bend/budapest",
+      "creator": "Europedoor editorial"
     },
     {
       "slug": "the-adriatic-run",
@@ -364,7 +368,8 @@
         "Sea-sickness tablets for the open crossings"
       ],
       "start": "italy/north-italy/venice",
-      "end": "croatia/dalmatia/dubrovnik"
+      "end": "croatia/dalmatia/dubrovnik",
+      "creator": "Europedoor editorial"
     },
     {
       "slug": "camino-and-sacred-europe",
@@ -425,7 +430,8 @@
         "Something to cover shoulders in every church"
       ],
       "start": "united-kingdom/london-and-the-south-east/canterbury",
-      "end": "spain/green-spain/santiago-de-compostela"
+      "end": "spain/green-spain/santiago-de-compostela",
+      "creator": "Europedoor editorial"
     },
     {
       "slug": "the-hanseatic-arc",
@@ -491,7 +497,8 @@
         "A book for the ferry legs"
       ],
       "start": "belgium/flanders/bruges",
-      "end": "estonia/tallinn-and-the-north/tallinn"
+      "end": "estonia/tallinn-and-the-north/tallinn",
+      "creator": "Europedoor editorial"
     },
     {
       "slug": "the-classical-mediterranean",
@@ -559,7 +566,8 @@
         "Modest dress for churches and mosques"
       ],
       "start": "italy/rome-and-lazio/rome",
-      "end": "turkiye/aegean-and-mediterranean/selcuk"
+      "end": "turkiye/aegean-and-mediterranean/selcuk",
+      "creator": "Europedoor editorial"
     },
     {
       "slug": "european-heritage-route",
@@ -637,7 +645,8 @@
           "nights": 3,
           "why": "Down the Danube to end in a thermal bath, ideally in the snow."
         }
-      ]
+      ],
+      "creator": "Europedoor editorial"
     },
     {
       "slug": "mediterranean-arc",
@@ -715,7 +724,8 @@
           "nights": 3,
           "why": "The end of the arc, and the beginning of most of what is on it."
         }
-      ]
+      ],
+      "creator": "Europedoor editorial"
     },
     {
       "slug": "the-baltic-crossing",
@@ -777,7 +787,8 @@
           "nights": 1,
           "why": "An island castle in a lake, an hour out, to finish on."
         }
-      ]
+      ],
+      "creator": "Europedoor editorial"
     },
     {
       "slug": "the-danube-line",
@@ -844,7 +855,8 @@
           "nights": 3,
           "why": "End where the Sava joins it, on a fortress above both."
         }
-      ]
+      ],
+      "creator": "Europedoor editorial"
     },
     {
       "slug": "iberian-circle",
@@ -920,7 +932,8 @@
           "nights": 3,
           "why": "Inland to finish: the Prado, vermouth at noon, and a train home."
         }
-      ]
+      ],
+      "creator": "Europedoor editorial"
     },
     {
       "slug": "carpathian-arc",
@@ -998,7 +1011,8 @@
           "nights": 3,
           "why": "North into Bucovina, to painted monasteries that have kept their colour for five centuries."
         }
-      ]
+      ],
+      "creator": "Europedoor editorial"
     },
     {
       "slug": "the-cold-north",
@@ -1066,7 +1080,8 @@
           "nights": 2,
           "why": "End in the iron town that is being physically moved off the hole it dug."
         }
-      ]
+      ],
+      "creator": "Europedoor editorial"
     },
     {
       "slug": "the-white-villages",
@@ -1132,6 +1147,113 @@
           "city": "spain/andalusia/malaga",
           "nights": 2,
           "why": "Back east along the coast, to finish with Picasso and grilled sardines."
+        }
+      ],
+      "creator": "Europedoor editorial"
+    },
+    {
+      "slug": "arctic-to-mediterranean",
+      "name": "Arctic to Mediterranean",
+      "strapline": "The full length of Europe, 69°N to 38°N",
+      "summary": "The specification's flagship, and the longest thing on this site: the whole north-to-south axis of Europe, from the midnight sun to the Aegean. Thirteen stops, eight countries, and roughly 5,000 kilometres of ground. Almost all of it can be done by train, which is the argument for taking it slowly rather than flying the middle out. It is a month, and it is honestly a month — anyone selling you this in a fortnight is selling you airports.",
+      "days": 34,
+      "budget": "moderate",
+      "interests": [
+        "rail",
+        "nature",
+        "mountains",
+        "history",
+        "architecture",
+        "food",
+        "coast"
+      ],
+      "months": [
+        "jun",
+        "jul",
+        "aug",
+        "sep"
+      ],
+      "difficulty": "moderate",
+      "transport": [
+        "rail",
+        "ferry",
+        "bus"
+      ],
+      "accommodation": "mixed",
+      "creator": "Europedoor editorial",
+      "pack": [
+        "Layers for both ends: it is 8°C in Tromsø and 32°C in Athens on the same trip",
+        "A rail pass, and the patience to reserve the legs that need reserving",
+        "Boots that will do a fell in Norway and a marble street in Rome",
+        "An eye mask for the north and a hat for the south"
+      ],
+      "start": "norway/nord-norge/tromso",
+      "end": "greece/athens-and-the-peloponnese/athens",
+      "legs": [
+        {
+          "city": "norway/nord-norge/tromso",
+          "nights": 3,
+          "why": "Begin at 69°N, where the sun does not set in June and does not rise in December."
+        },
+        {
+          "city": "norway/nord-norge/lofoten",
+          "nights": 3,
+          "why": "South-west into the islands: granite straight out of the sea, cod on racks."
+        },
+        {
+          "city": "sweden/swedish-lapland/abisko",
+          "nights": 2,
+          "why": "Over the border into Sweden by the Iron Ore Line, through Lapland."
+        },
+        {
+          "city": "sweden/stockholm-and-the-archipelago/stockholm",
+          "nights": 2,
+          "why": "The night train south, to a capital on fourteen islands."
+        },
+        {
+          "city": "denmark/zealand/copenhagen",
+          "nights": 2,
+          "why": "Across the Öresund bridge into Denmark."
+        },
+        {
+          "city": "germany/north-germany/hamburg",
+          "nights": 2,
+          "why": "Into Germany, and Europe's third port."
+        },
+        {
+          "city": "germany/berlin-and-the-east/berlin",
+          "nights": 3,
+          "why": "East to the city that carried most of the twentieth century."
+        },
+        {
+          "city": "austria/vienna-and-the-east/vienna",
+          "nights": 3,
+          "why": "South to the imperial capital, and the first hint of the south."
+        },
+        {
+          "city": "italy/north-italy/ortisei",
+          "nights": 3,
+          "why": "Over the Alps into the Dolomites, and Ladin-speaking valleys."
+        },
+        {
+          "city": "italy/north-italy/venice",
+          "nights": 2,
+          "why": "Down out of the mountains to the lagoon."
+        },
+        {
+          "city": "italy/rome-and-lazio/rome",
+          "nights": 3,
+          "why": "South through Italy to the city everything else was measured against."
+        },
+        {
+          "city": "italy/south-italy-and-islands/naples",
+          "nights": 2,
+          "why": "Further south, for the archaeological museum and the pizza."
+        },
+        {
+          "city": "greece/athens-and-the-peloponnese/athens",
+          "nights": 3,
+          "why": "Across the sea to the end of the line."
         }
       ]
     }

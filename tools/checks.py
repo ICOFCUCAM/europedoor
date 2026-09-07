@@ -216,11 +216,11 @@ def c_links():
     served = set()
     for f in site_files():
         served.add(canonical_of(f))
-    for extra in ("/assets/css/europedoor.css", "/assets/js/planner.js", "/assets/js/map.js",
-                  "/assets/js/my-europe.js", "/assets/js/search.js", "/assets/door.svg",
-                  "/api/atlas.json", "/api/search.json", "/sitemap.xml", "/robots.txt"):
-        if os.path.exists(os.path.join(OUT, extra.lstrip("/"))):
-            served.add(extra)
+    # Everything that is not HTML, discovered rather than listed: the
+    # hardcoded list went stale the first time a script was added.
+    for f in glob.glob(os.path.join(OUT, "**", "*"), recursive=True):
+        if os.path.isfile(f) and not f.endswith(".html"):
+            served.add("/" + os.path.relpath(f, OUT))
     n = 0
     for f in site_files():
         s = open(f, encoding="utf-8").read()

@@ -175,11 +175,16 @@ def s5():
 
 
 @section(6, "Homepage", "BUILT",
-         "The hero, the question, and both calls to action. The AI box is a "
-         "sentence box that works rather than a promise that does not.")
+         "The hero, the question in the hero itself, and the calls to "
+         "action. The AI box is a sentence box that works rather than a "
+         "promise that does not, and it says so under the field.")
 def s6():
-    yield has("/", "One door into Europe", "Plan a journey", "Open the Atlas")
-    yield "Say it in your own words" in page("/plan"), "the ask box exists"
+    yield has("/", "One door into Europe", "Explore Europe", "Every country",
+              "Search everything")
+    yield has("/", "Where would you like to go?", "Build me a journey"), \
+        "the question is asked on the homepage, not one click away"
+    yield has("/", "not by a\n  model"), "and the hero says what reads it"
+    yield "Say it in your own words" in page("/plan"), "the planner takes the same sentence"
 
 
 @section(7, "Homepage sections", "BUILT",
@@ -190,6 +195,12 @@ def s7():
     yield has("/", "Nine regions of Europe", "Find your kind of Europe", "Journeys across borders")
     yield h.index("Nine regions") < h.index("Find your kind"), "regions before experiences"
     yield h.index("Find your kind") < h.index("Journeys across borders"), "experiences before journeys"
+    # The specification's first homepage section is an interactive map with
+    # filters. The filters are links that open the real map with one applied,
+    # rather than a second map on the homepage to keep in step with the first.
+    yield has("/", "heromap-filters", "/map?layer=nature", "/map?layer=history"), \
+        "the hero map carries the specification's filters"
+    yield has("/", "Hidden Europe"), "including the quiet layer"
 
 
 @section(8, "Hidden Europe", "BUILT",
@@ -202,25 +213,47 @@ def s8():
 
 
 @section(9, "Stories", "PARTIAL",
-         "The desk exists and every story links into the Atlas both ways. "
-         "Eight of the specification's hundred are written.")
+         "The desk exists, the index is grouped by desk, every article "
+         "carries a byline, a publication date and tags, and every story "
+         "links into the Atlas both ways. Nine of the specification's "
+         "hundred are written.")
 def s9():
-    yield len(DATA["stories"]) >= 8, f"{len(DATA['stories'])} stories"
+    yield len(DATA["stories"]) >= 9, f"{len(DATA['stories'])} stories"
     yield len({s["section"] for s in DATA["stories"]}) >= 5, "across five or more desks"
+    # The specification names nine desks. The index groups by them rather
+    # than presenting one undifferentiated reverse-chronological list.
+    for desk in sorted({s["section"] for s in DATA["stories"]}):
+        yield f"<h2>{desk}</h2>" in page("/stories"), f"the {desk} desk has its own band"
+    for st in DATA["stories"]:
+        h = page(f"/stories/{st['slug']}")
+        yield "By " + st["author"] in h, f"{st['slug']} carries a byline"
+        yield st["published"] in h, f"{st['slug']} says when it was published"
+        yield all(t in h for t in st["tags"]), f"{st['slug']} carries its tags"
     for st in DATA["stories"]:
         for cid in st.get("places", []):
             yield st["title"] in page(f"/europe/{cid}"), f"{cid} links back to {st['slug']}"
 
 
 @section(10, "Plan your Europe", "PARTIAL",
-         "Nine of the eleven inputs are taken. Mobility requirements are "
-         "named as unsupported rather than silently dropped; number of "
-         "travellers is read and does not yet change the arithmetic.")
+         "Ten of the eleven inputs are taken and every one of them moves the "
+         "answer. Mobility requirements are the eleventh, and are named as "
+         "unsupported rather than silently dropped — we hold no step-free "
+         "access data, so a field for it would be a field that lies.")
 def s10():
-    yield has("/plan", "Days", "Total budget", "Travelling in", "Spending style", "Pace", "Start from")
+    yield has("/plan", "Days", "Total budget", "Travelling in", "Spending style",
+              "Pace", "Start from", "End near", "Travellers", "Accommodation",
+              "Getting between", "Show costs in", "Places you saved")
     js = src("assets/js/planner.js")
     yield "accessibility needs" in js, "mobility requirements are named as unsupported"
-    yield "travellers" in js, "number of travellers is read"
+    # Each of these has a browser check asserting the *output* moves, because
+    # an input that renders and changes nothing is decoration.
+    yield "bedFactor" in js, "travellers changes the arithmetic, not just the form"
+    yield "STAY_FACTOR" in js, "accommodation style changes the arithmetic"
+    yield "endCity" in js and "pull" in js, "the end point pulls the route towards it"
+    yield 'transport === "rail"' in js, "rail-only penalises the hops that need a plane"
+    yield "savedIds" in js, "saved places are favoured"
+    yield "planner inputs the specification asks for" in src("tools/browser-checks.js"), \
+        "and Chromium checks each of them end to end"
 
 
 # ── 11–18: the Atlas, places, experiences, journeys ───────────────────
@@ -231,27 +264,38 @@ def s10():
 def s11():
     yield exists("/europe/norway"), "the specification's URL shape"
     yield has("/europe/norway", "Capital", "Currency", "Languages", "Membership",
-              "Travel regions", "Getting around", "When to come", "Facts checked")
+              "Travel regions", "Getting around", "When to come", "Facts checked",
+              "Time zone")
     yield has("/europe/norway", "Fixed points in the year")
+    yield has("/europe/norway", "Popular destinations", "Experiences here",
+              "Journeys through"), "the country page aggregates what sits under it"
     yield doc_covers("docs/legal-position.md", "no entry, visa or security question is"), \
         "visa and safety information is refused, with the reason"
 
 
-@section(12, "Region page", "BUILT", "Every travel region has one.")
+@section(12, "Region page", "BUILT",
+         "Every travel region has one, and it aggregates the destinations, "
+         "places, experiences and journeys beneath it rather than being a "
+         "list of city links.")
 def s12():
     nregion = sum(len(c["regions"]) for c in DATA["countries"].values())
     yield nregion >= 120, f"{nregion} region pages"
     yield has("/europe/norway/fjord-norway", "Fjord Norway")
+    yield has("/europe/norway/fjord-norway", "Places to see", "Things to do"), \
+        "the region rolls up what its destinations hold"
+    yield has("/europe/norway/fjord-norway", "nights"), "and says how long the region takes"
 
 
 @section(13, "Destination page", "PARTIAL",
-         "Sixteen of the twenty sections. Accommodation and restaurants are "
-         "named and honestly empty; travel tips sit at country level.")
+         "Seventeen of the twenty sections, travel tips now among them. "
+         "Accommodation and restaurants are named and honestly empty — the "
+         "listing product is the missing piece, not the heading.")
 def s13():
     u = "/europe/norway/fjord-norway/bergen"
     yield has(u, "Why visit", "Places to see", "Things to do", "Events",
               "Accommodation &amp; restaurants", "When to come", "Getting there",
-              "Nearest onward stops", "Europe Experience Score", "Save to My Europe")
+              "Nearest onward stops", "Europe Experience Score", "Save to My Europe",
+              "Travel tips")
     yield "minimap" in page(u), "the destination carries a map"
     yield has("/europe/france/alps-and-east/chamonix", "This place, in the rest of the site"), \
         "suggested journeys and stories, where curation names the place"
@@ -272,10 +316,15 @@ def s14():
 
 
 @section(15, "Experience system", "BUILT",
-         "The specification's eight categories with 29 sub-categories, each "
-         "page printing the rule that built its list.")
+         "The specification's eight categories, now with 30 sub-categories — "
+         "Renaissance was the one it named that we did not have — each page "
+         "printing the rule that built its list.")
 def s15():
     yield len(DATA["categories"]) == 8, f"{len(DATA['categories'])} categories"
+    nsubs = sum(len(c["subs"]) for c in DATA["categories"])
+    yield nsubs >= 30, f"{nsubs} sub-categories"
+    subs = {sub["slug"] for c in DATA["categories"] for sub in c["subs"]}
+    yield "renaissance" in subs, "including Renaissance, which the specification names"
     for cat in DATA["categories"]:
         yield exists(f"/experiences/{cat['slug']}"), f"/experiences/{cat['slug']}"
     yield has("/experiences/nature", "How this list is built")
@@ -288,17 +337,22 @@ def s15():
 def s16():
     for j in DATA["journeys"]:
         for key in ("difficulty", "transport", "accommodation", "pack", "start", "end",
-                    "days", "budget", "months", "legs"):
+                    "days", "budget", "months", "legs", "creator"):
             yield key in j, f"{j['slug']} has {key}"
+    # The specification asks who curated a route. A route with no author is a
+    # route nobody is answerable for.
+    yield len({j["creator"] for j in DATA["journeys"]}) >= 1, "and names its curator"
 
 
 @section(17, "Journey page", "BUILT",
-         "Overview, map, route, transport, accommodation, budget, season and "
-         "packing, plus a way into the planner.")
+         "Overview, map, route, transport, accommodation, budget, season, "
+         "packing, the experiences the route passes and what you will be "
+         "eating — plus a named curator and a way into the planner.")
 def s17():
     u = "/journeys/the-alpine-grand-tour"
     yield has(u, "The route", "What to pack", "Estimated cost", "Difficulty",
-              "Transport", "Accommodation", "Open in the Planner", "Save to My Europe")
+              "Transport", "Accommodation", "Open in the Planner", "Save to My Europe",
+              "Experiences along the way", "What you will be eating", "Curated by")
     yield "routeline" in page(u), "the journey draws its own map"
 
 
@@ -309,6 +363,7 @@ def s18():
     yield "atlantic-to-the-mediterranean" in slugs, "Atlantic to Mediterranean"
     yield "european-heritage-route" in slugs, "European Heritage Route"
     yield "mediterranean-arc" in slugs, "Mediterranean Arc"
+    yield "scandinavia-to-central-europe" in slugs, "Scandinavia to Central Europe"
     widest = max(len({DATA["cities"][l["city"]]["country"]["slug"] for l in j["legs"]})
                  for j in DATA["journeys"])
     yield widest >= 7, f"the widest journey crosses {widest} countries"
@@ -326,6 +381,12 @@ def s19():
     for field in ("days", "budget", "travellers", "month", "start", "interests"):
         yield field in js, f"it extracts {field}"
     yield has("/plan", "Say it in your own words", "not by a model")
+    # "Ask only the necessary follow-up questions" — and answer anyway. An
+    # empty screen with a question on it is a worse answer than a
+    # provisional itinerary with the question above it.
+    yield "function followUps" in js, "it asks the questions that would change the answer"
+    yield "would change this" in js, "and puts them above a plan it built regardless"
+    yield "unsupported" in js or "cannot take account" in js, "and says what it cannot take"
 
 
 @section(20, "AI planner output", "BUILT",
@@ -337,6 +398,11 @@ def s20():
         yield line in js, f"the costing has a {line} line"
     yield "function dayPlan" in js, "a day-by-day exists"
     yield "alternativesFor" in js, "each stop offers alternatives"
+    # A distance is not a travel time. Every hop states how long it takes,
+    # by which mode, and a rail-only trip is never offered a flying time.
+    yield "function travelHours" in js and "function hoursText" in js, \
+        "every hop states a travelling time, not only a distance"
+    yield "a comfortable train leg" in js, "and what that leg actually is"
 
 
 @section(21, "AI safety and reliability", "PARTIAL",
@@ -475,10 +541,16 @@ def s32():
 
 @section(33, "Events platform", "PARTIAL",
          "The recurring European year, with a page per month that also "
-         "answers where to go. Dated per-year listings need a feed and a "
-         "rights position.")
+         "answers where to go, and the specification's event categories as a "
+         "filter on every one of them. Dated per-year listings need a feed "
+         "and a rights position, which is why no year is printed.")
 def s33():
     yield has("/events", "The European year")
+    yield "data-kind" in page("/events"), "every fixture carries its category"
+    yield "/assets/js/events.js" in page("/events"), "and the categories filter the list"
+    kinds = {f.get("kind") for c in DATA["countries"].values() for f in c["festivals"]}
+    yield len(kinds) >= 6, f"{len(kinds)} event categories in use"
+    yield None not in kinds, "and every fixture is categorised"
     for m in DATA["taxonomy"]["months"]:
         yield exists(f"/events/{m}"), f"/events/{m}"
     yield has("/events/oct", "At their best in October", "Quieter, and often better")
@@ -493,8 +565,10 @@ def s33():
 def s34():
     yield len(DATA["stories"]) >= 8, "articles exist as records"
     for st in DATA["stories"]:
-        for key in ("title", "section", "standfirst", "reading", "body", "places"):
+        for key in ("title", "section", "standfirst", "reading", "body", "places",
+                    "author", "tags", "published", "updated"):
             yield key in st, f"{st['slug']} has {key}"
+    yield "author" in src("tools/lib/data.py"), "and the validator requires the byline"
     yield doc_covers("docs/architecture.md", "validator"), "the workflow is documented"
 
 
@@ -624,6 +698,9 @@ def s45():
     js = src("assets/js/planner.js")
     for signal in ("wants", "budget", "month", "days", "start"):
         yield signal in js, f"{signal} is an input"
+    # A place you saved is a stronger signal than any tag we assigned it, and
+    # it is the one behavioural signal available without an account.
+    yield "savedIds" in js, "and a saved place is favoured over our own tagging"
     yield "W = {" in js and "relevance: 0.30" in js, "the weighting is explicit"
     yield has("/plan", "30%", "20%", "15%", "10%", "5%"), "and published"
 
@@ -770,6 +847,9 @@ def s59():
     yield bool(cx.get("as_of")), "the table is dated"
     yield has("/europe/norway", "indicative"), "and every use is labelled indicative"
     yield has("/help", "recorded by hand"), "with the caveat explained"
+    yield has("/plan", "Show costs in"), "the planner will price a trip in any of them"
+    yield "indicative, dated rate" in src("assets/js/planner.js"), \
+        "and a converted estimate says the rate is dated"
 
 
 @section(60, "Privacy", "BUILT",

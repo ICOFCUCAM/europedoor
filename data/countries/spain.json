@@ -58,17 +58,20 @@
     {
       "name": "Semana Santa processions",
       "month": "apr",
-      "where": "Seville, Málaga, Valladolid"
+      "where": "Seville, Málaga, Valladolid",
+      "kind": "religious"
     },
     {
       "name": "San Fermín",
       "month": "jul",
-      "where": "Pamplona"
+      "where": "Pamplona",
+      "kind": "sport"
     },
     {
       "name": "La Mercè",
       "month": "sep",
-      "where": "Barcelona"
+      "where": "Barcelona",
+      "kind": "religious"
     }
   ],
   "know": [
@@ -1349,5 +1352,6 @@
         }
       ]
     }
-  ]
+  ],
+  "timezone": "CET/CEST (UTC+1/+2) — the Canaries are an hour behind"
 }

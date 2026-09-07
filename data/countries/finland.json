@@ -1,63 +1,263 @@
 {
-  "code": "fi", "slug": "finland", "name": "Finland", "official": "Republic of Finland",
-  "macro": "nordic", "capital": "Helsinki", "currency": "EUR — euro",
-  "languages": ["Finnish", "Swedish", "Sámi languages"],
-  "blocs": ["eu", "schengen", "eurozone", "eea"],
+  "code": "fi",
+  "slug": "finland",
+  "name": "Finland",
+  "official": "Republic of Finland",
+  "macro": "nordic",
+  "capital": "Helsinki",
+  "currency": "EUR — euro",
+  "languages": [
+    "Finnish",
+    "Swedish",
+    "Sámi languages"
+  ],
+  "blocs": [
+    "eu",
+    "schengen",
+    "eurozone",
+    "eea"
+  ],
   "tagline": "Forest, lake, sauna, silence — and a design tradition that came out of all four.",
   "summary": "Finland is 188,000 lakes and more forest per person than anywhere in Europe, arranged around a habit of not talking unnecessarily. The sauna is not a spa treatment here; it is where the country conducts its private life, and there are more saunas than cars. Lapland in winter is the reason most people come, and the lake district in July is the reason some come back.",
-  "interests": ["nature", "design", "winter", "islands", "food"],
-  "budget": "high", "daily_eur": [90, 190],
-  "season": { "peak": ["jun", "jul", "aug"], "shoulder": ["feb", "mar", "sep"],
-    "note": "July is lake weather and the whole country is at a summer cottage. February and March give reliable snow with returning daylight — better than December, which is dark and expensive. Autumn ruska, the turning of the Lapland birch, is a fortnight in mid-September." },
-  "getting_around": "Trains north to Rovaniemi run overnight with car carriages. Helsinki's trams and the Suomenlinna ferry are on the same ticket. Beyond the rail line, Lapland is a car or a coach.",
-  "food": ["Rye bread, dense and sour, eaten with everything", "Lakeside perch and vendace, fried whole", "Salmiakki — salt liquorice, which is a test rather than a snack"],
-  "festivals": [
-    { "name": "Juhannus (midsummer)", "month": "jun", "where": "Lakeside, nationwide" },
-    { "name": "Savonlinna Opera Festival, in a medieval castle", "month": "jul", "where": "Savonlinna" },
-    { "name": "Ruska, the Lapland autumn colour", "month": "sep", "where": "Lapland" }
+  "interests": [
+    "nature",
+    "design",
+    "winter",
+    "islands",
+    "food"
   ],
-  "know": ["Sauna etiquette: naked, quiet, and you throw water on the stones yourself.", "Everyman's right allows walking, berry-picking and mushrooming on almost all land.", "Winter driving needs winter tyres by law, and reindeer have right of way in practice."],
+  "budget": "high",
+  "daily_eur": [
+    90,
+    190
+  ],
+  "season": {
+    "peak": [
+      "jun",
+      "jul",
+      "aug"
+    ],
+    "shoulder": [
+      "feb",
+      "mar",
+      "sep"
+    ],
+    "note": "July is lake weather and the whole country is at a summer cottage. February and March give reliable snow with returning daylight — better than December, which is dark and expensive. Autumn ruska, the turning of the Lapland birch, is a fortnight in mid-September."
+  },
+  "getting_around": "Trains north to Rovaniemi run overnight with car carriages. Helsinki's trams and the Suomenlinna ferry are on the same ticket. Beyond the rail line, Lapland is a car or a coach.",
+  "food": [
+    "Rye bread, dense and sour, eaten with everything",
+    "Lakeside perch and vendace, fried whole",
+    "Salmiakki — salt liquorice, which is a test rather than a snack"
+  ],
+  "festivals": [
+    {
+      "name": "Juhannus (midsummer)",
+      "month": "jun",
+      "where": "Lakeside, nationwide",
+      "kind": "seasonal"
+    },
+    {
+      "name": "Savonlinna Opera Festival, in a medieval castle",
+      "month": "jul",
+      "where": "Savonlinna",
+      "kind": "concert"
+    },
+    {
+      "name": "Ruska, the Lapland autumn colour",
+      "month": "sep",
+      "where": "Lapland",
+      "kind": "seasonal"
+    }
+  ],
+  "know": [
+    "Sauna etiquette: naked, quiet, and you throw water on the stones yourself.",
+    "Everyman's right allows walking, berry-picking and mushrooming on almost all land.",
+    "Winter driving needs winter tyres by law, and reindeer have right of way in practice."
+  ],
   "regions": [
-    { "slug": "helsinki-and-the-coast", "name": "Helsinki & the Southern Coast",
+    {
+      "slug": "helsinki-and-the-coast",
+      "name": "Helsinki & the Southern Coast",
       "summary": "A young capital of granite and sea, with a sea fortress and an archipelago at the end of the tram line.",
-      "interests": ["design", "cities", "islands", "architecture"],
+      "interests": [
+        "design",
+        "cities",
+        "islands",
+        "architecture"
+      ],
       "cities": [
-        { "slug": "helsinki", "name": "Helsinki", "lat": 60.17, "lon": 24.94,
+        {
+          "slug": "helsinki",
+          "name": "Helsinki",
+          "lat": 60.17,
+          "lon": 24.94,
           "summary": "Neoclassical centre, brutal-modern edges, and a design district you can walk in an afternoon.",
-          "interests": ["design", "architecture", "cities", "food", "islands"], "nights": [2, 3],
-          "highlights": ["Suomenlinna: a UNESCO sea fortress on six islands, twenty minutes by ferry", "Temppeliaukio, a church blasted into bedrock", "Löyly and the return of the public sauna to the waterfront", "The Oodi library, which lends power tools"],
+          "interests": [
+            "design",
+            "architecture",
+            "cities",
+            "food",
+            "islands"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Suomenlinna: a UNESCO sea fortress on six islands, twenty minutes by ferry",
+            "Temppeliaukio, a church blasted into bedrock",
+            "Löyly and the return of the public sauna to the waterfront",
+            "The Oodi library, which lends power tools"
+          ],
           "experiences": [
-            { "slug": "helsinki-public-sauna", "name": "A public sauna on the sea", "kind": "water", "band": "moderate", "summary": "Hot, then the Baltic, then hot again. The rule is that nobody performs and nobody talks much." },
-            { "slug": "helsinki-design-district", "name": "The Design District on foot", "kind": "walk", "band": "low", "summary": "Twenty-five streets, two hundred shops and studios, and the through-line from Aalto to whoever graduated last year." }
-          ] },
-        { "slug": "porvoo", "name": "Porvoo", "lat": 60.39, "lon": 25.66, "quiet": true,
+            {
+              "slug": "helsinki-public-sauna",
+              "name": "A public sauna on the sea",
+              "kind": "water",
+              "band": "moderate",
+              "summary": "Hot, then the Baltic, then hot again. The rule is that nobody performs and nobody talks much."
+            },
+            {
+              "slug": "helsinki-design-district",
+              "name": "The Design District on foot",
+              "kind": "walk",
+              "band": "low",
+              "summary": "Twenty-five streets, two hundred shops and studios, and the through-line from Aalto to whoever graduated last year."
+            }
+          ]
+        },
+        {
+          "slug": "porvoo",
+          "name": "Porvoo",
+          "lat": 60.39,
+          "lon": 25.66,
+          "quiet": true,
           "summary": "Red ochre warehouses on a river, and Finland's second-oldest town an hour from the capital.",
-          "interests": ["history", "food", "coast"], "nights": [1, 1],
-          "highlights": ["The riverfront shore houses, painted for a royal visit in 1809", "Cobbled old town with working chocolate and glass makers", "Wooden church on the hill above it"] }
-      ] },
-    { "slug": "lakeland", "name": "The Lakeland",
+          "interests": [
+            "history",
+            "food",
+            "coast"
+          ],
+          "nights": [
+            1,
+            1
+          ],
+          "highlights": [
+            "The riverfront shore houses, painted for a royal visit in 1809",
+            "Cobbled old town with working chocolate and glass makers",
+            "Wooden church on the hill above it"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "lakeland",
+      "name": "The Lakeland",
       "summary": "The blue middle of the country: 188,000 lakes, wooden cottages, and a castle in the water.",
-      "interests": ["nature", "islands", "food"],
+      "interests": [
+        "nature",
+        "islands",
+        "food"
+      ],
       "cities": [
-        { "slug": "savonlinna", "name": "Savonlinna", "lat": 61.87, "lon": 28.88, "quiet": true,
+        {
+          "slug": "savonlinna",
+          "name": "Savonlinna",
+          "lat": 61.87,
+          "lon": 28.88,
+          "quiet": true,
           "summary": "A 15th-century castle on an island in the middle of Saimaa, which hosts opera in its courtyard each July.",
-          "interests": ["history", "nature", "music"], "nights": [1, 2],
-          "highlights": ["Olavinlinna castle, built to face east and never taken by storm", "Opera in the courtyard, one month a year", "Saimaa ringed seals — a freshwater seal found nowhere else"],
-          "experiences": [{ "slug": "saimaa-seal-watch", "name": "Looking for the Saimaa seal", "kind": "wild", "band": "moderate", "summary": "Fewer than four hundred exist. A quiet boat, an early morning, and no promises — which is how it should be sold." }] }
-      ] },
-    { "slug": "finnish-lapland", "name": "Finnish Lapland",
+          "interests": [
+            "history",
+            "nature",
+            "music"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Olavinlinna castle, built to face east and never taken by storm",
+            "Opera in the courtyard, one month a year",
+            "Saimaa ringed seals — a freshwater seal found nowhere else"
+          ],
+          "experiences": [
+            {
+              "slug": "saimaa-seal-watch",
+              "name": "Looking for the Saimaa seal",
+              "kind": "wild",
+              "band": "moderate",
+              "summary": "Fewer than four hundred exist. A quiet boat, an early morning, and no promises — which is how it should be sold."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "finnish-lapland",
+      "name": "Finnish Lapland",
       "summary": "Above the Circle: fells rather than mountains, reindeer husbandry, and two months without a sunrise.",
-      "interests": ["winter", "nature", "wild"],
+      "interests": [
+        "winter",
+        "nature",
+        "wild"
+      ],
       "cities": [
-        { "slug": "rovaniemi", "name": "Rovaniemi", "lat": 66.50, "lon": 25.73,
+        {
+          "slug": "rovaniemi",
+          "name": "Rovaniemi",
+          "lat": 66.5,
+          "lon": 25.73,
           "summary": "The gateway to Lapland, rebuilt after 1944 to an Alvar Aalto plan shaped like reindeer antlers.",
-          "interests": ["winter", "design", "wild"], "nights": [2, 3],
-          "highlights": ["Arktikum, the best museum on Arctic life anywhere", "Husky and reindeer trails from December to March", "The Arctic Circle, marked and unavoidable"] },
-        { "slug": "inari", "name": "Inari", "lat": 68.91, "lon": 27.03, "quiet": true,
+          "interests": [
+            "winter",
+            "design",
+            "wild"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Arktikum, the best museum on Arctic life anywhere",
+            "Husky and reindeer trails from December to March",
+            "The Arctic Circle, marked and unavoidable"
+          ]
+        },
+        {
+          "slug": "inari",
+          "name": "Inari",
+          "lat": 68.91,
+          "lon": 27.03,
+          "quiet": true,
           "summary": "The centre of Sámi Finland, on a lake with three thousand islands.",
-          "interests": ["winter", "nature", "history"], "nights": [1, 3],
-          "highlights": ["Siida: the Sámi museum, written by Sámi people", "Ukonsaari, a sacred island out on the lake", "Aurora with almost no light pollution in any direction"],
-          "experiences": [{ "slug": "inari-sami-museum", "name": "Siida, on Sámi terms", "kind": "museum", "band": "low", "summary": "A national minority telling its own story, including the parts about the Finnish state — worth an afternoon rather than an hour." }] }
-      ] }
-  ]
+          "interests": [
+            "winter",
+            "nature",
+            "history"
+          ],
+          "nights": [
+            1,
+            3
+          ],
+          "highlights": [
+            "Siida: the Sámi museum, written by Sámi people",
+            "Ukonsaari, a sacred island out on the lake",
+            "Aurora with almost no light pollution in any direction"
+          ],
+          "experiences": [
+            {
+              "slug": "inari-sami-museum",
+              "name": "Siida, on Sámi terms",
+              "kind": "museum",
+              "band": "low",
+              "summary": "A national minority telling its own story, including the parts about the Finnish state — worth an afternoon rather than an hour."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "timezone": "EET/EEST (UTC+2/+3)"
 }

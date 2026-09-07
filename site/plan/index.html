@@ -88,6 +88,42 @@
           <select id="start" name="start"><option value="">Anywhere that fits</option></select>
         </div>
       </div>
+      <div class="form-row">
+        <div class="field">
+          <label for="end">End near</label>
+          <select id="end" name="end"><option value="">Wherever it gets to</option></select>
+        </div>
+        <div class="field">
+          <label for="travellers">Travellers</label>
+          <input type="number" id="travellers" name="travellers" min="1" max="12" value="1" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="accommodation">Accommodation</label>
+          <select id="accommodation" name="accommodation">
+            <option value="mixed" selected>Mixed — whatever suits the place</option>
+            <option value="guesthouse">Guesthouses and small places</option>
+            <option value="hotel">Hotels</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label for="transport">Getting between</label>
+          <select id="transport" name="transport">
+            <option value="any" selected>Whatever is quickest</option>
+            <option value="rail">Rail and ferry, no flights</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="currency">Show costs in</label>
+          <select id="currency" name="currency"><option value="ALL">ALL</option><option value="AMD">AMD</option><option value="AZN">AZN</option><option value="BAM">BAM</option><option value="BGN">BGN</option><option value="BYN">BYN</option><option value="CHF">CHF</option><option value="CZK">CZK</option><option value="DKK">DKK</option><option value="EUR" selected>EUR</option><option value="GBP">GBP</option><option value="GEL">GEL</option><option value="HUF">HUF</option><option value="ISK">ISK</option><option value="MDL">MDL</option><option value="MKD">MKD</option><option value="NOK">NOK</option><option value="PLN">PLN</option><option value="RON">RON</option><option value="RSD">RSD</option><option value="RUB">RUB</option><option value="SEK">SEK</option><option value="TRY">TRY</option><option value="UAH">UAH</option></select>
+        </div>
+        <div class="field">
+          <label for="saved">Places you saved</label>
+          <label class="inlinecheck"><input type="checkbox" id="saved" name="saved">
+          Favour the ones in My Europe</label>
+        </div>
+      </div>
       <fieldset class="fieldset">
         <legend>What are you travelling for?</legend>
         <div class="checks"><label><input type="checkbox" name="interest" value="history">

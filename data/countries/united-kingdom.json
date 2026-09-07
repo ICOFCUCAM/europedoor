@@ -1,118 +1,534 @@
 {
-  "code": "gb", "slug": "united-kingdom", "name": "United Kingdom", "official": "United Kingdom of Great Britain and Northern Ireland",
-  "macro": "british-isles", "capital": "London", "currency": "GBP — pound sterling",
-  "languages": ["English", "Welsh", "Scottish Gaelic", "Irish"],
-  "blocs": ["cta"],
+  "code": "gb",
+  "slug": "united-kingdom",
+  "name": "United Kingdom",
+  "official": "United Kingdom of Great Britain and Northern Ireland",
+  "macro": "british-isles",
+  "capital": "London",
+  "currency": "GBP — pound sterling",
+  "languages": [
+    "English",
+    "Welsh",
+    "Scottish Gaelic",
+    "Irish"
+  ],
+  "blocs": [
+    "cta"
+  ],
   "tagline": "Four nations, one small island group, and an argument about all of it that has run for a thousand years.",
   "summary": "The UK compresses an enormous amount into a short train ride: a global city, a Roman spa town, a mining valley, a Hebridean beach and a border wall built by an emperor, all within a day of each other. Nothing is far and everything is different — the accent changes every forty miles and so does the beer. It left the EU in 2020, so entry, roaming and customs work differently from its neighbours.",
-  "interests": ["history", "art", "music", "coast", "mountains", "cities", "rail", "sacred"],
-  "budget": "high", "daily_eur": [95, 220],
-  "season": { "peak": ["jun", "jul", "aug"], "shoulder": ["may", "sep", "oct"],
-    "note": "May and September are the sweet spot: long days, functioning gardens, no school holidays. Scotland's midges rule out still evenings in July and August on the west coast. Nowhere is reliably dry and nobody plans around it." },
-  "getting_around": "Rail reaches almost everywhere and costs least when booked weeks ahead; advance singles are a different price from walk-up fares by a factor of four. Scotland's islands run on CalMac ferries. London's Oyster/contactless system also covers most of the south-east.",
-  "food": ["A Sunday roast, which is a meal and an institution", "Indian food, in the specifically British forms invented here", "Cheese: over 700 named varieties, most of them regional and unexported"],
-  "festivals": [
-    { "name": "Edinburgh Festival Fringe — the largest arts festival on earth", "month": "aug", "where": "Edinburgh" },
-    { "name": "Glastonbury Festival", "month": "jun", "where": "Somerset" },
-    { "name": "Hogmanay", "month": "dec", "where": "Scotland" }
+  "interests": [
+    "history",
+    "art",
+    "music",
+    "coast",
+    "mountains",
+    "cities",
+    "rail",
+    "sacred"
   ],
-  "know": ["Not in Schengen: your Schengen days do not apply here and the border check is real.", "Driving is on the left, and rural roads in Wales and the Highlands are single-track with passing places.", "Right to roam exists in Scotland and barely exists in England — footpaths there are rights of way across private land, which is a different thing."],
+  "budget": "high",
+  "daily_eur": [
+    95,
+    220
+  ],
+  "season": {
+    "peak": [
+      "jun",
+      "jul",
+      "aug"
+    ],
+    "shoulder": [
+      "may",
+      "sep",
+      "oct"
+    ],
+    "note": "May and September are the sweet spot: long days, functioning gardens, no school holidays. Scotland's midges rule out still evenings in July and August on the west coast. Nowhere is reliably dry and nobody plans around it."
+  },
+  "getting_around": "Rail reaches almost everywhere and costs least when booked weeks ahead; advance singles are a different price from walk-up fares by a factor of four. Scotland's islands run on CalMac ferries. London's Oyster/contactless system also covers most of the south-east.",
+  "food": [
+    "A Sunday roast, which is a meal and an institution",
+    "Indian food, in the specifically British forms invented here",
+    "Cheese: over 700 named varieties, most of them regional and unexported"
+  ],
+  "festivals": [
+    {
+      "name": "Edinburgh Festival Fringe — the largest arts festival on earth",
+      "month": "aug",
+      "where": "Edinburgh",
+      "kind": "cultural"
+    },
+    {
+      "name": "Glastonbury Festival",
+      "month": "jun",
+      "where": "Somerset",
+      "kind": "concert"
+    },
+    {
+      "name": "Hogmanay",
+      "month": "dec",
+      "where": "Scotland",
+      "kind": "cultural"
+    }
+  ],
+  "know": [
+    "Not in Schengen: your Schengen days do not apply here and the border check is real.",
+    "Driving is on the left, and rural roads in Wales and the Highlands are single-track with passing places.",
+    "Right to roam exists in Scotland and barely exists in England — footpaths there are rights of way across private land, which is a different thing."
+  ],
   "regions": [
-    { "slug": "london-and-the-south-east", "name": "London & the South East",
+    {
+      "slug": "london-and-the-south-east",
+      "name": "London & the South East",
       "summary": "The capital, the cathedral city that crowned the country, and the coast that faces France.",
-      "interests": ["cities", "art", "history", "music", "food"],
+      "interests": [
+        "cities",
+        "art",
+        "history",
+        "music",
+        "food"
+      ],
       "cities": [
-        { "slug": "london", "name": "London", "lat": 51.51, "lon": -0.13,
+        {
+          "slug": "london",
+          "name": "London",
+          "lat": 51.51,
+          "lon": -0.13,
           "summary": "A city of villages that grew together, with the free national collections of a former empire in the middle of it.",
-          "interests": ["cities", "art", "music", "food", "history", "architecture"], "nights": [3, 5],
-          "highlights": ["The British Museum, the National Gallery and the Tates — all free, all enormous", "Borough Market, then the Thames path east past Shakespeare's Globe", "Hampstead Heath and the swimming ponds, open all year", "A play in a 900-seat theatre for the price of a cinema ticket, if you queue"],
+          "interests": [
+            "cities",
+            "art",
+            "music",
+            "food",
+            "history",
+            "architecture"
+          ],
+          "nights": [
+            3,
+            5
+          ],
+          "highlights": [
+            "The British Museum, the National Gallery and the Tates — all free, all enormous",
+            "Borough Market, then the Thames path east past Shakespeare's Globe",
+            "Hampstead Heath and the swimming ponds, open all year",
+            "A play in a 900-seat theatre for the price of a cinema ticket, if you queue"
+          ],
           "experiences": [
-            { "slug": "london-heath-ponds", "name": "The Hampstead bathing ponds", "kind": "water", "band": "low", "summary": "Three ponds, open every day of the year, including the January mornings when the ice is broken by hand." },
-            { "slug": "london-free-collections", "name": "One free national collection a day", "kind": "museum", "band": "low", "summary": "Britain's museums charge nothing for the permanent collections; treat one as an hour's visit rather than a day's endurance." }
-          ] },
-        { "slug": "canterbury", "name": "Canterbury", "lat": 51.28, "lon": 1.08, "quiet": true,
+            {
+              "slug": "london-heath-ponds",
+              "name": "The Hampstead bathing ponds",
+              "kind": "water",
+              "band": "low",
+              "summary": "Three ponds, open every day of the year, including the January mornings when the ice is broken by hand."
+            },
+            {
+              "slug": "london-free-collections",
+              "name": "One free national collection a day",
+              "kind": "museum",
+              "band": "low",
+              "summary": "Britain's museums charge nothing for the permanent collections; treat one as an hour's visit rather than a day's endurance."
+            }
+          ]
+        },
+        {
+          "slug": "canterbury",
+          "name": "Canterbury",
+          "lat": 51.28,
+          "lon": 1.08,
+          "quiet": true,
           "summary": "The mother church of a global communion, in a walled town on the pilgrims' road from London.",
-          "interests": ["sacred", "history"], "nights": [1, 1],
-          "highlights": ["The cathedral, and the spot where Becket was killed in 1170", "The Pilgrims' Way, still walkable from Winchester or Southwark", "Roman and Norman layers visible in the same street"],
-          "experiences": [{ "slug": "canterbury-pilgrims-way", "name": "The last day of the Pilgrims' Way", "kind": "walk", "band": "low", "summary": "Twenty miles from Chilham along the North Downs, arriving on foot the way it was meant to be done." }] }
-      ] },
-    { "slug": "west-country", "name": "The West Country",
-      "summary": "Georgian Bath, granite Cornwall, and the mildest, wettest, greenest corner of England.",
-      "interests": ["coast", "history", "architecture", "food"],
-      "cities": [
-        { "slug": "bath", "name": "Bath", "lat": 51.38, "lon": -2.36,
-          "summary": "A Roman bathing complex under a Georgian city built in one honey-coloured stone.",
-          "interests": ["history", "architecture", "food"], "nights": [1, 2],
-          "highlights": ["The Roman Baths, still fed by the only hot spring in Britain", "The Royal Crescent and the Circus, built as speculation and now the argument for it", "Bathing in the thermal water again, at the modern spa"] },
-        { "slug": "st-ives", "name": "St Ives", "lat": 50.21, "lon": -5.48, "quiet": true,
-          "summary": "A Cornish fishing town whose light brought the modernists, and kept them.",
-          "interests": ["art", "coast", "food"], "nights": [2, 3],
-          "highlights": ["Tate St Ives and the Barbara Hepworth garden, left as she had it", "The coast path west to Zennor along granite cliffs", "Porthmeor beach, which surfs properly"],
-          "experiences": [{ "slug": "cornwall-coast-path", "name": "A day on the South West Coast Path", "kind": "walk", "band": "low", "summary": "1,014 kilometres in total; the St Ives-to-Zennor stretch gives you the best of it in six hours." }] }
-      ] },
-    { "slug": "the-north", "name": "Northern England",
-      "summary": "A Roman wall, a Viking city, mill towns turned music towns, and the Lakes.",
-      "interests": ["history", "mountains", "music", "nature"],
-      "cities": [
-        { "slug": "york", "name": "York", "lat": 53.96, "lon": -1.08,
-          "summary": "Roman, Viking and medieval in the same square mile, inside walls you can walk around.",
-          "interests": ["history", "architecture", "food"], "nights": [1, 2],
-          "highlights": ["York Minster's medieval glass, the largest expanse in Britain", "The Shambles, a 14th-century street of overhanging timber", "The city walls, three kilometres, best at opening time"] },
-        { "slug": "keswick", "name": "Keswick & the Lakes", "lat": 54.60, "lon": -3.13,
-          "summary": "A market town under Skiddaw on Derwentwater, at the centre of England's mountain country.",
-          "interests": ["mountains", "nature", "coast"], "nights": [2, 3],
-          "highlights": ["Catbells: a two-hour ridge with a view worth ten", "Rowing on Derwentwater and the launch that circles it", "Wild swimming in Buttermere, cold enough to hurt"],
-          "experiences": [{ "slug": "lakes-fell-day", "name": "A Wainwright, start to finish", "kind": "walk", "band": "low", "summary": "214 fells were catalogued by one man in seven hand-written volumes; walking one of the small ones is the best introduction to why." }] }
-      ] },
-    { "slug": "scotland", "name": "Scotland",
-      "summary": "An old capital on a volcano, and a Highland north of sea lochs, whisky and islands.",
-      "interests": ["history", "mountains", "islands", "music", "wine"],
-      "cities": [
-        { "slug": "edinburgh", "name": "Edinburgh", "lat": 55.95, "lon": -3.19,
-          "summary": "A medieval spine running down from a castle on a plug of volcanic rock, with a Georgian grid alongside.",
-          "interests": ["history", "architecture", "music", "cities", "festivals"], "nights": [2, 3],
-          "highlights": ["The Royal Mile at seven in the morning, before anyone else", "Arthur's Seat, a full hill inside the city", "The National Museum of Scotland's free, excellent everything", "The Fringe in August, which triples the population"],
+          "interests": [
+            "sacred",
+            "history"
+          ],
+          "nights": [
+            1,
+            1
+          ],
+          "highlights": [
+            "The cathedral, and the spot where Becket was killed in 1170",
+            "The Pilgrims' Way, still walkable from Winchester or Southwark",
+            "Roman and Norman layers visible in the same street"
+          ],
           "experiences": [
-            { "slug": "edinburgh-arthurs-seat", "name": "Up Arthur's Seat before breakfast", "kind": "walk", "band": "low", "summary": "251 metres of extinct volcano, forty minutes up, and the whole city and the Forth laid out at the top." }
-          ] },
-        { "slug": "skye", "name": "Isle of Skye (Portree)", "lat": 57.41, "lon": -6.19,
+            {
+              "slug": "canterbury-pilgrims-way",
+              "name": "The last day of the Pilgrims' Way",
+              "kind": "walk",
+              "band": "low",
+              "summary": "Twenty miles from Chilham along the North Downs, arriving on foot the way it was meant to be done."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "west-country",
+      "name": "The West Country",
+      "summary": "Georgian Bath, granite Cornwall, and the mildest, wettest, greenest corner of England.",
+      "interests": [
+        "coast",
+        "history",
+        "architecture",
+        "food"
+      ],
+      "cities": [
+        {
+          "slug": "bath",
+          "name": "Bath",
+          "lat": 51.38,
+          "lon": -2.36,
+          "summary": "A Roman bathing complex under a Georgian city built in one honey-coloured stone.",
+          "interests": [
+            "history",
+            "architecture",
+            "food"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Roman Baths, still fed by the only hot spring in Britain",
+            "The Royal Crescent and the Circus, built as speculation and now the argument for it",
+            "Bathing in the thermal water again, at the modern spa"
+          ]
+        },
+        {
+          "slug": "st-ives",
+          "name": "St Ives",
+          "lat": 50.21,
+          "lon": -5.48,
+          "quiet": true,
+          "summary": "A Cornish fishing town whose light brought the modernists, and kept them.",
+          "interests": [
+            "art",
+            "coast",
+            "food"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Tate St Ives and the Barbara Hepworth garden, left as she had it",
+            "The coast path west to Zennor along granite cliffs",
+            "Porthmeor beach, which surfs properly"
+          ],
+          "experiences": [
+            {
+              "slug": "cornwall-coast-path",
+              "name": "A day on the South West Coast Path",
+              "kind": "walk",
+              "band": "low",
+              "summary": "1,014 kilometres in total; the St Ives-to-Zennor stretch gives you the best of it in six hours."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "the-north",
+      "name": "Northern England",
+      "summary": "A Roman wall, a Viking city, mill towns turned music towns, and the Lakes.",
+      "interests": [
+        "history",
+        "mountains",
+        "music",
+        "nature"
+      ],
+      "cities": [
+        {
+          "slug": "york",
+          "name": "York",
+          "lat": 53.96,
+          "lon": -1.08,
+          "summary": "Roman, Viking and medieval in the same square mile, inside walls you can walk around.",
+          "interests": [
+            "history",
+            "architecture",
+            "food"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "York Minster's medieval glass, the largest expanse in Britain",
+            "The Shambles, a 14th-century street of overhanging timber",
+            "The city walls, three kilometres, best at opening time"
+          ]
+        },
+        {
+          "slug": "keswick",
+          "name": "Keswick & the Lakes",
+          "lat": 54.6,
+          "lon": -3.13,
+          "summary": "A market town under Skiddaw on Derwentwater, at the centre of England's mountain country.",
+          "interests": [
+            "mountains",
+            "nature",
+            "coast"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Catbells: a two-hour ridge with a view worth ten",
+            "Rowing on Derwentwater and the launch that circles it",
+            "Wild swimming in Buttermere, cold enough to hurt"
+          ],
+          "experiences": [
+            {
+              "slug": "lakes-fell-day",
+              "name": "A Wainwright, start to finish",
+              "kind": "walk",
+              "band": "low",
+              "summary": "214 fells were catalogued by one man in seven hand-written volumes; walking one of the small ones is the best introduction to why."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "scotland",
+      "name": "Scotland",
+      "summary": "An old capital on a volcano, and a Highland north of sea lochs, whisky and islands.",
+      "interests": [
+        "history",
+        "mountains",
+        "islands",
+        "music",
+        "wine"
+      ],
+      "cities": [
+        {
+          "slug": "edinburgh",
+          "name": "Edinburgh",
+          "lat": 55.95,
+          "lon": -3.19,
+          "summary": "A medieval spine running down from a castle on a plug of volcanic rock, with a Georgian grid alongside.",
+          "interests": [
+            "history",
+            "architecture",
+            "music",
+            "cities",
+            "festivals"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The Royal Mile at seven in the morning, before anyone else",
+            "Arthur's Seat, a full hill inside the city",
+            "The National Museum of Scotland's free, excellent everything",
+            "The Fringe in August, which triples the population"
+          ],
+          "experiences": [
+            {
+              "slug": "edinburgh-arthurs-seat",
+              "name": "Up Arthur's Seat before breakfast",
+              "kind": "walk",
+              "band": "low",
+              "summary": "251 metres of extinct volcano, forty minutes up, and the whole city and the Forth laid out at the top."
+            }
+          ]
+        },
+        {
+          "slug": "skye",
+          "name": "Isle of Skye (Portree)",
+          "lat": 57.41,
+          "lon": -6.19,
           "summary": "Black basalt ridges, sea cliffs and more visitors than the single-track roads were built for.",
-          "interests": ["mountains", "islands", "nature", "coast"], "nights": [2, 3],
-          "highlights": ["The Quiraing, a landslip you walk into", "The Cuillin ridge, which is mountaineering rather than hiking", "Neist Point at sunset, with the Outer Hebrides on the horizon"],
-          "experiences": [{ "slug": "skye-quiraing-circuit", "name": "The Quiraing circuit", "kind": "walk", "band": "low", "summary": "Seven kilometres through a landscape still slowly moving downhill; start early, because the car park fills by nine." }] },
-        { "slug": "islay", "name": "Islay", "lat": 55.76, "lon": -6.19, "quiet": true,
+          "interests": [
+            "mountains",
+            "islands",
+            "nature",
+            "coast"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The Quiraing, a landslip you walk into",
+            "The Cuillin ridge, which is mountaineering rather than hiking",
+            "Neist Point at sunset, with the Outer Hebrides on the horizon"
+          ],
+          "experiences": [
+            {
+              "slug": "skye-quiraing-circuit",
+              "name": "The Quiraing circuit",
+              "kind": "walk",
+              "band": "low",
+              "summary": "Seven kilometres through a landscape still slowly moving downhill; start early, because the car park fills by nine."
+            }
+          ]
+        },
+        {
+          "slug": "islay",
+          "name": "Islay",
+          "lat": 55.76,
+          "lon": -6.19,
+          "quiet": true,
           "summary": "A low green island of nine working distilleries, 3,000 people and 50,000 wintering geese.",
-          "interests": ["wine", "coast", "wild", "nature"], "nights": [2, 3],
-          "highlights": ["Peated whisky at the distillery that made it, on the shore", "Barnacle geese arriving from Greenland each October", "Machir Bay, empty in any weather"],
-          "experiences": [{ "slug": "islay-distillery-shore-walk", "name": "Three distilleries on foot", "kind": "cellar", "band": "moderate", "summary": "Ardbeg, Lagavulin and Laphroaig sit within five kilometres of each other along one coastal path — walk it, for obvious reasons." }] }
-      ] },
-    { "slug": "wales", "name": "Wales",
+          "interests": [
+            "wine",
+            "coast",
+            "wild",
+            "nature"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Peated whisky at the distillery that made it, on the shore",
+            "Barnacle geese arriving from Greenland each October",
+            "Machir Bay, empty in any weather"
+          ],
+          "experiences": [
+            {
+              "slug": "islay-distillery-shore-walk",
+              "name": "Three distilleries on foot",
+              "kind": "cellar",
+              "band": "moderate",
+              "summary": "Ardbeg, Lagavulin and Laphroaig sit within five kilometres of each other along one coastal path — walk it, for obvious reasons."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "wales",
+      "name": "Wales",
       "summary": "A living Celtic language, castles built to suppress it, and mountains in the north.",
-      "interests": ["mountains", "history", "coast", "music"],
+      "interests": [
+        "mountains",
+        "history",
+        "coast",
+        "music"
+      ],
       "cities": [
-        { "slug": "cardiff", "name": "Cardiff", "lat": 51.48, "lon": -3.18,
+        {
+          "slug": "cardiff",
+          "name": "Cardiff",
+          "lat": 51.48,
+          "lon": -3.18,
           "summary": "A coal port turned capital, with a fantasy castle in the middle and a rugby stadium that empties into the streets.",
-          "interests": ["cities", "music", "history"], "nights": [1, 2],
-          "highlights": ["Cardiff Castle's Victorian gothic interiors, wildly over the top", "St Fagans: a free open-air museum of relocated Welsh buildings", "A match day, if you can get in"] },
-        { "slug": "snowdonia", "name": "Eryri / Snowdonia (Betws-y-Coed)", "lat": 53.09, "lon": -3.80,
+          "interests": [
+            "cities",
+            "music",
+            "history"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Cardiff Castle's Victorian gothic interiors, wildly over the top",
+            "St Fagans: a free open-air museum of relocated Welsh buildings",
+            "A match day, if you can get in"
+          ]
+        },
+        {
+          "slug": "snowdonia",
+          "name": "Eryri / Snowdonia (Betws-y-Coed)",
+          "lat": 53.09,
+          "lon": -3.8,
           "summary": "Slate, lakes and the highest mountains in England and Wales, in a national park with a Welsh-speaking heart.",
-          "interests": ["mountains", "nature", "rail"], "nights": [2, 3],
-          "highlights": ["Yr Wyddfa by the Watkin or Rhyd Ddu path rather than the crowded one", "The slate landscape of Blaenau Ffestiniog, now UNESCO-listed", "Narrow-gauge railways built for slate, now for the view"],
-          "experiences": [{ "slug": "ffestiniog-slate-railway", "name": "The slate railway to the coast", "kind": "ride", "band": "moderate", "summary": "Built in 1836 to run loaded downhill by gravity; it still descends 700 feet to Porthmadog through the woods." }] }
-      ] },
-    { "slug": "northern-ireland", "name": "Northern Ireland",
+          "interests": [
+            "mountains",
+            "nature",
+            "rail"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Yr Wyddfa by the Watkin or Rhyd Ddu path rather than the crowded one",
+            "The slate landscape of Blaenau Ffestiniog, now UNESCO-listed",
+            "Narrow-gauge railways built for slate, now for the view"
+          ],
+          "experiences": [
+            {
+              "slug": "ffestiniog-slate-railway",
+              "name": "The slate railway to the coast",
+              "kind": "ride",
+              "band": "moderate",
+              "summary": "Built in 1836 to run loaded downhill by gravity; it still descends 700 feet to Porthmadog through the woods."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "northern-ireland",
+      "name": "Northern Ireland",
       "summary": "A basalt coast, a shipyard city, and recent history that is neither hidden nor settled.",
-      "interests": ["coast", "history", "music"],
+      "interests": [
+        "coast",
+        "history",
+        "music"
+      ],
       "cities": [
-        { "slug": "belfast", "name": "Belfast", "lat": 54.60, "lon": -5.93,
+        {
+          "slug": "belfast",
+          "name": "Belfast",
+          "lat": 54.6,
+          "lon": -5.93,
           "summary": "A Victorian industrial city working through its own recent past in public, with murals as the text.",
-          "interests": ["history", "music", "cities"], "nights": [1, 2],
-          "highlights": ["The Titanic Quarter, on the slipway where she was built", "Black cab tours of the peace walls, given by people who lived it", "The Crown Liquor Saloon, a gas-lit gin palace owned by the National Trust"],
-          "experiences": [{ "slug": "belfast-mural-tour", "name": "The walls, told by both sides", "kind": "walk", "band": "moderate", "summary": "The good operators take you to both communities and let the contradictions stand rather than resolving them for you." }] },
-        { "slug": "causeway-coast", "name": "The Causeway Coast (Bushmills)", "lat": 55.20, "lon": -6.52, "quiet": true,
+          "interests": [
+            "history",
+            "music",
+            "cities"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Titanic Quarter, on the slipway where she was built",
+            "Black cab tours of the peace walls, given by people who lived it",
+            "The Crown Liquor Saloon, a gas-lit gin palace owned by the National Trust"
+          ],
+          "experiences": [
+            {
+              "slug": "belfast-mural-tour",
+              "name": "The walls, told by both sides",
+              "kind": "walk",
+              "band": "moderate",
+              "summary": "The good operators take you to both communities and let the contradictions stand rather than resolving them for you."
+            }
+          ]
+        },
+        {
+          "slug": "causeway-coast",
+          "name": "The Causeway Coast (Bushmills)",
+          "lat": 55.2,
+          "lon": -6.52,
+          "quiet": true,
           "summary": "Forty thousand basalt columns, a rope bridge to a fishing rock, and cliffs the whole way along.",
-          "interests": ["coast", "nature", "wine"], "nights": [1, 2],
-          "highlights": ["The Giant's Causeway, best at dawn or in rain", "Carrick-a-Rede rope bridge, if heights are your thing", "The oldest licensed distillery in the world, from 1608"] }
-      ] }
-  ]
+          "interests": [
+            "coast",
+            "nature",
+            "wine"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Giant's Causeway, best at dawn or in rain",
+            "Carrick-a-Rede rope bridge, if heights are your thing",
+            "The oldest licensed distillery in the world, from 1608"
+          ]
+        }
+      ]
+    }
+  ],
+  "timezone": "GMT/BST (UTC+0/+1)"
 }

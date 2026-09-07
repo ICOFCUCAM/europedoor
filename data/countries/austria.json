@@ -1,63 +1,265 @@
 {
-  "code": "at", "slug": "austria", "name": "Austria", "official": "Republic of Austria",
-  "macro": "alpine-central", "capital": "Vienna", "currency": "EUR — euro",
-  "languages": ["German"],
-  "blocs": ["eu", "schengen", "eurozone", "eea"],
+  "code": "at",
+  "slug": "austria",
+  "name": "Austria",
+  "official": "Republic of Austria",
+  "macro": "alpine-central",
+  "capital": "Vienna",
+  "currency": "EUR — euro",
+  "languages": [
+    "German"
+  ],
+  "blocs": [
+    "eu",
+    "schengen",
+    "eurozone",
+    "eea"
+  ],
   "tagline": "An imperial capital with a small country attached, most of it vertical.",
   "summary": "Austria spent six centuries as the seat of an empire and then lost it in an afternoon, which is why Vienna is a capital built for twice the country. Everything west of it is mountain: ski resorts in winter, high pasture in summer, and lakes cold enough to hurt. The coffee house, the opera and the Sunday hike are all still institutions rather than attractions.",
-  "interests": ["music", "art", "mountains", "winter", "architecture", "food"],
-  "budget": "high", "daily_eur": [85, 190],
-  "season": { "peak": ["jun", "jul", "aug", "dec", "jan", "feb"], "shoulder": ["may", "sep", "oct"],
-    "note": "Vienna is a year-round city and best in the shoulder months. The Alps have two seasons and a gap between them: lifts and mountain huts close in April–May and again in November." },
-  "getting_around": "ÖBB trains are punctual and the Railjet crosses the country in four hours. Mountain valleys have postbuses timed to the trains. Vienna's transport is cheap and the annual pass is famously a euro a day.",
-  "food": ["Wiener Schnitzel, veal and beaten thin, with potato salad", "Kaffee und Kuchen, an afternoon institution with its own vocabulary", "Wine from the Wachau and Burgenland, which nobody outside expects"],
-  "festivals": [
-    { "name": "Vienna Ball season", "month": "feb", "where": "Vienna" },
-    { "name": "Salzburg Festival", "month": "jul", "where": "Salzburg" },
-    { "name": "Christkindlmarkt", "month": "dec", "where": "Vienna, Salzburg, Innsbruck" }
+  "interests": [
+    "music",
+    "art",
+    "mountains",
+    "winter",
+    "architecture",
+    "food"
   ],
-  "know": ["In a coffee house you are buying the table, not the coffee; nobody will rush you.", "Mountain huts (Hütten) need booking and cash, and lights go out early.", "Sunday closing is near-total outside stations and tourist areas."],
+  "budget": "high",
+  "daily_eur": [
+    85,
+    190
+  ],
+  "season": {
+    "peak": [
+      "jun",
+      "jul",
+      "aug",
+      "dec",
+      "jan",
+      "feb"
+    ],
+    "shoulder": [
+      "may",
+      "sep",
+      "oct"
+    ],
+    "note": "Vienna is a year-round city and best in the shoulder months. The Alps have two seasons and a gap between them: lifts and mountain huts close in April–May and again in November."
+  },
+  "getting_around": "ÖBB trains are punctual and the Railjet crosses the country in four hours. Mountain valleys have postbuses timed to the trains. Vienna's transport is cheap and the annual pass is famously a euro a day.",
+  "food": [
+    "Wiener Schnitzel, veal and beaten thin, with potato salad",
+    "Kaffee und Kuchen, an afternoon institution with its own vocabulary",
+    "Wine from the Wachau and Burgenland, which nobody outside expects"
+  ],
+  "festivals": [
+    {
+      "name": "Vienna Ball season",
+      "month": "feb",
+      "where": "Vienna",
+      "kind": "cultural"
+    },
+    {
+      "name": "Salzburg Festival",
+      "month": "jul",
+      "where": "Salzburg",
+      "kind": "cultural"
+    },
+    {
+      "name": "Christkindlmarkt",
+      "month": "dec",
+      "where": "Vienna, Salzburg, Innsbruck",
+      "kind": "market"
+    }
+  ],
+  "know": [
+    "In a coffee house you are buying the table, not the coffee; nobody will rush you.",
+    "Mountain huts (Hütten) need booking and cash, and lights go out early.",
+    "Sunday closing is near-total outside stations and tourist areas."
+  ],
   "regions": [
-    { "slug": "vienna-and-the-east", "name": "Vienna & the East",
+    {
+      "slug": "vienna-and-the-east",
+      "name": "Vienna & the East",
       "summary": "The imperial capital, the Danube valley's vineyards, and Hungary's old border country.",
-      "interests": ["music", "art", "architecture", "wine", "cities"],
+      "interests": [
+        "music",
+        "art",
+        "architecture",
+        "wine",
+        "cities"
+      ],
       "cities": [
-        { "slug": "vienna", "name": "Vienna", "lat": 48.21, "lon": 16.37,
+        {
+          "slug": "vienna",
+          "name": "Vienna",
+          "lat": 48.21,
+          "lon": 16.37,
           "summary": "Habsburg on the outside, Freud and Klimt and social housing on the inside, with the world's best-funded music scene.",
-          "interests": ["music", "art", "architecture", "food", "cities"], "nights": [3, 4],
-          "highlights": ["Klimt's Kiss at the Belvedere and the Secession's Beethoven Frieze", "Standing tickets at the Staatsoper for the price of a sandwich", "The Naschmarkt, and a coffee house afternoon with a newspaper on a stick", "Red Vienna's 1920s housing — Karl-Marx-Hof is a kilometre long"],
+          "interests": [
+            "music",
+            "art",
+            "architecture",
+            "food",
+            "cities"
+          ],
+          "nights": [
+            3,
+            4
+          ],
+          "highlights": [
+            "Klimt's Kiss at the Belvedere and the Secession's Beethoven Frieze",
+            "Standing tickets at the Staatsoper for the price of a sandwich",
+            "The Naschmarkt, and a coffee house afternoon with a newspaper on a stick",
+            "Red Vienna's 1920s housing — Karl-Marx-Hof is a kilometre long"
+          ],
           "experiences": [
-            { "slug": "vienna-standing-opera", "name": "Standing room at the Staatsoper", "kind": "stage", "band": "low", "summary": "A few euros, queued for on the night, in one of the great opera houses. Bring a scarf to tie to the rail and hold your place." },
-            { "slug": "vienna-heuriger", "name": "A heuriger on the city edge", "kind": "cellar", "band": "moderate", "summary": "Wine taverns in Vienna's own vineyards, open only when the grower has wine to sell — a pine branch over the door means open." }
-          ] },
-        { "slug": "durnstein", "name": "Dürnstein & the Wachau", "lat": 48.40, "lon": 15.52, "quiet": true,
+            {
+              "slug": "vienna-standing-opera",
+              "name": "Standing room at the Staatsoper",
+              "kind": "stage",
+              "band": "low",
+              "summary": "A few euros, queued for on the night, in one of the great opera houses. Bring a scarf to tie to the rail and hold your place."
+            },
+            {
+              "slug": "vienna-heuriger",
+              "name": "A heuriger on the city edge",
+              "kind": "cellar",
+              "band": "moderate",
+              "summary": "Wine taverns in Vienna's own vineyards, open only when the grower has wine to sell — a pine branch over the door means open."
+            }
+          ]
+        },
+        {
+          "slug": "durnstein",
+          "name": "Dürnstein & the Wachau",
+          "lat": 48.4,
+          "lon": 15.52,
+          "quiet": true,
           "summary": "A blue baroque tower over the Danube, terraced vineyards behind, and the castle where Richard the Lionheart was held.",
-          "interests": ["wine", "nature", "history"], "nights": [1, 2],
-          "highlights": ["Grüner Veltliner and Riesling from terraces built by monks", "The Danube cycle path, flat and shaded", "Melk Abbey upriver, gold from floor to ceiling"] }
-      ] },
-    { "slug": "salzburg-and-the-lakes", "name": "Salzburg & the Salzkammergut",
+          "interests": [
+            "wine",
+            "nature",
+            "history"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Grüner Veltliner and Riesling from terraces built by monks",
+            "The Danube cycle path, flat and shaded",
+            "Melk Abbey upriver, gold from floor to ceiling"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "salzburg-and-the-lakes",
+      "name": "Salzburg & the Salzkammergut",
       "summary": "A prince-archbishop's baroque city, and a district of seventy-six lakes behind it.",
-      "interests": ["music", "nature", "history", "mountains"],
+      "interests": [
+        "music",
+        "nature",
+        "history",
+        "mountains"
+      ],
       "cities": [
-        { "slug": "salzburg", "name": "Salzburg", "lat": 47.80, "lon": 13.05,
+        {
+          "slug": "salzburg",
+          "name": "Salzburg",
+          "lat": 47.8,
+          "lon": 13.05,
           "summary": "Baroque built on salt money, under a fortress, with Mozart born in the middle of it.",
-          "interests": ["music", "architecture", "history"], "nights": [1, 2],
-          "highlights": ["Hohensalzburg fortress, never taken in a thousand years", "Mozart's birthplace and the concerts in the Residenz", "Hellbrunn's trick fountains, designed in 1615 to soak guests"] },
-        { "slug": "hallstatt", "name": "Hallstatt", "lat": 47.56, "lon": 13.65,
+          "interests": [
+            "music",
+            "architecture",
+            "history"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Hohensalzburg fortress, never taken in a thousand years",
+            "Mozart's birthplace and the concerts in the Residenz",
+            "Hellbrunn's trick fountains, designed in 1615 to soak guests"
+          ]
+        },
+        {
+          "slug": "hallstatt",
+          "name": "Hallstatt",
+          "lat": 47.56,
+          "lon": 13.65,
           "summary": "A lakeside village under a salt mountain, with 7,000 years of continuous mining and more visitors than it can hold.",
-          "interests": ["nature", "history"], "nights": [1, 1],
-          "highlights": ["The oldest salt mine in the world, and a wooden staircase from 1344 inside it", "The bone house, with painted skulls stacked by family", "Early morning or evening — the day-trip window is 10 to 4 and it is unbearable"],
-          "experiences": [{ "slug": "hallstatt-salt-mine", "name": "Into the salt mountain", "kind": "museum", "band": "moderate", "summary": "Miners' slides, a salt lake underground, and the Bronze Age tools that came out of the same shafts." }] }
-      ] },
-    { "slug": "tyrol", "name": "Tyrol & the West",
+          "interests": [
+            "nature",
+            "history"
+          ],
+          "nights": [
+            1,
+            1
+          ],
+          "highlights": [
+            "The oldest salt mine in the world, and a wooden staircase from 1344 inside it",
+            "The bone house, with painted skulls stacked by family",
+            "Early morning or evening — the day-trip window is 10 to 4 and it is unbearable"
+          ],
+          "experiences": [
+            {
+              "slug": "hallstatt-salt-mine",
+              "name": "Into the salt mountain",
+              "kind": "museum",
+              "band": "moderate",
+              "summary": "Miners' slides, a salt lake underground, and the Bronze Age tools that came out of the same shafts."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "tyrol",
+      "name": "Tyrol & the West",
       "summary": "The alpine heart: Innsbruck between two ranges, and valleys of huts and high paths.",
-      "interests": ["mountains", "winter", "nature"],
+      "interests": [
+        "mountains",
+        "winter",
+        "nature"
+      ],
       "cities": [
-        { "slug": "innsbruck", "name": "Innsbruck", "lat": 47.27, "lon": 11.39,
+        {
+          "slug": "innsbruck",
+          "name": "Innsbruck",
+          "lat": 47.27,
+          "lon": 11.39,
           "summary": "A university city at 574 metres with a 2,300-metre mountain reachable from the centre in twenty minutes.",
-          "interests": ["mountains", "winter", "architecture", "cities"], "nights": [2, 3],
-          "highlights": ["The Nordkette funicular, Zaha Hadid stations from town to summit", "The Golden Roof and the old town beneath it", "Ski jumping at Bergisel, and the view from the tower"],
-          "experiences": [{ "slug": "innsbruck-nordkette", "name": "City to summit in twenty minutes", "kind": "ride", "band": "moderate", "summary": "Tram, funicular and two cable cars take you from a café table to 2,256 metres of exposed ridge; take a jacket you would not think you needed." }] }
-      ] }
-  ]
+          "interests": [
+            "mountains",
+            "winter",
+            "architecture",
+            "cities"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The Nordkette funicular, Zaha Hadid stations from town to summit",
+            "The Golden Roof and the old town beneath it",
+            "Ski jumping at Bergisel, and the view from the tower"
+          ],
+          "experiences": [
+            {
+              "slug": "innsbruck-nordkette",
+              "name": "City to summit in twenty minutes",
+              "kind": "ride",
+              "band": "moderate",
+              "summary": "Tram, funicular and two cable cars take you from a café table to 2,256 metres of exposed ridge; take a jacket you would not think you needed."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "timezone": "CET/CEST (UTC+1/+2)"
 }

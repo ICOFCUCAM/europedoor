@@ -1,32 +1,117 @@
 {
-  "code": "sm", "slug": "san-marino", "name": "San Marino", "official": "Republic of San Marino",
-  "macro": "mediterranean", "capital": "City of San Marino", "currency": "EUR — euro",
-  "languages": ["Italian"],
-  "blocs": ["eurozone"],
+  "code": "sm",
+  "slug": "san-marino",
+  "name": "San Marino",
+  "official": "Republic of San Marino",
+  "macro": "mediterranean",
+  "capital": "City of San Marino",
+  "currency": "EUR — euro",
+  "languages": [
+    "Italian"
+  ],
+  "blocs": [
+    "eurozone"
+  ],
   "tagline": "The world's oldest surviving republic, on a limestone crag with three towers on the ridge.",
   "summary": "San Marino claims a founding date of 301 and has been continuously self-governing ever since, which makes it the oldest republic in existence. It sits on Monte Titano, entirely surrounded by Italy, twenty minutes from the Adriatic beaches at Rimini. Two heads of state are elected every six months. It is small, unashamedly touristic in the centre, and has a view over half of Romagna.",
-  "interests": ["history", "architecture", "mountains"],
-  "budget": "moderate", "daily_eur": [55, 130],
-  "season": { "peak": ["may", "jun", "sep"], "shoulder": ["apr", "jul", "aug", "oct"],
-    "note": "Spring and early autumn are best; the ridge is exposed and hot in July. Winter brings fog that makes the towers appear to float, which is worth timing for." },
-  "getting_around": "A bus from Rimini takes fifty minutes; a cable car climbs from Borgo Maggiore to the old town. The historic centre is stepped and closed to traffic.",
-  "food": ["Piadina, the Romagna flatbread, filled and folded", "Torta Tre Monti, a wafer cake named after the three towers", "Sangiovese from the surrounding hills"],
-  "festivals": [
-    { "name": "Investiture of the Captains Regent", "month": "apr", "where": "City of San Marino" },
-    { "name": "Medieval Days", "month": "jul", "where": "City of San Marino" },
-    { "name": "Second investiture of the year", "month": "oct", "where": "City of San Marino" }
+  "interests": [
+    "history",
+    "architecture",
+    "mountains"
   ],
-  "know": ["No border control with Italy; the euro is used but San Marino mints its own collectable coins.", "Passport stamps are available for a fee at the tourist office.", "The historic centre and Monte Titano are UNESCO-listed."],
+  "budget": "moderate",
+  "daily_eur": [
+    55,
+    130
+  ],
+  "season": {
+    "peak": [
+      "may",
+      "jun",
+      "sep"
+    ],
+    "shoulder": [
+      "apr",
+      "jul",
+      "aug",
+      "oct"
+    ],
+    "note": "Spring and early autumn are best; the ridge is exposed and hot in July. Winter brings fog that makes the towers appear to float, which is worth timing for."
+  },
+  "getting_around": "A bus from Rimini takes fifty minutes; a cable car climbs from Borgo Maggiore to the old town. The historic centre is stepped and closed to traffic.",
+  "food": [
+    "Piadina, the Romagna flatbread, filled and folded",
+    "Torta Tre Monti, a wafer cake named after the three towers",
+    "Sangiovese from the surrounding hills"
+  ],
+  "festivals": [
+    {
+      "name": "Investiture of the Captains Regent",
+      "month": "apr",
+      "where": "City of San Marino",
+      "kind": "cultural"
+    },
+    {
+      "name": "Medieval Days",
+      "month": "jul",
+      "where": "City of San Marino",
+      "kind": "cultural"
+    },
+    {
+      "name": "Second investiture of the year",
+      "month": "oct",
+      "where": "City of San Marino",
+      "kind": "cultural"
+    }
+  ],
+  "know": [
+    "No border control with Italy; the euro is used but San Marino mints its own collectable coins.",
+    "Passport stamps are available for a fee at the tourist office.",
+    "The historic centre and Monte Titano are UNESCO-listed."
+  ],
   "regions": [
-    { "slug": "monte-titano", "name": "Monte Titano",
+    {
+      "slug": "monte-titano",
+      "name": "Monte Titano",
       "summary": "The ridge, its three fortresses, and the republic's old town below them.",
-      "interests": ["history", "architecture", "mountains"],
+      "interests": [
+        "history",
+        "architecture",
+        "mountains"
+      ],
       "cities": [
-        { "slug": "city-of-san-marino", "name": "City of San Marino", "lat": 43.94, "lon": 12.45,
+        {
+          "slug": "city-of-san-marino",
+          "name": "City of San Marino",
+          "lat": 43.94,
+          "lon": 12.45,
           "summary": "A walled town at 750 metres with three towers along the crest and the Adriatic visible on a clear day.",
-          "interests": ["history", "architecture", "mountains"], "nights": [1, 1],
-          "highlights": ["The Passo delle Streghe, the path linking the first two towers along the cliff", "Guaita, the oldest tower, from the 11th century", "The view to Rimini and the sea, 20 kilometres away and 750 metres down"],
-          "experiences": [{ "slug": "san-marino-tower-ridge", "name": "The witches' path between the towers", "kind": "walk", "band": "low", "summary": "A narrow ridge path with drops on both sides, linking Guaita and Cesta; twenty minutes, and the whole reason the republic survived." }] }
-      ] }
-  ]
+          "interests": [
+            "history",
+            "architecture",
+            "mountains"
+          ],
+          "nights": [
+            1,
+            1
+          ],
+          "highlights": [
+            "The Passo delle Streghe, the path linking the first two towers along the cliff",
+            "Guaita, the oldest tower, from the 11th century",
+            "The view to Rimini and the sea, 20 kilometres away and 750 metres down"
+          ],
+          "experiences": [
+            {
+              "slug": "san-marino-tower-ridge",
+              "name": "The witches' path between the towers",
+              "kind": "walk",
+              "band": "low",
+              "summary": "A narrow ridge path with drops on both sides, linking Guaita and Cesta; twenty minutes, and the whole reason the republic survived."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "timezone": "CET/CEST (UTC+1/+2)"
 }

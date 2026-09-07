@@ -1,46 +1,183 @@
 {
-  "code": "az", "slug": "azerbaijan", "name": "Azerbaijan", "official": "Republic of Azerbaijan",
-  "macro": "caucasus-bosphorus", "capital": "Baku", "currency": "AZN — Azerbaijani manat",
-  "languages": ["Azerbaijani"],
+  "code": "az",
+  "slug": "azerbaijan",
+  "name": "Azerbaijan",
+  "official": "Republic of Azerbaijan",
+  "macro": "caucasus-bosphorus",
+  "capital": "Baku",
+  "currency": "AZN — Azerbaijani manat",
+  "languages": [
+    "Azerbaijani"
+  ],
   "blocs": [],
   "tagline": "Fire that comes out of the ground, a walled medieval city, and oil money spent on architecture.",
   "summary": "Azerbaijan sits on the Caspian, on gas reserves that have been burning at the surface for millennia — the Zoroastrian fire temples were built around them. Baku pairs a walled old city with a skyline of flame-shaped towers. Beyond the capital the Greater Caucasus rises to 4,000 metres with mountain villages that kept their own languages, and mud volcanoes cover the semi-desert south.",
-  "interests": ["history", "architecture", "mountains", "food", "nature"],
-  "budget": "moderate", "daily_eur": [35, 95],
-  "season": { "peak": ["apr", "may", "sep", "oct"], "shoulder": ["jun", "nov"],
-    "note": "Spring and autumn; Baku is hot and windy in summer and the mountains are best from June to September. Novruz in March is the biggest holiday of the year." },
-  "getting_around": "A modern railway links Baku to Ganja and Sheki. Buses and shared taxis cover the rest. Mountain villages like Xinaliq need a 4x4. The Armenian border is closed.",
-  "food": ["Plov, in dozens of versions, cooked in a pastry crust for feasts", "Dolma and kebab, argued over with every neighbour", "Tea from a pear-shaped armudu glass, with jam rather than sugar"],
-  "festivals": [
-    { "name": "Novruz, the spring new year", "month": "mar", "where": "Nationwide" },
-    { "name": "Baku Jazz Festival", "month": "oct", "where": "Baku" },
-    { "name": "Pomegranate Festival", "month": "nov", "where": "Göyçay" }
+  "interests": [
+    "history",
+    "architecture",
+    "mountains",
+    "food",
+    "nature"
   ],
-  "know": ["The border with Armenia is closed; an Armenian stamp can complicate entry.", "Baku's old city and the Gobustan petroglyphs are both UNESCO-listed.", "Tea houses are a social institution and usually male-dominated outside the capital."],
+  "budget": "moderate",
+  "daily_eur": [
+    35,
+    95
+  ],
+  "season": {
+    "peak": [
+      "apr",
+      "may",
+      "sep",
+      "oct"
+    ],
+    "shoulder": [
+      "jun",
+      "nov"
+    ],
+    "note": "Spring and autumn; Baku is hot and windy in summer and the mountains are best from June to September. Novruz in March is the biggest holiday of the year."
+  },
+  "getting_around": "A modern railway links Baku to Ganja and Sheki. Buses and shared taxis cover the rest. Mountain villages like Xinaliq need a 4x4. The Armenian border is closed.",
+  "food": [
+    "Plov, in dozens of versions, cooked in a pastry crust for feasts",
+    "Dolma and kebab, argued over with every neighbour",
+    "Tea from a pear-shaped armudu glass, with jam rather than sugar"
+  ],
+  "festivals": [
+    {
+      "name": "Novruz, the spring new year",
+      "month": "mar",
+      "where": "Nationwide",
+      "kind": "seasonal"
+    },
+    {
+      "name": "Baku Jazz Festival",
+      "month": "oct",
+      "where": "Baku",
+      "kind": "concert"
+    },
+    {
+      "name": "Pomegranate Festival",
+      "month": "nov",
+      "where": "Göyçay",
+      "kind": "food"
+    }
+  ],
+  "know": [
+    "The border with Armenia is closed; an Armenian stamp can complicate entry.",
+    "Baku's old city and the Gobustan petroglyphs are both UNESCO-listed.",
+    "Tea houses are a social institution and usually male-dominated outside the capital."
+  ],
   "regions": [
-    { "slug": "baku-and-the-caspian", "name": "Baku & the Caspian",
+    {
+      "slug": "baku-and-the-caspian",
+      "name": "Baku & the Caspian",
       "summary": "The walled city, the flame towers, the fire temple and the petroglyphs south of town.",
-      "interests": ["history", "architecture", "nature"],
+      "interests": [
+        "history",
+        "architecture",
+        "nature"
+      ],
       "cities": [
-        { "slug": "baku", "name": "Baku", "lat": 40.41, "lon": 49.87,
+        {
+          "slug": "baku",
+          "name": "Baku",
+          "lat": 40.41,
+          "lon": 49.87,
           "summary": "A UNESCO-listed walled city with a mysterious stone tower, ringed by oil-boom mansions and three flame-shaped skyscrapers.",
-          "interests": ["architecture", "history", "food", "cities"], "nights": [2, 3],
-          "highlights": ["Icherisheher, the walled old city, and the Maiden Tower nobody can fully explain", "The Heydar Aliyev Centre, Zaha Hadid's curved white building", "Ateshgah, the fire temple, and Yanar Dag, a hillside that has burned for centuries", "Gobustan's 6,000 petroglyphs and the mud volcanoes beside them"],
-          "experiences": [{ "slug": "gobustan-mud-volcanoes", "name": "Petroglyphs and mud volcanoes", "kind": "walk", "band": "moderate", "summary": "Rock carvings of boats and dancers from 10,000 years ago, then a field of cold mud volcanoes burping methane a few kilometres on." }] }
-      ] },
-    { "slug": "the-north-west", "name": "The Northwest & the Mountains",
+          "interests": [
+            "architecture",
+            "history",
+            "food",
+            "cities"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Icherisheher, the walled old city, and the Maiden Tower nobody can fully explain",
+            "The Heydar Aliyev Centre, Zaha Hadid's curved white building",
+            "Ateshgah, the fire temple, and Yanar Dag, a hillside that has burned for centuries",
+            "Gobustan's 6,000 petroglyphs and the mud volcanoes beside them"
+          ],
+          "experiences": [
+            {
+              "slug": "gobustan-mud-volcanoes",
+              "name": "Petroglyphs and mud volcanoes",
+              "kind": "walk",
+              "band": "moderate",
+              "summary": "Rock carvings of boats and dancers from 10,000 years ago, then a field of cold mud volcanoes burping methane a few kilometres on."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "the-north-west",
+      "name": "The Northwest & the Mountains",
       "summary": "Sheki's caravanserai and stained glass, and villages high in the Greater Caucasus.",
-      "interests": ["history", "mountains", "food"],
+      "interests": [
+        "history",
+        "mountains",
+        "food"
+      ],
       "cities": [
-        { "slug": "sheki", "name": "Sheki", "lat": 41.19, "lon": 47.17, "quiet": true,
+        {
+          "slug": "sheki",
+          "name": "Sheki",
+          "lat": 41.19,
+          "lon": 47.17,
+          "quiet": true,
           "summary": "A silk road town under wooded mountains, with a khan's summer palace whose windows are built without glue or nails.",
-          "interests": ["history", "architecture", "food"], "nights": [1, 2],
-          "highlights": ["The Palace of Sheki Khans, with shebeke lattice windows of 5,000 pieces each", "The caravanserai, still taking guests", "Sheki halva, layered and made only here"],
-          "experiences": [{ "slug": "sheki-shebeke-workshop", "name": "Shebeke: glass without glue", "kind": "workshop", "band": "low", "summary": "Wooden lattice and coloured glass assembled entirely by friction; the workshops still make them and will show you the joints." }] },
-        { "slug": "xinaliq", "name": "Xınalıq", "lat": 41.18, "lon": 48.30, "quiet": true,
+          "interests": [
+            "history",
+            "architecture",
+            "food"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Palace of Sheki Khans, with shebeke lattice windows of 5,000 pieces each",
+            "The caravanserai, still taking guests",
+            "Sheki halva, layered and made only here"
+          ],
+          "experiences": [
+            {
+              "slug": "sheki-shebeke-workshop",
+              "name": "Shebeke: glass without glue",
+              "kind": "workshop",
+              "band": "low",
+              "summary": "Wooden lattice and coloured glass assembled entirely by friction; the workshops still make them and will show you the joints."
+            }
+          ]
+        },
+        {
+          "slug": "xinaliq",
+          "name": "Xınalıq",
+          "lat": 41.18,
+          "lon": 48.3,
+          "quiet": true,
           "summary": "A village at 2,300 metres whose people speak a language related to nothing else, reached by a single mountain road.",
-          "interests": ["mountains", "nature", "history"], "nights": [1, 2],
-          "highlights": ["Flat-roofed stone houses stacked up the slope", "The Ketsh language, spoken by a few thousand people and nobody else", "Shepherd routes into the high Caucasus"] }
-      ] }
-  ]
+          "interests": [
+            "mountains",
+            "nature",
+            "history"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Flat-roofed stone houses stacked up the slope",
+            "The Ketsh language, spoken by a few thousand people and nobody else",
+            "Shepherd routes into the high Caucasus"
+          ]
+        }
+      ]
+    }
+  ],
+  "timezone": "AZT (UTC+4, no DST)"
 }

@@ -157,10 +157,24 @@ def home(data):
         x, y = project(n["city"]["lat"], n["city"]["lon"])
         cls = " advisory" if n["country"].get("advisory") else ""
         dots.append(f'<circle class="herodot{cls}" cx="{x:.1f}" cy="{y:.1f}" r="4"/>')
+    # The specification's first homepage section is an interactive map with
+    # filters. The filters live on the map; these open it with one already
+    # applied, which is the same thing minus a second full map on the
+    # homepage that would have to be kept in step with the first.
+    HOME_LAYERS = ["nature", "mountains", "coast", "history", "sacred", "food",
+                   "wine", "islands", "winter", "cities"]
+    layerchips = "".join(
+        f'<a class="chip" href="/map?layer={esc(k)}">'
+        f'<span aria-hidden="true">{esc(data["interests"][k]["icon"])}</span> '
+        f'{esc(data["interests"][k]["name"])}</a>'
+        for k in HOME_LAYERS
+    )
     heromap = (
-        f'<a class="heromap" href="/map" aria-label="Map of all {len(data["cities"])} cities in the Atlas">'
+        f'<a class="heromap" href="/map" aria-label="Map of all {len(data["cities"])} places in the Atlas">'
         f'<svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true">{"".join(dots)}</svg>'
-        f'<span class="heromap-cap">{len(data["cities"])} cities. Every one has a page.</span></a>'
+        f'<span class="heromap-cap">{len(data["cities"])} places. Every one has a page.</span></a>'
+        f'<div class="chips heromap-filters">{layerchips}'
+        f'<a class="chip" href="/beyond-the-obvious">◦ Hidden Europe</a></div>'
     )
 
     body = f"""
@@ -171,9 +185,17 @@ def home(data):
   <p class="lede">Fifty countries, their regions, their cities and what is worth your time in
   each — held in one structure, so a fjord in Vestland and a cellar in Alentejo can appear in
   the same itinerary without either being flattened into a listicle.</p>
+  <form class="askhome" action="/plan" method="get">
+    <label for="homeask">Where would you like to go?</label>
+    <input type="text" id="homeask" name="ask" autocomplete="off"
+           placeholder="I have 10 days in September. I love mountains, history and local food.">
+    <button class="btn" type="submit">Build me a journey</button>
+  </form>
+  <p class="small askhome-note">Read by rules in your browser on the next page — not by a
+  model, and not sent anywhere.</p>
   <div class="hero-actions">
-    <a class="btn" href="/plan">Plan a journey</a>
-    <a class="btn ghost" href="/countries">Open the Atlas</a>
+    <a class="btn ghost" href="/discover">Explore Europe</a>
+    <a class="btn ghost" href="/countries">Every country</a>
     <a class="btn ghost" href="/search">Search everything</a>
   </div>
   <p class="small" style="margin-top:var(--s6)">{ncountries} countries · {nregions} travel regions ·
@@ -300,17 +322,66 @@ def country_page(data, c):
             card(urls.region(c, r), "Region", r["name"], r["summary"], seed=f"region:{c['slug']}:{r['slug']}", meta=meta)
         )
     festivals = "".join(
-        f"""<div class="row"><div><h3>{esc(f['name'])}</h3>
+        f"""<a class="row" href="{urls.month(f['month'])}"><div><h3>{esc(f['name'])}</h3>
         <p class="rowsub">{esc(f.get('where', ''))}</p></div>
-        <p class="rowmeta">{esc(data['taxonomy']['month_names'][f['month']])}</p></div>"""
+        <p class="rowmeta">{esc(EVENT_KIND_NAMES[f['kind']])} · {esc(data['taxonomy']['month_names'][f['month']])}</p></a>"""
         for f in c["festivals"]
     )
+
+    # The specification asks a country page for popular destinations,
+    # experiences, journeys and stories. "Popular" is not a thing we can
+    # measure — there is no traffic — so it is the destinations we have
+    # written most about, and the page says so.
+    ranked = sorted(
+        ((r, t) for r in c["regions"] for t in r["cities"]),
+        key=lambda rt: -(len(rt[1].get("places", [])) * 2 + len(rt[1].get("experiences", []))
+                         + len(rt[1]["highlights"])),
+    )
+    popular = [
+        card(urls.city(c, r, t), f"{r['name']}", t["name"], t["summary"],
+             seed=f"city:{c['slug']}:{t['slug']}",
+             meta=f'<p class="cardmeta">{len(t.get("places", []))} places · '
+                  f'{len(t.get("experiences", []))} experiences</p>')
+        for r, t in ranked[:6]
+    ]
+    kinds_map = data["taxonomy"]["experience_kinds"]
+    # Slice the list, never the HTML: truncating the joined string cut a
+    # closing tag in half and produced one malformed page.
+    cexp_items = [
+        (r, t, e) for r in c["regions"] for t in r["cities"] for e in t.get("experiences", [])
+    ][:8]
+    cexps = "".join(
+        f"""<a class="row" href="{urls.city(c, r, t)}#things-to-do">
+        <div><h3>{esc(e['name'])}</h3><p class="rowsub">{esc(e['summary'])}</p></div>
+        <p class="rowmeta">{esc(t['name'])} · {esc(kinds_map[e['kind']])}</p></a>"""
+        for r, t, e in cexp_items
+    )
+    seen_j, cjourneys = set(), ""
+    seen_s, cstories = set(), ""
+    for r in c["regions"]:
+        for t in r["cities"]:
+            b = data["back"][f"{c['slug']}/{r['slug']}/{t['slug']}"]
+            for j in b["journeys"]:
+                if j["slug"] in seen_j:
+                    continue
+                seen_j.add(j["slug"])
+                cjourneys += (f"""<a class="row" href="{urls.journey(j)}">
+                    <div><h3>{esc(j['name'])}</h3><p class="rowsub">{esc(j['strapline'])}</p></div>
+                    <p class="rowmeta">{j['days']} days · via {esc(t['name'])}</p></a>""")
+            for st in b["stories"]:
+                if st["slug"] in seen_s:
+                    continue
+                seen_s.add(st["slug"])
+                cstories += (f"""<a class="row" href="{urls.story(st)}">
+                    <div><h3>{esc(st['title'])}</h3><p class="rowsub">{esc(st['standfirst'])}</p></div>
+                    <p class="rowmeta">{esc(st['section'])} · {esc(st['reading'])}</p></a>""")
     know = "".join(f"<li>{esc(k)}</li>" for k in c["know"])
     food = "".join(f"<li>{esc(f)}</li>" for f in c["food"])
     facts = factlist([
         ("Capital", esc(c["capital"])),
         ("Currency", esc(c["currency"])),
         ("Languages", esc(", ".join(c["languages"]))),
+        ("Time zone", esc(c.get("timezone", ""))),
         ("Membership", esc(bloc_line(data, c))),
         ("Typical day", daily_line(data, c)),
         ("Best months", esc(months_line(data, c["season"]["peak"]))),
@@ -344,10 +415,23 @@ def country_page(data, c):
   </aside>
 </div>
 
-{section("Travel regions", grid(region_cards, 3),
+{section("Travel regions", grid(region_cards, 3), id="regions",
          lede=f"{len(c['regions'])} editorial regions, each opening onto its cities.")}
 
-{section("Fixed points in the year", f'<div class="rows">{festivals}</div>') if festivals else ""}
+{section("Popular destinations", grid(popular, 3),
+         lede="The destinations we have written most about, which is not the same as the ones most people go to — and is the only ranking we can honestly compute.",
+         more=("Every region", "#regions")) if popular else ""}
+
+{section("Experiences here", f'<div class="rows">{cexps}</div>',
+         lede=f"A sample of what is listed across {esc(c['name'])}.",
+         more=("Every experience category", "/experiences")) if cexps else ""}
+
+{section("Journeys through " + c["name"], f'<div class="rows">{cjourneys}</div>') if cjourneys else ""}
+
+{section("Stories set here", f'<div class="rows">{cstories}</div>') if cstories else ""}
+
+{section("Fixed points in the year", f'<div class="rows">{festivals}</div>',
+         more=("The whole European year", "/events")) if festivals else ""}
 """
     return f"/europe/{c['slug']}/index.html", page(
         c["name"], body, path=urls.country(c), area="countries",
@@ -357,6 +441,37 @@ def country_page(data, c):
 
 def region_page(data, c, r):
     m = next(x for x in data["macros"] if x["slug"] == c["macro_slug"])
+    # The specification asks a region page for geography, culture, cities,
+    # attractions, food, experiences, events, accommodation and journeys.
+    # Everything we hold at this level is aggregated here rather than left
+    # for the reader to assemble by clicking through every destination.
+    kinds_map = data["taxonomy"]["experience_kinds"]
+    rplaces = [(t, pl) for t in r["cities"] for pl in t.get("places", [])]
+    rexps = [(t, e) for t in r["cities"] for e in t.get("experiences", [])]
+    placerows = "".join(
+        f"""<a class="row" href="{urls.place(c, r, t, pl)}">
+        <div><h3>{esc(pl['name'])}</h3><p class="rowsub">{esc(pl['summary'])}</p></div>
+        <p class="rowmeta">{esc(t['name'])} · {esc(PLACE_KIND_NAMES[pl['kind']])}</p></a>"""
+        for t, pl in rplaces
+    )
+    exprows = "".join(
+        f"""<a class="row" href="{urls.city(c, r, t)}#things-to-do">
+        <div><h3>{esc(e['name'])}</h3><p class="rowsub">{esc(e['summary'])}</p></div>
+        <p class="rowmeta">{esc(t['name'])} · {esc(kinds_map[e['kind']])}</p></a>"""
+        for t, e in rexps
+    )
+    seen, jrows = set(), ""
+    for t in r["cities"]:
+        for j in data["back"][f"{c['slug']}/{r['slug']}/{t['slug']}"]["journeys"]:
+            if j["slug"] in seen:
+                continue
+            seen.add(j["slug"])
+            jrows += (f"""<a class="row" href="{urls.journey(j)}">
+                <div><h3>{esc(j['name'])}</h3><p class="rowsub">{esc(j['strapline'])}</p></div>
+                <p class="rowmeta">{j['days']} days · via {esc(t['name'])}</p></a>""")
+    # Named apart from `nights`, which the card loop below reuses for a
+    # per-destination range — the collision made this a list at render time.
+    pass_nights = sum(sum(t["nights"]) / 2 for t in r["cities"])
     cards = []
     for t in r["cities"]:
         nights = t["nights"]
@@ -371,8 +486,27 @@ def region_page(data, c, r):
   <h1>{esc(r['name'])}</h1>
   <p class="lede">{esc(r['summary'])}</p>
   {chips(r["interests"], data["interests"])}
+  {factlist([
+      ("Destinations", str(len(r["cities"]))),
+      ("Places recorded", str(len(rplaces))),
+      ("Experiences", str(len(rexps))),
+      ("A full pass", f"about {int(pass_nights)} nights"),
+      ("Best months", esc(months_line(data, c["season"]["peak"]))),
+      ("Typical day", daily_line(data, c)),
+  ])}
 </div>
-{grid(cards, 3)}
+{section("Destinations", grid(cards, 3))}
+{section("Places to see", f'<div class="rows">{placerows}</div>',
+         lede=f"Everything recorded across {esc(r['name'])}, in one list.") if placerows else ""}
+{section("Things to do", f'<div class="rows">{exprows}</div>') if exprows else ""}
+{section("Journeys through " + r["name"], f'<div class="rows">{jrows}</div>') if jrows else ""}
+{section("Accommodation & restaurants", STAY_NOTE)}
+<div class="note">
+  <h2 class="mini">Food, events and practicalities are on the country page</h2>
+  <p>They belong to {esc(c['name'])} rather than to {esc(r['name'])}, and repeating them on
+  every region page is how two copies of a fact start disagreeing.
+  <a href="{urls.country(c)}">{esc(c['name'])} →</a></p>
+</div>
 """
     return f"/europe/{c['slug']}/{r['slug']}/index.html", page(
         f"{r['name']}, {c['name']}", body, path=urls.region(c, r), area="countries",
@@ -498,6 +632,10 @@ def city_page(data, c, r, t):
     <p><button class="btn ghost" type="button" data-save="city:{esc(cid)}" data-kind="Place" data-label="{esc(t['name'])}, {esc(c['name'])}" data-url="{urls.city(c, r, t)}">Save to My Europe</button></p>
   </aside>
 </div>
+{section("Travel tips", '<ul class="stack">' + "".join(f"<li>{esc(k)}</li>" for k in c["know"]) + "</ul>",
+         id="tips",
+         lede=f"Practical things about {esc(c['name'])} that are not obvious from outside it.")}
+
 {section("Accommodation & restaurants", STAY_NOTE, id="stay")}
 
 {section("Nearest onward stops", f'<div class="rows">{nearrows}</div>',
@@ -630,10 +768,29 @@ def journey_page(data, j):
         ("Transport", esc(", ".join(j["transport"]))),
         ("Accommodation", esc(j["accommodation"])),
         ("Budget shape", esc(j["budget"])),
+        ("Curated by", esc(j["creator"])),
         ("Estimated cost", f"about €{est:,} per person"),
         ("Months that work", esc(months_line(data, j["months"]))),
     ])
     packlist = "".join(f"<li>{esc(x)}</li>" for x in j["pack"])
+    kinds_map = data["taxonomy"]["experience_kinds"]
+    jexp_items = [
+        (idx[l["city"]], e)
+        for l in j["legs"] for e in idx[l["city"]]["city"].get("experiences", [])
+    ][:10]
+    jexps = "".join(
+        f"""<a class="row" href="{urls.city(n['country'], n['region'], n['city'])}#things-to-do">
+        <div><h3>{esc(e['name'])}</h3><p class="rowsub">{esc(e['summary'])}</p></div>
+        <p class="rowmeta">{esc(n['city']['name'])} · {esc(kinds_map[e['kind']])}</p></a>"""
+        for n, e in jexp_items
+    )
+    seen_food, jfood = set(), ""
+    for l in j["legs"]:
+        cc = idx[l["city"]]["country"]
+        if cc["slug"] in seen_food:
+            continue
+        seen_food.add(cc["slug"])
+        jfood += f"<li><strong>{esc(cc['name'])}</strong> — {esc(cc['food'][0])}</li>"
     body = f"""
 {crumbs([("Europe", "/discover"), ("Journeys", "/journeys"), (j["name"], None)])}
 <div class="pagehead">
@@ -651,6 +808,12 @@ def journey_page(data, j):
     <h2>The route</h2>
     {routemap(data, j)}
     <ul class="legs">{''.join(legs)}</ul>
+
+    <h2 style="margin-top:var(--s7)">Experiences along the way</h2>
+    {f'<div class="rows">{jexps}</div>' if jexps else '<p class="small">Nothing listed on this route yet.</p>'}
+
+    <h2 style="margin-top:var(--s7)">What you will be eating</h2>
+    <ul class="stack">{jfood}</ul>
 
     <h2 style="margin-top:var(--s7)">What to pack</h2>
     <ul class="stack">{packlist}</ul>
@@ -729,6 +892,7 @@ def planner_api(data):
     ]
     return "/api/atlas.json", {
         "generated": "build",
+        "currencies": data["taxonomy"].get("currencies", {}),
         "interests": data["taxonomy"]["interests"],
         "months": data["taxonomy"]["months"],
         "monthNames": data["taxonomy"]["month_names"],
@@ -747,6 +911,11 @@ def planner_page(data):
     months = "".join(
         f'<option value="{esc(m)}">{esc(data["taxonomy"]["month_names"][m])}</option>'
         for m in data["taxonomy"]["months"]
+    )
+    cx = data["taxonomy"].get("currencies", {})
+    curoptions = "".join(
+        f'<option value="{esc(code)}"{" selected" if code == "EUR" else ""}>{esc(code)}</option>'
+        for code in sorted(cx.get("rates", {}))
     )
     budgets = "".join(
         f'<option value="{esc(b["slug"])}"{" selected" if b["slug"] == "moderate" else ""}>'
@@ -811,6 +980,42 @@ def planner_page(data):
         <div class="field">
           <label for="start">Start from</label>
           <select id="start" name="start"><option value="">Anywhere that fits</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label for="end">End near</label>
+          <select id="end" name="end"><option value="">Wherever it gets to</option></select>
+        </div>
+        <div class="field">
+          <label for="travellers">Travellers</label>
+          <input type="number" id="travellers" name="travellers" min="1" max="12" value="1" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="accommodation">Accommodation</label>
+          <select id="accommodation" name="accommodation">
+            <option value="mixed" selected>Mixed — whatever suits the place</option>
+            <option value="guesthouse">Guesthouses and small places</option>
+            <option value="hotel">Hotels</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label for="transport">Getting between</label>
+          <select id="transport" name="transport">
+            <option value="any" selected>Whatever is quickest</option>
+            <option value="rail">Rail and ferry, no flights</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="currency">Show costs in</label>
+          <select id="currency" name="currency">{curoptions}</select>
+        </div>
+        <div class="field">
+          <label for="saved">Places you saved</label>
+          <label class="inlinecheck"><input type="checkbox" id="saved" name="saved">
+          Favour the ones in My Europe</label>
         </div>
       </div>
       <fieldset class="fieldset">
@@ -1048,6 +1253,12 @@ def facet_page(data, c, r, t, key, payload):
 
 
 # ── places ────────────────────────────────────────────────────────────
+
+EVENT_KIND_NAMES = {
+    "festival": "Festival", "concert": "Music", "sport": "Sport",
+    "exhibition": "Exhibition", "religious": "Religious", "cultural": "Cultural",
+    "food": "Food", "market": "Market", "seasonal": "Seasonal",
+}
 
 PLACE_KIND_NAMES = {
     "museum": "Museum", "castle": "Castle", "church": "Church",
@@ -1537,12 +1748,16 @@ def theme_page(data, t):
 # ── stories ───────────────────────────────────────────────────────────
 
 def stories_index(data):
-    cards = [
-        card(f"/stories/{s['slug']}", s["section"], s["title"], s["standfirst"],
-             seed="story:" + s["slug"], meta=f'<p class="cardmeta">{esc(s["reading"])}</p>')
-        for s in data["stories"]
-    ]
     sections = sorted({s["section"] for s in data["stories"]})
+    desks = ""
+    for desk in sections:
+        items = [s for s in data["stories"] if s["section"] == desk]
+        desks += section(desk, grid([
+            card(urls.story(s), s["published"], s["title"], s["standfirst"],
+                 seed="story:" + s["slug"],
+                 meta=f'<p class="cardmeta">{esc(s["reading"])}</p>')
+            for s in items
+        ], 3))
     body = f"""
 {crumbs([("Europe", "/discover"), ("Stories", None)])}
 <div class="pagehead">
@@ -1552,7 +1767,7 @@ def stories_index(data):
   food, faith, nature and culture. Every story links into the Atlas, and every Atlas page that
   a story touches links back, so reading and planning are the same motion.</p>
 </div>
-{grid(cards, 3)}
+{desks}
 """
     return "/stories/index.html", page(
         "Stories", body, path="/stories", area=None,
@@ -1562,6 +1777,12 @@ def stories_index(data):
 
 def story_page(data, s):
     paras = "".join(f"<p>{esc(p)}</p>" for p in s["body"])
+    updated = ("" if s["updated"] == s["published"]
+               else f', updated <time datetime="{esc(s["updated"])}">{esc(s["updated"])}</time>')
+    tagchips = "".join(
+        f'<a class="chip" href="/search?q={esc(t.replace(" ", "+"))}">{esc(t)}</a>'
+        for t in s["tags"]
+    )
     links = ""
     if s.get("places"):
         rows = "".join(
@@ -1579,6 +1800,9 @@ def story_page(data, s):
   <p class="kicker">{esc(s['section'])} · {esc(s['reading'])}</p>
   <h1>{esc(s['title'])}</h1>
   <p class="lede">{esc(s['standfirst'])}</p>
+  <p class="small byline">By {esc(s['author'])} · published
+  <time datetime="{esc(s['published'])}">{esc(s['published'])}</time>{updated}</p>
+  <div class="chips">{tagchips}</div>
 </div>
 <div class="card-art" style="border:1px solid var(--rule);border-radius:var(--radius);aspect-ratio:21/9;overflow:hidden">
 {plate("story:" + s["slug"], 1260, 540, s["title"])}
@@ -1732,9 +1956,9 @@ def events_page(data):
         if not items:
             continue
         rows = "".join(
-            f"""<a class="row" href="{urls.country(c)}">
+            f"""<a class="row event" data-kind="{esc(f['kind'])}" href="{urls.country(c)}">
             <div><h3>{esc(f['name'])}</h3><p class="rowsub">{esc(f.get('where', ''))}</p></div>
-            <p class="rowmeta">{esc(c['name'])}</p></a>"""
+            <p class="rowmeta">{esc(EVENT_KIND_NAMES[f['kind']])} · {esc(c['name'])}</p></a>"""
             for f, c in items
         )
         blocks.append(
@@ -1749,6 +1973,15 @@ def events_page(data):
         for m in data["taxonomy"]["months"]
     )
     total = sum(len(v) for v in by_month.values())
+    kindcounts = {}
+    for v in by_month.values():
+        for f, _ in v:
+            kindcounts[f["kind"]] = kindcounts.get(f["kind"], 0) + 1
+    kindfilters = "".join(
+        f'<label><input type="checkbox" name="eventkind" value="{esc(k)}"> '
+        f'{esc(EVENT_KIND_NAMES[k])} ({n})</label>'
+        for k, n in sorted(kindcounts.items(), key=lambda kv: -kv[1])
+    )
     body = f"""
 {crumbs([("Europe", "/discover"), ("Events", None)])}
 <div class="pagehead">
@@ -1759,11 +1992,14 @@ def events_page(data):
   Dated listings for a given year need a live events feed, which is Stage 2.</p>
   <div class="chips">{jump}</div>
 </div>
+<div class="checks" id="eventkinds">{kindfilters}</div>
+<p class="small" id="eventcount"></p>
 {''.join(blocks)}
 """
     return "/events/index.html", page(
         "Events", body, path="/events", area=None,
-        description="The recurring European year: festivals, markets, pilgrimages and seasonal events, month by month.",
+        description="The recurring European year: festivals, markets, pilgrimages and seasonal events, month by month, filterable by category.",
+        scripts=["/assets/js/events.js"],
     )
 
 
@@ -1780,9 +2016,9 @@ def events_month_page(data, month):
                 fixtures.append((f, c))
     fixtures.sort(key=lambda p: p[1]["name"])
     rows = "".join(
-        f"""<a class="row" href="{urls.country(c)}">
+        f"""<a class="row event" data-kind="{esc(f['kind'])}" href="{urls.country(c)}">
         <div><h3>{esc(f['name'])}</h3><p class="rowsub">{esc(f.get('where', ''))}</p></div>
-        <p class="rowmeta">{esc(c['name'])}</p></a>"""
+        <p class="rowmeta">{esc(EVENT_KIND_NAMES[f['kind']])} · {esc(c['name'])}</p></a>"""
         for f, c in fixtures
     )
 

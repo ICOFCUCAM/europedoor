@@ -1,53 +1,218 @@
 {
-  "code": "ge", "slug": "georgia", "name": "Georgia", "official": "Georgia",
-  "macro": "caucasus-bosphorus", "capital": "Tbilisi", "currency": "GEL — Georgian lari",
-  "languages": ["Georgian"],
+  "code": "ge",
+  "slug": "georgia",
+  "name": "Georgia",
+  "official": "Georgia",
+  "macro": "caucasus-bosphorus",
+  "capital": "Tbilisi",
+  "currency": "GEL — Georgian lari",
+  "languages": [
+    "Georgian"
+  ],
   "blocs": [],
   "tagline": "Eight thousand years of winemaking, its own alphabet, and mountains higher than the Alps.",
   "summary": "Georgia has been making wine in buried clay qvevri for eight millennia — the oldest evidence anywhere — and has an alphabet used by no other language. It sits on the southern side of the Greater Caucasus, with 5,000-metre peaks, and its supra feasting tradition, presided over by a tamada, is a formal institution rather than a party. A Council of Europe member, and European by most political definitions.",
-  "interests": ["wine", "food", "mountains", "sacred", "history", "wild"],
-  "budget": "low", "daily_eur": [25, 75],
-  "season": { "peak": ["may", "jun", "sep", "oct"], "shoulder": ["apr", "jul", "aug"],
-    "note": "Late spring and early autumn are best; the harvest (rtveli) in September and October is the country at its most characteristic. High mountain roads to Tusheti and Ushguli open roughly June to October and close hard." },
-  "getting_around": "Marshrutka minibuses reach everywhere, leaving when full. The Tbilisi–Batumi train is comfortable. Mountain roads need a 4x4 and a driver who knows them; the Tusheti road is genuinely dangerous.",
-  "food": ["Khachapuri, cheese bread, in regional forms — the Adjarian one has an egg on top", "Khinkali, soup dumplings held by the twisted top, which is left uneaten", "Amber wine: white grapes fermented on skins in buried qvevri"],
-  "festivals": [
-    { "name": "Rtveli, the grape harvest", "month": "sep", "where": "Kakheti" },
-    { "name": "Tbilisoba, the city's festival", "month": "oct", "where": "Tbilisi" },
-    { "name": "Orthodox Easter", "month": "apr", "where": "Nationwide" }
+  "interests": [
+    "wine",
+    "food",
+    "mountains",
+    "sacred",
+    "history",
+    "wild"
   ],
-  "know": ["A supra has rules: the tamada leads, toasts are made in sequence, and you do not toast out of turn.", "Abkhazia and South Ossetia are outside government control and should not be entered from Russia.", "Sulphur baths in Tbilisi are a genuine local habit, not a tourist product."],
+  "budget": "low",
+  "daily_eur": [
+    25,
+    75
+  ],
+  "season": {
+    "peak": [
+      "may",
+      "jun",
+      "sep",
+      "oct"
+    ],
+    "shoulder": [
+      "apr",
+      "jul",
+      "aug"
+    ],
+    "note": "Late spring and early autumn are best; the harvest (rtveli) in September and October is the country at its most characteristic. High mountain roads to Tusheti and Ushguli open roughly June to October and close hard."
+  },
+  "getting_around": "Marshrutka minibuses reach everywhere, leaving when full. The Tbilisi–Batumi train is comfortable. Mountain roads need a 4x4 and a driver who knows them; the Tusheti road is genuinely dangerous.",
+  "food": [
+    "Khachapuri, cheese bread, in regional forms — the Adjarian one has an egg on top",
+    "Khinkali, soup dumplings held by the twisted top, which is left uneaten",
+    "Amber wine: white grapes fermented on skins in buried qvevri"
+  ],
+  "festivals": [
+    {
+      "name": "Rtveli, the grape harvest",
+      "month": "sep",
+      "where": "Kakheti",
+      "kind": "food"
+    },
+    {
+      "name": "Tbilisoba, the city's festival",
+      "month": "oct",
+      "where": "Tbilisi",
+      "kind": "cultural"
+    },
+    {
+      "name": "Orthodox Easter",
+      "month": "apr",
+      "where": "Nationwide",
+      "kind": "religious"
+    }
+  ],
+  "know": [
+    "A supra has rules: the tamada leads, toasts are made in sequence, and you do not toast out of turn.",
+    "Abkhazia and South Ossetia are outside government control and should not be entered from Russia.",
+    "Sulphur baths in Tbilisi are a genuine local habit, not a tourist product."
+  ],
   "regions": [
-    { "slug": "tbilisi-and-kakheti", "name": "Tbilisi & Kakheti",
+    {
+      "slug": "tbilisi-and-kakheti",
+      "name": "Tbilisi & Kakheti",
       "summary": "The capital in its gorge, and the wine country east of it.",
-      "interests": ["wine", "food", "history", "sacred"],
+      "interests": [
+        "wine",
+        "food",
+        "history",
+        "sacred"
+      ],
       "cities": [
-        { "slug": "tbilisi", "name": "Tbilisi", "lat": 41.72, "lon": 44.79,
+        {
+          "slug": "tbilisi",
+          "name": "Tbilisi",
+          "lat": 41.72,
+          "lon": 44.79,
           "summary": "Wooden balconies, a fortress above, sulphur baths below, and Persian, Russian and Soviet layers in the same street.",
-          "interests": ["food", "wine", "history", "architecture", "cities"], "nights": [2, 3],
-          "highlights": ["The sulphur bath district, with domed brick roofs at ground level", "Narikala fortress and the cable car to it", "The dry bridge flea market, selling Soviet everything", "Wine bars pouring qvevri wines by the glass"],
+          "interests": [
+            "food",
+            "wine",
+            "history",
+            "architecture",
+            "cities"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The sulphur bath district, with domed brick roofs at ground level",
+            "Narikala fortress and the cable car to it",
+            "The dry bridge flea market, selling Soviet everything",
+            "Wine bars pouring qvevri wines by the glass"
+          ],
           "experiences": [
-            { "slug": "tbilisi-sulphur-bath", "name": "A private room at the sulphur baths", "kind": "water", "band": "low", "summary": "Hot spring water at 40°C, a hard scrub if you want one, and an hour that costs less than a meal." }
-          ] },
-        { "slug": "sighnaghi", "name": "Sighnaghi & Kakheti", "lat": 41.62, "lon": 45.92, "quiet": true,
+            {
+              "slug": "tbilisi-sulphur-bath",
+              "name": "A private room at the sulphur baths",
+              "kind": "water",
+              "band": "low",
+              "summary": "Hot spring water at 40°C, a hard scrub if you want one, and an hour that costs less than a meal."
+            }
+          ]
+        },
+        {
+          "slug": "sighnaghi",
+          "name": "Sighnaghi & Kakheti",
+          "lat": 41.62,
+          "lon": 45.92,
+          "quiet": true,
           "summary": "A walled hill town over the Alazani valley, with the Caucasus on the horizon and vineyards to the foot of them.",
-          "interests": ["wine", "food", "history"], "nights": [1, 2],
-          "highlights": ["Family cellars fermenting in buried qvevri", "The town walls, 4 km with 23 towers", "Bodbe monastery, and the valley view from below it"],
-          "experiences": [{ "slug": "kakheti-qvevri-cellar", "name": "A qvevri cellar and a supra", "kind": "cellar", "band": "low", "summary": "Wine fermented in clay buried to the neck, then a table that goes on for hours with a tamada running it." }] }
-      ] },
-    { "slug": "the-caucasus", "name": "The Greater Caucasus",
+          "interests": [
+            "wine",
+            "food",
+            "history"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Family cellars fermenting in buried qvevri",
+            "The town walls, 4 km with 23 towers",
+            "Bodbe monastery, and the valley view from below it"
+          ],
+          "experiences": [
+            {
+              "slug": "kakheti-qvevri-cellar",
+              "name": "A qvevri cellar and a supra",
+              "kind": "cellar",
+              "band": "low",
+              "summary": "Wine fermented in clay buried to the neck, then a table that goes on for hours with a tamada running it."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "the-caucasus",
+      "name": "The Greater Caucasus",
       "summary": "Svaneti's stone towers, Kazbegi's church on a ridge, and roads that close with the snow.",
-      "interests": ["mountains", "history", "wild", "nature"],
+      "interests": [
+        "mountains",
+        "history",
+        "wild",
+        "nature"
+      ],
       "cities": [
-        { "slug": "mestia", "name": "Mestia, Svaneti", "lat": 43.04, "lon": 42.73, "quiet": true,
+        {
+          "slug": "mestia",
+          "name": "Mestia, Svaneti",
+          "lat": 43.04,
+          "lon": 42.73,
+          "quiet": true,
           "summary": "A mountain region of defensive stone towers built by families against each other, under 5,000-metre peaks.",
-          "interests": ["mountains", "history", "wild"], "nights": [2, 4],
-          "highlights": ["Koshki towers, 9th to 13th century, one per family", "Ushguli, among the highest permanently inhabited villages in Europe", "The four-day Mestia to Ushguli trek"],
-          "experiences": [{ "slug": "svaneti-trek", "name": "Mestia to Ushguli on foot", "kind": "walk", "band": "moderate", "summary": "Four days between villages with guesthouses each night, no need to carry a tent, and glaciers in view most of the way." }] },
-        { "slug": "kazbegi", "name": "Stepantsminda (Kazbegi)", "lat": 42.66, "lon": 44.64,
+          "interests": [
+            "mountains",
+            "history",
+            "wild"
+          ],
+          "nights": [
+            2,
+            4
+          ],
+          "highlights": [
+            "Koshki towers, 9th to 13th century, one per family",
+            "Ushguli, among the highest permanently inhabited villages in Europe",
+            "The four-day Mestia to Ushguli trek"
+          ],
+          "experiences": [
+            {
+              "slug": "svaneti-trek",
+              "name": "Mestia to Ushguli on foot",
+              "kind": "walk",
+              "band": "moderate",
+              "summary": "Four days between villages with guesthouses each night, no need to carry a tent, and glaciers in view most of the way."
+            }
+          ]
+        },
+        {
+          "slug": "kazbegi",
+          "name": "Stepantsminda (Kazbegi)",
+          "lat": 42.66,
+          "lon": 44.64,
           "summary": "A village under a 5,047-metre volcano, with a 14th-century church on a spur above it.",
-          "interests": ["mountains", "sacred", "nature"], "nights": [1, 2],
-          "highlights": ["Gergeti Trinity church, walked up in two hours", "The Georgian Military Highway through the Jvari pass", "Glacier views from the trail above the church"] }
-      ] }
-  ]
+          "interests": [
+            "mountains",
+            "sacred",
+            "nature"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Gergeti Trinity church, walked up in two hours",
+            "The Georgian Military Highway through the Jvari pass",
+            "Glacier views from the trail above the church"
+          ]
+        }
+      ]
+    }
+  ],
+  "timezone": "GET (UTC+4, no DST)"
 }

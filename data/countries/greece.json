@@ -54,17 +54,20 @@
     {
       "name": "Orthodox Easter — the biggest event of the year",
       "month": "apr",
-      "where": "Nationwide, especially the islands"
+      "where": "Nationwide, especially the islands",
+      "kind": "religious"
     },
     {
       "name": "Athens & Epidaurus Festival, in ancient theatres",
       "month": "jun",
-      "where": "Athens and Epidaurus"
+      "where": "Athens and Epidaurus",
+      "kind": "cultural"
     },
     {
       "name": "Grape harvest and village panigiria",
       "month": "aug",
-      "where": "Islands and mountain villages"
+      "where": "Islands and mountain villages",
+      "kind": "food"
     }
   ],
   "know": [
@@ -1118,5 +1121,6 @@
         }
       ]
     }
-  ]
+  ],
+  "timezone": "EET/EEST (UTC+2/+3)"
 }

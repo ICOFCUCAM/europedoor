@@ -24,6 +24,13 @@
       : dots.length + " cities. Turn on a layer to narrow it.";
   }
 
+  // Arriving from the homepage with ?layer=mountains turns that layer on.
+  var wanted = new URLSearchParams(location.search).get("layer");
+  if (wanted) {
+    var pre = box.querySelector('input[name="layer"][value="' + wanted + '"]');
+    if (pre) pre.checked = true;
+  }
+
   box.addEventListener("change", apply);
   apply();
 

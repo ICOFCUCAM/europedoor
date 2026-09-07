@@ -1,68 +1,300 @@
 {
-  "code": "pt", "slug": "portugal", "name": "Portugal", "official": "Portuguese Republic",
-  "macro": "mediterranean", "capital": "Lisbon", "currency": "EUR — euro",
-  "languages": ["Portuguese", "Mirandese"],
-  "blocs": ["eu", "schengen", "eurozone", "eea"],
+  "code": "pt",
+  "slug": "portugal",
+  "name": "Portugal",
+  "official": "Portuguese Republic",
+  "macro": "mediterranean",
+  "capital": "Lisbon",
+  "currency": "EUR — euro",
+  "languages": [
+    "Portuguese",
+    "Mirandese"
+  ],
+  "blocs": [
+    "eu",
+    "schengen",
+    "eurozone",
+    "eea"
+  ],
   "tagline": "Europe's western edge, facing an ocean it once mapped, with the oldest fixed borders on the continent.",
   "summary": "Portugal has looked outward for six hundred years and inward for the rest, which shows in its architecture — Manueline stonework covered in ropes and sea creatures — and its food, built on cod fished off Newfoundland. The Atlantic keeps it cooler and wilder than Spain. Lisbon and Porto have both been thoroughly discovered; the Alentejo, the Beiras and the interior have not.",
-  "interests": ["coast", "food", "wine", "history", "architecture", "music", "sacred"],
-  "budget": "moderate", "daily_eur": [50, 125],
-  "season": { "peak": ["may", "jun", "sep", "oct"], "shoulder": ["apr", "nov"],
-    "note": "Spring and autumn are the best of it; the Algarve is full from June to September and the interior is very hot. The Douro harvest in late September is the country at its most itself. Winter is mild, wet and cheap." },
-  "getting_around": "Alfa Pendular trains link Lisbon and Porto in under three hours. The Douro line is one of Europe's great scenic railways. Buses reach the Alentejo; a car helps everywhere rural.",
-  "food": ["Bacalhau, salt cod, in a claimed 365 preparations", "Pastel de nata, eaten warm with cinnamon, standing at a counter", "Grilled sardines in June, and the whole country smells of them"],
-  "festivals": [
-    { "name": "Santos Populares — sardines, basil and street parties", "month": "jun", "where": "Lisbon and Porto" },
-    { "name": "Douro grape harvest", "month": "sep", "where": "The Douro valley" },
-    { "name": "Festa de São João, with hammers and bonfires", "month": "jun", "where": "Porto" }
+  "interests": [
+    "coast",
+    "food",
+    "wine",
+    "history",
+    "architecture",
+    "music",
+    "sacred"
   ],
-  "know": ["The couvert — bread, olives, cheese put on your table — is charged unless you send it back.", "Fado has two schools, Lisbon's and Coimbra's, and neither is background music.", "Atlantic beaches have real currents; the flag system is enforced and worth obeying."],
+  "budget": "moderate",
+  "daily_eur": [
+    50,
+    125
+  ],
+  "season": {
+    "peak": [
+      "may",
+      "jun",
+      "sep",
+      "oct"
+    ],
+    "shoulder": [
+      "apr",
+      "nov"
+    ],
+    "note": "Spring and autumn are the best of it; the Algarve is full from June to September and the interior is very hot. The Douro harvest in late September is the country at its most itself. Winter is mild, wet and cheap."
+  },
+  "getting_around": "Alfa Pendular trains link Lisbon and Porto in under three hours. The Douro line is one of Europe's great scenic railways. Buses reach the Alentejo; a car helps everywhere rural.",
+  "food": [
+    "Bacalhau, salt cod, in a claimed 365 preparations",
+    "Pastel de nata, eaten warm with cinnamon, standing at a counter",
+    "Grilled sardines in June, and the whole country smells of them"
+  ],
+  "festivals": [
+    {
+      "name": "Santos Populares — sardines, basil and street parties",
+      "month": "jun",
+      "where": "Lisbon and Porto",
+      "kind": "food"
+    },
+    {
+      "name": "Douro grape harvest",
+      "month": "sep",
+      "where": "The Douro valley",
+      "kind": "food"
+    },
+    {
+      "name": "Festa de São João, with hammers and bonfires",
+      "month": "jun",
+      "where": "Porto",
+      "kind": "religious"
+    }
+  ],
+  "know": [
+    "The couvert — bread, olives, cheese put on your table — is charged unless you send it back.",
+    "Fado has two schools, Lisbon's and Coimbra's, and neither is background music.",
+    "Atlantic beaches have real currents; the flag system is enforced and worth obeying."
+  ],
   "regions": [
-    { "slug": "lisbon-and-the-west", "name": "Lisbon & the West",
+    {
+      "slug": "lisbon-and-the-west",
+      "name": "Lisbon & the West",
       "summary": "The capital on seven hills, a romantic mountain town above it, and the surf coast beyond.",
-      "interests": ["cities", "architecture", "music", "coast", "food"],
+      "interests": [
+        "cities",
+        "architecture",
+        "music",
+        "coast",
+        "food"
+      ],
       "cities": [
-        { "slug": "lisbon", "name": "Lisbon", "lat": 38.72, "lon": -9.14,
+        {
+          "slug": "lisbon",
+          "name": "Lisbon",
+          "lat": 38.72,
+          "lon": -9.14,
           "summary": "A tiled, hilly, sea-facing capital rebuilt on a grid after the 1755 earthquake, with trams that still climb the old parts.",
-          "interests": ["cities", "architecture", "food", "music", "coast"], "nights": [3, 4],
-          "highlights": ["The Gulbenkian, one of the best private collections ever assembled, in a garden", "Jerónimos monastery's Manueline cloister at Belém", "Tram 28 at seven in the morning, or not at all", "Fado in Alfama, in a room of thirty people"],
+          "interests": [
+            "cities",
+            "architecture",
+            "food",
+            "music",
+            "coast"
+          ],
+          "nights": [
+            3,
+            4
+          ],
+          "highlights": [
+            "The Gulbenkian, one of the best private collections ever assembled, in a garden",
+            "Jerónimos monastery's Manueline cloister at Belém",
+            "Tram 28 at seven in the morning, or not at all",
+            "Fado in Alfama, in a room of thirty people"
+          ],
           "experiences": [
-            { "slug": "lisbon-fado-house", "name": "Fado in a small house", "kind": "stage", "band": "moderate", "summary": "Lights down, conversation stops, and two guitars. The venues that ask for silence are the ones worth finding." },
-            { "slug": "lisbon-tiles-walk", "name": "Azulejos, street by street", "kind": "walk", "band": "low", "summary": "Tiled facades were cheap weatherproofing before they were beautiful; the Tile Museum explains it and then the streets deliver it." }
-          ] },
-        { "slug": "sintra", "name": "Sintra", "lat": 38.80, "lon": -9.39,
+            {
+              "slug": "lisbon-fado-house",
+              "name": "Fado in a small house",
+              "kind": "stage",
+              "band": "moderate",
+              "summary": "Lights down, conversation stops, and two guitars. The venues that ask for silence are the ones worth finding."
+            },
+            {
+              "slug": "lisbon-tiles-walk",
+              "name": "Azulejos, street by street",
+              "kind": "walk",
+              "band": "low",
+              "summary": "Tiled facades were cheap weatherproofing before they were beautiful; the Tile Museum explains it and then the streets deliver it."
+            }
+          ]
+        },
+        {
+          "slug": "sintra",
+          "name": "Sintra",
+          "lat": 38.8,
+          "lon": -9.39,
           "summary": "A microclimate of mist and forest on a ridge, with romantic palaces built into it by people with too much money.",
-          "interests": ["architecture", "nature", "history"], "nights": [1, 2],
-          "highlights": ["Pena Palace, painted in colours that should not work", "Quinta da Regaleira's initiation well, a spiral into the ground", "The Moorish castle walls along the ridge"] }
-      ] },
-    { "slug": "porto-and-the-douro", "name": "Porto & the Douro",
+          "interests": [
+            "architecture",
+            "nature",
+            "history"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Pena Palace, painted in colours that should not work",
+            "Quinta da Regaleira's initiation well, a spiral into the ground",
+            "The Moorish castle walls along the ridge"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "porto-and-the-douro",
+      "name": "Porto & the Douro",
       "summary": "A granite river city, and the terraced valley that invented demarcated wine.",
-      "interests": ["wine", "food", "architecture", "rail"],
+      "interests": [
+        "wine",
+        "food",
+        "architecture",
+        "rail"
+      ],
       "cities": [
-        { "slug": "porto", "name": "Porto", "lat": 41.15, "lon": -8.61,
+        {
+          "slug": "porto",
+          "name": "Porto",
+          "lat": 41.15,
+          "lon": -8.61,
           "summary": "Steep, granite and blue-tiled, with port lodges across the river and an ocean at the end of the tram line.",
-          "interests": ["wine", "food", "architecture", "cities"], "nights": [2, 3],
-          "highlights": ["Livraria Lello, and the queue that proves it", "Port lodges in Vila Nova de Gaia, tasted in order", "São Bento station's 20,000 tiles", "Francesinha, which is not for the faint-hearted"],
-          "experiences": [{ "slug": "porto-port-lodge", "name": "Port, tasted in the right order", "kind": "cellar", "band": "moderate", "summary": "White, then tawny by age, then vintage — the tawnies are where the interest is and where the guides usually rush." }] },
-        { "slug": "pinhao", "name": "Pinhão & the Douro valley", "lat": 41.19, "lon": -7.54, "quiet": true,
+          "interests": [
+            "wine",
+            "food",
+            "architecture",
+            "cities"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Livraria Lello, and the queue that proves it",
+            "Port lodges in Vila Nova de Gaia, tasted in order",
+            "São Bento station's 20,000 tiles",
+            "Francesinha, which is not for the faint-hearted"
+          ],
+          "experiences": [
+            {
+              "slug": "porto-port-lodge",
+              "name": "Port, tasted in the right order",
+              "kind": "cellar",
+              "band": "moderate",
+              "summary": "White, then tawny by age, then vintage — the tawnies are where the interest is and where the guides usually rush."
+            }
+          ]
+        },
+        {
+          "slug": "pinhao",
+          "name": "Pinhão & the Douro valley",
+          "lat": 41.19,
+          "lon": -7.54,
+          "quiet": true,
           "summary": "Terraced schist vineyards falling into a dammed river, worked by hand because machines cannot stand up on them.",
-          "interests": ["wine", "nature", "rail", "food"], "nights": [2, 3],
-          "highlights": ["The Douro railway along the water from Peso da Régua", "Quintas that take guests and let you pick during harvest", "Foot-treading in granite lagares, still done for the top wines"],
-          "experiences": [{ "slug": "douro-harvest-treading", "name": "Treading grapes at harvest", "kind": "cellar", "band": "moderate", "summary": "Knee-deep in a granite tank for two hours, in a line, to a rhythm — the least romantic and most enjoyable part of winemaking." }] }
-      ] },
-    { "slug": "alentejo-and-the-south", "name": "The Alentejo & the South",
+          "interests": [
+            "wine",
+            "nature",
+            "rail",
+            "food"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The Douro railway along the water from Peso da Régua",
+            "Quintas that take guests and let you pick during harvest",
+            "Foot-treading in granite lagares, still done for the top wines"
+          ],
+          "experiences": [
+            {
+              "slug": "douro-harvest-treading",
+              "name": "Treading grapes at harvest",
+              "kind": "cellar",
+              "band": "moderate",
+              "summary": "Knee-deep in a granite tank for two hours, in a line, to a rhythm — the least romantic and most enjoyable part of winemaking."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "alentejo-and-the-south",
+      "name": "The Alentejo & the South",
       "summary": "Cork oak plains, a walled Roman city, and a wilder coast west of the Algarve.",
-      "interests": ["wine", "history", "coast", "food"],
+      "interests": [
+        "wine",
+        "history",
+        "coast",
+        "food"
+      ],
       "cities": [
-        { "slug": "evora", "name": "Évora", "lat": 38.57, "lon": -7.91, "quiet": true,
+        {
+          "slug": "evora",
+          "name": "Évora",
+          "lat": 38.57,
+          "lon": -7.91,
+          "quiet": true,
           "summary": "A walled town with a Roman temple in the middle, a chapel of bones, and megaliths in the fields around it.",
-          "interests": ["history", "sacred", "wine", "food"], "nights": [1, 2],
-          "highlights": ["The Temple of Diana, standing since the 1st century", "The Capela dos Ossos and its unambiguous doorway inscription", "Almendres cromlech, older than Stonehenge, and usually empty"],
-          "experiences": [{ "slug": "alentejo-cork-and-wine", "name": "Cork oaks and Alentejo reds", "kind": "cellar", "band": "low", "summary": "The trees are stripped every nine years and the date is painted on the trunk; the wine estates between them charge a fraction of the Douro." }] },
-        { "slug": "lagos", "name": "Lagos & the Algarve", "lat": 37.10, "lon": -8.67,
+          "interests": [
+            "history",
+            "sacred",
+            "wine",
+            "food"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Temple of Diana, standing since the 1st century",
+            "The Capela dos Ossos and its unambiguous doorway inscription",
+            "Almendres cromlech, older than Stonehenge, and usually empty"
+          ],
+          "experiences": [
+            {
+              "slug": "alentejo-cork-and-wine",
+              "name": "Cork oaks and Alentejo reds",
+              "kind": "cellar",
+              "band": "low",
+              "summary": "The trees are stripped every nine years and the date is painted on the trunk; the wine estates between them charge a fraction of the Douro."
+            }
+          ]
+        },
+        {
+          "slug": "lagos",
+          "name": "Lagos & the Algarve",
+          "lat": 37.1,
+          "lon": -8.67,
           "summary": "Golden cliffs, sea caves and the harbour that launched the age of exploration — and, less proudly, Europe's first slave market.",
-          "interests": ["coast", "history", "food"], "nights": [2, 3],
-          "highlights": ["Ponta da Piedade's arches and grottoes by kayak", "The Rota Vicentina north into the wild west coast", "Cataplana seafood, cooked in its own copper pot"] }
-      ] }
-  ]
+          "interests": [
+            "coast",
+            "history",
+            "food"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Ponta da Piedade's arches and grottoes by kayak",
+            "The Rota Vicentina north into the wild west coast",
+            "Cataplana seafood, cooked in its own copper pot"
+          ]
+        }
+      ]
+    }
+  ],
+  "timezone": "WET/WEST (UTC+0/+1)"
 }

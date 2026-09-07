@@ -1,53 +1,222 @@
 {
-  "code": "hu", "slug": "hungary", "name": "Hungary", "official": "Hungary",
-  "macro": "alpine-central", "capital": "Budapest", "currency": "HUF — Hungarian forint",
-  "languages": ["Hungarian"],
-  "blocs": ["eu", "schengen", "eea"],
+  "code": "hu",
+  "slug": "hungary",
+  "name": "Hungary",
+  "official": "Hungary",
+  "macro": "alpine-central",
+  "capital": "Budapest",
+  "currency": "HUF — Hungarian forint",
+  "languages": [
+    "Hungarian"
+  ],
+  "blocs": [
+    "eu",
+    "schengen",
+    "eea"
+  ],
   "tagline": "A thermal-water capital on the Danube, a language related to almost nothing, and sweet wine that outlived empires.",
   "summary": "Hungary sits on a plain of hot springs — Budapest alone has over a hundred, and the bathing culture runs from Roman to Ottoman to imperial. The language is Finno-Ugric and unrelated to any neighbour, which has shaped a certain separateness. Beyond the capital there is Lake Balaton, the volcanic wine hills above it, and Tokaj, where botrytised wine was made a century before Sauternes.",
-  "interests": ["architecture", "food", "wine", "music", "history", "cities"],
-  "budget": "moderate", "daily_eur": [40, 105],
-  "season": { "peak": ["may", "jun", "jul", "aug", "sep"], "shoulder": ["apr", "oct"],
-    "note": "Budapest is good year-round and the outdoor thermal baths are best in January, steaming in the cold. Balaton is a summer place and dead outside it. Harvest in Tokaj is October, late." },
-  "getting_around": "Budapest's metro line 1 is the oldest on the continent after London and still running. Trains reach Balaton, Eger and Tokaj slowly and cheaply. The capital is walkable and its trams are useful.",
-  "food": ["Paprika, in everything, and not interchangeable with chilli", "Goulash, which is a soup here and not a stew", "Tokaji Aszú, sweet, ancient and unlike any other dessert wine"],
-  "festivals": [
-    { "name": "Budapest Spring Festival", "month": "apr", "where": "Budapest" },
-    { "name": "Sziget Festival, on an island in the Danube", "month": "aug", "where": "Budapest" },
-    { "name": "Tokaj harvest", "month": "oct", "where": "Tokaj" }
+  "interests": [
+    "architecture",
+    "food",
+    "wine",
+    "music",
+    "history",
+    "cities"
   ],
-  "know": ["The forint, not the euro; exchange rates at street bureaux are usually terrible.", "In the baths, bring flip-flops and a towel or hire both; some pools require a cap.", "Ruin bars occupy derelict courtyards in the old Jewish quarter, which is also a memorial district — the two coexist awkwardly."],
+  "budget": "moderate",
+  "daily_eur": [
+    40,
+    105
+  ],
+  "season": {
+    "peak": [
+      "may",
+      "jun",
+      "jul",
+      "aug",
+      "sep"
+    ],
+    "shoulder": [
+      "apr",
+      "oct"
+    ],
+    "note": "Budapest is good year-round and the outdoor thermal baths are best in January, steaming in the cold. Balaton is a summer place and dead outside it. Harvest in Tokaj is October, late."
+  },
+  "getting_around": "Budapest's metro line 1 is the oldest on the continent after London and still running. Trains reach Balaton, Eger and Tokaj slowly and cheaply. The capital is walkable and its trams are useful.",
+  "food": [
+    "Paprika, in everything, and not interchangeable with chilli",
+    "Goulash, which is a soup here and not a stew",
+    "Tokaji Aszú, sweet, ancient and unlike any other dessert wine"
+  ],
+  "festivals": [
+    {
+      "name": "Budapest Spring Festival",
+      "month": "apr",
+      "where": "Budapest",
+      "kind": "cultural"
+    },
+    {
+      "name": "Sziget Festival, on an island in the Danube",
+      "month": "aug",
+      "where": "Budapest",
+      "kind": "concert"
+    },
+    {
+      "name": "Tokaj harvest",
+      "month": "oct",
+      "where": "Tokaj",
+      "kind": "food"
+    }
+  ],
+  "know": [
+    "The forint, not the euro; exchange rates at street bureaux are usually terrible.",
+    "In the baths, bring flip-flops and a towel or hire both; some pools require a cap.",
+    "Ruin bars occupy derelict courtyards in the old Jewish quarter, which is also a memorial district — the two coexist awkwardly."
+  ],
   "regions": [
-    { "slug": "budapest-and-the-danube-bend", "name": "Budapest & the Danube Bend",
+    {
+      "slug": "budapest-and-the-danube-bend",
+      "name": "Budapest & the Danube Bend",
       "summary": "Two cities on either bank, and the river's sharp turn north of them.",
-      "interests": ["architecture", "music", "food", "cities"],
+      "interests": [
+        "architecture",
+        "music",
+        "food",
+        "cities"
+      ],
       "cities": [
-        { "slug": "budapest", "name": "Budapest", "lat": 47.50, "lon": 19.04,
+        {
+          "slug": "budapest",
+          "name": "Budapest",
+          "lat": 47.5,
+          "lon": 19.04,
           "summary": "Hilly Buda and flat Pest, joined by bridges, with a parliament on the water and a hundred hot springs underneath.",
-          "interests": ["architecture", "food", "music", "cities", "history"], "nights": [3, 4],
-          "highlights": ["Széchenyi and Gellért baths — one grand and outdoor, one Art Nouveau and indoor", "The parliament, seen from the Buda side at night", "The Great Market Hall, and lángos on the upper floor", "The House of Terror, in the building both secret polices used"],
+          "interests": [
+            "architecture",
+            "food",
+            "music",
+            "cities",
+            "history"
+          ],
+          "nights": [
+            3,
+            4
+          ],
+          "highlights": [
+            "Széchenyi and Gellért baths — one grand and outdoor, one Art Nouveau and indoor",
+            "The parliament, seen from the Buda side at night",
+            "The Great Market Hall, and lángos on the upper floor",
+            "The House of Terror, in the building both secret polices used"
+          ],
           "experiences": [
-            { "slug": "budapest-thermal-bath", "name": "An outdoor thermal bath in winter", "kind": "water", "band": "moderate", "summary": "38°C water, snow on the stone, and old men playing chess on floating boards. Go early; go on a weekday." },
-            { "slug": "budapest-ruin-bar", "name": "A ruin bar, before it fills", "kind": "stage", "band": "low", "summary": "Derelict courtyard buildings filled with salvaged furniture; Szimpla was the first and is still worth an early evening." }
-          ] },
-        { "slug": "szentendre", "name": "Szentendre", "lat": 47.67, "lon": 19.08, "quiet": true,
+            {
+              "slug": "budapest-thermal-bath",
+              "name": "An outdoor thermal bath in winter",
+              "kind": "water",
+              "band": "moderate",
+              "summary": "38°C water, snow on the stone, and old men playing chess on floating boards. Go early; go on a weekday."
+            },
+            {
+              "slug": "budapest-ruin-bar",
+              "name": "A ruin bar, before it fills",
+              "kind": "stage",
+              "band": "low",
+              "summary": "Derelict courtyard buildings filled with salvaged furniture; Szimpla was the first and is still worth an early evening."
+            }
+          ]
+        },
+        {
+          "slug": "szentendre",
+          "name": "Szentendre",
+          "lat": 47.67,
+          "lon": 19.08,
+          "quiet": true,
           "summary": "A Serbian Orthodox artists' town on the river, forty minutes from the capital by suburban rail.",
-          "interests": ["art", "sacred", "history"], "nights": [1, 1],
-          "highlights": ["Orthodox churches from the 18th-century Serb migration", "The open-air ethnographic museum outside town", "Marzipan, oddly, and a museum of it"] }
-      ] },
-    { "slug": "balaton-and-the-wine-country", "name": "Balaton & the Wine Country",
+          "interests": [
+            "art",
+            "sacred",
+            "history"
+          ],
+          "nights": [
+            1,
+            1
+          ],
+          "highlights": [
+            "Orthodox churches from the 18th-century Serb migration",
+            "The open-air ethnographic museum outside town",
+            "Marzipan, oddly, and a museum of it"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "balaton-and-the-wine-country",
+      "name": "Balaton & the Wine Country",
       "summary": "Central Europe's largest lake, volcanic hills above it, and Tokaj to the northeast.",
-      "interests": ["wine", "coast", "food", "nature"],
+      "interests": [
+        "wine",
+        "coast",
+        "food",
+        "nature"
+      ],
       "cities": [
-        { "slug": "tihany", "name": "Tihany, Lake Balaton", "lat": 46.91, "lon": 17.89, "quiet": true,
+        {
+          "slug": "tihany",
+          "name": "Tihany, Lake Balaton",
+          "lat": 46.91,
+          "lon": 17.89,
+          "quiet": true,
           "summary": "A lavender peninsula with an abbey on a cliff, sticking into a shallow warm lake.",
-          "interests": ["coast", "wine", "sacred", "nature"], "nights": [1, 2],
-          "highlights": ["The abbey and its 1055 founding charter — the oldest written Hungarian", "Lavender fields in late June", "Water warm enough to stand in for hours, and rarely deeper than four metres"] },
-        { "slug": "tokaj", "name": "Tokaj", "lat": 48.12, "lon": 21.41, "quiet": true,
+          "interests": [
+            "coast",
+            "wine",
+            "sacred",
+            "nature"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The abbey and its 1055 founding charter — the oldest written Hungarian",
+            "Lavender fields in late June",
+            "Water warm enough to stand in for hours, and rarely deeper than four metres"
+          ]
+        },
+        {
+          "slug": "tokaj",
+          "name": "Tokaj",
+          "lat": 48.12,
+          "lon": 21.41,
+          "quiet": true,
           "summary": "The world's first classified wine region, from 1737, on volcanic slopes at a river confluence.",
-          "interests": ["wine", "history", "food"], "nights": [1, 2],
-          "highlights": ["Aszú berries picked individually, one shrivelled grape at a time", "Cellars cut into rock and furred with black mould", "Dry furmint, which is the region's current argument"],
-          "experiences": [{ "slug": "tokaj-cellar-tasting", "name": "A mouldy cellar in Tokaj", "kind": "cellar", "band": "low", "summary": "The black fungus on the walls regulates humidity and is left alone deliberately; taste dry furmint first and six-puttonyos last." }] }
-      ] }
-  ]
+          "interests": [
+            "wine",
+            "history",
+            "food"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Aszú berries picked individually, one shrivelled grape at a time",
+            "Cellars cut into rock and furred with black mould",
+            "Dry furmint, which is the region's current argument"
+          ],
+          "experiences": [
+            {
+              "slug": "tokaj-cellar-tasting",
+              "name": "A mouldy cellar in Tokaj",
+              "kind": "cellar",
+              "band": "low",
+              "summary": "The black fungus on the walls regulates humidity and is left alone deliberately; taste dry furmint first and six-puttonyos last."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "timezone": "CET/CEST (UTC+1/+2)"
 }

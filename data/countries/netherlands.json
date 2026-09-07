@@ -1,52 +1,216 @@
 {
-  "code": "nl", "slug": "netherlands", "name": "Netherlands", "official": "Kingdom of the Netherlands",
-  "macro": "western", "capital": "Amsterdam", "currency": "EUR — euro",
-  "languages": ["Dutch", "Frisian"],
-  "blocs": ["eu", "schengen", "eurozone", "eea"],
+  "code": "nl",
+  "slug": "netherlands",
+  "name": "Netherlands",
+  "official": "Kingdom of the Netherlands",
+  "macro": "western",
+  "capital": "Amsterdam",
+  "currency": "EUR — euro",
+  "languages": [
+    "Dutch",
+    "Frisian"
+  ],
+  "blocs": [
+    "eu",
+    "schengen",
+    "eurozone",
+    "eea"
+  ],
   "tagline": "A country built on purpose, mostly below sea level, and cycled end to end.",
   "summary": "A quarter of the Netherlands lies below sea level and nearly all of it was arranged by people — drained, diked, pumped and planned. That habit of design runs through the painting, the cities and the bicycle infrastructure, which is the best on earth and not close. Amsterdam absorbs most visitors; Utrecht, Rotterdam and the northern islands absorb almost none.",
-  "interests": ["art", "design", "architecture", "cities", "food"],
-  "budget": "high", "daily_eur": [85, 185],
-  "season": { "peak": ["apr", "may", "jun", "jul", "aug"], "shoulder": ["sep", "oct"],
-    "note": "The bulb fields flower from late March to mid-May and that is a genuine spectacle with genuine crowds. Summer is long-evening terrace weather. Winter is grey and flat, and the museums are empty, which is a fair trade." },
-  "getting_around": "Trains are frequent and the whole country is inside two hours. Rent a bicycle in every city; the lanes are separated, signposted and used by everyone from toddlers to pensioners in suits. The OV-chipkaart or a contactless card covers everything.",
-  "food": ["Raw herring, held by the tail, with onion — in season from June", "Stroopwafel, made fresh on a market griddle rather than boxed", "Indonesian rijsttafel, a colonial legacy taken very seriously"],
-  "festivals": [
-    { "name": "King's Day — the whole country in orange, and a national flea market", "month": "apr", "where": "Nationwide, especially Amsterdam" },
-    { "name": "Bulb season at Keukenhof", "month": "apr", "where": "Lisse" },
-    { "name": "Sinterklaas", "month": "dec", "where": "Nationwide" }
+  "interests": [
+    "art",
+    "design",
+    "architecture",
+    "cities",
+    "food"
   ],
-  "know": ["Do not walk in the bicycle lane. This is the single most reliable way to annoy a Dutch person.", "Amsterdam's centre is heavily regulated now — tours, rentals and behaviour all more restricted than the reputation suggests.", "Almost everyone speaks excellent English and will switch before you finish your first Dutch sentence."],
+  "budget": "high",
+  "daily_eur": [
+    85,
+    185
+  ],
+  "season": {
+    "peak": [
+      "apr",
+      "may",
+      "jun",
+      "jul",
+      "aug"
+    ],
+    "shoulder": [
+      "sep",
+      "oct"
+    ],
+    "note": "The bulb fields flower from late March to mid-May and that is a genuine spectacle with genuine crowds. Summer is long-evening terrace weather. Winter is grey and flat, and the museums are empty, which is a fair trade."
+  },
+  "getting_around": "Trains are frequent and the whole country is inside two hours. Rent a bicycle in every city; the lanes are separated, signposted and used by everyone from toddlers to pensioners in suits. The OV-chipkaart or a contactless card covers everything.",
+  "food": [
+    "Raw herring, held by the tail, with onion — in season from June",
+    "Stroopwafel, made fresh on a market griddle rather than boxed",
+    "Indonesian rijsttafel, a colonial legacy taken very seriously"
+  ],
+  "festivals": [
+    {
+      "name": "King's Day — the whole country in orange, and a national flea market",
+      "month": "apr",
+      "where": "Nationwide, especially Amsterdam",
+      "kind": "market"
+    },
+    {
+      "name": "Bulb season at Keukenhof",
+      "month": "apr",
+      "where": "Lisse",
+      "kind": "exhibition"
+    },
+    {
+      "name": "Sinterklaas",
+      "month": "dec",
+      "where": "Nationwide",
+      "kind": "religious"
+    }
+  ],
+  "know": [
+    "Do not walk in the bicycle lane. This is the single most reliable way to annoy a Dutch person.",
+    "Amsterdam's centre is heavily regulated now — tours, rentals and behaviour all more restricted than the reputation suggests.",
+    "Almost everyone speaks excellent English and will switch before you finish your first Dutch sentence."
+  ],
   "regions": [
-    { "slug": "randstad", "name": "The Randstad",
+    {
+      "slug": "randstad",
+      "name": "The Randstad",
       "summary": "The dense western ring: Amsterdam, Rotterdam, The Hague, Utrecht and the polder between them.",
-      "interests": ["art", "architecture", "cities", "design"],
+      "interests": [
+        "art",
+        "architecture",
+        "cities",
+        "design"
+      ],
       "cities": [
-        { "slug": "amsterdam", "name": "Amsterdam", "lat": 52.37, "lon": 4.90,
+        {
+          "slug": "amsterdam",
+          "name": "Amsterdam",
+          "lat": 52.37,
+          "lon": 4.9,
           "summary": "A 17th-century canal plan that still works, with two of the world's great collections inside it.",
-          "interests": ["art", "architecture", "cities", "food", "music"], "nights": [2, 4],
-          "highlights": ["The Rijksmuseum, and half an hour in front of the Vermeers", "The Van Gogh Museum, booked ahead or not at all", "The Jordaan and the Nine Streets on foot", "A canal at seven in the morning, before the boats"],
+          "interests": [
+            "art",
+            "architecture",
+            "cities",
+            "food",
+            "music"
+          ],
+          "nights": [
+            2,
+            4
+          ],
+          "highlights": [
+            "The Rijksmuseum, and half an hour in front of the Vermeers",
+            "The Van Gogh Museum, booked ahead or not at all",
+            "The Jordaan and the Nine Streets on foot",
+            "A canal at seven in the morning, before the boats"
+          ],
           "experiences": [
-            { "slug": "amsterdam-by-bike", "name": "The city the way it is used", "kind": "ride", "band": "low", "summary": "Rent for a day, ride out to Amsterdam-Noord on the free ferry, and stop thinking of the bicycle as an activity." }
-          ] },
-        { "slug": "rotterdam", "name": "Rotterdam", "lat": 51.92, "lon": 4.48,
+            {
+              "slug": "amsterdam-by-bike",
+              "name": "The city the way it is used",
+              "kind": "ride",
+              "band": "low",
+              "summary": "Rent for a day, ride out to Amsterdam-Noord on the free ferry, and stop thinking of the bicycle as an activity."
+            }
+          ]
+        },
+        {
+          "slug": "rotterdam",
+          "name": "Rotterdam",
+          "lat": 51.92,
+          "lon": 4.48,
           "summary": "Flattened in 1940 and rebuilt as an argument for modern architecture, on Europe's largest port.",
-          "interests": ["architecture", "design", "cities", "food"], "nights": [1, 2],
-          "highlights": ["The Markthal, a food market inside a housing block", "Depot Boijmans, the first publicly accessible art storage building anywhere", "Harbour tours through a port that runs for forty kilometres"] },
-        { "slug": "utrecht", "name": "Utrecht", "lat": 52.09, "lon": 5.12, "quiet": true,
+          "interests": [
+            "architecture",
+            "design",
+            "cities",
+            "food"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Markthal, a food market inside a housing block",
+            "Depot Boijmans, the first publicly accessible art storage building anywhere",
+            "Harbour tours through a port that runs for forty kilometres"
+          ]
+        },
+        {
+          "slug": "utrecht",
+          "name": "Utrecht",
+          "lat": 52.09,
+          "lon": 5.12,
+          "quiet": true,
           "summary": "Amsterdam's canals at half the scale and a fifth of the crowd, with wharf cellars at water level.",
-          "interests": ["cities", "food", "architecture"], "nights": [1, 2],
-          "highlights": ["The Oudegracht's two-level canals, unique in Europe", "The Dom tower, 112 metres, 465 steps", "Rietveld's Schröder House, the built manifesto of De Stijl"] }
-      ] },
-    { "slug": "north-and-islands", "name": "The North & the Wadden Islands",
+          "interests": [
+            "cities",
+            "food",
+            "architecture"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Oudegracht's two-level canals, unique in Europe",
+            "The Dom tower, 112 metres, 465 steps",
+            "Rietveld's Schröder House, the built manifesto of De Stijl"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "north-and-islands",
+      "name": "The North & the Wadden Islands",
       "summary": "Frisian country, mudflats that appear at low tide, and islands with no cars.",
-      "interests": ["nature", "coast", "islands", "wild"],
+      "interests": [
+        "nature",
+        "coast",
+        "islands",
+        "wild"
+      ],
       "cities": [
-        { "slug": "texel", "name": "Texel", "lat": 53.06, "lon": 4.80, "quiet": true,
+        {
+          "slug": "texel",
+          "name": "Texel",
+          "lat": 53.06,
+          "lon": 4.8,
+          "quiet": true,
           "summary": "The largest Wadden island: dunes, sheep, seals and thirty kilometres of empty North Sea beach.",
-          "interests": ["islands", "nature", "coast", "wild"], "nights": [2, 3],
-          "highlights": ["Seal colonies on the sandbanks, seen from a boat", "Bird reserves on the migration route, best in spring", "Local lamb and a brewery, on an island you can cycle around in a day"],
-          "experiences": [{ "slug": "wadden-mudflat-walk", "name": "Wadlopen — walking the sea floor", "kind": "walk", "band": "moderate", "summary": "Guided walks across the exposed seabed at low tide, thigh-deep in mud, timed against a returning sea. Never attempted alone." }] }
-      ] }
-  ]
+          "interests": [
+            "islands",
+            "nature",
+            "coast",
+            "wild"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Seal colonies on the sandbanks, seen from a boat",
+            "Bird reserves on the migration route, best in spring",
+            "Local lamb and a brewery, on an island you can cycle around in a day"
+          ],
+          "experiences": [
+            {
+              "slug": "wadden-mudflat-walk",
+              "name": "Wadlopen — walking the sea floor",
+              "kind": "walk",
+              "band": "moderate",
+              "summary": "Guided walks across the exposed seabed at low tide, thigh-deep in mud, timed against a returning sea. Never attempted alone."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "timezone": "CET/CEST (UTC+1/+2)"
 }
