@@ -246,6 +246,45 @@ async function main() {
   const a7 = await ask("hello");
   ok(/Nothing I could use/.test(a7.read), "an unparseable sentence did not say so");
 
+  // ── the specification's planner output ─────────────────────────────
+  await page.goto(base + "/plan", { waitUntil: "networkidle" });
+  await page.fill("#days", "12");
+  await page.fill("#budget", "2500");
+  await page.check('input[name="interest"][value="history"]');
+  await page.click('#planner button[type="submit"]');
+  await page.waitForSelector("#result .leg");
+
+  const costLabels = await page.locator("#result .result-summary dt").allTextContents();
+  for (const want of ["Accommodation", "Food", "Transport", "Activities"]) {
+    ok(costLabels.some((l) => l.includes(want)), `cost breakdown has no ${want} line`);
+  }
+  ok((await page.locator("#result .daylist li").count()) > 3,
+     "the itinerary has no day-by-day breakdown");
+
+  // Sharing: the link must carry the route, not just the inputs, because the
+  // planner jitters and would otherwise return a different trip.
+  const before = await page.locator("#result .leg h3 a").allTextContents();
+  await page.click("#shareplan");
+  await page.waitForTimeout(150);
+  const shared = await page.evaluate(() => location.pathname + location.search);
+  ok(/[?&]r=/.test(shared), "the share link does not carry the route");
+  const p2 = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  await p2.goto(base + shared, { waitUntil: "networkidle" });
+  await p2.waitForSelector("#result .leg");
+  const after = await p2.locator("#result .leg h3 a").allTextContents();
+  ok(before.join("|") === after.join("|"),
+     `a shared plan came back different: ${before.join(">")} vs ${after.join(">")}`);
+  ok(/saved itinerary/i.test(await p2.locator("#result .note").first().textContent()),
+     "a restored plan does not say where it came from");
+  await p2.close();
+
+  // Saving an itinerary must survive into My Europe.
+  await page.click("#saveplan");
+  await page.waitForTimeout(150);
+  await page.goto(base + "/my-europe", { waitUntil: "networkidle" });
+  ok(/Itinerar/i.test(await page.locator("#mine").textContent()),
+     "a saved itinerary did not reach My Europe");
+
   // ── the map ────────────────────────────────────────────────────────
   await page.goto(base + "/map", { waitUntil: "networkidle" });
   const dots = await page.locator("#dots .dot").count();

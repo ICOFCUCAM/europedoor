@@ -54,7 +54,7 @@
   }
   // Group by kind, so a list of thirty is still readable. Order is fixed
   // rather than by count, so the page does not rearrange itself under you.
-  var ORDER = ["Place", "Journey", "Theme", "Story"];
+  var ORDER = ["Itinerary", "Place", "Journey", "Theme", "Story"];
   var groups = {};
   list.forEach(function (x) { (groups[x.kind || "Place"] = groups[x.kind || "Place"] || []).push(x); });
   var html = "<h2>" + list.length + (list.length === 1 ? " saved item" : " saved items") + "</h2>";

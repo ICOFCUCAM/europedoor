@@ -75,36 +75,87 @@
   }
 
   function impliedDaily(opts) {
-    // Beds and meals are roughly four fifths of a trip's cost once transport
-    // and a buffer are taken out. This is what the traveller can actually
-    // spend per day, and it is a ceiling, not a target: coming in under
-    // budget is a good outcome and is never penalised.
-    return (opts.budget * 0.78) / Math.max(1, opts.days);
+    // Beds and meals are about 60% of a trip once transport, activities and
+    // the buffer come out — the split was 78% before activities were costed
+    // separately, and leaving it there let unaffordable places through. This
+    // is a ceiling, not a target: coming in under budget is never penalised.
+    return (opts.budget * 0.60) / Math.max(1, opts.days);
   }
 
-  function fitScore(city, wants, month, style, ceiling) {
+  /* The specification proposes a weighted recommendation score:
+   *
+   *   30% user relevance · 20% experience match · 15% season suitability
+   *   10% accessibility  · 10% popularity       · 10% content quality
+   *   5%  diversity/novelty
+   *
+   * Six of those seven can be computed honestly. Popularity cannot: there is
+   * no traffic on this site yet and no licensed visitor-numbers dataset, so a
+   * popularity term would be a number we made up wearing a percentage sign.
+   * Its 10% moves to content quality, which is measurable exactly, and the
+   * reallocation is stated on /plan rather than buried in here.
+   *
+   * "Accessibility" is read as reachability — how connected a place is to the
+   * rest of the Atlas — and NOT as disabled access, which we hold no data on
+   * and say so on the page.
+   */
+  var W = {
+    relevance: 0.30,   // how many of your interests the place carries
+    experience: 0.20,  // things to actually do there
+    season: 0.15,      // the month you named
+    reach: 0.10,       // how connected it is
+    quality: 0.20,     // how much of it we have written (10% + popularity's 10%)
+    novelty: 0.05      // quiet places, and countries not yet in the route
+  };
+
+  var REACH = null;
+  function reachOf(city) {
+    if (!REACH) {
+      REACH = {};
+      var cs = ATLAS.cities;
+      for (var a = 0; a < cs.length; a++) {
+        var n = 0;
+        for (var b = 0; b < cs.length; b++) if (a !== b && km(cs[a], cs[b]) < 300) n++;
+        REACH[cs[a].id] = n;
+      }
+    }
+    // Twelve neighbours inside 300 km is about as connected as Europe gets.
+    return Math.min(1, (REACH[city.id] || 0) / 12);
+  }
+
+  function fitScore(city, wants, month, style, ceiling, context) {
     var matched = 0, i;
     for (i = 0; i < wants.length; i++) {
       if (city.interests.indexOf(wants[i]) >= 0) matched++;
     }
     var interest = wants.length ? matched / wants.length : 0.5;
-    var base = 0.30 + 0.70 * interest;
+    var todo = city.todo || [];
+    var expMatch = Math.min(1, todo.length / 4) * (wants.length ? (matched > 0 ? 1 : 0.35) : 1);
+    var season = city.peak.indexOf(month) >= 0 ? 1
+               : city.shoulder.indexOf(month) >= 0 ? 0.75 : 0.35;
+    var quality = Math.min(1, (city.depth || 0) / 8) * (city.checked ? 1 : 0.92);
+    var novelty = (city.quiet ? 0.6 : 0) +
+                  (context && context.perCountry && context.perCountry[city.countrySlug] ? 0 : 0.4);
+    var base = W.relevance * interest + W.experience * expMatch + W.season * season
+             + W.reach * reachOf(city) + W.quality * quality + W.novelty * novelty;
     // A generous budget stops caring what a place costs; a frugal one does.
     var costPenalty = 1;
     if (style === "low" && city.budget === "high") costPenalty = 0.72;
     if (style === "low" && city.budget === "moderate") costPenalty = 0.92;
     if (style === "high" && city.budget === "low") costPenalty = 0.96;
     // Somewhere with listed experiences has more to actually do.
-    var depth = 1 + Math.min(city.exp, 3) * 0.035;
+    var depth = 1;
     // Affordability. Somewhere you cannot afford is not a recommendation,
     // so a city whose daily rate is above the ceiling is damped in
     // proportion to how far above. Being cheaper than the ceiling is free.
     var afford = 1;
     if (ceiling > 0) {
       var rate = dailyRate(city, style);
-      if (rate > ceiling) afford = Math.max(0.25, Math.pow(ceiling / rate, 1.4));
+      // Steeper than it looks: at three times the ceiling a place is down to
+      // about a tenth of its score, which is what "cannot afford it" should
+      // mean. The old 0.25 floor let Switzerland survive a €700 fortnight.
+      if (rate > ceiling) afford = Math.max(0.06, Math.pow(ceiling / rate, 1.9));
     }
-    return base * seasonFactor(city, month) * costPenalty * depth * afford;
+    return base * costPenalty * depth * afford;
   }
 
   function nightsFor(city, pace, remaining) {
@@ -126,8 +177,9 @@
       else opts.geoTooNarrow = true;
     }
     var ceiling = impliedDaily(opts);
+    var context = { perCountry: {} };
     var scored = cities.map(function (c) {
-      return { c: c, s: fitScore(c, opts.wants, opts.month, opts.style, ceiling) };
+      return { c: c, s: fitScore(c, opts.wants, opts.month, opts.style, ceiling, context) };
     });
     scored.sort(function (a, b) { return b.s - a.s; });
 
@@ -152,10 +204,19 @@
       route.push({ city: current, nights: n });
       used[current.id] = true;
       perCountry[current.countrySlug] = (perCountry[current.countrySlug] || 0) + 1;
+      context.perCountry = perCountry;
       remaining -= n;
       if (remaining <= 0) break;
 
       var best = null, bestV = -1;
+      // Diversity pressure, from the specification: a route that has taken
+      // three big cities in a row should start finding the alternative to the
+      // fourth. It builds rather than switching on, so a trip that genuinely
+      // wants capitals still gets them.
+      var bigRun = 0;
+      for (var q = route.length - 1; q >= 0 && q >= route.length - 3; q--) {
+        if (route[q].city.interests.indexOf("cities") >= 0 && !route[q].city.quiet) bigRun++;
+      }
       for (var j = 0; j < scored.length; j++) {
         var cand = scored[j].c;
         if (used[cand.id]) continue;
@@ -165,26 +226,45 @@
         // has to be earned by a much better fit.
         var travel = 1 / (1 + Math.pow(d / 420, 1.55));
         var repeat = (perCountry[cand.countrySlug] || 0) >= 3 ? 0.72 : 1;
-        var v = scored[j].s * travel * repeat * (0.93 + rand() * 0.14);
+        var diverse = 1;
+        if (bigRun >= 2) {
+          var isBig = cand.interests.indexOf("cities") >= 0 && !cand.quiet;
+          diverse = isBig ? 0.78 : 1.18;
+        }
+        var v = scored[j].s * travel * repeat * diverse * (0.93 + rand() * 0.14);
         if (v > bestV) { bestV = v; best = cand; }
       }
       if (!best) break;
       current = best;
     }
+    window.__EPD_SCORED = scored;
+    window.__EPD_USED = used;
     return route;
   }
 
+  // Activities are not inside the daily band — that covers beds and meals —
+  // so they are estimated separately, per day, by spending style.
+  var ACTIVITY_PER_DAY = { low: 8, moderate: 18, high: 38 };
+
   function costing(route, opts) {
-    var stay = 0, transport = 0, i, d;
+    var beds = 0, food = 0, transport = 0, nights = 0, i, d;
     for (i = 0; i < route.length; i++) {
-      stay += route[i].nights * dailyRate(route[i].city, opts.style);
+      var rate = dailyRate(route[i].city, opts.style);
+      // Sixty/forty is the split the daily bands were written against.
+      beds += route[i].nights * rate * 0.6;
+      food += route[i].nights * rate * 0.4;
+      nights += route[i].nights;
     }
     for (i = 1; i < route.length; i++) {
       d = km(route[i - 1].city, route[i].city);
       transport += transportCost(d);
     }
-    var buffer = Math.round((stay + transport) * 0.12);
-    return { stay: stay, transport: transport, buffer: buffer, total: stay + transport + buffer };
+    var activities = ACTIVITY_PER_DAY[opts.style] * (nights + 1);
+    beds = Math.round(beds); food = Math.round(food);
+    var subtotal = beds + food + transport + activities;
+    var buffer = Math.round(subtotal * 0.12);
+    return { beds: beds, food: food, transport: transport, activities: activities,
+             buffer: buffer, stay: beds + food, total: subtotal + buffer };
   }
 
   function euro(n) { return "€" + n.toLocaleString("en-GB"); }
@@ -201,6 +281,31 @@
     return "Matches " + names.join(", ") + ".";
   }
 
+  function alternativesFor(scored, route, i, used) {
+    // Two runners-up near this stop: what the planner nearly chose. Showing
+    // them is the difference between a recommendation and an instruction.
+    var here = route[i].city, out = [];
+    for (var j = 0; j < scored.length && out.length < 2; j++) {
+      var c = scored[j].c;
+      if (used[c.id]) continue;
+      var d = km(here, c);
+      if (d < 30 || d > 260) continue;
+      out.push({ city: c, km: d });
+    }
+    return out;
+  }
+
+  function dayPlan(city, nights, dayFrom) {
+    // Distribute what we hold across the days round-robin, so three items
+    // over four nights gives three named days and one free one rather than
+    // two crowded days and two apologies.
+    var todo = (city.todo || []).slice();
+    var days = [];
+    for (var n = 0; n < nights; n++) days.push({ day: dayFrom + n, items: [] });
+    for (var i = 0; i < todo.length; i++) days[i % nights].items.push(todo[i]);
+    return days;
+  }
+
   function render(route, opts) {
     if (!route.length) {
       result.innerHTML = '<div class="note warn"><p>Nothing in the Atlas fits that yet. Try more days, or fewer interests at once.</p></div>';
@@ -208,6 +313,8 @@
     }
     var c = costing(route, opts);
     var day = 1, legs = "", i, hop, countries = [];
+    var scoredAll = window.__EPD_SCORED || [];
+    var usedAll = window.__EPD_USED || {};
     for (i = 0; i < route.length; i++) {
       var st = route[i], city = st.city;
       if (countries.indexOf(city.country) < 0) countries.push(city.country);
@@ -218,12 +325,38 @@
       }
       var last = day + st.nights - 1;
       var when = st.nights === 1 ? "Day " + day : "Days " + day + "–" + last;
+
+      var days = dayPlan(city, st.nights, day);
+      var empty = (city.todo || []).length === 0;
+      var dayHtml = days.map(function (dd) {
+        if (!dd.items.length) {
+          return "<li><strong>Day " + dd.day + "</strong> — free. Nothing further recorded.</li>";
+        }
+        return "<li><strong>Day " + dd.day + "</strong> — " + dd.items.map(function (it) {
+          return '<a href="' + it.u + '">' + it.n + "</a>";
+        }).join("; ") + "</li>";
+      }).join("");
+      if (empty) {
+        dayHtml = "<li>We hold nothing specific for " + city.name + " yet. That is a gap in " +
+          '<a href="' + city.url + '">our writing</a> rather than in the place, and it is ' +
+          "why it is a stop rather than a schedule.</li>";
+      }
+
+      // No alternatives for a start the traveller chose themselves.
+      var alts = (i === 0 && opts.start) ? [] : alternativesFor(scoredAll, route, i, usedAll);
+      var altHtml = alts.length
+        ? '<p class="small alt">Instead of ' + city.name + ": " + alts.map(function (a) {
+            return '<a href="' + a.city.url + '">' + a.city.name + "</a> (" + a.km + " km)";
+          }).join(", ") + ". The planner ranked them just behind.</p>"
+        : "";
+
       legs += '<li class="leg"><div class="leg-when">' + when + '</div><div>' +
               '<h3><a href="' + city.url + '">' + city.name + "</a> <span class=\"small\">· " +
               city.country + " · " + city.region + "</span></h3>" +
               "<p>" + city.why + "</p>" +
               '<p class="small" style="margin-top:.4rem">' + whyLine(city, opts.wants) +
-              " " + euro(dailyRate(city, opts.style)) + " a day here." + "</p>" + hop +
+              " " + euro(dailyRate(city, opts.style)) + " a day here." + "</p>" +
+              '<ul class="daylist">' + dayHtml + "</ul>" + altHtml + hop +
               "</div></li>";
       day = last + 1;
     }
@@ -247,15 +380,26 @@
         " stops, " + countries.length + (countries.length === 1 ? " country" : " countries") + "</h2>" +
       '<dl class="result-summary">' +
         "<div><dt>Estimated total</dt><dd>" + euro(c.total) + "</dd></div>" +
-        "<div><dt>Beds &amp; meals</dt><dd>" + euro(c.stay) + "</dd></div>" +
-        "<div><dt>Getting between</dt><dd>" + euro(c.transport) + "</dd></div>" +
+        "<div><dt>Accommodation</dt><dd>" + euro(c.beds) + "</dd></div>" +
+        "<div><dt>Food</dt><dd>" + euro(c.food) + "</dd></div>" +
+        "<div><dt>Transport</dt><dd>" + euro(c.transport) + "</dd></div>" +
+        "<div><dt>Activities</dt><dd>" + euro(c.activities) + "</dd></div>" +
         "<div><dt>12% buffer</dt><dd>" + euro(c.buffer) + "</dd></div>" +
         "<div><dt>Ground covered</dt><dd>" + totalKm.toLocaleString("en-GB") + " km</dd></div>" +
       "</dl>" +
       verdict +
       '<ul class="legs">' + legs + "</ul>" +
+      '<div class="hero-actions" style="margin-top:0">' +
+        '<button class="btn ghost" type="button" id="saveplan">Save this to My Europe</button>' +
+        '<button class="btn ghost" type="button" id="shareplan">Copy a link to it</button>' +
+      "</div>" +
+      '<p class="small" id="planstate"></p>' +
       '<p class="small">Estimates are planning arithmetic from published daily bands and ' +
-      'straight-line distances — not quotes. <a href="/sources">How these numbers are made</a>.</p>';
+      'straight-line distances — not quotes. Activities are estimated at ' +
+      euro(ACTIVITY_PER_DAY[opts.style]) + ' a day for this spending style. ' +
+      '<a href="/sources">How these numbers are made</a>.</p>';
+
+    wireSaveAndShare(route, opts);
   }
 
 
@@ -545,6 +689,74 @@
     return html;
   }
 
+  /* A plan has to survive being closed. The route is encoded into the URL —
+   * not re-planned from the inputs, because the planner deliberately jitters
+   * and would return something slightly different — so a shared link is the
+   * same itinerary, and My Europe stores nothing but that link. */
+  function planUrl(route, opts) {
+    var q = new URLSearchParams();
+    q.set("d", opts.days); q.set("b", opts.budget); q.set("m", opts.month);
+    q.set("s", opts.style); q.set("p", opts.pace);
+    if (opts.wants.length) q.set("i", opts.wants.join(","));
+    q.set("r", route.map(function (st) { return st.city.id + ":" + st.nights; }).join("|"));
+    return location.origin + "/plan?" + q.toString();
+  }
+
+  function routeFromParams(q) {
+    var raw = q.get("r");
+    if (!raw) return null;
+    var byId = {};
+    for (var i = 0; i < ATLAS.cities.length; i++) byId[ATLAS.cities[i].id] = ATLAS.cities[i];
+    var out = [];
+    raw.split("|").forEach(function (part) {
+      var bits = part.split(":");
+      var city = byId[bits[0]];
+      if (city) out.push({ city: city, nights: parseInt(bits[1], 10) || 1 });
+    });
+    return out.length ? out : null;
+  }
+
+  function wireSaveAndShare(route, opts) {
+    var url = planUrl(route, opts);
+    var state = document.getElementById("planstate");
+    var save = document.getElementById("saveplan");
+    var share = document.getElementById("shareplan");
+    if (!save || !share) return;
+
+    var label = opts.days + " days: " + route.map(function (s) { return s.city.name; }).join(" → ");
+    save.addEventListener("click", function () {
+      var KEY = "europedoor.saved.v1";
+      var list;
+      try { list = JSON.parse(localStorage.getItem(KEY) || "[]"); } catch (e) { list = []; }
+      var id = "itinerary:" + route.map(function (s) { return s.city.id; }).join("|");
+      if (!list.some(function (x) { return x.id === id; })) {
+        list.push({ id: id, kind: "Itinerary", label: label, url: url.replace(location.origin, "") });
+      }
+      try {
+        localStorage.setItem(KEY, JSON.stringify(list));
+        state.innerHTML = 'Saved. It is in <a href="/my-europe">My Europe</a>, in this browser ' +
+          "only — there is no account and nothing was sent anywhere.";
+      } catch (e) {
+        state.textContent = "This browser will not let us save.";
+      }
+    });
+
+    share.addEventListener("click", function () {
+      history.replaceState(null, "", url.replace(location.origin, ""));
+      function done() {
+        state.textContent = "Link copied, and it is in the address bar. It carries the route " +
+          "itself, so whoever opens it sees this itinerary rather than a new one.";
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(done, function () {
+          state.textContent = "Copy it from the address bar — it now holds this itinerary.";
+        });
+      } else {
+        state.textContent = "Copy it from the address bar — it now holds this itinerary.";
+      }
+    });
+  }
+
   function readForm() {
     var wants = [];
     var boxes = form.querySelectorAll('input[name="interest"]:checked');
@@ -575,6 +787,26 @@
   function applyUrlState() {
     var q = new URLSearchParams(location.search);
     if (q.get("from")) startSel.value = q.get("from");
+    if (q.get("d")) form.days.value = q.get("d");
+    if (q.get("b")) form.budget.value = q.get("b");
+    if (q.get("m")) form.month.value = q.get("m");
+    if (q.get("s")) form.style.value = q.get("s");
+    if (q.get("p")) form.pace.value = q.get("p");
+    if (q.get("i")) {
+      var want = q.get("i").split(",");
+      var boxes = form.querySelectorAll('input[name="interest"]');
+      for (var k = 0; k < boxes.length; k++) boxes[k].checked = want.indexOf(boxes[k].value) >= 0;
+    }
+    var shared = routeFromParams(q);
+    if (shared) {
+      var opts = readForm();
+      render(shared, opts);
+      result.insertAdjacentHTML("afterbegin",
+        '<div class="note"><h3>This is somebody\'s saved itinerary</h3><p>It came from the link ' +
+        "you opened rather than from the planner, so it is exactly what they had. Change anything " +
+        "below and press build to make it yours.</p></div>");
+      return;
+    }
     var hash = location.hash.replace(/^#/, "");
     var m = /^journey=(.+)$/.exec(hash);
     if (m) {

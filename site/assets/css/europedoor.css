@@ -328,3 +328,10 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .minilabel { font-family: var(--text); font-size: 11px; fill: var(--ink-3); }
 .minilabel.here { fill: var(--ink); font-weight: 600; }
 .minimap figcaption { font-size: var(--t-xs); color: var(--ink-3); margin-top: var(--s3); }
+
+/* ── the day-by-day inside a planned leg ──────────────────────────── */
+.daylist { list-style: none; margin: var(--s3) 0 0; padding: 0; font-size: var(--t-sm); }
+.daylist li { padding: var(--s2) 0; border-top: 1px dotted var(--rule); color: var(--ink-2); }
+.daylist li strong { color: var(--ink); font-weight: 600; }
+.leg .alt { margin-top: var(--s3); color: var(--ink-3); }
+.leg .alt a { color: var(--ink-2); }

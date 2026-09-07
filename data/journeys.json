@@ -56,7 +56,22 @@
           "nights": 2,
           "why": "The last leg by bus, into the largest Art Nouveau quarter in Europe."
         }
-      ]
+      ],
+      "difficulty": "moderate",
+      "transport": [
+        "rail",
+        "ferry",
+        "bus"
+      ],
+      "accommodation": "mixed",
+      "pack": [
+        "Waterproof shell and a warm layer for June — the Arctic does not read the calendar",
+        "Boots that will do a fell path as well as a city",
+        "An eye mask: it does not get dark",
+        "A card, not cash — the whole north is cashless"
+      ],
+      "start": "norway/nord-norge/tromso",
+      "end": "latvia/riga-and-around/riga"
     },
     {
       "slug": "atlantic-to-the-mediterranean",
@@ -120,7 +135,20 @@
           "nights": 3,
           "why": "The last hop east. Three thousand years, stacked, and the best street food of the trip."
         }
-      ]
+      ],
+      "difficulty": "easy",
+      "transport": [
+        "rail"
+      ],
+      "accommodation": "hotel",
+      "pack": [
+        "Comfortable shoes for cobbles and hills",
+        "Sun protection from April onwards",
+        "Something with sleeves for churches",
+        "A rail pass, or advance singles booked the day they open"
+      ],
+      "start": "portugal/porto-and-the-douro/porto",
+      "end": "italy/rome-and-lazio/rome"
     },
     {
       "slug": "the-alpine-grand-tour",
@@ -173,7 +201,22 @@
           "nights": 3,
           "why": "South into the Dolomites and Ladin-speaking valleys, for the pink light on limestone at dawn."
         }
-      ]
+      ],
+      "difficulty": "demanding",
+      "transport": [
+        "rail",
+        "cable car",
+        "postbus"
+      ],
+      "accommodation": "mixed",
+      "pack": [
+        "Boots with ankle support and a broken-in sole",
+        "Layers, and a hat, even in August",
+        "Cash for mountain huts, which often take nothing else",
+        "Sun cream — snow at altitude burns"
+      ],
+      "start": "france/alps-and-east/chamonix",
+      "end": "italy/north-italy/ortisei"
     },
     {
       "slug": "scandinavia-to-central-europe",
@@ -231,7 +274,19 @@
           "nights": 3,
           "why": "The last leg down the Danube, ending in a thermal bath in the snow if you time it right."
         }
-      ]
+      ],
+      "difficulty": "easy",
+      "transport": [
+        "rail"
+      ],
+      "accommodation": "hotel",
+      "pack": [
+        "An umbrella you do not mind losing",
+        "Comfortable shoes; these are walking cities",
+        "One smart layer for an opera house or a concert hall"
+      ],
+      "start": "denmark/zealand/copenhagen",
+      "end": "hungary/budapest-and-the-danube-bend/budapest"
     },
     {
       "slug": "the-adriatic-run",
@@ -294,7 +349,22 @@
           "nights": 2,
           "why": "The last two hours north up the coast, into the walls. Walk them at opening."
         }
-      ]
+      ],
+      "difficulty": "moderate",
+      "transport": [
+        "ferry",
+        "bus",
+        "rail"
+      ],
+      "accommodation": "mixed",
+      "pack": [
+        "Water shoes — most of this coast is pebble or rock",
+        "A dry bag for boat legs",
+        "Shoulders and knees covered for churches and mosques",
+        "Sea-sickness tablets for the open crossings"
+      ],
+      "start": "italy/north-italy/venice",
+      "end": "croatia/dalmatia/dubrovnik"
     },
     {
       "slug": "camino-and-sacred-europe",
@@ -341,7 +411,21 @@
           "nights": 4,
           "why": "The long jump west, and the last hundred kilometres walked in from Sarria."
         }
-      ]
+      ],
+      "difficulty": "moderate",
+      "transport": [
+        "rail",
+        "on foot"
+      ],
+      "accommodation": "guesthouse",
+      "pack": [
+        "Boots already broken in — this is not the trip to test them",
+        "A credencial if you intend to walk the last stage",
+        "Blister tape, before you need it",
+        "Something to cover shoulders in every church"
+      ],
+      "start": "united-kingdom/london-and-the-south-east/canterbury",
+      "end": "spain/green-spain/santiago-de-compostela"
     },
     {
       "slug": "the-hanseatic-arc",
@@ -394,7 +478,20 @@
           "nights": 3,
           "why": "The last stop: the wall, the towers and the guild halls, all still standing."
         }
-      ]
+      ],
+      "difficulty": "easy",
+      "transport": [
+        "rail",
+        "ferry"
+      ],
+      "accommodation": "hotel",
+      "pack": [
+        "A windproof layer; the Baltic is not warm even in July",
+        "Comfortable shoes for brick and cobble",
+        "A book for the ferry legs"
+      ],
+      "start": "belgium/flanders/bruges",
+      "end": "estonia/tallinn-and-the-north/tallinn"
     },
     {
       "slug": "the-classical-mediterranean",
@@ -446,6 +543,595 @@
           "city": "turkiye/aegean-and-mediterranean/selcuk",
           "nights": 3,
           "why": "On to Anatolia and Ephesus, where the library facade and the marble street still stand."
+        }
+      ],
+      "difficulty": "moderate",
+      "transport": [
+        "rail",
+        "ferry",
+        "flight"
+      ],
+      "accommodation": "mixed",
+      "pack": [
+        "A hat and real sun protection — the sites have no shade",
+        "Two litres of water capacity per person",
+        "Boots for Ephesus and the Sicilian sites",
+        "Modest dress for churches and mosques"
+      ],
+      "start": "italy/rome-and-lazio/rome",
+      "end": "turkiye/aegean-and-mediterranean/selcuk"
+    },
+    {
+      "slug": "european-heritage-route",
+      "name": "The European Heritage Route",
+      "strapline": "London to Budapest by rail",
+      "summary": "The specification's own suggestion, and a good one: the cathedral-and-capital spine of western and central Europe, taken entirely by train. It crosses seven countries and four architectural centuries without ever needing a flight, and every stop on it is a city that once thought of itself as the centre of something.",
+      "days": 20,
+      "budget": "moderate",
+      "interests": [
+        "history",
+        "architecture",
+        "art",
+        "music",
+        "cities",
+        "rail"
+      ],
+      "months": [
+        "apr",
+        "may",
+        "jun",
+        "sep",
+        "oct"
+      ],
+      "difficulty": "easy",
+      "transport": [
+        "rail"
+      ],
+      "accommodation": "hotel",
+      "pack": [
+        "A rail pass, or advance singles",
+        "One smart layer for a concert",
+        "An umbrella",
+        "Shoulders covered for churches"
+      ],
+      "start": "united-kingdom/london-and-the-south-east/london",
+      "end": "hungary/budapest-and-the-danube-bend/budapest",
+      "legs": [
+        {
+          "city": "united-kingdom/london-and-the-south-east/london",
+          "nights": 3,
+          "why": "Begin with the free national collections and a play for the price of a cinema ticket."
+        },
+        {
+          "city": "united-kingdom/london-and-the-south-east/canterbury",
+          "nights": 1,
+          "why": "An hour out, and the mother church of a global communion."
+        },
+        {
+          "city": "belgium/flanders/bruges",
+          "nights": 2,
+          "why": "Under the Channel and into Flanders: a city preserved by going broke in 1500."
+        },
+        {
+          "city": "netherlands/randstad/amsterdam",
+          "nights": 2,
+          "why": "The canal ring, the Rijksmuseum, and a bicycle rather than a tram."
+        },
+        {
+          "city": "germany/rhine-and-the-west/cologne",
+          "nights": 2,
+          "why": "Up the Rhine: a cathedral that took 632 years and a Roman city under the streets."
+        },
+        {
+          "city": "czechia/prague-and-bohemia/prague",
+          "nights": 3,
+          "why": "East into Bohemia, and the largest intact gothic and baroque centre north of the Alps."
+        },
+        {
+          "city": "austria/vienna-and-the-east/vienna",
+          "nights": 3,
+          "why": "South to the imperial capital: standing tickets at the opera, coffee houses in the afternoon."
+        },
+        {
+          "city": "hungary/budapest-and-the-danube-bend/budapest",
+          "nights": 3,
+          "why": "Down the Danube to end in a thermal bath, ideally in the snow."
+        }
+      ]
+    },
+    {
+      "slug": "mediterranean-arc",
+      "name": "The Mediterranean Arc",
+      "strapline": "Barcelona to Athens along one sea",
+      "summary": "Also from the specification: the northern shore of the Mediterranean, followed east. It changes language five times and cuisine about fifteen, and the through-line is a sea that everyone on it has been trading across for three thousand years. Ferries and trains for most of it; one flight at the end unless you have a spare week.",
+      "days": 21,
+      "budget": "moderate",
+      "interests": [
+        "coast",
+        "food",
+        "history",
+        "architecture",
+        "islands"
+      ],
+      "months": [
+        "may",
+        "jun",
+        "sep",
+        "oct"
+      ],
+      "difficulty": "easy",
+      "transport": [
+        "rail",
+        "ferry",
+        "flight"
+      ],
+      "accommodation": "mixed",
+      "pack": [
+        "Water shoes",
+        "Sun protection from May",
+        "A dry bag",
+        "Modest dress for churches"
+      ],
+      "start": "spain/catalonia-and-the-east/barcelona",
+      "end": "greece/athens-and-the-peloponnese/athens",
+      "legs": [
+        {
+          "city": "spain/catalonia-and-the-east/barcelona",
+          "nights": 3,
+          "why": "Start where the Mediterranean meets a grid designed in 1859."
+        },
+        {
+          "city": "france/provence-and-the-south/nice",
+          "nights": 2,
+          "why": "Over the border along the coast, into the light the painters came for."
+        },
+        {
+          "city": "italy/north-italy/vernazza",
+          "nights": 2,
+          "why": "Into Liguria and the five villages on the cliff coast."
+        },
+        {
+          "city": "italy/rome-and-lazio/rome",
+          "nights": 3,
+          "why": "Inland briefly, because it would be absurd not to."
+        },
+        {
+          "city": "italy/south-italy-and-islands/naples",
+          "nights": 2,
+          "why": "South for the archaeological museum and the pizza that justifies the detour."
+        },
+        {
+          "city": "italy/south-italy-and-islands/syracuse",
+          "nights": 3,
+          "why": "Across to Sicily: the most powerful Greek city in the world, once."
+        },
+        {
+          "city": "greece/the-islands/corfu",
+          "nights": 2,
+          "why": "East across the Ionian, into Venetian Greece."
+        },
+        {
+          "city": "greece/athens-and-the-peloponnese/athens",
+          "nights": 3,
+          "why": "The end of the arc, and the beginning of most of what is on it."
+        }
+      ]
+    },
+    {
+      "slug": "the-baltic-crossing",
+      "name": "The Baltic Crossing",
+      "strapline": "Four capitals and a sea",
+      "summary": "A short, dense route round the eastern Baltic: three capitals that were occupied within living memory and one that was not, joined by ferries that locals use as buses. It is the cheapest good rail-and-boat trip in northern Europe and the least travelled by visitors from outside it.",
+      "days": 14,
+      "budget": "moderate",
+      "interests": [
+        "history",
+        "architecture",
+        "food",
+        "design",
+        "coast"
+      ],
+      "months": [
+        "jun",
+        "jul",
+        "aug",
+        "sep"
+      ],
+      "difficulty": "easy",
+      "transport": [
+        "ferry",
+        "bus",
+        "rail"
+      ],
+      "accommodation": "hotel",
+      "pack": [
+        "A windproof layer",
+        "Comfortable shoes for cobbles",
+        "A card — the region is nearly cashless"
+      ],
+      "start": "finland/helsinki-and-the-coast/helsinki",
+      "end": "lithuania/vilnius-and-the-east/trakai",
+      "legs": [
+        {
+          "city": "finland/helsinki-and-the-coast/helsinki",
+          "nights": 3,
+          "why": "Granite, design, and a public sauna on the water."
+        },
+        {
+          "city": "estonia/tallinn-and-the-north/tallinn",
+          "nights": 3,
+          "why": "Two hours south by fast ferry into an intact medieval wall."
+        },
+        {
+          "city": "latvia/riga-and-around/riga",
+          "nights": 3,
+          "why": "The largest Art Nouveau quarter in Europe, and a market in five Zeppelin hangars."
+        },
+        {
+          "city": "lithuania/vilnius-and-the-east/vilnius",
+          "nights": 3,
+          "why": "South again: forty churches, endless courtyards, and a republic of artists."
+        },
+        {
+          "city": "lithuania/vilnius-and-the-east/trakai",
+          "nights": 1,
+          "why": "An island castle in a lake, an hour out, to finish on."
+        }
+      ]
+    },
+    {
+      "slug": "the-danube-line",
+      "name": "The Danube Line",
+      "strapline": "Four countries down one river",
+      "summary": "The Danube passes through more capitals than any river in the world, and this follows the interesting half of it. Cycle path, train and river boat all run alongside each other for most of the way, so the transport is a choice rather than a constraint.",
+      "days": 16,
+      "budget": "moderate",
+      "interests": [
+        "rail",
+        "history",
+        "wine",
+        "architecture",
+        "food"
+      ],
+      "months": [
+        "may",
+        "jun",
+        "sep",
+        "oct"
+      ],
+      "difficulty": "easy",
+      "transport": [
+        "rail",
+        "river boat",
+        "bicycle"
+      ],
+      "accommodation": "mixed",
+      "pack": [
+        "A bicycle, if you want one — the path is flat the whole way",
+        "Sun protection on the water",
+        "One smart layer for Vienna"
+      ],
+      "start": "austria/vienna-and-the-east/durnstein",
+      "end": "serbia/belgrade-and-vojvodina/belgrade",
+      "legs": [
+        {
+          "city": "austria/vienna-and-the-east/durnstein",
+          "nights": 2,
+          "why": "Start in the Wachau: terraced vineyards and a blue baroque tower over the water."
+        },
+        {
+          "city": "austria/vienna-and-the-east/vienna",
+          "nights": 3,
+          "why": "Downstream to the imperial capital."
+        },
+        {
+          "city": "slovakia/bratislava-and-the-southwest/bratislava",
+          "nights": 2,
+          "why": "An hour further, and a different country with a castle on the bluff."
+        },
+        {
+          "city": "hungary/budapest-and-the-danube-bend/budapest",
+          "nights": 3,
+          "why": "The river's best city, and its widest."
+        },
+        {
+          "city": "serbia/belgrade-and-vojvodina/novi-sad",
+          "nights": 2,
+          "why": "Into Serbia: a Habsburg river town under a fortress with sixteen kilometres of tunnels."
+        },
+        {
+          "city": "serbia/belgrade-and-vojvodina/belgrade",
+          "nights": 3,
+          "why": "End where the Sava joins it, on a fortress above both."
+        }
+      ]
+    },
+    {
+      "slug": "iberian-circle",
+      "name": "The Iberian Circle",
+      "strapline": "Two countries, one peninsula, no flights",
+      "summary": "A loop rather than a line: down the Atlantic, across the Moorish south, up the Mediterranean and back through the middle. High-speed rail makes the long legs painless and the slow legs are where the trip actually is.",
+      "days": 23,
+      "budget": "moderate",
+      "interests": [
+        "food",
+        "history",
+        "architecture",
+        "coast",
+        "wine"
+      ],
+      "months": [
+        "apr",
+        "may",
+        "sep",
+        "oct"
+      ],
+      "difficulty": "easy",
+      "transport": [
+        "rail",
+        "bus"
+      ],
+      "accommodation": "mixed",
+      "pack": [
+        "Comfortable shoes",
+        "Sun protection and a hat from May",
+        "A siesta-shaped attitude to the afternoon"
+      ],
+      "start": "portugal/porto-and-the-douro/porto",
+      "end": "spain/madrid-and-the-centre/madrid",
+      "legs": [
+        {
+          "city": "portugal/porto-and-the-douro/porto",
+          "nights": 3,
+          "why": "Begin on the Atlantic, with port lodges across the river."
+        },
+        {
+          "city": "portugal/lisbon-and-the-west/lisbon",
+          "nights": 3,
+          "why": "Down the coast: tiles, fado and the Gulbenkian."
+        },
+        {
+          "city": "portugal/alentejo-and-the-south/evora",
+          "nights": 2,
+          "why": "Inland into the Alentejo, and a Roman temple in a walled town."
+        },
+        {
+          "city": "spain/andalusia/seville",
+          "nights": 3,
+          "why": "Across the border into Andalusia."
+        },
+        {
+          "city": "spain/andalusia/granada",
+          "nights": 3,
+          "why": "East, to the Alhambra and free tapas."
+        },
+        {
+          "city": "spain/catalonia-and-the-east/valencia",
+          "nights": 2,
+          "why": "North up the Mediterranean for paella where the rice grows."
+        },
+        {
+          "city": "spain/catalonia-and-the-east/barcelona",
+          "nights": 3,
+          "why": "The last coastal stop, and the densest three days of the route."
+        },
+        {
+          "city": "spain/madrid-and-the-centre/madrid",
+          "nights": 3,
+          "why": "Inland to finish: the Prado, vermouth at noon, and a train home."
+        }
+      ]
+    },
+    {
+      "slug": "carpathian-arc",
+      "name": "The Carpathian Arc",
+      "strapline": "Mountains, monasteries and very few visitors",
+      "summary": "The Carpathians run 1,500 kilometres through five countries and almost nobody outside them treats the range as one thing. This does. Wooden churches, painted monasteries, hay meadows cut by hand, brown bears, and prices that make western Europe look absurd.",
+      "days": 20,
+      "budget": "low",
+      "interests": [
+        "mountains",
+        "sacred",
+        "nature",
+        "wild",
+        "history"
+      ],
+      "months": [
+        "jun",
+        "jul",
+        "aug",
+        "sep"
+      ],
+      "difficulty": "moderate",
+      "transport": [
+        "rail",
+        "bus",
+        "car"
+      ],
+      "accommodation": "guesthouse",
+      "pack": [
+        "Boots",
+        "A torch for unlit churches",
+        "Cash for village guesthouses",
+        "Layers — the range makes its own weather"
+      ],
+      "start": "poland/lesser-poland/krakow",
+      "end": "romania/bucovina-and-maramures/gura-humorului",
+      "legs": [
+        {
+          "city": "poland/lesser-poland/krakow",
+          "nights": 3,
+          "why": "Start in the city, then go east and stop seeing anyone."
+        },
+        {
+          "city": "poland/lesser-poland/zakopane",
+          "nights": 2,
+          "why": "Into the Tatras, Poland's only alpine range."
+        },
+        {
+          "city": "slovakia/tatras-and-the-north/poprad",
+          "nights": 2,
+          "why": "Over the border into Slovakia and the same mountains under another name."
+        },
+        {
+          "city": "slovakia/tatras-and-the-north/levoca",
+          "nights": 2,
+          "why": "Down into the Spiš: a walled town under the largest castle ruin in central Europe."
+        },
+        {
+          "city": "romania/transylvania/sighisoara",
+          "nights": 3,
+          "why": "South into Transylvania and the Saxon citadels."
+        },
+        {
+          "city": "romania/transylvania/viscri",
+          "nights": 2,
+          "why": "A single-street village with a fortified church and horses on the road."
+        },
+        {
+          "city": "romania/transylvania/brasov",
+          "nights": 2,
+          "why": "Under a wooded mountain, with a bear hide bookable at dusk."
+        },
+        {
+          "city": "romania/bucovina-and-maramures/gura-humorului",
+          "nights": 3,
+          "why": "North into Bucovina, to painted monasteries that have kept their colour for five centuries."
+        }
+      ]
+    },
+    {
+      "slug": "the-cold-north",
+      "name": "The Cold North",
+      "strapline": "Winter, treated as the reason rather than the problem",
+      "summary": "Most of Europe's north is sold in summer and is more itself in February. This is a winter route: aurora, snow, saunas, ice and four hours of daylight that are better than most places get in twelve. It needs proper clothing and repays it.",
+      "days": 18,
+      "budget": "moderate",
+      "interests": [
+        "winter",
+        "nature",
+        "wild",
+        "design"
+      ],
+      "months": [
+        "dec",
+        "jan",
+        "feb",
+        "mar"
+      ],
+      "difficulty": "demanding",
+      "transport": [
+        "rail",
+        "bus",
+        "flight"
+      ],
+      "accommodation": "mixed",
+      "pack": [
+        "Proper insulated boots, not fashion boots",
+        "Mittens, not gloves",
+        "A merino base layer",
+        "Something to cover your face at −25°C",
+        "Patience: the aurora is a forecast, not a booking"
+      ],
+      "start": "finland/helsinki-and-the-coast/helsinki",
+      "end": "sweden/swedish-lapland/kiruna",
+      "legs": [
+        {
+          "city": "finland/helsinki-and-the-coast/helsinki",
+          "nights": 2,
+          "why": "Start with a sauna on the frozen waterfront."
+        },
+        {
+          "city": "finland/finnish-lapland/rovaniemi",
+          "nights": 3,
+          "why": "North by night train, into Lapland proper."
+        },
+        {
+          "city": "finland/finnish-lapland/inari",
+          "nights": 3,
+          "why": "Sámi Finland, a lake with three thousand islands, and no light pollution in any direction."
+        },
+        {
+          "city": "norway/nord-norge/tromso",
+          "nights": 4,
+          "why": "Across into Norway for whales in the dark and the aurora directly overhead."
+        },
+        {
+          "city": "sweden/swedish-lapland/abisko",
+          "nights": 3,
+          "why": "South-east into the driest winter sky in Lapland, and the chairlift into it."
+        },
+        {
+          "city": "sweden/swedish-lapland/kiruna",
+          "nights": 2,
+          "why": "End in the iron town that is being physically moved off the hole it dug."
+        }
+      ]
+    },
+    {
+      "slug": "the-white-villages",
+      "name": "The White South",
+      "strapline": "Andalusia and the Maghreb's long shadow",
+      "summary": "Eight centuries of Islamic rule left more than the Alhambra, and this route is the rest of it: the horseshoe arch in the village church, the irrigation channel still running, the word for the vegetable. Short legs, hot afternoons, and everything happening after six.",
+      "days": 15,
+      "budget": "moderate",
+      "interests": [
+        "history",
+        "architecture",
+        "sacred",
+        "food",
+        "coast"
+      ],
+      "months": [
+        "mar",
+        "apr",
+        "may",
+        "oct"
+      ],
+      "difficulty": "easy",
+      "transport": [
+        "bus",
+        "rail"
+      ],
+      "accommodation": "mixed",
+      "pack": [
+        "A hat",
+        "A siesta",
+        "Shoes for cobbled hills",
+        "Modest dress for the mosque-cathedral"
+      ],
+      "start": "spain/andalusia/seville",
+      "end": "spain/andalusia/malaga",
+      "legs": [
+        {
+          "city": "spain/andalusia/seville",
+          "nights": 3,
+          "why": "Start with the Alcázar and a flamenco peña."
+        },
+        {
+          "city": "spain/andalusia/cordoba",
+          "nights": 2,
+          "why": "An hour and a half north-east, for 856 columns."
+        },
+        {
+          "city": "spain/andalusia/granada",
+          "nights": 3,
+          "why": "East to the last Moorish city in Spain."
+        },
+        {
+          "city": "spain/andalusia/ronda",
+          "nights": 2,
+          "why": "West into the white villages, over a 120-metre gorge."
+        },
+        {
+          "city": "spain/andalusia/cadiz",
+          "nights": 2,
+          "why": "To the Atlantic, and possibly the oldest city in western Europe."
+        },
+        {
+          "city": "spain/andalusia/malaga",
+          "nights": 2,
+          "why": "Back east along the coast, to finish with Picasso and grilled sardines."
         }
       ]
     }

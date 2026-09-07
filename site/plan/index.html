@@ -118,13 +118,24 @@
   </div>
   <aside class="rail">
     <h3>How it decides</h3>
+    <p>Every destination is scored out of one, on a published weighting:</p>
     <ul>
-      <li>Every city is scored on how many of your interests it carries, at region and city level.</li>
-      <li>The month you pick moves the score: peak season up, off season down, never to zero.</li>
-      <li>Each next stop is penalised by distance, so the route stops wandering.</li>
-      <li>Nights come from the range on each city page, stretched or squeezed by your pace.</li>
-      <li>Cost is nights × the country's daily band, plus a distance-based transport estimate.</li>
+      <li><strong>30%</strong> how many of your interests it carries</li>
+      <li><strong>20%</strong> whether it has things to actually do that match them</li>
+      <li><strong>15%</strong> the month you named — peak, shoulder or off, never zero</li>
+      <li><strong>10%</strong> how connected it is to the rest of the Atlas</li>
+      <li><strong>20%</strong> how much of it we have actually written</li>
+      <li><strong>5%</strong> novelty: quiet places, and countries not yet in your route</li>
     </ul>
+    <p class="small">The specification this came from allocates 10% to popularity. We have no
+    traffic and no licensed visitor data, so that term would be a number we invented wearing a
+    percentage sign. Its weight moved to content quality, which is measurable. And
+    "accessibility" there means <em>reachability</em> — we hold no step-free access data at
+    all, and <a href="/accessibility">say so</a>.</p>
+    <p>Then: distance penalises each next stop so the route stops wandering; three big cities
+    in a row start to push the fourth choice towards the alternative; nights come from the
+    range on each destination page; and anything above what your budget can afford per day is
+    damped.</p>
     <h3>What it will not do</h3>
     <p>It will not book anything, price a real hotel, or route you into a country under a
     travel advisory — those are excluded from the planning index entirely.</p>

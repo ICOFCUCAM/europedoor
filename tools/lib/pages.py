@@ -534,7 +534,8 @@ def journeys_index(data):
             cn = data["cities"][leg["city"]]["country"]["name"]
             if cn not in countries:
                 countries.append(cn)
-        meta = f'<p class="cardmeta">{j["days"]} days · {len(countries)} countries · {esc(j["budget"])}</p>'
+        meta = (f'<p class="cardmeta">{j["days"]} days · {len(countries)} countries · '
+                f'{esc(j["difficulty"])} · {esc(j["budget"])}</p>')
         cards.append(card(urls.journey(j), j["strapline"], j["name"], j["summary"][:150] + "…",
                           seed="journey:" + j["slug"], meta=meta))
     body = f"""
@@ -586,13 +587,34 @@ def journey_page(data, j):
         haversine(idx[j["legs"][i]["city"]]["city"], idx[j["legs"][i + 1]["city"]]["city"])
         for i in range(len(j["legs"]) - 1)
     )
+    # Estimated budget, computed the same way the planner computes one, so a
+    # journey page and a plan for the same route cannot disagree.
+    style_i = {"low": 0, "moderate": 1, "high": 2}[j["budget"]]
+    stay = 0
+    for leg in j["legs"]:
+        band = idx[leg["city"]]["country"]["daily_eur"]
+        rate = band[0] + (band[1] - band[0]) * (style_i / 2)
+        stay += leg["nights"] * rate
+    transport_eur = 0
+    for i in range(len(j["legs"]) - 1):
+        km = haversine(idx[j["legs"][i]["city"]]["city"], idx[j["legs"][i + 1]["city"]]["city"])
+        transport_eur += max(18, km * (0.11 if km < 400 else 0.09))
+    est = int(round((stay + transport_eur) * 1.12 / 10) * 10)
+
     facts = factlist([
         ("Length", f"{j['days']} days"),
+        ("From / to", f'<a href="{urls.city_by_id(idx, j["start"])}">{esc(idx[j["start"]]["city"]["name"])}</a> → '
+                     f'<a href="{urls.city_by_id(idx, j["end"])}">{esc(idx[j["end"]]["city"]["name"])}</a>'),
         ("Countries", esc(" → ".join(countries))),
         ("Ground covered", f"{total_km:,} km between stops"),
+        ("Difficulty", esc(j["difficulty"])),
+        ("Transport", esc(", ".join(j["transport"]))),
+        ("Accommodation", esc(j["accommodation"])),
         ("Budget shape", esc(j["budget"])),
+        ("Estimated cost", f"about €{est:,} per person"),
         ("Months that work", esc(months_line(data, j["months"]))),
     ])
+    packlist = "".join(f"<li>{esc(x)}</li>" for x in j["pack"])
     body = f"""
 {crumbs([("Europe", "/discover"), ("Journeys", "/journeys"), (j["name"], None)])}
 <div class="pagehead">
@@ -608,7 +630,17 @@ def journey_page(data, j):
     {chips(j["interests"], data["interests"])}
     {facts}
     <h2>The route</h2>
+    {routemap(data, j)}
     <ul class="legs">{''.join(legs)}</ul>
+
+    <h2 style="margin-top:var(--s7)">What to pack</h2>
+    <ul class="stack">{packlist}</ul>
+
+    <h2 style="margin-top:var(--s7)">What this estimate covers</h2>
+    <p>About €{est:,} per person: {j['days'] - 1} nights at the {esc(j['budget'])} daily band for
+    each country on the route, plus a distance-based transport figure between stops, plus 12%.
+    It excludes getting to the start and home from the end, and it is planning arithmetic from
+    published bands rather than a quote. <a href="/sources">How these numbers are made →</a></p>
   </div>
   <aside class="rail">
     <h3>Make it yours</h3>
@@ -658,6 +690,15 @@ def planner_api(data):
             "why": t["summary"],
             "highlights": t["highlights"][:2],
             "exp": len(t.get("experiences", [])),
+            # What there is actually to do, for the day-by-day, and how much
+            # of it we hold, for the content-quality term in the score.
+            "todo": ([{"n": pl["name"], "k": "place", "u": urls.place(c, r, t, pl)}
+                      for pl in t.get("places", [])[:4]]
+                     + [{"n": e["name"], "k": e["kind"], "u": urls.city(c, r, t) + "#things-to-do"}
+                        for e in t.get("experiences", [])[:3]]),
+            "depth": len(t.get("places", [])) + len(t.get("experiences", [])) + len(t["highlights"]),
+            "quiet": bool(t.get("quiet")),
+            "checked": bool(c.get("checked")),
         })
     journeys = [
         {
@@ -766,13 +807,24 @@ def planner_page(data):
   </div>
   <aside class="rail">
     <h3>How it decides</h3>
+    <p>Every destination is scored out of one, on a published weighting:</p>
     <ul>
-      <li>Every city is scored on how many of your interests it carries, at region and city level.</li>
-      <li>The month you pick moves the score: peak season up, off season down, never to zero.</li>
-      <li>Each next stop is penalised by distance, so the route stops wandering.</li>
-      <li>Nights come from the range on each city page, stretched or squeezed by your pace.</li>
-      <li>Cost is nights × the country's daily band, plus a distance-based transport estimate.</li>
+      <li><strong>30%</strong> how many of your interests it carries</li>
+      <li><strong>20%</strong> whether it has things to actually do that match them</li>
+      <li><strong>15%</strong> the month you named — peak, shoulder or off, never zero</li>
+      <li><strong>10%</strong> how connected it is to the rest of the Atlas</li>
+      <li><strong>20%</strong> how much of it we have actually written</li>
+      <li><strong>5%</strong> novelty: quiet places, and countries not yet in your route</li>
     </ul>
+    <p class="small">The specification this came from allocates 10% to popularity. We have no
+    traffic and no licensed visitor data, so that term would be a number we invented wearing a
+    percentage sign. Its weight moved to content quality, which is measurable. And
+    "accessibility" there means <em>reachability</em> — we hold no step-free access data at
+    all, and <a href="/accessibility">say so</a>.</p>
+    <p>Then: distance penalises each next stop so the route stops wandering; three big cities
+    in a row start to push the fourth choice towards the alternative; nights come from the
+    range on each destination page; and anything above what your budget can afford per day is
+    damped.</p>
     <h3>What it will not do</h3>
     <p>It will not book anything, price a real hotel, or route you into a country under a
     travel advisory — those are excluded from the planning index entirely.</p>
@@ -831,6 +883,37 @@ def minimap(data, t, span=3.2):
         f'{"".join(dots)}{"".join(labels)}</svg>'
         f'<figcaption>{esc(t["name"])} and everything within about '
         f'{int(span * 60)} kilometres in the Atlas. <a href="/map">The full map →</a></figcaption></figure>'
+    )
+
+
+def routemap(data, j):
+    """The journey drawn on the continent. Same projection as /map, so a
+    route on a journey page and the same route on the map agree exactly."""
+    idx = data["cities"]
+    pts = [project(idx[l["city"]]["city"]["lat"], idx[l["city"]]["city"]["lon"]) for l in j["legs"]]
+    xs = [p[0] for p in pts]
+    ys = [p[1] for p in pts]
+    pad = 90
+    x0, x1 = min(xs) - pad, max(xs) + pad
+    y0, y1 = min(ys) - pad, max(ys) + pad
+    w, h = max(240.0, x1 - x0), max(160.0, y1 - y0)
+    d = " ".join(("M" if i == 0 else "L") + f"{x:.1f} {y:.1f}" for i, (x, y) in enumerate(pts))
+    dots = "".join(
+        f'<circle class="routedot" cx="{x:.1f}" cy="{y:.1f}" r="6"><title>{i + 1}. '
+        f'{esc(idx[j["legs"][i]["city"]]["city"]["name"])}</title></circle>'
+        for i, (x, y) in enumerate(pts)
+    )
+    labels = "".join(
+        f'<text class="minilabel here" x="{x + 10:.1f}" y="{y + 4:.1f}">'
+        f'{esc(idx[j["legs"][i]["city"]]["city"]["name"])}</text>'
+        for i, (x, y) in enumerate(pts)
+    )
+    return (
+        f'<figure class="minimap"><svg viewBox="{x0:.1f} {y0:.1f} {w:.1f} {h:.1f}" role="img" '
+        f'aria-label="Route map for {esc(j["name"])}">'
+        f'<path class="routeline" d="{d}"/>{dots}{labels}</svg>'
+        f'<figcaption>Straight lines between stops. What each one means on the ground is in the '
+        f'note under the leg. <a href="/map">The whole map, with every journey →</a></figcaption></figure>'
     )
 
 

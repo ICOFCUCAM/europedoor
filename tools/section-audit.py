@@ -140,9 +140,9 @@ def s4():
             break
     yield NCOUNTRY >= 50, f"{NCOUNTRY} countries"
     yield NCITY >= 240, f"{NCITY} cities"
-    yield has(u, "What earns the time", "Experiences here", "When to come",
-              "Getting there", "Nearest onward stops", "Fixed points in the year",
-              "Europe Experience Score")
+    yield has(u, "Why visit", "Things to do", "When to come", "Getting there",
+              "Nearest onward stops", "Events", "Europe Experience Score",
+              "Accommodation &amp; restaurants")
     yield has(edged_city(), "This place, in the rest of the site")
     yield has("/europe/norway", "Getting around", "Travel regions",
               "Worth knowing", "At the table", "Facts checked")

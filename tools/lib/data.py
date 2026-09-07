@@ -208,8 +208,20 @@ def load():
         p.require(SLUG.match(j.get("slug", "")), jw, "journey slug is not a slug")
         p.require(j["slug"] not in seen_j, jw, "duplicate journey slug")
         seen_j.add(j.get("slug"))
-        for key in ("name", "strapline", "summary", "days", "budget", "interests", "months", "legs"):
+        for key in ("name", "strapline", "summary", "days", "budget", "interests", "months",
+                    "legs", "difficulty", "transport", "accommodation", "pack", "start", "end"):
             p.require(key in j, jw, f"missing key {key!r}")
+        p.require(j.get("difficulty") in ("easy", "moderate", "demanding"), jw,
+                  "difficulty must be easy/moderate/demanding")
+        # This one exists because difficulty and budget share three of their
+        # words, and a journey shipped with budget="demanding" for exactly
+        # that reason.
+        p.require(j.get("budget") in BUDGETS, jw,
+                  "budget must be low/moderate/high, not a difficulty")
+        p.require(j.get("accommodation") in ("guesthouse", "hotel", "mixed"), jw,
+                  "accommodation must be guesthouse/hotel/mixed")
+        p.require(len(j.get("pack", [])) >= 3, jw, "a journey needs at least three packing notes")
+        p.require(len(j.get("transport", [])) >= 1, jw, "a journey needs a transport mode")
         for i in j.get("interests", []):
             p.require(i in interests, jw, f"unknown interest {i!r}")
         for m in j.get("months", []):
@@ -219,6 +231,8 @@ def load():
             p.require(leg.get("city") in index, jw, f"leg points at unknown city {leg.get('city')!r}")
             p.require(isinstance(leg.get("nights"), int) and leg["nights"] >= 1, jw, "leg needs nights")
             p.require(bool(leg.get("why")), jw, f"leg {leg.get('city')} needs a why")
+        p.require(j.get("start") == j["legs"][0]["city"], jw, "start must be the first leg")
+        p.require(j.get("end") == j["legs"][-1]["city"], jw, "end must be the last leg")
         total = sum(l.get("nights", 0) for l in j.get("legs", []))
         p.require(total == j.get("days", -1) - 1, jw,
                   f"legs total {total} nights but the journey claims {j.get('days')} days")
