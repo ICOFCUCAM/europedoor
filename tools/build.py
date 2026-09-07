@@ -89,6 +89,7 @@ def build():
     emit(P.about_page(d))
     emit(P.how_it_works_page(d))
     emit(P.sources_page(d))
+    emit(P.freshness_page(d))
     emit(P.not_found(d))
 
     for path, payload in (P.planner_api(d), P.search_api(d)):

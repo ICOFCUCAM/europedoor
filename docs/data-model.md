@@ -41,6 +41,11 @@ twice, or not at all, fails the build.
     "level": "avoid",              //   from the planner index entirely
     "note": "…"
   },
+  "checked": {                     // optional. Absent means never verified,
+    "on": "2026-09-07",            //   which every country page states in
+    "by": "…",                     //   words and /sources/freshness lists.
+    "sources": [{ "what": "…", "where": "…" }]
+  },
   "tagline": "…",                  // one line, used on cards
   "summary": "…",                  // 3–5 sentences
   "interests": ["mountains", "coast", …],
@@ -173,9 +178,8 @@ See [`europe-fund.md`](europe-fund.md).
 
 ## What is missing and should be added
 
-* `facts_checked_on` / `facts_checked_by` per country and city. The whole
-  dataset is currently unverified editorial writing and `/sources` says so;
-  this field is how that stops being true one row at a time.
+* Per-**city** verification. Countries carry `checked`; cities do not yet,
+  and a city page is where most of the perishable claims actually live.
 * Administrative region codes (NUTS), for later data joins.
 * Accessibility notes per city and experience — the most common thing a real
   traveller needs and the most common thing a travel site omits.

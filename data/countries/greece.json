@@ -1,85 +1,756 @@
 {
-  "code": "gr", "slug": "greece", "name": "Greece", "official": "Hellenic Republic",
-  "macro": "mediterranean", "capital": "Athens", "currency": "EUR — euro",
-  "languages": ["Greek"],
-  "blocs": ["eu", "schengen", "eurozone", "eea"],
+  "code": "gr",
+  "slug": "greece",
+  "name": "Greece",
+  "official": "Hellenic Republic",
+  "macro": "mediterranean",
+  "capital": "Athens",
+  "currency": "EUR — euro",
+  "languages": [
+    "Greek"
+  ],
+  "blocs": [
+    "eu",
+    "schengen",
+    "eurozone",
+    "eea"
+  ],
   "tagline": "Six thousand islands, of which two hundred and twenty-seven are inhabited, and a mainland almost nobody visits.",
   "summary": "Greece is more mountain than island by area, and the mainland — Epirus, the Pindus, the Peloponnese — is emptier and greener than the postcards suggest. The islands divide into groups with different architecture, food and weather; the Cyclades are white and windy, the Ionians green, the Dodecanese medieval. Everything closes down in the afternoon heat and reopens at six, which is not laziness but sense.",
-  "interests": ["islands", "coast", "history", "sacred", "food", "mountains", "wine"],
-  "budget": "moderate", "daily_eur": [55, 140],
-  "season": { "peak": ["jun", "jul", "aug", "sep"], "shoulder": ["may", "oct"],
-    "note": "May, June, September and early October are the sweet spot: swimmable sea, open tavernas, tolerable ruins. August is the whole of Greece and half of Europe on the same ferries. Many island businesses close entirely from November to April." },
-  "getting_around": "Ferries are the network: fast catamarans and slow open-deck boats, both booked online and both cancelled by wind. Domestic flights save a day to the far islands. The mainland needs a car; the Athens metro is excellent and has an archaeological museum inside a station.",
-  "food": ["Whatever is in the pot that day — ask to see the kitchen, which is normal", "Greek salad with no lettuce, and bread to finish the oil", "Wine from Santorini's assyrtiko and Naoussa's xinomavro, both serious and both cheap here"],
-  "festivals": [
-    { "name": "Orthodox Easter — the biggest event of the year", "month": "apr", "where": "Nationwide, especially the islands" },
-    { "name": "Athens & Epidaurus Festival, in ancient theatres", "month": "jun", "where": "Athens and Epidaurus" },
-    { "name": "Grape harvest and village panigiria", "month": "aug", "where": "Islands and mountain villages" }
+  "interests": [
+    "islands",
+    "coast",
+    "history",
+    "sacred",
+    "food",
+    "mountains",
+    "wine"
   ],
-  "know": ["Ferry cancellations for wind are common and not negotiable; leave a buffer day before a flight home.", "Many older buildings ask you to bin paper rather than flush it — follow the sign.", "Archaeological sites close early in winter and midday shade is scarce; go at opening."],
+  "budget": "moderate",
+  "daily_eur": [
+    55,
+    140
+  ],
+  "season": {
+    "peak": [
+      "jun",
+      "jul",
+      "aug",
+      "sep"
+    ],
+    "shoulder": [
+      "may",
+      "oct"
+    ],
+    "note": "May, June, September and early October are the sweet spot: swimmable sea, open tavernas, tolerable ruins. August is the whole of Greece and half of Europe on the same ferries. Many island businesses close entirely from November to April."
+  },
+  "getting_around": "Ferries are the network: fast catamarans and slow open-deck boats, both booked online and both cancelled by wind. Domestic flights save a day to the far islands. The mainland needs a car; the Athens metro is excellent and has an archaeological museum inside a station.",
+  "food": [
+    "Whatever is in the pot that day — ask to see the kitchen, which is normal",
+    "Greek salad with no lettuce, and bread to finish the oil",
+    "Wine from Santorini's assyrtiko and Naoussa's xinomavro, both serious and both cheap here"
+  ],
+  "festivals": [
+    {
+      "name": "Orthodox Easter — the biggest event of the year",
+      "month": "apr",
+      "where": "Nationwide, especially the islands"
+    },
+    {
+      "name": "Athens & Epidaurus Festival, in ancient theatres",
+      "month": "jun",
+      "where": "Athens and Epidaurus"
+    },
+    {
+      "name": "Grape harvest and village panigiria",
+      "month": "aug",
+      "where": "Islands and mountain villages"
+    }
+  ],
+  "know": [
+    "Ferry cancellations for wind are common and not negotiable; leave a buffer day before a flight home.",
+    "Many older buildings ask you to bin paper rather than flush it — follow the sign.",
+    "Archaeological sites close early in winter and midday shade is scarce; go at opening."
+  ],
   "regions": [
-    { "slug": "athens-and-the-peloponnese", "name": "Athens & the Peloponnese",
+    {
+      "slug": "athens-and-the-peloponnese",
+      "name": "Athens & the Peloponnese",
       "summary": "The classical core: the Acropolis, Mycenae, Olympia and a peninsula of castles and empty coast.",
-      "interests": ["history", "sacred", "food", "coast"],
+      "interests": [
+        "history",
+        "sacred",
+        "food",
+        "coast"
+      ],
       "cities": [
-        { "slug": "athens", "name": "Athens", "lat": 37.98, "lon": 23.73,
+        {
+          "slug": "athens",
+          "name": "Athens",
+          "lat": 37.98,
+          "lon": 23.73,
           "summary": "A sprawling modern capital with a 2,500-year-old temple on a rock in the middle and a food scene that got very good, quietly.",
-          "interests": ["history", "food", "art", "cities", "music"], "nights": [2, 3],
-          "highlights": ["The Acropolis at opening, and the Acropolis Museum afterwards, in that order", "The National Archaeological Museum, which is the real prize", "Rooftop bars looking at a floodlit Parthenon", "Anafiotika, a Cycladic village accidentally inside the city"],
+          "interests": [
+            "history",
+            "food",
+            "art",
+            "cities",
+            "music"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The Acropolis at opening, and the Acropolis Museum afterwards, in that order",
+            "The National Archaeological Museum, which is the real prize",
+            "Rooftop bars looking at a floodlit Parthenon",
+            "Anafiotika, a Cycladic village accidentally inside the city"
+          ],
           "experiences": [
-            { "slug": "athens-acropolis-museum", "name": "The Acropolis Museum, third floor", "kind": "museum", "band": "moderate", "summary": "The Parthenon frieze laid out at actual scale and orientation, with plaster casts where the British Museum holds the originals — the gaps are the argument." }
-          ] },
-        { "slug": "nafplio", "name": "Nafplio", "lat": 37.57, "lon": 22.80, "quiet": true,
+            {
+              "slug": "athens-acropolis-museum",
+              "name": "The Acropolis Museum, third floor",
+              "kind": "museum",
+              "band": "moderate",
+              "summary": "The Parthenon frieze laid out at actual scale and orientation, with plaster casts where the British Museum holds the originals — the gaps are the argument."
+            }
+          ]
+        },
+        {
+          "slug": "nafplio",
+          "name": "Nafplio",
+          "lat": 37.57,
+          "lon": 22.8,
+          "quiet": true,
           "summary": "Greece's first capital: Venetian, neoclassical, under two fortresses, on a gulf in the Peloponnese.",
-          "interests": ["history", "coast", "food"], "nights": [2, 3],
-          "highlights": ["Palamidi fortress and its 999 steps", "Epidaurus's theatre, where a coin dropped on stage is audible in the back row", "Mycenae's lion gate, forty minutes north"],
-          "experiences": [{ "slug": "epidaurus-acoustics", "name": "The acoustics at Epidaurus", "kind": "sacred", "band": "low", "summary": "Sit in the top row and have someone whisper on the orchestra floor. Built in the 4th century BC and still unexplained in full." }] },
-        { "slug": "monemvasia", "name": "Monemvasia", "lat": 36.69, "lon": 23.05, "quiet": true,
+          "interests": [
+            "history",
+            "coast",
+            "food"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Palamidi fortress and its 999 steps",
+            "Epidaurus's theatre, where a coin dropped on stage is audible in the back row",
+            "Mycenae's lion gate, forty minutes north"
+          ],
+          "experiences": [
+            {
+              "slug": "epidaurus-acoustics",
+              "name": "The acoustics at Epidaurus",
+              "kind": "sacred",
+              "band": "low",
+              "summary": "Sit in the top row and have someone whisper on the orchestra floor. Built in the 4th century BC and still unexplained in full."
+            }
+          ]
+        },
+        {
+          "slug": "monemvasia",
+          "name": "Monemvasia",
+          "lat": 36.69,
+          "lon": 23.05,
+          "quiet": true,
           "summary": "A Byzantine town hidden on the seaward side of a rock island, invisible from the mainland.",
-          "interests": ["history", "coast", "sacred"], "nights": [1, 2],
-          "highlights": ["A single gate, and no cars inside the walls", "The upper town's ruins and Hagia Sophia on the summit", "Swimming off the rocks below the walls"] }
-      ] },
-    { "slug": "the-islands", "name": "The Islands",
+          "interests": [
+            "history",
+            "coast",
+            "sacred"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "A single gate, and no cars inside the walls",
+            "The upper town's ruins and Hagia Sophia on the summit",
+            "Swimming off the rocks below the walls"
+          ]
+        },
+        {
+          "slug": "delphi",
+          "name": "Delphi",
+          "lat": 38.48,
+          "lon": 22.5,
+          "summary": "The navel of the ancient world, on a terrace of Mount Parnassus above a sea of olive trees.",
+          "interests": [
+            "history",
+            "sacred",
+            "mountains",
+            "nature"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The sacred way up to the temple of Apollo, where the oracle spoke",
+            "The bronze Charioteer, which survived because an earthquake buried it",
+            "The stadium at the top, above everything, and usually empty"
+          ],
+          "experiences": [
+            {
+              "slug": "delphi-early-sacred-way",
+              "name": "The sacred way at opening",
+              "kind": "sacred",
+              "band": "low",
+              "summary": "The site opens at eight and the coaches arrive at ten. Two hours of Delphi alone is a different place from Delphi at noon."
+            }
+          ]
+        },
+        {
+          "slug": "olympia",
+          "name": "Olympia",
+          "lat": 37.64,
+          "lon": 21.63,
+          "quiet": true,
+          "summary": "Where the games were held every four years for a millennium, in a wooded valley between two rivers.",
+          "interests": [
+            "history",
+            "sacred",
+            "nature"
+          ],
+          "nights": [
+            1,
+            1
+          ],
+          "highlights": [
+            "The original stadium, entered through its vaulted tunnel",
+            "The workshop of Pheidias, identified by a cup with his name on it",
+            "Hermes of Praxiteles in the museum, found where it fell"
+          ]
+        },
+        {
+          "slug": "mystras",
+          "name": "Mystras",
+          "lat": 37.07,
+          "lon": 22.37,
+          "quiet": true,
+          "summary": "A Byzantine city on a spur of Taygetos, abandoned in the 1950s and left standing: palaces, churches and frescoes.",
+          "interests": [
+            "history",
+            "sacred",
+            "architecture",
+            "mountains"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "A whole late-Byzantine city, walked from the castle down",
+            "Frescoes in six churches, most of them unrestored",
+            "Sparta below, which has almost nothing left"
+          ]
+        },
+        {
+          "slug": "kardamyli",
+          "name": "Kardamyli & the Mani",
+          "lat": 36.89,
+          "lon": 22.23,
+          "quiet": true,
+          "summary": "Stone tower houses on a wild peninsula where blood feuds ran into the 20th century, above a clear sea.",
+          "interests": [
+            "coast",
+            "history",
+            "mountains",
+            "food"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Tower villages built for feuding families, still standing empty",
+            "The Viros gorge, walked from the sea up into Taygetos",
+            "Patrick Leigh Fermor's house, now open by appointment"
+          ]
+        },
+        {
+          "slug": "hydra",
+          "name": "Hydra",
+          "lat": 37.35,
+          "lon": 23.47,
+          "quiet": true,
+          "summary": "An island two hours from Athens with no cars and no bicycles at all — mules, boats and feet.",
+          "interests": [
+            "islands",
+            "coast",
+            "history",
+            "art"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Shipowners' mansions round a stone harbour, from the 1790s",
+            "No wheeled traffic of any kind, by law",
+            "Swimming off the rocks at Spilia, straight from the town"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "the-islands",
+      "name": "The Islands",
       "summary": "Cyclades, Dodecanese, Ionian and Crete — related, and not remotely the same.",
-      "interests": ["islands", "coast", "food", "wine"],
+      "interests": [
+        "islands",
+        "coast",
+        "food",
+        "wine"
+      ],
       "cities": [
-        { "slug": "naxos", "name": "Naxos", "lat": 37.10, "lon": 25.38, "quiet": true,
+        {
+          "slug": "naxos",
+          "name": "Naxos",
+          "lat": 37.1,
+          "lon": 25.38,
+          "quiet": true,
           "summary": "The largest Cycladic island: mountain villages, marble quarries, a working agricultural interior and long sandy beaches.",
-          "interests": ["islands", "coast", "food", "mountains"], "nights": [3, 4],
-          "highlights": ["The Portara, a temple doorway on an islet at the harbour", "Halki and the mountain villages, with citron distilleries", "An unfinished 6th-century BC kouros lying in a field where it cracked"],
-          "experiences": [{ "slug": "naxos-mountain-villages", "name": "The interior, not the beach", "kind": "ride", "band": "low", "summary": "Half the island is farmland at altitude — cheese, potatoes and Venetian towers, twenty minutes from the sand." }] },
-        { "slug": "santorini", "name": "Santorini", "lat": 36.42, "lon": 25.43,
+          "interests": [
+            "islands",
+            "coast",
+            "food",
+            "mountains"
+          ],
+          "nights": [
+            3,
+            4
+          ],
+          "highlights": [
+            "The Portara, a temple doorway on an islet at the harbour",
+            "Halki and the mountain villages, with citron distilleries",
+            "An unfinished 6th-century BC kouros lying in a field where it cracked"
+          ],
+          "experiences": [
+            {
+              "slug": "naxos-mountain-villages",
+              "name": "The interior, not the beach",
+              "kind": "ride",
+              "band": "low",
+              "summary": "Half the island is farmland at altitude — cheese, potatoes and Venetian towers, twenty minutes from the sand."
+            }
+          ]
+        },
+        {
+          "slug": "santorini",
+          "name": "Santorini",
+          "lat": 36.42,
+          "lon": 25.43,
           "summary": "The rim of a drowned volcano, with villages on the edge of a 300-metre cliff and vines grown in baskets on the ground.",
-          "interests": ["islands", "wine", "coast", "history"], "nights": [2, 3],
-          "highlights": ["Akrotiri: a Bronze Age town buried in ash and preserved whole", "Assyrtiko from vines trained into wreaths against the wind", "The caldera path from Fira to Oia — walked early, not at sunset"],
-          "experiences": [{ "slug": "santorini-assyrtiko", "name": "Vines grown in baskets", "kind": "cellar", "band": "moderate", "summary": "No trellises: the vines are woven into circles on the ground to shelter the fruit from wind and catch night moisture." }] },
-        { "slug": "chania", "name": "Chania, Crete", "lat": 35.51, "lon": 24.02,
+          "interests": [
+            "islands",
+            "wine",
+            "coast",
+            "history"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Akrotiri: a Bronze Age town buried in ash and preserved whole",
+            "Assyrtiko from vines trained into wreaths against the wind",
+            "The caldera path from Fira to Oia — walked early, not at sunset"
+          ],
+          "experiences": [
+            {
+              "slug": "santorini-assyrtiko",
+              "name": "Vines grown in baskets",
+              "kind": "cellar",
+              "band": "moderate",
+              "summary": "No trellises: the vines are woven into circles on the ground to shelter the fruit from wind and catch night moisture."
+            }
+          ]
+        },
+        {
+          "slug": "chania",
+          "name": "Chania, Crete",
+          "lat": 35.51,
+          "lon": 24.02,
           "summary": "A Venetian harbour with an Ottoman quarter behind it, on an island large enough to be its own country.",
-          "interests": ["coast", "food", "history", "mountains"], "nights": [3, 4],
-          "highlights": ["The Venetian lighthouse and the harbour arc", "Samaria gorge: 16 km down through the White Mountains to the sea", "Cretan food — the diet the research is about — in mountain villages"],
-          "experiences": [{ "slug": "samaria-gorge", "name": "Down the Samaria gorge", "kind": "walk", "band": "moderate", "summary": "Sixteen kilometres, one direction only, ending at a boat because there is no road out. Open May to October." }] },
-        { "slug": "rhodes", "name": "Rhodes", "lat": 36.44, "lon": 28.22,
+          "interests": [
+            "coast",
+            "food",
+            "history",
+            "mountains"
+          ],
+          "nights": [
+            3,
+            4
+          ],
+          "highlights": [
+            "The Venetian lighthouse and the harbour arc",
+            "Samaria gorge: 16 km down through the White Mountains to the sea",
+            "Cretan food — the diet the research is about — in mountain villages"
+          ],
+          "experiences": [
+            {
+              "slug": "samaria-gorge",
+              "name": "Down the Samaria gorge",
+              "kind": "walk",
+              "band": "moderate",
+              "summary": "Sixteen kilometres, one direction only, ending at a boat because there is no road out. Open May to October."
+            }
+          ]
+        },
+        {
+          "slug": "rhodes",
+          "name": "Rhodes",
+          "lat": 36.44,
+          "lon": 28.22,
           "summary": "A walled medieval city built by crusader knights, on an island of Ottoman villages and butterfly valleys.",
-          "interests": ["history", "coast", "architecture"], "nights": [2, 3],
-          "highlights": ["The largest inhabited medieval town in Europe, inside four kilometres of wall", "Lindos's acropolis above a white village and a bay", "Ottoman baths and mosques the guidebooks skip"] }
-      ] },
-    { "slug": "northern-greece", "name": "Northern Greece",
+          "interests": [
+            "history",
+            "coast",
+            "architecture"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The largest inhabited medieval town in Europe, inside four kilometres of wall",
+            "Lindos's acropolis above a white village and a bay",
+            "Ottoman baths and mosques the guidebooks skip"
+          ]
+        },
+        {
+          "slug": "milos",
+          "name": "Milos",
+          "lat": 36.72,
+          "lon": 24.44,
+          "summary": "A volcanic island of white rock formations, coloured mining beaches and boat-only coves.",
+          "interests": [
+            "islands",
+            "coast",
+            "nature"
+          ],
+          "nights": [
+            3,
+            4
+          ],
+          "highlights": [
+            "Sarakiniko: white pumice worn into a moonscape by the sea",
+            "Kleftiko's sea caves, reachable only by boat",
+            "Fishermen's syrmata: garages cut into the rock, painted, now let out"
+          ],
+          "experiences": [
+            {
+              "slug": "milos-boat-day",
+              "name": "Round the island by boat",
+              "kind": "water",
+              "band": "moderate",
+              "summary": "Half the coast has no road to it. A day boat from Adamas is the only way to see Kleftiko and the southern coves."
+            }
+          ]
+        },
+        {
+          "slug": "paros",
+          "name": "Paros",
+          "lat": 37.08,
+          "lon": 25.15,
+          "summary": "Cycladic in the way people imagine the Cyclades, with marble quarries that supplied the ancient world and a working town behind the beaches.",
+          "interests": [
+            "islands",
+            "coast",
+            "food",
+            "history"
+          ],
+          "nights": [
+            3,
+            4
+          ],
+          "highlights": [
+            "Naoussa's small harbour, before the evening crowd",
+            "The Byzantine road, a marble path over the hills to Lefkes",
+            "Parian marble, which the Venus de Milo is made of"
+          ]
+        },
+        {
+          "slug": "symi",
+          "name": "Symi",
+          "lat": 36.61,
+          "lon": 27.84,
+          "quiet": true,
+          "summary": "Neoclassical mansions in ochre and blue stacked round a horseshoe harbour, an hour from Rhodes.",
+          "interests": [
+            "islands",
+            "coast",
+            "architecture",
+            "sacred"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The harbour at Gialos, which is the reason to come",
+            "Panormitis monastery at the southern end, reached by boat",
+            "Sponge diving history, and the shops that still sell them"
+          ]
+        },
+        {
+          "slug": "corfu",
+          "name": "Corfu",
+          "lat": 39.62,
+          "lon": 19.92,
+          "summary": "Venetian for four centuries and British for fifty, green all year, with an old town that looks nothing like the Aegean.",
+          "interests": [
+            "islands",
+            "architecture",
+            "history",
+            "food"
+          ],
+          "nights": [
+            3,
+            4
+          ],
+          "highlights": [
+            "The UNESCO old town, Venetian streets and two fortresses",
+            "Cricket on the Spianada, a British hangover",
+            "Mount Pantokrator, and Albania visible across the strait"
+          ]
+        },
+        {
+          "slug": "kefalonia",
+          "name": "Kefalonia",
+          "lat": 38.25,
+          "lon": 20.49,
+          "summary": "The largest Ionian island: an underground lake, a mountain of black fir, and the loggerhead turtles offshore.",
+          "interests": [
+            "islands",
+            "coast",
+            "nature",
+            "wild",
+            "wine"
+          ],
+          "nights": [
+            3,
+            4
+          ],
+          "highlights": [
+            "Melissani cave, where the roof collapsed and the light comes straight down",
+            "Mount Ainos, black fir found nowhere else",
+            "Robola wine, grown on limestone at altitude"
+          ]
+        },
+        {
+          "slug": "ikaria",
+          "name": "Ikaria",
+          "lat": 37.6,
+          "lon": 26.17,
+          "quiet": true,
+          "summary": "A steep island where people routinely live past ninety, festivals start at midnight and shops open when they open.",
+          "interests": [
+            "islands",
+            "food",
+            "nature",
+            "music"
+          ],
+          "nights": [
+            3,
+            4
+          ],
+          "highlights": [
+            "Panigiria: village festivals that run until dawn and are not for tourists",
+            "Radioactive hot springs at Therma, used since antiquity",
+            "Nas and the west coast, which is nearly roadless"
+          ],
+          "experiences": [
+            {
+              "slug": "ikaria-panigiri",
+              "name": "A panigiri that ends at dawn",
+              "kind": "stage",
+              "band": "low",
+              "summary": "A village saint's day: one long table, live violin and lute, dancing in a circle, and food priced to cover the church roof."
+            }
+          ]
+        },
+        {
+          "slug": "heraklion",
+          "name": "Heraklion & Knossos",
+          "lat": 35.34,
+          "lon": 25.13,
+          "summary": "Crete's capital and the Minoan palace beside it — Europe's oldest city, and a reconstruction people still argue about.",
+          "interests": [
+            "history",
+            "food",
+            "architecture"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Knossos, and Evans's concrete reconstructions, which are the argument",
+            "The archaeological museum, which holds what Knossos actually yielded",
+            "Venetian walls, and Kazantzakis buried on top of them"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "northern-greece",
+      "name": "Northern Greece",
       "summary": "Meteora's monasteries on rock pillars, Epirus's stone villages, and Thessaloniki's food.",
-      "interests": ["sacred", "mountains", "food", "history"],
+      "interests": [
+        "sacred",
+        "mountains",
+        "food",
+        "history"
+      ],
       "cities": [
-        { "slug": "meteora", "name": "Meteora (Kalambaka)", "lat": 39.71, "lon": 21.63,
+        {
+          "slug": "meteora",
+          "name": "Meteora (Kalambaka)",
+          "lat": 39.71,
+          "lon": 21.63,
           "summary": "Six working monasteries on top of sandstone pillars, reached for centuries by rope ladder and net.",
-          "interests": ["sacred", "mountains", "history"], "nights": [1, 2],
-          "highlights": ["The footpaths between monasteries, which almost every visitor drives instead", "Frescoes inside Varlaam and Great Meteoron", "Sunset from the rocks, not from the coach park"],
-          "experiences": [{ "slug": "meteora-monastery-paths", "name": "The old monks' paths", "kind": "walk", "band": "low", "summary": "Stone-cut trails link the pillars through the woods; three hours on foot beats a whole day by road." }] },
-        { "slug": "thessaloniki", "name": "Thessaloniki", "lat": 40.64, "lon": 22.94,
+          "interests": [
+            "sacred",
+            "mountains",
+            "history"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The footpaths between monasteries, which almost every visitor drives instead",
+            "Frescoes inside Varlaam and Great Meteoron",
+            "Sunset from the rocks, not from the coach park"
+          ],
+          "experiences": [
+            {
+              "slug": "meteora-monastery-paths",
+              "name": "The old monks' paths",
+              "kind": "walk",
+              "band": "low",
+              "summary": "Stone-cut trails link the pillars through the woods; three hours on foot beats a whole day by road."
+            }
+          ]
+        },
+        {
+          "slug": "thessaloniki",
+          "name": "Thessaloniki",
+          "lat": 40.64,
+          "lon": 22.94,
           "summary": "Greece's second city: Byzantine, Ottoman and Sephardic layers, and the country's most confident food.",
-          "interests": ["food", "history", "music", "sacred"], "nights": [2, 3],
-          "highlights": ["The Rotunda and the Byzantine churches on the UNESCO list", "Modiano and Kapani markets, then bougatsa for breakfast", "The waterfront walk to the Umbrellas at dusk"] },
-        { "slug": "zagori", "name": "Zagori (Monodendri)", "lat": 39.88, "lon": 20.75, "quiet": true,
+          "interests": [
+            "food",
+            "history",
+            "music",
+            "sacred"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The Rotunda and the Byzantine churches on the UNESCO list",
+            "Modiano and Kapani markets, then bougatsa for breakfast",
+            "The waterfront walk to the Umbrellas at dusk"
+          ]
+        },
+        {
+          "slug": "zagori",
+          "name": "Zagori (Monodendri)",
+          "lat": 39.88,
+          "lon": 20.75,
+          "quiet": true,
           "summary": "Forty-six stone villages in the Pindus mountains, linked by packhorse bridges over the deepest gorge in the world by ratio.",
-          "interests": ["mountains", "nature", "food", "wild"], "nights": [2, 3],
-          "highlights": ["The Vikos gorge, from the Oxya viewpoint or from inside it", "Arched stone bridges built by 18th-century merchant guilds", "Bears, wolves and 1,800 plant species in the national park"] }
-      ] }
+          "interests": [
+            "mountains",
+            "nature",
+            "food",
+            "wild"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The Vikos gorge, from the Oxya viewpoint or from inside it",
+            "Arched stone bridges built by 18th-century merchant guilds",
+            "Bears, wolves and 1,800 plant species in the national park"
+          ]
+        },
+        {
+          "slug": "pelion",
+          "name": "Pelion (Makrinitsa)",
+          "lat": 39.4,
+          "lon": 22.99,
+          "quiet": true,
+          "summary": "Stone villages with slate roofs on a wooded mountain that drops to beaches on both sides.",
+          "interests": [
+            "mountains",
+            "coast",
+            "nature",
+            "food"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Kalderimia: cobbled mule paths between villages, still the best way around",
+            "The narrow-gauge Moutzouris railway, built by Evaristo de Chirico",
+            "Apples, chestnuts and firs on one side of the ridge, the Aegean on the other"
+          ]
+        },
+        {
+          "slug": "kavala",
+          "name": "Kavala",
+          "lat": 40.94,
+          "lon": 24.41,
+          "quiet": true,
+          "summary": "An Ottoman aqueduct over a harbour town, with Philippi's ruins inland and Thasos across the water.",
+          "interests": [
+            "history",
+            "coast",
+            "food",
+            "sacred"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Kamares aqueduct, striding across the middle of town",
+            "Philippi: a Roman city, a battlefield, and where Paul first preached in Europe",
+            "Ferries to Thasos, which is green and largely undeveloped"
+          ]
+        },
+        {
+          "slug": "ioannina",
+          "name": "Ioannina",
+          "lat": 39.67,
+          "lon": 20.85,
+          "quiet": true,
+          "summary": "An Ottoman lake city with an island in it, a silversmithing tradition and the gateway to Zagori.",
+          "interests": [
+            "history",
+            "food",
+            "sacred",
+            "nature"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The walled kastro, and two mosques still standing inside it",
+            "The island, reached in ten minutes, with five monasteries and no cars",
+            "Silverwork, which the city has done for four centuries"
+          ]
+        }
+      ]
+    }
   ]
 }

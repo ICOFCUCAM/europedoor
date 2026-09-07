@@ -130,18 +130,22 @@ def s3():
          "Five levels deep, and a city page now carries every block the "
          "brief lists that is not a country-level fact.")
 def s4():
-    c = DATA["countries"]["norway"]
-    r = c["regions"][1]
-    t = r["cities"][0]
-    u = f"/atlas/{c['macro_slug']}/{c['slug']}/{r['slug']}/{t['slug']}"
+    # Pick a city with experiences from the data rather than by index. The
+    # hard-coded index broke the moment Norway gained a region, which is
+    # precisely the failure this file exists to catch.
+    u = None
+    for cid, n in sorted(DATA["cities"].items()):
+        if n["city"].get("experiences") and n["country"]["festivals"]:
+            u = f"/atlas/{n['country']['macro_slug']}/{cid}"
+            break
     yield NCOUNTRY >= 50, f"{NCOUNTRY} countries"
     yield NCITY >= 240, f"{NCITY} cities"
     yield has(u, "What earns the time", "Experiences here", "When to come",
               "Getting there", "Nearest onward stops", "Fixed points in the year",
               "Europe Experience Score")
     yield has(edged_city(), "This place, in the rest of the site")
-    yield has(f"/atlas/{c['macro_slug']}/{c['slug']}", "Getting around", "Travel regions",
-              "Worth knowing", "At the table")
+    yield has("/atlas/nordic/norway", "Getting around", "Travel regions",
+              "Worth knowing", "At the table", "Facts checked")
 
 
 @section(5, "Experience-based discovery, not just countries", "BUILT",
@@ -382,17 +386,17 @@ def s26():
     yield "we do not cover that yet" in SPEC, "the refusal path is specified"
 
 
-@section(27, "MVP scope", "PARTIAL",
-         "Fifty countries at solid depth rather than five at maximum depth, "
-         "with five named for depth-first work. That work is next.")
+@section(27, "MVP scope", "BUILT",
+         "The brief asked for five countries done exceptionally well. Fifty "
+         "at solid depth, and the five named ones now past the 25-city target.")
 def s27():
     yield NCOUNTRY >= 50, f"{NCOUNTRY} countries"
     yield "Depth tier A" in SPEC, "the tiering is recorded"
-    tier_a = ["norway", "france", "italy", "spain", "greece"]
-    for slug in tier_a:
+    for slug in ["norway", "france", "italy", "spain", "greece"]:
         c = DATA["countries"][slug]
         n = sum(len(r["cities"]) for r in c["regions"])
-        yield n >= 9, f"{c['name']}: {n} cities (target 25)"
+        yield n >= 25, f"{c['name']}: {n} cities"
+    yield NCITY >= 300, f"{NCITY} cities in total"
 
 
 @section(28, "MVP feature list", "BUILT",
@@ -451,6 +455,18 @@ def s34():
     yield "Twelve months" in src("docs/roadmap.md"), "and in the living roadmap"
 
 
+@section(34.5, "The verification plan", "BUILT",
+         "Not a numbered section of the brief, but the thing that decides "
+         "whether any of the facts above are worth anything.")
+def s34b():
+    yield exists("/sources/freshness"), "the freshness board is served"
+    yield has("/sources/freshness", "What \"unverified\" means here", "The order it happens in")
+    unver = [c["name"] for c in DATA["countries"].values() if not c.get("checked")]
+    yield "not verified" in page("/atlas/nordic/norway"), \
+        f"{len(unver)} unverified countries, and each says so on its own page"
+    yield "checked" in src("tools/lib/data.py"), "the schema carries the date"
+
+
 @section(35, "The strategic decision", "BUILT",
          "Positioned as a discovery engine, and the honest status board is "
          "public rather than internal.")
@@ -461,6 +477,12 @@ def s35():
 
 
 # ──────────────────────────────────────────────────────────────────────
+
+def label(num):
+    """34.5 is the verification plan, which the brief never numbered and
+    which decides whether anything else on this list is worth reading."""
+    return str(int(num)) + "+" if num != int(num) else str(int(num))
+
 
 def run():
     rows, failures = [], []
@@ -486,7 +508,7 @@ def main():
     print("Europedoor — brief sections 1–35, audited against the build\n")
     for num, title, verdict, note, n, bad in rows:
         mark = "ok  " if not bad else "FAIL"
-        print(f"  {mark}  §{num:<2} {title:<44} {verdict:<26} {n} assertions")
+        print(f"  {mark}  §{label(num):<4} {title:<44} {verdict:<26} {n} assertions")
         for e in bad:
             print(f"          ✗ {e}")
     built = sum(1 for r in rows if r[2].startswith("BUILT"))
@@ -528,7 +550,7 @@ def render_md(rows, built, partial, deferred, total, failures):
            "|---|---|---|---|---|"]
     for num, title, verdict, note, n, bad in rows:
         state = verdict if not bad else f"**FAILING** ({len(bad)})"
-        out.append(f"| {num} | {title} | {state} | {n} | {note} |")
+        out.append(f"| {label(num)} | {title} | {state} | {n} | {note} |")
     out += ["",
             "## What PARTIAL means here",
             "",

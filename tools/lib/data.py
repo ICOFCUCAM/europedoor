@@ -16,6 +16,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 DATA = os.path.join(ROOT, "data")
 
 SLUG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 BUDGETS = ("low", "moderate", "high")
 BLOCS = ("eu", "schengen", "eurozone", "eea", "cta")
 ADVISORY_LEVELS = ("caution", "avoid")
@@ -94,6 +95,17 @@ def load():
                 p.require(m in months, where, f"unknown month {m!r} in season.{band}")
         for f in c.get("festivals", []):
             p.require(f.get("month") in months, where, f"festival {f.get('name')!r}: bad month")
+        # Fact verification. Absent means never checked, and that is the
+        # truthful state of almost every record — /sources/freshness publishes
+        # it rather than letting the silence read as confidence.
+        ch = c.get("checked")
+        if ch:
+            p.require(ISO_DATE.match(ch.get("on", "")), where, "checked.on must be YYYY-MM-DD")
+            p.require(bool(ch.get("by")), where, "a check needs a name against it")
+            for src in ch.get("sources", []):
+                p.require(bool(src.get("what")) and bool(src.get("where")), where,
+                          "each source needs what was checked and where")
+
         adv = c.get("advisory")
         if adv:
             p.require(adv.get("level") in ADVISORY_LEVELS, where, "advisory.level must be caution/avoid")
@@ -118,7 +130,9 @@ def load():
                 seen_cities.add(t.get("slug"))
                 for key in ("name", "lat", "lon", "summary", "interests", "nights", "highlights"):
                     p.require(key in t, tw, f"missing key {key!r}")
-                p.require(34.0 <= t.get("lat", 0) <= 72.0, tw, "lat looks off the map for Europe")
+                p.require(34.0 <= t.get("lat", 0) <= 79.0, tw, "lat looks off the map for Europe")
+                # 79 rather than 72 because Longyearbyen, at 78.2, is a real
+                # place people travel to and the first thing this bound rejected.
                 p.require(-26.0 <= t.get("lon", 0) <= 50.0, tw, "lon looks off the map for Europe")
                 n = t.get("nights")
                 p.require(

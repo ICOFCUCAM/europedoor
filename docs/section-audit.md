@@ -7,7 +7,7 @@ generated HTML as they stand. A section is BUILT only if every assertion
 under it holds right now — which means this file cannot drift from the
 product without CI noticing.
 
-**26 built · 5 partial · 4 deferred · 199 assertions · 0 failing**
+**28 built · 4 partial · 4 deferred · 204 assertions · 0 failing**
 
 Section 36 is the architecture diagram rather than a feature, and is
 reflected in the repository layout rather than audited here.
@@ -40,7 +40,7 @@ reflected in the repository layout rather than audited here.
 | 24 | The database as a knowledge graph | BUILT | 4 | Edges in both directions: a city knows its journeys, themes and stories, not only its parents. |
 | 25 | Technology stack | BUILT (deliberately smaller) | 4 | Python standard library and static output. Each proposed addition has a named trigger instead of a date. |
 | 26 | AI architecture | PARTIAL | 4 | The discipline is built and the model is not: retrieval, the route engine and refusal exist; narration is specified with its prompts. |
-| 27 | MVP scope | PARTIAL | 7 | Fifty countries at solid depth rather than five at maximum depth, with five named for depth-first work. That work is next. |
+| 27 | MVP scope | BUILT | 8 | The brief asked for five countries done exceptionally well. Fifty at solid depth, and the five named ones now past the 25-city target. |
 | 28 | MVP feature list | BUILT | 11 | Every item on the brief's list is live except accounts, which are browser-local by choice. |
 | 29 | Homepage | BUILT | 3 | The brief's running order, with the AI search box replaced by a sentence box that exists. |
 | 30 | The business flywheel | BUILT (as specification) | 1 | Recorded, with the slowest arrow named. |
@@ -48,6 +48,7 @@ reflected in the repository layout rather than audited here.
 | 32 | The differentiator | BUILT | 1 | Adopted verbatim, and published on the site rather than kept internal. |
 | 33 | Three-stage development | BUILT (as specification) | 1 | Adopted, with the editorial cost the brief understates called out. |
 | 34 | Twelve-month roadmap | BUILT (as specification) | 2 | In the specification and kept current in docs/roadmap.md. |
+| 34+ | The verification plan | BUILT | 4 | Not a numbered section of the brief, but the thing that decides whether any of the facts above are worth anything. |
 | 35 | The strategic decision | BUILT | 3 | Positioned as a discovery engine, and the honest status board is public rather than internal. |
 
 ## What PARTIAL means here

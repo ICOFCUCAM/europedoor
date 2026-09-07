@@ -90,8 +90,8 @@ Everything in the brief's tree exists. It is reached from a shorter nav.
 ## 4. The Europe Atlas — **built**
 
 `Europe → region of Europe → country → travel region → city → experience`,
-generated end to end from `data/`. 50 countries, 121 travel regions, 244
-cities, 166 experiences. Every city page carries: summary, what earns the
+generated end to end from `data/`. 50 countries, 130 travel regions, 319
+cities, 197 experiences. Every city page carries: summary, what earns the
 time, experiences, an Experience Score, a suggested night range, coordinates,
 and computed nearest onward stops.
 
@@ -309,10 +309,17 @@ cannot show whether the model holds across Europe — Norway and Albania break
 different assumptions. The brief's instinct is right about effort
 concentration, so:
 
-**Depth tier A (deepen first):** Norway, France, Italy, Spain, Greece.
-Target: 8+ regions, 25+ cities, 40+ experiences, 5 stories, verified facts
-with dates.
-**Depth tier B:** everything else, at current depth, verified opportunistically.
+**Depth tier A — done.** Norway 25 cities across 6 regions, France 28 across
+8, Italy 25 across 5, Spain 27 across 7, Greece 25 across 3. That is 130
+cities in five countries against 189 in the other forty-five.
+**Depth tier B:** everything else, at current depth. Next ten countries to
+20+ cities.
+
+What is *not* done in tier A is verification. The facts in those 130 cities
+are still editorial first drafts, and `/sources/freshness` says so country by
+country. Depth without verification is a larger surface of unchecked claims,
+which is why verification is now the top of the roadmap rather than more
+cities.
 
 ## 29. Homepage — **built, differently worded**
 
@@ -859,7 +866,7 @@ run.
 
 ## 3.1 MVP — what is already true
 
-Built and passing checks: the Atlas (50/121/244), the Planner, Search, 8
+Built and passing checks: the Atlas (50/130/319), the Planner, Search, 8
 Journeys, 13 Themes, 8 Stories, the Map, Experiences with a verification
 model, the Fund register, the Experience Score with a published method, My
 Europe, Events, and an honest status page.
@@ -872,10 +879,13 @@ a paid position.
 
 Not built and next, in order:
 
-1. **Depth tier A.** Norway, France, Italy, Spain, Greece to 25+ cities each.
-2. **Fact verification pass** with `facts_checked_on` dates surfaced.
-3. **Twenty more stories**, because organic traffic comes from those and not
+1. **Verification.** The mechanism is built and the board at
+   `/sources/freshness` reads 0 of 50. Currency, blocs, entry and cost bands
+   first, against official sources, one country at a time.
+2. **Twenty more stories**, because organic traffic comes from those and not
    from the Atlas.
+3. **Accessibility notes** per city and experience — the planner already
+   admits it cannot take account of them, which is the argument for adding them.
 4. **The AI layer**, as specified in 2.4, once 1–3 are done.
 
 ## 3.2 Roadmap, twelve months

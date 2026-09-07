@@ -52,6 +52,17 @@ def advisory_note(c):
 </div>"""
 
 
+def checked_line(c):
+    """Every country page says when its practical facts were last verified.
+    For almost all of them the honest answer is "never", and printing that is
+    the point: an unmarked page reads as a checked page."""
+    ch = c.get("checked")
+    if not ch:
+        return ('<span class="tag advisory">not verified</span> '
+                '<a href="/sources/freshness">why this matters</a>')
+    return f'{esc(ch["on"])} by {esc(ch["by"])}'
+
+
 def bloc_line(data, c):
     names = data["taxonomy"]["blocs"]
     got = [names[b] for b in c.get("blocs", []) if b in names]
@@ -285,6 +296,7 @@ def country_page(data, c):
         ("Typical day", f"€{c['daily_eur'][0]}–{c['daily_eur'][1]} per person"),
         ("Best months", esc(months_line(data, c["season"]["peak"]))),
         ("Quieter months", esc(months_line(data, c["season"].get("shoulder", [])))),
+        ("Facts checked", checked_line(c)),
     ])
     body = f"""
 {crumbs([("Europe", "/atlas"), ("Atlas", "/atlas"), (m["name"], urls.macro(m)), (c["name"], None)])}
@@ -1657,6 +1669,9 @@ def sources_page(data):
     </ol>
   </div>
   <aside class="rail">
+    <h3>Fact freshness</h3>
+    <p>Every country, and the date its practical facts were last checked.
+    <a href="/sources/freshness">The board →</a></p>
     <h3>Tell us</h3>
     <p>Corrections are wanted, including blunt ones. A correction channel goes up with the entity;
     until then, the repository's issue tracker is the honest answer.</p>
@@ -1670,6 +1685,75 @@ def sources_page(data):
     return "/sources/index.html", page(
         "Sources & corrections", body, path="/sources", area=None,
         description="How Europedoor's facts are produced, what is computed rather than claimed, and the verification plan.",
+    )
+
+
+def freshness_page(data):
+    """The verification plan, made operational and public.
+
+    Most travel sites present an unverified fact and a verified fact
+    identically. This page is the alternative: every country, the date its
+    practical facts were last checked, and — for now — a column of the word
+    "never", because that is the truth."""
+    rows = []
+    checked = 0
+    for c in sorted(data["countries"].values(), key=lambda c: (bool(c.get("checked")), c["name"])):
+        ch = c.get("checked")
+        if ch:
+            checked += 1
+            meta = f'{esc(ch["on"])} · {esc(ch["by"])}'
+            tag = ""
+        else:
+            meta = "never"
+            tag = ' <span class="tag advisory">unverified</span>'
+        ncity = sum(len(r["cities"]) for r in c["regions"])
+        rows.append(
+            f"""<a class="row" href="{urls.country(c)}">
+            <div><h3>{esc(c['name'])}{tag}</h3>
+            <p class="rowsub">{ncity} cities · {esc(c['currency'])} · €{c['daily_eur'][0]}–{c['daily_eur'][1]} a day</p></div>
+            <p class="rowmeta">{meta}</p></a>"""
+        )
+    n = len(data["countries"])
+    body = f"""
+{crumbs([("Europe", "/atlas"), ("Sources & corrections", "/sources"), ("Fact freshness", None)])}
+<div class="pagehead">
+  <p class="kicker">Fact freshness</p>
+  <h1>{checked} of {n} countries verified.</h1>
+  <p class="lede">Currencies, costs, seasons, entry rules and opening arrangements all move.
+  This page says, for every country, when a person last checked the practical facts against a
+  source — and for most of them the answer is still "never", which is why it is written down
+  rather than left to be assumed.</p>
+</div>
+
+<div class="note warn">
+  <h3>What "unverified" means here</h3>
+  <p>The entry was written editorially by someone who knows the place. It is a considered
+  first draft, not a citation-backed reference, and no one has yet gone back through it
+  against an official source. Treat cost bands as indicative, seasons as typical rather than
+  guaranteed, and anything involving a border, a visa or your safety as needing the
+  government source instead of us.</p>
+</div>
+
+<div class="split">
+  <div><div class="rows">{''.join(rows)}</div></div>
+  <aside class="rail">
+    <h3>The order it happens in</h3>
+    <ol>
+      <li>Currency, blocs, entry arrangements — against the relevant official body.</li>
+      <li>Cost bands — against current published prices in three cities per country.</li>
+      <li>Seasons and opening — against operators and municipalities.</li>
+      <li>The date lands on the country page, in public, next to the facts it covers.</li>
+    </ol>
+    <h3>Why the date and not a tick</h3>
+    <p>A tick says "correct". A date says "correct on this day, and you can judge how much
+    that is worth now". Only the second one is true.</p>
+    <p><a href="/sources">Sources and corrections →</a></p>
+  </aside>
+</div>
+"""
+    return "/sources/freshness/index.html", page(
+        "Fact freshness", body, path="/sources/freshness", area=None,
+        description=f"When every country's practical facts were last checked against a source — {checked} of {n} verified so far, and the rest said so plainly.",
     )
 
 

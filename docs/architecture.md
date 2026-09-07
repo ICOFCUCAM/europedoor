@@ -1,6 +1,6 @@
 # How Europedoor is built
 
-524 static HTML files, generated from 61 JSON files by 2,000 lines of
+609 static HTML files, generated from 61 JSON files by 2,000 lines of
 dependency-free Python. No database, no framework, no runtime. This is a
 deliberate position and the trigger for changing it is written down in
 [`product-specification.md`](product-specification.md) §2.2.
@@ -113,9 +113,9 @@ time, not filtered in the UI, so no client bug can route into one.
 python3 tools/build.py            build site/
 python3 tools/build.py check      validate data, render nothing
 python3 tools/build.py stats      what is in the dataset
-python3 tools/checks.py           22 checks, ~28,000 things examined
-node tools/browser-checks.js      103 checks in Chromium (needs playwright)
-python3 tools/section-audit.py    the brief's 35 sections, 199 assertions
+python3 tools/checks.py           23 checks, ~36,000 things examined
+node tools/browser-checks.js      102 checks in Chromium (needs playwright)
+python3 tools/section-audit.py    the brief's 35 sections, 204 assertions
 ```
 
 CI runs all four, and fails if the committed `site/` differs from a fresh

@@ -1,113 +1,927 @@
 {
-  "code": "fr", "slug": "france", "name": "France", "official": "French Republic",
-  "macro": "western", "capital": "Paris", "currency": "EUR — euro",
-  "languages": ["French"],
-  "blocs": ["eu", "schengen", "eurozone", "eea"],
+  "code": "fr",
+  "slug": "france",
+  "name": "France",
+  "official": "French Republic",
+  "macro": "western",
+  "capital": "Paris",
+  "currency": "EUR — euro",
+  "languages": [
+    "French"
+  ],
+  "blocs": [
+    "eu",
+    "schengen",
+    "eurozone",
+    "eea"
+  ],
   "tagline": "The most visited country on earth, and still mostly empty fifty kilometres from anywhere famous.",
   "summary": "France is the size of Texas with every landscape Europe offers: Atlantic surf, alpine glacier, Mediterranean cliff, volcanic upland and four hundred kilometres of vineyard between them. It receives more visitors than any country in the world, and almost all of them go to the same six places — which leaves the Auvergne, the Jura, the Aveyron and half of Brittany to whoever bothers. Food and wine are not a sector here; they are the organising principle.",
-  "interests": ["food", "wine", "art", "history", "architecture", "mountains", "coast", "sacred"],
-  "budget": "high", "daily_eur": [85, 210],
-  "season": { "peak": ["jun", "jul", "aug", "sep"], "shoulder": ["apr", "may", "oct"],
-    "note": "Paris in October is better than Paris in July: warm enough, half the queue, and the light is famously kinder. The whole country goes on holiday in August and the cities empty while the coast fills. September is harvest in the vineyards, which is the best and busiest time to be in them." },
-  "getting_around": "The TGV network makes Paris–Marseille three hours and Paris–Bordeaux two. Book on the day fares open and pay a third. Rural France needs a car; the regional TER trains are slow, cheap and lovely if you have the time.",
-  "food": ["Bread bought twice a day, because it is worth nothing by evening", "Cheese as a course, in order, before dessert", "The regional dish that is not exported: cassoulet, choucroute, aligot, socca — each belongs to one place"],
-  "festivals": [
-    { "name": "Fête de la Musique — free music on every street", "month": "jun", "where": "Nationwide" },
-    { "name": "Bastille Day", "month": "jul", "where": "Nationwide" },
-    { "name": "Les Vendanges — the wine harvest", "month": "sep", "where": "Every wine region" }
+  "interests": [
+    "food",
+    "wine",
+    "art",
+    "history",
+    "architecture",
+    "mountains",
+    "coast",
+    "sacred"
   ],
-  "know": ["Lunch is 12 to 2 and a rural kitchen closes at 13:45 regardless of your plans.", "Bonjour on entering a shop is not optional politeness; skipping it reads as rudeness.", "Many museums are free on the first Sunday of the month, and unbearable on it."],
+  "budget": "high",
+  "daily_eur": [
+    85,
+    210
+  ],
+  "season": {
+    "peak": [
+      "jun",
+      "jul",
+      "aug",
+      "sep"
+    ],
+    "shoulder": [
+      "apr",
+      "may",
+      "oct"
+    ],
+    "note": "Paris in October is better than Paris in July: warm enough, half the queue, and the light is famously kinder. The whole country goes on holiday in August and the cities empty while the coast fills. September is harvest in the vineyards, which is the best and busiest time to be in them."
+  },
+  "getting_around": "The TGV network makes Paris–Marseille three hours and Paris–Bordeaux two. Book on the day fares open and pay a third. Rural France needs a car; the regional TER trains are slow, cheap and lovely if you have the time.",
+  "food": [
+    "Bread bought twice a day, because it is worth nothing by evening",
+    "Cheese as a course, in order, before dessert",
+    "The regional dish that is not exported: cassoulet, choucroute, aligot, socca — each belongs to one place"
+  ],
+  "festivals": [
+    {
+      "name": "Fête de la Musique — free music on every street",
+      "month": "jun",
+      "where": "Nationwide"
+    },
+    {
+      "name": "Bastille Day",
+      "month": "jul",
+      "where": "Nationwide"
+    },
+    {
+      "name": "Les Vendanges — the wine harvest",
+      "month": "sep",
+      "where": "Every wine region"
+    }
+  ],
+  "know": [
+    "Lunch is 12 to 2 and a rural kitchen closes at 13:45 regardless of your plans.",
+    "Bonjour on entering a shop is not optional politeness; skipping it reads as rudeness.",
+    "Many museums are free on the first Sunday of the month, and unbearable on it."
+  ],
   "regions": [
-    { "slug": "paris-and-ile-de-france", "name": "Paris & Île-de-France",
+    {
+      "slug": "paris-and-ile-de-france",
+      "name": "Paris & Île-de-France",
       "summary": "The capital and the palaces and cathedrals within an hour of it.",
-      "interests": ["art", "architecture", "food", "cities", "sacred"],
+      "interests": [
+        "art",
+        "architecture",
+        "food",
+        "cities",
+        "sacred"
+      ],
       "cities": [
-        { "slug": "paris", "name": "Paris", "lat": 48.86, "lon": 2.35,
+        {
+          "slug": "paris",
+          "name": "Paris",
+          "lat": 48.86,
+          "lon": 2.35,
           "summary": "Nineteenth-century town planning at monumental scale, with the world's densest concentration of art inside it.",
-          "interests": ["art", "architecture", "food", "cities", "wine"], "nights": [3, 5],
-          "highlights": ["The Musée d'Orsay in a railway station, better than the Louvre for a single visit", "Père Lachaise, a walled city of the dead with its own map", "The covered passages of the 2nd, from the 1820s", "A market street — rue Mouffetard, rue des Martyrs — early on a Sunday"],
+          "interests": [
+            "art",
+            "architecture",
+            "food",
+            "cities",
+            "wine"
+          ],
+          "nights": [
+            3,
+            5
+          ],
+          "highlights": [
+            "The Musée d'Orsay in a railway station, better than the Louvre for a single visit",
+            "Père Lachaise, a walled city of the dead with its own map",
+            "The covered passages of the 2nd, from the 1820s",
+            "A market street — rue Mouffetard, rue des Martyrs — early on a Sunday"
+          ],
           "experiences": [
-            { "slug": "paris-market-street", "name": "A market street before ten", "kind": "table", "band": "low", "summary": "Cheese, bread, a rotisserie chicken and a bottle, then eat it in a park; the most Parisian thing available and it costs almost nothing." },
-            { "slug": "paris-passages-walk", "name": "The covered passages", "kind": "walk", "band": "low", "summary": "Glass-roofed arcades built before the department store and mostly forgotten since — a two-hour walk in the dry." }
-          ] },
-        { "slug": "chartres", "name": "Chartres", "lat": 48.45, "lon": 1.49, "quiet": true,
+            {
+              "slug": "paris-market-street",
+              "name": "A market street before ten",
+              "kind": "table",
+              "band": "low",
+              "summary": "Cheese, bread, a rotisserie chicken and a bottle, then eat it in a park; the most Parisian thing available and it costs almost nothing."
+            },
+            {
+              "slug": "paris-passages-walk",
+              "name": "The covered passages",
+              "kind": "walk",
+              "band": "low",
+              "summary": "Glass-roofed arcades built before the department store and mostly forgotten since — a two-hour walk in the dry."
+            }
+          ]
+        },
+        {
+          "slug": "chartres",
+          "name": "Chartres",
+          "lat": 48.45,
+          "lon": 1.49,
+          "quiet": true,
           "summary": "The most complete Gothic cathedral in France, with 172 windows of 12th-century glass that survived two wars in boxes.",
-          "interests": ["sacred", "architecture", "history"], "nights": [1, 1],
-          "highlights": ["The blue of the Notre-Dame de la Belle-Verrière window", "The labyrinth in the nave floor, walkable on Fridays in summer", "The old town below, on the river"] }
-      ] },
-    { "slug": "normandy-brittany", "name": "Normandy & Brittany",
+          "interests": [
+            "sacred",
+            "architecture",
+            "history"
+          ],
+          "nights": [
+            1,
+            1
+          ],
+          "highlights": [
+            "The blue of the Notre-Dame de la Belle-Verrière window",
+            "The labyrinth in the nave floor, walkable on Fridays in summer",
+            "The old town below, on the river"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "champagne-and-the-north",
+      "name": "Champagne & the North",
+      "summary": "Chalk cellars under a coronation city, a Flemish-Belgian border culture, and the battlefields of two wars.",
+      "interests": [
+        "wine",
+        "history",
+        "architecture",
+        "food"
+      ],
+      "cities": [
+        {
+          "slug": "reims",
+          "name": "Reims",
+          "lat": 49.26,
+          "lon": 4.03,
+          "summary": "Where thirty-three French kings were crowned, above twenty kilometres of Roman chalk cellars full of champagne.",
+          "interests": [
+            "wine",
+            "sacred",
+            "history",
+            "architecture"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The cathedral's smiling angel, and Chagall's windows behind the altar",
+            "Crayères: Gallo-Roman chalk pits, now cellars, at 10°C year-round",
+            "The Montagne de Reims villages, where the grapes actually come from"
+          ],
+          "experiences": [
+            {
+              "slug": "reims-chalk-cellars",
+              "name": "Down into the crayères",
+              "kind": "cellar",
+              "band": "moderate",
+              "summary": "Chalk quarried by Romans, thirty metres down, holding millions of bottles at a constant temperature nobody has to pay for."
+            }
+          ]
+        },
+        {
+          "slug": "lille",
+          "name": "Lille",
+          "lat": 50.63,
+          "lon": 3.06,
+          "summary": "Flemish in its architecture and French in its administration, with the best food market north of Lyon.",
+          "interests": [
+            "architecture",
+            "food",
+            "art",
+            "cities"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Vieux Lille's Flemish brick and the Grand'Place",
+            "Palais des Beaux-Arts, the second-largest collection in France",
+            "La Braderie in September: Europe's largest flea market, and mussels everywhere"
+          ]
+        },
+        {
+          "slug": "amiens",
+          "name": "Amiens",
+          "lat": 49.89,
+          "lon": 2.3,
+          "quiet": true,
+          "summary": "The largest gothic cathedral in France by volume, and market gardens on canals behind it.",
+          "interests": [
+            "sacred",
+            "architecture",
+            "food",
+            "nature"
+          ],
+          "nights": [
+            1,
+            1
+          ],
+          "highlights": [
+            "The cathedral, twice the volume of Notre-Dame de Paris",
+            "Hortillonnages: 300 hectares of floating market gardens, seen from a punt",
+            "Jules Verne's house, where he wrote most of it"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "normandy-brittany",
+      "name": "Normandy & Brittany",
       "summary": "Tidal islands, invasion beaches, cider country and a Celtic peninsula that faces the Atlantic.",
-      "interests": ["coast", "history", "sacred", "food"],
+      "interests": [
+        "coast",
+        "history",
+        "sacred",
+        "food"
+      ],
       "cities": [
-        { "slug": "mont-saint-michel", "name": "Mont-Saint-Michel", "lat": 48.64, "lon": -1.51,
+        {
+          "slug": "mont-saint-michel",
+          "name": "Mont-Saint-Michel",
+          "lat": 48.64,
+          "lon": -1.51,
           "summary": "An abbey on a rock in a bay with the fastest tides in Europe, and a village winding up to it.",
-          "interests": ["sacred", "coast", "history", "architecture"], "nights": [1, 1],
-          "highlights": ["The abbey at opening or on a night visit, not at noon", "Walking the bay barefoot with a guide, which is the only safe way", "The tide, which moves faster than a person walks on spring highs"],
-          "experiences": [{ "slug": "mont-saint-michel-bay-crossing", "name": "Cross the bay on foot", "kind": "walk", "band": "moderate", "summary": "Guided, barefoot, over quicksand and channels; the mount is a different thing entirely when you arrive the medieval way." }] },
-        { "slug": "bayeux", "name": "Bayeux & the Landing Beaches", "lat": 49.28, "lon": -0.70, "quiet": true,
+          "interests": [
+            "sacred",
+            "coast",
+            "history",
+            "architecture"
+          ],
+          "nights": [
+            1,
+            1
+          ],
+          "highlights": [
+            "The abbey at opening or on a night visit, not at noon",
+            "Walking the bay barefoot with a guide, which is the only safe way",
+            "The tide, which moves faster than a person walks on spring highs"
+          ],
+          "experiences": [
+            {
+              "slug": "mont-saint-michel-bay-crossing",
+              "name": "Cross the bay on foot",
+              "kind": "walk",
+              "band": "moderate",
+              "summary": "Guided, barefoot, over quicksand and channels; the mount is a different thing entirely when you arrive the medieval way."
+            }
+          ]
+        },
+        {
+          "slug": "bayeux",
+          "name": "Bayeux & the Landing Beaches",
+          "lat": 49.28,
+          "lon": -0.7,
+          "quiet": true,
           "summary": "A town that kept its cathedral, its 70-metre embroidery of 1066, and the beaches of 1944 twenty minutes away.",
-          "interests": ["history", "sacred", "coast"], "nights": [1, 2],
-          "highlights": ["The Bayeux Tapestry, seen slowly with the audio guide", "Omaha and the American cemetery above it", "Arromanches, where the concrete harbour is still in the sea"] },
-        { "slug": "saint-malo", "name": "Saint-Malo", "lat": 48.65, "lon": -2.03,
+          "interests": [
+            "history",
+            "sacred",
+            "coast"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Bayeux Tapestry, seen slowly with the audio guide",
+            "Omaha and the American cemetery above it",
+            "Arromanches, where the concrete harbour is still in the sea"
+          ]
+        },
+        {
+          "slug": "saint-malo",
+          "name": "Saint-Malo",
+          "lat": 48.65,
+          "lon": -2.03,
           "summary": "A corsair city inside granite ramparts, rebuilt stone by stone after 1944, with a tidal range of twelve metres.",
-          "interests": ["coast", "history", "food"], "nights": [1, 2],
-          "highlights": ["The ramparts circuit at high tide, when spray comes over", "Walking to the Grand Bé island at low water — and watching the clock", "Oysters at Cancale, ten kilometres east"] }
-      ] },
-    { "slug": "loire-and-the-southwest", "name": "The Loire & the Southwest",
+          "interests": [
+            "coast",
+            "history",
+            "food"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The ramparts circuit at high tide, when spray comes over",
+            "Walking to the Grand Bé island at low water — and watching the clock",
+            "Oysters at Cancale, ten kilometres east"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "loire-and-the-southwest",
+      "name": "The Loire & the Southwest",
       "summary": "Renaissance châteaux on a wide slow river, then Bordeaux, the dunes and the Basque coast.",
-      "interests": ["wine", "history", "architecture", "coast", "food"],
+      "interests": [
+        "wine",
+        "history",
+        "architecture",
+        "coast",
+        "food"
+      ],
       "cities": [
-        { "slug": "amboise", "name": "Amboise & the Loire châteaux", "lat": 47.41, "lon": 0.98,
+        {
+          "slug": "amboise",
+          "name": "Amboise & the Loire châteaux",
+          "lat": 47.41,
+          "lon": 0.98,
           "summary": "A royal town on the Loire, with Leonardo's last house at the top of it and Chenonceau downstream.",
-          "interests": ["history", "architecture", "wine"], "nights": [2, 3],
-          "highlights": ["Chenonceau, built across the river itself", "Clos Lucé, where Leonardo died in 1519", "Cycling the Loire à Vélo between châteaux, all of it flat"],
-          "experiences": [{ "slug": "loire-a-velo", "name": "Château to château by bicycle", "kind": "ride", "band": "moderate", "summary": "900 km of signed, flat riverside route; two days of it between Blois and Tours is the best introduction." }] },
-        { "slug": "bordeaux", "name": "Bordeaux", "lat": 44.84, "lon": -0.58,
+          "interests": [
+            "history",
+            "architecture",
+            "wine"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Chenonceau, built across the river itself",
+            "Clos Lucé, where Leonardo died in 1519",
+            "Cycling the Loire à Vélo between châteaux, all of it flat"
+          ],
+          "experiences": [
+            {
+              "slug": "loire-a-velo",
+              "name": "Château to château by bicycle",
+              "kind": "ride",
+              "band": "moderate",
+              "summary": "900 km of signed, flat riverside route; two days of it between Blois and Tours is the best introduction."
+            }
+          ]
+        },
+        {
+          "slug": "bordeaux",
+          "name": "Bordeaux",
+          "lat": 44.84,
+          "lon": -0.58,
           "summary": "An 18th-century stone city on a river bend, cleaned in the 2000s, with the world's most famous vineyards at the gates.",
-          "interests": ["wine", "architecture", "food", "cities"], "nights": [2, 3],
-          "highlights": ["The Place de la Bourse and its mirror of water", "Saint-Émilion, a monolithic church cut into rock, forty minutes east", "The Cité du Vin, which is better than it sounds"],
-          "experiences": [{ "slug": "saint-emilion-cellar", "name": "A small Saint-Émilion cellar", "kind": "cellar", "band": "moderate", "summary": "Skip the classified growths and visit a family making 20,000 bottles; you will taste from the barrel and be told the truth about the vintage." }] },
-        { "slug": "biarritz", "name": "Biarritz & the Basque Coast", "lat": 43.48, "lon": -1.56,
+          "interests": [
+            "wine",
+            "architecture",
+            "food",
+            "cities"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The Place de la Bourse and its mirror of water",
+            "Saint-Émilion, a monolithic church cut into rock, forty minutes east",
+            "The Cité du Vin, which is better than it sounds"
+          ],
+          "experiences": [
+            {
+              "slug": "saint-emilion-cellar",
+              "name": "A small Saint-Émilion cellar",
+              "kind": "cellar",
+              "band": "moderate",
+              "summary": "Skip the classified growths and visit a family making 20,000 bottles; you will taste from the barrel and be told the truth about the vintage."
+            }
+          ]
+        },
+        {
+          "slug": "biarritz",
+          "name": "Biarritz & the Basque Coast",
+          "lat": 43.48,
+          "lon": -1.56,
           "summary": "Atlantic surf, a Napoleonic resort, and a food culture that belongs to a nation without a state.",
-          "interests": ["coast", "food", "wine"], "nights": [2, 3],
-          "highlights": ["Surf at the Côte des Basques, where European surfing started in 1957", "Pintxos across the border in San Sebastián, an hour away", "Espelette peppers drying on house fronts in September"] }
-      ] },
-    { "slug": "alps-and-east", "name": "The Alps & the East",
+          "interests": [
+            "coast",
+            "food",
+            "wine"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Surf at the Côte des Basques, where European surfing started in 1957",
+            "Pintxos across the border in San Sebastián, an hour away",
+            "Espelette peppers drying on house fronts in September"
+          ]
+        },
+        {
+          "slug": "sarlat",
+          "name": "Sarlat & the Dordogne",
+          "lat": 44.89,
+          "lon": 1.22,
+          "quiet": true,
+          "summary": "A honey-coloured medieval town in a valley of castles, walnut groves and the oldest painted caves in Europe.",
+          "interests": [
+            "history",
+            "food",
+            "nature",
+            "architecture"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Lascaux IV, an exact facsimile because the original is closed for its own survival",
+            "Castles facing each other across the river from the Hundred Years' War",
+            "Saturday market: walnuts, foie gras, and truffles in winter"
+          ],
+          "experiences": [
+            {
+              "slug": "dordogne-painted-caves",
+              "name": "The painted caves, original and copy",
+              "kind": "museum",
+              "band": "moderate",
+              "summary": "Font-de-Gaume still admits a few dozen people a day to originals; Lascaux is a facsimile because breath destroyed the real one within fifteen years of opening."
+            }
+          ]
+        },
+        {
+          "slug": "toulouse",
+          "name": "Toulouse",
+          "lat": 43.6,
+          "lon": 1.44,
+          "summary": "The pink city: brick everything, a Romanesque basilica, aerospace money and a canal to the Mediterranean.",
+          "interests": [
+            "architecture",
+            "food",
+            "sacred",
+            "cities"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Saint-Sernin, the largest Romanesque church still standing",
+            "Canal du Midi, walked or cycled towards the sea",
+            "Cassoulet, which is argued over with Castelnaudary and Carcassonne"
+          ]
+        },
+        {
+          "slug": "la-rochelle",
+          "name": "La Rochelle",
+          "lat": 46.16,
+          "lon": -1.15,
+          "quiet": true,
+          "summary": "A Protestant merchant port behind three medieval towers, with an island of white houses across a bridge.",
+          "interests": [
+            "coast",
+            "history",
+            "food",
+            "islands"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The harbour towers, which held a chain across the entrance",
+            "Île de Ré: hollyhocks, salt marshes and 100 km of cycle path",
+            "Oysters from Marennes-Oléron, eaten at the quayside"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "alps-and-east",
+      "name": "The Alps & the East",
       "summary": "Mont Blanc, the Jura, Burgundy's slope of vineyards and Alsace's timbered villages.",
-      "interests": ["mountains", "wine", "winter", "food"],
+      "interests": [
+        "mountains",
+        "wine",
+        "winter",
+        "food"
+      ],
       "cities": [
-        { "slug": "chamonix", "name": "Chamonix", "lat": 45.92, "lon": 6.87,
+        {
+          "slug": "chamonix",
+          "name": "Chamonix",
+          "lat": 45.92,
+          "lon": 6.87,
           "summary": "A valley town under the highest mountain in western Europe, where alpinism was invented.",
-          "interests": ["mountains", "winter", "nature"], "nights": [2, 4],
-          "highlights": ["Aiguille du Midi by cable car to 3,842 metres, in twenty minutes", "The Mer de Glace, and the ladders marking where the ice used to be", "The Tour du Mont Blanc, which starts and finishes here"],
-          "experiences": [{ "slug": "chamonix-mer-de-glace", "name": "Down to the Mer de Glace", "kind": "walk", "band": "moderate", "summary": "The steps to the ice are signed with the year the glacier reached each level; the descent is a chronology as much as a walk." }] },
-        { "slug": "beaune", "name": "Beaune", "lat": 47.02, "lon": 4.84, "quiet": true,
+          "interests": [
+            "mountains",
+            "winter",
+            "nature"
+          ],
+          "nights": [
+            2,
+            4
+          ],
+          "highlights": [
+            "Aiguille du Midi by cable car to 3,842 metres, in twenty minutes",
+            "The Mer de Glace, and the ladders marking where the ice used to be",
+            "The Tour du Mont Blanc, which starts and finishes here"
+          ],
+          "experiences": [
+            {
+              "slug": "chamonix-mer-de-glace",
+              "name": "Down to the Mer de Glace",
+              "kind": "walk",
+              "band": "moderate",
+              "summary": "The steps to the ice are signed with the year the glacier reached each level; the descent is a chronology as much as a walk."
+            }
+          ]
+        },
+        {
+          "slug": "beaune",
+          "name": "Beaune",
+          "lat": 47.02,
+          "lon": 4.84,
+          "quiet": true,
           "summary": "The wine capital of Burgundy, inside its own walls, on the most valuable agricultural land on earth.",
-          "interests": ["wine", "food", "history"], "nights": [1, 2],
-          "highlights": ["The Hôtel-Dieu's glazed tile roof and 15th-century wards", "Walking or cycling the Côte de Beaune between named vineyards", "The Hospices auction in November"] },
-        { "slug": "colmar", "name": "Colmar & the Alsace wine road", "lat": 48.08, "lon": 7.36,
+          "interests": [
+            "wine",
+            "food",
+            "history"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Hôtel-Dieu's glazed tile roof and 15th-century wards",
+            "Walking or cycling the Côte de Beaune between named vineyards",
+            "The Hospices auction in November"
+          ]
+        },
+        {
+          "slug": "colmar",
+          "name": "Colmar & the Alsace wine road",
+          "lat": 48.08,
+          "lon": 7.36,
           "summary": "Half-timbered, geranium-hung, and German four times in a century — the food and the wine still say so.",
-          "interests": ["wine", "architecture", "food"], "nights": [1, 2],
-          "highlights": ["The Isenheim Altarpiece at the Unterlinden, which stops people mid-sentence", "The wine road south through Eguisheim and Riquewihr", "Christmas markets, which here are the real thing"] }
-      ] },
-    { "slug": "provence-and-the-south", "name": "Provence & the Mediterranean",
+          "interests": [
+            "wine",
+            "architecture",
+            "food"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Isenheim Altarpiece at the Unterlinden, which stops people mid-sentence",
+            "The wine road south through Eguisheim and Riquewihr",
+            "Christmas markets, which here are the real thing"
+          ]
+        },
+        {
+          "slug": "annecy",
+          "name": "Annecy",
+          "lat": 45.9,
+          "lon": 6.13,
+          "summary": "A canal town on the cleanest large lake in Europe, with the Alps standing straight up behind it.",
+          "interests": [
+            "mountains",
+            "nature",
+            "coast",
+            "food"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Swimming in the lake from public beaches all summer",
+            "The 40 km lakeside cycle path on a former railway",
+            "Paragliding off Col de la Forclaz onto the shore"
+          ],
+          "experiences": [
+            {
+              "slug": "annecy-lake-swim",
+              "name": "Swim in Lake Annecy",
+              "kind": "water",
+              "band": "low",
+              "summary": "Fed by mountain springs and cleaned up by a 1960s sewer scheme that is now the textbook example; you can see the bottom at four metres."
+            }
+          ]
+        },
+        {
+          "slug": "strasbourg",
+          "name": "Strasbourg",
+          "lat": 48.58,
+          "lon": 7.75,
+          "summary": "A cathedral of pink sandstone over a half-timbered island, and the European Parliament twenty minutes away.",
+          "interests": [
+            "architecture",
+            "food",
+            "wine",
+            "sacred",
+            "cities"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The cathedral's astronomical clock, which performs at half past twelve",
+            "La Petite France's canals and tanners' houses",
+            "Winstubs: Alsatian taverns serving choucroute and dry Riesling"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "provence-and-the-south",
+      "name": "Provence & the Mediterranean",
       "summary": "Roman engineering, lavender, the light the painters came for, and a coast that invented the summer holiday.",
-      "interests": ["coast", "art", "history", "food", "wine"],
+      "interests": [
+        "coast",
+        "art",
+        "history",
+        "food",
+        "wine"
+      ],
       "cities": [
-        { "slug": "arles", "name": "Arles", "lat": 43.68, "lon": 4.63,
+        {
+          "slug": "arles",
+          "name": "Arles",
+          "lat": 43.68,
+          "lon": 4.63,
           "summary": "A Roman arena still in use, the Rhône delta at the door, and the year Van Gogh painted two hundred canvases here.",
-          "interests": ["history", "art", "food"], "nights": [1, 2],
-          "highlights": ["The amphitheatre, built in 90 AD and still hosting events", "The Camargue: salt, white horses, flamingos, and a rice crop", "Les Rencontres, Europe's oldest photography festival, in July"],
-          "experiences": [{ "slug": "camargue-horseback", "name": "The Camargue from a horse", "kind": "ride", "band": "moderate", "summary": "The local white horses are bred to work in water; a half-day gets you into marsh no vehicle reaches." }] },
-        { "slug": "marseille", "name": "Marseille", "lat": 43.30, "lon": 5.37,
+          "interests": [
+            "history",
+            "art",
+            "food"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The amphitheatre, built in 90 AD and still hosting events",
+            "The Camargue: salt, white horses, flamingos, and a rice crop",
+            "Les Rencontres, Europe's oldest photography festival, in July"
+          ],
+          "experiences": [
+            {
+              "slug": "camargue-horseback",
+              "name": "The Camargue from a horse",
+              "kind": "ride",
+              "band": "moderate",
+              "summary": "The local white horses are bred to work in water; a half-day gets you into marsh no vehicle reaches."
+            }
+          ]
+        },
+        {
+          "slug": "marseille",
+          "name": "Marseille",
+          "lat": 43.3,
+          "lon": 5.37,
           "summary": "France's oldest city, founded by Greeks in 600 BC, Mediterranean rather than French in almost every respect.",
-          "interests": ["food", "coast", "cities", "art"], "nights": [2, 3],
-          "highlights": ["The Calanques: white limestone inlets, reachable on foot from the edge of town", "MuCEM and the footbridge to the fort", "Bouillabaisse where the fishermen eat, not on the Vieux-Port strip"],
-          "experiences": [{ "slug": "calanques-walk", "name": "Walk into the Calanques", "kind": "walk", "band": "low", "summary": "From Luminy to Sugiton in ninety minutes; in summer access is capped and booked, which is why the water is still clear." }] },
-        { "slug": "nice", "name": "Nice", "lat": 43.70, "lon": 7.27,
+          "interests": [
+            "food",
+            "coast",
+            "cities",
+            "art"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The Calanques: white limestone inlets, reachable on foot from the edge of town",
+            "MuCEM and the footbridge to the fort",
+            "Bouillabaisse where the fishermen eat, not on the Vieux-Port strip"
+          ],
+          "experiences": [
+            {
+              "slug": "calanques-walk",
+              "name": "Walk into the Calanques",
+              "kind": "walk",
+              "band": "low",
+              "summary": "From Luminy to Sugiton in ninety minutes; in summer access is capped and booked, which is why the water is still clear."
+            }
+          ]
+        },
+        {
+          "slug": "nice",
+          "name": "Nice",
+          "lat": 43.7,
+          "lon": 7.27,
           "summary": "An Italian city until 1860, with an old town that still cooks like one and a pebble bay that never closes.",
-          "interests": ["coast", "art", "food"], "nights": [2, 3],
-          "highlights": ["The Cours Saleya market, and socca eaten standing up", "Matisse and Chagall museums up the hill in Cimiez", "The train east to Menton along the coast, for the price of a coffee"] }
-      ] }
+          "interests": [
+            "coast",
+            "art",
+            "food"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The Cours Saleya market, and socca eaten standing up",
+            "Matisse and Chagall museums up the hill in Cimiez",
+            "The train east to Menton along the coast, for the price of a coffee"
+          ]
+        },
+        {
+          "slug": "avignon",
+          "name": "Avignon",
+          "lat": 43.95,
+          "lon": 4.81,
+          "summary": "Seven popes ruled from here in the 14th century and left the largest gothic palace in the world behind them.",
+          "interests": [
+            "history",
+            "sacred",
+            "architecture",
+            "festivals",
+            "wine"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Palais des Papes, more fortress than palace",
+            "The famous half-bridge, which stops in the Rhône",
+            "The July festival, when the whole city becomes a stage"
+          ],
+          "experiences": [
+            {
+              "slug": "chateauneuf-cellar",
+              "name": "Châteauneuf-du-Pape, in the village",
+              "kind": "cellar",
+              "band": "moderate",
+              "summary": "Thirteen permitted grape varieties and stones the size of fists that hold the day's heat into the night; the growers pour in their own cellars."
+            }
+          ]
+        },
+        {
+          "slug": "carcassonne",
+          "name": "Carcassonne",
+          "lat": 43.21,
+          "lon": 2.35,
+          "summary": "A double-walled citadel of 52 towers, heavily restored in the 1850s and argued about ever since.",
+          "interests": [
+            "history",
+            "architecture",
+            "wine"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The walls at night, when the day visitors have gone and it is floodlit",
+            "Viollet-le-Duc's restoration, and the debate about whether it invented as much as it saved",
+            "Corbières and Minervois wine in the plain below"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "corsica",
+      "name": "Corsica",
+      "summary": "A mountain in the sea: 2,700-metre peaks, an interior of maquis and stone villages, and a language that is not French.",
+      "interests": [
+        "mountains",
+        "coast",
+        "islands",
+        "food",
+        "nature"
+      ],
+      "cities": [
+        {
+          "slug": "bonifacio",
+          "name": "Bonifacio",
+          "lat": 41.39,
+          "lon": 9.16,
+          "summary": "A citadel on white limestone cliffs undercut by the sea, with Sardinia visible across twelve kilometres of strait.",
+          "interests": [
+            "coast",
+            "history",
+            "islands"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The King of Aragon's staircase, 187 steps cut into the cliff face",
+            "Boat trips into the sea caves under the town",
+            "Lavezzi islands, granite and empty, half an hour offshore"
+          ]
+        },
+        {
+          "slug": "corte",
+          "name": "Corte",
+          "lat": 42.31,
+          "lon": 9.15,
+          "quiet": true,
+          "summary": "The old Corsican capital in the mountainous centre, with the university that keeps the language alive and the GR20 above it.",
+          "interests": [
+            "mountains",
+            "history",
+            "nature",
+            "food"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The citadel on a rock, and the museum of Corsica inside it",
+            "Restonica gorge, and the glacial lakes at the top of it",
+            "The GR20, often called Europe's hardest waymarked trail"
+          ],
+          "experiences": [
+            {
+              "slug": "gr20-stage",
+              "name": "One stage of the GR20",
+              "kind": "walk",
+              "band": "moderate",
+              "summary": "180 km and 15 days for the whole thing; a single stage out of Vizzavona gives you the granite and the exposure without the fortnight."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "auvergne",
+      "name": "The Auvergne & the Massif Central",
+      "summary": "Extinct volcanoes, Romanesque churches, mineral water and the emptiest quarter of France.",
+      "interests": [
+        "mountains",
+        "nature",
+        "sacred",
+        "food"
+      ],
+      "cities": [
+        {
+          "slug": "le-puy-en-velay",
+          "name": "Le Puy-en-Velay",
+          "lat": 45.04,
+          "lon": 3.88,
+          "quiet": true,
+          "summary": "Chapels on top of volcanic plugs, green lentils with their own appellation, and the start of the oldest road to Santiago.",
+          "interests": [
+            "sacred",
+            "history",
+            "food",
+            "nature"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Saint-Michel d'Aiguilhe: 268 steps up a volcanic needle to a 10th-century chapel",
+            "The cathedral, and the pilgrim mass each morning before departure",
+            "Puy lentils, which are grown nowhere else and taste of it"
+          ],
+          "experiences": [
+            {
+              "slug": "via-podiensis-first-day",
+              "name": "The first day of the Via Podiensis",
+              "kind": "walk",
+              "band": "low",
+              "summary": "The oldest of the Santiago routes leaves from the cathedral steps after the 7 am pilgrim mass. The first day to Saint-Privat is twenty-three kilometres and sets the tone."
+            }
+          ]
+        },
+        {
+          "slug": "clermont-ferrand",
+          "name": "Clermont-Ferrand",
+          "lat": 45.78,
+          "lon": 3.08,
+          "quiet": true,
+          "summary": "A city built in black volcanic stone under a chain of eighty dormant volcanoes.",
+          "interests": [
+            "nature",
+            "architecture",
+            "mountains"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The black lava cathedral, which looks like nothing else in France",
+            "Puy de Dôme, 1,465 metres, by rack railway or on foot",
+            "The Chaîne des Puys, on the UNESCO list as a geological site"
+          ]
+        }
+      ]
+    }
   ]
 }

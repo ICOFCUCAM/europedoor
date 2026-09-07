@@ -1,92 +1,893 @@
 {
-  "code": "es", "slug": "spain", "name": "Spain", "official": "Kingdom of Spain",
-  "macro": "mediterranean", "capital": "Madrid", "currency": "EUR — euro",
-  "languages": ["Spanish", "Catalan", "Galician", "Basque"],
-  "blocs": ["eu", "schengen", "eurozone", "eea"],
+  "code": "es",
+  "slug": "spain",
+  "name": "Spain",
+  "official": "Kingdom of Spain",
+  "macro": "mediterranean",
+  "capital": "Madrid",
+  "currency": "EUR — euro",
+  "languages": [
+    "Spanish",
+    "Catalan",
+    "Galician",
+    "Basque"
+  ],
+  "blocs": [
+    "eu",
+    "schengen",
+    "eurozone",
+    "eea"
+  ],
   "tagline": "Several countries wearing one flag, with the second-highest average altitude in Europe.",
   "summary": "Spain is a high dry plateau with green mountains at the top and a coastline everyone else visits. It carries eight centuries of Islamic rule in its south, a Celtic wet north, and languages that are not dialects of anything. Eating happens late — lunch at two, dinner at ten — and the pace only makes sense once you accept it. The interior, Extremadura, Aragón, Galicia's inland, is nearly empty.",
-  "interests": ["food", "wine", "history", "architecture", "coast", "art", "sacred", "mountains"],
-  "budget": "moderate", "daily_eur": [60, 150],
-  "season": { "peak": ["may", "jun", "sep", "oct"], "shoulder": ["apr", "nov"],
-    "note": "July and August in the interior are brutal — Córdoba regularly passes 44°C — and the coast is full. May, June, September and October are the real seasons. The green north is best in summer, when everywhere else is unbearable." },
-  "getting_around": "AVE high-speed rail links Madrid to Barcelona, Seville, Valencia and Málaga in two to three hours; book early. Buses cover the interior where rail does not. Northern Spain needs a car.",
-  "food": ["Tapas, which is a way of eating rather than a dish — and free with a drink in Granada and León", "Jamón ibérico de bellota, from pigs that ate acorns, sliced by hand", "Regional: paella only in Valencia, pintxos in the Basque country, pulpo in Galicia"],
-  "festivals": [
-    { "name": "Semana Santa processions", "month": "apr", "where": "Seville, Málaga, Valladolid" },
-    { "name": "San Fermín", "month": "jul", "where": "Pamplona" },
-    { "name": "La Mercè", "month": "sep", "where": "Barcelona" }
+  "interests": [
+    "food",
+    "wine",
+    "history",
+    "architecture",
+    "coast",
+    "art",
+    "sacred",
+    "mountains"
   ],
-  "know": ["Lunch runs 14:00–16:00 and kitchens genuinely close; dinner starts at 21:00.", "Many museums are free in the last two hours of the day.", "The Camino de Santiago is a working pilgrimage with its own etiquette, not a long-distance hiking route."],
+  "budget": "moderate",
+  "daily_eur": [
+    60,
+    150
+  ],
+  "season": {
+    "peak": [
+      "may",
+      "jun",
+      "sep",
+      "oct"
+    ],
+    "shoulder": [
+      "apr",
+      "nov"
+    ],
+    "note": "July and August in the interior are brutal — Córdoba regularly passes 44°C — and the coast is full. May, June, September and October are the real seasons. The green north is best in summer, when everywhere else is unbearable."
+  },
+  "getting_around": "AVE high-speed rail links Madrid to Barcelona, Seville, Valencia and Málaga in two to three hours; book early. Buses cover the interior where rail does not. Northern Spain needs a car.",
+  "food": [
+    "Tapas, which is a way of eating rather than a dish — and free with a drink in Granada and León",
+    "Jamón ibérico de bellota, from pigs that ate acorns, sliced by hand",
+    "Regional: paella only in Valencia, pintxos in the Basque country, pulpo in Galicia"
+  ],
+  "festivals": [
+    {
+      "name": "Semana Santa processions",
+      "month": "apr",
+      "where": "Seville, Málaga, Valladolid"
+    },
+    {
+      "name": "San Fermín",
+      "month": "jul",
+      "where": "Pamplona"
+    },
+    {
+      "name": "La Mercè",
+      "month": "sep",
+      "where": "Barcelona"
+    }
+  ],
+  "know": [
+    "Lunch runs 14:00–16:00 and kitchens genuinely close; dinner starts at 21:00.",
+    "Many museums are free in the last two hours of the day.",
+    "The Camino de Santiago is a working pilgrimage with its own etiquette, not a long-distance hiking route."
+  ],
   "regions": [
-    { "slug": "andalusia", "name": "Andalusia",
+    {
+      "slug": "andalusia",
+      "name": "Andalusia",
       "summary": "The Moorish south: the Alhambra, three great cities, white villages and the mountains behind them.",
-      "interests": ["history", "architecture", "food", "sacred", "music"],
+      "interests": [
+        "history",
+        "architecture",
+        "food",
+        "sacred",
+        "music"
+      ],
       "cities": [
-        { "slug": "granada", "name": "Granada", "lat": 37.18, "lon": -3.60,
+        {
+          "slug": "granada",
+          "name": "Granada",
+          "lat": 37.18,
+          "lon": -3.6,
           "summary": "The last Moorish city in Spain, under the Sierra Nevada, with the Alhambra above it.",
-          "interests": ["architecture", "history", "food", "music", "mountains"], "nights": [2, 3],
-          "highlights": ["The Alhambra's Nasrid palaces, booked months ahead and worth every minute", "The Albaicín's white lanes and the view from San Nicolás at sunset", "Free tapas with every drink, which is a real local law of physics", "Skiing and the beach within ninety minutes of each other in March"],
+          "interests": [
+            "architecture",
+            "history",
+            "food",
+            "music",
+            "mountains"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The Alhambra's Nasrid palaces, booked months ahead and worth every minute",
+            "The Albaicín's white lanes and the view from San Nicolás at sunset",
+            "Free tapas with every drink, which is a real local law of physics",
+            "Skiing and the beach within ninety minutes of each other in March"
+          ],
           "experiences": [
-            { "slug": "granada-nasrid-palaces", "name": "The Nasrid palaces, on a timed ticket", "kind": "sacred", "band": "moderate", "summary": "Half-hour entry slots, sold out weeks ahead. Take the earliest of the day — the courtyards were designed for low light and few people." },
-            { "slug": "granada-free-tapas", "name": "Tapas, the Granada way", "kind": "table", "band": "low", "summary": "Every drink comes with a plate you did not order and cannot choose; four bars is a dinner." }
-          ] },
-        { "slug": "seville", "name": "Seville", "lat": 37.39, "lon": -5.99,
+            {
+              "slug": "granada-nasrid-palaces",
+              "name": "The Nasrid palaces, on a timed ticket",
+              "kind": "sacred",
+              "band": "moderate",
+              "summary": "Half-hour entry slots, sold out weeks ahead. Take the earliest of the day — the courtyards were designed for low light and few people."
+            },
+            {
+              "slug": "granada-free-tapas",
+              "name": "Tapas, the Granada way",
+              "kind": "table",
+              "band": "low",
+              "summary": "Every drink comes with a plate you did not order and cannot choose; four bars is a dinner."
+            }
+          ]
+        },
+        {
+          "slug": "seville",
+          "name": "Seville",
+          "lat": 37.39,
+          "lon": -5.99,
           "summary": "Orange trees, the world's largest gothic cathedral, and flamenco that belongs to specific families.",
-          "interests": ["architecture", "music", "food", "sacred"], "nights": [2, 3],
-          "highlights": ["The Real Alcázar, still a working royal palace", "The Giralda, a minaret with a cathedral built round it", "A flamenco peña rather than a tablao — the difference is everything"],
-          "experiences": [{ "slug": "seville-flamenco-pena", "name": "Flamenco in a peña", "kind": "stage", "band": "moderate", "summary": "Members' clubs that admit visitors quietly; no castanets, no stage, and the singing is the part that matters." }] },
-        { "slug": "cordoba", "name": "Córdoba", "lat": 37.89, "lon": -4.78, "quiet": true,
+          "interests": [
+            "architecture",
+            "music",
+            "food",
+            "sacred"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The Real Alcázar, still a working royal palace",
+            "The Giralda, a minaret with a cathedral built round it",
+            "A flamenco peña rather than a tablao — the difference is everything"
+          ],
+          "experiences": [
+            {
+              "slug": "seville-flamenco-pena",
+              "name": "Flamenco in a peña",
+              "kind": "stage",
+              "band": "moderate",
+              "summary": "Members' clubs that admit visitors quietly; no castanets, no stage, and the singing is the part that matters."
+            }
+          ]
+        },
+        {
+          "slug": "cordoba",
+          "name": "Córdoba",
+          "lat": 37.89,
+          "lon": -4.78,
+          "quiet": true,
           "summary": "The largest city in the world in the 10th century, with a mosque-cathedral of 856 columns at its centre.",
-          "interests": ["history", "architecture", "sacred"], "nights": [1, 2],
-          "highlights": ["The Mezquita, a cathedral inserted into a mosque and both left standing", "Patio courtyards, opened to the public each May", "The Roman bridge at dawn"] }
-      ] },
-    { "slug": "catalonia-and-the-east", "name": "Catalonia & the East",
+          "interests": [
+            "history",
+            "architecture",
+            "sacred"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Mezquita, a cathedral inserted into a mosque and both left standing",
+            "Patio courtyards, opened to the public each May",
+            "The Roman bridge at dawn"
+          ]
+        },
+        {
+          "slug": "ronda",
+          "name": "Ronda",
+          "lat": 36.74,
+          "lon": -5.16,
+          "quiet": true,
+          "summary": "A town split by a 120-metre gorge with an 18th-century bridge across it, in the middle of white-village country.",
+          "interests": [
+            "history",
+            "nature",
+            "wine",
+            "architecture"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Puente Nuevo, and the path down into the gorge below it",
+            "One of Spain's oldest bullrings, whether or not you approve",
+            "Serranía de Ronda wine, which nobody exports"
+          ]
+        },
+        {
+          "slug": "cadiz",
+          "name": "Cádiz",
+          "lat": 36.53,
+          "lon": -6.3,
+          "summary": "Possibly the oldest continuously inhabited city in western Europe, on a spit, surrounded by water on three sides.",
+          "interests": [
+            "coast",
+            "history",
+            "food",
+            "festivals"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "La Caleta beach between two castles, in the middle of the old town",
+            "Carnival in February, which is the best in mainland Spain",
+            "Fried fish sold by weight in paper cones"
+          ]
+        },
+        {
+          "slug": "malaga",
+          "name": "Málaga",
+          "lat": 36.72,
+          "lon": -4.42,
+          "summary": "A port that spent a decade turning itself into a museum city, with Picasso's birthplace and a Moorish fortress above.",
+          "interests": [
+            "art",
+            "coast",
+            "food",
+            "history"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Picasso Museum, in the city he left at ten",
+            "The Alcazaba and Gibralfaro, walked up in half an hour",
+            "Espetos: sardines grilled on a stick over a boat full of sand"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "catalonia-and-the-east",
+      "name": "Catalonia & the East",
       "summary": "Barcelona, the Costa Brava's coves, Roman Tarragona and the Pyrenees behind.",
-      "interests": ["architecture", "art", "coast", "food", "mountains"],
+      "interests": [
+        "architecture",
+        "art",
+        "coast",
+        "food",
+        "mountains"
+      ],
       "cities": [
-        { "slug": "barcelona", "name": "Barcelona", "lat": 41.39, "lon": 2.17,
+        {
+          "slug": "barcelona",
+          "name": "Barcelona",
+          "lat": 41.39,
+          "lon": 2.17,
           "summary": "A Roman city inside a medieval city inside a 19th-century grid, with Gaudí's work scattered across all three.",
-          "interests": ["architecture", "art", "food", "coast", "cities"], "nights": [3, 4],
-          "highlights": ["The Sagrada Família's interior light, which is the actual point", "The Eixample grid and its chamfered corners, a 19th-century plan that worked", "Santa Caterina and Sant Antoni markets, where the city shops", "Montjuïc's Fundació Miró and the view back over the port"],
-          "experiences": [{ "slug": "barcelona-eixample-walk", "name": "The grid, read as a plan", "kind": "walk", "band": "low", "summary": "Cerdà's 1859 blocks were designed with gardens inside; a few have been reopened, and finding them changes how the city reads." }] },
-        { "slug": "girona", "name": "Girona & the Empordà", "lat": 41.98, "lon": 2.82, "quiet": true,
+          "interests": [
+            "architecture",
+            "art",
+            "food",
+            "coast",
+            "cities"
+          ],
+          "nights": [
+            3,
+            4
+          ],
+          "highlights": [
+            "The Sagrada Família's interior light, which is the actual point",
+            "The Eixample grid and its chamfered corners, a 19th-century plan that worked",
+            "Santa Caterina and Sant Antoni markets, where the city shops",
+            "Montjuïc's Fundació Miró and the view back over the port"
+          ],
+          "experiences": [
+            {
+              "slug": "barcelona-eixample-walk",
+              "name": "The grid, read as a plan",
+              "kind": "walk",
+              "band": "low",
+              "summary": "Cerdà's 1859 blocks were designed with gardens inside; a few have been reopened, and finding them changes how the city reads."
+            }
+          ]
+        },
+        {
+          "slug": "girona",
+          "name": "Girona & the Empordà",
+          "lat": 41.98,
+          "lon": 2.82,
+          "quiet": true,
           "summary": "A walled river city with the widest gothic nave in the world, forty minutes from Barcelona and a fraction of the crowd.",
-          "interests": ["history", "food", "architecture", "wine"], "nights": [1, 2],
-          "highlights": ["The Jewish quarter, one of Europe's best preserved", "The city walls, walkable, with the Pyrenees on the horizon", "Empordà wine and the coves of the northern Costa Brava"],
-          "experiences": [{ "slug": "costa-brava-cami-de-ronda", "name": "The Camí de Ronda coastal path", "kind": "walk", "band": "low", "summary": "A smugglers' and coastguards' path linking coves between Begur and Palamós; it reaches beaches no road does." }] }
-      ] },
-    { "slug": "madrid-and-the-centre", "name": "Madrid & the Centre",
+          "interests": [
+            "history",
+            "food",
+            "architecture",
+            "wine"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Jewish quarter, one of Europe's best preserved",
+            "The city walls, walkable, with the Pyrenees on the horizon",
+            "Empordà wine and the coves of the northern Costa Brava"
+          ],
+          "experiences": [
+            {
+              "slug": "costa-brava-cami-de-ronda",
+              "name": "The Camí de Ronda coastal path",
+              "kind": "walk",
+              "band": "low",
+              "summary": "A smugglers' and coastguards' path linking coves between Begur and Palamós; it reaches beaches no road does."
+            }
+          ]
+        },
+        {
+          "slug": "valencia",
+          "name": "Valencia",
+          "lat": 39.47,
+          "lon": -0.38,
+          "summary": "A river turned into a nine-kilometre park, a gothic silk exchange, and the actual home of paella.",
+          "interests": [
+            "food",
+            "architecture",
+            "coast",
+            "design"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Turia gardens: a flood-diverted riverbed, now the city's spine",
+            "La Lonja, a gothic trading hall with twisted stone columns",
+            "Paella valenciana, with rabbit and beans and no seafood at all"
+          ],
+          "experiences": [
+            {
+              "slug": "valencia-paella-albufera",
+              "name": "Paella where the rice grows",
+              "kind": "table",
+              "band": "moderate",
+              "summary": "The Albufera lagoon south of the city grows the rice and cooks it over orange wood; lunchtime only, and never in the evening."
+            }
+          ]
+        },
+        {
+          "slug": "tarragona",
+          "name": "Tarragona",
+          "lat": 41.12,
+          "lon": 1.25,
+          "quiet": true,
+          "summary": "The Roman capital of Hispania, with an amphitheatre on the beach and an aqueduct in the woods.",
+          "interests": [
+            "history",
+            "coast",
+            "wine"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The amphitheatre, looking straight out to sea",
+            "Les Ferreres aqueduct, walkable along the top",
+            "Human tower competitions, on the UNESCO list, in the surrounding towns"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "madrid-and-the-centre",
+      "name": "Madrid & the Centre",
       "summary": "The capital on the meseta, and the walled and imperial cities within an hour of it.",
-      "interests": ["art", "food", "history", "cities"],
+      "interests": [
+        "art",
+        "food",
+        "history",
+        "cities"
+      ],
       "cities": [
-        { "slug": "madrid", "name": "Madrid", "lat": 40.42, "lon": -3.70,
+        {
+          "slug": "madrid",
+          "name": "Madrid",
+          "lat": 40.42,
+          "lon": -3.7,
           "summary": "A high plateau capital with three of the world's great galleries in one kilometre and a nightlife that starts at midnight.",
-          "interests": ["art", "food", "cities", "music"], "nights": [2, 4],
-          "highlights": ["The Prado's Velázquez and Goya, and the Reina Sofía's Guernica", "El Rastro flea market on Sunday morning", "Retiro park, and the crystal palace in it", "Vermouth at noon, which is a Madrid institution"],
-          "experiences": [{ "slug": "madrid-vermut-hour", "name": "La hora del vermut", "kind": "table", "band": "low", "summary": "Sunday, around one, house vermouth on tap with an olive and a siphon of soda — the most Madrid ninety minutes there is." }] },
-        { "slug": "toledo", "name": "Toledo", "lat": 39.86, "lon": -4.02,
+          "interests": [
+            "art",
+            "food",
+            "cities",
+            "music"
+          ],
+          "nights": [
+            2,
+            4
+          ],
+          "highlights": [
+            "The Prado's Velázquez and Goya, and the Reina Sofía's Guernica",
+            "El Rastro flea market on Sunday morning",
+            "Retiro park, and the crystal palace in it",
+            "Vermouth at noon, which is a Madrid institution"
+          ],
+          "experiences": [
+            {
+              "slug": "madrid-vermut-hour",
+              "name": "La hora del vermut",
+              "kind": "table",
+              "band": "low",
+              "summary": "Sunday, around one, house vermouth on tap with an olive and a siphon of soda — the most Madrid ninety minutes there is."
+            }
+          ]
+        },
+        {
+          "slug": "toledo",
+          "name": "Toledo",
+          "lat": 39.86,
+          "lon": -4.02,
           "summary": "A city on a granite outcrop in a river loop, where Christian, Jewish and Muslim Spain were one place for centuries.",
-          "interests": ["history", "sacred", "architecture", "art"], "nights": [1, 2],
-          "highlights": ["El Greco's Burial of the Count of Orgaz, in the church it was painted for", "Synagogues built by Muslim craftsmen for Jewish congregations under Christian kings", "The city from the far bank at night"] }
-      ] },
-    { "slug": "green-spain", "name": "Green Spain",
+          "interests": [
+            "history",
+            "sacred",
+            "architecture",
+            "art"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "El Greco's Burial of the Count of Orgaz, in the church it was painted for",
+            "Synagogues built by Muslim craftsmen for Jewish congregations under Christian kings",
+            "The city from the far bank at night"
+          ]
+        },
+        {
+          "slug": "segovia",
+          "name": "Segovia",
+          "lat": 40.95,
+          "lon": -4.12,
+          "quiet": true,
+          "summary": "A Roman aqueduct of 167 arches, built without mortar, running straight through the middle of a working town.",
+          "interests": [
+            "history",
+            "architecture",
+            "food"
+          ],
+          "nights": [
+            1,
+            1
+          ],
+          "highlights": [
+            "The aqueduct, 28 metres high, dry-stone, still standing after 2,000 years",
+            "The Alcázar on its rock, which Disney is said to have borrowed",
+            "Cochinillo, roast suckling pig, carved with a plate"
+          ]
+        },
+        {
+          "slug": "salamanca",
+          "name": "Salamanca",
+          "lat": 40.97,
+          "lon": -5.66,
+          "summary": "A university city since 1218, in sandstone that turns gold at sunset, with two cathedrals joined together.",
+          "interests": [
+            "architecture",
+            "history",
+            "music",
+            "cities"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Plaza Mayor, the best in Spain and used as a living room",
+            "The frog carved on the university facade, which students must find",
+            "Old and new cathedrals sharing a wall, 300 years apart"
+          ]
+        },
+        {
+          "slug": "cuenca",
+          "name": "Cuenca",
+          "lat": 40.07,
+          "lon": -2.13,
+          "quiet": true,
+          "summary": "Houses hanging over a gorge on two sides, with an abstract art museum inside them.",
+          "interests": [
+            "architecture",
+            "nature",
+            "art"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The casas colgadas, cantilevered over a 100-metre drop",
+            "Spanish Abstract Art Museum, in the hanging houses themselves",
+            "The Serranía de Cuenca's rock formations behind the town"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "green-spain",
+      "name": "Green Spain",
       "summary": "The Atlantic north: Basque food, Cantabrian mountains, and Galicia at the end of the pilgrimage.",
-      "interests": ["food", "coast", "mountains", "sacred", "wine"],
+      "interests": [
+        "food",
+        "coast",
+        "mountains",
+        "sacred",
+        "wine"
+      ],
       "cities": [
-        { "slug": "san-sebastian", "name": "San Sebastián", "lat": 43.32, "lon": -1.98,
+        {
+          "slug": "san-sebastian",
+          "name": "San Sebastián",
+          "lat": 43.32,
+          "lon": -1.98,
           "summary": "A shell-shaped bay, a belle époque town, and more Michelin stars per head than anywhere on earth.",
-          "interests": ["food", "coast", "cities"], "nights": [2, 3],
-          "highlights": ["Pintxos bar to pintxos bar in the Parte Vieja, one dish each", "La Concha beach and the walk round to Ondarreta", "Cider houses inland in Astigarraga, January to April"],
-          "experiences": [{ "slug": "donostia-pintxo-crawl", "name": "A pintxo crawl, done properly", "kind": "table", "band": "moderate", "summary": "One drink and one signature dish per bar, standing, then move. Sitting down is how visitors get it wrong." }] },
-        { "slug": "santiago-de-compostela", "name": "Santiago de Compostela", "lat": 42.88, "lon": -8.54,
+          "interests": [
+            "food",
+            "coast",
+            "cities"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Pintxos bar to pintxos bar in the Parte Vieja, one dish each",
+            "La Concha beach and the walk round to Ondarreta",
+            "Cider houses inland in Astigarraga, January to April"
+          ],
+          "experiences": [
+            {
+              "slug": "donostia-pintxo-crawl",
+              "name": "A pintxo crawl, done properly",
+              "kind": "table",
+              "band": "moderate",
+              "summary": "One drink and one signature dish per bar, standing, then move. Sitting down is how visitors get it wrong."
+            }
+          ]
+        },
+        {
+          "slug": "santiago-de-compostela",
+          "name": "Santiago de Compostela",
+          "lat": 42.88,
+          "lon": -8.54,
           "summary": "The end of the Camino: a granite city that rains constantly and fills each afternoon with people who have walked there.",
-          "interests": ["sacred", "history", "food", "architecture"], "nights": [1, 2],
-          "highlights": ["The pilgrims' mass, and the botafumeiro when it swings", "Arriving on foot into the Praza do Obradoiro", "Galician seafood at the Mercado de Abastos"],
-          "experiences": [{ "slug": "camino-final-stage", "name": "The last hundred kilometres", "kind": "walk", "band": "low", "summary": "From Sarria, five days, and the minimum distance for a compostela. Busy, sociable, and still the real thing." }] },
-        { "slug": "picos-de-europa", "name": "Picos de Europa (Cangas de Onís)", "lat": 43.35, "lon": -5.13, "quiet": true,
+          "interests": [
+            "sacred",
+            "history",
+            "food",
+            "architecture"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The pilgrims' mass, and the botafumeiro when it swings",
+            "Arriving on foot into the Praza do Obradoiro",
+            "Galician seafood at the Mercado de Abastos"
+          ],
+          "experiences": [
+            {
+              "slug": "camino-final-stage",
+              "name": "The last hundred kilometres",
+              "kind": "walk",
+              "band": "low",
+              "summary": "From Sarria, five days, and the minimum distance for a compostela. Busy, sociable, and still the real thing."
+            }
+          ]
+        },
+        {
+          "slug": "picos-de-europa",
+          "name": "Picos de Europa (Cangas de Onís)",
+          "lat": 43.35,
+          "lon": -5.13,
+          "quiet": true,
           "summary": "Limestone peaks twenty kilometres from the sea, with a cable car, gorges and blue cheese aged in caves.",
-          "interests": ["mountains", "nature", "food", "wild"], "nights": [2, 3],
-          "highlights": ["The Cares gorge, twelve kilometres cut into a cliff", "Cabrales cheese, matured in mountain caves", "Covadonga's lakes and the shrine below them"] }
-      ] }
+          "interests": [
+            "mountains",
+            "nature",
+            "food",
+            "wild"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The Cares gorge, twelve kilometres cut into a cliff",
+            "Cabrales cheese, matured in mountain caves",
+            "Covadonga's lakes and the shrine below them"
+          ]
+        },
+        {
+          "slug": "bilbao",
+          "name": "Bilbao",
+          "lat": 43.26,
+          "lon": -2.93,
+          "summary": "A steel city that commissioned one building in 1997 and changed what cities thought was possible.",
+          "interests": [
+            "art",
+            "architecture",
+            "food",
+            "cities"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "The Guggenheim, and the argument about whether one building can do that",
+            "Pintxos in the Casco Viejo, standing, one per bar",
+            "The Vizcaya transporter bridge, from 1893 and still carrying cars"
+          ],
+          "experiences": [
+            {
+              "slug": "bilbao-transporter-bridge",
+              "name": "Across on the hanging gondola",
+              "kind": "ride",
+              "band": "low",
+              "summary": "The world's oldest transporter bridge, on the UNESCO list, still running every eight minutes as a local crossing."
+            }
+          ]
+        },
+        {
+          "slug": "ribeira-sacra",
+          "name": "Ribeira Sacra",
+          "lat": 42.41,
+          "lon": -7.7,
+          "quiet": true,
+          "summary": "Vineyards on canyon walls above the Sil, worked from boats and by hand, with Romanesque monasteries in the woods.",
+          "interests": [
+            "wine",
+            "nature",
+            "sacred",
+            "food"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Terraces at gradients that need a winch, above a 500-metre gorge",
+            "Mencía reds from vines nobody can mechanise",
+            "Catamarans up the canyon, and eighteen Romanesque churches within an hour"
+          ],
+          "experiences": [
+            {
+              "slug": "ribeira-sacra-heroic-viticulture",
+              "name": "Heroic viticulture, from the river",
+              "kind": "cellar",
+              "band": "moderate",
+              "summary": "The growers call it viticultura heroica without irony: everything is carried up and down by hand or cable, and the boat is the only way to see why."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "aragon-and-the-pyrenees",
+      "name": "Aragón & the Pyrenees",
+      "summary": "Mudéjar brick towers, a Spanish Grand Canyon, and the emptiest inhabited country in Europe.",
+      "interests": [
+        "mountains",
+        "architecture",
+        "history",
+        "nature"
+      ],
+      "cities": [
+        {
+          "slug": "zaragoza",
+          "name": "Zaragoza",
+          "lat": 41.65,
+          "lon": -0.88,
+          "summary": "Roman, Moorish, Christian and industrial in the same city, with a basilica the size of a cathedral on the Ebro.",
+          "interests": [
+            "architecture",
+            "history",
+            "food",
+            "cities"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Aljafería, an 11th-century Moorish palace, now the regional parliament",
+            "Basílica del Pilar's eleven domes on the river",
+            "Mudéjar brickwork, on the UNESCO list, all over the old town"
+          ]
+        },
+        {
+          "slug": "torla-ordesa",
+          "name": "Torla & Ordesa",
+          "lat": 42.62,
+          "lon": -0.11,
+          "quiet": true,
+          "summary": "A stone village at the mouth of a glacial canyon, under the third-highest peak in the Pyrenees.",
+          "interests": [
+            "mountains",
+            "nature",
+            "wild"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Ordesa canyon and the Cola de Caballo, a full day on a good path",
+            "Monte Perdido, 3,355 metres, and the bearded vultures over it",
+            "A shuttle bus in summer because the valley road is closed to cars"
+          ]
+        },
+        {
+          "slug": "albarracin",
+          "name": "Albarracín",
+          "lat": 40.41,
+          "lon": -1.44,
+          "quiet": true,
+          "summary": "A pink town wrapped in a river bend and a wall that climbs the ridge above it, in one of Europe's emptiest provinces.",
+          "interests": [
+            "history",
+            "architecture",
+            "nature"
+          ],
+          "nights": [
+            1,
+            1
+          ],
+          "highlights": [
+            "The wall walk, up the hill and back down",
+            "Prehistoric rock shelters in the pine woods outside",
+            "A province with fewer than ten people per square kilometre"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "balearics",
+      "name": "The Balearic Islands",
+      "summary": "Four islands with four different characters: a gothic cathedral on one, prehistoric stone on another, and a mountain range that walks well in winter.",
+      "interests": [
+        "islands",
+        "coast",
+        "food",
+        "mountains"
+      ],
+      "cities": [
+        {
+          "slug": "palma",
+          "name": "Palma de Mallorca",
+          "lat": 39.57,
+          "lon": 2.65,
+          "summary": "A cathedral with a Gaudí interior on the harbour, and the Tramuntana mountains behind it for the other three seasons.",
+          "interests": [
+            "architecture",
+            "coast",
+            "food",
+            "mountains"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "La Seu, whose canopy Gaudí redesigned and whose chapel Barceló repainted in 2007",
+            "The Serra de Tramuntana, UNESCO-listed, and best from October to May",
+            "The wooden train to Sóller, running since 1912"
+          ],
+          "experiences": [
+            {
+              "slug": "soller-wooden-train",
+              "name": "The wooden train to Sóller",
+              "kind": "ride",
+              "band": "moderate",
+              "summary": "1912 rolling stock through thirteen tunnels and an orange valley, then a tram to the port. Ordinary transport, and the best hour on the island."
+            }
+          ]
+        },
+        {
+          "slug": "ciutadella",
+          "name": "Ciutadella, Menorca",
+          "lat": 40.0,
+          "lon": 3.84,
+          "quiet": true,
+          "summary": "Menorca's old capital: a sandstone harbour town on an island that is a UNESCO biosphere reserve and mostly farmland.",
+          "interests": [
+            "islands",
+            "coast",
+            "history",
+            "food"
+          ],
+          "nights": [
+            2,
+            3
+          ],
+          "highlights": [
+            "Camí de Cavalls: 185 km of bridle path round the whole coast",
+            "Talayotic stone monuments, on the UNESCO list since 2023",
+            "Beaches on the north coast reached only on foot"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "extremadura",
+      "name": "Extremadura",
+      "summary": "The far west: Roman theatres still in use, conquistador palaces, black pigs under oak trees, and almost no visitors.",
+      "interests": [
+        "history",
+        "food",
+        "nature",
+        "architecture"
+      ],
+      "cities": [
+        {
+          "slug": "caceres",
+          "name": "Cáceres",
+          "lat": 39.48,
+          "lon": -6.37,
+          "quiet": true,
+          "summary": "A walled old town of Moorish towers and conquistador palaces, with storks nesting on most of them.",
+          "interests": [
+            "history",
+            "architecture",
+            "food"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "A UNESCO old town with no modern buildings inside the walls at all",
+            "Storks on every tower from February",
+            "Ibérico ham from acorn-fed pigs in the dehesa outside"
+          ]
+        },
+        {
+          "slug": "merida",
+          "name": "Mérida",
+          "lat": 38.92,
+          "lon": -6.34,
+          "quiet": true,
+          "summary": "The best Roman ruins in Spain, including a theatre that still stages classical drama every summer.",
+          "interests": [
+            "history",
+            "architecture",
+            "sacred"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The theatre, from 15 BC, with a summer festival on its stage",
+            "A 792-metre Roman bridge, still walked across",
+            "The national museum of Roman art, in a Rafael Moneo building"
+          ],
+          "experiences": [
+            {
+              "slug": "merida-roman-theatre",
+              "name": "Classical drama in a Roman theatre",
+              "kind": "stage",
+              "band": "moderate",
+              "summary": "Greek and Roman plays staged every July and August in the theatre they were written for, which is a different experience from reading them."
+            }
+          ]
+        }
+      ]
+    }
   ]
 }

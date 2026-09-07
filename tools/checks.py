@@ -136,7 +136,7 @@ def c_built():
     expect += 1 + len(d["fund"])
     expect += 6                                   # map, events, quiet, my-europe, method, about
     expect += len(d["taxonomy"]["months"])        # /events/<month>
-    expect += 2                                   # how-it-works, sources
+    expect += 3                                   # how-it-works, sources, freshness
     expect += 1                                   # 404
     got = len(site_files())
     if got != expect:
@@ -453,6 +453,24 @@ def c_experiences():
         if esc(it["exp"]["name"]) not in s:
             fail(f"experience {it['exp']['slug']} missing from its kind page")
     return len(items)
+
+
+@check("every country's verification status is stated, not implied")
+def c_freshness():
+    # An unmarked page reads as a checked page. Every country page must say
+    # which it is, and the board must list all of them.
+    d = D.load()
+    board = open(os.path.join(OUT, "sources", "freshness", "index.html"), encoding="utf-8").read()
+    for c in d["countries"].values():
+        if c["name"] not in board:
+            fail(f"freshness board omits {c['name']}")
+        f = os.path.join(OUT, "atlas", c["macro_slug"], c["slug"], "index.html")
+        s = open(f, encoding="utf-8").read()
+        if "Facts checked" not in s:
+            fail(f"{c['name']}: country page does not state its verification status")
+        if not c.get("checked") and "not verified" not in s:
+            fail(f"{c['name']}: unverified, but the page does not say so")
+    return len(d["countries"])
 
 
 @check("the honest-status page still distinguishes built from designed")
