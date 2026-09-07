@@ -284,3 +284,17 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 /* ── the search link in the masthead ──────────────────────────────── */
 .navsearch { color: var(--door); }
 .navsearch span { font-size: 1.1em; line-height: 1; }
+
+/* ── the hero map ─────────────────────────────────────────────────── */
+.hero { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s7); align-items: center; }
+.heromap { display: none; text-decoration: none; }
+.heromap svg { width: 100%; height: auto; display: block; }
+.herodot { fill: var(--sea); opacity: .55; transition: opacity .2s ease; }
+.herodot.advisory { fill: var(--ink-3); opacity: .25; }
+.heromap:hover .herodot { opacity: .85; }
+.heromap-cap { display: block; margin-top: var(--s3); font-size: var(--t-xs); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.heromap:hover .heromap-cap { color: var(--door); }
+@media (min-width: 64rem) {
+  .hero { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); }
+  .heromap { display: block; }
+}

@@ -33,7 +33,7 @@ python3 tools/build.py check      # validate the data, render nothing
 python3 tools/build.py stats      # what is in the dataset
 
 python3 tools/checks.py           # 22 checks over the built HTML
-node tools/browser-checks.js      # 85 checks in Chromium (needs playwright)
+node tools/browser-checks.js      # 88 checks in Chromium (needs playwright)
 
 python3 -m http.server -d site 8000   # then open http://localhost:8000
 ```

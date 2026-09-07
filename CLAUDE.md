@@ -64,7 +64,7 @@ Run all four before claiming anything is done.
     python3 tools/build.py check       validate the data
     python3 tools/build.py            508 pages
     python3 tools/checks.py            22 checks, ~28,000 things examined
-    node tools/browser-checks.js       85 checks in Chromium
+    node tools/browser-checks.js       88 checks in Chromium
 
 The browser checks need `npm install playwright` and take about thirty
 seconds. They earn their place: they caught a 47-pixel mobile overflow on

@@ -16,7 +16,7 @@ Kept current. The reasoning is in
 * My Europe (browser-local saves), Events, `/beyond-the-obvious`
 * Search: the whole index filtered in the browser, with accent folding
 * An honest status page separating built / designed / blocked
-* 22 static checks and 85 browser checks, in CI
+* 22 static checks and 88 browser checks, in CI
 
 ## Next, in order
 

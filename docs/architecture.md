@@ -76,11 +76,17 @@ this.
 ```
 score(city)  = (0.30 + 0.70 × interest match)
              × season factor (peak 1.18, shoulder 1.00, off 0.74)
-             × budget fit
+             × style fit
              × depth (1 + 0.035 per listed experience, capped at 3)
+             × affordability
 
 next stop    = argmax over unvisited cities of
                score × 1/(1 + (km/420)^1.55) × country repeat penalty × jitter
+
+affordable   = 1, unless the city's daily rate exceeds
+               (budget × 0.78 / days), in which case it is damped in
+               proportion. Cheaper than the ceiling is never penalised —
+               under budget is a good outcome.
 
 nights       = clamp(round(mean(city.nights)) + pace, city.nights)
 cost         = Σ nights × daily rate(country, style)
@@ -108,7 +114,7 @@ python3 tools/build.py            build site/
 python3 tools/build.py check      validate data, render nothing
 python3 tools/build.py stats      what is in the dataset
 python3 tools/checks.py           22 checks, ~28,000 things examined
-node tools/browser-checks.js      85 checks in Chromium (needs playwright)
+node tools/browser-checks.js      88 checks in Chromium (needs playwright)
 ```
 
 CI runs all four, and fails if the committed `site/` differs from a fresh

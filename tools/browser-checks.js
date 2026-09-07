@@ -175,6 +175,26 @@ async function main() {
   ok((await page.locator("#results").textContent()).includes("Nothing for"),
      "an unmatched search did not say it found nothing");
 
+  // A budget that cannot buy Switzerland must not return Switzerland.
+  async function routeOnBudget(budget) {
+    await page.goto(base + "/plan", { waitUntil: "networkidle" });
+    await page.fill("#days", "12");
+    await page.fill("#budget", String(budget));
+    await page.check('input[name="interest"][value="mountains"]');
+    await page.click('#planner button[type="submit"]');
+    await page.waitForSelector("#result .leg");
+    const text = await page.locator("#result").textContent();
+    const totalTxt = await page.locator("#result .result-summary dd").first().textContent();
+    return { text, total: parseInt(totalTxt.replace(/[^0-9]/g, ""), 10) };
+  }
+  const lean = await routeOnBudget(700);
+  ok(lean.total <= 700 * 1.35,
+     `a €700 mountain trip was planned at €${lean.total}`);
+  ok(!/Switzerland|Zermatt|Lauterbrunnen/.test(lean.text),
+     "a €700 budget still routed through Switzerland");
+  const rich = await routeOnBudget(6000);
+  ok(rich.total > lean.total, "a nine-fold budget produced no more expensive a trip");
+
   // ── the map ────────────────────────────────────────────────────────
   await page.goto(base + "/map", { waitUntil: "networkidle" });
   const dots = await page.locator("#dots .dot").count();

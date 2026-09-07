@@ -71,7 +71,15 @@
     return Math.round(lo + (hi - lo) * STYLE_DAILY[style]);
   }
 
-  function fitScore(city, wants, month, style) {
+  function impliedDaily(opts) {
+    // Beds and meals are roughly four fifths of a trip's cost once transport
+    // and a buffer are taken out. This is what the traveller can actually
+    // spend per day, and it is a ceiling, not a target: coming in under
+    // budget is a good outcome and is never penalised.
+    return (opts.budget * 0.78) / Math.max(1, opts.days);
+  }
+
+  function fitScore(city, wants, month, style, ceiling) {
     var matched = 0, i;
     for (i = 0; i < wants.length; i++) {
       if (city.interests.indexOf(wants[i]) >= 0) matched++;
@@ -85,7 +93,15 @@
     if (style === "high" && city.budget === "low") costPenalty = 0.96;
     // Somewhere with listed experiences has more to actually do.
     var depth = 1 + Math.min(city.exp, 3) * 0.035;
-    return base * seasonFactor(city, month) * costPenalty * depth;
+    // Affordability. Somewhere you cannot afford is not a recommendation,
+    // so a city whose daily rate is above the ceiling is damped in
+    // proportion to how far above. Being cheaper than the ceiling is free.
+    var afford = 1;
+    if (ceiling > 0) {
+      var rate = dailyRate(city, style);
+      if (rate > ceiling) afford = Math.max(0.25, Math.pow(ceiling / rate, 1.4));
+    }
+    return base * seasonFactor(city, month) * costPenalty * depth * afford;
   }
 
   function nightsFor(city, pace, remaining) {
@@ -98,8 +114,9 @@
 
   function plan(opts) {
     var cities = ATLAS.cities.slice();
+    var ceiling = impliedDaily(opts);
     var scored = cities.map(function (c) {
-      return { c: c, s: fitScore(c, opts.wants, opts.month, opts.style) };
+      return { c: c, s: fitScore(c, opts.wants, opts.month, opts.style, ceiling) };
     });
     scored.sort(function (a, b) { return b.s - a.s; });
 

@@ -97,8 +97,20 @@ def home(data):
         ]
     )
 
+    dots = []
+    for cid, n in sorted(data["cities"].items()):
+        x, y = project(n["city"]["lat"], n["city"]["lon"])
+        cls = " advisory" if n["country"].get("advisory") else ""
+        dots.append(f'<circle class="herodot{cls}" cx="{x:.1f}" cy="{y:.1f}" r="4"/>')
+    heromap = (
+        f'<a class="heromap" href="/map" aria-label="Map of all {len(data["cities"])} cities in the Atlas">'
+        f'<svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true">{"".join(dots)}</svg>'
+        f'<span class="heromap-cap">{len(data["cities"])} cities. Every one has a page.</span></a>'
+    )
+
     body = f"""
 <div class="hero">
+  <div class="hero-text">
   <p class="kicker">Discover · Plan · Experience</p>
   <h1>One door into Europe.</h1>
   <p class="lede">Fifty countries, their regions, their cities and what is worth your time in
@@ -111,9 +123,11 @@ def home(data):
   </div>
   <p class="small" style="margin-top:var(--s6)">{ncountries} countries · {nregions} travel regions ·
   {ncities} cities · {len(data['journeys'])} curated journeys</p>
+  </div>
+  {heromap}
 </div>
 
-{section("Start with the map", grid(cards, 3),
+{section("Nine regions of Europe", grid(cards, 3),
          lede="Europe organised the way people actually travel it — by shared coast, shared mountain range and shared history, not by alphabet.",
          more=("All nine regions of Europe", "/atlas"))}
 
@@ -543,7 +557,8 @@ def planner_page(data):
         for m in data["taxonomy"]["months"]
     )
     budgets = "".join(
-        f'<option value="{esc(b["slug"])}">{esc(b["name"])} — {esc(b["note"])}</option>'
+        f'<option value="{esc(b["slug"])}"{" selected" if b["slug"] == "moderate" else ""}>'
+        f'{esc(b["name"])} — {esc(b["note"])}</option>'
         for b in data["taxonomy"]["budgets"]
     )
     body = f"""
