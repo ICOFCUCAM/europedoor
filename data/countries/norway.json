@@ -1,0 +1,222 @@
+{
+  "code": "no",
+  "slug": "norway",
+  "name": "Norway",
+  "official": "Kingdom of Norway",
+  "macro": "nordic",
+  "capital": "Oslo",
+  "currency": "NOK — Norwegian krone",
+  "languages": ["Norwegian (Bokmål and Nynorsk)", "Sámi languages"],
+  "blocs": ["schengen", "eea"],
+  "tagline": "A country shaped by water that had somewhere to be.",
+  "summary": "Norway is long — its coastline, unfolded, would wrap a good way round the world — and almost everything worth seeing sits where rock meets salt water. The interior is high plateau and slow trains; the coast is fjord, ferry and fishing town. Prices are the highest in Europe and the light is the strangest: midnight sun above the Arctic Circle in June, four-hour days in December.",
+  "interests": ["mountains", "coast", "nature", "rail", "winter", "design"],
+  "budget": "high",
+  "daily_eur": [115, 260],
+  "season": {
+    "peak": ["jun", "jul", "aug"],
+    "shoulder": ["may", "sep"],
+    "note": "June and July give you the midnight sun and open mountain roads. Late September brings colour and empty trails. Late January to March is the northern lights and ski season; November is neither."
+  },
+  "getting_around": "The Bergen and Dovre railways are two of Europe's great train rides and cost less than the equivalent flight if booked early. Coastal Norway runs on ferries and express boats — treat them as public transport, not excursions. North of Trondheim, distances get serious: fly, or take the coastal ferry and give it days rather than hours.",
+  "food": [
+    "Brown cheese (brunost) — caramelised whey, sliced thin, an acquired and worthwhile taste",
+    "Cured and smoked salmon, and the fresher, less-famous cod",
+    "Kanelbolle: the cinnamon bun that fuels every hike"
+  ],
+  "festivals": [
+    { "name": "Bergen International Festival", "month": "may", "where": "Bergen" },
+    { "name": "Midnight sun period", "month": "jun", "where": "Everywhere north of the Arctic Circle" },
+    { "name": "Northern Lights season begins in earnest", "month": "oct", "where": "Tromsø and Finnmark" }
+  ],
+  "know": [
+    "Card and phone payment work everywhere, including on ferries and in mountain huts. Cash is close to useless.",
+    "Allemannsretten — the right to roam — lets you walk and camp on uncultivated land, with obligations attached: no fires in summer, no trace, 150 metres from any house.",
+    "Alcohol above 4.7% is sold only in state Vinmonopolet shops, which close early and shut on Sundays."
+  ],
+  "regions": [
+    {
+      "slug": "ostlandet",
+      "name": "Østlandet & the East",
+      "summary": "The populated, farmed, forested east: the capital, the big lakes, and the valleys the ski world takes seriously.",
+      "interests": ["cities", "design", "winter", "art"],
+      "cities": [
+        {
+          "slug": "oslo",
+          "name": "Oslo",
+          "lat": 59.91, "lon": 10.75,
+          "summary": "A capital that spent its oil money on architecture and then put a forest and a fjord within a tram ride of the result.",
+          "interests": ["art", "architecture", "design", "cities", "nature"],
+          "nights": [2, 3],
+          "highlights": [
+            "The Munch museum and the National Museum, which between them hold the versions of The Scream worth arguing about",
+            "The Fram and Kon-Tiki polar ships, kept whole in Bygdøy",
+            "Island-hopping the inner Oslofjord on a standard public ferry ticket",
+            "Nordmarka: 1,700 km of forest trail, reached by metro"
+          ],
+          "experiences": [
+            { "slug": "oslofjord-island-ferry", "name": "The commuter ferry as a day out", "kind": "water", "band": "low", "summary": "Ride the public boats to Hovedøya and Gressholmen with a swim towel and a bakery bag; it is a city transport ticket, not a cruise." },
+            { "slug": "oslo-architecture-walk", "name": "Waterfront architecture walk", "kind": "walk", "band": "low", "summary": "Opera roof to Munch to the library at Bjørvika — twenty years of a city deciding what it wanted to look like, in ninety minutes." }
+          ]
+        },
+        {
+          "slug": "lillehammer",
+          "name": "Lillehammer",
+          "lat": 61.11, "lon": 10.47,
+          "summary": "Olympic town on a long lake, with an open-air museum that is really a village of 200 relocated buildings.",
+          "interests": ["winter", "history", "nature"],
+          "nights": [1, 2],
+          "highlights": [
+            "Maihaugen: farms, a stave church and a whole timber town, walked rather than viewed",
+            "The 1994 Olympic bob track, still rideable",
+            "Cross-country trails that start where the streets end"
+          ],
+          "experiences": [
+            { "slug": "maihaugen-timber-town", "name": "Maihaugen open-air museum", "kind": "museum", "band": "moderate", "summary": "Two hundred buildings moved log by log from across Gudbrandsdalen; the point is the carpentry, not the costumes." }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "fjord-norway",
+      "name": "Fjord Norway",
+      "summary": "The west coast: Bergen and its rain, the deep fjord arms, and the roads that only open when the snow lets them.",
+      "interests": ["mountains", "coast", "nature", "rail"],
+      "cities": [
+        {
+          "slug": "bergen",
+          "name": "Bergen",
+          "lat": 60.39, "lon": 5.32,
+          "summary": "A hanseatic trading port wedged between seven mountains, wet 200 days a year and entirely unbothered about it.",
+          "interests": ["coast", "history", "food", "music", "rail"],
+          "nights": [2, 3],
+          "highlights": [
+            "Bryggen's leaning wooden warehouses, and the fire history that explains their gaps",
+            "The Fløibanen funicular to a mountain you can walk down in an hour",
+            "The fish market — better one street back, where the locals buy",
+            "The Bergen Railway east: seven hours across a high plateau"
+          ],
+          "experiences": [
+            { "slug": "bergen-seven-mountains-walk", "name": "Fløyen to Ulriken ridge walk", "kind": "walk", "band": "low", "summary": "Five hours along the tops between the two cable cars, with the city on one side and nothing but bog and rock on the other." },
+            { "slug": "bergen-fish-counter-lunch", "name": "Lunch at a working fish counter", "kind": "table", "band": "moderate", "summary": "Skip the tourist stalls; eat where the boats deliver, standing up, whatever came in that morning." }
+          ]
+        },
+        {
+          "slug": "flam",
+          "name": "Flåm",
+          "lat": 60.86, "lon": 7.11,
+          "summary": "A hamlet at the end of a fjord arm, famous for a railway that drops 865 metres in twenty kilometres.",
+          "interests": ["rail", "mountains", "nature"],
+          "nights": [1, 2],
+          "highlights": [
+            "The Flåm Railway, best taken uphill and walked or cycled back down",
+            "Nærøyfjord: a UNESCO-listed fjord arm 250 metres wide at its narrowest",
+            "Aurlandsdalen, a day-long valley walk between old summer farms"
+          ],
+          "experiences": [
+            { "slug": "flam-rallarvegen-descent", "name": "Ride the Rallarvegen down", "kind": "ride", "band": "moderate", "summary": "The old navvies' road from Myrdal, gravel all the way, downhill nearly all the way — a bike, a train ticket and a whole afternoon." }
+          ]
+        },
+        {
+          "slug": "alesund",
+          "name": "Ålesund",
+          "lat": 62.47, "lon": 6.15,
+          "summary": "Burned to the ground in 1904 and rebuilt, all at once, in Art Nouveau — so the whole town matches.",
+          "interests": ["architecture", "coast", "design"],
+          "nights": [1, 2],
+          "highlights": [
+            "418 steps up Aksla for the archipelago laid out below",
+            "The Jugendstil centre, in the old pharmacy",
+            "Day boats to Runde's puffin cliffs in early summer"
+          ],
+          "experiences": [
+            { "slug": "alesund-jugendstil-walk", "name": "The town that burned and matched", "kind": "walk", "band": "low", "summary": "A short walk that only works once you know the date: every façade you pass was drawn in the same three years." }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "trondelag",
+      "name": "Trøndelag",
+      "summary": "The old seat of Norwegian kings, plus a copper town preserved by being too remote to modernise.",
+      "interests": ["history", "sacred", "food"],
+      "cities": [
+        {
+          "slug": "trondheim",
+          "name": "Trondheim",
+          "lat": 63.43, "lon": 10.4,
+          "summary": "A student city built around the northernmost medieval cathedral in the world, and the end of a thousand-year pilgrim path.",
+          "interests": ["sacred", "history", "food", "cities"],
+          "nights": [2, 3],
+          "highlights": [
+            "Nidaros Cathedral, the terminus of the St Olav Ways",
+            "The old wharves along the Nidelva, best from the Gamle Bybro",
+            "A food scene punching far above a city of 200,000"
+          ],
+          "experiences": [
+            { "slug": "trondheim-nidaros-close", "name": "The cathedral, from the workshop side", "kind": "sacred", "band": "low", "summary": "The stoneyard has been cutting replacement blocks continuously for a century; see that before you see the nave." }
+          ]
+        },
+        {
+          "slug": "roros",
+          "name": "Røros",
+          "lat": 62.57, "lon": 11.38,
+          "summary": "A 17th-century copper-mining town of black timber houses, at -30°C for weeks at a stretch and listed by UNESCO for surviving intact.",
+          "interests": ["history", "winter", "architecture"],
+          "nights": [1, 2],
+          "highlights": [
+            "Slaggveien: turf-roofed miners' cottages on slag heaps",
+            "The mine at Olavsgruva, 50 metres underground",
+            "Røros Martnan, the February winter market"
+          ],
+          "experiences": [
+            { "slug": "roros-copper-mine", "name": "Down the Olav mine", "kind": "museum", "band": "moderate", "summary": "Five degrees underground year-round, hard hats, and the noise a hand drill made before compressed air." }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "nord-norge",
+      "name": "Northern Norway",
+      "summary": "Above the Arctic Circle: island chains, Sámi country, whales in winter and no darkness at all in June.",
+      "interests": ["winter", "nature", "coast", "islands"],
+      "cities": [
+        {
+          "slug": "tromso",
+          "name": "Tromsø",
+          "lat": 69.65, "lon": 18.96,
+          "summary": "A university town at 69°N with more bars per head than anywhere else in Norway, and the aurora directly overhead.",
+          "interests": ["winter", "nature", "music", "cities"],
+          "nights": [2, 4],
+          "highlights": [
+            "The Arctic Cathedral and the cable car above the strait",
+            "Aurora hunting between late September and late March, inland where the sky is clearer",
+            "Whale watching off Skjervøy in November and December"
+          ],
+          "experiences": [
+            { "slug": "tromso-aurora-chase", "name": "An aurora night with a forecast, not a promise", "kind": "wild", "band": "high", "summary": "A guide who drives to clear sky — sometimes into Finland — is worth more than one who stays put; nobody can guarantee the lights, and anyone who does is selling something." },
+            { "slug": "tromso-sami-reindeer", "name": "A Sámi reindeer herding afternoon", "kind": "wild", "band": "moderate", "summary": "Book with a Sámi-owned operator; the difference between a working herd and a photo backdrop is obvious within ten minutes." }
+          ]
+        },
+        {
+          "slug": "lofoten",
+          "name": "Lofoten (Svolvær)",
+          "lat": 68.23, "lon": 14.57,
+          "summary": "Granite peaks that rise straight from the sea, red fishermen's cabins below them, and cod drying on racks every spring.",
+          "interests": ["mountains", "coast", "islands", "nature"],
+          "nights": [3, 5],
+          "highlights": [
+            "Reine and Hamnøy, the two views that put Lofoten on every screen",
+            "Ryten and Reinebringen — short, steep, and worth the calves",
+            "Sleeping in a rorbu, the cabins built for seasonal cod crews",
+            "Unstad's cold-water surf, wetsuits mandatory"
+          ],
+          "experiences": [
+            { "slug": "lofoten-rorbu-stay", "name": "A night in a working rorbu", "kind": "walk", "band": "moderate", "summary": "The old cod-fishing cabins on stilts; the good ones still smell faintly of tar and are still owned by fishing families." },
+            { "slug": "lofoten-cold-water-surf", "name": "Cold-water surf at Unstad", "kind": "water", "band": "moderate", "summary": "Beach break inside the Arctic Circle, 6mm of neoprene, and a sauna afterwards that you will remember longer than the waves." }
+          ]
+        }
+      ]
+    }
+  ]
+}

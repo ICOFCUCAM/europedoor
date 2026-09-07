@@ -1,0 +1,57 @@
+{
+  "macros": [
+    { "slug": "nordic", "name": "The Nordics", "blurb": "Long light in summer, long dark in winter, and a coastline that keeps folding back on itself.", "countries": ["norway", "sweden", "denmark", "finland", "iceland"] },
+    { "slug": "baltic", "name": "The Baltic States", "blurb": "Three small countries with three unrelated languages, hanseatic old towns and a shared, recent memory of leaving.", "countries": ["estonia", "latvia", "lithuania"] },
+    { "slug": "british-isles", "name": "Britain & Ireland", "blurb": "Two islands, four nations, and a weather system that makes the landscape green and the pubs necessary.", "countries": ["united-kingdom", "ireland"] },
+    { "slug": "western", "name": "Western Europe", "blurb": "Where the rail network is densest and the distance between a cathedral and a beach is measured in hours.", "countries": ["france", "netherlands", "belgium", "luxembourg", "monaco"] },
+    { "slug": "alpine-central", "name": "Alpine & Central Europe", "blurb": "The high middle of the continent — mountain passes above, imperial capitals below, and trains through both.", "countries": ["germany", "switzerland", "austria", "liechtenstein", "czechia", "poland", "slovakia", "hungary", "slovenia"] },
+    { "slug": "mediterranean", "name": "The Mediterranean", "blurb": "Three peninsulas and a scatter of islands that have been trading, arguing and cooking with each other for three thousand years.", "countries": ["spain", "portugal", "italy", "greece", "malta", "cyprus", "andorra", "san-marino", "vatican-city"] },
+    { "slug": "adriatic-balkans", "name": "The Adriatic & Balkans", "blurb": "Mountains that end in a clear sea, ottoman and habsburg layers in the same street, and Europe's least crowded coast.", "countries": ["croatia", "bosnia-and-herzegovina", "serbia", "montenegro", "north-macedonia", "albania", "kosovo", "bulgaria", "romania"] },
+    { "slug": "eastern", "name": "Eastern Europe", "blurb": "The wide flat east — forest, steppe and river — where travel advice matters more than a guidebook.", "countries": ["ukraine", "moldova", "belarus", "russia"] },
+    { "slug": "caucasus-bosphorus", "name": "The Caucasus & the Bosphorus", "blurb": "Europe's contested eastern edge: wine older than the alphabet, mountains higher than the Alps, and a city on two continents.", "countries": ["georgia", "armenia", "azerbaijan", "turkiye"] }
+  ],
+  "interests": [
+    { "slug": "history", "name": "History & ruins", "icon": "⚑" },
+    { "slug": "art", "name": "Art & museums", "icon": "◈" },
+    { "slug": "architecture", "name": "Architecture", "icon": "⌂" },
+    { "slug": "sacred", "name": "Sacred places", "icon": "✝" },
+    { "slug": "food", "name": "Food", "icon": "●" },
+    { "slug": "wine", "name": "Wine & drink", "icon": "◑" },
+    { "slug": "mountains", "name": "Mountains", "icon": "▲" },
+    { "slug": "coast", "name": "Coast & beaches", "icon": "≈" },
+    { "slug": "islands", "name": "Islands", "icon": "○" },
+    { "slug": "nature", "name": "Wild nature", "icon": "♣" },
+    { "slug": "winter", "name": "Snow & winter", "icon": "❄" },
+    { "slug": "cities", "name": "Big cities", "icon": "▦" },
+    { "slug": "music", "name": "Music & nightlife", "icon": "♫" },
+    { "slug": "design", "name": "Design & making", "icon": "◧" },
+    { "slug": "rail", "name": "Slow travel by rail", "icon": "═" },
+    { "slug": "festivals", "name": "Festivals", "icon": "✵" }
+  ],
+  "budgets": [
+    { "slug": "low", "name": "Frugal", "note": "Hostels, guesthouses, self-catering, regional trains and buses." },
+    { "slug": "moderate", "name": "Comfortable", "note": "Three-star hotels or good apartments, one restaurant meal a day, some fast trains." },
+    { "slug": "high", "name": "Generous", "note": "Well-reviewed hotels, restaurants that book out, flights and first-class rail where it saves a day." }
+  ],
+  "months": ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"],
+  "month_names": { "jan": "January", "feb": "February", "mar": "March", "apr": "April", "may": "May", "jun": "June", "jul": "July", "aug": "August", "sep": "September", "oct": "October", "nov": "November", "dec": "December" },
+  "blocs": {
+    "eu": "European Union",
+    "schengen": "Schengen area",
+    "eurozone": "Uses the euro",
+    "eea": "European Economic Area",
+    "cta": "Common Travel Area"
+  },
+  "experience_kinds": {
+    "walk": "Walk or hike",
+    "table": "Food & table",
+    "workshop": "Workshop or making",
+    "water": "On the water",
+    "museum": "Museum or collection",
+    "sacred": "Sacred site",
+    "ride": "Rail, road or ride",
+    "stage": "Music & performance",
+    "wild": "Wildlife & nature",
+    "cellar": "Cellar & vineyard"
+  }
+}

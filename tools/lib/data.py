@@ -1,0 +1,267 @@
+"""Load the Europedoor dataset and refuse to hand back anything malformed.
+
+Every page on the site is generated from data/, so a typo here becomes a
+broken page there. The validator is deliberately loud and deliberately
+strict: it is cheaper to fail the build than to publish a city that claims
+to be in a region that does not exist.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import re
+
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DATA = os.path.join(ROOT, "data")
+
+SLUG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+BUDGETS = ("low", "moderate", "high")
+BLOCS = ("eu", "schengen", "eurozone", "eea", "cta")
+ADVISORY_LEVELS = ("caution", "avoid")
+
+
+class DataError(Exception):
+    pass
+
+
+class Problems:
+    """Collects every complaint rather than dying on the first one."""
+
+    def __init__(self):
+        self.items = []
+
+    def add(self, where, message):
+        self.items.append(f"{where}: {message}")
+
+    def require(self, cond, where, message):
+        if not cond:
+            self.add(where, message)
+        return cond
+
+    def raise_if_any(self):
+        if self.items:
+            raise DataError(
+                "%d data problem(s):\n  - %s" % (len(self.items), "\n  - ".join(self.items))
+            )
+
+
+def _read(path):
+    with open(path, "r", encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def load():
+    """Return the whole dataset, cross-linked and validated."""
+    tax = _read(os.path.join(DATA, "taxonomy.json"))
+    interests = {i["slug"]: i for i in tax["interests"]}
+    months = set(tax["months"])
+    kinds = tax["experience_kinds"]
+
+    p = Problems()
+
+    countries = {}
+    files = sorted(os.listdir(os.path.join(DATA, "countries")))
+    for fn in files:
+        if not fn.endswith(".json"):
+            continue
+        c = _read(os.path.join(DATA, "countries", fn))
+        where = "countries/" + fn
+        for key in (
+            "code", "slug", "name", "macro", "capital", "currency", "languages",
+            "blocs", "tagline", "summary", "interests", "budget", "daily_eur",
+            "season", "getting_around", "food", "festivals", "know", "regions",
+        ):
+            p.require(key in c, where, f"missing key {key!r}")
+        if "slug" not in c:
+            continue
+        p.require(SLUG.match(c["slug"]), where, "slug is not a slug")
+        p.require(fn == c["slug"] + ".json", where, "filename must match slug")
+        p.require(c["slug"] not in countries, where, "duplicate country slug")
+        p.require(c.get("budget") in BUDGETS, where, "budget must be one of " + "/".join(BUDGETS))
+        for b in c.get("blocs", []):
+            p.require(b in BLOCS, where, f"unknown bloc {b!r}")
+        for i in c.get("interests", []):
+            p.require(i in interests, where, f"unknown interest {i!r}")
+        rng = c.get("daily_eur")
+        p.require(
+            isinstance(rng, list) and len(rng) == 2 and 0 < rng[0] < rng[1],
+            where, "daily_eur must be [low, high] with low < high",
+        )
+        season = c.get("season", {})
+        for band in ("peak", "shoulder"):
+            for m in season.get(band, []):
+                p.require(m in months, where, f"unknown month {m!r} in season.{band}")
+        for f in c.get("festivals", []):
+            p.require(f.get("month") in months, where, f"festival {f.get('name')!r}: bad month")
+        adv = c.get("advisory")
+        if adv:
+            p.require(adv.get("level") in ADVISORY_LEVELS, where, "advisory.level must be caution/avoid")
+            p.require(bool(adv.get("note")), where, "an advisory needs a note")
+
+        seen_regions = set()
+        for r in c.get("regions", []):
+            rw = f"{where} > {r.get('slug')}"
+            p.require(SLUG.match(r.get("slug", "")), rw, "region slug is not a slug")
+            p.require(r["slug"] not in seen_regions, rw, "duplicate region slug")
+            seen_regions.add(r.get("slug"))
+            for key in ("name", "summary", "interests", "cities"):
+                p.require(key in r, rw, f"missing key {key!r}")
+            for i in r.get("interests", []):
+                p.require(i in interests, rw, f"unknown interest {i!r}")
+            p.require(len(r.get("cities", [])) >= 1, rw, "a region needs at least one city")
+            seen_cities = set()
+            for t in r.get("cities", []):
+                tw = f"{rw} > {t.get('slug')}"
+                p.require(SLUG.match(t.get("slug", "")), tw, "city slug is not a slug")
+                p.require(t["slug"] not in seen_cities, tw, "duplicate city slug")
+                seen_cities.add(t.get("slug"))
+                for key in ("name", "lat", "lon", "summary", "interests", "nights", "highlights"):
+                    p.require(key in t, tw, f"missing key {key!r}")
+                p.require(35.0 <= t.get("lat", 0) <= 72.0, tw, "lat looks off the map for Europe")
+                p.require(-26.0 <= t.get("lon", 0) <= 50.0, tw, "lon looks off the map for Europe")
+                n = t.get("nights")
+                p.require(
+                    isinstance(n, list) and len(n) == 2 and 1 <= n[0] <= n[1] <= 7,
+                    tw, "nights must be [min, max] within 1..7",
+                )
+                for i in t.get("interests", []):
+                    p.require(i in interests, tw, f"unknown interest {i!r}")
+                p.require(len(t.get("highlights", [])) >= 2, tw, "give a city at least two highlights")
+                for e in t.get("experiences", []):
+                    ew = f"{tw} > {e.get('slug')}"
+                    p.require(SLUG.match(e.get("slug", "")), ew, "experience slug is not a slug")
+                    p.require(e.get("kind") in kinds, ew, f"unknown experience kind {e.get('kind')!r}")
+                    p.require(e.get("band") in BUDGETS, ew, "experience band must be low/moderate/high")
+                    p.require(bool(e.get("summary")), ew, "an experience needs a summary")
+        countries[c["slug"]] = c
+
+    # Macro regions own countries; every country must be owned exactly once.
+    listed = []
+    for m in tax["macros"]:
+        for cs in m["countries"]:
+            listed.append(cs)
+            if cs in countries:
+                countries[cs]["macro_slug"] = m["slug"]
+                countries[cs]["macro_name"] = m["name"]
+            else:
+                p.add("taxonomy", f"macro {m['slug']} lists unknown country {cs!r}")
+    for cs in countries:
+        p.require(cs in listed, "taxonomy", f"country {cs!r} belongs to no macro region")
+    p.require(len(listed) == len(set(listed)), "taxonomy", "a country is listed in two macro regions")
+
+    themes = _read(os.path.join(DATA, "themes.json"))["themes"]
+    stories = _read(os.path.join(DATA, "stories.json"))["stories"]
+    journeys = _read(os.path.join(DATA, "journeys.json"))["journeys"]
+    fund = _read(os.path.join(DATA, "fund.json"))["projects"]
+    providers = _read(os.path.join(DATA, "providers.json"))
+
+    index = city_index(countries)
+    seen_j = set()
+    for j in journeys:
+        jw = "journeys/" + str(j.get("slug"))
+        p.require(SLUG.match(j.get("slug", "")), jw, "journey slug is not a slug")
+        p.require(j["slug"] not in seen_j, jw, "duplicate journey slug")
+        seen_j.add(j.get("slug"))
+        for key in ("name", "strapline", "summary", "days", "budget", "interests", "months", "legs"):
+            p.require(key in j, jw, f"missing key {key!r}")
+        for i in j.get("interests", []):
+            p.require(i in interests, jw, f"unknown interest {i!r}")
+        for m in j.get("months", []):
+            p.require(m in months, jw, f"unknown month {m!r}")
+        p.require(len(j.get("legs", [])) >= 3, jw, "a journey needs at least three legs")
+        for leg in j.get("legs", []):
+            p.require(leg.get("city") in index, jw, f"leg points at unknown city {leg.get('city')!r}")
+            p.require(isinstance(leg.get("nights"), int) and leg["nights"] >= 1, jw, "leg needs nights")
+            p.require(bool(leg.get("why")), jw, f"leg {leg.get('city')} needs a why")
+        total = sum(l.get("nights", 0) for l in j.get("legs", []))
+        p.require(total == j.get("days", -1) - 1, jw,
+                  f"legs total {total} nights but the journey claims {j.get('days')} days")
+
+    seen_t = set()
+    for t in themes:
+        tw = "themes/" + str(t.get("slug"))
+        p.require(SLUG.match(t.get("slug", "")), tw, "theme slug is not a slug")
+        p.require(t["slug"] not in seen_t, tw, "duplicate theme slug")
+        seen_t.add(t.get("slug"))
+        for key in ("name", "strapline", "summary", "interests", "stops"):
+            p.require(key in t, tw, f"missing key {key!r}")
+        for i in t.get("interests", []):
+            p.require(i in interests, tw, f"unknown interest {i!r}")
+        p.require(len(t.get("stops", [])) >= 4, tw, "a theme needs at least four stops")
+        for stop in t.get("stops", []):
+            p.require(stop.get("city") in index, tw, f"stop points at unknown city {stop.get('city')!r}")
+            p.require(bool(stop.get("why")), tw, f"stop {stop.get('city')} needs a why")
+
+    seen_s = set()
+    for st in stories:
+        sw = "stories/" + str(st.get("slug"))
+        p.require(SLUG.match(st.get("slug", "")), sw, "story slug is not a slug")
+        p.require(st["slug"] not in seen_s, sw, "duplicate story slug")
+        seen_s.add(st.get("slug"))
+        for key in ("title", "section", "standfirst", "reading", "body"):
+            p.require(key in st, sw, f"missing key {key!r}")
+        p.require(len(st.get("body", [])) >= 4, sw, "a story needs at least four paragraphs")
+        for cid in st.get("places", []):
+            p.require(cid in index, sw, f"story points at unknown city {cid!r}")
+
+    seen_f = set()
+    for f in fund:
+        fw = "fund/" + str(f.get("slug"))
+        p.require(SLUG.match(f.get("slug", "")), fw, "project slug is not a slug")
+        p.require(f["slug"] not in seen_f, fw, "duplicate project slug")
+        seen_f.add(f.get("slug"))
+        for key in ("name", "theme", "country", "summary", "need", "status", "partner"):
+            p.require(key in f, fw, f"missing key {key!r}")
+        p.require(f.get("country") in countries, fw, f"unknown country {f.get('country')!r}")
+        p.require(f.get("status") in ("listed", "in-progress", "complete"), fw, "bad status")
+        p.require("amount" not in f and "raised" not in f and "goal" not in f, fw,
+                  "the Fund carries no money at MVP — see docs/europe-fund.md")
+
+    for prov in providers["providers"]:
+        pw = "providers/" + str(prov.get("slug"))
+        for key in ("name", "kind", "city", "country", "summary", "tier", "checks"):
+            p.require(key in prov, pw, f"missing key {key!r}")
+        p.require(prov.get("tier") in ("applied", "reviewed", "verified"), pw, "bad tier")
+        p.require(prov.get("country") in countries, pw, f"unknown country {prov.get('country')!r}")
+
+    p.raise_if_any()
+
+    return {
+        "taxonomy": tax,
+        "interests": interests,
+        "countries": countries,
+        "macros": tax["macros"],
+        "journeys": journeys,
+        "themes": themes,
+        "stories": stories,
+        "fund": fund,
+        "providers": providers,
+        "cities": index,
+    }
+
+
+def city_index(countries):
+    """Every city keyed by "<country>/<region>/<city>", with its ancestry attached."""
+    out = {}
+    for c in countries.values():
+        for r in c["regions"]:
+            for t in r["cities"]:
+                cid = f"{c['slug']}/{r['slug']}/{t['slug']}"
+                out[cid] = {
+                    "id": cid,
+                    "city": t,
+                    "region": r,
+                    "country": c,
+                }
+    return out
+
+
+def all_experiences(countries):
+    out = []
+    for c in countries.values():
+        for r in c["regions"]:
+            for t in r["cities"]:
+                for e in t.get("experiences", []):
+                    out.append({"exp": e, "city": t, "region": r, "country": c})
+    return out
