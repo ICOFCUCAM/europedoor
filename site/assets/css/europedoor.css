@@ -318,3 +318,13 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .navsearch { color: var(--door); }
 .navsearch span { font-size: 1.1em; line-height: 1; }
 @media (max-width: 60rem) { .masthead-in { flex-wrap: wrap; } }
+
+/* ── the small map on a destination page ──────────────────────────── */
+.minimap { margin: var(--s5) 0; padding: var(--s4); border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper-2); }
+.minimap svg { width: 100%; height: auto; display: block; }
+.minidot circle { fill: var(--ink-3); opacity: .55; }
+.minidot:hover circle { fill: var(--door); opacity: 1; }
+.minidot.here circle { fill: var(--door); opacity: 1; }
+.minilabel { font-family: var(--text); font-size: 11px; fill: var(--ink-3); }
+.minilabel.here { fill: var(--ink); font-weight: 600; }
+.minimap figcaption { font-size: var(--t-xs); color: var(--ink-3); margin-top: var(--s3); }

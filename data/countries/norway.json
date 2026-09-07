@@ -119,6 +119,58 @@
               "band": "low",
               "summary": "Opera roof to Munch to the library at Bjørvika — twenty years of a city deciding what it wanted to look like, in ninety minutes."
             }
+          ],
+          "places": [
+            {
+              "slug": "munch-museum",
+              "name": "MUNCH",
+              "kind": "museum",
+              "summary": "Thirteen floors on the waterfront holding the artist's own bequest — 26,000 works, including the versions of The Scream worth arguing about.",
+              "lat": 59.906,
+              "lon": 10.755,
+              "duration": "2–3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "fram-museum",
+              "name": "Fram Museum",
+              "kind": "museum",
+              "summary": "The polar ship Fram kept whole indoors, with her hull open so you can walk the decks that drifted across the Arctic for three years.",
+              "lat": 59.902,
+              "lon": 10.699,
+              "duration": "90 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "vigeland-park",
+              "name": "Vigeland Sculpture Park",
+              "kind": "park",
+              "summary": "212 bronze and granite figures by one sculptor in one park, free and open at every hour, including four in the morning.",
+              "lat": 59.927,
+              "lon": 10.7,
+              "duration": "1–2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "akershus-fortress",
+              "name": "Akershus Fortress",
+              "kind": "castle",
+              "summary": "A medieval castle on the harbour that was never taken by siege, with the government quarter and the fjord on either side of it.",
+              "lat": 59.907,
+              "lon": 10.736,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "oslo-opera-house",
+              "name": "Oslo Opera House",
+              "kind": "monument",
+              "summary": "A roof that comes down to the water so the public can walk up it, which is the building's actual argument.",
+              "lat": 59.907,
+              "lon": 10.753,
+              "duration": "30 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -148,6 +200,18 @@
               "kind": "museum",
               "band": "moderate",
               "summary": "Two hundred buildings moved log by log from across Gudbrandsdalen; the point is the carpentry, not the costumes."
+            }
+          ],
+          "places": [
+            {
+              "slug": "maihaugen",
+              "name": "Maihaugen",
+              "kind": "museum",
+              "summary": "Two hundred buildings moved log by log from across Gudbrandsdalen, including a stave church.",
+              "lat": 61.114,
+              "lon": 10.474,
+              "duration": "3 hours",
+              "season": "year-round"
             }
           ]
         },
@@ -211,6 +275,28 @@
               "kind": "museum",
               "band": "moderate",
               "summary": "The plant, the pipeline the saboteurs climbed, and an account that does not tidy up how close it came to failing."
+            }
+          ],
+          "places": [
+            {
+              "slug": "vemork",
+              "name": "Vemork",
+              "kind": "museum",
+              "summary": "The heavy water plant sabotaged in 1943, with the pipeline the saboteurs climbed still on the cliff.",
+              "lat": 59.873,
+              "lon": 8.489,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "rjukan-mirrors",
+              "name": "The Sun Mirrors",
+              "kind": "monument",
+              "summary": "Three heliostats on the mountain throwing daylight into a square the sun cannot reach for six months.",
+              "lat": 59.879,
+              "lon": 8.593,
+              "duration": "20 minutes",
+              "season": "winter"
             }
           ]
         }
@@ -352,6 +438,48 @@
               "band": "moderate",
               "summary": "Skip the tourist stalls; eat where the boats deliver, standing up, whatever came in that morning."
             }
+          ],
+          "places": [
+            {
+              "slug": "bryggen",
+              "name": "Bryggen",
+              "kind": "quarter",
+              "summary": "The leaning wooden trading houses of the Hanseatic wharf, rebuilt after each fire on the same foundations since the 1100s.",
+              "lat": 60.397,
+              "lon": 5.324,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "floyen",
+              "name": "Fløyen",
+              "kind": "viewpoint",
+              "summary": "320 metres above the city by funicular, with a path down through the woods that most people forget to take.",
+              "lat": 60.396,
+              "lon": 5.351,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "bergen-fish-market",
+              "name": "Fish Market",
+              "kind": "market",
+              "summary": "Outdoor from May, indoors year-round, and better one street back where the boats actually deliver.",
+              "lat": 60.395,
+              "lon": 5.325,
+              "duration": "45 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "kode-museums",
+              "name": "KODE",
+              "kind": "museum",
+              "summary": "Four buildings on one street holding Munch, Astrup and the largest Norwegian art collection outside Oslo.",
+              "lat": 60.392,
+              "lon": 5.328,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -381,6 +509,28 @@
               "kind": "ride",
               "band": "moderate",
               "summary": "The old navvies' road from Myrdal, gravel all the way, downhill nearly all the way — a bike, a train ticket and a whole afternoon."
+            }
+          ],
+          "places": [
+            {
+              "slug": "flam-railway",
+              "name": "Flåm Railway",
+              "kind": "monument",
+              "summary": "Twenty kilometres and 865 metres of descent through twenty tunnels, most of them dug by hand.",
+              "lat": 60.863,
+              "lon": 7.113,
+              "duration": "1 hour each way",
+              "season": "year-round"
+            },
+            {
+              "slug": "naeroyfjord",
+              "name": "Nærøyfjord",
+              "kind": "waterfall",
+              "summary": "A UNESCO fjord arm 250 metres wide at its narrowest, with waterfalls straight off the wall above the boat.",
+              "lat": 60.9,
+              "lon": 6.9,
+              "duration": "2 hours by boat",
+              "season": "spring-autumn"
             }
           ]
         },
@@ -412,6 +562,28 @@
               "band": "low",
               "summary": "A short walk that only works once you know the date: every façade you pass was drawn in the same three years."
             }
+          ],
+          "places": [
+            {
+              "slug": "aksla-viewpoint",
+              "name": "Aksla",
+              "kind": "viewpoint",
+              "summary": "418 steps up from the town park, with the Art Nouveau roofs and the archipelago laid out below.",
+              "lat": 62.474,
+              "lon": 6.161,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "jugendstilsenteret",
+              "name": "Jugendstilsenteret",
+              "kind": "museum",
+              "summary": "The Art Nouveau centre in the old pharmacy, explaining why an entire town matches.",
+              "lat": 62.472,
+              "lon": 6.153,
+              "duration": "1 hour",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -442,6 +614,38 @@
               "kind": "walk",
               "band": "low",
               "summary": "Eight kilometres round on rock and boardwalk. Start before seven; by eleven there is a queue for the photograph and no railing to queue behind."
+            }
+          ],
+          "places": [
+            {
+              "slug": "preikestolen",
+              "name": "Preikestolen",
+              "kind": "mountain",
+              "summary": "A flat slab 604 metres above the Lysefjord with no railing, reached by an eight-kilometre path.",
+              "lat": 58.986,
+              "lon": 6.19,
+              "duration": "4–5 hours",
+              "season": "spring-autumn"
+            },
+            {
+              "slug": "gamle-stavanger",
+              "name": "Gamle Stavanger",
+              "kind": "quarter",
+              "summary": "173 white wooden houses from the 18th and 19th centuries, on cobbled lanes above the harbour.",
+              "lat": 58.972,
+              "lon": 5.729,
+              "duration": "45 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "petroleum-museum",
+              "name": "Norwegian Petroleum Museum",
+              "kind": "museum",
+              "summary": "The industry that paid for modern Norway, explained more frankly than a national museum usually manages.",
+              "lat": 58.974,
+              "lon": 5.734,
+              "duration": "2 hours",
+              "season": "year-round"
             }
           ]
         },
@@ -525,6 +729,28 @@
               "band": "moderate",
               "summary": "Skageflå was farmed until 1918 on a shelf 250 metres above the water, reached by ladder. The boat drops you at the bottom and you climb."
             }
+          ],
+          "places": [
+            {
+              "slug": "seven-sisters",
+              "name": "The Seven Sisters",
+              "kind": "waterfall",
+              "summary": "Seven falls dropping 250 metres into the fjord, opposite a suitor who never got anywhere.",
+              "lat": 62.117,
+              "lon": 7.15,
+              "duration": "2 hours by boat",
+              "season": "summer"
+            },
+            {
+              "slug": "skageflaa",
+              "name": "Skageflå",
+              "kind": "ruin",
+              "summary": "A farm worked until 1918 on a ledge 250 metres above the water, reached by boat and then by climbing.",
+              "lat": 62.106,
+              "lon": 7.106,
+              "duration": "3 hours",
+              "season": "summer"
+            }
           ]
         },
         {
@@ -591,6 +817,38 @@
               "band": "low",
               "summary": "The stoneyard has been cutting replacement blocks continuously for a century; see that before you see the nave."
             }
+          ],
+          "places": [
+            {
+              "slug": "nidaros-cathedral",
+              "name": "Nidaros Cathedral",
+              "kind": "church",
+              "summary": "The northernmost medieval cathedral in the world, the end of the St Olav Ways, and a stoneyard that has cut replacement blocks continuously for a century.",
+              "lat": 63.427,
+              "lon": 10.397,
+              "duration": "90 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "gamle-bybro",
+              "name": "Gamle Bybro",
+              "kind": "bridge",
+              "summary": "The old town bridge, red-painted, with the wooden wharves of the Nidelva on both sides of it.",
+              "lat": 63.428,
+              "lon": 10.401,
+              "duration": "15 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "ringve-museum",
+              "name": "Ringve Music Museum",
+              "kind": "museum",
+              "summary": "A national collection of musical instruments in a manor house above the fjord, played rather than displayed.",
+              "lat": 63.443,
+              "lon": 10.457,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -620,6 +878,38 @@
               "kind": "museum",
               "band": "moderate",
               "summary": "Five degrees underground year-round, hard hats, and the noise a hand drill made before compressed air."
+            }
+          ],
+          "places": [
+            {
+              "slug": "roros-church",
+              "name": "Røros Church",
+              "kind": "church",
+              "summary": "A 1784 stone church seating 1,600 in a town of 3,700, built by a copper company for its workers.",
+              "lat": 62.575,
+              "lon": 11.383,
+              "duration": "45 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "olavsgruva",
+              "name": "Olavsgruva Mine",
+              "kind": "cave",
+              "summary": "Fifty metres underground at five degrees year-round, in a copper mine worked from 1650.",
+              "lat": 62.641,
+              "lon": 11.554,
+              "duration": "90 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "slaggveien",
+              "name": "Slaggveien",
+              "kind": "street",
+              "summary": "Turf-roofed miners' cottages built on the slag heaps, which is the whole social history in one lane.",
+              "lat": 62.573,
+              "lon": 11.386,
+              "duration": "30 minutes",
+              "season": "year-round"
             }
           ]
         }
@@ -672,6 +962,38 @@
               "band": "moderate",
               "summary": "Book with a Sámi-owned operator; the difference between a working herd and a photo backdrop is obvious within ten minutes."
             }
+          ],
+          "places": [
+            {
+              "slug": "arctic-cathedral",
+              "name": "Arctic Cathedral",
+              "kind": "church",
+              "summary": "Eleven concrete triangles and a glass mosaic 23 metres high, finished in 1965 and visible from the whole city.",
+              "lat": 69.669,
+              "lon": 18.998,
+              "duration": "30 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "polaria",
+              "name": "Polaria",
+              "kind": "museum",
+              "summary": "A small aquarium and Arctic research centre with bearded seals, built as five ice floes tipped against a shore.",
+              "lat": 69.646,
+              "lon": 18.951,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "storsteinen",
+              "name": "Storsteinen",
+              "kind": "viewpoint",
+              "summary": "421 metres by cable car, with the island city below and the midnight sun above it from late May.",
+              "lat": 69.649,
+              "lon": 18.995,
+              "duration": "90 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -710,6 +1032,38 @@
               "kind": "water",
               "band": "moderate",
               "summary": "Beach break inside the Arctic Circle, 6mm of neoprene, and a sauna afterwards that you will remember longer than the waves."
+            }
+          ],
+          "places": [
+            {
+              "slug": "reinebringen",
+              "name": "Reinebringen",
+              "kind": "mountain",
+              "summary": "1,566 Sherpa-built stone steps to the view of Reine that appears on every poster of Norway.",
+              "lat": 67.93,
+              "lon": 13.088,
+              "duration": "2–3 hours",
+              "season": "summer"
+            },
+            {
+              "slug": "unstad-beach",
+              "name": "Unstad",
+              "kind": "beach",
+              "summary": "A cold-water surf break inside the Arctic Circle, with a sauna at the top of the sand.",
+              "lat": 68.298,
+              "lon": 13.673,
+              "duration": "half a day",
+              "season": "year-round"
+            },
+            {
+              "slug": "lofotr-viking-museum",
+              "name": "Lofotr Viking Museum",
+              "kind": "museum",
+              "summary": "A reconstructed 83-metre chieftain's longhouse on the site where the original was found in a barley field.",
+              "lat": 68.226,
+              "lon": 13.786,
+              "duration": "2 hours",
+              "season": "year-round"
             }
           ]
         },
@@ -892,6 +1246,28 @@
               "kind": "ride",
               "band": "high",
               "summary": "Wheeled carts in summer, runners in winter, and the same dogs that supplied the mines before snowmobiles."
+            }
+          ],
+          "places": [
+            {
+              "slug": "svalbard-museum",
+              "name": "Svalbard Museum",
+              "kind": "museum",
+              "summary": "Whaling, mining, trapping and the ecology of an archipelago where nothing decomposes, in one well-made room.",
+              "lat": 78.223,
+              "lon": 15.633,
+              "duration": "90 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "global-seed-vault",
+              "name": "Global Seed Vault",
+              "kind": "monument",
+              "summary": "A concrete wedge in a mountainside holding a million seed samples. Nobody goes inside; the point is that it is there.",
+              "lat": 78.236,
+              "lon": 15.491,
+              "duration": "20 minutes, from outside",
+              "season": "year-round"
             }
           ]
         }

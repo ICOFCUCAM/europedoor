@@ -125,6 +125,58 @@
               "band": "low",
               "summary": "Glass-roofed arcades built before the department store and mostly forgotten since — a two-hour walk in the dry."
             }
+          ],
+          "places": [
+            {
+              "slug": "musee-dorsay",
+              "name": "Musée d'Orsay",
+              "kind": "museum",
+              "summary": "Impressionism in a Beaux-Arts railway station, and a better single visit than the Louvre.",
+              "lat": 48.86,
+              "lon": 2.327,
+              "duration": "3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "pere-lachaise",
+              "name": "Père Lachaise",
+              "kind": "park",
+              "summary": "A walled city of the dead with its own map, 44 hectares, and better company than most parks.",
+              "lat": 48.861,
+              "lon": 2.393,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "sainte-chapelle",
+              "name": "Sainte-Chapelle",
+              "kind": "church",
+              "summary": "Fifteen windows of 13th-century glass holding 1,113 scenes, in a chapel built as a reliquary.",
+              "lat": 48.855,
+              "lon": 2.345,
+              "duration": "45 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "passages-couverts",
+              "name": "The Covered Passages",
+              "kind": "street",
+              "summary": "Glass-roofed arcades from the 1820s, built before the department store and mostly forgotten since.",
+              "lat": 48.869,
+              "lon": 2.342,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "rodin-museum",
+              "name": "Musée Rodin",
+              "kind": "museum",
+              "summary": "The sculptor's own house and garden, where The Thinker sits outside and the queue does not exist.",
+              "lat": 48.855,
+              "lon": 2.316,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -147,6 +199,18 @@
             "The blue of the Notre-Dame de la Belle-Verrière window",
             "The labyrinth in the nave floor, walkable on Fridays in summer",
             "The old town below, on the river"
+          ],
+          "places": [
+            {
+              "slug": "chartres-cathedral",
+              "name": "Chartres Cathedral",
+              "kind": "church",
+              "summary": "172 windows of 12th-century glass that survived two wars in boxes, and a labyrinth in the nave floor.",
+              "lat": 48.448,
+              "lon": 1.488,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         }
       ]
@@ -190,6 +254,18 @@
               "kind": "cellar",
               "band": "moderate",
               "summary": "Chalk quarried by Romans, thirty metres down, holding millions of bottles at a constant temperature nobody has to pay for."
+            }
+          ],
+          "places": [
+            {
+              "slug": "reims-cathedral",
+              "name": "Reims Cathedral",
+              "kind": "church",
+              "summary": "Where thirty-three French kings were crowned, with a smiling angel outside and Chagall windows within.",
+              "lat": 49.254,
+              "lon": 4.034,
+              "duration": "90 minutes",
+              "season": "year-round"
             }
           ]
         },
@@ -280,6 +356,18 @@
               "band": "moderate",
               "summary": "Guided, barefoot, over quicksand and channels; the mount is a different thing entirely when you arrive the medieval way."
             }
+          ],
+          "places": [
+            {
+              "slug": "mont-saint-michel-abbey",
+              "name": "The Abbey",
+              "kind": "monastery",
+              "summary": "A Romanesque and Gothic abbey stacked on a granite rock, best at opening or on a night visit.",
+              "lat": 48.636,
+              "lon": -1.511,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -302,6 +390,28 @@
             "The Bayeux Tapestry, seen slowly with the audio guide",
             "Omaha and the American cemetery above it",
             "Arromanches, where the concrete harbour is still in the sea"
+          ],
+          "places": [
+            {
+              "slug": "bayeux-tapestry",
+              "name": "Bayeux Tapestry",
+              "kind": "museum",
+              "summary": "Seventy metres of embroidery telling 1066 from the winning side, seen slowly with the audio guide.",
+              "lat": 49.276,
+              "lon": -0.703,
+              "duration": "90 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "omaha-beach",
+              "name": "Omaha Beach & the American Cemetery",
+              "kind": "monument",
+              "summary": "Five kilometres of sand and 9,388 graves on the bluff above it.",
+              "lat": 49.359,
+              "lon": -0.856,
+              "duration": "half a day",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -367,6 +477,28 @@
               "band": "moderate",
               "summary": "900 km of signed, flat riverside route; two days of it between Blois and Tours is the best introduction."
             }
+          ],
+          "places": [
+            {
+              "slug": "chenonceau",
+              "name": "Château de Chenonceau",
+              "kind": "castle",
+              "summary": "Built across the river itself, and run by a succession of women who each rebuilt part of it.",
+              "lat": 47.325,
+              "lon": 1.07,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "clos-luce",
+              "name": "Clos Lucé",
+              "kind": "museum",
+              "summary": "Leonardo's last house, connected to the royal château by a tunnel he probably never used.",
+              "lat": 47.41,
+              "lon": 0.989,
+              "duration": "90 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -397,6 +529,28 @@
               "kind": "cellar",
               "band": "moderate",
               "summary": "Skip the classified growths and visit a family making 20,000 bottles; you will taste from the barrel and be told the truth about the vintage."
+            }
+          ],
+          "places": [
+            {
+              "slug": "place-de-la-bourse",
+              "name": "Place de la Bourse & Miroir d'eau",
+              "kind": "square",
+              "summary": "An 18th-century facade and the world's largest reflecting pool, two centimetres deep.",
+              "lat": 44.841,
+              "lon": -0.57,
+              "duration": "30 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "saint-emilion",
+              "name": "Saint-Émilion",
+              "kind": "monument",
+              "summary": "A monolithic church cut down into the rock, in a village that is the whole appellation's shopfront.",
+              "lat": 44.894,
+              "lon": -0.156,
+              "duration": "half a day",
+              "season": "year-round"
             }
           ]
         },
@@ -451,6 +605,28 @@
               "band": "moderate",
               "summary": "Font-de-Gaume still admits a few dozen people a day to originals; Lascaux is a facsimile because breath destroyed the real one within fifteen years of opening."
             }
+          ],
+          "places": [
+            {
+              "slug": "lascaux-iv",
+              "name": "Lascaux IV",
+              "kind": "museum",
+              "summary": "An exact facsimile of a cave closed since 1963 because human breath was destroying the paintings.",
+              "lat": 45.053,
+              "lon": 1.174,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "chateau-de-beynac",
+              "name": "Château de Beynac",
+              "kind": "castle",
+              "summary": "A cliff-top fortress facing its enemy across the river, essentially unchanged since the 1300s.",
+              "lat": 44.842,
+              "lon": 1.145,
+              "duration": "90 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -473,6 +649,18 @@
             "Saint-Sernin, the largest Romanesque church still standing",
             "Canal du Midi, walked or cycled towards the sea",
             "Cassoulet, which is argued over with Castelnaudary and Carcassonne"
+          ],
+          "places": [
+            {
+              "slug": "basilique-saint-sernin",
+              "name": "Basilique Saint-Sernin",
+              "kind": "church",
+              "summary": "The largest Romanesque church still standing, built in brick for pilgrims on the way to Santiago.",
+              "lat": 43.608,
+              "lon": 1.442,
+              "duration": "1 hour",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -539,6 +727,28 @@
               "band": "moderate",
               "summary": "The steps to the ice are signed with the year the glacier reached each level; the descent is a chronology as much as a walk."
             }
+          ],
+          "places": [
+            {
+              "slug": "aiguille-du-midi",
+              "name": "Aiguille du Midi",
+              "kind": "mountain",
+              "summary": "3,842 metres in twenty minutes by cable car, with Mont Blanc across the glacier.",
+              "lat": 45.879,
+              "lon": 6.887,
+              "duration": "3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "mer-de-glace",
+              "name": "Mer de Glace",
+              "kind": "mountain",
+              "summary": "France's largest glacier, reached by rack railway, with the steps down signed by the year the ice reached them.",
+              "lat": 45.897,
+              "lon": 6.921,
+              "duration": "3 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -561,6 +771,18 @@
             "The Hôtel-Dieu's glazed tile roof and 15th-century wards",
             "Walking or cycling the Côte de Beaune between named vineyards",
             "The Hospices auction in November"
+          ],
+          "places": [
+            {
+              "slug": "hotel-dieu",
+              "name": "Hôtel-Dieu",
+              "kind": "museum",
+              "summary": "A 15th-century charity hospital under a glazed tile roof, with the wards left as they were.",
+              "lat": 47.022,
+              "lon": 4.838,
+              "duration": "90 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -582,6 +804,18 @@
             "The Isenheim Altarpiece at the Unterlinden, which stops people mid-sentence",
             "The wine road south through Eguisheim and Riquewihr",
             "Christmas markets, which here are the real thing"
+          ],
+          "places": [
+            {
+              "slug": "unterlinden",
+              "name": "Musée Unterlinden",
+              "kind": "museum",
+              "summary": "The Isenheim Altarpiece, which stops people mid-sentence, in a Dominican convent.",
+              "lat": 48.079,
+              "lon": 7.355,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -613,6 +847,18 @@
               "band": "low",
               "summary": "Fed by mountain springs and cleaned up by a 1960s sewer scheme that is now the textbook example; you can see the bottom at four metres."
             }
+          ],
+          "places": [
+            {
+              "slug": "lake-annecy",
+              "name": "Lake Annecy",
+              "kind": "beach",
+              "summary": "The cleanest large lake in Europe, swimmable from public beaches, with the Alps standing behind it.",
+              "lat": 45.855,
+              "lon": 6.163,
+              "duration": "half a day",
+              "season": "summer"
+            }
           ]
         },
         {
@@ -636,6 +882,28 @@
             "The cathedral's astronomical clock, which performs at half past twelve",
             "La Petite France's canals and tanners' houses",
             "Winstubs: Alsatian taverns serving choucroute and dry Riesling"
+          ],
+          "places": [
+            {
+              "slug": "strasbourg-cathedral",
+              "name": "Strasbourg Cathedral",
+              "kind": "church",
+              "summary": "Pink sandstone, a single spire, and an astronomical clock that performs at half past twelve.",
+              "lat": 48.582,
+              "lon": 7.751,
+              "duration": "90 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "petite-france",
+              "name": "La Petite France",
+              "kind": "quarter",
+              "summary": "Tanners' houses on canals with drying lofts in the roofs, on an island in the Ill.",
+              "lat": 48.58,
+              "lon": 7.741,
+              "duration": "1 hour",
+              "season": "year-round"
+            }
           ]
         }
       ]
@@ -680,6 +948,28 @@
               "band": "moderate",
               "summary": "The local white horses are bred to work in water; a half-day gets you into marsh no vehicle reaches."
             }
+          ],
+          "places": [
+            {
+              "slug": "arles-amphitheatre",
+              "name": "Arles Amphitheatre",
+              "kind": "theatre",
+              "summary": "Built around 90 AD for 20,000 people and still used for events, which is the point.",
+              "lat": 43.678,
+              "lon": 4.631,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "van-gogh-sites",
+              "name": "The Van Gogh sites",
+              "kind": "street",
+              "summary": "The café terrace, the hospital courtyard and the yellow house's corner, in the year he painted 200 canvases.",
+              "lat": 43.677,
+              "lon": 4.628,
+              "duration": "90 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -711,6 +1001,28 @@
               "band": "low",
               "summary": "From Luminy to Sugiton in ninety minutes; in summer access is capped and booked, which is why the water is still clear."
             }
+          ],
+          "places": [
+            {
+              "slug": "calanques",
+              "name": "Calanques de Sugiton",
+              "kind": "beach",
+              "summary": "White limestone inlets reached on foot from the edge of the city, with access capped in summer.",
+              "lat": 43.211,
+              "lon": 5.451,
+              "duration": "4 hours",
+              "season": "spring-autumn"
+            },
+            {
+              "slug": "mucem",
+              "name": "MuCEM",
+              "kind": "museum",
+              "summary": "A black concrete lattice on the harbour, joined to a 17th-century fort by a footbridge.",
+              "lat": 43.296,
+              "lon": 5.361,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -732,6 +1044,28 @@
             "The Cours Saleya market, and socca eaten standing up",
             "Matisse and Chagall museums up the hill in Cimiez",
             "The train east to Menton along the coast, for the price of a coffee"
+          ],
+          "places": [
+            {
+              "slug": "cours-saleya",
+              "name": "Cours Saleya",
+              "kind": "market",
+              "summary": "Flowers, produce and socca eaten standing up, in the old town's one wide street.",
+              "lat": 43.695,
+              "lon": 7.275,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "matisse-museum",
+              "name": "Musée Matisse",
+              "kind": "museum",
+              "summary": "A red villa in the olive groves of Cimiez holding the artist's own bequest.",
+              "lat": 43.719,
+              "lon": 7.276,
+              "duration": "90 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -764,6 +1098,18 @@
               "band": "moderate",
               "summary": "Thirteen permitted grape varieties and stones the size of fists that hold the day's heat into the night; the growers pour in their own cellars."
             }
+          ],
+          "places": [
+            {
+              "slug": "palais-des-papes",
+              "name": "Palais des Papes",
+              "kind": "castle",
+              "summary": "The largest Gothic palace in the world, built by seven popes in fourteen years and stripped bare afterwards.",
+              "lat": 43.951,
+              "lon": 4.808,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -785,6 +1131,18 @@
             "The walls at night, when the day visitors have gone and it is floodlit",
             "Viollet-le-Duc's restoration, and the debate about whether it invented as much as it saved",
             "Corbières and Minervois wine in the plain below"
+          ],
+          "places": [
+            {
+              "slug": "cite-de-carcassonne",
+              "name": "La Cité",
+              "kind": "castle",
+              "summary": "Two rings of wall and 52 towers, heavily restored in the 1850s and argued about ever since.",
+              "lat": 43.206,
+              "lon": 2.364,
+              "duration": "3 hours",
+              "season": "year-round"
+            }
           ]
         }
       ]
@@ -820,6 +1178,18 @@
             "The King of Aragon's staircase, 187 steps cut into the cliff face",
             "Boat trips into the sea caves under the town",
             "Lavezzi islands, granite and empty, half an hour offshore"
+          ],
+          "places": [
+            {
+              "slug": "escalier-du-roi-daragon",
+              "name": "Escalier du Roi d'Aragon",
+              "kind": "monument",
+              "summary": "187 steps cut into a limestone cliff, reputedly in a single night, and certainly not.",
+              "lat": 41.384,
+              "lon": 9.158,
+              "duration": "1 hour",
+              "season": "weather-dependent"
+            }
           ]
         },
         {
@@ -896,6 +1266,18 @@
               "kind": "walk",
               "band": "low",
               "summary": "The oldest of the Santiago routes leaves from the cathedral steps after the 7 am pilgrim mass. The first day to Saint-Privat is twenty-three kilometres and sets the tone."
+            }
+          ],
+          "places": [
+            {
+              "slug": "saint-michel-aiguilhe",
+              "name": "Saint-Michel d'Aiguilhe",
+              "kind": "church",
+              "summary": "268 steps up a volcanic needle to a chapel consecrated in 962.",
+              "lat": 45.048,
+              "lon": 3.883,
+              "duration": "1 hour",
+              "season": "year-round"
             }
           ]
         },

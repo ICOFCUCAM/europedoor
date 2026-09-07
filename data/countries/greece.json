@@ -115,6 +115,48 @@
               "band": "moderate",
               "summary": "The Parthenon frieze laid out at actual scale and orientation, with plaster casts where the British Museum holds the originals — the gaps are the argument."
             }
+          ],
+          "places": [
+            {
+              "slug": "acropolis",
+              "name": "The Acropolis",
+              "kind": "archaeological-site",
+              "summary": "The Parthenon, the Erechtheion and the Propylaea on one rock, best at opening or in the last hour.",
+              "lat": 37.971,
+              "lon": 23.726,
+              "duration": "3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "acropolis-museum",
+              "name": "Acropolis Museum",
+              "kind": "museum",
+              "summary": "The Parthenon frieze laid out at actual scale and orientation, with casts where the originals are in London.",
+              "lat": 37.968,
+              "lon": 23.729,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "national-archaeological-museum",
+              "name": "National Archaeological Museum",
+              "kind": "museum",
+              "summary": "The Mask of Agamemnon, the Antikythera mechanism, and the best classical collection anywhere.",
+              "lat": 37.989,
+              "lon": 23.732,
+              "duration": "3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "anafiotika",
+              "name": "Anafiotika",
+              "kind": "quarter",
+              "summary": "A Cycladic village built inside Athens by island masons in the 1840s, and still lived in.",
+              "lat": 37.972,
+              "lon": 23.728,
+              "duration": "45 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -146,6 +188,38 @@
               "band": "low",
               "summary": "Sit in the top row and have someone whisper on the orchestra floor. Built in the 4th century BC and still unexplained in full."
             }
+          ],
+          "places": [
+            {
+              "slug": "palamidi",
+              "name": "Palamidi",
+              "kind": "castle",
+              "summary": "A Venetian fortress of eight bastions above the town, reached by 999 steps or a road.",
+              "lat": 37.564,
+              "lon": 22.803,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "epidaurus",
+              "name": "Epidaurus Theatre",
+              "kind": "theatre",
+              "summary": "A 4th-century BC theatre whose acoustics carry a whisper to the back row, and still nobody fully knows why.",
+              "lat": 37.596,
+              "lon": 23.079,
+              "duration": "90 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "mycenae",
+              "name": "Mycenae",
+              "kind": "archaeological-site",
+              "summary": "The Lion Gate and the shaft graves of a civilisation that collapsed three thousand years ago.",
+              "lat": 37.731,
+              "lon": 22.756,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -168,6 +242,18 @@
             "A single gate, and no cars inside the walls",
             "The upper town's ruins and Hagia Sophia on the summit",
             "Swimming off the rocks below the walls"
+          ],
+          "places": [
+            {
+              "slug": "monemvasia-upper-town",
+              "name": "The Upper Town",
+              "kind": "ruin",
+              "summary": "A Byzantine town on top of the rock, with Hagia Sophia on the edge and almost nobody up there.",
+              "lat": 36.687,
+              "lon": 23.055,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -199,6 +285,28 @@
               "band": "low",
               "summary": "The site opens at eight and the coaches arrive at ten. Two hours of Delphi alone is a different place from Delphi at noon."
             }
+          ],
+          "places": [
+            {
+              "slug": "delphi-sanctuary",
+              "name": "Sanctuary of Apollo",
+              "kind": "archaeological-site",
+              "summary": "The sacred way, the temple, the treasuries and the stadium above them all, on a terrace of Parnassus.",
+              "lat": 38.482,
+              "lon": 22.501,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "delphi-museum",
+              "name": "Delphi Museum",
+              "kind": "museum",
+              "summary": "The bronze Charioteer, which survived because an earthquake buried it.",
+              "lat": 38.481,
+              "lon": 22.502,
+              "duration": "1 hour",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -221,6 +329,18 @@
             "The original stadium, entered through its vaulted tunnel",
             "The workshop of Pheidias, identified by a cup with his name on it",
             "Hermes of Praxiteles in the museum, found where it fell"
+          ],
+          "places": [
+            {
+              "slug": "olympia-stadium",
+              "name": "The Stadium",
+              "kind": "archaeological-site",
+              "summary": "Entered through a vaulted tunnel, with the original start line still in place.",
+              "lat": 37.639,
+              "lon": 21.632,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -244,6 +364,18 @@
             "A whole late-Byzantine city, walked from the castle down",
             "Frescoes in six churches, most of them unrestored",
             "Sparta below, which has almost nothing left"
+          ],
+          "places": [
+            {
+              "slug": "mystras-site",
+              "name": "Mystras",
+              "kind": "archaeological-site",
+              "summary": "A whole late-Byzantine city on a spur of Taygetos: palaces, churches, frescoes, walked downhill.",
+              "lat": 37.073,
+              "lon": 22.367,
+              "duration": "3 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -267,6 +399,18 @@
             "Tower villages built for feuding families, still standing empty",
             "The Viros gorge, walked from the sea up into Taygetos",
             "Patrick Leigh Fermor's house, now open by appointment"
+          ],
+          "places": [
+            {
+              "slug": "viros-gorge",
+              "name": "Viros Gorge",
+              "kind": "mountain",
+              "summary": "A dry riverbed walked from the sea up into Taygetos, past chapels cut into the rock.",
+              "lat": 36.9,
+              "lon": 22.24,
+              "duration": "5 hours",
+              "season": "spring-autumn"
+            }
           ]
         },
         {
@@ -290,6 +434,18 @@
             "Shipowners' mansions round a stone harbour, from the 1790s",
             "No wheeled traffic of any kind, by law",
             "Swimming off the rocks at Spilia, straight from the town"
+          ],
+          "places": [
+            {
+              "slug": "hydra-harbour",
+              "name": "Hydra Harbour",
+              "kind": "monument",
+              "summary": "Shipowners' stone mansions round a working port with no cars, no bicycles and mules on the quay.",
+              "lat": 37.35,
+              "lon": 23.466,
+              "duration": "1 hour",
+              "season": "year-round"
+            }
           ]
         }
       ]
@@ -335,6 +491,28 @@
               "band": "low",
               "summary": "Half the island is farmland at altitude — cheese, potatoes and Venetian towers, twenty minutes from the sand."
             }
+          ],
+          "places": [
+            {
+              "slug": "portara",
+              "name": "Portara",
+              "kind": "monument",
+              "summary": "A temple doorway on an islet at the harbour, left standing because the marble was too big to steal.",
+              "lat": 37.11,
+              "lon": 25.373,
+              "duration": "30 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "naxos-kouros",
+              "name": "The unfinished kouros",
+              "kind": "archaeological-site",
+              "summary": "A ten-metre marble figure lying where it cracked in the quarry 2,600 years ago.",
+              "lat": 37.14,
+              "lon": 25.52,
+              "duration": "45 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -365,6 +543,28 @@
               "kind": "cellar",
               "band": "moderate",
               "summary": "No trellises: the vines are woven into circles on the ground to shelter the fruit from wind and catch night moisture."
+            }
+          ],
+          "places": [
+            {
+              "slug": "akrotiri",
+              "name": "Akrotiri",
+              "kind": "archaeological-site",
+              "summary": "A Bronze Age town buried in ash and preserved whole, with two-storey houses and drains that still work.",
+              "lat": 36.351,
+              "lon": 25.403,
+              "duration": "90 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "fira-oia-path",
+              "name": "The caldera path",
+              "kind": "mountain",
+              "summary": "Ten kilometres along the rim from Fira to Oia, walked early rather than at sunset.",
+              "lat": 36.43,
+              "lon": 25.427,
+              "duration": "4 hours",
+              "season": "spring-autumn"
             }
           ]
         },
@@ -397,6 +597,28 @@
               "band": "moderate",
               "summary": "Sixteen kilometres, one direction only, ending at a boat because there is no road out. Open May to October."
             }
+          ],
+          "places": [
+            {
+              "slug": "samaria-gorge",
+              "name": "Samaria Gorge",
+              "kind": "mountain",
+              "summary": "Sixteen kilometres downhill through the White Mountains to a village with no road out.",
+              "lat": 35.29,
+              "lon": 23.958,
+              "duration": "6–7 hours",
+              "season": "summer"
+            },
+            {
+              "slug": "chania-harbour",
+              "name": "Venetian Harbour",
+              "kind": "monument",
+              "summary": "A curved quay, a lighthouse rebuilt by Egyptians in the 1830s, and a mosque at the near end.",
+              "lat": 35.518,
+              "lon": 24.019,
+              "duration": "1 hour",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -418,6 +640,28 @@
             "The largest inhabited medieval town in Europe, inside four kilometres of wall",
             "Lindos's acropolis above a white village and a bay",
             "Ottoman baths and mosques the guidebooks skip"
+          ],
+          "places": [
+            {
+              "slug": "palace-grand-master",
+              "name": "Palace of the Grand Master",
+              "kind": "castle",
+              "summary": "A crusader fortress rebuilt by Italy in the 1930s as a holiday residence for Mussolini, who never used it.",
+              "lat": 36.446,
+              "lon": 28.226,
+              "duration": "90 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "lindos-acropolis",
+              "name": "Lindos Acropolis",
+              "kind": "archaeological-site",
+              "summary": "A Doric stoa on a rock above a white village and a bay, climbed on foot or by donkey.",
+              "lat": 36.091,
+              "lon": 28.087,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -447,6 +691,28 @@
               "kind": "water",
               "band": "moderate",
               "summary": "Half the coast has no road to it. A day boat from Adamas is the only way to see Kleftiko and the southern coves."
+            }
+          ],
+          "places": [
+            {
+              "slug": "sarakiniko",
+              "name": "Sarakiniko",
+              "kind": "beach",
+              "summary": "White pumice worn by the sea into something that looks like nowhere else in the Mediterranean.",
+              "lat": 36.744,
+              "lon": 24.463,
+              "duration": "2 hours",
+              "season": "summer"
+            },
+            {
+              "slug": "kleftiko",
+              "name": "Kleftiko",
+              "kind": "beach",
+              "summary": "Sea caves and stacks on a coast with no road to it, reached only by boat.",
+              "lat": 36.66,
+              "lon": 24.363,
+              "duration": "a day by boat",
+              "season": "summer"
             }
           ]
         },
@@ -515,6 +781,18 @@
             "The UNESCO old town, Venetian streets and two fortresses",
             "Cricket on the Spianada, a British hangover",
             "Mount Pantokrator, and Albania visible across the strait"
+          ],
+          "places": [
+            {
+              "slug": "old-fortress-corfu",
+              "name": "Old Fortress",
+              "kind": "castle",
+              "summary": "A Venetian fort on a rock islet, with a Georgian garrison church inside it.",
+              "lat": 39.624,
+              "lon": 19.928,
+              "duration": "90 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -591,6 +869,28 @@
             "Knossos, and Evans's concrete reconstructions, which are the argument",
             "The archaeological museum, which holds what Knossos actually yielded",
             "Venetian walls, and Kazantzakis buried on top of them"
+          ],
+          "places": [
+            {
+              "slug": "knossos",
+              "name": "Knossos",
+              "kind": "archaeological-site",
+              "summary": "The Minoan palace, and Evans's concrete reconstructions, which are the argument as much as the site.",
+              "lat": 35.298,
+              "lon": 25.163,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "heraklion-museum",
+              "name": "Heraklion Archaeological Museum",
+              "kind": "museum",
+              "summary": "What Knossos actually yielded — the frescoes, the bull-leaping, the undeciphered discs.",
+              "lat": 35.339,
+              "lon": 25.136,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         }
       ]
@@ -634,6 +934,28 @@
               "band": "low",
               "summary": "Stone-cut trails link the pillars through the woods; three hours on foot beats a whole day by road."
             }
+          ],
+          "places": [
+            {
+              "slug": "great-meteoron",
+              "name": "Great Meteoron",
+              "kind": "monastery",
+              "summary": "The largest of the six working monasteries, on the highest pillar, reached now by steps rather than net.",
+              "lat": 39.723,
+              "lon": 21.63,
+              "duration": "90 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "varlaam",
+              "name": "Varlaam",
+              "kind": "monastery",
+              "summary": "Frescoed throughout, with the windlass tower that hauled everything up for four hundred years.",
+              "lat": 39.721,
+              "lon": 21.628,
+              "duration": "1 hour",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -656,6 +978,28 @@
             "The Rotunda and the Byzantine churches on the UNESCO list",
             "Modiano and Kapani markets, then bougatsa for breakfast",
             "The waterfront walk to the Umbrellas at dusk"
+          ],
+          "places": [
+            {
+              "slug": "rotunda",
+              "name": "The Rotunda",
+              "kind": "monument",
+              "summary": "A 4th-century Roman rotunda that has been a mausoleum, a church and a mosque, and keeps its minaret.",
+              "lat": 40.633,
+              "lon": 22.953,
+              "duration": "45 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "jewish-museum-thessaloniki",
+              "name": "Jewish Museum of Thessaloniki",
+              "kind": "museum",
+              "summary": "Four centuries of a majority-Sephardic city, and 1943, told without flinching.",
+              "lat": 40.634,
+              "lon": 22.94,
+              "duration": "90 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -679,6 +1023,28 @@
             "The Vikos gorge, from the Oxya viewpoint or from inside it",
             "Arched stone bridges built by 18th-century merchant guilds",
             "Bears, wolves and 1,800 plant species in the national park"
+          ],
+          "places": [
+            {
+              "slug": "vikos-gorge",
+              "name": "Vikos Gorge",
+              "kind": "mountain",
+              "summary": "The deepest gorge in the world by width-to-depth ratio, seen from Oxya or walked from inside.",
+              "lat": 39.951,
+              "lon": 20.74,
+              "duration": "a full day",
+              "season": "spring-autumn"
+            },
+            {
+              "slug": "zagori-bridges",
+              "name": "The stone bridges",
+              "kind": "bridge",
+              "summary": "Single- and triple-arched packhorse bridges built by 18th-century merchant guilds, still crossed on foot.",
+              "lat": 39.9,
+              "lon": 20.76,
+              "duration": "half a day",
+              "season": "year-round"
+            }
           ]
         },
         {

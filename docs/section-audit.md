@@ -7,7 +7,7 @@ generated HTML as they stand. A section is BUILT only if every assertion
 under it holds right now — which means this file cannot drift from the
 product without CI noticing.
 
-**28 built · 4 partial · 4 deferred · 204 assertions · 0 failing**
+**28 built · 4 partial · 4 deferred · 204 assertions · 1 failing**
 
 Section 36 is the architecture diagram rather than a feature, and is
 reflected in the repository layout rather than audited here.
@@ -17,7 +17,7 @@ reflected in the repository layout rather than audited here.
 | 1 | The core idea: discovery + planning + experience | BUILT | 3 | All five surfaces exist and none of them transacts. |
 | 2 | Brand positioning | BUILT | 4 | Settled as Europedoor, and enforced rather than merely asserted. |
 | 3 | Site architecture | BUILT | 14 | Five top-level items rather than the brief's eight; every node in the brief's tree is still reachable. |
-| 4 | The Europe Atlas | BUILT | 5 | Five levels deep, and a city page now carries every block the brief lists that is not a country-level fact. |
+| 4 | The Europe Atlas | **FAILING** (1) | 5 | Five levels deep, and a city page now carries every block the brief lists that is not a country-level fact. |
 | 5 | Experience-based discovery, not just countries | BUILT | 15 | Thirteen themes, each crossing borders on purpose. |
 | 6 | The journey planner | PARTIAL | 7 | The engine, the scoring and a rule-based sentence reader are built. The model-written narration in §26 is specified and not built. |
 | 7 | The journey engine | BUILT | 9 | Eight curated journeys, with the night arithmetic enforced. |

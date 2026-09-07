@@ -127,6 +127,38 @@
               "band": "low",
               "summary": "Every drink comes with a plate you did not order and cannot choose; four bars is a dinner."
             }
+          ],
+          "places": [
+            {
+              "slug": "alhambra",
+              "name": "The Alhambra",
+              "kind": "castle",
+              "summary": "Nasrid palaces, a fortress and a summer garden on one hill, entered in half-hour slots booked weeks ahead.",
+              "lat": 37.176,
+              "lon": -3.588,
+              "duration": "half a day",
+              "season": "year-round"
+            },
+            {
+              "slug": "albaicin",
+              "name": "Albaicín",
+              "kind": "quarter",
+              "summary": "White lanes on the hill facing the Alhambra, best walked upward and finished at San Nicolás.",
+              "lat": 37.18,
+              "lon": -3.593,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "capilla-real",
+              "name": "Capilla Real",
+              "kind": "church",
+              "summary": "Where Ferdinand and Isabella are buried, next to the cathedral that was built to outshine it.",
+              "lat": 37.176,
+              "lon": -3.599,
+              "duration": "45 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -158,6 +190,38 @@
               "band": "moderate",
               "summary": "Members' clubs that admit visitors quietly; no castanets, no stage, and the singing is the part that matters."
             }
+          ],
+          "places": [
+            {
+              "slug": "real-alcazar",
+              "name": "Real Alcázar",
+              "kind": "castle",
+              "summary": "A working royal palace with Mudéjar ceilings and gardens that have been continuously planted since the 1100s.",
+              "lat": 37.383,
+              "lon": -5.991,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "seville-cathedral",
+              "name": "Seville Cathedral & the Giralda",
+              "kind": "church",
+              "summary": "The largest Gothic cathedral in the world, with a minaret for a bell tower and a ramp instead of stairs.",
+              "lat": 37.386,
+              "lon": -5.993,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "plaza-de-espana",
+              "name": "Plaza de España",
+              "kind": "square",
+              "summary": "A 1929 half-circle of tiled bridges and alcoves, one for each province, around a canal.",
+              "lat": 37.377,
+              "lon": -5.987,
+              "duration": "45 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -180,6 +244,28 @@
             "The Mezquita, a cathedral inserted into a mosque and both left standing",
             "Patio courtyards, opened to the public each May",
             "The Roman bridge at dawn"
+          ],
+          "places": [
+            {
+              "slug": "mezquita",
+              "name": "Mezquita-Catedral",
+              "kind": "church",
+              "summary": "856 columns of a 10th-century mosque with a cathedral inserted into the middle, and both left standing.",
+              "lat": 37.879,
+              "lon": -4.779,
+              "duration": "90 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "roman-bridge-cordoba",
+              "name": "Roman Bridge",
+              "kind": "bridge",
+              "summary": "Sixteen arches across the Guadalquivir, Roman in origin and rebuilt many times, best at dawn.",
+              "lat": 37.876,
+              "lon": -4.779,
+              "duration": "30 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -203,6 +289,18 @@
             "The Puente Nuevo, and the path down into the gorge below it",
             "One of Spain's oldest bullrings, whether or not you approve",
             "Serranía de Ronda wine, which nobody exports"
+          ],
+          "places": [
+            {
+              "slug": "puente-nuevo",
+              "name": "Puente Nuevo",
+              "kind": "bridge",
+              "summary": "An 18th-century bridge across a 120-metre gorge, with a path down to see it from beneath.",
+              "lat": 36.741,
+              "lon": -5.166,
+              "duration": "90 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -294,6 +392,48 @@
               "band": "low",
               "summary": "Cerdà's 1859 blocks were designed with gardens inside; a few have been reopened, and finding them changes how the city reads."
             }
+          ],
+          "places": [
+            {
+              "slug": "sagrada-familia",
+              "name": "Sagrada Família",
+              "kind": "church",
+              "summary": "The interior light is the point; the facades are the argument. Under construction since 1882.",
+              "lat": 41.404,
+              "lon": 2.174,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "park-guell",
+              "name": "Park Güell",
+              "kind": "park",
+              "summary": "A failed housing development turned public park, with the serpentine bench and the city below.",
+              "lat": 41.414,
+              "lon": 2.153,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "santa-caterina-market",
+              "name": "Mercat de Santa Caterina",
+              "kind": "market",
+              "summary": "A wavy tiled roof over the market Barcelona actually shops in, rather than the one on the Rambla.",
+              "lat": 41.386,
+              "lon": 2.177,
+              "duration": "45 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "hospital-sant-pau",
+              "name": "Hospital de Sant Pau",
+              "kind": "monument",
+              "summary": "Twelve modernista pavilions built as a hospital because Domènech thought patients recover faster in beauty.",
+              "lat": 41.412,
+              "lon": 2.174,
+              "duration": "90 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -326,6 +466,28 @@
               "band": "low",
               "summary": "A smugglers' and coastguards' path linking coves between Begur and Palamós; it reaches beaches no road does."
             }
+          ],
+          "places": [
+            {
+              "slug": "girona-cathedral",
+              "name": "Girona Cathedral",
+              "kind": "church",
+              "summary": "The widest Gothic nave in the world, at the top of 91 steps, with a Romanesque tapestry inside.",
+              "lat": 41.987,
+              "lon": 2.826,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "call-jueu",
+              "name": "El Call",
+              "kind": "quarter",
+              "summary": "One of Europe's best-preserved medieval Jewish quarters, with a museum in the middle of it.",
+              "lat": 41.986,
+              "lon": 2.824,
+              "duration": "1 hour",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -356,6 +518,28 @@
               "kind": "table",
               "band": "moderate",
               "summary": "The Albufera lagoon south of the city grows the rice and cooks it over orange wood; lunchtime only, and never in the evening."
+            }
+          ],
+          "places": [
+            {
+              "slug": "la-lonja",
+              "name": "La Lonja de la Seda",
+              "kind": "monument",
+              "summary": "A Gothic silk exchange with twisted stone columns, built to show that trade was worth a cathedral.",
+              "lat": 39.474,
+              "lon": -0.378,
+              "duration": "45 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "turia-gardens",
+              "name": "Jardín del Turia",
+              "kind": "park",
+              "summary": "Nine kilometres of park in a flood-diverted riverbed, which is the best civic decision Valencia ever made.",
+              "lat": 39.472,
+              "lon": -0.365,
+              "duration": "2 hours",
+              "season": "year-round"
             }
           ]
         },
@@ -424,6 +608,48 @@
               "band": "low",
               "summary": "Sunday, around one, house vermouth on tap with an olive and a siphon of soda — the most Madrid ninety minutes there is."
             }
+          ],
+          "places": [
+            {
+              "slug": "prado",
+              "name": "Museo del Prado",
+              "kind": "museum",
+              "summary": "Velázquez, Goya and Bosch in a building designed as a natural history cabinet.",
+              "lat": 40.414,
+              "lon": -3.692,
+              "duration": "3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "reina-sofia",
+              "name": "Reina Sofía",
+              "kind": "museum",
+              "summary": "Guernica, in a former hospital, with the room it needs around it.",
+              "lat": 40.408,
+              "lon": -3.694,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "retiro",
+              "name": "Parque del Retiro",
+              "kind": "park",
+              "summary": "125 hectares of former royal garden with a glass palace in the middle and rowing boats on the lake.",
+              "lat": 40.415,
+              "lon": -3.683,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "el-rastro",
+              "name": "El Rastro",
+              "kind": "market",
+              "summary": "Sunday morning flea market down a hillside, unchanged in character for four centuries.",
+              "lat": 40.408,
+              "lon": -3.708,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -446,6 +672,38 @@
             "El Greco's Burial of the Count of Orgaz, in the church it was painted for",
             "Synagogues built by Muslim craftsmen for Jewish congregations under Christian kings",
             "The city from the far bank at night"
+          ],
+          "places": [
+            {
+              "slug": "toledo-cathedral",
+              "name": "Toledo Cathedral",
+              "kind": "church",
+              "summary": "A Gothic pile with a Baroque hole cut in the roof to light the altar behind the altar.",
+              "lat": 39.857,
+              "lon": -4.024,
+              "duration": "90 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "santo-tome",
+              "name": "Santo Tomé",
+              "kind": "church",
+              "summary": "El Greco's Burial of the Count of Orgaz, still in the church it was painted for in 1586.",
+              "lat": 39.857,
+              "lon": -4.028,
+              "duration": "30 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "sinagoga-del-transito",
+              "name": "Sinagoga del Tránsito",
+              "kind": "monument",
+              "summary": "A 14th-century synagogue built by Muslim craftsmen for a Jewish congregation under a Christian king.",
+              "lat": 39.856,
+              "lon": -4.031,
+              "duration": "1 hour",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -468,6 +726,28 @@
             "The aqueduct, 28 metres high, dry-stone, still standing after 2,000 years",
             "The Alcázar on its rock, which Disney is said to have borrowed",
             "Cochinillo, roast suckling pig, carved with a plate"
+          ],
+          "places": [
+            {
+              "slug": "segovia-aqueduct",
+              "name": "Roman Aqueduct",
+              "kind": "monument",
+              "summary": "167 arches, 28 metres high, built without mortar and standing in the middle of a working town.",
+              "lat": 40.948,
+              "lon": -4.118,
+              "duration": "45 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "alcazar-segovia",
+              "name": "Alcázar of Segovia",
+              "kind": "castle",
+              "summary": "A castle on a rock at the confluence of two rivers, rebuilt after an 1862 fire into something even more improbable.",
+              "lat": 40.953,
+              "lon": -4.132,
+              "duration": "90 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -490,6 +770,28 @@
             "The Plaza Mayor, the best in Spain and used as a living room",
             "The frog carved on the university facade, which students must find",
             "Old and new cathedrals sharing a wall, 300 years apart"
+          ],
+          "places": [
+            {
+              "slug": "plaza-mayor-salamanca",
+              "name": "Plaza Mayor",
+              "kind": "square",
+              "summary": "The best square in Spain, used as a living room, and gold at sunset because of the stone.",
+              "lat": 40.965,
+              "lon": -5.664,
+              "duration": "30 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "universidad-de-salamanca",
+              "name": "University facade",
+              "kind": "monument",
+              "summary": "A plateresque wall of carving with a frog on a skull that students are required to find.",
+              "lat": 40.961,
+              "lon": -5.667,
+              "duration": "45 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -512,6 +814,18 @@
             "The casas colgadas, cantilevered over a 100-metre drop",
             "Spanish Abstract Art Museum, in the hanging houses themselves",
             "The Serranía de Cuenca's rock formations behind the town"
+          ],
+          "places": [
+            {
+              "slug": "casas-colgadas",
+              "name": "Casas Colgadas",
+              "kind": "monument",
+              "summary": "Houses cantilevered over a 100-metre gorge, holding a museum of Spanish abstract art.",
+              "lat": 40.077,
+              "lon": -2.128,
+              "duration": "90 minutes",
+              "season": "year-round"
+            }
           ]
         }
       ]
@@ -556,6 +870,28 @@
               "band": "moderate",
               "summary": "One drink and one signature dish per bar, standing, then move. Sitting down is how visitors get it wrong."
             }
+          ],
+          "places": [
+            {
+              "slug": "la-concha",
+              "name": "La Concha",
+              "kind": "beach",
+              "summary": "A shell-shaped bay with a promenade the whole way round and an island in the middle of it.",
+              "lat": 43.318,
+              "lon": -1.987,
+              "duration": "half a day",
+              "season": "summer"
+            },
+            {
+              "slug": "monte-igueldo",
+              "name": "Monte Igueldo",
+              "kind": "viewpoint",
+              "summary": "A funicular from 1912 to the headland, with the bay laid out exactly as the postcards have it.",
+              "lat": 43.319,
+              "lon": -2.008,
+              "duration": "90 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -587,6 +923,28 @@
               "band": "low",
               "summary": "From Sarria, five days, and the minimum distance for a compostela. Busy, sociable, and still the real thing."
             }
+          ],
+          "places": [
+            {
+              "slug": "santiago-cathedral",
+              "name": "Santiago Cathedral",
+              "kind": "church",
+              "summary": "The end of the Camino, and the botafumeiro swinging across the transept when it is scheduled.",
+              "lat": 42.881,
+              "lon": -8.545,
+              "duration": "90 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "mercado-de-abastos",
+              "name": "Mercado de Abastos",
+              "kind": "market",
+              "summary": "Galician seafood bought at one counter and cooked at another, which is the correct system.",
+              "lat": 42.88,
+              "lon": -8.541,
+              "duration": "1 hour",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -610,6 +968,28 @@
             "The Cares gorge, twelve kilometres cut into a cliff",
             "Cabrales cheese, matured in mountain caves",
             "Covadonga's lakes and the shrine below them"
+          ],
+          "places": [
+            {
+              "slug": "cares-gorge",
+              "name": "Ruta del Cares",
+              "kind": "mountain",
+              "summary": "Twelve kilometres cut into a cliff face for a hydro channel, now the most walked path in northern Spain.",
+              "lat": 43.222,
+              "lon": -4.9,
+              "duration": "6 hours",
+              "season": "spring-autumn"
+            },
+            {
+              "slug": "covadonga-lakes",
+              "name": "Lagos de Covadonga",
+              "kind": "mountain",
+              "summary": "Two glacial lakes at 1,100 metres above a shrine, with the road closed to cars in high season.",
+              "lat": 43.271,
+              "lon": -4.987,
+              "duration": "half a day",
+              "season": "summer"
+            }
           ]
         },
         {
@@ -640,6 +1020,28 @@
               "kind": "ride",
               "band": "low",
               "summary": "The world's oldest transporter bridge, on the UNESCO list, still running every eight minutes as a local crossing."
+            }
+          ],
+          "places": [
+            {
+              "slug": "guggenheim-bilbao",
+              "name": "Guggenheim Bilbao",
+              "kind": "museum",
+              "summary": "Titanium on a riverbank, and the single building most often credited with changing a city's mind about itself.",
+              "lat": 43.269,
+              "lon": -2.934,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "vizcaya-bridge",
+              "name": "Vizcaya Bridge",
+              "kind": "bridge",
+              "summary": "The world's oldest transporter bridge, from 1893, still carrying cars across in a hanging gondola.",
+              "lat": 43.323,
+              "lon": -3.017,
+              "duration": "45 minutes",
+              "season": "year-round"
             }
           ]
         },
@@ -730,6 +1132,18 @@
             "Ordesa canyon and the Cola de Caballo, a full day on a good path",
             "Monte Perdido, 3,355 metres, and the bearded vultures over it",
             "A shuttle bus in summer because the valley road is closed to cars"
+          ],
+          "places": [
+            {
+              "slug": "cola-de-caballo",
+              "name": "Cola de Caballo",
+              "kind": "waterfall",
+              "summary": "The horsetail fall at the head of the Ordesa canyon, at the end of a long flat path most people can walk.",
+              "lat": 42.657,
+              "lon": -0.041,
+              "duration": "6 hours",
+              "season": "summer"
+            }
           ]
         },
         {
@@ -796,6 +1210,28 @@
               "band": "moderate",
               "summary": "1912 rolling stock through thirteen tunnels and an orange valley, then a tram to the port. Ordinary transport, and the best hour on the island."
             }
+          ],
+          "places": [
+            {
+              "slug": "la-seu",
+              "name": "La Seu",
+              "kind": "church",
+              "summary": "A cathedral on the harbour with a canopy Gaudí redesigned and a chapel Barceló repainted in ceramic.",
+              "lat": 39.567,
+              "lon": 2.649,
+              "duration": "90 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "soller-railway",
+              "name": "Sóller Railway",
+              "kind": "monument",
+              "summary": "1912 wooden carriages through thirteen tunnels and an orange valley, then a tram to the sea.",
+              "lat": 39.571,
+              "lon": 2.647,
+              "duration": "half a day",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -854,6 +1290,18 @@
             "A UNESCO old town with no modern buildings inside the walls at all",
             "Storks on every tower from February",
             "Ibérico ham from acorn-fed pigs in the dehesa outside"
+          ],
+          "places": [
+            {
+              "slug": "caceres-old-town",
+              "name": "Ciudad Monumental",
+              "kind": "quarter",
+              "summary": "A walled old town with no modern building inside it at all, and storks on most of the towers.",
+              "lat": 39.472,
+              "lon": -6.371,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -884,6 +1332,18 @@
               "kind": "stage",
               "band": "moderate",
               "summary": "Greek and Roman plays staged every July and August in the theatre they were written for, which is a different experience from reading them."
+            }
+          ],
+          "places": [
+            {
+              "slug": "merida-roman-theatre",
+              "name": "Roman Theatre",
+              "kind": "theatre",
+              "summary": "Built in 15 BC, buried for centuries, and staging Greek and Roman drama every summer since 1933.",
+              "lat": 38.915,
+              "lon": -6.338,
+              "duration": "90 minutes",
+              "season": "year-round"
             }
           ]
         }

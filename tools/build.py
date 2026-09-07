@@ -59,6 +59,10 @@ def build():
             emit(P.region_page(d, c, r))
             for t in r["cities"]:
                 emit(P.city_page(d, c, r, t))
+                for pl in t.get("places", []):
+                    emit(P.place_page(d, c, r, t, pl))
+                for key, payload in P.facets_for(d, c, r, t).items():
+                    emit(P.facet_page(d, c, r, t, key, payload))
     for i in d["taxonomy"]["interests"]:
         emit(P.interest_page(d, i))
     emit(P.journeys_index(d))
@@ -133,9 +137,11 @@ def stats():
     nregion = sum(len(c["regions"]) for c in d["countries"].values())
     ncity = len(d["cities"])
     nexp = len(D.all_experiences(d["countries"]))
+    nplace = len(D.all_places(d["countries"]))
     print(f"countries   {ncountry}")
     print(f"regions     {nregion}")
     print(f"cities      {ncity}")
+    print(f"places      {nplace}")
     print(f"experiences {nexp}")
     print(f"journeys    {len(d['journeys'])}")
     print(f"themes      {len(d['themes'])}")

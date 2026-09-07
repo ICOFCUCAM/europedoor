@@ -18,6 +18,14 @@ DATA = os.path.join(ROOT, "data")
 SLUG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 BUDGETS = ("low", "moderate", "high")
+# The specification's examples, plus the ones Europe actually keeps producing.
+PLACE_KINDS = (
+    "museum", "castle", "church", "monastery", "mountain", "waterfall",
+    "beach", "monument", "archaeological-site", "park", "viewpoint",
+    "bridge", "market", "garden", "island", "cave", "street", "square",
+    "lighthouse", "quarter", "ruin", "theatre", "library", "bath",
+)
+PLACE_SEASONS = ("year-round", "summer", "winter", "spring-autumn", "weather-dependent")
 BLOCS = ("eu", "schengen", "eurozone", "eea", "cta")
 ADVISORY_LEVELS = ("caution", "avoid")
 
@@ -143,6 +151,28 @@ def load():
                 for i in t.get("interests", []):
                     p.require(i in interests, tw, f"unknown interest {i!r}")
                 p.require(len(t.get("highlights", [])) >= 2, tw, "give a city at least two highlights")
+                # Places: the specification's entity below a destination.
+                # Opening hours, prices and official links are deliberately
+                # absent rather than invented — see docs/data-model.md.
+                seen_places = set()
+                for pl in t.get("places", []):
+                    pw = f"{tw} > place/{pl.get('slug')}"
+                    p.require(SLUG.match(pl.get("slug", "")), pw, "place slug is not a slug")
+                    p.require(pl["slug"] not in seen_places, pw, "duplicate place slug")
+                    seen_places.add(pl.get("slug"))
+                    for key in ("name", "kind", "summary", "lat", "lon", "duration", "season"):
+                        p.require(key in pl, pw, f"missing key {key!r}")
+                    p.require(pl.get("kind") in PLACE_KINDS, pw,
+                              f"unknown place kind {pl.get('kind')!r}")
+                    p.require(pl.get("season") in PLACE_SEASONS, pw,
+                              f"season must be one of {'/'.join(PLACE_SEASONS)}")
+                    p.require(34.0 <= pl.get("lat", 0) <= 79.0, pw, "lat off the map")
+                    p.require(-26.0 <= pl.get("lon", 0) <= 50.0, pw, "lon off the map")
+                    for volatile in ("hours", "price", "website", "phone"):
+                        p.require(volatile not in pl, pw,
+                                  f"{volatile!r} is volatile and must not be authored "
+                                  "unverified — see docs/data-model.md")
+
                 for e in t.get("experiences", []):
                     ew = f"{tw} > {e.get('slug')}"
                     p.require(SLUG.match(e.get("slug", "")), ew, "experience slug is not a slug")
@@ -301,6 +331,16 @@ def city_index(countries):
                     "region": r,
                     "country": c,
                 }
+    return out
+
+
+def all_places(countries):
+    out = []
+    for c in countries.values():
+        for r in c["regions"]:
+            for t in r["cities"]:
+                for pl in t.get("places", []):
+                    out.append({"place": pl, "city": t, "region": r, "country": c})
     return out
 
 

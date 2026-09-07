@@ -417,6 +417,16 @@ def city_page(data, c, r, t):
     # When to come and how to arrive are country-level facts, and repeating
     # them on 244 city pages would be a maintenance trap. They are summarised
     # here and linked to the one place they are written.
+    fkeys = facets_for(data, c, r, t)
+    facetlinks = ("<h3>More on " + esc(t["name"]) + "</h3><p>" + " · ".join(
+        f'<a href="{urls.facet(c, r, t, k)}">{esc(urls.FACETS[k])}</a>' for k in fkeys
+    ) + "</p>") if fkeys else ""
+    placerows = "".join(
+        f"""<a class="row" href="{urls.place(c, r, t, pl)}">
+        <div><h3>{esc(pl['name'])}</h3><p class="rowsub">{esc(pl['summary'])}</p></div>
+        <p class="rowmeta">{esc(PLACE_KIND_NAMES[pl['kind']])} · {esc(pl['duration'])}</p></a>"""
+        for pl in t.get("places", [])
+    )
     fest = [f for f in c["festivals"]]
     festrows = "".join(
         f"""<div class="row"><div><h3>{esc(f['name'])}</h3>
@@ -436,13 +446,17 @@ def city_page(data, c, r, t):
 <div class="card-art" style="max-width:100%;border:1px solid var(--rule);border-radius:var(--radius);aspect-ratio:21/9;overflow:hidden">
 {plate(f"city:{c['slug']}:{t['slug']}", 1260, 540, t['name'])}
 </div>
+{minimap(data, t)}
 <div class="split" style="margin-top:var(--s7)">
   <div>
-    <h2>What earns the time</h2>
+    <h2 id="why-visit">Why visit</h2>
     <ul class="stack">{highlights}</ul>
     {scorebars(city_scores(c, r, t))}
-    {section("Experiences here", f'<div class="rows">{exps}</div>') if exps else ""}
-    {section("Fixed points in the year", f'<div class="rows">{festrows}</div>',
+    {section("Places to see", f'<div class="rows">{placerows}</div>',
+             id="places",
+             lede=f"{len(t.get('places', []))} recorded so far. We hold what each one is and how long to give it, and deliberately not its opening hours or price.") if placerows else ""}
+    {section("Things to do", f'<div class="rows">{exps}</div>', id="things-to-do") if exps else ""}
+    {section("Events", f'<div class="rows">{festrows}</div>', id="events",
              lede=f"Nationwide fixtures in {c['name']}. See the whole European year on /events.") if festrows else ""}
   </div>
   <aside class="rail">
@@ -461,9 +475,12 @@ def city_page(data, c, r, t):
     <h3>Where you are</h3>
     <p class="mono">{t['lat']:.2f}°N, {t['lon']:.2f}°E</p>
     <p><a href="/plan?from={esc(c['slug'])}%2F{esc(r['slug'])}%2F{esc(t['slug'])}">Start a journey here →</a></p>
+    {facetlinks}
     <p><button class="btn ghost" type="button" data-save="city:{esc(cid)}" data-kind="Place" data-label="{esc(t['name'])}, {esc(c['name'])}" data-url="{urls.city(c, r, t)}">Save to My Europe</button></p>
   </aside>
 </div>
+{section("Accommodation & restaurants", STAY_NOTE, id="stay")}
+
 {section("Nearest onward stops", f'<div class="rows">{nearrows}</div>',
          lede="Straight-line distance, and what that usually means in practice.")}
 {edges}
@@ -768,6 +785,251 @@ def planner_page(data):
         "Plan a journey", body, path="/plan", area="plan",
         description="Tell Europedoor your days, budget and interests and it builds a European itinerary with real distances, real night counts and a cost estimate.",
         scripts=["/assets/js/planner.js"],
+    )
+
+
+# Named on every destination page, and honestly empty. A scraped hotel list
+# would take an afternoon and would be the first unverified thing on the site.
+STAY_NOTE = """<div class="note">
+  <p>Europedoor lists neither, yet. Both are business listings rather than editorial entries:
+  they need an operator who claims them, a verification tier and a way to keep prices current,
+  and all three are blocked on the same thing as everything else commercial here.
+  <a href="/for-businesses">How listings will work</a> ·
+  <a href="/how-it-works">what is built and what is blocked</a>.</p>
+  <p class="small">Publishing a scraped hotel list would be quick and would be the first
+  unverified thing on this site. That is the trade being refused.</p>
+</div>"""
+
+
+def minimap(data, t, span=3.2):
+    """A small map centred on one destination, drawn from the same
+    projection the big map uses. Its neighbours are on it so the reader can
+    see the shape of the onward journey rather than read distances."""
+    cx, cy = project(t["lat"], t["lon"])
+    w, h = 900, 320
+    dots, labels = [], []
+    for cid, n in sorted(data["cities"].items()):
+        x, y = project(n["city"]["lat"], n["city"]["lon"])
+        dx, dy = (x - cx), (y - cy)
+        if abs(dx) > w / 2 / span or abs(dy) > h / 2 / span:
+            continue
+        px, py = w / 2 + dx * span, h / 2 + dy * span
+        here = n["city"] is t
+        dots.append(
+            f'<a class="minidot{" here" if here else ""}" href="{urls.city(n["country"], n["region"], n["city"])}">'
+            f'<circle cx="{px:.1f}" cy="{py:.1f}" r="{5.5 if here else 3.6}"/>'
+            f'<title>{esc(n["city"]["name"])}, {esc(n["country"]["name"])}</title></a>'
+        )
+        if here or abs(dx) < w / 2 / span * 0.62:
+            labels.append(
+                f'<text class="minilabel{" here" if here else ""}" x="{px + 8:.1f}" y="{py + 4:.1f}">'
+                f'{esc(n["city"]["name"])}</text>'
+            )
+    return (
+        f'<figure class="minimap"><svg viewBox="0 0 {w} {h}" role="img" '
+        f'aria-label="Map of {esc(t["name"])} and the places around it">'
+        f'{"".join(dots)}{"".join(labels)}</svg>'
+        f'<figcaption>{esc(t["name"])} and everything within about '
+        f'{int(span * 60)} kilometres in the Atlas. <a href="/map">The full map →</a></figcaption></figure>'
+    )
+
+
+# ── destination facets ────────────────────────────────────────────────
+#
+# The specification asks for /europe/norway/bergen/things-to-do and its
+# siblings as a programmatic SEO channel. It also warns, in the same
+# document, against creating thousands of thin pages. Both are right, so a
+# facet only exists where there is enough material to justify it — the
+# thresholds below are the whole policy.
+
+HISTORY_KINDS = ("castle", "church", "monastery", "archaeological-site", "monument",
+                 "ruin", "theatre", "bridge", "quarter", "library", "bath")
+FOOD_KINDS = ("market",)
+FOOD_EXP_KINDS = ("table", "cellar")
+HISTORY_EXP_KINDS = ("museum", "sacred")
+
+
+def facets_for(data, c, r, t):
+    """Which facet pages this destination has earned, and their contents."""
+    places = t.get("places", [])
+    exps = t.get("experiences", [])
+    cid = f"{c['slug']}/{r['slug']}/{t['slug']}"
+    b = data["back"][cid]
+    out = {}
+
+    todo = places + exps
+    if len(todo) >= 4:
+        out["things-to-do"] = {"places": places, "exps": exps}
+
+    food_exps = [e for e in exps if e["kind"] in FOOD_EXP_KINDS]
+    food_places = [pl for pl in places if pl["kind"] in FOOD_KINDS]
+    if len(food_exps) + len(food_places) >= 1:
+        out["food"] = {"places": food_places, "exps": food_exps}
+
+    hist_places = [pl for pl in places if pl["kind"] in HISTORY_KINDS]
+    hist_exps = [e for e in exps if e["kind"] in HISTORY_EXP_KINDS]
+    if len(hist_places) + len(hist_exps) >= 3:
+        out["history"] = {"places": hist_places, "exps": hist_exps}
+
+    if len(b["journeys"]) + len(b["themes"]) + len(b["stories"]) >= 2:
+        out["journeys"] = b
+    return out
+
+
+def facet_page(data, c, r, t, key, payload):
+    name = urls.FACETS[key]
+    rows = []
+    if key == "journeys":
+        for j in payload["journeys"]:
+            leg = next(l for l in j["legs"] if l["city"] == f"{c['slug']}/{r['slug']}/{t['slug']}")
+            rows.append((urls.journey(j), j["name"], leg["why"], f"{j['days']} days"))
+        for th in payload["themes"]:
+            stop = next(x for x in th["stops"] if x["city"] == f"{c['slug']}/{r['slug']}/{t['slug']}")
+            rows.append((urls.theme(th), th["name"], stop["why"], "Theme"))
+        for st in payload["stories"]:
+            rows.append((urls.story(st), st["title"], st["standfirst"], st["reading"]))
+        lede = (f"Every curated route, theme and story in the Atlas that passes through "
+                f"{t['name']}. None of them was written to fill this page.")
+    else:
+        for pl in payload["places"]:
+            rows.append((urls.place(c, r, t, pl), pl["name"], pl["summary"],
+                         f"{PLACE_KIND_NAMES[pl['kind']]} · {pl['duration']}"))
+        kinds = data["taxonomy"]["experience_kinds"]
+        for e in payload["exps"]:
+            rows.append((urls.city(c, r, t) + "#things-to-do", e["name"], e["summary"],
+                         f"{kinds[e['kind']]} · {e['band']}"))
+        lede = {
+            "things-to-do": f"Everything in the Atlas for {t['name']}: places to see and things to do, in one list.",
+            "food": f"What {t['name']} puts on a table, and where. Country-wide dishes are on the {c['name']} page.",
+            "history": f"The layers you can actually stand in — {t['name']}'s built and excavated history.",
+        }[key]
+
+    rowhtml = "".join(
+        f"""<a class="row" href="{esc(href)}"><div><h3>{esc(title)}</h3>
+        <p class="rowsub">{esc(sub)}</p></div><p class="rowmeta">{esc(meta)}</p></a>"""
+        for href, title, sub, meta in rows
+    )
+    extra = ""
+    if key == "food":
+        extra = section(
+            f"Across {c['name']}",
+            '<ul class="stack">' + "".join(f"<li>{esc(x)}</li>" for x in c["food"]) + "</ul>",
+            lede="Dishes that belong to the country rather than to this destination.")
+    body = f"""
+{crumbs([("Europe", "/discover"), ("Countries", "/countries"), (c["name"], urls.country(c)),
+         (r["name"], urls.region(c, r)), (t["name"], urls.city(c, r, t)), (name, None)])}
+<div class="pagehead">
+  <p class="kicker">{esc(t['name'])}, {esc(c['name'])}</p>
+  <h1>{esc(name)} in {esc(t['name'])}</h1>
+  <p class="lede">{esc(lede)}</p>
+</div>
+<div class="rows">{rowhtml}</div>
+{extra}
+<div class="note" style="margin-top:var(--s7)">
+  <p>This page exists because {t['name']} has enough in the Atlas to fill it. Destinations
+  that do not have a page for this, on purpose — a facet with two entries is a thin page
+  wearing a heading. <a href="{urls.city(c, r, t)}">Back to {esc(t['name'])}</a>.</p>
+</div>
+"""
+    return f"{urls.facet(c, r, t, key)}/index.html", page(
+        f"{name} in {t['name']}", body, path=urls.facet(c, r, t, key), area="countries",
+        description=f"{name} in {t['name']}, {c['name']}: {len(rows)} entries from the Europedoor Atlas.",
+    )
+
+
+# ── places ────────────────────────────────────────────────────────────
+
+PLACE_KIND_NAMES = {
+    "museum": "Museum", "castle": "Castle", "church": "Church",
+    "monastery": "Monastery", "mountain": "Mountain", "waterfall": "Waterfall",
+    "beach": "Beach", "monument": "Monument", "archaeological-site": "Archaeological site",
+    "park": "Park", "viewpoint": "Viewpoint", "bridge": "Bridge", "market": "Market",
+    "garden": "Garden", "island": "Island", "cave": "Cave", "street": "Street",
+    "square": "Square", "lighthouse": "Lighthouse", "quarter": "Quarter",
+    "ruin": "Ruin", "theatre": "Theatre", "library": "Library", "bath": "Baths",
+}
+SEASON_NAMES = {
+    "year-round": "Open year-round", "summer": "Summer only",
+    "winter": "Winter only", "spring-autumn": "Spring and autumn",
+    "weather-dependent": "Weather-dependent",
+}
+
+
+def place_page(data, c, r, t, pl):
+    """A single point of interest.
+
+    The specification's field list includes opening hours, prices and an
+    official website. This page holds none of them, and says so instead of
+    guessing: those are the three fields that go stale fastest and the three
+    a traveller is most damaged by being wrong about."""
+    others = [x for x in t.get("places", []) if x is not pl]
+    nearby = "".join(
+        f"""<a class="row" href="{urls.place(c, r, t, x)}">
+        <div><h3>{esc(x['name'])}</h3><p class="rowsub">{esc(x['summary'])}</p></div>
+        <p class="rowmeta">{esc(PLACE_KIND_NAMES[x['kind']])}</p></a>"""
+        for x in others
+    )
+    cid = f"{c['slug']}/{r['slug']}/{t['slug']}"
+    b = data["back"][cid]
+    jrows = "".join(
+        f"""<a class="row" href="{urls.journey(j)}">
+        <div><h3>{esc(j['name'])}</h3><p class="rowsub">{esc(j['strapline'])}</p></div>
+        <p class="rowmeta">{j['days']} days</p></a>"""
+        for j in b["journeys"]
+    )
+    facts = factlist([
+        ("Kind", esc(PLACE_KIND_NAMES[pl["kind"]])),
+        ("Give it", esc(pl["duration"])),
+        ("Season", esc(SEASON_NAMES[pl["season"]])),
+        ("Where", f'<span class="mono">{pl["lat"]:.3f}°N, {pl["lon"]:.3f}°E</span>'),
+        ("In", f'<a href="{urls.city(c, r, t)}">{esc(t["name"])}</a>'),
+    ])
+    body = f"""
+{crumbs([("Europe", "/discover"), ("Countries", "/countries"), (c["name"], urls.country(c)),
+         (r["name"], urls.region(c, r)), (t["name"], urls.city(c, r, t)), (pl["name"], None)])}
+<div class="pagehead">
+  <p class="kicker">{esc(PLACE_KIND_NAMES[pl['kind']])} · {esc(t['name'])}, {esc(c['name'])}</p>
+  <h1>{esc(pl['name'])}</h1>
+  <p class="lede">{esc(pl['summary'])}</p>
+</div>
+<div class="card-art" style="border:1px solid var(--rule);border-radius:var(--radius);aspect-ratio:21/9;overflow:hidden">
+{plate(f"place:{c['slug']}:{t['slug']}:{pl['slug']}", 1260, 540, pl['name'])}
+</div>
+<div class="split" style="margin-top:var(--s7)">
+  <div>
+    {facts}
+    <div class="note warn">
+      <h3>We do not hold opening hours, prices or a website for this</h3>
+      <p>Those are the three fields that go stale fastest and the three you are most damaged
+      by being wrong about, so this site does not carry them at all rather than carrying an
+      unverified version. Check the operator or the municipality on the day. The estimate of
+      how long to give it, and the season, are editorial judgements and are usually stable.</p>
+    </div>
+    <p><button class="btn ghost" type="button" data-save="place:{esc(cid)}/{esc(pl['slug'])}"
+       data-kind="Place" data-label="{esc(pl['name'])}, {esc(t['name'])}"
+       data-url="{urls.place(c, r, t, pl)}">Save to My Europe</button></p>
+    {section("Other places in " + t["name"], f'<div class="rows">{nearby}</div>') if nearby else ""}
+    {section("Journeys that stop here", f'<div class="rows">{jrows}</div>') if jrows else ""}
+  </div>
+  <aside class="rail">
+    <h3>Accessibility</h3>
+    <p>Not documented. Europedoor holds no step-free access, hearing loop or accessible
+    toilet information for any place, and inventing it would be worse than the gap —
+    <a href="/accessibility">the position in full</a>.</p>
+    <h3>Getting there</h3>
+    <p>{esc(c['getting_around'][:140])}…
+    <a href="{urls.country(c)}#getting-around">All of {esc(c['name'])} →</a></p>
+    <h3>Up a level</h3>
+    <p><a href="{urls.city(c, r, t)}">{esc(t['name'])}</a> ·
+    <a href="{urls.region(c, r)}">{esc(r['name'])}</a> ·
+    <a href="{urls.country(c)}">{esc(c['name'])}</a></p>
+  </aside>
+</div>
+"""
+    return f"{urls.place(c, r, t, pl)}/index.html", page(
+        f"{pl['name']}, {t['name']}", body, path=urls.place(c, r, t, pl), area="countries",
+        description=pl["summary"][:180],
+        scripts=["/assets/js/my-europe.js"],
     )
 
 
@@ -1872,6 +2134,11 @@ def search_api(data):
                 add("City", t["name"], f"{r['name']}, {c['name']}", urls.city(c, r, t),
                     [t["name"], t["summary"], " ".join(t["highlights"]),
                      " ".join(t["interests"]), c["name"], r["name"]], 1.6)
+                for pl in t.get("places", []):
+                    add("Place", pl["name"], f"{t['name']}, {c['name']}",
+                        urls.place(c, r, t, pl),
+                        [pl["name"], pl["summary"], PLACE_KIND_NAMES[pl["kind"]], t["name"], c["name"]],
+                        1.5)
                 for e in t.get("experiences", []):
                     add("Experience", e["name"], f"{t['name']}, {c['name']}",
                         urls.city(c, r, t), [e["name"], e["summary"], e["kind"]], 0.9)
@@ -1890,6 +2157,13 @@ def search_api(data):
     for i in data["taxonomy"]["interests"]:
         add("Interest", i["name"], "Everywhere tagged for it", urls.interest(i["slug"]),
             [i["name"], i["slug"]], 1.3)
+    for cat in data["categories"]:
+        add("Category", cat["name"], cat["blurb"][:70], urls.category(cat["slug"]),
+            [cat["name"], cat["blurb"]], 1.3)
+        for sub in cat.get("subs", []):
+            add("Category", sub["name"], cat["name"],
+                urls.subcategory(cat["slug"], sub["slug"]),
+                [sub["name"]] + sub["keywords"], 1.1)
     return "/api/search.json", {"rows": rows}
 
 

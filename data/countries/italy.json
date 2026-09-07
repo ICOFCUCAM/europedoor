@@ -126,6 +126,58 @@
               "band": "low",
               "summary": "The road is closed to traffic on Sundays: basalt paving from 312 BC, catacombs, aqueducts and countryside, inside the city."
             }
+          ],
+          "places": [
+            {
+              "slug": "pantheon",
+              "name": "Pantheon",
+              "kind": "monument",
+              "summary": "The largest unreinforced concrete dome ever built, finished around 126 AD and still holding up a working church.",
+              "lat": 41.899,
+              "lon": 12.477,
+              "duration": "45 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "roman-forum",
+              "name": "Roman Forum & Palatine",
+              "kind": "archaeological-site",
+              "summary": "The civic centre of an empire, walked at ground level, with the hill the emperors lived on above it.",
+              "lat": 41.892,
+              "lon": 12.485,
+              "duration": "3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "borghese-gallery",
+              "name": "Galleria Borghese",
+              "kind": "museum",
+              "summary": "Bernini's marble that behaves like flesh, in a villa that admits 360 people at a time by booking.",
+              "lat": 41.914,
+              "lon": 12.492,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "appian-way",
+              "name": "Via Appia Antica",
+              "kind": "street",
+              "summary": "Basalt paving from 312 BC, closed to traffic on Sundays, with catacombs and aqueducts either side.",
+              "lat": 41.851,
+              "lon": 12.545,
+              "duration": "half a day",
+              "season": "year-round"
+            },
+            {
+              "slug": "testaccio-market",
+              "name": "Mercato Testaccio",
+              "kind": "market",
+              "summary": "Where Roman offal cooking survives, in a purpose-built modern hall the traders actually wanted.",
+              "lat": 41.876,
+              "lon": 12.475,
+              "duration": "1 hour",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -149,6 +201,28 @@
             "The cathedral facade, and Signorelli's apocalypse frescoes inside",
             "St Patrick's Well: a double-helix staircase 54 metres down",
             "1,200 caves cut into the tufa beneath the streets"
+          ],
+          "places": [
+            {
+              "slug": "orvieto-cathedral",
+              "name": "Orvieto Cathedral",
+              "kind": "church",
+              "summary": "A striped facade of mosaic and marble, with Signorelli's apocalypse frescoes in the chapel inside.",
+              "lat": 42.717,
+              "lon": 12.113,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "pozzo-di-san-patrizio",
+              "name": "Pozzo di San Patrizio",
+              "kind": "monument",
+              "summary": "A 54-metre well with two spiral staircases that never meet, so mules could descend and climb without passing.",
+              "lat": 42.719,
+              "lon": 12.121,
+              "duration": "45 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -216,6 +290,48 @@
               "band": "low",
               "summary": "Gregorian chant in an 11th-century church above the city, at 17:30, free, and almost always uncrowded."
             }
+          ],
+          "places": [
+            {
+              "slug": "duomo-dome",
+              "name": "Brunelleschi's Dome",
+              "kind": "church",
+              "summary": "Four million bricks laid without a centring frame, climbed between its two shells by 463 steps.",
+              "lat": 43.773,
+              "lon": 11.256,
+              "duration": "90 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "uffizi",
+              "name": "Uffizi",
+              "kind": "museum",
+              "summary": "The Medici collection in the offices Vasari built for them, and the reason people book Florence months ahead.",
+              "lat": 43.768,
+              "lon": 11.255,
+              "duration": "3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "bargello",
+              "name": "Bargello",
+              "kind": "museum",
+              "summary": "Donatello, Michelangelo and the sculpture the Uffizi queue never sees, in a 13th-century prison.",
+              "lat": 43.77,
+              "lon": 11.258,
+              "duration": "90 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "san-miniato",
+              "name": "San Miniato al Monte",
+              "kind": "church",
+              "summary": "An 11th-century facade above the city, with Gregorian chant at vespers and almost no crowd.",
+              "lat": 43.759,
+              "lon": 11.265,
+              "duration": "1 hour",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -238,6 +354,28 @@
             "The Campo, and the Palio run around it twice each summer",
             "The cathedral's inlaid marble floor, uncovered a few weeks a year",
             "The contrade — seventeen districts with their own churches, museums and feuds"
+          ],
+          "places": [
+            {
+              "slug": "piazza-del-campo",
+              "name": "Piazza del Campo",
+              "kind": "square",
+              "summary": "A shell-shaped square sloping to the town hall, with the Palio run round its edge twice each summer.",
+              "lat": 43.318,
+              "lon": 11.332,
+              "duration": "45 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "siena-cathedral",
+              "name": "Siena Cathedral",
+              "kind": "church",
+              "summary": "Striped marble inside and out, over an inlaid floor uncovered only a few weeks a year.",
+              "lat": 43.317,
+              "lon": 11.329,
+              "duration": "90 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -268,6 +406,28 @@
               "kind": "walk",
               "band": "low",
               "summary": "Four kilometres of covered walkway climbing out of the city, built so a procession would never get wet."
+            }
+          ],
+          "places": [
+            {
+              "slug": "portico-san-luca",
+              "name": "Portico di San Luca",
+              "kind": "monument",
+              "summary": "666 arches climbing four kilometres out of the city so a procession would never get wet.",
+              "lat": 44.48,
+              "lon": 11.298,
+              "duration": "2–3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "quadrilatero",
+              "name": "Il Quadrilatero",
+              "kind": "market",
+              "summary": "The medieval trades quarter, still laid out by guild, still selling food at seven in the morning.",
+              "lat": 44.493,
+              "lon": 11.345,
+              "duration": "1 hour",
+              "season": "year-round"
             }
           ]
         },
@@ -300,6 +460,28 @@
               "kind": "ride",
               "band": "low",
               "summary": "Four kilometres of Renaissance rampart, planted with plane trees in 1818 and used as a promenade ever since."
+            }
+          ],
+          "places": [
+            {
+              "slug": "lucca-walls",
+              "name": "The Walls",
+              "kind": "monument",
+              "summary": "Four kilometres of intact Renaissance rampart, planted with plane trees in 1818 and used as a park ever since.",
+              "lat": 43.844,
+              "lon": 10.502,
+              "duration": "1 hour by bicycle",
+              "season": "year-round"
+            },
+            {
+              "slug": "piazza-anfiteatro",
+              "name": "Piazza dell'Anfiteatro",
+              "kind": "square",
+              "summary": "The oval of a Roman amphitheatre, built over in houses, which is why the square is that shape.",
+              "lat": 43.845,
+              "lon": 10.507,
+              "duration": "20 minutes",
+              "season": "year-round"
             }
           ]
         },
@@ -369,6 +551,38 @@
               "band": "low",
               "summary": "Small plates and a small glass of wine at a bàcaro, standing, moving on after one — the Venetian version of an aperitivo."
             }
+          ],
+          "places": [
+            {
+              "slug": "basilica-san-marco",
+              "name": "Basilica di San Marco",
+              "kind": "church",
+              "summary": "Eight thousand square metres of gold mosaic over a Byzantine plan, on a floor that undulates with the subsidence.",
+              "lat": 45.434,
+              "lon": 12.34,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "accademia",
+              "name": "Gallerie dell'Accademia",
+              "kind": "museum",
+              "summary": "Five centuries of Venetian painting where it was painted, including Giorgione's Tempest.",
+              "lat": 45.431,
+              "lon": 12.328,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "torcello",
+              "name": "Torcello",
+              "kind": "island",
+              "summary": "The lagoon's first settlement, now nine residents and a cathedral with mosaics older than Venice itself.",
+              "lat": 45.497,
+              "lon": 12.417,
+              "duration": "half a day",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -400,6 +614,28 @@
               "band": "moderate",
               "summary": "Dinner at seven, lights out at ten, and the Enrosadira — the pink glow on the rock at dawn — from the door."
             }
+          ],
+          "places": [
+            {
+              "slug": "alpe-di-siusi",
+              "name": "Alpe di Siusi",
+              "kind": "park",
+              "summary": "The largest high-altitude alpine meadow in Europe, 57 square kilometres at 1,800 metres.",
+              "lat": 46.54,
+              "lon": 11.62,
+              "duration": "a full day",
+              "season": "summer"
+            },
+            {
+              "slug": "seceda",
+              "name": "Seceda",
+              "kind": "mountain",
+              "summary": "A tilted limestone ridge above Val Gardena, reached by cable car and walked along the top.",
+              "lat": 46.605,
+              "lon": 11.69,
+              "duration": "3 hours",
+              "season": "summer"
+            }
           ]
         },
         {
@@ -422,6 +658,28 @@
             "The Duomo roof terraces, walked among the spires",
             "Leonardo's Last Supper, fifteen minutes, booked in advance",
             "Navigli canals at aperitivo hour"
+          ],
+          "places": [
+            {
+              "slug": "last-supper",
+              "name": "The Last Supper",
+              "kind": "monument",
+              "summary": "Fifteen minutes with Leonardo's wall, twenty-five people at a time, booked months ahead.",
+              "lat": 45.466,
+              "lon": 9.171,
+              "duration": "30 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "duomo-milan",
+              "name": "Duomo di Milano",
+              "kind": "church",
+              "summary": "Six centuries in the building, with roof terraces you walk among the spires and statues.",
+              "lat": 45.464,
+              "lon": 9.192,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -454,6 +712,28 @@
               "band": "low",
               "summary": "Carpano started here in 1786. The historic cafés still serve it the way it was drunk: cold, alone, with a small plate."
             }
+          ],
+          "places": [
+            {
+              "slug": "museo-egizio",
+              "name": "Museo Egizio",
+              "kind": "museum",
+              "summary": "The oldest Egyptian museum in the world and, by collection, second only to Cairo.",
+              "lat": 45.068,
+              "lon": 7.684,
+              "duration": "3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "mole-antonelliana",
+              "name": "Mole Antonelliana",
+              "kind": "monument",
+              "summary": "A 167-metre brick tower holding the national cinema museum, with a glass lift up the middle.",
+              "lat": 45.069,
+              "lon": 7.693,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -485,6 +765,28 @@
               "band": "moderate",
               "summary": "Fifteen thousand people, no amplification, and the cheap seats on the stone steps are the ones with the acoustics."
             }
+          ],
+          "places": [
+            {
+              "slug": "verona-arena",
+              "name": "Arena di Verona",
+              "kind": "theatre",
+              "summary": "A 1st-century amphitheatre seating 15,000, hosting opera without amplification since 1913.",
+              "lat": 45.439,
+              "lon": 10.994,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "basilica-san-zeno",
+              "name": "Basilica di San Zeno",
+              "kind": "church",
+              "summary": "Bronze doors of 48 panels and a Mantegna altarpiece, in the quietest great church in the city.",
+              "lat": 45.442,
+              "lon": 10.978,
+              "duration": "45 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -515,6 +817,18 @@
               "kind": "walk",
               "band": "moderate",
               "summary": "The high paths behind the villages are free, empty and better; the coastal one is the queue."
+            }
+          ],
+          "places": [
+            {
+              "slug": "sentiero-azzurro",
+              "name": "Sentiero Azzurro",
+              "kind": "monument",
+              "summary": "The blue path between the five villages, ticketed, and closed in sections after each landslip.",
+              "lat": 44.135,
+              "lon": 9.686,
+              "duration": "4 hours",
+              "season": "spring-autumn"
             }
           ]
         },
@@ -561,6 +875,28 @@
             "Piazza Unità d'Italia, the largest sea-facing square in Europe",
             "The Risiera di San Sabba, the only Nazi camp with a crematorium on Italian soil",
             "Coffee ordered in a local dialect that confuses every other Italian"
+          ],
+          "places": [
+            {
+              "slug": "risiera-di-san-sabba",
+              "name": "Risiera di San Sabba",
+              "kind": "monument",
+              "summary": "A rice mill used as a Nazi camp with a crematorium — the only one on Italian soil — kept as a memorial.",
+              "lat": 45.632,
+              "lon": 13.786,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "piazza-unita",
+              "name": "Piazza Unità d'Italia",
+              "kind": "square",
+              "summary": "The largest sea-facing square in Europe, Habsburg on three sides and open on the fourth.",
+              "lat": 45.65,
+              "lon": 13.769,
+              "duration": "30 minutes",
+              "season": "year-round"
+            }
           ]
         }
       ]
@@ -605,6 +941,28 @@
               "kind": "sacred",
               "band": "low",
               "summary": "An hour uphill through holm oak to the caves Francis actually used, which are quieter and more convincing than the basilica."
+            }
+          ],
+          "places": [
+            {
+              "slug": "basilica-san-francesco",
+              "name": "Basilica of St Francis",
+              "kind": "church",
+              "summary": "Giotto's fresco cycle in the upper church, restored after the 1997 earthquake brought the vault down.",
+              "lat": 43.075,
+              "lon": 12.605,
+              "duration": "90 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "eremo-delle-carceri",
+              "name": "Eremo delle Carceri",
+              "kind": "monastery",
+              "summary": "The caves Francis actually used, in holm oak woods an hour above the town on foot.",
+              "lat": 43.066,
+              "lon": 12.634,
+              "duration": "2 hours",
+              "season": "year-round"
             }
           ]
         },
@@ -674,6 +1032,38 @@
               "band": "low",
               "summary": "Older and poorer than the baked kind, folded into a wallet and eaten walking; the sign to look for is a queue of locals."
             }
+          ],
+          "places": [
+            {
+              "slug": "naples-archaeological",
+              "name": "National Archaeological Museum",
+              "kind": "museum",
+              "summary": "Everything good from Pompeii and Herculaneum, including the Farnese marbles and the secret cabinet.",
+              "lat": 40.853,
+              "lon": 14.25,
+              "duration": "3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "pompeii",
+              "name": "Pompeii",
+              "kind": "archaeological-site",
+              "summary": "A Roman town stopped in 79 AD: streets, bakeries, election graffiti and the casts of people who did not leave.",
+              "lat": 40.75,
+              "lon": 14.485,
+              "duration": "half a day",
+              "season": "year-round"
+            },
+            {
+              "slug": "napoli-sotterranea",
+              "name": "Napoli Sotterranea",
+              "kind": "cave",
+              "summary": "Greek quarries turned aqueduct turned air-raid shelter, forty metres under the old town.",
+              "lat": 40.85,
+              "lon": 14.256,
+              "duration": "90 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -695,6 +1085,28 @@
             "The Sassi, and rock churches with Byzantine frescoes",
             "A restored cave house showing how families and animals shared one room",
             "The gorge opposite, and the view back at night"
+          ],
+          "places": [
+            {
+              "slug": "sassi",
+              "name": "The Sassi",
+              "kind": "quarter",
+              "summary": "Cave dwellings inhabited for nine thousand years, evacuated in 1952 as a national disgrace and now UNESCO-listed.",
+              "lat": 40.666,
+              "lon": 16.611,
+              "duration": "half a day",
+              "season": "year-round"
+            },
+            {
+              "slug": "santa-maria-de-idris",
+              "name": "Santa Maria de Idris",
+              "kind": "church",
+              "summary": "A rock church cut into a spur above the ravine, frescoed inside and reached by steps.",
+              "lat": 40.665,
+              "lon": 16.612,
+              "duration": "30 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -726,6 +1138,38 @@
               "band": "low",
               "summary": "Panelle, arancine, sfincione, and — if you are brave — pani ca meusa. A thousand years of occupation in six snacks."
             }
+          ],
+          "places": [
+            {
+              "slug": "cappella-palatina",
+              "name": "Cappella Palatina",
+              "kind": "church",
+              "summary": "An Islamic muqarnas ceiling over Byzantine mosaics, commissioned by a Norman king, in one room.",
+              "lat": 38.111,
+              "lon": 13.353,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "ballaro-market",
+              "name": "Ballarò",
+              "kind": "market",
+              "summary": "A thousand years of shouted commerce, and the best street food in Italy under the awnings.",
+              "lat": 38.111,
+              "lon": 13.36,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "monreale",
+              "name": "Monreale",
+              "kind": "church",
+              "summary": "6,500 square metres of gold mosaic twenty minutes uphill, which most Palermo visitors skip.",
+              "lat": 38.082,
+              "lon": 13.292,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -749,6 +1193,28 @@
             "The cathedral, built inside a 5th-century BC temple, columns and all",
             "The Greek theatre, still used for classical drama each summer",
             "Swimming off the rocks at the tip of Ortigia at sunset"
+          ],
+          "places": [
+            {
+              "slug": "ortigia-cathedral",
+              "name": "Duomo di Siracusa",
+              "kind": "church",
+              "summary": "A 5th-century BC Doric temple with a cathedral built around it; the columns are in the walls.",
+              "lat": 37.059,
+              "lon": 15.293,
+              "duration": "45 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "greek-theatre-syracuse",
+              "name": "Greek Theatre",
+              "kind": "theatre",
+              "summary": "Carved into the rock in the 5th century BC and still staging Aeschylus each summer.",
+              "lat": 37.075,
+              "lon": 15.276,
+              "duration": "90 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -772,6 +1238,18 @@
             "Santa Croce's facade, which took a century and shows it",
             "A Roman amphitheatre found under the main square in 1901",
             "Orecchiette, and the Salento coast on both sides"
+          ],
+          "places": [
+            {
+              "slug": "santa-croce-lecce",
+              "name": "Basilica di Santa Croce",
+              "kind": "church",
+              "summary": "A century of carving in soft golden limestone, which is why the facade looks like it is melting upward.",
+              "lat": 40.353,
+              "lon": 18.174,
+              "duration": "45 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -802,6 +1280,18 @@
               "kind": "museum",
               "band": "low",
               "summary": "Su Nuraxi at Barumini is the UNESCO one, but there are seven thousand of these dry-stone towers and you can walk into many of them alone."
+            }
+          ],
+          "places": [
+            {
+              "slug": "neptunes-grotto",
+              "name": "Grotta di Nettuno",
+              "kind": "cave",
+              "summary": "A sea cave under a 110-metre cliff, entered by 654 steps down or by boat in calm weather.",
+              "lat": 40.56,
+              "lon": 8.161,
+              "duration": "90 minutes",
+              "season": "weather-dependent"
             }
           ]
         },
@@ -834,6 +1324,18 @@
               "kind": "wild",
               "band": "moderate",
               "summary": "The volcano has erupted more or less continuously for two thousand years. Boats hold position off the Sciara del Fuoco after dark."
+            }
+          ],
+          "places": [
+            {
+              "slug": "stromboli",
+              "name": "Stromboli",
+              "kind": "mountain",
+              "summary": "A volcano that has erupted every twenty minutes or so for two thousand years, watched from the water at dusk.",
+              "lat": 38.789,
+              "lon": 15.213,
+              "duration": "an evening",
+              "season": "weather-dependent"
             }
           ]
         }

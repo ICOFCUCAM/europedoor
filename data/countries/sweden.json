@@ -1,68 +1,312 @@
 {
-  "code": "se", "slug": "sweden", "name": "Sweden", "official": "Kingdom of Sweden",
-  "macro": "nordic", "capital": "Stockholm", "currency": "SEK — Swedish krona",
-  "languages": ["Swedish", "Sámi languages", "Finnish (minority)"],
-  "blocs": ["eu", "schengen", "eea"],
+  "code": "se",
+  "slug": "sweden",
+  "name": "Sweden",
+  "official": "Kingdom of Sweden",
+  "macro": "nordic",
+  "capital": "Stockholm",
+  "currency": "SEK — Swedish krona",
+  "languages": [
+    "Swedish",
+    "Sámi languages",
+    "Finnish (minority)"
+  ],
+  "blocs": [
+    "eu",
+    "schengen",
+    "eea"
+  ],
   "tagline": "An archipelago capital, a thousand miles of forest, and a country that would rather you were comfortable than impressed.",
   "summary": "Sweden runs from Baltic islands to Arctic tundra, and most of the middle is forest and lake. The cities are calm and well-made; the countryside is where the country keeps its imagination — allemansrätten lets you walk into almost any of it. Two things surprise first-time visitors: how far north the country goes, and how seriously it takes coffee at three in the afternoon.",
-  "interests": ["design", "nature", "islands", "food", "winter", "cities"],
-  "budget": "high", "daily_eur": [95, 210],
-  "season": { "peak": ["jun", "jul", "aug"], "shoulder": ["may", "sep"],
-    "note": "Midsummer, in the third week of June, effectively closes the country and is the best week to be in it if you have somewhere to be invited. Late summer is warm and empty because Swedes are on their own islands. Winter is for Lapland and light installations, not for Stockholm's daylight." },
-  "getting_around": "Trains are fast, punctual and expensive unless booked well ahead; the night train to Abisko is worth taking for its own sake. Stockholm's archipelago runs on ferries all summer and half of it shuts in October. Distances north of Sundsvall are American in scale.",
-  "food": ["Fika: coffee and a cardamom bun, treated as an appointment rather than a snack", "Herring in five preparations at any midsummer table", "Toast Skagen — prawns, dill and roe on fried bread, the country's best restaurant dish"],
-  "festivals": [
-    { "name": "Midsummer", "month": "jun", "where": "Everywhere, especially the countryside" },
-    { "name": "Crayfish parties (kräftskiva)", "month": "aug", "where": "Gardens and jetties nationwide" },
-    { "name": "Lucia processions", "month": "dec", "where": "Churches and schools nationwide" }
+  "interests": [
+    "design",
+    "nature",
+    "islands",
+    "food",
+    "winter",
+    "cities"
   ],
-  "know": ["Card everywhere; many places take no cash at all, including some museums and buses.", "Systembolaget holds the monopoly on strong alcohol and closes on Sundays.", "The right to roam comes with the duty not to disturb — never within sight of a house, never a fire in a dry summer."],
+  "budget": "high",
+  "daily_eur": [
+    95,
+    210
+  ],
+  "season": {
+    "peak": [
+      "jun",
+      "jul",
+      "aug"
+    ],
+    "shoulder": [
+      "may",
+      "sep"
+    ],
+    "note": "Midsummer, in the third week of June, effectively closes the country and is the best week to be in it if you have somewhere to be invited. Late summer is warm and empty because Swedes are on their own islands. Winter is for Lapland and light installations, not for Stockholm's daylight."
+  },
+  "getting_around": "Trains are fast, punctual and expensive unless booked well ahead; the night train to Abisko is worth taking for its own sake. Stockholm's archipelago runs on ferries all summer and half of it shuts in October. Distances north of Sundsvall are American in scale.",
+  "food": [
+    "Fika: coffee and a cardamom bun, treated as an appointment rather than a snack",
+    "Herring in five preparations at any midsummer table",
+    "Toast Skagen — prawns, dill and roe on fried bread, the country's best restaurant dish"
+  ],
+  "festivals": [
+    {
+      "name": "Midsummer",
+      "month": "jun",
+      "where": "Everywhere, especially the countryside"
+    },
+    {
+      "name": "Crayfish parties (kräftskiva)",
+      "month": "aug",
+      "where": "Gardens and jetties nationwide"
+    },
+    {
+      "name": "Lucia processions",
+      "month": "dec",
+      "where": "Churches and schools nationwide"
+    }
+  ],
+  "know": [
+    "Card everywhere; many places take no cash at all, including some museums and buses.",
+    "Systembolaget holds the monopoly on strong alcohol and closes on Sundays.",
+    "The right to roam comes with the duty not to disturb — never within sight of a house, never a fire in a dry summer."
+  ],
   "regions": [
-    { "slug": "stockholm-and-the-archipelago", "name": "Stockholm & the Archipelago",
+    {
+      "slug": "stockholm-and-the-archipelago",
+      "name": "Stockholm & the Archipelago",
       "summary": "A capital built across fourteen islands, opening east into thirty thousand more.",
-      "interests": ["cities", "design", "islands", "art"],
+      "interests": [
+        "cities",
+        "design",
+        "islands",
+        "art"
+      ],
       "cities": [
-        { "slug": "stockholm", "name": "Stockholm", "lat": 59.33, "lon": 18.07,
+        {
+          "slug": "stockholm",
+          "name": "Stockholm",
+          "lat": 59.33,
+          "lon": 18.07,
           "summary": "Water on every side, a preserved medieval core, and the best-funded museums in the Nordics.",
-          "interests": ["cities", "design", "art", "food", "islands"], "nights": [3, 4],
-          "highlights": ["The Vasa: a warship that sank in 1628, raised whole in 1961", "Gamla Stan early, before the tour groups, or late", "Fotografiska and the design shops of Södermalm", "A summer ferry east to Vaxholm on a commuter ticket"],
+          "interests": [
+            "cities",
+            "design",
+            "art",
+            "food",
+            "islands"
+          ],
+          "nights": [
+            3,
+            4
+          ],
+          "highlights": [
+            "The Vasa: a warship that sank in 1628, raised whole in 1961",
+            "Gamla Stan early, before the tour groups, or late",
+            "Fotografiska and the design shops of Södermalm",
+            "A summer ferry east to Vaxholm on a commuter ticket"
+          ],
           "experiences": [
-            { "slug": "stockholm-archipelago-ferry", "name": "Archipelago on a commuter boat", "kind": "water", "band": "low", "summary": "The Waxholmsbolaget boats are public transport that happen to cross one of the world's great island landscapes." },
-            { "slug": "stockholm-fika-circuit", "name": "A proper fika circuit", "kind": "table", "band": "low", "summary": "Four bakeries, one afternoon, and the argument about whether the cardamom bun beats the cinnamon one." }
-          ] },
-        { "slug": "uppsala", "name": "Uppsala", "lat": 59.86, "lon": 17.64, "quiet": true,
+            {
+              "slug": "stockholm-archipelago-ferry",
+              "name": "Archipelago on a commuter boat",
+              "kind": "water",
+              "band": "low",
+              "summary": "The Waxholmsbolaget boats are public transport that happen to cross one of the world's great island landscapes."
+            },
+            {
+              "slug": "stockholm-fika-circuit",
+              "name": "A proper fika circuit",
+              "kind": "table",
+              "band": "low",
+              "summary": "Four bakeries, one afternoon, and the argument about whether the cardamom bun beats the cinnamon one."
+            }
+          ]
+        },
+        {
+          "slug": "uppsala",
+          "name": "Uppsala",
+          "lat": 59.86,
+          "lon": 17.64,
+          "quiet": true,
           "summary": "Sweden's oldest university, its largest cathedral, and the burial mounds of kings who predate both.",
-          "interests": ["history", "sacred", "cities"], "nights": [1, 2],
-          "highlights": ["Gamla Uppsala's royal mounds, from the 6th century", "The cathedral, the tallest in the Nordics", "Linnaeus's own garden, replanted to his 1745 plan"],
-          "experiences": [{ "slug": "uppsala-linnaeus-garden", "name": "Linnaeus's garden, in his order", "kind": "walk", "band": "low", "summary": "The beds are laid out by his sexual system of classification, which is the point and also the scandal of 1735." }] }
-      ] },
-    { "slug": "south-sweden", "name": "Skåne & the South",
+          "interests": [
+            "history",
+            "sacred",
+            "cities"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Gamla Uppsala's royal mounds, from the 6th century",
+            "The cathedral, the tallest in the Nordics",
+            "Linnaeus's own garden, replanted to his 1745 plan"
+          ],
+          "experiences": [
+            {
+              "slug": "uppsala-linnaeus-garden",
+              "name": "Linnaeus's garden, in his order",
+              "kind": "walk",
+              "band": "low",
+              "summary": "The beds are laid out by his sexual system of classification, which is the point and also the scandal of 1735."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "south-sweden",
+      "name": "Skåne & the South",
       "summary": "Flat, fertile, Danish until 1658, and now the country's most interesting place to eat.",
-      "interests": ["food", "coast", "design", "history"],
+      "interests": [
+        "food",
+        "coast",
+        "design",
+        "history"
+      ],
       "cities": [
-        { "slug": "malmo", "name": "Malmö", "lat": 55.60, "lon": 13.00,
+        {
+          "slug": "malmo",
+          "name": "Malmö",
+          "lat": 55.6,
+          "lon": 13.0,
           "summary": "Post-industrial, young, and twenty minutes by train from Copenhagen across the bridge.",
-          "interests": ["design", "food", "architecture", "cities"], "nights": [1, 2],
-          "highlights": ["The Turning Torso and the Western Harbour rebuilt from shipyards", "Falafel, which Malmö does better than anywhere north of Beirut", "Ribersborg's cold bathhouse, open year-round"],
-          "experiences": [{ "slug": "malmo-kallbadhus", "name": "The open-air cold bathhouse", "kind": "water", "band": "low", "summary": "A wooden pier, a sauna, and the Öresund at four degrees; the locals do it in February and talk about it all year." }] },
-        { "slug": "ystad", "name": "Ystad", "lat": 55.43, "lon": 13.82, "quiet": true,
+          "interests": [
+            "design",
+            "food",
+            "architecture",
+            "cities"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The Turning Torso and the Western Harbour rebuilt from shipyards",
+            "Falafel, which Malmö does better than anywhere north of Beirut",
+            "Ribersborg's cold bathhouse, open year-round"
+          ],
+          "experiences": [
+            {
+              "slug": "malmo-kallbadhus",
+              "name": "The open-air cold bathhouse",
+              "kind": "water",
+              "band": "low",
+              "summary": "A wooden pier, a sauna, and the Öresund at four degrees; the locals do it in February and talk about it all year."
+            }
+          ]
+        },
+        {
+          "slug": "ystad",
+          "name": "Ystad",
+          "lat": 55.43,
+          "lon": 13.82,
+          "quiet": true,
           "summary": "Half-timbered market town on a long empty beach, with a Bronze Age stone ship on the cliff above.",
-          "interests": ["coast", "history"], "nights": [1, 2],
-          "highlights": ["Ales stenar: 59 boulders in the shape of a ship, on a headland", "Three hundred half-timbered houses, still lived in", "The night watchman's horn, sounded every quarter hour since the 1600s"] }
-      ] },
-    { "slug": "swedish-lapland", "name": "Swedish Lapland",
+          "interests": [
+            "coast",
+            "history"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "Ales stenar: 59 boulders in the shape of a ship, on a headland",
+            "Three hundred half-timbered houses, still lived in",
+            "The night watchman's horn, sounded every quarter hour since the 1600s"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "swedish-lapland",
+      "name": "Swedish Lapland",
       "summary": "Above the Arctic Circle: Sámi reindeer country, the Kungsleden trail, and skies that perform.",
-      "interests": ["winter", "nature", "mountains", "wild"],
+      "interests": [
+        "winter",
+        "nature",
+        "mountains",
+        "wild"
+      ],
       "cities": [
-        { "slug": "abisko", "name": "Abisko", "lat": 68.35, "lon": 18.83, "quiet": true,
+        {
+          "slug": "abisko",
+          "name": "Abisko",
+          "lat": 68.35,
+          "lon": 18.83,
+          "quiet": true,
           "summary": "A rain-shadowed valley with Sweden's clearest winter skies and the northern end of its greatest trail.",
-          "interests": ["winter", "nature", "mountains"], "nights": [2, 4],
-          "highlights": ["The Aurora Sky Station, reached by chairlift in the dark", "Kungsleden: 440 km south to Hemavan, hut to hut", "Midnight sun over Lapporten's U-shaped notch in June"],
-          "experiences": [{ "slug": "abisko-kungsleden-first-leg", "name": "The first hut on the Kungsleden", "kind": "walk", "band": "moderate", "summary": "One day out and one back gets you the landscape without the fortnight; the huts sell chocolate and take card." }] },
-        { "slug": "kiruna", "name": "Kiruna", "lat": 67.86, "lon": 20.23,
+          "interests": [
+            "winter",
+            "nature",
+            "mountains"
+          ],
+          "nights": [
+            2,
+            4
+          ],
+          "highlights": [
+            "The Aurora Sky Station, reached by chairlift in the dark",
+            "Kungsleden: 440 km south to Hemavan, hut to hut",
+            "Midnight sun over Lapporten's U-shaped notch in June"
+          ],
+          "experiences": [
+            {
+              "slug": "abisko-kungsleden-first-leg",
+              "name": "The first hut on the Kungsleden",
+              "kind": "walk",
+              "band": "moderate",
+              "summary": "One day out and one back gets you the landscape without the fortnight; the huts sell chocolate and take card."
+            }
+          ],
+          "places": [
+            {
+              "slug": "aurora-sky-station",
+              "name": "Aurora Sky Station",
+              "kind": "viewpoint",
+              "summary": "900 metres up by chairlift in the dark, in the driest sky in Swedish Lapland.",
+              "lat": 68.353,
+              "lon": 18.816,
+              "duration": "3 hours",
+              "season": "winter"
+            },
+            {
+              "slug": "lapporten",
+              "name": "Lapporten",
+              "kind": "mountain",
+              "summary": "The U-shaped glacial notch that frames the valley and appears on everything Sámi Lapland prints.",
+              "lat": 68.31,
+              "lon": 18.75,
+              "duration": "viewed, or a full day walked",
+              "season": "summer"
+            }
+          ]
+        },
+        {
+          "slug": "kiruna",
+          "name": "Kiruna",
+          "lat": 67.86,
+          "lon": 20.23,
           "summary": "An iron-ore town so successful at mining that it is being physically moved, building by building, off the hole it dug.",
-          "interests": ["winter", "history", "design"], "nights": [1, 2],
-          "highlights": ["The mine tour, 540 metres down", "The wooden church, voted Sweden's finest building and relocated whole", "Jukkasjärvi's ice hotel, rebuilt every December"] }
-      ] }
+          "interests": [
+            "winter",
+            "history",
+            "design"
+          ],
+          "nights": [
+            1,
+            2
+          ],
+          "highlights": [
+            "The mine tour, 540 metres down",
+            "The wooden church, voted Sweden's finest building and relocated whole",
+            "Jukkasjärvi's ice hotel, rebuilt every December"
+          ]
+        }
+      ]
+    }
   ]
 }
