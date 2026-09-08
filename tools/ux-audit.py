@@ -228,6 +228,36 @@ def s2036_18():
         "and has not overwritten the summary"
 
 
+@section("2036-6", "Europe in Motion", "BUILT",
+         "Twelve ways to cut the continent, each a query evaluated against "
+         "every destination on every build — and each page prints the query "
+         "that made it. A motion cannot become a hand-picked list, because "
+         "the validator refuses a field that names destinations.")
+def s2036_6():
+    import json as _json
+    motions = _json.load(open(os.path.join(ROOT, "data", "motions.json"),
+                              encoding="utf-8"))["motions"]
+    yield len(motions) >= 12, f"{len(motions)} motions"
+    yield bool(page("/europe-in")), "the index is served"
+    for m in motions:
+        h = page("/europe-in/" + m["slug"])
+        yield bool(h), f"/europe-in/{m['slug']} is served"
+        # A landing page that will not say what produced it is an assertion.
+        yield "The query that made this page" in h, f"{m['slug']} states its query"
+        yield "Nothing here is hand-picked" in h, f"{m['slug']} says it is a query"
+    # The one field that must not exist. A curated list wearing the clothes
+    # of a query is exactly what this refuses to be.
+    yield "a motion is a query, not a hand-picked list" in src("tools/lib/data.py"), \
+        "and the validator refuses a destination list on a motion"
+    yield "a motion with no query terms" in src("tools/lib/data.py"), \
+        "and refuses a motion that would match everything"
+    yield "Europe in Motion" in src("tools/browser-checks.js"), \
+        "with browser checks that the queries differ and the latitude one is geographic"
+    # Same discipline as Discover Mode: never explain the constraint back.
+    yield "Never explain the constraint back" in src("tools/lib/pages.py"), \
+        "and shared reasons are hoisted rather than repeated per row"
+
+
 @section(7, "Featured journeys", "ALREADY",
          "Cards carrying days, countries and the route, as the brief draws "
          "them.")

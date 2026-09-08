@@ -562,6 +562,56 @@ async function main() {
   ok(/not a crowd measurement/i.test(methodHtml),
      "/method does not say what discoverability is not");
 
+  // ── Europe in Motion ───────────────────────────────────────────────
+  // The trap in "dynamic discovery layer" is that the cheap version — a
+  // banner over a hand-picked list — looks identical to the real one on the
+  // day it ships and is wrong within a season. These checks are all about
+  // that distinction.
+  await page.goto(base + "/europe-in", { waitUntil: "networkidle" });
+  const motionCards = await page.locator(".card").count();
+  ok(motionCards >= 12, `the motion index lists ${motionCards} motions`);
+
+  const motionLinks = await page.locator('a[href^="/europe-in/"]').evaluateAll(
+    (as) => Array.from(new Set(as.map((a) => a.getAttribute("href")))));
+  ok(motionLinks.length >= 12, "the index does not link every motion");
+
+  for (const href of motionLinks) {
+    const r = await page.request.get(base + href);
+    ok(r.status() === 200, `${href} returned ${r.status()}`);
+    const html = await r.text();
+    // Every motion page must print the query that produced it. A landing
+    // page that will not say what produced it is an assertion.
+    ok(/The query that made this page/.test(html), `${href} does not state its query`);
+    ok(/destinations match, in \d+/.test(html), `${href} does not say how many matched`);
+    ok(/Nothing here is hand-picked/.test(html), `${href} does not say it is a query`);
+    // And it must have actually matched something.
+    const n = (html.match(/class="row"/g) || []).length;
+    ok(n >= 3, `${href} matched only ${n} destinations`);
+  }
+
+  // The queries must actually differ from one another. Two motions returning
+  // the same list would mean the query is decorative.
+  async function motionNames(href) {
+    const html = await (await page.request.get(base + href)).text();
+    return (html.match(/<h3>([^<]+)<\/h3>/g) || []).join("|");
+  }
+  const railMotion = await motionNames("/europe-in/by-rail");
+  const islandMotion = await motionNames("/europe-in/islands");
+  ok(railMotion !== islandMotion, "two motions returned the same destinations");
+
+  // The latitude query is geographic, not editorial: nothing south of 63N.
+  const nl = await (await page.request.get(base + "/europe-in/northern-lights")).text();
+  ok(/above 63° north/.test(nl), "the northern-lights query is not stated as a latitude");
+  for (const south of ["Lisbon", "Athens", "Rome", "Madrid", "Paris"]) {
+    ok(!nl.includes(">" + south + "<"), `${south} appeared above 63° north`);
+  }
+
+  // Hidden villages must be genuinely hidden: no capitals.
+  const hidden = await (await page.request.get(base + "/europe-in/hidden-villages")).text();
+  for (const capital of ["Paris", "London", "Berlin", "Madrid", "Vienna", "Rome"]) {
+    ok(!hidden.includes(">" + capital + "<"), `${capital} is in Europe's hidden villages`);
+  }
+
   // ── search ─────────────────────────────────────────────────────────
   await page.goto(base + "/search", { waitUntil: "networkidle" });
   await page.fill("#q", "bergen");

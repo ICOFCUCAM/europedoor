@@ -3317,6 +3317,269 @@ def search_page(data):
 
 # ── discover: the entry point ─────────────────────────────────────────
 
+# ── Europe in Motion ─────────────────────────────────────────────────
+#
+# The transformation brief asks for a dynamic discovery layer: "Europe in
+# Autumn", "Europe by rail", "Europe's hidden villages". The trap in that
+# request is that the cheapest version is a banner with a hand-picked list
+# behind it, which looks identical to the real thing on the day it ships and
+# is wrong within a season.
+#
+# So each motion is a QUERY, declared in data/motions.json and evaluated
+# here against the whole Atlas on every build. Three consequences, all
+# deliberate:
+#
+#   * there is no field for naming destinations, so a motion cannot become a
+#     curated list without somebody changing the validator;
+#   * every page prints the query it ran, in words, above the results —
+#     which is the difference between a landing page and an assertion;
+#   * a motion matching nothing fails the build rather than shipping an
+#     empty page with a nice headline on it.
+#
+# The specification also warns against mass-producing thin programmatic
+# pages. Twelve of these, each carrying a real query over 319 destinations
+# plus the journeys and themes that match, is the opposite of thin — but the
+# number matters, and it is small on purpose.
+
+def motion_match(data, m, cid, n):
+    """Does one destination satisfy one motion? Returns (bool, reasons)."""
+    c, r, t = n["country"], n["region"], n["city"]
+    tags = set(t["interests"]) | set(r["interests"])
+    why = []
+
+    wants = m.get("interests", [])
+    if wants:
+        hit = [w for w in wants if w in tags]
+        if m.get("all_interests"):
+            if len(hit) != len(wants):
+                return False, []
+            why.append("carries " + and_list(
+                [data["interests"][w]["name"] for w in wants]))
+        else:
+            if not hit:
+                return False, []
+            why.append("tagged " + and_list([data["interests"][w]["name"] for w in hit]))
+
+    months = m.get("months", [])
+    if months:
+        season = c["season"]
+        if m.get("shoulder_only"):
+            got = [x for x in months if x in season.get("shoulder", [])]
+            if not got:
+                return False, []
+            why.append("in its quieter shoulder season in "
+                       + and_list([data["taxonomy"]["month_names"][x] for x in got]))
+        else:
+            got = [x for x in months if x in season["peak"] or x in season.get("shoulder", [])]
+            if not got:
+                return False, []
+            why.append("in season in "
+                       + and_list([data["taxonomy"]["month_names"][x] for x in got]))
+
+    if "min_lat" in m:
+        if t["lat"] < m["min_lat"]:
+            return False, []
+        why.append(f"at {t['lat']:.1f}° north")
+
+    if m.get("max_nights") and t["nights"][1] > m["max_nights"]:
+        return False, []
+
+    disc, terms = discoverability(
+        c, r, t,
+        journeys_through=len(data["back"].get(cid, {}).get("journeys", [])),
+        country_cities=sum(len(x["cities"]) for x in c["regions"]))
+    if disc < m.get("min_disc", 0):
+        return False, []
+    if m.get("min_disc", 0) >= 60 and terms:
+        # Two clauses, not one. The score varies per place and is the
+        # informative half; the terms behind it are usually identical across
+        # a whole motion, and joining them into one string meant the shared
+        # half could never be hoisted out.
+        why.append(f"scores {disc} for discoverability")
+        why.append(and_list([x.lower() for x in terms[:2]]))
+    return True, why
+
+
+def and_list(items):
+    """"a", "a and b", "a, b and c" — and "" for nothing, because a motion
+    with no interests (the latitude and discoverability ones) reaches here
+    with an empty list and used to take the last index of it."""
+    items = [x for x in items if x]
+    if not items:
+        return ""
+    if len(items) == 1:
+        return items[0]
+    if len(items) == 2:
+        return items[0] + " and " + items[1]
+    return ", ".join(items[:-1]) + " and " + items[-1]
+
+
+def motion_query_words(data, m):
+    """The query, in words, printed above the results. A landing page that
+    will not say what produced it is an assertion."""
+    parts = []
+    wants = m.get("interests", [])
+    if wants:
+        names = [data["interests"][w]["name"] for w in wants]
+        parts.append(("every destination tagged " + and_list(names))
+                     if m.get("all_interests") and len(names) > 1
+                     else ("any destination tagged " + and_list(names)))
+        if m.get("all_interests") and len(names) > 1:
+            parts[-1] = "every destination tagged with all of " + and_list(names)
+    if m.get("months"):
+        names = [data["taxonomy"]["month_names"][x] for x in m["months"]]
+        parts.append(("whose country's quieter shoulder season falls in "
+                      if m.get("shoulder_only") else "in season in ") + and_list(names))
+    if "min_lat" in m:
+        parts.append(f"lying above {m['min_lat']:g}° north")
+    if m.get("min_disc"):
+        parts.append(f"scoring {m['min_disc']} or more for "
+                     "discoverability")
+    if m.get("max_nights"):
+        parts.append(f"worth no more than {m['max_nights']} nights, which is "
+                     "what makes it a village rather than a city")
+    return and_list(parts) + "."
+
+
+def motion_page(data, m):
+    hits = []
+    for cid, n in sorted(data["cities"].items()):
+        ok, why = motion_match(data, m, cid, n)
+        if ok:
+            hits.append((n, why))
+    # A motion matching nothing is a bug in the query, not a page.
+    assert hits, f"motion {m['slug']} matched nothing"
+
+    # Two per country, as everywhere else: a list where six of the first
+    # eight are Italian has described Italy rather than Europe.
+    per, shown = {}, []
+    for n, why in sorted(hits, key=lambda h: (h[0]["country"]["name"], h[0]["city"]["name"])):
+        cs = n["country"]["slug"]
+        if per.get(cs, 0) >= 2:
+            continue
+        per[cs] = per.get(cs, 0) + 1
+        shown.append((n, why))
+
+    # Never explain the constraint back — the same rule Discover Mode is
+    # built on. On the hidden-villages page every row said "not the capital
+    # and editorially quiet", which is a restatement of the query the reader
+    # is already reading two inches above. A clause true of every result is
+    # hoisted into the query note; each row keeps only what distinguishes it.
+    common = [c for c in (shown[0][1] if shown else [])
+              if all(c in w for _n, w in shown)]
+    rows = "".join(
+        f"""<a class="row" href="{urls.city(n['country'], n['region'], n['city'])}">
+        <div><h3>{esc(n['city']['name'])}</h3>
+        <p class="rowsub">{esc(n['city']['summary'])}</p>
+        {f'<p class="whythis"><span>And this one</span> {esc(and_list([c for c in why if c not in common]))}.</p>'
+         if [c for c in why if c not in common] else ""}</div>
+        <p class="rowmeta">{esc(n['country']['name'])}<br><span class="small">
+        {n['city']['nights'][0]}–{n['city']['nights'][1]} nights</span></p></a>"""
+        for n, why in shown
+    )
+    shared_note = (f'<p class="whyall"><span>All of them</span> {esc(and_list(common))}.</p>'
+                   if common else "")
+
+    wants = set(m.get("interests", []))
+    jrows = [j for j in data["journeys"] if wants & set(j["interests"])][:3]
+    jcards = [card(urls.journey(j), f"{j['days']} days · {len(j['legs'])} stops",
+                   j["name"], j["strapline"], seed="journey:" + j["slug"],
+                   motif=motif_for(j["interests"]))
+              for j in jrows]
+    trows = [t for t in data["themes"] if wants & set(t.get("interests", []))][:3]
+    tcards = [card(f"/themes/{t['slug']}", "Theme", t["name"], t["summary"],
+                   seed="theme:" + t["slug"]) for t in trows]
+
+    body = f"""
+{crumbs([("Europe", "/discover"), ("Europe in Motion", "/europe-in"), (m["name"], None)])}
+<div class="pagehead">
+  <p class="kicker">Europe in Motion</p>
+  <h1>{esc(m["name"])}</h1>
+  <p class="lede">{esc(m["lede"])}</p>
+</div>
+
+<div class="note">
+  <h2 class="mini">The query that made this page</h2>
+  <p>{esc(motion_query_words(data, m))}</p>
+  <p class="small">Run against all {len(data['cities'])} destinations on every build.
+  Nothing here is hand-picked — there is no field for naming a destination in a motion,
+  deliberately. {len(hits)} destinations match, in {len({n['country']['slug'] for n, _ in hits})}
+  countries; {len(shown)} are shown, at most two per country.</p>
+</div>
+
+{shared_note}
+<div class="rows">{rows}</div>
+
+{section("Journeys that go this way", grid(jcards, 3)) if jcards else ""}
+{section("Themes that run through it", grid(tcards, 3)) if tcards else ""}
+
+<div class="note mt7">
+  <h2 class="mini">Build this into a route</h2>
+  <p>The Journey Planner weights the same tags this page queries on, so choosing
+  {esc(and_list([data["interests"][w]["name"] for w in m.get("interests", [])]) or "these interests")}
+  there will build a route through places like these.
+  <a href="/plan">Plan a journey →</a> · <a href="/discover">Discover mode →</a></p>
+</div>
+"""
+    return f"/europe-in/{m['slug']}/index.html", page(
+        m["name"], body, path=f"/europe-in/{m['slug']}", area="discover",
+        description=f"{m['strapline']} {len(hits)} destinations match, queried from the Atlas on every build.",
+        og=("motion:" + m["slug"], motif_for(m.get("interests", [])),
+            f"{m['name']} — {m['strapline']}"),
+        ld_blocks=[
+            ld_breadcrumb([("Europe", "/discover"), ("Europe in Motion", "/europe-in"),
+                           (m["name"], f"/europe-in/{m['slug']}")]),
+            {"@context": "https://schema.org", "@type": "ItemList",
+             "name": m["name"], "description": m["lede"],
+             "url": f"https://europedoor.com/europe-in/{m['slug']}",
+             "numberOfItems": len(shown),
+             "itemListElement": [
+                 {"@type": "ListItem", "position": i,
+                  "item": ld_within("TouristDestination", n["city"]["name"],
+                                    urls.city(n["country"], n["region"], n["city"]))}
+                 for i, (n, _w) in enumerate(shown, start=1)]},
+        ],
+    )
+
+
+def motion_index(data):
+    cards = []
+    for m in data["motions"]:
+        n = sum(1 for cid, x in data["cities"].items()
+                if motion_match(data, m, cid, x)[0])
+        cards.append(card(f"/europe-in/{m['slug']}", f"{n} destinations",
+                          m["name"], m["strapline"],
+                          seed="motion:" + m["slug"],
+                          motif=motif_for(m.get("interests", []))))
+    body = f"""
+{crumbs([("Europe", "/discover"), ("Europe in Motion", None)])}
+<div class="pagehead">
+  <p class="kicker">Europe in Motion</p>
+  <h1>The continent, cut a dozen different ways.</h1>
+  <p class="lede">Not categories. Each of these is a query run against all
+  {len(data['cities'])} destinations on every build, and each page prints the query that
+  made it. A list somebody curated by hand looks identical to one a query produced — on
+  the day it ships, and never again.</p>
+</div>
+{grid(cards, 3)}
+
+<div class="note mt7">
+  <h2 class="mini">Why this is not a set of tags</h2>
+  <p>A tag page tells you what carries a label. These ask questions the tags cannot answer on
+  their own: which places have their <em>quieter</em> season in autumn, which lie above 63°
+  north, which score highly for <a href="/method#discoverability">discoverability</a> and are
+  small enough to be villages. The query is the product.</p>
+</div>
+"""
+    return "/europe-in/index.html", page(
+        "Europe in Motion", body, path="/europe-in", area="discover",
+        description=f"A dozen ways to cut the continent — each a real query run against all {len(data['cities'])} destinations on every build, with the query printed on the page.",
+        og=("motion:index", "peaks", "Europe in Motion"),
+        ld_blocks=[ld_breadcrumb([("Europe", "/discover"),
+                                  ("Europe in Motion", "/europe-in")])],
+    )
+
+
 def discover_page(data):
     """The specification's first navigation item, and the honest answer to
     "where do I start". Four ways in — by region, by what you travel for, by
@@ -3337,6 +3600,13 @@ def discover_page(data):
         <h3>{esc(i['name'])}</h3></div></a>"""
         for i in data["taxonomy"]["interests"]
     )
+    motion_cards = [
+        card(f"/europe-in/{m['slug']}",
+             f"{sum(1 for cid, x in data['cities'].items() if motion_match(data, m, cid, x)[0])} destinations",
+             m["name"], m["strapline"], seed="motion:" + m["slug"],
+             motif=motif_for(m.get("interests", [])))
+        for m in data["motions"][:6]
+    ]
     months = data["taxonomy"]["months"]
     names = data["taxonomy"]["month_names"]
     month_chips = "".join(
@@ -3404,6 +3674,10 @@ def discover_page(data):
 {section("By what you travel for", '<div class="grid cols-4">' + interest_cards + "</div>",
          lede="Seventeen tags. The Journey Planner weights the same ones, so what you see here is what it will build from.",
          more=("Cross-border themes", "/themes"))}
+
+{section("Europe in Motion", grid(motion_cards, 3),
+         lede="A dozen ways to cut the continent, each one a query run against every destination on every build rather than a list somebody chose. Each page prints the query that made it.",
+         more=("All twelve", "/europe-in"))}
 
 {section("By month", f'<div class="chips">{month_chips}</div>',
          lede="What is on, which countries are at their best, and which are in the quieter shoulder — which is usually where you should be going.",

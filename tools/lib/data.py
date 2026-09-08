@@ -348,6 +348,30 @@ def load():
         p.require(bool(cat.get("subs")) or bool(cat.get("derived")), cw,
                   "a category needs sub-categories or a derivation rule")
 
+    # Europe in Motion. Each entry is a query, and it is validated as one:
+    # a motion with no query terms would match the whole Atlas, and a motion
+    # with a hand-picked list of destinations would be a curated list wearing
+    # the clothes of a query. Neither is allowed.
+    motions = _read(os.path.join(DATA, "motions.json")).get("motions", [])
+    seen_motions = set()
+    for m in motions:
+        where = f"motions.json > {m.get('slug')}"
+        for key in ("slug", "name", "strapline", "lede"):
+            p.require(bool(m.get(key)), where, f"missing {key!r}")
+        p.require(SLUG.match(m.get("slug", "")), where, "slug is not a slug")
+        p.require(m["slug"] not in seen_motions, where, "duplicate motion slug")
+        seen_motions.add(m.get("slug"))
+        for i in m.get("interests", []):
+            p.require(i in interests, where, f"unknown interest {i!r}")
+        for mo in m.get("months", []):
+            p.require(mo in months, where, f"unknown month {mo!r}")
+        p.require(any(k in m for k in ("interests", "months", "min_lat"))
+                  or m.get("min_disc", 0) > 0, where,
+                  "a motion with no query terms would match the whole Atlas")
+        p.require("cities" not in m and "destinations" not in m, where,
+                  "a motion is a query, not a hand-picked list — there is no "
+                  "field for naming destinations, deliberately")
+
     # The photograph register.
     #
     # This block MUST stay above p.raise_if_any(). The first version sat
@@ -394,6 +418,7 @@ def load():
             back[cid]["stories"].append(st)
 
     return {
+        "motions": motions,
         "images": images,
         "taxonomy": tax,
         "interests": interests,

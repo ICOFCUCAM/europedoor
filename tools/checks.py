@@ -146,6 +146,7 @@ def c_built():
     expect += len(d["taxonomy"]["months"])        # /events/<month>
     expect += 5                                   # how-it-works, sources, freshness,
                                                   # api-docs, manifesto
+    expect += 1 + len(d["motions"])               # Europe in Motion
     expect += 1                                   # /discover
     expect += 7                                   # privacy, cookies, terms, accessibility,
                                                   # help, contact, for-tourism-boards
@@ -866,8 +867,13 @@ def c_structured_data():
 
     # The types we mean to emit. A new one appearing without a decision is
     # worth a failing check, because schema types carry search behaviour.
+    # ItemList arrived with Europe in Motion, where a page IS a list of
+    # destinations a query returned. Added deliberately: this guard exists so
+    # a schema type cannot appear without somebody deciding it should, and
+    # this is that decision.
     expected = {"BreadcrumbList", "Country", "TouristDestination",
-                "TouristAttraction", "TouristTrip", "Article", "WebSite"}
+                "TouristAttraction", "TouristTrip", "Article", "WebSite",
+                "ItemList"}
     if seen_types - expected:
         fail(f"unexpected schema types: {sorted(seen_types - expected)}")
     if expected - seen_types:

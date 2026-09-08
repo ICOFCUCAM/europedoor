@@ -1,6 +1,6 @@
 # EuropeDoor — working notes
 
-A static site: 1,059 generated HTML files, no dependencies, no database. Every
+A static site: 1,072 generated HTML files, no dependencies, no database. Every
 page comes from `data/` via `tools/build.py`. Nothing in `site/` was written
 by a human and nothing ever should be.
 
@@ -27,7 +27,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **the Postgres/PostGIS model, the API, Next.js, auth, search, the AI pipeline** | **`docs/technical-foundation.md`** — a destination with a trigger, not a plan for Monday. Nothing in it should be built yet |
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
 | **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,273 assertions against the real build, and CI fails if any of them stops being true |
-| **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence: 45 sections, 247 assertions |
+| **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence: 46 sections, 289 assertions |
 
 ## The rules that catch people out
 
@@ -57,6 +57,18 @@ a shape to one only — a card that stops matching its page is invisible from
 here, because it is rendered inside somebody else's product. A check asserts
 both still come from `plate_shapes`. Cards are cached in `assets/og/`,
 content-addressed, and pruned: first build 24s, every build after that 2s.
+
+**A motion is a query, not a list.** `data/motions.json` declares twelve
+queries; the validator refuses a field naming destinations and refuses a
+motion with no query terms, and every `/europe-in/*` page prints the query
+that made it. A curated list wearing the clothes of a query looks identical
+on the day it ships and is wrong within a season.
+
+**Never explain the constraint back.** Discover Mode and the motion pages
+both hoist a reason shared by every result into one line above the list, and
+carry only what distinguishes each row. The first version repeated the filter
+on every card; individually true, collectively boilerplate, and boilerplate is
+what a reader learns to skip.
 
 **Two scores, both published, neither for sale.** The Europe Experience
 Score says what a place is *for*; **discoverability** says how far it is from
@@ -125,11 +137,11 @@ worth making.
 Run all seven before claiming anything is done.
 
     python3 tools/build.py check       validate the data
-    python3 tools/build.py           1,059 pages
-    python3 tools/checks.py            28 checks, ~97,300 things examined
-    node tools/browser-checks.js       429 checks in Chromium, incl. accessibility
+    python3 tools/build.py           1,072 pages
+    python3 tools/checks.py            28 checks, ~99,900 things examined
+    node tools/browser-checks.js       504 checks in Chromium, incl. accessibility
     python3 tools/section-audit.py --check   the 99 spec sections, 1,273 assertions
-    python3 tools/ux-audit.py --check        the 37 UI/UX + brand + 2036 sections, 247 assertions
+    python3 tools/ux-audit.py --check        the 37 UI/UX + brand + 2036 sections, 289 assertions
     python3 tools/content-report.py --write  what is missing, against the spec's targets
 
 The browser checks need `npm install playwright` and take a couple of

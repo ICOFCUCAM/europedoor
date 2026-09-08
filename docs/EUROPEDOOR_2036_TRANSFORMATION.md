@@ -153,7 +153,7 @@ The honest list:
   planner's own legs still do not carry one, and should.
 - **The homepage is a good grid, not a story.** §50's OPEN → DISCOVER →
   WONDER → UNDERSTAND → PLAN → GO progression is not there.
-- **No seasonal front door.** Month pages exist; "Europe in Autumn" does not.
+- ~~No seasonal front door.~~ **Fixed** — Europe in Motion.
 
 ## 16. Accessibility problems
 
@@ -249,8 +249,22 @@ current stack.
    what distinguishes it: the tags you did not ask for, whether it is peak
    or shoulder in your month, its discoverability terms, and whether we
    have actually written it up.
-4. **Europe in Motion** (§6): "Europe in Autumn", "by rail", "sacred",
-   "hidden villages" — each a real query over the graph, not a banner.
+4. ~~**Europe in Motion**~~ **BUILT.** Twelve motions at `/europe-in`,
+   each a **query** declared in `data/motions.json` and evaluated against
+   every destination on every build.
+
+   The trap in "dynamic discovery layer" is that the cheap version — a
+   banner over a hand-picked list — looks identical to the real one on the
+   day it ships and is wrong within a season. So: there is no field for
+   naming a destination in a motion and the validator refuses one; a motion
+   with no query terms is refused too, because it would match the whole
+   Atlas; every page prints its query in words above the results; and a
+   motion matching nothing fails the build rather than shipping an empty
+   page with a good headline on it.
+
+   Some of the queries are things a tag page cannot answer: which places
+   have their *quieter* season in autumn, which lie above 63° north, which
+   score 80+ for discoverability **and** are small enough to be villages.
 5. ~~**Discoverability score**~~ **BUILT.** Five named terms, published at
    `/method#discoverability`, carried in `/api/atlas.json` per destination
    along with the terms that fired. Capitals sit at the floor; Theth,

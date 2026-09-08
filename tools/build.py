@@ -101,6 +101,9 @@ def build():
     emit(P.sources_page(d))
     emit(P.api_page(d))
     emit(P.manifesto_page(d))
+    emit(P.motion_index(d))
+    for m in d["motions"]:
+        emit(P.motion_page(d, m))
     emit(P.freshness_page(d))
     emit(P.privacy_page(d))
     emit(P.cookies_page(d))

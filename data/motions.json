@@ -1,0 +1,104 @@
+{
+  "$comment": "Europe in Motion. Each entry is a QUERY, not a banner: the fields below are evaluated against the Atlas on every build, and the resulting page states the query it ran in plain words. A motion whose query returns nothing fails the build rather than shipping an empty landing page. No motion may hand-pick destinations — there is no field for it, deliberately, because a curated list wearing the clothes of a query is the exact thing this refuses to be.",
+  "motions": [
+    {
+      "slug": "autumn",
+      "name": "Europe in autumn",
+      "strapline": "The shoulder, which is usually the better half of the year.",
+      "lede": "September to November is when the queues go, the light gets long and the food gets better. These are the places whose own quieter season falls in those months — not the ones that merely tolerate autumn.",
+      "months": ["sep", "oct", "nov"],
+      "shoulder_only": true,
+      "min_disc": 0
+    },
+    {
+      "slug": "by-rail",
+      "name": "Europe by rail",
+      "strapline": "Where the train is the reason, not the transport.",
+      "lede": "Places we have tagged for slow travel by rail: reachable without flying, and worth the arriving. The Journey Planner will build a route through them with no flights in it.",
+      "interests": ["rail"],
+      "min_disc": 0
+    },
+    {
+      "slug": "sacred",
+      "name": "Europe's sacred places",
+      "strapline": "Cathedrals, monasteries, pilgrim roads and the quiet ones.",
+      "lede": "Fifteen hundred years of building for reasons other than commerce. Presented as heritage and as architecture, and open to anybody — the history is the point rather than the belief.",
+      "interests": ["sacred"],
+      "min_disc": 0
+    },
+    {
+      "slug": "hidden-villages",
+      "name": "Europe's hidden villages",
+      "strapline": "The small ones, computed rather than curated.",
+      "lede": "Everything here scores 80 or above for discoverability: not a capital, off the curated circuit, not tagged for the things a continent is famous for. The score and every term in it are published.",
+      "min_disc": 80,
+      "max_nights": 3
+    },
+    {
+      "slug": "islands",
+      "name": "Europe's islands",
+      "strapline": "Where the ferry timetable becomes the itinerary.",
+      "lede": "From the Aegean to the Atlantic. Islands change the arithmetic of a trip — fewer places, longer stays, and a boat that goes when it goes.",
+      "interests": ["islands"],
+      "min_disc": 0
+    },
+    {
+      "slug": "mountains",
+      "name": "Europe's mountains",
+      "strapline": "Alps, Pyrenees, Carpathians, Balkans, Caucasus.",
+      "lede": "Europe has more mountain range than its reputation suggests, and most of it is not the Alps. These are the places where the mountain is the reason to go.",
+      "interests": ["mountains"],
+      "min_disc": 0
+    },
+    {
+      "slug": "medieval",
+      "name": "Europe's medieval world",
+      "strapline": "Walls, guildhalls, cloisters and streets that still bend.",
+      "lede": "Places carrying both history and architecture in our tagging — which is the closest honest proxy we have for a town whose medieval shape survived.",
+      "interests": ["history", "architecture"],
+      "all_interests": true,
+      "min_disc": 0
+    },
+    {
+      "slug": "the-table",
+      "name": "Europe's culinary regions",
+      "strapline": "Where the region is the recipe.",
+      "lede": "Food and wine together, which in Europe usually means a place where what is grown, what is drunk and what is cooked all come from within about fifty kilometres.",
+      "interests": ["food", "wine"],
+      "all_interests": true,
+      "min_disc": 0
+    },
+    {
+      "slug": "northern-lights",
+      "name": "Europe under the northern lights",
+      "strapline": "Above 63° north, between September and March.",
+      "lede": "A genuinely geographic query: everywhere in the Atlas above 63° north. Whether you see the aurora on any given night is weather and solar activity, and nobody can promise it — what we can tell you is where the latitude makes it possible.",
+      "min_lat": 63.0,
+      "min_disc": 0
+    },
+    {
+      "slug": "winter",
+      "name": "Europe in winter",
+      "strapline": "Snow, thermal water, long nights and markets.",
+      "lede": "Places tagged for winter: skiing where there is skiing, but also thermal baths, Christmas markets and the northern towns that are better under snow than under sun.",
+      "interests": ["winter"],
+      "min_disc": 0
+    },
+    {
+      "slug": "after-dark",
+      "name": "Europe after dark",
+      "strapline": "Music, opera, and the cities that stay up.",
+      "lede": "Places tagged for music and nightlife — which in Europe covers both a techno cellar in Berlin and an opera house in Parma, and the same list has to hold both.",
+      "interests": ["music"],
+      "min_disc": 0
+    },
+    {
+      "slug": "the-coast",
+      "name": "Europe's coastlines",
+      "strapline": "Sixty-eight thousand kilometres of it.",
+      "lede": "Europe has more coast per square kilometre than any other continent, and almost none of it looks like the postcard. Atlantic, Mediterranean, Adriatic, Baltic, Aegean, Black Sea and Arctic.",
+      "interests": ["coast"],
+      "min_disc": 0
+    }
+  ]
+}

@@ -437,6 +437,7 @@ FOOTER_NAV = [
     ("/for-businesses", T("footer.for-businesses")),
     ("/for-tourism-boards", T("footer.for-tourism-boards")),
     ("/fund", T("footer.fund")),
+    ("/europe-in", T("footer.motion")),
     ("/map", T("footer.map")),
     ("/themes", T("footer.themes")),
     ("/beyond-the-obvious", T("footer.beyond")),
