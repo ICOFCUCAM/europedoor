@@ -54,19 +54,22 @@
       "name": "Budapest Spring Festival",
       "month": "apr",
       "where": "Budapest",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "budapest"
     },
     {
       "name": "Sziget Festival, on an island in the Danube",
       "month": "aug",
       "where": "Budapest",
-      "kind": "concert"
+      "kind": "concert",
+      "city": "budapest"
     },
     {
       "name": "Tokaj harvest",
       "month": "oct",
       "where": "Tokaj",
-      "kind": "food"
+      "kind": "food",
+      "city": "tokaj"
     }
   ],
   "know": [

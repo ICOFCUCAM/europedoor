@@ -50,7 +50,8 @@
       "name": "National Day — fireworks and an open castle garden",
       "month": "aug",
       "where": "Vaduz",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "vaduz"
     },
     {
       "name": "Alpine cattle descent",
@@ -62,7 +63,8 @@
       "name": "Vaduz Christmas market",
       "month": "dec",
       "where": "Vaduz",
-      "kind": "market"
+      "kind": "market",
+      "city": "vaduz"
     }
   ],
   "know": [

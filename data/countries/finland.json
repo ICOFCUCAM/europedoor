@@ -61,7 +61,8 @@
       "name": "Savonlinna Opera Festival, in a medieval castle",
       "month": "jul",
       "where": "Savonlinna",
-      "kind": "concert"
+      "kind": "concert",
+      "city": "savonlinna"
     },
     {
       "name": "Ruska, the Lapland autumn colour",

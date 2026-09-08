@@ -52,13 +52,15 @@
       "name": "Wianki, midsummer wreaths on the Vistula",
       "month": "jun",
       "where": "Kraków",
-      "kind": "seasonal"
+      "kind": "seasonal",
+      "city": "krakow"
     },
     {
       "name": "Pierogi festival",
       "month": "aug",
       "where": "Kraków",
-      "kind": "food"
+      "kind": "food",
+      "city": "krakow"
     },
     {
       "name": "Christmas markets and Wigilia",

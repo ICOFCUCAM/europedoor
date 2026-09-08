@@ -116,7 +116,17 @@
               "name": "The Acropolis Museum, third floor",
               "kind": "museum",
               "band": "moderate",
-              "summary": "The Parthenon frieze laid out at actual scale and orientation, with plaster casts where the British Museum holds the originals — the gaps are the argument."
+              "summary": "The Parthenon frieze laid out at actual scale and orientation, with plaster casts where the British Museum holds the originals — the gaps are the argument.",
+              "at": [
+                {
+                  "place": "acropolis-museum",
+                  "how": "at"
+                },
+                {
+                  "place": "acropolis",
+                  "how": "about"
+                }
+              ]
             }
           ],
           "places": [
@@ -598,7 +608,13 @@
               "name": "Down the Samaria gorge",
               "kind": "walk",
               "band": "moderate",
-              "summary": "Sixteen kilometres, one direction only, ending at a boat because there is no road out. Open May to October."
+              "summary": "Sixteen kilometres, one direction only, ending at a boat because there is no road out. Open May to October.",
+              "at": [
+                {
+                  "place": "samaria-gorge",
+                  "how": "at"
+                }
+              ]
             }
           ],
           "places": [

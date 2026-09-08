@@ -54,7 +54,8 @@
       "name": "Dubrovnik Summer Festival",
       "month": "jul",
       "where": "Dubrovnik",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "dubrovnik"
     },
     {
       "name": "Rijeka Carnival",

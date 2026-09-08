@@ -54,7 +54,8 @@
       "name": "Ljubljana Festival",
       "month": "jul",
       "where": "Ljubljana",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "ljubljana"
     },
     {
       "name": "Kurentovanje, a masked winter-driving-out rite",

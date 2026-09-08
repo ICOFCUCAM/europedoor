@@ -54,7 +54,8 @@
       "name": "Prague Spring music festival",
       "month": "may",
       "where": "Prague",
-      "kind": "concert"
+      "kind": "concert",
+      "city": "prague"
     },
     {
       "name": "Wine harvest festivals in Moravia",
@@ -122,7 +123,13 @@
               "name": "Vyšehrad and the river bend",
               "kind": "walk",
               "band": "low",
-              "summary": "The city's first castle, a cemetery of composers, and the whole of Prague from the ramparts without a crowd."
+              "summary": "The city's first castle, a cemetery of composers, and the whole of Prague from the ramparts without a crowd.",
+              "at": [
+                {
+                  "place": "vysehrad",
+                  "how": "at"
+                }
+              ]
             }
           ],
           "places": [

@@ -1151,6 +1151,160 @@ def c_instruction():
     return n
 
 
+@check("the knowledge graph holds what the schema asks for, and refuses what it cannot know")
+def c_schema():
+    """The Build Package v1 §2 schema, audited against the running data.
+
+    Three groups of assertion, and the third is the one that matters:
+
+      1. What EXISTS. Every entity the schema names has the fields it asks
+         for, or a documented equivalent — iso3, coordinates and population
+         are derived from Natural Earth and carry the dataset that produced
+         each value.
+      2. What is DERIVED rather than authored. A measurement a person can
+         type is a measurement somebody will type wrong, and a wrong
+         population with no source attached is indistinguishable from a right
+         one. So the derived fields must be absent from every authored file
+         and present in data/geo/facts.json.
+      3. What is REFUSED. The schema asks a place for `featured`, `rating`
+         and `review_count`. There is no such field and there will not be:
+         sponsorship attaches to a provider and affects directory surfaces
+         only, and we hold no ratings for anywhere in Europe. This group
+         asserts the refusal at the file level, so the wall cannot be walked
+         through by adding a key to one JSON file.
+    """
+    n = 0
+    d = D.load()
+
+    # 1. Derived facts exist and travel with their provenance.
+    for c in d["countries"].values():
+        got = c.get("derived", {})
+        for field in ("iso3", "lat", "lon", "population"):
+            if field not in got:
+                fail(f"{c['slug']} has no derived {field} — run scripts/map/process.py")
+            n += 1
+        if got and not c.get("derived_source"):
+            fail(f"{c['slug']} carries derived facts with no source named")
+        for r in c["regions"]:
+            if r.get("type") not in D.REGION_TYPES:
+                fail(f"{c['slug']}/{r['slug']} has type {r.get('type')!r}")
+            if "lat" not in r.get("derived", {}):
+                fail(f"{c['slug']}/{r['slug']} has no derived position")
+            n += 2
+    # 2. And are absent from every authored file.
+    for path in sorted(glob.glob(os.path.join(ROOT, "data", "countries", "*.json"))):
+        raw = json.load(open(path, encoding="utf-8"))
+        base = os.path.basename(path)
+        for field in D.DERIVED_COUNTRY:
+            if field in raw:
+                fail(f"data/countries/{base} authors {field!r}, which is derived")
+        for r in raw.get("regions", []):
+            for field in ("lat", "lon", "latitude", "longitude", "geometry"):
+                if field in r:
+                    fail(f"data/countries/{base} authors a region {field!r}")
+            for t in r.get("cities", []):
+                for field in D.DERIVED_CITY:
+                    if field in t:
+                        fail(f"data/countries/{base}: {t.get('slug')} authors {field!r}")
+                # 3. The wall, at the file level.
+                for entity, rows in (("place", t.get("places", [])),
+                                     ("experience", t.get("experiences", []))):
+                    for row in rows:
+                        for sold in ("featured", "rank", "boost", "sponsored", "promoted"):
+                            if sold in row:
+                                fail(f"data/countries/{base}: {entity} "
+                                     f"{row.get('slug')} carries {sold!r} — an editorial "
+                                     f"record may never be buyable")
+                        for unheld in ("rating", "review_count", "reviews", "stars"):
+                            if unheld in row:
+                                fail(f"data/countries/{base}: {entity} "
+                                     f"{row.get('slug')} carries {unheld!r}, which we do "
+                                     f"not hold for anywhere in Europe")
+                        for volatile in ("hours", "opening_hours", "price", "price_level",
+                                         "website", "phone"):
+                            if volatile in row:
+                                fail(f"data/countries/{base}: {entity} "
+                                     f"{row.get('slug')} carries {volatile!r}, which goes "
+                                     f"stale and damages a traveller when it is wrong")
+                        n += 3
+        n += 1
+
+    # The §2.5 edge: every link resolves, and resolves within its own
+    # destination. An edge that crosses destinations is a bug that renders as
+    # a plausible sentence.
+    edges = 0
+    for node in d["cities"].values():
+        t = node["city"]
+        slugs = {pl["slug"] for pl in t.get("places", [])}
+        for e in t.get("experiences", []):
+            for link in e.get("at", []):
+                if link["place"] not in slugs:
+                    fail(f"{node['id']}: experience {e['slug']} links to "
+                         f"{link['place']!r}, which is not a place here")
+                if link["how"] not in D.RELATIONSHIPS:
+                    fail(f"{node['id']}: unknown relationship {link['how']!r}")
+                edges += 1
+                n += 2
+    if edges < 10:
+        fail(f"only {edges} place-experience edges — the §2.5 relationship is the "
+             f"thing that makes this a graph rather than two lists")
+
+    # THE ONE THAT MATTERS. Population is the most tempting proxy for crowding
+    # there is, and discoverability is published as explicitly NOT a crowd
+    # measurement. The day a score reads a population, /method starts lying.
+    score_src = open(os.path.join(ROOT, "tools", "lib", "score.py"), encoding="utf-8").read()
+    for banned in ("population", "derived[", 'get("derived")', "pop_max", "POP_"):
+        if banned in score_src:
+            fail(f"tools/lib/score.py mentions {banned!r} — a score may not read a "
+                 f"derived population. Discoverability is not a crowd measurement, "
+                 f"and /method says so in those words")
+        n += 1
+
+    # §2.11: nodes yes, routes never. An operator, a frequency, a duration or
+    # a fare in the data is a promise about a departure we cannot keep, and
+    # the failure mode is somebody standing on a platform.
+    facts_path = os.path.join(ROOT, "data", "geo", "facts.json")
+    if os.path.exists(facts_path):
+        with open(facts_path, encoding="utf-8") as fh:
+            fjson = json.load(fh)
+        tr = fjson.get("transport", {})
+        if len(tr) < 100:
+            fail(f"only {len(tr)} destinations carry a transport node — "
+                 f"run scripts/map/process.py")
+        for cid, row in tr.items():
+            if not row.get("source"):
+                fail(f"transport for {cid} names no source")
+            for nd in row.get("nodes", []):
+                for routish in ("operator", "frequency", "duration_minutes",
+                                "price_from", "departs", "arrives"):
+                    if routish in nd:
+                        fail(f"transport node at {cid} carries {routish!r} — routes are "
+                             f"refused; we hold no timetables and own no inventory")
+        n += len(tr)
+        # Every destination page that shows a distance must say it is a
+        # straight line. A kilometre figure next to an airport name reads as
+        # travel distance, and for Theth the difference is four hours.
+        page = os.path.join(OUT, "europe", "albania", "the-albanian-alps",
+                            "theth", "index.html")
+        if os.path.exists(page):
+            body = open(page, encoding="utf-8").read()
+            if "getting-near" in body and "straight line" not in body:
+                fail("a destination shows transport distances without saying they are "
+                     "straight-line")
+            n += 1
+
+    # A draft is excluded from the build, not published with a badge on it.
+    for path in sorted(glob.glob(os.path.join(OUT, "**", "*.html"), recursive=True)):
+        pass
+    published = {c["slug"] for c in d["countries"].values()}
+    for path in sorted(glob.glob(os.path.join(ROOT, "data", "countries", "*.json"))):
+        raw = json.load(open(path, encoding="utf-8"))
+        if raw.get("status") == "draft" and raw["slug"] in published:
+            fail(f"{raw['slug']} is a draft and was published anyway")
+        n += 1
+    return n
+
+
 @check("the documentation set exists and is not describing a different repository")
 def c_docs():
     """Ten documents the development brief names, plus the ones this project

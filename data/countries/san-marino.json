@@ -49,19 +49,22 @@
       "name": "Investiture of the Captains Regent",
       "month": "apr",
       "where": "City of San Marino",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "city-of-san-marino"
     },
     {
       "name": "Medieval Days",
       "month": "jul",
       "where": "City of San Marino",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "city-of-san-marino"
     },
     {
       "name": "Second investiture of the year",
       "month": "oct",
       "where": "City of San Marino",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "city-of-san-marino"
     }
   ],
   "know": [

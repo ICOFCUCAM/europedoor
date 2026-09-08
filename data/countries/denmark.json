@@ -52,13 +52,15 @@
       "name": "Roskilde Festival",
       "month": "jun",
       "where": "Roskilde",
-      "kind": "concert"
+      "kind": "concert",
+      "city": "roskilde"
     },
     {
       "name": "Copenhagen Jazz Festival",
       "month": "jul",
       "where": "Copenhagen",
-      "kind": "concert"
+      "kind": "concert",
+      "city": "copenhagen"
     },
     {
       "name": "Christmas markets and Tivoli lights",

@@ -42,6 +42,48 @@
       "fetched": "2026-09-08",
       "sha256": "2631b5b39b6d1acc56de75235109b5af2dbb4b0ac5a127b6f06185977247fd4b",
       "bytes": 4636
+    },
+    {
+      "id": "ne-10m-populated-places",
+      "dataset": "Natural Earth 1:10m populated places",
+      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_populated_places.geojson",
+      "path": "data/raw/ne_10m_populated_places.geojson.gz",
+      "licence": "public-domain",
+      "licence_doc": "natural-earth.md",
+      "version": "Natural Earth v5.1.2",
+      "attribution_required": false,
+      "share_alike": false,
+      "fetched": "2026-09-08",
+      "sha256": "b95692f8af8f30932cc25727b9273354cf4bbccd0ddb3e706abf050823ca5857",
+      "bytes": 2743137
+    },
+    {
+      "id": "ne-10m-airports",
+      "dataset": "Natural Earth 1:10m airports",
+      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_airports.geojson",
+      "path": "data/raw/ne_10m_airports.geojson.gz",
+      "licence": "public-domain",
+      "licence_doc": "natural-earth.md",
+      "version": "Natural Earth v5.1.2",
+      "attribution_required": false,
+      "share_alike": false,
+      "fetched": "2026-09-08",
+      "sha256": "9347e1cac4cb74dc279b9f2ef414bcbcf047e9ec1e2e4da7927045f8be9726b6",
+      "bytes": 210184
+    },
+    {
+      "id": "ne-10m-ports",
+      "dataset": "Natural Earth 1:10m ports",
+      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_ports.geojson",
+      "path": "data/raw/ne_10m_ports.geojson.gz",
+      "licence": "public-domain",
+      "licence_doc": "natural-earth.md",
+      "version": "Natural Earth v5.1.2",
+      "attribution_required": false,
+      "share_alike": false,
+      "fetched": "2026-09-08",
+      "sha256": "32b10201b1f63b9446cc06132bc2be1ae29c8f4b0cc2e47de7016d4c3bf6a502",
+      "bytes": 38564
     }
   ],
   "blocked": [

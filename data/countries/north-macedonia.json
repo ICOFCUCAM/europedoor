@@ -50,7 +50,8 @@
       "name": "Ohrid Summer Festival",
       "month": "jul",
       "where": "Ohrid",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "ohrid"
     },
     {
       "name": "Galičnik wedding, a village wedding staged as a festival",
@@ -62,7 +63,8 @@
       "name": "Skopje Jazz Festival",
       "month": "oct",
       "where": "Skopje",
-      "kind": "concert"
+      "kind": "concert",
+      "city": "skopje"
     }
   ],
   "know": [

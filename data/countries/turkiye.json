@@ -57,7 +57,8 @@
       "name": "Istanbul Music Festival",
       "month": "jun",
       "where": "Istanbul",
-      "kind": "concert"
+      "kind": "concert",
+      "city": "istanbul"
     },
     {
       "name": "Whirling dervish ceremonies for Rumi",

@@ -29,6 +29,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
 | **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,273 assertions against the real build, and CI fails if any of them stops being true |
 | **the map, geographic data, tiles, or "why not Mapbox?"** | **`docs/map-architecture.md`** — the pipeline, the three levels of detail, and why this is SVG rather than MapLibre. Then **`docs/data-licenses/`**, which is the register, and **`docs/boundary-policy.md`** for disputed frontiers |
+| **"is field X in the model?" — the Build Package schema** | **`docs/schema-mapping.md`** — every entity and field of Build Package v1 §2 against the running data: HAVE, BUILT, or REFUSED with the promise behind each refusal |
 | **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence: 51 sections, 326 assertions |
 
 ## The rules that catch people out
@@ -209,6 +210,22 @@ assistant is called EuropeDoor Guide. The customer sees EuropeDoor and then
 experiences intelligence; they never see AI EUROPE TRAVEL PLATFORM. Enforced,
 because every competitor has crossed that line and it is the easiest one to
 cross by accident.
+
+**A measurement is never authored; an editorial record can never be bought.**
+Two rules from the schema audit, both enforced twice. `iso3`, coordinates and
+population live in `data/geo/facts.json`, derived by `scripts/map/process.py`
+from committed public-domain data, each carrying the dataset that produced it —
+the validator refuses them as authored keys. And `featured`, `rank`, `boost`,
+`sponsored`, `rating`, `review_count`, `opening_hours`, `price_level`,
+`website` and `phone` are refused on every editorial record, in the schema and
+again at the file level in `checks.py`. Seventeen refusals, each one a promise.
+
+**Natural Earth knows 157 of 319 destinations, and that is the product.** The
+162 it does not know are Theth, Xınalıq, Madriu-Perafita-Claror. Where there is
+no source the field is absent rather than estimated, and `content-report.py`
+counts it. **A population may never feed a score** — it is the most tempting
+proxy for crowding there is, discoverability is published as explicitly not a
+crowd measurement, and a check greps `score.py` to keep it that way.
 
 ## Gates
 

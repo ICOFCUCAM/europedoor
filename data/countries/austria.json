@@ -57,13 +57,15 @@
       "name": "Vienna Ball season",
       "month": "feb",
       "where": "Vienna",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "vienna"
     },
     {
       "name": "Salzburg Festival",
       "month": "jul",
       "where": "Salzburg",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "salzburg"
     },
     {
       "name": "Christkindlmarkt",

@@ -62,6 +62,36 @@ def gaps(d):
         d["cities"][cid]["city"]["name"] for cid, b in d["back"].items()
         if not (b["journeys"] or b["themes"] or b["stories"])
     )
+    # The Build Package v1 §2 fields that are BUILT but not yet filled in.
+    # Every one of these is editorial work rather than engineering, and every
+    # one is a place where the schema exists and the content does not — which
+    # is exactly the state that looks finished from the code and is not. See
+    # docs/schema-mapping.md.
+    out["destinations with no kind of place recorded"] = sorted(
+        f"{t['name']}, {c['name']}"
+        for c in d["countries"].values() for r in c["regions"] for t in r["cities"]
+        if not t.get("city_type")
+    )
+    out["experiences not tied to any place (§2.5)"] = sorted(
+        f"{e['name']} — {t['name']}"
+        for c in d["countries"].values() for r in c["regions"] for t in r["cities"]
+        for e in t.get("experiences", []) if not e.get("at")
+    )
+    out["experiences with no difficulty or season"] = sorted(
+        f"{e['name']} — {t['name']}"
+        for c in d["countries"].values() for r in c["regions"] for t in r["cities"]
+        for e in t.get("experiences", [])
+        if not e.get("difficulty") and not e.get("season")
+    )
+    out["events not tied to a destination (§2.9)"] = sorted(
+        f"{f['name']} — {c['name']}"
+        for c in d["countries"].values() for f in c.get("festivals", [])
+        if not f.get("city")
+    )
+    out["journey stops naming no place (§2.7)"] = sorted(
+        f"{j['name']} — day {leg['day_number']}, {leg['city'].split('/')[-1]}"
+        for j in d["journeys"] for leg in j["legs"] if not leg.get("places")
+    )
     return out
 
 

@@ -62,13 +62,15 @@
       "name": "Sighișoara Medieval Festival",
       "month": "jul",
       "where": "Sighișoara",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "sighisoara"
     },
     {
       "name": "George Enescu Festival, odd-numbered years",
       "month": "sep",
       "where": "Bucharest",
-      "kind": "concert"
+      "kind": "concert",
+      "city": "bucharest"
     }
   ],
   "know": [

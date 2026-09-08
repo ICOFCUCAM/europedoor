@@ -52,7 +52,8 @@
       "name": "Kaziukas craft fair, since 1604",
       "month": "mar",
       "where": "Vilnius",
-      "kind": "market"
+      "kind": "market",
+      "city": "vilnius"
     },
     {
       "name": "Joninės, midsummer on the coast",
@@ -64,7 +65,8 @@
       "name": "Song Celebration, every four years",
       "month": "jul",
       "where": "Vilnius",
-      "kind": "concert"
+      "kind": "concert",
+      "city": "vilnius"
     }
   ],
   "know": [

@@ -474,6 +474,45 @@ def s23():
     yield bool(src("docs/boundary-policy.md")), "a written policy for disputed boundaries"
 
 
+@section("23b", "The knowledge graph — Build Package v1 §2", "BUILT",
+         "Every entity and field the schema names, audited in "
+         "docs/schema-mapping.md: what exists, what was built for it, and "
+         "the seventeen fields refused because they are promises rather "
+         "than shortfalls.")
+def s23b():
+    d = DATA
+    yield bool(src("docs/schema-mapping.md")), "the audit exists"
+    # Derived facts, from public-domain data, never authored.
+    yield all("iso3" in c.get("derived", {}) for c in d["countries"].values()), \
+        "iso3 on all 50 countries, derived"
+    yield all(c.get("derived", {}).get("population") for c in d["countries"].values()), \
+        "and a dated population"
+    yield all(r.get("type") for c in d["countries"].values() for r in c["regions"]), \
+        "every region states its type"
+    yield all("lat" in r.get("derived", {}) for c in d["countries"].values()
+              for r in c["regions"]), "and carries a derived position"
+    # The refusals, at the file level.
+    raw = "".join(src(f"data/countries/{c['slug']}.json") for c in d["countries"].values())
+    for sold in ('"featured"', '"sponsored"', '"rank"', '"boost"'):
+        yield sold not in raw, f"no editorial record carries {sold}"
+    for unheld in ('"rating"', '"review_count"', '"opening_hours"', '"price_level"'):
+        yield unheld not in raw, f"nor {unheld}"
+    # §2.5, the edge that makes this a graph rather than two lists.
+    edges = sum(len(e.get("at", [])) for c in d["countries"].values() for r in c["regions"]
+                for t in r["cities"] for e in t.get("experiences", []))
+    yield edges >= 10, f"{edges} typed place-experience edges"
+    yield "What happens here" in page("/europe/norway/fjord-norway/stavanger/place/preikestolen"), \
+        "rendered on the place page"
+    # §2.7, derived rather than authored twice.
+    yield all("day_number" in leg for j in d["journeys"] for leg in j["legs"]), \
+        "every journey stop has a derived day number"
+    # §2.9, and the content bug it fixed.
+    tied = sum(1 for c in d["countries"].values() for f in c["festivals"] if f.get("city"))
+    yield tied >= 40, f"{tied} events tied to the destination they happen in"
+    yield "Palio" not in page("/europe/italy/rome-and-lazio/rome"), \
+        "so Rome has stopped advertising the Palio di Siena"
+
+
 @section(24, "Search engine", "BUILT",
          "All five of the specification's query shapes, answered in the "
          "browser, with the interpretation shown back.")

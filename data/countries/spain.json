@@ -71,7 +71,8 @@
       "name": "La Mercè",
       "month": "sep",
       "where": "Barcelona",
-      "kind": "religious"
+      "kind": "religious",
+      "city": "barcelona"
     }
   ],
   "know": [
@@ -1334,7 +1335,13 @@
               "name": "Classical drama in a Roman theatre",
               "kind": "stage",
               "band": "moderate",
-              "summary": "Greek and Roman plays staged every July and August in the theatre they were written for, which is a different experience from reading them."
+              "summary": "Greek and Roman plays staged every July and August in the theatre they were written for, which is a different experience from reading them.",
+              "at": [
+                {
+                  "place": "merida-roman-theatre",
+                  "how": "at"
+                }
+              ]
             }
           ],
           "places": [

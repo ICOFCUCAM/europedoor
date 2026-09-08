@@ -65,7 +65,8 @@
       "name": "Palio di Siena",
       "month": "jul",
       "where": "Siena",
-      "kind": "sport"
+      "kind": "sport",
+      "city": "siena"
     },
     {
       "name": "Truffle season and its fairs",
@@ -462,7 +463,13 @@
               "name": "Round the walls on a bicycle",
               "kind": "ride",
               "band": "low",
-              "summary": "Four kilometres of Renaissance rampart, planted with plane trees in 1818 and used as a promenade ever since."
+              "summary": "Four kilometres of Renaissance rampart, planted with plane trees in 1818 and used as a promenade ever since.",
+              "at": [
+                {
+                  "place": "lucca-walls",
+                  "how": "at"
+                }
+              ]
             }
           ],
           "places": [
@@ -1326,7 +1333,13 @@
               "name": "Stromboli, from the water",
               "kind": "wild",
               "band": "moderate",
-              "summary": "The volcano has erupted more or less continuously for two thousand years. Boats hold position off the Sciara del Fuoco after dark."
+              "summary": "The volcano has erupted more or less continuously for two thousand years. Boats hold position off the Sciara del Fuoco after dark.",
+              "at": [
+                {
+                  "place": "stromboli",
+                  "how": "about"
+                }
+              ]
             }
           ],
           "places": [

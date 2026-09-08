@@ -47,6 +47,7 @@ import json
 import math
 import os
 import sys
+import unicodedata
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 RAW = os.path.join(ROOT, "data", "raw")
@@ -78,6 +79,10 @@ ISO_FIX = {
     "AND": "ad",
     "MLT": "mt",
 }
+
+# The one country in the atlas with no ISO alpha-3 code, because ISO has
+# never assigned one.
+ISO3_USER_ASSIGNED = {"xk": "XKX"}
 
 # Countries we do not have a page for but must draw, or the map has holes in
 # it where the reader expects land. They are rendered as context: no fill
@@ -321,7 +326,7 @@ def provenance():
 def build():
     graph = load_graph()
     prov = provenance()
-    files = {}
+    files = {"facts.json": facts(graph)}
 
     cache = {}
     for lod, cfg in LODS.items():
@@ -437,6 +442,224 @@ def _touches(a, b, pad=0.75):
     """
     return not (b[2] < a[0] - pad or b[0] > a[2] + pad or
                 b[3] < a[1] - pad or b[1] > a[3] + pad)
+
+
+# ── derived facts ────────────────────────────────────────────────────────
+#
+# The Build Package schema asks countries for iso3, latitude, longitude and
+# population, and cities for population and a type. Every one of those is a
+# MEASUREMENT, not an editorial judgement, and this repository already has a
+# rule about the difference: a field a person can type is a field somebody
+# will type the wrong thing into. So none of them is authored. They are
+# derived here from the public-domain Natural Earth files already committed
+# under data/raw/, written into data/geo/facts.json with the dataset that
+# produced each one, and merged at load time. The validator refuses them as
+# authored keys.
+#
+# What is deliberately NOT derived: anything the source does not actually
+# know. Natural Earth lists 157 of our 319 destinations; the other 162 are
+# villages, valleys and monuments — Theth, Xınalıq, Madriu-Perafita-Claror —
+# and that is not a coverage failure, it is the product. Those rows are
+# absent rather than estimated, and content-report.py counts them.
+
+FEATURE_TO_TYPE = {
+    "Admin-0 capital": "capital",
+    "Admin-0 capital alt": "capital",
+    "Admin-1 capital": "city",
+    "Admin-1 region capital": "city",
+    "Admin-0 region capital": "city",
+    "Historic place": "site",
+}
+
+# Bands for a plain populated place. Natural Earth's POP_MAX is a metropolitan
+# figure, so these are deliberately generous: the point is to tell a city from
+# a village, not to rank them.
+def _type_from(feature, pop):
+    t = FEATURE_TO_TYPE.get(feature)
+    if t:
+        return t
+    if pop is None:
+        return None
+    if pop >= 100_000:
+        return "city"
+    if pop >= 10_000:
+        return "town"
+    return "village"
+
+
+def _fold(s):
+    """Strip accents and punctuation for name matching.
+
+    Ålesund/Alesund, Gjirokastër/Gjirokaster, Xınalıq/Xinaliq — the dataset
+    and our editors do not agree about diacritics and there is no reason they
+    should."""
+    out = unicodedata.normalize("NFKD", s or "")
+    out = out.encode("ascii", "ignore").decode().lower()
+    return "".join(ch for ch in out if ch.isalnum())
+
+
+def _km(lat1, lon1, lat2, lon2):
+    r = 6371.0
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dp, dl = p2 - p1, math.radians(lon2 - lon1)
+    h = math.sin(dp / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
+    return 2 * r * math.asin(math.sqrt(h))
+
+
+def facts(graph):
+    """Country and destination facts, each carrying the dataset it came from."""
+    admin = read_ne("ne_50m_admin_0_countries.geojson.gz")
+    countries = {}
+    for feat in admin["features"]:
+        props = feat.get("properties") or {}
+        code = key_for(props)
+        if code not in graph:
+            continue
+        iso3 = props.get("ISO_A3_EH") or props.get("ADM0_A3") or ""
+        row = {"source": "Natural Earth 1:50m admin 0 countries"}
+        if iso3 and iso3 != "-99":
+            row["iso3"] = iso3
+        elif code in ISO3_USER_ASSIGNED:
+            # Kosovo. ISO 3166 has assigned it no code at all, so there is
+            # nothing to look up and nothing to derive — XKX is the
+            # user-assigned code in common use, exactly as XK is the alpha-2
+            # this repository already uses as Kosovo's country key. Recording
+            # it with the note attached is the same decision as that one, and
+            # docs/boundary-policy.md says why it is an identifier join rather
+            # than a recognition claim. Silently omitting the field would
+            # have read as a data gap; silently filling it would have read as
+            # an ISO assignment.
+            row["iso3"] = ISO3_USER_ASSIGNED[code]
+            row["iso3_note"] = ("user-assigned; ISO 3166 has assigned no alpha-3 "
+                                "code. See docs/boundary-policy.md")
+        # LABEL_X/LABEL_Y is the cartographer's label anchor, not a centroid.
+        # It is the better number by a distance: the centroid of Norway is in
+        # Sweden and the centroid of Croatia is in Bosnia, because a centroid
+        # knows nothing about the shape it sits in.
+        if props.get("LABEL_X") is not None:
+            row["lat"] = round(float(props["LABEL_Y"]), 4)
+            row["lon"] = round(float(props["LABEL_X"]), 4)
+        if props.get("POP_EST"):
+            row["population"] = int(props["POP_EST"])
+            row["population_year"] = int(props.get("POP_YEAR") or 0) or None
+        countries[code] = row
+
+    with gzip.open(os.path.join(RAW, "ne_10m_populated_places.geojson.gz"),
+                   "rt", encoding="utf-8") as fh:
+        pp = json.load(fh)
+    index = []
+    for feat in pp["features"]:
+        q = feat.get("properties") or {}
+        lat, lon = q.get("LATITUDE"), q.get("LONGITUDE")
+        if lat is None or lon is None:
+            continue
+        if not (BBOX[0] <= lon <= BBOX[2] and BBOX[1] <= lat <= BBOX[3]):
+            continue
+        index.append((
+            (q.get("ISO_A2") or "").lower(),
+            _fold(q.get("NAME_EN") or q.get("NAME")), _fold(q.get("NAME")),
+            float(lat), float(lon), q.get("POP_MAX"), q.get("FEATURECLA"),
+        ))
+
+    dests = {}
+    for code, c in graph.items():
+        for r in c["regions"]:
+            for t in r["cities"]:
+                want = _fold(t["name"])
+                best = None
+                for iso, en, nat, la, lo, pop, fc in index:
+                    if iso != code:
+                        continue
+                    # Both tests must pass: within 25 km AND the name agrees.
+                    # Distance alone matches the wrong village in the next
+                    # valley; the name alone matches a Springfield anywhere.
+                    d = _km(t["lat"], t["lon"], la, lo)
+                    if d > 25.0:
+                        continue
+                    if not (want in (en, nat) or want.startswith(en) or en.startswith(want)):
+                        continue
+                    if best is None or d < best[0]:
+                        best = (d, pop, fc)
+                if best is None:
+                    continue
+                _d, pop, fc = best
+                row = {"source": "Natural Earth 1:10m populated places",
+                       "match_km": round(_d, 1)}
+                if pop:
+                    row["population"] = int(pop)
+                kind = _type_from(fc, pop)
+                if kind:
+                    row["city_type"] = kind
+                dests[f'{c["slug"]}/{r["slug"]}/{t["slug"]}'] = row
+    return {
+        "$comment": "GENERATED by scripts/map/process.py from the public-domain "
+                    "Natural Earth files in data/raw/. Do not edit and do not copy "
+                    "these values into data/countries/*.json — the validator refuses "
+                    "them there, because a derived fact that can be typed is a "
+                    "derived fact that will be typed wrong.",
+        "countries": countries,
+        "destinations": dests,
+        "transport": transport(graph),
+    }
+
+
+# ── §2.11, the half of it that can be sourced ────────────────────────────
+#
+# The Build Package asks for transport_nodes AND transport_routes. The nodes
+# are geography: an airport is at a fixed place and Natural Earth publishes
+# 893 of them in the public domain. The routes are not: an operator, a
+# frequency, a duration and a fare need a licensed feed, change without
+# notice, and are the single most damaging thing a travel page can get wrong.
+#
+# So the nodes are built and the routes are refused, which is the honest half
+# and is also the useful half: what a destination page needs to answer is
+# "how do I get near here", not "what time is the 14:05".
+NODE_KINDS = {"airport": 120.0, "port": 60.0}
+
+
+def transport(graph):
+    nodes = []
+    for fn, kind, namekey in (("ne_10m_airports.geojson.gz", "airport", "name"),
+                              ("ne_10m_ports.geojson.gz", "port", "name")):
+        with gzip.open(os.path.join(RAW, fn), "rt", encoding="utf-8") as fh:
+            doc = json.load(fh)
+        for feat in doc["features"]:
+            q = feat.get("properties") or {}
+            g = feat.get("geometry") or {}
+            if g.get("type") != "Point":
+                continue
+            lon, lat = g["coordinates"][0], g["coordinates"][1]
+            if not (BBOX[0] <= lon <= BBOX[2] and BBOX[1] <= lat <= BBOX[3]):
+                continue
+            name = q.get("name_en") or q.get(namekey)
+            if not name:
+                continue
+            row = {"name": name, "kind": kind,
+                   "lat": round(float(lat), 4), "lon": round(float(lon), 4)}
+            if q.get("iata_code"):
+                row["iata"] = q["iata_code"]
+            nodes.append(row)
+
+    # Attach each destination to the nodes within reach of it, nearest first.
+    # A radius rather than a count, because "the nearest airport" to Theth is
+    # 90 km away over a mountain and "the nearest airport" to Amsterdam is
+    # nine kilometres, and a fixed top-3 would present those as equivalent.
+    out = {}
+    for code, c in graph.items():
+        for r in c["regions"]:
+            for t in r["cities"]:
+                near = []
+                for nd in nodes:
+                    d = _km(t["lat"], t["lon"], nd["lat"], nd["lon"])
+                    if d <= NODE_KINDS[nd["kind"]]:
+                        near.append(dict(nd, km=round(d)))
+                near.sort(key=lambda n: n["km"])
+                if near:
+                    out[f'{c["slug"]}/{r["slug"]}/{t["slug"]}'] = {
+                        "source": "Natural Earth 1:10m airports and ports",
+                        "nodes": near[:4],
+                    }
+    return out
 
 
 def dump(obj):

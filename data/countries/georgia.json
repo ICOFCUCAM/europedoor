@@ -56,7 +56,8 @@
       "name": "Tbilisoba, the city's festival",
       "month": "oct",
       "where": "Tbilisi",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "tbilisi"
     },
     {
       "name": "Orthodox Easter",

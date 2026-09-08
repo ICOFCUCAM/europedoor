@@ -63,7 +63,8 @@
       "name": "National Day",
       "month": "nov",
       "where": "Monaco-Ville",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "monaco-ville"
     }
   ],
   "know": [

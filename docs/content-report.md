@@ -45,6 +45,26 @@ Albania, Andorra, Armenia, Austria, Azerbaijan, Belarus, Belgium, Bosnia and Her
 
 Aarhus, Albarracín, Alghero, Sardinia, Alta, Amiens, Andorra la Vella, Annecy, Arezzo, Assisi, Avignon, Balestrand, Belfast, Bellagio & Lake Como, Berchtesgaden, Bergen, Bern, Biarritz & the Basque Coast, Bilbao, Bitola, Bled, Bodø, Bonifacio, Brussels, Bucharest, and 147 more.
 
+### Destinations with no kind of place recorded — 162
+
+Abisko, Sweden, Albarracín, Spain, Alghero, Sardinia, Italy, Amboise & the Loire châteaux, France, Arles, France, Assisi, Italy, Avignon, France, Bacharach & the Rhine Gorge, Germany, Balestrand, Norway, Bansko, Bulgaria, Bayeux & the Landing Beaches, France, Beaune, France, Bellagio & Lake Como, Italy, Belovezhskaya Pushcha, Belarus, Berchtesgaden, Germany, Białowieża, Poland, Blagaj, Bosnia and Herzegovina, Bled, Slovenia, Bonifacio, France, Bovec & the Soča, Slovenia, Canterbury, United Kingdom, Carcassonne, France, Chamonix, France, Chartres, France, and 138 more.
+
+### Experiences not tied to any place (§2.5) — 182
+
+A Moravian cellar at harvest — Mikulov, A Sámi reindeer herding afternoon — Tromsø, A Wainwright, start to finish — Keswick & the Lakes, A bear hide in the Carpathians — Brașov, A beer garden, done correctly — Munich, A concert in a Roman theatre — Plovdiv, A day on the Liechtenstein Trail — Vaduz, A day on the South West Coast Path — St Ives, A heuriger on the city edge — Vienna, A kafana with live music — Belgrade, A lambic brewery, spontaneously fermented — Brussels, A market street before ten — Paris, A mouldy cellar in Tokaj — Tokaj, A night in a monastery cell — Rila Monastery, A night in a rifugio — Ortisei & the Dolomites, A night in a working rorbu — Lofoten (Svolvær), A panigiri that ends at dawn — Ikaria, A pintxo crawl, done properly — San Sebastián, A private room at the sulphur baths — Tbilisi, A proper fika circuit — Stockholm, A pub with a tapster, not a menu — Prague, A public sauna on the sea — Helsinki, A qvevri cellar and a supra — Sighnaghi & Kakheti, A real session, not a show — Dublin, and 158 more.
+
+### Experiences with no difficulty or season — 197
+
+A Moravian cellar at harvest — Mikulov, A Sámi reindeer herding afternoon — Tromsø, A Wainwright, start to finish — Keswick & the Lakes, A bear hide in the Carpathians — Brașov, A beer garden, done correctly — Munich, A concert in a Roman theatre — Plovdiv, A day on the Liechtenstein Trail — Vaduz, A day on the South West Coast Path — St Ives, A heuriger on the city edge — Vienna, A kafana with live music — Belgrade, A lambic brewery, spontaneously fermented — Brussels, A market street before ten — Paris, A mouldy cellar in Tokaj — Tokaj, A night in a monastery cell — Rila Monastery, A night in a rifugio — Ortisei & the Dolomites, A night in a working rorbu — Lofoten (Svolvær), A panigiri that ends at dawn — Ikaria, A pintxo crawl, done properly — San Sebastián, A private room at the sulphur baths — Tbilisi, A proper fika circuit — Stockholm, A pub with a tapster, not a menu — Prague, A public sauna on the sea — Helsinki, A qvevri cellar and a supra — Sighnaghi & Kakheti, A real session, not a show — Dublin, and 173 more.
+
+### Events not tied to a destination (§2.9) — 94
+
+Alpabzug — cattle descending in flowers — Switzerland, Alpine cattle descent — Liechtenstein, Andorra la Vella winter sports season — Andorra, Areni wine festival — Armenia, Athens & Epidaurus Festival, in ancient theatres — Greece, Bastille Day — France, Boka Night, with decorated boats — Montenegro, Bulb season at Keukenhof — Netherlands, Carnevale — Italy, Carnival of Binche, with the Gilles and the oranges — Belgium, Carnival — Malta, Christkindlmarkt — Austria, Christmas markets and Tivoli lights — Denmark, Christmas markets and Wigilia — Poland, Christmas markets and beer festivals — Belgium, Christmas markets — Czechia, Christmas markets — Germany, Christmas markets — Slovakia, Coastal season and beach festivals — Albania, Crayfish parties (kräftskiva) — Sweden, Douro grape harvest — Portugal, Easter Mass and Urbi et Orbi — Vatican City, Easter in Bucovina, with painted eggs — Romania, Easter, with pysanky decorated eggs — Ukraine, and 70 more.
+
+### Journey stops naming no place (§2.7) — 121
+
+Arctic to Mediterranean — day 1, tromso, Arctic to Mediterranean — day 11, copenhagen, Arctic to Mediterranean — day 13, hamburg, Arctic to Mediterranean — day 15, berlin, Arctic to Mediterranean — day 18, vienna, Arctic to Mediterranean — day 21, ortisei, Arctic to Mediterranean — day 24, venice, Arctic to Mediterranean — day 26, rome, Arctic to Mediterranean — day 29, naples, Arctic to Mediterranean — day 31, athens, Arctic to Mediterranean — day 4, lofoten, Arctic to Mediterranean — day 7, abisko, Arctic to Mediterranean — day 9, stockholm, Arctic to the Baltic — day 1, tromso, Arctic to the Baltic — day 10, stockholm, Arctic to the Baltic — day 13, helsinki, Arctic to the Baltic — day 15, tallinn, Arctic to the Baltic — day 17, riga, Arctic to the Baltic — day 4, lofoten, Arctic to the Baltic — day 8, abisko, Atlantic to the Mediterranean — day 1, porto, Atlantic to the Mediterranean — day 12, granada, Atlantic to the Mediterranean — day 15, barcelona, Atlantic to the Mediterranean — day 18, nice, and 97 more.
+
 ## Interface translation
 
 | language | coverage | ships |

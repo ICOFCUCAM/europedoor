@@ -50,7 +50,8 @@
       "name": "Secret Solstice and the near-endless June light",
       "month": "jun",
       "where": "Reykjavík",
-      "kind": "seasonal"
+      "kind": "seasonal",
+      "city": "reykjavik"
     },
     {
       "name": "Réttir — the autumn sheep round-up, done on horseback",
@@ -62,7 +63,8 @@
       "name": "Iceland Airwaves",
       "month": "nov",
       "where": "Reykjavík",
-      "kind": "concert"
+      "kind": "concert",
+      "city": "reykjavik"
     }
   ],
   "know": [

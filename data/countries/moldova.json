@@ -49,7 +49,8 @@
       "name": "National Wine Day",
       "month": "oct",
       "where": "Chișinău",
-      "kind": "food"
+      "kind": "food",
+      "city": "chisinau"
     },
     {
       "name": "Mărțișor, spring welcome with red-and-white tokens",

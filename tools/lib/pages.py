@@ -537,10 +537,25 @@ def country_page(data, c):
                     <p class="rowmeta">{esc(st['section'])} · {esc(st['reading'])}</p></a>""")
     know = "".join(f"<li>{esc(k)}</li>" for k in c["know"])
     food = "".join(f"<li>{esc(f)}</li>" for f in c["food"])
+    # Derived facts, each carrying the dataset that produced it. Population
+    # is a measurement and is therefore never authored — it comes from
+    # Natural Earth via scripts/map/process.py, dated, and the page prints
+    # the year, because "67 million" with no year is a number that quietly
+    # becomes wrong and never announces it.
+    d = c.get("derived", {})
+    pop = ""
+    if d.get("population"):
+        yr = f" ({d['population_year']})" if d.get("population_year") else ""
+        pop = (f'{d["population"]:,}{yr} <span class="small">— '
+               f'{esc(c.get("derived_source", ""))}</span>')
+    codes = c["code"].upper() + (f' · {esc(d["iso3"])}' if d.get("iso3") else "")
+
     facts = factlist([
         ("Capital", esc(c["capital"])),
         ("Currency", esc(c["currency"])),
         ("Languages", esc(", ".join(c["languages"]))),
+        ("Population", pop),
+        ("ISO codes", codes),
         ("Time zone", esc(c.get("timezone", ""))),
         ("Membership", esc(bloc_line(data, c))),
         ("Typical day", daily_line(data, c)),
@@ -704,14 +719,57 @@ def region_page(data, c, r):
     )
 
 
+CITY_TYPE_NAMES = {
+    "capital": "Capital city", "city": "City", "town": "Town",
+    "village": "Village", "island": "Island", "valley": "Valley",
+    "park": "National park", "site": "Historic site",
+}
+
+
+def pop_line(t):
+    """A destination's population, or nothing at all.
+
+    Natural Earth lists 157 of our 319 destinations. The other 162 are
+    villages, valleys and monuments — Theth, Xınalıq, Madriu-Perafita-Claror —
+    and their absence is not a coverage failure, it is the product. So the
+    row simply does not appear rather than saying "unknown", which would read
+    as a defect in the record rather than as the size of the place.
+
+    It never becomes a score. A population is the most tempting proxy for
+    crowding there is, and discoverability is explicitly not a crowd
+    measurement; checks.py asserts that no scoring code reads this field.
+    """
+    d = t.get("derived", {})
+    if not d.get("population"):
+        return ""
+    return (f'{d["population"]:,} <span class="small">— '
+            f'{esc(t.get("derived_source", ""))}</span>')
+
+
 def city_page(data, c, r, t):
     m = next(x for x in data["macros"] if x["slug"] == c["macro_slug"])
     cid = f"{c['slug']}/{r['slug']}/{t['slug']}"
     highlights = "".join(f"<li>{esc(h)}</li>" for h in t["highlights"])
     kinds = data["taxonomy"]["experience_kinds"]
+    # The §2.5 edge in the other direction: an experience says which place it
+    # is tied to, and how. Each row carries an id so a place page can link
+    # straight to it — an experience is a row on its destination rather than a
+    # page of its own, because 197 thin pages is not a product and "everything
+    # there is to do in Bergen, in one place" is.
+    _pl_by_slug = {pl["slug"]: pl for pl in t.get("places", [])}
+    _HOW = {"at": "at", "from": "starting at", "about": "about"}
+
+    def _where(e):
+        links = [
+            f'{_HOW[l["how"]]} <a href="{urls.place(c, r, t, _pl_by_slug[l["place"]])}">'
+            f'{esc(_pl_by_slug[l["place"]]["name"])}</a>'
+            for l in e.get("at", []) if l["place"] in _pl_by_slug
+        ]
+        return f'<p class="rowsub small">— {", ".join(links)}</p>' if links else ""
+
     exps = "".join(
-        f"""<div class="row"><div><h3>{esc(e['name'])}</h3>
-        <p class="rowsub">{esc(e['summary'])}</p></div>
+        f"""<div class="row" id="exp-{esc(e['slug'])}"><div><h3>{esc(e['name'])}</h3>
+        <p class="rowsub">{esc(e['summary'])}</p>{_where(e)}</div>
         <p class="rowmeta">{esc(kinds[e['kind']])} · {esc(e['band'])}</p></div>"""
         for e in t.get("experiences", [])
     )
@@ -770,13 +828,38 @@ def city_page(data, c, r, t):
         <p class="rowmeta">{esc(PLACE_KIND_NAMES[pl['kind']])} · {esc(pl['duration'])}</p></a>"""
         for pl in t.get("places", [])
     )
-    fest = [f for f in c["festivals"]]
-    festrows = "".join(
-        f"""<div class="row"><div><h3>{esc(f['name'])}</h3>
-        <p class="rowsub">{esc(f.get('where', ''))}</p></div>
-        <p class="rowmeta">{esc(data['taxonomy']['month_names'][f['month']])}</p></div>"""
-        for f in fest
+    # §2.11: the nodes, never the routes. What a destination page has to
+    # answer is "how do I get near here", and an airport is at a fixed place
+    # that a public-domain dataset knows. A timetable is not.
+    NODE_NAMES = {"airport": "Airport", "port": "Port"}
+    transrows = "".join(
+        f"""<div class="row"><div><h3>{esc(nd['name'])}</h3>
+        <p class="rowsub">{esc(NODE_NAMES[nd['kind']])}"""
+        f"""{f" · {esc(nd['iata'])}" if nd.get('iata') else ""}</p></div>
+        <p class="rowmeta">{nd['km']} km in a straight line</p></div>"""
+        for nd in t.get("transport", [])
     )
+
+    # Events, now that §2.9 gives one an edge into the graph.
+    #
+    # This used to print every festival in the country on every destination
+    # page in it, so Carnevale appeared on all 25 Italian city pages
+    # including the ones 700 km from Venice. It read as a fact about the
+    # place and was a fact about the country. With `city` on an event, the
+    # ones tied here come first and the ones tied *elsewhere* are dropped —
+    # only the genuinely nationwide ones stay, under a heading that says so.
+    here_f = [f for f in c["festivals"] if f.get("city") == t["slug"]]
+    wide_f = [f for f in c["festivals"] if not f.get("city")]
+
+    def _festrows(items):
+        return "".join(
+            f"""<div class="row"><div><h3>{esc(f['name'])}</h3>
+            <p class="rowsub">{esc(f.get('where', ''))}</p></div>
+            <p class="rowmeta">{esc(data['taxonomy']['month_names'][f['month']])}</p></div>"""
+            for f in items
+        )
+    festrows = _festrows(here_f)
+    widerows = _festrows(wide_f)
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)),
          (c["name"], urls.country(c)), (r["name"], urls.region(c, r)), (t["name"], None)])}
@@ -785,6 +868,12 @@ def city_page(data, c, r, t):
   <h1>{esc(t['name'])}</h1>
   <p class="lede">{esc(t['summary'])}</p>
   {chips(t["interests"], data["interests"])}
+  {factlist([
+      ("Kind of place", esc(CITY_TYPE_NAMES.get(t.get("city_type"), ""))),
+      ("Population", pop_line(t)),
+      ("Region", f'<a href="{urls.region(c, r)}">{esc(r["name"])}</a>'),
+      ("Coordinates", f'<span class="mono">{t["lat"]:.3f}, {t["lon"]:.3f}</span>'),
+  ])}
 </div>
 <div class="card-art frame">
 {picture(data["images"], f"city:{cid}", w=1260, h=540,
@@ -797,7 +886,8 @@ def city_page(data, c, r, t):
     ("Overview", "why-visit"),
     ("Places", "places" if placerows else ""),
     ("Things to do", "things-to-do" if exps else ""),
-    ("Events", "events" if festrows else ""),
+    ("Getting near", "getting-near" if transrows else ""),
+    ("Events", "events" if (festrows or widerows) else ""),
     ("Travel tips", "tips"),
     ("Stay & eat", "stay"),
     ("Onward", "onward"),
@@ -812,8 +902,18 @@ def city_page(data, c, r, t):
              id="places",
              lede=f"{len(t.get('places', []))} recorded so far. We hold what each one is and how long to give it, and deliberately not its opening hours or price.") if placerows else ""}
     {section("Things to do", f'<div class="rows">{exps}</div>', id="things-to-do") if exps else ""}
-    {section("Events", f'<div class="rows">{festrows}</div>', id="events",
-             lede=f"Nationwide fixtures in {c['name']}. See the whole European year on /events.") if festrows else ""}
+    {section("Getting near", f'<div class="rows">{transrows}</div>', id="getting-near",
+             lede="Airports and ports within reach, from Natural Earth — public domain, hosted "
+                  "by us. The distance is a straight line, which is the only thing a coordinate "
+                  "can honestly tell you: 43 km across the Accursed Mountains is four hours, and "
+                  "we hold no timetables, operators or fares.") if transrows else ""}
+    {section("Events here", f'<div class="rows">{festrows}</div>', id="events",
+             lede=f"Fixtures tied to {esc(t['name'])} itself.") if festrows else ""}
+    {section(f"Elsewhere in {esc(c['name'])}" if festrows else "Events",
+             f'<div class="rows">{widerows}</div>',
+             id="" if festrows else "events",
+             lede=f"Nationwide fixtures, not tied to one destination. "
+                  f"The whole European year is on /events.") if widerows else ""}
   </div>
   <aside class="rail">
     <h2 class="mini">Give it {esc(stay)}</h2>
@@ -989,16 +1089,28 @@ def journey_page(data, j):
         if prev is not None:
             km = haversine(prev, t)
             hop = f'<p class="hop">↳ {esc(hop_note(km))} from {esc(prev["name"])}</p>'
-        last = day + leg["nights"] - 1
-        when = f"Day {day}" if leg["nights"] == 1 else f"Days {day}–{last}"
+        # The day numbers are derived at load now (see data.load), so the
+        # page reads them rather than counting again. Two places counting the
+        # same nights is how a journey page and an API disagree about which
+        # day you are in Bergen.
+        when = (f"Day {leg['day_number']}" if leg["nights"] == 1
+                else f"Days {leg['day_number']}–{leg['day_last']}")
+        # §2.7: which recorded places this stop is actually for.
+        stops = "".join(
+            f'<a href="{urls.place(c, r, t, pl)}">{esc(pl["name"])}</a>'
+            for slug in leg.get("places", [])
+            for pl in t.get("places", []) if pl["slug"] == slug
+        )
+        stoprow = (f'<p class="small">Here: {stops}</p>'
+                   if stops else "")
         legs.append(
             f"""<li class="leg">
             <div class="leg-when">{esc(when)}</div>
             <div><h3><a href="{urls.city(c, r, t)}">{esc(t['name'])}</a>
             <span class="small">· {esc(c['name'])}</span></h3>
-            <p>{esc(leg['why'])}</p>{hop}</div></li>"""
+            <p>{esc(leg['why'])}</p>{stoprow}{hop}</div></li>"""
         )
-        day = last + 1
+        day = leg["day_last"] + 1
         prev = t
     countries = []
     for leg in j["legs"]:
@@ -1701,7 +1813,9 @@ EVENT_KIND_NAMES = {
 }
 
 PLACE_KIND_NAMES = {
-    "museum": "Museum", "castle": "Castle", "church": "Church",
+    "museum": "Museum", "gallery": "Gallery", "castle": "Castle",
+    "palace": "Palace", "church": "Church", "mosque": "Mosque",
+    "synagogue": "Synagogue", "lake": "Lake",
     "monastery": "Monastery", "mountain": "Mountain", "waterfall": "Waterfall",
     "beach": "Beach", "monument": "Monument", "archaeological-site": "Archaeological site",
     "park": "Park", "viewpoint": "Viewpoint", "bridge": "Bridge", "market": "Market",
@@ -1723,6 +1837,20 @@ def place_page(data, c, r, t, pl):
     official website. This page holds none of them, and says so instead of
     guessing: those are the three fields that go stale fastest and the three
     a traveller is most damaged by being wrong about."""
+    # The §2.5 edge, read from the destination's own experiences. A place
+    # page could not previously say what there is to DO here — places and
+    # experiences sat side by side under a destination with nothing joining
+    # them. The Louvre is a place; "Renaissance rooms before the coaches
+    # arrive" is an experience that happens in it, and until there was an
+    # edge, neither page could mention the other.
+    HOW = {"at": "Happens here", "from": "Starts here", "about": "About this place"}
+    doing = "".join(
+        f"""<a class="row" href="{urls.experience(c, r, t, e)}">
+        <div><h3>{esc(e['name'])}</h3><p class="rowsub">{esc(e['summary'])}</p></div>
+        <p class="rowmeta">{esc(HOW[link['how']])}</p></a>"""
+        for e in t.get("experiences", [])
+        for link in e.get("at", []) if link["place"] == pl["slug"]
+    )
     others = [x for x in t.get("places", []) if x is not pl]
     nearby = "".join(
         f"""<a class="row" href="{urls.place(c, r, t, x)}">
@@ -1773,6 +1901,9 @@ def place_page(data, c, r, t, pl):
     <p><button class="btn ghost" type="button" data-save="place:{esc(cid)}/{esc(pl['slug'])}"
        data-kind="Place" data-label="{esc(pl['name'])}, {esc(t['name'])}"
        data-url="{urls.place(c, r, t, pl)}">Save to My Europe</button></p>
+    {section("What happens here", f'<div class="rows">{doing}</div>',
+             lede="Experiences tied to this place, and how each one is tied to it — "
+                  "standing on it, starting from it, or looking at it.") if doing else ""}
     {section("Other places in " + t["name"], f'<div class="rows">{nearby}</div>') if nearby else ""}
     {section("Journeys that stop here", f'<div class="rows">{jrows}</div>') if jrows else ""}
   </div>
@@ -3519,8 +3650,25 @@ def countries_api(data):
             regions.append({
                 "slug": r["slug"], "name": r["name"], "url": urls.region(c, r),
                 "interests": r["interests"],
-                "destinations": [{"slug": t["slug"], "name": t["name"],
-                                  "url": urls.city(c, r, t)} for t in r["cities"]],
+                "type": r["type"],
+                # Derived, and it says so: we hold region membership and no
+                # region geometry, so a region's position is the middle of
+                # its own destinations. A consumer that treats this as a
+                # boundary centroid would be wrong, so the source is in the
+                # document rather than in a footnote on a page.
+                "position": r["derived"],
+                "positionSource": r["derived_source"],
+                "destinations": [
+                    dict({"slug": t["slug"], "name": t["name"],
+                          "url": urls.city(c, r, t),
+                          "lat": t["lat"], "lon": t["lon"]},
+                         **({"kind": t["city_type"],
+                             "kindSource": t.get("city_type_source")}
+                            if t.get("city_type") else {}),
+                         **({"population": t["derived"]["population"],
+                             "populationSource": t["derived_source"]}
+                            if t.get("derived", {}).get("population") else {}))
+                    for t in r["cities"]],
             })
         row = {
             "slug": slug,
@@ -3528,6 +3676,11 @@ def countries_api(data):
             "url": urls.country(c),
             "macro": c["macro_slug"],
             "capital": c["capital"],
+            "iso2": c["code"].upper(),
+            # Every derived fact carries the dataset that produced it. A
+            # population with no source is a number a consumer has to trust;
+            # one with a source is a number they can check.
+            "derived": dict(c.get("derived", {}), source=c.get("derived_source")),
             "currency": c["currency"],
             "timezone": c["timezone"],
             "languages": c["languages"],

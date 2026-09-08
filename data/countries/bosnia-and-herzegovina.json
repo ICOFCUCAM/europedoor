@@ -51,19 +51,22 @@
       "name": "Sarajevo Film Festival",
       "month": "aug",
       "where": "Sarajevo",
-      "kind": "exhibition"
+      "kind": "exhibition",
+      "city": "sarajevo"
     },
     {
       "name": "Mostar Old Bridge diving competition",
       "month": "jul",
       "where": "Mostar",
-      "kind": "sport"
+      "kind": "sport",
+      "city": "mostar"
     },
     {
       "name": "Baščaršija Nights",
       "month": "jul",
       "where": "Sarajevo",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "sarajevo"
     }
   ],
   "know": [

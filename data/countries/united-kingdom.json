@@ -56,7 +56,8 @@
       "name": "Edinburgh Festival Fringe — the largest arts festival on earth",
       "month": "aug",
       "where": "Edinburgh",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "edinburgh"
     },
     {
       "name": "Glastonbury Festival",

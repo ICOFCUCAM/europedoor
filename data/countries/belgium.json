@@ -63,7 +63,8 @@
       "name": "Ommegang procession",
       "month": "jul",
       "where": "Brussels",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "brussels"
     },
     {
       "name": "Christmas markets and beer festivals",

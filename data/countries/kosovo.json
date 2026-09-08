@@ -52,13 +52,15 @@
       "name": "DokuFest documentary film festival",
       "month": "aug",
       "where": "Prizren",
-      "kind": "exhibition"
+      "kind": "exhibition",
+      "city": "prizren"
     },
     {
       "name": "Prishtina International Film Festival",
       "month": "jul",
       "where": "Pristina",
-      "kind": "exhibition"
+      "kind": "exhibition",
+      "city": "pristina"
     },
     {
       "name": "Independence Day",

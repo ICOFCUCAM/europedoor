@@ -19,13 +19,55 @@ SLUG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 BUDGETS = ("low", "moderate", "high")
 # The specification's examples, plus the ones Europe actually keeps producing.
+# The Build Package schema names 23 place_types. Ours had 24 and now has 29:
+# palace, mosque, synagogue, lake and gallery were genuinely missing and are
+# added.
+#
+# Two of the schema's types are deliberately NOT here. `restaurant` and
+# `hotel` are businesses, and a business is not a place in this data model —
+# it lives in data/providers.json behind the sponsorship wall, precisely so
+# that nothing anybody can pay for can ever enter the editorial dataset. Let
+# a hotel be a `place` and the wall has a door in it.
 PLACE_KINDS = (
-    "museum", "castle", "church", "monastery", "mountain", "waterfall",
-    "beach", "monument", "archaeological-site", "park", "viewpoint",
-    "bridge", "market", "garden", "island", "cave", "street", "square",
-    "lighthouse", "quarter", "ruin", "theatre", "library", "bath",
+    "museum", "gallery", "castle", "palace", "church", "monastery", "mosque",
+    "synagogue", "mountain", "waterfall", "lake", "beach", "monument",
+    "archaeological-site", "park", "viewpoint", "bridge", "market", "garden",
+    "island", "cave", "street", "square", "lighthouse", "quarter", "ruin",
+    "theatre", "library", "bath",
 )
 PLACE_SEASONS = ("year-round", "summer", "winter", "spring-autumn", "weather-dependent")
+
+# How an experience relates to a place — the §2.5 edge. Three types, because
+# the distinction that matters is where you actually stand:
+#
+#   at      the experience happens there. Swim in Lake Annecy / lake-annecy.
+#   from    it starts there and goes somewhere else. The Fløyen-to-Ulriken
+#           ridge walk begins at Fløyen and ends five hours away.
+#   about   it is about the place without being on it. "Stromboli, from the
+#           water" is a boat looking at a volcano.
+#
+# A conventional travel site would collapse all three into "related", and
+# then a reader would arrive at a trailhead expecting a summit.
+RELATIONSHIPS = ("at", "from", "about")
+
+# Difficulty, for the experiences that have one. Deliberately four plain words
+# rather than a 1-5 scale: a number implies a measurement nobody took, and
+# "grade 3" means nothing to the person deciding whether to bring a child.
+DIFFICULTIES = ("easy", "moderate", "demanding", "serious")
+
+# What shape a journey is. The Build Package calls this journey_type and its
+# examples are all routes; ours separates the three that behave differently
+# when a planner reasons about them.
+JOURNEY_TYPES = ("route", "loop", "base")
+
+# §2.10. Ours nine, theirs nine, five shared — the union, so the sections
+# already written stay valid and the four the schema adds are available
+# without a migration.
+STORY_SECTIONS = (
+    "History", "Culture", "People", "Food", "Travel",      # in both
+    "Adventure", "Faith", "Nature", "Places",              # ours
+    "Architecture", "Tradition", "Discovery", "Local guide",  # the schema's
+)
 # The specification's event categories (§33).
 EVENT_KINDS = ("festival", "concert", "sport", "exhibition", "religious",
                "cultural", "food", "market", "seasonal")
@@ -47,6 +89,36 @@ IMAGE_LICENCES = ("CC0", "CC-BY-4.0", "CC-BY-SA-4.0", "Pexels", "Unsplash",
                   "commissioned", "licensed-stock", "owner-supplied")
 
 SOURCE_KINDS = ("official", "operator", "municipal", "press", "editorial")
+
+# The lifecycle field the Build Package schema asks for. Two values, because a
+# third would be a workflow and there is no editor to run one.
+STATUS = ("published", "draft")
+
+# Fields that come from data/geo/facts.json and may never appear in an
+# authored file. See the note in scripts/map/process.py.
+DERIVED_COUNTRY = ("iso3", "lat", "lon", "latitude", "longitude", "population",
+                   "population_year")
+DERIVED_CITY = ("population", "population_year")
+
+# What a EuropeDoor region IS. The Build Package schema offers state,
+# province, department, canton, autonomous_region, territory and
+# historical_region — all administrative units. Ours are none of those: they
+# are travel regions drawn by editors, and Fjord Norway is not a canton. So
+# the vocabulary carries the administrative values for the day the data model
+# holds real administrative units, and `editorial` for what we actually have —
+# which is also why the map draws a region as its destinations rather than as
+# a boundary. Defaulting to `editorial` rather than leaving it blank is the
+# point: an unstated type is a type a reader will assume.
+REGION_TYPES = ("editorial", "state", "province", "department", "canton",
+                "autonomous_region", "territory", "historical_region")
+
+# city_type in the schema. Ours is wider than the schema's, because half of
+# what this atlas calls a destination is not a settlement: Theth is a village,
+# Lofoten is an archipelago, Madriu-Perafita-Claror is a valley and
+# Mont-Saint-Michel is a site. Calling all 319 of them "city" was already
+# slightly wrong before the schema asked.
+CITY_TYPES = ("capital", "city", "town", "village", "island", "valley",
+              "park", "site")
 
 VERIFICATION_STATUS = ("unverified", "machine-reviewed", "editor-reviewed",
                        "business-verified", "officially-sourced")
@@ -113,6 +185,23 @@ def load():
         p.require(fn == c["slug"] + ".json", where, "filename must match slug")
         p.require(c["slug"] not in countries, where, "duplicate country slug")
         p.require(c.get("budget") in BUDGETS, where, "budget must be one of " + "/".join(BUDGETS))
+
+        # Derived facts are never authored. Same rule as `confidence`, and for
+        # the same reason: a field a person can type is a field somebody will
+        # type the wrong thing into, and a wrong population with no source
+        # attached is indistinguishable from a right one. These come from
+        # data/geo/facts.json, which names the dataset behind every value.
+        for banned in DERIVED_COUNTRY:
+            p.require(banned not in c, where,
+                      f"{banned} is derived from Natural Earth, not authored — "
+                      f"it is in data/geo/facts.json; remove it here")
+
+        # status is the one lifecycle field, and it does something: a draft is
+        # excluded from the build entirely rather than published with a badge
+        # on it. Absent means published, so the 50 files that predate this
+        # field did not have to change.
+        p.require(c.get("status", "published") in STATUS, where,
+                  f"status must be one of {'/'.join(STATUS)}")
         for b in c.get("blocs", []):
             p.require(b in BLOCS, where, f"unknown bloc {b!r}")
         for i in c.get("interests", []):
@@ -126,10 +215,37 @@ def load():
         for band in ("peak", "shoulder"):
             for m in season.get(band, []):
                 p.require(m in months, where, f"unknown month {m!r} in season.{band}")
+        city_slugs = {t["slug"] for r in c.get("regions", []) for t in r.get("cities", [])}
         for f in c.get("festivals", []):
             p.require(f.get("month") in months, where, f"festival {f.get('name')!r}: bad month")
             p.require(f.get("kind") in EVENT_KINDS, where,
                       f"festival {f.get('name')!r}: kind must be one of {'/'.join(EVENT_KINDS)}")
+            p.require(f.get("status", "published") in STATUS, where,
+                      f"festival {f.get('name')!r}: bad status")
+            # ── §2.9, the edge that makes an event part of the graph ─────
+            #
+            # An event used to carry `where` as prose — "Venice, Viareggio,
+            # Ivrea" — which reads fine and joins to nothing. An optional
+            # `city` slug attaches it to a destination we hold, so an event
+            # can appear on the page of the place it happens in. The prose
+            # stays, because three cities in one line is a true sentence the
+            # graph cannot hold.
+            if f.get("city"):
+                p.require(f["city"] in city_slugs, where,
+                          f"festival {f.get('name')!r}: city {f['city']!r} is not a "
+                          f"destination in this country")
+            # start_at / end_at are refused. We hold the MONTH, which is
+            # verifiable and stable — Carnevale is in February and has been
+            # for centuries. Exact dates move every year, need a source per
+            # event per year, and are wrong silently. A month that is right
+            # beats a date that is nearly right.
+            for dated in ("start_at", "end_at", "starts", "ends", "date", "dates"):
+                p.require(dated not in f, where,
+                          f"festival {f.get('name')!r}: {dated!r} needs a source per "
+                          f"event per year and goes wrong silently. We hold the month")
+            for volatile in ("price_from", "price", "website", "tickets"):
+                p.require(volatile not in f, where,
+                          f"festival {f.get('name')!r}: {volatile!r} is volatile")
         p.require(bool(c.get("timezone")), where, "a country needs a time zone")
         # Fact verification. Absent means never checked, and that is the
         # truthful state of almost every record — /sources/freshness publishes
@@ -175,6 +291,17 @@ def load():
                 p.require(key in r, rw, f"missing key {key!r}")
             for i in r.get("interests", []):
                 p.require(i in interests, rw, f"unknown interest {i!r}")
+            p.require(r.get("type", "editorial") in REGION_TYPES, rw,
+                      f"region type must be one of {'/'.join(REGION_TYPES)}")
+            p.require(r.get("status", "published") in STATUS, rw,
+                      f"status must be one of {'/'.join(STATUS)}")
+            # A region has no authored coordinates. Its position is the middle
+            # of its own destinations, computed at load, because that is the
+            # only thing we actually hold — see the note on region geometry in
+            # docs/map-architecture.md.
+            for banned in ("lat", "lon", "latitude", "longitude", "geometry"):
+                p.require(banned not in r, rw,
+                          f"a region's {banned} is derived from its destinations, not authored")
             p.require(len(r.get("cities", [])) >= 1, rw, "a region needs at least one city")
             seen_cities = set()
             for t in r.get("cities", []):
@@ -196,6 +323,19 @@ def load():
                 for i in t.get("interests", []):
                     p.require(i in interests, tw, f"unknown interest {i!r}")
                 p.require(len(t.get("highlights", [])) >= 2, tw, "give a city at least two highlights")
+                p.require(t.get("status", "published") in STATUS, tw,
+                          f"status must be one of {'/'.join(STATUS)}")
+                # city_type may be authored, because it is an editorial
+                # judgement rather than a measurement: whether Lofoten is an
+                # archipelago or a town is a decision, and Natural Earth's
+                # answer for it is "not listed". Where it IS authored it wins
+                # over the derived value, which is the point of allowing it.
+                p.require(t.get("city_type", "city") in CITY_TYPES, tw,
+                          f"city_type must be one of {'/'.join(CITY_TYPES)}")
+                for banned in DERIVED_CITY:
+                    p.require(banned not in t, tw,
+                              f"{banned} is derived from Natural Earth, not authored — "
+                              f"see data/geo/facts.json")
                 # Places: the specification's entity below a destination.
                 # Opening hours, prices and official links are deliberately
                 # absent rather than invented — see docs/data-model.md.
@@ -213,17 +353,89 @@ def load():
                               f"season must be one of {'/'.join(PLACE_SEASONS)}")
                     p.require(34.0 <= pl.get("lat", 0) <= 79.0, pw, "lat off the map")
                     p.require(-26.0 <= pl.get("lon", 0) <= 50.0, pw, "lon off the map")
+                    p.require(pl.get("status", "published") in STATUS, pw,
+                              f"status must be one of {'/'.join(STATUS)}")
+                    # The Build Package schema asks a place for `featured`.
+                    # There is no such field and there will not be one: a
+                    # sponsor pays a provider, and a provider affects
+                    # directory surfaces only. A `featured` flag on an
+                    # editorial place is the whole wall with a door in it, and
+                    # the wall is the only version of that promise worth
+                    # making. Same for rank/boost/sponsored.
+                    for sold in ("featured", "rank", "boost", "sponsored", "promoted"):
+                        p.require(sold not in pl, pw,
+                                  f"{sold!r} would make an editorial place buyable — "
+                                  f"sponsorship attaches to a provider and affects "
+                                  f"directory surfaces only. See docs/legal-position.md")
+                    # And for a rating. We hold none: no visitor numbers, no
+                    # reviews, no survey. checks.py already refuses
+                    # aggregateRating in JSON-LD for the same reason, and a
+                    # number in the data that the structured data refuses to
+                    # publish is a number waiting for somebody to publish it.
+                    for unheld in ("rating", "review_count", "reviews", "stars"):
+                        p.require(unheld not in pl, pw,
+                                  f"{unheld!r} is a measurement we do not hold and cannot "
+                                  f"source — a gap stated beats a gap filled")
                     for volatile in ("hours", "price", "website", "phone"):
                         p.require(volatile not in pl, pw,
                                   f"{volatile!r} is volatile and must not be authored "
                                   "unverified — see docs/data-model.md")
 
+                place_slugs = {pl.get("slug") for pl in t.get("places", [])}
+                seen_exp = set()
                 for e in t.get("experiences", []):
                     ew = f"{tw} > {e.get('slug')}"
                     p.require(SLUG.match(e.get("slug", "")), ew, "experience slug is not a slug")
+                    p.require(e["slug"] not in seen_exp, ew, "duplicate experience slug")
+                    seen_exp.add(e.get("slug"))
                     p.require(e.get("kind") in kinds, ew, f"unknown experience kind {e.get('kind')!r}")
                     p.require(e.get("band") in BUDGETS, ew, "experience band must be low/moderate/high")
                     p.require(bool(e.get("summary")), ew, "an experience needs a summary")
+                    p.require(e.get("status", "published") in STATUS, ew,
+                              f"status must be one of {'/'.join(STATUS)}")
+                    # Optional, and reported as content debt rather than
+                    # demanded: 197 experiences is a lot of judgements to make
+                    # in one sitting, and a required field gets filled in with
+                    # whatever is quickest.
+                    if "difficulty" in e:
+                        p.require(e["difficulty"] in DIFFICULTIES, ew,
+                                  f"difficulty must be one of {'/'.join(DIFFICULTIES)}")
+                    if "season" in e:
+                        p.require(e["season"] in PLACE_SEASONS, ew,
+                                  f"season must be one of {'/'.join(PLACE_SEASONS)}")
+
+                    # ── the place ↔ experience edge, §2.5 ────────────────
+                    #
+                    # An experience is not a place. The Louvre is a place;
+                    # "Renaissance rooms before the coaches arrive" is an
+                    # experience that happens in it. Before this, the two sat
+                    # side by side under a destination with nothing joining
+                    # them, so a place page could not say what there is to do
+                    # there and an experience page could not say where.
+                    #
+                    # The edge is authored, not inferred. A substring match
+                    # between an experience name and a place name gets
+                    # "Waterfront architecture walk" to the Munch Museum,
+                    # which is a plausible-looking lie.
+                    for link in e.get("at", []):
+                        p.require(isinstance(link, dict), ew, "each `at` entry is an object")
+                        if not isinstance(link, dict):
+                            continue
+                        p.require(link.get("place") in place_slugs, ew,
+                                  f"`at` names {link.get('place')!r}, which is not a place in "
+                                  f"this destination — an edge may not cross destinations")
+                        p.require(link.get("how") in RELATIONSHIPS, ew,
+                                  f"`at.how` must be one of {'/'.join(RELATIONSHIPS)}")
+                    for sold in ("featured", "rank", "boost", "sponsored", "promoted"):
+                        p.require(sold not in e, ew,
+                                  f"{sold!r} would make an editorial experience buyable")
+                    for unheld in ("rating", "review_count", "reviews", "stars", "price_from"):
+                        p.require(unheld not in e, ew,
+                                  f"{unheld!r} is a measurement we do not hold. The price band "
+                                  f"is `band`, which is honest about being a band")
+                    for volatile in ("hours", "price", "website", "phone", "booking_url"):
+                        p.require(volatile not in e, ew,
+                                  f"{volatile!r} is volatile and must not be authored")
         countries[c["slug"]] = c
 
     # Macro regions own countries; every country must be owned exactly once.
@@ -273,10 +485,51 @@ def load():
         for m in j.get("months", []):
             p.require(m in months, jw, f"unknown month {m!r}")
         p.require(len(j.get("legs", [])) >= 3, jw, "a journey needs at least three legs")
+        p.require(j.get("type", "route") in JOURNEY_TYPES, jw,
+                  f"journey type must be one of {'/'.join(JOURNEY_TYPES)}")
+        p.require(j.get("status", "published") in STATUS, jw,
+                  f"status must be one of {'/'.join(STATUS)}")
+        for sold in ("featured", "rank", "boost", "sponsored", "promoted"):
+            p.require(sold not in j, jw,
+                      f"{sold!r} would make a journey buyable. Sponsorship attaches to a "
+                      f"provider and affects directory surfaces only")
+        for unheld in ("rating", "review_count", "price_from", "price"):
+            p.require(unheld not in j, jw,
+                      f"{unheld!r} is not a thing we hold. The cost of a journey is "
+                      f"computed from the daily bands and shown as an estimate")
+        # ── §2.7 journey stops ──────────────────────────────────────────
+        #
+        # `sequence` and `day_number` are derived at load: an array already
+        # has an order, and a day number is the sum of the nights before it.
+        # Authoring either is a second source of truth that goes wrong the
+        # first time somebody inserts a leg.
+        #
+        # `arrival_time` and `departure_time` are refused. Those are
+        # timetable facts with a booking system behind them; we hold no
+        # timetables, we own no inventory, and a departure time that is
+        # wrong is the single most damaging thing a travel page can print.
         for leg in j.get("legs", []):
             p.require(leg.get("city") in index, jw, f"leg points at unknown city {leg.get('city')!r}")
             p.require(isinstance(leg.get("nights"), int) and leg["nights"] >= 1, jw, "leg needs nights")
             p.require(bool(leg.get("why")), jw, f"leg {leg.get('city')} needs a why")
+            for banned in ("sequence", "day_number", "day"):
+                p.require(banned not in leg, jw,
+                          f"a leg's {banned!r} is derived from the order and the nights, "
+                          f"not authored")
+            for timetable in ("arrival_time", "departure_time", "arrives", "departs"):
+                p.require(timetable not in leg, jw,
+                          f"{timetable!r} is a timetable fact. We hold no timetables and "
+                          f"a wrong departure time is the most damaging thing this site "
+                          f"could print")
+            # The optional edge from a stop into the graph: which recorded
+            # places this leg is actually for. Validated against that city's
+            # own places, so a stop cannot point somewhere it does not go.
+            if leg.get("city") in index:
+                here = {pl["slug"] for pl in index[leg["city"]]["city"].get("places", [])}
+                for slug in leg.get("places", []):
+                    p.require(slug in here, jw,
+                              f"leg {leg['city']} lists place {slug!r}, which is not "
+                              f"recorded in that destination")
         p.require(j.get("start") == j["legs"][0]["city"], jw, "start must be the first leg")
         p.require(j.get("end") == j["legs"][-1]["city"], jw, "end must be the last leg")
         total = sum(l.get("nights", 0) for l in j.get("legs", []))
@@ -313,6 +566,17 @@ def load():
         p.require(len(st.get("body", [])) >= 4, sw, "a story needs at least four paragraphs")
         for cid in st.get("places", []):
             p.require(cid in index, sw, f"story points at unknown city {cid!r}")
+        # §2.10 story_type. The nine sections already in use were a
+        # convention rather than a vocabulary — nothing stopped the tenth
+        # story inventing "Adventure & Nature" and quietly starting a second
+        # index. This is the union of what we use and what the Build Package
+        # names, so both stay valid and neither drifts.
+        p.require(st.get("section") in STORY_SECTIONS, sw,
+                  f"section must be one of {'/'.join(STORY_SECTIONS)}")
+        p.require(st.get("status", "published") in STATUS, sw,
+                  f"status must be one of {'/'.join(STATUS)}")
+        for sold in ("featured", "sponsored", "promoted", "rank"):
+            p.require(sold not in st, sw, f"{sold!r} would make a story buyable")
 
     seen_f = set()
     for f in fund:
@@ -416,6 +680,81 @@ def load():
     for st in stories:
         for cid in st.get("places", []):
             back[cid]["stories"].append(st)
+
+    # ── derived facts ────────────────────────────────────────────────
+    #
+    # iso3, a country's label point, and population come from Natural Earth
+    # via scripts/map/process.py. They are merged here rather than authored,
+    # and every one arrives with the dataset that produced it attached, so a
+    # page can say where a number came from without anybody remembering to.
+    #
+    # A region's position is computed from its own destinations, because that
+    # is the only thing we hold: we have region membership and no region
+    # geometry. The map has drawn regions that way since it was rebuilt; this
+    # puts the same number in the data model so the API and the map cannot
+    # disagree about where Vestland is.
+    facts = _read(os.path.join(DATA, "geo", "facts.json")) if os.path.exists(
+        os.path.join(DATA, "geo", "facts.json")) else {"countries": {}, "destinations": {}}
+    for c in countries.values():
+        f = facts["countries"].get(c["code"].lower(), {})
+        c["derived"] = {k: v for k, v in f.items() if k != "source"}
+        c["derived_source"] = f.get("source")
+        c.setdefault("status", "published")
+        for r in c["regions"]:
+            r.setdefault("type", "editorial")
+            r.setdefault("status", "published")
+            pts = [(t["lat"], t["lon"]) for t in r["cities"]]
+            r["derived"] = {
+                "lat": round(sum(a for a, _b in pts) / len(pts), 4),
+                "lon": round(sum(b for _a, b in pts) / len(pts), 4),
+                "destinations": len(pts),
+            }
+            r["derived_source"] = "the middle of this region's own destinations"
+            for t in r["cities"]:
+                t.setdefault("status", "published")
+                d = facts["destinations"].get(f'{c["slug"]}/{r["slug"]}/{t["slug"]}', {})
+                t["derived"] = {k: v for k, v in d.items() if k != "source"}
+                t["derived_source"] = d.get("source")
+                # §2.11 transport nodes. The routes half is refused; see the
+                # note in scripts/map/process.py.
+                tr = facts.get("transport", {}).get(
+                    f'{c["slug"]}/{r["slug"]}/{t["slug"]}', {})
+                t["transport"] = tr.get("nodes", [])
+                t["transport_source"] = tr.get("source")
+                # An authored city_type wins over the derived one. Natural
+                # Earth is right about Bergen and has never heard of Theth.
+                if "city_type" not in t and d.get("city_type"):
+                    t["city_type"] = d["city_type"]
+                    t["city_type_source"] = d["source"]
+                elif "city_type" in t:
+                    t["city_type_source"] = "editorial"
+
+    # ── §2.7, derived ────────────────────────────────────────────────
+    #
+    # sequence and day_number, computed rather than authored: an array
+    # already has an order, and a day number is one plus the nights before
+    # it. Authoring either is a second source of truth that goes wrong the
+    # first time somebody inserts a leg in the middle, and goes wrong
+    # silently, because both numbers still look like numbers.
+    for j in journeys:
+        j.setdefault("type", "route")
+        j.setdefault("status", "published")
+        day = 1
+        for i, leg in enumerate(j["legs"]):
+            leg["sequence"] = i + 1
+            leg["day_number"] = day
+            leg["day_last"] = day + leg["nights"] - 1
+            day += leg["nights"]
+
+    # A draft is excluded, not published with a badge on it. This is the one
+    # thing `status` does, and it has to do something: a lifecycle column that
+    # changes nothing is a column that will be set wrongly and never noticed.
+    for slug in [s for s, c in countries.items() if c["status"] == "draft"]:
+        del countries[slug]
+    for c in countries.values():
+        c["regions"] = [r for r in c["regions"] if r["status"] != "draft"]
+        for r in c["regions"]:
+            r["cities"] = [t for t in r["cities"] if t["status"] != "draft"]
 
     return {
         "motions": motions,

@@ -52,7 +52,8 @@
       "name": "Laulupidu, the song festival — 30,000 singers, every five years",
       "month": "jul",
       "where": "Tallinn",
-      "kind": "concert"
+      "kind": "concert",
+      "city": "tallinn"
     },
     {
       "name": "Jaanipäev, midsummer bonfires",
@@ -64,7 +65,8 @@
       "name": "Christmas market in the Town Hall Square",
       "month": "dec",
       "where": "Tallinn",
-      "kind": "market"
+      "kind": "market",
+      "city": "tallinn"
     }
   ],
   "know": [

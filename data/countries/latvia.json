@@ -52,7 +52,8 @@
       "name": "Song and Dance Celebration — every five years, tens of thousands of singers",
       "month": "jul",
       "where": "Riga",
-      "kind": "concert"
+      "kind": "concert",
+      "city": "riga"
     },
     {
       "name": "Jāņi, midsummer with wreaths and cheese",
@@ -64,7 +65,8 @@
       "name": "Riga City Festival",
       "month": "aug",
       "where": "Riga",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "riga"
     }
   ],
   "know": [

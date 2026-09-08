@@ -126,7 +126,13 @@
               "name": "The covered passages",
               "kind": "walk",
               "band": "low",
-              "summary": "Glass-roofed arcades built before the department store and mostly forgotten since — a two-hour walk in the dry."
+              "summary": "Glass-roofed arcades built before the department store and mostly forgotten since — a two-hour walk in the dry.",
+              "at": [
+                {
+                  "place": "passages-couverts",
+                  "how": "at"
+                }
+              ]
             }
           ],
           "places": [
@@ -531,7 +537,13 @@
               "name": "A small Saint-Émilion cellar",
               "kind": "cellar",
               "band": "moderate",
-              "summary": "Skip the classified growths and visit a family making 20,000 bottles; you will taste from the barrel and be told the truth about the vintage."
+              "summary": "Skip the classified growths and visit a family making 20,000 bottles; you will taste from the barrel and be told the truth about the vintage.",
+              "at": [
+                {
+                  "place": "saint-emilion",
+                  "how": "at"
+                }
+              ]
             }
           ],
           "places": [
@@ -728,7 +740,13 @@
               "name": "Down to the Mer de Glace",
               "kind": "walk",
               "band": "moderate",
-              "summary": "The steps to the ice are signed with the year the glacier reached each level; the descent is a chronology as much as a walk."
+              "summary": "The steps to the ice are signed with the year the glacier reached each level; the descent is a chronology as much as a walk.",
+              "at": [
+                {
+                  "place": "mer-de-glace",
+                  "how": "at"
+                }
+              ]
             }
           ],
           "places": [
@@ -848,7 +866,13 @@
               "name": "Swim in Lake Annecy",
               "kind": "water",
               "band": "low",
-              "summary": "Fed by mountain springs and cleaned up by a 1960s sewer scheme that is now the textbook example; you can see the bottom at four metres."
+              "summary": "Fed by mountain springs and cleaned up by a 1960s sewer scheme that is now the textbook example; you can see the bottom at four metres.",
+              "at": [
+                {
+                  "place": "lake-annecy",
+                  "how": "at"
+                }
+              ]
             }
           ],
           "places": [

@@ -61,7 +61,8 @@
       "name": "Genocide Remembrance Day",
       "month": "apr",
       "where": "Yerevan",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "yerevan"
     }
   ],
   "know": [

@@ -63,7 +63,8 @@
       "name": "Oktoberfest — which starts in September",
       "month": "sep",
       "where": "Munich",
-      "kind": "food"
+      "kind": "food",
+      "city": "munich"
     },
     {
       "name": "Christmas markets",

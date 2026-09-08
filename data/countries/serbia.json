@@ -50,7 +50,8 @@
       "name": "EXIT festival, in a Habsburg fortress",
       "month": "jul",
       "where": "Novi Sad",
-      "kind": "concert"
+      "kind": "concert",
+      "city": "novi-sad"
     },
     {
       "name": "Guča trumpet festival",
@@ -62,7 +63,8 @@
       "name": "Belgrade Beer Fest",
       "month": "aug",
       "where": "Belgrade",
-      "kind": "food"
+      "kind": "food",
+      "city": "belgrade"
     }
   ],
   "know": [

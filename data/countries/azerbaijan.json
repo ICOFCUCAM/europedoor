@@ -54,7 +54,8 @@
       "name": "Baku Jazz Festival",
       "month": "oct",
       "where": "Baku",
-      "kind": "concert"
+      "kind": "concert",
+      "city": "baku"
     },
     {
       "name": "Pomegranate Festival",

@@ -52,7 +52,8 @@
       "name": "Bergen International Festival",
       "month": "may",
       "where": "Bergen",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "bergen"
     },
     {
       "name": "Midnight sun period",
@@ -202,7 +203,13 @@
               "name": "Maihaugen open-air museum",
               "kind": "museum",
               "band": "moderate",
-              "summary": "Two hundred buildings moved log by log from across Gudbrandsdalen; the point is the carpentry, not the costumes."
+              "summary": "Two hundred buildings moved log by log from across Gudbrandsdalen; the point is the carpentry, not the costumes.",
+              "at": [
+                {
+                  "place": "maihaugen",
+                  "how": "at"
+                }
+              ]
             }
           ],
           "places": [
@@ -277,7 +284,13 @@
               "name": "Vemork and the heavy water raid",
               "kind": "museum",
               "band": "moderate",
-              "summary": "The plant, the pipeline the saboteurs climbed, and an account that does not tidy up how close it came to failing."
+              "summary": "The plant, the pipeline the saboteurs climbed, and an account that does not tidy up how close it came to failing.",
+              "at": [
+                {
+                  "place": "vemork",
+                  "how": "at"
+                }
+              ]
             }
           ],
           "places": [
@@ -432,7 +445,13 @@
               "name": "Fløyen to Ulriken ridge walk",
               "kind": "walk",
               "band": "low",
-              "summary": "Five hours along the tops between the two cable cars, with the city on one side and nothing but bog and rock on the other."
+              "summary": "Five hours along the tops between the two cable cars, with the city on one side and nothing but bog and rock on the other.",
+              "at": [
+                {
+                  "place": "floyen",
+                  "how": "from"
+                }
+              ]
             },
             {
               "slug": "bergen-fish-counter-lunch",
@@ -616,7 +635,13 @@
               "name": "Preikestolen, early",
               "kind": "walk",
               "band": "low",
-              "summary": "Eight kilometres round on rock and boardwalk. Start before seven; by eleven there is a queue for the photograph and no railing to queue behind."
+              "summary": "Eight kilometres round on rock and boardwalk. Start before seven; by eleven there is a queue for the photograph and no railing to queue behind.",
+              "at": [
+                {
+                  "place": "preikestolen",
+                  "how": "at"
+                }
+              ]
             }
           ],
           "places": [
@@ -1034,7 +1059,13 @@
               "name": "Cold-water surf at Unstad",
               "kind": "water",
               "band": "moderate",
-              "summary": "Beach break inside the Arctic Circle, 6mm of neoprene, and a sauna afterwards that you will remember longer than the waves."
+              "summary": "Beach break inside the Arctic Circle, 6mm of neoprene, and a sauna afterwards that you will remember longer than the waves.",
+              "at": [
+                {
+                  "place": "unstad-beach",
+                  "how": "at"
+                }
+              ]
             }
           ],
           "places": [

@@ -59,7 +59,8 @@
       "name": "Bratislava Coronation festivities",
       "month": "sep",
       "where": "Bratislava",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "bratislava"
     },
     {
       "name": "Christmas markets",

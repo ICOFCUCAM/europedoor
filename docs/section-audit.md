@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**100 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 1 locked · 1 refused · 1 built (deliberately smaller) · 1282 assertions · 0 failing**
+**101 sections · 39 partial · 31 built · 17 deferred · 11 recorded · 1 locked · 1 refused · 1 built (deliberately smaller) · 1300 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -34,6 +34,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 21 | AI safety and reliability | PARTIAL | 4 | The refusals are built; the model that would need them is not. Volatile fields are refused at the schema level, which is stronger than a prompt. |
 | 22 | AI travel assistant | DEFERRED | 2 | Needs accounts, a saved itinerary on a server and a model. All three are blocked; none is pretended. |
 | 23 | Map system | BUILT | 13 | Real geography from public-domain data we host ourselves, three levels of detail, the Europe-country-region-destination drill-down, togglable layers, a journey overlay and the popup card. No map provider, no key, no recurring cost. |
+| 23b | The knowledge graph — Build Package v1 §2 | BUILT | 18 | Every entity and field the schema names, audited in docs/schema-mapping.md: what exists, what was built for it, and the seventeen fields refused because they are promises rather than shortfalls. |
 | 24 | Search engine | BUILT | 5 | All five of the specification's query shapes, answered in the browser, with the interpretation shown back. |
 | 25 | Search result types | BUILT | 10 | Nine result types, grouped, ranked by relevance and freshness of match — and no paid placement, because there is no field that could carry one. |
 | 26 | My Europe | PARTIAL | 11 | Saving, collections and bucket lists all work, in the browser — and a saved list moves between devices as text, which the specification files under authentication and which turns out not to need it. Accounts remain blocked on a data controller. |

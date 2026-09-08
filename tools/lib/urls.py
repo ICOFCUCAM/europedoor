@@ -108,6 +108,18 @@ def fund_project(p):
     return f"/fund/{p['slug']}"
 
 
+def experience(c, r, t, e):
+    """An experience has no page of its own; it is a row on its destination.
+
+    Deliberately not a page: 197 experiences would be 197 thin pages, and the
+    thing a reader actually wants — everything there is to do in Bergen, in
+    one place — is the destination. So the URL is an anchor into that list,
+    which is a real, linkable, shareable location and costs nothing to keep
+    correct.
+    """
+    return f"{city(c, r, t)}#exp-{e['slug']}"
+
+
 def experience_kind(k):
     return f"/experiences/kind/{k}"
 

@@ -59,7 +59,8 @@
       "name": "Galway International Arts Festival",
       "month": "jul",
       "where": "Galway",
-      "kind": "cultural"
+      "kind": "cultural",
+      "city": "galway"
     },
     {
       "name": "Fleadh Cheoil, the traditional music championship",
