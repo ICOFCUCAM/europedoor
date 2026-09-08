@@ -226,12 +226,41 @@ current stack.
 
 ### Phase A — Geography becomes the interface
 
-1. **A real map.** Vector boundaries, zoom, country → region → destination
-   drill-down, layers bound to the graph, and the existing text alternative
-   kept. Needs a licensing decision on boundary data — **the first thing to
-   put to the owner.**
+1. ~~**A real map.**~~ **BUILT.** Real coastlines and borders from Natural
+   Earth, public domain, fetched and hashed by `scripts/map/fetch.py` and
+   processed into `data/geo/` by `scripts/map/process.py` — both re-runnable,
+   both checked for staleness in CI. Three levels of detail: the coarse one is
+   inline so the map draws with JavaScript off, the finer continent file
+   arrives when you zoom past 1.6×, and each country has its own. Fifty
+   countries: 44 as shapes, and Monaco, Vatican City and four more at the
+   widest zoom as ringed points, because at 1:50 million they have no polygon
+   and inventing one would have been a lie about a measurement.
+
+   The drill-down is Europe → country → region → destination and every rung is
+   an `<a href>` before any script runs: `/europe/norway` →
+   `/europe/norway/vestland` → `/europe/norway/vestland/bergen`. Country pages
+   got the middle rung they never had — a map of the country with its regions
+   and destinations on it, labels decluttered by content depth.
+
+   **Cost: €0/month, and a check enforces it.** No provider, no key, no tile
+   server, no request off this origin. `checks.py` fails the build on a page or
+   script naming a commercial map host.
+
+   What is *not* built, and why: region **boundaries**. That needs Eurostat
+   NUTS, whose data is copyrighted with provisions a person has to accept, and
+   the terms could not be read from the build environment. Documented and
+   stopped rather than guessed — see
+   `docs/data-licenses/eurostat-gisco-nuts.md`. Regions are drawn as their
+   destinations grouped and named, which is exactly what we hold.
+
+   The rebuild also found a projection bug a year old: the map claimed to
+   correct for latitude and multiplied x by `cos(52°)/cos(52°)`, so Europe had
+   been 60% too wide since the map was written. Nobody could see it, because
+   313 dots on an empty rectangle are the right shape by definition.
 2. **Map as navigation**, not a page: reachable from the masthead and the
-   thumb bar, with state in the URL.
+   thumb bar. **PARTIAL** — the selection is now in the URL (`/map?c=norway`),
+   so a drilled-in map can be sent to somebody; the navigation entry is not
+   done.
 
 ### Phase B — Discovery becomes the product
 
@@ -347,10 +376,24 @@ decision.
 
 ## The three decisions that are the owner's, not mine
 
-1. **Map provider and boundary licensing.** Everything in Phase A depends on
-   it, and it is the first recurring cost this project would take on.
-   Options are open data (self-hosted tiles, free, operational work) or a
-   commercial provider (a bill, less work, some lock-in).
+1. ~~**Map provider and boundary licensing.**~~ **ANSWERED, 2026-09-08, by the
+   owner: EuropeDoor does not pay for maps.** No commercial provider, no paid
+   API, no per-load billing, no key that creates a recurring map cost, and no
+   dependence on somebody else's public tile server. The map is self-hosted
+   open data on our own CDN.
+
+   Built on that decision: Natural Earth (public domain) fetched, hashed,
+   committed and processed by `scripts/map/`; three levels of detail in
+   `data/geo/`; the Europe → country → region → destination drill-down; layers
+   that toggle; €0 of recurring cost. See `docs/map-architecture.md`.
+
+   One licensing question stayed open rather than being guessed at: **Eurostat
+   NUTS** would give real region *boundaries*, and its data is copyrighted with
+   provisions that must be accepted by a person. The provisions could not be
+   read from the build environment, so nothing was imported. The seven answers
+   §24 of the map brief asks for are in
+   `docs/data-licenses/eurostat-gisco-nuts.md`; the recommendation there is to
+   ship without it, which is what happened.
 2. **Whether to start the Next.js/Postgres migration before the entity
    exists.** I recommend no, for the reasons in §20 above. It is a strategic
    call and I have not started it.
@@ -358,5 +401,5 @@ decision.
    cover Albarracín or Theth — which is precisely the product. See
    `docs/images.md`.
 
-Until those are answered, Phases B and C are entirely unblocked and are where
-the work goes.
+Decision 1 is answered and Phase A's map is built. Decisions 2 and 3 remain
+the owner's; Phases B and C are complete.

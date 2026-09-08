@@ -1004,16 +1004,93 @@ async function main() {
   ok(/Cit|Region|Place/.test(s5.heads), "results are not grouped by type");
 
   // ── the map ────────────────────────────────────────────────────────
+  //
+  // The controls live in a closed <details> under the map, because the first
+  // layout put thirteen interest filters and two selects between the headline
+  // and the drawing and a 1280x1000 laptop opened the page called "the map"
+  // with no map on it. Opening it is now a real user action, so the check
+  // performs it rather than assuming it.
   await page.goto(base + "/map", { waitUntil: "networkidle" });
   const dots = await page.locator("#dots .dot").count();
   ok(dots > 200, `map drew only ${dots} cities`);
+  await page.locator(".maptools > summary").click();
   await page.check('#layers input[value="winter"]');
   await page.waitForTimeout(120);
   const lit = await page.locator("#dots .dot:not(.off)").count();
   ok(lit > 0 && lit < dots, `winter layer lit ${lit} of ${dots} — filtering is not working`);
 
+  // ── real geography ─────────────────────────────────────────────────
+  //
+  // The map used to be 313 dots on an empty rectangle and its own note said
+  // there were no coastlines because we had no licence to draw any. These
+  // assertions are what stops that regressing quietly: a map that loses its
+  // land still renders, still passes every HTML check, and looks like a
+  // styling accident rather than a missing dataset.
+  await page.goto(base + "/map", { waitUntil: "networkidle" });
+  const shapes = await page.locator("#countries .cshape").count();
+  const pts = await page.locator("#nogeo .cpoint").count();
+  ok(shapes > 40, `the map drew only ${shapes} country shapes`);
+  ok(shapes + pts === 50, `${shapes} shapes + ${pts} points is not the 50 countries in the Atlas`);
+  const noHref = await page.locator("#countries .cshape:not([href])").count();
+  ok(noHref === 0, `${noHref} country shapes have no href — the drill-down must be links first`);
+
+  // Nothing is fetched from anywhere but this origin. The whole point of the
+  // architecture is that there is no map bill, and a stray absolute URL is
+  // how that stops being true.
+  const external = [];
+  page.on("request", (r) => {
+    if (!r.url().startsWith(base)) external.push(r.url());
+  });
+  await page.goto(base + "/map", { waitUntil: "networkidle" });
+
+  // Clicking a country: panel, regions, destinations, a way in, and the
+  // selection in the URL so a drilled-in map can be sent to somebody.
+  await page.evaluate(() =>
+    document.getElementById("cshape-norway").dispatchEvent(
+      new MouseEvent("click", { bubbles: true, cancelable: true, button: 0 })));
+  await page.waitForSelector("#countrypanel:not([hidden])");
+  const cpanel = await page.locator("#countrypanel").textContent();
+  ok(/Norway/.test(cpanel), "the country panel does not name the country");
+  const regionLinks = await page.locator("#countrypanel .regionlist .rlink").count();
+  ok(regionLinks >= 5, `Norway shows ${regionLinks} regions in the panel`);
+  ok(await page.locator("#countrypanel .btn").getAttribute("href") === "/europe/norway",
+     "the panel's way in does not point at the country page");
+  ok(/c=norway/.test(await page.evaluate(() => location.search)),
+     "the selection is not in the URL, so a drilled-in map cannot be shared");
+
+  // The region and destination rows are real pages, not decoration. This is
+  // the §58 rule: no dead buttons.
+  const rHref = await page.locator("#countrypanel .rlink").first().getAttribute("href");
+  const dHref = await page.locator("#countrypanel .regionlist a").nth(1).getAttribute("href");
+  for (const href of [rHref, dHref]) {
+    const res = await page.request.get(base + href);
+    ok(res.status() === 200, `the panel links to ${href}, which is ${res.status()}`);
+  }
+
+  // Selecting a country zooms to it and loads that country's own geometry.
+  const vb = await page.locator("#europemap").getAttribute("viewBox");
+  ok(Number(vb.split(/\s+/)[2]) < 1000, `selecting a country did not zoom the map (${vb})`);
+  await page.waitForFunction(() => document.querySelectorAll("#detail .cshape").length > 0,
+                             null, { timeout: 8000 });
+  const detailed = await page.locator("#detail .cshape").count();
+  ok(detailed > 0, "the country's own level of detail never loaded");
+  ok(external.length === 0,
+     `the map fetched ${external.length} thing(s) off this origin: ${external.slice(0, 2)}`);
+
+  // Back to the whole continent, and the selection leaves the URL with it.
+  await page.locator("#zoomreset").click();
+  ok(await page.locator("#countrypanel").isHidden(), "the panel will not close");
+  // Compared as numbers, not as a string: applyView writes the viewBox with
+  // toFixed(1), so the reset value is "0.0 0.0 1000.0 780.0" and a string
+  // comparison against the markup's "0 0 1000 780" fails on formatting while
+  // reporting a behavioural fault.
+  const back = (await page.locator("#europemap").getAttribute("viewBox")).split(/\s+/).map(Number);
+  ok(back[0] === 0 && back[1] === 0 && back[2] === 1000 && back[3] === 780,
+     `'Whole of Europe' left the view at ${back.join(" ")}`);
+
   // Map popups, the places layer and distance from a chosen origin.
   await page.goto(base + "/map", { waitUntil: "networkidle" });
+  await page.locator(".maptools > summary").click();
   await page.selectOption("#mapfrom", { index: 5 });
   await page.locator("#dots .dot").nth(40).click();
   await page.waitForSelector("#mappopup:not([hidden])");
@@ -1023,8 +1100,30 @@ async function main() {
   await page.locator(".mappopup-close").click();
   ok(await page.locator("#mappopup").isHidden(), "the popup will not close");
   ok(await page.locator("#places").isHidden(), "the places layer starts visible");
-  await page.check('#layers input[value="places"]');
+  await page.check('#geolayers input[value="places"]');
   ok(!(await page.locator("#places").isHidden()), "the places layer will not turn on");
+  await page.check('#geolayers input[value="regions"]');
+  await page.waitForTimeout(120);
+  const rlabels = await page.locator("#regions .rlabel").count();
+  ok(rlabels > 10, `the regions layer drew ${rlabels} groupings`);
+  await page.uncheck('#geolayers input[value="cities"]');
+  ok(await page.locator("#dots").isHidden(), "the destinations layer will not turn off");
+
+  // ── the country map ────────────────────────────────────────────────
+  //
+  // The middle rung of Europe -> country -> region -> destination, which did
+  // not exist before there was geometry: a country page could list its
+  // regions and could not show you where any of them were.
+  await page.goto(base + "/europe/italy", { waitUntil: "networkidle" });
+  ok(await page.locator(".countrymap svg").count() === 1, "Italy has no country map");
+  ok(await page.locator(".countrymap .countries path.here").count() > 0,
+     "the country map does not pick out the country it is of");
+  const cmDots = await page.locator(".countrymap .minidot").count();
+  ok(cmDots > 15, `the Italy map drew ${cmDots} destinations`);
+  const cmCap = await page.locator(".countrymap figcaption").textContent();
+  ok(/Natural Earth/.test(cmCap), "the country map does not say where its coastline came from");
+  ok(/groupings, not boundaries/.test(cmCap),
+     "the country map does not say that its regions are not boundaries");
 
 
   // ── saved places ───────────────────────────────────────────────────
@@ -1316,7 +1415,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 480;
+  const FLOOR = 540;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +

@@ -126,6 +126,27 @@ def build():
             shutil.copytree(src, os.path.join(OUT, "assets", sub))
     shutil.copy(os.path.join(ROOT, "assets", "door.svg"), os.path.join(OUT, "assets", "door.svg"))
 
+    # The map geometry. Published under /api/geo/ rather than /assets/ because
+    # it is data the page fetches, not an asset the page references, and
+    # because the two directories get different Cache-Control: geometry that
+    # changes when Natural Earth ships a release should not be immutable for a
+    # year. The continent file is already inline in /map, so nothing here is
+    # needed for the map to draw — these are the detail levels a browser asks
+    # for when somebody zooms into a country. With JavaScript off none of them
+    # is ever requested and the map still works.
+    geo_src = os.path.join(ROOT, "data", "geo")
+    geo_n = 0
+    if os.path.isdir(geo_src):
+        for root, _dirs, names in os.walk(geo_src):
+            for name in sorted(names):
+                if not name.endswith(".json"):
+                    continue
+                rel = os.path.relpath(os.path.join(root, name), geo_src)
+                dst = os.path.join(OUT, "api", "geo", rel)
+                os.makedirs(os.path.dirname(dst), exist_ok=True)
+                shutil.copy(os.path.join(root, name), dst)
+                geo_n += 1
+
     canonical = [
         "/" if p == "/index.html" else p[: -len("index.html")].rstrip("/")
         for p in written
@@ -174,7 +195,7 @@ def build():
     card_note = f", {len(wanted)} cards"
     if made or pruned:
         card_note += f" ({made} rendered, {pruned} pruned)"
-    print(f"{len(written)} pages + api + sitemap{card_note} → site/")
+    print(f"{len(written)} pages + api + sitemap{card_note} + {geo_n} geometry files → site/")
     return d, written
 
 

@@ -1,0 +1,162 @@
+#!/usr/bin/env python3
+"""Stage 1 of the map pipeline: DOWNLOAD -> VERIFY -> RECORD.
+
+    python3 scripts/map/fetch.py            download anything missing
+    python3 scripts/map/fetch.py --force    re-download everything
+    python3 scripts/map/fetch.py --verify   check the bytes on disk, fetch nothing
+
+This is the only place in the repository that opens a network socket, and it
+is deliberately not part of `tools/build.py`. The build must run on a host with
+no internet and produce identical pages, so the raw sources and the processed
+geometry are both committed. Fetching is a thing a person does when a dataset
+version changes, not a thing that happens on every deploy.
+
+Three rules, each of which exists because the opposite is the normal failure:
+
+1. **No entry in the register, no download.** The URL list lives in
+   docs/data-licenses/sources.json, next to the licence records, so adding a
+   dataset means writing down its terms in the same commit.
+
+2. **No licence document, no download.** The `licence_doc` named by an entry
+   must already exist as a file. A licence written after the data arrives is a
+   licence written to fit what was already done.
+
+3. **The `blocked` list is refused by id.** Naming a blocked dataset on the
+   command line prints why it is blocked and exits non-zero. Eurostat NUTS is
+   in that list; see docs/data-licenses/eurostat-gisco-nuts.md.
+
+Stdlib only, like everything else here.
+"""
+
+import gzip
+import hashlib
+import json
+import os
+import sys
+import urllib.request
+
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+REGISTER = os.path.join(ROOT, "docs", "data-licenses", "sources.json")
+LICDIR = os.path.join(ROOT, "docs", "data-licenses")
+
+# GitHub answers a request with no User-Agent, but says so in the logs and is
+# within its rights to stop. Identify the fetcher.
+UA = "EuropeDoor-map-pipeline/1 (+https://europedoor.com; static site build)"
+
+
+def sha256(b):
+    return hashlib.sha256(b).hexdigest()
+
+
+def load():
+    with open(REGISTER, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def save(reg):
+    with open(REGISTER, "w", encoding="utf-8") as fh:
+        json.dump(reg, fh, indent=2, ensure_ascii=False)
+        fh.write("\n")
+
+
+def read_local(path):
+    """Return the bytes as stored — gzipped on disk stays gzipped here.
+
+    The hash we record is the hash of the file in the repository, not of the
+    decompressed content, because the point of the hash is 'is this the file I
+    checked' and gzip is not deterministic across versions.
+    """
+    with open(path, "rb") as fh:
+        return fh.read()
+
+
+def download(url):
+    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    with urllib.request.urlopen(req, timeout=180) as resp:
+        return resp.read()
+
+
+def store(path, raw):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    if path.endswith(".gz"):
+        # mtime=0 so the same source produces the same bytes on every machine.
+        # Without it every fetch shows as a change in `git diff` even when the
+        # upstream file has not moved, and a diff that is always dirty is a
+        # diff nobody reads.
+        with open(path, "wb") as fh:
+            with gzip.GzipFile(fileobj=fh, mode="wb", mtime=0) as gz:
+                gz.write(raw)
+    else:
+        with open(path, "wb") as fh:
+            fh.write(raw)
+    return read_local(path)
+
+
+def main(argv):
+    force = "--force" in argv
+    verify = "--verify" in argv
+    wanted = [a for a in argv[1:] if not a.startswith("-")]
+
+    reg = load()
+    blocked = {b["id"]: b for b in reg.get("blocked", [])}
+    for name in wanted:
+        if name in blocked:
+            b = blocked[name]
+            print(f"REFUSED: {name} — {b['dataset']}")
+            print(f"  licence: {b['licence']}")
+            print(f"  reason:  {b['reason']}")
+            print(f"  read:    docs/data-licenses/{b['licence_doc']}")
+            return 2
+
+    bad = 0
+    for src in reg["sources"]:
+        if wanted and src["id"] not in wanted:
+            continue
+        path = os.path.join(ROOT, src["path"])
+        doc = os.path.join(LICDIR, src["licence_doc"])
+        if not os.path.exists(doc):
+            print(f"REFUSED: {src['id']} has no licence record at "
+                  f"docs/data-licenses/{src['licence_doc']}")
+            bad += 1
+            continue
+
+        if verify:
+            if not os.path.exists(path):
+                print(f"MISSING  {src['id']:<16} {src['path']}")
+                bad += 1
+                continue
+            got = sha256(read_local(path))
+            if src["sha256"] and got != src["sha256"]:
+                print(f"CHANGED  {src['id']:<16} recorded {src['sha256'][:12]} "
+                      f"on disk {got[:12]}")
+                bad += 1
+            else:
+                print(f"ok       {src['id']:<16} {src['bytes']:>9,} bytes  "
+                      f"{got[:12]}")
+            continue
+
+        if os.path.exists(path) and not force:
+            print(f"have     {src['id']:<16} {src['path']}")
+            continue
+
+        print(f"fetch    {src['id']:<16} {src['url']}")
+        try:
+            raw = download(src["url"])
+        except Exception as exc:            # noqa: BLE001 — report, do not crash
+            print(f"  FAILED: {exc}")
+            bad += 1
+            continue
+        stored = store(path, raw)
+        src["sha256"] = sha256(stored)
+        src["bytes"] = len(stored)
+        src["fetched"] = __import__("datetime").date.today().isoformat()
+        print(f"  {len(raw):,} bytes source -> {len(stored):,} on disk  "
+              f"{src['sha256'][:12]}")
+
+    if not verify:
+        save(reg)
+    return 1 if bad else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

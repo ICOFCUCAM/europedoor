@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import math
 
+from . import geo
 from . import urls
 from .render import (LD_PUBLISHER, SITE_NAME, SITE_TAGLINE, card, chips, crumbs,
                      esc, factlist, grid,
@@ -575,6 +576,7 @@ def country_page(data, c):
   </aside>
 </div>
 
+{countrymap(data, c)}
 {section("Travel regions", grid(region_cards, 3), id="regions",
          lede=f"{len(c['regions'])} editorial regions, each opening onto its cities.")}
 
@@ -1378,6 +1380,138 @@ STAY_NOTE = """<div class="note">
 </div>"""
 
 
+def _declutter(items, w, h):
+    """Greedy label placement: keep a label only if its box is still free.
+
+    Norway has 25 destinations in six regions and the first version drew all
+    31 labels at their exact positions, so "Østlandet & the East" sat across
+    "Fjord Norway" sat across four city names and the map was a smear. The
+    fix is the oldest one in cartography: decide an order of importance and
+    drop what does not fit.
+
+    `items` are (priority, x, y, width, height, svg) with priority 0 first.
+    Anything that collides with something already placed is dropped, not
+    moved — nudging a label away from its own dot is how a map starts lying
+    about where things are.
+    """
+    placed, out = [], []
+    for pri, x, y, bw, bh, svg in sorted(items, key=lambda i: i[0]):
+        b = (x, y - bh, x + bw, y)
+        if b[0] < -20 or b[2] > w + 20 or b[1] < 0 or b[3] > h:
+            continue
+        if any(not (b[2] < o[0] or b[0] > o[2] or b[3] < o[1] or b[1] > o[3])
+               for o in placed):
+            continue
+        placed.append(b)
+        out.append(svg)
+    return out
+
+
+def countrymap(data, c):
+    """The country, drawn, with its regions and every destination on it.
+
+    This is the middle rung of Europe -> country -> region -> destination, and
+    before there was geometry it was the rung that did not exist: a country
+    page could list its regions but could not show you where they were.
+
+    Regions are drawn as their destinations grouped and labelled, not as
+    boundaries. We hold which region a destination belongs to; we do not hold
+    region geometry, because the dataset that has it is blocked on a licensing
+    question (docs/data-licenses/eurostat-gisco-nuts.md). A hull drawn round
+    Bergen and Ålesund and labelled Vestland would look like an answer and be
+    a guess, and a map that guesses once can be trusted about nothing.
+    """
+    doc = geo.country(c["slug"])
+    allpts = [(r, t) for r in c["regions"] for t in r["cities"]]
+    if not doc or not allpts:
+        return ""
+    w, h = 900, 560
+
+    # The frame is the country's own geometry, and nothing else. An earlier
+    # version widened it to hold every destination, which for Norway means
+    # Longyearbyen at 78°N — 700 km beyond the top of the drawn coastline —
+    # and produced a map that was two-fifths empty sea with Norway squeezed
+    # into a corner. One outlier should cost one marker, not the whole frame.
+    if doc.get("bbox"):
+        bbox = list(doc["bbox"])
+    else:
+        # Vatican City has no polygon at any scale. Frame it on its own
+        # destinations so every country page has the same shape.
+        lons = [t["lon"] for _r, t in allpts]
+        lats = [t["lat"] for _r, t in allpts]
+        bbox = [min(lons) - 0.25, min(lats) - 0.2, max(lons) + 0.25, max(lats) + 0.2]
+    proj = geo.Projection(bbox, w, h, pad=0.05)
+    ctx, land = geo.landmass(proj, (0, 0, w, h), doc=doc, highlight=c["slug"])
+
+    # When two destination labels collide the one we have written more about
+    # wins, so a country map keeps Bergen and drops Geiranger rather than the
+    # other way round because of where the alphabet put them.
+    depth = {}
+    for _r, t in allpts:
+        depth[id(t)] = (len(t.get("places", [])) * 2 + len(t.get("experiences", []))
+                        + len(t["highlights"]))
+    deepest = max(depth.values()) or 1
+
+    dots, ties, labels, offframe = [], [], [], []
+    for r in c["regions"]:
+        rp = []
+        for t in r["cities"]:
+            x, y = proj.xy(t["lat"], t["lon"])
+            if not (-8 <= x <= w + 8 and -8 <= y <= h + 8):
+                offframe.append((r, t))
+                continue
+            rp.append((x, y))
+            dots.append(
+                f'<a class="minidot" href="{urls.city(c, r, t)}">'
+                f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.4"/>'
+                f'<title>{esc(t["name"])} — {esc(r["name"])}</title></a>'
+            )
+            labels.append((
+                2.0 - depth[id(t)] / deepest, x + 7, y + 4, len(t["name"]) * 6.0 + 8, 13,
+                f'<text class="minilabel" x="{x + 7:.1f}" y="{y + 4:.1f}">'
+                f'{esc(t["name"])}</text>'
+            ))
+        if len(rp) > 1:
+            cx = sum(p[0] for p in rp) / len(rp)
+            cy = sum(p[1] for p in rp) / len(rp)
+            ties.extend(
+                f'<line class="rtie" x1="{cx:.1f}" y1="{cy:.1f}" x2="{x:.1f}" y2="{y:.1f}"/>'
+                for x, y in rp
+            )
+            # Priority 0: a region name is the thing this map is for, so it
+            # displaces a destination label rather than the other way round.
+            tw = len(r["name"]) * 8.4
+            labels.append((
+                0, cx - tw / 2, cy - 10, tw, 19,
+                f'<a class="rlabel" href="{urls.region(c, r)}">'
+                f'<text x="{cx:.1f}" y="{cy - 10:.1f}">{esc(r["name"])}</text>'
+                f'<title>{esc(r["name"])} — {len(r["cities"])} destinations</title></a>'
+            ))
+
+    shown = sum(len(r["cities"]) for r in c["regions"]) - len(offframe)
+    note = ""
+    if offframe:
+        links = ", ".join(
+            f'<a href="{urls.city(c, r, t)}">{esc(t["name"])}</a>' for r, t in offframe[:4]
+        )
+        more = f' and {len(offframe) - 4} more' if len(offframe) > 4 else ""
+        note = (f' {len(offframe)} outside this frame: {links}{more} — too far from the '
+                f'mainland to draw at this scale without emptying the map.')
+    return (
+        f'<figure class="minimap countrymap"><svg viewBox="0 0 {w} {h}" role="img" '
+        f'aria-label="Map of {esc(c["name"])} showing its regions and the destinations in the '
+        f'Atlas">{ctx}{land}{"".join(ties)}{"".join(dots)}'
+        f'{"".join(_declutter(labels, w, h))}</svg>'
+        f'<figcaption>{esc(c["name"])}, its {len(c["regions"])} regions and {shown} '
+        f'{"destination" if shown == 1 else "destinations"}.{note} Coastline and borders from '
+        f'{esc(geo.sources_line(doc))} — public domain, hosted by us. Region names sit at the '
+        f'centre of their own destinations: they are groupings, not boundaries. Labels that '
+        f'would overlap are dropped rather than moved. '
+        f'<a href="/map?c={esc(c["slug"])}">Open {esc(c["name"])} on the full map →</a>'
+        f'</figcaption></figure>'
+    )
+
+
 def minimap(data, t, span=3.2):
     """A small map centred on one destination, drawn from the same
     projection the big map uses. Its neighbours are on it so the reader can
@@ -2161,13 +2295,23 @@ MAP_W, MAP_H = 1000, 780
 LON0, LON1, LAT0, LAT1 = -25.0, 45.0, 33.0, 71.5
 
 
+# One projection, used by everything that draws Europe: the big map, the
+# journey overlays, the locator on a country page, the homepage strip.
+#
+# The version this replaced claimed in its docstring to be "corrected at 52°N
+# so Europe is not stretched sideways" and then computed
+# `(x - MAP_W/2) * (k / cos(52°)) + MAP_W/2` — where k was itself cos(52°), so
+# the whole correction multiplied x by exactly 1.0 and did nothing. Europe had
+# been drawn 60% too wide since the map was written, and nobody caught it
+# because there were no coastlines to look wrong: 313 dots on an empty
+# rectangle are the right shape by definition. Real geography is what made the
+# bug visible, which is an argument for real geography on its own.
+MAPPROJ = geo.Projection((LON0, LAT0, LON1, LAT1), MAP_W, MAP_H, pad=0.0)
+
+
 def project(lat, lon):
-    """Equirectangular, corrected at 52°N so Europe is not stretched sideways."""
-    k = math.cos(math.radians(52.0))
-    x = (lon - LON0) / (LON1 - LON0) * MAP_W
-    x = (x - MAP_W / 2) * (k / math.cos(math.radians(52.0))) + MAP_W / 2
-    y = (LAT1 - lat) / (LAT1 - LAT0) * MAP_H
-    return x, y
+    """Equirectangular, genuinely corrected at the middle of the extent."""
+    return MAPPROJ.xy(lat, lon)
 
 
 def maplist(data):
@@ -2265,47 +2409,192 @@ def map_page(data):
         f'<option value="{esc(j["slug"])}">{esc(j["name"])} — {j["days"]} days</option>'
         for j in data["journeys"]
     )
+
+    # ── the land ──────────────────────────────────────────────────────
+    #
+    # Countries are drawn at build time into the same projection the dots use,
+    # from the same function, so a coastline and the city on it cannot
+    # disagree about where they are. That is the same reason the journey legs
+    # are projected here rather than in the browser, and it is worth the
+    # repetition: two projections is a bug that renders.
+    #
+    # One <path> per country, all of its islands in that one path, because
+    # then a hit-test, a hover and a highlight are one element each with no
+    # bookkeeping — clicking the smallest island in the Aegean is clicking
+    # Greece.
+    # lod0 inline, not lod1. A whole-continent view is zoom 0-3 in the map
+    # brief's own ladder, and 1:110m is what that zoom can show: the detailed
+    # file is 74 KB of path text to draw fjords three pixels wide. The
+    # detailed levels are fetched when somebody zooms, which is what a level
+    # of detail is for — shipping the finest one at every zoom is the same
+    # mistake as having only one.
+    doc = geo.load("europe-lod0.json")
+    context, shapes, nogeo = [], [], []
+    if doc:
+        for ident, ent in sorted(doc["countries"].items(),
+                                 key=lambda kv: kv[1]["name"]):
+            d = MAPPROJ.shape(ent["rings"])
+            if not d:
+                continue
+            if ent["atlas"]:
+                # An <a> around the path, so the drill-down is a link with an
+                # href before any JavaScript runs. With scripting off this map
+                # is still a navigable map of Europe; with it on, the click is
+                # intercepted and zooms instead.
+                shapes.append(
+                    f'<a class="cshape" href="{urls.country_by_slug(ent["slug"])}" '
+                    f'id="cshape-{esc(ent["slug"])}" data-slug="{esc(ent["slug"])}" '
+                    f'data-name="{esc(ent["name"])}" '
+                    f'data-bbox="{",".join(str(v) for v in ent["bbox"])}">'
+                    f'<path d="{d}"></path>'
+                    f'<title>{esc(ent["name"])}</title></a>'
+                )
+            else:
+                context.append(f'<path d="{d}"></path>')
+        # Monaco is 2 km² and Vatican City is 0.44 km²; a 1:50m cartographic
+        # source has no polygon for either, and inventing one would be exactly
+        # the fake geography this map was rebuilt to get rid of. They are
+        # drawn as a marked point at their own coordinates and the legend says
+        # why, which is both honest and the only thing that would fit.
+        for code, ent in sorted(doc.get("nogeometry", {}).items()):
+            here = next((n for n in data["cities"].values()
+                         if n["country"]["slug"] == ent["slug"]), None)
+            if not here:
+                continue
+            x, y = project(here["city"]["lat"], here["city"]["lon"])
+            nogeo.append(
+                f'<a class="cpoint" href="{urls.country_by_slug(ent["slug"])}" '
+                f'data-slug="{esc(ent["slug"])}" data-name="{esc(ent["name"])}">'
+                f'<circle cx="{x:.1f}" cy="{y:.1f}" r="5"></circle>'
+                f'<title>{esc(ent["name"])} — too small to draw at this scale'
+                f'</title></a>'
+            )
+
+    # What the country panel shows when a shape is chosen. Read out of the
+    # same data/countries/*.json the pages are built from — the map keeps no
+    # list of its own, so a region added to the atlas appears here without
+    # anybody remembering to update the map.
+    cinfo = {}
+    for c in sorted(data["countries"].values(), key=lambda c: c["name"]):
+        cinfo[c["slug"]] = {
+            "n": c["name"], "u": urls.country(c), "t": c["tagline"],
+            "adv": bool(c.get("advisory")),
+            "r": [{"n": r["name"], "u": urls.region(c, r),
+                   "d": [{"n": t["name"], "u": urls.city(c, r, t),
+                          "id": f'{c["slug"]}/{r["slug"]}/{t["slug"]}'}
+                         for t in r["cities"]]}
+                  for r in c["regions"]],
+        }
+
+    attribution = geo.sources_line(geo.load("europe-lod1.json") or doc)
+
+    # The projection, as six numbers, so the browser can place geometry it
+    # fetches later at exactly the pixel the build would have put it at. Sent
+    # rather than reimplemented: a second copy of a projection is a second
+    # copy that drifts, and the way you find out is a coastline two pixels off
+    # the city on it.
+    projinfo = {
+        "k": round(MAPPROJ.k, 9), "scale": round(MAPPROJ.scale, 9),
+        "ox": round(MAPPROJ.ox, 4), "oy": round(MAPPROJ.oy, 4),
+        "x0": MAPPROJ.x0, "y1": MAPPROJ.y1,
+        "w": MAP_W, "h": MAP_H,
+    }
     body = f"""
 {crumbs([("Europe", "/discover"), ("Map", None)])}
 <div class="pagehead">
   <p class="kicker">The map</p>
-  <h1>Every city in the Atlas, at once.</h1>
-  <p class="lede">{len(data['cities'])} places, drawn from their own coordinates — no tiles, no
-  third-party map service, nothing loaded from anyone else's server. Turn on a layer to see
-  where in Europe that thing actually is.</p>
+  <h1>Europe, and everything we hold in it.</h1>
+  <p class="lede">{len(data['countries'])} countries drawn from open geographic data we host
+  ourselves, with {len(data['cities'])} destinations and {len(placedots)} places on top of them.
+  No tiles from anyone else's server, no map account, no key. Click a country to go into it.</p>
 </div>
-<div class="checks" id="layers">{filters}
-  <label><input type="checkbox" name="extra" value="places"> ◦ Places ({len(placedots)})</label>
+<div class="mapstage">
+<div class="mapmain">
+<div class="mapzoom">
+  <button type="button" class="zbtn" id="zoomin" aria-label="Zoom in">+</button>
+  <button type="button" class="zbtn" id="zoomout" aria-label="Zoom out">−</button>
+  <button type="button" class="zbtn wide" id="zoomreset">Whole of Europe</button>
+  <span class="small" id="zoomwhere" aria-live="polite"></span>
 </div>
-<div class="form-row mw34">
-  <div class="field">
-    <label for="journeylayer">Draw a journey over it</label>
-    <select id="journeylayer"><option value="">None</option>{joptions}</select>
-  </div>
-  <div class="field">
-    <label for="mapfrom">Measure distances from</label>
-    <select id="mapfrom"><option value="">Nowhere in particular</option>{fromoptions}</select>
-  </div>
-</div>
-<p class="small" id="mapcount"></p>
 <div class="mapwrap">
-<svg viewBox="0 0 {MAP_W} {MAP_H}" class="europemap" role="img" aria-describedby="maplist" aria-label="Map of European cities in the Atlas">
+<svg viewBox="0 0 {MAP_W} {MAP_H}" id="europemap" class="europemap" role="img" aria-describedby="maplist" aria-label="Map of Europe showing every country, destination and place in the Atlas">
 <rect width="{MAP_W}" height="{MAP_H}" fill="none"/>
+<g id="context" class="context" aria-hidden="true">{''.join(context)}</g>
+<g id="countries" class="countries">{''.join(shapes)}</g>
+<g id="detail" class="countries"></g>
+<g id="nogeo" class="nogeo">{''.join(nogeo)}</g>
 <g id="route"></g>
+<g id="regions" hidden></g>
 <g id="places" hidden>{''.join(placedots)}</g>
 <g id="dots">{''.join(dots)}</g>
 </svg>
 </div>
-<div id="mappopup" class="mappopup" hidden aria-live="polite"></div>
 <p class="small" id="routenote"></p>
+</div>
+<aside class="mapside">
+  <div id="countrypanel" class="countrypanel" hidden aria-live="polite"></div>
+  <div id="mappopup" class="mappopup" hidden aria-live="polite"></div>
+</aside>
+</div>
+
+<details class="maptools">
+  <summary>Layers, overlays and how to read the map</summary>
+  <div class="maphint">
+    <ul class="legend">
+      <li><span class="sw land"></span> A country in the Atlas — click it to open the panel,
+        click again to go to its page</li>
+      <li><span class="sw ctx"></span> Land outside the Atlas, drawn so the coast has a far
+        shore</li>
+      <li><span class="sw dest"></span> A destination we have written</li>
+      <li><span class="sw ring"></span> A country too small to draw at this scale — Monaco and
+        Vatican City, and four more at the widest zoom</li>
+    </ul>
+    <p class="small">Drag to pan, scroll or use + and − to zoom. Zooming past 1.6× loads a finer
+    coastline; opening a country loads that country's own.</p>
+  </div>
+  <div class="maplayers">
+    <fieldset id="geolayers">
+      <legend class="mini">Geography</legend>
+      <label><input type="checkbox" name="geo" value="borders" checked> Borders</label>
+      <label><input type="checkbox" name="geo" value="regions"> Regions</label>
+      <label><input type="checkbox" name="geo" value="cities" checked> Destinations</label>
+      <label><input type="checkbox" name="geo" value="places"> Places ({len(placedots)})</label>
+    </fieldset>
+  </div>
+  <p class="mini">What each destination is for</p>
+  <div class="checks" id="layers">{filters}</div>
+  <div class="form-row mw34">
+    <div class="field">
+      <label for="journeylayer">Draw a journey over it</label>
+      <select id="journeylayer"><option value="">None</option>{joptions}</select>
+    </div>
+    <div class="field">
+      <label for="mapfrom">Measure distances from</label>
+      <select id="mapfrom"><option value="">Nowhere in particular</option>{fromoptions}</select>
+    </div>
+  </div>
+  <p class="small" id="mapcount"></p>
+</details>
 {jsondata("europedoor-journeys", jdata)}
 {jsondata("europedoor-mapinfo", info)}
+{jsondata("europedoor-countries", cinfo)}
+{jsondata("europedoor-projection", projinfo)}
 <div class="note">
   <h2 class="mini">What this drawing is and is not</h2>
-  <p>It is a point map on an equirectangular projection, corrected at 52°N. There are no
-  coastlines because we do not have a licence to draw any — the shape you see is Europe's
-  cities describing Europe's outline by themselves, which is a fair picture of where people
-  live. A tiled basemap is a Stage 2 job with a vendor and a bill attached.</p>
+  <p>The land comes from <strong>{esc(attribution)}</strong>, which is in the public domain and
+  which we host ourselves: the file your browser drew this from is on our own servers, fetched
+  once by a script in this repository, hashed, and committed. There is no map account behind it
+  and no per-view bill, and that is a deliberate architectural choice rather than a stage we
+  have not reached yet.</p>
+  <p>It is a <strong>cartographic</strong> source, not a legal one. It is built to look right at
+  a stated scale, and at the scale of a whole continent a border is a line a few kilometres
+  wide. Do not read a disputed frontier off this map. Two countries in the Atlas — Monaco and
+  Vatican City — have no shape here at all, because at 1:50 million they are smaller than a
+  pixel; they are drawn as a ringed point instead of a polygon we made up.
+  <a href="/method#map">How the map is built</a>.</p>
+  <p>Projection: equirectangular, corrected at the middle of the extent. Regions are shown by
+  the destinations that belong to them, not as boundaries — we hold which region a place is in,
+  and we do not hold region geometry.</p>
 </div>
 
 {maplist(data)}
@@ -2536,6 +2825,49 @@ def my_europe_page(data):
 
 
 def method_page(data):
+
+    # Published on /method because the map is now a claim about the world and
+    # a claim republished without its provenance is a claim nobody can check.
+    # Built before the page body rather than inside it: the body is one big
+    # f-string, and a nested triple-quoted f-string closes it early — which is
+    # a syntax error two hundred lines further down, in a place that has
+    # nothing to do with the mistake.
+    maprows = "".join(
+        f'<div class="row"><div><h3>{esc(h)}</h3><p class="rowsub">{b}</p></div>'
+        f'<p class="rowmeta">{esc(m)}</p></div>'
+        for h, b, m in (
+            ("Where the land comes from",
+             "Natural Earth, at 1:110 million and 1:50 million. Public domain: the licence says "
+             "in as many words that no permission is needed and no credit is required. We credit "
+             "it anyway, because a reader looking at a border is entitled to know which dataset "
+             "drew it.", "public domain"),
+            ("How it gets here",
+             "A script fetches it and records the SHA-256 of the exact bytes; a second clips it "
+             "to Europe, simplifies it to three levels of detail and writes the result into the "
+             "repository. Both are re-runnable, and the build fails if what is committed is not "
+             "what the pipeline produces.", "reproducible"),
+            ("What it is not",
+             "Natural Earth is a cartographic source, built to look right at a stated scale. It "
+             "is not a legal or authoritative statement of where a border runs, and at the scale "
+             "of a continent a border is a line several kilometres wide. Do not read a disputed "
+             "frontier off this map.", "cartographic"),
+            ("Two countries have no shape",
+             "Monaco is 2&nbsp;km² and Vatican City is 0.44&nbsp;km². At 1:50 million neither has "
+             "a polygon at all, so both are drawn as a ringed point. Inventing an outline would "
+             "have been easy, and would have been a lie about a measurement.",
+             f"2 of {len(data['countries'])}"),
+            ("Regions are groupings, not boundaries",
+             "We hold which region a destination belongs to. We do not hold region geometry — the "
+             "dataset that has it carries conditions nobody here has accepted — so a region is "
+             "drawn as its own destinations with its name at the middle of them, and never as a "
+             "line.", "no geometry"),
+        )
+    )
+    mapmethod = section(
+        "How the map is drawn", f'<div class="rows">{maprows}</div>', id="map",
+        lede="Open geographic data, hosted by us, with the licence written down before the data "
+             "was downloaded. No map account, no key, no third-party tile server.")
+
     from .score import methodology_rows
     from .score import REFUSED, DISCOVER_TERMS, discoverability
     rows = "".join(
@@ -2588,6 +2920,8 @@ def method_page(data):
   a high number means fewer people will have told you about a place, not that it is better.
   {high} of {ncity} places score 70 or above.</p>
 </div>
+
+{mapmethod}
 
 <div class="split mt7">
   <div>

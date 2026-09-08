@@ -1,0 +1,65 @@
+{
+  "$comment": "The register fetch.py reads. A source with no entry here cannot be fetched, and a source whose bytes do not match its recorded sha256 fails --verify. 'licence_doc' must name a file in this directory; fetch.py checks that it exists before it opens a socket, because a licence written after the download is a licence written to fit.",
+  "sources": [
+    {
+      "id": "ne-110m-admin0",
+      "dataset": "Natural Earth 1:110m admin 0 countries",
+      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson",
+      "path": "data/raw/ne_110m_admin_0_countries.geojson.gz",
+      "licence": "public-domain",
+      "licence_doc": "natural-earth.md",
+      "version": "Natural Earth v5.1.2",
+      "attribution_required": false,
+      "share_alike": false,
+      "fetched": "2026-09-08",
+      "sha256": "c4bc0b2ecc399a7840371520ceb4b68b169ba8eccb9cd10ef7432cbdd769fd2b",
+      "bytes": 209562
+    },
+    {
+      "id": "ne-50m-admin0",
+      "dataset": "Natural Earth 1:50m admin 0 countries",
+      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson",
+      "path": "data/raw/ne_50m_admin_0_countries.geojson.gz",
+      "licence": "public-domain",
+      "licence_doc": "natural-earth.md",
+      "version": "Natural Earth v5.1.2",
+      "attribution_required": false,
+      "share_alike": false,
+      "fetched": "2026-09-08",
+      "sha256": "e721d7461448ae169b498dc1b092db6c7c29f970f1855b67facc729c884289ef",
+      "bytes": 1022527
+    },
+    {
+      "id": "ne-licence",
+      "dataset": "Natural Earth licence text",
+      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/LICENSE.md",
+      "path": "data/raw/natural-earth-LICENSE.md",
+      "licence": "public-domain",
+      "licence_doc": "natural-earth.md",
+      "version": "as published",
+      "attribution_required": false,
+      "share_alike": false,
+      "fetched": "2026-09-08",
+      "sha256": "2631b5b39b6d1acc56de75235109b5af2dbb4b0ac5a127b6f06185977247fd4b",
+      "bytes": 4636
+    }
+  ],
+  "blocked": [
+    {
+      "id": "gisco-nuts-2024",
+      "dataset": "Eurostat / GISCO NUTS 2024 regions, levels 1-3",
+      "url": "https://raw.githubusercontent.com/eurostat/Nuts2json/master/pub/v2/2024/4326/20M/nutsrg_2.json",
+      "licence": "copyrighted, use subject to acceptance of Eurostat provisions",
+      "licence_doc": "eurostat-gisco-nuts.md",
+      "reason": "The provisions could not be read from this environment and have not been accepted by anyone. fetch.py refuses every entry in this list."
+    },
+    {
+      "id": "osm",
+      "dataset": "OpenStreetMap",
+      "url": "https://planet.openstreetmap.org/",
+      "licence": "ODbL 1.0",
+      "licence_doc": "openstreetmap-not-used.md",
+      "reason": "Share-alike. Deliberately kept out of the knowledge graph; see the licence doc for the conditions under which it may return."
+    }
+  ]
+}

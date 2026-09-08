@@ -27,6 +27,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **the Postgres/PostGIS model, the API, Next.js, auth, search, the AI pipeline** | **`docs/technical-foundation.md`** — a destination with a trigger, not a plan for Monday. Nothing in it should be built yet |
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
 | **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,273 assertions against the real build, and CI fails if any of them stops being true |
+| **the map, geographic data, tiles, or "why not Mapbox?"** | **`docs/map-architecture.md`** — the pipeline, the three levels of detail, and why this is SVG rather than MapLibre. Then **`docs/data-licenses/`**, which is the register, and **`docs/boundary-policy.md`** for disputed frontiers |
 | **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence: 51 sections, 326 assertions |
 
 ## The rules that catch people out
@@ -138,6 +139,42 @@ Sponsorship attaches to a provider and affects directory surfaces only. That
 wall is enforced in the schema, which is the only version of the promise
 worth making.
 
+**EuropeDoor does not pay for maps, and a check enforces it.** The land comes
+from Natural Earth (public domain), fetched by `scripts/map/fetch.py`, hashed,
+committed, and processed into `data/geo/` by `scripts/map/process.py`. There is
+no provider, no key, no tile server and no request that leaves this origin to
+draw a coastline. `checks.py` fails on a page or script that names a commercial
+map host or a public tile server. Adding one is a decision for the owner, not
+a convenience.
+
+**No dataset enters without its licence written down first.** `fetch.py`
+refuses to open a socket for a source with no row in
+`docs/data-licenses/sources.json` and no `.md` file beside it, and it refuses
+by name anything on the `blocked` list. Two things are on that list on purpose:
+**Eurostat NUTS** (copyrighted, use conditional on accepting provisions nobody
+here has read — so region *boundaries* are not drawn) and **OpenStreetMap**
+(ODbL share-alike, kept out of the knowledge graph deliberately). "Free to
+download" is not "free of obligations".
+
+**`data/geo/` is generated and CI fails if it is stale**, exactly like `site/`.
+After changing `scripts/map/` or `data/raw/`, run
+`python3 scripts/map/process.py` and commit the result in the same commit.
+
+**Regions are a grouping, not a boundary.** We hold which destinations belong
+to a region; we do not hold region geometry. The map draws a region as its own
+destinations with the name at the middle of them and says so on the page. A
+convex hull round Bergen and Ålesund labelled "Vestland" would look like an
+answer and be a guess — and Monaco and Vatican City get a ringed point rather
+than an invented outline for the same reason.
+
+**One projection, and it was wrong for a year.** `pages.MAPPROJ` is the only
+projection; everything that draws Europe uses it, and the browser is handed its
+six numbers rather than reimplementing it. The version this replaced claimed to
+correct for latitude and then multiplied x by `cos(52°)/cos(52°)`, which is 1 —
+Europe was 60% too wide and nobody noticed, because 313 dots on an empty
+rectangle are the right shape by definition. Real geography is what made it
+visible.
+
 ## Gates
 
 Run all seven before claiming anything is done.
@@ -159,6 +196,15 @@ caught the planner producing a 2,500 km final leg to reach a named end city
 and calling it an itinerary. None of those was findable by reading the code.
 They launch the sandbox's own Chromium via `executablePath` because the npm
 package version will not match the installed browser build.
+
+The map pipeline is **not** part of the build — the build must run on a host
+with no internet and produce identical pages, so the raw data and the processed
+geometry are both committed. Run these when a dataset version changes:
+
+    python3 scripts/map/fetch.py --verify    the bytes on disk are the bytes checked
+    python3 scripts/map/process.py --check   data/geo/ matches the pipeline
+
+Both are also asserted by `checks.py`, so a stale `data/geo/` fails CI.
 
 **Three of the gates write files.** `section-audit.py --write`, `ux-audit.py --write`
 and `content-report.py --write` regenerate documents that CI then checks for

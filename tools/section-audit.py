@@ -443,8 +443,10 @@ def s22():
 
 
 @section(23, "Map system", "BUILT",
-         "Every destination, seventeen togglable layers, a places layer, a "
-         "journey overlay, and the popup card the specification describes.")
+         "Real geography from public-domain data we host ourselves, three "
+         "levels of detail, the Europe-country-region-destination drill-down, "
+         "togglable layers, a journey overlay and the popup card. No map "
+         "provider, no key, no recurring cost.")
 def s23():
     h = page("/map")
     yield h.count('class="dot') >= 300, "every destination is drawn"
@@ -455,6 +457,21 @@ def s23():
     yield 'id="mappopup"' in h and 'id="europedoor-mapinfo"' in h, "the popup and its data"
     yield 'id="mapfrom"' in h, "distance from a chosen origin"
     yield "mapbox" not in h.lower() and "googleapis" not in h.lower(), "no third-party map service"
+    # The map was 313 dots on an empty rectangle until 2026-09, and its own
+    # note said there were no coastlines because we had no licence to draw
+    # any. That is now false and these assertions are what keeps it false.
+    yield h.count('class="cshape"') > 40, "real country geometry, drawn"
+    yield 'id="context"' in h and 'id="nogeo"' in h, "land outside the Atlas, and the two countries too small to draw"
+    yield 'id="europedoor-projection"' in h, "the projection handed to the browser rather than reimplemented"
+    yield (os.path.exists(os.path.join(OUT, "api", "geo", "europe-lod1.json")) and
+           os.path.exists(os.path.join(OUT, "api", "geo", "country", "norway.json"))), \
+        "the finer levels of detail, published on our own origin"
+    yield "Natural Earth" in h, "the source is named on the page"
+    yield ".countrymap" in src("assets/css/europedoor.css") and \
+        'class="minimap countrymap"' in page("/europe/norway"), "the country map"
+    yield bool(src("docs/data-licenses/sources.json")) and \
+        bool(src("docs/data-licenses/natural-earth.md")), "the licence register"
+    yield bool(src("docs/boundary-policy.md")), "a written policy for disputed boundaries"
 
 
 @section(24, "Search engine", "BUILT",

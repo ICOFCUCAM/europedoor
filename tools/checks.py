@@ -16,6 +16,7 @@ comment on each explaining which.
 from __future__ import annotations
 
 import glob
+import hashlib
 import html.parser
 import json
 import os
@@ -881,6 +882,137 @@ def c_structured_data():
              f"{sorted(expected - seen_types)}")
     if n < 2000:
         fail(f"only {n} structured-data items across the site")
+    return n
+
+
+@check("the map is drawn from open data we hold, host and can rebuild")
+def c_map():
+    """The map must cost nothing to run, and that has to be checkable.
+
+    "EuropeDoor does not pay for maps" is a product decision, and a product
+    decision that lives only in a document is a product decision somebody
+    undoes in a hurry on a Friday. Six assertions, each one guarding a
+    different way that could happen:
+
+      1. no published page reaches a commercial map provider or a public tile
+         server — checked by hostname, on the actual HTML and JavaScript
+      2. no licence-bearing source is fetched without its licence written down
+         first, and the bytes on disk are the bytes that were checked
+      3. the datasets deliberately refused stay refused, and stay documented
+      4. data/geo/ is what the pipeline produces from data/raw/ — the same
+         staleness contract as site/
+      5. every country in the Atlas is on the map, as a shape or as a named
+         point, and never quietly missing
+      6. the provenance travels with the geometry: every published file names
+         the dataset, the licence and the hash it came from
+    """
+    n = 0
+
+    # 1. No third-party map anything. Hostnames rather than a vague "maps"
+    # substring, because a page that says "the map" is not a violation and a
+    # check that cannot tell the difference gets switched off.
+    banned = (
+        "api.mapbox.com", "mapbox.com", "maps.googleapis.com", "maps.google.com",
+        "api.maptiler.com", "maptiler.com", "tile.openstreetmap.org",
+        "tiles.openstreetmap.org", "basemaps.cartocdn.com", "api.here.com",
+        "dev.virtualearth.net", "services.arcgisonline.com", "tiles.stadiamaps.com",
+        "unpkg.com/maplibre", "cdn.jsdelivr.net/npm/maplibre",
+    )
+    for path in site_files() + sorted(glob.glob(os.path.join(OUT, "assets", "js", "*.js"))):
+        with open(path, encoding="utf-8") as fh:
+            body = fh.read()
+        low = body.lower()
+        for host in banned:
+            if host in low:
+                fail(f"{rel(path)} reaches {host} — the map must cost nothing to run "
+                     f"and must add no third-party origin")
+        n += 1
+
+    # 2 and 3. The register, and the licence document that must exist before
+    # anything is fetched.
+    regpath = os.path.join(ROOT, "docs", "data-licenses", "sources.json")
+    if not os.path.exists(regpath):
+        fail("docs/data-licenses/sources.json is missing — no dataset can be traced")
+        return n
+    with open(regpath, encoding="utf-8") as fh:
+        reg = json.load(fh)
+    for src in reg["sources"]:
+        doc = os.path.join(ROOT, "docs", "data-licenses", src["licence_doc"])
+        if not os.path.exists(doc):
+            fail(f"{src['id']} has no licence record at docs/data-licenses/{src['licence_doc']}")
+        raw = os.path.join(ROOT, src["path"])
+        if not os.path.exists(raw):
+            fail(f"{src['id']} is registered but {src['path']} is not in the repository")
+            continue
+        if not src.get("sha256"):
+            fail(f"{src['id']} has no recorded sha256 — run scripts/map/fetch.py")
+            continue
+        with open(raw, "rb") as fh:
+            got = hashlib.sha256(fh.read()).hexdigest()
+        if got != src["sha256"]:
+            fail(f"{src['path']} is not the file that was checked: recorded "
+                 f"{src['sha256'][:12]}, on disk {got[:12]}")
+        n += 3
+    for b in reg.get("blocked", []):
+        doc = os.path.join(ROOT, "docs", "data-licenses", b["licence_doc"])
+        if not os.path.exists(doc):
+            fail(f"blocked dataset {b['id']} has no licence record saying why")
+        if not b.get("reason"):
+            fail(f"blocked dataset {b['id']} carries no reason")
+        n += 2
+
+    # 4. data/geo/ is generated, and a stale generated directory means the
+    # site is drawing something no longer derivable from its documented source.
+    sys.path.insert(0, os.path.join(ROOT, "scripts", "map"))
+    try:
+        import process as MAPPIPE
+    except Exception as exc:                        # noqa: BLE001
+        fail(f"scripts/map/process.py will not import: {exc}")
+        return n
+    produced = MAPPIPE.build()
+    geodir = os.path.join(ROOT, "data", "geo")
+    for relpath, obj in produced.items():
+        full = os.path.join(geodir, relpath)
+        if not os.path.exists(full):
+            fail(f"data/geo/{relpath} is missing — run scripts/map/process.py")
+            continue
+        with open(full, encoding="utf-8") as fh:
+            if fh.read() != MAPPIPE.dump(obj):
+                fail(f"data/geo/{relpath} is stale — run scripts/map/process.py")
+        n += 1
+
+    # 5. Every country in the Atlas is on the map somewhere. A country that is
+    # neither a shape nor a named point has silently fallen off, and on a map
+    # of fifty countries nobody counts.
+    d = D.load()
+    for lod in ("europe-lod0.json", "europe-lod1.json"):
+        doc = produced[lod]
+        drawn = {i for i, e in doc["countries"].items() if e["atlas"]}
+        named = set(doc["nogeometry"])
+        for c in d["countries"].values():
+            code = c["code"].lower()
+            if code not in drawn and code not in named:
+                fail(f"{c['name']} is in the Atlas but is neither drawn nor named "
+                     f"in {lod}")
+            n += 1
+        # 6. Provenance travels with the geometry.
+        if not doc.get("sources"):
+            fail(f"{lod} carries no provenance")
+        for src in doc.get("sources", []):
+            if not src.get("licence") or not src.get("sha256"):
+                fail(f"{lod} names a source with no licence or no hash")
+            n += 1
+
+    # The published copies under /api/geo/ must be the same files.
+    for lod in ("europe-lod0.json", "europe-lod1.json"):
+        pub = os.path.join(OUT, "api", "geo", lod)
+        if not os.path.exists(pub):
+            fail(f"/api/geo/{lod} was not published")
+            continue
+        with open(pub, encoding="utf-8") as a, open(os.path.join(geodir, lod), encoding="utf-8") as b:
+            if a.read() != b.read():
+                fail(f"/api/geo/{lod} differs from data/geo/{lod}")
+        n += 1
     return n
 
 

@@ -8,7 +8,7 @@ its requirements are about how something looks and nobody can check a feeling.
 So every row here asserts against the generated HTML, the CSS and the JavaScript
 as they actually are.
 
-**51 sections · 21 built · 15 already · 12 partial · 1 refused · 1 locked · 1 deferred · 326 assertions · 0 failing**
+**51 sections · 22 built · 14 already · 12 partial · 1 refused · 1 locked · 1 deferred · 331 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -40,7 +40,7 @@ as they actually are.
 | 18 | Place page | PARTIAL | 4 | About, location, nearby and a save action. Refused: the photograph, the star rating and the opening hours — the last of these is rejected by the validator, not merely omitted. |
 | 19 | Experience page | PARTIAL | 3 | What it is, where, when and who runs it. Refused: the rating and the book button. |
 | 20 | Business page | PARTIAL | 3 | Verification is published with what each level actually checks, and sponsorship can never touch a place — that wall is in the schema, which is the only version of the promise worth making. |
-| 21 | Map experience | ALREADY | 3 | Layers, a journey overlay, a distance origin and a popup card. |
+| 21 | Map experience | BUILT | 8 | Real coastlines and borders, a level-of-detail ladder, zoom and pan, the country drill-down with its selection in the URL, togglable layers, a journey overlay and a popup card. Self-hosted open data: no provider, no key, no bill. |
 | 22 | Search interface | ALREADY | 2 | One box that takes a sentence, answered in the browser. |
 | 23 | Search results | ALREADY | 2 | The interpretation shown back above the results, exactly as the brief draws it, then results grouped by kind. |
 | 24 | My Europe | PARTIAL | 3 | Saved places, collections and bucket lists, plus a way to move the whole list to another device. No account, so no welcome-back and no cross-device sync on our side. |

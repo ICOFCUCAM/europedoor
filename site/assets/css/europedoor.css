@@ -57,6 +57,15 @@
   --sea:          var(--atlantic);
   --sea-dark:     var(--atlantic-2);
   --warn:         #8a3324;
+
+  /* the map. Five values, kept together so the drawing can be re-toned in
+     one place — a map whose colours are scattered across twelve rules is a
+     map nobody adjusts twice. */
+  --map-sea:      #dbe3e0;
+  --map-land:     #f7f6f3;
+  --map-context:  #e7e6e0;
+  --map-border:   #b9c3bf;
+  --map-hover:    #cbdad4;
   --warn-bg:      #f8eeea;
 
   /* type */
@@ -112,6 +121,11 @@
     --sea: var(--atlantic);
     --sea-dark: var(--atlantic-2);
     --warn: #eda897;
+    --map-sea: #0a1214;
+    --map-land: #1b2528;
+    --map-context: #141c1e;
+    --map-border: #35464a;
+    --map-hover: #2c4a44;
     --warn-bg: #2a1a17;
     --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 24px -12px rgba(0,0,0,.7);
     --shadow-lift: 0 2px 4px rgba(0,0,0,.55), 0 18px 40px -18px rgba(0,0,0,.8);
@@ -318,7 +332,18 @@ main.wide { max-width: 92rem; }
 .score .small { margin: var(--s4) 0 0; }
 
 /* ── the map ──────────────────────────────────────────────── */
-.mapwrap { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper-2); padding: var(--s4); margin: var(--s5) 0; overflow-x: auto; }
+/* The drawing is 1000 x 780, so at a full-width 1232px column it is 960px
+ * tall and a 900px-high laptop shows Scandinavia and nothing else. Capping
+ * the WIDTH from the viewport height, rather than capping the height, is what
+ * keeps the whole continent on screen without letterboxing: an SVG with
+ * width:100% and max-height centres itself inside a box it no longer fills,
+ * and the empty sea either side of it is not free. 1.282 is MAP_W/MAP_H and
+ * lives here as a number because CSS cannot read it from the SVG. */
+.mapwrap {
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--paper-2); padding: var(--s4); margin: var(--s3) 0 var(--s5);
+  overflow-x: auto; max-width: calc(66vh * 1.282); margin-inline: auto;
+}
 .europemap { width: 100%; height: auto; display: block; min-width: 34rem; }
 .europemap .dot circle { fill: var(--sea); opacity: .78; transition: opacity .15s ease, r .15s ease; }
 .europemap .dot:hover circle { fill: var(--door); opacity: 1; r: 7; }
@@ -403,6 +428,155 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .mappopup-close:hover { color: var(--door); }
 .europemap .placedot circle { fill: var(--door); opacity: .5; }
 .europemap .placedot:hover circle { opacity: 1; }
+
+/* ── the land ────────────────────────────────────────────────────────
+ *
+ * Real geography, from Natural Earth via scripts/map/. The design problem
+ * this solves is that a map with a basemap in it wants to look like every
+ * other map with a basemap in it, and a tile-service pastiche — motorway
+ * yellow, park green, a scale bar — would say EuropeDoor bought a map. This
+ * one is drawn the way the rest of the site is drawn: paper, one rule
+ * weight, colour reserved for the thing you can act on.
+ *
+ * So the sea is the page. Land is a shade above it. A country we hold is a
+ * shade above that, and the only saturated colour on the whole drawing is
+ * the country under the pointer and the destinations on it. Nothing else
+ * competes.
+ *
+ * --z is the current zoom, written by map.js on every viewBox change.
+ * Everything with a fixed on-screen size divides by it: an SVG stroke and an
+ * SVG radius are in user units, so without this a 1px border is 8px at 8x
+ * and Europe becomes a coloured blob with the coastline eating the coast.
+ */
+/* The sea is its own token, not the page ground. The first version used
+ * --paper-2 for the wrapper and --paper for land, which is a 4% lightness
+ * step: on a good monitor it was a subtle map, and on a laptop at an angle it
+ * was a blank rectangle with dots on it. A map has to survive being looked at
+ * badly. The sea is now a desaturated Atlantic — cool against the warm
+ * limestone of the land, which is also the one place on the site where the
+ * primary green is allowed to be a surface rather than an action, because
+ * here it is not offering anything. */
+.europemap { --z: 1; }
+.mapwrap { background: var(--map-sea); }
+.europemap .context path { fill: var(--map-context); stroke: none; }
+.europemap .countries path {
+  fill: var(--map-land); stroke: var(--map-border);
+  stroke-width: calc(1px / var(--z)); stroke-linejoin: round;
+}
+.europemap.noborders .countries path { stroke: none; }
+.europemap .cshape { cursor: pointer; }
+.europemap .cshape path { transition: fill .15s ease; }
+.europemap .cshape:hover path { fill: var(--map-hover); stroke: var(--sea); }
+.europemap .cshape:focus-visible path { stroke: var(--sea); stroke-width: calc(2.5px / var(--z)); }
+.europemap .cshape.on path { fill: var(--map-hover); stroke: var(--sea); stroke-width: calc(1.6px / var(--z)); }
+/* Monaco is 2 km² and Vatican City is 0.44 km². Natural Earth has no polygon
+ * for either at 1:50m, so they are a ringed point rather than a shape we
+ * invented — the ring is what says "this is a marker, not a country the size
+ * of a village". */
+.europemap .nogeo circle {
+  fill: var(--map-land); stroke: var(--ink-3);
+  stroke-width: calc(1.4px / var(--z)); r: calc(5px / var(--z));
+}
+.europemap .nogeo a:hover circle { stroke: var(--sea); fill: var(--map-hover); }
+
+.europemap .dot circle { r: calc(4.2px / var(--z)); }
+.europemap .dot:hover circle { r: calc(7px / var(--z)); }
+.europemap .placedot circle { r: calc(2.6px / var(--z)); }
+.routeline { stroke-width: calc(2.5px / var(--z)); stroke-dasharray: calc(7px / var(--z)) calc(5px / var(--z)); }
+.europemap .routedot { r: calc(7px / var(--z)); }
+
+/* Regions are a grouping, not a boundary — we hold which destinations belong
+ * to a region and we do not hold region geometry. The hairlines say
+ * "these belong together" without drawing a frontier we cannot source.
+ * See docs/data-licenses/eurostat-gisco-nuts.md. */
+.europemap .rtie { stroke: var(--sea); stroke-width: calc(.75px / var(--z)); opacity: .3; }
+.europemap .rlabel text {
+  fill: var(--ink-2); font-size: calc(11px / var(--z)); font-weight: 600;
+  text-anchor: middle; paint-order: stroke; stroke: var(--map-land);
+  stroke-width: calc(3px / var(--z)); stroke-linejoin: round;
+}
+.europemap .rlabel:hover text { fill: var(--sea); }
+
+/* The map goes above the controls, which sounds obvious and was not what
+ * shipped first. The first layout put the geography toggles, thirteen
+ * interest filters and two selects between the headline and the drawing, so
+ * on a 1280x1000 laptop the page called "the map" opened with no map on it.
+ * Controls now live in a closed <details> underneath, and the map starts
+ * about 380px down where it can be seen without scrolling.
+ *
+ * The side column is the other half of that fix: clicking a country used to
+ * fill a panel below the map, which on a tall drawing is off-screen — so the
+ * click appeared to do nothing at all. */
+/* minmax(0, 1fr) at BOTH widths, and min-width: 0 on the column. A grid item
+ * defaults to min-width: auto, which means it refuses to shrink below its
+ * content — and the content here is an SVG with min-width: 34rem, whose
+ * horizontal scrolling .mapwrap was quietly handling until the day it became
+ * a grid item. Turning the map page into two columns therefore pushed 204px
+ * off the right edge of a 390px phone, and the static check that guards
+ * against exactly this could not see it: it reads the HTML, and this is a
+ * layout that only exists once a browser has run the grid algorithm. The
+ * browser suite is what found it. */
+.mapstage { display: grid; gap: var(--s5); align-items: start; grid-template-columns: minmax(0, 1fr); margin-top: var(--s4); }
+.mapmain { min-width: 0; }
+/* The second column exists only while there is something in it. A permanent
+ * 21rem sidebar holding a legend took a fifth of the drawing away from the
+ * map on every visit to pay for a panel most visits never open — and with
+ * scripting off it could never open at all, so the map would have been narrow
+ * for nothing. map.js sets .withpanel. */
+@media (min-width: 62rem) {
+  .mapstage.withpanel { grid-template-columns: minmax(0, 1fr) 21rem; }
+}
+.mapside:empty, .mapside { min-width: 0; }
+.mapside > * { margin-top: 0; }
+.maphint { border: 1px solid var(--rule); border-radius: var(--radius); padding: var(--s4); background: var(--paper-2); margin: var(--s4) 0; }
+.maphint p:last-child { margin-bottom: 0; }
+.legend { list-style: none; padding: 0; margin: var(--s3) 0; font-size: var(--t-sm); }
+.legend li { display: flex; gap: var(--s3); align-items: baseline; margin-bottom: var(--s2); }
+.legend .sw { flex: 0 0 auto; width: 1rem; height: 1rem; border-radius: 3px; border: 1px solid var(--map-border); }
+.legend .sw.land { background: var(--map-land); }
+.legend .sw.ctx { background: var(--map-context); }
+.legend .sw.dest { background: var(--sea); border-radius: 50%; border-color: var(--sea); width: .75rem; height: .75rem; }
+.legend .sw.ring { background: var(--map-land); border-radius: 50%; border-color: var(--ink-3); border-width: 2px; width: .8rem; height: .8rem; }
+/* Land under the small maps. The country map is the middle rung of
+ * Europe -> country -> region -> destination, and before there was geometry
+ * it did not exist: a country page could list its regions and could not show
+ * you where any of them were. */
+.countrymap svg { background: var(--map-sea); border-radius: var(--radius); }
+.countrymap .context path { fill: var(--map-context); }
+.countrymap .countries path { fill: var(--map-land); stroke: var(--map-border); stroke-width: 1; }
+.countrymap .countries path.here { fill: var(--map-hover); stroke: var(--sea); stroke-width: 1.4; }
+.countrymap .rtie { stroke: var(--sea); stroke-width: 1; opacity: .35; }
+.countrymap .rlabel text {
+  fill: var(--ink-2); font-size: 15px; font-weight: 700; text-anchor: middle;
+  paint-order: stroke; stroke: var(--map-hover); stroke-width: 4; stroke-linejoin: round;
+}
+.countrymap .rlabel:hover text { fill: var(--sea); }
+
+.maptools { margin: var(--s6) 0; border-top: 1px solid var(--rule); padding-top: var(--s4); }
+.maptools > summary { cursor: pointer; font-weight: 600; }
+.maptools .mini { margin: var(--s5) 0 var(--s2); }
+
+.mapzoom { display: flex; align-items: center; gap: var(--s2); margin: 0; flex-wrap: wrap; }
+.zbtn {
+  min-width: 2.5rem; min-height: 2.5rem; border: 1px solid var(--rule);
+  border-radius: var(--radius); background: var(--paper); color: var(--ink);
+  font-size: var(--t-md); line-height: 1; cursor: pointer;
+}
+.zbtn.wide { min-width: auto; padding: 0 var(--s3); font-size: var(--t-sm); }
+.zbtn:hover { border-color: var(--sea); color: var(--sea); }
+.maplayers fieldset { border: 0; padding: 0; margin: var(--s4) 0 0; }
+.maplayers legend { padding: 0; margin-bottom: var(--s2); }
+.maplayers label { display: inline-flex; align-items: center; gap: var(--s2); margin-right: var(--s4); }
+
+.countrypanel {
+  position: relative; max-width: 34rem; margin: var(--s4) 0; padding: var(--s5);
+  border: 1px solid var(--ink-3); border-radius: var(--radius);
+  background: var(--paper-2); box-shadow: var(--shadow-lift);
+}
+.countrypanel p { max-width: none; }
+.regionlist { list-style: none; padding: 0; margin: var(--s4) 0; }
+.regionlist li { padding: var(--s2) 0; border-top: 1px solid var(--rule); }
+.regionlist .rlink { font-weight: 600; }
 
 /* ── saved rows with a collection picker ──────────────────────────── */
 .row.saved { grid-template-columns: minmax(0,1fr) auto; }

@@ -48,6 +48,17 @@ def country(c):
     return f"{EUROPE}/{c['slug']}"
 
 
+def country_by_slug(slug):
+    """The country URL when all you hold is the slug.
+
+    The map draws shapes from data/geo/, which carries a slug and no country
+    record, so it cannot call country(c). Deliberately built from the same
+    EUROPE prefix rather than a second f-string, because two places that
+    format the same URL is how a redirect gets written six months later.
+    """
+    return f"{EUROPE}/{slug}"
+
+
 def region(c, r):
     return f"{country(c)}/{r['slug']}"
 

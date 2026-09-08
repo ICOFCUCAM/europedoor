@@ -520,12 +520,25 @@ def s20():
 
 # ── 21–27: map, search, dashboards, mobile ────────────────────────────
 
-@section(21, "Map experience", "ALREADY",
-         "Layers, a journey overlay, a distance origin and a popup card.")
+@section(21, "Map experience", "BUILT",
+         "Real coastlines and borders, a level-of-detail ladder, zoom and pan, "
+         "the country drill-down with its selection in the URL, togglable "
+         "layers, a journey overlay and a popup card. Self-hosted open data: "
+         "no provider, no key, no bill.")
 def s21():
-    yield 'id="layers"' in page("/map"), "the filters"
-    yield 'id="mappopup"' in page("/map"), "the popup"
-    yield 'id="journeylayer"' in page("/map"), "the journey overlay"
+    h = page("/map")
+    yield 'id="layers"' in h, "the filters"
+    yield 'id="mappopup"' in h, "the popup"
+    yield 'id="journeylayer"' in h, "the journey overlay"
+    # The brief asks the map to become the geographic interface to the
+    # knowledge graph rather than a decorative component. These are the four
+    # things that distinguish one from the other.
+    yield h.count('class="cshape"') > 40, "countries are drawn, not implied by their cities"
+    yield 'href="/europe/' in h.split('id="countries"', 1)[-1][:60000], \
+        "every country shape is a link before any JavaScript runs"
+    yield 'id="zoomreset"' in h and 'id="zoomin"' in h, "zoom, operable by pointer and keyboard"
+    yield "regionlist" in src("assets/js/map.js"), "region and destination rows in the country panel"
+    yield 'class="minimap countrymap"' in page("/europe/norway"), "the country map, one rung down"
 
 
 @section(22, "Search interface", "ALREADY",

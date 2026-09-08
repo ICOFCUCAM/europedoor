@@ -69,6 +69,12 @@
   109 of 319 places score 70 or above.</p>
 </div>
 
+<section class="band" id="map">
+  <div class="band-head"><h2>How the map is drawn</h2><p class="lede">Open geographic data, hosted by us, with the licence written down before the data was downloaded. No map account, no key, no third-party tile server.</p></div>
+  <div class="rows"><div class="row"><div><h3>Where the land comes from</h3><p class="rowsub">Natural Earth, at 1:110 million and 1:50 million. Public domain: the licence says in as many words that no permission is needed and no credit is required. We credit it anyway, because a reader looking at a border is entitled to know which dataset drew it.</p></div><p class="rowmeta">public domain</p></div><div class="row"><div><h3>How it gets here</h3><p class="rowsub">A script fetches it and records the SHA-256 of the exact bytes; a second clips it to Europe, simplifies it to three levels of detail and writes the result into the repository. Both are re-runnable, and the build fails if what is committed is not what the pipeline produces.</p></div><p class="rowmeta">reproducible</p></div><div class="row"><div><h3>What it is not</h3><p class="rowsub">Natural Earth is a cartographic source, built to look right at a stated scale. It is not a legal or authoritative statement of where a border runs, and at the scale of a continent a border is a line several kilometres wide. Do not read a disputed frontier off this map.</p></div><p class="rowmeta">cartographic</p></div><div class="row"><div><h3>Two countries have no shape</h3><p class="rowsub">Monaco is 2&nbsp;km² and Vatican City is 0.44&nbsp;km². At 1:50 million neither has a polygon at all, so both are drawn as a ringed point. Inventing an outline would have been easy, and would have been a lie about a measurement.</p></div><p class="rowmeta">2 of 50</p></div><div class="row"><div><h3>Regions are groupings, not boundaries</h3><p class="rowsub">We hold which region a destination belongs to. We do not hold region geometry — the dataset that has it carries conditions nobody here has accepted — so a region is drawn as its own destinations with its name at the middle of them, and never as a line.</p></div><p class="rowmeta">no geometry</p></div></div>
+  
+</section>
+
 <div class="split mt7">
   <div>
     <h2>What the scores are not</h2>
