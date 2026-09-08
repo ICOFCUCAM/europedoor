@@ -130,6 +130,10 @@ def build():
     ]
     write("/sitemap.xml", P.sitemap(canonical))
     write("/_headers", R.headers_file())
+    # vercel.json is not generated — it carries redirects and caching rules a
+    # human edits — but its security headers ARE checked against
+    # render.HEADERS by tools/checks.py, because the host reads that file and
+    # not site/_headers.
     write("/robots.txt", "User-agent: *\nAllow: /\nSitemap: https://europedoor.com/sitemap.xml\n")
 
     print(f"{len(written)} pages + api + sitemap → site/")

@@ -649,9 +649,31 @@ def c_csp():
             fail(f"{rel}: no content security policy")
         n += 1
 
-    # The two copies of the policy must not drift. A header and a meta tag
-    # saying different things is worse than either one alone, because which
-    # applies depends on the host.
+    # THE HOST ACTUALLY READS vercel.json.
+    #
+    # site/_headers is Netlify and Cloudflare Pages syntax. This site deploys
+    # to Vercel, which ignores it entirely — so for as long as the headers
+    # lived only in that file, not one of them shipped to production. The
+    # repository looked correct and the served site had no HSTS, no nosniff,
+    # no Permissions-Policy and no frame-ancestors. Only the meta CSP was
+    # doing anything.
+    #
+    # Both files are now emitted from render.HEADERS, and this check fails if
+    # either drifts from it. A security header that exists in the repository
+    # and not in the response is worse than a missing one, because it stops
+    # anybody looking.
+    vercel = json.load(open(os.path.join(ROOT, "vercel.json"), encoding="utf-8"))
+    catch_all = [h for h in vercel.get("headers", []) if h.get("source") == "/(.*)"]
+    if len(catch_all) != 1:
+        fail("vercel.json has no single catch-all header rule; "
+             "the security headers do not reach production")
+    served = {h["key"]: h["value"] for h in catch_all[0]["headers"]}
+    for name, value in R.HEADERS.items():
+        if served.get(name) != value:
+            fail(f"vercel.json {name}: serves {served.get(name)!r}, "
+                 f"render.HEADERS says {value!r}")
+        n += 1
+
     hdr = open(os.path.join(OUT, "_headers"), encoding="utf-8").read()
     for directive in R.CSP_META.split("; "):
         if directive not in hdr:
@@ -669,6 +691,72 @@ def c_csp():
         for m in re.finditer(r'(?:src|href)="(https?://[^"]+)"', h):
             if not m.group(1).startswith("https://europedoor.com"):
                 fail(f"{os.path.relpath(f, OUT)}: loads from {m.group(1)}")
+        n += 1
+    return n
+
+
+@check("the documentation set exists and is not describing a different repository")
+def c_docs():
+    """Ten documents the development brief names, plus the ones this project
+    added, plus the thing that actually goes wrong with documentation.
+
+    Documentation does not usually go missing. It goes *stale*: docs/roadmap.md
+    sat for three sessions claiming 8 journeys, 8 stories, 23 checks and 204
+    assertions long after every one of those had moved, and nothing failed —
+    because a document that is merely out of date is still a document.
+
+    So this check does two things. It asserts the files exist, and it asserts
+    the hand-written ones do not carry counts that the generated ones own. A
+    number copied out of a generated document is a number that will be wrong
+    within a month, and the fix is to link rather than to copy.
+    """
+    required = ["architecture", "product", "development", "database", "roadmap",
+                "api", "ai", "deployment", "security", "content-model",
+                "brand", "brand-lock", "images", "data-model", "legal-position",
+                "technical-foundation", "audit-2026-09"]
+    n = 0
+    for name in required:
+        path = os.path.join(ROOT, "docs", f"{name}.md")
+        if not os.path.exists(path):
+            fail(f"docs/{name}.md is missing")
+            continue
+        if os.path.getsize(path) < 400:
+            fail(f"docs/{name}.md is a stub")
+        n += 1
+
+    # The generated documents own these numbers. A hand-written document that
+    # restates one has taken on a maintenance obligation nobody will honour.
+    d = D.load()
+    owned = {
+        str(len(D.all_places(d["countries"]))): "places",
+        str(len(d["journeys"])): "journeys",
+        str(len(d["stories"])): "stories",
+    }
+    generated = {"content-report", "section-audit", "ux-audit"}
+    for path in sorted(glob.glob(os.path.join(ROOT, "docs", "*.md"))):
+        name = os.path.basename(path)[:-3]
+        if name in generated:
+            continue
+        text = open(path, encoding="utf-8").read()
+        for number, what in owned.items():
+            # Only the "<n> <thing>" form — a bare number can be anything, and
+            # a check that fires on coincidences is a check somebody disables.
+            #
+            # A document that links content-report.md is exempt, deliberately.
+            # The rule being enforced is "if you state a count, point at the
+            # document that owns it", not "never state a count": the roadmap
+            # and the audit both need to name figures to make an argument,
+            # and both send the reader to the regenerated source.
+            if f"{number} {what}" in text and "docs/content-report.md" not in text:
+                fail(f"docs/{name}.md states '{number} {what}' without pointing at "
+                     "docs/content-report.md, which owns that number and regenerates it")
+        n += 1
+
+    # The README has to get somebody to a build.
+    readme = open(os.path.join(ROOT, "README.md"), encoding="utf-8").read()
+    for needed in ("python3 tools/build.py", "docs/roadmap.md", "docs/architecture.md"):
+        if needed not in readme:
+            fail(f"README.md does not mention {needed!r}")
         n += 1
     return n
 

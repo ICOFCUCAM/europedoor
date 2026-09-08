@@ -1210,11 +1210,24 @@ def s87():
 
 
 @section(88, "Development phases", "RECORDED",
-         "Phase 0 and most of Phase 1 are done. Phase 2 is commercial and "
-         "blocked; Phase 3 is scale.")
+         "The roadmap is now written against the ten-phase development brief "
+         "and states, per phase, whether it is done, partial or blocked — and "
+         "for the blocked ones, that they all trace to the same missing "
+         "entity rather than to anything technical.")
 def s88():
     yield spec_covers("Roadmap, twelve months"), "the phasing is recorded"
-    yield doc_covers("docs/roadmap.md", "Blocked, and by what"), "with what blocks each"
+    yield doc_covers("docs/roadmap.md", "Where each phase actually stands"), \
+        "with a per-phase state"
+    yield doc_covers("docs/roadmap.md", "The governing constraint",
+                     "no incorporated entity"), \
+        "and the one constraint every blocked phase traces to"
+    yield doc_covers("docs/roadmap.md", "the order they unblock in"), \
+        "and the order they unblock in"
+    # A roadmap that lists only what is next is a wish list. This one has to
+    # say what it refuses, or the refusals get re-proposed every quarter.
+    yield doc_covers("docs/roadmap.md", "deliberately does not do"), \
+        "and what it deliberately will not do"
+    yield bool(src("docs/audit-2026-09.md")), "and the audit it came out of"
 
 
 @section(89, "Development team", "RECORDED",

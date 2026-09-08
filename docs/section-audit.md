@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**100 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 1 locked · 1 refused · 1 built (deliberately smaller) · 1253 assertions · 0 failing**
+**100 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 1 locked · 1 refused · 1 built (deliberately smaller) · 1257 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -98,7 +98,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 85 | Core user flow | PARTIAL | 3 | Discover → destination → experience → planner → journey → customise → save → share all work. Book, travel, review and return need the blocked half. |
 | 86 | Business user flow | PARTIAL | 2 | Discover, understand the tiers and the price all work. Create an account onwards needs authentication. |
 | 87 | Tourism board flow | PARTIAL | 1 | The offer and the refusal are published; the campaign machinery needs traffic and a contract. |
-| 88 | Development phases | RECORDED | 2 | Phase 0 and most of Phase 1 are done. Phase 2 is commercial and blocked; Phase 3 is scale. |
+| 88 | Development phases | RECORDED | 6 | The roadmap is now written against the ten-phase development brief and states, per phase, whether it is done, partial or blocked — and for the blocked ones, that they all trace to the same missing entity rather than to anything technical. |
 | 89 | Development team | RECORDED | 1 | Recorded, with the observation the specification understates: editorial is the largest line and the first one cut. |
 | 90 | Initial budget priority | RECORDED | 2 | Architecture, database, UX and content first — which is what was actually spent here, in that order. |
 | 91 | First 90 days | RECORDED | 2 | Days 31–90 are what this repository is. Days 1–30 — company, legal structure — are the blocking gap, and every blocked feature traces back to them. |

@@ -14,7 +14,8 @@ Via Europa. Take their architecture and drop their branding section. See
 
 | doing | read |
 |---|---|
-| **anything substantial — start here** | **`docs/product-specification.md`** — both specifications answered: the 36-section brief in Parts 1–3, the 99-section one in Part 4. Plus the Postgres schema, the API, the AI pipeline with actual prompts, the dashboards, the money and the risks |
+| **starting a session — read this first** | **`docs/audit-2026-09.md`** — the repository audit: current stack, what exists, technical debt, and the one open architectural decision (Next.js/Postgres: not yet, and why). Then **`docs/roadmap.md`** |
+| **anything substantial** | **`docs/product-specification.md`** — both specifications answered: the 36-section brief in Parts 1–3, the 99-section one in Part 4. Plus the Postgres schema, the API, the AI pipeline with actual prompts, the dashboards, the money and the risks |
 | changing how pages are generated | **`docs/architecture.md`** — the four rules the build depends on |
 | adding or editing a place | **`docs/data-model.md`** — every field, and what the validator rejects |
 | the scores | **`docs/scoring-method.md`** — and note the formula is published at `/method`, so changing `score.py` changes a public page |
@@ -24,7 +25,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | photographs, or "why is there no picture here" | **`docs/images.md`** — the pipeline is built and enforced; the library is empty |
 | **the Postgres/PostGIS model, the API, Next.js, auth, search, the AI pipeline** | **`docs/technical-foundation.md`** — a destination with a trigger, not a plan for Monday. Nothing in it should be built yet |
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
-| **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,253 assertions against the real build, and CI fails if any of them stops being true |
+| **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,257 assertions against the real build, and CI fails if any of them stops being true |
 | **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence: 43 sections, 218 assertions |
 
 ## The rules that catch people out
@@ -48,6 +49,13 @@ output nobody is going to serve.
 hidden in the UI. Ukraine, Russia and Belarus keep a page carrying the
 warning and are absent from `/api/atlas.json`. Do not "fix" this by filtering
 in JavaScript.
+
+**Security headers live in `render.HEADERS`, and `vercel.json` is checked
+against it.** Vercel does NOT read `site/_headers` — that is Netlify and
+Cloudflare Pages syntax — so for as long as the headers lived only there,
+HSTS, nosniff, Permissions-Policy and frame-ancestors were absent from every
+production response while the repository looked correct. A check now fails on
+drift between the two.
 
 **The Fund holds nothing, and the checks enforce it.** No form, no payment
 link, no amount raised, no progress bar on any `/fund` page; no `amount`,
@@ -96,9 +104,9 @@ Run all seven before claiming anything is done.
 
     python3 tools/build.py check       validate the data
     python3 tools/build.py            988 pages
-    python3 tools/checks.py            25 checks, ~88,000 things examined
+    python3 tools/checks.py            26 checks, ~88,300 things examined
     node tools/browser-checks.js       389 checks in Chromium, incl. accessibility
-    python3 tools/section-audit.py --check   the 99 spec sections, 1,253 assertions
+    python3 tools/section-audit.py --check   the 99 spec sections, 1,257 assertions
     python3 tools/ux-audit.py --check        the 37 UI/UX + 6 brand sections, 218 assertions
     python3 tools/content-report.py --write  what is missing, against the spec's targets
 

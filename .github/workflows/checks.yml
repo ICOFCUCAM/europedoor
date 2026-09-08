@@ -58,6 +58,11 @@ jobs:
             exit 1
           fi
 
+      - name: Fail if the roadmap or the audit went stale
+        run: |
+          test -s docs/audit-2026-09.md
+          test -s docs/roadmap.md
+
       - name: Audit the UI/UX brief, section by section
         run: python3 tools/ux-audit.py --check
 

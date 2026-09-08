@@ -359,9 +359,12 @@ The load-bearing decisions:
 
 ## 8. Seed data
 
-The seed is this repository. `content/` is 50 countries, 130 regions, 319
-destinations, 192 places, 197 experiences, 17 journeys and 9 stories, all
-validated, all cross-linked, all written rather than imported.
+The seed is this repository. `content/` is every country, region,
+destination, place, experience, journey and story currently written —
+validated, cross-linked, and written rather than imported. The live counts
+are in `docs/content-report.md`, which is regenerated on every build; they are
+not copied here, because a number copied out of a generated document is a
+number that will be wrong within a month.
 
 ```
 content/
