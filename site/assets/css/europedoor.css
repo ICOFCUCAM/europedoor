@@ -385,7 +385,23 @@ main.wide { max-width: 92rem; }
 .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); border-color: var(--ink-3); }
 .card-art { aspect-ratio: 16 / 9; overflow: hidden; background: var(--paper-3); }
 .card.tall .card-art { aspect-ratio: 3 / 4; }
-.plate { width: 100%; height: 100%; display: block; }
+/* THE APERTURE, third renderer. Every generated landscape on EuropeDoor is
+   seen through a doorway — SVG clipPath on the maps, a pixel mask on the
+   social card, and here the box itself. Two horizontal radii of 50% meet at
+   the centre of the top edge, so the pair is one continuous elliptical head
+   with straight jambs below it: exactly the curve render.arch_path() draws.
+
+   It is CSS and not the SVG clip because .plate has a 16/9 viewBox and its
+   containers do not — .card-art is 16/9, .card.tall is 3/4 and the two lead
+   mosaic tiles are 21/9 — and preserveAspectRatio="slice" crops the drawing
+   to fill. An aperture cut inside that viewBox is cropped with it: sliced
+   flat on the wide tiles and gone entirely on the tall card. A border-radius
+   is measured against the painted box, so it fits whatever the box turns out
+   to be. The corners fall back to --paper-3, which is what .card-art already
+   paints, so the plate reads as die-cut out of the card rather than laid on
+   top of it. */
+.plate { width: 100%; height: 100%; display: block;
+         border-radius: 50% 50% 0 0 / 34% 34% 0 0; }
 .card-body { padding: var(--s4); }
 .card h3 { margin-bottom: var(--s2); }
 .card .blurb { font-size: var(--t-sm); color: var(--ink-2); margin: 0; }

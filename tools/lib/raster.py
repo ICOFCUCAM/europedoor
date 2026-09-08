@@ -23,6 +23,7 @@ a few milliseconds rather than the seconds a per-pixel Python loop costs.
 
 from __future__ import annotations
 
+import math
 import struct
 import zlib
 
@@ -96,6 +97,30 @@ class Canvas:
                 self.span(y, xs[i], xs[i + 1] + 1, rgb, alpha)
 
     # ── PNG ──────────────────────────────────────────────────────────
+    def arch_mask(self, rgb, rise=None):
+        """Paint everything OUTSIDE a segmental arch, leaving a doorway.
+
+        The same aperture the SVG maps and the CSS plate boxes are cut with,
+        in pixels, so a shared link carries the door into whatever product
+        renders the card. The geometry has to agree with render.arch_path()
+        or the site and the card drift, which is the failure the
+        one-drawing-two-renderers rule exists to prevent — so both describe
+        the same ellipse: rx = w/2, ry = rise, apex at (w/2, 0), springing
+        at (0, rise) and (w, rise).
+        """
+        if rise is None:
+            rise = min(self.h * 0.34, self.w * 0.5)
+        rise = max(1.0, min(rise, self.h * 0.9, self.w * 0.5))
+        half = self.w / 2.0
+        for y in range(self.h):
+            if y >= rise:
+                continue
+            t = (rise - y) / rise
+            inside = 1.0 - t * t
+            hw = half * math.sqrt(inside) if inside > 0 else 0.0
+            self.span(y, 0, int(half - hw), rgb, 1.0)
+            self.span(y, int(half + hw), self.w, rgb, 1.0)
+
     def png(self):
         """Truecolour, 8-bit, filter type 0 on every scanline.
 
@@ -117,8 +142,22 @@ class Canvas:
                 + chunk(b"IEND", b""))
 
 
-def plate_png(shapes, w, h):
-    """Render (sky_top, sky_bottom, prims) from render.plate_shapes()."""
+# limestone-3 (#e3e0d8), which is exactly --paper-3: the ground .card-art
+# paints behind a plate on the site. The card has no world to resolve a token
+# against, so the value is written out here — and it is the DISCOVER value on
+# purpose, because a shared link is somebody meeting EuropeDoor, and that is
+# the world the front door is in.
+CARD_WALL = (227, 224, 216)
+
+
+def plate_png(shapes, w, h, arch=True):
+    """Render (sky_top, sky_bottom, prims) from render.plate_shapes().
+
+    `arch` cuts the same aperture the SVG maps are cut with. A social card is
+    the one image whose authors never see it — it is rendered inside somebody
+    else's product, days later — which makes it the single best place to put
+    a mark that has to survive being cropped out of context.
+    """
     sky_a, sky_b, prims = shapes
     c = Canvas(w, h)
     c.vertical_gradient(sky_a, sky_b)
@@ -132,4 +171,6 @@ def plate_png(shapes, w, h):
             c.ellipse(prim[1], prim[2], prim[3], prim[3], prim[4], prim[5])
         elif kind == "ellipse":
             c.ellipse(prim[1], prim[2], prim[3], prim[4], prim[5], prim[6])
+    if arch:
+        c.arch_mask(CARD_WALL)
     return c.png()

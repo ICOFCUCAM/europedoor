@@ -44,7 +44,7 @@ MARK = (
 
 
 def arch_path(w, h, rise=None):
-    """A segmental arch across a w x h frame, as an SVG path.
+    """An arch across a w x h frame, as an SVG path.
 
     THE SIGNATURE. The mark is a door: a frame with a semicircular head. An
     arch is also the one architectural form the whole continent shares —
@@ -54,23 +54,37 @@ def arch_path(w, h, rise=None):
     scale. Structural, not illustrated, which is where brand metaphors last.
 
     Not a semicircle. A semicircular head on a 900x320 map would need a rise
-    of 450 and there are only 320 to spend, so the arch is SEGMENTAL — a
-    circular segment struck from a radius larger than the span, which is what
-    a mason does over a wide opening and what every bridge in Europe is. The
-    radius follows from the span and the rise:
+    of 450 and there are only 320 to spend, so the head is struck across the
+    full span at whatever rise the frame can afford — shallow and confident
+    over a wide opening, which is what a mason does and what every bridge in
+    Europe is.
 
-        R = (rise^2 + (span/2)^2) / (2 * rise)
+    ELLIPTICAL, not circular, and that was a correction rather than a
+    preference. The first version struck a circular segment,
+    R = (rise^2 + (span/2)^2) / (2*rise). It is the more honest masonry and
+    it cost the signature its third renderer: a circular segment cannot be
+    written as a CSS border-radius, so the plates — whose containers are
+    16/9, 3/4 and 21/9 while the viewBox is only ever 16/9 — had to be cut
+    inside the drawing with `preserveAspectRatio="slice"` cropping the head
+    flat on the wide ones and away entirely on the tall one. An elliptical
+    head with rx = span/2 and ry = rise IS a border-radius:
 
-    `rise` defaults to a quarter of the height, clamped so a very wide frame
-    keeps a shallow, confident curve rather than a bulge.
+        border-radius: 50% 50% 0 0 / <rise as % of height> ... 0 0
+
+    so the same aperture is now cut three ways — SVG clipPath here, pixels in
+    raster.arch_mask(), and the box itself in CSS — and all three describe one
+    curve. The two forms differ by about 20px in 630 at the quarter span; the
+    aperture surviving every aspect ratio is worth more than that.
+
+    `rise` defaults to about a third of the height, clamped so a very wide
+    frame keeps a shallow curve rather than a bulge.
     """
     if rise is None:
         rise = min(h * 0.34, w * 0.5)
     rise = max(1.0, min(rise, h * 0.9, w * 0.5))
     half = w / 2.0
-    r = (rise * rise + half * half) / (2.0 * rise)
     return (f"M0,{h:.1f} L0,{rise:.1f} "
-            f"A {r:.1f},{r:.1f} 0 0 1 {w:.1f},{rise:.1f} "
+            f"A {half:.1f},{rise:.1f} 0 0 1 {w:.1f},{rise:.1f} "
             f"L {w:.1f},{h:.1f} Z")
 
 
@@ -819,8 +833,15 @@ OG_W, OG_H = 1200, 630
 OG_WANTED = {}
 
 
+# The version tag is part of the key because the drawing is an input to the
+# picture and nothing else in the hash notices when it changes. v1 -> v2 is
+# the arch aperture: without the bump every one of the 794 cached cards would
+# have kept its pre-arch pixels under a filename that still looked current,
+# and the only symptom would have been a shared link that no longer matched
+# its page — invisible from here, because a card is rendered inside somebody
+# else's product.
 def og_key(seed, motif):
-    return hashlib.sha256(f"{seed}|{motif}|{OG_W}x{OG_H}|v1".encode()).hexdigest()[:16]
+    return hashlib.sha256(f"{seed}|{motif}|{OG_W}x{OG_H}|v2-arch".encode()).hexdigest()[:16]
 
 
 def og_tags(seed, motif, alt):

@@ -1917,6 +1917,59 @@ def c_no_fixed_widths():
     return n
 
 
+@check("the aperture is cut the same way by all three renderers")
+def c_aperture_agrees():
+    # The signature is one curve cut three ways: an SVG clipPath for the maps
+    # (render.arch_path), a pixel mask for the social card
+    # (raster.Canvas.arch_mask), and a border-radius for the plates, whose
+    # containers are 16/9, 3/4 and 21/9 while their viewBox is only ever
+    # 16/9. Three implementations of one shape is exactly the arrangement
+    # that drifts: the card stops matching the page and nobody sees it,
+    # because a card is rendered inside somebody else's product days later.
+    #
+    # So this asserts what they have to share. The rise fraction is the whole
+    # proportion of the arch — change it in one place and the doorway is a
+    # different doorway there — and the head is elliptical, rx = span/2,
+    # which is the only form a border-radius can state.
+    n = 0
+    src = {
+        "render.arch_path": open(os.path.join(ROOT, "tools/lib/render.py"),
+                                 encoding="utf-8").read(),
+        "raster.arch_mask": open(os.path.join(ROOT, "tools/lib/raster.py"),
+                                 encoding="utf-8").read(),
+    }
+    for name, text in src.items():
+        body = text.split("def arch_path", 1)[-1] if "path" in name else \
+            text.split("def arch_mask", 1)[-1]
+        body = body.split("\ndef ", 1)[0]
+        if "0.34" not in body:
+            fail(f"{name}: the rise is not 0.34 of the height — "
+                 f"the three renderers no longer draw one arch")
+        n += 1
+    # The SVG arc must be elliptical (rx = half, ry = rise), not the circular
+    # segment this started as: a circular segment cannot be written as a
+    # border-radius, and the plates would lose their aperture to
+    # preserveAspectRatio="slice".
+    rp = src["render.arch_path"].split("def arch_path", 1)[1].split("\ndef ", 1)[0]
+    if "{half:.1f},{rise:.1f}" not in rp:
+        fail("render.arch_path: the arc is not rx=half,ry=rise — CSS cannot "
+             "state the same curve")
+    n += 1
+    css = open(os.path.join(ROOT, "assets/css/europedoor.css"),
+               encoding="utf-8").read()
+    m = re.search(r"\.plate\s*\{[^}]*border-radius:\s*50% 50% 0 0 / "
+                  r"(\d+)% (\d+)% 0 0", css)
+    if not m:
+        fail(".plate has no arch border-radius — the plates are rectangles "
+             "again and only the maps and the card carry the door")
+    else:
+        if m.group(1) != m.group(2) or m.group(1) != "34":
+            fail(f".plate border-radius rise is {m.group(1)}%/{m.group(2)}%, "
+                 f"not 34%/34% — it no longer matches arch_path")
+        n += 1
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0
