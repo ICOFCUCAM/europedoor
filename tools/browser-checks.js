@@ -1405,13 +1405,113 @@ async function main() {
     ok(scheme === "light" ? LUM(home.bg) > 0.7 : LUM(home.bg) < 0.06,
        `${scheme}: DISCOVER did not follow the colour-scheme preference (${home.bg})`);
 
-    // A map is INTELLIGENCE wherever it is embedded.
+    // A map is INTELLIGENCE wherever it is embedded — and this pair of
+    // assertions had encoded the old IMPLEMENTATION of that promise rather
+    // than the promise. They demanded the <figure> carry data-world and paint
+    // a dark background, which is what a map was when it was a dark panel
+    // sitting on the page. It is now an aperture cut INTO the page: the
+    // figure keeps the page's own world so its caption is legible, the
+    // drawing carries the dark world, and the corners outside the arch show
+    // the page through. A figure with a dark background would fill those
+    // corners back in and destroy the door.
+    //
+    // So the claim is what it always meant: light wall, dark opening. The
+    // drawing is INTELLIGENCE, the ground inside the aperture is dark, and
+    // in the light scheme the page around it is not. It still fails if a
+    // map stops being an INTELLIGENCE component, and it now also fails if
+    // the wall goes dark — which the old version could not see.
     await w.goto(base + "/europe/italy", { waitUntil: "load" });
-    ok(await w.locator('.countrymap[data-world="intelligence"]').count() === 1,
-       "the country map is not an INTELLIGENCE component");
-    const figBg = await w.evaluate(() =>
-      getComputedStyle(document.querySelector(".countrymap")).backgroundColor);
-    ok(LUM(figBg) < 0.06, `the embedded map is not dark (${figBg})`);
+    ok(await w.locator('.countrymap svg[data-world="intelligence"]').count() === 1,
+       "the country map drawing is not an INTELLIGENCE component");
+    const ap = await w.evaluate(() => {
+      const g = document.querySelector(".countrymap .archground");
+      const fig = document.querySelector(".countrymap");
+      // The wall is the first ancestor that actually paints. Reading
+      // fig.parentElement alone returned rgba(0,0,0,0) and failed the
+      // assertion on a page whose wall is limestone — the transparency was
+      // mine, not the design's.
+      let n = fig.parentElement, wall = "";
+      while (n && n !== document.documentElement) {
+        const b = getComputedStyle(n).backgroundColor;
+        if (b && !/rgba\(0, 0, 0, 0\)|transparent/.test(b)) { wall = b; break; }
+        n = n.parentElement;
+      }
+      return { ground: g && getComputedStyle(g).fill,
+               panel: getComputedStyle(fig).backgroundColor,
+               wall: wall || getComputedStyle(document.body).backgroundColor };
+    });
+    ok(ap.ground && LUM(ap.ground) < 0.06,
+       `the opening is not dark (${ap.ground})`);
+    // The figure must paint NOTHING. That is the whole difference between an
+    // aperture and a panel: the corners outside the arch have to show the
+    // page through, and any background on the figure fills them back in —
+    // which is the shape a well-meaning "the map should have a frame" change
+    // would take. The first version of this assertion read the wall around
+    // the figure instead, and could not fail: a dark background put back on
+    // the figure left the section around it light and the suite green.
+    ok(/rgba\(0, 0, 0, 0\)|transparent/.test(ap.panel),
+       `${scheme}: the map figure paints ${ap.panel} — it is a panel again, `
+       + `and the corners outside the arch are filled in`);
+    if (scheme === "light") {
+      ok(LUM(ap.wall) > 0.7, `${scheme}: the wall the map is cut into is not `
+         + `light (${ap.wall}) — there is no light wall, dark opening`);
+    }
+    // WHAT THE DRAWING ACTUALLY PAINTS.
+    //
+    // This replaces what the CSS contrast probe was pretending to measure
+    // inside the maps. An aperture's ground is an SVG <rect class="archground">
+    // and its labels are fills, several of them translucent — a limestone at
+    // 72% over a near-black. Nothing about that pair is visible to
+    // getComputedStyle().color and a walk up the CSS background chain, so it
+    // is read here from the fills themselves, with alpha composited over the
+    // ground before the ratio, because 72% of limestone is what a reader
+    // sees and 100% of it is not.
+    //
+    // Small text: 4.5. The labels are 11px.
+    for (const url of ["/europe/italy",
+                       "/europe/austria/salzburg-and-the-lakes/hallstatt"]) {
+      await w.goto(base + url, { waitUntil: "load" });
+      const paint = await w.evaluate(() => {
+        const parse = (c) => {
+          const n = (c.match(/-?\d*\.?\d+/g) || []).map(Number);
+          const k = /^color\(/.test(c) ? 255 : 1;
+          return [n[0] * k, n[1] * k, n[2] * k,
+                  n.length > 3 ? n[3] : 1];
+        };
+        const out = [];
+        for (const fig of document.querySelectorAll(".minimap.arched")) {
+          const g = fig.querySelector(".archground");
+          if (!g) continue;
+          const ground = parse(getComputedStyle(g).fill);
+          for (const sel of [".minilabel", ".minilabel.here", ".minidot circle",
+                             ".minidot.here circle", ".routedot", ".routeline"]) {
+            const el = fig.querySelector(sel);
+            if (!el) continue;
+            const cs = getComputedStyle(el);
+            const raw = sel === ".routeline" ? cs.stroke : cs.fill;
+            const f = parse(raw);
+            const a = f[3] * parseFloat(cs.opacity || "1");
+            out.push({ sel, fg: [0, 1, 2].map((i) => f[i] * a + ground[i] * (1 - a)),
+                       bg: ground.slice(0, 3) });
+          }
+        }
+        return out;
+      });
+      ok(paint.length > 0, `${url}: no arched map to measure`);
+      const lin = (v) => { const x = v / 255;
+        return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); };
+      const rel = ([r, g, b]) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+      for (const m of paint) {
+        const [hi, lo] = [rel(m.fg), rel(m.bg)].sort((a, b) => b - a);
+        const r = (hi + 0.05) / (lo + 0.05);
+        // A dot and a route line are graphics, not text: 3:1 is the
+        // non-text threshold. The two label selectors are text.
+        const need = m.sel.startsWith(".minilabel") ? 4.5 : 3;
+        ok(r >= need, `${scheme} ${url}: ${m.sel} inside the aperture is `
+           + `${r.toFixed(2)}:1 on the opening's ground, needs ${need}`);
+      }
+    }
+
     await w.close();
   }
 
@@ -1480,8 +1580,22 @@ async function main() {
       return (l1 + 0.05) / (l2 + 0.05);
     };
 
+    // ownerSVGElement excludes everything inside a drawing, and that is a
+    // correction rather than a convenience. A map's dots are <a
+    // class="minidot"> whose textContent is a <title> — an accessible name,
+    // a tooltip, not one painted pixel. Both halves of the ratio are then
+    // fiction: getComputedStyle().color on an element that paints with
+    // `fill`, against a background found by walking up through elements that
+    // have no CSS background at all, to the body. On the arched maps that
+    // reported 1.00:1 on every dot in Norway — light INTELLIGENCE ink,
+    // inherited from the <svg>, measured against the limestone page — while
+    // the dots sit on a dark <rect> the walk cannot see, at about 15:1.
+    //
+    // A contrast probe that cannot see the ground is not measuring contrast.
+    // The drawings are measured below instead, from the fills they actually
+    // paint.
     const sample = [...document.querySelectorAll("p, li, a, h1, h2, h3, dt, dd, button, label, span.chip, .rowmeta, .kicker, .footer-legal")]
-      .filter((el) => el.textContent.trim().length > 3)
+      .filter((el) => el.textContent.trim().length > 3 && !el.ownerSVGElement)
       .slice(0, 220);
     for (const el of sample) {
       const cs = getComputedStyle(el);
@@ -1584,7 +1698,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 620;
+  const FLOOR = 660;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +

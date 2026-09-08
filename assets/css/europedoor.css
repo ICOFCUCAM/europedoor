@@ -1821,7 +1821,18 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
  * doorway cut into the page is exactly the dark ground that policy is for. */
 .minimap.arched .routeline { stroke: var(--lime); opacity: .95; }
 .minimap.arched .routedot { fill: var(--lime); stroke: var(--map-sea); stroke-width: 1.5; }
-.minimap.arched .minidot circle { fill: color-mix(in srgb, var(--limestone) 55%, transparent); }
+/* opacity:1 is the load-bearing half. The base rule is
+   `.minidot circle { fill: var(--ink-3); opacity: .55 }` — a fill and a
+   dimmer. Overriding only the fill left both dimmers in place, so the
+   colour-mix's 55% was multiplied by the element opacity's 55% and the
+   dots inside the aperture painted at 30% of limestone: 2.55:1 on the
+   opening's ground, under the 3:1 a non-text graphic needs. Nothing
+   could see it — a dot is drawn with `fill` on an SVG <rect>, which is
+   neither a CSS colour nor a CSS background — until the browser suite
+   started reading the fills and compositing the alpha itself. 5.86:1
+   now. */
+.minimap.arched .minidot circle { opacity: 1;
+  fill: color-mix(in srgb, var(--limestone) 55%, transparent); }
 .minimap.arched .minidot.here circle { fill: var(--lime); }
 .minimap.arched .minilabel { fill: color-mix(in srgb, var(--limestone) 72%, transparent); }
 .minimap.arched .minilabel.here { fill: var(--limestone); font-weight: 600; }
