@@ -151,3 +151,75 @@ Both matchers corrected, both floors rewritten to the truth,
   (peaks, skyline, coast, isles) — but at 480×310 they are flat.
 - The 168px mobile masthead is a **shell** decision and is not this family's
   to take.
+
+---
+
+# Exemplar 2 — Experience, built
+
+`/experiences/food/markets` and the 49 pages that inherit it.
+
+## What was there
+
+Six left-aligned titles with right-aligned metadata. **Zero plates, zero
+cards, zero bands** — the only family on the site with no visual element of
+any kind. A database table with a heading, on a page whose job is to make
+somebody want to do something.
+
+## What the page actually has
+
+Six well-written sentences about six specific things, **in six different
+countries**. The spread across Europe *is* the offer — and it was 11px grey
+text, right-aligned, at the end of each row.
+
+## The composition
+
+| | |
+|---|---|
+| **Leads with** | the country, then the town — the page reads down its left edge like the contents of a magazine feature |
+| **Then** | the thing, at reading size, with the sentence somebody wrote about it |
+| **Then** | kind and price band, quiet, right |
+| **A category** | leads with its authored blurb at display scale |
+| **A sub-category** | leads with the countries it reaches, and **is not given its parent's sentence** |
+
+**No imagery, deliberately.** The obvious move was a plate per row, and it is
+exactly the trap the brief names: a plate here illustrates the *city*, is
+already on that city's own page, and would be placed because the system has
+one. Typography and geography carry it instead.
+
+`row exprow`, never a replacement — the `row` primitive holds its reach at
+0.909.
+
+## A content defect found on the way
+
+`matches_sub()` searched the **town's name**. The keywords are matched as
+prefixes on purpose — so `monaster` catches monasteries and `archaeolog`
+catches archaeological — and that made place names satisfy them:
+
+```
+\bhall  matched Hallstatt   ->  a salt mine listed under Markets
+\bwar   matched Warsaw      ->  a museum listed under Modern history
+\bport  matched Portree     ->  a ridge walk listed under Cellars
+\bsnow  matched Snowdonia   ->  a slate railway listed under Skiing
+```
+
+**Eight of 423 listings across the 40 sub-pages arrived this way; five were
+nonsense and three were defensible.** A rule right three times in eight is
+not a rule. Dropping the town empties no page (423 → 415). A trailing `\b`
+was the other candidate and was rejected — it would break the four keywords
+that are stems on purpose.
+
+The published selection rule now says so on the page itself: *"matched
+against what we wrote about the experience and never against the name of the
+town, because a salt mine in Hallstatt is not a market."*
+
+Four assertions added, all **proved red** by restoring the old matcher.
+
+## The content gap this exposes, and does not paper over
+
+**Forty sub-categories have a name, a keyword list and no authored
+characterisation.** The first version filled that hole with the parent
+category's blurb, which put *"Markets, tables, cellars, vineyards and the
+dishes that belong to one valley"* in 40px type at the top of the Markets
+page — authored, true, and about the wrong thing. A sub-page now leads with
+its countries instead. **The missing sentence is editorial work, not a design
+problem, and the design's job is to leave the gap visible.**

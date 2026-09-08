@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**101 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1 refused · 1318 assertions · 0 failing**
+**101 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1 refused · 1323 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -25,7 +25,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 12 | Region page | BUILT | 4 | Every travel region has one, and it aggregates the destinations, places, experiences and journeys beneath it rather than being a list of city links. |
 | 13 | Destination page | PARTIAL | 6 | Seventeen of the twenty sections, travel tips now among them. Accommodation and restaurants are named and honestly empty — the listing product is the missing piece, not the heading. |
 | 14 | Place page | PARTIAL | 5 | The entity exists with 192 records. Opening hours, price and official website are refused rather than invented, and the validator rejects them. |
-| 15 | Experience system | BUILT | 13 | The specification's eight categories, now with 30 sub-categories — Renaissance was the one it named that we did not have — each page printing the rule that built its list. |
+| 15 | Experience system | BUILT | 18 | The specification's eight categories, now with 30 sub-categories — Renaissance was the one it named that we did not have — each page printing the rule that built its list. |
 | 16 | Journey system | BUILT | 188 | Every field on the specification's journey object except booking links, which are blocked with everything else commercial. |
 | 17 | Journey page | BUILT | 2 | Overview, map, route, transport, accommodation, budget, season, packing, the experiences the route passes and what you will be eating — plus a named curator and a way into the planner. |
 | 18 | Multi-country journeys | BUILT | 5 | All four the specification names, plus thirteen more, the widest crossing seven countries. |

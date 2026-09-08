@@ -2016,6 +2016,18 @@ def scorebars(scores):
 
 # ── experiences & the marketplace ─────────────────────────────────────
 
+def country_spread(countries):
+    """The countries a list reaches, as the page's own rhythm.
+
+    On this family the spread IS the offer — "Markets" is six markets in six
+    countries — and it used to be 11px grey text right-aligned at the end of
+    each table row. Nothing here is authored: it is the set of countries in
+    the list, in order.
+    """
+    return '<span class="sep" aria-hidden="true"> · </span>'.join(
+        f'<span>{esc(c)}</span>' for c in countries)
+
+
 def category_page(data, cat, sub=None):
     """A category or sub-category of experience, with its selection rule
     printed on it. A list nobody can reproduce is a list nobody can argue
@@ -2026,10 +2038,19 @@ def category_page(data, cat, sub=None):
     chosen = C.select(items, cat, sub)
     chosen.sort(key=lambda it: (it["country"]["name"], it["city"]["name"]))
 
+    # The country leads, because the spread across Europe IS the offer on
+    # this family: "Markets" is six markets in six countries, and that was
+    # 11px grey text right-aligned at the end of a table row. The class is
+    # `row exprow` and not a replacement, so the `row` primitive keeps its
+    # reach and this family gets its own composition on top of it.
     rows = "".join(
-        f"""<a class="row" href="{urls.city(it['country'], it['region'], it['city'])}">
-        <div><h3>{esc(it['exp']['name'])}</h3><p class="rowsub">{esc(it['exp']['summary'])}</p></div>
-        <p class="rowmeta">{esc(it['city']['name'])}, {esc(it['country']['name'])} · {esc(it['exp']['band'])}</p></a>"""
+        f"""<a class="row exprow" href="{urls.city(it['country'], it['region'], it['city'])}">
+        <p class="exp-where"><span class="exp-country">{esc(it['country']['name'])}</span>
+          <span class="exp-city">{esc(it['city']['name'])}</span></p>
+        <div class="exp-what"><h3>{esc(it['exp']['name'])}</h3>
+          <p class="rowsub">{esc(it['exp']['summary'])}</p></div>
+        <p class="rowmeta exp-kind">{esc(data['taxonomy']['experience_kinds'].get(it['exp']['kind'], it['exp']['kind']))}
+          <span class="exp-band">{esc(it['exp']['band'])}</span></p></a>"""
         for it in chosen
     )
     subcards = ""
@@ -2052,15 +2073,17 @@ def category_page(data, cat, sub=None):
 
     body = f"""
 {crumbs(trail)}
-<div class="pagehead">
+<div class="pagehead overture">
   <p class="kicker">{esc(cat['name']) if sub else 'Experience category'}</p>
   <h1>{esc(title)}</h1>
-  <p class="lede">{esc(cat['blurb']) if not sub else ''}
-  {len(chosen)} experiences across {len(countries)} countries.</p>
+  {f'<p class="statement">{esc(cat["blurb"])}</p>' if not sub else ""}
+  <p class="orient">{len(chosen)} across {len(countries)} {"country" if len(countries) == 1 else "countries"}</p>
 </div>
+{f'<p class="countryspread lead">{country_spread(countries)}</p>' if sub and countries else ""}
 {section("Sub-categories", subcards) if subcards else ""}
 {section("How this list is built", f'<p class="small mw44">{esc(C.rule_text(cat))}</p>') if not sub else ""}
-<div class="rows">{rows or '<p class="small">Nothing matches this rule yet, and an empty list is better than a padded one.</p>'}</div>
+<div class="rows explist">{rows or '<p class="small">Nothing matches this rule yet, and an empty list is better than a padded one.</p>'}</div>
+{f'<p class="small mw44 rulenote">Selected by name and description against: {esc(", ".join(sub["keywords"]))}. Matched against what we wrote about the experience, never against the name of the town.</p>' if sub else ""}
 """
     return f"{path}/index.html", page(
         title, body, path=path, area="experiences",

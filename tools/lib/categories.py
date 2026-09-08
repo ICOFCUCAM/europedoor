@@ -40,7 +40,25 @@ def text_of(exp, city=None):
 
 
 def matches_sub(exp, sub, city=None):
-    t = text_of(exp, city)
+    """A sub-category keyword describes the EXPERIENCE, not the town it sits in.
+
+    `city` is accepted and ignored, and that is the fix rather than an
+    oversight. It used to be searched, and because the keywords are matched
+    as prefixes — deliberately, so `monaster` catches monasteries and
+    `archaeolog` catches archaeological — a place name would satisfy them:
+
+        \bhall  matched Hallstatt   -> a salt mine listed under Markets
+        \bwar   matched Warsaw      -> a museum listed under Modern history
+        \bport  matched Portree     -> a ridge walk listed under Cellars
+        \bsnow  matched Snowdonia   -> a slate railway listed under Skiing
+
+    Eight of 423 listings across the 40 sub-pages came in this way. Five were
+    plainly wrong and three were defensible (Plitvice Lakes under lakes), and
+    a rule that is right three times in eight is not a rule. Dropping the
+    city empties no page. A trailing \b was the other candidate and was
+    rejected: it would break the four keywords that are stems on purpose.
+    """
+    t = text_of(exp)
     return any(re.search(r"\b" + re.escape(k.lower()), t) for k in sub["keywords"])
 
 
@@ -92,4 +110,6 @@ def rule_text(cat):
     return ("Anything in a place tagged " + ", ".join(cat.get("interests", [])) +
             ", plus anything whose own name or description matches one of the "
             f"{sum(len(s['keywords']) for s in cat.get('subs', []))} terms under the "
-            "sub-categories below.")
+            "sub-categories below. The terms are matched against what we wrote "
+            "about the experience and never against the name of the town, "
+            "because a salt mine in Hallstatt is not a market.")

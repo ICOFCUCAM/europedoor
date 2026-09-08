@@ -1514,3 +1514,75 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
   .placeband { grid-template-columns: 5fr 7fr; align-items: stretch; }
   .placeband-art { aspect-ratio: auto; }
 }
+
+
+/* ── EXPERIENCE: the second family to get a composition ───────────────
+ *
+ * The audit found this the most under-designed family relative to its
+ * promise: /experiences/food/markets rendered as six left-aligned titles
+ * with right-aligned metadata and no images, cards or bands at all — a
+ * database table with a heading, on a page whose job is to make somebody
+ * want to do something.
+ *
+ * WHAT THE PAGE ACTUALLY HAS: six well-written sentences about six specific
+ * things, in six different countries. The spread across Europe is the offer
+ * — and it was 11px grey text, right-aligned, at the end of each row. So the
+ * country leads now, and the page reads down its left edge like the contents
+ * of a magazine feature.
+ *
+ * NO IMAGERY, DELIBERATELY. The obvious move was a plate per row, and it is
+ * the exact trap the brief names: a plate here would be an illustration of
+ * the CITY, already shown on the city's own page, placed because the system
+ * has one rather than because this page needs it. The typography and the
+ * geography carry it instead.
+ *
+ * `row exprow`, never a replacement — the `row` primitive keeps its reach.
+ */
+/* A SUB-CATEGORY HAS NO AUTHORED SENTENCE, so it is not given one.
+ *
+ * The first version set the parent category's blurb as the hero on every
+ * sub-page, which put "Markets, tables, cellars, vineyards and the dishes
+ * that belong to one valley" in 40px type at the top of the Markets page —
+ * authored, true, and about the wrong thing. Forty sub-categories have a
+ * name, a keyword list and no characterisation; that is a content gap, and
+ * the design's job is to leave it visible rather than paper it with a
+ * sentence about something else.
+ *
+ * So a CATEGORY page leads with its blurb, and a SUB page leads with the
+ * countries it reaches — which is the honest answer to "what is on this
+ * page", and on this family it is also the offer. */
+.countryspread {
+  margin: var(--s5) 0 0; font-size: var(--t-xs); letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-3); line-height: 1.5;
+}
+.countryspread.lead {
+  margin-top: var(--s4); font-size: var(--t-sm); letter-spacing: .08em;
+  color: var(--ink-2); max-width: 46rem; line-height: 1.5;
+}
+.countryspread.lead span:not(.sep) { color: var(--ink); font-weight: 500; }
+.countryspread .sep { color: var(--rule); }
+
+.explist { margin-top: var(--s7); }
+.exprow { align-items: start; }
+.exp-where { margin: 0; display: grid; gap: 2px; align-content: start; }
+.exp-country {
+  font-size: var(--t-xs); letter-spacing: .1em; text-transform: uppercase;
+  font-weight: 600; color: var(--door);
+}
+.exp-city { font-size: var(--t-sm); color: var(--ink-2); }
+.exp-what h3 { margin: 0; }
+.exp-what .rowsub { margin-top: var(--s2); max-width: 52ch; }
+.exp-kind {
+  font-size: var(--t-xs); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-3); display: grid; gap: 2px; justify-items: start;
+}
+.exp-band { color: var(--ink-3); letter-spacing: .04em; }
+.rulenote { margin-top: var(--s6); color: var(--ink-3); }
+
+/* A phone reads it as one column: where, then what, then which kind. The
+ * desktop three-track layout is a composition and does not survive being
+ * stacked, so it is only asked for once there is width for it. */
+@media (min-width: 52rem) {
+  .exprow { display: grid; grid-template-columns: 13rem 1fr 9rem; gap: var(--s5); }
+  .exp-kind { justify-items: end; text-align: right; }
+}

@@ -387,6 +387,39 @@ def s15():
     yield has("/experiences/nature", "How this list is built")
     yield has("/experiences/family", "exclusion words"), "the derived rule is published"
 
+    # A SUB-CATEGORY KEYWORD MUST NOT MATCH A TOWN'S NAME. The keywords are
+    # matched as prefixes on purpose, so `monaster` catches monasteries and
+    # `archaeolog` catches archaeological — and while the town name was also
+    # searched, `hall` matched Hallstatt, `war` matched Warsaw, `port`
+    # matched Portree and `snow` matched Snowdonia. Eight of 423 listings
+    # arrived that way and five of them were nonsense: a salt mine under
+    # Markets, a ridge walk under Cellars.
+    from lib import categories as _C
+    from lib.data import all_experiences as _all
+    _items = _all(DATA["countries"])
+    bad = []
+    for _cat in DATA["categories"]:
+        for _sub in _cat.get("subs", []):
+            for it in _C.select(_items, _cat, _sub):
+                if not _C.matches_sub(it["exp"], _sub, None):
+                    bad.append(f"{_cat['slug']}/{_sub['slug']}: {it['exp']['name']}")
+    yield not bad, ("a sub-category selects on the experience, never on the town: "
+                    + "; ".join(bad[:3]) if bad else
+                    "a sub-category selects on the experience, never on the town")
+    # And the specific one, by name, because it is the clearest to read.
+    yield "Into the salt mountain" not in page("/experiences/food/markets"), \
+        "a salt mine in Hallstatt is not a market"
+
+    # The composition: the country leads, because the spread across Europe is
+    # what this family is offering.
+    yield has("/experiences/food/markets", 'class="exp-country"', "countryspread"), \
+        "the experience list leads with where in Europe each one is"
+    # A sub-category has no authored sentence and is not given the parent's.
+    yield 'class="statement"' not in page("/experiences/food/markets"), \
+        "a sub-category does not borrow its category's voice"
+    yield 'class="statement"' in page("/experiences/food"), \
+        "a category leads with the sentence somebody wrote for it"
+
 
 @section(16, "Journey system", "BUILT",
          "Every field on the specification's journey object except booking "
