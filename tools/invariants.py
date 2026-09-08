@@ -217,6 +217,16 @@ def measure():
             # one, not plates being removed. 319 destination pages dropped
             # theirs when the map alone was measured to be the stronger
             # page, and nothing in the suite noticed until this row existed.
+            # THE SIGNATURE, COUNTED. The arch is the one thing that should
+            # make a screenshot recognisable with the wordmark cropped off,
+            # and a signature that is not measured is a signature that
+            # quietly stops being applied to the next family somebody adds.
+            "signature.apertures": {
+                "value": sum(1 for b in bodies.values() if 'clip-path="url(#arch-' in b),
+                "kind": "floor",
+                "why": "Pages whose geography is seen through the arch. A floor: "
+                       "the aperture is the identity, and a new map that forgets "
+                       "it is a page that stops looking like EuropeDoor."},
             "plates.page_share": {
                 "value": round(sum(1 for b in bodies.values()
                                    if re.search(r'class="[^"]*(?<![\w-])plate(?![\w-])', b))
