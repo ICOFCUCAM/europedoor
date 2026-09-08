@@ -119,8 +119,87 @@ recorded because the mistake is instructive: **a contact sheet is good for
 finding defects and bad for measuring proportions.** Look to find, count to
 conclude.
 
-**None of the three is fixed here.** They are the subject of the next
-experiment, run through §6.1 with the register as its control.
+## 6.4a The experiment, run — results
+
+All three fixes as one controlled change, rebuilt, and inspected at the size a
+card is actually looked at rather than at generation resolution.
+
+### A — motif reachability: FIXED
+
+`plain` is drawn on **8 destinations**. All seven declared motifs are now
+reachable, and reachability is an invariant (`plates.motifs_reachable`), so a
+motif cannot silently become dead code again.
+
+### B — the sliced light: FIXED, and it was systemic
+
+The light is no longer emitted before the motif at a seed-chosen height. It is
+appended after the silhouette is known, fitted to the sky that exists above
+it, and inserted behind. Where there is no sky, the plate simply has no moon —
+which is a real thing a night city looks like, and better than a sliver.
+
+**Lille was not a one-off. 69 of 319 destinations — 22% — had a light sliced
+by a tower or a spire.** 54 skylines and 15 towers. It was invisible because a
+single plate looks plausible; only the set, at card size, shows it.
+
+**And the first fix introduced a different defect.** Pushing the light up with
+no floor jammed it against the frame on the tallest skylines — Bucharest,
+Turin, Amsterdam and Chișinău all gained a cropped half-moon on the top edge.
+Found the same way, by looking at the sheet again. The light is now *fitted*
+rather than *pushed*: never more than a third of the available sky, with a
+clear margin top and bottom.
+
+A geometric check now asserts, on all 319 plates at both output sizes, that
+the light is inside the frame and clear of every narrow shape. Reverting the
+fix produces 40 failures; the check was watched going red before it was
+trusted.
+
+### C — `city_type` consumed: FIXED, narrowly
+
+**And the first attempt was wrong in an instructive way.** Mapping all eight
+classifications to motifs put a *universal* field above the interest pass, so
+the interest pass stopped running: `forest` fell from 19 plates to 1. One dead
+motif traded for another.
+
+The shipped version maps only the five classifications that are visually
+**decisive** — village, site, island, valley, park — and leaves capital, city
+and town to the interests, because what a settlement is *for* describes it
+better than its size does. Topography still gets first refusal: Theth is a
+mountain village and draws peaks, not a plain.
+
+### The measured result
+
+| motif | before | after | Δ |
+|---|---:|---:|---:|
+| skyline | 90 | 89 | −1 |
+| peaks | 81 | 83 | +2 |
+| coast | 57 | 57 | 0 |
+| tower | 53 | 50 | −3 |
+| forest | 19 | 13 | −6 |
+| isles | 19 | 19 | 0 |
+| **plain** | **0** | **8** | **+8** |
+
+**11 plates changed motif, of 319.** A small, targeted change — which is what
+the experiment was supposed to produce. Civita di Bagnoregio, a village on an
+eroding tufa pillar, is no longer a skyline of tower blocks.
+
+### Newly discovered, and not fixed
+
+| finding | judgement |
+|---|---|
+| skyline lights are now visibly smaller than those on peaks and coast plates | a consequence of fitting to available sky. Consistent, and reads as a distant sun above a city — but it slightly weakens the family resemblance across the set |
+| Postojna & Škocjan, a cave system, draws a tower | `site → tower` assumes a monument. One destination; not worth a sixth mapping |
+| Albarracín, a town of about a thousand people, is still a skyline | the deliberate trade in C: `town` is left to the interests. It remains the weakest plate in the sheet |
+
+### The verdict on the atlas question
+
+**The generated system is stronger than it was and is not yet a flagship
+visual language.** It now has seven working motifs, no rendering faults, and a
+classification feeding it. What it does not have is variety *within* a motif:
+two mountain towns are still interchangeable, because the only thing that
+distinguishes them is a hash.
+
+That is the next experiment, and it is also zero-cost. **No photography
+purchase is justified yet** — the free system has not been exhausted.
 
 ## 6.5 What must stay distinct while the identity changes
 

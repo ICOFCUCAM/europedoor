@@ -1679,6 +1679,81 @@ def c_frontend():
     return n
 
 
+@check("every plate's light is whole, and every motif is reachable")
+def c_plates():
+    """Geometry, asserted on all 319 destination plates.
+
+    Two guarantees, both of which were defects until this experiment:
+
+    1. THE LIGHT IS NEVER SLICED. It used to be emitted before the motif at a
+       seed-chosen height, so a skyline whose towers rose past it cut the
+       circle into a crescent — on Lille's night plate the moon survived as a
+       sliver that reads, at the size a card is actually looked at, as a stray
+       character. It is now fitted to the sky that exists above the
+       silhouette, and where there is no sky the plate has no moon, which is a
+       real thing a night city looks like.
+
+       The first attempt at that fix only pushed the light UP with no floor,
+       which jammed it against the frame on the tallest skylines. This check
+       asserts both: clear of every shape, AND fully inside the frame.
+
+    2. EVERY MOTIF IS REACHABLE. `plain` was declared and never drawn, because
+       `food -> plain` sat below eight interests that almost every European
+       destination carries, and the hash fallback never fired. A seventh of
+       the vocabulary was dead code, and nothing said so.
+    """
+    d = D.load()
+    n = 0
+    drawn = set()
+    for cid, node in sorted(d["cities"].items()):
+        t, r, c = node["city"], node["region"], node["country"]
+        motif = (R.motif_for(t["interests"], t.get("city_type"))
+                 or R.motif_for(r["interests"]))
+        drawn.add(motif)
+        seed = f'city:{c["slug"]}:{t["slug"]}'
+        for w, h in ((640, 360), (1200, 630)):
+            _a, _b, prims = R.plate_shapes(seed, w, h, motif)
+            light = next((p for p in prims if p[0] == "circle"), None)
+            if light is None:
+                n += 1
+                continue
+            _k, lx, ly, lr, _col, _op = light
+            if lx - lr < 0 or lx + lr > w or ly - lr < 0 or ly + lr > h:
+                fail(f"{cid}: the light is cropped by the frame at {w}x{h} "
+                     f"(centre {lx:.0f},{ly:.0f} radius {lr:.0f})")
+            # Nothing painted after the light may overlap it. Bounding boxes
+            # are enough: every motif element is axis-aligned or a polygon,
+            # and a box that misses cannot overlap.
+            for prim in prims:
+                if prim is light:
+                    continue
+                if prim[0] == "rect":
+                    x0, y0 = prim[1], prim[2]
+                    x1, y1 = x0 + prim[3], y0 + prim[4]
+                elif prim[0] == "poly":
+                    xs = [p[0] for p in prim[1]]
+                    ys = [p[1] for p in prim[1]]
+                    x0, y0, x1, y1 = min(xs), min(ys), max(xs), max(ys)
+                else:
+                    continue
+                # A ridge or a water plane spans the full width and sits below
+                # the horizon; overlapping those is a sunset, not a fault. Only
+                # the narrow elements — towers, spires, trees — can slice.
+                if (x1 - x0) > w * 0.55:
+                    continue
+                if lx + lr > x0 and lx - lr < x1 and ly + lr > y0 and ly - lr < y1:
+                    fail(f"{cid}: the {motif} light is cut by a shape at {w}x{h} — "
+                         f"it reads as a stray glyph at card size")
+            n += 1
+
+    missing = set(R.MOTIFS) - drawn
+    if missing:
+        fail(f"{sorted(missing)} declared in MOTIFS and never drawn — a motif "
+             f"nothing reaches is dead code that looks like vocabulary")
+    n += len(R.MOTIFS)
+    return n
+
+
 @check("the invariants hold — what a visual change may not move")
 def c_invariants():
     """docs/invariants.json, recomputed.

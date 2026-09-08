@@ -125,11 +125,69 @@ MOTIF_BY_INTEREST = (
 )
 
 
-def motif_for(interests):
-    """The motif a place's own tagging asks for, or None to let the hash
-    choose. Deterministic, and never random."""
+# What KIND of place gets which drawing, once its topography has had first
+# refusal. This arrived after the schema audit gave every destination a
+# `city_type`, and it fixes a data-to-visual mismatch: the atlas knew Civita
+# di Bagnoregio was a village on a tufa pillar and drew it as a skyline of
+# tower blocks, because the plate reads interests and nothing else.
+#
+# Deliberately NOT one motif per city_type — no village_motif, no park_motif.
+# Eight classifications map onto the six drawings that already exist:
+#
+#   village  →  plain    open country with soft ridges
+#   site     →  tower    a single monument in a landscape
+#   island   →  isles
+#   valley   →  peaks
+#   park     →  forest
+# ONLY the classifications that are visually decisive. capital, city and town
+# are deliberately absent: what a settlement is *for* — sacred, wine, art,
+# nature — describes it better than its size does, and those live in
+# MOTIF_BY_INTEREST below.
+#
+# The first version of this table mapped all eight, and the experiment
+# measured the cost: `forest` fell from 19 plates to 1, because a universal
+# classification placed above the interest pass means the interest pass never
+# runs. One dead motif was traded for another. Five decisive kinds, and the
+# interests keep everything else.
+MOTIF_BY_KIND = {
+    "village": "plain",    # a village is not a skyline of tower blocks
+    "site": "tower",       # a single monument in a landscape
+    "island": "isles",
+    "valley": "peaks",
+    "park": "forest",
+}
+
+# Topography wins over classification. Bergen is a city AND is wedged between
+# seven mountains on a fjord; drawing it as a skyline would be true and
+# useless. These three interests describe the land itself, so they get first
+# refusal before the kind of settlement is considered at all.
+MOTIF_BY_LAND = (
+    ("mountains", "peaks"), ("winter", "peaks"), ("wild", "peaks"),
+    ("islands", "isles"), ("coast", "coast"),
+)
+
+
+def motif_for(interests, city_type=None):
+    """The motif a place asks for, in three passes.
+
+        1. the land          mountains, islands, coast
+        2. what kind of place it is    city_type
+        3. everything else   the remaining interests
+
+    Returns None only if all three miss, which lets the hash choose. Before
+    city_type was consulted, pass 3 caught everything and `plain` was
+    unreachable — one of seven motifs was dead code, because `food → plain`
+    sat below eight interests that almost every European destination carries.
+    Villages reach it now.
+    """
+    have = interests or ()
+    for want, motif in MOTIF_BY_LAND:
+        if want in have:
+            return motif
+    if city_type in MOTIF_BY_KIND:
+        return MOTIF_BY_KIND[city_type]
     for want, motif in MOTIF_BY_INTEREST:
-        if want in (interests or ()):
+        if want in have:
             return motif
     return None
 
@@ -203,7 +261,15 @@ def plate_shapes(seed, w, h, motif=None):
     wide = (w / h) > 2.0
     horizon = h * ((0.44 if wide else 0.56) + (d[7] % 24) / 180.0)
 
-    prims = [("circle", lx, ly, lr, light, 0.5 if night else 0.75)]
+    # The light is appended LAST and inserted at the front, because where it
+    # can go depends on what the motif draws. It used to be emitted first at a
+    # seed-chosen height, and a skyline whose towers rose past it sliced the
+    # circle into a crescent: on Lille's night plate the moon survived as a
+    # sliver that reads, at the size a card is actually looked at, as a stray
+    # character. A sun behind a smooth ridge is a sunset; a moon behind a
+    # thin vertical bar is a rendering fault, and the difference is only
+    # visible at consumption size.
+    prims = []
 
     def ridge(y, amp, n, colour, jitter):
         pts = [(0.0, h)]
@@ -285,6 +351,34 @@ def plate_shapes(seed, w, h, motif=None):
     else:  # plain
         for i, (drop, amp) in enumerate(((0.00, 0.06), (0.13, 0.05), (0.26, 0.04))):
             prims.append(ridge(horizon + h * drop, h * amp, 4 + i * 2, band[i], 8 + i * 6))
+
+    # Now place the light clear of everything the motif drew. `top` is the
+    # highest painted point; the light sits in the band above it, keeping its
+    # seed-chosen horizontal position so two plates from the same slug still
+    # differ. Where the motif reaches so high there is no room — a tall tower
+    # on a low horizon — the light moves aside instead of up.
+    top = h
+    for prim in prims:
+        if prim[0] == "poly":
+            top = min(top, min(y for _x, y in prim[1]))
+        elif prim[0] == "rect":
+            top = min(top, prim[2])
+    # `top` is now the height of the clear sky. The first version of this fix
+    # only pushed the light UP, with no floor, and on the tallest skylines
+    # that jammed it against the frame and cropped it — Bucharest, Turin and
+    # Amsterdam all gained a half-moon sitting on the top edge. A defect
+    # traded for a different defect, found the same way: by looking at the
+    # sheet at the size a card is actually seen.
+    #
+    # So the light is fitted to the sky rather than pushed out of the way. It
+    # never takes more than a third of the available height, and it keeps a
+    # clear margin at the top and at the silhouette. Where the sky is too
+    # small to hold anything, the plate simply has no moon — which is a real
+    # thing a night city looks like, and better than a sliver.
+    lr = min(lr, top * 0.34)
+    if lr >= h * 0.028:
+        ly = min(max(ly, lr * 1.25), top - lr * 1.25)
+        prims.insert(0, ("circle", lx, ly, lr, light, 0.5 if night else 0.75))
 
     # The doorway is NOT in the plate, and getting there took three tries
     # worth recording.

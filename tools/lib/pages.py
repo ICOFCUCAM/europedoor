@@ -237,7 +237,7 @@ def home(data):
         card(urls.city(n["country"], n["region"], n["city"]),
              f"{n['country']['name']} · {n['region']['name']}", n["city"]["name"],
              n["city"]["summary"], seed=f"city:{n['country']['slug']}:{n['city']['slug']}",
-             motif=motif_for(n["city"]["interests"]))
+             motif=motif_for(n["city"]["interests"], n["city"].get("city_type")))
         for n in sorted(quiet, key=lambda n: n["city"]["name"])[:3]
     ]
     storycards = [
@@ -889,7 +889,8 @@ def city_page(data, c, r, t):
          alt=f"{t['name']}, {c['name']}", eager=True,
          sizes="(min-width: 76rem) 76rem, 100vw",
          fallback_seed=f"city:{c['slug']}:{t['slug']}",
-         fallback_motif=motif_for(t["interests"]) or motif_for(r["interests"]))}
+         fallback_motif=motif_for(t["interests"], t.get("city_type"))
+                        or motif_for(r["interests"]))}
 </div>
 {sectionnav([
     ("Overview", "why-visit"),
@@ -961,7 +962,7 @@ def city_page(data, c, r, t):
         description=t["summary"][:180],
         scripts=["/assets/js/my-europe.js"],
         og=(f"city:{c['slug']}:{t['slug']}",
-            motif_for(t["interests"]) or motif_for(r["interests"]),
+            motif_for(t["interests"], t.get("city_type")) or motif_for(r["interests"]),
             f"{t['name']}, {c['name']} — {t['summary'][:90]}"),
         ld_blocks=[
             ld_breadcrumb([("Europe", "/discover"), ("Countries", "/countries"),
@@ -2868,7 +2869,7 @@ def events_month_page(data, month):
         card(urls.city(n["country"], n["region"], n["city"]),
              f"{n['country']['name']} · {n['region']['name']}", n["city"]["name"],
              n["city"]["summary"], seed=f"city:{n['country']['slug']}:{n['city']['slug']}",
-             motif=motif_for(n["city"]["interests"]))
+             motif=motif_for(n["city"]["interests"], n["city"].get("city_type")))
         for n in quiet[:6]
     ]
 

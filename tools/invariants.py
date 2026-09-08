@@ -47,6 +47,20 @@ def _pages():
     return sorted(glob.glob(os.path.join(OUT, "**", "*.html"), recursive=True))
 
 
+def _reachable():
+    """How many of the declared motifs any destination actually draws."""
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from lib import data as D                                      # noqa: E402
+    from lib import render as R                                    # noqa: E402
+    d = D.load()
+    seen = set()
+    for node in d["cities"].values():
+        t, r = node["city"], node["region"]
+        seen.add(R.motif_for(t["interests"], t.get("city_type"))
+                 or R.motif_for(r["interests"]))
+    return len(seen & set(R.MOTIFS))
+
+
 def measure():
     css = _css()
     pages = _pages()
@@ -170,9 +184,14 @@ def measure():
                        "which must go through the licence register first."},
             "plates.motifs_declared": {
                 "value": len(R.MOTIFS), "kind": "exact",
-                "why": "Seven declared. See docs/design-migration.md: one of "
-                       "them is currently unreachable, which this number is what "
-                       "made countable."},
+                "why": "Seven declared."},
+            "plates.motifs_reachable": {
+                "value": _reachable(), "kind": "exact",
+                "why": "Seven drawn. `plain` was declared and never reached for "
+                       "the life of the plate system, because food -> plain sat "
+                       "below eight interests almost every European destination "
+                       "carries. A motif nothing reaches is dead code that looks "
+                       "like vocabulary."},
             "primitives.reach": {
                 "value": prim_floor, "kind": "floor",
                 "why": "The share of pages each primitive appears on. A family "

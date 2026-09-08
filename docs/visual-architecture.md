@@ -119,6 +119,13 @@ cool steps around cobalt and ultramarine; night plates bottom out near graphite
 with a lime light, day plates lift toward limestone under a low warm sun — the
 single warm note in the system.
 
+**The plates carry three fixes from the §6 experiment**: all seven motifs are
+now reachable (`plain` was dead code), the light is fitted to the sky rather
+than emitted before the motif — 69 of 319 plates had it sliced by a tower —
+and motif selection consumes `city_type` for the five classifications that are
+visually decisive. A geometric check asserts the light is whole on all 319 at
+both output sizes.
+
 **The photography direction cannot be executed without a budget.** Free stock
 covers the Eiffel Tower and will never cover Albarracín or Theth, which is
 precisely the product. `docs/images.md` holds the pipeline, which is built and

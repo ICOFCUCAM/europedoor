@@ -99,7 +99,12 @@
     "plates.motifs_declared": {
       "value": 7,
       "kind": "exact",
-      "why": "Seven declared. See docs/design-migration.md: one of them is currently unreachable, which this number is what made countable."
+      "why": "Seven declared."
+    },
+    "plates.motifs_reachable": {
+      "value": 7,
+      "kind": "exact",
+      "why": "Seven drawn. `plain` was declared and never reached for the life of the plate system, because food -> plain sat below eight interests almost every European destination carries. A motif nothing reaches is dead code that looks like vocabulary."
     },
     "primitives.reach": {
       "value": {

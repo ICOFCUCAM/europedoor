@@ -301,6 +301,26 @@ reason, and a row without one fails. Moving one is allowed; moving one
 deliberate act. **`routes.hash` is the important one**: a restyle must not move
 a URL, and every inbound link and social card depends on that.
 
+**A plate's light is fitted to the sky, not placed by the seed.** It used to
+be emitted before the motif, so a skyline's towers sliced it into a crescent
+that reads as a stray glyph at card size — and it was not one plate, it was 69
+of 319. The first fix pushed it up with no floor and cropped it against the
+frame instead. It is now fitted: never more than a third of the available sky,
+clear margins, and no moon at all where there is no sky. A geometric check
+asserts it on every plate at both output sizes.
+
+**A motif nothing reaches is dead code that looks like vocabulary.** `plain`
+was declared for the life of the plate system and never drawn, because
+`food → plain` sat below eight interests almost every European destination
+carries. Reachability is an invariant now.
+
+**Motif selection consumes `city_type`, but only where it is decisive.**
+village, site, island, valley, park — and topography still gets first refusal,
+so Theth is a mountain village and draws peaks. capital, city and town are
+deliberately left to the interests: mapping all eight put a *universal* field
+above the interest pass and `forest` fell from 19 plates to 1. One dead motif
+traded for another.
+
 **Look to find, count to conclude.** A contact sheet of forty plates suggested
 skylines were about 38% of them; measured across every destination they are
 28%. The sample was biased and the eye was wrong. The same sheet *did* find
