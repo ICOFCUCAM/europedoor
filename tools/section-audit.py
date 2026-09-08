@@ -440,6 +440,28 @@ def s16():
          "eating — plus a named curator and a way into the planner.")
 def s17():
     u = "/journeys/the-alpine-grand-tour"
+    # THE COMPOSITION. A journey is a sequence, and the page is now built as
+    # one: the strapline is the hero, the drawn route follows immediately,
+    # and the eleven-item fact table moved BELOW the legs. It used to open on
+    # that table, with the sequence four screens down as a bulleted list.
+    h = page(u)
+    yield 'class="statement"' in h, "the strapline is the hero, not an 11px kicker"
+    yield 'class="legs route"' in h, "the legs are drawn as a route, not listed"
+    # Assert the FACT TABLE's position, not the heading order. The first
+    # version of this compared two headings, and moving the facts above the
+    # route left both headings where they were — it passed a deliberate
+    # regression. A check that cannot fail on the thing it names is worse
+    # than no check.
+    yield h.index('class="legs route"') < h.index('class="facts"'), \
+        "the sequence comes before the fact table"
+    yield '<g class="countries"' in h, "the route is drawn over real land, not on black"
+    # Every stop keeps a dot even where its label was dropped for collision.
+    import re as _re
+    _m = _re.search(r'aria-label="Route map[^>]*>(.*?)</svg>', h, _re.S)
+    _svg = _m.group(1) if _m else ""
+    yield _svg.count('class="routedot"') == len(
+        [j for j in DATA["journeys"] if j["slug"] == "the-alpine-grand-tour"][0]["legs"]), \
+        "every stop is on the map, labelled or not"
     yield has(u, "The route", "What to pack", "Estimated cost", "Difficulty",
               "Transport", "Accommodation", "Open in the Planner", "Save to My Europe",
               "Experiences along the way", "What you will be eating", "Curated by")

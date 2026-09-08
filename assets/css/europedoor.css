@@ -1586,3 +1586,86 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
   .exprow { display: grid; grid-template-columns: 13rem 1fr 9rem; gap: var(--s5); }
   .exp-kind { justify-items: end; text-align: right; }
 }
+
+
+/* ── JOURNEY: the third family, and the one about movement ────────────
+ *
+ * The audit found the widest gap in the product here: 34 days and eight
+ * countries rendered as an article with one picture at the top, an
+ * eleven-item fact table above the route, and the sequence itself as a
+ * bulleted list four screens down. The content is a line across a continent
+ * and the page was a document.
+ *
+ * THE CONNECTOR IS NOW DRAWN. Each stop is a node on a continuous rule, and
+ * the distance to it sits ON that rule, above the town it leads to — because
+ * a hop is the movement between two places, not a footnote belonging to the
+ * second one. Nothing here is invented: the nodes are the legs, the line is
+ * the order, and the kilometres are the same haversine the planner uses.
+ *
+ * The first and last nodes are filled. A journey has a beginning and an end,
+ * and that is the one thing a list of thirteen identical bullets cannot say.
+ */
+/* A north-south journey has a tall, narrow bounding box, and the route map's
+ * viewBox IS that box — so at width:100% "Arctic to Mediterranean" rendered
+ * about two thousand pixels deep with its labels colliding. The frame is
+ * capped and the drawing letterboxes inside it, which is what
+ * preserveAspectRatio already does. */
+.routewrap { margin: var(--s7) 0 0; }
+/* SIZED BY HEIGHT, NOT WIDTH. The viewBox is the route's own bounding box,
+ * so a north-south journey is 2.35x taller than it is wide: at width:100%
+ * "Arctic to Mediterranean" rendered about 2,700px deep with Lofoten
+ * printed straight through Abisko. Setting the height and letting the width
+ * follow the ratio gives a portrait map for a portrait route and a wide one
+ * for the Hanseatic Arc, without either being told which it is. */
+.routewrap .routemap svg {
+  display: block; margin-inline: auto;
+  height: min(70vh, 640px); width: auto; max-width: 100%;
+  background: var(--map-sea); border-radius: var(--radius);
+}
+.routewrap .routemap .context path { fill: var(--map-context); }
+.routewrap .routemap .countries path { fill: var(--map-land); stroke: var(--map-border); stroke-width: 1; }
+
+.legs.route { margin-top: var(--s6); }
+.route .leg {
+  grid-template-columns: 6rem minmax(0, 1fr);
+  gap: var(--s4);
+  border-top: none;
+  padding: 0 0 var(--s6);
+}
+.route .leg:last-child { border-bottom: none; padding-bottom: 0; }
+.route .leg-when { display: grid; gap: 2px; align-content: start; padding-top: 0; }
+.route .leg-day { color: var(--ink-2); }
+.route .leg-nights { color: var(--ink-3); }
+
+/* The rail: one border, one node per stop. */
+.route .leg-what {
+  position: relative;
+  border-left: 1px solid var(--rule);
+  padding-left: var(--s5);
+  padding-bottom: var(--s2);
+}
+.route .leg:last-child .leg-what { padding-bottom: 0; }
+.route .leg-what::before {
+  content: ""; position: absolute; left: -5px; top: 6px;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--paper); border: 2px solid var(--door);
+}
+.route .leg:first-child .leg-what::before,
+.route .leg:last-child .leg-what::before { background: var(--door); }
+
+/* The distance sits on the rule, above the stop it leads to. */
+.route .hop {
+  margin: 0 0 var(--s3); font-size: var(--t-xs); color: var(--ink-3);
+  letter-spacing: .04em;
+}
+.route .leg:first-child .hop { display: none; }
+.route .leg h3 { margin: 0; }
+.route .leg-country {
+  display: block; font-size: var(--t-xs); letter-spacing: .1em;
+  text-transform: uppercase; color: var(--door); font-weight: 600; margin-top: 2px;
+}
+.route .why { margin-top: var(--s2); max-width: 52ch; }
+
+@media (min-width: 52rem) {
+  .route .leg { grid-template-columns: 8rem minmax(0, 1fr); }
+}

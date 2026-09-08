@@ -223,3 +223,58 @@ dishes that belong to one valley"* in 40px type at the top of the Markets
 page — authored, true, and about the wrong thing. A sub-page now leads with
 its countries instead. **The missing sentence is editorial work, not a design
 problem, and the design's job is to leave the gap visible.**
+
+---
+
+# Exemplar 3 — Journey, built
+
+`/journeys/arctic-to-mediterranean` and the 17 that inherit it.
+
+## What was there
+
+34 days, 13 stops, 8 countries — as an article with one plate at the top, an
+**eleven-item fact table above the route**, and the sequence itself four
+screens down as a bulleted list. The audit called this the widest gap in the
+product between what content *is* and what a page *is*.
+
+## The composition
+
+| act | what |
+|---|---|
+| **1** | `JOURNEY` → name → **the strapline as the hero** — *"The full length of Europe, 69°N to 38°N"* was an 11px uppercase kicker |
+| **2** | `34 days · 13 stops · 7 countries · 4,993 km`, one derived line |
+| **3** | **the route, drawn, immediately** — over real land |
+| **4** | the sequence as a rail: days and nights left, a node per stop, the distance sitting *on* the rule above the town it leads to |
+| **5** | then the fact table, the experiences, the food, the packing, the estimate |
+
+**The hop moved above the stop it leads to.** It used to be appended after
+the `why`, which read as a footnote belonging to the arriving town rather
+than as the movement between two of them — on a page whose entire subject is
+movement. The first and last nodes are filled: a journey has a beginning and
+an end, and that is the one thing thirteen identical bullets cannot say.
+
+## Three defects found by rendering
+
+1. **The route map rendered ~2,700px deep.** Its viewBox is the route's own
+   bounding box, and a north–south journey is 2.35× taller than it is wide;
+   at `width:100%` that is what you get. It is now **sized by height** and
+   the width follows the ratio — which gives a portrait map for Arctic to
+   Mediterranean and a landscape one for the Hanseatic Arc, without either
+   being told which it is.
+2. **No land under the line.** A lime zigzag on black — the same "a dot map
+   with nothing under it is a scatter plot" fault as the homepage hero, and
+   worse here, because the whole claim of a journey page is that the route
+   crosses a real continent.
+3. **Labels printed through each other** — "Lofoten (Svolvær)" straight
+   across "Abisko" on the flagship route. A label is now dropped when it
+   would land on one already placed: **29 of 121 across all journeys**.
+   Costs nothing — every stop keeps its dot and its `<title>`, and the rail
+   below names all of them in order.
+
+## And a check that could not fail
+
+The first version of the ordering assertion compared two **headings**, so
+moving the fact table back above the route left both headings where they
+were and the deliberate regression passed. Rewritten to compare the position
+of `class="facts"` against `class="legs route"`, and then proved red.
+**A check that cannot fail on the thing it names is worse than no check.**

@@ -1089,12 +1089,20 @@ def journey_page(data, j):
         )
         stoprow = (f'<p class="small">Here: {stops}</p>'
                    if stops else "")
+        # The hop comes FIRST, above the stop it leads to, because it is how
+        # you got there. It used to be appended after the `why`, which read
+        # as a footnote belonging to the arriving town rather than as the
+        # movement between two of them — on a page whose entire subject is
+        # movement.
+        nights = f"{leg['nights']} night" + ("" if leg["nights"] == 1 else "s")
         legs.append(
             f"""<li class="leg">
-            <div class="leg-when">{esc(when)}</div>
-            <div><h3><a href="{urls.city(c, r, t)}">{esc(t['name'])}</a>
-            <span class="small">· {esc(c['name'])}</span></h3>
-            <p>{esc(leg['why'])}</p>{stoprow}{hop}</div></li>"""
+            <div class="leg-when"><span class="leg-day">{esc(when)}</span>
+              <span class="leg-nights">{esc(nights)}</span></div>
+            <div class="leg-what">{hop}
+            <h3><a href="{urls.city(c, r, t)}">{esc(t['name'])}</a>
+            <span class="leg-country">{esc(c['name'])}</span></h3>
+            <p class="why">{esc(leg['why'])}</p>{stoprow}</div></li>"""
         )
         day = leg["day_last"] + 1
         prev = t
@@ -1157,22 +1165,22 @@ def journey_page(data, j):
     body = f"""
 {crumbs([("Europe", "/discover"), ("Journeys", "/journeys"), (j["name"], None)])}
 <div class="pagehead">
-  <p class="kicker">{esc(j['strapline'])}</p>
+  <p class="kicker">Journey</p>
   <h1>{esc(j['name'])}</h1>
+  <p class="statement">{esc(j['strapline'])}</p>
+  <p class="orient">{j['days']} days · {len(j['legs'])} stops · {len(countries)} countries · {total_km:,} km</p>
+  {chips(j["interests"], data["interests"])}
 </div>
-<div class="card-art frame">
-{picture(data["images"], "journey:" + j["slug"], w=1260, h=540, alt=j["name"], eager=True,
-         sizes="(min-width: 76rem) 76rem, 100vw",
-         fallback_seed="journey:" + j["slug"], fallback_motif=motif_for(j["interests"]))}
-</div>
+
+<div class="routewrap">{routemap(data, j)}</div>
+
 <div class="split mt7">
   <div>
     <p class="lede">{esc(j['summary'])}</p>
-    {chips(j["interests"], data["interests"])}
+    <h2 id="the-route">The route, in order</h2>
+    <ol class="legs route">{''.join(legs)}</ol>
+    <h2 class="mt7">The shape of it</h2>
     {facts}
-    <h2>The route</h2>
-    {routemap(data, j)}
-    <ul class="legs">{''.join(legs)}</ul>
 
     <h2 class="mt7">Experiences along the way</h2>
     {f'<div class="rows">{jexps}</div>' if jexps else '<p class="small">Nothing listed on this route yet.</p>'}
@@ -1740,16 +1748,34 @@ def routemap(data, j):
         f'{esc(idx[j["legs"][i]["city"]]["city"]["name"])}</title></circle>'
         for i, (x, y) in enumerate(pts)
     )
-    labels = "".join(
-        f'<text class="minilabel here" x="{x + 10:.1f}" y="{y + 4:.1f}">'
-        f'{esc(idx[j["legs"][i]["city"]]["city"]["name"])}</text>'
-        for i, (x, y) in enumerate(pts)
-    )
+    # LABEL COLLISION. Stops that are close on the map printed their names
+    # through each other — "Lofoten (Svolvær)" straight across "Abisko" on
+    # the flagship route. A label is dropped when it would land on one
+    # already placed, which costs nothing: every stop keeps its dot and its
+    # <title>, and the list below names all thirteen in order. Thresholds
+    # are a share of the frame, so they hold whatever the route's shape.
+    placed = []
+    lab = []
+    dx_min, dy_min = w * 0.22, h * 0.028
+    for i, (x, y) in enumerate(pts):
+        if any(abs(x - px) < dx_min and abs(y - py) < dy_min for px, py in placed):
+            continue
+        placed.append((x, y))
+        lab.append(
+            f'<text class="minilabel here" x="{x + 10:.1f}" y="{y + 4:.1f}">'
+            f'{esc(idx[j["legs"][i]["city"]]["city"]["name"])}</text>'
+        )
+    labels = "".join(lab)
+    # The land, under the line. Without it this was a lime zigzag on black —
+    # the same "a dot map with nothing under it is a scatter plot" fault the
+    # homepage hero had, and worse here: the entire claim of a journey page
+    # is that the route crosses a real continent.
+    ctx, land = geo.landmass(MAPPROJ, (x0, y0, w, h))
     return (
-        f'<figure class="minimap" data-world="intelligence">'
+        f'<figure class="minimap routemap" data-world="intelligence">'
         f'<svg viewBox="{x0:.1f} {y0:.1f} {w:.1f} {h:.1f}" role="img" '
         f'aria-label="Route map for {esc(j["name"])}">'
-        f'<path class="routeline" d="{d}"/>{dots}{labels}</svg>'
+        f'{ctx}{land}<path class="routeline" d="{d}"/>{dots}{labels}</svg>'
         f'<figcaption>Straight lines between stops. What each one means on the ground is in the '
         f'note under the leg. <a href="/map">The whole map, with every journey →</a></figcaption></figure>'
     )
