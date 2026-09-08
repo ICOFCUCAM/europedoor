@@ -1700,6 +1700,23 @@ def countrymap(data, c):
     )
 
 
+def first_sentence(text):
+    """The first sentence, whole.
+
+    This was `text[:140] + "…"`, which cut "The Bergen and Dovre railways are
+    two of Europe's great train rides and cost less than the equivalent
+    flight if booked early. Coastal Norway…" — a truncation mid-clause,
+    printed on 400 place pages, that reads as a rendering fault rather than
+    as a summary. A sentence boundary is the one place a text can be cut
+    without looking broken.
+    """
+    for stop in (". ", "! ", "? "):
+        i = text.find(stop)
+        if i > 0:
+            return text[:i + 1]
+    return text
+
+
 def country_orient(c):
     """One derived line under a country's statement.
 
@@ -1752,7 +1769,7 @@ def orient_line(t):
 # survives the thing it captions is worse than no caption.
 
 
-def minimap(data, t, span=3.2):
+def minimap(data, t, span=3.2, about=None):
     """A small map centred on one destination, drawn from the same
     projection the big map uses. Its neighbours are on it so the reader can
     see the shape of the onward journey rather than read distances.
@@ -1835,7 +1852,18 @@ def minimap(data, t, span=3.2):
         f'<g transform="translate({w/2 - cx*span:.2f},{h/2 - cy*span:.2f}) scale({span})">'
         f'{ctx}{land}</g>'
         f'{"".join(dots)}{"".join(labels)}</g></svg>'
-        f'<figcaption>{esc(t["name"])} and its neighbours in the Atlas — the frame is about '
+        # `about` names something INSIDE this destination — a place page's
+        # subject. The map is then honestly captioned as what it is: this
+        # atlas has one projection and its finest unit is about four
+        # kilometres, so there is no map of a building, and a map labelled
+        # "Bryggen" that is actually a map of Bergen would be the kind of
+        # small lie refused everywhere else here.
+        f'<figcaption>'
+        + (f'{esc(about)} is in {esc(t["name"])}, and this is {esc(t["name"])} '
+           f'— the atlas draws Europe in one projection whose finest unit is '
+           f'about four kilometres, so it maps the town rather than the '
+           f'street. The frame is about ' if about else
+           f'{esc(t["name"])} and its neighbours in the Atlas — the frame is about ') +
         f'{km_w:,} km across and {km_h:,} km deep at this latitude. '
         f'<a href="/map">The full map →</a></figcaption></figure>'
     )
@@ -2223,6 +2251,29 @@ def place_page(data, c, r, t, pl):
         <p class="rowmeta">{j['days']} days</p></a>"""
         for j in b["journeys"]
     )
+    # A PLATE THAT KNEW NOTHING ABOUT THE PLACE, 1260x540, AT THE TOP.
+    #
+    # Bryggen is a row of Hanseatic trading houses on a specific wharf. Its
+    # page opened with a generated coastline drawn from the hash of its slug
+    # and the interests of the town around it — flat, monochrome, and about
+    # nothing. The destination exemplar already measured that the plate
+    # cannot carry a hero and removed it from 319 pages; this family kept a
+    # bigger one.
+    #
+    # What replaces it is the only true picture available. This atlas draws
+    # in one projection whose finest unit is about four kilometres, so there
+    # is no honest map of a building — but there is an honest map of where
+    # the building is, and for a reader who arrived here from a search that
+    # is the orientation they lack. The caption says exactly that, because a
+    # map captioned "Bryggen" that is actually a map of Bergen would be the
+    # kind of small lie this repository refuses everywhere else.
+    has_photo = bool((data.get("images") or {}).get(f"place:{cid}/{pl['slug']}"))
+    placeart = (f'<div class="card-art frame">'
+                + picture(data["images"], f"place:{cid}/{pl['slug']}", w=1260, h=540,
+                          alt=f"{pl['name']}, {t['name']}", eager=True,
+                          sizes="(min-width: 76rem) 76rem, 100vw")
+                + '</div>') if has_photo else minimap(data, t, span="auto", about=pl["name"])
+
     facts = factlist([
         ("Kind", esc(PLACE_KIND_NAMES[pl["kind"]])),
         ("Give it", esc(pl["duration"])),
@@ -2233,21 +2284,37 @@ def place_page(data, c, r, t, pl):
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (c["name"], urls.country(c)),
          (r["name"], urls.region(c, r)), (t["name"], urls.city(c, r, t)), (pl["name"], None)])}
-<div class="pagehead">
+<div class="pagehead overture">
   <p class="kicker">{esc(PLACE_KIND_NAMES[pl['kind']])} · {esc(t['name'])}, {esc(c['name'])}</p>
   <h1>{esc(pl['name'])}</h1>
-  <p class="lede">{esc(pl['summary'])}</p>
+  <p class="statement">{esc(pl['summary'])}</p>
+  <p class="orient">Give it {esc(pl['duration'])} · {esc(SEASON_NAMES[pl['season']])} ·
+  <span class="mono">{pl["lat"]:.3f}°N, {pl["lon"]:.3f}°E</span></p>
 </div>
-<div class="card-art frame">
-{picture(data["images"], f"place:{cid}/{pl['slug']}", w=1260, h=540,
-         alt=f"{pl['name']}, {t['name']}", eager=True,
-         sizes="(min-width: 76rem) 76rem, 100vw",
-         fallback_seed=f"place:{c['slug']}:{t['slug']}:{pl['slug']}",
-         fallback_motif=motif_for(t["interests"]))}
-</div>
-<div class="split mt7">
+{placeart}
+
+<section class="practical" aria-label="Practical">
   <div>
-    {facts}
+    <h2 class="mini">Accessibility</h2>
+    <p>Not documented. EuropeDoor holds no step-free access, hearing loop or
+    accessible toilet information for any place, and inventing it would be
+    worse than the gap — <a href="/accessibility">the position in full</a>.</p>
+  </div>
+  <div>
+    <h2 class="mini">Getting there</h2>
+    <p>{esc(first_sentence(c['getting_around']))}
+    <a href="{urls.country(c)}#getting-around">All of {esc(c['name'])} →</a></p>
+  </div>
+  <div>
+    <h2 class="mini">Up a level</h2>
+    <p><a href="{urls.city(c, r, t)}">{esc(t['name'])}</a> ·
+    <a href="{urls.region(c, r)}">{esc(r['name'])}</a> ·
+    <a href="{urls.country(c)}">{esc(c['name'])}</a></p>
+  </div>
+</section>
+
+<div>
+  <div>
     <div class="note warn">
       <h2 class="mini">We do not hold opening hours, prices or a website for this</h2>
       <p>Those are the three fields that go stale fastest and the three you are most damaged
@@ -2264,20 +2331,10 @@ def place_page(data, c, r, t, pl):
     {section("Other places in " + t["name"], f'<div class="rows">{nearby}</div>') if nearby else ""}
     {section("Journeys that stop here", f'<div class="rows">{jrows}</div>') if jrows else ""}
   </div>
-  <aside class="rail">
-    <h2 class="mini">Accessibility</h2>
-    <p>Not documented. EuropeDoor holds no step-free access, hearing loop or accessible
-    toilet information for any place, and inventing it would be worse than the gap —
-    <a href="/accessibility">the position in full</a>.</p>
-    <h2 class="mini">Getting there</h2>
-    <p>{esc(c['getting_around'][:140])}…
-    <a href="{urls.country(c)}#getting-around">All of {esc(c['name'])} →</a></p>
-    <h2 class="mini">Up a level</h2>
-    <p><a href="{urls.city(c, r, t)}">{esc(t['name'])}</a> ·
-    <a href="{urls.region(c, r)}">{esc(r['name'])}</a> ·
-    <a href="{urls.country(c)}">{esc(c['name'])}</a></p>
-  </aside>
 </div>
+{section("The record", facts, tone="quiet",
+         lede="What this atlas holds about " + esc(pl["name"]) + ", and nothing "
+              "it does not.")}
 """
     return f"{urls.place(c, r, t, pl)}/index.html", page(
         f"{pl['name']}, {t['name']}", body, path=urls.place(c, r, t, pl), area="countries",

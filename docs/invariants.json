@@ -107,12 +107,12 @@
       "why": "The heaviest page on the site. Guards against a template quietly inlining something large across a whole family, which is how the coastline reached 51 pages and 2.1 MB."
     },
     "signature.apertures": {
-      "value": 526,
+      "value": 781,
       "kind": "floor",
       "why": "Pages whose geography is seen through the arch. A floor: the aperture is the identity, and a new map that forgets it is a page that stops looking like EuropeDoor."
     },
     "plates.page_share": {
-      "value": 0.456,
+      "value": 0.218,
       "kind": "ceiling",
       "why": "The share of pages carrying a generated illustration. A ceiling because the failure mode is an illustration placed because the system has one, which is the one reason the art direction forbids."
     },
@@ -134,7 +134,7 @@
         "crumbs": 0.998,
         "row": 0.9,
         "card": 0.226,
-        "band": 0.755,
+        "band": 0.779,
         "note": 0.812,
         "facts": 0.731,
         "btn": 0.576,
