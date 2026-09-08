@@ -633,9 +633,7 @@ def region_page(data, c, r):
     pass_nights = sum(sum(t["nights"]) / 2 for t in r["cities"])
     cards = []
     for t in r["cities"]:
-        nights = t["nights"]
-        n = f"{nights[0]}–{nights[1]} nights" if nights[0] != nights[1] else f"{nights[0]} nights"
-        meta = f'<p class="cardmeta">{n}</p>'
+        meta = f'<p class="cardmeta">{nights_line(t)}</p>'
         # NOT the country. Every destination on a region page is in the same
         # country, so a kicker reading NORWAY eight times down the grid is
         # the boilerplate the "never explain the constraint back" rule
@@ -794,8 +792,7 @@ def city_page(data, c, r, t):
         <p class="rowmeta">{esc(hop_note(haversine(t, n['city'])))}</p></a>"""
         for n in near
     )
-    nights = t["nights"]
-    stay = f"{nights[0]}–{nights[1]} nights" if nights[0] != nights[1] else f"{nights[0]} nights"
+    stay = nights_line(t)
 
     # Everything that points at this city. These are the graph edges: a
     # journey that stops here, a theme that names it, a story set in it.
@@ -1715,6 +1712,20 @@ def first_sentence(text):
         if i > 0:
             return text[:i + 1]
     return text
+
+
+def nights_line(t):
+    """"2–3 nights", or "1 night" when the range has no range in it.
+
+    Tatev read "1–1 NIGHTS" on the motion pages, which is a template showing
+    through: a range whose ends are equal is not a range, and a plural on a
+    one is not English. The region page already formatted this correctly and
+    three other surfaces did not, which is the argument for one function.
+    """
+    lo, hi = t["nights"][0], t["nights"][1]
+    if lo == hi:
+        return f'{lo} night' if lo == 1 else f'{lo} nights'
+    return f'{lo}–{hi} nights'
 
 
 def country_orient(c):
@@ -4708,14 +4719,38 @@ def motion_page(data, m):
         f"""<a class="row" href="{urls.city(n['country'], n['region'], n['city'])}">
         <div><h3>{esc(n['city']['name'])}</h3>
         <p class="rowsub">{esc(n['city']['summary'])}</p>
-        {f'<p class="whythis"><span>And this one</span> {esc(and_list([c for c in why if c not in common]))}.</p>'
+        {f'<p class="whythis">{esc(and_list([c for c in why if c not in common]))}.</p>'
          if [c for c in why if c not in common] else ""}</div>
         <p class="rowmeta">{esc(n['country']['name'])}<br><span class="small">
-        {n['city']['nights'][0]}–{n['city']['nights'][1]} nights</span></p></a>"""
+        {nights_line(n['city'])}</span></p></a>"""
         for n, why in shown
     )
     shared_note = (f'<p class="whyall"><span>All of them</span> {esc(and_list(common))}.</p>'
                    if common else "")
+
+    # THE ANSWER TO THE QUERY, AS A SHAPE.
+    #
+    # A motion is a query, and its result is a distribution across the
+    # continent — "Europe's hidden villages" is 65 places in 42 countries and
+    # the page showed none of them. Every point that is SHOWN is drawn, not
+    # every point that matched: the two-per-country cap is what the reader is
+    # actually reading, and a map with 83 dots under a list of 65 would be a
+    # different answer to the same question.
+    #
+    # At this density most labels collide and are dropped, which is the
+    # existing rule and is right here: the shape is the argument, and every
+    # dot is a link with its name in the title.
+    mpts = [(*project(n["city"]["lat"], n["city"]["lon"]),
+             urls.city(n["country"], n["region"], n["city"]), n["city"]["name"])
+            for n, _w in shown]
+    motionmap = pointsmap(
+        mpts, "mo" + "".join(ch for ch in m["slug"] if ch.isalnum())[:14],
+        f'The {len(shown)} destinations below, where they are. '
+        f'{len(hits)} matched the query and this is the '
+        f'{"two-per-country" if len(hits) != len(shown) else "whole"} list. '
+        f'Names are dropped where they would overlap; every dot is a link. '
+        f'Coastline from <a href="/sources">Natural Earth</a>, public domain.',
+        f'Map of the {len(shown)} destinations in {m["name"]}') if len(mpts) >= 2 else ""
 
     wants = set(m.get("interests", []))
     jrows = [j for j in data["journeys"] if wants & set(j["interests"])][:3]
@@ -4744,6 +4779,7 @@ def motion_page(data, m):
   countries; {len(shown)} are shown, at most two per country.</p>
 </div>
 
+{motionmap}
 {shared_note}
 <div class="rows">{rows}</div>
 
