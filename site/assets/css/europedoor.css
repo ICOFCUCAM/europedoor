@@ -1785,6 +1785,15 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
 .minimap.arched svg { background: none; border-radius: 0; }
 .routewrap .routemap.arched svg { background: none; }
 .minimap.arched figcaption { color: var(--ink-3); }
+/* The homepage hero is the same aperture. It is an <a>, not a <figure>, so
+   it takes the same treatment by name rather than by inheritance. */
+.heromap.arched svg { background: none; border-radius: 0; }
+.heromap.arched .countries path,
+.heromap.arched .context path { fill: none; vector-effect: non-scaling-stroke; }
+.heromap.arched .countries path { stroke: var(--map-border); stroke-width: 1; }
+.heromap.arched .context path { stroke: color-mix(in srgb, var(--map-border) 55%, transparent); stroke-width: 0.7; }
+.heromap.arched .herodot { fill: var(--lime); opacity: .9; }
+.heromap.arched .herodot.advisory { fill: var(--map-border); opacity: .6; }
 
 /* The aperture draws in its OWN ink, not the page's.
  *

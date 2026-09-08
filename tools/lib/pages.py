@@ -1637,11 +1637,14 @@ def countrymap(data, c):
         note = (f' {len(offframe)} outside this frame: {links}{more} — too far from the '
                 f'mainland to draw at this scale without emptying the map.')
     return (
-        f'<figure class="minimap countrymap" data-world="intelligence">'
+        f'<figure class="minimap countrymap arched">'
         f'<svg viewBox="0 0 {w} {h}" role="img" '
         f'aria-label="Map of {esc(c["name"])} showing its regions and the destinations in the '
-        f'Atlas">{ctx}{land}{"".join(ties)}{"".join(dots)}'
-        f'{"".join(_declutter(labels, w, h))}</svg>'
+        f'Atlas"><defs>{arch_clip("cm" + c["slug"][:14].replace(chr(45), ""), w, h)}</defs>'
+        f'<g clip-path="url(#arch-{"cm" + c["slug"][:14].replace(chr(45), "")})">'
+        f'<rect x="0" y="0" width="{w}" height="{h}" class="archground"/>'
+        f'{ctx}{land}{"".join(ties)}{"".join(dots)}'
+        f'{"".join(_declutter(labels, w, h))}</g></svg>'
         f'<figcaption>{esc(c["name"])}, its {len(c["regions"])} regions and {shown} '
         f'{"destination" if shown == 1 else "destinations"}.{note} Coastline and borders from '
         f'{esc(geo.sources_line(doc))} — public domain, hosted by us. Region names sit at the '
@@ -4458,6 +4461,9 @@ def discover_page(data):
         dots.append(f'<circle class="herodot{cls}" cx="{x:.1f}" cy="{y:.1f}" r="4"/>')
     quiet = sum(1 for n in data["cities"].values() if n["city"].get("quiet"))
 
+    # Land under the dots: /discover had the same scatter-plot fault that
+    # the homepage hero and the destination locator both had.
+    dctx, dland = geo.landmass(MAPPROJ, (0, 0, MAP_W, MAP_H))
     body = f"""
 {crumbs([("Europe", "/discover"), ("Discover", None)])}
 <div class="pagehead">
@@ -4501,8 +4507,9 @@ def discover_page(data):
   <div id="discover-results"></div>
 </section>
 
-<a class="heromap wide-map" href="/map" aria-label="Map of all {len(data['cities'])} places">
-  <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true">{''.join(dots)}</svg>
+
+<a class="heromap wide-map arched" href="/map" aria-label="Map of all {len(data['cities'])} places">
+  <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true"><defs>{arch_clip("disc", MAP_W, MAP_H)}</defs><g clip-path="url(#arch-disc)"><rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>{dctx}{dland}{''.join(dots)}</g></svg>
   <span class="heromap-cap">Open the full map, with layers →</span>
 </a>
 
