@@ -330,6 +330,19 @@ measuring a drawing requires drawing it. `tools/plate-variation.py` holds a
 ceiling on interchangeable pairs per motif family; it is not in `checks.py`
 because eight seconds on every build is a gate people stop running.
 
+**Counting says a family is repetitive; only ablation says which layer to
+change.** Three attempts to vary `tower` reasoned from the drawing and picked
+the shaft, which paints 4% of a card-sized plate. Deleting each layer in turn
+and re-counting the twins — `plate-variation.py --ablate tower` — found that
+68% of the plate was two ridges carrying no variation at all, and that the
+foreground one was *hiding* the nave and shaft, the only layers that vary:
+removing it made the family more varied, not less. Seeding those two
+constants took tower from 41 twin pairs to 27. **Seeding the ridges'
+amplitude and segment count — the exact fix that took coast from 125 twins to
+25 — moved nothing: 41 to 41.** The same repair does not transfer between
+motifs. And read a negative delta against what is underneath: `isles` reports
+its water as occluding, but the only thing under that water is the sky.
+
 **Look to find, count to conclude.** A contact sheet of forty plates suggested
 skylines were about 38% of them; measured across every destination they are
 28%. The sample was biased and the eye was wrong. The same sheet *did* find

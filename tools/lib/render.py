@@ -337,17 +337,31 @@ def plate_shapes(seed, w, h, motif=None):
         # arrow — or worse, a rocket. Wider shaft, shallower spire, and a
         # nave block beside it.
         tx = w * (0.28 + (d[9] / 255.0) * 0.38)
-        # tw is a constant, and it was TRIED as a seeded value in the §6
-        # variation experiment: 41 twin pairs became 42, which is noise. The
-        # same minimal treatment that took coast from 125 twins to 25 does
-        # nothing here, because a tower's similarity comes from the whole
-        # composition — ridge, nave, shaft, spire, second ridge — and not
-        # from one width. Reverted rather than kept, because a change with no
-        # measured benefit is a change that only looks like progress.
+        # tw is a constant, and it was TRIED as a seeded value: 41 twin pairs
+        # became 42, which is noise. Reverted rather than kept, because a
+        # change with no measured benefit is a change that only looks like
+        # progress — and an ablation later said why it could not have
+        # worked. The shaft paints 4% of a card-sized plate. The two ridges
+        # paint 68% of it between them, and both were constants.
+        #
+        #   plate-variation.py --ablate tower
+        #
+        #   layer          coverage   twins without it
+        #   ridge-back        41.1%     44  (+3, noise — carries nothing)
+        #   ridge-front       27.1%     35  (-6, it HID what varies)
+        #   nave               6.0%     49  (+8)
+        #   shaft              4.0%     47  (+6)
+        #   cornice, spire      0.9%    41, 44
+        #
+        # Guessing had picked the 4% layer. The two numbers seeded below are
+        # the ones the measurement named, and nothing else moved.
         tw = w * 0.075
         th = h * (0.26 + (d[10] % 60) / 500.0)
         nave_w = tw * (1.9 + (d[11] % 30) / 40.0)
-        nave_h = th * 0.42
+        # Seeded: the nave is 6% of the plate and the ablation says that 6%
+        # carries variation, but its height was pinned to the shaft's at a
+        # fixed 0.42, so every tower was the same profile scaled. 32 -> 27.
+        nave_h = th * (0.30 + (d[20] % 40) / 100.0)
         prims.append(("rect", tx + tw, horizon - nave_h, nave_w, nave_h + h * 0.2,
                       band[2], 1.0))
         prims.append(("rect", tx, horizon - th, tw, th + h * 0.2, band[2], 1.0))
@@ -360,7 +374,20 @@ def plate_shapes(seed, w, h, motif=None):
         prims.append(("poly", [(tx, horizon - th),
                                (tx + tw / 2, horizon - th - h * 0.115),
                                (tx + tw, horizon - th)], band[2], 1.0))
-        prims.append(ridge(horizon + h * 0.16, h * 0.10, 7, band[1], 20))
+        # The foreground ridge was pinned at 0.16h below the horizon on all
+        # fifty plates. It is the only layer whose REMOVAL made the family
+        # more varied — 41 twins down to 35 — because it is drawn last, over
+        # the base of the nave and shaft, which is where the variation is.
+        # A layer that occludes the varying part of a drawing is worse than
+        # a constant: it subtracts. Seeding where it sits lets each plate
+        # show a different amount of what actually differs. 41 -> 32.
+        #
+        # Seeding its amplitude and segment count instead — the treatment
+        # that took coast from 125 twins to 25 — was tried first and moved
+        # nothing at all: 41 -> 41. The same fix does not transfer between
+        # motifs, and the ablation is what says which one to reach for.
+        front_drop = h * (0.08 + (d[19] % 88) / 400.0)
+        prims.append(ridge(horizon + front_drop, h * 0.10, 7, band[1], 20))
     elif motif == "isles":
         # Four islands, always, at y = horizon + 0.05h + i*0.09h — a fixed
         # ladder. Only cx, rw and rh varied, so 19 destinations produced 8

@@ -298,7 +298,7 @@ build is a gate people stop running.
 | finding | measured |
 |---|---|
 | `plain` is the flattest family | 10.7% of pairs are twins — but n=8, so 3 pairs. Low priority until more villages exist |
-| `tower` did not respond to the minimal treatment | 41 twin pairs, 3.3%. Needs a compositional variant rather than a seeded constant, and has not earned one yet |
+| ~~`tower` did not respond to the minimal treatment~~ | ~~41 twin pairs, 3.3%~~ — **answered in §6.4c. It responded to a different constant, and the sentence above named the wrong reason** |
 | skyline lights are smaller than other families' | from §6.4a. Geometrically safe, not yet visually normalised |
 
 **The verdict on the atlas question, updated.** The generated system now has
@@ -308,6 +308,103 @@ the rest and both are small. **It is closer to a flagship visual language than
 it was, and still no photography purchase is justified** — the free system has
 not been exhausted, and each experiment so far has cost nothing and found
 something.
+
+## 6.4c Experiment E — why the 41 tower twins were twins
+
+**The instruction that set this up was to measure before changing.** Not
+"vary tower"; *"investigate the 41 tower twin pairs, but only after measuring
+why they are twins. If the duplication comes from one constant, test that
+constant. If it comes from the composition itself, test the smallest
+compositional change. If neither produces a measurable improvement, leave
+tower alone."* That order is the whole result below, because the answer this
+experiment gives is one no amount of looking at the drawing had produced in
+three previous attempts.
+
+### The instrument: ablation
+
+The twin count says a family is repetitive. It cannot say **which layer** is
+responsible, and `tower` draws seven of them. So `plate-variation.py --ablate
+tower` deletes each primitive in turn, re-renders all 50 plates and re-counts
+the twins. A layer whose deletion changes nothing was distinguishing nothing;
+a layer whose deletion makes the family *more* varied is hiding the part that
+does.
+
+| layer | coverage of the plate | twins without it | delta |
+|---|---|---|---|
+| ridge-back | **41.1%** | 44 | +3 — noise |
+| ridge-front | **25.8%** | 35 | **−6 — it was hiding what varies** |
+| nave | 6.3% | 49 | +8 |
+| shaft | 4.0% | 47 | +6 |
+| spire | 0.6% | 44 | +3 |
+| cornice | 0.3% | 41 | 0 |
+| light | 0.8% | 53 | +12 |
+
+**Two thirds of a tower plate is two ridges, and neither was doing any work.**
+The shapes that distinguish one tower from another — the nave and the shaft —
+paint 10% of the frame between them, and the foreground ridge was drawn last,
+over their bases.
+
+This is why the §6.4b attempt failed. It seeded `tw`, the shaft width: the
+4% layer. It was the shaft that *looked* like the subject of the drawing.
+
+**Reading a negative delta requires knowing what is underneath.** Deleting a
+layer reveals the layer below it, so if that one varies more, the result reads
+as "occludes" whether or not anything is wrong. `isles` reports −4 on its
+water — and under that water there is only the sky gradient, which varies by
+hue on every plate. The water is doing its job. Tower's −6 was real because
+what sat under that ridge was the base of the nave and the shaft: the two
+layers the same run had just named as carrying the variation. **The delta
+locates a suspect; what lies beneath it settles the case.**
+
+### The four tests, in order, smallest first
+
+| # | change | twins | verdict |
+|---|---|---|---|
+| — | baseline | 41 | |
+| 1 | seed both ridges' amplitude and segment count — *the exact treatment that took coast from 125 to 25* | **41** | **no effect at all.** Kept nothing |
+| 2 | seed the foreground ridge's drop, the constant the ablation named | **32** | kept |
+| 3 | widen the tower height range | 31 | **one pair — noise, and it changes the drawing's proportions.** Reverted |
+| 4 | seed the nave height, pinned at a fixed 0.42 of the shaft | **27** | kept |
+
+**41 → 27 twin pairs, 3.3% → 2.2% of pairs, nearest-neighbour distance
+0.0207 → 0.0245.** Two constants seeded. No new shape, no new colour, no new
+concept, and eleven lines of diff.
+
+Test 1 is the one worth keeping in mind. The coast fix was a *good* fix, and
+applying it to the next-worst family was the obvious move — it moved nothing.
+**The same repair does not transfer between motifs, because the layer that
+was constant is not in the same place twice.** Only the ablation says where
+to reach.
+
+### Confirmation, not just a smaller number
+
+Re-running the ablation after the change is the check on the diagnosis:
+`ridge-front` moved from **−6 (occluding what varies)** to **+7 (carrying
+variation)**. It is now doing the opposite of what it was doing. That is a
+prediction made before the change and confirmed after it, which a twin count
+alone could never have supplied.
+
+Rendered at card size before and after, and measured: the tower is *more*
+visible on average, not less — mean 207 → 221 painted pixels of 2,560, range
+159–262 → 148–327. The foreground band now sits at a different height on each
+plate instead of the same one on all fifty.
+
+One honest note: the single closest pair, Echternach / Toledo, got marginally
+closer (0.0086 → 0.0077). Individual pairs move both ways under a change that
+improves the aggregate, and the aggregate is the thing being measured.
+
+### What was NOT done
+
+`plain` is untouched. It has the highest twin *percentage* of any family
+(10.7%) and n=8, which is three pairs — a denominator too small to learn
+anything from. **A percentage over 28 pairs is not a finding.** It waits for
+more villages in the dataset, not for more code.
+
+### The ceiling moves
+
+`docs/plate-variation.json` records tower at **27**, down from 41. Restoring
+the fixed `0.16h` foreground drop fails the gate by name — *"tower: 40
+interchangeable pairs, ceiling 27"* — exit 1. Verified, not assumed.
 
 ## 6.5 What must stay distinct while the identity changes
 

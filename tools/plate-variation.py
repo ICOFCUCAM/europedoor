@@ -5,6 +5,9 @@
     python3 tools/plate-variation.py --write    record the twin counts
     python3 tools/plate-variation.py --check    fail if any family got MORE
                                                 interchangeable
+    python3 tools/plate-variation.py --ablate tower
+                                                WHICH layer of one motif
+                                                carries the variation
 
 Not part of tools/checks.py: it renders 319 plates and compares every pair,
 which is eight seconds. A gate that adds eight seconds to every build is a
@@ -26,6 +29,24 @@ produced a confident number:
 Measuring a drawing requires drawing it. This renders every plate at 64x40
 through the same rasteriser the social cards use and compares pixels, which
 is what a reader's eye does with a card.
+
+--ablate answers the next question, which the twin count cannot: a family is
+repetitive, but WHICH of its layers is responsible? It removes each primitive
+in turn and re-counts. A layer whose removal changes nothing carries no
+variation however much of the frame it paints; a layer whose removal makes
+the family MORE varied is occluding the part that does. Tower needed this:
+three rounds of reasoning about the drawing had picked the shaft, which is
+4% of the plate, while 68% of it was two ridges nobody had looked at.
+
+READ A NEGATIVE DELTA AGAINST WHAT IS UNDERNEATH. Deleting a layer does not
+reveal nothing; it reveals the layer below, and if THAT one varies more the
+result reads as "occludes" whether or not anything is wrong. isles reports
+-4 on its water, but the only thing under that water is the sky gradient,
+which varies by hue on every plate — the water is doing its job. tower's -6
+on its foreground ridge was real, because what sat under that ridge was the
+base of the nave and the shaft: the two layers the same run had just named
+as the ones carrying variation. The delta locates a suspect; what lies
+beneath it is what settles the case.
 """
 import json, os, sys, collections
 
@@ -60,11 +81,109 @@ def dist(a, b):
 
 
 d = D.load()
-fam = collections.defaultdict(list)
+plates = []
 for cid, n in sorted(d["cities"].items()):
     t, r, c = n["city"], n["region"], n["country"]
     m = R.motif_for(t["interests"], t.get("city_type")) or R.motif_for(r["interests"])
-    fam[m].append((t["name"], pixels(f'city:{c["slug"]}:{t["slug"]}', m)))
+    plates.append((m, t["name"], f'city:{c["slug"]}:{t["slug"]}'))
+
+
+def twins(imgs):
+    return sum(1 for i in range(len(imgs)) for j in range(i + 1, len(imgs))
+               if dist(imgs[i], imgs[j]) < 0.020)
+
+
+if "--ablate" in sys.argv:
+    # Layer names, per motif, as (head, repeated, tail). Four of the seven
+    # motifs emit a seed-chosen NUMBER of primitives — coast's headland is
+    # on half of them, isles draws three to six, skyline and forest fill the
+    # frame — so a flat positional list mislabels the trailing layer on
+    # exactly the plates where it matters. head is matched from the front,
+    # tail from the back, and the repeated name fills whatever is between.
+    LAYERS = {
+        "tower": (["ridge-back", "nave", "shaft", "cornice", "spire", "ridge-front"],
+                  None, []),
+        "coast": (["ridge", "water", "glint", "glint", "glint"], None, ["headland"]),
+        "peaks": ([], "ridge", []),
+        "isles": (["water"], "isle", []),
+        "forest": (["ridge"], "tree", ["ridge-front"]),
+        "plain": ([], "ridge", []),
+        "skyline": (["ridge"], "block", []),
+    }
+    motif = sys.argv[sys.argv.index("--ablate") + 1]
+    if motif not in LAYERS:
+        print(f"unknown motif: {motif}")
+        sys.exit(2)
+    shapes = [(nm, R.plate_shapes(sd, W, H, motif))
+              for m, nm, sd in plates if m == motif]
+
+    def named(prims):
+        """Name every primitive of one plate. The light is inserted at the
+        FRONT of the list and only where there is sky to hold it, so it is
+        identified by its shape rather than by its index."""
+        head, rep, tail = LAYERS[motif]
+        body = [i for i, p in enumerate(prims) if p[0] != "circle"]
+        out = {i: "light" for i, p in enumerate(prims) if p[0] == "circle"}
+        take_tail = tail if len(body) >= len(head) + len(tail) else []
+        for k, i in enumerate(body):
+            back = len(body) - k
+            if k < len(head):
+                out[i] = head[k]
+            elif back <= len(take_tail):
+                out[i] = take_tail[len(take_tail) - back]
+            else:
+                out[i] = rep or "extra"
+        return [out[i] for i in range(len(prims))]
+
+    def draw(sky_a, sky_b, prims):
+        c = raster.Canvas(W, H)
+        c.vertical_gradient(sky_a, sky_b)
+        for p in prims:
+            if p[0] == "poly":
+                c.polygon(p[1], p[2], p[3])
+            elif p[0] == "rect":
+                c.rect(p[1], p[2], p[3], p[4], p[5], p[6])
+            elif p[0] == "circle":
+                c.ellipse(p[1], p[2], p[3], p[3], p[4], p[5])
+            elif p[0] == "ellipse":
+                c.ellipse(p[1], p[2], p[3], p[4], p[5], p[6])
+        return b"".join(bytes(r) for r in c.rows)
+
+    full = [draw(a, b, pr) for _nm, (a, b, pr) in shapes]
+    sky = [draw(a, b, []) for _nm, (a, b, pr) in shapes]
+    base = twins(full)
+    order = []
+    for nm, (a, b, pr) in shapes:
+        for ln in named(pr):
+            if ln not in order:
+                order.append(ln)
+    print(f"{motif}: {len(shapes)} plates, {base} twin pairs\n")
+    print(f"{'layer':<13}{'coverage':>10}{'twins without':>15}{'delta':>8}   reading")
+    print("-" * 66)
+    for layer in order:
+        cov, kept = [], []
+        for nm, (a, b, pr) in shapes:
+            names = named(pr)
+            solo = draw(a, b, [p for p, n2 in zip(pr, names) if n2 == layer])
+            cov.append(sum(1 for x, y in zip(solo, draw(a, b, []))
+                           if x != y) / len(solo))
+            kept.append(draw(a, b, [p for p, n2 in zip(pr, names) if n2 != layer]))
+        t = twins(kept)
+        delta = t - base
+        read = ("carries the variation" if delta > 3 else
+                "OCCLUDES what varies" if delta < -3 else "carries none")
+        print(f"{layer:<13}{100 * sum(cov) / len(cov):>9.1f}%{t:>15}{delta:>+8}   {read}")
+    print(f"{'(colour only)':<13}{'':>10}{twins(sky):>15}{twins(sky) - base:>+8}   "
+          f"the sky and the palette alone")
+    print("\ncoverage = share of a 64x40 plate the layer paints")
+    print("delta    = twin pairs gained by DELETING the layer. Positive means "
+          "it was\n           distinguishing plates; negative means it was "
+          "hiding what does.")
+    sys.exit(0)
+
+fam = collections.defaultdict(list)
+for m, nm, sd in plates:
+    fam[m].append((nm, pixels(sd, m)))
 
 print(f"{'motif':<9}{'n':>4}{'mean d':>9}{'near d':>9}{'twins':>7}{'twin%':>7}  closest pair")
 print("-" * 88)
