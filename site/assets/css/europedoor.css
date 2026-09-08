@@ -487,6 +487,28 @@ main.wide { max-width: 92rem; }
   .row .rowmeta { white-space: normal; }
   .scorerow { grid-template-columns: 7rem 1fr 2.2rem; gap: var(--s2); }
 }
+/* MOTION: CONSIDERED, TRIED, AND REMOVED.
+ *
+ * The brief asks where motion would communicate movement, transition,
+ * discovery, hierarchy or state. On the destination page the only candidate
+ * was transition — the section nav jumps to an anchor several screens away,
+ * and an instant jump leaves a reader unsure whether they moved down the
+ * page or landed on a new one. Everything else considered was decoration:
+ * reasons fading in, the map easing, cards lifting further.
+ *
+ * `html { scroll-behavior: smooth }` was added for that one case and is
+ * gone again. It makes every programmatic scrollTo asynchronous, and the
+ * browser suite failed within a minute: a check that scrolls to the bottom
+ * and asserts the sticky bars do not cover the last link measured before
+ * the scroll had landed. The layout was fine; the global setting was not.
+ *
+ * And the site already had an answer. planner.js opts in per call, with
+ * scrollIntoView({behavior:"smooth"}), exactly where a transition needs
+ * explaining. A global override was a blunter version of a decision this
+ * codebase had already made properly.
+ *
+ * The sticky rail carries state on this page and animates nothing.
+ */
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
   .card:hover { transform: none; }
@@ -1513,6 +1535,9 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
 @media (min-width: 62rem) {
   .placeband { grid-template-columns: 5fr 7fr; align-items: stretch; }
   .placeband-art { aspect-ratio: auto; }
+  /* No photograph, no illustration: the map takes the full width and its
+   * labels become legible, which is the whole reason the plate went. */
+  .placeband.maponly { grid-template-columns: 1fr; }
 }
 
 
@@ -1669,3 +1694,50 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
 @media (min-width: 52rem) {
   .route .leg { grid-template-columns: 8rem minmax(0, 1fr); }
 }
+
+
+/* ── DESTINATION, the lower two-thirds ────────────────────────────────
+ *
+ * The first pass at this family designed the opening and left everything
+ * below the placeband exactly as the audit found it: a score-bar dashboard
+ * as the first thing after the argument, section ledes explaining OUR DATA
+ * POLICY rather than the place ("2 recorded so far. We hold what each one
+ * is and deliberately not its opening hours"), and the best practical
+ * writing on the page — how many nights, when to come, how to get there —
+ * shut in a grey rail on the right.
+ *
+ * An invitation followed three screens later by a database is not a
+ * first-grade page. It is a first-grade opening bolted to the old one.
+ *
+ * So: the practical answers come into the flow, directly under the map,
+ * because "how long, when, how do I get there" is what a reader asks
+ * immediately after deciding they might go. The rail keeps the ACTIONS,
+ * which is what a rail is for. And the metadata and the scores go last,
+ * under a heading that says what they are.
+ */
+.practical {
+  margin-top: var(--s6);
+  padding-top: var(--s5);
+  border-top: 1px solid var(--rule);
+  display: grid;
+  gap: var(--s6);
+}
+.practical h2 { margin: 0 0 var(--s2); }
+.practical p { margin: 0; color: var(--ink-2); max-width: 34ch; }
+@media (min-width: 52rem) {
+  .practical { grid-template-columns: repeat(3, 1fr); gap: var(--s7);
+               margin-top: var(--s8); padding-top: var(--s6); }
+}
+
+/* The honesty notes stay — they are a rule here — but they stop being the
+ * section's introduction. A disclosure about what we deliberately do not
+ * hold is worth reading after the list, not instead of it. */
+.sourcenote {
+  margin-top: var(--s4);
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+  max-width: 60ch;
+}
+
+.placeband.maponly { grid-template-columns: 1fr; }
+@media (min-width: 62rem) { .placeband.maponly { grid-template-columns: 1fr; } }

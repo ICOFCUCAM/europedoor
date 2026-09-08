@@ -278,3 +278,62 @@ moving the fact table back above the route left both headings where they
 were and the deliberate regression passed. Rewritten to compare the position
 of `class="facts"` against `class="legs route"`, and then proved red.
 **A check that cannot fail on the thing it names is worse than no check.**
+
+---
+
+# Exemplar 1, finished
+
+The first pass designed the **opening** and left everything below the
+placeband as the audit found it. That is not a first-grade page; it is a
+first-grade opening bolted to the old one. What changed on the second pass:
+
+| | before | after |
+|---|---|---|
+| the practical writing | *"Give it 2–4 nights"*, *"When to come"*, *"Getting there"* — in a grey rail on the right | **in the flow**, three columns, directly under the map. It is what a reader asks the moment they decide they might go |
+| the rail | four headings of prose plus the actions | **actions only** — that is what a rail is for. Sticky, so it travels |
+| the score bars | first thing after the argument | last, in **"The record"**, with a lede saying what it is: *useful when you are already interested, and not a reason to be* |
+| section ledes | *"2 recorded so far. We hold what each one is and deliberately not its opening hours"* — our data policy, as the section's introduction | a **quiet note under the rows**. The honesty is a rule here and stays; its prominence does not |
+
+## The plate: it did not earn its place
+
+I called the plates the weakest element and then left them on 319 pages.
+Rendered three ways and looked at:
+
+- **plate + map** — the map squeezed to half width, labels cramped, and a
+  flat illustration beside it
+- **map at half width alone** — lopsided, no visual at all
+- **map at full width** — Chamonix with Annecy, Zermatt, Lauterbrunnen and
+  Lugano around it, legible, and true
+
+The third is plainly the strongest. **So the illustration goes**, under the
+same rule the homepage hero follows: a photograph if the register holds one,
+and where it does not, nothing in its place. The plates keep every other job —
+this page's social card is still drawn from `plate_shapes()`.
+
+`plates.page_share` is now a **ceiling** at 0.465 (was 0.778 across 834
+pages). A ceiling, not a floor, because the failure mode being guarded is an
+illustration *spreading* onto pages that do not need one. Proved red by
+putting the plate back: *"0.762 exceeds the recorded ceiling 0.465"*.
+
+**And a caption that outlived what it captioned.** `art_note()` printed
+"Illustration, not a photograph" — honest while there was an illustration,
+and a disclaimer about something absent once there wasn't. Deleted.
+
+## Motion: considered, tried, removed
+
+The only candidate was transition — the section nav jumps several screens.
+`html { scroll-behavior: smooth }` was added for it and **failed the browser
+suite within a minute**: it makes every programmatic `scrollTo` asynchronous,
+and a check that scrolls to the bottom to assert the sticky bars do not cover
+the last link measured before the scroll landed. The layout was fine; the
+global setting was not.
+
+The site already had the answer — `planner.js` opts in per call with
+`scrollIntoView({behavior:"smooth"})`, exactly where a transition needs
+explaining. **No motion was added.**
+
+## Still open, and not this family's to take
+
+The **168px mobile masthead** — 20% of a 390×844 viewport on all 1,072 pages,
+on a site that already carries a bottom thumbbar covering the same
+destinations. Shell, not page. Owner's call.

@@ -837,6 +837,25 @@ def city_page(data, c, r, t):
         )
     festrows = _festrows(here_f)
     widerows = _festrows(wide_f)
+    # A VISUAL EARNS ITS POSITION OR IT IS NOT PLACED.
+    #
+    # The placeband used to be [generated plate | map] on all 319 pages. It
+    # was rendered both ways and looked at: the plate at 480x310 is flat, and
+    # the map beside it was squeezed to half width with its labels cramped.
+    # The map ALONE, full width, is the stronger page — Chamonix with Annecy,
+    # Zermatt, Lauterbrunnen and Lugano around it, legible, and true.
+    #
+    # So the illustration goes, and the rule is the same one the homepage
+    # hero follows: a photograph if the register holds one, and where it does
+    # not, no illustration in its place. The plates keep every other job they
+    # have — the social card for this page is still drawn from plate_shapes.
+    has_photo = bool((data.get("images") or {}).get(f"city:{cid}"))
+    photo_block = (f'<div class="placeband-art">'
+                   + picture(data["images"], f"city:{cid}", w=1260, h=540,
+                             alt=f"{t['name']}, {c['name']}", eager=True,
+                             sizes="(min-width: 76rem) 44rem, 100vw")
+                   + '</div>') if has_photo else ""
+
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)),
          (c["name"], urls.country(c)), (r["name"], urls.region(c, r)), (t["name"], None)])}
@@ -853,19 +872,11 @@ def city_page(data, c, r, t):
   <ol class="reasons">{reasons}</ol>
 </section>
 
-<figure class="placeband">
-  <div class="placeband-art">
-{picture(data["images"], f"city:{cid}", w=1260, h=540,
-         alt=f"{t['name']}, {c['name']}", eager=True,
-         sizes="(min-width: 76rem) 44rem, 100vw",
-         fallback_seed=f"city:{c['slug']}:{t['slug']}",
-         fallback_motif=motif_for(t["interests"], t.get("city_type"))
-                        or motif_for(r["interests"]))}
-  </div>
+<div class="placeband{'' if has_photo else ' maponly'}">
+  {photo_block}
   <div class="placeband-map">{minimap(data, t, span="auto")}</div>
-  <figcaption>{art_note(data, cid, t)} {esc(t["name"])} is at
-    <span class="mono">{coord_line(t)}</span>, and this is what is around it.</figcaption>
-</figure>
+  <p class="sourcenote">{esc(t["name"])} is at <span class="mono">{coord_line(t)}</span>.</p>
+</div>
 {sectionnav([
     ("Overview", "why-visit"),
     ("Places", "places" if placerows else ""),
@@ -876,23 +887,37 @@ def city_page(data, c, r, t):
     ("Stay & eat", "stay"),
     ("Onward", "onward"),
 ])}
+<section class="practical" aria-label="Practical">
+  <div>
+    <h2 class="mini">Give it {esc(stay)}</h2>
+    <p>Enough to see the list below without spending the trip on trains. The Journey
+    Planner uses exactly this range when it builds an itinerary.</p>
+  </div>
+  <div>
+    <h2 class="mini">When to come</h2>
+    <p>Best: {esc(months_line(data, c["season"]["peak"]))}. Quieter:
+    {esc(months_line(data, c["season"].get("shoulder", [])) or "—")}.
+    <a href="{urls.country(c)}#when">Why, and what that means →</a></p>
+  </div>
+  <div>
+    <h2 class="mini">Getting there</h2>
+    <p>{esc(c['getting_around'][:150])}…
+    <a href="{urls.country(c)}#getting-around">All of {esc(c['name'])} →</a></p>
+  </div>
+</section>
+
 <div class="split mt7">
   <div>
-    {factlist([
-        ("Kind of place", esc(CITY_TYPE_NAMES.get(t.get("city_type"), ""))),
-        ("Population", pop_line(t)),
-        ("Region", f'<a href="{urls.region(c, r)}">{esc(r["name"])}</a>'),
-    ])}
-    {scorebars(city_scores(c, r, t))}
-    {section("Places to see", f'<div class="rows">{placerows}</div>',
-             id="places",
-             lede=f"{len(t.get('places', []))} recorded so far. We hold what each one is and how long to give it, and deliberately not its opening hours or price.") if placerows else ""}
+    {section("Places to see", f'<div class="rows">{placerows}</div>'
+             + f'<p class="sourcenote">{len(t.get("places", []))} recorded so far. We hold what each one is and how long to give it, and deliberately not its opening hours or price.</p>',
+             id="places") if placerows else ""}
     {section("Things to do", f'<div class="rows">{exps}</div>', id="things-to-do") if exps else ""}
-    {section("Getting near", f'<div class="rows">{transrows}</div>', id="getting-near",
-             lede="Airports and ports within reach, from Natural Earth — public domain, hosted "
-                  "by us. The distance is a straight line, which is the only thing a coordinate "
-                  "can honestly tell you: 43 km across the Accursed Mountains is four hours, and "
-                  "we hold no timetables, operators or fares.") if transrows else ""}
+    {section("Getting near", f'<div class="rows">{transrows}</div>'
+             + '<p class="sourcenote">Airports and ports within reach, from Natural Earth — '
+               'public domain, hosted by us. The distance is a straight line, which is the only '
+               'thing a coordinate can honestly tell you: 43 km across the Accursed Mountains is '
+               'four hours, and we hold no timetables, operators or fares.</p>',
+             id="getting-near") if transrows else ""}
     {section("Events here", f'<div class="rows">{festrows}</div>', id="events",
              lede=f"Fixtures tied to {esc(t['name'])} itself.") if festrows else ""}
     {section(f"Elsewhere in {esc(c['name'])}" if festrows else "Events",
@@ -902,20 +927,7 @@ def city_page(data, c, r, t):
                   f"The whole European year is on /events.") if widerows else ""}
   </div>
   <aside class="rail">
-    <h2 class="mini">Give it {esc(stay)}</h2>
-    <p>Enough to see the list on the left without spending the trip on trains. The Journey
-    Planner uses exactly this range when it builds an itinerary.</p>
-    <h2 class="mini">When to come</h2>
-    <p>Best: {esc(months_line(data, c["season"]["peak"]))}. Quieter:
-    {esc(months_line(data, c["season"].get("shoulder", [])) or "—")}.
-    <a href="{urls.country(c)}#when">Why, and what that means →</a></p>
-
-    <h2 class="mini">Getting there</h2>
-    <p>{esc(c['getting_around'][:150])}…
-    <a href="{urls.country(c)}#getting-around">All of {esc(c['name'])} →</a></p>
-
-    <h2 class="mini">Where you are</h2>
-    <p class="mono">{t['lat']:.2f}°N, {t['lon']:.2f}°E</p>
+    <h2 class="mini">Take it further</h2>
     <p><a href="/plan?from={esc(c['slug'])}%2F{esc(r['slug'])}%2F{esc(t['slug'])}">Start a journey here →</a></p>
     {facetlinks}
     <p><button class="btn ghost" type="button" data-save="city:{esc(cid)}" data-kind="Place" data-label="{esc(t['name'])}, {esc(c['name'])}" data-url="{urls.city(c, r, t)}">Save to My Europe</button></p>
@@ -930,6 +942,16 @@ def city_page(data, c, r, t):
 {section("Nearest onward stops", f'<div class="rows">{nearrows}</div>',
          id="onward",
          lede="Straight-line distance, and what that usually means in practice.")}
+
+{section("The record", factlist([
+    ("Kind of place", esc(CITY_TYPE_NAMES.get(t.get("city_type"), ""))),
+    ("Population", pop_line(t)),
+    ("Region", f'<a href="{urls.region(c, r)}">{esc(r["name"])}</a>'),
+    ("Coordinates", f'<span class="mono">{coord_line(t)}</span>'),
+]) + scorebars(city_scores(c, r, t)), id="record", tone="quiet",
+   lede="What we hold about this place, and what our own tagging makes of it. "
+        "It is the last thing on the page on purpose: it is useful when you are "
+        "already interested, and it is not a reason to be.")}
 {edges}
 {stickycta(data, c, r, t)}
 """
@@ -1656,15 +1678,14 @@ def orient_line(t):
     return " · ".join(bits)
 
 
-def art_note(data, cid, t):
-    """Say what the picture IS. A generated horizon shown without comment
-    beside a real coordinate invites a reader to take it for a photograph of
-    the place, and it is not one — it is drawn from the destination's own
-    tags. Where a licensed photograph exists, picture() renders its credit
-    and this says nothing, because the credit is the honest note."""
-    if (data.get("images") or {}).get(f"city:{cid}"):
-        return ""
-    return "Illustration, not a photograph —"
+# art_note() was deleted rather than kept.
+#
+# It existed to say "Illustration, not a photograph" beside a generated
+# horizon, which was the honest thing to do while there WAS a generated
+# horizon. The illustration is gone from this family, so the note became a
+# disclaimer about something that is not on the page — the same class of
+# untruth it was written to prevent, pointing the other way. A caption that
+# survives the thing it captions is worse than no caption.
 
 
 def minimap(data, t, span=3.2):

@@ -211,6 +211,21 @@ def measure():
                 "why": "The heaviest page on the site. Guards against a template "
                        "quietly inlining something large across a whole family, "
                        "which is how the coastline reached 51 pages and 2.1 MB."},
+            # A CEILING, not a floor, and the direction is the point. The
+            # rule is that a visual earns its position — so what needs
+            # guarding is plates SPREADING back onto pages that do not need
+            # one, not plates being removed. 319 destination pages dropped
+            # theirs when the map alone was measured to be the stronger
+            # page, and nothing in the suite noticed until this row existed.
+            "plates.page_share": {
+                "value": round(sum(1 for b in bodies.values()
+                                   if re.search(r'class="[^"]*(?<![\w-])plate(?![\w-])', b))
+                               / len(pages), 3),
+                "kind": "ceiling",
+                "why": "The share of pages carrying a generated illustration. A "
+                       "ceiling because the failure mode is an illustration "
+                       "placed because the system has one, which is the one "
+                       "reason the art direction forbids."},
             "plates.motifs_declared": {
                 "value": len(R.MOTIFS), "kind": "exact",
                 "why": "Seven declared."},
