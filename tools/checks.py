@@ -1260,6 +1260,60 @@ def c_schema():
                  f"and /method says so in those words")
         n += 1
 
+    # §2.14: every edge in the derived relationship index resolves to an
+    # entity that exists, and no relationship silently drops to zero.
+    #
+    # The second half is not hypothetical. `gathers` shipped at zero for one
+    # build because the derivation read `theme["places"]` and a theme's
+    # destinations are `stops` — a typo in the derivation itself, which is the
+    # one failure a derived index cannot catch for you. A count per
+    # relationship in the document, and a floor on each here, is what makes it
+    # visible.
+    gpath = os.path.join(OUT, "api", "graph.json")
+    if not os.path.exists(gpath):
+        fail("/api/graph.json was not published")
+    else:
+        with open(gpath, encoding="utf-8") as fh:
+            g = json.load(fh)
+        ids = {
+            "macro": {m["slug"] for m in d["macros"]},
+            "country": set(d["countries"]),
+            "region": {f'{c["slug"]}/{r["slug"]}'
+                       for c in d["countries"].values() for r in c["regions"]},
+            "destination": set(d["cities"]),
+            "place": {f'{cid}/{pl["slug"]}' for cid, node in d["cities"].items()
+                      for pl in node["city"].get("places", [])},
+            "experience": {f'{cid}#{e["slug"]}' for cid, node in d["cities"].items()
+                           for e in node["city"].get("experiences", [])},
+            "journey": {j["slug"] for j in d["journeys"]},
+            "story": {st["slug"] for st in d["stories"]},
+            "theme": {th["slug"] for th in d["themes"]},
+        }
+        for row in g["edges"]:
+            st, si, _rel, tt, ti = row[:5]
+            for kind, ident in ((st, si), (tt, ti)):
+                if kind in ids and ident not in ids[kind]:
+                    fail(f"/api/graph.json: {kind} {ident!r} does not exist")
+            n += 1
+        floors = {"part_of": 400, "located_in": 400, "near": 1500, "includes": 100,
+                  "serves": 200, "gathers": 50, "about": 20, "happens_in": 40,
+                  "available_at": 10}
+        for rel, floor in floors.items():
+            got = g["relationships"].get(rel, 0)
+            if got < floor:
+                fail(f"/api/graph.json has {got} {rel!r} edges and this atlas has "
+                     f"{floor}+ — a relationship that drops to zero is what nobody notices")
+            n += 1
+        # A weight is a measurement or it is absent. There is no relevance
+        # score, because nobody computed one from anything.
+        for row in g["edges"]:
+            meta = row[5] if len(row) > 5 else {}
+            for invented in ("weight", "score", "relevance", "confidence"):
+                if invented in meta:
+                    fail(f"/api/graph.json carries {invented!r} — the only weight in this "
+                         f"graph is `km`, which is a real distance")
+            n += 1
+
     # §2.11: nodes yes, routes never. An operator, a frequency, a duration or
     # a fare in the data is a promise about a departure we cannot keep, and
     # the failure mode is somebody standing on a platform.

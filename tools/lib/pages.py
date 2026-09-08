@@ -767,10 +767,19 @@ def city_page(data, c, r, t):
         ]
         return f'<p class="rowsub small">— {", ".join(links)}</p>' if links else ""
 
+    # §2.16 saved_experiences. My Europe already saved destinations, places,
+    # journeys, themes and stories; an experience was the one kind of thing
+    # you could read about and not keep, which is a strange omission on a
+    # page whose whole job is "things to do here". It became possible once
+    # each row had a stable id to point at.
     exps = "".join(
         f"""<div class="row" id="exp-{esc(e['slug'])}"><div><h3>{esc(e['name'])}</h3>
         <p class="rowsub">{esc(e['summary'])}</p>{_where(e)}</div>
-        <p class="rowmeta">{esc(kinds[e['kind']])} · {esc(e['band'])}</p></div>"""
+        <div class="rowside"><p class="rowmeta">{esc(kinds[e['kind']])} · {esc(e['band'])}</p>
+        <button class="btn ghost tiny" type="button"
+          data-save="experience:{esc(cid)}#{esc(e['slug'])}" data-kind="Experience"
+          data-label="{esc(e['name'])}, {esc(t['name'])}"
+          data-url="{esc(urls.experience(c, r, t, e))}">Save</button></div></div>"""
         for e in t.get("experiences", [])
     )
     # Nearby cities, computed rather than curated: the same distance function
@@ -3627,6 +3636,124 @@ def sitemap(paths):
 
 # ── search ────────────────────────────────────────────────────────────
 
+def graph_api(data):
+    """§2.14 — every relationship in the atlas, as one traversable index.
+
+    The Build Package asks for a `relationships` table: source_type,
+    source_id, relationship_type, target_type, target_id, weight, metadata.
+    This is that document, with one difference that matters.
+
+    **The edges are derived, not stored.** A free-standing relationships
+    table cannot be validated: nothing stops a row naming an entity that does
+    not exist, or naming it with the wrong type, and the failure mode is a
+    page that is quietly empty rather than a build that stops. Every edge
+    below is computed at build time from a relation that is already checked
+    somewhere else — the nesting, a journey leg, a story's `places`, the
+    §2.5 place-experience edge — so an edge cannot dangle, because there is
+    nowhere for it to dangle from.
+
+    That is the same trade as `entity_categories` in §2.12: identical
+    expressiveness, and a failure mode of "the build stops".
+
+    **`weight` is only ever a real measurement.** Distance in kilometres,
+    and nothing else. A relevance weight would be a number nobody computed
+    from anything, sitting in a document that looks authoritative, and this
+    repository has a rule about that.
+    """
+    E = []
+
+    def edge(st, si, rel, tt, ti, **meta):
+        row = [st, si, rel, tt, ti]
+        if meta:
+            row.append(meta)
+        E.append(row)
+
+    for slug, c in sorted(data["countries"].items()):
+        edge("country", slug, "part_of", "macro", c["macro_slug"])
+        for r in c["regions"]:
+            rid = f"{slug}/{r['slug']}"
+            edge("region", rid, "part_of", "country", slug)
+            for t in r["cities"]:
+                cid = f"{rid}/{t['slug']}"
+                edge("destination", cid, "part_of", "region", rid)
+                for pl in t.get("places", []):
+                    edge("place", f"{cid}/{pl['slug']}", "located_in", "destination", cid,
+                         kind=pl["kind"])
+                for e in t.get("experiences", []):
+                    eid = f"{cid}#{e['slug']}"
+                    edge("experience", eid, "located_in", "destination", cid, kind=e["kind"])
+                    # The §2.5 edge, carrying which of the three it is. The
+                    # schema's example calls this available_at; ours knows
+                    # whether you stand on the place, start from it, or look
+                    # at it from a boat.
+                    for link in e.get("at", []):
+                        edge("experience", eid, "available_at", "place",
+                             f"{cid}/{link['place']}", how=link["how"])
+                # Transport is a relationship, not a column: a node serves a
+                # destination, and the weight is a straight-line distance
+                # rather than a travel time, which is stated everywhere it
+                # appears.
+                for nd in t.get("transport", []):
+                    edge("transport_node", f"{nd['kind']}:{nd['name']}", "serves",
+                         "destination", cid, km=nd["km"], straightLine=True)
+                for f in c.get("festivals", []):
+                    if f.get("city") == t["slug"]:
+                        edge("event", f"{slug}#{f['name']}", "happens_in", "destination", cid,
+                             month=f["month"])
+
+    for j in data["journeys"]:
+        for leg in j["legs"]:
+            edge("journey", j["slug"], "includes", "destination", leg["city"],
+                 day=leg["day_number"], nights=leg["nights"])
+            for ps in leg.get("places", []):
+                edge("journey", j["slug"], "stops_at", "place", f"{leg['city']}/{ps}",
+                     day=leg["day_number"])
+
+    for st in data["stories"]:
+        for cid in st.get("places", []):
+            edge("story", st["slug"], "about", "destination", cid)
+
+    # A theme's destinations are `stops`, not `places` — the two entities use
+    # different words for the same idea, and reading the wrong one produced
+    # 0 `gathers` edges in a document that otherwise looked complete. That is
+    # the failure mode a derived index is supposed to prevent, arriving via
+    # the one place it cannot: a typo in the derivation itself. Hence the
+    # per-relationship counts in this document and the floor on them in
+    # checks.py — a relationship that silently drops to zero is exactly what
+    # nobody notices.
+    for th in data["themes"]:
+        for stop in th.get("stops", []):
+            edge("theme", th["slug"], "gathers", "destination", stop["city"],
+                 why=bool(stop.get("why")))
+
+    # Proximity, computed with the same function the planner uses so the
+    # graph and a route can never disagree about what is close.
+    nodes = sorted(data["cities"].items())
+    for cid, n in nodes:
+        near = sorted(
+            ((haversine(n["city"], m["city"]), mid) for mid, m in nodes if mid != cid),
+        )[:6]
+        for km, mid in near:
+            edge("destination", cid, "near", "destination", mid, km=round(km))
+
+    kinds = {}
+    for row in E:
+        kinds[row[2]] = kinds.get(row[2], 0) + 1
+
+    return "/api/graph.json", {
+        "generated": "build",
+        "licence": API_LICENCE,
+        "note": ("Every relationship in the atlas, derived at build time from relations "
+                 "that are validated elsewhere — so no edge can point at an entity that "
+                 "does not exist. `weight` appears only as `km`, a real straight-line "
+                 "distance; there is no relevance score, because nobody computed one."),
+        "shape": ["sourceType", "sourceId", "relationship", "targetType", "targetId",
+                  "metadata (optional)"],
+        "relationships": kinds,
+        "edges": E,
+    }
+
+
 def countries_api(data):
     """Country-level facts, as one flat document.
 
@@ -3776,6 +3903,12 @@ def search_api(data):
                     b=c["budget"], q=(1 if t.get("quiet") else None),
                     m=c["season"]["peak"] + c["season"].get("shoulder", []),
                     la=t["lat"], lo=t["lon"], cs=c["slug"],
+                    # §2.19: what KIND of place it is, so "mountain villages"
+                    # can mean villages. The field existed after the schema
+                    # audit and the search did not read it, so "romantic
+                    # mountain villages near Milan" quietly dropped the word
+                    # "villages" and returned Bellagio and Vernazza.
+                    ct=t.get("city_type"),
                     i=sorted(set(t["interests"]) | set(r["interests"])))
                 for pl in t.get("places", []):
                     add("Place", pl["name"], f"{t['name']}, {c['name']}",
@@ -3809,6 +3942,11 @@ def search_api(data):
                 [sub["name"]] + sub["keywords"], 1.1)
     return "/api/search.json", {
         "rows": rows,
+        # Sent rather than typed into the prose. The empty state used to say
+        # "50 countries and 244 cities" while the atlas held 319, and nothing
+        # failed, because a number inside a sentence in a JavaScript file is
+        # checked by nothing at all.
+        "counts": {"countries": len(data["countries"]), "cities": len(data["cities"])},
         "monthNames": data["taxonomy"]["month_names"],
         "interests": {i["slug"]: i["name"] for i in data["taxonomy"]["interests"]},
     }

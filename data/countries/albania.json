@@ -153,7 +153,8 @@
             "Gjipe beach, at the mouth of a canyon, reached on foot",
             "The Llogara pass, dropping 1,000 metres to the sea",
             "Fish, olive oil and citrus from the villages behind"
-          ]
+          ],
+          "city_type": "village"
         }
       ]
     },
@@ -203,7 +204,8 @@
               "band": "low",
               "summary": "Three hours through a flooded gorge on a working passenger boat that carries villagers, goats and the occasional car."
             }
-          ]
+          ],
+          "city_type": "village"
         }
       ]
     }

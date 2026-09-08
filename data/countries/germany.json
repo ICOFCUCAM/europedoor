@@ -334,7 +334,8 @@
               "band": "moderate",
               "summary": "The boatman stops mid-lake and plays into the cliff; the echo comes back a full phrase later."
             }
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -423,7 +424,8 @@
               "band": "low",
               "summary": "The high path gives you the whole gorge; the trains and boats below give you the way back."
             }
-          ]
+          ],
+          "city_type": "village"
         }
       ]
     },

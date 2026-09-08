@@ -159,7 +159,8 @@
               "band": "low",
               "summary": "Twenty miles from Chilham along the North Downs, arriving on foot the way it was meant to be done."
             }
-          ]
+          ],
+          "city_type": "city"
         }
       ]
     },
@@ -224,7 +225,8 @@
               "band": "low",
               "summary": "1,014 kilometres in total; the St Ives-to-Zennor stretch gives you the best of it in six hours."
             }
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -288,7 +290,8 @@
               "band": "low",
               "summary": "214 fells were catalogued by one man in seven hand-written volumes; walking one of the small ones is the best introduction to why."
             }
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -366,7 +369,8 @@
               "band": "low",
               "summary": "Seven kilometres through a landscape still slowly moving downhill; start early, because the car park fills by nine."
             }
-          ]
+          ],
+          "city_type": "island"
         },
         {
           "slug": "islay",
@@ -398,7 +402,8 @@
               "band": "moderate",
               "summary": "Ardbeg, Lagavulin and Laphroaig sit within five kilometres of each other along one coastal path — walk it, for obvious reasons."
             }
-          ]
+          ],
+          "city_type": "island"
         }
       ]
     },
@@ -462,7 +467,8 @@
               "band": "moderate",
               "summary": "Built in 1836 to run loaded downhill by gravity; it still descends 700 feet to Porthmadog through the woods."
             }
-          ]
+          ],
+          "city_type": "park"
         }
       ]
     },
@@ -526,7 +532,8 @@
             "The Giant's Causeway, best at dawn or in rain",
             "Carrick-a-Rede rope bridge, if heights are your thing",
             "The oldest licensed distillery in the world, from 1608"
-          ]
+          ],
+          "city_type": "site"
         }
       ]
     }

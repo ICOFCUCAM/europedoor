@@ -117,7 +117,8 @@
               "band": "moderate",
               "summary": "Two hours on a balcony path with the Eiger, Mönch and Jungfrau directly across the valley the whole way."
             }
-          ]
+          ],
+          "city_type": "valley"
         },
         {
           "slug": "bern",
@@ -181,7 +182,8 @@
             "The Matterhorn from the Riffelsee at sunrise, reflected",
             "Gornergrat railway to 3,089 metres",
             "The Haute Route, ending here from Chamonix"
-          ]
+          ],
+          "city_type": "village"
         },
         {
           "slug": "lugano",
@@ -247,7 +249,8 @@
               "band": "moderate",
               "summary": "From glacier to palm trees in four hours, over the Landwasser viaduct and around the Brusio spiral — booked as a normal train, not a tour."
             }
-          ]
+          ],
+          "city_type": "valley"
         }
       ]
     }

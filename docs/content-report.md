@@ -45,9 +45,9 @@ Albania, Andorra, Armenia, Austria, Azerbaijan, Belarus, Belgium, Bosnia and Her
 
 Aarhus, Albarracín, Alghero, Sardinia, Alta, Amiens, Andorra la Vella, Annecy, Arezzo, Assisi, Avignon, Balestrand, Belfast, Bellagio & Lake Como, Berchtesgaden, Bergen, Bern, Biarritz & the Basque Coast, Bilbao, Bitola, Bled, Bodø, Bonifacio, Brussels, Bucharest, and 147 more.
 
-### Destinations with no kind of place recorded — 162
+### Destinations with no kind of place recorded — 0
 
-Abisko, Sweden, Albarracín, Spain, Alghero, Sardinia, Italy, Amboise & the Loire châteaux, France, Arles, France, Assisi, Italy, Avignon, France, Bacharach & the Rhine Gorge, Germany, Balestrand, Norway, Bansko, Bulgaria, Bayeux & the Landing Beaches, France, Beaune, France, Bellagio & Lake Como, Italy, Belovezhskaya Pushcha, Belarus, Berchtesgaden, Germany, Białowieża, Poland, Blagaj, Bosnia and Herzegovina, Bled, Slovenia, Bonifacio, France, Bovec & the Soča, Slovenia, Canterbury, United Kingdom, Carcassonne, France, Chamonix, France, Chartres, France, and 138 more.
+None.
 
 ### Experiences not tied to any place (§2.5) — 182
 

@@ -145,7 +145,8 @@
             "Turaida's red brick castle above the Gauja",
             "Gūtmanis cave, carved with visitors' names since the 1600s",
             "The bobsleigh track, open to the public in winter"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -200,7 +201,8 @@
             "Ventas rumba, where fish jump the falls in spring",
             "Latvia's longest brick bridge, from 1874",
             "Timber streets almost untouched since the 18th century"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     }

@@ -149,7 +149,8 @@
             "Pena Palace, painted in colours that should not work",
             "Quinta da Regaleira's initiation well, a spiral into the ground",
             "The Moorish castle walls along the ridge"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -226,7 +227,8 @@
               "band": "moderate",
               "summary": "Knee-deep in a granite tank for two hours, in a line, to a rhythm — the least romantic and most enjoyable part of winemaking."
             }
-          ]
+          ],
+          "city_type": "valley"
         }
       ]
     },
@@ -292,7 +294,8 @@
             "Ponta da Piedade's arches and grottoes by kayak",
             "The Rota Vicentina north into the wild west coast",
             "Cataplana seafood, cooked in its own copper pot"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     }

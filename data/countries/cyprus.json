@@ -179,7 +179,8 @@
               "band": "low",
               "summary": "Small stone chapels under enormous pitched roofs, frescoed inside floor to ceiling; several need a key fetched from a village house."
             }
-          ]
+          ],
+          "city_type": "village"
         }
       ]
     }

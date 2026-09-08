@@ -207,7 +207,8 @@
               "band": "moderate",
               "summary": "Guided walks across the exposed seabed at low tide, thigh-deep in mud, timed against a returning sea. Never attempted alone."
             }
-          ]
+          ],
+          "city_type": "island"
         }
       ]
     }

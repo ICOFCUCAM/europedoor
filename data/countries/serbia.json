@@ -182,7 +182,8 @@
               "band": "low",
               "summary": "A 760 mm gauge line that loops over itself to climb 300 metres; two and a half hours and a great deal of leaning out of windows."
             }
-          ]
+          ],
+          "city_type": "village"
         },
         {
           "slug": "studenica",
@@ -204,7 +205,8 @@
             "The Crucifixion fresco, a landmark of Byzantine painting",
             "White marble churches inside a circular wall",
             "The valley, which has almost nothing else in it"
-          ]
+          ],
+          "city_type": "site"
         }
       ]
     }

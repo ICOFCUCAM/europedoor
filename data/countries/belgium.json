@@ -318,7 +318,8 @@
             "408 steps or a cable car to the citadel",
             "Kayaking the Lesse down to the river",
             "Adolphe Sax's house, and saxophones on every bridge"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     }

@@ -177,7 +177,8 @@
             "Ephesus's library facade and marble street",
             "The terrace houses, roofed and separately ticketed, with intact mosaics",
             "Şirince, a hill village of former Greek houses making fruit wine"
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "fethiye",
@@ -208,7 +209,8 @@
               "band": "low",
               "summary": "Waymarked in red and white since 1999, through pine, ruins and goat country, with village pensions at the ends of most stages."
             }
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -251,7 +253,8 @@
               "band": "low",
               "summary": "Ihlara, Rose and Pigeon valleys are walked in a morning each, with abandoned rock churches nobody signposts."
             }
-          ]
+          ],
+          "city_type": "village"
         }
       ]
     }

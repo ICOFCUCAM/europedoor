@@ -233,7 +233,8 @@
               "duration": "2 hours",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "monemvasia",
@@ -267,7 +268,8 @@
               "duration": "2 hours",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "delphi",
@@ -320,7 +322,8 @@
               "duration": "1 hour",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "site"
         },
         {
           "slug": "olympia",
@@ -354,7 +357,8 @@
               "duration": "2 hours",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "site"
         },
         {
           "slug": "mystras",
@@ -389,7 +393,8 @@
               "duration": "3 hours",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "site"
         },
         {
           "slug": "kardamyli",
@@ -424,7 +429,8 @@
               "duration": "5 hours",
               "season": "spring-autumn"
             }
-          ]
+          ],
+          "city_type": "village"
         },
         {
           "slug": "hydra",
@@ -459,7 +465,8 @@
               "duration": "1 hour",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "island"
         }
       ]
     },
@@ -526,7 +533,8 @@
               "duration": "45 minutes",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "island"
         },
         {
           "slug": "santorini",
@@ -579,7 +587,8 @@
               "duration": "4 hours",
               "season": "spring-autumn"
             }
-          ]
+          ],
+          "city_type": "island"
         },
         {
           "slug": "chania",
@@ -733,7 +742,8 @@
               "duration": "a day by boat",
               "season": "summer"
             }
-          ]
+          ],
+          "city_type": "island"
         },
         {
           "slug": "paros",
@@ -755,7 +765,8 @@
             "Naoussa's small harbour, before the evening crowd",
             "The Byzantine road, a marble path over the hills to Lefkes",
             "Parian marble, which the Venus de Milo is made of"
-          ]
+          ],
+          "city_type": "island"
         },
         {
           "slug": "symi",
@@ -778,7 +789,8 @@
             "The harbour at Gialos, which is the reason to come",
             "Panormitis monastery at the southern end, reached by boat",
             "Sponge diving history, and the shops that still sell them"
-          ]
+          ],
+          "city_type": "island"
         },
         {
           "slug": "corfu",
@@ -835,7 +847,8 @@
             "Melissani cave, where the roof collapsed and the light comes straight down",
             "Mount Ainos, black fir found nowhere else",
             "Robola wine, grown on limestone at altitude"
-          ]
+          ],
+          "city_type": "island"
         },
         {
           "slug": "ikaria",
@@ -867,7 +880,8 @@
               "band": "low",
               "summary": "A village saint's day: one long table, live violin and lute, dancing in a circle, and food priced to cover the church roof."
             }
-          ]
+          ],
+          "city_type": "island"
         },
         {
           "slug": "heraklion",
@@ -975,7 +989,8 @@
               "duration": "1 hour",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "site"
         },
         {
           "slug": "thessaloniki",
@@ -1064,7 +1079,8 @@
               "duration": "half a day",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "village"
         },
         {
           "slug": "pelion",
@@ -1087,7 +1103,8 @@
             "Kalderimia: cobbled mule paths between villages, still the best way around",
             "The narrow-gauge Moutzouris railway, built by Evaristo de Chirico",
             "Apples, chestnuts and firs on one side of the ridge, the Aegean on the other"
-          ]
+          ],
+          "city_type": "village"
         },
         {
           "slug": "kavala",

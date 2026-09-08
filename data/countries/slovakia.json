@@ -114,7 +114,8 @@
               "band": "moderate",
               "summary": "Beds, soup and beer at 1,500 metres, carried up by porters on wooden frames — a practice still going and worth watching."
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "levoca",
@@ -136,7 +137,8 @@
             "Master Pavol's altar, 18.6 metres of carved lime wood",
             "Spiš castle, four hectares of ruin on a limestone hill",
             "The town walls and the wooden cage of shame in the square"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },

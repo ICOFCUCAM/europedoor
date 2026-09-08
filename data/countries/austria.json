@@ -194,7 +194,8 @@
             "Grüner Veltliner and Riesling from terraces built by monks",
             "The Danube cycle path, flat and shaded",
             "Melk Abbey upriver, gold from floor to ceiling"
-          ]
+          ],
+          "city_type": "village"
         }
       ]
     },
@@ -279,7 +280,8 @@
               "band": "moderate",
               "summary": "Miners' slides, a salt lake underground, and the Bronze Age tools that came out of the same shafts."
             }
-          ]
+          ],
+          "city_type": "village"
         }
       ]
     },

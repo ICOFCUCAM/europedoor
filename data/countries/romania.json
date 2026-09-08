@@ -139,7 +139,8 @@
             "The clock tower's figures, turning since 1648",
             "The covered stairway, 175 steps, built so children could get to school in snow",
             "Painted guild houses inside the walls"
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "viscri",
@@ -171,7 +172,8 @@
               "band": "low",
               "summary": "The meadows are cut by hand because machines would destroy them; in June the villages will show you how and it is harder than it looks."
             }
-          ]
+          ],
+          "city_type": "village"
         }
       ]
     },
@@ -214,7 +216,8 @@
               "band": "low",
               "summary": "A 1547 exterior fresco whose blue has not faded in five hundred winters, and whose recipe is still not known."
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "sapanta",
@@ -236,7 +239,8 @@
             "The Merry Cemetery: 800 carved oak crosses with verses about the dead",
             "Wooden churches on the UNESCO list, built without nails",
             "Horse carts, which are transport rather than heritage"
-          ]
+          ],
+          "city_type": "village"
         }
       ]
     },

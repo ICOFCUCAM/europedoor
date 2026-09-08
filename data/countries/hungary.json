@@ -191,7 +191,8 @@
             "Orthodox churches from the 18th-century Serb migration",
             "The open-air ethnographic museum outside town",
             "Marzipan, oddly, and a museum of it"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -227,7 +228,8 @@
             "The abbey and its 1055 founding charter — the oldest written Hungarian",
             "Lavender fields in late June",
             "Water warm enough to stand in for hours, and rarely deeper than four metres"
-          ]
+          ],
+          "city_type": "village"
         },
         {
           "slug": "tokaj",
@@ -258,7 +260,8 @@
               "band": "low",
               "summary": "The black fungus on the walls regulates humidity and is left alone deliberately; taste dry furmint first and six-puttonyos last."
             }
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     }

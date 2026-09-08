@@ -1133,12 +1133,16 @@ async function main() {
   // relabelled only the button that was clicked, so the other went on
   // offering to save something already saved. (The phone block below clicks
   // the other one; this is the desktop half of the same assertion.)
-  await page.click("[data-save]:not([data-short])");
-  ok((await page.locator("[data-save]:not([data-short])").textContent()).includes("✓"),
+  // Scoped to the destination's own save action. It used to be the only
+  // [data-save] on the page that was not the sticky bar; §2.16 added one per
+  // experience, and the bare selector started matching seventeen things.
+  const cityBtn = '[data-save^="city:"]:not([data-short])';
+  await page.click(cityBtn);
+  ok((await page.locator(cityBtn).textContent()).includes("✓"),
      "save button did not confirm");
   ok((await page.locator("[data-save][data-short]").textContent()).includes("✓"),
      "saving from the rail did not update the sticky bar's button");
-  ok(await page.locator('[data-save][aria-pressed="true"]').count() === 2,
+  ok(await page.locator('[data-save^="city:"][aria-pressed="true"]').count() === 2,
      "the save buttons did not report their pressed state to assistive tech");
   await page.goto(base + "/my-europe", { waitUntil: "networkidle" });
   ok((await page.locator("#mine").textContent()).includes("Bergen"), "saved place did not appear in My Europe");
@@ -1211,7 +1215,7 @@ async function main() {
   await phone.click("[data-save][data-short]");
   ok((await phone.locator("[data-save][data-short]").textContent()).includes("✓"),
      "the compact save button did not confirm");
-  ok((await phone.locator("[data-save]:not([data-short])").textContent()).includes("✓"),
+  ok((await phone.locator('[data-save^="city:"]:not([data-short])').textContent()).includes("✓"),
      "saving from the sticky bar did not update the button in the rail");
   await phone.evaluate(() => localStorage.clear());
 
@@ -1266,6 +1270,62 @@ async function main() {
     document.documentElement.scrollWidth - document.documentElement.clientWidth
   );
   ok(mapOver <= 1, `/map overflows the page by ${mapOver}px instead of scrolling its own wrapper`);
+
+  // ── the knowledge graph, and what the search does with it ──────────
+  //
+  // §2.14-§2.19. These run in a browser rather than as static checks
+  // because the thing being tested is what a reader actually gets: a search
+  // that parses a sentence, and an empty result that explains itself.
+  const gp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  const graph = await (await gp.request.get(base + "/api/graph.json")).json();
+  ok(graph.edges.length > 3000, `the graph has only ${graph.edges.length} edges`);
+  ok(Object.keys(graph.relationships).length >= 9,
+     `only ${Object.keys(graph.relationships).length} relationship types`);
+  for (const rel of ["part_of", "located_in", "near", "includes", "serves",
+                     "gathers", "about", "happens_in", "available_at"]) {
+    ok((graph.relationships[rel] || 0) > 0, `the graph has no ${rel} edges`);
+  }
+  ok(!JSON.stringify(graph.edges).includes('"weight"'),
+     "the graph carries a weight; the only weight here is km, a real distance");
+  await gp.close();
+
+  // §2.19, run as the spec's own example. It found two real gaps the first
+  // time it was run — "villages" silently dropped, and an empty result that
+  // explained nothing — so it stays in the suite.
+  const sp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  await sp.goto(base + "/search", { waitUntil: "networkidle" });
+  await sp.fill("#q", "romantic mountain villages near Milan");
+  await sp.waitForTimeout(320);
+  const und = (await sp.locator("#searchunderstood").textContent()).replace(/\s+/g, " ");
+  ok(/near Milan/.test(und), `proximity was not read: ${und}`);
+  ok(/villages/.test(und), `the kind of place was not read: ${und}`);
+  ok(/mountains/.test(und), `the interests were not read: ${und}`);
+  // A query that genuinely matches nothing: Czechia is not a low-cost
+  // country, so every part of this parses and together they find none.
+  await sp.fill("#q", "cheap food cities near Prague");
+  await sp.waitForTimeout(320);
+  const empty = (await sp.locator("#results").textContent()).replace(/\s+/g, " ");
+  ok(/would leave \d+/.test(empty),
+     "an empty result does not say which constraint emptied it");
+  ok(/319 destinations/.test(empty),
+     "the empty state's counts are typed rather than read from the index");
+  // The kind filter has to actually filter, not just be read back.
+  await sp.fill("#q", "villages");
+  await sp.waitForTimeout(320);
+  const villages = await sp.locator("#results h3").allTextContents();
+  ok(villages.length > 1, "no destinations are recorded as villages");
+  await sp.close();
+
+  // §2.16: an experience is savable, which it was not before it had an id.
+  const xp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  await xp.goto(base + "/europe/norway/fjord-norway/bergen", { waitUntil: "networkidle" });
+  const saveExp = xp.locator('[data-save^="experience:"]').first();
+  ok(await saveExp.count() > 0, "an experience cannot be saved");
+  await saveExp.click();
+  await xp.waitForTimeout(150);
+  const stored = await xp.evaluate(() => localStorage.getItem("europedoor.saved.v1") || "");
+  ok(stored.includes("experience:"), "saving an experience did not store it");
+  await xp.close();
 
   // ── the two worlds ─────────────────────────────────────────────────
   //
@@ -1512,7 +1572,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 600;
+  const FLOOR = 620;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +

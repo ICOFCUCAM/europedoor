@@ -131,7 +131,8 @@
               "band": "low",
               "summary": "Six hours in from Escaldes; the only sounds are water and cowbells, and the huts are open and free."
             }
-          ]
+          ],
+          "city_type": "valley"
         }
       ]
     }

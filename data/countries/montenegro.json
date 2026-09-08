@@ -111,7 +111,8 @@
               "band": "low",
               "summary": "Ninety minutes up, the whole bay below, and a small church halfway. Go before eight or don't go in July."
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "perast",
@@ -133,7 +134,8 @@
             "The boat to Our Lady of the Rocks, five minutes offshore",
             "Palaces built by sea captains who served Venice",
             "Swimming off the town steps at seven in the morning"
-          ]
+          ],
+          "city_type": "village"
         }
       ]
     },
@@ -177,7 +179,8 @@
               "band": "moderate",
               "summary": "The deepest canyon in Europe, drinkable water the whole way, and a season from May to October."
             }
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     }

@@ -718,6 +718,9 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 }
 .countrymap .rlabel:hover text { fill: var(--sea); }
 
+.rowside { display: flex; flex-direction: column; align-items: flex-end; gap: var(--s2); flex: none; }
+.btn.tiny { font-size: var(--t-xs); padding: var(--s1) var(--s3); }
+
 .maptools { margin: var(--s6) 0; border-top: 1px solid var(--rule); padding-top: var(--s4); }
 .maptools > summary { cursor: pointer; font-weight: 600; }
 .maptools .mini { margin: var(--s5) 0 var(--s2); }

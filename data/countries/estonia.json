@@ -168,7 +168,8 @@
             "Viru bog boardwalk at dawn",
             "Palmse and Sagadi manors, restored",
             "Hara's derelict submarine base, slowly returning to the sea"
-          ]
+          ],
+          "city_type": "park"
         }
       ]
     },
@@ -235,7 +236,8 @@
             "The 14th-century castle, complete with its moat",
             "Kaali meteorite crater, formed within human memory",
             "Juniper, windmills, and roads with no traffic on them"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     }

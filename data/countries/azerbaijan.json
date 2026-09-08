@@ -153,7 +153,8 @@
               "band": "low",
               "summary": "Wooden lattice and coloured glass assembled entirely by friction; the workshops still make them and will show you the joints."
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "xinaliq",
@@ -175,7 +176,8 @@
             "Flat-roofed stone houses stacked up the slope",
             "The Ketsh language, spoken by a few thousand people and nobody else",
             "Shepherd routes into the high Caucasus"
-          ]
+          ],
+          "city_type": "village"
         }
       ]
     }

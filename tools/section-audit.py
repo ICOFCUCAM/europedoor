@@ -503,6 +503,22 @@ def s23b():
     yield edges >= 10, f"{edges} typed place-experience edges"
     yield "What happens here" in page("/europe/norway/fjord-norway/stavanger/place/preikestolen"), \
         "rendered on the place page"
+    # §2.14: relationships derived, never stored.
+    import json as _json, os as _os
+    gpath = _os.path.join(OUT, "api", "graph.json")
+    graph = _json.load(open(gpath, encoding="utf-8")) if _os.path.exists(gpath) else {"edges": [], "relationships": {}}
+    yield len(graph["edges"]) > 3000, f"{len(graph['edges'])} relationship edges"
+    yield len(graph["relationships"]) >= 9, "across nine relationship types"
+    yield not _os.path.exists(_os.path.join(ROOT, "data", "relationships.json")), \
+        "and no stored edge table, which could not be validated"
+    # §2.2: every destination says what kind of place it is.
+    yield all(t.get("city_type") for c in d["countries"].values() for r in c["regions"]
+              for t in r["cities"]), "every destination states its kind"
+    # §2.11 transport nodes, and §2.16 saved experiences.
+    yield sum(1 for c in d["countries"].values() for r in c["regions"] for t in r["cities"]
+              if t.get("transport")) > 200, "transport nodes on most destinations"
+    yield 'data-save="experience:' in page("/europe/norway/fjord-norway/bergen"), \
+        "and an experience can be saved"
     # §2.7, derived rather than authored twice.
     yield all("day_number" in leg for j in d["journeys"] for leg in j["legs"]), \
         "every journey stop has a derived day number"

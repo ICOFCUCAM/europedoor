@@ -220,7 +220,8 @@
               "duration": "2 hours",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "city"
         }
       ]
     },
@@ -377,7 +378,8 @@
               "duration": "2 hours",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "site"
         },
         {
           "slug": "bayeux",
@@ -421,7 +423,8 @@
               "duration": "half a day",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "saint-malo",
@@ -442,7 +445,8 @@
             "The ramparts circuit at high tide, when spray comes over",
             "Walking to the Grand Bé island at low water — and watching the clock",
             "Oysters at Cancale, ten kilometres east"
-          ]
+          ],
+          "city_type": "city"
         }
       ]
     },
@@ -508,7 +512,8 @@
               "duration": "90 minutes",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "bordeaux",
@@ -642,7 +647,8 @@
               "duration": "90 minutes",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "toulouse",
@@ -770,7 +776,8 @@
               "duration": "3 hours",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "beaune",
@@ -804,7 +811,8 @@
               "duration": "90 minutes",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "colmar",
@@ -837,7 +845,8 @@
               "duration": "2 hours",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "annecy",
@@ -997,7 +1006,8 @@
               "duration": "90 minutes",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "marseille",
@@ -1137,7 +1147,8 @@
               "duration": "2 hours",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "city"
         },
         {
           "slug": "carcassonne",
@@ -1170,7 +1181,8 @@
               "duration": "3 hours",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -1217,7 +1229,8 @@
               "duration": "1 hour",
               "season": "weather-dependent"
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "corte",
@@ -1249,7 +1262,8 @@
               "band": "moderate",
               "summary": "180 km and 15 days for the whole thing; a single stage out of Vizzavona gives you the granite and the exposure without the fortnight."
             }
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -1306,7 +1320,8 @@
               "duration": "1 hour",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "clermont-ferrand",

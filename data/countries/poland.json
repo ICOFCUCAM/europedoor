@@ -155,7 +155,8 @@
               "band": "low",
               "summary": "Nine kilometres of asphalt road that everyone does, then a steep hour above it that almost nobody does — take the second part."
             }
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -268,7 +269,8 @@
               "band": "moderate",
               "summary": "A guide, a hide and a 4 am start; the forest's edge meadows are where the herds actually come out."
             }
-          ]
+          ],
+          "city_type": "park"
         }
       ]
     }

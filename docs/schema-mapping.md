@@ -54,11 +54,27 @@ navigable without a query language.
 | **region `type`** | **BUILT** | the schema's seven administrative values, plus `editorial`, which is what all 130 of ours are |
 | **region `latitude/longitude`** | **BUILT** | derived from the region's own destinations |
 | region `geometry` | REFUSED | we hold region membership, not region geometry — `docs/data-licenses/eurostat-gisco-nuts.md` |
-| **`city_type`** | **BUILT** | 8 values. 157 of 319 known |
+| **`city_type`** | **BUILT** | 8 values, **319 of 319**. See the note on the derivation's bias below |
 | city `population` | BUILT (partial) | 157 of 319 |
 | city `geometry` | HAVE | a destination is a point; `lat`/`lon` is its geometry |
 
-**Why 157 of 319 is not a coverage failure.** Natural Earth lists the
+**The derivation was systematically biased, and a check caught it.** Natural
+Earth's populated-places dataset is, by construction, a list of *populated
+places* — so the derived `city_type` produced **one village in 157**, and the
+162 destinations it could not classify were disproportionately the villages,
+valleys, parks and sites. A browser check asserting "villages exist" went red,
+which is how the bias surfaced.
+
+All 319 are now classified, and the 162 the source could not reach were
+**authored** — read one at a time from the summary this atlas had already
+written about each. That is legitimate where a population is not: whether
+Lofoten is an archipelago or a town is an editorial judgement, and Natural
+Earth's answer for it is "not listed".
+
+    city 108 · town 82 · capital 48 · village 30
+    site 17 · island 16 · valley 9 · park 9
+
+**Why 157 of 319 population figures is not a coverage failure.** Natural Earth lists the
 destinations most people have heard of. The 162 it does not list are Theth,
 Xınalıq, Madriu-Perafita-Claror, Mont-Saint-Michel — villages, valleys and
 monuments — and they are *the product*. Where there is no source the row is
@@ -341,6 +357,195 @@ of the slug, with the motif taken from what the place actually is. An empty
 register is a true statement; a register with a placeholder row is not. See
 `docs/images.md`.
 
+## §2.14 The knowledge graph — **BUILT**, as a derived index
+
+`/api/graph.json`: **3,716 edges** across nine relationship types, every one of
+the schema's examples included.
+
+| relationship | edges | derived from |
+|---|---:|---|
+| `near` | 1,914 | the same haversine the planner uses, so a route and the graph can never disagree about what is close |
+| `serves` | 521 | §2.11 transport nodes, weighted in km |
+| `part_of` | 499 | the nesting: destination → region → country → macro |
+| `located_in` | 452 | places and experiences under their destination |
+| `includes` | 121 | journey legs, carrying the day number |
+| `gathers` | 104 | themes |
+| `happens_in` | 56 | §2.9 events |
+| `about` | 33 | stories |
+| `available_at` | 16 | the §2.5 edge, carrying `at` / `from` / `about` |
+
+**The edges are derived, not stored, and that is the whole design.** A
+free-standing `relationships` table cannot be validated: nothing stops a row
+naming an entity that does not exist, or naming it with the wrong type, and it
+fails as a quietly empty page rather than as a stopped build. Every edge here
+is computed at build time from a relation already checked somewhere else — so
+an edge cannot dangle, because there is nowhere for it to dangle from.
+`data/relationships.json` is refused by the validator by name.
+
+**`weight` is only ever a real measurement.** `km`, and nothing else. A
+relevance weight would be a number nobody computed from anything, sitting in a
+document that looks authoritative. `checks.py` refuses `weight`, `score`,
+`relevance` and `confidence` in any edge's metadata.
+
+**One failure worth keeping.** `gathers` shipped at **zero** for one build,
+because the derivation read `theme["places"]` and a theme's destinations are
+`stops`. That is the one failure a derived index cannot catch for you: a typo
+in the derivation itself. The document now carries a count per relationship
+and `checks.py` puts a floor under each — a relationship that silently drops to
+zero is exactly what nobody notices.
+
+## §2.15 Users — refused, for now, with the reason
+
+There are no accounts, no `users` table, no email addresses and no server that
+could hold one. That is a standing decision recorded in
+`docs/audit-2026-09.md`, and three things hold it:
+
+- **There is no legal entity.** Holding an email address makes somebody a data
+  controller under the GDPR, with obligations that attach to a company that
+  does not exist yet.
+- **There is no backend.** The site is static files on a CDN. Adding auth
+  means adding a server, a session store and an attack surface, for a feature
+  nothing currently needs.
+- **The feature works without it.** `/my-europe` saves to the browser. No
+  account, no email, nothing leaves the device — which is a better privacy
+  position than any table could be, and it is what the page says.
+
+`user_preferences` is the interesting one: it exists, and it is *derived*.
+**Travel DNA** on `/my-europe` computes travel style, budget level and
+interests from what somebody has actually saved, states its own denominator
+("computed from the 5 places you have saved"), says it is not a personality
+test, and is recomputed on the page every time it opens. A preferences table
+somebody fills in once is a table that describes who they were.
+
+## §2.16 Saved places, experiences and journeys — **BUILT**
+
+All three, plus two more, in `localStorage` under `europedoor.saved.v1`:
+
+    saved_places        HAVE   destinations and places, two kinds
+    saved_journeys      HAVE
+    saved_experiences   BUILT  the one kind you could read about and not keep
+    saved themes        HAVE   beyond the schema
+    saved stories       HAVE   beyond the schema
+
+Experiences became savable once §2.5 gave each row a stable id to point at,
+which is the second time that edge paid for itself.
+
+There is no `user_id` column, because there is no user. The list exports and
+imports as text, so moving it between devices is a copy and paste rather than
+an account.
+
+## §2.17 The AI layer — already the architecture, and stricter
+
+> *We should not store the AI as the source of truth. The database remains
+> authoritative. AI operates on top of it. This prevents the common mistake of
+> allowing an LLM to invent the underlying travel database.*
+
+That mistake is **structurally impossible here**, because there is no LLM at
+all. The planner and the search are deterministic rule engines that run in the
+browser, over `/api/atlas.json` and `/api/search.json`. Every sentence on
+every page was written by a person or generated from a validated field. The
+planner's own page says so in those words: *"read by rules in your browser —
+not by a model, and not sent anywhere."*
+
+When a model is added — it is Phase E, and it is blocked on a decision or a
+bill — the contract is already written and is narrower than §2.17 asks for:
+
+1. **A model may read the graph. It may never write it.** No generated value
+   enters `data/`, and `git diff` is what enforces it.
+2. **No generated sentence may assert a fact that is not in the data.** The
+   claim and the field it came from get published together, the way every
+   derived fact in this audit already carries its source.
+3. **It is named `EuropeDoor Guide`, and the letters "AI" appear in no
+   masthead, no navigation and no `h1`** — a check enforces that today,
+   before there is anything to name.
+
+## §2.18 PostgreSQL + PostGIS — the trigger, not the timetable
+
+Every capability §2.18 lists is answered today, and the reason is scale rather
+than cleverness. Measured on the running dataset:
+
+| §2.18 asks for | state | measured |
+|---|---|---|
+| find attractions within 2 km | HAVE | scanning **all 255 places** takes **0.17 ms** and finds Sainte-Chapelle and the Covered Passages within 2 km of Paris |
+| find destinations within 100 km | HAVE | all **101,442** destination pairs in **73 ms**, in pure Python, at build time |
+| find experiences along this route | HAVE | the planner does it, in the browser |
+| find places inside this region | HAVE | the nesting *is* containment, and it cannot dangle |
+| find nearby transport | HAVE | §2.11, 257 of 319 destinations |
+| calculate geographic relationships | HAVE | §2.14, 3,716 edges |
+| find restaurants near this hotel | REFUSED | there are no businesses, deliberately — §2.8 |
+
+**A spatial index is an optimisation, and there is nothing yet to optimise.**
+PostGIS earns its place the moment one of three things is true, and not
+before:
+
+1. **The data stops fitting in a browser.** `/api/atlas.json` is 303 KB today.
+   Somewhere north of a few megabytes, shipping the index to the client stops
+   being reasonable and the query has to move to a server.
+2. **Queries become user-defined at runtime**, rather than the fixed set the
+   build can precompute.
+3. **There is write traffic** — accounts, submissions, bookings — which needs
+   §2.15, which needs a company.
+
+Until then Postgres would add a server, a migration story, a backup story and
+a failure mode, to answer in 40 ms what is currently answered in 0.17 ms.
+`docs/technical-foundation.md` holds the destination — schema, extensions,
+index strategy — and is explicit that nothing in it should be built yet.
+
+## §2.19 The search layer
+
+    PostgreSQL → PostGIS → full-text → vector
+
+Three of those four are answered; the fourth is honest about being absent.
+
+**Full-text and geography: HAVE.** The spec's own example query was run
+against the live search during this audit, and it parsed:
+
+> *"romantic mountain villages near Milan"* →
+> `near Milan: within 300 km` · `villages: destinations recorded as that` ·
+> `reading that as: coast & beaches, islands, wine & drink, architecture, mountains`
+
+Two real gaps surfaced from running it, and both are now closed:
+
+- **"villages" was silently dropped.** `city_type` existed after the §2.2
+  audit and the search did not read it, so the query returned Bellagio and
+  Vernazza — neither a village. The field is in the index now, and eight kind
+  words are parsed.
+- **An empty result explained nothing.** It said "nothing for that" and left
+  the reader to guess which of five constraints did it, which teaches people
+  the search is broken rather than that Czechia is not a low-cost country. It
+  now re-runs the query with each modifier dropped and reports what would come
+  back: *"Dropping villages would leave 52 places, and dropping near Milan
+  would leave 1."*
+
+That second fix also removed a stale number: the empty state said "50
+countries and 244 cities" while the atlas held 319. A count typed into a
+sentence in a JavaScript file is checked by nothing at all; it comes from the
+index now.
+
+**Vector search: GAP, and honestly so.** Semantic similarity needs embeddings,
+which needs a model and a bill — Phase E. What stands in for it today is the
+modifier map: "romantic" resolves to a set of interests we actually hold. That
+is a lookup table pretending to be nothing more than a lookup table, and the
+page shows the reader exactly what it did with their words.
+
+## §2.20 The resulting architecture, layer by layer
+
+| the diagram's layer | here |
+|---|---|
+| EXPERIENCE LAYER — Discover / Plan / Experience | `/discover`, `/plan`, `/experiences`, and the two design worlds those split into |
+| JOURNEY ENGINE | `assets/js/planner.js` — deterministic, in the browser, with an honest refusal when it cannot do what was asked |
+| AI SERVICES | **none, on purpose.** §2.17 |
+| SEARCH ENGINE | `assets/js/search.js` over a 459 KB index |
+| RECOMMENDER | Discover Mode and Travel DNA, both derived and both showing their working |
+| KNOWLEDGE GRAPH | `/api/graph.json`, 3,716 derived edges |
+| GEOGRAPHY | 50 countries, 130 regions, 319 destinations, 255 places, real Natural Earth geometry |
+| EXPERIENCES | 197 experiences, 17 journeys, 0 businesses (deliberately), 9 stories |
+| LIVE DATA | 150 events by month, 521 transport `serves` edges. **Availability and updates: none** — that is a feed, and feeds are §2.8's problem |
+| POSTGRES + POSTGIS | not yet — §2.18 names the three triggers |
+| OBJECT STORAGE | not yet. 0 photographs are licensed, so there is nothing to store |
+
+**The shape is right; two floors are unbuilt and both are unbuilt on purpose.**
+
 ## What this audit changed
 
     place_type            24 → 29 values
@@ -349,7 +554,7 @@ register is a true statement; a register with a placeholder row is not. See
     country population    0 → 50, dated
     region type           0 → 130 (all editorial, stated)
     region coordinates    0 → 130, derived
-    city_type             0 → 157 of 319
+    city_type             0 → 319 of 319 (157 derived, 162 authored)
     city population       0 → 157 of 319
     place↔experience      0 → 16 typed edges
     events → destination  0 → 56 of 150
@@ -359,13 +564,16 @@ register is a true statement; a register with a placeholder row is not. See
                           places, experiences, journeys, events
     story_type            convention → validated vocabulary
     transport nodes       none → 257 of 319 destinations
-    refusals              4 fields → 21, enforced at the file level
+    graph edges           none → 3,716 derived, across 9 relationships
+    saved_experiences     unsavable → savable
+    searchable city_type  ignored → 8 kind words parsed
+    empty search state    "nothing for that" → which constraint emptied it
+    refusals              4 fields → 25, enforced at the file level
 
 ## Still open, and editorial rather than technical
 
 | | |
 |---|---|
-| `city_type` | 162 of 319 unclassified |
 | place ↔ experience edges | 181 of 197 experiences unlinked |
 | journey stop places | 121 of 121 legs unlinked |
 | experience difficulty and season | 0 of 197 |

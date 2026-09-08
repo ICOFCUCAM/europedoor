@@ -216,7 +216,8 @@
               "duration": "20 minutes",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "cesky-raj",
@@ -238,7 +239,8 @@
             "Prachovské skály's maze of rock corridors",
             "Trosky castle on two volcanic plugs",
             "Sandstone climbing where the rules ban metal protection"
-          ]
+          ],
+          "city_type": "park"
         }
       ]
     },
@@ -326,7 +328,8 @@
               "band": "low",
               "summary": "Burčák — half-fermented, cloudy and briefly available each September — is drunk cold from the barrel and does not travel."
             }
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     }

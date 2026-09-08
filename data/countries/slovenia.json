@@ -115,7 +115,8 @@
               "band": "moderate",
               "summary": "A boat design and a rowing licence handed down through the same families since 1740; there is no engine on the lake by law."
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "bovec",
@@ -147,7 +148,8 @@
               "band": "low",
               "summary": "Trenches, chapels and cemeteries left in place along the mountain front where 300,000 died; the signage is unusually honest."
             }
-          ]
+          ],
+          "city_type": "valley"
         }
       ]
     },
@@ -212,7 +214,8 @@
               "band": "moderate",
               "summary": "A river 100 metres below you, inside a mountain, crossed on a suspended footbridge. Quieter and more astonishing than its famous neighbour."
             }
-          ]
+          ],
+          "city_type": "site"
         },
         {
           "slug": "piran",
@@ -235,7 +238,8 @@
             "Tartini square, and the campanile modelled on San Marco",
             "Sečovlje salt pans, harvested by hand",
             "Swimming off the rocks below the walls"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     }

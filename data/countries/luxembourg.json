@@ -137,7 +137,8 @@
             "Crémant tasting where it is bottled",
             "The riverside cycle path along both banks",
             "Harvest weekends in late September"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -180,7 +181,8 @@
               "band": "low",
               "summary": "112 km of waymarked trail through gorges narrow enough to touch both walls; a day section is easy and free."
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "vianden",
@@ -201,7 +203,8 @@
             "The castle, one of the largest west of the Rhine",
             "Hugo's house on the bridge, kept as it was",
             "The chairlift up for the view back"
-          ]
+          ],
+          "city_type": "village"
         }
       ]
     }

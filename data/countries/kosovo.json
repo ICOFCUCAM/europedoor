@@ -105,7 +105,8 @@
             "The National Library, which everyone has an opinion about",
             "Newborn, the typographic monument repainted every year",
             "Gračanica monastery, 14th-century frescoes, ten minutes out"
-          ]
+          ],
+          "city_type": "capital"
         }
       ]
     },
@@ -149,7 +150,8 @@
               "band": "low",
               "summary": "Twenty minutes of steps for the whole town, its minarets and its bell towers in one frame."
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "peja",
@@ -181,7 +183,8 @@
               "band": "moderate",
               "summary": "192 km across three countries in ten days, with village guesthouses and border permits arranged in advance."
             }
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     }

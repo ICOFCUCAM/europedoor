@@ -211,6 +211,27 @@ experiences intelligence; they never see AI EUROPE TRAVEL PLATFORM. Enforced,
 because every competitor has crossed that line and it is the easiest one to
 cross by accident.
 
+**Relationships are derived, never stored.** `/api/graph.json` carries 3,716
+edges across nine types, every one computed at build time from a relation that
+is validated somewhere else — the nesting, a journey leg, a story's `places`.
+`data/relationships.json` is refused by name: a free-standing edge table cannot
+be validated, and it fails as a quietly empty page rather than a stopped build.
+The only `weight` in that graph is `km`, a real distance; `checks.py` refuses
+`weight`, `score`, `relevance` and `confidence` in any edge.
+
+**A relationship that drops to zero is what nobody notices.** `gathers` shipped
+at zero for one build because the derivation read `theme["places"]` and a
+theme's destinations are `stops`. The document now carries a count per
+relationship and `checks.py` puts a floor under each.
+
+**A derivation can be systematically biased, and only a check finds it.**
+`city_type` derived from Natural Earth's populated places produced **one
+village in 157**, because that dataset is by construction a list of populated
+places — so the destinations it could not classify were disproportionately the
+villages. All 319 are classified now: 157 derived, 162 authored from the
+summary this atlas had already written about each. Authoring a *classification*
+is legitimate where authoring a *measurement* is not.
+
 **A measurement is never authored; an editorial record can never be bought.**
 Two rules from the schema audit, both enforced twice. `iso3`, coordinates and
 population live in `data/geo/facts.json`, derived by `scripts/map/process.py`

@@ -173,7 +173,8 @@
               "duration": "2 hours",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "site"
         }
       ]
     },
@@ -249,7 +250,8 @@
               "band": "low",
               "summary": "Hire at the pier, ride the length of it, and be back for the last ferry — the island's whole scale in one day."
             }
-          ]
+          ],
+          "city_type": "island"
         },
         {
           "slug": "dingle",
@@ -283,7 +285,8 @@
               "duration": "half a day",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     }

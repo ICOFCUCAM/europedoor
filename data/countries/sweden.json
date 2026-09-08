@@ -220,7 +220,8 @@
             "Ales stenar: 59 boulders in the shape of a ship, on a headland",
             "Three hundred half-timbered houses, still lived in",
             "The night watchman's horn, sounded every quarter hour since the 1600s"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -286,7 +287,8 @@
               "duration": "viewed, or a full day walked",
               "season": "summer"
             }
-          ]
+          ],
+          "city_type": "park"
         },
         {
           "slug": "kiruna",

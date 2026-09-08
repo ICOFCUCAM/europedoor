@@ -115,7 +115,7 @@ def build():
     emit(P.not_found(d))
 
     for path, payload in (P.planner_api(d), P.search_api(d),
-                          P.countries_api(d), P.journeys_api(d)):
+                          P.countries_api(d), P.journeys_api(d), P.graph_api(d)):
         write(path, json.dumps(payload, ensure_ascii=False, separators=(",", ":")))
 
     # Static assets are copied, never symlinked: the output directory has to

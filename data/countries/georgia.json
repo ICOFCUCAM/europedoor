@@ -145,7 +145,8 @@
               "band": "low",
               "summary": "Wine fermented in clay buried to the neck, then a table that goes on for hours with a tamada running it."
             }
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -189,7 +190,8 @@
               "band": "moderate",
               "summary": "Four days between villages with guesthouses each night, no need to carry a tent, and glaciers in view most of the way."
             }
-          ]
+          ],
+          "city_type": "valley"
         },
         {
           "slug": "kazbegi",
@@ -210,7 +212,8 @@
             "Gergeti Trinity church, walked up in two hours",
             "The Georgian Military Highway through the Jvari pass",
             "Glacier views from the trail above the church"
-          ]
+          ],
+          "city_type": "village"
         }
       ]
     }

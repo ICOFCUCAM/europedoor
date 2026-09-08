@@ -227,7 +227,8 @@
               "duration": "45 minutes",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "civita-di-bagnoregio",
@@ -249,7 +250,8 @@
             "The bridge, which is the only way in and takes ten minutes",
             "Etruscan tunnels cut under the rock",
             "Watching the cliff edge, which loses a little every winter — the town is called 'the dying city' locally"
-          ]
+          ],
+          "city_type": "village"
         }
       ]
     },
@@ -493,7 +495,8 @@
               "duration": "20 minutes",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "city"
         },
         {
           "slug": "arezzo",
@@ -646,7 +649,8 @@
               "duration": "3 hours",
               "season": "summer"
             }
-          ]
+          ],
+          "city_type": "valley"
         },
         {
           "slug": "milan",
@@ -840,7 +844,8 @@
               "duration": "4 hours",
               "season": "spring-autumn"
             }
-          ]
+          ],
+          "city_type": "village"
         },
         {
           "slug": "bellagio",
@@ -862,7 +867,8 @@
             "Villa Melzi and Villa Carlotta's gardens, best in May for the azaleas",
             "The car ferry across to Varenna and Menaggio, used as transport",
             "Walking up out of the villages into terraced chestnut woods"
-          ]
+          ],
+          "city_type": "village"
         },
         {
           "slug": "trieste",
@@ -974,7 +980,8 @@
               "duration": "2 hours",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "urbino",
@@ -996,7 +1003,8 @@
             "Piero della Francesca's Flagellation, a small painting people travel for",
             "The duke's studiolo, panelled in trompe-l'œil marquetry",
             "Raphael's birthplace, on a steep street"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -1117,7 +1125,8 @@
               "duration": "30 minutes",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "city"
         },
         {
           "slug": "palermo",
@@ -1303,7 +1312,8 @@
               "duration": "90 minutes",
               "season": "weather-dependent"
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "lipari",
@@ -1353,7 +1363,8 @@
               "duration": "an evening",
               "season": "weather-dependent"
             }
-          ]
+          ],
+          "city_type": "island"
         }
       ]
     }

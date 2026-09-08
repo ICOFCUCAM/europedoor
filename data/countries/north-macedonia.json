@@ -114,7 +114,8 @@
               "band": "low",
               "summary": "An hour and a half by boat to a monastery at the springs on the Albanian border, past cliffs with nothing else on them."
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "bitola",

@@ -145,7 +145,8 @@
             "The Many-Coloured Mosque, painted rather than tiled",
             "Ivo Andrić's birthplace, and the novel he set here",
             "Vlašić cheese from the mountain above"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -209,7 +210,8 @@
             "The tekke, a Sufi lodge from around 1520, still in use",
             "The spring, one of Europe's largest karst sources",
             "Trout restaurants over the water below it"
-          ]
+          ],
+          "city_type": "site"
         }
       ]
     }

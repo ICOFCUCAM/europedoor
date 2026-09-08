@@ -146,7 +146,8 @@
             "The island castle, reachable by footbridge",
             "Kibinai pastries in Karaim wooden houses",
             "Rowing boats and swimming in the same lake"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -189,7 +190,8 @@
               "band": "low",
               "summary": "Sand that buried four villages in the 19th century; the boardwalk exists because walking on it directly would start it moving again."
             }
-          ]
+          ],
+          "city_type": "village"
         },
         {
           "slug": "siauliai",

@@ -135,7 +135,8 @@
               "band": "low",
               "summary": "Simple rooms, an early curfew, and the courtyard entirely to yourself at dawn."
             }
-          ]
+          ],
+          "city_type": "site"
         },
         {
           "slug": "bansko",
@@ -157,7 +158,8 @@
             "Pirin national park's glacial lakes and the Vihren summit",
             "Mehanas serving Bansko sausage and heavy red wine",
             "Lift passes at a fraction of Alpine prices"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -223,7 +225,8 @@
             "Forty churches in a town of a few hundred metres across",
             "Wooden Ottoman-era houses on stone bases",
             "Out of season, when it stops being a beach resort annexe"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     }

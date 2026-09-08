@@ -254,7 +254,8 @@
               "band": "low",
               "summary": "Fredrikstad runs its river crossings free of charge as ordinary transport; ride them between the old town and the new for as long as you like."
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "rjukan",
@@ -314,7 +315,8 @@
               "duration": "20 minutes",
               "season": "winter"
             }
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -379,7 +381,8 @@
               "band": "moderate",
               "summary": "Every August the harbour fills with clinker-built boats and the people who maintain them; go for the sound of the hulls rather than the programme."
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "lindesnes",
@@ -401,7 +404,8 @@
             "The lighthouse, lit since 1656",
             "Under: a dining room submerged against the seabed",
             "2,518 km to the North Cape, in a straight line north"
-          ]
+          ],
+          "city_type": "site"
         }
       ]
     },
@@ -554,7 +558,8 @@
               "duration": "2 hours by boat",
               "season": "spring-autumn"
             }
-          ]
+          ],
+          "city_type": "village"
         },
         {
           "slug": "alesund",
@@ -705,7 +710,8 @@
               "band": "moderate",
               "summary": "Ten to twelve hours, a 1,200-metre climb, and mountain rescue callouts every season from people who read it as a viewpoint with a car park."
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "voss",
@@ -779,7 +785,8 @@
               "duration": "3 hours",
               "season": "summer"
             }
-          ]
+          ],
+          "city_type": "valley"
         },
         {
           "slug": "balestrand",
@@ -802,7 +809,8 @@
             "Dragestil villas, a Norwegian national-romantic invention",
             "The English church of St Olaf, built by a homesick Englishwoman in 1897",
             "Express boats along the longest fjord in Norway"
-          ]
+          ],
+          "city_type": "village"
         }
       ]
     },
@@ -939,7 +947,8 @@
               "duration": "30 minutes",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -1099,7 +1108,8 @@
               "duration": "2 hours",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "island"
         },
         {
           "slug": "bodo",
@@ -1176,7 +1186,8 @@
             "Segla and Hesten: short, steep, and among the best views in the country",
             "Fishing villages on the outer coast with working boats",
             "A national scenic route with rest stops designed by architects"
-          ]
+          ],
+          "city_type": "island"
         },
         {
           "slug": "alta",
@@ -1229,7 +1240,8 @@
             "The plateau at midnight in June, with the sun still up",
             "Gjesvær's bird cliffs: puffins, gannets and 100,000 pairs",
             "Honningsvåg itself, which is a working port and better company than the cape"
-          ]
+          ],
+          "city_type": "site"
         }
       ]
     },
@@ -1303,7 +1315,8 @@
               "duration": "20 minutes, from outside",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     }

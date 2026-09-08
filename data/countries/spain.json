@@ -305,7 +305,8 @@
               "duration": "90 minutes",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "cadiz",
@@ -492,7 +493,8 @@
               "duration": "1 hour",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "city"
         },
         {
           "slug": "valencia",
@@ -752,7 +754,8 @@
               "duration": "90 minutes",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "city"
         },
         {
           "slug": "salamanca",
@@ -830,7 +833,8 @@
               "duration": "90 minutes",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "city"
         }
       ]
     },
@@ -994,7 +998,8 @@
               "duration": "half a day",
               "season": "summer"
             }
-          ]
+          ],
+          "city_type": "park"
         },
         {
           "slug": "bilbao",
@@ -1079,7 +1084,8 @@
               "band": "moderate",
               "summary": "The growers call it viticultura heroica without irony: everything is carried up and down by hand or cable, and the boat is the only way to see why."
             }
-          ]
+          ],
+          "city_type": "valley"
         }
       ]
     },
@@ -1148,7 +1154,8 @@
               "duration": "6 hours",
               "season": "summer"
             }
-          ]
+          ],
+          "city_type": "village"
         },
         {
           "slug": "albarracin",
@@ -1170,7 +1177,8 @@
             "The wall walk, up the hill and back down",
             "Prehistoric rock shelters in the pine woods outside",
             "A province with fewer than ten people per square kilometre"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -1259,7 +1267,8 @@
             "Camí de Cavalls: 185 km of bridle path round the whole coast",
             "Talayotic stone monuments, on the UNESCO list since 2023",
             "Beaches on the north coast reached only on foot"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -1306,7 +1315,8 @@
               "duration": "2 hours",
               "season": "year-round"
             }
-          ]
+          ],
+          "city_type": "city"
         },
         {
           "slug": "merida",

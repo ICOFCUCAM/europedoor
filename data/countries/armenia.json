@@ -142,7 +142,8 @@
               "band": "low",
               "summary": "Singers perform in the carved chambers because the acoustics are extraordinary; the sound arrives from the stone itself."
             }
-          ]
+          ],
+          "city_type": "site"
         }
       ]
     },
@@ -177,7 +178,8 @@
             "Haghartsin and Goshavank monasteries in deep forest",
             "The Transcaucasian Trail through the national park",
             "Lake Sevan, thirty minutes away at 1,900 metres"
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "tatev",
@@ -199,7 +201,8 @@
             "The Wings of Tatev cable car, 5.7 km over a gorge",
             "The monastery's swinging pillar, an early seismograph",
             "The Vorotan gorge below"
-          ]
+          ],
+          "city_type": "site"
         }
       ]
     }

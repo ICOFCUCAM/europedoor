@@ -14,7 +14,7 @@
 (function () {
   "use strict";
 
-  var ROWS = null, INDEX = null;
+  var ROWS = null, INDEX = null, COUNTS = { countries: 0, cities: 0 };
 
   /* The specification asks search to understand more than a word: an intent
    * ("romantic places"), a budget ("cheap European destinations"), a season
@@ -63,7 +63,8 @@
               "i", "want", "looking", "find", "show", "me"];
 
   function parseQuery(q) {
-    var mods = { cheap: false, quiet: false, month: null, near: null, interests: [], rest: q };
+    var mods = { cheap: false, quiet: false, month: null, near: null, kind: null,
+                 interests: [], rest: q };
     var t = " " + q + " ";
 
     if (/\b(cheap|cheapest|budget|affordable|inexpensive)\b/.test(t)) {
@@ -90,6 +91,15 @@
         if (n === wanted || wanted.indexOf(n) === 0) { mods.near = ROWS[i]; break; }
       }
       if (mods.near) t = t.replace(near[0], " ");
+    }
+
+    /* Kind of place, from the plural or the singular. Checked before the
+     * interest map, because "mountain villages" is a kind AND an interest and
+     * both should survive: mountains as the interest, village as the kind. */
+    for (var kw in KIND_WORDS) {
+      if (!Object.prototype.hasOwnProperty.call(KIND_WORDS, kw)) continue;
+      var re = new RegExp("\\b" + kw + "s?\\b");
+      if (re.test(t)) { mods.kind = kw; t = t.replace(re, " "); break; }
     }
     for (var word in MODIFIER_INTENT) {
       if (new RegExp("\\b" + word + "\\b").test(t)) {
@@ -156,6 +166,7 @@
     if (mods.quiet) chips.push("quiet: places tagged uncrowded");
     if (mods.month) chips.push("in " + INDEX.months[mods.month] + ": good that month");
     if (mods.near) chips.push("near " + mods.near.n + ": within 300 km");
+    if (mods.kind) chips.push(KIND_WORDS[mods.kind] + ": destinations recorded as that");
     if (mods.interests.length) {
       var names = mods.interests.map(function (i) { return INDEX.interests[i] || i; });
       chips.push("reading that as: " + names.join(", ").toLowerCase());
@@ -164,6 +175,11 @@
     if (!box) return;
     box.innerHTML = chips.map(function (c) { return '<span class="chip">' + escape_(c) + "</span>"; }).join("");
   }
+
+  var KIND_WORDS = {
+    capital: "capitals", city: "cities", town: "towns", village: "villages",
+    island: "islands", valley: "valleys", park: "national parks", site: "historic sites",
+  };
 
   function passesModifiers(row, mods) {
     if (mods.cheap && row.b && row.b !== "low") return false;
@@ -174,6 +190,12 @@
       if (row.la === undefined) return false;
       if (kmBetween(mods.near, row) > 300) return false;
     }
+    /* What kind of place. Only 157 of 319 destinations are classified, so
+     * this filter deliberately keeps the unclassified ones OUT rather than
+     * letting them through: a search for villages that returns everything we
+     * have not got round to labelling is a search that has stopped meaning
+     * anything. The empty state below says when that is what emptied it. */
+    if (mods.kind && row.ct !== mods.kind) return false;
     if (mods.interests.length && row.i) {
       var hit = mods.interests.some(function (i) { return row.i.indexOf(i) >= 0; });
       if (!hit) return false;
@@ -190,7 +212,14 @@
     }
     var mods = parseQuery(q);
     understoodHtml(mods);
-    var anyMod = mods.cheap || mods.quiet || mods.month || mods.near || mods.interests.length;
+    // mods.kind belongs in this list, and was missing from it for one build:
+    // a query of "villages" parsed correctly, showed "villages: destinations
+    // recorded as that" in the interpretation, and then ran no filter at all,
+    // because anyMod was false and the search term was empty. A modifier that
+    // is read back to the reader and not applied is worse than one that is
+    // ignored outright — it tells them it worked.
+    var anyMod = mods.cheap || mods.quiet || mods.month || mods.near || mods.kind ||
+                 mods.interests.length;
     var term = mods.rest;
 
     var hits = [];
@@ -224,10 +253,49 @@
     hits.sort(function (a, b) { return b.s - a.s || a.r.n.localeCompare(b.r.n); });
 
     if (!hits.length) {
+      /* Nothing found, and WHY. The old version said "nothing for that" and
+       * left the reader to guess which of four constraints did it — which is
+       * the same failure the planner had before it learned to refuse
+       * honestly: a filter that empties a result set silently teaches people
+       * that the search is broken rather than that Czechia is not a low-cost
+       * country.
+       *
+       * So: re-run the query with each modifier dropped in turn, and report
+       * the ones that would bring results back. It costs one extra pass over
+       * an index that is already in memory. */
+      var lifted = [];
+      var names = {
+        cheap: "cheap", quiet: "quiet", month: "the month",
+        near: mods.near ? "near " + mods.near.n : "the place",
+        kind: mods.kind ? KIND_WORDS[mods.kind] : "the kind",
+        interests: "what it is for",
+      };
+      ["cheap", "quiet", "month", "near", "kind", "interests"].forEach(function (key) {
+        var was = mods[key];
+        if (!was || (key === "interests" && !was.length)) return;
+        mods[key] = key === "interests" ? [] : null;
+        var n = 0;
+        for (var i = 0; i < ROWS.length; i++) if (passesModifiers(ROWS[i], mods)) n++;
+        mods[key] = was;
+        if (n > 0) lifted.push({ label: names[key], n: n });
+      });
+      lifted.sort(function (a, b) { return b.n - a.n; });
+
+      var why = "";
+      if (lifted.length) {
+        why = "<p>Every part of that is understood; together they match nothing. " +
+          "Dropping <strong>" + escape_(lifted[0].label) + "</strong> would leave " +
+          lifted[0].n + (lifted[0].n === 1 ? " place" : " places") +
+          (lifted.length > 1
+            ? ", and dropping " + escape_(lifted[1].label) + " would leave " + lifted[1].n + "."
+            : ".") + "</p>";
+      }
       out.innerHTML = '<div class="note"><p>Nothing for <strong>' + escape_(qraw) +
-        "</strong>. EuropeDoor covers 50 countries and 244 cities — a lot of Europe is " +
-        "not in it yet, and saying so is better than guessing. " +
-        '<a href="/atlas">Browse the Atlas</a> or ' +
+        "</strong>.</p>" + why +
+        "<p class=\"small\">The Atlas holds " + COUNTS.countries + " countries and " +
+        COUNTS.cities + " destinations. A lot of Europe is not in it yet, and saying so " +
+        "is better than guessing. " +
+        '<a href="/countries">Browse the Atlas</a> or ' +
         '<a href="/sources">tell us what is missing</a>.</p></div>';
       return;
     }
@@ -300,6 +368,12 @@
     .then(function (j) {
       ROWS = j.rows;
       INDEX = { months: j.monthNames || j.months || {}, interests: j.interests || {} };
+      /* Counts from the index rather than typed into the prose. The empty
+       * state used to say "50 countries and 244 cities"; the atlas had 319
+       * by then, and nothing failed, because a number in a sentence is not
+       * checked by anything. */
+      COUNTS = { countries: j.counts ? j.counts.countries : 0,
+                 cities: j.counts ? j.counts.cities : 0 };
       var q = new URLSearchParams(location.search).get("q");
       if (q) input.value = q;
       run(input.value || "");

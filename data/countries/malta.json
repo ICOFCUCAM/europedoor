@@ -139,7 +139,8 @@
             "The bastion walls over the whole island at dusk",
             "St Paul's catacombs, cut in the 3rd century",
             "Evening, when the day visitors leave and it earns its name"
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "hagar-qim",
@@ -160,7 +161,8 @@
             "Some of the oldest free-standing structures on earth",
             "The solstice alignment through a small oval port",
             "The Blue Grotto below, by boat in calm weather"
-          ]
+          ],
+          "city_type": "site"
         }
       ]
     },
@@ -205,7 +207,8 @@
               "band": "low",
               "summary": "Rock-cut pans worked by the same family for five generations; they harvest by hand in summer and will explain it if you ask."
             }
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     }

@@ -214,7 +214,8 @@
               "band": "moderate",
               "summary": "Ordered by phone that morning: octopus and potatoes under an iron bell buried in embers for three hours."
             }
-          ]
+          ],
+          "city_type": "island"
         }
       ]
     },
@@ -248,7 +249,8 @@
             "The old town's stepped lanes, all of them ending at water",
             "Golden Cape forest park, cycled or walked",
             "Istrian tables — truffle, prosciutto, malvazija — at half Italian prices"
-          ]
+          ],
+          "city_type": "town"
         },
         {
           "slug": "motovun",
@@ -270,7 +272,8 @@
             "Truffle hunting in the Motovun forest with dogs, October and November",
             "The Parenzana, a disused railway turned cycle path",
             "Istrian malvazija from cellars in the villages below"
-          ]
+          ],
+          "city_type": "town"
         }
       ]
     },
@@ -367,7 +370,8 @@
               "duration": "1 hour",
               "season": "spring-autumn"
             }
-          ]
+          ],
+          "city_type": "park"
         }
       ]
     }
