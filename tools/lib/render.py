@@ -514,7 +514,90 @@ def bottom_nav(path):
             + "".join(out) + "</nav>")
 
 
-def page(title, body, *, path, description, trail=None, area=None, head_extra="", scripts=(), wide=False):
+# ── structured data ──────────────────────────────────────────────────
+#
+# 988 correct pages that a search engine has to guess at. JSON-LD is what
+# turns "a heading that says Bergen" into "a TouristDestination at 60.39N,
+# 5.32E, inside Fjord Norway, inside Norway".
+#
+# The rule here is the same one the rest of the product runs on: emit only
+# what we actually hold. That means several properties Google's rich-result
+# documentation encourages are deliberately absent, and the absences are the
+# interesting part:
+#
+#   aggregateRating   there are no reviews. A rating with no reviewers is a
+#                     number we invented, and in structured data it is a
+#                     number we invented in a machine-readable format.
+#   offers / price    nothing is bookable and no price came from a supplier.
+#   openingHours      the validator refuses the field, so there is nothing
+#                     to serialise.
+#   image             there are no photographs yet, and a plate is an SVG.
+#                     Pointing at one would be claiming a photograph.
+#   Event             our festivals are recurring fixtures with no dated
+#                     instance. schema.org/Event requires startDate, and
+#                     inventing one to satisfy a validator is exactly the
+#                     failure mode this whole product is arranged against.
+#
+# A wrong rich result is worse than none: it is a claim, machine-readable,
+# republished by somebody who cannot check it.
+
+LD_PUBLISHER = {"@type": "Organization", "name": SITE_NAME, "url": "https://europedoor.com"}
+
+
+def ld(*blocks):
+    """Serialise JSON-LD blocks into one script element.
+
+    application/ld+json is a data block, not executable script — the browser
+    never runs it — so it does not need the Content-Security-Policy loosened.
+    checks.py allows this type alongside application/json for that reason and
+    no other.
+    """
+    items = [b for b in blocks if b]
+    if not items:
+        return ""
+    payload = json.dumps(items[0] if len(items) == 1 else items,
+                         separators=(",", ":"), ensure_ascii=False)
+    payload = payload.replace("</", "<\\/")
+    return f'<script type="application/ld+json">{payload}</script>'
+
+
+def ld_breadcrumb(trail):
+    """trail: [(label, href_or_None)] — the same list crumbs() is given, so
+    the visible breadcrumb and the machine-readable one cannot disagree."""
+    items = []
+    for i, (label, href) in enumerate(trail, start=1):
+        item = {"@type": "ListItem", "position": i, "name": label}
+        if href:
+            item["item"] = "https://europedoor.com" + href
+        items.append(item)
+    return {"@context": "https://schema.org", "@type": "BreadcrumbList",
+            "itemListElement": items}
+
+
+def ld_place(kind, *, name, url, description, lat=None, lon=None, within=None,
+             extra=None):
+    out = {"@context": "https://schema.org", "@type": kind,
+           "name": name, "url": "https://europedoor.com" + url,
+           "description": description}
+    if lat is not None:
+        out["geo"] = {"@type": "GeoCoordinates", "latitude": lat, "longitude": lon}
+    if within:
+        out["containedInPlace"] = within
+    if extra:
+        # Drop empties rather than serialising them. A property present with
+        # no value says "we hold this" and then does not — which in a format
+        # designed to be trusted is worse than the property being absent.
+        # 200 destinations were emitting includesAttraction: [] before a
+        # check caught it, because they have no places recorded yet.
+        out.update({k: v for k, v in extra.items() if v not in (None, "", [], {})})
+    return out
+
+
+def ld_within(kind, name, url):
+    return {"@type": kind, "name": name, "url": "https://europedoor.com" + url}
+
+
+def page(title, body, *, path, description, trail=None, area=None, head_extra="", scripts=(), wide=False, ld_blocks=()):
     nav = []
     for href, label, _blurb in NAV:
         mark = ' aria-current="page"' if area == label.lower() else ''
@@ -537,7 +620,7 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 <meta property="og:type" content="website">
 <link rel="stylesheet" href="/assets/css/europedoor.css">
 <link rel="icon" href="/assets/door.svg" type="image/svg+xml">
-{head_extra}</head>
+{ld(*ld_blocks)}{head_extra}</head>
 <body class="area-{esc(area or 'none')}">
 <a class="skip" href="#main">{esc(T("skip"))}</a>
 <header class="masthead">

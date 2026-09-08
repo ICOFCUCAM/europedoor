@@ -10,8 +10,10 @@ from __future__ import annotations
 import math
 
 from . import urls
-from .render import (SITE_NAME, card, chips, crumbs, esc, factlist, grid,
-                     jsondata, motif_for, page, picture, plate, section)
+from .render import (LD_PUBLISHER, SITE_NAME, SITE_TAGLINE, card, chips, crumbs,
+                     esc, factlist, grid,
+                     jsondata, ld_breadcrumb, ld_place, ld_within, motif_for,
+                     page, picture, plate, section)
 from .score import city_scores, country_scores
 
 HOME = ("Europe", "/discover")
@@ -361,6 +363,21 @@ def home(data):
     return "/index.html", page(
         SITE_NAME, body, path="/", area=None,
         description="Discover, plan and experience Europe: an atlas of every country, region and city, a journey planner, curated cross-border routes and local experiences.",
+        ld_blocks=[
+            {"@context": "https://schema.org", "@type": "WebSite",
+             "name": SITE_NAME, "url": "https://europedoor.com",
+             "description": SITE_TAGLINE,
+             "inLanguage": "en",
+             "publisher": LD_PUBLISHER,
+             # The sitelinks search box. It points at a page that answers in
+             # the browser from a static index, which is the same search the
+             # reader gets — not a second implementation.
+             "potentialAction": {
+                 "@type": "SearchAction",
+                 "target": {"@type": "EntryPoint",
+                            "urlTemplate": "https://europedoor.com/search?q={search_term_string}"},
+                 "query-input": "required name=search_term_string"}},
+        ],
     )
 
 
@@ -550,6 +567,15 @@ def country_page(data, c):
     return f"/europe/{c['slug']}/index.html", page(
         c["name"], body, path=urls.country(c), area="countries",
         description=c["summary"][:180],
+        ld_blocks=[
+            ld_breadcrumb([("Europe", "/discover"), ("Countries", "/countries"),
+                           (m["name"], urls.macro(m)), (c["name"], urls.country(c))]),
+            ld_place("Country", name=c["name"], url=urls.country(c),
+                     description=c["summary"],
+                     extra={"alternateName": c.get("official") or c["name"],
+                            "currency": c["currency"].split(" — ")[0],
+                            "containedInPlace": ld_within("Place", "Europe", "/discover")}),
+        ],
     )
 
 
@@ -625,6 +651,21 @@ def region_page(data, c, r):
     return f"/europe/{c['slug']}/{r['slug']}/index.html", page(
         f"{r['name']}, {c['name']}", body, path=urls.region(c, r), area="countries",
         description=r["summary"][:180],
+        ld_blocks=[
+            ld_breadcrumb([("Europe", "/discover"), ("Countries", "/countries"),
+                           (m["name"], urls.macro(m)), (c["name"], urls.country(c)),
+                           (r["name"], urls.region(c, r))]),
+            ld_place("TouristDestination", name=r["name"], url=urls.region(c, r),
+                     description=r["summary"],
+                     within=ld_within("Country", c["name"], urls.country(c)),
+                     extra={"touristType": [data["interests"][i]["name"]
+                                            for i in r["interests"]
+                                            if i in data["interests"]],
+                            "includesAttraction": [
+                                ld_within("TouristDestination", t["name"],
+                                          urls.city(c, r, t))
+                                for t in r["cities"][:12]]}),
+        ],
     )
 
 
@@ -775,6 +816,21 @@ def city_page(data, c, r, t):
         f"{t['name']}, {c['name']}", body, path=urls.city(c, r, t), area="countries",
         description=t["summary"][:180],
         scripts=["/assets/js/my-europe.js"],
+        ld_blocks=[
+            ld_breadcrumb([("Europe", "/discover"), ("Countries", "/countries"),
+                           (m["name"], urls.macro(m)), (c["name"], urls.country(c)),
+                           (r["name"], urls.region(c, r)), (t["name"], urls.city(c, r, t))]),
+            ld_place("TouristDestination", name=t["name"], url=urls.city(c, r, t),
+                     description=t["summary"], lat=t["lat"], lon=t["lon"],
+                     within=ld_within("TouristDestination", r["name"], urls.region(c, r)),
+                     extra={"touristType": [data["interests"][i]["name"]
+                                            for i in t["interests"]
+                                            if i in data["interests"]],
+                            "includesAttraction": [
+                                ld_within("TouristAttraction", pl["name"],
+                                          urls.place(c, r, t, pl))
+                                for pl in t.get("places", [])]}),
+        ],
     )
 
 
@@ -1010,10 +1066,33 @@ def journey_page(data, j):
   </aside>
 </div>
 """
+    legs_ld = []
+    for leg in j["legs"]:
+        n = data["cities"][leg["city"]]
+        legs_ld.append(ld_within("TouristDestination", n["city"]["name"],
+                                 urls.city(n["country"], n["region"], n["city"])))
     return f"/journeys/{j['slug']}/index.html", page(
         j["name"], body, path=urls.journey(j), area="journeys",
         description=j["summary"][:180],
         scripts=["/assets/js/my-europe.js"],
+        ld_blocks=[
+            ld_breadcrumb([("Europe", "/discover"), ("Journeys", "/journeys"),
+                           (j["name"], urls.journey(j))]),
+            # TouristTrip, with the stops as its itinerary. No offers and no
+            # price: the estimate is planning arithmetic from published daily
+            # bands, not a quote, and serialising it as an offer would turn a
+            # caveat into a machine-readable commitment.
+            {"@context": "https://schema.org", "@type": "TouristTrip",
+             "name": j["name"], "url": "https://europedoor.com" + urls.journey(j),
+             "description": j["summary"],
+             "touristType": [data["interests"][i]["name"] for i in j["interests"]
+                             if i in data["interests"]],
+             "itinerary": {"@type": "ItemList",
+                           "numberOfItems": len(legs_ld),
+                           "itemListElement": [
+                               {"@type": "ListItem", "position": i, "item": leg}
+                               for i, leg in enumerate(legs_ld, start=1)]}},
+        ],
     )
 
 
@@ -1528,6 +1607,19 @@ def place_page(data, c, r, t, pl):
         f"{pl['name']}, {t['name']}", body, path=urls.place(c, r, t, pl), area="countries",
         description=pl["summary"][:180],
         scripts=["/assets/js/my-europe.js"],
+        ld_blocks=[
+            ld_breadcrumb([("Europe", "/discover"), ("Countries", "/countries"),
+                           (c["name"], urls.country(c)), (r["name"], urls.region(c, r)),
+                           (t["name"], urls.city(c, r, t)),
+                           (pl["name"], urls.place(c, r, t, pl))]),
+            # No openingHours, no offers, no aggregateRating. The validator
+            # refuses the first, nothing is bookable, and there are no
+            # reviews — see the note above ld() in render.py.
+            ld_place("TouristAttraction", name=pl["name"], url=urls.place(c, r, t, pl),
+                     description=pl["summary"],
+                     lat=t["lat"], lon=t["lon"],
+                     within=ld_within("TouristDestination", t["name"], urls.city(c, r, t))),
+        ],
     )
 
 
@@ -1995,6 +2087,19 @@ def story_page(data, s):
         s["title"], body, path=f"/stories/{s['slug']}", area=None,
         description=s["standfirst"][:180],
         scripts=["/assets/js/my-europe.js"],
+        ld_blocks=[
+            ld_breadcrumb([("Europe", "/discover"), ("Stories", "/stories"),
+                           (s["title"], f"/stories/{s['slug']}")]),
+            {"@context": "https://schema.org", "@type": "Article",
+             "headline": s["title"], "description": s["standfirst"],
+             "url": f"https://europedoor.com/stories/{s['slug']}",
+             "articleSection": s["section"],
+             "keywords": s["tags"],
+             "author": {"@type": "Organization", "name": s["author"]},
+             "publisher": LD_PUBLISHER,
+             "datePublished": s["published"], "dateModified": s["updated"],
+             "isAccessibleForFree": True},
+        ],
     )
 
 

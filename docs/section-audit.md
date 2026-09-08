@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**100 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 1 locked · 1 refused · 1 built (deliberately smaller) · 1257 assertions · 0 failing**
+**100 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 1 locked · 1 refused · 1 built (deliberately smaller) · 1269 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -50,7 +50,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 37 | Relationship model | BUILT | 4 | The hierarchy in both directions, plus place → journey, place → story, destination → theme. |
 | 38 | Data quality | PARTIAL | 8 | All four exist now: a dated verification record, per-field provenance naming which claim was checked against what, an optional source URL, and a confidence score derived from the source kind and the age of the check rather than typed by hand. What has not happened is the checking — 0 of 50 countries, and the board says so on the site. |
 | 39 | Image management | REFUSED | 3 | There are no photographs at all. Every illustration is generated from the place's own slug, which makes the licensing question disappear rather than be managed. |
-| 40 | SEO architecture | BUILT | 7 | The specification's URL shapes, including the facet pages — with its own thin-page warning enforced as a threshold. |
+| 40 | SEO architecture | BUILT | 19 | The specification's URL shapes including the facet pages, its own thin-page warning enforced as a threshold, and structured data on every entity — which claims nothing the product does not hold. |
 | 41 | Internal linking | BUILT | 3 | Every page reaches its parents, its siblings and the curation that names it. |
 | 42 | Technical architecture | BUILT (deliberately smaller) | 4 | Python standard library and static output. Each proposed component has a named trigger rather than a date. |
 | 43 | API architecture | PARTIAL | 9 | All four public read endpoints ship, documented, and are the same documents the site itself runs on. The specification filed two of them under Stage 2 alongside the authenticated ones; that grouping was wrong and only a re-read caught it — a read-only projection of committed data needs no backend. What genuinely does is every endpoint that writes. |

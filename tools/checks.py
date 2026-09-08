@@ -28,6 +28,8 @@ from lib import data as D
 from lib import pages as P
 from lib import score as S
 from lib import render as R
+from html import unescape as html_unescape
+
 from lib.render import OPERATOR, SITE_NAME, esc
 
 ROOT = D.ROOT
@@ -639,7 +641,11 @@ def c_csp():
             attrs = m.group(1)
             if "src=" in attrs:
                 continue
-            if 'type="application/json"' in attrs:
+            # Data blocks, not script. The browser never executes either,
+            # and Chromium reports zero CSP violations for both — verified
+            # rather than assumed, because "surely CSP does not apply to
+            # that" is how an exception list starts growing.
+            if 'type="application/json"' in attrs or 'type="application/ld+json"' in attrs:
                 continue
             fail(f"{rel}: an inline script would force script-src 'unsafe-inline'")
         if inline_style.search(h):
@@ -692,6 +698,98 @@ def c_csp():
             if not m.group(1).startswith("https://europedoor.com"):
                 fail(f"{os.path.relpath(f, OUT)}: loads from {m.group(1)}")
         n += 1
+    return n
+
+
+@check("structured data is valid, matches the page, and claims nothing we do not hold")
+def c_structured_data():
+    """JSON-LD is a machine-readable claim, republished by people who cannot
+    check it. That makes a wrong one worse than none at all.
+
+    Three things are checked. That it parses and carries the required
+    properties. That it agrees with the visible page — a breadcrumb that
+    disagrees with the one a reader can see is the exact failure this format
+    invites, because nobody looks at it. And that it never carries the four
+    properties this product cannot honestly emit.
+    """
+    # Emitting any of these would be inventing data in a format designed to
+    # be trusted. There are no reviews, nothing is bookable, the validator
+    # refuses opening hours, and there are no photographs.
+    FORBIDDEN = ("aggregateRating", "reviewCount", "ratingValue", "offers",
+                 "price", "priceRange", "openingHours", "openingHoursSpecification")
+    n = 0
+    seen_types = set()
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        blocks = re.findall(r'<script type="application/ld\+json">(.*?)</script>', h, re.S)
+        if not blocks:
+            continue
+        if len(blocks) > 1:
+            fail(f"{rel(f)}: {len(blocks)} ld+json blocks; one per page, as an array")
+        try:
+            data = json.loads(blocks[0])
+        except Exception as e:
+            fail(f"{rel(f)}: ld+json does not parse: {e}")
+            continue
+        items = data if isinstance(data, list) else [data]
+        flat = json.dumps(items)
+        for bad in FORBIDDEN:
+            if f'"{bad}"' in flat:
+                fail(f"{rel(f)}: structured data carries {bad!r}, which this "
+                     "product does not hold")
+        for item in items:
+            if "@context" not in item:
+                fail(f"{rel(f)}: an ld+json item with no @context")
+            if "@type" not in item:
+                fail(f"{rel(f)}: an ld+json item with no @type")
+                continue
+            seen_types.add(item["@type"])
+            # A null or empty value is worse than an absent one: it says
+            # "we have this property" and then does not.
+            for key, value in item.items():
+                if value is None or value == "" or value == []:
+                    fail(f"{rel(f)}: {item['@type']}.{key} is empty; omit it instead")
+            n += 1
+
+            if item["@type"] == "BreadcrumbList":
+                # It must agree with the breadcrumb a reader can see. A
+                # machine-readable trail nobody looks at is a trail that
+                # drifts.
+                names = [x["name"] for x in item["itemListElement"]]
+                positions = [x["position"] for x in item["itemListElement"]]
+                if positions != list(range(1, len(positions) + 1)):
+                    fail(f"{rel(f)}: breadcrumb positions are not 1..n")
+                visible = re.search(r'<nav class="crumbs".*?</nav>', h, re.S)
+                if visible:
+                    text = re.sub(r"<[^>]+>", "\u0000", visible.group(0))
+                    shown = [x.strip() for x in text.split("\u0000") if x.strip() and x.strip() != "/"]
+                    if [html_unescape(x) for x in shown] != names:
+                        fail(f"{rel(f)}: the structured breadcrumb says {names} "
+                             f"but the page shows {shown}")
+                n += 1
+            else:
+                # Every entity must be self-identifying and point at itself.
+                # Article names itself with headline rather than name, which
+                # is schema.org's own spelling, not an exception.
+                naming = "headline" if item["@type"] == "Article" else "name"
+                for required in (naming, "url"):
+                    if required not in item:
+                        fail(f"{rel(f)}: {item['@type']} has no {required}")
+                url = item.get("url", "")
+                if url and not url.startswith("https://europedoor.com"):
+                    fail(f"{rel(f)}: {item['@type']}.url is {url}")
+
+    # The types we mean to emit. A new one appearing without a decision is
+    # worth a failing check, because schema types carry search behaviour.
+    expected = {"BreadcrumbList", "Country", "TouristDestination",
+                "TouristAttraction", "TouristTrip", "Article", "WebSite"}
+    if seen_types - expected:
+        fail(f"unexpected schema types: {sorted(seen_types - expected)}")
+    if expected - seen_types:
+        fail(f"schema types that should be emitted and are not: "
+             f"{sorted(expected - seen_types)}")
+    if n < 2000:
+        fail(f"only {n} structured-data items across the site")
     return n
 
 

@@ -58,14 +58,29 @@ Phases 0–4 are not blocked, and that is where the work is.
 
 ### Phase 2 — the one real SEO gap
 
-4. **Structured data.** No page emits JSON-LD. `TouristDestination`,
-   `Country`, `Article`, `ItemList` and `BreadcrumbList` are all directly
-   supported by data we already hold and validate. This is the highest-value
-   unblocked work in the repository: it is what turns 988 correct pages into
-   988 pages a search engine understands.
-5. **Open Graph images.** `og:image` is absent. The plate generator already
-   produces one per entity; it needs a rasterised endpoint or a committed PNG
-   per surface.
+4. ~~**Structured data.**~~ **Done.** Seven schema types across the Atlas,
+   journeys, stories and the homepage — `Country`, `TouristDestination`,
+   `TouristAttraction`, `TouristTrip`, `Article`, `WebSite` and a
+   `BreadcrumbList` on every entity page. 2,152 items, validated on every
+   build against the *visible* page, so a machine-readable breadcrumb cannot
+   drift from the one a reader sees.
+
+   The absences are deliberate and enforced: no `aggregateRating` (there are
+   no reviews), no `offers` or `price` (nothing is bookable), no
+   `openingHours` (the validator refuses the field), no `image` (there are no
+   photographs), and no `Event` (our festivals are recurring fixtures with no
+   dated instance, and `schema.org/Event` requires `startDate`). A wrong rich
+   result is worse than none: it is a claim, in a format designed to be
+   trusted, republished by somebody who cannot check it.
+
+5. **Open Graph images.** `og:image` is absent, and this is now the next
+   item. The plate generator produces a unique illustration per entity but
+   emits SVG, and the platforms that consume `og:image` want a raster.
+   Rasterising in pure Python is feasible — the plates are gradients, a
+   circle and filled polygons, and `zlib` is standard library — but it is a
+   real build cost, so it should be scoped to the ~100 shareable surfaces
+   (homepage, macro regions, countries, journeys, themes, stories) rather
+   than all 988.
 
 ### Phase 3 — finish the journey system
 

@@ -675,9 +675,27 @@ def s39():
 
 
 @section(40, "SEO architecture", "BUILT",
-         "The specification's URL shapes, including the facet pages — with "
-         "its own thin-page warning enforced as a threshold.")
+         "The specification's URL shapes including the facet pages, its own "
+         "thin-page warning enforced as a threshold, and structured data on "
+         "every entity — which claims nothing the product does not hold.")
 def s40():
+    # JSON-LD is a machine-readable claim republished by people who cannot
+    # check it, so a wrong one is worse than none.
+    yield 'application/ld+json' in page("/europe/norway/fjord-norway/bergen"), \
+        "destinations carry structured data"
+    for u, kind in (("/", "WebSite"), ("/europe/norway", "Country"),
+                    ("/europe/norway/fjord-norway", "TouristDestination"),
+                    ("/europe/norway/fjord-norway/bergen/place/bryggen", "TouristAttraction"),
+                    ("/journeys/the-alpine-grand-tour", "TouristTrip"),
+                    ("/stories/the-last-forest", "Article")):
+        yield f'"@type":"{kind}"' in page(u), f"{u} is a {kind}"
+    yield '"@type":"BreadcrumbList"' in page("/europe/norway"), "with breadcrumbs"
+    yield "structured data is valid, matches the page" in src("tools/checks.py"), \
+        "and a check validates it against the visible page"
+    # The absences are the interesting part.
+    for forbidden in ("aggregateRating", "openingHours", '"offers"'):
+        yield every_page(lambda h, x=forbidden: x not in h,
+                         f"no {forbidden} anywhere")
     yield exists("/europe/norway"), "/europe/<country>"
     yield exists("/europe/norway/fjord-norway/bergen"), "/europe/<country>/<region>/<destination>"
     yield exists("/europe/norway/fjord-norway/bergen/things-to-do"), "a things-to-do facet"
