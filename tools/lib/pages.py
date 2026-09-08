@@ -522,33 +522,40 @@ def country_page(data, c):
     ])
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)), (c["name"], None)])}
-<div class="pagehead">
+<div class="pagehead overture">
   <p class="kicker">{esc(m['name'])}</p>
   <h1>{esc(c['name'])}</h1>
-  <p class="lede">{esc(c['tagline'])}</p>
+  <p class="statement">{esc(c['tagline'])}</p>
+  <p class="orient">{country_orient(c)}</p>
+  {chips(c["interests"], data["interests"])}
 </div>
 {advisory_note(c)}
-<div class="split">
-  <div>
-    <p>{esc(c['summary'])}</p>
-    {chips(c["interests"], data["interests"])}
-    {facts}
-    {scorebars(country_scores(c))}
-    <h2 id="getting-around" class="mt7">Getting around</h2>
-    <p>{esc(c['getting_around'])}</p>
-    <h2 id="when" class="mt7">When to come</h2>
-    <p>{esc(c['season']['note'])}</p>
-    {provenance_block(c)}
-  </div>
-  <aside class="rail">
-    <h2 class="mini">Worth knowing</h2>
-    <ul>{know}</ul>
-    <h2 class="mini">At the table</h2>
-    <ul>{food}</ul>
-  </aside>
-</div>
 
 {countrymap(data, c)}
+
+<div class="measure lead">
+  <p>{esc(c['summary'])}</p>
+</div>
+
+<section class="practical" aria-label="Practical">
+  <div>
+    <h2 id="getting-around" class="mini">Getting around</h2>
+    <p>{esc(c['getting_around'])}</p>
+  </div>
+  <div>
+    <h2 id="when" class="mini">When to come</h2>
+    <p>{esc(c['season']['note'])}</p>
+  </div>
+  <div>
+    <h2 class="mini">Worth knowing</h2>
+    <ul>{know}</ul>
+  </div>
+  <div>
+    <h2 class="mini">At the table</h2>
+    <ul>{food}</ul>
+  </div>
+</section>
+
 {section("Travel regions", grid(region_cards, 3), id="regions",
          lede=f"{len(c['regions'])} editorial regions, each opening onto its cities.")}
 
@@ -566,6 +573,13 @@ def country_page(data, c):
 
 {section("Fixed points in the year", f'<div class="rows">{festivals}</div>',
          more=("The whole European year", "/events")) if festivals else ""}
+
+{section("The record", facts + scorebars(country_scores(c)) + provenance_block(c),
+         tone="quiet",
+         lede="What we hold about " + esc(c["name"]) + ", where each figure came "
+              "from, and when it was last checked. The score says what this "
+              "country is for, not how good it is — it is useful once you are "
+              "already interested and is not a reason to be.")}
 """
     return f"/europe/{c['slug']}/index.html", page(
         c["name"], body, path=urls.country(c), area="countries",
@@ -1646,14 +1660,41 @@ def countrymap(data, c):
         f'<rect x="0" y="0" width="{w}" height="{h}" class="archground"/>'
         f'{ctx}{land}{"".join(ties)}{"".join(dots)}'
         f'{"".join(_declutter(labels, w, h))}</g></svg>'
+        # FOUR LINES OF GREY TYPE UNDER THE PAGE'S MOST IMPORTANT IMAGE.
+        #
+        # This caption carried the full attribution — five dataset names
+        # joined by "and" — plus two sentences of methodology, and it was
+        # written when the map sat two-thirds of the way down the page where
+        # nobody read it. The composition moved the map directly under the
+        # h1, and the same paragraph is now the second thing on a country
+        # page. The claims are all still made: the register at /sources is
+        # the honest form of the attribution, and the grouping-not-boundary
+        # rule is on /method and in the map's own aria-label. What stays
+        # here is what a reader of THIS map needs: what it shows, what is
+        # missing from it, and where to open it bigger.
         f'<figcaption>{esc(c["name"])}, its {len(c["regions"])} regions and {shown} '
-        f'{"destination" if shown == 1 else "destinations"}.{note} Coastline and borders from '
-        f'{esc(geo.sources_line(doc))} — public domain, hosted by us. Region names sit at the '
-        f'centre of their own destinations: they are groupings, not boundaries. Labels that '
-        f'would overlap are dropped rather than moved. '
+        f'{"destination" if shown == 1 else "destinations"}. Region names sit at the '
+        f'centre of their own destinations — they are groupings, not boundaries.{note} '
+        f'Coastline and borders from <a href="/sources">Natural Earth</a>, public domain. '
         f'<a href="/map?c={esc(c["slug"])}">Open {esc(c["name"])} on the full map →</a>'
         f'</figcaption></figure>'
     )
+
+
+def country_orient(c):
+    """One derived line under a country's statement.
+
+    The country page's job is ORIENTATION, and the first thing a reader
+    needs oriented is size: how much of this country the atlas actually
+    holds, and where its centre of gravity is. Derived, never authored —
+    the counts come from the regions themselves and change when the data
+    does.
+    """
+    regions = len(c["regions"])
+    towns = sum(len(r["cities"]) for r in c["regions"])
+    return (f'{towns} destination{"s" if towns != 1 else ""} across '
+            f'{regions} region{"s" if regions != 1 else ""} · '
+            f'capital {esc(c["capital"])}')
 
 
 def coord_line(t):

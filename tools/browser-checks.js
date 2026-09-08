@@ -1484,7 +1484,8 @@ async function main() {
           if (!g) continue;
           const ground = parse(getComputedStyle(g).fill);
           for (const sel of [".minilabel", ".minilabel.here", ".minidot circle",
-                             ".minidot.here circle", ".routedot", ".routeline"]) {
+                             ".minidot.here circle", ".routedot", ".routeline",
+                             ".rlabel text"]) {
             const el = fig.querySelector(sel);
             if (!el) continue;
             const cs = getComputedStyle(el);
@@ -1506,7 +1507,8 @@ async function main() {
         const r = (hi + 0.05) / (lo + 0.05);
         // A dot and a route line are graphics, not text: 3:1 is the
         // non-text threshold. The two label selectors are text.
-        const need = m.sel.startsWith(".minilabel") ? 4.5 : 3;
+        const need = (m.sel.startsWith(".minilabel")
+                      || m.sel === ".rlabel text") ? 4.5 : 3;
         ok(r >= need, `${scheme} ${url}: ${m.sel} inside the aperture is `
            + `${r.toFixed(2)}:1 on the opening's ground, needs ${need}`);
       }

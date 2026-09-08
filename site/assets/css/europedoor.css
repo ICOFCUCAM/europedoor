@@ -1842,10 +1842,22 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
 }
 .practical h2 { margin: 0 0 var(--s2); }
 .practical p { margin: 0; color: var(--ink-2); max-width: 34ch; }
+.practical ul { margin: 0; padding-left: var(--s4); color: var(--ink-2);
+                font-size: var(--t-base); }
+.practical li { margin-bottom: var(--s2); }
+/* auto-fit, not repeat(3): the destination page has three of these and the
+   country page has four — Getting around, When to come, Worth knowing, At
+   the table — and a fixed three left the fourth alone on a second row
+   looking like a mistake. auto-fit gives three columns to three items and
+   four to four, at the same track width, so both pages read as one band. */
 @media (min-width: 52rem) {
-  .practical { grid-template-columns: repeat(3, 1fr); gap: var(--s7);
-               margin-top: var(--s8); padding-top: var(--s6); }
+  .practical { grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+               gap: var(--s7); margin-top: var(--s8); padding-top: var(--s6); }
 }
+/* The country's own argument, one step up, in the flow under its map. Not
+   .lede: a lede sits in the pagehead and is grey. This is body copy that
+   happens to be first. */
+.measure.lead p { font-size: var(--t-md); color: var(--ink); }
 
 /* The honesty notes stay — they are a rule here — but they stop being the
  * section's introduction. A disclosure about what we deliberately do not
@@ -1938,6 +1950,16 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
 .minimap.arched .minidot.here circle { fill: var(--lime); }
 .minimap.arched .minilabel { fill: color-mix(in srgb, var(--limestone) 72%, transparent); }
 .minimap.arched .minilabel.here { fill: var(--limestone); font-weight: 600; }
+/* The region names, which the aperture left behind. .countrymap .rlabel
+   still resolved --ink-2 against the drawing's INTELLIGENCE world and haloed
+   it in --map-hover, a mid-navy, four pixels wide: at 15px bold that reads
+   as a smudge rather than a label, and the halo was lighter than the ground
+   it was meant to knock out of. The halo is the ground colour now — it
+   exists to cut the coastline out from behind the type and to do nothing
+   else — and the fill is stated, like every other mark inside the arch. */
+.minimap.arched .rlabel text { fill: color-mix(in srgb, var(--limestone) 88%, transparent);
+  stroke: var(--map-sea); stroke-width: 3; }
+.minimap.arched .rlabel:hover text { fill: var(--lime); }
 
 /* EUROPE AS AN ENGRAVED LINE, not a dark mass.
  *
