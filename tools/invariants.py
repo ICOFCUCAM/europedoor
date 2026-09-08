@@ -142,7 +142,16 @@ def measure():
                 "value": len(set(re.findall(r"font-size:\s*([^;]+);", css))),
                 "kind": "ceiling",
                 "why": "A ceiling, not a target. The sibling repository measures "
-                       "418; that is what happens without a line."},
+                       "418; that is what happens without a line. It moved to "
+                       "16 for the essay hed, and for nothing else: the design "
+                       "audit's central finding is that eleven of twelve "
+                       "rendered families place an identically-sized h1 at an "
+                       "identical vertical position, and no size that already "
+                       "existed could stop that. The same commit's other five "
+                       "candidate type values — a serif leading, a tighter "
+                       "hed, a deck clamp one decimal off one already in the "
+                       "file — were snapped back to what the site had, and no "
+                       "reader could name the difference."},
             "css.font_weights": {
                 "value": len(set(re.findall(r"font-weight:\s*([^;]+);", css))),
                 "kind": "ceiling", "why": "Four is enough for an editorial system."},
@@ -248,17 +257,23 @@ def measure():
                        "like vocabulary."},
             "primitives.reach": {
                 "value": prim_floor, "kind": "floor",
-                "why": "The share of pages each primitive appears on. A family that "
-                       "stops using `row` has grown its own components and the "
-                       "design system has forked without anybody deciding. THESE "
-                       "NUMBERS WERE WRONG UNTIL THE DESTINATION EXEMPLAR: the "
-                       "matcher used \\b, and a hyphen is a word boundary, so "
-                       "`card` counted `card-art` and `row` counted `rowsub`. "
-                       "The card floor read 0.785 and the true figure is 0.226 — "
-                       "the most-cited primitive in the design system was "
-                       "three-quarters an image wrapper."
-                       "that stops using `row` has grown its own components and "
-                       "the design system has forked without anybody deciding."},
+                "why": "The share of pages each primitive appears on. A family "
+                       "that quietly stops using one has grown its own "
+                       "components and the design system has forked without "
+                       "anybody deciding — which is the failure this floor "
+                       "exists to catch. A family that stops using one ON "
+                       "PURPOSE is the other thing that moves it, and the "
+                       "difference is whether the drop is recorded here in the "
+                       "same commit with the composition that caused it. The "
+                       "essay family cost pagehead, row and band about a "
+                       "hundredth each: nine story pages that no longer share "
+                       "the atlas chassis, which is the whole point of them. "
+                       "THESE NUMBERS WERE WRONG UNTIL THE DESTINATION "
+                       "EXEMPLAR: the matcher used \\b, and a hyphen is a word "
+                       "boundary, so `card` counted `card-art` and `row` "
+                       "counted `rowsub`. The card floor read 0.785 and the "
+                       "true figure is 0.226 — the most-cited primitive in the "
+                       "design system was three-quarters an image wrapper."},
         },
     }
 

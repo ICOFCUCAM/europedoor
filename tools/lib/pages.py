@@ -2671,33 +2671,49 @@ def story_page(data, s):
                           alt=s["title"], eager=True,
                           sizes="(min-width: 76rem) 76rem, 100vw")
                 + '</div>') if has_photo else storymap(data, s)
-    links = ""
+    # WHERE THIS HAPPENS MOVES INTO THE MARGIN.
+    #
+    # It was a full section of rows below the save button — the last thing
+    # on the page, read by nobody who stopped at the end of the story, and
+    # the reason the essay's right-hand third was empty for its whole
+    # length. In the margin it is beside the paragraph that mentions the
+    # place, it is the same list the map above is drawn from, and it is what
+    # fills the space a 38rem measure leaves in a 76rem page.
+    #
+    # No card, no panel, no .rail: a rail is the destination page's furniture
+    # and this family is not that one. A hairline, a label and the names.
+    margin = ""
     if s.get("places"):
         rows = "".join(
-            f"""<a class="row" href="{urls.city_by_id(data['cities'], cid)}">
-            <div><h3>{esc(data['cities'][cid]['city']['name'])}</h3>
-            <p class="rowsub">{esc(data['cities'][cid]['country']['name'])}</p></div>
-            <p class="rowmeta">In the Atlas</p></a>"""
+            f'<a class="marginplace" href="{urls.city_by_id(data["cities"], cid)}">'
+            f'<span class="mp-name">{esc(data["cities"][cid]["city"]["name"])}</span>'
+            f'<span class="mp-country">{esc(data["cities"][cid]["country"]["name"])}</span></a>'
             for cid in s["places"]
         )
-        links = section("Where this happens", f'<div class="rows">{rows}</div>')
+        margin = (f'<aside class="essaymargin" aria-label="Where this happens">'
+                  f'<h2 class="mp-label">Where this happens</h2>{rows}'
+                  f'<p class="mp-note">Every one of them is in the Atlas.</p></aside>')
     body = f"""
 {crumbs([("Europe", "/discover"), ("Stories", "/stories"), (s["title"], None)])}
-<article>
-<div class="pagehead">
+<article class="essay">
+<div class="essayhead">
   <p class="kicker">{esc(s['section'])} · {esc(s['reading'])}</p>
   <h1>{esc(s['title'])}</h1>
-  <p class="lede">{esc(s['standfirst'])}</p>
-  <p class="small byline">By {esc(s['author'])} · published
+  <p class="deck">{esc(s['standfirst'])}</p>
+  <p class="byline">By {esc(s['author'])} · published
   <time datetime="{esc(s['published'])}">{esc(s['published'])}</time>{updated}</p>
-  <div class="chips">{tagchips}</div>
 </div>
 {storyart}
-<div class="measure">{paras}</div>
-<p><button class="btn ghost" type="button" data-save="story:{esc(s['slug'])}" data-kind="Story"
-   data-label="{esc(s['title'])}" data-url="/stories/{esc(s['slug'])}">Save to My Europe</button></p>
+<div class="essaywrap{'' if margin else ' nomargin'}">
+  <div class="essaybody">{paras}</div>
+  {margin}
+</div>
+<div class="essayfoot">
+  <div class="chips">{tagchips}</div>
+  <p><button class="btn ghost" type="button" data-save="story:{esc(s['slug'])}" data-kind="Story"
+     data-label="{esc(s['title'])}" data-url="/stories/{esc(s['slug'])}">Save to My Europe</button></p>
+</div>
 </article>
-{links}
 """
     return f"/stories/{s['slug']}/index.html", page(
         s["title"], body, path=f"/stories/{s['slug']}", area="stories",

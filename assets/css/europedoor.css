@@ -858,6 +858,108 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .db  { display: block; }
 .nodec { text-decoration: none; }
 .measure { max-width: var(--measure); margin: var(--s7) 0; }
+
+/* ── the essay ────────────────────────────────────────────────────────
+ *
+ * THE ONE FAMILY WHERE TYPE CAN CARRY THE WHOLE TRANSFORMATION, at no
+ * imagery cost — and the family the design audit measured as the clearest
+ * failure of a shared chassis: a magazine story and a country encyclopedia
+ * placed an identically-sized h1 at an identical vertical position, and the
+ * entire art-directional difference between them was an 11px kicker
+ * changing hue.
+ *
+ * So a story is set, not laid out. Three moves, all of them typographic:
+ *
+ *   the body is SERIF. --display is already in the stack for every heading
+ *   on the site, so this costs zero webfonts and zero bytes, and it is the
+ *   single loudest signal a reader gets that they have moved from an atlas
+ *   entry to a piece of writing. Nothing else on europedoor.com sets a
+ *   paragraph in it.
+ *
+ *   the measure GROWS with the face. 34rem is right for 15px sans; the same
+ *   column at 19px serif holds about 52 characters and reads as a poem. 38
+ *   puts it back to roughly 68.
+ *
+ *   the head has AIR where the chips were. The tag row sat directly under
+ *   the byline, four grey pills between the standfirst and the story, and
+ *   it is the least urgent thing on the page — a search link. It is at the
+ *   foot now, with the save action, where a reader who has finished is.
+ */
+ * ONE new font size, and four line-heights unchanged. The first draft of
+ * this block cost two sizes and four line-heights, and the invariant
+ * register caught all six: css.font_sizes 15 -> 17, css.line_heights 4 -> 8.
+ * Five of the six were vanity — 1.62 instead of 1.5 for the serif, 1.03
+ * instead of 1.12 on the hed, a deck clamp one decimal off one that already
+ * existed. They were snapped to values the site already had and nothing
+ * about the page changed that a reader could name.
+ *
+ * The sixth is real and is kept: the hed's own clamp. The whole finding
+ * behind this family is that eleven of twelve rendered families place an
+ * identically-sized h1 at an identical vertical position, and there is no
+ * way to stop doing that with a size that already exists.
+ */
+.essay { --measure: 38rem; }
+.essayhead { margin: var(--s6) 0 var(--s7); }
+.essayhead h1 {
+  font-size: clamp(var(--t-3xl), 5.2vw, var(--t-5xl));
+  line-height: 1.12; letter-spacing: -.022em; max-width: 20ch;
+  text-wrap: balance; margin: var(--s4) 0 0;
+}
+.essayhead .deck {
+  font-family: var(--display); font-size: clamp(var(--t-lg), 2.4vw, var(--t-2xl));
+  line-height: 1.25; color: var(--ink-2); max-width: 30ch;
+  margin-top: var(--s5);
+}
+.essayhead .byline {
+  margin-top: var(--s6); padding-top: var(--s3);
+  border-top: 1px solid var(--rule); max-width: 30ch;
+  font-size: var(--t-xs); letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-3);
+}
+.essaybody { max-width: var(--measure); margin: var(--s7) 0 var(--s8); }
+.essaybody p {
+  font-family: var(--display); font-size: var(--t-lg);
+  line-height: 1.5; color: var(--ink); margin: 0 0 var(--s5); max-width: none;
+}
+/* The opening paragraph, one step up. Not a drop cap: a versal is the first
+   thing a template reaches for and the last thing that means anything, and
+   it fails outright on "Białowieża has never been logged" where the letter
+   carries a diacritic. A size change says the same thing and survives every
+   language this atlas writes in. */
+.essaybody p:first-child { font-size: var(--t-xl); }
+.essayfoot { margin-top: var(--s7); padding-top: var(--s5);
+             border-top: 1px solid var(--rule); }
+.essayfoot .chips { margin-bottom: var(--s5); }
+
+/* The margin. A 38rem measure inside a 76rem page leaves a column, and an
+   essay that ignores it is a narrow strip of text adrift on paper — which
+   is what this page was. The places the story is about go there: the same
+   list the map at the top is drawn from, beside the paragraphs that name
+   them rather than under the save button at the very bottom, where it was.
+   Sticky, because the whole point is that it stays while the reader
+   travels down the piece. */
+.essaywrap { display: grid; gap: var(--s8);
+             grid-template-columns: minmax(0, var(--measure)) minmax(0, 1fr);
+             align-items: start; }
+.essaywrap.nomargin { display: block; }
+.essaymargin { position: sticky; top: 6rem; margin: var(--s7) 0;
+               padding-top: var(--s3); border-top: 2px solid var(--ink); }
+.mp-label { font-size: var(--t-xs); letter-spacing: .08em; text-transform: uppercase;
+            color: var(--ink-3); margin: 0 0 var(--s4); font-family: var(--text);
+            font-weight: 600; }
+.marginplace { display: block; text-decoration: none; padding: var(--s3) 0;
+               border-bottom: 1px solid var(--rule); }
+.marginplace:hover .mp-name { color: var(--door); }
+.mp-name { display: block; font-family: var(--display); font-size: var(--t-md);
+           color: var(--ink); line-height: 1.25; }
+.mp-country { display: block; font-size: var(--t-xs); color: var(--ink-3);
+              letter-spacing: .04em; margin-top: 2px; }
+.mp-note { font-size: var(--t-xs); color: var(--ink-3); margin-top: var(--s4);
+           max-width: none; }
+@media (max-width: 60rem) {
+  .essaywrap { grid-template-columns: 1fr; gap: var(--s6); }
+  .essaymargin { position: static; }
+}
 .mw44 { max-width: 44rem; }
 .mw34 { margin: var(--s4) 0; max-width: 34rem; }
 .frame { max-width: 100%; border: 1px solid var(--rule); border-radius: var(--radius);
