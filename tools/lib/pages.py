@@ -1746,7 +1746,7 @@ def minimap(data, t, span=3.2):
                 f'{esc(n["city"]["name"])}</text>'
             )
     return (
-        f'<figure class="minimap arched" data-world="intelligence">'
+        f'<figure class="minimap arched">'
         f'<svg viewBox="0 0 {w} {h}" role="img" '
         f'aria-label="Map of {esc(t["name"])} and the places around it">'
         f'<defs>{arch_clip(uid, w, h)}</defs>'
@@ -1802,10 +1802,13 @@ def routemap(data, j):
     # is that the route crosses a real continent.
     ctx, land = geo.landmass(MAPPROJ, (x0, y0, w, h))
     return (
-        f'<figure class="minimap routemap" data-world="intelligence">'
+        f'<figure class="minimap routemap arched">'
         f'<svg viewBox="{x0:.1f} {y0:.1f} {w:.1f} {h:.1f}" role="img" '
         f'aria-label="Route map for {esc(j["name"])}">'
-        f'{ctx}{land}<path class="routeline" d="{d}"/>{dots}{labels}</svg>'
+        f'<defs>{arch_clip("rt" + j["slug"][:12].replace(chr(45), ""), w, h, x0=x0, y0=y0)}</defs>'
+        f'<g clip-path="url(#arch-{"rt" + j["slug"][:12].replace(chr(45), "")})">'
+        f'<rect x="{x0:.1f}" y="{y0:.1f}" width="{w:.1f}" height="{h:.1f}" class="archground"/>'
+        f'{ctx}{land}<path class="routeline" d="{d}"/>{dots}{labels}</g></svg>'
         f'<figcaption>Straight lines between stops. What each one means on the ground is in the '
         f'note under the leg. <a href="/map">The whole map, with every journey →</a></figcaption></figure>'
     )

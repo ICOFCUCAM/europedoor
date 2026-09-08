@@ -1760,8 +1760,46 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
  * quarter-ellipses and the difference is exactly what makes it read as
  * architecture rather than as a rounded corner.
  */
+/* The aperture is CUT OUT OF THE PAGE. The ground inside the arch is the
+ * sea; outside it there is nothing — the page itself shows through. A dark
+ * rectangle with a slightly darker arch on it is a panel; a doorway with
+ * the page visible around it is an opening, and that is the whole idea. */
 .archground { fill: var(--map-sea); }
+
+/* A LIGHT WALL WITH A DARK OPENING.
+ *
+ * The figure used to carry data-world="intelligence", which resolves --paper
+ * to graphite — so the aperture was a dark arch on a dark panel and the door
+ * did not read at all. The --map-* tokens are global, not world-scoped, so
+ * the map keeps its own dark palette without the figure claiming the dark
+ * world; the frame loses its panel and its border, and the arch is cut
+ * straight into the page. Light wall, dark opening. That is a door.
+ *
+ * It also fixes the caption, which was light-on-light the moment the panel
+ * went: it now takes the page's own ink because the page's own world applies.
+ */
+.minimap.arched {
+  background: none; border: 0; padding: 0; border-radius: 0;
+  color: inherit;
+}
 .minimap.arched svg { background: none; border-radius: 0; }
+.routewrap .routemap.arched svg { background: none; }
+.minimap.arched figcaption { color: var(--ink-3); }
+
+/* The aperture draws in its OWN ink, not the page's.
+ *
+ * Dropping data-world="intelligence" fixed the wall and cost the drawing its
+ * colours: the route resolved --door to cobalt-deep and went navy-on-black.
+ * The inside of the arch is a dark ground whatever world the page is in, so
+ * it names its colours explicitly. Lime is the electric accent and is
+ * dark-ground-only by policy — 16:1 on graphite, 1.05:1 on ivory — and a
+ * doorway cut into the page is exactly the dark ground that policy is for. */
+.minimap.arched .routeline { stroke: var(--lime); opacity: .95; }
+.minimap.arched .routedot { fill: var(--lime); stroke: var(--map-sea); stroke-width: 1.5; }
+.minimap.arched .minidot circle { fill: color-mix(in srgb, var(--limestone) 55%, transparent); }
+.minimap.arched .minidot.here circle { fill: var(--lime); }
+.minimap.arched .minilabel { fill: color-mix(in srgb, var(--limestone) 72%, transparent); }
+.minimap.arched .minilabel.here { fill: var(--limestone); font-weight: 600; }
 
 /* EUROPE AS AN ENGRAVED LINE, not a dark mass.
  *

@@ -74,10 +74,19 @@ def arch_path(w, h, rise=None):
             f"L {w:.1f},{h:.1f} Z")
 
 
-def arch_clip(uid, w, h, rise=None):
-    """The arch as a <clipPath>, for clipping a map inside its own SVG."""
+def arch_clip(uid, w, h, rise=None, x0=0.0, y0=0.0):
+    """The arch as a <clipPath>, for clipping a map inside its own SVG.
+
+    `x0`/`y0` are the viewBox origin, and they are not optional in practice:
+    a route map's viewBox is the route's own bounding box and starts
+    wherever the northernmost stop happens to be — often at a negative y.
+    The first version built the path at 0,0 and clipped the entire drawing
+    away, which renders as a black rectangle and looks exactly like a
+    styling problem rather than a coordinate one.
+    """
+    off = f' transform="translate({x0:.1f},{y0:.1f})"' if (x0 or y0) else ""
     return (f'<clipPath id="arch-{esc(uid)}">'
-            f'<path d="{arch_path(w, h, rise)}"/></clipPath>')
+            f'<path d="{arch_path(w, h, rise)}"{off}/></clipPath>')
 
 
 def esc(s):
