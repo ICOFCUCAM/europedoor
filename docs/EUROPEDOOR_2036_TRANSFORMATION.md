@@ -148,11 +148,9 @@ The honest list:
   equirectangular projection with layers and a popup. It does not zoom, it
   has no coastlines, and it is not how anyone navigates the site. The brief's
   §5 is right that this is the biggest gap.
-- **Discovery requires knowing what you want.** `/discover` is nine macro
-  regions. There is no "pick four moods and be shown the continent".
-- **No "why this?" on any recommendation.** The planner scores by a published
-  formula but never says *"because you prefer historic places with fewer
-  visitors"* next to a specific stop.
+- ~~Discovery requires knowing what you want.~~ **Fixed** — Discover Mode.
+- ~~No "why this?" on any recommendation.~~ **Fixed** on Discover Mode; the
+  planner's own legs still do not carry one, and should.
 - **The homepage is a good grid, not a story.** §50's OPEN → DISCOVER →
   WONDER → UNDERSTAND → PLAN → GO progression is not there.
 - **No seasonal front door.** Month pages exist; "Europe in Autumn" does not.
@@ -238,13 +236,31 @@ current stack.
 
 ### Phase B — Discovery becomes the product
 
-3. **Discover Mode** (§7): pick moods and constraints, get destinations,
-   journeys, experiences and stories back — with a **"why this"** line on
-   every card, generated from the same scoring terms `/method` publishes.
+3. ~~**Discover Mode**~~ **BUILT.** Pick moods and constraints at
+   `/discover` and the continent narrows in the browser, with a **"why
+   this"** on every card generated from the same terms `/method` publishes.
+
+   The design decision the feature turns on: **never explain the constraint
+   back.** The first version put the full reason on every card, and because
+   the interests *are* the filter, all twelve began "carries every one of
+   Mountains, History and Food" — individually true, collectively
+   boilerplate, and boilerplate is what a reader learns to skip. Shared
+   reasons are now hoisted once above the list and each card carries only
+   what distinguishes it: the tags you did not ask for, whether it is peak
+   or shoulder in your month, its discoverability terms, and whether we
+   have actually written it up.
 4. **Europe in Motion** (§6): "Europe in Autumn", "by rail", "sacred",
    "hidden villages" — each a real query over the graph, not a banner.
-5. **Discoverability score** (§18), published like the existing score, so
-   Hidden Europe is a computation rather than an editorial whim.
+5. ~~**Discoverability score**~~ **BUILT.** Five named terms, published at
+   `/method#discoverability`, carried in `/api/atlas.json` per destination
+   along with the terms that fired. Capitals sit at the floor; Theth,
+   Xınalıq and Žabljak at the ceiling.
+
+   It says plainly what it is not: **not a crowd measurement.** We hold no
+   visitor numbers, search volume or occupancy data for anywhere in Europe,
+   and inventing a proxy for one and calling it evidence is the thing this
+   project exists not to do. It measures obscurity *within this Atlas* —
+   a smaller claim, and one we can defend.
 6. **The homepage as a progression** (§50).
 
 ### Phase C — The journey engine grows up

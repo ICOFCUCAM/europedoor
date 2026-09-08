@@ -182,6 +182,52 @@ def s6():
     yield "@media (prefers-reduced-motion: reduce)" in CSS, "and stop for anyone who asked"
 
 
+@section("2036-7", "Discover Mode", "BUILT",
+         "The surface that answers \"I do not know where I want to go\". Pick "
+         "moods and constraints and the continent narrows — and every "
+         "recommendation says why, naming the terms that actually fired.")
+def s2036_7():
+    d = src("assets/js/discover.js")
+    yield bool(page("/discover")) and 'id="discover-mode"' in page("/discover"), \
+        "Discover Mode is on the discover page"
+    yield "/assets/js/discover.js" in page("/discover"), "and runs"
+    yield "function rate" in d, "it scores against the reader's choices"
+    # The design decision the whole feature turns on: never explain the
+    # constraint back. A card that repeats the filter is boilerplate, and
+    # boilerplate is what a reader learns to skip.
+    yield "asked" in d and "extra" in d, "reasons are split into asked-for and additional"
+    yield "whyall" in d and "whythis" in d, "the shared reason is hoisted, the rest per card"
+    yield 'aria-pressed' in d, "the chips are toggle buttons, not styled checkboxes"
+    yield "at most two per country" in d, "and the list is Europe, not one corner of it"
+    yield "Discover Mode" in src("tools/browser-checks.js"), "with browser checks"
+
+
+@section("2036-18", "Discoverability, computed", "BUILT",
+         "Hidden Europe was an editorial tag — the most interesting claim on "
+         "the site and the one nobody could check. It is now a published "
+         "score with five named terms, and it says plainly that it measures "
+         "obscurity within this Atlas rather than crowds.")
+def s2036_18():
+    sc = src("tools/lib/score.py")
+    yield "def discoverability" in sc, "the score exists"
+    yield "DISCOVER_TERMS" in sc, "its terms are a published table"
+    yield has("/method", "Discoverability", "not a crowd measurement"), \
+        "and /method publishes both the terms and what it is not"
+    yield 'id="discoverability"' in page("/method"), "with an anchor to link at"
+    # We hold no visitor numbers for anywhere, and a proxy presented as
+    # evidence is the thing this project exists not to do.
+    yield "no visitor numbers" in page("/method"), "and says why there is no crowd term"
+    import json as _json
+    api = _json.load(open(os.path.join(OUT, "api", "atlas.json"), encoding="utf-8"))
+    yield all("disc" in c for c in api["cities"]), "every destination carries the score"
+    yield all("discWhy" in c for c in api["cities"]), "and the terms that fired for it"
+    # The field is discWhy, not why: `why` already holds the city summary,
+    # and overwriting it silently emptied the description on every planner
+    # leg and every Discover Mode row before a screenshot caught it.
+    yield all(isinstance(c.get("why"), str) for c in api["cities"]), \
+        "and has not overwritten the summary"
+
+
 @section(7, "Featured journeys", "ALREADY",
          "Cards carrying days, countries and the route, as the brief draws "
          "them.")

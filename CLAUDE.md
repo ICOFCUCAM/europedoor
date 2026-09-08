@@ -27,7 +27,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **the Postgres/PostGIS model, the API, Next.js, auth, search, the AI pipeline** | **`docs/technical-foundation.md`** — a destination with a trigger, not a plan for Monday. Nothing in it should be built yet |
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
 | **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,273 assertions against the real build, and CI fails if any of them stops being true |
-| **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence: 43 sections, 231 assertions |
+| **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence: 45 sections, 247 assertions |
 
 ## The rules that catch people out
 
@@ -57,6 +57,12 @@ a shape to one only — a card that stops matching its page is invisible from
 here, because it is rendered inside somebody else's product. A check asserts
 both still come from `plate_shapes`. Cards are cached in `assets/og/`,
 content-addressed, and pruned: first build 24s, every build after that 2s.
+
+**Two scores, both published, neither for sale.** The Europe Experience
+Score says what a place is *for*; **discoverability** says how far it is from
+being the obvious choice. Both are computed from the dataset on every build
+and both are published in full at `/method`. Discoverability is **not a crowd
+measurement** — we hold no visitor numbers for anywhere, and the page says so.
 
 **Structured data claims only what we hold.** JSON-LD is a machine-readable
 claim republished by people who cannot check it, so `checks.py` refuses
@@ -121,9 +127,9 @@ Run all seven before claiming anything is done.
     python3 tools/build.py check       validate the data
     python3 tools/build.py           1,059 pages
     python3 tools/checks.py            28 checks, ~97,300 things examined
-    node tools/browser-checks.js       409 checks in Chromium, incl. accessibility
+    node tools/browser-checks.js       429 checks in Chromium, incl. accessibility
     python3 tools/section-audit.py --check   the 99 spec sections, 1,273 assertions
-    python3 tools/ux-audit.py --check        the 37 UI/UX + 6 brand sections, 231 assertions
+    python3 tools/ux-audit.py --check        the 37 UI/UX + brand + 2036 sections, 247 assertions
     python3 tools/content-report.py --write  what is missing, against the spec's targets
 
 The browser checks need `npm install playwright` and take a couple of

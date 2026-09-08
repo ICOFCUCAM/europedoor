@@ -8,7 +8,7 @@ its requirements are about how something looks and nobody can check a feeling.
 So every row here asserts against the generated HTML, the CSS and the JavaScript
 as they actually are.
 
-**43 sections · 15 already · 13 built · 12 partial · 1 refused · 1 locked · 1 deferred · 231 assertions · 0 failing**
+**45 sections · 15 built · 15 already · 12 partial · 1 refused · 1 locked · 1 deferred · 247 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -18,6 +18,8 @@ as they actually are.
 | 4 | Homepage hero | PARTIAL | 4 | Full-bleed hero, the headline, the ask box and the call to action. The hero image is a generated plate. |
 | 5 | Homepage — Explore | ALREADY | 6 | The interactive map with the brief's filter row, as links into the real map rather than a second map to keep in step. |
 | 6 | Experience categories | ALREADY | 3 | Eight large cards, one per category, with the brief's hover. |
+| 2036-7 | Discover Mode | BUILT | 8 | The surface that answers "I do not know where I want to go". Pick moods and constraints and the continent narrows — and every recommendation says why, naming the terms that actually fired. |
+| 2036-18 | Discoverability, computed | BUILT | 8 | Hidden Europe was an editorial tag — the most interesting claim on the site and the one nobody could check. It is now a published score with five named terms, and it says plainly that it measures obscurity within this Atlas rather than crowds. |
 | 7 | Featured journeys | ALREADY | 2 | Cards carrying days, countries and the route, as the brief draws them. |
 | 8 | Hidden Europe | ALREADY | 2 | A quiet tag, its own band, and a rule that nowhere is ever called undiscovered. |
 | 9 | Homepage AI planner | ALREADY | 2 | The sentence box, in the hero, saying under the field what reads it — which is rules in the browser, not a model. |

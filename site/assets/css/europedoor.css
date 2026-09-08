@@ -809,3 +809,34 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
           font: inherit; cursor: pointer; }
 .addhit:hover { background: var(--paper-3); }
 .addhit .small { color: var(--ink-3); }
+
+/* ── Discover Mode ────────────────────────────────────────────
+ * Interest chips are real toggle buttons carrying aria-pressed, not styled
+ * checkboxes — a screen reader should hear "Mountains, pressed", which is
+ * what the control actually is.
+ */
+.picks { gap: var(--s2); }
+.chip.pick { cursor: pointer; font: inherit; font-size: var(--t-sm);
+             border: 1px solid var(--rule); background: var(--paper); color: var(--ink-2);
+             min-height: 36px; }
+.chip.pick:hover { border-color: var(--atlantic); color: var(--ink); }
+.chip.pick[aria-pressed="true"] { background: var(--atlantic); border-color: var(--atlantic);
+                                  color: var(--paper); }
+@media (max-width: 44rem) { .chip.pick { min-height: 44px; } }
+
+/* The "why this" line. It is the point of the whole feature, so it is set
+ * apart rather than folded into the body copy — a recommendation you cannot
+ * interrogate is an advertisement. */
+.whythis { margin: var(--s3) 0 0; font-size: var(--t-sm); color: var(--ink-2);
+           border-left: 3px solid var(--atlantic-3); padding-left: var(--s3); max-width: none; }
+.whyall { margin: 0 0 var(--s4); font-size: var(--t-sm); color: var(--ink-2);
+          border-left: 3px solid var(--atlantic); padding-left: var(--s3); max-width: none; }
+.whyall span, .whythis span { font-weight: 700; color: var(--atlantic);
+                              letter-spacing: .04em; text-transform: uppercase;
+                              font-size: var(--t-xs); margin-right: var(--s2); }
+
+/* The field label above a control is uppercase; the text beside a checkbox
+   is a sentence and must not be. "ONLY PLACES WITH A HIGH DISCOVERABILITY
+   SCORE" set in caps over two lines is a label nobody reads. */
+.inlinecheck { text-transform: none; letter-spacing: normal; font-weight: 400;
+               font-size: var(--t-sm); display: flex; gap: var(--s2); align-items: baseline; }

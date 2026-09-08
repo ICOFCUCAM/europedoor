@@ -488,6 +488,80 @@ async function main() {
   ok(!/How many days|can you spend/.test(fullHtml),
      "the planner asked for information the sentence had already given");
 
+  // ── Discover Mode ──────────────────────────────────────────────────
+  // The surface that answers "I don't know where I want to go", and the
+  // only one on the site where every recommendation has to justify itself.
+  await page.goto(base + "/discover", { waitUntil: "networkidle" });
+  ok(await page.locator("#discover-interests .chip.pick").count() >= 16,
+     "the interest chips did not render from the Atlas");
+  ok(await page.locator("#discover-results .row").count() === 0,
+     "Discover Mode showed results before anything was chosen");
+
+  for (const i of ["mountains", "history", "food"]) {
+    await page.click(`[data-interest="${i}"]`);
+  }
+  await page.waitForTimeout(150);
+  // Toggle buttons, not styled checkboxes: a screen reader should hear
+  // "Mountains, pressed".
+  ok(await page.locator('[data-interest="mountains"]').getAttribute("aria-pressed") === "true",
+     "a chosen interest does not report itself pressed");
+  const picked = await page.locator("#discover-results .row").count();
+  ok(picked > 0 && picked <= 12, `Discover Mode returned ${picked} rows`);
+
+  // Every result explains itself. This is the point of the feature.
+  const whys = await page.locator("#discover-results .whythis").count();
+  ok(whys === picked, `${picked} results but ${whys} explanations`);
+
+  // At most two per country, or the list has told you about one corner of
+  // Europe rather than about Europe.
+  const countries = await page.locator("#discover-results .rowmeta").allTextContents();
+  const perCountry = {};
+  for (const c of countries) {
+    const k = c.split("\n")[0].trim();
+    perCountry[k] = (perCountry[k] || 0) + 1;
+  }
+  ok(Object.values(perCountry).every((n) => n <= 2),
+     `a country appears ${Math.max(...Object.values(perCountry))} times in twelve results`);
+
+  // Constraints must actually constrain.
+  await page.check("#discover-quiet");
+  await page.waitForTimeout(200);
+  const quietRows = await page.locator("#discover-results .whythis").allTextContents();
+  ok(quietRows.every((t) => /discoverability/.test(t)),
+     "asking for off-the-circuit places did not change what the results say");
+  const lead = await page.locator(".whyall").textContent();
+  ok(/off the obvious circuit/.test(lead),
+     "the shared reason was not hoisted out of the individual cards");
+  // The filter itself must not be repeated on every card — that is the
+  // boilerplate this design exists to remove.
+  ok(!quietRows.some((t) => /carries every one of/.test(t)),
+     "each card still restates the filter the reader set");
+
+  // No capital should survive the off-the-circuit filter, since not being
+  // one is the largest single term in the score.
+  await page.selectOption("#discover-month", "oct");
+  await page.waitForTimeout(200);
+  const names = await page.locator("#discover-results h3").allTextContents();
+  for (const capital of ["Paris", "London", "Madrid", "Rome", "Berlin", "Vienna"]) {
+    ok(!names.includes(capital), `${capital} survived the off-the-circuit filter`);
+  }
+
+  // Clearing puts it back to the empty state rather than a stale list.
+  await page.click("#discover-clear");
+  await page.waitForTimeout(150);
+  ok(await page.locator("#discover-results .row").count() === 0,
+     "clearing Discover Mode left the previous results on screen");
+  ok(await page.locator('[data-interest="mountains"]').getAttribute("aria-pressed") === "false",
+     "clearing left a chip still pressed");
+
+  // The score behind it is published, or it is a ranking nobody should trust.
+  const method = await page.request.get(base + "/method");
+  ok(method.status() === 200, "/method is not served");
+  const methodHtml = await method.text();
+  ok(/id="discoverability"/.test(methodHtml), "discoverability is not published on /method");
+  ok(/not a crowd measurement/i.test(methodHtml),
+     "/method does not say what discoverability is not");
+
   // ── search ─────────────────────────────────────────────────────────
   await page.goto(base + "/search", { waitUntil: "networkidle" });
   await page.fill("#q", "bergen");

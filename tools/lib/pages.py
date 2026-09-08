@@ -14,7 +14,7 @@ from .render import (LD_PUBLISHER, SITE_NAME, SITE_TAGLINE, card, chips, crumbs,
                      esc, factlist, grid,
                      jsondata, ld_breadcrumb, ld_place, ld_within, motif_for,
                      page, picture, plate, section)
-from .score import city_scores, country_scores
+from .score import city_scores, country_scores, discoverability
 
 HOME = ("Europe", "/discover")
 
@@ -1116,6 +1116,10 @@ def planner_api(data):
         c, r, t = n["country"], n["region"], n["city"]
         if c.get("advisory"):
             continue
+        disc, why = discoverability(
+            c, r, t,
+            journeys_through=len(data["back"].get(cid, {}).get("journeys", [])),
+            country_cities=sum(len(x["cities"]) for x in c["regions"]))
         cities.append({
             "id": cid,
             "name": t["name"],
@@ -1134,6 +1138,13 @@ def planner_api(data):
             "why": t["summary"],
             "highlights": t["highlights"][:2],
             "exp": len(t.get("experiences", [])),
+            # How far this place is from being the obvious choice, and which
+            # terms of that score actually fired — so Discover Mode can say
+            # WHY it recommended something instead of asserting that it did.
+            # NOT "why": that key already holds the city summary, and
+            # overwriting it silently emptied the description on every
+            # planner leg and every Discover Mode row. Two fields, two names.
+            "disc": disc, "discWhy": why,
             # What there is actually to do, for the day-by-day, and how much
             # of it we hold, for the content-quality term in the score.
             "todo": ([{"n": pl["name"], "k": "place", "u": urls.place(c, r, t, pl)}
@@ -2497,7 +2508,7 @@ def my_europe_page(data):
 
 def method_page(data):
     from .score import methodology_rows
-    from .score import REFUSED
+    from .score import REFUSED, DISCOVER_TERMS, discoverability
     rows = "".join(
         f'<div class="row"><div><h3>{esc(name)}</h3><p class="rowsub">{esc(formula)}</p></div>'
         f'<p class="rowmeta">0–97</p></div>'
@@ -2508,6 +2519,17 @@ def method_page(data):
         f'<p class="rowmeta">not computed</p></div>'
         for name, why in REFUSED.items()
     )
+    discrows = "".join(
+        f'<div class="row"><div><h3>{esc(name)}</h3><p class="rowsub">{esc(why)}</p></div>'
+        f'<p class="rowmeta">+{pts}</p></div>'
+        for name, pts, why in DISCOVER_TERMS
+    )
+    _d = [discoverability(n["country"], n["region"], n["city"],
+                          journeys_through=len(data["back"].get(cid, {}).get("journeys", [])),
+                          country_cities=sum(len(x["cities"]) for x in n["country"]["regions"]))[0]
+          for cid, n in data["cities"].items()]
+    high = sum(1 for v in _d if v >= 70)
+    ncity = len(_d)
     body = f"""
 {crumbs([("Europe", "/discover"), ("Method", None)])}
 <div class="pagehead">
@@ -2521,6 +2543,22 @@ def method_page(data):
 
 {section("Two dimensions this refuses to compute", f'<div class="rows">{refused}</div>',
          lede="The specification this came from lists ten. Eight are computable from the dataset. These two are not, and an approximation would be worse than the gap.")}
+
+{section("Discoverability", f'<div class="rows">{discrows}</div>', id="discoverability",
+         lede="A second, separate score, used by Discover Mode and by Beyond the Obvious. It answers one narrow question: how far is this place from being the obvious choice?")}
+
+<div class="note warn">
+  <h2 class="mini">What discoverability is not</h2>
+  <p><strong>It is not a crowd measurement.</strong> We hold no visitor numbers, no search
+  volume and no occupancy data for anywhere in Europe — every product that sells those is
+  licensed, and inventing a proxy for one and calling it evidence is the thing this project
+  exists not to do.</p>
+  <p>So the score measures obscurity <em>within this Atlas</em>: how far a place is from the
+  obvious circuit as our own dataset describes it. That is a smaller claim than "undiscovered"
+  and it is one we can actually defend. It is also <strong>not a quality score</strong> —
+  a high number means fewer people will have told you about a place, not that it is better.
+  {high} of {ncity} places score 70 or above.</p>
+</div>
 
 <div class="split mt7">
   <div>
@@ -3315,12 +3353,44 @@ def discover_page(data):
 {crumbs([("Europe", "/discover"), ("Discover", None)])}
 <div class="pagehead">
   <p class="kicker">Discover</p>
-  <h1>Where would you like to go?</h1>
-  <p class="lede">Four ways into {len(data['cities'])} places across {len(data['countries'])} countries:
-  by where they are, by what you travel for, by a route somebody has already thought about,
-  or by the month you happen to be free. If you would rather just say it in a sentence,
-  <a href="/plan">the planner reads sentences</a>.</p>
+  <h1>Where will Europe take you?</h1>
+  <p class="lede">Every other page here asks you to already know where you want to go — a
+  country, a region, a sentence. This one does not. Say what you are travelling for and
+  {len(data['cities'])} places across {len(data['countries'])} countries will narrow
+  themselves, and each one will tell you why it is on the list.</p>
 </div>
+
+<section class="band" id="discover-mode">
+  <div class="band-head">
+    <h2>Discover mode</h2>
+    <p class="lede">Pick as many as you like. Nothing is submitted; the whole Atlas is in
+    your browser and the list re-sorts as you choose.</p>
+  </div>
+  <div class="chips picks" id="discover-interests"></div>
+  <div class="form-row mt5">
+    <div class="field">
+      <label for="discover-month">Travelling in</label>
+      <select id="discover-month"></select>
+    </div>
+    <div class="field">
+      <label for="discover-budget">Spending band</label>
+      <select id="discover-budget"></select>
+    </div>
+    <div class="field">
+      <label for="discover-quiet">Off the obvious circuit</label>
+      <label class="inlinecheck"><input type="checkbox" id="discover-quiet">
+      Only places with a high discoverability score</label>
+    </div>
+    <div class="field">
+      <label for="discover-rail">Reachable slowly</label>
+      <label class="inlinecheck"><input type="checkbox" id="discover-rail">
+      Favour places on the slow-rail list</label>
+    </div>
+  </div>
+  <p class="small"><button type="button" class="linkish" id="discover-clear">Clear everything</button></p>
+  <p class="small" id="discover-count" aria-live="polite"></p>
+  <div id="discover-results"></div>
+</section>
 
 <a class="heromap wide-map" href="/map" aria-label="Map of all {len(data['cities'])} places">
   <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true">{''.join(dots)}</svg>
@@ -3340,15 +3410,23 @@ def discover_page(data):
          more=("The whole European year", "/events"))}
 
 <div class="note">
-  <h2 class="mini">The other way to use this</h2>
-  <p>{quiet} places in the Atlas are tagged quiet: the goods without the crowd.
-  <a href="/beyond-the-obvious">Beyond the obvious</a> collects them, and the planner
-  scores shoulder-season months upward rather than downward.</p>
+  <h2 class="mini">What "off the obvious circuit" means, exactly</h2>
+  <p>It is a computed score, not a mood. A place scores higher for not being a capital, for
+  being marked quiet by an editor who knows the region, for having no curated route through
+  it, for not being tagged with the things a continent is famous for, and for sitting in a
+  country the Atlas has written thinly. Every term and its points are
+  <a href="/method#discoverability">published on the method page</a>.</p>
+  <p class="small">It measures obscurity <em>within this Atlas</em> — which is a smaller and
+  truer claim than "undiscovered". We hold no visitor numbers for anywhere, and a proxy for
+  crowding presented as evidence is the thing this project exists not to do.
+  {quiet} places carry the editorial quiet tag; <a href="/beyond-the-obvious">Beyond the
+  obvious</a> collects them.</p>
 </div>
 """
     return "/discover/index.html", page(
         "Discover Europe", body, path="/discover", area="discover",
-        description=f"Four ways into Europe: by region, by what you travel for, by curated journey, or by month — across {len(data['cities'])} places in {len(data['countries'])} countries.",
+        description=f"Say what you are travelling for and {len(data['cities'])} places across {len(data['countries'])} countries narrow themselves — each one saying why it is on the list.",
+        scripts=["/assets/js/discover.js"],
     )
 
 

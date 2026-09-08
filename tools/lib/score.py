@@ -126,6 +126,81 @@ def city_scores(country, region, city):
     return out
 
 
+# ── discoverability ──────────────────────────────────────────────────
+#
+# "Hidden Europe" was an editorial tag: somebody decided a place was quiet
+# and wrote it down. That is a defensible way to start and an indefensible
+# way to stay, because it makes the most interesting claim on the site the
+# one nobody can check.
+#
+# This is the computed version. It answers a narrow question — **how far is
+# this place from being obvious?** — and it is deliberately NOT a quality
+# score. A high discoverability does not mean better; it means fewer people
+# will have told you about it.
+#
+# What we can honestly use, and what we cannot:
+#
+#   we DO NOT have visitor numbers, search volume, hotel occupancy or any
+#   other measure of how busy anywhere actually is. Every crowd-data
+#   product is licensed, and inventing a proxy for it and calling it
+#   evidence is the thing this project exists not to do.
+#
+#   we DO have: whether a place is a capital, how big a country's whole
+#   dataset is, how many curated routes pass through it, how many of the
+#   famous-by-default tags it carries, and whether an editor who knows the
+#   region marked it quiet.
+#
+# So the score measures OBSCURITY WITHIN OUR OWN ATLAS, which is a smaller
+# and truer claim than "undiscovered". The page says exactly that.
+DISCOVER_TERMS = (
+    ("Not the capital", 22,
+     "A capital is where a first visit goes. Everything else has to be chosen."),
+    ("Editorially quiet", 24,
+     "An editor who knows the region marked it as somewhere that stays quiet "
+     "in season. This is the one judgement in the score, and it is a person's."),
+    ("Few curated routes pass through", 18,
+     "Our own journeys are a proxy for the obvious circuit. A place none of "
+     "them reaches is off it."),
+    ("Not tagged for the famous things", 20,
+     "Cities, art and architecture are what a continent is famous for. Nature, "
+     "wild and sacred are what people find later."),
+    ("In a country we have written thinly", 16,
+     "Where the Atlas itself is thin, the place is very likely thin in every "
+     "other guide too — which is either a gap or an opportunity, and the "
+     "content report says which."),
+)
+OBVIOUS_TAGS = ("cities", "art", "architecture")
+
+
+def discoverability(country, region, city, *, journeys_through=0, country_cities=0):
+    """0-100: how far this place is from being the obvious choice.
+
+    Not a quality score, and not a crowd measurement — see the note above.
+    Every term is listed on /method with the points it can contribute.
+    """
+    tags = set(city["interests"]) | set(region["interests"])
+    v = 0
+    fired = []
+    if city["name"] != country.get("capital"):
+        v += 22; fired.append("Not the capital")
+    if city.get("quiet"):
+        v += 24; fired.append("Editorially quiet")
+    if journeys_through == 0:
+        v += 18; fired.append("Few curated routes pass through")
+    elif journeys_through == 1:
+        v += 9
+    obvious = sum(1 for t in OBVIOUS_TAGS if t in tags)
+    if obvious == 0:
+        v += 20; fired.append("Not tagged for the famous things")
+    elif obvious == 1:
+        v += 10
+    if country_cities and country_cities <= 4:
+        v += 16; fired.append("In a country we have written thinly")
+    elif country_cities and country_cities <= 6:
+        v += 8
+    return _clamp(v), fired
+
+
 def country_scores(country):
     """A country scores as the mean of its cities, so a country cannot be
     stronger on a dimension than the places you would actually visit."""
