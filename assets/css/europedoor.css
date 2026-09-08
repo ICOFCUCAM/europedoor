@@ -452,7 +452,13 @@ main.wide { max-width: 92rem; }
 
 /* ── forms (the planner) ──────────────────────────────────── */
 .form { display: grid; gap: var(--s5); background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); padding: var(--s5); }
-.field > label, .fieldset > legend { display: block; font-size: var(--t-xs); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--s2); font-weight: 600; }
+/* :not(.inlinecheck) is load-bearing. The first attempt at this changed the
+   group heading from a <label> to a <p class="fieldhead"> and left the rule
+   as `.field > label` — but the checkbox's own wrapper IS a <label> and IS a
+   direct child of .field, so it went on matching and the sentence went on
+   rendering in capitals. The browser check written in the same commit is
+   what said so; reading the CSS said it was fixed. */
+.field > label:not(.inlinecheck), .field > .fieldhead, .fieldset > legend { display: block; font-size: var(--t-xs); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--s2); font-weight: 600; }
 .field input[type="number"], .field input[type="text"], .field select {
   width: 100%; font: inherit; padding: var(--s3); border: 1px solid var(--rule); border-radius: var(--radius);
   background: var(--paper); color: var(--ink);
@@ -829,9 +835,27 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .heromap-filters { margin-top: var(--s4); }
 @media (min-width: 40rem) { .askhome { grid-template-columns: 1fr auto; align-items: end; } .askhome label { grid-column: 1 / -1; margin-bottom: calc(var(--s2) * -1); } }
 
-/* a checkbox that sits inside a field, rather than in a chip row */
-.inlinecheck { display: flex; align-items: center; gap: var(--s2); font-size: var(--t-sm);
-  text-transform: none; letter-spacing: 0; color: var(--ink-2); font-weight: 400; }
+/* A checkbox that sits inside a field rather than in a chip row.
+ *
+ * THE RULE THAT WAS WRITTEN TWICE AND NEVER APPLIED. The field label above a
+ * control is uppercase; the text beside a checkbox is a sentence and must
+ * not be — "ONLY PLACES WITH A HIGH DISCOVERABILITY SCORE" set in caps over
+ * two lines is a label nobody reads. Somebody noticed that, wrote the fix,
+ * and wrote it a second time three hundred lines further down, and the
+ * page kept rendering in caps both times: the markup was
+ * `<div class="field"><label>…</label><label class="inlinecheck">…`, so
+ * `.field > label` (0,1,1) beat `.inlinecheck` (0,1,0) and the reset lost
+ * the cascade to a rule that was not even about it.
+ *
+ * The markup is the fix, not a specificity war: the group heading was never
+ * a control label — it was an explicit `for=` label on an input that already
+ * had a wrapping one, so every one of these checkboxes had two labels and an
+ * accessible name of both concatenated. It is a <p class="fieldhead"> now,
+ * `.field > label` does not apply, and one .inlinecheck block does the rest.
+ * A browser check asserts the computed text-transform, because computed
+ * style is the only thing that could ever have caught this. */
+.inlinecheck { display: flex; align-items: baseline; gap: var(--s2); font-size: var(--t-sm);
+  text-transform: none; letter-spacing: normal; color: var(--ink-2); font-weight: 400; }
 .inlinecheck input { accent-color: var(--door); margin: 0; }
 
 /* ── layout utilities, and why they are not inline styles ─────────
@@ -1336,12 +1360,6 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 .whyall span, .whythis span { font-weight: 700; color: var(--sea);
                               letter-spacing: .04em; text-transform: uppercase;
                               font-size: var(--t-xs); margin-right: var(--s2); }
-
-/* The field label above a control is uppercase; the text beside a checkbox
-   is a sentence and must not be. "ONLY PLACES WITH A HIGH DISCOVERABILITY
-   SCORE" set in caps over two lines is a label nobody reads. */
-.inlinecheck { text-transform: none; letter-spacing: normal; font-weight: 400;
-               font-size: var(--t-sm); display: flex; gap: var(--s2); align-items: baseline; }
 
 /* ── the homepage progression ─────────────────────────────────
  * The specification asks the homepage to move the reader through open,

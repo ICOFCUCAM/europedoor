@@ -1517,6 +1517,47 @@ async function main() {
     await w.close();
   }
 
+  // A SENTENCE BESIDE A CHECKBOX IS NOT A LABEL IN CAPS.
+  //
+  // .inlinecheck resets text-transform, and that reset was written twice, in
+  // two places, and lost both times: the markup put it inside a .field next
+  // to another <label>, so `.field > label` at (0,1,1) beat `.inlinecheck` at
+  // (0,1,0) and "Only places with a high discoverability score" rendered as
+  // two lines of capitals on /discover and /plan. Nothing caught it because
+  // nothing read a computed style — which is the only place a lost cascade
+  // is visible. So this reads it.
+  //
+  // The second assertion is the reason the markup changed rather than the
+  // specificity: each of those checkboxes had an explicit `for=` label AND a
+  // wrapping one, so its accessible name was both of them concatenated.
+  for (const url of ["/discover", "/plan"]) {
+    const cp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await cp.goto(base + url, { waitUntil: "load" });
+    const boxes = await cp.evaluate(() => {
+      const out = [];
+      for (const el of document.querySelectorAll(".inlinecheck")) {
+        const cs = getComputedStyle(el);
+        const input = el.querySelector('input[type="checkbox"]');
+        const forLabels = input
+          ? document.querySelectorAll(`label[for="${input.id}"]`).length : 0;
+        out.push({ text: el.textContent.trim().slice(0, 40),
+                   transform: cs.textTransform, forLabels });
+      }
+      return out;
+    });
+    ok(boxes.length > 0, `${url}: no .inlinecheck to measure`);
+    for (const b of boxes) {
+      ok(b.transform === "none",
+         `${url}: "${b.text}" is painted text-transform:${b.transform} — a `
+         + `sentence beside a checkbox, in capitals, because a more specific `
+         + `selector beat the reset`);
+      ok(b.forLabels === 0,
+         `${url}: "${b.text}" also has a label[for] pointing at its input, so `
+         + `the control has two labels and its accessible name is both`);
+    }
+    await cp.close();
+  }
+
   // No gold anywhere in what the browser actually paints.
   const goldPage = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await goldPage.goto(base + "/sources", { waitUntil: "load" });
@@ -1700,7 +1741,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 660;
+  const FLOOR = 675;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +

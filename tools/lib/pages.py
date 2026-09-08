@@ -1487,7 +1487,7 @@ def planner_page(data):
           <select id="currency" name="currency">{curoptions}</select>
         </div>
         <div class="field">
-          <label for="saved">Places you saved</label>
+          <p class="fieldhead">Places you saved</p>
           <label class="inlinecheck"><input type="checkbox" id="saved" name="saved">
           Favour the ones in My Europe</label>
         </div>
@@ -4887,12 +4887,12 @@ def discover_page(data):
       <select id="discover-budget"></select>
     </div>
     <div class="field">
-      <label for="discover-quiet">Off the obvious circuit</label>
+      <p class="fieldhead">Off the obvious circuit</p>
       <label class="inlinecheck"><input type="checkbox" id="discover-quiet">
       Only places with a high discoverability score</label>
     </div>
     <div class="field">
-      <label for="discover-rail">Reachable slowly</label>
+      <p class="fieldhead">Reachable slowly</p>
       <label class="inlinecheck"><input type="checkbox" id="discover-rail">
       Favour places on the slow-rail list</label>
     </div>
