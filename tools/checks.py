@@ -2010,6 +2010,35 @@ def c_no_builtin_hash():
     return n
 
 
+@check("no sub-category is a promise of a list that does not exist")
+def c_subcategories_reachable():
+    # THE `plain` MOTIF RULE, APPLIED TO THE TAXONOMY. A declared vocabulary
+    # nothing reaches is dead code that looks like a promise — and a
+    # sub-category is a stronger promise than a motif, because it ships as a
+    # URL, a card in a grid saying "0 listed", and a page with nothing on it.
+    #
+    # /experiences/nature/waterfalls and /experiences/nature/national-parks
+    # were exactly that. Not a matching bug: no experience in this atlas is
+    # about a waterfall or a national park, and broadening the keywords until
+    # something fell in would have been fabricating relevance to keep a page
+    # alive. They are removed. Two of forty.
+    #
+    # A floor of one, not three: one is a list, zero is a promise unkept.
+    from lib import data as D, categories as CAT
+    d = D.load()
+    items = D.all_experiences(d["countries"])
+    n = 0
+    for cat in d["taxonomy"]["categories"]:
+        for sub in cat.get("subs", []):
+            if not CAT.select(items, cat, sub):
+                fail(f'/experiences/{cat["slug"]}/{sub["slug"]} lists nothing — '
+                     f'a sub-category is a page, a card and a URL promising a '
+                     f'list. Remove it or write something it describes; do not '
+                     f'widen its keywords until something falls in')
+            n += 1
+    return n
+
+
 @check("every experience in a category earns its place by itself")
 def c_category_membership():
     # A property of the CONTAINER may not establish a claim about the ITEM.

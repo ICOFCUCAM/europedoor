@@ -376,15 +376,27 @@ def s14():
 
 
 @section(15, "Experience system", "BUILT",
-         "The specification's eight categories, now with 30 sub-categories — "
+         "The specification's eight categories and their sub-categories — "
          "Renaissance was the one it named that we did not have — each page "
-         "printing the rule that built its list.")
+         "printing the rule that built its list, and every sub-category "
+         "actually listing something.")
 def s15():
     yield len(DATA["categories"]) == 8, f"{len(DATA['categories'])} categories"
-    nsubs = sum(len(c["subs"]) for c in DATA["categories"])
-    yield nsubs >= 30, f"{nsubs} sub-categories"
+    # NOT `nsubs >= 30`. That assertion encoded the taxonomy's SIZE as though
+    # size were the promise, and it went red the moment two sub-categories
+    # that listed nothing were removed — forbidding exactly the correction it
+    # should have demanded. /experiences/nature/waterfalls was a URL, a card
+    # reading "0 listed" and an empty page, and there is no experience in
+    # this atlas about a waterfall.
+    #
+    # The promise is that the specification's named sub-categories exist and
+    # that every declared one is a real list. Both still fail on the thing
+    # this was protecting: deleting Renaissance, or letting a sub-category
+    # ship empty.
     subs = {sub["slug"] for c in DATA["categories"] for sub in c["subs"]}
     yield "renaissance" in subs, "including Renaissance, which the specification names"
+    for want in ("markets", "cellars", "medieval", "hiking", "museums", "monasteries"):
+        yield want in subs, f"the {want} sub-category exists"
     for cat in DATA["categories"]:
         yield exists(f"/experiences/{cat['slug']}"), f"/experiences/{cat['slug']}"
     yield has("/experiences/nature", "How this list is built")

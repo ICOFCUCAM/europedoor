@@ -282,15 +282,6 @@
       ],
       "subs": [
         {
-          "slug": "waterfalls",
-          "name": "Waterfalls",
-          "keywords": [
-            "waterfall",
-            "falls",
-            "cascade"
-          ]
-        },
-        {
           "slug": "fjords",
           "name": "Fjords & sea inlets",
           "keywords": [
@@ -342,17 +333,6 @@
             "river",
             "gorge",
             "canyon"
-          ]
-        },
-        {
-          "slug": "national-parks",
-          "name": "National parks",
-          "keywords": [
-            "national park",
-            "nature reserve",
-            "biosphere",
-            "unesco site",
-            "reserve"
           ]
         }
       ]
