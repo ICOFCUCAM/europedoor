@@ -3320,6 +3320,52 @@ def events_month_page(data, month):
     i = ms.index(month)
     prev_m, next_m = ms[(i - 1) % 12], ms[(i + 1) % 12]
 
+    # THE MONTH, AS A PICTURE — and the honest half of it.
+    #
+    # A month page listed eleven fixtures in eleven countries and showed
+    # nowhere. "October in Europe" is a shape: Areni, Motovun, Tokaj, Alba,
+    # Tromsø. That is the family's whole subject and it was text.
+    #
+    # Only the fixtures carrying a validated `city` can be drawn, which is
+    # 56 of 150 across the year, and the gap is not a data failure — it is
+    # what a fixture IS. "Everywhere north of the Arctic Circle" and "Truffle
+    # season" are not points, and pinning them to a capital to fill the map
+    # would be inventing a location. So the caption counts both halves and
+    # the list below carries all of them.
+    #
+    # Under two mapped fixtures there is no map: January has none and March
+    # has one, and a map of Europe with a single dot on it is not a map of
+    # Europe. Two months without the signature beats twelve with a fiction.
+    mapped = []
+    for f, fc in fixtures:
+        n = data["cities"].get(f"{fc['slug']}/{f['city']}") if f.get("city") else None
+        if not n:
+            for r in fc["regions"]:
+                for t in r["cities"]:
+                    if f.get("city") and t["slug"] == f["city"]:
+                        n = {"country": fc, "region": r, "city": t}
+        if n:
+            mapped.append((f, n))
+    monthmap = ""
+    if len(mapped) >= 2:
+        pts = [(*project(n["city"]["lat"], n["city"]["lon"]),
+                urls.city(n["country"], n["region"], n["city"]), n["city"]["name"])
+               for _f, n in mapped]
+        rest = len(fixtures) - len(mapped)
+        cap = (f'{len(mapped)} of the {len(fixtures)} fixture'
+               f'{"s" if len(fixtures) != 1 else ""} in {esc(name)} happen in a '
+               f'destination this atlas holds, and those are the ones drawn. '
+               + (f'The other {rest} '
+                  f'{"are" if rest != 1 else "is"} in the list below: a season, '
+                  f'a region or a whole country is not a point, and pinning '
+                  f'one to a capital to fill the map would be inventing a '
+                  f'location. ' if rest else '')
+               + f'Coastline from <a href="/sources">Natural Earth</a>, public '
+                 f'domain. <a href="/map">The full map →</a>')
+        monthmap = pointsmap(pts, "ev" + month, cap,
+                             f'Map of the {len(mapped)} fixtures in {name} that '
+                             f'happen in a destination in the Atlas')
+
     body = f"""
 {crumbs([("Europe", "/discover"), ("Events", "/events"), (name, None)])}
 <div class="pagehead">
@@ -3333,6 +3379,7 @@ def events_month_page(data, month):
     <a class="chip" href="/events/{esc(next_m)}">{esc(names[next_m])} →</a>
   </div>
 </div>
+{monthmap}
 {section(f"On in {name}", f'<div class="rows">{rows}</div>') if rows else ""}
 {section(f"At their best in {name}", f'<div class="rows">{country_rows(peak)}</div>',
          lede="Peak season: the weather works, everything is open, and so is everyone else's calendar.") if peak else ""}
