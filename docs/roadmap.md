@@ -33,7 +33,7 @@ Phases 0–4 are not blocked, and that is where the work is.
 | **0** | Foundation | **mostly done, gaps named below** | design system, error handling, test infra and CI all exist. Auth and DB are deliberately absent |
 | **1** | Europe knowledge foundation | **done** | 50 countries → 130 regions → 319 destinations → 192 places → 197 experiences, validated, with sources and verification states |
 | **2** | Public discovery | **done** | every surface ships; SEO gap named below |
-| **3** | Journey system | **done, bar one** | curated journeys, itinerary builder, save, share, and stop-level editing. Adding a stop to an existing route is the gap |
+| **3** | Journey system | **done** | curated journeys, itinerary builder, save, share, and full stop-level editing: reorder, lengthen, shorten, remove, add |
 | **4** | AI | **rules, no model** | the whole pipeline except the model: intent extraction, retrieval, planning, refusal. See `docs/ai.md` |
 | **5** | Users | **blocked** | browser-local only. Needs a data controller |
 | **6** | Businesses | **blocked** | needs authentication |
@@ -111,12 +111,19 @@ Phases 0–4 are not blocked, and that is where the work is.
    because regenerating from the form inputs would re-run a planner that
    deliberately jitters and hand somebody a different trip.
 
-### Phase 3 — what is left
+8. ~~**Adding a stop to an existing route.**~~ **Done.** Every leg carries
+   "+ stop after", opening a filter over the whole Atlas — which is already
+   in memory, so it is an array filter rather than a request.
 
-8. **A stop cannot yet be *added* to an existing route.** Removing and
-   reordering work; inserting a destination needs a picker over the whole
-   Atlas, which is the search index the site already ships — a contained
-   piece of work, and the obvious next one here.
+   Three things make it usable rather than merely present: a city already on
+   the route is never offered, the distance from the stop it would follow is
+   on every row (on a route the question is always what a stop *costs*, and
+   a list that hides it invites a 900 km detour that looks like a small
+   edit), and accents fold exactly as they do in search — a reader who can
+   find Malmö there and not here would be right to think one of them is
+   broken.
+
+**Phase 3 is complete.**
 
 ### Phase 1 — the dataset, which is the actual asset
 

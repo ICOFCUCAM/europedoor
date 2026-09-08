@@ -26,7 +26,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **the Postgres/PostGIS model, the API, Next.js, auth, search, the AI pipeline** | **`docs/technical-foundation.md`** — a destination with a trigger, not a plan for Monday. Nothing in it should be built yet |
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
 | **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,273 assertions against the real build, and CI fails if any of them stops being true |
-| **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence: 43 sections, 226 assertions |
+| **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence: 43 sections, 231 assertions |
 
 ## The rules that catch people out
 
@@ -120,9 +120,9 @@ Run all seven before claiming anything is done.
     python3 tools/build.py check       validate the data
     python3 tools/build.py            988 pages
     python3 tools/checks.py            28 checks, ~91,900 things examined
-    node tools/browser-checks.js       401 checks in Chromium, incl. accessibility
+    node tools/browser-checks.js       409 checks in Chromium, incl. accessibility
     python3 tools/section-audit.py --check   the 99 spec sections, 1,273 assertions
-    python3 tools/ux-audit.py --check        the 37 UI/UX + 6 brand sections, 226 assertions
+    python3 tools/ux-audit.py --check        the 37 UI/UX + 6 brand sections, 231 assertions
     python3 tools/content-report.py --write  what is missing, against the spec's targets
 
 The browser checks need `npm install playwright` and take a couple of

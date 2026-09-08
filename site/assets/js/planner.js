@@ -558,8 +558,107 @@
     result.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  /* Fold accents so "malmo" finds Malmö. The search page does the same
+   * thing; both had it before this picker existed, and a reader who can
+   * find a city in search and not in the planner would be right to think
+   * one of them is broken. */
+  function fold(x) {
+    return String(x).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function addPanel(panel, route, opts, after) {
+    var inRoute = {};
+    route.forEach(function (st) { inRoute[st.city.id] = true; });
+    var from = route[after].city;
+
+    panel.innerHTML =
+      '<label class="small" for="addq' + after + '">Add a stop after ' +
+      from.name + '</label>' +
+      '<input type="search" id="addq' + after + '" class="addq" autocomplete="off" ' +
+      'placeholder="Type a city — Ghent, Ohrid, Trieste…" ' +
+      'aria-describedby="addhelp' + after + '">' +
+      '<p class="small" id="addhelp' + after + '">Anywhere in the Atlas. Distance is ' +
+      'from ' + from.name + ', so you can see what a stop actually costs you.</p>' +
+      '<ul class="addhits" role="listbox" aria-label="Places to add"></ul>';
+
+    var box = panel.querySelector(".addq");
+    var hits = panel.querySelector(".addhits");
+
+    function render() {
+      var q = fold(box.value.trim());
+      if (q.length < 2) {
+        hits.innerHTML = '<li class="small">Two letters is enough to start.</li>';
+        return;
+      }
+      var found = [];
+      for (var i = 0; i < ATLAS.cities.length && found.length < 200; i++) {
+        var c = ATLAS.cities[i];
+        if (inRoute[c.id]) continue;   // already on the route
+        if (fold(c.name).indexOf(q) < 0 && fold(c.country).indexOf(q) < 0) continue;
+        found.push({ c: c, d: km(from, c), starts: fold(c.name).indexOf(q) === 0 });
+      }
+      // A prefix match first, then the nearest — because on a route the
+      // question is almost always "what is near here", and a list ordered
+      // purely alphabetically buries it.
+      found.sort(function (a, b) {
+        if (a.starts !== b.starts) return a.starts ? -1 : 1;
+        return a.d - b.d;
+      });
+      if (!found.length) {
+        hits.innerHTML = '<li class="small">Nothing in the Atlas matches that. ' +
+          'It may be somewhere we have not written up yet — ' +
+          '<a href="/countries">the countries page</a> shows what we hold.</li>';
+        return;
+      }
+      hits.innerHTML = found.slice(0, 8).map(function (f) {
+        return '<li><button type="button" class="addhit" data-city="' + f.c.id + '">' +
+          "<span>" + f.c.name + ' <span class="small">· ' + f.c.country + "</span></span>" +
+          '<span class="small">' + f.d.toLocaleString("en-GB") + " km</span></button></li>";
+      }).join("");
+      hits.querySelectorAll(".addhit").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var id = b.getAttribute("data-city");
+          var city = null;
+          for (var i = 0; i < ATLAS.cities.length; i++) {
+            if (ATLAS.cities[i].id === id) { city = ATLAS.cities[i]; break; }
+          }
+          if (!city) return;
+          editRoute(function (r) {
+            // Its own recorded range, at the reader's pace — the same
+            // number the planner would have used had it chosen this stop.
+            r.splice(after + 1, 0,
+                     { city: city, nights: nightsFor(city, opts.pace, 99) });
+            r.forEach(function (st) { delete st.forced; });
+          });
+        });
+      });
+    }
+
+    box.addEventListener("input", render);
+    render();
+    box.focus();
+  }
+
   function wireEditing(scope, route, opts) {
     EDITED = { route: route, opts: opts };
+    scope.querySelectorAll("[data-add]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var after = Number(b.getAttribute("data-add"));
+        var panel = scope.querySelector("#addpanel" + after);
+        if (!panel) return;
+        var open = !panel.hidden;
+        // One panel at a time: two open search boxes is two places to type
+        // and no way to tell which one is listening.
+        scope.querySelectorAll(".addstop").forEach(function (x) { x.hidden = true; });
+        scope.querySelectorAll("[data-add]").forEach(function (x) {
+          x.setAttribute("aria-expanded", "false");
+        });
+        if (open) return;
+        panel.hidden = false;
+        b.setAttribute("aria-expanded", "true");
+        addPanel(panel, route, opts, after);
+      });
+    });
     scope.querySelectorAll("[data-move]").forEach(function (b) {
       b.addEventListener("click", function () {
         var i = Number(b.getAttribute("data-move")), d = Number(b.getAttribute("data-dir"));
@@ -655,7 +754,11 @@
           ' aria-label="One night more in ' + city.name + '">+ night</button>' +
         '<button type="button" class="linkish drop" data-drop="' + i + '"' +
           (route.length <= 2 ? " disabled" : "") + ' aria-label="Remove ' + city.name + ' from the route">× remove</button>' +
-        "</p>";
+        '<button type="button" class="linkish" data-add="' + i + '"' +
+          ' aria-expanded="false" aria-controls="addpanel' + i + '"' +
+          ' aria-label="Add a stop after ' + city.name + '">+ stop after</button>' +
+        "</p>" +
+        '<div class="addstop" id="addpanel' + i + '" hidden></div>';
 
       legs += '<li class="leg"><div class="leg-when">' + when + '</div><div>' +
               '<h3><a href="' + city.url + '">' + city.name + "</a> <span class=\"small\">· " +

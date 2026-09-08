@@ -291,6 +291,44 @@ async function main() {
   ok(await page.locator('.leg:nth-child(1) [data-nights][data-by="-1"]').isDisabled(),
      "a stop can be reduced below one night");
 
+  // Adding a stop. A filter over the Atlas already in memory, rendered as
+  // real buttons — so this is also the accessibility check.
+  const beforeAdd = await page.locator("#result .leg h3 a").allTextContents();
+  await page.click('.leg:nth-child(1) [data-add]');
+  await page.waitForSelector(".addstop:not([hidden]) .addq");
+  ok(await page.locator('.leg:nth-child(1) [data-add]').getAttribute("aria-expanded") === "true",
+     "the add control does not report that it opened");
+  await page.fill(".addstop:not([hidden]) .addq", "gh");
+  await page.waitForTimeout(120);
+  ok(await page.locator(".addstop:not([hidden]) .addhit").count() > 0,
+     "two letters returned nothing");
+  // Accent folding, the same as search: a reader who can find Malmö there
+  // and not here would be right to think one of them is broken.
+  await page.fill(".addstop:not([hidden]) .addq", "malmo");
+  await page.waitForTimeout(120);
+  const addRow = await page.locator(".addstop:not([hidden]) .addhit").first().textContent();
+  ok(/Malmö/.test(addRow), `"malmo" did not find Malmö: ${addRow}`);
+  // Every row states the distance from the stop it would follow.
+  ok(/\d+ km/.test(addRow), `an add-a-stop row gave no distance: ${addRow}`);
+
+  await page.click(".addstop:not([hidden]) .addhit");
+  await page.waitForTimeout(200);
+  const afterAdd = await page.locator("#result .leg h3 a").allTextContents();
+  ok(afterAdd.length === beforeAdd.length + 1,
+     `adding a stop gave ${afterAdd.length} from ${beforeAdd.length}`);
+  ok(afterAdd[1] === "Malmö", `the stop landed at ${afterAdd[1]}, not second`);
+  ok(afterAdd[0] === beforeAdd[0], "adding a stop moved the one before it");
+
+  // A stop already on the route must never be offered twice.
+  await page.click('.leg:nth-child(1) [data-add]');
+  await page.waitForSelector(".addstop:not([hidden]) .addq");
+  await page.fill(".addstop:not([hidden]) .addq", "malmo");
+  await page.waitForTimeout(120);
+  const offeredAgain = await page.locator(".addstop:not([hidden]) .addhit").allTextContents();
+  ok(!offeredAgain.some((t) => /Malmö/.test(t)),
+     "a city already on the route was offered again");
+  await page.click('.leg:nth-child(1) [data-add]');   // close it
+
   // Sharing an edited plan must carry the EDIT, not the inputs. This is the
   // whole point of the frozen route: regenerating from the form would run
   // the planner again, and the planner jitters.

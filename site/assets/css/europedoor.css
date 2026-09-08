@@ -781,3 +781,31 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
   .legedit { gap: var(--s4); }
   .legedit .linkish { min-height: 44px; }
 }
+
+/* ── adding a stop ────────────────────────────────────────────
+ * A search box and a list of buttons rather than a combobox widget: the
+ * whole Atlas is already in memory, so this is a filter over an array, and
+ * a real <button> per result is keyboard-operable and screen-reader
+ * readable without a single ARIA role having to be got right.
+ *
+ * The distance sits on every row because on a route the question is always
+ * "what does this stop actually cost me", and a list that hides it invites
+ * a 900 km detour that looks like a small edit.
+ */
+.addstop { margin: var(--s4) 0 0; padding: var(--s4); border: 1px solid var(--rule);
+           border-radius: var(--radius); background: var(--paper-2); max-width: 34rem; }
+.addstop label { display: block; font-weight: 600; margin-bottom: var(--s2); }
+.addq { width: 100%; padding: var(--s3); border: 1px solid var(--rule);
+        border-radius: var(--radius); background: var(--paper); color: var(--ink);
+        font: inherit; min-height: 44px; }
+.addq:focus { border-color: var(--atlantic); }
+/* The focus ring is offset 3px and was landing on the help text below it. */
+.addstop .small { margin-top: var(--s3); }
+.addhits { list-style: none; margin: var(--s3) 0 0; padding: 0; }
+.addhits li { margin: 0; }
+.addhit { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4);
+          width: 100%; text-align: left; min-height: 44px; padding: var(--s2) var(--s3);
+          border: 0; border-radius: var(--radius); background: none; color: inherit;
+          font: inherit; cursor: pointer; }
+.addhit:hover { background: var(--paper-3); }
+.addhit .small { color: var(--ink-3); }

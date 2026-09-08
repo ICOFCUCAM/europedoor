@@ -265,6 +265,16 @@ def s14():
     yield 'q.set("r"' in PLANNER, "the shared link carries the route itself"
     yield "a shared edited plan came back different" in BROWSER, \
         "with a browser check that a shared edit restores as edited"
+    # And a stop can be added, which is the half that makes the rest useful.
+    yield "data-add" in PLANNER, "a stop can be added to an existing route"
+    yield "function addPanel" in PLANNER, "with a picker over the whole Atlas"
+    yield "inRoute[c.id]" in PLANNER, "that never offers a stop already on the route"
+    # Distance on every row: on a route the question is always what a stop
+    # costs, and a list that hides it invites a 900 km detour that looks
+    # like a small edit.
+    yield 'f.d.toLocaleString("en-GB")' in PLANNER, "and states the distance from the stop before"
+    yield "a city already on the route was offered again" in BROWSER, \
+        "with checks for the exclusion and the accent folding"
 
 
 # ── 15–20: the page types ─────────────────────────────────────────────
