@@ -70,7 +70,44 @@ imported, the seven answers were written down, and the product shipped without
 region boundaries. **A summarised licence you could not read is a fabrication
 with a citation on it.**
 
-### 4. Never invent data to fill a gap
+### 4. The Data Integrity Rule: never author a measurement; you may author a classification
+
+The distinction is the difference between a fact about the world that somebody
+measured and a judgement this atlas is qualified to make.
+
+    A MEASUREMENT is derived, carries its source, and is absent where
+    there is none.
+        population · coordinates · iso3 · distance · a transport node
+
+    A CLASSIFICATION may be authored, because it IS the editorial work.
+        village · valley · island · archaeological site · region type ·
+        story section · what an experience is for
+
+Authoring `"Italy has an authenticity score of 87"` is inventing a
+measurement. Authoring `"Theth is a village"` is doing the job. The validator
+enforces the first half by refusing `iso3`, `lat`, `lon` and `population` as
+authored keys anywhere in `data/`, and enforces the second by requiring every
+authored classification to come from a stated vocabulary.
+
+### 4a. A reputable dataset can still systematically bias the product
+
+Natural Earth was not wrong. It simply was not built to answer the question
+this atlas asks. Its populated-places file is, by construction, a list of
+populated places — so deriving `city_type` from it produced **one village in
+157**, and the destinations it could not classify were disproportionately the
+villages, valleys and sites. That is the product's whole thesis, silently
+under-served by its own data pipeline, and the only thing that found it was a
+check asserting a fact about the output rather than about the code.
+
+The correct pipeline, and the order matters:
+
+    external dataset → derived classification → validation →
+    author correction → published classification
+
+Never stop at "derived". A derivation's coverage is a claim about the source,
+not about the world, and the gap between the two is where the product lives.
+
+### 5. Never invent data to fill a gap
 
 Monaco is 2 km² and Vatican City is 0.44 km². At 1:50 million neither has a
 polygon. They are drawn as a ringed point and the legend says why. Drawing an
@@ -81,7 +118,7 @@ The same rule produced: no crowd proxy, no seeded businesses, no
 `aggregateRating` in structured data, no region boundary hulled out of the
 destinations inside it. **A gap stated is worth more than a gap filled.**
 
-### 5. Every claim gets a check, and the check gets shown to fail
+### 6. Every claim gets a check, and the check gets shown to fail
 
 "EuropeDoor does not pay for maps" is now 1,249 assertions in `checks.py`,
 including a hostname list that fails the build on any page or script naming a
@@ -94,7 +131,7 @@ anything. This repository has already shipped a browser suite that printed
 *"all 4 browser checks passed"* while 540 ran, because a `const` shadowed the
 counter. **Prove the check can go red in the same session you write it.**
 
-### 6. Report every bug the work surfaced, including yours
+### 7. Report every bug the work surfaced, including yours
 
 The map rebuild is on record as having found three: a projection that
 multiplied x by `cos(52°)/cos(52°)` and had therefore drawn Europe 60% too wide
@@ -107,12 +144,40 @@ the commit message.
 in the CSS about the 47px overflow is worth more than the two lines that fixed
 it.
 
-### 7. Zero recurring cost is the default
+### 8. Zero recurring cost is the default
 
 A bill is the owner's decision, never a convenience. Where a free path exists
 and costs operational work instead, take the operational work and write down
 the pipeline so somebody can rebuild it. Where no free path exists, stop —
 see rule 3.
+
+### The order of authority
+
+The methodology this session settled on, written down because the opposite is
+the default:
+
+    PRODUCT PRINCIPLES
+          ↓
+    BUILT SYSTEM
+          ↓
+    MEASUREMENTS
+          ↓
+    CHECKS
+          ↓
+    ARCHITECTURE
+          ↓
+    FUTURE EXTENSIONS
+
+**Not** architecture document → force implementation → find reasons to justify
+it. A blueprint is a hypothesis. When the running system disagrees with it,
+the running system is the evidence and the blueprint is the thing that
+changes — provided the disagreement is measured rather than asserted.
+
+Three things in this repository exist because that order was followed: the map
+is SVG rather than MapLibre (88 KB of data against 800 KB of renderer);
+Postgres is not built (0.17 ms for the query it would accelerate); and the
+`relationships` table was replaced by a derived index (an authored edge table
+cannot be validated).
 
 ---
 

@@ -1316,6 +1316,15 @@ def planner_api(data):
     ]
     return "/api/atlas.json", {
         "generated": "build",
+        # Every published document says what it is and under what terms. Three
+        # of the five endpoints carried this and two did not, which nothing
+        # caught, because a missing key in a document nobody validates is
+        # invisible. There is a check for it now.
+        "licence": API_LICENCE,
+        "note": ("The planner index. Advisory countries are STRIPPED from this "
+                 "document — it is a list of places to route through, and routing "
+                 "somebody into one is the harm. /api/countries.json is the "
+                 "description of the continent and keeps them, with the advisory."),
         "currencies": data["taxonomy"].get("currencies", {}),
         "interests": data["taxonomy"]["interests"],
         "months": data["taxonomy"]["months"],
@@ -3941,6 +3950,12 @@ def search_api(data):
                 urls.subcategory(cat["slug"], sub["slug"]),
                 [sub["name"]] + sub["keywords"], 1.1)
     return "/api/search.json", {
+        "generated": "build",
+        "licence": API_LICENCE,
+        "note": ("One flat index of everything findable, filtered in the browser. "
+                 "`t` is the pre-lowercased haystack; `ct` is the kind of place; "
+                 "`la`/`lo` are coordinates. No ranking is precomputed — the "
+                 "weight `w` is a kind weight, not a relevance score."),
         "rows": rows,
         # Sent rather than typed into the prose. The empty state used to say
         # "50 countries and 244 cities" while the atlas held 319, and nothing

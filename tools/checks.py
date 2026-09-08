@@ -1359,6 +1359,123 @@ def c_schema():
     return n
 
 
+@check("every published endpoint states what it is, and holds to its contract")
+def c_api():
+    """The read API, checked as a contract rather than trusted as output.
+
+    Five JSON endpoints and 53 geometry files are published from this build.
+    They are static files on a CDN — there is no server, no query parameter
+    and no request that can fail — which means the only things that can go
+    wrong are silent: a document that stops saying what it is, a field that
+    disappears, or a number in one endpoint that disagrees with the same
+    number in another.
+
+    So: every endpoint names its terms, every one carries the keys its
+    consumers read, and the counts across endpoints have to agree with the
+    dataset and with each other.
+    """
+    n = 0
+    d = D.load()
+    endpoints = ["atlas.json", "countries.json", "graph.json", "journeys.json",
+                 "search.json"]
+    docs = {}
+    for name in endpoints:
+        path = os.path.join(OUT, "api", name)
+        if not os.path.exists(path):
+            fail(f"/api/{name} was not published")
+            continue
+        with open(path, encoding="utf-8") as fh:
+            docs[name] = json.load(fh)
+        n += 1
+
+    # 1. Terms. An endpoint that does not say what may be done with it is an
+    # endpoint somebody will assume the wrong thing about. Two of the five
+    # shipped without this for months and nothing noticed.
+    for name, doc in docs.items():
+        lic = doc.get("licence")
+        if not isinstance(lic, dict) or not lic.get("use") or not lic.get("attribution"):
+            fail(f"/api/{name} does not state its licence")
+        if not doc.get("note"):
+            fail(f"/api/{name} does not say what it is")
+        if doc.get("generated") != "build":
+            fail(f"/api/{name} does not declare that it is built, not live")
+        n += 3
+
+    # 2. The keys each consumer actually reads. A renamed field in a document
+    # nothing validates is a feature that stops working in the browser and
+    # nowhere else.
+    contracts = {
+        "atlas.json": ["cities", "journeys", "interests", "months", "monthNames",
+                       "budgets", "currencies"],
+        "search.json": ["rows", "counts", "interests", "monthNames"],
+        "countries.json": ["countries"],
+        "journeys.json": ["journeys"],
+        "graph.json": ["edges", "relationships", "shape"],
+    }
+    for name, keys in contracts.items():
+        for key in keys:
+            if name in docs and key not in docs[name]:
+                fail(f"/api/{name} has lost its {key!r} key, which a consumer reads")
+            n += 1
+
+    # 3. The counts agree — with the dataset, and with each other. This is the
+    # failure that a static build makes possible and easy: two documents
+    # generated in the same run from the same data, disagreeing, because one
+    # of them filters and the other forgot to say so.
+    if "atlas.json" in docs and "search.json" in docs:
+        atlas_cities = len(docs["atlas.json"]["cities"])
+        advisory = sum(1 for c in d["countries"].values() if c.get("advisory"))
+        stripped = sum(1 for node in d["cities"].values()
+                       if node["country"].get("advisory"))
+        if atlas_cities != len(d["cities"]) - stripped:
+            fail(f"/api/atlas.json holds {atlas_cities} destinations; the atlas has "
+                 f"{len(d['cities'])} and {stripped} are stripped as advisory")
+        # And the note has to say so, because a document that silently omits
+        # 12 destinations is worse than one that omits them and explains why.
+        if "advisor" not in docs["atlas.json"].get("note", "").lower():
+            fail("/api/atlas.json strips advisory countries and does not say so")
+        counts = docs["search.json"].get("counts", {})
+        if counts.get("cities") != len(d["cities"]):
+            fail(f"/api/search.json counts {counts.get('cities')} destinations, "
+                 f"the atlas has {len(d['cities'])}")
+        if counts.get("countries") != len(d["countries"]):
+            fail(f"/api/search.json counts {counts.get('countries')} countries")
+        n += 4
+
+    if "countries.json" in docs:
+        if len(docs["countries.json"]["countries"]) != len(d["countries"]):
+            fail("/api/countries.json does not hold every country")
+        # The opposite rule to atlas.json, and it is deliberate: a consumer
+        # deciding what to do about Belarus needs to be told there is an
+        # advisory, not handed a document in which it silently does not exist.
+        adv = sum(1 for c in docs["countries.json"]["countries"] if c.get("advisory"))
+        if adv != sum(1 for c in d["countries"].values() if c.get("advisory")):
+            fail("/api/countries.json drops advisory countries; it must keep them")
+        n += 2
+
+    # 4. Nothing published invents a number. The same refusal as the schema,
+    # applied to the output rather than the input, because a field can be
+    # absent from data/ and computed into an endpoint.
+    for name, doc in docs.items():
+        body = json.dumps(doc)
+        for invented in ('"rating"', '"review_count"', '"featured"', '"sponsored"',
+                         '"price_from"', '"opening_hours"'):
+            if invented in body:
+                fail(f"/api/{name} publishes {invented}, which we do not hold")
+            n += 1
+
+    # 5. The documentation page lists every endpoint that exists. An
+    # undocumented endpoint is one nobody can rely on.
+    api_html = os.path.join(OUT, "api", "index.html")
+    if os.path.exists(api_html):
+        page = open(api_html, encoding="utf-8").read()
+        for name in endpoints:
+            if f"/api/{name}" not in page:
+                fail(f"/api/{name} is published and not documented on /api")
+            n += 1
+    return n
+
+
 @check("the documentation set exists and is not describing a different repository")
 def c_docs():
     """Ten documents the development brief names, plus the ones this project
@@ -1374,7 +1491,8 @@ def c_docs():
     number copied out of a generated document is a number that will be wrong
     within a month, and the fix is to link rather than to copy.
     """
-    required = ["architecture", "product", "development", "database", "roadmap",
+    required = ["api-architecture", "schema-mapping", "instruction",
+                "architecture", "product", "development", "database", "roadmap",
                 "api", "ai", "deployment", "security", "content-model",
                 "brand", "brand-lock", "images", "data-model", "legal-position",
                 "technical-foundation", "audit-2026-09",

@@ -1,3 +1,26 @@
+> **§2 IS CLOSED.** The owner accepted this audit as the built state on
+> 2026-09-08, with one consequence recorded here: **the original
+> `relationships` table is removed from the target architecture rather than
+> implemented.** A derived index is the stronger design and the blueprint
+> changed to match the implementation, not the other way round.
+>
+> | section | status |
+> |---|---|
+> | §2.1 Geography | built |
+> | §2.2 Classifications | built |
+> | §2.3–2.13 Core data | built |
+> | §2.14 Knowledge graph | built, **derived** |
+> | §2.15 Users | refused, with the trigger named |
+> | §2.16 Preferences | built, **derived** (Travel DNA) |
+> | §2.17 Saved | built, six kinds |
+> | §2.18 Geographic performance | measured; no spatial layer justified yet |
+> | §2.19 Search | measured, three bugs found and corrected |
+> | §2.20 Architecture | mapped layer by layer |
+>
+> §3 is `docs/api-architecture.md`, written the same way: from the running
+> system. Do not reopen §2 to make the original blueprint look like the
+> implementation.
+
 # Build Package v1 §2 — the schema, against what is actually running
 
 Every field the Build Package asks for, checked against the live dataset.

@@ -29,6 +29,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
 | **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,273 assertions against the real build, and CI fails if any of them stops being true |
 | **the map, geographic data, tiles, or "why not Mapbox?"** | **`docs/map-architecture.md`** — the pipeline, the three levels of detail, and why this is SVG rather than MapLibre. Then **`docs/data-licenses/`**, which is the register, and **`docs/boundary-policy.md`** for disputed frontiers |
+| **the API — endpoints, contracts, empty states, what not to build** | **`docs/api-architecture.md`** — §3, written from the running system. Five static documents, no server, and the trigger that would change each of the nine things deliberately unbuilt |
 | **"is field X in the model?" — the Build Package schema** | **`docs/schema-mapping.md`** — every entity and field of Build Package v1 §2 against the running data: HAVE, BUILT, or REFUSED with the promise behind each refusal |
 | **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence: 51 sections, 326 assertions |
 
@@ -231,6 +232,20 @@ places — so the destinations it could not classify were disproportionately the
 villages. All 319 are classified now: 157 derived, 162 authored from the
 summary this atlas had already written about each. Authoring a *classification*
 is legitimate where authoring a *measurement* is not.
+
+**The Data Integrity Rule: never author a measurement; you may author a
+classification.** `population`, `iso3`, coordinates and distances are derived,
+carry their source, and are absent where there is none. `village`, `valley`,
+`island`, `site`, a region's type, a story's section — those are the editorial
+work and are authored from a stated vocabulary. Authoring "an authenticity
+score of 87" invents a measurement; authoring "Theth is a village" is the job.
+
+**The order of authority is: principles → built system → measurements → checks
+→ architecture → future extensions.** Not architecture → force implementation →
+justify. A blueprint is a hypothesis; when the running system disagrees, and
+the disagreement is *measured*, the blueprint changes. Three things here exist
+because of that: SVG rather than MapLibre, no Postgres, and a derived graph
+index rather than a `relationships` table.
 
 **A measurement is never authored; an editorial record can never be bought.**
 Two rules from the schema audit, both enforced twice. `iso3`, coordinates and
