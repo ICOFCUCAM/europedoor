@@ -29,6 +29,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
 | **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,273 assertions against the real build, and CI fails if any of them stops being true |
 | **the map, geographic data, tiles, or "why not Mapbox?"** | **`docs/map-architecture.md`** — the pipeline, the three levels of detail, and why this is SVG rather than MapLibre. Then **`docs/data-licenses/`**, which is the register, and **`docs/boundary-policy.md`** for disputed frontiers |
+| **the frontend — routes, the shell, primitives, what §4 must not do** | **`docs/frontend-architecture.md`** — §4, measured. 1,067 documents and five applications; eleven primitives cover 100% of the site |
 | **the API — endpoints, contracts, empty states, what not to build** | **`docs/api-architecture.md`** — §3, written from the running system. Five static documents, no server, and the trigger that would change each of the nine things deliberately unbuilt |
 | **"is field X in the model?" — the Build Package schema** | **`docs/schema-mapping.md`** — every entity and field of Build Package v1 §2 against the running data: HAVE, BUILT, or REFUSED with the promise behind each refusal |
 | **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence: 51 sections, 326 assertions |
@@ -211,6 +212,23 @@ assistant is called EuropeDoor Guide. The customer sees EuropeDoor and then
 experiences intelligence; they never see AI EUROPE TRAVEL PLATFORM. Enforced,
 because every competitor has crossed that line and it is the easiest one to
 cross by accident.
+
+**Declare every dependency that crosses a boundary.** `data/contracts.json`
+names, for each script, which index it reads and which fields — with a reason
+per field. `checks.py` fails on a declared field that vanishes AND on a script
+fetching an index it has not declared. Coupling is fine; silent coupling is
+not. The live case is the search index's live counts, which the empty state
+prints — it used to say "244 cities" while the atlas held 319.
+
+**Five pages are applications; 1,067 are documents.** 453 pages load no
+JavaScript at all and 613 load one file only to draw a save button. A check
+fails if a sixth application appears, because the whole of
+`docs/frontend-architecture.md` is written on that ratio.
+
+**Eleven primitives cover the site**, four of them on 100% of pages. Changing
+`render.section()` changes 1,072 pages; changing a page changes one. A check
+puts a floor under each primitive's reach, so a page family cannot quietly
+grow its own component set.
 
 **Relationships are derived, never stored.** `/api/graph.json` carries 3,716
 edges across nine types, every one computed at build time from a relation that

@@ -1,3 +1,23 @@
+> **§3 IS CLOSED.**
+>
+>     §3 API ARCHITECTURE
+>     STATUS:       CLOSED
+>     ARCHITECTURE: STATIC / CLIENT-CONSUMED
+>     SERVER:       REFUSED FOR NOW
+>
+> Explicitly not built, each with a documented trigger in §3.9: authentication,
+> rate limiting, pagination, API versioning, server-side error contracts,
+> server-side business logic, a database API, microservices.
+>
+> **The architectural conclusion: EuropeDoor does not need a server.** Static
+> data is currently the simpler, faster, cheaper and more verifiable
+> architecture. The implementation takes precedence over the original
+> hypothetical API design.
+>
+> **`built` is not `live`.** A JSON document existing in this repository does
+> not make it a server API. Every endpoint carries `generated: "build"` and a
+> check requires it.
+
 # §3 — The API, as it actually is
 
 Written from the running system, not from a proposal. Everything below was

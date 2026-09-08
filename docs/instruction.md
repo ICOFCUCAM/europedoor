@@ -118,7 +118,26 @@ The same rule produced: no crowd proxy, no seeded businesses, no
 `aggregateRating` in structured data, no region boundary hulled out of the
 destinations inside it. **A gap stated is worth more than a gap filled.**
 
-### 6. Every claim gets a check, and the check gets shown to fail
+### 6. Declare every dependency that crosses a boundary
+
+> No consumer may depend on a field belonging to another index unless the
+> dependency is declared in `data/contracts.json` and checked.
+
+Coupling is not the problem; **silent** coupling is. Do not remove a
+dependency because coupling sounds bad — make it visible and testable, so the
+build forces the consumer and its contract to be updated together.
+
+The live case: the search index carries live counts, and the empty state
+prints them. That is correct — the alternative is a number typed into a
+JavaScript file, which is what it used to be, and it said "244 cities" while
+the atlas held 319. What was wrong was that nothing declared it: splitting the
+index would have broken a sentence in a UI with no test failing.
+
+The check runs both ways — a declared field that vanishes, and an undeclared
+fetch that appears — and a dependency must carry a *reason*, because one
+without a reason is one nobody can ever decide to remove.
+
+### 7. Every claim gets a check, and the check gets shown to fail
 
 "EuropeDoor does not pay for maps" is now 1,249 assertions in `checks.py`,
 including a hostname list that fails the build on any page or script naming a
@@ -131,7 +150,7 @@ anything. This repository has already shipped a browser suite that printed
 *"all 4 browser checks passed"* while 540 ran, because a `const` shadowed the
 counter. **Prove the check can go red in the same session you write it.**
 
-### 7. Report every bug the work surfaced, including yours
+### 8. Report every bug the work surfaced, including yours
 
 The map rebuild is on record as having found three: a projection that
 multiplied x by `cos(52°)/cos(52°)` and had therefore drawn Europe 60% too wide
@@ -144,7 +163,7 @@ the commit message.
 in the CSS about the 47px overflow is worth more than the two lines that fixed
 it.
 
-### 8. Zero recurring cost is the default
+### 9. Zero recurring cost is the default
 
 A bill is the owner's decision, never a convenience. Where a free path exists
 and costs operational work instead, take the operational work and write down

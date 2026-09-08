@@ -1464,6 +1464,93 @@ def c_api():
                 fail(f"/api/{name} publishes {invented}, which we do not hold")
             n += 1
 
+    # 6. DECLARED DEPENDENCIES. No consumer may depend on a field belonging to
+    # another index unless the dependency is declared in data/contracts.json
+    # and checked here.
+    #
+    # Coupling is not the problem; SILENT coupling is. The search.json ->
+    # counts -> empty-state relationship is legitimate and load-bearing — the
+    # empty state prints "319 destinations" and that number must be live, not
+    # typed. What was wrong with it was that nothing said so: splitting the
+    # index into search.json + counts.json would have broken a sentence in a
+    # UI and no test would have failed.
+    cpath = os.path.join(ROOT, "data", "contracts.json")
+    if not os.path.exists(cpath):
+        fail("data/contracts.json is missing — no data dependency is declared")
+    else:
+        with open(cpath, encoding="utf-8") as fh:
+            contracts = json.load(fh)
+
+        def _dig(doc, path):
+            cur = doc
+            for part in path.split("."):
+                if not isinstance(cur, dict) or part not in cur:
+                    return None
+                cur = cur[part]
+            return cur
+
+        declared_fetches = {}
+        for con in contracts["consumers"]:
+            js = os.path.join(ROOT, con["consumer"])
+            if not os.path.exists(js):
+                fail(f"contracts name {con['consumer']}, which does not exist")
+                continue
+            declared_fetches[con["consumer"]] = set(con["reads"])
+            for endpoint, fields in con["reads"].items():
+                # A wildcard endpoint (one file per country) is checked
+                # against a representative instance.
+                probe = endpoint.replace("*", "norway")
+                path = os.path.join(OUT, probe.lstrip("/"))
+                if not os.path.exists(path):
+                    fail(f"{con['consumer']} declares {endpoint}, which is not published")
+                    continue
+                with open(path, encoding="utf-8") as fh:
+                    doc = json.load(fh)
+                for field, why in fields.items():
+                    if _dig(doc, field) is None:
+                        fail(f"{con['consumer']} depends on {endpoint} -> {field}, "
+                             f"which is not there ({why[:60]})")
+                    if not why:
+                        fail(f"{con['consumer']} declares {endpoint} -> {field} "
+                             f"with no reason; a dependency without a reason is "
+                             f"one nobody can decide to remove")
+                    n += 1
+
+        # And the other direction: a consumer that fetches an index it has not
+        # declared. This is what makes the rule enforceable rather than
+        # aspirational — a new fetch() has to be written down.
+        for js_path in sorted(glob.glob(os.path.join(ROOT, "assets", "js", "*.js"))):
+            rel = os.path.relpath(js_path, ROOT)
+            body = open(js_path, encoding="utf-8").read()
+            fetched = set()
+            for m in re.finditer(r'["\'](/api/[A-Za-z0-9/_.-]*)', body):
+                url = m.group(1)
+                if url.endswith("/"):
+                    url += "*.json"
+                fetched.add(url)
+            if not fetched:
+                continue
+            declared = declared_fetches.get(rel, set())
+            for url in fetched:
+                if url in declared:
+                    continue
+                # /api/geo/country/ is written as a prefix and completed at
+                # runtime; match it against the wildcard form.
+                if any(dec.replace("*.json", "") == url.replace("*.json", "")
+                       for dec in declared):
+                    continue
+                fail(f"{rel} fetches {url} and does not declare it in "
+                     f"data/contracts.json — declare the dependency and say "
+                     f"which fields it reads")
+            n += 1
+
+        for ep in contracts["published_only"]["endpoints"]:
+            name = os.path.basename(ep)
+            users = [c["consumer"] for c in contracts["consumers"] if ep in c["reads"]]
+            if users:
+                fail(f"{ep} is listed as published-only but {users[0]} declares it")
+            n += 1
+
     # 5. The documentation page lists every endpoint that exists. An
     # undocumented endpoint is one nobody can rely on.
     api_html = os.path.join(OUT, "api", "index.html")
@@ -1473,6 +1560,95 @@ def c_api():
             if f"/api/{name}" not in page:
                 fail(f"/api/{name} is published and not documented on /api")
             n += 1
+    return n
+
+
+@check("the frontend is one shell, eleven primitives and five applications")
+def c_frontend():
+    """The §4 audit, asserted rather than trusted.
+
+    Every number in docs/frontend-architecture.md came from the build, which
+    means every one of them can quietly stop being true. These are the four
+    that would change the architecture if they moved:
+
+      1. ONE shell. A second function emitting <html> is how a masthead comes
+         to exist twice and diverge within a month.
+      2. FIVE applications. 1,067 of 1,072 pages are documents; the moment a
+         sixth page starts carrying application logic, the "documents plus a
+         handful of apps" framing is wrong and §4 needs revisiting.
+      3. ELEVEN primitives covering the site. If a page family stops using
+         them, it has grown its own component set and the design system has
+         forked without anybody deciding to.
+      4. The type scale and the breakpoints stay small. The sibling repository
+         measured 418 font sizes and 45 breakpoints; that is what happens
+         without a number to hold the line on.
+    """
+    n = 0
+    css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"), encoding="utf-8").read()
+
+    # 1. One shell, one masthead per page, one footer, no inline style.
+    shells = sum(open(os.path.join(ROOT, "tools", "lib", f), encoding="utf-8").read()
+                 .count("<!doctype html>") for f in ("render.py", "pages.py"))
+    if shells != 1:
+        fail(f"{shells} functions emit a page shell; there must be exactly one")
+    n += 1
+    for path in site_files():
+        body = open(path, encoding="utf-8").read()
+        mast = body.count('class="masthead"')
+        foot = body.count("<footer")
+        if mast != 1:
+            fail(f"{rel(path)} has {mast} mastheads; there must be exactly one")
+        if foot != 1:
+            fail(f"{rel(path)} has {foot} footers; there must be exactly one")
+        n += 2
+
+    # 2. Five applications, and no more without a decision.
+    APPS = {"planner.js", "search.js", "map.js", "discover.js", "events.js"}
+    carriers = set()
+    for path in site_files():
+        body = open(path, encoding="utf-8").read()
+        for m in re.finditer(r"/assets/js/([a-z-]+\.js)", body):
+            if m.group(1) != "my-europe.js":
+                carriers.add(m.group(1))
+    extra = carriers - APPS
+    if extra:
+        fail(f"a sixth application appeared: {sorted(extra)} — 1,067 of 1,072 pages "
+             f"are documents, and docs/frontend-architecture.md is written on that")
+    n += 1
+
+    # 3. The primitives still generate the site. Percentages are floors, not
+    # targets: a family that stops using `row` has grown its own components.
+    FLOORS = {"kicker": 0.99, "masthead": 0.99, "pagehead": 0.99, "crumbs": 0.99,
+              "row": 0.85, "card": 0.70, "band": 0.70, "note": 0.70}
+    total = 0
+    hits = {k: 0 for k in FLOORS}
+    for path in site_files():
+        body = open(path, encoding="utf-8").read()
+        total += 1
+        for prim in FLOORS:
+            if re.search(r'class="[^"]*\b' + prim + r'\b', body):
+                hits[prim] += 1
+    for prim, floor in FLOORS.items():
+        got = hits[prim] / total
+        if got < floor:
+            fail(f"the {prim!r} primitive is on {got:.0%} of pages and the audit "
+                 f"says {floor:.0%} — a page family has grown its own components")
+        n += 1
+
+    # 4. The scale stays small.
+    sizes = set(re.findall(r"font-size:\s*([^;]+);", css))
+    if len(sizes) > 20:
+        fail(f"{len(sizes)} distinct font-size values; the audit measured 13 and the "
+             f"sibling repository measured 418")
+    bps = set(re.findall(r"@media[^{]*\(m(?:in|ax)-width:\s*([^)]+)\)", css))
+    if len(bps) > 10:
+        fail(f"{len(bps)} breakpoints; the audit measured 6")
+    shadows = set(re.findall(r"box-shadow:\s*([^;]+);", css))
+    if len(shadows) > 6:
+        fail(f"{len(shadows)} distinct shadows; the audit measured 2")
+    if len(glob.glob(os.path.join(ROOT, "assets", "css", "*.css"))) != 1:
+        fail("there is more than one stylesheet")
+    n += 4
     return n
 
 
@@ -1491,7 +1667,8 @@ def c_docs():
     number copied out of a generated document is a number that will be wrong
     within a month, and the fix is to link rather than to copy.
     """
-    required = ["api-architecture", "schema-mapping", "instruction",
+    required = ["api-architecture", "frontend-architecture", "schema-mapping",
+                "instruction",
                 "architecture", "product", "development", "database", "roadmap",
                 "api", "ai", "deployment", "security", "content-model",
                 "brand", "brand-lock", "images", "data-model", "legal-position",
