@@ -562,7 +562,7 @@ def s21():
         "every country shape is a link before any JavaScript runs"
     yield 'id="zoomreset"' in h and 'id="zoomin"' in h, "zoom, operable by pointer and keyboard"
     yield "regionlist" in src("assets/js/map.js"), "region and destination rows in the country panel"
-    yield 'class="minimap countrymap"' in page("/europe/norway"), "the country map, one rung down"
+    yield 'class="minimap countrymap' in page("/europe/norway"), "the country map, one rung down"
 
 
 @section(22, "Search interface", "ALREADY",
@@ -812,7 +812,15 @@ def sb4a():
     # A map is INTELLIGENCE wherever it is embedded — a window into the
     # machine cut into an editorial page, which is the door as a design
     # language rather than as a glyph.
-    yield 'countrymap" data-world="intelligence"' in page("/europe/italy"), \
+    # The world moved from the <figure> to the <svg> when the map became an
+    # aperture cut into the page: it describes the MAP, and carrying it on
+    # the figure also resolved --paper to graphite, which put a dark arch on
+    # a dark panel and turned the caption light-on-light. The promise is
+    # unchanged and still asserted — an embedded map reads as INTELLIGENCE
+    # wherever it sits — but it is asserted on the element it describes.
+    _h = page("/europe/italy")
+    _i = _h.index('class="minimap countrymap')
+    yield 'data-world="intelligence"' in _h[_i:_i + 260], \
         "and an embedded map carries the world on the element"
     # Three accents inside DISCOVER, one inside INTELLIGENCE.
     yield "body.area-stories, body.area-events, body.area-experiences" in CSS, \

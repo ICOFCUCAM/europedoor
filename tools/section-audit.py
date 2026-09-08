@@ -569,7 +569,7 @@ def s23():
         "the finer levels of detail, published on our own origin"
     yield "Natural Earth" in h, "the source is named on the page"
     yield ".countrymap" in src("assets/css/europedoor.css") and \
-        'class="minimap countrymap"' in page("/europe/norway"), "the country map"
+        'class="minimap countrymap' in page("/europe/norway"), "the country map"
     yield bool(src("docs/data-licenses/sources.json")) and \
         bool(src("docs/data-licenses/natural-earth.md")), "the licence register"
     yield bool(src("docs/boundary-policy.md")), "a written policy for disputed boundaries"

@@ -1638,7 +1638,7 @@ def countrymap(data, c):
                 f'mainland to draw at this scale without emptying the map.')
     return (
         f'<figure class="minimap countrymap arched">'
-        f'<svg viewBox="0 0 {w} {h}" role="img" '
+        f'<svg viewBox="0 0 {w} {h}" role="img" data-world="intelligence" '
         f'aria-label="Map of {esc(c["name"])} showing its regions and the destinations in the '
         f'Atlas"><defs>{arch_clip("cm" + c["slug"][:14].replace(chr(45), ""), w, h)}</defs>'
         f'<g clip-path="url(#arch-{"cm" + c["slug"][:14].replace(chr(45), "")})">'
@@ -1750,7 +1750,7 @@ def minimap(data, t, span=3.2):
             )
     return (
         f'<figure class="minimap arched">'
-        f'<svg viewBox="0 0 {w} {h}" role="img" '
+        f'<svg viewBox="0 0 {w} {h}" role="img" data-world="intelligence" '
         f'aria-label="Map of {esc(t["name"])} and the places around it">'
         f'<defs>{arch_clip(uid, w, h)}</defs>'
         f'<g clip-path="url(#arch-{uid})">'
@@ -1806,7 +1806,7 @@ def routemap(data, j):
     ctx, land = geo.landmass(MAPPROJ, (x0, y0, w, h))
     return (
         f'<figure class="minimap routemap arched">'
-        f'<svg viewBox="{x0:.1f} {y0:.1f} {w:.1f} {h:.1f}" role="img" '
+        f'<svg viewBox="{x0:.1f} {y0:.1f} {w:.1f} {h:.1f}" role="img" data-world="intelligence" '
         f'aria-label="Route map for {esc(j["name"])}">'
         f'<defs>{arch_clip("rt" + j["slug"][:12].replace(chr(45), ""), w, h, x0=x0, y0=y0)}</defs>'
         f'<g clip-path="url(#arch-{"rt" + j["slug"][:12].replace(chr(45), "")})">'
