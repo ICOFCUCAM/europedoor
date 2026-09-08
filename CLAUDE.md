@@ -32,6 +32,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **the frontend — routes, the shell, primitives, what §4 must not do** | **`docs/frontend-architecture.md`** — §4, measured. 1,067 documents and five applications; eleven primitives cover 100% of the site |
 | **the API — endpoints, contracts, empty states, what not to build** | **`docs/api-architecture.md`** — §3, written from the running system. Five static documents, no server, and the trigger that would change each of the nine things deliberately unbuilt |
 | **"is field X in the model?" — the Build Package schema** | **`docs/schema-mapping.md`** — every entity and field of Build Package v1 §2 against the running data: HAVE, BUILT, or REFUSED with the promise behind each refusal |
+| **changing anything visual — the protocol and the control** | **`docs/design-migration.md`** — §6. The pipeline, the invariant register as its control, and the three measured defects in the generated plates that are the next experiment's subject |
 | **the visual system — tokens, type, the two worlds, what is left** | **`docs/visual-architecture.md`** — §5, measured. The European Future migration as it actually landed, plus the fifteen deliberate attacks that went red |
 | **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence |
 
@@ -290,6 +291,23 @@ counts it. **A population may never feed a score** — it is the most tempting
 proxy for crowding there is, discoverability is published as explicitly not a
 crowd measurement, and a check greps `score.py` to keep it that way.
 
+**A visual change is a controlled experiment, and `docs/invariants.json` is the
+control.** Twenty-one things that must not move while something else does —
+one shell, one stylesheet, zero webfonts, zero inline styles, zero `<img>`
+tags, zero golds, five applications, the route-set hash, and a floor under
+each primitive's reach. `exact`, `ceiling` and `floor`; every row carries a
+reason, and a row without one fails. Moving one is allowed; moving one
+*silently* is not — `tools/invariants.py --write` in the same commit is the
+deliberate act. **`routes.hash` is the important one**: a restyle must not move
+a URL, and every inbound link and social card depends on that.
+
+**Look to find, count to conclude.** A contact sheet of forty plates suggested
+skylines were about 38% of them; measured across every destination they are
+28%. The sample was biased and the eye was wrong. The same sheet *did* find
+three real defects no amount of code-reading would have — including a moon
+drawn behind a skyline and clipped into an unreadable glyph. Rendering finds
+defects; counting settles proportions.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
@@ -305,6 +323,7 @@ the rest.
     python3 tools/section-audit.py --check    the spec sections
     python3 tools/ux-audit.py --check         the UI/UX, brand and 2036 sections
     python3 tools/content-report.py --write   what is missing, against the spec's targets
+    python3 tools/invariants.py --check       what a visual change may not move
 
 The browser checks need `npm install playwright` and take a couple of
 minutes. They earn their place repeatedly: a 47-pixel mobile overflow on

@@ -1679,6 +1679,51 @@ def c_frontend():
     return n
 
 
+@check("the invariants hold — what a visual change may not move")
+def c_invariants():
+    """docs/invariants.json, recomputed.
+
+    A visual migration is a controlled experiment and this is the control:
+    21 things that were true before the change and must still be true after
+    it. Recorded with a `why` each, because an invariant nobody can explain
+    is one nobody can decide to change.
+
+    Moving one is allowed. Moving one *silently* is not — the register is
+    updated in the same commit, and the diff is the record.
+    """
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    import importlib
+    inv = importlib.import_module("invariants")
+    got = inv.measure()["invariants"]
+    path = os.path.join(ROOT, "docs", "invariants.json")
+    if not os.path.exists(path):
+        fail("docs/invariants.json is missing — run tools/invariants.py --write")
+        return 0
+    with open(path, encoding="utf-8") as fh:
+        want = json.load(fh)["invariants"]
+    n = 0
+    for name, spec in sorted(want.items()):
+        now = got.get(name, {}).get("value")
+        exp, kind = spec["value"], spec["kind"]
+        if not spec.get("why"):
+            fail(f"invariant {name} carries no reason")
+        if kind == "floor" and isinstance(exp, dict):
+            for k, v in exp.items():
+                if now.get(k, 0) < v:
+                    fail(f"invariant {name}.{k} fell to {now.get(k)} from {v} — "
+                         f"{spec['why']}")
+                n += 1
+        elif kind == "ceiling":
+            if now > exp:
+                fail(f"invariant {name} rose to {now} above {exp} — {spec['why']}")
+            n += 1
+        else:
+            if now != exp:
+                fail(f"invariant {name} is {now!r}, recorded {exp!r} — {spec['why']}")
+            n += 1
+    return n
+
+
 @check("the documentation set exists and is not describing a different repository")
 def c_docs():
     """Ten documents the development brief names, plus the ones this project
@@ -1695,7 +1740,7 @@ def c_docs():
     within a month, and the fix is to link rather than to copy.
     """
     required = ["api-architecture", "frontend-architecture", "visual-architecture",
-                "schema-mapping", "instruction",
+                "design-migration", "schema-mapping", "instruction",
                 "architecture", "product", "development", "database", "roadmap",
                 "api", "ai", "deployment", "security", "content-model",
                 "brand", "brand-lock", "images", "data-model", "legal-position",
