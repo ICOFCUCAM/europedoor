@@ -2100,6 +2100,10 @@ FOOD_KINDS = ("market",)
 FOOD_EXP_KINDS = ("table", "cellar")
 HISTORY_EXP_KINDS = ("museum", "sacred")
 
+# Three. Below it, the page is a heading with a list under it that a reader
+# could have seen in full on the destination page they came from.
+FACET_MIN = 3
+
 
 def facets_for(data, c, r, t):
     """Which facet pages this destination has earned, and their contents."""
@@ -2109,22 +2113,42 @@ def facets_for(data, c, r, t):
     b = data["back"][cid]
     out = {}
 
-    todo = places + exps
-    if len(todo) >= 4:
-        out["things-to-do"] = {"places": places, "exps": exps}
-
+    # ONE THRESHOLD, AND IT IS THE ONE THE PAGES THEMSELVES CLAIM.
+    #
+    # Every facet page ends with a note reading "a facet with two entries is
+    # a thin page wearing a heading". It was printed on 76 pages that had two
+    # entries or one. Measured across all 137:
+    #
+    #     food          42 pages, median 1 entry, ALL 42 under three
+    #     journeys      61 pages, median 2,       34 under three
+    #     things-to-do  26 pages, median 5,        0
+    #     history        8 pages, median 3,        0
+    #
+    # The thresholds were 1, 2, 4 and 3 — four numbers, no policy, and two of
+    # them below the line the pages print. "Food & markets in Siena" with one
+    # row is the thin page the specification warns about in the same document
+    # that asks for the SEO channel, and it is worse than absent because a
+    # reader who follows a heading and finds one row learns that headings
+    # here mean nothing.
+    #
+    # FACET_MIN is three for all four. 137 pages become 61, the note becomes
+    # true, and nothing is orphaned: every row on every removed page is still
+    # on the destination page it came from.
     food_exps = [e for e in exps if e["kind"] in FOOD_EXP_KINDS]
     food_places = [pl for pl in places if pl["kind"] in FOOD_KINDS]
-    if len(food_exps) + len(food_places) >= 1:
-        out["food"] = {"places": food_places, "exps": food_exps}
-
     hist_places = [pl for pl in places if pl["kind"] in HISTORY_KINDS]
     hist_exps = [e for e in exps if e["kind"] in HISTORY_EXP_KINDS]
-    if len(hist_places) + len(hist_exps) >= 3:
-        out["history"] = {"places": hist_places, "exps": hist_exps}
-
-    if len(b["journeys"]) + len(b["themes"]) + len(b["stories"]) >= 2:
-        out["journeys"] = b
+    candidates = {
+        "things-to-do": (len(places) + len(exps), {"places": places, "exps": exps}),
+        "food": (len(food_exps) + len(food_places),
+                 {"places": food_places, "exps": food_exps}),
+        "history": (len(hist_places) + len(hist_exps),
+                    {"places": hist_places, "exps": hist_exps}),
+        "journeys": (len(b["journeys"]) + len(b["themes"]) + len(b["stories"]), b),
+    }
+    for key, (n, payload) in candidates.items():
+        if n >= FACET_MIN:
+            out[key] = payload
     return out
 
 
@@ -2178,9 +2202,10 @@ def facet_page(data, c, r, t, key, payload):
 <div class="rows">{rowhtml}</div>
 {extra}
 <div class="note mt7">
-  <p>This page exists because {t['name']} has enough in the Atlas to fill it. Destinations
-  that do not have a page for this, on purpose — a facet with two entries is a thin page
-  wearing a heading. <a href="{urls.city(c, r, t)}">Back to {esc(t['name'])}</a>.</p>
+  <p>This page exists because {t['name']} has at least {FACET_MIN} of them in the Atlas.
+  Destinations with fewer do not have a page for this, on purpose — a facet with one or two
+  entries is a heading with a list under it that you could have read in full on the page you
+  came from. <a href="{urls.city(c, r, t)}">Back to {esc(t['name'])}</a>.</p>
 </div>
 """
     return f"{urls.facet(c, r, t, key)}/index.html", page(

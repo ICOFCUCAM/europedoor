@@ -65,6 +65,10 @@ Alpabzug — cattle descending in flowers — Switzerland, Alpine cattle descent
 
 Arctic to Mediterranean — day 1, tromso, Arctic to Mediterranean — day 11, copenhagen, Arctic to Mediterranean — day 13, hamburg, Arctic to Mediterranean — day 15, berlin, Arctic to Mediterranean — day 18, vienna, Arctic to Mediterranean — day 21, ortisei, Arctic to Mediterranean — day 24, venice, Arctic to Mediterranean — day 26, rome, Arctic to Mediterranean — day 29, naples, Arctic to Mediterranean — day 31, athens, Arctic to Mediterranean — day 4, lofoten, Arctic to Mediterranean — day 7, abisko, Arctic to Mediterranean — day 9, stockholm, Arctic to the Baltic — day 1, tromso, Arctic to the Baltic — day 10, stockholm, Arctic to the Baltic — day 13, helsinki, Arctic to the Baltic — day 15, tallinn, Arctic to the Baltic — day 17, riga, Arctic to the Baltic — day 4, lofoten, Arctic to the Baltic — day 8, abisko, Atlantic to the Mediterranean — day 1, porto, Atlantic to the Mediterranean — day 12, granada, Atlantic to the Mediterranean — day 15, barcelona, Atlantic to the Mediterranean — day 18, nice, and 97 more.
 
+### Facet types that generate no page at all (threshold 3) — 1
+
+Food & drink.
+
 ## Interface translation
 
 | language | coverage | ships |

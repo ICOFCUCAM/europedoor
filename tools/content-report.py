@@ -24,6 +24,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from lib import data as D
 from lib import i18n
+from lib import urls
 
 TIER_A = ["norway", "france", "italy", "spain", "greece"]
 
@@ -91,6 +92,21 @@ def gaps(d):
     out["journey stops naming no place (§2.7)"] = sorted(
         f"{j['name']} — day {leg['day_number']}, {leg['city'].split('/')[-1]}"
         for j in d["journeys"] for leg in j["legs"] if not leg.get("places")
+    )
+    # A facet type that generates no page anywhere. `food` is one: after the
+    # threshold became three for all four, not one destination in 319 has
+    # three markets, tables or cellars recorded. The rule is sound and the
+    # data is thin, which is an editorial gap and not an engineering one —
+    # so it is counted here rather than fixed by lowering the bar until a
+    # page appears.
+    from lib import pages as P
+    seen = set()
+    for c in d["countries"].values():
+        for r in c["regions"]:
+            for t in r["cities"]:
+                seen |= set(P.facets_for(d, c, r, t))
+    out[f"facet types that generate no page at all (threshold {P.FACET_MIN})"] = sorted(
+        name for key, name in urls.FACETS.items() if key not in seen
     )
     return out
 
