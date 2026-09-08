@@ -293,11 +293,28 @@ decision.
 
 ### Phase C — The journey engine grows up
 
-7. **"What if?"** (§13) — the signature feature, and it is *reachable now*:
-   the planner already re-costs and re-routes on every edit. "What if I stay
-   two more days / remove Paris / go entirely by rail / avoid crowds" is a
-   set of transforms over an existing route plus the refusal path that
-   already exists.
+7. ~~**"What if?"**~~ **BUILT.** Five transforms over the itinerary you
+   already have: two days longer, spend less, entirely by train, avoid the
+   crowded places, more history and sacred places.
+
+   What separates it from a row of preset buttons is that **it shows the
+   consequence before applying it** — what you lose, what you gain, how the
+   days move, what it costs against what you were paying. A button that
+   silently rebuilds the itinerary is a slot machine: after three presses
+   the reader has lost the plan they liked and cannot tell what any press
+   cost them. "Keep what I have" is a real option.
+
+   A sixth question is named and **refused**: *what if it rains?* We hold no
+   weather data and no forecast for anywhere, and a rainy-day plan built
+   from nothing would be a guess with a confident face on it.
+
+   Two bugs worth recording. The crowd-avoiding swap first offered Siena →
+   **Corte** — 200 km away and across the Ligurian Sea, because
+   straight-line distance does not know about water; swaps stay in the same
+   country now. And the threshold for "meaningfully less obvious" was set at
+   +25 discoverability, which rejected Arezzo, Urbino and Civita di
+   Bagnoregio at exactly +24 — the right answers for Tuscany — and reported
+   that nothing would change.
 8. **Travel DNA** (§11), computed from saves in the browser, editable and
    resettable, never presented as psychological truth.
 

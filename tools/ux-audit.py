@@ -299,6 +299,31 @@ def s2036_43():
         "with a browser check that it does not"
 
 
+@section("2036-13", "What if?", "BUILT",
+         "Five transforms over an itinerary that already exists, and each "
+         "one shows the consequence BEFORE applying it. A sixth question is "
+         "named and refused: we hold no weather data, so there is no rainy "
+         "day plan.")
+def s2036_13():
+    js = PLANNER
+    yield "WHAT_IFS" in js, "the transforms exist"
+    for t in ("longer", "cheaper", "rail", "quieter", "history"):
+        yield f'id: "{t}"' in js, f"what-if: {t}"
+    # The distinction that makes it a feature rather than a row of presets.
+    yield "whatif-apply" in js and "whatif-keep" in js, \
+        "a preview is offered before anything is applied"
+    yield "function diffRoutes" in js, "and the preview is a diff, not a rebuild"
+    yield "Keep what I have" in js, "and declining is a real option"
+    # We hold no weather data. A rainy-day plan built from nothing would be
+    # a guess with a confident face on it.
+    yield "no weather data" in js, "and the one it cannot answer is named"
+    # Straight-line distance does not know about water: the first version
+    # swapped Siena for Corte, 200 km away across the Ligurian Sea.
+    yield "c.countrySlug !== r[i].city.countrySlug" in js, \
+        "and a swap cannot cross a sea it cannot see"
+    yield "What if?" in BROWSER, "with browser checks that preview does not apply"
+
+
 @section(7, "Featured journeys", "ALREADY",
          "Cards carrying days, countries and the route, as the brief draws "
          "them — now placed after the planner, because a journey nobody has "

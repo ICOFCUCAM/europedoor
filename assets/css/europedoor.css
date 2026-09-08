@@ -862,3 +862,18 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
                    padding: var(--s8) calc(50vw - 50%); }
 .band.tone-quiet .band-head h2 { max-width: 20ch; }
 .band.tone-quiet .lede { max-width: 46rem; }
+
+/* ── What if? ─────────────────────────────────────────────────
+ * The panel sits after the itinerary, not before it: it is a question about
+ * a plan you already have, and putting it above would make it a filter.
+ * The preview is a note rather than a modal, because nothing here needs to
+ * be dismissed before the reader can look at their route again — the whole
+ * point is comparing the two.
+ */
+.whatif { margin: var(--s7) 0 0; padding: var(--s5); border: 1px solid var(--rule);
+          border-radius: var(--radius); background: var(--paper-2); }
+.whatif h2.mini { margin-top: 0; }
+.whatif .chips { margin: var(--s4) 0; }
+.whatif-preview { background: var(--paper); border-left: 4px solid var(--atlantic); }
+.whatif-preview .stack { margin: var(--s3) 0; }
+.whatif-preview .stack li { margin-bottom: var(--s2); }

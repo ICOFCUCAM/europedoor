@@ -8,7 +8,7 @@ its requirements are about how something looks and nobody can check a feeling.
 So every row here asserts against the generated HTML, the CSS and the JavaScript
 as they actually are.
 
-**48 sections · 18 built · 15 already · 12 partial · 1 refused · 1 locked · 1 deferred · 302 assertions · 0 failing**
+**49 sections · 19 built · 15 already · 12 partial · 1 refused · 1 locked · 1 deferred · 314 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -23,6 +23,7 @@ as they actually are.
 | 2036-6 | Europe in Motion | BUILT | 42 | Twelve ways to cut the continent, each a query evaluated against every destination on every build — and each page prints the query that made it. A motion cannot become a hand-picked list, because the validator refuses a field that names destinations. |
 | 2036-50 | The homepage as a progression | BUILT | 6 | Open, discover, wonder, understand, plan, go — named on the page, because a progression nobody can see is just an ordering. One band changes ground so the rhythm is felt rather than intended. |
 | 2036-43 | Why this stop, and not the runner-up | BUILT | 7 | Every itinerary leg says what distinguishes it. The shared reason — the interests the reader chose — is stated once above the route, which is the same rule Discover Mode is built on. |
+| 2036-13 | What if? | BUILT | 12 | Five transforms over an itinerary that already exists, and each one shows the consequence BEFORE applying it. A sixth question is named and refused: we hold no weather data, so there is no rainy day plan. |
 | 7 | Featured journeys | ALREADY | 2 | Cards carrying days, countries and the route, as the brief draws them — now placed after the planner, because a journey nobody has planned is not somewhere they are going. |
 | 8 | Hidden Europe | ALREADY | 2 | A quiet tag, its own band, and a rule that nowhere is ever called undiscovered. |
 | 9 | Homepage AI planner | ALREADY | 2 | The sentence box, in the hero, saying under the field what reads it — which is rules in the browser, not a model. |

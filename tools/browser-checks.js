@@ -259,6 +259,75 @@ async function main() {
   ok(!legWhy.some((t) => / and .* and at its /.test(t)),
      "a why-line has two conjunctions colliding");
 
+  // ── What if? ───────────────────────────────────────────────────────
+  // What separates this from a row of preset buttons is that it shows the
+  // consequence BEFORE applying it. A button that silently rebuilds the
+  // itinerary is a slot machine: after three presses the reader has lost
+  // the plan they liked and cannot tell what any press cost them.
+  await page.goto(base + "/plan", { waitUntil: "networkidle" });
+  await page.fill("#days", "12");
+  await page.fill("#budget", "2500");
+  for (const i of ["history", "food"]) {
+    await page.check(`input[name="interest"][value="${i}"]`);
+  }
+  await page.click('#planner button[type="submit"]');
+  await page.waitForSelector("#result .leg");
+  const routeBefore = (await page.locator("#result .leg h3 a").allTextContents()).join(">");
+
+  ok(await page.locator("#whatif [data-whatif]").count() >= 5,
+     "fewer than five what-ifs offered");
+  // The one it refuses, and says why. We hold no weather data.
+  ok(/What if it rains/.test(await page.locator("#whatif").innerText()),
+     "the panel does not name the question it cannot answer");
+  ok(/no weather data/.test(await page.locator("#whatif").innerText()),
+     "and does not say why it cannot answer it");
+
+  // Preview first: the route must not move until Apply is pressed.
+  await page.click('[data-whatif="cheaper"]');
+  await page.waitForSelector("#whatif-out .whatif-preview");
+  const preview = await page.locator("#whatif-out").innerText();
+  ok(/instead of/.test(preview), "the preview does not compare against the current plan");
+  ok(/€/.test(preview), "the preview does not price the change");
+  ok((await page.locator("#result .leg h3 a").allTextContents()).join(">") === routeBefore,
+     "previewing a what-if changed the itinerary before it was applied");
+  ok(await page.locator("#whatif-keep").count() === 1,
+     "there is no way to decline a what-if");
+
+  // Keeping leaves it alone.
+  await page.click("#whatif-keep");
+  await page.waitForTimeout(120);
+  ok((await page.locator("#result .leg h3 a").allTextContents()).join(">") === routeBefore,
+     "declining a what-if still changed the plan");
+
+  // Applying does change it, says so, and is not a dead end.
+  await page.click('[data-whatif="quieter"]');
+  await page.waitForSelector("#whatif-out .whatif-preview");
+  const quietPreview = await page.locator("#whatif-out").innerText();
+  ok(/You lose|Nothing would change/.test(quietPreview),
+     "the crowd-avoiding what-if says nothing about what it swaps");
+  if (/You lose/.test(quietPreview)) {
+    await page.click("#whatif-apply");
+    await page.waitForTimeout(400);
+    const routeAfter = (await page.locator("#result .leg h3 a").allTextContents()).join(">");
+    ok(routeAfter !== routeBefore, "applying a what-if did not change the itinerary");
+    ok(/Applied:/.test(await page.locator("#result .note").first().innerText()),
+       "an applied what-if does not say it was applied");
+    ok(await page.locator("#replan").count() === 1,
+       "an applied what-if leaves no way back to the form");
+  }
+
+  // The two that replan must warn that they do — the order can move more
+  // than a reader expects.
+  await page.goto(base + "/plan", { waitUntil: "networkidle" });
+  await page.fill("#days", "12");
+  await page.click('#planner button[type="submit"]');
+  await page.waitForSelector("#result .leg");
+  await page.click('[data-whatif="rail"]');
+  await page.waitForSelector("#whatif-out");
+  const railText = await page.locator("#whatif-out").innerText();
+  ok(/replans|Nothing would change/.test(railText),
+     "the rail what-if does not warn that it replans");
+
   // ── editing an itinerary ───────────────────────────────────────────
   // The difference between a suggestion and a plan. Every control is a real
   // button with a real label, so this is also the accessibility check for

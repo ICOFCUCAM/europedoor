@@ -700,6 +700,254 @@
     box.focus();
   }
 
+  /* ── What if? ──────────────────────────────────────────────────────
+   *
+   * The signature feature, and the thing that separates it from a row of
+   * preset buttons is that it SHOWS THE CONSEQUENCE BEFORE APPLYING IT.
+   *
+   * A button that silently rebuilds the itinerary is a slot machine: the
+   * reader cannot tell what the change cost them, and after three presses
+   * they have lost the plan they liked. So every what-if produces a
+   * comparison — what moves, what it costs, and what you give up — and only
+   * then offers to apply it. "Keep what I have" is a real option and the
+   * default.
+   *
+   * Every transform is deterministic and operates on the route the reader
+   * already has, except the two that genuinely cannot: rail-only and
+   * "more history", where the constraint changes which places belong in the
+   * route at all. Those replan, and say so.
+   */
+  function cloneRoute(route) {
+    return route.map(function (st) {
+      return { city: st.city, nights: st.nights };
+    });
+  }
+
+  var WHAT_IFS = [
+    {
+      id: "longer",
+      label: "I stay two days longer",
+      note: "Nights go to the stops with the most to do, not spread evenly.",
+      run: function (route, opts) {
+        var r = cloneRoute(route);
+        var order = r.map(function (st, i) { return i; }).sort(function (a, b) {
+          return (r[b].city.todo || []).length - (r[a].city.todo || []).length;
+        });
+        r[order[0]].nights += 1;
+        r[order[Math.min(1, order.length - 1)]].nights += 1;
+        return { route: r, opts: opts };
+      },
+    },
+    {
+      id: "cheaper",
+      label: "I want to spend less",
+      note: "Guesthouses instead of hotels, and a band down on daily spending. " +
+            "The route does not change; what you pay for it does.",
+      run: function (route, opts) {
+        var o = {};
+        for (var k in opts) o[k] = opts[k];
+        o.accommodation = "guesthouse";
+        o.style = opts.style === "high" ? "moderate" : "low";
+        return { route: cloneRoute(route), opts: o };
+      },
+    },
+    {
+      id: "rail",
+      label: "I travel entirely by train",
+      note: "Replans: a 1,200 km hop is a lost day rather than a cheap flight, " +
+            "so some stops stop making sense.",
+      replan: true,
+      run: function (route, opts) {
+        var o = {};
+        for (var k in opts) o[k] = opts[k];
+        o.transport = "rail";
+        o.start = route[0].city.id;
+        return { route: plan(o), opts: o };
+      },
+    },
+    {
+      id: "quieter",
+      label: "I avoid the crowded places",
+      note: "Swaps the most obvious stops for the nearest less obvious one in the " +
+            "same country. Uses the published discoverability score, not a guess " +
+            "about crowds.",
+      run: function (route, opts) {
+        var r = cloneRoute(route);
+        var used = {};
+        r.forEach(function (st) { used[st.city.id] = true; });
+        // Swap the two least discoverable stops, never the first — a start
+        // the reader chose is not ours to move.
+        var order = r.map(function (st, i) { return i; })
+                     .filter(function (i) { return i > 0; })
+                     .sort(function (a, b) { return r[a].city.disc - r[b].city.disc; });
+        var swaps = 0;
+        for (var q = 0; q < order.length && swaps < 2; q++) {
+          var i = order[q];
+          if (r[i].city.disc >= 70) continue;      // already not obvious
+          var best = null, bestD = 1e9;
+          for (var j = 0; j < ATLAS.cities.length; j++) {
+            var c = ATLAS.cities[j];
+            /* +20, not +25. The first threshold was one point too strict:
+             * for a Tuscan route it rejected Arezzo, Urbino and Civita di
+             * Bagnoregio, all at exactly +24 over Siena — which are the
+             * right answers to "avoid the crowded places" in Tuscany, and
+             * the feature silently reported that nothing would change. */
+            if (used[c.id] || c.disc < r[i].city.disc + 20) continue;
+            /* Same country, not merely nearby. Straight-line distance does
+             * not know about water: the first version swapped Siena for
+             * Corte, which is 200 km away and in Corsica — a ferry, not a
+             * detour. The site already refuses to treat a sea crossing as a
+             * short hop everywhere else; this is the same rule. */
+            if (c.countrySlug !== r[i].city.countrySlug) continue;
+            var d = km(r[i].city, c);
+            if (d > 260) continue;                 // still on the same route
+            if (d < bestD) { bestD = d; best = c; }
+          }
+          if (best) {
+            used[best.id] = true;
+            delete used[r[i].city.id];
+            r[i] = { city: best, nights: r[i].nights };
+            swaps++;
+          }
+        }
+        return { route: r, opts: opts };
+      },
+    },
+    {
+      id: "history",
+      label: "I want more history and sacred places",
+      note: "Replans with those added to what you asked for.",
+      replan: true,
+      run: function (route, opts) {
+        var o = {};
+        for (var k in opts) o[k] = opts[k];
+        o.wants = opts.wants.slice();
+        ["history", "sacred"].forEach(function (w) {
+          if (o.wants.indexOf(w) < 0) o.wants.push(w);
+        });
+        o.start = route[0].city.id;
+        return { route: plan(o), opts: o };
+      },
+    },
+  ];
+
+  function routeIds(route) {
+    return route.map(function (st) { return st.city.id + ":" + st.nights; }).join("|");
+  }
+
+  function diffRoutes(before, after) {
+    var wasNames = before.map(function (s) { return s.city.name; });
+    var isNames = after.map(function (s) { return s.city.name; });
+    return {
+      gone: wasNames.filter(function (n) { return isNames.indexOf(n) < 0; }),
+      added: isNames.filter(function (n) { return wasNames.indexOf(n) < 0; }),
+      wasNights: before.reduce(function (a, s) { return a + s.nights; }, 0),
+      isNights: after.reduce(function (a, s) { return a + s.nights; }, 0),
+    };
+  }
+
+  function renderWhatIf(scope, route, opts) {
+    var panel = scope.querySelector("#whatif");
+    if (!panel) return;
+    panel.innerHTML =
+      '<h2 class="mini">What if…</h2>' +
+      '<p class="small">Each of these shows you what it would cost before it changes ' +
+      "anything. Nothing is applied until you say so.</p>" +
+      '<div class="chips">' + WHAT_IFS.map(function (w) {
+        return '<button type="button" class="chip pick" data-whatif="' + w.id + '">' +
+          w.label + "</button>";
+      }).join("") + "</div>" +
+      '<div id="whatif-out"></div>' +
+      '<p class="small mt5"><strong>What if it rains?</strong> We cannot answer that one. ' +
+      'EuropeDoor holds no weather data and no forecast for anywhere — a "rainy day plan" ' +
+      "built from nothing would be a guess with a confident face on it. What each stop has " +
+      "indoors is on its own page.</p>";
+
+    panel.querySelectorAll("[data-whatif]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var w = WHAT_IFS.filter(function (x) { return x.id === b.getAttribute("data-whatif"); })[0];
+        var out = panel.querySelector("#whatif-out");
+        /* NOT `result`. That is the module-level element every render
+         * writes into, and shadowing it here meant applying a what-if
+         * called insertAdjacentHTML on a plain object. Second time a local
+         * has shadowed an outer name in this file; both times the symptom
+         * was a method missing on something that looked right. */
+        var outcome;
+        try { outcome = w.run(route, opts); } catch (e) { outcome = null; }
+        if (!outcome || !outcome.route || !outcome.route.length) {
+          out.innerHTML = '<div class="note warn"><p>That change leaves nothing the ' +
+            "planner would stand behind. The constraints are already tight.</p></div>";
+          return;
+        }
+        var newOpts = outcome.opts;
+        var newRoute = outcome.route;
+        var nights = newRoute.reduce(function (a, s) { return a + s.nights; }, 0);
+        newOpts = (function (o) {
+          var c = {}; for (var k in o) c[k] = o[k];
+          c.days = nights + 1;
+          return c;
+        })(newOpts);
+
+        if (routeIds(newRoute) === routeIds(route) && newOpts.style === opts.style &&
+            newOpts.accommodation === opts.accommodation) {
+          out.innerHTML = '<div class="note"><p><strong>Nothing would change.</strong> ' +
+            "This itinerary already satisfies that — which is worth knowing, and is why " +
+            "the button says what it would do rather than just doing it.</p></div>";
+          return;
+        }
+
+        var d = diffRoutes(route, newRoute);
+        var was = costing(route, opts), now = costing(newRoute, newOpts);
+        var delta = now.total - was.total;
+        var lines = [];
+        if (d.isNights !== d.wasNights) {
+          lines.push("<li><strong>" + (d.isNights > d.wasNights ? "+" : "") +
+            (d.isNights - d.wasNights) + " nights</strong> — " + (newOpts.days) +
+            " days instead of " + opts.days + ".</li>");
+        }
+        if (d.gone.length) {
+          lines.push("<li><strong>You lose</strong> " + d.gone.join(", ") + ".</li>");
+        }
+        if (d.added.length) {
+          lines.push("<li><strong>You gain</strong> " + d.added.join(", ") + ".</li>");
+        }
+        lines.push("<li><strong>" + (delta >= 0 ? "+" : "−") + money(Math.abs(delta)) +
+          "</strong> — " + money(now.total) + " instead of " + money(was.total) + ".</li>");
+        if (w.replan) {
+          lines.push("<li class=\"small\">This one replans rather than editing what you " +
+            "have, so the order may change more than you expect.</li>");
+        }
+
+        out.innerHTML =
+          '<div class="note whatif-preview"><h3 class="mini">What if — ' +
+          w.label + "?</h3>" +
+          "<p class=\"small\">" + w.note + "</p>" +
+          "<ul class=\"stack\">" + lines.join("") + "</ul>" +
+          '<div class="hero-actions mt0">' +
+          '<button class="btn" type="button" id="whatif-apply">Apply this</button>' +
+          '<button class="btn ghost" type="button" id="whatif-keep">Keep what I have</button>' +
+          "</div></div>";
+
+        out.querySelector("#whatif-keep").addEventListener("click", function () {
+          out.innerHTML = "";
+        });
+        out.querySelector("#whatif-apply").addEventListener("click", function () {
+          EDITED = { route: newRoute, opts: newOpts };
+          form.days.value = newOpts.days;
+          if (form.style) form.style.value = newOpts.style;
+          drawPlan(newRoute, newOpts, result);
+          result.insertAdjacentHTML("afterbegin",
+            '<div class="note"><p><strong>Applied: “' + w.label + '”.</strong> ' +
+            "Everything below is recomputed from your version. " +
+            '<button type="button" class="linkish" id="replan">Start again from the form</button></p></div>');
+          var again = document.getElementById("replan");
+          if (again) again.addEventListener("click", function () { EDITED = null; go(); });
+          result.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+    });
+  }
+
   function wireEditing(scope, route, opts) {
     EDITED = { route: route, opts: opts };
     scope.querySelectorAll("[data-add]").forEach(function (b) {
@@ -871,6 +1119,7 @@
         '<button class="btn ghost" type="button" id="shareplan">Copy a link to it</button>' +
       "</div>" +
       '<p class="small" id="planstate"></p>' +
+      '<div class="whatif" id="whatif"></div>' +
       '<p class="small">Each day lists the places and experiences we hold for that stop. ' +
       'It does not name a hotel or a restaurant: EuropeDoor lists neither yet, and ' +
       '<a href="/for-businesses">the reason is on the businesses page</a>. ' +
@@ -884,6 +1133,7 @@
 
     wireSaveAndShare(route, opts, out);
     wireEditing(out, route, opts);
+    renderWhatIf(out, route, opts);
   }
 
 
