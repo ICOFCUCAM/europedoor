@@ -1016,6 +1016,119 @@ def c_map():
     return n
 
 
+@check("the standing instruction holds, and its palette is arithmetically possible")
+def c_instruction():
+    """docs/instruction.md and docs/palette.json, checked rather than trusted.
+
+    A palette written only in prose drifts. Somebody nudges a hex "slightly
+    warmer" during a redesign, the contrast ratio goes with it, and nothing
+    complains until a reader cannot see a link — at which point the palette
+    document still says 4.77:1 and is wrong. So the roles are declared as data
+    and the ratios are recomputed here, from the hexes actually in the file.
+
+    Also: the letters AI stay out of the branding. The customer sees
+    EuropeDoor and then experiences intelligence; they do not see AI EUROPE
+    TRAVEL PLATFORM. That is the single easiest line in the instruction for a
+    well-meaning person to cross, because every competitor has crossed it.
+    """
+    n = 0
+    path = os.path.join(ROOT, "docs", "palette.json")
+    if not os.path.exists(path):
+        fail("docs/palette.json is missing — the palette has no checkable form")
+        return n
+    with open(path, encoding="utf-8") as fh:
+        pal = json.load(fh)
+
+    def _lum(hexv):
+        h = hexv.lstrip("#")
+        ch = [int(h[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+        ch = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4 for c in ch]
+        return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2]
+
+    def _ratio(a, b):
+        la, lb = _lum(a), _lum(b)
+        hi, lo = max(la, lb), min(la, lb)
+        return (hi + 0.05) / (lo + 0.05)
+
+    tok = pal["tokens"]
+    for name, t in tok.items():
+        if not re.fullmatch(r"#[0-9A-Fa-f]{6}", t["hex"]):
+            fail(f"palette token {name} is not a six-digit hex: {t['hex']}")
+        if not t.get("role"):
+            fail(f"palette token {name} has no stated role")
+        n += 1
+
+    # Every claimed pairing must actually clear the line it claims. WCAG 2.2
+    # AA: 4.5 for body text, 3.0 for large text and UI edges.
+    for c in pal["claims"]:
+        for side in ("fg", "bg"):
+            if c[side] not in tok:
+                fail(f"palette claim names unknown token {c[side]}")
+                break
+        else:
+            r = _ratio(tok[c["fg"]]["hex"], tok[c["bg"]]["hex"])
+            if c.get("text") and r < 4.5:
+                fail(f"palette claims {c['fg']} is body text on {c['bg']}, but it is "
+                     f"{r:.2f}:1 and AA needs 4.50")
+            if c.get("ui") and r < 3.0:
+                fail(f"palette claims {c['fg']} is usable UI on {c['bg']}, but it is "
+                     f"{r:.2f}:1 and AA needs 3.00")
+            n += 2
+
+    # And the forbidden pairings must stay forbidden. A hex edit that
+    # accidentally makes one of these pass means the palette moved without
+    # anybody deciding to move it — which is worth failing on, because the
+    # instruction reasons about these values by name.
+    for c in pal["forbidden"]:
+        if c["fg"] not in tok or c["bg"] not in tok:
+            fail(f"forbidden pairing names an unknown token: {c['fg']} on {c['bg']}")
+            continue
+        r = _ratio(tok[c["fg"]]["hex"], tok[c["bg"]]["hex"])
+        if r >= 4.5:
+            fail(f"{c['fg']} on {c['bg']} is listed as forbidden but now measures "
+                 f"{r:.2f}:1 — the palette moved; re-decide rather than re-label")
+        if not c.get("why"):
+            fail(f"forbidden pairing {c['fg']} on {c['bg']} carries no reason")
+        n += 1
+
+    if sum(pal["ratio"][k] for k in pal["ratio"] if not k.startswith("$")) != 100:
+        fail("the palette ratio does not add to 100")
+    n += 1
+
+    doc = os.path.join(ROOT, "docs", "instruction.md")
+    if not os.path.exists(doc) or os.path.getsize(doc) < 4000:
+        fail("docs/instruction.md is missing or a stub")
+    else:
+        body = open(doc, encoding="utf-8").read()
+        for token in ("#101214", "#F5F2EA", "#3157FF", "#C8FF4D"):
+            if token not in body:
+                fail(f"docs/instruction.md does not name {token}")
+            n += 1
+        # The readable table and the register must agree on the values the
+        # instruction reasons about by name.
+        for name in ("graphite", "ivory", "cobalt", "lime"):
+            if tok[name]["hex"].upper() not in body.upper():
+                fail(f"docs/instruction.md and docs/palette.json disagree about {name}")
+            n += 1
+
+    # "AI" stays out of the branding: the masthead, the primary navigation and
+    # every h1. Matched as a standalone word so "Ukraine" and "said" are safe,
+    # and case-sensitively so nothing trips on ordinary prose.
+    word = re.compile(r"(?<![A-Za-z])AI(?![A-Za-z])")
+    for path in site_files():
+        with open(path, encoding="utf-8") as fh:
+            body = fh.read()
+        head = body.split("</header>", 1)[0]
+        if word.search(re.sub(r"<[^>]+>", " ", head)):
+            fail(f"{rel(path)} puts AI in the masthead — the assistant is called "
+                 f"EuropeDoor Guide, and the customer sees EuropeDoor")
+        for m in re.finditer(r"<h1[^>]*>(.*?)</h1>", body, re.S):
+            if word.search(re.sub(r"<[^>]+>", " ", m.group(1))):
+                fail(f"{rel(path)} puts AI in an h1")
+        n += 1
+    return n
+
+
 @check("the documentation set exists and is not describing a different repository")
 def c_docs():
     """Ten documents the development brief names, plus the ones this project

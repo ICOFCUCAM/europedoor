@@ -14,6 +14,7 @@ Via Europa. Take their architecture and drop their branding section. See
 
 | doing | read |
 |---|---|
+| **anything at all — read this first, every session** | **`docs/instruction.md`** — the standing instruction. Part 1 is how work is done here (audit first, deviate with numbers, STOP on licensing, never invent data, prove every check can fail). Part 2 is the visual instruction: **European Future**, the two worlds, the palette, the 60/25/10/5 ratio and the measured contrast limits. `docs/palette.json` is the checkable form |
 | **the transformation brief, and the three decisions waiting on the owner** | **`docs/EUROPEDOOR_2036_TRANSFORMATION.md`** — the 2036 audit, what to keep/replace/redesign, and a five-phase roadmap. Phases B and C are unblocked; A waits on a map-licensing decision |
 | **starting a session — read this first** | **`docs/audit-2026-09.md`** — the repository audit: current stack, what exists, technical debt, and the one open architectural decision (Next.js/Postgres: not yet, and why). Then **`docs/roadmap.md`** |
 | **anything substantial** | **`docs/product-specification.md`** — both specifications answered: the 36-section brief in Parts 1–3, the 99-section one in Part 4. Plus the Postgres schema, the API, the AI pipeline with actual prompts, the dashboards, the money and the risks |
@@ -174,6 +175,19 @@ correct for latitude and then multiplied x by `cos(52°)/cos(52°)`, which is 1 
 Europe was 60% too wide and nobody noticed, because 313 dots on an empty
 rectangle are the right shape by definition. Real geography is what made it
 visible.
+
+**The palette is data, and the contrast is recomputed.** `docs/palette.json`
+declares which colours may carry text on which surfaces; `checks.py` recomputes
+every ratio from the hexes in the file and fails on a claim the arithmetic does
+not support. It caught its own author on the first run: `cobalt-lift` cleared AA
+on the graphite ground and failed on the card surface, which is lighter. **A
+dark palette has two backgrounds and the lighter one binds.**
+
+**"AI" does not appear in the masthead, the navigation or any h1.** The
+assistant is called EuropeDoor Guide. The customer sees EuropeDoor and then
+experiences intelligence; they never see AI EUROPE TRAVEL PLATFORM. Enforced,
+because every competitor has crossed that line and it is the easiest one to
+cross by accident.
 
 ## Gates
 
