@@ -176,12 +176,33 @@ Europe was 60% too wide and nobody noticed, because 313 dots on an empty
 rectangle are the right shape by definition. Real geography is what made it
 visible.
 
+**Two worlds, one set of components.** `<body data-world>` selects which set
+of semantic tokens the whole stylesheet resolves to: DISCOVER is limestone and
+editorial, INTELLIGENCE is graphite and luminous. Five pages are INTELLIGENCE
+(`/map`, `/plan`, `/my-europe`, `/search`, `/discover`) and so is every
+embedded map figure, wherever it sits. **INTELLIGENCE is dark in both
+colour-scheme preferences on purpose** — the world says where the reader is,
+not how they like their screen; if it followed the preference the two worlds
+would collapse into a theme toggle.
+
+**There is no gold, and two checks keep it out.** Brass was the only gold in
+the previous palette and European Future removes it — `checks.py` fails on a
+`--brass`/`--gold` token, on a raw gold hex anywhere in the stylesheet, and the
+browser suite fails on a gold the browser actually paints. Verified all three
+ways. Atlantic green and terracotta were *retained* rather than deleted: green
+for heritage and provenance, terracotta as the warm cultural accent on
+stories, events and experiences.
+
 **The palette is data, and the contrast is recomputed.** `docs/palette.json`
 declares which colours may carry text on which surfaces; `checks.py` recomputes
 every ratio from the hexes in the file and fails on a claim the arithmetic does
-not support. It caught its own author on the first run: `cobalt-lift` cleared AA
-on the graphite ground and failed on the card surface, which is lighter. **A
-dark palette has two backgrounds and the lighter one binds.**
+not support. It caught its own author twice. First: `cobalt-lift` cleared AA on
+the graphite ground and failed on the card surface, which is lighter — **a dark
+palette has two backgrounds and the lighter one binds.** Then the browser suite
+failed seven pages when the accent was bound to the signature `#3157FF`: 4.93
+on the ground, 4.36 on the card the kickers actually sit on. **The signature is
+a colour that gets drawn, not read** — `--signature` for the mark and the score
+bars, `--door` (cobalt-deep) for anything that is text.
 
 **"AI" does not appear in the masthead, the navigation or any h1.** The
 assistant is called EuropeDoor Guide. The customer sees EuropeDoor and then

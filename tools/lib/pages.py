@@ -1364,6 +1364,8 @@ def planner_page(data):
         "Plan a journey", body, path="/plan", area="plan",
         description="Tell EuropeDoor your days, budget and interests and it builds a European itinerary with real distances, real night counts and a cost estimate.",
         scripts=["/assets/js/planner.js"],
+        # INTELLIGENCE — the planner: journey construction
+        world="intelligence"
     )
 
 
@@ -1498,7 +1500,8 @@ def countrymap(data, c):
         note = (f' {len(offframe)} outside this frame: {links}{more} — too far from the '
                 f'mainland to draw at this scale without emptying the map.')
     return (
-        f'<figure class="minimap countrymap"><svg viewBox="0 0 {w} {h}" role="img" '
+        f'<figure class="minimap countrymap" data-world="intelligence">'
+        f'<svg viewBox="0 0 {w} {h}" role="img" '
         f'aria-label="Map of {esc(c["name"])} showing its regions and the destinations in the '
         f'Atlas">{ctx}{land}{"".join(ties)}{"".join(dots)}'
         f'{"".join(_declutter(labels, w, h))}</svg>'
@@ -1544,7 +1547,8 @@ def minimap(data, t, span=3.2):
                 f'{esc(n["city"]["name"])}</text>'
             )
     return (
-        f'<figure class="minimap"><svg viewBox="0 0 {w} {h}" role="img" '
+        f'<figure class="minimap" data-world="intelligence">'
+        f'<svg viewBox="0 0 {w} {h}" role="img" '
         f'aria-label="Map of {esc(t["name"])} and the places around it">'
         f'{"".join(dots)}{"".join(labels)}</svg>'
         f'<figcaption>{esc(t["name"])} and its neighbours in the Atlas — the frame is about '
@@ -1576,7 +1580,8 @@ def routemap(data, j):
         for i, (x, y) in enumerate(pts)
     )
     return (
-        f'<figure class="minimap"><svg viewBox="{x0:.1f} {y0:.1f} {w:.1f} {h:.1f}" role="img" '
+        f'<figure class="minimap" data-world="intelligence">'
+        f'<svg viewBox="{x0:.1f} {y0:.1f} {w:.1f} {h:.1f}" role="img" '
         f'aria-label="Route map for {esc(j["name"])}">'
         f'<path class="routeline" d="{d}"/>{dots}{labels}</svg>'
         f'<figcaption>Straight lines between stops. What each one means on the ground is in the '
@@ -2091,6 +2096,8 @@ def fund_index(data):
     return "/fund/index.html", page(
         "Europe Fund", body, path="/fund", area="fund",
         description="A public register of European heritage, language, trail and coastline projects — listed openly, holding no money until the legal and payment work is done.",
+        # heritage: this page is about how we know what we claim
+        accent="heritage"
     )
 
 
@@ -2224,7 +2231,7 @@ def stories_index(data):
 {desks}
 """
     return "/stories/index.html", page(
-        "Stories", body, path="/stories", area=None,
+        "Stories", body, path="/stories", area="stories",
         description="Editorial from across Europe: people, history, food, faith, nature and culture, each linked into the Atlas.",
     )
 
@@ -2269,7 +2276,7 @@ def story_page(data, s):
 {links}
 """
     return f"/stories/{s['slug']}/index.html", page(
-        s["title"], body, path=f"/stories/{s['slug']}", area=None,
+        s["title"], body, path=f"/stories/{s['slug']}", area="stories",
         description=s["standfirst"][:180],
         scripts=["/assets/js/my-europe.js"],
         og=("story:" + s["slug"], None, f"{s['title']} — {s['standfirst'][:90]}"),
@@ -2603,6 +2610,8 @@ def map_page(data):
         "Map", body, path="/map", area="countries",
         description="A point map of every city in the EuropeDoor Atlas, filterable by what you travel for. No third-party tiles.",
         scripts=["/assets/js/map.js"], wide=True,
+        # INTELLIGENCE — route intelligence
+        world="intelligence"
     )
 
 
@@ -2661,7 +2670,7 @@ def events_page(data):
 {''.join(blocks)}
 """
     return "/events/index.html", page(
-        "Events", body, path="/events", area=None,
+        "Events", body, path="/events", area="events",
         description="The recurring European year: festivals, markets, pilgrimages and seasonal events, month by month, filterable by category.",
         scripts=["/assets/js/events.js"],
     )
@@ -2741,7 +2750,7 @@ def events_month_page(data, month):
          more=("Every quiet place", "/beyond-the-obvious")) if qcards else ""}
 """
     return f"/events/{month}/index.html", page(
-        f"{name} in Europe", body, path=f"/events/{month}", area=None,
+        f"{name} in Europe", body, path=f"/events/{month}", area="events",
         description=f"What is on in Europe in {name}, which countries are at their best, which are in the quieter shoulder season, and where to go instead of the obvious.",
     )
 
@@ -2821,6 +2830,8 @@ def my_europe_page(data):
         "My Europe", body, path="/my-europe", area=None,
         description="Your saved European places, journeys and stories — stored in your own browser, with no account and no server.",
         scripts=["/assets/js/my-europe.js"],
+        # INTELLIGENCE — personalisation and saved journeys
+        world="intelligence"
     )
 
 
@@ -2952,6 +2963,8 @@ def method_page(data):
     return "/method/index.html", page(
         "Method", body, path="/method", area=None,
         description="The complete, published formula behind the Europe Experience Score — and the four things it deliberately is not.",
+        # heritage: this page is about how we know what we claim
+        accent="heritage"
     )
 
 
@@ -3346,6 +3359,8 @@ def sources_page(data):
     return "/sources/index.html", page(
         "Sources & corrections", body, path="/sources", area=None,
         description="How EuropeDoor's facts are produced, what is computed rather than claimed, and the verification plan.",
+        # heritage: this page is about how we know what we claim
+        accent="heritage"
     )
 
 
@@ -3446,6 +3461,8 @@ def freshness_page(data):
     return "/sources/freshness/index.html", page(
         "Fact freshness", body, path="/sources/freshness", area=None,
         description=f"When every country's practical facts were last checked against a source — {checked} of {n} verified so far, and the rest said so plainly.",
+        # heritage: this page is about how we know what we claim
+        accent="heritage"
     )
 
 
@@ -3676,6 +3693,8 @@ def search_page(data):
         "Search", body, path="/search", area=None,
         description="Search every country, region, city, journey, theme, story and project on EuropeDoor — in your browser, with nothing sent anywhere.",
         scripts=["/assets/js/search.js"],
+        # INTELLIGENCE — search and filter intelligence
+        world="intelligence"
     )
 
 # ── discover: the entry point ─────────────────────────────────────────
@@ -4064,6 +4083,8 @@ def discover_page(data):
         "Discover Europe", body, path="/discover", area="discover",
         description=f"Say what you are travelling for and {len(data['cities'])} places across {len(data['countries'])} countries narrow themselves — each one saying why it is on the list.",
         scripts=["/assets/js/discover.js"],
+        # INTELLIGENCE — filter intelligence — Discover Mode is a tool, not a browse surface. /discover/<macro> stays editorial
+        world="intelligence"
     )
 
 

@@ -1,22 +1,23 @@
-> **DIRECTION CHANGE, 2026-09-08 — read `docs/instruction.md` first.**
+> **MIGRATED, 2026-09-08 — `docs/instruction.md` is now the built state.**
 >
-> The owner has set a new visual direction: **European Future** — Deep Graphite
-> `#101214`, Warm Ivory `#F5F2EA`, Stone `#D9D5CC`, European Cobalt `#3157FF`,
-> Electric Lime `#C8FF4D`, at a 60/25/10/5 ratio, across two worlds (DISCOVER,
-> light and editorial; INTELLIGENCE, dark and luminous).
+> The running palette is **European Future**: Deep Graphite `#101214`,
+> Limestone `#F7F6F3`, European Cobalt `#3157FF`, Cobalt Lift `#627FFF`,
+> Electric Lime `#C8FF4D`, across two worlds — DISCOVER (light, editorial)
+> and INTELLIGENCE (dark, luminous). Atlantic green and terracotta are
+> **retained**, with narrow homes: green for heritage and provenance,
+> terracotta as the warm cultural accent. Gold is gone entirely, and a check
+> keeps it gone.
 >
-> Everything below describes the palette **currently running**: limestone,
-> Atlantic green and terracotta. It is not superseded yet, because nothing has
-> been repainted — the migration is green → graphite and is a distinct piece of
-> work with an owner decision in front of it (which surfaces belong to which
-> world). Until that is taken, this document is the built state and
-> `docs/instruction.md` is the target.
+> Everything below describes the palette this migrated FROM. It is kept as
+> the baseline, not as a proposal — the migration was green → graphite, and
+> three of that palette's decisions survived it: the ground was never pure
+> white, gold was never allowed on anything interactive, and the lifted
+> values it used at night for green and terracotta are the ones the new
+> system uses.
 >
-> One correction worth keeping: the new direction opens by rejecting a
-> blue/gold identity. This site has never been blue/gold. The green was chosen
-> specifically to avoid EU blue and yellow, and brass is forbidden on anything
-> interactive. The critique appears to be of a mockup rather than of the
-> running product.
+> One correction worth recording: the direction that prompted this opened by
+> rejecting a blue/gold identity. This site has never been blue/gold. The
+> green was chosen specifically to avoid EU blue and yellow.
 
 # EuropeDoor — the brand, as built
 

@@ -8,7 +8,7 @@ its requirements are about how something looks and nobody can check a feeling.
 So every row here asserts against the generated HTML, the CSS and the JavaScript
 as they actually are.
 
-**51 sections · 22 built · 14 already · 12 partial · 1 refused · 1 locked · 1 deferred · 331 assertions · 0 failing**
+**52 sections · 23 built · 14 already · 12 partial · 1 refused · 1 locked · 1 deferred · 353 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -56,7 +56,8 @@ as they actually are.
 | B1 | Name, casing and the trademark position | LOCKED | 5 | EuropeDoor, one word, title case. The mark is NOT cleared — it is in use in the doors trade — so the site carries no ® or ™ and the brand is working rather than announced. |
 | B2 | Tagline and promise | BUILT | 6 | Open the door to Europe. One primary line; the six campaign lines are not in the shell, because a site with six taglines has none. |
 | B3 | The four doors | BUILT | 7 | Discover, understand, experience, journey — as a numbered sequence of links, not a menu of equals. It replaced five pillars that described our components rather than the reader's path. |
-| B4 | Colour | BUILT | 9 | Atlantic green, limestone ground, terracotta accent, charcoal type, brass reserved for heritage and never for a control. Deliberately not EU blue and gold. |
+| B4 | Colour | BUILT | 16 | European Future: graphite foundation, limestone ground, cobalt signature, electric lime in the dark world only. Atlantic green and terracotta retained with narrow homes; gold removed entirely. Deliberately not EU blue and gold, and no longer green-primary. |
+| B4a | The two worlds | BUILT | 15 | DISCOVER is light and editorial; INTELLIGENCE is dark and luminous, in both colour-scheme preferences. One attribute on <body>, one set of components. |
 | B5 | The mark | BUILT | 6 | Concept B: two vertical forms, and the negative space between them is the symbol. It replaced a literal door with a knob, which the Bible explicitly rules out. |
 | B6 | Voice, manifesto and trust | BUILT | 13 | The manifesto is a page rather than a slide, and the four labels that say where every claim comes from are on the same page underneath it. That second half is what stops the first half being advertising copy. |
 | 34 | Figma file structure | DEFERRED | 1 | There is no Figma file. There is a built site, and a second source of truth would have to be kept in step with the first. |

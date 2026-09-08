@@ -1095,18 +1095,40 @@ def c_instruction():
         fail("the palette ratio does not add to 100")
     n += 1
 
+    # Gold is out of the system entirely, and this is the assertion that keeps
+    # it out: no token in the palette, and no rule in the stylesheet, may be a
+    # gold or brass. Gold says luxury, premium, heritage, wealth. The product
+    # has to say Europe, discovery, movement, intelligence, culture, future.
+    if not pal.get("gold", "").startswith("None"):
+        fail("docs/palette.json no longer states that there is no gold")
+    css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"), encoding="utf-8").read()
+    if re.search(r"--(brass|gold)\s*:", css):
+        fail("assets/css/europedoor.css defines a gold or brass token; "
+             "European Future has no gold")
+    for hexv, token in re.findall(r"(#[0-9a-fA-F]{6})", css) and \
+            [(m, m) for m in re.findall(r"#[0-9a-fA-F]{6}", css)]:
+        r_, g_, b_ = (int(hexv[i:i + 2], 16) for i in (1, 3, 5))
+        # A gold is a mid-lightness, saturated yellow: red high, green close
+        # behind, blue far back. This catches #8a6d34 and #c2a165, the two
+        # brasses that were in the previous system, without catching the
+        # limestone ground (which is barely saturated) or terracotta (whose
+        # green sits far below its red).
+        if 90 <= r_ <= 215 and abs(r_ - g_) < 55 and (g_ - b_) > 45 and (r_ - b_) > 70:
+            fail(f"assets/css/europedoor.css still contains a gold: {hexv}")
+    n += 2
+
     doc = os.path.join(ROOT, "docs", "instruction.md")
     if not os.path.exists(doc) or os.path.getsize(doc) < 4000:
         fail("docs/instruction.md is missing or a stub")
     else:
         body = open(doc, encoding="utf-8").read()
-        for token in ("#101214", "#F5F2EA", "#3157FF", "#C8FF4D"):
+        for token in ("#101214", "#F7F6F3", "#3157FF", "#C8FF4D", "#14483C", "#A4491F"):
             if token not in body:
                 fail(f"docs/instruction.md does not name {token}")
             n += 1
         # The readable table and the register must agree on the values the
         # instruction reasons about by name.
-        for name in ("graphite", "ivory", "cobalt", "lime"):
+        for name in ("graphite", "limestone", "cobalt", "lime", "atlantic", "terracotta"):
             if tok[name]["hex"].upper() not in body.upper():
                 fail(f"docs/instruction.md and docs/palette.json disagree about {name}")
             n += 1

@@ -151,58 +151,124 @@ bug.
 
 | token | hex | what it is |
 |---|---|---|
-| Deep Graphite | `#101214` | the technological foundation. Ink in the light world, ground in the dark |
+| Deep Graphite | `#101214` | the intelligence foundation. Ink in the light world, ground in the dark |
 | Graphite Surface | `#1A1E22` | cards and raised surfaces in the dark world |
-| Warm Ivory | `#F5F2EA` | the main surface. **Never pure white** — white is a screen, ivory is paper |
-| Stone / Mineral | `#D9D5CC` | cards, structural elements, rules |
-| **European Cobalt** | `#3157FF` | the signature. Sparingly, and never as a background |
-| Cobalt Deep | `#2A4AD9` | links and actions in the light world |
-| Cobalt Lift | `#627FFF` | links and actions in the dark world |
-| **Electric Lime** | `#C8FF4D` | the future accent. **Dark world only** |
+| **Limestone** | `#F7F6F3` | the DISCOVER ground, kept from the previous system. **Never pure white** |
+| Limestone Surface | `#EEECE7` | cards and raised surfaces in the light world |
+| **European Cobalt** | `#3157FF` | the digital signature — for things **drawn**, not read |
+| Cobalt Deep | `#2A4AD9` | every cobalt that is text or an action, in the light world |
+| Cobalt Lift | `#627FFF` | links and interactive elements on dark surfaces |
+| Atlantic Green | `#14483C` | heritage and provenance. The previous primary, retained with a narrow home |
+| Terracotta | `#A4491F` | the warm cultural accent |
+| **Electric Lime** | `#C8FF4D` | the dark-world signal. INTELLIGENCE only |
 | Ultramarine | `#665CFF` | atmosphere only: gradients, map washes, immersive moments |
+| ~~Gold / Brass~~ | — | **none.** See below |
+
+### There is no gold
+
+Brass `#8A6D34` was the only gold in the previous system, it was already
+forbidden on anything interactive, and European Future removes it outright.
+The one place it survived — the "computed" tier on a source badge — is a
+neutral grey now, which is also more honest about what that tier is.
+
+Gold says *luxury · premium · heritage · wealth*. This product has to say
+*Europe · discovery · movement · intelligence · culture · future*. Gold
+against anything reads as a luxury travel agency; cobalt against graphite
+reads as European digital infrastructure. `checks.py` fails the build on a
+gold or brass token **and** on a raw gold hex smuggled into a rule — verified
+by reintroducing `#8a6d34` as a token and `#c2a165` as a value, and watching
+both go red.
+
+### Three accents inside DISCOVER, one inside INTELLIGENCE
+
+The accent says what **kind** of thing is being read. A reader will never name
+this and will feel it: an essay about a festival should not be the same blue
+as a boundary dataset.
+
+| accent | colour | where |
+|---|---|---|
+| structural | Cobalt Deep | the default — homepage, countries, regions, destinations, journeys |
+| cultural | Terracotta | stories, events, experiences — the human half of DISCOVER |
+| heritage | Atlantic Green | how this project knows what it claims: `/method`, `/sources`, `/fund`, `/sources/freshness` |
+| electric | Electric Lime | **INTELLIGENCE only**, in every colour-scheme preference |
+
+Bound by the nav area the shell already sets, so most of it cost no page
+change. Setting it surfaced a navigation bug that had been there for months:
+`stories` and `events` passed no area at all, so the masthead never marked
+either section as current. The accent depended on it, which is how it showed.
 
 ### The ratio is the instruction, not the hex codes
 
-    60%  warm light / ivory
+    60%  limestone
     25%  graphite
     10%  cobalt
-     5%  electric accent
+     5%  the accent
 
 A palette gives you *blue website with gold buttons*. A ratio gives you
-*European editorial design over futuristic digital infrastructure*. If a screen
-does not hold roughly this distribution, the palette has been applied and the
-instruction has not.
+*European editorial design over futuristic digital infrastructure*. If a
+screen does not hold roughly this distribution, the palette has been applied
+and the instruction has not.
+
+The most visible tenth of that cobalt is the primary button. A graphite button
+is correct and says nothing, and a signature that never appears on the one
+thing the reader is meant to press is a signature that exists only in the
+documentation.
 
 ### Where each colour may go, measured rather than asserted
 
 WCAG 2.2, AA: body text needs 4.5:1, large text and UI edges need 3:1. These
-are computed, and `checks.py` recomputes them from `docs/palette.json` on every
-build — so a hex nudged "slightly warmer" in a redesign cannot quietly take a
-contrast ratio with it.
+are computed, and `checks.py` recomputes all thirty-one claimed pairings from
+`docs/palette.json` on every build — so a hex nudged "slightly warmer" in a
+redesign cannot quietly take a contrast ratio with it.
 
-|  | on ivory | on graphite | on stone |
+| | on limestone | on the light card | on graphite |
 |---|---|---|---|
-| Graphite | **16.78** | — | **12.82** |
-| Ivory | — | **16.78** | — |
-| Cobalt `#3157FF` | **4.77** ✓ | 3.52 ✗ text | 3.64 ✗ text |
-| Cobalt Deep `#2A4AD9` | **6.09** ✓ | — | **4.66** ✓ |
-| Cobalt Lift `#627FFF` | 3.13 ✗ text | **5.36** ✓ | — |
-| Electric Lime `#C8FF4D` | **1.05 — invisible** | **15.97** ✓ | **1.25 — invisible** |
-| Ultramarine `#665CFF` | 4.13 ✗ | 4.06 ✗ | 3.16 ✗ text |
+| Graphite | **17.37** | **15.90** | — |
+| Limestone | — | — | **17.37** |
+| Cobalt `#3157FF` | 4.93 | 4.52 | 3.52 ✗ |
+| Cobalt Deep `#2A4AD9` | **6.31** ✓ | **5.78** ✓ | — |
+| Cobalt Lift `#627FFF` | 3.13 ✗ | — | **5.36** ✓ |
+| Atlantic `#14483C` | **9.61** ✓ | **8.80** ✓ | 1.81 ✗ |
+| Terracotta `#A4491F` | **5.47** ✓ | **5.01** ✓ | 3.17 ✗ |
+| Electric Lime `#C8FF4D` | **1.09 — invisible** | 1.13 — invisible | **15.97** ✓ |
+| Ultramarine `#665CFF` | 4.28 ✗ | 4.15 ✗ | 4.06 ✗ |
 
-Three consequences that are not negotiable, because they are arithmetic:
+Five consequences that are not negotiable, because they are arithmetic:
 
-- **Electric Lime does not exist in the light world.** At 1.05:1 on ivory it is
-  not a subtle accent, it is nothing at all. This is not a constraint on the
-  two-worlds idea — it is the two-worlds idea enforced by physics, and it makes
-  lime an unmistakable signal that you have crossed into INTELLIGENCE.
-- **Ultramarine is never type.** It fails on every ground we have. It is a
+- **Electric Lime does not exist in the light world.** At 1.09:1 on limestone
+  it is not a subtle accent, it is nothing at all. This is not a constraint on
+  the two-worlds idea — it is the two-worlds idea enforced by physics, and it
+  makes lime a reliable signal that the reader has crossed into the machine.
+- **Ultramarine is never type.** It fails on every ground we hold. It is a
   gradient, a map wash, a glow behind a route. The moment a word is set in it,
   somebody cannot read that word.
-- **Cobalt needs two variants.** The signature `#3157FF` reads on ivory and
-  nowhere else. `cobalt-deep` carries links on stone; `cobalt-lift` carries them
-  on graphite. A single "brand blue" used everywhere fails two of three
-  surfaces.
+- **The signature is a drawn colour, not a read one.** `#3157FF` is 4.93 on
+  limestone, 4.52 on a card and 4.04 on the deepest light surface. It belongs
+  to the mark, the score bars and the dots on the map; anything cobalt that is
+  *text* is `cobalt-deep`. This was learned the hard way — see below.
+- **Atlantic and terracotta both lift at night.** `#14483C` is 1.81:1 on
+  graphite and `#A4491F` is 3.17:1: a heading nobody can see, and one that is
+  nearly invisible. The lifted values are the ones the previous system already
+  used at night, which is the one piece of the old palette's homework that
+  carried straight across.
+- **A dark palette has two backgrounds, and the lighter one binds.**
+  `cobalt-lift` was first set at `#5070FF`, which clears AA on the graphite
+  ground at 4.56:1 — and falls to 4.07:1 on the raised card surface, where
+  links actually sit. It is `#627FFF`, chosen against the card.
+
+### Two failures worth keeping
+
+Both were caught by a check rather than by looking, which is the argument for
+the checks.
+
+**The palette register caught its own author on its first run**, on the
+cobalt-lift value above.
+
+**The browser suite failed seven pages** when the accent was first bound to
+the signature `#3157FF`: 4.93 on the ground, but 4.36 on the card ground the
+kickers actually sat on. That is the instruction's own sentence — *the
+signature reads on the ground and nowhere else* — arriving as a build failure
+three paragraphs after it was written. Which is what a check is for.
 
 ### The door is a design language, not a logo
 
@@ -249,42 +315,66 @@ the single easiest thing for a well-meaning person to add.
 
 ---
 
-## Part 3 — what this changes, and what is not done
+## Part 3 — what the migration did
 
-**One correction, for the record.** The instruction above opens by rejecting a
-blue/gold identity. The built site is not blue/gold and never has been: the
-current tokens are limestone `#F7F6F3`, Atlantic green `#14483C` and terracotta
-`#A4491F`, with a brass `#8A6D34` reserved for heritage moments and forbidden
-on anything interactive — a palette chosen specifically to avoid EU blue and
-gold. The critique appears to be of a mockup rather than of the running
-product. That does not make the new direction wrong; it means the migration is
-**green → graphite**, not **blue → graphite**, and the two are different pieces
-of work.
+**The correction that shaped it.** The direction arrived rejecting a
+blue/gold identity. This site has never been blue/gold: it was limestone,
+Atlantic green and terracotta, with brass forbidden on anything interactive.
+So the migration was **green → graphite**, and it was a migration rather than
+a replacement. Limestone stayed as the ground. Atlantic green and terracotta
+stayed with narrow named homes rather than being deleted. Gold left entirely.
+What is new is the graphite foundation, the cobalt signature, the electric
+accent, and the two worlds those make possible.
 
-**What this document does today.** It settles the name, the positioning, the
-philosophy, the two worlds, the palette, the ratio, the accessibility limits,
-the door as a design language, the photography direction and the avoid list. It
-makes the palette machine-checkable. It does not repaint anything.
+**The gates it ran, in order.**
 
-**What the migration would take.** One stylesheet holds every token
-(`assets/css/europedoor.css`), so the token swap itself is small. What is not
-small:
+    current tokens
+      → European Future tokens
+      → DISCOVER / INTELLIGENCE surface classification
+      → contrast verification, both worlds, both preferences
+      → SVG plate re-toning
+      → --map-* verification
+      → social card verification
+      → 1,072 pages regenerated
+      → 30 static checks
+      → 561 browser checks
+      → 1,282 section assertions
+      → 331 UX assertions
+      → 0 failures
 
-1. Deciding which of the existing surfaces belong to DISCOVER and which to
-   INTELLIGENCE — the map, the planner and My Europe are the obvious
-   INTELLIGENCE candidates, and that is a product decision, not a CSS one.
-2. Re-verifying every colour pair in both schemes; the browser suite already
-   checks WCAG contrast and has previously darkened two tokens for failing it.
-3. The generated SVG plates, the social cards and the map's five `--map-*`
-   tokens all derive from the palette and would need re-toning together.
-4. 1,072 pages regenerated and re-checked.
+**Classification.** Five pages are INTELLIGENCE: `/map`, `/plan`,
+`/my-europe`, `/search` and `/discover` — Discover Mode is a filter, not a
+browse surface, and `/discover/<macro>` stays editorial. Everything else is
+DISCOVER. The map figures on country, destination and journey pages carry
+`data-world="intelligence"` on the element itself: an INTELLIGENCE component
+embedded in an editorial page, which is the door working as a design language
+rather than as a glyph — a window into the machine, cut into a page.
 
-**Open, and the owner's:**
+**INTELLIGENCE is dark in both colour-scheme preferences**, deliberately. The
+world is a statement about where the reader is, not a lighting preference. If
+it went light for a light-mode reader the two worlds would collapse into one
+and the whole idea would be a theme toggle with extra steps. DISCOVER does
+follow the preference, and for a dark-preference reader the two worlds stay
+apart by accent: DISCOVER is blue, INTELLIGENCE is electric, and lime never
+appears on an editorial page in either preference.
 
-- Approve the green → graphite migration, and the DISCOVER / INTELLIGENCE split
-  of the existing surfaces.
+**The plates were re-toned, not just re-tinted.** All 794 social cards and
+every generated illustration come from one `plate_shapes()` description, so
+the SVG on the page and the PNG in somebody else's feed could not drift. The
+hues moved from `(168, 196, 210, 32, 24, 14)` — Atlantic teal through brick —
+to six cool steps around cobalt and ultramarine. Night plates bottom out near
+graphite and their light is lime; day plates lift toward limestone with a low
+warm sun, which is the single warm note in the system and the reason they read
+as European light rather than as a gradient.
+
+**Still the owner's:**
+
 - Import Eurostat NUTS, or take Natural Earth admin 1 as the cheaper unblock
   for region shapes (`docs/data-licenses/eurostat-gisco-nuts.md`).
-- The photography budget (`docs/images.md`). Free stock covers the Eiffel Tower
-  and will never cover Albarracín or Theth, which is precisely the product —
-  and it will certainly never cover the hero described above.
+- The photography budget (`docs/images.md`). Free stock covers the Eiffel
+  Tower and will never cover Albarracín or Theth, which is precisely the
+  product — and it will certainly never cover the hero this document
+  describes.
+- Whether `/journeys/*` should be INTELLIGENCE rather than DISCOVER. They are
+  editorial storytelling today and read as such; the route map inside them is
+  already an INTELLIGENCE component.

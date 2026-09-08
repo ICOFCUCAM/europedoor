@@ -739,20 +739,55 @@ def sb3():
 
 
 @section("B4", "Colour", "BUILT",
-         "Atlantic green, limestone ground, terracotta accent, charcoal "
-         "type, brass reserved for heritage and never for a control. "
-         "Deliberately not EU blue and gold.")
+         "European Future: graphite foundation, limestone ground, cobalt "
+         "signature, electric lime in the dark world only. Atlantic green "
+         "and terracotta retained with narrow homes; gold removed entirely. "
+         "Deliberately not EU blue and gold, and no longer green-primary.")
 def sb4():
-    for token in ("--atlantic:", "--terracotta:", "--brass:", "--paper:", "--ink:"):
+    for token in ("--graphite:", "--limestone:", "--cobalt:", "--cobalt-lift:",
+                  "--lime:", "--atlantic:", "--terracotta:", "--paper:", "--ink:"):
         yield token in CSS, f"{token} is defined"
-    # Brass is a heritage highlight, not a UI colour: a gold control reads
-    # as a premium upsell, and there is nothing to sell.
-    for control in (".btn {", ".btn.ghost"):
-        block = CSS.split(control)[1].split("}")[0] if control in CSS else ""
-        yield "--brass" not in block, f"{control} does not use brass"
+    # Gold is out of the system. It was the one thing in the previous palette
+    # that European Future removes rather than rehomes: gold says luxury,
+    # premium, heritage, wealth, and this product has to say Europe,
+    # discovery, movement, intelligence, culture, future.
+    yield "--brass" not in CSS, "and there is no brass token left"
+    yield "#8a6d34" not in CSS.lower() and "#c2a165" not in CSS.lower(), \
+        "nor either of the two brasses as a raw value"
+    # The signature is a drawn colour. Bound to text it failed seven pages in
+    # the browser suite at 4.36:1 on a card, which is the instruction's own
+    # sentence arriving as a build failure.
+    yield "--signature:" in CSS, "the signature is separated from the text accent"
+    yield "--door:         var(--cobalt-deep);" in CSS, \
+        "so anything cobalt that is read uses the deeper one"
     yield "prefers-color-scheme: dark" in CSS, "and the palette has a night form"
-    yield "--atlantic: #4f9d85" in CSS.replace("    ", "").replace("\n", "\n"), \
-        "which lifts the green rather than inverting it"
+    yield "#63b79c" in CSS and "#e08a5c" in CSS, \
+        "which lifts the retained accents rather than inverting them"
+    yield doc_covers("docs/palette.json", "cobalt-lift"), \
+        "and the whole palette is machine-checkable"
+
+
+@section("B4a", "The two worlds", "BUILT",
+         "DISCOVER is light and editorial; INTELLIGENCE is dark and "
+         "luminous, in both colour-scheme preferences. One attribute on "
+         "<body>, one set of components.")
+def sb4a():
+    yield 'data-world="{world}"' in RENDER, "the shell carries the world"
+    yield '[data-world="intelligence"]' in CSS, "and the stylesheet rebinds every token for it"
+    for path in ("/map", "/plan", "/my-europe", "/search", "/discover"):
+        yield 'data-world="intelligence"' in page(path), f"{path} is INTELLIGENCE"
+    for path in ("/", "/europe/norway", "/stories", "/method"):
+        yield 'data-world="discover"' in page(path), f"{path} is DISCOVER"
+    # A map is INTELLIGENCE wherever it is embedded — a window into the
+    # machine cut into an editorial page, which is the door as a design
+    # language rather than as a glyph.
+    yield 'countrymap" data-world="intelligence"' in page("/europe/italy"), \
+        "and an embedded map carries the world on the element"
+    # Three accents inside DISCOVER, one inside INTELLIGENCE.
+    yield "body.area-stories, body.area-events, body.area-experiences" in CSS, \
+        "the cultural accent is bound to the cultural areas"
+    yield 'body[data-accent="heritage"]' in CSS, "and heritage to the provenance pages"
+    yield 'data-accent="heritage"' in page("/method"), "which /method carries"
 
 
 @section("B5", "The mark", "BUILT",
@@ -763,7 +798,9 @@ def sb5():
     yield "MARK = (" in RENDER, "the mark is drawn once"
     yield "mark-frame" in RENDER and "mark-leaf" in RENDER, "as two forms"
     yield every_page(lambda h: 'class="mark"' in h, "on every page")
-    yield ".mark-frame { fill: var(--atlantic); }" in CSS, "taking the brand colour from CSS"
+    yield ".mark-frame { fill: var(--ink); }" in CSS and \
+        ".mark-leaf  { fill: var(--signature); }" in CSS, \
+        "taking graphite and the signature from CSS, so it holds in both worlds"
     # It used to be a border-radius trick with a ::after dot for the knob.
     yield ".door::after" not in CSS, "and the literal door with a knob is gone"
     yield doc_covers("docs/brand.md", "Rejected on the way"), \

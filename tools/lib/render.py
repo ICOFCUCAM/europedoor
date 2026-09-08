@@ -83,11 +83,28 @@ def esc(s):
 # else in the identity, shouting from the card grid. Removed. The set is
 # deliberately narrow: an illustration system with a wide gamut does not
 # read as a system.
-PLATE_HUES = (168, 196, 210, 32, 24, 14)
+# ── plate hues ──────────────────────────────────────────────────────
+#
+# European Future. The old set was (168, 196, 210, 32, 24, 14) — Atlantic
+# teal through to brick — and the warm half of it was the terracotta accent
+# showing up in every generated landscape. Under the new system warmth comes
+# from the ivory ground and from photography, not from the plates, so these
+# are six cool steps around cobalt (229°) and ultramarine (244°): slate,
+# steel, cold sea, cobalt, indigo, violet.
+#
+# Six, not four, because the distribution is `hash % len(PLATE_HUES)` across
+# 794 cards and a shorter list is visibly repetitive on an index page. And
+# low saturation throughout: this is meant to read as stone and weather at
+# dusk, which is cinematic, rather than as six blue rectangles, which is a
+# corporate deck.
+PLATE_HUES = (200, 214, 224, 229, 236, 244)
 
 # Saturation is capped per hue. The warm end (brass, brick) goes muddy above
 # about 30%, and the cool end goes to a swimming-pool blue above 34%.
-PLATE_SAT = {168: 26, 196: 28, 210: 24, 32: 24, 24: 22, 14: 20}
+# Saturation is capped per hue. Above about 30% at the cobalt end the plates
+# stop being architecture and start being a swimming pool, and the violet end
+# goes purple-neon — which is on the avoid list by name.
+PLATE_SAT = {200: 16, 214: 18, 224: 20, 229: 22, 236: 19, 244: 17}
 
 MOTIFS = ("peaks", "coast", "skyline", "tower", "isles", "forest", "plain")
 
@@ -158,13 +175,22 @@ def plate_shapes(seed, w, h, motif=None):
     night = d[3] % 5 == 0
     sat, sat2 = PLATE_SAT[hue], PLATE_SAT[hue2]
     if night:
-        sky_a, sky_b = _hsl(hue, sat + 6, 13), _hsl(hue2, sat2, 24)
-        band = [_hsl(hue, sat, l) for l in (21, 16, 11)]
-        light = _hsl(44, 48, 76)
+        # Night. The sky bottoms out near graphite and the light is the
+        # electric accent — which is the only place lime appears in a
+        # DISCOVER surface, and it appears there because a night plate IS a
+        # dark ground. Contrast does the policing: lime on #101214 is 16:1
+        # and on ivory is 1.05:1, so it cannot leak into the light world.
+        sky_a, sky_b = _hsl(hue, sat + 6, 9), _hsl(hue2, sat2, 21)
+        band = [_hsl(hue, sat, l) for l in (18, 13, 9)]
+        light = _hsl(79, 62, 66)
     else:
-        sky_a, sky_b = _hsl(hue2, sat2, 78), _hsl(hue, sat, 55)
-        band = [_hsl(hue, sat, l) for l in (43, 32, 22)]
-        light = _hsl(42, 62, 85)
+        # Day. The sky lifts toward ivory rather than to a saturated blue, so
+        # a card sits on the page instead of shouting off it, and the sun is
+        # a low warm one — the single warm note in the system, and the reason
+        # the plates read as European light rather than as a gradient.
+        sky_a, sky_b = _hsl(hue2, max(8, sat2 - 8), 86), _hsl(hue, sat, 54)
+        band = [_hsl(hue, sat, l) for l in (42, 31, 21)]
+        light = _hsl(38, 54, 88)
 
     # The light: sun or moon, placed by the seed, never dead centre.
     lx = w * (0.16 + (d[4] / 255.0) * 0.68)
@@ -685,7 +711,34 @@ def ld_within(kind, name, url):
     return {"@type": kind, "name": name, "url": "https://europedoor.com" + url}
 
 
-def page(title, body, *, path, description, trail=None, area=None, head_extra="", scripts=(), wide=False, ld_blocks=(), og=None):
+# The two worlds. A surface belongs to one of them and does not blend.
+#
+#   DISCOVER      light, warm, editorial, human — where people fall in love
+#                 with Europe: stories, destinations, places, experiences,
+#                 culture, food, photography-led browsing.
+#   INTELLIGENCE  dark, graphite, quietly luminous — where people meet the
+#                 machine: the map, the planner, My Europe, search, route
+#                 and filter intelligence, EuropeDoor Guide.
+#
+# It is one attribute on <body> and the stylesheet does the rest, because the
+# alternative — a second set of components for the dark world — is how a
+# masthead comes to exist twice and diverge within a month. The tokens are
+# rebound per world; every rule that consumes them is written once.
+WORLDS = ("discover", "intelligence")
+
+
+# Accents inside DISCOVER. cobalt is the default and needs no marker; the
+# cultural accent is bound by the nav area the shell already sets. Only
+# heritage — the pages about how this project knows what it claims — needs
+# saying out loud, because those pages have no nav area of their own.
+ACCENTS = ("", "heritage")
+
+
+def page(title, body, *, path, description, trail=None, area=None, head_extra="", scripts=(), wide=False, ld_blocks=(), og=None, world="discover", accent=""):
+    if world not in WORLDS:
+        raise ValueError(f"{path}: unknown world {world!r}; it is one of {WORLDS}")
+    if accent not in ACCENTS:
+        raise ValueError(f"{path}: unknown accent {accent!r}; it is one of {ACCENTS}")
     nav = []
     for href, label, _blurb in NAV:
         mark = ' aria-current="page"' if area == label.lower() else ''
@@ -712,7 +765,7 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 <link rel="stylesheet" href="/assets/css/europedoor.css">
 <link rel="icon" href="/assets/door.svg" type="image/svg+xml">
 {ld(*ld_blocks)}{head_extra}</head>
-<body class="area-{esc(area or 'none')}">
+<body class="area-{esc(area or 'none')}" data-world="{world}"{f' data-accent="{accent}"' if accent else ''}>
 <a class="skip" href="#main">{esc(T("skip"))}</a>
 <header class="masthead">
   <div class="masthead-in">

@@ -6,67 +6,133 @@
 :root {
   color-scheme: light dark;
 
-  /* ── the palette ──────────────────────────────────────────────
+  /* ── the palette: EUROPEAN FUTURE ─────────────────────────────
    *
-   * Brand Bible V1: Atlantic green primary, a pale editorial ground,
-   * terracotta for warmth, near-black for type, muted brass for heritage
-   * moments. Explicitly NOT EU blue-and-gold: looking like an institution
-   * we are not is worse than looking like nothing.
+   * See docs/instruction.md. The raw values are also in docs/palette.json,
+   * which is the checkable copy: tools/checks.py recomputes the WCAG contrast
+   * of every claimed pairing from those hexes, so a value nudged "slightly
+   * warmer" in a redesign cannot quietly take a ratio with it.
    *
-   * The greens are pulled cool and north — the Atlantic seaboard, not a
-   * forest floor — and the ground is a limestone paper rather than a warm
-   * sand. That is a deliberate distance from other travel sites in this
-   * family: a palette that reads as somebody else's is not an identity.
+   * This is a migration of the previous system rather than a replacement of
+   * it. Limestone stays as the ground, Atlantic green and terracotta stay
+   * with narrow named roles, and gold leaves entirely. What is new is the
+   * graphite foundation, the cobalt signature and the electric accent — and
+   * the two worlds those make possible.
    *
-   * Every value below was measured against the WCAG 2.2 AA line by
-   * tools/browser-checks.js in both colour schemes, on all three paper
-   * tones. Two earlier tokens failed that check and were darkened; the
-   * comments recording which are kept on purpose.
+   * TWO WORLDS, one set of components. <body data-world> selects which set of
+   * semantic tokens the whole stylesheet resolves to. Everything below the
+   * token block is written once and inherits.
+   *
+   *   DISCOVER      limestone ground, graphite ink, cobalt action.
+   *   INTELLIGENCE  graphite ground, limestone ink, cobalt-lift action, and the
+   *                 electric accent — which cannot appear in the light world
+   *                 at all, because #C8FF4D on #F5F2EA is 1.05:1. That is not
+   *                 a constraint on the idea; it is the idea enforced by
+   *                 physics, and it makes lime a reliable signal that the
+   *                 reader has crossed into the machine.
+   *
+   * The ratio is the instruction, not the hex codes: 60 limestone / 25
+   * graphite / 10 cobalt / 5 electric. A palette gives you a blue website with gold
+   * buttons; a ratio gives you European editorial design over futuristic
+   * infrastructure.
    */
 
-  /* ground — limestone, cool, editorial */
-  --paper:        #f7f6f3;
-  --paper-2:      #eeece7;
-  --paper-3:      #e3e0d8;
-  --ink:          #14181c;   /* near-black charcoal, the Bible's "dark" */
-  --ink-2:        #39424a;
-  --ink-3:        #59626c;
-  --rule:         #d8d5cc;
+  /* raw — never used directly by a component, only bound below */
+  --graphite:     #101214;
+  --graphite-2:   #1a1e22;
+  --graphite-3:   #1d2226;
+  --limestone:    #f7f6f3;   /* never #fff: white is a screen, limestone is paper.
+                                Kept from the previous system rather than replaced with
+                                a warmer ivory — the ground was the part of the old
+                                palette that was already right, and the owner's table
+                                names it. */
+  --limestone-2:  #eeece7;
+  --limestone-3:  #e3e0d8;
+  --cobalt:       #3157ff;   /* the signature. 4.93 on limestone, 4.52 on the card
+                                ground, 4.04 on --paper-3 — so it is a DRAWN colour,
+                                not a read one. See --signature below. */
+  --cobalt-deep:  #2a4ad9;   /* everything cobalt that is text: 6.31 / 5.78 / 5.17 */
+  --cobalt-lift:  #627fff;   /* actions in the dark world. Chosen against the CARD, not
+                                the ground — #5070FF clears 4.56 on #101214 and falls to
+                                4.07 on #1a1e22, where links actually sit. A dark palette
+                                has two backgrounds and the lighter one binds. */
+  --cobalt-air:   #8398ff;   /* the accent in the dark world's DISCOVER surfaces */
+  --lime:         #c8ff4d;   /* INTELLIGENCE only, and not by policy: 1.05:1
+                                on limestone means it is invisible in the light
+                                world whatever anyone intends */
+  --ultramarine:  #665cff;   /* atmosphere only: gradients, map washes. Never type. */
 
-  /* PRIMARY — Atlantic green. The door, the wordmark, the primary action. */
+  /* Retained from the previous system, with narrow homes rather than as
+     leftovers. Both are DISCOVER colours and neither appears in
+     INTELLIGENCE, where the only accent is lime.
+
+     --atlantic    heritage and provenance. The pages that talk about how
+                   this project knows what it claims: /method, /sources,
+                   /brand, /honest, /fund. It was the primary for a year and
+                   it is the right colour for the parts of the product that
+                   are about its own history and trustworthiness.
+     --terracotta  the warm cultural accent: stories, events, experiences.
+                   Inside DISCOVER, cobalt marks the structural and
+                   geographic — countries, regions, destinations, journeys —
+                   and terracotta marks the human and cultural. That is a
+                   real editorial distinction, not decoration. */
   --atlantic:     #14483c;
   --atlantic-2:   #0e3630;
-  --atlantic-3:   #1d6250;
-
-  /* ACCENT — terracotta. Warmth and human culture; never the primary
-     action, or the page starts shouting in two voices at once. */
   --terracotta:   #a4491f;
-  --terracotta-2: #8a3a17;
+  --terracotta-2: #8a3a17;   /* the deeper one, for text on --paper-3 where
+                                #a4491f measures 4.48 and just misses */
 
-  /* HIGHLIGHT — muted brass, for heritage moments only. Not a UI colour:
-     nothing interactive is ever brass, because a gold control reads as a
-     premium upsell and there is nothing to sell. */
-  --brass:        #8a6d34;
+  /* There is no gold. Brass was the only gold token in the previous system,
+     it was already forbidden on anything interactive, and European Future
+     removes it: gold says luxury, premium, heritage, wealth, and this
+     product has to say Europe, discovery, movement, intelligence, culture,
+     future. The one place it survived — the "computed" source tier — is a
+     neutral grey now, which is also more honest about what that tier is. */
 
-  /* the signals, mapped onto the new palette
-     --door is the accent in prose and kickers; --sea is the interactive
-     colour (focus rings, links in body copy) and is now the primary green
-     rather than a separate blue, so the palette holds together. */
-  --door:         var(--terracotta);
-  --door-dark:    var(--terracotta-2);
-  --sea:          var(--atlantic);
-  --sea-dark:     var(--atlantic-2);
-  --warn:         #8a3324;
+  /* ── WORLD 01 — DISCOVER, light ────────────────────────────── */
+  --paper:        var(--limestone);
+  --paper-2:      var(--limestone-2);
+  --paper-3:      var(--limestone-3);
+  --ink:          var(--graphite);
+  --ink-2:        #3a4048;
+  --ink-3:        #565d66;   /* 5.05 on --paper-3; #5c636c measured 4.15 there and failed */
+  --rule:         #d8d5cc;
 
-  /* the map. Five values, kept together so the drawing can be re-toned in
-     one place — a map whose colours are scattered across twelve rules is a
-     map nobody adjusts twice. */
-  --map-sea:      #dbe3e0;
-  --map-land:     #f7f6f3;
-  --map-context:  #e7e6e0;
-  --map-border:   #b9c3bf;
-  --map-hover:    #cbdad4;
-  --warn-bg:      #f8eeea;
+  --sea:          var(--cobalt-deep);   /* links, focus rings, the interactive colour */
+  --sea-dark:     #1f3aad;
+
+  /* --door is the accent WHERE IT IS TEXT, so it is cobalt-deep and not the
+     signature. The signature #3157FF was bound here first and the browser
+     suite failed seven pages with it: 4.77 on ivory, but 4.36 on the card
+     ground --paper-2 and 3.64 on stone, and a kicker lives on a card. This
+     is the instruction's own finding arriving as a build failure — "cobalt
+     reads on ivory and nowhere else" — which is what a check is for.
+
+     So in the light world the accent and the action are the same blue, and
+     the difference between them is typographic: a kicker is small-caps, a
+     link is underlined, a button is filled. One signature used three ways is
+     a firmer identity than two hues competing, and the second note in the
+     ratio is graphite, not another colour. */
+  --door:         var(--cobalt-deep);
+  --door-dark:    #1f3aad;
+
+  /* The signature at full strength, for things that are drawn rather than
+     read. WCAG asks 3:1 of a graphic, not 4.5:1, so this is where #3157FF
+     lives: the mark, the score bars, the dots on the map. */
+  --signature:    var(--cobalt);
+
+  /* Warnings are the one thing that must not be the brand colour, or an
+     advisory reads as a link. A brick red, measured: 6.46 on ivory. */
+  --warn:         #a32a1e;
+  --warn-bg:      #f7ebe8;
+
+  /* the map — always INTELLIGENCE, wherever it is embedded */
+  --map-sea:      #0a0e10;
+  --map-land:     #1f252a;
+  --map-context:  #161b1f;
+  --map-border:   #39434b;
+  --map-hover:    #24405e;
+
 
   /* type */
   --display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
@@ -97,36 +163,126 @@
   --shadow-lift: 0 2px 4px rgba(20,22,30,.08), 0 18px 40px -18px rgba(20,22,30,.30);
 }
 
+/* Inside DISCOVER, the accent says what kind of thing you are reading.
+ *
+ *   cobalt      structural and geographic — the homepage, countries,
+ *               regions, destinations, journeys. The default.
+ *   terracotta  human and cultural — stories, events, experiences.
+ *   atlantic    heritage and provenance — how this project knows what it
+ *               claims: /method, /sources, /brand, /honest, /fund.
+ *
+ * Bound by the class the shell already sets, so no page builder had to
+ * change for the first two. It is a distinction a reader will never name and
+ * will feel: an essay about a festival should not be the same blue as a
+ * boundary dataset.
+ *
+ * INTELLIGENCE overrides all of it below — in the dark world the accent is
+ * lime and nothing else, which is what makes crossing worlds legible. */
+body.area-stories, body.area-events, body.area-experiences {
+  --door:      var(--terracotta);
+  --door-dark: var(--terracotta-2);
+}
+body[data-accent="heritage"] {
+  --door:      var(--atlantic);
+  --door-dark: var(--atlantic-2);
+}
+
+/* Both accents have to lift for a dark-preference reader, and the browser
+   suite is what said so: #a4491f is 3.17:1 on graphite and #14483c is
+   1.81:1, which is a heading nobody can see. The lifted values are the ones
+   the previous system already used at night — this is the one place where
+   the old palette's homework carried straight over. */
+@media (prefers-color-scheme: dark) {
+  body.area-stories, body.area-events, body.area-experiences {
+    --door:      #e08a5c;
+    --door-dark: #ea9a6c;
+  }
+  body[data-accent="heritage"] {
+    --door:      #63b79c;
+    --door-dark: #77c7ad;
+  }
+}
+
+/* INTELLIGENCE outranks both, in every preference. `body.area-x` is
+   specificity (0,1,1) and a bare [data-world] is (0,1,0), so without the
+   extra element qualifier a cultural page that ever became INTELLIGENCE
+   would keep terracotta on a graphite ground — 3.17:1, and invisible. No
+   page is in that position today; the rule is here so none ever is. */
+body[data-world="intelligence"] {
+  --door:      var(--lime);
+  --door-dark: #d8ff85;
+}
+
+/* ── WORLD 02 — INTELLIGENCE ───────────────────────────────────
+ *
+ * The map, the planner, My Europe, search, journey construction,
+ * personalisation, saved journeys, route and filter intelligence, and
+ * EuropeDoor Guide.
+ *
+ * Dark in BOTH colour-scheme preferences, deliberately. The world is a
+ * statement about where the reader is, not a lighting preference: if
+ * INTELLIGENCE went light for a light-mode reader, the two worlds would
+ * collapse into one and the whole idea would be a theme toggle with extra
+ * steps.
+ *
+ * Applied to a whole page via <body data-world="intelligence">, and to a
+ * single component inside a DISCOVER page — the map figure on a country page —
+ * via the same attribute on that element. That is the door working as a design
+ * language rather than as a glyph: a window into the machine, cut into an
+ * editorial page. */
+[data-world="intelligence"] {
+  --paper:        var(--graphite);
+  --paper-2:      var(--graphite-2);
+  --paper-3:      var(--graphite-3);
+  --ink:          var(--limestone);
+  --ink-2:        #c3c8cc;
+  --ink-3:        #949ba3;
+  --rule:         #2a3138;
+
+  --sea:          var(--cobalt-lift);
+  --sea-dark:     var(--cobalt-air);
+  --door:         var(--lime);      /* the electric accent, ~5%, and only here */
+  --door-dark:    #d8ff85;
+  --signature:    var(--cobalt-lift);
+
+  --warn:         #f0a090;
+  --warn-bg:      #2a1a17;
+
+  --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 24px -12px rgba(0,0,0,.7);
+  --shadow-lift: 0 2px 4px rgba(0,0,0,.55), 0 18px 40px -18px rgba(0,0,0,.8);
+
+  color-scheme: dark;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* DISCOVER, for a reader who prefers dark.
+ *
+ * Not an inversion of the light world and not a copy of INTELLIGENCE. The
+ * ground is the same graphite, because there is only one dark ground worth
+ * having — but the accent stays in the cobalt family rather than becoming
+ * lime. That is what keeps the two worlds distinguishable for a dark-mode
+ * reader: DISCOVER is blue, INTELLIGENCE is electric, and lime never appears
+ * on an editorial page in either preference. */
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Not an inversion. At night the ground becomes the deep end of the
-       Atlantic green rather than a neutral grey, so the brand survives the
-       switch; the accent lifts because terracotta at #a4491f on a dark
-       ground is unreadable. */
-    --paper: #0d1416;
-    --paper-2: #131c1e;
-    --paper-3: #1b2528;
-    --ink: #eceae4;
-    --ink-2: #bec5c4;
-    --ink-3: #8e9896;
-    --rule: #263134;
-    --atlantic: #4f9d85;
-    --atlantic-2: #6fb69f;
-    --atlantic-3: #2c6d5b;
-    --terracotta: #e08a5c;
-    --terracotta-2: #ecA079;
-    --brass: #c2a165;
-    --door: var(--terracotta);
-    --door-dark: var(--terracotta-2);
-    --sea: var(--atlantic);
-    --sea-dark: var(--atlantic-2);
-    --warn: #eda897;
-    --map-sea: #0a1214;
-    --map-land: #1b2528;
-    --map-context: #141c1e;
-    --map-border: #35464a;
-    --map-hover: #2c4a44;
-    --warn-bg: #2a1a17;
+    --paper:        var(--graphite);
+    --paper-2:      var(--graphite-2);
+    --paper-3:      var(--graphite-3);
+    --ink:          var(--limestone);
+    --ink-2:        #c3c8cc;
+    --ink-3:        #949ba3;
+    --rule:         #2a3138;
+
+    --sea:          var(--cobalt-lift);
+    --sea-dark:     var(--cobalt-air);
+    --door:         var(--cobalt-air);
+    --door-dark:    #a3b4ff;
+    --signature:    var(--cobalt-lift);
+
+    --warn:         #f0a090;
+    --warn-bg:      #2a1a17;
+
     --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 24px -12px rgba(0,0,0,.7);
     --shadow-lift: 0 2px 4px rgba(0,0,0,.55), 0 18px 40px -18px rgba(0,0,0,.8);
   }
@@ -166,8 +322,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
    any ground including a photograph. It takes its colour from the palette,
    which is why it is inline SVG and not a file in an <img>. */
 .mark { width: 1.05em; height: 1.05em; flex: none; }
-.mark-frame { fill: var(--atlantic); }
-.mark-leaf  { fill: var(--atlantic-3); }
+.mark-frame { fill: var(--ink); }
+.mark-leaf  { fill: var(--signature); }
 .nav { display: flex; gap: var(--s5); flex-wrap: wrap; font-size: var(--t-sm); letter-spacing: .04em; text-transform: uppercase; }
 .nav a { text-decoration: none; color: var(--ink-2); padding-bottom: 2px; border-bottom: 1.5px solid transparent; }
 .nav a:hover { color: var(--ink); border-bottom-color: var(--door); }
@@ -195,10 +351,17 @@ main.wide { max-width: 92rem; }
 .hero .lede { font-size: clamp(var(--t-md), 2vw, var(--t-lg)); max-width: 42rem; margin-top: var(--s5); }
 .hero-actions { display: flex; gap: var(--s3); flex-wrap: wrap; margin-top: var(--s6); }
 
-.btn { display: inline-block; text-decoration: none; font-size: var(--t-base); padding: var(--s3) var(--s5); border-radius: var(--radius); border: 1px solid var(--ink); background: var(--ink); color: var(--paper); font-weight: 500; cursor: pointer; }
-.btn:hover { background: var(--ink-2); border-color: var(--ink-2); }
-.btn.ghost { background: transparent; color: var(--ink); }
-.btn.ghost:hover { background: var(--paper-2); }
+/* The primary action is the signature colour, not ink. Cobalt is 10% of the
+ * ratio and this is where most of that 10% is spent: a graphite button is
+ * correct and says nothing, and a palette whose signature never appears on
+ * the one thing the reader is meant to press is a palette that exists only
+ * in the documentation. Measured both ways — ivory on cobalt-deep is 6.09,
+ * graphite on cobalt-lift is 5.36 — because the label inverts with the world
+ * and only one of those two would have been checked by eye. */
+.btn { display: inline-block; text-decoration: none; font-size: var(--t-base); padding: var(--s3) var(--s5); border-radius: var(--radius); border: 1px solid var(--sea); background: var(--sea); color: var(--paper); font-weight: 500; cursor: pointer; }
+.btn:hover { background: var(--sea-dark); border-color: var(--sea-dark); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
+.btn.ghost:hover { background: var(--paper-2); border-color: var(--sea); color: var(--sea); }
 
 /* ── bands & grids ────────────────────────────────────────── */
 .band { margin: var(--s8) 0; }
@@ -327,7 +490,7 @@ main.wide { max-width: 92rem; }
 .scorerow { display: grid; grid-template-columns: 8.5rem 1fr 2.5rem; gap: var(--s3); align-items: center; margin-bottom: var(--s2); }
 .scorelabel { font-size: var(--t-sm); color: var(--ink-2); }
 .scorebar { height: 7px; background: var(--paper-3); border-radius: 999px; overflow: hidden; }
-.scorebar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--sea), var(--door)); }
+.scorebar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--sea), var(--signature)); }
 .scorenum { font-family: var(--mono); font-size: var(--t-sm); text-align: right; color: var(--ink-2); }
 .score .small { margin: var(--s4) 0 0; }
 
@@ -395,7 +558,10 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 @media (max-width: 60rem) { .masthead-in { flex-wrap: wrap; } }
 
 /* ── the small map on a destination page ──────────────────────────── */
-.minimap { margin: var(--s5) 0; padding: var(--s4); border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper-2); }
+.minimap {
+  margin: var(--s5) 0; padding: var(--s4); border: 1px solid var(--rule);
+  border-radius: var(--radius); background: var(--paper); color: var(--ink);
+}
 .minimap svg { width: 100%; height: auto; display: block; }
 .minidot circle { fill: var(--ink-3); opacity: .55; }
 .minidot:hover circle { fill: var(--door); opacity: 1; }
@@ -877,8 +1043,8 @@ html { scroll-padding-top: 5rem; }
  * four permanent arrows in a row is four arrows competing.
  */
 .doors .door { position: relative; }
-.doors .door .kicker { color: var(--atlantic); }
-.doorgo { margin: var(--s3) 0 0; color: var(--terracotta); font-size: var(--t-lg);
+.doors .door .kicker { color: var(--sea); }
+.doorgo { margin: var(--s3) 0 0; color: var(--door); font-size: var(--t-lg);
           opacity: 0; transform: translateX(-4px); transition: opacity .18s ease, transform .18s ease; }
 .doors .door:hover .doorgo, .doors .door:focus-visible .doorgo { opacity: 1; transform: none; }
 @media (max-width: 60rem) { .doorgo { opacity: 1; transform: none; } }
@@ -891,7 +1057,7 @@ html { scroll-padding-top: 5rem; }
 .manifesto { font-family: var(--display); font-size: clamp(var(--t-lg), 2.4vw, var(--t-2xl));
              line-height: 1.5; max-width: 44rem; }
 .manifesto p { margin: 0 0 var(--s3); max-width: none; text-wrap: balance; }
-.manifesto-close { margin-top: var(--s6); color: var(--atlantic); font-weight: 600; }
+.manifesto-close { margin-top: var(--s6); color: var(--sea); font-weight: 600; }
 
 /* ── the trust architecture ───────────────────────────────────
  * Four sources, and the point is that they LOOK different. A badge with a
@@ -907,12 +1073,12 @@ html { scroll-padding-top: 5rem; }
 .tierbadge { display: inline-block; font-family: var(--text); font-size: var(--t-xs);
              letter-spacing: .12em; text-transform: uppercase; font-weight: 700;
              padding: 3px 9px; border-radius: 999px; }
-.tier-verified  { border-left-color: var(--atlantic); }
-.tier-verified  .tierbadge { background: var(--atlantic); color: var(--paper); }
-.tier-editorial { border-left-color: var(--terracotta); }
-.tier-editorial .tierbadge { background: var(--terracotta); color: var(--paper); }
-.tier-computed  { border-left-color: var(--brass); }
-.tier-computed  .tierbadge { background: var(--brass); color: var(--paper); }
+.tier-verified  { border-left-color: var(--sea); }
+.tier-verified  .tierbadge { background: var(--sea); color: var(--paper); }
+.tier-editorial { border-left-color: var(--door); }
+.tier-editorial .tierbadge { background: var(--door); color: var(--paper); }
+.tier-computed  { border-left-color: var(--ink-3); }
+.tier-computed  .tierbadge { background: var(--ink-3); color: var(--paper); }
 .tier-community { border-left-color: var(--ink-3); }
 .tier-community .tierbadge { background: transparent; color: var(--ink-3);
                              box-shadow: inset 0 0 0 1.5px var(--ink-3); }
@@ -972,7 +1138,7 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 .addq { width: 100%; padding: var(--s3); border: 1px solid var(--rule);
         border-radius: var(--radius); background: var(--paper); color: var(--ink);
         font: inherit; min-height: 44px; }
-.addq:focus { border-color: var(--atlantic); }
+.addq:focus { border-color: var(--sea); }
 /* The focus ring is offset 3px and was landing on the help text below it. */
 .addstop .small { margin-top: var(--s3); }
 .addhits { list-style: none; margin: var(--s3) 0 0; padding: 0; }
@@ -993,8 +1159,8 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 .chip.pick { cursor: pointer; font: inherit; font-size: var(--t-sm);
              border: 1px solid var(--rule); background: var(--paper); color: var(--ink-2);
              min-height: 36px; }
-.chip.pick:hover { border-color: var(--atlantic); color: var(--ink); }
-.chip.pick[aria-pressed="true"] { background: var(--atlantic); border-color: var(--atlantic);
+.chip.pick:hover { border-color: var(--sea); color: var(--ink); }
+.chip.pick[aria-pressed="true"] { background: var(--sea); border-color: var(--sea);
                                   color: var(--paper); }
 @media (max-width: 44rem) { .chip.pick { min-height: 44px; } }
 
@@ -1002,10 +1168,10 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
  * apart rather than folded into the body copy — a recommendation you cannot
  * interrogate is an advertisement. */
 .whythis { margin: var(--s3) 0 0; font-size: var(--t-sm); color: var(--ink-2);
-           border-left: 3px solid var(--atlantic-3); padding-left: var(--s3); max-width: none; }
+           border-left: 3px solid var(--sea-dark); padding-left: var(--s3); max-width: none; }
 .whyall { margin: 0 0 var(--s4); font-size: var(--t-sm); color: var(--ink-2);
-          border-left: 3px solid var(--atlantic); padding-left: var(--s3); max-width: none; }
-.whyall span, .whythis span { font-weight: 700; color: var(--atlantic);
+          border-left: 3px solid var(--sea); padding-left: var(--s3); max-width: none; }
+.whyall span, .whythis span { font-weight: 700; color: var(--sea);
                               letter-spacing: .04em; text-transform: uppercase;
                               font-size: var(--t-xs); margin-right: var(--s2); }
 
@@ -1023,9 +1189,9 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
  * merely intended.
  */
 .stage { font-size: var(--t-xs); letter-spacing: .18em; text-transform: uppercase;
-         font-weight: 700; color: var(--atlantic); margin: 0 0 var(--s2); }
+         font-weight: 700; color: var(--sea); margin: 0 0 var(--s2); }
 .stage::before { content: ""; display: inline-block; width: 1.6rem; height: 1px;
-                 background: var(--atlantic); vertical-align: middle;
+                 background: var(--sea); vertical-align: middle;
                  margin-right: var(--s3); }
 
 /* The wonder band. Quieter ground and a wider measure, because the point of
@@ -1048,7 +1214,7 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
           border-radius: var(--radius); background: var(--paper-2); }
 .whatif h2.mini { margin-top: 0; }
 .whatif .chips { margin: var(--s4) 0; }
-.whatif-preview { background: var(--paper); border-left: 4px solid var(--atlantic); }
+.whatif-preview { background: var(--paper); border-left: 4px solid var(--sea); }
 .whatif-preview .stack { margin: var(--s3) 0; }
 .whatif-preview .stack li { margin-bottom: var(--s2); }
 

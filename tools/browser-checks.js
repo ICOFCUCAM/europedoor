@@ -1267,6 +1267,103 @@ async function main() {
   );
   ok(mapOver <= 1, `/map overflows the page by ${mapOver}px instead of scrolling its own wrapper`);
 
+  // ── the two worlds ─────────────────────────────────────────────────
+  //
+  // A palette can be correct in a token file and wrong on the page: what
+  // matters is what the browser paints after cascade, media query and
+  // inheritance. So these read computed colour, not CSS source.
+  //
+  // The load-bearing claim is that INTELLIGENCE is dark in BOTH colour-scheme
+  // preferences. If it went light for a light-mode reader the two worlds
+  // would collapse into one and the whole idea would be a theme toggle.
+  const LUM = (c) => {
+    const n = (c.match(/-?\d*\.?\d+/g) || []).map(Number);
+    const scale = /^color\(/.test(c) ? 255 : 1;
+    const [r, g, b] = n.slice(0, 3).map((v) => {
+      const x = (v * scale) / 255;
+      return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const worldProbe = () => ({
+    world: document.body.dataset.world || "discover",
+    accent: document.body.dataset.accent || "",
+    bg: getComputedStyle(document.body).backgroundColor,
+    door: getComputedStyle(document.body).getPropertyValue("--door").trim(),
+    limeAnywhere: [...document.querySelectorAll("*")].some((el) => {
+      const c = getComputedStyle(el).color;
+      const m = c.match(/\d+/g);
+      return m && Number(m[0]) > 150 && Number(m[1]) > 220 && Number(m[2]) < 130;
+    }),
+  });
+
+  for (const scheme of ["light", "dark"]) {
+    const w = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await w.emulateMedia({ colorScheme: scheme });
+
+    for (const url of ["/map", "/plan", "/my-europe", "/search", "/discover"]) {
+      await w.goto(base + url, { waitUntil: "load" });
+      const r = await w.evaluate(worldProbe);
+      ok(r.world === "intelligence", `${url} is not in the INTELLIGENCE world`);
+      ok(LUM(r.bg) < 0.06, `${scheme} ${url}: INTELLIGENCE is not dark (${r.bg})`);
+      ok(/200,\s*255,\s*77|#c8ff4d/i.test(r.door),
+         `${scheme} ${url}: the INTELLIGENCE accent is ${r.door}, not electric lime`);
+    }
+
+    // DISCOVER: three accents, and never the electric one.
+    for (const [url, want] of [["/", "structural"], ["/europe/norway", "structural"],
+                               ["/stories", "cultural"], ["/events/oct", "cultural"],
+                               ["/method", "heritage"], ["/sources", "heritage"]]) {
+      await w.goto(base + url, { waitUntil: "load" });
+      const r = await w.evaluate(worldProbe);
+      ok(r.world === "discover", `${url} should be DISCOVER, is ${r.world}`);
+      ok(!r.limeAnywhere, `${scheme} ${url}: electric lime is set on text in the light world`);
+      if (want === "heritage") ok(r.accent === "heritage", `${url} is not marked heritage`);
+      if (want === "cultural") {
+        // --door is a custom property, so it comes back as the authored
+        // value — a hex — not as the rgb() a computed colour would give.
+        ok(/#a4491f|#e08a5c|164,\s*73,\s*31|224,\s*138,\s*92/i.test(r.door),
+           `${scheme} ${url}: the cultural accent is ${r.door}, not terracotta`);
+      }
+    }
+
+    // DISCOVER follows the reader's preference; INTELLIGENCE does not.
+    await w.goto(base + "/", { waitUntil: "load" });
+    const home = await w.evaluate(worldProbe);
+    ok(scheme === "light" ? LUM(home.bg) > 0.7 : LUM(home.bg) < 0.06,
+       `${scheme}: DISCOVER did not follow the colour-scheme preference (${home.bg})`);
+
+    // A map is INTELLIGENCE wherever it is embedded.
+    await w.goto(base + "/europe/italy", { waitUntil: "load" });
+    ok(await w.locator('.countrymap[data-world="intelligence"]').count() === 1,
+       "the country map is not an INTELLIGENCE component");
+    const figBg = await w.evaluate(() =>
+      getComputedStyle(document.querySelector(".countrymap")).backgroundColor);
+    ok(LUM(figBg) < 0.06, `the embedded map is not dark (${figBg})`);
+    await w.close();
+  }
+
+  // No gold anywhere in what the browser actually paints.
+  const goldPage = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  await goldPage.goto(base + "/sources", { waitUntil: "load" });
+  const golds = await goldPage.evaluate(() => {
+    const bad = [];
+    for (const el of document.querySelectorAll("*")) {
+      const cs = getComputedStyle(el);
+      for (const prop of ["color", "backgroundColor", "borderTopColor"]) {
+        const m = (cs[prop] || "").match(/\d+/g);
+        if (!m) continue;
+        const [r, g, b] = m.map(Number);
+        if (r >= 90 && r <= 215 && Math.abs(r - g) < 55 && g - b > 45 && r - b > 70) {
+          bad.push(`${el.tagName}.${el.className} ${prop} rgb(${r},${g},${b})`);
+        }
+      }
+    }
+    return bad.slice(0, 3);
+  });
+  ok(golds.length === 0, `gold is painted on /sources: ${golds[0]}`);
+  await goldPage.close();
+
   // ── accessibility: WCAG 2.2 AA, the part a machine can hold ─────────
   //
   // Not a conformance claim. These are the failures a build can catch, run
@@ -1415,7 +1512,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 540;
+  const FLOOR = 600;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +
