@@ -7,6 +7,7 @@ test without a build directory existing.
 
 from __future__ import annotations
 
+import hashlib
 import math
 from urllib.parse import quote
 
@@ -1713,7 +1714,23 @@ def minimap(data, t, span=3.2):
     # The land is the doorway's ground: an arch cut over emptiness is a
     # shape, an arch cut over a coastline is an opening onto somewhere.
     ctx, land = geo.landmass(MAPPROJ, (0, 0, MAP_W, MAP_H))
-    uid = "mm%d" % (abs(hash((t["name"], t["lat"], t["lon"]))) % 100000)
+    # NOT builtins.hash(). THE BUILD WAS NOT DETERMINISTIC.
+    #
+    # This was `abs(hash((name, lat, lon))) % 100000`, and Python randomises
+    # the hash of a string per process unless PYTHONHASHSEED is set. So every
+    # build gave all 319 destination pages a different clipPath id and 319
+    # files changed with nothing behind it. The generated site is committed
+    # and CI fails when it is stale, so the cost is not cosmetic: `git
+    # status` after a build always said 319 files, which is exactly the
+    # amount of noise a real one-file regression hides in. It survived four
+    # commits of this work before a word-diff of a page I had not touched
+    # showed the only change was the id.
+    #
+    # sha256 of the same three values: stable across processes, machines and
+    # Python versions, which is what "the build produces identical pages"
+    # requires.
+    uid = "mm" + hashlib.sha256(
+        f'{t["name"]}|{t["lat"]}|{t["lon"]}'.encode()).hexdigest()[:8]
     if span == "auto":
         pts = [project(n["city"]["lat"], n["city"]["lon"]) for n in data["cities"].values()]
         span = 2.4

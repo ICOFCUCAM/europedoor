@@ -1970,6 +1970,46 @@ def c_aperture_agrees():
     return n
 
 
+@check("nothing in the build depends on Python's randomised hash")
+def c_no_builtin_hash():
+    # THE BUILD WAS NOT REPRODUCIBLE AND NOTHING SAID SO.
+    #
+    # minimap() built its clipPath id from `abs(hash((name, lat, lon)))`, and
+    # CPython randomises the hash of a string per process. Every build gave
+    # all 319 destination pages a different id, so `git status` after a build
+    # always reported 319 changed files with nothing behind them — which is
+    # exactly the amount of noise one real regression hides in. The generated
+    # site is committed and CI fails when it is stale, so "the build produces
+    # identical pages" is a promise this repository actually makes.
+    #
+    # hashlib is fine and is what the plates, the OG cache key and the
+    # aperture ids already use. builtins.hash() is not, for anything that
+    # reaches a file.
+    n = 0
+    # "tools" already contains "tools/lib" — listing both walked pages.py
+    # twice and reported the same line twice, which is a check lying about
+    # how much it found.
+    for sub in ("tools", "scripts"):
+        d = os.path.join(ROOT, sub)
+        if not os.path.isdir(d):
+            continue
+        for dirpath, dirnames, filenames in os.walk(d):
+            dirnames[:] = [x for x in dirnames if x != "__pycache__"]
+            for fn in sorted(filenames):
+                if not fn.endswith(".py"):
+                    continue
+                path = os.path.join(dirpath, fn)
+                for i, line in enumerate(open(path, encoding="utf-8"), 1):
+                    code = line.split("#", 1)[0]
+                    if re.search(r"(?<![.\w])hash\s*\(", code):
+                        fail(f"{os.path.relpath(path, ROOT)}:{i}: "
+                             f"builtins.hash() — randomised "
+                             f"per process, so anything it reaches makes the "
+                             f"build unreproducible. Use hashlib.")
+                n += 1
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0

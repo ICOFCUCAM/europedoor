@@ -181,6 +181,28 @@ Europe was 60% too wide and nobody noticed, because 313 dots on an empty
 rectangle are the right shape by definition. Real geography is what made it
 visible.
 
+**The aperture is the signature, and it is cut three ways.** Geography on
+EuropeDoor is seen through a doorway: an elliptical arch, rx = span/2, ry =
+34% of the height, on every embedded map, every generated plate and every
+social card. `render.arch_path()` cuts the SVG, `raster.Canvas.arch_mask()`
+cuts the pixels, and `.plate { border-radius: 50% 50% 0 0 / 34% 34% 0 0 }`
+cuts the box — three renderers because a plate's viewBox is 16/9 and its
+containers are 16/9, 3/4 and 21/9, so an aperture cut inside the drawing is
+cropped away by `preserveAspectRatio="slice"`. The head is elliptical rather
+than a circular segment for exactly one reason: CSS cannot state a circular
+segment. `checks.py` asserts all four values agree, and `signature.apertures`
+is a floor. **A map figure must paint no background** — the corners outside
+the arch show the page through, and that is the difference between an
+aperture and a panel. Light wall, dark opening.
+
+**A story is not a place, and its picture may not be drawn from a hash.**
+`plate_shapes()` picks a motif from the seed when none is passed, so for a
+year every essay opened on a landscape chosen by chance — the piece about the
+last unlogged primeval forest in Europe opened with tower blocks. A story
+opens on `storymap()`: the destinations in its own validated `places` field,
+same projection as `/map`, real coastline, through the arch. A photograph
+first if the register holds one; never an illustration.
+
 **Two worlds, one set of components.** `<body data-world>` selects which set
 of semantic tokens the whole stylesheet resolves to: DISCOVER is limestone and
 editorial, INTELLIGENCE is graphite and luminous. Five pages are INTELLIGENCE

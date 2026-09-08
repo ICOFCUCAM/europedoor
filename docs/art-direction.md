@@ -337,3 +337,122 @@ explaining. **No motion was added.**
 The **168px mobile masthead** — 20% of a 390×844 viewport on all 1,072 pages,
 on a site that already carries a bottom thumbbar covering the same
 destinations. Shell, not page. Owner's call.
+
+---
+
+# Part 2 — Iconicity
+
+The exemplars asked whether a page was *designed*. This part asks a harder
+question: whether a page is **recognisable with the logo removed**. Not
+professional — a hundred travel sites are professional. Distinctive,
+memorable, hard to confuse with anyone else, and emotionally about Europe.
+
+The answer had to be one thing, applied everywhere, because a signature that
+appears on three pages is a decoration.
+
+## The aperture
+
+**The door is not drawn. It is what you look through.**
+
+A logo of a door is a logo. An arch cut into every drawing on the site is a
+*structure*: geography is seen THROUGH a doorway, on every family, at every
+scale. It is also the one architectural form the whole continent shares —
+Roman, Romanesque, Gothic, Moorish, and every railway station built to look
+like all four — so it says Europe without a flag, a landmark or a stock
+photograph of a cobbled street.
+
+The head is **elliptical**, rx = span/2, ry = 34% of the height. It began as
+a circular segment, which is the more honest masonry, and that cost the
+signature a renderer: a circular segment cannot be written as a CSS
+`border-radius`. There are three renderers and they must agree.
+
+| renderer | what it cuts | where |
+|---|---|---|
+| `render.arch_path()` → SVG `clipPath` | the drawing | every embedded map |
+| `raster.Canvas.arch_mask()` → pixels | the card | 794 social cards |
+| `.plate { border-radius }` | the box | 319 generated plates |
+
+The plates are why there are three and not two. Their viewBox is always 16/9
+and their containers are not — `.card-art` is 16/9, `.card.tall` is 3/4, the
+lead mosaic tiles are 21/9 — and `preserveAspectRatio="slice"` crops the
+drawing to fill. An aperture cut *inside* that viewBox is cropped with it:
+sliced flat on the wide tiles, gone entirely on the tall card. A
+border-radius is measured against the painted box, so it fits whatever the
+box turns out to be.
+
+A static check asserts all four claims — the rise fraction in both Python
+renderers, the arc's rx/ry, and the border-radius in the stylesheet. Each was
+broken in turn and each failed alone.
+
+## Light wall, dark opening
+
+The embedded maps were dark panels sitting on the page. They are now openings
+cut into it: the drawing carries the INTELLIGENCE world, the figure carries
+the page's own so its caption stays legible, and **the figure paints
+nothing** — the corners outside the arch show the page through. A background
+on the figure fills them back in and there is no door.
+
+That inversion broke two browser assertions which had encoded the panel as
+though it were the promise, and they stayed red for four commits. Rewritten
+to the promise, in three parts, each able to fail alone.
+
+## The social card
+
+A card is the one image whose author never sees it: rendered days later, at
+somebody else's scale, inside a product we do not control, next to nine other
+links. If the signature is not in it, the most widely-seen surface EuropeDoor
+has is 794 anonymous gradients. The `og_key` hash had to gain a version tag
+for the re-render to happen at all — it hashed seed, motif and size, and the
+drawing was not one of its inputs.
+
+## Two families, two lessons
+
+**Story.** The plate at the top of an essay was chosen by a hash. "The last
+forest that was never cut", about the one primeval forest in Europe never
+logged, opened with 1260×540 of tower blocks. A plate is a landscape for a
+*place*, derived from what that place is; a story is not a place, it is a
+claim about several of them, and `places` already names which. A story now
+opens with its own geography.
+
+Then type, which is the only instrument this family has and the only one it
+needs: serif body, a measure that grows with the face, air where the tag
+chips were, and the places moved from a section under the save button into a
+sticky margin note beside the paragraphs that name them.
+
+**What it cost, recorded rather than hidden.** The first draft of that
+typography added two font sizes and four line-heights. Five of the six were
+vanity and were snapped back to values the site already had. One was kept:
+the essay hed's clamp, because there is no way to stop placing an
+identically-sized h1 on every family using a size that already exists.
+
+## The register as the control
+
+Twenty-six invariants. Two of them exist for this work:
+
+    signature.apertures   floor 396    pages whose geography is seen through the arch
+    plates.page_share     ceiling 0.456  pages carrying a generated illustration
+
+A floor and a ceiling pointing in opposite directions, which is the whole
+policy in two numbers: the door spreads, the illustration does not.
+
+## The questions each commit had to answer
+
+- Could this be a poster?
+- Would a reader know it was EuropeDoor with the logo removed?
+- What is the one thing being done here that another excellent travel website
+  probably would not?
+
+For the aperture the answer is that nobody else cuts their maps into a
+doorway. For the story family it is that the essay opens on the geography of
+its own argument, derived from a validated field, rather than on a
+photograph bought to look like the subject.
+
+## Still open
+
+- **The licensed photograph.** `docs/hero-brief.md`, seven questions, none
+  answered. The plate system has been measured unable to carry a hero and
+  that measurement is the whole justification for the spend.
+- **The 168px mobile masthead** — 20% of a 390×844 viewport on all 1,072
+  pages. Shell, not page. Owner's call.
+- **Region, Place, Event and Experience** have the aperture and not yet a
+  composition of their own.
