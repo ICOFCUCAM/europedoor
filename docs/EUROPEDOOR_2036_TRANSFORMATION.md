@@ -149,10 +149,9 @@ The honest list:
   has no coastlines, and it is not how anyone navigates the site. The brief's
   §5 is right that this is the biggest gap.
 - ~~Discovery requires knowing what you want.~~ **Fixed** — Discover Mode.
-- ~~No "why this?" on any recommendation.~~ **Fixed** on Discover Mode; the
-  planner's own legs still do not carry one, and should.
-- **The homepage is a good grid, not a story.** §50's OPEN → DISCOVER →
-  WONDER → UNDERSTAND → PLAN → GO progression is not there.
+- ~~No "why this?" on any recommendation.~~ **Fixed** — Discover Mode, the
+  motion pages and now every itinerary leg.
+- ~~The homepage is a good grid, not a story.~~ **Fixed.**
 - ~~No seasonal front door.~~ **Fixed** — Europe in Motion.
 
 ## 16. Accessibility problems
@@ -275,7 +274,22 @@ current stack.
    and inventing a proxy for one and calling it evidence is the thing this
    project exists not to do. It measures obscurity *within this Atlas* —
    a smaller claim, and one we can defend.
-6. **The homepage as a progression** (§50).
+6. ~~**The homepage as a progression**~~ **BUILT.** Open → discover →
+   wonder → understand → browse → plan → go, with each step **named on the
+   page**, because a progression nobody can see is just an ordering. The
+   wonder band changes ground and runs full-bleed so the rhythm is felt
+   rather than merely intended, and the geography index — nine regions,
+   seventeen tags — moves *after* the emotional part instead of opening the
+   page with a filing cabinet.
+
+   This puts the 2036 brief in direct conflict with §7 of the earlier UI
+   specification, which fixes the order as regions → experiences →
+   journeys. The later brief wins; the section audit records that it does
+   and why.
+
+**Phase B is complete.** Every UX finding in the audit above is now struck
+through except the map, which is Phase A and waits on the licensing
+decision.
 
 ### Phase C — The journey engine grows up
 

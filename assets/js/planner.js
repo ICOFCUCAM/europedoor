@@ -378,16 +378,77 @@
     return (sym ? sym : CUR + " ") + v.toLocaleString("en-GB");
   }
 
-  function whyLine(city, wants) {
-    var hits = wants.filter(function (w) { return city.interests.indexOf(w) >= 0; });
-    var names = hits.map(function (h) {
-      for (var i = 0; i < ATLAS.interests.length; i++) {
-        if (ATLAS.interests[i].slug === h) return ATLAS.interests[i].name.toLowerCase();
-      }
-      return h;
+  function interestName(slug) {
+    for (var i = 0; i < ATLAS.interests.length; i++) {
+      if (ATLAS.interests[i].slug === slug) return ATLAS.interests[i].name.toLowerCase();
+    }
+    return slug;
+  }
+
+  function joinList(items) {
+    items = items.filter(Boolean);
+    if (!items.length) return "";
+    if (items.length === 1) return items[0];
+    if (items.length === 2) return items[0] + " and " + items[1];
+    return items.slice(0, -1).join(", ") + " and " + items[items.length - 1];
+  }
+
+  /* Why THIS stop, and not the runner-up.
+   *
+   * The old version said "Matches history & ruins, food." on every leg of
+   * an itinerary built from history and food — which is the interests the
+   * reader had just ticked, read back to them, twelve times. Same mistake
+   * Discover Mode made and the same fix: never explain the constraint back.
+   * The interests go once above the itinerary; each leg carries what
+   * distinguishes it.
+   *
+   * The clauses are ordered by how surprising they are, because the useful
+   * sentence is "you did not ask for this and it is here anyway".
+   */
+  function whyLine(city, wants, opts) {
+    var bits = [];
+
+    var extra = city.interests.filter(function (t) {
+      return wants.indexOf(t) < 0 &&
+        ["sacred", "wine", "wild", "islands", "winter", "music", "design",
+         "art", "architecture", "festivals", "rail"].indexOf(t) >= 0;
     });
-    if (!names.length) return "Chosen for the shape of the route rather than your interests — it sits between two places that did match.";
-    return "Matches " + names.join(", ") + ".";
+    if (extra.length) {
+      bits.push("also " + joinList(extra.slice(0, 3).map(interestName)));
+    }
+
+    if (opts && opts.month) {
+      if ((city.shoulder || []).indexOf(opts.month) >= 0) {
+        bits.push("in its quieter shoulder season then");
+      } else if (city.peak.indexOf(opts.month) >= 0) {
+        bits.push("at its peak then");
+      } else {
+        bits.push("out of season then");
+      }
+    }
+
+    if (city.disc >= 80) {
+      bits.push("well off the obvious circuit at " + city.disc + " for discoverability");
+    } else if (city.disc <= 30) {
+      bits.push("one of the obvious ones, which is not a criticism");
+    }
+
+    if ((city.todo || []).length === 0) {
+      bits.push("a stop rather than a schedule — we have tagged it but not written it up");
+    }
+
+    var matched = wants.filter(function (w) { return city.interests.indexOf(w) >= 0; });
+    if (!matched.length) {
+      bits.unshift("here for the shape of the route rather than your interests — it sits " +
+                   "between two places that did match");
+    }
+
+    if (!bits.length) return "";
+    /* Semicolons between the clauses, not "and". Each clause already
+     * contains an "and" of its own ("also architecture, art and wine"), so
+     * joining them with another one produced "…and wine & drink and at its
+     * peak then" — two conjunctions colliding in every sentence. */
+    return city.name + " is " + bits.join("; ") + ".";
   }
 
   function alternativesFor(scored, route, i, used) {
@@ -764,7 +825,7 @@
               '<h3><a href="' + city.url + '">' + city.name + "</a> <span class=\"small\">· " +
               city.country + " · " + city.region + "</span></h3>" +
               "<p>" + city.why + "</p>" +
-              '<p class="small mt-tight">' + whyLine(city, opts.wants) +
+              '<p class="small mt-tight">' + whyLine(city, opts.wants, opts) +
               " " + money(dailyRate(city, opts.style)) + " a day here." + "</p>" +
               '<ul class="daylist">' + dayHtml + "</ul>" + forcedNote + altHtml +
               controls + hop +
@@ -799,6 +860,11 @@
         "<div><dt>Ground covered</dt><dd>" + totalKm.toLocaleString("en-GB") + " km</dd></div>" +
       "</dl>" +
       verdict +
+      (opts.wants.length
+        ? '<p class="whyall"><span>In common</span> Every stop below carries at least one of ' +
+          joinList(opts.wants.map(interestName)) +
+          " — because that is what you asked for. Each line says what else is true of it.</p>"
+        : "") +
       '<ul class="legs">' + legs + "</ul>" +
       '<div class="hero-actions mt0">' +
         '<button class="btn ghost" type="button" id="saveplan">Save this to My Europe</button>' +

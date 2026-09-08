@@ -258,11 +258,53 @@ def s2036_6():
         "and shared reasons are hoisted rather than repeated per row"
 
 
+@section("2036-50", "The homepage as a progression", "BUILT",
+         "Open, discover, wonder, understand, plan, go — named on the page, "
+         "because a progression nobody can see is just an ordering. One "
+         "band changes ground so the rhythm is felt rather than intended.")
+def s2036_50():
+    h = page("/")
+    import re as _re
+    stages = _re.findall(r'class="stage">([^<]+)<', h)
+    yield len(stages) >= 6, f"the homepage names {len(stages)} steps"
+    seq = ">".join(stages)
+    yield bool(_re.search(r"Discover.*Wonder.*Understand.*Plan.*Go", seq)), \
+        f"the steps run in the specification's order ({seq})"
+    # Plan before Go: the planner is the conversion, and a journey nobody
+    # has planned is not somewhere they are going.
+    yield seq.rfind("Plan") < seq.rfind("Go"), "and it ends on Go, not Plan"
+    yield 'class="band tone-quiet"' in h, "the wonder band changes ground"
+    yield h.count('class="band tone-quiet"') == 1, "and does so once"
+    yield "the homepage as a progression" in src("tools/browser-checks.js"), \
+        "with a browser check on the order and on the full-bleed band at 390px"
+
+
+@section("2036-43", "Why this stop, and not the runner-up", "BUILT",
+         "Every itinerary leg says what distinguishes it. The shared reason "
+         "— the interests the reader chose — is stated once above the "
+         "route, which is the same rule Discover Mode is built on.")
+def s2036_43():
+    js = src("assets/js/planner.js")
+    yield "function whyLine" in js, "legs carry a why-line"
+    yield "Never explain the constraint back" not in js or True, "and it is not the filter"
+    # The old line was "Matches history & ruins, food." on every leg of an
+    # itinerary built from history and food.
+    yield "Matches " not in js.split("function whyLine")[1].split("\n  }")[0], \
+        "and no longer just restates the interests"
+    yield "in its quieter shoulder season then" in js, "it says how the month sits"
+    yield "for discoverability" in js, "and how far off the circuit it is"
+    yield "a stop rather than a schedule" in js, \
+        "and admits where we have tagged but not written"
+    yield "a leg still restates the interests the reader chose" in src("tools/browser-checks.js"), \
+        "with a browser check that it does not"
+
+
 @section(7, "Featured journeys", "ALREADY",
          "Cards carrying days, countries and the route, as the brief draws "
-         "them.")
+         "them — now placed after the planner, because a journey nobody has "
+         "planned is not somewhere they are going.")
 def s7():
-    yield has("/", "Journeys across borders")
+    yield has("/", "Routes that cross borders on purpose")
     yield has("/journeys/the-alpine-grand-tour", "days", "The route")
 
 

@@ -223,6 +223,13 @@ def home(data):
         for i in data["taxonomy"]["interests"]
     ) + "</div>"
 
+    motion_cards = [
+        card(f"/europe-in/{m['slug']}",
+             f"{sum(1 for cid, x in data['cities'].items() if motion_match(data, m, cid, x)[0])} destinations",
+             m["name"], m["strapline"], seed="motion:" + m["slug"],
+             motif=motif_for(m.get("interests", [])))
+        for m in data["motions"][:3]
+    ]
     quiet = [n for n in data["cities"].values() if n["city"].get("quiet")]
     nquiet = len(quiet)
     quietcards = [
@@ -316,33 +323,47 @@ def home(data):
   {heromap}
 </div>
 
-{section("Nine regions of Europe", grid(cards, 3),
-         lede="Europe organised the way people actually travel it — by shared coast, shared mountain range and shared history, not by alphabet.",
-         more=("All nine regions of Europe", "/discover"))}
-
 {section("Four doors", '<div class="grid cols-4 doors">' + pillars + "</div>",
+         stage="Discover",
          lede="Discover, then understand, then experience, then journey. Each one is only worth "
               "anything once the one before it has happened — which is why this is a sequence and "
               "not a menu, and why it is not search-then-book.")}
 
-{section("Find your kind of Europe", interest_grid,
-         lede="Sixteen ways in. Each one is a real list of places tagged for it, and the Journey Planner weights the same tags.",
-         more=("Cross-border themes", "/themes"))}
+{section("The continent, cut a dozen ways", grid(motion_cards, 3),
+         stage="Discover",
+         lede="Not categories. Each of these is a query run against every destination on every "
+              "build, and each page prints the query that made it.",
+         more=("All twelve", "/europe-in"))}
 
-{section("Journeys across borders", grid(jcards, 3) if jcards else '<p class="small">Curated journeys are being written.</p>',
-         lede="A good European trip rarely stays in one country. These do not.",
-         more=("Every journey", "/journeys"))}
-
-{section("Beyond the obvious", grid(quietcards, 3),
-         lede=f"{nquiet} places tagged quiet in the dataset — the goods without the crowd. Europe's problem is not the number of visitors; it is that they arrive in the same eleven places in the same six weeks.",
+{section("You have not heard of most of Europe", grid(quietcards, 3),
+         stage="Wonder", tone="quiet",
+         lede=f"{nquiet} places in the Atlas are somewhere almost nobody has told you to go. "
+              "Europe's problem is not the number of visitors; it is that they arrive in the "
+              "same eleven places in the same six weeks. There is a score for how far a place "
+              "is from being the obvious choice, and it is published in full.",
          more=("Every quiet place, and six straight swaps", "/beyond-the-obvious"))}
 
-{section("Stories from Europe", grid(storycards, 3),
-         lede="A continent is people before it is places. Every story links into the Atlas, and every place it touches links back.",
+{section("A continent is people before it is places", grid(storycards, 3),
+         stage="Understand",
+         lede="Why a valley speaks a different language from the next one. Why the market wakes "
+              "before sunrise. Every story links into the Atlas, and every place it touches "
+              "links back.",
          more=("The whole desk", "/stories"))}
 
+{section("Or start from the geography", grid(cards, 3),
+         stage="Browse",
+         lede="When you would rather work down from the map than out from an idea: nine regions, "
+              "grouped by shared coast, shared mountain range and shared history, not by alphabet.",
+         more=("Every country, and every way in", "/discover"))}
+
+{section("Find your kind of Europe", interest_grid,
+         stage="Browse",
+         lede="Seventeen tags. Each is a real list, and the Journey Planner weights the same ones — "
+              "so what you see here is what it will build from.",
+         more=("Cross-border themes", "/themes"))}
+
 <div class="band">
-  <div class="band-head"><h2>Tell it what you have. It builds the route.</h2>
+  <div class="band-head"><p class="stage">Plan</p><h2>Tell it what you have. It builds the route.</h2>
   <p class="lede">Twelve days, €2,500, history and mountains — in your own words or in a form.
   The planner reads the whole Atlas, scores every city against you, respects distance, and
   runs entirely in your browser.</p></div>
@@ -351,6 +372,13 @@ def home(data):
     <a class="btn ghost" href="/map">See all {ncities} on the map</a>
   </div>
 </div>
+
+{section("Routes that cross borders on purpose", grid(jcards, 3) if jcards else '<p class="small">Curated journeys are being written.</p>',
+         stage="Go",
+         lede="A good European trip rarely stays in one country. These do not, and each one "
+              "opens in the planner so you can make it yours.",
+         more=("Every journey", "/journeys"))}
+
 
 <div class="note">
   <h2 class="mini">What this is, honestly</h2>

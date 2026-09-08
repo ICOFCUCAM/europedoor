@@ -743,12 +743,22 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 """
 
 
-def section(title, body, *, id=None, lede=None, more=None):
+def section(title, body, *, id=None, lede=None, more=None, stage=None, tone=None):
+    """A band.
+
+    `stage` prints a small step marker above the heading. It exists for the
+    homepage, where the specification asks for an emotional progression —
+    open, discover, wonder, understand, plan, go — rather than a grid of
+    thirty cards. A progression nobody can see is just an order, so the
+    steps are named on the page.
+    """
     idattr = f' id="{esc(id)}"' if id else ""
+    toneattr = f" tone-{esc(tone)}" if tone else ""
+    stagehtml = f'<p class="stage">{esc(stage)}</p>' if stage else ""
     ledehtml = f'<p class="lede">{esc(lede)}</p>' if lede else ""
     morehtml = f'<p class="more"><a href="{esc(more[1])}">{esc(more[0])} →</a></p>' if more else ""
-    return f"""<section class="band"{idattr}>
-  <div class="band-head"><h2>{esc(title)}</h2>{ledehtml}</div>
+    return f"""<section class="band{toneattr}"{idattr}>
+  <div class="band-head">{stagehtml}<h2>{esc(title)}</h2>{ledehtml}</div>
   {body}
   {morehtml}
 </section>"""

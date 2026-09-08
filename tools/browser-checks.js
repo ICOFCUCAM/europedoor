@@ -232,6 +232,33 @@ async function main() {
      `favouring a saved place did not put it in the route: ${withSaved.route}`);
   await page.evaluate(() => localStorage.removeItem("europedoor.saved.v1"));
 
+  // ── why each stop, and not the runner-up ───────────────────────────
+  // The old line said "Matches history & ruins, food." on every leg of an
+  // itinerary built from history and food — the reader's own filter read
+  // back to them twelve times. Same rule as Discover Mode: the shared
+  // reason goes once, each leg carries what distinguishes it.
+  await page.goto(base + "/plan", { waitUntil: "networkidle" });
+  await page.fill("#days", "14");
+  await page.selectOption("#month", "oct");
+  for (const i of ["mountains", "history"]) {
+    await page.check(`input[name="interest"][value="${i}"]`);
+  }
+  await page.click('#planner button[type="submit"]');
+  await page.waitForSelector("#result .leg");
+  const hoisted = await page.locator("#result .whyall").textContent();
+  ok(/because that is what you asked for/.test(hoisted),
+     "the itinerary does not hoist the shared reason");
+  const legWhy = await page.locator("#result .leg .mt-tight").allTextContents();
+  ok(legWhy.length >= 3, "legs carry no why-line");
+  ok(!legWhy.some((t) => /^Matches /.test(t.trim())),
+     "a leg still restates the interests the reader chose");
+  ok(legWhy.some((t) => /also |shoulder season|discoverability|not written it up/.test(t)),
+     "no leg says anything the reader did not already ask for");
+  // Two conjunctions colliding is what happens when clauses that each
+  // contain "and" are joined with another one.
+  ok(!legWhy.some((t) => / and .* and at its /.test(t)),
+     "a why-line has two conjunctions colliding");
+
   // ── editing an itinerary ───────────────────────────────────────────
   // The difference between a suggestion and a plan. Every control is a real
   // button with a real label, so this is also the accessibility check for
@@ -561,6 +588,33 @@ async function main() {
   ok(/id="discoverability"/.test(methodHtml), "discoverability is not published on /method");
   ok(/not a crowd measurement/i.test(methodHtml),
      "/method does not say what discoverability is not");
+
+  // ── the homepage as a progression ──────────────────────────────────
+  // The specification asks the homepage to move a reader through open,
+  // discover, wonder, understand, plan, go — rather than be a grid of
+  // thirty cards. A progression nobody can see is just an ordering, so the
+  // steps are named on the page and checked in order here.
+  await page.goto(base + "/", { waitUntil: "networkidle" });
+  const stages = await page.locator(".stage").allTextContents();
+  ok(stages.length >= 6, `the homepage names ${stages.length} steps`);
+  const seq = stages.join(">");
+  ok(/Discover.*Wonder.*Understand.*Plan.*Go/.test(seq),
+     `the progression is out of order: ${seq}`);
+  // Plan before Go: the planner is the conversion, and a journey you have
+  // not planned is not somewhere you are going.
+  ok(seq.lastIndexOf("Plan") < seq.lastIndexOf("Go"),
+     "the homepage ends on Plan rather than Go");
+  // The wonder band changes ground, so the rhythm is felt rather than
+  // merely intended — and it must not blow out the page at any width.
+  ok(await page.locator(".band.tone-quiet").count() === 1,
+     "the wonder band is missing or duplicated");
+  for (const w of [1280, 390]) {
+    await page.setViewportSize({ width: w, height: 900 });
+    const over = await page.evaluate(() =>
+      document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    ok(over <= 1, `the full-bleed band overflows by ${over}px at ${w}`);
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
 
   // ── Europe in Motion ───────────────────────────────────────────────
   // The trap in "dynamic discovery layer" is that the cheap version — a

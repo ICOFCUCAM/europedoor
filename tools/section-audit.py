@@ -198,9 +198,17 @@ def s6():
          "filters as links into the real map rather than a second one.")
 def s7():
     h = page("/")
-    yield has("/", "Nine regions of Europe", "Find your kind of Europe", "Journeys across borders")
-    yield h.index("Nine regions") < h.index("Find your kind"), "regions before experiences"
-    yield h.index("Find your kind") < h.index("Journeys across borders"), "experiences before journeys"
+    # The specification's three sections are all present. Their ORDER is now
+    # set by the 2036 brief's progression instead — open, discover, wonder,
+    # understand, plan, go — which puts the geography index after the
+    # emotional part rather than first. The two briefs disagree here and the
+    # later one wins; see docs/EUROPEDOOR_2036_TRANSFORMATION.md.
+    yield has("/", "Or start from the geography", "Find your kind of Europe",
+              "Routes that cross borders on purpose")
+    yield h.index("Or start from the geography") < h.index("Find your kind"), \
+        "regions before experiences"
+    yield h.index("Find your kind") < h.index("Routes that cross borders"), \
+        "experiences before journeys"
     # The specification's first homepage section is an interactive map with
     # filters. The filters are links that open the real map with one applied,
     # rather than a second map on the homepage to keep in step with the first.

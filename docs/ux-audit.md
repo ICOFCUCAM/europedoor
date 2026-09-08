@@ -8,7 +8,7 @@ its requirements are about how something looks and nobody can check a feeling.
 So every row here asserts against the generated HTML, the CSS and the JavaScript
 as they actually are.
 
-**46 sections · 16 built · 15 already · 12 partial · 1 refused · 1 locked · 1 deferred · 289 assertions · 0 failing**
+**48 sections · 18 built · 15 already · 12 partial · 1 refused · 1 locked · 1 deferred · 302 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -21,7 +21,9 @@ as they actually are.
 | 2036-7 | Discover Mode | BUILT | 8 | The surface that answers "I do not know where I want to go". Pick moods and constraints and the continent narrows — and every recommendation says why, naming the terms that actually fired. |
 | 2036-18 | Discoverability, computed | BUILT | 8 | Hidden Europe was an editorial tag — the most interesting claim on the site and the one nobody could check. It is now a published score with five named terms, and it says plainly that it measures obscurity within this Atlas rather than crowds. |
 | 2036-6 | Europe in Motion | BUILT | 42 | Twelve ways to cut the continent, each a query evaluated against every destination on every build — and each page prints the query that made it. A motion cannot become a hand-picked list, because the validator refuses a field that names destinations. |
-| 7 | Featured journeys | ALREADY | 2 | Cards carrying days, countries and the route, as the brief draws them. |
+| 2036-50 | The homepage as a progression | BUILT | 6 | Open, discover, wonder, understand, plan, go — named on the page, because a progression nobody can see is just an ordering. One band changes ground so the rhythm is felt rather than intended. |
+| 2036-43 | Why this stop, and not the runner-up | BUILT | 7 | Every itinerary leg says what distinguishes it. The shared reason — the interests the reader chose — is stated once above the route, which is the same rule Discover Mode is built on. |
+| 7 | Featured journeys | ALREADY | 2 | Cards carrying days, countries and the route, as the brief draws them — now placed after the planner, because a journey nobody has planned is not somewhere they are going. |
 | 8 | Hidden Europe | ALREADY | 2 | A quiet tag, its own band, and a rule that nowhere is ever called undiscovered. |
 | 9 | Homepage AI planner | ALREADY | 2 | The sentence box, in the hero, saying under the field what reads it — which is rules in the browser, not a model. |
 | 10 | Planner — screen 1 | ALREADY | 7 | Start, end, dates, travellers, budget and interests, all present and all moving the answer. |

@@ -840,3 +840,25 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    SCORE" set in caps over two lines is a label nobody reads. */
 .inlinecheck { text-transform: none; letter-spacing: normal; font-weight: 400;
                font-size: var(--t-sm); display: flex; gap: var(--s2); align-items: baseline; }
+
+/* ── the homepage progression ─────────────────────────────────
+ * The specification asks the homepage to move the reader through open,
+ * discover, wonder, understand, plan, go — rather than be a grid of thirty
+ * cards. A progression nobody can see is just an ordering, so the steps are
+ * named, and one band changes ground so the rhythm is felt rather than
+ * merely intended.
+ */
+.stage { font-size: var(--t-xs); letter-spacing: .18em; text-transform: uppercase;
+         font-weight: 700; color: var(--atlantic); margin: 0 0 var(--s2); }
+.stage::before { content: ""; display: inline-block; width: 1.6rem; height: 1px;
+                 background: var(--atlantic); vertical-align: middle;
+                 margin-right: var(--s3); }
+
+/* The wonder band. Quieter ground and a wider measure, because the point of
+   it is to slow the reader down for a moment rather than to be scanned. */
+.band.tone-quiet { background: var(--paper-2); border-top: 1px solid var(--rule);
+                   border-bottom: 1px solid var(--rule);
+                   margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw);
+                   padding: var(--s8) calc(50vw - 50%); }
+.band.tone-quiet .band-head h2 { max-width: 20ch; }
+.band.tone-quiet .lede { max-width: 46rem; }
