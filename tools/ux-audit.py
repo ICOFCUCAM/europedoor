@@ -324,6 +324,40 @@ def s2036_13():
     yield "What if?" in BROWSER, "with browser checks that preview does not apply"
 
 
+@section("2036-11", "European Travel DNA", "BUILT",
+         "A travel preference model computed from what this browser has "
+         "saved — with its denominator stated, a floor under it, every "
+         "dimension adjustable, a reset, and nothing stored or sent. It is "
+         "not a personality test and the page says so in those words.")
+def s2036_11():
+    js = MINE
+    yield "buildDna" in js, "the profile is computed"
+    yield "DNA_MIN" in js, "and refuses to appear below a floor"
+    # A profile with no denominator is a claim.
+    yield "Computed from the" in js and "places</strong> you have saved" in js, \
+        "it says what it was computed from, in numbers"
+    yield "not a personality test" in js, "and what it is not"
+    yield "derived on this page every time" in js, "and that it is not stored"
+    # A model of you that you cannot correct is a model being done to you.
+    yield "data-dna" in js and "dnareset" in js, "every dimension is adjustable and resettable"
+    yield "europedoor.dna.v1" in js, "and adjustments stay in this browser"
+    # Useful, or it should not exist.
+    yield '"/plan?i=' in js, "and it hands its top interests to the planner"
+    yield "the travel profile" in BROWSER, "with browser checks on the floor and the reset"
+
+
+@section("2036-60", "The suite can no longer lie about its own coverage", "BUILT",
+         "The browser suite once reported \"all 4 browser checks passed\" "
+         "and exited 0, because a local shadowed its counter. It now "
+         "refuses to call itself passing on an implausibly small run.")
+def s2036_60():
+    b = BROWSER
+    yield "const FLOOR" in b, "there is a floor on the check count"
+    yield "stopped counting" in b, "and it explains the failure it exists for"
+    # The shadowing that caused it, recorded where it happened.
+    yield "temporal dead zone" in b, "with the cause written down"
+
+
 @section(7, "Featured journeys", "ALREADY",
          "Cards carrying days, countries and the route, as the brief draws "
          "them — now placed after the planner, because a journey nobody has "

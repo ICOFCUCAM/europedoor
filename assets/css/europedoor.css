@@ -877,3 +877,26 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 .whatif-preview { background: var(--paper); border-left: 4px solid var(--atlantic); }
 .whatif-preview .stack { margin: var(--s3) 0; }
 .whatif-preview .stack li { margin-bottom: var(--s2); }
+
+/* ── travel profile ───────────────────────────────────────────
+ * Deliberately built from the same .scorebar as the Europe Experience
+ * Score, because it is the same kind of thing: a derived number with its
+ * method published, not a measurement. Using a different, more
+ * personal-looking visual would be the first step towards it reading as a
+ * personality test.
+ */
+.dna .dnarows { margin: var(--s4) 0; }
+.dnarow { display: grid; grid-template-columns: 11rem 1fr 2.5rem auto;
+          gap: var(--s3); align-items: center; margin-bottom: var(--s2); }
+.dnalabel { font-size: var(--t-sm); color: var(--ink-2); }
+.dnanudge { display: flex; gap: var(--s2); }
+.dnanudge .linkish { min-width: 28px; min-height: 28px; text-decoration: none;
+                     font-size: var(--t-md); text-align: center; }
+@media (max-width: 44rem) {
+  .dnarow { grid-template-columns: 1fr auto; grid-template-areas: "l n" "b b" "u u"; }
+  .dnalabel { grid-area: l; }
+  .dnarow .scorenum { grid-area: n; }
+  .dnarow .scorebar { grid-area: b; }
+  .dnanudge { grid-area: u; }
+  .dnanudge .linkish { min-width: 44px; min-height: 44px; }
+}

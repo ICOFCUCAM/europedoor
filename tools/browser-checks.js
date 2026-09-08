@@ -584,6 +584,75 @@ async function main() {
   ok(!/How many days|can you spend/.test(fullHtml),
      "the planner asked for information the sentence had already given");
 
+  // ── the travel profile ─────────────────────────────────────────────
+  // A preference model, and the brief is explicit it must never read as
+  // psychological truth. These checks are mostly about that: the
+  // denominator, the floor, the editability, and the wording.
+  await page.goto(base + "/my-europe", { waitUntil: "networkidle" });
+  await page.evaluate(() => {
+    localStorage.setItem("europedoor.saved.v1", JSON.stringify([
+      { id: "city:norway/fjord-norway/bergen", kind: "City", label: "Bergen", url: "/x" },
+      { id: "city:italy/tuscany-and-the-centre/siena", kind: "City", label: "Siena", url: "/x" },
+    ]));
+  });
+  await page.reload({ waitUntil: "networkidle" });
+  await page.waitForTimeout(300);
+  const thin = await page.locator("#dna").innerText();
+  // Three saves is noise wearing a percentage sign.
+  ok(/Save at least 4/.test(thin), "the profile appears below its own floor");
+  ok(/You have 2 so far/.test(thin), "and does not say how far off the floor you are");
+  ok(await page.locator("#dna .dnarow").count() === 0,
+     "rows were drawn from two saved places");
+
+  await page.evaluate(() => {
+    localStorage.setItem("europedoor.saved.v1", JSON.stringify([
+      "norway/fjord-norway/bergen", "italy/tuscany-and-the-centre/siena",
+      "greece/the-peloponnese/kardamyli", "france/alps-and-east/chamonix",
+      "austria/salzburg-and-the-lakes/hallstatt",
+    ].map((id) => ({ id: "city:" + id, kind: "City", label: id, url: "/x" }))));
+    localStorage.removeItem("europedoor.dna.v1");
+  });
+  await page.reload({ waitUntil: "networkidle" });
+  await page.waitForTimeout(400);
+  const dna = await page.locator("#dna").innerText();
+  ok(await page.locator("#dna .dnarow").count() >= 3, "the profile drew no rows");
+  // A profile with no denominator is a claim.
+  ok(/Computed from the \d+ places/.test(dna),
+     "the profile does not say what it was computed from");
+  ok(/not a personality test/.test(dna),
+     "the profile does not say what it is not");
+  ok(/derived on this page every time/.test(dna),
+     "the profile does not say it is not stored");
+
+  // A model of you that you cannot correct is a model being done to you.
+  const firstBefore = await page.locator("#dna .dnarow").first().innerText();
+  await page.click('#dna [data-dna][data-by="-10"]');
+  await page.waitForTimeout(250);
+  ok(/\(adjusted\)/.test(await page.locator("#dna").innerText()),
+     "an adjusted row is not marked as adjusted");
+  await page.click("#dnareset");
+  await page.waitForTimeout(250);
+  ok(!/\(adjusted\)/.test(await page.locator("#dna").innerText()),
+     "resetting the profile left an override behind");
+  ok((await page.locator("#dna .dnarow").first().innerText()) === firstBefore,
+     "resetting did not restore what the saves say");
+
+  // And it has to be useful, or it should not exist: the CTA must land on a
+  // planner with those interests already chosen. No dead buttons.
+  const dnaPlan = await page.locator('#dna a[href^="/plan?i="]').getAttribute("href");
+  ok(dnaPlan && dnaPlan.length > 9, "the profile does not hand anything to the planner");
+  await page.goto(base + dnaPlan, { waitUntil: "networkidle" });
+  /* NOT `checked`: that is the suite's own counter, declared at module
+   * scope, and a const of the same name inside main() put the whole
+   * function body in its temporal dead zone. The suite reported "all 4
+   * browser checks passed" and exited 0 — a green run that had silently
+   * stopped counting. A test harness that can lie about how much it ran is
+   * worse than one that fails. */
+  const preselected = await page.locator('input[name="interest"]:checked').count();
+  ok(preselected >= 3, `the profile's link pre-selected ${preselected} interests`);
+
+  await page.evaluate(() => localStorage.clear());
+
   // ── Discover Mode ──────────────────────────────────────────────────
   // The surface that answers "I don't know where I want to go", and the
   // only one on the site where every recommendation has to justify itself.
@@ -1234,6 +1303,26 @@ async function main() {
 
   await browser.close();
   server.close();
+
+  /* A floor on the count itself.
+   *
+   * This suite once reported "all 4 browser checks passed" and exited 0,
+   * because a `const checked` inside main() shadowed the module-level
+   * counter and put it in a temporal dead zone. Every assertion still ran;
+   * almost none of them was counted. A green run that has silently stopped
+   * counting is worse than a red one, because nobody looks at it.
+   *
+   * So the suite now refuses to call itself passing if it ran far fewer
+   * checks than it did last time. Raise this when the real number grows;
+   * it is a ratchet, not a target.
+   */
+  const FLOOR = 480;
+  if (checked < FLOOR) {
+    console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
+                "Something exited early or stopped counting — that is a failure, " +
+                "not a pass.");
+    process.exit(1);
+  }
 
   if (failures.length) {
     console.log(`\n${failures.length} browser check failure(s) of ${checked}:`);

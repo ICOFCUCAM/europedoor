@@ -59,6 +59,129 @@
     });
   });
 
+  /* ── Travel DNA ──────────────────────────────────────────────────
+   *
+   * A travel PREFERENCE model, computed from what this browser has saved.
+   * The brief is explicit that it must never be presented as psychological
+   * truth, and that matters more than it sounds: a bar chart of percentages
+   * with a person's name over it reads as a personality test whatever the
+   * caption says. So:
+   *
+   *   * it says what it is computed from, in numbers — "from the 7 places
+   *     you have saved" — because a profile with no denominator is a claim;
+   *   * it will not appear at all under four saved places, since three
+   *     saves is noise wearing a percentage sign;
+   *   * every dimension is adjustable and the whole thing is resettable,
+   *     because a model of you that you cannot correct is a model that is
+   *     being done to you;
+   *   * it never leaves the browser. There is no account here and no
+   *     request; the profile is derived on the page every time it is shown
+   *     and stored nowhere except your own adjustments.
+   *
+   * And it is useful, which is the test of whether it should exist: it
+   * hands its top interests to the Planner and to Discover Mode.
+   */
+  var DNA_KEY = "europedoor.dna.v1";
+  var DNA_MIN = 4;
+
+  function dnaAdjust() {
+    try { return JSON.parse(localStorage.getItem(DNA_KEY) || "{}"); }
+    catch (e) { return {}; }
+  }
+  function dnaSave(a) {
+    try { localStorage.setItem(DNA_KEY, JSON.stringify(a)); return true; }
+    catch (e) { return false; }
+  }
+
+  function buildDna(atlas, saved) {
+    var byId = {};
+    for (var i = 0; i < atlas.cities.length; i++) byId[atlas.cities[i].id] = atlas.cities[i];
+
+    // A saved place resolves to the destination it is in, because interests
+    // live on the destination. A journey or a story is not counted: it says
+    // what somebody curated, not what this reader chose.
+    var counted = 0, tally = {};
+    saved.forEach(function (x) {
+      var m = /^(?:city|place):([^/]+\/[^/]+\/[^/]+)/.exec(x.id || "");
+      if (!m) return;
+      var c = byId[m[1]];
+      if (!c) return;
+      counted++;
+      c.interests.forEach(function (t) { tally[t] = (tally[t] || 0) + 1; });
+    });
+    if (counted < DNA_MIN) return { counted: counted, rows: [] };
+
+    var adj = dnaAdjust();
+    var rows = atlas.interests.map(function (i) {
+      var share = Math.round(((tally[i.slug] || 0) / counted) * 100);
+      var moved = adj[i.slug];
+      return {
+        slug: i.slug, name: i.name, icon: i.icon,
+        raw: share,
+        value: Math.max(0, Math.min(100, moved === undefined ? share : moved)),
+        adjusted: moved !== undefined,
+      };
+    }).filter(function (r) { return r.value > 0 || r.adjusted; });
+    rows.sort(function (a, b) { return b.value - a.value; });
+    return { counted: counted, rows: rows };
+  }
+
+  function renderDna(host, atlas, saved) {
+    var dna = buildDna(atlas, saved);
+    if (!dna.rows.length) {
+      host.innerHTML = '<div class="note"><h2 class="mini">Your travel profile</h2>' +
+        "<p>Save at least " + DNA_MIN + " places and this will show what you keep choosing. " +
+        "You have " + dna.counted + " so far. Fewer than " + DNA_MIN +
+        " is noise wearing a percentage sign, so there is nothing here worth showing yet.</p></div>";
+      return;
+    }
+    var top = dna.rows.slice(0, 6);
+    host.innerHTML =
+      '<div class="note dna"><h2 class="mini">Your travel profile</h2>' +
+      "<p>Computed from the <strong>" + dna.counted + " places</strong> you have saved in " +
+      "this browser, and from nothing else. It is a record of what you keep choosing — " +
+      "<strong>not a personality test</strong>, not a judgement, and not something we hold: " +
+      "it is derived on this page every time you open it.</p>" +
+      '<div class="dnarows">' + top.map(function (r) {
+        return '<div class="dnarow"><span class="dnalabel">' +
+          '<span aria-hidden="true">' + r.icon + "</span> " + r.name +
+          (r.adjusted ? ' <span class="small">(adjusted)</span>' : "") + "</span>" +
+          '<span class="scorebar"><span class="w' + r.value + '"></span></span>' +
+          '<span class="scorenum">' + r.value + "</span>" +
+          '<span class="dnanudge">' +
+          '<button type="button" class="linkish" data-dna="' + r.slug + '" data-by="-10"' +
+          ' aria-label="Less ' + r.name + '">−</button>' +
+          '<button type="button" class="linkish" data-dna="' + r.slug + '" data-by="10"' +
+          ' aria-label="More ' + r.name + '">+</button></span></div>';
+      }).join("") + "</div>" +
+      '<div class="hero-actions mt0">' +
+      '<a class="btn" href="/plan?i=' + top.slice(0, 4).map(function (r) { return r.slug; }).join(",") +
+      '">Plan a journey from this</a>' +
+      '<a class="btn ghost" href="/discover">Explore with it</a>' +
+      '<button class="btn ghost" type="button" id="dnareset">Reset the profile</button>' +
+      "</div>" +
+      '<p class="small">Adjusting a row overrides what your saves say, and reset removes every ' +
+      "override. Nothing here is sent anywhere — <a href=\"/privacy\">how to check that</a>.</p>" +
+      "</div>";
+
+    host.querySelectorAll("[data-dna]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var slug = b.getAttribute("data-dna");
+        var by = Number(b.getAttribute("data-by"));
+        var adj = dnaAdjust();
+        var row = dna.rows.filter(function (r) { return r.slug === slug; })[0];
+        adj[slug] = Math.max(0, Math.min(100, (row ? row.value : 0) + by));
+        if (dnaSave(adj)) renderDna(host, atlas, saved);
+      });
+    });
+    var reset = host.querySelector("#dnareset");
+    if (reset) {
+      reset.addEventListener("click", function () {
+        if (dnaSave({})) renderDna(host, atlas, saved);
+      });
+    }
+  }
+
   var mine = document.getElementById("mine");
   if (!mine) return;
   var list = read();
@@ -255,4 +378,17 @@
   }
 
   render();
+
+  /* The Atlas is fetched only here, only on this page, and only to resolve
+   * saved ids to the interests that produce the profile. It is the same
+   * static document the planner uses, so it is almost certainly cached. */
+  var dnaHost = document.getElementById("dna");
+  if (dnaHost) {
+    fetch("/api/atlas.json").then(function (r) { return r.json(); }).then(function (atlas) {
+      renderDna(dnaHost, atlas, list);
+    }).catch(function () {
+      dnaHost.innerHTML = '<div class="note"><p>The Atlas index did not load, so the ' +
+        "travel profile cannot be computed. Your saved list above is unaffected.</p></div>";
+    });
+  }
 })();

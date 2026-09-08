@@ -315,8 +315,22 @@ decision.
    +25 discoverability, which rejected Arezzo, Urbino and Civita di
    Bagnoregio at exactly +24 — the right answers for Tuscany — and reported
    that nothing would change.
-8. **Travel DNA** (§11), computed from saves in the browser, editable and
-   resettable, never presented as psychological truth.
+8. ~~**Travel DNA**~~ **BUILT.** A travel *preference* model on
+   `/my-europe`, computed from what this browser has saved and nothing else.
+
+   The brief says it must never be presented as psychological truth, and
+   that is harder than it sounds: a bar chart of percentages with a
+   person's name over it reads as a personality test whatever the caption
+   says. So it states its denominator — "computed from the 7 places you
+   have saved" — refuses to appear at all under four saves, marks every
+   adjusted row, resets completely, and uses the same `.scorebar` as the
+   published Europe Experience Score rather than a more personal-looking
+   visual.
+
+   It also has to be *useful* or it should not exist: its top four
+   interests hand straight to the planner, pre-selected.
+
+**Phase C is complete.**
 
 ### Phase D — Blocked on the entity
 
