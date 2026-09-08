@@ -120,6 +120,21 @@ point: **the image cannot arrive quietly.**
 
 ---
 
+## The acceptance gate, set by the owner
+
+**The placeholder hero is not to be polished.** Its structure is accepted as
+it stands and no further visual work belongs on it — time spent making an
+empty frame look finished is time spent on something that is about to be
+replaced.
+
+**The next visual gate is the licensed photograph itself.** When it is
+installed, the hero is judged as ONE COMPOSITION — photograph, scrim,
+masthead, headline, lede, discovery field and chips together — against the
+original EuropeDoor benchmark. Not as a set of parts that each pass, and not
+by whether the screenshot looks better than the one before it.
+
+That is a single pass/fail on the whole frame, and it is the owner's call.
+
 ## To re-measure the day it lands
 
 1. Painted contrast over the *photograph*, not the fallback. The current
