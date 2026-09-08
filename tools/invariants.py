@@ -182,6 +182,28 @@ def measure():
                 "why": "Zero today, because zero photographs are licensed. This "
                        "moving is the signal that licensed imagery arrived — "
                        "which must go through the licence register first."},
+            # The homepage is the flagship page and the one most likely to
+            # gain weight, because every good idea wants to live on it. It
+            # already carried a 2.6x regression unnoticed: a commit that cut
+            # it from eight bands to three also inlined 90 KB of coastline
+            # under the hero and shipped at 118,935 bytes while reporting
+            # 45,806. Thirty-five static checks, 652 browser checks and
+            # twenty-two invariants said nothing, because not one of them
+            # measured bytes.
+            "weight.home_kb": {
+                "value": round(len(next(b for k, b in bodies.items()
+                                       if os.path.relpath(k, OUT) == "index.html")) / 1024),
+                "kind": "ceiling",
+                "why": "The homepage's rendered HTML in KB. A ceiling, not a "
+                       "target: it is allowed to move, deliberately, in a diff "
+                       "somebody reads. It is here because a 2.6x regression on "
+                       "this page passed every other gate in silence."},
+            "weight.max_page_kb": {
+                "value": round(max(len(b) for b in bodies.values()) / 1024),
+                "kind": "ceiling",
+                "why": "The heaviest page on the site. Guards against a template "
+                       "quietly inlining something large across a whole family, "
+                       "which is how the coastline reached 51 pages and 2.1 MB."},
             "plates.motifs_declared": {
                 "value": len(R.MOTIFS), "kind": "exact",
                 "why": "Seven declared."},

@@ -182,7 +182,11 @@ def s6():
     yield has("/", "Open the door to Europe")
     yield has("/", "what would you like to discover?", "Plan my journey"), \
         "the question is asked on the homepage, not one click away"
-    yield has("/", "not by a\n  model"), "and the hero says what reads it"
+    # The hero used to carry "read by rules in your browser — not by a model,
+    # and not sent anywhere". It moved OFF the homepage with the cinematic
+    # rebuild, and that is right: the promise belongs on the page that
+    # actually reads the input, which already carries it. Asserted there.
+    yield has("/plan", "not by a"), "the planner says what reads the sentence"
     # Brand Bible V1: "Plan my journey" is the primary conversion and the
     # explore action is the secondary, and the ORDER is the point.
     #
@@ -230,11 +234,17 @@ def s7():
         n_in = sum(1 for f in ALL_HTML
                    if f'href="{url}"' in open(f, encoding="utf-8").read())
         yield n_in >= 1000, f"{url} still linked from {n_in} pages"
-    # The hero map draws the coastline, not just the dots. A dot map with
-    # nothing under it is a scatter plot, and this page was the last one
-    # still shipping one.
-    yield has("/", 'class="heromap"', '<g class="countries"'), \
-        "the hero map carries real geography under its places"
+    # THE MAP IS NOT IN THE HERO, and that is now the assertion. It was, and
+    # it was two mistakes at once: it made a data surface the first thing a
+    # reader met on a page whose job is to make them want to go somewhere,
+    # and it inlined 90 KB of coastline — 76% of the page — to do it. The
+    # map is a discovery mechanism and it lives at /map.
+    yield 'class="heromap"' not in h, "the map is not in the hero"
+    yield has("/", 'href="/map"'), "and is one tap away"
+    # /map draws its land as .cshape paths, not the <g class="countries">
+    # wrapper the small embedded maps use. Asserted against what the page
+    # actually renders rather than against the shape I assumed it had.
+    yield has("/map", 'class="cshape"'), "with real country geography on it"
 
 
 @section(8, "Hidden Europe", "BUILT",

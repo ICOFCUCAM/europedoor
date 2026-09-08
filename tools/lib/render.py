@@ -894,7 +894,7 @@ WORLDS = ("discover", "intelligence")
 ACCENTS = ("", "heritage")
 
 
-def page(title, body, *, path, description, trail=None, area=None, head_extra="", scripts=(), wide=False, ld_blocks=(), og=None, world="discover", accent=""):
+def page(title, body, *, path, description, trail=None, area=None, head_extra="", scripts=(), wide=False, ld_blocks=(), og=None, world="discover", accent="", hero=False):
     if world not in WORLDS:
         raise ValueError(f"{path}: unknown world {world!r}; it is one of {WORLDS}")
     if accent not in ACCENTS:
@@ -925,7 +925,7 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 <link rel="stylesheet" href="/assets/css/europedoor.css">
 <link rel="icon" href="/assets/door.svg" type="image/svg+xml">
 {ld(*ld_blocks)}{head_extra}</head>
-<body class="area-{esc(area or 'none')}" data-world="{world}"{f' data-accent="{accent}"' if accent else ''}>
+<body class="area-{esc(area or 'none')}" data-world="{world}"{f' data-accent="{accent}"' if accent else ''}{' data-hero' if hero else ''}>
 <a class="skip" href="#main">{esc(T("skip"))}</a>
 <header class="masthead">
   <div class="masthead-in">

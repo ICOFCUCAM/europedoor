@@ -42,7 +42,7 @@
       "why": "Zero. A webfont is a third-party origin, a render delay and a hole in default-src 'none'. 2036 does not require a new typeface."
     },
     "css.font_sizes": {
-      "value": 13,
+      "value": 14,
       "kind": "ceiling",
       "why": "A ceiling, not a target. The sibling repository measures 418; that is what happens without a line."
     },
@@ -95,6 +95,16 @@
       "value": 0,
       "kind": "exact",
       "why": "Zero today, because zero photographs are licensed. This moving is the signal that licensed imagery arrived — which must go through the licence register first."
+    },
+    "weight.home_kb": {
+      "value": 25,
+      "kind": "ceiling",
+      "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it is allowed to move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence."
+    },
+    "weight.max_page_kb": {
+      "value": 438,
+      "kind": "ceiling",
+      "why": "The heaviest page on the site. Guards against a template quietly inlining something large across a whole family, which is how the coastline reached 51 pages and 2.1 MB."
     },
     "plates.motifs_declared": {
       "value": 7,

@@ -1262,3 +1262,157 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
   .dnanudge { grid-area: u; }
   .dnanudge .linkish { min-width: 44px; min-height: 44px; }
 }
+
+/* ── the full-bleed hero ──────────────────────────────────────────────
+ *
+ * The homepage led with structure and it was cold: a headline, a form, a
+ * technical note, a row of counts and a 90 KB data map, above eight
+ * identical generated tiles. Correct, disciplined, and it made the reader
+ * meet the data model before they wanted to go anywhere.
+ *
+ * This is the entrance instead. Full-bleed, the masthead over it, the type
+ * and the discovery field inside the picture. It is built to hold a
+ * licensed photograph and to be shippable before one arrives — .shot is
+ * added only when the register actually holds the file, and the ground
+ * below is what a reader sees until then.
+ *
+ * The fallback is deliberately NOT a generated plate. Rendering the plate
+ * system at 1200x500 was tried and measured: flat, monochrome, a dead slab
+ * across the bottom third. It carries a 160x100 card and cannot carry this.
+ */
+.herofull {
+  position: relative; isolation: isolate;
+  margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw);
+  min-height: min(84vh, 46rem);
+  display: grid; align-items: end;
+  padding: calc(var(--s8) * 2) calc(50vw - 50%) var(--s8);
+  margin-bottom: var(--s7);
+  /* Depth without a photograph, and the bed a photograph sits on. Two
+   * radial pools over deep ink — atmosphere rather than a flat panel — in
+   * the palette's own colours, no new token. */
+  background:
+    radial-gradient(120% 90% at 78% 12%, color-mix(in srgb, var(--sea) 34%, transparent), transparent 62%),
+    radial-gradient(90% 80% at 12% 92%, color-mix(in srgb, var(--atlantic) 30%, transparent), transparent 58%),
+    var(--graphite);
+  color: var(--limestone);
+}
+/* The photograph, when one is licensed, and the scrim that keeps the type
+ * readable over it. A scrim is not decoration here: it is what makes the
+ * contrast ratio a property of the design rather than of the picture. */
+.herofull picture { position: absolute; inset: 0; z-index: -2; display: block; }
+.herofull .photo { width: 100%; height: 100%; object-fit: cover;
+                   object-position: var(--fx, 50%) var(--fy, 50%); }
+.herofull.shot::after {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--graphite) 62%, transparent) 0%,
+    color-mix(in srgb, var(--graphite) 34%, transparent) 42%,
+    color-mix(in srgb, var(--graphite) 86%, transparent) 100%);
+}
+.herofull .credit { position: absolute; right: var(--s4); bottom: var(--s3); z-index: 1;
+                    font-size: var(--t-xs); color: color-mix(in srgb, var(--limestone) 70%, transparent); }
+.herobody { max-width: 46rem; }
+.herofull .kicker { color: color-mix(in srgb, var(--limestone) 78%, transparent); }
+/* The kicker repeats the headline verbatim, so it is decoration to a
+ * screen reader and is hidden from one rather than read twice. */
+.herofull .kicker { visibility: hidden; }
+.herofull h1 { color: var(--limestone); max-width: 14ch;
+               font-size: clamp(var(--t-4xl), 7vw, var(--t-6xl)); }
+.herofull .lede { color: color-mix(in srgb, var(--limestone) 88%, transparent);
+                  max-width: 34rem; }
+
+/* The discovery field belongs to the picture, not to a form below it. */
+.askhero { display: grid; gap: var(--s3); margin-top: var(--s6); max-width: 44rem; }
+.askhero label { font-size: var(--t-xs); letter-spacing: .1em; text-transform: uppercase;
+                 color: color-mix(in srgb, var(--limestone) 76%, transparent); font-weight: 600; }
+.askhero input { width: 100%; font: inherit; font-size: var(--t-md);
+                 padding: var(--s4); border: 1px solid transparent; border-radius: var(--radius);
+                 background: var(--paper); color: var(--ink); }
+.askhero input:focus-visible { border-color: var(--signature); }
+.herofull .hero-intents { margin-top: var(--s4); }
+.herofull .chip { background: color-mix(in srgb, var(--graphite) 55%, transparent);
+                  border-color: color-mix(in srgb, var(--limestone) 42%, transparent);
+                  color: var(--limestone); }
+.herofull .chip:hover { background: color-mix(in srgb, var(--limestone) 16%, transparent); }
+@media (min-width: 40rem) { .askhero { grid-template-columns: 1fr auto; align-items: end; }
+  .askhero label { grid-column: 1 / -1; margin-bottom: calc(var(--s2) * -1); } }
+
+/* The masthead sits over the hero on the homepage only, and returns to its
+ * own ground the moment the reader scrolls past it. One shell, one
+ * masthead — this is a body attribute the single stylesheet reacts to,
+ * exactly like data-world, not a second header. */
+/* main carries top padding on every page, and the hero has to start at y=0
+ * or the overlaid masthead sits in a strip of limestone with
+ * limestone-coloured links on it — measured, not guessed: the links were
+ * the right colour the whole time and simply had a light ground under them.
+ *
+ * The first fix was `margin-top: -32px` on the hero, which is the desktop
+ * padding hard-coded. main's padding is smaller on a phone, so the hero
+ * started at y=-8 there and the top of the picture was cropped. Zeroing the
+ * padding is exact at every width; a negative margin matching one
+ * breakpoint's value is a magic number waiting for the next breakpoint. */
+body[data-hero] main { padding-top: 0; }
+/* A SCRIM, not transparency, and it stays sticky.
+ *
+ * The first version made the masthead transparent and absolute. The browser
+ * suite failed it at 1.00:1 and was right in a way the pixel probe was not:
+ * the hero is a SIBLING of the masthead, not an ancestor, so nothing in the
+ * box model gives those links a dark ground. Sampling painted pixels said
+ * 16.5:1 and that was true only for as long as the hero happened to be
+ * behind them and happened to be dark. The photograph is not chosen yet and
+ * may have a bright sky, in which case white-on-transparent is unreadable —
+ * which is precisely why every photographic hero puts a scrim under its
+ * navigation.
+ *
+ * `absolute` also silently cost the homepage its sticky navigation: it
+ * scrolled away and never came back, on the one page in the product where a
+ * reader is most likely to want to leave for somewhere else. Sticky, with a
+ * scrim, is both fixes at once. */
+body[data-hero] .masthead {
+  position: sticky;
+  background: color-mix(in srgb, var(--graphite) 88%, transparent);
+  backdrop-filter: saturate(1.2) blur(8px);
+  border-bottom-color: transparent;
+}
+/* Every link in the masthead, by its real class. The first version styled
+ * `.masthead a` and a `.brand` that does not exist in this markup, so the
+ * navigation rendered ink-on-graphite and was invisible — the header was
+ * there, keyboard-reachable and completely unreadable. Only looking at the
+ * rendered page found it. */
+body[data-hero] .masthead .wordmark,
+body[data-hero] .masthead .wordmark-text,
+body[data-hero] .masthead .nav a,
+body[data-hero] .masthead .navsearch,
+body[data-hero] .masthead .navmine { color: var(--limestone); }
+body[data-hero] .masthead .wordmark svg { fill: var(--limestone); color: var(--limestone); }
+body[data-hero] .masthead .nav a:hover,
+body[data-hero] .masthead .navsearch:hover,
+body[data-hero] .masthead .navmine:hover { color: var(--lime); }
+
+/* ── the discovery mosaic ─────────────────────────────────────────────
+ * Eight equal tiles read as a database index — every way into the
+ * continent given identical weight, which is the one thing an editor
+ * never does. This is a LAYOUT, not a new primitive: the children are the
+ * same .card used on 842 pages, and an asymmetric grid appears nowhere
+ * else in the codebase, so there is no repeated structure to extract.
+ */
+.grid.mosaic { grid-template-columns: 1fr; }
+@media (min-width: 44rem) { .grid.mosaic { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 64rem) {
+  /* Six tracks, not four. The first version spanned the lead tile across two
+   * ROWS as well as two columns, and a .card is art-then-body: the art took
+   * the whole doubled row and pushed the label out of the tile, so Mountains
+   * rendered as a picture with no name. It also left 8 items in a 4-track
+   * grid as 2.5 rows, with dead cells under the last two.
+   *
+   * Column spans only. Two wide tiles at the top, six even ones under them:
+   * 3+3, then 2+2+2, then 2+2+2. Eighteen cells, eight tiles, no gaps and
+   * no card whose body has nowhere to go. */
+  .grid.mosaic { grid-template-columns: repeat(6, 1fr); }
+  .grid.mosaic > :nth-child(1),
+  .grid.mosaic > :nth-child(2) { grid-column: span 3; }
+  .grid.mosaic > :nth-child(n+3) { grid-column: span 2; }
+  .grid.mosaic > :nth-child(1) .plate,
+  .grid.mosaic > :nth-child(2) .plate { aspect-ratio: 21 / 9; }
+}
+.homefoot { margin-top: var(--s8); }

@@ -330,6 +330,36 @@ measuring a drawing requires drawing it. `tools/plate-variation.py` holds a
 ceiling on interchangeable pairs per motif family; it is not in `checks.py`
 because eight seconds on every build is a gate people stop running.
 
+**The homepage leads with Europe, and the hero is photographic.** Cutting it
+from eight bands to three fixed a catalogue and left a different fault that
+only looking at the built page found: it led with *structure*. A headline, a
+form, a technical note, a row of counts and a data map, above eight identical
+generated tiles — an information architecture demonstration. The reader met
+the data model before they wanted to go anywhere. The hero is now full-bleed
+with the masthead over it (`body[data-hero]`, one shell, a body attribute the
+single stylesheet reacts to — never a second header), the map is gone from it,
+the counts are below the fold, and the eight equal tiles are an asymmetric
+mosaic. **`.card` is unchanged: an asymmetric grid appears nowhere else in the
+codebase, so the mosaic is a layout, not a new primitive.**
+
+**The plate system cannot carry a hero, and that is measured.** Rendered at
+1200×500 it is flat and monochrome with a dead slab across the bottom third —
+it has nothing to reward a reader who looks closely. It keeps every other job.
+That measurement is the whole justification for licensing a photograph, and
+`docs/hero-brief.md` holds the brief and the seven-question licence gate, all
+seven still unanswered. **Nothing may be committed against that gate from a
+provider's marketing page or from memory** — the sandbox proxy answers 403 to
+CONNECT for general hosts, so acquisition is a human step. Two independent
+guards, both proved red: `checks.py` refuses an `<img>` with no register row,
+and `safety.img_tags` catches it again.
+
+**Weight is now an invariant, because for one commit it was not.** The
+homepage shipped at 118,935 bytes while the commit message reported 45,806 —
+90 KB of inlined coastline under a hero map, 76% of the page — and every
+static check, every browser check, every section assertion and every
+invariant said nothing, because not one of them measured bytes. `weight.home_kb` and
+`weight.max_page_kb` are ceilings now. The homepage is 26 KB.
+
 **The homepage is the door, not the catalogue — three bands, and the count
 is checked.** It ran to eight: four doors, twelve motions, the quiet places,
 the stories desk, the macro regions, seventeen interest tiles, a planner pitch

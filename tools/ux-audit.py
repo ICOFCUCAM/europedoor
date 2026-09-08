@@ -403,7 +403,7 @@ def s8():
          "The sentence box, in the hero, saying under the field what reads "
          "it — which is rules in the browser, not a model.")
 def s9():
-    yield has("/", "askhome", "Plan my journey")
+    yield has("/", "askhero", "Plan my journey")
     yield has("/", "not by a"), "and says what reads it"
 
 
@@ -895,7 +895,7 @@ def s36():
     # The homepage is the one page that does not need to say where you are,
     # because you are at the front door; it carries the hero instead.
     yield every_page(lambda h: 'class="crumbs"' in h or 'class="pagehead"' in h
-                     or 'class="hero"' in h,
+                     or ('class="hero"' in h or 'class="herofull"' in h),
                      "every page says where you are")
     yield "Nearest onward stops" in CITY, "and where you can go next"
     yield "This place, in the rest of the site" in page(

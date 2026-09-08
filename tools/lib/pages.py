@@ -195,20 +195,33 @@ def months_line(data, keys):
 # ── home ──────────────────────────────────────────────────────────────
 
 def home(data):
-    """The homepage is the door, not the catalogue.
+    """The homepage is the door, not the catalogue — and it leads with Europe.
 
-    It used to run to eight bands: four doors, twelve motions, the quiet
-    places, the stories desk, the macro regions, seventeen interest tiles, a
-    planner pitch and the curated journeys. Every one of those is a real
-    surface with a real page, and the homepage was linking to all of them
-    because each was worth linking to. That is how a homepage becomes a
-    contents list — no single section is wrong, and the sum says "here is
-    everything we can do" rather than "here is Europe".
+    It ran to eight bands once: four doors, twelve motions, the quiet places,
+    the stories desk, the macro regions, seventeen interest tiles, a planner
+    pitch and the journeys. Every one was a real surface worth linking to,
+    which is exactly how a homepage becomes a contents list.
 
-    Three bands now: see Europe, find your Europe, start a journey. Nothing
-    was deleted from the site; the removed sections all keep their pages and
-    every one of those URLs is still linked from the masthead or the footer
-    of all 1,072 pages, which is why cutting them here orphans nothing.
+    Cutting it to three fixed that and introduced a different fault, which
+    only looking at the built page found: it led with STRUCTURE. A headline,
+    a form, a technical note, a row of counts and a data map, above eight
+    identical generated tiles. Technically disciplined and emotionally cold —
+    an information architecture demonstration rather than a way into a
+    continent. The reader met the data model before they wanted to go
+    anywhere.
+
+    So the hero is now photographic and full-bleed, the map is gone from it
+    (it is a discovery mechanism, not the hero, and it also happened to be
+    90 KB of inlined coastline), the counts moved below the fold, and the
+    eight equal tiles became an asymmetric mosaic.
+
+    THE PHOTOGRAPH IS NOT HERE YET. `picture()` returns one when the register
+    holds it and falls back when it does not, so this page is shippable
+    today and the licensed file is a one-row change to data/images.json.
+    The fallback is NOT a generated plate: rendering the plate system at
+    hero scale was tried and measured, and at 1200x500 it is a flat
+    monochrome band with a dead slab across the bottom third. It carries a
+    160x100 card and it cannot carry a hero. See docs/hero-brief.md.
     """
     ncountries = len(data["countries"])
     ncities = len(data["cities"])
@@ -227,8 +240,11 @@ def home(data):
     # the next-largest real interests — Architecture (126) and Big cities
     # (74) — and every tile carries its true name and its true count, so the
     # label on the homepage is the heading of the page it opens.
+    #
+    # The ORDER is the mosaic's composition: the first and the sixth get the
+    # wide cells, so the two largest pictures are a landscape and a coast.
     HOME_KINDS = ["mountains", "history", "food", "nature",
-                  "sacred", "coast", "architecture", "cities"]
+                  "coast", "sacred", "architecture", "cities"]
     kind_cards = [
         card(urls.interest(k), f"{n_by_interest[k]} destinations",
              data["interests"][k]["name"], None,
@@ -236,10 +252,32 @@ def home(data):
         for k in HOME_KINDS
     ]
 
+    # Three journeys, chosen by MEASUREMENT rather than by taste: ranked by
+    # countries crossed — the stated differentiator, since "a good European
+    # trip rarely stays in one country" — taking the highest first and
+    # skipping any that repeats a spine already represented. That yields
+    # Arctic to Mediterranean (7 countries), The Hanseatic Arc (6) and The
+    # Adriatic Run (5): a north-south spine, a Baltic one and an Adriatic
+    # one. The comp that prompted this asked for the Italian Grand Tour,
+    # Northern Lights Escape and Hidden Balkans; none of the three exists in
+    # this repository, and inventing them to match a picture is how a
+    # homepage starts lying about what is behind it.
+    FEATURED = ("arctic-to-mediterranean", "the-hanseatic-arc", "the-adriatic-run")
+    by_slug = {j["slug"]: j for j in data["journeys"]}
+    picked = [by_slug[s] for s in FEATURED if s in by_slug]
+    if len(picked) < 3:                       # the data moved; fall back to reach
+        rank = sorted(data["journeys"],
+                      key=lambda j: -len({l["city"].split("/")[0] for l in j["legs"]}))
+        for j in rank:
+            if len(picked) == 3:
+                break
+            if j["slug"] not in {p["slug"] for p in picked}:
+                picked.append(j)
     jcards = [
-        card(urls.journey(j), f"{j['days']} days · {len(j['legs'])} stops",
-             j["name"], j["strapline"], seed="journey:" + j["slug"])
-        for j in data["journeys"][:3]
+        card(urls.journey(j),
+             f"{j['days']} days · {len({l['city'].split('/')[0] for l in j['legs']})} countries",
+             j["name"], j["strapline"], seed="journey:" + j["slug"], tall=True)
+        for j in picked
     ]
 
     # The intent chips seed the same box they sit under, rather than jumping
@@ -258,67 +296,35 @@ def home(data):
         for label, q in INTENTS
     )
 
-    dots = []
-    for cid, n in sorted(data["cities"].items()):
-        x, y = project(n["city"]["lat"], n["city"]["lon"])
-        cls = " advisory" if n["country"].get("advisory") else ""
-        dots.append(f'<circle class="herodot{cls}" cx="{x:.1f}" cy="{y:.1f}" r="4"/>')
-    # The land goes UNDER the dots, and it was missing here.
-    #
-    # geo.landmass()'s own docstring says why this matters — "a dot map with
-    # nothing under it is a scatter plot" — and the homepage was the last
-    # place still making that mistake, months after the coastlines arrived
-    # and the city minimaps and journey routes were fixed. It is also the
-    # exact shape of the projection bug that survived a year here: 319 dots
-    # on an empty rectangle are the right shape by definition, because there
-    # is nothing in the frame to be the wrong shape against.
-    #
-    # It is the loudest thing on the page now, which is the point. The hero
-    # carries the image and each band below it is quieter; if every section
-    # is cinematic then none of them is.
-    ctx, land = geo.landmass(MAPPROJ, (0, 0, MAP_W, MAP_H))
-    # The eleven layer chips that used to sit under this map are gone. They
-    # were eleven links into filtered views of the same map the reader is
-    # already looking at, and they were the clearest example of the homepage
-    # explaining the machine instead of showing the continent.
-    heromap = (
-        f'<a class="heromap" href="/map" aria-label="Map of all {ncities} places in the Atlas">'
-        f'<svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true">{ctx}{land}{"".join(dots)}</svg>'
-        f'<span class="heromap-cap">{ncities} places. Every one has a page.</span></a>'
-    )
+    # The hero photograph, when one is licensed. `picture()` already returns
+    # a plate when the register has no row — which is right everywhere else
+    # and wrong here, so the hero asks the register directly and renders
+    # nothing rather than a plate it has been measured unable to carry.
+    hero_row = (data.get("images") or {}).get("home-hero")
+    heroimg = picture(data.get("images"), "home-hero", w=2400, h=1200,
+                      alt=hero_row["alt"] if hero_row else "",
+                      eager=True, sizes="100vw") if hero_row else ""
 
-    # "Real places · Real stories · Personal journeys" — and deliberately no
-    # fourth item. The design this follows carried POWERED BY AI in that slot.
-    # It is the single line in the whole comp that had to go: the reader meets
-    # EuropeDoor and then experiences intelligence, and a masthead that
-    # advertises its engine is selling the engine. checks.py has refused "AI"
-    # in the masthead, the navigation and every h1 since before this comp
-    # existed, so the phrase could never have reached a built page — but the
-    # rule stops at the h1, and this kicker sits under one.
     body = f"""
-<div class="hero">
-  <div class="hero-text">
-  <p class="kicker">Real places · Real stories · Personal journeys</p>
-  <h1>Open the door to Europe.</h1>
-  <p class="lede">Discover places, stories and journeys across one extraordinary
-  continent.</p>
-  <form class="askhome" action="/plan" method="get">
-    <label for="homeask">Where would you like to go — or what would you like to discover?</label>
-    <input type="text" id="homeask" name="ask" autocomplete="off"
-           placeholder="I want a quiet mountain escape in October."
-           data-rotate="Show me Europe&#39;s most historic cities.|Plan 10 days through Italy.|Where can I experience authentic Mediterranean culture?|I have 10 days in September. I love mountains, history and local food.">
-    <button class="btn" type="submit">Plan my journey</button>
-  </form>
-  <div class="chips hero-intents">{intentchips}</div>
-  <p class="small askhome-note">Read by rules in your browser on the next page — not by a
-  model, and not sent anywhere.</p>
-  <p class="small mt6">{ncountries} countries · {nregions} travel regions ·
-  {ncities} destinations · {len(data['journeys'])} curated journeys</p>
+<section class="herofull{' shot' if heroimg else ''}">
+  {heroimg}
+  <div class="herobody">
+    <p class="kicker">Open the door to Europe</p>
+    <h1>Open the door to Europe.</h1>
+    <p class="lede">Discover places, stories and journeys across one extraordinary
+    continent.</p>
+    <form class="askhero" action="/plan" method="get">
+      <label for="homeask">Where would you like to go — or what would you like to discover?</label>
+      <input type="text" id="homeask" name="ask" autocomplete="off"
+             placeholder="I want a quiet mountain escape in October."
+             data-rotate="Show me Europe&#39;s most historic cities.|Plan 10 days through Italy.|Where can I experience authentic Mediterranean culture?|I have 10 days in September. I love mountains, history and local food.">
+      <button class="btn" type="submit">Plan my journey</button>
+    </form>
+    <div class="chips hero-intents">{intentchips}</div>
   </div>
-  {heromap}
-</div>
+</section>
 
-{section("Find your kind of Europe", grid(kind_cards, 4),
+{section("Find your kind of Europe", '<div class="grid mosaic">' + "".join(kind_cards) + "</div>",
          stage="Discover", tone="quiet",
          lede="From iconic cities to hidden gems, from mountains to coastlines, from history "
               "to the way a place eats. Each of these is a real list, and the Journey Planner "
@@ -327,19 +333,20 @@ def home(data):
 
 {section("Journeys worth taking", grid(jcards, 3) if jcards else '<p class="small">Curated journeys are being written.</p>',
          stage="Go",
-         lede="Curated journeys, or let EuropeDoor Guide build yours. A good European trip "
-              "rarely stays in one country — these do not, and each one opens in the planner "
-              "so you can make it yours.",
-         more=("Every journey", "/journeys"))}
+         lede="A good European trip rarely stays in one country. These do not — and each one "
+              "opens in the planner, so you can make it yours.",
+         more=("Build your own journey", "/plan"))}
 
-<div class="note">
-  <p>EuropeDoor is pre-launch and editorial. Nothing here takes a payment, holds money or
-  makes a booking — see <a href="/how-it-works">how it works</a> for exactly which parts are
-  built, which are designed and which are still questions.</p>
+<div class="note homefoot">
+  <p>{ncountries} countries · {nregions} travel regions · {ncities} destinations ·
+  {len(data['journeys'])} curated journeys. EuropeDoor is pre-launch and editorial: nothing
+  here takes a payment, holds money or makes a booking — see
+  <a href="/how-it-works">how it works</a> for what is built, what is designed and what is
+  deliberately blocked.</p>
 </div>
 """
     return "/index.html", page(
-        SITE_NAME, body, path="/", area=None,
+        SITE_NAME, body, path="/", area=None, hero=True,
         description="Discover, plan and experience Europe: an atlas of every country, region and city, a journey planner, curated cross-border routes and local experiences.",
         og=("europedoor:home", "peaks", "EuropeDoor — open the door to Europe"),
         ld_blocks=[

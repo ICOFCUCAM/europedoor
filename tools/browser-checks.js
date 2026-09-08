@@ -875,7 +875,7 @@ async function main() {
   // the planner and run, or it is a decorative input.
   await page.goto(base + "/", { waitUntil: "networkidle" });
   await page.fill("#homeask", "10 days in September, mountains and local food");
-  await page.click(".askhome button[type=submit]");
+  await page.click(".askhero button[type=submit]");
   await page.waitForSelector("#result .leg");
   ok(/plan/.test(page.url()), "the homepage question did not reach the planner");
   const homeRead = await page.locator("#result .note").first().textContent();
