@@ -1029,8 +1029,14 @@ def s67():
     yield NCOUNTRY >= 5, f"{NCOUNTRY} countries (target 5)"
     yield sum(len(c["regions"]) for c in DATA["countries"].values()) >= 50, "50+ regions"
     yield NCITY >= 150, f"{NCITY} destinations (target 150)"
-    yield doc_covers("docs/content-report.md", "19% of MVP") or \
-        doc_covers("docs/content-report.md", "of MVP"), "the shortfalls are published"
+    # Assert the SHAPE, not the number. This line used to name "19% of MVP"
+    # and went red the first time somebody wrote sixty more places — which is
+    # a check punishing the work it exists to encourage. `or` on two
+    # doc_covers() calls also silently swallowed the first result, so the
+    # fallback made the specific figure decorative rather than enforced.
+    yield doc_covers("docs/content-report.md", "% of MVP", "MVP target"), \
+        "the shortfalls are published against target"
+    yield len(PLACES) < 1000, "and places are still short of the MVP target"
 
 
 @section(68, "Launch strategy", "RECORDED",

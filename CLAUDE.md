@@ -1,6 +1,6 @@
 # EuropeDoor — working notes
 
-A static site: 988 generated HTML files, no dependencies, no database. Every
+A static site: 1,059 generated HTML files, no dependencies, no database. Every
 page comes from `data/` via `tools/build.py`. Nothing in `site/` was written
 by a human and nothing ever should be.
 
@@ -118,8 +118,8 @@ worth making.
 Run all seven before claiming anything is done.
 
     python3 tools/build.py check       validate the data
-    python3 tools/build.py            988 pages
-    python3 tools/checks.py            28 checks, ~91,900 things examined
+    python3 tools/build.py           1,059 pages
+    python3 tools/checks.py            28 checks, ~97,300 things examined
     node tools/browser-checks.js       409 checks in Chromium, incl. accessibility
     python3 tools/section-audit.py --check   the 99 spec sections, 1,273 assertions
     python3 tools/ux-audit.py --check        the 37 UI/UX + 6 brand sections, 231 assertions

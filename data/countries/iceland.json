@@ -139,6 +139,18 @@
               "band": "high",
               "summary": "Two degrees, a dry suit, and water filtered through lava for decades — the clearest you will ever swim in."
             }
+          ],
+          "places": [
+            {
+              "slug": "almannagja",
+              "name": "Almannagjá",
+              "kind": "viewpoint",
+              "summary": "A rift where the North American and Eurasian plates pull apart about 2 cm a year, and the site of the Alþingi — a parliament that met here from 930.",
+              "lat": 64.256,
+              "lon": -21.129,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         }
       ]
@@ -172,6 +184,18 @@
             "Reynisfjara's basalt columns — and the sneaker waves that kill people who turn their backs",
             "Dyrhólaey's arch and puffin colony in early summer",
             "Katla under the ice, overdue and monitored"
+          ],
+          "places": [
+            {
+              "slug": "reynisfjara",
+              "name": "Reynisfjara",
+              "kind": "beach",
+              "summary": "Black sand, basalt columns and sneaker waves that have killed people who turned their backs on the sea. Watch the water; it is not a beach for paddling.",
+              "lat": 63.406,
+              "lon": -19.045,
+              "duration": "1 hour",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -202,6 +226,18 @@
               "kind": "walk",
               "band": "high",
               "summary": "The blue caves form and collapse each year; go with a guide who checks them that morning, and only from November to March."
+            }
+          ],
+          "places": [
+            {
+              "slug": "jokulsarlon",
+              "name": "Jökulsárlón",
+              "kind": "viewpoint",
+              "summary": "A lagoon where the glacier calves icebergs that drift out to sea and wash back onto the black beach opposite, which is why it is called Diamond Beach.",
+              "lat": 64.048,
+              "lon": -16.179,
+              "duration": "2 hours",
+              "season": "year-round"
             }
           ]
         }

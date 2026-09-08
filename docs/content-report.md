@@ -14,7 +14,7 @@ which has one advantage a dashboard does not: the gaps show up in a diff.
 | Countries | 50 | 5 | 10 | met |
 | Travel regions | 130 | 50 | — | met |
 | Destinations | 319 | 150 | 300 | met |
-| Places | 192 | 1000 | 3000 | 19% of MVP |
+| Places | 255 | 1000 | 3000 | 26% of MVP |
 | Experiences | 197 | 300 | 1000 | 66% of MVP |
 | Journeys | 17 | 50 | 100 | 34% of MVP |
 | Stories | 9 | 100 | 500 | 9% of MVP |
@@ -29,13 +29,13 @@ honest position is that they are behind rather than automatable.
 
 ## Where the dataset is thin
 
-### Countries with no places — 44
+### Countries with no places — 34
 
-Albania, Andorra, Armenia, Austria, Azerbaijan, Belarus, Belgium, Bosnia and Herzegovina, Bulgaria, Croatia, Cyprus, Czechia, Denmark, Estonia, Finland, Georgia, Germany, Hungary, Iceland, Ireland, Kosovo, Latvia, Liechtenstein, Lithuania, and 20 more.
+Albania, Andorra, Armenia, Azerbaijan, Belarus, Bosnia and Herzegovina, Bulgaria, Cyprus, Finland, Georgia, Kosovo, Latvia, Liechtenstein, Lithuania, Luxembourg, Malta, Moldova, Monaco, Montenegro, Netherlands, North Macedonia, Poland, Portugal, Romania, and 10 more.
 
-### Destinations with no experiences and no places — 112
+### Destinations with no experiences and no places — 98
 
-Albarracín, Spain, Amiens, France, Andorra la Vella, Andorra, Antwerp, Belgium, Arezzo, Italy, Balestrand, Norway, Bansko, Bulgaria, Bath, United Kingdom, Bellagio & Lake Como, Italy, Belovezhskaya Pushcha, Belarus, Biarritz & the Basque Coast, France, Bitola, North Macedonia, Blagaj, Bosnia and Herzegovina, Brno, Czechia, Bucharest, Romania, Cardiff, United Kingdom, Ciutadella, Menorca, Spain, Civita di Bagnoregio, Italy, Clermont-Ferrand, France, Cologne, Germany, Cádiz, Spain, Dilijan, Armenia, Dinant, Belgium, Dingle, Ireland, and 88 more.
+Albarracín, Spain, Amiens, France, Andorra la Vella, Andorra, Arezzo, Italy, Balestrand, Norway, Bansko, Bulgaria, Bath, United Kingdom, Bellagio & Lake Como, Italy, Belovezhskaya Pushcha, Belarus, Biarritz & the Basque Coast, France, Bitola, North Macedonia, Blagaj, Bosnia and Herzegovina, Bucharest, Romania, Cardiff, United Kingdom, Ciutadella, Menorca, Spain, Civita di Bagnoregio, Italy, Clermont-Ferrand, France, Cádiz, Spain, Dilijan, Armenia, Dinant, Belgium, Dürnstein & the Wachau, Austria, Edirne, Türkiye, Gdańsk, Poland, Gjirokastër, Albania, and 74 more.
 
 ### Countries never fact-checked — 50
 

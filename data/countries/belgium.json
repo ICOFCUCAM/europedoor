@@ -118,6 +118,28 @@
               "band": "low",
               "summary": "Day-trippers arrive from ten. Between six and nine the canals belong to you and the swans."
             }
+          ],
+          "places": [
+            {
+              "slug": "markt-belfry",
+              "name": "The Belfry",
+              "kind": "monument",
+              "summary": "366 steps to a carillon of 47 bells. The climb is single-file and timed, and the view is the only way to understand how small the medieval city actually is.",
+              "lat": 51.208,
+              "lon": 3.225,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "groeningemuseum",
+              "name": "Groeningemuseum",
+              "kind": "museum",
+              "summary": "Six centuries of Flemish painting in a building you can cross in twenty minutes, including Van Eyck's Madonna with Canon van der Paele.",
+              "lat": 51.204,
+              "lon": 3.226,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -140,6 +162,28 @@
             "The Ghent Altarpiece, restored, in the cathedral it was painted for",
             "The Graslei quays at dusk",
             "Vegetarian Thursdays, a city policy since 2009"
+          ],
+          "places": [
+            {
+              "slug": "st-bavo",
+              "name": "Saint Bavo's Cathedral",
+              "kind": "church",
+              "summary": "Holds the Ghent Altarpiece — the Van Eyck brothers, 1432, twelve panels, stolen thirteen times and still missing one. It is shown behind glass in a climate-controlled chapel.",
+              "lat": 51.053,
+              "lon": 3.727,
+              "duration": "1–2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "gravensteen",
+              "name": "Gravensteen",
+              "kind": "castle",
+              "summary": "A moated twelfth-century castle in the middle of the city, complete with the counts' quarters and a distinctly unsentimental collection of judicial instruments.",
+              "lat": 51.057,
+              "lon": 3.721,
+              "duration": "1–2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -162,6 +206,28 @@
             "Rubens's own house and studio",
             "The station, which is a cathedral pretending to be a station",
             "MoMu and the Antwerp Six's continuing influence"
+          ],
+          "places": [
+            {
+              "slug": "cathedral-of-our-lady",
+              "name": "Cathedral of Our Lady",
+              "kind": "church",
+              "summary": "The tallest gothic church in the Low Countries, holding four Rubens altarpieces in the positions he painted them for.",
+              "lat": 51.22,
+              "lon": 4.402,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "mas",
+              "name": "MAS",
+              "kind": "museum",
+              "summary": "A stack of red sandstone boxes on the old docks. The spiral escalator to the roof is free and gives the best view of the port.",
+              "lat": 51.229,
+              "lon": 4.406,
+              "duration": "2–3 hours",
+              "season": "year-round"
+            }
           ]
         }
       ]
@@ -206,6 +272,28 @@
               "kind": "cellar",
               "band": "moderate",
               "summary": "Beer left open to the air of one valley, aged three years in barrel — the last place in the world doing this at scale."
+            }
+          ],
+          "places": [
+            {
+              "slug": "grand-place",
+              "name": "Grand-Place",
+              "kind": "square",
+              "summary": "Rebuilt in five years after a French bombardment flattened it in 1695, which is why a medieval square is uniformly late baroque.",
+              "lat": 50.847,
+              "lon": 4.352,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "royal-museums",
+              "name": "Royal Museums of Fine Arts",
+              "kind": "museum",
+              "summary": "Four museums in one, and the Magritte collection is the largest anywhere — 200-odd works, which is enough to see him stop being a joke and start being a painter.",
+              "lat": 50.842,
+              "lon": 4.358,
+              "duration": "3 hours",
+              "season": "year-round"
             }
           ]
         },

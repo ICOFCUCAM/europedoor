@@ -122,6 +122,38 @@
               "band": "moderate",
               "summary": "Herring first, then fish, then meat, then cheese, with aquavit between — a lunch that takes three hours and is meant to."
             }
+          ],
+          "places": [
+            {
+              "slug": "tivoli",
+              "name": "Tivoli Gardens",
+              "kind": "park",
+              "summary": "Opened 1843 and the second-oldest amusement park still running. Walt Disney visited twice and took notes; the wooden roller coaster still has a brakeman riding in it.",
+              "lat": 55.674,
+              "lon": 12.568,
+              "duration": "half a day",
+              "season": "spring-autumn"
+            },
+            {
+              "slug": "ny-carlsberg",
+              "name": "Ny Carlsberg Glyptotek",
+              "kind": "museum",
+              "summary": "A brewer's collection: Mediterranean antiquity downstairs, French impressionism upstairs, and a winter garden with a palm house in the middle of both.",
+              "lat": 55.673,
+              "lon": 12.573,
+              "duration": "2–3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "rosenborg",
+              "name": "Rosenborg Castle",
+              "kind": "castle",
+              "summary": "A Renaissance summer house in the middle of town, holding the crown jewels in a basement that feels far too casual for what is in it.",
+              "lat": 55.686,
+              "lon": 12.577,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -152,6 +184,28 @@
               "kind": "water",
               "band": "moderate",
               "summary": "Built with period tools from the excavated hulls; you supply the arms and learn quickly why Vikings were fit."
+            }
+          ],
+          "places": [
+            {
+              "slug": "viking-ship-museum",
+              "name": "Viking Ship Museum",
+              "kind": "museum",
+              "summary": "Five ships deliberately sunk in 1070 to block the fjord, raised in 1962 and reassembled from fragments. Reconstructions are sailed from the harbour outside.",
+              "lat": 55.65,
+              "lon": 12.081,
+              "duration": "2–3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "roskilde-cathedral",
+              "name": "Roskilde Cathedral",
+              "kind": "church",
+              "summary": "The burial place of forty Danish kings and queens across nine hundred years, so the building is also a walk through changing ideas about how to be remembered.",
+              "lat": 55.643,
+              "lon": 12.081,
+              "duration": "1–2 hours",
+              "season": "year-round"
             }
           ]
         }

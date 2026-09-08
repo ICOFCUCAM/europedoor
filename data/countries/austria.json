@@ -128,6 +128,48 @@
               "band": "moderate",
               "summary": "Wine taverns in Vienna's own vineyards, open only when the grower has wine to sell — a pine branch over the door means open."
             }
+          ],
+          "places": [
+            {
+              "slug": "schonbrunn",
+              "name": "Schönbrunn Palace",
+              "kind": "castle",
+              "summary": "1,441 rooms, a park that is free to walk, and a zoo founded in 1752 that is the oldest still operating anywhere.",
+              "lat": 48.185,
+              "lon": 16.312,
+              "duration": "half a day",
+              "season": "year-round"
+            },
+            {
+              "slug": "kunsthistorisches",
+              "name": "Kunsthistorisches Museum",
+              "kind": "museum",
+              "summary": "The Habsburg collection, which means the largest group of Bruegels in existence and a room of Vermeer, Velázquez and Caravaggio that would be a national museum anywhere else.",
+              "lat": 48.204,
+              "lon": 16.362,
+              "duration": "3–4 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "stephansdom",
+              "name": "Stephansdom",
+              "kind": "church",
+              "summary": "The tiled roof is the thing: 230,000 glazed tiles in a chevron pattern, laid as a double eagle on one side and the city arms on the other.",
+              "lat": 48.209,
+              "lon": 16.373,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "naschmarkt",
+              "name": "Naschmarkt",
+              "kind": "market",
+              "summary": "A kilometre and a half of stalls that began as a milk market in the 1770s. Cheaper and less performed at the far end from the underground station.",
+              "lat": 48.198,
+              "lon": 16.363,
+              "duration": "1–2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -184,6 +226,28 @@
             "Hohensalzburg fortress, never taken in a thousand years",
             "Mozart's birthplace and the concerts in the Residenz",
             "Hellbrunn's trick fountains, designed in 1615 to soak guests"
+          ],
+          "places": [
+            {
+              "slug": "hohensalzburg",
+              "name": "Hohensalzburg Fortress",
+              "kind": "castle",
+              "summary": "Never taken in nine hundred years, largely because nobody seriously tried. The funicular up is the oldest still running in the world.",
+              "lat": 47.795,
+              "lon": 13.047,
+              "duration": "2–3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "mirabell-gardens",
+              "name": "Mirabell Gardens",
+              "kind": "garden",
+              "summary": "Baroque parterre laid out in 1690, and the steps every visitor recognises without being able to say why until somebody mentions the film.",
+              "lat": 47.806,
+              "lon": 13.042,
+              "duration": "1 hour",
+              "season": "spring-autumn"
+            }
           ]
         },
         {
@@ -255,6 +319,28 @@
               "kind": "ride",
               "band": "moderate",
               "summary": "Tram, funicular and two cable cars take you from a café table to 2,256 metres of exposed ridge; take a jacket you would not think you needed."
+            }
+          ],
+          "places": [
+            {
+              "slug": "nordkette",
+              "name": "Nordkette",
+              "kind": "mountain",
+              "summary": "A cable railway from the middle of the city to 2,300 m in twenty minutes. Few places let you go from a coffee to an alpine ridge that fast.",
+              "lat": 47.311,
+              "lon": 11.384,
+              "duration": "half a day",
+              "season": "year-round"
+            },
+            {
+              "slug": "goldenes-dachl",
+              "name": "Goldenes Dachl",
+              "kind": "monument",
+              "summary": "A balcony roofed with 2,657 fire-gilded copper tiles, built in 1500 so Maximilian I could watch tournaments in the square below.",
+              "lat": 47.269,
+              "lon": 11.394,
+              "duration": "20 minutes",
+              "season": "year-round"
             }
           ]
         }

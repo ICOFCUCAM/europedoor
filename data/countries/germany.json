@@ -127,6 +127,48 @@
               "band": "low",
               "summary": "Two 2,000-metre runways, open to anyone, kept deliberately empty by referendum."
             }
+          ],
+          "places": [
+            {
+              "slug": "museum-island",
+              "name": "Museumsinsel",
+              "kind": "museum",
+              "summary": "Five museums on one island in the Spree, holding the Pergamon altar, the bust of Nefertiti and enough classical sculpture to make a day feel short.",
+              "lat": 52.52,
+              "lon": 13.398,
+              "duration": "a full day",
+              "season": "year-round"
+            },
+            {
+              "slug": "east-side-gallery",
+              "name": "East Side Gallery",
+              "kind": "monument",
+              "summary": "The longest surviving stretch of the Wall, 1.3 km of it, painted by artists from twenty-one countries in 1990 and repainted since as the originals weathered.",
+              "lat": 52.505,
+              "lon": 13.44,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "brandenburg-gate",
+              "name": "Brandenburg Gate",
+              "kind": "monument",
+              "summary": "Prussian triumphal arch, then a gate nobody could pass through for twenty-eight years, and now the place every photograph of the city is taken from.",
+              "lat": 52.516,
+              "lon": 13.378,
+              "duration": "30 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "tempelhof",
+              "name": "Tempelhofer Feld",
+              "kind": "park",
+              "summary": "A closed airport turned into a park, and the runways were left. Berliners cycle, skate and barbecue on a 300-hectare field where planes landed until 2008.",
+              "lat": 52.473,
+              "lon": 13.404,
+              "duration": "2 hours",
+              "season": "spring-autumn"
+            }
           ]
         },
         {
@@ -149,6 +191,28 @@
             "The Frauenkirche, reassembled from the rubble and finished in 2005",
             "The Green Vault's treasury, booked in timed slots",
             "Saxon Switzerland's sandstone towers, forty minutes upriver"
+          ],
+          "places": [
+            {
+              "slug": "frauenkirche",
+              "name": "Frauenkirche",
+              "kind": "church",
+              "summary": "Rebuilt from its own rubble between 1994 and 2005, with the blackened original stones set back where they were found. The dark blocks in the pale facade are the point.",
+              "lat": 51.052,
+              "lon": 13.742,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "zwinger",
+              "name": "The Zwinger",
+              "kind": "monument",
+              "summary": "A baroque pleasure palace built around a courtyard, now holding the Old Masters gallery and Raphael's Sistine Madonna — the one with the two bored cherubs at the bottom.",
+              "lat": 51.053,
+              "lon": 13.734,
+              "duration": "2–3 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -217,6 +281,28 @@
               "band": "low",
               "summary": "Buy the beer, bring the food, sit at the unmarked communal tables — the marked ones are for served customers and the distinction matters."
             }
+          ],
+          "places": [
+            {
+              "slug": "englischer-garten",
+              "name": "Englischer Garten",
+              "kind": "park",
+              "summary": "Larger than Central Park, with a standing wave on the Eisbach where surfers queue in wetsuits all year, and beer gardens under chestnut trees at the far end.",
+              "lat": 48.164,
+              "lon": 11.605,
+              "duration": "2–3 hours",
+              "season": "spring-autumn"
+            },
+            {
+              "slug": "residenz",
+              "name": "The Residenz",
+              "kind": "castle",
+              "summary": "The Wittelsbach city palace: ten courtyards, 130 rooms open, and a treasury holding crowns from the tenth century onward.",
+              "lat": 48.141,
+              "lon": 11.578,
+              "duration": "3 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -282,6 +368,28 @@
             "The Dom, and 533 steps up the south tower",
             "Kölsch served in 200 ml glasses, replaced until you cover it with the mat",
             "The Roman-Germanic museum's mosaic, found while digging an air-raid shelter"
+          ],
+          "places": [
+            {
+              "slug": "cologne-cathedral",
+              "name": "Kölner Dom",
+              "kind": "church",
+              "summary": "Begun in 1248, abandoned for three centuries, finished in 1880 to the original plans. It survived the war standing in a flattened city because bomber crews used it to navigate.",
+              "lat": 50.941,
+              "lon": 6.958,
+              "duration": "1–2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "roman-germanic-museum",
+              "name": "Roman-Germanic Museum",
+              "kind": "museum",
+              "summary": "Built over the Dionysus mosaic where it was found, which is the correct way to display a floor. Cologne was a Roman colony and this is what is left of it.",
+              "lat": 50.941,
+              "lon": 6.96,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -358,6 +466,28 @@
               "band": "low",
               "summary": "A public transport ferry down the Elbe past the container terminals; same view, a fraction of the price."
             }
+          ],
+          "places": [
+            {
+              "slug": "speicherstadt",
+              "name": "Speicherstadt",
+              "kind": "quarter",
+              "summary": "The largest warehouse district in the world, red brick on oak piles, built in the 1880s for coffee, tea, spices and carpets. Best walked at dusk when the canals go still.",
+              "lat": 53.543,
+              "lon": 9.988,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "elbphilharmonie",
+              "name": "Elbphilharmonie",
+              "kind": "theatre",
+              "summary": "A glass wave on top of a 1960s cocoa warehouse. The public plaza between the two is free and gives the best view of the harbour in the city.",
+              "lat": 53.541,
+              "lon": 9.984,
+              "duration": "1–2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -380,6 +510,18 @@
             "The Holstentor, leaning and famous and on the old fifty-mark note",
             "Seven towers on the island skyline",
             "Thomas Mann's family house, and Buddenbrooks written in it"
+          ],
+          "places": [
+            {
+              "slug": "holstentor",
+              "name": "Holstentor",
+              "kind": "monument",
+              "summary": "The city gate that leans, because it was built on marshy ground in 1464 and has been settling ever since. It is on the back of the old fifty-mark note.",
+              "lat": 53.866,
+              "lon": 10.68,
+              "duration": "30 minutes",
+              "season": "year-round"
+            }
           ]
         }
       ]

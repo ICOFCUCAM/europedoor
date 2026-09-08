@@ -124,6 +124,48 @@
               "band": "low",
               "summary": "The city's first castle, a cemetery of composers, and the whole of Prague from the ramparts without a crowd."
             }
+          ],
+          "places": [
+            {
+              "slug": "charles-bridge",
+              "name": "Charles Bridge",
+              "kind": "bridge",
+              "summary": "Fourteenth-century, thirty baroque statues, and so crowded by ten in the morning that the only honest advice is to walk it at dawn or after midnight.",
+              "lat": 50.086,
+              "lon": 14.412,
+              "duration": "45 minutes",
+              "season": "year-round"
+            },
+            {
+              "slug": "prague-castle",
+              "name": "Prague Castle",
+              "kind": "castle",
+              "summary": "Not a castle so much as a walled hill town that has been the seat of Bohemian kings, Holy Roman emperors and Czech presidents in turn. St Vitus Cathedral is inside it.",
+              "lat": 50.09,
+              "lon": 14.4,
+              "duration": "3–4 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "old-jewish-quarter",
+              "name": "Josefov, the Jewish Quarter",
+              "kind": "quarter",
+              "summary": "Six synagogues and a cemetery where twelve thousand headstones lean against each other because the ground was reused for three hundred years and there was nowhere else to bury.",
+              "lat": 50.09,
+              "lon": 14.418,
+              "duration": "3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "vysehrad",
+              "name": "Vyšehrad and the river bend",
+              "kind": "ruin",
+              "summary": "The other castle rock, south along the Vltava, with a neo-gothic basilica and the national cemetery. Locals come here to avoid the crowds at the first one.",
+              "lat": 50.064,
+              "lon": 14.418,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -145,6 +187,28 @@
             "The baroque theatre, with original 1766 machinery still working",
             "The bear moat, which has had bears since the 1700s",
             "Canoeing the river loop around the town"
+          ],
+          "places": [
+            {
+              "slug": "krumlov-castle",
+              "name": "Český Krumlov Castle",
+              "kind": "castle",
+              "summary": "The second-largest castle complex in the country, wrapped in a river meander, with a baroque theatre that still has its original stage machinery and painted scenery.",
+              "lat": 48.813,
+              "lon": 14.315,
+              "duration": "2–3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "cloak-bridge",
+              "name": "The Cloak Bridge",
+              "kind": "bridge",
+              "summary": "A three-tiered covered viaduct joining the castle to its theatre across a ravine, built so the household could reach a performance without going outside.",
+              "lat": 48.812,
+              "lon": 14.313,
+              "duration": "20 minutes",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -202,6 +266,28 @@
             "Villa Tugendhat, Mies van der Rohe, 1930, bookable in advance only",
             "The second-largest ossuary in Europe, found in 2001",
             "A cannonball fired at 11 am, which is why the cathedral rings noon an hour early"
+          ],
+          "places": [
+            {
+              "slug": "villa-tugendhat",
+              "name": "Villa Tugendhat",
+              "kind": "monument",
+              "summary": "Mies van der Rohe, 1930, and the building where modernism stopped being a manifesto and became a house somebody lived in. Entry is by timed tour and books out weeks ahead.",
+              "lat": 49.207,
+              "lon": 16.616,
+              "duration": "1–2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "spilberk",
+              "name": "Špilberk Castle",
+              "kind": "castle",
+              "summary": "A hilltop fortress that spent the nineteenth century as the Habsburg empire's most feared prison, and now holds the city museum and the best view over the roofs.",
+              "lat": 49.194,
+              "lon": 16.599,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {

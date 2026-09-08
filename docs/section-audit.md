@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**100 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 1 locked · 1 refused · 1 built (deliberately smaller) · 1273 assertions · 0 failing**
+**100 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 1 locked · 1 refused · 1 built (deliberately smaller) · 1274 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -77,7 +77,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 64 | North star metric | RECORDED | 2 | Meaningfully planned journeys per active user, not page views. |
 | 65 | MVP scope | BUILT | 13 | Every item on the specification's MVP list is live except user accounts, which are browser-local by choice. |
 | 66 | Initial countries | BUILT | 12 | All five of the specification's launch cluster are depth-tier A, and all seven of its second cluster exist. |
-| 67 | MVP content target | PARTIAL | 4 | Countries, regions and destinations are past target. Places, experiences, journeys and stories are behind, and business listings are deliberately not being seeded. |
+| 67 | MVP content target | PARTIAL | 5 | Countries, regions and destinations are past target. Places, experiences, journeys and stories are behind, and business listings are deliberately not being seeded. |
 | 68 | Launch strategy | RECORDED | 2 | Depth before breadth, and the thin-page warning enforced in code rather than remembered. |
 | 69 | Content production model | PARTIAL | 3 | Editorial is the only one of the three sources running. Local contributors and business-supplied facts both need accounts. |
 | 70 | Local contributor programme | DEFERRED | 1 | Needs accounts, moderation and attribution. Specified, not built, not implied anywhere on the site. |

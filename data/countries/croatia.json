@@ -116,6 +116,28 @@
               "band": "low",
               "summary": "The cellars survive because they were filled with rubbish for centuries; they map the imperial floor plan above exactly."
             }
+          ],
+          "places": [
+            {
+              "slug": "diocletians-palace",
+              "name": "Diocletian's Palace",
+              "kind": "archaeological-site",
+              "summary": "Not a ruin: a Roman emperor's retirement palace that three thousand people still live inside. The cathedral is his mausoleum, repurposed by the people he persecuted.",
+              "lat": 43.508,
+              "lon": 16.44,
+              "duration": "3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "marjan",
+              "name": "Marjan Hill",
+              "kind": "park",
+              "summary": "A pine-covered headland walked by everyone in Split at some point on a Sunday, with swimming coves on the south side and the whole coast from the top.",
+              "lat": 43.509,
+              "lon": 16.418,
+              "duration": "2–3 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -137,6 +159,28 @@
             "The walls, walked at opening or in the last hour",
             "Lokrum island, ten minutes by boat, with a monastery and peacocks",
             "The Rector's Palace and the 1317 pharmacy still trading"
+          ],
+          "places": [
+            {
+              "slug": "city-walls",
+              "name": "The City Walls",
+              "kind": "monument",
+              "summary": "Two kilometres of unbroken circuit, up to 25 m high, walked in one direction only. Go at opening or an hour before closing; the middle of the day is a queue with a view.",
+              "lat": 42.641,
+              "lon": 18.107,
+              "duration": "2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "rectors-palace",
+              "name": "Rector's Palace",
+              "kind": "monument",
+              "summary": "Where the elected head of the Ragusan republic lived for exactly one month at a time, forbidden to leave the building — a constitution designed around distrust of power.",
+              "lat": 42.64,
+              "lon": 18.111,
+              "duration": "1 hour",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -259,6 +303,18 @@
             "The Museum of Broken Relationships, which is much better than the joke",
             "Dolac market above the main square",
             "The Upper Town, and the gas lamps still lit by hand each evening"
+          ],
+          "places": [
+            {
+              "slug": "upper-town",
+              "name": "Gornji Grad",
+              "kind": "quarter",
+              "summary": "The medieval hill town, with a cannon fired at noon every day since 1877 and a tiled church roof carrying the arms of Croatia, Dalmatia and Slavonia.",
+              "lat": 45.815,
+              "lon": 15.974,
+              "duration": "2–3 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -287,6 +343,28 @@
               "kind": "walk",
               "band": "moderate",
               "summary": "Timed entry tickets sell out; the 7 am slot gives you an hour of empty boardwalk before the coaches from the coast arrive."
+            }
+          ],
+          "places": [
+            {
+              "slug": "upper-lakes",
+              "name": "The Upper Lakes",
+              "kind": "waterfall",
+              "summary": "Twelve terraced lakes joined by travertine barriers that are still growing about a centimetre a year. The boardwalks have no railings, which is part of it.",
+              "lat": 44.891,
+              "lon": 15.611,
+              "duration": "3–4 hours",
+              "season": "spring-autumn"
+            },
+            {
+              "slug": "veliki-slap",
+              "name": "Veliki Slap",
+              "kind": "waterfall",
+              "summary": "78 m, the tallest in Croatia, at the foot of the lower canyon. Heaviest after the snowmelt and reduced to a thread by late August.",
+              "lat": 44.867,
+              "lon": 15.601,
+              "duration": "1 hour",
+              "season": "spring-autumn"
             }
           ]
         }

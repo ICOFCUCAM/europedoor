@@ -124,6 +124,48 @@
               "band": "low",
               "summary": "Derelict courtyard buildings filled with salvaged furniture; Szimpla was the first and is still worth an early evening."
             }
+          ],
+          "places": [
+            {
+              "slug": "szechenyi-baths",
+              "name": "Széchenyi Baths",
+              "kind": "bath",
+              "summary": "Eighteen pools fed from a well 1,246 m down. The outdoor pools stay at 38°C, which is why the photographs of people playing chess in the steam are all taken in winter.",
+              "lat": 47.519,
+              "lon": 19.082,
+              "duration": "2–3 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "fishermans-bastion",
+              "name": "Fisherman's Bastion",
+              "kind": "viewpoint",
+              "summary": "Seven neo-Romanesque turrets for the seven Magyar tribes, built in 1902 purely as a viewing terrace. The upper levels charge; the lower ones are free and nearly as good.",
+              "lat": 47.502,
+              "lon": 19.035,
+              "duration": "1 hour",
+              "season": "year-round"
+            },
+            {
+              "slug": "great-market-hall",
+              "name": "Great Market Hall",
+              "kind": "market",
+              "summary": "Three floors under a Zsolnay tiled roof: paprika and salami on the ground, cooked food and a great deal of embroidery above.",
+              "lat": 47.487,
+              "lon": 19.058,
+              "duration": "1–2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "house-of-terror",
+              "name": "House of Terror",
+              "kind": "museum",
+              "summary": "The headquarters of first the Arrow Cross and then the state security police, kept as a museum of both occupations. The basement cells are as they were found.",
+              "lat": 47.506,
+              "lon": 19.064,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {

@@ -116,6 +116,28 @@
               "band": "low",
               "summary": "Musicians sit in a circle facing each other, not the room; the etiquette is quiet during tunes and buy the round."
             }
+          ],
+          "places": [
+            {
+              "slug": "trinity-library",
+              "name": "The Long Room, Trinity College",
+              "kind": "library",
+              "summary": "Sixty-five metres of oak barrel vault holding 200,000 of the library's oldest books, with the Book of Kells shown below it a page at a time.",
+              "lat": 53.344,
+              "lon": -6.257,
+              "duration": "1–2 hours",
+              "season": "year-round"
+            },
+            {
+              "slug": "kilmainham-gaol",
+              "name": "Kilmainham Gaol",
+              "kind": "monument",
+              "summary": "Where the leaders of the 1916 Rising were held and shot. Guided entry only, and the tours sell out days ahead — which is the single most useful thing to know about visiting Dublin.",
+              "lat": 53.342,
+              "lon": -6.31,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         },
         {
@@ -138,6 +160,18 @@
             "The round tower, 30 metres, built as a bell tower and a refuge",
             "The Spinc ridge walk above the upper lake",
             "Early morning, before the coaches from Dublin"
+          ],
+          "places": [
+            {
+              "slug": "round-tower",
+              "name": "The Round Tower and monastic city",
+              "kind": "monastery",
+              "summary": "A sixth-century monastic settlement in a glacial valley, with a 30 m round tower whose door is four metres off the ground for reasons nobody has to explain twice.",
+              "lat": 53.011,
+              "lon": -6.327,
+              "duration": "2 hours",
+              "season": "year-round"
+            }
           ]
         }
       ]
@@ -236,6 +270,18 @@
             "The Slea Head drive, and stopping at the clocháin",
             "Gallarus Oratory, dry-stone and watertight after 1,200 years",
             "Music in pubs that are also hardware shops"
+          ],
+          "places": [
+            {
+              "slug": "slea-head",
+              "name": "Slea Head",
+              "kind": "viewpoint",
+              "summary": "The western end of the peninsula, looking at the Blasket Islands, with beehive huts and an oratory built without mortar that has stayed dry for twelve hundred years.",
+              "lat": 52.104,
+              "lon": -10.457,
+              "duration": "half a day",
+              "season": "year-round"
+            }
           ]
         }
       ]
