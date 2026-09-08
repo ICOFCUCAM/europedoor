@@ -43,6 +43,43 @@ MARK = (
 )
 
 
+def arch_path(w, h, rise=None):
+    """A segmental arch across a w x h frame, as an SVG path.
+
+    THE SIGNATURE. The mark is a door: a frame with a semicircular head. An
+    arch is also the one architectural form the whole continent shares —
+    Roman, Romanesque, Gothic, Moorish, and every railway station built to
+    look like all four. So the door stops being a logo shape and becomes the
+    aperture: geography is seen THROUGH a doorway, on every family, at every
+    scale. Structural, not illustrated, which is where brand metaphors last.
+
+    Not a semicircle. A semicircular head on a 900x320 map would need a rise
+    of 450 and there are only 320 to spend, so the arch is SEGMENTAL — a
+    circular segment struck from a radius larger than the span, which is what
+    a mason does over a wide opening and what every bridge in Europe is. The
+    radius follows from the span and the rise:
+
+        R = (rise^2 + (span/2)^2) / (2 * rise)
+
+    `rise` defaults to a quarter of the height, clamped so a very wide frame
+    keeps a shallow, confident curve rather than a bulge.
+    """
+    if rise is None:
+        rise = min(h * 0.34, w * 0.5)
+    rise = max(1.0, min(rise, h * 0.9, w * 0.5))
+    half = w / 2.0
+    r = (rise * rise + half * half) / (2.0 * rise)
+    return (f"M0,{h:.1f} L0,{rise:.1f} "
+            f"A {r:.1f},{r:.1f} 0 0 1 {w:.1f},{rise:.1f} "
+            f"L {w:.1f},{h:.1f} Z")
+
+
+def arch_clip(uid, w, h, rise=None):
+    """The arch as a <clipPath>, for clipping a map inside its own SVG."""
+    return (f'<clipPath id="arch-{esc(uid)}">'
+            f'<path d="{arch_path(w, h, rise)}"/></clipPath>')
+
+
 def esc(s):
     return html.escape(str(s), quote=True)
 

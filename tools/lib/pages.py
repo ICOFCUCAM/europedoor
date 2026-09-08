@@ -15,7 +15,7 @@ from . import urls
 from .render import (LD_PUBLISHER, SITE_NAME, SITE_TAGLINE, card, chips, crumbs,
                      esc, factlist, grid,
                      jsondata, ld_breadcrumb, ld_place, ld_within, motif_for,
-                     page, picture, plate, section)
+                     page, picture, plate, section, arch_clip)
 from .score import city_scores, country_scores, discoverability
 
 HOME = ("Europe", "/discover")
@@ -1707,6 +1707,10 @@ def minimap(data, t, span=3.2):
     """
     cx, cy = project(t["lat"], t["lon"])
     w, h = 900, 320
+    # The land is the doorway's ground: an arch cut over emptiness is a
+    # shape, an arch cut over a coastline is an opening onto somewhere.
+    ctx, land = geo.landmass(MAPPROJ, (0, 0, MAP_W, MAP_H))
+    uid = "mm%d" % (abs(hash((t["name"], t["lat"], t["lon"]))) % 100000)
     if span == "auto":
         pts = [project(n["city"]["lat"], n["city"]["lon"]) for n in data["cities"].values()]
         span = 2.4
@@ -1742,10 +1746,15 @@ def minimap(data, t, span=3.2):
                 f'{esc(n["city"]["name"])}</text>'
             )
     return (
-        f'<figure class="minimap" data-world="intelligence">'
+        f'<figure class="minimap arched" data-world="intelligence">'
         f'<svg viewBox="0 0 {w} {h}" role="img" '
         f'aria-label="Map of {esc(t["name"])} and the places around it">'
-        f'{"".join(dots)}{"".join(labels)}</svg>'
+        f'<defs>{arch_clip(uid, w, h)}</defs>'
+        f'<g clip-path="url(#arch-{uid})">'
+        f'<rect x="0" y="0" width="{w}" height="{h}" class="archground"/>'
+        f'<g transform="translate({w/2 - cx*span:.2f},{h/2 - cy*span:.2f}) scale({span})">'
+        f'{ctx}{land}</g>'
+        f'{"".join(dots)}{"".join(labels)}</g></svg>'
         f'<figcaption>{esc(t["name"])} and its neighbours in the Atlas — the frame is about '
         f'{km_w:,} km across and {km_h:,} km deep at this latitude. '
         f'<a href="/map">The full map →</a></figcaption></figure>'

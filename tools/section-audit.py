@@ -353,7 +353,10 @@ def s13():
     yield 'class="statement"' in h, "the authored sentence is set as the hero"
     yield ("Kind of place" not in h) or (h.index("Why go") < h.index("Kind of place")), \
         "the argument comes before the metadata"
-    yield h.count('class="minimap"') == 1, "the map appears once, not twice"
+    # Count the CLASS TOKEN, not the exact attribute: the locator gained
+    # `arched` when the arch became the signature aperture, and an exact
+    # match on class="minimap" silently counted zero.
+    yield h.count('class="minimap') == 1, "the map appears once, not twice"
     yield has("/europe/france/alps-and-east/chamonix", "This place, in the rest of the site"), \
         "suggested journeys and stories, where curation names the place"
 

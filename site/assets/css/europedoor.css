@@ -1741,3 +1741,41 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
 
 .placeband.maponly { grid-template-columns: 1fr; }
 @media (min-width: 62rem) { .placeband.maponly { grid-template-columns: 1fr; } }
+
+
+/* ── THE ARCH: EuropeDoor's signature aperture ────────────────────────
+ *
+ * The mark is a door with a semicircular head. The arch is also the one
+ * architectural form the whole continent shares — Roman, Romanesque,
+ * Gothic, Moorish, and every railway station built to look like all four.
+ *
+ * So the door stops being a logo shape and becomes the APERTURE. Geography
+ * is seen through a doorway: the locator on a destination, the route on a
+ * journey, the country on its own page. It is the same opening at every
+ * scale, on every family, and it is the thing that should be recognisable
+ * with the wordmark cropped off.
+ *
+ * The curve is cut in the SVG, not approximated with border-radius, because
+ * a segmental arch struck from a real radius is a different shape from two
+ * quarter-ellipses and the difference is exactly what makes it read as
+ * architecture rather than as a rounded corner.
+ */
+.archground { fill: var(--map-sea); }
+.minimap.arched svg { background: none; border-radius: 0; }
+
+/* EUROPE AS AN ENGRAVED LINE, not a dark mass.
+ *
+ * Filled land at this zoom is almost the whole frame, so #1f252a on #0a0e10
+ * rendered as black on black and the doorway opened onto nothing. Drawing
+ * the frontier instead of filling the country turns the aperture into an
+ * engraving — and on a European travel product the borders are not
+ * decoration, they are the information: this is the valley where France,
+ * Switzerland and Italy meet, and you can see that.
+ */
+/* non-scaling-stroke, or the frontier is a worm. The land is drawn inside a
+ * scale(span) transform, so a 1.1-unit stroke rendered at five pixels and
+ * the border of France looked like a river in flood. */
+.minimap.arched .countries path,
+.minimap.arched .context path { fill: none; vector-effect: non-scaling-stroke; }
+.minimap.arched .countries path { stroke: var(--map-border); stroke-width: 1.1; }
+.minimap.arched .context path { stroke: color-mix(in srgb, var(--map-border) 60%, transparent); stroke-width: 0.7; }
