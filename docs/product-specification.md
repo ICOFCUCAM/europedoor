@@ -1,6 +1,6 @@
-# Europedoor — product specification
+# EuropeDoor — product specification
 
-**Product: Europedoor. Domain: europedoor.com. The name is settled — see
+**Product: EuropeDoor. Domain: europedoor.com. The name is settled — see
 [`brand-lock.md`](brand-lock.md).**
 
 This document takes a 36-section strategy brief and turns it into decisions:
@@ -23,7 +23,7 @@ four such places and they are marked **DEVIATION**.
 
 ## Part 0 — the one-sentence version
 
-> Europedoor is where a traveller works out what Europe *is* and what they
+> EuropeDoor is where a traveller works out what Europe *is* and what they
 > want from it. Booking is what happens afterwards, and it is not the
 > product.
 
@@ -46,7 +46,7 @@ structure first (`/atlas`) with planning (`/plan`), curation (`/journeys`,
 
 **DEVIATION 1.** The brief proposes a naming exercise (Europia, Via Europa,
 Europe Atlas, and so on) and suggests "EUROPE ATLAS" as a working name. The
-name is Europedoor, at europedoor.com, and that is a decision already taken.
+name is EuropeDoor, at europedoor.com, and that is a decision already taken.
 "Atlas" survives as the name of pillar one — the country/region/city
 structure — and never as the name of the product.
 
@@ -651,7 +651,7 @@ only model calls, and neither is permitted to introduce a fact.
 
 ```
 You convert a traveller's message into a JSON planning request for
-Europedoor. You never answer travel questions and you never name places
+EuropeDoor. You never answer travel questions and you never name places
 that the user did not name.
 
 Return exactly this JSON and nothing else:
@@ -710,7 +710,7 @@ choosing anything.
 
 You will receive:
   ROUTE  — an ordered list of stops with night counts and distances
-  ROWS   — the Europedoor dataset rows for exactly those places
+  ROWS   — the EuropeDoor dataset rows for exactly those places
   ASK    — what the traveller said they wanted
 
 Write the itinerary in the voice of a well-travelled editor: specific,
@@ -762,7 +762,7 @@ Streams, in the order they can realistically be turned on:
 **The commission flow**, when it exists:
 
 ```
-traveller books  →  Europedoor takes payment as agent (PSP)
+traveller books  →  EuropeDoor takes payment as agent (PSP)
                  →  operator is paid out on completion, minus 10–15%
                  →  cancellations follow the operator's stated policy,
                     which must be published before a listing goes live
@@ -975,7 +975,7 @@ recorded here, and every section of it is audited in
 
 ## 4.2 The one place it is overridden
 
-§1.1 proposes *Europe Atlas* as the product name. The name is **Europedoor**,
+§1.1 proposes *Europe Atlas* as the product name. The name is **EuropeDoor**,
 fixed by an instruction that predates the document and enforced in code. See
 [`brand-lock.md`](brand-lock.md). Everything else in that section — that a
 working name is provisional until trademark clearance — is adopted.

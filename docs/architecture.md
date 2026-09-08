@@ -1,4 +1,4 @@
-# How Europedoor is built
+# How EuropeDoor is built
 
 981 static HTML files, generated from 63 JSON files by 2,000 lines of
 dependency-free Python. No database, no framework, no runtime. This is a

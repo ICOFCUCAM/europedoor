@@ -1,10 +1,11 @@
-# Europedoor — working notes
+# EuropeDoor — working notes
 
-A static site: 987 generated HTML files, no dependencies, no database. Every
+A static site: 988 generated HTML files, no dependencies, no database. Every
 page comes from `data/` via `tools/build.py`. Nothing in `site/` was written
 by a human and nothing ever should be.
 
-**The name is Europedoor, at europedoor.com. It does not change.** Strategy
+**The name is EuropeDoor, at europedoor.com — one word, title case. It does
+not change, and the mark is NOT cleared.** Strategy
 documents keep arriving with alternatives on them — Europe Atlas, Europia,
 Via Europa. Take their architecture and drop their branding section. See
 `docs/brand-lock.md`; `tools/checks.py` enforces it.
@@ -18,10 +19,13 @@ Via Europa. Take their architecture and drop their branding section. See
 | adding or editing a place | **`docs/data-model.md`** — every field, and what the validator rejects |
 | the scores | **`docs/scoring-method.md`** — and note the formula is published at `/method`, so changing `score.py` changes a public page |
 | anything involving money | **`docs/europe-fund.md`** and **`docs/legal-position.md`** — three gates, all currently shut |
-| naming, branding, domains | **`docs/brand-lock.md`** — settled, and enforced |
+| naming, branding, domains | **`docs/brand-lock.md`** — settled, enforced, and the trademark is contested: EUROPEDOOR is in use in the doors trade, so no ®, no ™, nothing announced |
+| **colour, the mark, voice, the manifesto** | **`docs/brand.md`** — the Brand Bible as built, including the four logo directions that were rejected and why |
+| photographs, or "why is there no picture here" | **`docs/images.md`** — the pipeline is built and enforced; the library is empty |
+| **the Postgres/PostGIS model, the API, Next.js, auth, search, the AI pipeline** | **`docs/technical-foundation.md`** — a destination with a trigger, not a plan for Monday. Nothing in it should be built yet |
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
-| **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,250 assertions against the real build, and CI fails if any of them stops being true |
-| **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence: 37 sections, 168 assertions |
+| **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,253 assertions against the real build, and CI fails if any of them stops being true |
+| **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence: 43 sections, 218 assertions |
 
 ## The rules that catch people out
 
@@ -50,9 +54,14 @@ link, no amount raised, no progress bar on any `/fund` page; no `amount`,
 `raised`, `goal` or `target` in `data/fund.json`. This is the single easiest
 thing for a well-meaning person to break.
 
-**No photographs.** Every illustration is a deterministic SVG from the hash
-of a slug. `checks.py` fails on any `<img>`. This keeps the licensing
-position simple and it is not an aesthetic preference.
+**No image without a photographer, a source and a licence.** This replaced
+"no photographs at all", which was the right rule until there was a pipeline
+and the wrong one after. `data/images.json` is the register, the validator
+refuses a row missing any of the three, and `checks.py` refuses a published
+page referencing a file with no row. Zero photographs are licensed today;
+`docs/images.md` says why and what it would take. Everything else is a
+generated plate — a landscape from the hash of the slug, with the motif taken
+from what the place actually is.
 
 **The Content-Security-Policy is strict, and the pages are what make it
 possible.** `default-src 'none'`, no `'unsafe-inline'` in any directive. That
@@ -86,11 +95,11 @@ worth making.
 Run all seven before claiming anything is done.
 
     python3 tools/build.py check       validate the data
-    python3 tools/build.py            987 pages
-    python3 tools/checks.py            25 checks, ~74,700 things examined
+    python3 tools/build.py            988 pages
+    python3 tools/checks.py            25 checks, ~88,000 things examined
     node tools/browser-checks.js       389 checks in Chromium, incl. accessibility
-    python3 tools/section-audit.py --check   the 99 spec sections, 1,250 assertions
-    python3 tools/ux-audit.py --check        the 37 UI/UX sections, 168 assertions
+    python3 tools/section-audit.py --check   the 99 spec sections, 1,253 assertions
+    python3 tools/ux-audit.py --check        the 37 UI/UX + 6 brand sections, 218 assertions
     python3 tools/content-report.py --write  what is missing, against the spec's targets
 
 The browser checks need `npm install playwright` and take a couple of

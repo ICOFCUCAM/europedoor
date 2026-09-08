@@ -1,4 +1,4 @@
-"""Load the Europedoor dataset and refuse to hand back anything malformed.
+"""Load the EuropeDoor dataset and refuse to hand back anything malformed.
 
 Every page on the site is generated from data/, so a typo here becomes a
 broken page there. The validator is deliberately loud and deliberately
@@ -34,6 +34,18 @@ EVENT_KINDS = ("festival", "concert", "sport", "exhibition", "religious",
 # What kind of thing was consulted. The distinction that matters is whether
 # the source is answerable for the fact: a border authority is answerable for
 # its own entry rules in a way that a newspaper reporting them is not.
+# What a photograph must carry before it can be published. There is no
+# "unknown" and no default: an image whose licence nobody wrote down is an
+# image nobody can defend, and the cheapest moment to refuse it is the moment
+# it is added.
+IMAGE_REQUIRED = ("file", "alt", "photographer", "source", "licence")
+
+# Licences we will actually publish under. A permissive list would make this
+# field decorative; the point is that adding a new one is a decision somebody
+# has to make on purpose.
+IMAGE_LICENCES = ("CC0", "CC-BY-4.0", "CC-BY-SA-4.0", "Pexels", "Unsplash",
+                  "commissioned", "licensed-stock", "owner-supplied")
+
 SOURCE_KINDS = ("official", "operator", "municipal", "press", "editorial")
 
 VERIFICATION_STATUS = ("unverified", "machine-reviewed", "editor-reviewed",
@@ -336,6 +348,33 @@ def load():
         p.require(bool(cat.get("subs")) or bool(cat.get("derived")), cw,
                   "a category needs sub-categories or a derivation rule")
 
+    # The photograph register.
+    #
+    # This block MUST stay above p.raise_if_any(). The first version sat
+    # below it, next to the return, and every complaint it collected was
+    # discarded unread — a row with no licence at all passed `build.py
+    # check` cleanly. A validator that runs after the raise is not a
+    # validator, it is a list nobody opens.
+    images = _read(os.path.join(DATA, "images.json")).get("images", {})
+    for key, row in sorted(images.items()):
+        where = f"images.json > {key}"
+        for field in IMAGE_REQUIRED:
+            p.require(bool(row.get(field)), where,
+                      f"missing {field!r} — no photograph is published without a "
+                      "photographer, a source and a licence")
+        p.require(row.get("licence") in IMAGE_LICENCES, where,
+                  f"licence must be one of {'/'.join(IMAGE_LICENCES)}")
+        p.require(str(row.get("source", "")).startswith("https://"), where,
+                  "source must be an https URL you can open to check the licence")
+        # Alt text is a caption for someone who cannot see the photograph,
+        # not a keyword field. "Bergen" is the page title, not a description.
+        p.require(len(str(row.get("alt", ""))) >= 12, where,
+                  "alt must describe the photograph, not repeat the place name")
+        focal = row.get("focal", [50, 50])
+        p.require(isinstance(focal, list) and len(focal) == 2
+                  and all(0 <= v <= 100 for v in focal), where,
+                  "focal must be [x, y] percentages")
+
     p.raise_if_any()
 
     # Reverse edges. The brief calls the dataset a knowledge graph, and a
@@ -355,6 +394,7 @@ def load():
             back[cid]["stories"].append(st)
 
     return {
+        "images": images,
         "taxonomy": tax,
         "interests": interests,
         "countries": countries,

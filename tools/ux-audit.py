@@ -73,6 +73,12 @@ def every_page(pred, label):
     return (not bad, f"{len(bad)} pages fail: {label} (e.g. {os.path.relpath(bad[0], OUT) if bad else ''})")
 
 
+def doc_covers(doc, *needles):
+    text = src(doc)
+    missing = [n for n in needles if n not in text]
+    return (not missing, f"{doc} missing {missing}" if missing else f"recorded in {doc}")
+
+
 def refusal_recorded(*needles):
     """A refusal is only defensible if the reason is written down where
     somebody can disagree with it."""
@@ -95,19 +101,26 @@ def section(num, title, verdict, note):
 
 @section(1, "Design direction", "PARTIAL",
          "Editorial, map-led, typography-forward, and every page leads to "
-         "another. The one principle refused is the first: photography "
-         "leads discovery, and there are no photographs.")
+         "another. Photography leads discovery is answered by an enforced "
+         "pipeline and zero licensed photographs — the architecture is "
+         "built, the library is empty, and those are different claims.")
 def s1():
     yield has("/", "heromap"), "maps provide context, on the homepage itself"
     yield every_page(lambda h: "book now" not in h.lower(),
                      "booking never dominates, because there is none")
-    yield every_page(lambda h: "<img" not in h, "no photographs anywhere")
-    yield refusal_recorded("Photography (§1")
+    yield "def picture" in RENDER, "there is a photograph layer"
+    yield "no image is published without a photographer" in src("tools/checks.py"), \
+        "and no image ships without provenance"
+    yield bool(src("docs/images.md")), "with the acquisition problem stated plainly"
+    # The plates are the empty state, and they had to stop reading as a
+    # broken image before that was defensible.
+    yield "MOTIFS" in RENDER and "PLATE_HUES" in RENDER, \
+        "and the empty state is an illustration system, not a gradient"
 
 
 @section(2, "Global navigation", "BUILT",
          "The brief's desktop masthead exactly, and the five-item thumb bar "
-         "on a phone. Both name the product Europedoor, not Europe Atlas.")
+         "on a phone. Both name the product EuropeDoor, not Europe Atlas.")
 def s2():
     for label in ("Discover", "Countries", "Experiences", "Journeys", "Stories"):
         yield label in CITY, f"the masthead carries {label}"
@@ -143,8 +156,12 @@ def s3():
          "Full-bleed hero, the headline, the ask box and the call to "
          "action. The hero image is a generated plate.")
 def s4():
-    yield has("/", "One door into Europe", "Where would you like to go?", "Build me a journey")
+    yield has("/", "Open the door to Europe", "Plan my journey")
+    yield has("/", "what would you like to discover?"), "the Bible's own ask-box wording"
     yield has("/", "hero-actions"), "and the calls to action beneath it"
+    h = page("/")
+    yield h.index("Plan my journey") < h.index("Explore Europe"), \
+        "primary before secondary — the planner is the conversion"
 
 
 @section(5, "Homepage — Explore", "ALREADY",
@@ -185,7 +202,7 @@ def s8():
          "The sentence box, in the hero, saying under the field what reads "
          "it — which is rules in the browser, not a model.")
 def s9():
-    yield has("/", "askhome", "Build me a journey")
+    yield has("/", "askhome", "Plan my journey")
     yield has("/", "not by a"), "and says what reads it"
 
 
@@ -455,6 +472,112 @@ def s33():
     yield bool(page("/accessibility")), "and what is missing is published"
 
 
+# ── the Brand Bible ───────────────────────────────────────────────────
+#
+# Numbered B1-B6 rather than folded into the UI sections above, because they
+# came from a different document and a verdict should say which brief it is
+# answering.
+
+@section("B1", "Name, casing and the trademark position", "LOCKED",
+         "EuropeDoor, one word, title case. The mark is NOT cleared — it is "
+         "in use in the doors trade — so the site carries no ® or ™ and the "
+         "brand is working rather than announced.")
+def sb1():
+    from lib import render as R
+    yield R.SITE_NAME == "EuropeDoor", f"SITE_NAME is {R.SITE_NAME!r}"
+    yield every_page(lambda h: "Europe Door" not in h,
+                     "never two words — a generic phrase is unregistrable")
+    yield every_page(lambda h: "®" not in h and "™" not in h,
+                     "no registration symbol on an uncleared mark")
+    yield doc_covers("docs/brand-lock.md", "already in use as a business name",
+                     "South Africa", "Nice class"), \
+        "the conflict is recorded rather than assumed away"
+    yield doc_covers("docs/brand-lock.md", "pre-launch clearance task"), \
+        "with a formal clearance task before any registrable spend"
+
+
+@section("B2", "Tagline and promise", "BUILT",
+         "Open the door to Europe. One primary line; the six campaign lines "
+         "are not in the shell, because a site with six taglines has none.")
+def sb2():
+    from lib import render as R
+    yield R.SITE_TAGLINE == "Open the door to Europe.", "the primary tagline"
+    yield has("/", "Open the door to Europe"), "in the hero"
+    yield every_page(lambda h: "Open the door to Europe" in h, "and in the footer")
+    for campaign in ("Europe, opened", "Find your Europe", "See Europe differently"):
+        yield every_page(lambda h, c=campaign: c not in h, f"{campaign} is not in the shell")
+
+
+@section("B3", "The four doors", "BUILT",
+         "Discover, understand, experience, journey — as a numbered "
+         "sequence of links, not a menu of equals. It replaced five pillars "
+         "that described our components rather than the reader's path.")
+def sb3():
+    h = page("/")
+    for i, door in enumerate(("Discover", "Understand", "Experience", "Journey")):
+        yield f"<h3>{door}</h3>" in h, f"door {i + 1}: {door}"
+    order = [h.index(f"<h3>{d}</h3>") for d in
+             ("Discover", "Understand", "Experience", "Journey")]
+    yield order == sorted(order), "and they are in the Bible's order"
+    yield 'class="card door"' in h, "each door is a link, not an inert card"
+    yield "not search-then-book" in h, "and the page says why it is a sequence"
+
+
+@section("B4", "Colour", "BUILT",
+         "Atlantic green, limestone ground, terracotta accent, charcoal "
+         "type, brass reserved for heritage and never for a control. "
+         "Deliberately not EU blue and gold.")
+def sb4():
+    for token in ("--atlantic:", "--terracotta:", "--brass:", "--paper:", "--ink:"):
+        yield token in CSS, f"{token} is defined"
+    # Brass is a heritage highlight, not a UI colour: a gold control reads
+    # as a premium upsell, and there is nothing to sell.
+    for control in (".btn {", ".btn.ghost"):
+        block = CSS.split(control)[1].split("}")[0] if control in CSS else ""
+        yield "--brass" not in block, f"{control} does not use brass"
+    yield "prefers-color-scheme: dark" in CSS, "and the palette has a night form"
+    yield "--atlantic: #4f9d85" in CSS.replace("    ", "").replace("\n", "\n"), \
+        "which lifts the green rather than inverting it"
+
+
+@section("B5", "The mark", "BUILT",
+         "Concept B: two vertical forms, and the negative space between "
+         "them is the symbol. It replaced a literal door with a knob, which "
+         "the Bible explicitly rules out.")
+def sb5():
+    yield "MARK = (" in RENDER, "the mark is drawn once"
+    yield "mark-frame" in RENDER and "mark-leaf" in RENDER, "as two forms"
+    yield every_page(lambda h: 'class="mark"' in h, "on every page")
+    yield ".mark-frame { fill: var(--atlantic); }" in CSS, "taking the brand colour from CSS"
+    # It used to be a border-radius trick with a ::after dot for the knob.
+    yield ".door::after" not in CSS, "and the literal door with a knob is gone"
+    yield doc_covers("docs/brand.md", "Rejected on the way"), \
+        "with the four rejected directions recorded"
+
+
+@section("B6", "Voice, manifesto and trust", "BUILT",
+         "The manifesto is a page rather than a slide, and the four labels "
+         "that say where every claim comes from are on the same page "
+         "underneath it. That second half is what stops the first half "
+         "being advertising copy.")
+def sb6():
+    yield bool(page("/manifesto")), "the manifesto is a page"
+    yield has("/manifesto", "Europe is more than a collection of countries",
+              "EuropeDoor opens the way"), "carrying the Bible's own lines"
+    for tier in ("Verified", "Editorial", "Computed", "Community"):
+        yield f">{tier}</span>" in page("/manifesto"), f"the {tier} label"
+    # Community is deliberately empty, and says so rather than being absent.
+    yield "None yet" in page("/manifesto"), \
+        "and an empty tier says it is empty instead of being hidden"
+    # The corporate-software vocabulary the Bible bans.
+    for banned in ("AI-powered", "next-generation", "hyper-personalised",
+                   "travel ecosystem", "optimize your European"):
+        yield every_page(lambda h, b=banned: b.lower() not in h.lower(),
+                             f"{banned} appears nowhere")
+    yield every_page(lambda h: "as an AI language model" not in h.lower(),
+                     "nothing on the site talks like a model")
+
+
 # ── 34–37: the Figma deliverables ─────────────────────────────────────
 
 @section(34, "Figma file structure", "DEFERRED",
@@ -561,7 +684,7 @@ def render_md(rows, kinds, total, failures):
             "## The one lock",
             "",
             "The brief's navigation and page headers read **EUROPE ATLAS**. The name is",
-            "**Europedoor**, at **europedoor.com**, and `tools/checks.py` enforces it on every",
+            "**EuropeDoor**, at **europedoor.com**, and `tools/checks.py` enforces it on every",
             "page. See `docs/brand-lock.md`. A later document does not rename a product.",
             ""]
     return "\n".join(out)
@@ -569,7 +692,7 @@ def render_md(rows, kinds, total, failures):
 
 def main():
     rows, failures = run()
-    print("Europedoor — the 37-section UI/UX specification, audited against the build\n")
+    print("EuropeDoor — the 37-section UI/UX specification, audited against the build\n")
     for num, title, verdict, note, n, bad in rows:
         mark = "ok  " if not bad else "FAIL"
         print(f"  {mark}  §{num:<3} {title:<38} {verdict:<10} {n}")

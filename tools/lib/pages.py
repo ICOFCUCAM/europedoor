@@ -1,4 +1,4 @@
-"""Every page Europedoor publishes.
+"""Every page EuropeDoor publishes.
 
 Each builder returns (path, html). The build writes them; nothing here
 touches the filesystem, so a page can be rendered and asserted against in a
@@ -11,7 +11,7 @@ import math
 
 from . import urls
 from .render import (SITE_NAME, card, chips, crumbs, esc, factlist, grid,
-                     jsondata, page, plate, section)
+                     jsondata, motif_for, page, picture, plate, section)
 from .score import city_scores, country_scores
 
 HOME = ("Europe", "/discover")
@@ -21,10 +21,10 @@ HOME = ("Europe", "/discover")
 # page it was linked from does not travel with it.
 API_LICENCE = {
     "terms": "https://europedoor.com/terms",
-    "use": "Free to read, cache and build on, with attribution to Europedoor. "
+    "use": "Free to read, cache and build on, with attribution to EuropeDoor. "
            "Estimates are planning arithmetic, not quotes. Nothing here is "
            "entry, visa or safety advice.",
-    "attribution": "Europedoor — europedoor.com",
+    "attribution": "EuropeDoor — europedoor.com",
 }
 
 # How long a checked fact stays checked. Currencies, cost bands and seasons
@@ -106,7 +106,7 @@ def advisory_note(c):
     return f"""<div class="note warn">
   <h2 class="mini">{esc(heading)}</h2>
   <p>{esc(a['note'])}</p>
-  <p class="small">Europedoor keeps a page for every country in Europe, including the ones nobody
+  <p class="small">EuropeDoor keeps a page for every country in Europe, including the ones nobody
   should be travelling to right now. A page here is a record, not a recommendation, and
   countries at this level are excluded from the Journey Planner.</p>
 </div>"""
@@ -226,7 +226,8 @@ def home(data):
     quietcards = [
         card(urls.city(n["country"], n["region"], n["city"]),
              f"{n['country']['name']} · {n['region']['name']}", n["city"]["name"],
-             n["city"]["summary"], seed=f"city:{n['country']['slug']}:{n['city']['slug']}")
+             n["city"]["summary"], seed=f"city:{n['country']['slug']}:{n['city']['slug']}",
+             motif=motif_for(n["city"]["interests"]))
         for n in sorted(quiet, key=lambda n: n["city"]["name"])[:3]
     ]
     storycards = [
@@ -235,16 +236,28 @@ def home(data):
         for st in data["stories"][:3]
     ]
 
+    # The four doors, from the Brand Bible. Not five pillars in a row: a
+    # sequence, because each one is only worth anything once the one before
+    # it has happened. "Search, then book" is the model this replaces.
+    DOORS = [
+        ("Door one", "Discover", "/discover",
+         "Find places. Fifty countries, their travel regions and their cities — including the "
+         "ones nobody puts on a list."),
+        ("Door two", "Understand", "/stories",
+         "Learn the story behind them. Why a valley speaks a different language from the next "
+         "one, and why the market starts before sunrise."),
+        ("Door three", "Experience", "/experiences",
+         "Find the things to do, the people to meet and the cultures to encounter — sorted by "
+         "what you actually travel for."),
+        ("Door four", "Journey", "/plan",
+         "Turn discovery into a route: your days, your budget, your interests, costed and "
+         "ordered, with the distances between stops made honest."),
+    ]
     pillars = "".join(
-        f"""<div class="card"><div class="card-body">
-        <p class="kicker">{esc(k)}</p><h3>{esc(t)}</h3><p class="blurb">{esc(b)}</p></div></div>"""
-        for k, t, b in [
-            ("One", "Europe Atlas", "Every country, then its travel regions, then its cities, then the things you would actually do there. One shape, all the way down."),
-            ("Two", "Journey Planner", "Tell it how many days you have, what you can spend and what you like. It returns a real itinerary with real distances — not a list of links."),
-            ("Three", "European Journeys", "Curated routes that cross borders on purpose: Arctic to Baltic, Atlantic to Mediterranean, the Alpine grand tour."),
-            ("Four", "Local Experiences", "Guides, kitchens, museums, cellars and boats, listed by the people who run them and checked before they appear."),
-            ("Five", "Europe Fund", "Where travel money could go back: heritage repair, language survival, trail maintenance, coastline. Listed openly, long before a single euro moves."),
-        ]
+        f"""<a class="card door" href="{esc(u)}"><div class="card-body">
+        <p class="kicker">{esc(k)}</p><h3>{esc(t)}</h3><p class="blurb">{esc(b)}</p>
+        <p class="doorgo" aria-hidden="true">→</p></div></a>"""
+        for k, t, u, b in DOORS
     )
 
     dots = []
@@ -275,16 +288,18 @@ def home(data):
     body = f"""
 <div class="hero">
   <div class="hero-text">
-  <p class="kicker">Discover · Plan · Experience</p>
-  <h1>One door into Europe.</h1>
-  <p class="lede">Fifty countries, their regions, their cities and what is worth your time in
-  each — held in one structure, so a fjord in Vestland and a cellar in Alentejo can appear in
-  the same itinerary without either being flattened into a listicle.</p>
+  <p class="kicker">Discover · Understand · Experience · Journey</p>
+  <h1>Open the door to Europe.</h1>
+  <p class="lede">Discover places, stories and journeys across one extraordinary continent —
+  fifty countries, their regions and their cities, held in one structure, so a fjord in
+  Vestland and a cellar in Alentejo can appear in the same itinerary without either being
+  flattened into a listicle.</p>
   <form class="askhome" action="/plan" method="get">
-    <label for="homeask">Where would you like to go?</label>
+    <label for="homeask">Where would you like to go — or what would you like to discover?</label>
     <input type="text" id="homeask" name="ask" autocomplete="off"
-           placeholder="I have 10 days in September. I love mountains, history and local food.">
-    <button class="btn" type="submit">Build me a journey</button>
+           placeholder="I want a quiet mountain escape in October."
+           data-rotate="Show me Europe&#39;s most historic cities.|Plan 10 days through Italy.|Where can I experience authentic Mediterranean culture?|I have 10 days in September. I love mountains, history and local food.">
+    <button class="btn" type="submit">Plan my journey</button>
   </form>
   <p class="small askhome-note">Read by rules in your browser on the next page — not by a
   model, and not sent anywhere.</p>
@@ -303,8 +318,10 @@ def home(data):
          lede="Europe organised the way people actually travel it — by shared coast, shared mountain range and shared history, not by alphabet.",
          more=("All nine regions of Europe", "/discover"))}
 
-{section("Five things this is for", grid([pillars], 3) if False else '<div class="grid cols-3">' + pillars + "</div>",
-         lede="Not a booking engine with articles bolted on. A structure first, and everything else hung off it.")}
+{section("Four doors", '<div class="grid cols-4 doors">' + pillars + "</div>",
+         lede="Discover, then understand, then experience, then journey. Each one is only worth "
+              "anything once the one before it has happened — which is why this is a sequence and "
+              "not a menu, and why it is not search-then-book.")}
 
 {section("Find your kind of Europe", interest_grid,
          lede="Sixteen ways in. Each one is a real list of places tagged for it, and the Journey Planner weights the same tags.",
@@ -335,7 +352,7 @@ def home(data):
 
 <div class="note">
   <h2 class="mini">What this is, honestly</h2>
-  <p>Europedoor is pre-launch and editorial. Nothing here takes a payment, holds money or
+  <p>EuropeDoor is pre-launch and editorial. Nothing here takes a payment, holds money or
   makes a booking, and the Europe Fund deliberately carries no balances yet — see
   <a href="/how-it-works">how it works</a> for exactly which parts are built, which are
   designed and which are still questions.</p>
@@ -392,7 +409,8 @@ def macro_page(data, m):
         c = data["countries"][cs]
         ncity = sum(len(r["cities"]) for r in c["regions"])
         meta = f'<p class="cardmeta">{len(c["regions"])} regions · {ncity} cities · {esc(c["budget"])} cost</p>'
-        cards.append(card(urls.country(c), c["capital"], c["name"], c["tagline"], seed="country:" + c["slug"], meta=meta))
+        cards.append(card(urls.country(c), c["capital"], c["name"], c["tagline"], seed="country:" + c["slug"],
+                 meta=meta, motif=motif_for(c["interests"])))
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], None)])}
 <div class="pagehead">
@@ -693,7 +711,11 @@ def city_page(data, c, r, t):
   {chips(t["interests"], data["interests"])}
 </div>
 <div class="card-art frame">
-{plate(f"city:{c['slug']}:{t['slug']}", 1260, 540, t['name'])}
+{picture(data["images"], f"city:{cid}", w=1260, h=540,
+         alt=f"{t['name']}, {c['name']}", eager=True,
+         sizes="(min-width: 76rem) 76rem, 100vw",
+         fallback_seed=f"city:{c['slug']}:{t['slug']}",
+         fallback_motif=motif_for(t["interests"]) or motif_for(r["interests"]))}
 </div>
 {sectionnav([
     ("Overview", "why-visit"),
@@ -947,7 +969,9 @@ def journey_page(data, j):
   <h1>{esc(j['name'])}</h1>
 </div>
 <div class="card-art frame">
-{plate("journey:" + j["slug"], 1260, 540, j["name"])}
+{picture(data["images"], "journey:" + j["slug"], w=1260, h=540, alt=j["name"], eager=True,
+         sizes="(min-width: 76rem) 76rem, 100vw",
+         fallback_seed="journey:" + j["slug"], fallback_motif=motif_for(j["interests"]))}
 </div>
 <div class="split mt7">
   <div>
@@ -1208,7 +1232,7 @@ def planner_page(data):
 """
     return "/plan/index.html", page(
         "Plan a journey", body, path="/plan", area="plan",
-        description="Tell Europedoor your days, budget and interests and it builds a European itinerary with real distances, real night counts and a cost estimate.",
+        description="Tell EuropeDoor your days, budget and interests and it builds a European itinerary with real distances, real night counts and a cost estimate.",
         scripts=["/assets/js/planner.js"],
     )
 
@@ -1216,7 +1240,7 @@ def planner_page(data):
 # Named on every destination page, and honestly empty. A scraped hotel list
 # would take an afternoon and would be the first unverified thing on the site.
 STAY_NOTE = """<div class="note">
-  <p>Europedoor lists neither, yet. Both are business listings rather than editorial entries:
+  <p>EuropeDoor lists neither, yet. Both are business listings rather than editorial entries:
   they need an operator who claims them, a verification tier and a way to keep prices current,
   and all three are blocked on the same thing as everything else commercial here.
   <a href="/for-businesses">How listings will work</a> ·
@@ -1397,7 +1421,7 @@ def facet_page(data, c, r, t, key, payload):
 """
     return f"{urls.facet(c, r, t, key)}/index.html", page(
         f"{name} in {t['name']}", body, path=urls.facet(c, r, t, key), area="countries",
-        description=f"{name} in {t['name']}, {c['name']}: {len(rows)} entries from the Europedoor Atlas.",
+        description=f"{name} in {t['name']}, {c['name']}: {len(rows)} entries from the EuropeDoor Atlas.",
     )
 
 
@@ -1463,7 +1487,11 @@ def place_page(data, c, r, t, pl):
   <p class="lede">{esc(pl['summary'])}</p>
 </div>
 <div class="card-art frame">
-{plate(f"place:{c['slug']}:{t['slug']}:{pl['slug']}", 1260, 540, pl['name'])}
+{picture(data["images"], f"place:{cid}/{pl['slug']}", w=1260, h=540,
+         alt=f"{pl['name']}, {t['name']}", eager=True,
+         sizes="(min-width: 76rem) 76rem, 100vw",
+         fallback_seed=f"place:{c['slug']}:{t['slug']}:{pl['slug']}",
+         fallback_motif=motif_for(t["interests"]))}
 </div>
 <div class="split mt7">
   <div>
@@ -1483,7 +1511,7 @@ def place_page(data, c, r, t, pl):
   </div>
   <aside class="rail">
     <h2 class="mini">Accessibility</h2>
-    <p>Not documented. Europedoor holds no step-free access, hearing loop or accessible
+    <p>Not documented. EuropeDoor holds no step-free access, hearing loop or accessible
     toilet information for any place, and inventing it would be worse than the gap —
     <a href="/accessibility">the position in full</a>.</p>
     <h2 class="mini">Getting there</h2>
@@ -1658,7 +1686,7 @@ def join_page(data):
 <div class="pagehead">
   <p class="kicker">For guides, kitchens, museums and operators</p>
   <h1>List what you do.</h1>
-  <p class="lede">Europedoor lists experiences run by people who live where they happen.
+  <p class="lede">EuropeDoor lists experiences run by people who live where they happen.
   Listing is free. What costs is prominence, and we say so on the page rather than quietly
   sorting paid listings to the top.</p>
 </div>
@@ -1700,7 +1728,7 @@ def join_page(data):
 """
     return "/experiences/join/index.html", page(
         "List your experience", body, path="/experiences/join", area="experiences",
-        description="How guides, restaurants, museums and operators appear on Europedoor: three tiers, what is checked, and what placement never buys.",
+        description="How guides, restaurants, museums and operators appear on EuropeDoor: three tiers, what is checked, and what placement never buys.",
     )
 
 
@@ -1741,7 +1769,7 @@ def business_page(data):
 """
     return "/for-businesses/index.html", page(
         "For businesses", body, path="/for-businesses", area=None,
-        description="Europedoor's European business directory: profiles for hotels, operators, guides and institutions, three verification tiers, and a stated wall between paid placement and editorial.",
+        description="EuropeDoor's European business directory: profiles for hotels, operators, guides and institutions, three verification tiers, and a stated wall between paid placement and editorial.",
     )
 
 
@@ -1805,7 +1833,7 @@ def fund_page(data, p):
     {factlist([("Country", f'<a href="{urls.country(c)}">{esc(c["name"])}</a>'),
                ("Local partner", esc(p["partner"])),
                ("Status", esc(p["status"])),
-               ("Money held by Europedoor", "None — see the note")])}
+               ("Money held by EuropeDoor", "None — see the note")])}
   </div>
   <aside class="rail">
     <h2 class="mini">No balance shown, on purpose</h2>
@@ -1954,7 +1982,8 @@ def story_page(data, s):
   <div class="chips">{tagchips}</div>
 </div>
 <div class="card-art frame">
-{plate("story:" + s["slug"], 1260, 540, s["title"])}
+{picture(data["images"], "story:" + s["slug"], w=1260, h=540, alt=s["title"], eager=True,
+         sizes="(min-width: 76rem) 76rem, 100vw", fallback_seed="story:" + s["slug"])}
 </div>
 <div class="measure">{paras}</div>
 <p><button class="btn ghost" type="button" data-save="story:{esc(s['slug'])}" data-kind="Story"
@@ -2126,7 +2155,7 @@ def map_page(data):
 """
     return "/map/index.html", page(
         "Map", body, path="/map", area="countries",
-        description="A point map of every city in the Europedoor Atlas, filterable by what you travel for. No third-party tiles.",
+        description="A point map of every city in the EuropeDoor Atlas, filterable by what you travel for. No third-party tiles.",
         scripts=["/assets/js/map.js"], wide=True,
     )
 
@@ -2234,7 +2263,8 @@ def events_month_page(data, month):
     qcards = [
         card(urls.city(n["country"], n["region"], n["city"]),
              f"{n['country']['name']} · {n['region']['name']}", n["city"]["name"],
-             n["city"]["summary"], seed=f"city:{n['country']['slug']}:{n['city']['slug']}")
+             n["city"]["summary"], seed=f"city:{n['country']['slug']}:{n['city']['slug']}",
+             motif=motif_for(n["city"]["interests"]))
         for n in quiet[:6]
     ]
 
@@ -2446,7 +2476,7 @@ def about_page(data):
     tourism boards, atlases and travel magazines have organised continents this way for a century.
     What is owned is expression: another platform's words, photographs, code, layout and brand.
     None of that is here. Every line of copy, every generated illustration, the taxonomy, the
-    scoring method and all of the code were written for Europedoor. Where we were inspired by an
+    scoring method and all of the code were written for EuropeDoor. Where we were inspired by an
     existing model — a continental atlas with a community fund attached — we took the idea and
     built our own version of it, which is the part the law leaves open.</p>
   </div>
@@ -2455,7 +2485,7 @@ def about_page(data):
     <p>Pre-launch. No entity, no payments, no accounts, no bookings, no partners. What exists is
     the Atlas, the Planner, the Journeys, the register and the editorial.</p>
     <h2 class="mini">The name</h2>
-    <p>Europedoor, at europedoor.com. Settled — the Atlas is the name of the discovery layer
+    <p>EuropeDoor, at europedoor.com. Settled — the Atlas is the name of the discovery layer
     inside it, not an alternative name for the product.</p>
     <h2 class="mini">Corrections</h2>
     <p>Everything here can be wrong. <a href="/sources">How to tell us →</a></p>
@@ -2464,7 +2494,7 @@ def about_page(data):
 """
     return "/about/index.html", page(
         "About", body, path="/about", area=None,
-        description="What Europedoor is, what it refuses to be, and where the line sits between an idea anyone may use and expression nobody may copy.",
+        description="What EuropeDoor is, what it refuses to be, and where the line sits between an idea anyone may use and expression nobody may copy.",
     )
 
 
@@ -2526,7 +2556,110 @@ def how_it_works_page(data):
 """
     return "/how-it-works/index.html", page(
         "How it works", body, path="/how-it-works", area=None,
-        description="Europedoor's honest status board: what is built, what is only designed, and what is deliberately blocked until the legal and payment work is done.",
+        description="EuropeDoor's honest status board: what is built, what is only designed, and what is deliberately blocked until the legal and payment work is done.",
+    )
+
+
+def manifesto_page(data):
+    """The manifesto, and the trust architecture underneath it.
+
+    The Brand Bible offers the manifesto as "the foundational piece of the
+    website". A manifesto on its own is a poster, though, and a travel site
+    that opens with a poem about markets waking before sunrise and then
+    presents an unchecked fact identically to a checked one has told you what
+    it wants to be rather than what it is.
+
+    So the page is both halves. The lines first, because they are the reason
+    any of this is worth building — then, immediately underneath and on the
+    same page, the four labels that say where every claim on this site comes
+    from. The second half is what makes the first half something other than
+    advertising copy.
+    """
+    lines = [
+        "Europe is more than a collection of countries.",
+        "It is the road between them.",
+        "The language that changes from one valley to the next.",
+        "The market that wakes before sunrise.",
+        "The old church at the end of a village road.",
+        "The mountain beyond the train window.",
+        "The meal that becomes a memory.",
+        "The story you didn't know you were looking for.",
+    ]
+    verse = "".join(f"<p>{esc(l)}</p>" for l in lines)
+
+    # The trust architecture, §19. Four sources, and what each one is worth.
+    # This is published rather than kept internal because the promise is not
+    # "we know everything" — it is "you can tell where this came from".
+    tiers = [
+        ("Verified", "verified",
+         "Checked by a person against a source that is answerable for the fact — a "
+         "central bank for a currency, a border authority for an entry rule, an "
+         "operator for its own season. Carries the date it was checked and what it "
+         "was checked against.",
+         f"{sum(1 for c in data['countries'].values() if c.get('checked'))} of "
+         f"{len(data['countries'])} countries. The honest number, published on "
+         "the freshness board, and it expires."),
+        ("Editorial", "editorial",
+         "Written by someone who knows the place, reviewed as a change to this "
+         "repository, and published under a name. A considered first draft — not a "
+         "citation-backed reference.",
+         "Everything on this site that is not marked otherwise. All 319 destination "
+         "summaries, every country write-up, every story."),
+        ("Computed", "computed",
+         "Derived by a published formula from data we hold: distances, costs, "
+         "scores, nearest onward stops, seasonal fit. Change the formula and the "
+         "public page changes with it.",
+         "The Europe Experience Score and every estimate the Journey Planner makes. "
+         "The formula is at /method."),
+        ("Community", "community",
+         "Contributed by a reader or by the business itself. Attributed, and never "
+         "able to affect ranking.",
+         "None yet. Contribution needs accounts, moderation and attribution, and "
+         "none of the three exists. Nothing on this site is marked community, "
+         "because nothing is."),
+    ]
+    tierhtml = "".join(
+        f"""<div class="tier tier-{esc(cls)}">
+        <h3><span class="tierbadge">{esc(name)}</span></h3>
+        <p>{esc(what)}</p>
+        <p class="small"><strong>Where it stands:</strong> {esc(where)}</p></div>"""
+        for name, cls, what, where in tiers
+    )
+
+    body = f"""
+{crumbs([("Europe", "/discover"), ("What this is for", None)])}
+<div class="pagehead">
+  <p class="kicker">The manifesto</p>
+  <h1>Open the door to Europe.</h1>
+</div>
+
+<div class="manifesto">{verse}
+  <p class="manifesto-close">EuropeDoor opens the way.<br>Come discover what lies beyond.</p>
+</div>
+
+<div class="mt7">
+  <h2>And then the part that makes it true</h2>
+  <p class="lede">A travel site can write all of the above and still present a fact somebody
+  checked and a fact nobody checked in exactly the same typeface. Most of them do. Our promise
+  is not that we know everything — it is that you can always tell where something came from.</p>
+  <p>Four sources. Every claim on this site is one of them, and the difference is visible on the
+  page rather than recorded in a policy nobody reads.</p>
+  <div class="tiers">{tierhtml}</div>
+  <p class="small">The verification board is at <a href="/sources/freshness">/sources/freshness</a>,
+  the formulae at <a href="/method">/method</a>, and what is built versus what is merely designed
+  at <a href="/how-it-works">/how-it-works</a>. If any of those three disagrees with this page,
+  they are right and this page is out of date.</p>
+</div>
+
+<div class="hero-actions mt7">
+  <a class="btn" href="/plan">Plan my journey</a>
+  <a class="btn ghost" href="/discover">Explore Europe</a>
+</div>
+"""
+    return "/manifesto/index.html", page(
+        "What this is for", body, path="/manifesto",
+        description="Why EuropeDoor exists — and the four labels that say where every claim "
+                    "on it comes from: verified, editorial, computed, community.",
     )
 
 
@@ -2598,7 +2731,7 @@ def api_page(data):
 <div class="split mt7">
   <div>
     <h2>What you may do with them</h2>
-    <p>Read them, cache them, and build on them, with attribution to Europedoor. That
+    <p>Read them, cache them, and build on them, with attribution to EuropeDoor. That
     permission is written into each document as a <code>licence</code> field rather than left
     on this page, because a JSON file gets copied and the page it was linked from does not
     travel with it.</p>
@@ -2628,7 +2761,7 @@ def api_page(data):
     company. <a href="/how-it-works">None of that exists yet</a>, so none of it is published as a
     stub that returns nothing.</p>
     <h2 class="mini mt7">Attribution</h2>
-    <p class="small">Europedoor — europedoor.com. A link back is enough.</p>
+    <p class="small">EuropeDoor — europedoor.com. A link back is enough.</p>
   </aside>
 </div>
 """
@@ -2693,7 +2826,7 @@ def sources_page(data):
 """
     return "/sources/index.html", page(
         "Sources & corrections", body, path="/sources", area=None,
-        description="How Europedoor's facts are produced, what is computed rather than claimed, and the verification plan.",
+        description="How EuropeDoor's facts are produced, what is computed rather than claimed, and the verification plan.",
     )
 
 
@@ -2811,7 +2944,7 @@ def not_found(data):
 """
     return "/404.html", page(
         "Not found", body, path="/404", area=None,
-        description="That page is not on Europedoor. The Atlas, the curated journeys and the Journey Planner all still are.",
+        description="That page is not on EuropeDoor. The Atlas, the curated journeys and the Journey Planner all still are.",
     )
 
 
@@ -3001,7 +3134,7 @@ def search_page(data):
 <div class="pagehead">
   <p class="kicker">Search</p>
   <h1>Find it.</h1>
-  <p class="lede">Everything on Europedoor — {n} countries, regions, destinations, places,
+  <p class="lede">Everything on EuropeDoor — {n} countries, regions, destinations, places,
   journeys, themes, stories and projects — in one index that runs in your browser.
   Nothing you type is sent anywhere, and nobody can buy a position in it.</p>
   <p class="small">It reads more than words: <em>cheap</em> and <em>quiet</em> filter,
@@ -3022,7 +3155,7 @@ def search_page(data):
 """
     return "/search/index.html", page(
         "Search", body, path="/search", area=None,
-        description="Search every country, region, city, journey, theme, story and project on Europedoor — in your browser, with nothing sent anywhere.",
+        description="Search every country, region, city, journey, theme, story and project on EuropeDoor — in your browser, with nothing sent anywhere.",
         scripts=["/assets/js/search.js"],
     )
 
@@ -3118,7 +3251,7 @@ def _plain(title, kicker, lede, blocks, *, path, description, crumb):
 
 PRELAUNCH = """<div class="note warn">
   <h2 class="mini">This is a pre-launch draft, and it says so rather than pretending</h2>
-  <p>There is no incorporated company behind Europedoor yet, so there is no legal person to
+  <p>There is no incorporated company behind EuropeDoor yet, so there is no legal person to
   be bound by this document and no data controller to be accountable under it. What follows
   is the position we intend to take, published early so it can be argued with — it is not a
   contract, and it will be reviewed by a lawyer and re-issued in the name of a real entity
@@ -3176,9 +3309,9 @@ def privacy_page(data):
     <p>The site is not directed at children and collects nothing from anyone.</p>
   </aside>
 </div>"""
-    return _plain("Privacy", "Privacy", "What Europedoor collects: nothing. What it will collect, and under what conditions.",
+    return _plain("Privacy", "Privacy", "What EuropeDoor collects: nothing. What it will collect, and under what conditions.",
                   blocks, path="/privacy", crumb="Privacy",
-                  description="Europedoor collects no personal data, sets no cookies and loads no third-party scripts. What that means, and what will change when accounts exist.")
+                  description="EuropeDoor collects no personal data, sets no cookies and loads no third-party scripts. What that means, and what will change when accounts exist.")
 
 
 def cookies_page(data):
@@ -3213,7 +3346,7 @@ def cookies_page(data):
 </div>"""
     return _plain("Cookies", "Cookies", "There are none. Here is what is used instead, and what would have to change.",
                   blocks, path="/cookies", crumb="Cookies",
-                  description="Europedoor sets no cookies at all — no analytics, no preferences, no consent cookie. What it uses instead and what would require a banner.")
+                  description="EuropeDoor sets no cookies at all — no analytics, no preferences, no consent cookie. What it uses instead and what would require a banner.")
 
 
 def terms_page(data):
@@ -3260,7 +3393,7 @@ def terms_page(data):
 </div>"""
     return _plain("Terms", "Terms of use", "What this site is, what it is not, and what its facts are worth.",
                   blocks, path="/terms", crumb="Terms",
-                  description="Europedoor's terms: an editorial reference, not a booking service; unverified facts marked as such; and no contract until there is a company.")
+                  description="EuropeDoor's terms: an editorial reference, not a booking service; unverified facts marked as such; and no contract until there is a company.")
 
 
 def accessibility_page(data):
@@ -3311,7 +3444,7 @@ def accessibility_page(data):
 </div>"""
     return _plain("Accessibility", "Accessibility", "The target is WCAG 2.2 AA. Here is what is enforced on every build, and what is still missing.",
                   blocks, path="/accessibility", crumb="Accessibility",
-                  description="Europedoor's accessibility position: what is automatically enforced on every build, what has not been audited, and the place data that is missing.")
+                  description="EuropeDoor's accessibility position: what is automatically enforced on every build, what has not been audited, and the place data that is missing.")
 
 
 def help_page(data):
@@ -3369,7 +3502,7 @@ def help_page(data):
 </div>"""
     return _plain("Help", "Help", "How to use the site, and the questions people actually ask.",
                   blocks, path="/help", crumb="Help",
-                  description="How to use Europedoor: finding a place, planning a journey, what the facts are worth, and where saved places live.")
+                  description="How to use EuropeDoor: finding a place, planning a journey, what the facts are worth, and where saved places live.")
 
 
 def contact_page(data):
@@ -3409,7 +3542,7 @@ def contact_page(data):
 </div>"""
     return _plain("Contact", "Contact", "No form, and the reason is the same reason there are no accounts.",
                   blocks, path="/contact", crumb="Contact",
-                  description="How to reach Europedoor before it has a company: corrections, business listings, tourism organisations and press.")
+                  description="How to reach EuropeDoor before it has a company: corrections, business listings, tourism organisations and press.")
 
 
 def tourism_boards_page(data):
@@ -3462,4 +3595,4 @@ def tourism_boards_page(data):
     return _plain("For tourism boards", "For tourism organisations",
                   "What a national board, region or municipality could buy here — and the one thing that is not for sale.",
                   blocks, path="/for-tourism-boards", crumb="For tourism boards",
-                  description="What Europedoor would offer tourism boards: destination profiles, seasonality and demand intelligence, labelled campaigns — and why editorial ranking is never for sale.")
+                  description="What EuropeDoor would offer tourism boards: destination profiles, seasonality and demand intelligence, labelled campaigns — and why editorial ranking is never for sale.")

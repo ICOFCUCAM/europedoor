@@ -621,7 +621,7 @@
       "</div>" +
       '<p class="small" id="planstate"></p>' +
       '<p class="small">Each day lists the places and experiences we hold for that stop. ' +
-      'It does not name a hotel or a restaurant: Europedoor lists neither yet, and ' +
+      'It does not name a hotel or a restaurant: EuropeDoor lists neither yet, and ' +
       '<a href="/for-businesses">the reason is on the businesses page</a>. ' +
       (CUR !== "EUR" ? "Converted from euros at an indicative, dated rate — " +
         '<a href="/help#currency">what that means</a>. ' : "") +

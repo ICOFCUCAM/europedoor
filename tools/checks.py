@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Every check that has to pass before Europedoor ships.
+"""Every check that has to pass before EuropeDoor ships.
 
     python3 tools/checks.py
 
@@ -141,7 +141,8 @@ def c_built():
     expect += 1 + len(d["fund"])
     expect += 6                                   # map, events, quiet, my-europe, method, about
     expect += len(d["taxonomy"]["months"])        # /events/<month>
-    expect += 4                                   # how-it-works, sources, freshness, api-docs
+    expect += 5                                   # how-it-works, sources, freshness,
+                                                  # api-docs, manifesto
     expect += 1                                   # /discover
     expect += 7                                   # privacy, cookies, terms, accessibility,
                                                   # help, contact, for-tourism-boards
@@ -191,24 +192,36 @@ def c_head():
     return n
 
 
-@check("the brand is locked to Europedoor and europedoor.com")
+@check("the brand is locked to EuropeDoor and europedoor.com")
 def c_brand():
     # docs/brand-lock.md exists because incoming strategy documents keep
     # arriving with a different name on them. This is the enforcement.
-    banned = ["Europe Atlas ·", "Europia", "Via Europa", "Eurovia", "Europe Unbound", "europedoor.example"]
+    banned = ["Europe Atlas ·", "Europia", "Via Europa", "Eurovia", "Europe Unbound",
+              "europedoor.example",
+              # One word, always. The space turns a product name into a
+              # generic phrase, and a generic phrase is unregistrable — which
+              # matters more than usual here, because the mark is contested.
+              "Europe Door"]
     n = 0
     for f in site_files():
         s = open(f, encoding="utf-8").read()
-        if 'href="https://europedoor.com' in s and False:
-            pass
         if "europedoor.com" not in s:
             fail(f"{rel(f)}: no canonical on europedoor.com")
         for b in banned:
             if b in s:
                 fail(f"{rel(f)}: carries a competing or placeholder product name {b!r}")
         n += 1
-    if SITE_NAME != "Europedoor":
-        fail(f"SITE_NAME is {SITE_NAME!r}, must be 'Europedoor' — see docs/brand-lock.md")
+    if SITE_NAME != "EuropeDoor":
+        fail(f"SITE_NAME is {SITE_NAME!r}, must be 'EuropeDoor' — see docs/brand-lock.md")
+    # The mark is not cleared, and the site must not imply that it is. No page
+    # may carry a registration symbol.
+    for f in site_files():
+        s = open(f, encoding="utf-8").read()
+        for sym in ("®", "™"):
+            if sym in s:
+                fail(f"{rel(f)}: carries {sym} — the mark is not cleared, "
+                     "see docs/brand-lock.md")
+        n += 1
     return n
 
 
@@ -432,19 +445,56 @@ def c_search():
     return len(idx["rows"])
 
 
-@check("no photographs, and every illustration is generated")
-def c_no_photos():
-    # Every image on the site is a deterministic SVG built from a slug. This
-    # is what keeps the licensing position simple, so it is worth enforcing.
+@check("no image is published without a photographer, a source and a licence")
+def c_images():
+    """The rule that replaced "no photographs at all".
+
+    Refusing every <img> kept the licensing position simple by making it
+    impossible to get wrong, and that was the right rule while there was no
+    image pipeline. It is the wrong rule now that there is one, because it
+    bans the correct behaviour along with the incorrect one.
+
+    So the rule is stronger rather than looser: an image may be published,
+    and only if a row in data/images.json names who took it, where it came
+    from and under what licence. An unlicensed photograph on a public page
+    is the most expensive mistake a travel site can make, and it is always
+    made by accident — by an <img> somebody added in a hurry, which is
+    exactly what this refuses.
+    """
+    d = D.load()
+    images = d["images"]
+    known = {row["file"] for row in images.values()}
     n = 0
+    svgs = 0
     for f in site_files():
         s = open(f, encoding="utf-8").read()
-        for src in re.findall(r"<img[^>]*>", s):
-            fail(f"{rel(f)}: contains an <img>; illustrations are generated SVG")
-        n += s.count("<svg")
-    if n == 0:
+        svgs += s.count("<svg")
+        for tag in re.findall(r"<img[^>]*>", s):
+            m = re.search(r'src="([^"]+)"', tag)
+            if not m:
+                fail(f"{rel(f)}: an <img> with no src")
+                continue
+            src = m.group(1)
+            # Never a third party. The CSP already blocks it, but a check
+            # that names the reason is worth more than a silent failure.
+            if src.startswith("http") and "europedoor.com" not in src:
+                fail(f"{rel(f)}: hotlinks a photograph from {src}")
+            stem = re.sub(r"-\d+\.(jpg|webp|avif)$", "", src.split("/")[-1])
+            if stem not in known:
+                fail(f"{rel(f)}: <img> for {stem!r} has no row in data/images.json — "
+                     "no photographer, no source, no licence")
+            for attr in ("alt=", "width=", "height=", "loading="):
+                if attr not in tag:
+                    fail(f"{rel(f)}: <img> for {stem!r} is missing {attr[:-1]}")
+            n += 1
+        # One eager image per page, and no more. Page weight is then one
+        # question per page rather than a total.
+        eager = len(re.findall(r'<img[^>]*loading="eager"', s))
+        if eager > 1:
+            fail(f"{rel(f)}: {eager} eager images; a page gets one hero and the rest lazy")
+    if svgs == 0:
         fail("no generated illustrations found at all")
-    return n
+    return n + svgs
 
 
 @check("every experience kind has a page and every experience is on one")

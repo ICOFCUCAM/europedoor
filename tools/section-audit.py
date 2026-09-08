@@ -116,12 +116,12 @@ def s1():
 
 
 @section("1.1", "Product name", "LOCKED",
-         "The specification proposes Europe Atlas. The name is Europedoor, "
+         "The specification proposes Europe Atlas. The name is EuropeDoor, "
          "at europedoor.com, locked by an explicit instruction that predates "
          "this document. A later document does not get to rename a product.")
 def s1_1():
     yield bool(src("docs/brand-lock.md")), "the lock is written down"
-    yield "Europedoor" in src("tools/lib/render.py"), "SITE_NAME is Europedoor"
+    yield "EuropeDoor" in src("tools/lib/render.py"), "SITE_NAME is EuropeDoor"
     yield every_page(lambda h: "europedoor.com" in h, "canonical on europedoor.com")
     yield "brand is locked" in src("tools/checks.py"), "and enforced by a check"
     yield spec_covers("DEVIATION 1"), "the deviation is argued, not silent"
@@ -179,11 +179,16 @@ def s5():
          "action. The AI box is a sentence box that works rather than a "
          "promise that does not, and it says so under the field.")
 def s6():
-    yield has("/", "One door into Europe", "Explore Europe", "Every country",
+    yield has("/", "Open the door to Europe", "Explore Europe", "Every country",
               "Search everything")
-    yield has("/", "Where would you like to go?", "Build me a journey"), \
+    yield has("/", "what would you like to discover?", "Plan my journey"), \
         "the question is asked on the homepage, not one click away"
     yield has("/", "not by a\n  model"), "and the hero says what reads it"
+    # Brand Bible V1: "Plan my journey" is the primary conversion, "Explore
+    # Europe" the secondary, and the order is the point.
+    h = page("/")
+    yield h.index("Plan my journey") < h.index("Explore Europe"), \
+        "the CTA hierarchy is the wrong way round"
     yield "Say it in your own words" in page("/plan"), "the planner takes the same sentence"
 
 
@@ -811,7 +816,7 @@ def s51():
          "Needs partner coverage that does not exist. Nothing implies it.")
 def s52():
     yield every_page(lambda h: "Europe Atlas Pass" not in h and "membership pass" not in h.lower()
-                     and "Europedoor Pass" not in h, "no membership pass is offered")
+                     and "EuropeDoor Pass" not in h, "no membership pass is offered")
 
 
 @section(53, "Admin dashboard", "PARTIAL",
@@ -1150,7 +1155,7 @@ def s81():
          "a booking engine, which the whole product is arranged around.")
 def s82():
     yield has("/about", "discover"), "the positioning is public"
-    yield doc_covers("docs/brand-lock.md", "Europedoor"), "the identity is fixed"
+    yield doc_covers("docs/brand-lock.md", "EuropeDoor"), "the identity is fixed"
 
 
 @section(83, "Visual direction", "PARTIAL",
@@ -1324,10 +1329,17 @@ def s98():
 
 
 @section(99, "Product north star", "BUILT",
-         "Vision, mission and promise, on the site rather than in a deck.")
+         "Vision, mission and promise, on the site rather than in a deck — "
+         "and the manifesto is a page a reader can open, with the trust "
+         "architecture underneath it on the same page.")
 def s99():
     yield has("/about", "discover")
-    yield has("/", "One door into Europe")
+    yield has("/", "Open the door to Europe")
+    yield exists("/manifesto"), "the manifesto is a page, not a slide"
+    # A manifesto on its own is a poster. The four labels underneath it are
+    # what make it something other than advertising copy.
+    yield has("/manifesto", "Verified", "Editorial", "Computed", "Community"), \
+        "and it publishes where every claim on the site comes from"
     yield has("/how-it-works", "Built and live", "Designed, not built", "Deliberately blocked")
 
 
@@ -1362,7 +1374,7 @@ def run():
 
 def main():
     rows, failures = run()
-    print("Europedoor — the 99-section product specification, audited against the build\n")
+    print("EuropeDoor — the 99-section product specification, audited against the build\n")
     for num, title, verdict, note, n, bad in rows:
         mark = "ok  " if not bad else "FAIL"
         print(f"  {mark}  §{label(num):<4} {title:<44} {verdict:<28} {n}")
@@ -1421,7 +1433,7 @@ def render_md(rows, kinds, total, failures):
             "",
             "## The one place this overrides the specification",
             "",
-            "§1.1 proposes *Europe Atlas* as the product name. The name is **Europedoor**, at",
+            "§1.1 proposes *Europe Atlas* as the product name. The name is **EuropeDoor**, at",
             "europedoor.com, fixed by an explicit instruction that predates this document and",
             "enforced by `tools/checks.py`. A later document does not get to rename a product;",
             "see `docs/brand-lock.md`. Everything else in §1.1 — that the name is provisional",

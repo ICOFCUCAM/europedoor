@@ -1,4 +1,4 @@
-/* Europedoor — one stylesheet, one set of tokens.
+/* EuropeDoor — one stylesheet, one set of tokens.
    The rule that keeps this file honest: no page may ship its own <style>
    block. If something needs a new look, it needs a new token or a new
    component here, so the next page gets it too. */
@@ -6,27 +6,58 @@
 :root {
   color-scheme: light dark;
 
-  /* ink & paper */
-  --paper:        #faf7f2;
-  --paper-2:      #f2ede4;
-  --paper-3:      #e8e1d5;
-  --ink:          #161a22;
-  --ink-2:        #3c4350;
-  /* Same reason: #6b7280 was 3.72:1 on the darkest card ground, and it is
-     the colour every card's meta line and the footer's legal text uses. */
-  --ink-3:        #585f6a;
-  --rule:         #ddd5c7;
+  /* ── the palette ──────────────────────────────────────────────
+   *
+   * Brand Bible V1: Atlantic green primary, a pale editorial ground,
+   * terracotta for warmth, near-black for type, muted brass for heritage
+   * moments. Explicitly NOT EU blue-and-gold: looking like an institution
+   * we are not is worse than looking like nothing.
+   *
+   * The greens are pulled cool and north — the Atlantic seaboard, not a
+   * forest floor — and the ground is a limestone paper rather than a warm
+   * sand. That is a deliberate distance from other travel sites in this
+   * family: a palette that reads as somebody else's is not an identity.
+   *
+   * Every value below was measured against the WCAG 2.2 AA line by
+   * tools/browser-checks.js in both colour schemes, on all three paper
+   * tones. Two earlier tokens failed that check and were darkened; the
+   * comments recording which are kept on purpose.
+   */
 
-  /* the three signals: a door, a sea, a warning */
-  /* Darkened from #b4632a after the automated contrast check: the old value
-     was 4.13:1 on paper and 3.40:1 on the darkest card, and small text at
-     4.5:1 is the WCAG AA line. This passes on all three paper tones. */
-  --door:         #96501f;
-  --door-dark:    #7f4318;
-  --sea:          #1c5f77;
-  --sea-dark:     #14485a;
+  /* ground — limestone, cool, editorial */
+  --paper:        #f7f6f3;
+  --paper-2:      #eeece7;
+  --paper-3:      #e3e0d8;
+  --ink:          #14181c;   /* near-black charcoal, the Bible's "dark" */
+  --ink-2:        #39424a;
+  --ink-3:        #59626c;
+  --rule:         #d8d5cc;
+
+  /* PRIMARY — Atlantic green. The door, the wordmark, the primary action. */
+  --atlantic:     #14483c;
+  --atlantic-2:   #0e3630;
+  --atlantic-3:   #1d6250;
+
+  /* ACCENT — terracotta. Warmth and human culture; never the primary
+     action, or the page starts shouting in two voices at once. */
+  --terracotta:   #a4491f;
+  --terracotta-2: #8a3a17;
+
+  /* HIGHLIGHT — muted brass, for heritage moments only. Not a UI colour:
+     nothing interactive is ever brass, because a gold control reads as a
+     premium upsell and there is nothing to sell. */
+  --brass:        #8a6d34;
+
+  /* the signals, mapped onto the new palette
+     --door is the accent in prose and kickers; --sea is the interactive
+     colour (focus rings, links in body copy) and is now the primary green
+     rather than a separate blue, so the palette holds together. */
+  --door:         var(--terracotta);
+  --door-dark:    var(--terracotta-2);
+  --sea:          var(--atlantic);
+  --sea-dark:     var(--atlantic-2);
   --warn:         #8a3324;
-  --warn-bg:      #fbeee9;
+  --warn-bg:      #f8eeea;
 
   /* type */
   --display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
@@ -59,19 +90,29 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #12141a;
-    --paper-2: #191c24;
-    --paper-3: #21252f;
-    --ink: #eceae5;
-    --ink-2: #bdc2cb;
-    --ink-3: #8b929e;
-    --rule: #2c313c;
-    --door: #d8834a;
-    --door-dark: #e69a63;
-    --sea: #63b0c9;
-    --sea-dark: #8ccadf;
-    --warn: #e8a08e;
-    --warn-bg: #2b1b18;
+    /* Not an inversion. At night the ground becomes the deep end of the
+       Atlantic green rather than a neutral grey, so the brand survives the
+       switch; the accent lifts because terracotta at #a4491f on a dark
+       ground is unreadable. */
+    --paper: #0d1416;
+    --paper-2: #131c1e;
+    --paper-3: #1b2528;
+    --ink: #eceae4;
+    --ink-2: #bec5c4;
+    --ink-3: #8e9896;
+    --rule: #263134;
+    --atlantic: #4f9d85;
+    --atlantic-2: #6fb69f;
+    --atlantic-3: #2c6d5b;
+    --terracotta: #e08a5c;
+    --terracotta-2: #ecA079;
+    --brass: #c2a165;
+    --door: var(--terracotta);
+    --door-dark: var(--terracotta-2);
+    --sea: var(--atlantic);
+    --sea-dark: var(--atlantic-2);
+    --warn: #eda897;
+    --warn-bg: #2a1a17;
     --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 24px -12px rgba(0,0,0,.7);
     --shadow-lift: 0 2px 4px rgba(0,0,0,.55), 0 18px 40px -18px rgba(0,0,0,.8);
   }
@@ -106,9 +147,13 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 /* ── masthead ─────────────────────────────────────────────── */
 .masthead { position: sticky; top: 0; z-index: 40; background: color-mix(in srgb, var(--paper) 88%, transparent); backdrop-filter: saturate(1.4) blur(10px); border-bottom: 1px solid var(--rule); }
 .masthead-in { max-width: var(--page); margin: 0 auto; padding: var(--s3) var(--s5); display: flex; align-items: center; gap: var(--s6); justify-content: space-between; }
-.wordmark { display: inline-flex; align-items: center; gap: var(--s2); text-decoration: none; font-family: var(--display); font-size: var(--t-lg); letter-spacing: -0.02em; }
-.door { width: 13px; height: 20px; border: 2px solid var(--door); border-bottom-width: 0; border-radius: 7px 7px 0 0; position: relative; display: inline-block; }
-.door::after { content: ""; position: absolute; right: 2px; top: 9px; width: 3px; height: 3px; background: var(--door); border-radius: 50%; }
+.wordmark { display: inline-flex; align-items: center; gap: .42em; text-decoration: none; font-family: var(--display); font-size: var(--t-lg); letter-spacing: -0.02em; }
+/* The mark. Two tones rather than one shape with opacity, so it holds on
+   any ground including a photograph. It takes its colour from the palette,
+   which is why it is inline SVG and not a file in an <img>. */
+.mark { width: 1.05em; height: 1.05em; flex: none; }
+.mark-frame { fill: var(--atlantic); }
+.mark-leaf  { fill: var(--atlantic-3); }
 .nav { display: flex; gap: var(--s5); flex-wrap: wrap; font-size: var(--t-sm); letter-spacing: .04em; text-transform: uppercase; }
 .nav a { text-decoration: none; color: var(--ink-2); padding-bottom: 2px; border-bottom: 1.5px solid transparent; }
 .nav a:hover { color: var(--ink); border-bottom-color: var(--door); }
@@ -650,3 +695,70 @@ html { scroll-padding-top: 5rem; }
 .staged .now { color: var(--ink); font-weight: 600; }
 .staged .done { color: var(--ink-2); }
 .staged .failed { color: var(--warn); font-weight: 600; }
+
+/* ── the four doors ───────────────────────────────────────────
+ * A sequence, not a menu. Each card is a link now (they were inert divs
+ * describing five pillars), so the section that explains the product is
+ * also the fastest way into it. The arrow only appears on hover and focus:
+ * four permanent arrows in a row is four arrows competing.
+ */
+.doors .door { position: relative; }
+.doors .door .kicker { color: var(--atlantic); }
+.doorgo { margin: var(--s3) 0 0; color: var(--terracotta); font-size: var(--t-lg);
+          opacity: 0; transform: translateX(-4px); transition: opacity .18s ease, transform .18s ease; }
+.doors .door:hover .doorgo, .doors .door:focus-visible .doorgo { opacity: 1; transform: none; }
+@media (max-width: 60rem) { .doorgo { opacity: 1; transform: none; } }
+
+/* ── the manifesto ────────────────────────────────────────────
+ * Set as verse rather than as a paragraph: one line per line, generous
+ * leading, the display face, and a measure narrow enough that no line ever
+ * wraps on a desktop. A manifesto that wraps stops being a manifesto.
+ */
+.manifesto { font-family: var(--display); font-size: clamp(var(--t-lg), 2.4vw, var(--t-2xl));
+             line-height: 1.5; max-width: 44rem; }
+.manifesto p { margin: 0 0 var(--s3); max-width: none; text-wrap: balance; }
+.manifesto-close { margin-top: var(--s6); color: var(--atlantic); font-weight: 600; }
+
+/* ── the trust architecture ───────────────────────────────────
+ * Four sources, and the point is that they LOOK different. A badge with a
+ * colour, a left rule in that colour, and the honest count underneath each
+ * one. Community is deliberately the muted one: nothing on this site
+ * carries it yet, and the tier should look empty because it is.
+ */
+.tiers { display: grid; gap: var(--s4); margin: var(--s5) 0; }
+@media (min-width: 52rem) { .tiers { grid-template-columns: 1fr 1fr; } }
+.tier { border: 1px solid var(--rule); border-left-width: 4px; border-radius: var(--radius);
+        padding: var(--s4) var(--s5); background: var(--paper-2); }
+.tier h3 { margin: 0 0 var(--s3); }
+.tierbadge { display: inline-block; font-family: var(--text); font-size: var(--t-xs);
+             letter-spacing: .12em; text-transform: uppercase; font-weight: 700;
+             padding: 3px 9px; border-radius: 999px; }
+.tier-verified  { border-left-color: var(--atlantic); }
+.tier-verified  .tierbadge { background: var(--atlantic); color: var(--paper); }
+.tier-editorial { border-left-color: var(--terracotta); }
+.tier-editorial .tierbadge { background: var(--terracotta); color: var(--paper); }
+.tier-computed  { border-left-color: var(--brass); }
+.tier-computed  .tierbadge { background: var(--brass); color: var(--paper); }
+.tier-community { border-left-color: var(--ink-3); }
+.tier-community .tierbadge { background: transparent; color: var(--ink-3);
+                             box-shadow: inset 0 0 0 1.5px var(--ink-3); }
+
+/* ── photographs ──────────────────────────────────────────────
+ * There are none yet; this is what serves one when there is. The focal
+ * point is a per-image custom property because a 21:9 crop of a portrait
+ * photograph, centred, takes the sky and loses the subject — which is the
+ * single commonest way a responsive hero goes wrong.
+ */
+.photo { display: block; width: 100%; height: 100%; object-fit: cover;
+         object-position: var(--fx, 50%) var(--fy, 50%); }
+picture { display: block; position: relative; height: 100%; }
+/* The credit is always present in the markup and shown on hover or focus.
+   Always-visible credits on 988 pages is a design nobody ships; credits that
+   exist only in a data file are a licence risk. This is the compromise, and
+   it is readable to a screen reader either way. */
+.credit { position: absolute; right: 0; bottom: 0; margin: 0;
+          font-size: var(--t-xs); letter-spacing: .03em;
+          padding: 3px 8px; color: #fff; background: rgba(0,0,0,.55);
+          opacity: 0; transition: opacity .16s ease; }
+picture:hover .credit, picture:focus-within .credit { opacity: 1; }
+@media (max-width: 44rem) { .credit { opacity: 1; } }

@@ -199,7 +199,7 @@
        * whose url is not one of ours would put an arbitrary link on the
        * reader's own page. */
       if (!parsed || !Array.isArray(parsed.saved)) {
-        tstate.textContent = "That is not a Europedoor list. Paste the whole thing, including the brackets.";
+        tstate.textContent = "That is not a EuropeDoor list. Paste the whole thing, including the brackets.";
         return;
       }
       var clean = parsed.saved.filter(function (x) {
@@ -227,7 +227,7 @@
       document.getElementById("transferstate").textContent =
         added + (added === 1 ? " item added" : " items added") +
         (added < clean.length ? ", the rest were already here" : "") +
-        (dropped ? ". " + dropped + " ignored: not a Europedoor link." : ".");
+        (dropped ? ". " + dropped + " ignored: not a EuropeDoor link." : ".");
     });
 
     document.getElementById("clearmine").addEventListener("click", function () {

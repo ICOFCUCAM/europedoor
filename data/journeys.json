@@ -72,7 +72,7 @@
       ],
       "start": "norway/nord-norge/tromso",
       "end": "latvia/riga-and-around/riga",
-      "creator": "Europedoor editorial"
+      "creator": "EuropeDoor editorial"
     },
     {
       "slug": "atlantic-to-the-mediterranean",
@@ -150,7 +150,7 @@
       ],
       "start": "portugal/porto-and-the-douro/porto",
       "end": "italy/rome-and-lazio/rome",
-      "creator": "Europedoor editorial"
+      "creator": "EuropeDoor editorial"
     },
     {
       "slug": "the-alpine-grand-tour",
@@ -219,7 +219,7 @@
       ],
       "start": "france/alps-and-east/chamonix",
       "end": "italy/north-italy/ortisei",
-      "creator": "Europedoor editorial"
+      "creator": "EuropeDoor editorial"
     },
     {
       "slug": "scandinavia-to-central-europe",
@@ -290,7 +290,7 @@
       ],
       "start": "denmark/zealand/copenhagen",
       "end": "hungary/budapest-and-the-danube-bend/budapest",
-      "creator": "Europedoor editorial"
+      "creator": "EuropeDoor editorial"
     },
     {
       "slug": "the-adriatic-run",
@@ -369,7 +369,7 @@
       ],
       "start": "italy/north-italy/venice",
       "end": "croatia/dalmatia/dubrovnik",
-      "creator": "Europedoor editorial"
+      "creator": "EuropeDoor editorial"
     },
     {
       "slug": "camino-and-sacred-europe",
@@ -431,7 +431,7 @@
       ],
       "start": "united-kingdom/london-and-the-south-east/canterbury",
       "end": "spain/green-spain/santiago-de-compostela",
-      "creator": "Europedoor editorial"
+      "creator": "EuropeDoor editorial"
     },
     {
       "slug": "the-hanseatic-arc",
@@ -498,7 +498,7 @@
       ],
       "start": "belgium/flanders/bruges",
       "end": "estonia/tallinn-and-the-north/tallinn",
-      "creator": "Europedoor editorial"
+      "creator": "EuropeDoor editorial"
     },
     {
       "slug": "the-classical-mediterranean",
@@ -567,7 +567,7 @@
       ],
       "start": "italy/rome-and-lazio/rome",
       "end": "turkiye/aegean-and-mediterranean/selcuk",
-      "creator": "Europedoor editorial"
+      "creator": "EuropeDoor editorial"
     },
     {
       "slug": "european-heritage-route",
@@ -646,7 +646,7 @@
           "why": "Down the Danube to end in a thermal bath, ideally in the snow."
         }
       ],
-      "creator": "Europedoor editorial"
+      "creator": "EuropeDoor editorial"
     },
     {
       "slug": "mediterranean-arc",
@@ -725,7 +725,7 @@
           "why": "The end of the arc, and the beginning of most of what is on it."
         }
       ],
-      "creator": "Europedoor editorial"
+      "creator": "EuropeDoor editorial"
     },
     {
       "slug": "the-baltic-crossing",
@@ -788,7 +788,7 @@
           "why": "An island castle in a lake, an hour out, to finish on."
         }
       ],
-      "creator": "Europedoor editorial"
+      "creator": "EuropeDoor editorial"
     },
     {
       "slug": "the-danube-line",
@@ -856,7 +856,7 @@
           "why": "End where the Sava joins it, on a fortress above both."
         }
       ],
-      "creator": "Europedoor editorial"
+      "creator": "EuropeDoor editorial"
     },
     {
       "slug": "iberian-circle",
@@ -933,7 +933,7 @@
           "why": "Inland to finish: the Prado, vermouth at noon, and a train home."
         }
       ],
-      "creator": "Europedoor editorial"
+      "creator": "EuropeDoor editorial"
     },
     {
       "slug": "carpathian-arc",
@@ -1012,7 +1012,7 @@
           "why": "North into Bucovina, to painted monasteries that have kept their colour for five centuries."
         }
       ],
-      "creator": "Europedoor editorial"
+      "creator": "EuropeDoor editorial"
     },
     {
       "slug": "the-cold-north",
@@ -1081,7 +1081,7 @@
           "why": "End in the iron town that is being physically moved off the hole it dug."
         }
       ],
-      "creator": "Europedoor editorial"
+      "creator": "EuropeDoor editorial"
     },
     {
       "slug": "the-white-villages",
@@ -1149,7 +1149,7 @@
           "why": "Back east along the coast, to finish with Picasso and grilled sardines."
         }
       ],
-      "creator": "Europedoor editorial"
+      "creator": "EuropeDoor editorial"
     },
     {
       "slug": "arctic-to-mediterranean",
@@ -1180,7 +1180,7 @@
         "bus"
       ],
       "accommodation": "mixed",
-      "creator": "Europedoor editorial",
+      "creator": "EuropeDoor editorial",
       "pack": [
         "Layers for both ends: it is 8°C in Tromsø and 32°C in Athens on the same trip",
         "A rail pass, and the patience to reserve the legs that need reserving",

@@ -14,7 +14,7 @@ argument; that one is the evidence.
 ## The name, first
 
 The brief's navigation and page headers read **EUROPE ATLAS**. The name is
-**Europedoor, at europedoor.com**, locked by an instruction that predates
+**EuropeDoor, at europedoor.com**, locked by an instruction that predates
 every document that has arrived since. See `docs/brand-lock.md`;
 `tools/checks.py` enforces it on all 987 pages. Everything else in §2 is
 taken as written.

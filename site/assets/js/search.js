@@ -225,7 +225,7 @@
 
     if (!hits.length) {
       out.innerHTML = '<div class="note"><p>Nothing for <strong>' + escape_(qraw) +
-        "</strong>. Europedoor covers 50 countries and 244 cities — a lot of Europe is " +
+        "</strong>. EuropeDoor covers 50 countries and 244 cities — a lot of Europe is " +
         "not in it yet, and saying so is better than guessing. " +
         '<a href="/atlas">Browse the Atlas</a> or ' +
         '<a href="/sources">tell us what is missing</a>.</p></div>';

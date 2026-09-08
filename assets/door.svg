@@ -1,1 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#161a22"/><path d="M11 25V13a5 5 0 0 1 10 0v12" fill="none" stroke="#b4632a" stroke-width="2.5" stroke-linecap="round"/><circle cx="18.6" cy="19" r="1.3" fill="#b4632a"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="EuropeDoor">
+  <!-- Concept B from the Brand Bible: two vertical forms, and the negative
+       space between them is the symbol. The outer form is the doorway; the
+       inner form is the leaf standing ajar, hinged left and opening to the
+       right, so the sliver of ground on the right is what makes this a door
+       rather than an arch.
+
+       Drawn once, here. Rejected on the way: a literal door with a knob
+       (the Bible rules it out), a wedge of light (illegible under 24px), and
+       two jambs with an open apex (reads as two strokes, not an opening). -->
+  <rect width="32" height="32" rx="7" fill="#f7f6f3"/>
+  <path d="M5.5 29V15.2a10.5 10.5 0 0 1 21 0V29h-3.3V15.2a7.2 7.2 0 0 0-14.4 0V29z" fill="#14483c"/>
+  <path d="M10.9 29V16.6a5.1 5.1 0 0 1 5.1-5.1V29z" fill="#1d6250"/>
+</svg>

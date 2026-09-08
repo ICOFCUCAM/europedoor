@@ -1,0 +1,4 @@
+{
+  "$comment": "The photograph register. EVERY entry needs file, alt, photographer, source and licence; tools/lib/data.py refuses one that does not, and tools/checks.py refuses a published page that references a file with no row here. It is empty because nothing has been licensed yet — see docs/images.md. An empty register is a true statement; a register with a placeholder row in it is not.",
+  "images": {}
+}

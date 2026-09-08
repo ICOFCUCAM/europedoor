@@ -1,4 +1,4 @@
-/* Browser checks for Europedoor.
+/* Browser checks for EuropeDoor.
  *
  *   npm install playwright && node tools/browser-checks.js
  *

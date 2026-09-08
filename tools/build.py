@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build Europedoor.
+"""Build EuropeDoor.
 
     python3 tools/build.py            # build the site into site/
     python3 tools/build.py check      # validate the data, render nothing
@@ -100,6 +100,7 @@ def build():
     emit(P.how_it_works_page(d))
     emit(P.sources_page(d))
     emit(P.api_page(d))
+    emit(P.manifesto_page(d))
     emit(P.freshness_page(d))
     emit(P.privacy_page(d))
     emit(P.cookies_page(d))

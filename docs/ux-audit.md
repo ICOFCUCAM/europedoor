@@ -8,14 +8,14 @@ its requirements are about how something looks and nobody can check a feeling.
 So every row here asserts against the generated HTML, the CSS and the JavaScript
 as they actually are.
 
-**37 sections · 15 already · 13 partial · 7 built · 1 refused · 1 deferred · 168 assertions · 0 failing**
+**43 sections · 15 already · 13 partial · 12 built · 1 refused · 1 locked · 1 deferred · 218 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
-| 1 | Design direction | PARTIAL | 4 | Editorial, map-led, typography-forward, and every page leads to another. The one principle refused is the first: photography leads discovery, and there are no photographs. |
-| 2 | Global navigation | BUILT | 15 | The brief's desktop masthead exactly, and the five-item thumb bar on a phone. Both name the product Europedoor, not Europe Atlas. |
+| 1 | Design direction | PARTIAL | 6 | Editorial, map-led, typography-forward, and every page leads to another. Photography leads discovery is answered by an enforced pipeline and zero licensed photographs — the architecture is built, the library is empty, and those are different claims. |
+| 2 | Global navigation | BUILT | 15 | The brief's desktop masthead exactly, and the five-item thumb bar on a phone. Both name the product EuropeDoor, not Europe Atlas. |
 | 3 | Design tokens | PARTIAL | 6 | One 8px-derived spacing scale, one type scale, the brief's radii. The named webfonts are refused: a font CDN would hand every reader's address to a third party and contradict /privacy. |
-| 4 | Homepage hero | PARTIAL | 2 | Full-bleed hero, the headline, the ask box and the call to action. The hero image is a generated plate. |
+| 4 | Homepage hero | PARTIAL | 4 | Full-bleed hero, the headline, the ask box and the call to action. The hero image is a generated plate. |
 | 5 | Homepage — Explore | ALREADY | 6 | The interactive map with the brief's filter row, as links into the real map rather than a second map to keep in step. |
 | 6 | Experience categories | ALREADY | 3 | Eight large cards, one per category, with the brief's hover. |
 | 7 | Featured journeys | ALREADY | 2 | Cards carrying days, countries and the route, as the brief draws them. |
@@ -45,6 +45,12 @@ as they actually are.
 | 31 | Empty states | ALREADY | 2 | Every empty surface says what it is empty of and what to do, and the empty state is a real state rather than a spinner. |
 | 32 | Error states | BUILT | 6 | The brief's sharpest line — do not fabricate a result just to avoid an error — described what this planner did, because it scores every city and so can always return something. |
 | 33 | Accessibility | PARTIAL | 7 | Keyboard, focus, reduced motion, zoom and touch targets are all enforced in a browser on every build, and the map now has a real text alternative. A screen-reader audit by a person has not happened, and /accessibility says so. |
+| B1 | Name, casing and the trademark position | LOCKED | 5 | EuropeDoor, one word, title case. The mark is NOT cleared — it is in use in the doors trade — so the site carries no ® or ™ and the brand is working rather than announced. |
+| B2 | Tagline and promise | BUILT | 6 | Open the door to Europe. One primary line; the six campaign lines are not in the shell, because a site with six taglines has none. |
+| B3 | The four doors | BUILT | 7 | Discover, understand, experience, journey — as a numbered sequence of links, not a menu of equals. It replaced five pillars that described our components rather than the reader's path. |
+| B4 | Colour | BUILT | 9 | Atlantic green, limestone ground, terracotta accent, charcoal type, brass reserved for heritage and never for a control. Deliberately not EU blue and gold. |
+| B5 | The mark | BUILT | 6 | Concept B: two vertical forms, and the negative space between them is the symbol. It replaced a literal door with a knob, which the Bible explicitly rules out. |
+| B6 | Voice, manifesto and trust | BUILT | 13 | The manifesto is a page rather than a slide, and the four labels that say where every claim comes from are on the same page underneath it. That second half is what stops the first half being advertising copy. |
 | 34 | Figma file structure | DEFERRED | 1 | There is no Figma file. There is a built site, and a second source of truth would have to be kept in step with the first. |
 | 35 | Prototype flows | BUILT | 15 | All six flows are clickable on the live build rather than in a prototype, which is the stronger version of the same deliverable. |
 | 36 | The most important UX decision | ALREADY | 3 | Where am I, what is here, where next — answered on every page by breadcrumbs, the section nav and the onward links, rather than by a search box and hope. |
@@ -65,5 +71,5 @@ as they actually are.
 ## The one lock
 
 The brief's navigation and page headers read **EUROPE ATLAS**. The name is
-**Europedoor**, at **europedoor.com**, and `tools/checks.py` enforces it on every
+**EuropeDoor**, at **europedoor.com**, and `tools/checks.py` enforces it on every
 page. See `docs/brand-lock.md`. A later document does not rename a product.

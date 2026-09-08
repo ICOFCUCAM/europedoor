@@ -5,7 +5,7 @@ enforced in code, and what is waiting on a lawyer.
 
 ## 1. Originality
 
-Europedoor was built after looking at an existing continental travel platform
+EuropeDoor was built after looking at an existing continental travel platform
 and taking the *idea*: a continent organised as an atlas, with curated
 journeys and a community fund attached.
 
@@ -17,12 +17,12 @@ models are not protected by copyright.
 
 | element | position |
 |---|---|
-| Text | Every line written for Europedoor. No source text consulted while writing. |
+| Text | Every line written for EuropeDoor. No source text consulted while writing. |
 | Data | The taxonomy, the 50 countries, the regions, cities, experiences, journeys, themes and stories were authored here. |
 | Code | Written from scratch. No shared lineage of any kind. |
 | Design | Original type scale, palette, components and layout. |
 | Images | There are none. Every illustration is generated from a hash of the place's own slug. |
-| Brand | Europedoor, the door glyph, "One door into Europe" — all original. |
+| Brand | EuropeDoor, the door glyph, "One door into Europe" — all original. |
 
 `/about` states this position publicly, which is the right place for it: a
 claim of originality made only in an internal file is worth less than one
@@ -37,7 +37,7 @@ working on this project.
 
 Not done, and needed before any brand spend:
 
-* clearance search for "Europedoor" in **Nice class 39** (travel
+* clearance search for "EuropeDoor" in **Nice class 39** (travel
   arrangement), **41** (publishing, entertainment) and **42** (software);
 * EUIPO register search for confusable marks;
 * national searches in the launch markets;

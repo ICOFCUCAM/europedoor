@@ -6,17 +6,17 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**100 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 1 locked · 1 refused · 1 built (deliberately smaller) · 1250 assertions · 0 failing**
+**100 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 1 locked · 1 refused · 1 built (deliberately smaller) · 1253 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
 | 1 | Product vision and proposition | BUILT | 7 | Discovery, understanding, planning and experience — all four have surfaces, and none of them transacts. |
-| 1.1 | Product name | LOCKED | 5 | The specification proposes Europe Atlas. The name is Europedoor, at europedoor.com, locked by an explicit instruction that predates this document. A later document does not get to rename a product. |
+| 1.1 | Product name | LOCKED | 5 | The specification proposes Europe Atlas. The name is EuropeDoor, at europedoor.com, locked by an explicit instruction that predates this document. A later document does not get to rename a product. |
 | 2 | Product objectives | RECORDED | 6 | Eight objectives; six have a surface today and two are blocked on an entity. |
 | 3 | Target users | PARTIAL | 5 | Seven traveller types have a route through the product. Two — family and luxury — are derived by published rule rather than by data we hold, and the accessibility needs of any of them are not held at all. |
 | 4 | Core product principle | BUILT | 2 | Inspire → discover → understand → plan is built; book → experience → share is where the blocked half sits. |
 | 5 | Primary navigation | BUILT | 25 | The specification's seven items exactly, plus search and My Europe, plus every secondary link it lists. |
-| 6 | Homepage | BUILT | 4 | The hero, the question in the hero itself, and the calls to action. The AI box is a sentence box that works rather than a promise that does not, and it says so under the field. |
+| 6 | Homepage | BUILT | 5 | The hero, the question in the hero itself, and the calls to action. The AI box is a sentence box that works rather than a promise that does not, and it says so under the field. |
 | 7 | Homepage sections | BUILT | 5 | Explore the continent, explore by experience, featured journeys — in that order, over a hero map carrying the specification's filters as links into the real map rather than a second one. |
 | 8 | Hidden Europe | BUILT | 2 | A quiet tag, a page that collects it, and a rule that we never call anywhere undiscovered. |
 | 9 | Stories | PARTIAL | 71 | The desk exists, the index is grouped by desk, every article carries a byline, a publication date and tags, and every story links into the Atlas both ways. Nine of the specification's hundred are written. |
@@ -109,7 +109,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 96 | Final product principle | BUILT | 2 | Discovery over booking, stated on the site rather than kept internal — and enforced by there being nothing to book. |
 | 97 | MVP acceptance criteria | PARTIAL | 14 | Twelve of the fourteen visitor criteria pass. The two that do not are the account: a saved journey survives in this browser, not across devices. |
 | 98 | The first build — twelve modules | PARTIAL | 11 | Ten of the twelve ship. Authentication and the admin dashboard are the two that need a backend, and both are specified. |
-| 99 | Product north star | BUILT | 3 | Vision, mission and promise, on the site rather than in a deck. |
+| 99 | Product north star | BUILT | 5 | Vision, mission and promise, on the site rather than in a deck — and the manifesto is a page a reader can open, with the trust architecture underneath it on the same page. |
 
 ## What the verdicts mean
 
@@ -126,7 +126,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 
 ## The one place this overrides the specification
 
-§1.1 proposes *Europe Atlas* as the product name. The name is **Europedoor**, at
+§1.1 proposes *Europe Atlas* as the product name. The name is **EuropeDoor**, at
 europedoor.com, fixed by an explicit instruction that predates this document and
 enforced by `tools/checks.py`. A later document does not get to rename a product;
 see `docs/brand-lock.md`. Everything else in §1.1 — that the name is provisional
