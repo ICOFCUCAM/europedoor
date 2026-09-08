@@ -397,6 +397,20 @@ amplitude and segment count — the exact fix that took coast from 125 twins to
 motifs. And read a negative delta against what is underneath: `isles` reports
 its water as occluding, but the only thing under that water is the sky.
 
+**Design to purpose, not to data shape.** A page's structure comes from what
+the reader is trying to do, not from the shape of the record behind it. The
+experience template renders six rows because the data is six rows, and that is
+the wrong reason for a layout to exist.
+
+**A shared template is not a shared experience.** One shell, one stylesheet
+and eleven primitives are an engineering achievement and are kept. They are
+not, by themselves, a design. Measured across twelve rendered families:
+**eleven of the twelve place an identically-sized h1 at an identical vertical
+position**, and the entire art-directional difference between a magazine story
+and a country encyclopedia is one 11px kicker changing hue — terracotta on
+`area-stories`, cobalt on `area-countries`. The accent system is not broken; it
+is doing almost no work. See `docs/design-direction-audit.md`.
+
 **Look to find, count to conclude.** A contact sheet of forty plates suggested
 skylines were about 38% of them; measured across every destination they are
 28%. The sample was biased and the eye was wrong. The same sheet *did* find
