@@ -277,6 +277,9 @@
         "islands",
         "coast"
       ],
+      "kinds": [
+        "wild"
+      ],
       "subs": [
         {
           "slug": "waterfalls",
@@ -365,6 +368,11 @@
         "nature",
         "coast"
       ],
+      "kinds": [
+        "walk",
+        "water",
+        "ride"
+      ],
       "subs": [
         {
           "slug": "hiking",
@@ -451,6 +459,11 @@
         "design",
         "festivals",
         "architecture"
+      ],
+      "kinds": [
+        "museum",
+        "stage",
+        "workshop"
       ],
       "subs": [
         {
@@ -540,6 +553,7 @@
         "history",
         "architecture"
       ],
+      "kinds": [],
       "subs": [
         {
           "slug": "ancient",
@@ -654,6 +668,10 @@
         "food",
         "wine"
       ],
+      "kinds": [
+        "table",
+        "cellar"
+      ],
       "subs": [
         {
           "slug": "markets",
@@ -731,6 +749,9 @@
       "icon": "✝",
       "blurb": "Pilgrimage routes, cathedrals, monasteries and sacred sites of several traditions.",
       "interests": [
+        "sacred"
+      ],
+      "kinds": [
         "sacred"
       ],
       "subs": [

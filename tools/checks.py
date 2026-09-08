@@ -2010,6 +2010,41 @@ def c_no_builtin_hash():
     return n
 
 
+@check("every experience in a category earns its place by itself")
+def c_category_membership():
+    # A property of the CONTAINER may not establish a claim about the ITEM.
+    # This repository has now made that mistake twice: the sub-category
+    # keywords were matched against the town's NAME (8 wrong listings of
+    # 423), and category membership was granted by the town's INTERESTS (516
+    # of 866, so Food & drink opened with a nuclear bunker). Both were
+    # invisible from the outside — every page rendered, every count was
+    # consistent, and the lists were simply wrong.
+    #
+    # So the rule is asserted directly against the shipped selection: an
+    # experience appears in a category only if its own authored `kind` is one
+    # the category declares, or its own name/summary/kind matches one of the
+    # category's keywords. The town it happens to sit in is not consulted.
+    from lib import data as D, categories as CAT
+    d = D.load()
+    items = D.all_experiences(d["countries"])
+    n = 0
+    for cat in d["taxonomy"]["categories"]:
+        if cat.get("derived"):
+            continue
+        kinds = set(cat.get("kinds") or ())
+        for it in CAT.select(items, cat):
+            e = it["exp"]
+            own = (e.get("kind") in kinds
+                   or any(CAT.matches_sub(e, sub) for sub in cat.get("subs", [])))
+            if not own:
+                fail(f'/experiences/{cat["slug"]}: "{e["name"]}" is listed but '
+                     f'matches nothing about itself — it is there because of '
+                     f'{it["city"]["name"]}, and a property of the container '
+                     f'cannot establish a claim about the item')
+            n += 1
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0

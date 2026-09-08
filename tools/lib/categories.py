@@ -76,14 +76,49 @@ def is_luxury(exp):
 
 
 def in_category(item, cat):
-    """item: the dict all_experiences() yields."""
+    """A category describes the EXPERIENCE, not the town it sits in.
+
+    THE SAME MISTAKE AS THE CITY NAME, ONE LEVEL UP, AND FAR LARGER. This
+    used to open with:
+
+        tags = city["interests"] | region["interests"]
+        if tags & cat["interests"]: return True
+
+    so a destination tagged `food` put every experience in it under Food &
+    drink. The category page for food opened with a five-storey nuclear
+    bunker in Tirana, chant in a rock-cut chamber in Geghard, a manuscript
+    library in Yerevan and standing room at the Vienna Staatsoper before it
+    reached a heuriger. Measured across all six real categories:
+
+        Nature      147 listed,  32 matched their own words   115 from tags
+        Adventure   173          117                           56
+        Culture     147          61                            86
+        History     167          33                           134
+        Food        139          48                            91
+        Faith        93          59                            34
+
+    866 listings from 197 experiences — 4.4 categories each, which is the
+    arithmetic of a taxonomy that has stopped discriminating. A property of
+    the CONTAINER cannot establish a claim about the ITEM, and this is the
+    same rule that took the town's name out of matches_sub eight listings
+    ago; here it was 516.
+
+    What replaces it is the experience's own authored classification. `kind`
+    is one of ten values written per experience — table, cellar, museum,
+    stage, workshop, walk, water, ride, wild, sacred — and the categories now
+    declare which kinds belong to them in data/taxonomy.json. That is
+    authoring a classification, which this repository allows, rather than
+    inferring one from a neighbour, which is what the tag pass did.
+
+    368 listings, 1.9 per experience, and every one of the 197 still lands
+    somewhere: nothing was orphaned by the change.
+    """
     exp = item["exp"]
     if cat.get("derived") == "family":
         return is_family(exp)
     if cat.get("derived") == "luxury":
         return is_luxury(exp)
-    tags = set(item["city"]["interests"]) | set(item["region"]["interests"])
-    if tags & set(cat.get("interests", [])):
+    if exp.get("kind") in set(cat.get("kinds") or ()):
         return True
     return any(matches_sub(exp, sub, item["city"]) for sub in cat.get("subs", []))
 
@@ -107,9 +142,13 @@ def rule_text(cat):
         return ("Every experience we priced in the high band. There is no separate luxury "
                 "inventory and no partner arrangement behind this list — it is the "
                 "expensive end of what is already in the Atlas, labelled as expensive.")
-    return ("Anything in a place tagged " + ", ".join(cat.get("interests", [])) +
-            ", plus anything whose own name or description matches one of the "
+    kinds = cat.get("kinds") or []
+    kindbit = ("Everything we classified as " + ", ".join(kinds) + ", plus a"
+               if kinds else "A")
+    return (kindbit + "nything whose own name or description matches one of the "
             f"{sum(len(s['keywords']) for s in cat.get('subs', []))} terms under the "
-            "sub-categories below. The terms are matched against what we wrote "
-            "about the experience and never against the name of the town, "
-            "because a salt mine in Hallstatt is not a market.")
+            "sub-categories below. Both tests are about the experience itself. "
+            "Neither the name of the town nor the interests the town is tagged "
+            "with can put something in this list: a salt mine in Hallstatt is "
+            "not a market, and a bunker museum in a city known for its food is "
+            "not a meal.")
