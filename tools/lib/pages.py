@@ -1950,8 +1950,21 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad=60):
         if any(abs(px - qx) < dx_min and abs(py - qy) < dy_min for qx, qy in placed):
             continue
         placed.append((px, py))
-        lab.append(f'<text class="minilabel here" x="{px + 10:.1f}" y="{py + 4:.1f}">'
-                   f'{esc(name)}</text>')
+        # A LABEL THAT RUNS OFF THE RIGHT-HAND EDGE IS CUT BY THE ARCH.
+        # "Mestia, Svaneti" on the quiet map ended as "Mestia, Svane" against
+        # the frame — the clip path does not know the text is there, and a
+        # name sliced mid-word reads as a broken renderer. The rule is the
+        # one a cartographer uses: put the label on the other side of the dot
+        # when it will not fit on this one. 6.1 units per character at 11px
+        # is measured from the rendered labels, not guessed, and it only has
+        # to be close enough to decide which side.
+        wide = len(name) * 6.1 + 12
+        if px + wide > vw:
+            lab.append(f'<text class="minilabel here" text-anchor="end" '
+                       f'x="{px - 10:.1f}" y="{py + 4:.1f}">{esc(name)}</text>')
+        else:
+            lab.append(f'<text class="minilabel here" x="{px + 10:.1f}" '
+                       f'y="{py + 4:.1f}">{esc(name)}</text>')
     ctx, land = geo.landmass(MAPPROJ, (x0, y0, w, h))
     return (
         f'<figure class="minimap pointsmap arched">'
@@ -3442,6 +3455,27 @@ def quiet_page(data):
              seed=f"city:{n['country']['slug']}:{n['city']['slug']}")
         for n in quiet
     ]
+    # THE ARGUMENT OF THIS PAGE IS A DISTRIBUTION, AND IT WAS PROSE.
+    #
+    # "Too many visitors in the same eleven places" is a claim about where
+    # people are NOT. The quiet tag is on 89 destinations in 40 countries and
+    # the page listed them as cards, which shows how many and not where —
+    # and where is the entire point: the alternative to Santorini is not "a
+    # quieter island", it is a specific set of dots spread across a
+    # continent that a reader can see is nowhere near the eleven places.
+    qpts = [(*project(n["city"]["lat"], n["city"]["lon"]),
+             urls.city(n["country"], n["region"], n["city"]), n["city"]["name"])
+            for n in quiet]
+    quietmap = pointsmap(
+        qpts, "quiet",
+        f'Every destination carrying the quiet tag: {len(quiet)} of '
+        f'{len(data["cities"])}, in '
+        f'{len({n["country"]["slug"] for n in quiet})} countries. The tag is '
+        f'editorial and we will be wrong sometimes. Names are dropped where '
+        f'they would overlap; every dot is a link. Coastline from '
+        f'<a href="/sources">Natural Earth</a>, public domain.',
+        f'Map of the {len(quiet)} destinations tagged quiet') if len(qpts) >= 2 else ""
+
     swaps = "".join(
         f"""<div class="row"><div><h3>{esc(a)}</h3><p class="rowsub">{esc(why)}</p></div>
         <p class="rowmeta">try {esc(b)}</p></div>"""
@@ -3464,6 +3498,7 @@ def quiet_page(data):
   way — the Planner rewards shoulder months, the Atlas gives a Galician fishing town the same
   page template as Paris, and this is where the quiet places are listed on purpose.</p>
 </div>
+{quietmap}
 {section(f"{len(quiet)} places we would send you instead", grid(cards, 3),
          lede="Tagged quiet in the dataset: places with the goods and without the crowd. The tag is editorial and we will be wrong sometimes.")}
 {section("Six straight swaps", f'<div class="rows">{swaps}</div>',
