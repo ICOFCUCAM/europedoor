@@ -373,6 +373,13 @@ main.wide { max-width: 92rem; }
 .grid { display: grid; gap: var(--s4); grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
 .grid.cols-2 { grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr)); }
 .grid.cols-4 { grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr)); }
+/* cols-4 did not produce four columns. auto-fill packs in as many 12rem
+ * tracks as the container holds, which is five at 1280px — so the homepage's
+ * eight ways-in tiles wrapped 5 + 3 and the second row read as an orphan.
+ * The class is named for a count, so above the layout breakpoint it keeps
+ * that count. Below it auto-fill still does the right thing, which is why
+ * this is a floor on width rather than a rewrite. */
+@media (min-width: 64rem) { .grid.cols-4 { grid-template-columns: repeat(4, 1fr); } }
 
 .card { display: block; text-decoration: none; background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; }
 .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); border-color: var(--ink-3); }
@@ -525,10 +532,22 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 
 /* ── the hero map ─────────────────────────────────────────────────── */
 .hero { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s7); align-items: center; }
+/* The hero map is an INTELLIGENCE figure on a DISCOVER page, which is the
+ * same rule every other embedded map here follows: the world says what the
+ * reader is looking at, not which page it happens to sit on. It is also the
+ * whole visual rhythm of the homepage — one dark, dense, cinematic frame at
+ * the top, and progressively quieter bands under it.
+ *
+ * It rendered as a solid black silhouette the first time, because the land
+ * paths are styled only under .europemap and .countrymap and an unstyled
+ * <path> fills black. Nothing failed; the map simply arrived as a blot. */
 .heromap { display: none; text-decoration: none; }
-.heromap svg { width: 100%; height: auto; display: block; }
-.herodot { fill: var(--sea); opacity: .55; transition: opacity .2s ease; }
-.herodot.advisory { fill: var(--ink-3); opacity: .25; }
+.heromap svg { width: 100%; height: auto; display: block;
+               background: var(--map-sea); border-radius: var(--radius); }
+.heromap .context path { fill: var(--map-context); }
+.heromap .countries path { fill: var(--map-land); stroke: var(--map-border); stroke-width: 1; }
+.herodot { fill: var(--signature); opacity: .8; transition: opacity .2s ease; }
+.herodot.advisory { fill: var(--map-border); opacity: .5; }
 .heromap:hover .herodot { opacity: .85; }
 .heromap-cap { display: block; margin-top: var(--s3); font-size: var(--t-xs); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
 .heromap:hover .heromap-cap { color: var(--door); }

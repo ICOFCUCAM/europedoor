@@ -330,6 +330,30 @@ measuring a drawing requires drawing it. `tools/plate-variation.py` holds a
 ceiling on interchangeable pairs per motif family; it is not in `checks.py`
 because eight seconds on every build is a gate people stop running.
 
+**The homepage is the door, not the catalogue — three bands, and the count
+is checked.** It ran to eight: four doors, twelve motions, the quiet places,
+the stories desk, the macro regions, seventeen interest tiles, a planner pitch
+and the journeys. Every one was a real surface worth linking to, which is
+exactly how a homepage becomes a contents list — no single section is wrong
+and the sum says "here is everything we can do" instead of "here is Europe".
+Now: hero, eight ways in, three journeys, stop. `section-audit.py` asserts
+**two `<h2>` bands** as both a floor and a ceiling, because restraint erodes
+one defensible section at a time. **Cutting a band orphans nothing here** —
+every removed surface keeps its page and is linked from all 1,072, and the
+audit asserts that too. And when a band goes, check what it was the *only*
+home for: the four doors are a Brand Bible element and for one build they
+existed nowhere on the site, so they moved to `/how-it-works`.
+
+**A homepage assertion that demands six bands forbids restraint.** Cutting
+the page turned four checks red, and none of them was wrong to exist — they
+had encoded the old page's *shape* (six named stages, three ghost CTAs, a
+filter row, a section title) rather than its *promise*. Each was rewritten to
+assert the promise: the stages named must be real ones in canonical order
+ending on Go, the primary CTA must precede the secondary wherever the
+secondary now sits, the map filters must exist on the map that acts on them.
+Weaker claims, made deliberately, and each still fails on the thing it was
+protecting.
+
 **Counting says a family is repetitive; only ablation says which layer to
 change.** Three attempts to vary `tower` reasoned from the drawing and picked
 the shaft, which paints 4% of a card-sized plate. Deleting each layer in turn

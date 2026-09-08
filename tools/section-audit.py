@@ -179,42 +179,62 @@ def s5():
          "action. The AI box is a sentence box that works rather than a "
          "promise that does not, and it says so under the field.")
 def s6():
-    yield has("/", "Open the door to Europe", "Explore Europe", "Every country",
-              "Search everything")
+    yield has("/", "Open the door to Europe")
     yield has("/", "what would you like to discover?", "Plan my journey"), \
         "the question is asked on the homepage, not one click away"
     yield has("/", "not by a\n  model"), "and the hero says what reads it"
-    # Brand Bible V1: "Plan my journey" is the primary conversion, "Explore
-    # Europe" the secondary, and the order is the point.
+    # Brand Bible V1: "Plan my journey" is the primary conversion and the
+    # explore action is the secondary, and the ORDER is the point.
+    #
+    # The hero used to carry three ghost buttons — Explore Europe, Every
+    # country, Search everything — and now carries four intent chips that
+    # seed the same box they sit under. The secondary CTA was not deleted:
+    # it moved one band down and became "Explore the map", which is where
+    # the design this follows puts it too. So the hierarchy is still
+    # asserted, across the two bands rather than inside one.
     h = page("/")
-    yield h.index("Plan my journey") < h.index("Explore Europe"), \
+    yield h.index("Plan my journey") < h.index("Explore the map"), \
         "the CTA hierarchy is the wrong way round"
+    yield has("/", "/plan?ask="), "the intent chips seed the planner, not a dead end"
     yield "Say it in your own words" in page("/plan"), "the planner takes the same sentence"
 
 
-@section(7, "Homepage sections", "BUILT",
-         "Explore the continent, explore by experience, featured journeys — "
-         "in that order, over a hero map carrying the specification's "
-         "filters as links into the real map rather than a second one.")
+@section(7, "Homepage sections", "BUILT (deliberately smaller)",
+         "Three bands: the hero over a real map of Europe, the eight ways in, "
+         "the journeys. The specification's geography index and its hero-map "
+         "filter row were REMOVED from this page — both still exist as pages, "
+         "and both are linked from every page's masthead or footer.")
 def s7():
     h = page("/")
-    # The specification's three sections are all present. Their ORDER is now
-    # set by the 2036 brief's progression instead — open, discover, wonder,
-    # understand, plan, go — which puts the geography index after the
-    # emotional part rather than first. The two briefs disagree here and the
-    # later one wins; see docs/EUROPEDOOR_2036_TRANSFORMATION.md.
-    yield has("/", "Or start from the geography", "Find your kind of Europe",
-              "Routes that cross borders on purpose")
-    yield h.index("Or start from the geography") < h.index("Find your kind"), \
-        "regions before experiences"
-    yield h.index("Find your kind") < h.index("Routes that cross borders"), \
-        "experiences before journeys"
-    # The specification's first homepage section is an interactive map with
-    # filters. The filters are links that open the real map with one applied,
-    # rather than a second map on the homepage to keep in step with the first.
-    yield has("/", "heromap-filters", "/map?layer=nature", "/map?layer=history"), \
-        "the hero map carries the specification's filters"
-    yield has("/", "Hidden Europe"), "including the quiet layer"
+    # The homepage was eight bands and is now three. The specification asks
+    # for explore-the-continent, explore-by-experience and featured-journeys,
+    # in that order; two of the three are here and the geography index is
+    # not. That is a deliberate narrowing, not a regression, so this asserts
+    # what IS there and — more usefully — asserts that the removed surfaces
+    # did not become unreachable, which is the only way cutting a homepage
+    # section can actually cost anything.
+    yield has("/", "Find your kind of Europe", "Journeys worth taking")
+    yield h.index("Find your kind") < h.index("Journeys worth taking"), \
+        "ways in before journeys"
+    # Exactly two <h2> bands under the hero's h1. A floor AND a ceiling:
+    # this page's whole premise is restraint, and restraint is what quietly
+    # erodes — a section at a time, each one defensible on its own. It was
+    # eight bands when this assertion was written.
+    n = h.count("<h2>")
+    yield n == 2, f"{n} bands under the hero (ways in, journeys)"
+    # The geography index, the twelve motions, the quiet places, the stories
+    # desk and the interest index all lost their homepage band. None of them
+    # lost a reader: every one is linked from all 1,072 pages.
+    for url in ("/discover", "/europe-in", "/beyond-the-obvious", "/stories",
+                "/themes", "/map", "/journeys"):
+        n_in = sum(1 for f in ALL_HTML
+                   if f'href="{url}"' in open(f, encoding="utf-8").read())
+        yield n_in >= 1000, f"{url} still linked from {n_in} pages"
+    # The hero map draws the coastline, not just the dots. A dot map with
+    # nothing under it is a scatter plot, and this page was the last one
+    # still shipping one.
+    yield has("/", 'class="heromap"', '<g class="countries"'), \
+        "the hero map carries real geography under its places"
 
 
 @section(8, "Hidden Europe", "BUILT",

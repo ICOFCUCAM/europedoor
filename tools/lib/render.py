@@ -978,13 +978,23 @@ def section(title, body, *, id=None, lede=None, more=None, stage=None, tone=None
 
 
 def card(href, kicker, title, blurb, *, seed=None, meta="", tall=False, motif=None):
+    """`blurb` may be None, for a tile that is a picture and a name.
+
+    It is None in exactly one place — the eight ways-in tiles on the
+    homepage, where the interests carry a name and a count and no prose,
+    because none was ever written for them. The alternative was an empty
+    <p class="blurb"></p>, which is the present-but-empty pattern this
+    repository refuses in its JSON-LD for the same reason: a container that
+    says "there is copy here" and then has none.
+    """
     art = f'<div class="card-art">{plate(seed, 640, 360, title, motif=motif)}</div>' if seed else ""
+    blurbhtml = f'<p class="blurb">{esc(blurb)}</p>' if blurb else ""
     return f"""<a class="card{' tall' if tall else ''}" href="{esc(href)}">
   {art}
   <div class="card-body">
     <p class="kicker">{esc(kicker)}</p>
     <h3>{esc(title)}</h3>
-    <p class="blurb">{esc(blurb)}</p>
+    {blurbhtml}
     {meta}
   </div>
 </a>"""

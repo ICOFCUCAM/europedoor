@@ -158,26 +158,43 @@ def s3():
 def s4():
     yield has("/", "Open the door to Europe", "Plan my journey")
     yield has("/", "what would you like to discover?"), "the Bible's own ask-box wording"
-    yield has("/", "hero-actions"), "and the calls to action beneath it"
+    # The three ghost buttons under the hero became four intent chips that
+    # seed the box they sit under, and the secondary CTA moved one band down
+    # to "Explore the map". The hierarchy is unchanged and is still checked;
+    # only where the secondary sits has moved.
+    yield has("/", "hero-intents", "/plan?ask="), "and the intent chips beneath it"
     h = page("/")
-    yield h.index("Plan my journey") < h.index("Explore Europe"), \
+    yield h.index("Plan my journey") < h.index("Explore the map"), \
         "primary before secondary — the planner is the conversion"
 
 
-@section(5, "Homepage — Explore", "ALREADY",
-         "The interactive map with the brief's filter row, as links into the "
-         "real map rather than a second map to keep in step.")
+@section(5, "Homepage — Explore", "BUILT (deliberately smaller)",
+         "The map is on the homepage, drawn from real coastlines. Its filter "
+         "row is NOT: eleven chips under a map are eleven links into filtered "
+         "views of the map the reader is already looking at. The filters live "
+         "on /map, which is one tap away and is where they act.")
 def s5():
-    yield has("/", "heromap", "heromap-filters")
+    yield has("/", "heromap"), "the hero map is there"
+    yield has("/", '<g class="countries"'), "and draws land, not a scatter of dots"
+    yield has("/", 'href="/map"'), "and opens the real map"
+    # The requirement is still checked — at the surface that serves it.
     for layer in ("nature", "history", "food", "coast"):
-        yield f"/map?layer={layer}" in page("/"), f"the {layer} filter"
-    yield has("/", "Hidden Europe"), "and the quiet layer"
+        yield f'value="{layer}"' in page("/map") or f"layer={layer}" in page("/map"), \
+            f"the {layer} filter, on the map"
+    yield has("/map", "Hidden Europe") or has("/", "Hidden Europe"), "and the quiet layer"
 
 
 @section(6, "Experience categories", "ALREADY",
          "Eight large cards, one per category, with the brief's hover.")
 def s6():
     yield has("/", "Find your kind of Europe")
+    # Eight, exactly. This was seventeen interest tiles until the homepage
+    # was cut to three bands; the brief always asked for eight large cards
+    # and the page was quietly over-delivering into a wall of small ones.
+    h = page("/")
+    band = h[h.index("Find your kind of Europe"):h.index("Journeys worth taking")]
+    n = band.count('class="card"')
+    yield n == 8, f"{n} large cards, one per category"
     yield ".card:hover" in CSS, "the cards lift on hover"
     yield "@media (prefers-reduced-motion: reduce)" in CSS, "and stop for anyone who asked"
 
@@ -258,22 +275,29 @@ def s2036_6():
         "and shared reasons are hoisted rather than repeated per row"
 
 
-@section("2036-50", "The homepage as a progression", "BUILT",
-         "Open, discover, wonder, understand, plan, go — named on the page, "
-         "because a progression nobody can see is just an ordering. One "
-         "band changes ground so the rhythm is felt rather than intended.")
+@section("2036-50", "The homepage as a progression", "BUILT (deliberately smaller)",
+         "Open, discover, go — named on the page, because a progression "
+         "nobody can see is just an ordering. It named all six steps when it "
+         "had six bands, and that was the version that read as a contents "
+         "list. One band changes ground so the rhythm is felt.")
 def s2036_50():
     h = page("/")
     import re as _re
-    stages = _re.findall(r'class="stage">([^<]+)<', h)
-    yield len(stages) >= 6, f"the homepage names {len(stages)} steps"
+    CANON = ["Open", "Discover", "Wonder", "Understand", "Browse", "Plan", "Go"]
+    stages = [t.strip() for t in _re.findall(r'class="stage">([^<]+)<', h)]
     seq = ">".join(stages)
-    yield bool(_re.search(r"Discover.*Wonder.*Understand.*Plan.*Go", seq)), \
+    # Two steps, not six. A check that demands six bands is a check that
+    # forbids restraint, so what is asserted is that the steps named are
+    # real steps, in the canonical order, ending on Go — which is a weaker
+    # claim, made deliberately, and still fails on a homepage that puts its
+    # journeys above its discovery.
+    yield len(stages) >= 2, f"the homepage names {len(stages)} steps"
+    ranks = [CANON.index(t) if t in CANON else -1 for t in stages]
+    yield all(r >= 0 for r in ranks), f"every step is one of the six ({seq})"
+    yield all(i == 0 or ranks[i - 1] < r for i, r in enumerate(ranks)), \
         f"the steps run in the specification's order ({seq})"
-    # Plan before Go: the planner is the conversion, and a journey nobody
-    # has planned is not somewhere they are going.
-    yield seq.rfind("Plan") < seq.rfind("Go"), "and it ends on Go, not Plan"
-    yield 'class="band tone-quiet"' in h, "the wonder band changes ground"
+    yield stages[-1] == "Go", "and it ends on Go, not Plan"
+    yield 'class="band tone-quiet"' in h, "one band changes ground"
     yield h.count('class="band tone-quiet"') == 1, "and does so once"
     yield "the homepage as a progression" in src("tools/browser-checks.js"), \
         "with a browser check on the order and on the full-bleed band at 390px"
@@ -363,7 +387,7 @@ def s2036_60():
          "them — now placed after the planner, because a journey nobody has "
          "planned is not somewhere they are going.")
 def s7():
-    yield has("/", "Routes that cross borders on purpose")
+    yield has("/", "Journeys worth taking")
     yield has("/journeys/the-alpine-grand-tour", "days", "The route")
 
 
@@ -726,9 +750,16 @@ def sb2():
 @section("B3", "The four doors", "BUILT",
          "Discover, understand, experience, journey — as a numbered "
          "sequence of links, not a menu of equals. It replaced five pillars "
-         "that described our components rather than the reader's path.")
+         "that described our components rather than the reader's path. It "
+         "lives on /how-it-works, not the homepage: the homepage is the "
+         "door, and this is the page that says what is behind it.")
 def sb3():
-    h = page("/")
+    # This asserted the homepage until the homepage was cut to three bands.
+    # Moved rather than dropped — the sequence is a Brand Bible element, and
+    # for one build it existed nowhere on the site at all, which is exactly
+    # the kind of loss a section-by-section trim causes and nobody notices.
+    h = page("/how-it-works")
+    yield "Four doors" in h, "the sequence has a home"
     for i, door in enumerate(("Discover", "Understand", "Experience", "Journey")):
         yield f"<h3>{door}</h3>" in h, f"door {i + 1}: {door}"
     order = [h.index(f"<h3>{d}</h3>") for d in

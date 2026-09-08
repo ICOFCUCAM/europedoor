@@ -8,6 +8,7 @@ test without a build directory existing.
 from __future__ import annotations
 
 import math
+from urllib.parse import quote
 
 from . import geo
 from . import urls
@@ -194,80 +195,67 @@ def months_line(data, keys):
 # ── home ──────────────────────────────────────────────────────────────
 
 def home(data):
-    macros = data["macros"]
-    countries = data["countries"]
+    """The homepage is the door, not the catalogue.
+
+    It used to run to eight bands: four doors, twelve motions, the quiet
+    places, the stories desk, the macro regions, seventeen interest tiles, a
+    planner pitch and the curated journeys. Every one of those is a real
+    surface with a real page, and the homepage was linking to all of them
+    because each was worth linking to. That is how a homepage becomes a
+    contents list — no single section is wrong, and the sum says "here is
+    everything we can do" rather than "here is Europe".
+
+    Three bands now: see Europe, find your Europe, start a journey. Nothing
+    was deleted from the site; the removed sections all keep their pages and
+    every one of those URLs is still linked from the masthead or the footer
+    of all 1,072 pages, which is why cutting them here orphans nothing.
+    """
+    ncountries = len(data["countries"])
+    ncities = len(data["cities"])
+    nregions = sum(len(c["regions"]) for c in data["countries"].values())
     n_by_interest = {
         i["slug"]: sum(1 for n in data["cities"].values() if i["slug"] in n["city"]["interests"])
         for i in data["taxonomy"]["interests"]
     }
-    cards = []
-    for m in macros[:6]:
-        n = len(m["countries"])
-        cards.append(
-            card(urls.macro(m), f"{n} countries", m["name"], m["blurb"], seed="macro:" + m["slug"])
-        )
+
+    # Eight ways in, not seventeen. The design this follows asks for
+    # Mountains, History, Food, Nature, Faith & Heritage, Beaches, Adventure
+    # and Culture. Six of those are interests this atlas actually holds.
+    # ADVENTURE AND CULTURE ARE NOT: there is no such tag, no page behind
+    # either word, and no list of destinations that answers them. Rather than
+    # label a tile with a word the dataset cannot honour, the two slots go to
+    # the next-largest real interests — Architecture (126) and Big cities
+    # (74) — and every tile carries its true name and its true count, so the
+    # label on the homepage is the heading of the page it opens.
+    HOME_KINDS = ["mountains", "history", "food", "nature",
+                  "sacred", "coast", "architecture", "cities"]
+    kind_cards = [
+        card(urls.interest(k), f"{n_by_interest[k]} destinations",
+             data["interests"][k]["name"], None,
+             seed="interest:" + k, motif=motif_for([k]))
+        for k in HOME_KINDS
+    ]
+
     jcards = [
-        card(
-            urls.journey(j), f"{j['days']} days · {len(j['legs'])} stops", j["name"], j["strapline"],
-            seed="journey:" + j["slug"],
-        )
+        card(urls.journey(j), f"{j['days']} days · {len(j['legs'])} stops",
+             j["name"], j["strapline"], seed="journey:" + j["slug"])
         for j in data["journeys"][:3]
     ]
-    ncountries = len(countries)
-    ncities = len(data["cities"])
-    nregions = sum(len(c["regions"]) for c in countries.values())
 
-    interest_grid = '<div class="grid cols-4">' + "".join(
-        f"""<a class="card" href="{urls.interest(i['slug'])}"><div class="card-body">
-        <p class="kicker"><span aria-hidden="true">{esc(i['icon'])}</span> {n_by_interest[i['slug']]} cities</p>
-        <h3>{esc(i['name'])}</h3></div></a>"""
-        for i in data["taxonomy"]["interests"]
-    ) + "</div>"
-
-    motion_cards = [
-        card(f"/europe-in/{m['slug']}",
-             f"{sum(1 for cid, x in data['cities'].items() if motion_match(data, m, cid, x)[0])} destinations",
-             m["name"], m["strapline"], seed="motion:" + m["slug"],
-             motif=motif_for(m.get("interests", [])))
-        for m in data["motions"][:3]
+    # The intent chips seed the same box they sit under, rather than jumping
+    # somewhere else: the planner reads `ask` from the query string, so a
+    # chip and a typed sentence take the identical path. A chip that went to
+    # a different destination from the input above it would teach the reader
+    # that the input is decorative.
+    INTENTS = [
+        ("Mountain escapes", "I want a quiet mountain escape."),
+        ("Historic cities", "Show me Europe's most historic cities."),
+        ("Food experiences", "Authentic food experiences, wherever they are."),
+        ("Coastal journeys", "A coastal journey, ten days, no crowds."),
     ]
-    quiet = [n for n in data["cities"].values() if n["city"].get("quiet")]
-    nquiet = len(quiet)
-    quietcards = [
-        card(urls.city(n["country"], n["region"], n["city"]),
-             f"{n['country']['name']} · {n['region']['name']}", n["city"]["name"],
-             n["city"]["summary"], seed=f"city:{n['country']['slug']}:{n['city']['slug']}",
-             motif=motif_for(n["city"]["interests"], n["city"].get("city_type")))
-        for n in sorted(quiet, key=lambda n: n["city"]["name"])[:3]
-    ]
-    storycards = [
-        card(f"/stories/{st['slug']}", st["section"], st["title"], st["standfirst"],
-             seed="story:" + st["slug"], meta=f'<p class="cardmeta">{esc(st["reading"])}</p>')
-        for st in data["stories"][:3]
-    ]
-
-    # The four doors, from the Brand Bible. Not five pillars in a row: a
-    # sequence, because each one is only worth anything once the one before
-    # it has happened. "Search, then book" is the model this replaces.
-    DOORS = [
-        ("Door one", "Discover", "/discover",
-         "Find places. Fifty countries, their travel regions and their cities — including the "
-         "ones nobody puts on a list."),
-        ("Door two", "Understand", "/stories",
-         "Learn the story behind them. Why a valley speaks a different language from the next "
-         "one, and why the market starts before sunrise."),
-        ("Door three", "Experience", "/experiences",
-         "Find the things to do, the people to meet and the cultures to encounter — sorted by "
-         "what you actually travel for."),
-        ("Door four", "Journey", "/plan",
-         "Turn discovery into a route: your days, your budget, your interests, costed and "
-         "ordered, with the distances between stops made honest."),
-    ]
-    pillars = "".join(
-        f"""<a class="card door" href="{esc(u)}"><div class="card-body">
-        <p class="kicker">{esc(k)}</p><h3>{esc(t)}</h3><p class="blurb">{esc(b)}</p>
-        <p class="doorgo" aria-hidden="true">→</p></div></a>"""
-        for k, t, u, b in DOORS
+    intentchips = "".join(
+        f'<a class="chip" href="/plan?ask={quote(q)}">{esc(label)}</a>'
+        for label, q in INTENTS
     )
 
     dots = []
@@ -275,35 +263,45 @@ def home(data):
         x, y = project(n["city"]["lat"], n["city"]["lon"])
         cls = " advisory" if n["country"].get("advisory") else ""
         dots.append(f'<circle class="herodot{cls}" cx="{x:.1f}" cy="{y:.1f}" r="4"/>')
-    # The specification's first homepage section is an interactive map with
-    # filters. The filters live on the map; these open it with one already
-    # applied, which is the same thing minus a second full map on the
-    # homepage that would have to be kept in step with the first.
-    HOME_LAYERS = ["nature", "mountains", "coast", "history", "sacred", "food",
-                   "wine", "islands", "winter", "cities"]
-    layerchips = "".join(
-        f'<a class="chip" href="/map?layer={esc(k)}">'
-        f'<span aria-hidden="true">{esc(data["interests"][k]["icon"])}</span> '
-        f'{esc(data["interests"][k]["name"])}</a>'
-        for k in HOME_LAYERS
-    )
+    # The land goes UNDER the dots, and it was missing here.
+    #
+    # geo.landmass()'s own docstring says why this matters — "a dot map with
+    # nothing under it is a scatter plot" — and the homepage was the last
+    # place still making that mistake, months after the coastlines arrived
+    # and the city minimaps and journey routes were fixed. It is also the
+    # exact shape of the projection bug that survived a year here: 319 dots
+    # on an empty rectangle are the right shape by definition, because there
+    # is nothing in the frame to be the wrong shape against.
+    #
+    # It is the loudest thing on the page now, which is the point. The hero
+    # carries the image and each band below it is quieter; if every section
+    # is cinematic then none of them is.
+    ctx, land = geo.landmass(MAPPROJ, (0, 0, MAP_W, MAP_H))
+    # The eleven layer chips that used to sit under this map are gone. They
+    # were eleven links into filtered views of the same map the reader is
+    # already looking at, and they were the clearest example of the homepage
+    # explaining the machine instead of showing the continent.
     heromap = (
-        f'<a class="heromap" href="/map" aria-label="Map of all {len(data["cities"])} places in the Atlas">'
-        f'<svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true">{"".join(dots)}</svg>'
-        f'<span class="heromap-cap">{len(data["cities"])} places. Every one has a page.</span></a>'
-        f'<div class="chips heromap-filters">{layerchips}'
-        f'<a class="chip" href="/beyond-the-obvious">◦ Hidden Europe</a></div>'
+        f'<a class="heromap" href="/map" aria-label="Map of all {ncities} places in the Atlas">'
+        f'<svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true">{ctx}{land}{"".join(dots)}</svg>'
+        f'<span class="heromap-cap">{ncities} places. Every one has a page.</span></a>'
     )
 
+    # "Real places · Real stories · Personal journeys" — and deliberately no
+    # fourth item. The design this follows carried POWERED BY AI in that slot.
+    # It is the single line in the whole comp that had to go: the reader meets
+    # EuropeDoor and then experiences intelligence, and a masthead that
+    # advertises its engine is selling the engine. checks.py has refused "AI"
+    # in the masthead, the navigation and every h1 since before this comp
+    # existed, so the phrase could never have reached a built page — but the
+    # rule stops at the h1, and this kicker sits under one.
     body = f"""
 <div class="hero">
   <div class="hero-text">
-  <p class="kicker">Discover · Understand · Experience · Journey</p>
+  <p class="kicker">Real places · Real stories · Personal journeys</p>
   <h1>Open the door to Europe.</h1>
-  <p class="lede">Discover places, stories and journeys across one extraordinary continent —
-  fifty countries, their regions and their cities, held in one structure, so a fjord in
-  Vestland and a cellar in Alentejo can appear in the same itinerary without either being
-  flattened into a listicle.</p>
+  <p class="lede">Discover places, stories and journeys across one extraordinary
+  continent.</p>
   <form class="askhome" action="/plan" method="get">
     <label for="homeask">Where would you like to go — or what would you like to discover?</label>
     <input type="text" id="homeask" name="ask" autocomplete="off"
@@ -311,82 +309,33 @@ def home(data):
            data-rotate="Show me Europe&#39;s most historic cities.|Plan 10 days through Italy.|Where can I experience authentic Mediterranean culture?|I have 10 days in September. I love mountains, history and local food.">
     <button class="btn" type="submit">Plan my journey</button>
   </form>
+  <div class="chips hero-intents">{intentchips}</div>
   <p class="small askhome-note">Read by rules in your browser on the next page — not by a
   model, and not sent anywhere.</p>
-  <div class="hero-actions">
-    <a class="btn ghost" href="/discover">Explore Europe</a>
-    <a class="btn ghost" href="/countries">Every country</a>
-    <a class="btn ghost" href="/search">Search everything</a>
-  </div>
   <p class="small mt6">{ncountries} countries · {nregions} travel regions ·
-  {ncities} cities · {len(data['journeys'])} curated journeys</p>
+  {ncities} destinations · {len(data['journeys'])} curated journeys</p>
   </div>
   {heromap}
 </div>
 
-{section("Four doors", '<div class="grid cols-4 doors">' + pillars + "</div>",
-         stage="Discover",
-         lede="Discover, then understand, then experience, then journey. Each one is only worth "
-              "anything once the one before it has happened — which is why this is a sequence and "
-              "not a menu, and why it is not search-then-book.")}
+{section("Find your kind of Europe", grid(kind_cards, 4),
+         stage="Discover", tone="quiet",
+         lede="From iconic cities to hidden gems, from mountains to coastlines, from history "
+              "to the way a place eats. Each of these is a real list, and the Journey Planner "
+              "weights the same ones — so what you see here is what it will build from.",
+         more=("Explore the map", "/map"))}
 
-{section("The continent, cut a dozen ways", grid(motion_cards, 3),
-         stage="Discover",
-         lede="Not categories. Each of these is a query run against every destination on every "
-              "build, and each page prints the query that made it.",
-         more=("All twelve", "/europe-in"))}
-
-{section("You have not heard of most of Europe", grid(quietcards, 3),
-         stage="Wonder", tone="quiet",
-         lede=f"{nquiet} places in the Atlas are somewhere almost nobody has told you to go. "
-              "Europe's problem is not the number of visitors; it is that they arrive in the "
-              "same eleven places in the same six weeks. There is a score for how far a place "
-              "is from being the obvious choice, and it is published in full.",
-         more=("Every quiet place, and six straight swaps", "/beyond-the-obvious"))}
-
-{section("A continent is people before it is places", grid(storycards, 3),
-         stage="Understand",
-         lede="Why a valley speaks a different language from the next one. Why the market wakes "
-              "before sunrise. Every story links into the Atlas, and every place it touches "
-              "links back.",
-         more=("The whole desk", "/stories"))}
-
-{section("Or start from the geography", grid(cards, 3),
-         stage="Browse",
-         lede="When you would rather work down from the map than out from an idea: nine regions, "
-              "grouped by shared coast, shared mountain range and shared history, not by alphabet.",
-         more=("Every country, and every way in", "/discover"))}
-
-{section("Find your kind of Europe", interest_grid,
-         stage="Browse",
-         lede="Seventeen tags. Each is a real list, and the Journey Planner weights the same ones — "
-              "so what you see here is what it will build from.",
-         more=("Cross-border themes", "/themes"))}
-
-<div class="band">
-  <div class="band-head"><p class="stage">Plan</p><h2>Tell it what you have. It builds the route.</h2>
-  <p class="lede">Twelve days, €2,500, history and mountains — in your own words or in a form.
-  The planner reads the whole Atlas, scores every city against you, respects distance, and
-  runs entirely in your browser.</p></div>
-  <div class="hero-actions mt0">
-    <a class="btn" href="/plan">Plan a journey</a>
-    <a class="btn ghost" href="/map">See all {ncities} on the map</a>
-  </div>
-</div>
-
-{section("Routes that cross borders on purpose", grid(jcards, 3) if jcards else '<p class="small">Curated journeys are being written.</p>',
+{section("Journeys worth taking", grid(jcards, 3) if jcards else '<p class="small">Curated journeys are being written.</p>',
          stage="Go",
-         lede="A good European trip rarely stays in one country. These do not, and each one "
-              "opens in the planner so you can make it yours.",
+         lede="Curated journeys, or let EuropeDoor Guide build yours. A good European trip "
+              "rarely stays in one country — these do not, and each one opens in the planner "
+              "so you can make it yours.",
          more=("Every journey", "/journeys"))}
 
-
 <div class="note">
-  <h2 class="mini">What this is, honestly</h2>
   <p>EuropeDoor is pre-launch and editorial. Nothing here takes a payment, holds money or
-  makes a booking, and the Europe Fund deliberately carries no balances yet — see
-  <a href="/how-it-works">how it works</a> for exactly which parts are built, which are
-  designed and which are still questions.</p>
+  makes a booking — see <a href="/how-it-works">how it works</a> for exactly which parts are
+  built, which are designed and which are still questions.</p>
 </div>
 """
     return "/index.html", page(
@@ -3208,6 +3157,33 @@ def how_it_works_page(data):
         ("Europe Fund", "Public register of projects; no custody of money, and no balance shown until three gates clear", "register only"),
         ("Multilingual", "Ten languages, localisation rather than machine translation of destination copy", "designed, not built"),
     ])
+    # The four doors moved here from the homepage when that page was cut to
+    # three bands. They are a Brand Bible element, not a marketing section —
+    # the reader's path through the product, as a sequence rather than a menu
+    # of equals — and cutting the homepage band deleted the only place the
+    # sequence was written down anywhere on the site. The homepage is the
+    # door; this is the page that explains what is behind it.
+    DOORS = [
+        ("Door one", "Discover", "/discover",
+         "Find places. Fifty countries, their travel regions and their cities — including the "
+         "ones nobody puts on a list."),
+        ("Door two", "Understand", "/stories",
+         "Learn the story behind them. Why a valley speaks a different language from the next "
+         "one, and why the market starts before sunrise."),
+        ("Door three", "Experience", "/experiences",
+         "Find the things to do, the people to meet and the cultures to encounter — sorted by "
+         "what you actually travel for."),
+        ("Door four", "Journey", "/plan",
+         "Turn discovery into a route: your days, your budget, your interests, costed and "
+         "ordered, with the distances between stops made honest."),
+    ]
+    pillars = "".join(
+        f"""<a class="card door" href="{esc(u)}"><div class="card-body">
+        <p class="kicker">{esc(k)}</p><h3>{esc(t)}</h3><p class="blurb">{esc(b)}</p>
+        <p class="doorgo" aria-hidden="true">→</p></div></a>"""
+        for k, t, u, b in DOORS
+    )
+
     gated = table([
         ("Taking a payment", "Requires an incorporated entity, a named payee on every card surface, and a PSP contract", "blocked"),
         ("Holding contributions", "Requires the above plus a written position on the treatment of contributions in each collecting country", "blocked"),
@@ -3223,6 +3199,12 @@ def how_it_works_page(data):
   cheap insurance: nobody can accuse us of implying a booking engine or a fund that does not exist,
   and anybody evaluating this can see the actual state in one screen.</p>
 </div>
+
+{section("Four doors", '<div class="grid cols-4 doors">' + pillars + "</div>",
+         lede="Discover, then understand, then experience, then journey. Each one is only "
+              "worth anything once the one before it has happened — which is why this is a "
+              "sequence and not a menu, and why it is not search-then-book.")}
+
 {section("Built and live", built)}
 {section("Designed, not built", designed, lede="Specified in docs/product-specification.md in the repository, with schemas and flows. Not shipped.")}
 {section("Deliberately blocked", gated, lede="Each of these is one decision away from possible and is being held shut on purpose until the thing in the middle column exists.")}

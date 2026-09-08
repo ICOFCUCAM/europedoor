@@ -406,6 +406,112 @@ more villages in the dataset, not for more code.
 the fixed `0.16h` foreground drop fails the gate by name — *"tower: 40
 interchangeable pairs, ceiling 27"* — exit 1. Verified, not assumed.
 
+## 6.4d Experiment F — the homepage cut from eight bands to three
+
+**The direction, from the owner, against a full-page comp:** hero → discover →
+journeys → stop. No testimonials, no "Why EuropeDoor?", no feature grid, no
+statistics, no newsletter, no partner logos, no second CTA wall, no "how our
+AI works". *"The homepage is not a catalogue of everything EuropeDoor can do.
+It is the door into Europe."*
+
+### What the comp asks for that this repository cannot ship
+
+The comp is photographic throughout — a cinematic Adriatic hero, eight
+photographed category tiles, three photographed journey cards. **Zero
+photographs are licensed.** `data/images.json` is empty, the validator refuses
+a row without a photographer, a source and a licence, and `zero <img> tags` is
+an invariant. So the *structure* and the *restraint* of the comp are
+implementable today and its *imagery* is not, and no amount of design intent
+changes that. The tiles carry generated plates.
+
+That constraint turns out to serve the note the comp itself came with —
+*"slightly too saturated/photographic everywhere… if every section is a
+cinematic image, nothing feels cinematic anymore."* Plates are quieter than
+photographs by construction.
+
+### Two words in the comp that do not exist in the dataset
+
+The comp's eight categories are Mountains, History, Food, Nature, Faith &
+Heritage, Beaches, Adventure, Culture. Six are interests this atlas holds.
+**Adventure and Culture are not** — no tag, no page, no list of destinations
+that answers either word. The two slots went to the next-largest real
+interests, Architecture (126) and Big cities (74), and every tile carries its
+true name and its true count, so the label on the homepage is the heading of
+the page it opens. A tile reading "Adventure" that opened a page titled
+something else would be the smallest possible lie and still a lie.
+
+### POWERED BY AI
+
+The comp's fourth hero badge. It was never reachable: `checks.py` has refused
+"AI" in the masthead, the navigation and every `h1` since long before this
+comp existed, and the built page contains the string zero times. But **the
+rule stops at the `h1`, and that badge sits under one** — so the hero kicker
+now reads *Real places · Real stories · Personal journeys*, three items, no
+fourth. The engine is not the product.
+
+### Three defects the markup could not show
+
+Rendered at 1280 and at 390 after each change, because §6.4a is the record of
+what looking finds that reading does not.
+
+1. **`cols-4` did not produce four columns.** It is `auto-fill minmax(12rem,
+   1fr)`, which packs five tracks at 1280px, so the eight tiles wrapped 5 + 3
+   and the second row read as an orphan. The class is named for a count; above
+   the layout breakpoint it now keeps that count.
+2. **The hero map was a scatter plot.** It drew 319 dots and no coastline —
+   and `geo.landmass()`'s own docstring says why that is wrong: *"a dot map
+   with nothing under it is a scatter plot."* The city minimaps and the
+   journey routes were fixed when the coastlines arrived; the homepage was
+   the last page still making the mistake, which is also the exact shape of
+   the projection bug that survived a year here, because 319 dots on an empty
+   rectangle are the right shape by definition.
+3. **The land then rendered as a solid black blot.** The land paths are styled
+   only under `.europemap` and `.countrymap`, and an unstyled `<path>` fills
+   black. Nothing failed; the map simply arrived wrong. It is now an
+   INTELLIGENCE figure on a DISCOVER page, which is the rule every other
+   embedded map here already follows — and it is what gives the page the
+   rhythm the direction asked for: one dark, dense frame at the top, quieter
+   bands beneath it.
+
+### Four checks went red, and none of them was wrong to exist
+
+| check | what it encoded | rewritten to assert |
+|---|---|---|
+| §6 Homepage | three named ghost CTAs in the hero | the primary CTA precedes the secondary, wherever the secondary now sits |
+| §7 Homepage sections | three section titles, in order | two bands exactly, **and** that every removed surface is still linked from 1,000+ pages |
+| §5 Homepage — Explore | a filter row under the hero map | the filters exist on `/map`, which is the surface that acts on them |
+| 2036-50 The progression | six named stages matching a regex | the stages named are real ones, in canonical order, ending on Go |
+
+**Each had encoded the old page's shape rather than its promise.** A check
+that demands six bands is a check that forbids restraint. The replacements are
+weaker claims, made deliberately, and each still fails on the thing it was
+protecting — a homepage that puts journeys above discovery still goes red.
+
+### What cutting a band actually costs
+
+Nothing, for six of the seven removed surfaces: `/discover`, `/europe-in`,
+`/beyond-the-obvious`, `/stories`, `/themes`, `/map` and `/journeys` are
+linked from the masthead or footer of all 1,072 pages, and the section audit
+now asserts that rather than assuming it.
+
+**The seventh cost something.** The four doors — Discover, Understand,
+Experience, Journey, as a sequence rather than a menu of equals — are a Brand
+Bible element, and the homepage band was the only place the sequence was
+written down. For one build it existed nowhere on the site. It moved to
+`/how-it-works`: the homepage is the door, and that is the page that says what
+is behind it. **When a band goes, the question is not whether it was worth its
+space but whether it was the only home for something.**
+
+### The result
+
+| | before | after |
+|---|---|---|
+| bands under the hero | 8 | 2 |
+| homepage bytes | 69,499 | 45,806 |
+| ways-in tiles | 17 | 8 |
+| `<img>` tags | 0 | 0 |
+| "AI" on the page | 0 | 0 |
+
 ## 6.5 What must stay distinct while the identity changes
 
 The migration must **not** turn every page into INTELLIGENCE. The worlds stay

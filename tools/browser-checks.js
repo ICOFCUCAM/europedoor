@@ -732,16 +732,28 @@ async function main() {
   // discover, wonder, understand, plan, go — rather than be a grid of
   // thirty cards. A progression nobody can see is just an ordering, so the
   // steps are named on the page and checked in order here.
+  //
+  // THE HOMEPAGE IS NOW THREE BANDS AND NAMES TWO OF THOSE SIX STEPS. It
+  // used to name all six, one per band, and that was the version of this
+  // page that read as a contents list: every step present because every
+  // step was worth a section. The progression survives as an ordering the
+  // reader walks — hero, then discover, then go — and what is checked is
+  // that whatever steps ARE named appear in the canonical order. That is a
+  // weaker assertion than the one it replaces, deliberately: a check that
+  // demands six bands is a check that forbids restraint.
   await page.goto(base + "/", { waitUntil: "networkidle" });
+  const CANON = ["Open", "Discover", "Wonder", "Understand", "Browse", "Plan", "Go"];
   const stages = await page.locator(".stage").allTextContents();
-  ok(stages.length >= 6, `the homepage names ${stages.length} steps`);
   const seq = stages.join(">");
-  ok(/Discover.*Wonder.*Understand.*Plan.*Go/.test(seq),
+  ok(stages.length >= 2, `the homepage names ${stages.length} steps`);
+  const ranks = stages.map((t) => CANON.indexOf(t.trim()));
+  ok(ranks.every((r) => r >= 0),
+     `the homepage names a step that is not in the progression: ${seq}`);
+  ok(ranks.every((r, i) => i === 0 || ranks[i - 1] < r),
      `the progression is out of order: ${seq}`);
-  // Plan before Go: the planner is the conversion, and a journey you have
-  // not planned is not somewhere you are going.
-  ok(seq.lastIndexOf("Plan") < seq.lastIndexOf("Go"),
-     "the homepage ends on Plan rather than Go");
+  // It still ends on Go: the last thing the homepage asks for is a journey.
+  ok(stages[stages.length - 1].trim() === "Go",
+     `the homepage ends on ${stages[stages.length - 1]} rather than Go`);
   // The wonder band changes ground, so the rhythm is felt rather than
   // merely intended — and it must not blow out the page at any width.
   ok(await page.locator(".band.tone-quiet").count() === 1,
