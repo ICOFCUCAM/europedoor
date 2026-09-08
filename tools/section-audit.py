@@ -336,11 +336,24 @@ def s12():
          "listing product is the missing piece, not the heading.")
 def s13():
     u = "/europe/norway/fjord-norway/bergen"
-    yield has(u, "Why visit", "Places to see", "Things to do", "Events",
+    # "Why visit" became "Why go" when the destination family was given its
+    # own art direction: the same promise, moved from the fourth screen to
+    # the second, numbered, and set at reading size instead of body size.
+    yield has(u, "Why go", "Places to see", "Things to do", "Events",
               "Accommodation &amp; restaurants", "When to come", "Getting there",
               "Nearest onward stops", "Europe Experience Score", "Save to My Europe",
               "Travel tips")
     yield "minimap" in page(u), "the destination carries a map"
+    # The composition itself, asserted: the authored sentence is the hero and
+    # the argument precedes the metadata. This is the ordering the family
+    # exists to protect — a destination that reopens with a fact table has
+    # regressed to a database record, and that is the specific failure the
+    # design audit found on eleven of twelve families.
+    h = page(u)
+    yield 'class="statement"' in h, "the authored sentence is set as the hero"
+    yield ("Kind of place" not in h) or (h.index("Why go") < h.index("Kind of place")), \
+        "the argument comes before the metadata"
+    yield h.count('class="minimap"') == 1, "the map appears once, not twice"
     yield has("/europe/france/alps-and-east/chamonix", "This place, in the rest of the site"), \
         "suggested journeys and stories, where curation names the place"
 

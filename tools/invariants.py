@@ -73,8 +73,15 @@ def measure():
     prim_floor = {}
     for prim in ("kicker", "masthead", "pagehead", "crumbs", "row", "card",
                  "band", "note", "facts", "btn", "chip"):
+        # \b is the wrong boundary for a CSS class name, because a hyphen is
+        # a word boundary: `\bcard\b` matched `class="card-art frame"`, and
+        # `\brow\b` matches `rowsub` and `rowmeta`. The card floor of 0.785
+        # was therefore ~30% satisfied by an image wrapper on the 319
+        # destination pages, and the day that wrapper was renamed the floor
+        # fell through the floor. A class token ends at whitespace or the
+        # quote, never at a hyphen.
         hit = sum(1 for b in bodies.values()
-                  if re.search(r'class="[^"]*\b' + prim + r'\b', b))
+                  if re.search(r'class="[^"]*(?<![\w-])' + prim + r'(?![\w-])', b))
         prim_floor[prim] = round(hit / len(pages), 3)
 
     apps, enh = [], []
@@ -216,7 +223,15 @@ def measure():
                        "like vocabulary."},
             "primitives.reach": {
                 "value": prim_floor, "kind": "floor",
-                "why": "The share of pages each primitive appears on. A family "
+                "why": "The share of pages each primitive appears on. A family that "
+                       "stops using `row` has grown its own components and the "
+                       "design system has forked without anybody deciding. THESE "
+                       "NUMBERS WERE WRONG UNTIL THE DESTINATION EXEMPLAR: the "
+                       "matcher used \\b, and a hyphen is a word boundary, so "
+                       "`card` counted `card-art` and `row` counted `rowsub`. "
+                       "The card floor read 0.785 and the true figure is 0.226 — "
+                       "the most-cited primitive in the design system was "
+                       "three-quarters an image wrapper."
                        "that stops using `row` has grown its own components and "
                        "the design system has forked without anybody deciding."},
         },

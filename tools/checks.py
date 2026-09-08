@@ -1645,15 +1645,21 @@ def c_frontend():
 
     # 3. The primitives still generate the site. Percentages are floors, not
     # targets: a family that stops using `row` has grown its own components.
+    # `card` was 0.70 here and 0.785 in the invariant register, and BOTH were
+    # measured with `\bcard\b`, which matches `card-art` because a hyphen is
+    # a word boundary. The true figure is 0.226: the design system's
+    # most-cited primitive was three-quarters an image wrapper. Found when
+    # the destination exemplar renamed that wrapper and the floor collapsed.
+    # The matcher below now ends a class token at whitespace or the quote.
     FLOORS = {"kicker": 0.99, "masthead": 0.99, "pagehead": 0.99, "crumbs": 0.99,
-              "row": 0.85, "card": 0.70, "band": 0.70, "note": 0.70}
+              "row": 0.85, "card": 0.20, "band": 0.70, "note": 0.70}
     total = 0
     hits = {k: 0 for k in FLOORS}
     for path in site_files():
         body = open(path, encoding="utf-8").read()
         total += 1
         for prim in FLOORS:
-            if re.search(r'class="[^"]*\b' + prim + r'\b', body):
+            if re.search(r'class="[^"]*(?<![\w-])' + prim + r'(?![\w-])', body):
                 hits[prim] += 1
     for prim, floor in FLOORS.items():
         got = hits[prim] / total

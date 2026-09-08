@@ -706,6 +706,18 @@ def city_page(data, c, r, t):
     m = next(x for x in data["macros"] if x["slug"] == c["macro_slug"])
     cid = f"{c['slug']}/{r['slug']}/{t['slug']}"
     highlights = "".join(f"<li>{esc(h)}</li>" for h in t["highlights"])
+    # The three or four highlights are the ONLY universal editorial asset a
+    # destination has: every one of the 319 carries three or four, while 194
+    # of them carry no places at all and 98 carry neither places nor
+    # experiences. So the page is built on what is always there. They used to
+    # sit below a section nav, a map and a metadata table, inside the left
+    # column of a split, under the heading "Why visit" — the best writing on
+    # the page, four scrolls down and set at body size.
+    reasons = "".join(
+        f'<li><span class="rn" aria-hidden="true">{i + 1:02d}</span>'
+        f'<span class="rt">{esc(h)}</span></li>'
+        for i, h in enumerate(t["highlights"])
+    )
     kinds = data["taxonomy"]["experience_kinds"]
     # The §2.5 edge in the other direction: an experience says which place it
     # is tied to, and how. Each row carries an id so a place page can link
@@ -828,26 +840,32 @@ def city_page(data, c, r, t):
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)),
          (c["name"], urls.country(c)), (r["name"], urls.region(c, r)), (t["name"], None)])}
-<div class="pagehead">
+<div class="pagehead overture">
   <p class="kicker">{esc(r['name'])}, {esc(c['name'])}</p>
   <h1>{esc(t['name'])}</h1>
-  <p class="lede">{esc(t['summary'])}</p>
+  <p class="statement">{esc(t['summary'])}</p>
+  <p class="orient">{orient_line(t)}</p>
   {chips(t["interests"], data["interests"])}
-  {factlist([
-      ("Kind of place", esc(CITY_TYPE_NAMES.get(t.get("city_type"), ""))),
-      ("Population", pop_line(t)),
-      ("Region", f'<a href="{urls.region(c, r)}">{esc(r["name"])}</a>'),
-      ("Coordinates", f'<span class="mono">{t["lat"]:.3f}, {t["lon"]:.3f}</span>'),
-  ])}
 </div>
-<div class="card-art frame">
+
+<section class="whygo" aria-labelledby="why-visit">
+  <h2 id="why-visit">Why go</h2>
+  <ol class="reasons">{reasons}</ol>
+</section>
+
+<figure class="placeband">
+  <div class="placeband-art">
 {picture(data["images"], f"city:{cid}", w=1260, h=540,
          alt=f"{t['name']}, {c['name']}", eager=True,
-         sizes="(min-width: 76rem) 76rem, 100vw",
+         sizes="(min-width: 76rem) 44rem, 100vw",
          fallback_seed=f"city:{c['slug']}:{t['slug']}",
          fallback_motif=motif_for(t["interests"], t.get("city_type"))
                         or motif_for(r["interests"]))}
-</div>
+  </div>
+  <div class="placeband-map">{minimap(data, t, span="auto")}</div>
+  <figcaption>{art_note(data, cid, t)} {esc(t["name"])} is at
+    <span class="mono">{coord_line(t)}</span>, and this is what is around it.</figcaption>
+</figure>
 {sectionnav([
     ("Overview", "why-visit"),
     ("Places", "places" if placerows else ""),
@@ -858,11 +876,13 @@ def city_page(data, c, r, t):
     ("Stay & eat", "stay"),
     ("Onward", "onward"),
 ])}
-{minimap(data, t)}
 <div class="split mt7">
   <div>
-    <h2 id="why-visit">Why visit</h2>
-    <ul class="stack">{highlights}</ul>
+    {factlist([
+        ("Kind of place", esc(CITY_TYPE_NAMES.get(t.get("city_type"), ""))),
+        ("Population", pop_line(t)),
+        ("Region", f'<a href="{urls.region(c, r)}">{esc(r["name"])}</a>'),
+    ])}
     {scorebars(city_scores(c, r, t))}
     {section("Places to see", f'<div class="rows">{placerows}</div>',
              id="places",
@@ -1602,12 +1622,71 @@ def countrymap(data, c):
     )
 
 
+def coord_line(t):
+    """45.920°N, 6.870°E — a coordinate a reader can put into anything."""
+    return (f'{abs(t["lat"]):.3f}°{"N" if t["lat"] >= 0 else "S"}, '
+            f'{abs(t["lon"]):.3f}°{"E" if t["lon"] >= 0 else "W"}')
+
+
+def orient_line(t):
+    """One thin line under the statement: what kind of place, and how long.
+
+    This is the ONLY factual line above the argument. Everything else —
+    population, coordinates, the region link, the scores — moved below it,
+    because a reader who has not yet been told why to care about a place has
+    no use for its population. The two facts kept are the two that change
+    whether you would go at all: what kind of thing it is, and whether it is
+    an afternoon or a week.
+    """
+    bits = []
+    kind = CITY_TYPE_NAMES.get(t.get("city_type"))
+    if kind:
+        bits.append(esc(kind))
+    n = t.get("nights") or []
+    if len(n) == 2:
+        bits.append(f"{n[0]}–{n[1]} nights" if n[0] != n[1] else f"{n[0]} nights")
+    return " · ".join(bits)
+
+
+def art_note(data, cid, t):
+    """Say what the picture IS. A generated horizon shown without comment
+    beside a real coordinate invites a reader to take it for a photograph of
+    the place, and it is not one — it is drawn from the destination's own
+    tags. Where a licensed photograph exists, picture() renders its credit
+    and this says nothing, because the credit is the honest note."""
+    if (data.get("images") or {}).get(f"city:{cid}"):
+        return ""
+    return "Illustration, not a photograph —"
+
+
 def minimap(data, t, span=3.2):
     """A small map centred on one destination, drawn from the same
     projection the big map uses. Its neighbours are on it so the reader can
-    see the shape of the onward journey rather than read distances."""
+    see the shape of the onward journey rather than read distances.
+
+    `span="auto"` FITS THE FRAME TO THE COUNTRY, which a fixed number cannot.
+    The destination composition first used a fixed span=8 — tight enough to
+    feel local — and 43 of the 319 destinations came out as a nearly empty
+    rectangle with one dot in it. Not only the genuinely remote ones:
+    **Berlin and Kyiv** were in that list, because what a span means depends
+    entirely on how densely the atlas covers that part of Europe. Svalbard
+    really is alone; Berlin is not, and a map that says it is, is wrong.
+
+    So the frame widens until it has company, and stops. The caption already
+    derives and prints the real kilometres, so a map of Svalbard still says
+    it is looking across 2,000 km — the reader is told, not misled.
+    """
     cx, cy = project(t["lat"], t["lon"])
     w, h = 900, 320
+    if span == "auto":
+        pts = [project(n["city"]["lat"], n["city"]["lon"]) for n in data["cities"].values()]
+        span = 2.4
+        for cand in (10.0, 8.0, 6.0, 4.5, 3.2, 2.4):
+            near = sum(1 for x, y in pts
+                       if abs(x - cx) <= w / 2 / cand and abs(y - cy) <= h / 2 / cand)
+            if near >= 6:          # the destination itself plus five others
+                span = cand
+                break
     # The caption used to claim "within about 192 kilometres", which was
     # span x 60 and meant nothing. Derive it from the projection instead:
     # the frame is far wider than it is deep, and both shrink with latitude.

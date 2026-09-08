@@ -42,7 +42,7 @@
       "why": "Zero. A webfont is a third-party origin, a render delay and a hole in default-src 'none'. 2036 does not require a new typeface."
     },
     "css.font_sizes": {
-      "value": 14,
+      "value": 15,
       "kind": "ceiling",
       "why": "A ceiling, not a target. The sibling repository measures 418; that is what happens without a line."
     },
@@ -122,8 +122,8 @@
         "masthead": 1.0,
         "pagehead": 0.999,
         "crumbs": 0.998,
-        "row": 0.911,
-        "card": 0.785,
+        "row": 0.909,
+        "card": 0.226,
         "band": 0.763,
         "note": 0.812,
         "facts": 0.731,
@@ -131,7 +131,7 @@
         "chip": 0.516
       },
       "kind": "floor",
-      "why": "The share of pages each primitive appears on. A family that stops using `row` has grown its own components and the design system has forked without anybody deciding."
+      "why": "The share of pages each primitive appears on. A family that stops using `row` has grown its own components and the design system has forked without anybody deciding. THESE NUMBERS WERE WRONG UNTIL THE DESTINATION EXEMPLAR: the matcher used \\b, and a hyphen is a word boundary, so `card` counted `card-art` and `row` counted `rowsub`. The card floor read 0.785 and the true figure is 0.226 — the most-cited primitive in the design system was three-quarters an image wrapper.that stops using `row` has grown its own components and the design system has forked without anybody deciding."
     }
   }
 }

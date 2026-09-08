@@ -150,7 +150,7 @@ Measured by how much of the site each one actually appears on:
 | `kicker`, `masthead`, `pagehead`, `crumbs` | 7,590 | **100%** |
 | `row` / `rows` | 11,378 | **91%** |
 | `note` | 1,014 | 81% |
-| `card` | 6,087 | 78% |
+| `card` | 6,087 | **23%** — was published as 78%; the matcher counted `card-art` because a hyphen is a word boundary |
 | `plate` (the generated illustration) | 2,377 | 78% |
 | `band` | 6,508 | 76% |
 | `facts` | 784 | 73% |
@@ -162,7 +162,8 @@ Measured by how much of the site each one actually appears on:
 | `sectionnav` | 319 | 30% |
 
 **Eleven primitives account for essentially every pixel.** Restyling `row`,
-`card` and `band` restyles three quarters of the site; restyling the four
+`band` restyles three quarters of the site (`card` reaches 23%, not the 78% this
+document published before the matcher was corrected); restyling the four
 100% primitives restyles all of it. That is the lever, and it is why §4 should
 never contain the phrase "redesign 1,072 pages".
 

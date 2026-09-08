@@ -1416,3 +1416,101 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
   .grid.mosaic > :nth-child(2) .plate { aspect-ratio: 21 / 9; }
 }
 .homefoot { margin-top: var(--s8); }
+
+
+/* ── DESTINATION: the art direction of one content family ─────────────
+ *
+ * The audit found eleven of twelve page families opening with an
+ * identically-sized h1 at an identical vertical position, after an
+ * identical kicker and lede. A destination and an archaeological site and a
+ * 34-day journey all began the same way. This is the first family given a
+ * composition of its own.
+ *
+ * These class names are NOT new primitives. .overture, .whygo, .reasons and
+ * .placeband each appear on exactly one family, and a primitive here needs
+ * the same pattern in three places. They are this family's art direction,
+ * and they compose the existing .pagehead, .kicker, .chip, .facts and
+ * .minimap rather than replacing any of them — which is why the primitive
+ * reach floors still hold.
+ *
+ * WHAT IS DOMINANT, AND WHY. A destination's only universal editorial asset
+ * is one authored sentence and three or four highlights: every one of the
+ * 319 has them, while 194 have no places at all and 98 have neither places
+ * nor experiences. So the sentence is the hero and the highlights are the
+ * argument. Population, coordinates, the region link and the scores moved
+ * BELOW both — a reader who has not been told why to care about a place has
+ * no use for its population.
+ */
+/* Mobile-first, and the values are not decoration: measured at 390x844, the
+ * shell spends 168px on a wrapped masthead and 53 on breadcrumbs, so 41% of
+ * the first screen is gone before the place is named. What this family can
+ * control is the space it spends itself, so it spends less of it on a phone
+ * and the argument starts higher. Written mobile-first and widened at an
+ * EXISTING breakpoint, so the breakpoint ceiling does not move. */
+.overture { padding-top: var(--s4); }
+.overture h1 { max-width: 14ch; }
+/* The authored sentence, at display scale. It was a .lede — 17px grey body
+ * copy — which is how the best-written thing on the page ended up looking
+ * like a caption. 66 to 144 characters across the atlas, median 103, so the
+ * measure is set for two lines at the top of that range and never more. */
+.statement {
+  font-family: var(--display);
+  font-size: clamp(var(--t-xl), 3.1vw, var(--t-3xl));
+  line-height: 1.12;
+  letter-spacing: -0.012em;
+  max-width: 26ch;
+  margin: var(--s4) 0 0;
+  color: var(--ink);
+  text-wrap: balance;
+}
+/* The only factual line above the argument, and only two facts: what kind
+ * of thing it is, and whether it is an afternoon or a week. Both change
+ * whether you would go at all. */
+.orient {
+  margin: var(--s4) 0 0; font-size: var(--t-xs); letter-spacing: .12em;
+  text-transform: uppercase; color: var(--ink-3); font-weight: 600;
+}
+.overture .chips { margin-top: var(--s4); }
+
+/* THE ARGUMENT. Numbered, because three reasons presented as a bulleted
+ * list read as a specification and the same three numbered read as an
+ * editor's case. */
+.whygo { margin-top: var(--s6); border-top: 1px solid var(--rule); padding-top: var(--s5); }
+.whygo h2 { font-size: var(--t-xs); letter-spacing: .12em; text-transform: uppercase;
+            color: var(--ink-3); font-weight: 600; margin: 0 0 var(--s5); }
+.reasons { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s4); }
+.reasons li { display: grid; grid-template-columns: 2.6rem 1fr; align-items: baseline;
+              gap: var(--s3); }
+.reasons .rn { font-family: var(--mono); font-size: var(--t-sm); color: var(--door);
+               font-variant-numeric: tabular-nums; }
+/* An existing type step and an existing line-height. The first version
+ * invented a clamp and a 1.42 for this, which is how a type scale grows by
+ * two steps for one section nobody would have missed them on. */
+.reasons .rt { font-size: var(--t-md); line-height: 1.5;
+               max-width: 46ch; color: var(--ink); }
+@media (min-width: 62rem) {
+  .overture { padding-top: var(--s7); }
+  .whygo { margin-top: var(--s8); padding-top: var(--s6); }
+  /* auto-fit, not a fixed 3. 272 destinations carry three highlights and 47
+   * carry four; a hard three-column grid wrapped the fourth onto a row of
+   * its own, and Venice and Longyearbyen both shipped with an orphan. */
+  .reasons { grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: var(--s6); }
+  .reasons li { grid-template-columns: 1fr; gap: var(--s2); }
+}
+
+/* WHERE IT IS, AND WHAT KIND OF COUNTRY IT IS — one figure, so the
+ * illustration has a reason to exist beside a real coordinate instead of
+ * sitting at the top as a decorative box. The caption says which of the two
+ * it is; a generated horizon shown silently next to real geography invites
+ * a reader to take it for a photograph. */
+.placeband { margin: var(--s8) 0 0; display: grid; gap: var(--s4); }
+.placeband-art .plate, .placeband-art picture { display: block; width: 100%;
+  height: 100%; object-fit: cover; border-radius: var(--radius); }
+.placeband-art { aspect-ratio: 16 / 9; overflow: hidden; border-radius: var(--radius); }
+.placeband-map .minimap { margin: 0; }
+.placeband figcaption { grid-column: 1 / -1; font-size: var(--t-xs); color: var(--ink-3);
+                        line-height: 1.5; }
+@media (min-width: 62rem) {
+  .placeband { grid-template-columns: 5fr 7fr; align-items: stretch; }
+  .placeband-art { aspect-ratio: auto; }
+}
