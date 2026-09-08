@@ -528,6 +528,66 @@
    * module-level `result` here: a previous version did, and every subsequent
    * plan then rendered inside a collapsed details block from a request two
    * screens ago. */
+  /* Once a route has been edited it is no longer what the planner would
+   * produce from these inputs, so it has to be carried explicitly rather
+   * than regenerated. EDITED holds it; "Give me a different one" and any
+   * change to the form clear it, because at that point the reader has asked
+   * for a new plan rather than a change to this one. */
+  var EDITED = null;
+
+  function editRoute(fn) {
+    if (!EDITED) return;
+    var route = EDITED.route, opts = EDITED.opts;
+    fn(route);
+    if (!route.length) { EDITED = null; go(); return; }
+    // Days are the sum of the nights plus the journey home, so an edit
+    // moves the trip length rather than silently reflowing it into a
+    // number the reader did not choose.
+    var nights = 0;
+    for (var i = 0; i < route.length; i++) nights += route[i].nights;
+    opts.days = nights + 1;
+    form.days.value = opts.days;
+    drawPlan(route, opts, result);
+    result.insertAdjacentHTML("afterbegin",
+      '<div class="note"><p><strong>You have changed this itinerary.</strong> ' +
+      "The days, the distances and the estimate below are recomputed from your version, " +
+      "not from the planner's. " +
+      '<button type="button" class="linkish" id="replan">Start again from the form</button></p></div>');
+    var again = document.getElementById("replan");
+    if (again) again.addEventListener("click", function () { EDITED = null; go(); });
+    result.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function wireEditing(scope, route, opts) {
+    EDITED = { route: route, opts: opts };
+    scope.querySelectorAll("[data-move]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var i = Number(b.getAttribute("data-move")), d = Number(b.getAttribute("data-dir"));
+        editRoute(function (r) {
+          if (i + d < 0 || i + d >= r.length) return;
+          var tmp = r[i]; r[i] = r[i + d]; r[i + d] = tmp;
+          // A reordered route is no longer the planner's, so the forced-leg
+          // note from the original ordering is no longer true of it.
+          r.forEach(function (st) { delete st.forced; });
+        });
+      });
+    });
+    scope.querySelectorAll("[data-nights]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var i = Number(b.getAttribute("data-nights")), by = Number(b.getAttribute("data-by"));
+        editRoute(function (r) {
+          r[i].nights = Math.max(1, Math.min(14, r[i].nights + by));
+        });
+      });
+    });
+    scope.querySelectorAll("[data-drop]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var i = Number(b.getAttribute("data-drop"));
+        editRoute(function (r) { if (r.length > 2) r.splice(i, 1); });
+      });
+    });
+  }
+
   function drawPlan(route, opts, into) {
     var out = into || result;
     CUR = opts.currency || "EUR";
@@ -576,13 +636,35 @@
           }).join(", ") + ". The planner ranked them just behind.</p>"
         : "";
 
+      /* The itinerary is editable from here, which is the difference
+       * between a suggestion and a plan. Every control is a real button
+       * with a real label — not a drag handle — because drag-and-drop is
+       * unusable with a keyboard, unusable with a screen reader, and
+       * miserable on a phone, and this is a list of at most fourteen
+       * things. "Move up" is not a worse interaction than dragging; it is
+       * a better one that looks less impressive. */
+      var controls =
+        '<p class="legedit">' +
+        '<button type="button" class="linkish" data-move="' + i + '" data-dir="-1"' +
+          (i === 0 ? " disabled" : "") + ' aria-label="Move ' + city.name + ' earlier">↑ earlier</button>' +
+        '<button type="button" class="linkish" data-move="' + i + '" data-dir="1"' +
+          (i === route.length - 1 ? " disabled" : "") + ' aria-label="Move ' + city.name + ' later">↓ later</button>' +
+        '<button type="button" class="linkish" data-nights="' + i + '" data-by="-1"' +
+          (st.nights <= 1 ? " disabled" : "") + ' aria-label="One night fewer in ' + city.name + '">− night</button>' +
+        '<button type="button" class="linkish" data-nights="' + i + '" data-by="1"' +
+          ' aria-label="One night more in ' + city.name + '">+ night</button>' +
+        '<button type="button" class="linkish drop" data-drop="' + i + '"' +
+          (route.length <= 2 ? " disabled" : "") + ' aria-label="Remove ' + city.name + ' from the route">× remove</button>' +
+        "</p>";
+
       legs += '<li class="leg"><div class="leg-when">' + when + '</div><div>' +
               '<h3><a href="' + city.url + '">' + city.name + "</a> <span class=\"small\">· " +
               city.country + " · " + city.region + "</span></h3>" +
               "<p>" + city.why + "</p>" +
               '<p class="small mt-tight">' + whyLine(city, opts.wants) +
               " " + money(dailyRate(city, opts.style)) + " a day here." + "</p>" +
-              '<ul class="daylist">' + dayHtml + "</ul>" + forcedNote + altHtml + hop +
+              '<ul class="daylist">' + dayHtml + "</ul>" + forcedNote + altHtml +
+              controls + hop +
               "</div></li>";
       day = last + 1;
     }
@@ -632,6 +714,7 @@
       '<a href="/sources">How these numbers are made</a>.</p>';
 
     wireSaveAndShare(route, opts, out);
+    wireEditing(out, route, opts);
   }
 
 
@@ -1089,6 +1172,7 @@
 
   function go(e) {
     if (e) e.preventDefault();
+    EDITED = null;
     currentGeo = [];
     var opts = readForm();
     // Submitting the form is stating the budget: the number is on screen in

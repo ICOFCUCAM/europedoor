@@ -33,7 +33,7 @@ Phases 0–4 are not blocked, and that is where the work is.
 | **0** | Foundation | **mostly done, gaps named below** | design system, error handling, test infra and CI all exist. Auth and DB are deliberately absent |
 | **1** | Europe knowledge foundation | **done** | 50 countries → 130 regions → 319 destinations → 192 places → 197 experiences, validated, with sources and verification states |
 | **2** | Public discovery | **done** | every surface ships; SEO gap named below |
-| **3** | Journey system | **mostly done** | 17 curated journeys, itinerary builder, save, share. Day-level drag-reorder is missing |
+| **3** | Journey system | **done, bar one** | curated journeys, itinerary builder, save, share, and stop-level editing. Adding a stop to an existing route is the gap |
 | **4** | AI | **rules, no model** | the whole pipeline except the model: intent extraction, retrieval, planning, refusal. See `docs/ai.md` |
 | **5** | Users | **blocked** | browser-local only. Needs a data controller |
 | **6** | Businesses | **blocked** | needs authentication |
@@ -97,15 +97,32 @@ Phases 0–4 are not blocked, and that is where the work is.
 
 ### Phase 3 — finish the journey system
 
-7. **Reorder and edit a saved itinerary.** The planner builds and saves; it
-   cannot yet be edited stop-by-stop. This needs the frozen-document model in
-   `docs/technical-foundation.md` §1.2, not a database.
+7. ~~**Reorder and edit a saved itinerary.**~~ **Done.** Any stop can be
+   moved earlier or later, lengthened, shortened or removed, and the days,
+   distances and estimate all recompute from the reader's version rather
+   than the planner's.
+
+   Buttons, not drag handles. Drag-and-drop is unusable with a keyboard,
+   unusable with a screen reader and miserable on a phone; for a list of at
+   most fourteen things, "move earlier" is a better interaction that merely
+   looks less impressive — and it is testable, which drag is not.
+
+   The edited route is carried explicitly and travels in the share link,
+   because regenerating from the form inputs would re-run a planner that
+   deliberately jitters and hand somebody a different trip.
+
+### Phase 3 — what is left
+
+8. **A stop cannot yet be *added* to an existing route.** Removing and
+   reordering work; inserting a destination needs a picker over the whole
+   Atlas, which is the search index the site already ships — a contained
+   piece of work, and the obvious next one here.
 
 ### Phase 1 — the dataset, which is the actual asset
 
-8. **Places: 192 of a 1,000 MVP target.** 44 countries have none at all.
-9. **Stories: 9 of 100.** Roughly a day each, and not automatable.
-10. **Fact verification: 0 of 50 countries.** The machinery is built and
+9. **Places: 192 of a 1,000 MVP target.** 44 countries have none at all.
+10. **Stories: 9 of 100.** Roughly a day each, and not automatable.
+11. **Fact verification: 0 of 50 countries.** The machinery is built and
    expires correctly; nobody has done a check. This is the single biggest
    credibility gap on the site and it is published as such.
 
@@ -114,10 +131,10 @@ these three.
 
 ### Blocked, and the order they unblock in
 
-11. Entity incorporated → data controller → accounts → **Phase 5**
-12. Accounts → operator claims → **Phase 6**
-13. Accounts → contributor roles → **Phase 7** browser CMS
-14. Traffic → **Phase 9**
+12. Entity incorporated → data controller → accounts → **Phase 5**
+13. Accounts → operator claims → **Phase 6**
+14. Accounts → contributor roles → **Phase 7** browser CMS
+15. Traffic → **Phase 9**
 
 ## What this roadmap deliberately does not do
 

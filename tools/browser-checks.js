@@ -232,6 +232,85 @@ async function main() {
      `favouring a saved place did not put it in the route: ${withSaved.route}`);
   await page.evaluate(() => localStorage.removeItem("europedoor.saved.v1"));
 
+  // ── editing an itinerary ───────────────────────────────────────────
+  // The difference between a suggestion and a plan. Every control is a real
+  // button with a real label, so this is also the accessibility check for
+  // the feature — there is no drag-and-drop to be untestable.
+  async function freshPlan() {
+    await page.goto(base + "/plan", { waitUntil: "networkidle" });
+    await page.fill("#days", "14");
+    await page.fill("#budget", "3000");
+    await page.check('input[name="interest"][value="history"]');
+    await page.click('#planner button[type="submit"]');
+    await page.waitForSelector("#result .leg");
+    return (await page.locator("#result .leg h3 a").allTextContents());
+  }
+  const startRoute = await freshPlan();
+  ok(startRoute.length >= 4, `only ${startRoute.length} stops to edit`);
+
+  // Reorder. The second stop becomes the first.
+  await page.click('.leg:nth-child(2) [data-move][data-dir="-1"]');
+  await page.waitForSelector("#result .note");
+  const reordered = await page.locator("#result .leg h3 a").allTextContents();
+  ok(reordered[0] === startRoute[1] && reordered[1] === startRoute[0],
+     `reorder did not swap: ${startRoute.slice(0,2)} -> ${reordered.slice(0,2)}`);
+  ok(/You have changed this itinerary/.test(await page.locator("#result").innerHTML()),
+     "an edited itinerary did not say it had been edited");
+  // The first stop can never move earlier.
+  ok(await page.locator('.leg:nth-child(1) [data-move][data-dir="-1"]').isDisabled(),
+     "the first stop offers to move earlier");
+
+  // Remove. The route shortens and the days follow the nights, rather than
+  // silently reflowing into a length the reader did not choose.
+  const daysBefore = Number(await page.inputValue("#days"));
+  await page.click('.leg:nth-child(2) [data-drop]');
+  await page.waitForTimeout(150);
+  const afterDrop = await page.locator("#result .leg h3 a").allTextContents();
+  ok(afterDrop.length === reordered.length - 1,
+     `removing a stop left ${afterDrop.length} of ${reordered.length}`);
+  ok(!afterDrop.includes(reordered[1]), `${reordered[1]} was removed but is still in the route`);
+  const daysAfter = Number(await page.inputValue("#days"));
+  ok(daysAfter < daysBefore, `days did not follow the removed stop: ${daysBefore} -> ${daysAfter}`);
+
+  // Nights. The estimate must move with them — an editable itinerary whose
+  // cost does not change is a list, not a plan.
+  const costBefore = parseInt((await page.locator("#result .result-summary dd").first()
+                              .textContent()).replace(/[^0-9]/g, ""), 10);
+  await page.click('.leg:nth-child(1) [data-nights][data-by="1"]');
+  await page.waitForTimeout(150);
+  const costAfter = parseInt((await page.locator("#result .result-summary dd").first()
+                             .textContent()).replace(/[^0-9]/g, ""), 10);
+  ok(costAfter > costBefore, `adding a night did not change the estimate: ${costBefore} -> ${costAfter}`);
+  // And a stop can never go below one night.
+  for (let i = 0; i < 20; i++) {
+    const btn = page.locator('.leg:nth-child(1) [data-nights][data-by="-1"]');
+    if (await btn.isDisabled()) break;
+    await btn.click();
+    await page.waitForTimeout(60);
+  }
+  ok(await page.locator('.leg:nth-child(1) [data-nights][data-by="-1"]').isDisabled(),
+     "a stop can be reduced below one night");
+
+  // Sharing an edited plan must carry the EDIT, not the inputs. This is the
+  // whole point of the frozen route: regenerating from the form would run
+  // the planner again, and the planner jitters.
+  const editedRoute = await page.locator("#result .leg h3 a").allTextContents();
+  await page.click("#shareplan");
+  await page.waitForTimeout(150);
+  const sharedUrl = page.url();
+  ok(/[?&]r=/.test(sharedUrl), "the shared link does not carry the route itself");
+  await page.goto(sharedUrl, { waitUntil: "networkidle" });
+  await page.waitForSelector("#result .leg");
+  const restored = await page.locator("#result .leg h3 a").allTextContents();
+  ok(restored.join("|") === editedRoute.join("|"),
+     `a shared edited plan came back different:\n  saved:    ${editedRoute.join(" > ")}\n  restored: ${restored.join(" > ")}`);
+
+  // Starting again from the form abandons the edit rather than compounding it.
+  await page.click('#planner button[type="submit"]');
+  await page.waitForSelector("#result .leg");
+  ok(!/You have changed this itinerary/.test(await page.locator("#result").innerHTML()),
+     "a fresh plan still claimed to be an edited one");
+
   // ── refusing, instead of fabricating ───────────────────────────────
   // The UI specification's sharpest line: "Do not fabricate a result just to
   // avoid an error." This planner scores every city in the Atlas, so it can

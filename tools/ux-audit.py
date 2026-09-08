@@ -243,13 +243,28 @@ def s13():
     yield "daylist" in PLANNER, "rendered as day cards"
 
 
-@section(14, "Journey customisation", "PARTIAL",
-         "Every stop offers alternatives and the whole plan rebuilds from "
-         "changed inputs. Drag-to-reorder needs a stateful itinerary "
-         "document, which is the saved-plan feature an account would carry.")
+@section(14, "Journey customisation", "BUILT",
+         "Reorder, remove and lengthen or shorten any stop; the days, the "
+         "distances and the estimate all recompute from the reader's "
+         "version. Buttons rather than drag handles, deliberately — and the "
+         "edited route is what gets shared, not the inputs that made it.")
 def s14():
     yield "alternativesFor" in PLANNER, "each stop offers alternatives"
     yield 'id="again"' in page("/plan"), "and the whole plan can be rebuilt"
+    for control in ("data-move", "data-nights", "data-drop"):
+        yield control in PLANNER, f"stops can be edited: {control}"
+    # Drag-and-drop is unusable with a keyboard, unusable with a screen
+    # reader and miserable on a phone. For a list of at most fourteen
+    # things, "move earlier" is a better interaction that looks less
+    # impressive — and it is testable, which drag is not.
+    yield "aria-label=\"Move " in PLANNER, "every control is labelled"
+    yield "EDITED" in PLANNER, "an edited route is carried, not regenerated"
+    yield "You have changed this itinerary" in PLANNER, "and the page says so"
+    # The planner jitters, so regenerating a shared plan from its inputs
+    # would return a different trip. The route travels in the link.
+    yield 'q.set("r"' in PLANNER, "the shared link carries the route itself"
+    yield "a shared edited plan came back different" in BROWSER, \
+        "with a browser check that a shared edit restores as edited"
 
 
 # ── 15–20: the page types ─────────────────────────────────────────────

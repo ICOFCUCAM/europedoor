@@ -762,3 +762,22 @@ picture { display: block; position: relative; height: 100%; }
           opacity: 0; transition: opacity .16s ease; }
 picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 @media (max-width: 44rem) { .credit { opacity: 1; } }
+
+/* ── editing an itinerary ─────────────────────────────────────
+ * Buttons, not drag handles. Drag-and-drop is unusable with a keyboard,
+ * unusable with a screen reader and miserable on a phone, and this is a
+ * list of at most fourteen things — "move earlier" is a better interaction
+ * that merely looks less impressive.
+ *
+ * They sit at 44px on a phone because they are the controls a reader uses
+ * most and the WCAG 2.2 target-size floor is not a ceiling.
+ */
+.legedit { display: flex; flex-wrap: wrap; gap: var(--s3); margin: var(--s3) 0 0;
+           font-size: var(--t-sm); }
+.legedit .linkish { min-height: 32px; padding: 2px 0; }
+.legedit .linkish[disabled] { opacity: .35; cursor: default; text-decoration: none; }
+.legedit .drop { color: var(--warn); }
+@media (max-width: 44rem) {
+  .legedit { gap: var(--s4); }
+  .legedit .linkish { min-height: 44px; }
+}

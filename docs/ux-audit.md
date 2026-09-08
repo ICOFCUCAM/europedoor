@@ -8,7 +8,7 @@ its requirements are about how something looks and nobody can check a feeling.
 So every row here asserts against the generated HTML, the CSS and the JavaScript
 as they actually are.
 
-**43 sections · 15 already · 13 partial · 12 built · 1 refused · 1 locked · 1 deferred · 218 assertions · 0 failing**
+**43 sections · 15 already · 13 built · 12 partial · 1 refused · 1 locked · 1 deferred · 226 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -25,7 +25,7 @@ as they actually are.
 | 11 | Conversational mode | PARTIAL | 4 | The planner reads a sentence, shows back what it understood, and asks only the follow-ups that would change the answer. It does not hold a turn-by-turn conversation, because that needs a model. |
 | 12 | Results screen | ALREADY | 3 | Days, travellers, the route, the estimate and save/share. |
 | 13 | Day cards | ALREADY | 2 | A card per day with what is on it and what the day costs. |
-| 14 | Journey customisation | PARTIAL | 2 | Every stop offers alternatives and the whole plan rebuilds from changed inputs. Drag-to-reorder needs a stateful itinerary document, which is the saved-plan feature an account would carry. |
+| 14 | Journey customisation | BUILT | 10 | Reorder, remove and lengthen or shorten any stop; the days, the distances and the estimate all recompute from the reader's version. Buttons rather than drag handles, deliberately — and the edited route is what gets shared, not the inputs that made it. |
 | 15 | Country page | ALREADY | 1 | Hero, regions, popular destinations, experiences and journeys, in the brief's order. |
 | 16 | Destination page | BUILT | 5 | The brief's section navigation, scrolling sideways on a phone and listing only the sections this page actually has. |
 | 17 | Content hierarchy | ALREADY | 2 | Why visit, then what to see, then what to do, then where to stay, then how to turn it into a journey. Discovery-first, as asked. |

@@ -1216,6 +1216,11 @@ def s84():
          "customise → save → share all work. Book, travel, review and "
          "return need the blocked half.")
 def s85():
+    # "Customise" is the step most planners skip: they generate, and then
+    # the only edit available is generating again.
+    js = src("assets/js/planner.js")
+    yield "data-move" in js and "data-drop" in js and "data-nights" in js, \
+        "an itinerary can be reordered, shortened and cut"
     yield exists("/discover") and exists("/europe/norway/fjord-norway/bergen"), "discover to destination"
     yield "planUrl" in src("assets/js/planner.js"), "customise, save and share"
     yield has("/how-it-works", "Deliberately blocked"), "and the rest is named as blocked"

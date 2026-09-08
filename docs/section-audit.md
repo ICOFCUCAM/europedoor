@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**100 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 1 locked · 1 refused · 1 built (deliberately smaller) · 1272 assertions · 0 failing**
+**100 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 1 locked · 1 refused · 1 built (deliberately smaller) · 1273 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -95,7 +95,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 82 | Brand personality | RECORDED | 2 | Intelligent, welcoming, culturally careful — and specifically not a booking engine, which the whole product is arranged around. |
 | 83 | Visual direction | PARTIAL | 4 | Editorial, map-led, generous whitespace, one type scale. The specification asks for large photography; there are no photographs at all, which is a licensing decision, not an aesthetic one. |
 | 84 | Design system | BUILT | 13 | Every component on the specification's list exists as one CSS class in one stylesheet, and a page may not ship its own style block. |
-| 85 | Core user flow | PARTIAL | 3 | Discover → destination → experience → planner → journey → customise → save → share all work. Book, travel, review and return need the blocked half. |
+| 85 | Core user flow | PARTIAL | 4 | Discover → destination → experience → planner → journey → customise → save → share all work. Book, travel, review and return need the blocked half. |
 | 86 | Business user flow | PARTIAL | 2 | Discover, understand the tiers and the price all work. Create an account onwards needs authentication. |
 | 87 | Tourism board flow | PARTIAL | 1 | The offer and the refusal are published; the campaign machinery needs traffic and a contract. |
 | 88 | Development phases | RECORDED | 6 | The roadmap is now written against the ten-phase development brief and states, per phase, whether it is done, partial or blocked — and for the blocked ones, that they all trace to the same missing entity rather than to anything technical. |
