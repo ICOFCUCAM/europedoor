@@ -1602,18 +1602,45 @@ def c_frontend():
             fail(f"{rel(path)} has {foot} footers; there must be exactly one")
         n += 2
 
-    # 2. Five applications, and no more without a decision.
-    APPS = {"planner.js", "search.js", "map.js", "discover.js", "events.js"}
-    carriers = set()
-    for path in site_files():
-        body = open(path, encoding="utf-8").read()
-        for m in re.finditer(r"/assets/js/([a-z-]+\.js)", body):
-            if m.group(1) != "my-europe.js":
-                carriers.add(m.group(1))
-    extra = carriers - APPS
-    if extra:
-        fail(f"a sixth application appeared: {sorted(extra)} — 1,067 of 1,072 pages "
-             f"are documents, and docs/frontend-architecture.md is written on that")
+    # 2. Five applications and two enhancements — tested by BEHAVIOUR rather
+    # than by a list of filenames, because a list of filenames goes stale and
+    # a behaviour does not.
+    #
+    # The first version of this check was a hardcoded set and it had the
+    # boundary backwards: it counted events.js (36 lines, a checkbox filter
+    # over rows already in the page) as an application, and my-europe.js
+    # (which owns all three storage keys) as not one. The objective test:
+    #
+    #   an APPLICATION fetches an index, or owns client state, or both.
+    #     It must declare its dependencies in data/contracts.json.
+    #   an ENHANCEMENT does neither. It operates on markup already in the
+    #     page, so the page works without it, and it stays small.
+    #
+    # A script that starts fetching or storing has become an application and
+    # has to say what it depends on. A script that does neither and grows past
+    # a hundred lines is doing something that needs declaring.
+    cpath = os.path.join(ROOT, "data", "contracts.json")
+    declared = set()
+    if os.path.exists(cpath):
+        with open(cpath, encoding="utf-8") as fh:
+            declared = {c["consumer"] for c in json.load(fh)["consumers"]}
+    apps, enhancements = [], []
+    for js_path in sorted(glob.glob(os.path.join(ROOT, "assets", "js", "*.js"))):
+        relp = os.path.relpath(js_path, ROOT)
+        body = open(js_path, encoding="utf-8").read()
+        stateful = ("fetch(" in body or "localStorage" in body)
+        (apps if stateful else enhancements).append((relp, body.count("\n")))
+        if stateful and relp not in declared:
+            fail(f"{relp} fetches or owns state, which makes it an application — "
+                 f"declare what it depends on in data/contracts.json")
+        if not stateful and body.count("\n") > 100:
+            fail(f"{relp} has {body.count(chr(10))} lines and neither fetches nor "
+                 f"stores anything. An enhancement that large is an application "
+                 f"that has not said so")
+        n += 1
+    if len(apps) != 5:
+        fail(f"{len(apps)} application scripts, and docs/frontend-architecture.md "
+             f"is written on there being five: {sorted(a for a, _ in apps)}")
     n += 1
 
     # 3. The primitives still generate the site. Percentages are floors, not
@@ -1667,8 +1694,8 @@ def c_docs():
     number copied out of a generated document is a number that will be wrong
     within a month, and the fix is to link rather than to copy.
     """
-    required = ["api-architecture", "frontend-architecture", "schema-mapping",
-                "instruction",
+    required = ["api-architecture", "frontend-architecture", "visual-architecture",
+                "schema-mapping", "instruction",
                 "architecture", "product", "development", "database", "roadmap",
                 "api", "ai", "deployment", "security", "content-model",
                 "brand", "brand-lock", "images", "data-model", "legal-position",
@@ -1683,6 +1710,25 @@ def c_docs():
         if os.path.getsize(path) < 400:
             fail(f"docs/{name}.md is a stub")
         n += 1
+
+    # CLAUDE.md is read first by every session and was the one hand-written
+    # file the staleness rule did not cover. It carried five wrong counts —
+    # 28 checks, 540 browser checks, 1,273 and 326 assertions, 244 cities —
+    # all of which had been true once. A count in the file everybody reads
+    # first is the worst place for a count to go stale.
+    claude = os.path.join(ROOT, "CLAUDE.md")
+    if os.path.exists(claude):
+        body = open(claude, encoding="utf-8").read()
+        for pat, what in ((r"\b(\d+) checks\b", "a check count"),
+                          (r"\b(\d+) browser checks\b", "a browser-check count"),
+                          (r"\b(\d+) assertions\b", "an assertion count"),
+                          (r"\b(\d+) cities\b", "a destination count"),
+                          (r"\b(\d+) pages\b", "a page count")):
+            for m in re.finditer(pat, body):
+                fail(f"CLAUDE.md states {what} ({m.group(0)!r}). Every one of these "
+                     f"grew during a single session — link to the command or the "
+                     f"generated document instead of copying its number")
+            n += 1
 
     # The generated documents own these numbers. A hand-written document that
     # restates one has taken on a maintenance obligation nobody will honour.

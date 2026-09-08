@@ -60,8 +60,37 @@ this discipline is preventing, not a hypothetical.
 | | pages | loads |
 |---|---:|---|
 | documents with no script at all | **453** | — |
-| documents with a save button | **613** | `my-europe.js` only |
-| **applications** | **5** | `planner.js`, `search.js`, `map.js`, `discover.js`, `events.js` |
+| documents with a save button | **613** | the save-button half of `my-europe.js` |
+| **applications** | **5** | `planner.js` · `map.js` · `my-europe.js` · `search.js` · `discover.js` |
+| enhancements | 1 | `events.js` — 36 lines |
+
+**The fifth application, named from the repository rather than the brief, is
+Search.** In descending size:
+
+| | lines | surface | reads | owns |
+|---|---:|---|---|---|
+| Planner | 1,721 | `/plan` | `atlas.json` | `saved.v1` |
+| Map | 643 | `/map` | `geo/*` | — |
+| My Europe | 394 | `/my-europe` | `atlas.json` | all three storage keys |
+| **Search** | 385 | `/search` | `search.json` | — |
+| Discover Mode | 270 | `/discover` | `atlas.json` | — |
+
+**And a correction to this audit's own first draft.** It named `events.js` as
+the fifth application and treated `my-europe.js` as "not one", which is
+backwards: `events.js` is 36 lines of checkbox filtering over rows already in
+the page, and `my-europe.js` owns every piece of client state in the product.
+
+The boundary is now **behavioural rather than a list of filenames**, because a
+list goes stale and a behaviour does not:
+
+    an APPLICATION fetches an index, or owns client state, or both.
+      It must declare its dependencies in data/contracts.json.
+    an ENHANCEMENT does neither. The page works without it, and it stays
+      under a hundred lines.
+
+A script that starts fetching has become an application and has to say what it
+depends on — verified by adding a `fetch()` to `events.js` and watching the
+build go red.
 
 Every one of the five reads an index declared in `data/contracts.json`, and
 `checks.py` refuses a consumer that fetches an index it has not declared —

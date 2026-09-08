@@ -27,12 +27,13 @@ Via Europa. Take their architecture and drop their branding section. See
 | photographs, or "why is there no picture here" | **`docs/images.md`** — the pipeline is built and enforced; the library is empty |
 | **the Postgres/PostGIS model, the API, Next.js, auth, search, the AI pipeline** | **`docs/technical-foundation.md`** — a destination with a trigger, not a plan for Monday. Nothing in it should be built yet |
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
-| **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,273 assertions against the real build, and CI fails if any of them stops being true |
+| **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. Every spec section asserted against the real build, and CI fails if any of them stops being true |
 | **the map, geographic data, tiles, or "why not Mapbox?"** | **`docs/map-architecture.md`** — the pipeline, the three levels of detail, and why this is SVG rather than MapLibre. Then **`docs/data-licenses/`**, which is the register, and **`docs/boundary-policy.md`** for disputed frontiers |
 | **the frontend — routes, the shell, primitives, what §4 must not do** | **`docs/frontend-architecture.md`** — §4, measured. 1,067 documents and five applications; eleven primitives cover 100% of the site |
 | **the API — endpoints, contracts, empty states, what not to build** | **`docs/api-architecture.md`** — §3, written from the running system. Five static documents, no server, and the trigger that would change each of the nine things deliberately unbuilt |
 | **"is field X in the model?" — the Build Package schema** | **`docs/schema-mapping.md`** — every entity and field of Build Package v1 §2 against the running data: HAVE, BUILT, or REFUSED with the promise behind each refusal |
-| **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence: 51 sections, 326 assertions |
+| **the visual system — tokens, type, the two worlds, what is left** | **`docs/visual-architecture.md`** — §5, measured. The European Future migration as it actually landed, plus the fifteen deliberate attacks that went red |
+| **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence |
 
 ## The rules that catch people out
 
@@ -218,17 +219,25 @@ names, for each script, which index it reads and which fields — with a reason
 per field. `checks.py` fails on a declared field that vanishes AND on a script
 fetching an index it has not declared. Coupling is fine; silent coupling is
 not. The live case is the search index's live counts, which the empty state
-prints — it used to say "244 cities" while the atlas held 319.
+prints — it used to carry a hard-coded figure that had been true two hundred
+destinations earlier.
 
-**Five pages are applications; 1,067 are documents.** 453 pages load no
-JavaScript at all and 613 load one file only to draw a save button. A check
-fails if a sixth application appears, because the whole of
-`docs/frontend-architecture.md` is written on that ratio.
+**Five applications, two enhancements, and the test is behavioural.** An
+application fetches an index or owns client state, and must declare what it
+depends on in `data/contracts.json`; an enhancement does neither, operates on
+markup already in the page, and stays under a hundred lines. Most of the site
+loads no JavaScript at all. The first version of this check was a list of
+filenames and
+had the boundary backwards — it counted `events.js` (36 lines of checkbox
+filtering) as an application and `my-europe.js` (which owns all three storage
+keys) as not one.
 
 **Eleven primitives cover the site**, four of them on 100% of pages. Changing
-`render.section()` changes 1,072 pages; changing a page changes one. A check
-puts a floor under each primitive's reach, so a page family cannot quietly
-grow its own component set.
+`render.section()` changes every page; changing a page changes one. A check
+puts a floor under each primitive's reach, so a page family cannot quietly grow
+its own component set. **No new primitive until repeated structure has actually
+emerged** — do not invent a `ResultCard` family for a shape that has not
+appeared three times.
 
 **Relationships are derived, never stored.** `/api/graph.json` carries 3,716
 edges across nine types, every one computed at build time from a relation that
@@ -283,15 +292,19 @@ crowd measurement, and a check greps `score.py` to keep it that way.
 
 ## Gates
 
-Run all seven before claiming anything is done.
+Run all of these before claiming anything is done. **No counts here on
+purpose** — every total here grew during a single session, and this list spent
+weeks understating the static and browser suites by a wide margin while looking
+authoritative. Each command prints its own total; the generated documents own
+the rest.
 
-    python3 tools/build.py check       validate the data
-    python3 tools/build.py           1,072 pages
-    python3 tools/checks.py            28 checks, ~99,900 things examined
-    node tools/browser-checks.js       540 checks in Chromium, incl. accessibility
-    python3 tools/section-audit.py --check   the 99 spec sections, 1,273 assertions
-    python3 tools/ux-audit.py --check        the 37 UI/UX + brand + 2036 sections, 326 assertions
-    python3 tools/content-report.py --write  what is missing, against the spec's targets
+    python3 tools/build.py check              validate the data
+    python3 tools/build.py                    build every page
+    python3 tools/checks.py                   the static checks
+    node tools/browser-checks.js              Chromium, incl. accessibility and contrast
+    python3 tools/section-audit.py --check    the spec sections
+    python3 tools/ux-audit.py --check         the UI/UX, brand and 2036 sections
+    python3 tools/content-report.py --write   what is missing, against the spec's targets
 
 The browser checks need `npm install playwright` and take a couple of
 minutes. They earn their place repeatedly: a 47-pixel mobile overflow on
@@ -324,8 +337,8 @@ staleness, exactly like `site/`. Run them and commit the result.
    once, so one run fixes one round of mistakes.
 4. Build, run both check suites, commit `site/` with the data.
 
-Depth beats breadth. 244 cities written properly beats 40,000 imported, and
-there is no importer in this repository on purpose.
+Depth beats breadth. A few hundred destinations written properly beats 40,000
+imported, and there is no importer in this repository on purpose.
 
 ## Style
 
