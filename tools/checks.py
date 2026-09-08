@@ -896,7 +896,8 @@ def c_docs():
     required = ["architecture", "product", "development", "database", "roadmap",
                 "api", "ai", "deployment", "security", "content-model",
                 "brand", "brand-lock", "images", "data-model", "legal-position",
-                "technical-foundation", "audit-2026-09"]
+                "technical-foundation", "audit-2026-09",
+                "EUROPEDOOR_2036_TRANSFORMATION"]
     n = 0
     for name in required:
         path = os.path.join(ROOT, "docs", f"{name}.md")

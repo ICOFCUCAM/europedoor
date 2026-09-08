@@ -1,5 +1,12 @@
 # Roadmap
 
+> **September 2026:** a transformation brief has arrived and its audit is in
+> [`EUROPEDOOR_2036_TRANSFORMATION.md`](EUROPEDOOR_2036_TRANSFORMATION.md).
+> That document supersedes the ordering below for anything visual or
+> geographic; this file remains the record of the ten-phase development brief
+> and of what each blocked phase is blocked on. The two agree on the
+> substance: the stack does not change yet, and the map is the largest gap.
+
 Read `docs/audit-2026-09.md` first — it is the repository audit this roadmap
 came out of, and it explains the one decision that governs everything below:
 **the stack does not change yet.**
