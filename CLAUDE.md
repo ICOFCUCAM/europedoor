@@ -321,6 +321,15 @@ deliberately left to the interests: mapping all eight put a *universal* field
 above the interest pass and `forest` fell from 19 plates to 1. One dead motif
 traded for another.
 
+**An instrument can be wrong three times and look right each time.** Measuring
+within-motif variation reported "peaks: 92% duplication" (bounding boxes made
+every ridge one constant), then "isles: 79%" (the scanline ignored ellipses),
+then "isles: 74%" (the islands sit *below* the horizon and are interior detail,
+not silhouette). Only rendering at 64×40 and comparing pixels was right —
+measuring a drawing requires drawing it. `tools/plate-variation.py` holds a
+ceiling on interchangeable pairs per motif family; it is not in `checks.py`
+because eight seconds on every build is a gate people stop running.
+
 **Look to find, count to conclude.** A contact sheet of forty plates suggested
 skylines were about 38% of them; measured across every destination they are
 28%. The sample was biased and the eye was wrong. The same sheet *did* find
@@ -344,6 +353,7 @@ the rest.
     python3 tools/ux-audit.py --check         the UI/UX, brand and 2036 sections
     python3 tools/content-report.py --write   what is missing, against the spec's targets
     python3 tools/invariants.py --check       what a visual change may not move
+    python3 tools/plate-variation.py --check  the plates have not got more alike
 
 The browser checks need `npm install playwright` and take a couple of
 minutes. They earn their place repeatedly: a 47-pixel mobile overflow on

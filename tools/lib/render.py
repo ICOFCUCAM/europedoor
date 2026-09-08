@@ -286,14 +286,40 @@ def plate_shapes(seed, w, h, motif=None):
         for i, (drop, amp, n) in enumerate(layers):
             prims.append(ridge(horizon + h * drop, h * amp, n, band[min(i, 2)], 8 + i * 7))
     elif motif == "coast":
-        prims.append(ridge(horizon, h * 0.10, 4, band[0], 8))
-        prims.append(("rect", 0, horizon + h * 0.10, w, h, band[2], 1.0))
+        # The headland count and depth were fixed at 4 and 0.10h for the life
+        # of the motif, so the only thing distinguishing two coasts was where
+        # the ridge jitter happened to land — 57 plates, 48 of them within 3%
+        # of another and sharing its hue. Seeding the two numbers that were
+        # constants is the smallest change that can move that, and it adds no
+        # new shape.
+        n_head = 4 + d[12] % 4
+        amp = 0.07 + (d[13] % 70) / 900.0
+        prims.append(ridge(horizon, h * amp, n_head, band[0], 8))
+        prims.append(("rect", 0, horizon + h * amp, w, h, band[2], 1.0))
         # Under the light, and narrowing with distance from it — a
         # reflection somewhere else on the water is just a scratch.
         for i in range(3):
             bw = w * (0.13 - i * 0.032)
-            prims.append(("rect", lx - bw / 2, horizon + h * (0.18 + i * 0.11),
+            prims.append(("rect", lx - bw / 2, horizon + h * (amp + 0.08 + i * 0.11),
                           bw, h * 0.011, light, 0.34 - i * 0.09))
+        # ONE compositional variant, on about half of coasts: a headland
+        # reaching into the water from whichever side the light is not on.
+        #
+        # Seeding the ridge count and depth above took coast from 125 twin
+        # pairs to 82 and left it still the least varied family — because the
+        # water is 40% of the frame and was identical on every plate. This is
+        # the smallest thing that breaks that: one polygon, no new colour, no
+        # new concept. Measured before keeping.
+        if d[16] % 2:
+            from_left = lx > w * 0.5
+            reach = w * (0.22 + (d[17] % 90) / 400.0)
+            drop = h * (0.10 + (d[18] % 60) / 700.0)
+            base = horizon + h * amp
+            pts = ([(0.0, base), (reach, base), (reach * 0.62, base + drop), (0.0, base + drop * 1.5)]
+                   if from_left else
+                   [(float(w), base), (w - reach, base), (w - reach * 0.62, base + drop),
+                    (float(w), base + drop * 1.5)])
+            prims.append(("poly", pts, band[1], 1.0))
     elif motif == "skyline":
         prims.append(ridge(horizon, h * 0.08, 6, band[0], 8))
         x, i = 0.0, 0
@@ -311,6 +337,13 @@ def plate_shapes(seed, w, h, motif=None):
         # arrow — or worse, a rocket. Wider shaft, shallower spire, and a
         # nave block beside it.
         tx = w * (0.28 + (d[9] / 255.0) * 0.38)
+        # tw is a constant, and it was TRIED as a seeded value in the §6
+        # variation experiment: 41 twin pairs became 42, which is noise. The
+        # same minimal treatment that took coast from 125 twins to 25 does
+        # nothing here, because a tower's similarity comes from the whole
+        # composition — ridge, nave, shaft, spire, second ridge — and not
+        # from one width. Reverted rather than kept, because a change with no
+        # measured benefit is a change that only looks like progress.
         tw = w * 0.075
         th = h * (0.26 + (d[10] % 60) / 500.0)
         nave_w = tw * (1.9 + (d[11] % 30) / 40.0)
@@ -329,13 +362,19 @@ def plate_shapes(seed, w, h, motif=None):
                                (tx + tw, horizon - th)], band[2], 1.0))
         prims.append(ridge(horizon + h * 0.16, h * 0.10, 7, band[1], 20))
     elif motif == "isles":
+        # Four islands, always, at y = horizon + 0.05h + i*0.09h — a fixed
+        # ladder. Only cx, rw and rh varied, so 19 destinations produced 8
+        # distinct silhouettes and the nearest-neighbour distance was 0.001.
+        # The count and the vertical placement were the constants; seeding
+        # them is again the smallest change that adds no new shape.
         prims.append(("rect", 0, horizon, w, h, band[2], 1.0))
-        for i in range(4):
+        n_isle = 3 + d[12] % 4
+        for i in range(n_isle):
             cx = w * (0.10 + (d[(9 + i) % 32] / 255.0) * 0.8)
             rw = w * (0.05 + (d[(14 + i) % 32] % 50) / 700.0)
             rh = h * (0.03 + (d[(19 + i) % 32] % 40) / 700.0)
-            prims.append(("ellipse", cx, horizon + h * (0.05 + i * 0.09), rw, rh,
-                          band[i % 2], 1.0))
+            cy = horizon + h * (0.04 + (d[(24 + i) % 32] / 255.0) * 0.30)
+            prims.append(("ellipse", cx, cy, rw, rh, band[i % 2], 1.0))
     elif motif == "forest":
         prims.append(ridge(horizon, h * 0.09, 5, band[0], 8))
         x, i = 0.0, 0
