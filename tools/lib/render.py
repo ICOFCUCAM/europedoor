@@ -117,10 +117,37 @@ def motif_for(interests):
     return None
 
 
-def plate(seed, w=640, h=360, label="", motif=None):
-    """A deterministic landscape for one slug. Same slug, same plate."""
+def _hsl(h, sl, l):
+    """HSL to an (r, g, b) triple.
+
+    The SVG renderer could emit hsl() and let the browser do this. The PNG
+    renderer cannot, and having two colour pipelines is how the two drawings
+    start disagreeing — so both go through here.
+    """
+    sl, l = sl / 100.0, l / 100.0
+    c = (1 - abs(2 * l - 1)) * sl
+    x = c * (1 - abs(((h / 60.0) % 2) - 1))
+    m = l - c / 2
+    r, g, b = [(c, x, 0), (x, c, 0), (0, c, x),
+               (0, x, c), (x, 0, c), (c, 0, x)][int(h // 60) % 6]
+    return (round((r + m) * 255), round((g + m) * 255), round((b + m) * 255))
+
+
+def plate_shapes(seed, w, h, motif=None):
+    """The geometry of one plate, as primitives, in draw order.
+
+    This exists so that the SVG on the page and the PNG a social card shows
+    come from ONE description. Two drawings of the same illustration diverge
+    the first time somebody adjusts one of them, and nobody would ever
+    notice — the PNG is only ever seen inside somebody else's product.
+
+    Returns (sky_top, sky_bottom, prims), where each prim is a tuple:
+        ("poly",    [(x, y), ...],        rgb, alpha)
+        ("rect",    x, y, w, h,           rgb, alpha)
+        ("circle",  cx, cy, r,            rgb, alpha)
+        ("ellipse", cx, cy, rx, ry,       rgb, alpha)
+    """
     d = hashlib.sha256(seed.encode("utf-8")).digest()
-    uid = f"{d[26]:02x}{d[27]:02x}{d[28]:02x}"
     if motif is None:
         motif = MOTIFS[d[0] % len(MOTIFS)]
 
@@ -131,13 +158,13 @@ def plate(seed, w=640, h=360, label="", motif=None):
     night = d[3] % 5 == 0
     sat, sat2 = PLATE_SAT[hue], PLATE_SAT[hue2]
     if night:
-        sky_a, sky_b = f"hsl({hue} {sat + 6}% 13%)", f"hsl({hue2} {sat2}% 24%)"
-        band = [f"hsl({hue} {sat}% {l}%)" for l in (21, 16, 11)]
-        light = "hsl(44 48% 76%)"
+        sky_a, sky_b = _hsl(hue, sat + 6, 13), _hsl(hue2, sat2, 24)
+        band = [_hsl(hue, sat, l) for l in (21, 16, 11)]
+        light = _hsl(44, 48, 76)
     else:
-        sky_a, sky_b = f"hsl({hue2} {sat2}% 78%)", f"hsl({hue} {sat}% 55%)"
-        band = [f"hsl({hue} {sat}% {l}%)" for l in (43, 32, 22)]
-        light = "hsl(42 62% 85%)"
+        sky_a, sky_b = _hsl(hue2, sat2, 78), _hsl(hue, sat, 55)
+        band = [_hsl(hue, sat, l) for l in (43, 32, 22)]
+        light = _hsl(42, 62, 85)
 
     # The light: sun or moon, placed by the seed, never dead centre.
     lx = w * (0.16 + (d[4] / 255.0) * 0.68)
@@ -149,16 +176,15 @@ def plate(seed, w=640, h=360, label="", motif=None):
     # Raise it as the frame widens.
     wide = (w / h) > 2.0
     horizon = h * ((0.44 if wide else 0.56) + (d[7] % 24) / 180.0)
-    parts = []
+
+    prims = [("circle", lx, ly, lr, light, 0.5 if night else 0.75)]
 
     def ridge(y, amp, n, colour, jitter):
-        """One layer of the landscape, as a filled polygon along the top."""
-        pts = []
+        pts = [(0.0, h)]
         for i in range(n + 1):
-            x = w * i / n
-            k = d[(jitter + i) % 32]
-            pts.append(f"{x:.0f},{y - amp * (k / 255.0):.0f}")
-        return (f'<polygon points="0,{h} ' + " ".join(pts) + f' {w},{h}" fill="{colour}"/>')
+            pts.append((w * i / n, y - amp * (d[(jitter + i) % 32] / 255.0)))
+        pts.append((float(w), h))
+        return ("poly", pts, colour, 1.0)
 
     if motif == "peaks":
         # More layers on a wide crop: three ridges across a 21:9 hero leave
@@ -166,31 +192,28 @@ def plate(seed, w=640, h=360, label="", motif=None):
         layers = (((0.00, 0.30, 5), (0.08, 0.24, 7), (0.16, 0.18, 9), (0.26, 0.12, 11))
                   if wide else ((0.00, 0.30, 5), (0.10, 0.22, 7), (0.20, 0.14, 9)))
         for i, (drop, amp, n) in enumerate(layers):
-            parts.append(ridge(horizon + h * drop, h * amp, n, band[min(i, 2)], 8 + i * 7))
+            prims.append(ridge(horizon + h * drop, h * amp, n, band[min(i, 2)], 8 + i * 7))
     elif motif == "coast":
-        parts.append(ridge(horizon, h * 0.10, 4, band[0], 8))
-        # Water: flat, with two pale bands for the light's reflection.
-        parts.append(f'<rect x="0" y="{horizon + h*0.10:.0f}" width="{w}" height="{h}" fill="{band[2]}"/>')
+        prims.append(ridge(horizon, h * 0.10, 4, band[0], 8))
+        prims.append(("rect", 0, horizon + h * 0.10, w, h, band[2], 1.0))
         # Under the light, and narrowing with distance from it — a
         # reflection somewhere else on the water is just a scratch.
         for i in range(3):
-            yy = horizon + h * (0.18 + i * 0.11)
             bw = w * (0.13 - i * 0.032)
-            parts.append(f'<rect x="{lx - bw/2:.0f}" y="{yy:.0f}" width="{bw:.0f}" '
-                         f'height="{h*0.011:.0f}" fill="{light}" opacity="{0.34 - i*0.09:.2f}"/>')
+            prims.append(("rect", lx - bw / 2, horizon + h * (0.18 + i * 0.11),
+                          bw, h * 0.011, light, 0.34 - i * 0.09))
     elif motif == "skyline":
-        parts.append(ridge(horizon, h * 0.08, 6, band[0], 8))
-        x = 0.0
-        i = 0
+        prims.append(ridge(horizon, h * 0.08, 6, band[0], 8))
+        x, i = 0.0, 0
         while x < w:
             bw = w * (0.035 + (d[(9 + i) % 32] % 60) / 900.0)
             bh = h * (0.10 + (d[(15 + i) % 32] / 255.0) * 0.30)
-            parts.append(f'<rect x="{x:.0f}" y="{horizon - bh:.0f}" width="{bw:.0f}" '
-                         f'height="{bh + h:.0f}" fill="{band[1] if i % 2 else band[2]}"/>')
+            prims.append(("rect", x, horizon - bh, bw, bh + h,
+                          band[1] if i % 2 else band[2], 1.0))
             x += bw + w * 0.012
             i += 1
     elif motif == "tower":
-        parts.append(ridge(horizon, h * 0.07, 5, band[0], 8))
+        prims.append(ridge(horizon, h * 0.07, 5, band[0], 8))
         # A tower needs a building under it. The first version was a thin
         # shaft with a sharp triangle on top and read, unmistakably, as an
         # arrow — or worse, a rocket. Wider shaft, shallower spire, and a
@@ -200,47 +223,43 @@ def plate(seed, w=640, h=360, label="", motif=None):
         th = h * (0.26 + (d[10] % 60) / 500.0)
         nave_w = tw * (1.9 + (d[11] % 30) / 40.0)
         nave_h = th * 0.42
-        parts.append(f'<rect x="{tx + tw:.0f}" y="{horizon - nave_h:.0f}" '
-                     f'width="{nave_w:.0f}" height="{nave_h + h*0.2:.0f}" fill="{band[2]}"/>')
-        parts.append(f'<rect x="{tx:.0f}" y="{horizon - th:.0f}" width="{tw:.0f}" '
-                     f'height="{th + h*0.2:.0f}" fill="{band[2]}"/>')
+        prims.append(("rect", tx + tw, horizon - nave_h, nave_w, nave_h + h * 0.2,
+                      band[2], 1.0))
+        prims.append(("rect", tx, horizon - th, tw, th + h * 0.2, band[2], 1.0))
         # The spire must not be wider than the shaft. A triangle overhanging
         # a narrow stick is an arrowhead, and two rounds of this drawing
         # read as a rocket before the overhang was removed. Flush sides, a
-        # taller and narrower point, and a cornice line where they meet.
-        parts.append(f'<rect x="{tx - tw*0.10:.0f}" y="{horizon - th:.0f}" '
-                     f'width="{tw*1.20:.0f}" height="{h*0.012:.0f}" fill="{band[2]}"/>')
-        parts.append(f'<path d="M{tx:.0f} {horizon - th:.0f} '
-                     f'L{tx + tw/2:.0f} {horizon - th - h*0.115:.0f} '
-                     f'L{tx + tw:.0f} {horizon - th:.0f} Z" fill="{band[2]}"/>')
-        parts.append(ridge(horizon + h * 0.16, h * 0.10, 7, band[1], 20))
+        # taller and narrower point, and a cornice where they meet.
+        prims.append(("rect", tx - tw * 0.10, horizon - th, tw * 1.20, h * 0.012,
+                      band[2], 1.0))
+        prims.append(("poly", [(tx, horizon - th),
+                               (tx + tw / 2, horizon - th - h * 0.115),
+                               (tx + tw, horizon - th)], band[2], 1.0))
+        prims.append(ridge(horizon + h * 0.16, h * 0.10, 7, band[1], 20))
     elif motif == "isles":
-        parts.append(f'<rect x="0" y="{horizon:.0f}" width="{w}" height="{h}" fill="{band[2]}"/>')
+        prims.append(("rect", 0, horizon, w, h, band[2], 1.0))
         for i in range(4):
             cx = w * (0.10 + (d[(9 + i) % 32] / 255.0) * 0.8)
             rw = w * (0.05 + (d[(14 + i) % 32] % 50) / 700.0)
             rh = h * (0.03 + (d[(19 + i) % 32] % 40) / 700.0)
-            parts.append(f'<ellipse cx="{cx:.0f}" cy="{horizon + h*(0.05 + i*0.09):.0f}" '
-                         f'rx="{rw:.0f}" ry="{rh:.0f}" fill="{band[i % 2]}"/>')
+            prims.append(("ellipse", cx, horizon + h * (0.05 + i * 0.09), rw, rh,
+                          band[i % 2], 1.0))
     elif motif == "forest":
-        parts.append(ridge(horizon, h * 0.09, 5, band[0], 8))
-        x = 0.0
-        i = 0
+        prims.append(ridge(horizon, h * 0.09, 5, band[0], 8))
+        x, i = 0.0, 0
         while x < w:
             tw = w * 0.026
             th = h * (0.10 + (d[(11 + i) % 32] / 255.0) * 0.16)
             base = horizon + h * 0.10
-            parts.append(f'<path d="M{x:.0f} {base:.0f} L{x + tw/2:.0f} {base - th:.0f} '
-                         f'L{x + tw:.0f} {base:.0f} Z" fill="{band[1 + i % 2]}"/>')
+            prims.append(("poly", [(x, base), (x + tw / 2, base - th), (x + tw, base)],
+                          band[1 + i % 2], 1.0))
             x += tw * 0.78
             i += 1
-        parts.append(ridge(horizon + h * 0.22, h * 0.06, 6, band[2], 24))
+        prims.append(ridge(horizon + h * 0.22, h * 0.06, 6, band[2], 24))
     else:  # plain
         for i, (drop, amp) in enumerate(((0.00, 0.06), (0.13, 0.05), (0.26, 0.04))):
-            parts.append(ridge(horizon + h * drop, h * amp, 4 + i * 2, band[i], 8 + i * 6))
+            prims.append(ridge(horizon + h * drop, h * amp, 4 + i * 2, band[i], 8 + i * 6))
 
-    # The doorway, faintly, over everything: the illustration is seen through
-    # it. Same geometry as the mark, scaled to the plate.
     # The doorway is NOT in the plate, and getting there took three tries
     # worth recording.
     #
@@ -252,24 +271,51 @@ def plate(seed, w=640, h=360, label="", motif=None):
     #                           competing with the sun the plate already has
     #
     # The third was the useful failure. Every version was trying to get the
-    # brand shape into all 987 illustrations, and a motif repeated into every
+    # brand shape into all 988 illustrations, and a motif repeated into every
     # surface stops being a motif and becomes a tic. The doorway belongs in
-    # the mark, the favicon and one deliberate place on the homepage — used
-    # once, with intent — not stamped over every landscape.
-    #
-    # The plates are stronger without it.
+    # the mark, the favicon and one deliberate place — used once, with
+    # intent — not stamped over every landscape.
+    return sky_a, sky_b, prims
 
+
+def _rgb(c):
+    return f"rgb({c[0]},{c[1]},{c[2]})"
+
+
+def plate(seed, w=640, h=360, label="", motif=None):
+    """A deterministic landscape for one slug, as SVG. Same slug, same plate."""
+    sky_a, sky_b, prims = plate_shapes(seed, w, h, motif)
+    uid = hashlib.sha256(f"{seed}{w}{h}".encode()).hexdigest()[:6]
+    out = []
+    for prim in prims:
+        kind = prim[0]
+        op = "" if prim[-1] >= 1.0 else f' opacity="{prim[-1]:.2f}"'
+        if kind == "poly":
+            pts = " ".join(f"{x:.0f},{y:.0f}" for x, y in prim[1])
+            out.append(f'<polygon points="{pts}" fill="{_rgb(prim[2])}"{op}/>')
+        elif kind == "rect":
+            _, x, y, rw, rh, colour, _a = prim
+            out.append(f'<rect x="{x:.0f}" y="{y:.0f}" width="{rw:.0f}" '
+                       f'height="{rh:.0f}" fill="{_rgb(colour)}"{op}/>')
+        elif kind == "circle":
+            _, cx, cy, r, colour, _a = prim
+            out.append(f'<circle cx="{cx:.0f}" cy="{cy:.0f}" r="{r:.0f}" '
+                       f'fill="{_rgb(colour)}"{op}/>')
+        elif kind == "ellipse":
+            _, cx, cy, rx, ry, colour, _a = prim
+            out.append(f'<ellipse cx="{cx:.0f}" cy="{cy:.0f}" rx="{rx:.0f}" '
+                       f'ry="{ry:.0f}" fill="{_rgb(colour)}"{op}/>')
     return (
         f'<svg class="plate" viewBox="0 0 {w} {h}" role="img" aria-label="{esc(label or seed)}" '
         f'preserveAspectRatio="xMidYMid slice">'
         f'<defs><linearGradient id="sky{uid}" x1="0" y1="0" x2="0" y2="1">'
-        f'<stop offset="0" stop-color="{sky_a}"/><stop offset="1" stop-color="{sky_b}"/>'
-        f"</linearGradient>"
+        f'<stop offset="0" stop-color="{_rgb(sky_a)}"/>'
+        f'<stop offset="1" stop-color="{_rgb(sky_b)}"/>'
+        f'</linearGradient>'
         f'<clipPath id="clip{uid}"><rect width="{w}" height="{h}"/></clipPath></defs>'
         f'<g clip-path="url(#clip{uid})">'
         f'<rect width="{w}" height="{h}" fill="url(#sky{uid})"/>'
-        f'<circle cx="{lx:.0f}" cy="{ly:.0f}" r="{lr:.0f}" fill="{light}" opacity="{0.5 if night else 0.75:.2f}"/>'
-        f'{"".join(parts)}</g></svg>'
+        f'{"".join(out)}</g></svg>'
     )
 
 
@@ -514,6 +560,47 @@ def bottom_nav(path):
             + "".join(out) + "</nav>")
 
 
+# ── social cards ─────────────────────────────────────────────────────
+#
+# og:image, and the reason it is a real problem rather than a meta tag.
+#
+# Every illustration on this site is an SVG generated at build time. The
+# platforms that render a link preview want a raster, so without this a
+# shared EuropeDoor link is a grey box with a title on it — which is a poor
+# showing for a product whose whole argument is that discovery is visual.
+#
+# tools/lib/raster.py renders these from render.plate_shapes(): the same
+# geometry the SVG comes from, never a second drawing. A PNG that diverged
+# from the SVG would only ever be seen inside somebody else's product, so
+# nobody here would notice.
+#
+# They cost about 23 ms each, which is 23 seconds across the site — too much
+# to pay on every build for something that changes only when the plate
+# algorithm does. So a plate is content-addressed by exactly the inputs that
+# determine it, cached in assets/og/, and rendered only when missing. The
+# build prunes anything no page asked for, so the cache cannot silently grow
+# into a directory of orphans nobody can account for.
+OG_W, OG_H = 1200, 630
+
+# Filled by page(); read by build.py after every page is emitted.
+OG_WANTED = {}
+
+
+def og_key(seed, motif):
+    return hashlib.sha256(f"{seed}|{motif}|{OG_W}x{OG_H}|v1".encode()).hexdigest()[:16]
+
+
+def og_tags(seed, motif, alt):
+    key = og_key(seed, motif)
+    OG_WANTED[key] = (seed, motif)
+    url = f"https://europedoor.com/assets/og/{key}.png"
+    return (f'<meta property="og:image" content="{url}">'
+            f'<meta property="og:image:width" content="{OG_W}">'
+            f'<meta property="og:image:height" content="{OG_H}">'
+            f'<meta property="og:image:alt" content="{esc(alt)}">'
+            f'<meta name="twitter:card" content="summary_large_image">')
+
+
 # ── structured data ──────────────────────────────────────────────────
 #
 # 988 correct pages that a search engine has to guess at. JSON-LD is what
@@ -597,7 +684,7 @@ def ld_within(kind, name, url):
     return {"@type": kind, "name": name, "url": "https://europedoor.com" + url}
 
 
-def page(title, body, *, path, description, trail=None, area=None, head_extra="", scripts=(), wide=False, ld_blocks=()):
+def page(title, body, *, path, description, trail=None, area=None, head_extra="", scripts=(), wide=False, ld_blocks=(), og=None):
     nav = []
     for href, label, _blurb in NAV:
         mark = ' aria-current="page"' if area == label.lower() else ''
@@ -618,6 +705,9 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 <meta property="og:title" content="{esc(full_title)}">
 <meta property="og:description" content="{esc(description)}">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://europedoor.com{esc(path)}">
+<meta property="og:site_name" content="{esc(SITE_NAME)}">
+{og_tags(*og) if og else ''}
 <link rel="stylesheet" href="/assets/css/europedoor.css">
 <link rel="icon" href="/assets/door.svg" type="image/svg+xml">
 {ld(*ld_blocks)}{head_extra}</head>

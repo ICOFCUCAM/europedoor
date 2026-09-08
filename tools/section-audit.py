@@ -692,6 +692,15 @@ def s40():
     yield '"@type":"BreadcrumbList"' in page("/europe/norway"), "with breadcrumbs"
     yield "structured data is valid, matches the page" in src("tools/checks.py"), \
         "and a check validates it against the visible page"
+    # Social cards: the one image on this site its own authors never look at,
+    # because it is rendered inside somebody else's product.
+    yield has("/europe/norway/fjord-norway/bergen",
+              'property="og:image"', 'property="og:image:alt"',
+              'content="summary_large_image"'), "every entity page has a social card"
+    yield "def plate_shapes" in src("tools/lib/render.py"), \
+        "and the card and the page come from one geometry, not two drawings"
+    yield "every social card exists, is a real PNG" in src("tools/checks.py"), \
+        "with a check that the PNG is real and the dimensions are honest"
     # The absences are the interesting part.
     for forbidden in ("aggregateRating", "openingHours", '"offers"'):
         yield every_page(lambda h, x=forbidden: x not in h,

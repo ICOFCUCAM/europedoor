@@ -363,6 +363,7 @@ def home(data):
     return "/index.html", page(
         SITE_NAME, body, path="/", area=None,
         description="Discover, plan and experience Europe: an atlas of every country, region and city, a journey planner, curated cross-border routes and local experiences.",
+        og=("europedoor:home", "peaks", "EuropeDoor — open the door to Europe"),
         ld_blocks=[
             {"@context": "https://schema.org", "@type": "WebSite",
              "name": SITE_NAME, "url": "https://europedoor.com",
@@ -567,6 +568,8 @@ def country_page(data, c):
     return f"/europe/{c['slug']}/index.html", page(
         c["name"], body, path=urls.country(c), area="countries",
         description=c["summary"][:180],
+        og=("country:" + c["slug"], motif_for(c["interests"]),
+            f"{c['name']} — {c['tagline']}"),
         ld_blocks=[
             ld_breadcrumb([("Europe", "/discover"), ("Countries", "/countries"),
                            (m["name"], urls.macro(m)), (c["name"], urls.country(c))]),
@@ -651,6 +654,8 @@ def region_page(data, c, r):
     return f"/europe/{c['slug']}/{r['slug']}/index.html", page(
         f"{r['name']}, {c['name']}", body, path=urls.region(c, r), area="countries",
         description=r["summary"][:180],
+        og=(f"region:{c['slug']}:{r['slug']}", motif_for(r["interests"]),
+            f"{r['name']}, {c['name']}"),
         ld_blocks=[
             ld_breadcrumb([("Europe", "/discover"), ("Countries", "/countries"),
                            (m["name"], urls.macro(m)), (c["name"], urls.country(c)),
@@ -816,6 +821,9 @@ def city_page(data, c, r, t):
         f"{t['name']}, {c['name']}", body, path=urls.city(c, r, t), area="countries",
         description=t["summary"][:180],
         scripts=["/assets/js/my-europe.js"],
+        og=(f"city:{c['slug']}:{t['slug']}",
+            motif_for(t["interests"]) or motif_for(r["interests"]),
+            f"{t['name']}, {c['name']} — {t['summary'][:90]}"),
         ld_blocks=[
             ld_breadcrumb([("Europe", "/discover"), ("Countries", "/countries"),
                            (m["name"], urls.macro(m)), (c["name"], urls.country(c)),
@@ -1075,6 +1083,8 @@ def journey_page(data, j):
         j["name"], body, path=urls.journey(j), area="journeys",
         description=j["summary"][:180],
         scripts=["/assets/js/my-europe.js"],
+        og=("journey:" + j["slug"], motif_for(j["interests"]),
+            f"{j['name']} — {j['strapline']}"),
         ld_blocks=[
             ld_breadcrumb([("Europe", "/discover"), ("Journeys", "/journeys"),
                            (j["name"], urls.journey(j))]),
@@ -1607,6 +1617,8 @@ def place_page(data, c, r, t, pl):
         f"{pl['name']}, {t['name']}", body, path=urls.place(c, r, t, pl), area="countries",
         description=pl["summary"][:180],
         scripts=["/assets/js/my-europe.js"],
+        og=(f"place:{c['slug']}:{t['slug']}:{pl['slug']}", motif_for(t["interests"]),
+            f"{pl['name']}, {t['name']}"),
         ld_blocks=[
             ld_breadcrumb([("Europe", "/discover"), ("Countries", "/countries"),
                            (c["name"], urls.country(c)), (r["name"], urls.region(c, r)),
@@ -2087,6 +2099,7 @@ def story_page(data, s):
         s["title"], body, path=f"/stories/{s['slug']}", area=None,
         description=s["standfirst"][:180],
         scripts=["/assets/js/my-europe.js"],
+        og=("story:" + s["slug"], None, f"{s['title']} — {s['standfirst'][:90]}"),
         ld_blocks=[
             ld_breadcrumb([("Europe", "/discover"), ("Stories", "/stories"),
                            (s["title"], f"/stories/{s['slug']}")]),

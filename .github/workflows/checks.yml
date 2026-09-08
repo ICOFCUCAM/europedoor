@@ -26,6 +26,14 @@ jobs:
       - name: Rebuild the site
         run: python3 tools/build.py
 
+      - name: Fail if the social-card cache is stale
+        run: |
+          if ! git diff --quiet -- assets/og/; then
+            echo "assets/og/ is out of date. Run: python3 tools/build.py && git add assets/og/"
+            git diff --stat -- assets/og/
+            exit 1
+          fi
+
       - name: Fail if the committed site is stale
         run: |
           if ! git diff --quiet -- site/; then

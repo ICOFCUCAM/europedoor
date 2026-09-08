@@ -20,6 +20,7 @@ import html.parser
 import json
 import os
 import re
+import struct
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -698,6 +699,90 @@ def c_csp():
             if not m.group(1).startswith("https://europedoor.com"):
                 fail(f"{os.path.relpath(f, OUT)}: loads from {m.group(1)}")
         n += 1
+    return n
+
+
+@check("every social card exists, is a real PNG, and comes from the same drawing as the page")
+def c_social_cards():
+    """og:image, and the failure mode nobody catches.
+
+    A social card is the one image on this site that its own authors never
+    look at: it is rendered inside somebody else's product, days later, from
+    a URL nobody clicks. So a card that is missing, corrupt, the wrong size,
+    or a *different drawing from the page it represents* can be broken for
+    months without anybody noticing.
+
+    Hence four assertions rather than "the tag is present": the file exists,
+    it is a valid PNG whose real dimensions match the ones the tag declares,
+    nothing in the cache is an orphan, and the raster and the SVG are driven
+    by one geometry function so they cannot drift apart.
+    """
+    n = 0
+    referenced = set()
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        m = re.search(r'<meta property="og:image" content="([^"]+)"', h)
+        if not m:
+            # Only entity pages carry a card. A card for /terms would be a
+            # landscape with no relationship to the page.
+            continue
+        url = m.group(1)
+        if not url.startswith("https://europedoor.com/assets/og/"):
+            fail(f"{rel(f)}: og:image points off-site: {url}")
+            continue
+        name = url.rsplit("/", 1)[-1]
+        referenced.add(name)
+        path = os.path.join(OUT, "assets", "og", name)
+        if not os.path.exists(path):
+            fail(f"{rel(f)}: og:image {name} does not exist")
+            continue
+        raw = open(path, "rb").read()
+        if raw[:8] != b"\x89PNG\r\n\x1a\n":
+            fail(f"{name}: not a PNG")
+            continue
+        # IHDR is always the first chunk: 8 magic + 4 length + 4 tag.
+        width, height = struct.unpack(">II", raw[16:24])
+        declared_w = re.search(r'og:image:width" content="(\d+)"', h)
+        declared_h = re.search(r'og:image:height" content="(\d+)"', h)
+        if not declared_w or not declared_h:
+            fail(f"{rel(f)}: og:image with no declared width and height")
+        elif (width, height) != (int(declared_w.group(1)), int(declared_h.group(1))):
+            fail(f"{rel(f)}: og:image is {width}x{height}, tag says "
+                 f"{declared_w.group(1)}x{declared_h.group(1)}")
+        if 'og:image:alt' not in h:
+            fail(f"{rel(f)}: og:image with no alt")
+        if 'name="twitter:card" content="summary_large_image"' not in h:
+            fail(f"{rel(f)}: og:image without a large-card hint")
+        n += 1
+
+    if not referenced:
+        fail("no social cards at all")
+
+    # Orphans. The cache is content-addressed, so changing the drawing
+    # changes every filename; without pruning it accumulates a directory of
+    # pictures from past versions that nobody can account for.
+    cache = os.path.join(ROOT, "assets", "og")
+    on_disk = {x for x in os.listdir(cache) if x.endswith(".png")}
+    for orphan in sorted(on_disk - referenced):
+        fail(f"assets/og/{orphan} is an orphan: no page asks for it")
+    for missing in sorted(referenced - on_disk):
+        fail(f"assets/og/{missing} is referenced but not cached")
+    n += len(on_disk)
+
+    # One drawing, two renderers. This is the assertion that matters: if
+    # somebody adds a shape to the SVG path only, the card silently stops
+    # representing the page.
+    r = open(os.path.join(ROOT, "tools", "lib", "render.py"), encoding="utf-8").read()
+    raster_src = open(os.path.join(ROOT, "tools", "lib", "raster.py"), encoding="utf-8").read()
+    if "def plate_shapes" not in r:
+        fail("render.plate_shapes is gone; the two renderers have no shared geometry")
+    plate_body = r.split("def plate(seed")[1].split("\ndef ")[0]
+    if "plate_shapes(" not in plate_body:
+        fail("render.plate() no longer renders from plate_shapes(); "
+             "the SVG and the social card are now two separate drawings")
+    if "plate_shapes" not in raster_src and "shapes" not in raster_src:
+        fail("raster.py no longer renders from the shared geometry")
+    n += 3
     return n
 
 

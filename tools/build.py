@@ -129,6 +129,38 @@ def build():
         if p.endswith("index.html")
     ]
     write("/sitemap.xml", P.sitemap(canonical))
+    # ── social cards ─────────────────────────────────────────────────
+    #
+    # Deterministic, content-addressed, and cached in assets/og/ because they
+    # cost ~23 ms each and change only when the plate algorithm does. The key
+    # is a hash of exactly the inputs that determine the picture, so a change
+    # to any of them produces a new filename and the old one is pruned below.
+    #
+    # Pruning matters: without it the cache becomes a directory of orphans
+    # from every past version of the drawing, and nobody can tell which are
+    # live. Anything no page asked for this build is deleted.
+    from lib import raster
+    og_dir = os.path.join(ROOT, "assets", "og")
+    os.makedirs(og_dir, exist_ok=True)
+    wanted = R.OG_WANTED
+    made = 0
+    for key, (seed, motif) in sorted(wanted.items()):
+        cached = os.path.join(og_dir, key + ".png")
+        if not os.path.exists(cached):
+            shapes = R.plate_shapes(seed, R.OG_W, R.OG_H, motif)
+            with open(cached, "wb") as fh:
+                fh.write(raster.plate_png(shapes, R.OG_W, R.OG_H))
+            made += 1
+    pruned = 0
+    for fn in sorted(os.listdir(og_dir)):
+        if fn.endswith(".png") and fn[:-4] not in wanted:
+            os.remove(os.path.join(og_dir, fn))
+            pruned += 1
+    os.makedirs(os.path.join(OUT, "assets", "og"), exist_ok=True)
+    for key in wanted:
+        shutil.copy(os.path.join(og_dir, key + ".png"),
+                    os.path.join(OUT, "assets", "og", key + ".png"))
+
     write("/_headers", R.headers_file())
     # vercel.json is not generated — it carries redirects and caching rules a
     # human edits — but its security headers ARE checked against
@@ -136,7 +168,10 @@ def build():
     # not site/_headers.
     write("/robots.txt", "User-agent: *\nAllow: /\nSitemap: https://europedoor.com/sitemap.xml\n")
 
-    print(f"{len(written)} pages + api + sitemap → site/")
+    card_note = f", {len(wanted)} cards"
+    if made or pruned:
+        card_note += f" ({made} rendered, {pruned} pruned)"
+    print(f"{len(written)} pages + api + sitemap{card_note} → site/")
     return d, written
 
 

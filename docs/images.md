@@ -82,6 +82,28 @@ impossible to get wrong. It is the wrong rule now, because it bans the
 correct behaviour along with the incorrect one. The replacement is stricter
 in the way that matters and permissive in the way that does not.
 
+## Social cards
+
+`og:image` is a separate problem from photography and it is solved. 718 cards
+at 1200×630, one per entity, rendered by `tools/lib/raster.py` — a scanline
+polygon filler and a PNG encoder written on `zlib` and `struct`.
+
+Written rather than installed: the alternative is Pillow plus a headless SVG
+renderer, two large dependencies (one of them a browser) added to a project
+whose dependency list is empty, in order to draw gradients, circles and
+filled polygons.
+
+They render from `render.plate_shapes()` — the same geometry the SVG on the
+page comes from, never a second drawing. That matters more here than
+anywhere else on the site: a social card is the one image its own authors
+never look at, because it is rendered inside somebody else's product days
+later. A check asserts both renderers still come from that one function.
+
+Content-addressed and cached in `assets/og/`, keyed by exactly the inputs
+that determine the picture. First build 24 s; every build after that, 2 s.
+Anything no page asks for is pruned, so a change to the drawing cannot leave
+the cache full of orphans nobody can account for.
+
 ## The acquisition problem, stated plainly
 
 The Bible asks for three categories, and the third is the one that matters:

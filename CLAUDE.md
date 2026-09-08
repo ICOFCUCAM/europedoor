@@ -25,7 +25,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | photographs, or "why is there no picture here" | **`docs/images.md`** — the pipeline is built and enforced; the library is empty |
 | **the Postgres/PostGIS model, the API, Next.js, auth, search, the AI pipeline** | **`docs/technical-foundation.md`** — a destination with a trigger, not a plan for Monday. Nothing in it should be built yet |
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
-| **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,269 assertions against the real build, and CI fails if any of them stops being true |
+| **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. 100 sections, 1,272 assertions against the real build, and CI fails if any of them stops being true |
 | **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence: 43 sections, 218 assertions |
 
 ## The rules that catch people out
@@ -49,6 +49,13 @@ output nobody is going to serve.
 hidden in the UI. Ukraine, Russia and Belarus keep a page carrying the
 warning and are absent from `/api/atlas.json`. Do not "fix" this by filtering
 in JavaScript.
+
+**One drawing, two renderers.** `render.plate_shapes()` is the geometry;
+`plate()` emits SVG and `raster.plate_png()` emits the social card. Never add
+a shape to one only — a card that stops matching its page is invisible from
+here, because it is rendered inside somebody else's product. A check asserts
+both still come from `plate_shapes`. Cards are cached in `assets/og/`,
+content-addressed, and pruned: first build 24s, every build after that 2s.
 
 **Structured data claims only what we hold.** JSON-LD is a machine-readable
 claim republished by people who cannot check it, so `checks.py` refuses
@@ -112,9 +119,9 @@ Run all seven before claiming anything is done.
 
     python3 tools/build.py check       validate the data
     python3 tools/build.py            988 pages
-    python3 tools/checks.py            27 checks, ~90,500 things examined
+    python3 tools/checks.py            28 checks, ~91,900 things examined
     node tools/browser-checks.js       389 checks in Chromium, incl. accessibility
-    python3 tools/section-audit.py --check   the 99 spec sections, 1,269 assertions
+    python3 tools/section-audit.py --check   the 99 spec sections, 1,272 assertions
     python3 tools/ux-audit.py --check        the 37 UI/UX + 6 brand sections, 218 assertions
     python3 tools/content-report.py --write  what is missing, against the spec's targets
 

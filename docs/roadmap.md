@@ -73,26 +73,39 @@ Phases 0–4 are not blocked, and that is where the work is.
    result is worse than none: it is a claim, in a format designed to be
    trusted, republished by somebody who cannot check it.
 
-5. **Open Graph images.** `og:image` is absent, and this is now the next
-   item. The plate generator produces a unique illustration per entity but
-   emits SVG, and the platforms that consume `og:image` want a raster.
-   Rasterising in pure Python is feasible — the plates are gradients, a
-   circle and filled polygons, and `zlib` is standard library — but it is a
-   real build cost, so it should be scoped to the ~100 shareable surfaces
-   (homepage, macro regions, countries, journeys, themes, stories) rather
-   than all 988.
+5. ~~**Open Graph images.**~~ **Done.** 718 social cards at 1200×630, one
+   per entity, rendered in pure Python — `tools/lib/raster.py`, a scanline
+   filler and a PNG encoder on `zlib` and `struct`. No Pillow, no headless
+   browser, no change to a dependency list that is still empty.
+
+   They render from `render.plate_shapes()`, the **same geometry the SVG on
+   the page comes from**. A second drawing would only ever be seen inside
+   somebody else's product, so nobody here would notice it drifting — a
+   check asserts both renderers are still driven by that one function.
+
+   Cost: ~23 ms each, so they are content-addressed and cached in
+   `assets/og/`. First build 24 s, every build after that 2 s, and anything
+   no page asks for is pruned so the cache cannot fill with orphans from
+   past versions of the drawing.
+
+### Phase 2 — what is left
+
+6. **Text on the social cards.** They are the illustration alone. A card
+   carrying the place name would be stronger, and rendering text needs
+   glyph outlines — a bitmap font compiled into the repository, or the one
+   dependency this would justify. Not obviously worth it yet.
 
 ### Phase 3 — finish the journey system
 
-6. **Reorder and edit a saved itinerary.** The planner builds and saves; it
+7. **Reorder and edit a saved itinerary.** The planner builds and saves; it
    cannot yet be edited stop-by-stop. This needs the frozen-document model in
    `docs/technical-foundation.md` §1.2, not a database.
 
 ### Phase 1 — the dataset, which is the actual asset
 
-7. **Places: 192 of a 1,000 MVP target.** 44 countries have none at all.
-8. **Stories: 9 of 100.** Roughly a day each, and not automatable.
-9. **Fact verification: 0 of 50 countries.** The machinery is built and
+8. **Places: 192 of a 1,000 MVP target.** 44 countries have none at all.
+9. **Stories: 9 of 100.** Roughly a day each, and not automatable.
+10. **Fact verification: 0 of 50 countries.** The machinery is built and
    expires correctly; nobody has done a check. This is the single biggest
    credibility gap on the site and it is published as such.
 
@@ -101,10 +114,10 @@ these three.
 
 ### Blocked, and the order they unblock in
 
-10. Entity incorporated → data controller → accounts → **Phase 5**
-11. Accounts → operator claims → **Phase 6**
-12. Accounts → contributor roles → **Phase 7** browser CMS
-13. Traffic → **Phase 9**
+11. Entity incorporated → data controller → accounts → **Phase 5**
+12. Accounts → operator claims → **Phase 6**
+13. Accounts → contributor roles → **Phase 7** browser CMS
+14. Traffic → **Phase 9**
 
 ## What this roadmap deliberately does not do
 
