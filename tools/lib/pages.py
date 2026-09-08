@@ -636,30 +636,49 @@ def region_page(data, c, r):
         nights = t["nights"]
         n = f"{nights[0]}–{nights[1]} nights" if nights[0] != nights[1] else f"{nights[0]} nights"
         meta = f'<p class="cardmeta">{n}</p>'
-        cards.append(card(urls.city(c, r, t), c["name"], t["name"], t["summary"], seed=f"city:{c['slug']}:{t['slug']}", meta=meta))
+        # NOT the country. Every destination on a region page is in the same
+        # country, so a kicker reading NORWAY eight times down the grid is
+        # the boilerplate the "never explain the constraint back" rule
+        # forbids: a reason shared by every result is hoisted into one line
+        # above the list — here, the breadcrumb and the h1 — and the row
+        # carries only what distinguishes it. What kind of place it is does.
+        cards.append(card(urls.city(c, r, t),
+                          CITY_TYPE_NAMES.get(t.get("city_type"), "Destination"),
+                          t["name"], t["summary"],
+                          seed=f"city:{c['slug']}:{t['slug']}", meta=meta))
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)),
          (c["name"], urls.country(c)), (r["name"], None)])}
-<div class="pagehead">
+<div class="pagehead overture">
   <p class="kicker">{esc(c['name'])}</p>
   <h1>{esc(r['name'])}</h1>
-  <p class="lede">{esc(r['summary'])}</p>
+  <p class="statement">{esc(r['summary'])}</p>
+  <p class="orient">{len(r["cities"])} destination{"s" if len(r["cities"]) != 1 else ""} ·
+  {len(rplaces)} place{"s" if len(rplaces) != 1 else ""} recorded ·
+  about {int(pass_nights)} nights to see it all</p>
   {chips(r["interests"], data["interests"])}
-  {factlist([
-      ("Destinations", str(len(r["cities"]))),
-      ("Places recorded", str(len(rplaces))),
-      ("Experiences", str(len(rexps))),
-      ("A full pass", f"about {int(pass_nights)} nights"),
-      ("Best months", esc(months_line(data, c["season"]["peak"]))),
-      ("Typical day", daily_line(data, c)),
-  ])}
 </div>
+
+{regionmap(data, c, r)}
+
 {section("Destinations", grid(cards, 3))}
 {section("Places to see", f'<div class="rows">{placerows}</div>',
          lede=f"Everything recorded across {esc(r['name'])}, in one list.") if placerows else ""}
 {section("Things to do", f'<div class="rows">{exprows}</div>') if exprows else ""}
 {section("Journeys through " + r["name"], f'<div class="rows">{jrows}</div>') if jrows else ""}
 {section("Accommodation & restaurants", STAY_NOTE)}
+{section("The record", factlist([
+      ("Destinations", str(len(r["cities"]))),
+      ("Places recorded", str(len(rplaces))),
+      ("Experiences", str(len(rexps))),
+      ("A full pass", f"about {int(pass_nights)} nights"),
+      ("Best months", esc(months_line(data, c["season"]["peak"]))),
+      ("Typical day", daily_line(data, c)),
+  ]), tone="quiet",
+  lede="What this atlas holds about " + esc(r["name"]) + ". The counts are "
+       "derived from the region's own destinations and move when it does; "
+       "the seasons and the daily cost belong to " + esc(c["name"]) + " and "
+       "are repeated here rather than looked up.")}
 <div class="note">
   <h2 class="mini">Food, events and practicalities are on the country page</h2>
   <p>They belong to {esc(c['name'])} rather than to {esc(r['name'])}, and repeating them on
@@ -1822,10 +1841,122 @@ def minimap(data, t, span=3.2):
     )
 
 
+def pointsmap(pts, uid, caption, aria, want=2.6, pad=60):
+    """A set of places on the continent, through the aperture.
+
+    `pts` is [(x, y, href, name)] in projection space. Extracted from
+    storymap() when the region pages needed exactly the same picture — a
+    handful of destinations, framed to fit, with the land under them — and
+    the alternative was a second implementation of the framing, the clamp,
+    the unit normalisation and the label collision rule, which is how two
+    maps of the same atlas start disagreeing about where Bergen is.
+    """
+    xs = [p[0] for p in pts]
+    ys = [p[1] for p in pts]
+    x0, x1 = min(xs) - pad, max(xs) + pad
+    y0, y1 = min(ys) - pad, max(ys) + pad
+    w, h = max(280.0, x1 - x0), max(150.0, y1 - y0)
+    # ONE PROPORTION ACROSS EVERY MAP OF THIS KIND, or the family has no
+    # signature. The bounding box of two places 50 km apart is nearly square;
+    # the box of five languages across a continent is a letterbox. Left
+    # alone, the arch over each would be a different arch, and the reader
+    # would never see that they are the same aperture. The SHORT axis grows,
+    # which only ever adds context and never crops a place out.
+    if w / h < want:
+        grow = (h * want - w) / 2.0
+        x0, w = x0 - grow, h * want
+    elif w / h > want:
+        grow = (w / want - h) / 2.0
+        y0, h = y0 - grow, w / want
+    # AND THEN CLAMPED TO THE WORLD THE PROJECTION DRAWS.
+    #
+    # Widening a nearly-square frame to 2.6:1 once put it at x = -173..1374
+    # on a canvas that is 0..1000, so 400px of it were outside the dataset
+    # and Natural Earth's own eastern limit drew as a hard vertical line
+    # through empty black. It looks like a rendering fault and is in fact a
+    # frame asking for land that was never in the file. The frame slides back
+    # inside the canvas, and where the aspect it wants will not fit at all it
+    # gives up the aspect rather than the land.
+    if w >= MAP_W:
+        x0, w = 0.0, float(MAP_W)
+    else:
+        x0 = min(max(x0, 0.0), MAP_W - w)
+    if h >= MAP_H:
+        y0, h = 0.0, float(MAP_H)
+    else:
+        y0 = min(max(y0, 0.0), MAP_H - h)
+    # ONE UNIT SYSTEM, or the type changes size per page. These frames run
+    # from 390 projection-pixels wide to the full 1000 and every one is drawn
+    # at the same column width, so a viewBox of 390 magnifies an 11px label
+    # to 33. Nothing in CSS can correct that — the browser scales the units
+    # and the stylesheet only knows the units — so the geometry is scaled
+    # into a fixed 1000-wide frame here and one rule sizes every label.
+    k = 1000.0 / w
+    vw, vh = 1000.0, h * k
+    dots, placed, lab = [], [], []
+    # A tenth of the frame, not the route map's fifth: these places are few
+    # and far apart, and 0.20 of a continental frame dropped Tirana's label
+    # for being within 300px of Budapest's.
+    dx_min, dy_min = vw * 0.10, vh * 0.030
+    for x, y, href, name in pts:
+        px, py = (x - x0) * k, (y - y0) * k
+        dots.append(
+            f'<a class="minidot here" href="{href}">'
+            f'<circle cx="{px:.1f}" cy="{py:.1f}" r="5.5"/>'
+            f'<title>{esc(name)}</title></a>'
+        )
+        # Same collision rule as the route map: a label that would land on
+        # one already placed is dropped, not moved. Every place keeps its
+        # dot, its <title> and its row in the list below.
+        if any(abs(px - qx) < dx_min and abs(py - qy) < dy_min for qx, qy in placed):
+            continue
+        placed.append((px, py))
+        lab.append(f'<text class="minilabel here" x="{px + 10:.1f}" y="{py + 4:.1f}">'
+                   f'{esc(name)}</text>')
+    ctx, land = geo.landmass(MAPPROJ, (x0, y0, w, h))
+    return (
+        f'<figure class="minimap pointsmap arched">'
+        f'<svg viewBox="0 0 {vw:.1f} {vh:.1f}" role="img" '
+        f'data-world="intelligence" aria-label="{esc(aria)}">'
+        f'<defs>{arch_clip(uid, vw, vh)}</defs>'
+        f'<g clip-path="url(#arch-{uid})">'
+        f'<rect x="0" y="0" width="{vw:.1f}" height="{vh:.1f}" class="archground"/>'
+        f'<g transform="scale({k:.4f}) translate({-x0:.1f},{-y0:.1f})">{ctx}{land}</g>'
+        f'{"".join(dots)}{"".join(lab)}</g></svg>'
+        f'<figcaption>{caption}</figcaption></figure>'
+    )
+
+
+def regionmap(data, c, r):
+    """A region as its own destinations, through the door.
+
+    A region page had no map at all, on the one family that IS a grouping of
+    places — and the atlas holds no region geometry on purpose: a convex hull
+    round Bergen and Alesund labelled "Vestland" would look like an answer
+    and be a guess. What it does hold is exactly which destinations belong
+    here, so that is what is drawn, which is the same thing the country map
+    already says in its caption.
+    """
+    pts = [(*project(t["lat"], t["lon"]), urls.city(c, r, t), t["name"])
+           for t in r["cities"]]
+    if not pts:
+        return ""
+    uid = "rg" + "".join(ch for ch in f'{c["slug"]}{r["slug"]}' if ch.isalnum())[:14]
+    cap = (f'{esc(r["name"])} is the {len(pts)} destination'
+           f'{"s" if len(pts) != 1 else ""} below, not a boundary — this atlas '
+           f'holds which places belong to a region and deliberately not a line '
+           f'round them. Coastline from <a href="/sources">Natural Earth</a>, '
+           f'public domain. <a href="/map?c={esc(c["slug"])}">Open '
+           f'{esc(c["name"])} on the full map →</a>')
+    return pointsmap(pts, uid, cap,
+                     f'Map of {r["name"]}, {c["name"]}: its '
+                     f'{len(pts)} destinations in the Atlas')
+
+
 def storymap(data, s):
     """Where a story happens, drawn on the continent.
 
-    This replaces a generated plate, and the plate was not merely weak here —
+    This replaced a generated plate, and the plate was not merely weak here —
     it was WRONG. "The last forest that was never cut" is about Bialowieza,
     the one primeval forest in Europe that has never been logged, and it
     opened with 1260x540 of tower blocks. The motif comes from the hash of
@@ -1836,7 +1967,7 @@ def storymap(data, s):
     A plate is a landscape for a PLACE, derived from what that place is. A
     story is not a place. It is a claim about several of them — and this
     atlas knows exactly which, because `places` is validated against the
-    city index and the section at the foot of the page already lists them.
+    city index and the margin note beside the text already lists them.
 
     So the opening image is the geography the story is about: the same
     projection as /map, the real coastline under it, its places lit and
@@ -1848,123 +1979,30 @@ def storymap(data, s):
     holds one, and where it does not, nothing in its place.
     """
     idx = data["cities"]
-    pts = []
+    pts, names = [], []
     for cid in s.get("places") or ():
         n = idx.get(cid)
         if not n:
             continue
         x, y = project(n["city"]["lat"], n["city"]["lon"])
-        pts.append((x, y, n))
+        pts.append((x, y, urls.city(n["country"], n["region"], n["city"]),
+                    n["city"]["name"]))
+        names.append(n["city"]["name"])
     if not pts:
         return ""
-    xs = [p[0] for p in pts]
-    ys = [p[1] for p in pts]
-    # 60, not the route map's 90. The arch already eats the top corners, so
-    # generous padding is spent twice — and on the trails story it was the
-    # difference between a band and a 748-pixel-tall square: Abisko to Corte
-    # is most of the canvas before any padding at all.
-    pad = 60
-    x0, x1 = min(xs) - pad, max(xs) + pad
-    y0, y1 = min(ys) - pad, max(ys) + pad
-    w, h = max(280.0, x1 - x0), max(150.0, y1 - y0)
-    # ONE PROPORTION ACROSS ALL NINE, or the family has no signature.
-    #
-    # The bounding box of two places in Poland and Belarus is nearly square;
-    # the box of Basque country, Hungary and Georgia is a letterbox. Left
-    # alone, the arch over each would be a different arch — a tall narrow
-    # doorway on one story and a flat one on the next — and the reader would
-    # never see that they are the same aperture. So the SHORT axis grows to
-    # meet a fixed 2.6:1, which only ever adds context around the places and
-    # never crops one out.
-    want = 2.6
-    if w / h < want:
-        grow = (h * want - w) / 2.0
-        x0, w = x0 - grow, h * want
-    elif w / h > want:
-        grow = (w / want - h) / 2.0
-        y0, h = y0 - grow, w / want
-    # AND THEN CLAMPED TO THE WORLD THE PROJECTION DRAWS.
-    #
-    # The languages story frames San Sebastian, Budapest, Helsinki, Tirana
-    # and Tbilisi — a nearly square bounding box, so widening it to 2.6:1 put
-    # the frame at x = -173 to 1374 on a canvas that is 0 to 1000. Four
-    # hundred pixels of it were outside the dataset, and Natural Earth's own
-    # eastern edge drew as a hard vertical line through empty black next to
-    # Tbilisi. It looks like a rendering fault and is in fact a frame asking
-    # for land that was never in the file.
-    #
-    # So the frame slides back inside the canvas, and where the aspect it
-    # wants will not fit at all it gives the aspect up rather than the land.
-    # A story about five scattered languages then shows the whole continent,
-    # which is the true picture of that story anyway.
-    if w >= MAP_W:
-        x0, w = 0.0, float(MAP_W)
-    else:
-        x0 = min(max(x0, 0.0), MAP_W - w)
-    if h >= MAP_H:
-        y0, h = 0.0, float(MAP_H)
-    else:
-        y0 = min(max(y0, 0.0), MAP_H - h)
-    # ONE UNIT SYSTEM FOR ALL NINE, or the type changes size per story.
-    #
-    # The frames range from 390 projection-pixels wide (Bialowieza and
-    # Belovezhskaya Pushcha, 50 km apart) to the full 1000 (five languages
-    # across the continent), and every one of them is drawn at the same
-    # column width. A viewBox of 390 magnifies everything inside it by three:
-    # an 11px label rendered at 33 on the forest story and 11 on the
-    # languages story, and dots to match. Nothing in CSS can correct that,
-    # because the browser scales the units and the stylesheet only knows the
-    # units. So the geometry is scaled into a fixed 1000-wide frame here
-    # instead, and one rule sizes labels on every map the site draws.
-    k = 1000.0 / w
-    vw, vh = 1000.0, h * k
-    at = lambda x, y: ((x - x0) * k, (y - y0) * k)
-    dots, placed, lab = [], [], []
-    # A tenth of the frame, not the route map's fifth: a story's places are
-    # few and far apart, and 0.20 of a continental frame dropped Tirana's
-    # label for being within 300px of Budapest's.
-    dx_min, dy_min = vw * 0.10, vh * 0.030
-    for x, y, n in pts:
-        px, py = at(x, y)
-        dots.append(
-            f'<a class="minidot here" href="{urls.city(n["country"], n["region"], n["city"])}">'
-            f'<circle cx="{px:.1f}" cy="{py:.1f}" r="5.5"/>'
-            f'<title>{esc(n["city"]["name"])}, {esc(n["country"]["name"])}</title></a>'
-        )
-        # Same collision rule as the route map: a label that would land on
-        # one already placed is dropped, not moved. Every place keeps its
-        # dot, its <title> and its row in "Where this happens".
-        if any(abs(px - qx) < dx_min and abs(py - qy) < dy_min for qx, qy in placed):
-            continue
-        placed.append((px, py))
-        lab.append(f'<text class="minilabel here" x="{px + 10:.1f}" y="{py + 4:.1f}">'
-                   f'{esc(n["city"]["name"])}</text>')
-    ctx, land = geo.landmass(MAPPROJ, (x0, y0, w, h))
-    uid = "st" + "".join(ch for ch in s["slug"] if ch.isalnum())[:14]
-    names = [n["city"]["name"] for _x, _y, n in pts]
     where = (names[0] if len(names) == 1
              else ", ".join(names[:-1]) + " and " + names[-1])
-    return (
-        f'<figure class="minimap storymap arched">'
-        f'<svg viewBox="0 0 {vw:.1f} {vh:.1f}" role="img" '
-        f'data-world="intelligence" aria-label="Map of where {esc(s["title"])} '
-        f'happens: {esc(where)}">'
-        f'<defs>{arch_clip(uid, vw, vh)}</defs>'
-        f'<g clip-path="url(#arch-{uid})">'
-        f'<rect x="0" y="0" width="{vw:.1f}" height="{vh:.1f}" class="archground"/>'
-        f'<g transform="scale({k:.4f}) translate({-x0:.1f},{-y0:.1f})">{ctx}{land}</g>'
-        f'{"".join(dots)}{"".join(lab)}</g></svg>'
-        # The full attribution is five dataset names joined by "and" — it
-        # runs to two lines under the map and buries the one thing the
-        # caption is for, which is naming the places. The register is the
-        # honest form of that sentence and it is one click away, so the
-        # caption points at it rather than reciting it. The country map,
-        # whose caption is already a paragraph about what a region is and
-        # is not, still prints it in full.
-        f'<figcaption>Where this happens: {esc(where)}. Coastline and borders '
-        f'from <a href="/sources">Natural Earth</a>, public domain. '
-        f'<a href="/map">The full map →</a></figcaption></figure>'
-    )
+    uid = "st" + "".join(ch for ch in s["slug"] if ch.isalnum())[:14]
+    # The full attribution is five dataset names joined by "and" — it runs to
+    # two lines under the map and buries the one thing the caption is for,
+    # which is naming the places. The register is the honest form of that
+    # sentence and it is one click away, so the caption points at it rather
+    # than reciting it.
+    cap = (f'Where this happens: {esc(where)}. Coastline and borders from '
+           f'<a href="/sources">Natural Earth</a>, public domain. '
+           f'<a href="/map">The full map →</a>')
+    return pointsmap(pts, uid, cap,
+                     f'Map of where {s["title"]} happens: {where}')
 
 
 def routemap(data, j):

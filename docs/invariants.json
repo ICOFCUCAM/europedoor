@@ -107,7 +107,7 @@
       "why": "The heaviest page on the site. Guards against a template quietly inlining something large across a whole family, which is how the coastline reached 51 pages and 2.1 MB."
     },
     "signature.apertures": {
-      "value": 396,
+      "value": 526,
       "kind": "floor",
       "why": "Pages whose geography is seen through the arch. A floor: the aperture is the identity, and a new map that forgets it is a page that stops looking like EuropeDoor."
     },
