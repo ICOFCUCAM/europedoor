@@ -299,9 +299,7 @@
             "forest",
             "woods",
             "woodland",
-            "pine",
-            "birch",
-            "oak"
+            "birch"
           ]
         },
         {
@@ -331,7 +329,6 @@
             "lake",
             "lagoon",
             "river",
-            "gorge",
             "canyon"
           ]
         }
@@ -693,7 +690,6 @@
             "cellar",
             "vineyard",
             "qvevri",
-            "port",
             "champagne",
             "riesling",
             "harvest",
@@ -713,11 +709,9 @@
             "kitchen",
             "cheese",
             "salt pan",
-            "bake",
             "bakery",
             "oven",
             "smokehouse",
-            "farm",
             "olive"
           ]
         }

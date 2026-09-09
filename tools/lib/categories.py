@@ -62,6 +62,34 @@ def matches_sub(exp, sub, city=None):
     return any(re.search(r"\b" + re.escape(k.lower()), t) for k in sub["keywords"])
 
 
+def live_keywords(sub, texts):
+    """Which of a sub-category's terms have actually matched something, and
+    which are declared and idle.
+
+    113 of 261 keywords across the 38 sub-categories match nothing in the
+    197 experiences this atlas holds — puffin, kayak, bauhaus, quattrocento,
+    holocaust. That is NOT the dead-vocabulary defect the motifs and the
+    sub-categories had: a keyword costs nothing when it matches nothing, it
+    ships no URL and no empty page, and deleting "puffin" would delete the
+    intent to write about puffins.
+
+    The defect is what the page SAYS. Every sub-page printed its full term
+    list — "Selected by name and description against: wine, cellar,
+    vineyard, qvevri, port, champagne, riesling, harvest…" — as though all
+    fourteen had done work, when champagne and riesling have never selected
+    anything. A published rule that overstates itself is worse than an
+    unpublished one, because a reader can check it and will find it wrong.
+
+    So the page prints both halves, and the idle half is a content report a
+    reader can act on: it is a list of things nobody has written about yet.
+    """
+    live, idle = [], []
+    for k in sub["keywords"]:
+        pat = re.compile(r"\b" + re.escape(k.lower()))
+        (live if any(pat.search(t) for t in texts) else idle).append(k)
+    return live, idle
+
+
 def is_family(exp):
     if exp.get("kind") not in FAMILY_KINDS:
         return False

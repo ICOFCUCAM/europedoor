@@ -2563,6 +2563,35 @@ def category_page(data, cat, sub=None):
         trail.append((cat["name"], urls.category(cat["slug"])))
     trail.append((title, None))
 
+    # THE WORKING OF THE RULE, INCLUDING THE PARTS THAT DID NOTHING.
+    #
+    # This line used to print the sub-category's whole keyword list as
+    # though every term had selected something. Across the 38 sub-pages, 113
+    # of 261 terms match nothing in the 197 experiences here — so /experiences
+    # /food/cellars claimed to have selected against champagne and riesling,
+    # which have never matched a word anybody wrote. A published rule that
+    # overstates itself is worse than an unpublished one, because a reader
+    # can check it.
+    #
+    # Both halves are printed now, and the idle half is the more useful one:
+    # it is a list of things nobody has written about yet, on the page where
+    # somebody looking for them would land.
+    rulenote = ""
+    if sub:
+        texts = [C.text_of(it["exp"]) for it in items]
+        live, idle = C.live_keywords(sub, texts)
+        rulenote = (f'<p class="small mw44 rulenote">Selected by name and '
+                    f'description against {esc(and_list(live))} — matched on '
+                    f'what we wrote about the experience, never on the name of '
+                    f'the town.')
+        if idle:
+            rulenote += (f' {len(idle)} more '
+                         f'{"terms are" if len(idle) != 1 else "term is"} '
+                         f'declared for this list and {"have" if len(idle) != 1 else "has"} '
+                         f'matched nothing yet: {esc(", ".join(idle))}. That is a '
+                         f'gap in the writing rather than a fact about Europe.')
+        rulenote += "</p>"
+
     body = f"""
 {crumbs(trail)}
 <div class="pagehead overture">
@@ -2575,7 +2604,7 @@ def category_page(data, cat, sub=None):
 {section("Sub-categories", subcards) if subcards else ""}
 {section("How this list is built", f'<p class="small mw44">{esc(C.rule_text(cat))}</p>') if not sub else ""}
 <div class="rows explist">{rows or '<p class="small">Nothing matches this rule yet, and an empty list is better than a padded one.</p>'}</div>
-{f'<p class="small mw44 rulenote">Selected by name and description against: {esc(", ".join(sub["keywords"]))}. Matched against what we wrote about the experience, never against the name of the town.</p>' if sub else ""}
+{rulenote}
 """
     return f"{path}/index.html", page(
         title, body, path=path, area="experiences",
