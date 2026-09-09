@@ -653,12 +653,19 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
   border-radius: var(--radius); background: var(--paper); color: var(--ink);
 }
 .minimap svg { width: 100%; height: auto; display: block; }
-.minidot circle { fill: var(--ink-3); opacity: .55; }
+/* EVERY MINIMAP IS ARCHED — 824 of 824 — so the un-arched fills below never
+   applied to anything. They were written when a map was a light panel on a
+   light page and kept when it became a dark opening; the `.arched` variants
+   have carried every one of these values since. The dead-rule scan lists
+   them, and the honest resolution is to delete the fill rather than raise
+   the ceiling: styling that cannot apply is dead code that looks like a
+   decision. The geometry (size, weight, family) stays here, because that IS
+   what applies. */
+.minidot circle { opacity: .55; }
 .minidot:hover circle { fill: var(--door); opacity: 1; }
-.minidot.here circle { fill: var(--door); opacity: 1; }
-.minilabel { font-family: var(--text); font-size: calc(11px / var(--z));
-             fill: var(--ink-3); }
-.minilabel.here { fill: var(--ink); font-weight: 600; }
+.minidot.here circle { opacity: 1; }
+.minilabel { font-family: var(--text); font-size: calc(11px / var(--z)); }
+.minilabel.here { font-weight: 600; }
 .minimap figcaption { font-size: var(--t-xs); color: var(--ink-3); margin-top: var(--s3); }
 
 /* ── the day-by-day inside a planned leg ──────────────────────────── */
@@ -809,9 +816,13 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
    fill, at a specificity that wins. Deleted rather than left in place:
    styling that cannot apply is dead code that looks like a decision. */
 .countrymap .rtie { stroke: var(--sea); stroke-width: 1; opacity: .35; }
+/* The fill and the halo that were here never applied either — same fight,
+   `.minimap.arched .rlabel text` wins it — so a region name was styled for a
+   light panel and drawn on a dark opening. What is left is the geometry,
+   which is what this selector actually decides. */
 .countrymap .rlabel text {
-  fill: var(--ink-2); font-size: 15px; font-weight: 700; text-anchor: middle;
-  paint-order: stroke; stroke: var(--map-hover); stroke-width: 4; stroke-linejoin: round;
+  font-size: 15px; font-weight: 700; text-anchor: middle;
+  paint-order: stroke; stroke-linejoin: round;
 }
 /* A MACRO REGION IS A SET OF WHOLE COUNTRIES, AND THEY HAVE TO READ AS ONE.
    The first render drew the names in the dark ink of a light page on a

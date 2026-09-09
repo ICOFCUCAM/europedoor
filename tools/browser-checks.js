@@ -1412,7 +1412,16 @@ async function main() {
   // those is a refactor rather than a deletion. Raising this number is
   // allowed; doing it without reading the list is not.
   {
-    const DEAD_CEILING = 27;
+    // 27 -> 18. Two things moved it. The media filter above stopped
+    // reporting a rule that is asleep as one that is dead, and the base
+    // fills that could never apply were deleted: every minimap this build
+    // emits is arched — 824 of 824 — so `.minidot circle { fill }`,
+    // `.minilabel { fill }` and `.countrymap .rlabel text { fill, stroke }`
+    // had been superseded on every page since the map became an opening.
+    // What survives is mostly REDUNDANT rather than unreachable: a `color`
+    // that restates what the element already inherits. That is a different
+    // and much smaller fault, and it is what the remaining number is.
+    const DEAD_CEILING = 18;
     const seen = new Map();
     for (const u of ["/", "/europe/austria", "/europe/austria/tyrol",
                      "/europe/austria/tyrol/innsbruck",
@@ -1431,13 +1440,20 @@ async function main() {
         // an empty list is truthy — the first version of this walker recursed
         // into nothing for every rule, collected none of the 630, and
         // reported a clean result. That is the failure this check is about.
-        const walk = (rs) => {
+        // AND A MEDIA RULE THAT DOES NOT CURRENTLY APPLY IS NOT DEAD, IT IS
+        // ASLEEP. The first version flattened every @media block, so the
+        // dark-preference stroke on the aperture's edge was reported as a
+        // rule that never wins — true in the light preference this runs in,
+        // and exactly the wrong conclusion.
+        const walk = (rs, live) => {
           for (const r of rs) {
-            if (r.cssRules && r.cssRules.length) walk([...r.cssRules]);
-            else if (r.selectorText && r.style) flat.push(r);
+            const cond = r.conditionText || r.media?.mediaText;
+            const on = cond ? live && matchMedia(cond).matches : live;
+            if (r.cssRules && r.cssRules.length) walk([...r.cssRules], on);
+            else if (on && r.selectorText && r.style) flat.push(r);
           }
         };
-        walk([...sheet.cssRules]);
+        walk([...sheet.cssRules], true);
         const out = [];
         for (const rule of flat) {
           const props = PROPS.filter((p) => rule.style.getPropertyValue(p));

@@ -313,6 +313,18 @@ visible in any count. The scan removes each declaration and sees whether
 anything on the page moves; a rule that matches elements and changes none of
 them cannot apply.
 
+**Every minimap is arched — 824 of 824 — so the un-arched base fills could
+never apply.** They were written when a map was a light panel on a light page
+and kept when it became a dark opening; `.minidot circle { fill }`,
+`.minilabel { fill }` and `.countrymap .rlabel text { fill, stroke }` have
+been superseded on every page since. Deleted, keeping the geometry those
+selectors really decide. **And a media rule that does not currently apply is
+asleep, not dead** — the first scan flattened every `@media` block and
+reported the dark-preference reveal as a rule that never wins, which is true
+in the light preference it runs in and exactly the wrong conclusion. 27 dead
+rules to 18, and what survives is mostly **redundant** rather than
+unreachable: a `color` restating what the element already inherits.
+
 **Its first run found that a country is not highlighted on its own map** —
 `.countrymap .countries path.here` never won anywhere, so Austria was drawn
 on Austria's page in exactly the same grey as Germany, on all fifty. The
