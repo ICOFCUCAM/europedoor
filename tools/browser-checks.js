@@ -1390,6 +1390,75 @@ async function main() {
   ok(stored.includes("experience:"), "saving an experience did not store it");
   await xp.close();
 
+  // ── the door exists in both colour-scheme preferences ──────────────
+  //
+  // "Light wall, dark opening" is the whole reading of the aperture: a map
+  // figure paints no background so the corners outside the arch show the
+  // page through. Measured as the contrast between the page those corners
+  // reveal and the ground inside the opening, on every arched map:
+  //
+  //     light preference   17.94:1
+  //     dark preference     1.03:1
+  //
+  // In the dark preference the wall is graphite and so is the opening. There
+  // is no step and there is no door, on every page that draws one — the
+  // site's signature existed in one system setting. It cannot be fixed by
+  // darkening the opening either: two near-blacks are always about 1:1, and
+  // pure black against the graphite ground measures 1.11.
+  //
+  // So the door is read the way a real one is when the wall is dark: by its
+  // cut edge. This asserts that a reader can see the opening EITHER WAY —
+  // by the step from the wall, or by the reveal — in both preferences, and
+  // it is the second half that was missing.
+  for (const scheme of ["light", "dark"]) {
+    const ctx = await browser.newContext({ colorScheme: scheme });
+    const pg = await ctx.newPage();
+    for (const u of ["/europe/austria", "/europe/austria/tyrol",
+                     "/journeys/the-alpine-grand-tour", "/beyond-the-obvious",
+                     "/events/oct"]) {
+      await pg.goto(base + u, { waitUntil: "load" });
+      const m = await pg.evaluate(() => {
+        // color(srgb r g b / a) gives 0..1 channels, rgb() gives 0..255.
+        const parse = (s) => {
+          const n = (s.match(/[\d.]+/g) || [0, 0, 0]).map(Number);
+          const k = /^color\(/.test(s) ? 255 : 1;
+          return [n[0] * k, n[1] * k, n[2] * k, n.length > 3 ? n[3] : 1];
+        };
+        const fig = document.querySelector("figure.minimap.arched");
+        if (!fig) return null;
+        const ground = parse(getComputedStyle(fig.querySelector(".archground")).fill);
+        const edge = fig.querySelector(".archedge");
+        let el = fig.parentElement, bg = "rgba(0, 0, 0, 0)";
+        while (el && /rgba\(0, 0, 0, 0\)/.test(bg)) {
+          bg = getComputedStyle(el).backgroundColor; el = el.parentElement;
+        }
+        if (!edge) return { wall: parse(bg), ground, edge: null };
+        const e = parse(getComputedStyle(edge).stroke);
+        const a = e[3];
+        return { wall: parse(bg), ground,
+                 edge: [0, 1, 2].map((i) => e[i] * a + ground[i] * (1 - a)) };
+      });
+      ok(m !== null, `${u}: no arched map to measure in ${scheme}`);
+      if (!m) continue;
+      const lin = (v) => { const x = v / 255;
+        return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); };
+      const rel = ([r, g, b]) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+      const ratio = (a, b) => {
+        const [hi, lo] = [rel(a), rel(b)].sort((x, y) => y - x);
+        return (hi + 0.05) / (lo + 0.05);
+      };
+      ok(m.edge !== null, `${u} in ${scheme}: the aperture has no cut edge`);
+      const byWall = ratio(m.wall, m.ground);
+      const byEdge = m.edge ? ratio(m.edge, m.ground) : 1;
+      ok(Math.max(byWall, byEdge) >= 1.5,
+         `${u} in ${scheme}: the opening is invisible — ` +
+         `${byWall.toFixed(2)}:1 against the wall it is cut into and ` +
+         `${byEdge.toFixed(2)}:1 on its own edge. The door has to be readable ` +
+         "in both preferences or it is not a signature.");
+    }
+    await ctx.close();
+  }
+
   // ── an invisible thing that painted ────────────────────────────────
   //
   // The touch targets added behind each map dot are transparent circles.
@@ -2044,7 +2113,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 778;
+  const FLOOR = 808;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +

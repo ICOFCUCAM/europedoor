@@ -2055,6 +2055,33 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
   stroke: var(--map-sea); stroke-width: 3; }
 .minimap.arched .rlabel:hover text { fill: var(--lime); }
 
+/* THE REVEAL — the cut edge of the aperture.
+   "Light wall, dark opening" is the whole reading of the door, and it only
+   held in one colour-scheme preference. Measured on every arched map, as the
+   contrast between the page its corners reveal and the ground inside it:
+
+       light preference   17.94:1
+       dark preference     1.03:1
+
+   In the dark preference the wall is graphite and the opening is graphite:
+   no step, no door, on every page that draws one. Darkening the opening
+   cannot fix it — two near-blacks are always about 1:1, and pure black
+   against the graphite ground measures 1.11.
+
+   So the door is read the other way a real one is, by its edge: a doorway is
+   visible because the wall's surface stops. The line is drawn from the same
+   arch_path() the clip uses, outside the clip group so it is not cut away by
+   itself, and it is stated in both preferences rather than only the one that
+   needs it — a signature that changes shape with a system setting is two
+   signatures. */
+.minimap.arched .archedge,
+.heromap .archedge { fill: none; stroke: var(--rule); stroke-width: 1; }
+@media (prefers-color-scheme: dark) {
+  /* Where it is the only thing saying "opening", it carries more weight. */
+  .minimap.arched .archedge,
+  .heromap .archedge { stroke: color-mix(in srgb, var(--limestone) 26%, transparent); }
+}
+
 /* THE TAP TARGET IS NOT THE DOT.
    A .minidot is r=5.5 in a 1000-unit viewBox, which renders at 3.9px across
    on a 358px phone; WCAG 2.2 AA puts the floor at 24. Enlarging the drawn

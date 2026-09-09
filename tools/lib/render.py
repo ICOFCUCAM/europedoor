@@ -103,6 +103,36 @@ def arch_clip(uid, w, h, rise=None, x0=0.0, y0=0.0):
             f'<path d="{arch_path(w, h, rise)}"{off}/></clipPath>')
 
 
+def arch_edge(w, h, rise=None, x0=0.0, y0=0.0):
+    """The cut edge of the aperture — the reveal.
+
+    THE SIGNATURE ONLY EXISTED IN ONE COLOUR-SCHEME PREFERENCE.
+
+    "Light wall, dark opening" is the whole reading of the door: the corners
+    outside the arch show the page through, and a map figure paints no
+    background so that they can. Measured on every arched map, as the
+    contrast between the page the corners reveal and the ground inside the
+    opening:
+
+        light preference   17.94:1
+        dark preference     1.03:1
+
+    In the dark preference the wall is graphite and the opening is graphite,
+    so there is no step and there is no door — on every page that draws one.
+    And it cannot be fixed by darkening the opening: two near-blacks are
+    always about 1:1, because luminance contrast collapses at that end of
+    the scale. rgb(0,0,0) against the graphite ground is 1.11:1.
+
+    So the door is read the other way a real one is: by its EDGE. A doorway
+    cut in a wall is visible because the wall's surface stops, and the reveal
+    catches the light. This is that line, and it is not a fourth definition
+    of the curve — it calls the same arch_path() the clip does, so the
+    check that asserts all the aperture's values agree still holds.
+    """
+    off = f' transform="translate({x0:.1f},{y0:.1f})"' if (x0 or y0) else ""
+    return f'<path class="archedge" d="{arch_path(w, h, rise)}"{off}/>'
+
+
 def esc(s):
     return html.escape(str(s), quote=True)
 

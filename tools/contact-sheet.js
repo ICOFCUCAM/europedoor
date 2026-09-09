@@ -65,10 +65,17 @@ figcaption{position:absolute;top:0;left:0;background:#111;color:#fff;
   const file = path.join(dir, "sheet.html");
   fs.writeFileSync(file, html);
 
+  // --dark shoots the same sheet in the dark colour-scheme preference.
+  // DISCOVER is limestone and INTELLIGENCE is graphite in BOTH preferences
+  // by design — the world says where the reader is, not how they like their
+  // screen — so the two sheets should differ only where the stylesheet
+  // deliberately answers prefers-color-scheme.
+  const dark = process.argv.includes("--dark");
   const browser = await chromium.launch({
     executablePath: "/opt/pw-browsers/chromium",
   });
   const page = await browser.newPage({
+    colorScheme: dark ? "dark" : "light",
     viewport: {
       width: Math.round(W * SCALE) * COLS + 8 * (COLS + 1),
       height: Math.ceil(FAMILIES.length / COLS) * (Math.round(H * SCALE) + 8) + 8,

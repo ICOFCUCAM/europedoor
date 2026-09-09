@@ -16,7 +16,7 @@ from . import urls
 from .render import (LD_PUBLISHER, SITE_NAME, SITE_TAGLINE, card, chips, crumbs,
                      esc, factlist, grid,
                      jsondata, ld_breadcrumb, ld_place, ld_within, motif_for,
-                     page, picture, plate, section, arch_clip)
+                     page, picture, plate, section, arch_clip, arch_edge)
 from .score import city_scores, country_scores, discoverability
 
 HOME = ("Europe", "/discover")
@@ -1792,7 +1792,7 @@ def countrymap(data, c):
         f'<g clip-path="url(#arch-{"cm" + c["slug"][:14].replace(chr(45), "")})">'
         f'<rect x="0" y="0" width="{w}" height="{h}" class="archground"/>'
         f'{ctx}{land}{"".join(ties)}{"".join(dots)}'
-        f'{drawn}</g></svg>'
+        f'{drawn}</g>{arch_edge(w, h)}</svg>'
         # FOUR LINES OF GREY TYPE UNDER THE PAGE'S MOST IMPORTANT IMAGE.
         #
         # This caption carried the full attribution — five dataset names
@@ -2125,7 +2125,7 @@ def minimap(data, t, span=3.2, about=None, named=None):
         f'<rect x="0" y="0" width="{w}" height="{h}" class="archground"/>'
         f'<g transform="translate({w/2 - cx*span:.2f},{h/2 - cy*span:.2f}) scale({span})">'
         f'{ctx}{land}</g>'
-        f'{"".join(dots)}{"".join(labels)}{bar}</g></svg>'
+        f'{"".join(dots)}{"".join(labels)}{bar}</g>{arch_edge(w, h)}</svg>'
         # `about` names something INSIDE this destination — a place page's
         # subject. The map is then honestly captioned as what it is: this
         # atlas has one projection and its finest unit is about four
@@ -2538,7 +2538,7 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
         f'<g clip-path="url(#arch-{uid})">'
         f'<rect x="0" y="0" width="{vw:.1f}" height="{vh:.1f}" class="archground"/>'
         f'<g transform="scale({k:.4f}) translate({-x0:.1f},{-y0:.1f})">{ctx}{land}</g>'
-        f'{route}{"".join(dots)}{"".join(lab)}{bar}</g></svg>'
+        f'{route}{"".join(dots)}{"".join(lab)}{bar}</g>{arch_edge(vw, vh)}</svg>'
         f'<figcaption>{caption}</figcaption></figure>'
     )
 
@@ -5813,7 +5813,7 @@ def discover_page(data):
 
 
 <a class="heromap wide-map arched" href="/map" aria-label="Map of all {len(data['cities'])} places">
-  <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true"><defs>{arch_clip("disc", MAP_W, MAP_H)}</defs><g clip-path="url(#arch-disc)"><rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>{dctx}{dland}{''.join(dots)}</g></svg>
+  <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true"><defs>{arch_clip("disc", MAP_W, MAP_H)}</defs><g clip-path="url(#arch-disc)"><rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>{dctx}{dland}{''.join(dots)}</g>{arch_edge(MAP_W, MAP_H)}</svg>
   <span class="heromap-cap">Coastline from Natural Earth, public domain.
   Open the full map, with layers →</span>
 </a>

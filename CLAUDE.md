@@ -303,6 +303,30 @@ shipped HTML — a page printing a hop says "straight line", and no page
 anywhere claims a mode or a ground distance. A source-level check would have
 passed on all three.
 
+**The signature existed in one colour-scheme preference.** *Light wall, dark
+opening* is the whole reading of the aperture — the corners outside the arch
+show the page through, which is why a map figure paints no background.
+Measured as the contrast between the page those corners reveal and the ground
+inside the opening, on every arched map:
+
+| preference | wall : opening |
+|---|---|
+| light | 17.94:1 |
+| dark | 1.03:1 |
+
+In the dark preference the wall is graphite and so is the opening: no step,
+no door, on every page that draws one. **It cannot be fixed by darkening the
+opening** — two near-blacks are always about 1:1, and pure black against the
+graphite ground measures 1.11. So the door is read the other way a real one
+is: by its **cut edge**, the reveal, drawn from the same `arch_path()` the
+clip uses and stated in both preferences, because a signature that changes
+shape with a system setting is two signatures. 1.03:1 to 2.18:1 in dark.
+
+**The contact sheet takes `--dark`, and only ever looking in light is how
+this survived.** The browser check now asserts the opening is readable
+*either way* — by the step from the wall, or by the reveal — in both
+preferences.
+
 **The stories index was nine three-column grids each holding one card.**
 Built from the desk taxonomy rather than from what a reader is doing: nine
 desks, one story each, so nine `<h2>` bands and a 280px card alone in a
