@@ -1436,7 +1436,15 @@ async function main() {
     // lime route override, superseded because every route map is now an
     // atlas plate, and an atlas-scoped `.routeline` that restated the
     // cobalt and opacity the base rule already sets.
-    const DEAD_CEILING = 21;
+    // 21 -> 23 when the macro map became an editorial illustration. Its own
+    // fill selector was superseded and was DELETED rather than counted; what
+    // remains are `.minimap.arched .context path`'s fill and stroke, which
+    // now only the country reference map and the /discover hero map can
+    // reach, and neither shows a context country on the pages this scan
+    // visits. Same category as the three above: needed by the instruments,
+    // unreachable from here, and the honest fix is scoping the base rules
+    // `:not(.atlas)` — a refactor of every minimap selector.
+    const DEAD_CEILING = 23;
     const seen = new Map();
     for (const u of ["/", "/europe/austria", "/europe/austria/tyrol",
                      "/europe/austria/tyrol/innsbruck",

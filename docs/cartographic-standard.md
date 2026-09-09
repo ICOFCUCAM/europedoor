@@ -28,6 +28,28 @@ and never geographic truth.** Everything drawn here comes from a dataset in
 | 9 | **The aperture is the EuropeDoor signature** | `signature.apertures` is a floor in the invariant register; the arch is cut by four renderers that `checks.py` asserts agree |
 | 10 | **Every map should tell you something about the place** | The editorial test, and the only one of the ten a machine cannot hold. It is what the recognition instrument is for |
 
+## Terrain: where it explains the place, and nowhere else
+
+| map | terrain | treatment |
+|---|---|---|
+| country | no | geography, rivers, peaks, destinations |
+| region | usually no | geography and physical features |
+| destination | yes | local relief, subordinate to the place |
+| journey | yes | relief as a contextual backdrop |
+| Europe overview | no | clean atlas |
+| `/map` | optional | instrument |
+
+**Terrain must support recognition and sense of place, never become the
+subject of the map.** And: **no layer may be added merely because the source
+dataset exists.** Every layer earns its weight by improving one of
+recognition, orientation, sense of place, hierarchy or beauty. If it does
+none of those, it is omitted.
+
+A digital elevation model, when it comes, is a low-resolution derived relief
+for **destination and journey illustrations only**. Not the country plates,
+not the overview, not the whole atlas — that is how an editorial atlas drifts
+into a GIS application.
+
 ## What the standard forbids, specifically
 
 - **No invented geography, at any scale.** No hillshade fitted to nothing, no

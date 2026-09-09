@@ -541,17 +541,18 @@ def macromap(data, m):
            f'rest of Europe behind them. Borders and coastline from '
            f'<a href="/sources">Natural Earth</a>, public domain. '
            f'<a href="/map">The whole map →</a>')
-    return (
-        f'<figure class="minimap macromap arched{dense_class(drawn)}">'
-        f'<svg viewBox="0 0 {w} {h}" role="img" data-world="intelligence" '
-        f'aria-label="Map of {esc(m["name"])}: its {len(members)} countries '
-        f'filled, the rest of Europe behind them">'
-        f'<defs>{arch_clip(uid, w, h)}</defs>'
-        f'<g clip-path="url(#arch-{uid})">'
-        f'<rect x="0" y="0" width="{w}" height="{h}" class="archground"/>'
-        f'{ctx}{land}{drawn}</g>{arch_edge(w, h)}</svg>'
-        f'<figcaption>{cap}</figcaption></figure>'
-    )
+    # AN ILLUSTRATION, NOT AN INSTRUMENT. A macro region drawn as its member
+    # countries is a picture of where the Nordics are; it carries no scale
+    # bar, no layers and nothing to operate. It was the last editorial map
+    # still in the graphite palette, which is the black-land-on-black-water
+    # the standard forbids for editorial geography.
+    return cartography.plate(
+        uid=uid, w=w, h=h, proj=MAPPROJ, view=(0, 0, w, h),
+        land=f"{ctx}{land}", labels=drawn,
+        caption=f'<figcaption>{cap}</figcaption>',
+        figure_class=f"minimap macromap arched atlas{dense_class(drawn)}",
+        aria=(f'Map of {esc(m["name"])}: its {len(members)} countries filled, '
+              f'the rest of Europe behind them'))
 
 
 def macro_page(data, m):
@@ -667,7 +668,7 @@ def _settingportrait(data, c, doc):
     x, y = proj.xy(clat, clon)
     uid = "cs" + "".join(ch for ch in c["slug"] if ch.isalnum())[:14]
     return (
-        f'<figure class="minimap portrait setting arched atlas">'
+        f'<figure class="minimap portrait setting arched atlas" data-role="illustration">'
         f'<svg viewBox="0 0 {w:.0f} {h:.0f}" role="img" data-world="discover" '
         f'aria-label="{esc(c["name"])} marked at its own coordinates, among its '
         f'neighbours. No cartographic source this atlas holds draws an outline '
@@ -2602,7 +2603,7 @@ def countrymap(data, c):
                 f'mainland to draw at this scale without emptying the map.')
     drawn = "".join(phone_declutter(_declutter(labels, w, h)))
     return (
-        f'<figure class="minimap countrymap arched{dense_class(drawn)}">'
+        f'<figure class="minimap countrymap arched{dense_class(drawn)}" data-role="instrument">'
         f'<svg viewBox="0 0 {w} {h}" role="img" data-world="intelligence" '
         f'aria-label="Map of {esc(c["name"])} showing its regions and the destinations in the '
         f'Atlas"><defs>{arch_clip("cm" + c["slug"][:14].replace(chr(45), ""), w, h)}</defs>'
@@ -2881,6 +2882,58 @@ def minimap(data, t, span=3.2, about=None, named=None):
                         1.0 / span, w, h)
     dots, labels = [], []
     inframe = []
+
+    # PHYSICAL GEOGRAPHY ON THE TWO FAMILIES THAT MOST NEED IT. Rendered and
+    # looked at, Chamonix's plate was a beige field with dots on it: you could
+    # not tell it was the Alps. Peaks and named ranges are the terrain this
+    # atlas actually holds — a measurement somebody else made, never a surface
+    # fitted here.
+    #
+    # THE PROJECTOR IS THIS MAP'S OWN. The land is drawn inside a translate
+    # and scale, so continent coordinates have to go through the same
+    # transform or the Alps land in France, which is exactly what happened the
+    # first time feature labels were added anywhere.
+    _peaks_done = [False]
+
+    def _tx(lat, lon):
+        px_, py_ = project(lat, lon)
+        return (w / 2 + (px_ - cx) * span, h / 2 + (py_ - cy) * span)
+
+    def _fits(got):
+        """Place a label if it clears every box already down."""
+        if not got:
+            return False
+        _lh, lx, ly, lw, lh = got
+        bx = (lx - LABEL_CLEAR, ly - LABEL_CLEAR,
+              lx + lw + LABEL_CLEAR, ly + lh + LABEL_CLEAR)
+        for _hh, qx, qy, qw, qh in labels:
+            q = (qx - LABEL_CLEAR, qy - LABEL_CLEAR,
+                 qx + qw + LABEL_CLEAR, qy + qh + LABEL_CLEAR)
+            if not (bx[2] < q[0] or bx[0] > q[2]
+                    or bx[3] < q[1] or bx[1] > q[3]):
+                return False
+        labels.append(got)
+        return True
+
+    def _physical():
+        for fx, fy, fnm, fm in cartography.summit_points(_tx, (0, 0, w, h),
+                                                         most=3):
+            if any(_fits(place_label_box(fx, fy, f"{fnm} {fm:,} m", w, h,
+                                         cls="peakname", off=off_,
+                                         prefer=pref))
+                   for pref in ("beside", "over")
+                   for off_ in (9.0, 20.0)):
+                dots.append(f'<path class="peak" d="M{fx:.1f} {fy - 4.2:.1f}'
+                            f'L{fx + 4.0:.1f} {fy + 2.6:.1f}'
+                            f'L{fx - 4.0:.1f} {fy + 2.6:.1f}Z">'
+                            f'<title>{esc(fnm)} — {fm:,} m</title></path>')
+        for fx, fy, fnm in cartography.feature_points(_tx, (0, 0, w, h)):
+            _fits(place_label_box(fx, fy, fnm, w, h, cls="fname",
+                                  metric="rlabel", off=8.0, prefer="over"))
+        for fx, fy, fnm in cartography.water_points(_tx, (0, 0, w, h)):
+            _fits(place_label_box(fx, fy, fnm, w, h, cls="sname",
+                                  metric="rlabel", off=8.0, prefer="over"))
+
     for _cid, n in sorted(data["cities"].items()):
         x, y = project(n["city"]["lat"], n["city"]["lon"])
         dx, dy = (x - cx), (y - cy)
@@ -2889,11 +2942,23 @@ def minimap(data, t, span=3.2, about=None, named=None):
         inframe.append((w / 2 + dx * span, h / 2 + dy * span))
     # The frame here is w wide rather than 1000, so the cap scales with it.
     hitr = hit_radius(inframe, w, cap=34.0 * w / 1000.0)
-    for cid, n in sorted(data["cities"].items()):
+    # THE SUBJECT FIRST, THEN THE PHYSICAL GEOGRAPHY, THEN THE NEIGHBOURS.
+    # Mont Blanc is ten kilometres from Chamonix and the Matterhorn is beside
+    # Zermatt, so at this scale a summit sits almost on top of the town it
+    # explains and every placement rule that ran the towns first dropped both
+    # peaks. On an Alpine plate the mountain outranks a NEIGHBOURING town's
+    # name — it is the reason the town is there — and the subject's own name
+    # outranks everything.
+    _ordered = sorted(data["cities"].items(),
+                      key=lambda kv: (0 if kv[1]["city"] is t else 1, kv[0]))
+    for cid, n in _ordered:
         x, y = project(n["city"]["lat"], n["city"]["lon"])
         dx, dy = (x - cx), (y - cy)
         if abs(dx) > w / 2 / span or abs(dy) > h / 2 / span:
             continue
+        if n["city"] is not t and not _peaks_done[0]:
+            _peaks_done[0] = True
+            _physical()
         px, py = w / 2 + dx * span, h / 2 + dy * span
         here = n["city"] is t
         # A DOT THE PAGE CANNOT NAME IS NOT A LINK.
@@ -2935,6 +3000,11 @@ def minimap(data, t, span=3.2, about=None, named=None):
                 cls="minilabel here" if here else "minilabel", off=8.0)
             if got:
                 labels.append(got)
+    # If the frame held only the subject, the physical pass never ran in the
+    # loop; run it now.
+    if not _peaks_done[0]:
+        _physical()
+
     drawnlabels = "".join(phone_declutter(labels))
     return (
         cartography.plate(
@@ -4848,7 +4918,7 @@ def map_page(data):
   <span class="small" id="zoomwhere" aria-live="polite"></span>
 </div>
 <div class="mapwrap">
-<svg viewBox="0 0 {MAP_W} {MAP_H}" id="europemap" class="europemap" role="img" aria-describedby="maplist" aria-label="Map of Europe showing every country, destination and place in the Atlas">
+<svg viewBox="0 0 {MAP_W} {MAP_H}" id="europemap" class="europemap" data-role="instrument" role="img" aria-describedby="maplist" aria-label="Map of Europe showing every country, destination and place in the Atlas">
 <rect width="{MAP_W}" height="{MAP_H}" fill="none"/>
 <g id="context" class="context" aria-hidden="true">{''.join(context)}</g>
 <g id="countries" class="countries">{''.join(shapes)}</g>
@@ -6818,7 +6888,7 @@ def discover_page(data):
 </section>
 
 
-<a class="heromap wide-map arched" href="/map" aria-label="Map of all {len(data['cities'])} places">
+<a class="heromap wide-map arched" data-role="instrument" href="/map" aria-label="Map of all {len(data['cities'])} places">
   <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true"><defs>{arch_clip("disc", MAP_W, MAP_H)}</defs><g clip-path="url(#arch-disc)"><rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>{dctx}{dland}{''.join(dots)}</g>{arch_edge(MAP_W, MAP_H)}</svg>
   <span class="heromap-cap">Coastline from Natural Earth, public domain.
   Open the full map, with layers →</span>

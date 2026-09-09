@@ -2914,6 +2914,12 @@ body[data-hero] .masthead { position: sticky; }
    Four layers, which is what makes a map a map: the water is the ground of
    the opening, the land sits on it, the coast is the edge between them, and
    the subject is the only thing in the accent. */
+/* LAND IS NEVER THE COLOUR OF WATER, on an instrument either. These maps
+   drew land with `fill: none`, so the sea showed through it and a country
+   was a near-black shape on a near-black ground separated only by a
+   hairline. That is the failure the editorial rule names — black land on
+   black water — and an instrument is exempt from the PAPER, not from being
+   legible. `--map-land` against `--map-sea` is a measured 1.50 step. */
 .minimap.arched .countries path { fill: var(--map-land);
                                   vector-effect: non-scaling-stroke; }
 .minimap.arched .context path { fill: var(--map-context);
@@ -2927,7 +2933,11 @@ body[data-hero] .masthead { position: sticky; }
    collision in three commits that rendered as "the thing simply is not
    there": the touch targets painted because they LOST one, and this lost one
    too. Neither is visible in any count. */
-.minimap.arched.macromap .countries path.here,
+/* THE MACRO SELECTOR IS GONE FROM THIS PAIR: a macro map is an editorial
+   illustration and wears the atlas skin now, so its members are filled by
+   `.lyr-land .countries path.here` and this half matched fifty elements and
+   changed none of them. The country reference map is an INSTRUMENT and keeps
+   its half. */
 /* AND THE COUNTRY ON ITS OWN PAGE, which lost the same fight on all fifty.
    `.countrymap .countries path.here` sets a fill and a stroke and never wins
    anywhere: found by deleting every rule in this stylesheet in turn and

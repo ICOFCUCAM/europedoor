@@ -2468,6 +2468,46 @@ def c_one_label_rule():
     return n
 
 
+@check("every map declares whether it is an illustration or an instrument")
+def c_map_roles():
+    # A MAP IS AN EDITORIAL ILLUSTRATION UNLESS IT SAYS OTHERWISE. The
+    # default runs that way because the failure runs one way: a picture that
+    # drifts into instrument styling is a page that has quietly become a
+    # dashboard, and nobody notices until somebody looks at twelve families
+    # side by side — which is how the macro region map spent its whole life
+    # in the graphite palette while being a picture of where the Nordics are.
+    #
+    # Asserted on the SHIPPED HTML, and with the consequence attached: an
+    # illustration must carry the atlas skin, and an instrument must not.
+    # Declaring a role and then styling the other way is worse than not
+    # declaring one, because it reads as a decision.
+    pat = re.compile(r'<(?:figure|a|svg)[^>]*class="([^"]*(?:minimap|heromap|'
+                     r'europemap)[^"]*)"[^>]*>')
+    n = illus = instr = 0
+    for path in site_files():
+        html = open(path, encoding="utf-8").read()
+        for m in pat.finditer(html):
+            tag, cls = m.group(0), m.group(1)
+            role = re.search(r'data-role="(\w+)"', tag)
+            assert role, f"{rel(path)}: a map with no declared role: {cls}"
+            assert role.group(1) in ("illustration", "instrument"), (
+                f"{rel(path)}: unknown map role {role.group(1)}")
+            if role.group(1) == "illustration":
+                assert "atlas" in cls.split(), (
+                    f"{rel(path)}: an illustration without the atlas skin — "
+                    f"editorial geography is warm paper and Atlantic water, "
+                    f"never land on a near-black ground")
+                illus += 1
+            else:
+                assert "atlas" not in cls.split(), (
+                    f"{rel(path)}: an instrument wearing the atlas skin")
+                instr += 1
+            n += 1
+    assert illus > 700 and instr > 40, (
+        f"only {illus} illustrations and {instr} instruments found")
+    return n
+
+
 @check("the cartographic standard holds where a machine can hold it")
 def c_cartographic_standard():
     # THE STANDARD IS docs/cartographic-standard.md, AND NINE OF ITS TEN

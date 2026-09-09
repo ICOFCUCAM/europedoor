@@ -1,5 +1,19 @@
 """The EuropeDoor editorial map renderer.
 
+A MAP IS AN EDITORIAL ILLUSTRATION UNLESS IT IS EXPLICITLY DESIGNATED AN
+INSTRUMENT. That is the default here — `role="illustration"` — and it is the
+default because the failure runs one way: a picture that drifts into
+instrument styling is a page that has quietly become a dashboard, and nobody
+notices until somebody looks at twelve families side by side. An instrument
+has to say so, in the markup, and `checks.py` reads it off the shipped HTML.
+
+    illustration   country, destination, place, region, journey, story,
+                   motion, macro — looked at. Warm paper, Atlantic water,
+                   ink coastlines.
+    instrument     /map, /plan, /search, /discover and the country reference
+                   map — operated. Graphite, layers, a scale bar, links.
+
+
     GEOGRAPHIC DATA ─┐                    ┌─ VISUAL STYLE
       coast          │                    │   palette
       borders        ├──▶ THIS MODULE ◀───┤   relief
@@ -415,7 +429,7 @@ def region_bounds(proj, view):
 
 def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
           cities="", destinations="", labels="", route="", caption="",
-          features="", waters="", summits="",
+          features="", waters="", summits="", role="illustration",
           figure_class="minimap arched atlas", aria="", rim=True):
     """A complete editorial plate: the layers, in order, through the arch.
 
@@ -470,7 +484,7 @@ def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
             body.append(_group(name, route))
     inner = "".join(body)
     return (
-        f'<figure class="{figure_class}">'
+        f'<figure class="{figure_class}" data-role="{role}">'
         f'<svg viewBox="0 0 {w:.0f} {h:.0f}" role="img" data-world="discover"'
         f'{f" aria-label={chr(34)}{aria}{chr(34)}" if aria else ""}>'
         f'<defs>{arch_clip(uid, w, h)}</defs>'
