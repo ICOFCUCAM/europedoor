@@ -1475,13 +1475,10 @@ def planner_page(data):
     )
     body = f"""
 {crumbs([("Europe", "/discover"), ("Plan", None)])}
-<div class="pagehead">
+<div class="pagehead instrument">
   <p class="kicker">Journey Planner</p>
   <h1>Twelve days, €2,500, history and mountains.</h1>
-  <p class="lede">Say what you have and what you like — in a sentence or in the form. The planner reads the whole Atlas —
-  {len(data['cities'])} cities across {len(data['countries'])} countries — scores every one against
-  you, then builds a route that respects distance instead of teleporting between highlights.
-  It runs entirely in your browser; nothing you type is sent anywhere.</p>
+  <p class="lede">Say what you have and what you like — in a sentence, or in the form below.</p>
 </div>
 
 <form class="form ask" id="askform">
@@ -1490,6 +1487,10 @@ def planner_page(data):
     <textarea id="ask" name="ask" rows="2"
       placeholder="I have 12 days and €2,500, starting in Lisbon, and I love history, mountains and food."></textarea>
   </div>
+  <p class="small">The planner reads the whole Atlas — {len(data['cities'])} cities across
+  {len(data['countries'])} countries — scores every one against you, then builds a route that
+  respects distance instead of teleporting between highlights. It runs entirely in your
+  browser; nothing you type is sent anywhere.</p>
   <div class="hero-actions mt0">
     <button class="btn" type="submit">Read that and build it</button>
   </div>
@@ -3674,12 +3675,11 @@ def map_page(data):
                  for lat in (35.0, 52.25, 71.0) for lon in (-24.0, 10.0, 44.0)]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Map", None)])}
-<div class="pagehead">
+<div class="pagehead instrument">
   <p class="kicker">The map</p>
   <h1>Europe, and everything we hold in it.</h1>
-  <p class="lede">{len(data['countries'])} countries drawn from open geographic data we host
-  ourselves, with {len(data['cities'])} destinations and {len(placedots)} places on top of them.
-  No tiles from anyone else's server, no map account, no key. Click a country to go into it.</p>
+  <p class="lede">{len(data['countries'])} countries, {len(data['cities'])} destinations and
+  {len(placedots)} places. Click a country to go into it.</p>
 </div>
 <div class="mapstage">
 <div class="mapmain">
@@ -3766,7 +3766,10 @@ def map_page(data):
   Vatican City — have no shape here at all, because at 1:50 million they are smaller than a
   pixel; they are drawn as a ringed point instead of a polygon we made up.
   <a href="/method#map">How the map is built</a>.</p>
-  <p>Projection: equirectangular, corrected at the middle of the extent. Regions are shown by
+  <p>Projection: a <strong>Lambert conformal conic</strong> on the angles the EU publishes
+  pan-European maps at — standard parallels {geo.LCC_P1:g}°N and {geo.LCC_P2:g}°N, origin
+  {geo.LCC_LAT0:g}°N, central meridian {geo.LCC_LON0:g}°E. Conformal means shape is preserved
+  everywhere: a country is the shape it is, at any latitude on this map. Regions are shown by
   the destinations that belong to them, not as boundaries — we hold which region a place is in,
   and we do not hold region geometry.</p>
 </div>
@@ -4162,7 +4165,7 @@ def quiet_page(data):
 def my_europe_page(data):
     body = f"""
 {crumbs([("Europe", "/discover"), ("My Europe", None)])}
-<div class="pagehead">
+<div class="pagehead instrument">
   <p class="kicker">My Europe</p>
   <h1>The list you are building.</h1>
   <p class="lede">Saved places, saved journeys, saved stories. This lives in your browser and
@@ -5209,21 +5212,21 @@ def search_page(data):
          + len(data["stories"]) + len(data["fund"]))
     body = f"""
 {crumbs([("Europe", "/discover"), ("Search", None)])}
-<div class="pagehead">
+<div class="pagehead instrument">
   <p class="kicker">Search</p>
   <h1>Find it.</h1>
   <p class="lede">Everything on EuropeDoor — {n} countries, regions, destinations, places,
   journeys, themes, stories and projects — in one index that runs in your browser.
   Nothing you type is sent anywhere, and nobody can buy a position in it.</p>
-  <p class="small">It reads more than words: <em>cheap</em> and <em>quiet</em> filter,
-  a month narrows to places that are good in it, and <em>near Prague</em> means within
-  300 kilometres of Prague. Whatever it understood is shown back to you as chips.</p>
 </div>
 <form class="form" id="searchform" role="search">
   <div class="field">
     <label for="q">Search Europe</label>
     <input type="text" id="q" name="q" autocomplete="off" autofocus
            placeholder="quiet beaches in september · medieval castles near prague · cheap mountains">
+    <p class="small">It reads more than words: <em>cheap</em> and <em>quiet</em> filter,
+    a month narrows to places that are good in it, and <em>near Prague</em> means within
+    300 kilometres of Prague. Whatever it understood is shown back to you as chips.</p>
   </div>
 </form>
 <div class="chips" id="searchunderstood" aria-live="polite"></div>
@@ -5612,7 +5615,7 @@ def discover_page(data):
     dctx, dland = geo.landmass(MAPPROJ, (0, 0, MAP_W, MAP_H))
     body = f"""
 {crumbs([("Europe", "/discover"), ("Discover", None)])}
-<div class="pagehead">
+<div class="pagehead instrument">
   <p class="kicker">Discover</p>
   <h1>Where will Europe take you?</h1>
   <p class="lede">Every other page here asks you to already know where you want to go — a

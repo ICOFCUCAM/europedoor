@@ -2525,6 +2525,65 @@ def c_year_band():
     return n
 
 
+@check("no published page names a projection the build does not use")
+def c_published_projection():
+    # COMMIT 27 REPLACED THE PROJECTION AND LEFT THE PAGE THAT PUBLISHES IT
+    # SAYING THE OLD NAME.
+    #
+    # Three renderers were made to agree — geo.py, the browser, and a check
+    # asserting conformality at 54 points — and /map went on telling readers
+    # "Projection: equirectangular, corrected at the middle of the extent."
+    # That is the projection whose scale error ran from -25.3% at 35°N to
+    # +89.7% at North Cape, and it is exactly the claim the correction was
+    # made to stop being true. Every check in the suite was green: not one of
+    # them read the prose.
+    #
+    # A name in a comment is history and is welcome; a name in a PAGE is a
+    # claim to a reader. So this reads the shipped HTML only.
+    from lib import geo
+    GONE = ("equirectangular", "web mercator", "mercator", "plate carrée",
+            "plate carree")
+    n = 0
+    named = 0
+    for path in site_files():
+        h = open(path, encoding="utf-8").read()
+        low = h.lower()
+        n += 1
+        for bad in GONE:
+            if bad in low:
+                fail(f"{canonical_of(path)}: names {bad!r} as this map's "
+                     f"projection. The build draws a Lambert conformal conic "
+                     f"at {geo.LCC_P1:g}/{geo.LCC_P2:g}/{geo.LCC_LAT0:g}/"
+                     f"{geo.LCC_LON0:g}.")
+        if "conformal conic" in low:
+            named += 1
+            # And where a page does name it, the four angles it prints must
+            # be the four the build uses. A page that names the right
+            # projection on the wrong parallels is the same failure one
+            # correction later.
+            #
+            # SCOPED TO THE SENTENCE, because the first version searched the
+            # whole document and /map draws its own graticule: "35°N" appears
+            # eight times as an axis label, so the assertion was satisfied by
+            # the drawing rather than by the claim, and deliberately breaking
+            # the prose left it green. A check that can be satisfied by
+            # something other than the thing it is about is not a check.
+            i = low.index("conformal conic")
+            sentence = h[max(0, i - 200):i + 400]
+            for label, val in (("P1", geo.LCC_P1), ("P2", geo.LCC_P2),
+                               ("LAT0", geo.LCC_LAT0), ("LON0", geo.LCC_LON0)):
+                if f"{val:g}°" not in sentence:
+                    fail(f"{canonical_of(path)}: names a conformal conic but "
+                         f"its {label} of {val:g}° is not in the sentence "
+                         f"that names it")
+    n += 1
+    if not named:
+        fail("no published page states the projection Europe is drawn on. "
+             "/map used to, and it was wrong for six commits; saying nothing "
+             "is how it stayed wrong.")
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0

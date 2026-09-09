@@ -553,10 +553,37 @@ main.wide { max-width: 92rem; }
  * width:100% and max-height centres itself inside a box it no longer fills,
  * and the empty sea either side of it is not free. 1.282 is MAP_W/MAP_H and
  * lives here as a number because CSS cannot read it from the SVG. */
+/* 66vh BOUGHT A THIRD OF THE WIDTH FOR A GOAL IT DID NOT REACH.
+   The rule above is right that letterboxing wastes the sea; the constant was
+   wrong. Measured on a 1440-wide window with the map starting at y=380:
+
+       window height   map width   map bottom   whole continent on screen?
+             760          643          889              no
+             900          762          981              no
+            1000          846         1047              no
+            1200         1015         1179              yes
+
+   So at every ordinary height the map was BOTH too narrow AND still below
+   the fold — paying 35% of the column for a promise it kept only on a very
+   tall screen. And the cost was not the sea either side, it was empty PAGE
+   either side, outside the panel, misaligned with a head that runs the full
+   width. That reads as a broken layout rather than as a considered frame.
+
+   Capping by the viewport height instead was tried and is worse: the wrap
+   goes full width and the SVG letterboxes INSIDE it, so the empty sea moves
+   from outside the panel to inside it and nothing is gained. The panel has
+   to hug the drawing; only the budget was wrong.
+
+   So the budget is 88vh rather than 66, still capped at the column so it can
+   never overflow: 857 at a 760 window, 1015 at 900, 1354 at 1200, against
+   643 / 762 / 1015 before. The whole continent is no longer promised above
+   the fold, because that promise was only ever kept on a 1200px-tall screen
+   and cost a third of the instrument to make. An instrument gets the width;
+   the reader scrolls. */
 .mapwrap {
   border: 1px solid var(--rule); border-radius: var(--radius);
   background: var(--paper-2); padding: var(--s4); margin: var(--s3) 0 var(--s5);
-  overflow-x: auto; max-width: calc(66vh * 1.282); margin-inline: auto;
+  overflow-x: auto; max-width: min(100%, calc(88vh * 1.282)); margin-inline: auto;
 }
 .europemap { width: 100%; height: auto; display: block; min-width: 34rem; }
 .europemap .dot circle { fill: var(--sea); opacity: .78; transition: opacity .15s ease, r .15s ease; }
@@ -2026,6 +2053,36 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
 .minimap.arched .rlabel text { fill: color-mix(in srgb, var(--limestone) 88%, transparent);
   stroke: var(--map-sea); stroke-width: 3; }
 .minimap.arched .rlabel:hover text { fill: var(--lime); }
+
+/* AN INSTRUMENT'S TITLE IS A LABEL, BECAUSE THE PAGE IS THE TOOL.
+   Measured across twenty-two rendered families: twenty-one place a 60px h1
+   at y=164 or y=212, and the only one that differs is the homepage, which
+   has a hero. On the five INTELLIGENCE pages that is actively wrong — the
+   head pushed the instrument to y=436 on /plan, y=449 on /map and y=460 on
+   /search, so half the first screen of a tool was a magazine headline and
+   three lines of prose. /discover was worse: its controls started at 1989,
+   two screens down.
+
+   The h1 reuses the h2 declaration VERBATIM rather than introducing a
+   thirteenth size. That is not a saving, it is the argument: an instrument's
+   title carries the weight of a section heading, not of an overture. The
+   kicker sits on the same line, because a tool does not need two.
+
+   The lede keeps only the invitation. Provenance — which datasets, which
+   projection, what the map is not — belongs below the instrument, and on
+   /map it already lived there. */
+.pagehead.instrument { display: grid; gap: var(--s2); padding-bottom: var(--s3); }
+.pagehead.instrument h1 { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); max-width: 46ch;
+                          text-wrap: balance; }
+.pagehead.instrument .kicker { margin: 0; }
+.pagehead.instrument .lede { font-size: var(--t-md); max-width: 52ch; margin: 0; }
+@media (min-width: 52rem) {
+  /* The kicker and the title on one line, baseline-aligned: two stacked
+     labels above a tool is one label too many. */
+  .pagehead.instrument { grid-template-columns: auto 1fr; align-items: baseline;
+                         column-gap: var(--s4); }
+  .pagehead.instrument .lede { grid-column: 1 / -1; }
+}
 
 /* THE EUROPEAN YEAR, AS ITS OWN SHAPE.
    The events family's signature moment. It replaced twelve identical chips

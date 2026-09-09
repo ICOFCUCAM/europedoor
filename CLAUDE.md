@@ -303,6 +303,41 @@ shipped HTML — a page printing a hop says "straight line", and no page
 anywhere claims a mode or a ground distance. A source-level check would have
 passed on all three.
 
+**Twenty-one of twenty-two families place a 60px h1 at y=164 or y=212.** Only
+the homepage differs, because it has a hero. On the five INTELLIGENCE pages
+that is actively wrong: the head pushed the instrument to y=436 on `/plan`,
+449 on `/map` and 460 on `/search`, so half the first screen of a *tool* was a
+magazine headline and four or five lines of prose. **An instrument's title is
+a label, because the page is the tool** — `.pagehead.instrument` reuses the h2
+font-size declaration verbatim rather than introducing a thirteenth size, and
+that is the argument rather than a saving. The instructions moved to the
+control they describe: how the planner scores sits beside the button that
+runs it, and what the search box understands sits under the search box.
+Instruments now start at 328–397.
+
+**The map's 66vh cap bought a third of its width for a promise it did not
+keep.** Measured on a 1440-wide window: the whole continent was above the fold
+only at a 1200px viewport height, and at 760/900/1000 the map was *both*
+narrower and still below the fold. The cost was not the sea either side, it
+was empty **page** either side, outside the panel, misaligned with a
+full-width head. Capping by viewport height instead is worse — the wrap goes
+full width and the drawing letterboxes inside it, so the empty sea moves in
+rather than away. The budget is 88vh, capped at the column: 857 / 1015 / 1354
+against 643 / 762 / 1015.
+
+**Commit 27 changed the projection and left the page that publishes it saying
+the old name.** `/map` went on printing *"Projection: equirectangular,
+corrected at the middle of the extent"* — the projection whose scale error ran
+−25.3% to +89.7%, and the exact claim the correction existed to stop being
+true. Three renderers were made to agree and 54 conformality points were
+asserted; not one check read the prose. A name in a comment is history; a name
+on a **page** is a claim to a reader, so `checks.py` now reads the shipped HTML
+only, and also asserts that some page states the projection at all — saying
+nothing is how it stayed wrong. **The first version of the angle half could be
+satisfied by the drawing rather than the claim**: `/map` draws its own
+graticule and "35°N" appears eight times as an axis label, so breaking the
+prose left it green. Scoped to the sentence that names the projection.
+
 **The mechanism was standing in front of the answer, and saying everything
 twice.** A motion's signature moment is the query drawn as a shape: "everywhere
 above 63° north" is eight lit points across Iceland, Norway, Sweden and Finnish

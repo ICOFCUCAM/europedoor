@@ -35,12 +35,11 @@
 <main id="main" class="wide">
 
 <nav class="crumbs" aria-label="Breadcrumb"><a href="/discover">Europe</a><span class="sep" aria-hidden="true">/</span><span aria-current="page">Map</span></nav>
-<div class="pagehead">
+<div class="pagehead instrument">
   <p class="kicker">The map</p>
   <h1>Europe, and everything we hold in it.</h1>
-  <p class="lede">50 countries drawn from open geographic data we host
-  ourselves, with 319 destinations and 255 places on top of them.
-  No tiles from anyone else's server, no map account, no key. Click a country to go into it.</p>
+  <p class="lede">50 countries, 319 destinations and
+  255 places. Click a country to go into it.</p>
 </div>
 <div class="mapstage">
 <div class="mapmain">
@@ -127,7 +126,10 @@
   Vatican City — have no shape here at all, because at 1:50 million they are smaller than a
   pixel; they are drawn as a ringed point instead of a polygon we made up.
   <a href="/method#map">How the map is built</a>.</p>
-  <p>Projection: equirectangular, corrected at the middle of the extent. Regions are shown by
+  <p>Projection: a <strong>Lambert conformal conic</strong> on the angles the EU publishes
+  pan-European maps at — standard parallels 35°N and 65°N, origin
+  52°N, central meridian 10°E. Conformal means shape is preserved
+  everywhere: a country is the shape it is, at any latitude on this map. Regions are shown by
   the destinations that belong to them, not as boundaries — we hold which region a place is in,
   and we do not hold region geometry.</p>
 </div>
