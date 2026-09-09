@@ -2061,7 +2061,17 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
    dot would destroy the map, so each link carries a transparent circle
    behind its dot, sized at build time to half the distance to the nearest
    other dot — the largest target that can never steal a neighbour's tap. */
-.minidot .hit { fill: transparent; stroke: none; }
+/* AND IT HAS TO OUT-SPECIFY THE FILLS ABOVE, WHICH IT DID NOT.
+   `.minidot .hit` is (0,2,0) and `.minimap.arched .minidot circle` is
+   (0,3,1), so the touch targets painted at 55% limestone: three grey blobs
+   the size of a region across every country map, and lime saucers on the
+   month and quiet maps. Fifty-one static checks, seven hundred and
+   seventy-seven browser checks, 1,334 section assertions and every
+   invariant were green — a contact sheet of twelve families found it in one
+   look, which is the whole argument for rendering the thing. */
+.minimap .minidot .hit,
+.minimap.arched .minidot .hit,
+.minimap.arched .minidot.here .hit { fill: transparent; stroke: none; }
 /* A context dot is not a link and must not offer to be one. */
 .minidot.context { pointer-events: none; }
 

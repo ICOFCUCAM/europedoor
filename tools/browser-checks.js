@@ -1390,6 +1390,33 @@ async function main() {
   ok(stored.includes("experience:"), "saving an experience did not store it");
   await xp.close();
 
+  // ── an invisible thing that painted ────────────────────────────────
+  //
+  // The touch targets added behind each map dot are transparent circles.
+  // `.minidot .hit` is specificity (0,2,0) and `.minimap.arched .minidot
+  // circle` is (0,3,1), so every one of them painted at 55% limestone:
+  // three grey blobs the size of a region across every country map, and
+  // lime saucers over the month and quiet maps.
+  //
+  // 51 static checks, 777 browser checks, 1,334 section assertions and 26
+  // invariants were all green. A contact sheet of twelve families found it
+  // in one look — rendering finds defects, counting settles proportions —
+  // and this is the assertion that would have found it without one.
+  for (const u of ["/europe/austria", "/europe/austria/tyrol",
+                   "/europe/austria/tyrol/innsbruck",
+                   "/journeys/the-alpine-grand-tour", "/events/oct",
+                   "/beyond-the-obvious"]) {
+    await page.goto(base + u, { waitUntil: "load" });
+    const painted = await page.evaluate(() =>
+      [...document.querySelectorAll(".minidot .hit")].filter((c) => {
+        const f = getComputedStyle(c).fill;
+        return f !== "none" && !/rgba\(0, 0, 0, 0\)/.test(f);
+      }).length);
+    ok(painted === 0,
+       `${u}: ${painted} touch target(s) are painting. They are meant to be ` +
+       "invisible, and a fill on them is a blob the size of the target.");
+  }
+
   // ── a target too small to hit, and no other way in ─────────────────
   //
   // A .minidot is r=5.5 in a 1000-unit viewBox: 3.9px across on a 358px
@@ -1711,8 +1738,14 @@ async function main() {
           const g = fig.querySelector(".archground");
           if (!g) continue;
           const ground = parse(getComputedStyle(g).fill);
-          for (const sel of [".minilabel", ".minilabel.here", ".minidot circle",
-                             ".minidot.here circle", ".routeline",
+          // `:not(.hit)` because a dot now carries a transparent touch
+          // target as its FIRST circle, and querySelector takes the first:
+          // this measured the invisible one and reported 1.00:1 on the
+          // ground, which is true of the target and says nothing about the
+          // dot the reader sees.
+          for (const sel of [".minilabel", ".minilabel.here",
+                             ".minidot circle:not(.hit)",
+                             ".minidot.here circle:not(.hit)", ".routeline",
                              ".rlabel text", ".scalebar text", ".scalebar path"]) {
             const el = fig.querySelector(sel);
             if (!el) continue;
@@ -2011,7 +2044,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 772;
+  const FLOOR = 778;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +

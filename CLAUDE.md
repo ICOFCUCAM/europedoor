@@ -303,6 +303,17 @@ shipped HTML — a page printing a hop says "straight line", and no page
 anywhere claims a mode or a ground distance. A source-level check would have
 passed on all three.
 
+**An invisible thing painted, and every counting check was green.** The
+touch targets behind each map dot are transparent circles. `.minidot .hit` is
+specificity (0,2,0) and `.minimap.arched .minidot circle` is (0,3,1), so all
+of them painted at 55% limestone: **three grey blobs the size of a region on
+every country map**, and lime saucers over the month and quiet maps. Every
+gate was green — the static suite, the browser suite, both audits and the
+whole invariant register. Not one of them counts things a reader can see. A
+contact sheet of twelve families found it in one look. Fixing it
+then broke a contrast check, which had been reading the first `.minidot
+circle` — now the invisible one — and reporting 1.00:1.
+
 **A dot on a map is a link, and it was 3.9 pixels wide.** WCAG 2.2 AA puts
 the floor at 24. The suite measured the thumb bar's five items and nothing
 else, so 130 links on `/beyond-the-obvious`, 12 on a destination page and 345
@@ -762,6 +773,11 @@ caught the planner producing a 2,500 km final leg to reach a named end city
 and calling it an itinerary. None of those was findable by reading the code.
 They launch the sandbox's own Chromium via `executablePath` because the npm
 package version will not match the installed browser build.
+
+**And one that is deliberately not a gate.** `node tools/contact-sheet.js`
+puts one page per family in a single image. A sheet cannot fail, and a gate
+that cannot fail is a gate people stop running — the same reason
+`plate-variation.py` is kept out. Run it after a visual change, and look.
 
 The map pipeline is **not** part of the build — the build must run on a host
 with no internet and produce identical pages, so the raw data and the processed
