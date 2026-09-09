@@ -27,7 +27,24 @@ const OUT = process.argv[2] || "contact-sheet.png";
 
 // One exemplar per rendered family. Add a row when a family appears; the
 // point of the sheet is that every family is in one field of view.
-const FAMILIES = [
+// --more shoots the OTHER twelve: the families the first sheet does not
+// include, which is exactly the set nobody had looked at.
+const MORE = [
+  ["macro", "/countries/"],
+  ["place", "/europe/austria/vienna-and-the-east/vienna/place/schonbrunn/"],
+  ["facet", "/europe/austria/vienna-and-the-east/vienna/things-to-do/"],
+  ["interest", "/interests/mountains/"],
+  ["experiences", "/experiences/"],
+  ["category", "/experiences/food/"],
+  ["how it works", "/how-it-works/"],
+  ["fund project", "/fund/"],
+  ["method", "/method/"],
+  ["about", "/about/"],
+  ["manifesto", "/manifesto/"],
+  ["sources", "/sources/"],
+];
+
+const FAMILIES = process.argv.includes("--more") ? MORE : [
   ["home", "/"],
   ["country", "/europe/austria/"],
   ["region", "/europe/austria/tyrol/"],
@@ -76,6 +93,27 @@ figcaption{position:absolute;top:0;left:0;background:#111;color:#fff;
   // screen — so the two sheets should differ only where the stylesheet
   // deliberately answers prefers-color-scheme.
   const dark = process.argv.includes("--dark");
+  // A SHEET THAT PHOTOGRAPHS A 404 LOOKS LIKE A BLANK PAGE.
+  // The second sheet carried /experiences/food-and-drink, which does not
+  // exist — the route is /experiences/food — and the cell rendered as an
+  // empty white rectangle with the server's error text at 31% scale. That is
+  // the same failure as a suite that stops counting: the output looks like a
+  // result. Every URL is checked before anything is drawn.
+  const browser0 = await chromium.launch({
+    executablePath: "/opt/pw-browsers/chromium",
+  });
+  const probe = await browser0.newPage();
+  const missing = [];
+  for (const [name, url] of FAMILIES) {
+    const r = await probe.goto(BASE + url, { waitUntil: "commit" });
+    if (!r || r.status() !== 200) missing.push(`${name} ${url} -> ${r ? r.status() : "no response"}`);
+  }
+  await browser0.close();
+  if (missing.length) {
+    console.error("contact sheet: these are not pages —\n  " + missing.join("\n  "));
+    process.exit(1);
+  }
+
   const browser = await chromium.launch({
     executablePath: "/opt/pw-browsers/chromium",
   });

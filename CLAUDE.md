@@ -832,7 +832,14 @@ They launch the sandbox's own Chromium via `executablePath` because the npm
 package version will not match the installed browser build.
 
 **And one that is deliberately not a gate.** `node tools/contact-sheet.js`
-puts one page per family in a single image. A sheet cannot fail, and a gate
+puts one page per family in a single image. `--dark` shoots the dark
+colour-scheme preference, `--phone` shoots 390px, and `--more` shoots the
+twelve families the default set leaves out — macro, place, facet, interest,
+experiences, category, how-it-works, fund, method, about, manifesto,
+sources. Each of those three found a defect the whole gate suite was green
+on. **It refuses to draw a page that is not 200**: the second sheet
+photographed a 404 as a blank white cell, which is the same failure as a
+suite that stops counting — the output still looks like a result. A sheet cannot fail, and a gate
 that cannot fail is a gate people stop running — the same reason
 `plate-variation.py` is kept out. Run it after a visual change, and look.
 
