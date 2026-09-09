@@ -992,7 +992,7 @@ own tracked uppercase, so no font size is introduced. Twenty-three of the
 forty-four are named; the rest are dropped, and keep their shape, their
 frontier, their link and their accessible name.
 
-**Two rules were needed and neither was obvious.** Without the first, the
+**Three rules were needed and none was obvious.** Without the first, the
 nine anchors and four positions are enough freedom to LEAVE: ICELAND floated
 in the Denmark Strait, UNITED KINGDOM and PORTUGAL sat in the Atlantic and
 BOSNIA AND HERZEGOVINA lay across the whole Balkan peninsula. **A name's
@@ -1000,13 +1000,29 @@ middle must be on the country it names** — it may run out over the sea, which
 is what a printed atlas does with Norway, and it may not start there.
 
 That fixed the position and left the width: SWITZERLAND then ran from
-Bordeaux to Munich, correctly centred. A printed atlas answers with an
-abbreviation, a leader line or a number in a key and this picture carries none
-of the three, so **a name more than twice its country's longest side is
-dropped**. Measured against the LONGEST side rather than the width, because
-Portugal is 55 units across and 160 tall and its name reads perfectly down it.
-Iceland's name is 1.8 times its island and belongs on the map; Switzerland's
-is 3.6 times its country and does not.
+Bordeaux to Munich, correctly centred, CROATIA lay across Bosnia and AUSTRIA
+across Hungary. **A BOUNDING BOX IS NOT A COUNTRY** — the middle of Croatia's
+box is in Bosnia — so the test is the real polygon, and the second rule is
+that **a name may run over water and never over a neighbour.**
+
+**And "not one point on a neighbour" was the wrong rule, measured.** It left
+ten names and dropped GERMANY, POLAND, SWEDEN, NORWAY, FINLAND and UNITED
+KINGDOM, which are exactly the countries a reader orients by. A printed atlas
+lets the ends of a name touch a neighbour; what it never does is lay a name
+ACROSS one. So the third rule is a fraction rather than a flag: ten samples
+along the name, at most two of them on somebody else's ground — tried at zero
+first and at two only if nothing fits, so the nine anchors choose the cleanest
+placement available rather than the first tolerable one.
+
+**Fifteen names, and the number is geography's rather than a target.** Raising
+the ceiling to 99 produced the same fifteen: RUSSIA, TÜRKIYE, UKRAINE, ITALY,
+SWEDEN, FRANCE, SPAIN, GERMANY, UNITED KINGDOM, POLAND, ROMANIA, GREECE,
+ICELAND, AZERBAIJAN, IRELAND. **The question is not how many countries can be
+labelled** — an earlier, looser version put twenty-three on and every extra
+one was a name lying across its neighbours. The rest of the continent is read
+from its shape, which is what the shape is for. The countries are also placed
+LARGEST FIRST, by drawn area, because in document order — alphabetical by ISO
+code — Albania took a position before Germany was asked for one.
 
 **And they come off below 44rem.** `--t-lg` is a length in a 1,120-unit
 viewBox: at 390 that is a third of a pixel per unit, so a twenty-unit name

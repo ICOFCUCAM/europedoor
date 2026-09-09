@@ -415,13 +415,96 @@ def heroeurope(data):
     NAME_INSET = 14.0
     taken = []
 
+    # WHOSE GROUND IS THIS? A name may run out over the SEA — a printed atlas
+    # does that with Norway and with Chile — and may never run over a
+    # neighbour. Keeping the name's middle on its own country was not enough
+    # by half: SWITZERLAND ran from Bordeaux to Munich correctly centred,
+    # CROATIA lay across Bosnia, AUSTRIA across Hungary, GREECE into Türkiye.
+    # A bounding box is not a country either — Croatia's box has its middle in
+    # Bosnia — so the test is the real polygon.
+    #
+    # Every country's rings are indexed once, with a bounding box in front of
+    # each so that almost every sample is rejected by four comparisons.
+    def _rings_of(d):
+        out = []
+        for sub in d.split("Z"):
+            pts = [(float(a), float(b))
+                   for a, b in re.findall(r"[ML](-?[\d.]+) (-?[\d.]+)", sub)]
+            if len(pts) >= 3:
+                xs = [q[0] for q in pts]
+                ys = [q[1] for q in pts]
+                out.append(((min(xs), min(ys), max(xs), max(ys)), pts))
+        return out
+
+    def _inside(pts, x, y):
+        """Even-odd crossing test — the standard one, and it is exact."""
+        hit = False
+        j = len(pts) - 1
+        for i, (px_, py_) in enumerate(pts):
+            qx, qy = pts[j]
+            if (py_ > y) != (qy > y) and \
+                    x < (qx - px_) * (y - py_) / (qy - py_) + px_:
+                hit = not hit
+            j = i
+        return hit
+
+    shapes = []
+    for _m in re.finditer(r'<path d="([^"]*)"><title>([^<]*)</title></path>',
+                          land):
+        shapes.append(_rings_of(_m.group(1)))
+
+    def _crosses(mine, x, y):
+        for k, rings in enumerate(shapes):
+            if k == mine:
+                continue
+            for bb_, pts in rings:
+                if not (bb_[0] <= x <= bb_[2] and bb_[1] <= y <= bb_[3]):
+                    continue
+                if _inside(pts, x, y):
+                    return True
+        return False
+
+    # AND "NOT ONE PIXEL ON A NEIGHBOUR" WAS THE WRONG RULE, MEASURED.
+    #
+    # Forbidding every crossing left ten names — and it dropped GERMANY,
+    # POLAND, SWEDEN, NORWAY, FINLAND and UNITED KINGDOM, which are exactly
+    # the countries a reader orients by. A printed atlas lets the ends of a
+    # name touch a neighbour; what it never does is lay a name ACROSS one.
+    # So the test is a fraction rather than a flag: ten samples along the
+    # name, at most two of them on somebody else's ground.
+    #
+    # It is tried at zero first and at two only if nothing fits, which makes
+    # the four positions and nine anchors choose the cleanest placement
+    # available rather than the first tolerable one — the routine returns the
+    # first that fits, so the tolerance is the pass and not a score.
+    CROSS_OK = 2
+
+    def _crossings(mine, x0, y0, w0, h0):
+        mid_y = y0 + h0 / 2.0
+        cap_y = y0 + h0 * 0.34
+        n_ = 0
+        for i in range(7):
+            if _crosses(mine, x0 + w0 * i / 6.0, mid_y):
+                n_ += 1
+        for i in range(3):
+            if _crosses(mine, x0 + w0 * (0.15 + 0.35 * i), cap_y):
+                n_ += 1
+        return n_
+
+    def _own(mine, x, y):
+        for bb_, pts in shapes[mine]:
+            if (bb_[0] <= x <= bb_[2] and bb_[1] <= y <= bb_[3]
+                    and _inside(pts, x, y)):
+                return True
+        return False
+
     def _clear(lx, ly, lw, lh):
         b = (lx - LABEL_CLEAR, ly - LABEL_CLEAR,
              lx + lw + LABEL_CLEAR, ly + lh + LABEL_CLEAR)
         return not any(not (b[2] < q[0] or b[0] > q[2]
                             or b[3] < q[1] or b[1] > q[3]) for q in taken)
 
-    def _inframe(x, y, wide, anchor, box=None, metric="cname"):
+    def _inframe(x, y, wide, anchor, mine=None, metric="cname", tol=0):
         x0, y0, w0, h0 = _label_box(
             x, y, wide, anchor, *LABEL_METRICS[metric][2:])
         if not (x0 >= view[0] + NAME_INSET
@@ -429,27 +512,45 @@ def heroeurope(data):
                 and y0 >= view[1] + NAME_INSET
                 and y0 + h0 <= view[1] + vh - NAME_INSET):
             return False
-        # AND THE NAME'S MIDDLE MUST BE ON THE COUNTRY IT NAMES. Without this
-        # the first version put ICELAND in the Denmark Strait, UNITED KINGDOM
-        # and PORTUGAL in the Atlantic and BOSNIA AND HERZEGOVINA across the
-        # whole Balkan peninsula: the four positions and nine anchors are a
-        # lot of freedom, and every one of them was allowed to leave. A name
-        # WIDER than its own country may still run out over the sea, which is
-        # what a printed atlas does with Norway and with Chile; its centre may
-        # not.
-        if box is None:
+        if mine is None:
             return True
-        return (box[0] <= x0 + w0 / 2.0 <= box[2]
-                and box[1] <= y0 + h0 / 2.0 <= box[3])
+        # THE MIDDLE ON ITS OWN COUNTRY, AND NOT ONE SAMPLE ON ANYBODY
+        # ELSE'S. Nine sample points along the name — seven on the baseline
+        # and three at cap height — because a name is a bar of type rather
+        # than a point, and the whole bar has to be over its own ground or
+        # over water.
+        if not _own(mine, x0 + w0 / 2.0, y0 + h0 / 2.0):
+            return False
+        return _crossings(mine, x0, y0, w0, h0) <= tol
 
     ANCHORS = ((0, 0), (0, -0.35), (0, 0.35), (-0.4, 0), (0.4, 0),
                (-0.3, -0.3), (0.3, -0.3), (-0.3, 0.3), (0.3, 0.3))
-    names = []
-    for m in re.finditer(r'<path d="([^"]*)"><title>([^<]*)</title></path>',
-                         land):
+    # THE BIGGEST COUNTRIES CLAIM THEIR SPACE FIRST, and there is a cap.
+    #
+    # Placed in document order — which is alphabetical by ISO code — Albania
+    # took a position before Germany was asked for one, and the map filled up
+    # from whoever happened to be first. Drawn area is the honest order here:
+    # it is a property of THIS picture rather than a judgement about the
+    # country, and it is the same quantity that decides whether a name can
+    # fit at all.
+    #
+    # And the cap is the point of the whole layer. The question is not how
+    # many countries can be labelled, it is whether the labels make Europe
+    # more recognisable — so sixteen is the ceiling and the rest of the
+    # continent is read from its shape, which is what the shape is for.
+    NAME_MAX = 16
+    order_ = []
+    for idx, m in enumerate(re.finditer(
+            r'<path d="([^"]*)"><title>([^<]*)</title></path>', land)):
         spot = _dpath(m.group(1))
-        if not spot:
-            continue
+        if spot:
+            order_.append(((spot[3][2] - spot[3][0]) * (spot[3][3] - spot[3][1]),
+                           idx, m, spot))
+    order_.sort(key=lambda t: -t[0])
+    names = []
+    for _area, idx, m, spot in order_:
+        if len(names) >= NAME_MAX:
+            break
         cx, cy, rad, bbox = spot
         up = (m.group(2).replace('&amp;', '&').replace('&lt;', '<')
               .replace('&gt;', '>').replace('&quot;', '"')).upper()
@@ -468,19 +569,26 @@ def heroeurope(data):
         # perfectly down it. Twice that side is the limit: Iceland's name is
         # 1.8 times its island and belongs on the map; Switzerland's is 3.6
         # times its country and does not.
+        # A LOOSE CAP, AND ONLY TO BOUND THE WORK. The crossing test is what
+        # decides now; this stops a name four times its own country's length
+        # from paying for nine anchors and forty polygon tests to be told so.
         span = max(bbox[2] - bbox[0], bbox[3] - bbox[1])
         pad_, ch_, _u, _d = LABEL_METRICS["cname"]
         one = pad_ + len(up) * ch_
         two = (pad_ + max(len(a) for a in up.rsplit(" ", 1)) * ch_
                if " " in up else one)
-        if min(one, two) > 2.0 * span:
+        if min(one, two) > 3.0 * span:
             continue
         got = None
-        for fx, fy in ANCHORS:
-            got = place_label_box(cx + fx * rad, cy + fy * rad, up, vw, vh,
-                                  cls="cname", off=10.0, prefer="over",
-                                  metric="cname", clears=_clear,
-                                  fits=lambda *a, _b=bbox: _inframe(*a, box=_b))
+        for tol_ in (0, CROSS_OK):
+            for fx, fy in ANCHORS:
+                got = place_label_box(
+                    cx + fx * rad, cy + fy * rad, up, vw, vh, cls="cname",
+                    off=10.0, prefer="over", metric="cname", clears=_clear,
+                    fits=lambda *a, _i=idx, _t=tol_: _inframe(
+                        *a, mine=_i, tol=_t))
+                if got:
+                    break
             if got:
                 break
         if not got and " " in up:
@@ -499,8 +607,9 @@ def heroeurope(data):
                                       vw, vh, cls="cname", off=10.0,
                                       prefer="over", metric="cname2",
                                       clears=_clear, wrap=_two,
-                                      fits=lambda *a, _b=bbox: _inframe(
-                                          *a, box=_b, metric="cname2"))
+                                      fits=lambda *a, _i=idx: _inframe(
+                                          *a, mine=_i, metric="cname2",
+                                          tol=CROSS_OK))
                 if got:
                     break
         if got:
