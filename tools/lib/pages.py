@@ -3693,7 +3693,24 @@ def story_page(data, s):
         s["title"], body, path=f"/stories/{s['slug']}", area="stories",
         description=s["standfirst"][:180],
         scripts=["/assets/js/my-europe.js"],
-        og=("story:" + s["slug"], None, f"{s['title']} — {s['standfirst'][:90]}"),
+        # NO SOCIAL CARD, AND THAT IS THE RULE RATHER THAN AN OMISSION.
+        #
+        # "A story is not a place, and its picture may not be drawn from a
+        # hash. A photograph first if the register holds one; never an
+        # illustration." The story PAGE was rebuilt on storymap() for that,
+        # and the story INDEX had its nine hash-drawn cards removed. This
+        # line went on passing motif=None, which is exactly the instruction
+        # to pick the landscape from the hash of the slug — on the one
+        # picture that is rendered inside somebody else's product, where
+        # nobody here would ever see it.
+        #
+        # The alternative to a hash-drawn landscape is not a better hash. A
+        # plate IS an illustration, so no motif is allowed either; the
+        # register holds no photographs; and rasterising storymap() would
+        # need a second renderer for map geometry that does not exist. So a
+        # shared story link carries its title and its standfirst and no
+        # image, until the register holds a photograph for it.
+        og=None,
         ld_blocks=[
             ld_breadcrumb([("Europe", "/discover"), ("Stories", "/stories"),
                            (s["title"], f"/stories/{s['slug']}")]),

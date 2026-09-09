@@ -2724,6 +2724,54 @@ def c_story_never_a_plate():
     return n
 
 
+@check("no social card is a landscape chosen by a hash")
+def c_og_never_hashed():
+    # A CARD IS THE ONE PICTURE RENDERED INSIDE SOMEBODY ELSE'S PRODUCT.
+    #
+    # og_tags() takes a motif. Where a page passes one, the card is the same
+    # drawing as the page and comes from what the record IS. Where it passes
+    # None, plate_shapes() picks the landscape from the hash of the seed.
+    #
+    # The story family passed None. The rule — a story is not a place and its
+    # picture may not be drawn from a hash — had already been enforced twice:
+    # the page was rebuilt on storymap(), and the index had its nine
+    # hash-drawn cards removed. The social card went on being a landscape
+    # chosen by the slug, on the one surface nobody here ever looks at.
+    #
+    # This asserts it at the source, because the shipped HTML cannot tell a
+    # hash-chosen card from a named one — both are a URL to a PNG. Every og=
+    # in pages.py either names a motif or is None, and None now means no card
+    # at all rather than "choose one for me".
+    src = open(os.path.join(ROOT, "tools", "lib", "pages.py"),
+               encoding="utf-8").read()
+    n = 0
+    for m in re.finditer(r"og=\((.{0,160}?)\),\n", src, re.S):
+        n += 1
+        args = m.group(1)
+        # the second argument is the motif
+        parts = [p.strip() for p in args.split(",")]
+        if len(parts) >= 2 and parts[1] in ("None", "none"):
+            fail(f"a page passes og=(seed, None, ...): the social card for it "
+                 f"is a landscape chosen by the hash of the seed. Name the "
+                 f"motif from what the record is, or pass og=None and ship "
+                 f"no card — {args[:70]}")
+    n += 1
+    if "og=None," not in src:
+        fail("nothing passes og=None any more. That was the story family's "
+             "answer to a rule that forbids both a hash-drawn picture and an "
+             "illustration; if a story has a card again it needs a reason.")
+    # And the built pages agree: no story ships one.
+    d = D.load()
+    for st in d["stories"]:
+        n += 1
+        path = os.path.join(OUT, "stories", st["slug"], "index.html")
+        if os.path.exists(path) and "og:image" in open(path, encoding="utf-8").read():
+            fail(f"/stories/{st['slug']}: ships a social card. A story's "
+                 f"picture is its own places, a photograph from the register, "
+                 f"or nothing.")
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0

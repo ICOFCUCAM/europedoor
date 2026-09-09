@@ -303,6 +303,19 @@ shipped HTML — a page printing a hop says "straight line", and no page
 anywhere claims a mode or a ground distance. A source-level check would have
 passed on all three.
 
+**A story shipped a hash-drawn landscape to every platform that renders its
+link.** The rule was enforced twice — the page rebuilt on `storymap()`, the
+index's nine illustrations removed — and `og=` went on passing `motif=None`,
+which is precisely the instruction to pick the picture from the hash of the
+slug, on the one surface nobody here ever looks at. **The alternative to a
+hash-drawn landscape is not a better hash**: a plate is an illustration, the
+register holds no photographs, and rasterising a storymap needs a second
+renderer for map geometry that does not exist. So a shared story link carries
+its title and standfirst and no image. Nine cards pruned. `checks.py` refuses
+`og=(seed, None, …)` anywhere — the shipped HTML cannot tell a hash-chosen
+card from a named one, both are a URL to a PNG, so this one is asserted at
+the source.
+
 **Styling that cannot apply is dead code that looks like a decision, and a
 check now deletes every rule in turn to find it.** Twice in three commits a
 rule lost a specificity fight and the result rendered as *the thing is simply
