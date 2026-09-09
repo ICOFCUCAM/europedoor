@@ -2027,6 +2027,71 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
   stroke: var(--map-sea); stroke-width: 3; }
 .minimap.arched .rlabel:hover text { fill: var(--lime); }
 
+/* THE EUROPEAN YEAR, AS ITS OWN SHAPE.
+   The events family's signature moment. It replaced twelve identical chips
+   on the index and a previous/whole-year/next row on each month page: every
+   one the same width and the same weight whether the month held 3 fixtures
+   or 28, which is a table of contents for a year and a year is the one thing
+   that is not a list.
+
+   TWO ELEMENTS, ON PURPOSE. The bars are an SVG with
+   preserveAspectRatio="none" — twelve columns SHOULD fill whatever width
+   they are given — and that transform scales everything in the viewBox,
+   text included. With the month names inside it they rendered at 49% of
+   their own width on a 390px screen: squashed type, on a phone, on thirteen
+   pages, and font-size in CSS does not save it because the transform is
+   applied after. The names are an HTML list instead, on a grid of the same
+   twelve columns. The list is also the navigation: a 2px bar was never a
+   reliable target, and the SVG is aria-hidden because it now says nothing
+   the list does not.
+
+   No aperture. The door is how this atlas draws GEOGRAPHY; a year is not a
+   place, and twelve little arches would be the signature as wallpaper. */
+.yearband { margin: var(--s5) 0 var(--s6); }
+.yearband .ybars { display: block; width: 100%; height: 104px; }
+.yearband .ybase { stroke: var(--rule); stroke-width: 1; }
+.yearband .ybar { fill: color-mix(in srgb, var(--terracotta) 26%, transparent); }
+.yearband .yshoulder { fill: color-mix(in srgb, var(--sea) 34%, transparent); }
+/* The month you are on is the only one that gets the full accent. */
+.yearband .ybar.on { fill: var(--terracotta); }
+.yearband .yshoulder.on { fill: color-mix(in srgb, var(--sea) 78%, transparent); }
+
+.yearband .ykeys { list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(12, 1fr); }
+.yearband .ykey a { display: flex; flex-direction: column; align-items: center;
+  gap: 1px; padding: var(--s2) 0; text-decoration: none; color: var(--ink-3); }
+.yearband .ymon { font-size: var(--t-xs); letter-spacing: .08em; text-transform: uppercase; }
+.yearband .ynum { font-size: var(--t-xs); font-variant-numeric: tabular-nums; }
+.yearband .ykey a:hover .ymon,
+.yearband .ykey a:hover .ynum,
+.yearband .ykey a:focus-visible .ymon,
+.yearband .ykey a:focus-visible .ynum { color: var(--door-dark); }
+.yearband .ykey.on a { color: var(--door-dark); font-weight: 700; }
+.yearband .whyall { margin-top: var(--s3); }
+@media (max-width: 44rem) {
+  /* 44rem, which is the phone breakpoint this stylesheet already has seven
+     of — the first version of this block invented a seventh at 640px, in
+     px, and the invariant register caught it in the same commit. Six
+     breakpoints is six layouts somebody has to test in Chromium.
+
+     Twelve columns at 390px are 32px each and at 360px they are 27.3.
+     "SEP" at 12px with the letter-spacing gone is 27.2 wide, which is a
+     tenth of a pixel of margin and therefore no margin at all — the next
+     font fallback overflows it. Mixed case is 22.5, and reads better small
+     besides, so the caps go on the phone and the count keeps its own line
+     under the name. 12px is the smallest size in the scale and a
+     thirteenth would be a new one.
+
+     The measured limit, stated rather than waved at: at 320px the columns
+     are 23.9 and "May" renders at 24.8, so one label in twelve is 0.9px
+     wider than its own cell. It is centred in a centred cell whose
+     neighbours have between 1 and 9px of slack, the labels do not touch,
+     and the page does not scroll — measured at 320, 360 and 390. It is a
+     tolerance, not a clean fit, and the next size down does not exist. */
+  .yearband .ybars { height: 84px; }
+  .yearband .ymon { letter-spacing: 0; text-transform: none; }
+}
+
 /* EUROPE AS AN ENGRAVED LINE, not a dark mass.
  *
  * Filled land at this zoom is almost the whole frame, so #1f252a on #0a0e10

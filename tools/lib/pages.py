@@ -3784,6 +3784,127 @@ def map_page(data):
 
 # ── events ────────────────────────────────────────────────────────────
 
+def year_band(data, here=None):
+    """The European year as its own shape, and the events family's signature.
+
+    THE SUBJECT OF THIS FAMILY IS TIME, AND TIME WAS RENDERED AS TWELVE
+    IDENTICAL PILLS.
+
+    The index carried a chip per month and the month pages carried
+    previous / whole year / next. Every one the same width, the same weight,
+    saying nothing about the month behind it — a table of contents for a year,
+    which is the one thing a year is not. Meanwhile the shape was in the data
+    and printed as prose eleven screens apart: "3 fixed points across Europe"
+    under January and "28" under July.
+
+    Measured from the dataset, which is the only place either number may come
+    from:
+
+        Jan  3   Feb 13   Mar  6   Apr 15   May  4   Jun 20
+        Jul 28   Aug 16   Sep 16   Oct 11   Nov  4   Dec 14
+
+    Europe is nearly silent in January and crowded in July, and this atlas's
+    whole editorial position is that the shoulder is where you should be
+    going — so the band carries both: the bar is what is ON, the rule beneath
+    it is how many countries are in their quieter shoulder that month. October
+    has the most of those, 25, and it is the month the bar makes look thin.
+    That disagreement is the argument the family exists to make.
+
+    NO APERTURE HERE, deliberately. The door is how this atlas draws
+    GEOGRAPHY, and a year is not a place; twelve little arches would be the
+    signature as wallpaper. See docs/signature-moments.md, question 6.
+
+    Drawn in SVG because a bar's height has to be in the markup — a CSS
+    custom property would need a style attribute, and there is not one of
+    those anywhere on this site.
+    """
+    ms = data["taxonomy"]["months"]
+    names = data["taxonomy"]["month_names"]
+    fx = {m: 0 for m in ms}
+    sh = {m: 0 for m in ms}
+    for c in data["countries"].values():
+        for f in c["festivals"]:
+            fx[f["month"]] += 1
+        if c.get("advisory"):
+            continue
+        for m in c["season"].get("shoulder", []):
+            sh[m] += 1
+    # MIRRORED ABOUT ONE AXIS, because the first version drew the shoulder as
+    # a 3px rule under each bar and it read as an underline rather than as a
+    # second series. The whole argument of this band is that October is THIN
+    # on fixtures and THICKEST on shoulder countries, and rendering it showed
+    # that the disagreement — the only reason to draw two numbers at all —
+    # was the part you could not see. Up is what is on; down is where it is
+    # quiet; October is short above the line and longest below it.
+    # MIRRORED ABOUT ONE AXIS, because the first version drew the shoulder as
+    # a 3px rule under each bar and it read as an underline rather than as a
+    # second series. The whole argument of this band is that October is THIN
+    # on fixtures and THICKEST on shoulder countries, and rendering it showed
+    # that the disagreement — the only reason to draw two numbers at all —
+    # was the part you could not see. Up is what is on; down is where it is
+    # quiet; October is short above the line and longest below it.
+    #
+    # AND THE TYPE IS NOT IN THE PICTURE, because the picture stretches.
+    # `preserveAspectRatio="none"` is right for twelve columns that should
+    # fill whatever width they are given — and it scales EVERYTHING in the
+    # viewBox, text included. At 390px the horizontal scale is 0.39 and the
+    # vertical 0.79, so the month names rendered at 49% of their own width:
+    # squashed type, on a phone, on thirteen pages. Setting font-size in CSS
+    # does not save it; the transform is applied after. Only rendering at
+    # phone width shows it.
+    #
+    # So the SVG holds the geometry and nothing else, and the twelve names
+    # are an HTML list beside it. That also fixes the interaction: a 2px bar
+    # was never a reliable target, and the list is a proper set of links.
+    W, H = 1000.0, 104.0
+    COL = W / 12.0
+    BASE, TALL, DEEP = 66.0, 58.0, 34.0
+    fmax = max(fx.values()) or 1
+    smax = max(sh.values()) or 1
+    bars = []
+    for i, m in enumerate(ms):
+        x = i * COL
+        # A month with no fixtures still has a floor under its bar: a zero
+        # drawn as nothing reads as a rendering fault rather than a quiet
+        # month. A month with no shoulder countries draws nothing, because
+        # that is a real absence and December genuinely has none.
+        bh = max(2.0, fx[m] / fmax * TALL)
+        sd = max(2.0, sh[m] / smax * DEEP) if sh[m] else 0.0
+        on = " on" if m == here else ""
+        bars.append(
+            f'<rect class="ybar{on}" x="{x + 7:.1f}" y="{BASE - bh:.1f}" '
+            f'width="{COL - 14:.1f}" height="{bh:.1f}"/>'
+        )
+        if sd:
+            bars.append(
+                f'<rect class="yshoulder{on}" x="{x + 7:.1f}" '
+                f'y="{BASE + 1:.1f}" width="{COL - 14:.1f}" height="{sd:.1f}"/>'
+            )
+    keys = "".join(
+        f'<li class="ykey{" on" if m == here else ""}">'
+        f'<a href="/events/{esc(m)}">'
+        f'<span class="ymon">{esc(names[m][:3])}</span>'
+        f'<span class="ynum">{fx[m]}</span>'
+        f'<span class="visually-hidden">{esc(names[m])}: {fx[m]} recurring fixture'
+        f'{"s" if fx[m] != 1 else ""}, {sh[m]} countr'
+        f'{"ies" if sh[m] != 1 else "y"} in their quieter shoulder</span>'
+        f'</a></li>'
+        for m in ms
+    )
+    # The one line that says what the picture means, hoisted rather than
+    # repeated twelve times — same rule as Discover Mode and the motions.
+    note = ('<p class="whyall"><span>Above the line</span> is what is on. '
+            'Below it is how many countries are in their quieter shoulder '
+            'that month. October is one of the thinnest above and the '
+            'deepest below, and that disagreement is the whole argument.</p>')
+    return (f'<nav class="yearband" aria-label="The European year, month by month">'
+            f'<svg class="ybars" viewBox="0 0 {W:.0f} {H:.0f}" '
+            f'preserveAspectRatio="none" aria-hidden="true" focusable="false">'
+            f'<line class="ybase" x1="0" y1="{BASE:.1f}" x2="{W:.0f}" '
+            f'y2="{BASE:.1f}"/>{"".join(bars)}</svg>'
+            f'<ol class="ykeys">{keys}</ol>{note}</nav>')
+
+
 def events_page(data):
     names = data["taxonomy"]["month_names"]
     by_month = {m: [] for m in data["taxonomy"]["months"]}
@@ -3808,10 +3929,9 @@ def events_page(data):
             f'<a href="/events/{esc(m)}">Where to go in {esc(names[m])} →</a></p></div>'
             f'<div class="rows">{rows}</div></section>'
         )
-    jump = " ".join(
-        f'<a class="chip" href="/events/{esc(m)}">{esc(names[m])}</a>'
-        for m in data["taxonomy"]["months"]
-    )
+    # The twelve chips this replaces were the same width and the same weight
+    # whether the month held 3 fixtures or 28. See year_band().
+    jump = year_band(data)
     total = sum(len(v) for v in by_month.values())
     kindcounts = {}
     for v in by_month.values():
@@ -3830,8 +3950,8 @@ def events_page(data):
   <p class="lede">{total} recurring fixtures — festivals, markets, pilgrimages, harvests and the
   handful of natural events worth planning a year around. These are the annual, dependable ones.
   Dated listings for a given year need a live events feed, which is Stage 2.</p>
-  <div class="chips">{jump}</div>
 </div>
+{jump}
 <div class="checks" id="eventkinds">{kindfilters}</div>
 <p class="small" id="eventcount"></p>
 {''.join(blocks)}
@@ -3947,12 +4067,8 @@ def events_month_page(data, month):
   <h1>{esc(name)} in Europe</h1>
   <p class="lede">{len(fixtures)} recurring fixtures, {len(peak)} countries at their best and
   {len(shoulder)} in the quieter shoulder — which is usually where you should be going.</p>
-  <div class="chips">
-    <a class="chip" href="/events/{esc(prev_m)}">← {esc(names[prev_m])}</a>
-    <a class="chip" href="/events">The whole year</a>
-    <a class="chip" href="/events/{esc(next_m)}">{esc(names[next_m])} →</a>
-  </div>
 </div>
+{year_band(data, month)}
 {monthmap}
 {section(f"On in {name}", f'<div class="rows">{rows}</div>') if rows else ""}
 {section(f"At their best in {name}", f'<div class="rows">{country_rows(peak)}</div>',

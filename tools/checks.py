@@ -2451,6 +2451,80 @@ def c_one_label_rule():
     return n
 
 
+@check("the year band draws the dataset, and both of its numbers agree with it")
+def c_year_band():
+    # A CHART IS A CLAIM, AND THIS ONE IS PUBLISHED ON THIRTEEN PAGES.
+    #
+    # The European year is the events family's subject, and it was drawn as
+    # twelve identical chips — the same width and weight whether the month
+    # held 3 recurring fixtures or 28. The band replaces them with the shape
+    # the data actually has, which means two derived series are now a
+    # picture: what is ON in a month (bar, up) and how many countries are in
+    # their quieter SHOULDER that month (bar, down).
+    #
+    # Neither may ever be authored. Both are counted here, independently of
+    # pages.year_band(), from the same source it reads — and both are
+    # asserted against the built HTML, because a chart that agrees with the
+    # generator and disagrees with the dataset is the failure mode a chart
+    # has. A bar drawn from a number nobody can check is decoration.
+    d = D.load()
+    ms = d["taxonomy"]["months"]
+    fx = {m: 0 for m in ms}
+    sh = {m: 0 for m in ms}
+    for c in d["countries"].values():
+        for f in c["festivals"]:
+            fx[f["month"]] += 1
+        if c.get("advisory"):
+            continue
+        for m in c["season"].get("shoulder", []):
+            sh[m] += 1
+    n = 0
+    pages = [os.path.join(OUT, "events", "index.html")] + [
+        os.path.join(OUT, "events", m, "index.html") for m in ms
+    ]
+    for path in pages:
+        if not os.path.exists(path):
+            fail(f"{rel(path)}: the events family is missing a page")
+            continue
+        h = open(path, encoding="utf-8").read()
+        if 'class="yearband"' not in h:
+            fail(f"{canonical_of(path)}: no year band. It is the events "
+                 f"family's signature and it is on every page of the family.")
+            continue
+        # Every month is reachable from every page of the family, and its
+        # printed count is the counted one.
+        for m in ms:
+            n += 1
+            if f'href="/events/{m}"' not in h:
+                fail(f"{canonical_of(path)}: the year band does not reach "
+                     f"/events/{m}")
+            want = (f"{d['taxonomy']['month_names'][m]}: {fx[m]} recurring "
+                    f"fixture{'s' if fx[m] != 1 else ''}, {sh[m]} countr"
+                    f"{'ies' if sh[m] != 1 else 'y'} in their quieter shoulder")
+            if want not in h:
+                fail(f"{canonical_of(path)}: the year band's figure for "
+                     f"{m} disagrees with the dataset — {want!r} is not on "
+                     f"the page. A chart is a claim.")
+    # The bars are geometry, so the tallest bar must be the largest number.
+    # This is the half a count cannot catch: correct labels over a drawing
+    # scaled from the wrong series still reads as a finished chart.
+    top = max(ms, key=lambda m: fx[m])
+    src = open(os.path.join(ROOT, "tools", "lib", "pages.py"),
+               encoding="utf-8").read()
+    band = src[src.index("def year_band("):src.index("def events_page(")]
+    for token in ("fx[m] / fmax * TALL", "sh[m] / smax * DEEP"):
+        n += 1
+        if token not in band:
+            fail(f"year_band: {token!r} is gone — a bar is no longer scaled "
+                 f"by the series it is labelled with.")
+    h = open(os.path.join(OUT, "events", top, "index.html"),
+             encoding="utf-8").read()
+    n += 1
+    if 'class="ybar on"' not in h:
+        fail(f"/events/{top}: the month you are on is not marked on the band")
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0

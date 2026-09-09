@@ -129,17 +129,25 @@ three are gaps. That distinction is the whole content of this document.
 8. The query terms themselves, published in full.
 9. **REFUSED**: a field naming a destination. The validator refuses it.
 
-### Month — 12 — *the year, as a place*
+### Month — 12 (and the events index) — *where this month sits in the year*
 
-1. Europe has a shape in July and a different one in January.
-2. Eighteen lit points, and the count of the ten that cannot be points.
-3. Only fixtures tied to a validated destination.
-4. Lede, map, what is on, who is at their best, who is quieter.
-5. Step to the next month.
-6. **Explicit** where there are at least two mapped fixtures; **absent** in January and March, where there are none and one.
+1. Europe is nearly silent in January and crowded in July, and the month you are looking at has a position in that.
+2. **The year band.** Twelve columns: the bar above the line is what is on that month, the bar below it is how many countries are in their quieter shoulder. The month you are on is the only one in full accent.
+3. Above the fold, none — the year is time, not place. Below it, the fixtures that sit in a validated destination.
+4. Lede, the year, the map, what is on, who is at their best, who is quieter.
+5. Step to any of the twelve, from a control that also says how big each is.
+6. **Absent on the band, explicit on the map.** The door is how this atlas draws geography; a year is not a place, and twelve little arches would be the signature as wallpaper. The map below keeps it where there are at least two mapped fixtures, and loses it in January and March, where there are none and one.
 7. None.
-8. Counts of both halves — mapped and unmappable — in the caption.
-9. **REFUSED**: pinning a season or a nationwide festival to a capital to fill the map.
+8. Two derived series in the band, both counted from the dataset and both asserted against it on every build; counts of both halves — mapped and unmappable — in the map caption.
+9. **REFUSED**: pinning a season or a nationwide festival to a capital to fill the map. **REFUSED**: twelve identical chips, which is what this family had — a table of contents for a year, and a year is the one thing that is not a list.
+
+**The disagreement is the design.** October is one of the thinnest months
+above the line, eleven fixtures, and the deepest below it, twenty-five
+countries in shoulder season. This atlas's editorial position is that the
+shoulder is where you should be going, so a band that showed only "what is
+on" would draw the opposite of the argument the family exists to make. The
+first version drew the shoulder as a 3px rule under each bar; it read as an
+underline, and the one thing worth seeing was the thing you could not.
 
 ---
 

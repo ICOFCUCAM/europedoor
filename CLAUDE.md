@@ -303,6 +303,36 @@ shipped HTML — a page printing a hop says "straight line", and no page
 anywhere claims a mode or a ground distance. A source-level check would have
 passed on all three.
 
+**A year is not a list, and it was rendered as twelve identical pills.** The
+events family's subject is time. The index carried a chip per month and each
+month page carried previous / whole year / next — every one the same width
+and weight whether the month held 3 recurring fixtures or 28. Meanwhile the
+shape was in the data and printed as prose eleven screens apart. `year_band()`
+draws it: the bar above the line is what is on, the bar below is how many
+countries are in their quieter shoulder. **October is one of the thinnest
+above and the deepest below, and that disagreement is the argument the family
+exists to make** — so a band showing only "what is on" would have drawn the
+opposite of this atlas's editorial position. The first version drew the
+shoulder as a 3px rule beneath each bar and it read as an underline; the one
+thing worth seeing was the thing you could not. **No aperture on it** — the
+door is how this atlas draws geography, and twelve little arches would be
+the signature as wallpaper.
+
+**A chart is a claim, so both series are checked against the dataset.**
+`checks.py` counts the fixtures and the shoulder countries independently of
+the generator, asserts every printed figure appears on all thirteen pages,
+and asserts the bars are still scaled by the series they are labelled with —
+correct labels over a drawing scaled from the wrong array still reads as a
+finished chart. Proved red three ways.
+
+**`preserveAspectRatio="none"` stretches the type with the picture.** Twelve
+columns *should* fill whatever width they are given, and that transform
+scales everything in the viewBox — so with the month names inside it they
+rendered at 49% of their own width on a 390px screen. Setting `font-size` in
+CSS does not save it; the transform is applied after. The SVG holds the
+geometry and the names are an HTML grid beside it, which also fixed the
+interaction: a 2px bar was never a reliable target.
+
 **A story is not a place, and its picture may not be drawn from a hash.**
 `plate_shapes()` picks a motif from the seed when none is passed, so for a
 year every essay opened on a landscape chosen by chance — the piece about the
