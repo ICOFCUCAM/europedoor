@@ -883,6 +883,15 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .nodec { text-decoration: none; }
 .measure { max-width: var(--measure); margin: var(--s7) 0; }
 
+/* An absence, stated. Not a smaller, greyer version of a list — the same
+   measure and the same ink as the thing that would have been there, because
+   a gap this site chose is content, not a rendering failure. The strong lead
+   is what is missing; the rest is why, and what would fill it. */
+.emptystate { max-width: 44ch; margin: var(--s5) 0; color: var(--ink-2);
+              border-left: 2px solid var(--rule); padding-left: var(--s4); }
+.emptystate strong { display: block; color: var(--ink); font-weight: 600;
+                     margin-bottom: var(--s2); }
+
 /* ── the essay ────────────────────────────────────────────────────────
  *
  * THE ONE FAMILY WHERE TYPE CAN CARRY THE WHOLE TRANSFORMATION, at no

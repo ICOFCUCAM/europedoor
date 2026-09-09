@@ -1917,6 +1917,44 @@ def c_no_fixed_widths():
     return n
 
 
+@check("an absence says why it is an absence")
+def c_empty_states_explain():
+    # THE FOUR PLACES WHERE THIS SITE'S OWN HABIT LAPSED. Everywhere else it
+    # states its limits at length — the place page's three refused fields,
+    # the interest page's idle keywords, Svalbard's missing map, the facet
+    # threshold — and four empty states said only "Nothing tagged yet.",
+    # "Nothing listed yet.", "Nothing listed on this route yet." A bare
+    # "nothing yet" reads as a page that failed to load.
+    #
+    # All four are LATENT: not one of them renders today, because every
+    # interest has destinations and every kind has entries. So this is
+    # asserted against the generator, which is the only place a state nobody
+    # can see today still exists. Both halves are required — what is
+    # missing, and why — because the second half is the whole point.
+    src = open(os.path.join(ROOT, "tools/lib/pages.py"), encoding="utf-8").read()
+    n = 0
+    for m in re.finditer(r"empty_state\(\s*(?P<q>['\"])(?P<what>.*?)(?P=q)\s*,"
+                         r"(?P<why>.*?)\)\}", src, re.S):
+        what = m.group("what")
+        why = "".join(re.findall(r"['\"]([^'\"]*)['\"]", m.group("why")))
+        if not what.endswith((".", "!", "?")):
+            fail(f'empty_state("{what[:48]}…") — the first half must be a '
+                 f'sentence naming what is missing')
+        if len(why) < 80:
+            fail(f'empty_state("{what[:48]}…") gives {len(why)} characters of '
+                 f'reason — an absence this site chose is content, and "nothing '
+                 f'yet" on its own reads as a page that failed to load')
+        n += 1
+    if n < 4:
+        fail(f"only {n} explained empty states found in the generator; there "
+             f"were four bare ones and each was replaced")
+    # And no bare one may come back.
+    for m in re.finditer(r'"[^"]*Nothing (?:tagged|listed|matches)[^"]*"', src):
+        if "empty_state" not in src[max(0, m.start() - 300):m.start()]:
+            fail(f"a bare empty state is back: {m.group(0)[:70]}")
+    return n
+
+
 @check("every dot on a map lands inside its own frame")
 def c_map_dots_in_frame():
     # Svalbard's region map drew Longyearbyen at y = -317 on a viewBox that

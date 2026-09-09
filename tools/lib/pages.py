@@ -1081,7 +1081,13 @@ def interest_page(data, i, ranking):
     total = len(data["cities"])
     pct = round(100.0 * len(cities) / total) if total else 0
     rank = ranking.index(slug) + 1
-    band = next(text for floor, text in INTEREST_BANDS if pct >= floor)
+    # Zero is not the narrow end of the scale, it is off it. Forcing the
+    # empty state to render — the only way to see a latent branch — showed
+    # the band sentence claiming a tag with no destinations "makes a real
+    # filter", which is a judgement about a list that does not exist.
+    band = ("Nothing carries it yet, so there is no list to judge."
+            if not cities
+            else next(text for floor, text in INTEREST_BANDS if pct >= floor))
     shown = cities[:60]
     cards = [
         card(
@@ -1108,7 +1114,11 @@ def interest_page(data, i, ranking):
   {len(data['countries'])} countries · {rank_phrase(rank, len(ranking))}</p>
 </div>
 
-{grid(cards, 3) if cards else '<p class="small">Nothing tagged yet.</p>'}
+{grid(cards, 3) if cards else empty_state(
+      "No destination carries this tag yet.",
+      "The tag exists in the taxonomy and the Journey Planner already weights "
+      "it, so the moment a destination is written with it this page fills "
+      "itself. Nothing is filtered out here — there is nothing in yet.")}
 
 <div class="note mt7">
   <h2 class="mini">Why this page tells you its own tag is wide</h2>
@@ -1277,7 +1287,11 @@ def journey_page(data, j):
     {facts}
 
     <h2 class="mt7">Experiences along the way</h2>
-    {f'<div class="rows">{jexps}</div>' if jexps else '<p class="small">Nothing listed on this route yet.</p>'}
+    {f'<div class="rows">{jexps}</div>' if jexps else empty_state(
+      "No experiences are recorded in the stops on this route.",
+      "Experiences are written per destination, not per journey, so this "
+      "list fills as the towns along the way get written up. It is a gap in "
+      "the writing rather than a quiet stretch of Europe.")}
 
     <h2 class="mt7">What you will be eating</h2>
     <ul class="stack">{jfood}</ul>
@@ -1795,6 +1809,26 @@ def ordinal(n):
         return words[n]
     suffix = "th" if 11 <= n % 100 <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
     return f"{n}{suffix}"
+
+
+def empty_state(what, why):
+    """An absence that says why it is an absence.
+
+    THE FOURTH-MOST-COMMON THING THIS SITE SHOWS A READER IS A GAP, and for
+    four of them it said only "Nothing tagged yet." / "Nothing listed yet." /
+    "Nothing listed on this route yet." A bare "nothing yet" reads as a page
+    that failed to load. Everywhere else this repository states its limits at
+    length and gets credit for it — the place page's three refused fields,
+    the interest page's idle keywords, Svalbard's missing map, the facet
+    threshold — and these four were the surfaces where the habit lapsed.
+    That inconsistency is not a small thing on a site whose whole claim is
+    that it tells you what it does not have.
+
+    Two parts, always: what is missing, and why — where "why" names the
+    editorial work that would fill it, because on this site an empty list is
+    almost always a gap in the writing rather than a fact about Europe.
+    """
+    return (f'<p class="emptystate"><strong>{what}</strong> {why}</p>')
 
 
 def nights_line(t):
@@ -2681,7 +2715,12 @@ def category_page(data, cat, sub=None):
 {f'<p class="countryspread lead">{country_spread(countries)}</p>' if sub and countries else ""}
 {section("Sub-categories", subcards) if subcards else ""}
 {section("How this list is built", f'<p class="small mw44">{esc(C.rule_text(cat))}</p>') if not sub else ""}
-<div class="rows explist">{rows or '<p class="small">Nothing matches this rule yet, and an empty list is better than a padded one.</p>'}</div>
+<div class="rows explist">{rows or empty_state(
+      "Nothing matches this rule yet.",
+      "The rule is printed below and is the same one every other list on "
+      "this site is built from. An empty list is better than a padded one, "
+      "and widening the rule until something fell in would make every other "
+      "list on the site mean less.")}</div>
 {rulenote}
 """
     return f"{path}/index.html", page(
@@ -2755,7 +2794,11 @@ def experience_kind_page(data, kind, name):
   <p class="kicker">{len(items)} across Europe</p>
   <h1>{esc(name)}</h1>
 </div>
-<div class="rows">{rows or '<p class="small">Nothing listed yet.</p>'}</div>
+<div class="rows">{rows or empty_state(
+      "Nothing in the Atlas is classified this way yet.",
+      "This is one of ten kinds an experience can be given, and the kind is "
+      "authored per experience. An empty page here means nobody has written "
+      "one, not that Europe has none.")}</div>
 """
     return f"/experiences/kind/{kind}/index.html", page(
         name, body, path=urls.experience_kind(kind), area="experiences",
