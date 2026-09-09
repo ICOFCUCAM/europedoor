@@ -1749,12 +1749,28 @@ async function main() {
   // or dense from the names it actually emitted, and the phone rule enlarges
   // the first and drops the second. This asserts the outcome rather than the
   // mechanism: whatever is still drawn at 390px is at least 9px.
+  //
+  // WHAT COUNTS AS A DOT MAP IS MEASURED, AND THE DOTS ARE COUNTED AS DRAWN.
+  // The dot half of this check used to assert that EVERY `figure.minimap`
+  // had a `.minidot` — a claim about dot maps written as a claim about maps.
+  // The country portrait is a map with no dots at any width, because it is a
+  // picture of a shape rather than an instrument, and it turned this red for
+  // the right reason and the wrong claim.
+  //
+  // Rewriting it to compare the DOM across widths would have been WORSE THAN
+  // WRONG, it would have been VACUOUS: `.minidot` elements are emitted by the
+  // build and the phone rules are CSS, so the two counts can never disagree
+  // and the check could not fail at all. The promise is that a map carrying
+  // names still SHOWS its dots on a phone, so the dots are counted as the
+  // browser draws them — laid out, not display:none, not zero-sized — and
+  // only figures that carry names are asked.
+  const MAPWIDTH_PAGES = ["/europe/austria/tyrol/innsbruck", "/europe/austria",
+                          "/europe/austria/tyrol", "/journeys/the-alpine-grand-tour",
+                          "/europe-in/northern-lights", "/events/oct",
+                          "/beyond-the-obvious"];
   for (const w of [390, 480]) {
     await page.setViewportSize({ width: w, height: 800 });
-    for (const u of ["/europe/austria/tyrol/innsbruck", "/europe/austria",
-                     "/europe/austria/tyrol", "/journeys/the-alpine-grand-tour",
-                     "/europe-in/northern-lights", "/events/oct",
-                     "/beyond-the-obvious"]) {
+    for (const u of MAPWIDTH_PAGES) {
       await page.goto(base + u, { waitUntil: "load" });
       const small = await page.evaluate(() => {
         const bad = [];
@@ -1774,10 +1790,17 @@ async function main() {
          small.slice(0, 3).map((b) => `"${b.t}" at ${b.px}px`).join(", "));
       // And a map that dropped its names must not have dropped its dots:
       // the names live in the list under the figure, the dots are the map.
-      const kept = await page.evaluate(() =>
+      const lost = await page.evaluate(() =>
         [...document.querySelectorAll("figure.minimap svg")]
-          .every((s) => s.querySelectorAll(".minidot").length > 0));
-      ok(kept, `${u} at ${w}px has a map figure with no dots left`);
+          .filter((s) => s.querySelectorAll(".minilabel").length > 0)
+          .filter((s) => ![...s.querySelectorAll(".minidot circle")].some((d) => {
+            const st = getComputedStyle(d);
+            if (st.display === "none" || st.visibility === "hidden") return false;
+            const b = d.getBoundingClientRect();
+            return b.width > 0 && b.height > 0;
+          })).length);
+      ok(lost === 0,
+         `${u} at ${w}px has ${lost} named map(s) drawing no dots`);
     }
   }
   await page.setViewportSize({ width: 1280, height: 900 });

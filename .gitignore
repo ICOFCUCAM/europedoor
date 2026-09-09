@@ -3,3 +3,8 @@ __pycache__/
 .DS_Store
 .vercel/
 node_modules/
+
+# The two instruments that write an image rather than a verdict.
+# Neither is a gate and neither belongs in the repository.
+contact-sheet.png
+recognition.png

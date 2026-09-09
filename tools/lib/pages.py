@@ -576,6 +576,213 @@ def macro_page(data, m):
     )
 
 
+# THE LARGEST SCALE THE SOURCE CAN CARRY, AND NO LARGER. A portrait blows a
+# country's outline up to 416 pixels, and at that size a simplified polygon
+# stops being an outline and becomes a claim about a shape. Measured as the
+# MEDIAN straight segment of the principal ring, as a fraction of that ring's
+# own diagonal — the median rather than the longest, because Russia's longest
+# segment is 52% of its diagonal and is the 52°E cut in the dataset, not a
+# simplification, and its median is 0.31%:
+#
+#     Monaco 63.7%   Liechtenstein 37.5%   San Marino 35.6%   Malta 34.4%
+#     Andorra 16.6%  Luxembourg 12.5%  |  Cyprus 5.7%  Kosovo 4.5%  Italy 0.9%
+#
+# The gap between Luxembourg and Cyprus is the widest in the distribution, so
+# the line sits in it. Monaco came out of the first build as a TRIANGLE and
+# San Marino as a hexagon, four hundred pixels tall, on the page whose entire
+# job is to say what a place is.
+#
+# The five above the line that /map already knows about are the five it draws
+# as a ringed point rather than an outline, for this exact reason; this is the
+# same refusal one zoom level in, and it finds Luxembourg as well.
+PORTRAIT_SEGMENT_MAX = 0.10
+
+
+def _outline_coarseness(rings):
+    """Median segment of the largest ring, over that ring's diagonal."""
+    if not rings:
+        return 1.0
+    def parea(ring):
+        pr = [geo.lcc(ring[i + 1], ring[i]) for i in range(0, len(ring), 2)]
+        a = 0.0
+        n = len(pr)
+        for i in range(n):
+            a += pr[i][0] * pr[(i + 1) % n][1] - pr[(i + 1) % n][0] * pr[i][1]
+        return abs(a) / 2.0
+    main = max(rings, key=parea)
+    pr = [geo.lcc(main[i + 1], main[i]) for i in range(0, len(main), 2)]
+    if len(pr) < 3:
+        return 1.0
+    xs = [q[0] for q in pr]
+    ys = [q[1] for q in pr]
+    diag = math.hypot(max(xs) - min(xs), max(ys) - min(ys))
+    if diag <= 0:
+        return 1.0
+    segs = sorted(math.hypot(pr[(i + 1) % len(pr)][0] - pr[i][0],
+                             pr[(i + 1) % len(pr)][1] - pr[i][1])
+                  for i in range(len(pr)))
+    return segs[len(segs) // 2] / diag
+
+
+def _settingportrait(data, c, doc):
+    """A country the source cannot draw, marked in the country it is in.
+
+    THE ALTERNATIVE TO A MADE-UP OUTLINE IS NOT A BETTER OUTLINE. Six
+    countries are smaller than the tolerance the atlas's cartographic source
+    was simplified at: Monaco, Vatican City, San Marino, Liechtenstein,
+    Andorra, Malta — plus Luxembourg, which the measurement finds and /map
+    does not, because a shape 21 vertices long is convincing at continent
+    scale and a polygon at 416 pixels.
+
+    So the door opens on the SETTING instead, at a scale the source is good
+    for: four degrees of latitude centred on the country, its neighbours drawn
+    the way every other portrait draws them, and the country itself a ringed
+    point at its own coordinates. That is the same mark and the same reason as
+    /map's, one zoom level in, and for a micro-state it is not a lesser
+    picture — being a speck against the Pyrenees or the Ligurian coast is the
+    most specific true thing this atlas can draw about Andorra or Monaco.
+
+    Nothing is invented and nothing is magnified past what it can bear.
+    """
+    if doc.get("bbox"):
+        lon0, lat0, lon1, lat1 = doc["bbox"]
+        clon, clat = (lon0 + lon1) / 2.0, (lat0 + lat1) / 2.0
+    else:
+        pts = [t for r in c["regions"] for t in r["cities"]]
+        if not pts:
+            return ""
+        clon = sum(t["lon"] for t in pts) / len(pts)
+        clat = sum(t["lat"] for t in pts) / len(pts)
+    # Four degrees of latitude, about 440 km: the window at which the median
+    # segment of the coarsest of these outlines falls under a pixel, so the
+    # simplification is gone and the geography around it is not.
+    half = 2.0
+    bbox = [clon - half * 1.6, clat - half, clon + half * 1.6, clat + half]
+    w = 520.0
+    h = round(w / 0.86)
+    proj = geo.Projection(bbox, w, h, pad=0.0)
+    ctx, land = geo.landmass(proj, (0, 0, w, h), doc=geo.load("europe-lod1.json"))
+    x, y = proj.xy(clat, clon)
+    uid = "cs" + "".join(ch for ch in c["slug"] if ch.isalnum())[:14]
+    return (
+        f'<figure class="minimap portrait setting arched">'
+        f'<svg viewBox="0 0 {w:.0f} {h:.0f}" role="img" data-world="intelligence" '
+        f'aria-label="{esc(c["name"])} marked at its own coordinates, among its '
+        f'neighbours. No cartographic source this atlas holds draws an outline '
+        f'for it at a size this picture could show, so it is a point rather '
+        f'than an invented shape">'
+        f'<defs>{arch_clip(uid, w, h)}</defs>'
+        f'<g clip-path="url(#arch-{uid})">'
+        f'<rect x="0" y="0" width="{w:.0f}" height="{h:.0f}" class="archground"/>'
+        f'{ctx}{land}'
+        f'<g class="cmark"><circle cx="{x:.1f}" cy="{y:.1f}" r="23"/>'
+        f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.5" class="core"/></g>'
+        f'</g>{arch_edge(w, h)}</svg></figure>'
+    )
+
+
+def countryportrait(data, c):
+    """The country's own outline, as a portrait. COUNTRY = identity.
+
+    The country page opened on a REFERENCE MAP: the country with its regions
+    named, its destinations dotted, its neighbours drawn, a scale bar and a
+    caption explaining that a region is a grouping. All of that is true and
+    all of it is the country as a RECORD. It answers "what is in here", which
+    is the question the bands below the fold are for.
+
+    A country page is for a different question — what kind of place is this —
+    and the answer a reader keeps is the shape, the name and one sentence.
+    So the top of the page is a portrait: the outline filled, alone, with no
+    label on it and nothing to operate. A portrait is not an instrument.
+
+    THE DOOR IS TALL HERE, AND THAT IS THE POINT. The homepage's opening is
+    wide because a continent is wide. A country is a figure, so it stands in
+    a figure's doorway — which is what a door actually is, and what the arch
+    was drawn from. The aperture's proportion follows its subject; a
+    signature that is the same shape at every size is a stamp.
+
+    The reference map is not deleted. It moves down to `Travel regions`,
+    which is the band that needs it, and keeps every label, dot and note it
+    had.
+
+    Where a country has no polygon at 1:50 million — Monaco and Vatican City
+    — there is no portrait rather than an invented one, on the same rule
+    that gives them a ringed point on /map instead of a made-up outline.
+    """
+    doc = geo.country(c["slug"])
+    if not doc:
+        return ""
+    ent = next((v for v in (doc.get("countries") or {}).values()
+                if v.get("slug") == c["slug"]), None)
+    rings = (ent or {}).get("rings") or []
+    if not doc.get("bbox") or _outline_coarseness(rings) >= PORTRAIT_SEGMENT_MAX:
+        return _settingportrait(data, c, doc)
+    # THE DOOR'S PROPORTION FOLLOWS THE COUNTRY, and one fixed shape does not
+    # work. Measured on the real projection across the 49 countries that have
+    # a polygon: they run from 0.41 (Liechtenstein) to 1.86 (Austria), median
+    # 1.13 — the median country is slightly WIDER than tall, and a fixed
+    # 520x720 door filled only 61% of its short axis, worst case 39%. Austria
+    # stood in a tall doorway as a small wide sliver with empty above and
+    # below it, which is a portrait of nothing.
+    #
+    # Clamped to [0.62, 1.30] so it is always more upright than the
+    # homepage's full-bleed opening and never becomes a letterbox: median
+    # fill 100%, worst 66%, and only two of 49 under 70%.
+    # THE FRAME IS THE PRINCIPAL LANDMASS, not everything the country owns.
+    # Portugal's bbox reaches the Azores, 1,400 km into the Atlantic, and the
+    # first version of this portrait drew a door nine-tenths full of empty
+    # ocean with Portugal against one corner. See geo.principal_frame.
+    bbox, outside = geo.principal_frame(doc, c["slug"])
+    if not bbox:
+        return ""
+    lon0, lat0, lon1, lat1 = bbox
+    xs, ys = [], []
+    for i in range(9):
+        t = i / 8.0
+        for lon, lat in ((lon0 + (lon1 - lon0) * t, lat0),
+                         (lon0 + (lon1 - lon0) * t, lat1),
+                         (lon0, lat0 + (lat1 - lat0) * t),
+                         (lon1, lat0 + (lat1 - lat0) * t)):
+            x, y = MAPPROJ.xy(lat, lon)
+            xs.append(x)
+            ys.append(y)
+    span_y = (max(ys) - min(ys)) or 1.0
+    aspect = max(0.62, min(1.30, (max(xs) - min(xs)) / span_y))
+    w = 520.0
+    h = round(w / aspect)
+    proj = geo.Projection(list(bbox), w, h, pad=0.14)
+    ctx, land = geo.landmass(proj, (0, 0, w, h), doc=doc, highlight=c["slug"])
+    uid = "cp" + "".join(ch for ch in c["slug"] if ch.isalnum())[:14]
+    # CROPPING IN SILENCE IS THE THING TO AVOID. Where a country has land
+    # outside this frame it is said, in the one place a reader of the figure
+    # can get at it. Today that is Portugal and nowhere else.
+    away = (f". {outside} outlying island{'s' if outside != 1 else ''} "
+            f"{'lie' if outside != 1 else 'lies'} outside this frame") if outside else ""
+    # A COUNTRY CAN BE CLOSED BY THE DATA RATHER THAN BY ITS OWN BORDER, and
+    # one is. data/geo/ is cut at 52°E, so Russia's outline ends on a straight
+    # slant that a reader has every reason to read as a frontier. The picture
+    # cannot be fixed — the geometry east of the cut is not in this repository
+    # — so it is SAID, in the one place a portrait has room to say anything.
+    # This is the only page in the atlas that gets a caption under its door.
+    euro = geo.load("europe-lod1.json") or {}
+    lim = (euro.get("bbox") or [None])[2]
+    cut = lim is not None and abs(bbox[2] - lim) < 1e-6
+    cutsay = (f". The outline stops at {lim:.0f} degrees east, where this "
+              f"atlas's map data ends, not at a border") if cut else ""
+    cap = (f'<figcaption>The outline stops at {lim:.0f}°E, where this atlas\'s '
+           f'map data ends — not at a border.</figcaption>') if cut else ""
+    return (
+        f'<figure class="minimap portrait arched">'
+        f'<svg viewBox="0 0 {w:.0f} {h:.0f}" role="img" data-world="intelligence" '
+        f'aria-label="The outline of {esc(c["name"])}, drawn on this atlas\'s '
+        f'projection{away}{cutsay}">'
+        f'<defs>{arch_clip(uid, w, h)}</defs>'
+        f'<g clip-path="url(#arch-{uid})">'
+        f'<rect x="0" y="0" width="{w:.0f}" height="{h:.0f}" class="archground"/>'
+        f'{ctx}{land}</g>{arch_edge(w, h)}</svg>{cap}</figure>'
+    )
+
+
 def country_page(data, c):
     m = next(x for x in data["macros"] if x["slug"] == c["macro_slug"])
     region_cards = []
@@ -669,16 +876,17 @@ def country_page(data, c):
     ])
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)), (c["name"], None)])}
-<div class="pagehead overture">
-  <p class="kicker">{esc(m['name'])}</p>
-  <h1>{esc(c['name'])}</h1>
-  {statement(c['tagline'])}
-  <p class="orient">{country_orient(c)}</p>
-  {chips(c["interests"], data["interests"])}
+<div class="pagehead overture portraithead">
+  <div class="portraitsay">
+    <p class="kicker">{esc(m['name'])}</p>
+    <h1>{esc(c['name'])}</h1>
+    {statement(c['tagline'])}
+    <p class="orient">{country_orient(c)}</p>
+    {chips(c["interests"], data["interests"])}
+  </div>
+  {countryportrait(data, c)}
 </div>
 {advisory_note(c)}
-
-{countrymap(data, c)}
 
 <div class="measure lead">
   <p>{esc(c['summary'])}</p>
@@ -703,7 +911,7 @@ def country_page(data, c):
   </div>
 </section>
 
-{section("Travel regions", grid(region_cards, 3), id="regions",
+{section("Travel regions", countrymap(data, c) + grid(region_cards, 3), id="regions",
          lede=f"{len(c['regions'])} editorial regions, each opening onto its cities.")}
 
 {section("Popular destinations", grid(popular, 3),
@@ -1818,8 +2026,13 @@ def countrymap(data, c):
     # Longyearbyen at 78°N — 700 km beyond the top of the drawn coastline —
     # and produced a map that was two-fifths empty sea with Norway squeezed
     # into a corner. One outlier should cost one marker, not the whole frame.
+    #
+    # And the same rule one level down: the frame is the country's PRINCIPAL
+    # landmass, because `bbox` is the extent of every ring and for Portugal
+    # that reaches the Azores — this map was nine-tenths empty Atlantic with
+    # all six destinations in one corner of it. geo.principal_frame.
     if doc.get("bbox"):
-        bbox = list(doc["bbox"])
+        bbox = geo.principal_frame(doc, c["slug"])[0] or list(doc["bbox"])
     else:
         # Vatican City has no polygon at any scale. Frame it on its own
         # destinations so every country page has the same shape.

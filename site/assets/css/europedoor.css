@@ -1549,6 +1549,71 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 .askband { margin: calc(var(--s7) * -1) 0 var(--s7); }
 .askband .hero-intents { margin-top: var(--s4); }
 
+/* COUNTRY = IDENTITY. The name beside the shape, and the shape in a tall
+   door. The homepage's opening is wide because a continent is wide; a
+   country is a figure and stands in a figure's doorway. The aperture's
+   proportion follows its subject — a signature that is the same shape at
+   every size is a stamp. */
+.pagehead.portraithead { display: grid; gap: var(--s6); align-items: center; }
+.portrait { margin: 0; width: min-content; }
+/* One page in the atlas carries a caption under its door — Russia, whose
+   outline is closed by the 52°E edge of data/geo/ rather than by a border.
+   `min-content` above is what keeps that sentence wrapping to the door's own
+   width instead of setting the width of the figure and shoving the door
+   sideways. */
+.portrait figcaption { margin-top: var(--s3); }
+/* HUNG AT ONE HEIGHT, LIKE PICTURES IN A ROOM — the width is the country's.
+   Sized by WIDTH the doors came out at wildly different heights, because a
+   door's proportion follows its country: Austria's was 258px tall and
+   Portugal's 512, on two pages a reader meets one after the other, and the
+   head jumped by a quarter of a screen between them. Sizing by height keeps
+   the doorway the same and lets the shape inside it differ, which is the
+   whole claim this figure makes. Measured after: every portrait 416px, width
+   258 (Portugal) to 541 (Austria). */
+.portrait svg { display: block; width: auto; height: 26rem; }
+/* AND THE SETTING IS FILLED, WHICH TAKES BEATING THE `fill: none` every
+   other arched map is drawn with — that rule is right when the country is
+   the subject and the land around it is context. Here the land around it IS
+   the subject, and unfilled it gave seven pages a black door with a small
+   ring in the middle of nothing: Monaco showed no coast, Andorra showed two
+   border lines in an empty field. Specificity is (0,3,1) against (0,2,1),
+   checked in the browser rather than counted here, because two collisions in
+   this stylesheet have already rendered as the thing simply not being there.
+   Sea stays the ground, so the coast is a real edge again. */
+.minimap.portrait.setting .countries path,
+.minimap.portrait.setting .context path {
+  fill: var(--map-land); stroke: var(--map-border); stroke-width: 1.1; }
+
+/* THE MARK FOR A COUNTRY THE SOURCE CANNOT DRAW. A ring and a core, the
+   same two-part mark /map uses for the six countries with no polygon at
+   1:50m, at the size a portrait is looked at rather than the size a
+   continent is scanned at. The ring is the claim ("it is here"); the core
+   is the point the ring is about. */
+.minimap.portrait.setting .cmark circle {
+  fill: none; stroke: var(--signature); stroke-width: 2.6; }
+.minimap.portrait.setting .cmark .core {
+  fill: var(--signature); stroke: none; }
+
+/* Filled, like a macro member, because the subject here IS the country and
+   an outline of it among outlines is the reference map's job, not this. */
+.minimap.arched.portrait .countries path.here {
+  fill: var(--map-hover); stroke: var(--sea); stroke-width: 1.3; }
+@media (min-width: 52rem) {
+  /* `auto` rather than a fixed track: the door takes the width its country
+     needs and the type takes the rest, so a narrow country does not leave a
+     column of nothing beside it. */
+  .pagehead.portraithead { grid-template-columns: minmax(0, 1fr) auto;
+                           column-gap: var(--s8); }
+  .portrait { justify-self: end; }
+}
+@media (max-width: 52rem) {
+  /* On a phone the portrait goes under the name and loses a third of its
+     height: at 26rem the widest door is 541px, wider than the screen, and
+     the character line has to arrive before the picture in any case. */
+  .portrait { margin-inline: auto; }
+  .portrait svg { height: 15rem; }
+}
+
 /* THE HERO IS THE DOORWAY, AND EUROPE IS WHAT IS THROUGH IT.
    Stripped of its mark and set beside eight other families, this page was a
    navy gradient, a headline, a search box and four chips — a travel product

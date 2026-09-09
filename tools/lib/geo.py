@@ -103,6 +103,77 @@ def lcc(lat, lon):
     return rho * math.sin(theta), LCC_RHO0 - rho * math.cos(theta)
 
 
+def principal_frame(doc, slug, margin=1.0):
+    """The bbox of a country's PRINCIPAL landmass, not of everything it owns.
+
+    THE FAILURE THIS EXISTS FOR. A country's `bbox` in `data/geo/` is the
+    extent of every ring it has, and for one country that is not a picture of
+    the country. Portugal's bbox runs from 31.3°W to 6.2°W because the Azores
+    are 1,400 km out in the Atlantic: the mainland fills NINE PER CENT of that
+    box, so both the portrait and the reference map drew an empty ocean with
+    Portugal as a sliver against one corner, and six of six destinations in
+    that sliver. Measured across all 49 countries with a polygon, the mainland
+    fills the bbox: Portugal 9%, Malta 35%, Denmark 37%, Greece 53%, and 90%+
+    for forty of them.
+
+    The rule is `countrymap`'s own, one level down — ONE OUTLIER SHOULD COST
+    ONE MARKER, NOT THE WHOLE FRAME — applied to rings instead of dots. Rings
+    are ordered by projected area; the largest is the principal landmass, and
+    any other ring joins the frame if it lies within `margin` times that
+    landmass's own span of it. Stating the distance in the country's own size
+    rather than in kilometres is what makes it one rule: Gozo is a fifth of
+    Malta and five km off it, the Azores are 2% of Portugal and two Portugals
+    away, and an absolute threshold cannot tell those apart.
+
+    Measured at margin 1.0 across the 49: exactly one country loses a ring.
+    Portugal loses seven, holding 2.4% of its land area — the Azores and
+    Madeira — and no destination at all, because all six of its destinations
+    are on the mainland. Denmark keeps Bornholm, Greece keeps Crete and
+    Rhodes, Norway keeps its islands, Malta keeps Gozo.
+
+    Returns (bbox, outside) — the lon/lat frame, and how many rings fall
+    outside it, so a caller can SAY SO rather than crop in silence.
+    """
+    ent = None
+    for _k, v in (doc.get("countries") or {}).items():
+        if v.get("slug") == slug:
+            ent = v
+            break
+    if not ent or not ent.get("rings"):
+        return (list(doc["bbox"]) if doc.get("bbox") else None), 0
+    metric = []
+    for ring in ent["rings"]:
+        pts = [(ring[i], ring[i + 1]) for i in range(0, len(ring), 2)]
+        pr = [lcc(la, lo) for lo, la in pts]
+        a = 0.0
+        n = len(pr)
+        for i in range(n):
+            x0, y0 = pr[i]
+            x1, y1 = pr[(i + 1) % n]
+            a += x0 * y1 - x1 * y0
+        xs = [q[0] for q in pr]
+        ys = [q[1] for q in pr]
+        lons = [q[0] for q in pts]
+        lats = [q[1] for q in pts]
+        metric.append((abs(a) / 2.0, min(xs), min(ys), max(xs), max(ys),
+                       min(lons), min(lats), max(lons), max(lats)))
+    metric.sort(key=lambda z: -z[0])
+    m = metric[0]
+    span = max(m[3] - m[1], m[4] - m[2])
+    lim = (m[1] - margin * span, m[2] - margin * span,
+           m[3] + margin * span, m[4] + margin * span)
+    keep = [m]
+    outside = 0
+    for b in metric[1:]:
+        if b[1] >= lim[0] and b[2] >= lim[1] and b[3] <= lim[2] and b[4] <= lim[3]:
+            keep.append(b)
+        else:
+            outside += 1
+    bbox = [min(k[5] for k in keep), min(k[6] for k in keep),
+            max(k[7] for k in keep), max(k[8] for k in keep)]
+    return bbox, outside
+
+
 class Projection:
     """Lambert conformal conic, fitted to whatever extent it is given.
 

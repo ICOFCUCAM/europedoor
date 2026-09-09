@@ -76,17 +76,42 @@ subject.
 
 ---
 
-### Country — 50 — *orientation*
+### Country — 50 — *identity and character* — EXEMPLAR
 
-1. A whole country, held in one frame, without a guidebook's contents page.
-2. The map immediately under the name.
-3. The country, its regions at their own centres, its destinations.
-4. Statement, map, argument, practical, the atlas, the record.
-5. Go into a region.
-6. **Explicit.**
-7. None. The country is its own shape.
-8. Last. Facts with sources, score with a disclaimer.
-9. **REFUSED**: a rail of grey bullets; a fact table above the country.
+Rewritten as the first of the four exemplars. The old answer to question 2
+was *the map immediately under the name*, and the map in question was the
+reference map: the country with its regions labelled, every destination
+dotted, a scale bar and a note explaining that a region is a grouping. All of
+that is true and all of it is the country as a **record** — it answers *what
+is in here*, which is what the bands below the fold are for. A page whose job
+is *what kind of place is this* opened on a contents page with geography.
+
+1. **Emotional promise** — this place has a character, and you feel what kind
+   of place it is before you read a detail of it.
+2. **Signature moment** — the country's own outline as a **portrait**:
+   filled, alone, standing in a doorway, with nothing on it to operate. The
+   door's proportion follows the country, and every portrait is hung at the
+   same height, so what differs between two pages is the shape.
+3. **Geography** — its own polygon, at the largest scale the source can carry
+   and no larger; neighbours as context. Nothing invented, nothing magnified
+   past what it can bear.
+4. **Imagery** — none. The shape is the picture, and it is true.
+5. **Hierarchy** — the name and the character line beside the portrait; the
+   record, the regions and the reference map below, in that order.
+6. **Interaction** — go into a region or a destination.
+7. **Aperture** — explicit, and it is the page's only one. The reference map
+   keeps its own arch, 810 pixels further down; measured at 1280×900 the two
+   are never in a viewport together.
+8. **Data** — last. Facts with sources, score with a disclaimer.
+9. **NOT above the fold** — region names, destination dots, the scale bar,
+   population, currency, the score, any count that is not the extent of the
+   set. Every one of those is the country as a record.
+
+Where the source cannot carry a portrait, the door opens on the **setting**
+instead — Monaco marked on the Ligurian coast, Andorra in the Pyrenees. See
+`_settingportrait`; the measurement that decides it is in
+`PORTRAIT_SEGMENT_MAX`, and the first build drew Monaco as a triangle four
+hundred pixels tall.
 
 ### Region — 130 — *a grouping, honestly*
 
