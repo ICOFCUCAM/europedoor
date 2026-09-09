@@ -277,6 +277,32 @@ document authorises work on it.
 
 ---
 
+## Where this stood at commit 50
+
+Measured, not asserted. The programme's own opening claim was that eleven of
+twelve rendered families placed an identically-sized h1 at an identical
+vertical position, and that the entire art-directional difference between a
+magazine story and a country encyclopedia was one 11px kicker changing hue.
+
+| | at commit 30 | at commit 50 |
+|---|---|---|
+| distinct head treatments across the families | 1 | 3 |
+| families with a geographic expression | 12 of 13 | 13 of 13 |
+| the aperture, in the dark colour-scheme preference | 1.03:1 — invisible | 2.18:1 on its reveal |
+| map labels legible on a phone | 3.9px | 9.3px, or dropped for the list |
+| map labels cut by the aperture | 184, 14 of them invisible | 0 |
+| map links under 24px with no text equivalent | 26 | 0 |
+| records drawn one way on one page and another on the next | 272 of 319 | 0 |
+| social cards chosen by a hash | 9 | 0 |
+| stylesheet rules that can never apply | 27 | 18, and ceilinged |
+
+Three of those were found by *looking* — a contact sheet in the dark
+preference, one at 390px, and one that photographed a 404 as a blank cell —
+after the whole gate suite came back green. Rendering finds defects; counting
+settles proportions.
+
+---
+
 ## The test this is all for
 
 A screenshot with the logo removed should still be recognisable as

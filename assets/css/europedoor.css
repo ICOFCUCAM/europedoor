@@ -2105,12 +2105,21 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
    scale value it is not a role, it is a decoration. */
 .pagehead.index .lede { max-width: 46ch; }
 @media (min-width: 62rem) {
+  /* START, not end. `align-items: end` bottom-aligned the h1 with the lede,
+     so on /beyond-the-obvious — whose lede runs to five lines — the kicker
+     sat at the top and its own title dropped sixty pixels away from it. The
+     extent sits beside the name; it does not push it down. */
   .pagehead.index { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-                    column-gap: var(--s7); align-items: end; }
+                    column-gap: var(--s7); align-items: start; }
   .pagehead.index .kicker { grid-column: 1; }
   .pagehead.index h1 { grid-column: 1; }
-  .pagehead.index .lede { grid-column: 2; grid-row: 1 / span 2; margin: 0;
-                          align-self: end; }
+  /* ON THE TITLE'S ROW, NOT SPANNING BOTH. A grid item that spans two rows
+     distributes its height across them, so a five-line lede made row one —
+     the kicker's row — tall, and /beyond-the-obvious put its title 59px
+     below its own kicker. The extent belongs beside the NAME, which is row
+     two, and the kicker keeps row one to itself. */
+  .pagehead.index .lede { grid-column: 2; grid-row: 2; margin: 0;
+                          align-self: start; }
 }
 
 /* THE REVEAL — the cut edge of the aperture.
