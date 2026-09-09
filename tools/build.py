@@ -64,8 +64,17 @@ def build():
                     emit(P.place_page(d, c, r, t, pl))
                 for key, payload in P.facets_for(d, c, r, t).items():
                     emit(P.facet_page(d, c, r, t, key, payload))
+    # Every interest page states how wide its own tag is RELATIVE to the
+    # other sixteen, so the ranking is computed once here rather than
+    # seventeen times inside the page.
+    interest_ranking = [
+        x["slug"] for x in sorted(
+            d["taxonomy"]["interests"],
+            key=lambda x: -sum(1 for n in d["cities"].values()
+                               if x["slug"] in n["city"]["interests"]))
+    ]
     for i in d["taxonomy"]["interests"]:
-        emit(P.interest_page(d, i))
+        emit(P.interest_page(d, i, interest_ranking))
     emit(P.journeys_index(d))
     for j in d["journeys"]:
         emit(P.journey_page(d, j))

@@ -1055,11 +1055,34 @@ def sectionnav(items):
 
 # ── interests ─────────────────────────────────────────────────────────
 
-def interest_page(data, i):
+# How wide a tag is, in words, from a stated vocabulary.
+#
+# THE BAND IS AUTHORED; THE NUMBER IS DERIVED. That is the Data Integrity
+# Rule's line and this sits on the legal side of it: "History & ruins covers
+# 63% of the atlas" is a measurement, computed on every build and never
+# typed; "63% is too wide to be a useful filter" is a classification, made
+# from a published threshold that a reader can disagree with.
+INTEREST_BANDS = (
+    (40, "As a filter on its own it barely narrows Europe. It is most useful "
+         "combined with a second one in Discover Mode."),
+    (15, "It narrows Europe usefully without emptying it, which is about "
+         "where a filter earns its place."),
+    (0,  "One of the narrowest tags in this atlas, which makes it a real "
+         "filter — and a short list is a gap in the writing as much as a "
+         "fact about Europe."),
+)
+
+
+def interest_page(data, i, ranking):
     slug = i["slug"]
     cities = [n for n in data["cities"].values() if slug in n["city"]["interests"]]
     cities.sort(key=lambda n: (n["country"]["name"], n["city"]["name"]))
     countries = sorted({n["country"]["slug"] for n in cities})
+    total = len(data["cities"])
+    pct = round(100.0 * len(cities) / total) if total else 0
+    rank = ranking.index(slug) + 1
+    band = next(text for floor, text in INTEREST_BANDS if pct >= floor)
+    shown = cities[:60]
     cards = [
         card(
             urls.city(n["country"], n["region"], n["city"]),
@@ -1067,17 +1090,35 @@ def interest_page(data, i):
             n["city"]["name"], n["city"]["summary"],
             seed=f"city:{n['country']['slug']}:{n['city']['slug']}",
         )
-        for n in cities[:60]
+        for n in shown
     ]
+    # 200 destinations were silently cut to 60 with nothing on the page
+    # saying so — a list that stops without admitting it stopped is the one
+    # kind of incompleteness a reader cannot detect.
+    cut = (f" Showing the first {len(shown)} of {len(cities)}, alphabetically "
+           f"by country." if len(cities) > len(shown) else "")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Experiences", "/experiences"), (i["name"], None)])}
-<div class="pagehead">
+<div class="pagehead overture">
   <p class="kicker">Travelling for</p>
   <h1>{esc(i['name'])}</h1>
-  <p class="lede">{len(cities)} cities across {len(countries)} countries are tagged for this.
-  The Journey Planner weights the same tag, so what you see here is what it will build from.</p>
+  {statement(f"{len(cities)} of the {total} destinations in this atlas are tagged "
+             f"{i['name'].lower()}. {band}")}
+  <p class="orient">{pct}% of the atlas · {len(countries)} of
+  {len(data['countries'])} countries · {rank_phrase(rank, len(ranking))}</p>
 </div>
+
 {grid(cards, 3) if cards else '<p class="small">Nothing tagged yet.</p>'}
+
+<div class="note mt7">
+  <h2 class="mini">Why this page tells you its own tag is wide</h2>
+  <p>A filter that matches most of a continent is not a filter, and hiding
+  that makes the tool look better than it is. The share is counted from the
+  dataset on every build; the sentence about it comes from one published
+  rule — over 40% barely narrows anything, 15–40% narrows usefully, under
+  15% is genuinely narrow. The Journey Planner weights this same tag, so what
+  you see here is what it will build from.{cut}</p>
+</div>
 """
     return f"/interests/{slug}/index.html", page(
         i["name"], body, path=urls.interest(slug), area="countries",
@@ -1726,6 +1767,34 @@ def statement(text):
     """The overture's sentence, at whichever of the two sizes it needs."""
     long = " long" if len(text) > STATEMENT_MAX else ""
     return f'<p class="statement{long}">{esc(text)}</p>'
+
+
+def rank_phrase(rank, total):
+    """"the widest of 17 tags", "the second widest", "the narrowest".
+
+    Rendered as `the {ordinal(rank)} widest` this produced "the FIRST widest
+    of 17 tags" on /interests/history, which is not English — the superlative
+    already carries the one. The ends of the list are the two places a rank
+    has its own word, and both are worth having: the narrowest tag is as
+    interesting a fact about this atlas as the widest."""
+    if rank == 1:
+        return f"the widest of {total} tags"
+    if rank == total:
+        return f"the narrowest of {total} tags"
+    return f"the {ordinal(rank)} widest of {total} tags"
+
+
+def ordinal(n):
+    """1 -> first, 2 -> second … 17 -> 17th. Words to ten, digits after.
+
+    "the 1th widest" was what `f"{n}th"` produced, which is the kind of thing
+    a template does when nobody renders it."""
+    words = ("", "first", "second", "third", "fourth", "fifth", "sixth",
+             "seventh", "eighth", "ninth", "tenth")
+    if n < len(words):
+        return words[n]
+    suffix = "th" if 11 <= n % 100 <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+    return f"{n}{suffix}"
 
 
 def nights_line(t):
