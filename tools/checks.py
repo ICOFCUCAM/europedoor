@@ -2451,6 +2451,63 @@ def c_one_label_rule():
     return n
 
 
+@check("the map renderer's layers are declared, ordered and painted")
+def c_cartography():
+    # THE PAINT ORDER IS THE THING THAT CANNOT BE SEEN TO BE WRONG. Terrain
+    # under the coastline, rivers under the coastline, a route over
+    # everything but the labels — get one of those backwards and the picture
+    # still looks like a picture. Five families used to compose their own
+    # plates inline, which is five opinions about an order nobody could read
+    # in one place. Now `cartography.ORDER` is the order and this asserts
+    # three things about it against the SHIPPED HTML and the stylesheet:
+    #
+    #   1. every layer group emitted on a page is in the declared order,
+    #   2. every declared class has a rule in the stylesheet, so a layer
+    #      cannot be added and silently render as nothing — this codebase has
+    #      made that mistake three times on specificity alone,
+    #   3. every layer whose dataset is absent has its appearance DECIDED in
+    #      writing, so a gap is one somebody wrote down rather than one
+    #      nobody noticed.
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from lib import cartography as C
+    css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
+                encoding="utf-8").read()
+    n = 0
+    for name in C.ORDER:
+        cls = C.CLASSES[name]
+        if not C.held(name):
+            assert name in C.DECIDED, (
+                f"layer {name} has no data and no decided appearance — "
+                f"a gap nobody wrote down")
+            n += 1
+            continue
+        if name in C.FOLDED:
+            carrier, why = C.FOLDED[name]
+            assert carrier in C.ORDER and why, (
+                f"layer {name} is folded into something that is not a layer")
+            n += 1
+            continue
+        assert f".{cls}" in css, (
+            f"layer {name} paints through .{cls} and the stylesheet has no "
+            f"rule for it")
+        n += 1
+    rank = {f"lyr-{name}": i for i, name in enumerate(C.ORDER)}
+    pages = 0
+    for path in site_files():
+        html = open(path, encoding="utf-8").read()
+        got = re.findall(r'<g class="lyr (lyr-[a-z-]+)"', html)
+        if not got:
+            continue
+        pages += 1
+        seen = [rank[g] for g in got if g in rank]
+        assert seen == sorted(seen), (
+            f"{rel(path)} emits its map layers out of the declared order: "
+            f"{got}")
+        n += len(seen)
+    assert pages >= 40, f"only {pages} pages carry a layered plate"
+    return n
+
+
 @check("a journey's leg bars are drawn from the real distances")
 def c_leg_bars():
     # A CHART IS A CLAIM, AND THIS ONE IS PUBLISHED ON SEVENTEEN PAGES.

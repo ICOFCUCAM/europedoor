@@ -21,6 +21,46 @@ That is what the two worlds have always meant — not a theme, but whether the
 reader is browsing or working — and it is why black remains available for the
 compositions that earn it rather than being the default for all 824 figures.
 
+## The pipeline
+
+    GEOGRAPHIC DATA ─┐                        ┌─ VISUAL STYLE
+      coast          │                        │   palette
+      borders        ├──▶ cartography.py ◀────┤   relief
+      rivers         │    the renderer        │   typography
+                     ▼
+              terrain · water · labels
+                     ▼
+                aperture / arch
+
+`tools/lib/cartography.py` is the renderer and the only thing that holds both
+sides. Geography comes in as projected paths and knows nothing about colour;
+style comes in as a declaration of which class each layer paints through and
+knows nothing about geography.
+
+**Nothing in the renderer emits a colour.** A `style="…"` attribute anywhere
+would force `style-src` open on all 1,033 pages, which is why there is not one
+in this repository. `checks.py` asserts the stylesheet carries a rule for
+every layer the renderer can draw, so a layer cannot be added and silently
+render as nothing — the failure this codebase has made three times on
+specificity alone.
+
+**Why this replaced inline composition rather than tidying it.** Five families
+each fetched their own geometry, wrote their own groups and decided their own
+paint order. The cost was never duplication; it was that there was nowhere to
+add a layer. Terrain sits above the land fill and below the coastline, rivers
+above terrain and below the coast, a route above everything but the labels.
+With five inline compositions there are five opinions about that, and the
+first one to be wrong is invisible: a river drawn over a coastline still looks
+like a river.
+
+Three layers are **held but folded** into the land path's own stroke —
+coastline, country boundaries and the selected-place emphasis — because a
+country is one filled, stroked path at this level of detail. `FOLDED` records
+each one and what carries it. Splitting them needs a stroke-only second pass
+over the same geometry, about forty per cent more bytes on these pages, and
+**terrain will force it**: relief cannot sit under a coastline and over a land
+fill while the two are one path.
+
 ## Cartography v2 — the fourteen layers
 
 The stack is declared in `geo.LAYERS` and walked by `pages.plate_stack()`.

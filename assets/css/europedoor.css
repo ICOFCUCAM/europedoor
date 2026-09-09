@@ -2422,8 +2422,14 @@ body[data-hero] .masthead { position: sticky; }
    without argument. Checked in the browser, not counted here — three
    collisions in this stylesheet have already rendered as the thing simply
    not being there. */
-.minimap.arched.atlas .archground { fill: var(--atlas-sea); }
-.minimap.arched.atlas .countries path { fill: var(--atlas-land);
+/* THE STYLESHEET PAINTS LAYERS, NOT ELEMENTS. `cartography.ORDER` names
+   fourteen layers and this file carries a rule for each one it can draw, so
+   a reader of either file finds the same names and `checks.py` can assert
+   that a declared layer is actually painted. A layer added to the renderer
+   with no rule here used to render as nothing, which is the failure this
+   codebase has made three times on specificity alone. */
+.minimap.arched.atlas .lyr-ocean rect { fill: var(--atlas-sea); }
+.minimap.arched.atlas .lyr-land .countries path { fill: var(--atlas-land);
                                         stroke: var(--atlas-coast);
                                         stroke-width: 0.9; }
 /* CONTEXT IS THE SAME LAND. `context` means "a country this atlas does not
@@ -2432,25 +2438,25 @@ body[data-hero] .masthead { position: sticky; }
    Türkiye that a reader can only read as a geographic claim. Same fill, a
    lighter coastline, because the difference that IS real is how much we
    know about it. */
-.minimap.arched.atlas .context path { fill: var(--atlas-land);
+.minimap.arched.atlas .lyr-land .context path { fill: var(--atlas-land);
                                       stroke: color-mix(in srgb, var(--atlas-coast) 45%, transparent); }
-.minimap.arched.atlas .countries path.here { fill: var(--atlas-here);
+.minimap.arched.atlas .lyr-land .countries path.here { fill: var(--atlas-here);
                                              stroke: var(--atlas-hereline);
                                              stroke-width: 1.2; }
 /* The place names on an atlas plate: ink on a paper halo, so a name stays
    legible where it crosses a coastline. The capital is set in small caps
    the way every printed atlas distinguishes it — `capital` is authored data
    per country, not a ranking derived from anything. */
-.minimap.arched.atlas .pname { fill: var(--graphite); font-size: 11px;
+.minimap.arched.atlas .lyr-labels .pname { fill: var(--graphite); font-size: 11px;
                                font-family: var(--text); paint-order: stroke;
                                stroke: var(--atlas-land); stroke-width: 2.6; }
-.minimap.arched.atlas .pname.cap { font-weight: 700; letter-spacing: .06em; }
-.minimap.arched.atlas .pmark.cap { fill: var(--cobalt-deep); stroke-width: 2; }
+.minimap.arched.atlas .lyr-labels .pname.cap { font-weight: 700; letter-spacing: .06em; }
+.minimap.arched.atlas .lyr-destinations .pmark.cap { fill: var(--cobalt-deep); stroke-width: 2; }
 /* ON A PHONE THE PLATE IS 240px TALL, so 18 units renders at 6.8px — not
    small type, type that does not resolve into glyphs. The names are dropped
    and the marks are kept, which is the rule every other map here follows:
    every one of these places is named in full in the regions band below. */
-@media (max-width: 62rem) { .minimap.arched.atlas .pname { display: none; } }
+@media (max-width: 62rem) { .minimap.arched.atlas .lyr-labels .pname { display: none; } }
 
 /* THE LIMESTONE RIM. A printed plate has a reveal you can see the thickness
    of; the arch had a single hairline. Two lines, the outer in the page's own
@@ -2485,13 +2491,21 @@ body[data-hero] .masthead { position: sticky; }
                             border: 1px solid var(--atlas-hereline);
                             border-radius: 2px; }
 
+/* THE FOUR LAYERS THIS ATLAS CANNOT DRAW carry no rule, on purpose: a rule
+   for a layer that emits nothing is dead code that looks like a decision.
+   Their appearance is decided in `cartography.DECIDED` and asserted there.
+   terrain · hillshade · rivers · region-bounds
+
 /* THE COAST TREATMENT. A printed atlas puts a soft band in the water along
    a coast, and it is what makes a coastline read as an edge rather than as
    a line between two flat fields. Drawn by stroking the land silhouette
    thickly UNDER the land fill, so the band falls entirely in the water.
    It is a convention, not bathymetry: this atlas holds no depth data and
    this says nothing about how deep anything is. */
-.minimap.arched.atlas .coasthalo { fill: none;
+/* The stylesheet paints LAYERS now, not ad-hoc classes: `lyr-coastal-water`
+   is a declared layer of the stack and this is its rule, so a reader of
+   either file finds the same fourteen names. */
+.minimap.arched.atlas .lyr-coastal-water use { fill: none;
   stroke: color-mix(in srgb, var(--atlas-coast) 34%, transparent);
   stroke-width: 7; stroke-linejoin: round; }
 
@@ -2500,13 +2514,13 @@ body[data-hero] .masthead { position: sticky; }
    same weight as the country next to it. Three: a frontier is the lightest
    because it is context, a coast is the edge of the subject's world, and
    the subject's own outline is the heaviest thing on the plate. */
-.minimap.arched.atlas .context path { stroke-width: 0.7; }
-.minimap.arched.atlas .countries path { stroke-width: 0.9; }
-.minimap.arched.atlas .countries path.here { stroke-width: 1.6; }
+.minimap.arched.atlas .lyr-land .context path { stroke-width: 0.7; }
+.minimap.arched.atlas .lyr-land .countries path { stroke-width: 0.9; }
+.minimap.arched.atlas .lyr-land .countries path.here { stroke-width: 1.6; }
 
 /* The places, as marks rather than as navigation. Ink with a paper ring, so
    one reads against the country's own blue and against the water alike. */
-.minimap.arched.atlas .pmark { fill: var(--atlas-hereline);
+.minimap.arched.atlas .lyr-destinations .pmark { fill: var(--atlas-hereline);
                                stroke: var(--atlas-land); stroke-width: 1.6; }
 
 /* THE MARKS AND NAMES ON A PAPER MAP. Lime on graphite is the INSTRUMENT's
@@ -2514,13 +2528,13 @@ body[data-hero] .masthead { position: sticky; }
    highlighter. Here the place you are reading about is cobalt, its
    neighbours are ink, and the names are ink with a paper halo, which is how
    a printed atlas keeps a name legible over a coastline. */
-.minimap.arched.atlas .minidot circle { fill: var(--atlas-hereline);
+.minimap.arched.atlas .lyr-destinations .minidot circle { fill: var(--atlas-hereline);
                                         stroke: var(--atlas-land); stroke-width: 1.4; }
-.minimap.arched.atlas .minidot.here circle { fill: var(--cobalt-deep);
+.minimap.arched.atlas .lyr-destinations .minidot.here circle { fill: var(--cobalt-deep);
                                              stroke: var(--atlas-land); stroke-width: 1.8; }
-.minimap.arched.atlas .minidot .hit,
-.minimap.arched.atlas .minidot.here .hit { fill: transparent; stroke: none; }
-.minimap.arched.atlas .minilabel { fill: var(--graphite);
+.minimap.arched.atlas .lyr-destinations .minidot .hit,
+.minimap.arched.atlas .lyr-destinations .minidot.here .hit { fill: transparent; stroke: none; }
+.minimap.arched.atlas .lyr-labels .minilabel { fill: var(--graphite);
                                    paint-order: stroke;
                                    stroke: var(--atlas-land); stroke-width: 2.6; }
 /* THE SIGNATURE IS A COLOUR THAT GETS DRAWN, NOT READ — the rule that
@@ -2531,15 +2545,15 @@ body[data-hero] .masthead { position: sticky; }
    The `fill` is NOT restated here: the base `.minilabel` rule above already
    sets ink, and a declaration that restates what the element already has is
    a dead rule — the scan counts it, and it counted this one. */
-.minimap.arched.atlas .minilabel.here { font-weight: 700; }
-.minimap.arched.atlas .rlabel text { fill: var(--graphite); paint-order: stroke;
+.minimap.arched.atlas .lyr-labels .minilabel.here { font-weight: 700; }
+.minimap.arched.atlas .lyr-labels .rlabel text { fill: var(--graphite); paint-order: stroke;
                                      stroke: var(--atlas-land); stroke-width: 3; }
 /* The scale bar in coast measured 2.57:1 on the water it is drawn over — a
    rule you cannot read is not a scale. A slate that clears AA on both the
    water and the land, because a bar crosses from one to the other. */
-.minimap.arched.atlas .scalebar line,
-.minimap.arched.atlas .scalebar path { stroke: #2b415a; }
-.minimap.arched.atlas .scalebar text { fill: #2b415a; }
+.minimap.arched.atlas .lyr-labels .scalebar line,
+.minimap.arched.atlas .lyr-labels .scalebar path { stroke: #2b415a; }
+.minimap.arched.atlas .lyr-labels .scalebar text { fill: #2b415a; }
 
 /* On paper the reveal is the whole reading of the opening, so it is ink
    rather than a hairline rule. */

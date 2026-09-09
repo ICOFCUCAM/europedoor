@@ -12,6 +12,7 @@ import math
 import re
 from urllib.parse import quote
 
+from . import cartography
 from . import geo
 from . import urls
 from .render import (LD_PUBLISHER, SITE_NAME, SITE_TAGLINE, arch_rim, card, chips, crumbs,
@@ -994,12 +995,11 @@ def countryportrait(data, c):
                 order_.append((0 if iscap else 1, -_depth(t), px, py,
                                t["name"], iscap))
     order_.sort()
-    marks = ""
-    boxes_ = []
+    dotmarks, boxes_ = "", []
     for _k, _d, px, py, nm, iscap in order_:
-        marks += (f'<circle class="pmark{" cap" if iscap else ""}" '
-                  f'cx="{px:.1f}" cy="{py:.1f}" r="{4.5 if iscap else 3.5}">'
-                  f'<title>{esc(nm)}</title></circle>')
+        dotmarks += (f'<circle class="pmark{" cap" if iscap else ""}" '
+                     f'cx="{px:.1f}" cy="{py:.1f}" r="{4.5 if iscap else 3.5}">'
+                     f'<title>{esc(nm)}</title></circle>')
         got = place_label_box(px, py, nm, w, h,
                               cls="pname" + (" cap" if iscap else ""))
         if not got:
@@ -1018,7 +1018,7 @@ def countryportrait(data, c):
             continue
         boxes_.append(box)
         labs_.append(lhtml)
-    marks += "".join(labs_)
+    namemarks = "".join(labs_)
     uid = "cp" + "".join(ch for ch in c["slug"] if ch.isalnum())[:14]
     # CROPPING IN SILENCE IS THE THING TO AVOID. Where a country has land
     # outside this frame it is said, in the one place a reader of the figure
@@ -1038,22 +1038,26 @@ def countryportrait(data, c):
               f"atlas's map data ends, not at a border") if cut else ""
     cap = (f'<figcaption>The outline stops at {lim:.0f}°E, where this atlas\'s '
            f'map data ends — not at a border.</figcaption>') if cut else ""
+    # THE PLATE IS COMPOSED BY THE RENDERER, NOT HERE. Geography goes in as
+    # projected paths and marks; the paint order, the aperture, the rim and
+    # the reveal are `cartography.plate`'s, in one place, for every family
+    # that will follow. Splitting the marks from the names is not tidiness:
+    # they are two layers of the stack and terrain has to be able to land
+    # between them.
     return (
         f'<div class="plate">'
-        f'<figure class="minimap portrait arched atlas">'
-        f'<svg viewBox="0 0 {w:.0f} {h:.0f}" role="img" data-world="discover" '
-        f'aria-label="The outline of {esc(c["name"])}, drawn on this atlas\'s '
-        f'projection{away}{cutsay}">'
-        f'<defs>{arch_clip(uid, w, h)}</defs>'
-        f'<g clip-path="url(#arch-{uid})">'
-        f'<rect x="0" y="0" width="{w:.0f}" height="{h:.0f}" class="archground"/>'
-        f'{coast_halo(uid)}<g id="{uid}-land">{ctx}{land}</g>'
-        f'<g class="lyr lyr-places">{marks}</g></g>{arch_rim(w, h)}{arch_edge(w, h)}</svg>{cap}'
-        f'</figure>'
-        f'<div class="platefoot">{locator_inset(c["slug"])}'
-        f'<ul class="platekey"><li class="k-cap">Capital</li>'
-        f'<li class="k-dest">Destination</li>'
-        f'<li class="k-here">{esc(c["name"])}</li></ul></div></div>'
+        + cartography.plate(
+            uid=uid, w=w, h=h, proj=proj, view=(0, 0, w, h),
+            land=land, context=ctx,
+            destinations=dotmarks, labels=namemarks,
+            caption=cap,
+            figure_class="minimap portrait arched atlas",
+            aria=(f'The outline of {esc(c["name"])}, drawn on this atlas\'s '
+                  f'projection{away}{cutsay}'))
+        + f'<div class="platefoot">{locator_inset(c["slug"])}'
+          f'<ul class="platekey"><li class="k-cap">Capital</li>'
+          f'<li class="k-dest">Destination</li>'
+          f'<li class="k-here">{esc(c["name"])}</li></ul></div></div>'
     )
 
 
@@ -2765,22 +2769,25 @@ def minimap(data, t, span=3.2, about=None, named=None):
                 labels.append(got)
     drawnlabels = "".join(phone_declutter(labels))
     return (
-        f'<figure class="minimap arched atlas{dense_class(drawnlabels)}">'
-        f'<svg viewBox="0 0 {w} {h}" role="img" data-world="discover" '
-        f'aria-label="Map of {esc(t["name"])} and the places around it">'
-        f'<defs>{arch_clip(uid, w, h)}</defs>'
-        f'<g clip-path="url(#arch-{uid})">'
-        f'<rect x="0" y="0" width="{w}" height="{h}" class="archground"/>'
-        f'<g transform="translate({w/2 - cx*span:.2f},{h/2 - cy*span:.2f}) scale({span})">'
-        f'{ctx}{land}</g>'
-        f'{"".join(dots)}{drawnlabels}{bar}</g>{arch_edge(w, h)}</svg>'
+        cartography.plate(
+            uid=uid, w=w, h=h, proj=MAPPROJ, view=(0, 0, w, h),
+            # The transform is the destination map's own: it draws the
+            # continent's geometry and scales the window in, where a country
+            # plate projects to its own frame. The renderer takes the land as
+            # given and never touches a coordinate.
+            land=(f'<g transform="translate({w/2 - cx*span:.2f},'
+                  f'{h/2 - cy*span:.2f}) scale({span})">{ctx}{land}</g>'),
+            destinations="".join(dots), labels=drawnlabels + bar,
+            rim=False,
+            figure_class=f"minimap arched atlas{dense_class(drawnlabels)}",
+            aria=f"Map of {esc(t['name'])} and the places around it")[:-len("</figure>")]
         # `about` names something INSIDE this destination — a place page's
         # subject. The map is then honestly captioned as what it is: this
         # atlas has one projection and its finest unit is about four
         # kilometres, so there is no map of a building, and a map labelled
         # "Bryggen" that is actually a map of Bergen would be the kind of
         # small lie refused everywhere else here.
-        f'<figcaption>'
+        + f'<figcaption>'
         + (f'{esc(about)} is in {esc(t["name"])}, and this is {esc(t["name"])} '
            f'— the atlas draws Europe in one projection whose finest unit is '
            f'about four kilometres, so it maps the town rather than the '
