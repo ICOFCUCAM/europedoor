@@ -665,8 +665,8 @@ def _settingportrait(data, c, doc):
     x, y = proj.xy(clat, clon)
     uid = "cs" + "".join(ch for ch in c["slug"] if ch.isalnum())[:14]
     return (
-        f'<figure class="minimap portrait setting arched">'
-        f'<svg viewBox="0 0 {w:.0f} {h:.0f}" role="img" data-world="intelligence" '
+        f'<figure class="minimap portrait setting arched atlas">'
+        f'<svg viewBox="0 0 {w:.0f} {h:.0f}" role="img" data-world="discover" '
         f'aria-label="{esc(c["name"])} marked at its own coordinates, among its '
         f'neighbours. No cartographic source this atlas holds draws an outline '
         f'for it at a size this picture could show, so it is a point rather '
@@ -748,10 +748,105 @@ def countryportrait(data, c):
             ys.append(y)
     span_y = (max(ys) - min(ys)) or 1.0
     aspect = max(0.62, min(1.30, (max(xs) - min(xs)) / span_y))
-    w = 520.0
-    h = round(w / aspect)
+    # THE viewBox HEIGHT IS FIXED AND THE WIDTH FOLLOWS THE COUNTRY, which
+    # is the opposite of the obvious way round and is the only way the type
+    # can be sized. A label is drawn in viewBox UNITS and the browser scales
+    # the viewBox to the box it is given: with a fixed 520-unit width the
+    # rendered size is 11 x (renderedWidth / 520), and every portrait is hung
+    # at one CSS height with its width following its country — 258px for
+    # Portugal, 541px for Austria. So the same declaration came out at 5.8px
+    # on one page and 11.4px on another. This is the same defect measured
+    # across the embedded maps at commit 39, met again from the other side.
+    #
+    # Fixing the viewBox HEIGHT makes units-to-pixels constant on every
+    # country whatever its shape, so one font-size is one size everywhere.
+    #
+    # AND THE HEIGHT IS CHOSEN SO THE EXISTING MAP-LABEL SIZE IS THE RIGHT
+    # ONE. 391 units against a 416px plate is 1.064 pixels per unit, so
+    # `.minilabel`'s 11 units render at 11.7px — a size this stylesheet
+    # already has. Picking a round 640 instead needed an 18px declaration,
+    # which is a SEVENTEENTH font size in a file with a ceiling of sixteen,
+    # bought for a number that is not even a rendered size: a label in an
+    # SVG is in viewBox units. Choosing the frame instead of the type also
+    # means the width model fitted for these labels applies unchanged rather
+    # than being scaled, and that model is an upper envelope with a fixed
+    # per-name cost that does not scale per character.
+    h = 391.0
+    w = round(h * aspect)
     proj = geo.Projection(list(bbox), w, h, pad=0.14)
     ctx, land = geo.landmass(proj, (0, 0, w, h), doc=doc, highlight=c["slug"])
+    # THE PLACE LAYER. A shape answers "what shape is this country"; an atlas
+    # answers "where are the places". Every destination the atlas holds for
+    # this country, at its own coordinate, unlabelled and not a link — the
+    # reference map further down is the instrument and carries the names, the
+    # touch targets and the scale bar. Here they are marks on a map, and the
+    # `<title>` is what a screen reader gets.
+    #
+    # ALL OF THEM, OR NONE, AND NEVER A SELECTION. Picking "the five most
+    # meaningful" would be a ranking this atlas does not hold and refuses to
+    # invent — there is no `rank`, `featured` or `boost` on a place, in the
+    # schema or anywhere else. The median country has FOUR destinations and
+    # 41 of 50 have six or fewer, so for most of Europe every mark fits.
+    #
+    # AND THE PLACES ARE NAMED. A mark with no name answers "how many" and
+    # not "where"; an atlas plate names what it draws. Same placement rule
+    # as every other map here — right of the dot, then left, then under,
+    # then over, each tested against the real curve of the aperture — and a
+    # name that fits nowhere is dropped exactly as a colliding one is,
+    # keeping its mark, its <title> and its row in the regions band below.
+    # The capital is marked differently because it is the one place on a
+    # country map every atlas distinguishes, and `capital` is authored data.
+    cap_name = (c.get("capital") or {}).get("name") if isinstance(c.get("capital"), dict) else c.get("capital")
+    pts_, placed_, labs_ = [], [], []
+    for r_ in c["regions"]:
+        for t in r_["cities"]:
+            px, py = proj.xy(t["lat"], t["lon"])
+            if 0 <= px <= w and 0 <= py <= h:
+                pts_.append((px, py, t["name"]))
+    # THE CAPITAL IS PLACED FIRST AND WINS EVERY COLLISION, then the places
+    # we have written most about. Ordered by position alone, Lisbon's label
+    # was dropped for Sintra's — 25 km apart, and the alphabet of latitude
+    # decided which name a reader of Portugal's plate gets. The capital is
+    # the one name a country plate may not lose; after it, the same depth
+    # measure the reference map uses, so a country keeps Bordeaux and drops
+    # Bonifacio rather than the other way round.
+    def _depth(t):
+        return (len(t.get("places", [])) * 2 + len(t.get("experiences", []))
+                + len(t.get("highlights", [])))
+    order_ = []
+    for r_ in c["regions"]:
+        for t in r_["cities"]:
+            px, py = proj.xy(t["lat"], t["lon"])
+            if 0 <= px <= w and 0 <= py <= h:
+                iscap = bool(cap_name and t["name"].split(" &")[0] == cap_name)
+                order_.append((0 if iscap else 1, -_depth(t), px, py,
+                               t["name"], iscap))
+    order_.sort()
+    marks = ""
+    boxes_ = []
+    for _k, _d, px, py, nm, iscap in order_:
+        marks += (f'<circle class="pmark{" cap" if iscap else ""}" '
+                  f'cx="{px:.1f}" cy="{py:.1f}" r="{4.5 if iscap else 3.5}">'
+                  f'<title>{esc(nm)}</title></circle>')
+        got = place_label_box(px, py, nm, w, h,
+                              cls="pname" + (" cap" if iscap else ""))
+        if not got:
+            continue
+        lhtml, lx, ly, lw, lh = got
+        box = (lx - LABEL_CLEAR, ly - LABEL_CLEAR,
+               lx + lw + LABEL_CLEAR, ly + lh + LABEL_CLEAR)
+        # A REAL BOX OVERLAP, NOT A DISTANCE. The first version dropped a
+        # label only if its DOT was within 8% of the frame of another dot,
+        # which says nothing about a name 28 characters long: France drew
+        # "Sarlat & the Puy-en-Velay" through "Clermont-Ferrand" and
+        # "Biarritz & the Basque Coast" through "Toulouse", because the dots
+        # were far enough apart and the words were not.
+        if any(not (box[2] < q[0] or box[0] > q[2]
+                    or box[3] < q[1] or box[1] > q[3]) for q in boxes_):
+            continue
+        boxes_.append(box)
+        labs_.append(lhtml)
+    marks += "".join(labs_)
     uid = "cp" + "".join(ch for ch in c["slug"] if ch.isalnum())[:14]
     # CROPPING IN SILENCE IS THE THING TO AVOID. Where a country has land
     # outside this frame it is said, in the one place a reader of the figure
@@ -772,14 +867,14 @@ def countryportrait(data, c):
     cap = (f'<figcaption>The outline stops at {lim:.0f}°E, where this atlas\'s '
            f'map data ends — not at a border.</figcaption>') if cut else ""
     return (
-        f'<figure class="minimap portrait arched">'
-        f'<svg viewBox="0 0 {w:.0f} {h:.0f}" role="img" data-world="intelligence" '
+        f'<figure class="minimap portrait arched atlas">'
+        f'<svg viewBox="0 0 {w:.0f} {h:.0f}" role="img" data-world="discover" '
         f'aria-label="The outline of {esc(c["name"])}, drawn on this atlas\'s '
         f'projection{away}{cutsay}">'
         f'<defs>{arch_clip(uid, w, h)}</defs>'
         f'<g clip-path="url(#arch-{uid})">'
         f'<rect x="0" y="0" width="{w:.0f}" height="{h:.0f}" class="archground"/>'
-        f'{ctx}{land}</g>{arch_edge(w, h)}</svg>{cap}</figure>'
+        f'{ctx}{land}<g class="pmarks">{marks}</g></g>{arch_edge(w, h)}</svg>{cap}</figure>'
     )
 
 
@@ -2491,8 +2586,8 @@ def minimap(data, t, span=3.2, about=None, named=None):
                 labels.append(got)
     drawnlabels = "".join(phone_declutter(labels))
     return (
-        f'<figure class="minimap arched{dense_class(drawnlabels)}">'
-        f'<svg viewBox="0 0 {w} {h}" role="img" data-world="intelligence" '
+        f'<figure class="minimap arched atlas{dense_class(drawnlabels)}">'
+        f'<svg viewBox="0 0 {w} {h}" role="img" data-world="discover" '
         f'aria-label="Map of {esc(t["name"])} and the places around it">'
         f'<defs>{arch_clip(uid, w, h)}</defs>'
         f'<g clip-path="url(#arch-{uid})">'

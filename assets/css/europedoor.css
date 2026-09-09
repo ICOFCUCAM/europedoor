@@ -126,12 +126,49 @@
   --warn:         #a32a1e;
   --warn-bg:      #f7ebe8;
 
-  /* the map — always INTELLIGENCE, wherever it is embedded */
-  --map-sea:      #0a0e10;
-  --map-land:     #1f252a;
-  --map-context:  #161b1f;
-  --map-border:   #39434b;
-  --map-hover:    #24405e;
+  /* THE CARTOGRAPHY — always INTELLIGENCE, wherever it is embedded.
+     PAPER, INK, BLUE. The first version of these five was near-black water
+     (#0a0e10) with a blue polygon on it, and the association it carried was
+     GIS software: a dashboard, a satellite interface, a database selection
+     state. Measured, the reason was that nothing was a step away from
+     anything — land against water was 1.25:1, a coastline against its own
+     land 1.53, and the highlighted country against its neighbours 1.45. A
+     map whose layers are all within a third of a stop of each other is not
+     a map, it is a silhouette on a dark tile.
+     These are ink rather than black, and each layer is a real step:
+     land:sea 1.50, coast:land 2.04, subject:land 2.02. The opening stays an
+     opening — limestone wall against this water is 17.35:1, against the old
+     water 17.94, so the signature loses a third of a stop and gains a
+     cartography. They are declared in docs/palette.json with a role each
+     and checked against this file, which for the life of the map they were
+     not: five hexes governing every drawing on the site, outside the
+     palette that is data. */
+  /* THE ATLAS — the EDITORIAL cartography, on paper.
+     The owner's direction: an EuropeDoor map must feel like an editorial
+     European atlas, and black must stop being the default ground for every
+     one of them. So the family splits on what the drawing IS. A country
+     portrait, a destination's local view and a story's map are PICTURES —
+     they are looked at — and a printed atlas is warm paper, pale water and
+     an ink coastline. /map, the planner, search and the country reference
+     map are INSTRUMENTS — they are operated — and those stay graphite,
+     which is what the two worlds have always meant: not a theme, but
+     whether the reader is browsing or working.
+     Measured: land against water 1.39, coast against land 3.57, the subject
+     against its neighbours 2.31. The aperture is then read by its CUT EDGE
+     rather than by a tonal step from the wall, which is the machinery the
+     dark preference already needed and already has. */
+  --atlas-sea:     #bccfe0;
+  --atlas-land:    #f2efe8;
+  --atlas-context: #e6e2d9;
+  --atlas-coast:   #6d7f95;
+  --atlas-here:    #7fa1cf;
+  --atlas-hereline:#3f5f96;
+
+  --map-sea:      #0a1220;
+  --map-land:     #253546;
+  --map-context:  #1b2735;
+  --map-border:   #4a6480;
+  --map-hover:    #3a6299;
 
 
   /* type */
@@ -1639,19 +1676,6 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    whole claim this figure makes. Measured after: every portrait 416px, width
    258 (Portugal) to 541 (Austria). */
 .portrait svg { display: block; width: auto; height: 26rem; }
-/* AND THE SETTING IS FILLED, WHICH TAKES BEATING THE `fill: none` every
-   other arched map is drawn with — that rule is right when the country is
-   the subject and the land around it is context. Here the land around it IS
-   the subject, and unfilled it gave seven pages a black door with a small
-   ring in the middle of nothing: Monaco showed no coast, Andorra showed two
-   border lines in an empty field. Specificity is (0,3,1) against (0,2,1),
-   checked in the browser rather than counted here, because two collisions in
-   this stylesheet have already rendered as the thing simply not being there.
-   Sea stays the ground, so the coast is a real edge again. */
-.minimap.portrait.setting .countries path,
-.minimap.portrait.setting .context path {
-  fill: var(--map-land); stroke: var(--map-border); stroke-width: 1.1; }
-
 /* THE MARK FOR A COUNTRY THE SOURCE CANNOT DRAW. A ring and a core, the
    same two-part mark /map uses for the six countries with no polygon at
    1:50m, at the size a portrait is looked at rather than the size a
@@ -1662,10 +1686,11 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 .minimap.portrait.setting .cmark .core {
   fill: var(--signature); stroke: none; }
 
-/* Filled, like a macro member, because the subject here IS the country and
-   an outline of it among outlines is the reference map's job, not this. */
-.minimap.arched.portrait .countries path.here {
-  fill: var(--map-hover); stroke: var(--sea); stroke-width: 1.3; }
+/* The portrait's own fill rule lived here and is DELETED, not kept: the
+   atlas skin sets the subject's fill and stroke at the same specificity and
+   further down the file, so this one matched fifty elements and changed
+   none of them. The dead-rule scan found it in the same run that shipped
+   the skin, which is what that scan is for. */
 @media (min-width: 52rem) {
   /* `auto` rather than a fixed track: the door takes the width its country
      needs and the type takes the rest, so a narrow country does not leave a
@@ -2386,6 +2411,83 @@ body[data-hero] .masthead { position: sticky; }
   .heromap .archedge { stroke: color-mix(in srgb, var(--limestone) 26%, transparent); }
 }
 
+/* THE ATLAS SKIN. Specificity is deliberate and generous: every rule it
+   beats is `.minimap.arched …` at (0,3,1), so these are (0,4,1) and win
+   without argument. Checked in the browser, not counted here — three
+   collisions in this stylesheet have already rendered as the thing simply
+   not being there. */
+.minimap.arched.atlas .archground { fill: var(--atlas-sea); }
+.minimap.arched.atlas .countries path { fill: var(--atlas-land);
+                                        stroke: var(--atlas-coast);
+                                        stroke-width: 0.9; }
+/* CONTEXT IS THE SAME LAND. `context` means "a country this atlas does not
+   write about", which is a fact about the dataset and not about the ground:
+   giving it its own tone drew a warm wedge across Cyprus, Azerbaijan and
+   Türkiye that a reader can only read as a geographic claim. Same fill, a
+   lighter coastline, because the difference that IS real is how much we
+   know about it. */
+.minimap.arched.atlas .context path { fill: var(--atlas-land);
+                                      stroke: color-mix(in srgb, var(--atlas-coast) 45%, transparent); }
+.minimap.arched.atlas .countries path.here { fill: var(--atlas-here);
+                                             stroke: var(--atlas-hereline);
+                                             stroke-width: 1.2; }
+/* The place names on an atlas plate: ink on a paper halo, so a name stays
+   legible where it crosses a coastline. The capital is set in small caps
+   the way every printed atlas distinguishes it — `capital` is authored data
+   per country, not a ranking derived from anything. */
+.minimap.arched.atlas .pname { fill: var(--graphite); font-size: 11px;
+                               font-family: var(--text); paint-order: stroke;
+                               stroke: var(--atlas-land); stroke-width: 2.6; }
+.minimap.arched.atlas .pname.cap { font-weight: 700; letter-spacing: .06em; }
+.minimap.arched.atlas .pmark.cap { fill: var(--cobalt-deep); stroke-width: 2; }
+/* ON A PHONE THE PLATE IS 240px TALL, so 18 units renders at 6.8px — not
+   small type, type that does not resolve into glyphs. The names are dropped
+   and the marks are kept, which is the rule every other map here follows:
+   every one of these places is named in full in the regions band below. */
+@media (max-width: 62rem) { .minimap.arched.atlas .pname { display: none; } }
+
+/* The places, as marks rather than as navigation. Ink with a paper ring, so
+   one reads against the country's own blue and against the water alike. */
+.minimap.arched.atlas .pmark { fill: var(--atlas-hereline);
+                               stroke: var(--atlas-land); stroke-width: 1.6; }
+
+/* THE MARKS AND NAMES ON A PAPER MAP. Lime on graphite is the INSTRUMENT's
+   signal — it is the colour /map lights a result in — and on paper it is a
+   highlighter. Here the place you are reading about is cobalt, its
+   neighbours are ink, and the names are ink with a paper halo, which is how
+   a printed atlas keeps a name legible over a coastline. */
+.minimap.arched.atlas .minidot circle { fill: var(--atlas-hereline);
+                                        stroke: var(--atlas-land); stroke-width: 1.4; }
+.minimap.arched.atlas .minidot.here circle { fill: var(--cobalt-deep);
+                                             stroke: var(--atlas-land); stroke-width: 1.8; }
+.minimap.arched.atlas .minidot .hit,
+.minimap.arched.atlas .minidot.here .hit { fill: transparent; stroke: none; }
+.minimap.arched.atlas .minilabel { fill: var(--graphite);
+                                   paint-order: stroke;
+                                   stroke: var(--atlas-land); stroke-width: 2.6; }
+/* THE SIGNATURE IS A COLOUR THAT GETS DRAWN, NOT READ — the rule that
+   already separated `--signature` from `--door` on the rest of the site,
+   met again here. Cobalt-deep names the place you are reading about and
+   measures 4.27:1 on this water, under AA. So the DOT is cobalt and the
+   NAME is ink in bold: the accent is drawn, the text is read. */
+   The `fill` is NOT restated here: the base `.minilabel` rule above already
+   sets ink, and a declaration that restates what the element already has is
+   a dead rule — the scan counts it, and it counted this one. */
+.minimap.arched.atlas .minilabel.here { font-weight: 700; }
+.minimap.arched.atlas .rlabel text { fill: var(--graphite); paint-order: stroke;
+                                     stroke: var(--atlas-land); stroke-width: 3; }
+/* The scale bar in coast measured 2.57:1 on the water it is drawn over — a
+   rule you cannot read is not a scale. A slate that clears AA on both the
+   water and the land, because a bar crosses from one to the other. */
+.minimap.arched.atlas .scalebar line,
+.minimap.arched.atlas .scalebar path { stroke: #2b415a; }
+.minimap.arched.atlas .scalebar text { fill: #2b415a; }
+
+/* On paper the reveal is the whole reading of the opening, so it is ink
+   rather than a hairline rule. */
+.minimap.arched.atlas .archedge { stroke: var(--graphite); stroke-width: 1.2;
+                                  opacity: .55; }
+
 /* THE TAP TARGET IS NOT THE DOT.
    A .minidot is r=5.5 in a 1000-unit viewBox, which renders at 3.9px across
    on a 358px phone; WCAG 2.2 AA puts the floor at 24. Enlarging the drawn
@@ -2551,8 +2653,20 @@ body[data-hero] .masthead { position: sticky; }
 /* non-scaling-stroke, or the frontier is a worm. The land is drawn inside a
  * scale(span) transform, so a 1.1-unit stroke rendered at five pixels and
  * the border of France looked like a river in flood. */
-.minimap.arched .countries path,
-.minimap.arched .context path { fill: none; vector-effect: non-scaling-stroke; }
+/* THE LAND IS PAINTED, AND FOR THE LIFE OF THE EMBEDDED MAP IT WAS NOT.
+   `fill: none` made every minimap a set of frontier lines on one dark
+   field, so Portugal's Atlantic edge meant nothing, Greece's islands were
+   blue fragments rather than islands, and a country was a polygon floating
+   in a UI tile. /map — the site's own big instrument — has painted its land
+   since it was built, so the family was already inconsistent with the one
+   drawing everybody sees.
+   Four layers, which is what makes a map a map: the water is the ground of
+   the opening, the land sits on it, the coast is the edge between them, and
+   the subject is the only thing in the accent. */
+.minimap.arched .countries path { fill: var(--map-land);
+                                  vector-effect: non-scaling-stroke; }
+.minimap.arched .context path { fill: var(--map-context);
+                                vector-effect: non-scaling-stroke; }
 .minimap.arched .countries path { stroke: var(--map-border); stroke-width: 1.1; }
 /* AND THE MACRO MEMBERS ARE FILLED, WHICH TAKES BEATING THE RULE ABOVE.
    `.macromap .countries path.here` and `.minimap.arched .countries path` are
@@ -2572,4 +2686,3 @@ body[data-hero] .masthead { position: sticky; }
   fill: var(--map-hover); stroke: var(--sea); stroke-width: 1.3; }
 .minimap.arched .context path { stroke: color-mix(in srgb, var(--map-border) 60%, transparent); stroke-width: 0.7; }
 
-.placeband-map .minimap.arched .countries path { fill: var(--map-land); }
