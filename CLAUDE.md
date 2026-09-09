@@ -174,13 +174,34 @@ convex hull round Bergen and Ålesund labelled "Vestland" would look like an
 answer and be a guess — and Monaco and Vatican City get a ringed point rather
 than an invented outline for the same reason.
 
-**One projection, and it was wrong for a year.** `pages.MAPPROJ` is the only
-projection; everything that draws Europe uses it, and the browser is handed its
-six numbers rather than reimplementing it. The version this replaced claimed to
-correct for latitude and then multiplied x by `cos(52°)/cos(52°)`, which is 1 —
-Europe was 60% too wide and nobody noticed, because 313 dots on an empty
-rectangle are the right shape by definition. Real geography is what made it
-visible.
+**One projection, and it has been wrong twice.** `pages.MAPPROJ` is the only
+projection and everything that draws Europe uses it. It is now a **Lambert
+conformal conic at EPSG:3034's angles** — standard parallels 35°N and 65°N,
+origin 52°N, central meridian 10°E — which is the conformal conic the EU
+publishes pan-European maps on, chosen for this exact extent.
+
+The first version multiplied x by `cos(52°)/cos(52°)`, which is 1: Europe was
+60% too wide for a year and nobody noticed, because 313 dots on an empty
+rectangle are the right shape by definition. Real geography made that visible.
+The second was equirectangular with one cos(latitude) correction at the middle
+of the extent — exact on one line and wrong everywhere else. Measured as the
+ratio of scale along the parallel to scale along the meridian, which is 1.000
+everywhere on a conformal projection: **−25.3% at 35°N, +22.4% at 60°N, +44.9%
+at 65°N, +89.7% at North Cape**, on every page that draws land
+(`signature.apertures` counts them). A coastline stretched 45% still
+looks like a coastline, so this one needed arithmetic rather than a contact
+sheet. `checks.py` asserts conformality at 54 points and pins the four angles,
+because moving a standard parallel keeps a projection conformal and quietly
+redraws Europe.
+
+A conic is not affine, so the browser can no longer be handed six numbers. It
+is handed the four **angles** and derives the cone constant with the same three
+lines `geo.py` uses — one projection, decided in one place — and a browser
+check asserts the two implementations agree to a hundredth of a pixel on nine
+points. **Rings are clipped in lon/lat before projecting**: `data/geo/` is cut
+at 52°E and the extent stops at 45, and under a conic those seven degrees
+rotate about the cone apex and land back inside the canvas instead of falling
+off the right-hand edge.
 
 **The aperture is the signature, and it is cut three ways.** Geography on
 EuropeDoor is seen through a doorway: an elliptical arch, rx = span/2, ry =

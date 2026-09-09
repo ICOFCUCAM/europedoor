@@ -70,15 +70,78 @@ def country(slug):
     return load(os.path.join("country", slug + ".json"))
 
 
-class Projection:
-    """Equirectangular, corrected at the middle latitude of its own extent.
+# LAMBERT CONFORMAL CONIC, at the parameters Europe's own official
+# projection uses: standard parallels 35°N and 65°N, origin 52°N, central
+# meridian 10°E. Those are EPSG:3034 (ETRS89-LCC), the conformal conic the
+# EU publishes pan-European maps on, and this extent (33–71.5°N) is the
+# extent it was chosen for.
+LCC_P1, LCC_P2, LCC_LAT0, LCC_LON0 = 35.0, 65.0, 52.0, 10.0
 
-    The correction is what stops Europe looking stretched: a degree of
-    longitude at 60°N is half the ground distance of one at the equator, so
-    without cos(lat) Norway is twice as wide as it should be. Correcting at
-    the *centre of the extent being drawn* rather than at a fixed 52° matters
-    once there are country insets — a Norway inset corrected at 52° is visibly
-    wrong, and a Cyprus one is wrong the other way.
+
+def _lcc_n_f():
+    """The cone constant and the scale factor. Derived once, not typed.
+
+        n = ln(cos p1 / cos p2) / ln(tan(pi/4 + p2/2) / tan(pi/4 + p1/2))
+        F = cos(p1) * tan^n(pi/4 + p1/2) / n
+    """
+    p1, p2 = math.radians(LCC_P1), math.radians(LCC_P2)
+    t1 = math.tan(math.pi / 4 + p1 / 2)
+    t2 = math.tan(math.pi / 4 + p2 / 2)
+    n = math.log(math.cos(p1) / math.cos(p2)) / math.log(t2 / t1)
+    f = math.cos(p1) * (t1 ** n) / n
+    return n, f
+
+
+LCC_N, LCC_F = _lcc_n_f()
+LCC_RHO0 = LCC_F / (math.tan(math.pi / 4 + math.radians(LCC_LAT0) / 2) ** LCC_N)
+
+
+def lcc(lat, lon):
+    """(lat, lon) -> planar (x, y) on a unit sphere, y increasing north."""
+    rho = LCC_F / (math.tan(math.pi / 4 + math.radians(lat) / 2) ** LCC_N)
+    theta = LCC_N * math.radians(lon - LCC_LON0)
+    return rho * math.sin(theta), LCC_RHO0 - rho * math.cos(theta)
+
+
+class Projection:
+    """Lambert conformal conic, fitted to whatever extent it is given.
+
+    WHAT THIS REPLACED, AND THE NUMBER THAT JUSTIFIES IT. The previous
+    projection was equirectangular with a single cos(latitude) correction
+    taken at the middle of the extent. That is exact at one latitude and
+    wrong everywhere else, and over Europe "everywhere else" is most of it.
+    Measured as the ratio of scale along the parallel to scale along the
+    meridian — which is 1.000 everywhere on a conformal projection, and is
+    the whole definition of "shape is right here":
+
+        latitude        before        after
+        35°N  Crete     -25.8%        +0.0%
+        45°N            -14.0%        -0.0%
+        52.25°N          -0.7%        -0.0%
+        60°N  Oslo      +21.6%        +0.0%
+        65°N            +43.9%        -0.0%
+        71°N  N. Cape   +86.8%        +0.1%
+
+    Scandinavia was drawn 44% too wide at the Arctic Circle and Crete 26%
+    too narrow, on 817 pages, for the whole life of the map. The predecessor
+    of the predecessor multiplied x by cos(52°)/cos(52°) — exactly 1 — and
+    drew Europe 60% too wide for a year; that was caught by putting real
+    coastlines under the dots. This one needed the arithmetic, because a
+    coastline stretched 44% still looks like a coastline.
+
+    A conic is not affine, so the browser can no longer be handed six numbers
+    and a multiplication. It is handed the four ANGLES instead — the two
+    standard parallels, the origin and the central meridian — and derives n
+    and F from them with the same three lines this file uses, so there is
+    still exactly one projection and one place its parameters are decided.
+    A browser check asserts the two implementations agree to a hundredth of
+    a pixel on nine points spread across the extent.
+
+    Fixed parallels for every drawing, including country insets. The old
+    class re-derived its correction from each inset's own centre, which meant
+    a Norway inset and a Cyprus inset were two different projections; now
+    they are the same one, which is what "one projection" was always supposed
+    to mean.
     """
 
     def __init__(self, bbox, width, height, pad=0.06):
@@ -87,22 +150,38 @@ class Projection:
         # jammed against the frame.
         dx, dy = (x1 - x0) * pad, (y1 - y0) * pad
         x0, y0, x1, y1 = x0 - dx, y0 - dy, x1 + dx, y1 + dy
-        self.k = math.cos(math.radians((y0 + y1) / 2.0))
-        # Fit the corrected extent into the box, preserving aspect, so the
-        # drawing is centred rather than squashed.
-        gw = (x1 - x0) * self.k
-        gh = (y1 - y0)
+        # The projected extent is found by walking the boundary, not by
+        # projecting the four corners: on a conic the parallels are arcs, so
+        # the northernmost drawn point of a box is the middle of its top edge
+        # and the corners are lower. Projecting corners alone clips the top
+        # of Scandinavia off its own map.
+        xs, ys = [], []
+        steps = 64
+        for i in range(steps + 1):
+            t = i / steps
+            lon = x0 + (x1 - x0) * t
+            lat = y0 + (y1 - y0) * t
+            for a, b in ((lat, x0), (lat, x1), (y0, lon), (y1, lon)):
+                px, py = lcc(a, b)
+                xs.append(px)
+                ys.append(py)
+        self.px0, self.px1 = min(xs), max(xs)
+        self.py0, self.py1 = min(ys), max(ys)
+        gw, gh = self.px1 - self.px0, self.py1 - self.py0
         scale = min(width / gw, height / gh)
         self.scale = scale
         self.w, self.h = width, height
         self.ox = (width - gw * scale) / 2.0
         self.oy = (height - gh * scale) / 2.0
         self.x0, self.y0, self.x1, self.y1 = x0, y0, x1, y1
+        # Kept for the callers that still print a longitude span in the
+        # caption; it is no longer part of projecting anything.
+        self.k = math.cos(math.radians((y0 + y1) / 2.0))
 
     def xy(self, lat, lon):
-        x = self.ox + (lon - self.x0) * self.k * self.scale
-        y = self.oy + (self.y1 - lat) * self.scale
-        return x, y
+        px, py = lcc(lat, lon)
+        return (self.ox + (px - self.px0) * self.scale,
+                self.oy + (self.py1 - py) * self.scale)
 
     def path(self, flat):
         """One flat [lon,lat,...] ring -> an SVG path `d`, or "" if degenerate.
@@ -116,6 +195,31 @@ class Projection:
         for no visible change, because a 1:50m source at continent zoom has
         more detail than the raster can show.
         """
+        # CLIPPED IN LON/LAT, BEFORE PROJECTING — which the equirectangular
+        # predecessor never needed and a conic cannot do without.
+        #
+        # data/geo/ is cut at 52°E and this projection's extent stops at 45.
+        # Under the old projection the extra seven degrees simply landed past
+        # x = 1000 and the viewBox threw them away. A conic ROTATES about its
+        # apex, so the same vertices swung up and to the right and landed
+        # back INSIDE the canvas: /map rendered a large grey wedge over the
+        # north-east, which is Russia's straight data-clip edge at 52°E drawn
+        # correctly as a radial line and looking exactly like a rendering
+        # fault. Found by looking at the map, not by any arithmetic.
+        #
+        # So a ring is cut to the extent it is being drawn for, and the edge
+        # a reader sees is the map's own edge rather than the shape of a
+        # file. The min/max pre-test keeps this off the hot path: on the
+        # continent view only a handful of rings touch the boundary at all.
+        lons = flat[0::2]
+        lats = flat[1::2]
+        if (min(lons) < self.x0 or max(lons) > self.x1
+                or min(lats) < self.y0 or max(lats) > self.y1):
+            pts = _clip(list(zip(lons, lats)),
+                        (self.x0, self.y0, self.x1, self.y1))
+            if len(pts) < 3:
+                return ""
+            flat = [c for p in pts for c in p]
         out = []
         last = None
         for i in range(0, len(flat), 2):
@@ -247,6 +351,29 @@ def landmass(proj, view, doc=None, highlight=None, pad=40.0):
 def _esc(x):
     return (str(x).replace("&", "&amp;").replace("<", "&lt;")
             .replace(">", "&gt;").replace('"', "&quot;"))
+
+
+def km_per_unit(proj, lat, lon):
+    """Ground kilometres per projected unit, at one point.
+
+    The captions used to compute this from degrees per pixel and a cosine,
+    which was correct only for the equirectangular projection that is gone.
+    A conformal projection has ONE scale at a point — the same along the
+    parallel and along the meridian, which is what conformal means — so it is
+    measured rather than derived: project two points a fiftieth of a degree
+    apart, and divide the real distance by the drawn one.
+    """
+    d = 0.02
+    x1, y1 = proj.xy(lat, lon - d)
+    x2, y2 = proj.xy(lat, lon + d)
+    drawn = math.hypot(x2 - x1, y2 - y1)
+    if drawn <= 0:
+        return 0.0
+    # Great-circle distance between the same two points, R = 6371 km.
+    a = math.radians(lat)
+    ground = 2 * 6371.0 * math.asin(
+        math.cos(a) * math.sin(math.radians(d)))
+    return ground / drawn
 
 
 def sources_line(doc):

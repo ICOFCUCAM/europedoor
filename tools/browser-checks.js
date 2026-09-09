@@ -1558,6 +1558,46 @@ async function main() {
     await cp.close();
   }
 
+  // ONE PROJECTION, TWO IMPLEMENTATIONS, AND A CHECK THAT THEY AGREE.
+  //
+  // The map used to be equirectangular, so the build could hand the browser
+  // six numbers and one multiplication. A conic is not affine — the scale
+  // along a parallel has to change with latitude for shape to be right
+  // anywhere but one line — so map.js now derives the cone constant from the
+  // four angles the build publishes. That is a second copy of a formula, and
+  // a second copy of a projection is a second copy that drifts; you find out
+  // when a coastline sits two pixels off the city on it.
+  //
+  // The build writes the Python answer for nine points spread across the
+  // extent into the page; this reads map.js's answer for the same nine and
+  // requires them to agree to a hundredth of a pixel.
+  {
+    const pp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await pp.goto(base + "/map", { waitUntil: "load" });
+    const cmp = await pp.evaluate(() => {
+      const probe = window.__europedoorProjectionProbe;
+      const el = document.getElementById("europedoor-projection-probe");
+      if (!probe || !el) return { missing: true };
+      const want = JSON.parse(el.textContent);
+      return { missing: false, rows: want.map((r) => {
+        const got = probe(r[0], r[1]);
+        return { lat: r[0], lon: r[1], dx: got[0] - r[2], dy: got[1] - r[3] };
+      }) };
+    });
+    ok(!cmp.missing, "/map publishes no projection probe — the two "
+       + "implementations of the projection cannot be compared");
+    if (!cmp.missing) {
+      ok(cmp.rows.length >= 9, `only ${cmp.rows.length} projection probe points`);
+      for (const r of cmp.rows) {
+        ok(Math.abs(r.dx) < 0.01 && Math.abs(r.dy) < 0.01,
+           `the browser projects ${r.lat}°N ${r.lon}°E ${r.dx.toFixed(3)}, `
+           + `${r.dy.toFixed(3)} px away from the build — one projection, two `
+           + `implementations, and they have drifted`);
+      }
+    }
+    await pp.close();
+  }
+
   // No gold anywhere in what the browser actually paints.
   const goldPage = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await goldPage.goto(base + "/sources", { waitUntil: "load" });
@@ -1741,7 +1781,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 675;
+  const FLOOR = 688;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +

@@ -1946,12 +1946,14 @@ def minimap(data, t, span=3.2, about=None):
                 span = cand
                 break
     # The caption used to claim "within about 192 kilometres", which was
-    # span x 60 and meant nothing. Derive it from the projection instead:
-    # the frame is far wider than it is deep, and both shrink with latitude.
-    deg_per_px_lon = (LON1 - LON0) / MAP_W
-    deg_per_px_lat = (LAT1 - LAT0) / MAP_H
-    km_w = int(round(w / span * deg_per_px_lon * 111 * math.cos(math.radians(t["lat"])) / 10) * 10)
-    km_h = int(round(h / span * deg_per_px_lat * 111 / 10) * 10)
+    # span x 60 and meant nothing. Then it was derived from degrees per pixel
+    # and a cosine, which was right for an equirectangular projection and is
+    # wrong for the conformal conic that replaced it. A conformal projection
+    # has one scale at a point — the same along the parallel and along the
+    # meridian — so both numbers now come from measuring it there.
+    kmu = geo.km_per_unit(MAPPROJ, t["lat"], t["lon"])
+    km_w = int(round(w / span * kmu / 10) * 10)
+    km_h = int(round(h / span * kmu / 10) * 10)
     dots, labels = [], []
     for cid, n in sorted(data["cities"].items()):
         x, y = project(n["city"]["lat"], n["city"]["lon"])
@@ -3411,12 +3413,24 @@ def map_page(data):
     # rather than reimplemented: a second copy of a projection is a second
     # copy that drifts, and the way you find out is a coastline two pixels off
     # the city on it.
+    # The four angles, not a derived constant: the browser recomputes n and F
+    # from them with the same three lines geo.py uses, so the projection is
+    # decided in exactly one place and transported as its own definition.
     projinfo = {
-        "k": round(MAPPROJ.k, 9), "scale": round(MAPPROJ.scale, 9),
+        "p1": geo.LCC_P1, "p2": geo.LCC_P2,
+        "lat0": geo.LCC_LAT0, "lon0": geo.LCC_LON0,
+        "scale": round(MAPPROJ.scale, 9),
         "ox": round(MAPPROJ.ox, 4), "oy": round(MAPPROJ.oy, 4),
-        "x0": MAPPROJ.x0, "y1": MAPPROJ.y1,
+        "px0": round(MAPPROJ.px0, 12), "py1": round(MAPPROJ.py1, 12),
         "w": MAP_W, "h": MAP_H,
     }
+    # Nine points across the extent, with the answer this build computed.
+    # The browser recomputes them and the suite requires agreement to a
+    # hundredth of a pixel — the only thing standing between one projection
+    # and two that look the same until they do not.
+    projprobe = [[lat, lon, round(MAPPROJ.xy(lat, lon)[0], 6),
+                  round(MAPPROJ.xy(lat, lon)[1], 6)]
+                 for lat in (35.0, 52.25, 71.0) for lon in (-24.0, 10.0, 44.0)]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Map", None)])}
 <div class="pagehead">
@@ -3497,6 +3511,7 @@ def map_page(data):
 {jsondata("europedoor-mapinfo", info)}
 {jsondata("europedoor-countries", cinfo)}
 {jsondata("europedoor-projection", projinfo)}
+{jsondata("europedoor-projection-probe", projprobe)}
 <div class="note">
   <h2 class="mini">What this drawing is and is not</h2>
   <p>The land comes from <strong>{esc(attribution)}</strong>, which is in the public domain and

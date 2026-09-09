@@ -46,14 +46,41 @@
   var INFO = pageData("europedoor-mapinfo") || {};
   var JOURNEYS = pageData("europedoor-journeys") || [];
 
-  /* The same six numbers the build projected with, applied by the same
-   * formula. Not reimplemented from the definition of an equirectangular
-   * projection — a second copy of a projection is a second copy that drifts,
-   * and you find out when a coastline sits two pixels off the city on it. */
+  /* Lambert conformal conic, from the same four ANGLES the build used.
+   *
+   * This was six numbers and one multiplication, because the projection was
+   * equirectangular and affine. A conic is not affine — that is the whole
+   * point of it, since the scale along a parallel has to change with
+   * latitude for shape to be right anywhere but one line — so the browser
+   * now derives the cone constant and the scale factor here.
+   *
+   * That is a second implementation of a formula, which this file has always
+   * refused. The refusal is kept where it matters: the four parallels are
+   * DECIDED in one place, tools/lib/geo.py, and handed here as data; nothing
+   * about the projection is chosen twice. And a browser check asserts the
+   * two implementations agree to a hundredth of a pixel on nine points
+   * spread across the extent, so a drift is a failing build rather than a
+   * coastline sitting two pixels off the city on it. */
+  var LCC = (function () {
+    var p1 = PROJ.p1 * Math.PI / 180, p2 = PROJ.p2 * Math.PI / 180;
+    var t1 = Math.tan(Math.PI / 4 + p1 / 2), t2 = Math.tan(Math.PI / 4 + p2 / 2);
+    var n = Math.log(Math.cos(p1) / Math.cos(p2)) / Math.log(t2 / t1);
+    var f = Math.cos(p1) * Math.pow(t1, n) / n;
+    var rho0 = f / Math.pow(Math.tan(Math.PI / 4 + PROJ.lat0 * Math.PI / 360), n);
+    return { n: n, f: f, rho0: rho0 };
+  }());
+
   function px(lat, lon) {
-    return [PROJ.ox + (lon - PROJ.x0) * PROJ.k * PROJ.scale,
-            PROJ.oy + (PROJ.y1 - lat) * PROJ.scale];
+    var rho = LCC.f / Math.pow(Math.tan(Math.PI / 4 + lat * Math.PI / 360), LCC.n);
+    var theta = LCC.n * (lon - PROJ.lon0) * Math.PI / 180;
+    var x = rho * Math.sin(theta), y = LCC.rho0 - rho * Math.cos(theta);
+    return [PROJ.ox + (x - PROJ.px0) * PROJ.scale,
+            PROJ.oy + (PROJ.py1 - y) * PROJ.scale];
   }
+
+  /* Exposed for the browser check that asserts this implementation and the
+     build's agree. Not used by anything on the page. */
+  window.__europedoorProjectionProbe = px;
 
   function ringPath(flat) {
     var d = "", last = null, i, p;

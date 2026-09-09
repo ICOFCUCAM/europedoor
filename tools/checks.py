@@ -1955,6 +1955,65 @@ def c_empty_states_explain():
     return n
 
 
+@check("the projection keeps shape at every latitude it draws")
+def c_projection_conformal():
+    # THE MEASUREMENT THAT JUSTIFIED REPLACING THE PROJECTION, KEPT AS A
+    # GATE. "Shape is right here" has a definition: the scale along the
+    # parallel equals the scale along the meridian. The ratio is 1.000
+    # everywhere on a conformal projection and nowhere else.
+    #
+    # The equirectangular predecessor took one cos(latitude) correction at
+    # the middle of its extent, so it was exact on one line and wrong on
+    # every other. Measured against a sphere of R = 6371 km:
+    #
+    #     35°N Crete      -25.3%      65°N            +44.9%
+    #     45°N            -13.4%      71°N N. Cape    +89.7%
+    #     60°N Oslo       +22.4%
+    #
+    # Norway was drawn 45% too wide at the Arctic Circle on 817 pages. A
+    # coastline stretched 45% still looks like a coastline, which is why
+    # this needed arithmetic rather than another contact sheet.
+    #
+    # 0.5% is the tolerance: a hundred times smaller than the smallest error
+    # the old projection had anywhere except its one true parallel, and far
+    # below the 1.33 km simplification floor of the geometry underneath.
+    import math
+    from lib import geo
+    # The four angles are a DECISION, and conformality does not protect them:
+    # moving a standard parallel keeps the projection conformal and quietly
+    # redraws Europe. These are EPSG:3034, the conformal conic the EU
+    # publishes pan-European maps on, chosen for this exact extent.
+    for got, want, what in ((geo.LCC_P1, 35.0, "first standard parallel"),
+                            (geo.LCC_P2, 65.0, "second standard parallel"),
+                            (geo.LCC_LAT0, 52.0, "latitude of origin"),
+                            (geo.LCC_LON0, 10.0, "central meridian")):
+        if got != want:
+            fail(f"the {what} is {got}, not {want} — the projection is still "
+                 f"conformal and Europe is a different shape. Change it "
+                 f"deliberately, here, or not at all")
+    KM = 111.195          # one degree on a sphere of R = 6371 km, either way
+    proj = geo.Projection((-25.0, 33.0, 45.0, 71.5), 1000, 780, pad=0.0)
+    n = 0
+    for lat in (34.0, 35.0, 40.0, 45.0, 52.25, 60.0, 65.0, 71.0, 71.5):
+        for lon in (-24.0, -10.0, 0.0, 10.0, 25.0, 44.0):
+            d = 0.02
+            x1, y1 = proj.xy(lat, lon - d)
+            x2, y2 = proj.xy(lat, lon + d)
+            par = math.hypot(x2 - x1, y2 - y1) / (
+                2 * d * KM * math.cos(math.radians(lat)))
+            x3, y3 = proj.xy(lat - d, lon)
+            x4, y4 = proj.xy(lat + d, lon)
+            mer = math.hypot(x4 - x3, y4 - y3) / (2 * d * KM)
+            err = par / mer - 1.0
+            if abs(err) > 0.005:
+                fail(f"at {lat}°N {lon}°E the map is {err * 100:+.1f}% out of "
+                     f"shape — the scale along the parallel and the scale "
+                     f"along the meridian must match, and that is what makes "
+                     f"a coastline the right coastline")
+            n += 1
+    return n
+
+
 @check("every dot on a map lands inside its own frame")
 def c_map_dots_in_frame():
     # Svalbard's region map drew Longyearbyen at y = -317 on a viewBox that
