@@ -99,7 +99,7 @@
   "weight.home_kb": {
    "value": 119,
    "kind": "ceiling",
-   "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it is allowed to move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence. 48 -> 109 when the hero became a drawing rather than a silhouette; 109 -> 114 when it became an atlas rather than a relief (frontiers, rivers, lakes); 114 -> 118 when every country became a link and the land could no longer be one merged path; 118 -> 119 for the twenty-three country names set across it. That is the whole picture AND the whole navigation in one page with no photograph, no webfont and no JavaScript; the licensed hero photograph the brief is still open for is 150 KB on its own. Anything above this is a template inlining something, which is the failure the ceiling is for."
+   "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it is allowed to move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence."
   },
   "weight.max_page_kb": {
    "value": 440,
@@ -117,7 +117,7 @@
    "why": "Pages whose geography is seen through the arch. A floor: the aperture is the identity, and a new map that forgets it is a page that stops looking like EuropeDoor."
   },
   "plates.page_share": {
-   "value": 0.225,
+   "value": 0.223,
    "kind": "ceiling",
    "why": "The share of pages carrying a generated illustration. A ceiling because the failure mode is an illustration placed because the system has one, which is the one reason the art direction forbids."
   },
@@ -137,8 +137,8 @@
     "masthead": 1.0,
     "pagehead": 0.99,
     "crumbs": 0.998,
-    "row": 0.856,
-    "card": 0.227,
+    "row": 0.858,
+    "card": 0.226,
     "band": 0.76,
     "note": 0.824,
     "facts": 0.759,
@@ -146,7 +146,7 @@
     "chip": 0.523
    },
    "kind": "floor",
-   "why": "The share of pages each primitive appears on. A family that quietly stops using one has grown its own components and the design system has forked without anybody deciding — which is the failure this floor exists to catch. A family that stops using one ON PURPOSE is the other thing that moves it, and the difference is whether the drop is recorded here in the same commit with the composition that caused it. The essay family cost pagehead, row and band about a hundredth each: nine story pages that no longer share the atlas chassis, which is the whole point of them. THESE NUMBERS WERE WRONG UNTIL THE DESTINATION EXEMPLAR: the matcher used \\b, and a hyphen is a word boundary, so `card` counted `card-art` and `row` counted `rowsub`. The card floor read 0.785 and the true figure is 0.226 — the most-cited primitive in the design system was three-quarters an image wrapper. AND THE EXPERIENCE EXEMPLAR MOVED THREE OF THEM ON PURPOSE. Forty-eight category pages and ten kind pages stopped using `row`, `card` and `band`: the list of experiences was a four-column table built from `row`, the sub-categories were four `card`s holding a count and a name and nothing else, and \"How this list is built\" was a `band` standing in front of the list it described. An experience is an invitation and the writing is the picture, so the rows became `.invites` — a two-column editorial list with no card, no border and no plate — the four empty cards became four links, and the rule moved under the list it proves. row 0.899 to 0.855, card 0.233 to 0.227, band 0.767 to 0.759."
+   "why": "The share of pages each primitive appears on. A family that quietly stops using one has grown its own components and the design system has forked without anybody deciding — which is the failure this floor exists to catch. A family that stops using one ON PURPOSE is the other thing that moves it, and the difference is whether the drop is recorded here in the same commit with the composition that caused it. The essay family cost pagehead, row and band about a hundredth each: nine story pages that no longer share the atlas chassis, which is the whole point of them. THESE NUMBERS WERE WRONG UNTIL THE DESTINATION EXEMPLAR: the matcher used \\b, and a hyphen is a word boundary, so `card` counted `card-art` and `row` counted `rowsub`. The card floor read 0.785 and the true figure is 0.226 — the most-cited primitive in the design system was three-quarters an image wrapper. AND THE EXPERIENCE EXEMPLAR MOVED THREE OF THEM ON PURPOSE. Forty-eight category pages and ten kind pages stopped using `row`, `card` and `band`: the list of experiences was a four-column table built from `row`, the sub-categories were four `card`s holding a count and a name and nothing else, and \"How this list is built\" was a `band` standing in front of the list it described. An experience is an invitation and the writing is the picture, so the rows became `.invites` — a two-column editorial list with no card, no border and no plate — the four empty cards became four links, and the rule moved under the list it proves. row 0.899 to 0.855, card 0.233 to 0.227, band 0.767 to 0.759. AND THE TWO INDEX EXEMPLARS MOVED IT AGAIN, ON PURPOSE. Eight of the nine indexes were the same 280px card grid — the h1 finding one level up, recorded in docs/design-direction-audit.md. A card is the right shape for a set of like things chosen on LOOK. A journey is chosen on where it goes, and a motion is a query: neither is a look. /journeys became rows carrying the stops in order and each route's own legs end to end, and /europe-in became the twelve queries printed as queries, generated by the same function the twelve pages use. Two pages stopped using card and started using row: card 0.227 to 0.226."
   }
  }
 }

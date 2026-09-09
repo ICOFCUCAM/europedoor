@@ -617,6 +617,27 @@ main.wide { max-width: 92rem; }
 .hopbar { display: block; height: 3px; margin: var(--s2) 0 var(--s3);
           background: var(--paper-3); border-radius: 999px; overflow: hidden; }
 .hopbar > span { display: block; height: 100%; background: var(--door); }
+/* THE WHOLE ROUTE IN ONE LINE, on the journeys index. Same track, same ink,
+   the legs laid end to end instead of stacked one per row — a variant of an
+   element that already exists rather than a new one, which is the rule: no
+   new primitive until repeated structure has actually emerged. The hairline
+   between segments is what makes the legs countable; without it the bar is a
+   length and says nothing about the rhythm. */
+.hopbar.route { display: flex; gap: 1px; background: none; }
+.hopbar.route > span { background: var(--door); border-radius: 999px;
+                       min-width: 2px; }
+.journeyrow .rowsub { margin-bottom: 0; }
+/* THE QUERY, ON THE INDEX THAT LISTS TWELVE OF THEM. Set in the mono face
+   the rest of the site uses for a computed value — a score, a coordinate, a
+   SHA — because that is what this is: a sentence a machine produced from the
+   dataset, not a description somebody wrote. Quieter than the strapline
+   above it, because you read the name first and the query when you want to
+   know what made the page. */
+.motionrow .motionq { font-family: var(--mono); font-size: var(--t-sm);
+                      color: var(--ink-2); margin: var(--s2) 0 0;
+                      max-width: 62ch; }
+.motionrow .rowmeta { text-align: right; font-variant-numeric: tabular-nums; }
+.journeyrow .rowmeta { text-align: right; white-space: nowrap; }
 /* The stop's number in the order — a real sequence, so a numeral says
    something true rather than decorating a list. */
 .leg-no { display: block; font-family: var(--mono); font-size: var(--t-sm);

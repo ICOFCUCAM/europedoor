@@ -777,8 +777,20 @@ async function main() {
   // day it ships and is wrong within a season. These checks are all about
   // that distinction.
   await page.goto(base + "/europe-in", { waitUntil: "networkidle" });
-  const motionCards = await page.locator(".card").count();
-  ok(motionCards >= 12, `the motion index lists ${motionCards} motions`);
+  // COUNTED AS LINKS AND QUERIES, NOT AS CARDS. This asserted `.card` and
+  // went red when the index stopped being a card grid — which is the shape,
+  // not the promise, and this repository has now made that mistake in five
+  // separate assertions. The promise is that the index lists every motion
+  // and prints the query that made each one, which is the whole argument of
+  // the family: a list somebody curated by hand looks identical to one a
+  // query produced, on the day it ships and never again.
+  const motionRows = await page.locator(".motionrow").count();
+  ok(motionRows >= 12, `the motion index lists ${motionRows} motions`);
+  const motionQ = await page.locator(".motionq").allTextContents();
+  ok(motionQ.length === motionRows,
+     `${motionRows} motions listed and ${motionQ.length} queries printed`);
+  ok(motionQ.every(t => t.trim().length > 20 && t.trim().endsWith(".")),
+     "a motion on the index is listed without the query that made it");
 
   const motionLinks = await page.locator('a[href^="/europe-in/"]').evaluateAll(
     (as) => Array.from(new Set(as.map((a) => a.getAttribute("href")))));
@@ -2492,7 +2504,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 857;
+  const FLOOR = 870;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +

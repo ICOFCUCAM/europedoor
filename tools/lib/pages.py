@@ -2731,18 +2731,58 @@ def interest_page(data, i, ranking):
 # ── journeys ──────────────────────────────────────────────────────────
 
 def journeys_index(data):
-    cards = []
+    """Seventeen journeys, shown as routes rather than as cards.
+
+    THE INDEX SHOWED EVERYTHING ABOUT A JOURNEY EXCEPT THE JOURNEY. Four
+    across, each a generated plate over a name, a truncated summary and
+    "19 DAYS · 5 COUNTRIES · MODERATE" — and four abstract landscapes in a
+    row read as a family rather than as four trips. The one thing that makes
+    a journey a journey, and the one thing this atlas holds in full, is the
+    ORDERED SEQUENCE OF PLACES. It was the only thing not on the page.
+
+    Eight of the nine indexes were the same 280px card grid; that finding is
+    recorded in docs/design-direction-audit.md as the h1 finding one level up.
+    A card is the right shape for a set of like things a reader is choosing
+    between on look. A journey is not chosen on look: it is chosen on where it
+    goes, how long it takes and how hard it is, and all three of those are
+    text.
+
+    So it is the `row` primitive — already on 86% of pages, so this is not a
+    new component — carrying the stops in order, and a route line that is the
+    same `hopbar` the journey page draws, laid end to end instead of stacked.
+    A reader sees the shape of the trip: many short segments is a slow local
+    circuit, three long ones is a continental haul.
+    """
+    rows = []
     for j in data["journeys"]:
-        countries = []
+        countries, stops, hops = [], [], []
+        prev = None
         for leg in j["legs"]:
-            cn = data["cities"][leg["city"]]["country"]["name"]
+            n = data["cities"][leg["city"]]
+            cn = n["country"]["name"]
             if cn not in countries:
                 countries.append(cn)
-        meta = (f'<p class="cardmeta">{j["days"]} days · {len(countries)} countries · '
-                f'{esc(j["difficulty"])} · {esc(j["budget"])}</p>')
-        cards.append(card(urls.journey(j), j["strapline"], j["name"], j["summary"][:150] + "…",
-                          seed="journey:" + j["slug"], meta=meta,
-                          motif=motif_for(j["interests"])))
+            stops.append(esc(n["city"]["name"]))
+            if prev is not None:
+                hops.append(haversine(prev, n["city"]))
+            prev = n["city"]
+        # THE SEGMENTS ARE A SHARE OF THE WHOLE TRIP, not of its longest leg.
+        # The journey page scales each hop against the longest one, because
+        # there the question is "which of these days is the long one". Here
+        # the bar is the whole route in one line, so a segment is its share of
+        # the total distance and the line reads as the trip's own rhythm.
+        total = sum(hops)
+        segs = "".join(
+            f'<span class="w{max(1, int(round(km / total * 100)))}"></span>'
+            for km in hops) if total else ""
+        rows.append(
+            f'<a class="row journeyrow" href="{urls.journey(j)}">'
+            f'<div><p class="kicker">{esc(j["strapline"])}</p>'
+            f'<h3>{esc(j["name"])}</h3>'
+            f'<p class="rowsub">{" · ".join(stops)}</p>'
+            f'<span class="hopbar route" aria-hidden="true">{segs}</span></div>'
+            f'<p class="rowmeta">{j["days"]} days<br>{len(countries)} countries'
+            f'<br>{esc(j["difficulty"])}</p></a>')
     body = f"""
 {crumbs([("Europe", "/discover"), ("Journeys", None)])}
 <div class="pagehead index">
@@ -2752,7 +2792,12 @@ def journeys_index(data):
   every stop links back into the Atlas, and the nights add up to the days on the tin. Take one
   as written, or open it in the Planner and bend it to the time you actually have.</p>
 </div>
-{grid(cards, 3)}
+<div class="rows">{"".join(rows)}</div>
+<p class="small">Every stop above is a place in the Atlas, in the order the
+route takes it. The line under each is that journey's own legs end to end —
+its share of the whole distance, so the shape is the trip's rhythm rather
+than a comparison between trips. Distances are straight lines between
+coordinates; what they mean on the ground is on the journey's own page.</p>
 """
     return "/journeys/index.html", page(
         "Journeys", body, path="/journeys", area="journeys",
@@ -7782,14 +7827,35 @@ def motion_page(data, m):
 
 
 def motion_index(data):
-    cards = []
+    """Twelve queries, printed as queries.
+
+    THE FAMILY'S WHOLE ARGUMENT WAS THE ONE THING THE INDEX DID NOT SHOW.
+    Every `/europe-in/*` page prints the query that made it — that is the
+    rule this family exists to demonstrate, and `checks.py` asserts it on all
+    twelve. The index showed twelve generated landscapes instead, one per
+    query, and the query nowhere.
+
+    **A motion is not a place.** It has no coastline, no topography and no
+    season of its own, so a plate drawn for one is a picture of nowhere
+    standing in for a sentence — the same failure as the stories index, one
+    family over, and the rule written for it applies here word for word: the
+    alternative to a hash-drawn landscape is not a better hash.
+
+    So the picture goes and the query arrives, generated by the same
+    `motion_query_words()` the twelve pages use, so the index cannot state a
+    query the page it links to would not.
+    """
+    rows = []
     for m in data["motions"]:
         n = sum(1 for cid, x in data["cities"].items()
                 if motion_match(data, m, cid, x)[0])
-        cards.append(card(f"/europe-in/{m['slug']}", f"{n} destinations",
-                          m["name"], m["strapline"],
-                          seed="motion:" + m["slug"],
-                          motif=motif_for(m.get("interests", []))))
+        rows.append(
+            f'<a class="row motionrow" href="/europe-in/{m["slug"]}">'
+            f'<div><h3>{esc(m["name"])}</h3>'
+            f'<p class="rowsub">{esc(m["strapline"])}</p>'
+            f'<p class="motionq">{esc(motion_query_words(data, m))}</p></div>'
+            f'<p class="rowmeta">{n}<br><span class="small">destinations</span>'
+            f'</p></a>')
     body = f"""
 {crumbs([("Europe", "/discover"), ("Europe in Motion", None)])}
 <div class="pagehead index">
@@ -7800,7 +7866,7 @@ def motion_index(data):
   made it. A list somebody curated by hand looks identical to one a query produced — on
   the day it ships, and never again.</p>
 </div>
-{grid(cards, 3)}
+<div class="rows">{"".join(rows)}</div>
 
 <div class="note mt7">
   <h2 class="mini">Why this is not a set of tags</h2>
