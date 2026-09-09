@@ -2772,6 +2772,64 @@ def c_og_never_hashed():
     return n
 
 
+@check("every page head declares what kind of page it is")
+def c_pagehead_role():
+    # TWENTY-ONE OF TWENTY-TWO FAMILIES PLACED AN IDENTICAL h1 IN AN
+    # IDENTICAL PLACE, and the only one that differed had a hero. The entire
+    # art-directional difference between a magazine story and a country
+    # encyclopedia was one 11px kicker changing hue.
+    #
+    # There are three roles, and they are what the reader is DOING:
+    #
+    #   overture    one thing. The name is the event: a narrow measure and
+    #               air above it, and the page opens rather than starts.
+    #   index       a set. What matters is how big, so the extent sits
+    #               beside the name and the set starts sooner.
+    #   instrument  a tool. The title is a label at section weight on the
+    #               same line as its kicker, because the page IS the thing.
+    #
+    # None of them adds a type size — a seventeenth was refused twice, and
+    # if a role needs a new scale value it is a decoration and not a role.
+    #
+    # The pages with no role are the ones that are genuinely just prose:
+    # the manifesto, the method, the legal set. They are named here, so a
+    # NEW page cannot join them by accident — which is exactly how twenty-one
+    # families ended up sharing one head.
+    PLAIN = {
+        "/about", "/method", "/manifesto", "/sources", "/api", "/how-it-works",
+        "/join", "/for-business", "/freshness", "/privacy", "/cookies",
+        "/terms", "/accessibility", "/help", "/contact", "/tourism-boards",
+        "/404", "/discover", "/my-europe", "/search",
+        # The real routes, which differ from what the generators are called:
+        "/api-docs", "/experiences/join", "/for-businesses",
+        "/for-tourism-boards", "/sources/freshness",
+    }
+    ROLES = ("overture", "index", "instrument")
+    n = 0
+    for path in site_files():
+        r = canonical_of(path)
+        h = open(path, encoding="utf-8").read()
+        m = re.search(r'<div class="pagehead([^"]*)"', h)
+        if not m:
+            continue
+        n += 1
+        got = [x for x in ROLES if x in m.group(1)]
+        if len(got) == 1:
+            continue
+        if not got and r in PLAIN:
+            continue
+        if len(got) > 1:
+            fail(f"{r}: the head claims {len(got)} roles ({', '.join(got)}). "
+                 f"A page is one thing, a set of things, or a tool.")
+        else:
+            fail(f"{r}: the head declares no role. It is one of "
+                 f"{'/'.join(ROLES)}, or it is prose and belongs in the "
+                 f"named list in this check — which exists so a new page "
+                 f"cannot join the twenty-one that shared one head by "
+                 f"accident.")
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0

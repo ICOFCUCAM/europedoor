@@ -852,6 +852,24 @@ the reader is trying to do, not from the shape of the record behind it. The
 experience template renders six rows because the data is six rows, and that is
 the wrong reason for a layout to exist.
 
+**Three roles, and every page head has one.** Twenty-one of twenty-two
+families placed a 60px h1 at y=164 or y=212, and the only one that differed
+had a hero. The roles are what the reader is *doing*, not decoration:
+
+| role | it is | the head |
+|---|---|---|
+| `overture` | one thing | narrow measure, air above; the name is the event |
+| `index` | a set | the extent sits *beside* the name; the set starts sooner |
+| `instrument` | a tool | a label at section weight, on its kicker's line |
+
+Measured after: 30px at y=136 for an instrument, 60px at 164 across 574 for
+an index, 60px at 212 across 420 for an overture — and an index's set starts
+at 347 where it used to start at 538. **None of the three adds a type
+size**; a seventeenth was refused twice, and a role that needs a new scale
+value is a decoration. `checks.py` requires exactly one role per head and
+names the prose pages that have none, **so a new page cannot join the
+twenty-one by accident** — which is how they got there.
+
 **A shared template is not a shared experience.** One shell, one stylesheet
 and eleven primitives are an engineering achievement and are kept. They are
 not, by themselves, a design. Measured across twelve rendered families:

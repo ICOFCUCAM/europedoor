@@ -415,7 +415,7 @@ def countries_index(data):
         )
     body = f"""
 {crumbs([("Europe", "/discover"), ("Atlas", None)])}
-<div class="pagehead">
+<div class="pagehead index">
   <p class="kicker">Every country in Europe</p>
   <h1>Europe, all the way down.</h1>
   <p class="lede">Nine regions, {len(data['countries'])} countries, {sum(len(c['regions']) for c in data['countries'].values())}
@@ -505,7 +505,7 @@ def macro_page(data, m):
                  meta=meta, motif=motif_for(c["interests"])))
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], None)])}
-<div class="pagehead">
+<div class="pagehead overture">
   <p class="kicker">Region of Europe</p>
   <h1>{esc(m['name'])}</h1>
   <p class="lede">{esc(m['blurb'])}</p>
@@ -1249,7 +1249,7 @@ def journeys_index(data):
                           motif=motif_for(j["interests"])))
     body = f"""
 {crumbs([("Europe", "/discover"), ("Journeys", None)])}
-<div class="pagehead">
+<div class="pagehead index">
   <p class="kicker">European Journeys</p>
   <h1>Routes that cross borders on purpose.</h1>
   <p class="lede">{len(data['journeys'])} routes, each a real sequence with real distances:
@@ -2893,7 +2893,7 @@ def facet_page(data, c, r, t, key, payload):
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (c["name"], urls.country(c)),
          (r["name"], urls.region(c, r)), (t["name"], urls.city(c, r, t)), (name, None)])}
-<div class="pagehead">
+<div class="pagehead index">
   <p class="kicker">{esc(t['name'])}, {esc(c['name'])}</p>
   <h1>{esc(name)} in {esc(t['name'])}</h1>
   <p class="lede">{esc(lede)}</p>
@@ -3237,7 +3237,7 @@ def experiences_index(data):
     )
     body = f"""
 {crumbs([("Europe", "/discover"), ("Experiences", None)])}
-<div class="pagehead">
+<div class="pagehead index">
   <p class="kicker">Local Experiences</p>
   <h1>What people actually do here.</h1>
   <p class="lede">{len(items)} experiences across the Atlas, in ten kinds. Anything a business
@@ -3270,7 +3270,7 @@ def experience_kind_page(data, kind, name):
     )
     body = f"""
 {crumbs([("Europe", "/discover"), ("Experiences", "/experiences"), (name, None)])}
-<div class="pagehead">
+<div class="pagehead index">
   <p class="kicker">{len(items)} across Europe</p>
   <h1>{esc(name)}</h1>
 </div>
@@ -3398,7 +3398,7 @@ def fund_index(data):
     ]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Fund", None)])}
-<div class="pagehead">
+<div class="pagehead index">
   <p class="kicker">Europe Fund</p>
   <h1>What travel leaves behind.</h1>
   <p class="lede">Tourism arrives in a place and takes something out of it — a path, a language,
@@ -3435,7 +3435,7 @@ def fund_page(data, p):
     c = data["countries"][p["country"]]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Fund", "/fund"), (p["name"], None)])}
-<div class="pagehead">
+<div class="pagehead overture">
   <p class="kicker">{esc(p['theme'])} · {esc(c['name'])}</p>
   <h1>{esc(p['name'])}</h1>
 </div>
@@ -3474,7 +3474,7 @@ def themes_index(data):
     ]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Themes", None)])}
-<div class="pagehead">
+<div class="pagehead index">
   <p class="kicker">Discovery without a map of borders</p>
   <h1>Europe, organised by what you came for.</h1>
   <p class="lede">Medieval Europe is not a country. Neither is sacred Europe, or Viking Europe,
@@ -3610,7 +3610,7 @@ def stories_index(data):
     ) + "</div>"
     body = f"""
 {crumbs([("Europe", "/discover"), ("Stories", None)])}
-<div class="pagehead">
+<div class="pagehead index">
   <p class="kicker">Stories</p>
   <h1>A continent is people before it is places.</h1>
   <p class="lede">{len(data['stories'])} pieces across {len(sections)} desks — people, history,
@@ -4237,7 +4237,7 @@ def events_page(data):
     )
     body = f"""
 {crumbs([("Europe", "/discover"), ("Events", None)])}
-<div class="pagehead">
+<div class="pagehead index">
   <p class="kicker">The European year</p>
   <h1>What is on, and when.</h1>
   <p class="lede">{total} recurring fixtures — festivals, markets, pilgrimages, harvests and the
@@ -4355,7 +4355,7 @@ def events_month_page(data, month):
 
     body = f"""
 {crumbs([("Europe", "/discover"), ("Events", "/events"), (name, None)])}
-<div class="pagehead">
+<div class="pagehead overture">
   <p class="kicker">The European year</p>
   <h1>{esc(name)} in Europe</h1>
   <p class="lede">{len(fixtures)} recurring fixtures, {len(peak)} countries at their best and
@@ -4425,7 +4425,7 @@ def quiet_page(data):
     )
     body = f"""
 {crumbs([("Europe", "/discover"), ("Beyond the obvious", None)])}
-<div class="pagehead">
+<div class="pagehead index">
   <p class="kicker">Responsible travel, stated plainly</p>
   <h1>Beyond the obvious.</h1>
   <p class="lede">Europe's problem is not too many visitors; it is too many visitors in the same
@@ -5783,7 +5783,7 @@ def motion_page(data, m):
 
     body = f"""
 {crumbs([("Europe", "/discover"), ("Europe in Motion", "/europe-in"), (m["name"], None)])}
-<div class="pagehead">
+<div class="pagehead overture">
   <p class="kicker">Europe in Motion</p>
   <h1>{esc(m["name"])}</h1>
   <p class="lede">{esc(m["lede"])}</p>
@@ -5837,7 +5837,7 @@ def motion_index(data):
                           motif=motif_for(m.get("interests", []))))
     body = f"""
 {crumbs([("Europe", "/discover"), ("Europe in Motion", None)])}
-<div class="pagehead">
+<div class="pagehead index">
   <p class="kicker">Europe in Motion</p>
   <h1>The continent, cut a dozen different ways.</h1>
   <p class="lede">Not categories. {len(data['motions'])} queries, each run against all

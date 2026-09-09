@@ -2084,6 +2084,35 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
   stroke: var(--map-sea); stroke-width: 3; }
 .minimap.arched .rlabel:hover text { fill: var(--lime); }
 
+/* THREE ROLES, AND EVERY PAGE HAS ONE.
+   Measured across twenty-two rendered families: twenty-one placed a 60px h1
+   at y=164 or y=212, and the only one that differed had a hero. The
+   difference between families was one 11px kicker changing hue.
+
+   The roles are not decoration, they are what the reader is doing:
+
+     overture    one thing. The name is the event; it gets a narrow measure
+                 and air above it, and the page opens rather than starts.
+     index       a set. What matters is HOW BIG, so the extent sits BESIDE
+                 the name on a wide screen instead of under it, and the set
+                 itself starts a line and a half sooner.
+     instrument  a tool. The title is a label at section weight, on the same
+                 line as its kicker, because the page IS the thing.
+
+   None of the three introduces a type size. A seventeenth was refused in
+   commit 38 and is refused here: the difference between a magazine story and
+   an encyclopedia entry is measure, position and air, and if it needs a new
+   scale value it is not a role, it is a decoration. */
+.pagehead.index .lede { max-width: 46ch; }
+@media (min-width: 62rem) {
+  .pagehead.index { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+                    column-gap: var(--s7); align-items: end; }
+  .pagehead.index .kicker { grid-column: 1; }
+  .pagehead.index h1 { grid-column: 1; }
+  .pagehead.index .lede { grid-column: 2; grid-row: 1 / span 2; margin: 0;
+                          align-self: end; }
+}
+
 /* THE REVEAL — the cut edge of the aperture.
    "Light wall, dark opening" is the whole reading of the door, and it only
    held in one colour-scheme preference. Measured on every arched map, as the
