@@ -8,7 +8,7 @@ its requirements are about how something looks and nobody can check a feeling.
 So every row here asserts against the generated HTML, the CSS and the JavaScript
 as they actually are.
 
-**52 sections · 22 built · 13 already · 12 partial · 2 built (deliberately smaller) · 1 refused · 1 locked · 1 deferred · 358 assertions · 0 failing**
+**52 sections · 22 built · 13 already · 12 partial · 2 built (deliberately smaller) · 1 refused · 1 locked · 1 deferred · 370 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -20,7 +20,7 @@ as they actually are.
 | 6 | Experience categories | ALREADY | 4 | Eight large cards, one per category, with the brief's hover. |
 | 2036-7 | Discover Mode | BUILT | 8 | The surface that answers "I do not know where I want to go". Pick moods and constraints and the continent narrows — and every recommendation says why, naming the terms that actually fired. |
 | 2036-18 | Discoverability, computed | BUILT | 8 | Hidden Europe was an editorial tag — the most interesting claim on the site and the one nobody could check. It is now a published score with five named terms, and it says plainly that it measures obscurity within this Atlas rather than crowds. |
-| 2036-6 | Europe in Motion | BUILT | 42 | Twelve ways to cut the continent, each a query evaluated against every destination on every build — and each page prints the query that made it. A motion cannot become a hand-picked list, because the validator refuses a field that names destinations. |
+| 2036-6 | Europe in Motion | BUILT | 54 | Twelve ways to cut the continent, each a query evaluated against every destination on every build — and each page prints the query that made it. A motion cannot become a hand-picked list, because the validator refuses a field that names destinations. |
 | 2036-50 | The homepage as a progression | BUILT (deliberately smaller) | 7 | Open, discover, go — named on the page, because a progression nobody can see is just an ordering. It named all six steps when it had six bands, and that was the version that read as a contents list. One band changes ground so the rhythm is felt. |
 | 2036-43 | Why this stop, and not the runner-up | BUILT | 7 | Every itinerary leg says what distinguishes it. The shared reason — the interests the reader chose — is stated once above the route, which is the same rule Discover Mode is built on. |
 | 2036-13 | What if? | BUILT | 12 | Five transforms over an itinerary that already exists, and each one shows the consequence BEFORE applying it. A sixth question is named and refused: we hold no weather data, so there is no rainy day plan. |

@@ -5362,7 +5362,26 @@ def motion_query_words(data, m):
     if m.get("max_nights"):
         parts.append(f"worth no more than {m['max_nights']} nights, which is "
                      "what makes it a village rather than a city")
-    return and_list(parts) + "."
+    # EVERY CLAUSE NEEDS SOMETHING TO ATTACH TO.
+    #
+    # The interest clause carries its own subject ("any destination tagged
+    # Islands"); the other four are relative clauses — "lying above 63°
+    # north", "scoring 80 or more for discoverability", "whose country's
+    # quieter shoulder season falls in October". A motion with no interest
+    # term therefore produced a dangling fragment, which read acceptably
+    # under a heading that said "The query that made this page" and stopped
+    # reading at all once the query became one hoisted line: "The query
+    # lying above 63° north." Four of the twelve are like that.
+    #
+    # So the subject is always present, and the result is a sentence.
+    # It is a PREFIX and not another list item: and_list joins with "and",
+    # so inserting it produced "Every destination and lying above 63° north."
+    # Two wrongs in one line, and the second only visible once the first was
+    # fixed and the sentence was read.
+    out = and_list(parts) + "."
+    if not wants:
+        out = "every destination " + out
+    return out[0].upper() + out[1:]
 
 
 def motion_page(data, m):
@@ -5421,12 +5440,40 @@ def motion_page(data, m):
             for n, _w in shown]
     motionmap = pointsmap(
         mpts, "mo" + "".join(ch for ch in m["slug"] if ch.isalnum())[:14],
-        f'The {len(shown)} destinations below, where they are. '
-        f'{len(hits)} matched the query and this is the '
-        f'{"two-per-country" if len(hits) != len(shown) else "whole"} list. '
         f'Names are dropped where they would overlap; every dot is a link. '
         f'Coastline from <a href="/sources">Natural Earth</a>, public domain.',
         f'Map of the {len(shown)} destinations in {m["name"]}') if len(mpts) >= 2 else ""
+
+    # THE QUERY IS THE PROOF, AND IT WAS A GREY BOX IN FRONT OF THE ANSWER.
+    #
+    # It sat above the map as `<div class="note"><h2 class="mini">The query
+    # that made this page</h2>` — an administrative panel between the head
+    # and the one thing on the page that answers the question. The reader met
+    # the mechanism before they met Europe.
+    #
+    # And it said everything twice. Measured across the built site: all
+    # twelve motion pages printed the match count and the shown count in the
+    # panel AND again in the map caption — "19 destinations match … 8 are
+    # shown" above, "The 8 destinations below … 19 matched the query" below,
+    # on every one of them. That is the family's own rule broken by the page
+    # that states it: never explain the constraint back.
+    #
+    # So the map comes up to meet the head, the counts are stated once, and
+    # the query keeps the shape every other hoisted line on this site has —
+    # one line, under the thing it explains, rather than a box in front of
+    # it. It is still the whole credibility claim of the family and it still
+    # prints the expression that produced the list.
+    ncountries = len({n["country"]["slug"] for n, _ in hits})
+    querynote = (
+        f'<p class="whyall"><span>The query</span> {esc(motion_query_words(data, m))} '
+        f'Run against all {len(data["cities"])} destinations on every build, and '
+        f'nothing here is hand-picked — there is no field for naming a destination '
+        f'in a motion, deliberately. {len(hits)} match, in {ncountries} '
+        f'{"countries" if ncountries != 1 else "country"}'
+        + (f'; the {len(shown)} below are at most two per country.'
+           if len(hits) != len(shown) else ', and all of them are below.')
+        + '</p>'
+    )
 
     wants = set(m.get("interests", []))
     jrows = [j for j in data["journeys"] if wants & set(j["interests"])][:3]
@@ -5446,16 +5493,8 @@ def motion_page(data, m):
   <p class="lede">{esc(m["lede"])}</p>
 </div>
 
-<div class="note">
-  <h2 class="mini">The query that made this page</h2>
-  <p>{esc(motion_query_words(data, m))}</p>
-  <p class="small">Run against all {len(data['cities'])} destinations on every build.
-  Nothing here is hand-picked — there is no field for naming a destination in a motion,
-  deliberately. {len(hits)} destinations match, in {len({n['country']['slug'] for n, _ in hits})}
-  countries; {len(shown)} are shown, at most two per country.</p>
-</div>
-
 {motionmap}
+{querynote}
 {shared_note}
 <div class="rows">{rows}</div>
 

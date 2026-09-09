@@ -120,14 +120,30 @@ three are gaps. That distinction is the whole content of this document.
 ### Motion — 12 — *a query, answered*
 
 1. This is not a list somebody wrote. It is what the atlas says when asked.
-2. The query printed above the answer, and the answer as a shape.
+2. **The answer as a shape.** "Everywhere above 63° north" is eight lit points across Iceland, Norway, Sweden and Finnish Lapland, and you see the latitude before you read it. The query is the *proof*, and proof goes under the thing it proves.
 3. Every destination shown, spread across the continent.
-4. Query note, map, the hoisted shared reason, the rows.
+4. Head, map, the query as one line, the hoisted shared reason, the rows.
 5. Go into one.
 6. **Explicit.**
 7. None.
-8. The query terms themselves, published in full.
-9. **REFUSED**: a field naming a destination. The validator refuses it.
+8. The query expression itself, published in full, plus the match count and the shown count — each stated once.
+9. **REFUSED**: a field naming a destination; the validator refuses it. **REFUSED**: the query as a boxed panel in front of the map.
+
+**The mechanism was standing in front of the answer.** The query used to be a
+grey `.note` panel with its own `<h2>`, between the head and the map — the
+reader met how the page was built before they met Europe. And it said
+everything twice: measured across the built site, **all twelve pages printed
+the match count and the shown count in the panel and again in the map
+caption**. That is this family's own rule, never explain the constraint back,
+broken by the family that states it.
+
+Fixing it broke two assertions, both correctly and both for the wrong claim:
+they required the literal heading `The query that made this page`. They now
+assert that the query expression generated from the motion's own data is on
+the page — a page can carry the heading and print the wrong query — and that
+the counts appear once. Four of the twelve queries also turned out to be
+dangling clauses that only read under a heading: "The query lying above 63°
+north." Every one now carries its subject.
 
 ### Month — 12 (and the events index) — *where this month sits in the year*
 

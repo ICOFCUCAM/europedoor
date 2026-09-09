@@ -303,6 +303,37 @@ shipped HTML — a page printing a hop says "straight line", and no page
 anywhere claims a mode or a ground distance. A source-level check would have
 passed on all three.
 
+**The mechanism was standing in front of the answer, and saying everything
+twice.** A motion's signature moment is the query drawn as a shape: "everywhere
+above 63° north" is eight lit points across Iceland, Norway, Sweden and Finnish
+Lapland, and you see the latitude before you read it. That map sat *below* a
+grey `.note` panel with its own `<h2>The query that made this page</h2>` — the
+reader met how the page was built before they met Europe. And measured across
+the built site, **all twelve motion pages printed the match count and the shown
+count in that panel and again in the map caption**: this family's own rule,
+never explain the constraint back, broken by the family that states it. The map
+now comes up to meet the head and the query is one hoisted line under it,
+stated once. **The query is the proof, and proof goes under the thing it
+proves.**
+
+**Four of the twelve queries only parsed under a heading.** `motion_query_words`
+builds a clause list, and the interest clause carries its own subject ("any
+destination tagged Islands") while the other four are relative clauses. With no
+interest term the result dangled — *"The query lying above 63° north."* The
+subject is a **prefix** now, not another list item: inserting it into the list
+produced "Every destination *and* lying above 63° north", which is two wrongs in
+one line and the second was only visible once the first was fixed and the
+sentence was read aloud.
+
+**Five assertions pinned the panel's strings rather than its promise**, across
+the UX audit and the browser suite, and all five went red for the right reason
+and the wrong claim. Rewritten: the page must print the query expression
+generated from **its own data** — a page can carry the right heading and print
+the wrong query — must say it is not a list, must say how many matched, must say
+each of those **once**, and the query must begin with its subject. Every one
+still fails on the thing it protects. The duplication was invisible to the old
+assertions because it lived inside the shape they were protecting.
+
 **A year is not a list, and it was rendered as twelve identical pills.** The
 events family's subject is time. The index carried a chip per month and each
 month page carried previous / whole year / next — every one the same width

@@ -256,12 +256,35 @@ def s2036_6():
                               encoding="utf-8"))["motions"]
     yield len(motions) >= 12, f"{len(motions)} motions"
     yield bool(page("/europe-in")), "the index is served"
+    # THIS ASSERTED A HEADING, NOT A PROMISE.
+    #
+    # It required the literal string "The query that made this page" on every
+    # motion page — the h2 of a grey `.note` panel that sat between the head
+    # and the map. When the panel went (it was an administrative box in front
+    # of the family's own answer, and it printed the match and shown counts
+    # that the map caption printed again, on all twelve pages) these went red
+    # for the right reason and the wrong claim.
+    #
+    # The promise is that a landing page says what produced it. So it now
+    # asserts the query EXPRESSION generated from the motion's own data is on
+    # the page, which is the stronger claim the heading was standing in for:
+    # a page can carry the heading and print the wrong query, and this
+    # catches that. And it asserts the new half — that the counts appear once
+    # rather than twice, because restating them is the family's own rule
+    # broken by the page that states it.
+    from lib import pages as _P
+    from lib.render import esc as _esc
+    _d = DATA
     for m in motions:
         h = page("/europe-in/" + m["slug"])
         yield bool(h), f"/europe-in/{m['slug']} is served"
-        # A landing page that will not say what produced it is an assertion.
-        yield "The query that made this page" in h, f"{m['slug']} states its query"
-        yield "Nothing here is hand-picked" in h, f"{m['slug']} says it is a query"
+        md = next(x for x in _d["motions"] if x["slug"] == m["slug"])
+        q = _P.motion_query_words(_d, md)
+        yield _esc(q) in h, f"{m['slug']} prints the query its own data produced"
+        yield "nothing here is hand-picked" in h.lower(), \
+            f"{m['slug']} says it is a query and not a list"
+        yield h.count("matched the query") + h.lower().count(" match, in ") == 1, \
+            f"{m['slug']} states its match count once, not in two places"
     # The one field that must not exist. A curated list wearing the clothes
     # of a query is exactly what this refuses to be.
     yield "a motion is a query, not a hand-picked list" in src("tools/lib/data.py"), \

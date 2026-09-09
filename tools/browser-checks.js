@@ -790,9 +790,32 @@ async function main() {
     const html = await r.text();
     // Every motion page must print the query that produced it. A landing
     // page that will not say what produced it is an assertion.
-    ok(/The query that made this page/.test(html), `${href} does not state its query`);
-    ok(/destinations match, in \d+/.test(html), `${href} does not say how many matched`);
-    ok(/Nothing here is hand-picked/.test(html), `${href} does not say it is a query`);
+    //
+    // THESE PINNED THE STRINGS OF A PANEL RATHER THAN THE PROMISE. The query
+    // used to be a grey `.note` box with an h2 reading "The query that made
+    // this page", sitting between the head and the map — the mechanism in
+    // front of the answer — and it printed the match and shown counts that
+    // the map caption printed again, on all twelve pages. Moving it turned
+    // these red for the right reason and the wrong claim.
+    //
+    // The promise is: the page says what produced it, says it is a query and
+    // not a list, says how many matched, and says each of those ONCE. The
+    // last one is the half the old assertions could never have caught,
+    // because the duplication was in the shape they were protecting.
+    ok(/class="whyall"[^>]*>\s*<span>The query<\/span>/.test(html),
+       `${href} does not state its query`);
+    ok(/\d+ match, in \d+ countr/.test(html), `${href} does not say how many matched`);
+    ok(/nothing here is hand-picked/i.test(html), `${href} does not say it is a query`);
+    const said = (html.match(/matched the query/g) || []).length +
+                 (html.match(/ match, in \d+ countr/g) || []).length;
+    ok(said === 1, `${href} states its match count ${said} times, not once`);
+    // And the query has to read as a sentence. Four of the twelve were
+    // relative clauses with no subject — "The query lying above 63° north."
+    // — which parsed under a heading and stopped parsing the moment the
+    // query became one hoisted line.
+    const q = (html.match(/<span>The query<\/span>\s*([^<]{4,120})/) || [])[1] || "";
+    ok(/^\s*(Any|Every) destination /.test(q),
+       `${href} query does not start with its subject: ${JSON.stringify(q.slice(0, 60))}`);
     // And it must have actually matched something.
     const n = (html.match(/class="row"/g) || []).length;
     ok(n >= 3, `${href} matched only ${n} destinations`);
@@ -1858,7 +1881,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 706;
+  const FLOOR = 730;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +
