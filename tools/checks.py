@@ -1955,6 +1955,82 @@ def c_empty_states_explain():
     return n
 
 
+@check("a blocked dataset cannot enter the register under another name")
+def c_blocked_by_data_not_label():
+    # THE BLOCK ONLY EVER FIRED ON THE ID TYPED ON THE COMMAND LINE.
+    # fetch.py matched `blocked` against argv and its loop over `sources`
+    # never consulted the list at all, so a row added as
+    # `osm-land-polygons`, pointing at openstreetmap.org, would have been
+    # downloaded without the refusal printing a word. The guard was on the
+    # LABEL, and the label is chosen by whoever is adding the dataset.
+    #
+    # fetch.py matches the data now. This asserts the same thing at CI,
+    # because fetch.py is run by a person when a dataset version changes and
+    # CI runs on every commit — the register can go wrong months before
+    # anybody types the command that would catch it.
+    reg = json.load(open(os.path.join(ROOT, "docs/data-licenses/sources.json"),
+                         encoding="utf-8"))
+    blocked = reg.get("blocked", [])
+    n = 0
+    for b in blocked:
+        if not b.get("refuse_matching"):
+            fail(f'blocked entry "{b["id"]}" declares no refuse_matching '
+                 f'patterns, so it can only ever be refused by its own id — '
+                 f'which is the hole this check exists for')
+        n += 1
+    for src in reg["sources"]:
+        hay = " ".join((src.get("id", ""), src.get("url", ""),
+                        src.get("dataset", ""))).lower()
+        for b in blocked:
+            hit = ([b["id"]] if src.get("id") == b["id"] else []) + [
+                pat for pat in b.get("refuse_matching", []) if pat.lower() in hay]
+            if hit:
+                fail(f'source "{src["id"]}" matches blocked dataset '
+                     f'"{b["id"]}" on {hit[0]!r} — {b["licence"]}. A blocked '
+                     f'dataset does not become permitted by being given a '
+                     f'different id; see docs/data-licenses/{b["licence_doc"]}')
+        n += 1
+    return n
+
+
+@check("a page that draws land names where the land came from")
+def c_land_is_credited():
+    # 318 OF 817 PAGES DREW A COASTLINE WITH NO CREDIT ON THEM, and the 499
+    # that had one mostly had it BY ACCIDENT: a destination page names
+    # Natural Earth because `pop_line` prints the dataset that produced its
+    # population, so the 45 destinations with no population figure had no
+    # credit either. Coverage that depends on a different field being
+    # present is worse than no coverage, because it looks like a policy.
+    #
+    # Natural Earth requires no attribution at all — the licence says so —
+    # so today this is a matter of taste, and geo.sources_line()'s own
+    # docstring gives the reason: a reader looking at a border is entitled
+    # to know which dataset drew it, and an uncredited map invites the
+    # assumption that we surveyed it.
+    #
+    # It stops being taste the moment any source in the register carries
+    # attribution_required. Every row is false today; this check hardens
+    # itself automatically when one is not, and the message says so, so that
+    # the first ODbL byte cannot arrive without the credit already being
+    # everywhere it has to be.
+    reg = json.load(open(os.path.join(ROOT, "docs/data-licenses/sources.json"),
+                         encoding="utf-8"))
+    required = [s for s in reg["sources"] if s.get("attribution_required")]
+    n = 0
+    for f in site_files():
+        html = open(f, encoding="utf-8").read()
+        if '<g class="context"' not in html and 'class="countries"' not in html:
+            continue
+        n += 1
+        if "Natural Earth" not in html:
+            extra = (f" A source in the register now requires attribution "
+                     f"({required[0]['id']}), so this is a licence breach and "
+                     f"not a style question." if required else "")
+            fail(f"{rel(f)} draws a coastline and names no source for it."
+                 f"{extra}")
+    return n
+
+
 @check("no page carries geography it does not show")
 def c_map_land_is_in_frame():
     # A SANTORINI PAGE CARRIED THE COASTLINE OF NORWAY.

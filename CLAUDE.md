@@ -154,14 +154,34 @@ draw a coastline. `checks.py` fails on a page or script that names a commercial
 map host or a public tile server. Adding one is a decision for the owner, not
 a convenience.
 
-**No dataset enters without its licence written down first.** `fetch.py`
-refuses to open a socket for a source with no row in
-`docs/data-licenses/sources.json` and no `.md` file beside it, and it refuses
-by name anything on the `blocked` list. Two things are on that list on purpose:
+**No dataset enters without its licence written down first, and the block is
+on the DATA rather than the label.** `fetch.py` refuses to open a socket for a
+source with no row in `docs/data-licenses/sources.json` and no `.md` file
+beside it. For a while it also refused the `blocked` list **by id typed on the
+command line only** — the loop over `sources` never consulted that list — so a
+row added as `osm-land-polygons` pointing at openstreetmap.org would have been
+downloaded without the refusal printing a word. A guard on a label is a guard
+whoever adds the dataset gets to choose. Each blocked entry now declares
+`refuse_matching` patterns tested against a candidate's id, URL *and* dataset
+name, `fetch.py` refuses on a match, and `checks.py` asserts the same thing on
+every commit — because `fetch.py` runs when a person types it and CI runs
+always. Two things are on that list on purpose:
 **Eurostat NUTS** (copyrighted, use conditional on accepting provisions nobody
 here has read — so region *boundaries* are not drawn) and **OpenStreetMap**
 (ODbL share-alike, kept out of the knowledge graph deliberately). "Free to
 download" is not "free of obligations".
+
+**A page that draws land names where the land came from.** Two in five of the
+pages that draw one had no credit at all, and most of the 499 that had one had it *by
+accident*: a destination page named Natural Earth because `pop_line` prints
+the dataset behind its population, so the 45 destinations with no population
+figure named nothing and every place page named nothing. Coverage that depends
+on a different field being present is worse than none, because it looks like a
+policy. Natural Earth requires no attribution — the licence says so — so today
+this is `geo.sources_line()`'s stated reason: a reader looking at a border is
+entitled to know which dataset drew it. It stops being taste the moment any
+row in the register carries `attribution_required`, and the check hardens
+itself and says so when one does.
 
 **`data/geo/` is generated and CI fails if it is stale**, exactly like `site/`.
 After changing `scripts/map/` or `data/raw/`, run

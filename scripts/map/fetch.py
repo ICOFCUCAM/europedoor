@@ -99,13 +99,52 @@ def main(argv):
 
     reg = load()
     blocked = {b["id"]: b for b in reg.get("blocked", [])}
+
+    def refusal(src):
+        """Which blocked entry a candidate source is, if any.
+
+        THE BLOCK ONLY EVER FIRED ON THE ID TYPED ON THE COMMAND LINE.
+        `blocked` was matched against argv and nothing else, and the loop
+        over `sources` below never consulted it — so a row added to
+        `sources` as, say, `osm-land-polygons`, pointing at
+        openstreetmap.org, would have been fetched without the refusal
+        printing a word. The guard was on the LABEL, and a label is chosen
+        by whoever is adding the dataset.
+        
+        It matches the data now: the id, the URL and the dataset name, each
+        against the patterns the blocked entry declares. Found by the Aegean
+        experiment while it was reading this file to explain to a human how
+        NOT to bypass it.
+        """
+        hay = " ".join((src.get("id", ""), src.get("url", ""),
+                        src.get("dataset", ""))).lower()
+        for b in blocked.values():
+            if src.get("id") == b["id"]:
+                return b
+            for pat in b.get("refuse_matching", []):
+                if pat.lower() in hay:
+                    return b
+        return None
+
+    def refuse(name, b):
+        print(f"REFUSED: {name} — {b['dataset']}")
+        print(f"  licence: {b['licence']}")
+        print(f"  reason:  {b['reason']}")
+        print(f"  read:    docs/data-licenses/{b['licence_doc']}")
+
     for name in wanted:
         if name in blocked:
-            b = blocked[name]
-            print(f"REFUSED: {name} — {b['dataset']}")
-            print(f"  licence: {b['licence']}")
-            print(f"  reason:  {b['reason']}")
-            print(f"  read:    docs/data-licenses/{b['licence_doc']}")
+            refuse(name, blocked[name])
+            return 2
+
+    # And every row in the register, whatever it calls itself.
+    for src in reg["sources"]:
+        b = refusal(src)
+        if b:
+            refuse(src["id"], b)
+            print(f"  matched: {src.get('url', '')}")
+            print(f"  This row is in `sources`, not `blocked`, and would "
+                  f"otherwise have been downloaded.")
             return 2
 
     bad = 0

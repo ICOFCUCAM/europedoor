@@ -2041,6 +2041,14 @@ def minimap(data, t, span=3.2, about=None):
            f'street. The frame is about ' if about else
            f'{esc(t["name"])} and its neighbours in the Atlas — the frame is about ') +
         f'{km_w:,} km across and {km_h:,} km deep at this latitude. '
+        # THE CREDIT, WHICH 318 PAGES DID NOT CARRY AND 274 CARRIED BY
+        # ACCIDENT. A destination page named Natural Earth because pop_line
+        # prints the dataset behind its population — so the 45 destinations
+        # with no population figure named nothing, and every place page named
+        # nothing. Coverage that depends on a different field being present
+        # is worse than none, because it looks like a policy. One clause, the
+        # same one the region and story maps carry.
+        f'Coastline from <a href="/sources">Natural Earth</a>, public domain. '
         f'<a href="/map">The full map →</a></figcaption></figure>'
     )
 
@@ -2353,7 +2361,8 @@ def routemap(data, j):
                     n["city"]["name"]))
     uid = "rt" + "".join(ch for ch in j["slug"] if ch.isalnum())[:14]
     cap = ('Straight lines between stops, in order. What each one means on the '
-           'ground is in the note under the leg. '
+           'ground is in the note under the leg. Coastline from '
+           '<a href="/sources">Natural Earth</a>, public domain. '
            '<a href="/map">The whole map, with every journey →</a>')
     return pointsmap(pts, uid, cap, f'Route map for {j["name"]}',
                      line=True)
@@ -5312,7 +5321,8 @@ def discover_page(data):
 
 <a class="heromap wide-map arched" href="/map" aria-label="Map of all {len(data['cities'])} places">
   <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true"><defs>{arch_clip("disc", MAP_W, MAP_H)}</defs><g clip-path="url(#arch-disc)"><rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>{dctx}{dland}{''.join(dots)}</g></svg>
-  <span class="heromap-cap">Open the full map, with layers →</span>
+  <span class="heromap-cap">Coastline from Natural Earth, public domain.
+  Open the full map, with layers →</span>
 </a>
 
 {section("By where it is", grid(macro_cards, 3),

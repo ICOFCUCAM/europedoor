@@ -91,6 +91,12 @@
       "id": "gisco-nuts-2024",
       "dataset": "Eurostat / GISCO NUTS 2024 regions, levels 1-3",
       "url": "https://raw.githubusercontent.com/eurostat/Nuts2json/master/pub/v2/2024/4326/20M/nutsrg_2.json",
+      "refuse_matching": [
+        "ec.europa.eu",
+        "eurostat",
+        "gisco",
+        "nuts2json"
+      ],
       "licence": "copyrighted, use subject to acceptance of Eurostat provisions",
       "licence_doc": "eurostat-gisco-nuts.md",
       "reason": "The provisions could not be read from this environment and have not been accepted by anyone. fetch.py refuses every entry in this list."
@@ -99,6 +105,17 @@
       "id": "osm",
       "dataset": "OpenStreetMap",
       "url": "https://planet.openstreetmap.org/",
+      "refuse_matching": [
+        "openstreetmap.org",
+        "osm.org",
+        "geofabrik.de",
+        "openmaptiles",
+        "planetiler",
+        "overpass-api.de",
+        "osmdata.openstreetmap.de",
+        "openstreetmap",
+        "osm-"
+      ],
       "licence": "ODbL 1.0",
       "licence_doc": "openstreetmap-not-used.md",
       "reason": "Share-alike. Deliberately kept out of the knowledge graph; see the licence doc for the conditions under which it may return."
