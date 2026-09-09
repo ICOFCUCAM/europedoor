@@ -465,41 +465,77 @@ def rivers(proj, view):
     if not doc:
         return ""
     x, y, w, h = view
-    box = (x - 40.0, y - 40.0, x + w + 40.0, y + h + 40.0)
+    # PROPORTIONAL TO THE WINDOW, AND FOR ONE COMMIT IT WAS NOT. A flat
+    # 40-unit pad is 4% of the continent frame this was written against and
+    # 44% of a destination frame's 90 units, so a plate carried rivers four
+    # hundred plate-units outside its own picture. The same arithmetic as the
+    # coastline's own clip, for the same reason: a page must not contain
+    # geography it cannot display.
+    pad = max(4.0, max(w, h) * 0.10)
+    box = (x - pad, y - pad, x + w + pad, y + h + pad)
+
+    def runs(pts):
+        """The parts of a polyline inside the box, as separate subpaths.
+
+        A river was emitted WHOLE if any point of it fell in the window, so a
+        plate showing fifty kilometres of the Danube shipped the Danube from
+        the Black Forest to the Black Sea. One point either side of each run
+        is kept so the line still reaches the edge of the frame rather than
+        stopping short of it.
+        """
+        out, cur = [], []
+        inside = [box[0] <= px <= box[2] and box[1] <= py <= box[3]
+                  for px, py in pts]
+        for i, p in enumerate(pts):
+            near = (inside[i] or (i and inside[i - 1])
+                    or (i + 1 < len(inside) and inside[i + 1]))
+            if near:
+                cur.append(p)
+            elif cur:
+                out.append(cur)
+                cur = []
+        if cur:
+            out.append(cur)
+        return out
+
+    def draw(pts):
+        d, last = [], None
+        for px, py in pts:
+            q = (round(px, 1), round(py, 1))
+            if q == last:
+                continue
+            d.append(("M" if not d else "L") + f"{q[0]} {q[1]}")
+            last = q
+        return "".join(d) if len(d) >= 2 else ""
+
     out = []
     for feat in doc.get("rivers", []):
         if feat.get("rank", 99) > RIVER_RANK:
             continue
-        d, last, seen = [], None, False
-        for i in range(0, len(feat["line"]), 2):
-            px, py = proj.xy(feat["line"][i + 1], feat["line"][i])
-            if box[0] <= px <= box[2] and box[1] <= py <= box[3]:
-                seen = True
-            px, py = round(px, 1), round(py, 1)
-            if last == (px, py):
-                continue
-            d.append(("M" if not d else "L") + f"{px} {py}")
-            last = (px, py)
-        if seen and len(d) >= 2:
+        line = feat["line"]
+        pts = [proj.xy(line[i + 1], line[i]) for i in range(0, len(line), 2)]
+        d = "".join(draw(r) for r in runs(pts))
+        if d:
             cls = "major" if feat.get("rank", 99) <= 4 else "minor"
-            out.append(f'<path class="riv {cls}" d="{"".join(d)}">'
+            out.append(f'<path class="riv {cls}" d="{d}">'
                        f'<title>{feat.get("name", "")}</title></path>')
     for feat in doc.get("lakes", []):
         if feat.get("rank", 99) > LAKE_RANK:
             continue
-        d, last, seen = [], None, False
+        d = []
         for ring in feat.get("rings", []):
-            for i in range(0, len(ring), 2):
-                px, py = proj.xy(ring[i + 1], ring[i])
-                if box[0] <= px <= box[2] and box[1] <= py <= box[3]:
-                    seen = True
-                px, py = round(px, 1), round(py, 1)
-                if last == (px, py):
-                    continue
-                d.append(("M" if not d else "L") + f"{px} {py}")
-                last = (px, py)
-            d.append("Z")
-        if seen and len(d) >= 4:
+            pts = [proj.xy(ring[i + 1], ring[i]) for i in range(0, len(ring), 2)]
+            if (max(p[0] for p in pts) < box[0] or min(p[0] for p in pts) > box[2]
+                    or max(p[1] for p in pts) < box[1]
+                    or min(p[1] for p in pts) > box[3]):
+                continue
+            cut = geo._clip(pts, box)
+            if len(cut) < 3:
+                continue
+            piece = draw(cut)
+            if piece:
+                d.append(piece + "Z")
+        if d:
             out.append(f'<path class="lake" d="{"".join(d)}">'
                        f'<title>{feat.get("name", "")}</title></path>')
     return "".join(out)
@@ -598,8 +634,9 @@ def region_bounds(proj, view):
 
 
 def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
+          transform="", relief=False, frame_km=None,
           cities="", destinations="", labels="", route="", caption="",
-          features="", waters="", summits="", terrain="", bounds="",
+          features="", waters="", summits="",
           role="illustration", figure_class="minimap arched atlas",
           aria="", rim=True):
     """A complete editorial plate: the layers, in order, through the arch.
@@ -608,10 +645,41 @@ def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
     job and this module never touches a coordinate. Everything else is a
     fragment a caller has built from data the build holds.
 
+    TWO SPACES, AND CONFLATING THEM PUT THE KAMA ON EVERY ALPINE PLATE.
+
+    `w` and `h` are the viewBox — the picture. `view` is the window in
+    `proj`'s own coordinates that the picture shows, and `transform` is what
+    takes the second to the first. On a country plate they are the same
+    thing: the projection is fitted to the frame, so view is (0, 0, w, h) and
+    there is no transform. On a destination or a journey plate they are not:
+    the continent projection is drawn at 1000x780 and the plate scales a
+    small window of it up, inside a translate-and-scale.
+
+    Every caller used to pass `view=(0, 0, w, h)` regardless, and the layers
+    this module renders itself — rivers, region boundaries — were selected
+    with that box and emitted OUTSIDE the transform. So a destination plate
+    asked "which rivers are in the rectangle (0,0)-(900,320) of Europe",
+    which is the North Sea and Finland, and drew the answer at continent
+    coordinates over a picture of the Alps. **The same 111 watercourses
+    appeared on all 824 of them**: the Kama, the Dalälven, the Kemijoki and
+    the Neva on Chamonix, on Bergen, on Athens, identically. It looked right
+    — blue lines and lakes on a map look like rivers wherever they are — and
+    the country plates, which pass a real projection and no transform, were
+    correct all along, which is what kept it invisible.
+
+    So the two spaces are now separate parameters and this function wraps
+    everything it renders in `transform` itself. A caller cannot get half of
+    it right any more, because a caller no longer does any of it.
+
     The aperture is last and outermost, because it is not a layer: it is the
     opening the whole stack is seen through, and the rim and reveal are
     outside the clip so a reader sees the thickness of the cut.
     """
+    def placed(body):
+        """Into the plate's own space, if it has one."""
+        return f'<g transform="{transform}">{body}</g>' if (transform and body) else body
+
+    terrain_body = terrain(proj, view, relief, frame_km)
     body = []
     for name in ORDER:
         if name == "ocean":
@@ -624,21 +692,16 @@ def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
             continue
         elif name == "land":
             body.append(f'<g id="{uid}-land" class="lyr {CLASSES["land"]}">'
-                        f'{context}{land}</g>' if (land or context) else "")
+                        f'{placed(context + land)}</g>'
+                        if (land or context) else "")
         elif name == "terrain":
-            # The caller supplies it, for the same reason it supplies `land`:
-            # a destination plate draws the continent inside its own
-            # translate-and-scale, and geometry that does not go through that
-            # transform lands in the wrong country. This module still decides
-            # that relief is drawn HERE — above the land fill, below the
-            # boundary — which is the whole of its job.
-            body.append(_group(name, terrain))
+            body.append(_group(name, placed(terrain_body)))
         elif name == "hillshade":
-            body.append(_group(name, hillshade(proj, view)))
+            body.append(_group(name, placed(hillshade(proj, view))))
         elif name == "rivers":
-            body.append(_group(name, rivers(proj, view)))
+            body.append(_group(name, placed(rivers(proj, view))))
         elif name == "region-bounds":
-            body.append(_group(name, region_bounds(proj, view)))
+            body.append(_group(name, placed(region_bounds(proj, view))))
         elif name == "feature-labels":
             body.append(_group(name, features))
         elif name == "water-labels":
@@ -648,9 +711,10 @@ def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
             # path's own stroke IS the boundary and a second pass would be
             # 5 KB of duplicate geometry on 1,033 pages for no visible
             # change; with terrain over it the stroke is buried and the
-            # picture loses its frontiers. So the caller passes the
-            # stroke-only pass exactly when it passes relief.
-            body.append(_group(name, bounds))
+            # picture loses its frontiers. Derived here from the same markup
+            # the land layer got, so it cannot drift from it.
+            body.append(_group(name, placed(stroke_only(context + land))
+                               if terrain_body else ""))
         elif name in ("coastline", "selected"):
             # Still the land path's own stroke and its `here` fill.
             continue

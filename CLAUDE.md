@@ -29,6 +29,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **the Postgres/PostGIS model, the API, Next.js, auth, search, the AI pipeline** | **`docs/technical-foundation.md`** — a destination with a trigger, not a plan for Monday. Nothing in it should be built yet |
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
 | **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. Every spec section asserted against the real build, and CI fails if any of them stops being true |
+| **coastline detail on a local frame, and the rivers fault it found** | **`docs/coastline-lod.md`** — A/B/C measured on five destinations. Under 1,000 km a plate draws local geometry, clipped; above it, the continental file. And the same 111 rivers were on all 824 destination plates |
 | **terrain — where relief is drawn and what decides it** | **`docs/terrain-prototype.md`** — Chamonix at four strengths judged by eye, then eight destinations judged together. One absolute palette, zoom 6 because that is where the licence is, and a measurement rather than a list deciding which 147 destinations get it |
 | **the cartographic standard — the ten principles and what holds each** | **`docs/cartographic-standard.md`** — editorial European atlas, not GIS. Nine of the ten are held by a check or an invariant; the tenth is the editorial test |
 | **how a map is DRAWN — palette, layers, what the benchmark still needs** | **`docs/cartography.md`** — the pictures are paper and the instruments are graphite. The four layers, the measured palette, and the four things the benchmark has that are blocked on a licence or a socket |
@@ -209,6 +210,37 @@ label was placed, was inside the aperture, and did not collide at the width
 every check ran at. All three families take the `--z` compensation now, all
 four count toward `dense_class()`, and `phone_declutter()` marks the first
 `class="` on whatever it is given.
+
+**A PLATE HAS TWO COORDINATE SPACES AND `plate()` CONFLATED THEM, so the same
+111 rivers were drawn on all 824 destination and journey plates.** `w`/`h` are
+the viewBox; `view` is the window in the projection's own coordinates. On a
+country plate they are the same thing — the projection is fitted to the frame —
+and on a destination plate they are not: the continent is drawn at 1000×780 and
+the plate scales a small window of it up inside a translate-and-scale. Every
+caller passed `view=(0, 0, w, h)`, so the layers the renderer draws itself asked
+which rivers are in the rectangle (0,0)–(900,320) of Europe — the North Sea and
+Finland — and drew the answer at continent coordinates over a picture of the
+Alps. **The Kama, the Dalälven and the Neva were on Chamonix, on Bergen and on
+Athens, identically.** It survived because it looks right: blue lines and lakes
+read as rivers wherever they are, and the country plates were correct all along
+because they pass a real projection and no transform. `plate()` now takes
+`view` and `transform` separately and applies the transform to everything it
+renders itself — a caller cannot get half of it right, because a caller no
+longer does any of it. Underneath it: a river was emitted **whole** if one point
+of it fell in the window, and the clip pad was a flat 40 units, written for a
+900-unit frame and left on a 90-unit one.
+
+**The coastline was nine pixels coarse on a local frame, and it left seams of
+sea colour on inland ones.** lod1 simplifies at 0.04° — 4.4 km — so Attica was
+a wedge and the Cyclades were lozenges; and two neighbours simplified
+independently do not share an edge, so **Kraków, which has no coast at all,**
+had thin slivers of ocean running along the Polish frontier. Under
+`geo.LOCAL_LOD_MAX_KM` (1,000 km) a destination plate draws from the lod2 file
+already in the repository, merged over the continental one and clipped to the
+window. Measured three ways: unclipped lod2 is the same picture for eight times
+the bytes, so the clip is not an optimisation of the idea, it is the idea. 277
+of 319 destinations are under the cap; `/map`, the country plates, the macro
+regions and the journeys keep the level they had.
 
 **Terrain is drawn where the GROUND says so, and the rule is a measurement.**
 147 of 319 destinations and 6 of 17 journeys carry four hypsometric bands from

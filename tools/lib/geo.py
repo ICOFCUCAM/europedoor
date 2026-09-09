@@ -170,6 +170,29 @@ def country(slug):
     return load(os.path.join("country", slug + ".json"))
 
 
+# HOW WIDE A FRAME MAY BE AND STILL BE DRAWN FROM LOCAL GEOMETRY.
+#
+# Measured on five destinations at their real frames — A the continental file,
+# B the local one unclipped, C the local one clipped to the window:
+#
+#     place      frame    A coords / bytes    B            C
+#     Athens     578 km   492 /  6,280     7,271 / 89,661   895 / 11,119
+#     Bergen     582 km   305 /  3,928     7,768 / 95,517   560 /  6,988
+#     Corfu      581 km   578 /  7,529     7,271 / 89,661   990 / 12,475
+#     Chamonix   589 km   405 /  5,449     7,230 / 89,268   729 /  9,377
+#     Krakow     739 km   462 /  6,122     7,496 / 92,357   894 / 11,306
+#
+# B and C are the same picture — everything B adds is outside the window and
+# thrown away by the viewBox — and B is eight times the bytes. So the answer
+# is C, and the clip is not an optimisation, it is the whole difference
+# between affordable and not.
+#
+# 1,000 km. Above it a plate is a continental picture: 42 of 319 destinations
+# frame between 1,100 and 2,400 km, and at that scale 4.4 km of simplification
+# is a third of a pixel and buys nothing. Below it the coarse file is nine
+# pixels of error on a coastline a reader is looking straight at.
+LOCAL_LOD_MAX_KM = 1000.0
+
 _LOCAL = {}
 
 

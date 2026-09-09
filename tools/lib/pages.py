@@ -2869,21 +2869,22 @@ def minimap(data, t, span=3.2, about=None, named=None):
     # (cx, cy) ± half the frame in projection units, which is the same
     # arithmetic the dots two blocks below already use.
     view = (cx - w / 2 / span, cy - h / 2 / span, w / span, h / span)
-    # THE COASTLINE AT THE SCALE THIS FRAME IS ACTUALLY DRAWN AT. See
-    # geo.local(): lod1 simplifies at 4.4 km, which is nine pixels here, and
-    # it made every coastal destination a polygon. lod2 is already in the
-    # repository. Only for a local frame — a 2,458 km one is a continental
-    # picture and lod1 is the right detail for it, as well as the affordable
-    # one.
+    kmu = geo.km_per_unit(MAPPROJ, t["lat"], t["lon"])
+    km_w = int(round(w / span * kmu / 10) * 10)
+    km_h = int(round(h / span * kmu / 10) * 10)
+    # THE LOCAL LOD RULE, AND IT IS STATED IN KILOMETRES BECAUSE THAT IS WHAT
+    # DECIDES IT. See geo.local() and docs/coastline-lod.md: the continental
+    # file simplifies at 4.4 km, which is nine pixels on a frame this size,
+    # and it made every coastal destination a set of wedges — and left visible
+    # seams of sea colour along frontiers on inland ones. The finer file is
+    # already in the repository and only what falls in the window is emitted.
+    # A frame wider than the cap is a continental picture, where lod1 is both
+    # the right detail and the affordable one.
     _home = next((n["country"]["slug"] for n in data["cities"].values()
                   if n["city"] is t), None)
     ctx, land = geo.landmass(
         MAPPROJ, view,
-        doc=geo.local(_home) if span >= 6.0 else None)
-
-    kmu = geo.km_per_unit(MAPPROJ, t["lat"], t["lon"])
-    km_w = int(round(w / span * kmu / 10) * 10)
-    km_h = int(round(h / span * kmu / 10) * 10)
+        doc=geo.local(_home) if km_w <= geo.LOCAL_LOD_MAX_KM else None)
     # And the bar, on the same arithmetic the caption uses. These are the
     # most-seen maps on the site — one per destination and one per place —
     # and until the projection was conformal none of them could carry one.
@@ -3028,27 +3029,21 @@ def minimap(data, t, span=3.2, about=None, named=None):
                  f'{n["city"]["slug"]}'
                  for n in data["cities"].values() if n["city"] is t), None)
     tdraw = cartography.draws_relief(cartography.relief_of(tkey))
-    xform = (f'<g transform="translate({w/2 - cx*span:.2f},'
-             f'{h/2 - cy*span:.2f}) scale({span})">')
-    terr = cartography.terrain(MAPPROJ, view, tdraw, km_w)
     return (
         cartography.plate(
-            uid=uid, w=w, h=h, proj=MAPPROJ, view=(0, 0, w, h),
-            # The transform is the destination map's own: it draws the
-            # continent's geometry and scales the window in, where a country
-            # plate projects to its own frame. The renderer takes the land as
-            # given and never touches a coordinate.
-            land=f'{xform}{ctx}{land}</g>',
-            # And the relief and the frontiers go through the SAME transform,
-            # or the Alps land in France — which is exactly what happened the
-            # first time a layer was added outside it.
-            terrain=f"{xform}{terr}</g>" if terr else "",
-            bounds=(f"{xform}{cartography.stroke_only(ctx + land)}</g>"
-                    if terr else ""),
+            # TWO SPACES, NAMED SEPARATELY. `view` is the window in the
+            # continent projection this plate shows; `transform` is what
+            # takes that window to the 900x320 picture. Every caller used to
+            # pass (0, 0, w, h) here, which made the renderer select its own
+            # layers from the North Sea and draw them over the Alps.
+            uid=uid, w=w, h=h, proj=MAPPROJ, view=view,
+            transform=(f'translate({w/2 - cx*span:.2f},'
+                       f'{h/2 - cy*span:.2f}) scale({span})'),
+            land=land, context=ctx, relief=tdraw, frame_km=km_w,
             destinations="".join(dots), labels=drawnlabels + bar,
             rim=False,
             figure_class=(f"minimap arched atlas{dense_class(drawnlabels)}"
-                          + (" terrain" if terr else "")),
+                          + (" terrain" if tdraw else "")),
             aria=f"Map of {esc(t['name'])} and the places around it")[:-len("</figure>")]
         # `about` names something INSIDE this destination — a place page's
         # subject. The map is then honestly captioned as what it is: this
@@ -3542,20 +3537,16 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
     # crossing mountains, and a motion's map is a picture of a QUERY, where
     # relief would be decoration over an argument. The caller measures it, so
     # this function has no opinion about which places are mountainous.
-    xform = f'<g transform="scale({k:.4f}) translate({-x0:.1f},{-y0:.1f})">'
     frame_km = w * geo.km_per_unit(MAPPROJ, _lat_at(y0 + h / 2), LCC_MID_LON)
-    terr = cartography.terrain(MAPPROJ, (x0, y0, w, h), relief, frame_km)
     return cartography.plate(
-        uid=uid, w=vw, h=vh, proj=MAPPROJ, view=(0, 0, vw, vh),
-        land=f'{xform}{ctx}{land}</g>',
-        terrain=f"{xform}{terr}</g>" if terr else "",
-        bounds=(f"{xform}{cartography.stroke_only(ctx + land)}</g>"
-                if terr else ""),
+        uid=uid, w=vw, h=vh, proj=MAPPROJ, view=(x0, y0, w, h),
+        transform=f"scale({k:.4f}) translate({-x0:.1f},{-y0:.1f})",
+        land=land, context=ctx, relief=relief, frame_km=frame_km,
         route=route, destinations="".join(dots),
         labels="".join(lab) + bar,
         caption=f'<figcaption>{caption}</figcaption>',
         figure_class=(f"minimap pointsmap arched atlas{dense}"
-                      + (f" terr-{relief}" if terr else "")),
+                      + (" terrain" if relief else "")),
         aria=esc(aria))
 
 

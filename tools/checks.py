@@ -2508,6 +2508,93 @@ def c_map_roles():
     return n
 
 
+@check("a local frame is drawn from local geometry, and a continental one is not")
+def c_local_lod():
+    """The coastline LOD rule, read back off the shipped pages.
+
+    THE DEFECT: the continental file simplifies at 0.04 degrees, which is
+    4.4 km, which is nine pixels on the 590 km frame a destination plate
+    actually draws. Attica came out as a wedge, the Cyclades as lozenges and
+    the Norwegian coast as a staircase — and on an INLAND page with no
+    coast at all, Krakow, two neighbours simplified independently do not share
+    an edge, so thin slivers of sea colour ran along the Polish frontier and
+    the Danube. Every coastal destination had looked like that since these
+    maps were built, and nobody had put a coastal frame and an Alpine frame
+    side by side.
+
+    THE RULE: under `geo.LOCAL_LOD_MAX_KM` a destination plate draws from the
+    per-country file at 0.012 degrees, merged over the continental one so a
+    frame reaching two countries further still has land in it; above the cap
+    it draws from the continental file, because there 4.4 km is a third of a
+    pixel and the finer geometry is bytes for nothing.
+
+    Asserted by recovering each plate's own frame from its transform and its
+    caption, rebuilding the land markup both ways, and requiring the page to
+    carry the one the rule selects. Sampled at the BOUNDARY — the widest
+    frames below the cap and the narrowest above it — because that is the
+    only place a threshold can be wrong.
+    """
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from lib import geo as G                                        # noqa: E402
+    from lib import pages as P                                      # noqa: E402
+
+    seen = []
+    for path in site_files():
+        r = rel(path).lstrip("/").split("/")
+        if r[0] != "europe" or len(r) != 5:
+            continue
+        html = open(path, encoding="utf-8").read()
+        m = re.search(r'<g transform="translate\(([-\d.]+),([-\d.]+)\) '
+                      r'scale\(([\d.]+)\)">', html)
+        km = re.search(r"frame is about ([\d,]+) km across", html)
+        if not m or not km:
+            continue
+        tx, ty, span = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        w, h = 900.0, 320.0
+        cx, cy = (w / 2 - tx) / span, (h / 2 - ty) / span
+        seen.append((int(km.group(1).replace(",", "")), "/".join(r[1:4]),
+                     path, html, (cx - w / 2 / span, cy - h / 2 / span,
+                                  w / span, h / span)))
+    assert len(seen) > 250, f"only {len(seen)} destination plates found"
+    seen.sort()
+    under = [x for x in seen if x[0] <= G.LOCAL_LOD_MAX_KM]
+    over = [x for x in seen if x[0] > G.LOCAL_LOD_MAX_KM]
+    assert under and over, (
+        f"the cap separates nothing: {len(under)} under, {len(over)} over")
+    sample = under[-8:] + over[:8]
+
+    def points(markup):
+        return len(re.findall(r"[ML]-?[\d.]", markup))
+
+    # COUNTED, NOT MATCHED CHARACTER FOR CHARACTER. The frame is recovered
+    # from a transform printed to two decimals, so the clip box here differs
+    # from the build's in the fifth decimal and a vertex can round the other
+    # way. Exact string matching was the first version and failed on one page
+    # in sixteen for that reason — which is a brittle check finding its own
+    # arithmetic, not a defect.
+    n = 0
+    for km, key, path, html, view in sample:
+        slug = key.split("/")[0]
+        coarse = points(G.landmass(P.MAPPROJ, view)[1])
+        fine = points(G.landmass(P.MAPPROJ, view, doc=G.local(slug))[1])
+        if not coarse or fine < coarse * 1.15:
+            continue            # too little of this country drawn to tell
+        got = points(re.search(r'<g class="countries"[^>]*>(.*?)</g>'
+                               r'(?=<g class="lyr|</g>)', html, re.S).group(1))
+        want, other = ((fine, coarse) if km <= G.LOCAL_LOD_MAX_KM
+                       else (coarse, fine))
+        assert abs(got - want) < abs(got - other), (
+            f"{rel(path)} frames {km} km and draws {got} coastline points; "
+            f"the {G.LOCAL_LOD_MAX_KM:.0f} km rule selects {want} and the "
+            f"other level is {other}. A coastline nine pixels coarse on a "
+            f"frame a reader is looking straight at is what this exists to "
+            f"stop; the finer one on a continental frame is bytes for "
+            f"nothing")
+        n += 1
+    assert n >= 8, f"only {n} plates were decisive enough to test"
+    return n
+
+
 @check("terrain draws only where the ground was measured to earn it")
 def c_terrain():
     """Five promises about the relief layer, on the shipped HTML.
