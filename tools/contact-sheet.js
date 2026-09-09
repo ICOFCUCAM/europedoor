@@ -42,7 +42,12 @@ const FAMILIES = [
   ["plan", "/plan/"],
 ];
 
-const SCALE = 0.31, COLS = 4, W = 1280, H = 1500;
+// --phone shoots the same twelve at 390px, which is the width most readers
+// have and the one this programme kept measuring and never LOOKING at. The
+// scale is higher because the frame is narrower; the sheet stays one image.
+const PHONE = process.argv.includes("--phone");
+const SCALE = PHONE ? 0.62 : 0.31, COLS = PHONE ? 6 : 4;
+const W = PHONE ? 390 : 1280, H = PHONE ? 1400 : 1500;
 
 (async () => {
   const cells = FAMILIES.map(

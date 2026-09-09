@@ -2132,6 +2132,12 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
 @media (max-width: 44rem) {
   .minimap:not(.dense) { --z: .42; }
   .minimap.dense .minilabel { display: none; }
+  /* And the names that only fit at the small size. Enlarging the type broke
+     the collision rule that placed it: 434 overlapping pairs on 275 of the
+     815 pages that draw a labelled map, "Hallstatt" through "Berchtesgaden"
+     by 49px. The build re-tests every box at this scale and marks the ones
+     that lose; they keep their place on a wide screen. */
+  .minimap .wide-only { display: none; }
 }
 
 /* AN INSTRUMENT'S TITLE IS A LABEL, BECAUSE THE PAGE IS THE TOOL.

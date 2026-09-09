@@ -1390,6 +1390,55 @@ async function main() {
   ok(stored.includes("experience:"), "saving an experience did not store it");
   await xp.close();
 
+  // ── enlarging the type broke the rule that placed it ───────────────
+  //
+  // Labels are positioned at build time against boxes measured at 11 units,
+  // and the phone rule draws a sparse map's names at 26 so they resolve into
+  // glyphs at all. Nothing re-ran the collision pass at the new size.
+  // Measured across every page that draws a labelled map, at 390px:
+  //
+  //     434 overlapping pairs on 275 of 815 pages
+  //     "Hallstatt" through "Berchtesgaden" by 49px
+  //     "Andorra la Vella" through "Madriu-Perafita-Claror" by 91px
+  //
+  // Found by LOOKING — a contact sheet at phone width — after a commit whose
+  // own measurements (label size in CSS pixels) were all green. Size and
+  // arrangement are different questions and only one of them was tested.
+  //
+  // The build now re-tests every box at the phone's scale and marks the ones
+  // that lose `wide-only`: 30% of labels are not drawn on a narrow screen,
+  // and every one of them keeps its dot, its <title> and its row below.
+  await page.setViewportSize({ width: 390, height: 800 });
+  for (const u of ["/europe/andorra/the-valleys/andorra-la-vella",
+                   "/europe/austria/salzburg-and-the-lakes/salzburg",
+                   "/europe/austria/vienna-and-the-east/vienna",
+                   "/journeys/the-alpine-grand-tour", "/events/oct",
+                   "/europe/austria"]) {
+    await page.goto(base + u, { waitUntil: "load" });
+    const clashes = await page.evaluate(() => {
+      const out = [];
+      for (const svg of document.querySelectorAll("figure.minimap svg")) {
+        const ls = [...svg.querySelectorAll("text.minilabel")]
+          .filter((t) => getComputedStyle(t).display !== "none")
+          .map((t) => ({ t: t.textContent.trim(), r: t.getBoundingClientRect() }));
+        for (let i = 0; i < ls.length; i++) {
+          for (let j = i + 1; j < ls.length; j++) {
+            const a = ls[i].r, c = ls[j].r;
+            if (Math.min(a.right, c.right) - Math.max(a.left, c.left) > 1 &&
+                Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top) > 1) {
+              out.push(`"${ls[i].t}" over "${ls[j].t}"`);
+            }
+          }
+        }
+      }
+      return out;
+    });
+    ok(clashes.length === 0,
+       `${u} at 390px: ${clashes.length} map labels overlap — ` +
+       clashes.slice(0, 2).join(", "));
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+
   // ── the door exists in both colour-scheme preferences ──────────────
   //
   // "Light wall, dark opening" is the whole reading of the aperture: a map
@@ -2113,7 +2162,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 808;
+  const FLOOR = 814;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +

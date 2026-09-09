@@ -1663,7 +1663,10 @@ def _declutter(items, w, h):
                for o in placed):
             continue
         placed.append(b)
-        out.append(svg)
+        # The box travels with the label: the phone pass re-tests it at the
+        # size a narrow screen draws it, and can only do that if it knows
+        # where the label ended up.
+        out.append((svg, b[0], b[1], b[2] - b[0], b[3] - b[1]))
     return out
 
 
@@ -1783,7 +1786,7 @@ def countrymap(data, c):
         more = f' and {len(offframe) - 4} more' if len(offframe) > 4 else ""
         note = (f' {len(offframe)} outside this frame: {links}{more} — too far from the '
                 f'mainland to draw at this scale without emptying the map.')
-    drawn = "".join(_declutter(labels, w, h))
+    drawn = "".join(phone_declutter(_declutter(labels, w, h)))
     return (
         f'<figure class="minimap countrymap arched{dense_class(drawn)}">'
         f'<svg viewBox="0 0 {w} {h}" role="img" data-world="intelligence" '
@@ -2113,11 +2116,14 @@ def minimap(data, t, span=3.2, about=None, named=None):
             # removes, and most of them were on this map: it draws every
             # neighbour it can reach, so it is the family that puts labels
             # nearest the curve. See place_label().
-            labels.append(place_label(
+            got = place_label_box(
                 px, py, n["city"]["name"], w, h,
-                cls="minilabel here" if here else "minilabel", off=8.0))
+                cls="minilabel here" if here else "minilabel", off=8.0)
+            if got:
+                labels.append(got)
+    drawnlabels = "".join(phone_declutter(labels))
     return (
-        f'<figure class="minimap arched{dense_class("".join(labels))}">'
+        f'<figure class="minimap arched{dense_class(drawnlabels)}">'
         f'<svg viewBox="0 0 {w} {h}" role="img" data-world="intelligence" '
         f'aria-label="Map of {esc(t["name"])} and the places around it">'
         f'<defs>{arch_clip(uid, w, h)}</defs>'
@@ -2125,7 +2131,7 @@ def minimap(data, t, span=3.2, about=None, named=None):
         f'<rect x="0" y="0" width="{w}" height="{h}" class="archground"/>'
         f'<g transform="translate({w/2 - cx*span:.2f},{h/2 - cy*span:.2f}) scale({span})">'
         f'{ctx}{land}</g>'
-        f'{"".join(dots)}{"".join(labels)}{bar}</g>{arch_edge(w, h)}</svg>'
+        f'{"".join(dots)}{drawnlabels}{bar}</g>{arch_edge(w, h)}</svg>'
         # `about` names something INSIDE this destination — a place page's
         # subject. The map is then honestly captioned as what it is: this
         # atlas has one projection and its finest unit is about four
@@ -2325,6 +2331,50 @@ def hit_radius(pts, vw, cap=34.0, floor=6.0):
     return max(floor, min(cap, near / 2.0))
 
 
+# The phone rule enlarges a sparse map's labels from 11 units to 26 (see the
+# stylesheet). That is the ratio the boxes grow by, and the build has to know
+# it because only the build can decide which names survive the larger size.
+PHONE_LABEL_SCALE = 26.0 / 11.0
+
+
+def phone_declutter(placed):
+    """Which of these labels still fit once a phone enlarges them.
+
+    ENLARGING THE TYPE BROKE THE RULE THAT PLACED IT.
+
+    Labels are positioned at build time against boxes measured at 11 units,
+    and commit 38 made a phone draw them at 26 so they resolve into glyphs at
+    all. Nothing re-ran the collision pass at the new size: measured across
+    every page that draws a labelled map, at 390px, **434 overlapping pairs
+    on 275 of 815 pages** — "Hallstatt" through "Berchtesgaden" by 49px,
+    "Andorra la Vella" through "Madriu-Perafita-Claror" by 91.
+
+    A fix that shrinks the type back is the original defect; one that drops
+    every label is worse than the collision. So the boxes are re-tested here
+    at the phone's scale, growing about each label's own anchor, and the ones
+    that lose are marked `wide-only` — they keep their place and their size
+    on a wide screen and are not drawn on a narrow one. The dot, the <title>
+    and the row below survive either way, as they do for a collision.
+
+    `placed` is [(html, x0, y0, w, h)]; returns the html, in order.
+    """
+    kept, out = [], []
+    for html, x0, y0, w, h in placed:
+        cx, cy = x0 + w / 2.0, y0 + h / 2.0
+        bw, bh = w * PHONE_LABEL_SCALE, h * PHONE_LABEL_SCALE
+        box = (cx - bw / 2.0, cy - bh / 2.0, bw, bh)
+        clash = any(box[0] < k[0] + k[2] and k[0] < box[0] + box[2]
+                    and box[1] < k[1] + k[3] and k[1] < box[1] + box[3]
+                    for k in kept)
+        if clash:
+            out.append(html.replace('class="minilabel', 'class="wide-only minilabel', 1)
+                       if 'class="minilabel' in html else html)
+        else:
+            kept.append(box)
+            out.append(html)
+    return out
+
+
 def dense_class(markup):
     """Does this map draw more names than a phone can enlarge?
 
@@ -2493,7 +2543,11 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
         # Four candidate positions, each tested against the real curve.
         # See place_label(): the previous rule tested the rectangle, which is
         # not the edge that cuts.
-        lab.append(place_label(px, py, name, vw, vh))
+        # The box comes back too: the phone pass has to re-test it at the
+        # larger size the stylesheet draws it at.
+        got = place_label_box(px, py, name, vw, vh)
+        if got:
+            lab.append(got)
     # A ROUTE IS THE SAME PICTURE WITH ONE MORE ELEMENT. `line` draws the
     # order; a theme, a month or a motion has no order and passes False,
     # and that single element is the whole difference between "these places
@@ -2529,6 +2583,7 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
     # knows. A map with two names can afford to draw them at two and a half
     # times the size on a phone; one with forty-one cannot, and its names are
     # in the list underneath the figure on every page that draws it.
+    lab = phone_declutter(lab)
     dense = dense_class("".join(lab))
     return (
         f'<figure class="minimap pointsmap arched{dense}">'

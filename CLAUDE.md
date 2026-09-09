@@ -303,6 +303,20 @@ shipped HTML — a page printing a hop says "straight line", and no page
 anywhere claims a mode or a ground distance. A source-level check would have
 passed on all three.
 
+**Enlarging the type broke the rule that placed it.** Labels are positioned
+at build time against boxes measured at 11 units; the phone rule draws a
+sparse map's names at 26 so they resolve into glyphs at all. Nothing re-ran
+the collision pass at the new size — **434 overlapping pairs, on a third of
+every page that draws a labelled map**, "Hallstatt" through "Berchtesgaden" by
+49px, "Andorra la Vella" through "Madriu-Perafita-Claror" by 91. Found by
+*looking*, on a contact sheet at phone width, one commit after every
+measurement of label **size** came back green. **Size and arrangement are
+different questions and only one of them was being tested.**
+`phone_declutter()` re-tests every box at the phone's scale and marks the
+losers `wide-only`: 30% of labels are not drawn on a narrow screen, and each
+keeps its dot, its `<title>` and its row below. `tools/contact-sheet.js`
+takes `--phone` as well as `--dark`.
+
 **The signature existed in one colour-scheme preference.** *Light wall, dark
 opening* is the whole reading of the aperture — the corners outside the arch
 show the page through, which is why a map figure paints no background.
