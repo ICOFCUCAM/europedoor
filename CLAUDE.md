@@ -303,6 +303,38 @@ shipped HTML — a page printing a hop says "straight line", and no page
 anywhere claims a mode or a ground distance. A source-level check would have
 passed on all three.
 
+**A dot on a map is a link, and it was 3.9 pixels wide.** WCAG 2.2 AA puts
+the floor at 24. The suite measured the thumb bar's five items and nothing
+else, so 130 links on `/beyond-the-obvious`, 12 on a destination page and 345
+country shapes on `/map` were never looked at. Enlarging the drawn dot would
+destroy the map, so each link carries a transparent circle sized at build
+time to **half the distance to its nearest neighbour** — the largest target
+that can never steal an adjacent tap.
+
+**Where it still cannot reach 24, SC 2.5.8 asks for the same function
+elsewhere on the page, and three families did not have it.** Six of
+Innsbruck's twelve dots led to places appearing nowhere else in the document
+— not in the rows, not in the prose, not in the structured data. A dot the
+page cannot name is now **context**: it keeps its `<title>`, loses its link,
+and stops pretending to be navigation. The marker for the page you are on
+stopped linking to itself. And `/map`'s text alternative now names the fifty
+countries as well as the 319 destinations, because twenty of them draw
+between 3.6 and 12 pixels wide.
+
+**Measuring it the strict way was itself wrong**, and said the journey pages
+had six unreachable stops. They are links inside an `h3`, 22px tall because
+that is the line — and SC 2.5.8's own Inline exception exempts them. The
+equivalent is judged on existing, not on being 24px itself.
+
+**Three assertions broke on this, each pinning a shape rather than a
+promise.** §17 counted `<circle>` and six stops became twelve; rewritten to
+`<title>` it read thirty-one, because the land under the route carries a
+title per country; it now counts destination links inside the figure. The
+map's text alternative was asserted by a bare count of its links, which grew
+by fifty. And the country total was asserted against `.cshape` alone, reading
+44 against 50 — six countries have no polygon at 1:50m and are drawn as a
+ringed point.
+
 **A map label is 11 units, not 11 pixels, and on a phone it rendered at
 3.9.** `.minilabel` is sized in a 1000-unit viewBox and the browser scales
 that viewBox to its container, so what a reader gets is `11 × (width/1000)`:

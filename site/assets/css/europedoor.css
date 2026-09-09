@@ -2055,6 +2055,16 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
   stroke: var(--map-sea); stroke-width: 3; }
 .minimap.arched .rlabel:hover text { fill: var(--lime); }
 
+/* THE TAP TARGET IS NOT THE DOT.
+   A .minidot is r=5.5 in a 1000-unit viewBox, which renders at 3.9px across
+   on a 358px phone; WCAG 2.2 AA puts the floor at 24. Enlarging the drawn
+   dot would destroy the map, so each link carries a transparent circle
+   behind its dot, sized at build time to half the distance to the nearest
+   other dot — the largest target that can never steal a neighbour's tap. */
+.minidot .hit { fill: transparent; stroke: none; }
+/* A context dot is not a link and must not offer to be one. */
+.minidot.context { pointer-events: none; }
+
 /* A LABEL THAT DOES NOT RESOLVE INTO GLYPHS IS WORSE THAN NO LABEL.
    `.minilabel` is 11 units in a 1000-unit viewBox and the browser scales the
    viewBox to its container, so the size a reader actually gets is

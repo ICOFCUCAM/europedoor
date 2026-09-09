@@ -817,6 +817,10 @@ def city_page(data, c, r, t):
         <p class="rowmeta">{esc(hop_note(haversine(t, n['city'])))} away</p></a>"""
         for n in near
     )
+    # What the page names, the map may link. See minimap(): six of Innsbruck's
+    # twelve dots led to places that appeared nowhere else in the document.
+    nearnamed = {urls.city(n["country"], n["region"], n["city"]) for n in near}
+
     stay = nights_line(t)
 
     # Everything that points at this city. These are the graph edges: a
@@ -930,7 +934,7 @@ def city_page(data, c, r, t):
 
 <div class="placeband{'' if has_photo else ' maponly'}">
   {photo_block}
-  <div class="placeband-map">{minimap(data, t, span="auto")}</div>
+  <div class="placeband-map">{minimap(data, t, span="auto", named=nearnamed)}</div>
   <p class="sourcenote">{esc(t["name"])} is at <span class="mono">{coord_line(t)}</span>.</p>
 </div>
 {sectionnav([
@@ -1709,6 +1713,11 @@ def countrymap(data, c):
     deepest = max(depth.values()) or 1
 
     dots, ties, labels, offframe = [], [], [], []
+    hitr = hit_radius(
+        [proj.xy(t["lat"], t["lon"]) for r in c["regions"] for t in r["cities"]
+         if -8 <= proj.xy(t["lat"], t["lon"])[0] <= w + 8
+         and -8 <= proj.xy(t["lat"], t["lon"])[1] <= h + 8],
+        w, cap=34.0 * w / 1000.0)
     for r in c["regions"]:
         rp = []
         for t in r["cities"]:
@@ -1719,6 +1728,7 @@ def countrymap(data, c):
             rp.append((x, y))
             dots.append(
                 f'<a class="minidot" href="{urls.city(c, r, t)}">'
+                f'<circle class="hit" cx="{x:.1f}" cy="{y:.1f}" r="{hitr:.1f}"/>'
                 f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.4"/>'
                 f'<title>{esc(t["name"])} — {esc(r["name"])}</title></a>'
             )
@@ -1973,7 +1983,7 @@ def orient_line(t):
 # survives the thing it captions is worse than no caption.
 
 
-def minimap(data, t, span=3.2, about=None):
+def minimap(data, t, span=3.2, about=None, named=None):
     """A small map centred on one destination, drawn from the same
     projection the big map uses. Its neighbours are on it so the reader can
     see the shape of the onward journey rather than read distances.
@@ -2053,6 +2063,15 @@ def minimap(data, t, span=3.2, about=None):
                         _lat_at(cy - h / 2 / span), LCC_MID_LON,
                         1.0 / span, w, h)
     dots, labels = [], []
+    inframe = []
+    for _cid, n in sorted(data["cities"].items()):
+        x, y = project(n["city"]["lat"], n["city"]["lon"])
+        dx, dy = (x - cx), (y - cy)
+        if abs(dx) > w / 2 / span or abs(dy) > h / 2 / span:
+            continue
+        inframe.append((w / 2 + dx * span, h / 2 + dy * span))
+    # The frame here is w wide rather than 1000, so the cap scales with it.
+    hitr = hit_radius(inframe, w, cap=34.0 * w / 1000.0)
     for cid, n in sorted(data["cities"].items()):
         x, y = project(n["city"]["lat"], n["city"]["lon"])
         dx, dy = (x - cx), (y - cy)
@@ -2060,11 +2079,34 @@ def minimap(data, t, span=3.2, about=None):
             continue
         px, py = w / 2 + dx * span, h / 2 + dy * span
         here = n["city"] is t
-        dots.append(
-            f'<a class="minidot{" here" if here else ""}" href="{urls.city(n["country"], n["region"], n["city"])}">'
-            f'<circle cx="{px:.1f}" cy="{py:.1f}" r="{5.5 if here else 3.6}"/>'
-            f'<title>{esc(n["city"]["name"])}, {esc(n["country"]["name"])}</title></a>'
-        )
+        # A DOT THE PAGE CANNOT NAME IS NOT A LINK.
+        #
+        # This map draws every destination that falls in the frame, and the
+        # page lists the eight nearest. On Innsbruck that is twelve dots and
+        # eight rows: Hallstatt, Bled, Bovec, Lauterbrunnen and St. Moritz
+        # were reachable ONLY as a 4.9-pixel circle, appearing nowhere else
+        # in the document — not in the rows, not in the prose, not in the
+        # structured data. Six links on a phone that no reader could hit and
+        # no screen reader would ever reach in the flow.
+        #
+        # The context dots are worth keeping: they are what shows that
+        # Innsbruck sits among others rather than alone. So they stay as
+        # context, with their name in a <title>, and stop pretending to be
+        # navigation. What the page names, the map links.
+        url = urls.city(n["country"], n["region"], n["city"])
+        title = f'<title>{esc(n["city"]["name"])}, {esc(n["country"]["name"])}</title>'
+        # The "here" dot linked to the page it is drawn on. That is a marker,
+        # not navigation, and a 5.5-unit self-link is the worst kind of small
+        # target: it costs a tap and goes nowhere.
+        links = (named is None or url in named) and not here
+        body = (f'<circle class="hit" cx="{px:.1f}" cy="{py:.1f}" r="{hitr:.1f}"/>'
+                if links else "")
+        body += f'<circle cx="{px:.1f}" cy="{py:.1f}" r="{5.5 if here else 3.6}"/>'
+        if links:
+            dots.append(f'<a class="minidot" href="{url}">{body}{title}</a>')
+        else:
+            dots.append(f'<g class="minidot{" here" if here else " context"}">'
+                        f'{body}{title}</g>')
         if here or abs(dx) < w / 2 / span * 0.62:
             # Against the aperture, not the rectangle. Fourteen names across
             # the site were drawn entirely inside the corner the arch
@@ -2251,6 +2293,38 @@ def place_label(px, py, name, vw, vh, cls="minilabel here", off=10.0,
     return got[0] if got else ""
 
 
+def hit_radius(pts, vw, cap=34.0, floor=6.0):
+    """The largest touch target these dots can carry without overlapping.
+
+    A DOT ON A MAP IS A LINK, AND IT WAS 3.9 PIXELS WIDE.
+
+    The visible circle is r=5.5 in a 1000-unit viewBox, which on a 358px
+    phone renders at 3.9px across. WCAG 2.2 AA puts the floor at 24. The
+    suite already checked the thumb bar's five items and nothing else, so 130
+    links on /beyond-the-obvious, 12 on a destination page and 345 on /map
+    were never looked at.
+
+    Enlarging the DRAWN dot would destroy the map, so the target is a
+    transparent circle behind it, and its size is not a constant: it is half
+    the distance to the nearest other dot, so two neighbours can never steal
+    each other's tap. Where that is small the map is dense, the target stays
+    small, and the honest answer is the list of the same places underneath —
+    which is on every page that draws one of these maps, and which the
+    caption points at.
+
+    `cap` is 34 units, the radius that renders at 24px at 390.
+    """
+    if len(pts) < 2:
+        return cap
+    near = cap * 2
+    for i, a in enumerate(pts):
+        for b in pts[i + 1:]:
+            d = math.hypot(a[0] - b[0], a[1] - b[1])
+            if d < near:
+                near = d
+    return max(floor, min(cap, near / 2.0))
+
+
 def dense_class(markup):
     """Does this map draw more names than a phone can enlarge?
 
@@ -2401,10 +2475,12 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
     # and far apart, and 0.20 of a continental frame dropped Tirana's label
     # for being within 300px of Budapest's.
     dx_min, dy_min = vw * 0.10, vh * 0.030
+    hitr = hit_radius([((x - x0) * k, (y - y0) * k) for x, y, _h, _n in pts], vw)
     for x, y, href, name in pts:
         px, py = (x - x0) * k, (y - y0) * k
         dots.append(
             f'<a class="minidot here" href="{href}">'
+            f'<circle class="hit" cx="{px:.1f}" cy="{py:.1f}" r="{hitr:.1f}"/>'
             f'<circle cx="{px:.1f}" cy="{py:.1f}" r="5.5"/>'
             f'<title>{esc(name)}</title></a>'
         )
@@ -3546,6 +3622,20 @@ def maplist(data):
         )
         blocks.append(f'<h3>{esc(macro)} <span class="small">{len(by_macro[macro])}</span></h3>'
                       f'<ul class="stack cols">{items}</ul>')
+    # AND THE COUNTRIES, because twenty of the fifty are drawn small enough
+    # that their shape is the only way in: Monaco and Vatican City are a
+    # ringed point, and Andorra, Liechtenstein, San Marino, Malta and the
+    # Baltic republics render between 3.6 and 12 pixels wide on a phone.
+    # WCAG 2.5.8 allows a small target where the same function is available
+    # from a control on the SAME page that is not small; this list is that
+    # control, and it did not carry countries.
+    countries = "".join(
+        f'<li><a href="{urls.country(c)}">{esc(c["name"])}</a></li>'
+        for c in sorted(data["countries"].values(), key=lambda c: c["name"])
+    )
+    blocks.insert(0, f'<h3>Every country <span class="small">'
+                     f'{len(data["countries"])}</span></h3>'
+                     f'<ul class="stack cols">{countries}</ul>')
     return (f'<details class="maplist" id="maplist">'
             f'<summary>Every place on this map, as a list '
             f'({len(data["cities"])} places, grouped by region)</summary>'

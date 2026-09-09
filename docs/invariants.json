@@ -102,9 +102,9 @@
       "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it is allowed to move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence."
     },
     "weight.max_page_kb": {
-      "value": 437,
+      "value": 440,
       "kind": "ceiling",
-      "why": "The heaviest page on the site. Guards against a template quietly inlining something large across a whole family, which is how the coastline reached 51 pages and 2.1 MB."
+      "why": "The heaviest page on the site. Guards against a template quietly inlining something large across a whole family, which is how the coastline reached 51 pages and 2.1 MB. It moved 437 -> 440 for /map's text alternative, which now names the fifty countries as well as the 319 destinations: twenty of those countries draw between 3.6 and 12 pixels wide on a phone and their shape was the only way in. Three kilobytes for twenty targets nobody could hit."
     },
     "signature.apertures": {
       "value": 816,
@@ -141,7 +141,7 @@
         "chip": 0.523
       },
       "kind": "floor",
-      "why": "The share of pages each primitive appears on. A family that quietly stops using one has grown its own components and the design system has forked without anybody deciding — which is the failure this floor exists to catch. A family that stops using one ON PURPOSE is the other thing that moves it, and the difference is whether the drop is recorded here in the same commit with the composition that caused it. The essay family cost pagehead, row and band about a hundredth each: nine story pages that no longer share the atlas chassis, which is the whole point of them. THESE NUMBERS WERE WRONG UNTIL THE DESTINATION EXEMPLAR: the matcher used \\b, and a hyphen is a word boundary, so `card` counted `card-art` and `row` counted `rowsub`. The card floor read 0.785 and the true figure is 0.226 — the most-cited primitive in the design system was three-quarters an image wrapper. AND THE EVENTS FAMILY COST `chip` 0.012: the year band replaced twelve identical month chips on the index and a previous / whole-year / next row on each month page — thirteen pages where the chip was doing the work a chart should do. Every one of those pages still reaches every month, from a control that also says how many fixtures each holds."
+      "why": "The share of pages each primitive appears on. A family that quietly stops using one has grown its own components and the design system has forked without anybody deciding — which is the failure this floor exists to catch. A family that stops using one ON PURPOSE is the other thing that moves it, and the difference is whether the drop is recorded here in the same commit with the composition that caused it. The essay family cost pagehead, row and band about a hundredth each: nine story pages that no longer share the atlas chassis, which is the whole point of them. THESE NUMBERS WERE WRONG UNTIL THE DESTINATION EXEMPLAR: the matcher used \\b, and a hyphen is a word boundary, so `card` counted `card-art` and `row` counted `rowsub`. The card floor read 0.785 and the true figure is 0.226 — the most-cited primitive in the design system was three-quarters an image wrapper."
     }
   }
 }

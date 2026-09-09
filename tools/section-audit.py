@@ -474,13 +474,23 @@ def s17():
     import re as _re
     _m = _re.search(r'aria-label="Route map[^>]*>(.*?)</svg>', h, _re.S)
     _svg = _m.group(1) if _m else ""
-    # Counted as CIRCLES, not as `class="routedot"`. The promise is that
-    # every stop is on the map; the class was the old implementation, and it
-    # changed when the route map was rebuilt on the shared pointsmap (the
-    # stops became links, so each dot is now an <a> wrapping a <circle>).
-    # An assertion that names a class fails on a refactor and passes on a
-    # missing stop, which is exactly backwards.
-    yield _svg.count('<circle') == len(
+    # Counted as NAMES, not as `class="routedot"` and not as circles either.
+    # The promise is that every stop is on the map. The class was the first
+    # implementation and changed when the route map moved to the shared
+    # pointsmap; the circle count was the second and changed when each dot
+    # grew a transparent touch target behind it, so six stops became twelve
+    # circles. Both failed on a refactor and would have passed on a missing
+    # stop, which is exactly backwards.
+    #
+    # Counted as DESTINATIONS REACHED FROM THE DRAWING. <title> was tried and
+    # is wrong for a third reason: the land under the route carries a title
+    # per country, so six stops read as thirty-one. The promise is that every
+    # stop is on the map and can be got to from it, which is exactly the set
+    # of destination links inside the figure — no class name, no shape count,
+    # and it fails on a missing stop rather than on a refactor.
+    import re as _re
+    _stops = set(_re.findall(r'href="(/europe/[^"]+/[^"]+/[^"]+)"', _svg))
+    yield len(_stops) == len(
         [j for j in DATA["journeys"] if j["slug"] == "the-alpine-grand-tour"][0]["legs"]), \
         "every stop is on the map, labelled or not"
     yield has(u, "The route", "What to pack", "Estimated cost", "Difficulty",

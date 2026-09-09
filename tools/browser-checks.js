@@ -1299,9 +1299,32 @@ async function main() {
   const described = await phone.getAttribute(".europemap", "aria-describedby");
   ok(described === "maplist", "the map does not point at its text alternative");
   ok(await phone.locator("#maplist").count() === 1, "there is no text alternative to the map");
-  const listed = await phone.locator("#maplist li a").count();
+  // THIS COUNTED EVERY LINK IN THE LIST AND THE LIST GREW A SECOND JOB.
+  // The alternative now also carries the fifty countries, because twenty of
+  // them draw between 3.6 and 12 pixels wide on a phone and their shape was
+  // the only way in — SC 2.5.8 allows a small target where the same function
+  // is on the same page, and this list is that control. So a bare count of
+  // `#maplist li a` went from 319 to 369 and failed for the right reason and
+  // the wrong claim. The promise is that every place the map DRAWS is in the
+  // list; it is now asserted against the destination links specifically, and
+  // the countries are asserted as their own half.
+  const listed = await phone.locator('#maplist li a[href^="/europe/"]')
+    .evaluateAll((as) => as.filter((a) => a.getAttribute("href").split("/").length > 3).length);
   const dotted = await phone.locator("#dots .dot").count();
   ok(listed === dotted, `the map draws ${dotted} places and lists ${listed}`);
+  const listedCountries = await phone.locator('#maplist li a[href^="/europe/"]')
+    .evaluateAll((as) => as.filter((a) => a.getAttribute("href").split("/").length === 3).length);
+  // Six countries have no polygon at 1:50m and are drawn as a ringed point
+  // instead — Andorra, Liechtenstein, Malta, Monaco, San Marino and Vatican
+  // City — so the drawn total is shapes plus points, not shapes alone. The
+  // first version asserted against `.cshape` only and read 44 against 50,
+  // which is the check being wrong rather than the page.
+  const mapShapes = await phone.locator("#countries a.cshape").count();
+  const mapPoints = await phone.locator("#nogeo a.cpoint").count();
+  ok(listedCountries === mapShapes + mapPoints,
+     `the map draws ${mapShapes + mapPoints} countries ` +
+     `(${mapShapes} as shapes, ${mapPoints} as points) and the list names ` +
+     `${listedCountries}`);
 
   // The map is allowed to scroll inside its own container, and must not
   // make the page scroll.
@@ -1366,6 +1389,60 @@ async function main() {
   const stored = await xp.evaluate(() => localStorage.getItem("europedoor.saved.v1") || "");
   ok(stored.includes("experience:"), "saving an experience did not store it");
   await xp.close();
+
+  // ── a target too small to hit, and no other way in ─────────────────
+  //
+  // A .minidot is r=5.5 in a 1000-unit viewBox: 3.9px across on a 358px
+  // phone, against WCAG 2.2 AA's 24px floor. The suite already measured the
+  // thumb bar's five items and nothing else, so 130 links on
+  // /beyond-the-obvious, 12 on a destination page and 345 country shapes on
+  // /map went unlooked-at for the life of the map.
+  //
+  // A geographic dot cannot always be 24px — 130 of them at that size on a
+  // 358px map is a solid block — and SC 2.5.8 does not ask it to: a small
+  // target is allowed where the same function is available from another
+  // control on the SAME page. So this asserts the pair. Each dot's target is
+  // as large as it can be without stealing its neighbour's tap (build-time,
+  // half the nearest-neighbour distance), and where that is still under 24
+  // the destination must be reachable as a text link on the page.
+  //
+  // Inline text links are exempt from the size floor by SC 2.5.8's own
+  // Inline exception, so the equivalent is judged on existing, not on being
+  // 24px itself. Measuring it the strict way first said the journey pages
+  // had six unreachable stops, which was the measurement being wrong: they
+  // are links inside an h3, 22px tall because that is the line.
+  for (const u of ["/europe/austria/tyrol/innsbruck", "/europe/austria",
+                   "/journeys/the-alpine-grand-tour", "/beyond-the-obvious",
+                   "/events/oct", "/europe-in/northern-lights", "/map"]) {
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.goto(base + u, { waitUntil: "load" });
+    const gaps = await page.evaluate(() => {
+      const text = new Set();
+      for (const a of document.querySelectorAll("a")) {
+        if (a.closest("svg")) continue;
+        const h = a.getAttribute("href");
+        if (h) text.add(h);
+      }
+      const out = [];
+      for (const a of document.querySelectorAll("svg a.minidot, svg a.cshape")) {
+        const r = a.getBoundingClientRect();
+        if (Math.min(r.width, r.height) >= 24) continue;
+        const h = a.getAttribute("href");
+        if (!text.has(h)) out.push(h);
+      }
+      return out;
+    });
+    ok(gaps.length === 0,
+       `${u}: ${gaps.length} map link(s) under 24px with no text equivalent ` +
+       `on the page — ${gaps.slice(0, 2).join(", ")}`);
+    // And the marker for the page you are already on is a marker, not a
+    // link: a 5.5-unit self-link costs a tap and goes nowhere.
+    const self = await page.evaluate((path) =>
+      [...document.querySelectorAll("svg a.minidot")]
+        .filter((a) => a.getAttribute("href") === path).length, new URL(base + u).pathname);
+    ok(self === 0, `${u}: the map links to the page it is drawn on`);
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
 
   // ── a name too small to be a name ──────────────────────────────────
   //
@@ -1934,7 +2011,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 758;
+  const FLOOR = 772;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +
