@@ -1015,10 +1015,39 @@ def countryportrait(data, c):
             px, py = proj.xy(t["lat"], t["lon"])
             if 0 <= px <= w and 0 <= py <= h:
                 iscap = bool(cap_name and t["name"].split(" &")[0] == cap_name)
-                order_.append((0 if iscap else 1, -_depth(t), px, py,
-                               t["name"], iscap, t.get("city_type") or ""))
+                kind_ = t.get("city_type") or ""
+                # MINOR LOCATIONS GIVE WAY FIRST. An atlas drops the smallest
+                # names when a plate runs out of room, not whichever the
+                # alphabet reached last: capital, then city, then everything
+                # else by how much this atlas has written about it.
+                rank_ = 0 if iscap else (1 if kind_ == "city" else 2)
+                order_.append((rank_, -_depth(t), px, py,
+                               t["name"], iscap, kind_))
     order_.sort()
-    dotmarks, boxes_ = "", []
+    dotmarks, boxes_, minor = "", [], []
+
+    def _try_label(px, py, text, cls, metric="minilabel", off=10.0,
+                   prefer="beside"):
+        """Place a label if it fits the aperture and hits nothing already there.
+
+        One placement routine for every level of the hierarchy, so a region
+        name and a village name compete on the same terms and in the order
+        the hierarchy sets — which is the whole point of having one.
+        """
+        got = place_label_box(px, py, text, w, h, cls=cls, off=off,
+                              prefer=prefer, metric=metric)
+        if not got:
+            return False
+        lhtml, lx, ly, lw, lh = got
+        bx = (lx - LABEL_CLEAR, ly - LABEL_CLEAR,
+              lx + lw + LABEL_CLEAR, ly + lh + LABEL_CLEAR)
+        if any(not (bx[2] < q[0] or bx[0] > q[2]
+                    or bx[3] < q[1] or bx[1] > q[3]) for q in boxes_):
+            return False
+        boxes_.append(bx)
+        labs_.append(lhtml)
+        return True
+
     for _k, _d, px, py, nm, iscap, kind in order_:
         # A CARTOGRAPHIC TYPE HIERARCHY, FROM DATA THE ATLAS ALREADY HOLDS.
         # Every place used to be the same dot and the same 11px name, which
@@ -1043,29 +1072,54 @@ def countryportrait(data, c):
             dotmarks += (f'<circle class="pmark{"" if city else " open"}" '
                          f'cx="{px:.1f}" cy="{py:.1f}" r="{3.4 if city else 3.0}">'
                          f'<title>{esc(nm)}</title></circle>')
-        got = place_label_box(px, py, nm, w, h,
-                              cls="pname" + (" cap" if iscap else ""))
-        if not got:
-            continue
-        lhtml, lx, ly, lw, lh = got
-        box = (lx - LABEL_CLEAR, ly - LABEL_CLEAR,
-               lx + lw + LABEL_CLEAR, ly + lh + LABEL_CLEAR)
         # A REAL BOX OVERLAP, NOT A DISTANCE. The first version dropped a
         # label only if its DOT was within 8% of the frame of another dot,
         # which says nothing about a name 28 characters long: France drew
-        # "Sarlat & the Puy-en-Velay" through "Clermont-Ferrand" and
-        # "Biarritz & the Basque Coast" through "Toulouse", because the dots
-        # were far enough apart and the words were not.
-        if any(not (box[2] < q[0] or box[0] > q[2]
-                    or box[3] < q[1] or box[1] > q[3]) for q in boxes_):
+        # "Sarlat & the Puy-en-Velay" through "Clermont-Ferrand", because the
+        # dots were far enough apart and the words were not.
+        #
+        # Rank 2 — everything that is not a capital or a city — waits for the
+        # second pass, so a REGION can take the space instead. A grouping is
+        # a level of the hierarchy and only exists if it can win something:
+        # placed last, it was drawn on twelve plates of fifty and never on a
+        # large country.
+        if _k >= 2:
+            minor.append((px, py, nm))
             continue
-        boxes_.append(box)
-        labs_.append(lhtml)
+        _try_label(px, py, nm, "pname" + (" cap" if iscap else ""))
     # THE PLATE NAMES ITS OWN SUBJECT. An atlas plate has the country's name
     # set across it, and there is a second reason here: the recognition test
     # strips the wordmark and the page title, and a plate that names what it
     # draws survives that where a shape alone does not. Tracked, quiet, and
     # UNDER the place names, which are the ones a reader is looking for.
+    # REGIONS, IN SPACED UPPERCASE, AT THE MIDDLE OF THEIR OWN DESTINATIONS.
+    # We hold which destinations belong to a region and no region geometry,
+    # so a region is named where its places are and nowhere else — the same
+    # honest device the reference map uses, and the reason there is no
+    # boundary round it. Placed after the place names and tested against the
+    # same boxes, so a region name never costs a destination its name: a
+    # grouping is the thing a reader can most afford to lose.
+    for r_ in c["regions"]:
+        pts_r = [proj.xy(t["lat"], t["lon"]) for t in r_["cities"]]
+        pts_r = [(x, y) for x, y in pts_r if 0 <= x <= w and 0 <= y <= h]
+        if len(pts_r) < 2:
+            continue
+        rx = sum(p[0] for p in pts_r) / len(pts_r)
+        ry = sum(p[1] for p in pts_r) / len(pts_r)
+        got = place_label_box(rx, ry, r_["name"].upper(), w, h,
+                              cls="rname", off=9.0, prefer="over",
+                              metric="rlabel")
+        if not got:
+            continue
+        lhtml, lx, ly, lw, lh = got
+        box = (lx - LABEL_CLEAR, ly - LABEL_CLEAR,
+               lx + lw + LABEL_CLEAR, ly + lh + LABEL_CLEAR)
+        if any(not (box[2] < q[0] or box[0] > q[2]
+                    or box[3] < q[1] or box[1] > q[3]) for q in boxes_):
+            continue
+        boxes_.append(box)
+        labs_.append(lhtml)
+
     cbox = _highlight_box(land)
     countryname = ""
     if cbox:

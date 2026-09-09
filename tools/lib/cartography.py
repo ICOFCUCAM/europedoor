@@ -62,6 +62,8 @@ SOURCES = {
     "region-bounds":  "regions-lod1.json",
     "cities":         None,
     "destinations":   None,
+    "feature-labels": "features-lod1.json",
+    "water-labels":   "marine-lod1.json",
     "labels":         None,
     "route":          None,
     "selected":       "countries",
@@ -72,7 +74,8 @@ SOURCES = {
 # reorder it.
 ORDER = ("ocean", "coastal-water", "land", "terrain", "hillshade", "rivers",
          "coastline", "country-bounds", "region-bounds", "cities",
-         "destinations", "labels", "route", "selected")
+         "destinations", "feature-labels", "water-labels", "labels", "route",
+         "selected")
 
 
 # ── VISUAL STYLE ──────────────────────────────────────────────────────
@@ -114,6 +117,15 @@ TERRAIN_CHAIN = ("dem", "hypsometric", "hillshade", "terrain-texture",
                  "country-mask", "country-bounds", "rivers", "labels")
 
 DECIDED = {
+    "feature-labels": "Named ranges and basins — ALPS, PYRENEES, MASSIF "
+                      "CENTRAL — in an italic serif, the way a printed atlas "
+                      "has always set a physical feature apart from a "
+                      "political one. THIS IS THE LAYER THAT LETS A READER "
+                      "SEE WHERE THE ALPS ARE BEFORE ANY DEM EXISTS, which "
+                      "is why it is worth fetching first.",
+    "water-labels": "Sea and ocean names in widely tracked uppercase, in the "
+                    "water colour rather than in ink. An area, not a point, "
+                    "which is why it is tracked and why it carries no mark.",
     "terrain": "The five steps of HYPSOMETRIC above, from the land tone "
                "toward the warm accent. No hypsometric rainbow: in an "
                "editorial atlas height is felt, not read off a legend, and "
@@ -291,6 +303,54 @@ def rivers(proj, view):
     return "".join(out)
 
 
+def area_labels(path, proj, view, cls):
+    """Named areas — seas, ranges, basins — as one word each where they are.
+
+    Written before the data for the same reason `rivers()` is: a layer that
+    quietly renders nothing once its file arrives is the failure this stack
+    exists to make impossible.
+
+    The geometry is only ever read for WHERE to put the word. An area label
+    is a name, not an outline, and drawing the edge of the Alps from a
+    polygon somebody else generalised would be a claim about where they end.
+    `at` is the label point the pipeline chose rather than a centroid taken
+    here, because the centroid of a crescent-shaped range falls outside it.
+    """
+    doc = geo.load(path)
+    if not doc:
+        return ""
+    x, y, w, h = view
+    out = []
+    for feat in doc.get("features", []):
+        name = (feat.get("name") or "").strip()
+        at = feat.get("at")
+        if not name or not at or len(at) < 2:
+            continue
+        px, py = proj.xy(at[1], at[0])
+        if not (x <= px <= x + w and y <= py <= y + h):
+            continue
+        out.append(f'<text class="{cls}" x="{px:.1f}" y="{py:.1f}" '
+                   f'text-anchor="middle">{_esc(name)}</text>')
+    return "".join(out)
+
+
+def _esc(x):
+    return (str(x).replace("&", "&amp;").replace("<", "&lt;")
+            .replace(">", "&gt;").replace('"', "&quot;"))
+
+
+def feature_labels(proj, view):
+    if not held("feature-labels"):
+        return ""
+    return area_labels(SOURCES["feature-labels"], proj, view, "fname")
+
+
+def water_labels(proj, view):
+    if not held("water-labels"):
+        return ""
+    return area_labels(SOURCES["water-labels"], proj, view, "sname")
+
+
 def region_bounds(proj, view):
     if not held("region-bounds"):
         return ""
@@ -331,6 +391,10 @@ def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
             body.append(_group(name, rivers(proj, view)))
         elif name == "region-bounds":
             body.append(_group(name, region_bounds(proj, view)))
+        elif name == "feature-labels":
+            body.append(_group(name, feature_labels(proj, view)))
+        elif name == "water-labels":
+            body.append(_group(name, water_labels(proj, view)))
         elif name in ("coastline", "country-bounds", "selected"):
             # Drawn by the land group's own stroke today. When terrain lands
             # these become their own stroke-only pass so relief sits UNDER

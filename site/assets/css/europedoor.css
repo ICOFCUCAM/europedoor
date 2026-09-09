@@ -2490,6 +2490,35 @@ body[data-hero] .masthead { position: sticky; }
 .minimap.arched.atlas .lyr-land .countries path.here {
   fill: color-mix(in srgb, #ffffff 62%, transparent);
   stroke: var(--atlas-hereline); }
+/* A SEA IS AN AREA, SO IT IS WIDELY TRACKED AND CARRIES NO MARK. In the
+   water colour rather than in ink, because it names the water it sits in.
+   The rule is here before the data — the layer is written and the fetch is
+   one command — since a rule written after the fact is argued about in a
+   hurry. */
+.minimap.arched.atlas .lyr-water-labels .sname {
+  font-family: var(--display); font-size: var(--t-xs); font-style: italic;
+  letter-spacing: .32em; text-transform: uppercase;
+  fill: color-mix(in srgb, var(--atlas-land) 78%, transparent); }
+
+/* A PHYSICAL FEATURE IS SET APART FROM A POLITICAL ONE, which an atlas has
+   always done with an italic serif. ALPS and PYRENEES are geography; a
+   frontier is a decision. */
+.minimap.arched.atlas .lyr-feature-labels .fname {
+  font-family: var(--display); font-size: var(--t-xs); font-style: italic;
+  letter-spacing: .1em;
+  fill: color-mix(in srgb, var(--atlas-hereline) 72%, transparent);
+  paint-order: stroke; stroke: var(--atlas-here); stroke-width: 2.2; }
+
+/* A REGION IS A GROUPING, AND SPACED UPPERCASE IS HOW AN ATLAS SAYS SO —
+   the same treatment a sea gets, because both name an area rather than a
+   point, and neither has a boundary drawn round it here. Quieter than a
+   place name and placed after them: a grouping is the thing a reader can
+   most afford to lose. */
+.minimap.arched.atlas .lyr-labels .rname {
+  font-size: var(--t-xs); letter-spacing: .18em; font-weight: 600;
+  fill: color-mix(in srgb, var(--atlas-hereline) 62%, transparent);
+  paint-order: stroke; stroke: var(--atlas-here); stroke-width: 2.4; }
+
 /* THE COUNTRY'S OWN NAME, set across the plate the way an atlas sets one:
    tracked, quiet, and under the place names rather than over them. It is
    also what makes the plate survive the recognition test — strip the
