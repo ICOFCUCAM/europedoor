@@ -5397,22 +5397,79 @@ def fund_page(data, p):
 # ── themes: experience-first discovery ────────────────────────────────
 
 def themes_index(data):
-    cards = [
-        card(f"/themes/{t['slug']}", f"{len(t['stops'])} places", t["name"], t["strapline"],
-             seed="theme:" + t["slug"], motif=motif_for(t.get("interests", [])))
-        for t in data["themes"]
-    ]
+    """Thirteen themes, shown by how far each one reaches.
+
+    "8 PLACES" WAS ON ALL THIRTEEN CARDS AND IS NOT INFORMATION. Every theme
+    in this dataset holds exactly eight stops, so the one figure the card grid
+    printed was a constant wearing the clothes of a measurement. That is the
+    /europe-in failure one family over: a number that is not the set\'s own
+    extent reads as one.
+
+    What actually separates them is REACH. Renaissance Europe is Italy, France
+    and Belgium; Thermal Europe is the United Kingdom, Hungary, Iceland,
+    Finland, Bulgaria, Azerbaijan and Georgia. Three countries against seven is
+    the difference between a corner of the continent and an argument that
+    crosses the whole of it, and the grid showed neither — it showed a
+    generated landscape, and a theme is not a place: it has no coastline, no
+    topography and no season, which is the same reason the twelve motions lost
+    theirs.
+
+    So the row carries the eight destinations and the count of countries.
+
+    A COMMA WAS THE FIRST SEPARATOR AND THREE PLACE NAMES CONTAIN ONE.
+    "Victoria, Gozo", "Mestia, Svaneti" and "Nida, Curonian Spit" are single
+    destinations in this atlas, so Island Europe\'s eight places read as nine
+    and Mountain Europe\'s as nine — a list that miscounts itself, on the one
+    index whose whole argument is a count. The comma was chosen to stop the
+    list reading as a route, which the middot on /journeys deliberately does;
+    what actually distinguishes the two families is the ROUTE LINE under a
+    journey\'s stops, and a theme has none — the same absence the theme page
+    makes its point out of by drawing these dots with no path between them.
+    """
+    idx = data["cities"]
+    # DERIVED, because the note under the list states it. Every theme holds
+    # eight stops today; a hard-coded eight in the prose is the figure that
+    # was true two hundred destinations ago, which this repository has
+    # already shipped once.
+    sizes = sorted({len(t["stops"]) for t in data["themes"]})
+    words = ("no", "one", "two", "three", "four", "five", "six", "seven",
+             "eight", "nine", "ten", "eleven", "twelve")
+
+    def say(k):
+        return words[k] if k < len(words) else str(k)
+
+    held = (f"every one of these holds {say(sizes[0])}" if len(sizes) == 1
+            else f"they hold between {say(sizes[0])} and {say(sizes[-1])}")
+    rows = []
+    for t in data["themes"]:
+        countries, places = [], []
+        for stop in t["stops"]:
+            n = idx[stop["city"]]
+            cn = n["country"]["name"]
+            if cn not in countries:
+                countries.append(cn)
+            places.append(esc(n["city"]["name"]))
+        rows.append(
+            f'<a class="row themerow" href="/themes/{t["slug"]}">'
+            f'<div><p class="kicker">{esc(t["strapline"])}</p>'
+            f'<h3>{esc(t["name"])}</h3>'
+            f'<p class="rowsub">{" · ".join(places)}</p></div>'
+            f'<p class="rowmeta">{len(countries)}<br>'
+            f'{"countries" if len(countries) != 1 else "country"}</p></a>')
     body = f"""
 {crumbs([("Europe", "/discover"), ("Themes", None)])}
 <div class="pagehead index">
   <p class="kicker">Discovery without a map of borders</p>
   <h1>Europe, organised by what you came for.</h1>
   <p class="lede">Medieval Europe is not a country. Neither is sacred Europe, or Viking Europe,
-  or the Europe you reach only by train. {len(data['themes'])} of them cut across the Atlas:
-  each one is a real sequence of real places, and each place stays linked to the country it is
-  actually in.</p>
+  or the Europe you reach only by train. {len(data['themes'])} of them cut across the Atlas,
+  and each place under one of them stays linked to the country it is actually in.</p>
 </div>
-{grid(cards, 3)}
+<div class="rows">{"".join(rows)}</div>
+<p class="small">The places under each theme are not in travelling order, and
+the number beside them is how many countries the theme crosses rather than how
+many places it holds — {held}. For an order that
+respects distance, put the ones you want into the <a href="/plan">Planner</a>.</p>
 """
     return "/themes/index.html", page(
         "Themes", body, path="/themes", area="countries",

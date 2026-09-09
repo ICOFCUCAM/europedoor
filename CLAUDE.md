@@ -683,8 +683,8 @@ made once: a hard-coded figure that was true two hundred destinations ago.
 
 **Eight of the nine indexes were the same 280px card grid, and the shape of
 the data was the whole layout.** That is the design-direction finding again,
-one level up from the h1. Four are fixed: `/stories` is a contents page,
-`/events` is a year band, and now these two.
+one level up from the h1. Five are fixed: `/stories` is a contents page,
+`/events` is a year band, and now these three.
 
 **A card is the right shape for a set of like things chosen on LOOK.** A
 journey is not chosen on look and neither is a query, so neither of them was
@@ -718,6 +718,35 @@ suite counted `.card` on the motion index; it went red when the index stopped
 being a card grid, which is the fifth time an assertion in this repository
 has protected a layout instead of a promise. It counts motions and queries
 now, and still fails on the thing it was written for.
+
+**`/themes` printed a count that was the same on all thirteen cards.** Every
+theme in this dataset holds exactly eight stops, so "8 PLACES" was a constant
+wearing the clothes of a measurement — the `/europe-in` failure one family
+over, where a number that is not the set's own extent reads as one. What
+separates the thirteen is **reach**: Renaissance Europe is Italy, France and
+Belgium, Thermal Europe is the United Kingdom, Hungary, Iceland, Finland,
+Bulgaria, Azerbaijan and Georgia, and three countries against seven is the
+difference between a corner of the continent and an argument that crosses the
+whole of it. The rows carry the eight destinations and the count of countries,
+and the "every one holds eight" in the note under them is derived, because a
+figure typed into prose is the figure that was true two hundred destinations
+ago.
+
+**A comma cannot separate a list of European place names.** "Victoria, Gozo",
+"Mestia, Svaneti" and "Nida, Curonian Spit" are single destinations here, so
+the first version of that list read as nine places and ten on the one index
+whose whole argument is a count. The comma was chosen to stop the list reading
+as a route, which the middot on `/journeys` deliberately does — but what
+actually distinguishes the two families is the **route line** under a
+journey's stops, and a theme has none. That is the same absence the theme page
+makes its point out of, by drawing these dots with no path between them.
+
+**A reason typed into `docs/invariants.json` is wiped by the next
+`--write`.** The register is generated exactly like `site/`, so the paragraph
+recording why `/journeys` and `/europe-in` moved `primitives.reach.card`
+survived one commit and then vanished with no failing check — the same class
+of loss as editing a page in `site/`. A reason belongs in
+`tools/invariants.py`, which is the source the register is written from.
 
 **Twenty-one of twenty-two families place a 60px h1 at y=164 or y=212.** Only
 the homepage differs, because it has a hero. On the five INTELLIGENCE pages

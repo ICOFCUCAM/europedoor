@@ -638,6 +638,13 @@ main.wide { max-width: 92rem; }
                       max-width: 62ch; }
 .motionrow .rowmeta { text-align: right; font-variant-numeric: tabular-nums; }
 .journeyrow .rowmeta { text-align: right; white-space: nowrap; }
+/* HOW FAR THE THEME REACHES, WHICH IS THE ONLY FIGURE ON THIS INDEX THAT
+   VARIES. Every theme holds eight places, so the count the cards used to
+   print was a constant; the number of countries runs from three to eight and
+   is the whole difference between a corner of the continent and an argument
+   that crosses it. Right-aligned and tabular so the column reads as a range
+   down the page rather than as thirteen unrelated numerals. */
+.themerow .rowmeta { text-align: right; font-variant-numeric: tabular-nums; }
 /* The stop's number in the order — a real sequence, so a numeral says
    something true rather than decorating a list. */
 .leg-no { display: block; font-family: var(--mono); font-size: var(--t-sm);
