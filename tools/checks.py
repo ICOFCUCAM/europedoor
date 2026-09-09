@@ -953,6 +953,23 @@ def c_map():
             fail(f"{src['path']} is not the file that was checked: recorded "
                  f"{src['sha256'][:12]}, on disk {got[:12]}")
         n += 3
+    # AWAITING FETCH: registered, licence-checked, and genuinely not here.
+    # A row in this list that HAS its file is a row somebody fetched and
+    # forgot to move, which would sit here looking settled while the checks
+    # that hash `sources` never touched it.
+    for a in reg.get("awaiting_fetch", []):
+        doc = os.path.join(ROOT, "docs", "data-licenses", a["licence_doc"])
+        if not os.path.exists(doc):
+            fail(f"awaiting dataset {a['id']} has no licence record")
+        if os.path.exists(os.path.join(ROOT, a["path"])):
+            fail(f"{a['id']} is in `awaiting_fetch` and its file IS in the "
+                 f"repository — move the row to `sources` with its sha256, "
+                 f"or the bytes nobody hashed will be the ones that ship")
+        if not a.get("fills_layer") or not a.get("selection"):
+            fail(f"{a['id']} does not say which layer it fills or what it "
+                 f"selects — an unselected dataset is how a map gets four "
+                 f"thousand streams on it")
+        n += 3
     for b in reg.get("blocked", []):
         doc = os.path.join(ROOT, "docs", "data-licenses", b["licence_doc"])
         if not os.path.exists(doc):

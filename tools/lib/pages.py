@@ -803,6 +803,23 @@ def plate_stack(proj, view, *, ocean="", landmass="", subject="",
     return "".join(out)
 
 
+def _star(cx, cy, r):
+    """A five-pointed star for a capital.
+
+    The one mark every printed atlas reserves for a capital, and the reason
+    to draw it rather than enlarge a dot: a bigger dot says "more", a star
+    says "different in kind". `capital` is authored per country, so this is a
+    classification drawn, not a ranking invented.
+    """
+    import math as _m
+    pts = []
+    for i in range(10):
+        a = -_m.pi / 2 + i * _m.pi / 5
+        k = r if i % 2 == 0 else r * 0.42
+        pts.append(f"{cx + k * _m.cos(a):.1f} {cy + k * _m.sin(a):.1f}")
+    return "M" + "L".join(pts) + "Z"
+
+
 def locator_inset(slug, size=132.0):
     """Where in Europe this is, at a glance, beside the plate.
 
@@ -947,7 +964,13 @@ def countryportrait(data, c):
     h = 391.0
     w = round(h * aspect)
     proj = geo.Projection(list(bbox), w, h, pad=0.14)
-    ctx, land = geo.landmass(proj, (0, 0, w, h), doc=doc, highlight=c["slug"])
+    # NEIGHBOURS ARE CONTEXT, AND DISTANT COUNTRIES ARE QUIETER STILL.
+    # France's plate was France plus twenty polygons of equal weight, all
+    # asking to be read. The band is a country's distance from the subject on
+    # this drawing, in the drawing's own units, so it is the same judgement
+    # on a plate of Luxembourg and a plate of Ukraine.
+    ctx, land = geo.landmass(proj, (0, 0, w, h), doc=doc, highlight=c["slug"],
+                             bands=geo.distance_bands(doc, c["slug"], proj))
     # THE PLACE LAYER. A shape answers "what shape is this country"; an atlas
     # answers "where are the places". Every destination the atlas holds for
     # this country, at its own coordinate, unlabelled and not a link — the
@@ -993,13 +1016,33 @@ def countryportrait(data, c):
             if 0 <= px <= w and 0 <= py <= h:
                 iscap = bool(cap_name and t["name"].split(" &")[0] == cap_name)
                 order_.append((0 if iscap else 1, -_depth(t), px, py,
-                               t["name"], iscap))
+                               t["name"], iscap, t.get("city_type") or ""))
     order_.sort()
     dotmarks, boxes_ = "", []
-    for _k, _d, px, py, nm, iscap in order_:
-        dotmarks += (f'<circle class="pmark{" cap" if iscap else ""}" '
-                     f'cx="{px:.1f}" cy="{py:.1f}" r="{4.5 if iscap else 3.5}">'
-                     f'<title>{esc(nm)}</title></circle>')
+    for _k, _d, px, py, nm, iscap, kind in order_:
+        # A CARTOGRAPHIC TYPE HIERARCHY, FROM DATA THE ATLAS ALREADY HOLDS.
+        # Every place used to be the same dot and the same 11px name, which
+        # is a database printed on a map. `city_type` is classified for all
+        # 319 — capital, city, town, village, island, valley, site, park —
+        # and an atlas has always drawn those differently:
+        #
+        #   capital     a star, and the name in tracked small caps
+        #   city        a filled dot
+        #   everything  an OUTLINED dot: a place worth going to that is not
+        #   else        a city is exactly what this atlas is for, and a ring
+        #               is how a printed atlas has always said so
+        #
+        # Nothing is authored to make this work. It is the classification
+        # already in the dataset, drawn.
+        if iscap:
+            r = 5.0
+            dotmarks += (f'<path class="pmark cap" d="{_star(px, py, r)}">'
+                         f'<title>{esc(nm)}</title></path>')
+        else:
+            city = kind == "city"
+            dotmarks += (f'<circle class="pmark{"" if city else " open"}" '
+                         f'cx="{px:.1f}" cy="{py:.1f}" r="{3.4 if city else 3.0}">'
+                         f'<title>{esc(nm)}</title></circle>')
         got = place_label_box(px, py, nm, w, h,
                               cls="pname" + (" cap" if iscap else ""))
         if not got:
@@ -1018,7 +1061,18 @@ def countryportrait(data, c):
             continue
         boxes_.append(box)
         labs_.append(lhtml)
-    namemarks = "".join(labs_)
+    # THE PLATE NAMES ITS OWN SUBJECT. An atlas plate has the country's name
+    # set across it, and there is a second reason here: the recognition test
+    # strips the wordmark and the page title, and a plate that names what it
+    # draws survives that where a shape alone does not. Tracked, quiet, and
+    # UNDER the place names, which are the ones a reader is looking for.
+    cbox = _highlight_box(land)
+    countryname = ""
+    if cbox:
+        ncx, ncy, _r = cbox
+        countryname = (f'<text class="cname" x="{ncx:.1f}" y="{ncy:.1f}" '
+                       f'text-anchor="middle">{esc(c["name"].upper())}</text>')
+    namemarks = countryname + "".join(labs_)
     uid = "cp" + "".join(ch for ch in c["slug"] if ch.isalnum())[:14]
     # CROPPING IN SILENCE IS THE THING TO AVOID. Where a country has land
     # outside this frame it is said, in the one place a reader of the figure

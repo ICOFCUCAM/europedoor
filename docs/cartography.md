@@ -84,6 +84,77 @@ Five steps, because four cannot show a foothill and six begin to read as a
 legend a reader has to consult. Warm as it rises and never saturated: height
 is **felt**, and the typography stays dominant over the ground.
 
+## Three voices of context
+
+    subject      the brightest land, the finest heaviest edge
+    near         warm parchment
+    mid / far    increasingly quiet, still parchment
+
+A plate of France used to be France and twenty polygons of equal weight, all
+asking to be read. The band is **measured, not listed**: a country's distance
+from the subject on this drawing, in the drawing's own units, so it is the
+same judgement on a plate of Luxembourg and a plate of Ukraine.
+
+The first version measured the gap between bounding boxes, which is zero the
+moment two boxes overlap on either axis — so every country on France's plate
+came out `near`, Austria included. A box is not a place. It is centre to
+centre now.
+
+And the quieter bands are mixed toward a **warm grey, not toward the sea**:
+mixing toward the water desaturates and darkens them into exactly the blue
+they have to be distinguished from, and Germany and Spain went quiet by
+becoming sea.
+
+Nothing is hidden. A far country keeps its shape, its coastline and its
+`<title>`, because a reader looking at France still needs to see that Spain
+is underneath it.
+
+## The cartographic type hierarchy
+
+| feature | mark | type |
+|---|---|---|
+| country | — | tracked serif caps, quiet, under the place names |
+| capital | a **star** | ink, bold |
+| city | a filled dot | ink on a paper halo |
+| destination | an **outlined** dot | ink on a paper halo |
+| sea, range, river | *waiting on a fetch* | tracked caps · italic serif · small italic |
+
+Every place used to be the same dot and the same name: a database printed on
+a map. `city_type` is classified for all 319 destinations already, so this is
+that classification **drawn** rather than anything authored. A star rather
+than a bigger dot, because a bigger dot says *more* and a star says
+*different in kind*.
+
+The country's own name on the plate does a second job: the recognition test
+strips the wordmark and the page title, and a plate that names what it draws
+survives that where a shape alone does not.
+
+## Rivers: written, registered, one command away
+
+The renderer is **written, not stubbed** — proved by dropping a test file in
+and watching the layer appear in the stack in the right position, then
+removing it and watching it go. Four datasets are now in the register under
+`awaiting_fetch`, all Natural Earth, all under the same public-domain terms
+as the land already here, so **no licence decision is waiting on anybody**:
+
+| dataset | fills | selection |
+|---|---|---|
+| 1:50m rivers and lake centrelines | rivers | `scalerank ≤ 5` |
+| 1:50m lakes | rivers | `scalerank ≤ 4` |
+| 1:50m marine polygons | labels | named seas and oceans |
+| 1:50m physical geography regions | labels | named ranges and basins |
+
+The selection matters as much as the licence: Natural Earth ships several
+thousand watercourses and this atlas wants the Loire, the Seine, the Rhône,
+the Garonne and the Danube. Hundreds of tiny streams is the OpenStreetMap
+default look, which is the thing this cartography exists not to be.
+`checks.py` refuses a row that does not say which layer it fills and what it
+selects, and refuses one whose file is present — a fetched row must move to
+`sources` with its hash, or the bytes nobody hashed are the ones that ship.
+
+The last of those four is worth naming separately: **named ranges and basins
+are what let a reader see where the Alps are before any DEM exists.**
+
 ## The pipeline
 
     GEOGRAPHIC DATA ─┐                        ┌─ VISUAL STYLE

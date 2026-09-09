@@ -147,8 +147,21 @@ def main(argv):
                   f"otherwise have been downloaded.")
             return 2
 
+    # `awaiting_fetch` rows are registered and not in the repository. They
+    # are fetched by the same loop and go through the same blocked-pattern
+    # refusal, because a row's list does not decide whether it is allowed —
+    # the data does. After a successful fetch the row is moved to `sources`
+    # with its sha256, and `checks.py` fails if one is left here with its
+    # file present.
+    todo = list(reg["sources"]) + list(reg.get("awaiting_fetch", []))
+    for src in todo:
+        b = refusal(src)
+        if b:
+            refuse(src["id"], b)
+            return 2
+
     bad = 0
-    for src in reg["sources"]:
+    for src in todo:
         if wanted and src["id"] not in wanted:
             continue
         path = os.path.join(ROOT, src["path"])
@@ -161,6 +174,14 @@ def main(argv):
 
         if verify:
             if not os.path.exists(path):
+                # An `awaiting_fetch` row is SUPPOSED to be absent. Counting
+                # it as a failure would make the documented verify gate red
+                # for the ordinary state of the repository, and a gate that
+                # is red when nothing is wrong is a gate people stop running.
+                if src.get("fills_layer"):
+                    print(f"awaiting {src['id']:<16} {src['path']} "
+                          f"— fills the {src['fills_layer']} layer")
+                    continue
                 print(f"MISSING  {src['id']:<16} {src['path']}")
                 bad += 1
                 continue

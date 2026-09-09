@@ -222,10 +222,73 @@ def hillshade(proj, view):
     unwritten("hillshade", SOURCES["hillshade"])
 
 
+# WHICH WATERCOURSES ARE CARTOGRAPHY AND WHICH ARE NOISE. Natural Earth
+# ships several thousand rivers at 1:50m. This atlas wants the Loire, the
+# Seine, the Rhône, the Garonne, the Danube — the rivers a reader recognises
+# as the shape of a country — and hundreds of tiny streams would be the
+# OpenStreetMap default look, which is the thing this cartography exists not
+# to be. Natural Earth's own `scalerank` is the selection: it is the map
+# scale at which the publisher intends a feature to appear, so this is their
+# editorial judgement rather than one invented here.
+RIVER_RANK = 5
+LAKE_RANK = 4
+
+
 def rivers(proj, view):
-    if not held("rivers"):
+    """Rivers and lakes, when the repository holds them.
+
+    Written now, not stubbed: the day `data/geo/hydrology-lod1.json` lands
+    this draws, and the reason to write it before the data is that a layer
+    which quietly renders nothing once its file arrives is the failure this
+    whole stack was built to make impossible.
+
+    Two classes, because a hierarchy of one is a list: `major` for the rivers
+    that carry a country's shape and `minor` for the rest that survive the
+    rank cut. Both thinner than the coastline — a river drawn as heavily as a
+    coast turns a country into a leaf.
+    """
+    doc = geo.load(SOURCES["rivers"])
+    if not doc:
         return ""
-    unwritten("rivers", SOURCES["rivers"])
+    x, y, w, h = view
+    box = (x - 40.0, y - 40.0, x + w + 40.0, y + h + 40.0)
+    out = []
+    for feat in doc.get("rivers", []):
+        if feat.get("rank", 99) > RIVER_RANK:
+            continue
+        d, last, seen = [], None, False
+        for i in range(0, len(feat["line"]), 2):
+            px, py = proj.xy(feat["line"][i + 1], feat["line"][i])
+            if box[0] <= px <= box[2] and box[1] <= py <= box[3]:
+                seen = True
+            px, py = round(px, 1), round(py, 1)
+            if last == (px, py):
+                continue
+            d.append(("M" if not d else "L") + f"{px} {py}")
+            last = (px, py)
+        if seen and len(d) >= 2:
+            cls = "major" if feat.get("rank", 99) <= 2 else "minor"
+            out.append(f'<path class="riv {cls}" d="{"".join(d)}">'
+                       f'<title>{feat.get("name", "")}</title></path>')
+    for feat in doc.get("lakes", []):
+        if feat.get("rank", 99) > LAKE_RANK:
+            continue
+        d, last, seen = [], None, False
+        for ring in feat.get("rings", []):
+            for i in range(0, len(ring), 2):
+                px, py = proj.xy(ring[i + 1], ring[i])
+                if box[0] <= px <= box[2] and box[1] <= py <= box[3]:
+                    seen = True
+                px, py = round(px, 1), round(py, 1)
+                if last == (px, py):
+                    continue
+                d.append(("M" if not d else "L") + f"{px} {py}")
+                last = (px, py)
+            d.append("Z")
+        if seen and len(d) >= 4:
+            out.append(f'<path class="lake" d="{"".join(d)}">'
+                       f'<title>{feat.get("name", "")}</title></path>')
+    return "".join(out)
 
 
 def region_bounds(proj, view):

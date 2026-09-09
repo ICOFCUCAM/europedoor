@@ -462,7 +462,51 @@ def _cross(a, b, axis, v):
     return (p[0], p[1])
 
 
-def landmass(proj, view, doc=None, highlight=None, pad=40.0):
+def distance_bands(doc, slug, proj, near=0.6, mid=1.3):
+    """Which countries are near the subject on this drawing, and which are far.
+
+    Returns {slug: "near"|"mid"|"far"}. The measure is the gap between a
+    country's drawn bounding box and the subject's, as a fraction of the
+    subject's own larger dimension — so it is the same judgement on a plate
+    of Luxembourg and a plate of Ukraine, which an absolute distance in
+    kilometres would not be.
+
+    Touching or all but touching is `near`; out to about one subject-width is
+    `mid`; beyond that is `far`. Nothing is hidden: a far country is still
+    drawn, still carries its <title>, and is simply quieter, because a reader
+    looking at France still needs to see that Spain is underneath it.
+    """
+    # CENTRE TO CENTRE, NOT BOX TO BOX. The first version measured the gap
+    # between bounding boxes, which is zero the moment two boxes overlap on
+    # either axis — so every country on France's plate came out `near`,
+    # Austria included, because Austria's box overlaps France's in latitude.
+    # A box is not a place.
+    mid_pt = {}
+    for _k, ent in (doc.get("countries") or {}).items():
+        xs, ys = [], []
+        for ring in ent.get("rings") or []:
+            for i in range(0, len(ring), 2):
+                x, y = proj.xy(ring[i + 1], ring[i])
+                xs.append(x)
+                ys.append(y)
+        if xs:
+            mid_pt[ent.get("slug")] = ((min(xs) + max(xs)) / 2.0,
+                                       (min(ys) + max(ys)) / 2.0,
+                                       max(max(xs) - min(xs), max(ys) - min(ys)))
+    me = mid_pt.get(slug)
+    if not me:
+        return {}
+    span = me[2] or 1.0
+    out = {}
+    for s_, b in mid_pt.items():
+        if s_ == slug:
+            continue
+        gap = ((b[0] - me[0]) ** 2 + (b[1] - me[1]) ** 2) ** 0.5 / span
+        out[s_] = "near" if gap <= near else ("mid" if gap <= mid else "far")
+    return out
+
+
+def landmass(proj, view, doc=None, highlight=None, pad=40.0, bands=None):
     """Land under a small map, clipped to the window it is drawn in.
 
     `view` is (x, y, w, h) in the projection's own pixel space — the same
@@ -517,8 +561,18 @@ def landmass(proj, view, doc=None, highlight=None, pad=40.0):
         cls = ""
         if highlight and ent.get("slug") in (
                 {highlight} if isinstance(highlight, str) else set(highlight)):
-            cls = ' class="here"'
-        el = f'<path{cls} d="{"".join(parts)}"><title>{_esc(ent["name"])}</title></path>'
+            cls = "here"
+        elif bands:
+            # NEIGHBOURS ARE CONTEXT, AND DISTANT COUNTRIES ARE QUIETER STILL.
+            # Every country used to be drawn in one tone, so France's plate
+            # was France plus twenty polygons of equal weight all asking to
+            # be read. The band is the country's own distance from the
+            # subject, measured on the drawing in the drawing's own units —
+            # derived, like everything else here, and not a list somebody
+            # typed.
+            cls = bands.get(ent.get("slug"), "")
+        el = (f'<path{f" class={chr(34)}{cls}{chr(34)}" if cls else ""} '
+              f'd="{"".join(parts)}"><title>{_esc(ent["name"])}</title></path>')
         (ours if ent["atlas"] else ctx).append(el)
     return (f'<g class="context" aria-hidden="true">{"".join(ctx)}</g>',
             f'<g class="countries" aria-hidden="true">{"".join(ours)}</g>')

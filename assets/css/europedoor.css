@@ -2461,6 +2461,25 @@ body[data-hero] .masthead { position: sticky; }
    know about it. */
 .minimap.arched.atlas .lyr-land .context path { fill: var(--atlas-land);
                                       stroke: color-mix(in srgb, var(--atlas-coast) 45%, transparent); }
+/* THE THREE VOICES OF CONTEXT. A plate of France used to be France and
+   twenty polygons of equal weight, every one of them asking to be read. The
+   hierarchy is now: the subject, then its neighbours in warm parchment, then
+   the rest of Europe getting quieter with distance. Nothing is hidden — a
+   far country keeps its shape, its coastline and its <title>, because a
+   reader looking at France still needs to see that Spain is underneath it.
+   The band is measured, not listed: distance from the subject on this
+   drawing, in the drawing's own units.
+   MIXED TOWARD A WARM GREY, NOT TOWARD THE SEA. The first version mixed the
+   quieter bands toward the water, which desaturates and darkens them into
+   exactly the blue they have to be distinguished from: Germany and Spain
+   went quiet by becoming sea. Parchment stays parchment and simply recedes. */
+.minimap.arched.atlas .lyr-land .countries path.mid,
+.minimap.arched.atlas .lyr-land .context path.mid {
+  fill: #d6d0c1; stroke: color-mix(in srgb, var(--atlas-coast) 62%, transparent); }
+.minimap.arched.atlas .lyr-land .countries path.far,
+.minimap.arched.atlas .lyr-land .context path.far {
+  fill: #c6c0b1; stroke: color-mix(in srgb, var(--atlas-coast) 38%, transparent); }
+
 /* THE SUBJECT IS A WASH, NOT A FILL, so whatever is under it survives. An
    opaque country hides everything the terrain layers will eventually put
    there — the Alps, the Massif Central, the Loire basin — and a plate whose
@@ -2471,6 +2490,18 @@ body[data-hero] .masthead { position: sticky; }
 .minimap.arched.atlas .lyr-land .countries path.here {
   fill: color-mix(in srgb, #ffffff 62%, transparent);
   stroke: var(--atlas-hereline); }
+/* THE COUNTRY'S OWN NAME, set across the plate the way an atlas sets one:
+   tracked, quiet, and under the place names rather than over them. It is
+   also what makes the plate survive the recognition test — strip the
+   wordmark and the page title and the drawing still says where it is.
+   `--t-lg` rather than a literal: a font-size in an SVG is in user units, so
+   this renders at about 21px on a 416px plate, and no seventeenth size
+   enters the stylesheet for it. */
+.minimap.arched.atlas .lyr-labels .cname {
+  font-family: var(--display); font-size: var(--t-lg);
+  letter-spacing: .22em; text-transform: uppercase;
+  fill: color-mix(in srgb, var(--atlas-hereline) 46%, transparent); }
+
 /* The place names on an atlas plate: ink on a paper halo, so a name stays
    legible where it crosses a coastline. The capital is set in small caps
    the way every printed atlas distinguishes it — `capital` is authored data
@@ -2479,7 +2510,14 @@ body[data-hero] .masthead { position: sticky; }
                                font-family: var(--text); paint-order: stroke;
                                stroke: var(--atlas-land); stroke-width: 2.6; }
 .minimap.arched.atlas .lyr-labels .pname.cap { font-weight: 700; letter-spacing: .06em; }
-.minimap.arched.atlas .lyr-destinations .pmark.cap { fill: var(--cobalt-deep); stroke-width: 2; }
+/* A CITY IS FILLED, EVERYTHING ELSE IS A RING, AND A CAPITAL IS A STAR.
+   Every place used to be the same dot: a database printed on a map. A ring
+   is how a printed atlas has always drawn a place that is worth going to and
+   is not a city, which is most of what this atlas is about. */
+.minimap.arched.atlas .lyr-destinations .pmark.open {
+  fill: var(--atlas-here); stroke: var(--atlas-hereline); stroke-width: 1.4; }
+.minimap.arched.atlas .lyr-destinations .pmark.cap { fill: var(--cobalt-deep);
+  stroke: var(--atlas-land); stroke-width: 1.4; paint-order: stroke; }
 /* ON A PHONE THE PLATE IS 240px TALL, so 18 units renders at 6.8px — not
    small type, type that does not resolve into glyphs. The names are dropped
    and the marks are kept, which is the rule every other map here follows:
@@ -2519,10 +2557,24 @@ body[data-hero] .masthead { position: sticky; }
                             border: 1px solid var(--atlas-hereline);
                             border-radius: 2px; }
 
+/* RIVERS AND LAKES. The rules are here before the data, because the layer
+   is written and the file is one fetch away — and a rule written after the
+   fact is a rule argued about in a hurry. In the water colour, by rank, and
+   ALWAYS thinner than the coastline's 0.9: a river drawn as heavily as a
+   coast turns a country into a leaf. */
+.minimap.arched.atlas .lyr-rivers .riv { fill: none; stroke: var(--ocean-shallow);
+  vector-effect: non-scaling-stroke; stroke-linecap: round; }
+.minimap.arched.atlas .lyr-rivers .riv.major { stroke-width: 0.8; }
+.minimap.arched.atlas .lyr-rivers .riv.minor { stroke-width: 0.5;
+  stroke: color-mix(in srgb, var(--ocean-shallow) 70%, transparent); }
+.minimap.arched.atlas .lyr-rivers .lake { fill: var(--ocean-shallow);
+  stroke: var(--ocean-mid); stroke-width: 0.5;
+  vector-effect: non-scaling-stroke; }
+
 /* THE FOUR LAYERS THIS ATLAS CANNOT DRAW carry no rule, on purpose: a rule
    for a layer that emits nothing is dead code that looks like a decision.
    Their appearance is decided in `cartography.DECIDED` and asserted there.
-   terrain · hillshade · rivers · region-bounds
+   terrain · hillshade · region-bounds
 
 /* THE COAST TREATMENT. A printed atlas puts a soft band in the water along
    a coast, and it is what makes a coastline read as an edge rather than as
