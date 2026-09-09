@@ -97,9 +97,9 @@
    "why": "Zero today, because zero photographs are licensed. This moving is the signal that licensed imagery arrived — which must go through the licence register first."
   },
   "weight.home_kb": {
-   "value": 118,
+   "value": 119,
    "kind": "ceiling",
-   "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it is allowed to move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence. 48 -> 109 when the hero became a drawing rather than a silhouette; 109 -> 114 when it became an atlas rather than a relief (frontiers, rivers, lakes); 114 -> 118 when every country became a link and the land could no longer be one merged path — 44 anchors, 44 names and 44 path elements instead of one. That is the whole picture AND the whole navigation in one page with no photograph, no webfont and no JavaScript; the licensed hero photograph the brief is still open for is 150 KB on its own. Anything above this is a template inlining something, which is the failure the ceiling is for."
+   "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it is allowed to move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence. 48 -> 109 when the hero became a drawing rather than a silhouette; 109 -> 114 when it became an atlas rather than a relief (frontiers, rivers, lakes); 114 -> 118 when every country became a link and the land could no longer be one merged path; 118 -> 119 for the twenty-three country names set across it. That is the whole picture AND the whole navigation in one page with no photograph, no webfont and no JavaScript; the licensed hero photograph the brief is still open for is 150 KB on its own. Anything above this is a template inlining something, which is the failure the ceiling is for."
   },
   "weight.max_page_kb": {
    "value": 440,

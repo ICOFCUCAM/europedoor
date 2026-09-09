@@ -2868,10 +2868,27 @@ body[data-hero] .masthead { position: sticky; }
    `--t-lg` rather than a literal: a font-size in an SVG is in user units, so
    this renders at about 21px on a 416px plate, and no seventeenth size
    enters the stylesheet for it. */
-.minimap.arched.atlas .lyr-labels .cname {
+.minimap.arched.atlas .lyr-labels .cname,
+.heroeurope .lyr-labels .cname {
   font-family: var(--display); font-size: var(--t-lg);
   letter-spacing: .22em; text-transform: uppercase;
   fill: color-mix(in srgb, var(--atlas-hereline) 46%, transparent); }
+/* THE SAME TYPOGRAPHY, ONE LEVEL UP, AND ITS OWN INK. The plate sets a
+   country's name in the highlight colour because there is one country on it
+   and it is the subject; the hero has fifty and none of them is. Graphite at
+   a third, which is a shade quieter than the frontiers — a name should be
+   found when looked for and never met before the shape it names. */
+.heroeurope .lyr-labels .cname {
+  fill: color-mix(in srgb, var(--graphite) 48%, transparent); }
+/* AND THEY COME OFF ON A PHONE. `--t-lg` is a length in the viewBox, and the
+   viewBox is 1,120 units wide: at 390 that is a third of a pixel per unit, so
+   a twenty-unit name renders at seven pixels — not small type, type that does
+   not resolve into glyphs. It is the same measurement that took the map
+   labels off narrow screens on eight hundred pages. The countries keep their
+   shape, their link and their accessible name. */
+@media (max-width: 44rem) {
+  .heroeurope .lyr-labels { display: none; }
+}
 
 /* The place names on an atlas plate: ink on a paper halo, so a name stays
    legible where it crosses a coastline. The capital is set in small caps

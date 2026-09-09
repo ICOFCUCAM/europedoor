@@ -376,6 +376,138 @@ def heroeurope(data):
     # inherits from ITS OWN parent instead and is a stroke with no fill.
     bounds = '<use href="#heroland"/>'
 
+    # THE COUNTRIES ARE NAMED, AND THE NAME IS THE ONE PIECE OF TYPE ON THE
+    # PICTURE.
+    #
+    # Every other map on this site sets the country's own name across it, and
+    # for the same second reason: the recognition instrument strips the
+    # wordmark and the page title, and a drawing that names what it draws
+    # survives that where a shape alone does not. It is placed by the atlas's
+    # single placement rule rather than a second one — the centroid of the
+    # country's own drawn shape, then eight points around it inside its own
+    # radius, each of the four positions tested against the frame and against
+    # every name already down. A name that fits nowhere is dropped, exactly as
+    # one that collides is, and the country keeps its shape, its link and its
+    # accessible name. A wide name breaks at its last space, which is what a
+    # printed atlas does.
+    #
+    # Tracked uppercase at the plates' own size and colour, so this is the
+    # same typography one level up rather than a new one: no font size is
+    # introduced, and `checks.py` counts them.
+    def _dpath(d):
+        """The bounding box of the largest subpath in a `d`, and its centre."""
+        best, bb = 0.0, None
+        for sub in d.split("Z"):
+            pts = [(float(a), float(b))
+                   for a, b in re.findall(r"[ML](-?[\d.]+) (-?[\d.]+)", sub)]
+            if len(pts) < 3:
+                continue
+            xs = [q[0] for q in pts]
+            ys = [q[1] for q in pts]
+            area = (max(xs) - min(xs)) * (max(ys) - min(ys))
+            if area > best:
+                best, bb = area, (min(xs), min(ys), max(xs), max(ys))
+        if not bb:
+            return None
+        return ((bb[0] + bb[2]) / 2.0, (bb[1] + bb[3]) / 2.0,
+                min(bb[2] - bb[0], bb[3] - bb[1]) / 2.0, bb)
+
+    NAME_INSET = 14.0
+    taken = []
+
+    def _clear(lx, ly, lw, lh):
+        b = (lx - LABEL_CLEAR, ly - LABEL_CLEAR,
+             lx + lw + LABEL_CLEAR, ly + lh + LABEL_CLEAR)
+        return not any(not (b[2] < q[0] or b[0] > q[2]
+                            or b[3] < q[1] or b[1] > q[3]) for q in taken)
+
+    def _inframe(x, y, wide, anchor, box=None, metric="cname"):
+        x0, y0, w0, h0 = _label_box(
+            x, y, wide, anchor, *LABEL_METRICS[metric][2:])
+        if not (x0 >= view[0] + NAME_INSET
+                and x0 + w0 <= view[0] + vw - NAME_INSET
+                and y0 >= view[1] + NAME_INSET
+                and y0 + h0 <= view[1] + vh - NAME_INSET):
+            return False
+        # AND THE NAME'S MIDDLE MUST BE ON THE COUNTRY IT NAMES. Without this
+        # the first version put ICELAND in the Denmark Strait, UNITED KINGDOM
+        # and PORTUGAL in the Atlantic and BOSNIA AND HERZEGOVINA across the
+        # whole Balkan peninsula: the four positions and nine anchors are a
+        # lot of freedom, and every one of them was allowed to leave. A name
+        # WIDER than its own country may still run out over the sea, which is
+        # what a printed atlas does with Norway and with Chile; its centre may
+        # not.
+        if box is None:
+            return True
+        return (box[0] <= x0 + w0 / 2.0 <= box[2]
+                and box[1] <= y0 + h0 / 2.0 <= box[3])
+
+    ANCHORS = ((0, 0), (0, -0.35), (0, 0.35), (-0.4, 0), (0.4, 0),
+               (-0.3, -0.3), (0.3, -0.3), (-0.3, 0.3), (0.3, 0.3))
+    names = []
+    for m in re.finditer(r'<path d="([^"]*)"><title>([^<]*)</title></path>',
+                         land):
+        spot = _dpath(m.group(1))
+        if not spot:
+            continue
+        cx, cy, rad, bbox = spot
+        up = (m.group(2).replace('&amp;', '&').replace('&lt;', '<')
+              .replace('&gt;', '>').replace('&quot;', '"')).upper()
+        # A NAME MUCH WIDER THAN ITS OWN COUNTRY IS NOT A LABEL, IT IS A
+        # SENTENCE LYING ACROSS THE NEIGHBOURS. Keeping the centre on the
+        # country stopped ICELAND floating in the Denmark Strait and left a
+        # worse fault behind it: SWITZERLAND ran from Bordeaux to Munich,
+        # BOSNIA AND HERZEGOVINA from Italy to Romania, BELGIUM out over the
+        # North Sea. A printed atlas answers that with an abbreviation, a
+        # leader line or a number in a key, and this picture will not carry
+        # any of the three — so the name is dropped and the country keeps its
+        # shape, its frontier, its link and its accessible name.
+        #
+        # Measured against the country's LONGEST side rather than its width,
+        # because Portugal is 55 units across and 160 tall and its name reads
+        # perfectly down it. Twice that side is the limit: Iceland's name is
+        # 1.8 times its island and belongs on the map; Switzerland's is 3.6
+        # times its country and does not.
+        span = max(bbox[2] - bbox[0], bbox[3] - bbox[1])
+        pad_, ch_, _u, _d = LABEL_METRICS["cname"]
+        one = pad_ + len(up) * ch_
+        two = (pad_ + max(len(a) for a in up.rsplit(" ", 1)) * ch_
+               if " " in up else one)
+        if min(one, two) > 2.0 * span:
+            continue
+        got = None
+        for fx, fy in ANCHORS:
+            got = place_label_box(cx + fx * rad, cy + fy * rad, up, vw, vh,
+                                  cls="cname", off=10.0, prefer="over",
+                                  metric="cname", clears=_clear,
+                                  fits=lambda *a, _b=bbox: _inframe(*a, box=_b))
+            if got:
+                break
+        if not got and " " in up:
+            a_, b_ = up.rsplit(" ", 1)
+            long_ = a_ if len(a_) >= len(b_) else b_
+
+            def _two(attr, x, y, _nm, _a=a_, _b=b_):
+                return (f'<text class="cname"{attr} x="{x:.1f}" y="{y:.1f}">'
+                        f'<tspan x="{x:.1f}" dy="{-CNAME_LEAD / 2:.1f}">'
+                        f'{esc(_a)}</tspan>'
+                        f'<tspan x="{x:.1f}" dy="{CNAME_LEAD:.1f}">'
+                        f'{esc(_b)}</tspan></text>')
+
+            for fx, fy in ANCHORS:
+                got = place_label_box(cx + fx * rad, cy + fy * rad, long_,
+                                      vw, vh, cls="cname", off=10.0,
+                                      prefer="over", metric="cname2",
+                                      clears=_clear, wrap=_two,
+                                      fits=lambda *a, _b=bbox: _inframe(
+                                          *a, box=_b, metric="cname2"))
+                if got:
+                    break
+        if got:
+            names.append(got[0])
+            taken.append((got[1], got[2], got[1] + got[3], got[2] + got[4]))
+    names = "".join(names)
+
     # A LITTLE WATER, AND THE RANK IS WHERE THE RESTRAINT LIVES. The plates
     # draw rank 6 and every lake, which over the whole continent is 153 rivers
     # and 65 lakes and 49 KB — a hydrology map with Europe underneath it. Rank
@@ -658,6 +790,13 @@ def heroeurope(data):
            if water else "")
         + (f'<g class="lyr lyr-country-bounds" aria-hidden="true">{bounds}</g>'
            if bounds else "")
+        # THE NAMES, ABOVE THE FRONTIERS AND UNDER THE DUSK — so a name in
+        # the east dims with the ground it is written on rather than floating
+        # over it. `aria-hidden`, because the accessible name of each country
+        # is already on its link and a screen reader should not hear fifty
+        # countries twice.
+        + (f'<g class="lyr lyr-labels" aria-hidden="true">{names}</g>'
+           if names else "")
         # THE DUSK, LAST AND OVER EVERYTHING THE ATLAS DREW. Two rectangles
         # of graphite whose alpha ramps along the two data cuts, masked to
         # the atlas's own land. It is not a cartographic layer and is not in
@@ -3702,7 +3841,7 @@ def _label_box(x, y, wide, anchor, up, down):
 
 def place_label_box(px, py, name, vw, vh, cls="minilabel here", off=10.0,
                     prefer="beside", wrap=None, metric="minilabel",
-                    clears=None):
+                    clears=None, fits=None):
     """The first position that fits inside the aperture AND is free, with its box.
 
     Right of the dot, then left, then under it, then over it. A name that
@@ -3744,8 +3883,16 @@ def place_label_box(px, py, name, vw, vh, cls="minilabel here", off=10.0,
     else:
         order = ((px + off, py + 4, "start"), (px - off, py + 4, "end"),
                  (px, py + off + 8, "middle"), (px, py - off - 1, "middle"))
+    # `fits` IS A PARAMETER BECAUSE ONE FAMILY IS NOT CUT BY AN ARCH. Every
+    # plate on this site is, so the default is the aperture and nothing else
+    # passes anything. The homepage hero is cut by the HERO's arch rather than
+    # by one inside its own drawing, and the drawing is inset within it, so
+    # testing the map's own box as an ellipse would reject names that are
+    # plainly visible — Iceland's, for one.
+    fits = fits or (lambda x, y, wide, anchor:
+                    label_fits(x, y, wide, anchor, vw, vh, up, down))
     for x, y, anchor in order:
-        if not label_fits(x, y, wide, anchor, vw, vh, up, down):
+        if not fits(x, y, wide, anchor):
             continue
         box = _label_box(x, y, wide, anchor, up, down)
         if clears is not None and not clears(*box):

@@ -981,6 +981,39 @@ one that was removed** — that one hid a data cut at 33°N and now lives inside
 the drawing as a radial gradient along that parallel. This one ends the
 picture, and a picture that ends may say so.
 
+**The countries are named, and the name is the only type on the picture.**
+Every other map here sets a country's name across it, and for the same second
+reason: the recognition instrument strips the wordmark and the page title, and
+a drawing that names what it draws survives that where a shape alone does not.
+Placed by the atlas's own single placement rule — the centroid of the
+country's drawn shape, then eight points around it, each of the four positions
+tested against the frame and against every name already down — in the plates'
+own tracked uppercase, so no font size is introduced. Twenty-three of the
+forty-four are named; the rest are dropped, and keep their shape, their
+frontier, their link and their accessible name.
+
+**Two rules were needed and neither was obvious.** Without the first, the
+nine anchors and four positions are enough freedom to LEAVE: ICELAND floated
+in the Denmark Strait, UNITED KINGDOM and PORTUGAL sat in the Atlantic and
+BOSNIA AND HERZEGOVINA lay across the whole Balkan peninsula. **A name's
+middle must be on the country it names** — it may run out over the sea, which
+is what a printed atlas does with Norway, and it may not start there.
+
+That fixed the position and left the width: SWITZERLAND then ran from
+Bordeaux to Munich, correctly centred. A printed atlas answers with an
+abbreviation, a leader line or a number in a key and this picture carries none
+of the three, so **a name more than twice its country's longest side is
+dropped**. Measured against the LONGEST side rather than the width, because
+Portugal is 55 units across and 160 tall and its name reads perfectly down it.
+Iceland's name is 1.8 times its island and belongs on the map; Switzerland's
+is 3.6 times its country and does not.
+
+**And they come off below 44rem.** `--t-lg` is a length in a 1,120-unit
+viewBox: at 390 that is a third of a pixel per unit, so a twenty-unit name
+renders at seven pixels — not small type, type that does not resolve into
+glyphs. It is the same measurement that took the map labels off narrow screens
+on eight hundred pages.
+
 **Every country on the hero is a door, and for one commit none of them
 opened.** The picture's one job is to be the way in and it led nowhere:
 `aria-hidden`, `pointer-events: none`, not in the tab order. Each of the
