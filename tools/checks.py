@@ -2468,6 +2468,94 @@ def c_one_label_rule():
     return n
 
 
+@check("the cartographic standard holds where a machine can hold it")
+def c_cartographic_standard():
+    # THE STANDARD IS docs/cartographic-standard.md, AND NINE OF ITS TEN
+    # PRINCIPLES ARE SOMEBODY'S OPINION UNTIL SOMETHING MEASURES THEM. Three
+    # are mechanical and are measured here.
+    #
+    # 2. GEOGRAPHY BEFORE DATABASE — a plate draws what it can name. Every
+    #    mark on a country plate has a label on the same plate. The rule is
+    #    not a ranking, because this atlas holds none: `rank`, `featured`,
+    #    `boost` and `sponsored` are refused on every editorial record.
+    #    Curation is by legibility, which is a property of the DRAWING and
+    #    never a judgement about the place.
+    #
+    # 4. HIERARCHY BEFORE COMPLETENESS — the capital is placed first and
+    #    cannot be dropped. A country plate with no capital on it is not a
+    #    country plate.
+    #
+    # 7. QUIET COLOUR BEFORE SATURATED COLOUR — every colour the cartography
+    #    paints is under a saturation ceiling. Saturated colour is the single
+    #    clearest difference between an editorial atlas and a dashboard, and
+    #    it is the easiest thing to lose one token at a time.
+    # CHROMA, NOT HSV SATURATION. The first version of this used
+    # `colorsys.rgb_to_hsv`, which reports the deep ocean #123f55 at 0.79 —
+    # a dark navy called loud. HSV saturation is a ratio to the brightest
+    # channel, so it rises as a colour DARKENS whatever its colourfulness,
+    # and every editorial ink in this palette would have failed. Chroma is
+    # the spread between the channels, which is what "quiet" means to an eye:
+    # the deep ocean is 0.26 and a dashboard cyan is 1.00.
+    css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
+               encoding="utf-8").read()
+    n = 0
+    loud = []
+    for name, hexv in re.findall(r"--(atlas-[a-z-]+|ocean-[a-z-]+):\s*(#[0-9a-fA-F]{6})",
+                                 css):
+        ch = [int(hexv[i:i + 2], 16) for i in (1, 3, 5)]
+        chroma = (max(ch) - min(ch)) / 255.0
+        if chroma > 0.40:
+            loud.append(f"--{name} {hexv} at chroma {chroma:.2f}")
+        n += 1
+    assert not loud, ("the cartography paints a saturated colour: "
+                      + "; ".join(loud))
+    assert n >= 8, f"only {n} cartographic colours found — has the palette moved?"
+
+    plates = 0
+    for path in site_files():
+        html = open(path, encoding="utf-8").read()
+        if 'class="lyr lyr-destinations"' not in html:
+            continue
+        i = html.index('class="lyr lyr-destinations"')
+        marks = html[i:html.index("</g>", i)]
+        j = html.index('class="lyr lyr-labels"')
+        labels = html[j:html.index("</g>", j)]
+        # SCOPED TO THE COUNTRY PLATE, which is the family this rule is
+        # about. A destination's local view is a different promise — where
+        # you are AND what is around you — so it draws its neighbours and
+        # hands their names to the list below on a narrow screen, which is
+        # the phone rule every embedded map has followed since commit 39.
+        nmark = marks.count('class="pmark')
+        nname = len(re.findall(r'class="pname(?: cap)?"', labels))
+        if nmark == 0:
+            continue
+        plates += 1
+        assert nmark == nname, (
+            f"{rel(path)} draws {nmark} marks and names {nname} of them — a "
+            f"mark the plate cannot name is a dot that says only 'something "
+            f"is here'")
+        # THE CAPITAL, WHERE THE ATLAS HOLDS ONE. Montenegro's capital is
+        # Podgorica and this atlas writes about Kotor, Perast and Žabljak —
+        # so there is no capital to mark, and inventing a point for it would
+        # be drawing a place we have nothing to say about. The promise is:
+        # if the capital is one of the country's destinations, the plate
+        # draws it and cannot drop it.
+        slug = rel(path).split("/")[2]
+        cy = json.load(open(os.path.join(ROOT, "data", "countries",
+                                         slug + ".json"), encoding="utf-8"))
+        cap = cy.get("capital")
+        holds = any(t["name"].split(" &")[0] == cap
+                    for r in cy["regions"] for t in r["cities"])
+        if holds:
+            assert 'class="pmark cap"' in marks, (
+                f"{rel(path)} holds {cap} as a destination and its plate does "
+                f"not draw it — the capital is placed first and cannot be "
+                f"dropped")
+        n += 2
+    assert plates >= 40, f"only {plates} plates examined"
+    return n
+
+
 @check("the map renderer's layers are declared, ordered and painted")
 def c_cartography():
     # THE PAINT ORDER IS THE THING THAT CANNOT BE SEEN TO BE WRONG. Terrain

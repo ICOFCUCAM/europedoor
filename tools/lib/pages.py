@@ -1024,7 +1024,7 @@ def countryportrait(data, c):
                 order_.append((rank_, -_depth(t), px, py,
                                t["name"], iscap, kind_))
     order_.sort()
-    dotmarks, boxes_, minor = "", [], []
+    dotmarks, boxes_, minor, marks_, named_ = "", [], [], [], set()
 
     def _try_label(px, py, text, cls, metric="minilabel", off=10.0,
                    prefer="beside"):
@@ -1048,6 +1048,15 @@ def countryportrait(data, c):
         labs_.append(lhtml)
         return True
 
+    def _mark(px, py, nm, iscap, kind):
+        if iscap:
+            return (f'<path class="pmark cap" d="{_star(px, py, 5.0)}">'
+                    f'<title>{esc(nm)}</title></path>')
+        city = kind == "city"
+        return (f'<circle class="pmark{"" if city else " open"}" '
+                f'cx="{px:.1f}" cy="{py:.1f}" r="{3.4 if city else 3.0}">'
+                f'<title>{esc(nm)}</title></circle>')
+
     for _k, _d, px, py, nm, iscap, kind in order_:
         # A CARTOGRAPHIC TYPE HIERARCHY, FROM DATA THE ATLAS ALREADY HOLDS.
         # Every place used to be the same dot and the same 11px name, which
@@ -1063,15 +1072,7 @@ def countryportrait(data, c):
         #
         # Nothing is authored to make this work. It is the classification
         # already in the dataset, drawn.
-        if iscap:
-            r = 5.0
-            dotmarks += (f'<path class="pmark cap" d="{_star(px, py, r)}">'
-                         f'<title>{esc(nm)}</title></path>')
-        else:
-            city = kind == "city"
-            dotmarks += (f'<circle class="pmark{"" if city else " open"}" '
-                         f'cx="{px:.1f}" cy="{py:.1f}" r="{3.4 if city else 3.0}">'
-                         f'<title>{esc(nm)}</title></circle>')
+        marks_.append((px, py, nm, iscap, kind))
         # A REAL BOX OVERLAP, NOT A DISTANCE. The first version dropped a
         # label only if its DOT was within 8% of the frame of another dot,
         # which says nothing about a name 28 characters long: France drew
@@ -1086,7 +1087,8 @@ def countryportrait(data, c):
         if _k >= 2:
             minor.append((px, py, nm))
             continue
-        _try_label(px, py, nm, "pname" + (" cap" if iscap else ""))
+        if _try_label(px, py, nm, "pname" + (" cap" if iscap else "")):
+            named_.add(nm)
     # THE PLATE NAMES ITS OWN SUBJECT. An atlas plate has the country's name
     # set across it, and there is a second reason here: the recognition test
     # strips the wordmark and the page title, and a plate that names what it
@@ -1099,26 +1101,50 @@ def countryportrait(data, c):
     # boundary round it. Placed after the place names and tested against the
     # same boxes, so a region name never costs a destination its name: a
     # grouping is the thing a reader can most afford to lose.
+    # THE MINOR LOCATIONS, THEN THE REGIONS. Placing regions first cost
+    # France four place names for two groupings — "THE ALPS & THE EAST" is a
+    # third of the plate's width at region size — and a plate that names four
+    # fewer real places to name two groupings is a worse plate. A grouping is
+    # the thing a reader can most afford to lose, so it takes what is left.
+    for px, py, nm in minor:
+        if _try_label(px, py, nm, "pname"):
+            named_.add(nm)
+
     for r_ in c["regions"]:
         pts_r = [proj.xy(t["lat"], t["lon"]) for t in r_["cities"]]
         pts_r = [(x, y) for x, y in pts_r if 0 <= x <= w and 0 <= y <= h]
         if len(pts_r) < 2:
             continue
-        rx = sum(p[0] for p in pts_r) / len(pts_r)
-        ry = sum(p[1] for p in pts_r) / len(pts_r)
-        got = place_label_box(rx, ry, r_["name"].upper(), w, h,
-                              cls="rname", off=9.0, prefer="over",
-                              metric="rlabel")
-        if not got:
-            continue
-        lhtml, lx, ly, lw, lh = got
-        box = (lx - LABEL_CLEAR, ly - LABEL_CLEAR,
-               lx + lw + LABEL_CLEAR, ly + lh + LABEL_CLEAR)
-        if any(not (box[2] < q[0] or box[0] > q[2]
-                    or box[3] < q[1] or box[1] > q[3]) for q in boxes_):
-            continue
-        boxes_.append(box)
-        labs_.append(lhtml)
+        _try_label(sum(p[0] for p in pts_r) / len(pts_r),
+                   sum(p[1] for p in pts_r) / len(pts_r),
+                   r_["name"].upper(), "rname", metric="rlabel", off=9.0,
+                   prefer="over")
+
+    # A PLATE DRAWS WHAT IT CAN NAME. Every destination used to get a mark,
+    # so France carried twenty-eight and eleven of them were dots with no
+    # word anywhere near them — "we hold 319 records, therefore 319 dots",
+    # which is database visualisation rather than cartography.
+    #
+    # The rule is not a ranking, because this atlas holds none and refuses to
+    # invent one: `rank`, `featured`, `boost` and `sponsored` are refused on
+    # every editorial record, in the schema and again at the file level. It
+    # is LEGIBILITY. A mark whose name the plate could not fit says only
+    # "there is something here", and that is what the reference map further
+    # down the page is for — it keeps every dot, every name, every touch
+    # target and the scale bar.
+    #
+    # A capital and a city always draw, named or not: those are the two
+    # levels a reader orients by, and a country plate with no capital on it
+    # is not a country plate.
+    # THE CAPITAL ALWAYS, AND OTHERWISE ONLY WHAT IS NAMED. The first version
+    # of this rule also drew every city named or not, which left France with
+    # fifteen marks and five words: ten dots saying "something is here" and
+    # nothing else, which is the database behaviour the rule was written to
+    # remove. A mark the plate cannot name belongs on the reference map,
+    # which keeps every dot, every name and every touch target.
+    for px, py, nm, iscap, kind in marks_:
+        if iscap or nm in named_:
+            dotmarks += _mark(px, py, nm, iscap, kind)
 
     cbox = _highlight_box(land)
     countryname = ""
@@ -1164,6 +1190,7 @@ def countryportrait(data, c):
                   f'projection{away}{cutsay}'))
         + f'<div class="platefoot">{locator_inset(c["slug"])}'
           f'<ul class="platekey"><li class="k-cap">Capital</li>'
+          f'<li class="k-city">City</li>'
           f'<li class="k-dest">Destination</li>'
           f'<li class="k-here">{esc(c["name"])}</li></ul></div></div>'
     )

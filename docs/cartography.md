@@ -1,5 +1,30 @@
 # The EuropeDoor Atlas — cartographic art direction
 
+## The rule that governs the benchmark
+
+> **The reference plate is art direction and never geographic truth.** All
+> geometry, positions, borders, rivers and terrain come from authoritative
+> datasets in `data/geo/`, fetched by `scripts/map/fetch.py`, hashed and
+> registered in `docs/data-licenses/`. Nothing is ever traced, eyeballed or
+> transcribed from the reference.
+
+This matters more here than it would elsewhere, because the reference plate
+is **itself generated**: its coastline, its rivers, its region boundaries and
+its relief are an image model's idea of Portugal, not Portugal. Copying any
+of it would put invented geography on 1,033 pages under the same aperture
+that carries the real thing, and a reader has no way to tell the two apart.
+
+What the reference is for: palette, the four-step water, the type hierarchy,
+the key, the locator, the frame, the restraint. What it is not for: where
+anything is.
+
+The existing guards already catch the data half — `fetch.py` refuses a source
+with no licence row, `checks.py` hashes every raw file against the register,
+and the validator refuses `iso3`, coordinates and population as authored
+keys. The guard for the drawing half is this paragraph and the fact that
+every layer in the renderer reads a registered file or nothing at all.
+
+
 **Principle: Europe is not displayed as data. It is revealed as geography.**
 
 The country plates were a blue polygon on a near-black field with a thin

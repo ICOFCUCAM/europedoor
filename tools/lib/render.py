@@ -114,7 +114,13 @@ def arch_rim(w, h, rise=None, x0=0.0, y0=0.0):
     `arch_path()` as the clip and the reveal, because three curves that
     disagree by a pixel is three signatures.
     """
-    return f'<path class="archrim" d="{arch_path(w, h, rise)}"/>'
+    # TWO LINES, NOT ONE. A single hairline reads as a border round a
+    # picture; a window cut in a wall shows the FACE of the wall and then the
+    # shadow of the cut, and the eye reads depth from the pair. The outer is
+    # the page's own limestone laid over the drawing's edge, the inner a fine
+    # ink line just inside it.
+    return (f'<path class="archrim" d="{arch_path(w, h, rise)}"/>'
+            f'<path class="archrim inner" d="{arch_path(w, h, rise)}"/>')
 
 
 def arch_edge(w, h, rise=None, x0=0.0, y0=0.0):

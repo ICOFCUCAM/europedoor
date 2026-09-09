@@ -2558,8 +2558,16 @@ body[data-hero] .masthead { position: sticky; }
    limestone and the inner in ink, is what an architectural opening actually
    shows: the wall's edge, then the shadow of the cut. */
 .minimap.arched.atlas .archedge { stroke-width: 1.1; }
+/* THE APERTURE IS A WINDOW CUT IN LIMESTONE, not an SVG in a rounded
+   rectangle. The wall's face is laid over the drawing's edge and a fine ink
+   line sits just inside it, which is what an opening in masonry actually
+   shows and where the eye reads depth from. Both are struck from the same
+   `arch_path()` as the clip and the reveal: three curves that disagree by a
+   pixel is three signatures. */
 .minimap.arched.atlas .archrim { fill: none; stroke: var(--limestone);
-                                 stroke-width: 4; }
+                                 stroke-width: 6; }
+.minimap.arched.atlas .archrim.inner { stroke: var(--graphite);
+                                       stroke-width: 1; opacity: .38; }
 
 /* THE PLATE FOOT: where in Europe this is, and what the marks mean. Both are
    on the benchmark and both are cheap; a key is how a map stops needing a
@@ -2580,10 +2588,19 @@ body[data-hero] .masthead { position: sticky; }
 .platekey li { display: flex; align-items: center; gap: var(--s3); }
 .platekey li::before { content: ""; flex: 0 0 auto; width: 10px; height: 10px;
                        border-radius: 999px; }
-.platekey .k-cap::before { background: var(--door); }
-.platekey .k-dest::before { background: var(--atlas-hereline); }
-.platekey .k-here::before { background: var(--atlas-here);
-                            border: 1px solid var(--atlas-hereline);
+/* THE KEY SHOWS THE MARKS THE PLATE ACTUALLY DRAWS. It carried a blue dot
+   for a capital after the capital became a star, and no city at all after
+   the city became a filled dot — a key that disagrees with its map is worse
+   than none, because a reader believes it. */
+.platekey .k-cap::before { background: var(--door);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%,
+                     21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  border-radius: 0; width: 12px; height: 12px; }
+.platekey .k-city::before { background: var(--atlas-hereline); }
+.platekey .k-dest::before { background: var(--atlas-here);
+                            border: 1.4px solid var(--atlas-hereline); }
+.platekey .k-here::before { background: #ffffff;
+                            border: 1.1px solid var(--atlas-hereline);
                             border-radius: 2px; }
 
 /* RIVERS AND LAKES. The rules are here before the data, because the layer

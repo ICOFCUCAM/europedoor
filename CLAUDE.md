@@ -29,6 +29,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **the Postgres/PostGIS model, the API, Next.js, auth, search, the AI pipeline** | **`docs/technical-foundation.md`** — a destination with a trigger, not a plan for Monday. Nothing in it should be built yet |
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
 | **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. Every spec section asserted against the real build, and CI fails if any of them stops being true |
+| **the cartographic standard — the ten principles and what holds each** | **`docs/cartographic-standard.md`** — editorial European atlas, not GIS. Nine of the ten are held by a check or an invariant; the tenth is the editorial test |
 | **how a map is DRAWN — palette, layers, what the benchmark still needs** | **`docs/cartography.md`** — the pictures are paper and the instruments are graphite. The four layers, the measured palette, and the four things the benchmark has that are blocked on a licence or a socket |
 | **the map, geographic data, tiles, or "why not Mapbox?"** | **`docs/map-architecture.md`** — the pipeline, the three levels of detail, and why this is SVG rather than MapLibre. Then **`docs/data-licenses/`**, which is the register, and **`docs/boundary-policy.md`** for disputed frontiers |
 | **the frontend — routes, the shell, primitives, what §4 must not do** | **`docs/frontend-architecture.md`** — §4, measured. 1,067 documents and five applications; eleven primitives cover 100% of the site |
@@ -147,6 +148,15 @@ into.
 Sponsorship attaches to a provider and affects directory surfaces only. That
 wall is enforced in the schema, which is the only version of the promise
 worth making.
+
+**A reference plate is art direction, never geographic truth.** The
+cartographic benchmark this atlas is being drawn against is an AI-generated
+image: its coastline, its rivers, its region boundaries and its relief are a
+model's idea of Portugal rather than Portugal. Take its palette, its water
+ramp, its type hierarchy, its key, its locator and its restraint; take
+nothing about where anything is. All geometry comes from `data/geo/`, fetched
+by `scripts/map/fetch.py`, hashed and registered in `docs/data-licenses/`.
+Nothing is traced, eyeballed or transcribed. See `docs/cartography.md`.
 
 **EuropeDoor does not pay for maps, and a check enforces it.** The land comes
 from Natural Earth (public domain), fetched by `scripts/map/fetch.py`, hashed,
