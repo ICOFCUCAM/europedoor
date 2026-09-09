@@ -2451,6 +2451,69 @@ def c_one_label_rule():
     return n
 
 
+@check("a journey's leg bars are drawn from the real distances")
+def c_leg_bars():
+    # A CHART IS A CLAIM, AND THIS ONE IS PUBLISHED ON SEVENTEEN PAGES.
+    #
+    # The shape of a journey is the lengths of its legs, and the page stated
+    # them in words 104 times and never drew them. Within one journey the
+    # longest leg is between 1.6x and 20.5x the shortest, so every leg row
+    # being the same height made the Carpathian Arc — a 22 km hop and a
+    # 443 km haul in the same list — look exactly like the White Villages.
+    #
+    # The bar is `.w0`-`.w100`, so what is asserted is the PERCENTAGE on the
+    # shipped page against a haversine computed here, independently of
+    # `pages.py`. Correct labels over a drawing scaled from the wrong array
+    # still reads as a finished chart, which is the failure this catches:
+    # one scale WITHIN a journey, the longest leg full width. Also asserted
+    # is that the longest reaches 100 — a bar chart whose top value is 60%
+    # is a chart nobody can read a ratio off.
+    import math
+
+    def hav(a, b):
+        R = 6371.0
+        p1, p2 = math.radians(a["lat"]), math.radians(b["lat"])
+        dp = math.radians(b["lat"] - a["lat"])
+        dl = math.radians(b["lon"] - a["lon"])
+        x = math.sin(dp / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
+        # ROUNDED, because the bar must agree with the number printed
+        # beside it: the page says "146 km" and scales the bar by 146. The
+        # haversine itself is recomputed here from the coordinates rather
+        # than read from the build, which is the part that has to be
+        # independent; sharing the decision to round to whole kilometres is
+        # not agreeing with itself, it is asserting the drawing matches the
+        # words. Off by one leg in seventeen journeys when it did not.
+        return round(2 * R * math.asin(math.sqrt(x)))
+
+    cities = {}
+    for fn in sorted(os.listdir(os.path.join(ROOT, "data", "countries"))):
+        if not fn.endswith(".json"):
+            continue
+        cy = json.load(open(os.path.join(ROOT, "data", "countries", fn), encoding="utf-8"))
+        for reg in cy["regions"]:
+            for t in reg["cities"]:
+                cities[f"{cy['slug']}/{reg['slug']}/{t['slug']}"] = t
+    journeys = list(json.load(
+        open(os.path.join(ROOT, "data", "journeys.json"), encoding="utf-8")).values())[0]
+    n = 0
+    for j in journeys:
+        stops = [cities[l["city"]] for l in j["legs"]]
+        km = [hav(a, b) for a, b in zip(stops, stops[1:])]
+        if not km:
+            continue
+        want = [int(round(d / max(km) * 100)) for d in km]
+        html = open(os.path.join(OUT, "journeys", j["slug"], "index.html"),
+                    encoding="utf-8").read()
+        got = [int(x) for x in re.findall(r'<span class="hopbar"[^>]*>'
+                                          r'<span class="w(\d+)">', html)]
+        assert got == want, (
+            f"/journeys/{j['slug']}: leg bars {got} but the distances give {want}")
+        assert 100 in want, f"/journeys/{j['slug']}: no leg bar reaches full width"
+        n += len(want)
+    assert n > 80, f"only {n} leg bars examined"
+    return n
+
+
 @check("the year band draws the dataset, and both of its numbers agree with it")
 def c_year_band():
     # A CHART IS A CLAIM, AND THIS ONE IS PUBLISHED ON THIRTEEN PAGES.

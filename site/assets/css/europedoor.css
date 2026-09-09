@@ -545,6 +545,24 @@ main.wide { max-width: 92rem; }
 .scorenum { font-family: var(--mono); font-size: var(--t-sm); text-align: right; color: var(--ink-2); }
 .score .small { margin: var(--s4) 0 0; }
 
+/* THE SHAPE OF A JOURNEY IS THE LENGTHS OF ITS LEGS, and the page had a
+   section called "The shape of it" containing a table of facts. Every leg
+   row was the same height whatever the distance, so the Carpathian Arc — a
+   22 km hop and a 443 km haul in the same list — looked exactly like the
+   White Villages, whose longest leg is 1.6x its shortest. The number was
+   printed in words on all 104 legs and never once drawn.
+   One scale within a journey, never between journeys: shared, every Alpine
+   leg would be a stub beside an Arctic one and say nothing about either.
+   Built from `.w0`-`.w100`, the same utility classes the Europe Experience
+   Score uses, because a `style` attribute would force `style-src` open on
+   all 1,033 pages. */
+.hopbar { display: block; height: 3px; margin: var(--s2) 0 var(--s3);
+          background: var(--paper-3); border-radius: 999px; overflow: hidden; }
+.hopbar > span { display: block; height: 100%; background: var(--door); }
+/* The stop's number in the order — a real sequence, so a numeral says
+   something true rather than decorating a list. */
+.leg-no { display: block; font-family: var(--mono); font-size: var(--t-sm);
+          color: var(--door); font-variant-numeric: tabular-nums; }
 /* ── the map ──────────────────────────────────────────────── */
 /* The drawing is 1000 x 780, so at a full-width 1232px column it is 960px
  * tall and a 900px-high laptop shows Scandinavia and nothing else. Capping
@@ -2228,6 +2246,18 @@ body[data-hero] .masthead { position: sticky; }
 .minimap.arched .minidot circle { opacity: 1;
   fill: color-mix(in srgb, var(--limestone) 55%, transparent); }
 .minimap.arched .minidot.here circle { fill: var(--lime); }
+/* AND WHICH END IT STARTS AT. A route line drawn in order is the same
+   drawing as the same route travelled backwards, so the last stop is hollow
+   and the first is not, and the caption says which is which — an unexplained
+   second mark is a puzzle, not a signal. Only an ordered set gets it:
+   `line=True` is already the one thing separating a route from a theme.
+   `:not(.hit)` because each dot carries a transparent 24px touch target as
+   well, and painting THAT is how three grey blobs the size of a region
+   appeared on every country map with every check green.
+   Placed after the `.here` rule rather than before it: same specificity,
+   (0,4,1) both, so the later one wins and the earlier one is dead. */
+.minimap.arched .minidot.last circle:not(.hit) {
+  fill: var(--map-sea); stroke: var(--lime); stroke-width: 2.4; }
 .minimap.arched .minilabel { fill: color-mix(in srgb, var(--limestone) 72%, transparent); }
 .minimap.arched .minilabel.here { fill: var(--limestone); font-weight: 600; }
 /* The region names, which the aperture left behind. .countrymap .rlabel

@@ -1535,14 +1535,39 @@ def journey_page(data, j):
     legs = []
     day = 1
     prev = None
+    # THE SHAPE OF A JOURNEY IS THE LENGTHS OF ITS LEGS, and the page stated
+    # them 104 times in prose and never once showed them. Measured across the
+    # seventeen journeys: legs run 22 km to 2,531 km, and within a single
+    # journey the longest is between 1.6x and 20.5x the shortest — the
+    # Carpathian Arc is a 22 km hop and a 443 km haul in the same list, and
+    # both rows were the same height, so the trip that is three short days and
+    # one long one looked exactly like the trip that is six even ones.
+    #
+    # Drawn as a bar per leg on ONE scale within the journey — the longest leg
+    # is full width — because a scale shared between journeys would make every
+    # Alpine leg a stub next to an Arctic one and say nothing about either.
+    # `.w0`-`.w100` are the utility classes the Europe Experience Score
+    # already uses; a `style` attribute would force `style-src` open on all
+    # 1,033 pages, which is the reason there is not one anywhere.
+    hops = []
+    _p = None
+    for leg in j["legs"]:
+        t_ = idx[leg["city"]]["city"]
+        if _p is not None:
+            hops.append(haversine(_p, t_))
+        _p = t_
+    longest = max(hops) if hops else 0.0
     for leg in j["legs"]:
         n = idx[leg["city"]]
         t, r, c = n["city"], n["region"], n["country"]
         hop = ""
         if prev is not None:
             km = haversine(prev, t)
+            pct = int(round(km / longest * 100)) if longest else 0
             hop = (f'<p class="hop">↳ {esc(hop_note(km))} from '
-                   f'{esc(prev["name"])} in a straight line</p>')
+                   f'{esc(prev["name"])} in a straight line</p>'
+                   f'<span class="hopbar" aria-hidden="true">'
+                   f'<span class="w{pct}"></span></span>')
         # The day numbers are derived at load now (see data.load), so the
         # page reads them rather than counting again. Two places counting the
         # same nights is how a journey page and an API disagree about which
@@ -1565,7 +1590,8 @@ def journey_page(data, j):
         nights = f"{leg['nights']} night" + ("" if leg["nights"] == 1 else "s")
         legs.append(
             f"""<li class="leg">
-            <div class="leg-when"><span class="leg-day">{esc(when)}</span>
+            <div class="leg-when"><span class="leg-no">{len(legs) + 1}</span>
+              <span class="leg-day">{esc(when)}</span>
               <span class="leg-nights">{esc(nights)}</span></div>
             <div class="leg-what">{hop}
             <h3><a href="{urls.city(c, r, t)}">{esc(t['name'])}</a>
@@ -1652,7 +1678,12 @@ def journey_page(data, j):
     Zermatt is 69&nbsp;km here and about 170 on the ground, round a mountain
     range. It is here for the scale of the thing, not for planning a day.</p>
     <ol class="legs route">{''.join(legs)}</ol>
-    <h2 class="mt7">The shape of it</h2>
+    <!-- A SECTION CALLED "The shape of it" HELD A TABLE OF FACTS. The shape
+         of a journey is the lengths of its legs, and that is now drawn on
+         the legs themselves; what is here is the record, so it says so.
+         A heading that promises a shape and delivers a list is the same
+         failure as an index that states the wrong count. -->
+    <h2 class="mt7">The record</h2>
     {facts}
 
     <h2 class="mt7">Experiences along the way</h2>
@@ -2863,10 +2894,20 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
     # for being within 300px of Budapest's.
     dx_min, dy_min = vw * 0.10, vh * 0.030
     hitr = hit_radius([((x - x0) * k, (y - y0) * k) for x, y, _h, _n in pts], vw)
-    for x, y, href, name in pts:
+    for i, (x, y, href, name) in enumerate(pts):
         px, py = (x - x0) * k, (y - y0) * k
+        # WHERE IT STARTS, ON A PICTURE OF A JOURNEY. A route line drawn in
+        # order carries no direction a reader can see: the Alpine Grand Tour
+        # and the same six valleys travelled backwards are the same drawing.
+        # Only an ORDERED set gets this — `line` is already the one thing
+        # separating "you go to these in this sequence" from "these places
+        # make one case", and marking a first stop on a theme map would be
+        # asserting an order the data does not have.
+        ends = ""
+        if line:
+            ends = " first" if i == 0 else (" last" if i == len(pts) - 1 else "")
         dots.append(
-            f'<a class="minidot here" href="{href}">'
+            f'<a class="minidot here{ends}" href="{href}">'
             f'<circle class="hit" cx="{px:.1f}" cy="{py:.1f}" r="{hitr:.1f}"/>'
             f'<circle cx="{px:.1f}" cy="{py:.1f}" r="5.5"/>'
             f'<title>{esc(name)}</title></a>'
@@ -3048,8 +3089,8 @@ def routemap(data, j):
                     urls.city(n["country"], n["region"], n["city"]),
                     n["city"]["name"]))
     uid = "rt" + "".join(ch for ch in j["slug"] if ch.isalnum())[:14]
-    cap = ('Straight lines between stops, in order — the order is real, the '
-           'lines are not routes. Coastline from '
+    cap = ('Straight lines between stops, in order, ending at the hollow dot '
+           '— the order is real, the lines are not routes. Coastline from '
            '<a href="/sources">Natural Earth</a>, public domain. '
            '<a href="/map">The whole map, with every journey →</a>')
     return pointsmap(pts, uid, cap, f'Route map for {j["name"]}',

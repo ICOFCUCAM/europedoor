@@ -170,17 +170,41 @@ hundred pixels tall.
 8. **REFUSED** on this family: no score, no facts, no counts. A story is not a record.
 9. **REFUSED**: a drop cap, tag chips above the text, related-content furniture in the body.
 
-### Journey — 17 — *movement*
+### Journey — 17 — *movement and progression* — EXEMPLAR
 
-1. Seventeen days, and you can see the shape of them.
-2. The route drawn across the continent, hop by hop.
-3. The line, with the land under it.
-4. Statement, route, the legs in order, the record.
-5. Open a leg.
-6. **Explicit.**
-7. None.
-8. Days, distances, and what each leg costs in hours.
-9. **REFUSED**: a price, a booking, a "from £".
+The third exemplar. The page had a section headed **The shape of it**
+containing a table of facts, and the shape of a journey — the lengths of its
+legs — was stated in words on all 104 legs and drawn nowhere. Every leg row
+was the same height whatever the distance, so the Carpathian Arc (a 22 km hop
+and a 443 km haul in one list) looked exactly like the White Villages (whose
+longest leg is 1.6× its shortest).
+
+1. **Emotional promise** — a trip with a shape: where it starts, where it
+   ends, and what the days between them are actually like.
+2. **Signature moment** — the spine, drawn to scale. Each leg carries a bar
+   whose length is its real straight-line distance, on one scale within the
+   journey, so reading down the list *is* the trip: three short valley hops
+   and then a 443 km haul, seen before it is read.
+3. **Geography** — the route on the continent, in order, with the last stop
+   hollow so the drawing has a direction. A route line drawn in order is
+   otherwise the same picture as the route travelled backwards.
+4. **Imagery** — none today. This is the family whose photographic slot is
+   the clearest (a sequence, one frame per stop) and the emptiest; see
+   `docs/image-philosophy.md`.
+5. **Hierarchy** — name, what it is, the counts, the route, then the legs in
+   order. The record last, under a heading that says *record*.
+6. **Interaction** — open a stop, or put the whole thing in the planner.
+7. **Aperture** — explicit, one, at the top: 2.6:1, wider than a
+   destination's window because a route has extent and the extent is the
+   subject.
+8. **Data** — the record, the cost estimate, the months, all last, and the
+   estimate carries its both-directions caveat once, above the legs.
+9. **NOT above the fold** — the fact table, the cost, the packing list, the
+   food, the experiences rail. All of it is what you read after deciding.
+
+**One scale within a journey, never between journeys.** Shared, every Alpine
+leg would be a stub beside an Arctic one and say nothing about either.
+`checks.py` recomputes every bar from the coordinates.
 
 ### Motion — 12 — *a query, answered*
 
