@@ -376,6 +376,56 @@ def km_per_unit(proj, lat, lon):
     return ground / drawn
 
 
+def scale_bar(proj, lat_lo, lat_hi, lon, units_per_unit, frame_w, frame_h,
+              tol=0.02):
+    """A scale bar, or nothing, and the arithmetic that decides which.
+
+    THE PROJECTION IS WHAT MADE THIS POSSIBLE, AND IT IS WORTH SAYING WHY.
+    Under the equirectangular projection that preceded the conic, ground
+    distance per drawn unit along a parallel ran from 7.52 km at 33°N to
+    2.85 km at 71.5°N — a spread of 164% inside one frame. A single bar
+    would not have been an approximation, it would have been a lie, and this
+    site does not draw those. Under the conformal conic the same figure runs
+    6.05 to 6.57 km/unit across the whole of Europe, is exact on both
+    standard parallels, and is never more than 4.6% out anywhere.
+
+    So the bar is drawn where it is honest and omitted where it is not: the
+    scale is computed at the frame's own centre latitude, the worst departure
+    across the frame's OWN latitude span is measured, and if that exceeds
+    `tol` there is no bar. A map of Svalbard and Crete together gets none. A
+    map of the Cyclades gets one good to a fraction of a percent.
+
+    `units_per_unit` converts one RENDERED unit into one projection unit —
+    the minimaps draw under a scale(span) transform and pointsmap normalises
+    every frame to 1000 wide, so neither of them draws in projection units.
+    """
+    mid = (lat_lo + lat_hi) / 2.0
+    at_mid = km_per_unit(proj, mid, lon)
+    worst = 0.0
+    steps = 8
+    for i in range(steps + 1):
+        lat = lat_lo + (lat_hi - lat_lo) * i / steps
+        worst = max(worst, abs(km_per_unit(proj, lat, lon) / at_mid - 1.0))
+    if worst > tol:
+        return ""
+    km_per_drawn = at_mid * units_per_unit
+    # A bar somewhere near a fifth of the frame, at a number a reader can
+    # hold: 10, 20, 50, 100, 200, 500, 1000.
+    want = frame_w * 0.2 * km_per_drawn
+    steps_km = [10, 20, 50, 100, 200, 500, 1000, 2000]
+    km = min(steps_km, key=lambda v: abs(math.log(v / want)) if want > 0 else 0)
+    length = km / km_per_drawn
+    if length < frame_w * 0.06 or length > frame_w * 0.42:
+        return ""
+    x = frame_w * 0.035
+    y = frame_h - frame_h * 0.075
+    tick = max(3.0, frame_h * 0.018)
+    return (f'<g class="scalebar" aria-hidden="true">'
+            f'<path d="M{x:.1f} {y - tick:.1f}V{y:.1f}H{x + length:.1f}'
+            f'V{y - tick:.1f}"/>'
+            f'<text x="{x:.1f}" y="{y - tick - 4:.1f}">{km:,} km</text></g>')
+
+
 def sources_line(doc):
     """The attribution sentence for whatever drew this map.
 

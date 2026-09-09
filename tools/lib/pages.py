@@ -1831,6 +1831,30 @@ def empty_state(what, why):
     return (f'<p class="emptystate"><strong>{what}</strong> {why}</p>')
 
 
+# The central meridian of the projection. A scale bar is measured there
+# because that is where a conic's own arithmetic is simplest; the check that
+# the bar is honest walks the frame's latitudes, which is the axis that
+# actually moves the scale.
+LCC_MID_LON = 10.0
+
+
+def _lat_at(y):
+    """Projection y -> latitude, on the central meridian.
+
+    A conic has no closed inverse worth writing here for one caption, and a
+    bisection over the extent costs about forty comparisons — cheaper than
+    the coastline it is drawn on top of, and impossible to get subtly wrong.
+    """
+    lo, hi = 20.0, 85.0
+    for _ in range(60):
+        mid = (lo + hi) / 2.0
+        if MAPPROJ.xy(mid, LCC_MID_LON)[1] > y:
+            lo = mid
+        else:
+            hi = mid
+    return (lo + hi) / 2.0
+
+
 def nights_line(t):
     """"2–3 nights", or "1 night" when the range has no range in it.
 
@@ -1954,6 +1978,12 @@ def minimap(data, t, span=3.2, about=None):
     kmu = geo.km_per_unit(MAPPROJ, t["lat"], t["lon"])
     km_w = int(round(w / span * kmu / 10) * 10)
     km_h = int(round(h / span * kmu / 10) * 10)
+    # And the bar, on the same arithmetic the caption uses. These are the
+    # most-seen maps on the site — one per destination and one per place —
+    # and until the projection was conformal none of them could carry one.
+    bar = geo.scale_bar(MAPPROJ, _lat_at(cy + h / 2 / span),
+                        _lat_at(cy - h / 2 / span), LCC_MID_LON,
+                        1.0 / span, w, h)
     dots, labels = [], []
     for cid, n in sorted(data["cities"].items()):
         x, y = project(n["city"]["lat"], n["city"]["lon"])
@@ -1981,7 +2011,7 @@ def minimap(data, t, span=3.2, about=None):
         f'<rect x="0" y="0" width="{w}" height="{h}" class="archground"/>'
         f'<g transform="translate({w/2 - cx*span:.2f},{h/2 - cy*span:.2f}) scale({span})">'
         f'{ctx}{land}</g>'
-        f'{"".join(dots)}{"".join(labels)}</g></svg>'
+        f'{"".join(dots)}{"".join(labels)}{bar}</g></svg>'
         # `about` names something INSIDE this destination — a place page's
         # subject. The map is then honestly captioned as what it is: this
         # atlas has one projection and its finest unit is about four
@@ -2174,6 +2204,12 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
                      for i, (x, y, _h, _n) in enumerate(pts))
         route = f'<path class="routeline" d="{d}"/>'
     ctx, land = geo.landmass(MAPPROJ, (x0, y0, w, h))
+    # The frame's own latitude span, back out of projection space, so the bar
+    # is drawn only where one number is true across the whole picture.
+    lat_hi = _lat_at(y0)
+    lat_lo = _lat_at(y0 + h)
+    bar = geo.scale_bar(MAPPROJ, lat_lo, lat_hi, LCC_MID_LON,
+                        1.0 / k, vw, vh)
     return (
         f'<figure class="minimap pointsmap arched">'
         f'<svg viewBox="0 0 {vw:.1f} {vh:.1f}" role="img" '
@@ -2182,7 +2218,7 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
         f'<g clip-path="url(#arch-{uid})">'
         f'<rect x="0" y="0" width="{vw:.1f}" height="{vh:.1f}" class="archground"/>'
         f'<g transform="scale({k:.4f}) translate({-x0:.1f},{-y0:.1f})">{ctx}{land}</g>'
-        f'{route}{"".join(dots)}{"".join(lab)}</g></svg>'
+        f'{route}{"".join(dots)}{"".join(lab)}{bar}</g></svg>'
         f'<figcaption>{caption}</figcaption></figure>'
     )
 

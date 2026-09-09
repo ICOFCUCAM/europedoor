@@ -1972,6 +1972,26 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
 .heromap.arched .herodot { fill: var(--lime); opacity: .9; }
 .heromap.arched .herodot.advisory { fill: var(--map-border); opacity: .6; }
 
+/* THE SCALE BAR, WHICH THE PROJECTION EARNED.
+ *
+ * Under the equirectangular projection this replaced, ground distance per
+ * drawn unit ran from 7.52 km at 33°N to 2.85 km at 71.5°N — 164% across one
+ * frame — so a single bar would not have been an approximation but a lie.
+ * The conformal conic holds 6.05–6.57 km/unit across the whole of Europe, so
+ * a bar can be drawn, and geo.scale_bar() omits it on any frame where one
+ * number is not true to within 2% of itself.
+ *
+ * Drawn like an instrument, not like a label: a hairline in the map's own
+ * limestone, sitting in the negative space the conic's fan leaves at the
+ * bottom of the aperture. */
+.scalebar path { fill: none; stroke: color-mix(in srgb, var(--limestone) 62%, transparent);
+                 stroke-width: 1.1; vector-effect: non-scaling-stroke; }
+/* 11px, not 10: the map labels are already 11 and a scale bar is not worth
+   a seventeenth font size on a site that holds sixteen. The invariant
+   register caught it in the same commit that introduced it. */
+.scalebar text { font-family: var(--text); font-size: 11px; letter-spacing: .06em;
+                 fill: color-mix(in srgb, var(--limestone) 62%, transparent); }
+
 /* The aperture draws in its OWN ink, not the page's.
  *
  * Dropping data-world="intelligence" fixed the wall and cost the drawing its

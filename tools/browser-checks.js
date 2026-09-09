@@ -1485,11 +1485,12 @@ async function main() {
           const ground = parse(getComputedStyle(g).fill);
           for (const sel of [".minilabel", ".minilabel.here", ".minidot circle",
                              ".minidot.here circle", ".routeline",
-                             ".rlabel text"]) {
+                             ".rlabel text", ".scalebar text", ".scalebar path"]) {
             const el = fig.querySelector(sel);
             if (!el) continue;
             const cs = getComputedStyle(el);
-            const raw = sel === ".routeline" ? cs.stroke : cs.fill;
+            const raw = (sel === ".routeline" || sel === ".scalebar path")
+            ? cs.stroke : cs.fill;
             const f = parse(raw);
             const a = f[3] * parseFloat(cs.opacity || "1");
             out.push({ sel, fg: [0, 1, 2].map((i) => f[i] * a + ground[i] * (1 - a)),
@@ -1508,7 +1509,8 @@ async function main() {
         // A dot and a route line are graphics, not text: 3:1 is the
         // non-text threshold. The two label selectors are text.
         const need = (m.sel.startsWith(".minilabel")
-                      || m.sel === ".rlabel text") ? 4.5 : 3;
+                      || m.sel === ".rlabel text"
+                      || m.sel === ".scalebar text") ? 4.5 : 3;
         ok(r >= need, `${scheme} ${url}: ${m.sel} inside the aperture is `
            + `${r.toFixed(2)}:1 on the opening's ground, needs ${need}`);
       }
@@ -1781,7 +1783,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 688;
+  const FLOOR = 692;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +
