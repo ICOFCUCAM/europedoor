@@ -303,6 +303,25 @@ shipped HTML — a page printing a hop says "straight line", and no page
 anywhere claims a mode or a ground distance. A source-level check would have
 passed on all three.
 
+**The stories index was nine three-column grids each holding one card.**
+Built from the desk taxonomy rather than from what a reader is doing: nine
+desks, one story each, so nine `<h2>` bands and a 280px card alone in a
+1,168px row with 888 pixels of white beside it, nine times, over 5,792 pixels
+of page. *Design to purpose, not to data shape* — and the shape of the data
+was the entire layout. Nine essays are a contents page: one list, newest
+first, the desk as a kicker on the piece it belongs to, which is what a desk
+always was.
+
+**And all nine drew an illustration chosen by the hash of their own slug** —
+the exact thing *a story is not a place, and its picture may not be drawn
+from a hash* was written for, one page over from where it was enforced.
+Nothing checked the index. The fix is no picture at all: the alternative to a
+hash-drawn landscape is not a better hash. A check now reads every page for a
+story card carrying a plate, because the next place this happens is a
+related-reading rail that does not exist yet. **A section assertion required
+an `<h2>` per desk and the index obliged** — it was reading "grouped by desk"
+as "banded by desk" and enforcing the data's shape as the layout.
+
 **An invisible thing painted, and every counting check was green.** The
 touch targets behind each map dot are transparent circles. `.minidot .hit` is
 specificity (0,2,0) and `.minimap.arched .minidot circle` is (0,3,1), so all

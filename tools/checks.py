@@ -2677,6 +2677,53 @@ def c_one_plate_per_thing():
     return n
 
 
+@check("a story's picture is never drawn from a hash, on any page")
+def c_story_never_a_plate():
+    # THE RULE EXISTED AND WAS ENFORCED ON ONE PAGE OF TWO.
+    #
+    # "A story is not a place, and its picture may not be drawn from a hash"
+    # — the piece about the last unlogged primeval forest in Europe opened on
+    # tower blocks, and story_page() was rebuilt on storymap() to fix it: the
+    # destinations in the story's own validated `places` field, real
+    # coastline, through the arch.
+    #
+    # The INDEX went on carding all nine with `seed="story:" + slug` and no
+    # motif, so every essay got an illustration chosen by the hash of its
+    # own slug — the exact thing the rule was written for, one page over,
+    # and no check looked. It is fixed by the index having no pictures at
+    # all: nine essays are a contents page.
+    #
+    # Asserted on the shipped HTML for every page in the site, because the
+    # next place this can happen is a card on a country page or a related-
+    # reading rail that does not exist yet.
+    d = D.load()
+    slugs = {st["slug"] for st in d["stories"]}
+    n = 0
+    for path in site_files():
+        h = open(path, encoding="utf-8").read()
+        # a plate and a story link inside the same card
+        for m in re.finditer(r'<a class="card"[^>]*href="/stories/([^"/]+)"'
+                             r'(.{0,600}?)</a>', h, re.S):
+            n += 1
+            if m.group(1) in slugs and 'class="plate"' in m.group(2):
+                fail(f'{canonical_of(path)}: the card for the story '
+                     f'"{m.group(1)}" draws a generated plate. A story is not '
+                     f'a place and its picture may not be drawn from a hash — '
+                     f'its own places, a photograph from the register, or '
+                     f'nothing.')
+    n += 1
+    if not os.path.exists(os.path.join(OUT, "stories", "index.html")):
+        fail("/stories: the index is missing")
+    else:
+        idx = open(os.path.join(OUT, "stories", "index.html"),
+                   encoding="utf-8").read()
+        if 'class="plate"' in idx:
+            fail("/stories: the index draws a generated plate. Nine essays "
+                 "are a contents page, and the alternative to a hash-drawn "
+                 "landscape is not a better hash, it is no picture.")
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0

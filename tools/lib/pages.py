@@ -3455,16 +3455,38 @@ def theme_page(data, t):
 # ── stories ───────────────────────────────────────────────────────────
 
 def stories_index(data):
+    # NINE THREE-COLUMN GRIDS, EACH CONTAINING ONE CARD.
+    #
+    # The page was built from the DESK TAXONOMY rather than from what a
+    # reader is doing. Nine desks, one story each, so nine <h2> bands and
+    # nine grids of one — a 280px card alone in a 1,168px row with 888
+    # pixels of white beside it, nine times, over 5,792 pixels of page. The
+    # rule this repository already states is "design to purpose, not to data
+    # shape", and the shape of the data was the whole layout.
+    #
+    # AND EVERY ONE OF THEM DREW AN ILLUSTRATION CHOSEN BY HASH. The other
+    # rule this repository already states is that a story is not a place and
+    # its picture may not be drawn from a hash — that is why the story PAGE
+    # opens on a storymap of its own validated places. The index went on
+    # picking a landscape from the slug for all nine, which is the same
+    # failure the rule was written for, one page over.
+    #
+    # Nine essays is a contents page. The desk becomes a kicker on the piece
+    # it belongs to, which is what it always was — a property of the story,
+    # not a heading over one — and the date and the reading time are what a
+    # reader actually chooses on.
     sections = sorted({s["section"] for s in data["stories"]})
-    desks = ""
-    for desk in sections:
-        items = [s for s in data["stories"] if s["section"] == desk]
-        desks += section(desk, grid([
-            card(urls.story(s), s["published"], s["title"], s["standfirst"],
-                 seed="story:" + s["slug"],
-                 meta=f'<p class="cardmeta">{esc(s["reading"])}</p>')
-            for s in items
-        ], 3))
+    byline = sorted(data["stories"],
+                    key=lambda s: (s["published"], s["title"]), reverse=True)
+    desks = '<div class="rows">' + "".join(
+        f'<a class="row" href="{urls.story(s)}">'
+        f'<div><p class="kicker">{esc(s["section"])}</p>'
+        f'<h3>{esc(s["title"])}</h3>'
+        f'<p class="rowsub">{esc(s["standfirst"])}</p></div>'
+        f'<p class="rowmeta">{esc(s["published"])}<br>'
+        f'<span class="small">{esc(s["reading"])}</span></p></a>'
+        for s in byline
+    ) + "</div>"
     body = f"""
 {crumbs([("Europe", "/discover"), ("Stories", None)])}
 <div class="pagehead">

@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**101 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1 refused · 1334 assertions · 0 failing**
+**101 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1 refused · 1344 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -19,7 +19,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 6 | Homepage | BUILT | 6 | The hero, the question in the hero itself, and the calls to action. The AI box is a sentence box that works rather than a promise that does not, and it says so under the field. |
 | 7 | Homepage sections | BUILT (deliberately smaller) | 13 | Three bands: the hero over a real map of Europe, the eight ways in, the journeys. The specification's geography index and its hero-map filter row were REMOVED from this page — both still exist as pages, and both are linked from every page's masthead or footer. |
 | 8 | Hidden Europe | BUILT | 2 | A quiet tag, a page that collects it, and a rule that we never call anywhere undiscovered. |
-| 9 | Stories | PARTIAL | 71 | The desk exists, the index is grouped by desk, every article carries a byline, a publication date and tags, and every story links into the Atlas both ways. Nine of the specification's hundred are written. |
+| 9 | Stories | PARTIAL | 81 | The desk exists, the index is grouped by desk, every article carries a byline, a publication date and tags, and every story links into the Atlas both ways. Nine of the specification's hundred are written. |
 | 10 | Plan your Europe | PARTIAL | 8 | Ten of the eleven inputs are taken and every one of them moves the answer. Mobility requirements are the eleventh, and are named as unsupported rather than silently dropped — we hold no step-free access data, so a field for it would be a field that lies. |
 | 11 | Country page | BUILT | 5 | URL shape as specified, and every section on the list except visa and emergency information, which are refused as unverified. |
 | 12 | Region page | BUILT | 4 | Every travel region has one, and it aggregates the destinations, places, experiences and journeys beneath it rather than being a list of city links. |

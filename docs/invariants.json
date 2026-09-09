@@ -104,7 +104,7 @@
     "weight.max_page_kb": {
       "value": 440,
       "kind": "ceiling",
-      "why": "The heaviest page on the site. Guards against a template quietly inlining something large across a whole family, which is how the coastline reached 51 pages and 2.1 MB. It moved 437 -> 440 for /map's text alternative, which now names the fifty countries as well as the 319 destinations: twenty of those countries draw between 3.6 and 12 pixels wide on a phone and their shape was the only way in. Three kilobytes for twenty targets nobody could hit."
+      "why": "The heaviest page on the site. Guards against a template quietly inlining something large across a whole family, which is how the coastline reached 51 pages and 2.1 MB."
     },
     "signature.apertures": {
       "value": 816,
@@ -112,7 +112,7 @@
       "why": "Pages whose geography is seen through the arch. A floor: the aperture is the identity, and a new map that forgets it is a page that stops looking like EuropeDoor."
     },
     "plates.page_share": {
-      "value": 0.227,
+      "value": 0.226,
       "kind": "ceiling",
       "why": "The share of pages carrying a generated illustration. A ceiling because the failure mode is an illustration placed because the system has one, which is the one reason the art direction forbids."
     },
@@ -132,16 +132,16 @@
         "masthead": 1.0,
         "pagehead": 0.99,
         "crumbs": 0.998,
-        "row": 0.898,
-        "card": 0.234,
-        "band": 0.768,
+        "row": 0.899,
+        "card": 0.233,
+        "band": 0.767,
         "note": 0.824,
         "facts": 0.759,
         "btn": 0.598,
         "chip": 0.523
       },
       "kind": "floor",
-      "why": "The share of pages each primitive appears on. A family that quietly stops using one has grown its own components and the design system has forked without anybody deciding — which is the failure this floor exists to catch. A family that stops using one ON PURPOSE is the other thing that moves it, and the difference is whether the drop is recorded here in the same commit with the composition that caused it. The essay family cost pagehead, row and band about a hundredth each: nine story pages that no longer share the atlas chassis, which is the whole point of them. THESE NUMBERS WERE WRONG UNTIL THE DESTINATION EXEMPLAR: the matcher used \\b, and a hyphen is a word boundary, so `card` counted `card-art` and `row` counted `rowsub`. The card floor read 0.785 and the true figure is 0.226 — the most-cited primitive in the design system was three-quarters an image wrapper."
+      "why": "The share of pages each primitive appears on. A family that quietly stops using one has grown its own components and the design system has forked without anybody deciding — which is the failure this floor exists to catch. A family that stops using one ON PURPOSE is the other thing that moves it, and the difference is whether the drop is recorded here in the same commit with the composition that caused it. The essay family cost pagehead, row and band about a hundredth each: nine story pages that no longer share the atlas chassis, which is the whole point of them. THESE NUMBERS WERE WRONG UNTIL THE DESTINATION EXEMPLAR: the matcher used \\b, and a hyphen is a word boundary, so `card` counted `card-art` and `row` counted `rowsub`. The card floor read 0.785 and the true figure is 0.226 — the most-cited primitive in the design system was three-quarters an image wrapper. AND THE STORIES INDEX COST card AND band A THOUSANDTH EACH: it was nine three-column grids of one card, one per desk — the desk taxonomy used as the layout — and nine essays are a contents page, so it is one list of rows with the desk as a kicker. That also removed nine illustrations chosen by the hash of a slug, which the story rule already forbade on the story page and nothing checked on the index."
     }
   }
 }
