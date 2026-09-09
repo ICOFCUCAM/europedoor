@@ -1110,6 +1110,38 @@ def countryportrait(data, c):
         if _try_label(px, py, nm, "pname"):
             named_.add(nm)
 
+    # THE HIGHEST NAMED PEAKS IN FRAME, after the destinations. The owner's
+    # country-page order is capital, major cities, selected destinations,
+    # then major geographic features — and placed BEFORE them the peaks took
+    # Zermatt's and Lauterbrunnen's names off Switzerland's own plate, which
+    # is a page about the places this atlas writes about. A triangle and a height is how a physical atlas says
+    # "mountains here"; it is a measurement somebody else made rather than a
+    # surface this atlas fitted, and it is never called relief.
+    #
+    # DRAWN ONLY WHERE THE NAME FITS, for the same reason every other mark
+    # is: a triangle a reader cannot name says "something is here" and
+    # nothing else, and this plate's whole rule is that it draws what it can
+    # name. Never more than a few either — a plate is not a field of
+    # triangles.
+    summitmarks = ""
+    for px, py, nm, m in cartography.summit_points(proj.xy, (0, 0, w, h)):
+        if _try_label(px, py, f"{nm} {m:,} m", "peakname", off=8.0):
+            summitmarks += (f'<path class="peak" d="M{px:.1f} {py - 4.2:.1f}'
+                            f'L{px + 4.0:.1f} {py + 2.6:.1f}'
+                            f'L{px - 4.0:.1f} {py + 2.6:.1f}Z">'
+                            f'<title>{esc(nm)} — {m:,} m</title></path>')
+
+    # PHYSICAL FEATURES AND SEAS, through the same placement rule as every
+    # other level and in the owner's order: after the places, before the
+    # groupings. ALPS is geography and a region is an editorial grouping;
+    # when only one of them fits, the geography wins.
+    for px, py, nm in cartography.feature_points(proj.xy, (0, 0, w, h)):
+        _try_label(px, py, nm, "fname", metric="rlabel", off=8.0,
+                   prefer="over")
+    for px, py, nm in cartography.water_points(proj.xy, (0, 0, w, h)):
+        _try_label(px, py, nm, "sname", metric="rlabel", off=8.0,
+                   prefer="over")
+
     for r_ in c["regions"]:
         pts_r = [proj.xy(t["lat"], t["lon"]) for t in r_["cities"]]
         pts_r = [(x, y) for x, y in pts_r if 0 <= x <= w and 0 <= y <= h]
@@ -1184,6 +1216,7 @@ def countryportrait(data, c):
             uid=uid, w=w, h=h, proj=proj, view=(0, 0, w, h),
             land=land, context=ctx,
             destinations=dotmarks, labels=namemarks,
+            summits=summitmarks,
             caption=cap,
             figure_class="minimap portrait arched atlas",
             aria=(f'The outline of {esc(c["name"])}, drawn on this atlas\'s '
@@ -3379,17 +3412,24 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
     # in the list underneath the figure on every page that draws it.
     lab = phone_declutter(lab)
     dense = dense_class("".join(lab))
-    return (
-        f'<figure class="minimap pointsmap arched{dense}">'
-        f'<svg viewBox="0 0 {vw:.1f} {vh:.1f}" role="img" '
-        f'data-world="intelligence" aria-label="{esc(aria)}">'
-        f'<defs>{arch_clip(uid, vw, vh)}</defs>'
-        f'<g clip-path="url(#arch-{uid})">'
-        f'<rect x="0" y="0" width="{vw:.1f}" height="{vh:.1f}" class="archground"/>'
-        f'<g transform="scale({k:.4f}) translate({-x0:.1f},{-y0:.1f})">{ctx}{land}</g>'
-        f'{route}{"".join(dots)}{"".join(lab)}{bar}</g>{arch_edge(vw, vh)}</svg>'
-        f'<figcaption>{caption}</figcaption></figure>'
-    )
+    # ONE RENDERER FOR EVERY PICTURE. A region, a journey, a story and a
+    # motion are all "these places, on the real coastline, through the door",
+    # and each used to compose its own SVG. They go through the same stack as
+    # the country and destination plates now, so a layer added once lands on
+    # all six kinds — which is the whole reason the stack exists.
+    #
+    # `/map`, `/plan`, `/search` and the country reference map stay graphite:
+    # those are INSTRUMENTS, operated rather than looked at, and that is what
+    # the two worlds have always meant.
+    return cartography.plate(
+        uid=uid, w=vw, h=vh, proj=MAPPROJ, view=(0, 0, vw, vh),
+        land=(f'<g transform="scale({k:.4f}) '
+              f'translate({-x0:.1f},{-y0:.1f})">{ctx}{land}</g>'),
+        route=route, destinations="".join(dots),
+        labels="".join(lab) + bar,
+        caption=f'<figcaption>{caption}</figcaption>',
+        figure_class=f"minimap pointsmap arched atlas{dense}",
+        aria=esc(aria))
 
 
 def regionmap(data, c, r):

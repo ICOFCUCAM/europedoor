@@ -154,6 +154,35 @@ The country's own name on the plate does a second job: the recognition test
 strips the wordmark and the page title, and a plate that names what it draws
 survives that where a shape alone does not.
 
+## What was fetched, and what the plates gained
+
+**The proxy reaches raw.githubusercontent.com.** Five Natural Earth themes
+were registered, fetched, hashed and processed in one pass, so four of the
+declared-and-empty layers now draw real data:
+
+| dataset | layer | in the extent |
+|---|---|---|
+| 1:50m rivers and lake centrelines | rivers | 153 river parts |
+| 1:50m lakes | rivers | 65 lakes |
+| 1:50m marine polygons | water labels | 21 named seas |
+| 1:50m physical geography regions | feature labels | 20 named ranges and plains |
+| 1:10m named elevation points | summits | 99 named peaks with heights |
+
+**Scalerank 6 is the whole of Natural Earth's river set, and it is the right
+cut here.** The Rhône, the Garonne, the Po and the Duero are rank 6, and a
+map of Europe without the Rhône is not restraint, it is an omission. The
+publisher's ranks are about how much of the *world* a sheet shows; this atlas
+shows one continent, so the whole set clipped to the extent is about a
+hundred and thirty watercourses — an editorial number, not the four thousand
+an unfiltered extract gives.
+
+**The summits are not relief and are never called relief.** A hillshade needs
+an elevation model this repository does not have. What it has is 99 named
+peaks with the height somebody else measured, and a reader sees where the
+high ground is because they cluster along the Alps, the Caucasus and the
+Pyrenees. The 1:50m file has **three** in the whole of Europe — Elbrus, Mont
+Blanc and one depression — which is why this one is 1:10m.
+
 ## Rivers: written, registered, one command away
 
 The renderer is **written, not stubbed** — proved by dropping a test file in

@@ -323,10 +323,177 @@ def provenance():
     ]
 
 
+# ── hydrology, seas and physical features ────────────────────────────────
+#
+# THE THREE THEMES THAT MAKE AN INLAND PLATE A PLACE. A country map built
+# from coastlines and frontiers alone has nothing to show where there is no
+# coast: measured on the rendered plates, Portugal and Greece read as
+# geography and Paris and the Alpine Grand Tour read as empty parchment with
+# dots on it. Rivers give an inland plate its structure, and named ranges let
+# a reader see where the Alps are without any elevation model at all.
+#
+# THE SELECTION IS THE WHOLE JOB. Natural Earth ships 462 watercourses and
+# 412 lakes at this scale; drawing them all is the OpenStreetMap default
+# look. `scalerank` is the publisher's own judgement of the scale a feature
+# belongs at, so using it is their editorial decision rather than one
+# invented here.
+# SCALERANK 6 IS THE WHOLE OF NATURAL EARTH'S RIVER SET, and it is the right
+# cut here for a reason worth writing down: the Rhône, the Garonne, the Po
+# and the Duero are rank 6, and a map of Europe without the Rhône is not
+# restraint, it is an omission. The publisher's ranks are about how much of
+# the WORLD a sheet shows; this atlas shows one continent, so the whole set
+# clipped to the extent is about a hundred and thirty watercourses — an
+# editorial number, not the four thousand an unfiltered OSM extract gives.
+RIVER_RANK = 6
+LAKE_RANK = 1       # 340 of 412 at this scale; the ones that shape a country
+FEATURE_KINDS = ("Range/mtn", "Plateau", "Basin", "Plain", "Lowland",
+                 "Foothills", "Valley", "Desert", "Tundra")
+
+
+def _in_bbox(lon, lat, pad=6.0):
+    return (BBOX[0] - pad <= lon <= BBOX[2] + pad
+            and BBOX[1] - pad <= lat <= BBOX[3] + pad)
+
+
+def _lines_of(geom):
+    t = geom.get("type")
+    if t == "LineString":
+        return [geom["coordinates"]]
+    if t == "MultiLineString":
+        return geom["coordinates"]
+    return []
+
+
+def _rings_of(geom):
+    t = geom.get("type")
+    if t == "Polygon":
+        return geom["coordinates"]
+    if t == "MultiPolygon":
+        return [r for poly in geom["coordinates"] for r in poly]
+    return []
+
+
+def hydrology():
+    """Rivers and lakes, cut to the extent and simplified like the land."""
+    rivers, lakes = [], []
+    src = read_ne("ne_50m_rivers_lake_centerlines.geojson.gz")
+    for feat in src["features"]:
+        pr = feat.get("properties") or {}
+        rank = pr.get("scalerank")
+        if rank is None or rank > RIVER_RANK:
+            continue
+        for line in _lines_of(feat.get("geometry") or {}):
+            pts = [(round(x, 3), round(y, 3)) for x, y in line
+                   if _in_bbox(x, y)]
+            if len(pts) < 2:
+                continue
+            pts = rdp(pts, 0.02)
+            flat = [v for p in pts for v in p]
+            rivers.append({"name": pr.get("name") or "", "rank": rank,
+                           "line": flat})
+    src = read_ne("ne_50m_lakes.geojson.gz")
+    for feat in src["features"]:
+        pr = feat.get("properties") or {}
+        rank = pr.get("scalerank")
+        if rank is None or rank > LAKE_RANK:
+            continue
+        rings = []
+        for ring in _rings_of(feat.get("geometry") or {}):
+            pts = [(round(x, 3), round(y, 3)) for x, y in ring
+                   if _in_bbox(x, y)]
+            if len(pts) < 4:
+                continue
+            pts = rdp(pts, 0.02)
+            if len(pts) >= 4:
+                rings.append([v for p in pts for v in p])
+        if rings:
+            lakes.append({"name": pr.get("name") or "", "rank": rank,
+                          "rings": rings})
+    return {"rivers": rivers, "lakes": lakes}
+
+
+def _label_point(geom):
+    """Where a name goes for an area, from the area itself.
+
+    The mean of the largest ring's vertices rather than a bounding-box
+    centre: the centre of the Alps' box is in Bavaria.
+    """
+    best = None
+    for ring in _rings_of(geom):
+        if best is None or len(ring) > len(best):
+            best = ring
+    if not best:
+        return None
+    xs = [p[0] for p in best]
+    ys = [p[1] for p in best]
+    return [round(sum(xs) / len(xs), 3), round(sum(ys) / len(ys), 3)]
+
+
+def area_names(fname, kinds=None, upper=False):
+    """One label point per named area, and nothing else.
+
+    The geometry is read only to find WHERE the word goes. An area label is a
+    name, not an outline, and drawing the edge of the Alps from a polygon
+    somebody else generalised would be a claim about where they end.
+    """
+    out = []
+    for feat in read_ne(fname)["features"]:
+        pr = feat.get("properties") or {}
+        name = (pr.get("name") or pr.get("NAME") or "").strip()
+        kind = pr.get("featurecla") or pr.get("FEATURECLA") or ""
+        if not name or (kinds and kind not in kinds):
+            continue
+        at = _label_point(feat.get("geometry") or {})
+        if not at or not _in_bbox(at[0], at[1], pad=0.0):
+            continue
+        out.append({"name": name.upper() if upper else name,
+                    "kind": kind, "at": at})
+    return {"features": out}
+
+
+def summits():
+    """Named peaks with measured heights, inside the extent.
+
+    NOT A TERRAIN LAYER AND NOT PRETENDING TO BE ONE. A hillshade needs an
+    elevation model this repository does not have; what it does have, now,
+    is 105 named summits with the height somebody else measured. A reader
+    sees where the high ground is because the peaks cluster along the Alps,
+    the Caucasus and the Pyrenees — which is how a printed physical atlas
+    labels a mountain range, and it is the closest honest thing to relief
+    that does not involve fitting a surface.
+
+    The 1:50m file has THREE in the whole of Europe. This is 1:10m for that
+    reason and no other.
+    """
+    out = []
+    for feat in read_ne("ne_10m_geography_regions_elevation_points.geojson.gz")["features"]:
+        pr = feat.get("properties") or {}
+        name = (pr.get("name") or "").strip()
+        elev = pr.get("elevation")
+        if not name or elev is None or (pr.get("featurecla") or "") != "mountain":
+            continue
+        lon, lat = (feat.get("geometry") or {}).get("coordinates", [None, None])[:2]
+        if lon is None or not _in_bbox(lon, lat, pad=0.0):
+            continue
+        out.append({"name": name, "m": int(elev),
+                    "at": [round(lon, 3), round(lat, 3)]})
+    out.sort(key=lambda x: -x["m"])
+    return {"features": out}
+
+
 def build():
     graph = load_graph()
     prov = provenance()
     files = {"facts.json": facts(graph)}
+    files["hydrology-lod1.json"] = dict(hydrology(), sources=prov)
+    files["marine-lod1.json"] = dict(
+        area_names("ne_50m_geography_marine_polys.geojson.gz", upper=True),
+        sources=prov)
+    files["summits-lod1.json"] = dict(summits(), sources=prov)
+    files["features-lod1.json"] = dict(
+        area_names("ne_50m_geography_regions_polys.geojson.gz",
+                   kinds=FEATURE_KINDS, upper=True),
+        sources=prov)
 
     cache = {}
     for lod, cfg in LODS.items():

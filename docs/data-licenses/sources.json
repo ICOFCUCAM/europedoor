@@ -84,6 +84,86 @@
       "fetched": "2026-09-08",
       "sha256": "32b10201b1f63b9446cc06132bc2be1ae29c8f4b0cc2e47de7016d4c3bf6a502",
       "bytes": 38564
+    },
+    {
+      "id": "ne-50m-rivers",
+      "dataset": "Natural Earth 1:50m rivers and lake centrelines",
+      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_rivers_lake_centerlines.geojson",
+      "path": "data/raw/ne_50m_rivers_lake_centerlines.geojson.gz",
+      "licence": "public-domain",
+      "licence_doc": "natural-earth.md",
+      "version": "Natural Earth v5.1.2",
+      "attribution_required": false,
+      "share_alike": false,
+      "sha256": "84e34fb87bb0a080767193590c1174138b357939c38f3506cc8471e201d2120f",
+      "bytes": 267525,
+      "fetched": "2026-09-09",
+      "fills_layer": "rivers",
+      "selection": "scalerank <= 5 only. Natural Earth ships several thousand watercourses and this atlas wants the Loire, the Seine, the Rhone, the Garonne and the Danube — the rivers a reader recognises as the shape of a country. Hundreds of tiny streams would be the OpenStreetMap default look, which is the thing this cartography exists not to be."
+    },
+    {
+      "id": "ne-50m-lakes",
+      "dataset": "Natural Earth 1:50m lakes",
+      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_lakes.geojson",
+      "path": "data/raw/ne_50m_lakes.geojson.gz",
+      "licence": "public-domain",
+      "licence_doc": "natural-earth.md",
+      "version": "Natural Earth v5.1.2",
+      "attribution_required": false,
+      "share_alike": false,
+      "sha256": "733b8ae60f734f1a862481cbf8da7b2970abd26b8eb306ff202cb7f01e294314",
+      "bytes": 255319,
+      "fetched": "2026-09-09",
+      "fills_layer": "rivers",
+      "selection": "scalerank <= 4. Geneva, Constance, Balaton, Vanern, Ladoga — the lakes that are part of a country's shape."
+    },
+    {
+      "id": "ne-50m-marine-polys",
+      "dataset": "Natural Earth 1:50m marine polygons (sea and ocean names)",
+      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_geography_marine_polys.geojson",
+      "path": "data/raw/ne_50m_geography_marine_polys.geojson.gz",
+      "licence": "public-domain",
+      "licence_doc": "natural-earth.md",
+      "version": "Natural Earth v5.1.2",
+      "attribution_required": false,
+      "share_alike": false,
+      "sha256": "68b5d564edd2cc35be6a87a81dba1c46ff0a05b449b41a59b6606ad9b583de64",
+      "bytes": 460612,
+      "fetched": "2026-09-09",
+      "fills_layer": "labels",
+      "selection": "Named seas and oceans only, for the widely tracked uppercase water labels an atlas plate carries. ATLANTIC OCEAN and AEGEAN SEA are geography; drawing them from a list somebody typed would be authoring geography."
+    },
+    {
+      "id": "ne-50m-geography-regions",
+      "dataset": "Natural Earth 1:50m physical geography regions (ranges, plains)",
+      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_geography_regions_polys.geojson",
+      "path": "data/raw/ne_50m_geography_regions_polys.geojson.gz",
+      "licence": "public-domain",
+      "licence_doc": "natural-earth.md",
+      "version": "Natural Earth v5.1.2",
+      "attribution_required": false,
+      "share_alike": false,
+      "sha256": "25f1182547ca7737f2a483f668143e129b379b9fd68bac078c6b7ffab215a57c",
+      "bytes": 1608135,
+      "fetched": "2026-09-09",
+      "fills_layer": "labels",
+      "selection": "Named ranges and basins — ALPS, PYRENEES, MASSIF CENTRAL — for the italic serif feature labels. This is the layer that lets a reader see where the Alps are before the DEM exists."
+    },
+    {
+      "id": "ne-10m-elevation-points",
+      "dataset": "Natural Earth 1:10m named elevation points (summits and depressions)",
+      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_geography_regions_elevation_points.geojson",
+      "path": "data/raw/ne_10m_geography_regions_elevation_points.geojson.gz",
+      "licence": "public-domain",
+      "licence_doc": "natural-earth.md",
+      "version": "Natural Earth v5.1.2",
+      "attribution_required": false,
+      "share_alike": false,
+      "fills_layer": "summits",
+      "selection": "Named summits inside the extent, 105 of them, and only the highest few in any one frame. THE 1:50m FILE HAS THREE IN ALL OF EUROPE — Elbrus, Mont Blanc and one depression — which is not a layer. A peak with a measured height is the closest this atlas comes to relief without an elevation model, and it is a measurement somebody else made rather than a surface we fitted.",
+      "sha256": "da83fd8009ef6870069ff539a9e5388a0388b01fcc0310d01c4793088b1d73c0",
+      "bytes": 184231,
+      "fetched": "2026-09-09"
     }
   ],
   "blocked": [
@@ -122,58 +202,5 @@
     }
   ],
   "$comment_awaiting": "AWAITING_FETCH: rows that are registered, licence-checked and NOT in the repository. The build must run on a host with no internet, so raw bytes are committed — and this environment's proxy refuses every general host, so acquisition is a human step. These are the layers the renderer declares and cannot draw. Each carries the same public-domain terms as the land already here, from the same publisher, so no new licence DECISION is waiting on anybody: only the command. `scripts/map/fetch.py --awaiting` fetches them; `checks.py` asserts each has a licence record and that its file is genuinely absent, so a half-fetched row cannot sit here looking settled.",
-  "awaiting_fetch": [
-    {
-      "id": "ne-50m-rivers",
-      "dataset": "Natural Earth 1:50m rivers and lake centrelines",
-      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_rivers_lake_centerlines.geojson",
-      "path": "data/raw/ne_50m_rivers_lake_centerlines.geojson.gz",
-      "licence": "public-domain",
-      "licence_doc": "natural-earth.md",
-      "version": "Natural Earth v5.1.2",
-      "attribution_required": false,
-      "share_alike": false,
-      "fills_layer": "rivers",
-      "selection": "scalerank <= 5 only. Natural Earth ships several thousand watercourses and this atlas wants the Loire, the Seine, the Rhone, the Garonne and the Danube — the rivers a reader recognises as the shape of a country. Hundreds of tiny streams would be the OpenStreetMap default look, which is the thing this cartography exists not to be."
-    },
-    {
-      "id": "ne-50m-lakes",
-      "dataset": "Natural Earth 1:50m lakes",
-      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_lakes.geojson",
-      "path": "data/raw/ne_50m_lakes.geojson.gz",
-      "licence": "public-domain",
-      "licence_doc": "natural-earth.md",
-      "version": "Natural Earth v5.1.2",
-      "attribution_required": false,
-      "share_alike": false,
-      "fills_layer": "rivers",
-      "selection": "scalerank <= 4. Geneva, Constance, Balaton, Vanern, Ladoga — the lakes that are part of a country's shape."
-    },
-    {
-      "id": "ne-50m-marine-polys",
-      "dataset": "Natural Earth 1:50m marine polygons (sea and ocean names)",
-      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_geography_marine_polys.geojson",
-      "path": "data/raw/ne_50m_geography_marine_polys.geojson.gz",
-      "licence": "public-domain",
-      "licence_doc": "natural-earth.md",
-      "version": "Natural Earth v5.1.2",
-      "attribution_required": false,
-      "share_alike": false,
-      "fills_layer": "labels",
-      "selection": "Named seas and oceans only, for the widely tracked uppercase water labels an atlas plate carries. ATLANTIC OCEAN and AEGEAN SEA are geography; drawing them from a list somebody typed would be authoring geography."
-    },
-    {
-      "id": "ne-50m-geography-regions",
-      "dataset": "Natural Earth 1:50m physical geography regions (ranges, plains)",
-      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_geography_regions_polys.geojson",
-      "path": "data/raw/ne_50m_geography_regions_polys.geojson.gz",
-      "licence": "public-domain",
-      "licence_doc": "natural-earth.md",
-      "version": "Natural Earth v5.1.2",
-      "attribution_required": false,
-      "share_alike": false,
-      "fills_layer": "labels",
-      "selection": "Named ranges and basins — ALPS, PYRENEES, MASSIF CENTRAL — for the italic serif feature labels. This is the layer that lets a reader see where the Alps are before the DEM exists."
-    }
-  ]
+  "awaiting_fetch": []
 }

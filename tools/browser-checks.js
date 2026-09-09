@@ -1421,7 +1421,22 @@ async function main() {
     // What survives is mostly REDUNDANT rather than unreachable: a `color`
     // that restates what the element already inherits. That is a different
     // and much smaller fault, and it is what the remaining number is.
-    const DEAD_CEILING = 18;
+    // 18 -> 21 WITH THE MIGRATION THAT MOVED THEM, and the list was read.
+    // Every picture-family map became an atlas plate in one commit, so three
+    // base rules that still apply on the INSTRUMENT maps — the country
+    // reference map, /map, the macro maps — are superseded on every page
+    // this scan visits: `.scalebar text`, `.minimap.arched .minidot.here
+    // circle` and `.minimap.arched .minilabel.here`. They are not deletable,
+    // because the instruments still need them, and they are not reachable
+    // from here, because the scan looks at the pages a reader looks at. The
+    // honest fix is to scope the base rules to `:not(.atlas)`, which is a
+    // refactor of every minimap selector and is not this commit.
+    //
+    // Two rules WERE genuinely dead and were deleted rather than counted: a
+    // lime route override, superseded because every route map is now an
+    // atlas plate, and an atlas-scoped `.routeline` that restated the
+    // cobalt and opacity the base rule already sets.
+    const DEAD_CEILING = 21;
     const seen = new Map();
     for (const u of ["/", "/europe/austria", "/europe/austria/tyrol",
                      "/europe/austria/tyrol/innsbruck",

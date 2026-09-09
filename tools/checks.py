@@ -2592,6 +2592,13 @@ def c_cartography():
                 f"layer {name} is folded into something that is not a layer")
             n += 1
             continue
+        if name in C.PAINTED_BY:
+            sel = C.PAINTED_BY[name]
+            assert sel in css, (
+                f"layer {name} is recorded as painting through {sel} and the "
+                f"stylesheet has no such rule")
+            n += 1
+            continue
         assert f".{cls}" in css, (
             f"layer {name} paints through .{cls} and the stylesheet has no "
             f"rule for it")

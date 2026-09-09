@@ -60,6 +60,7 @@ SOURCES = {
     "coastline":      "countries",
     "country-bounds": "countries",
     "region-bounds":  "regions-lod1.json",
+    "summits":        "summits-lod1.json",
     "cities":         None,
     "destinations":   None,
     "feature-labels": "features-lod1.json",
@@ -74,8 +75,8 @@ SOURCES = {
 # reorder it.
 ORDER = ("ocean", "coastal-water", "land", "terrain", "hillshade", "rivers",
          "coastline", "country-bounds", "region-bounds", "cities",
-         "destinations", "feature-labels", "water-labels", "labels", "route",
-         "selected")
+         "summits", "destinations", "feature-labels", "water-labels", "labels",
+         "route", "selected")
 
 
 # ── VISUAL STYLE ──────────────────────────────────────────────────────
@@ -116,6 +117,14 @@ HYPSOMETRIC = (
 TERRAIN_CHAIN = ("dem", "hypsometric", "hillshade", "terrain-texture",
                  "country-mask", "country-bounds", "rivers", "labels")
 
+# A LAYER MAY PAINT THROUGH A RULE IT SHARES WITH THE REST OF THE SITE.
+# A route line looks the same on a plate as it does on /map — cobalt, dashed,
+# 90% — so an atlas-scoped rule restating it is dead code, and the dead-rule
+# scan proved exactly that when one was written. The layer is real, its group
+# is real, and this records where its paint comes from instead of demanding a
+# redundant rule with its own class.
+PAINTED_BY = {"route": ".routeline"}
+
 DECIDED = {
     "feature-labels": "Named ranges and basins — ALPS, PYRENEES, MASSIF "
                       "CENTRAL — in an italic serif, the way a printed atlas "
@@ -155,6 +164,17 @@ DECIDED = {
 # Recorded rather than left implicit: a layer in ORDER that quietly never
 # appears is indistinguishable from one somebody forgot.
 FOLDED = {
+    "feature-labels": ("labels", "the NAMES are their own typographic level "
+                                 "and keep their own class, but they are "
+                                 "PLACED by the same rule as every other "
+                                 "name — tested against the real curve of "
+                                 "the aperture, in priority order, dropping "
+                                 "what does not fit. Two placement rules "
+                                 "would disagree within a month, and the "
+                                 "first version proved it: features drawn "
+                                 "outside that rule landed KJOLEN MOUNTAINS "
+                                 "over France"),
+    "water-labels": ("labels", "same rule, same reason"),
     "coastal-water": ("land", "three soft shadows of the land silhouette, "
                               "cast into the water. THE FIRST VERSION WAS "
                               "THREE `<use>` OF THE LAND GROUP AND PAINTED "
@@ -176,8 +196,6 @@ FOLDED = {
                          "own fill and a heavier stroke"),
     "cities": ("destinations", "the capital is a destination with a `cap` "
                                "class; no separate city source is held"),
-    "route": ("labels", "only the journey family draws one, and that family "
-                        "has not been migrated to this renderer yet"),
 }
 
 
@@ -242,8 +260,8 @@ def hillshade(proj, view):
 # to be. Natural Earth's own `scalerank` is the selection: it is the map
 # scale at which the publisher intends a feature to appear, so this is their
 # editorial judgement rather than one invented here.
-RIVER_RANK = 5
-LAKE_RANK = 4
+RIVER_RANK = 6
+LAKE_RANK = 1
 
 
 def rivers(proj, view):
@@ -279,7 +297,7 @@ def rivers(proj, view):
             d.append(("M" if not d else "L") + f"{px} {py}")
             last = (px, py)
         if seen and len(d) >= 2:
-            cls = "major" if feat.get("rank", 99) <= 2 else "minor"
+            cls = "major" if feat.get("rank", 99) <= 4 else "minor"
             out.append(f'<path class="riv {cls}" d="{"".join(d)}">'
                        f'<title>{feat.get("name", "")}</title></path>')
     for feat in doc.get("lakes", []):
@@ -303,22 +321,29 @@ def rivers(proj, view):
     return "".join(out)
 
 
-def area_labels(path, proj, view, cls):
-    """Named areas — seas, ranges, basins — as one word each where they are.
+def area_points(path, to_xy, view, margin=22.0):
+    """Named areas as (x, y, name), in the PLATE's own coordinates.
 
-    Written before the data for the same reason `rivers()` is: a layer that
-    quietly renders nothing once its file arrives is the failure this stack
-    exists to make impossible.
+    THE PROJECTOR IS PASSED IN, NOT ASSUMED. The first version took the
+    atlas's projection and used it directly, which is right for a country
+    plate and wrong for every other family: a destination map and a route map
+    draw the continent's geometry inside their own `transform`, so the land
+    is scaled and translated and the labels were not. KJOLEN MOUNTAINS
+    appeared over France and NORTHERN EUROPEAN PLAIN over the Alps. The
+    caller knows its own transform; this does not.
 
-    The geometry is only ever read for WHERE to put the word. An area label
-    is a name, not an outline, and drawing the edge of the Alps from a
-    polygon somebody else generalised would be a claim about where they end.
-    `at` is the label point the pipeline chose rather than a centroid taken
-    here, because the centroid of a crescent-shaped range falls outside it.
+    Returns points, not markup, because WHERE a name goes is a placement
+    decision and this atlas already has one rule for that — tested against
+    the real curve of the aperture, in priority order, dropping what does not
+    fit. Two placement rules would disagree within a month.
+
+    The geometry is read only for where the word goes. An area label is a
+    name, not an outline: drawing the edge of the Alps from a polygon
+    somebody else generalised would be a claim about where they end.
     """
     doc = geo.load(path)
     if not doc:
-        return ""
+        return []
     x, y, w, h = view
     out = []
     for feat in doc.get("features", []):
@@ -326,29 +351,60 @@ def area_labels(path, proj, view, cls):
         at = feat.get("at")
         if not name or not at or len(at) < 2:
             continue
-        px, py = proj.xy(at[1], at[0])
-        if not (x <= px <= x + w and y <= py <= y + h):
+        px, py = to_xy(at[1], at[0])
+        if not (x + margin <= px <= x + w - margin
+                and y + margin <= py <= y + h - margin):
             continue
-        out.append(f'<text class="{cls}" x="{px:.1f}" y="{py:.1f}" '
-                   f'text-anchor="middle">{_esc(name)}</text>')
-    return "".join(out)
+        out.append((px, py, name))
+    return out
+
+
+def summit_points(to_xy, view, most=5):
+    """The highest named peaks in this frame, and no more than a few.
+
+    NOT RELIEF, AND NEVER CALLED RELIEF. A hillshade needs an elevation model
+    this repository does not have. What it has is 99 summits with the height
+    somebody else measured, and a reader sees where the high ground is
+    because they cluster along the Alps, the Caucasus and the Pyrenees —
+    which is how a printed physical atlas labels a range.
+
+    `most` is the whole discipline: a plate is never a field of triangles.
+    The list arrives sorted by height, so taking the first few that fall in
+    frame takes the ones a reader has heard of.
+    """
+    doc = geo.load(SOURCES["summits"])
+    if not doc:
+        return []
+    x, y, w, h = view
+    out = []
+    for feat in doc.get("features", []):
+        at = feat.get("at")
+        if not at:
+            continue
+        px, py = to_xy(at[1], at[0])
+        if not (x + 14 <= px <= x + w - 14 and y + 14 <= py <= y + h - 14):
+            continue
+        out.append((px, py, feat["name"], feat["m"]))
+        if len(out) >= most:
+            break
+    return out
+
+
+def feature_points(to_xy, view):
+    if not held("feature-labels"):
+        return []
+    return area_points(SOURCES["feature-labels"], to_xy, view)
+
+
+def water_points(to_xy, view):
+    if not held("water-labels"):
+        return []
+    return area_points(SOURCES["water-labels"], to_xy, view)
 
 
 def _esc(x):
     return (str(x).replace("&", "&amp;").replace("<", "&lt;")
             .replace(">", "&gt;").replace('"', "&quot;"))
-
-
-def feature_labels(proj, view):
-    if not held("feature-labels"):
-        return ""
-    return area_labels(SOURCES["feature-labels"], proj, view, "fname")
-
-
-def water_labels(proj, view):
-    if not held("water-labels"):
-        return ""
-    return area_labels(SOURCES["water-labels"], proj, view, "sname")
 
 
 def region_bounds(proj, view):
@@ -359,6 +415,7 @@ def region_bounds(proj, view):
 
 def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
           cities="", destinations="", labels="", route="", caption="",
+          features="", waters="", summits="",
           figure_class="minimap arched atlas", aria="", rim=True):
     """A complete editorial plate: the layers, in order, through the arch.
 
@@ -392,15 +449,17 @@ def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
         elif name == "region-bounds":
             body.append(_group(name, region_bounds(proj, view)))
         elif name == "feature-labels":
-            body.append(_group(name, feature_labels(proj, view)))
+            body.append(_group(name, features))
         elif name == "water-labels":
-            body.append(_group(name, water_labels(proj, view)))
+            body.append(_group(name, waters))
         elif name in ("coastline", "country-bounds", "selected"):
             # Drawn by the land group's own stroke today. When terrain lands
             # these become their own stroke-only pass so relief sits UNDER
             # them, and that pass re-emits the geometry — about 40% of the
             # bytes on these pages. Measured then, not guessed now.
             continue
+        elif name == "summits":
+            body.append(_group(name, summits))
         elif name == "cities":
             body.append(_group(name, cities))
         elif name == "destinations":
