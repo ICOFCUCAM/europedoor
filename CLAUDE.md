@@ -303,6 +303,23 @@ shipped HTML — a page printing a hop says "straight line", and no page
 anywhere claims a mode or a ground distance. A source-level check would have
 passed on all three.
 
+**The macro regions were the last geographic family with no geography** — a
+headline and a grid of nine cards, telling a reader which countries are in
+the Nordics without ever showing where it is. **A macro region is the one
+grouping here with real polygons behind it**: a region is a set of
+destinations and is refused a boundary, but the Nordics *is* five whole
+countries and Natural Earth has all five. Nothing is invented — the members
+are filled, everything else is context, the frame is the members' own extent.
+
+**And the fill lost a specificity fight, so the map of the Nordics had the
+Nordics indistinguishable from the rest of Europe while the caption said
+"filled".** `.macromap .countries path.here` and `.minimap.arched .countries
+path` are both (0,3,1) and the second is further down the file.
+**That is the second such collision in three commits that rendered as "the
+thing simply is not there"** — the touch targets painted because they lost
+one, these vanished because they lost one — and neither is visible in any
+count.
+
 **Enlarging the type broke the rule that placed it.** Labels are positioned
 at build time against boxes measured at 11 units; the phone rule draws a
 sparse map's names at 26 so they resolve into glyphs at all. Nothing re-ran

@@ -57,6 +57,25 @@ three are gaps. That distinction is the whole content of this document.
 8. **Data** — last, quiet, with a lede saying it is not a reason to go.
 9. **Absent** — opening hours, prices, a website, a rating. Seventeen refusals, each a promise.
 
+### Macro region — 9 — *where in Europe this is*
+
+1. The Nordics is a place, not a list of five countries.
+2. **The five countries, filled.** A macro region is the one grouping in this atlas with real polygons behind it — a region is a set of destinations and is refused a boundary, but the Nordics *is* Norway, Sweden, Denmark, Finland and Iceland, and Natural Earth has all five.
+3. The members filled, the rest of Europe behind them, framed to the members' own extent.
+4. Head, map, the countries as cards.
+5. Go into a country.
+6. **Explicit.**
+7. None.
+8. The count of members, and each country's regions and destinations on its card.
+9. **REFUSED**: a boundary drawn round the group. The frame is the members' extent; the shapes are the members' own.
+
+**This was the last geographic family with no geography** — a headline and a
+grid of nine cards, telling the reader which countries are in the Nordics
+without ever showing where it is. Every other geographic family draws its
+subject.
+
+---
+
 ### Country — 50 — *orientation*
 
 1. A whole country, held in one frame, without a guidebook's contents page.

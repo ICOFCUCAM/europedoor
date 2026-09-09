@@ -1390,6 +1390,45 @@ async function main() {
   ok(stored.includes("experience:"), "saving an experience did not store it");
   await xp.close();
 
+  // ── a macro region has to look like one ────────────────────────────
+  //
+  // A macro region is the only grouping in this atlas with real polygons
+  // behind it: a region is a set of destinations with no boundary and is
+  // drawn as those, but the Nordics IS five whole countries and Natural
+  // Earth has all five. It was the last geographic family with no geography
+  // — a headline and a grid of cards.
+  //
+  // The first render drew the members in the same grey as the rest of
+  // Europe: `.macromap .countries path.here` and `.minimap.arched .countries
+  // path` are both specificity (0,3,1) and the second is further down the
+  // file, so `fill: none` won and the map of the Nordics had the Nordics
+  // indistinguishable — while the caption said "filled". That is the second
+  // specificity collision in three commits rendering as "the thing simply is
+  // not there", and neither is visible in any count.
+  for (const u of ["/discover/nordic", "/discover/baltic", "/discover/alpine-central"]) {
+    await page.goto(base + u, { waitUntil: "load" });
+    const m = await page.evaluate(() => {
+      const fig = document.querySelector("figure.macromap");
+      if (!fig) return null;
+      const here = fig.querySelector(".countries path.here");
+      const ctx = fig.querySelector(".context path");
+      if (!here) return { members: 0 };
+      return { members: fig.querySelectorAll(".countries path.here").length,
+               fill: getComputedStyle(here).fill,
+               ctxFill: ctx ? getComputedStyle(ctx).fill : "none",
+               names: fig.querySelectorAll("text.mmlabel").length };
+    });
+    ok(m !== null, `${u}: the macro region draws no map`);
+    if (!m) continue;
+    ok(m.members >= 2, `${u}: the map fills ${m.members} member countries`);
+    ok(m.fill !== "none" && !/rgba\(0, 0, 0, 0\)/.test(m.fill),
+       `${u}: the member countries are not filled (${m.fill}). A map of a ` +
+       "region on which the region is not distinguishable is a map of Europe.");
+    ok(m.fill !== m.ctxFill,
+       `${u}: the members are painted the same as everything else`);
+    ok(m.names >= 1, `${u}: no member country is named on the map`);
+  }
+
   // ── enlarging the type broke the rule that placed it ───────────────
   //
   // Labels are positioned at build time against boxes measured at 11 units,
@@ -2162,7 +2201,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 814;
+  const FLOOR = 829;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +

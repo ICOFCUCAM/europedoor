@@ -807,6 +807,18 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
   fill: var(--ink-2); font-size: 15px; font-weight: 700; text-anchor: middle;
   paint-order: stroke; stroke: var(--map-hover); stroke-width: 4; stroke-linejoin: round;
 }
+/* A MACRO REGION IS A SET OF WHOLE COUNTRIES, AND THEY HAVE TO READ AS ONE.
+   The first render drew the names in the dark ink of a light page on a
+   near-black ground: the class passed to the placement rule was
+   `rlabel-text`, which does not exist, so nothing styled them at all. The
+   size is the same declaration the region names use rather than a
+   seventeenth. The FILL is further down, next to the rule that was beating
+   it. */
+.macromap .mmlabel {
+  fill: color-mix(in srgb, var(--limestone) 92%, transparent);
+  font-family: var(--display); font-size: 15px; font-weight: 700;
+  paint-order: stroke; stroke: var(--map-sea); stroke-width: 3; stroke-linejoin: round;
+}
 .countrymap .rlabel:hover text { fill: var(--sea); }
 
 .rowside { display: flex; flex-direction: column; align-items: flex-end; gap: var(--s2); flex: none; }
@@ -2250,4 +2262,14 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
 .minimap.arched .countries path,
 .minimap.arched .context path { fill: none; vector-effect: non-scaling-stroke; }
 .minimap.arched .countries path { stroke: var(--map-border); stroke-width: 1.1; }
+/* AND THE MACRO MEMBERS ARE FILLED, WHICH TAKES BEATING THE RULE ABOVE.
+   `.macromap .countries path.here` and `.minimap.arched .countries path` are
+   both (0,3,1), and the second is further down the file, so a map of the
+   Nordics rendered with the Nordics indistinguishable from the rest of
+   Europe — while the caption said "filled". That is the second specificity
+   collision in three commits that rendered as "the thing simply is not
+   there": the touch targets painted because they LOST one, and this lost one
+   too. Neither is visible in any count. */
+.minimap.arched.macromap .countries path.here {
+  fill: var(--map-hover); stroke: var(--sea); stroke-width: 1.3; }
 .minimap.arched .context path { stroke: color-mix(in srgb, var(--map-border) 60%, transparent); stroke-width: 0.7; }

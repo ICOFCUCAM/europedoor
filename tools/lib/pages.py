@@ -430,6 +430,71 @@ def countries_index(data):
     )
 
 
+def macromap(data, m):
+    """A macro region as the countries it is made of.
+
+    THE ONLY GEOGRAPHIC FAMILY WITH NO GEOGRAPHY. Every other one draws its
+    subject: a country its borders, a region its destinations, a journey its
+    route, a motion its answer, a month its fixtures. A macro region — the
+    Nordics, the Caucasus and the Bosphorus — was a headline and a grid of
+    nine cards, and the reader was told which countries are in it without
+    ever being shown where it is.
+
+    And it is the one grouping here that can be drawn honestly. Regions are
+    refused a boundary because we hold which destinations belong to one and
+    not its geometry; a macro region is a set of WHOLE COUNTRIES, and their
+    polygons are Natural Earth's, already committed and already drawn on
+    /map. Nothing is invented: the members are filled, everything else is
+    context, and the frame is the members' own extent.
+    """
+    doc = geo.load("europe-lod0.json")
+    if not doc:
+        return ""
+    members = set(m["countries"])
+    boxes = [ent["bbox"] for ent in doc["countries"].values()
+             if ent.get("slug") in members and ent.get("bbox")]
+    if not boxes:
+        return ""
+    bbox = [min(b[0] for b in boxes), min(b[1] for b in boxes),
+            max(b[2] for b in boxes), max(b[3] for b in boxes)]
+    w, h = 900, 420
+    proj = geo.Projection(bbox, w, h, pad=0.10)
+    ctx, land = geo.landmass(proj, (0, 0, w, h), doc=doc, highlight=members)
+    uid = "mm" + "".join(ch for ch in m["slug"] if ch.isalnum())[:14]
+    # The member names, at the middle of each country's own drawn extent,
+    # through the same placement rule every other map uses.
+    labels = []
+    for ent in sorted(doc["countries"].values(), key=lambda e: e.get("name", "")):
+        if ent.get("slug") not in members or not ent.get("bbox"):
+            continue
+        b = ent["bbox"]
+        px, py = proj.xy((b[1] + b[3]) / 2.0, (b[0] + b[2]) / 2.0)
+        got = place_label_box(px, py, ent["name"], w, h, cls="mmlabel",
+                              off=9.0, prefer="over", metric="rlabel")
+        if got:
+            labels.append(got)
+    drawn = "".join(phone_declutter(_declutter(
+        [(0, x0, y0 + 14.0, lw + 8, lh + 4, html)
+         for html, x0, y0, lw, lh in labels], w, h)))
+    n = sum(len(data["countries"][cs]["regions"]) for cs in m["countries"]
+            if cs in data["countries"])
+    cap = (f'The {len(members)} countries of {esc(m["name"])}, filled, with the '
+           f'rest of Europe behind them. Borders and coastline from '
+           f'<a href="/sources">Natural Earth</a>, public domain. '
+           f'<a href="/map">The whole map →</a>')
+    return (
+        f'<figure class="minimap macromap arched{dense_class(drawn)}">'
+        f'<svg viewBox="0 0 {w} {h}" role="img" data-world="intelligence" '
+        f'aria-label="Map of {esc(m["name"])}: its {len(members)} countries '
+        f'filled, the rest of Europe behind them">'
+        f'<defs>{arch_clip(uid, w, h)}</defs>'
+        f'<g clip-path="url(#arch-{uid})">'
+        f'<rect x="0" y="0" width="{w}" height="{h}" class="archground"/>'
+        f'{ctx}{land}{drawn}</g>{arch_edge(w, h)}</svg>'
+        f'<figcaption>{cap}</figcaption></figure>'
+    )
+
+
 def macro_page(data, m):
     cards = []
     for cs in m["countries"]:
@@ -445,6 +510,7 @@ def macro_page(data, m):
   <h1>{esc(m['name'])}</h1>
   <p class="lede">{esc(m['blurb'])}</p>
 </div>
+{macromap(data, m)}
 {grid(cards, 3)}
 """
     return f"/discover/{m['slug']}/index.html", page(

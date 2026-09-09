@@ -339,8 +339,13 @@ def landmass(proj, view, doc=None, highlight=None, pad=40.0):
                 parts.append("".join(d) + "Z")
         if not parts:
             continue
+        # `highlight` takes a slug or a set of them. The macro maps need the
+        # set: a macro region IS a group of whole countries, which is the one
+        # grouping in this atlas with real polygons behind it — a region is a
+        # grouping with no boundary and is drawn as its own destinations.
         cls = ""
-        if highlight and ent.get("slug") == highlight:
+        if highlight and ent.get("slug") in (
+                {highlight} if isinstance(highlight, str) else set(highlight)):
             cls = ' class="here"'
         el = f'<path{cls} d="{"".join(parts)}"><title>{_esc(ent["name"])}</title></path>'
         (ours if ent["atlas"] else ctx).append(el)

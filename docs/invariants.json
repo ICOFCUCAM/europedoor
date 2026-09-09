@@ -107,9 +107,9 @@
       "why": "The heaviest page on the site. Guards against a template quietly inlining something large across a whole family, which is how the coastline reached 51 pages and 2.1 MB."
     },
     "signature.apertures": {
-      "value": 816,
+      "value": 825,
       "kind": "floor",
-      "why": "Pages whose geography is seen through the arch. A floor: the aperture is the identity, and a new map that forgets it is a page that stops looking like EuropeDoor."
+      "why": "Pages whose geography is seen through the arch. A floor: the aperture is the identity, and a new map that forgets it is a page that stops looking like EuropeDoor. 816 -> 825: the nine macro regions, which were the last geographic family with no geography — a headline and a grid of cards, telling the reader which countries are in the Nordics without ever showing where it is. A macro region is the one grouping here with real polygons behind it, so nothing is invented by drawing it."
     },
     "plates.page_share": {
       "value": 0.226,
@@ -141,7 +141,7 @@
         "chip": 0.523
       },
       "kind": "floor",
-      "why": "The share of pages each primitive appears on. A family that quietly stops using one has grown its own components and the design system has forked without anybody deciding — which is the failure this floor exists to catch. A family that stops using one ON PURPOSE is the other thing that moves it, and the difference is whether the drop is recorded here in the same commit with the composition that caused it. The essay family cost pagehead, row and band about a hundredth each: nine story pages that no longer share the atlas chassis, which is the whole point of them. THESE NUMBERS WERE WRONG UNTIL THE DESTINATION EXEMPLAR: the matcher used \\b, and a hyphen is a word boundary, so `card` counted `card-art` and `row` counted `rowsub`. The card floor read 0.785 and the true figure is 0.226 — the most-cited primitive in the design system was three-quarters an image wrapper. AND THE STORIES INDEX COST card AND band A THOUSANDTH EACH: it was nine three-column grids of one card, one per desk — the desk taxonomy used as the layout — and nine essays are a contents page, so it is one list of rows with the desk as a kicker. That also removed nine illustrations chosen by the hash of a slug, which the story rule already forbade on the story page and nothing checked on the index."
+      "why": "The share of pages each primitive appears on. A family that quietly stops using one has grown its own components and the design system has forked without anybody deciding — which is the failure this floor exists to catch. A family that stops using one ON PURPOSE is the other thing that moves it, and the difference is whether the drop is recorded here in the same commit with the composition that caused it. The essay family cost pagehead, row and band about a hundredth each: nine story pages that no longer share the atlas chassis, which is the whole point of them. THESE NUMBERS WERE WRONG UNTIL THE DESTINATION EXEMPLAR: the matcher used \\b, and a hyphen is a word boundary, so `card` counted `card-art` and `row` counted `rowsub`. The card floor read 0.785 and the true figure is 0.226 — the most-cited primitive in the design system was three-quarters an image wrapper."
     }
   }
 }
