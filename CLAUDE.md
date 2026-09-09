@@ -29,6 +29,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **the Postgres/PostGIS model, the API, Next.js, auth, search, the AI pipeline** | **`docs/technical-foundation.md`** — a destination with a trigger, not a plan for Monday. Nothing in it should be built yet |
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
 | **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. Every spec section asserted against the real build, and CI fails if any of them stops being true |
+| **terrain: does a DEM earn its place, and at what strength** | **`docs/terrain-prototype.md`** — Chamonix at four strengths, judged by eye. Accepted at medium; zoom 7 because that is where the licence is, and the eight things the brief asked for before integrating |
 | **the cartographic standard — the ten principles and what holds each** | **`docs/cartographic-standard.md`** — editorial European atlas, not GIS. Nine of the ten are held by a check or an invariant; the tenth is the editorial test |
 | **how a map is DRAWN — palette, layers, what the benchmark still needs** | **`docs/cartography.md`** — the pictures are paper and the instruments are graphite. The four layers, the measured palette, and the four things the benchmark has that are blocked on a licence or a socket |
 | **the map, geographic data, tiles, or "why not Mapbox?"** | **`docs/map-architecture.md`** — the pipeline, the three levels of detail, and why this is SVG rather than MapLibre. Then **`docs/data-licenses/`**, which is the register, and **`docs/boundary-policy.md`** for disputed frontiers |
@@ -194,6 +195,20 @@ this is `geo.sources_line()`'s stated reason: a reader looking at a border is
 entitled to know which dataset drew it. It stops being taste the moment any
 row in the register carries `attribution_required`, and the check hardens
 itself and says so when one does.
+
+**A label is a label, and the physical names inherited none of the rules
+written for the place names.** `.peakname`, `.fname` and `.sname` were added
+after the two passes that fix exactly this, and took neither: they were sized
+in a fixed px inside a scaled viewBox, so Monte Rosa's height rendered **5.1
+pixels tall** at 390, and `phone_declutter()` matched `class="minilabel` and
+nothing else, so a physical label went through the pass, was measured, lost,
+and was drawn anyway. Chamonix printed *"Monte Rosa 4,634 m"* through its own
+name on a phone, one commit after the peak was added. Found by rendering the
+page at 390 while shooting something else; no count could see it, because the
+label was placed, was inside the aperture, and did not collide at the width
+every check ran at. All three families take the `--z` compensation now, all
+four count toward `dense_class()`, and `phone_declutter()` marks the first
+`class="` on whatever it is given.
 
 **`data/geo/` is generated and CI fails if it is stale**, exactly like `site/`.
 After changing `scripts/map/` or `data/raw/`, run

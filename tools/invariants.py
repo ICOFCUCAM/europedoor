@@ -58,6 +58,18 @@ def _css():
     return re.sub(r"/\*.*?\*/", "", css, flags=re.S)
 
 
+def _size_of(value):
+    """The type size a declaration states, with the --z compensation removed.
+
+    See css.font_sizes below. This normalises only the exact shape
+    `calc(X / var(--z))`, which is the map-label compensation and nothing
+    else: a real new size still counts as one, and that is proved both ways
+    in the same commit.
+    """
+    m = re.match(r"^calc\(\s*(.+?)\s*/\s*var\(--z\)\s*\)$", value.strip())
+    return m.group(1) if m else value.strip()
+
+
 def _pages():
     return sorted(glob.glob(os.path.join(OUT, "**", "*.html"), recursive=True))
 
@@ -154,7 +166,19 @@ def measure():
                        "and a hole in default-src 'none'. 2036 does not require "
                        "a new typeface."},
             "css.font_sizes": {
-                "value": len(set(re.findall(r"font-size:\s*([^;]+);", css))),
+                # A COMPENSATION CONSTANT FOR A COORDINATE SYSTEM IS NOT A
+                # TYPE SIZE, and the stylesheet has said so since the map
+                # labels were fixed: `calc(11px / var(--z))` draws an 11px
+                # label at the scale the viewBox is being drawn at. Counting
+                # it as its own size made the register fail on the commit
+                # that gave the physical map labels the same compensation the
+                # place names already had — a fix that adds no size, refused
+                # by an instrument reading the arithmetic instead of the
+                # value. Dividing by --z is normalised away; 17 becomes 15,
+                # because `calc(11px / var(--z))` was itself being counted
+                # separately from the `11px` it is.
+                "value": len({_size_of(v) for v in
+                              re.findall(r"font-size:\s*([^;]+);", css)}),
                 "kind": "ceiling",
                 "why": "A ceiling, not a target. The sibling repository measures "
                        "418; that is what happens without a line. It moved to "

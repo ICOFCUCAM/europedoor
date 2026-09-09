@@ -2500,7 +2500,7 @@ body[data-hero] .masthead { position: sticky; }
 .minimap.arched.atlas .lyr-summits .peak { fill: var(--atlas-coast);
   stroke: var(--atlas-here); stroke-width: 1.1; paint-order: stroke; }
 .minimap.arched.atlas .lyr-labels .peakname {
-  font-family: var(--display); font-size: var(--t-xs); font-style: italic;
+  font-family: var(--display); font-size: calc(var(--t-xs) / var(--z)); font-style: italic;
   fill: var(--atlas-coast); paint-order: stroke;
   stroke: var(--atlas-here); stroke-width: 2.2; }
 
@@ -2510,7 +2510,7 @@ body[data-hero] .masthead { position: sticky; }
    one command — since a rule written after the fact is argued about in a
    hurry. */
 .minimap.arched.atlas .lyr-labels .sname {
-  font-family: var(--display); font-size: var(--t-xs); font-style: italic;
+  font-family: var(--display); font-size: calc(var(--t-xs) / var(--z)); font-style: italic;
   letter-spacing: .32em; text-transform: uppercase;
   fill: color-mix(in srgb, var(--atlas-land) 78%, transparent); }
 
@@ -2518,7 +2518,7 @@ body[data-hero] .masthead { position: sticky; }
    always done with an italic serif. ALPS and PYRENEES are geography; a
    frontier is a decision. */
 .minimap.arched.atlas .lyr-labels .fname {
-  font-family: var(--display); font-size: var(--t-xs); font-style: italic;
+  font-family: var(--display); font-size: calc(var(--t-xs) / var(--z)); font-style: italic;
   letter-spacing: .1em;
   fill: color-mix(in srgb, var(--atlas-hereline) 72%, transparent);
   paint-order: stroke; stroke: var(--atlas-here); stroke-width: 2.2; }
@@ -2788,7 +2788,17 @@ body[data-hero] .masthead { position: sticky; }
    an 11px label to 9.4px at 390. */
 @media (max-width: 44rem) {
   .minimap:not(.dense) { --z: .42; }
-  .minimap.dense .minilabel { display: none; }
+  /* A LABEL IS A LABEL. The physical names were written after this rule and
+     inherited none of it: `.peakname`, `.fname` and `.sname` were sized in
+     a fixed px inside a scaled viewBox, which is the defect the paragraph
+     above exists for, and they rendered at 5.1px at 390 — Monte Rosa's
+     height was 6 pixels tall and printed through Chamonix's own name. They
+     take the same --z compensation now and they disappear on a dense map
+     for the same reason a place name does. */
+  .minimap.dense .minilabel,
+  .minimap.dense .peakname,
+  .minimap.dense .fname,
+  .minimap.dense .sname { display: none; }
   /* And the names that only fit at the small size. Enlarging the type broke
      the collision rule that placed it: 434 overlapping pairs on 275 of the
      815 pages that draw a labelled map, "Hallstatt" through "Berchtesgaden"

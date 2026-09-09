@@ -42,9 +42,9 @@
       "why": "Zero. A webfont is a third-party origin, a render delay and a hole in default-src 'none'. 2036 does not require a new typeface."
     },
     "css.font_sizes": {
-      "value": 16,
+      "value": 15,
       "kind": "ceiling",
-      "why": "A ceiling, not a target. The sibling repository measures 418; that is what happens without a line. It moved to 16 for the essay hed, and for nothing else: the design audit's central finding is that eleven of twelve rendered families place an identically-sized h1 at an identical vertical position, and no size that already existed could stop that. The same commit's other five candidate type values — a serif leading, a tighter hed, a deck clamp one decimal off one already in the file — were snapped back to what the site had, and no reader could name the difference."
+      "why": "A ceiling, not a target. The sibling repository measures 418; that is what happens without a line. It moved to 16 for the essay hed, and for nothing else: the design audit's central finding is that eleven of twelve rendered families place an identically-sized h1 at an identical vertical position, and no size that already existed could stop that. The same commit's other five candidate type values — a serif leading, a tighter hed, a deck clamp one decimal off one already in the file — were snapped back to what the site had, and no reader could name the difference. MOVED 16 -> 15 DELIBERATELY, and downward: the counter used to read `calc(11px / var(--z))` as a size of its own, separately from the `11px` it is. A compensation constant for a coordinate system is not a typographic choice, and the stylesheet has said so since the map labels were fixed. The slack that hid was real — a genuinely new 37px passed under the old ceiling and fails under this one."
     },
     "css.font_weights": {
       "value": 4,

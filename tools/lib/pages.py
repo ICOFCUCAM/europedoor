@@ -3254,8 +3254,16 @@ def phone_declutter(placed):
                     and box[1] < k[1] + k[3] and k[1] < box[1] + box[3]
                     for k in kept)
         if clash:
-            out.append(html.replace('class="minilabel', 'class="wide-only minilabel', 1)
-                       if 'class="minilabel' in html else html)
+            # ANY LABEL, NOT ONLY A PLACE NAME. This matched `class="minilabel`
+            # and nothing else, so the physical names added later — a peak, a
+            # range, a sea — went through this pass, were measured, lost, and
+            # were drawn anyway. Chamonix at 390px printed "Monte Rosa
+            # 4,634 m" through its own name, one commit after the pass that
+            # added the peak and one commit after the pass that fixes exactly
+            # this. Marking the first `class="` covers every label family and
+            # the wrapped ones too, and `.minimap .wide-only` matches any
+            # element, so a wrapper is as good a place to carry it as a text.
+            out.append(html.replace('class="', 'class="wide-only ', 1))
         else:
             kept.append(box)
             out.append(html)
@@ -3273,7 +3281,13 @@ def dense_class(markup):
     visible names the same treatment as a continental one with forty-one.
     Six or fewer names can be drawn at 26 units on a phone; more cannot.
     """
-    return "" if markup.count('<text class="minilabel') <= 6 else " dense"
+    # AND THE PHYSICAL NAMES COUNT. They are labels a phone has to enlarge
+    # exactly as it enlarges a place name, and counting only `.minilabel`
+    # called a map with six towns and four mountains sparse — so all ten were
+    # scaled up on a 390px screen and two of them collided.
+    names = sum(markup.count(f'<text class="{c}') for c in
+                ("minilabel", "peakname", "fname", "sname"))
+    return "" if names <= 6 else " dense"
 
 
 def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
