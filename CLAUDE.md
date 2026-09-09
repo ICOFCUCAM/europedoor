@@ -34,6 +34,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **"is field X in the model?" — the Build Package schema** | **`docs/schema-mapping.md`** — every entity and field of Build Package v1 §2 against the running data: HAVE, BUILT, or REFUSED with the promise behind each refusal |
 | **changing anything visual — the protocol and the control** | **`docs/design-migration.md`** — §6. The pipeline, the invariant register as its control, and the three measured defects in the generated plates that are the next experiment's subject |
 | **the visual system — tokens, type, the two worlds, what is left** | **`docs/visual-architecture.md`** — §5, measured. The European Future migration as it actually landed, plus the fifteen deliberate attacks that went red |
+| **what each family's page is FOR — the nine questions, and where the door is deliberately absent** | **`docs/signature-moments.md`** — emotional promise, signature moment, geographic expression, hierarchy, interaction, aperture, imagery, data, and what is refused. Read before adding a map to a family |
 | **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence |
 
 ## The rules that catch people out
@@ -194,6 +195,17 @@ segment. `checks.py` asserts all four values agree, and `signature.apertures`
 is a floor. **A map figure must paint no background** — the corners outside
 the arch show the page through, and that is the difference between an
 aperture and a panel. Light wall, dark opening.
+
+**The aperture may be explicit, subtle, implied or absent — recognition, not
+repetition.** A signature applied to everything is wallpaper. `docs/signature-moments.md`
+answers nine questions per family — emotional promise, signature moment,
+geographic expression, hierarchy, interaction, the role of the aperture, of
+imagery, of data, and what is deliberately absent — and records where the
+door is *correctly* missing: **/map** is the instrument rather than a picture
+of somewhere, the **facet** pages exist to be left quickly and must not each
+repeat their parent's map, and the **interest** pages would draw three
+identical maps of Europe for their three largest tags. Before adding an
+aperture to a family, answer question 2 for it.
 
 **A story is not a place, and its picture may not be drawn from a hash.**
 `plate_shapes()` picks a motif from the seed when none is passed, so for a
