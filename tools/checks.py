@@ -1955,6 +1955,80 @@ def c_empty_states_explain():
     return n
 
 
+@check("no page carries geography it does not show")
+def c_map_land_is_in_frame():
+    # A SANTORINI PAGE CARRIED THE COASTLINE OF NORWAY.
+    #
+    # minimap() asked landmass() for the whole 1000x780 canvas and let the
+    # arch's clip path hide everything outside the frame. The picture was
+    # right, so nothing looked wrong, and no check had ever measured what a
+    # page CONTAINS as against what it SHOWS: 73,464 bytes of continent in
+    # every destination and place page, 79.7% of the bytes on a Santorini
+    # page, on a site whose heaviest page is a recorded ceiling.
+    #
+    # It was found by an experiment measuring something else entirely, which
+    # is the argument for measuring things. This is the check that would have
+    # found it: every coordinate emitted into a map's <g> must be inside the
+    # window that <g> is drawn through, with a margin for the clip's own pad.
+    def inner_of(html, start):
+        """The transform group's contents, matched by depth.
+
+        A non-greedy `(.*?)</g>` was the first version and it stopped at the
+        first close tag, which is the end of the nested <g class="context">.
+        On most pages that group is empty once the frame is clipped, so the
+        check silently examined 74 of 574 maps and reported itself green. A
+        check that quietly stops looking is the failure mode this repository
+        has already had once, in the browser suite's own counter.
+        """
+        # Depth starts at 1: `start` is already INSIDE the transform group.
+        # Starting it at 0 made the first nested close look like the end and
+        # reproduced the original bug exactly — 74 of 574 again.
+        depth, i = 1, start
+        while i < len(html):
+            j = html.find("<g", i)
+            k = html.find("</g>", i)
+            if k < 0:
+                return ""
+            if 0 <= j < k:
+                depth += 1
+                i = j + 2
+            else:
+                depth -= 1
+                if depth == 0:
+                    return html[start:k]
+                i = k + 4
+        return ""
+
+    n = 0
+    for f in site_files():
+        html = open(f, encoding="utf-8").read()
+        for m in re.finditer(
+                r'<g transform="translate\((-?[\d.]+),(-?[\d.]+)\) '
+                r'scale\(([\d.]+)\)">', html):
+            tx, ty, sc = (float(m.group(1)), float(m.group(2)),
+                          float(m.group(3)))
+            inner = inner_of(html, m.end())
+            xs = [float(v) for v in re.findall(r'[ML](-?[\d.]+) ', inner)]
+            ys = [float(v) for v in re.findall(r'[ML]-?[\d.]+ (-?[\d.]+)', inner)]
+            if not xs:
+                continue
+            # Into rendered units, the same way the browser will.
+            rx = [x * sc + tx for x in xs]
+            ry = [y * sc + ty for y in ys]
+            # 900x320 is the minimap frame; allow landmass()'s own 40-unit pad
+            # scaled, plus a little, before calling it waste.
+            slack = 40.0 * sc + 20.0
+            out = sum(1 for x, y in zip(rx, ry)
+                      if x < -slack or x > 900 + slack
+                      or y < -slack or y > 320 + slack)
+            if out > len(rx) * 0.02:
+                fail(f"{rel(f)}: {out} of {len(rx)} coastline points are "
+                     f"outside the frame they are drawn in — the clip path "
+                     f"hides them and the page still ships them")
+            n += 1
+    return n
+
+
 @check("the projection keeps shape at every latitude it draws")
 def c_projection_conformal():
     # THE MEASUREMENT THAT JUSTIFIED REPLACING THE PROJECTION, KEPT AS A

@@ -154,6 +154,7 @@
     "lod2_rings_in_bbox": 23,
     "osm_rings_in_bbox": null,
     "islands_absent_from_current_data": null,
+    "ne_rings_absent_from_osm": null,
     "lod1_floor_bbox_km2_at_this_latitude": 99.0,
     "lod2_floor_bbox_km2_at_this_latitude": 14.9
   },

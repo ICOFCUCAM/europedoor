@@ -20,7 +20,7 @@ Not "is OSM better than Natural Earth" — it plainly is, at some scale, and
 that question has no decision attached to it. The decision is whether the
 improvement lands inside the frames this site actually renders, at a byte cost
 the page-weight invariants can carry, for a share-alike obligation that
-`docs/openstreetmap-not-used.md` says must be paid deliberately.
+`docs/data-licenses/openstreetmap-not-used.md` says must be paid deliberately.
 
 **Null hypothesis (H₀).** At EuropeDoor's real zoom levels, the difference
 between Natural Earth 1:50m as processed by `scripts/map/process.py` and
@@ -240,6 +240,15 @@ aesthetics. Each is a separate decision with its own trigger.
 Both are standard library plus `tools/lib`, both run offline, and neither
 writes outside this directory. `measure.py` reports the OSM side as **not
 present** until `osm/` holds a file, and never estimates it.
+
+**The absent path was proved, not assumed.** The OSM-present branch — the
+second column of the table, the compactness-error column that M2 is judged on,
+the absent-island count and the OSM byte figure — was exercised once against
+four synthetic rings in a scratch directory, so it is known to run rather than
+merely known to be written. The synthetic data was never placed in `osm/` and
+never written to `results.json`; its numbers were nonsense and were discarded,
+which is the only correct use for them. A code path that has only ever been
+read is a code path that fails on the day it first matters.
 
 `render.py` writes two contact sheets at the real rendered widths — 1136 px
 and 310 px per panel — because the desktop and phone answers differ and a

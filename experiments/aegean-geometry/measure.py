@@ -426,6 +426,52 @@ def ring_for(dest, rings):
 
 # ── the zoom the reader actually sees ─────────────────────────────────────
 
+def rep_point(pts):
+    """A point inside a ring, for asking 'does the other side know about this'.
+
+    The vertex mean first, because it is inside for anything convex and for
+    most real islands; a vertex nudged towards it when the mean falls outside
+    (a crescent, a caldera rim). Not a full pole-of-inaccessibility: this only
+    has to land on the island, not in the middle of it.
+    """
+    n = len(pts) - 1 if closed(pts) else len(pts)
+    cx = sum(p[0] for p in pts[:n]) / n
+    cy = sum(p[1] for p in pts[:n]) / n
+    if point_in_ring((cx, cy), pts):
+        return cx, cy
+    for x, y in pts[:n]:
+        q = (x + (cx - x) * 0.02, y + (cy - y) * 0.02)
+        if point_in_ring(q, pts):
+            return q
+    return cx, cy
+
+
+def absent_from(rings, other, minbox):
+    """Rings on one side that the other side has no land for at all.
+
+    "Absent" is not "drawn differently": a shrunken blob still contains its
+    own island's middle, so it counts as present and shows up in the shape
+    metrics instead. Absent means no ring on the other side contains this
+    ring's representative point — nothing is drawn there.
+
+    Reported twice, above and below the pipeline's own ring-drop floor,
+    because the two have different answers. Below the floor is "our
+    processing dropped it"; above it is "the source never had it".
+    """
+    small, big = 0, 0
+    for r in rings:
+        pt = rep_point(r["pts"])
+        if any(point_in_ring(pt, o["pts"]) for o in other):
+            continue
+        x0, y0, x1, y1 = bbox_of(r["pts"])
+        if (x1 - x0) * (y1 - y0) < minbox:
+            small += 1
+        else:
+            big += 1
+    return {"total": small + big, "above_lod1_floor": big,
+            "below_lod1_floor": small}
+
+
 def spans(proj, dests, C):
     """Reproduce minimap()'s span="auto" ladder for every destination.
 
@@ -584,7 +630,14 @@ def main(argv):
         "lod1_rings_in_bbox": len(ne_box),
         "lod2_rings_in_bbox": len(ne2_box),
         "osm_rings_in_bbox": None if osm_box is None else len(osm_box),
-        "islands_absent_from_current_data": None,   # needs the authoritative side
+        # Only computable with the authoritative side; None means "not
+        # measured", never "zero".
+        "islands_absent_from_current_data":
+            None if osm_box is None
+            else absent_from(osm_box, ne_box, C["lod1_minbox_deg2"]),
+        "ne_rings_absent_from_osm":
+            None if osm_box is None
+            else absent_from(ne_box, osm_box, C["lod1_minbox_deg2"]),
         "lod1_floor_bbox_km2_at_this_latitude":
             round(C["lod1_minbox_deg2"] * lat_scale * lon_scale, 1),
         "lod2_floor_bbox_km2_at_this_latitude":
@@ -704,14 +757,18 @@ def main(argv):
     print(f"   rings actually in country/greece.json (lod2)      {c['lod2_rings_in_bbox']:>5}")
     print(f"   rings in the OSM side                             "
           f"{dash(c['osm_rings_in_bbox']):>5}")
+    a = c["islands_absent_from_current_data"]
     print(f"   islands absent from current data (needs OSM)      "
-          f"{dash(c['islands_absent_from_current_data']):>5}")
+          f"{(a['total'] if a else '—'):>5}"
+          + (f"   ({a['above_lod1_floor']} of them above our own "
+             f"ring-drop floor)" if a else ""))
     print(f"   lod1 floor is a {c['lod1_floor_bbox_km2_at_this_latitude']} km2 "
           f"BOUNDING BOX at this latitude (not an area)")
 
     print("\n3. SHAPE FIDELITY — the nearest drawn ring to each destination")
     hdr = (f"   {'destination':<22}{'sp':>5}{'crn':>5}{'area':>9}{'perim':>8}"
-           f"{'cmp':>7}{'c/100km':>9}{'offshore':>10}   {'crn':>5}{'cmp':>7}")
+           f"{'cmp':>7}{'c/100km':>9}{'offshore':>10}   {'crn':>5}{'cmp':>7}"
+           f"{'cmp err':>9}")
     print(hdr)
     print("   " + "-" * (len(hdr) - 3))
     for r in sorted(islands, key=lambda r: (not r["named"], r["name"])):
@@ -728,7 +785,8 @@ def main(argv):
               f"{n['compactness']:>7.3f}{n['corners_per_100km']:>9.2f}"
               f"{off:>10}   "
               f"{dash(o and o['corners']):>5}"
-              f"{dash(o and round(o['compactness'], 3)):>7}")
+              f"{dash(o and round(o['compactness'], 3)):>7}"
+              f"{dash(r['compactness_error'] and round(r['compactness_error'], 3)):>9}")
     print("   * = one of the four islands the experiment is named for")
     print("   crn = corners, i.e. ring length less the repeated closing point")
     print("   offshore = km from the destination to the nearest drawn coastline")
@@ -740,7 +798,13 @@ def main(argv):
     for row in t["ne_dot_in_sea"]:
         print(f"     - {row['name']:<22} {row['km_offshore']:>6.1f} km from the "
               f"nearest drawn land")
-    print(f"   OSM: {dash(t['osm_dot_in_sea'] and len(t['osm_dot_in_sea']))}")
+    if t["osm_dot_in_sea"] is None:
+        print("   OSM: —")
+    else:
+        print(f"   OSM: {len(t['osm_dot_in_sea'])} of "
+              f"{t['destinations_in_bbox']} land in the sea")
+        for name in t["osm_dot_in_sea"]:
+            print(f"     - {name}")
 
     print("\n5. BYTES AT THE REAL RENDER SIZE")
     b = res["bytes"]

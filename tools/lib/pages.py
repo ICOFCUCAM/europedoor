@@ -1940,9 +1940,6 @@ def minimap(data, t, span=3.2, about=None):
     """
     cx, cy = project(t["lat"], t["lon"])
     w, h = 900, 320
-    # The land is the doorway's ground: an arch cut over emptiness is a
-    # shape, an arch cut over a coastline is an opening onto somewhere.
-    ctx, land = geo.landmass(MAPPROJ, (0, 0, MAP_W, MAP_H))
     # NOT builtins.hash(). THE BUILD WAS NOT DETERMINISTIC.
     #
     # This was `abs(hash((name, lat, lon))) % 100000`, and Python randomises
@@ -1975,6 +1972,25 @@ def minimap(data, t, span=3.2, about=None):
     # wrong for the conformal conic that replaced it. A conformal projection
     # has one scale at a point — the same along the parallel and along the
     # meridian — so both numbers now come from measuring it there.
+    # The land is the doorway's ground: an arch cut over emptiness is a
+    # shape, an arch cut over a coastline is an opening onto somewhere.
+    #
+    # CLIPPED TO THE WINDOW, WHICH IT WAS NOT FOR THE LIFE OF THIS MAP.
+    #
+    # This asked landmass() for (0, 0, MAP_W, MAP_H) — the entire continent —
+    # and let the arch's clip path hide everything outside the frame. So a
+    # Santorini page carried the coastline of Norway: 73,464 bytes of Europe
+    # emitted into every destination and place page, about 79% of the bytes
+    # on the page, on a site whose heaviest page is a recorded ceiling.
+    #
+    # It cost nothing to notice and nothing to fix. It survived because the
+    # picture was right — the clip path did hide it — and no check has ever
+    # measured what a page contains that it does not show. The window is
+    # (cx, cy) ± half the frame in projection units, which is the same
+    # arithmetic the dots two blocks below already use.
+    view = (cx - w / 2 / span, cy - h / 2 / span, w / span, h / span)
+    ctx, land = geo.landmass(MAPPROJ, view)
+
     kmu = geo.km_per_unit(MAPPROJ, t["lat"], t["lon"])
     km_w = int(round(w / span * kmu / 10) * 10)
     km_h = int(round(h / span * kmu / 10) * 10)

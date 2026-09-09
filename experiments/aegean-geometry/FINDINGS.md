@@ -262,7 +262,15 @@ repository's rule is to keep the evidence of a mistake:
    inside a style element mentioned a literal less-than. An SVG is XML. The
    style block is wrapped in CDATA now.
 
-None of the four was visible in the source, all four were visible in one
+A fifth came from running the branch that has no data yet: exercising
+`measure.py`'s OSM-present path against four synthetic rings showed that the
+"islands absent from current data" row and the compactness-error column had
+never executed, and one of them needed a definition rather than a formula —
+"absent" had to be made to mean *nothing is drawn there*, not *drawn
+differently*, or a shrunken blob would have counted as a missing island and
+inflated the case for changing the dataset.
+
+None of the first four was visible in the source, all four were visible in one
 screenshot, and #1 and #4 would have produced an artefact that looked like a
 missing file rather than a broken one.
 
