@@ -53,6 +53,7 @@ failure this codebase has made three times with specificity alone.
 from __future__ import annotations
 
 import os
+import re
 
 from . import geo
 from .render import arch_clip, arch_edge, arch_rim
@@ -149,10 +150,6 @@ DECIDED = {
     "water-labels": "Sea and ocean names in widely tracked uppercase, in the "
                     "water colour rather than in ink. An area, not a point, "
                     "which is why it is tracked and why it carries no mark.",
-    "terrain": "The five steps of HYPSOMETRIC above, from the land tone "
-               "toward the warm accent. No hypsometric rainbow: in an "
-               "editorial atlas height is felt, not read off a legend, and "
-               "the typography stays dominant over the ground.",
     "hillshade": "One light from the north-west, at most 12% opacity, "
                  "multiplied over the terrain tint and clipped to land. "
                  "Never over flat ground, where it invents structure.",
@@ -202,10 +199,13 @@ FOLDED = {
                               "itself, and the ramp was never on the page. "
                               "A filter needs no second copy of Europe and "
                               "cannot lose a cascade fight"),
-    "coastline": ("land", "the land path's own stroke; needs a stroke-only "
-                          "pass to separate, which terrain will force"),
-    "country-bounds": ("land", "same stroke as the coastline — the two are "
-                               "one path per country at this LOD"),
+    "coastline": ("land", "the land path's own stroke. COUNTRY-BOUNDS USED TO "
+                          "BE FOLDED HERE TOO and was unfolded the day terrain "
+                          "landed, exactly as this note predicted: relief "
+                          "paints over a stroke, so a boundary under it is a "
+                          "boundary that is not there. The coastline stays "
+                          "folded because it is where land meets water and "
+                          "nothing is drawn between them"),
     "selected": ("land", "the `here` class on the land path, which sets its "
                          "own fill and a heavier stroke"),
     "cities": ("destinations", "the capital is a destination with a `cap` "
@@ -254,10 +254,180 @@ def unwritten(name, path):
         f"already decided: {DECIDED.get(name, '(undecided)')}")
 
 
-def terrain(proj, view):
-    if not held("terrain"):
+# THE BAND BOUNDARIES ARE CACHED WITH THEIR BOUNDING BOXES, once per build.
+# 2,265 rings and 58,000 vertices are read for every plate that draws relief,
+# and a min/max scan of every ring on every page is 46 million coordinate
+# reads across the site. The box is computed once and the rejection is four
+# comparisons.
+_BANDS = None
+
+
+def _bands():
+    global _BANDS
+    if _BANDS is None:
+        doc = geo.load(SOURCES["terrain"])
+        _BANDS = []
+        if doc:
+            for band in doc.get("bands", []):
+                rows = []
+                for r in band["rings"]:
+                    lons, lats = r[0::2], r[1::2]
+                    rows.append((min(lons), min(lats), max(lons), max(lats), r))
+                _BANDS.append((band["min_m"], rows))
+    return _BANDS
+
+
+def stroke_only(markup):
+    """The same country geometry again, as a stroke with no fill.
+
+    THE BOUNDARIES VANISH UNDER THE TERRAIN OTHERWISE, and the first render of
+    the prototype proved it: the frame carried a clear France/Switzerland/Italy
+    frontier without relief and none with it, because a boundary here is a
+    STROKE ON THE LAND PATH and the bands paint over it. ORDER has always put
+    `country-bounds` above `terrain`; FOLDED said that layer was carried by
+    `land` and that separating it was what "terrain will force". This is that.
+
+    It costs the country rings a second time — about 5 KB on a destination
+    plate against 30 KB of terrain — and there is no cheaper form. A `<use>`
+    clone is still matched by the selectors that fill the ORIGINAL paths, so
+    the copy would come back filled; this repository has already lost a day
+    to that once, on the coastal water ramp.
+
+    `<title>` is dropped: the names are on the paths underneath, and a second
+    copy would double every country in the accessibility tree.
+    """
+    if not markup:
         return ""
-    unwritten("terrain", SOURCES["terrain"])
+    out = []
+    for m in re.finditer(r'<path\b([^>]*?)\sd="([^"]*)"', markup):
+        cls = re.search(r'class="([^"]*)"', m.group(1))
+        extra = " here" if cls and "here" in cls.group(1).split() else ""
+        out.append(f'<path class="bnd{extra}" d="{m.group(2)}"/>')
+    return "".join(out)
+
+
+def draws_relief(measure):
+    """Whether this place's picture gets relief at all.
+
+    ONE PALETTE, ABSOLUTE, AND THE FLAT PLACES ARE REDUCED BY THE SCALE
+    RATHER THAN BY A WEAKER INK. A second, fainter strength was built first
+    and measured: at 40% of the way to the hypsometric colours the only band
+    Bergen has is 0.043 of luminance from the land tone — a layer that ships
+    twenty-three kilobytes and cannot be seen. And two strengths make
+    #d8ceb4 mean 600 m on one page and something else on another, which is
+    not a hypsometric scale, it is decoration that looks like one.
+
+    A flat place is already quieter, automatically: it reaches only the quiet
+    end of the scale. Bergen's ground crosses one band boundary and gets one
+    step; Chamonix's crosses four. That is the reduction the owner asked for,
+    delivered by the thing that was already true.
+
+    Two measurements decide it, both taken from the same model that draws the
+    bands and travelling with it in data/geo/terrain-lod1.json: the spread
+    within 25 km, and the crest — because the 200 m step is 0.013 of
+    luminance from the land tone, deliberately the quietest thing on the
+    plate, and a place whose ground reaches only that band would ship a layer
+    nobody can read.
+    """
+    doc = geo.load(SOURCES["terrain"])
+    if not doc or not measure:
+        return False
+    t = doc["relief_thresholds_m"]
+    return measure[0] >= t["min_spread"] and measure[1] >= t["min_crest"]
+
+
+def relief_of(key):
+    """[spread, crest] within 25 km of one destination, or None."""
+    doc = geo.load(SOURCES["terrain"])
+    return (doc or {}).get("relief", {}).get(key)
+
+
+# HOW WIDE A FRAME MAY BE AND STILL BE A PICTURE OF SOMEWHERE.
+#
+# Relief answers "what kind of ground is this place in". Across a continent it
+# answers a different question — it becomes a physical map of Europe, which is
+# a fine document and is not what a journey page is. Measured: the
+# Arctic-to-Mediterranean route frames 4,207 km and drew every band in the
+# dataset, 787 KB on one page, and at that scale the Alps are a smudge the
+# width of a thumb. The owner's rule is the one being kept: the objective is
+# not more geographic information, it is more convincing geography, and a
+# layer that improves none of recognition, orientation, sense of place,
+# hierarchy or beauty is omitted.
+#
+# 1,500 km, which is chosen from the seventeen journey frames rather than
+# picked as a round number. It admits the six that are regional — the Alpine
+# Grand Tour at 1,278 km, the Carpathian Arc at 1,388, the Adriatic Run at
+# 1,449 — and excludes the eleven that cross the continent, the nearest of
+# them at 1,691. The Alps are about 1,200 km end to end, so the widest frame
+# this allows is still one mountain system rather than a subcontinent.
+#
+# A destination plate is 590 km and never comes near it. The cap is not a
+# byte budget, but it is also the thing that keeps these pages under the
+# recorded weight ceiling, which is how the first version was found.
+TERRAIN_MAX_KM = 1500.0
+
+
+def terrain(proj, view, draw=False, frame_km=None):
+    """The hypsometric bands, painted lowest first.
+
+    NOT A HILLSHADE. A hillshade is a light source: it invents a direction
+    and paints structure onto flat ground. A band claims only height, which
+    is the one thing the elevation model measures. See
+    docs/terrain-prototype.md for the four strengths that were rendered and
+    why the strongest was not chosen.
+
+    Only where the ground says so. `draw` is False on most of the atlas, and
+    there this returns nothing at all rather than a faint wash: a Paris
+    illustration must not look like a topographic map because the pipeline
+    happens to own an elevation model.
+    """
+    if not draw or not held("terrain"):
+        return ""
+    if frame_km is not None and frame_km > TERRAIN_MAX_KM:
+        return ""
+    x, y, w, h = view
+    # CLIPPED TO THE WINDOW, AND THE FIRST VERSION WAS NOT. The bands are
+    # traced over the whole extent, so the 200 m boundary is a handful of
+    # enormous rings — one of them runs from the Pyrenees to the Urals. A
+    # rejection test on the ring's bounding box keeps every one of those,
+    # and a destination page went from 55 KB to 154 KB drawing the relief of
+    # countries it does not show. Sutherland-Hodgman against the window is
+    # the same repair `landmass()` already carries for the coastline, and for
+    # the same reason: a page must not contain geography it cannot display.
+    #
+    # The box is a sixth of the window beyond every edge — far enough that
+    # the cut and the slivers an even-odd fill leaves where an outer ring and
+    # a hole meet on the same clip edge land outside the viewBox, and near
+    # enough that a page is not carrying four times the geography it shows.
+    # A whole plate's width of padding was the first version and cost 90 KB a
+    # page, which is the same failure, one order down.
+    pad = max(w, h) * 0.16
+    box = (x - pad, y - pad, x + w + pad, y + h + pad)
+    out = []
+    for min_m, rows in _bands():
+        ds = []
+        for _lo0, _la0, _lo1, _la1, flat in rows:
+            pts = [proj.xy(flat[i + 1], flat[i]) for i in range(0, len(flat), 2)]
+            if (max(p[0] for p in pts) < box[0]
+                    or min(p[0] for p in pts) > box[2]
+                    or max(p[1] for p in pts) < box[1]
+                    or min(p[1] for p in pts) > box[3]):
+                continue
+            pts = geo._clip(pts, box)
+            if len(pts) < 3:
+                continue
+            d, last = [], None
+            for px, py in pts:
+                q = (round(px, 1), round(py, 1))
+                if q == last:
+                    continue
+                d.append(("M" if not d else "L") + f"{q[0]} {q[1]}")
+                last = q
+            if len(d) >= 4:
+                ds.append("".join(d) + "Z")
+        if ds:
+            out.append(f'<path class="tband t{min_m}" d="{"".join(ds)}"/>')
+    return "".join(out)
 
 
 def hillshade(proj, view):
@@ -281,15 +451,15 @@ LAKE_RANK = 1
 def rivers(proj, view):
     """Rivers and lakes, when the repository holds them.
 
-    Written now, not stubbed: the day `data/geo/hydrology-lod1.json` lands
-    this draws, and the reason to write it before the data is that a layer
-    which quietly renders nothing once its file arrives is the failure this
-    whole stack was built to make impossible.
-
     Two classes, because a hierarchy of one is a list: `major` for the rivers
     that carry a country's shape and `minor` for the rest that survive the
     rank cut. Both thinner than the coastline — a river drawn as heavily as a
     coast turns a country into a leaf.
+
+    ABOVE THE TERRAIN AND BELOW THE LABELS, which is the owner's rule and a
+    printed atlas's: water is a separate visual layer and must never inherit
+    land shading. A river under the relief would be tinted by the band it
+    crosses and would change colour as it came down a valley.
     """
     doc = geo.load(SOURCES["rivers"])
     if not doc:
@@ -429,8 +599,9 @@ def region_bounds(proj, view):
 
 def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
           cities="", destinations="", labels="", route="", caption="",
-          features="", waters="", summits="", role="illustration",
-          figure_class="minimap arched atlas", aria="", rim=True):
+          features="", waters="", summits="", terrain="", bounds="",
+          role="illustration", figure_class="minimap arched atlas",
+          aria="", rim=True):
     """A complete editorial plate: the layers, in order, through the arch.
 
     `land` and `context` arrive already projected — geography is `geo.py`'s
@@ -455,7 +626,13 @@ def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
             body.append(f'<g id="{uid}-land" class="lyr {CLASSES["land"]}">'
                         f'{context}{land}</g>' if (land or context) else "")
         elif name == "terrain":
-            body.append(_group(name, terrain(proj, view)))
+            # The caller supplies it, for the same reason it supplies `land`:
+            # a destination plate draws the continent inside its own
+            # translate-and-scale, and geometry that does not go through that
+            # transform lands in the wrong country. This module still decides
+            # that relief is drawn HERE — above the land fill, below the
+            # boundary — which is the whole of its job.
+            body.append(_group(name, terrain))
         elif name == "hillshade":
             body.append(_group(name, hillshade(proj, view)))
         elif name == "rivers":
@@ -466,11 +643,16 @@ def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
             body.append(_group(name, features))
         elif name == "water-labels":
             body.append(_group(name, waters))
-        elif name in ("coastline", "country-bounds", "selected"):
-            # Drawn by the land group's own stroke today. When terrain lands
-            # these become their own stroke-only pass so relief sits UNDER
-            # them, and that pass re-emits the geometry — about 40% of the
-            # bytes on these pages. Measured then, not guessed now.
+        elif name == "country-bounds":
+            # UNFOLDED, and only where it has to be. With no terrain the land
+            # path's own stroke IS the boundary and a second pass would be
+            # 5 KB of duplicate geometry on 1,033 pages for no visible
+            # change; with terrain over it the stroke is buried and the
+            # picture loses its frontiers. So the caller passes the
+            # stroke-only pass exactly when it passes relief.
+            body.append(_group(name, bounds))
+        elif name in ("coastline", "selected"):
+            # Still the land path's own stroke and its `here` fill.
             continue
         elif name == "summits":
             body.append(_group(name, summits))

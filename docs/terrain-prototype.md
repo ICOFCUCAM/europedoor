@@ -3,9 +3,11 @@
 **Question asked:** does restrained terrain materially improve the recognition
 and sense of place of an Alpine destination?
 
-**Answer: yes, and not marginally.** Accepted at MEDIUM strength. Nothing is
-integrated yet; what follows is the eight things the brief asked to be written
-down first.
+**Answer: yes, and not marginally.** Accepted at MEDIUM strength, and now
+**integrated on the destination and journey illustrations** under the owner's
+five rules. What follows is the eight things the brief asked to be written down
+first, then what integration changed and what the second benchmark — eight
+destinations, looked at together — found.
 
 The benchmark question was put the other way round, and that is the version
 worth answering: *does removing the terrain make Chamonix feel less like
@@ -238,16 +240,169 @@ forbids authoring its height.
 Destination and journey illustrations only. Not the country plates, not the
 atlas, not `/map`. No layer is added merely because the source dataset exists.
 
-## What integration still needs
+## Integration, and what changed on the way
 
-1. `country-bounds` unfolded from `land`, so a boundary is drawn above the
-   terrain rather than under it. This is the one structural change.
-2. A renderer in `cartography.py` for the `terrain` layer, and the derived
-   rings written to `data/geo/` under the same staleness contract as the
-   coastline — `unwritten()` correctly refuses the file until the renderer
-   exists, which is why nothing is in `data/geo/` yet.
-3. The per-destination classification above, authored from a stated vocabulary.
-4. A wider fetch for the journey frames, at zoom 7 and no deeper, with the
-   provenance header recorded per tile as the six here are.
-5. A check that the bands are what the DEM says: the point-in-polygon test
-   that found the saddle bug, run over the shipped rings.
+### Zoom 6, not zoom 7 — and the licence got cleaner
+
+The prototype ran at zoom 7. Rendered against the same Chamonix frame the two
+are indistinguishable: the field is smoothed with a 5 km kernel either way, so
+865 m of detail is thrown away before anything is drawn. Zoom 7 over the whole
+extent would be **728 tiles**; zoom 6 is **182 tiles and 10.5 MB**, and its
+land is GMTED2010 with ETOPO1 in the sea — two US Government public-domain
+sets, without even the SRTM that zoom 7 brings in. Smoothed harder, at an
+8.6 km kernel, the Arve and Aosta valleys merge into one mass and the 2,000 m
+band nearly disappears, so this is not "coarser is fine": it is the one step
+where the picture does not change and the bytes do.
+
+**The whole extent is fetched, not only the mountains**, because whether a
+destination gets terrain is a measurement and Paris has to be measured to be
+found flat.
+
+### One palette, not two — measured out
+
+A second, fainter strength was built first, at 40% of the way to the
+hypsometric colours, for exactly the flatter places the owner asked to have
+room for. It was wrong twice over:
+
+* **It could not be seen.** The only band Bergen has is 0.043 of luminance
+  from the land tone at that strength — a layer that ships 23 KB and renders
+  as nothing, which is what this repository calls dead code that looks like a
+  decision.
+* **It broke the scale.** Two strengths make `#d8ceb4` mean 600 m on one page
+  and something else on another. A hypsometric scale that is not absolute is
+  decoration that looks like one.
+
+The reduction the owner asked for was already there, for free: **an absolute
+scale reduces itself.** Bergen's ground crosses one band boundary and gets one
+step; Chamonix's crosses four and gets the pale stone at the top. Rendered
+side by side that is exactly the difference between "there are hills here" and
+"this is the high Alps", and nothing had to be dimmed to say it.
+
+### The suitability rule is a measurement, and its first version was biased
+
+Not a list of mountainous places — that would be an authored measurement, and
+the one thing this repository does not do. Two numbers, taken from the same
+model that draws the bands and stored beside them in
+`data/geo/terrain-lod1.json`:
+
+| | |
+|---|---|
+| **spread** | the 95th minus the 5th percentile of ground within 40 km |
+| **crest** | the 95th percentile itself |
+
+Terrain is drawn when spread ≥ 300 m **and** crest ≥ 600 m. The second test
+exists because the 200 m band is 0.013 of luminance from the land tone — the
+quietest thing on the plate, deliberately — so a place whose ground reaches
+only that band would ship a layer nobody can read.
+
+**The first version measured sea.** It clamped water to zero and included it,
+so a percentile over a circle that is four-fifths sea is a percentile of sea:
+Athens, in a basin ringed by Hymettus, Penteli and Parnitha, measured *lower*
+at 40 km than at 25, because widening the circle added water rather than
+mountains. Nice measured 1,200 m once the water came out. That is the same
+shape of failure as deriving `city_type` from a dataset of populated places
+and getting one village in 157: **a derivation can be systematically biased
+against exactly the cases it exists for.**
+
+**And 25 km was too tight.** It measured Bergen at 387 m — a town of seven
+mountains — because at 1.7 km a cell Ulriken's 643 m averages down to a
+shoulder and the fjord walls are just outside the circle. 40 km reads Bergen
+at 707 m and still leaves Venice at 41, Amsterdam at 11 and Paris at 150. A
+radius wide enough to find mountains everywhere would find them in the
+Netherlands.
+
+| | spread | crest | terrain |
+|---|---|---|---|
+| Zermatt | 2,002 m | 3,050 m | yes |
+| Chamonix | 1,798 m | 2,752 m | yes |
+| Ortisei & the Dolomites | 1,384 m | 2,162 m | yes |
+| Bergen | 702 m | 707 m | yes |
+| Athens | 586 m | **598 m** | no |
+| Paris | 102 m | 150 m | no |
+| Venice | 41 m | 41 m | no |
+| Amsterdam | 11 m | 11 m | no |
+
+**147 of 319 destinations** draw relief, and **six of seventeen** journeys.
+Athens misses the crest test by two metres, which is recorded here rather than
+smoothed over: a threshold has to fall somewhere, and the point of stating it
+is that nobody had to pick Athens.
+
+### The frame cap
+
+Relief answers "what kind of ground is this place in". Across a continent it
+answers a different question and becomes a physical map of Europe. Measured:
+the Arctic-to-Mediterranean route frames 4,207 km and drew every band in the
+dataset — **787 KB on one page**, with the Alps a smudge the width of a thumb.
+
+`TERRAIN_MAX_KM` is **1,500 km**, chosen from the seventeen journey frames
+rather than picked as a round number: it admits the six that are regional (the
+Alpine Grand Tour at 1,278 km, the Carpathian Arc at 1,388, the Adriatic Run
+at 1,449) and excludes the eleven that cross the continent, the nearest of
+them at 1,691. A destination plate is 590 km and never comes near it.
+
+### The boundary, unfolded
+
+`cartography.ORDER` has always put `country-bounds` above `terrain`;
+`FOLDED` said that layer was carried by `land` and that separating it was what
+"terrain will force". It did. A frontier here is a stroke on the land path, so
+the bands paint over it — the prototype's first render carried a clear
+France/Switzerland/Italy border without relief and none with it. The
+stroke-only pass costs about 5 KB against 24 KB of terrain, and is emitted
+only on the plates that draw relief. Re-emitting it also reproduced the
+*frontier is a worm* failure the stylesheet already documents, because the
+duplicate was written without `vector-effect: non-scaling-stroke`: **a rule
+that exists is not a rule that is inherited.**
+
+### What the eight-destination benchmark found that terrain did not cause
+
+Chamonix, Zermatt and Ortisei were unmistakable at once. Bergen and Athens
+were not — and the reason had nothing to do with relief. **lod1 simplifies the
+coastline at 0.04 degrees, which is 4.4 km, which is nine pixels on a 590 km
+plate**: Attica came out as a wedge, the Cyclades as lozenges, and the
+Norwegian coast as a staircase. Every coastal destination has looked like that
+since these maps were built, and nobody had put a coastal frame and an Alpine
+frame side by side.
+
+lod2 is 0.012 degrees — 1.3 km, under three pixels at the same scale — and it
+was already in the repository, one file per country carrying that country and
+every neighbour within 0.75 degrees. `geo.local()` merges it over the
+continental file for frames tighter than about 980 km, so this cost **no new
+data**. Athens is now Attica and the Saronic Gulf; Bergen is fjords.
+
+## Page weight
+
+| | bytes |
+|---|---|
+| Chamonix before any of this | 55,344 |
+| Chamonix now (terrain 24 KB, boundary 5 KB, lod2 coast) | 93,039 |
+| the heaviest page on the site, unchanged | 452,785 |
+| `weight.max_page_kb`, the recorded ceiling | 440 |
+
+`data/geo/terrain-lod1.json` is 677 KB and `data/raw/terrarium/` is 10.5 MB.
+Neither reaches a browser.
+
+## What holds it
+
+* `checks.py` — relief is an illustration layer only, on the destination and
+  journey families only; a plate draws it exactly when the measurement says
+  so; the boundary pass is present wherever relief is; the four band fills are
+  the approved 65% mix and there are exactly four; no frame past the cap
+  carries it. Proved red three ways.
+* `invariants.py` — `map.relief_pages`, a floor, because six derivation
+  stages each of which can silently return nothing look identical to a page
+  that was always flat.
+* `process.py --check` — the terrain file's fingerprint: every input byte,
+  every parameter, and `relief.py`'s own source.
+
+## What is still open
+
+1. **Small islands measure flat and get nothing.** Santorini's caldera rim is
+   about a kilometre wide against a 1.7 km cell, so the model shows sea. That
+   is honest — we cannot draw what we cannot resolve — and it is a limit of
+   zoom 6 rather than of the approach.
+2. **A place plate inherits its destination's relief**, which is right (it is
+   the same picture of the same town) and has not been looked at on its own.
+3. **The `here` wash is still under the terrain** on the families that have
+   one. No destination plate highlights a country today, so nothing is wrong;
+   a country plate that gains relief would need `selected` unfolded the same
+   way `country-bounds` just was.

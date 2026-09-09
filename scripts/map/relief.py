@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-"""The terrain prototype: a DEM turned into a soft tonal field, in vectors.
+"""A DEM turned into a soft tonal field, in vectors.
 
-    python3 scripts/map/relief.py --report
-    python3 scripts/map/relief.py --out /tmp/relief.json
+    python3 scripts/map/relief.py            report, write nothing
+    python3 scripts/map/relief.py --out X    write the bands to X
 
-THIS IS A PROTOTYPE AND IS DELIBERATELY NOT WIRED INTO process.py. It writes
-where it is told and never into data/geo/, because `cartography.unwritten()`
-raises the moment a layer's file appears without a renderer for it — the
-guard is right, and the renderer is the next decision rather than this one.
-Everything here is the evidence behind docs/terrain-prototype.md.
+Called by scripts/map/process.py, which is where data/geo/terrain-lod1.json
+and the per-destination relief measurement come from. The evidence behind the
+decision to have this at all is in docs/terrain-prototype.md: Chamonix rendered
+four ways and looked at.
 
 WHY VECTORS AND NOT A PICTURE. There is no <img> on this site and there is
 not going to be one for a map: the register holds no photographs, the
@@ -27,6 +26,8 @@ is the one thing the source actually measures.
 The chain is: decode -> blur -> threshold -> trace -> simplify -> project.
 """
 
+import array
+import hashlib
 import json
 import math
 import os
@@ -36,30 +37,90 @@ import zlib
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# ZOOM 7 AND NO DEEPER, AND THE REASON IS THE LICENCE RATHER THAN THE PIXELS.
+# ZOOM 6 AND NO DEEPER, AND THE REASON IS THE LICENCE RATHER THAN THE PIXELS.
 # Tilezen fills Europe with EU-DEM at zoom 9 and with four national CC BY sets
-# at zoom 10; at zoom 7 the land is SRTM and GMTED and the sea is ETOPO1, all
-# three US Government public domain. See docs/data-licenses/aws-terrain-tiles.md.
-Z, TILE = 7, 256
+# at zoom 10, and zoom 7 brings in SRTM. At zoom 6 the land is GMTED2010 and
+# the sea is ETOPO1 — two US Government public-domain sets and nothing else.
+# See docs/data-licenses/aws-terrain-tiles.md, where every tile carries the
+# provenance header the service returned for it.
+#
+# AND ZOOM 6 IS ALSO THE RIGHT PICTURE, which is luck rather than design and
+# was measured rather than assumed. The prototype ran at zoom 7; rendered
+# against the same Chamonix frame the two are indistinguishable, because the
+# field is smoothed with a 5 km kernel either way and 865 m of detail is
+# thrown away before anything is drawn. Zoom 7 over the same extent would be
+# 728 tiles instead of 182 and four times the bytes for nothing a reader can
+# see. Smoothed harder — an 8.6 km kernel — the Arve and Aosta valleys merge
+# into one mass and the 2,000 m band nearly disappears, so this is not simply
+# "coarser is fine".
+Z, TILE = 6, 256
 
-# The six tiles that cover the Chamonix frame. A wider extent is a wider fetch
-# and a decision for whoever integrates this, not a default.
-XS, YS = (65, 66, 67), (45, 46)
+# The extent the atlas draws, which is pages.MAPPROJ's own bbox. Stated here
+# rather than imported because scripts/ does not import tools/lib — but the
+# numbers are asserted equal by checks.py, so the two cannot drift.
+EXTENT = (-25.0, 33.0, 45.0, 71.5)          # lon0, lat0, lon1, lat1
+
+
+def tile_x(lon):
+    return int((lon + 180.0) / 360.0 * 2 ** Z)
+
+
+def tile_y(lat):
+    return int((1.0 - math.asinh(math.tan(math.radians(lat))) / math.pi)
+               / 2.0 * 2 ** Z)
+
+
+def tiles():
+    """Every tile that intersects the extent: 14 x 13 = 182.
+
+    THE WHOLE EXTENT, NOT ONLY THE MOUNTAINS. Whether a destination gets
+    terrain at all is a measurement taken from this grid, and Paris has to be
+    measured to be found flat. A list of mountainous places typed by hand
+    would be an authored measurement, which is the one thing this repository
+    does not do.
+    """
+    xs = range(tile_x(EXTENT[0]), tile_x(EXTENT[2]) + 1)
+    ys = range(tile_y(EXTENT[3]), tile_y(EXTENT[1]) + 1)
+    return list(xs), list(ys)
+
+
+XS, YS = tiles()
 
 # The five steps of cartography.HYPSOMETRIC. The 0-200 step is the land tone
 # the plate already paints, so only four boundaries are traced.
 BANDS = (200, 600, 1200, 2000)
 
-# Three box passes at radius 2 is a near-Gaussian over about five cells, which
-# at 865 m a cell is roughly a 4 km kernel. Measured against radius 1: the
-# ridges survive both, and radius 2 costs 34 KB where radius 1 costs 84.
-BLUR_RADIUS = 2
+# Three box passes at radius 1 is a near-Gaussian over about five kilometres.
+# This is the "soft tonal field, no hard digital shadows" half of the brief:
+# a grid thresholded raw stair-steps at cell size, and a stair-step reads as a
+# rendering fault rather than as a ridge.
+BLUR_RADIUS = 1
 
 # Douglas-Peucker tolerance in grid cells, and the smallest loop worth
-# drawing. 1.2 cells is about 1 km, which is under a pixel on a phone and
-# about two on a desktop plate.
-SIMPLIFY = 1.2
-MIN_AREA = 10.0
+# drawing. 0.6 cells is about a kilometre, under a pixel on a phone; 4 cells
+# squared is about 12 square kilometres, which is a hill rather than a speck.
+SIMPLIFY = 0.8
+MIN_AREA = 8.0
+
+# HOW FAR FROM A PLACE ITS OWN RELIEF IS MEASURED. Not the plate frame: a
+# destination frame is 590 km across, and Venice's contains the whole of the
+# eastern Alps. What decides whether terrain belongs on a picture OF VENICE is
+# the ground within an afternoon of Venice, which is flat.
+#
+# 40 km rather than 25, because 25 measured Bergen at 387 m and Bergen is a
+# town of seven mountains: at 1.7 km a cell, Ulriken's 643 m averages down to
+# a shoulder, and the fjord walls that make the place are just outside the
+# circle. 40 km is still an afternoon and reads Bergen at 707 m. It does not
+# rescue Venice (41 m), Amsterdam (11) or Paris (150), which is the test that
+# matters — a radius wide enough to find mountains everywhere would find them
+# in the Netherlands.
+RELIEF_RADIUS_KM = 40.0
+
+# The two thresholds that decide whether a place's picture gets relief:
+# 300 m of variation within 25 km, AND ground reaching the 600 m band, which
+# is the first band a reader can see. See draws() for why there is one
+# strength rather than two.
+RELIEF_OFF, RELIEF_CREST = 300.0, 600.0
 
 
 # ── the source ───────────────────────────────────────────────────────────
@@ -124,18 +185,23 @@ def png_rgb(path):
 
 
 def grid():
-    """The tile block as one elevation array, in metres.
+    """The whole mosaic as one elevation array, in metres, row-major.
+
+    An `array('f')` rather than a list: 11.9 million cells is 48 MB packed and
+    about half a gigabyte as Python floats, and the blur needs two of them.
 
     Terrarium encoding: metres = (R * 256 + G + B / 256) - 32768. Verified
-    against four known heights before anything was drawn from it — Mont Blanc
-    4,675 against a true 4,808 (the summit is one cell of an 865 m grid, so
-    an average), Chamonix 1,043 against 1,035, Geneva 379 against 375, and
-    the sea off Nice at -941. A decoder that is out by a scale factor still
-    produces a picture that looks like terrain, so this is checked with
-    numbers rather than by looking.
+    against four known heights before anything was drawn from it — Mont Blanc,
+    Chamonix, Geneva and the sea off Nice — because a decoder that is out by a
+    scale factor still produces a picture that looks like terrain, so this is
+    checked with numbers rather than by looking.
+
+    A tile that is not in data/raw/ is an error, not a hole. Half a mosaic
+    would draw a coastline of missing data straight through the Alps and look
+    like a rendering fault, which this repository has already shipped once.
     """
     W, H = len(XS) * TILE, len(YS) * TILE
-    g = [0.0] * (W * H)
+    g = array.array("f", bytes(4 * W * H))
     for ti, x in enumerate(XS):
         for tj, y in enumerate(YS):
             path = os.path.join(ROOT, "data", "raw", "terrarium",
@@ -148,8 +214,110 @@ def grid():
                 row = (tj * TILE + r) * W + ti * TILE
                 for c in range(TILE):
                     o = base + c * chan
-                    g[row + c] = (px[o] * 256 + px[o + 1] + px[o + 2] / 256.0) - 32768.0
+                    g[row + c] = (px[o] * 256 + px[o + 1]
+                                  + px[o + 2] / 256.0) - 32768.0
     return W, H, g
+
+
+def cell(lon, lat):
+    """(lon, lat) -> fractional cell in the mosaic."""
+    n = 2 ** Z * TILE
+    x = (lon + 180.0) / 360.0 * n - XS[0] * TILE
+    y = ((1.0 - math.asinh(math.tan(math.radians(lat))) / math.pi) / 2.0 * n
+         - YS[0] * TILE)
+    return x, y
+
+
+def lonlat(x, y):
+    """A cell in the mosaic -> (lon, lat)."""
+    n = 2 ** Z * TILE
+    gx = x + XS[0] * TILE
+    gy = y + YS[0] * TILE
+    return (gx / n * 360.0 - 180.0,
+            math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * gy / n)))))
+
+
+def relief_at(W, H, g, lon, lat, radius_km=RELIEF_RADIUS_KM):
+    """How much ground goes up and down within `radius_km` of a point.
+
+    NOT THE PLATE FRAME. A destination frame is 590 km across and Venice's
+    contains the whole of the eastern Alps, so a frame-wide measure would put
+    the Dolomites' relief on a picture of a lagoon. What decides whether
+    terrain belongs on a picture OF somewhere is the ground within an
+    afternoon of it.
+
+    The 95th minus the 5th percentile rather than max minus min, so one
+    summit or one sinkhole in range cannot decide it.
+
+    LAND ONLY, AND THE FIRST VERSION WAS SYSTEMATICALLY BIASED AGAINST
+    EXACTLY THE PLACES THIS IS FOR. Clamping the sea to zero and including it
+    put a coastal town's water in the same distribution as its hills, and a
+    percentile over a circle that is four-fifths sea is a percentile of sea:
+    Athens, in a basin ringed by Hymettus, Penteli and Parnitha, measured 556
+    m at 40 km — lower than at 25 — because widening the circle added water,
+    not mountains. Nice measured 1,200 once the water came out. A derivation
+    can be systematically biased and only a measurement finds it; this
+    repository has made that exact mistake once already, deriving `city_type`
+    from a dataset of populated places and getting one village in 157.
+
+    Returns [spread, crest]; both zero where there is not enough land to
+    measure, which is how a small island answers honestly rather than flat.
+    """
+    # Mercator cells are square in metres, so one radius in cells covers the
+    # circle at this latitude.
+    m_per_cell = (math.cos(math.radians(lat)) * 2 * math.pi * 6378137.0
+                  / (2 ** Z * TILE))
+    r = max(1, int(round(radius_km * 1000.0 / m_per_cell)))
+    cx, cy = cell(lon, lat)
+    x0, x1 = max(0, int(cx) - r), min(W - 1, int(cx) + r)
+    y0, y1 = max(0, int(cy) - r), min(H - 1, int(cy) + r)
+    vals = []
+    rr = r * r
+    for y in range(y0, y1 + 1):
+        dy = y - cy
+        row = y * W
+        for x in range(x0, x1 + 1):
+            dx = x - cx
+            if dx * dx + dy * dy <= rr:
+                v = g[row + x]
+                if v > 0.0:
+                    vals.append(v)
+    if len(vals) < 8:
+        return [0.0, 0.0]
+    vals.sort()
+    hi = vals[int(0.95 * (len(vals) - 1))]
+    lo = vals[int(0.05 * (len(vals) - 1))]
+    return [round(hi - lo, 1), round(hi, 1)]
+
+
+def draws(measure):
+    """Whether this place's picture gets relief at all. Two tests.
+
+    ONE PALETTE, ABSOLUTE, AND THE FLAT PLACES ARE REDUCED BY THE SCALE
+    RATHER THAN BY A WEAKER INK. A second, fainter strength was built first
+    and measured: at 40% of the way to the hypsometric colours, the only band
+    Bergen has is 0.043 of luminance from the land tone, which is a layer
+    that paints twenty-three kilobytes and cannot be seen. Worse, two
+    strengths make #d8ceb4 mean 600 m on one page and something else on
+    another, and a hypsometric scale that is not absolute is not a
+    hypsometric scale.
+
+    A flat place is already quieter, automatically: it only ever reaches the
+    quiet end of the scale. Bergen's ground crosses one boundary and gets one
+    step; Chamonix's crosses four.
+
+    So the reduction is an on/off, and it takes two measurements:
+
+      spread  the 95th minus the 5th percentile within 25 km — is there
+              variation to show at all
+      crest   the 95th percentile itself — does that variation cross a
+              boundary a reader can SEE. The 200 m step is 0.013 of
+              luminance from the land tone, which is deliberately the
+              quietest thing on the plate; a place whose ground reaches only
+              that band would ship a layer nobody can read.
+    """
+    spread, crest = measure
+    return spread >= RELIEF_OFF and crest >= RELIEF_CREST
 
 
 def blur(W, H, g, radius=BLUR_RADIUS, passes=3):
@@ -161,7 +329,7 @@ def blur(W, H, g, radius=BLUR_RADIUS, passes=3):
     """
     for _ in range(passes):
         n = 2 * radius + 1
-        out = [0.0] * (W * H)
+        out = array.array("f", bytes(4 * W * H))
         for y in range(H):
             row = y * W
             acc = sum(g[row + min(W - 1, max(0, i))] for i in range(-radius, radius + 1))
@@ -170,7 +338,7 @@ def blur(W, H, g, radius=BLUR_RADIUS, passes=3):
                 acc += (g[row + min(W - 1, x + radius + 1)]
                         - g[row + max(0, x - radius)])
         g = out
-        out = [0.0] * (W * H)
+        out = array.array("f", bytes(4 * W * H))
         for x in range(W):
             acc = sum(g[min(H - 1, max(0, j)) * W + x] for j in range(-radius, radius + 1))
             for y in range(H):
@@ -182,6 +350,19 @@ def blur(W, H, g, radius=BLUR_RADIUS, passes=3):
 
 
 # ── marching squares ─────────────────────────────────────────────────────
+
+# A CELL EXACTLY ON THE THRESHOLD IS THE DEGENERATE CASE, and it happened.
+# Six cells in the mosaic hold exactly 200.0 m, one exactly 1200.0 and one
+# exactly 2000.0 — GMTED is metres and the box blur of a flat neighbourhood
+# lands back on an integer often enough. A corner exactly equal to the
+# threshold puts the crossing ON a grid corner, two cells then produce
+# coincident endpoints, and the chain has two ways to leave one point: six
+# segments in chains that did not close, on a run that was correct
+# everywhere else. Nudging the threshold off every representable elevation
+# by a millimetre removes the case rather than special-casing it, and moves
+# a band boundary by a millimetre of height.
+THRESHOLD_EPS = 1e-3
+
 
 def _interp(a, b, t):
     return 0.5 if b == a else (t - a) / (b - a)
@@ -206,9 +387,7 @@ def loops(W, H, g, t):
     as a registration error, which is what sent the first hour of debugging
     at the projection instead of at the topology.
     """
-    def at(x, y):
-        return g[y * W + x]
-
+    t = t + THRESHOLD_EPS
     segs = []
     for y in range(H - 1):
         row = y * W
@@ -326,23 +505,20 @@ def simplify(ring, eps=SIMPLIFY):
 
 # ── the whole chain ──────────────────────────────────────────────────────
 
-def bands():
-    """[(min_m, [flat lon/lat ring, ...])], and the counts behind it."""
+def field():
+    """The smoothed mosaic, once. Both outputs are derived from this."""
     W, H, g = grid()
-    g = blur(W, H, g)
+    return W, H, blur(W, H, g)
+
+
+def bands(W, H, g):
+    """[(min_m, [flat lon/lat ring, ...])], and the counts behind it."""
     PW, PH = W + 2, H + 2
-    pad = [-1e9] * (PW * PH)
+    pad = array.array("f", bytes(4 * PW * PH))
+    for i in range(PW * PH):
+        pad[i] = -1e9
     for y in range(H):
         pad[(y + 1) * PW + 1:(y + 1) * PW + 1 + W] = g[y * W:(y + 1) * W]
-
-    n = 2 ** Z
-
-    def lonlat(x, y):
-        gx = (x - 1) + XS[0] * TILE
-        gy = (y - 1) + YS[0] * TILE
-        lon = gx / (n * TILE) * 360.0 - 180.0
-        lat = math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * gy / (n * TILE)))))
-        return lon, lat
 
     out, stats = [], []
     for t in BANDS:
@@ -353,7 +529,7 @@ def bands():
         for r in simp:
             flat = []
             for x, y in r:
-                lo, la = lonlat(x, y)
+                lo, la = lonlat(x - 1, y - 1)
                 flat += [round(lo, 3), round(la, 3)]
             rings.append(flat)
         out.append((t, rings))
@@ -362,27 +538,119 @@ def bands():
     return out, stats
 
 
+SOURCE_LINE = ("AWS Terrain Tiles zoom 6 (GMTED2010 and ETOPO1, US Government "
+               "public domain); see docs/data-licenses/aws-terrain-tiles.md")
+
+
+def fingerprint():
+    """What this file would be regenerated FROM, in one comparable dict.
+
+    WHY A FINGERPRINT AND NOT A RECOMPUTATION. Everything else in data/geo/ is
+    checked by rebuilding it and comparing: `checks.py` calls process.build()
+    and diffs the result, which is the strongest possible staleness contract
+    and costs a second. This one costs a minute — decoding 182 PNGs and
+    smoothing twelve million cells in pure Python — and `checks.py` is the
+    gate people run every few minutes. A gate that takes a minute is a gate
+    people stop running, which is the same reason plate-variation.py is kept
+    out of the suite.
+
+    So the guard moves to the inputs. It fails if any source byte changes
+    (the tiles are hashed), if any parameter changes, or if this file changes
+    at all — including a comment, because a check that decides which of your
+    edits mattered is a check that will one day decide wrongly. Regenerating
+    is one command.
+
+    That is not weaker than diffing the output. It is different: diffing
+    catches an edit that changes the drawing, and this catches an edit that
+    changes the pipeline, which is a superset — a refactor that happens to
+    produce identical rings still has to be re-run and re-committed, and the
+    diff will show nothing, which is the correct answer.
+    """
+    h = hashlib.sha256()
+    for x in XS:
+        for y in YS:
+            path = os.path.join(ROOT, "data", "raw", "terrarium",
+                                str(Z), str(x), f"{y}.png")
+            with open(path, "rb") as fh:
+                h.update(hashlib.sha256(fh.read()).digest())
+    with open(os.path.abspath(__file__), "rb") as fh:
+        code = hashlib.sha256(fh.read()).hexdigest()
+    return {
+        "zoom": Z, "extent": list(EXTENT),
+        "tiles": f"{len(XS)}x{len(YS)}",
+        "bands_m": list(BANDS),
+        "blur_radius": BLUR_RADIUS, "blur_passes": 3,
+        "threshold_eps": THRESHOLD_EPS,
+        "simplify_cells": SIMPLIFY, "min_area_cells": MIN_AREA,
+        "relief_radius_km": RELIEF_RADIUS_KM,
+        "relief_thresholds_m": [RELIEF_OFF, RELIEF_CREST],
+        "tiles_sha256": h.hexdigest(),
+        "relief_py_sha256": code,
+    }
+
+
+def document(W, H, g, places=()):
+    """The terrain file: the bands, and the relief measured for each place.
+
+    `places` is [(key, lon, lat)] — the atlas's own destinations. The
+    measurement lives here rather than in facts.json because it comes from
+    this grid and nothing else does, and because facts.json is rebuilt and
+    diffed on every checks.py run while this file is guarded by its
+    fingerprint.
+    """
+    out, stats = bands(W, H, g)
+    cell_m = (math.cos(math.radians(45.0)) * 2 * math.pi * 6378137.0
+              / (2 ** Z * TILE))
+    relief = {}
+    for key, lon, lat in places:
+        relief[key] = relief_at(W, H, g, lon, lat)   # [spread, crest]
+    return {
+        "$comment": "GENERATED by scripts/map/relief.py. Hypsometric band "
+                    "boundaries traced from a public-domain elevation model, "
+                    "and the relief measured within "
+                    f"{RELIEF_RADIUS_KM:.0f} km of each destination as "
+                    "[spread, crest] in metres — which is what decides "
+                    "whether that destination's picture gets terrain at all. Never hand-edited: run "
+                    "`python3 scripts/map/process.py --terrain`.",
+        "$source": SOURCE_LINE,
+        "cell_m": round(cell_m),
+        "smoothed_m": round(cell_m * (2 * BLUR_RADIUS + 1)),
+        "relief_radius_km": RELIEF_RADIUS_KM,
+        "relief_thresholds_m": {"min_spread": RELIEF_OFF,
+                                "min_crest": RELIEF_CREST},
+        "pipeline": fingerprint(),
+        "relief": relief,
+        "bands": [{"min_m": t, "rings": r} for t, r in out],
+    }, stats
+
+
 def main(argv):
     import time
     t0 = time.time()
-    out, stats = bands()
-    took = time.time() - t0
-    doc = {"$source": "AWS Terrain Tiles zoom 7 (SRTM, GMTED2010, ETOPO1 — "
-                      "public domain); see docs/data-licenses/aws-terrain-tiles.md",
-           "bands": [{"min_m": t, "rings": r} for t, r in out]}
+    W, H, g = field()
+    t1 = time.time()
+    doc, stats = document(W, H, g)
     blob = json.dumps(doc, separators=(",", ":"))
-    print(f"{len(XS) * TILE}x{len(YS) * TILE} cells, "
+    print(f"{W}x{H} cells over {len(XS)}x{len(YS)} tiles, "
           f"blur r={BLUR_RADIUS}x3, simplify {SIMPLIFY}, min area {MIN_AREA}")
+    print(f"  field in {t1 - t0:.1f}s")
     for t, traced, kept, v0, v1 in stats:
-        print(f"  >={t:>4} m  loops {traced:>4} kept {kept:>4}  "
-              f"vertices {v0:>6} -> {v1:>5}")
-    print(f"  {len(blob):,} bytes of JSON, {took:.1f}s")
+        print(f"  >={t:>4} m  loops {traced:>5} kept {kept:>5}  "
+              f"vertices {v0:>7} -> {v1:>6}")
+    print(f"  {len(blob):,} bytes of JSON, {time.time() - t0:.1f}s total")
+    for lon, lat, name in ((6.87, 45.92, "Chamonix"), (7.75, 46.02, "Zermatt"),
+                           (5.32, 60.39, "Bergen"), (11.67, 46.57, "Ortisei"),
+                           (23.73, 37.98, "Athens"), (12.34, 45.44, "Venice"),
+                           (4.90, 52.37, "Amsterdam"), (2.35, 48.86, "Paris")):
+        m = relief_at(W, H, g, lon, lat)
+        print(f"  {name:<10} spread {m[0]:>7.0f} m  crest {m[1]:>7.0f} m "
+              f"within {RELIEF_RADIUS_KM:.0f} km -> "
+              f"{'terrain' if draws(m) else 'none'}")
     for i, a in enumerate(argv):
         if a == "--out":
-            path = argv[i + 1]
-            with open(path, "w", encoding="utf-8") as fh:
+            with open(argv[i + 1], "w", encoding="utf-8") as fh:
                 fh.write(blob)
-            print(f"  wrote {path}")
+            print(f"  wrote {argv[i + 1]}")
     return 0
 
 

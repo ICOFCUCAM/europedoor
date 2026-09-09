@@ -2493,6 +2493,57 @@ body[data-hero] .masthead { position: sticky; }
 .minimap.arched.atlas .lyr-land .countries path.here {
   fill: color-mix(in srgb, #ffffff 62%, transparent);
   stroke: var(--atlas-hereline); }
+/* THE TERRAIN, AND THE CEILING ON IT.
+
+   Four hypsometric bands from a public-domain elevation model, painted
+   lowest first and mixed toward the land tone rather than laid over it with
+   an opacity — stacked translucency compounds, and the fifth band would be a
+   different colour depending on what happened to be under it.
+
+   ONE PALETTE, AND IT IS THE CEILING THE EXPERIMENT APPROVED. Chamonix was
+   rendered at four strengths and looked at (docs/terrain-prototype.md): the
+   strongest was rejected because at that tonal distance the ochre stops
+   being a ground and becomes a ramp, and the map reads as a visualisation of
+   height instead of a picture of a valley. These are 65% of the way from the
+   land tone to each band's hypsometric colour.
+
+   A SECOND, FAINTER STRENGTH WAS BUILT FIRST AND MEASURED OUT. At 40% the
+   only band Bergen has is 0.043 of luminance from the land tone — a layer
+   that ships twenty-three kilobytes and cannot be seen — and two strengths
+   make #d8ceb4 mean 600 m on one page and something else on another, which
+   is not a hypsometric scale. A flat place is already quieter, automatically:
+   it reaches only the quiet end of an absolute scale. Bergen's ground crosses
+   one boundary and gets one step; Chamonix's crosses four.
+
+   The 200 m step is 0.013 of luminance from the land tone and is meant to
+   be: it separates a plain from a foothill and is not a step to be read.
+   Whether a plate gets any of this at all is a MEASUREMENT — the spread and
+   the crest of the ground within 25 km — never a list of mountainous places
+   typed by somebody. */
+.minimap.arched.atlas .lyr-terrain .tband { fill-rule: evenodd; }
+.minimap.arched.atlas .lyr-terrain .t200  { fill: #dbd7c2; }
+.minimap.arched.atlas .lyr-terrain .t600  { fill: #d8ceb4; }
+.minimap.arched.atlas .lyr-terrain .t1200 { fill: #d3c5ac; }
+.minimap.arched.atlas .lyr-terrain .t2000 { fill: #e3ddd2; }
+
+/* THE FRONTIER, RE-DRAWN ABOVE THE RELIEF. A boundary on this map is a
+   stroke on the land path, so the bands paint over it: the prototype's first
+   render carried a clear France/Switzerland/Italy frontier without terrain
+   and none with it. `cartography.ORDER` has always put `country-bounds`
+   above `terrain`; this is the layer being unfolded from `land`, and it is
+   emitted only on the plates that draw relief, because without terrain a
+   second pass is 5 KB of duplicate geometry for no visible change.
+
+   non-scaling-stroke, or the frontier is a worm: the land is drawn inside a
+   scale(10) and 0.9 units becomes nine. The duplicate reproduced that
+   failure the moment it was written without this line, one screen away from
+   the rule that already documents it. */
+.minimap.arched.atlas .lyr-country-bounds .bnd {
+  fill: none; stroke: var(--atlas-coast); stroke-width: 0.9;
+  vector-effect: non-scaling-stroke; }
+.minimap.arched.atlas .lyr-country-bounds .bnd.here {
+  stroke: var(--atlas-hereline); stroke-width: 1.1; }
+
 /* A PEAK, AND ITS MEASURED HEIGHT. Not relief and never called relief: a
    hillshade needs an elevation model this atlas does not have. A triangle
    and a number is how a physical atlas has always said "mountains here", and

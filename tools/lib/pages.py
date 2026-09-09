@@ -2869,7 +2869,17 @@ def minimap(data, t, span=3.2, about=None, named=None):
     # (cx, cy) ± half the frame in projection units, which is the same
     # arithmetic the dots two blocks below already use.
     view = (cx - w / 2 / span, cy - h / 2 / span, w / span, h / span)
-    ctx, land = geo.landmass(MAPPROJ, view)
+    # THE COASTLINE AT THE SCALE THIS FRAME IS ACTUALLY DRAWN AT. See
+    # geo.local(): lod1 simplifies at 4.4 km, which is nine pixels here, and
+    # it made every coastal destination a polygon. lod2 is already in the
+    # repository. Only for a local frame — a 2,458 km one is a continental
+    # picture and lod1 is the right detail for it, as well as the affordable
+    # one.
+    _home = next((n["country"]["slug"] for n in data["cities"].values()
+                  if n["city"] is t), None)
+    ctx, land = geo.landmass(
+        MAPPROJ, view,
+        doc=geo.local(_home) if span >= 6.0 else None)
 
     kmu = geo.km_per_unit(MAPPROJ, t["lat"], t["lon"])
     km_w = int(round(w / span * kmu / 10) * 10)
@@ -3006,6 +3016,21 @@ def minimap(data, t, span=3.2, about=None, named=None):
         _physical()
 
     drawnlabels = "".join(phone_declutter(labels))
+
+    # RELIEF, WHERE THE GROUND SAYS SO AND NOWHERE ELSE. The strength is
+    # derived from the elevation model — the 95th minus the 5th percentile of
+    # height within 25 km of this destination — and never from a list of
+    # mountainous places, which would be an authored measurement. Paris measures 99 m of
+    # spread and gets no terrain, because a Paris illustration must not look
+    # like a topographic map merely because the pipeline owns a DEM. See
+    # docs/terrain-prototype.md.
+    tkey = next((f'{n["country"]["slug"]}/{n["region"]["slug"]}/'
+                 f'{n["city"]["slug"]}'
+                 for n in data["cities"].values() if n["city"] is t), None)
+    tdraw = cartography.draws_relief(cartography.relief_of(tkey))
+    xform = (f'<g transform="translate({w/2 - cx*span:.2f},'
+             f'{h/2 - cy*span:.2f}) scale({span})">')
+    terr = cartography.terrain(MAPPROJ, view, tdraw, km_w)
     return (
         cartography.plate(
             uid=uid, w=w, h=h, proj=MAPPROJ, view=(0, 0, w, h),
@@ -3013,11 +3038,17 @@ def minimap(data, t, span=3.2, about=None, named=None):
             # continent's geometry and scales the window in, where a country
             # plate projects to its own frame. The renderer takes the land as
             # given and never touches a coordinate.
-            land=(f'<g transform="translate({w/2 - cx*span:.2f},'
-                  f'{h/2 - cy*span:.2f}) scale({span})">{ctx}{land}</g>'),
+            land=f'{xform}{ctx}{land}</g>',
+            # And the relief and the frontiers go through the SAME transform,
+            # or the Alps land in France — which is exactly what happened the
+            # first time a layer was added outside it.
+            terrain=f"{xform}{terr}</g>" if terr else "",
+            bounds=(f"{xform}{cartography.stroke_only(ctx + land)}</g>"
+                    if terr else ""),
             destinations="".join(dots), labels=drawnlabels + bar,
             rim=False,
-            figure_class=f"minimap arched atlas{dense_class(drawnlabels)}",
+            figure_class=(f"minimap arched atlas{dense_class(drawnlabels)}"
+                          + (" terrain" if terr else "")),
             aria=f"Map of {esc(t['name'])} and the places around it")[:-len("</figure>")]
         # `about` names something INSIDE this destination — a place page's
         # subject. The map is then honestly captioned as what it is: this
@@ -3291,7 +3322,7 @@ def dense_class(markup):
 
 
 def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
-              min_w=120.0, min_h=75.0, line=False, extra=""):
+              min_w=120.0, min_h=75.0, line=False, extra="", relief=False):
     """A set of places on the continent, through the aperture.
 
     `pts` is [(x, y, href, name)] in projection space. Extracted from
@@ -3505,14 +3536,26 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
     # `/map`, `/plan`, `/search` and the country reference map stay graphite:
     # those are INSTRUMENTS, operated rather than looked at, and that is what
     # the two worlds have always meant.
+    # RELIEF ON THE ONE FAMILY OF THESE THAT EARNS IT. `pointsmap` draws a
+    # region, a story, a motion, a theme, a month and a journey, and only the
+    # journey passes `relief` — a journey through the Alps is a picture of
+    # crossing mountains, and a motion's map is a picture of a QUERY, where
+    # relief would be decoration over an argument. The caller measures it, so
+    # this function has no opinion about which places are mountainous.
+    xform = f'<g transform="scale({k:.4f}) translate({-x0:.1f},{-y0:.1f})">'
+    frame_km = w * geo.km_per_unit(MAPPROJ, _lat_at(y0 + h / 2), LCC_MID_LON)
+    terr = cartography.terrain(MAPPROJ, (x0, y0, w, h), relief, frame_km)
     return cartography.plate(
         uid=uid, w=vw, h=vh, proj=MAPPROJ, view=(0, 0, vw, vh),
-        land=(f'<g transform="scale({k:.4f}) '
-              f'translate({-x0:.1f},{-y0:.1f})">{ctx}{land}</g>'),
+        land=f'{xform}{ctx}{land}</g>',
+        terrain=f"{xform}{terr}</g>" if terr else "",
+        bounds=(f"{xform}{cartography.stroke_only(ctx + land)}</g>"
+                if terr else ""),
         route=route, destinations="".join(dots),
         labels="".join(lab) + bar,
         caption=f'<figcaption>{caption}</figcaption>',
-        figure_class=f"minimap pointsmap arched atlas{dense}",
+        figure_class=(f"minimap pointsmap arched atlas{dense}"
+                      + (f" terr-{relief}" if terr else "")),
         aria=esc(aria))
 
 
@@ -3633,8 +3676,17 @@ def routemap(data, j):
            '— the order is real, the lines are not routes. Coastline from '
            '<a href="/sources">Natural Earth</a>, public domain. '
            '<a href="/map">The whole map, with every journey →</a>')
+    # A JOURNEY DRAWS RELIEF IF ANY OF ITS STOPS DOES. A route is one picture
+    # of one crossing, and "this journey goes into the mountains" is what the
+    # map is for; requiring every stop to qualify would drop the Alpine Grand
+    # Tour because it starts in a valley town. The frame cap below is what
+    # stops that becoming a physical map of Europe.
+    rel = any(cartography.draws_relief(cartography.relief_of(k)) for k in (
+            f'{idx[leg["city"]]["country"]["slug"]}/'
+            f'{idx[leg["city"]]["region"]["slug"]}/'
+            f'{idx[leg["city"]]["city"]["slug"]}' for leg in j["legs"]))
     return pointsmap(pts, uid, cap, f'Route map for {j["name"]}',
-                     line=True)
+                     line=True, relief=rel)
 
 
 # ── destination facets ────────────────────────────────────────────────

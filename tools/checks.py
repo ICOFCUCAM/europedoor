@@ -2508,6 +2508,121 @@ def c_map_roles():
     return n
 
 
+@check("terrain draws only where the ground was measured to earn it")
+def c_terrain():
+    """Five promises about the relief layer, on the shipped HTML.
+
+    THE FAILURE THIS EXISTS FOR IS NOT A BUG, IT IS A DRIFT. An elevation
+    model in the repository is a standing invitation to put relief on
+    everything, and the version of this product that has a topographic Paris
+    is one careless commit away. Every assertion here is the owner's rule
+    turned into arithmetic somebody else can re-run.
+
+      1. relief is an ILLUSTRATION layer — never on a map that declares
+         itself an instrument, and only on the two families it was approved
+         for: a destination and a journey
+      2. a plate draws relief if and only if the MEASUREMENT says so — the
+         spread and the crest of the ground round that destination, read
+         from data/geo/terrain-lod1.json, which is the same file the bands
+         come from
+      3. the boundary is drawn ABOVE it. A frontier here is a stroke on the
+         land path, so the bands bury it; the prototype's first render had a
+         clear France/Switzerland/Italy border without terrain and none with
+         it
+      4. the palette is the one the experiment approved and there is no
+         stronger one — four fills, each 65% of the way from the land tone
+         to its hypsometric colour
+      5. no frame wider than the cap carries it, because across a continent
+         relief stops being a picture of somewhere and becomes a physical
+         map of Europe
+    """
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from lib import cartography as C                                # noqa: E402
+    from lib import geo as G                                        # noqa: E402
+
+    doc = G.load("terrain-lod1.json")
+    assert doc, "data/geo/terrain-lod1.json is missing — run the pipeline"
+    n = 0
+
+    # 4. The palette, against HYPSOMETRIC and the approved 65%.
+    css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
+               encoding="utf-8").read()
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    base = (0xde, 0xd8, 0xca)                    # --atlas-land
+    for lo, _hi, hexcol, _why in C.HYPSOMETRIC:
+        if lo == 0:
+            continue
+        v = [int(hexcol[i:i + 2], 16) for i in (1, 3, 5)]
+        want = "#%02x%02x%02x" % tuple(
+            int(round(base[i] + (v[i] - base[i]) * 0.65)) for i in range(3))
+        assert f".t{lo}  {{ fill: {want}; }}" in css or \
+               f".t{lo} {{ fill: {want}; }}" in css, (
+            f"the terrain band at {lo} m is not the approved mix: expected "
+            f"{want}, which is 65% of the way from the land tone to "
+            f"{hexcol}. The strongest version was rejected by eye; a "
+            f"stronger fill here is that rejection being undone silently")
+        n += 1
+    assert len(re.findall(r"\.lyr-terrain \.t\d+\s*\{", css)) == 4, (
+        "the stylesheet declares a number of terrain bands that is not four "
+        "— a second strength was measured out (see the rule's comment) and "
+        "an absolute hypsometric scale cannot have two")
+    n += 1
+
+    # 1, 2, 3, 5. Every plate that draws it, and every one that should.
+    want_terrain = set()
+    for key, m in doc["relief"].items():
+        if C.draws_relief(m):
+            want_terrain.add(key)
+    drew, offenders = set(), []
+    for path in site_files():
+        html = open(path, encoding="utf-8").read()
+        if 'class="lyr lyr-terrain"' not in html:
+            continue
+        n += 1
+        r = rel(path).lstrip("/")
+        assert 'data-role="instrument"' not in html.split(
+            'class="lyr lyr-terrain"')[0][-900:], (
+            f"/{r}: relief on a map that declares itself an instrument")
+        assert 'class="lyr lyr-country-bounds"' in html, (
+            f"/{r}: relief with no boundary pass above it — a frontier here "
+            f"is a stroke on the land path and the bands paint over it")
+        parts = r.split("/")
+        # A place page draws its own destination's plate, which is the same
+        # picture of the same town; it belongs to the destination family.
+        if parts[0] == "europe" and len(parts) >= 5:
+            drew.add("/".join(parts[1:4]))
+        elif parts[0] != "journeys":
+            offenders.append("/" + r)
+    assert not offenders, (
+        f"relief on {len(offenders)} page(s) outside the destination and "
+        f"journey families, the two it was approved for: {offenders[:4]}")
+    # A destination page draws it exactly when the ground says so.
+    missing = sorted(want_terrain - drew)[:4]
+    extra = sorted(drew - want_terrain)[:4]
+    assert not extra, (
+        f"{len(extra)} destination(s) draw relief the measurement does not "
+        f"support: {extra}")
+    assert len(drew) > 30, (
+        f"only {len(drew)} destinations draw relief; the measurement says "
+        f"{len(want_terrain)} should")
+    n += 2
+
+    # 5. The cap, checked against what the pages actually say they frame.
+    for path in site_files():
+        html = open(path, encoding="utf-8").read()
+        if 'class="lyr lyr-terrain"' not in html:
+            continue
+        m = re.search(r"frame is about ([\d,]+) km across", html)
+        if m:
+            km = int(m.group(1).replace(",", ""))
+            assert km <= C.TERRAIN_MAX_KM, (
+                f"{rel(path)} draws relief on a {km} km frame, past the "
+                f"{C.TERRAIN_MAX_KM:.0f} km cap — at that scale it is a "
+                f"physical map of Europe rather than a picture of somewhere")
+            n += 1
+    return n
+
+
 @check("the cartographic standard holds where a machine can hold it")
 def c_cartographic_standard():
     # THE STANDARD IS docs/cartographic-standard.md, AND NINE OF ITS TEN

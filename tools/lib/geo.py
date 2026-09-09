@@ -170,6 +170,43 @@ def country(slug):
     return load(os.path.join("country", slug + ".json"))
 
 
+_LOCAL = {}
+
+
+def local(slug):
+    """The continent at lod1, with one country's neighbourhood at lod2.
+
+    A DESTINATION PLATE IS 590 KM WIDE AND WAS DRAWN AT CONTINENTAL DETAIL.
+    lod1 simplifies at 0.04 degrees, which is 4.4 km, which is nine pixels on
+    a 900-unit plate of a 590 km frame — so Attica came out as a wedge, the
+    Cyclades as lozenges and the Norwegian coast as a staircase. The benchmark
+    that found it was looking at terrain, and the terrain was fine: the
+    coastline underneath had been that coarse on every coastal destination
+    since these maps were built, and nobody had put a coastal frame and an
+    Alpine frame side by side.
+
+    lod2 is 0.012 degrees — 1.3 km, under three pixels at the same scale — and
+    it is already in the repository, one file per country, carrying that
+    country and every neighbour whose box comes within 0.75 degrees. So this
+    costs no new data: it merges the finer entries over the continental ones
+    and leaves everything the local file does not cover at lod1, which is what
+    keeps a frame that reaches two countries further from having a hole in it.
+    """
+    base = load("europe-lod1.json")
+    if slug is None or not base:
+        return base
+    if slug in _LOCAL:
+        return _LOCAL[slug]
+    fine = country(slug)
+    if not fine or not fine.get("countries"):
+        _LOCAL[slug] = base
+        return base
+    merged = dict(base)
+    merged["countries"] = dict(base["countries"], **fine["countries"])
+    _LOCAL[slug] = merged
+    return merged
+
+
 # LAMBERT CONFORMAL CONIC, at the parameters Europe's own official
 # projection uses: standard parallels 35°N and 65°N, origin 52°N, central
 # meridian 10°E. Those are EPSG:3034 (ETRS89-LCC), the conformal conic the

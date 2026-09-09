@@ -44,7 +44,7 @@
     "css.font_sizes": {
       "value": 15,
       "kind": "ceiling",
-      "why": "A ceiling, not a target. The sibling repository measures 418; that is what happens without a line. It moved to 16 for the essay hed, and for nothing else: the design audit's central finding is that eleven of twelve rendered families place an identically-sized h1 at an identical vertical position, and no size that already existed could stop that. The same commit's other five candidate type values — a serif leading, a tighter hed, a deck clamp one decimal off one already in the file — were snapped back to what the site had, and no reader could name the difference. MOVED 16 -> 15 DELIBERATELY, and downward: the counter used to read `calc(11px / var(--z))` as a size of its own, separately from the `11px` it is. A compensation constant for a coordinate system is not a typographic choice, and the stylesheet has said so since the map labels were fixed. The slack that hid was real — a genuinely new 37px passed under the old ceiling and fails under this one."
+      "why": "A ceiling, not a target. The sibling repository measures 418; that is what happens without a line. It moved to 16 for the essay hed, and for nothing else: the design audit's central finding is that eleven of twelve rendered families place an identically-sized h1 at an identical vertical position, and no size that already existed could stop that. The same commit's other five candidate type values — a serif leading, a tighter hed, a deck clamp one decimal off one already in the file — were snapped back to what the site had, and no reader could name the difference."
     },
     "css.font_weights": {
       "value": 4,
@@ -105,6 +105,11 @@
       "value": 440,
       "kind": "ceiling",
       "why": "The heaviest page on the site. Guards against a template quietly inlining something large across a whole family, which is how the coastline reached 51 pages and 2.1 MB."
+    },
+    "map.relief_pages": {
+      "value": 261,
+      "kind": "floor",
+      "why": "Pages that draw hypsometric relief. Every one of them is a destination or a journey whose own ground was measured past both thresholds; see docs/terrain-prototype.md. A floor rather than an exact, because adding an Alpine destination should not need a ceremony — but losing them all should."
     },
     "signature.apertures": {
       "value": 825,

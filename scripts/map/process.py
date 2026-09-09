@@ -829,6 +829,49 @@ def transport(graph):
     return out
 
 
+TERRAIN = "terrain-lod1.json"
+
+
+def terrain_places(graph):
+    """[(key, lon, lat)] for every destination, keyed as facts.json keys it."""
+    out = []
+    for c in graph.values():
+        for r in c.get("regions", []):
+            for t in r.get("cities", []):
+                out.append((f'{c["slug"]}/{r["slug"]}/{t["slug"]}',
+                            t["lon"], t["lat"]))
+    return sorted(out)
+
+
+def terrain_doc():
+    """The expensive one, kept out of build() on purpose — see relief.fingerprint."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import relief
+    W, H, g = relief.field()
+    doc, _stats = relief.document(W, H, g, terrain_places(load_graph()))
+    return doc
+
+
+def terrain_is_current():
+    """Cheap staleness: the fingerprint on disk against the one now."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import relief
+    path = os.path.join(OUT, TERRAIN)
+    if not os.path.exists(path):
+        return False, f"{TERRAIN} is missing"
+    with open(path, encoding="utf-8") as fh:
+        try:
+            have = json.load(fh).get("pipeline")
+        except ValueError:
+            return False, f"{TERRAIN} is not valid JSON"
+    want = relief.fingerprint()
+    if have != want:
+        diff = sorted(k for k in set(list(have or {}) + list(want))
+                      if (have or {}).get(k) != want.get(k))
+        return False, f"{TERRAIN} was built from different inputs: {', '.join(diff)}"
+    return True, f"{TERRAIN} matches its inputs"
+
+
 def dump(obj):
     return json.dumps(obj, separators=(",", ":"), ensure_ascii=False) + "\n"
 
@@ -838,6 +881,11 @@ def main(argv):
     files = build()
 
     if check:
+        ok, why = terrain_is_current()
+        if not ok:
+            print("data/geo/ is stale — run: python3 scripts/map/process.py")
+            print("  " + why)
+            return 1
         stale = []
         for rel, obj in files.items():
             path = os.path.join(OUT, rel)
@@ -852,15 +900,36 @@ def main(argv):
             for n in names:
                 if n.endswith(".json"):
                     have.add(os.path.relpath(os.path.join(root, n), OUT))
-        for extra in sorted(have - set(files)):
+        for extra in sorted(have - set(files) - {TERRAIN}):
             stale.append(extra + " (not produced by the pipeline)")
         if stale:
             print("data/geo/ is stale — run: python3 scripts/map/process.py")
             for s in sorted(stale):
                 print("  " + s)
             return 1
-        print(f"data/geo/ matches the pipeline: {len(files)} files")
+        print(f"data/geo/ matches the pipeline: {len(files) + 1} files "
+              f"({why})")
         return 0
+
+    # THE TERRAIN FILE IS REGENERATED HERE AND NOWHERE ELSE, and it is not in
+    # `files` because build() is called by checks.py on every run. Decoding
+    # 182 PNGs and smoothing twelve million cells takes about a minute; the
+    # static suite takes seventeen seconds, and a gate that takes a minute is
+    # a gate people stop running. Its staleness is guarded by a fingerprint
+    # of every input byte, every parameter and this pipeline's own source —
+    # see relief.fingerprint() for why that is not the weaker contract it
+    # looks like.
+    ok, why = terrain_is_current()
+    if ok and "--force" not in argv:
+        print(f"  {TERRAIN} is already current ({why}) — pass --force to rebuild")
+    else:
+        doc = terrain_doc()
+        with open(os.path.join(OUT, TERRAIN), "w", encoding="utf-8") as fh:
+            fh.write(dump(doc))
+        n = sum(len(b["rings"]) for b in doc["bands"])
+        print(f"  {TERRAIN:<20} {n:>5,} rings  "
+              f"{len(doc['relief']):>4} places measured  "
+              f"{len(dump(doc)):>9,} bytes")
 
     total = 0
     for rel, obj in files.items():

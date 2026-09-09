@@ -17,7 +17,7 @@ and never geographic truth.** Everything drawn here comes from a dataset in
 
 | # | principle | what holds it |
 |---|---|---|
-| 1 | **Terrain before polygon** | The fourteen-layer stack in `cartography.ORDER`, with terrain, hillshade, rivers and region boundaries declared, positioned and empty. A layer with no data emits nothing and raises the moment its file appears unwritten |
+| 1 | **Terrain before polygon** | The fourteen-layer stack in `cartography.ORDER`. Terrain is **drawn** on the destination and journey families from a public-domain elevation model; hillshade and region boundaries stay declared, positioned and empty. A layer with no data emits nothing and raises the moment its file appears unwritten |
 | 2 | **Geography before database** | A plate draws what it can name. Measured across the fifty country plates: **176 marks, 176 of them named.** Not one anonymous dot |
 | 3 | **Context before density** | Three voices — the subject, its neighbours in warm parchment, the rest quieter with distance — banded by measured distance on the drawing, not by a list |
 | 4 | **Hierarchy before completeness** | One placement routine, one order: capital, city, destination, region. The capital is placed first and cannot be dropped |
@@ -33,11 +33,26 @@ and never geographic truth.** Everything drawn here comes from a dataset in
 | map | terrain | treatment |
 |---|---|---|
 | country | no | geography, rivers, peaks, destinations |
-| region | usually no | geography and physical features |
-| destination | yes | local relief, subordinate to the place |
-| journey | yes | relief as a contextual backdrop |
+| region | no | geography and physical features |
+| destination | **where the ground earns it** | four hypsometric bands, subordinate to the place. 147 of 319 |
+| journey | **where the ground earns it, under 1,500 km** | the same bands as a backdrop to the route. 6 of 17 |
+| place | inherits its destination | it is the same picture of the same town |
 | Europe overview | no | clean atlas |
-| `/map` | optional | instrument |
+| `/map` | **no** | an instrument, and relief is an illustration layer |
+
+**"Where the ground earns it" is a measurement, never a list.** The spread and
+the crest of the ground within 40 km of the destination, taken from the same
+model that draws the bands and stored with them. Chamonix reads 1,798 and
+2,752; Paris reads 102 and 150 and gets nothing. A list of mountainous places
+typed by somebody would be an authored measurement, which this atlas does not
+do — and it would be the mechanism by which a topographic Paris eventually
+ships.
+
+**One palette, absolute.** There is no weaker variant for flatter places: a
+second strength was built, measured at 0.043 of luminance on the only band
+Bergen has, and removed. An absolute scale reduces itself — a flat place
+reaches only the quiet end of it — and two strengths would make one colour
+mean two heights. See `docs/terrain-prototype.md`.
 
 **Terrain must support recognition and sense of place, never become the
 subject of the map.** And: **no layer may be added merely because the source
@@ -45,10 +60,13 @@ dataset exists.** Every layer earns its weight by improving one of
 recognition, orientation, sense of place, hierarchy or beauty. If it does
 none of those, it is omitted.
 
-A digital elevation model, when it comes, is a low-resolution derived relief
-for **destination and journey illustrations only**. Not the country plates,
-not the overview, not the whole atlas — that is how an editorial atlas drifts
-into a GIS application.
+The elevation model is a low-resolution derived relief for **destination and
+journey illustrations only**. Not the country plates, not the overview, not
+the whole atlas — that is how an editorial atlas drifts into a GIS
+application. It is zoom 6 of the AWS Terrain Tiles, 1,730 m a cell, smoothed
+with a 5 km kernel and traced into four band boundaries; there is no
+hillshade, because a hillshade invents a light direction and paints structure
+onto flat ground, and a band claims only height.
 
 ## What the standard forbids, specifically
 

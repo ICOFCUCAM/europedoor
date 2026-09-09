@@ -269,6 +269,25 @@ def measure():
             # make a screenshot recognisable with the wordmark cropped off,
             # and a signature that is not measured is a signature that
             # quietly stops being applied to the next family somebody adds.
+            # RELIEF IS ALLOWED WHERE THE GROUND EARNED IT, AND A FLOOR IS
+            # THE CONTROL ON BOTH DIRECTIONS OF DRIFT. Up, because an
+            # elevation model in the repository is a standing invitation to
+            # put terrain on everything and end up with a topographic Paris.
+            # Down, because the layer is derived through six stages — a
+            # fingerprint, a measurement, two thresholds, a frame cap and a
+            # clip — and any one of them silently returning nothing looks
+            # exactly like a page that was always flat. `gathers` shipped at
+            # zero for a build once for that reason.
+            "map.relief_pages": {
+                "value": sum(1 for b in bodies.values()
+                             if 'class="lyr lyr-terrain"' in b),
+                "kind": "floor",
+                "why": "Pages that draw hypsometric relief. Every one of them "
+                       "is a destination or a journey whose own ground was "
+                       "measured past both thresholds; see "
+                       "docs/terrain-prototype.md. A floor rather than an "
+                       "exact, because adding an Alpine destination should "
+                       "not need a ceremony — but losing them all should."},
             "signature.apertures": {
                 "value": sum(1 for b in bodies.values() if 'clip-path="url(#arch-' in b),
                 "kind": "floor",

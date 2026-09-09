@@ -29,7 +29,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **the Postgres/PostGIS model, the API, Next.js, auth, search, the AI pipeline** | **`docs/technical-foundation.md`** — a destination with a trigger, not a plan for Monday. Nothing in it should be built yet |
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
 | **"did we actually implement section N?"** | **`docs/section-audit.md`** — generated, never hand-edited. Every spec section asserted against the real build, and CI fails if any of them stops being true |
-| **terrain: does a DEM earn its place, and at what strength** | **`docs/terrain-prototype.md`** — Chamonix at four strengths, judged by eye. Accepted at medium; zoom 7 because that is where the licence is, and the eight things the brief asked for before integrating |
+| **terrain — where relief is drawn and what decides it** | **`docs/terrain-prototype.md`** — Chamonix at four strengths judged by eye, then eight destinations judged together. One absolute palette, zoom 6 because that is where the licence is, and a measurement rather than a list deciding which 147 destinations get it |
 | **the cartographic standard — the ten principles and what holds each** | **`docs/cartographic-standard.md`** — editorial European atlas, not GIS. Nine of the ten are held by a check or an invariant; the tenth is the editorial test |
 | **how a map is DRAWN — palette, layers, what the benchmark still needs** | **`docs/cartography.md`** — the pictures are paper and the instruments are graphite. The four layers, the measured palette, and the four things the benchmark has that are blocked on a licence or a socket |
 | **the map, geographic data, tiles, or "why not Mapbox?"** | **`docs/map-architecture.md`** — the pipeline, the three levels of detail, and why this is SVG rather than MapLibre. Then **`docs/data-licenses/`**, which is the register, and **`docs/boundary-policy.md`** for disputed frontiers |
@@ -209,6 +209,60 @@ label was placed, was inside the aperture, and did not collide at the width
 every check ran at. All three families take the `--z` compensation now, all
 four count toward `dense_class()`, and `phone_declutter()` marks the first
 `class="` on whatever it is given.
+
+**Terrain is drawn where the GROUND says so, and the rule is a measurement.**
+147 of 319 destinations and 6 of 17 journeys carry four hypsometric bands from
+a public-domain elevation model; the rest carry none. What decides is the
+spread and the crest of the ground within 40 km of the place, derived by
+`scripts/map/relief.py` and stored beside the bands in
+`data/geo/terrain-lod1.json` — Chamonix reads 1,798 m and 2,752 m, Paris reads
+102 and 150. **A list of mountainous places would be an authored measurement**,
+and it is the mechanism by which a topographic Paris eventually ships.
+
+**Its first version measured sea.** Clamping water to zero and including it in
+the percentile made a coastal circle four-fifths sea, so Athens — in a basin
+ringed by three mountains — measured *lower* at 40 km than at 25. Land cells
+only. That is the `city_type` failure again: a derivation can be
+systematically biased against exactly the cases it exists for.
+
+**One palette, absolute, and a second strength was measured out.** A fainter
+variant for flatter places rendered 0.043 of luminance from the land tone on
+the only band Bergen has — a layer that ships 23 KB and cannot be seen — and
+made `#d8ceb4` mean 600 m on one page and something else on another. An
+absolute scale reduces itself: Bergen's ground crosses one band boundary and
+gets one step, Chamonix's crosses four.
+
+**Relief is capped by frame width, not only by place.** The
+Arctic-to-Mediterranean journey frames 4,207 km and drew 787 KB of bands with
+the Alps a smudge the width of a thumb. `TERRAIN_MAX_KM` is 1,500 km, taken
+from the seventeen journey frames rather than picked: it admits the six that
+are regional and excludes the eleven that cross the continent.
+
+**A boundary is a stroke on the land path, so relief buries it.**
+`country-bounds` was folded into `land` with a note saying separating it was
+what "terrain will force" — it did. The stroke-only pass is emitted only on
+plates that draw relief, and writing it without `vector-effect:
+non-scaling-stroke` reproduced the *frontier is a worm* failure one screen
+from the rule that documents it. **A rule that exists is not a rule that is
+inherited.**
+
+**The coastline was nine pixels coarse on every coastal destination, and an
+Alpine benchmark is what found it.** lod1 simplifies at 0.04° — 4.4 km, nine
+pixels on a 590 km plate — so Attica was a wedge, the Cyclades were lozenges
+and the Norwegian coast was a staircase, on every coastal page since these
+maps were built. Nobody had put a coastal frame and an Alpine frame side by
+side. `geo.local()` merges the lod2 already in the repository over the
+continental file for frames under about 980 km: no new data, and Athens is
+Attica again.
+
+**The terrain file is checked by fingerprint, not by rebuilding it.**
+Everything else in `data/geo/` is verified by re-running the pipeline in
+memory and diffing, which costs a second. This one costs a minute — 182 PNGs
+and twelve million cells in pure Python — and `checks.py` runs every few
+minutes. So the guard moved to the inputs: every source byte, every parameter,
+and `relief.py`'s own source hash. That is not the weaker contract it looks
+like — it also fails on a refactor that produces identical rings, which is
+correct.
 
 **`data/geo/` is generated and CI fails if it is stale**, exactly like `site/`.
 After changing `scripts/map/` or `data/raw/`, run
@@ -1003,6 +1057,11 @@ geometry are both committed. Run these when a dataset version changes:
 
     python3 scripts/map/fetch.py --verify    the bytes on disk are the bytes checked
     python3 scripts/map/process.py --check   data/geo/ matches the pipeline
+    python3 scripts/map/process.py --force   rebuild it INCLUDING the terrain
+
+`process.py` on its own leaves `terrain-lod1.json` alone when its fingerprint
+still matches, because rebuilding it decodes 182 elevation tiles and smooths
+twelve million cells and takes about a minute. `--force` rebuilds it anyway.
 
 Both are also asserted by `checks.py`, so a stale `data/geo/` fails CI.
 
