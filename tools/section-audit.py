@@ -441,14 +441,29 @@ def s15():
     yield "Into the salt mountain" not in page("/experiences/food/markets"), \
         "a salt mine in Hallstatt is not a market"
 
-    # The composition: the country leads, because the spread across Europe is
-    # what this family is offering.
-    yield has("/experiences/food/markets", 'class="exp-country"', "countryspread"), \
-        "the experience list leads with where in Europe each one is"
+    # THE PROMISE, NOT THE MARKUP. Both of these pinned a class name and both
+    # went red on the experience exemplar for the right reason and the wrong
+    # claim. `exp-country` was one cell of a four-column table that no longer
+    # exists; what has to be true is that a reader can see where in Europe
+    # each entry is. `class="statement"` was the display-size element an
+    # OVERTURE head uses, and a category page is an INDEX — it is a set of 48
+    # things, not one thing — so the sentence somebody wrote for it now sits
+    # in the slot an index head has for exactly that. Asserted as the words,
+    # which is what a reader gets either way.
+    from html import escape as esc_
+    _food = next(c for c in DATA["categories"] if c["slug"] == "food")
+    _mkt = next(sb for sb in _food["subs"] if sb["slug"] == "markets")
+    _mk = page("/experiences/food/markets")
+    _missing = [f"{it['city']['name']}, {it['country']['name']}"
+                for it in _C.select(_items, _food, _mkt)
+                if f"{esc_(it['city']['name'])}, {esc_(it['country']['name'])}" not in _mk]
+    yield not _missing, ("every experience in a list says where in Europe it is: "
+                         + "; ".join(_missing[:3]) if _missing else
+                         "every experience in a list says where in Europe it is")
     # A sub-category has no authored sentence and is not given the parent's.
-    yield 'class="statement"' not in page("/experiences/food/markets"), \
+    yield esc_(_food["blurb"]) not in _mk, \
         "a sub-category does not borrow its category's voice"
-    yield 'class="statement"' in page("/experiences/food"), \
+    yield esc_(_food["blurb"]) in page("/experiences/food"), \
         "a category leads with the sentence somebody wrote for it"
 
 

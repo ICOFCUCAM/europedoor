@@ -288,7 +288,21 @@ def measure():
                        "boundary, so `card` counted `card-art` and `row` "
                        "counted `rowsub`. The card floor read 0.785 and the "
                        "true figure is 0.226 — the most-cited primitive in the "
-                       "design system was three-quarters an image wrapper."},
+                       "design system was three-quarters an image wrapper. "
+                       "AND THE EXPERIENCE EXEMPLAR MOVED THREE OF THEM ON "
+                       "PURPOSE. Forty-eight category pages and ten kind "
+                       "pages stopped using `row`, `card` and `band`: the "
+                       "list of experiences was a four-column table built "
+                       "from `row`, the sub-categories were four `card`s "
+                       "holding a count and a name and nothing else, and "
+                       "\"How this list is built\" was a `band` standing in "
+                       "front of the list it described. An experience is an "
+                       "invitation and the writing is the picture, so the "
+                       "rows became `.invites` — a two-column editorial list "
+                       "with no card, no border and no plate — the four "
+                       "empty cards became four links, and the rule moved "
+                       "under the list it proves. row 0.899 to 0.855, card "
+                       "0.233 to 0.227, band 0.767 to 0.759."},
         },
     }
 

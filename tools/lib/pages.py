@@ -3439,25 +3439,42 @@ def category_page(data, cat, sub=None):
     # 11px grey text right-aligned at the end of a table row. The class is
     # `row exprow` and not a replacement, so the `row` primitive keeps its
     # reach and this family gets its own composition on top of it.
+    # AN EXPERIENCE IS AN INVITATION, AND THE WRITING IS THE PICTURE. This
+    # list was a four-column table — country, city, name, summary, kind,
+    # band — 48 rows deep, everything at one size, so "Bosnian coffee,
+    # properly" and "Vermouth where it was invented" were fighting a
+    # database layout. The family's only material is the sentence somebody
+    # wrote, and the design of this page is that sentence being readable.
+    #
+    # AND THE KIND IS PRINTED ONLY WHERE IT DISTINGUISHES. On /experiences
+    # /food every row said CELLAR & VINEYARD or FOOD & TABLE forty-eight
+    # times, which is this atlas's own rule broken by the family that has
+    # the longest lists: never explain the constraint back. What every row
+    # shares is hoisted above the list; only what differs stays on the row.
+    kindsin = {it["exp"]["kind"] for it in chosen}
+    kindname = data["taxonomy"]["experience_kinds"]
     rows = "".join(
-        f"""<a class="row exprow" href="{urls.city(it['country'], it['region'], it['city'])}">
-        <p class="exp-where"><span class="exp-country">{esc(it['country']['name'])}</span>
-          <span class="exp-city">{esc(it['city']['name'])}</span></p>
-        <div class="exp-what"><h3>{esc(it['exp']['name'])}</h3>
-          <p class="rowsub">{esc(it['exp']['summary'])}</p></div>
-        <p class="rowmeta exp-kind">{esc(data['taxonomy']['experience_kinds'].get(it['exp']['kind'], it['exp']['kind']))}
-          <span class="exp-band">{esc(it['exp']['band'])}</span></p></a>"""
+        f"""<li class="invite"><a href="{urls.city(it['country'], it['region'], it['city'])}">
+        <h2>{esc(it['exp']['name'])}</h2>
+        <p class="invite-sum">{esc(it['exp']['summary'])}</p>
+        <p class="invite-where">{esc(it['city']['name'])}, {esc(it['country']['name'])}"""
+        + (f" · {esc(kindname.get(it['exp']['kind'], it['exp']['kind']))}"
+           if len(kindsin) > 1 else "")
+        + f""" · {esc(it['exp']['band'])}</p></a></li>"""
         for it in chosen
     )
     subcards = ""
     if not sub and cat.get("subs"):
         counts = {sb["slug"]: len(C.select(items, cat, sb)) for sb in cat["subs"]}
-        subcards = '<div class="grid cols-4">' + "".join(
-            f"""<a class="card" href="{urls.subcategory(cat['slug'], sb['slug'])}">
-            <div class="card-body"><p class="kicker">{counts[sb['slug']]} listed</p>
-            <h3>{esc(sb['name'])}</h3></div></a>"""
+        # A CARD IS A CONTAINER FOR SOMETHING, AND THESE HELD A COUNT AND A
+        # NAME. Four grey boxes with nothing in them, taking a full band and
+        # 150 pixels of the page above the list they narrow. They are what
+        # they always were: four links with a number each.
+        subcards = '<ul class="sublinks">' + "".join(
+            f"""<li><a href="{urls.subcategory(cat['slug'], sb['slug'])}">"""
+            f"""{esc(sb['name'])} <span>{counts[sb['slug']]}</span></a></li>"""
             for sb in cat["subs"]
-        ) + "</div>"
+        ) + "</ul>"
 
     countries = sorted({it["country"]["name"] for it in chosen})
     title = sub["name"] if sub else cat["name"]
@@ -3498,27 +3515,83 @@ def category_page(data, cat, sub=None):
 
     body = f"""
 {crumbs(trail)}
-<div class="pagehead overture">
+<!-- AN INDEX, NOT AN OVERTURE. This page is a SET — 48 experiences across
+     26 countries — and it carried the head of a page about one thing: a
+     60px h1 at y=212 with the extent under it. The three roles are what the
+     reader is doing, and an index's extent sits beside its name so the set
+     starts sooner. Measured across the twenty-two families: 538 to 347. -->
+<div class="pagehead index">
   <p class="kicker">{esc(cat['name']) if sub else 'Experience category'}</p>
   <h1>{esc(title)}</h1>
-  {statement(cat["blurb"]) if not sub else ""}
+  <!-- `.lede`, not `.statement`. An index head places its extent beside the
+       name in column two, row two, and the display-size statement is
+       three lines to the h1's one — so the row grew to 128px and pushed the
+       count line 93 pixels below the title it belongs to. The role decides
+       the slot; using an overture's element inside an index head is how the
+       gap got there. -->
+  {f'<p class="lede">{esc(cat["blurb"])}</p>' if not sub else ""}
   <p class="orient">{len(chosen)} across {len(countries)} {"country" if len(countries) == 1 else "countries"}</p>
 </div>
 {f'<p class="countryspread lead">{country_spread(countries)}</p>' if sub and countries else ""}
-{section("Sub-categories", subcards) if subcards else ""}
-{section("How this list is built", f'<p class="small mw44">{esc(C.rule_text(cat))}</p>') if not sub else ""}
-<div class="rows explist">{rows or empty_state(
+{f'<nav class="sublinkwrap" aria-label="Sub-categories">{subcards}</nav>' if subcards else ""}
+<!-- THE MECHANISM WAS STANDING IN FRONT OF THE ANSWER. "How this list is
+     built" was a full section with its own h2 and a lede, ABOVE the list,
+     so a reader met the selection rule before they met a single thing to
+     do — the exact defect the motion pages were rebuilt for, one family
+     over. THE QUERY IS THE PROOF, AND PROOF GOES UNDER THE THING IT
+     PROVES: the rule now sits below the list, beside the sub-category
+     rulenote, which was already there and is the same kind of sentence. -->
+<ol class="invites">{rows or empty_state(
       "Nothing matches this rule yet.",
       "The rule is printed below and is the same one every other list on "
       "this site is built from. An empty list is better than a padded one, "
       "and widening the rule until something fell in would make every other "
-      "list on the site mean less.")}</div>
+      "list on the site mean less.")}</ol>
+{f'<p class="listrule">How this list is built: {esc(C.rule_text(cat))}</p>' if not sub else ""}
 {rulenote}
 """
     return f"{path}/index.html", page(
         title, body, path=path, area="experiences",
         description=f"{title}: {len(chosen)} experiences across {len(countries)} European countries, selected by a published rule.",
     )
+
+
+def sample_names(items, n=3):
+    """A few of the actual invitations in a set, spread across it.
+
+    AN EXPERIENCE IS AN INVITATION, AND THE WRITING IS THE PICTURE. The
+    category and kind tiles carried a generated plate each — eighteen
+    hash-drawn landscapes standing for abstractions, so "Adventure" opened
+    on a church tower and "Culture" on a lake, chosen by the hash of the
+    slug and related to nothing. That is the rule already written one family
+    over — a story is not a place, and its picture may not be drawn from a
+    hash — and A CATEGORY IS NOT A PLACE EITHER. The alternative to a
+    hash-drawn landscape is not a better hash.
+
+    What replaces it is the thing the family is actually made of. "Bosnian
+    coffee, properly", "The commuter ferry as a day out", "Hut to hut in the
+    High Tatras" — three of those say what Adventure is here far better than
+    any drawing this repository can generate, and they are real rows a
+    reader can go and read.
+
+    Evenly spaced through the sorted list rather than the first three, so
+    they come from across Europe instead of from whichever country the
+    alphabet put first. Deterministic, and derived.
+    """
+    if not items:
+        return []
+    order = sorted(items, key=lambda it: (it["country"]["name"], it["city"]["name"],
+                                          it["exp"]["name"]))
+    if len(order) <= n:
+        return [it["exp"]["name"] for it in order]
+    # AT THE MIDDLE OF EACH NTH OF THE LIST, NOT AT ITS ENDS. Spacing from
+    # index 0 put the same Albanian entry — "The Koman Lake ferry" — at the
+    # top of Nature, Adventure AND Culture, because every list is sorted by
+    # country and Albania is first in all of them. Three tiles side by side
+    # leading with the same line reads as a broken page, and it was an
+    # artefact of the sampling rather than anything about the data.
+    return [order[min(len(order) - 1, int((i + 0.5) * len(order) / n))]["exp"]["name"]
+            for i in range(n)]
 
 
 def experiences_index(data):
@@ -3529,15 +3602,26 @@ def experiences_index(data):
     for it in items:
         counts[it["exp"]["kind"]] = counts.get(it["exp"]["kind"], 0) + 1
     from . import categories as C
+
+    def taste(sel):
+        names = sample_names(sel)
+        return ('<p class="taste">' + "".join(
+            f"<span>{esc(x)}</span>" for x in names) + "</p>") if names else ""
+
     catcards = [
         card(urls.category(cat["slug"]), f"{len(C.select(items, cat))} listed", cat["name"],
-             cat["blurb"], seed="cat:" + cat["slug"])
+             cat["blurb"], meta=taste(C.select(items, cat)))
         for cat in data["categories"]
     ]
+    # NO BLURB, BECAUSE IT WAS THE SAME SENTENCE TEN TIMES. Every kind tile
+    # carried "Grouped by what you actually do rather than by what it is
+    # about", which is a fact about the axis and not about the kind — the
+    # boilerplate this atlas's own rule forbids, hoisted into the section
+    # lede where one copy of it belongs. `blurb=None` is the pattern the
+    # homepage's eight ways-in tiles already use.
     cards = [
-        card(urls.experience_kind(k), f"{counts.get(k, 0)} listed", name,
-             "Grouped by what you actually do rather than by what it is about.",
-             seed="kind:" + k)
+        card(urls.experience_kind(k), f"{counts.get(k, 0)} listed", name, None,
+             meta=taste([it for it in items if it["exp"]["kind"] == k]))
         for k, name in kinds.items()
     ]
     rows = "".join(
@@ -3559,10 +3643,16 @@ def experiences_index(data):
   <a class="btn ghost" href="/for-businesses">For businesses</a></div>
 </div>
 {section("Eight categories", grid(catcards, 4),
-         lede="The specification's taxonomy: what an experience is about. Each category page prints the rule that built its list.")}
+         lede="What an experience is about. Each tile carries three of its own entries, spread across the list, and each category page prints the rule that built it.")}
 {section("Ten kinds", grid(cards, 4),
          lede="The other axis: what you physically do. A cellar visit and a cathedral are both sacred to somebody; only one of them is a walk.")}
-{section("Recently added", f'<div class="rows">{rows}</div>')}
+<!-- "Recently added" WAS A CLAIM THE DATA CANNOT SUPPORT. An experience
+     carries a slug, a name, a kind, a band and a summary, and no date of
+     any sort, so these 24 were simply the first 24 the loader returned in
+     country order — Austria to Croatia, called recent. A false ordering is
+     worse than none, because a reader takes it for a signal. -->
+{section("Twenty-four of them", f'<div class="rows">{rows}</div>',
+         lede="The first two dozen in country order — there is no date on an experience here, so this is a sample and not a recency.")}
 """
     return "/experiences/index.html", page(
         "Experiences", body, path="/experiences", area="experiences",
@@ -3574,10 +3664,20 @@ def experience_kind_page(data, kind, name):
     from .data import all_experiences
     items = [it for it in all_experiences(data["countries"]) if it["exp"]["kind"] == kind]
     items.sort(key=lambda it: (it["country"]["name"], it["city"]["name"]))
+    # THE SAME COMPOSITION AS A CATEGORY PAGE, because it is the same
+    # content: a set of invitations. This was `.rows` with the place
+    # right-aligned across 1,168 pixels from the name it belongs to, on the
+    # other axis of the same family. Two lists of experiences laid out two
+    # ways is the design system forking inside one family.
+    #
+    # The kind is not printed on a kind page: every row on it is that kind
+    # by definition, which is the constraint explained back.
     rows = "".join(
-        f"""<a class="row" href="{urls.city(it['country'], it['region'], it['city'])}">
-        <div><h3>{esc(it['exp']['name'])}</h3><p class="rowsub">{esc(it['exp']['summary'])}</p></div>
-        <p class="rowmeta">{esc(it['city']['name'])}, {esc(it['country']['name'])} · {esc(it['exp']['band'])}</p></a>"""
+        f"""<li class="invite"><a href="{urls.city(it['country'], it['region'], it['city'])}">
+        <h2>{esc(it['exp']['name'])}</h2>
+        <p class="invite-sum">{esc(it['exp']['summary'])}</p>
+        <p class="invite-where">{esc(it['city']['name'])}, {esc(it['country']['name'])}
+        · {esc(it['exp']['band'])}</p></a></li>"""
         for it in items
     )
     body = f"""
@@ -3586,11 +3686,11 @@ def experience_kind_page(data, kind, name):
   <p class="kicker">{len(items)} across Europe</p>
   <h1>{esc(name)}</h1>
 </div>
-<div class="rows">{rows or empty_state(
+<ol class="invites">{rows or empty_state(
       "Nothing in the Atlas is classified this way yet.",
       "This is one of ten kinds an experience can be given, and the kind is "
       "authored per experience. An empty page here means nobody has written "
-      "one, not that Europe has none.")}</div>
+      "one, not that Europe has none.")}</ol>
 """
     return f"/experiences/kind/{kind}/index.html", page(
         name, body, path=urls.experience_kind(kind), area="experiences",

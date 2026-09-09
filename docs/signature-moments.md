@@ -206,6 +206,45 @@ longest leg is 1.6× its shortest).
 leg would be a stub beside an Arctic one and say nothing about either.
 `checks.py` recomputes every bar from the coordinates.
 
+### Experience — 48 pages — *an invitation* — EXEMPLAR
+
+The fourth exemplar, and the weakest cell in the recognition test before it.
+A category page was a name, a sentence, 620 pixels of empty limestone, four
+grey boxes holding a count and a name and nothing else, a section headed
+**How this list is built**, and then 48 experiences as a four-column table:
+country, city, name, summary, kind, band, everything at one size. The index
+carried **eighteen hash-drawn plates** standing for abstractions — Adventure
+opened on a church tower and Culture on a lake, chosen by the hash of a slug.
+
+1. **Emotional promise** — you want to go and do one of these.
+2. **Signature moment** — the writing. "Bosnian coffee, properly", "The
+   commuter ferry as a day out", "Haymaking with a scythe". This is the one
+   family whose subject is a **verb**, and its only material is the sentence
+   somebody wrote about a thing you could go and do. The design job is
+   letting it be read: two columns, no card, no border, no plate, and what
+   separates two invitations is the air between them.
+3. **Geography** — **none, deliberately.** 48 dots scattered over Europe
+   would say "food is everywhere", which is true and is not an insight. The
+   place is named on each entry, where a reader needs it.
+4. **Imagery** — none, and the eighteen plates were removed rather than
+   improved. **A category is not a place**, so its picture may not be drawn
+   from a hash — the rule already written for stories, one family over. Each
+   tile now carries three of its own real entries instead. This is also the
+   family where the visual system is closest to genuinely exhausted, because
+   a map cannot draw a verb; see `docs/image-philosophy.md`.
+5. **Hierarchy** — the name, the sentence beside it, the count, the
+   sub-categories as four links, then the invitations.
+6. **Interaction** — narrow by sub-category, or go to the place.
+7. **Aperture** — **absent**, and correctly. The door is how this atlas draws
+   geography, and this family draws none.
+8. **Data** — the band on each entry, and the kind **only where the list is
+   mixed**. On `/experiences/food` every row said CELLAR & VINEYARD or FOOD &
+   TABLE 48 times: the constraint explained back, by the family with the
+   longest lists.
+9. **NOT above the fold** — the selection rule. It is the proof, and proof
+   goes under the thing it proves; it stood in front of it as a whole band
+   with its own heading.
+
 ### Motion — 12 — *a query, answered*
 
 1. This is not a list somebody wrote. It is what the atlas says when asked.

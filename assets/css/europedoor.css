@@ -563,6 +563,56 @@ main.wide { max-width: 92rem; }
    something true rather than decorating a list. */
 .leg-no { display: block; font-family: var(--mono); font-size: var(--t-sm);
           color: var(--door); font-variant-numeric: tabular-nums; }
+/* THREE OF ITS OWN ENTRIES, WHERE A HASH-DRAWN LANDSCAPE USED TO BE. The
+   experience index carried eighteen generated plates standing for
+   abstractions — "Adventure" opened on a church tower — and the family's
+   real material is the writing. Set small and quiet: these are a taste of
+   what is inside the tile, not a list, so they must not compete with the
+   category's own name. */
+.taste { margin: var(--s3) 0 0; display: grid; gap: 2px; }
+.taste span { font-size: var(--t-xs); color: var(--ink-3); line-height: 1.5;
+              overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* THE INVITATION IS THE DESIGN. A category page listed 48 experiences as a
+   four-column table — country, city, name, summary, kind, band — everything
+   at one size, so "Bosnian coffee, properly" and "The commuter ferry as a
+   day out" were fighting a spreadsheet. This family's only material is the
+   sentence somebody wrote about a thing you could go and do, and the whole
+   design job is letting it be read.
+   Two columns on a wide screen because forty-eight of them in one column is
+   a scroll and not a menu; one on a phone. No card, no border, no plate:
+   what separates two invitations is the air between them. */
+.invites { list-style: none; margin: var(--s6) 0 0; padding: 0;
+           display: grid; gap: var(--s6); }
+.invite a { display: block; text-decoration: none; color: inherit; }
+/* h2, NOT h3. The list lost its "How this list is built" band, and with it
+   the only h2 on /experiences/nature — so the page ran h1 straight to h3 and
+   the browser suite caught a skipped heading level on two of them. Each
+   invitation IS a top-level item of this page, so h2 is what it was all
+   along; the size is set here because a heading's level is its place in the
+   document and not its size. */
+.invite h2 { font-family: var(--serif); font-size: var(--t-md); line-height: 1.25;
+             margin: 0 0 var(--s2); color: var(--ink); font-weight: 700; }
+.invite a:hover h2, .invite a:focus-visible h2 { color: var(--door); }
+.invite-sum { margin: 0 0 var(--s2); color: var(--ink-2); max-width: 46ch; }
+.invite-where { margin: 0; font-size: var(--t-xs); letter-spacing: .08em;
+                text-transform: uppercase; color: var(--ink-3); }
+/* The selection rule, under the list it selected — a band with its own
+   heading used to stand in front of it. */
+.listrule { margin: var(--s7) 0 0; max-width: 60ch; font-size: var(--t-sm);
+            color: var(--ink-3); }
+/* Four links with a number each, where four empty cards used to be. */
+.sublinkwrap { margin: var(--s5) 0 0; }
+.sublinks { list-style: none; margin: 0; padding: 0;
+            display: flex; flex-wrap: wrap; gap: var(--s3) var(--s5); }
+.sublinks a { text-decoration: none; color: var(--door); font-weight: 600; }
+.sublinks a:hover { text-decoration: underline; }
+.sublinks span { font-family: var(--mono); color: var(--ink-3); font-weight: 400; }
+@media (min-width: 62rem) {
+  .invites { grid-template-columns: repeat(2, minmax(0, 1fr));
+             column-gap: var(--s8); }
+}
+
 /* ── the map ──────────────────────────────────────────────── */
 /* The drawing is 1000 x 780, so at a full-width 1232px column it is 960px
  * tall and a 900px-high laptop shows Scandinavia and nothing else. Capping
