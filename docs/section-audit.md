@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**101 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1 refused · 1333 assertions · 0 failing**
+**101 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1 refused · 1334 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -30,7 +30,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 17 | Journey page | BUILT | 7 | Overview, map, route, transport, accommodation, budget, season, packing, the experiences the route passes and what you will be eating — plus a named curator and a way into the planner. |
 | 18 | Multi-country journeys | BUILT | 5 | All four the specification names, plus thirteen more, the widest crossing seven countries. |
 | 19 | AI journey planner — input | PARTIAL | 11 | The extraction the specification describes is built and runs on rules in the browser. The model is specified, with its prompts, and not built — the discipline had to exist first. |
-| 20 | AI planner output | BUILT | 9 | Summary, route, the five-line expenditure breakdown, and a day-by-day with alternatives — plus, on every hop, how long it takes and by what, because a distance is not a travel time. |
+| 20 | AI planner output | BUILT | 10 | Summary, route, the five-line expenditure breakdown, and a day-by-day with alternatives — plus, on every hop, an estimated time, and one hoisted sentence saying the estimate is wrong in both directions because there is no road or rail geometry here. |
 | 21 | AI safety and reliability | PARTIAL | 4 | The refusals are built; the model that would need them is not. Volatile fields are refused at the schema level, which is stronger than a prompt. |
 | 22 | AI travel assistant | DEFERRED | 2 | Needs accounts, a saved itinerary on a server and a model. All three are blocked; none is pretended. |
 | 23 | Map system | BUILT | 13 | Real geography from public-domain data we host ourselves, three levels of detail, the Europe-country-region-destination drill-down, togglable layers, a journey overlay and the popup card. No map provider, no key, no recurring cost. |

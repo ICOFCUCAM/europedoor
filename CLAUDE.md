@@ -248,6 +248,34 @@ repeat their parent's map, and the **interest** pages would draw three
 identical maps of Europe for their three largest tags. Before adding an
 aperture to a family, answer question 2 for it.
 
+**A great-circle distance is a floor on a journey, and for a year it was
+printed as the journey.** Every distance here is haversine between two
+coordinates; there is no road and no rail geometry in this repository. The
+journey pages printed "69 km — a local train or a short drive" for Chamonix
+to Zermatt, which is 69 km as the crow flies, about 170 on the ground, and
+two changes round a mountain range. The thresholds were not wrong — Vienna to
+Bratislava really is a short train — they were being asked a question the
+input cannot answer, and the answer was the one number in this product a
+reader could act on and be wrong about.
+
+The first correction was worse: the planner said **"at least"**, and
+`travelHours()` knows one average speed and nothing about whether a
+high-speed line exists, so its error is not signed. Measured against six real
+legs it undershoots short mountain hops and overshoots every fast corridor —
+Paris to Marseille reads 8h36m against a real four and a half. An estimate is
+not a bound and must not be dressed as one. The time now says "about", the
+distance says "in a straight line", and the sentence saying the estimate is
+out in **both** directions is hoisted once above the legs.
+
+**Removing a claim leaves surfaces pointing at it.** Three did, and only
+rendering the pages found them: the journey map caption promised "what each
+one means on the ground is in the note under the leg", `/map`'s journey note
+promised the same, and the facts list had a **"Ground covered"** row that was
+neither ground nor covered. `checks.py` now asserts the promise on the
+shipped HTML — a page printing a hop says "straight line", and no page
+anywhere claims a mode or a ground distance. A source-level check would have
+passed on all three.
+
 **A story is not a place, and its picture may not be drawn from a hash.**
 `plate_shapes()` picks a motif from the seed when none is passed, so for a
 year every essay opened on a landscape chosen by chance — the piece about the

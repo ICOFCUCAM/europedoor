@@ -64,20 +64,41 @@
     return whole + "h" + (mins ? " " + mins + "m" : "");
   }
 
+  /* A DISTANCE THAT CANNOT BE TRAVELLED, AND A TIME NOBODY CAN BOUND.
+   *
+   * This printed "69 km, about 1h39m — a local train or a short drive" for
+   * Chamonix to Zermatt. The two towns are 69 km apart as the crow flies,
+   * about 170 km on the ground, and the journey is a change at Martigny and
+   * Visp: most of a day, round a mountain range. The arithmetic was not
+   * wrong; it was being asked a question a great-circle distance cannot
+   * answer, and the answer was printed as a fact a reader would plan around.
+   *
+   * The first correction said "at least", which was worse. travelHours()
+   * knows one average speed and nothing about whether a high-speed line
+   * exists, so its error is not signed. Measured against six real legs it
+   * undershoots the short mountain hops and overshoots every fast corridor:
+   * Paris to Marseille is 660 km here, the model says 8h36m, the TGV does it
+   * in about four and a half door to door. A floor that is two hours over on
+   * four legs in six is not a floor, it is a guess wearing the word.
+   *
+   * So: the distance says it is a straight line, the time says "about", the
+   * mode claim is gone, and the sentence explaining what the estimate is
+   * worth — including that it is wrong in BOTH directions — is hoisted once
+   * above the itinerary rather than implied on every leg. Restoring "a short
+   * drive" is the one change here that would make the planner assert
+   * something a traveller could act on and be wrong about. */
   function hopNote(d, opts) {
     var railOnly = opts && opts.transport === "rail";
-    if (d < 90) return d + " km, about " + hoursText(travelHours(d, "ground")) +
-      " — a local train or a short drive";
-    if (d < 400) return d + " km, about " + hoursText(travelHours(d, "ground")) +
-      " — a comfortable train leg";
-    if (d < 900) return d + " km, about " + hoursText(travelHours(d, "ground")) +
-      " by rail" + (railOnly ? " — a long day, and the point of doing it this way"
-                             : ", or " + hoursText(travelHours(d, "fly")) + " door to door by air");
+    var ground = "about " + hoursText(travelHours(d, "ground"));
+    if (d < 400) return d + " km in a straight line — " + ground + " on the ground";
+    if (d < 900) return d + " km in a straight line — " + ground + " by rail" +
+      (railOnly ? ", and the point of doing it this way"
+                : ", or about " + hoursText(travelHours(d, "fly")) + " door to door by air");
     return railOnly
-      ? d + " km — more than a day overland. Kept because you asked for no flights; " +
-        "consider a night train or an extra night either side."
-      : d + " km — about " + hoursText(travelHours(d, "fly")) + " door to door by air, " +
-        "or give the overland crossing a day of its own";
+      ? d + " km in a straight line — more than a day overland. Kept because you " +
+        "asked for no flights; consider a night train or an extra night either side."
+      : d + " km in a straight line — about " + hoursText(travelHours(d, "fly")) +
+        " door to door by air, or give the overland crossing a day of its own";
   }
 
   function transportCost(d) {
@@ -1008,8 +1029,8 @@
       if (countries.indexOf(city.country) < 0) countries.push(city.country);
       hop = "";
       if (i > 0) {
-        hop = '<p class="hop">↳ ' + hopNote(km(route[i - 1].city, city), opts) +
-              " from " + route[i - 1].city.name + "</p>";
+        hop = '<p class="hop">↳ From ' + route[i - 1].city.name + ': ' +
+              hopNote(km(route[i - 1].city, city), opts) + "</p>";
       }
       var last = day + st.nights - 1;
       var when = st.nights === 1 ? "Day " + day : "Days " + day + "–" + last;
@@ -1070,13 +1091,14 @@
         '<div class="addstop" id="addpanel' + i + '" hidden></div>';
 
       legs += '<li class="leg"><div class="leg-when">' + when + '</div><div>' +
+              hop +
               '<h3><a href="' + city.url + '">' + city.name + "</a> <span class=\"small\">· " +
               city.country + " · " + city.region + "</span></h3>" +
               "<p>" + city.why + "</p>" +
               '<p class="small mt-tight">' + whyLine(city, opts.wants, opts) +
               " " + money(dailyRate(city, opts.style)) + " a day here." + "</p>" +
               '<ul class="daylist">' + dayHtml + "</ul>" + forcedNote + altHtml +
-              controls + hop +
+              controls +
               "</div></li>";
       day = last + 1;
     }
@@ -1105,7 +1127,7 @@
         "<div><dt>Transport</dt><dd>" + money(c.transport) + "</dd></div>" +
         "<div><dt>Activities</dt><dd>" + money(c.activities) + "</dd></div>" +
         "<div><dt>12% buffer</dt><dd>" + money(c.buffer) + "</dd></div>" +
-        "<div><dt>Ground covered</dt><dd>" + totalKm.toLocaleString("en-GB") + " km</dd></div>" +
+        "<div><dt>Straight-line distance</dt><dd>" + totalKm.toLocaleString("en-GB") + " km</dd></div>" +
       "</dl>" +
       verdict +
       (opts.wants.length
@@ -1113,6 +1135,10 @@
           joinList(opts.wants.map(interestName)) +
           " — because that is what you asked for. Each line says what else is true of it.</p>"
         : "") +
+      '<p class="whyall"><span>Every hop</span> is a straight line, and the time ' +
+        'is that distance at one average speed. With no route geometry here the ' +
+        'estimate is out in both directions: a mountain leg is slower, a fast ' +
+        'corridor hours quicker.</p>' +
       '<ul class="legs">' + legs + "</ul>" +
       '<div class="hero-actions mt0">' +
         '<button class="btn ghost" type="button" id="saveplan">Save this to My Europe</button>' +

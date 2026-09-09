@@ -93,14 +93,36 @@ def haversine(a, b):
 
 
 def hop_note(km):
-    """How you would actually cover that distance, in one line."""
-    if km < 90:
-        return f"{km} km — a local train or a short drive"
-    if km < 400:
-        return f"{km} km — a comfortable train leg, half a day at most"
-    if km < 900:
-        return f"{km} km — a long rail day, or a short flight if the days are tight"
-    return f"{km} km — fly, or give the overland crossing a day of its own"
+    """A distance, and nothing that does not follow from it.
+
+    THIS USED TO NAME THE MODE AND THE DURATION, FROM A STRAIGHT LINE.
+    "69 km — a local train or a short drive" was printed for Chamonix to
+    Zermatt, which is 69 km as the crow flies, about 170 km on the ground,
+    and a change at Martigny and Visp: most of a day, round a mountain
+    range. Zakopane to Poprad is 37 km with the Tatras in between. The
+    thresholds themselves were not wrong — Vienna to Bratislava really is a
+    short train — they were being asked a question the input cannot answer.
+
+    This atlas holds no road and no rail geometry. It holds two coordinates,
+    and a great-circle distance between them is a FLOOR on the journey, never
+    the journey. So the line says the distance and stops, and the sentence
+    explaining what a straight line is worth is hoisted once above the list
+    rather than implied thirteen times inside it — the same rule Discover
+    Mode and the motion pages are built on.
+
+    The planner prints a TIME beside the same distance and keeps doing so,
+    because a scale is what a planner is for — but it no longer calls that
+    time a minimum. The first attempt at this correction said "at least",
+    which measured worse than the claim it replaced: the speed model knows
+    nothing about whether a high-speed line exists, so on Paris to Marseille
+    it reads 8h36m against a real four and a half.
+
+    Restoring the mode claim is the one thing that would make this page make
+    an assertion a reader could act on and be wrong about, which is the whole
+    reason routing is on the roadmap. Until it is there, the page does not
+    guess.
+    """
+    return f"{km} km"
 
 
 def advisory_note(c):
@@ -789,7 +811,7 @@ def city_page(data, c, r, t):
     nearrows = "".join(
         f"""<a class="row" href="{urls.city(n['country'], n['region'], n['city'])}">
         <div><h3>{esc(n['city']['name'])}</h3><p class="rowsub">{esc(n['country']['name'])} · {esc(n['region']['name'])}</p></div>
-        <p class="rowmeta">{esc(hop_note(haversine(t, n['city'])))}</p></a>"""
+        <p class="rowmeta">{esc(hop_note(haversine(t, n['city'])))} away</p></a>"""
         for n in near
     )
     stay = nights_line(t)
@@ -1178,7 +1200,8 @@ def journey_page(data, j):
         hop = ""
         if prev is not None:
             km = haversine(prev, t)
-            hop = f'<p class="hop">↳ {esc(hop_note(km))} from {esc(prev["name"])}</p>'
+            hop = (f'<p class="hop">↳ {esc(hop_note(km))} from '
+                   f'{esc(prev["name"])} in a straight line</p>')
         # The day numbers are derived at load now (see data.load), so the
         # page reads them rather than counting again. Two places counting the
         # same nights is how a journey page and an API disagree about which
@@ -1238,7 +1261,7 @@ def journey_page(data, j):
         ("From / to", f'<a href="{urls.city_by_id(idx, j["start"])}">{esc(idx[j["start"]]["city"]["name"])}</a> → '
                      f'<a href="{urls.city_by_id(idx, j["end"])}">{esc(idx[j["end"]]["city"]["name"])}</a>'),
         ("Countries", esc(" → ".join(countries))),
-        ("Ground covered", f"{total_km:,} km between stops"),
+        ("Straight-line distance", f"{total_km:,} km, stop to stop"),
         ("Difficulty", esc(j["difficulty"])),
         ("Transport", esc(", ".join(j["transport"]))),
         ("Accommodation", esc(j["accommodation"])),
@@ -1268,11 +1291,11 @@ def journey_page(data, j):
         jfood += f"<li><strong>{esc(cc['name'])}</strong> — {esc(cc['food'][0])}</li>"
     body = f"""
 {crumbs([("Europe", "/discover"), ("Journeys", "/journeys"), (j["name"], None)])}
-<div class="pagehead">
+<div class="pagehead overture">
   <p class="kicker">Journey</p>
   <h1>{esc(j['name'])}</h1>
   {statement(j['strapline'])}
-  <p class="orient">{j['days']} days · {len(j['legs'])} stops · {len(countries)} countries · {total_km:,} km</p>
+  <p class="orient">{j['days']} days · {len(j['legs'])} stops · {len(countries)} countries · {total_km:,} km in a straight line</p>
   {chips(j["interests"], data["interests"])}
 </div>
 
@@ -1282,6 +1305,11 @@ def journey_page(data, j):
   <div>
     <p class="lede">{esc(j['summary'])}</p>
     <h2 id="the-route">The route, in order</h2>
+    <p class="whyall"><span>Every hop</span> is a straight-line distance
+    between two coordinates. This atlas holds no road and no rail geometry,
+    so that number is a floor on the leg and never the leg — Chamonix to
+    Zermatt is 69&nbsp;km here and about 170 on the ground, round a mountain
+    range. It is here for the scale of the thing, not for planning a day.</p>
     <ol class="legs route">{''.join(legs)}</ol>
     <h2 class="mt7">The shape of it</h2>
     {facts}
@@ -1312,9 +1340,6 @@ def journey_page(data, j):
     <p><a class="btn" href="/plan#journey={esc(j['slug'])}">Open in the Planner</a></p>
     <p><button class="btn ghost" type="button" data-save="journey:{esc(j['slug'])}" data-kind="Journey"
        data-label="{esc(j['name'])}" data-url="{urls.journey(j)}">Save to My Europe</button></p>
-    <h2 class="mini">How to read a leg</h2>
-    <p>Distances are straight-line between stops. Rail beats the straight line in the Alps and
-    loses badly across the Adriatic — the note under each hop says which.</p>
   </aside>
 </div>
 """
@@ -2360,8 +2385,8 @@ def routemap(data, j):
                     urls.city(n["country"], n["region"], n["city"]),
                     n["city"]["name"]))
     uid = "rt" + "".join(ch for ch in j["slug"] if ch.isalnum())[:14]
-    cap = ('Straight lines between stops, in order. What each one means on the '
-           'ground is in the note under the leg. Coastline from '
+    cap = ('Straight lines between stops, in order — the order is real, the '
+           'lines are not routes. Coastline from '
            '<a href="/sources">Natural Earth</a>, public domain. '
            '<a href="/map">The whole map, with every journey →</a>')
     return pointsmap(pts, uid, cap, f'Route map for {j["name"]}',

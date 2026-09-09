@@ -2347,6 +2347,66 @@ def c_category_membership():
     return n
 
 
+@check("a great-circle distance is never printed as a journey")
+def c_straight_line_honesty():
+    # THE ONLY NUMBER IN THIS PRODUCT A READER COULD ACT ON AND BE WRONG.
+    #
+    # Every distance here is haversine between two coordinates. There is no
+    # road and no rail geometry in this repository, so that figure is a floor
+    # on the leg and never the leg: Chamonix to Zermatt is 69 km here and
+    # about 170 on the ground, round a mountain range, with two changes.
+    #
+    # The journey pages printed "69 km — a local train or a short drive" for
+    # exactly that leg, and the planner printed "about 1h39m" beside it. The
+    # thresholds were not wrong; they were being asked a question a straight
+    # line cannot answer. Removing the claim then left THREE surfaces
+    # pointing at it — the journey map caption ("what each one means on the
+    # ground is in the note under the leg"), the /map journey note, and a
+    # "Ground covered" row in the facts — each promising an answer that no
+    # longer existed anywhere. Only rendering the pages found them.
+    #
+    # So this asserts the promise on the SHIPPED HTML rather than the source:
+    #   1. a page that prints a hop distance says "straight line" on it, and
+    #   2. no page anywhere claims a travel mode or a ground distance,
+    #      because both would have to be derived from the great circle.
+    #
+    # It is deliberately a vocabulary check on the built output. A source
+    # check would have passed on all three of the surfaces above.
+    MODE_CLAIMS = [
+        "a local train or a short drive",
+        "a comfortable train leg",
+        "a long rail day",
+        "means on the ground is in the note",
+        "Ground covered",
+    ]
+    n = 0
+    for path in site_files():
+        h = open(path, encoding="utf-8").read()
+        r = canonical_of(path)
+        for claim in MODE_CLAIMS:
+            if claim in h:
+                fail(f'{r}: "{claim}" — a claim about the ground, made from a '
+                     f'great-circle distance. This atlas holds no route geometry.')
+        # A hop line is the shape `↳ … km …`; the planner builds its own in
+        # JavaScript, so the page carrying the planner is checked by the
+        # phrase being present in the script it loads (below).
+        if 'class="hop"' in h:
+            n += 1
+            if "straight line" not in h:
+                fail(f"{r}: prints a hop distance and never says it is a "
+                     f"straight line")
+    js = open(os.path.join(ROOT, "assets", "js", "planner.js"),
+              encoding="utf-8").read()
+    n += 1
+    if "in a straight line" not in js:
+        fail("planner.js: builds hop lines and never says they are straight-line")
+    if "out in both directions" not in js:
+        fail("planner.js: prints a travel time from a straight line without "
+             "saying the estimate is unsigned — travelHours() knows one "
+             "average speed and reads 8h36m for Paris to Marseille")
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0

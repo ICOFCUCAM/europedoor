@@ -525,19 +525,39 @@ def s19():
 
 @section(20, "AI planner output", "BUILT",
          "Summary, route, the five-line expenditure breakdown, and a "
-         "day-by-day with alternatives — plus, on every hop, how long it "
-         "takes and by what, because a distance is not a travel time.")
+         "day-by-day with alternatives — plus, on every hop, an estimated "
+         "time, and one hoisted sentence saying the estimate is wrong in "
+         "both directions because there is no road or rail geometry here.")
 def s20():
     js = src("assets/js/planner.js")
     for line in ("beds", "food", "transport", "activities", "buffer"):
         yield line in js, f"the costing has a {line} line"
     yield "function dayPlan" in js, "a day-by-day exists"
     yield "alternativesFor" in js, "each stop offers alternatives"
-    # A distance is not a travel time. Every hop states how long it takes,
-    # by which mode, and a rail-only trip is never offered a flying time.
+    # A distance is not a travel time — and a STRAIGHT-LINE distance is not
+    # even a distance you can travel. This asserted `"a comfortable train
+    # leg" in js`, which pinned the exact wording of a claim the planner had
+    # no basis for: Chamonix to Zermatt is 69 km as the crow flies, about
+    # 170 km on the ground, and it was printed as "about 1h39m — a local
+    # train or a short drive". The assertion was protecting the false half
+    # of the promise and would have failed on the correction.
+    #
+    # The correction after that asserted `"at least "`, and was wrong in the
+    # other direction: travelHours() knows one average speed, so it reads
+    # 8h36m for Paris to Marseille against a real four and a half. An
+    # estimate is not a bound and must not be dressed as one.
+    #
+    # The promise is that a hop states a TIME, that the distance says what
+    # kind of distance it is, and that the caveat is hoisted once rather
+    # than repeated on every leg. Each half still fails on the thing it
+    # protects: deleting the arithmetic, asserting a mode again, or moving
+    # the caveat back down into the rows.
     yield "function travelHours" in js and "function hoursText" in js, \
         "every hop states a travelling time, not only a distance"
-    yield "a comfortable train leg" in js, "and what that leg actually is"
+    yield "in a straight line" in js, \
+        "and names the distance for what it is"
+    yield "out in both directions" in js and "whyall" in js, \
+        "with the estimate's honesty hoisted once, not repeated per leg"
 
 
 @section(21, "AI safety and reliability", "PARTIAL",

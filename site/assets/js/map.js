@@ -607,8 +607,8 @@
 
     if (note) {
       note.innerHTML = esc(j.name) + " — " + j.pts.length + " stops over " + j.days +
-        ' days. <a href="' + j.url + '">Read the route</a>. The line is straight between ' +
-        "stops; what that means on the ground is on the journey page.";
+        ' days. <a href="' + j.url + '">Read the route</a>. The line is straight ' +
+        "between stops: the order is real, the line is not a route.";
     }
   }
   if (sel) { sel.addEventListener("change", drawJourney); drawJourney(); }

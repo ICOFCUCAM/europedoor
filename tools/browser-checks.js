@@ -245,9 +245,14 @@ async function main() {
   }
   await page.click('#planner button[type="submit"]');
   await page.waitForSelector("#result .leg");
-  const hoisted = await page.locator("#result .whyall").textContent();
-  ok(/because that is what you asked for/.test(hoisted),
+  const hoists = await page.locator("#result .whyall").allTextContents();
+  ok(hoists.some((t) => /because that is what you asked for/.test(t)),
      "the itinerary does not hoist the shared reason");
+  ok(hoists.some((t) => /out in both directions/.test(t)),
+     "the itinerary does not hoist what its distances and times are worth");
+  ok(hoists.length <= 2,
+     `${hoists.length} hoisted blocks above the first stop — a preamble, ` +
+     "which is the boilerplate the hoist exists to prevent");
   const legWhy = await page.locator("#result .leg .mt-tight").allTextContents();
   ok(legWhy.length >= 3, "legs carry no why-line");
   ok(!legWhy.some((t) => /^Matches /.test(t.trim())),
@@ -1783,7 +1788,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 692;
+  const FLOOR = 696;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +
