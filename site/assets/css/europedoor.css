@@ -1850,6 +1850,32 @@ body[data-hero] .masthead { position: sticky; }
 /* THE ARGUMENT. Numbered, because three reasons presented as a bulleted
  * list read as a specification and the same three numbered read as an
  * editor's case. */
+/* ARRIVAL: THE NAME, WHAT IT IS, AND WHAT YOU WOULD DO — all in one look.
+   A destination page put the three reasons a person would go BELOW the head,
+   in a three-column band with a rule over it, and put the view of where the
+   place is below THAT, at y=840 on a 900-tall screen. So the first screen of
+   a page whose whole promise is "you are here" carried a name, a sentence,
+   four chips and 620 pixels of empty limestone beside them.
+   The reasons are the best writing on the page and they answer the question
+   a reader arrives with, so they move into the head, beside the name. The
+   view comes up under both, full width. Same components, same primitives,
+   one different arrangement: the head is not a headline any more, it is a
+   first look round. */
+.pagehead.overture.arrivalhead { display: grid; gap: var(--s6); }
+.arrivalhead .whygo { border-top: none; margin-top: 0; padding-top: 0; }
+@media (min-width: 62rem) {
+  .pagehead.overture.arrivalhead {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
+    column-gap: var(--s8); align-items: start; }
+  /* One column in the head, not three: the reasons are a list read down
+     beside the name, and the three-across arrangement below the fold was
+     the shape of a band, not of an answer. */
+  .arrivalhead .reasons { grid-template-columns: 1fr; gap: var(--s5); }
+  .arrivalhead .reasons li { grid-template-columns: 2.6rem 1fr;
+                             align-items: baseline; gap: var(--s3); }
+  .arrivalhead .whygo { padding-top: var(--s2); }
+}
+
 .whygo { margin-top: var(--s6); border-top: 1px solid var(--rule); padding-top: var(--s5); }
 .whygo h2 { font-size: var(--t-xs); letter-spacing: .12em; text-transform: uppercase;
             color: var(--ink-3); font-weight: 600; margin: 0 0 var(--s5); }
@@ -2465,3 +2491,5 @@ body[data-hero] .masthead { position: sticky; }
 .minimap.arched.countrymap .countries path.here {
   fill: var(--map-hover); stroke: var(--sea); stroke-width: 1.3; }
 .minimap.arched .context path { stroke: color-mix(in srgb, var(--map-border) 60%, transparent); stroke-width: 0.7; }
+
+.placeband-map .minimap.arched .countries path { fill: var(--map-land); }

@@ -1250,18 +1250,19 @@ def city_page(data, c, r, t):
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)),
          (c["name"], urls.country(c)), (r["name"], urls.region(c, r)), (t["name"], None)])}
-<div class="pagehead overture">
-  <p class="kicker">{esc(r['name'])}, {esc(c['name'])}</p>
-  <h1>{esc(t['name'])}</h1>
-  {statement(t['summary'])}
-  <p class="orient">{orient_line(t)}</p>
-  {chips(t["interests"], data["interests"])}
+<div class="pagehead overture arrivalhead">
+  <div class="arrivalsay">
+    <p class="kicker">{esc(r['name'])}, {esc(c['name'])}</p>
+    <h1>{esc(t['name'])}</h1>
+    {statement(t['summary'])}
+    <p class="orient">{orient_line(t)}</p>
+    {chips(t["interests"], data["interests"])}
+  </div>
+  <section class="whygo" aria-labelledby="why-visit">
+    <h2 id="why-visit">Why go</h2>
+    <ol class="reasons">{reasons}</ol>
+  </section>
 </div>
-
-<section class="whygo" aria-labelledby="why-visit">
-  <h2 id="why-visit">Why go</h2>
-  <ol class="reasons">{reasons}</ol>
-</section>
 
 <div class="placeband{'' if has_photo else ' maponly'}">
   {photo_block}

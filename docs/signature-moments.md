@@ -45,17 +45,38 @@ three are gaps. That distinction is the whole content of this document.
 
 ## The nine questions, per family
 
-### Destination — 319 pages — *invitation*
+### Destination — 319 pages — *arrival* — EXEMPLAR
 
-1. **Emotional promise** — you could actually go here, and here is why you would.
-2. **Signature moment** — the three numbered reasons, then the country around it.
-3. **Geographic expression** — the destination and its neighbours, frame fitted until it has company.
-4. **Visual hierarchy** — one authored sentence, three reasons, the map, the practical answers, the record last.
-5. **Primary interaction** — save it, or open a neighbour.
-6. **Aperture** — **explicit**. This is where the door was proved.
-7. **Imagery** — a photograph when the register holds one; otherwise nothing. Never a plate.
-8. **Data** — last, quiet, with a lede saying it is not a reason to go.
-9. **Absent** — opening hours, prices, a website, a rating. Seventeen refusals, each a promise.
+The second exemplar. The page was a record with a headline on it: name,
+sentence, four chips, then 620 pixels of empty limestone beside them, then
+*Why go* in a three-across band below a rule, then the view of where the
+place is at y=840 on a 900-tall screen. Every part of it true, and the first
+screen answered none of the questions a person arriving has.
+
+1. **Emotional promise** — you are somewhere, and you can already see what
+   you would do on the first morning.
+2. **Signature moment** — the local view: a wide, shallow opening with the
+   destination itself at the centre in lime, its neighbours quiet around it,
+   and a scale bar saying how far. **A country is a shape; a destination is a
+   position**, and a position only means anything relative to other things.
+3. **Geography** — regional, about 600 km across, framed by
+   `minimap(span="auto")` so Berlin is not drawn as though it were alone.
+   The land is **painted** here and nowhere else on the site: at continent
+   and country scale adjacent fills merge into one mass and the borders are
+   the information, and at 600 km across the sea is half the picture.
+4. **Imagery** — a photograph if the register holds one, and where it does
+   not, nothing. Never a plate; a destination is a place, not a mood.
+5. **Hierarchy** — the name and what it is on the left, the three reasons
+   beside them on the right, the view full width under both. Everything else
+   below.
+6. **Interaction** — save it, add it to a journey, or go on to a neighbour.
+7. **Aperture** — explicit, and **wide**: 900 × 320, struck shallow the way a
+   mason strikes a wide one. The country's door is upright because a country
+   is a figure; this is a window because arriving is looking out of one.
+8. **Data** — the record, the score and the coordinates, all below.
+9. **NOT above the fold** — the score, the places table, the experiences, the
+   accommodation band, the onward stops, anything the reader would only want
+   after deciding to come.
 
 ### Macro region — 9 — *where in Europe this is*
 

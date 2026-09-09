@@ -1875,6 +1875,52 @@ async function main() {
        "with no name on any of them");
   }
 
+  // ── arrival: the destination page's own grammar ────────────────────
+  //
+  // A destination page is about being SOMEWHERE, and two things carry that.
+  //
+  // First, WHAT YOU WOULD DO IS BESIDE THE NAME. The three reasons a person
+  // would go used to sit below the head in a three-across band, and the view
+  // of where the place is sat below THAT — at y=840 on a 900-tall screen. So
+  // the first screen of the page carried a name, a sentence, four chips and
+  // 620 pixels of empty limestone. Asserted as position rather than as
+  // markup: the reasons start above the view, and the view starts inside the
+  // first screen.
+  //
+  // Second, THE LOCAL VIEW PAINTS ITS LAND. Every other map on this site
+  // draws land as outline only, which is right at continent and country
+  // scale where adjacent fills merge into one mass and the borders are the
+  // information. At 600 km across it is wrong: the Aegean was the same
+  // near-black as the Peloponnese, so a page whose whole promise is "you are
+  // here" showed an island nowhere. The first attempt at the fix LOST A
+  // SPECIFICITY FIGHT — `.minimap.arched .countries path` is (0,3,1), not
+  // the (0,2,1) it looks like — and rendered as the thing simply not being
+  // there, which is the third time in this stylesheet. So this measures the
+  // painted colours, not the rule.
+  for (const u of ["/europe/austria/tyrol/innsbruck",
+                   "/europe/greece/athens-and-the-peloponnese/hydra"]) {
+    await page.goto(base + u, { waitUntil: "load" });
+    const a = await page.evaluate(() => {
+      const r = document.querySelector(".arrivalhead .reasons");
+      const v = document.querySelector(".placeband-map figure.minimap");
+      const land = document.querySelector(".placeband-map .countries path");
+      const sea = document.querySelector(".placeband-map .archground");
+      return {
+        reasons: r ? r.getBoundingClientRect().top + scrollY : null,
+        view: v ? v.getBoundingClientRect().top + scrollY : null,
+        land: land && getComputedStyle(land).fill,
+        sea: sea && getComputedStyle(sea).fill,
+      };
+    });
+    ok(a.reasons !== null && a.view !== null && a.reasons < a.view,
+       `${u}: the reasons are not above the view (${a.reasons} / ${a.view})`);
+    ok(a.view !== null && a.view < 900,
+       `${u}: the view starts at ${a.view}, below the first screen`);
+    ok(a.land && a.land !== "none" && a.land !== a.sea,
+       `${u}: the local view paints its land the same as its sea ` +
+       `(${a.land} vs ${a.sea})`);
+  }
+
   // ── the two worlds ─────────────────────────────────────────────────
   //
   // A palette can be correct in a token file and wrong on the page: what
