@@ -564,8 +564,19 @@ RIVER_RANK = 6
 LAKE_RANK = 1
 
 
-def rivers(proj, view):
+def rivers(proj, view, river_rank=None, lake_rank=None, thin_units=0.0,
+           min_lake_units=0.0):
     """Rivers and lakes, when the repository holds them.
+
+    THE RANKS ARE PARAMETERS BECAUSE THE HERO NEEDS A DIFFERENT ANSWER. A
+    plate is a picture of somewhere and wants the watercourses that carry
+    that somewhere's shape: RIVER_RANK 6 and LAKE_RANK 1, which over the
+    whole continent is 153 rivers and 65 lakes and 49 KB. The homepage draws
+    the whole continent as one image, where 153 rivers is a hydrology map and
+    what the picture wants is the half-dozen a reader would name unprompted.
+    Everything else about the layer — the clip, the run-splitting, the
+    classes, the order — is the same, because two implementations of the same
+    layer disagree within a month.
 
     Two classes, because a hierarchy of one is a list: `major` for the rivers
     that carry a country's shape and `minor` for the rest that survive the
@@ -624,19 +635,23 @@ def rivers(proj, view):
             last = q
         return "".join(d) if len(d) >= 2 else ""
 
+    rrank = RIVER_RANK if river_rank is None else river_rank
+    lrank = LAKE_RANK if lake_rank is None else lake_rank
     out = []
     for feat in doc.get("rivers", []):
-        if feat.get("rank", 99) > RIVER_RANK:
+        if feat.get("rank", 99) > rrank:
             continue
         line = feat["line"]
         pts = [proj.xy(line[i + 1], line[i]) for i in range(0, len(line), 2)]
+        if thin_units:
+            pts = geo.thin(pts, thin_units)
         d = "".join(draw(r) for r in runs(pts))
         if d:
             cls = "major" if feat.get("rank", 99) <= 4 else "minor"
             out.append(f'<path class="riv {cls}" d="{d}">'
                        f'<title>{feat.get("name", "")}</title></path>')
     for feat in doc.get("lakes", []):
-        if feat.get("rank", 99) > LAKE_RANK:
+        if feat.get("rank", 99) > lrank:
             continue
         d = []
         for ring in feat.get("rings", []):
@@ -646,7 +661,16 @@ def rivers(proj, view):
                     or min(p[1] for p in pts) > box[3]):
                 continue
             cut = geo._clip(pts, box)
-            if len(cut) < 3:
+            if thin_units:
+                cut = geo.thin(cut, thin_units)
+            # A LAKE TOO SMALL TO READ IS NOT A LAKE, it is a dot of water.
+            # The rank in the source is Natural Earth's own importance, and
+            # its coarsest step still admits 55 of them across the continent;
+            # what a picture of Europe wants is the ones a reader can see,
+            # which is a property of THIS drawing rather than of the dataset.
+            # Measured in drawn units, like every other threshold here.
+            if len(cut) < 3 or (min_lake_units
+                                and geo.ring_area(cut) < min_lake_units):
                 continue
             piece = draw(cut)
             if piece:

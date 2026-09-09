@@ -97,9 +97,9 @@
    "why": "Zero today, because zero photographs are licensed. This moving is the signal that licensed imagery arrived — which must go through the licence register first."
   },
   "weight.home_kb": {
-   "value": 109,
+   "value": 114,
    "kind": "ceiling",
-   "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it is allowed to move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence. Moved 48 -> 109 when the hero became a drawing rather than a silhouette: 43 KB of Europe at lod1 thinned to the units it is drawn in, 25 KB of hypsometric relief and 18 KB of the ground beyond the atlas. That is 86 KB of geometry for the one picture on this site no competitor can draw, on a page with no photograph, no webfont and no JavaScript; the licensed hero photograph the brief is still open for is 150 KB on its own. Anything above this is a template inlining something, which is the failure the ceiling is for."
+   "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it is allowed to move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence. Moved 48 -> 109 when the hero became a drawing rather than a silhouette, and 109 -> 114 when it became an atlas rather than a relief: frontiers cost nothing (a <use> of the land path), and the rivers, the lakes and the finer ground beyond are about 15 KB between them. That is the whole picture in one page with no photograph, no webfont and no JavaScript; the licensed hero photograph the brief is still open for is 150 KB on its own. Anything above this is a template inlining something, which is the failure the ceiling is for."
   },
   "weight.max_page_kb": {
    "value": 440,
@@ -109,7 +109,7 @@
   "map.relief_pages": {
    "value": 262,
    "kind": "floor",
-   "why": "Pages that draw hypsometric relief. 261 of them are a destination or a journey whose own ground was measured past both thresholds; the 262nd is the homepage, whose hero is the continent rather than a place and draws three of the four bands as a picture. See docs/terrain-prototype.md. A floor rather than an exact, because adding an Alpine destination should not need a ceremony — but losing them all should."
+   "why": "Pages that draw hypsometric relief. Every one of them is a destination or a journey whose own ground was measured past both thresholds; see docs/terrain-prototype.md. A floor rather than an exact, because adding an Alpine destination should not need a ceremony — but losing them all should."
   },
   "signature.apertures": {
    "value": 825,

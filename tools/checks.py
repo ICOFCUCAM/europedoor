@@ -2698,11 +2698,34 @@ def c_terrain():
         # either the boundary is drawn above the terrain, or there is no
         # boundary for the terrain to bury.
         if r == "index.html":
-            assert 'class="lyr lyr-country-bounds"' not in html, (
-                "the hero has grown a country-boundary layer. It is filled "
-                "on purpose — fifty frontiers competing with a headline is "
-                "the political map this hero was rebuilt to remove — so a "
-                "boundary here needs the same argument the plates made")
+            # THE HERO DRAWS FRONTIERS NOW, AND THE PROMISE IS THAT THEY ARE
+            # FELT RATHER THAN READ. It was filled and borderless once,
+            # because the first attempt drew fifty bright lines — per-country
+            # translucent strokes double where two countries share an edge.
+            # That is a fact about compositing, not an argument against
+            # frontiers, and without them the hero read as a relief sculpture
+            # of Europe rather than as an atlas of fifty countries.
+            #
+            # So the assertion is the one the plates make plus a ceiling on
+            # the ink: the boundary pass exists, and its stroke is no more
+            # than 40% of the way from the parchment to the page's own ink.
+            # Past that it stops being a frontier felt at reading distance
+            # and becomes a political map, which is a different picture.
+            assert 'class="lyr lyr-country-bounds"' in html, (
+                "the hero draws relief and no boundary pass above it — the "
+                "bands paint over a frontier here exactly as they do on a "
+                "plate")
+            m = re.search(r"\.heroeurope \.lyr-country-bounds\s*\{[^}]*"
+                          r"stroke:\s*color-mix\(in srgb,\s*var\(--graphite\)"
+                          r"\s*(\d+)%", css)
+            assert m, ("the hero's frontier ink is not a stated mix of the "
+                       "page's ink into the parchment, so how loud it is "
+                       "cannot be read off the stylesheet")
+            assert int(m.group(1)) <= 40, (
+                f"the hero's frontiers are {m.group(1)}% of the way to the "
+                f"page's ink. At reading distance nobody should think 'I see "
+                f"borders'; past 40% this is a political map")
+            n += 2
         else:
             assert 'class="lyr lyr-country-bounds"' in html, (
                 f"/{r}: relief with no boundary pass above it — a frontier "
@@ -2803,15 +2826,45 @@ def c_hero_frame():
     # place where a coastline was severed, and that is the thing that must
     # not be visible. Read off the shipped geometry, so it measures what is
     # drawn rather than what was intended.
+    # THE TWO SEAMS ARE EXEMPT, AND ONLY THOSE TWO. This layer is cut to the
+    # complement of the atlas — the strip east of 52°E and the strip south of
+    # 33°N — so those two edges are where the atlas's geometry stops and this
+    # one takes over. They are inside the frame on purpose, and each has a
+    # fade over it. Every other edge is a cut through land nobody is drawing
+    # the other side of, and must fall outside the picture.
+    seams = doc.get("seams") or {}
+    strips = doc["strips"]
+    edges = []
+    for strip in strips:
+        box = strip["box"]
+        edges.append(("west", 0, box[0]))
+        edges.append(("south", 1, box[1]))
+        edges.append(("east", 0, box[2]))
+        edges.append(("north", 1, box[3]))
     bad = []
-    for ring in doc["rings"]:
+    for st in strips:
+      for ring in st["rings"]:
         for i in range(0, len(ring), 2):
             lon, lat = ring[i], ring[i + 1]
-            side = ("west" if abs(lon - lo0) < 1e-3 else
-                    "east" if abs(lon - lo1) < 1e-3 else
-                    "south" if abs(lat - la0) < 1e-3 else
-                    "north" if abs(lat - la1) < 1e-3 else "")
+            side = ""
+            for name, axis, v in edges:
+                if abs((lon if axis == 0 else lat) - v) > 1e-3:
+                    continue
+                if axis == 0 and abs(v - seams.get("lon", 1e9)) < 1e-6:
+                    continue
+                if axis == 1 and abs(v - seams.get("lat", 1e9)) < 1e-6:
+                    continue
+                side = name
+                break
             if not side:
+                continue
+            # AND A STRIP'S EDGE IS NOT A CUT WHERE ANOTHER STRIP COVERS IT.
+            # The two overlap in the south-east: the southern strip stops at
+            # 52°E and the eastern one runs from 36°E, so the southern strip's
+            # eastern edge has ground on both sides of it and severs nothing.
+            if any(b["box"][0] - 1e-6 <= lon <= b["box"][2] + 1e-6
+                   and b["box"][1] - 1e-6 <= lat <= b["box"][3] + 1e-6
+                   and b is not st for b in strips):
                 continue
             x, y = PG.MAPPROJ.xy(lat, lon)
             if vx <= x <= vx + vw and vy <= y <= vy + vh:

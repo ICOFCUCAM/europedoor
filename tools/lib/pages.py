@@ -271,7 +271,6 @@ def heroeurope(data):
     #
     #     lod0, as published            22,927 bytes   blocky, and unevenly
     #     lod1, as published            73,463 bytes   too heavy for a hero
-    #     lod1 thinned at 2.4 units     34,336 bytes   this
     # THE HERO HAS ITS OWN WINDOW ON THE PROJECTION, and it is wider and
     # deeper than the atlas's. MAP_W x MAP_H is the frame every other map on
     # this site is drawn in and it is fitted to what this product writes
@@ -331,6 +330,64 @@ def heroeurope(data):
     relief = cartography.relief_wash(MAPPROJ, view,
                                      thin_units=2.5, min_units=50.0)
 
+    # THE BOUNDARY PASS, AND IT COSTS NO GEOMETRY.
+    #
+    # The hero read as a relief sculpture of Europe rather than as an atlas of
+    # fifty countries, and the reason is one missing layer: land was a single
+    # blob. Every other map here draws frontiers. The first attempt at it on
+    # this page drew fifty bright lines, because per-country translucent
+    # strokes double where two countries share an edge — which is why the land
+    # is one merged path with the transparency on its group.
+    #
+    # ORDER puts country-bounds ABOVE terrain, and it has to: a boundary here
+    # is a stroke on the land path and the bands paint straight over it. On a
+    # plate that costs the country rings a second time, and on this page the
+    # rings are 43 KB. So the pass is a `<use>` of the same path.
+    #
+    # THAT IS THE TRAP THIS REPOSITORY LOST A DAY TO ONCE, and the escape is
+    # to style by INHERITANCE rather than by id. A `<use>` clone is still
+    # matched by a selector for the original element, so `#heroland { fill }`
+    # would come back filled in the copy. Nothing selects the path any more:
+    # fill and stroke are set on `.herolandg` and inherited, so the clone
+    # inherits from ITS OWN parent instead and is a stroke with no fill.
+    bounds = '<use href="#heroland"/>'
+
+    # A LITTLE WATER, AND THE RANK IS WHERE THE RESTRAINT LIVES. The plates
+    # draw rank 6 and every lake, which over the whole continent is 153 rivers
+    # and 65 lakes and 49 KB — a hydrology map with Europe underneath it. Rank
+    # 3 is the thirty-five a reader would name unprompted: the Danube, the
+    # Rhine, the Volga, the Loire, the Vistula, the Po. The lakes are cut by
+    # DRAWN AREA rather than by the dataset's own importance, because what a
+    # picture wants is the ones you can see: 55 becomes 22 and Ladoga, Vänern,
+    # Balaton and Geneva are all still there.
+    water = cartography.rivers(MAPPROJ, view, river_rank=3, lake_rank=0,
+                               thin_units=1.6, min_lake_units=25.0)
+
+    # NINE MARKS WERE TRIED HERE AND ARE NOT DRAWN, and the measurement is
+    # the reason rather than the taste.
+    #
+    # Every other map on this site carries human destinations and this one
+    # carries none, so the brief asked for seven to twelve extremely
+    # restrained points — not a dataset, just "the continent is populated with
+    # discoveries". It was built: one per macro region, placed on the real
+    # destination nearest that region's own centre, 2.6 units across, in the
+    # frontier ink, no label, no link, no title.
+    #
+    # Two things came back. At 2.6 units they render 2.3 pixels wide on a
+    # 1,440 window and you have to hunt for them, so they do not say the thing
+    # they were added to say; and anything large enough to say it is a dot on
+    # the cover of an atlas that the page cannot name. **A plate draws what it
+    # can name** is principle 2 of docs/cartographic-standard.md and is held
+    # at 176 marks named out of 176 across the fifty country plates. A mark
+    # this page cannot name is the "something is here" dot that rule exists to
+    # refuse, and the sentence directly under the picture already says it in
+    # words: fifty countries, and somewhere in them the thing you have not
+    # thought of yet.
+    #
+    # The centroid version also placed one mark in Belarus — an advisory
+    # country stripped from the planner — which is the second reason a derived
+    # point is not automatically an honest one.
+
     # AND THE LAND CARRIES ON PAST THE ATLAS, drawn as a different thing.
     #
     # Europe is not an island and this drawing said it was. Everything east of
@@ -354,8 +411,13 @@ def heroeurope(data):
     # 17% opacity and 4 KB apart on every request. Coarser than that starts
     # to show in Anatolia's south coast, which is the one stretch of this
     # layer that runs close to land the reader is looking at.
-    beyond = geo.beyondmass(MAPPROJ, view, thin_units=5.0, min_units=120.0,
+    # Thinned harder than the atlas because it is drawn as shadow rather than
+    # as a shape a reader reads — and it is cheap now that it is cut to the
+    # atlas's complement rather than to a box containing it: 18 KB of second,
+    # coarser European coastline became 6 KB of Asia, Arabia and the Sahara.
+    beyond = geo.beyondmass(MAPPROJ, view, thin_units=2.5, min_units=60.0,
                             pad=0.0)
+    beyond = [b for b in beyond if b]
     # THE DATA CUT IS A DIAGONAL, AND THE FADE THAT HID IT WAS VERTICAL.
     #
     # data/geo/ stops at 52°E. Under the conic that meridian runs from
@@ -386,6 +448,11 @@ def heroeurope(data):
     # the water is still a straight line across the north-east — the exact
     # thing the fade exists to remove.
     ex1, ey1, ex2, ey2 = _band(70.0, 40.0, 52.0, 360.0, 40.0)
+    # The ground's own fade-in is NARROWER than the atlas's fade-out, and on
+    # purpose: the atlas has 320 units to dissolve across because that dissolve
+    # is the picture, and the ground only has to arrive without an edge. It is
+    # fully there 40 units short of the cut, which is where the atlas is gone.
+    gx1, gy1, gx2, gy2 = _band(70.0, 40.0, 52.0, 150.0, 40.0)
     # THE SOUTHERN CUT WAS HIDDEN IN CSS AND SO WAS EVERYTHING NEAR IT. The
     # atlas holds North Africa down to 33°N and no further, and the bottom
     # eighth of the drawing was faded in the stylesheet to cover that straight
@@ -436,6 +503,32 @@ def heroeurope(data):
         f' x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}" height="{vh:.0f}">'
         f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
         f' height="{vh:.0f}" fill="url(#herofootg)"/></mask>'
+        # AND THE SAME TWO GRADIENTS RUN BACKWARDS FOR THE GROUND.
+        #
+        # The ground used to be drawn with no mask at all, because it lay
+        # under the whole picture and the atlas simply faded onto it. It is
+        # cut to the atlas's complement now, so it BEGINS somewhere — and a
+        # graphite shape beginning on a straight line in open sea is the
+        # rendering fault the fades exist to remove, arrived at from the other
+        # side. Each strip fades IN along the same edge the atlas fades OUT
+        # along: the same gradient geometry with the stops swapped, so the two
+        # cross over and neither has an edge.
+        f'<linearGradient id="heroedgein" gradientUnits="userSpaceOnUse"'
+        f' x1="{gx1:.1f}" y1="{gy1:.1f}" x2="{gx2:.1f}" y2="{gy2:.1f}">'
+        f'<stop offset="0" stop-color="#000"/>'
+        f'<stop offset="1" stop-color="#fff"/></linearGradient>'
+        f'<radialGradient id="herofootgin" gradientUnits="userSpaceOnUse"'
+        f' cx="{ax:.1f}" cy="{ay:.1f}" r="{r33:.1f}">'
+        f'<stop offset="{foot0:.4f}" stop-color="#000"/>'
+        f'<stop offset="{foot1:.4f}" stop-color="#fff"/></radialGradient>'
+        f'<mask id="heroeastin" maskUnits="userSpaceOnUse"'
+        f' x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}" height="{vh:.0f}">'
+        f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
+        f' height="{vh:.0f}" fill="url(#heroedgein)"/></mask>'
+        f'<mask id="herofootin" maskUnits="userSpaceOnUse"'
+        f' x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}" height="{vh:.0f}">'
+        f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
+        f' height="{vh:.0f}" fill="url(#herofootgin)"/></mask>'
         # RELIEF ONLY WHERE THIS ATLAS GOES. Anatolia and the Atlas mountains
         # are real ground and this file holds them, and drawn at the weight the
         # Alps are drawn at they took the right-hand third of the picture: the
@@ -447,11 +540,15 @@ def heroeurope(data):
         + (f'<clipPath id="herolandclip" clipPathUnits="userSpaceOnUse">'
            f'<use href="#heroland"/></clipPath>' if relief else "")
         + f'</defs>'
-        # THE GROUND, OUTSIDE BOTH MASKS. It is the one layer that must not
-        # fade: the fades exist to hand the eye from the atlas to this, and a
-        # fade applied to both would take the picture back to an edge.
-        + (f'<g class="lyr lyr-beyond"><path id="herobeyond" d="{beyond}"/></g>'
-           if beyond else "")
+        # THE GROUND, EACH STRIP FADING IN WHERE THE ATLAS FADES OUT. The
+        # first is east of 46°E and crosses over along the 52°E meridian; the
+        # second is south of 34°N and crosses over along the 33rd parallel.
+        # Both are one colour, so the strip that overlaps the other in the
+        # south-east corner cannot show a join.
+        + ('<g class="lyr lyr-beyond">'
+           + "".join(f'<g mask="url(#{m})"><path d="{d}"/></g>'
+                     for m, d in zip(("heroeastin", "herofootin"), beyond))
+           + '</g>' if beyond else "")
         + f'<g mask="url(#herofoot)"><g mask="url(#herocut)">'
         # OPACITY ON THE GROUP, NOT ON THE PAINT, and that is the whole fix.
         #
@@ -470,6 +567,13 @@ def heroeurope(data):
         + f'<g class="heroctxg">{ctx}</g><g class="herolandg">{land}</g></g>'
         + (f'<g class="lyr lyr-terrain" clip-path="url(#herolandclip)">'
            f'{relief}</g>' if relief else "")
+        # ORDER: terrain, then water, then the frontiers over both. Water is
+        # a separate visual layer and must never inherit land shading — a
+        # river under the relief would be tinted by the band it crosses and
+        # would change colour coming down a valley — and a frontier under the
+        # relief is not there at all.
+        + (f'<g class="lyr lyr-rivers">{water}</g>' if water else "")
+        + (f'<g class="lyr lyr-country-bounds">{bounds}</g>' if bounds else "")
         + f'</g></g></svg></div>'
     )
 

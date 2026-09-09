@@ -18,7 +18,7 @@ and never geographic truth.** Everything drawn here comes from a dataset in
 | # | principle | what holds it |
 |---|---|---|
 | 1 | **Terrain before polygon** | The fourteen-layer stack in `cartography.ORDER`. Terrain is **drawn** on the destination and journey families from a public-domain elevation model; hillshade and region boundaries stay declared, positioned and empty. A layer with no data emits nothing and raises the moment its file appears unwritten |
-| 2 | **Geography before database** | A plate draws what it can name. Measured across the fifty country plates: **176 marks, 176 of them named.** Not one anonymous dot |
+| 2 | **Geography before database** | A plate draws what it can name. Measured across the fifty country plates: **176 marks, 176 of them named.** Not one anonymous dot — and the homepage hero draws none at all, because nine restrained anchors were built, measured at 2.3 pixels, and removed rather than named |
 | 3 | **Context before density** | Three voices — the subject, its neighbours in warm parchment, the rest quieter with distance — banded by measured distance on the drawing, not by a list |
 | 4 | **Hierarchy before completeness** | One placement routine, one order: capital, city, destination, region. The capital is placed first and cannot be dropped |
 | 5 | **Editorial composition before uniform cards** | Four page grammars, each with its own answers to the nine questions in `docs/signature-moments.md` |
@@ -37,7 +37,7 @@ and never geographic truth.** Everything drawn here comes from a dataset in
 | destination | **where the ground earns it** | four hypsometric bands, subordinate to the place. 147 of 319 |
 | journey | **where the ground earns it, under 1,500 km** | the same bands as a backdrop to the route. 6 of 17 |
 | place | inherits its destination | it is the same picture of the same town |
-| homepage hero | **yes, as a picture** | three of the four bands over the whole continent — see below |
+| homepage hero | **yes, as a picture** | three of the four bands over the whole continent, at half the plate's strength — see below |
 | Europe overview | no | clean atlas |
 | `/map` | **no** | an instrument, and relief is an illustration layer |
 

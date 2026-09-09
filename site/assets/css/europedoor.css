@@ -1775,12 +1775,45 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    background layer can do; in graphite it would draw the frame itself. Found
    at 390px, where the drawing is a third of the size and there is nothing
    else to look at. */
-.heroeurope #herobeyond { fill: var(--graphite); stroke: none; }
-.heroeurope #heroland, .heroeurope #heroctx {
+.heroeurope .lyr-beyond path { fill: var(--graphite); stroke: none; }
+/* PAINTED BY INHERITANCE, NEVER BY ID, and that is what makes the boundary
+   pass free. The frontiers are a `<use>` of the same path above the terrain,
+   and a `<use>` clone is matched by any selector that matches the original —
+   `#heroland { fill }` would come back filled inside the copy. Nothing
+   selects the path: fill and stroke sit on the group and are inherited, so
+   the clone inherits from its own parent instead. See heroeurope(). */
+.heroeurope .herolandg, .heroeurope .heroctxg {
   fill: var(--atlas-land); stroke: var(--atlas-land);
   stroke-width: 1.4; stroke-linejoin: round; }
-.heroeurope .herolandg { opacity: .78; }
+/* 0.90 rather than 0.78. The land was let through to the sea underneath so
+   the continent would sit IN the water rather than on top of it, and at a
+   near-black ground that reading worked. On the lifted blue it just made the
+   parchment grey — the land and the relief were the same value and the eye
+   could not tell coast from country from mountain, which is the whole
+   difference between a map and a relief sculpture. */
+.heroeurope .herolandg { opacity: .90; }
 .heroeurope .heroctxg { opacity: .30; }
+/* FIFTY COUNTRIES, FELT RATHER THAN READ. Not a political map — at reading
+   distance nobody should think "I see borders", and everybody should know
+   this is a map of Europe rather than a relief sculpture of it. One ink,
+   thin, a quarter of the way from the parchment to the page's own ink, and
+   the same stroke draws the COAST: a frontier has parchment on both sides
+   and the coastline has the sea on one, so the coast comes out the sharpest
+   line in the drawing without a second weight being declared anywhere. */
+.heroeurope .lyr-country-bounds {
+  fill: none; stroke-width: 1.05; stroke-linejoin: round;
+  stroke: color-mix(in srgb, var(--graphite) 30%, var(--atlas-land)); }
+/* WATER IS ITS OWN MATERIAL, and it is the sea's colour rather than a
+   darker land. Thinner than the coastline: a river drawn as heavily as a
+   coast turns a country into a leaf. */
+.heroeurope .lyr-rivers .riv {
+  fill: none; stroke-width: .8; stroke-linecap: round;
+  stroke: color-mix(in srgb, var(--ocean-deep) 44%, var(--atlas-land)); }
+.heroeurope .lyr-rivers .riv.major { stroke-width: 1.15; }
+
+.heroeurope .lyr-rivers .lake {
+  stroke: none;
+  fill: color-mix(in srgb, var(--ocean-deep) 72%, var(--atlas-land)); }
 /* THE SAME ABSOLUTE SCALE, AND FOR ONE COMMIT IT WAS NOT. These are
    cartography.HYPSOMETRIC's own colours — 600 m warm ochre, 1,200 m pale
    brown, 2,000 m light stone — and the top one was #efe9dd here against
@@ -1802,9 +1835,14 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 /* No `stroke: none` here: nothing strokes a band, and the dead-rule scan
    counts a declaration that changes nothing as dead however defensive it is. */
 .heroeurope .lyr-terrain .tband { fill-rule: evenodd; }
-.heroeurope .lyr-terrain .t600  { fill: color-mix(in srgb, #d5c9a8 74%, transparent); }
-.heroeurope .lyr-terrain .t1200 { fill: color-mix(in srgb, #cdbb9c 82%, transparent); }
-.heroeurope .lyr-terrain .t2000 { fill: color-mix(in srgb, #e6e0d6 92%, transparent); }
+/* AND THE ALPS ARE DISCOVERABLE RATHER THAN THE HEADLINE. The alphas were
+   74/82/92, chosen when relief was the only thing in the picture besides the
+   coastline; with frontiers, rivers and lakes in it the eye went terrain,
+   terrain, terrain, and only then Europe. Continent first, geography second,
+   terrain third. */
+.heroeurope .lyr-terrain .t600  { fill: color-mix(in srgb, #d5c9a8 52%, transparent); }
+.heroeurope .lyr-terrain .t1200 { fill: color-mix(in srgb, #cdbb9c 62%, transparent); }
+.heroeurope .lyr-terrain .t2000 { fill: color-mix(in srgb, #e6e0d6 74%, transparent); }
 
 /* The way in, moved out of the opening. A form inside the doorway made the
    first screen a search box with a picture behind it; the invitation is the
@@ -1932,10 +1970,25 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    * water rather than a panel. Limestone measures 8.4:1 on the lightest
    * point of the first and 8.6:1 where the two stack, against 10.4:1 on the
    * bare ground — AAA throughout, and the browser suite re-measures it. */
+  /* AND THE WATER HAD TO BECOME OBVIOUSLY WATER. `--ocean-deep` alone is
+   * #123f55, which against limestone type is a magnificent 10.4:1 and against
+   * warm parchment land is very nearly black: the hero read as a relief
+   * sculpture lit on a dark ground rather than as land in a sea. Every plate
+   * on this site sits on the same four-step Atlantic ramp and uses more of
+   * it; the hero was pinned to the deepest step because it was built when the
+   * map was a faint silhouette that needed the contrast.
+   *
+   * The ground is 55% of the way up that ramp now — #1e5469, a desaturated
+   * European blue rather than a navy — and the parchment above it is
+   * luminous instead of grey. Limestone measures 7.7:1 on it bare and 6.9:1
+   * on the lightest point of the pool over it, against 10.4 and 8.4 before:
+   * AAA for the headline, AA with room for the standfirst, and the browser
+   * suite re-measures both. It is a mix of two tokens rather than a new one:
+   * this is the same ocean, further up its own ramp. */
   background:
     radial-gradient(58% 54% at 46% 74%, color-mix(in srgb, var(--ocean-mid) 40%, transparent), transparent 70%),
     radial-gradient(70% 60% at 10% 30%, color-mix(in srgb, var(--atlantic) 18%, transparent), transparent 66%),
-    var(--ocean-deep);
+    color-mix(in srgb, var(--ocean-mid) 55%, var(--ocean-deep));
   color: var(--limestone);
 }
 /* The photograph, when one is licensed, and the scrim that keeps the type

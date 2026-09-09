@@ -737,7 +737,12 @@ def landmass(proj, view, doc=None, highlight=None, pad=40.0, bands=None,
 
 
 def beyondmass(proj, view, thin_units=0.0, min_units=0.0, pad=40.0):
-    """The land outside the atlas, as one path of `d` data and nothing else.
+    """The land outside the atlas: one path of `d` data PER STRIP.
+
+    A list rather than a string, because the two strips cross-fade with the
+    atlas along different edges — the eastern one along the 52°E meridian and
+    the southern one along the 33rd parallel — and a single mask for both
+    would erase the Sahara or the Urals depending which edge it followed.
 
     `beyond-lod0.json` holds anonymous rings — no country, no slug, no title —
     because it is scenery for one picture rather than geography this product
@@ -753,11 +758,16 @@ def beyondmass(proj, view, thin_units=0.0, min_units=0.0, pad=40.0):
     """
     doc = load("beyond-lod0.json")
     if not doc:
-        return ""
+        return []
     x, y, w, h = view
     box = (x - pad, y - pad, x + w + pad, y + h + pad)
+    return [_beyond_strip(st["rings"], proj, box, thin_units, min_units)
+            for st in doc["strips"]]
+
+
+def _beyond_strip(rings, proj, box, thin_units, min_units):
     out = []
-    for ring in doc["rings"]:
+    for ring in rings:
         pts = [proj.xy(ring[i + 1], ring[i]) for i in range(0, len(ring), 2)]
         xs = [p[0] for p in pts]
         ys = [p[1] for p in pts]

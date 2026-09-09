@@ -981,6 +981,74 @@ one that was removed** — that one hid a data cut at 33°N and now lives inside
 the drawing as a radial gradient along that parallel. This one ends the
 picture, and a picture that ends may say so.
 
+**The hero was a relief sculpture of Europe, not an atlas of it.** Water,
+silhouette, terrain — three layers, where every other map here draws
+frontiers, rivers, lakes, a coastline in ink and a subject. The land was one
+value everywhere, so the eye could not read coast → country → mountain →
+water, which is the whole difference between a map and a beautiful shape.
+Five layers were added and one was tested and rejected.
+
+**Frontiers cost 27 bytes, because the pass is a `<use` of the land path.**
+ORDER puts `country-bounds` above `terrain` and it has to — a boundary here
+is a stroke on the land path and the bands paint over it — and repeating
+43 KB of country rings on the homepage to say so is not affordable. The escape
+from the `<use>` selector trap that this repository already lost a day to is
+to **paint by inheritance rather than by id**: nothing selects `#heroland` any
+more, fill and stroke sit on `.herolandg`, so the clone inherits from its own
+parent and comes out a stroke with no fill. One ink draws the frontiers and
+the coast, and the coast comes out the sharpest line in the drawing without a
+second weight being declared anywhere — a frontier has parchment on both sides
+and a coastline has the sea on one.
+
+**The water had to become water.** `--ocean-deep` alone is very nearly black
+against warm parchment, and the hero was pinned to the deepest step of the
+Atlantic ramp because it was built when the map was a faint silhouette that
+needed the contrast. It sits 55% up that ramp now, the land went 0.78 → 0.90
+so the parchment is luminous rather than grey, and the relief dropped to
+52/62/74% so the Alps are discoverable rather than the headline. Limestone
+measures 7.7:1 on the new ground and 6.9:1 on the lightest point of the pool
+over it, against 10.4 and 8.4 before.
+
+**Rank is where restraint lives in a water layer.** The plates draw rank 6 and
+every lake, which over the whole continent is 153 rivers, 65 lakes and 49 KB —
+a hydrology map with Europe underneath it. The hero draws rank 3 and cuts
+lakes by **drawn area** rather than by the dataset's own importance, because
+what a picture wants is the ones you can see: 9.5 KB, 35 rivers, 22 lakes,
+and Ladoga, Vänern, Balaton and Geneva are all still there.
+
+**Nine marks were built, measured and removed.** The brief asked for seven to
+twelve extremely restrained points, so the continent would not read as empty
+terrain: one per macro region, on the real destination nearest that region's
+centre, no label, no link, no title. At 2.6 units they render 2.3 pixels wide
+and you have to hunt for them, so they do not say the thing they were added to
+say — and anything large enough to say it is **a dot on the cover of an atlas
+that the page cannot name**, which is principle 2 and is held at 176 marks
+named out of 176 across the fifty country plates. The centroid version also
+put one in Belarus, an advisory country stripped from the planner: a derived
+point is not automatically an honest one. The sentence under the picture
+already says it in words.
+
+**Two levels of detail of the same coast can be stacked only where one is
+hidden.** The ground beyond the atlas was every landmass in a box that
+CONTAINS Europe, so under every European coast there was a second, coarser
+copy of the same coastline — and in graphite under translucent parchment the
+disagreement showed as a **black fringe** five or six units wide along
+Anatolia, the Black Sea and North Africa. It reads as a drop shadow, which is
+exactly the kind of accident that gets mistaken for a decision. The layer is
+cut to the atlas's **complement** now — the strip east of the atlas and the
+strip south of it — which also took it from 18 KB to 6.
+
+**And a complement has to cross-fade, not abut.** Cut exactly at 52°E and
+33°N the two met edge-to-edge, and the atlas's eastern fade is 320 units wide
+and already down to 4% at 46°E: between them was a band of bare sea and then a
+hard black diagonal, which is the rendering fault the fade was written to
+remove, arrived at from the other side. Each strip reaches back into the atlas
+and fades **in** along the same edge the atlas fades **out** along — the same
+gradient geometry with the stops swapped — so the two cross over and neither
+has an edge. The strips are kept separately in the file for that reason: one
+mask for both would erase the Sahara or the Urals depending which edge it
+followed.
+
 **A parallel is not a horizontal line on a conic, and the first southern fade
 was one.** The 33rd runs from y=706 over Tunisia to y=590 over the Caspian,
 so a horizontal gradient placed on the Tunisian end left the cut showing right
