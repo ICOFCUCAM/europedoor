@@ -853,6 +853,32 @@ def heroeurope(data):
         # white is opaque: the fill and stroke are presentation attributes on
         # the `<use>` itself, which the clone inherits, because nothing
         # selects the paths inside.
+        # THE SHORE, AS A DRAWING CONVENTION AND NOT AS A CLAIM ABOUT DEPTH.
+        #
+        # Half of this picture is water and it was one flat wash: a 20% crop
+        # of the middle read as a competent atlas of north-west Europe and as
+        # nothing else. What a printed atlas puts there is a graduated band
+        # along every coast, and what makes it honest is that it is CONSTANT
+        # WIDTH — real bathymetry is not, and nothing here holds a sounding.
+        # It is the land's own silhouette, blurred, in the lighter step of the
+        # same Atlantic ramp the ground is drawn from, underneath everything.
+        # No geometry: a `<use>` and a blur.
+        f'<filter id="heroshore" x="-6%" y="-6%" width="112%" height="112%"'
+        f' color-interpolation-filters="sRGB">'
+        f'<feGaussianBlur stdDeviation="4.5"/></filter>'
+        # THE PAPER. Editorial cartography is printed, and every plate on this
+        # site is drawn as paper and graphite; the hero was the one surface
+        # with no material in it at all — two flat washes and a coastline.
+        # Fractal noise at a fine frequency, desaturated to a neutral and laid
+        # over the whole picture at a few per cent, is the grain of the stock
+        # rather than a texture of anything: it claims nothing, it is the same
+        # everywhere, and it is what makes the difference between a fill and a
+        # surface. One filter, no geometry, no request.
+        f'<filter id="herograin" x="0" y="0" width="100%" height="100%"'
+        f' color-interpolation-filters="sRGB">'
+        f'<feTurbulence type="fractalNoise" baseFrequency="0.9"'
+        f' numOctaves="3" stitchTiles="stitch" result="n"/>'
+        f'<feColorMatrix in="n" type="saturate" values="0"/></filter>'
         + (f'<mask id="herolandmask" maskUnits="userSpaceOnUse"'
            f' x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
            f' height="{vh:.0f}">'
@@ -885,6 +911,25 @@ def heroeurope(data):
         # overlapping strokes inside it cannot double. The paths are opaque and
         # the group is not, which looks identical where nothing overlaps and
         # correct where things do.
+        + f'<g class="lyr lyr-coastal-water" aria-hidden="true">'
+        f'<use href="#heroctx" filter="url(#heroshore)"/>'
+        f'<use href="#heroland" filter="url(#heroshore)"/></g>'
+        # AND THE COAST IS HEAVIER THAN A FRONTIER, for 27 bytes. A coastline
+        # is where land meets sea and a frontier is a line drawn on land, and
+        # until now both were the same stroke: the hierarchy every atlas has
+        # was missing. A second `<use>` UNDER the land, stroked wider and
+        # darker, shows only the half of its stroke that falls outside the
+        # fill — which is exactly the coast, and never an internal border,
+        # because a neighbour's fill covers it.
+        #
+        # NOT A `lyr-` LAYER, and the order check is right to have said so.
+        # ORDER puts `coastline` after the rivers, and there it would be drawn
+        # OVER the land and would stroke every internal frontier at coast
+        # weight. In this drawing the coastline is still what ORDER says it
+        # is — the land path's own edge — and this is how that edge is given
+        # its weight, which is a rendering technique rather than a layer.
+        + f'<g class="herocoast" aria-hidden="true">'
+        f'<use href="#heroctx"/><use href="#heroland"/></g>'
         + f'<g class="lyr lyr-land">'
         + f'<g class="heroctxg" aria-hidden="true">{ctx}</g>'
         + f'<g class="herolandg">{land}</g></g>'
@@ -911,6 +956,17 @@ def heroeurope(data):
         # the atlas's own land. It is not a cartographic layer and is not in
         # ORDER: it is the light in the room, and the reason the continent
         # dissolves eastward into the ground it stands on rather than ending.
+        # THE GRAIN IS ON THE LAND AND NOT ON THE WHOLE PICTURE. It covered
+        # the frame first, and the frame is the SVG — which is 78% of the
+        # hero, inset right, with bare background either side of it. The
+        # result was a hard vertical seam down the middle of the Atlantic
+        # between grained water and smooth water. Masked to the land it
+        # cannot have an edge, and the land is what was flat: the sea has the
+        # shore band and the deep-water ramp now, and paper is what the
+        # continent is printed on.
+        + f'<rect class="herograin" aria-hidden="true" mask="url(#herodim)"'
+        f' x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
+        f' height="{vh:.0f}" filter="url(#herograin)"/>'
         + f'<g class="herodusk" aria-hidden="true" mask="url(#herodim)">'
         + f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
         f' height="{vh:.0f}" fill="url(#heroedge)"/>'

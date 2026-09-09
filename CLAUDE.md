@@ -981,6 +981,52 @@ one that was removed** — that one hid a data cut at 33°N and now lives inside
 the drawing as a radial gradient along that parallel. This one ends the
 picture, and a picture that ends may say so.
 
+**The art-direction pass, and its test was a 20% crop.** Cut the hero into
+tiles the size of a fifth of it, hide the masthead, the wordmark and the
+headline, and look: the middle tile read as *a competent atlas of north-west
+Europe* and as nothing else. Half of it was one flat blue field and the other
+half was one flat cream one. Everything that followed came from that tile
+rather than from a list of features other maps have.
+
+**A shore band, from the palette's own ocean ramp.** `--ocean-deep`,
+`--ocean-mid`, `--ocean-shallow`, `--ocean-coastal` — four steps, and the hero
+used one and a half of them. The land's silhouette, blurred four and a half
+units, in `--ocean-shallow` under everything: the North Sea, the Irish Sea and
+the Baltic become near water and the open Atlantic stays far. **Constant
+width, because it is a drawing convention and not a claim** — nothing here
+holds a sounding, and real bathymetry is not a constant band. No geometry: a
+`<use>` and a blur.
+
+**A soft halo reads as an object glowing; a narrow one reads as water.** The
+first version mixed a lighter blue by hand and blurred it at nine units, and
+Iceland came out with a lit aura round it. Same idea, four units apart.
+
+**The coast is heavier than a frontier now, for 27 bytes.** A coastline is
+where land meets sea and a frontier is a line drawn on land, and both were the
+same stroke. A `<use>` UNDER the land, stroked wider and darker, shows only
+the half of its stroke that falls outside the fill — exactly the coast, and
+never an internal border, because a neighbour's fill covers it. **It is not a
+`lyr-` layer and the order check was right to say so**: ORDER puts `coastline`
+after the rivers, where it would stroke every frontier at coast weight.
+
+**Paper.** Fractal noise at a fine frequency, desaturated, multiplied over the
+land at 8.5%. It claims nothing and is the same everywhere; it is the
+difference between a fill and a surface. **On the LAND, not the frame** — the
+first version covered the SVG, which is 78% of the hero inset right, and drew
+a hard vertical seam down the middle of the Atlantic between grained water and
+smooth water.
+
+**And the reveal, which is the one part of the signature the hero did not
+have.** Every plate cuts the aperture three ways and then draws two more
+things at the cut: the wall's face laid over the drawing's edge, and a fine
+ink line just inside it — which is what an opening in masonry actually shows
+and where the eye reads depth from. The hero cuts the arch at the largest size
+it appears anywhere and had a rounded rectangle. Same colour, same weight,
+same 38% graphite as the 824 plates, fading out down the sides because the
+bottom of this arch is not a cut. An `outline` rather than an inset
+`box-shadow`, because the register counts shadows and two is the whole
+vocabulary.
+
 **The countries are named, and the name is the only type on the picture.**
 Every other map here sets a country's name across it, and for the same second
 reason: the recognition instrument strips the wordmark and the page title, and

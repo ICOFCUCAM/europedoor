@@ -1784,10 +1784,40 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    at 390px, where the drawing is a third of the size and there is nothing
    else to look at. */
 .heroeurope .lyr-beyond path { fill: var(--graphite); stroke: none; }
+/* THE SHORE BAND, AND IT IS THE PALETTE'S OWN SHALLOW STEP. The ocean ramp
+   has four: deep, mid, shallow, coastal. The hero's ground is 55% of the way
+   from deep to mid and the water had nothing else in it, so half the picture
+   was one flat field — a 20% crop of the middle read as a competent atlas of
+   north-west Europe and as nothing else.
+
+   `--ocean-shallow`, tight rather than soft. The first version mixed a
+   lighter blue by hand and blurred it at nine units, and Iceland came out
+   with a LIT AURA round it: a soft halo reads as an object glowing, and a
+   narrow band reads as water getting shallower. Same idea, four units apart.
+
+   Constant width, because it is a drawing convention and not a claim about
+   depth — nothing in this repository holds a sounding, and real bathymetry
+   is not a constant band. */
+.heroeurope .lyr-coastal-water use {
+  fill: color-mix(in srgb, var(--ocean-shallow) 76%, transparent); }
+/* THE COAST, HEAVIER THAN A FRONTIER. Only the outer half of this stroke is
+   ever seen: the land's own fill covers the rest, and a neighbour's fill
+   covers it along every internal border. So one declaration gives the
+   coastline its own weight without a second geometry and without the
+   frontiers gaining any. */
+.heroeurope .herocoast use {
+  fill: none; stroke-width: 2.4; stroke-linejoin: round;
+  stroke: color-mix(in srgb, var(--graphite) 52%, var(--atlas-land)); }
 /* THE DUSK IS THE SAME GRAPHITE AS THE GROUND, which is what makes the
    continent dissolve INTO it rather than under a grey veil. The stops carry
    their own opacity; only the colour is set here, in one place, so the ground
    and the light that turns the atlas into it can never drift apart. */
+/* THE GRAIN, AT THE STRENGTH OF A PAPER STOCK AND NOT OF A TEXTURE. Over
+   everything the atlas drew and under the dusk, multiplying so it darkens the
+   light half of the picture and leaves the dark half alone — which is what a
+   printed grain does and what an added-light one would not. */
+.heroeurope .herograin { opacity: .085; mix-blend-mode: multiply;
+                         pointer-events: none; }
 .heroeurope .herodusk stop { stop-color: var(--graphite); }
 /* EVERY LAYER OVER THE LAND IS TRANSPARENT TO A POINTER. The terrain, the
    rivers, the frontiers and the dusk are all drawn above the countries and
@@ -2042,6 +2072,32 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
     color-mix(in srgb, var(--ocean-mid) 55%, var(--ocean-deep));
   color: var(--limestone);
 }
+/* THE REVEAL — THE ONE PART OF THE SIGNATURE THE HERO DID NOT HAVE.
+ *
+ * An `outline` rather than an inset `box-shadow`: both follow the radius and
+ * neither affects layout, and the invariant register counts shadows. Two is
+ * the whole vocabulary — a rest state and a lifted one — and a cut edge is
+ * not a third of those.
+ *
+ * Every plate on this site cuts its aperture three ways and then draws two
+ * more things at the cut: `.archrim`, the wall's face laid over the drawing's
+ * edge, and `.archrim.inner`, a fine ink line just inside it. That second
+ * line is what an opening in masonry actually shows and where the eye reads
+ * depth from — and the hero, which cuts the arch at the largest size it
+ * appears anywhere, had a rounded rectangle and nothing at the cut.
+ *
+ * Same relationship, same colour, same weight as the 824 plates: graphite at
+ * 38%, one pixel, inside the curve. It fades out down the sides because the
+ * bottom of this arch is not a cut — it is where the picture meets the page,
+ * and a line across it would read as a border on the section below. */
+.herofull::before {
+  content: ""; position: absolute; inset: 0; z-index: 1;
+  border-radius: inherit; pointer-events: none;
+  outline: 1px solid color-mix(in srgb, var(--graphite) 38%, transparent);
+  outline-offset: -1px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 46%, transparent 84%);
+  mask-image: linear-gradient(to bottom, #000 46%, transparent 84%); }
+
 /* The photograph, when one is licensed, and the scrim that keeps the type
  * readable over it. A scrim is not decoration here: it is what makes the
  * contrast ratio a property of the design rather than of the picture. */
