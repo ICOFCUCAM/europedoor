@@ -103,6 +103,20 @@ def arch_clip(uid, w, h, rise=None, x0=0.0, y0=0.0):
             f'<path d="{arch_path(w, h, rise)}"{off}/></clipPath>')
 
 
+def arch_rim(w, h, rise=None, x0=0.0, y0=0.0):
+    """The wall's own edge, outside the reveal.
+
+    A printed plate has a reveal you can see the THICKNESS of. The aperture
+    had one hairline, which reads as a border rather than as an opening cut
+    through something. Two lines — the outer in the page's own limestone,
+    the inner in ink — is what an architectural opening actually shows: the
+    face of the wall, and then the shadow of the cut. Drawn from the same
+    `arch_path()` as the clip and the reveal, because three curves that
+    disagree by a pixel is three signatures.
+    """
+    return f'<path class="archrim" d="{arch_path(w, h, rise)}"/>'
+
+
 def arch_edge(w, h, rise=None, x0=0.0, y0=0.0):
     """The cut edge of the aperture — the reveal.
 

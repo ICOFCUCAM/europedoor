@@ -66,6 +66,106 @@ def load(name):
     return _CACHE[name]
 
 
+# ── THE LAYER STACK ───────────────────────────────────────────────────
+#
+# BUILD THE TERRAIN-READY ARCHITECTURE; DO NOT INVENT TERRAIN.
+#
+# A cartographic plate is not one drawing, it is an ordered stack, and the
+# reason to declare the stack rather than emit three groups inline is that
+# TWO OF ITS LAYERS HAVE NO DATA YET. Relief and hydrology are the largest
+# visual gap between this atlas and a printed one, and the honest way to hold
+# that gap open is to give each of them a real slot with a named dataset
+# requirement, a fixed position in the paint order and its own class — so the
+# day `data/geo/` carries rivers, one file appears and the layer draws.
+#
+# The rule this encodes is the Data Integrity Rule applied to DRAWING: a
+# layer whose dataset is absent emits NOTHING. Not a placeholder, not a
+# gradient standing in for relief, not a hand-drawn river. An invented
+# terrain shade is a measurement authored, and it would be the most
+# convincing wrong thing this repository has ever drawn, because a reader
+# cannot tell a fitted hillshade from a decorative one.
+#
+# `needs` is a file in data/geo/, or None for a layer drawn from data the
+# build already holds. `checks.py` asserts that every layer here is either
+# drawn or absent-with-a-stated-dataset, that the paint order is the one the
+# stylesheet expects, and that no page claims a layer that is not held.
+LAYERS = (
+    # name                needs                    what it draws / will draw
+    ("ocean",             None,                    "the water, and the ground of the opening"),
+    ("coastal-water",     None,                    "the band of lighter water along a coast"),
+    ("land",              "countries",             "land, as a filled field of warm paper"),
+    ("terrain",           "terrain-lod1.json",     "elevation tint: upland warmer, lowland cooler, four steps, no more"),
+    ("hillshade",         "hillshade-lod1.json",   "relief, one light from the north-west, at most 12% opacity, never on flat ground"),
+    ("rivers",            "hydrology-lod1.json",   "rivers by order and lakes, in the water colour, thinner than any coastline"),
+    ("coastline",         "countries",             "the edge between land and water, the heaviest line that is not the subject"),
+    ("country-bounds",    "countries",             "frontiers between neighbours, the lightest line on the plate"),
+    ("region-bounds",     "regions-lod1.json",     "regional frontiers, dashed and lighter still. REFUSED, not merely absent"),
+    ("cities",            None,                    "the capital, and cities where a source names them"),
+    ("destinations",      None,                    "the places this atlas writes about"),
+    ("labels",            None,                    "names, in one hierarchy, placed against the aperture"),
+    ("route",             None,                    "a journey's line, where the plate is a route"),
+    ("selected",          "countries",             "the country or place the plate is about"),
+)
+
+# HOW A LAYER WILL LOOK WHEN IT IS POPULATED, stated now so the renderer is
+# terrain-ready rather than terrain-hopeful. Each of these is a decision that
+# does not depend on having the data, and writing it down is what stops the
+# day the data arrives from becoming a fresh argument about style.
+#
+#   terrain     Four steps and no more, from the palette's own land tone
+#               towards its warm accent. No hypsometric rainbow: the whole
+#               point of an editorial atlas is that height is felt, not read.
+#   hillshade   One light, from the north-west, at most 12% opacity,
+#               multiplied over the terrain tint and clipped to land. Never
+#               over flat ground, where it invents structure.
+#   rivers      In the water colour, by stream order, and always thinner than
+#               the coastline — a river drawn as heavily as a coast turns a
+#               country into a leaf.
+#   region      Dashed, lighter than a country frontier, and labelled in the
+#   bounds      same small caps as a sea. REFUSED today on licensing rather
+#               than missing: Eurostat NUTS is the only pan-European source
+#               and its provisions have not been read.
+LAYER_LOOK_DECIDED = ("terrain", "hillshade", "rivers", "region-bounds")
+
+
+def layer_state():
+    """Which layers this repository can draw today, and which cannot.
+
+    Returns [(name, needs, drawn, why)] in paint order. A layer that needs a
+    file `data/geo/` does not have is reported as not drawn, with the file it
+    is waiting for — which is what `/sources` prints and what `checks.py`
+    reads. Absence is stated, never filled.
+    """
+    out = []
+    for name, needs, role in LAYERS:
+        if needs is None or needs == "countries":
+            out.append((name, needs, True, role))
+            continue
+        drawn = os.path.exists(os.path.join(GEO, needs))
+        out.append((name, needs, drawn, role))
+    return out
+
+
+def layers_held():
+    return [n for n, _needs, drawn, _r in layer_state() if drawn]
+
+
+def layers_waiting():
+    return [(n, needs) for n, needs, drawn, _r in layer_state() if not drawn]
+
+
+def layer_group(name, body=""):
+    """One layer of the stack, as its own group, in paint order.
+
+    Emitted even when empty for the layers that ARE held, because a group
+    with a class is where a stylesheet and a reader of the DOM find a layer;
+    NOT emitted at all for a layer whose dataset is absent, because an empty
+    `<g class="terrain">` on 1,033 pages is a claim that terrain is a thing
+    this map has and simply had none of here.
+    """
+    return f'<g class="lyr lyr-{name}" aria-hidden="true">{body}</g>'
+
+
 def country(slug):
     return load(os.path.join("country", slug + ".json"))
 

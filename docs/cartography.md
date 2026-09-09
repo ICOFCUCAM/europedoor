@@ -21,7 +21,67 @@ That is what the two worlds have always meant — not a theme, but whether the
 reader is browsing or working — and it is why black remains available for the
 compositions that earn it rather than being the default for all 824 figures.
 
-## The four layers
+## Cartography v2 — the fourteen layers
+
+The stack is declared in `geo.LAYERS` and walked by `pages.plate_stack()`.
+Four of the fourteen have no data. **They are not stubs that draw something
+plausible**: a layer whose dataset is absent emits nothing at all, not even an
+empty group, because an empty `<g class="terrain">` on 1,033 pages is a claim
+that the map has terrain and simply had none here. `terrain_paths()`,
+`hillshade_paths()` and `hydrology_paths()` exist, return nothing today, and
+**raise loudly** the moment their file appears without them being written.
+
+| # | layer | data | held |
+|---|---|---|---|
+| 1 | ocean | none needed | yes |
+| 2 | coastal water | derived from the coastline | yes |
+| 3 | land | `country/*.json` | yes |
+| 4 | terrain | `terrain-lod1.json` | **no** |
+| 5 | hillshade | `hillshade-lod1.json` | **no** |
+| 6 | rivers | `hydrology-lod1.json` | **no** |
+| 7 | coastline | `country/*.json` | yes |
+| 8 | country boundaries | `country/*.json` | yes |
+| 9 | region boundaries | `regions-lod1.json` | **no, and refused** |
+| 10 | cities | `data/countries` | yes |
+| 11 | destinations | `data/countries` | yes |
+| 12 | labels | derived | yes |
+| 13 | route | derived | yes |
+| 14 | selected place | `country/*.json` | yes |
+
+### How the empty layers will look, decided now
+
+Writing this down is what stops the day the data arrives from becoming a
+fresh argument about style.
+
+- **Terrain** — four steps and no more, from the land tone toward the warm
+  accent. No hypsometric rainbow: in an editorial atlas height is felt, not
+  read off a legend.
+- **Hillshade** — one light from the north-west, at most 12% opacity,
+  multiplied over the terrain tint and clipped to land. **Never over flat
+  ground**, where it invents structure that is not there.
+- **Rivers** — in the water colour, by stream order, always thinner than the
+  coastline. A river drawn as heavily as a coast turns a country into a leaf.
+- **Region boundaries** — dashed, lighter than a country frontier, labelled in
+  the same small caps as a sea.
+
+### What was built for the data that IS held
+
+- **Coast treatment.** The soft band a printed atlas puts in the water along a
+  coast, drawn by stroking the land silhouette under the land fill. Emitted as
+  a `<use>` so the geometry is not paid for twice: about forty bytes a plate.
+  It is a convention, **not bathymetry** — the atlas holds no depth data.
+- **Boundary hierarchy.** Three weights: a frontier is lightest because it is
+  context, a coast is the edge of the subject's world, the subject's own
+  outline is the heaviest thing on the plate.
+- **Label and city hierarchy.** The capital in cobalt and bold, destinations in
+  ink, and the capital placed first so it wins every collision.
+- **A Europe locator**, with the subject ringed, because a country filled at
+  112px across the continent is three pixels a reader's eye never finds.
+- **A key**, so a map stops needing a caption to explain its own dots.
+- **A limestone rim** outside the reveal: the face of the wall, then the shadow
+  of the cut, both from the same `arch_path()`.
+
+## The four layers (v1, superseded above)
 
 1. **The window.** The aperture, unchanged: `arch_path()` at rx = span/2, ry =
    34% of height, cut three ways. On paper it is read by its **cut edge**

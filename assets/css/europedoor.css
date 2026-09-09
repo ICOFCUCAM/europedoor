@@ -1660,7 +1660,13 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    proportion follows its subject — a signature that is the same shape at
    every size is a stamp. */
 .pagehead.portraithead { display: grid; gap: var(--s6); align-items: center; }
-.portrait { margin: 0; width: min-content; }
+/* THE PLATE: the figure and its foot. The locator and the key started
+   INSIDE the figure and inherited the whole atlas skin through the cascade —
+   `.minimap.arched.atlas .context path` is (0,4,1) and beat every rule the
+   inset had, so Europe was drawn in the plate's own land and coast colours
+   at 80 pixels and read as a scribble. A sibling, not a child. */
+.plate { width: min-content; }
+.portrait { margin: 0; }
 /* One page in the atlas carries a caption under its door — Russia, whose
    outline is closed by the 52°E edge of data/geo/ rather than by a border.
    `min-content` above is what keeps that sentence wrapping to the door's own
@@ -1697,7 +1703,7 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
      column of nothing beside it. */
   .pagehead.portraithead { grid-template-columns: minmax(0, 1fr) auto;
                            column-gap: var(--s8); }
-  .portrait { justify-self: end; }
+  .plate { justify-self: end; }
 }
 @media (max-width: 52rem) {
   /* On a phone the portrait goes under the name and loses a third of its
@@ -2445,6 +2451,58 @@ body[data-hero] .masthead { position: sticky; }
    and the marks are kept, which is the rule every other map here follows:
    every one of these places is named in full in the regions band below. */
 @media (max-width: 62rem) { .minimap.arched.atlas .pname { display: none; } }
+
+/* THE LIMESTONE RIM. A printed plate has a reveal you can see the thickness
+   of; the arch had a single hairline. Two lines, the outer in the page's own
+   limestone and the inner in ink, is what an architectural opening actually
+   shows: the wall's edge, then the shadow of the cut. */
+.minimap.arched.atlas .archedge { stroke-width: 1.1; }
+.minimap.arched.atlas .archrim { fill: none; stroke: var(--limestone);
+                                 stroke-width: 4; }
+
+/* THE PLATE FOOT: where in Europe this is, and what the marks mean. Both are
+   on the benchmark and both are cheap; a key is how a map stops needing a
+   caption to explain its own dots. */
+.platefoot { display: flex; align-items: flex-start; gap: var(--s5);
+             margin-top: var(--s4); }
+.locator { margin: 0; flex: 0 0 auto; }
+.locator svg { display: block; width: 7rem; height: auto; }
+.locator .countries path { fill: var(--limestone-3); stroke: none; }
+.locator .context path { fill: var(--limestone-3); stroke: none; }
+.locator .countries path.here { fill: var(--door); stroke: none; }
+.locator .locring { fill: none; stroke: var(--door); stroke-width: 1.2; }
+.locator figcaption { font-size: var(--t-xs); color: var(--ink-3);
+                      letter-spacing: .08em; text-transform: uppercase;
+                      margin-top: var(--s2); }
+.platekey { list-style: none; margin: 0; padding: 0; display: grid;
+            gap: var(--s2); font-size: var(--t-xs); color: var(--ink-3); }
+.platekey li { display: flex; align-items: center; gap: var(--s3); }
+.platekey li::before { content: ""; flex: 0 0 auto; width: 10px; height: 10px;
+                       border-radius: 999px; }
+.platekey .k-cap::before { background: var(--door); }
+.platekey .k-dest::before { background: var(--atlas-hereline); }
+.platekey .k-here::before { background: var(--atlas-here);
+                            border: 1px solid var(--atlas-hereline);
+                            border-radius: 2px; }
+
+/* THE COAST TREATMENT. A printed atlas puts a soft band in the water along
+   a coast, and it is what makes a coastline read as an edge rather than as
+   a line between two flat fields. Drawn by stroking the land silhouette
+   thickly UNDER the land fill, so the band falls entirely in the water.
+   It is a convention, not bathymetry: this atlas holds no depth data and
+   this says nothing about how deep anything is. */
+.minimap.arched.atlas .coasthalo { fill: none;
+  stroke: color-mix(in srgb, var(--atlas-coast) 34%, transparent);
+  stroke-width: 7; stroke-linejoin: round; }
+
+/* THE BOUNDARY HIERARCHY. One weight for everything made a frontier and a
+   coast the same statement, and put the country this plate is about at the
+   same weight as the country next to it. Three: a frontier is the lightest
+   because it is context, a coast is the edge of the subject's world, and
+   the subject's own outline is the heaviest thing on the plate. */
+.minimap.arched.atlas .context path { stroke-width: 0.7; }
+.minimap.arched.atlas .countries path { stroke-width: 0.9; }
+.minimap.arched.atlas .countries path.here { stroke-width: 1.6; }
 
 /* The places, as marks rather than as navigation. Ink with a paper ring, so
    one reads against the country's own blue and against the water alike. */

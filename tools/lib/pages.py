@@ -9,11 +9,12 @@ from __future__ import annotations
 
 import hashlib
 import math
+import re
 from urllib.parse import quote
 
 from . import geo
 from . import urls
-from .render import (LD_PUBLISHER, SITE_NAME, SITE_TAGLINE, card, chips, crumbs,
+from .render import (LD_PUBLISHER, SITE_NAME, SITE_TAGLINE, arch_rim, card, chips, crumbs,
                      esc, factlist, grid,
                      jsondata, ld_breadcrumb, ld_place, ld_within, motif_for,
                      page, picture, plate, section, arch_clip, arch_edge)
@@ -681,6 +682,177 @@ def _settingportrait(data, c, doc):
     )
 
 
+def terrain_paths(proj, view):
+    """Relief, when this repository holds any. It holds none.
+
+    NOT A STUB THAT DRAWS SOMETHING PLAUSIBLE. The layer exists so the
+    architecture is complete and the gap is visible; it returns nothing
+    because `data/geo/terrain-lod1.json` does not exist, and the day it does
+    this is the one function that has to learn to read it.
+
+    An invented hillshade would be the most convincing wrong thing in this
+    repository — a reader cannot tell a fitted one from a decorative one,
+    which is exactly why the Data Integrity Rule forbids authoring a
+    measurement. See docs/cartography.md for what would fill it.
+    """
+    doc = geo.load("terrain-lod1.json")
+    if not doc:
+        return ""
+    raise NotImplementedError(
+        "data/geo/terrain-lod1.json has appeared and terrain_paths() has not "
+        "been written. Failing loudly is the point: a layer that silently "
+        "draws nothing once its data arrives is worse than one that was "
+        "never declared.")
+
+
+def hillshade_paths(proj, view):
+    """Relief shading, when this repository holds any. It holds none.
+
+    One light from the north-west at no more than 12% opacity, multiplied
+    over the terrain tint and clipped to land — decided now so the day the
+    data arrives is not a fresh argument about style. Never over flat
+    ground: a hillshade on a plain invents structure that is not there.
+    """
+    doc = geo.load("hillshade-lod1.json")
+    if not doc:
+        return ""
+    raise NotImplementedError(
+        "data/geo/hillshade-lod1.json has appeared and hillshade_paths() has "
+        "not been written.")
+
+
+def hydrology_paths(proj, view):
+    """Rivers and lakes, when this repository holds any. It holds none.
+
+    Natural Earth publishes both under the same public-domain terms as the
+    land already here, so this is a fetch a person can run rather than a
+    licence anybody has to decide. The register carries the rows; the bytes
+    are not in the repository, and the build must run on a host with no
+    internet, so they never will be until somebody fetches them.
+    """
+    doc = geo.load("hydrology-lod1.json")
+    if not doc:
+        return ""
+    raise NotImplementedError(
+        "data/geo/hydrology-lod1.json has appeared and hydrology_paths() has "
+        "not been written.")
+
+
+def coast_halo(uid):
+    """The soft band a printed atlas puts in the water along a coast.
+
+    A TREATMENT, NOT A MEASUREMENT. This is drawn from the coastline this
+    repository already holds, by stroking the land silhouette thickly in the
+    water beneath the land fill. It is the cartographic convention that says
+    "this edge is a coast"; it is NOT bathymetry, and it must never be
+    mistaken for one — the atlas holds no depth data and nothing here implies
+    a distance from shore or a number of metres.
+
+    Emitted as a `<use>` of the landmass group rather than a second copy of
+    the geometry, because the geometry is most of the bytes on these pages
+    and the coastline of Europe is not worth paying for twice: the whole
+    treatment costs about forty bytes per plate.
+    """
+    return f'<use href="#{uid}-land" class="coasthalo"/>'
+
+
+def plate_stack(proj, view, *, ocean="", landmass="", subject="",
+                places="", labels=""):
+    """A cartographic plate, composed through the declared layer stack.
+
+    ONE PAINT ORDER, DECIDED IN ONE PLACE. The plates used to concatenate
+    three strings inline, which works right up to the moment a fourth layer
+    arrives and every family has its own opinion about where it goes. The
+    order lives in `geo.LAYERS`; this walks it.
+
+    A layer whose dataset is absent contributes NOTHING — not an empty group,
+    which on 1,033 pages is a claim that the map has terrain and simply had
+    none here. `checks.py` asserts the shipped HTML carries exactly the
+    layers this repository holds.
+    """
+    made = {
+        "ocean": ocean,
+        "coastal-water": "",   # a `<use>` of the land group; see coast_halo()
+        "land": landmass,
+        "terrain": lambda: terrain_paths(proj, view),
+        "hillshade": lambda: hillshade_paths(proj, view),
+        "rivers": lambda: hydrology_paths(proj, view),
+        # Coastline and frontiers are the land group's own stroke today. When
+        # terrain arrives they have to become their own stroke-only pass so
+        # relief sits UNDER them, and that pass re-emits the geometry — about
+        # 40% of the bytes on these pages. Measured then, not guessed now.
+        "coastline": "",
+        "country-bounds": "",
+        "region-bounds": "",
+        "cities": "",
+        "destinations": places,
+        "labels": labels,
+        "route": "",
+        "selected": subject,
+    }
+    out = []
+    for name, _needs, drawn, _role in geo.layer_state():
+        if not drawn:
+            continue
+        body = made.get(name, "")
+        if callable(body):
+            body = body()
+        if body:
+            out.append(geo.layer_group(name, body))
+    return "".join(out)
+
+
+def locator_inset(slug, size=132.0):
+    """Where in Europe this is, at a glance, beside the plate.
+
+    The benchmark plate carries one and it is the single cheapest thing on
+    it: a reader who does not already know where Moldova is learns it in one
+    look, and the main plate is then free to be about the country rather than
+    about the continent. Same projection, same data, same aperture logic —
+    the continent at lod0, the subject filled, nothing else marked.
+    """
+    doc = geo.load("europe-lod0.json")
+    if not doc:
+        return ""
+    proj = geo.Projection([-24.0, 34.0, 45.0, 71.0], size * 1.02, size, pad=0.0)
+    ctx, land = geo.landmass(proj, (0, 0, size * 1.02, size), doc=doc,
+                             highlight=slug)
+    # A RING, BECAUSE A SMALL COUNTRY IS A FEW PIXELS. Portugal filled at
+    # 112px across Europe is three pixels of cobalt and a reader's eye never
+    # finds it; the ring is what the benchmark plate does and it is the whole
+    # value of an inset. Centred on the subject's own drawn extent.
+    ring = ""
+    box = _highlight_box(land)
+    if box:
+        cx, cy, r = box
+        ring = (f'<circle class="locring" cx="{cx:.1f}" cy="{cy:.1f}" '
+                f'r="{max(9.0, r + 5.0):.1f}"/>')
+    return (f'<figure class="locator" aria-hidden="true">'
+            f'<svg viewBox="0 0 {size * 1.02:.0f} {size:.0f}" '
+            f'role="presentation">{ctx}{land}{ring}</svg>'
+            f'<figcaption>in Europe</figcaption></figure>')
+
+
+def _highlight_box(land):
+    """Centre and radius of the highlighted shape in an emitted <g>.
+
+    Read back off the path text rather than recomputed, so the ring cannot
+    disagree with the drawing it rings — the same reason the plate and the
+    social card come from one geometry function.
+    """
+    m = re.search(r'class="[^"]*\bhere\b[^"]*"[^>]*\sd="([^"]+)"', land)
+    if not m:
+        m = re.search(r'<path[^>]*\sd="([^"]+)"[^>]*class="[^"]*\bhere\b', land)
+    if not m:
+        return None
+    nums = [float(v) for v in re.findall(r'-?\d+(?:\.\d+)?', m.group(1))]
+    if len(nums) < 4:
+        return None
+    xs, ys = nums[0::2], nums[1::2]
+    cx, cy = (min(xs) + max(xs)) / 2.0, (min(ys) + max(ys)) / 2.0
+    return cx, cy, max(max(xs) - min(xs), max(ys) - min(ys)) / 2.0
+
+
 def countryportrait(data, c):
     """The country's own outline, as a portrait. COUNTRY = identity.
 
@@ -867,6 +1039,7 @@ def countryportrait(data, c):
     cap = (f'<figcaption>The outline stops at {lim:.0f}°E, where this atlas\'s '
            f'map data ends — not at a border.</figcaption>') if cut else ""
     return (
+        f'<div class="plate">'
         f'<figure class="minimap portrait arched atlas">'
         f'<svg viewBox="0 0 {w:.0f} {h:.0f}" role="img" data-world="discover" '
         f'aria-label="The outline of {esc(c["name"])}, drawn on this atlas\'s '
@@ -874,7 +1047,13 @@ def countryportrait(data, c):
         f'<defs>{arch_clip(uid, w, h)}</defs>'
         f'<g clip-path="url(#arch-{uid})">'
         f'<rect x="0" y="0" width="{w:.0f}" height="{h:.0f}" class="archground"/>'
-        f'{ctx}{land}<g class="pmarks">{marks}</g></g>{arch_edge(w, h)}</svg>{cap}</figure>'
+        f'{coast_halo(uid)}<g id="{uid}-land">{ctx}{land}</g>'
+        f'<g class="lyr lyr-places">{marks}</g></g>{arch_rim(w, h)}{arch_edge(w, h)}</svg>{cap}'
+        f'</figure>'
+        f'<div class="platefoot">{locator_inset(c["slug"])}'
+        f'<ul class="platekey"><li class="k-cap">Capital</li>'
+        f'<li class="k-dest">Destination</li>'
+        f'<li class="k-here">{esc(c["name"])}</li></ul></div></div>'
     )
 
 
