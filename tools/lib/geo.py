@@ -414,6 +414,30 @@ class Projection:
         return (self.ox + (px - self.px0) * self.scale,
                 self.oy + (self.py1 - py) * self.scale)
 
+    def apex(self):
+        """The cone's apex, in this drawing's own coordinates.
+
+        A conic's meridians are straight lines radiating from one point and
+        its parallels are circular arcs about it. Both facts are useful the
+        moment anything has to follow a parallel — a fade along the southern
+        edge of the atlas extent, say — because a LINEAR gradient can follow
+        a meridian exactly and a parallel not at all. The hero's first
+        southern fade was horizontal and left the 33°N cut showing across
+        Anatolia and the Caspian, where that parallel is 150 units higher up
+        the drawing than it is over Sicily. That is the same failure as the
+        vertical fade over the 52°E cut, one edge round.
+
+        rho is zero at the apex, so in lcc's own space it is (0, RHO0).
+        """
+        return (self.ox + (0.0 - self.px0) * self.scale,
+                self.oy + (self.py1 - LCC_RHO0) * self.scale)
+
+    def parallel_radius(self, lat):
+        """How far one parallel sits from the apex, in drawn units."""
+        ax, ay = self.apex()
+        x, y = self.xy(lat, LCC_LON0)
+        return math.hypot(x - ax, y - ay)
+
     def path(self, flat):
         """One flat [lon,lat,...] ring -> an SVG path `d`, or "" if degenerate.
 
@@ -476,6 +500,77 @@ class Projection:
         clicking Greece's smallest island is clicking Greece.
         """
         return "".join(p for p in (self.path(r) for r in rings) if p)
+
+
+def thin(pts, eps):
+    """Visvalingam-Whyatt in PROJECTED units, for a drawing that is not a plate.
+
+    THE LEVEL OF DETAIL A PICTURE NEEDS IS A PROPERTY OF THE PICTURE, not of
+    the file. `data/geo/` is simplified in degrees, which is the right unit
+    for a dataset and the wrong one for a frame: 0.04 degrees is 4.4 km, and
+    4.4 km is nine pixels on a destination plate and one on the homepage's
+    continent. So the continental drawing takes the FINER file and thins it
+    here, in the units it is actually drawn in, which is both better looking
+    and smaller than the coarse file — the coarse one is simplified in
+    longitude, so it flattens Iceland and Scotland far harder than Greece.
+
+    VISVALINGAM RATHER THAN DOUGLAS-PEUCKER, AND THE FIRST VERSION WAS
+    DOUGLAS-PEUCKER. It keeps the point furthest from a chord, which on a
+    fjord coast is the head of the fjord: the sides go and the head stays, so
+    Norway came out covered in bright one-pixel needles radiating from the
+    coast, and the Alps grew hairs. Visvalingam drops the vertex whose
+    triangle with its neighbours is smallest, which is exactly the measure a
+    needle fails — a spike is two long edges enclosing no area. The threshold
+    is `eps` squared, so eps stays "a feature about this many units across".
+    """
+    if eps <= 0 or len(pts) < 5:
+        return pts
+    n = len(pts)
+    closed = pts[0] == pts[-1]
+    prev = list(range(-1, n - 1))
+    nxt = list(range(1, n + 1))
+    nxt[n - 1] = -1
+    alive = [True] * n
+    limit = eps * eps
+
+    def tri(i):
+        a, b, c = prev[i], i, nxt[i]
+        if a < 0 or c < 0:
+            return float("inf")
+        return abs((pts[b][0] - pts[a][0]) * (pts[c][1] - pts[a][1])
+                   - (pts[c][0] - pts[a][0]) * (pts[b][1] - pts[a][1])) / 2.0
+
+    import heapq
+    heap = [(tri(i), i) for i in range(1, n - 1)]
+    heapq.heapify(heap)
+    left = n
+    while heap and left > 4:
+        area, i = heapq.heappop(heap)
+        if not alive[i] or area != tri(i):
+            continue                      # stale entry, its neighbours moved
+        if area > limit:
+            break
+        alive[i] = False
+        left -= 1
+        a, c = prev[i], nxt[i]
+        if a >= 0:
+            nxt[a] = c
+        if c >= 0:
+            prev[c] = a
+        for j in (a, c):
+            if j > 0 and j < n - 1 and alive[j]:
+                heapq.heappush(heap, (tri(j), j))
+    out = [p for p, k in zip(pts, alive) if k]
+    if closed and out[0] != out[-1]:
+        out.append(out[0])
+    return out
+
+
+def ring_area(pts):
+    a = 0.0
+    for i in range(len(pts) - 1):
+        a += pts[i][0] * pts[i + 1][1] - pts[i + 1][0] * pts[i][1]
+    return abs(a) / 2.0
 
 
 def _clip(pts, box):
@@ -566,7 +661,8 @@ def distance_bands(doc, slug, proj, near=0.6, mid=1.3):
     return out
 
 
-def landmass(proj, view, doc=None, highlight=None, pad=40.0, bands=None):
+def landmass(proj, view, doc=None, highlight=None, pad=40.0, bands=None,
+             thin_units=0.0, min_units=0.0):
     """Land under a small map, clipped to the window it is drawn in.
 
     `view` is (x, y, w, h) in the projection's own pixel space — the same
@@ -601,7 +697,9 @@ def landmass(proj, view, doc=None, highlight=None, pad=40.0, bands=None):
             if max(xs) < box[0] or min(xs) > box[2] or max(ys) < box[1] or min(ys) > box[3]:
                 continue
             cut = _clip(pts, box)
-            if len(cut) < 3:
+            if thin_units:
+                cut = thin(cut, thin_units)
+            if len(cut) < 3 or (min_units and ring_area(cut) < min_units):
                 continue
             d = []
             for i, (cx, cy) in enumerate(cut):
@@ -636,6 +734,58 @@ def landmass(proj, view, doc=None, highlight=None, pad=40.0, bands=None):
         (ours if ent["atlas"] else ctx).append(el)
     return (f'<g class="context" aria-hidden="true">{"".join(ctx)}</g>',
             f'<g class="countries" aria-hidden="true">{"".join(ours)}</g>')
+
+
+def beyondmass(proj, view, thin_units=0.0, min_units=0.0, pad=40.0):
+    """The land outside the atlas, as one path of `d` data and nothing else.
+
+    `beyond-lod0.json` holds anonymous rings — no country, no slug, no title —
+    because it is scenery for one picture rather than geography this product
+    writes about. See BEYOND_BBOX in scripts/map/process.py for why it exists
+    at all: the hero's subject is the continent, and a continent cut off at
+    52°E ends in mid-air.
+
+    It returns bare path data rather than a group, because the caller merges
+    it into a single element for exactly the reason the hero merges its own
+    two: fifty translucent shapes with shared edges composite into fifty
+    bright frontiers, and a political map is the one thing this drawing must
+    not become.
+    """
+    doc = load("beyond-lod0.json")
+    if not doc:
+        return ""
+    x, y, w, h = view
+    box = (x - pad, y - pad, x + w + pad, y + h + pad)
+    out = []
+    for ring in doc["rings"]:
+        pts = [proj.xy(ring[i + 1], ring[i]) for i in range(0, len(ring), 2)]
+        xs = [p[0] for p in pts]
+        ys = [p[1] for p in pts]
+        if (max(xs) < box[0] or min(xs) > box[2]
+                or max(ys) < box[1] or min(ys) > box[3]):
+            continue
+        # THINNED BEFORE IT IS CLIPPED, and the other order drew chords
+        # across the picture. Sutherland-Hodgman leaves a run of vertices
+        # along the box edge where a ring leaves the window; thinning that
+        # run afterwards collapses it into one straight segment from where
+        # the ring left to where it came back, which at this tolerance cut
+        # visible diagonals across the Sahara and across Kazakhstan. The
+        # clip is exact and cheap, so it goes last and stays exact.
+        if thin_units:
+            pts = thin(pts, thin_units)
+        cut = _clip(pts, box)
+        if len(cut) < 3 or (min_units and ring_area(cut) < min_units):
+            continue
+        d, last = [], None
+        for cx, cy in cut:
+            q = (round(cx, 1), round(cy, 1))
+            if q == last:
+                continue
+            d.append(("M" if not d else "L") + f"{q[0]} {q[1]}")
+            last = q
+        if len(d) >= 3:
+            out.append("".join(d) + "Z")
+    return "".join(out)
 
 
 def _esc(x):

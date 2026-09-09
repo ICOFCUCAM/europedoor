@@ -103,6 +103,50 @@ CONTEXT = {
 # way", it reads as a bug in the drawing. Context only works when the shape is
 # recognisable enough to be read as a place.
 
+# WHAT IS BEYOND THE ATLAS, FOR THE HOMEPAGE HERO AND NOTHING ELSE.
+#
+# BBOX above is the atlas: it stops at 52°E because that is where this product
+# stops writing about places, and every map on the site is drawn from it. That
+# is right for a map of a place and wrong for the one picture on the site whose
+# subject is the CONTINENT — cut at 52°E, Europe ends in mid-air, and the hero
+# had to fade its own eastern quarter to stop the cut reading as a rendering
+# fault. Fading the edge of the world is not the same as drawing what is
+# there.
+#
+# So the hero gets a second, much quieter geometry: the land around Europe,
+# out to the Yenisei and down past Arabia, drawn as the ground Europe sits on
+# rather than as anywhere this atlas has anything to say about. It is a
+# separate file for the same reason the terrain is: nothing else may draw it,
+# and a wider extent must not become a wider atlas by accident.
+# AND EVERY EDGE OF THIS BOX IS A STRAIGHT CUT THROUGH REAL LAND, so the box
+# is chosen so that none of them is inside the hero's frame. The first one ran
+# -32°E to 74°N and both of those showed: Greenland was sliced down the middle
+# of Scoresby Sund and drew a straight vertical edge in the Atlantic, and
+# Novaya Zemlya was cut along the 74th parallel. At 17% opacity on a dark sea
+# that is faint on a desktop and unmistakable on a phone, where the drawing is
+# a third of the size and the eye has nothing else to look at.
+#
+# West is at -14.5°E: west of the African Atlantic coast at every latitude the
+# frame shows — -11 left one vertex of the Saharan coast cut at 28.7°N, inside
+# the frame at the bottom left — and east of the Canaries and of everything in
+# the north Atlantic that survives the minimum ring size, so no island is
+# sliced. It is not a round number because the honest one is wherever the cut
+# stops crossing land, which is measured. North is at 78°N, above the top of
+# the hero's frame at every longitude it holds (the frame's northern edge runs
+# 77.8°N over Norway and 73.3°N over the Urals), so Svalbard's slice happens
+# off the picture. East and south were already clear: under this conic the
+# 102°E cut runs x=1,489 at 36°N and y=-192 at 68°N, and the 8°N cut y=1,003
+# at 50°E, none of them inside the frame.
+# checks.py asserts all four, because a wider dataset later is exactly the
+# sort of improvement that would quietly put one back.
+BEYOND_BBOX = (-14.5, 8.0, 102.0, 78.0)
+BEYOND = "beyond-lod0.json"
+
+# Coarser than lod0 and with a much larger minimum ring, because this is
+# drawn at a fifth of the contrast of the land in front of it: an island that
+# reads as a speck in the subject reads as dirt on the lens out here.
+BEYOND_EPS, BEYOND_MINBOX = 0.11, 0.6
+
 # Level of detail. `eps` is the Douglas-Peucker tolerance in degrees; `minbox`
 # drops a ring whose bounding box is smaller than this many square degrees.
 # The numbers were chosen by rendering, not by theory — see docs/map-architecture.md.
@@ -232,7 +276,14 @@ def key_for(props):
     return None
 
 
-def rings_for(feature, eps, minbox):
+def rings_for(feature, eps, minbox, box=None):
+    """The rings of one Natural Earth feature, clipped to `box`.
+
+    The box is a parameter because the homepage hero needs a WIDER one than
+    the atlas — see BEYOND_BBOX. Everything else passes nothing and gets the
+    atlas extent, which is what every call did when it was a constant.
+    """
+    box = BBOX if box is None else box
     geom = feature.get("geometry") or {}
     if geom.get("type") == "MultiPolygon":
         polys = geom["coordinates"]
@@ -244,9 +295,9 @@ def rings_for(feature, eps, minbox):
     for poly in polys:
         ring = [(float(x), float(y)) for x, y in poly[0]]
         x0, y0, x1, y1 = bbox_of(ring)
-        if x1 < BBOX[0] or x0 > BBOX[2] or y1 < BBOX[1] or y0 > BBOX[3]:
+        if x1 < box[0] or x0 > box[2] or y1 < box[1] or y0 > box[3]:
             continue
-        ring = clip(ring, BBOX)
+        ring = clip(ring, box)
         if len(ring) < 4:
             continue
         bx0, by0, bx1, by1 = bbox_of(ring)
@@ -481,6 +532,37 @@ def summits():
     return {"features": out}
 
 
+def beyond():
+    """Every landmass in the wider window, as one anonymous set of rings.
+
+    NO COUNTRY IDENTITY, ON PURPOSE. The atlas's own files are keyed by
+    country because a reader can click one; this is scenery. Giving it codes
+    would invite a page to colour it, label it or link it, and the moment
+    anything does, the extent of this product has quietly moved east.
+
+    It is not deduplicated against the atlas either. Russia and Kazakhstan
+    appear in both — clipped at 52 in one and running to 102 here — and the
+    hero draws this layer UNDER the others, so the overlap is covered by the
+    stronger treatment rather than seamed against it. Cutting a hole in this
+    layer where the atlas sits would put a boundary between them, which is
+    the one thing the drawing must not have: Europe is meant to be part of
+    the same land, only lit.
+    """
+    ne = read_ne(LODS["lod0"]["src"])
+    rings = []
+    for f in ne["features"]:
+        for r in rings_for(f, BEYOND_EPS, BEYOND_MINBOX, box=BEYOND_BBOX):
+            rings.append(flatten(r))
+    rings.sort(key=len, reverse=True)
+    return {
+        "$comment": "GENERATED by scripts/map/process.py. The land around "
+                    "Europe, for the homepage hero only: no country identity, "
+                    "no link, no label. See BEYOND_BBOX.",
+        "bbox": list(BEYOND_BBOX),
+        "rings": rings,
+    }
+
+
 def build():
     graph = load_graph()
     prov = provenance()
@@ -490,6 +572,7 @@ def build():
         area_names("ne_50m_geography_marine_polys.geojson.gz", upper=True),
         sources=prov)
     files["summits-lod1.json"] = dict(summits(), sources=prov)
+    files[BEYOND] = dict(beyond(), sources=prov)
     files["features-lod1.json"] = dict(
         area_names("ne_50m_geography_regions_polys.geojson.gz",
                    kinds=FEATURE_KINDS, upper=True),
@@ -940,6 +1023,9 @@ def main(argv):
             fh.write(body)
         total += len(body)
     print(f"wrote {len(files)} files, {total:,} bytes into data/geo/")
+    nb = sum(len(r) // 2 for r in files[BEYOND]["rings"])
+    print(f"  {BEYOND:<20} {len(files[BEYOND]['rings']):>3} rings   {nb:>6,} points  "
+          f"{len(dump(files[BEYOND])):>8,} bytes")
     for rel in ("europe-lod0.json", "europe-lod1.json"):
         n = sum(len(r) // 2 for c in files[rel]["countries"].values() for r in c["rings"])
         print(f"  {rel:<20} {len(files[rel]['countries']):>3} shapes  {n:>6,} points  "

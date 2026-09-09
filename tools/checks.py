@@ -2649,11 +2649,30 @@ def c_terrain():
             f"{hexcol}. The strongest version was rejected by eye; a "
             f"stronger fill here is that rejection being undone silently")
         n += 1
-    assert len(re.findall(r"\.lyr-terrain \.t\d+\s*\{", css)) == 4, (
-        "the stylesheet declares a number of terrain bands that is not four "
-        "— a second strength was measured out (see the rule's comment) and "
-        "an absolute hypsometric scale cannot have two")
-    n += 1
+    # THE HERO DRAWS THE SAME SCALE OVER A DIFFERENT GROUND. It is the one
+    # other family that paints these bands: three of them, the pure
+    # hypsometric colour at a stated alpha rather than mixed 65% toward an
+    # opaque parchment, because the land under it is itself translucent. The
+    # ALPHA is a treatment and may differ; the COLOUR may not, and for one
+    # commit the hero's snow was #efe9dd against #e6e0d6 everywhere else —
+    # one colour meaning two heights, arrived at by eye on a dark surface.
+    for lo, _hi, hexcol, _why in C.HYPSOMETRIC:
+        if lo < 600:
+            continue          # the 200 m band does not read at this scale
+        assert re.search(r"\.heroeurope \.lyr-terrain \.t%d\s*\{[^}]*%s"
+                         % (lo, re.escape(hexcol)), css), (
+            f"the hero's terrain band at {lo} m is not {hexcol}, the colour "
+            f"this height has everywhere else in the atlas. The alpha over "
+            f"it is the hero's own treatment; the colour is the scale")
+        n += 1
+    for fam, want in ((r"\.minimap\.arched\.atlas", 4),
+                      (r"\.heroeurope", 3)):
+        got = len(re.findall(fam + r" \.lyr-terrain \.t\d+\s*\{", css))
+        assert got == want, (
+            f"that family declares {got} terrain bands rather than {want} — "
+            f"a second strength was measured out (see the rule's comment) "
+            f"and an absolute hypsometric scale cannot have two")
+        n += 1
 
     # 1, 2, 3, 5. Every plate that draws it, and every one that should.
     want_terrain = set()
@@ -2670,19 +2689,47 @@ def c_terrain():
         assert 'data-role="instrument"' not in html.split(
             'class="lyr lyr-terrain"')[0][-900:], (
             f"/{r}: relief on a map that declares itself an instrument")
-        assert 'class="lyr lyr-country-bounds"' in html, (
-            f"/{r}: relief with no boundary pass above it — a frontier here "
-            f"is a stroke on the land path and the bands paint over it")
+        # THE PROMISE IS THAT RELIEF CANNOT BURY A FRONTIER, and there are
+        # two ways to keep it. A plate unfolds the boundary and re-emits it
+        # above the bands. The hero draws no frontier at all — it is filled,
+        # adjacent countries merge, and the only line in it is where land
+        # meets sea, because stroking fifty countries made a political map
+        # out of a picture. Both are kept here rather than one excused:
+        # either the boundary is drawn above the terrain, or there is no
+        # boundary for the terrain to bury.
+        if r == "index.html":
+            assert 'class="lyr lyr-country-bounds"' not in html, (
+                "the hero has grown a country-boundary layer. It is filled "
+                "on purpose — fifty frontiers competing with a headline is "
+                "the political map this hero was rebuilt to remove — so a "
+                "boundary here needs the same argument the plates made")
+        else:
+            assert 'class="lyr lyr-country-bounds"' in html, (
+                f"/{r}: relief with no boundary pass above it — a frontier "
+                f"here is a stroke on the land path and the bands paint "
+                f"over it")
         parts = r.split("/")
         # A place page draws its own destination's plate, which is the same
         # picture of the same town; it belongs to the destination family.
         if parts[0] == "europe" and len(parts) >= 5:
             drew.add("/".join(parts[1:4]))
+        elif r == "index.html":
+            # THE HOMEPAGE HERO IS THE THIRD FAMILY, AND IT IS A DIFFERENT
+            # TREATMENT RATHER THAN AN EXCEPTION. `terrain()` is the plate
+            # rule — the suitability measurement, the two thresholds and the
+            # 1,500 km frame cap — and none of it applies here, because the
+            # hero is not a picture of a place: it is the continent, and the
+            # question it answers is "this is Europe, and it has mountains in
+            # it". It draws three bands rather than four, thinned to a
+            # picture's tolerance, through relief_wash(). The plate rule is
+            # untouched and every assertion below still runs on it.
+            continue
         elif parts[0] != "journeys":
             offenders.append("/" + r)
     assert not offenders, (
-        f"relief on {len(offenders)} page(s) outside the destination and "
-        f"journey families, the two it was approved for: {offenders[:4]}")
+        f"relief on {len(offenders)} page(s) outside the destination, "
+        f"journey and hero families, the three it was approved for: "
+        f"{offenders[:4]}")
     # A destination page draws it exactly when the ground says so.
     missing = sorted(want_terrain - drew)[:4]
     extra = sorted(drew - want_terrain)[:4]
@@ -2707,6 +2754,212 @@ def c_terrain():
                 f"{C.TERRAIN_MAX_KM:.0f} km cap — at that scale it is a "
                 f"physical map of Europe rather than a picture of somewhere")
             n += 1
+    return n
+
+
+@check("the hero's frame shows no edge of the data behind it")
+def c_hero_frame():
+    """The homepage draws land the atlas does not hold, and every edge shows.
+
+    THE HERO IS THE ONE PICTURE ON THIS SITE WHOSE SUBJECT IS THE CONTINENT,
+    so it draws a second geometry — beyond-lod0.json, the ground around
+    Europe — under the atlas and at a sixth of its contrast. That file is a
+    box cut out of the world, and a box has four straight edges through real
+    land. The first one ran -32°E to 74°N: Greenland was sliced down the
+    middle of Scoresby Sund and drew a straight vertical edge in the north
+    Atlantic, and Novaya Zemlya was cut along the 74th parallel. Both are
+    faint on a desktop and unmistakable at 390px.
+
+    Two things are asserted, both arithmetic rather than opinion.
+
+    1. NO EDGE OF THAT BOX IS INSIDE THE HERO'S FRAME. The box's four sides
+       are walked in lon/lat and projected — a conic turns a meridian into a
+       radial line and a parallel into an arc, so neither is a straight line
+       in the drawing and a sampled walk is the honest test — and no sample
+       may land inside the viewBox. A wider dataset later is exactly the sort
+       of improvement that would quietly put one back.
+
+    2. THE STYLESHEET'S ASPECT RATIO IS THE VIEWBOX'S. An SVG clips to its
+       VIEWPORT, not to its viewBox, so a mismatch letterboxes and the bands
+       show whatever geometry lies outside the frame. The stacked phone hero
+       carried 1000/780 for one commit against a 1120/800 drawing and drew a
+       straight line above and below the continent.
+    """
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from lib import pages as PG                                     # noqa: E402
+
+    import json as _json
+    doc = _json.load(open(os.path.join(ROOT, "data", "geo",
+                                       "beyond-lod0.json"), encoding="utf-8"))
+    lo0, la0, lo1, la1 = doc["bbox"]
+    vx, vy, vw, vh = PG.HERO_VIEW
+    n = 0
+    # THE TEST IS WHERE THE CUT MEETS LAND, not where the box is. The western
+    # edge cannot be moved out of the frame at all — under this conic the
+    # apex is just above the picture, so at 70°N the whole 360° of longitude
+    # is inside a few hundred units and there is no meridian far enough west.
+    # What matters is not the box: it is whether the box cuts anything. A
+    # vertex of a drawn ring that sits exactly ON one of the four edges is a
+    # place where a coastline was severed, and that is the thing that must
+    # not be visible. Read off the shipped geometry, so it measures what is
+    # drawn rather than what was intended.
+    bad = []
+    for ring in doc["rings"]:
+        for i in range(0, len(ring), 2):
+            lon, lat = ring[i], ring[i + 1]
+            side = ("west" if abs(lon - lo0) < 1e-3 else
+                    "east" if abs(lon - lo1) < 1e-3 else
+                    "south" if abs(lat - la0) < 1e-3 else
+                    "north" if abs(lat - la1) < 1e-3 else "")
+            if not side:
+                continue
+            x, y = PG.MAPPROJ.xy(lat, lon)
+            if vx <= x <= vx + vw and vy <= y <= vy + vh:
+                bad.append((side, round(lat, 1), round(lon, 1),
+                            round(x), round(y)))
+    assert not bad, (
+        f"the ground layer's own data cut severs a coastline at "
+        f"{len(bad)} point(s) inside the hero's frame, so the drawing ends "
+        f"on a straight line through real land: {bad[:3]}. Move BEYOND_BBOX "
+        f"out, or the frame in")
+    n += 4
+
+    css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
+               encoding="utf-8").read()
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    m = re.search(r"\.heroeurope svg\s*\{[^}]*aspect-ratio:\s*"
+                  r"(\d+)\s*/\s*(\d+)", css)
+    assert m, ("the stacked hero declares no aspect-ratio; without one the "
+               "SVG box is whatever the row leaves it and the drawing is "
+               "letterboxed inside it")
+    assert (int(m.group(1)), int(m.group(2))) == (int(vw), int(vh)), (
+        f"the hero's CSS aspect-ratio is {m.group(1)}/{m.group(2)} and its "
+        f"viewBox is {int(vw)}/{int(vh)}. An SVG clips to its viewport, so "
+        f"the difference is a band of geometry from outside the frame")
+    n += 1
+
+    # And the shipped page must actually carry that viewBox, because both
+    # numbers above are read from the source rather than from the HTML.
+    html = open(os.path.join(ROOT, "site", "index.html"),
+                encoding="utf-8").read()
+    assert f'viewBox="{vx:.0f} {vy:.0f} {vw:.0f} {vh:.0f}"' in html, (
+        "the homepage does not carry the hero viewBox this check just "
+        "asserted two things about")
+    n += 1
+    return n
+
+
+@check("every page that draws relief names the survey that measured it")
+def c_relief_credit():
+    """The credit is derived from the register, not typed into a caption.
+
+    THE PROMISE WAS WRITTEN IN A LICENCE DOCUMENT AND KEPT ON NO PAGE. The
+    Credit section of docs/data-licenses/aws-terrain-tiles.md says, in as
+    many words, that any page which draws terrain names the elevation
+    source. Relief then shipped to 153 destination plates, six journeys and
+    the homepage and not one of them contained the word GMTED. Nothing
+    failed, because the promise lived in prose.
+
+    AND WHEN IT WAS FINALLY DRAWN, THE SENTENCE IN THAT DOCUMENT NAMED THE
+    WRONG SURVEY. It asks for "SRTM and GMTED2010", which was true of the
+    six zoom-7 tiles the Chamonix prototype fetched and false of everything
+    that ships: the integration went to zoom 6, and the service's own
+    per-tile imagery header — recorded in the register when each tile was
+    fetched — names gmted and etopo1 on those and srtm on none of them.
+
+    So this reads the register rather than a sentence. The datasets are the
+    ones the shipped tiles actually declare, at the zoom the terrain
+    document says it was built at, and both directions are asserted: a page
+    that draws relief names each of them, and the credit names none the
+    register does not support. Crediting a survey whose data is not in the
+    picture is the same class of untruth as crediting none.
+    """
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from lib import cartography as C                                # noqa: E402
+    from lib import geo as G                                        # noqa: E402
+
+    tdoc = G.load("terrain-lod1.json")
+    assert tdoc, "data/geo/terrain-lod1.json is missing — run the pipeline"
+    zoom = tdoc["pipeline"]["zoom"]
+
+    reg = json.load(open(os.path.join(ROOT, "docs", "data-licenses",
+                                      "sources.json"), encoding="utf-8"))
+    # The name each imagery prefix is published under. A prefix with no entry
+    # here is a dataset nobody has decided how to credit, which must stop the
+    # build rather than be dropped from a sentence.
+    NAMES = {"gmted": "GMTED2010", "srtm": "SRTM", "etopo1": "ETOPO1",
+             "3dep": "3DEP", "eudem": "EU-DEM"}
+    used, tiles = {}, 0
+    for row in reg["sources"]:
+        if row.get("fills_layer") != "terrain":
+            continue
+        if f"/terrarium/{zoom}/" not in row["url"]:
+            continue          # a prototype tile at another zoom; not shipped
+        tiles += 1
+        for part in (row.get("provenance") or "").split(","):
+            part = part.strip().split("/")[0].lower()
+            if not part:
+                continue
+            assert part in NAMES, (
+                f"the register records imagery from '{part}', which has no "
+                f"published name here — a dataset nobody has decided how to "
+                f"credit cannot be silently left out of the credit")
+            used[NAMES[part]] = used.get(NAMES[part], 0) + 1
+    assert tiles > 100, (
+        f"only {tiles} elevation tiles at zoom {zoom} in the register; the "
+        f"shipped relief covers Europe and needs the whole set")
+    assert used, "no imagery provenance recorded for the shipped tiles"
+    n = 2
+
+    # 1. The credit names every dataset the shipped tiles declare, and no
+    #    dataset they do not.
+    plain = re.sub(r"<[^>]+>", "", C.RELIEF_CREDIT)
+    for name in used:
+        assert name in plain, (
+            f"the relief credit does not name {name}, which {used[name]} of "
+            f"the {tiles} shipped elevation tiles declare as their imagery "
+            f"source")
+        n += 1
+    for name in set(NAMES.values()) - set(used):
+        assert name not in plain, (
+            f"the relief credit names {name}, and no shipped tile at zoom "
+            f"{zoom} declares it — crediting a survey whose data is not in "
+            f"the picture is the mistake this check was written for")
+        n += 1
+
+    # 2. Every page that draws relief carries it, in text a reader sees.
+    #    Tags are stripped first: the credit links "public domain" to the
+    #    register, so a check on the raw markup would be asserting where the
+    #    anchor happens to fall.
+    pages = 0
+    for path in site_files():
+        html = open(path, encoding="utf-8").read()
+        if 'class="lyr lyr-terrain"' not in html:
+            continue
+        pages += 1
+        text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
+        for name in used:
+            assert name in text, (
+                f"{rel(path)} draws relief and does not name {name}. The "
+                f"credit is attached to the drawing by "
+                f"cartography.credited(); a page that has one and not the "
+                f"other has grown its own way of building a caption")
+    assert pages > 100, (
+        f"only {pages} pages draw relief; the measurement says far more do, "
+        f"so this check has stopped reaching the pages it is for")
+    n += 1
+
+    # 3. The link goes somewhere that carries the credit. A thousand maps
+    #    said "Coastline from Natural Earth" with Natural Earth linked to
+    #    /sources, and /sources did not contain those two words anywhere.
+    reg_page = os.path.join(ROOT, "site", "sources", "index.html")
+    text = re.sub(r"<[^>]+>", " ", open(reg_page, encoding="utf-8").read())
+    for name in list(used) + ["Natural Earth"]:
+        assert name in text, (
+            f"/sources does not name {name}, and every map on the site "
+            f"links its credit there. A credit pointing at a page that does "
+            f"not carry it looks like a register and is not one")
+        n += 1
     return n
 
 

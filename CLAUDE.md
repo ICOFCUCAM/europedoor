@@ -949,17 +949,90 @@ So the opening is cut here at the largest size the arch appears anywhere, the
 masthead stands on the limestone wall above it, and Europe is drawn inside —
 one silhouette, no dot, no filter, no count, no label.
 
+**Europe is not an island, and for three commits the hero drew it as one.**
+`data/geo/` stops at 52°E and 33°N because that is where this product stops
+writing about places, so the hero faded its own eastern quarter and its
+southern eighth to stop two straight data cuts reading as rendering faults.
+That is an honest way to hide an edge and a poor way to draw a continent. The
+land carries on now — `beyond-lod0.json`, anonymous rings out to the Yenisei
+and down past Arabia, no country, no relief, no label, nothing to click, at a
+sixth of the contrast. **The fades stayed exactly where they were and now do
+the opposite job**: they no longer hide an edge, they hand the eye from the
+lit continent to the quiet ground.
+
+**A parallel is not a horizontal line on a conic, and the first southern fade
+was one.** The 33rd runs from y=706 over Tunisia to y=590 over the Caspian,
+so a horizontal gradient placed on the Tunisian end left the cut showing right
+across Anatolia — the same failure as the vertical fade over the 52°E cut, one
+edge round. A conic's parallels are circles about the cone apex, so it is a
+**radial** gradient centred there (`geo.Projection.apex()`), exact at every
+longitude by construction. And the box that data comes from has four straight
+edges through real land: `checks.py` asserts that no vertex of a drawn ring
+sitting ON one of those edges projects inside the hero's frame — the test is
+where the cut meets land, because the western edge cannot be moved out of the
+frame at all under this conic.
+
+**The ground layer must not be stroked, and stroking it drew a rectangle.**
+`#heroland` closes hairline seams between independently simplified neighbours
+with a stroke in its own fill colour; the ground has no seams to close, and
+its rings are clipped to the frame — so a stroke ran along all four edges of
+the window and outlined it. At 17% on a dark sea that is a pale panel behind
+the continent. Found at 390px; on a desktop it was faint enough to read as
+atmosphere.
+
+**The hero has its own window on the projection, and the stylesheet must
+agree with it.** `pages.HERO_VIEW` is 1120×800 where every other map is
+1000×780. An SVG clips to its VIEWPORT rather than to its viewBox, so the
+phone rule's `aspect-ratio` carried the old 1000/780 for one commit and the
+two twelve-pixel letterbox bands showed the geometry outside the frame as a
+straight line above and below the continent. A check asserts the two agree.
+
+**The side-by-side hero has nowhere to put a continent on a phone.** Held at
+78% of a 390px screen the drawing was 304 units wide for the whole of Europe
+and the headline crossed the Mediterranean. Below 52rem the two columns become
+two rows: full width, its own proportion, the type under it — 304 to 390 units
+and a quarter of the opening to half of it, with nothing cropped. Capped at
+54vh, because at 820 wide the same rule made a 1,044px hero out of a 900px
+window, which is the same fault the other way round.
+
+**Every page that draws relief names the survey that measured it, and the
+sentence in the licence document named the wrong one.** `docs/data-licenses/
+aws-terrain-tiles.md` asked for "SRTM and GMTED2010" — true of the six zoom-7
+prototype tiles and false of the 182 zoom-6 tiles that ship, whose imagery
+headers name gmted and etopo1 and never srtm. `checks.py` now derives the
+credit's dataset list from those recorded headers, at the zoom the terrain
+document says it was built at, and asserts every page carrying `lyr-terrain`
+names each one. **The credit is attached to the drawing, never to the
+request** — `cartography.credited()` takes the rendered terrain markup, so a
+journey that asks for relief and is refused it for its width cannot print a
+credit for a layer nobody can see.
+
+**A credit whose link goes to a page that does not carry it is worse than no
+credit.** Every map on this site ends "Coastline from Natural Earth" with
+Natural Earth linked to `/sources`, and `/sources` did not contain those two
+words anywhere. It is built from the `sources` rows inside each `data/geo/`
+document now — dataset, licence, version, the SHA-256 of the exact bytes and
+the date they were fetched — so it cannot drift from what actually drew the
+maps.
+
 **A hero map was removed once, for reasons that do not apply to this.** That
 one was an *instrument*: lod1 coastline, 319 dots, a filter row, ~90,000
-bytes, and it led with structure. This is a coastline and nothing else.
+bytes, and it led with structure. This leads with a continent.
 
 | | bytes |
 |---|---|
 | the hero map that was removed | ~90,000 |
-| this | 22,927 |
+| the first version of this, a lod0 silhouette | 22,927 |
+| Europe at lod1, thinned to 1.8 units | 42,550 |
+| the hypsometric relief over it | 25,305 |
+| the ground beyond the atlas | 18,171 |
 | the licensed photograph the brief is still open for | 150,000+ |
 
-`weight.home_kb` moved 25 → 47, recorded. **The photograph brief stays
+`weight.home_kb` moved 25 → 47 → 109, each time recorded. **1.8 units rather
+than 2.4 because the Europe side is where the detail is worth paying for**:
+2.4 is 2.1 device pixels at this size, coarse enough to round the Danish
+straits and turn the Aegean into wedges. The ground beyond is thinned three
+times harder for the opposite reason. **The photograph brief stays
 open** — a photograph does a job this cannot, the atmosphere of a particular
 morning. This does one the photograph cannot either, and it is the reason it
 is here rather than a placeholder: **no other travel product can draw Europe

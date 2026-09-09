@@ -367,6 +367,66 @@ def relief_of(key):
 TERRAIN_MAX_KM = 1500.0
 
 
+# THE CREDIT FOR THE GROUND, WHICH FOR THREE COMMITS NO PAGE CARRIED.
+#
+# `docs/data-licenses/aws-terrain-tiles.md` says, in its own Credit section,
+# that any page which draws terrain names this sentence. Then relief shipped
+# to 153 destination plates, six journeys and the homepage and not one of them
+# said the word GMTED — a promise written in a licence document and kept
+# nowhere, which is the same failure as the coastline credit that 318 pages
+# did not carry and 274 carried by accident.
+#
+# None of the three datasets requires it. SRTM and GMTED2010 are USGS and
+# ETOPO1 is NOAA; all three are US Government public domain and all three
+# merely REQUEST credit. It is drawn anyway for the reason the Natural Earth
+# credit is drawn: a reader looking at a mountain range is entitled to know
+# which survey measured it, and an uncredited relief invites the assumption
+# that we modelled it.
+#
+# AND THE SENTENCE THE LICENCE DOCUMENT ASKED FOR NAMED THE WRONG SURVEY.
+# It said "SRTM and GMTED2010", which was true of the six zoom-7 tiles the
+# Chamonix prototype fetched and is not true of anything that ships: the
+# integration went to zoom 6, where Tilezen's own per-tile
+# `x-amz-meta-x-imagery-sources` header names GMTED and ETOPO1 and never
+# SRTM. Recorded per tile in the register, so the mistake was a sentence
+# nobody re-read rather than a claim nobody could check — 176 of the 182
+# shipped tiles name gmted, 157 name etopo1, none name srtm.
+#
+# ETOPO1 is named even though no band boundary is traced through the sea.
+# The grid is smoothed with a three-pass kernel before it is traced, so an
+# ocean cell pulls the 200 m contour for about five kilometres inland, and
+# every fjord, every Greek island and the whole Italian coast is inside that.
+# A dataset that moves the line is a dataset that drew it.
+RELIEF_CREDIT = ('Relief from GMTED2010 (USGS) and ETOPO1 (NOAA), '
+                 '<a href="/sources">public domain</a>.')
+
+
+def credited(caption, drew):
+    """The relief credit, added to a caption by the plate that drew it.
+
+    IT IS ATTACHED TO THE DRAWING, NEVER TO THE INTENTION. `relief=True` is a
+    request; `terrain()` answers it with "" for a frame past the cap, so a
+    journey can ask for relief, be refused for its width, and would then have
+    printed a credit for a layer nobody can see. Crediting a dataset that
+    drew nothing is a smaller lie than failing to credit one that did, and it
+    is still a lie about the picture — so this takes the rendered markup as
+    its input and the caller never gets a say.
+
+    The credit goes with the other credits, before the map link that ends
+    these captions, because a link is a way out of the page and nothing
+    should read as an afterthought behind it.
+    """
+    if not drew or not caption:
+        return caption
+    cut = caption.rfind('<a href="/map')
+    if cut != -1:
+        return caption[:cut] + RELIEF_CREDIT + " " + caption[cut:]
+    cut = caption.rfind("</figcaption>")
+    if cut == -1:
+        return caption
+    return caption[:cut] + " " + RELIEF_CREDIT + caption[cut:]
+
+
 def terrain(proj, view, draw=False, frame_km=None):
     """The hypsometric bands, painted lowest first.
 
@@ -415,6 +475,62 @@ def terrain(proj, view, draw=False, frame_km=None):
                 continue
             pts = geo._clip(pts, box)
             if len(pts) < 3:
+                continue
+            d, last = [], None
+            for px, py in pts:
+                q = (round(px, 1), round(py, 1))
+                if q == last:
+                    continue
+                d.append(("M" if not d else "L") + f"{q[0]} {q[1]}")
+                last = q
+            if len(d) >= 4:
+                ds.append("".join(d) + "Z")
+        if ds:
+            out.append(f'<path class="tband t{min_m}" d="{"".join(ds)}"/>')
+    return "".join(out)
+
+
+def relief_wash(proj, view, thin_units=2.5, min_units=30.0,
+                bands=(600, 1200, 2000)):
+    """The continent's relief, simplified for a PICTURE rather than a plate.
+
+    THE HOMEPAGE IS THE ONE PLACE THIS PRODUCT DRAWS THE WHOLE CONTINENT AS AN
+    IMAGE, and it was the plainest map on the site: a flat silhouette at 15%
+    limestone, at the coarsest level of detail, on the largest surface and the
+    first thing anybody sees. Every destination plate had warm parchment,
+    Atlantic water, an ink coastline, rivers, named summits and four
+    hypsometric bands; the front door had none of it.
+
+    `terrain()` is the plate treatment and stays exactly as it is — the
+    suitability measurement, the two thresholds and the 1,500 km frame cap are
+    a rule about DESTINATION and JOURNEY illustrations and are not touched
+    here. This is a different family with a different job: not "what kind of
+    ground is this place in" but "this is Europe, and it has mountains in it".
+
+    It reuses the same band boundaries and thins them in the units the
+    drawing is actually made in, which is what makes it affordable: the four
+    bands over the whole extent are 58,000 vertices and about 660 KB, and the
+    three that read at continental scale, thinned at two and a half units,
+    are about a hundred rings and 24 KB. The 200 m band is dropped: it is
+    0.013 of luminance from the land tone on a plate and nothing at all here.
+    """
+    if not held("terrain"):
+        return ""
+    x, y, w, h = view
+    box = (x - 40.0, y - 40.0, x + w + 40.0, y + h + 40.0)
+    out = []
+    for min_m, rows in _bands():
+        if min_m not in bands:
+            continue
+        ds = []
+        for _lo0, _la0, _lo1, _la1, flat in rows:
+            pts = [proj.xy(flat[i + 1], flat[i]) for i in range(0, len(flat), 2)]
+            if (max(p[0] for p in pts) < box[0] or min(p[0] for p in pts) > box[2]
+                    or max(p[1] for p in pts) < box[1]
+                    or min(p[1] for p in pts) > box[3]):
+                continue
+            pts = geo.thin(pts, thin_units)
+            if len(pts) < 4 or geo.ring_area(pts) < min_units:
                 continue
             d, last = [], None
             for px, py in pts:
@@ -736,5 +852,5 @@ def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
         f'<defs>{arch_clip(uid, w, h)}</defs>'
         f'<g clip-path="url(#arch-{uid})">{inner}</g>'
         f'{arch_rim(w, h) if rim else ""}{arch_edge(w, h)}'
-        f'</svg>{caption}</figure>'
+        f'</svg>{credited(caption, terrain_body)}</figure>'
     )

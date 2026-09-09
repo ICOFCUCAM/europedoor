@@ -258,14 +258,210 @@ def heroeurope(data):
     runs on past it, which is where the type goes: the empty space is the
     composition rather than something to fill.
     """
-    doc = geo.load("europe-lod0.json")
+    doc = geo.load("europe-lod1.json")
     if not doc:
         return ""
-    ctx, land = geo.landmass(MAPPROJ, (0, 0, MAP_W, MAP_H), doc=doc)
+    # THE FINER FILE, THINNED IN THE UNITS THE PICTURE IS DRAWN IN. This drew
+    # `europe-lod0.json`, which is simplified at 0.055 DEGREES — a unit that
+    # is 6 km at the Mediterranean and half that at North Cape, so it flattened
+    # Iceland into a pentagon and Britain into a wedge while leaving Greece
+    # comparatively intact. At the hero's rendered size one projection unit is
+    # about one pixel, so the fine file thinned at 1.8 units is both a better
+    # shape and fewer bytes than the coarse one:
+    #
+    #     lod0, as published            22,927 bytes   blocky, and unevenly
+    #     lod1, as published            73,463 bytes   too heavy for a hero
+    #     lod1 thinned at 2.4 units     34,336 bytes   this
+    # THE HERO HAS ITS OWN WINDOW ON THE PROJECTION, and it is wider and
+    # deeper than the atlas's. MAP_W x MAP_H is the frame every other map on
+    # this site is drawn in and it is fitted to what this product writes
+    # about: it stops where data/geo/ stops. The hero's subject is not a set
+    # of destinations, it is the continent — and a continent that ends in a
+    # fade at 52°E is a continent that ends in mid-air.
+    #
+    # The window is checked against the edges of `beyond-lod0.json` rather
+    # than chosen by eye: under this conic the 102°E cut runs from x=1,489 at
+    # 36°N to y=-192 at 68°N and the 8°N cut from y=1,003 at 50°E outward, so
+    # neither is inside this box at any latitude. The drawing reaches every
+    # edge of its own frame and no fade has to hide anything.
+    view = HERO_VIEW
+    _, _, vw, vh = view
+    #     lod1 thinned at 2.4 units     32,075 bytes   the first version
+    #     lod1 thinned at 1.8 units     42,550 bytes   this
+    #
+    # AND THE EUROPE SIDE IS WHERE THE DETAIL IS WORTH PAYING FOR. 2.4 units
+    # is 2.1 device pixels on a retina screen at this size, which is coarse
+    # enough to see: it rounds the Danish straits, closes the narrower
+    # Norwegian fjords and turns the Aegean into a handful of wedges. 1.8 is
+    # 1.6 pixels and costs ten kilobytes on one page — the only page on this
+    # site where the coastline IS the picture rather than the ground under
+    # one. The layer beyond it is thinned three times harder for the opposite
+    # reason.
+    ctx, land = geo.landmass(MAPPROJ, view, doc=doc,
+                             thin_units=1.8, min_units=6.0)
+
+    # ONE PATH PER GROUP, NOT ONE PER COUNTRY, and it is not a saving.
+    #
+    # Two neighbouring polygons simplified independently do not share an edge,
+    # so at this alpha the water showed through the cracks as hairlines across
+    # France, Germany and Poland. Stroking each country in its own fill colour
+    # closed them and drew a POLITICAL MAP: where two countries meet two
+    # strokes overlap, and the doubled alpha is a bright line — fifty frontiers
+    # competing with a headline, which is the exact failure this hero was
+    # rebuilt to remove.
+    #
+    # One path per group has neither problem. A single fill is painted once
+    # however many subpaths overlap, and a single stroke of the same colour
+    # closes the seams without ever doubling. The per-country <title> elements
+    # go with it, which costs nothing: this drawing is aria-hidden, and a name
+    # no screen reader can reach was never a name.
+    def _merge(markup, ident):
+        d = "".join(re.findall(r'<path[^>]*\sd="([^"]*)"', markup))
+        return f'<path id="{ident}" d="{d}"/>' if d else ""
+
+    ctx = _merge(ctx, "heroctx")
+    land = _merge(land, "heroland")
+    # AND THE RELIEF, which is the whole reason this is worth doing. Every
+    # destination plate on this site carries hypsometric bands and the front
+    # door carried a flat silhouette — the plainest map on the site, on the
+    # largest surface, first. Three bands, thinned to a picture's tolerance:
+    # the Alps, the Pyrenees, the Carpathians, the Scandinavian spine and
+    # Iceland come up out of the dark, and nothing else is added. Still no
+    # dot, no filter, no count, no label.
+    relief = cartography.relief_wash(MAPPROJ, view,
+                                     thin_units=2.5, min_units=50.0)
+
+    # AND THE LAND CARRIES ON PAST THE ATLAS, drawn as a different thing.
+    #
+    # Europe is not an island and this drawing said it was. Everything east of
+    # 52°E and south of 33°N is outside what this product writes about, so
+    # data/geo/ stops there and the hero faded its own eastern quarter and its
+    # southern eighth to keep two straight data cuts from reading as rendering
+    # faults. That is an honest way to hide an edge and a poor way to draw a
+    # continent: a fade says "the picture stops", and what is actually true is
+    # that the LAND carries on and this atlas does not.
+    #
+    # So the ground under the picture is now the real ground — western Siberia,
+    # the Caspian, Iran, Arabia, the Sahara — from beyond-lod0.json, anonymous
+    # rings at a fifth of the contrast, with no relief on them and nothing to
+    # click. Europe is what is lit; Asia and Africa are what it stands on. The
+    # fades stay exactly where they were and now do the opposite job: they no
+    # longer hide an edge, they hand the eye from the lit continent to the
+    # quiet ground, so the boundary between two treatments is a gradient
+    # rather than the straight line the two datasets actually meet along.
+    # Thinned much harder than the atlas in front of it, because it is drawn
+    # at a sixth of the contrast: 3.0/60 and 5.0/120 are indistinguishable at
+    # 17% opacity and 4 KB apart on every request. Coarser than that starts
+    # to show in Anatolia's south coast, which is the one stretch of this
+    # layer that runs close to land the reader is looking at.
+    beyond = geo.beyondmass(MAPPROJ, view, thin_units=5.0, min_units=120.0,
+                            pad=0.0)
+    # THE DATA CUT IS A DIAGONAL, AND THE FADE THAT HID IT WAS VERTICAL.
+    #
+    # data/geo/ stops at 52°E. Under the conic that meridian runs from
+    # (747, 36) at 70°N to (1024, 471) at 40°N — a straight line leaning 57°
+    # off the vertical — and a straight edge through Russia reads as a
+    # rendering fault rather than as the edge of what this atlas holds. The
+    # CSS mask that hid it faded left-to-right, so to cover a diagonal it had
+    # to start at 40% of the width, which is central Europe: Italy, the
+    # Adriatic, Greece and the whole Balkan peninsula were inside the fade and
+    # read as sea, on the hero of a European travel product.
+    #
+    # The fade runs along the cut instead, in the drawing's own coordinates
+    # where the cut's geometry is known exactly rather than guessed at in
+    # percentages of a box the drawing is letterboxed inside. Everything west
+    # of it is fully drawn.
+    def _band(lat0, lat1, lon, before, after):
+        """A gradient running perpendicular to one meridian of the data cut."""
+        a, b = MAPPROJ.xy(lat0, lon), MAPPROJ.xy(lat1, lon)
+        mx, my = (a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0
+        dx, dy = b[0] - a[0], b[1] - a[1]
+        n = math.hypot(dx, dy)
+        nx, ny = dy / n, -dx / n                 # perpendicular, pointing east
+        return (mx - nx * before, my - ny * before,
+                mx - nx * after, my - ny * after)
+
+    # Fully transparent BEFORE the cut, not at it. Ending the fade on the cut
+    # left the mask 7% opaque along it, and 7% of a bright coastline against
+    # the water is still a straight line across the north-east — the exact
+    # thing the fade exists to remove.
+    ex1, ey1, ex2, ey2 = _band(70.0, 40.0, 52.0, 360.0, 40.0)
+    # THE SOUTHERN CUT WAS HIDDEN IN CSS AND SO WAS EVERYTHING NEAR IT. The
+    # atlas holds North Africa down to 33°N and no further, and the bottom
+    # eighth of the drawing was faded in the stylesheet to cover that straight
+    # edge — a fade in the ELEMENT's coordinates, which is a different space
+    # from the drawing's and moves whenever the box changes shape.
+    #
+    # AND THE FIRST FIX, A HORIZONTAL GRADIENT IN THE DRAWING'S OWN SPACE, WAS
+    # WRONG FOR THE SAME REASON THE VERTICAL ONE WAS. **A parallel is not a
+    # horizontal line on a conic.** The 33rd runs from y=706 over Tunisia to
+    # y=590 over the Caspian — 116 units of rise — so a horizontal fade placed
+    # on the Tunisian end left the cut showing right across Anatolia, which is
+    # exactly where the eye goes once Asia is drawn.
+    #
+    # A conic's parallels are circles about the cone apex, so the fade is a
+    # RADIAL gradient centred there: it follows the 33rd parallel exactly, at
+    # every longitude, by construction rather than by tuning. The apex is
+    # geo.Projection.apex() and the radius is parallel_radius(), so if the
+    # projection ever moves this moves with it.
+    ax, ay = MAPPROJ.apex()
+    r33 = MAPPROJ.parallel_radius(33.0)
+    foot0, foot1 = (r33 - 150.0) / r33, (r33 - 6.0) / r33
     return (
         f'<div class="heroeurope" aria-hidden="true">'
-        f'<svg viewBox="0 0 {MAP_W} {MAP_H}" preserveAspectRatio="xMidYMid meet"'
-        f' focusable="false">{ctx}{land}</svg></div>'
+        f'<svg viewBox="{view[0]:.0f} {view[1]:.0f} {vw:.0f} {vh:.0f}"'
+        f' preserveAspectRatio="xMidYMid meet" focusable="false">'
+        f'<defs><linearGradient id="heroedge" gradientUnits="userSpaceOnUse"'
+        f' x1="{ex1:.1f}" y1="{ey1:.1f}" x2="{ex2:.1f}" y2="{ey2:.1f}">'
+        f'<stop offset="0" stop-color="#fff"/>'
+        f'<stop offset="1" stop-color="#000"/></linearGradient>'
+        f'<radialGradient id="herofootg" gradientUnits="userSpaceOnUse"'
+        f' cx="{ax:.1f}" cy="{ay:.1f}" r="{r33:.1f}">'
+        f'<stop offset="{foot0:.4f}" stop-color="#fff"/>'
+        f'<stop offset="{foot1:.4f}" stop-color="#000"/></radialGradient>'
+        f'<mask id="herocut" maskUnits="userSpaceOnUse"'
+        f' x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}" height="{vh:.0f}">'
+        f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
+        f' height="{vh:.0f}" fill="url(#heroedge)"/></mask>'
+        f'<mask id="herofoot" maskUnits="userSpaceOnUse"'
+        f' x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}" height="{vh:.0f}">'
+        f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
+        f' height="{vh:.0f}" fill="url(#herofootg)"/></mask>'
+        # RELIEF ONLY WHERE THIS ATLAS GOES. Anatolia and the Atlas mountains
+        # are real ground and this file holds them, and drawn at the weight the
+        # Alps are drawn at they took the right-hand third of the picture: the
+        # eye went to Turkey on the homepage of a European travel product. The
+        # clip re-uses the land geometry rather than repeating it — 40 KB of
+        # coastline emitted twice was the first version — and a clipPath cares
+        # only about shape, so the selector trap that makes `<use>` unusable
+        # for painting does not apply here.
+        + (f'<clipPath id="herolandclip" clipPathUnits="userSpaceOnUse">'
+           f'<use href="#heroland"/></clipPath>' if relief else "")
+        + f'</defs>'
+        # THE GROUND, OUTSIDE BOTH MASKS. It is the one layer that must not
+        # fade: the fades exist to hand the eye from the atlas to this, and a
+        # fade applied to both would take the picture back to an edge.
+        + (f'<g class="lyr lyr-beyond"><path id="herobeyond" d="{beyond}"/></g>'
+           if beyond else "")
+        + f'<g mask="url(#herofoot)"><g mask="url(#herocut)">'
+        # OPACITY ON THE GROUP, NOT ON THE PAINT, and that is the whole fix.
+        #
+        # The seams between two independently simplified neighbours have to be
+        # closed by a stroke, and a stroke in the fill's own colour drew a
+        # bright frontier everywhere two countries met: at 78% alpha the two
+        # coincident strokes composite to 95%, so the map grew fifty white
+        # borders — the exact political map this hero was rebuilt to remove,
+        # arrived at from the opposite direction.
+        #
+        # A group opacity flattens the group FIRST and composites it once, so
+        # overlapping strokes inside it cannot double. The paths are opaque and
+        # the group is not, which looks identical where nothing overlaps and
+        # correct where things do.
+        + f'<g class="lyr lyr-land">'
+        + f'<g class="heroctxg">{ctx}</g><g class="herolandg">{land}</g></g>'
+        + (f'<g class="lyr lyr-terrain" clip-path="url(#herolandclip)">'
+           f'{relief}</g>' if relief else "")
+        + f'</g></g></svg></div>'
     )
 
 
@@ -381,10 +577,22 @@ def home(data):
                       alt=hero_row["alt"] if hero_row else "",
                       eager=True, sizes="100vw") if hero_row else ""
 
+    # THE CREDIT IS READ OFF THE DRAWING, not off the intention to draw.
+    # The hero's relief comes from the same bands the plates use and is
+    # dropped entirely if the file is absent, so the note under it asks the
+    # markup whether there is any ground in the picture before naming the
+    # survey that measured it. Every other page gets this from
+    # cartography.credited(); the hero builds its own SVG rather than a
+    # plate, so it is the one place the same rule has to be written twice —
+    # and a check asserts both say it.
+    hero = heroeurope(data)
+    heroground = (" " + cartography.RELIEF_CREDIT
+                  if "lyr-terrain" in hero else "")
+
     body = f"""
 <section class="herofull{' shot' if heroimg else ''}">
   {heroimg}
-  {heroeurope(data)}
+  {hero}
   <div class="herobody">
     <h1>Open the door to Europe.</h1>
     <p class="lede">One continent, drawn as we hold it. Fifty countries, and
@@ -403,7 +611,7 @@ def home(data):
   <div class="chips hero-intents">{intentchips}</div>
   <p class="sourcenote">The continent above is drawn from
   <a href="/sources">Natural Earth</a>, public domain, on a Lambert conformal
-  conic — the same projection and the same file as every other map here.
+  conic — the same projection and the same file as every other map here.{heroground}
   <a href="/map">Open the map →</a></p>
 </div>
 
@@ -3125,29 +3333,22 @@ def minimap(data, t, span=3.2, about=None, named=None):
                  f'{n["city"]["slug"]}'
                  for n in data["cities"].values() if n["city"] is t), None)
     tdraw = cartography.draws_relief(cartography.relief_of(tkey))
-    return (
-        cartography.plate(
-            # TWO SPACES, NAMED SEPARATELY. `view` is the window in the
-            # continent projection this plate shows; `transform` is what
-            # takes that window to the 900x320 picture. Every caller used to
-            # pass (0, 0, w, h) here, which made the renderer select its own
-            # layers from the North Sea and draw them over the Alps.
-            uid=uid, w=w, h=h, proj=MAPPROJ, view=view,
-            transform=(f'translate({w/2 - cx*span:.2f},'
-                       f'{h/2 - cy*span:.2f}) scale({span})'),
-            land=land, context=ctx, relief=tdraw, frame_km=km_w,
-            destinations="".join(dots), labels=drawnlabels + bar,
-            rim=False,
-            figure_class=(f"minimap arched atlas{dense_class(drawnlabels)}"
-                          + (" terrain" if tdraw else "")),
-            aria=f"Map of {esc(t['name'])} and the places around it")[:-len("</figure>")]
-        # `about` names something INSIDE this destination — a place page's
-        # subject. The map is then honestly captioned as what it is: this
-        # atlas has one projection and its finest unit is about four
-        # kilometres, so there is no map of a building, and a map labelled
-        # "Bryggen" that is actually a map of Bergen would be the kind of
-        # small lie refused everywhere else here.
-        + f'<figcaption>'
+    # `about` names something INSIDE this destination — a place page's
+    # subject. The map is then honestly captioned as what it is: this atlas
+    # has one projection and its finest unit is about four kilometres, so
+    # there is no map of a building, and a map labelled "Bryggen" that is
+    # actually a map of Bergen would be the kind of small lie refused
+    # everywhere else here.
+    #
+    # AND THE CAPTION GOES THROUGH THE PLATE NOW, rather than being glued on
+    # after slicing `</figure>` off the end of it. The plate is the only
+    # thing that knows which layers it actually drew, and the relief credit
+    # is attached to the drawing rather than to the request — see
+    # cartography.credited(). Building the sentence out here and handing it
+    # over costs nothing and removes the one place in this file that took a
+    # renderer's output apart with a string index.
+    cap = (
+        f'<figcaption>'
         + (f'{esc(about)} is in {esc(t["name"])}, and this is {esc(t["name"])} '
            f'— the atlas draws Europe in one projection whose finest unit is '
            f'about four kilometres, so it maps the town rather than the '
@@ -3162,8 +3363,22 @@ def minimap(data, t, span=3.2, about=None, named=None):
         # is worse than none, because it looks like a policy. One clause, the
         # same one the region and story maps carry.
         f'Coastline from <a href="/sources">Natural Earth</a>, public domain. '
-        f'<a href="/map">The full map →</a></figcaption></figure>'
-    )
+        f'<a href="/map">The full map →</a></figcaption>')
+    return cartography.plate(
+        # TWO SPACES, NAMED SEPARATELY. `view` is the window in the
+        # continent projection this plate shows; `transform` is what
+        # takes that window to the 900x320 picture. Every caller used to
+        # pass (0, 0, w, h) here, which made the renderer select its own
+        # layers from the North Sea and draw them over the Alps.
+        uid=uid, w=w, h=h, proj=MAPPROJ, view=view,
+        transform=(f'translate({w/2 - cx*span:.2f},'
+                   f'{h/2 - cy*span:.2f}) scale({span})'),
+        land=land, context=ctx, relief=tdraw, frame_km=km_w,
+        destinations="".join(dots), labels=drawnlabels + bar,
+        rim=False, caption=cap,
+        figure_class=(f"minimap arched atlas{dense_class(drawnlabels)}"
+                      + (" terrain" if tdraw else "")),
+        aria=f"Map of {esc(t['name'])} and the places around it")
 
 
 # THE CLIP IS AN ELLIPSE AND THE PLACEMENT RULE TESTED A RECTANGLE.
@@ -4881,6 +5096,18 @@ def story_page(data, s):
 # ── the map ───────────────────────────────────────────────────────────
 
 MAP_W, MAP_H = 1000, 780
+
+# THE HOMEPAGE HERO'S OWN WINDOW ON THE SAME PROJECTION. Wider and deeper than
+# the atlas frame, because its subject is the continent rather than a set of
+# places: Europe is drawn where it always is and the land carries on past it
+# into Asia and Africa, from beyond-lod0.json, quietly.
+#
+# The numbers are the largest window whose edges show no data cut. Checked
+# against beyond-lod0.json's own bbox under this projection: the 102°E cut
+# runs from x=1,489 at 36°N to y=-192 at 68°N and the 8°N cut from y=1,003 at
+# 50°E outward, so neither is inside (0, 0)-(1120, 800) at any latitude, and
+# no fade has to hide anything. Widening past this would put one back.
+HERO_VIEW = (0.0, 0.0, 1120.0, 800.0)
 LON0, LON1, LAT0, LAT1 = -25.0, 45.0, 33.0, 71.5
 
 
@@ -6136,6 +6363,62 @@ def api_page(data):
 
 
 def sources_page(data):
+    # THE PAGE A THOUSAND CREDITS POINT AT NEVER NAMED A SINGLE DATASET.
+    #
+    # Every map on this site ends "Coastline from Natural Earth, public
+    # domain" with Natural Earth linked to /sources, and /sources was about
+    # editorial facts: it did not contain the words "Natural Earth" anywhere.
+    # A credit whose link goes to a page that does not carry the credit is
+    # worse than an uncredited map, because it looks like a register. Found
+    # while adding the relief credit, which would have been the second dead
+    # link to the same page.
+    #
+    # It is BUILT FROM THE GEOMETRY FILES, not typed. Each data/geo/ document
+    # carries the rows that produced it — dataset, licence, version, the
+    # SHA-256 of the exact bytes and the date they were fetched — written
+    # there by scripts/map/fetch.py from docs/data-licenses/sources.json. So
+    # this table cannot drift from what actually drew the maps, and a dataset
+    # added without a licence row cannot appear here at all, because fetch.py
+    # will not open a socket for one.
+    georows = []
+    geodoc = geo.load("europe-lod1.json") or {}
+    for src in geodoc.get("sources", []):
+        georows.append((
+            src["dataset"],
+            f'{esc(src.get("version", ""))} · fetched {esc(src.get("fetched", "—"))} · '
+            f'SHA-256 <span class="mono">{esc(src.get("sha256", "")[:12])}…</span>',
+            src.get("licence", "").replace("-", " ")))
+    tdoc = geo.load("terrain-lod1.json") or {}
+    if tdoc.get("$source"):
+        pl = tdoc.get("pipeline", {})
+        georows.append((
+            tdoc["$source"].split(";")[0].strip(),
+            f'Decoded into four hypsometric band boundaries at '
+            f'{", ".join(f"{b:,}" for b in pl.get("bands_m", []))} m, '
+            f'about {tdoc.get("smoothed_m", 0):,} m across after smoothing. '
+            f'No pixel of the source reaches a page: this atlas has no '
+            f'<span class="mono">&lt;img&gt;</span> on any map.',
+            "public domain"))
+    georows = "".join(
+        f'<div class="row"><div><h3>{esc(name)}</h3>'
+        f'<p class="rowsub">{sub}</p></div>'
+        f'<p class="rowmeta">{esc(lic)}</p></div>'
+        for name, sub, lic in georows)
+    geodata = section(
+        "Where the geography comes from",
+        f'<div class="rows">{georows}</div>'
+        '<p class="small">Every one of these is public domain and none of '
+        'them requires a credit. We print one on every map anyway: a reader '
+        'looking at a border, or at a mountain range, is entitled to know '
+        'which survey measured it, and an uncredited map invites the '
+        'assumption that we surveyed it ourselves. The licence for each is '
+        'written down in the repository before the data is downloaded — '
+        'the fetcher refuses a source that has no licence file.</p>',
+        id="geography",
+        lede="Open data, hosted by us, fetched by a script that records the "
+             "SHA-256 of the exact bytes. No map account, no key, no "
+             "third-party tile server, and nothing traced by hand.")
+
     body = f"""
 {crumbs([("Europe", "/discover"), ("Sources & corrections", None)])}
 <div class="pagehead">
@@ -6186,6 +6469,8 @@ def sources_page(data):
     accidental use of somebody's holiday photograph.</p>
   </aside>
 </div>
+
+{geodata}
 """
     return "/sources/index.html", page(
         "Sources & corrections", body, path="/sources", area=None,

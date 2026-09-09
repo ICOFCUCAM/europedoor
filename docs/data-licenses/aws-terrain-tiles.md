@@ -1,7 +1,10 @@
 # AWS Terrain Tiles — elevation, and the three datasets underneath it
 
-**Status: fetched, at zoom 7 only, over one frame.** Used to derive the
-`terrain` layer for the Chamonix relief prototype. Nothing else draws it yet.
+**Status: integrated. Zoom 6 over the whole extent, and zoom 7 over one
+frame.** The 182 zoom-6 tiles are what ships: they derive the hypsometric
+bands drawn on 261 destination and journey plates and on the homepage hero.
+The six zoom-7 tiles are the Chamonix prototype and are kept because the
+prototype's measurements are quoted in `docs/terrain-prototype.md`.
 
 ## What this is
 
@@ -49,23 +52,35 @@ document states which dataset fills which zoom:
 
 **EU-DEM enters at zoom 9. Every national dataset with a CC BY obligation
 enters at zoom 10.** At zoom 7 the land is SRTM and GMTED and the sea is
-ETOPO1 — three US Government public-domain datasets, and nothing else.
+ETOPO1 — three US Government public-domain datasets, and nothing else. At
+zoom 6 it is GMTED and ETOPO1 and not even SRTM.
 
-So the rule this repository fetches under is: **zoom 7, and no deeper.** A
-zoom-9 tile of the Alps is a different licence position wearing the same URL
-shape, which is exactly the failure mode `refuse_matching` exists for
-elsewhere. Zoom 8 is also SRTM and would also be clean; 7 is what the
-prototype needed and 7 is what is recorded, because a limit set at what was
-actually verified is a limit somebody can check.
+So the rule this repository fetches under is: **zoom 7, and no deeper**, and
+what actually ships is a zoom deeper still. A zoom-9 tile of the Alps is a
+different licence position wearing the same URL shape, which is exactly the
+failure mode `refuse_matching` exists for elsewhere. Zoom 8 is also SRTM and
+would also be clean; 7 is the limit that was verified tile by tile, so 7 is
+what is recorded, because a limit set at what was actually checked is a limit
+somebody else can re-check.
+
+**The integration chose 6 for a cartographic reason and inherited a safer
+licence position as a side effect.** 1,730 m a cell is the resolution a
+restrained tonal field wants: at zoom 7 the bands carry detail that reads as a
+GIS hillshade at plate size and costs four times the bytes for it. That the
+land at that zoom is GMTED alone — one US Government public-domain dataset —
+is a consequence rather than the argument, and it is why the credit names
+GMTED2010 and ETOPO1 and not SRTM.
 
 ## It is verified per tile, not assumed
 
 The service publishes the contributing images for every tile it serves, in
 the `x-amz-meta-x-imagery-sources` response header. Each row in
 `sources.json` carries that header **as returned for that exact tile**, so
-the claim above is evidence rather than a reading of a table. Every one of
-the six tiles fetched names only `srtm/*`, `gmted/*` and (for the tile that
-touches the Mediterranean) `etopo1/*`.
+the claim above is evidence rather than a reading of a table. Across all 188
+tiles fetched, the headers name only `srtm/*`, `gmted/*` and `etopo1/*` —
+and split by zoom, the six prototype tiles at 7 name srtm on 71 of their
+contributing images while the 182 shipped tiles at 6 name gmted on 176 and
+etopo1 on 157 and srtm on none.
 
 If a re-fetch ever returns a header naming anything else, the recorded
 `provenance` string will no longer match and the difference will be in the
@@ -79,7 +94,24 @@ this atlas already credits Natural Earth on the same reasoning — a reader
 looking at relief is entitled to know which survey measured it. So any page
 that draws terrain names:
 
-    SRTM and GMTED2010 elevation data courtesy of the U.S. Geological Survey
+    Relief from GMTED2010 (USGS) and ETOPO1 (NOAA), public domain.
+
+**This sentence said "SRTM and GMTED2010" for three commits and was wrong.**
+It was written against the six zoom-7 prototype tiles, whose imagery header
+names `srtm/*` on 71 of their contributing images. The integration went to
+**zoom 6**, and the header on those 182 tiles names `gmted/*` on 176 and
+`etopo1/*` on 157 and `srtm/*` on none. Crediting a survey whose data is not
+in the picture is the same class of untruth as crediting none, and it lasted
+because the promise lived in prose here rather than in a check. `checks.py`
+now derives the credit's dataset list from the `provenance` header recorded
+in `sources.json`, filtered to the zoom `data/geo/terrain-lod1.json` says it
+was built at, and asserts every page carrying `lyr-terrain` names each one.
+
+**ETOPO1 is named even though no band boundary is traced through the sea.**
+The grid is smoothed with a three-pass kernel before it is traced, so an
+ocean cell pulls the 200 m contour about five kilometres inland — every
+fjord, every Greek island and the whole Italian coast is inside that. A
+dataset that moves the line is a dataset that drew it.
 
 `attribution_required` stays `false` on these rows, because it is false; the
 credit is drawn anyway. Setting the flag to `true` when the licence does not
@@ -88,7 +120,7 @@ the first genuinely share-alike byte — fire on a false alarm and be ignored.
 
 ## What is derived, and what is thrown away
 
-`scripts/map/process.py` decodes the tiles, smooths the grid, and traces
+`scripts/map/relief.py` decodes the tiles, smooths the grid, and traces
 **hypsometric band boundaries** at 200, 600, 1,200 and 2,000 metres into
 lon/lat rings. The bands are the only thing that ships. No pixel of the
 source reaches a page: there is no `<img>` in this product and there is not

@@ -37,6 +37,7 @@ and never geographic truth.** Everything drawn here comes from a dataset in
 | destination | **where the ground earns it** | four hypsometric bands, subordinate to the place. 147 of 319 |
 | journey | **where the ground earns it, under 1,500 km** | the same bands as a backdrop to the route. 6 of 17 |
 | place | inherits its destination | it is the same picture of the same town |
+| homepage hero | **yes, as a picture** | three of the four bands over the whole continent — see below |
 | Europe overview | no | clean atlas |
 | `/map` | **no** | an instrument, and relief is an illustration layer |
 
@@ -53,6 +54,25 @@ second strength was built, measured at 0.043 of luminance on the only band
 Bergen has, and removed. An absolute scale reduces itself — a flat place
 reaches only the quiet end of it — and two strengths would make one colour
 mean two heights. See `docs/terrain-prototype.md`.
+
+**The hero is the third family, and it is a different treatment rather than
+an exception.** The suitability measurement, the two thresholds and the
+1,500 km frame cap are a rule about a picture of a PLACE: does this ground
+explain this destination. The homepage's subject is the continent, and the
+question it answers is "this is Europe, and it has mountains in it" — so it
+draws the same absolute scale over the whole extent, three bands rather than
+four (the 200 m band is nothing at all at continental scale), thinned to a
+picture's tolerance. The colours are `HYPSOMETRIC`'s own and `checks.py`
+reads all three off it; only the alpha over them is the hero's, because the
+land under it is itself translucent.
+
+**The hero also draws the ground beyond the atlas, and draws it as a
+different thing.** `beyond-lod0.json` is western Siberia, the Caspian, Iran,
+Arabia and the Sahara: anonymous rings, no country, no relief, no label,
+nothing to click, at a sixth of the contrast of the land in front of them.
+Europe is not an island and a drawing that ends at 52°E said it was. The
+distinction a reader is meant to feel is not *these countries matter less* —
+it is *this is where the light stops*, which is what a door does.
 
 **Terrain must support recognition and sense of place, never become the
 subject of the map.** And: **no layer may be added merely because the source
