@@ -1917,6 +1917,32 @@ def c_no_fixed_widths():
     return n
 
 
+@check("every dot on a map lands inside its own frame")
+def c_map_dots_in_frame():
+    # Svalbard's region map drew Longyearbyen at y = -317 on a viewBox that
+    # starts at 0. The dot was invisible, the map was of an empty sea, and
+    # nothing on the page said a place was missing — because the projection
+    # stops at 71.5°N and Longyearbyen is at 78.2.
+    #
+    # No amount of looking at the other 129 region maps would have found it.
+    # What found it was asserting the thing a map must be true of: the
+    # subject is inside the picture. One of 191 failed.
+    n = 0
+    for f in site_files():
+        html = open(f, encoding="utf-8").read()
+        for m in re.finditer(r'pointsmap arched"><svg viewBox="0 0 ([\d.]+) ([\d.]+)"'
+                             r'(.*?)</svg>', html, re.S):
+            w, h, frag = float(m.group(1)), float(m.group(2)), m.group(3)
+            for c in re.finditer(r'<circle cx="([\d.-]+)" cy="([\d.-]+)"', frag):
+                x, y = float(c.group(1)), float(c.group(2))
+                if not (0 <= x <= w and 0 <= y <= h):
+                    fail(f"{rel(f)}: a map dot is at ({x:.0f}, {y:.0f}) on a "
+                         f"{w:.0f}x{h:.0f} frame — outside the picture, so it "
+                         f"is not drawn and nothing says it is missing")
+                n += 1
+    return n
+
+
 @check("the aperture is cut the same way by all three renderers")
 def c_aperture_agrees():
     # The signature is one curve cut three ways: an SVG clipPath for the maps

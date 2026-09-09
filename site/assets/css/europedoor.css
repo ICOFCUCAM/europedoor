@@ -1972,7 +1972,6 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
  * dark-ground-only by policy — 16:1 on graphite, 1.05:1 on ivory — and a
  * doorway cut into the page is exactly the dark ground that policy is for. */
 .minimap.arched .routeline { stroke: var(--lime); opacity: .95; }
-.minimap.arched .routedot { fill: var(--lime); stroke: var(--map-sea); stroke-width: 1.5; }
 /* opacity:1 is the load-bearing half. The base rule is
    `.minidot circle { fill: var(--ink-3); opacity: .55 }` — a fill and a
    dimmer. Overriding only the fill left both dimmers in place, so the

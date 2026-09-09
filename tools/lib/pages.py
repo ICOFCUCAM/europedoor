@@ -1963,7 +1963,8 @@ def minimap(data, t, span=3.2, about=None):
     )
 
 
-def pointsmap(pts, uid, caption, aria, want=2.6, pad=60):
+def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
+              min_w=120.0, min_h=75.0, line=False, extra=""):
     """A set of places on the continent, through the aperture.
 
     `pts` is [(x, y, href, name)] in projection space. Extracted from
@@ -1973,23 +1974,101 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad=60):
     the unit normalisation and the label collision rule, which is how two
     maps of the same atlas start disagreeing about where Bergen is.
     """
+    # A POINT OUTSIDE THE PROJECTION IS NOT A POINT THIS MAP CAN DRAW.
+    #
+    # Longyearbyen is at 78.2°N and the projection stops at 71.5. Svalbard's
+    # region map put its one destination at y = -317 on a frame that starts
+    # at 0 — an invisible dot, a map of an empty sea, and nothing anywhere
+    # saying a place was missing. The country map for Norway has always
+    # handled this ("1 outside this frame: Longyearbyen") and the region map
+    # inherited none of it.
+    #
+    # So the frame is built from the points it can actually contain, and
+    # anything dropped is named in the caption rather than silently absent.
+    # Found by asserting that every dot lands inside its own viewBox: one of
+    # 130 region maps failed, and no rendering of the other 129 would have
+    # shown it.
+    off = [p for p in pts if not (0 <= p[0] <= MAP_W and 0 <= p[1] <= MAP_H)]
+    pts = [p for p in pts if p not in off]
+    if not pts:
+        # Svalbard's only destination is its only point, and it is north of
+        # the projection. Returning "" left the page with no map and no
+        # explanation, which reads as a missing feature rather than as a
+        # stated limit — so the absence says why it is absent.
+        names = ", ".join(esc(p[3]) for p in off)
+        return (f'<p class="sourcenote">No map: {names} '
+                f'{"lies" if len(off) == 1 else "lie"} beyond the northern '
+                f'edge of the projection this atlas draws, and a map without '
+                f'the place on it would be a map of the wrong thing. '
+                f'<a href="/map">The full map →</a></p>')
+    if off:
+        names = ", ".join(esc(p[3]) for p in off)
+        caption += (f' {len(off)} outside this frame: {names} — beyond the '
+                    f'northern edge of the projection this atlas draws.')
     xs = [p[0] for p in pts]
     ys = [p[1] for p in pts]
+    # PADDING IN PROPORTION TO THE SUBJECT, NOT IN ABSOLUTE UNITS.
+    #
+    # A flat 90 was larger than the Carpathian Arc: its six stops span 106
+    # projection units, so 90 on each side put three-quarters of the frame
+    # outside the route before the aspect fit had done anything. Breathing
+    # room is a ratio; a floor keeps two places forty kilometres apart from
+    # being drawn at street scale.
+    span = max(max(xs) - min(xs), max(ys) - min(ys))
+    pad = max(pad_min, span * pad_frac)
     x0, x1 = min(xs) - pad, max(xs) + pad
     y0, y1 = min(ys) - pad, max(ys) + pad
-    w, h = max(280.0, x1 - x0), max(150.0, y1 - y0)
+    # THE FLOOR, AND WHY IT POINTS THE OPPOSITE WAY FOR TWO KINDS OF MAP.
+    #
+    # A route has extent and IS the subject, so a frame much larger than it
+    # buries it: the Alpine Grand Tour's six stops filled 12% of their own
+    # map. A one-destination region has no extent at all, and the subject is
+    # then the CONTEXT — Tyrol drawn at 250 km across is one dot in a tangle
+    # of frontier lines that could be anywhere in the Alps.
+    #
+    # Measured both ways rather than argued: dominant-axis fill across the
+    # 17 routes runs 36/63/82% (min/median/max) at this default, and the
+    # region maps pass a much larger floor for the opposite reason. The
+    # metric that first said regions were fine was itself wrong — it counted
+    # every <circle> on the page, and every destination card carries a plate
+    # with a moon in it.
+    # AND THE FLOOR EXPANDS AROUND THE CENTRE, NOT FROM THE ORIGIN.
+    # `w = max(min_w, x1 - x0)` left x0 alone, so a frame that had to grow
+    # to the floor grew east and south only: Innsbruck, the single stop in
+    # Tyrol & the West, sat 25% from the left edge and 15% from the top of
+    # its own map. Rendering found it; the numbers said the frame was the
+    # right size and never asked where it was.
+    cx, cy = (x0 + x1) / 2.0, (y0 + y1) / 2.0
+    w, h = max(min_w, x1 - x0), max(min_h, y1 - y0)
+    x0, y0 = cx - w / 2.0, cy - h / 2.0
     # ONE PROPORTION ACROSS EVERY MAP OF THIS KIND, or the family has no
     # signature. The bounding box of two places 50 km apart is nearly square;
     # the box of five languages across a continent is a letterbox. Left
     # alone, the arch over each would be a different arch, and the reader
     # would never see that they are the same aperture. The SHORT axis grows,
     # which only ever adds context and never crops a place out.
+    # AND THE TARGET MAY NOT COST THE SUBJECT ITS SCALE.
+    #
+    # A fixed 2.6:1 is right for a spread and catastrophic for a compact
+    # one. Measured across the seventeen journey routes after the frames
+    # were normalised: the Alpine Grand Tour occupied 12% of its own map's
+    # width, the Carpathian Arc 11%, Arctic to the Baltic 13% — six valleys
+    # in four countries drawn as three dots lost between Brittany and
+    # Hungary. The aspect was being bought with the entire legibility of the
+    # picture.
+    #
+    # So the short axis may grow, and may not grow without limit: GROW_MAX
+    # of the padded bounding box. The aspect then lands anywhere between the
+    # subject's own shape and the target, which is a range the arch survives
+    # — a rounder head over a compact route is still a doorway, and a route
+    # you can see is not optional.
+    GROW_MAX = 1.7
     if w / h < want:
-        grow = (h * want - w) / 2.0
-        x0, w = x0 - grow, h * want
+        w2 = min(h * want, w * GROW_MAX)
+        x0, w = x0 - (w2 - w) / 2.0, w2
     elif w / h > want:
-        grow = (w / want - h) / 2.0
-        y0, h = y0 - grow, w / want
+        h2 = min(w / want, h * GROW_MAX)
+        y0, h = y0 - (h2 - h) / 2.0, h2
     # AND THEN CLAMPED TO THE WORLD THE PROJECTION DRAWS.
     #
     # Widening a nearly-square frame to 2.6:1 once put it at x = -173..1374
@@ -2048,6 +2127,16 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad=60):
         else:
             lab.append(f'<text class="minilabel here" x="{px + 10:.1f}" '
                        f'y="{py + 4:.1f}">{esc(name)}</text>')
+    # A ROUTE IS THE SAME PICTURE WITH ONE MORE ELEMENT. `line` draws the
+    # order; a theme, a month or a motion has no order and passes False,
+    # and that single element is the whole difference between "these places
+    # make one case" and "you go to these in this sequence".
+    route = ""
+    if line:
+        d = " ".join(("M" if i == 0 else "L")
+                     + f"{(x - x0) * k:.1f} {(y - y0) * k:.1f}"
+                     for i, (x, y, _h, _n) in enumerate(pts))
+        route = f'<path class="routeline" d="{d}"/>'
     ctx, land = geo.landmass(MAPPROJ, (x0, y0, w, h))
     return (
         f'<figure class="minimap pointsmap arched">'
@@ -2057,7 +2146,7 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad=60):
         f'<g clip-path="url(#arch-{uid})">'
         f'<rect x="0" y="0" width="{vw:.1f}" height="{vh:.1f}" class="archground"/>'
         f'<g transform="scale({k:.4f}) translate({-x0:.1f},{-y0:.1f})">{ctx}{land}</g>'
-        f'{"".join(dots)}{"".join(lab)}</g></svg>'
+        f'{route}{"".join(dots)}{"".join(lab)}</g></svg>'
         f'<figcaption>{caption}</figcaption></figure>'
     )
 
@@ -2083,9 +2172,15 @@ def regionmap(data, c, r):
            f'round them. Coastline from <a href="/sources">Natural Earth</a>, '
            f'public domain. <a href="/map?c={esc(c["slug"])}">Open '
            f'{esc(c["name"])} on the full map →</a>')
+    # A REGION NEEDS THE COUNTRY AROUND IT, NOT A CLOSE-UP OF ITSELF.
+    # Tyrol & the West holds one destination; at the default floor that is a
+    # single dot in 250 km of unlabelled frontier line, which could be
+    # anywhere in the Alps. 260 x 165 is roughly 1,100 x 700 km — enough for
+    # a coast or a recognisable border to appear and place it.
     return pointsmap(pts, uid, cap,
                      f'Map of {r["name"]}, {c["name"]}: its '
-                     f'{len(pts)} destinations in the Atlas')
+                     f'{len(pts)} destinations in the Atlas',
+                     min_w=260.0, min_h=165.0)
 
 
 def storymap(data, s):
@@ -2141,56 +2236,39 @@ def storymap(data, s):
 
 
 def routemap(data, j):
-    """The journey drawn on the continent. Same projection as /map, so a
-    route on a journey page and the same route on the map agree exactly."""
+    """The journey drawn on the continent, in order.
+
+    THE LABELS WERE THREE TIMES TOO BIG, ON EVERY JOURNEY WITH A SHORT
+    ROUTE. This function used to build its own viewBox in raw projection
+    units, so the Alpine Grand Tour — 509 km end to end — got a frame about
+    330 units wide, rendered at the full column width, and every 11px label
+    came out at 34: "Lauterbrunnen" straight through "Chamonix", both of
+    them larger than the h2 below. Nothing in CSS can correct it, because
+    the browser scales the units and the stylesheet only knows the units.
+    That is the same defect pointsmap() was built to fix for the story maps,
+    and the fix is to stop having two implementations of the same picture.
+
+    A route is that picture with one more element: the line. Passing
+    line=True is now the entire difference between a journey and a theme —
+    which is exactly right, because the difference between them IS the
+    order.
+
+    The stops became links on the way through, which they were not before:
+    every dot on every other map on this site opens the place it marks.
+    """
     idx = data["cities"]
-    pts = [project(idx[l["city"]]["city"]["lat"], idx[l["city"]]["city"]["lon"]) for l in j["legs"]]
-    xs = [p[0] for p in pts]
-    ys = [p[1] for p in pts]
-    pad = 90
-    x0, x1 = min(xs) - pad, max(xs) + pad
-    y0, y1 = min(ys) - pad, max(ys) + pad
-    w, h = max(240.0, x1 - x0), max(160.0, y1 - y0)
-    d = " ".join(("M" if i == 0 else "L") + f"{x:.1f} {y:.1f}" for i, (x, y) in enumerate(pts))
-    dots = "".join(
-        f'<circle class="routedot" cx="{x:.1f}" cy="{y:.1f}" r="6"><title>{i + 1}. '
-        f'{esc(idx[j["legs"][i]["city"]]["city"]["name"])}</title></circle>'
-        for i, (x, y) in enumerate(pts)
-    )
-    # LABEL COLLISION. Stops that are close on the map printed their names
-    # through each other — "Lofoten (Svolvær)" straight across "Abisko" on
-    # the flagship route. A label is dropped when it would land on one
-    # already placed, which costs nothing: every stop keeps its dot and its
-    # <title>, and the list below names all thirteen in order. Thresholds
-    # are a share of the frame, so they hold whatever the route's shape.
-    placed = []
-    lab = []
-    dx_min, dy_min = w * 0.22, h * 0.028
-    for i, (x, y) in enumerate(pts):
-        if any(abs(x - px) < dx_min and abs(y - py) < dy_min for px, py in placed):
-            continue
-        placed.append((x, y))
-        lab.append(
-            f'<text class="minilabel here" x="{x + 10:.1f}" y="{y + 4:.1f}">'
-            f'{esc(idx[j["legs"][i]["city"]]["city"]["name"])}</text>'
-        )
-    labels = "".join(lab)
-    # The land, under the line. Without it this was a lime zigzag on black —
-    # the same "a dot map with nothing under it is a scatter plot" fault the
-    # homepage hero had, and worse here: the entire claim of a journey page
-    # is that the route crosses a real continent.
-    ctx, land = geo.landmass(MAPPROJ, (x0, y0, w, h))
-    return (
-        f'<figure class="minimap routemap arched">'
-        f'<svg viewBox="{x0:.1f} {y0:.1f} {w:.1f} {h:.1f}" role="img" data-world="intelligence" '
-        f'aria-label="Route map for {esc(j["name"])}">'
-        f'<defs>{arch_clip("rt" + j["slug"][:12].replace(chr(45), ""), w, h, x0=x0, y0=y0)}</defs>'
-        f'<g clip-path="url(#arch-{"rt" + j["slug"][:12].replace(chr(45), "")})">'
-        f'<rect x="{x0:.1f}" y="{y0:.1f}" width="{w:.1f}" height="{h:.1f}" class="archground"/>'
-        f'{ctx}{land}<path class="routeline" d="{d}"/>{dots}{labels}</g></svg>'
-        f'<figcaption>Straight lines between stops. What each one means on the ground is in the '
-        f'note under the leg. <a href="/map">The whole map, with every journey →</a></figcaption></figure>'
-    )
+    pts = []
+    for leg in j["legs"]:
+        n = idx[leg["city"]]
+        pts.append((*project(n["city"]["lat"], n["city"]["lon"]),
+                    urls.city(n["country"], n["region"], n["city"]),
+                    n["city"]["name"]))
+    uid = "rt" + "".join(ch for ch in j["slug"] if ch.isalnum())[:14]
+    cap = ('Straight lines between stops, in order. What each one means on the '
+           'ground is in the note under the leg. '
+           '<a href="/map">The whole map, with every journey →</a>')
+    return pointsmap(pts, uid, cap, f'Route map for {j["name"]}',
+                     line=True)
 
 
 # ── destination facets ────────────────────────────────────────────────

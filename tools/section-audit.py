@@ -474,7 +474,13 @@ def s17():
     import re as _re
     _m = _re.search(r'aria-label="Route map[^>]*>(.*?)</svg>', h, _re.S)
     _svg = _m.group(1) if _m else ""
-    yield _svg.count('class="routedot"') == len(
+    # Counted as CIRCLES, not as `class="routedot"`. The promise is that
+    # every stop is on the map; the class was the old implementation, and it
+    # changed when the route map was rebuilt on the shared pointsmap (the
+    # stops became links, so each dot is now an <a> wrapping a <circle>).
+    # An assertion that names a class fails on a refactor and passes on a
+    # missing stop, which is exactly backwards.
+    yield _svg.count('<circle') == len(
         [j for j in DATA["journeys"] if j["slug"] == "the-alpine-grand-tour"][0]["legs"]), \
         "every stop is on the map, labelled or not"
     yield has(u, "The route", "What to pack", "Estimated cost", "Difficulty",

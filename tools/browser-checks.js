@@ -1484,7 +1484,7 @@ async function main() {
           if (!g) continue;
           const ground = parse(getComputedStyle(g).fill);
           for (const sel of [".minilabel", ".minilabel.here", ".minidot circle",
-                             ".minidot.here circle", ".routedot", ".routeline",
+                             ".minidot.here circle", ".routeline",
                              ".rlabel text"]) {
             const el = fig.querySelector(sel);
             if (!el) continue;
