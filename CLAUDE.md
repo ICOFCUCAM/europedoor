@@ -303,6 +303,29 @@ shipped HTML — a page printing a hop says "straight line", and no page
 anywhere claims a mode or a ground distance. A source-level check would have
 passed on all three.
 
+**Styling that cannot apply is dead code that looks like a decision, and a
+check now deletes every rule in turn to find it.** Twice in three commits a
+rule lost a specificity fight and the result rendered as *the thing is simply
+not there* — the touch targets painted because `.minidot .hit` (0,2,0) lost
+to `.minimap.arched .minidot circle` (0,3,1); the macro members were not
+filled because two (0,3,1) selectors met and the later one won. Neither is
+visible in any count. The scan removes each declaration and sees whether
+anything on the page moves; a rule that matches elements and changes none of
+them cannot apply.
+
+**Its first run found that a country is not highlighted on its own map** —
+`.countrymap .countries path.here` never won anywhere, so Austria was drawn
+on Austria's page in exactly the same grey as Germany, on all fifty. The
+scan is a **ceiling, not zero**: several base rules are legitimately
+superseded by an `.arched` variant on every page that has one, and the
+honest fix for those is a refactor. Raising the number is allowed; raising
+it without reading the list is not.
+
+**The scanner's own first version examined nothing and reported clean.** A
+`CSSStyleRule` carries an *empty* `cssRules` list for CSS nesting, and an
+empty list is truthy — so the walker recursed into nothing for every rule and
+collected none of the 630. The check asserts its own reach for that reason.
+
 **The macro regions were the last geographic family with no geography** — a
 headline and a grid of nine cards, telling a reader which countries are in
 the Nordics without ever showing where it is. **A macro region is the one

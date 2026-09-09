@@ -800,8 +800,14 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
  * you where any of them were. */
 .countrymap svg { background: var(--map-sea); border-radius: var(--radius); }
 .countrymap .context path { fill: var(--map-context); }
-.countrymap .countries path { fill: var(--map-land); stroke: var(--map-border); stroke-width: 1; }
-.countrymap .countries path.here { fill: var(--map-hover); stroke: var(--sea); stroke-width: 1.4; }
+/* The two rules that were here — `.countrymap .countries path` and the same
+   with `.here` — set a fill and a stroke and never won anywhere. Both are
+   (0,3,1) against `.minimap.arched .countries path`, which is further down
+   the file, so the country map's own styling was entirely superseded and the
+   `.here` highlight meant Austria was drawn on Austria's page in exactly the
+   same grey as Germany, on all fifty. The live version is beside the macro
+   fill, at a specificity that wins. Deleted rather than left in place:
+   styling that cannot apply is dead code that looks like a decision. */
 .countrymap .rtie { stroke: var(--sea); stroke-width: 1; opacity: .35; }
 .countrymap .rlabel text {
   fill: var(--ink-2); font-size: 15px; font-weight: 700; text-anchor: middle;
@@ -2270,6 +2276,12 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
    collision in three commits that rendered as "the thing simply is not
    there": the touch targets painted because they LOST one, and this lost one
    too. Neither is visible in any count. */
-.minimap.arched.macromap .countries path.here {
+.minimap.arched.macromap .countries path.here,
+/* AND THE COUNTRY ON ITS OWN PAGE, which lost the same fight on all fifty.
+   `.countrymap .countries path.here` sets a fill and a stroke and never wins
+   anywhere: found by deleting every rule in this stylesheet in turn and
+   seeing whether anything moved. Austria was drawn on Austria's page in
+   exactly the same grey as Germany. */
+.minimap.arched.countrymap .countries path.here {
   fill: var(--map-hover); stroke: var(--sea); stroke-width: 1.3; }
 .minimap.arched .context path { stroke: color-mix(in srgb, var(--map-border) 60%, transparent); stroke-width: 0.7; }

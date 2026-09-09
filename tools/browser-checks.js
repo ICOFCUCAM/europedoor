@@ -1390,6 +1390,91 @@ async function main() {
   ok(stored.includes("experience:"), "saving an experience did not store it");
   await xp.close();
 
+  // ── styling that cannot apply ──────────────────────────────────────
+  //
+  // TWICE IN THREE COMMITS A RULE LOST A SPECIFICITY FIGHT AND THE RESULT
+  // RENDERED AS "THE THING IS SIMPLY NOT THERE". The touch targets painted
+  // because `.minidot .hit` (0,2,0) lost to `.minimap.arched .minidot circle`
+  // (0,3,1); the macro members were not filled because `.macromap .countries
+  // path.here` and `.minimap.arched .countries path` are both (0,3,1) and the
+  // second is further down the file. Neither is visible in any count.
+  //
+  // This finds them the only way that is not guesswork: delete each
+  // declaration in turn and see whether anything on the page moves. A rule
+  // that matches elements and changes none of them cannot apply.
+  //
+  // The first thing it found, on its first run: `.countrymap .countries
+  // path.here` never won, so a country was drawn on its own page in exactly
+  // the same grey as its neighbours — all fifty of them.
+  //
+  // A CEILING, not zero. Several base rules are legitimately superseded by
+  // an `.arched` variant on every page that has one, and the honest fix for
+  // those is a refactor rather than a deletion. Raising this number is
+  // allowed; doing it without reading the list is not.
+  {
+    const DEAD_CEILING = 27;
+    const seen = new Map();
+    for (const u of ["/", "/europe/austria", "/europe/austria/tyrol",
+                     "/europe/austria/tyrol/innsbruck",
+                     "/journeys/the-alpine-grand-tour", "/discover/nordic",
+                     "/events/oct", "/beyond-the-obvious", "/map", "/plan",
+                     "/stories", "/themes"]) {
+      await page.goto(base + u, { waitUntil: "load" });
+      const rows = await page.evaluate(() => {
+        const PROPS = ["fill", "stroke", "display", "color",
+                       "background-color", "opacity", "visibility"];
+        const sheet = [...document.styleSheets]
+          .find((s) => (s.href || "").includes("europedoor.css"));
+        if (!sheet) return [];
+        const flat = [];
+        // A CSSStyleRule carries an EMPTY cssRules list for CSS nesting, and
+        // an empty list is truthy — the first version of this walker recursed
+        // into nothing for every rule, collected none of the 630, and
+        // reported a clean result. That is the failure this check is about.
+        const walk = (rs) => {
+          for (const r of rs) {
+            if (r.cssRules && r.cssRules.length) walk([...r.cssRules]);
+            else if (r.selectorText && r.style) flat.push(r);
+          }
+        };
+        walk([...sheet.cssRules]);
+        const out = [];
+        for (const rule of flat) {
+          const props = PROPS.filter((p) => rule.style.getPropertyValue(p));
+          if (!props.length) continue;
+          let els;
+          try { els = document.querySelectorAll(rule.selectorText); }
+          catch (e) { continue; }
+          if (!els.length) continue;
+          const read = () => [...els].slice(0, 40)
+            .map((e) => props.map((p) => getComputedStyle(e)[p]).join("|"));
+          const before = read();
+          const saved = props.map((p) => [p, rule.style.getPropertyValue(p),
+                                          rule.style.getPropertyPriority(p)]);
+          for (const [p] of saved) rule.style.removeProperty(p);
+          const after = read();
+          for (const [p, v, pr] of saved) rule.style.setProperty(p, v, pr);
+          out.push([`${rule.selectorText} {${props.join(",")}}`,
+                    before.some((b, i) => b !== after[i])]);
+        }
+        return out;
+      });
+      for (const [k, won] of rows) {
+        seen.set(k, (seen.get(k) || false) || won);
+      }
+    }
+    const dead = [...seen.entries()].filter(([, won]) => !won).map(([k]) => k);
+    ok(seen.size > 100,
+       `the dead-rule scan examined only ${seen.size} rules — it has stopped ` +
+       "walking the stylesheet, which is exactly how its first version " +
+       "reported a clean result while collecting nothing");
+    ok(dead.length <= DEAD_CEILING,
+       `${dead.length} stylesheet rules match elements and change none of ` +
+       `them, above the ceiling of ${DEAD_CEILING}: ` +
+       dead.slice(0, 4).join("; "));
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+
   // ── a macro region has to look like one ────────────────────────────
   //
   // A macro region is the only grouping in this atlas with real polygons
@@ -2201,7 +2286,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 829;
+  const FLOOR = 831;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +
