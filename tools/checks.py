@@ -2407,6 +2407,50 @@ def c_straight_line_honesty():
     return n
 
 
+@check("every map label is placed against the aperture, by the one rule")
+def c_one_label_rule():
+    # THREE MAP FAMILIES EACH CHOSE THEIR OWN LABEL POSITION, AND TWO OF THEM
+    # ONLY EVER OFFERED ONE.
+    #
+    # pointsmap had the cartographer's rule (flip to the other side of the
+    # dot) and tested it against the rectangle; minimap and the country map
+    # put every name to the right of its dot and tested nothing. The drawing
+    # is clipped by the ARCH, so the top corners are gone: 184 labels across
+    # 142 pages were cut and 14 were drawn entirely inside the removed
+    # corner, invisible, with nothing saying a place was missing.
+    #
+    # All three now ask place_label_box() for a position that survives the
+    # curve. A browser check measures the result with the real getBBox — the
+    # only instrument that knows how wide a name is — and this one guards the
+    # regression that check would not see for a while: a FOURTH map family
+    # emitting its own <text class="minilabel"> with its own idea of where a
+    # name goes. It is a source check on purpose; the browser suite visits
+    # six pages, and a new family might not be one of them.
+    src = open(os.path.join(ROOT, "tools", "lib", "pages.py"),
+               encoding="utf-8").read()
+    emits = re.findall(r"<text class=\\?[\"']?\{?[^>]*minilabel", src)
+    n = len(emits)
+    # place_label_box is the one place allowed to write that tag.
+    fn = src[src.index("def place_label_box("):src.index("def place_label(")]
+    inside = len(re.findall(r"<text class=", fn))
+    if n - inside > 0:
+        fail(f"{n - inside} <text class=\"minilabel\"> emitted outside "
+             f"place_label_box(). Every map label is placed against the "
+             f"aperture by one rule, because three families each choosing "
+             f"their own is how 14 destination names became invisible.")
+    # And the aperture the placement tests must be the aperture that cuts.
+    # in_arch() restates render.arch_path()'s curve in a second language; if
+    # one moves and the other does not, labels are placed against a door
+    # that is not there.
+    for token in ("vh * 0.34, vw * 0.5", "vh * 0.9, vw * 0.5"):
+        if token not in src:
+            fail(f"pages.in_arch has stopped matching render.arch_path: "
+                 f"{token!r} is gone. The placement rule and the clip path "
+                 f"must describe one curve.")
+        n += 1
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0

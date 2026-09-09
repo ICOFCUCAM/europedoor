@@ -1344,6 +1344,76 @@ async function main() {
   ok(stored.includes("experience:"), "saving an experience did not store it");
   await xp.close();
 
+  // ── the signature does not eat the content ─────────────────────────
+  //
+  // THE APERTURE WAS DELETING THE NAMES IT EXISTS TO FRAME.
+  //
+  // Labels were placed with a rule that tested the RECTANGLE — put the name
+  // on the other side of the dot if it runs off the right-hand edge — and
+  // the drawing is clipped by the ARCH. rx = span/2, ry = 34% of the height,
+  // so the top corners are removed entirely and a name can sit well inside
+  // the viewBox and be sliced by the curve above it.
+  //
+  // Measured across all 815 pages that draw a labelled map: 5,184 labels, of
+  // which 184 on 142 pages had a corner outside the aperture and FOURTEEN
+  // were drawn entirely inside the removed corner. "Dürnstein & the Wachau"
+  // did not exist on the Hallstatt map, with nothing anywhere saying a place
+  // was missing. A rectangle check reported those same pages as at most 0.7%
+  // over: the instrument was measuring the wrong boundary.
+  //
+  // This is the browser's own getBBox, which is the only thing that knows
+  // how wide a name really is — pages.py places from a fitted model, and a
+  // static check re-running that model would only ever agree with itself.
+  // The three emitters are covered on purpose: pointsmap (a journey),
+  // minimap (a destination and its neighbours) and the country map.
+  for (const u of ["/journeys/the-alpine-grand-tour",
+                   "/europe/austria/salzburg-and-the-lakes/hallstatt",
+                   "/europe/austria",
+                   "/events/oct",
+                   "/europe/spain/andalusia/cadiz",
+                   "/beyond-the-obvious"]) {
+    await page.goto(base + u, { waitUntil: "load" });
+    const cut = await page.evaluate(() => {
+      const bad = [];
+      for (const svg of document.querySelectorAll("svg[viewBox]")) {
+        const [vx, vy, vw, vh] = svg.getAttribute("viewBox").split(/\s+/).map(Number);
+        if (!svg.querySelector("text.minilabel")) continue;
+        const rise = Math.min(vh * 0.34, vw * 0.5);
+        const inside = (x, y) => {
+          if (x < vx || x > vx + vw || y > vy + vh) return false;
+          if (y >= vy + rise) return true;
+          const dx = (x - (vx + vw / 2)) / (vw / 2), dy = (y - (vy + rise)) / rise;
+          return dx * dx + dy * dy <= 1;
+        };
+        for (const t of svg.querySelectorAll("text.minilabel")) {
+          let b; try { b = t.getBBox(); } catch (e) { continue; }
+          if (!b.width) continue;
+          const corners = [[b.x, b.y], [b.x + b.width, b.y],
+                           [b.x, b.y + b.height], [b.x + b.width, b.y + b.height]];
+          const out = corners.filter((c) => !inside(c[0], c[1])).length;
+          if (out) bad.push({ txt: t.textContent.trim(), out });
+        }
+      }
+      return bad;
+    });
+    ok(cut.length === 0,
+       `${u}: ${cut.length} map label(s) cut by the aperture — ` +
+       cut.slice(0, 3).map((c) => `"${c.txt}" (${c.out}/4 corners)`).join(", "));
+    // And a map that solved the clipping by drawing no names at all has
+    // solved nothing: every map with dots keeps at least one label.
+    const cover = await page.evaluate(() => {
+      const o = [];
+      for (const svg of document.querySelectorAll("svg[viewBox]")) {
+        const d = svg.querySelectorAll(".minidot").length;
+        if (d) o.push([d, svg.querySelectorAll("text.minilabel").length]);
+      }
+      return o;
+    });
+    ok(cover.every((c) => c[1] > 0),
+       `${u}: a map draws ${cover.filter((c) => !c[1]).length} dot cluster(s) ` +
+       "with no name on any of them");
+  }
+
   // ── the two worlds ─────────────────────────────────────────────────
   //
   // A palette can be correct in a token file and wrong on the page: what
@@ -1788,7 +1858,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 696;
+  const FLOOR = 706;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +

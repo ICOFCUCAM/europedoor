@@ -1716,11 +1716,18 @@ def countrymap(data, c):
                 f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.4"/>'
                 f'<title>{esc(t["name"])} — {esc(r["name"])}</title></a>'
             )
-            labels.append((
-                2.0 - depth[id(t)] / deepest, x + 7, y + 4, len(t["name"]) * 6.0 + 8, 13,
-                f'<text class="minilabel" x="{x + 7:.1f}" y="{y + 4:.1f}">'
-                f'{esc(t["name"])}</text>'
-            ))
+            # The country map already sorts by depth and drops collisions;
+            # it was choosing the position itself and only ever offering
+            # one, to the right of the dot. It now asks place_label_box()
+            # for a position that survives the aperture and sorts on the box
+            # that comes back, so a name near the curve moves rather than
+            # being sliced by it.
+            got = place_label_box(x, y, t["name"], w, h,
+                                  cls="minilabel", off=7.0)
+            if got:
+                lhtml, lx, ly, lw, lh = got
+                labels.append((2.0 - depth[id(t)] / deepest,
+                               lx, ly + LABEL_UP, lw + 8, lh + 4, lhtml))
         if len(rp) > 1:
             cx = sum(p[0] for p in rp) / len(rp)
             cy = sum(p[1] for p in rp) / len(rp)
@@ -1730,13 +1737,26 @@ def countrymap(data, c):
             )
             # Priority 0: a region name is the thing this map is for, so it
             # displaces a destination label rather than the other way round.
-            tw = len(r["name"]) * 8.4
-            labels.append((
-                0, cx - tw / 2, cy - 10, tw, 19,
-                f'<a class="rlabel" href="{urls.region(c, r)}">'
-                f'<text x="{cx:.1f}" y="{cy - 10:.1f}">{esc(r["name"])}</text>'
-                f'<title>{esc(r["name"])} — {len(r["cities"])} destinations</title></a>'
-            ))
+            #
+            # It is also the fourth thing on this site that emitted a map
+            # label with its own idea of where one goes — centred over the
+            # region's destinations, tested against nothing. It happened not
+            # to be cut, because a centroid is by construction away from the
+            # edges; "happened not to be" is not a property. It now asks for
+            # a position that survives the aperture, preferring the middle,
+            # and is dropped rather than sliced if none does. The region
+            # keeps its tie-lines, its destinations and its row below.
+            got = place_label_box(
+                cx, cy - 10, r["name"], w, h, off=10.0, prefer="over",
+                metric="rlabel",
+                wrap=lambda a, x, y, name: (
+                    f'<a class="rlabel" href="{urls.region(c, r)}">'
+                    f'<text{a} x="{x:.1f}" y="{y:.1f}">{esc(name)}</text>'
+                    f'<title>{esc(name)} — {len(r["cities"])} destinations'
+                    f'</title></a>'))
+            if got:
+                rhtml, rx0, ry0, rw, rh = got
+                labels.append((0, rx0, ry0 + 14.0, rw, rh + 6, rhtml))
 
     shown = sum(len(r["cities"]) for r in c["regions"]) - len(offframe)
     note = ""
@@ -2039,10 +2059,14 @@ def minimap(data, t, span=3.2, about=None):
             f'<title>{esc(n["city"]["name"])}, {esc(n["country"]["name"])}</title></a>'
         )
         if here or abs(dx) < w / 2 / span * 0.62:
-            labels.append(
-                f'<text class="minilabel{" here" if here else ""}" x="{px + 8:.1f}" y="{py + 4:.1f}">'
-                f'{esc(n["city"]["name"])}</text>'
-            )
+            # Against the aperture, not the rectangle. Fourteen names across
+            # the site were drawn entirely inside the corner the arch
+            # removes, and most of them were on this map: it draws every
+            # neighbour it can reach, so it is the family that puts labels
+            # nearest the curve. See place_label().
+            labels.append(place_label(
+                px, py, n["city"]["name"], w, h,
+                cls="minilabel here" if here else "minilabel", off=8.0))
     return (
         f'<figure class="minimap arched">'
         f'<svg viewBox="0 0 {w} {h}" role="img" data-world="intelligence" '
@@ -2076,6 +2100,148 @@ def minimap(data, t, span=3.2, about=None):
         f'Coastline from <a href="/sources">Natural Earth</a>, public domain. '
         f'<a href="/map">The full map →</a></figcaption></figure>'
     )
+
+
+# THE CLIP IS AN ELLIPSE AND THE PLACEMENT RULE TESTED A RECTANGLE.
+#
+# `px + wide > vw` puts a label on the other side of its dot when it would
+# run off the right-hand edge, which is what a cartographer does and was
+# right about the edge it tested. It is not the edge that cuts. The drawing
+# is clipped by the ARCH — rx = span/2, ry = 34% of the height — so the top
+# corners are removed entirely, and a label can sit comfortably inside the
+# viewBox and be sliced by the curve above it.
+#
+# Measured across all 815 pages that draw a labelled map: 5,184 labels, of
+# which 184 on 142 pages had a corner outside the aperture and FOURTEEN were
+# drawn entirely inside the removed corner — invisible, with nothing anywhere
+# saying a place was missing. "Dürnstein & the Wachau" simply did not exist
+# on the Hallstatt map. The rectangle check reported the same pages as at
+# most 0.7% over, which is why nobody looked: the instrument was measuring
+# the wrong boundary.
+#
+# So the signature was deleting the content it exists to frame, and only
+# testing against the real curve finds it.
+def in_arch(px, py, vw, vh, rise=None, inset=0.0):
+    """Is this point inside the aperture? Same curve as render.arch_path.
+
+    `inset` shrinks the opening before testing. Type that touches the curve
+    exactly is not cut and still looks cramped, and the estimate of a label's
+    box is an estimate: with no margin at all one name in 5,114 came out
+    0.25% of the radius outside, which is a rounding error rather than a
+    placement decision. LABEL_CLEAR is what a mason leaves.
+    """
+    if rise is None:
+        rise = min(vh * 0.34, vw * 0.5)
+    rise = max(1.0, min(rise, vh * 0.9, vw * 0.5))
+    if not (inset <= px <= vw - inset and py <= vh - inset):
+        return False
+    if py >= rise:
+        return True
+    rx, ry = vw / 2.0 - inset, rise - inset
+    if rx <= 0 or ry <= 0:
+        return False
+    dx = (px - vw / 2.0) / rx
+    dy = (py - rise) / ry
+    return dx * dx + dy * dy <= 1.0
+
+
+# A LABEL'S WIDTH IS NOT PROPORTIONAL TO ITS LENGTH, AND 6.1 PER CHARACTER
+# UNDERSTATED 244 OF 311 NAMES.
+#
+# The old constant was measured, and measured as a MEAN: it only ever had to
+# decide which side of a dot a name went on, where being wrong by a few units
+# changes nothing. It is now deciding whether a name can be drawn at all, and
+# an estimate that is under the truth four times in five drops labels that fit
+# and keeps labels that do not.
+#
+# Fitted instead against every label the site renders — 1,057 measured boxes,
+# 311 distinct names from 3 to 40 characters, taking the WIDEST rendering of
+# each name in any frame — as the upper envelope of width against length:
+#
+#     units = 24.4 + 6.05 * characters
+#
+# which underestimates none of the 311. The intercept is real: a name has a
+# fixed cost (side bearings, the space the glyphs do not fill) that no
+# per-character figure can carry, which is why "Rome" measures 8.79 units per
+# character and "Amboise & the Loire châteaux" measures 5.9.
+LABEL_PAD, LABEL_CH = 24.4, 6.05
+# Ascent and descent from the same sample: the tallest rendered box is 13.10.
+LABEL_UP, LABEL_DOWN = 9.6, 4.0
+# And the clearance a name keeps from the curve, in frame units.
+LABEL_CLEAR = 4.0
+
+# ONE MODEL PER TYPE SIZE, because a region name is not a destination name.
+# `.countrymap .rlabel text` is 15px bold against the destination labels'
+# 11px, and the same envelope fitted over its 99 rendered names gives
+# 18.8 + 8.89 per character — so the 6.05 model understates 95 of the 99.
+# The old hand-written figure in the country map was `len(name) * 8.4`,
+# which understates 94 of them: close enough to sort collisions by and not
+# close enough to decide whether a name survives the curve.
+LABEL_METRICS = {
+    "minilabel": (LABEL_PAD, LABEL_CH, LABEL_UP, LABEL_DOWN),
+    "rlabel": (18.8, 8.89, 14.0, 5.0),
+}
+
+
+def label_fits(x, y, wide, anchor, vw, vh, up, down):
+    """Every corner of a label's box, against the aperture."""
+    x0, _y0, _w, _h = _label_box(x, y, wide, anchor, up, down)
+    return all(in_arch(cx, cy, vw, vh, inset=LABEL_CLEAR)
+               for cx in (x0, x0 + wide)
+               for cy in (y - up, y + down))
+
+
+def _label_box(x, y, wide, anchor, up, down):
+    x0 = (x if anchor == "start" else
+          x - wide if anchor == "end" else x - wide / 2.0)
+    return x0, y - up, wide, up + down
+
+
+def place_label_box(px, py, name, vw, vh, cls="minilabel here", off=10.0,
+                    prefer="beside", wrap=None, metric="minilabel"):
+    """The first position that fits inside the aperture, with its box.
+
+    Right of the dot, then left, then under it, then over it. A name that
+    fits nowhere is dropped exactly as a colliding one is — the dot, the
+    <title> and the row in the list below all survive — because a name
+    sliced mid-word by the signature reads as a broken renderer, and one
+    drawn entirely outside it reads as a missing place.
+
+    Returns (html, x0, y0, w, h) or None. The box is returned because the
+    country map sorts labels by depth and drops the ones that collide, and
+    it cannot do that against a position it did not choose.
+    """
+    pad, ch, up, down = LABEL_METRICS[metric]
+    wide = pad + len(name) * ch
+    # A destination's name goes beside its dot; a REGION's name goes over the
+    # middle of its destinations, because that is what it is naming — the
+    # group, not a point. Same four positions, different first choice.
+    if prefer == "over":
+        order = ((px, py, "middle"), (px, py + off + 12, "middle"),
+                 (px + off, py + 4, "start"), (px - off, py + 4, "end"))
+    else:
+        order = ((px + off, py + 4, "start"), (px - off, py + 4, "end"),
+                 (px, py + off + 8, "middle"), (px, py - off - 1, "middle"))
+    for x, y, anchor in order:
+        if label_fits(x, y, wide, anchor, vw, vh, up, down):
+            # ALWAYS EXPLICIT, even for "start". `.countrymap .rlabel text`
+            # sets `text-anchor: middle` in CSS, and a presentation attribute
+            # loses to a stylesheet rule — so omitting it on the default case
+            # would have the region names silently centred on a box computed
+            # for a left-anchored one.
+            a = f' text-anchor="{anchor}"'
+            box = _label_box(x, y, wide, anchor, up, down)
+            if wrap:
+                return (wrap(a, x, y, name), *box)
+            return ((f'<text class="{cls}"{a} x="{x:.1f}" y="{y:.1f}">'
+                     f'{esc(name)}</text>'), *box)
+    return None
+
+
+def place_label(px, py, name, vw, vh, cls="minilabel here", off=10.0,
+                prefer="beside"):
+    got = place_label_box(px, py, name, vw, vh, cls, off, prefer)
+    return got[0] if got else ""
 
 
 def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
@@ -2227,21 +2393,10 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
         if any(abs(px - qx) < dx_min and abs(py - qy) < dy_min for qx, qy in placed):
             continue
         placed.append((px, py))
-        # A LABEL THAT RUNS OFF THE RIGHT-HAND EDGE IS CUT BY THE ARCH.
-        # "Mestia, Svaneti" on the quiet map ended as "Mestia, Svane" against
-        # the frame — the clip path does not know the text is there, and a
-        # name sliced mid-word reads as a broken renderer. The rule is the
-        # one a cartographer uses: put the label on the other side of the dot
-        # when it will not fit on this one. 6.1 units per character at 11px
-        # is measured from the rendered labels, not guessed, and it only has
-        # to be close enough to decide which side.
-        wide = len(name) * 6.1 + 12
-        if px + wide > vw:
-            lab.append(f'<text class="minilabel here" text-anchor="end" '
-                       f'x="{px - 10:.1f}" y="{py + 4:.1f}">{esc(name)}</text>')
-        else:
-            lab.append(f'<text class="minilabel here" x="{px + 10:.1f}" '
-                       f'y="{py + 4:.1f}">{esc(name)}</text>')
+        # Four candidate positions, each tested against the real curve.
+        # See place_label(): the previous rule tested the rectangle, which is
+        # not the edge that cuts.
+        lab.append(place_label(px, py, name, vw, vh))
     # A ROUTE IS THE SAME PICTURE WITH ONE MORE ELEMENT. `line` draws the
     # order; a theme, a month or a motion has no order and passes False,
     # and that single element is the whole difference between "these places

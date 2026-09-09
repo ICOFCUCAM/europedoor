@@ -237,6 +237,33 @@ is a floor. **A map figure must paint no background** — the corners outside
 the arch show the page through, and that is the difference between an
 aperture and a panel. Light wall, dark opening.
 
+**The signature was deleting the content it exists to frame, and the
+instrument was measuring the wrong boundary.** Map labels were placed with
+the cartographer's rule — put the name on the other side of the dot if it
+runs off the right-hand edge — tested against the RECTANGLE. The drawing is
+clipped by the ARCH, so the top corners are gone. Measured across every page that
+draws a labelled map: 5,184 labels, **184 of them, on 142 of those
+pages, had a corner outside the aperture and FOURTEEN were drawn entirely
+inside the removed corner** — "Dürnstein & the Wachau" did not exist on the Hallstatt map, and
+nothing anywhere said a place was missing. A rectangle check reported those
+same pages as at most 0.7% over.
+
+**Four families each chose their own label position, and three of them
+offered only one.** `place_label_box()` is now the single rule: right of the
+dot, then left, then under, then over, each tested against the real curve;
+a name that fits nowhere is dropped exactly as a colliding one is, keeping
+its dot, its `<title>` and its row below. 184 → 0, 14 invisible → 0, and no
+map lost all its names.
+
+**A label's width is not proportional to its length.** The old `6.1 *
+chars` understated 244 of 311 rendered names, because a name has a fixed
+cost no per-character figure carries — "Rome" measures 8.79 units per
+character and "Amboise & the Loire châteaux" measures 5.9. Fitted as the
+upper envelope over every label the site renders: `24.4 + 6.05 * chars` for
+a destination, `18.8 + 8.89` for a region name at 15px bold. One model per
+type size, and the browser's own `getBBox` is the only honest instrument —
+a static check re-running the same model would only ever agree with itself.
+
 **The aperture may be explicit, subtle, implied or absent — recognition, not
 repetition.** A signature applied to everything is wallpaper. `docs/signature-moments.md`
 answers nine questions per family — emotional promise, signature moment,
