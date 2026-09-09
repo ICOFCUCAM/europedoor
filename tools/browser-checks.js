@@ -2393,6 +2393,88 @@ async function main() {
   ok(!anyTransition, "transitions still run under prefers-reduced-motion");
   await rm.close();
 
+  /* NO TWO NAMES ON A MAP MAY OVERLAP, AT EITHER WIDTH.
+   *
+   * The destination plate — one per destination and one per place, the
+   * most-seen map on this site — never had a collision pass at production
+   * size. The country map and the macro map both ran a greedy declutter; the
+   * destination map ran only the PHONE pass, which decides what fits at the
+   * enlarged phone size and marks the losers `wide-only`, and `wide-only` is
+   * `display: none` below 44rem and DRAWN above it. So every label the phone
+   * pass rejected came back on a desktop and nothing resolved it: measured
+   * across all 319 destination plates at 1280, **160 of them carried at least
+   * one overlapping pair**, 271 pairs in all, the worst "Levoča & the Spiš"
+   * through "Poprad & the High Tatras" by 135 pixels.
+   *
+   * Three more families were wrong underneath it. The route/region/motion
+   * maps tested a DISTANCE between dots rather than an overlap of boxes,
+   * which is the mistake this repository already has a note about one family
+   * over — it let "Omodos & the wine villages" run 156 px through "Kardamyli
+   * & the Mani" while dropping names that were merely near. The country
+   * portrait composed its own country name at the END and never measured it,
+   * so it landed on whatever was at the middle of the country: 27 of 50
+   * pages, the worst "ARMENIA" through "THE NORTH & SOUTH" by 125 px. And
+   * the phone pass tested bare overlap with no clearance, so two names could
+   * be placed touching.
+   *
+   * THE MODEL CANNOT CHECK ITSELF. Every one of those passes works from
+   * `LABEL_METRICS`, a fitted upper envelope on the width of a name; a static
+   * check re-running that model would only ever agree with it. The browser's
+   * own `getBoundingClientRect` is the only honest instrument, which is why
+   * this lives here and not in checks.py.
+   *
+   * Both widths, because the two passes are different rules: 1280 is where
+   * the placement decides, 390 is where the enlargement re-decides.
+   */
+  for (const [vw, vh] of [[1280, 900], [390, 800]]) {
+    const lc = await browser.newPage({ viewport: { width: vw, height: vh } });
+    let pairs = 0, worst = 0, worstAt = "";
+    for (const u of ["/europe/france/alps-and-east/chamonix",
+                     "/europe/greece/athens-and-the-peloponnese/athens",
+                     "/europe/norway/fjord-norway/bergen",
+                     "/europe/poland/lesser-poland/krakow",
+                     "/europe/andorra/the-valleys/andorra-la-vella",
+                     "/europe/slovakia/tatras-and-the-north/levoca",
+                     "/europe/armenia/yerevan-and-ararat/yerevan",
+                     "/europe/armenia",
+                     "/europe/cyprus",
+                     "/journeys/the-alpine-grand-tour",
+                     "/europe-in/islands",
+                     "/europe/italy/north-italy"]) {
+      const r = await lc.goto(base + u, { waitUntil: "domcontentloaded" });
+      if (!r || r.status() !== 200) continue;
+      const hit = await lc.evaluate(() => {
+        const out = [];
+        for (const fig of document.querySelectorAll("figure.minimap")) {
+          const t = [...fig.querySelectorAll("text")]
+            .filter((e) => e.getClientRects().length)
+            .map((e) => { const b = e.getBoundingClientRect();
+                          return [e.textContent.trim(), b.x, b.y, b.width, b.height]; });
+          for (let i = 0; i < t.length; i++)
+            for (let j = i + 1; j < t.length; j++) {
+              const a = t[i], c = t[j];
+              const ox = Math.min(a[1] + a[3], c[1] + c[3]) - Math.max(a[1], c[1]);
+              const oy = Math.min(a[2] + a[4], c[2] + c[4]) - Math.max(a[2], c[2]);
+              if (ox > 0 && oy > 0) out.push([a[0] + " / " + c[0], ox]);
+            }
+        }
+        return out;
+      });
+      for (const [names, ox] of hit) {
+        pairs++;
+        if (ox > worst) { worst = ox; worstAt = `${u}: ${names}`; }
+      }
+      checked++;   // one plate examined, at this width
+    }
+    ok(pairs === 0,
+       `${pairs} overlapping label pair(s) on the map plates at ${vw}px — ` +
+       `worst ${worst.toFixed(0)}px, ${worstAt}. A name drawn through another ` +
+       `name is the one defect on these plates a reader cannot work around: ` +
+       `the dot, the <title> and the row below survive a DROPPED label, and ` +
+       `nothing survives an unreadable one`);
+    await lc.close();
+  }
+
   ok(errors.length === 0, `console errors:\n    ${errors.slice(0, 5).join("\n    ")}`);
 
   await browser.close();
@@ -2410,7 +2492,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 831;
+  const FLOOR = 857;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +

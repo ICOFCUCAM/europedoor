@@ -1027,25 +1027,35 @@ def countryportrait(data, c):
     order_.sort()
     dotmarks, boxes_, minor, marks_, named_ = "", [], [], [], set()
 
+
+
     def _try_label(px, py, text, cls, metric="minilabel", off=10.0,
-                   prefer="beside"):
+                   prefer="beside", wrap=None):
         """Place a label if it fits the aperture and hits nothing already there.
 
         One placement routine for every level of the hierarchy, so a region
         name and a village name compete on the same terms and in the order
         the hierarchy sets — which is the whole point of having one.
         """
+        # THE TEST MOVED INSIDE THE PLACEMENT. It used to run on the position
+        # place_label_box had already chosen, so a name that collided where it
+        # wanted to go was dropped without trying the other three positions —
+        # which is what those four positions are for.
+        def _free(lx, ly, lw, lh):
+            bx = (lx - LABEL_CLEAR, ly - LABEL_CLEAR,
+                  lx + lw + LABEL_CLEAR, ly + lh + LABEL_CLEAR)
+            return not any(not (bx[2] < q[0] or bx[0] > q[2]
+                                or bx[3] < q[1] or bx[1] > q[3])
+                           for q in boxes_)
+
         got = place_label_box(px, py, text, w, h, cls=cls, off=off,
-                              prefer=prefer, metric=metric)
+                              prefer=prefer, metric=metric, clears=_free,
+                              wrap=wrap)
         if not got:
             return False
         lhtml, lx, ly, lw, lh = got
-        bx = (lx - LABEL_CLEAR, ly - LABEL_CLEAR,
-              lx + lw + LABEL_CLEAR, ly + lh + LABEL_CLEAR)
-        if any(not (bx[2] < q[0] or bx[0] > q[2]
-                    or bx[3] < q[1] or bx[1] > q[3]) for q in boxes_):
-            return False
-        boxes_.append(bx)
+        boxes_.append((lx - LABEL_CLEAR, ly - LABEL_CLEAR,
+                       lx + lw + LABEL_CLEAR, ly + lh + LABEL_CLEAR))
         labs_.append(lhtml)
         return True
 
@@ -1090,6 +1100,66 @@ def countryportrait(data, c):
             continue
         if _try_label(px, py, nm, "pname" + (" cap" if iscap else "")):
             named_.add(nm)
+
+    # THE COUNTRY'S OWN NAME, MEASURED AND PLACED LIKE EVERY OTHER NAME, which
+    # it never was: it used to be composed at the END and prepended to the
+    # finished labels, so it landed at the middle of the country's highlight
+    # box on top of whatever was already there. 27 of 50 country pages carried
+    # an overlap because of it, the worst "ARMENIA" through "THE NORTH & SOUTH"
+    # by 125 pixels.
+    #
+    # AFTER THE CAPITAL AND THE CITIES, NOT BEFORE THEM. Placing it first was
+    # the obvious reading of "the largest type wins" and it broke a rule this
+    # plate already has: every mark on a country plate carries a name, and the
+    # capital's mark is drawn unconditionally. Reserving a large box across
+    # the middle of Albania ate Tirana's label and left a star nothing named.
+    # The country name is the one label with real freedom — it may sit
+    # anywhere inside its own country — so it goes after the names that are
+    # pinned to a dot, and takes one of its four positions round the centroid.
+    #
+    # AND IT IS OFFERED MORE THAN ONE ANCHOR, because it is the only label on
+    # the plate that is not pinned to a dot. Four positions round a single
+    # centroid left SEVENTEEN OF FIFTY plates with no country name on them,
+    # which is a worse defect than the overlap it was fixing: the recognition
+    # instrument strips the wordmark and the page title, and a plate that
+    # cannot name its own subject fails that test by construction. A country
+    # name may sit anywhere inside its own country, so it is tried at the
+    # centroid and then at eight points around it, inside the country's own
+    # drawn radius.
+    _cbox = _highlight_box(land)
+    if _cbox:
+        _ccx, _ccy, _cr = _cbox
+        _anchors = ((0, 0), (0, -0.45), (0, 0.45), (-0.5, 0), (0.5, 0),
+                    (-0.4, -0.4), (0.4, -0.4), (-0.4, 0.4), (0.4, 0.4))
+        _up = c["name"].upper()
+        _placed_name = any(
+            _try_label(_ccx + fx * _cr, _ccy + fy * _cr, _up, "cname",
+                       metric="cname", off=10.0, prefer="over")
+            for fx, fy in _anchors)
+        # A NAME TOO WIDE FOR ITS OWN COUNTRY GOES ON TWO LINES, which is what
+        # a printed atlas does and what this one was doing by accident: BOSNIA
+        # AND HERZEGOVINA measures 392 units against a plate 391 wide, and
+        # UNITED KINGDOM 253 against 242, so both were being drawn straight
+        # off the edge of their own frame and sliced by the aperture. Dropping
+        # them instead would be worse — the recognition instrument strips the
+        # wordmark, and a plate that cannot name its subject fails by
+        # construction — so the name breaks at its last space.
+        if not _placed_name and " " in _up:
+            _a, _b = _up.rsplit(" ", 1)
+            _long = _a if len(_a) >= len(_b) else _b
+
+            def _two(attr, x, y, _nm, _a=_a, _b=_b):
+                return (f'<text class="cname"{attr} x="{x:.1f}" y="{y:.1f}">'
+                        f'<tspan x="{x:.1f}" dy="{-CNAME_LEAD / 2:.1f}">'
+                        f'{esc(_a)}</tspan>'
+                        f'<tspan x="{x:.1f}" dy="{CNAME_LEAD:.1f}">'
+                        f'{esc(_b)}</tspan></text>')
+
+            for fx, fy in _anchors:
+                if _try_label(_ccx + fx * _cr, _ccy + fy * _cr, _long,
+                              "cname", metric="cname2", off=10.0,
+                              prefer="over", wrap=_two):
+                    break
     # THE PLATE NAMES ITS OWN SUBJECT. An atlas plate has the country's name
     # set across it, and there is a second reason here: the recognition test
     # strips the wordmark and the page title, and a plate that names what it
@@ -1179,13 +1249,7 @@ def countryportrait(data, c):
         if iscap or nm in named_:
             dotmarks += _mark(px, py, nm, iscap, kind)
 
-    cbox = _highlight_box(land)
-    countryname = ""
-    if cbox:
-        ncx, ncy, _r = cbox
-        countryname = (f'<text class="cname" x="{ncx:.1f}" y="{ncy:.1f}" '
-                       f'text-anchor="middle">{esc(c["name"].upper())}</text>')
-    namemarks = countryname + "".join(labs_)
+    namemarks = "".join(labs_)
     uid = "cp" + "".join(ch for ch in c["slug"] if ch.isalnum())[:14]
     # CROPPING IN SILENCE IS THE THING TO AVOID. Where a country has land
     # outside this frame it is said, in the one place a reader of the figure
@@ -2892,6 +2956,12 @@ def minimap(data, t, span=3.2, about=None, named=None):
                         _lat_at(cy - h / 2 / span), LCC_MID_LON,
                         1.0 / span, w, h)
     dots, labels = [], []
+    # THE SCALE BAR IS TYPE TOO, and it is placed by arithmetic rather than by
+    # the placement rule, so the rule had never been told about it. Reserving
+    # its box before anything else is placed is what takes the site's last two
+    # overlapping pairs to zero; the subject's own name still ignores it,
+    # because the subject is never moved for anything.
+    labels.append(("", *geo.scale_bar_box(w, h)))
     inframe = []
 
     # PHYSICAL GEOGRAPHY ON THE TWO FAMILIES THAT MOST NEED IT. Rendered and
@@ -2909,6 +2979,23 @@ def minimap(data, t, span=3.2, about=None, named=None):
     def _tx(lat, lon):
         px_, py_ = project(lat, lon)
         return (w / 2 + (px_ - cx) * span, h / 2 + (py_ - cy) * span)
+
+    def _free(lx, ly, lw, lh):
+        """Is this box clear of every label already placed?
+
+        The same clearance the physical names have always been tested with,
+        now offered to the place names too — see place_label_box(), and see
+        the 160 plates of overlaps that came of their never having had it.
+        """
+        bx = (lx - LABEL_CLEAR, ly - LABEL_CLEAR,
+              lx + lw + LABEL_CLEAR, ly + lh + LABEL_CLEAR)
+        for _hh, qx, qy, qw, qh in labels:
+            q = (qx - LABEL_CLEAR, qy - LABEL_CLEAR,
+                 qx + qw + LABEL_CLEAR, qy + qh + LABEL_CLEAR)
+            if not (bx[2] < q[0] or bx[0] > q[2]
+                    or bx[3] < q[1] or bx[1] > q[3]):
+                return False
+        return True
 
     def _fits(got):
         """Place a label if it clears every box already down."""
@@ -3006,9 +3093,18 @@ def minimap(data, t, span=3.2, about=None, named=None):
             # removes, and most of them were on this map: it draws every
             # neighbour it can reach, so it is the family that puts labels
             # nearest the curve. See place_label().
+            # THE SUBJECT IS PLACED WHEREVER IT WANTS TO GO. It is the one
+            # name on this map that cannot be dropped or moved for somebody
+            # else's sake; every other name gives way to it, which is what
+            # placing it first already meant and what the clearance test now
+            # enforces. A neighbour tries all four positions and is dropped
+            # if none of them is free, keeping its dot, its <title> and its
+            # row in the list below — the same bargain a name too close to
+            # the aperture has always had.
             got = place_label_box(
                 px, py, n["city"]["name"], w, h,
-                cls="minilabel here" if here else "minilabel", off=8.0)
+                cls="minilabel here" if here else "minilabel", off=8.0,
+                clears=None if here else _free)
             if got:
                 labels.append(got)
     # If the frame held only the subject, the physical pass never ran in the
@@ -3145,9 +3241,26 @@ LABEL_CLEAR = 4.0
 # The old hand-written figure in the country map was `len(name) * 8.4`,
 # which understates 94 of them: close enough to sort collisions by and not
 # close enough to decide whether a name survives the curve.
+# AND A THIRD, FOR THE ONE NAME ON A COUNTRY PLATE THAT IS NOT A PLACE NAME.
+# `.cname` is the country's own name at --t-lg, uppercase, tracked 0.22em, and
+# it was composed at the end and prepended to the finished labels WITHOUT
+# being placed or measured — so it sat wherever the middle of the country was
+# and everything else was arranged around a box nobody had declared. 27 of 50
+# country pages carried an overlap because of it, the worst "ARMENIA" through
+# "THE NORTH & SOUTH" by 125 pixels. Fitted as the upper envelope over the 43
+# rendered names, which underestimates none of them.
+# The measured line box of a country name is 22.56 units deep, so that is the
+# leading a second line needs — see the two-line branch in countryportrait().
+CNAME_LEAD = 22.6
+
 LABEL_METRICS = {
     "minilabel": (LABEL_PAD, LABEL_CH, LABEL_UP, LABEL_DOWN),
     "rlabel": (18.8, 8.89, 14.0, 5.0),
+    "cname": (10.4, 17.35, 17.9, 4.7),
+    # And the same name on two lines, which is what an atlas does with a name
+    # too wide for the country it belongs to. Same width model — the wider
+    # half decides — and a box two lines deep, centred on the anchor.
+    "cname2": (10.4, 17.35, 17.9 + CNAME_LEAD / 2, 4.7 + CNAME_LEAD / 2),
 }
 
 
@@ -3166,14 +3279,33 @@ def _label_box(x, y, wide, anchor, up, down):
 
 
 def place_label_box(px, py, name, vw, vh, cls="minilabel here", off=10.0,
-                    prefer="beside", wrap=None, metric="minilabel"):
-    """The first position that fits inside the aperture, with its box.
+                    prefer="beside", wrap=None, metric="minilabel",
+                    clears=None):
+    """The first position that fits inside the aperture AND is free, with its box.
 
     Right of the dot, then left, then under it, then over it. A name that
     fits nowhere is dropped exactly as a colliding one is — the dot, the
     <title> and the row in the list below all survive — because a name
     sliced mid-word by the signature reads as a broken renderer, and one
     drawn entirely outside it reads as a missing place.
+
+    `clears(x0, y0, w, h)` is what makes the second half of that sentence
+    true. IT WAS NOT TRUE FOR THE DESTINATION FAMILY, which is the most-seen
+    map on this site — one per destination and one per place, 824 pages. The
+    country map and the macro map both run a greedy declutter over their
+    placed boxes; the destination map ran only the PHONE pass, which decides
+    what fits at the enlarged phone size and marks the losers `wide-only`.
+    `wide-only` is `display: none` below 44rem and drawn above it, so at
+    production size every rejected label came back and nothing ever resolved
+    an overlap: **160 of 319 destination plates carried at least one
+    overlapping pair at 1280 px**, the worst of them "Andorra la Vella"
+    through "Madriu-Perafita-Claror" by 120 pixels. Every colliding pair
+    involved a `wide-only` label, which is what named the cause.
+
+    The test belongs HERE rather than in a pass afterwards, because a label
+    that collides where it wants to go should try the other three positions
+    before it is dropped. A pass that filters a chosen position can only ever
+    delete.
 
     Returns (html, x0, y0, w, h) or None. The box is returned because the
     country map sorts labels by depth and drops the ones that collide, and
@@ -3191,18 +3323,21 @@ def place_label_box(px, py, name, vw, vh, cls="minilabel here", off=10.0,
         order = ((px + off, py + 4, "start"), (px - off, py + 4, "end"),
                  (px, py + off + 8, "middle"), (px, py - off - 1, "middle"))
     for x, y, anchor in order:
-        if label_fits(x, y, wide, anchor, vw, vh, up, down):
-            # ALWAYS EXPLICIT, even for "start". `.countrymap .rlabel text`
-            # sets `text-anchor: middle` in CSS, and a presentation attribute
-            # loses to a stylesheet rule — so omitting it on the default case
-            # would have the region names silently centred on a box computed
-            # for a left-anchored one.
-            a = f' text-anchor="{anchor}"'
-            box = _label_box(x, y, wide, anchor, up, down)
-            if wrap:
-                return (wrap(a, x, y, name), *box)
-            return ((f'<text class="{cls}"{a} x="{x:.1f}" y="{y:.1f}">'
-                     f'{esc(name)}</text>'), *box)
+        if not label_fits(x, y, wide, anchor, vw, vh, up, down):
+            continue
+        box = _label_box(x, y, wide, anchor, up, down)
+        if clears is not None and not clears(*box):
+            continue
+        # ALWAYS EXPLICIT, even for "start". `.countrymap .rlabel text`
+        # sets `text-anchor: middle` in CSS, and a presentation attribute
+        # loses to a stylesheet rule — so omitting it on the default case
+        # would have the region names silently centred on a box computed
+        # for a left-anchored one.
+        a = f' text-anchor="{anchor}"'
+        if wrap:
+            return (wrap(a, x, y, name), *box)
+        return ((f'<text class="{cls}"{a} x="{x:.1f}" y="{y:.1f}">'
+                 f'{esc(name)}</text>'), *box)
     return None
 
 
@@ -3272,10 +3407,18 @@ def phone_declutter(placed):
     `placed` is [(html, x0, y0, w, h)]; returns the html, in order.
     """
     kept, out = [], []
+    # THE SAME CLEARANCE EVERY OTHER PASS KEEPS, scaled with the boxes. This
+    # tested bare overlap, so two names could be placed touching: measured at
+    # 390 px, four plates had a pair meeting by up to two pixels. Not visible,
+    # and not a number to leave in a check's tolerance either — a threshold
+    # that forgives two pixels forgives the next regression that lands on
+    # two.
+    clear = LABEL_CLEAR * PHONE_LABEL_SCALE
     for html, x0, y0, w, h in placed:
         cx, cy = x0 + w / 2.0, y0 + h / 2.0
         bw, bh = w * PHONE_LABEL_SCALE, h * PHONE_LABEL_SCALE
-        box = (cx - bw / 2.0, cy - bh / 2.0, bw, bh)
+        box = (cx - bw / 2.0 - clear, cy - bh / 2.0 - clear,
+               bw + 2 * clear, bh + 2 * clear)
         clash = any(box[0] < k[0] + k[2] and k[0] < box[0] + box[2]
                     and box[1] < k[1] + k[3] and k[1] < box[1] + box[3]
                     for k in kept)
@@ -3448,10 +3591,28 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
     k = 1000.0 / w
     vw, vh = 1000.0, h * k
     dots, placed, lab = [], [], []
-    # A tenth of the frame, not the route map's fifth: these places are few
-    # and far apart, and 0.20 of a continental frame dropped Tirana's label
-    # for being within 300px of Budapest's.
-    dx_min, dy_min = vw * 0.10, vh * 0.030
+    # A DISTANCE IS NOT A COLLISION, AND THIS FAMILY WAS STILL USING ONE.
+    # `abs(px - qx) < vw * 0.10` drops a name that is near another DOT and
+    # says nothing about whether the two boxes overlap: it dropped Tirana for
+    # being 300 px from Budapest and let "Omodos & the wine villages" run 156
+    # px through "Kardamyli & the Mani". Measured across the six families this
+    # function draws: 18 overlapping pairs on 16 pages. The country map has
+    # had the box test since the day it was written, and the note in
+    # CLAUDE.md that a distance is not a collision was written for this same
+    # mistake one family over.
+    #
+    # The box test is the same one every other name on this site gets, and it
+    # is applied where a label is PLACED rather than after, so a name that
+    # collides where it wants to go tries the other three positions first.
+    bar_box = geo.scale_bar_box(vw, vh)
+
+    def _free(lx, ly, lw, lh):
+        for qx, qy, qw, qh in [bar_box] + [b[1:] for b in lab]:
+            if not (lx + lw + LABEL_CLEAR < qx or lx > qx + qw + LABEL_CLEAR
+                    or ly + lh + LABEL_CLEAR < qy or ly > qy + qh + LABEL_CLEAR):
+                return False
+        return True
+
     hitr = hit_radius([((x - x0) * k, (y - y0) * k) for x, y, _h, _n in pts], vw)
     for i, (x, y, href, name) in enumerate(pts):
         px, py = (x - x0) * k, (y - y0) * k
@@ -3471,18 +3632,13 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
             f'<circle cx="{px:.1f}" cy="{py:.1f}" r="5.5"/>'
             f'<title>{esc(name)}</title></a>'
         )
-        # Same collision rule as the route map: a label that would land on
-        # one already placed is dropped, not moved. Every place keeps its
-        # dot, its <title> and its row in the list below.
-        if any(abs(px - qx) < dx_min and abs(py - qy) < dy_min for qx, qy in placed):
-            continue
-        placed.append((px, py))
-        # Four candidate positions, each tested against the real curve.
-        # See place_label(): the previous rule tested the rectangle, which is
-        # not the edge that cuts.
+        # Four candidate positions, each tested against the real curve AND
+        # against every box already down. A name that fits nowhere free is
+        # dropped, not moved: every place keeps its dot, its <title> and its
+        # row in the list below.
         # The box comes back too: the phone pass has to re-test it at the
         # larger size the stylesheet draws it at.
-        got = place_label_box(px, py, name, vw, vh)
+        got = place_label_box(px, py, name, vw, vh, clears=_free)
         if got:
             lab.append(got)
     # A ROUTE IS THE SAME PICTURE WITH ONE MORE ELEMENT. `line` draws the

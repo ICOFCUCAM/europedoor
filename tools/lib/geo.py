@@ -666,6 +666,33 @@ def km_per_unit(proj, lat, lon):
     return ground / drawn
 
 
+# WHERE THE SCALE BAR SITS, IN ONE PLACE. A label pass has to keep out of it,
+# and two copies of "bottom-left, 3.5% in, 7.5% up" drift the first time one
+# of them is nudged. BAR_MAXW is the widest bar scale_bar will draw before it
+# gives up (the 0.42 test below), which is what a reservation has to assume:
+# the length is chosen from the frame's own scale and is not known until then.
+BAR_X, BAR_UP, BAR_TICK, BAR_MAXW, BAR_TEXT = 0.035, 0.075, 0.018, 0.42, 0.055
+
+
+def _bar_anchor(frame_w, frame_h):
+    return (frame_w * BAR_X, frame_h - frame_h * BAR_UP,
+            max(3.0, frame_h * BAR_TICK))
+
+
+def scale_bar_box(frame_w, frame_h):
+    """The rectangle a scale bar occupies, so a name can be kept out of it.
+
+    THE LABEL PASS DID NOT KNOW THE BAR WAS THERE. After the destination map
+    was given a clearance test, the last two overlapping pairs on the whole
+    site were both a peak name lying across "100 km" — the one piece of type
+    on these plates that is placed by arithmetic rather than by the placement
+    rule, and so the one piece it had never been told about.
+    """
+    x, y, tick = _bar_anchor(frame_w, frame_h)
+    top = y - tick - frame_h * BAR_TEXT
+    return (x, top, frame_w * BAR_MAXW, (y - top) + 2.0)
+
+
 def scale_bar(proj, lat_lo, lat_hi, lon, units_per_unit, frame_w, frame_h,
               tol=0.02):
     """A scale bar, or nothing, and the arithmetic that decides which.
@@ -707,9 +734,7 @@ def scale_bar(proj, lat_lo, lat_hi, lon, units_per_unit, frame_w, frame_h,
     length = km / km_per_drawn
     if length < frame_w * 0.06 or length > frame_w * 0.42:
         return ""
-    x = frame_w * 0.035
-    y = frame_h - frame_h * 0.075
-    tick = max(3.0, frame_h * 0.018)
+    x, y, tick = _bar_anchor(frame_w, frame_h)
     return (f'<g class="scalebar" aria-hidden="true">'
             f'<path d="M{x:.1f} {y - tick:.1f}V{y:.1f}H{x + length:.1f}'
             f'V{y - tick:.1f}"/>'

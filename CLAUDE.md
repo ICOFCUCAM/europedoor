@@ -211,6 +211,51 @@ every check ran at. All three families take the `--z` compensation now, all
 four count toward `dense_class()`, and `phone_declutter()` marks the first
 `class="` on whatever it is given.
 
+**The most-seen map on the site never had a collision pass at production
+size.** The country map and the macro map both run a greedy declutter; the
+destination plate ran only the PHONE pass, which decides what fits at the
+enlarged phone size and marks the losers `wide-only` — and `wide-only` is
+`display: none` below 44rem and **drawn above it**. So every label the phone
+pass rejected came back on a desktop and nothing resolved it. Measured across
+all 319 destination plates at 1280: **160 of them carried an overlapping pair**,
+271 pairs in all, the worst *"Levoča & the Spiš"* through *"Poprad & the High
+Tatras"* by 135 pixels.
+
+Three more families were wrong underneath it. **The route, region and motion
+maps tested a DISTANCE between dots rather than an overlap of boxes** — the
+mistake this file already records one family over — so they let "Omodos & the
+wine villages" run 156 px through "Kardamyli & the Mani" while dropping names
+that were merely near; the box test both fixed the overlaps and gave those
+pages more names (motion 239 → 380). **The country portrait composed its own
+country name at the END and never measured it**, so it landed at the middle of
+the country on top of whatever was there, on 27 country plates of fifty, the
+worst "ARMENIA" through "THE NORTH & SOUTH" by 125 px. And **the phone pass tested bare overlap
+with no clearance**, so two names could be placed touching — four plates at 390
+met by up to two pixels.
+
+**The test belongs where a label is PLACED, not in a pass afterwards.**
+`place_label_box()` takes a `clears` predicate now, so a name that collides
+where it wants to go tries its other three positions before it is dropped. A
+pass that filters a chosen position can only ever delete, which is why the
+country map gained 54 names by having its test moved inside.
+
+**Placing the country name first was the obvious reading and it broke a rule
+the plate already had.** Every mark on a country plate carries a name, and the
+capital's mark is drawn unconditionally — so reserving a large box across the
+middle of Albania ate Tirana's label and left a star nothing named. The country
+name is the one label with real freedom, so it goes after the names pinned to a
+dot, and is offered nine anchors inside its own country rather than one. **And
+a name too wide for its own country breaks at its last space**: BOSNIA AND
+HERZEGOVINA measures 392 units against a plate 391 wide and UNITED KINGDOM 253
+against 242, so both had been drawn straight off the edge of their frame and
+sliced by the aperture for the life of the plate.
+
+**The model cannot check itself.** All of this works from `LABEL_METRICS`, a
+fitted upper envelope on the width of a name, so a static check re-running that
+model would only ever agree with it. The browser's own
+`getBoundingClientRect` is the instrument, at 1280 and at 390, and the numbers
+are 271 overlapping pairs to zero.
+
 **A PLATE HAS TWO COORDINATE SPACES AND `plate()` CONFLATED THEM, so the same
 111 rivers were drawn on all 824 destination and journey plates.** `w`/`h` are
 the viewBox; `view` is the window in the projection's own coordinates. On a
