@@ -662,7 +662,7 @@ def distance_bands(doc, slug, proj, near=0.6, mid=1.3):
 
 
 def landmass(proj, view, doc=None, highlight=None, pad=40.0, bands=None,
-             thin_units=0.0, min_units=0.0):
+             thin_units=0.0, min_units=0.0, link=None):
     """Land under a small map, clipped to the window it is drawn in.
 
     `view` is (x, y, w, h) in the projection's own pixel space — the same
@@ -731,6 +731,16 @@ def landmass(proj, view, doc=None, highlight=None, pad=40.0, bands=None,
             cls = bands.get(ent.get("slug"), "")
         el = (f'<path{f" class={chr(34)}{cls}{chr(34)}" if cls else ""} '
               f'd="{"".join(parts)}"><title>{_esc(ent["name"])}</title></path>')
+        # A COUNTRY CAN BE A WAY IN, WHERE THE CALLER SAYS SO. `link` takes
+        # the entry and returns an href or "": the shape is then the link and
+        # its <title> is the accessible name, which is what an SVG <a> uses.
+        # Off by default, because a country on a destination plate is context
+        # a reader is not meant to leave through and 824 plates do not need
+        # 12,000 more anchors in them.
+        if link and ent["atlas"]:
+            href = link(ent)
+            if href:
+                el = f'<a href="{href}">{el}</a>'
         (ours if ent["atlas"] else ctx).append(el)
     return (f'<g class="context" aria-hidden="true">{"".join(ctx)}</g>',
             f'<g class="countries" aria-hidden="true">{"".join(ours)}</g>')

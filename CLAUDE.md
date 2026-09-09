@@ -981,6 +981,66 @@ one that was removed** — that one hid a data cut at 33°N and now lives inside
 the drawing as a radial gradient along that parallel. This one ends the
 picture, and a picture that ends may say so.
 
+**Every country on the hero is a door, and for one commit none of them
+opened.** The picture's one job is to be the way in and it led nowhere:
+`aria-hidden`, `pointer-events: none`, not in the tab order. Each of the
+forty-four countries with a polygon is an SVG `<a>` now, named by its own
+`<title>`, with the fill lifting under a hover or a keyboard focus. Still no
+dot, no label, no filter, no legend and no count — a link is navigation, and
+a control is what the brief refuses.
+
+**Three things had to be undone before a click could reach one, and the
+first two both worked from the keyboard.**
+
+- **A masked group hit-tests as ONE region.** The atlas layers sat inside two
+  `<g mask>` wrappers to fade toward the data cuts, so the click landed on
+  the wrapper and stopped. Enter on a focused country navigated perfectly,
+  which is exactly the kind of half-working that ships. The fade is PAINTED
+  now — a graphite rectangle whose alpha ramps along the same band, masked to
+  the atlas's own land so it dims the continent and not the Caspian — and the
+  layers underneath it are unmasked and clickable.
+- **`pointer-events: none` on the drawing was not overridable from inside
+  it.** A child set back to `auto` did not receive the click; the target was
+  the `<svg>`. Each layer above the land is set to `none` individually
+  instead, because a rule that has to be overridden is a rule that will be
+  got wrong again.
+- **Every layer above the land has a fill and swallowed the click in turn** —
+  terrain, then rivers, then the frontiers, then the dusk.
+
+**`<clipPath>` takes shapes, so the relief vanished the moment the land became
+a group.** The clip was `<use href="#heroland"/>`, `#heroland` became a `<g>`
+of fifty countries, and Chromium renders a `<use>` of a group inside a
+clipPath as nothing at all — every band gone. The terrain layer was still
+there, still in ORDER, still counted by every check that counts layers. Only
+looking found it. A mask takes any content.
+
+**A `<use>` clone does not inherit a stroke-width from a selector that does
+not match it.** The dusk is masked by a `<use>` of the land, and the land is
+stroked at 1.4 units to close its seams while the clone took the default of
+1 — so two tenths of a unit of parchment stayed uncovered along every edge,
+which along the 700-unit straight cut at 52°E is a bright hairline exactly
+where the picture must not have one.
+
+**A two-stop gradient has a crease at each end and the eye draws a line along
+it.** Every fade here was white-to-black in two stops: the brightness ramps at
+a constant rate and then stops dead, and human vision sharpens exactly that
+discontinuity — a Mach band. The ground arrived out of the dark along a
+perfectly straight diagonal that nothing in the drawing had drawn, and it was
+reported as a hard edge three times while "soften the gradient" never fixed
+it, because widening a linear ramp moves the crease without removing it.
+Smoothstep in five stops has zero slope at both ends and there is no crease to
+find.
+
+**The ranges are drawn as an edge rather than as a name.** The Alps, the
+Pyrenees, the Carpathians, the Scandes and the Anatolian ranges are exactly
+where the 1,200 and 2,000 metre bands are, but as a tonal wash they read as
+haze at this size. A hairline on those two band boundaries turns the wash into
+a ridge: same data, same layer, no new geometry, nothing to read. Thinner and
+paler than a frontier, because a range is a fact about the ground and a border
+is a claim about it. The band count is asserted by the FILLS for that reason —
+a rule counting selectors read the ridge as a fourth band and a second
+strength.
+
 **The hero was a relief sculpture of Europe, not an atlas of it.** Water,
 silhouette, terrain — three layers, where every other map here draws
 frontiers, rivers, lakes, a coastline in ink and a subject. The land was one

@@ -296,8 +296,17 @@ def heroeurope(data):
     # site where the coastline IS the picture rather than the ground under
     # one. The layer beyond it is thinned three times harder for the opposite
     # reason.
+    # AND EVERY COUNTRY IS A DOOR, which is the point of the picture.
+    #
+    # The hero was a picture you looked at: aria-hidden, pointer-events none,
+    # not in the tab order, not in the accessibility tree. On a page whose one
+    # job is to be the way in, the largest thing on it led nowhere. Each of
+    # the fifty countries is an SVG <a> to its own page now, with its name as
+    # the accessible name — no dot, no label, no filter and no count, so it is
+    # still the cover of the atlas rather than the index.
     ctx, land = geo.landmass(MAPPROJ, view, doc=doc,
-                             thin_units=1.8, min_units=6.0)
+                             thin_units=1.8, min_units=6.0,
+                             link=lambda ent: urls.country_by_slug(ent["slug"]))
 
     # ONE PATH PER GROUP, NOT ONE PER COUNTRY, and it is not a saving.
     #
@@ -319,7 +328,22 @@ def heroeurope(data):
         return f'<path id="{ident}" d="{d}"/>' if d else ""
 
     ctx = _merge(ctx, "heroctx")
-    land = _merge(land, "heroland")
+    # THE LAND IS NOT MERGED ANY MORE, and the reason the merge existed is
+    # gone with it. Two neighbours simplified independently do not share an
+    # edge, so the water showed through the cracks; stroking each country in
+    # its own fill colour closed them and, at a group opacity below 1, the two
+    # coincident strokes at a shared frontier composited BRIGHTER than either
+    # — fifty white borders. That is arithmetic about alpha, not about
+    # countries: at opacity 1 two identical opaque strokes are one stroke. The
+    # group is opaque now, so the seams close and nothing doubles, and each
+    # country can be its own element and therefore its own link.
+    #
+    # `<g id="heroland">` still exists for the two passes that need the union:
+    # the frontier stroke above the terrain and the clip that keeps the relief
+    # inside the atlas. Both are a `<use>` of the group, which costs no
+    # geometry, and the anchors inside the clone are inert — a shadow tree is
+    # not in the tab order.
+    land = f'<g id="heroland">{land}</g>'
     # AND THE RELIEF, which is the whole reason this is worth doing. Every
     # destination plate on this site carries hypsometric bands and the front
     # door carried a flat silhouette — the plainest map on the site, on the
@@ -443,6 +467,58 @@ def heroeurope(data):
         return (mx - nx * before, my - ny * before,
                 mx - nx * after, my - ny * after)
 
+    # A TWO-STOP GRADIENT HAS A CREASE AT EACH END, AND THE EYE DRAWS A LINE
+    # ALONG IT.
+    #
+    # Every fade here was white-to-black in two stops, which is linear: the
+    # brightness ramps at a constant rate and then stops dead. That corner is
+    # a discontinuity in the first derivative, and human vision sharpens
+    # exactly that — a Mach band — so the ground arrived out of the dark along
+    # a perfectly straight diagonal that nothing in the drawing had drawn. It
+    # was read as a hard edge in three separate rounds of looking at this
+    # picture and "soften the gradient" never fixed it, because widening a
+    # linear ramp moves the crease without removing it.
+    #
+    # Smoothstep has zero slope at both ends, so there is no crease to find.
+    # Five stops is enough at this size: the error against the real curve is
+    # under 1.5% of full scale, which is a third of one 8-bit level.
+    # AND THE FADE IS PAINTED NOW, NOT MASKED — because a mask breaks the
+    # links.
+    #
+    # The atlas layers used to sit inside two `<g mask>` wrappers, which is
+    # the natural way to fade them out toward the two data cuts. The moment
+    # every country became an anchor, none of them could be clicked:
+    # Chromium hit-tests a masked group as ONE region, so the click landed on
+    # the wrapper and stopped there. Keyboard activation still worked, which
+    # is exactly the kind of half-working that ships — the links were real, in
+    # the tab order, correctly named, and dead to a mouse.
+    #
+    # The same picture is arrived at by painting instead: a rectangle of
+    # graphite whose alpha ramps along the same band, over the top, masked to
+    # the atlas's own land so it dims the continent and not the sea. Masks on
+    # things nobody clicks are fine, and this one is on the overlay rather
+    # than on the layers underneath it.
+    def _dusk(lo=0.0, hi=1.0):
+        out = []
+        for i in range(5):
+            t = i / 4.0
+            v = t * t * (3.0 - 2.0 * t)
+            out.append(f'<stop offset="{lo + (hi - lo) * t:.4f}" '
+                       f'stop-opacity="{v:.3f}"/>')
+        return "".join(out)
+
+    def _stops(lo=0.0, hi=1.0, invert=False):
+        out = []
+        for i in range(5):
+            t = i / 4.0
+            v = t * t * (3.0 - 2.0 * t)
+            if invert:
+                v = 1.0 - v
+            g = round((1.0 - v) * 255)
+            out.append(f'<stop offset="{lo + (hi - lo) * t:.4f}" '
+                       f'stop-color="#{g:02x}{g:02x}{g:02x}"/>')
+        return "".join(out)
+
     # Fully transparent BEFORE the cut, not at it. Ending the fade on the cut
     # left the mask 7% opaque along it, and 7% of a bright coastline against
     # the water is still a straight line across the north-east — the exact
@@ -475,7 +551,14 @@ def heroeurope(data):
     r33 = MAPPROJ.parallel_radius(33.0)
     foot0, foot1 = (r33 - 150.0) / r33, (r33 - 6.0) / r33
     return (
-        f'<div class="heroeurope" aria-hidden="true">'
+        # NOT aria-hidden ANY MORE. It held fifty links the moment the
+        # countries became doors, and aria-hidden over focusable content is
+        # the one accessibility fault that is worse than no label: the links
+        # stay in the tab order and vanish from the accessibility tree. The
+        # group carries a name; every decorative layer inside it is hidden
+        # individually, so what a screen reader meets is fifty countries and
+        # nothing else.
+        f'<div class="heroeurope">'
         # SLICE RATHER THAN MEET, now that the frame is wider than Europe.
         # `meet` letterboxes, and a letterbox band is where the drawing's own
         # frame edge shows: with the ground beyond the atlas painted in
@@ -486,49 +569,31 @@ def heroeurope(data):
         # where it always did and the ground runs off the edges, which is
         # what ground does.
         f'<svg viewBox="{view[0]:.0f} {view[1]:.0f} {vw:.0f} {vh:.0f}"'
-        f' preserveAspectRatio="xMidYMid slice" focusable="false">'
+        f' preserveAspectRatio="xMidYMid slice" role="group"'
+        f' aria-label="Europe, drawn: every country is a link to its own page">'
         f'<defs><linearGradient id="heroedge" gradientUnits="userSpaceOnUse"'
         f' x1="{ex1:.1f}" y1="{ey1:.1f}" x2="{ex2:.1f}" y2="{ey2:.1f}">'
-        f'<stop offset="0" stop-color="#fff"/>'
-        f'<stop offset="1" stop-color="#000"/></linearGradient>'
+        f'{_dusk()}</linearGradient>'
         f'<radialGradient id="herofootg" gradientUnits="userSpaceOnUse"'
         f' cx="{ax:.1f}" cy="{ay:.1f}" r="{r33:.1f}">'
-        f'<stop offset="{foot0:.4f}" stop-color="#fff"/>'
-        f'<stop offset="{foot1:.4f}" stop-color="#000"/></radialGradient>'
-        f'<mask id="herocut" maskUnits="userSpaceOnUse"'
+        f'{_dusk(foot0, foot1)}</radialGradient>'
+
+
+        # The mask that keeps the dusk on the land and off the water. The
+        # Caspian, the Aral and the Sea of Azov are the far-eastern water this
+        # picture has, and an unmasked overlay would paint all three graphite.
+        f'<mask id="herodim" maskUnits="userSpaceOnUse"'
         f' x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}" height="{vh:.0f}">'
-        f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
-        f' height="{vh:.0f}" fill="url(#heroedge)"/></mask>'
-        f'<mask id="herofoot" maskUnits="userSpaceOnUse"'
-        f' x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}" height="{vh:.0f}">'
-        f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
-        f' height="{vh:.0f}" fill="url(#herofootg)"/></mask>'
-        # AND THE SAME TWO GRADIENTS RUN BACKWARDS FOR THE GROUND.
-        #
-        # The ground used to be drawn with no mask at all, because it lay
-        # under the whole picture and the atlas simply faded onto it. It is
-        # cut to the atlas's complement now, so it BEGINS somewhere — and a
-        # graphite shape beginning on a straight line in open sea is the
-        # rendering fault the fades exist to remove, arrived at from the other
-        # side. Each strip fades IN along the same edge the atlas fades OUT
-        # along: the same gradient geometry with the stops swapped, so the two
-        # cross over and neither has an edge.
-        f'<linearGradient id="heroedgein" gradientUnits="userSpaceOnUse"'
-        f' x1="{gx1:.1f}" y1="{gy1:.1f}" x2="{gx2:.1f}" y2="{gy2:.1f}">'
-        f'<stop offset="0" stop-color="#000"/>'
-        f'<stop offset="1" stop-color="#fff"/></linearGradient>'
-        f'<radialGradient id="herofootgin" gradientUnits="userSpaceOnUse"'
-        f' cx="{ax:.1f}" cy="{ay:.1f}" r="{r33:.1f}">'
-        f'<stop offset="{foot0:.4f}" stop-color="#000"/>'
-        f'<stop offset="{foot1:.4f}" stop-color="#fff"/></radialGradient>'
-        f'<mask id="heroeastin" maskUnits="userSpaceOnUse"'
-        f' x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}" height="{vh:.0f}">'
-        f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
-        f' height="{vh:.0f}" fill="url(#heroedgein)"/></mask>'
-        f'<mask id="herofootin" maskUnits="userSpaceOnUse"'
-        f' x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}" height="{vh:.0f}">'
-        f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
-        f' height="{vh:.0f}" fill="url(#herofootgin)"/></mask>'
+        # WIDER IN THE MASK THAN IN THE DRAWING, on purpose. The land is
+        # stroked at 1.4 units to close the seams between neighbours, and a
+        # `<use>` clone does not inherit that: nothing selects the paths, so
+        # the clone took the default stroke-width of 1 and left two tenths of
+        # a unit of parchment uncovered along every edge. Along the 52°E cut
+        # — a straight line 700 units long — that is a bright hairline
+        # exactly where the picture must not have one.
+        f'<use href="#heroctx" fill="#fff" stroke="#fff" stroke-width="3"/>'
+        f'<use href="#heroland" fill="#fff" stroke="#fff" stroke-width="3"/>'
+        f'</mask>'
         # RELIEF ONLY WHERE THIS ATLAS GOES. Anatolia and the Atlas mountains
         # are real ground and this file holds them, and drawn at the weight the
         # Alps are drawn at they took the right-hand third of the picture: the
@@ -537,19 +602,35 @@ def heroeurope(data):
         # coastline emitted twice was the first version — and a clipPath cares
         # only about shape, so the selector trap that makes `<use>` unusable
         # for painting does not apply here.
-        + (f'<clipPath id="herolandclip" clipPathUnits="userSpaceOnUse">'
-           f'<use href="#heroland"/></clipPath>' if relief else "")
+        # A MASK RATHER THAN A CLIP PATH, because the land is a GROUP now.
+        # `<clipPath>` takes shapes; Chromium renders a `<use>` of a group
+        # inside one as nothing at all, so the relief was clipped away
+        # entirely and the hero lost every band the moment the countries
+        # became links. Nothing failed — the terrain layer was still there,
+        # still in ORDER, still counted by every check that counts layers.
+        # Only looking at the picture found it. A mask takes any content, and
+        # white is opaque: the fill and stroke are presentation attributes on
+        # the `<use>` itself, which the clone inherits, because nothing
+        # selects the paths inside.
+        + (f'<mask id="herolandmask" maskUnits="userSpaceOnUse"'
+           f' x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
+           f' height="{vh:.0f}">'
+           f'<use href="#heroland" fill="#fff" stroke="#fff"/></mask>'
+           if relief else "")
         + f'</defs>'
         # THE GROUND, EACH STRIP FADING IN WHERE THE ATLAS FADES OUT. The
         # first is east of 46°E and crosses over along the 52°E meridian; the
         # second is south of 34°N and crosses over along the 33rd parallel.
         # Both are one colour, so the strip that overlaps the other in the
         # south-east corner cannot show a join.
-        + ('<g class="lyr lyr-beyond">'
-           + "".join(f'<g mask="url(#{m})"><path d="{d}"/></g>'
-                     for m, d in zip(("heroeastin", "herofootin"), beyond))
+        # THE GROUND, PLAIN AND UNDER EVERYTHING. It needed its own fades
+        # while the atlas was masked, because the two had to cross over; with
+        # the dusk painted on top instead, the atlas simply covers it where
+        # the atlas exists and the dusk turns the atlas into it where it does
+        # not. Nothing to cross-fade and no edge to hide.
+        + ('<g class="lyr lyr-beyond" aria-hidden="true">'
+           + "".join(f'<path d="{d}"/>' for d in beyond)
            + '</g>' if beyond else "")
-        + f'<g mask="url(#herofoot)"><g mask="url(#herocut)">'
         # OPACITY ON THE GROUP, NOT ON THE PAINT, and that is the whole fix.
         #
         # The seams between two independently simplified neighbours have to be
@@ -564,17 +645,30 @@ def heroeurope(data):
         # the group is not, which looks identical where nothing overlaps and
         # correct where things do.
         + f'<g class="lyr lyr-land">'
-        + f'<g class="heroctxg">{ctx}</g><g class="herolandg">{land}</g></g>'
-        + (f'<g class="lyr lyr-terrain" clip-path="url(#herolandclip)">'
-           f'{relief}</g>' if relief else "")
+        + f'<g class="heroctxg" aria-hidden="true">{ctx}</g>'
+        + f'<g class="herolandg">{land}</g></g>'
+        + (f'<g class="lyr lyr-terrain" aria-hidden="true"'
+           f' mask="url(#herolandmask)">{relief}</g>' if relief else "")
         # ORDER: terrain, then water, then the frontiers over both. Water is
         # a separate visual layer and must never inherit land shading — a
         # river under the relief would be tinted by the band it crosses and
         # would change colour coming down a valley — and a frontier under the
         # relief is not there at all.
-        + (f'<g class="lyr lyr-rivers">{water}</g>' if water else "")
-        + (f'<g class="lyr lyr-country-bounds">{bounds}</g>' if bounds else "")
-        + f'</g></g></svg></div>'
+        + (f'<g class="lyr lyr-rivers" aria-hidden="true">{water}</g>'
+           if water else "")
+        + (f'<g class="lyr lyr-country-bounds" aria-hidden="true">{bounds}</g>'
+           if bounds else "")
+        # THE DUSK, LAST AND OVER EVERYTHING THE ATLAS DREW. Two rectangles
+        # of graphite whose alpha ramps along the two data cuts, masked to
+        # the atlas's own land. It is not a cartographic layer and is not in
+        # ORDER: it is the light in the room, and the reason the continent
+        # dissolves eastward into the ground it stands on rather than ending.
+        + f'<g class="herodusk" aria-hidden="true" mask="url(#herodim)">'
+        + f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
+        f' height="{vh:.0f}" fill="url(#heroedge)"/>'
+        + f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
+        f' height="{vh:.0f}" fill="url(#herofootg)"/></g>'
+        + f'</svg></div>'
     )
 
 

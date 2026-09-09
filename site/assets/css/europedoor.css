@@ -1644,8 +1644,16 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    over its eastern quarter and its bottom eighth, so the continent emerges
    from the dark instead of being sliced by it, which is also true: that is
    where what we hold ends. */
+/* NO `pointer-events: none` HERE ANY MORE. It was right while the drawing
+   was decorative and sat under the type; with fifty countries as links it is
+   what stopped every one of them from being clickable. A child set back to
+   `auto` under a `none` ancestor is hit-testable in HTML and was not here:
+   the click landed on the <svg> itself and stopped. Keyboard activation
+   worked the whole time, which is exactly the kind of half-working that
+   ships. The type is a later sibling and still paints over the map, so
+   nothing under it becomes unselectable. */
 .heroeurope { position: absolute; inset: 0 0 0 auto; width: min(78%, 62rem);
-              z-index: -1; pointer-events: none;
+              z-index: 0;
               display: grid; align-items: center;
               /* THE FADE HID HALF THE CONTINENT ONCE THE MAP BECAME THE
                  PICTURE. It was tuned when this was a 15% silhouette that only
@@ -1776,6 +1784,21 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    at 390px, where the drawing is a third of the size and there is nothing
    else to look at. */
 .heroeurope .lyr-beyond path { fill: var(--graphite); stroke: none; }
+/* THE DUSK IS THE SAME GRAPHITE AS THE GROUND, which is what makes the
+   continent dissolve INTO it rather than under a grey veil. The stops carry
+   their own opacity; only the colour is set here, in one place, so the ground
+   and the light that turns the atlas into it can never drift apart. */
+.heroeurope .herodusk stop { stop-color: var(--graphite); }
+/* EVERY LAYER OVER THE LAND IS TRANSPARENT TO A POINTER. The terrain, the
+   rivers, the frontiers and the dusk are all drawn above the countries and
+   all of them have fills, so each one swallowed the click in turn. They are
+   set to `none` individually rather than by putting `none` on the whole
+   drawing and `auto` back on the anchors: an anchor set back to `auto` under
+   a `none` ancestor did not receive the click here, and a rule that has to be
+   overridden is a rule that will be got wrong again. */
+.heroeurope .lyr-beyond, .heroeurope .lyr-terrain, .heroeurope .lyr-rivers,
+.heroeurope .lyr-country-bounds, .heroeurope .heroctxg,
+.heroeurope .herodusk { pointer-events: none; }
 /* PAINTED BY INHERITANCE, NEVER BY ID, and that is what makes the boundary
    pass free. The frontiers are a `<use>` of the same path above the terrain,
    and a `<use>` clone is matched by any selector that matches the original —
@@ -1785,13 +1808,28 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 .heroeurope .herolandg, .heroeurope .heroctxg {
   fill: var(--atlas-land); stroke: var(--atlas-land);
   stroke-width: 1.4; stroke-linejoin: round; }
-/* 0.90 rather than 0.78. The land was let through to the sea underneath so
-   the continent would sit IN the water rather than on top of it, and at a
-   near-black ground that reading worked. On the lifted blue it just made the
-   parchment grey — the land and the relief were the same value and the eye
-   could not tell coast from country from mountain, which is the whole
-   difference between a map and a relief sculpture. */
-.heroeurope .herolandg { opacity: .90; }
+/* NO `opacity` ON `.herolandg`, AND THAT IS THE RULE RATHER THAN AN OMISSION.
+   Below 1 the two coincident strokes at a shared frontier composite brighter
+   than either and the map grows fifty white borders — which is why the land
+   used to be one merged path, and why it can be fifty separate countries,
+   and therefore fifty links, only while the group is opaque. At 1 two
+   identical opaque strokes are one stroke. It also reads better: 0.78 let the
+   sea through and made the parchment grey against the lifted blue, so the eye
+   could not tell coast from country from mountain. Declaring `opacity: 1`
+   here is a rule that changes nothing and the dead-rule scan says so, so the
+   promise is kept by checks.py instead. */
+/* A COUNTRY IS A DOOR, AND IT HAS TO LOOK LIKE ONE WHEN YOU REACH IT. The
+   fill lifts toward limestone under a hover or a keyboard focus; the terrain
+   is drawn over it at half opacity, so the change reads through the bands
+   rather than being hidden by them. The focus ring is the site's own. */
+.heroeurope a path { transition: fill .18s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .heroeurope a path { transition: none; }
+}
+.heroeurope a:hover path, .heroeurope a:focus-visible path {
+  fill: color-mix(in srgb, var(--limestone) 62%, var(--atlas-land)); }
+.heroeurope a:focus-visible { outline: 3px solid var(--signature);
+                              outline-offset: 2px; }
 .heroeurope .heroctxg { opacity: .30; }
 /* FIFTY COUNTRIES, FELT RATHER THAN READ. Not a political map — at reading
    distance nobody should think "I see borders", and everybody should know
@@ -1843,6 +1881,19 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 .heroeurope .lyr-terrain .t600  { fill: color-mix(in srgb, #d5c9a8 52%, transparent); }
 .heroeurope .lyr-terrain .t1200 { fill: color-mix(in srgb, #cdbb9c 62%, transparent); }
 .heroeurope .lyr-terrain .t2000 { fill: color-mix(in srgb, #e6e0d6 74%, transparent); }
+/* THE RANGES, AS AN EDGE RATHER THAN AS A NAME. The brief asked for the
+   Alps, the Pyrenees, the Carpathians, the Scandes and the Caucasus to be
+   recognisable, with no labels. They are already in the drawing — those five
+   are exactly where the 1,200 and 2,000 metre bands are — but as a tonal
+   wash they read as haze at this size. A hairline on the two upper band
+   boundaries turns the wash into a ridge: same data, same layer, no new
+   geometry and nothing to read. It is thinner and paler than a frontier,
+   because a range is a fact about the ground and a border is a claim about
+   it. */
+.heroeurope .lyr-terrain .t1200,
+.heroeurope .lyr-terrain .t2000 {
+  stroke-width: .55; stroke-linejoin: round;
+  stroke: color-mix(in srgb, var(--graphite) 22%, transparent); }
 
 /* The way in, moved out of the opening. A form inside the doorway made the
    first screen a search box with a picture behind it; the invitation is the

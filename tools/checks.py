@@ -2665,9 +2665,16 @@ def c_terrain():
             f"this height has everywhere else in the atlas. The alpha over "
             f"it is the hero's own treatment; the colour is the scale")
         n += 1
+    # COUNTED BY THE FILL, NOT BY THE SELECTOR. The hero also strokes its two
+    # upper bands — a hairline that turns the tonal wash into a ridge, which
+    # is the same data and the same layer — and a rule counting selectors read
+    # that as a fourth band and a second strength. What the rule protects is
+    # how many HEIGHTS have a colour, so it counts the declarations that give
+    # one.
     for fam, want in ((r"\.minimap\.arched\.atlas", 4),
                       (r"\.heroeurope", 3)):
-        got = len(re.findall(fam + r" \.lyr-terrain \.t\d+\s*\{", css))
+        got = len(re.findall(fam + r" \.lyr-terrain \.t\d+[^{]*\{[^}]*fill:",
+                             css))
         assert got == want, (
             f"that family declares {got} terrain bands rather than {want} — "
             f"a second strength was measured out (see the rule's comment) "
@@ -2880,6 +2887,22 @@ def c_hero_frame():
     css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
                encoding="utf-8").read()
     css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+
+    # THE LAND GROUP MUST STAY OPAQUE, and nothing in the stylesheet can say
+    # so: `opacity: 1` is the default, so the declaration is a rule that
+    # changes nothing and the dead-rule scan counts it. The promise is real
+    # though — below 1 the two coincident strokes at a shared frontier
+    # composite brighter than either, which is fifty white borders and is why
+    # the land was a single merged path before it was fifty links.
+    m = re.search(r"\.heroeurope \.herolandg\s*\{[^}]*opacity:\s*([\d.]+)",
+                  css)
+    assert not m or float(m.group(1)) >= 1.0, (
+        f"the hero's land group is drawn at {m.group(1)} opacity. Two "
+        f"coincident strokes at a shared frontier then composite brighter "
+        f"than either and the map grows fifty white borders — the political "
+        f"map this hero was rebuilt to remove")
+    n += 1
+
     m = re.search(r"\.heroeurope svg\s*\{[^}]*aspect-ratio:\s*"
                   r"(\d+)\s*/\s*(\d+)", css)
     assert m, ("the stacked hero declares no aspect-ratio; without one the "
