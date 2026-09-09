@@ -2584,6 +2584,50 @@ def c_published_projection():
     return n
 
 
+@check("an index states the extent of its own set, and the number is the real one")
+def c_index_extent():
+    # AN INDEX EXISTS TO SAY HOW BIG A SET IS, AND FIVE OF EIGHT DID NOT.
+    #
+    # Measured across the built site: /journeys, /themes, /europe-in,
+    # /beyond-the-obvious and /fund carried a head with no count in it at
+    # all. /europe-in was the sharpest case — it stated 319, the population
+    # its queries run against, and never 12, the number of queries on the
+    # page the reader is looking at. A number that is not the set's own
+    # extent is worse than none, because it reads as one.
+    #
+    # This is also the check that catches the opposite failure, which is the
+    # one this repository has already made once: a hard-coded figure that was
+    # true two hundred destinations ago. The count must equal what the build
+    # actually put on the page, so it can only be right by being derived.
+    d = D.load()
+    quiet = [n for n in d["cities"].values() if n["city"].get("quiet")]
+    want = {
+        "/countries": len(d["countries"]),
+        "/journeys": len(d["journeys"]),
+        "/stories": len(d["stories"]),
+        "/themes": len(d["themes"]),
+        "/experiences": len(D.all_experiences(d["countries"])),
+        "/europe-in": len(d["motions"]),
+        "/beyond-the-obvious": len(quiet),
+        "/fund": len(d["fund"]),
+    }
+    n = 0
+    for url, size in want.items():
+        path = os.path.join(OUT, url.strip("/"), "index.html")
+        if not os.path.exists(path):
+            fail(f"{url}: index is missing")
+            continue
+        h = open(path, encoding="utf-8").read()
+        i = h.find('class="pagehead')
+        head = re.sub(r"<[^>]+>", " ", h[i:h.find("</div>", i)]) if i >= 0 else ""
+        nums = {int(x) for x in re.findall(r"\b(\d{1,5})\b", head)}
+        n += 1
+        if size not in nums:
+            fail(f"{url}: the head never says how big the set is. It holds "
+                 f"{size}; the head states {sorted(nums) or 'no number at all'}.")
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0

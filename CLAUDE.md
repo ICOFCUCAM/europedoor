@@ -303,6 +303,20 @@ shipped HTML — a page printing a hop says "straight line", and no page
 anywhere claims a mode or a ground distance. A source-level check would have
 passed on all three.
 
+**An index exists to say how big a set is, and five of eight did not.**
+`/journeys`, `/themes`, `/europe-in`, `/beyond-the-obvious` and `/fund`
+carried a head with no count in it at all. `/europe-in` was the sharpest: it
+stated **319**, the population its queries run against, and never **12**, the
+number of queries on the page in front of the reader — a number that is not
+the set's own extent is worse than none, because it reads as one. Every count
+is derived and `checks.py` asserts it equals what the build actually put on
+the page, which also catches the opposite failure this repository has already
+made once: a hard-coded figure that was true two hundred destinations ago.
+
+**Eight of the nine indexes are the same 280px card grid.** Only `/countries`
+differs. That is the design-direction finding again, one level up from the
+h1 — and it is not yet fixed.
+
 **Twenty-one of twenty-two families place a 60px h1 at y=164 or y=212.** Only
 the homepage differs, because it has a hero. On the five INTELLIGENCE pages
 that is actively wrong: the head pushed the instrument to y=436 on `/plan`,

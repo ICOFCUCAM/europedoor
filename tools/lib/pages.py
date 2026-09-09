@@ -1177,9 +1177,9 @@ def journeys_index(data):
 <div class="pagehead">
   <p class="kicker">European Journeys</p>
   <h1>Routes that cross borders on purpose.</h1>
-  <p class="lede">Each of these is a real sequence with real distances: every stop links back
-  into the Atlas, and the nights add up to the days on the tin. Take one as written, or open it
-  in the Planner and bend it to the time you actually have.</p>
+  <p class="lede">{len(data['journeys'])} routes, each a real sequence with real distances:
+  every stop links back into the Atlas, and the nights add up to the days on the tin. Take one
+  as written, or open it in the Planner and bend it to the time you actually have.</p>
 </div>
 {grid(cards, 3)}
 """
@@ -3166,8 +3166,8 @@ def fund_index(data):
   <p class="kicker">Europe Fund</p>
   <h1>What travel leaves behind.</h1>
   <p class="lede">Tourism arrives in a place and takes something out of it — a path, a language,
-  a harbour wall, a summer. The Fund is the mechanism for putting something back, listed
-  publicly, project by project, with the local partner named.</p>
+  a harbour wall, a summer. The Fund is the mechanism for putting something back:
+  {len(data['fund'])} projects, listed publicly, with the local partner named on each.</p>
 </div>
 
 <div class="note warn">
@@ -3242,8 +3242,9 @@ def themes_index(data):
   <p class="kicker">Discovery without a map of borders</p>
   <h1>Europe, organised by what you came for.</h1>
   <p class="lede">Medieval Europe is not a country. Neither is sacred Europe, or Viking Europe,
-  or the Europe you reach only by train. These cut across the Atlas: each one is a real
-  sequence of real places, and each place stays linked to the country it is actually in.</p>
+  or the Europe you reach only by train. {len(data['themes'])} of them cut across the Atlas:
+  each one is a real sequence of real places, and each place stays linked to the country it is
+  actually in.</p>
 </div>
 {grid(cards, 3)}
 """
@@ -4140,7 +4141,8 @@ def quiet_page(data):
   <p class="lede">Europe's problem is not too many visitors; it is too many visitors in the same
   eleven places in the same six weeks. Every part of this platform is built to push the other
   way — the Planner rewards shoulder months, the Atlas gives a Galician fishing town the same
-  page template as Paris, and this is where the quiet places are listed on purpose.</p>
+  page template as Paris, and these {len(quiet)} places are where it would send you
+  instead.</p>
 </div>
 {quietmap}
 {section(f"{len(quiet)} places we would send you instead", grid(cards, 3),
@@ -5547,7 +5549,7 @@ def motion_index(data):
 <div class="pagehead">
   <p class="kicker">Europe in Motion</p>
   <h1>The continent, cut a dozen different ways.</h1>
-  <p class="lede">Not categories. Each of these is a query run against all
+  <p class="lede">Not categories. {len(data['motions'])} queries, each run against all
   {len(data['cities'])} destinations on every build, and each page prints the query that
   made it. A list somebody curated by hand looks identical to one a query produced — on
   the day it ships, and never again.</p>
