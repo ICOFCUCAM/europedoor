@@ -97,9 +97,9 @@
       "why": "Zero today, because zero photographs are licensed. This moving is the signal that licensed imagery arrived — which must go through the licence register first."
     },
     "weight.home_kb": {
-      "value": 25,
+      "value": 48,
       "kind": "ceiling",
-      "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it is allowed to move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence."
+      "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it is allowed to move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence. 25 -> 47, deliberately: the hero is now the doorway with Europe inside it, and the continent is 22,927 bytes of lod0 coastline. The number to compare it against is not 25, it is the two things it stands between — the hero map that was REMOVED was lod1 plus 319 destination dots plus a filter row at about 90,000 bytes and read as an instrument, and the licensed photograph the brief is still open for would be 150,000 upwards. This is a quarter of the first and a seventh of the second, it carries no dot, no filter and no count, and it is the one picture on the internet that only this product can make."
     },
     "weight.max_page_kb": {
       "value": 440,
@@ -109,7 +109,7 @@
     "signature.apertures": {
       "value": 825,
       "kind": "floor",
-      "why": "Pages whose geography is seen through the arch. A floor: the aperture is the identity, and a new map that forgets it is a page that stops looking like EuropeDoor. 816 -> 825: the nine macro regions, which were the last geographic family with no geography — a headline and a grid of cards, telling the reader which countries are in the Nordics without ever showing where it is. A macro region is the one grouping here with real polygons behind it, so nothing is invented by drawing it."
+      "why": "Pages whose geography is seen through the arch. A floor: the aperture is the identity, and a new map that forgets it is a page that stops looking like EuropeDoor."
     },
     "plates.page_share": {
       "value": 0.226,

@@ -217,6 +217,56 @@ def months_line(data, keys):
 
 # ── home ──────────────────────────────────────────────────────────────
 
+def heroeurope(data):
+    """Europe, entire, seen through the doorway. The homepage's picture.
+
+    THE HOMEPAGE WAS THE LEAST EUROPEDOOR PAGE ON THE SITE. Stripped of its
+    mark and its wordmark and set beside eight other families, it was a navy
+    gradient, a headline, a search box and four chips — recognisable as a
+    travel product and as nothing more specific than that. Six of the other
+    eight carried the aperture and were unmistakable; the one page that has
+    to say what this is said the least.
+
+    A HERO MAP WAS REMOVED ONCE, AND FOR GOOD REASONS THAT DO NOT APPLY HERE.
+    That one was an instrument: lod1 coastline, 319 destination dots, a
+    filter row and a row of counts — 90 KB, and it led with structure. The
+    reader met the data model before they wanted to go anywhere.
+
+    This is not that. It is a coastline and nothing else: no dot, no filter,
+    no count, no label. An instrument is a thing you operate; a continent is
+    a thing you look at.
+
+        lod1 + 319 dots + filters   ~90,000 bytes   the version removed
+        lod0, coastline only         22,927 bytes   this
+        a licensed hero photograph  150,000+ bytes  what it stands beside
+
+    It is a quarter of the drawing that failed and a seventh of the
+    photograph. THE PHOTOGRAPH BRIEF STAYS OPEN — docs/hero-brief.md, seven
+    questions unanswered — because a photograph does a job this cannot: the
+    atmosphere of a particular morning in a particular place. This does a
+    job the photograph cannot either, and the reason it is here rather than
+    a placeholder: no other travel product on earth can draw Europe on its
+    own conformal conic through its own aperture. It is the picture that is
+    ONLY ours.
+
+    Europe is fitted rather than cropped. The projection is 1.28:1 and a
+    hero is nearly 2:1, so slicing it would cut the Arctic off the top and
+    the Mediterranean off the bottom — the two edges that make the shape
+    recognisable. It sits to the right at its own proportion and the opening
+    runs on past it, which is where the type goes: the empty space is the
+    composition rather than something to fill.
+    """
+    doc = geo.load("europe-lod0.json")
+    if not doc:
+        return ""
+    ctx, land = geo.landmass(MAPPROJ, (0, 0, MAP_W, MAP_H), doc=doc)
+    return (
+        f'<div class="heroeurope" aria-hidden="true">'
+        f'<svg viewBox="0 0 {MAP_W} {MAP_H}" preserveAspectRatio="xMidYMid meet"'
+        f' focusable="false">{ctx}{land}</svg></div>'
+    )
+
+
 def home(data):
     """The homepage is the door, not the catalogue — and it leads with Europe.
 
@@ -332,21 +382,28 @@ def home(data):
     body = f"""
 <section class="herofull{' shot' if heroimg else ''}">
   {heroimg}
+  {heroeurope(data)}
   <div class="herobody">
-    <p class="kicker">Open the door to Europe</p>
     <h1>Open the door to Europe.</h1>
-    <p class="lede">Discover places, stories and journeys across one extraordinary
-    continent.</p>
-    <form class="askhero" action="/plan" method="get">
-      <label for="homeask">Where would you like to go — or what would you like to discover?</label>
-      <input type="text" id="homeask" name="ask" autocomplete="off"
-             placeholder="I want a quiet mountain escape in October."
-             data-rotate="Show me Europe&#39;s most historic cities.|Plan 10 days through Italy.|Where can I experience authentic Mediterranean culture?|I have 10 days in September. I love mountains, history and local food.">
-      <button class="btn" type="submit">Plan my journey</button>
-    </form>
-    <div class="chips hero-intents">{intentchips}</div>
+    <p class="lede">One continent, drawn as we hold it. Fifty countries, and
+    somewhere in them the thing you have not thought of yet.</p>
   </div>
 </section>
+
+<div class="askband">
+  <form class="askhero" action="/plan" method="get">
+    <label for="homeask">Where would you like to go — or what would you like to discover?</label>
+    <input type="text" id="homeask" name="ask" autocomplete="off"
+           placeholder="I want a quiet mountain escape in October."
+           data-rotate="Show me Europe&#39;s most historic cities.|Plan 10 days through Italy.|Where can I experience authentic Mediterranean culture?|I have 10 days in September. I love mountains, history and local food.">
+    <button class="btn" type="submit">Plan my journey</button>
+  </form>
+  <div class="chips hero-intents">{intentchips}</div>
+  <p class="sourcenote">The continent above is drawn from
+  <a href="/sources">Natural Earth</a>, public domain, on a Lambert conformal
+  conic — the same projection and the same file as every other map here.
+  <a href="/map">Open the map →</a></p>
+</div>
 
 {section("Find your kind of Europe", '<div class="grid mosaic">' + "".join(kind_cards) + "</div>",
          stage="Discover", tone="quiet",

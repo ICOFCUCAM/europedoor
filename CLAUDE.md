@@ -780,6 +780,50 @@ measuring a drawing requires drawing it. `tools/plate-variation.py` holds a
 ceiling on interchangeable pairs per motif family; it is not in `checks.py`
 because eight seconds on every build is a gate people stop running.
 
+**The hero is the doorway, and Europe is what is through it.** Stripped of
+its mark and set beside eight other families by `tools/recognition.js`, the
+homepage was the *least* EuropeDoor page on the site: a navy gradient, a
+headline, a search box and four chips — a travel product and nothing more
+specific. Six of the other eight carried the aperture and were unmistakable.
+The one page that has to say what this is said the least.
+
+So the opening is cut here at the largest size the arch appears anywhere, the
+masthead stands on the limestone wall above it, and Europe is drawn inside —
+one silhouette, no dot, no filter, no count, no label.
+
+**A hero map was removed once, for reasons that do not apply to this.** That
+one was an *instrument*: lod1 coastline, 319 dots, a filter row, ~90,000
+bytes, and it led with structure. This is a coastline and nothing else.
+
+| | bytes |
+|---|---|
+| the hero map that was removed | ~90,000 |
+| this | 22,927 |
+| the licensed photograph the brief is still open for | 150,000+ |
+
+`weight.home_kb` moved 25 → 47, recorded. **The photograph brief stays
+open** — a photograph does a job this cannot, the atmosphere of a particular
+morning. This does one the photograph cannot either, and it is the reason it
+is here rather than a placeholder: **no other travel product can draw Europe
+on its own conformal conic through its own aperture.**
+
+**Three things only rendering found.** The masthead's graphite scrim — right
+for type over a photograph — painted across the two corners that make the
+opening read, so the whole thing became a dark banner with a curved bottom;
+the masthead now stands on the wall in the wall's own colours. Stroking every
+country path made it a *political map*, fifty internal borders competing with
+a headline; filled, adjacent countries merge and the only outline is where
+land meets sea. And `data/geo/` is cut at 52°E, which under the conic runs
+from x=747 at 70°N to x=1024 at 40°N — a clean diagonal through Russia that
+reads as a rendering fault at screen scale, so the drawing fades where what we
+hold ends.
+
+**Moving the form out of the opening took its label with it.** `.askhero
+label` was limestone at 76%, right on graphite and **1.00:1 on the light
+band** — present, labelled, keyboard-reachable and invisible. The browser
+suite caught it; nothing else could have.
+
+**The old rule, kept because it is still true of everything below the fold:**
 **The homepage leads with Europe, and the hero is photographic.** Cutting it
 from eight bands to three fixed a catalogue and left a different fault that
 only looking at the built page found: it led with *structure*. A headline, a

@@ -1504,19 +1504,79 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
  * system at 1200x500 was tried and measured: flat, monochrome, a dead slab
  * across the bottom third. It carries a 160x100 card and cannot carry this.
  */
+/* EUROPE IN THE OPENING — an engraved line, not a dark mass.
+   It sits to the right at its own proportion and the opening runs on past
+   it: the projection is 1.28:1 and a hero is nearly 2:1, so slicing it would
+   cut the Arctic off the top and the Mediterranean off the bottom, which are
+   the two edges that make the shape recognisable. The empty space to the
+   left is where the type goes — the composition, not something to fill. */
+/* AND IT FADES WHERE THE DATA STOPS, rather than ending on a straight line.
+   data/geo/ is cut at 52°E, and under the conic that cut runs from x=747 at
+   70°N to x=1024 at 40°N — a clean diagonal straight through Russia. On an
+   instrument that is a frontier of the dataset and the page says so; at the
+   scale of a screen it reads as a rendering fault. The drawing fades out
+   over its eastern quarter and its bottom eighth, so the continent emerges
+   from the dark instead of being sliced by it, which is also true: that is
+   where what we hold ends. */
+.heroeurope { position: absolute; inset: 0 0 0 auto; width: min(78%, 62rem);
+              z-index: -1; pointer-events: none;
+              display: grid; align-items: center;
+              -webkit-mask-image:
+                linear-gradient(to right, #000 40%, transparent 84%),
+                linear-gradient(to bottom, #000 78%, transparent 98%);
+              -webkit-mask-composite: source-in;
+              mask-image:
+                linear-gradient(to right, #000 40%, transparent 84%),
+                linear-gradient(to bottom, #000 78%, transparent 98%);
+              mask-composite: intersect; }
+.heroeurope svg { width: 100%; height: 100%; }
+/* FILLED, NOT DRAWN AS A WIRE. The first version stroked every country path
+   and the hero became a political map: fifty internal borders competing with
+   a headline at the scale of a screen. "Europe as an engraved line" is the
+   rule for the INSTRUMENT, where a reader is looking for a frontier. A hero
+   is looking for a continent — one silhouette, whose only outline is where
+   land meets sea, because adjacent countries share an edge and the fills
+   merge into a single mass. */
+.heroeurope .countries path {
+  fill: color-mix(in srgb, var(--limestone) 15%, transparent); stroke: none; }
+.heroeurope .context path {
+  fill: color-mix(in srgb, var(--limestone) 6%, transparent); stroke: none; }
+
+/* The way in, moved out of the opening. A form inside the doorway made the
+   first screen a search box with a picture behind it; the invitation is the
+   continent, and the control belongs directly under it where it reads as the
+   answer to "how". */
+.askband { margin: calc(var(--s7) * -1) 0 var(--s7); }
+.askband .hero-intents { margin-top: var(--s4); }
+
+/* THE HERO IS THE DOORWAY, AND EUROPE IS WHAT IS THROUGH IT.
+   Stripped of its mark and set beside eight other families, this page was a
+   navy gradient, a headline, a search box and four chips — a travel product
+   and nothing more specific. Six of the other eight carried the aperture and
+   were unmistakable. The one page that has to say what this is said least.
+   So the opening is cut here at the largest size the arch appears anywhere:
+   full width, the head struck shallow across it the way a mason strikes a
+   wide one, and limestone in the corners above the curve. Light wall, dark
+   opening — the same sentence as every map on the site, at the scale of a
+   screen. */
 .herofull {
-  position: relative; isolation: isolate;
+  position: relative; isolation: isolate; overflow: hidden;
   margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw);
   min-height: min(84vh, 46rem);
   display: grid; align-items: end;
   padding: calc(var(--s8) * 2) calc(50vw - 50%) var(--s8);
   margin-bottom: var(--s7);
+  border-radius: 50% 50% 0 0 / 34% 34% 0 0;
   /* Depth without a photograph, and the bed a photograph sits on. Two
    * radial pools over deep ink — atmosphere rather than a flat panel — in
    * the palette's own colours, no new token. */
+  /* Two pools instead of three, and both moved out of the continent's way.
+     They were painting depth for a hero that had no picture in it; there is
+     a picture in it now, and a green pool under the Atlantic was competing
+     with the thing it was standing in for. */
   background:
-    radial-gradient(120% 90% at 78% 12%, color-mix(in srgb, var(--sea) 34%, transparent), transparent 62%),
-    radial-gradient(90% 80% at 12% 92%, color-mix(in srgb, var(--atlantic) 30%, transparent), transparent 58%),
+    radial-gradient(110% 80% at 68% 6%, color-mix(in srgb, var(--sea) 30%, transparent), transparent 66%),
+    radial-gradient(80% 70% at 6% 96%, color-mix(in srgb, var(--atlantic) 16%, transparent), transparent 60%),
     var(--graphite);
   color: var(--limestone);
 }
@@ -1540,24 +1600,33 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 /* The kicker repeats the headline verbatim, so it is decoration to a
  * screen reader and is hidden from one rather than read twice. */
 .herofull .kicker { visibility: hidden; }
-.herofull h1 { color: var(--limestone); max-width: 14ch;
+/* The colour that was here is inherited from .herofull and the dead-rule
+   scan said so; what this selector really decides is the measure. */
+.herofull h1 { max-width: 14ch;
                font-size: clamp(var(--t-4xl), 7vw, var(--t-6xl)); }
 .herofull .lede { color: color-mix(in srgb, var(--limestone) 88%, transparent);
                   max-width: 34rem; }
 
 /* The discovery field belongs to the picture, not to a form below it. */
 .askhero { display: grid; gap: var(--s3); margin-top: var(--s6); max-width: 44rem; }
+/* INK, NOT LIMESTONE — the form left the doorway and its label did not.
+   This was written for a control INSIDE the hero, where limestone at 76% is
+   right on graphite. The form now sits on the light band under the opening,
+   and the label went with it: limestone on limestone, 1.00:1, invisible.
+   The browser suite caught it and nothing else could have — the label is
+   present, labelled, keyboard-reachable and completely unreadable, which is
+   the same failure this stylesheet already records in the other direction
+   for the hero masthead. */
 .askhero label { font-size: var(--t-xs); letter-spacing: .1em; text-transform: uppercase;
-                 color: color-mix(in srgb, var(--limestone) 76%, transparent); font-weight: 600; }
+                 color: var(--ink-2); font-weight: 600; }
 .askhero input { width: 100%; font: inherit; font-size: var(--t-md);
                  padding: var(--s4); border: 1px solid transparent; border-radius: var(--radius);
                  background: var(--paper); color: var(--ink); }
 .askhero input:focus-visible { border-color: var(--signature); }
-.herofull .hero-intents { margin-top: var(--s4); }
-.herofull .chip { background: color-mix(in srgb, var(--graphite) 55%, transparent);
+.askband .chip, .herofull .chip { background: color-mix(in srgb, var(--graphite) 55%, transparent);
                   border-color: color-mix(in srgb, var(--limestone) 42%, transparent);
                   color: var(--limestone); }
-.herofull .chip:hover { background: color-mix(in srgb, var(--limestone) 16%, transparent); }
+.askband .chip:hover, .herofull .chip:hover { background: color-mix(in srgb, var(--limestone) 16%, transparent); }
 @media (min-width: 40rem) { .askhero { grid-template-columns: 1fr auto; align-items: end; }
   .askhero label { grid-column: 1 / -1; margin-bottom: calc(var(--s2) * -1); } }
 
@@ -1592,26 +1661,23 @@ body[data-hero] main { padding-top: 0; }
  * scrolled away and never came back, on the one page in the product where a
  * reader is most likely to want to leave for somewhere else. Sticky, with a
  * scrim, is both fixes at once. */
-body[data-hero] .masthead {
-  position: sticky;
-  background: color-mix(in srgb, var(--graphite) 88%, transparent);
-  backdrop-filter: saturate(1.2) blur(8px);
-  border-bottom-color: transparent;
-}
+/* AND THEN THE HERO STOPPED BEING A PHOTOGRAPH FILLING THE FRAME.
+ * The scrim above was right for that: type over an image needs a ground.
+ * The hero is now a doorway CUT IN THE WALL, and the wall is limestone —
+ * so a graphite band across the top painted over the two corners that make
+ * it read as an opening, and the whole thing became a dark banner with a
+ * curved bottom edge. The masthead stands on the wall, in the wall's own
+ * colours, which is also every other page's masthead and one less thing.
+ * Sticky is kept, for the reason above it. */
+body[data-hero] .masthead { position: sticky; }
 /* Every link in the masthead, by its real class. The first version styled
  * `.masthead a` and a `.brand` that does not exist in this markup, so the
  * navigation rendered ink-on-graphite and was invisible — the header was
  * there, keyboard-reachable and completely unreadable. Only looking at the
  * rendered page found it. */
-body[data-hero] .masthead .wordmark,
-body[data-hero] .masthead .wordmark-text,
-body[data-hero] .masthead .nav a,
-body[data-hero] .masthead .navsearch,
-body[data-hero] .masthead .navmine { color: var(--limestone); }
-body[data-hero] .masthead .wordmark svg { fill: var(--limestone); color: var(--limestone); }
-body[data-hero] .masthead .nav a:hover,
-body[data-hero] .masthead .navsearch:hover,
-body[data-hero] .masthead .navmine:hover { color: var(--lime); }
+/* The limestone link colours that were here went with the scrim: on the
+ * wall they were invisible-on-light, which is the same failure the comment
+ * above records in the other direction. */
 
 /* ── the discovery mosaic ─────────────────────────────────────────────
  * Eight equal tiles read as a database index — every way into the
