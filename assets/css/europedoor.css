@@ -1611,6 +1611,26 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
  * copy — which is how the best-written thing on the page ended up looking
  * like a caption. 66 to 144 characters across the atlas, median 103, so the
  * measure is set for two lines at the top of that range and never more. */
+/* TWO SIZES, ONE TREATMENT — because the copy is not one length.
+ *
+ * Measured across the families that carry a statement: a country's tagline
+ * runs 51–121 characters, a region's summary 45–149, a destination's 66–144.
+ * A theme's summary runs 239–344, every one of the thirteen, and set at
+ * 26ch of display serif that is eight lines of headline before the reader
+ * reaches anything they can act on — a paragraph wearing a statement's
+ * clothes.
+ *
+ * The fix is NOT to drop those families to the grey lede: the statement is
+ * how this atlas speaks and a theme is not a lesser page. It is a second
+ * size, picked by the generator from the length of the string, at a wider
+ * measure. Same face, same colour, same role; one step down and more room,
+ * which is what a longer sentence needs and what a shorter one must not
+ * have. */
+.statement.long {
+  font-size: clamp(var(--t-lg), 2.4vw, var(--t-2xl));
+  line-height: 1.25;
+  max-width: 44ch;
+}
 .statement {
   font-family: var(--display);
   font-size: clamp(var(--t-xl), 3.1vw, var(--t-3xl));

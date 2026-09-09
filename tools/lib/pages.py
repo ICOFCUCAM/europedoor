@@ -525,7 +525,7 @@ def country_page(data, c):
 <div class="pagehead overture">
   <p class="kicker">{esc(m['name'])}</p>
   <h1>{esc(c['name'])}</h1>
-  <p class="statement">{esc(c['tagline'])}</p>
+  {statement(c['tagline'])}
   <p class="orient">{country_orient(c)}</p>
   {chips(c["interests"], data["interests"])}
 </div>
@@ -650,7 +650,7 @@ def region_page(data, c, r):
 <div class="pagehead overture">
   <p class="kicker">{esc(c['name'])}</p>
   <h1>{esc(r['name'])}</h1>
-  <p class="statement">{esc(r['summary'])}</p>
+  {statement(r['summary'])}
   <p class="orient">{len(r["cities"])} destination{"s" if len(r["cities"]) != 1 else ""} ·
   {len(rplaces)} place{"s" if len(rplaces) != 1 else ""} recorded ·
   about {int(pass_nights)} nights to see it all</p>
@@ -893,7 +893,7 @@ def city_page(data, c, r, t):
 <div class="pagehead overture">
   <p class="kicker">{esc(r['name'])}, {esc(c['name'])}</p>
   <h1>{esc(t['name'])}</h1>
-  <p class="statement">{esc(t['summary'])}</p>
+  {statement(t['summary'])}
   <p class="orient">{orient_line(t)}</p>
   {chips(t["interests"], data["interests"])}
 </div>
@@ -1220,7 +1220,7 @@ def journey_page(data, j):
 <div class="pagehead">
   <p class="kicker">Journey</p>
   <h1>{esc(j['name'])}</h1>
-  <p class="statement">{esc(j['strapline'])}</p>
+  {statement(j['strapline'])}
   <p class="orient">{j['days']} days · {len(j['legs'])} stops · {len(countries)} countries · {total_km:,} km</p>
   {chips(j["interests"], data["interests"])}
 </div>
@@ -1712,6 +1712,20 @@ def first_sentence(text):
         if i > 0:
             return text[:i + 1]
     return text
+
+
+# The length at which a statement stops being one. Two lines of display
+# serif at 26ch is about here; past it the type has to come down a step or
+# the reader meets a wall instead of a sentence. Measured, not chosen: the
+# thirteen theme summaries are 239–344 characters and every other family's
+# copy is under 180.
+STATEMENT_MAX = 160
+
+
+def statement(text):
+    """The overture's sentence, at whichever of the two sizes it needs."""
+    long = " long" if len(text) > STATEMENT_MAX else ""
+    return f'<p class="statement{long}">{esc(text)}</p>'
 
 
 def nights_line(t):
@@ -2336,7 +2350,7 @@ def place_page(data, c, r, t, pl):
 <div class="pagehead overture">
   <p class="kicker">{esc(PLACE_KIND_NAMES[pl['kind']])} · {esc(t['name'])}, {esc(c['name'])}</p>
   <h1>{esc(pl['name'])}</h1>
-  <p class="statement">{esc(pl['summary'])}</p>
+  {statement(pl['summary'])}
   <p class="orient">Give it {esc(pl['duration'])} · {esc(SEASON_NAMES[pl['season']])} ·
   <span class="mono">{pl["lat"]:.3f}°N, {pl["lon"]:.3f}°E</span></p>
 </div>
@@ -2485,7 +2499,7 @@ def category_page(data, cat, sub=None):
 <div class="pagehead overture">
   <p class="kicker">{esc(cat['name']) if sub else 'Experience category'}</p>
   <h1>{esc(title)}</h1>
-  {f'<p class="statement">{esc(cat["blurb"])}</p>' if not sub else ""}
+  {statement(cat["blurb"]) if not sub else ""}
   <p class="orient">{len(chosen)} across {len(countries)} {"country" if len(countries) == 1 else "countries"}</p>
 </div>
 {f'<p class="countryspread lead">{country_spread(countries)}</p>' if sub and countries else ""}
@@ -2791,30 +2805,66 @@ def theme_page(data, t):
         cn = idx[stop["city"]]["country"]["name"]
         if cn not in countries:
             countries.append(cn)
+
+    # A CONSTELLATION, AND THE ABSENCE OF THE LINE IS THE POINT.
+    #
+    # The theme pages were the largest family carrying no geography at all —
+    # thirteen pages, eight stops each, three to eight countries apiece, and
+    # nothing on the page showed that the argument crosses a continent.
+    #
+    # But a theme must NOT borrow the journey page's route line. The rail on
+    # this page has said "a theme is a way of seeing, not a route" since it
+    # was written, and a line between Florence, Urbino and Rome would say the
+    # opposite in the one language a reader reads first. Renaissance Europe
+    # has no day one. So: the same aperture, the same projection, the same
+    # dots — and deliberately no path element. What distinguishes this family
+    # from journeys is exactly what is not drawn.
+    tpts = [(*project(idx[st["city"]]["city"]["lat"], idx[st["city"]]["city"]["lon"]),
+             urls.city(idx[st["city"]]["country"], idx[st["city"]]["region"],
+                       idx[st["city"]]["city"]),
+             idx[st["city"]]["city"]["name"])
+            for st in t["stops"]]
+    thememap = pointsmap(
+        tpts, "th" + "".join(ch for ch in t["slug"] if ch.isalnum())[:14],
+        f'{len(tpts)} places in {len(countries)} countries, and no line between '
+        f'them: a theme is a way of seeing rather than a route, and these are '
+        f'not in travelling order. Coastline from '
+        f'<a href="/sources">Natural Earth</a>, public domain.',
+        f'Map of the {len(tpts)} places in {t["name"]}, unlinked') if len(tpts) >= 2 else ""
+
     body = f"""
 {crumbs([("Europe", "/discover"), ("Themes", "/themes"), (t["name"], None)])}
-<div class="pagehead">
+<div class="pagehead overture">
   <p class="kicker">{esc(t['strapline'])}</p>
   <h1>{esc(t['name'])}</h1>
-  <p class="lede">{esc(t['summary'])}</p>
+  {statement(t['summary'])}
+  <p class="orient">{len(t['stops'])} places across {len(countries)}
+  {"countries" if len(countries) != 1 else "country"} · not an itinerary</p>
   {chips(t["interests"], data["interests"])}
 </div>
-<div class="split">
+
+{thememap}
+
+<div class="rows">{''.join(rows)}</div>
+
+<section class="practical" aria-label="Practical">
   <div>
-    <h2>{len(t['stops'])} places, {len(countries)} countries</h2>
-    <div class="rows">{''.join(rows)}</div>
-  </div>
-  <aside class="rail">
     <h2 class="mini">Not an itinerary</h2>
-    <p>A theme is a way of seeing, not a route: these places are not in travelling order and
-    most people take three or four of them, not all. For an order that respects distance,
-    put the ones you want into the <a href="/plan">Planner</a>.</p>
-    <h2 class="mini">Countries</h2>
+    <p>A theme is a way of seeing, not a route: these places are not in travelling
+    order and most people take three or four of them, not all. For an order that
+    respects distance, put the ones you want into the
+    <a href="/plan">Planner</a>.</p>
+  </div>
+  <div>
+    <h2 class="mini">Countries it crosses</h2>
     <p>{esc(", ".join(countries))}</p>
+  </div>
+  <div>
+    <h2 class="mini">Keep it</h2>
     <p><button class="btn ghost" type="button" data-save="theme:{esc(t['slug'])}" data-kind="Theme"
        data-label="{esc(t['name'])}" data-url="/themes/{esc(t['slug'])}">Save to My Europe</button></p>
-  </aside>
-</div>
+  </div>
+</section>
 """
     return f"/themes/{t['slug']}/index.html", page(
         t["name"], body, path=f"/themes/{t['slug']}", area="countries",
