@@ -1704,7 +1704,27 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
      showed the geometry outside the frame, ending in a straight horizontal
      line above and below the continent. checks.py asserts the two agree. */
   .heroeurope svg { height: auto; aspect-ratio: 1120 / 800; max-height: 54vh; }
-  .herofull { min-height: 0; row-gap: var(--s6); }
+  /* FULL-BLEED, AND THE LAST TENTH FADES. Stacked, the drawing's own frame
+     edges are inside the hero rather than under the arch, and with the ground
+     painted in graphite an edge is black meeting blue on a straight line. The
+     left and right go under the aperture by taking the hero's own padding
+     back; the bottom cannot, because the type is under it, so the picture
+     fades out over its last tenth. This is not the fade that was removed —
+     that one hid a DATA cut at 33°N and now lives in the drawing as a radial
+     gradient along that parallel. This one ends the PICTURE, and a picture
+     that ends is allowed to say so. */
+  .heroeurope { width: 100vw; margin-left: calc(50% - 50vw);
+                -webkit-mask-image:
+                  linear-gradient(to bottom, #000 90%, transparent 100%);
+                mask-image:
+                  linear-gradient(to bottom, #000 90%, transparent 100%); }
+  /* AND THE DRAWING STARTS AT THE TOP OF THE OPENING. Stacked, the hero's
+     own top padding put 90 pixels of sea above the picture, so the frame's
+     top edge sat in open water — and with the ground beyond the atlas
+     painted in graphite that edge is black meeting blue on a straight
+     horizontal line across the Arctic. Run to the top and the arch cuts it,
+     which is what the arch is for. */
+  .herofull { min-height: 0; row-gap: var(--s6); padding-top: 0; }
 }
 /* FILLED, NOT DRAWN AS A WIRE. The first version stroked every country path
    and the hero became a political map: fifty internal borders competing with
@@ -1727,25 +1747,35 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    into a bright line. Doing it the other way round — translucent paint,
    per-country paths — drew fifty white borders and made a political map of
    the hero. See heroeurope(). */
-/* THE GROUND EUROPE STANDS ON, AND IT IS DELIBERATELY NOT THE SAME PAINT.
-   Asia and Africa are drawn from the same parchment as the atlas and at a
-   fifth of its presence: enough that the Caspian, the Urals, Anatolia's far
-   side and the Sahara are land rather than sea, and not enough to be looked
-   at. No relief, no border, no title, nothing to click — the difference the
-   reader is meant to feel is not "these countries are less important", it is
-   "this is where the light stops", which is what a door does. */
+/* THE GROUND EUROPE STANDS ON, AND IT IS NOT MADE OF THE SAME MATERIAL.
+   The first version drew Asia and Africa from the same parchment as the
+   atlas at a sixth of its presence — quieter Europe, in other words, and it
+   read as a haze the eye kept trying to resolve into countries. They are
+   graphite instead: the same near-black the INTELLIGENCE world is grounded
+   in, solid, so the land past the atlas is not faint paper but unlit ground.
+
+   That is the whole picture in one line. **Europe is what the light falls
+   on.** The two fades along the 52°E and 33°N cuts now run from lit
+   parchment into shadow rather than from one paper to a fainter one, and the
+   hero stops being a map with a quiet margin and becomes a door with a lit
+   room through it. No relief, no border, no title, nothing to click: the
+   difference a reader is meant to feel is not "these countries are less
+   important", it is "this is where the light stops".
+
+   `--graphite` rather than `#000`, for the same reason limestone is never
+   `#fff`: black is a screen and graphite is a shadow. */
 /* AND IT IS NOT STROKED, which the layer in front of it has to be.
    `#heroland` closes the hairline seams between two independently simplified
    neighbours with a stroke in its own fill colour. This layer has no seams to
    close — it is one source, one simplification, and the rings are whole
    landmasses rather than countries — and stroking it drew a rectangle: the
    rings are clipped to the frame, so a stroke runs along all four edges of
-   the window and outlines it. At 17% on a dark sea that reads as a pale panel
-   behind the continent, which is the single most conspicuous thing a
-   background layer can do. Found at 390px, where the frame is a third of the
-   size and there is nothing else to look at. */
-.heroeurope .lyr-beyond { opacity: .17; }
-.heroeurope #herobeyond { fill: var(--atlas-land); stroke: none; }
+   the window and outlines it. On the parchment version that read as a pale
+   panel behind the continent, which is the single most conspicuous thing a
+   background layer can do; in graphite it would draw the frame itself. Found
+   at 390px, where the drawing is a third of the size and there is nothing
+   else to look at. */
+.heroeurope #herobeyond { fill: var(--graphite); stroke: none; }
 .heroeurope #heroland, .heroeurope #heroctx {
   fill: var(--atlas-land); stroke: var(--atlas-land);
   stroke-width: 1.4; stroke-linejoin: round; }

@@ -955,10 +955,31 @@ writing about places, so the hero faded its own eastern quarter and its
 southern eighth to stop two straight data cuts reading as rendering faults.
 That is an honest way to hide an edge and a poor way to draw a continent. The
 land carries on now — `beyond-lod0.json`, anonymous rings out to the Yenisei
-and down past Arabia, no country, no relief, no label, nothing to click, at a
-sixth of the contrast. **The fades stayed exactly where they were and now do
-the opposite job**: they no longer hide an edge, they hand the eye from the
-lit continent to the quiet ground.
+and down past Arabia, no country, no relief, no label, nothing to click.
+**The fades stayed exactly where they were and now do the opposite job**:
+they no longer hide an edge, they hand the eye from the lit continent to the
+ground around it.
+
+**And that ground is graphite, not quieter parchment.** The first version
+drew Asia and Africa from the same paper at a sixth of its presence — quieter
+Europe, in other words — and it read as a haze the eye kept trying to resolve
+into countries. Solid `--graphite`, the near-black the INTELLIGENCE world is
+grounded in, says the thing the picture is for in one move: **Europe is what
+the light falls on**, and the two fades run from lit parchment into shadow.
+The hero stops being a map with a quiet margin and becomes a door with a lit
+room through it. `--graphite` rather than `#000` for the same reason
+limestone is never `#fff`: black is a screen and graphite is a shadow.
+
+**A black ground has edges a pale one hides.** `preserveAspectRatio` was
+`meet`, which letterboxes — and a letterbox band is where the drawing's own
+frame edge shows, black meeting blue on a straight line 14 pixels above the
+bottom of the hero. It is `slice` now: the margin this frame gained east and
+south exists precisely to be cropped. Stacked, the drawing also runs full
+width and to the top of the opening, where the arch cuts it, and fades over
+its last tenth because the type is underneath. **That bottom fade is not the
+one that was removed** — that one hid a data cut at 33°N and now lives inside
+the drawing as a radial gradient along that parallel. This one ends the
+picture, and a picture that ends may say so.
 
 **A parallel is not a horizontal line on a conic, and the first southern fade
 was one.** The 33rd runs from y=706 over Tunisia to y=590 over the Caspian,
@@ -976,9 +997,9 @@ frame at all under this conic.
 `#heroland` closes hairline seams between independently simplified neighbours
 with a stroke in its own fill colour; the ground has no seams to close, and
 its rings are clipped to the frame — so a stroke ran along all four edges of
-the window and outlined it. At 17% on a dark sea that is a pale panel behind
-the continent. Found at 390px; on a desktop it was faint enough to read as
-atmosphere.
+the window and outlined it. On the parchment version that was a pale panel
+behind the continent; in graphite it would have drawn the frame itself. Found
+at 390px; on a desktop it was faint enough to read as atmosphere.
 
 **The hero has its own window on the projection, and the stylesheet must
 agree with it.** `pages.HERO_VIEW` is 1120×800 where every other map is

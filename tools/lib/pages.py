@@ -409,8 +409,17 @@ def heroeurope(data):
     foot0, foot1 = (r33 - 150.0) / r33, (r33 - 6.0) / r33
     return (
         f'<div class="heroeurope" aria-hidden="true">'
+        # SLICE RATHER THAN MEET, now that the frame is wider than Europe.
+        # `meet` letterboxes, and a letterbox band is where the drawing's own
+        # frame edge shows: with the ground beyond the atlas painted in
+        # graphite, that edge is black meeting blue on a straight line, 14
+        # pixels above the bottom of the hero on a desktop and across the
+        # middle of the picture on a phone. The margin this frame gained to
+        # the east and south exists precisely to be cropped — Europe sits
+        # where it always did and the ground runs off the edges, which is
+        # what ground does.
         f'<svg viewBox="{view[0]:.0f} {view[1]:.0f} {vw:.0f} {vh:.0f}"'
-        f' preserveAspectRatio="xMidYMid meet" focusable="false">'
+        f' preserveAspectRatio="xMidYMid slice" focusable="false">'
         f'<defs><linearGradient id="heroedge" gradientUnits="userSpaceOnUse"'
         f' x1="{ex1:.1f}" y1="{ey1:.1f}" x2="{ex2:.1f}" y2="{ey2:.1f}">'
         f'<stop offset="0" stop-color="#fff"/>'

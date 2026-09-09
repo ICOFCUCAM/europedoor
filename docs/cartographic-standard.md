@@ -66,13 +66,15 @@ picture's tolerance. The colours are `HYPSOMETRIC`'s own and `checks.py`
 reads all three off it; only the alpha over them is the hero's, because the
 land under it is itself translucent.
 
-**The hero also draws the ground beyond the atlas, and draws it as a
-different thing.** `beyond-lod0.json` is western Siberia, the Caspian, Iran,
-Arabia and the Sahara: anonymous rings, no country, no relief, no label,
-nothing to click, at a sixth of the contrast of the land in front of them.
-Europe is not an island and a drawing that ends at 52°E said it was. The
-distinction a reader is meant to feel is not *these countries matter less* —
-it is *this is where the light stops*, which is what a door does.
+**The hero also draws the ground beyond the atlas, and draws it in a
+different material.** `beyond-lod0.json` is western Siberia, the Caspian,
+Iran, Arabia and the Sahara: anonymous rings, no country, no relief, no
+label, nothing to click, in solid graphite. Europe is not an island and a
+drawing that ends at 52°E said it was; a drawing that continues in fainter
+parchment says the ground carries on and is less interesting, which is not
+the claim. Lit parchment against unlit ground is the claim: *this is where
+the light stops*, which is what a door does. It was tried at a sixth of the
+land tone first and read as a haze the eye kept trying to resolve.
 
 **Terrain must support recognition and sense of place, never become the
 subject of the map.** And: **no layer may be added merely because the source
