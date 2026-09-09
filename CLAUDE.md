@@ -303,6 +303,36 @@ shipped HTML — a page printing a hop says "straight line", and no page
 anywhere claims a mode or a ground distance. A source-level check would have
 passed on all three.
 
+**A map label is 11 units, not 11 pixels, and on a phone it rendered at
+3.9.** `.minilabel` is sized in a 1000-unit viewBox and the browser scales
+that viewBox to its container, so what a reader gets is `11 × (width/1000)`:
+
+| viewport | 390 | 480 | 704 | 900 | 1024 | 1280 |
+|---|---|---|---|---|---|---|
+| label px | 3.9 | 4.9 | 7.4 | 9.4 | 10.7 | 12.8 |
+
+Below about 860px that is not small type, it is type that does not resolve
+into glyphs — every phone and most tablets, on eight hundred pages, for the
+life of the embedded map. **Every existing check asked whether a label was
+placed and whether it survived the aperture; none asked whether it was
+legible.** There is no non-scaling-text in SVG and the fix depends on how
+many names a map carries, which only the build knows, so `dense_class()`
+marks each figure from the names it **emitted** — the three families each had
+a different idea of what "labels" meant, and counting the markup is the only
+one that is the same everywhere. Six or fewer are enlarged on a phone; more
+are dropped, keeping every dot, every `<title>`, and the list under the
+figure. 577 maps keep their names, 238 hand them to the list.
+
+**The invariant register counted a font size that existed only in a comment
+about not adding font sizes.** `css.font_sizes` matched the whole file, and
+this stylesheet's style is long comments naming the failure behind each rule
+— so a comment saying *the first version wrote `font-size: 26px`* was itself
+a seventeenth size. It can only inflate a count, never hide one, so nothing
+measured before was too permissive; but an instrument that reads its own
+documentation as code is wrong. Comments are stripped now, and the fix was
+proved both ways: a real declaration still fails, the same text in prose does
+not.
+
 **One thing, one picture — and 272 of 319 destinations had two.** `card()`
 takes an optional `motif`; without one, `plate_shapes()` picks from the seed.
 **Fourteen of the twenty call sites passed no motif**, including every

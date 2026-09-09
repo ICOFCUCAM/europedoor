@@ -39,8 +39,23 @@ REG = os.path.join(ROOT, "docs", "invariants.json")
 
 
 def _css():
-    return open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
-                encoding="utf-8").read()
+    """The stylesheet as the browser sees it — comments stripped.
+
+    THE REGISTER COUNTED A TYPE SIZE THAT EXISTED ONLY IN A COMMENT ABOUT
+    NOT ADDING TYPE SIZES. `css.font_sizes` matches `font-size:\s*([^;]+);`
+    across the whole file, and this stylesheet's whole style is long comments
+    naming the failure that prompted each rule — so a comment saying "the
+    first version wrote `font-size: 26px` and the register caught it" WAS a
+    seventeenth font size, and the ceiling failed on prose.
+    
+    It can only ever inflate a count, never hide one, so nothing measured
+    before this was too permissive. But an instrument that reads its own
+    documentation as code is wrong, and this file's rules all count things in
+    the CSS the browser actually applies.
+    """
+    css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
+               encoding="utf-8").read()
+    return re.sub(r"/\*.*?\*/", "", css, flags=re.S)
 
 
 def _pages():

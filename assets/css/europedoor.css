@@ -656,7 +656,8 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .minidot circle { fill: var(--ink-3); opacity: .55; }
 .minidot:hover circle { fill: var(--door); opacity: 1; }
 .minidot.here circle { fill: var(--door); opacity: 1; }
-.minilabel { font-family: var(--text); font-size: 11px; fill: var(--ink-3); }
+.minilabel { font-family: var(--text); font-size: calc(11px / var(--z));
+             fill: var(--ink-3); }
 .minilabel.here { fill: var(--ink); font-weight: 600; }
 .minimap figcaption { font-size: var(--t-xs); color: var(--ink-3); margin-top: var(--s3); }
 
@@ -712,7 +713,7 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
  * limestone of the land, which is also the one place on the site where the
  * primary green is allowed to be a surface rather than an action, because
  * here it is not offering anything. */
-.europemap { --z: 1; }
+.europemap, .minimap { --z: 1; }
 .mapwrap { background: var(--map-sea); }
 .europemap .context path { fill: var(--map-context); stroke: none; }
 .europemap .countries path {
@@ -2053,6 +2054,38 @@ body[data-hero] .masthead .navmine:hover { color: var(--lime); }
 .minimap.arched .rlabel text { fill: color-mix(in srgb, var(--limestone) 88%, transparent);
   stroke: var(--map-sea); stroke-width: 3; }
 .minimap.arched .rlabel:hover text { fill: var(--lime); }
+
+/* A LABEL THAT DOES NOT RESOLVE INTO GLYPHS IS WORSE THAN NO LABEL.
+   `.minilabel` is 11 units in a 1000-unit viewBox and the browser scales the
+   viewBox to its container, so the size a reader actually gets is
+   11 x (width / 1000). Measured across four map families:
+
+       viewport   390   480   704   900  1024  1280
+       label px   3.9   4.9   7.4   9.4  10.7  12.8
+
+   Under about 860px it is below 9px — every phone and most tablets were
+   shown names nobody can read, on eight hundred pages, for the life of the
+   embedded map. Nothing measured it because every check asked whether the
+   label was PLACED, not whether it was legible.
+
+   There is no non-scaling-text in SVG, so this has to be two rules and the
+   build has to say which applies: a map with six names or fewer enlarges
+   them on a phone, one with more cannot — forty-one names at two and a half
+   times the size is a smear — and drops them, keeping every dot, every
+   <title>, and the list of names that sits under the figure on every page
+   that draws one.
+
+   The enlargement REUSES `calc(11px / var(--z))`, which was already in this
+   file compensating for the zoom on /map. The first version wrote
+   `font-size: 26px` and the invariant register caught it in the same commit
+   as a seventeenth type size — correctly. A compensation constant for a
+   coordinate system is not a typographic choice, and the mechanism for it
+   already existed; --z is the scale a map is drawn at, and .42 is what takes
+   an 11px label to 9.4px at 390. */
+@media (max-width: 44rem) {
+  .minimap:not(.dense) { --z: .42; }
+  .minimap.dense .minilabel { display: none; }
+}
 
 /* AN INSTRUMENT'S TITLE IS A LABEL, BECAUSE THE PAGE IS THE TOOL.
    Measured across twenty-two rendered families: twenty-one place a 60px h1

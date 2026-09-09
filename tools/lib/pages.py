@@ -1773,15 +1773,16 @@ def countrymap(data, c):
         more = f' and {len(offframe) - 4} more' if len(offframe) > 4 else ""
         note = (f' {len(offframe)} outside this frame: {links}{more} — too far from the '
                 f'mainland to draw at this scale without emptying the map.')
+    drawn = "".join(_declutter(labels, w, h))
     return (
-        f'<figure class="minimap countrymap arched">'
+        f'<figure class="minimap countrymap arched{dense_class(drawn)}">'
         f'<svg viewBox="0 0 {w} {h}" role="img" data-world="intelligence" '
         f'aria-label="Map of {esc(c["name"])} showing its regions and the destinations in the '
         f'Atlas"><defs>{arch_clip("cm" + c["slug"][:14].replace(chr(45), ""), w, h)}</defs>'
         f'<g clip-path="url(#arch-{"cm" + c["slug"][:14].replace(chr(45), "")})">'
         f'<rect x="0" y="0" width="{w}" height="{h}" class="archground"/>'
         f'{ctx}{land}{"".join(ties)}{"".join(dots)}'
-        f'{"".join(_declutter(labels, w, h))}</g></svg>'
+        f'{drawn}</g></svg>'
         # FOUR LINES OF GREY TYPE UNDER THE PAGE'S MOST IMPORTANT IMAGE.
         #
         # This caption carried the full attribution — five dataset names
@@ -2074,7 +2075,7 @@ def minimap(data, t, span=3.2, about=None):
                 px, py, n["city"]["name"], w, h,
                 cls="minilabel here" if here else "minilabel", off=8.0))
     return (
-        f'<figure class="minimap arched">'
+        f'<figure class="minimap arched{dense_class("".join(labels))}">'
         f'<svg viewBox="0 0 {w} {h}" role="img" data-world="intelligence" '
         f'aria-label="Map of {esc(t["name"])} and the places around it">'
         f'<defs>{arch_clip(uid, w, h)}</defs>'
@@ -2250,6 +2251,20 @@ def place_label(px, py, name, vw, vh, cls="minilabel here", off=10.0,
     return got[0] if got else ""
 
 
+def dense_class(markup):
+    """Does this map draw more names than a phone can enlarge?
+
+    Counted from the EMITTED markup rather than from a list, because the
+    three map families each had a different idea of what "labels" meant:
+    pointsmap held placed labels, the country map held a priority-sorted
+    list before collisions dropped from it, and the destination map held
+    candidates. Marking density from those gave a country map with three
+    visible names the same treatment as a continental one with forty-one.
+    Six or fewer names can be drawn at 26 units on a phone; more cannot.
+    """
+    return "" if markup.count('<text class="minilabel') <= 6 else " dense"
+
+
 def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
               min_w=120.0, min_h=75.0, line=False, extra=""):
     """A set of places on the continent, through the aperture.
@@ -2420,8 +2435,27 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
     lat_lo = _lat_at(y0 + h)
     bar = geo.scale_bar(MAPPROJ, lat_lo, lat_hi, LCC_MID_LON,
                         1.0 / k, vw, vh)
+    # SPARSE OR DENSE, DECIDED HERE, BECAUSE ONLY THE BUILD KNOWS.
+    #
+    # A label is 11 units in a 1000-unit viewBox, and the browser scales the
+    # viewBox to the container — so the RENDERED size is 11 x (width/1000).
+    # Measured across four families:
+    #
+    #     viewport   390   480   704   900  1024  1280
+    #     label px   3.9   4.9   7.4   9.4  10.7  12.8
+    #
+    # Below about 860px it is under 9px, which is not small type, it is type
+    # that does not resolve into glyphs. Every phone and most tablets were
+    # being shown names nobody can read.
+    #
+    # CSS cannot fix it alone: there is no non-scaling-text, and the fix
+    # depends on how MANY labels a map carries, which only this function
+    # knows. A map with two names can afford to draw them at two and a half
+    # times the size on a phone; one with forty-one cannot, and its names are
+    # in the list underneath the figure on every page that draws it.
+    dense = dense_class("".join(lab))
     return (
-        f'<figure class="minimap pointsmap arched">'
+        f'<figure class="minimap pointsmap arched{dense}">'
         f'<svg viewBox="0 0 {vw:.1f} {vh:.1f}" role="img" '
         f'data-world="intelligence" aria-label="{esc(aria)}">'
         f'<defs>{arch_clip(uid, vw, vh)}</defs>'

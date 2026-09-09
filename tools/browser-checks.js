@@ -1367,6 +1367,59 @@ async function main() {
   ok(stored.includes("experience:"), "saving an experience did not store it");
   await xp.close();
 
+  // ── a name too small to be a name ──────────────────────────────────
+  //
+  // `.minilabel` is 11 units in a 1000-unit viewBox, and the browser scales
+  // the viewBox to its container — so the size a reader gets is
+  // 11 x (width / 1000), not 11px. Measured across four map families before
+  // the fix:
+  //
+  //     viewport   390   480   704   900  1024  1280
+  //     label px   3.9   4.9   7.4   9.4  10.7  12.8
+  //
+  // Under about 860px it is below 9px, which is not small type — it is type
+  // that does not resolve into glyphs. Every phone and most tablets were
+  // shown names nobody can read, on eight hundred pages, for the life of the
+  // embedded map. Every existing check asked whether a label was PLACED and
+  // whether it survived the aperture; none asked whether it was legible.
+  //
+  // There is no non-scaling-text in SVG, so the build marks each map sparse
+  // or dense from the names it actually emitted, and the phone rule enlarges
+  // the first and drops the second. This asserts the outcome rather than the
+  // mechanism: whatever is still drawn at 390px is at least 9px.
+  for (const w of [390, 480]) {
+    await page.setViewportSize({ width: w, height: 800 });
+    for (const u of ["/europe/austria/tyrol/innsbruck", "/europe/austria",
+                     "/europe/austria/tyrol", "/journeys/the-alpine-grand-tour",
+                     "/europe-in/northern-lights", "/events/oct",
+                     "/beyond-the-obvious"]) {
+      await page.goto(base + u, { waitUntil: "load" });
+      const small = await page.evaluate(() => {
+        const bad = [];
+        for (const t of document.querySelectorAll("figure.minimap text.minilabel")) {
+          const st = getComputedStyle(t);
+          if (st.display === "none" || st.visibility === "hidden") continue;
+          const svg = t.closest("svg");
+          const vw = Number(svg.getAttribute("viewBox").split(/\s+/)[2]);
+          const k = svg.getBoundingClientRect().width / vw;
+          const px = parseFloat(st.fontSize) * k;
+          if (px < 9) bad.push({ t: t.textContent.trim(), px: +px.toFixed(1) });
+        }
+        return bad;
+      });
+      ok(small.length === 0,
+         `${u} at ${w}px draws ${small.length} map label(s) below 9px — ` +
+         small.slice(0, 3).map((b) => `"${b.t}" at ${b.px}px`).join(", "));
+      // And a map that dropped its names must not have dropped its dots:
+      // the names live in the list under the figure, the dots are the map.
+      const kept = await page.evaluate(() =>
+        [...document.querySelectorAll("figure.minimap svg")]
+          .every((s) => s.querySelectorAll(".minidot").length > 0));
+      ok(kept, `${u} at ${w}px has a map figure with no dots left`);
+    }
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+
   // ── the signature does not eat the content ─────────────────────────
   //
   // THE APERTURE WAS DELETING THE NAMES IT EXISTS TO FRAME.
@@ -1881,7 +1934,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 730;
+  const FLOOR = 758;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +
