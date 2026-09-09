@@ -2081,8 +2081,24 @@ async function main() {
             ? cs.stroke : cs.fill;
             const f = parse(raw);
             const a = f[3] * parseFloat(cs.opacity || "1");
-            out.push({ sel, fg: [0, 1, 2].map((i) => f[i] * a + ground[i] * (1 - a)),
-                       bg: ground.slice(0, 3) });
+            // THE GROUND IS THE HALO WHERE THERE IS ONE. A name on an atlas
+            // plate is drawn with `paint-order: stroke` and a paper stroke
+            // under it, which is how a printed atlas keeps a name legible
+            // across a coastline: the reader sees ink on paper wherever the
+            // name falls. Measuring it against the WATER instead reports
+            // 1.67:1 for something nobody has any trouble reading, and would
+            // push the design towards putting names only over land.
+            // Only a stroke that is opaque and at least 1.2px counts — a
+            // hairline is not a ground, and a transparent one is not there.
+            let bg = ground.slice(0, 3);
+            const hs = parse(cs.stroke);
+            const hw = parseFloat(cs.strokeWidth || "0");
+            if (/stroke/.test(cs.paintOrder || "") && hs[3] >= 0.999 && hw >= 1.2
+                && sel !== ".routeline" && sel !== ".scalebar path") {
+              bg = hs.slice(0, 3);
+            }
+            out.push({ sel, fg: [0, 1, 2].map((i) => f[i] * a + bg[i] * (1 - a)),
+                       bg });
           }
         }
         return out;

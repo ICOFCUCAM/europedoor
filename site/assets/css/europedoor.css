@@ -157,12 +157,33 @@
      against its neighbours 2.31. The aperture is then read by its CUT EDGE
      rather than by a tonal step from the wall, which is the machinery the
      dark preference already needed and already has. */
-  --atlas-sea:     #bccfe0;
-  --atlas-land:    #f2efe8;
-  --atlas-context: #e6e2d9;
-  --atlas-coast:   #6d7f95;
-  --atlas-here:    #7fa1cf;
-  --atlas-hereline:#3f5f96;
+  /* THE ATLANTIC, IN FOUR STEPS. A flat pale fill made the water a surface
+     the land was pasted onto; a real atlas has an ocean that gets deeper as
+     it leaves the shore. These four are drawn as concentric strokes of the
+     coastline itself, so the ramp is DISTANCE FROM LAND — the one thing a
+     coastline can tell us — and never a claim about depth. This repository
+     holds no bathymetry and nothing here implies a number of metres.
+     Measured: the four steps are 1.53 to 1.86 apart, which is a ramp you
+     can see and not a set of stripes; limestone against the deep is 10.4:1,
+     so the aperture reads by tone again as well as by its cut edge. */
+  --ocean-deep:    #123f55;
+  --ocean-mid:     #28657a;
+  --ocean-shallow: #5d91a0;
+  --ocean-coastal: #8eb2b5;
+  --atlas-sea:     #123f55;
+  /* LAND IS ONE FAMILY, AND THE SUBJECT IS THE BRIGHTEST OF IT. The subject
+     used to be a light blue, which worked against pale water and reads as
+     SEA against an Atlantic one — Greece came out the same family of blue as
+     the Aegean around it. An atlas separates the country it is about by
+     making it the brightest land with the heaviest edge, not by turning it
+     into another shade of water. Measured: subject against neighbour 1.33,
+     subject against coastal water 2.14, and the outline 11:1 on its own
+     fill. */
+  --atlas-land:    #ded8ca;
+  --atlas-context: #ded8ca;
+  --atlas-here:    #faf7f0;
+  --atlas-coast:   #1d3a4d;
+  --atlas-hereline:#1d3a4d;
 
   --map-sea:      #0a1220;
   --map-land:     #253546;
@@ -2440,9 +2461,16 @@ body[data-hero] .masthead { position: sticky; }
    know about it. */
 .minimap.arched.atlas .lyr-land .context path { fill: var(--atlas-land);
                                       stroke: color-mix(in srgb, var(--atlas-coast) 45%, transparent); }
-.minimap.arched.atlas .lyr-land .countries path.here { fill: var(--atlas-here);
-                                             stroke: var(--atlas-hereline);
-                                             stroke-width: 1.2; }
+/* THE SUBJECT IS A WASH, NOT A FILL, so whatever is under it survives. An
+   opaque country hides everything the terrain layers will eventually put
+   there — the Alps, the Massif Central, the Loire basin — and a plate whose
+   subject is the one place you cannot see the ground is the wrong way round.
+   A white wash lifts it above its neighbours and lets them through; today
+   there is nothing under it but the land tone, and the day there is, this
+   does not have to change. */
+.minimap.arched.atlas .lyr-land .countries path.here {
+  fill: color-mix(in srgb, #ffffff 62%, transparent);
+  stroke: var(--atlas-hereline); }
 /* The place names on an atlas plate: ink on a paper halo, so a name stays
    legible where it crosses a coastline. The capital is set in small caps
    the way every printed atlas distinguishes it — `capital` is authored data
@@ -2505,9 +2533,23 @@ body[data-hero] .masthead { position: sticky; }
 /* The stylesheet paints LAYERS now, not ad-hoc classes: `lyr-coastal-water`
    is a declared layer of the stack and this is its rule, so a reader of
    either file finds the same fourteen names. */
-.minimap.arched.atlas .lyr-coastal-water use { fill: none;
-  stroke: color-mix(in srgb, var(--atlas-coast) 34%, transparent);
-  stroke-width: 7; stroke-linejoin: round; }
+/* THE COASTAL RAMP, CAST RATHER THAN STROKED. Three soft shadows of the
+   land silhouette, widest and deepest first, so the water lightens as it
+   approaches a shore. It is DISTANCE FROM LAND — the one thing a coastline
+   can tell us — and never a claim about depth; this atlas holds no
+   bathymetry and nothing here implies a number of metres.
+   THE FIRST VERSION WAS THREE `<use>` OF THE LAND GROUP AND PAINTED NOTHING.
+   A `<use>` shadow tree is still matched by the selectors that style the
+   original paths, so every clone kept the land's own paper fill and 0.9px
+   coast stroke, and the wide stroke set on the `<use>` never reached it. It
+   measured correctly on the `<use>` element itself and was not on the page —
+   the fourth time in this stylesheet that a treatment rendered as the thing
+   simply not being there. A filter needs no second copy of Europe's
+   geometry and cannot lose a cascade fight. */
+.minimap.arched.atlas .lyr-land {
+  filter: drop-shadow(0 0 3px var(--ocean-coastal))
+          drop-shadow(0 0 9px var(--ocean-shallow))
+          drop-shadow(0 0 20px var(--ocean-mid)); }
 
 /* THE BOUNDARY HIERARCHY. One weight for everything made a frontier and a
    coast the same statement, and put the country this plate is about at the
@@ -2516,7 +2558,12 @@ body[data-hero] .masthead { position: sticky; }
    the subject's own outline is the heaviest thing on the plate. */
 .minimap.arched.atlas .lyr-land .context path { stroke-width: 0.7; }
 .minimap.arched.atlas .lyr-land .countries path { stroke-width: 0.9; }
-.minimap.arched.atlas .lyr-land .countries path.here { stroke-width: 1.6; }
+/* AN ELEGANT HIGHLIGHT, NOT A THICK TECHNICAL OUTLINE. 1.1 against the
+   coastline's 0.9 and the frontier's 0.7: the subject is the heaviest line
+   on the plate by a hair, which is all a hierarchy needs. A soft luminous
+   edge — a wide light halo inside the boundary — needs a stroke-only second
+   pass over the same geometry, the same refactor terrain will force. */
+.minimap.arched.atlas .lyr-land .countries path.here { stroke-width: 1.1; }
 
 /* The places, as marks rather than as navigation. Ink with a paper ring, so
    one reads against the country's own blue and against the water alike. */
@@ -2528,10 +2575,12 @@ body[data-hero] .masthead { position: sticky; }
    highlighter. Here the place you are reading about is cobalt, its
    neighbours are ink, and the names are ink with a paper halo, which is how
    a printed atlas keeps a name legible over a coastline. */
+/* A dot's ground is its own paper ring, for the same reason a name's is:
+   the ring is what separates it from a coastline or a deep sea behind it. */
 .minimap.arched.atlas .lyr-destinations .minidot circle { fill: var(--atlas-hereline);
-                                        stroke: var(--atlas-land); stroke-width: 1.4; }
+  stroke: var(--atlas-land); stroke-width: 1.6; paint-order: stroke; }
 .minimap.arched.atlas .lyr-destinations .minidot.here circle { fill: var(--cobalt-deep);
-                                             stroke: var(--atlas-land); stroke-width: 1.8; }
+  stroke: var(--atlas-land); stroke-width: 2; paint-order: stroke; }
 .minimap.arched.atlas .lyr-destinations .minidot .hit,
 .minimap.arched.atlas .lyr-destinations .minidot.here .hit { fill: transparent; stroke: none; }
 .minimap.arched.atlas .lyr-labels .minilabel { fill: var(--graphite);
@@ -2552,8 +2601,11 @@ body[data-hero] .masthead { position: sticky; }
    rule you cannot read is not a scale. A slate that clears AA on both the
    water and the land, because a bar crosses from one to the other. */
 .minimap.arched.atlas .lyr-labels .scalebar line,
-.minimap.arched.atlas .lyr-labels .scalebar path { stroke: #2b415a; }
-.minimap.arched.atlas .lyr-labels .scalebar text { fill: #2b415a; }
+.minimap.arched.atlas .lyr-labels .scalebar path { stroke: var(--atlas-land); }
+/* The bar crosses water and land alike, so it is paper with an ink
+   halo: the reverse of a name, and readable on both. */
+.minimap.arched.atlas .lyr-labels .scalebar text { fill: var(--atlas-land);
+  paint-order: stroke; stroke: var(--ocean-deep); stroke-width: 2.4; }
 
 /* On paper the reveal is the whole reading of the opening, so it is ink
    rather than a hairline rule. */

@@ -21,6 +21,69 @@ That is what the two worlds have always meant — not a theme, but whether the
 reader is browsing or working — and it is why black remains available for the
 compositions that earn it rather than being the default for all 824 figures.
 
+## The ocean, in four steps
+
+    Deep ocean     #123f55
+    Mid ocean      #28657a
+    Shallow water  #5d91a0
+    Coastal water  #8eb2b5
+
+A flat pale fill made the water a surface the land was pasted onto. These
+four are **cast, not stroked**: three soft shadows of the land silhouette,
+widest and deepest first, so the water lightens as it approaches a shore.
+
+**It is distance from land, and never a claim about depth.** The coastline is
+the one thing that can tell us this, the atlas holds no bathymetry, and
+nothing here implies a number of metres.
+
+The first version was three `<use>` of the land group and **painted nothing at
+all**. A `<use>` shadow tree is still matched by the selectors that style the
+original paths, so every clone kept the land's own paper fill and 0.9px coast
+stroke, and the wide stroke set on the `<use>` never reached it. It measured
+correctly on the `<use>` element itself and was not on the page — the fourth
+time in this stylesheet that a treatment rendered as the thing simply not
+being there. A filter needs no second copy of Europe and cannot lose a
+cascade fight.
+
+## Land is one family, and the subject is a wash
+
+The subject used to be a light blue, which worked against pale water and
+reads as **sea** against an Atlantic one: Greece came out the same family of
+blue as the Aegean around it. An atlas separates the country it is about by
+making it the brightest land with the finest heaviest edge, not by turning it
+into another shade of water.
+
+And it is a **wash, not a fill**, so whatever is under it survives. An opaque
+country hides everything the terrain layers will eventually put there — the
+Alps, the Massif Central, the Loire basin — and a plate whose subject is the
+one place you cannot see the ground is the wrong way round.
+
+The boundary is 1.1 against the coastline's 0.9 and the frontier's 0.7. A
+soft luminous edge needs a stroke-only second pass over the same geometry,
+which is the same refactor terrain will force.
+
+## The terrain chain, decided and waiting on one file
+
+    DEM → hypsometric tint → hillshade → texture → country mask →
+    administrative boundaries → hydrography → labels
+
+Only the **DEM** is missing. Everything after it is a transform of the DEM and
+is written down in `cartography.HYPSOMETRIC` and `cartography.DECIDED` as data
+rather than as prose, so the day it lands the tint is a table lookup and not
+an argument.
+
+| band | tint | reads as |
+|---|---|---|
+| 0–200 m | `#dfe0cf` | lowland, muted green-grey |
+| 200–600 m | `#d9d6bd` | foothill, soft olive |
+| 600–1200 m | `#d5c9a8` | upland, warm ochre |
+| 1200–2000 m | `#cdbb9c` | high ground, pale brown |
+| 2000 m+ | `#e6e0d6` | mountain, light stone |
+
+Five steps, because four cannot show a foothill and six begin to read as a
+legend a reader has to consult. Warm as it rises and never saturated: height
+is **felt**, and the typography stays dominant over the ground.
+
 ## The pipeline
 
     GEOGRAPHIC DATA ─┐                        ┌─ VISUAL STYLE

@@ -84,10 +84,40 @@ ORDER = ("ocean", "coastal-water", "land", "terrain", "hillshade", "rivers",
 # wrote down rather than one nobody noticed.
 CLASSES = {name: f"lyr-{name}" for name in ORDER}
 
+# THE HYPSOMETRIC SCALE, AS DATA RATHER THAN AS PROSE. Declared now so the
+# day a DEM lands the tint is a table lookup and not an argument. Five steps,
+# because four cannot show a foothill and six start to read as a legend a
+# reader has to consult. Warm as it rises, and never saturated: in an
+# editorial atlas height is FELT, and the typography stays dominant.
+#
+# The colours are of this palette's own family — the land tone at the bottom
+# and the warm accent at the top — so a terrain plate is recognisably the
+# same atlas as a flat one, which a stock hypsometric ramp would not be.
+HYPSOMETRIC = (
+    (0,    200,  "#dfe0cf", "lowland, a muted green-grey"),
+    (200,  600,  "#d9d6bd", "foothill, soft olive"),
+    (600,  1200, "#d5c9a8", "upland, warm ochre"),
+    (1200, 2000, "#cdbb9c", "high ground, pale brown"),
+    (2000, None, "#e6e0d6", "mountain, light stone"),
+)
+
+# THE CHAIN THE TERRAIN LAYERS RUN IN, which is the owner's and is the order
+# a printed atlas is built in: the ground first, the light on it second, the
+# country cut out of both third, and everything a reader reads on top.
+#
+#   DEM → hypsometric tint → hillshade → texture → country mask →
+#   administrative boundaries → hydrography → labels
+#
+# Only the DEM is missing. Everything after it is a transform of the DEM and
+# is written down above and below.
+TERRAIN_CHAIN = ("dem", "hypsometric", "hillshade", "terrain-texture",
+                 "country-mask", "country-bounds", "rivers", "labels")
+
 DECIDED = {
-    "terrain": "Four steps and no more, from the land tone toward the warm "
-               "accent. No hypsometric rainbow: in an editorial atlas height "
-               "is felt, not read off a legend.",
+    "terrain": "The five steps of HYPSOMETRIC above, from the land tone "
+               "toward the warm accent. No hypsometric rainbow: in an "
+               "editorial atlas height is felt, not read off a legend, and "
+               "the typography stays dominant over the ground.",
     "hillshade": "One light from the north-west, at most 12% opacity, "
                  "multiplied over the terrain tint and clipped to land. "
                  "Never over flat ground, where it invents structure.",
@@ -113,6 +143,19 @@ DECIDED = {
 # Recorded rather than left implicit: a layer in ORDER that quietly never
 # appears is indistinguishable from one somebody forgot.
 FOLDED = {
+    "coastal-water": ("land", "three soft shadows of the land silhouette, "
+                              "cast into the water. THE FIRST VERSION WAS "
+                              "THREE `<use>` OF THE LAND GROUP AND PAINTED "
+                              "NOTHING AT ALL: the shadow tree a `<use>` "
+                              "clones is still matched by the selectors that "
+                              "style the ORIGINAL paths, so every clone kept "
+                              "the land's own paper fill and 0.9px coast "
+                              "stroke and the stroke set on the `<use>` never "
+                              "reached it. It looked like a decision, it "
+                              "measured correctly on the `<use>` element "
+                              "itself, and the ramp was never on the page. "
+                              "A filter needs no second copy of Europe and "
+                              "cannot lose a cascade fight"),
     "coastline": ("land", "the land path's own stroke; needs a stroke-only "
                           "pass to separate, which terrain will force"),
     "country-bounds": ("land", "same stroke as the coastline — the two are "
@@ -211,7 +254,9 @@ def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
                                      f'height="{h:.0f}" class="archground"/>'
                           if ocean else ""))
         elif name == "coastal-water":
-            body.append(_group(name, f'<use href="#{uid}-land"/>' if land else ""))
+            # FOLDED INTO THE LAND SILHOUETTE — see FOLDED, and see the note
+            # there about what the first version of this did.
+            continue
         elif name == "land":
             body.append(f'<g id="{uid}-land" class="lyr {CLASSES["land"]}">'
                         f'{context}{land}</g>' if (land or context) else "")
