@@ -303,6 +303,21 @@ shipped HTML — a page printing a hop says "straight line", and no page
 anywhere claims a mode or a ground distance. A source-level check would have
 passed on all three.
 
+**One thing, one picture — and 272 of 319 destinations had two.** `card()`
+takes an optional `motif`; without one, `plate_shapes()` picks from the seed.
+**Fourteen of the twenty call sites passed no motif**, including every
+destination card on a country page, a region page and an interest page, while
+the quiet index passed one. So Hallstatt drew its own topography on
+`/beyond-the-obvious` and whatever the hash of its slug chose everywhere
+else. Measured before the fix: **272 of 319 destinations, 15 of 17 journeys,
+11 of 13 themes.** The rule already existed for stories — *a story is not a
+place, and its picture may not be drawn from a hash* — and this was the same
+failure across every other record that knows what it is. A plate is
+content-addressed, so two pictures is also two cached PNGs and two social
+cards for one thing. `checks.py` compares the plate every page drew for each
+seed **in the shipped HTML**, because a source check on the call sites passes
+the day somebody adds a fifteenth.
+
 **An index exists to say how big a set is, and five of eight did not.**
 `/journeys`, `/themes`, `/europe-in`, `/beyond-the-obvious` and `/fund`
 carried a head with no count in it at all. `/europe-in` was the sharpest: it

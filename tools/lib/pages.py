@@ -299,7 +299,8 @@ def home(data):
     jcards = [
         card(urls.journey(j),
              f"{j['days']} days · {len({l['city'].split('/')[0] for l in j['legs']})} countries",
-             j["name"], j["strapline"], seed="journey:" + j["slug"], tall=True)
+             j["name"], j["strapline"], seed="journey:" + j["slug"], tall=True,
+             motif=motif_for(j["interests"]))
         for j in picked
     ]
 
@@ -479,6 +480,7 @@ def country_page(data, c):
     popular = [
         card(urls.city(c, r, t), f"{r['name']}", t["name"], t["summary"],
              seed=f"city:{c['slug']}:{t['slug']}",
+             motif=motif_for(t["interests"], t.get("city_type")),
              meta=f'<p class="cardmeta">{len(t.get("places", []))} places · '
                   f'{len(t.get("experiences", []))} experiences</p>')
         for r, t in ranked[:6]
@@ -665,7 +667,8 @@ def region_page(data, c, r):
         cards.append(card(urls.city(c, r, t),
                           CITY_TYPE_NAMES.get(t.get("city_type"), "Destination"),
                           t["name"], t["summary"],
-                          seed=f"city:{c['slug']}:{t['slug']}", meta=meta))
+                          seed=f"city:{c['slug']}:{t['slug']}", meta=meta,
+                          motif=motif_for(t["interests"], t.get("city_type"))))
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)),
          (c["name"], urls.country(c)), (r["name"], None)])}
@@ -1117,6 +1120,7 @@ def interest_page(data, i, ranking):
             f"{n['country']['name']} · {n['region']['name']}",
             n["city"]["name"], n["city"]["summary"],
             seed=f"city:{n['country']['slug']}:{n['city']['slug']}",
+            motif=motif_for(n["city"]["interests"], n["city"].get("city_type")),
         )
         for n in shown
     ]
@@ -1171,7 +1175,8 @@ def journeys_index(data):
         meta = (f'<p class="cardmeta">{j["days"]} days · {len(countries)} countries · '
                 f'{esc(j["difficulty"])} · {esc(j["budget"])}</p>')
         cards.append(card(urls.journey(j), j["strapline"], j["name"], j["summary"][:150] + "…",
-                          seed="journey:" + j["slug"], meta=meta))
+                          seed="journey:" + j["slug"], meta=meta,
+                          motif=motif_for(j["interests"])))
     body = f"""
 {crumbs([("Europe", "/discover"), ("Journeys", None)])}
 <div class="pagehead">
@@ -3233,7 +3238,7 @@ def fund_page(data, p):
 def themes_index(data):
     cards = [
         card(f"/themes/{t['slug']}", f"{len(t['stops'])} places", t["name"], t["strapline"],
-             seed="theme:" + t["slug"])
+             seed="theme:" + t["slug"], motif=motif_for(t.get("interests", [])))
         for t in data["themes"]
     ]
     body = f"""
@@ -4097,7 +4102,8 @@ def quiet_page(data):
     cards = [
         card(urls.city(n["country"], n["region"], n["city"]),
              f"{n['country']['name']} · {n['region']['name']}", n["city"]["name"], n["city"]["summary"],
-             seed=f"city:{n['country']['slug']}:{n['city']['slug']}")
+             seed=f"city:{n['country']['slug']}:{n['city']['slug']}",
+             motif=motif_for(n["city"]["interests"], n["city"].get("city_type")))
         for n in quiet
     ]
     # THE ARGUMENT OF THIS PAGE IS A DISTRIBUTION, AND IT WAS PROSE.
@@ -5488,7 +5494,8 @@ def motion_page(data, m):
               for j in jrows]
     trows = [t for t in data["themes"] if wants & set(t.get("interests", []))][:3]
     tcards = [card(f"/themes/{t['slug']}", "Theme", t["name"], t["summary"],
-                   seed="theme:" + t["slug"]) for t in trows]
+                   seed="theme:" + t["slug"],
+                   motif=motif_for(t.get("interests", []))) for t in trows]
 
     body = f"""
 {crumbs([("Europe", "/discover"), ("Europe in Motion", "/europe-in"), (m["name"], None)])}

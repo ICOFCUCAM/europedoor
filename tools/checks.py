@@ -2628,6 +2628,55 @@ def c_index_extent():
     return n
 
 
+@check("one thing, one picture — a plate is never chosen twice for the same record")
+def c_one_plate_per_thing():
+    # THE SAME PLACE HAD TWO LANDSCAPES DEPENDING ON WHICH PAGE YOU MET IT ON.
+    #
+    # `card()` takes an optional `motif`; without one, plate_shapes() picks
+    # from the seed. Fourteen of the twenty call sites passed no motif —
+    # including every destination card on a country page and a region page,
+    # while the quiet index passed one. So Hallstatt drew its own topography
+    # on /beyond-the-obvious and whatever the hash of its slug happened to
+    # choose everywhere else.
+    #
+    # Measured before the fix: 272 of 319 destinations, 15 of 17 journeys and
+    # 11 of 13 themes were drawn one way on one page and another way on the
+    # next. The rule already existed for stories — "a story is not a place,
+    # and its picture may not be drawn from a hash" — and this is the same
+    # failure across every other record that knows what it is.
+    #
+    # The plate is content-addressed, so two pictures also means two cached
+    # PNGs and two social cards for one thing.
+    #
+    # Asserted against the SHIPPED HTML by comparing the plate each page drew
+    # for a given seed. A source check on the call sites would pass the day
+    # somebody adds a fifteenth.
+    seen = {}
+    n = 0
+    for path in site_files():
+        h = open(path, encoding="utf-8").read()
+        # every plate carries its seed's identity in the gradient/clip ids
+        for m in re.finditer(r'<div class="card-art[^"]*">(.*?)</div>', h, re.S):
+            art = m.group(1)
+            # A plate names its own gradient and clip after the seed's hash,
+            # so the id IS the record's identity in the shipped markup.
+            key = re.search(r'id="sky([a-z0-9]+)"', art)
+            if not key:
+                continue
+            n += 1
+            k = key.group(1)
+            # the drawing itself, with the identity stripped back out
+            draw = art.replace(k, "")
+            if k in seen and seen[k][0] != draw:
+                fail(f"{canonical_of(path)}: the plate for {k} is not the "
+                     f"plate {seen[k][1]} drew for it. One record, one "
+                     f"picture — a landscape chosen by hash on one page and "
+                     f"by what the place is on another is two things to a "
+                     f"reader and two social cards to a crawler.")
+            seen.setdefault(k, (draw, canonical_of(path)))
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0
