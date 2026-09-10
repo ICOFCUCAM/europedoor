@@ -3891,6 +3891,40 @@ def c_score_median():
     return n
 
 
+@check("every <use> and every url(#id) points at something on the same page")
+def c_svg_refs():
+    # A <use> OF AN ID THAT IS NOT ON THE PAGE RENDERS AS NOTHING AT ALL, and
+    # nothing anywhere reports it — not the browser console, not the build,
+    # not any count. `constellation()` draws its land with a <use> of
+    # #constel-eu, which `constel_defs()` emits, and THREE separate pages have
+    # now shipped one without the other: /discover before the land was added
+    # under its dots, the 404 when it took the shared index opening, and every
+    # motion page when its related bands stopped being cards. Each rendered as
+    # a scatter of dots on empty sea, which looks deliberate.
+    #
+    # The general form is cheap: an SVG reference to a fragment on this
+    # document has to resolve on this document. It covers `<use href>`,
+    # `fill="url(#g)"`, `mask=`, `clip-path=` and `filter=` — a mask that
+    # resolves to nothing hides the whole element it is on, which is the
+    # loudest version of this fault.
+    use_pat = re.compile(r'<use[^>]+(?:xlink:)?href="#([A-Za-z0-9_-]+)"')
+    url_pat = re.compile(r'(?:fill|stroke|mask|clip-path|filter)="url\(#([A-Za-z0-9_-]+)\)"')
+    n = 0
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        have = set(re.findall(r'\sid="([A-Za-z0-9_-]+)"', h))
+        for pat, what in ((use_pat, "<use>"), (url_pat, "a url(#…) reference")):
+            for ident in sorted(set(pat.findall(h))):
+                n += 1
+                if ident not in have:
+                    fail(f"{canonical_of(f)}: {what} points at #{ident}, which "
+                         f"is not on the page. It renders as nothing and "
+                         f"reports nothing.")
+    if n < 1000:
+        fail(f"only {n} SVG references examined — the scan found almost none")
+    return n
+
+
 @check("a count agrees with its noun")
 def c_plurals():
     # MEASURED ON THE SHIPPED SITE: "1 experiences" on 110 pages, "1 nights"
