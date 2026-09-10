@@ -31,6 +31,46 @@
       "min_aspect": 1.5,
       "max_aspect": 2.4,
       "note": "The ground within 40 km spreads 1,798 m and crests at 2,752 m. A photograph here has to carry the valley floor against the wall above it, which is the reading the Stay layer makes in words."
+    },
+    "door-mountains": {
+      "key": "door-mountains",
+      "path": "/",
+      "surface": "The Mountains door on the homepage — a large editorial card under “Find your Europe”.",
+      "min_width": 1600,
+      "orientation": "landscape",
+      "min_aspect": 1.2,
+      "max_aspect": 1.9,
+      "note": "An alpine morning above cloud — a valley floor against the wall over it, not a summit portrait. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own."
+    },
+    "door-coast": {
+      "key": "door-coast",
+      "path": "/",
+      "surface": "The Coast & islands door on the homepage — a large editorial card under “Find your Europe”.",
+      "min_width": 1600,
+      "orientation": "landscape",
+      "min_aspect": 1.2,
+      "max_aspect": 1.9,
+      "note": "Where land ends. A cliff, a harbour or an island shore with the sea doing the work. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own."
+    },
+    "door-history": {
+      "key": "door-history",
+      "path": "/",
+      "surface": "The Historic cities door on the homepage — a large editorial card under “Find your Europe”.",
+      "min_width": 1600,
+      "orientation": "landscape",
+      "min_aspect": 1.2,
+      "max_aspect": 1.9,
+      "note": "A lived-in old street, not a monument. Somebody's Tuesday in a two-thousand-year-old city. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own."
+    },
+    "door-food": {
+      "key": "door-food",
+      "path": "/",
+      "surface": "The Food & wine door on the homepage — a large editorial card under “Find your Europe”.",
+      "min_width": 1600,
+      "orientation": "landscape",
+      "min_aspect": 1.2,
+      "max_aspect": 1.9,
+      "note": "A table, a market or a vineyard that could only be where it is. Never a styled plate on a board. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own."
     }
   }
 }

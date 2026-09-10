@@ -771,6 +771,34 @@ def load():
     # them here would be the first unverified thing on this site, and the
     # provider is the one who has them and the one who is named as having
     # them.
+    # THE HOMEPAGE'S EDITORIAL LAYER. Four doors and a closing statement, in
+    # data rather than in the template, because the homepage is an entrance
+    # somebody will want to rewrite without touching page code. Every door
+    # names a REAL interest, so the word on the door is the heading of the
+    # page it opens and the count beside it is the length of that list — the
+    # rule that stopped a tile being labelled "Adventure" when no such tag,
+    # no page and no list exists behind the word.
+    home = _read(os.path.join(DATA, "home.json"))
+    p.require(isinstance(home.get("doors"), list) and home["doors"],
+              "home.json", "no doors")
+    p.require(len(home["doors"]) <= 4, "home.json",
+              f"{len(home['doors'])} doors — the homepage shows at most four. "
+              "Eight was the finding: a reader stopped seeing destinations and "
+              "started seeing UI components.")
+    seen = set()
+    for d in home["doors"]:
+        w = f"home.json door {d.get('interest')!r}"
+        for key in ("interest", "title", "line", "where", "purpose"):
+            p.require(key in d and d[key], w, f"missing {key!r}")
+        p.require(d.get("interest") in interests, w,
+                  f"unknown interest {d.get('interest')!r} — a door must open "
+                  f"on a list this atlas actually holds")
+        p.require(d.get("interest") not in seen, w, "duplicate door")
+        seen.add(d.get("interest"))
+    for key in ("head", "body", "cta"):
+        p.require((home.get("closing") or {}).get(key), "home.json",
+                  f"closing statement is missing {key!r}")
+
     stay = _read(os.path.join(DATA, "stay.json")) if os.path.exists(
         os.path.join(DATA, "stay.json")) else {"providers": [],
                                                "accommodation_context": []}
@@ -952,6 +980,7 @@ def load():
 
     return {
         "motions": motions,
+        "home": home,
         "images": images,
         "taxonomy": tax,
         "interests": interests,

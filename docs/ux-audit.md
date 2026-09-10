@@ -8,7 +8,7 @@ its requirements are about how something looks and nobody can check a feeling.
 So every row here asserts against the generated HTML, the CSS and the JavaScript
 as they actually are.
 
-**52 sections · 22 built · 13 already · 12 partial · 2 built (deliberately smaller) · 1 refused · 1 locked · 1 deferred · 370 assertions · 0 failing**
+**52 sections · 22 built · 13 already · 12 partial · 2 built (deliberately smaller) · 1 refused · 1 locked · 1 deferred · 371 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -17,7 +17,7 @@ as they actually are.
 | 3 | Design tokens | PARTIAL | 6 | One 8px-derived spacing scale, one type scale, the brief's radii. The named webfonts are refused: a font CDN would hand every reader's address to a third party and contradict /privacy. |
 | 4 | Homepage hero | PARTIAL | 4 | Full-bleed hero, the headline, the ask box and the call to action. The hero image is a generated plate. |
 | 5 | Homepage — Explore | BUILT (deliberately smaller) | 8 | The map is on the homepage, drawn from real coastlines. Its filter row is NOT: eleven chips under a map are eleven links into filtered views of the map the reader is already looking at. The filters live on /map, which is one tap away and is where they act. |
-| 6 | Experience categories | ALREADY | 4 | Eight large cards, one per category, with the brief's hover. |
+| 6 | Experience categories | ALREADY | 5 | Eight large cards, one per category, with the brief's hover. |
 | 2036-7 | Discover Mode | BUILT | 8 | The surface that answers "I do not know where I want to go". Pick moods and constraints and the continent narrows — and every recommendation says why, naming the terms that actually fired. |
 | 2036-18 | Discoverability, computed | BUILT | 8 | Hidden Europe was an editorial tag — the most interesting claim on the site and the one nobody could check. It is now a published score with five named terms, and it says plainly that it measures obscurity within this Atlas rather than crowds. |
 | 2036-6 | Europe in Motion | BUILT | 54 | Twelve ways to cut the continent, each a query evaluated against every destination on every build — and each page prints the query that made it. A motion cannot become a hand-picked list, because the validator refuses a field that names destinations. |

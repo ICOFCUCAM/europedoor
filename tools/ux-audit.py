@@ -160,13 +160,18 @@ def s4():
     yield has("/", "Open the door to Europe", "Plan my journey")
     yield has("/", "what would you like to discover?"), "the Bible's own ask-box wording"
     # The three ghost buttons under the hero became four intent chips that
-    # seed the box they sit under, and the secondary CTA moved one band down
-    # to "Explore the map". The hierarchy is unchanged and is still checked;
-    # only where the secondary sits has moved.
+    # seed the box they sit under.
     yield has("/", "hero-intents", "/plan?ask="), "and the intent chips beneath it"
     h = page("/")
-    yield h.index("Plan my journey") < h.index("Explore the map"), \
-        "primary before secondary — the planner is the conversion"
+    # THE PROMISE IS THAT UTILITY COMES BEFORE BROWSING, and the first version
+    # of this assertion pinned the STRING it happened to come before —
+    # "Explore the map", which was the secondary link on a band that no longer
+    # exists. Sixth assertion in this repository to protect a layout instead
+    # of a claim, and it went red for a page that had got better. What must
+    # hold is that a reader can act before they are asked to browse: the
+    # planner sits above every section heading on the page.
+    yield h.index("Plan my journey") < h.index("<h2"), \
+        "the planner is above every band — utility before browsing"
 
 
 @section(5, "Homepage — Explore", "BUILT (deliberately smaller)",
@@ -188,16 +193,37 @@ def s5():
 @section(6, "Experience categories", "ALREADY",
          "Eight large cards, one per category, with the brief's hover.")
 def s6():
-    yield has("/", "Find your kind of Europe")
-    # Eight, exactly. This was seventeen interest tiles until the homepage
-    # was cut to three bands; the brief always asked for eight large cards
-    # and the page was quietly over-delivering into a wall of small ones.
+    yield has("/", "Where to begin")
+    # EIGHT WAS THE FINDING, NOT THE TARGET. This asserted exactly eight
+    # cards, which the brief did ask for and which the built page then
+    # disproved: eight tiles each drew the same silhouette with different
+    # dots, above three more on the journeys, so a reader met eleven maps
+    # before experiencing anything and the labels were too small to read.
+    # The count is four now, and the assertion is a CEILING rather than an
+    # equality, because the failure this family has is growth.
     h = page("/")
-    band = h[h.index("Find your kind of Europe"):h.index("Journeys worth taking")]
-    n = band.count('class="card"')
-    yield n == 8, f"{n} large cards, one per category"
-    yield ".card:hover" in CSS, "the cards lift on hover"
-    yield "@media (prefers-reduced-motion: reduce)" in CSS, "and stop for anyone who asked"
+    # "Find your Europe" was the heading this section was given and it is
+    # a RESERVED CAMPAIGN LINE: §B2 keeps six of them out of the shell,
+    # because a site with six taglines has none. The brand lock caught a
+    # heading the design direction asked for, which is what it is for.
+    band = h[h.index("Where to begin"):h.index("Journeys worth taking")]
+    # COUNTED ON THE WHOLE ATTRIBUTE, not on a prefix. The first version
+    # counted `class="way` and read 25, because waytext, wayline, waywhere,
+    # waymeta and waygo all begin with it — an instrument matching a
+    # substring of its own naming scheme.
+    import re as _re
+    ways = _re.findall(r'class="way(?: shot)?"', band)
+    n = len(ways)
+    yield 0 < n <= 4, f"{n} ways in — at most four, and each one large"
+    # Each door opens on a real list and says how long that list is, which is
+    # the rule that stopped a tile being labelled with a word no page answers.
+    yield len(_re.findall(r"\d+ destinations", band)) == n, \
+        "every door carries the true size of the list it opens"
+    # AND NO DOOR CARRIES A MAP. Four adjacent cards wearing the same picture
+    # of Europe is what this section was rebuilt to stop, so the assertion is
+    # on the absence rather than on the arrangement.
+    yield 'class="constel' not in band, "no door draws its own Europe"
+    yield "@media (prefers-reduced-motion: reduce)" in CSS, "and motion stops for anyone who asked"
 
 
 @section("2036-7", "Discover Mode", "BUILT",

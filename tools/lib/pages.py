@@ -1026,22 +1026,56 @@ def home(data):
     #
     # The ORDER is the mosaic's composition: the first and the sixth get the
     # wide cells, so the two largest pictures are a landscape and a coast.
-    HOME_KINDS = ["mountains", "history", "food", "nature",
-                  "coast", "sacred", "architecture", "cities"]
-    # THE TILE DRAWS ITS OWN DESTINATIONS, NOT A PAINTING OF NOWHERE.
-    # Every destination carrying the tag, lit on the shared silhouette: the
-    # count on the tile is the number of dots on it. Mountains is the Alps,
-    # the Pyrenees, the Carpathians and the Scandes; History is almost the
-    # whole continent; and that difference is the argument each tile exists
-    # to make. See constellation().
-    kind_cards = [
-        card(urls.interest(k), f"{n_by_interest[k]} destinations",
-             data["interests"][k]["name"], None,
-             art=constellation([project(n["city"]["lat"], n["city"]["lon"])
-                                for n in data["cities"].values()
-                                if k in n["city"]["interests"]]))
-        for k in HOME_KINDS
-    ]
+    # FOUR DOORS, NOT EIGHT TILES, AND NOT A MAP ON ANY OF THEM.
+    #
+    # The eight-tile version drew every destination carrying a tag, lit on
+    # the shared silhouette, and the argument for it was real: the count on
+    # the tile was the number of dots on it, and the difference between the
+    # Alps-and-Carpathians shape and the almost-everywhere shape was the
+    # thing the tile was trying to say.
+    #
+    # Rendered, it said something else. Eight beige Europes with blue dots,
+    # side by side, above three more on the journeys — eleven maps before a
+    # reader has experienced anything. Repetition turned the signature into
+    # background noise: you stop seeing destinations and start seeing UI
+    # components, and the labels are too small to read anyway. That is this
+    # atlas's own rule about the aperture — a signature applied to everything
+    # is wallpaper — arriving through a different door.
+    #
+    # A PER-CATEGORY CROP DOES NOT FIX IT. It was the obvious repair and it
+    # fails on the data: mountains, coast, history and food are all
+    # continent-wide here, so four crops are four pictures of Europe again.
+    #
+    # So a door is TYPE-LED with a photograph slot. Orientation is words —
+    # "From the Alps to the Caucasus" — desire is the photograph, and the map
+    # lives one click away on the page the door opens, where it is the
+    # subject rather than a card background. Cartography orients, photography
+    # persuades, and neither does the other's job.
+    #
+    # THE FALLBACK IS NOT A PLATE. picture() returns one when the register is
+    # empty, which is right on 800 pages and wrong here for the reason the
+    # hero already records: eleven abstract plates in a column is placeholder
+    # art doing a picture's job, and it was this exact section. So a door
+    # asks the register directly and, with no photograph, is type and space.
+    doors = []
+    for d in data["home"]["doors"]:
+        interest = data["interests"][d["interest"]]
+        n = n_by_interest[d["interest"]]
+        row = (data.get("images") or {}).get(d["purpose"])
+        shot = picture(data.get("images"), d["purpose"], w=1600, h=1000,
+                       alt=row["alt"], sizes="(min-width: 52rem) 50vw, 100vw"
+                       ) if row else ""
+        doors.append(
+            f"""<a class="way{' shot' if shot else ''}" href="{urls.interest(d['interest'])}">
+  {shot}
+  <div class="waytext">
+    <h3>{esc(d['title'])}</h3>
+    <p class="wayline">{esc(d['line'])}</p>
+    <p class="waywhere">{esc(d['where'])}</p>
+    <p class="waymeta"><span>{n} destinations</span><span class="waygo">Explore →</span></p>
+  </div>
+</a>"""
+        )
 
     # Three journeys, chosen by MEASUREMENT rather than by taste: ranked by
     # countries crossed — the stated differentiator, since "a good European
@@ -1067,15 +1101,73 @@ def home(data):
     # And a journey draws its ROUTE. The one thing that makes a journey a
     # journey is the ordered sequence, which is exactly what an abstract
     # plate could not show — the same finding that rebuilt /journeys.
-    jcards = [
-        card(urls.journey(j),
-             f"{j['days']} days · {len({l['city'].split('/')[0] for l in j['legs']})} countries",
-             j["name"], j["strapline"], tall=True,
-             art=constellation([project(data["cities"][l["city"]]["city"]["lat"],
-                                        data["cities"][l["city"]]["city"]["lon"])
-                                for l in j["legs"]], route=True))
-        for j in picked
-    ]
+    # AND A JOURNEY IS A ROW, NOT A CARD IN A GRID OF THREE.
+    #
+    # Three small cards each carrying a route drawn across the whole
+    # continent is three more maps in the eleven, at a size where the route
+    # is a squiggle. A journey is chosen on where it goes, in order — which
+    # is what /journeys already learned — so the row leads with the
+    # countries crossed and the stops, and the route drawing sits beside it
+    # as the explanation rather than as the picture.
+    jrows = []
+    for j in picked:
+        legs = [data["cities"][l["city"]]["city"] for l in j["legs"]]
+        countries = []
+        for l in j["legs"]:
+            name = data["countries"][l["city"].split("/")[0]]["name"]
+            if name not in countries:
+                countries.append(name)
+        km = j.get("km")
+        facts = [f"{j['days']} days", f"{len(countries)} countries",
+                 f"{len(j['legs'])} stops"]
+        jrows.append(
+            f"""<a class="jrow" href="{urls.journey(j)}">
+  <div class="jrowtext">
+    <p class="kicker">{esc(" → ".join(countries))}</p>
+    <h3>{esc(j['name'])}</h3>
+    <p class="jrowsub">{esc(j['strapline'])}</p>
+    <p class="jrowmeta">{esc(" · ".join(facts))}<span class="waygo">Explore journey →</span></p>
+  </div>
+  <div class="jrowart">{constellation(
+        [project(c["lat"], c["lon"]) for c in legs], route=True)}</div>
+</a>"""
+        )
+
+    # STORIES ARE PHOTOGRAPHY-FIRST AND THERE ARE NO PHOTOGRAPHS, so the
+    # lead piece gets the treatment the family already owns: the places that
+    # piece is actually about, drawn at size. That is the third distinct
+    # visual language in three sections — the doors carry none, a journey
+    # carries its route, a story carries its own scatter — which is the
+    # point. Four adjacent cards wearing the same picture of Europe is what
+    # this page was rebuilt to stop.
+    closing = data["home"]["closing"]
+    idx = data["cities"]
+
+    def story_glyph(st):
+        pts = [project(idx[cid]["city"]["lat"], idx[cid]["city"]["lon"])
+               for cid in (st.get("places") or ()) if cid in idx]
+        return constellation(pts, extra=" constel-theme") if pts else ""
+
+    recent = sorted(data["stories"], key=lambda st: st["published"], reverse=True)[:3]
+    storyband = ""
+    if recent:
+        lead, rest = recent[0], recent[1:]
+        others = "".join(
+            f'''<a class="storysm" href="{urls.story(st)}">
+        <p class="kicker">{esc(st["section"])}</p>
+        <h3>{esc(st["title"])}</h3>
+        <p class="rowsub">{esc(st["standfirst"])}</p></a>'''
+            for st in rest)
+        storyband = f'''<div class="storyband">
+      <a class="storylead" href="{urls.story(lead)}">
+        <div class="storyart">{story_glyph(lead)}</div>
+        <p class="kicker">{esc(lead["section"])} · {esc(lead["reading"])}</p>
+        <h3>{esc(lead["title"])}</h3>
+        <p class="rowsub">{esc(lead["standfirst"])}</p>
+        <p class="waygo">Read the story →</p>
+      </a>
+      <div class="storyside">{others}</div>
+    </div>'''
 
     # The intent chips seed the same box they sit under, rather than jumping
     # somewhere else: the planner reads `ask` from the query string, so a
@@ -1169,31 +1261,38 @@ def home(data):
     <button class="btn" type="submit">Plan my journey</button>
   </form>
   <div class="chips hero-intents">{intentchips}</div>
-  <p class="sourcenote">{herosource}
-  <a href="/map">Open the map →</a></p>
 </div>
 
 {constel_defs()}
-{section("Find your kind of Europe", '<div class="grid mosaic">' + "".join(kind_cards) + "</div>",
+{section("Where to begin", '<div class="wayin">' + "".join(doors) + "</div>",
          stage="Discover", tone="quiet",
-         lede="From iconic cities to hidden gems, from mountains to coastlines, from history "
-              "to the way a place eats. Each of these is a real list, and the Journey Planner "
-              "weights the same ones — so what you see here is what it will build from.",
-         more=("Explore the map", "/map"))}
+         lede="Four ways in, not a list of everything we hold. Each one opens on a "
+              "real list of destinations, and the map is there rather than here — "
+              "on the page it belongs to, at the size it deserves.",
+         more=("Every way in", "/discover"))}
 
-{section("Journeys worth taking", grid(jcards, 3) if jcards else '<p class="small">Curated journeys are being written.</p>',
+{section("Journeys worth taking", '<div class="jrows">' + "".join(jrows) + "</div>"
+         if jrows else '<p class="small">Curated journeys are being written.</p>',
          stage="Go",
-         lede="A good European trip rarely stays in one country. These do not — and each one "
-              "opens in the planner, so you can make it yours.",
-         more=("Build your own journey", "/plan"))}
+         lede="A good European trip rarely stays in one country. These do not — and each "
+              "one opens in the planner, so you can make it yours.",
+         more=("All " + str(len(data["journeys"])) + " journeys", "/journeys"))}
 
-<div class="note homefoot">
-  <p>{ncountries} countries · {nregions} travel regions · {ncities} destinations ·
-  {len(data['journeys'])} curated journeys. EuropeDoor is pre-launch and editorial: nothing
-  here takes a payment, holds money or makes a booking — see
-  <a href="/how-it-works">how it works</a> for what is built, what is designed and what is
-  deliberately blocked.</p>
-</div>
+{section("Stories from the road", storyband,
+         lede="A continent is people before it is places. Every piece links into the "
+              "Atlas, and every Atlas page a story touches links back.",
+         more=("All " + str(len(data["stories"])) + " stories", "/stories"))}
+
+<section class="closing">
+  <h2>{esc(closing["head"])}</h2>
+  <p>{esc(closing["body"])}</p>
+  <p class="closego"><a class="btn" href="/discover">{esc(closing["cta"])} →</a></p>
+  <p class="small">EuropeDoor is pre-launch and editorial: nothing here takes a payment,
+  holds money or makes a booking. <a href="/how-it-works">How it works</a> ·
+  <a href="/about">Who is behind it</a> · {ncountries} countries,
+  {nregions} travel regions, {ncities} destinations.</p>
+  <p class="sourcenote">{herosource} <a href="/map">Open the map →</a></p>
+</section>
 """
     return "/index.html", page(
         SITE_NAME, body, path="/", area=None, hero=True,
@@ -7224,7 +7323,7 @@ def how_it_works_page(data):
     pillars = "".join(
         f"""<a class="card door" href="{esc(u)}"><div class="card-body">
         <p class="kicker">{esc(k)}</p><h3>{esc(t)}</h3><p class="blurb">{esc(b)}</p>
-        <p class="doorgo" aria-hidden="true">→</p></div></a>"""
+        <p class="waygo" aria-hidden="true">→</p></div></a>"""
         for k, t, u, b in DOORS
     )
 

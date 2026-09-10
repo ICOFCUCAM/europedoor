@@ -415,7 +415,23 @@ def measure():
                        "until somebody regenerates and is then gone with no "
                        "failing check — the same class as editing a page in "
                        "site/. A reason belongs HERE, in the source the "
-                       "register is written from."},
+                       "register is written from. "
+                       "AND THE HOMEPAGE ENTRANCE TOOK BOTH, ON PURPOSE: card "
+                       "0.224 to 0.223 and note 0.820 to 0.819, one page each. "
+                       "The homepage was eight `card` tiles each drawing the "
+                       "same beige silhouette with different blue dots, above "
+                       "three more on the journeys — eleven maps before a "
+                       "reader had experienced anything, which turned the "
+                       "signature into background noise and made the labels "
+                       "too small to read. It is four type-led doors, three "
+                       "journey rows carrying a route that is legible, and a "
+                       "story lead now; the closing `note` of counts became an "
+                       "editorial statement, because a row reading `319 "
+                       "destinations · 17 journeys · 50 countries` is the "
+                       "database introducing itself and it was the last thing "
+                       "on the page. The counts are still there, in the quiet "
+                       "line, where they are true and checkable and no longer "
+                       "the argument."},
         },
     }
 

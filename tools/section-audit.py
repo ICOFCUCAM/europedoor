@@ -190,14 +190,17 @@ def s6():
     # Brand Bible V1: "Plan my journey" is the primary conversion and the
     # explore action is the secondary, and the ORDER is the point.
     #
-    # The hero used to carry three ghost buttons — Explore Europe, Every
-    # country, Search everything — and now carries four intent chips that
-    # seed the same box they sit under. The secondary CTA was not deleted:
-    # it moved one band down and became "Explore the map", which is where
-    # the design this follows puts it too. So the hierarchy is still
-    # asserted, across the two bands rather than inside one.
+    # The hero used to carry three ghost buttons and now carries four intent
+    # chips that seed the same box they sit under.
+    #
+    # THIS PINNED THE SECONDARY BY ITS STRING and went red when the band
+    # carrying "Explore the map" was rebuilt — a page that had got better.
+    # What the Brand Bible actually asks for is a hierarchy: the primary
+    # conversion comes before anything that invites browsing. So the claim is
+    # that the planner is above every section heading on the page, which is
+    # the same promise and survives the headings changing.
     h = page("/")
-    yield h.index("Plan my journey") < h.index("Explore the map"), \
+    yield h.index("Plan my journey") < h.index("<h2"), \
         "the CTA hierarchy is the wrong way round"
     yield has("/", "/plan?ask="), "the intent chips seed the planner, not a dead end"
     yield "Say it in your own words" in page("/plan"), "the planner takes the same sentence"
@@ -217,15 +220,35 @@ def s7():
     # what IS there and — more usefully — asserts that the removed surfaces
     # did not become unreachable, which is the only way cutting a homepage
     # section can actually cost anything.
-    yield has("/", "Find your kind of Europe", "Journeys worth taking")
-    yield h.index("Find your kind") < h.index("Journeys worth taking"), \
+    yield has("/", "Where to begin", "Journeys worth taking")
+    yield h.index("Where to begin") < h.index("Journeys worth taking"), \
         "ways in before journeys"
-    # Exactly two <h2> bands under the hero's h1. A floor AND a ceiling:
-    # this page's whole premise is restraint, and restraint is what quietly
-    # erodes — a section at a time, each one defensible on its own. It was
-    # eight bands when this assertion was written.
+    # FOUR BANDS, AND THE CEILING MOVED ON PURPOSE. It was two — a floor and
+    # a ceiling, written when this page had been cut from eight, because
+    # restraint erodes one defensible section at a time.
+    #
+    # It was raised by the owner's design direction, and the argument is not
+    # "more sections": it is that the two bands were both the SAME KIND of
+    # thing, a grid of cards over a picture of Europe, and that a homepage
+    # made of one repeated component is a catalogue of the platform's content
+    # types rather than an entrance to it. The four now differ in kind — four
+    # type-led doors, three journey rows carrying a route, a story lead, and
+    # a closing statement — and the ceiling is what stops a fifth arriving
+    # without the same argument being made again.
     n = h.count("<h2>")
-    yield n == 2, f"{n} bands under the hero (ways in, journeys)"
+    yield n == 4, f"{n} bands under the hero (ways in, journeys, stories, the statement)"
+    # AND NO TWO ADJACENT BANDS DRAW THE SAME PICTURE. That is the finding
+    # the ceiling used to stand in for: eight tiles and three journey cards
+    # each carrying the same beige silhouette with different blue dots, so a
+    # reader met eleven maps before experiencing anything and stopped seeing
+    # destinations at all. At most four drawings on the whole page now.
+    # COUNTED ON THE WHOLE ATTRIBUTE. The first version counted `class="constel`
+    # and read 12 against a page carrying four, because constel-defs,
+    # constel-lit and constel-route all begin with it — an instrument
+    # matching a substring of its own naming scheme, which is the same
+    # mistake the UX audit made in the same hour on `class="way`.
+    n_maps = len(re.findall(r'class="constel(?: constel-theme)?"', h))
+    yield n_maps <= 4, f"{n_maps} drawings on the homepage — it was eleven"
     # The geography index, the twelve motions, the quiet places, the stories
     # desk and the interest index all lost their homepage band. None of them
     # lost a reader: every one is linked from all 1,072 pages.

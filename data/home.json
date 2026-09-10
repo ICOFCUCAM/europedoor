@@ -1,0 +1,39 @@
+{
+  "$comment": "THE HOMEPAGE IS AN EDITORIAL ENTRANCE, NOT A CATALOGUE OF THE PLATFORM'S CONTENT TYPES. This file holds the copy that decision needs, because a page that needs to say something new says it in data/ rather than in a template. Four doors, not eight; the four are the ones a reader arrives already wanting, and each is a real interest in data/taxonomy.json so the name on the door is the heading of the page it opens and the count is the length of that list.",
+  "$why_no_map": "Eight tiles each drew the same beige silhouette with different blue dots, and repetition turned the signature into background noise: a reader stopped seeing destinations and started seeing UI components. A per-category crop was tried on paper and does not help — mountains, coast, history and food are all continent-wide, so four crops would be four pictures of Europe again. So a door is TYPE-LED with a photograph slot: orientation is words, desire is the photograph, and the map lives one click away on the page the door opens. Cartography orients, photography persuades, and neither does the other's job.",
+  "doors": [
+    {
+      "interest": "mountains",
+      "title": "Mountains",
+      "line": "A morning above the clouds.",
+      "where": "From the Alps to the Caucasus.",
+      "purpose": "door-mountains"
+    },
+    {
+      "interest": "coast",
+      "title": "Coast & islands",
+      "line": "Where the continent meets the sea.",
+      "where": "From Atlantic cliffs to Aegean islands.",
+      "purpose": "door-coast"
+    },
+    {
+      "interest": "history",
+      "title": "Historic cities",
+      "line": "Streets that remember.",
+      "where": "Two thousand years, still lived in.",
+      "purpose": "door-history"
+    },
+    {
+      "interest": "food",
+      "title": "Food & wine",
+      "line": "Europe, served locally.",
+      "where": "Where a region tastes of itself.",
+      "purpose": "door-food"
+    }
+  ],
+  "closing": {
+    "head": "Europe is not a checklist.",
+    "body": "It is a continent of places, crossings, flavours, histories and landscapes. EuropeDoor helps you find the ones worth opening.",
+    "cta": "Explore Europe"
+  }
+}

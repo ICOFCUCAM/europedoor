@@ -2257,16 +2257,24 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    present, labelled, keyboard-reachable and completely unreadable, which is
    the same failure this stylesheet already records in the other direction
    for the hero masthead. */
-.askhero label { font-size: var(--t-xs); letter-spacing: .1em; text-transform: uppercase;
-                 color: var(--ink-2); font-weight: 600; }
+/* AND THE BAND CAME OFF THE HERO, so the label stopped being a micro-caption
+   over a photograph and became the first thing anybody is asked. A shouty
+   uppercase label reads as a form; this is meant to read as a question. */
+.askhero label { font-family: var(--serif); font-size: var(--t-lg);
+                 color: var(--ink-2); }
 .askhero input { width: 100%; font: inherit; font-size: var(--t-md);
                  padding: var(--s4); border: 1px solid transparent; border-radius: var(--radius);
                  background: var(--paper); color: var(--ink); }
 .askhero input:focus-visible { border-color: var(--signature); }
-.askband .chip, .herofull .chip { background: color-mix(in srgb, var(--graphite) 55%, transparent);
-                  border-color: color-mix(in srgb, var(--limestone) 42%, transparent);
-                  color: var(--limestone); }
-.askband .chip:hover, .herofull .chip:hover { background: color-mix(in srgb, var(--limestone) 16%, transparent); }
+/* The chips were limestone on a graphite scrim because they sat inside the
+   hero. On the light band that treatment is a grey pill, which is the shape
+   this stylesheet uses for something INERT — and these are the fastest way
+   into the product. */
+.askband .chip, .herofull .chip { background: transparent;
+                  border-color: var(--ink-3); color: var(--ink-2);
+                  font-size: var(--t-sm); padding: var(--s1) var(--s4); }
+.askband .chip:hover, .herofull .chip:hover { background: var(--paper-2);
+                  border-color: var(--door); color: var(--door); }
 @media (min-width: 40rem) { .askhero { grid-template-columns: 1fr auto; align-items: end; }
   .askhero label { grid-column: 1 / -1; margin-bottom: calc(var(--s2) * -1); } }
 
@@ -3623,6 +3631,13 @@ body[data-hero] .masthead { position: sticky; }
      that makes that page an atlas off every phone, which is the same
      measurement being applied to a different number. */
   .constel:not(.regionglyph) { display: none; }
+  /* THIRD TIME THIS RULE HAS TAKEN A DRAWING OFF A PAGE THAT NEEDED IT, and
+     the measurement is the same one every time: 132px is a mark and the
+     whole width is a picture. On a phone the homepage stacks, so a journey's
+     route and a story's places get 390px — where a route down the length of
+     Europe is a line you can read, and where the alternative is a journey
+     row explaining itself with nothing. Same rule, different number. */
+  .jrowart .constel, .storyart .constel { display: block; }
 }
 
 /* ── two axes over one set, drawn as what separates them ──────────────
@@ -3697,3 +3712,167 @@ body[data-hero] .masthead { position: sticky; }
 .constel-route { fill: none; stroke: var(--door); stroke-width: 5;
                  stroke-linejoin: round; opacity: .55; }
 
+
+/* EVERY TYPE VALUE IN THIS SECTION IS ONE THE SITE ALREADY HAD. The first
+ * version introduced four — a 2xl-to-3xl clamp, a bare 2xl, and two leadings
+ * — and the invariant register refused all four. It is right to: the design
+ * audit's central finding is that eleven of twelve families place an
+ * identically sized h1 in an identical position, and no size that already
+ * existed could fix that. A door is not that argument. A role that needs a
+ * new scale value is a decoration, and this one reads at the sizes the site
+ * already publishes.
+ */
+
+/* NOTE: this section is `.way`, not `.door`, and the first version was
+ * `.door`. The Brand Bible's four doors on /how-it-works already own
+ * `.doors`, `.door` and `.doorgo` — and that component reveals its arrow
+ * on hover, so `.doorgo { opacity: 0 }` matched the homepage's four
+ * "Explore →" links and every one of them rendered present, labelled,
+ * cobalt, keyboard-reachable and INVISIBLE. Measured rather than guessed:
+ * the element was 133x33 at the right end of its row with opacity 0.
+ * Third component in this stylesheet to lose a fight it did not know it
+ * was in, and the first to lose it by NAME rather than by specificity.
+ */
+
+/* ── THE HOMEPAGE ENTRANCE ────────────────────────────────────────────
+ *
+ * Eight tiles became four doors, and a door carries no map.
+ *
+ * The tile version drew every destination with a tag lit on the shared
+ * silhouette, and the reasoning was sound: the count on the tile was the
+ * number of dots on it. Rendered, it said something else — eight beige
+ * Europes with blue dots above three more on the journeys, eleven maps
+ * before a reader has experienced anything. Repetition turned the signature
+ * into background noise, and the labels were too small to read besides. It
+ * is this stylesheet's own rule about the aperture arriving through another
+ * door: a signature applied to everything is wallpaper.
+ *
+ * So the section is TYPE-LED with a photograph slot, and the three sections
+ * under the hero each carry a DIFFERENT visual language — a door has none, a
+ * journey has its route, a story has its own scatter of places. Four
+ * adjacent cards wearing the same picture of Europe is the thing this
+ * replaced.
+ *
+ * FOUR THINGS DELIBERATELY ABSENT, as on the Stay layer: no border box, no
+ * radius, no shadow, no fill. Those four are what say "separate object,
+ * placed here by a system", and this is meant to read as a page rather than
+ * as a component library. A rule and space do the separating. */
+.wayin {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s7) var(--s6); border-top: 1px solid var(--rule); padding-top: var(--s6);
+}
+.way { text-decoration: none; }
+.way h3 {
+  font-family: var(--serif); font-size: clamp(var(--t-xl), 3.1vw, var(--t-3xl));
+  line-height: 1.12; margin: 0 0 var(--s3);
+}
+/* The editorial line is the promise and the only italic on the page: it is
+ * the sentence a reader answers, where everything under it is fact. */
+.wayline { font-family: var(--serif); font-style: italic; font-size: var(--t-lg);
+            color: var(--ink-2); margin: 0 0 var(--s3); }
+.waywhere { color: var(--ink-3); margin: 0 0 var(--s4); max-width: 34ch; }
+.waymeta {
+  display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4);
+  font-size: var(--t-sm); letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-3); border-top: 1px solid var(--rule); padding-top: var(--s3); margin: 0;
+}
+.waygo { color: var(--door); font-weight: 600; white-space: nowrap; }
+.way:hover h3, .way:focus-visible h3 { color: var(--door); }
+/* And when a photograph is licensed it becomes the dominant element, which
+ * is the whole point of the slot: cartography orients and photography
+ * persuades. `.shot` is added only when the register actually holds the
+ * file — the same test the hero makes, for the same reason. */
+.way picture { display: block; aspect-ratio: 3 / 2; overflow: hidden; margin-bottom: var(--s4); }
+.way .photo { width: 100%; height: 100%; object-fit: cover; }
+
+/* A journey is a row, because a journey is chosen on where it goes in order.
+ * The route drawing sits BESIDE the text as the explanation rather than
+ * standing in for it — three small cards each carrying a continent-wide
+ * squiggle was three more maps in the eleven. */
+.jrows { border-top: 1px solid var(--rule); }
+/* 13rem drew the whole continent 132 pixels wide, which is the tiny-label
+ * failure this page was rebuilt to remove, one section down. A route is
+ * the explanation of a journey and it has to be readable to explain
+ * anything: at 22rem the Arctic-to-Mediterranean line is a line. */
+.jrow {
+  display: grid; grid-template-columns: minmax(0, 1fr) 22rem; gap: var(--s6);
+  align-items: center; padding: var(--s6) 0; border-bottom: 1px solid var(--rule);
+  text-decoration: none; color: inherit;
+}
+.jrow h3 { font-family: var(--serif); font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); line-height: 1.12;
+           margin: 0 0 var(--s2); }
+.jrowsub { color: var(--ink-3); margin: 0 0 var(--s4); max-width: 52ch; }
+.jrowmeta {
+  display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4);
+  font-size: var(--t-sm); letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-3); margin: 0;
+}
+/* .constel is a 132px glyph — the size it is on a theme row, where it is a
+ * mark rather than a drawing. A journey's route has to be READ, so this
+ * one takes the column it was given. Same SVG, same viewBox, different
+ * job: the failure one section up was eight of these at glyph size being
+ * asked to carry a category. */
+.jrowart { align-self: center; }
+.jrowart .constel { width: 100%; }
+.jrowart .constel-lit circle { r: 9px; }
+.jrowart .constel-route { stroke-width: 7; }
+.jrow:hover h3, .jrow:focus-visible h3 { color: var(--door); }
+
+/* Stories: one lead with its own places drawn at size, two beside it. */
+.storyband { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--s6);
+             align-items: start;
+             border-top: 1px solid var(--rule); padding-top: var(--s6); }
+.storylead, .storysm { display: block; text-decoration: none; }
+.storylead h3 { font-family: var(--serif); font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); line-height: 1.12;
+                margin: 0 0 var(--s3); }
+/* The lead story's own places, at the size the journeys' routes are:
+ * this is the section's one dominant visual, and at 132px it was a
+ * grey smudge losing to two headlines beside it. */
+.storyart { margin-bottom: var(--s4); }
+/* 26rem was too far the other way: a pale continent with six dots on it,
+ * mostly empty, losing to two headlines beside it. 18rem is a MARK — the
+ * shape of where the piece is set — which is the job, and the journeys'
+ * routes stay the largest drawing on the page because a route is the one
+ * thing here that has to be read rather than recognised. */
+.storyart .constel { width: 100%; max-width: 18rem; }
+.storyart .constel-lit circle { r: 14px; }
+.storysm { padding-bottom: var(--s5); border-bottom: 1px solid var(--rule); margin-bottom: var(--s5); }
+.storysm:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
+.storysm h3 { margin: 0 0 var(--s2); }
+.storylead:hover h3, .storysm:hover h3,
+.storylead:focus-visible h3, .storysm:focus-visible h3 { color: var(--door); }
+
+/* THE CLOSING STATEMENT REPLACED A ROW OF COUNTS. "319 destinations · 17
+ * journeys · 50 countries" is the database introducing itself, and it was
+ * the last thing on the page — so the reader left having been told the size
+ * of the index rather than what it is for. The counts are still here, in the
+ * quiet line, because they are true and checkable; they are no longer the
+ * argument. */
+.closing { max-width: 44rem; margin: var(--s9) auto 0; text-align: center; }
+.closing h2 { font-family: var(--serif); margin: 0 0 var(--s4); }
+.closing p { color: var(--ink-2); font-size: var(--t-md); margin: 0 0 var(--s5); }
+.closing .small { color: var(--ink-3); }
+.closego { margin-bottom: var(--s6); }
+
+@media (max-width: 52rem) {
+  /* One column, and the journey route goes UNDER its text rather than into a
+   * 13rem column that is no longer 13rem wide. */
+  .wayin { grid-template-columns: 1fr; gap: var(--s6); }
+  .jrow, .storyband { grid-template-columns: 1fr; gap: var(--s4); }
+  .jrowart { max-width: 20rem; }
+}
+
+/* THE PLANNER BAND WAS POSITION TWO ON THE PAGE AND IT READ AS A FORM.
+ *
+ * Under the hero sat a shouty uppercase label, an input, a button, four grey
+ * pills and FIVE LINES of projection prose — standard parallels, central
+ * meridian, the elevation survey. Technically true and the second thing a
+ * reader met, which is the "it led with structure" failure the hero was
+ * rebuilt to fix, reappearing one band down. The credit moved to the foot of
+ * the page, where a credit belongs and where every check that requires it is
+ * equally satisfied.
+ *
+ * And the chips were `--paper-2` pills with a `--rule` border, which is the
+ * shape this stylesheet uses for something INERT. These are the fastest way
+ * into the product. They keep the primitive and take the ink they deserve. */
+.closing .sourcenote { margin-top: var(--s5); }
