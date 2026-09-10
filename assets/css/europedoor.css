@@ -644,7 +644,13 @@ main.wide { max-width: 92rem; }
    that is not round: a filled square, which differs from the filled disc by
    SILHOUETTE and reads at any size. */
 .sm-off { background: currentColor; border-radius: 0; }
-.row .rowmeta { display: flex; align-items: baseline; justify-content: flex-end; }
+/* NO FLEX HERE, AND THE FIRST VERSION OF THE STATE MARK ADDED IT. A flex
+   container makes every child and every text run a flex ITEM, and a <br>
+   between two items does nothing — so `2026-09-05<br><span>5 min</span>` on
+   the stories index rendered as "2026-09-055 MIN", a date and a reading time
+   run together with no separator, on every row of that page. The mark is an
+   inline-block with its own right margin and flows in the line it belongs
+   to; it never needed a flex container. */
 
 /* THE OBSERVED SPREAD OF A SCORE DIMENSION. /method printed "0–97" beside
    all eight, which is a constant wearing the clothes of a measurement — and

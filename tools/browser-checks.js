@@ -1410,6 +1410,37 @@ async function main() {
     }
   }
 
+  // ── A <br> INSIDE A FLEX CONTAINER DOES NOTHING ────────────────────
+  // Adding `display: flex` to `.rowmeta` for the state marks turned every
+  // child and every text run into a flex ITEM, and a <br> between two items
+  // has no effect — so `2026-09-05<br><span>5 min</span>` on the stories
+  // index rendered as "2026-09-055 min", a date and a reading time run
+  // together, on every row of that page. It is invisible from the source:
+  // the markup asks for a break and gets one everywhere else.
+  //
+  // The generic form of the fault, over the families that use a <br>.
+  for (const url of ["/stories", "/how-it-works", "/journeys", "/themes"]) {
+    const bp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await bp.goto(base + url, { waitUntil: "networkidle" });
+    const bad = await bp.evaluate(() =>
+      Array.from(document.querySelectorAll("br"))
+        .map((b) => b.parentElement)
+        .filter((p) => /flex|grid/.test(getComputedStyle(p).display))
+        .map((p) => p.className + " {" + getComputedStyle(p).display + "}")
+        .filter((v, i, a) => a.indexOf(v) === i));
+    ok(bad.length === 0,
+       `${url}: a <br> sits inside a flex or grid container, where it does ` +
+       `nothing — ${bad.join(", ")}`);
+    // And the promise the fault broke, asserted directly on the one family
+    // that ships a two-line meta.
+    if (url === "/stories") {
+      const t = await bp.locator(".storyrow .rowmeta").first().innerText();
+      ok(/\n/.test(t),
+         `the stories index runs the date and the reading time together: ${JSON.stringify(t)}`);
+    }
+    await bp.close();
+  }
+
   // ── THE BAR ABOVE THE PAGE ─────────────────────────────────────────
   // On a phone the address bar and the task-switcher card take
   // `theme-color`, and with none declared they took the platform default —
