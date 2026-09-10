@@ -4033,6 +4033,49 @@ def c_pagehead_role():
     return n
 
 
+@check("an SVG layer marked hidden is hidden without a stylesheet")
+def c_svg_hidden_is_hidden():
+    """A map layer switched off must be switched off in the drawing itself.
+
+    The UA stylesheet's `[hidden] { display: none }` is namespaced to HTML,
+    so an SVG <g> carrying the attribute goes on drawing. europedoor.css
+    adds a rule of its own — which is why the map's places layer once
+    shipped visible while marked hidden, and why the fix at the time was one
+    line of CSS.
+
+    That fix left the layer switches one stylesheet request away from being
+    inert, and CI found the other half of it: Chromium 131 does not apply
+    that author rule to these groups while Chromium 141 does. The same page
+    hid its places layer here and drew it on the runner, for three months,
+    with every gate green in one browser and two browser checks red in the
+    other.
+
+    So the promise is not "there is a rule that hides it". It is that the
+    markup hides it: `display` is an SVG presentation attribute and needs no
+    cascade, no stylesheet and no browser version. Proved both ways with the
+    stylesheet blocked — the attribute alone leaves the layer drawn, the
+    presentation attribute removes it.
+
+    The `hidden` attribute stays, because it is what a reader's assistive
+    technology is told. This asserts the two travel together.
+    """
+    n = 0
+    pat = re.compile(r"<g\b[^>]*>")
+    for f in site_files():
+        html = open(f, encoding="utf-8").read()
+        for tag in pat.findall(html):
+            if " hidden" not in tag and not tag.rstrip(">").endswith("hidden"):
+                continue
+            n += 1
+            if 'display="none"' not in tag:
+                fail(f"{rel(f)}: {tag} is marked hidden and carries no "
+                     f"display=\"none\". The hidden attribute draws nothing "
+                     f"on an SVG group without a stylesheet rule, and a "
+                     f"layer switch that depends on one is a layer switch "
+                     f"that is inert whenever that request fails.")
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0

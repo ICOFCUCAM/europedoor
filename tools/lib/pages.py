@@ -6278,8 +6278,8 @@ def map_page(data):
 <g id="detail" class="countries"></g>
 <g id="nogeo" class="nogeo">{''.join(nogeo)}</g>
 <g id="route"></g>
-<g id="regions" hidden></g>
-<g id="places" hidden>{''.join(placedots)}</g>
+<g id="regions" hidden display="none"></g>
+<g id="places" hidden display="none">{''.join(placedots)}</g>
 <g id="dots">{''.join(dots)}</g>
 </svg>
 </div>

@@ -2,16 +2,28 @@
 
 ## How it deploys
 
-Vercel. `buildCommand: python3 tools/build.py`, `outputDirectory: site`,
+Vercel. **`buildCommand` is empty**, `outputDirectory: site`,
 `cleanUrls: true`. No runtime, no functions, no environment variables, no
-secrets.
+secrets. The host copies `site/` and serves it.
 
 ```bash
-python3 tools/build.py     # 988 pages + 4 APIs + sitemap + robots + _headers
+python3 tools/build.py     # here, in the commit that changes data/ or tools/
 ```
 
-Every deploy is a full rebuild from `data/`. There is no incremental path and
-there does not need to be: the whole site builds in about four seconds.
+The build runs on a contributor's machine and in CI, and CI fails if `site/`
+differs from what the generator produces. **It does not run on the host, and
+it used to.** `buildCommand: python3 tools/build.py` asked the deploy image to
+reproduce, byte for byte, an artefact already sitting in the commit — so its
+only two outcomes were "identical" and "the deployment failed". The second one
+is silent from here: Vercel keeps the last good deployment live, so a build
+that stops working leaves the site frozen on old pages while the repository,
+the commit and every gate are correct. That is the same shape as the
+`site/_headers` gap below and the `immutable` one above — repository right,
+response wrong — and the fix is the same: take away the place the two can
+disagree.
+
+Rebuilding on the host was also the only reason the deploy image needed a
+Python at all. It needs nothing now.
 
 ## The headers
 

@@ -3,7 +3,7 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "outputDirectory": "site",
-  "buildCommand": "python3 tools/build.py",
+  "buildCommand": "",
   "headers": [
     {
       "source": "/(.*)",

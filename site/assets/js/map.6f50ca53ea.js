@@ -392,7 +392,7 @@
   function drawRegions() {
     if (!regionsG) return;
     var on = geoOn("regions");
-    if (!on) { regionsG.setAttribute("hidden", ""); regionsG.textContent = ""; return; }
+    if (!on) { showGroup(regionsG, false); regionsG.textContent = ""; return; }
     regionsG.textContent = "";
     var slugs = selected ? [selected] : Object.keys(COUNTRIES);
     var frag = document.createDocumentFragment();
@@ -439,8 +439,7 @@
       });
     });
     regionsG.appendChild(frag);
-    if (drawn) regionsG.removeAttribute("hidden");
-    else regionsG.setAttribute("hidden", "");
+    showGroup(regionsG, drawn);
   }
 
   /* ── layers ─────────────────────────────────────────────────────────
@@ -449,7 +448,21 @@
    * setAttribute rather than `.hidden`: these are SVG <g> elements, and
    * `.hidden` is an HTMLElement property — assigning it defines a JS
    * property nobody reads and the layer never appears. That cost an
-   * afternoon once and the comment is cheaper than the second afternoon. */
+   * afternoon once and the comment is cheaper than the second afternoon.
+   *
+   * AND THE ATTRIBUTE ALONE HIDES NOTHING WITHOUT A STYLESHEET. The UA
+   * sheet's `[hidden] { display: none }` is namespaced to HTML, so an SVG
+   * group marked hidden went on drawing until europedoor.css added a rule
+   * of its own — which means the map's layer switches were one stylesheet
+   * request away from being inert, and the eight hundred pages carrying an
+   * embedded map with them. CI found the other half of it: Chromium 131
+   * does not apply that author rule to these groups while Chromium 141
+   * does, so `places` shipped visible on the runner and hidden here, and
+   * the two browser checks that read a layer's visibility disagreed for
+   * three months. `display` is a PRESENTATION ATTRIBUTE in SVG: it needs
+   * no stylesheet, no cascade and no browser version. The `hidden`
+   * attribute stays because it is what a reader's assistive technology is
+   * told; the presentation attribute is what actually removes the ink. */
   var geobox = document.getElementById("geolayers");
 
   function geoOn(name) {
@@ -458,11 +471,15 @@
     return el ? el.checked : false;
   }
 
+  function showGroup(g, on) {
+    if (on) { g.removeAttribute("hidden"); g.removeAttribute("display"); }
+    else { g.setAttribute("hidden", ""); g.setAttribute("display", "none"); }
+  }
+
   function toggleGroup(id, on) {
     var g = document.getElementById(id);
     if (!g) return;
-    if (on) g.removeAttribute("hidden");
-    else g.setAttribute("hidden", "");
+    showGroup(g, on);
   }
 
   function applyGeo() {

@@ -1087,9 +1087,26 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .linkish:hover { color: var(--warn); }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-/* The hidden attribute has no effect on an SVG <g> without this, which is
-   how the map's places layer shipped visible when it was marked hidden. */
-[hidden] { display: none !important; }
+/* THE hidden ATTRIBUTE DRAWS NOTHING ON AN SVG GROUP, and for a while a
+   rule here — `[hidden] { display: none !important; }` — was what hid the
+   map's layers. The UA sheet's own version of that rule is namespaced to
+   HTML, so the places layer had shipped visible while marked hidden, and one
+   line of CSS looked like the fix.
+
+   It was half of one. It left every layer switch on /map one stylesheet
+   request away from being inert, and it made the switches depend on a
+   cascade: Chromium 131 does not apply that rule to those groups while
+   Chromium 141 does, so `places` was hidden on this machine and drawn on the
+   CI runner, and two browser checks disagreed with two others for three
+   months over which browser was looking.
+
+   The groups carry SVG's own `display` presentation attribute now, which
+   needs no stylesheet and no cascade, so this rule stopped changing anything
+   — and the dead-rule scan said so within one run, at 24 against a ceiling of
+   23. Deleted rather than counted: a rule that matches elements and changes
+   none of them is dead code that looks like a decision. `[hidden]` on the
+   HTML panels is the UA sheet's job and always was; neither .countrypanel
+   nor .mappopup sets a display of its own for it to have to beat. */
 
 /* ── a story's byline ─────────────────────────────────────────────── */
 .byline { color: var(--ink-3); margin-top: var(--s3); }

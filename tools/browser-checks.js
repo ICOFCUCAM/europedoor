@@ -1533,10 +1533,14 @@ async function main() {
        `the dead-rule scan examined only ${seen.size} rules — it has stopped ` +
        "walking the stylesheet, which is exactly how its first version " +
        "reported a clean result while collecting nothing");
+    // THE WHOLE LIST, NOT THE FIRST FOUR. Raising this ceiling is allowed
+    // and raising it without reading the list is not — and for the life of
+    // this check the failure printed four names out of two dozen, so the
+    // list it demands you read was the one thing it would not show you.
     ok(dead.length <= DEAD_CEILING,
        `${dead.length} stylesheet rules match elements and change none of ` +
-       `them, above the ceiling of ${DEAD_CEILING}: ` +
-       dead.slice(0, 4).join("; "));
+       `them, above the ceiling of ${DEAD_CEILING}:\n    ` +
+       dead.join(";\n    "));
   }
   await page.setViewportSize({ width: 1280, height: 900 });
 
