@@ -2920,6 +2920,23 @@ INTEREST_BANDS = (
 )
 
 
+_MACRO_OF = {}
+
+
+def _macro_of(data, country_slug):
+    """Which of the nine macro regions a country sits in.
+
+    Built once. `data/taxonomy.json` puts every country in exactly one, which
+    is asserted by the validator, so this cannot return None for a country
+    the atlas holds a page for.
+    """
+    if not _MACRO_OF:
+        for m in data["macros"]:
+            for c in m["countries"]:
+                _MACRO_OF[c] = m["slug"]
+    return _MACRO_OF[country_slug]
+
+
 def interest_page(data, i, ranking):
     slug = i["slug"]
     cities = [n for n in data["cities"].values() if slug in n["city"]["interests"]]
@@ -2950,13 +2967,36 @@ def interest_page(data, i, ranking):
     # used to stop at sixty with one sentence admitting it, and a list that
     # stops is the one kind of incompleteness a reader cannot detect. Rows
     # cost a few hundred bytes each, so there is no longer a reason to stop.
+    #
+    # AND SIXTY-THREE ROWS IN ONE COLUMN IS A LIST NOBODY READS. They were
+    # sorted by country and nothing marked where one country ended, so the
+    # order was real and invisible: Theth, Andorra la Vella, Madriu, Dilijan,
+    # Tsaghkadzor — correct, and indistinguishable from alphabetical by
+    # accident. The page opens on a drawing whose whole argument is WHERE
+    # these places are, and then handed the reader a flat column.
+    #
+    # Grouped by macro region, which is the atlas's own geographic grouping
+    # and the one the drawing above is made of — nine groups over sixty-three
+    # rows rather than thirty country headings over two rows each. It is a
+    # CLASSIFICATION and not a ranking: the groups run in the taxonomy's own
+    # order on every one of the seventeen pages, and a reader can see that
+    # Mountains is four ranges and History is the whole continent from the
+    # group headings alone.
+    by_macro = {}
+    for n in cities:
+        by_macro.setdefault(_macro_of(data, n["country"]["slug"]), []).append(n)
     rows = "".join(
-        f'<a class="row" href="{urls.city(n["country"], n["region"], n["city"])}">'
-        f'<div><h3>{esc(n["city"]["name"])}</h3>'
-        f'<p class="rowsub">{esc(n["city"]["summary"])}</p></div>'
-        f'<p class="rowmeta">{esc(n["country"]["name"])} · '
-        f'{esc(n["region"]["name"])}</p></a>'
-        for n in cities)
+        f'<div class="rowgroup"><p class="rowgrouphead">{esc(m["name"])}'
+        f'<span class="rowgroupn">{len(by_macro[m["slug"]])}</span></p>'
+        + "".join(
+            f'<a class="row" href="{urls.city(n["country"], n["region"], n["city"])}">'
+            f'<div><h3>{esc(n["city"]["name"])}</h3>'
+            f'<p class="rowsub">{esc(n["city"]["summary"])}</p></div>'
+            f'<p class="rowmeta">{esc(n["country"]["name"])} · '
+            f'{esc(n["region"]["name"])}</p></a>'
+            for n in by_macro[m["slug"]])
+        + "</div>"
+        for m in data["macros"] if m["slug"] in by_macro)
     # THE SHAPE OF THE TAG, DRAWN, AND IT IS THE PAGE'S OWN SENTENCE AS A
     # PICTURE. `docs/signature-moments.md` refused a map here on the grounds
     # that the three largest tags would draw three identical maps of Europe.

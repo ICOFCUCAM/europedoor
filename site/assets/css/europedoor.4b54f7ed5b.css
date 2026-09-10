@@ -702,6 +702,24 @@ main.wide { max-width: 92rem; }
 .askfoot .hero-actions { margin: 0; }
 @media (max-width: 52rem) { .askfoot { grid-template-columns: 1fr; } }
 
+/* A GROUP HEADING INSIDE A LIST OF ROWS. Sixty-three destinations in one
+   column, sorted by country with nothing marking where one country ended:
+   an order that is real and invisible reads as alphabetical by accident.
+   Not an <h3> — the rows already use one for the place name, and a heading
+   level that jumps about inside one list is worse than none. */
+.rowgroup + .rowgroup { margin-top: var(--s6); }
+/* `max-width: none` because the base `p` rule caps every paragraph at the
+   measure, and a rule that stops halfway across a list of full-width rows
+   reads as a rendering fault rather than a divider. */
+.rowgrouphead { display: flex; align-items: baseline; gap: var(--s3);
+                max-width: none;
+                margin: 0 0 var(--s2); padding-bottom: var(--s2);
+                border-bottom: 1px solid var(--ink-3);
+                font-size: var(--t-xs); letter-spacing: .12em;
+                text-transform: uppercase; color: var(--ink-2); }
+.rowgroupn { margin-left: auto; color: var(--ink-3);
+             font-variant-numeric: tabular-nums; letter-spacing: 0; }
+
 .rowdist { display: grid; gap: var(--s1); justify-items: end; }
 .dist { width: 8.5rem; height: 12px; display: block; }
 .distaxis { fill: var(--rule); }
