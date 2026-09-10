@@ -7205,13 +7205,6 @@ def year_band(data, here=None):
     # that the disagreement — the only reason to draw two numbers at all —
     # was the part you could not see. Up is what is on; down is where it is
     # quiet; October is short above the line and longest below it.
-    # MIRRORED ABOUT ONE AXIS, because the first version drew the shoulder as
-    # a 3px rule under each bar and it read as an underline rather than as a
-    # second series. The whole argument of this band is that October is THIN
-    # on fixtures and THICKEST on shoulder countries, and rendering it showed
-    # that the disagreement — the only reason to draw two numbers at all —
-    # was the part you could not see. Up is what is on; down is where it is
-    # quiet; October is short above the line and longest below it.
     #
     # AND THE TYPE IS NOT IN THE PICTURE, because the picture stretches.
     # `preserveAspectRatio="none"` is right for twelve columns that should
@@ -9139,9 +9132,6 @@ def discover_page(data):
     )
     months = data["taxonomy"]["months"]
     names = data["taxonomy"]["month_names"]
-    month_chips = "".join(
-        f'<a class="chip" href="{urls.month(m)}">{esc(names[m])}</a>' for m in months
-    )
     dots = []
     for cid, n in sorted(data["cities"].items()):
         x, y = project(n["city"]["lat"], n["city"]["lon"])
@@ -9219,7 +9209,7 @@ def discover_page(data):
          lede="A dozen ways to cut the continent, each one a query run against every destination on every build rather than a list somebody chose. Each page prints the query that made it.",
          more=("All twelve", "/europe-in"))}
 
-{section("By month", f'<div class="chips">{month_chips}</div>',
+{section("By month", year_band(data),
          lede="What is on, which countries are at their best, and which are in the quieter shoulder — which is usually where you should be going.",
          more=("The whole European year", "/events"))}
 

@@ -3865,9 +3865,18 @@ def c_year_band():
         for m in c["season"].get("shoulder", []):
             sh[m] += 1
     n = 0
+    # THE FLOOR IS THE EVENTS FAMILY AND THE SET IS WHEREVER IT IS DRAWN.
+    # /discover's "By month" band was twelve identical chips — the exact
+    # shape this chart was built to replace, still shipping one family over,
+    # on the page whose whole subject is how to choose. It draws the band
+    # now, so the check can no longer be a fixed list of thirteen files: a
+    # chart is a claim wherever it appears, and the fourteenth page would
+    # have been unchecked.
     pages = [os.path.join(OUT, "events", "index.html")] + [
         os.path.join(OUT, "events", m, "index.html") for m in ms
     ]
+    pages += [f for f in site_files()
+              if f not in pages and 'class="yearband"' in open(f, encoding="utf-8").read()]
     for path in pages:
         if not os.path.exists(path):
             fail(f"{rel(path)}: the events family is missing a page")
