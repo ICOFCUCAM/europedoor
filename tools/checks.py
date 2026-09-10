@@ -3877,6 +3877,32 @@ def c_score_median():
     return n
 
 
+@check("nothing on a page is escaped twice")
+def c_double_escape():
+    # NINETY-THREE PAGES PRINTED "Tyrol &amp; the West".
+    #
+    # `render.section()` escapes its own title and lede, and eight call sites
+    # passed `esc(...)` inside them — so every region, country and place whose
+    # name contains an ampersand rendered the entity in the body text, in the
+    # band heading and in the lede: "Everything recorded across Tyrol &amp;
+    # the West, in one list." It is invisible in the source, because both
+    # halves are correct on their own; only the composition is wrong.
+    #
+    # Asserted on the shipped HTML for the same reason the projection claim
+    # is: a source-level check passes the day somebody adds a ninth call
+    # site, and what a reader gets is the page.
+    n = 0
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        for pat in ("&amp;amp;", "&amp;lt;", "&amp;gt;", "&amp;#x27;", "&amp;quot;"):
+            n += 1
+            if pat in h:
+                fail(f"{canonical_of(f)} prints {pat!r} — something was "
+                     f"escaped twice. render.section() escapes its own title "
+                     f"and lede; a caller must not.")
+    return n
+
+
 @check("every link a script can write points at a route this site has")
 def c_script_links():
     # TWO DEAD LINKS LIVED IN EMPTY STATES FOR THE LIFE OF THIS SITE.

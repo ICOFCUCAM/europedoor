@@ -2398,7 +2398,7 @@ def country_page(data, c):
          more=("Every region", "#regions")) if popular else ""}
 
 {section("Experiences here", f'<div class="rows">{cexps}</div>',
-         lede=f"A sample of what is listed across {esc(c['name'])}.",
+         lede=f"A sample of what is listed across {c['name']}.",
          more=("Every experience category", "/experiences")) if cexps else ""}
 
 {section("Journeys through " + c["name"], f'<div class="rows">{cjourneys}</div>') if cjourneys else ""}
@@ -2410,7 +2410,7 @@ def country_page(data, c):
 
 {section("The record", facts + scorebars(country_scores(c), _spread("country", data)) + provenance_block(c),
          tone="quiet",
-         lede="What we hold about " + esc(c["name"]) + ", where each figure came "
+         lede="What we hold about " + c["name"] + ", where each figure came "
               "from, and when it was last checked. The score says what this "
               "country is for, not how good it is — it is useful once you are "
               "already interested and is not a reason to be.")}
@@ -2496,7 +2496,7 @@ def region_page(data, c, r):
 
 {section("Destinations", grid(cards, 3))}
 {section("Places to see", f'<div class="rows">{placerows}</div>',
-         lede=f"Everything recorded across {esc(r['name'])}, in one list.") if placerows else ""}
+         lede=f"Everything recorded across {r['name']}, in one list.") if placerows else ""}
 {section("Things to do", f'<div class="rows">{exprows}</div>') if exprows else ""}
 {section("Journeys through " + r["name"], f'<div class="rows">{jrows}</div>') if jrows else ""}
 {section("Accommodation & restaurants", STAY_NOTE)}
@@ -2508,7 +2508,7 @@ def region_page(data, c, r):
       ("Best months", esc(months_line(data, c["season"]["peak"]))),
       ("Typical day", daily_line(data, c)),
   ]), tone="quiet",
-  lede="What this atlas holds about " + esc(r["name"]) + ". The counts are "
+  lede="What this atlas holds about " + r["name"] + ". The counts are "
        "derived from the region's own destinations and move when it does; "
        "the seasons and the daily cost belong to " + esc(c["name"]) + " and "
        "are repeated here rather than looked up.")}
@@ -2797,8 +2797,8 @@ def city_page(data, c, r, t):
                'four hours, and we hold no timetables, operators or fares.</p>',
              id="getting-near") if transrows else ""}
     {section("Events here", f'<div class="rows">{festrows}</div>', id="events",
-             lede=f"Fixtures tied to {esc(t['name'])} itself.") if festrows else ""}
-    {section(f"Elsewhere in {esc(c['name'])}" if festrows else "Events",
+             lede=f"Fixtures tied to {t['name']} itself.") if festrows else ""}
+    {section(f"Elsewhere in {c['name']}" if festrows else "Events",
              f'<div class="rows">{widerows}</div>',
              id="" if festrows else "events",
              lede=f"Nationwide fixtures, not tied to one destination. "
@@ -2813,7 +2813,7 @@ def city_page(data, c, r, t):
 </div>
 {section("Travel tips", '<ul class="stack">' + "".join(f"<li>{esc(k)}</li>" for k in c["know"]) + "</ul>",
          id="tips",
-         lede=f"Practical things about {esc(c['name'])} that are not obvious from outside it.")}
+         lede=f"Practical things about {c['name']} that are not obvious from outside it.")}
 
 {stay_section(data, c, r, t, cid)}
 
@@ -5466,7 +5466,7 @@ def place_page(data, c, r, t, pl):
   </div>
 </div>
 {section("The record", facts, tone="quiet",
-         lede="What this atlas holds about " + esc(pl["name"]) + ", and nothing "
+         lede="What this atlas holds about " + pl["name"] + ", and nothing "
               "it does not.")}
 """
     return f"{urls.place(c, r, t, pl)}/index.html", page(
