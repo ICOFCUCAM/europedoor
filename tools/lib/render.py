@@ -690,6 +690,29 @@ def focal_class(fx, fy):
     return f"f-{x}{y}"
 
 
+def photo(images, key, *, w, h, alt="", eager=False, sizes="100vw"):
+    """A photograph if the register holds one, and NOTHING if it does not.
+
+    `picture()` falls back to a generated plate, which is right on eight
+    hundred destination pages and wrong on every editorial surface: eleven
+    abstract plates in a column is placeholder art doing a picture's job, and
+    that measurement is why they came off the homepage. An index hero or a
+    lead item wants a photograph or an honest absence, never a landscape
+    chosen by the hash of a slug.
+
+    So this is the seam every editorial layout asks through. A page calls it,
+    gets "" today, and lays itself out around the gap on purpose — the
+    no-image state is the SHIPPED state rather than a fallback, and the day a
+    row lands in data/images.json the same call returns the picture with no
+    page change at all.
+    """
+    row = (images or {}).get(key)
+    if not row:
+        return ""
+    return picture(images, key, w=w, h=h, alt=alt or row.get("alt", ""),
+                   eager=eager, sizes=sizes)
+
+
 def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed=None,
             fallback_motif=None):
     """A photograph for `key` if we hold one, otherwise a generated plate.

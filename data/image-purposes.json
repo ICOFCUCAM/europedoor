@@ -1,6 +1,6 @@
 {
   "$comment": "WHY A PHOTOGRAPH EXISTS, declared before one is acquired. A purpose names the surface the picture is FOR, the register key it fills, the page it is published on, and the minimum a photograph must be to do that job. scripts/images/acquire.py refuses a purpose that is not here and refuses a photograph that does not meet its requirements; tools/lib/data.py refuses a register row whose purpose is unknown, and refuses two rows claiming the same one. A photograph acquired for the homepage hero must not drift onto a destination page because it happened to be in the register — the surfaces have different jobs, different aspect ratios and different type over them.",
-  "$requirements": "min_width is native pixels, not the ladder's widest step: a 1,200px original upscaled to 2,400 is the same untruth as a population we estimated, and derive.py already refuses to upscale. orientation and aspect are the mechanical half of whether a picture can do the job; the editorial half — subject placement, hierarchy, whether it looks like generic stock — is why discovery presents candidates to a person instead of picking one.",
+  "$requirements": "min_width is native pixels, not the ladder's widest step: a 1,200px original upscaled to 2,400 is the same untruth as a population we estimated, and derive.py already refuses to upscale. orientation and aspect are the mechanical half of whether a picture can do the job; the editorial half — subject placement, hierarchy, whether it looks like generic stock — is why discovery presents candidates to a person instead of picking one. AND /plan HAS NO HERO SLOT ON PURPOSE. A purpose was declared for it and removed in the same session: the planner is an instrument, its title is a label rather than a headline because the page IS the tool, and that came from a measurement — the magazine head pushed the control to y=436 and half the first screen of a tool was a headline and four lines of prose. A photograph above the sentence box would undo exactly that, so the honest answer is no slot rather than a slot nobody should fill.",
   "purposes": {
     "homepage-hero": {
       "key": "home-hero",
@@ -71,6 +71,46 @@
       "min_aspect": 1.2,
       "max_aspect": 1.9,
       "note": "A table, a market or a vineyard that could only be where it is. Never a styled plate on a board. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own."
+    },
+    "journeys-hero": {
+      "key": "journeys-hero",
+      "path": "/journeys",
+      "surface": "The opening of the journeys index — a wide editorial image beside the headline.",
+      "min_width": 2000,
+      "orientation": "landscape",
+      "min_aspect": 1.3,
+      "max_aspect": 2.1,
+      "note": "A road, a rail line or a pass with distance in it: the feeling of crossing a border on purpose. Never a map, and never a single landmark. These five open five different indexes and are seen in sequence by anyone using the menu bar, so a set that reads as one stock search fails even when each passes alone."
+    },
+    "experiences-hero": {
+      "key": "experiences-hero",
+      "path": "/experiences",
+      "surface": "The opening of the experiences index.",
+      "min_width": 2000,
+      "orientation": "landscape",
+      "min_aspect": 1.3,
+      "max_aspect": 2.1,
+      "note": "Somebody DOING the thing — hands, a workshop, a kitchen, a boat. A person at work in a real place, not a posed portrait and not an empty interior. These five open five different indexes and are seen in sequence by anyone using the menu bar, so a set that reads as one stock search fails even when each passes alone."
+    },
+    "stories-hero": {
+      "key": "stories-hero",
+      "path": "/stories",
+      "surface": "The opening of the stories index.",
+      "min_width": 2000,
+      "orientation": "landscape",
+      "min_aspect": 1.3,
+      "max_aspect": 2.1,
+      "note": "A human moment that could be the opening frame of a long read. Faces are welcome; a landmark is not. These five open five different indexes and are seen in sequence by anyone using the menu bar, so a set that reads as one stock search fails even when each passes alone."
+    },
+    "events-hero": {
+      "key": "events-hero",
+      "path": "/events",
+      "surface": "The opening of the events index.",
+      "min_width": 2000,
+      "orientation": "landscape",
+      "min_aspect": 1.3,
+      "max_aspect": 2.1,
+      "note": "A European gathering in progress — a procession, a market, a festival crowd at dusk. It must read as a fixture in a real town, not a stadium. These five open five different indexes and are seen in sequence by anyone using the menu bar, so a set that reads as one stock search fails even when each passes alone."
     }
   }
 }

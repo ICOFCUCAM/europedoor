@@ -3908,10 +3908,12 @@ body[data-hero] .masthead { position: sticky; }
  * of each: too small to name a place, and eight of them saying nothing eight
  * times. The lead is the newest piece — a date, not a judgement — with its
  * own places drawn at size; the other eight are the row without the glyph. */
+/* No border-top: the opening above already closes with one, and two rules
+ * with a gap between them reads as a mistake rather than as a division. */
 .storyleadwide {
   display: grid; grid-template-columns: 22rem minmax(0, 1fr); gap: var(--s6);
   align-items: center; text-decoration: none; color: inherit;
-  border-top: 1px solid var(--rule); padding: var(--s6) 0;
+  padding: var(--s6) 0;
 }
 .storyleadwide h3 {
   font-family: var(--serif); font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
@@ -3924,3 +3926,92 @@ body[data-hero] .masthead { position: sticky; }
   .journeyrows .row, .storyleadwide { grid-template-columns: 1fr; gap: var(--s4); }
   .jart { max-width: 18rem; }
 }
+
+/* ── THE EDITORIAL INDEX OPENING ──────────────────────────────────────
+ *
+ * Five indexes opened identically — kicker, 60px serif h1, lede in the
+ * right-hand column, a rule, then rows — and then ran straight into a
+ * two-column list with a right-aligned meta column. That is the
+ * design-direction finding at its plainest: a shared template is not a
+ * shared experience, and these five were the clearest case of it on the
+ * site.
+ *
+ * An index opens on its own subject now, at size, BESIDE the type rather
+ * than under it. The art is a photograph where the register holds one and
+ * the family's own drawing where it does not — every route at once for the
+ * journeys, the year as a chart for the events. Never a generated plate:
+ * that is the measurement that took eleven of them off the homepage.
+ *
+ * THE PHOTOGRAPH SLOT IS THE POINT OF THE LAYOUT AND IT IS EMPTY TODAY. The
+ * composition is designed for the no-image state rather than degraded into
+ * it: the drawing holds the right-hand column at the same proportion a
+ * photograph will, so the day a row lands in data/images.json nothing on the
+ * page moves except what is inside that frame. */
+/* A VARIANT OF `pagehead`, sharing its role and its measure. */
+.pagehead.ihero {
+  display: grid; gap: var(--s7); align-items: center;
+  padding: var(--s6) 0 var(--s7); border-bottom: 1px solid var(--rule); max-width: none;
+}
+.pagehead.ihero.wide { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
+.iherotext h1 {
+  font-family: var(--serif); font-size: clamp(var(--t-3xl), 5.2vw, var(--t-5xl));
+  line-height: 1.12; margin: 0 0 var(--s4); text-wrap: balance;
+}
+.iherotext .lede { font-size: var(--t-md); color: var(--ink-2); max-width: 42ch; margin: 0; }
+.iherotext .chips { margin-top: var(--s5); }
+.iherotext .small { margin-top: var(--s4); color: var(--ink-3); }
+
+/* The aperture, once per page rather than once per card. An index opening is
+ * exactly where the signature belongs — it is the one large drawing on the
+ * page — and it is the same curve, from the same numbers, as the 824 plates
+ * and the hero. */
+.iheroart {
+  margin: 0; aspect-ratio: 4 / 3; overflow: hidden;
+  border-radius: 50% 50% 0 0 / 34% 34% 0 0;
+  background: var(--graphite);
+}
+.iheroart .constel, .iheroart svg { width: 100%; height: 100%; display: block; }
+.iheroart.shot picture, .iheroart.shot img {
+  display: block; width: 100%; height: 100%; object-fit: cover;
+}
+/* Every route at once: seventeen real sequences on one continent, which is a
+ * picture no other travel product can draw. The land is quiet and the lines
+ * carry it, because the subject is the reach of the set rather than Europe. */
+/* THE OPENING IS A DARK GROUND, so what is lit in it takes the dark
+ * world's colour. The 172 experience dots were --door, which is cobalt,
+ * on graphite: present, correct, counted, and invisible. That is the
+ * `.minidot .hit` failure in the other direction — a thing that paints
+ * and cannot be seen — and no count anywhere could report it. */
+.iheroart .constel { fill: color-mix(in srgb, var(--limestone) 30%, transparent); }
+.iheroart .constel-lit circle { fill: var(--lime); r: 9px; }
+/* r:9, not the theme row's 22. A glyph's radius is fitted to a 132px mark
+ * and this frame is five times that, so the same class rendered dots the
+ * size of small countries. Eleven units is not eleven pixels, again. */
+.allroutes { fill: color-mix(in srgb, var(--limestone) 30%, transparent); }
+.allroutes .constel-route {
+  fill: none; stroke: var(--lime); stroke-width: 4;
+  stroke-linejoin: round; stroke-linecap: round; opacity: .85;
+}
+
+@media (max-width: 60rem) {
+  .pagehead.ihero.wide { grid-template-columns: 1fr; gap: var(--s5); }
+  .iheroart { aspect-ratio: 3 / 2; }
+}
+
+/* The planner's method, under the tool rather than beside it. Four hundred
+ * words of scoring weights level with the fields a reader is filling in is
+ * two things competing for one attention, and it squeezed the form into two
+ * thirds of the page to make room. Under the tool is also where the question
+ * is asked: run it, look at the answer, then ask why it chose that. */
+.planmethod { border-top: 1px solid var(--rule); margin-top: var(--s7); padding-top: var(--s6); }
+.methodcols { columns: 2; column-gap: var(--s7); }
+.methodcols > * { break-inside: avoid; }
+.methodcols h2 { margin-top: 0; }
+@media (max-width: 60rem) { .methodcols { columns: 1; } }
+
+/* The planner's fields take the whole measure. `.split` was 1.7fr / 1fr with
+ * the method in the second column; the method moved under the tool and the
+ * grid kept both columns, so the form ran in two thirds of the page with a
+ * third of nothing beside it — removing something can leave the same hole
+ * that adding the wrong thing does. */
+.planform > div { max-width: none; }

@@ -19,7 +19,7 @@ from . import urls
 from .render import (LD_PUBLISHER, SITE_NAME, SITE_TAGLINE, arch_rim, card, chips, crumbs,
                      esc, factlist, grid,
                      jsondata, ld_breadcrumb, ld_place, ld_within, motif_for,
-                     page, picture, plate, section, arch_clip, arch_edge)
+                     page, photo, picture, plate, section, arch_clip, arch_edge)
 from .score import city_scores, country_scores, discoverability
 
 HOME = ("Europe", "/discover")
@@ -2991,16 +2991,44 @@ def journeys_index(data):
             f'<p class="rowmeta jfacts">{j["days"]} days · {len(countries)} countries'
             f' · {esc(j["difficulty"])}</p></div>'
             f'<div class="jart">{route}</div></a>')
+    # THE OPENING IS EVERY ROUTE AT ONCE, and no other travel product can
+    # draw it: seventeen real sequences of real places on one conformal
+    # conic, so a reader sees the reach of the whole set before reading a
+    # word. It is the family's own subject at size, which is what an index
+    # hero is for — and it is the honest stand-in until a photograph lands in
+    # the slot beside it, because a plate here would be a picture of nowhere.
+    allroutes = "".join(
+        '<polyline class="constel-route" points="'
+        + " ".join(f"{x:.0f},{y:.0f}" for x, y in
+                   [project(data["cities"][l["city"]]["city"]["lat"],
+                            data["cities"][l["city"]]["city"]["lon"])
+                    for l in j["legs"]]) + '"/>'
+        for j in data["journeys"])
+    # `slice` rather than the default `meet`. The frame is 4:3 and the map is
+    # 1000x780, which is 1.28 — close enough that slicing crops a few units of
+    # open sea and far enough that letterboxing left the continent floating in
+    # black margins with the arch cutting nothing. A drawing in an opening
+    # should fill the opening; that is what the homepage hero had to learn.
+    heroart = (f'<svg class="constel allroutes" viewBox="0 0 {MAP_W} {MAP_H}" '
+               f'preserveAspectRatio="xMidYMid slice" '
+               f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
+               f'{allroutes}</svg>')
     body = f"""
 {crumbs([("Europe", "/discover"), ("Journeys", None)])}
-<div class="pagehead index">
-  <p class="kicker">European Journeys</p>
-  <h1>Routes that cross borders on purpose.</h1>
-  <p class="lede">{len(data['journeys'])} routes, each a real sequence with real distances:
-  every stop links back into the Atlas, and the nights add up to the days on the tin. Take one
-  as written, or open it in the Planner and bend it to the time you actually have.</p>
-</div>
 {constel_defs()}
+{indexhero(
+    kicker="European Journeys",
+    title="Routes that cross borders on purpose.",
+    lede=f"{len(data['journeys'])} routes, each a real sequence with real distances: "
+         f"every stop links back into the Atlas, and the nights add up to the days on "
+         f"the tin. Take one as written, or open it in the Planner and bend it to the "
+         f"time you actually have.",
+    art=heroart,
+    img=photo(data.get("images"), "journeys-hero", w=2000, h=1200,
+              sizes="(min-width: 60rem) 52vw, 100vw"),
+    actions='<a class="btn" href="/plan">Build your own</a>'
+            '<a class="btn ghost" href="/map">See them on the map</a>',
+    note="Every line above is one of the seventeen, drawn from its own stops.")}
 <div class="rows journeyrows">{"".join(rows)}</div>
 <p class="small">The shape beside each route is where it goes, drawn on the same
 projection as every other map here. {geo.sources_line(geo.load("europe-lod0.json"))}
@@ -3357,7 +3385,7 @@ def planner_page(data):
   take account of rather than quietly dropping it.</p>
 </form>
 
-<div class="split">
+<div class="planform">
   <div>
     <form class="form" id="planner">
       <div class="form-row">
@@ -3439,7 +3467,20 @@ def planner_page(data):
     </form>
     <div id="result" aria-live="polite"></div>
   </div>
-  <aside class="rail">
+</div>
+
+<!-- HOW IT DECIDES CAME OUT OF THE RAIL AND WENT UNDER THE TOOL.
+     Four hundred words of scoring weights in a right-hand column, level
+     with the twelve fields and seventeen checkboxes a reader is filling
+     in — two things competing for the same attention, and the form
+     squeezed into two thirds of the page to make room for an essay
+     nobody reads while they are typing. The form takes the full measure
+     now and the method sits under it, which is also where a reader asks
+     the question: they run it, they look at the answer, and THEN they
+     want to know why it chose that. Proof goes under the thing it
+     proves, which is the rule the motion pages already publish. -->
+<div class="planmethod">
+  <div class="methodcols">
     <h2 class="mini">How it decides</h2>
     <p>Every destination is scored out of one, on a published weighting:</p>
     <ul>
@@ -3464,7 +3505,7 @@ def planner_page(data):
     travel advisory — those are excluded from the planning index entirely.</p>
     <p class="small">Estimates are editorial, not quotes. Check <a href="/sources">sources and
     corrections</a>.</p>
-  </aside>
+  </div>
 </div>
 """
     return "/plan/index.html", page(
@@ -5575,15 +5616,22 @@ def experiences_index(data):
     )
     body = f"""
 {crumbs([("Europe", "/discover"), ("Experiences", None)])}
-<div class="pagehead index">
-  <p class="kicker">Local Experiences</p>
-  <h1>What people actually do here.</h1>
-  <p class="lede">{len(items)} experiences across the Atlas, in ten kinds. Anything a business
-  lists carries the name of who runs it and the tier of checking it has passed — an unchecked
-  listing says so on its face rather than hiding behind a star rating.</p>
-  <div class="hero-actions"><a class="btn" href="/experiences/join">List your experience</a>
-  <a class="btn ghost" href="/for-businesses">For businesses</a></div>
-</div>
+{constel_defs()}
+{indexhero(
+    kicker="Local Experiences",
+    title="What people actually do here.",
+    lede=f"{len(items)} experiences across the Atlas, in ten kinds. Anything a business "
+         f"lists carries the name of who runs it and the tier of checking it has passed — "
+         f"an unchecked listing says so on its face rather than hiding behind a star "
+         f"rating.",
+    art=constellation(sorted({project(it["city"]["lat"], it["city"]["lon"])
+                              for it in items})),
+    img=photo(data.get("images"), "experiences-hero", w=2000, h=1200,
+              sizes="(min-width: 60rem) 52vw, 100vw"),
+    actions='<a class="btn" href="/experiences/join">List your experience</a>'
+            '<a class="btn ghost" href="/for-businesses">For businesses</a>',
+    note='Every place in the Atlas with something on this list. Coastline from '
+         '<a href="/sources">Natural Earth</a>, public domain.')}
 <!-- "Recently added" WAS A CLAIM THE DATA CANNOT SUPPORT. An experience
      carries a slug, a name, a kind, a band and a summary, and no date of
      any sort, so these 24 were simply the first 24 the loader returned in
@@ -5912,6 +5960,70 @@ def macro_frame(data, macro):
             for t in r["cities"]:
                 pts.append(project(t["lat"], t["lon"]))
     return pts
+
+
+def indexhero(*, kicker, title, lede, art="", img="", actions="", note=""):
+    """The editorial opening five indexes now share.
+
+    THE INDEXES WERE ALL THE SAME SHAPE AND THE SHAPE WAS A LIST. A kicker, a
+    60px serif h1, a lede in the right-hand column, a rule, and then rows —
+    every one of /journeys, /stories, /experiences, /events and /plan opened
+    identically and then ran straight into a two-column list with a
+    right-aligned meta column. Measured across them: eleven of twelve
+    families place an identically-sized h1 at an identical vertical position,
+    which is the design-direction finding, and these five were the clearest
+    case of it. A shared template is not a shared experience.
+
+    So an index opens on something now: the family's own subject, at size,
+    beside the type rather than under it. The art is a PHOTOGRAPH where the
+    register holds one and the family's own drawing where it does not —
+    seventeen routes on one continent for the journeys, the year drawn as a
+    chart for the events, the places a story is about for the stories. Never
+    a generated plate: that is the measurement that took eleven of them off
+    the homepage.
+
+    `img` is the photograph slot and it is passed rather than fetched here,
+    because the KEY is the caller's business — a hero has a declared purpose
+    in data/image-purposes.json and an item has its own register key. When
+    both are empty the hero is type and space, which is a composition rather
+    than a hole: the lede takes the measure it wants and the rule under it
+    does the work the picture would.
+    """
+    figure = ""
+    if img:
+        figure = f'<figure class="iheroart shot">{img}</figure>'
+    elif art:
+        figure = f'<figure class="iheroart">{art}</figure>'
+    if not figure:
+        # NO FIGURE MEANS THE HEAD THE SITE ALREADY HAS. /events is the one
+        # index whose subject cannot go in the arch — a twelve-column chart
+        # has to run the full width to be read — and the first version gave
+        # it the wide grid anyway, so the type sat in five columns of eleven
+        # with the other six empty. An opening with nothing on the right is
+        # not an opening, it is a headline with a hole beside it. The classic
+        # index head puts the lede BESIDE the name, which is what that layout
+        # is for, and the chart underneath does the work the picture would.
+        return (
+            f'<header class="pagehead index"><p class="kicker">{kicker}</p>'
+            f'<h1>{title}</h1><p class="lede">{lede}</p>'
+            f'{f"<div class=chips>{actions}</div>" if actions else ""}'
+            f'{f"<p class=small>{note}</p>" if note else ""}</header>')
+    # IT IS A `pagehead` VARIANT, NOT A NEW HEAD. The first version emitted
+    # its own <header class="ihero"> and the primitive check caught it in one
+    # run: pagehead fell off five pages and "a page family has grown its own
+    # components" is exactly what that floor exists to say. It was also two
+    # other failures at once — the head-role check requires every page to
+    # declare whether it is an overture, an index or an instrument, and the
+    # extent check reads the count out of the head — so replacing the head
+    # silently dropped both promises. A variant keeps all three and is what
+    # the design system is for.
+    return (
+        f'<header class="pagehead index ihero{" wide" if figure else ""}">'
+        f'<div class="iherotext"><p class="kicker">{kicker}</p>'
+        f'<h1>{title}</h1><p class="lede">{lede}</p>'
+        f'{f"<div class=chips>{actions}</div>" if actions else ""}'
+        f'{f"<p class=small>{note}</p>" if note else ""}</div>'
+        f'{figure}</header>')
 
 
 def region_glyph(members, frame=None):
@@ -6296,6 +6408,15 @@ def stories_index(data):
     # story page and the homepage both already use for this family. The other
     # eight keep the row, and lose the glyph: at 132px it said nothing, and
     # eight of them said nothing eight times.
+    # THE OPENING DRAWS EVERY PLACE THE NINE PIECES ARE SET IN. That is the
+    # family's own subject at size and it is the same derivation the story
+    # page and the homepage already use — never a plate, which is the rule
+    # this family exists to demonstrate.
+    allplaces = []
+    for st in byline:
+        for cid in st.get("places") or ():
+            if cid in idx:
+                allplaces.append(project(idx[cid]["city"]["lat"], idx[cid]["city"]["lon"]))
     lead, rest = byline[0], byline[1:]
     desks = (
         f'<a class="storylead storyleadwide" href="{urls.story(lead)}">'
@@ -6316,14 +6437,19 @@ def stories_index(data):
         ) + "</div>")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Stories", None)])}
-<div class="pagehead index">
-  <p class="kicker">Stories</p>
-  <h1>A continent is people before it is places.</h1>
-  <p class="lede">{len(data['stories'])} pieces across {len(sections)} desks — people, history,
-  food, faith, nature and culture. Every story links into the Atlas, and every Atlas page that
-  a story touches links back, so reading and planning are the same motion.</p>
-</div>
 {constel_defs()}
+{indexhero(
+    kicker="Stories",
+    title="A continent is people before it is places.",
+    lede=f"{len(data['stories'])} pieces across {len(sections)} desks — people, history, "
+         f"food, faith, nature and culture. Every story links into the Atlas, and every "
+         f"Atlas page that a story touches links back, so reading and planning are the "
+         f"same motion.",
+    art=constellation(allplaces),
+    img=photo(data.get("images"), "stories-hero", w=2000, h=1200,
+              sizes="(min-width: 60rem) 52vw, 100vw"),
+    note='Every place these nine pieces are set in, on one frame. Coastline from '
+         '<a href="/sources">Natural Earth</a>, public domain.')}
 {desks}
 <p class="small">The shape above the lead piece is the places it is about, drawn
 on the same projection as every other map here — and the same reason there is no
@@ -6974,13 +7100,23 @@ def events_page(data):
     )
     body = f"""
 {crumbs([("Europe", "/discover"), ("Events", None)])}
-<div class="pagehead index">
-  <p class="kicker">The European year</p>
-  <h1>What is on, and when.</h1>
-  <p class="lede">{total} recurring fixtures — festivals, markets, pilgrimages, harvests and the
-  handful of natural events worth planning a year around. These are the annual, dependable ones.
-  Dated listings for a given year need a live events feed, which is Stage 2.</p>
-</div>
+{indexhero(
+    kicker="The European year",
+    title="What is on, and when.",
+    lede=f"{total} recurring fixtures — festivals, markets, pilgrimages, harvests and the "
+         f"handful of natural events worth planning a year around. These are the annual, "
+         f"dependable ones. Dated listings for a given year need a live events feed, "
+         f"which is Stage 2.",
+    img=photo(data.get("images"), "events-hero", w=2000, h=1200,
+              sizes="(min-width: 60rem) 52vw, 100vw"))}
+<!-- NO DRAWING IN THE OPENING, AND THAT IS THE ONE EXCEPTION. Four of the
+     five indexes put their subject in the arch beside the headline; this
+     family's subject is TIME, and the year band under this head is a
+     twelve-column chart that has to run the full width to be read at all —
+     the same reason it is not an aperture. Squeezing it into a 4:3 opening
+     would be the signature applied for its own sake. So the hero is type
+     until a photograph lands in its slot, and the chart immediately under
+     it is the dominant visual the section needs. -->
 {jump}
 {''.join(blocks)}
 <p class="small">Every fixture is on its month's page, with the category filter
