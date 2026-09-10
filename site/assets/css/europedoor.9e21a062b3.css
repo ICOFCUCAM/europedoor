@@ -2205,7 +2205,21 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    printed grain does and what an added-light one would not. */
 .heroeurope .herograin { opacity: .085; mix-blend-mode: multiply;
                          pointer-events: none; }
-.heroeurope .herodusk stop { stop-color: var(--graphite); }
+/* AND THIS SELECTOR MATCHED NOTHING FOR THE LIFE OF THE DRAWN HERO. The
+   stops are inside <defs>, not inside `.herodusk` — the group only
+   REFERENCES the gradients — so `.heroeurope .herodusk stop` never selected
+   one, and every stop fell back to the SVG default for stop-color, which is
+   #000. The layer this file calls two rectangles of graphite ramped to pure
+   black: measured (0, 0, 0) against the (16, 18, 20) of the ground beside
+   it, and it is the one thing `--graphite` rather than #000` was written
+   down to prevent.
+
+   The dead-rule scan could not see it either: that scan finds rules which
+   MATCH elements and change none of them, and a rule matching no element at
+   all is a different fault. The browser suite now reads the resolved
+   stop-color instead, which is the only honest instrument for this. */
+.heroeurope #heroedge stop, .heroeurope #herofootg stop {
+  stop-color: var(--graphite); }
 /* EVERY LAYER OVER THE LAND IS TRANSPARENT TO A POINTER. The terrain, the
    rivers, the frontiers and the dusk are all drawn above the countries and
    all of them have fills, so each one swallowed the click in turn. They are

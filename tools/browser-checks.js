@@ -1441,6 +1441,35 @@ async function main() {
     await bp.close();
   }
 
+  // ── NO GRADIENT STOP FALLS BACK TO BLACK ───────────────────────────
+  // The hero's shadow is described in three places as "two rectangles of
+  // graphite", and every stop of both gradients resolved to #000 for the
+  // life of the drawn hero. The stops live in <defs> and the rule that
+  // coloured them selected `.herodusk stop` — the group only REFERENCES the
+  // gradients, so the selector matched nothing and the SVG default for
+  // stop-color, which is black, applied instead. Measured (0, 0, 0) against
+  // the (16, 18, 20) of the ground beside it.
+  //
+  // The dead-rule scan cannot see this: it finds rules that MATCH elements
+  // and change none of them, and a rule matching no element at all is a
+  // different fault. Reading the RESOLVED value is the only honest
+  // instrument, and this palette contains no black at all.
+  for (const url of ["/", "/map", "/europe/norway/fjord-norway/bergen"]) {
+    const sp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await sp.goto(base + url, { waitUntil: "networkidle" });
+    const stops = await sp.evaluate(() =>
+      Array.from(document.querySelectorAll("svg stop")).map((s) => ({
+        c: getComputedStyle(s).stopColor,
+        id: s.parentElement.id || s.parentElement.tagName,
+      })));
+    const black = stops.filter((s) => /^rgba?\(0,\s*0,\s*0/.test(s.c));
+    ok(black.length === 0,
+       `${url}: ${black.length} of ${stops.length} gradient stops resolve to ` +
+       `black — the SVG default, which this palette does not contain ` +
+       `(${black.slice(0, 3).map((s) => s.id).join(", ")})`);
+    await sp.close();
+  }
+
   // ── THE BAR ABOVE THE PAGE ─────────────────────────────────────────
   // On a phone the address bar and the task-switcher card take
   // `theme-color`, and with none declared they took the platform default —

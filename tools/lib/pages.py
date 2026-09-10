@@ -741,6 +741,22 @@ def heroeurope(data):
     # things nobody clicks are fine, and this one is on the overlay rather
     # than on the layers underneath it.
     def _dusk(lo=0.0, hi=1.0):
+        """The shadow's ramp — and every stop names its colour.
+
+        THE COMMENT SAID GRAPHITE AND THE PICTURE WAS BLACK. These stops
+        carried an opacity and no `stop-color`, and the SVG default for that
+        property is #000 — so the layer this file calls "two rectangles of
+        graphite" ramped to pure black, measured (0, 0, 0) against the
+        (16, 18, 20) the ground beside it is drawn in. It is the one thing
+        `--graphite` rather than #000` was written down to prevent: black is
+        a screen and graphite is a shadow, for the same reason limestone is
+        never #fff.
+
+        The colour stays in the stylesheet — there is a rule for it, and it
+        had been selecting nothing, because the stops live in <defs> and the
+        group only references the gradient. The rule points at the gradients
+        now and the browser suite reads the resolved value.
+        """
         out = []
         for i in range(5):
             t = i / 4.0
@@ -766,11 +782,12 @@ def heroeurope(data):
     # the water is still a straight line across the north-east — the exact
     # thing the fade exists to remove.
     ex1, ey1, ex2, ey2 = _band(70.0, 40.0, 52.0, 360.0, 40.0)
-    # The ground's own fade-in is NARROWER than the atlas's fade-out, and on
-    # purpose: the atlas has 320 units to dissolve across because that dissolve
-    # is the picture, and the ground only has to arrive without an edge. It is
-    # fully there 40 units short of the cut, which is where the atlas is gone.
-    gx1, gy1, gx2, gy2 = _band(70.0, 40.0, 52.0, 150.0, 40.0)
+    # THE GROUND'S OWN FADE-IN WAS DELETED AND ITS AXIS WAS LEFT BEHIND.
+    # `gx1, gy1, gx2, gy2 = _band(70, 40, 52, 150, 40)` sat here, unread by
+    # anything, with a paragraph above it explaining a fade the drawing no
+    # longer had — so the code still looked like it had one while the picture
+    # showed a hard edge. Dead code that reads as a decision is worse than an
+    # absence, which is the same reason the dead-rule scan exists for CSS.
     # THE SOUTHERN CUT WAS HIDDEN IN CSS AND SO WAS EVERYTHING NEAR IT. The
     # atlas holds North Africa down to 33°N and no further, and the bottom
     # eighth of the drawing was faded in the stylesheet to cover that straight
@@ -968,11 +985,32 @@ def heroeurope(data):
         + f'<rect class="herograin" aria-hidden="true" mask="url(#herodim)"'
         f' x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
         f' height="{vh:.0f}" filter="url(#herograin)"/>'
-        + f'<g class="herodusk" aria-hidden="true" mask="url(#herodim)">'
+        # THE MASK BELONGS ON ONE OF THE TWO, AND PUTTING IT ON BOTH LEFT A
+        # HARD BLACK WEDGE ACROSS THE TOP-RIGHT OF THE HOMEPAGE.
+        #
+        # `herodim` is the atlas's own land, and it was on the GROUP. The
+        # eastern shadow therefore stopped at every coastline: Russia went to
+        # graphite and the Barents Sea, the Black Sea and the Caspian beside
+        # it stayed bright Atlantic teal, while the ground beyond the atlas —
+        # graphite, opaque, cut dead straight along 52°E — began right there.
+        # Measured across that boundary: (42, 95, 115) to (0, 0, 0) in one
+        # pixel, a hard diagonal edge through the picture that opens the site,
+        # exactly the rendering fault the fades exist to remove.
+        #
+        # The eastern rectangle is unmasked now, so the water dissolves with
+        # the land it surrounds and there is nothing for the ground to abut.
+        # THE SOUTHERN ONE KEEPS THE MASK, and not for symmetry: the drawing
+        # is 78% of the hero inset right, so an unmasked southern shadow —
+        # opaque at the bottom-left, where its radius about the cone apex is
+        # largest — painted a straight vertical seam down the drawing's own
+        # left edge, over open Atlantic, behind the headline. The southern cut
+        # is only visible where it crosses LAND, so masking it to land costs
+        # nothing and removes that edge.
+        + f'<g class="herodusk" aria-hidden="true">'
         + f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
         f' height="{vh:.0f}" fill="url(#heroedge)"/>'
         + f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
-        f' height="{vh:.0f}" fill="url(#herofootg)"/></g>'
+        f' height="{vh:.0f}" mask="url(#herodim)" fill="url(#herofootg)"/></g>'
         + f'</svg></div>'
     )
 
