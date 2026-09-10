@@ -973,8 +973,15 @@ def s35():
 def s36():
     # The homepage is the one page that does not need to say where you are,
     # because you are at the front door; it carries the hero instead.
-    yield every_page(lambda h: 'class="crumbs"' in h or 'class="pagehead"' in h
-                     or ('class="hero"' in h or 'class="herofull"' in h),
+    # MATCHED ON THE CLASS, NOT ON THE WHOLE ATTRIBUTE. This required the
+    # literal `class="pagehead"`, so the day the 404 took the shared index
+    # opening — `class="pagehead index ihero wide"` — it reported that the
+    # page had stopped saying where you are, on a page that had just gained a
+    # kicker, a title, a lede and a drawing of the continent. Eighth
+    # assertion in this repository to pin a shape instead of a promise.
+    yield every_page(lambda h: 'class="crumbs"' in h
+                     or re.search(r'class="pagehead[ "]', h)
+                     or 'class="hero"' in h or 'class="herofull"' in h,
                      "every page says where you are")
     yield "Nearest onward stops" in CITY, "and where you can go next"
     yield "This place, in the rest of the site" in page(

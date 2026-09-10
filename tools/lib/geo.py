@@ -934,4 +934,13 @@ def sources_line(doc):
     if not doc or not doc.get("sources"):
         return ""
     names = sorted({s["dataset"] for s in doc["sources"]})
-    return " and ".join(names)
+    lics = sorted({s.get("licence", "") for s in doc["sources"]})
+    # A SENTENCE, BECAUSE EVERY CALLER WAS SETTING IT IN ONE. Five call sites
+    # dropped the bare dataset names into the middle of a paragraph — "...a
+    # boundary it does not have. Natural Earth 1:110m admin 0 countries Every
+    # stop above is a place in the Atlas..." — a run-on with no lead-in and no
+    # full stop, on every page that draws the whole continent. A credit that
+    # cannot be read is not a credit.
+    lic = (" public domain" if lics == ["public-domain"]
+           else " " + ", ".join(l.replace("-", " ") for l in lics if l))
+    return f"Drawn from {' and '.join(names)},{lic}."

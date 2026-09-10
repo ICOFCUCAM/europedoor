@@ -396,15 +396,45 @@ def load_graph():
 
 # ── build ─────────────────────────────────────────────────────────────────
 
-def provenance():
+def provenance(*used):
+    """The datasets that produced ONE output file.
+
+    THE CREDIT WAS ATTACHED TO THE PIPELINE, NOT TO THE DRAWING. Every
+    document in data/geo/ carried the same ten-row list — every .gz the
+    fetcher had ever downloaded — so `geo.sources_line()` rendered a sixty-
+    word sentence naming airports, ports, summits, marine polygons and river
+    centrelines under a picture that is fifty country OUTLINES and nothing
+    else. That is not verbose, it is WRONG: it credits datasets the drawing
+    does not contain, on the family of pages whose whole argument is that a
+    reader looking at a border is entitled to know which dataset drew it.
+
+    This repository already has the rule, written for relief: the credit is
+    attached to the drawing, never to the request. It had never been applied
+    to the geometry files it was inherited from.
+
+    `used` names the raw files this output actually reads. Empty means the
+    whole register, which no caller now passes — a builder that adds a source
+    and forgets this argument credits too little rather than too much, and
+    too little is the failure a reader can see.
+    """
     with open(os.path.join(ROOT, "docs", "data-licenses", "sources.json"),
               encoding="utf-8") as fh:
         reg = json.load(fh)
-    return [
-        {"dataset": s["dataset"], "licence": s["licence"], "version": s["version"],
-         "sha256": s["sha256"], "fetched": s["fetched"]}
-        for s in reg["sources"] if s["path"].endswith(".gz")
-    ]
+    want = {os.path.basename(u) for u in used}
+    rows = []
+    for s in reg["sources"]:
+        if not s["path"].endswith(".gz"):
+            continue
+        if want and os.path.basename(s["path"]) not in want:
+            continue
+        rows.append({"dataset": s["dataset"], "licence": s["licence"],
+                     "version": s["version"], "sha256": s["sha256"],
+                     "fetched": s["fetched"]})
+    if want and len(rows) != len(want):
+        raise SystemExit(
+            f"provenance(): {sorted(want - {os.path.basename(r['path']) for r in reg['sources']})} "
+            f"is not in the licence register")
+    return rows
 
 
 # ── hydrology, seas and physical features ────────────────────────────────
@@ -617,24 +647,31 @@ def beyond():
 
 def build():
     graph = load_graph()
-    prov = provenance()
+    # ONE LIST PER FILE, NAMING WHAT THAT FILE IS MADE OF. See provenance().
     files = {"facts.json": facts(graph)}
-    files["hydrology-lod1.json"] = dict(hydrology(), sources=prov)
+    files["hydrology-lod1.json"] = dict(hydrology(), sources=provenance(
+        "ne_50m_rivers_lake_centerlines.geojson.gz", "ne_50m_lakes.geojson.gz"))
     files["marine-lod1.json"] = dict(
         area_names("ne_50m_geography_marine_polys.geojson.gz", upper=True),
-        sources=prov)
-    files["summits-lod1.json"] = dict(summits(), sources=prov)
-    files[BEYOND] = dict(beyond(), sources=prov)
+        sources=provenance("ne_50m_geography_marine_polys.geojson.gz"))
+    files["summits-lod1.json"] = dict(summits(), sources=provenance(
+        "ne_10m_geography_regions_elevation_points.geojson.gz"))
+    # The ground beyond the atlas is drawn from the 1:50m admin-0 coastline,
+    # the same file the atlas itself uses — see beyond().
+    files[BEYOND] = dict(beyond(), sources=provenance(LODS["lod1"]["src"]))
     files["features-lod1.json"] = dict(
         area_names("ne_50m_geography_regions_polys.geojson.gz",
                    kinds=FEATURE_KINDS, upper=True),
-        sources=prov)
+        sources=provenance("ne_50m_geography_regions_polys.geojson.gz"))
 
     cache = {}
     for lod, cfg in LODS.items():
         if cfg["src"] not in cache:
             cache[cfg["src"]] = read_ne(cfg["src"])
         src = cache[cfg["src"]]
+        # A country outline file is one dataset: the admin-0 countries at this
+        # level of detail, and nothing else.
+        prov = provenance(cfg["src"])
 
         shapes = {}
         for feat in src["features"]:
