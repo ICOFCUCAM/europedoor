@@ -56,11 +56,11 @@ on:
         options: [pexels]
         default: pexels
       purpose:
-        description: "why this photograph exists, e.g. homepage-hero (data/image-purposes.json)"
+        description: "the surface, from data/image-purposes.json. DISCOVER takes a comma-separated list"
         required: true
         type: string
       query:
-        description: "discover only: what to search for"
+        description: "discover only: what to search for — one, or one per purpose, comma-separated"
         required: false
         type: string
       photo_id:
@@ -123,22 +123,48 @@ jobs:
               print("secret is a different scope; neither reaches this.")
           EOF
 
+      # ONE DISPATCH FOR A SET OF SURFACES, BECAUSE THEY ARE ONE DECISION.
+      # The ways-in band is four panels and a person judging it is judging
+      # the STRIP, not four unrelated pictures — four dispatches, four waits
+      # and four separate artifacts is a worse way to make one choice. Each
+      # purpose still gets its own search, its own manifest and its own
+      # sheets: this batches the RUN, never the acquisition, which stays one
+      # approved id at a time with one provenance record behind it.
       - name: Search and list candidates
         env:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PURPOSES: ${{ inputs.purpose }}
+          QUERIES: ${{ inputs.query }}
         run: |
           set -euo pipefail
-          python3 scripts/images/discover.py \
-            --provider "${{ inputs.provider }}" \
-            --purpose "${{ inputs.purpose }}" \
-            --query "${{ inputs.query }}" \
-            --manifest /tmp/candidates.json
+          python3 - <<'PY' > /tmp/plan.txt
+          import os
+          ps = [p.strip() for p in os.environ["PURPOSES"].split(",") if p.strip()]
+          qs = [q.strip() for q in os.environ.get("QUERIES", "").split(",")]
+          qs = [q for q in qs if q]
+          if len(qs) not in (0, 1, len(ps)):
+              raise SystemExit(
+                  f"{len(ps)} purposes and {len(qs)} queries. Give one query "
+                  f"for all of them, or one each, in the same order.")
+          for i, p in enumerate(ps):
+              q = "" if not qs else (qs[0] if len(qs) == 1 else qs[i])
+              print(f"{p}\t{q}")
+          PY
+          cat /tmp/plan.txt
+          while IFS=$'\t' read -r purpose query; do
+            echo "── $purpose ── $query"
+            python3 scripts/images/discover.py \
+              --provider "${{ inputs.provider }}" \
+              --purpose "$purpose" \
+              --query "$query" \
+              --manifest "/tmp/candidates-$purpose.json"
+          done < /tmp/plan.txt
 
       # THE SHEET IS THE POINT OF THIS STAGE, so it is not optional and it is
       # not a second dispatch. Discovery that ends at a list of ids hands the
       # art direction back to a provider's thumbnail grid, which is a
       # different composition than this site's.
-      - name: Draw every candidate inside the real hero
+      - name: Draw every candidate inside the real page
         env:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: |
@@ -149,35 +175,41 @@ jobs:
           # library for a step that does not decode an image is how a
           # dependency arrives without a reason.
           python3 tools/build.py
-          python3 scripts/images/contact_sheet.py --manifest /tmp/candidates.json
           npm install --no-save playwright@1.49.0
           npx playwright install --with-deps chromium
           # The suites launch the sandbox's own Chromium by path; a runner
           # has none, so the sheet takes the one Playwright just installed.
           HERO_SHEET_EXE="$(node -e 'console.log(require("playwright").chromium.executablePath())')"
           export HERO_SHEET_EXE
-          node tools/hero-sheet.js /tmp/hero-sheet.png
-          node tools/hero-sheet.js /tmp/hero-sheet-phone.png --phone
-          node tools/hero-sheet.js /tmp/hero-sheet-dark.png --dark
+          mkdir -p /tmp/sheets
+          # ONE SCRATCH DIRECTORY PER PURPOSE. `HERO_SHEET_DIR` was already
+          # the seam — the renderer has never known where its manifest comes
+          # from — so a set of surfaces needs no change to either script.
+          while IFS=$'\t' read -r purpose query; do
+            out=".cache/contact-$purpose"
+            python3 scripts/images/contact_sheet.py \
+              --manifest "/tmp/candidates-$purpose.json" --out "$out"
+            HERO_SHEET_DIR="$out" node tools/hero-sheet.js "/tmp/sheets/$purpose.png"
+            HERO_SHEET_DIR="$out" node tools/hero-sheet.js "/tmp/sheets/$purpose-phone.png" --phone
+            HERO_SHEET_DIR="$out" node tools/hero-sheet.js "/tmp/sheets/$purpose-dark.png" --dark
+            cp "/tmp/candidates-$purpose.json" /tmp/sheets/
+          done < /tmp/plan.txt
 
       # NEVER A COMMIT. These are somebody else's photographs with no register
       # row, no hash and no date — the exact thing the licence gate refuses —
       # so they leave as an artifact of the run and the repository never sees
       # one. checks.py asserts that from the other end.
-      - name: Upload the contact sheet
+      - name: Upload the contact sheets
         uses: actions/upload-artifact@v4
         with:
           name: hero-contact-sheet
-          path: |
-            /tmp/hero-sheet.png
-            /tmp/hero-sheet-phone.png
-            /tmp/hero-sheet-dark.png
-            /tmp/candidates.json
+          path: /tmp/sheets
           retention-days: 14
 
       - name: What to do with it
         run: |
-          echo "Download the artifact and LOOK at the three sheets."
+          echo "Download the artifact and LOOK at the sheets — three per purpose:"
+          echo "wide, phone and the dark preference."
           echo "Nothing was chosen for you: the order is the provider's"
           echo "search order and position on the sheet means nothing."
           echo "Then run this workflow again with stage=acquire and the id."

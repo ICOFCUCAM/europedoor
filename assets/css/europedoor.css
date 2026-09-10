@@ -4000,7 +4000,11 @@ body[data-hero] .masthead { position: sticky; }
  * shape of where the piece is set — which is the job, and the journeys'
  * routes stay the largest drawing on the page because a route is the one
  * thing here that has to be read rather than recognised. */
-.storyart .constel { width: 100%; max-width: 18rem; }
+/* THE LEAD STORY'S PICTURE IS THE LEAD'S. 18rem was set when this drawing
+   was one of nine in a column; it is one of one now, at the top of a band,
+   and held to 288px in a 440px column it left a third of the row empty
+   beside it — the same measured gap that rebuilt this index. */
+.storyart .constel { width: 100%; max-width: 26rem; }
 .storyart .constel-lit circle { r: 14px; }
 .storysm { padding-bottom: var(--s5); border-bottom: 1px solid var(--rule); margin-bottom: var(--s5); }
 .storysm:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }

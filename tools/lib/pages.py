@@ -1153,7 +1153,7 @@ def home(data):
     <p class="jrowmeta">{esc(" · ".join(facts))}<span class="waygo">Explore journey →</span></p>
   </div>
   <div class="jrowart">{constellation(
-        [project(c["lat"], c["lon"]) for c in legs], route=True)}</div>
+        [project(c["lat"], c["lon"]) for c in legs], route=True, frame=True)}</div>
 </a>"""
         )
 
@@ -1170,7 +1170,7 @@ def home(data):
     def story_glyph(st):
         pts = [project(idx[cid]["city"]["lat"], idx[cid]["city"]["lon"])
                for cid in (st.get("places") or ()) if cid in idx]
-        return constellation(pts, extra=" constel-theme") if pts else ""
+        return constellation(pts, extra=" constel-theme", frame=True) if pts else ""
 
     recent = sorted(data["stories"], key=lambda st: st["published"], reverse=True)[:3]
     storyband = ""
@@ -3039,7 +3039,7 @@ def journeys_index(data):
         route = constellation(
             [project(data["cities"][l["city"]]["city"]["lat"],
                      data["cities"][l["city"]]["city"]["lon"]) for l in j["legs"]],
-            route=True)
+            route=True, frame=True)
         rows.append(
             f'<a class="row journeyrow" href="{urls.journey(j)}">'
             f'<div><p class="kicker">{esc(j["strapline"])}</p>'
@@ -6142,42 +6142,12 @@ def region_glyph(members, frame=None):
     _ctx, lit = geo.landmass(
         MAPPROJ, (0.0, 0.0, float(MAP_W), float(MAP_H)), doc=doc,
         only=members, highlight=members, thin_units=5.0, min_units=60.0)
-    view = f"0 0 {MAP_W} {MAP_H}"
-    if frame:
-        xs = [x for x, _ in frame]
-        ys = [y for _, y in frame]
-        x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
-        # A THIRD OF THE REGION'S OWN SIZE AS CONTEXT, with a floor: a
-        # one-country region would otherwise frame a dot, and what makes a
-        # glyph readable is the coast around the lit part.
-        pad = max((x1 - x0), (y1 - y0)) * 0.34
-        pad = max(pad, 90.0)
-        x0, x1, y0, y1 = x0 - pad, x1 + pad, y0 - pad, y1 + pad
-        # Held to the canvas proportion so nine glyphs are nine boxes of the
-        # same shape and only the geography inside them differs.
-        w, h = x1 - x0, y1 - y0
-        want = MAP_W / MAP_H
-        if w / h < want:
-            grow = (h * want - w) / 2
-            x0, x1 = x0 - grow, x1 + grow
-        else:
-            grow = (w / want - h) / 2
-            y0, y1 = y0 - grow, y1 + grow
-        # AND THE BOX IS SLID BACK ONTO THE DRAWING. The Nordics framed
-        # y = -187, which is 187 units of nothing above the top of the
-        # silhouette: the padding is context and there is no context outside
-        # the canvas. Slid where it fits, clamped where the region is wider
-        # than the frame it is being drawn on.
-        w, h = x1 - x0, y1 - y0
-        if w >= MAP_W:
-            x0, w = 0.0, float(MAP_W)
-        else:
-            x0 = min(max(x0, 0.0), MAP_W - w)
-        if h >= MAP_H:
-            y0, h = 0.0, float(MAP_H)
-        else:
-            y0 = min(max(y0, 0.0), MAP_H - h)
-        view = f"{x0:.0f} {y0:.0f} {w:.0f} {h:.0f}"
+    # ONE FRAMING RULE, IN ONE PLACE. This was thirty lines inline here and
+    # a journey row and a story row needed the same arithmetic — see
+    # `glyph_view`, which is this, lifted out. `min_span=0` keeps this
+    # family's behaviour exactly: a macro region is big by construction and
+    # has never needed the floor a two-city story does.
+    view = glyph_view(frame, min_span=0.0) if frame else f"0 0 {MAP_W} {MAP_H}"
     return (f'<svg class="constel regionglyph" viewBox="{view}" '
             f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
             f'{lit}</svg>')
@@ -6232,7 +6202,58 @@ def route_line(pts):
             f'<polyline class="constel-route" points="{d}"/>')
 
 
-def constellation(pts, extra="", route=False):
+def glyph_view(pts, pad_frac=0.34, min_pad=90.0, min_span=340.0):
+    """The viewBox that frames a set of projected points, held to the canvas.
+
+    Lifted out of `region_glyph`, which had it inline, because the same
+    question was being asked by three families and answered once. THE FIRST
+    VERSION OF THAT FUNCTION DREW ALL NINE MACRO REGIONS AT THE FULL
+    CONTINENTAL EXTENT, so nine bands carried nine identical pictures of
+    Europe with a different corner lit and the Baltic States lit about 2% of
+    a frame the reader had already seen eight times. A journey row and a
+    story row had exactly that fault and kept it.
+
+    `min_span` is the floor a route and a story need and a region does not.
+    A macro region is big by construction; a story set in two cities is not,
+    and framed on its own extent alone it zooms until the drawing stops
+    being recognisable as Europe at all — which is the whole reason the
+    silhouette is there.
+    """
+    xs = [x for x, _ in pts]
+    ys = [y for _, y in pts]
+    x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+    pad = max((x1 - x0), (y1 - y0)) * pad_frac
+    pad = max(pad, min_pad)
+    x0, x1, y0, y1 = x0 - pad, x1 + pad, y0 - pad, y1 + pad
+    if (x1 - x0) < min_span:
+        grow = (min_span - (x1 - x0)) / 2
+        x0, x1 = x0 - grow, x1 + grow
+    # Held to the canvas proportion, so a set of glyphs is a set of boxes of
+    # the same shape and only the geography inside them differs.
+    w, h = x1 - x0, y1 - y0
+    want = MAP_W / MAP_H
+    if w / h < want:
+        grow = (h * want - w) / 2
+        x0, x1 = x0 - grow, x1 + grow
+    else:
+        grow = (w / want - h) / 2
+        y0, y1 = y0 - grow, y1 + grow
+    # And slid back onto the drawing: the padding is CONTEXT and there is no
+    # context outside the canvas. Clamped where the set is wider than the
+    # frame it is drawn on.
+    w, h = x1 - x0, y1 - y0
+    if w >= MAP_W:
+        x0, w = 0.0, float(MAP_W)
+    else:
+        x0 = min(max(x0, 0.0), MAP_W - w)
+    if h >= MAP_H:
+        y0, h = 0.0, float(MAP_H)
+    else:
+        y0 = min(max(y0, 0.0), MAP_H - h)
+    return f"{x0:.0f} {y0:.0f} {w:.0f} {h:.0f}"
+
+
+def constellation(pts, extra="", route=False, frame=False):
     """A set of real destinations lit on the shared silhouette.
 
     THE ARGUMENT DRAWN, AND THE REASON IT REPLACED ELEVEN PAINTINGS. The
@@ -6255,7 +6276,20 @@ def constellation(pts, extra="", route=False):
     """
     dots = "".join(f'<circle cx="{x:.0f}" cy="{y:.0f}"/>' for x, y in pts)
     line = route_line(pts) if route else ""
-    return (f'<svg class="constel{extra}" viewBox="0 0 {MAP_W} {MAP_H}" '
+    # FRAMED ON ITS OWN GROUND WHERE THE SUBJECT IS A ROUTE OR A SET OF
+    # PLACES, and never where the subject is REACH. Three featured journeys
+    # drew three identical continents with a thumbnail-sized squiggle in a
+    # different corner of each — the nine-macro-regions fault, on the
+    # homepage, one band under the strip that was rebuilt to stop exactly
+    # that. Framed, the Hanseatic Arc is a Baltic picture and the Adriatic
+    # Run is an Adriatic one, and the line is big enough to read.
+    #
+    # /themes is deliberately NOT framed: what separates thirteen themes is
+    # how far each one reaches, three countries against seven, and that
+    # comparison only exists while all thirteen are drawn at one extent.
+    # Framing them would delete the argument the family is making.
+    view = glyph_view(pts) if (frame and pts) else f"0 0 {MAP_W} {MAP_H}"
+    return (f'<svg class="constel{extra}" viewBox="{view}" '
             f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
             f'{line}<g class="constel-lit">{dots}</g></svg>')
 
@@ -6510,7 +6544,7 @@ def stories_index(data):
                 pts.append(project(n["city"]["lat"], n["city"]["lon"]))
         # A story that names no place gets no drawing, on the destination
         # page's rule: nothing in its place rather than something invented.
-        return constellation(pts, extra=" constel-theme") if pts else ""
+        return constellation(pts, extra=" constel-theme", frame=True) if pts else ""
     # A LEAD, AND THEN THE REST. Nine identical rows with a 132px grey Europe
     # at the right-hand end is a contents page with a decoration on it: the
     # glyph was too small to name a place, the text stopped at a third of the
