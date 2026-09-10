@@ -6201,6 +6201,33 @@ def region_glyph(members, frame=None):
             f'{lit}</svg>')
 
 
+def head_extent(pairs):
+    """What an instrument reads, on the instrument's own head line.
+
+    THE FIVE INTELLIGENCE HEADS LEFT HALF A ROW EMPTY. The instrument role is
+    a grid of `auto 1fr` — kicker, then title, baseline-aligned, with the lede
+    spanning under both — and a title is rarely wider than a third of the
+    page, so /discover, /map, /plan and /search each opened on a label, a
+    short line and about six hundred pixels of nothing beside it. That is the
+    same shape the closing statement had, one screen from the top instead of
+    at the bottom.
+
+    An index says how big its set is; an instrument should say what it is
+    operating OVER, which is the same promise from the other side and the one
+    thing that belongs in that column. Every figure is derived at build time
+    from the same structures the tool itself reads, so it cannot claim a
+    corpus the page does not have.
+
+    It is deliberately NOT instructions. How the planner scores sits beside
+    the button that runs it, and what the search box understands sits under
+    the search box — that move is why these heads are short, and putting it
+    back in the head would undo it.
+    """
+    return ('<p class="headextent">'
+            + "".join(f'<span><b>{n:,}</b> {esc(what)}</span>' for n, what in pairs)
+            + '</p>')
+
+
 def datacut_line():
     """One sentence naming where the drawn continent stops being a coastline.
 
@@ -7015,8 +7042,10 @@ def map_page(data):
 <div class="pagehead instrument">
   <p class="kicker">The map</p>
   <h1>Europe, and everything we hold in it.</h1>
-  <p class="lede">{len(data['countries'])} countries, {len(data['cities'])} destinations and
-  {len(placedots)} places. Click a country to go into it.</p>
+  {head_extent([(len(data['countries']), 'countries'),
+                (len(data['cities']), 'destinations'),
+                (len(placedots), 'places')])}
+  <p class="lede">Click a country to go into it.</p>
 </div>
 <div class="mapstage">
 <div class="mapmain">
@@ -8658,7 +8687,8 @@ def search_page(data):
 <div class="pagehead instrument">
   <p class="kicker">Search</p>
   <h1>Find it.</h1>
-  <p class="lede">Everything on EuropeDoor — {n} countries, regions, destinations, places,
+  {head_extent([(n, 'records indexed')])}
+  <p class="lede">Everything on EuropeDoor — countries, regions, destinations, places,
   journeys, themes, stories and projects — in one index that runs in your browser.
   Nothing you type is sent anywhere, and nobody can buy a position in it.</p>
 </div>
@@ -9127,10 +9157,12 @@ def discover_page(data):
 <div class="pagehead instrument">
   <p class="kicker">Discover</p>
   <h1>Where will Europe take you?</h1>
+  {head_extent([(len(data['cities']), 'destinations'),
+                (len(data['countries']), 'countries'),
+                (len(data['taxonomy']['interests']), 'things to travel for')])}
   <p class="lede">Every other page here asks you to already know where you want to go — a
-  country, a region, a sentence. This one does not. Say what you are travelling for and
-  {len(data['cities'])} places across {len(data['countries'])} countries will narrow
-  themselves, and each one will tell you why it is on the list.</p>
+  country, a region, a sentence. This one does not. Say what you are travelling for and the
+  list narrows itself, and each place left on it will tell you why it is there.</p>
 </div>
 
 <section class="band" id="discover-mode">

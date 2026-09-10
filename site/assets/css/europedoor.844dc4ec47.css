@@ -3483,12 +3483,24 @@ body[data-hero] .masthead { position: sticky; }
                           text-wrap: balance; }
 .pagehead.instrument .kicker { margin: 0; }
 .pagehead.instrument .lede { font-size: var(--t-md); max-width: 52ch; margin: 0; }
+
+/* WHAT THE INSTRUMENT READS, IN THE COLUMN THAT WAS EMPTY. See
+   pages.head_extent: a title is rarely a third of the page wide, so the
+   `auto 1fr` row left about six hundred pixels of nothing beside it on all
+   five INTELLIGENCE pages. Tabular, so three counts on one line read as a
+   set; the label stays quiet so the number is the thing that carries. */
+.headextent { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5);
+              margin: 0; font-size: var(--t-sm); color: var(--ink-3);
+              font-variant-numeric: tabular-nums; }
+.headextent b { font-weight: 600; color: var(--ink-2); }
+
 @media (min-width: 52rem) {
   /* The kicker and the title on one line, baseline-aligned: two stacked
      labels above a tool is one label too many. */
-  .pagehead.instrument { grid-template-columns: auto 1fr; align-items: baseline;
+  .pagehead.instrument { grid-template-columns: auto 1fr auto; align-items: baseline;
                          column-gap: var(--s4); }
   .pagehead.instrument .lede { grid-column: 1 / -1; }
+  .headextent { justify-content: flex-end; text-align: right; }
 }
 
 /* THE EUROPEAN YEAR, AS ITS OWN SHAPE.
