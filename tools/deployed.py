@@ -89,6 +89,27 @@ def main(argv):
     text = body.decode("utf-8", "replace")
     check("the homepage answers 200", status == 200, f"got {status}")
     if status != 200:
+        # A FAILURE MESSAGE WITH NO MEASUREMENT IN IT CANNOT BE DIAGNOSED, and
+        # this is the one failure where the next question is not about the
+        # code at all. A 404 means something ANSWERED and had no page: the
+        # host is reachable, the certificate is valid, DNS is right, and the
+        # project behind the domain has no production deployment. A refused
+        # connection or a DNS error would mean something else entirely, and
+        # the difference decides who fixes it and where. So say which.
+        print("\n  nobody is serving this origin's homepage. Who answered:")
+        for k in ("server", "x-vercel-id", "x-vercel-error", "x-matched-path",
+                  "content-type", "location", "age", "cache-control"):
+            v = {kk.lower(): vv for kk, vv in headers.items()}.get(k)
+            if v:
+                print(f"    {k}: {v}")
+        print(f"    body starts: {text.strip()[:120]!r}")
+        for alt in (origin.replace("://", "://www."), ) if "://www." not in origin else ():
+            a, ah, _ab = get(alt + "/")
+            print(f"    {alt}/ answers {a}"
+                  + (f"  ({ah.get('Location')})" if ah.get("Location") else ""))
+        print("\n  A 404 here is not something the repository can fix: the "
+              "build is committed and\n  correct, and no deployment of it is "
+              "attached to this domain.")
         return report()
 
     # THE ONE QUESTION THIS EXISTS FOR. The stylesheet's filename IS its
