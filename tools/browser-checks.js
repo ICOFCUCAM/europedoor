@@ -1161,15 +1161,41 @@ async function main() {
   ok(/Open /.test(popup), "the popup has no way into the page");
   await page.locator(".mappopup-close").click();
   ok(await page.locator("#mappopup").isHidden(), "the popup will not close");
-  ok(await page.locator("#places").isHidden(), "the places layer starts visible");
+
+  // A LAYER ASSERTION THAT SAYS ONLY "IT IS VISIBLE" IS NOT A MEASUREMENT.
+  // These two checks were red on the CI runner and green here for eighty-nine
+  // runs, and the message carried no number, so every diagnosis of them was a
+  // theory about a browser nobody could look at. `layerState` reports what
+  // the page actually holds — the attributes, the computed display, the box
+  // and how many children are in the group — and the failures print it. The
+  // browser that disagrees now says what it sees.
+  const layerState = (sel) => page.evaluate((s) => {
+    const el = document.querySelector(s);
+    if (!el) return "absent";
+    const cs = getComputedStyle(el);
+    const r = el.getBoundingClientRect();
+    return [
+      `hidden=${el.hasAttribute("hidden")}`,
+      `display-attr=${el.getAttribute("display")}`,
+      `computed-display=${cs.display}`,
+      `visibility=${cs.visibility}`,
+      `box=${Math.round(r.width)}x${Math.round(r.height)}`,
+      `children=${el.children.length}`,
+    ].join(" ");
+  }, sel);
+
+  ok(await page.locator("#places").isHidden(),
+     `the places layer starts visible: ${await layerState("#places")}`);
   await page.check('#geolayers input[value="places"]');
-  ok(!(await page.locator("#places").isHidden()), "the places layer will not turn on");
+  ok(!(await page.locator("#places").isHidden()),
+     `the places layer will not turn on: ${await layerState("#places")}`);
   await page.check('#geolayers input[value="regions"]');
   await page.waitForTimeout(120);
   const rlabels = await page.locator("#regions .rlabel").count();
   ok(rlabels > 10, `the regions layer drew ${rlabels} groupings`);
   await page.uncheck('#geolayers input[value="cities"]');
-  ok(await page.locator("#dots").isHidden(), "the destinations layer will not turn off");
+  ok(await page.locator("#dots").isHidden(),
+     `the destinations layer will not turn off: ${await layerState("#dots")}`);
 
   // ── the country map ────────────────────────────────────────────────
   //
