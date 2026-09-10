@@ -2927,34 +2927,64 @@ def interest_page(data, i, ranking):
     band = ("Nothing carries it yet, so there is no list to judge."
             if not cities
             else next(text for floor, text in INTEREST_BANDS if pct >= floor))
-    shown = cities[:60]
-    cards = [
-        card(
-            urls.city(n["country"], n["region"], n["city"]),
-            f"{n['country']['name']} · {n['region']['name']}",
-            n["city"]["name"], n["city"]["summary"],
-            seed=f"city:{n['country']['slug']}:{n['city']['slug']}",
-            motif=motif_for(n["city"]["interests"], n["city"].get("city_type")),
-        )
-        for n in shown
-    ]
-    # 200 destinations were silently cut to 60 with nothing on the page
-    # saying so — a list that stops without admitting it stopped is the one
-    # kind of incompleteness a reader cannot detect.
-    cut = (f" Showing the first {len(shown)} of {len(cities)}, alphabetically "
-           f"by country." if len(cities) > len(shown) else "")
+    # SEVEN HUNDRED AND TWENTY-EIGHT ABSTRACT PLATES ON SEVENTEEN PAGES.
+    #
+    # That is forty-three hash-drawn landscapes in a column on the average
+    # interest page, which is the measurement that emptied the homepage,
+    # /journeys, /europe-in and the stories index — placeholder art doing a
+    # picture's job — still shipping on the family that had the most of it.
+    # Eleven in a column was called a SaaS body under an atlas hero; forty
+    # three is a wall of gradients with the destinations behind it.
+    #
+    # A destination on this page is not chosen on LOOK, which is the test a
+    # card has to pass. It is chosen on where it is and what it is, and both
+    # of those are words. So the set is rows, and the whole set: the list
+    # used to stop at sixty with one sentence admitting it, and a list that
+    # stops is the one kind of incompleteness a reader cannot detect. Rows
+    # cost a few hundred bytes each, so there is no longer a reason to stop.
+    rows = "".join(
+        f'<a class="row" href="{urls.city(n["country"], n["region"], n["city"])}">'
+        f'<div><h3>{esc(n["city"]["name"])}</h3>'
+        f'<p class="rowsub">{esc(n["city"]["summary"])}</p></div>'
+        f'<p class="rowmeta">{esc(n["country"]["name"])} · '
+        f'{esc(n["region"]["name"])}</p></a>'
+        for n in cities)
+    # THE SHAPE OF THE TAG, DRAWN, AND IT IS THE PAGE'S OWN SENTENCE AS A
+    # PICTURE. `docs/signature-moments.md` refused a map here on the grounds
+    # that the three largest tags would draw three identical maps of Europe.
+    # That is true of History, Food and Architecture and it is exactly what
+    # this page already says in words — over 40% barely narrows anything —
+    # so the drawing agrees with the sentence rather than contradicting it,
+    # and for Islands, Snow and Wildlife it says something the sentence
+    # cannot. It is the homepage tiles' own argument: Mountains is four
+    # ranges, History is almost everywhere, and the difference between those
+    # two shapes is the thing worth showing.
+    #
+    # NOT FRAMED, deliberately, for the reason /themes is not framed: what
+    # is being compared across seventeen pages is REACH, and that comparison
+    # only exists while every one of them is drawn at the same extent.
+    #
+    # AND NO APERTURE. The refusal in signature-moments was about the door,
+    # not about geography, and it still holds: this is a glyph.
+    art = constellation([project(n["city"]["lat"], n["city"]["lon"])
+                         for n in cities]) if cities else ""
     body = f"""
 {crumbs([("Europe", "/discover"), ("Experiences", "/experiences"), (i["name"], None)])}
-<div class="pagehead overture">
-  <p class="kicker">Travelling for</p>
-  <h1>{esc(i['name'])}</h1>
-  {statement(f"{len(cities)} of the {total} destinations in this atlas are tagged "
-             f"{i['name'].lower()}. {band}")}
-  <p class="orient">{pct}% of the atlas · {len(countries)} of
-  {len(data['countries'])} countries · {rank_phrase(rank, len(ranking))}</p>
-</div>
+{constel_defs()}
+{indexhero(
+    kicker="Travelling for",
+    title=esc(i["name"]),
+    lede=f"{len(cities)} of the {total} destinations in this atlas are tagged "
+         f"{esc(i['name'].lower())}. {band}",
+    art=art,
+    note=f"{pct}% of the atlas · {len(countries)} of {len(data['countries'])} "
+         f"countries · {rank_phrase(rank, len(ranking))}"
+         + (f'. Every destination carrying the tag, drawn on one frame so the '
+            f'seventeen can be compared. Coastline from '
+            f'<a href="/sources">Natural Earth</a>, public domain.'
+            + datacut_line() if cities else ""))}
 
-{grid(cards, 3) if cards else empty_state(
+{f'<div class="rows">{rows}</div>' if rows else empty_state(
       "No destination carries this tag yet.",
       "The tag exists in the taxonomy and the Journey Planner already weights "
       "it, so the moment a destination is written with it this page fills "
@@ -2967,7 +2997,7 @@ def interest_page(data, i, ranking):
   dataset on every build; the sentence about it comes from one published
   rule — over 40% barely narrows anything, 15–40% narrows usefully, under
   15% is genuinely narrow. The Journey Planner weights this same tag, so what
-  you see here is what it will build from.{cut}</p>
+  you see here is what it will build from.</p>
 </div>
 """
     return f"/interests/{slug}/index.html", page(
@@ -5886,11 +5916,21 @@ def fund_index(data):
     themes = {}
     for p in data["fund"]:
         themes.setdefault(p["theme"], []).append(p)
-    cards = [
-        card(urls.fund_project(p), data["countries"][p["country"]]["name"], p["name"], p["summary"],
-             seed="fund:" + p["slug"], meta=f'<p class="cardmeta">{esc(p["theme"])} · {esc(p["status"])}</p>')
-        for p in data["fund"]
-    ]
+    # TWELVE HASH-DRAWN LANDSCAPES ON THE PAGE THAT PROMISES NOTHING IS
+    # DECORATION. A fund project is a real thing in a real place — Saxon
+    # fortified churches in Transylvania, hay meadows in Maramureș — and a
+    # gradient generated from its slug says nothing about any of them. It is
+    # the same measurement that emptied the homepage, /journeys, /europe-in,
+    # the stories index and the seventeen interest pages, on the one page
+    # where a picture nobody chose sits beside the words "listed publicly,
+    # with the local partner named on each".
+    rows = "".join(
+        f'<a class="row" href="{urls.fund_project(p)}">'
+        f'<div><p class="kicker">{esc(data["countries"][p["country"]]["name"])}</p>'
+        f'<h3>{esc(p["name"])}</h3>'
+        f'<p class="rowsub">{esc(p["summary"])}</p></div>'
+        f'<p class="rowmeta">{esc(p["theme"])} · {esc(p["status"])}</p></a>'
+        for p in data["fund"])
     body = f"""
 {crumbs([("Europe", "/discover"), ("Fund", None)])}
 <div class="pagehead index">
@@ -5911,7 +5951,7 @@ def fund_index(data):
   <p class="small">Rationale and the full gate: <a href="/how-it-works">how it works</a>.</p>
 </div>
 
-{section(f"{len(data['fund'])} projects on the register", grid(cards, 3),
+{section(f"{len(data['fund'])} projects on the register", f'<div class="rows">{rows}</div>',
          lede="Chosen for being small enough that a travel platform could plausibly matter to them, and specific enough that you could go and look at the result.")}
 
 {section("The four themes", '<div class="grid cols-4">' + "".join(
@@ -7421,13 +7461,20 @@ def events_month_page(data, month):
 def quiet_page(data):
     quiet = [n for n in data["cities"].values() if n["city"].get("quiet")]
     quiet.sort(key=lambda n: (n["country"]["name"], n["city"]["name"]))
-    cards = [
-        card(urls.city(n["country"], n["region"], n["city"]),
-             f"{n['country']['name']} · {n['region']['name']}", n["city"]["name"], n["city"]["summary"],
-             seed=f"city:{n['country']['slug']}:{n['city']['slug']}",
-             motif=motif_for(n["city"]["interests"], n["city"].get("city_type")))
-        for n in quiet
-    ]
+    # ONE HUNDRED AND THIRTY ABSTRACT PLATES ON ONE PAGE, directly under a
+    # map whose whole argument is WHERE these places are. The map answers
+    # the question and the grid beneath it answered nothing: a hash-drawn
+    # landscape per destination, 130 of them, on the page that exists to say
+    # a Galician fishing town gets the same treatment as Paris. A
+    # destination here is chosen on where it is and what it is like, and
+    # neither of those is a look, which is the test a card has to pass.
+    rows = "".join(
+        f'<a class="row" href="{urls.city(n["country"], n["region"], n["city"])}">'
+        f'<div><h3>{esc(n["city"]["name"])}</h3>'
+        f'<p class="rowsub">{esc(n["city"]["summary"])}</p></div>'
+        f'<p class="rowmeta">{esc(n["country"]["name"])} · '
+        f'{esc(n["region"]["name"])}</p></a>'
+        for n in quiet)
     # THE ARGUMENT OF THIS PAGE IS A DISTRIBUTION, AND IT WAS PROSE.
     #
     # "Too many visitors in the same eleven places" is a claim about where
@@ -7473,7 +7520,7 @@ def quiet_page(data):
   instead.</p>
 </div>
 {quietmap}
-{section(f"{len(quiet)} places we would send you instead", grid(cards, 3),
+{section(f"{len(quiet)} places we would send you instead", f'<div class="rows">{rows}</div>',
          lede="Tagged quiet in the dataset: places with the goods and without the crowd. The tag is editorial and we will be wrong sometimes.")}
 {section("Six straight swaps", f'<div class="rows">{swaps}</div>',
          lede="Same idea, different pressure.")}

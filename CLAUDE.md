@@ -40,6 +40,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **changing anything visual — the protocol and the control** | **`docs/design-migration.md`** — §6. The pipeline, the invariant register as its control, and the three measured defects in the generated plates that are the next experiment's subject |
 | **the visual system — tokens, type, the two worlds, what is left** | **`docs/visual-architecture.md`** — §5, measured. The European Future migration as it actually landed, plus the fifteen deliberate attacks that went red |
 | **what each family's page is FOR — the nine questions, and where the door is deliberately absent** | **`docs/signature-moments.md`** — emotional promise, signature moment, geographic expression, hierarchy, interaction, aperture, imagery, data, and what is refused. Read before adding a map to a family |
+| **"what is left, and who is blocking it"** | **`docs/gap-assessment.md`** — written from the site's own instruments. The engineering is finished, the content is a third written, and almost every remaining gap is a photograph nobody has licensed or a page nobody has written |
 | **anything visual — layout, navigation, states, mobile** | **`docs/ux-specification.md`** — the 37-section design brief answered, including the seven things it asks for that this product will not do and why. **`docs/ux-audit.md`** is the generated evidence |
 
 ## The rules that catch people out
@@ -1961,6 +1962,36 @@ skylines were about 38% of them; measured across every destination they are
 three real defects no amount of code-reading would have — including a moon
 drawn behind a skyline and clipped into an unreadable glyph. Rendering finds
 defects; counting settles proportions.
+
+**Seventeen interest pages carried 728 abstract plates and the quiet index
+carried 130.** That is forty-three hash-drawn landscapes in a column on the
+average interest page, and a hundred and thirty in a grid directly under a map
+whose whole argument is WHERE those places are — the measurement that emptied
+the homepage, `/journeys`, `/europe-in` and the stories index, still shipping
+on the family that had the most of it. A destination on those pages is chosen
+on where it is and what it is like, and neither of those is a LOOK, which is
+the test a card has to pass. They are rows now, and the WHOLE set: the interest
+list used to stop at sixty with one sentence admitting it, and a row is cheap
+enough that there is no longer a reason to stop. Each interest page opens on
+its own tag drawn instead — every destination carrying it, unframed, so the
+seventeen can be compared. **`docs/signature-moments.md` refused a map on this
+family** on the grounds that the three largest tags would draw three identical
+maps of Europe: true of History, Food and Architecture, and exactly what the
+page already says in words, so the drawing agrees with the sentence rather than
+contradicting it. The refusal was about the DOOR, and it still holds — this is
+a glyph. 1,718 plates on 227 pages to 860 on 209.
+
+**The line is density, not the plate.** What remains is 3.9 plates on a country
+page, 5.4 on a month page and 5.6 on a macro region: four cards in a grid of
+like things is the case a card was designed for. The measured failure has
+always been eleven in a column or forty-three on a page, and the line moves the
+day photographs exist for destinations rather than before.
+
+**`docs/gap-assessment.md` is the standing answer to "what is left".** Written
+from the site's own instruments rather than from opinion, and it says the thing
+worth repeating: the engineering is finished and the content is a third
+written, so almost every remaining gap is a photograph nobody has licensed or a
+page nobody has written, and neither is solvable by more code.
 
 ## Gates
 

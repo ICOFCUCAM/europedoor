@@ -462,7 +462,26 @@ def measure():
                        "twelve rows carrying their own counts and their own "
                        "shoulder figure, and the fixtures and their category "
                        "filter moved to the month pages where a reader can "
-                       "reach them. 45 KB to 13."},
+                       "reach them. 45 KB to 13. "
+                       "AND THE PLATE PASS TOOK IT 0.223 TO 0.205, EIGHTEEN "
+                       "PAGES, ON PURPOSE. The seventeen interest pages "
+                       "carried 728 abstract plates between them, which is "
+                       "forty-three hash-drawn landscapes in a column on the "
+                       "average one, and /beyond-the-obvious carried 130 in "
+                       "a grid directly under a map whose whole argument is "
+                       "WHERE those places are. That is the measurement that "
+                       "emptied the homepage, /journeys, /europe-in and the "
+                       "stories index, still shipping on the family that had "
+                       "the most of it. A destination on those pages is "
+                       "chosen on where it is and what it is like, and "
+                       "neither of those is a LOOK, which is the test a card "
+                       "has to pass. They are rows now, and the WHOLE set: "
+                       "the interest list used to stop at sixty with one "
+                       "sentence admitting it, and a row is cheap enough "
+                       "that there is no longer a reason to stop. Each "
+                       "interest page opens on its own tag drawn instead, "
+                       "every destination carrying it on one unframed "
+                       "extent, so the seventeen can be compared."},
         },
     }
 
