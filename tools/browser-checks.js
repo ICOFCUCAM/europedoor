@@ -1165,10 +1165,32 @@ async function main() {
   // A LAYER ASSERTION THAT SAYS ONLY "IT IS VISIBLE" IS NOT A MEASUREMENT.
   // These two checks were red on the CI runner and green here for eighty-nine
   // runs, and the message carried no number, so every diagnosis of them was a
-  // theory about a browser nobody could look at. `layerState` reports what
-  // the page actually holds — the attributes, the computed display, the box
-  // and how many children are in the group — and the failures print it. The
-  // browser that disagrees now says what it sees.
+  // theory about a browser nobody could look at. Adding the state to the
+  // message answered it in one run:
+  //
+  //   computed-display=none  box=479x727  children=255
+  //
+  // THE LAYER WAS HIDDEN IN BOTH BROWSERS AND THE INSTRUMENT WAS WRONG.
+  // Playwright's isHidden() is "the element has an empty bounding box", and
+  // Chromium 131 returns the children's geometry for an SVG <g> whose
+  // computed display is none, where 141 returns a zero rect. So the suite
+  // asked a question about a BOX and reported it as a question about
+  // VISIBILITY, and the two browsers disagreed about the box while agreeing
+  // exactly about the drawing. Nothing was ever wrong with the map.
+  //
+  // Same shape as the map labels sized in viewBox units and read as pixels:
+  // the number was real and it was not the number the promise is about. The
+  // promise here is that the layer is not DRAWN, so the assertion reads the
+  // computed display, which is what decides that, and keeps the rest of the
+  // state in the message so the next disagreement is one run to diagnose
+  // rather than three.
+  const layerDrawn = (sel) => page.evaluate((s) => {
+    const el = document.querySelector(s);
+    if (!el) return false;
+    const cs = getComputedStyle(el);
+    return cs.display !== "none" && cs.visibility !== "hidden";
+  }, sel);
+
   const layerState = (sel) => page.evaluate((s) => {
     const el = document.querySelector(s);
     if (!el) return "absent";
@@ -1184,17 +1206,17 @@ async function main() {
     ].join(" ");
   }, sel);
 
-  ok(await page.locator("#places").isHidden(),
+  ok(!(await layerDrawn("#places")),
      `the places layer starts visible: ${await layerState("#places")}`);
   await page.check('#geolayers input[value="places"]');
-  ok(!(await page.locator("#places").isHidden()),
+  ok(await layerDrawn("#places"),
      `the places layer will not turn on: ${await layerState("#places")}`);
   await page.check('#geolayers input[value="regions"]');
   await page.waitForTimeout(120);
   const rlabels = await page.locator("#regions .rlabel").count();
   ok(rlabels > 10, `the regions layer drew ${rlabels} groupings`);
   await page.uncheck('#geolayers input[value="cities"]');
-  ok(await page.locator("#dots").isHidden(),
+  ok(!(await layerDrawn("#dots")),
      `the destinations layer will not turn off: ${await layerState("#dots")}`);
 
   // ── the country map ────────────────────────────────────────────────
