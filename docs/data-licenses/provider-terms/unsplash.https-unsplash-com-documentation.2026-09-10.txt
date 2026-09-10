@@ -1,0 +1,563 @@
+# https://unsplash.com/documentation
+# read 2026-09-10
+# saved by a person from a browser
+# sha256 of the text as saved: 3977fe6c7cceefcd74c59d282957e06a93e558039a1c66404b60bcabe9e1e438
+
+Unsplash Developers
+
+    Documentation
+    Dataset
+    API Status
+    API Changelog
+
+API Documentation
+
+    Getting started
+        Creating a developer account
+        Registering your application
+        Libraries & SDKs
+        Guidelines & Crediting
+        Hotlinking
+        Deprecation policy
+    Schema
+        Location
+        Version
+        HTTP verbs
+        Error messages
+    Authorization
+        Public authentication
+        User authentication
+        Dynamic client registration
+    Pagination
+        Pagination headers
+    Rate limiting
+    Dynamically resizable images
+        Supported Parameters
+        Example image use
+    BlurHash Placeholders
+    Content safety
+    Supported languages
+    Current user
+        Get the user's profile
+        Update the current user's profile
+    Users
+        Get a user's public profile
+        List a user's photos
+        List a user's collections
+        Get a user's statistics
+    Photos
+        List photos
+        Get a photo
+        Get a random photo
+        Get a photo's statistics
+        Track a photo download
+        Update a photo
+    Search
+        Search photos
+        Search collections
+        Search users
+    Collections
+        List collections
+        Get a collection
+        Get a collection's photos
+        List a collection's related collections
+        Create a new collection
+        Update an existing collection
+        Delete a collection
+        Add a photo to a collection
+        Remove a photo from a collection
+    Topics
+        List topics
+        Get a topic
+        Get a topic's photos
+    Stats
+        Totals
+        Month
+    Additional docs
+        User Authentication Workflow
+        Dynamic Client Registration
+
+Quick shortcuts
+Setting up an application
+
+Follow the instructions to register as a developer and then setup your application(s). When you're ready, you can apply for a higher rate limit, provided your application follows the guidelines.
+Jump to documentation
+Search photos by keyword
+
+Search using the most powerful image search API in the world, powered by tens of millions of community generated tags and advanced image recognition.
+Jump to documentation
+Get a random photo
+
+Hit this endpoint to populate your application with a random photo, narrowing the pool of randomized photos with optional parameters like search term, orientation, collection, or user.
+Jump to documentation
+List new photos
+
+Every day hundreds of new photos are released on Unsplash. Grab an always updating list of photos to give your users beautiful, fresh photo options.
+Jump to documentation
+Getting started
+
+This document describes the resources that make up the official Unsplash JSON API.
+
+If you have any problems or requests, please contact our API team.
+Creating a developer account
+
+To access the Unsplash API, first join.
+Registering your application
+
+Once your account has been registered for the API, go to your apps. Click "New Application", and fill in the required details.
+
+Initially, your application will be in demo mode and will be rate-limited to 50 requests per hour. This is perfect for demo apps, trying out the API, and for educational purposes.
+
+If ready to move to production mode, follow the 'Apply for Production' instructions. If approved, your rate limit will be increased to the full amount.
+
+All applications must follow the API Guidelines, including properly providing attribution for the photographer and Unsplash.
+
+For more on when to apply for rate limits, see our help center.
+Libraries & SDKs
+
+To make it as easy as possible to integrate the Unsplash API, official libraries and SDKs exist in:
+
+    PHP (unsplash/unsplash-php)
+    Ruby (unsplash/unsplash_rb)
+    Javascript (unsplash/unsplash-js)
+    iOS (unsplash/unsplash-photopicker-ios)
+    Android (unsplash/unsplash-photopicker-android)
+
+Guidelines & Crediting
+
+To use the API you must abide by the terms and follow the API guidelines.
+Hotlinking
+
+Unlike most APIs, we require the image URLs returned by the API to be directly used or embedded in your applications (generally referred to as hotlinking). By using our CDN and embedding the photo URLs in your application, we can better track photo views and pass those stats on to the photographer, providing them with context for how popular their photo is and how it's being used. For more:
+
+    refer to the guidelines on hotlinking
+    refer to the documentation on how to hotlink to resized images
+
+Deprecation policy
+
+We will announce if we intend to discontinue or make a backwards-incompatible change to the API. For all publicly documented fields and endpoints, we will announce any changes via the changelog with at least 3 weeks of notice. For endpoints, we will also return a Warning header during the deprecation period.
+
+For any non-publicly documented fields or endpoints, we may make changes to these with no warning. Therefore, we suggest only using the fields and endpoints that are identified in the documentation below.
+Schema
+OpenAPI specification
+
+A public OpenAPI specification is available for the Unsplash API.
+Location
+
+The API is available at https://api.unsplash.com/. Responses are sent as JSON.
+Version
+
+All requests receive the v1 version of the API. We encourage you to specifically request this via the Accept-Version header:
+
+Accept-Version: v1
+Summary objects
+
+When retrieving a list of objects, an abbreviated or summary version of that object is returned - i.e., a subset of its attributes. To get a full detailed version of that object, fetch it individually.
+HTTP Verbs
+
+The Unsplash API uses HTTP verbs appropriate to each action.
+Verb / Description
+GET / Retrieving resources.
+POST / Creating resources.
+PUT / Updating resources.
+DELETE / Deleting resources.
+Error messages
+
+If an error occurs, whether on the server or client side, the error message(s) will be returned in an errors array. For example:
+
+422 Unprocessable Entity
+
+{
+  "errors": ["Username is missing", "Password cannot be blank"]
+}
+
+We use conventional HTTP response codes to indicate the success or failure of an API request.
+
+In general, codes in the 2xx range indicate success. Codes in the 4xx range indicate an error that failed given the information provided (e.g., a required parameter was omitted, etc.). Codes in the 5xx range indicate an error with Unsplash's servers.
+Common Status Codes / Description
+200 - OK / Everything worked as expected
+400 - Bad Request / The request was unacceptable, often due to missing a required parameter
+401 - Unauthorized / Invalid Access Token
+403 - Forbidden / Missing permissions to perform request
+404 - Not Found / The requested resource doesn't exist
+500, 503 / Something went wrong on our end
+Authorization
+Public Authentication
+
+Most actions can be performed without requiring authentication from a specific user. For example, searching, fetching, or downloading a photo does not require a user to log in.
+
+To authenticate requests in this way, pass your application's access key via the HTTP Authorization header:
+
+Authorization: Client-ID YOUR_ACCESS_KEY
+
+You can also pass this value using a client_id query parameter:
+
+https://api.unsplash.com/photos/?client_id=YOUR_ACCESS_KEY
+
+Tip
+
+Most Unsplash API applications use this form of authentication as it doesn't require users to login or join, and it's generally cacheable by our system, resulting in even faster response times.
+
+If only your access key is sent, attempting to perform non-public actions that require user authorization will result in a 401 Unauthorized response.
+User Authentication
+
+If you're building an API application which requires that responses be customized per user (i.e. have they liked a photo, fetch their private collections, etc.) or requires taking actions on behalf of users, then you'll need to use the user authentication workflow to create individual user bearer tokens for authentication.
+
+For more information, see the user authentication workflow documentation.
+Dynamic Client Registration
+
+Following the OAuth dynamic client registration protocol, we support a special authorization flow that grants individual API keys to each user with a user-friendly sign up process.
+
+This or the use of a proxy is required for applications that are decentralized, like Wordpress or Ghost, where a single API key can't be shared between all installations.
+
+For more information, see the dynamic client registration documentation.
+Pagination
+
+Requests that return multiple items (a list of photos, for example) will be paginated into pages of 10 items by default, up to a maximum of 30. The optional page and per_page query parameters can be supplied to define which page and the number of items per page to be returned, respectively.
+
+If page is not supplied, the first page will be returned.
+Pagination headers
+
+Additional pagination information is returned in the response headers:
+Per-page and Total
+
+The X-Per-Page and X-Total headers give the number of elements returned on each page and the total number of elements respectively.
+Link
+
+URL's for the first, last, next, and previous pages are supplied, if applicable. They are comma-separated and differentiated with a rel attribute.
+
+For example, after requesting page 3 of the photo list:
+
+Link: <https://api.unsplash.com/photos?page=1>; rel="first",
+<https://api.unsplash.com/photos?page=2>; rel="prev",
+<https://api.unsplash.com/photos?page=346>; rel="last",
+<https://api.unsplash.com/photos?page=4>; rel="next"
+
+Rate Limiting
+
+For applications in demo mode, the Unsplash API currently places a limit of 50 requests per hour. After approval for production, this limit is increased to 1000 requests per hour. On each request, your current rate limit status is returned in the response headers:
+
+X-Ratelimit-Limit: 1000
+X-Ratelimit-Remaining: 999
+
+Note that only the json requests (i.e., those to api.unsplash.com) are counted. Image file requests (images.unsplash.com) do not count against your rate limit.
+
+If you think you'll need a higher rate limit, contact us.
+Dynamically resizable images
+
+Every image returned by the Unsplash API is a dynamic image URL, which means that it can be manipulated to create new transformations of the image by simply adjusting the query parameters of the image URL.
+
+This enables resizing, cropping, compression, and changing the format of the image in realtime client-side, without any API calls.
+
+Under the hood, Unsplash uses Imgix, a powerful image manipulation service to provide dynamic image URLs.
+Supported parameters
+
+We officially support the parameters:
+
+    w, h: for adjusting the width and height of a photo
+    crop: for applying cropping to the photo
+    fm: for converting image format
+    auto=format: for automatically choosing the optimal image format depending on user browser
+    q: for changing the compression quality when using lossy file formats
+    fit: for changing the fit of the image within the specified dimensions
+    dpr: for adjusting the device pixel ratio of the image
+
+The other parameters offered by Imgix can be used, but we don't officially support them and may remove support for them at any time in the future.
+Tip
+
+The API returns image URLs containing an ixid parameter. All resizing and manipulations of image URLs must keep this parameter as it allows for your application to report photo views and be compliant with the API Guidelines.
+Example image use
+
+If you hit the /photos endpoint, you'll retrieve a list of photos. For each photo object returned, a list of image URLs are returned under urls.*:
+
+{
+  "urls": {
+     "raw": "https://images.unsplash.com/photo-1461988320302-91bde64fc8e4?ixid=2yJhcHBfaWQiOjEyMDd9",
+     "full": "https://images.unsplash.com/photo-1461988320302-91bde64fc8e4?ixid=2yJhcHBfaWQiOjEyMDd9&fm=jpg&q=80",
+     "regular": "https://images.unsplash.com/photo-1461988320302-91bde64fc8e4?ixid=2yJhcHBfaWQiOjEyMDd9&fm=jpg&fit=crop&w=1080&q=80&fit=max",
+     "small": "https://images.unsplash.com/photo-1461988320302-91bde64fc8e4?ixid=2yJhcHBfaWQiOjEyMDd9&&fm=jpg&w=400&fit=max",
+     "thumb": "https://images.unsplash.com/photo-1461988320302-91bde64fc8e4?ixid=2yJhcHBfaWQiOjEyMDd9&fm=jpg&w=200&fit=max"
+  },
+  // ... other photo fields
+}
+
+    full returns the photo in jpg format with its maximum dimensions. For performance purposes, we don't recommend using this as the photos will load slowly for your users.
+    regular returns the photo in jpg format with a width of 1080 pixels.
+    small returns the photo in jpg format with a width of 400 pixels.
+    thumb returns the photo in jpg format with a width of 200 pixels.
+    raw returns a base image URL with just the photo path and the ixid parameter for your API application. Use this to easily add additional image parameters to construct your own image URL.
+
+If your application needs an image with a width of 1500px and DPR of 2, take the raw URL and add the w=1500 and dpr=2 parameters to create a new image:
+
+photo.urls.raw + "&w=1500&dpr=2";
+
+If another part of your application needs that same image, but at half the width, you can easily construct another URL without hitting the API again:
+
+photo.urls.raw + "&w=750&dpr=2";
+
+For more, see Imgix's docs.
+BlurHash Placeholders
+
+All photo objects returned by the Unsplash API include a blur_hash string. This is a very compact representation of an image placeholder which can be used to display a blurred preview before the real image loads.
+
+Find out more about BlurHash and how to implement it on your application on its official page.
+Content safety
+
+By default, endpoints set the content_filter to low, which guarantees that no content violating our submission guidelines (like images containing nudity or violence) will be returned in results.
+
+To give you flexibility in filtering content further, set the content_filter to high (on endpoints that support it) to further remove content that may be unsuitable for younger audiences. Note that we can't guarantee that all potentially unsuitable content is removed.
+Supported Languages
+
+We're currently testing support for non-english languages on search endpoints. To access the beta, email api@unsplash.com with your application ID.
+
+Current User
+Get the user's profile
+
+GET /me
+
+Note: To access a user's private data, the user is required to authorize the read_user scope.
+
+Note: Without a Bearer token (i.e. using a Client-ID token) this request will return a 401 Unauthorized response.
+
+Update the current user's profile
+
+PUT /me
+
+Note: This action requires the write_user scope. Without it, it will return a 403 Forbidden response.
+
+Users
+Link relations
+
+Users have the following link relations:
+rel / Description
+self / API location of this user.
+html / HTML location of this user.
+photos / API location of this user's photos.
+portfolio / API location of this user's external portfolio.
+followers / API location of this user's followers.
+following / API location of users this user is following.
+Get a user's public profile
+
+Retrieve public details on a given user.
+
+GET /users/:username
+
+List a user's photos
+
+Get a list of photos uploaded by a user.
+
+GET /users/:username/photos
+
+Note: See the note on hotlinking.
+
+List a user's collections
+
+Get a list of collections created by the user.
+
+GET /users/:username/collections
+
+Get a user's statistics
+
+Retrieve the consolidated number of downloads, views and likes of all user's photos, as well as the historical breakdown and average of these stats in a specific timeframe (default is 30 days).
+
+GET /users/:username/statistics
+
+Photos
+Link relations
+
+Photos have the following link relations:
+rel / Description
+self / API location of this photo.
+html / HTML location of this photo.
+download / Download location of this photo.
+List photos
+
+Get a single page from the Editorial feed.
+
+GET /photos
+
+Note: See the note on hotlinking.
+
+Get a photo
+
+Retrieve a single photo.
+
+GET /photos/:id
+
+Note: See the note on hotlinking.
+
+Get a random photo
+
+Retrieve a single random photo, given optional filters.
+
+GET /photos/random
+
+Note: See the note on hotlinking.
+
+Get a photo's statistics
+
+Retrieve total number of downloads, views and likes of a single photo, as well as the historical breakdown of these stats in a specific timeframe (default is 30 days).
+
+GET /photos/:id/statistics
+
+Track a photo download
+
+To abide by the API guidelines, you need to trigger a GET request to this endpoint every time your application performs a download of a photo. To understand what constitutes a download, please refer to the 'Triggering a download' guideline.
+
+This is purely an event endpoint used to increment the number of downloads a photo has. You can think of it very similarly to the pageview event in Google Analytics—where you're incrementing a counter on the backend. This endpoint is not to be used to embed the photo (use the photo.urls.* properties instead) or to direct the user to the downloaded photo (use the photo.urls.full instead), it is for tracking purposes only.
+
+Note: This is different than the concept of a view, which is tracked automatically when you hotlink an image
+
+GET /photos/:id/download
+
+Parameters
+param / Description
+id / The photo's ID. Required.
+Response
+
+200 OK
+X-Ratelimit-Limit: 1000
+X-Ratelimit-Remaining: 999
+
+{
+  "url": "https://image.unsplash.com/example"
+}
+
+Update a photo
+
+Update a photo on behalf of the logged-in user. This requires the write_photos scope.
+
+PUT /photos/:id
+
+Search
+Search photos
+
+Get a single page of photo results for a query.
+
+GET /search/photos
+
+Note: See the note on hotlinking.
+
+Search collections
+
+Get a single page of collection results for a query.
+
+GET /search/collections
+
+Search users
+
+Get a single page of user results for a query.
+
+GET /search/users
+
+Collections
+Link relations
+
+Collections have the following link relations:
+rel / Description
+self / API location of this collection.
+html / HTML location of this collection.
+photos / API location of this collection's photos.
+related / API location of this collection's related collections.
+List collections
+
+Get a single page from the list of all collections.
+
+GET /collections
+
+Get a collection
+
+Retrieve a single collection. To view a user's private collections, the read_collections scope is required.
+
+GET /collections/:id
+
+Note: See the note on hotlinking.
+
+Get a collection's photos
+
+Retrieve a collection's photos.
+
+GET /collections/:id/photos
+
+Note: See the note on hotlinking.
+
+List a collection's related collections
+
+Retrieve a list of collections related to this one.
+
+GET /collections/:id/related
+
+Create a new collection
+
+Create a new collection. This requires the write_collections scope.
+
+POST /collections
+
+Update an existing collection
+
+Update an existing collection belonging to the logged-in user. This requires the write_collections scope.
+
+PUT /collections/:id
+
+Delete a collection
+
+Delete a collection belonging to the logged-in user. This requires the write_collections scope.
+
+DELETE /collections/:id
+
+Add a photo to a collection
+
+Add a photo to one of the logged-in user's collections. Requires the write_collections scope.
+
+POST /collections/:collection_id/add
+
+Remove a photo from a collection
+
+Remove a photo from one of the logged-in user's collections. Requires the write_collections scope.
+
+DELETE /collections/:collection_id/remove
+
+Topics
+Link relations
+
+Topics have the following link relations:
+rel / Description
+self / API location of this topic.
+html / HTML location of this topic.
+photos / API location of this topic's photos.
+List topics
+
+Get a single page from the list of all topics.
+
+GET /topics
+
+Note: See the note on hotlinking.
+
+Get a topic
+
+Retrieve a single topic.
+
+GET /topics/:id_or_slug
+
+Note: See the note on hotlinking.
+
+Get a topic's photos
+
+Retrieve a topic's photos.
+
+GET /topics/:id_or_slug/photos
+
+Note: See the note on hotlinking.
+
+Stats
+Totals
+
+Get a list of counts for all of Unsplash.
+
+GET /stats/total
+
+Month
+
+Get the overall Unsplash stats for the past 30 days.
+
+GET /stats/month

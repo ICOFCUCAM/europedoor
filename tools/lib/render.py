@@ -16,6 +16,7 @@ import hashlib
 import html
 import json
 import os
+from urllib.parse import urlsplit
 
 from .i18n import Strings
 
@@ -707,7 +708,32 @@ def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed
     def srcset(ext):
         return ", ".join(f"{base}-{n}.{ext} {n}w" for n in IMAGE_WIDTHS)
 
-    credit = row["photographer"]
+    # THE CREDIT IS WHAT THE PROVIDER'S TERMS REQUIRE, AND IT IS DERIVED.
+    # Pexels' API guidelines ask for two things and the first version of this
+    # printed neither: "Whenever you are doing an API request make sure to
+    # show a prominent link to Pexels" and "Always credit our photographers
+    # when possible (e.g. 'Photo by John Doe on Pexels' with a link to the
+    # photo page on Pexels)". It printed `photographer · licence`, plain text,
+    # no link anywhere — so the pipeline would have published its first
+    # photograph in breach of the terms it was fetched under.
+    #
+    # The gate's own question said this: "if a link to the provider or to the
+    # photographer's profile or specific wording is required, the renderer
+    # changes BEFORE the first fetch, not after". This is that change, made
+    # while the register is still empty.
+    #
+    # Both targets come from the register row rather than from a table of
+    # providers here: `source` is the photo's own page, required and checked
+    # to be https, and the provider link is the ORIGIN of `licence_url`, so
+    # https://www.pexels.com/license/ gives https://www.pexels.com — the
+    # example the guideline itself uses. Nothing is authored per provider,
+    # which is what keeps a second provider from needing a second renderer.
+    parts = urlsplit(row["licence_url"])
+    provider_url = f"{parts.scheme}://{parts.netloc}"
+    link = ' rel="noopener" target="_blank"'
+    credit = (f'Photo by <a href="{esc(row["source"])}"{link}>'
+              f'{esc(row["photographer"])}</a> on '
+              f'<a href="{esc(provider_url)}"{link}>{esc(row["licence"])}</a>')
     return (
         f"<picture>"
         f'<source type="image/avif" srcset="{esc(srcset("avif"))}" sizes="{esc(sizes)}">'
@@ -717,7 +743,7 @@ def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed
         f'loading="{"eager" if eager else "lazy"}" '
         f'fetchpriority="{"high" if eager else "auto"}" decoding="async" '
         f'class="photo {focal_class(fx, fy)}">'
-        f'<figcaption class="credit">{esc(credit)} · {esc(row["licence"])}</figcaption>'
+        f'<figcaption class="credit">{credit}</figcaption>'
         f"</picture>"
     )
 

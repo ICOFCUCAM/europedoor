@@ -1,0 +1,266 @@
+# https://www.pexels.com/api/documentation/
+# read 2026-09-10
+# saved by a person from a browser
+# sha256 of the text as saved: eb0b08d0b05167b124981bb45ce136e24b465d487feb3c182062e804ea648590
+
+Introduction
+
+The Pexels API enables programmatic access to the full Pexels content library, including photos, videos. All content is available free of charge, and you are welcome to use Pexels content for anything you'd like, as long as it is within our Title.
+
+The Pexels API is a RESTful JSON API, and you can interact with it from any language or framework with a HTTP library. Alternately, Pexels maintains some official Title you can use.
+
+If you have any questions, please visit our Help Center for answers and troubleshooting.
+
+Note: Video endpoints are now available at https://api.pexels.com/v1/videos/. The https://api.pexels.com/videos/ endpoints will be deprecated in the future, please update your code to use the new path.
+
+Guidelines
+
+Whenever you are doing an API request make sure to show a prominent link to Pexels. You can use a text link (e.g. "Photos provided by Pexels") or a link with our logo.
+
+Always credit our photographers when possible (e.g. "Photo by John Doe on Pexels" with a link to the photo page on Pexels).
+
+You may not copy or replicate core functionality of Pexels (including making Pexels content available as a wallpaper app).
+
+Do not abuse the API. By default, the API is rate-limited to 200 requests per hour and 20,000 requests per month. You may contact us to request a higher limit, but please include examples, or be prepared to give a demo, that clearly shows your use of the API with attribution. If you meet our API terms, you can get unlimited requests for free.
+
+Abuse of the Pexels API, including but not limited to attempting to work around the rate limit, will lead to termination of your API access.
+
+Linking back to Pexels
+
+<a href="https://www.pexels.com">Photos provided by Pexels</a>
+
+<!-- or show our white logo -->
+
+<a href="https://www.pexels.com">
+  <img src="https://images.pexels.com/lib/api/pexels-white.png" />
+</a>
+
+<!-- or show our black logo -->
+
+<a href="https://www.pexels.com">
+  <img src="https://images.pexels.com/lib/api/pexels.png" />
+</a>
+
+Linking back to a Photo
+
+This <a href="https://www.pexels.com/photo/food-dinner-lunch-meal-4147875">Photo</a> was taken by <a href="https://www.pexels.com/@daria">Daria</a> on Pexels.
+
+Client Libraries
+
+Pexels maintains a number of official API client libraries that you can use to interact with the Pexels API:
+Language / Package / Github / Changelog / Version
+Ruby / rubygems / pexels-ruby / changelog / 0.3.0
+Javascript / npm / pexels-javascript / changelog / 1.2.1
+.net / nuget / PexelsDotNetSDK / changelog / 1.0.6
+
+Please read the documentation for the client library you'd like to use for more information about syntax (code samples for each library are available on this documentation). Issues and Pull Requests on Github are also welcome!
+
+If you have created an unofficial Pexels API library for a different language please feel free to let us know about it!
+
+Authorization
+
+Authorization is required for the Pexels API. Anyone with a Pexels account can request an API key, which you will receive instantly.
+
+All requests you make to the API will need to include your key. This is provided by adding an Authorization header.
+
+Example of Authorization
+
+curl -H "Authorization: YOUR_API_KEY" \
+  "https://api.pexels.com/v1/search?query=people"
+
+Request Statistics
+
+To see how many requests you have left in your monthly quota, successful requests from the Pexels API include three HTTP headers:
+Response Header / Meaning
+X-Ratelimit-Limit / Your total request limit for the monthly period
+X-Ratelimit-Remaining / How many of these requests remain
+X-Ratelimit-Reset / UNIX timestamp of when the currently monthly period will roll over
+
+Note: These response headers are only returned on successful (2xx) responses. They are not included with other responses, including 429 Too Many Requests, which indicates you have exceeded your rate limit. Please be sure to keep track of X-Ratelimit-Remaining and X-Ratelimit-Reset in order to manage your request limit.
+
+Example of Rate Limit Headers
+
+X-Ratelimit-Limit: 20000
+X-Ratelimit-Remaining: 19684
+X-Ratelimit-Reset: 1590529646
+
+Pagination
+
+Most Pexels API requests return multiple records at once. All of these endpoints are paginated, and can return a maximum of 80 requests at one time. Each paginated request accepts the same parameters and returns the same pagination data in the response.
+
+Note: The prev_page and next_page response attributes will only be returned if there is a corresponding page.
+
+Pagination Request Parameters
+
+GET https://api.pexels.com/v1/curated?page=2&per_page=40
+
+Pagination Response Attributes
+
+{
+  "page": 2,
+  "per_page": 40,
+  "total_results": 8000,
+  "next_page": "https://api.pexels.com/v1/curated?page=3&per_page=40",
+  "prev_page": "https://api.pexels.com/v1/curated?page=1&per_page=40"
+}
+
+The Photo Resource
+
+The Photo resource is a JSON formatted version of a Pexels photo. The Photo API endpoints respond with the photo data formatted in this shape.
+
+Response
+
+id integer - The id of the photo.
+width integer - The real width of the photo in pixels.
+height integer - The real height of the photo in pixels.
+url string - The Pexels URL where the photo is located.
+photographer string - The name of the photographer who took the photo.
+photographer_url string - The URL of the photographer's Pexels profile.
+photographer_id integer - The id of the photographer.
+avg_color string - The average color of the photo. Useful for a placeholder while the image loads.
+src object - An assortment of different image sizes that can be used to display this Photo.
+alt string - Text description of the photo for use in the alt attribute.
+
+The Photo Resource
+
+{
+  "id": 2014422,
+  "width": 3024,
+  "height": 3024,
+  "url": "https://www.pexels.com/photo/brown-rocks-during-golden-hour-2014422/",
+  "photographer": "Joey Farina",
+  "photographer_url": "https://www.pexels.com/@joey",
+  "photographer_id": 680589,
+  "avg_color": "#978E82",
+  "src": {
+    "original": "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg",
+    "large2x": "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "large": "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+    "medium": "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg?auto=compress&cs=tinysrgb&h=350",
+    "small": "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg?auto=compress&cs=tinysrgb&h=130",
+    "portrait": "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1200&w=800",
+    "landscape": "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+    "tiny": "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg?auto=compress&cs=tinysrgb&dpr=1&fit=crop&h=200&w=280"
+  },
+  "liked": false,
+  "alt": "Brown Rocks During Golden Hour"
+}
+
+Search for Photos
+GET https://api.pexels.com/v1/search
+
+This endpoint enables you to search Pexels for any topic that you would like. For example your query could be something broad like Nature, Tigers, People. Or it could be something specific like Group of people working.
+
+Parameters
+
+query string | required - The search query. Ocean, Tigers, Pears, etc.
+orientation string | optional - Desired photo orientation. The current supported orientations are: landscape, portrait or square.
+size string | optional - Minimum photo size. The current supported sizes are: large(24MP), medium(12MP) or small(4MP).
+color string | optional - Desired photo color. Supported colors: red, orange, yellow, green, turquoise, blue, violet, pink, brown, black, gray, white or any hexidecimal color code (eg. #ffffff).
+locale string | optional - The locale of the search you are performing.
+page integer | optional - The page number you are requesting. Default: 1
+per_page integer | optional - The number of results you are requesting per page. Default: 15 Max: 80
+
+Response
+
+photos array of Photo - An array of Photo objects.
+page integer - The current page number.
+per_page integer - The number of results returned with each page.
+total_results integer - The total number of results for the request.
+prev_page string | optional - URL for the previous page of results, if applicable.
+next_page string | optional - URL for the next page of results, if applicable.
+
+Example Request
+
+curl -H "Authorization: YOUR_API_KEY" \
+  "https://api.pexels.com/v1/search?query=nature&per_page=1"
+
+Curated Photos
+GET https://api.pexels.com/v1/curated
+
+This endpoint enables you to receive real-time photos curated by the Pexels team.
+
+We add at least one new photo per hour to our curated list so that you always get a changing selection of trending photos.
+
+Get a Photo
+GET https://api.pexels.com/v1/photos/:id
+
+Retrieve a specific Photo from its id.
+
+Parameters
+
+id integer | required - The id of the photo you are requesting.
+
+Response
+
+Returns a Photo object
+
+Example Request
+
+curl -H "Authorization: YOUR_API_KEY" \
+  "https://api.pexels.com/v1/photos/2014422"
+
+The Video Resource
+
+The Video resource is a JSON formatted version of a Pexels video. The Video API endpoints respond with the video data formatted in this shape.
+
+Search for Videos
+GET https://api.pexels.com/v1/videos/search
+
+Popular Videos
+GET https://api.pexels.com/v1/videos/popular
+
+Get a Video
+GET https://api.pexels.com/v1/videos/videos/:id
+
+Overview
+
+Pexels Collections are a way to group specific photos and videos into one unified gallery. This can be useful if, for example, you want to expose a specific subset of Pexels content to your users. You can access all your collections and the media within them via the Pexels API.
+
+Note: Collections cannot be created or modified using the Pexels API. Rather, you can manage your collections on the Pexels website, iOS or Android app. API only gives you access to featured collections and your own collections.
+
+The Collection Resource
+
+Featured Collections
+GET https://api.pexels.com/v1/collections/featured
+
+My Collections
+GET https://api.pexels.com/v1/collections
+
+Collection Media
+GET https://api.pexels.com/v1/collections/:id
+
+Changelog
+
+This is a list of major changes to the Pexels API.
+
+2023-11-22
+    Added sort query parameter to the /collections/:id endpoint.
+
+2022-09-15
+    Added video_file.fps attribute for the Video resource.
+
+2021-12-14
+    Added alt attribute to the Photo resource.
+    Added previously-exposed liked attribute to the Photo responses.
+
+2021-09-13
+    Updated image attribute for the Video resource to use the correct orientation.
+    Updated video_picture.picture attribute for the Video resource to use the correct orientation.
+
+2021-08-12
+    Added Featured Collections endpoint.
+    Updated /collections/:id. Returns a collection if the collection is featured or belongs to the authenticated user.
+
+2021-04-19
+    Added Collections resource and endpoints.
+
+2020-12-11
+    Added avg_color attribute to the Photo resource.
+
+2020-11-12
+    Added orientation, size and color filters to Photo Search.
+    Added orientation and size filters to Video Search.
+
+2020-05-28
+    Initial version of this documentation.

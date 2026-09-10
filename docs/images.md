@@ -105,6 +105,53 @@ So the remaining route is a person:
 A hand-saved page works exactly like a fetched one, because the check reads
 the archive rather than the fetcher.
 
+## What the terms actually said, read on 2026-09-10
+
+All five pages were opened in a browser and archived under
+`docs/data-licenses/provider-terms/`. Both providers refuse an automated
+request, so a person read them; the archives say so in their own headers.
+
+**Pexels is usable and the credit is not what the licence page implies.** The
+licence page says attribution is not required. The **API documentation** says
+something else for anyone fetching through the API, which is how this pipeline
+fetches:
+
+> Whenever you are doing an API request make sure to show a prominent link to
+> Pexels. […] Always credit our photographers when possible (e.g. "Photo by
+> John Doe on Pexels" with a link to the photo page on Pexels).
+
+Two documents, both true, and the narrower one binds. `picture()` renders
+`Photo by <photographer> on Pexels` with the name linked to the photo's page
+and "Pexels" linked to pexels.com — derived from the register row, not from a
+table of providers, so a second provider needs no second renderer. It prints
+no download ping because the guidelines enumerate the obligations and none is
+an event, which is recorded as the `basis` for that negative.
+
+**Unsplash is REFUSED, and the suspicion on record turned out to be right.**
+Its API guidelines require hotlinking:
+
+> All API uses must use the hotlinked image URLs returned by the API under the
+> `photo.urls` properties. This applies to all uses of the image and not just
+> search results.
+
+This site sends `img-src 'self' data:` and a check refuses any third-party
+origin on any page. Honouring that means opening the Content-Security-Policy
+on all 1,033 pages to a host we do not control — **a decision about the
+security posture of the whole site, and the owner's, not a build step.** The
+row is answered, `usable` is false, the reason is recorded, and `fetch.py`
+refuses the provider by name with that reason.
+
+Unsplash also requires a download event on
+`photo.links.download_location`, and attribution naming both the photographer
+and Unsplash with a link to the photographer's profile carrying utm
+parameters. All three are recorded against their quotes, so if the CSP
+question is ever answered, what the code owes is already written down.
+
+**Answered is not the same as permitted**, and the gate had no way to say so:
+its first version failed the build on any `self_host` that was not true, which
+turns "we read the terms and they forbid this" into a red CI run forever.
+`usable` is the distinction.
+
 ## Until then: the plates
 
 Every surface without a photograph gets a generated plate — a small landscape

@@ -96,13 +96,34 @@ def cleared(slug):
         return False, (f"{slug} has no row in docs/data-licenses/"
                        f"photo-providers.json — the licence is not written "
                        f"down, so nothing is fetched")
+    # THIS READ THE FACT AND NOT ITS VALUE, AND HAD BEEN DEAD SINCE THE GATE
+    # STARTED ASKING FOR A QUOTE. Each fact became {value, quote, source} in
+    # the commit that made the gate demand the sentence, and this kept
+    # comparing the whole object to the string "UNANSWERED" — so `unanswered`
+    # was always empty and this branch never ran. What actually held the gate
+    # was the line below it: a dict is not True, so every provider was refused
+    # with a message about the CSP whatever was wrong. Refused for the wrong
+    # reason is not the same as refused, because the reason is the thing
+    # somebody acts on.
+    def value(k):
+        f = row.get(k)
+        return f.get("value") if isinstance(f, dict) else f
+
     unanswered = [k for k in ("self_host", "attribution", "download_ping")
-                  if row.get(k) in (None, "", "UNANSWERED")]
+                  if value(k) in (None, "", "UNANSWERED")]
     if unanswered:
         return False, (f"{slug}: {', '.join(unanswered)} unanswered in the "
                        f"licence gate. Read the provider's terms and answer "
                        f"them; do not answer them from memory")
-    if row["self_host"] is not True:
+    # ANSWERED IS NOT THE SAME AS PERMITTED. Reading a provider's terms and
+    # finding they forbid what this site does is the gate working; `usable`
+    # records which of the two happened, and REFUSING here is what stops the
+    # refusal being a comment in a JSON file.
+    if row.get("usable") is not True:
+        return False, (f"{slug}: the licence gate is answered and this "
+                       f"provider is REFUSED. "
+                       + (row.get("unusable_because") or "no reason recorded"))
+    if value("self_host") is not True:
         return False, (f"{slug}: self_host is not true. This site serves "
                        f"`img-src 'self' data:` and refuses a third-party "
                        f"origin, so a hotlink-only provider needs an owner "

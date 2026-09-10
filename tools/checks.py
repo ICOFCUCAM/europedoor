@@ -724,6 +724,22 @@ def c_csp():
         os.path.join(ROOT, "data", "stay.json")) else {"providers": []}
     allowed_hosts = {p["host"] for p in stayreg.get("providers", [])
                      if p.get("enabled")}
+    # A CREDIT IS A SECOND KIND OF OUTBOUND LINK AND IT IS NOT COMMERCIAL.
+    # Pexels' API guidelines require "a prominent link to Pexels" and the
+    # photographer credited "with a link to the photo page on Pexels" — an
+    # obligation of the licence, not a referral. So those hosts are allowed
+    # too, pinned to the licence gate exactly as the commercial ones are
+    # pinned to the Stay registry, and they take the opposite rule on
+    # `sponsored`: a link we are REQUIRED to publish must not be dressed as
+    # one we are paid for.
+    gatef = os.path.join(ROOT, "docs", "data-licenses", "photo-providers.json")
+    credit_hosts = set()
+    if os.path.exists(gatef):
+        for slug, prow in json.load(open(gatef, encoding="utf-8")).items():
+            if slug.startswith("$") or prow.get("usable") is not True:
+                continue
+            for u in prow.get("terms_urls", []):
+                credit_hosts.add(u.split("/")[2])
     if not allowed_hosts:
         # Not a failure: it is the state this site was in for its whole life
         # before the Stay layer, and the assertion below is then simply
@@ -748,6 +764,21 @@ def c_csp():
                 continue
             attrs = m.group(1) + m.group(3)
             host = url.split("/")[2]
+            if host in credit_hosts and host not in allowed_hosts:
+                rel = re.search(r'rel="([^"]*)"', attrs)
+                relv = rel.group(1) if rel else ""
+                n += 1
+                if "noopener" not in relv:
+                    fail(f"{os.path.relpath(f, OUT)}: credit link to {host} "
+                         f"has rel={relv!r}, missing 'noopener'")
+                if "sponsored" in relv:
+                    fail(f"{os.path.relpath(f, OUT)}: credit link to {host} "
+                         f"claims rel=sponsored. It is a licence obligation "
+                         f"and nobody is paying for it")
+                if 'target="_blank"' not in attrs:
+                    fail(f"{os.path.relpath(f, OUT)}: credit link to {host} "
+                         f"does not open in a new tab")
+                continue
             if host not in allowed_hosts:
                 fail(f"{os.path.relpath(f, OUT)}: links out to {host}, which is "
                      f"not an enabled provider in data/stay.json — an outbound "
@@ -1007,15 +1038,64 @@ def c_photo_gate():
                      f"cites. Either the terms changed, or the quote was typed "
                      f"from memory. Re-read the page")
 
+        # A NEGATIVE CANNOT BE PROVED BY A QUOTE. Every other answer here is
+        # backed by a sentence that says the thing; "no download event is
+        # required" is backed by the ABSENCE of such a sentence, and no quote
+        # can show an absence. The evidence for it is that some passage
+        # enumerates the obligations completely — so a `false` must say, in
+        # `basis`, what makes the omission conclusive, and the quote it cites
+        # is the passage that does the enumerating. Otherwise the honest
+        # answer to "is a ping required" is UNANSWERED.
+        for fact in FACTS:
+            f = row[fact]
+            if f.get("value") is False:
+                n += 1
+                if not (f.get("basis") or "").strip():
+                    fail(f"{slug}.{fact}: answered `false` with no `basis`. A "
+                         f"quote shows what a page says and never what it "
+                         f"omits, so a negative needs the reason its silence "
+                         f"is conclusive written down beside it")
+
         # 3. What a cleared answer obliges the code to do.
-        if row["self_host"]["value"] is not True:
-            fail(f"{slug}: self_host is cleared as {row['self_host']['value']!r}. "
-                 f"This site serves `img-src 'self' data:` and refuses a "
-                 f"third-party origin, so a hotlink-only provider needs an "
-                 f"owner decision that changes the CSP and that check")
-        if row["download_ping"]["value"] is True and not row.get("endpoint_download"):
-            fail(f"{slug}: a download event is required and no "
-                 f"`endpoint_download` is set, so nothing would call it")
+        #
+        # ANSWERING THE GATE AND BEING ABLE TO USE THE PROVIDER ARE TWO
+        # DIFFERENT THINGS, and the first version conflated them: any answer
+        # to self_host other than True failed the build. That is right about
+        # the consequence and wrong about the event — reading the terms and
+        # finding they forbid what this site does is the gate WORKING, and it
+        # must be recordable without leaving CI red forever.
+        #
+        # Unsplash is the live case. Its API guidelines require hotlinking:
+        # "All API uses must use the hotlinked image URLs returned by the API
+        # under the `photo.urls` properties." This site serves
+        # `img-src 'self' data:` and a check refuses any third-party origin,
+        # so honouring that means opening the CSP on all 1,033 pages — an
+        # owner decision about the security posture of the whole site, not a
+        # build step. So the row is answered, `usable` is false, the reason is
+        # recorded, and fetch.py refuses it.
+        usable = row.get("usable")
+        if usable is None:
+            fail(f"{slug}: answered and does not say whether it is `usable`. "
+                 f"A cleared gate is a reading of the terms, not permission "
+                 f"to fetch — say which")
+        elif usable is False:
+            if not (row.get("unusable_because") or "").strip():
+                fail(f"{slug}: marked unusable with no `unusable_because`. A "
+                     f"refusal nobody can read is one somebody will quietly "
+                     f"reverse")
+            if f'"{slug}"' in src and "REFUSE" not in src.upper():
+                fail(f"{slug}: marked unusable and fetch.py has no refusal "
+                     f"in it — the gate would be a comment")
+        else:
+            if row["self_host"]["value"] is not True:
+                fail(f"{slug}: usable with self_host cleared as "
+                     f"{row['self_host']['value']!r}. This site serves "
+                     f"`img-src 'self' data:` and refuses a third-party "
+                     f"origin, so a hotlink-only provider needs an owner "
+                     f"decision that changes the CSP and that check")
+            if row["download_ping"]["value"] is True and not row.get("endpoint_download"):
+                fail(f"{slug}: a download event is required and no "
+                     f"`endpoint_download` is set, so nothing would call it")
 
     # 4. No credential, anywhere near this.
     keyish = re.compile(r"[A-Za-z0-9_-]{40,}")
@@ -1027,8 +1107,21 @@ def c_photo_gate():
             continue
         body = open(f, encoding="utf-8").read()
         n += 1
+        archive_names = set(os.listdir(archive)) if os.path.isdir(archive) else set()
+        stems = {n.rsplit(".", 1)[0] for n in archive_names}
+        stems |= {part for n in stems for part in n.split(".")}
         for m in keyish.finditer(body):
             if "://" in body[max(0, m.start() - 12):m.start()]:
+                continue
+            # A LONG TOKEN THAT NAMES A FILE ON DISK IS A FILE NAME. The
+            # Unsplash guidelines archive is
+            # `unsplash.https-help-unsplash-com-en-articles-2511245-unsplash-api-guidelines.<date>.txt`,
+            # whose middle segment is 67 characters of letters, digits and
+            # hyphens — which is exactly the shape this pattern hunts for, and
+            # it failed the build on the evidence the gate exists to collect.
+            # Checked against the directory rather than by pattern, because a
+            # looser regex is how a real credential gets through.
+            if m.group(0) in stems:
                 continue
             fail(f"{rel_} contains a {len(m.group(0))}-character token that "
                  f"looks like a credential — keys live in repository secrets "
