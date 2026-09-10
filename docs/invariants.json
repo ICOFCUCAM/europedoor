@@ -71,6 +71,11 @@
       "kind": "exact",
       "why": "Zero. Gold says luxury, premium, wealth; this product has to say Europe, discovery, movement, intelligence."
     },
+    "css.lime": {
+      "value": 0,
+      "kind": "exact",
+      "why": "Zero. Electric lime was the dark world's accent and it ended up drawing geography — seventeen journey routes, 894 homepage dots, 319 destinations, 172 experiences and every lit country on every region glyph. An accent is five per cent of a screen and a continent is not. Removed rather than rehomed, like the brass, and the letters are counted in a DECLARATION only, because --lime is a prefix of --limestone and the note recording why it went names the hex."
+    },
     "js.applications": {
       "value": 5,
       "kind": "exact",
@@ -97,9 +102,9 @@
       "why": "Zero today, because zero photographs are licensed. This moving is the signal that licensed imagery arrived — which must go through the licence register first."
     },
     "weight.home_kb": {
-      "value": 121,
+      "value": 136,
       "kind": "ceiling",
-      "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it is allowed to move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence. 119 -> 146 ON PURPOSE: the body was eight abstract plates over 'Find your kind of Europe' and three more over the journeys — eleven purple gradients in a column under an atlas hero, which is placeholder art doing a picture's job, and the plate system was already measured as unable to carry a hero. Each tile now draws its OWN destinations lit on one shared silhouette: Mountains is the Alps, the Pyrenees, the Carpathians and the Scandes; History is almost the whole continent; and that difference is what the tile exists to say. The plates cost 14.7 KB and came out; 894 dots and one lod0 coastline went in. All of them and never a selection, so the count on the tile is the number of dots on it and a reader can check."
+      "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it is allowed to move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence. 119 -> 146 ON PURPOSE: the body was eight abstract plates over 'Find your kind of Europe' and three more over the journeys — eleven purple gradients in a column under an atlas hero, which is placeholder art doing a picture's job, and the plate system was already measured as unable to carry a hero. Each tile now draws its OWN destinations lit on one shared silhouette: Mountains is the Alps, the Pyrenees, the Carpathians and the Scandes; History is almost the whole continent; and that difference is what the tile exists to say. The plates cost 14.7 KB and came out; 894 dots and one lod0 coastline went in. All of them and never a selection, so the count on the tile is the number of dots on it and a reader can check. 121 -> 136 ON PURPOSE: the doors that replaced those tiles were written for a photograph and the register is empty, so the band rendered as four blocks of type — the one part of the homepage whose job is to make somebody want to go somewhere, doing it entirely in words. The drawing is back under the four headings, and it is the same 512 dots the tiles carried."
     },
     "weight.max_page_kb": {
       "value": 440,
@@ -142,7 +147,7 @@
         "band": 0.759,
         "note": 0.819,
         "facts": 0.759,
-        "btn": 0.598,
+        "btn": 0.6,
         "chip": 0.523
       },
       "kind": "floor",

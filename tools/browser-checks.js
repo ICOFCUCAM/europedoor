@@ -2162,11 +2162,24 @@ async function main() {
     accent: document.body.dataset.accent || "",
     bg: getComputedStyle(document.body).backgroundColor,
     door: getComputedStyle(document.body).getPropertyValue("--door").trim(),
-    limeAnywhere: [...document.querySelectorAll("*")].some((el) => {
-      const c = getComputedStyle(el).color;
-      const m = c.match(/\d+/g);
-      return m && Number(m[0]) > 150 && Number(m[1]) > 220 && Number(m[2]) < 130;
-    }),
+    // THE OLD VERSION READ `color` AND NOTHING ELSE, so it asked whether
+    // lime was set on TEXT — and lime was never mostly on text. It was on
+    // fill: seventeen journey routes, 894 homepage dots, 319 destinations,
+    // 172 experiences and every lit country on every region glyph. The
+    // property it was actually spent on was the one property this probe did
+    // not read. Four properties now, and the whole document, in both worlds.
+    limeAnywhere: [...document.querySelectorAll("*")].map((el) => {
+      const cs = getComputedStyle(el);
+      for (const prop of ["color", "fill", "stroke", "backgroundColor"]) {
+        const m = String(cs[prop] || "").match(/\d+/g);
+        if (m && m.length >= 3 && Number(m[0]) > 150 && Number(m[1]) > 220 &&
+            Number(m[2]) < 130 && !(m.length > 3 && Number(m[3]) === 0)) {
+          return el.tagName.toLowerCase() + "." + String(el.getAttribute("class") || "")
+                 + " " + prop + "=" + cs[prop];
+        }
+      }
+      return "";
+    }).filter(Boolean)[0] || "",
   });
 
   for (const scheme of ["light", "dark"]) {
@@ -2178,8 +2191,15 @@ async function main() {
       const r = await w.evaluate(worldProbe);
       ok(r.world === "intelligence", `${url} is not in the INTELLIGENCE world`);
       ok(LUM(r.bg) < 0.06, `${scheme} ${url}: INTELLIGENCE is not dark (${r.bg})`);
-      ok(/200,\s*255,\s*77|#c8ff4d/i.test(r.door),
-         `${scheme} ${url}: the INTELLIGENCE accent is ${r.door}, not electric lime`);
+      // The accent is the cobalt family, in both worlds and both
+      // preferences. It was electric lime here, asserted by its own hex —
+      // which is the fifth assertion in this suite to pin a value rather
+      // than a promise. The promise is that INTELLIGENCE has ONE accent, it
+      // is readable on the card as well as the ground, and it is not the
+      // colour that ended up drawing continents.
+      ok(/131,\s*152,\s*255|#8398ff/i.test(r.door),
+         `${scheme} ${url}: the INTELLIGENCE accent is ${r.door}, not cobalt-air`);
+      ok(!r.limeAnywhere, `${scheme} ${url}: electric lime is painted — ${r.limeAnywhere}`);
     }
 
     // DISCOVER: three accents, and never the electric one.
@@ -2189,7 +2209,7 @@ async function main() {
       await w.goto(base + url, { waitUntil: "load" });
       const r = await w.evaluate(worldProbe);
       ok(r.world === "discover", `${url} should be DISCOVER, is ${r.world}`);
-      ok(!r.limeAnywhere, `${scheme} ${url}: electric lime is set on text in the light world`);
+      ok(!r.limeAnywhere, `${scheme} ${url}: electric lime is painted — ${r.limeAnywhere}`);
       if (want === "heritage") ok(r.accent === "heritage", `${url} is not marked heritage`);
       if (want === "cultural") {
         // --door is a custom property, so it comes back as the authored

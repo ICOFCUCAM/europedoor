@@ -23,7 +23,11 @@ const os = require("os");
 const path = require("path");
 
 const BASE = process.env.BASE || "http://localhost:8899";
-const OUT = process.argv[2] || "contact-sheet.png";
+// The flags are not the filename. `contact-sheet.js --dark out.png` took
+// "--dark" as the output path and died inside Playwright on an unsupported
+// mime type — a tool that documents three flags and only accepts them after
+// the path is a tool people run wrong once and then stop running.
+const OUT = process.argv.slice(2).find((a) => !a.startsWith("--")) || "contact-sheet.png";
 
 // One exemplar per rendered family. Add a row when a family appears; the
 // point of the sheet is that every family is in one field of view.

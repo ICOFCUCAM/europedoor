@@ -345,14 +345,16 @@ def plate_shapes(seed, w, h, motif=None):
     night = d[3] % 5 == 0
     sat, sat2 = PLATE_SAT[hue], PLATE_SAT[hue2]
     if night:
-        # Night. The sky bottoms out near graphite and the light is the
-        # electric accent — which is the only place lime appears in a
-        # DISCOVER surface, and it appears there because a night plate IS a
-        # dark ground. Contrast does the policing: lime on #101214 is 16:1
-        # and on ivory is 1.05:1, so it cannot leak into the light world.
+        # Night. The sky bottoms out near graphite and the light is a moon.
+        # It used to be the electric accent, on the argument that a night
+        # plate IS a dark ground and lime could not leak into the light
+        # world from it. True, and it made 63 of the 319 cards carry an acid
+        # green disc — a moon is a warm white, and the reason lime was there
+        # was that the palette had one bright colour rather than that
+        # anything about the picture wanted it. It went with the token.
         sky_a, sky_b = _hsl(hue, sat + 6, 9), _hsl(hue2, sat2, 21)
         band = [_hsl(hue, sat, l) for l in (18, 13, 9)]
-        light = _hsl(79, 62, 66)
+        light = _hsl(44, 46, 86)
     else:
         # Day. The sky lifts toward ivory rather than to a saturated blue, so
         # a card sits on the page instead of shouting off it, and the sun is

@@ -1693,6 +1693,18 @@ def c_instruction():
     if re.search(r"--(brass|gold)\s*:", css):
         fail("assets/css/europedoor.css defines a gold or brass token; "
              "European Future has no gold")
+    # AND THERE IS NO ELECTRIC LIME, for a different reason than the gold.
+    # Gold went because of what it says. Lime went because of where it ended
+    # up: declared as the dark world's accent at five per cent of a screen,
+    # and spent on seventeen journey routes, 894 homepage dots, 319
+    # destinations, 172 experiences and every lit country on every region
+    # glyph. A continent drawn in the accent is a network diagram, which is
+    # the association the cartography split exists to escape.
+    # The DECLARATION is what is refused: `--lime` is a prefix of
+    # `--limestone`, and the note recording why it went names the hex.
+    if "--lime:" in css or re.search(r":\s*#c8ff4d", css, re.I):
+        fail("assets/css/europedoor.css still declares electric lime; it was "
+             "removed rather than rehomed, like the brass")
     for hexv, token in re.findall(r"(#[0-9a-fA-F]{6})", css) and \
             [(m, m) for m in re.findall(r"#[0-9a-fA-F]{6}", css)]:
         r_, g_, b_ = (int(hexv[i:i + 2], 16) for i in (1, 3, 5))
@@ -1710,13 +1722,13 @@ def c_instruction():
         fail("docs/instruction.md is missing or a stub")
     else:
         body = open(doc, encoding="utf-8").read()
-        for token in ("#101214", "#F7F6F3", "#3157FF", "#C8FF4D", "#14483C", "#A4491F"):
+        for token in ("#101214", "#F7F6F3", "#3157FF", "#8398FF", "#14483C", "#A4491F"):
             if token not in body:
                 fail(f"docs/instruction.md does not name {token}")
             n += 1
         # The readable table and the register must agree on the values the
         # instruction reasons about by name.
-        for name in ("graphite", "limestone", "cobalt", "lime", "atlantic", "terracotta"):
+        for name in ("graphite", "limestone", "cobalt", "cobalt-air", "atlantic", "terracotta"):
             if tok[name]["hex"].upper() not in body.upper():
                 fail(f"docs/instruction.md and docs/palette.json disagree about {name}")
             n += 1

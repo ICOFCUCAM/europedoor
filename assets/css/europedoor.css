@@ -24,15 +24,15 @@
    * token block is written once and inherits.
    *
    *   DISCOVER      limestone ground, graphite ink, cobalt action.
-   *   INTELLIGENCE  graphite ground, limestone ink, cobalt-lift action, and the
-   *                 electric accent — which cannot appear in the light world
-   *                 at all, because #C8FF4D on #F5F2EA is 1.05:1. That is not
-   *                 a constraint on the idea; it is the idea enforced by
-   *                 physics, and it makes lime a reliable signal that the
-   *                 reader has crossed into the machine.
+   *   INTELLIGENCE  graphite ground, limestone ink, cobalt-lift action, and
+   *                 cobalt-air as the accent. It was electric lime, and what
+   *                 retired lime was not the light world it could never enter
+   *                 but the dark one it was spreading across: the accent had
+   *                 become the colour of every route, every dot and every lit
+   *                 country, and a continent is not five per cent of a page.
    *
    * The ratio is the instruction, not the hex codes: 60 limestone / 25
-   * graphite / 10 cobalt / 5 electric. A palette gives you a blue website with gold
+   * graphite / 10 cobalt / 5 accent. A palette gives you a blue website with gold
    * buttons; a ratio gives you European editorial design over futuristic
    * infrastructure.
    */
@@ -57,14 +57,30 @@
                                 4.07 on #1a1e22, where links actually sit. A dark palette
                                 has two backgrounds and the lighter one binds. */
   --cobalt-air:   #8398ff;   /* the accent in the dark world's DISCOVER surfaces */
-  --lime:         #c8ff4d;   /* INTELLIGENCE only, and not by policy: 1.05:1
-                                on limestone means it is invisible in the light
-                                world whatever anyone intends */
+  /* THERE IS NO LIME, AND THE REASON IS A MEASUREMENT THE PALETTE NEVER
+     MADE: WHERE IT WAS ACTUALLY BEING SPENT. #c8ff4d was declared as the
+     dark world's accent — links, kickers, one button — and it ended up
+     drawing GEOGRAPHY: seventeen journey routes, 894 homepage dots, 319
+     destinations on /discover, 172 experiences, every lit country on every
+     region glyph and every `here` dot on fifty country maps. An accent is a
+     few per cent of a page; a continent is not a few per cent of anything.
+     Acid green over a dark continent reads as a network diagram or a
+     satellite overlay, which is the exact association the cartography split
+     was written to escape, arriving through the accent instead of through
+     the ground.
+     It is replaced rather than rehomed, the way brass was. The dark world's
+     accent is --cobalt-air, which this palette had already measured for
+     precisely that ground in the DISCOVER-dark block: 7.06 on the graphite
+     ground, 6.31 on the card, 6.04 on the deep surface, against the 4.5 a
+     read colour needs. The cost is that a dark-preference reader can no
+     longer tell the two worlds apart by hue — and the worlds were never a
+     hue: INTELLIGENCE is dark in BOTH preferences, which is the whole of
+     that distinction in the preference most readers are in. */
   --ultramarine:  #665cff;   /* atmosphere only: gradients, map washes. Never type. */
 
   /* Retained from the previous system, with narrow homes rather than as
      leftovers. Both are DISCOVER colours and neither appears in
-     INTELLIGENCE, where the only accent is lime.
+     INTELLIGENCE, where the only accent is cobalt-air.
 
      --atlantic    heritage and provenance. The pages that talk about how
                    this project knows what it claims: /method, /sources,
@@ -181,6 +197,12 @@
      fill. */
   --atlas-land:    #ded8ca;
   --atlas-context: #ded8ca;
+  /* The muted step of the same land, for context outside the subject and for
+     a glyph drawn on limestone, where #ded8ca measures 1.20:1 against the
+     page and is a silhouette you cannot quite see. It was a raw hex in two
+     plate rules before the glyphs needed it; a colour used in two families
+     is a token. */
+  --atlas-far:     #c6c0b1;
   --atlas-here:    #faf7f0;
   --atlas-coast:   #1d3a4d;
   --atlas-hereline:#1d3a4d;
@@ -234,8 +256,8 @@
  * will feel: an essay about a festival should not be the same blue as a
  * boundary dataset.
  *
- * INTELLIGENCE overrides all of it below — in the dark world the accent is
- * lime and nothing else, which is what makes crossing worlds legible. */
+ * INTELLIGENCE overrides all of it below — in the dark world there is one
+ * accent and nothing else, which is what makes crossing worlds legible. */
 body.area-stories, body.area-events, body.area-experiences {
   --door:      var(--terracotta);
   --door-dark: var(--terracotta-2);
@@ -267,8 +289,8 @@ body[data-accent="heritage"] {
    would keep terracotta on a graphite ground — 3.17:1, and invisible. No
    page is in that position today; the rule is here so none ever is. */
 body[data-world="intelligence"] {
-  --door:      var(--lime);
-  --door-dark: #d8ff85;
+  --door:      var(--cobalt-air);
+  --door-dark: #a3b4ff;
 }
 
 /* ── WORLD 02 — INTELLIGENCE ───────────────────────────────────
@@ -299,8 +321,8 @@ body[data-world="intelligence"] {
 
   --sea:          var(--cobalt-lift);
   --sea-dark:     var(--cobalt-air);
-  --door:         var(--lime);      /* the electric accent, ~5%, and only here */
-  --door-dark:    #d8ff85;
+  --door:         var(--cobalt-air); /* the accent, ~5%. It was electric lime */
+  --door-dark:    #a3b4ff;
   --signature:    var(--cobalt-lift);
 
   --warn:         #f0a090;
@@ -318,10 +340,12 @@ body[data-world="intelligence"] {
  *
  * Not an inversion of the light world and not a copy of INTELLIGENCE. The
  * ground is the same graphite, because there is only one dark ground worth
- * having — but the accent stays in the cobalt family rather than becoming
- * lime. That is what keeps the two worlds distinguishable for a dark-mode
- * reader: DISCOVER is blue, INTELLIGENCE is electric, and lime never appears
- * on an editorial page in either preference. */
+ * having, and the accent is cobalt-air. It was written here first, for a
+ * dark-preference editorial page, and measured here first — which is why it
+ * was available the day the electric accent was retired. The two worlds are
+ * now told apart by the fact that INTELLIGENCE is dark in BOTH preferences,
+ * which is the whole of that distinction in the preference most readers are
+ * in, rather than by a hue that only one of them could carry. */
 @media (prefers-color-scheme: dark) {
   :root {
     --paper:        var(--graphite);
@@ -2784,7 +2808,7 @@ body[data-hero] .masthead { position: sticky; }
 .heromap.arched .context path { fill: none; vector-effect: non-scaling-stroke; }
 .heromap.arched .countries path { stroke: var(--map-border); stroke-width: 1; }
 .heromap.arched .context path { stroke: color-mix(in srgb, var(--map-border) 55%, transparent); stroke-width: 0.7; }
-.heromap.arched .herodot { fill: var(--lime); opacity: .9; }
+.heromap.arched .herodot { fill: var(--cobalt-air); opacity: .95; }
 .heromap.arched .herodot.advisory { fill: var(--map-border); opacity: .6; }
 
 /* THE SCALE BAR, WHICH THE PROJECTION EARNED.
@@ -2831,7 +2855,7 @@ body[data-hero] .masthead { position: sticky; }
    now. */
 .minimap.arched .minidot circle { opacity: 1;
   fill: color-mix(in srgb, var(--limestone) 55%, transparent); }
-.minimap.arched .minidot.here circle { fill: var(--lime); }
+.minimap.arched .minidot.here circle { fill: var(--cobalt-air); }
 /* AND WHICH END IT STARTS AT. A route line drawn in order is the same
    drawing as the same route travelled backwards, so the last stop is hollow
    and the first is not, and the caption says which is which — an unexplained
@@ -2855,7 +2879,7 @@ body[data-hero] .masthead { position: sticky; }
    else — and the fill is stated, like every other mark inside the arch. */
 .minimap.arched .rlabel text { fill: color-mix(in srgb, var(--limestone) 88%, transparent);
   stroke: var(--map-sea); stroke-width: 3; }
-.minimap.arched .rlabel:hover text { fill: var(--lime); }
+.minimap.arched .rlabel:hover text { fill: var(--cobalt-air); }
 
 /* THREE ROLES, AND EVERY PAGE HAS ONE.
    Measured across twenty-two rendered families: twenty-one placed a 60px h1
@@ -2962,7 +2986,7 @@ body[data-hero] .masthead { position: sticky; }
   fill: #d6d0c1; stroke: color-mix(in srgb, var(--atlas-coast) 62%, transparent); }
 .minimap.arched.atlas .lyr-land .countries path.far,
 .minimap.arched.atlas .lyr-land .context path.far {
-  fill: #c6c0b1; stroke: color-mix(in srgb, var(--atlas-coast) 38%, transparent); }
+  fill: var(--atlas-far); stroke: color-mix(in srgb, var(--atlas-coast) 38%, transparent); }
 
 /* THE SUBJECT IS A WASH, NOT A FILL, so whatever is under it survives. An
    opaque country hides everything the terrain layers will eventually put
@@ -3622,9 +3646,23 @@ body[data-hero] .masthead { position: sticky; }
    repository already lost a day to on the hero, and the escape is the same
    one: PAINT BY INHERITANCE. `fill` on the container is inherited through the
    clone; the lit dots are real DOM and override it. */
-.constel { fill: var(--rule); stroke: none; }
-.constel-lit circle { fill: var(--door); }
-.themerow:hover .constel-lit circle { fill: var(--signature); }
+/* THE GLYPHS ARE CARTOGRAPHY AND WERE NEVER GIVEN THE CARTOGRAPHY.
+   The palette splits maps on what the drawing IS — a picture is warm paper,
+   pale water and an ink coast; an instrument is graphite — and the split was
+   applied to the plates and to nothing else. The glyph family, which is
+   every theme row, every journey row, every story, every homepage tile,
+   every region on the atlas index and all five index openings, kept a grey
+   wash and the dark world's accent: an acid-green continent on near-black,
+   which reads as a network diagram or a satellite overlay. It is the
+   largest map family on the site by page count and it was the only one
+   still outside the standard.
+   Land is the atlas's own muted parchment, marks are the signature — the
+   colour this palette reserves for things DRAWN rather than read — and a
+   mark carries a hairline of the ground so it separates from whatever it
+   sits on. Nothing here is a new colour. */
+.constel { fill: var(--atlas-far); stroke: none; }
+.constel-lit circle { fill: var(--cobalt); }
+.themerow:hover .constel-lit circle { fill: var(--cobalt-deep); }
 /* And the row is baseline-aligned, which is right for two columns of type and
    strands a 100px drawing at the top of its cell with the text beginning
    below it. The glyph is a figure, not a line of text. */
@@ -3699,8 +3737,8 @@ body[data-hero] .masthead { position: sticky; }
    them — it is the SHARED continent underneath that lives in a shadow tree
    and is painted by inheritance. Both halves of the <use> trap in four
    lines. */
-.regionglyph .countries path { fill: var(--door); }
-.macroband:hover .regionglyph .countries path { fill: var(--signature); }
+.regionglyph .countries path { fill: var(--cobalt); }
+.macroband:hover .regionglyph .countries path { fill: var(--cobalt-deep); }
 @media (max-width: 60rem) {
   /* Below the two-column measure the drawing goes under the head at its own
      proportion rather than being squeezed beside it — the same rule the hero
@@ -3719,16 +3757,42 @@ body[data-hero] .masthead { position: sticky; }
    What replaced them is not a better painting, it is the data: every
    destination carrying that tag, lit on one shared silhouette. The count on
    the tile is the number of dots on it. */
-.card-map { background: var(--paper-2); display: flex; align-items: center;
+/* A TILE IS A PICTURE, SO IT IS THE ATLAS'S GROUND AND NOT THE PAGE'S.
+   `--paper-2` is a card surface, which means the tile was limestone on a
+   DISCOVER page and graphite on /discover — the same drawing on two grounds,
+   and on the dark one an acid continent floating in near-black. The
+   cartography is world-independent by design: paper, ink, blue, wherever it
+   is embedded. */
+.card-map, .wayart { background: var(--atlas-sea); display: flex; align-items: center;
             justify-content: center; padding: var(--s4); }
+.card-map .constel, .wayart .constel { fill: var(--atlas-land); }
+.card-map .regionglyph .countries path { fill: var(--atlas-here);
+  stroke: var(--atlas-coast); stroke-width: 1.1; vector-effect: non-scaling-stroke; }
+.card:hover .card-map .regionglyph .countries path { fill: #fff; }
+.card-map .constel-lit circle, .wayart .constel-lit circle { fill: var(--cobalt);
+  stroke: var(--atlas-here); stroke-width: 1.6; }
+/* The door's own drawing, at the door's own size. `.card-map` is a tile in a
+   grid and this is the top half of a half-page block, so the radius is the
+   figure's rather than a card's, and the dots are fitted to the frame the
+   same way the openings' are. */
+.wayart { margin: 0 0 var(--s4); aspect-ratio: 16 / 9; overflow: hidden;
+          border-radius: var(--radius); padding: 0; }
+.wayart .constel { width: 100%; height: 100%; }
+.wayart .constel-lit circle { r: 9px; stroke-width: 2; }
 .card-map .constel { width: 100%; height: auto; }
 /* Bigger tiles, more dots, smaller marks: a 200-destination tile at 380px
    with the theme index's radius would be a solid field. Set here rather than
    per circle, so 894 dots cost four characters each rather than eleven. */
 .card-map .constel-lit circle { r: 7px; }
 .constel-theme .constel-lit circle { r: 22px; }
-.constel-route { fill: none; stroke: var(--door); stroke-width: 5;
-                 stroke-linejoin: round; opacity: .55; }
+/* A CASING, THEN A CORE — see `pages.route_line`. No single colour clears
+   3:1 on both cream land and the deep Atlantic; the arithmetic has no
+   solution, so the answer is the one every printed map uses. The casing is
+   the land's own light tone, wider, opaque, and it is what separates the
+   line from the ground and from the sixteen routes crossing it. */
+.constel-route { fill: none; stroke: var(--cobalt); stroke-width: 5;
+                 stroke-linejoin: round; stroke-linecap: round; }
+.constel-route.case { stroke: var(--atlas-here); stroke-width: 10; opacity: .92; }
 
 
 /* EVERY TYPE VALUE IN THIS SECTION IS ONE THE SITE ALREADY HAD. The first
@@ -3775,9 +3839,30 @@ body[data-hero] .masthead { position: sticky; }
  * radius, no shadow, no fill. Those four are what say "separate object,
  * placed here by a system", and this is meant to read as a page rather than
  * as a component library. A rule and space do the separating. */
+/* A LEAD AND THREE, NOT FOUR EQUALS. Two by two gave four blocks the same
+   weight, and with the photograph slots empty that is four blocks of type in
+   a row — the one band on the homepage whose job is to make somebody want to
+   go somewhere, doing it entirely in words. The lead takes the drawing and
+   the width; the other three are entries under it. One dominant element per
+   band, and one Europe on the page rather than four adjacent copies of it. */
 .wayin {
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--s7) var(--s6); border-top: 1px solid var(--rule); padding-top: var(--s6);
+}
+.way.lead {
+  grid-column: 1 / -1;
+  display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  gap: var(--s6); align-items: center;
+}
+.way.lead .wayart { margin: 0; }
+/* The lead is the biggest thing in the band and the three under it are
+   entries, so the heading steps down. `--t-xl` is already in the scale: a
+   hierarchy that needs a new size value is a decoration. */
+.way:not(.lead) h3 { font-size: var(--t-xl); }
+@media (max-width: 52rem) {
+  .wayin { grid-template-columns: 1fr; }
+  .way.lead { grid-template-columns: 1fr; }
+  .way.lead .wayart { margin-bottom: var(--s4); }
 }
 .way { text-decoration: none; }
 .way h3 {
@@ -3986,7 +4071,12 @@ body[data-hero] .masthead { position: sticky; }
 .iheroart {
   margin: 0; aspect-ratio: 4 / 3; overflow: hidden;
   border-radius: 50% 50% 0 0 / 34% 34% 0 0;
-  background: var(--graphite);
+  /* The opening is a map, so its ground is the Atlantic rather than the
+     dark world's paper. Graphite made five index openings a black tile with
+     a grey continent and acid marks on it; the plates two clicks away have
+     been cream land on this water since the cartography split. One
+     cartography, whatever the drawing is embedded in. */
+  background: var(--atlas-sea);
 }
 .iheroart .constel, .iheroart svg { width: 100%; height: 100%; display: block; }
 .iheroart.shot picture, .iheroart.shot img {
@@ -3995,13 +4085,16 @@ body[data-hero] .masthead { position: sticky; }
 /* Every route at once: seventeen real sequences on one continent, which is a
  * picture no other travel product can draw. The land is quiet and the lines
  * carry it, because the subject is the reach of the set rather than Europe. */
-/* THE OPENING IS A DARK GROUND, so what is lit in it takes the dark
- * world's colour. The 172 experience dots were --door, which is cobalt,
- * on graphite: present, correct, counted, and invisible. That is the
- * `.minidot .hit` failure in the other direction — a thing that paints
- * and cannot be seen — and no count anywhere could report it. */
-.iheroart .constel { fill: color-mix(in srgb, var(--limestone) 30%, transparent); }
-.iheroart .constel-lit circle { fill: var(--lime); r: 9px; }
+/* THE OPENING IS THE ATLAS AT INDEX SIZE. It was a dark ground with a grey
+ * continent on it and whatever the dark world's accent happened to be lit on
+ * top, which is how 172 experience dots came out cobalt on graphite —
+ * present, correct, counted and invisible — and then acid green when that
+ * was fixed. Neither was a decision about a MAP. Cream land on the
+ * Atlantic, marks in the signature, and every mark carries a hairline of
+ * the land so it separates from the water it may be sitting beside. */
+.iheroart .constel { fill: var(--atlas-land); }
+.iheroart .constel-lit circle { fill: var(--cobalt); r: 9px;
+  stroke: var(--atlas-here); stroke-width: 1.8; }
 /* r:9, not the theme row's 22. A glyph's radius is fitted to a 132px mark
  * and this frame is five times that, so the same class rendered dots the
  * size of small countries. Eleven units is not eleven pixels, again. */
@@ -4024,15 +4117,13 @@ body[data-hero] .masthead { position: sticky; }
  * 600-pixel box, and a scaled hairline is the frontier-is-a-worm failure
  * already shipped once here, one screen from the rule that documents it. */
 .iheroart .regionglyph .countries path {
-  fill: color-mix(in srgb, var(--limestone) 86%, transparent);
-  stroke: var(--graphite); stroke-width: 1.1;
+  fill: var(--atlas-here);
+  stroke: var(--atlas-coast); stroke-width: 1.1;
   vector-effect: non-scaling-stroke;
 }
-.allroutes { fill: color-mix(in srgb, var(--limestone) 30%, transparent); }
-.allroutes .constel-route {
-  fill: none; stroke: var(--lime); stroke-width: 4;
-  stroke-linejoin: round; stroke-linecap: round; opacity: .85;
-}
+.allroutes { fill: var(--atlas-land); }
+.allroutes .constel-route { stroke-width: 4; }
+.allroutes .constel-route.case { stroke-width: 9; }
 
 @media (max-width: 60rem) {
   .pagehead.ihero.wide { grid-template-columns: 1fr; gap: var(--s5); }

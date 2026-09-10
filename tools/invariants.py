@@ -215,6 +215,19 @@ def measure():
                 "kind": "exact",
                 "why": "Zero. Gold says luxury, premium, wealth; this product "
                        "has to say Europe, discovery, movement, intelligence."},
+            "css.lime": {
+                "value": len(re.findall(r":\s*#c8ff4d", css, re.I))
+                         + len(re.findall(r"--lime:", css)),
+                "kind": "exact",
+                "why": "Zero. Electric lime was the dark world's accent and it "
+                       "ended up drawing geography — seventeen journey routes, "
+                       "894 homepage dots, 319 destinations, 172 experiences "
+                       "and every lit country on every region glyph. An accent "
+                       "is five per cent of a screen and a continent is not. "
+                       "Removed rather than rehomed, like the brass, and the "
+                       "letters are counted in a DECLARATION only, because "
+                       "--lime is a prefix of --limestone and the note "
+                       "recording why it went names the hex."},
             "js.applications": {
                 "value": len(apps), "kind": "exact",
                 "why": "Five. An application fetches an index or owns client "
@@ -266,7 +279,14 @@ def measure():
                        "exists to say. The plates cost 14.7 KB and came out; "
                        "894 dots and one lod0 coastline went in. All of them "
                        "and never a selection, so the count on the tile is the "
-                       "number of dots on it and a reader can check."},
+                       "number of dots on it and a reader can check. "
+                       "121 -> 136 ON PURPOSE: the doors that replaced those "
+                       "tiles were written for a photograph and the register "
+                       "is empty, so the band rendered as four blocks of type "
+                       "— the one part of the homepage whose job is to make "
+                       "somebody want to go somewhere, doing it entirely in "
+                       "words. The drawing is back under the four headings, "
+                       "and it is the same 512 dots the tiles carried."},
             "weight.max_page_kb": {
                 "value": round(max(len(b) for b in bodies.values()) / 1024),
                 "kind": "ceiling",

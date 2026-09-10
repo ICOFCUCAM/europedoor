@@ -19,11 +19,11 @@
     }
   },
   "accents": {
-    "$comment": "Inside DISCOVER the accent says what KIND of thing is being read. In INTELLIGENCE there is one accent and it is lime, which is what makes crossing worlds legible.",
+    "$comment": "Inside DISCOVER the accent says what KIND of thing is being read. In INTELLIGENCE there is one accent and it is cobalt-air, which was measured for that ground in the DISCOVER-dark block before it was needed here. It was electric lime until the accent was found to be drawing geography: every route, every dot and every lit country, which is not five per cent of anything.",
     "structural": { "token": "cobalt-deep", "where": "the default: homepage, countries, regions, destinations, journeys" },
     "cultural":   { "token": "terracotta",  "where": "stories, events, experiences — the human half of DISCOVER" },
     "heritage":   { "token": "atlantic",    "where": "how this project knows what it claims: /method, /sources, /fund, /sources/freshness" },
-    "electric":   { "token": "lime",        "where": "INTELLIGENCE only, and not by policy — 1.09:1 on limestone means it is invisible in the light world whatever anyone intends" }
+    "machine":    { "token": "cobalt-air",  "where": "INTELLIGENCE only. 7.06 on the graphite ground, 6.31 on the card and 6.04 on the deep surface, so it is a read colour on all three — which electric lime was too, and it was never the contrast that failed" }
   },
   "ratio": {
     "$comment": "The ratio is the instruction, not the hex codes. A palette gives you a blue website with gold buttons; a ratio gives you European editorial design over futuristic infrastructure.",
@@ -48,7 +48,6 @@
     "terracotta":   { "hex": "#a4491f", "name": "Terracotta",        "role": "the warm cultural accent: stories, events, experiences" },
     "terracotta-2": { "hex": "#8a3a17", "name": "Terracotta Deep",   "role": "the same, on limestone-3, where #a4491f measures 4.48 and just misses" },
     "terracotta-lift":{ "hex": "#e08a5c", "name": "Terracotta Lift", "role": "the cultural accent for a dark-preference reader: #a4491f is 3.17:1 on graphite" },
-    "lime":         { "hex": "#c8ff4d", "name": "Electric Lime",     "role": "the dark-world signal. INTELLIGENCE only" },
     "ultramarine":  { "hex": "#665cff", "name": "Ultramarine",       "role": "atmosphere only: gradients, map washes, immersive moments. Never type" }
   },
   "claims": [
@@ -79,17 +78,16 @@
     { "fg": "terracotta-2",    "bg": "limestone-3", "text": true,  "ui": true },
     { "fg": "terracotta-lift", "bg": "graphite",    "text": true,  "ui": true },
     { "fg": "terracotta-lift", "bg": "graphite-2",  "text": true,  "ui": true },
-    { "fg": "lime",            "bg": "graphite",    "text": true,  "ui": true },
-    { "fg": "lime",            "bg": "graphite-2",  "text": true,  "ui": true },
-    { "fg": "lime",            "bg": "graphite-3",  "text": true,  "ui": true },
+    { "fg": "cobalt-air",      "bg": "graphite",    "text": true,  "ui": true },
+    { "fg": "cobalt-air",      "bg": "graphite-2",  "text": true,  "ui": true },
+    { "fg": "cobalt-air",      "bg": "graphite-3",  "text": true,  "ui": true },
     { "fg": "ultramarine",     "bg": "limestone-3", "text": false, "ui": true }
   ],
   "forbidden": [
     { "fg": "cobalt", "bg": "limestone-3", "why": "4.04 — the signature is a drawn colour, not a read one. Use cobalt-deep." },
     { "fg": "cobalt", "bg": "graphite", "why": "3.52 — a UI edge at most, never a link. Use cobalt-lift." },
     { "fg": "cobalt-lift", "bg": "limestone", "why": "3.13 — the dark world's link colour is a UI edge at most on light." },
-    { "fg": "lime", "bg": "limestone", "why": "1.09 — invisible. Lime does not exist in the light world." },
-    { "fg": "lime", "bg": "limestone-2", "why": "1.13 — invisible." },
+    { "fg": "cobalt-air", "bg": "limestone", "why": "2.44 — the dark world's accent is a UI edge at most on paper." },
     { "fg": "ultramarine", "bg": "limestone", "why": "4.28 — fails body text. Ultramarine is atmosphere, never type." },
     { "fg": "ultramarine", "bg": "graphite", "why": "4.06 — fails body text." },
     { "fg": "terracotta", "bg": "graphite", "why": "3.17 — the cultural accent has to lift at night. Use terracotta-lift." },
@@ -105,6 +103,7 @@
     "glassmorphism",
     "stock-tourist photography",
     "imagery that reads as AI-generated",
-    "the letters A and I in the masthead, the navigation, or any h1"
+    "the letters A and I in the masthead, the navigation, or any h1",
+    "electric lime, anywhere: it was the dark world's accent and it ended up drawing continents"
   ]
 }

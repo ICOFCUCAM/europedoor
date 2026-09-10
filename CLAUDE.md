@@ -869,6 +869,46 @@ ways. Atlantic green and terracotta were *retained* rather than deleted: green
 for heritage and provenance, terracotta as the warm cultural accent on
 stories, events and experiences.
 
+**There is no electric lime either, and it went for a different reason than
+the gold.** Gold went because of what it says. `#c8ff4d` went because of where
+it was being spent: declared as the dark world's accent — five per cent of a
+screen — and used to draw seventeen journey routes, 894 homepage dots, 319
+destinations on `/discover`, 172 experiences and every lit country on every
+region glyph. A continent drawn in the accent is a network diagram, which is
+the association the cartography split exists to escape, arriving through the
+accent instead of through the ground. The dark world's accent is `cobalt-air`,
+which the palette had already measured for that ground in the DISCOVER-dark
+block: 7.06 on graphite, 6.31 on the card, 6.04 on the deep surface. Removed
+rather than rehomed, with a guard on each end, and `css.lime` is an invariant.
+**The declaration is what is refused** — `--lime` is a prefix of `--limestone`,
+so the obvious form of that assertion is true of every stylesheet that has ever
+existed here, and it passed for one run while reading its own naming scheme.
+**And the browser probe read `color` and nothing else**, so it asked whether
+lime was set on TEXT — which is the one property it was never mostly on. It
+reads fill, stroke, colour and background now, over the whole document.
+
+**The glyph family is cartography and never got the cartography.** The palette
+splits maps on what the drawing IS: a picture is warm paper, pale water and an
+ink coast; an instrument is graphite. That split was applied to the 824 plates
+and to nothing else. Every theme row, every journey row, every story, the
+homepage tiles, all nine region glyphs and all five index openings kept a grey
+wash and the dark world's accent — the largest map family on the site by page
+count, and the only one still outside its own standard. They are the atlas
+palette now: `--atlas-land` for the land, `--atlas-here` with an ink frontier
+for what is lit, `--cobalt` for the marks, and a hairline of the land on every
+mark so it separates from whatever it sits on.
+
+**A route needs a casing, and the arithmetic is what says so.** Cream land is
+0.70 luminance and the Atlantic is 0.055, so a stroke needs to be above 0.265
+to clear 3:1 on the water and below 0.20 to clear it on the land: no colour
+satisfies both, and a route that crosses the Baltic either disappears at the
+coast or shouts on the land. Every printed map answers this with a casing —
+a wider stroke in the ground's light tone under a narrower one in the route's
+colour — and `pages.route_line()` is that, in one place. On the seventeen-route
+opening **all the casings are drawn before all the cores**, because a
+per-route casing lays the next route's cream stroke over the last route's
+cobalt one and every crossing becomes a break.
+
 **The palette is data, and the contrast is recomputed.** `docs/palette.json`
 declares which colours may carry text on which surfaces; `checks.py` recomputes
 every ratio from the hexes in the file and fails on a claim the arithmetic does

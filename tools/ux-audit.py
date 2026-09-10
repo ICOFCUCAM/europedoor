@@ -212,17 +212,27 @@ def s6():
     # waymeta and waygo all begin with it — an instrument matching a
     # substring of its own naming scheme.
     import re as _re
-    ways = _re.findall(r'class="way(?: shot)?"', band)
+    ways = _re.findall(r'class="way(?: lead)?(?: shot)?"', band)
     n = len(ways)
     yield 0 < n <= 4, f"{n} ways in — at most four, and each one large"
     # Each door opens on a real list and says how long that list is, which is
     # the rule that stopped a tile being labelled with a word no page answers.
     yield len(_re.findall(r"\d+ destinations", band)) == n, \
         "every door carries the true size of the list it opens"
-    # AND NO DOOR CARRIES A MAP. Four adjacent cards wearing the same picture
-    # of Europe is what this section was rebuilt to stop, so the assertion is
-    # on the absence rather than on the arrangement.
-    yield 'class="constel' not in band, "no door draws its own Europe"
+    # AND THE BAND CARRIES AT MOST ONE DRAWING. The promise this assertion
+    # was written for is the owner's eighth constraint — do not repeat the
+    # same Europe map treatment across adjacent cards — and its first form
+    # stated that as "no constellation in the band at all", which is the
+    # shape rather than the claim. It went red the day the band was given a
+    # LEAD: with the photograph slots empty the four doors rendered as four
+    # blocks of type, and the fix was one dominant element, not four tiles of
+    # the same coastline differing only in where the dots fall. Four was
+    # tried first and reverted in the same session for exactly the reason
+    # this assertion exists, which is why it is now a ceiling of one and
+    # still fails on the thing it was protecting.
+    n_maps = len(_re.findall(r'class="constel[ "]', band))
+    yield n_maps <= 1, f"{n_maps} doors draw their own Europe — at most one"
+    yield n_maps < n, "and never one per door"
     yield "@media (prefers-reduced-motion: reduce)" in CSS, "and motion stops for anyone who asked"
 
 
@@ -822,13 +832,23 @@ def sb3():
 
 @section("B4", "Colour", "BUILT",
          "European Future: graphite foundation, limestone ground, cobalt "
-         "signature, electric lime in the dark world only. Atlantic green "
+         "signature, cobalt-air in the dark world only. Atlantic green "
          "and terracotta retained with narrow homes; gold removed entirely. "
          "Deliberately not EU blue and gold, and no longer green-primary.")
 def sb4():
     for token in ("--graphite:", "--limestone:", "--cobalt:", "--cobalt-lift:",
-                  "--lime:", "--atlantic:", "--terracotta:", "--paper:", "--ink:"):
+                  "--cobalt-air:", "--atlantic:", "--terracotta:", "--paper:", "--ink:"):
         yield token in CSS, f"{token} is defined"
+    # AND LIME IS OUT OF THE SYSTEM THE WAY BRASS IS. It was the dark world's
+    # accent and it ended up drawing geography — every route, every dot, every
+    # lit country — which is not five per cent of anything. Removed rather
+    # than rehomed, and asserted from both ends like the gold.
+    # `--lime` is a prefix of `--limestone`, so the obvious form of this
+    # assertion is true of every stylesheet that has ever existed here. The
+    # declaration is what is being refused, not the letters.
+    yield "--lime:" not in CSS, "and there is no lime token left"
+    yield re.search(r":\s*#c8ff4d", CSS, re.I) is None, \
+        "nor the raw value in any declaration"
     # Gold is out of the system. It was the one thing in the previous palette
     # that European Future removes rather than rehomes: gold says luxury,
     # premium, heritage, wealth, and this product has to say Europe,

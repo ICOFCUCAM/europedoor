@@ -1065,9 +1065,49 @@ def home(data):
         shot = picture(data.get("images"), d["purpose"], w=1600, h=1000,
                        alt=row["alt"], sizes="(min-width: 52rem) 50vw, 100vw"
                        ) if row else ""
+        # FOUR HEADLINES AND NOTHING TO LOOK AT. The doors were written for a
+        # photograph, and with the register empty the whole band rendered as
+        # four blocks of type: the one place on the homepage that is supposed
+        # to make somebody want to go somewhere, doing it entirely in words.
+        # A no-image state is a composition, not an absence, and this one had
+        # never been drawn.
+        #
+        # The drawing is the same one the tiles used before the doors
+        # replaced them, and it is the answer to the question the door asks:
+        # every destination carrying that tag, lit on one continent. The 63
+        # mountain places are the Alps, the Pyrenees, the Carpathians and the
+        # Scandes; the 200 with history are almost everywhere; and the reader
+        # sees the difference between those two shapes before reading either
+        # heading. ALL of them and never a selection — the count under the
+        # door is the number of dots on it.
+        #
+        # NO APERTURE. The hero above is the largest arch on the site and
+        # four more under it is the signature as wallpaper, which is the rule
+        # the theme rows and the year band already keep.
+        # ONE OF THE FOUR, NOT FOUR OF THE FOUR. The first version drew all
+        # four and the section audit caught it in one run: eight drawings on
+        # the homepage against a ceiling of four. The ceiling is right, and
+        # it is the owner's eighth constraint in a check — do not repeat the
+        # same Europe map treatment across adjacent cards. Four tiles of the
+        # same coastline differing only in where the dots fall is exactly
+        # that, and side by side the two shapes read as one texture before
+        # anybody counts a dot.
+        #
+        # So the band has a LEAD. The first door in data/home.json, which is
+        # an authored editorial set of at most four, carries the drawing at
+        # size; the other three are the entries under it. One dominant
+        # element per band, which is the rule the whole redesign runs on, and
+        # the homepage's drawing count is unchanged at four.
+        lead = not doors and not shot
+        art = (
+            '<figure class="wayart">'
+            + constellation([project(n["city"]["lat"], n["city"]["lon"])
+                             for n in data["cities"].values()
+                             if d["interest"] in n["city"]["interests"]])
+            + "</figure>") if lead else ""
         doors.append(
-            f"""<a class="way{' shot' if shot else ''}" href="{urls.interest(d['interest'])}">
-  {shot}
+            f"""<a class="way{' lead' if lead else ''}{' shot' if shot else ''}" href="{urls.interest(d['interest'])}">
+  {shot}{art}
   <div class="waytext">
     <h3>{esc(d['title'])}</h3>
     <p class="wayline">{esc(d['line'])}</p>
@@ -3031,13 +3071,21 @@ def journeys_index(data):
     # word. It is the family's own subject at size, which is what an index
     # hero is for — and it is the honest stand-in until a photograph lands in
     # the slot beside it, because a plate here would be a picture of nowhere.
+    # THE CASINGS FIRST, ALL OF THEM, THEN THE CORES. Seventeen routes cross
+    # each other constantly, and a per-route casing would lay the next
+    # route's cream stroke over the previous route's cobalt one — a line that
+    # breaks wherever another passes. Both passes over the whole set, which
+    # is how a printed map plates a network.
+    routepts = [[project(data["cities"][l["city"]]["city"]["lat"],
+                         data["cities"][l["city"]]["city"]["lon"])
+                 for l in j["legs"]] for j in data["journeys"]]
     allroutes = "".join(
-        '<polyline class="constel-route" points="'
-        + " ".join(f"{x:.0f},{y:.0f}" for x, y in
-                   [project(data["cities"][l["city"]]["city"]["lat"],
-                            data["cities"][l["city"]]["city"]["lon"])
-                    for l in j["legs"]]) + '"/>'
-        for j in data["journeys"])
+        f'<polyline class="constel-route case" points="'
+        + " ".join(f"{x:.0f},{y:.0f}" for x, y in pts) + '"/>'
+        for pts in routepts) + "".join(
+        f'<polyline class="constel-route" points="'
+        + " ".join(f"{x:.0f},{y:.0f}" for x, y in pts) + '"/>'
+        for pts in routepts)
     # `slice` rather than the default `meet`. The frame is 4:3 and the map is
     # 1000x780, which is 1.28 — close enough that slicing crops a few units of
     # open sea and far enough that letterboxing left the continent floating in
@@ -3062,7 +3110,8 @@ def journeys_index(data):
               sizes="(min-width: 60rem) 52vw, 100vw"),
     actions='<a class="btn" href="/plan">Build your own</a>'
             '<a class="btn ghost" href="/map">See them on the map</a>',
-    note="Every line above is one of the seventeen, drawn from its own stops.")}
+    note="Every line above is one of the seventeen, drawn from its own stops."
+         + datacut_line())}
 <div class="rows journeyrows">{"".join(rows)}</div>
 <p class="small">The shape beside each route is where it goes, drawn on the same
 projection as every other map here. {geo.sources_line(geo.load("europe-lod0.json"))}
@@ -5665,7 +5714,8 @@ def experiences_index(data):
     actions='<a class="btn" href="/experiences/join">List your experience</a>'
             '<a class="btn ghost" href="/for-businesses">For businesses</a>',
     note='Every place in the Atlas with something on this list. Coastline from '
-         '<a href="/sources">Natural Earth</a>, public domain.')}
+         '<a href="/sources">Natural Earth</a>, public domain.'
+         + datacut_line())}
 <!-- "Recently added" WAS A CLAIM THE DATA CANNOT SUPPORT. An experience
      carries a slug, a name, a kind, a band and a summary, and no date of
      any sort, so these 24 were simply the first 24 the loader returned in
@@ -6149,6 +6199,55 @@ def region_glyph(members, frame=None):
             f'{lit}</svg>')
 
 
+def datacut_line():
+    """One sentence naming where the drawn continent stops being a coastline.
+
+    data/geo/ is cut at 52°E because that is where this product stops writing
+    about places, so Russia arrives on any full-continent drawing with a
+    straight slant through it. The site has three answers to that on record
+    and only one of them is available to a glyph. The homepage hero fades
+    over 320 units, which needs a frame wide enough to hold a fade.
+    `constel_defs` drops the CONTEXT, which works because the context is not
+    the subject — and cannot work here, because the sliced ring is a country
+    this atlas has a page for. Reframing cannot lose the cut either: the
+    easternmost destination in the Atlas projects within a hundred units of
+    it, so a frame that excludes the slant excludes the Caucasus.
+
+    What is left is the country portrait's answer, which is to SAY IT. The
+    degree is read off the dataset's own bbox, so the sentence cannot drift
+    from the data that produced the picture.
+    """
+    lim = (geo.load("europe-lod1.json") or {}).get("bbox", [None, None, None])[2]
+    if lim is None:
+        return ""
+    return (f" The continent stops at {lim:.0f}°E on the right, where this "
+            f"atlas's map data ends, not at a coast.")
+
+
+def route_line(pts):
+    """A route drawn the way a printed map draws one: a casing, then a core.
+
+    NO SINGLE COLOUR READS ON BOTH THE LAND AND THE SEA. The editorial
+    cartography is cream land on a deep Atlantic, and the arithmetic is
+    closed: a stroke needs a relative luminance above 0.265 to clear 3:1 on
+    #123f55 and below 0.20 to clear it on #ded8ca, so nothing satisfies both.
+    A route that crosses the Baltic therefore either disappears at the coast
+    or shouts on the land, which is what the acid-green version was solving
+    by being brighter than everything.
+
+    Every printed map answers this with a CASING: a wider stroke in the
+    ground's own light tone under a narrower one in the route's colour. The
+    casing separates the line from whatever it is over, and the core carries
+    the meaning — so the same line reads over cream, over the Atlantic and
+    over a neighbouring route, with no colour doing work it cannot do.
+    """
+    if len(pts) < 2:
+        return ""
+    d = " ".join(f"{x:.0f},{y:.0f}" for x, y in pts)
+    return (f'<polyline class="constel-route case" points="{d}"/>'
+            f'<polyline class="constel-route" points="{d}"/>')
+
+
 def constellation(pts, extra="", route=False):
     """A set of real destinations lit on the shared silhouette.
 
@@ -6171,10 +6270,7 @@ def constellation(pts, extra="", route=False):
     NO APERTURE. Eleven doors on one page is the signature as wallpaper.
     """
     dots = "".join(f'<circle cx="{x:.0f}" cy="{y:.0f}"/>' for x, y in pts)
-    line = ""
-    if route and len(pts) > 1:
-        line = ('<polyline class="constel-route" points="'
-                + " ".join(f"{x:.0f},{y:.0f}" for x, y in pts) + '"/>')
+    line = route_line(pts) if route else ""
     return (f'<svg class="constel{extra}" viewBox="0 0 {MAP_W} {MAP_H}" '
             f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
             f'{line}<g class="constel-lit">{dots}</g></svg>')
@@ -6483,7 +6579,8 @@ def stories_index(data):
     img=photo(data.get("images"), "stories-hero", w=2000, h=1200,
               sizes="(min-width: 60rem) 52vw, 100vw"),
     note='Every place these nine pieces are set in, on one frame. Coastline from '
-         '<a href="/sources">Natural Earth</a>, public domain.')}
+         '<a href="/sources">Natural Earth</a>, public domain.'
+         + datacut_line())}
 {desks}
 <p class="small">The shape above the lead piece is the places it is about, drawn
 on the same projection as every other map here — and the same reason there is no

@@ -8,7 +8,7 @@ its requirements are about how something looks and nobody can check a feeling.
 So every row here asserts against the generated HTML, the CSS and the JavaScript
 as they actually are.
 
-**52 sections · 22 built · 13 already · 12 partial · 2 built (deliberately smaller) · 1 refused · 1 locked · 1 deferred · 371 assertions · 0 failing**
+**52 sections · 22 built · 13 already · 12 partial · 2 built (deliberately smaller) · 1 refused · 1 locked · 1 deferred · 374 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -17,7 +17,7 @@ as they actually are.
 | 3 | Design tokens | PARTIAL | 6 | One 8px-derived spacing scale, one type scale, the brief's radii. The named webfonts are refused: a font CDN would hand every reader's address to a third party and contradict /privacy. |
 | 4 | Homepage hero | PARTIAL | 4 | Full-bleed hero, the headline, the ask box and the call to action. The hero image is a generated plate. |
 | 5 | Homepage — Explore | BUILT (deliberately smaller) | 8 | The map is on the homepage, drawn from real coastlines. Its filter row is NOT: eleven chips under a map are eleven links into filtered views of the map the reader is already looking at. The filters live on /map, which is one tap away and is where they act. |
-| 6 | Experience categories | ALREADY | 5 | Eight large cards, one per category, with the brief's hover. |
+| 6 | Experience categories | ALREADY | 6 | Eight large cards, one per category, with the brief's hover. |
 | 2036-7 | Discover Mode | BUILT | 8 | The surface that answers "I do not know where I want to go". Pick moods and constraints and the continent narrows — and every recommendation says why, naming the terms that actually fired. |
 | 2036-18 | Discoverability, computed | BUILT | 8 | Hidden Europe was an editorial tag — the most interesting claim on the site and the one nobody could check. It is now a published score with five named terms, and it says plainly that it measures obscurity within this Atlas rather than crowds. |
 | 2036-6 | Europe in Motion | BUILT | 54 | Twelve ways to cut the continent, each a query evaluated against every destination on every build — and each page prints the query that made it. A motion cannot become a hand-picked list, because the validator refuses a field that names destinations. |
@@ -56,7 +56,7 @@ as they actually are.
 | B1 | Name, casing and the trademark position | LOCKED | 5 | EuropeDoor, one word, title case. The mark is NOT cleared — it is in use in the doors trade — so the site carries no ® or ™ and the brand is working rather than announced. |
 | B2 | Tagline and promise | BUILT | 6 | Open the door to Europe. One primary line; the six campaign lines are not in the shell, because a site with six taglines has none. |
 | B3 | The four doors | BUILT | 8 | Discover, understand, experience, journey — as a numbered sequence of links, not a menu of equals. It replaced five pillars that described our components rather than the reader's path. It lives on /how-it-works, not the homepage: the homepage is the door, and this is the page that says what is behind it. |
-| B4 | Colour | BUILT | 16 | European Future: graphite foundation, limestone ground, cobalt signature, electric lime in the dark world only. Atlantic green and terracotta retained with narrow homes; gold removed entirely. Deliberately not EU blue and gold, and no longer green-primary. |
+| B4 | Colour | BUILT | 18 | European Future: graphite foundation, limestone ground, cobalt signature, cobalt-air in the dark world only. Atlantic green and terracotta retained with narrow homes; gold removed entirely. Deliberately not EU blue and gold, and no longer green-primary. |
 | B4a | The two worlds | BUILT | 15 | DISCOVER is light and editorial; INTELLIGENCE is dark and luminous, in both colour-scheme preferences. One attribute on <body>, one set of components. |
 | B5 | The mark | BUILT | 6 | Concept B: two vertical forms, and the negative space between them is the symbol. It replaced a literal door with a knob, which the Bible explicitly rules out. |
 | B6 | Voice, manifesto and trust | BUILT | 13 | The manifesto is a page rather than a slide, and the four labels that say where every claim comes from are on the same page underneath it. That second half is what stops the first half being advertising copy. |

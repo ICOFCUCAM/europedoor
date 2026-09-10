@@ -244,7 +244,7 @@ bug.
 | Cobalt Lift | `#627FFF` | links and interactive elements on dark surfaces |
 | Atlantic Green | `#14483C` | heritage and provenance. The previous primary, retained with a narrow home |
 | Terracotta | `#A4491F` | the warm cultural accent |
-| **Electric Lime** | `#C8FF4D` | the dark-world signal. INTELLIGENCE only |
+| **Cobalt Air** | `#8398FF` | the dark-world accent, in both worlds' dark surfaces. It replaced Electric Lime `#C8FF4D`, which is out of the system |
 | Ultramarine | `#665CFF` | atmosphere only: gradients, map washes, immersive moments |
 | ~~Gold / Brass~~ | — | **none.** See below |
 
@@ -314,15 +314,23 @@ redesign cannot quietly take a contrast ratio with it.
 | Cobalt Lift `#627FFF` | 3.13 ✗ | — | **5.36** ✓ |
 | Atlantic `#14483C` | **9.61** ✓ | **8.80** ✓ | 1.81 ✗ |
 | Terracotta `#A4491F` | **5.47** ✓ | **5.01** ✓ | 3.17 ✗ |
-| Electric Lime `#C8FF4D` | **1.09 — invisible** | 1.13 — invisible | **15.97** ✓ |
+| Cobalt Air `#8398FF` | 2.44 ✗ | 2.24 ✗ | **7.06** ✓ |
 | Ultramarine `#665CFF` | 4.28 ✗ | 4.15 ✗ | 4.06 ✗ |
 
 Five consequences that are not negotiable, because they are arithmetic:
 
-- **Electric Lime does not exist in the light world.** At 1.09:1 on limestone
-  it is not a subtle accent, it is nothing at all. This is not a constraint on
-  the two-worlds idea — it is the two-worlds idea enforced by physics, and it
-  makes lime a reliable signal that the reader has crossed into the machine.
+- **There is no Electric Lime, and what retired it was not contrast.**
+  `#C8FF4D` measured 15.97:1 on graphite and cleared every ground it was ever
+  used on. What it failed was the ratio above. An accent is five per cent of a
+  screen, and this one had become the colour of seventeen journey routes, 894
+  homepage dots, 319 destinations on `/discover`, 172 experiences and every
+  lit country on every region glyph — a continent, drawn in the accent, on a
+  near-black ground. That is a network diagram, and it is the exact
+  association the cartography split was written to escape, arriving through
+  the accent rather than through the ground. The dark world's accent is
+  `cobalt-air`, which this palette had already measured for that ground.
+  Lime is out of the system the way brass is: removed, not rehomed, with a
+  check on each end.
 - **Ultramarine is never type.** It fails on every ground we hold. It is a
   gradient, a map wash, a glow behind a route. The moment a word is set in it,
   somebody cannot read that word.
@@ -439,8 +447,9 @@ world is a statement about where the reader is, not a lighting preference. If
 it went light for a light-mode reader the two worlds would collapse into one
 and the whole idea would be a theme toggle with extra steps. DISCOVER does
 follow the preference, and for a dark-preference reader the two worlds stay
-apart by accent: DISCOVER is blue, INTELLIGENCE is electric, and lime never
-appears on an editorial page in either preference.
+apart by the ground itself rather than by a hue: INTELLIGENCE is dark in
+both preferences and DISCOVER only in one, which is a difference a reader
+meets on every page rather than only where an accent happens to appear.
 
 **The plates were re-toned, not just re-tinted.** All 794 social cards and
 every generated illustration come from one `plate_shapes()` description, so
