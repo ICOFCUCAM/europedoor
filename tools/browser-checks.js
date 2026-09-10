@@ -900,6 +900,18 @@ async function main() {
   // ── search ─────────────────────────────────────────────────────────
   await page.goto(base + "/search", { waitUntil: "networkidle" });
   await page.fill("#q", "bergen");
+  // WAIT FOR THE RESULTS, NOT FOR A ROW. /search has a resting state now —
+  // the index by kind, so the page opens on the thing it operates over
+  // rather than on a box and 280 pixels of nothing — and that is built from
+  // the same `row` primitive. `#results .row` matched it instantly and this
+  // assertion read "Countries" as the top hit for "bergen". The results
+  // announce their own count; that is what tells them apart from the state
+  // they replace — and "an h2 is present" is not that, because the resting
+  // state has one too, which is the point of it.
+  // A LOCATOR, NOT waitForFunction: that one evaluates a string, and this
+  // site's own Content-Security-Policy has no 'unsafe-eval', so the suite
+  // died with the page's CSP error rather than a verdict.
+  await page.locator("#results h2").filter({ hasText: /\d+ results?/ }).waitFor();
   await page.waitForSelector("#results .row");
   const first = await page.locator("#results .row h3").first().textContent();
   ok(first.trim() === "Bergen", `searching "bergen" put ${first!==null?first.trim():"nothing"} first`);

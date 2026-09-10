@@ -9015,9 +9015,16 @@ def search_page(data):
          "The public register of work worth putting something back into"),
     ]
     _kpeak = max(k[0] for k in kinds)
-    atrest = ('<p class="whyall"><span>In the index</span> Everything below is '
-              'searchable from the box above, and every kind is browsable '
-              'without searching at all.</p><div class="rows">'
+    # AN H2 ABOVE THE ROWS, BECAUSE A ROW'S NAME IS AN H3. The first version
+    # put the rows straight under the page's h1 and the accessibility scan
+    # caught it in one run: h1 → h3 at "Countries". Every other place this
+    # primitive appears has a band heading over it, and the results that
+    # replace this state announce themselves with an h2 too — so the resting
+    # state and the state it becomes have the same shape.
+    atrest = ('<h2>What is in the index</h2>'
+              '<p class="lede">Everything below is searchable from the box '
+              'above, and every kind is browsable without searching at all.</p>'
+              '<div class="rows">'
               + "".join(
                   f'<a class="row" href="{href}">'
                   f'<div><h3>{esc(label[:1].upper() + label[1:])}</h3>'
