@@ -816,28 +816,52 @@ NAV = [
 
 # Secondary navigation, also from the specification: everything a visitor may
 # need to find and never has to see.
-FOOTER_NAV = [
-    ("/for-businesses", T("footer.for-businesses")),
-    ("/for-tourism-boards", T("footer.for-tourism-boards")),
-    ("/fund", T("footer.fund")),
-    ("/europe-in", T("footer.motion")),
-    ("/map", T("footer.map")),
-    ("/themes", T("footer.themes")),
-    ("/beyond-the-obvious", T("footer.beyond")),
-    ("/my-europe", T("footer.myeurope")),
-    ("/manifesto", T("footer.manifesto")),
-    ("/about", T("footer.about")),
-    ("/how-it-works", T("footer.how-it-works")),
-    ("/method", T("footer.method")),
-    ("/sources", T("footer.sources")),
-    ("/api-docs", T("footer.api")),
-    ("/contact", T("footer.contact")),
-    ("/help", T("footer.help")),
-    ("/accessibility", T("footer.accessibility")),
-    ("/privacy", T("footer.privacy")),
-    ("/terms", T("footer.terms")),
-    ("/cookies", T("footer.cookies")),
+# TWENTY LINKS IN ONE FLAT ROW IS A LINK DUMP, and it was the last thing on
+# all 1,033 pages. Every one the same weight and the same size, wrapping into
+# two lines of near-identical text, so the register of the site — a public
+# method, a source register, an accessibility statement, a fund that holds
+# nothing — read as boilerplate. A reader looking for how the scores are
+# computed scanned twenty items in no order.
+#
+# Four groups, and the grouping is what the links ARE rather than a tidy
+# split: places to go next, what the project is and how to check it, who it
+# is for besides a traveller, and the pages a reader needs when something is
+# wrong. Same twenty links, same nav, same accessible name — the labels are
+# not headings, because the homepage asserts its own <h2> count and a footer
+# is not a band of the page.
+FOOTER_GROUPS = [
+    ("Explore", [
+        ("/map", T("footer.map")),
+        ("/themes", T("footer.themes")),
+        ("/europe-in", T("footer.motion")),
+        ("/beyond-the-obvious", T("footer.beyond")),
+        ("/my-europe", T("footer.myeurope")),
+    ]),
+    ("The project", [
+        ("/manifesto", T("footer.manifesto")),
+        ("/about", T("footer.about")),
+        ("/how-it-works", T("footer.how-it-works")),
+        ("/method", T("footer.method")),
+        ("/sources", T("footer.sources")),
+        ("/api-docs", T("footer.api")),
+    ]),
+    ("Work with us", [
+        ("/for-businesses", T("footer.for-businesses")),
+        ("/for-tourism-boards", T("footer.for-tourism-boards")),
+        ("/fund", T("footer.fund")),
+    ]),
+    ("Help & legal", [
+        ("/contact", T("footer.contact")),
+        ("/help", T("footer.help")),
+        ("/accessibility", T("footer.accessibility")),
+        ("/privacy", T("footer.privacy")),
+        ("/terms", T("footer.terms")),
+        ("/cookies", T("footer.cookies")),
+    ]),
 ]
+
+# Kept flat as well, because it is the set and several checks read it as one.
+FOOTER_NAV = [row for _, rows in FOOTER_GROUPS for row in rows]
 
 
 # The Content-Security-Policy, in one place because there is one shell.
@@ -1172,7 +1196,11 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
     scripts_html = "".join(
         f'<script src="{esc(asset(s[len("/assets/"):]) if s.startswith("/assets/") else s)}" defer></script>'
         for s in scripts)
-    footer_nav = "".join(f'<a href="{href}">{esc(label)}</a>' for href, label in FOOTER_NAV)
+    footer_nav = "".join(
+        f'<div class="fgroup"><p class="fghead">{esc(head)}</p>'
+        + "".join(f'<a href="{href}">{esc(label)}</a>' for href, label in rows)
+        + "</div>"
+        for head, rows in FOOTER_GROUPS)
     full_title = title if title == SITE_NAME else f"{title} · {SITE_NAME}"
     return f"""<!doctype html>
 <html lang="en">

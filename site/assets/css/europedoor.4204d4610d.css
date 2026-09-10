@@ -750,9 +750,27 @@ main.wide { max-width: 92rem; }
 .footer { border-top: 1px solid var(--rule); background: var(--paper-2); margin-top: var(--s9); }
 .footer-in { max-width: var(--page); margin: 0 auto; padding: var(--s7) var(--s5); }
 .footer-lede { font-family: var(--display); font-size: var(--t-lg); max-width: 34rem; }
-.footer-nav { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); margin: var(--s5) 0; font-size: var(--t-sm); }
+/* TWENTY LINKS IN ONE FLAT ROW, ON ALL 1,033 PAGES. Every one the same
+   weight and the same size, wrapping into two lines of near-identical text,
+   so the register of this site — a published method, a source register, an
+   accessibility statement, a fund that holds nothing — read as boilerplate,
+   and a reader looking for how the scores are computed scanned twenty items
+   in no order. Four groups, laid out as columns, each link on its own line:
+   a name in a column is found by reading down one list of five, not by
+   scanning a paragraph of twenty. */
+.footer-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+              gap: var(--s6) var(--s5); margin: var(--s6) 0 var(--s7);
+              font-size: var(--t-sm); align-items: start; }
+.fgroup { display: grid; gap: var(--s2); align-content: start; }
+.fghead { font-size: var(--t-xs); letter-spacing: .1em; text-transform: uppercase;
+          color: var(--ink-3); margin: 0 0 var(--s1); }
 .footer-nav a { text-decoration: none; color: var(--ink-2); }
-.footer-nav a:hover { color: var(--door); }
+.footer-nav a:hover, .footer-nav a:focus-visible { color: var(--door); }
+@media (max-width: 52rem) {
+  /* Two columns rather than one: four stacked lists is a very long footer on
+     a phone, and the groups are short enough to sit side by side. */
+  .footer-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 .footer-legal { font-size: var(--t-xs); color: var(--ink-3); max-width: 46rem; }
 
 @media (max-width: 60rem) {
