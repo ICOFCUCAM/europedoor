@@ -617,6 +617,35 @@ main.wide { max-width: 92rem; }
 .row .rowsub { font-size: var(--t-sm); color: var(--ink-2); margin: var(--s1) 0 0; }
 .row .rowmeta { font-size: var(--t-xs); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
 
+/* STATE IN THE FORM, NOT ONLY IN THE WORD. /how-it-works is three bands —
+   built, designed, blocked — and every row carried its state as an uppercase
+   label in the same weight and the same ink as the other two, so the only
+   thing separating "Search: BUILT" from "Taking a payment: BLOCKED" was
+   which heading you had scrolled past. On the one page whose whole argument
+   is that most pre-launch products blur exactly those three.
+
+   Three forms, and the form is what carries: a filled mark exists, a ring is
+   drawn and not made, a ring with a bar through it is held shut. Hue is the
+   second signal and never the only one — a reader who cannot separate two
+   hues still separates a disc from a ring, and this stylesheet has no state
+   palette to borrow, so inventing one for sixteen rows would be three tokens
+   nothing else on the site uses. */
+.statemark { display: inline-block; width: .62em; height: .62em; flex: none;
+             margin-right: .55em; border-radius: 999px; position: relative;
+             border: 1.5px solid currentColor; vertical-align: baseline; }
+.sm-on   { background: var(--atlantic); border-color: var(--atlantic); }
+.sm-part { background: linear-gradient(to right,
+             currentColor 0 50%, transparent 50% 100%); }
+.sm-draft { background: none; }
+/* A SLASH THROUGH A SIX-PIXEL RING IS A BLOB. The first version drew the
+   barred mark that way and it rendered as a diagonal smudge with two ends
+   poking out of the circle — a form that has to be recognised at 6px cannot
+   be a composition of two forms. A blocked thing is the one mark on the page
+   that is not round: a filled square, which differs from the filled disc by
+   SILHOUETTE and reads at any size. */
+.sm-off { background: currentColor; border-radius: 0; }
+.row .rowmeta { display: flex; align-items: baseline; justify-content: flex-end; }
+
 /* ── notes & callouts ─────────────────────────────────────── */
 .note { border-left: 3px solid var(--sea); background: var(--paper-2); padding: var(--s4) var(--s5); border-radius: 0 var(--radius) var(--radius) 0; margin: var(--s5) 0; font-size: var(--t-sm); }
 .note p:last-child { margin-bottom: 0; }

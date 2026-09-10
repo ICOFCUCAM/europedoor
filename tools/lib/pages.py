@@ -7793,10 +7793,29 @@ def about_page(data):
 
 
 def how_it_works_page(data):
+    # THE PAGE IS ABOUT A DISTINCTION AND THE DISTINCTION WAS SET IN GREY.
+    #
+    # Three bands — built, designed, blocked — each a list of rows carrying
+    # its state as an uppercase label in the same weight and the same ink as
+    # the other two. So the only thing separating "Search: BUILT" from
+    # "Accounts: DESIGNED, NOT BUILT" from "Taking a payment: BLOCKED" was
+    # which heading you had scrolled past, on the one page whose entire
+    # argument is that most pre-launch products blur exactly these three.
+    #
+    # State goes in the FORM, not only in the word: a filled mark for a thing
+    # that exists, a hollow ring for a thing that is drawn and not made, and a
+    # barred mark for a thing held shut. Form rather than hue alone, because a
+    # reader who cannot separate two hues still separates a disc from a ring —
+    # and because this stylesheet has no state palette and inventing one for
+    # sixteen rows would be three tokens nothing else uses.
+    STATEKIND = {"built": "on", "designed, seeded": "part", "register only": "part"}
+
     def table(rows):
         return '<div class="rows">' + "".join(
             f'<div class="row"><div><h3>{esc(a)}</h3><p class="rowsub">{esc(b)}</p></div>'
-            f'<p class="rowmeta">{esc(c)}</p></div>' for a, b, c in rows
+            f'<p class="rowmeta"><span class="statemark '
+            f'sm-{STATEKIND.get(c, "off" if "blocked" in c else "draft")}"></span>'
+            f'{esc(c)}</p></div>' for a, b, c in rows
         ) + "</div>"
 
     built = table([
