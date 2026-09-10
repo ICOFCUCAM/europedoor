@@ -373,7 +373,66 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .skip:focus { left: var(--s4); top: var(--s4); z-index: 99; background: var(--paper); padding: var(--s2) var(--s4); border: 1px solid var(--ink); }
 
 /* ── masthead ─────────────────────────────────────────────── */
-.masthead { position: sticky; top: 0; z-index: 40; background: color-mix(in srgb, var(--paper) 88%, transparent); backdrop-filter: saturate(1.4) blur(10px); border-bottom: 1px solid var(--rule); }
+/* THE MASTHEAD IS THE ONE BAND OF SIGNATURE COLOUR, AND IT IS OURS.
+ *
+ * It was paper on paper: a limestone bar over a limestone page, separated by
+ * a hairline. Correct, quiet, and it spent none of the 10% the ratio gives
+ * cobalt on the one element that appears on all 1,033 pages.
+ *
+ * The prompt for this was a booking site's navy band, and the measurement is
+ * why it is NOT that navy. Their CTA blue is hue 212 at 100% saturation and
+ * 45% lightness; this palette's cobalt is hue 229 at 100% and 60%. Ours is
+ * the brighter blue already — what differed was COVERAGE, a solid band across
+ * the top of every page against a pale one. So the band is the borrowed idea
+ * and the colour stays ours, which also matters because /about publishes "Not
+ * an OTA" and destination pages now link to one: wearing an OTA's livery on
+ * the page that links to it blurs exactly the boundary the Stay layer exists
+ * to keep visible.
+ *
+ * DONE BY REDEFINING THE TOKENS, NOT BY OVERRIDING THE RULES. The first
+ * version added `.masthead .nav a`, `.masthead .mark-leaf` and three more
+ * scoped selectors, and the dead-rule scan immediately reported four rules
+ * that matched elements and changed none of them: the base `.nav a {color}`
+ * and both `.mark-*` fills were superseded on every page, and
+ * `.masthead .navsearch` (0,2,0) lost outright to `.navutil a` (0,2,1). That
+ * is the fourth specificity collision this stylesheet has recorded, and it
+ * was avoidable — the two-worlds system next to it already solves this by
+ * resolving the SAME rules against different values. The masthead is a third
+ * world, three lines long: the base rules keep working, nothing is
+ * superseded, and there is nothing to lose a specificity fight.
+ *
+ * No new token and no new claim. `limestone on cobalt-deep` was already in
+ * docs/palette.json at 6.31:1, because the primary button has always used it.
+ *
+ * 96% opaque rather than the paper bar's 88%: the ink-to-ground margin here
+ * is 5.00 where graphite on limestone was 17.4, so there is far less room for
+ * page content scrolling underneath to eat it.
+ *
+ * THE MARK'S TWO TONES INVERT RATHER THAN RECOLOUR. On paper the frame is ink
+ * and the leaf is the signature; on the signature itself a cobalt leaf
+ * measures 1.28:1 and is simply not there. Frame bright, leaf a step down —
+ * which is also the mark's own logic, since it is a doorway and the opening
+ * is the darker half. Both clear the 3:1 a drawn shape needs. Never one shape
+ * at reduced opacity, which is what the mark's comment has said since it was
+ * drawn. */
+.masthead { position: sticky; top: 0; z-index: 40;
+            --ink:       var(--limestone);
+            --ink-2:     color-mix(in srgb, var(--limestone) 85%, var(--cobalt-deep));
+            --ink-3:     color-mix(in srgb, var(--limestone) 70%, var(--cobalt-deep));
+            --signature: color-mix(in srgb, var(--limestone) 70%, var(--cobalt-deep));
+            --door:      var(--limestone);
+            --rule:      color-mix(in srgb, var(--limestone) 34%, transparent);
+            background: color-mix(in srgb, var(--cobalt-deep) 96%, transparent);
+            /* AND THE COLOUR ITSELF, WHICH THE FIRST TOKEN VERSION FORGOT.
+             * Redefining --ink is not enough: the wordmark sets no colour of
+             * its own and inherited graphite from <body>, so it measured
+             * 2.75:1 on the cobalt band — present, legible-looking in a
+             * thumbnail, and below AA. The two-worlds block one screen up
+             * has always set `color: var(--ink)` for exactly this reason;
+             * this is a third world and needed the same line. */
+            color: var(--ink);
+            backdrop-filter: saturate(1.4) blur(10px);
+            border-bottom: 1px solid var(--rule); }
 .masthead-in { max-width: var(--page); margin: 0 auto; padding: var(--s3) var(--s5); display: flex; align-items: center; gap: var(--s6); justify-content: space-between; }
 .wordmark { display: inline-flex; align-items: center; gap: .42em; text-decoration: none; font-family: var(--display); font-size: var(--t-lg); letter-spacing: -0.02em; }
 /* The mark. Two tones rather than one shape with opacity, so it holds on

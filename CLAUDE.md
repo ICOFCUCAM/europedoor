@@ -1531,6 +1531,51 @@ version stacked them in the left half of a 1,168px band with six hundred
 pixels of white beside them, the same fault as the old stories index, found
 the same way, by rendering the page instead of reading it.
 
+**The masthead is the one band of signature colour, and the measurement is
+why it is not the colour that prompted it.** It was paper on paper — a
+limestone bar over a limestone page, separated by a hairline — which spent
+none of the 10% the ratio gives cobalt on the single element that appears on
+every page of the site. The prompt was a booking site's navy band, and measuring
+before copying reversed the premise:
+
+| | hue | saturation | lightness |
+|---|---|---|---|
+| the OTA's CTA blue `#006ce4` | 212 | 100% | 45% |
+| this palette's cobalt `#3157ff` | 229 | 100% | 60% |
+
+**Ours was already the brighter blue.** What differed was COVERAGE: a solid
+band across the top of every page against a pale one. So the band is the
+borrowed idea and the colour stays ours — which also matters because `/about`
+publishes "Not an OTA" and destination pages now link to one, and wearing an
+OTA's livery on the page that links to it blurs exactly the boundary the Stay
+layer exists to keep visible.
+
+**No new token and no new claim.** `limestone on cobalt-deep` was already in
+`docs/palette.json` at 6.31:1 because the primary button has always used it.
+Measured on the shipped pixels rather than on the declaration, because the bar
+is translucent and the ground behind it differs by world: `#3251da` over
+limestone and `#2847d0` over graphite, carrying the resting nav ink at 4.63
+and 5.31 and the wordmark at 5.84 and 6.70. It is 96% opaque where the paper
+bar was 88%, because the ink-to-ground margin here is 5.00 where graphite on
+limestone was 17.4, and there is far less room for content scrolling
+underneath to eat it.
+
+**The mark's two tones invert rather than recolour.** On paper the frame is
+ink and the leaf is the signature; on the signature itself a cobalt leaf
+measures **1.28:1** and is simply not there. The leaf becomes the brightest
+thing in the mark and the frame steps back — the same two-tone reading with
+the emphasis reversed, both clearing the 3:1 a shape needs. Never one shape at
+reduced opacity, which is what the mark's own comment has said since it was
+drawn.
+
+**And a thumbnail is not a measurement.** Reading the rendered `/map` at
+screen-shot size, the bar looked graphite and the INTELLIGENCE world looked
+like it had lost the change to a specificity collision — which this stylesheet
+really has lost three times. Sampling the actual pixels said `#2847d0` on
+every page in both worlds and both colour-scheme preferences. *Look to find,
+count to conclude* cuts both ways: the eye is what finds a defect and it is
+not what confirms one.
+
 **Design to purpose, not to data shape.** A page's structure comes from what
 the reader is trying to do, not from the shape of the record behind it. The
 experience template renders six rows because the data is six rows, and that is
