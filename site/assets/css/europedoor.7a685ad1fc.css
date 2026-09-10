@@ -497,6 +497,13 @@ main.wide { max-width: 92rem; }
  * that count. Below it auto-fill still does the right thing, which is why
  * this is a floor on width rather than a rewrite. */
 @media (min-width: 64rem) { .grid.cols-4 { grid-template-columns: repeat(4, 1fr); } }
+/* AND cols-3 HAD NO RULE AT ALL, so it fell through to the default track and
+ * packed FOUR at 1280. Nine macro regions came out 4 + 4 + 1 with the ninth
+ * alone in a row and eight hundred pixels of nothing beside it — the stories
+ * index's own fault, on /discover, where the nine are the one band that
+ * earned its pictures. A class named for a count keeps that count above the
+ * layout breakpoint; below it auto-fill is still right. */
+@media (min-width: 64rem) { .grid.cols-3 { grid-template-columns: repeat(3, 1fr); } }
 
 .card { display: block; text-decoration: none; background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; }
 .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); border-color: var(--ink-3); }
@@ -528,6 +535,17 @@ main.wide { max-width: 92rem; }
 .chips { display: flex; flex-wrap: wrap; gap: var(--s2); margin: var(--s4) 0; }
 .chip { font-size: var(--t-xs); text-decoration: none; padding: 3px var(--s3); border: 1px solid var(--rule); border-radius: 999px; color: var(--ink-2); background: var(--paper-2); white-space: nowrap; }
 .chip:hover { border-color: var(--door); color: var(--door); }
+/* A TAG WITH A COUNT ON IT IS A REGISTER ENTRY, NOT A CARD. /discover ended
+   in four bands and one of them was a four-column grid of seventeen boxes,
+   each carrying an icon, a figure and one word. Border, fill, radius and
+   shadow all say "separate object placed here by a system"; spending the
+   four of them on a tag name spends them on nothing, and the grid read as
+   one texture — the /experiences finding, on the page whose whole subject is
+   choosing. The register under it, the twelve months, was already chips.
+   Tabular figures because the numbers are being compared. */
+.countchip { display: inline-flex; align-items: baseline; gap: var(--s2); }
+.countchip .chipn { color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.countchip:hover .chipn { color: inherit; }
 
 /* ── facts ────────────────────────────────────────────────── */
 .facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: var(--s4) var(--s5); margin: var(--s6) 0; padding: var(--s5) 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
@@ -3987,6 +4005,29 @@ body[data-hero] .masthead { position: sticky; }
 /* r:9, not the theme row's 22. A glyph's radius is fitted to a 132px mark
  * and this frame is five times that, so the same class rendered dots the
  * size of small countries. Eleven units is not eleven pixels, again. */
+/* THE ATLAS INDEX OPENS ON THE FIFTY, AND ITS FILL IS COBALT ON GRAPHITE.
+ * `.regionglyph .countries path` is --door, which is right on a limestone
+ * band and is the `.minidot .hit` failure on the opening's dark ground:
+ * present, correct, counted and not there. Third time a colour has been
+ * carried onto this ground unchanged.
+ *
+ * NOT LIME EITHER, AND THAT IS THE ARGUMENT RATHER THAN A SAVING. The other
+ * three openings light a SUBSET — seventeen routes, 172 experiences, the
+ * places nine essays are set in — and lime is what says "these ones". Here
+ * the subset is every country there is, so lighting it states nothing and
+ * draws one flat blob. Paper countries with the shadow between them say the
+ * thing the page is for: the continent is fifty separate places, and the
+ * frontier is the picture. It is the hero's reading at index size, light
+ * falling on Europe.
+ *
+ * non-scaling-stroke because this is a 1,000-unit viewBox scaled into a
+ * 600-pixel box, and a scaled hairline is the frontier-is-a-worm failure
+ * already shipped once here, one screen from the rule that documents it. */
+.iheroart .regionglyph .countries path {
+  fill: color-mix(in srgb, var(--limestone) 86%, transparent);
+  stroke: var(--graphite); stroke-width: 1.1;
+  vector-effect: non-scaling-stroke;
+}
 .allroutes { fill: color-mix(in srgb, var(--limestone) 30%, transparent); }
 .allroutes .constel-route {
   fill: none; stroke: var(--lime); stroke-width: 4;

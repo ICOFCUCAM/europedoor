@@ -1362,16 +1362,50 @@ def countries_index(data):
             </div>
             <div class="rows">{''.join(rows)}</div></section>"""
         )
+    # THE PAGE ABOUT FIFTY COUNTRIES OPENED ON NONE OF THEM. Nine bands each
+    # carrying a regional glyph is three densities from the second band down
+    # and one density at the top: a kicker, a headline and a lede, then
+    # straight into the set. Every other index here now opens on its own
+    # subject at size, and the subject of this one is the continent divided —
+    # not Europe as a silhouette, which is what the glyphs below draw, but
+    # Europe as the fifty separate countries this atlas has written about,
+    # each one its own tile with a frontier around it. It is the only place
+    # on the site where that drawing appears, and it says the h1 in a
+    # picture.
+    #
+    # AND THE CUT IS SAID RATHER THAN HIDDEN. At the continental extent
+    # Russia arrives with the 52°E data cut in it — a straight slant across
+    # the top right of the opening, which is the rendering fault
+    # `constel_defs` drops the whole context to avoid and the homepage hero
+    # spends 320 units of fade on. Neither escape is available here: the
+    # sliced ring is a MEMBER rather than context, and reframing cannot lose
+    # it without losing the Caucasus, whose easternmost destination projects
+    # within a hundred units of the cut. The atlas already has an answer for
+    # exactly this, one family over — the Russia portrait cannot fix the
+    # picture either, so it says so under the drawing. The number is read off
+    # the dataset's own bbox rather than typed.
+    heroart = region_glyph(list(data["countries"]))
+    lim = (geo.load("europe-lod1.json") or {}).get("bbox", [None, None, None])[2]
+    cutsay = (f" Russia's outline stops at {lim:.0f}°E, where this atlas's map "
+              f"data ends, not at a border.") if lim is not None else ""
     body = f"""
 {crumbs([("Europe", "/discover"), ("Atlas", None)])}
 {constel_defs()}
-<div class="pagehead index">
-  <p class="kicker">Every country in Europe</p>
-  <h1>Europe, all the way down.</h1>
-  <p class="lede">Nine regions, {len(data['countries'])} countries, {sum(len(c['regions']) for c in data['countries'].values())}
-  travel regions and {len(data['cities'])} cities. The regions below are editorial travel regions,
-  not administrative ones: they group places that feel like each other and are usually visited together.</p>
-</div>
+{indexhero(
+    kicker="Every country in Europe",
+    title="Europe, all the way down.",
+    lede=f"Nine regions, {len(data['countries'])} countries, "
+         f"{sum(len(c['regions']) for c in data['countries'].values())} travel regions "
+         f"and {len(data['cities'])} cities. The regions below are editorial travel "
+         f"regions rather than administrative ones: they group places that feel like "
+         f"each other and are usually visited together.",
+    art=heroart,
+    img=photo(data.get("images"), "countries-hero", w=2000, h=1500,
+              sizes="(min-width: 60rem) 52vw, 100vw"),
+    actions='<a class="btn" href="/map">Open the map</a>'
+            '<a class="btn ghost" href="/discover">Start from what you like</a>',
+    note=f"Each of the {len(data['countries'])} countries above is drawn on its own, "
+         f"so the frontiers are the picture.{cutsay}")}
 {''.join(blocks)}
 <p class="small">The shape beside each region is the countries that region is made
 of, drawn to the same frame so the nine can be compared. A macro region is the one
@@ -8863,11 +8897,28 @@ def discover_page(data):
         i["slug"]: sum(1 for n in data["cities"].values() if i["slug"] in n["city"]["interests"])
         for i in data["taxonomy"]["interests"]
     }
-    interest_cards = "".join(
-        f"""<a class="card" href="{urls.interest(i['slug'])}"><div class="card-body">
-        <p class="kicker"><span aria-hidden="true">{esc(i['icon'])}</span> {n_by_interest[i['slug']]} places</p>
-        <h3>{esc(i['name'])}</h3></div></a>"""
-        for i in data["taxonomy"]["interests"]
+    # SEVENTEEN CARDS, EACH HOLDING ONE WORD AND A NUMBER.
+    #
+    # Border, fill, radius and shadow each say "separate object, placed here
+    # by a system", and a four-column grid spent all four of them on a tag
+    # name — the /experiences finding, on the page whose whole subject is how
+    # to choose. It is also the brief's ninth constraint word for word: no
+    # grid should require the reader to read tiny labels. A tag with a count
+    # on it is a REGISTER ENTRY, and the register directly below it, the
+    # twelve months, was already drawn as chips.
+    #
+    # ORDERED BY THE COUNT, WHICH IS A MEASUREMENT RATHER THAN A RANKING. The
+    # taxonomy's own order is editorial and says nothing to a reader; what
+    # this atlas is mostly about is derived on every build and is the one
+    # thing the seventeen can be compared on. Nothing is promoted: every tag
+    # is here and the number beside it is the number of destinations that
+    # carry it, so a reader can check it against the page it opens.
+    interest_chips = "".join(
+        f'<a class="chip countchip" href="{urls.interest(i["slug"])}">'
+        f'<span aria-hidden="true">{esc(i["icon"])}</span> {esc(i["name"])}'
+        f'<span class="chipn">{n_by_interest[i["slug"]]}</span></a>'
+        for i in sorted(data["taxonomy"]["interests"],
+                        key=lambda i: (-n_by_interest[i["slug"]], i["name"]))
     )
     # AND A MOTION IS A QUERY, NOT A PLACE. It has no coastline, no
     # topography and no season, so a plate drawn for one is a picture of
@@ -8956,8 +9007,10 @@ def discover_page(data):
          lede="Nine regions of Europe, grouped by shared coast, shared mountain range and shared history rather than by alphabet.",
          more=("Every country, A to Z", "/countries"))}
 
-{section("By what you travel for", '<div class="grid cols-4">' + interest_cards + "</div>",
-         lede="Seventeen tags. The Journey Planner weights the same ones, so what you see here is what it will build from.",
+{section("By what you travel for", f'<div class="chips">{interest_chips}</div>',
+         lede=f"{numword(len(data['taxonomy']['interests'])).capitalize()} tags, biggest "
+              f"first, with the number of destinations carrying each. The Journey Planner "
+              f"weights the same ones, so what you see here is what it will build from.",
          more=("Cross-border themes", "/themes"))}
 
 {section("Europe in Motion", '<div class="grid cols-3">' + motion_cards + "</div>",
