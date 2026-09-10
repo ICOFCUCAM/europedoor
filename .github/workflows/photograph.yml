@@ -1,0 +1,119 @@
+name: photograph
+
+# ACQUIRING A PHOTOGRAPH IS A STEP SOMEBODY RUNS, NOT PART OF THE BUILD.
+#
+# The build must run on a machine with no internet and produce identical
+# pages, which is why the map data is committed rather than fetched. The same
+# rule applies here: this workflow fetches, derives and COMMITS, and the build
+# never reaches the network.
+#
+# It is manual on purpose. A schedule would mean photographs arriving on this
+# site that nobody chose, and choosing is the entire job — see
+# docs/image-philosophy.md, where the argument for buying a photograph at all
+# is that it does something the drawing cannot.
+#
+# THE KEYS ARE REPOSITORY SECRETS AND ARE NEVER ECHOED. They are passed as
+# `env` on the one step that needs them, so they are not on a command line
+# that gets logged, and fetch.py never prints one.
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: "pexels or unsplash"
+        required: true
+        type: choice
+        options: [pexels, unsplash]
+      query:
+        description: "what to search for, e.g. 'Vienna Stephansdom rooftops'"
+        required: true
+        type: string
+      pick:
+        description: "which candidate — leave empty to LIST them and stop"
+        required: false
+        type: string
+      key:
+        description: "register key, e.g. city:austria/vienna-and-the-east/vienna"
+        required: false
+        type: string
+      alt:
+        description: "a caption for somebody who cannot see it, not the place name"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # The dataset has to be valid before anything is added to it. The
+      # LICENCE gate is not here — it lives inside fetch.py, which refuses
+      # before it opens a socket, because that is the only place that can
+      # refuse per provider. A step here that merely ran the checks would
+      # look like a gate and gate nothing, which is worse than no step.
+      - name: Validate the dataset
+        run: python3 tools/build.py check
+
+      - name: Search, or search and take one
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+        run: |
+          set -euo pipefail
+          ARGS=(--provider "${{ inputs.provider }}" --query "${{ inputs.query }}")
+          if [ -n "${{ inputs.pick }}" ]; then
+            ARGS+=(--pick "${{ inputs.pick }}" --key "${{ inputs.key }}" --alt "${{ inputs.alt }}")
+          fi
+          python3 scripts/images/fetch.py "${ARGS[@]}"
+
+      # Everything below only does anything when a photograph was actually
+      # taken. A listing run stops here, which is the intended default.
+      - name: Derivatives
+        if: ${{ inputs.pick != '' }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq imagemagick libheif1
+          # Not a heredoc: inside a YAML block scalar every line is
+          # indented, and a `<<EOF` terminator that is not at column zero is
+          # a terminator bash never sees.
+          STEM=$(python3 -c 'import json,os;print(json.load(open("data/images.json"))["images"][os.environ["KEY"]]["file"])')
+          python3 scripts/images/derive.py "$STEM"
+        env:
+          KEY: ${{ inputs.key }}
+
+      - name: Rebuild and check
+        if: ${{ inputs.pick != '' }}
+        run: |
+          set -euo pipefail
+          python3 tools/build.py check
+          python3 tools/build.py
+          python3 tools/checks.py
+          python3 tools/invariants.py --check
+
+      # A photograph moves `safety.img_tags` off zero, which is an exact
+      # invariant and the deliberate signal that licensed imagery arrived.
+      # That is a diff somebody reads, so this opens a branch rather than
+      # pushing to the default one.
+      - name: Commit to a branch
+        if: ${{ inputs.pick != '' }}
+        run: |
+          set -euo pipefail
+          git config user.name "europedoor-photographs"
+          git config user.email "noreply@europedoor.com"
+          BRANCH="photo/$(echo '${{ inputs.key }}' | tr ':/' '--')"
+          git checkout -b "$BRANCH"
+          git add assets/img data/images.json site
+          git commit -m "Photograph: ${{ inputs.key }} (${{ inputs.provider }})" \
+                     -m "Query: ${{ inputs.query }}" \
+                     -m "safety.img_tags leaves zero. Read the credit and the alt text before merging."
+          git push -u origin "$BRANCH"
+          echo "Opened $BRANCH — review the credit, the alt text and the crop."

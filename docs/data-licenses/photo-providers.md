@@ -69,6 +69,30 @@ repository secrets, passed to the step that runs the fetch. `fetch.py` exits
 with that instruction rather than a stack trace when the variable is missing,
 and it never prints a key.
 
+## Running it
+
+`.github/workflows/photograph.yml`, on manual dispatch only. A schedule would
+mean photographs arriving on this site that nobody chose, and choosing is the
+entire job.
+
+Leave **pick** empty and it lists candidates and stops. Fill in **pick**,
+**key** and **alt** and it takes that one, builds the derivatives, rebuilds
+the site, runs the checks — and **opens a branch rather than pushing to the
+default one**. A photograph moves `safety.img_tags` off an exact zero, which
+is the deliberate signal that licensed imagery has arrived, so it is a diff
+somebody reads.
+
+The keys are passed as `env` on the single step that needs them rather than
+on a command line, and `fetch.py` never prints one.
+
+**Derivatives are ImageMagick**, because this repository is stdlib-only and
+re-encoding AVIF in pure Python is not a thing anybody should attempt.
+`scripts/images/derive.py` says what to install when it is missing rather
+than failing three layers down, and it **never upscales**: a 900-pixel source
+gets the widths it can fill and no more, because a file named `-2400` holding
+900 pixels of detail is the same class of untruth as a population we
+estimated.
+
 ## The sandbox cannot do this
 
 The proxy answers 403 to CONNECT for general hosts, and the build must run on
