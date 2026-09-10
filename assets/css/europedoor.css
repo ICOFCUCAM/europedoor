@@ -657,8 +657,46 @@ main.wide { max-width: 92rem; }
   .rail { position: static; }
 }
 @media (max-width: 44rem) {
-  .masthead-in { flex-direction: column; align-items: flex-start; gap: var(--s3); }
+  /* THE MASTHEAD SPENT 168 PIXELS OF AN 844-PIXEL PHONE, which is a fifth of
+     the viewport before a page says anything, and with breadcrumbs and the
+     thumb bar it was 276 — a third of the first screen given to navigation,
+     on all 1,033 pages. It stacked in three rows because `flex-direction:
+     column` is the obvious phone answer and nobody measured what it cost.
+     The destination family already compensates for this figure in its own
+     padding, which is the wrong place: a page paying for the shell's
+     decision is the shell's bug.
+
+     Two rows. The wordmark and the two utilities share the first, because
+     they are identity and they are short; the seven sections take the
+     second as ONE line that scrolls sideways.
+
+     NOTHING IS HIDDEN, and that is the constraint that decided this. The
+     obvious cut is to drop the seven links on a phone, since the thumb bar
+     carries five destinations already — but `display: none` takes them out
+     of the tab order too, so a keyboard or screen-reader user on a narrow
+     window loses Countries, Experiences, Journeys, Stories and Events
+     entirely. A row that scrolls keeps every one of them reachable and
+     focusable. The fade at the right edge is the affordance saying so. */
+  .masthead-in {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "brand util" "nav nav";
+    align-items: center; gap: var(--s2) var(--s4);
+  }
+  .masthead-in .wordmark { grid-area: brand; }
+  .masthead-in .navutil  { grid-area: util; }
+  .masthead-in .nav {
+    grid-area: nav; flex-wrap: nowrap; overflow-x: auto;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    /* The scroll is contained here rather than on the page: the browser
+       suite fails on a document that scrolls sideways at 390, which is how
+       the 47-pixel city-page overflow was found. */
+    margin-right: calc(var(--s5) * -1); padding-right: var(--s5);
+    -webkit-mask-image: linear-gradient(to right, #000 88%, transparent);
+    mask-image: linear-gradient(to right, #000 88%, transparent);
+  }
+  .masthead-in .nav::-webkit-scrollbar { display: none; }
   .nav { gap: var(--s4); font-size: var(--t-xs); }
+  .nav a { white-space: nowrap; }
   main { padding: var(--s5) var(--s4) var(--s8); }
   .leg { grid-template-columns: 1fr; gap: var(--s2); }
   /* The right-hand column of a row is a nowrap label at desk width. On a

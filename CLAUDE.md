@@ -1979,10 +1979,11 @@ family** on the grounds that the three largest tags would draw three identical
 maps of Europe: true of History, Food and Architecture, and exactly what the
 page already says in words, so the drawing agrees with the sentence rather than
 contradicting it. The refusal was about the DOOR, and it still holds — this is
-a glyph. 1,718 plates on 227 pages to 860 on 209.
+a glyph. Half the abstract plates on the site came off in one pass;
+`docs/gap-assessment.md` carries the before and the after.
 
-**The line is density, not the plate.** What remains is 3.9 plates on a country
-page, 5.4 on a month page and 5.6 on a macro region: four cards in a grid of
+**The line is density, not the plate.** What remains is about four on a country
+page and five on a month or macro page: four cards in a grid of
 like things is the case a card was designed for. The measured failure has
 always been eleven in a column or forty-three on a page, and the line moves the
 day photographs exist for destinations rather than before.
