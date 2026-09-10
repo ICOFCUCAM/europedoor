@@ -1994,6 +1994,19 @@ worth repeating: the engineering is finished and the content is a third
 written, so almost every remaining gap is a photograph nobody has licensed or a
 page nobody has written, and neither is solvable by more code.
 
+**The four open decisions are answered, and each carries its trigger.**
+`docs/gap-assessment.md` §4 and `docs/EUROPEDOOR_2036_TRANSFORMATION.md`.
+Next.js and Postgres: **no**, until a write arrives from somebody who is not
+us. Photography budget: **zero**, and the reason is the shape of what is
+declared rather than thrift — eleven of the twelve declared purposes are
+generic European scenes BY DESIGN and free stock covers every one of them,
+while the set free stock cannot cover has no purpose declared for it. **The
+premise of that question was right and the inference was wrong**: free stock
+will never cover Theth, and nothing on this site asks it to. What to license
+first: **the four homepage doors**, not the hero, because the drawn hero is
+the one thing here no competitor can reproduce and a licensed stock
+photograph is by definition a thing anyone can also license.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

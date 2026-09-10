@@ -109,11 +109,39 @@ accommodation card, no crowd measurement, no region boundaries.
 
 ---
 
-## 4. The order to work in
+## 4. Decisions taken, 2026-09-10
 
-1. **Attach a deployment.** Nothing else reaches a reader until this is done,
-   and everything else is invisible without it.
-2. **License four photographs** for the homepage strip, then one for the
-   hero. That is one discover run and four acquire runs.
+The owner delegated the open decisions. All four are answered here and in
+`docs/EUROPEDOOR_2036_TRANSFORMATION.md`; none of them is a preference, and
+each carries the trigger that would reverse it.
+
+| decision | answer | trigger to revisit |
+|---|---|---|
+| Next.js and Postgres before the entity | **No** | a write from somebody who is not us: a business claiming a listing, or a saved itinerary that outlives a browser |
+| Photography budget | **Zero** | a declared purpose free stock cannot meet, which means declaring destination heroes for the 162 places Natural Earth has never heard of |
+| What to license first | **The four homepage doors** | they fill the one band whose job is desire and which has no drawing at all |
+| Whether to replace the drawn hero | **Not yet** | judged again once the four doors are in and the page can be looked at whole |
+| A `main` branch | **Created** | it costs nothing and it is the production branch a Vercel project defaults to |
+
+The photography answer is the one worth re-reading, because the premise of
+the original question was right and the inference was wrong. Free stock will
+never cover Theth — but no purpose is declared for Theth. Eleven of the
+twelve declared purposes are generic European scenes BY DESIGN, and the two
+destination slots that exist are Vienna and Chamonix. There is nothing to buy
+yet; commissioning is a different question and should not be answered until
+the declared slots are filled and a rendered page shows what is still
+missing.
+
+## 5. The order to work in
+
+1. **Attach a deployment.** Nothing else reaches a reader until this is
+   done, and everything else is invisible without it. A `main` branch now
+   exists at the same commit, which is what a Vercel project points at by
+   default; if the production branch was set to a branch that did not exist,
+   that alone is the fix.
+2. **License the four doors.** One discover run for all four purposes at
+   once, then four acquire runs, one approved id each.
 3. **Write.** Stories and journeys, in that order — the two furthest behind
-   and the two a reader most notices.
+   and the two a reader most notices. This is the one gap that is neither a
+   decision nor a setting, and it should not be automated: a story here
+   makes factual claims about real places.

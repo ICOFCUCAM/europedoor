@@ -394,12 +394,61 @@ decision.
    §24 of the map brief asks for are in
    `docs/data-licenses/eurostat-gisco-nuts.md`; the recommendation there is to
    ship without it, which is what happened.
-2. **Whether to start the Next.js/Postgres migration before the entity
-   exists.** I recommend no, for the reasons in §20 above. It is a strategic
-   call and I have not started it.
-3. **Photography budget.** Free stock covers the Eiffel Tower and will never
-   cover Albarracín or Theth — which is precisely the product. See
-   `docs/images.md`.
+2. ~~**Whether to start the Next.js/Postgres migration before the entity
+   exists.**~~ **ANSWERED, 2026-09-10, by the owner delegating it: NO, and
+   the trigger is written down rather than left to a mood.**
 
-Decision 1 is answered and Phase A's map is built. Decisions 2 and 3 remain
-the owner's; Phases B and C are complete.
+   The reasons are in §20 and none of them has moved. The running system
+   does not disagree with the blueprint anywhere that a database would fix:
+   1,033 pages, five static indexes, no server, and a search that is a
+   fetched JSON file. What Postgres buys is writes, and there is nobody to
+   write — no accounts, no operators claiming a listing, no bookings,
+   because all three are blocked on an incorporated entity that does not
+   exist.
+
+   **THE TRIGGER IS A WRITE FROM SOMEBODY WHO IS NOT US.** The day a
+   business can claim its own listing, or a reader can save an itinerary
+   that survives their browser, the static build stops being able to answer
+   and `docs/technical-foundation.md` becomes a plan for Monday. Until that
+   day it stays a destination. Building it earlier buys a schema nobody
+   writes to and a hosting bill that starts immediately.
+
+3. ~~**Photography budget.**~~ **ANSWERED, 2026-09-10, by the owner
+   delegating it: ZERO, and the reason is the shape of what is declared
+   rather than thrift.**
+
+   The premise of the original question was right and led to the wrong
+   conclusion. Free stock covers the Eiffel Tower and will never cover
+   Albarracín or Theth — so the inference was that a budget is needed
+   because this atlas is made of Theths.
+
+   Look at what is actually DECLARED. Twelve purposes exist in
+   `data/image-purposes.json` and eleven of them are generic European
+   scenes by design: a mountain, a coast, an old town, a table, a road with
+   distance in it, the light before choosing. Every one of those is
+   coverable by free stock, well, and each carries a written brief saying
+   what would make it fail. The set free stock cannot cover — a photograph
+   OF Theth — has no purpose declared for it, deliberately, and the two
+   destination purposes that do exist are Vienna and Chamonix, which are
+   exactly the iconic tier.
+
+   So there is nothing to buy yet. **THE TRIGGER IS A DECLARED PURPOSE THAT
+   FREE STOCK CANNOT MEET**, which today means declaring destination heroes
+   for the 162 places Natural Earth has never heard of. That is a
+   commissioning decision — a photographer, a fee, a release — and it is a
+   different question from a stock budget. It should not be answered until
+   the twelve declared slots are filled and a rendered page shows what is
+   still missing.
+
+4. **The first four acquisitions are the doors, not the hero.** The drawn
+   hero is the one thing on this site no competitor can reproduce — Europe
+   on its own conformal conic through its own aperture — and a licensed
+   stock photograph is by definition a thing anyone else can also license.
+   Spending the first acquisition on replacing the unrepeatable asset with
+   the most repeatable one is the wrong order. `door-mountains`,
+   `door-coast`, `door-history` and `door-food` fill the homepage strip,
+   which is the band whose whole job is desire and which has no drawing at
+   all. The hero is judged again once they are in.
+
+Decision 1 is answered and Phase A's map is built. Decisions 2, 3 and 4 are
+answered above; Phases B and C are complete.
