@@ -2251,8 +2251,17 @@ def c_frontend():
     # most-cited primitive was three-quarters an image wrapper. Found when
     # the destination exemplar renamed that wrapper and the floor collapsed.
     # The matcher below now ends a class token at whitespace or the quote.
+    #
+    # `card` 0.20 -> 0.07 WHEN THE REGION PAGES BECAME ROWS. 97 of the 130
+    # travel regions hold one or two destinations, so the band that is the
+    # subject of a region page opened with a single 280px tile and two empty
+    # columns beside it, each tile drawing a plate from its destination's own
+    # hash directly under a real map of the region. That is the stories-index
+    # failure and the plate measurement at once, and the rest of a region
+    # page was already rows. Recorded here and in the invariant register in
+    # the same commit; the floor is what stops it happening by accident.
     FLOORS = {"kicker": 0.99, "masthead": 0.99, "pagehead": 0.99, "crumbs": 0.99,
-              "row": 0.85, "card": 0.20, "band": 0.70, "note": 0.70}
+              "row": 0.85, "card": 0.07, "band": 0.70, "note": 0.70}
     total = 0
     hits = {k: 0 for k in FLOORS}
     for path in site_files():

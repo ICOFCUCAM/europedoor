@@ -481,7 +481,7 @@ def measure():
                        "that there is no longer a reason to stop. Each "
                        "interest page opens on its own tag drawn instead, "
                        "every destination carrying it on one unframed "
-                       "extent, so the seventeen can be compared."},
+                       "extent, so the seventeen can be compared. AND THE REGION PASS TOOK IT 0.205 TO 0.079, ONE HUNDRED AND THIRTY PAGES, ON PURPOSE. 97 of the 130 travel regions hold one or two destinations and 26 hold exactly one, so the band that IS the subject of a region page opened with a single 280px tile and two empty columns beside it — the stories-index failure exactly, with the shape of the data deciding the layout. Each tile also drew a plate from its destination's own hash directly under a real map of the region showing where those same places are. The rest of the page was already rows — places to see, things to do, journeys — so a region page was speaking two list languages one band apart. This is the largest single move this figure has made, and the last card grid outside the country pages."},
         },
     }
 

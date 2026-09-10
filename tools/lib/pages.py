@@ -2465,20 +2465,39 @@ def region_page(data, c, r):
     # Named apart from `nights`, which the card loop below reuses for a
     # per-destination range — the collision made this a list at render time.
     pass_nights = sum(sum(t["nights"]) / 2 for t in r["cities"])
-    cards = []
-    for t in r["cities"]:
-        meta = f'<p class="cardmeta">{nights_line(t)}</p>'
-        # NOT the country. Every destination on a region page is in the same
-        # country, so a kicker reading NORWAY eight times down the grid is
-        # the boilerplate the "never explain the constraint back" rule
-        # forbids: a reason shared by every result is hoisted into one line
-        # above the list — here, the breadcrumb and the h1 — and the row
-        # carries only what distinguishes it. What kind of place it is does.
-        cards.append(card(urls.city(c, r, t),
-                          CITY_TYPE_NAMES.get(t.get("city_type"), "Destination"),
-                          t["name"], t["summary"],
-                          seed=f"city:{c['slug']}:{t['slug']}", meta=meta,
-                          motif=motif_for(t["interests"], t.get("city_type"))))
+    # A THREE-COLUMN CARD GRID HOLDING ONE CARD, ON A QUARTER OF THE REGIONS.
+    #
+    # 97 of the 130 travel regions hold one or two destinations — 26 hold
+    # exactly one — so the band that IS the subject of the page opened with a
+    # single 280px tile and two empty columns beside it. That is the stories
+    # index failure exactly: a card alone in a 1,168px row, with the shape of
+    # the data deciding the layout and the layout unable to say so.
+    #
+    # And the tile's picture was a plate drawn from the destination's own
+    # hash, one or two per page over 130 pages, directly under a real map of
+    # the region that shows where those same places are. The measurement that
+    # emptied the homepage, /journeys, /europe-in, the stories index and the
+    # seventeen interest pages applies here for the same reason: a
+    # destination is chosen on where it is and what it is like, and neither
+    # of those is a LOOK, which is the test a card has to pass.
+    #
+    # Rows, which is what the rest of this page already is — places, things
+    # to do and journeys are all rows — so the region page stops speaking two
+    # list languages one band apart.
+    #
+    # NOT the country in the meta. Every destination on a region page is in
+    # the same country, so a kicker reading NORWAY eight times down the list
+    # is the boilerplate the "never explain the constraint back" rule forbids:
+    # the shared reason is hoisted into the breadcrumb and the h1, and each
+    # row carries only what distinguishes it. What kind of place it is does.
+    destrows = "".join(
+        f'<a class="row" href="{urls.city(c, r, t)}">'
+        f'<div><h3>{esc(t["name"])}</h3>'
+        f'<p class="rowsub">{esc(t["summary"])}</p></div>'
+        f'<p class="rowmeta">'
+        f'{esc(CITY_TYPE_NAMES.get(t.get("city_type"), "Destination"))}<br>'
+        f'<span class="small">{nights_line(t)}</span></p></a>'
+        for t in r["cities"])
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)),
          (c["name"], urls.country(c)), (r["name"], None)])}
@@ -2494,7 +2513,7 @@ def region_page(data, c, r):
 
 {regionmap(data, c, r)}
 
-{section("Destinations", grid(cards, 3))}
+{section("Destinations", f'<div class="rows">{destrows}</div>')}
 {section("Places to see", f'<div class="rows">{placerows}</div>',
          lede=f"Everything recorded across {r['name']}, in one list.") if placerows else ""}
 {section("Things to do", f'<div class="rows">{exprows}</div>') if exprows else ""}
