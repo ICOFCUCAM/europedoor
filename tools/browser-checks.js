@@ -940,8 +940,15 @@ async function main() {
   const allCount = await page.locator("#dots .dot").count();
   ok(litCount > 0 && litCount < allCount, "the preselected layer did not filter anything");
 
-  // Event categories must filter the year.
-  await page.goto(base + "/events", { waitUntil: "networkidle" });
+  // Event categories must filter the month.
+  //
+  // THIS RAN ON /events AND THE ROWS MOVED. The index printed all 197
+  // fixtures across twelve bands and fifteen screens, so the filter was a
+  // control on a page nobody could scroll; the rows live on the month pages
+  // now and the control went with them. The promise is unchanged — checking
+  // a category narrows the list and does not empty it — and it is asserted
+  // where a reader can actually use it.
+  await page.goto(base + "/events/jun", { waitUntil: "networkidle" });
   const beforeEvents = await page.locator(".row.event:not([hidden])").count();
   await page.check('#eventkinds input[value="food"]');
   await page.waitForTimeout(150);

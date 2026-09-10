@@ -884,12 +884,23 @@ def s32():
          "and a rights position, which is why no year is printed.")
 def s33():
     yield has("/events", "The European year")
-    yield "data-kind" in page("/events"), "every fixture carries its category"
-    # The URL carries a content hash now, so the literal path is a shape and
-    # not the promise. What matters is that the events script is the one this
-    # page loads.
-    yield bool(re.search(r'/assets/js/events\.[0-9a-f]+\.js', page("/events"))), \
+    # THE FIXTURES AND THEIR FILTER MOVED TO THE MONTH PAGES, and these two
+    # assertions followed them rather than being deleted. The index used to
+    # print all 197 fixtures across twelve bands and 14,875 pixels, so the
+    # filter was a control on a page nobody could scroll; the promise the
+    # specification actually makes is that every fixture carries a category
+    # and that the categories filter the list, and both hold where a reader
+    # can use them. Seventh assertion in this repository to have pinned the
+    # page a thing was on rather than the thing.
+    yield "data-kind" in page("/events/jun"), "every fixture carries its category"
+    yield bool(re.search(r'/assets/js/events\.[0-9a-f]+\.js', page("/events/jun"))), \
         "and the categories filter the list"
+    # And the index still answers the question an events index is for — when
+    # to go — which is the year band, and it names every month.
+    yield "yearband" in page("/events") or "year-band" in page("/events"), \
+        "the index draws the year"
+    for m in DATA["taxonomy"]["months"]:
+        yield f'href="/events/{m}"' in page("/events"), f"and links {m}"
     kinds = {f.get("kind") for c in DATA["countries"].values() for f in c["festivals"]}
     yield len(kinds) >= 6, f"{len(kinds)} event categories in use"
     yield None not in kinds, "and every fixture is categorised"

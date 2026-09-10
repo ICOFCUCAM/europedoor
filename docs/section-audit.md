@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**101 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1 refused · 1353 assertions · 0 failing**
+**101 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1 refused · 1366 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -44,7 +44,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 30 | Business verification | BUILT | 3 | Three levels with what each actually checks, published. Named applied/reviewed/verified rather than basic/verified/trusted, because 'trusted' is a claim about a business we cannot make. |
 | 31 | Business monetisation | RECORDED | 2 | Free, Professional and Premium at the specification's indicative prices, published with the caveat that they are untested. |
 | 32 | Tourism board platform | PARTIAL | 1 | The offer is published, including the one thing that is not for sale. The dashboard needs traffic that does not exist yet. |
-| 33 | Events platform | PARTIAL | 19 | The recurring European year, with a page per month that also answers where to go, and the specification's event categories as a filter on every one of them. Dated per-year listings need a feed and a rights position, which is why no year is printed. |
+| 33 | Events platform | PARTIAL | 32 | The recurring European year, with a page per month that also answers where to go, and the specification's event categories as a filter on every one of them. Dated per-year listings need a feed and a rights position, which is why no year is printed. |
 | 34 | Editorial CMS | PARTIAL | 93 | Version control is the CMS: every article is a record in data/, reviewed as a diff, with history and rollback for free. A browser editor is a backend product. |
 | 35 | Content quality system | PARTIAL | 7 | Draft → review → publish is the pull request, and the periodic review cycle is now automated: a check expires after a fixed interval and the board says so, so nothing can earn a verified badge once and keep it. What is still missing is the checking. |
 | 36 | Database model | PARTIAL | 12 | Every entity in the specification's list exists as validated data; the ones that need a write from someone other than a committer exist as DDL, with the migration trigger named. |

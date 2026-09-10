@@ -1358,7 +1358,7 @@ def countries_index(data):
             <div class="band-head"><p class="kicker">{len(m['countries'])} countries · {mcity} destinations</p>
             <h2><a href="{urls.macro(m)}" class="nodec">{esc(m['name'])}</a></h2>
             <p class="lede">{esc(m['blurb'])}</p></div>
-            <figure class="bandart">{region_glyph(m['countries'])}</figure>
+            <figure class="bandart">{region_glyph(m["countries"], macro_frame(data, m))}</figure>
             </div>
             <div class="rows">{''.join(rows)}</div></section>"""
         )
@@ -5856,7 +5856,27 @@ def numword(k):
     return NUMWORDS[k] if 0 <= k < len(NUMWORDS) else str(k)
 
 
-def region_glyph(members):
+def macro_frame(data, macro):
+    """Every destination in a macro region, projected — the box to frame on.
+
+    The countries themselves would be the truer extent and `geo.landmass`
+    hands back markup rather than geometry, so this frames on what the region
+    is FOR: the places in it. The difference matters least where it would
+    show most — a region's destinations sit inside its countries by
+    construction — and the padding is a third of the region's own size.
+    """
+    pts = []
+    for cs in macro["countries"]:
+        c = data["countries"].get(cs)
+        if not c:
+            continue
+        for r in c["regions"]:
+            for t in r["cities"]:
+                pts.append(project(t["lat"], t["lon"]))
+    return pts
+
+
+def region_glyph(members, frame=None):
     """A macro region as the countries it is made of, on the shared silhouette.
 
     THE ATLAS INDEX IS THE PAGE ABOUT COUNTRIES AND IT DREW NONE. /countries
@@ -5880,6 +5900,23 @@ def region_glyph(members):
 
     One coastline for all nine, because the members go ON the shared clone
     rather than carrying their own copy of Europe.
+
+    AND EACH ONE IS FRAMED ON ITS OWN GROUND. The first version drew all nine
+    at the full continental extent, so nine bands down the atlas index
+    carried nine identical pictures of Europe with a different corner of it
+    lit — which is the homepage's eleven-maps failure, on the page directly
+    under it, and the Baltic States lit about 2% of a frame the reader had
+    already seen eight times. The viewBox is the members' own extent now,
+    padded and held to the canvas's proportion so the glyph box does not
+    change shape between bands: the Nordics is a Nordic frame, the
+    Mediterranean a Mediterranean one, and the two are told apart before the
+    heading is read.
+
+    `frame` is the points to frame on — a region's destinations — because
+    `geo.landmass` returns markup rather than geometry and this needs a
+    bounding box. Without it the drawing falls back to the whole continent,
+    which is correct rather than clever: a caller that cannot say where a
+    region is gets the picture that makes no claim.
     """
     doc = geo.load("europe-lod0.json")
     if not doc:
@@ -5887,7 +5924,43 @@ def region_glyph(members):
     _ctx, lit = geo.landmass(
         MAPPROJ, (0.0, 0.0, float(MAP_W), float(MAP_H)), doc=doc,
         only=members, highlight=members, thin_units=5.0, min_units=60.0)
-    return (f'<svg class="constel regionglyph" viewBox="0 0 {MAP_W} {MAP_H}" '
+    view = f"0 0 {MAP_W} {MAP_H}"
+    if frame:
+        xs = [x for x, _ in frame]
+        ys = [y for _, y in frame]
+        x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+        # A THIRD OF THE REGION'S OWN SIZE AS CONTEXT, with a floor: a
+        # one-country region would otherwise frame a dot, and what makes a
+        # glyph readable is the coast around the lit part.
+        pad = max((x1 - x0), (y1 - y0)) * 0.34
+        pad = max(pad, 90.0)
+        x0, x1, y0, y1 = x0 - pad, x1 + pad, y0 - pad, y1 + pad
+        # Held to the canvas proportion so nine glyphs are nine boxes of the
+        # same shape and only the geography inside them differs.
+        w, h = x1 - x0, y1 - y0
+        want = MAP_W / MAP_H
+        if w / h < want:
+            grow = (h * want - w) / 2
+            x0, x1 = x0 - grow, x1 + grow
+        else:
+            grow = (w / want - h) / 2
+            y0, y1 = y0 - grow, y1 + grow
+        # AND THE BOX IS SLID BACK ONTO THE DRAWING. The Nordics framed
+        # y = -187, which is 187 units of nothing above the top of the
+        # silhouette: the padding is context and there is no context outside
+        # the canvas. Slid where it fits, clamped where the region is wider
+        # than the frame it is being drawn on.
+        w, h = x1 - x0, y1 - y0
+        if w >= MAP_W:
+            x0, w = 0.0, float(MAP_W)
+        else:
+            x0 = min(max(x0, 0.0), MAP_W - w)
+        if h >= MAP_H:
+            y0, h = 0.0, float(MAP_H)
+        else:
+            y0 = min(max(y0, 0.0), MAP_H - h)
+        view = f"{x0:.0f} {y0:.0f} {w:.0f} {h:.0f}"
+    return (f'<svg class="constel regionglyph" viewBox="{view}" '
             f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
             f'{lit}</svg>')
 
@@ -6799,24 +6872,37 @@ def events_page(data):
     for c in data["countries"].values():
         for f in c["festivals"]:
             by_month[f["month"]].append((f, c))
-    blocks = []
-    for m in data["taxonomy"]["months"]:
-        items = sorted(by_month[m], key=lambda p: p[1]["name"])
-        if not items:
-            continue
-        rows = "".join(
-            f"""<a class="row event" data-kind="{esc(f['kind'])}" href="{urls.country(c)}">
-            <div><h3>{esc(f['name'])}</h3><p class="rowsub">{esc(f.get('where', ''))}</p></div>
-            <p class="rowmeta">{esc(EVENT_KIND_NAMES[f['kind']])} · {esc(c['name'])}</p></a>"""
-            for f, c in items
-        )
-        blocks.append(
-            f'<section class="band" id="{esc(m)}"><div class="band-head">'
-            f'<h2><a href="/events/{esc(m)}" class="nodec">{esc(names[m])}</a></h2>'
-            f'<p class="lede">{len(items)} fixed points across Europe. '
-            f'<a href="/events/{esc(m)}">Where to go in {esc(names[m])} →</a></p></div>'
-            f'<div class="rows">{rows}</div></section>'
-        )
+    # THE INDEX PRINTED THE WHOLE YEAR AND RAN TO FIFTEEN SCREENS.
+    #
+    # Twelve <h2> bands, one per month, each holding every fixture in it:
+    # 197 rows, 14,875 pixels, and no reader has ever reached December. It is
+    # the catalogue failure in its purest form — the shape of the data as the
+    # whole layout — and it was worse here than anywhere, because the family's
+    # subject is TIME and the one thing the page could not show was the year.
+    #
+    # The year band above already answers "when should I go", which is the
+    # question an events index exists for. So the twelve months are twelve
+    # entries rather than twelve dumps: how many fixed points, how many
+    # countries are in their quieter shoulder, and a link to the month, which
+    # is where the fixtures and their filter live. Every figure is derived.
+    #
+    # NO SELECTION. "The three best festivals in June" would be a ranking
+    # this atlas does not hold, and three rows out of twenty-eight presented
+    # as a taste is a ranking wearing a smaller hat. The count is the taste.
+    shoulder = {m: sum(1 for c in data["countries"].values()
+                       if m in (c.get("season") or {}).get("shoulder", []))
+                for m in data["taxonomy"]["months"]}
+    most = max((len(v) for v in by_month.values()), default=1) or 1
+    monthrows = "".join(
+        f"""<a class="row monthrow" href="/events/{esc(m)}">
+        <div><h3>{esc(names[m])}</h3>
+        <p class="rowsub">{len(by_month[m])} fixed point{"" if len(by_month[m]) == 1 else "s"} ·
+        {shoulder[m]} countr{"y" if shoulder[m] == 1 else "ies"} in their quieter shoulder</p>
+        <div class="hopbar"><span class="w{min(100, round(len(by_month[m]) / most * 100 / 5) * 5)}"></span></div></div>
+        <p class="rowmeta">Where to go in {esc(names[m])} →</p></a>"""
+        for m in data["taxonomy"]["months"]
+    )
+    blocks = [f'<div class="rows monthrows">{monthrows}</div>']
     # The twelve chips this replaces were the same width and the same weight
     # whether the month held 3 fixtures or 28. See year_band().
     jump = year_band(data)
@@ -6840,14 +6926,15 @@ def events_page(data):
   Dated listings for a given year need a live events feed, which is Stage 2.</p>
 </div>
 {jump}
-<div class="checks" id="eventkinds">{kindfilters}</div>
-<p class="small" id="eventcount"></p>
 {''.join(blocks)}
+<p class="small">Every fixture is on its month's page, with the category filter
+beside it — {total} of them across {len(kindcounts)} categories. They are the
+annual, dependable ones; a dated listing for a given year needs a live events
+feed, which is Stage 2.</p>
 """
     return "/events/index.html", page(
         "Events", body, path="/events", area="events",
         description="The recurring European year: festivals, markets, pilgrimages and seasonal events, month by month, filterable by category.",
-        scripts=["/assets/js/events.js"],
     )
 
 
@@ -6868,6 +6955,20 @@ def events_month_page(data, month):
         <div><h3>{esc(f['name'])}</h3><p class="rowsub">{esc(f.get('where', ''))}</p></div>
         <p class="rowmeta">{esc(EVENT_KIND_NAMES[f['kind']])} · {esc(c['name'])}</p></a>"""
         for f, c in fixtures
+    )
+
+    # THE CATEGORY FILTER CAME WITH THE ROWS. It was on the index, acting on
+    # all 197 fixtures across fifteen screens; the rows are here now, so the
+    # control that acts on them is here too. Built from THIS MONTH'S kinds
+    # rather than from the year's, because a checkbox that can only ever
+    # empty the list is a control lying about what is behind it.
+    kindcounts = {}
+    for f, _c in fixtures:
+        kindcounts[f["kind"]] = kindcounts.get(f["kind"], 0) + 1
+    kindfilters = "".join(
+        f'<label><input type="checkbox" name="eventkind" value="{esc(k)}"> '
+        f'{esc(EVENT_KIND_NAMES[k])} ({n})</label>'
+        for k, n in sorted(kindcounts.items(), key=lambda kv: -kv[1])
     )
 
     peak = sorted((c for c in data["countries"].values()
@@ -6958,7 +7059,7 @@ def events_month_page(data, month):
 </div>
 {year_band(data, month)}
 {monthmap}
-{section(f"On in {name}", f'<div class="rows">{rows}</div>') if rows else ""}
+{section(f"On in {name}", f'<div class="checks" id="eventkinds">{kindfilters}</div>' + f'<p class="small" id="eventcount"></p>' + f'<div class="rows">{rows}</div>') if rows else ""}
 {section(f"At their best in {name}", f'<div class="rows">{country_rows(peak)}</div>',
          lede="Peak season: the weather works, everything is open, and so is everyone else's calendar.") if peak else ""}
 {section(f"Quieter, and often better, in {name}", f'<div class="rows">{country_rows(shoulder)}</div>',
@@ -6970,6 +7071,7 @@ def events_month_page(data, month):
     return f"/events/{month}/index.html", page(
         f"{name} in Europe", body, path=f"/events/{month}", area="events",
         description=f"What is on in Europe in {name}, which countries are at their best, which are in the quieter shoulder season, and where to go instead of the obvious.",
+        scripts=["/assets/js/events.js"],
     )
 
 
@@ -8543,9 +8645,26 @@ def discover_page(data):
     "where do I start". Four ways in — by region, by what you travel for, by
     a curated route, and by month — plus the map, because most people mean
     the map when they say discover."""
+    # THE LAST FIFTEEN ABSTRACT PLATES ON THE SITE WERE ON THIS PAGE.
+    #
+    # Nine macro cards and six motion cards each opened on a landscape chosen
+    # by the hash of a slug — the exact thing measured as "placeholder art
+    # doing a picture's job" when it was removed from the homepage, still
+    # here, on the page whose whole subject is how to choose. A reader
+    # scrolling /discover met fifteen purple gradients that agree with
+    # nothing on the page and tell them nothing about what is behind the
+    # link.
+    #
+    # A MACRO REGION IS THE ONE GROUPING IN THIS ATLAS WITH REAL POLYGONS.
+    # A travel region is a set of destinations and is refused a boundary; the
+    # Nordics is five whole countries Natural Earth already holds. So the
+    # card draws its own members, which is the same claim `macromap()` makes
+    # on the region's own page and the same drawing /countries uses — and
+    # nine of them are nine different shapes, where nine plates were nine
+    # pictures of nowhere.
     macro_cards = [
         card(urls.macro(m), f"{len(m['countries'])} countries", m["name"], m["blurb"],
-             seed="macro:" + m["slug"])
+             art=region_glyph(m["countries"], macro_frame(data, m)))
         for m in data["macros"]
     ]
     n_by_interest = {
@@ -8558,13 +8677,23 @@ def discover_page(data):
         <h3>{esc(i['name'])}</h3></div></a>"""
         for i in data["taxonomy"]["interests"]
     )
-    motion_cards = [
-        card(f"/europe-in/{m['slug']}",
-             f"{sum(1 for cid, x in data['cities'].items() if motion_match(data, m, cid, x)[0])} destinations",
-             m["name"], m["strapline"], seed="motion:" + m["slug"],
-             motif=motif_for(m.get("interests", [])))
+    # AND A MOTION IS A QUERY, NOT A PLACE. It has no coastline, no
+    # topography and no season, so a plate drawn for one is a picture of
+    # nowhere standing in for a sentence — the finding that rebuilt
+    # /europe-in, which prints its twelve queries as queries. This is the
+    # same family two clicks away and it was still drawing landscapes.
+    # The query is generated by the function the twelve pages use, so this
+    # index cannot state a query the page it links to would not.
+    motion_cards = "".join(
+        f"""<a class="card motioncard" href="/europe-in/{esc(m['slug'])}">
+        <div class="card-body">
+        <p class="kicker">{sum(1 for cid, x in data['cities'].items()
+                               if motion_match(data, m, cid, x)[0])} destinations</p>
+        <h3>{esc(m['name'])}</h3>
+        <p class="rowsub">{esc(m['strapline'])}</p>
+        <p class="motionq">{motion_query_words(data, m)}</p></div></a>"""
         for m in data["motions"][:6]
-    ]
+    )
     months = data["taxonomy"]["months"]
     names = data["taxonomy"]["month_names"]
     month_chips = "".join(
@@ -8630,6 +8759,7 @@ def discover_page(data):
   Open the full map, with layers →</span>
 </a>
 
+{constel_defs()}
 {section("By where it is", grid(macro_cards, 3),
          lede="Nine regions of Europe, grouped by shared coast, shared mountain range and shared history rather than by alphabet.",
          more=("Every country, A to Z", "/countries"))}
@@ -8638,7 +8768,7 @@ def discover_page(data):
          lede="Seventeen tags. The Journey Planner weights the same ones, so what you see here is what it will build from.",
          more=("Cross-border themes", "/themes"))}
 
-{section("Europe in Motion", grid(motion_cards, 3),
+{section("Europe in Motion", '<div class="grid cols-3">' + motion_cards + "</div>",
          lede="A dozen ways to cut the continent, each one a query run against every destination on every build rather than a list somebody chose. Each page prints the query that made it.",
          more=("All twelve", "/europe-in"))}
 

@@ -431,7 +431,18 @@ def measure():
                        "database introducing itself and it was the last thing "
                        "on the page. The counts are still there, in the quiet "
                        "line, where they are true and checkable and no longer "
-                       "the argument."},
+                       "the argument. "
+                       "AND THE MENU-BAR PASS TOOK `band` ONE MORE PAGE, 0.760 "
+                       "to 0.759: /events printed the whole year as twelve "
+                       "<h2> bands, one per month, holding all 197 fixtures "
+                       "over 14,875 pixels — the catalogue failure at its "
+                       "purest, on the family whose subject is TIME and which "
+                       "could not show the year. The year band above it "
+                       "already answers when to go, so the twelve months are "
+                       "twelve rows carrying their own counts and their own "
+                       "shoulder figure, and the fixtures and their category "
+                       "filter moved to the month pages where a reader can "
+                       "reach them. 45 KB to 13."},
         },
     }
 
