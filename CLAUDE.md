@@ -1658,6 +1658,41 @@ it**: "examined only 0 rules — it has stopped walking the stylesheet". That
 assertion exists because its first version reported clean while collecting
 nothing, and this is the second time it has paid for itself.
 
+**The photograph pipeline would have failed the build on photograph number
+one.** `picture()` emitted `style="--fx:40%;--fy:30%"` for the focal point,
+and `checks.py` refuses any `style="` attribute anywhere, because CSP hashes
+do not apply to style attributes and one would force `style-src` open on every
+page. Built, enforced, waiting — and contradicting itself, written by the same
+hand that wrote the refusal. **It survived because the register is empty: a
+code path nothing exercises is a code path nothing checks.** The focal point
+is nine anchor classes now, which is what a photo editor reaches for anyway.
+
+**Photographs got the gate the map data has had all along.**
+`scripts/map/fetch.py` refuses to open a socket for a dataset with no licence
+row. Photographs were enforced only at the OUTPUT — no published page may
+reference a file with no register row — and nothing at all stood between
+somebody with an API key and a download.
+`docs/data-licenses/photo-providers.json` holds three questions per provider
+and `scripts/images/fetch.py` refuses before the request until they are
+answered: **may we self-host** (this site serves `img-src 'self' data:` and
+refuses a third-party origin, so a hotlink-only provider needs a decision
+about the security posture of every page, not a build step), **what exactly
+must the credit say** (the renderer changes *before* the first fetch, not
+after), and **is a download ping required**. `Pexels` and `Unsplash` were
+already valid licence values in the schema before any of this.
+
+**None of the three may be answered from memory, and this file's own rule
+says so.** They are facts about a provider's live terms, and the sandbox
+answers 403 to CONNECT for general hosts. Getting one wrong means
+republishing somebody's photograph on terms we invented.
+
+**The fetcher lists and stops.** It prints the photographer, the pixel width
+and the page for each candidate and refuses to pick — a photograph chosen from
+a filename is a photograph nobody looked at, and this is the family whose
+entire argument for buying one is that it does a job the drawing cannot.
+Keys come from the environment, are never printed, and a check greps the
+committed files for anything credential-shaped.
+
 **Design to purpose, not to data shape.** A page's structure comes from what
 the reader is trying to do, not from the shape of the record behind it. The
 experience template renders six rows because the data is six rows, and that is

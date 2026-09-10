@@ -1554,8 +1554,22 @@ html { scroll-padding-top: 5rem; }
  * photograph, centred, takes the sky and loses the subject — which is the
  * single commonest way a responsive hero goes wrong.
  */
+/* NINE FOCAL ANCHORS AS CLASSES, BECAUSE THE ALTERNATIVE WAS AN INLINE
+   STYLE. picture() used to emit style="--fx:..;--fy:.." and checks.py refuses
+   a style attribute anywhere — one of them forces style-src open on every
+   page. The register was empty, so the path was never rendered and the
+   contradiction sat there waiting for photograph number one. */
 .photo { display: block; width: 100%; height: 100%; object-fit: cover;
-         object-position: var(--fx, 50%) var(--fy, 50%); }
+         object-position: 50% 50%; }
+.photo.f-lt { object-position:   0%   0%; }
+.photo.f-ct { object-position:  50%   0%; }
+.photo.f-rt { object-position: 100%   0%; }
+.photo.f-lc { object-position:   0%  50%; }
+.photo.f-cc { object-position:  50%  50%; }
+.photo.f-rc { object-position: 100%  50%; }
+.photo.f-lb { object-position:   0% 100%; }
+.photo.f-cb { object-position:  50% 100%; }
+.photo.f-rb { object-position: 100% 100%; }
 picture { display: block; position: relative; height: 100%; }
 /* The credit is always present in the markup and shown on hover or focus.
    Always-visible credits on 988 pages is a design nobody ships; credits that
@@ -2189,8 +2203,7 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
  * readable over it. A scrim is not decoration here: it is what makes the
  * contrast ratio a property of the design rather than of the picture. */
 .herofull picture { position: absolute; inset: 0; z-index: -2; display: block; }
-.herofull .photo { width: 100%; height: 100%; object-fit: cover;
-                   object-position: var(--fx, 50%) var(--fy, 50%); }
+.herofull .photo { width: 100%; height: 100%; object-fit: cover; }
 .herofull.shot::after {
   content: ""; position: absolute; inset: 0; z-index: -1;
   background: linear-gradient(180deg,

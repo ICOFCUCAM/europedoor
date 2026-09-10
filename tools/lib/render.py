@@ -658,6 +658,37 @@ IMAGE_WIDTHS = (480, 800, 1260, 1800, 2400)
 IMAGE_HOST = ""          # same origin. A CDN hostname goes here and in the CSP.
 
 
+# THE FOCAL POINT IS A CLASS, NOT AN INLINE STYLE, AND THE FIRST VERSION WAS
+# AN INLINE STYLE.
+#
+# `picture()` emitted `style="--fx:40%;--fy:30%"`, and `checks.py` refuses any
+# `style="` attribute anywhere on the site — because CSP hashes do not apply
+# to style attributes, so a single one would force `style-src` open on every
+# page. The whole photograph pipeline was built, enforced and waiting, and it
+# would have failed the build on the FIRST photograph it ever rendered. It
+# survived because the register is empty: a code path nothing exercises is a
+# code path nothing checks.
+#
+# That is the rule this repository already states one screen over — a rule
+# that exists is not a rule that is inherited — and it was written by the
+# same hand that wrote the refusal.
+#
+# Nine anchors rather than a percentage pair. It is what a photo editor
+# actually reaches for, it is nine CSS rules instead of an open-ended set,
+# and the loss against a free percentage is invisible on a cover crop. The
+# register keeps the precise `focal` it was given; the quantisation happens
+# here, at the one place that renders.
+FOCAL_X = (("l", 0), ("c", 50), ("r", 100))
+FOCAL_Y = (("t", 0), ("c", 50), ("b", 100))
+
+
+def focal_class(fx, fy):
+    """[x, y] percentages -> one of nine `f-<x><y>` anchors."""
+    x = min(FOCAL_X, key=lambda p: abs(p[1] - fx))[0]
+    y = min(FOCAL_Y, key=lambda p: abs(p[1] - fy))[0]
+    return f"f-{x}{y}"
+
+
 def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed=None,
             fallback_motif=None):
     """A photograph for `key` if we hold one, otherwise a generated plate.
@@ -685,7 +716,7 @@ def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed
         f'alt="{esc(alt)}" width="{w}" height="{h}" '
         f'loading="{"eager" if eager else "lazy"}" '
         f'fetchpriority="{"high" if eager else "auto"}" decoding="async" '
-        f'class="photo" style="--fx:{fx}%;--fy:{fy}%">'
+        f'class="photo {focal_class(fx, fy)}">'
         f'<figcaption class="credit">{esc(credit)} · {esc(row["licence"])}</figcaption>'
         f"</picture>"
     )

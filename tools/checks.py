@@ -820,6 +820,71 @@ def c_stay_lede():
     return n
 
 
+@check("no photograph is fetched from a provider whose licence is unanswered")
+def c_photo_gate():
+    """The same gate the map data has, on the one input that is somebody else's.
+
+    `scripts/map/fetch.py` refuses to open a socket for a dataset with no
+    licence row. Photographs needed the same thing and did not have it: the
+    register was enforced at the OUTPUT — no published page may reference a
+    file with no row — and nothing stood between a person with an API key and
+    a download.
+
+    Three assertions, and each is about a promise rather than a mechanism:
+      1. every provider the fetcher can reach has a row in the gate;
+      2. a provider whose row is cleared has actually answered all three
+         questions, so `self_host: true` cannot arrive without the
+         attribution string beside it;
+      3. no key is committed anywhere.
+    """
+    gate_path = os.path.join(ROOT, "docs", "data-licenses", "photo-providers.json")
+    fetch_path = os.path.join(ROOT, "scripts", "images", "fetch.py")
+    if not os.path.exists(fetch_path):
+        return 0
+    if not os.path.exists(gate_path):
+        fail("scripts/images/fetch.py exists and there is no licence gate "
+             "beside it — the map pipeline's rule applied to photographs")
+        return 1
+    gate = json.load(open(gate_path, encoding="utf-8"))
+    src = open(fetch_path, encoding="utf-8").read()
+    n = 0
+    for slug in re.findall(r'^\s{4}"([a-z]+)": \{$', src, re.M):
+        n += 1
+        if slug not in gate:
+            fail(f"fetch.py can reach {slug!r} and the licence gate has no "
+                 f"row for it")
+    for slug, row in gate.items():
+        if slug.startswith("$"):
+            continue
+        n += 1
+        answered = [row.get(k) for k in ("self_host", "attribution", "download_ping")]
+        if row.get("self_host") is True and any(
+                a in (None, "", "UNANSWERED") for a in answered):
+            fail(f"{slug}: self_host is cleared while another licence question "
+                 f"is unanswered — the three are one decision")
+        if row.get("self_host") is True and not row.get("read_on"):
+            fail(f"{slug}: cleared with no `read_on` date. A gate opened "
+                 f"without recording when the terms were read is a gate "
+                 f"nobody can re-check")
+    # 3. No credential, anywhere. Shape rather than name, so a key that is not
+    # one of the two we expect is caught too.
+    keyish = re.compile(r"(563492ad|[A-Za-z0-9_-]{40,})")
+    for rel_ in ("docs/data-licenses/photo-providers.json", "scripts/images/fetch.py",
+                 "data/images.json"):
+        f = os.path.join(ROOT, rel_)
+        if not os.path.exists(f):
+            continue
+        body = open(f, encoding="utf-8").read()
+        n += 1
+        for m in keyish.finditer(body):
+            tok = m.group(1)
+            if "://" in body[max(0, m.start() - 12):m.start()]:
+                continue        # part of a URL
+            fail(f"{rel_} contains a {len(tok)}-character token that looks like "
+                 f"a credential — keys live in repository secrets and nowhere else")
+    return n
+
+
 @check("nothing served immutable sits at a URL that can change")
 def c_immutable_assets():
     """`immutable` is a promise about the URL, not about the file.
