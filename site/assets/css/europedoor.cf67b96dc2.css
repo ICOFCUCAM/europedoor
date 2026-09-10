@@ -687,6 +687,21 @@ main.wide { max-width: 92rem; }
 .emptyways a:hover b, .emptyways a:focus-visible b { color: var(--door); }
 @media (max-width: 44rem) { .emptyways { grid-template-columns: 1fr; } }
 
+/* THE ASK PANEL SAID THE SAME THING TWICE AND STACKED BOTH IN A THIRD OF
+   THE PAGE. A full-width textarea, then a narrow paragraph about what the
+   planner reads, then the button, then a second narrow paragraph repeating
+   that it runs in your browser and is not a model — with six hundred pixels
+   of nothing beside each. Two notes about privacy, in one panel, either side
+   of the control they describe.
+
+   One note, beside the button it belongs to: the action is what the reader
+   came for, and the explanation earns its place by sitting level with it
+   rather than in front of it. */
+.askfoot { display: grid; grid-template-columns: auto minmax(0, 1fr);
+           gap: var(--s5); align-items: start; margin-top: var(--s5); }
+.askfoot .hero-actions { margin: 0; }
+@media (max-width: 52rem) { .askfoot { grid-template-columns: 1fr; } }
+
 .rowdist { display: grid; gap: var(--s1); justify-items: end; }
 .dist { width: 8.5rem; height: 12px; display: block; }
 .distaxis { fill: var(--rule); }

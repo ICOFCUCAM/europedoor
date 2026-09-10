@@ -3469,6 +3469,9 @@ def planner_page(data):
 <div class="pagehead instrument">
   <p class="kicker">Journey Planner</p>
   <h1>Twelve days, €2,500, history and mountains.</h1>
+  {head_extent([(len(data['cities']), 'destinations scored'),
+                (len(data['countries']), 'countries'),
+                (len(data['journeys']), 'routes already built')])}
   <p class="lede">Say what you have and what you like — in a sentence, or in the form below.</p>
 </div>
 
@@ -3478,16 +3481,16 @@ def planner_page(data):
     <textarea id="ask" name="ask" rows="2"
       placeholder="I have 12 days and €2,500, starting in Lisbon, and I love history, mountains and food."></textarea>
   </div>
-  <p class="small">The planner reads the whole Atlas — {len(data['cities'])} cities across
-  {len(data['countries'])} countries — scores every one against you, then builds a route that
-  respects distance instead of teleporting between highlights. It runs entirely in your
-  browser; nothing you type is sent anywhere.</p>
-  <div class="hero-actions mt0">
-    <button class="btn" type="submit">Read that and build it</button>
+  <div class="askfoot">
+    <div class="hero-actions mt0">
+      <button class="btn" type="submit">Read that and build it</button>
+    </div>
+    <p class="small mb0">The planner reads the whole Atlas, scores every destination
+    against you, then builds a route that respects distance instead of teleporting
+    between highlights. It is read by rules in your browser — not by a model, and not
+    sent anywhere — and it shows you exactly what it understood, naming anything it
+    could not take account of rather than quietly dropping it.</p>
   </div>
-  <p class="small mb0">Read by rules in your browser — not by a model, and
-  not sent anywhere. It shows you exactly what it understood, and names anything it could not
-  take account of rather than quietly dropping it.</p>
 </form>
 
 <div class="planform">
