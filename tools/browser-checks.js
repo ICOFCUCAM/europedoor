@@ -1410,6 +1410,62 @@ async function main() {
     }
   }
 
+  // ── THE BAR ABOVE THE PAGE ─────────────────────────────────────────
+  // On a phone the address bar and the task-switcher card take
+  // `theme-color`, and with none declared they took the platform default —
+  // so a site whose one band of signature colour is a cobalt masthead
+  // arrived on every Android phone with a white or black strip directly
+  // above it, on all 1,033 pages.
+  //
+  // The value is stated in render.py and asserted here against the colour
+  // Chromium ACTUALLY PAINTS on the masthead, in both worlds and both
+  // preferences. Two places that must agree, and a check on the drift — the
+  // same arrangement vercel.json has against render.HEADERS, for the same
+  // reason. The bar is translucent, so this composites it over the ground
+  // behind it rather than reading the declaration.
+  for (const [url, world] of [["/about", "discover"], ["/map", "intelligence"]]) {
+    for (const scheme of ["light", "dark"]) {
+      const tp = await browser.newPage({ viewport: { width: 390, height: 800 },
+                                         colorScheme: scheme });
+      await tp.goto(base + url, { waitUntil: "networkidle" });
+      const r = await tp.evaluate(() => {
+        const num = (s) => (s.match(/[\d.]+/g) || []).map(Number);
+        const m = getComputedStyle(document.querySelector(".masthead")).backgroundColor;
+        const g = num(getComputedStyle(document.body).backgroundColor);
+        let [r0, g0, b0, a] = num(m);
+        // color() srgb notation reports 0-1 components; rgb() reports 0-255.
+        if (r0 <= 1 && g0 <= 1 && b0 <= 1) { r0 *= 255; g0 *= 255; b0 *= 255; }
+        if (a === undefined) a = 1;
+        const mix = (f, b) => Math.round(f * a + b * (1 - a));
+        const hex = (n) => n.toString(16).padStart(2, "0");
+        const metas = Array.from(document.querySelectorAll('meta[name="theme-color"]'));
+        const media = window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark" : "light";
+        const pick = metas.find((t) => {
+          const q = t.getAttribute("media");
+          return !q || window.matchMedia(q).matches;
+        });
+        return {
+          painted: "#" + hex(mix(r0, g[0])) + hex(mix(g0, g[1])) + hex(mix(b0, g[2])),
+          declared: pick ? pick.getAttribute("content").toLowerCase() : null,
+          n: metas.length, media,
+        };
+      });
+      ok(r.declared !== null,
+         `${url} declares no theme-color for the ${scheme} preference — the ` +
+         `browser paints the bar above the masthead itself`);
+      ok(r.declared === r.painted,
+         `${url} in ${scheme}: theme-color is ${r.declared} and the masthead ` +
+         `paints ${r.painted}`);
+      // INTELLIGENCE is dark in both preferences on purpose, so it declares
+      // ONE value: a media-switched pair there would paint a light bar above
+      // a page that is never light.
+      ok(world === "intelligence" ? r.n === 1 : r.n === 2,
+         `${url} declares ${r.n} theme-colors for the ${world} world`);
+      await tp.close();
+    }
+  }
+
   // ── WHAT A DESTINATION PAGE PRINTS ─────────────────────────────────
   // A destination page is the one thing on this site people print, and there
   // was no print rule anywhere in 4,700 lines of stylesheet: a cobalt

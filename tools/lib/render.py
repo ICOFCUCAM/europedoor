@@ -864,6 +864,47 @@ FOOTER_GROUPS = [
 FOOTER_NAV = [row for _, rows in FOOTER_GROUPS for row in rows]
 
 
+# THE BROWSER PAINTS A BAR ABOVE THIS PAGE AND NOTHING TOLD IT WHAT COLOUR.
+#
+# On a phone the address bar and the task-switcher card take `theme-color`,
+# and with none declared they take the platform default — so a site whose one
+# band of signature colour is a cobalt masthead arrived on every Android
+# phone with a white or black strip directly above it. The masthead is the
+# element that appears on all 1,033 pages; the strip touching it is the first
+# thing a reader sees and the only part of the page we were not colouring.
+#
+# TWO VALUES, BECAUSE THE BAR IS TRANSLUCENT. It is `--cobalt-deep` at 96%
+# over whatever ground is behind it, and the ground differs by world: the
+# DISCOVER world in the light preference is limestone, and DISCOVER-dark and
+# INTELLIGENCE in both preferences are graphite. Composited:
+#
+#   #2a4ad9 at 96% over limestone #f7f6f3  ->  #3251da
+#   #2a4ad9 at 96% over graphite  #101214  ->  #2948d1
+#
+# These are stated here and asserted in the browser suite against the colour
+# Chromium actually paints, in both worlds and both preferences — the same
+# arrangement `vercel.json` has against `render.HEADERS`, for the same
+# reason: two places that must agree, and a check on the drift.
+THEME_COLOR_LIGHT = "#3251da"
+THEME_COLOR_DARK = "#2948d1"
+
+
+def theme_color_meta(world):
+    """The bar above the page, per world.
+
+    INTELLIGENCE is dark in BOTH colour-scheme preferences on purpose — the
+    world says where the reader is, not how they like their screen — so it
+    declares one value and no media query. A media-switched pair there would
+    paint a light bar above a page that is never light.
+    """
+    if world == "intelligence":
+        return f'<meta name="theme-color" content="{THEME_COLOR_DARK}">'
+    return (f'<meta name="theme-color" content="{THEME_COLOR_LIGHT}" '
+            f'media="(prefers-color-scheme: light)">\n'
+            f'<meta name="theme-color" content="{THEME_COLOR_DARK}" '
+            f'media="(prefers-color-scheme: dark)">')
+
+
 # The Content-Security-Policy, in one place because there is one shell.
 #
 # Every directive is the most restrictive value the site can actually run
@@ -1209,6 +1250,7 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="{esc(CSP_META)}">
 <meta name="referrer" content="strict-origin-when-cross-origin">
+{theme_color_meta(world)}
 <title>{esc(full_title)}</title>
 <meta name="description" content="{esc(description)}">
 <link rel="canonical" href="https://europedoor.com{esc(path)}">
