@@ -250,11 +250,37 @@ async function main() {
      "the itinerary does not hoist the shared reason");
   ok(hoists.some((t) => /out in both directions/.test(t)),
      "the itinerary does not hoist what its distances and times are worth");
-  ok(hoists.length <= 2,
+  ok(hoists.length <= 3,
      `${hoists.length} hoisted blocks above the first stop — a preamble, ` +
      "which is the boilerplate the hoist exists to prevent");
   const legWhy = await page.locator("#result .leg .mt-tight").allTextContents();
   ok(legWhy.length >= 3, "legs carry no why-line");
+
+  // AND THE PROMISE THE CEILING WAS STANDING IN FOR: no clause may appear on
+  // every leg. Rendering a real twelve-day Italian route showed five of six
+  // stops opening on the same forty words — "is here for the shape of the
+  // route rather than your interests — it sits between two places that did
+  // match" — and closing on the same "€123 a day here", with the one
+  // differing clause buried between them. Individually true, collectively
+  // boilerplate, and this repository's own rule for exactly this surface.
+  //
+  // Split on the semicolons the sentence is joined with, and on the rate,
+  // and count how many legs carry each clause.
+  {
+    const legs = await page.locator("#result .leg").count();
+    const seen = {};
+    for (const t of legWhy) {
+      const own = new Set(t.replace(/^[^ ]+ is /, "")
+                           .split(/[;.] ?/)
+                           .map((x) => x.trim())
+                           .filter((x) => x.length > 12));
+      for (const clause of own) seen[clause] = (seen[clause] || 0) + 1;
+    }
+    const everywhere = Object.keys(seen).filter((k) => seen[k] === legs && legs >= 3);
+    ok(everywhere.length === 0,
+       `a clause is on all ${legs} legs and was not hoisted: ` +
+       everywhere.map((c) => JSON.stringify(c.slice(0, 60))).join(", "));
+  }
   ok(!legWhy.some((t) => /^Matches /.test(t.trim())),
      "a leg still restates the interests the reader chose");
   ok(legWhy.some((t) => /also |shoulder season|discoverability|not written it up/.test(t)),

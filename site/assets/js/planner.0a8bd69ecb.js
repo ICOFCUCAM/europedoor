@@ -427,6 +427,31 @@
    * sentence is "you did not ask for this and it is here anyway".
    */
   function whyLine(city, wants, opts) {
+    var bits = whyBits(city, wants, opts);
+    if (!bits.length) return "";
+    /* Semicolons between the clauses, not "and". Each clause already
+     * contains an "and" of its own ("also architecture, art and wine"), so
+     * joining them with another one produced "…and wine & drink and at its
+     * peak then" — two conjunctions colliding in every sentence. */
+    return city.name + " is " + bits.join("; ") + ".";
+  }
+
+  /* THE CLAUSES, SEPARATELY, SO THE SHARED ONES CAN BE HOISTED.
+   *
+   * whyLine() joined them straight into a sentence, and rendering a real
+   * itinerary showed what that costs: on a twelve-day Italian route, five of
+   * six stops read "…is here for the shape of the route rather than your
+   * interests — it sits between two places that did match; …; at its peak
+   * then. €123 a day here." The differing middle clause was buried between
+   * forty identical words at each end.
+   *
+   * That is this repository's own rule — never explain the constraint back,
+   * a reason shared by every result goes in one line above the list — broken
+   * on the planner, which is the surface it was written for. The function
+   * that composes the sentence cannot hoist anything, so the caller gets the
+   * clauses and decides.
+   */
+  function whyBits(city, wants, opts) {
     var bits = [];
 
     var extra = city.interests.filter(function (t) {
@@ -464,12 +489,17 @@
                    "between two places that did match");
     }
 
-    if (!bits.length) return "";
-    /* Semicolons between the clauses, not "and". Each clause already
-     * contains an "and" of its own ("also architecture, art and wine"), so
-     * joining them with another one produced "…and wine & drink and at its
-     * peak then" — two conjunctions colliding in every sentence. */
-    return city.name + " is " + bits.join("; ") + ".";
+    return bits;
+  }
+
+  /* One leg's line, with whatever the hoist already said removed. A leg
+   * whose every clause was shared says nothing at all rather than repeating
+   * the hoist — an empty paragraph is worse than an absent one. */
+  function legWhy(city, bits, shared, rate) {
+    var mine = bits.filter(function (b) { return shared.indexOf(b) < 0; });
+    var text = mine.length ? city.name + " is " + mine.join("; ") + "." : "";
+    if (rate) text += (text ? " " : "") + rate + " a day here.";
+    return text ? '<p class="small mt-tight">' + text + "</p>" : "";
   }
 
   function alternativesFor(scored, route, i, used) {
@@ -1022,6 +1052,31 @@
     CUR = opts.currency || "EUR";
     var c = costing(route, opts);
     var day = 1, legs = "", i, hop, countries = [];
+
+    /* WHAT EVERY STOP SAYS, HOISTED OUT OF EVERY STOP. Rendering a real
+     * twelve-day Italian route showed five of six legs opening on the same
+     * forty words — "…is here for the shape of the route rather than your
+     * interests — it sits between two places that did match" — and closing
+     * on the same "€123 a day here", with the one differing clause buried
+     * between them. Individually true, collectively boilerplate, and
+     * boilerplate is what a reader learns to skip.
+     *
+     * A clause is hoisted only when EVERY stop carries it and there are at
+     * least three stops: on a two-stop route "both of them" is not a
+     * pattern, it is a coincidence. */
+    var allBits = [], allRates = [], shared = [], sharedRate = null;
+    for (i = 0; i < route.length; i++) {
+      allBits.push(whyBits(route[i].city, opts.wants, opts));
+      allRates.push(money(dailyRate(route[i].city, opts.style)));
+    }
+    if (route.length >= 3) {
+      shared = allBits[0].filter(function (b) {
+        return allBits.every(function (bs) { return bs.indexOf(b) >= 0; });
+      });
+      if (allRates.every(function (r) { return r === allRates[0]; })) {
+        sharedRate = allRates[0];
+      }
+    }
     var scoredAll = window.__EPD_SCORED || [];
     var usedAll = window.__EPD_USED || {};
     for (i = 0; i < route.length; i++) {
@@ -1095,8 +1150,7 @@
               '<h3><a href="' + city.url + '">' + city.name + "</a> <span class=\"small\">· " +
               city.country + " · " + city.region + "</span></h3>" +
               "<p>" + city.why + "</p>" +
-              '<p class="small mt-tight">' + whyLine(city, opts.wants, opts) +
-              " " + money(dailyRate(city, opts.style)) + " a day here." + "</p>" +
+              legWhy(city, allBits[i], shared, sharedRate ? "" : allRates[i]) +
               '<ul class="daylist">' + dayHtml + "</ul>" + forcedNote + altHtml +
               controls +
               "</div></li>";
@@ -1134,6 +1188,17 @@
         ? '<p class="whyall"><span>In common</span> Every stop below carries at least one of ' +
           joinList(opts.wants.map(interestName)) +
           " — because that is what you asked for. Each line says what else is true of it.</p>"
+        : "") +
+      (shared.length || sharedRate
+        ? '<p class="whyall"><span>Every stop</span> ' +
+          (shared.length
+            ? "is " + shared.join("; ") + "."
+            : "") +
+          (sharedRate
+            ? (shared.length ? " " : "") + "Every one of them costs about " +
+              sharedRate + " a day."
+            : "") +
+          " Each line below carries only what is different." + "</p>"
         : "") +
       '<p class="whyall"><span>Every hop</span> is a straight line, and the time ' +
         'is that distance at one average speed. With no route geometry here the ' +
