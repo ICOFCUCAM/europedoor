@@ -7622,13 +7622,36 @@ def events_month_page(data, month):
     quiet = [n for n in data["cities"].values()
              if n["city"].get("quiet") and month in n["country"]["season"].get("shoulder", [])]
     quiet.sort(key=lambda n: (n["country"]["name"], n["city"]["name"]))
-    qcards = [
-        card(urls.city(n["country"], n["region"], n["city"]),
-             f"{n['country']['name']} · {n['region']['name']}", n["city"]["name"],
-             n["city"]["summary"], seed=f"city:{n['country']['slug']}:{n['city']['slug']}",
-             motif=motif_for(n["city"]["interests"], n["city"].get("city_type")))
-        for n in quiet[:6]
-    ]
+    # SIX HASH-DRAWN LANDSCAPES ON TWELVE MONTH PAGES, and the last card grid
+    # of them on the site outside the country pages.
+    #
+    # This band is the single most useful recommendation this dataset makes —
+    # a quiet place in a country that is in its shoulder season THIS MONTH —
+    # and it was six abstract gradients above six names. A destination is
+    # chosen on where it is and what it is like; neither is a look, which is
+    # the test a card has to pass, and this is the same measurement that
+    # emptied the homepage, /journeys, /europe-in, the stories index, the
+    # seventeen interest pages, 130 region pages and twelve motion pages.
+    #
+    # ONE DRAWING FOR THE SIX, not six. What a reader wants from "where would
+    # you send me in October" is where those places ARE — and six framed
+    # thumbnails would be six pictures of the same continent, which is the
+    # nine-macro-regions fault. The /themes answer: the set lit on one extent,
+    # and the rows underneath it name them in the order the page already
+    # sorted them.
+    qshown = quiet[:6]
+    qart = constellation(
+        [project(n["city"]["lat"], n["city"]["lon"]) for n in qshown],
+        frame=True) if qshown else ""
+    qrows = "".join(
+        f'<a class="row" href="{urls.city(n["country"], n["region"], n["city"])}">'
+        f'<div><h3>{esc(n["city"]["name"])}</h3>'
+        f'<p class="rowsub">{esc(n["city"]["summary"])}</p></div>'
+        f'<p class="rowmeta">{esc(n["country"]["name"])}<br>'
+        f'<span class="small">{esc(n["region"]["name"])}</span></p></a>'
+        for n in qshown)
+    qband = (f'<div class="quietsend"><figure class="quietart">{qart}</figure>'
+             f'<div class="rows">{qrows}</div></div>') if qshown else ""
 
     ms = data["taxonomy"]["months"]
     i = ms.index(month)
@@ -7689,6 +7712,7 @@ def events_month_page(data, month):
   {n_of(len(peak), "country")} at their best and {len(shoulder)} in the quieter
   shoulder — which is usually where you should be going.</p>
 </div>
+{constel_defs() if qshown else ""}
 {year_band(data, month)}
 {monthmap}
 {section(f"On in {name}", f'<div class="checks" id="eventkinds">{kindfilters}</div>' + f'<p class="small" id="eventcount"></p>' + f'<div class="rows">{rows}</div>') if rows else ""}
@@ -7696,9 +7720,12 @@ def events_month_page(data, month):
          lede="Peak season: the weather works, everything is open, and so is everyone else's calendar.") if peak else ""}
 {section(f"Quieter, and often better, in {name}", f'<div class="rows">{country_rows(shoulder)}</div>',
          lede="Shoulder season. The Journey Planner scores these upward rather than downward for exactly this month.") if shoulder else ""}
-{section("Where we would actually send you", grid(qcards, 3),
-         lede=f"Quiet places in countries that are in shoulder season this month — the intersection of the two things that matter.",
-         more=("Every quiet place", "/beyond-the-obvious")) if qcards else ""}
+{section("Where we would actually send you", qband,
+         lede=("Quiet places in countries that are in shoulder season this month "
+               "— the intersection of the two things that matter. The drawing is "
+               "where those six are, on one frame. "
+               + geo.sources_line(geo.load("europe-lod0.json"))),
+         more=("Every quiet place", "/beyond-the-obvious")) if qshown else ""}
 """
     return f"/events/{month}/index.html", page(
         f"{name} in Europe", body, path=f"/events/{month}", area="events",

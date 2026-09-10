@@ -2282,7 +2282,7 @@ def c_frontend():
     # on a gradient chosen by the hash of a slug, on the family whose whole
     # argument is that a motion is not a place.
     FLOORS = {"kicker": 0.99, "masthead": 0.99, "pagehead": 0.99, "crumbs": 0.99,
-              "row": 0.85, "card": 0.06, "band": 0.70, "note": 0.70}
+              "row": 0.85, "card": 0.05, "band": 0.70, "note": 0.70}
     total = 0
     hits = {k: 0 for k in FLOORS}
     for path in site_files():

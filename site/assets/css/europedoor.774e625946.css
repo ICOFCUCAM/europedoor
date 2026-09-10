@@ -788,6 +788,27 @@ main.wide { max-width: 92rem; }
 .planmap .constel-route { stroke-width: 7; }
 .planmap .constel-route.case { stroke-width: 14; }
 
+/* ONE DRAWING FOR THE SIX. A month page's last band answers "where would
+   you send me in October", and it was six abstract plates over six names.
+   Six framed thumbnails would be six pictures of the same continent, so the
+   set is lit on one extent beside the rows that name them — the /themes
+   arrangement, on the family whose subject is time. */
+.quietsend { display: grid; grid-template-columns: 20rem minmax(0, 1fr);
+             gap: var(--s6); align-items: start; }
+.quietart { margin: 0; }
+.quietart .constel { display: block; width: 100%; height: auto; }
+/* NOT `.constel-theme`, WHOSE MARKS ARE 22 UNITS. That radius is right for a
+   themes row, drawn unframed at the whole continent; this drawing is FRAMED
+   on six places, so the same number rendered as six blue discs the size of
+   Switzerland. A radius in viewBox units is not a radius in pixels — the
+   same arithmetic that took the map labels off narrow screens. */
+.quietart .constel-lit circle { r: 10px; stroke: var(--atlas-here);
+                                stroke-width: 2; }
+@media (max-width: 60rem) {
+  .quietsend { grid-template-columns: 1fr; }
+  .quietart { max-width: 22rem; }
+}
+
 .rowdist { display: grid; gap: var(--s1); justify-items: end; }
 .dist { width: 8.5rem; height: 12px; display: block; }
 .distaxis { fill: var(--rule); }
