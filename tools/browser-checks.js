@@ -1521,7 +1521,18 @@ async function main() {
     // visits. Same category as the three above: needed by the instruments,
     // unreachable from here, and the honest fix is scoping the base rules
     // `:not(.atlas)` — a refactor of every minimap selector.
-    const DEAD_CEILING = 23;
+    // 23 -> 25, AND THE TWO ARE HOVER STATES THIS SCAN CANNOT TRIGGER.
+    // `.storylead:hover h3` and `.storyleadwide:hover h3` colour a headline
+    // when a reader points at it; the scan removes a declaration and asks
+    // whether anything on the page moves, and nothing is hovered while it
+    // looks. So they are reported as never winning and they win every time a
+    // reader touches them. That is a limit of the instrument rather than
+    // dead code — the same reason a @media block that does not currently
+    // apply is asleep and not dead, which this scan already had to learn.
+    //
+    // The list was read before this number moved. Raising it is allowed;
+    // raising it without reading is what the ceiling exists to stop.
+    const DEAD_CEILING = 25;
     const seen = new Map();
     for (const u of ["/", "/europe/austria", "/europe/austria/tyrol",
                      "/europe/austria/tyrol/innsbruck",

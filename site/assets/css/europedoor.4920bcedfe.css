@@ -3876,3 +3876,51 @@ body[data-hero] .masthead { position: sticky; }
  * shape this stylesheet uses for something INERT. These are the fastest way
  * into the product. They keep the primitive and take the ink they deserve. */
 .closing .sourcenote { margin-top: var(--s5); }
+
+/* ── THE INDEXES THAT SHOWED EVERYTHING EXCEPT THE THING ──────────────
+ *
+ * /journeys was seventeen rows of kicker, name, dot-separated stops, a thin
+ * bar and three right-aligned facts. Every one identical, no drawing
+ * anywhere — and the HOMEPAGE was showing three journeys better than the
+ * journeys index showed seventeen, because the homepage drew their routes.
+ *
+ * A journey is chosen on where it goes. That is the one question this atlas
+ * can answer in a picture and the one the index refused to. No two of the
+ * seventeen lines are alike — Arctic to Mediterranean is the length of
+ * Europe, the Iberian Circle is a loop in one corner — so this is the family
+ * where a drawing per row DIFFERENTIATES rather than repeats, which is the
+ * test the homepage's four doors failed and this one passes. */
+/* The name was --t-lg, a hair above the stops list under it, so seventeen
+ * journeys had seventeen quiet headings. An index's rows are its subject. */
+.journeyrows .row { grid-template-columns: minmax(0, 1fr) 15rem; align-items: center; }
+.journeyrow h3 { font-family: var(--serif); font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
+                 line-height: 1.12; margin: 0 0 var(--s2); }
+.journeyrow:hover h3, .journeyrow:focus-visible h3 { color: var(--door); }
+.jart .constel { width: 100%; }
+.jart .constel-lit circle { r: 11px; }
+.jart .constel-route { stroke-width: 8; }
+.journeyrow .jfacts {
+  text-align: left; margin: var(--s3) 0 0; font-size: var(--t-sm);
+  letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3);
+}
+
+/* And /stories was nine of the same row with a 132px grey Europe at the end
+ * of each: too small to name a place, and eight of them saying nothing eight
+ * times. The lead is the newest piece — a date, not a judgement — with its
+ * own places drawn at size; the other eight are the row without the glyph. */
+.storyleadwide {
+  display: grid; grid-template-columns: 22rem minmax(0, 1fr); gap: var(--s6);
+  align-items: center; text-decoration: none; color: inherit;
+  border-top: 1px solid var(--rule); padding: var(--s6) 0;
+}
+.storyleadwide h3 {
+  font-family: var(--serif); font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
+  line-height: 1.12; margin: 0 0 var(--s3);
+}
+.storyleadwide .rowsub { max-width: 52ch; }
+.storyleadwide:hover h3, .storyleadwide:focus-visible h3 { color: var(--door); }
+
+@media (max-width: 52rem) {
+  .journeyrows .row, .storyleadwide { grid-template-columns: 1fr; gap: var(--s4); }
+  .jart { max-width: 18rem; }
+}

@@ -2965,14 +2965,32 @@ def journeys_index(data):
         segs = "".join(
             f'<span class="w{max(1, int(round(km / total * 100)))}"></span>'
             for km in hops) if total else ""
+        # AND THE ROUTE IS DRAWN. Seventeen rows of kicker, name, dot-separated
+        # stops and a thin bar is a spreadsheet: the page told a reader
+        # everything about a journey except where it goes, which is the one
+        # question a journey is chosen on and the one this atlas can answer
+        # in a picture. The homepage was showing three journeys better than
+        # the journeys index showed seventeen.
+        #
+        # No two of these seventeen lines are alike — Arctic to Mediterranean
+        # is the length of Europe, the Iberian Circle is a loop in one corner,
+        # the Baltic Crossing is four capitals in a square — so this is the
+        # one family where a drawing per row differentiates rather than
+        # repeats. That is the test the homepage's four doors failed and this
+        # one passes.
+        route = constellation(
+            [project(data["cities"][l["city"]]["city"]["lat"],
+                     data["cities"][l["city"]]["city"]["lon"]) for l in j["legs"]],
+            route=True)
         rows.append(
             f'<a class="row journeyrow" href="{urls.journey(j)}">'
             f'<div><p class="kicker">{esc(j["strapline"])}</p>'
             f'<h3>{esc(j["name"])}</h3>'
             f'<p class="rowsub">{" · ".join(stops)}</p>'
-            f'<span class="hopbar route" aria-hidden="true">{segs}</span></div>'
-            f'<p class="rowmeta">{j["days"]} days<br>{len(countries)} countries'
-            f'<br>{esc(j["difficulty"])}</p></a>')
+            f'<span class="hopbar route" aria-hidden="true">{segs}</span>'
+            f'<p class="rowmeta jfacts">{j["days"]} days · {len(countries)} countries'
+            f' · {esc(j["difficulty"])}</p></div>'
+            f'<div class="jart">{route}</div></a>')
     body = f"""
 {crumbs([("Europe", "/discover"), ("Journeys", None)])}
 <div class="pagehead index">
@@ -2982,8 +3000,11 @@ def journeys_index(data):
   every stop links back into the Atlas, and the nights add up to the days on the tin. Take one
   as written, or open it in the Planner and bend it to the time you actually have.</p>
 </div>
-<div class="rows">{"".join(rows)}</div>
-<p class="small">Every stop above is a place in the Atlas, in the order the
+{constel_defs()}
+<div class="rows journeyrows">{"".join(rows)}</div>
+<p class="small">The shape beside each route is where it goes, drawn on the same
+projection as every other map here. {geo.sources_line(geo.load("europe-lod0.json"))}
+Every stop above is a place in the Atlas, in the order the
 route takes it. The line under each is that journey's own legs end to end —
 its share of the whole distance, so the shape is the trip's rhythm rather
 than a comparison between trips. Distances are straight lines between
@@ -5563,7 +5584,30 @@ def experiences_index(data):
   <div class="hero-actions"><a class="btn" href="/experiences/join">List your experience</a>
   <a class="btn ghost" href="/for-businesses">For businesses</a></div>
 </div>
+<!-- "Recently added" WAS A CLAIM THE DATA CANNOT SUPPORT. An experience
+     carries a slug, a name, a kind, a band and a summary, and no date of
+     any sort, so these 24 were simply the first 24 the loader returned in
+     country order — Austria to Croatia, called recent. A false ordering is
+     worse than none, because a reader takes it for a signal. -->
+{section("Twenty-four of them", f'<div class="rows">{rows}</div>',
+         lede="What people actually do, in country order — there is no date on an "
+              "experience here, so this is a sample and not a recency. Every one is a "
+              "real, named thing in a real place, and every one links to the page of "
+              "the place it happens in.",
+         more=("How this list is cut", "#kinds"))}
+
+<!-- THE TWO AXES CAME AFTER THE EXPERIENCES, and the order is the whole
+     change. The page opened on eighteen taxonomy rows — eight categories,
+     then ten kinds, both as bar charts — so a reader met the information
+     architecture before a single thing anybody does. That is design to the
+     data's shape rather than to the reader's purpose, and this page's own
+     head says its subject is "what people actually do here".
+     The bars are kept: Family holds 131 entries and Luxury holds 5, and
+     that difference is real and is the argument for having two axes at all.
+     They are now the answer to "how is this list cut", asked after the
+     list. -->
 {section(f"{numword(len(data['categories'])).capitalize()} categories", '<div class="rows">' + "".join(catcards) + "</div>",
+         tone="quiet",
          lede=f"What an experience is about, largest first. An experience may be in "
               f"several of these at once — {len(data['categories'])} categories hold "
               f"{sum(catn.values())} memberships across {len(items)} experiences — so each "
@@ -5571,17 +5615,11 @@ def experiences_index(data):
               f"Each row carries three of its own entries, and each category page prints the "
               f"rule that built it.")}
 {section(f"{numword(len(kinds)).capitalize()} kinds", '<div class="rows">' + "".join(cards) + "</div>",
+         tone="quiet",
          lede=f"The other axis: what you physically do. A cellar visit and a cathedral are "
               f"both sacred to somebody; only one of them is a walk. These do not overlap — "
               f"every experience has exactly one kind, and the {len(kinds)} of them account "
               f"for all {sum(counts.values())}.")}
-<!-- "Recently added" WAS A CLAIM THE DATA CANNOT SUPPORT. An experience
-     carries a slug, a name, a kind, a band and a summary, and no date of
-     any sort, so these 24 were simply the first 24 the loader returned in
-     country order — Austria to Croatia, called recent. A false ordering is
-     worse than none, because a reader takes it for a signal. -->
-{section("Twenty-four of them", f'<div class="rows">{rows}</div>',
-         lede="The first two dozen in country order — there is no date on an experience here, so this is a sample and not a recency.")}
 """
     return "/experiences/index.html", page(
         "Experiences", body, path="/experiences", area="experiences",
@@ -6247,16 +6285,35 @@ def stories_index(data):
         # A story that names no place gets no drawing, on the destination
         # page's rule: nothing in its place rather than something invented.
         return constellation(pts, extra=" constel-theme") if pts else ""
-    desks = '<div class="rows">' + "".join(
-        f'<a class="row storyrow" href="{urls.story(s)}">'
-        f'<div><p class="kicker">{esc(s["section"])}</p>'
-        f'<h3>{esc(s["title"])}</h3>'
-        f'<p class="rowsub">{esc(s["standfirst"])}</p></div>'
-        f'<div class="themeside">{glyph(s)}'
-        f'<p class="rowmeta">{esc(s["published"])}<br>'
-        f'<span class="small">{esc(s["reading"])}</span></p></div></a>'
-        for s in byline
-    ) + "</div>"
+    # A LEAD, AND THEN THE REST. Nine identical rows with a 132px grey Europe
+    # at the right-hand end is a contents page with a decoration on it: the
+    # glyph was too small to name a place, the text stopped at a third of the
+    # column, and the newest piece looked exactly like the ninth. An index of
+    # nine essays has room to say which one to read first, and the answer is
+    # the newest — a date, not a judgement.
+    #
+    # The lead's own places are drawn at size, which is the treatment the
+    # story page and the homepage both already use for this family. The other
+    # eight keep the row, and lose the glyph: at 132px it said nothing, and
+    # eight of them said nothing eight times.
+    lead, rest = byline[0], byline[1:]
+    desks = (
+        f'<a class="storylead storyleadwide" href="{urls.story(lead)}">'
+        f'<div class="storyart">{glyph(lead)}</div>'
+        f'<div><p class="kicker">{esc(lead["section"])} · {esc(lead["reading"])} · '
+        f'{esc(lead["published"])}</p>'
+        f'<h3>{esc(lead["title"])}</h3>'
+        f'<p class="rowsub">{esc(lead["standfirst"])}</p>'
+        f'<p class="doorgo">Read the story →</p></div></a>'
+        '<div class="rows">' + "".join(
+            f'<a class="row storyrow" href="{urls.story(s)}">'
+            f'<div><p class="kicker">{esc(s["section"])}</p>'
+            f'<h3>{esc(s["title"])}</h3>'
+            f'<p class="rowsub">{esc(s["standfirst"])}</p></div>'
+            f'<p class="rowmeta">{esc(s["published"])}<br>'
+            f'<span class="small">{esc(s["reading"])}</span></p></a>'
+            for s in rest
+        ) + "</div>")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Stories", None)])}
 <div class="pagehead index">
@@ -6268,12 +6325,11 @@ def stories_index(data):
 </div>
 {constel_defs()}
 {desks}
-<p class="small">The shape beside each piece is the places that piece is about,
-drawn to the same frame so the nine can be compared — the same field the story
-opens on at full size, and the same reason there is no other picture here: a
-story is not a place, and a landscape chosen for it by chance once put tower
-blocks above an essay on the last unlogged forest in Europe.
-{geo.sources_line(geo.load("europe-lod0.json"))}</p>
+<p class="small">The shape above the lead piece is the places it is about, drawn
+on the same projection as every other map here — and the same reason there is no
+other picture on this page: a story is not a place, and a landscape chosen for it
+by chance once put tower blocks above an essay on the last unlogged forest in
+Europe. Coastline from <a href="/sources">Natural Earth</a>, public domain.</p>
 """
     return "/stories/index.html", page(
         "Stories", body, path="/stories", area="stories",
