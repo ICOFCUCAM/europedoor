@@ -347,18 +347,54 @@ def s12():
 
 
 @section(13, "Destination page", "PARTIAL",
-         "Seventeen of the twenty sections, travel tips now among them. "
-         "Accommodation and restaurants are named and honestly empty — the "
-         "listing product is the missing piece, not the heading.")
+         "Seventeen of the twenty sections, travel tips now among them. The "
+         "Stay layer is built on one exemplar: Chamonix offers a base and a "
+         "referral, the other 318 still say honestly that they list nothing.")
 def s13():
     u = "/europe/norway/fjord-norway/bergen"
     # "Why visit" became "Why go" when the destination family was given its
     # own art direction: the same promise, moved from the fourth screen to
     # the second, numbered, and set at reading size instead of body size.
+    # THIS LIST USED TO PIN THE LITERAL "Accommodation &amp; restaurants",
+    # WHICH IS A SHAPE AND NOT THE PROMISE. It was the seventh assertion in
+    # this repository to protect a layout instead of a claim, and it was a
+    # landmine rather than a live failure: the string was true of all 319
+    # destinations only while none of them had a Stay layer, so the day the
+    # grammar propagated to Bergen this went red for a page that had got
+    # BETTER. A heading that varies with what the place is — "Sleep below the
+    # peaks" in a valley, "Stay on the island" on Naxos — is the design, and
+    # an audit that forbids it is an audit enforcing the absence of the
+    # feature it is auditing.
+    #
+    # The promise is asserted below instead, on both states, and it still
+    # fails on what the literal was really protecting: that the section
+    # exists at all and is honest about what is behind it.
     yield has(u, "Why go", "Places to see", "Things to do", "Events",
-              "Accommodation &amp; restaurants", "When to come", "Getting there",
+              "When to come", "Getting there",
               "Nearest onward stops", "Europe Experience Score", "Save to My Europe",
               "Travel tips")
+    yield 'id="stay"' in page(u), "every destination carries a stay section"
+    # The uncovered state: it says it lists neither, and points at where the
+    # listing product is explained rather than leaving a dead heading.
+    yield has(u, "EuropeDoor lists neither", "for-businesses"), \
+        "an uncovered destination says so and links to how listings will work"
+    # The covered state: a base, the provider named as the party holding the
+    # rooms, our own holdings stated, and a disclosure in whichever direction
+    # the credential points.
+    ex = "/europe/france/alps-and-east/chamonix"
+    yield 'id="stay"' in page(ex), "the exemplar carries the stay section"
+    yield has(ex, "Sleep below the peaks", "Booking.com"), \
+        "the exemplar offers a base and names the provider"
+    yield has(ex, "They hold the rooms, the prices and the availability",
+              "EuropeDoor holds none of the three"), \
+        "who holds what is stated where the reader leaves"
+    yield ("nofollow noopener" in page(ex) and 'target="_blank"' in page(ex)), \
+        "the referral is nofollow, noopener and opens in a new tab"
+    yield ("earns nothing" in page(ex) or "may earn a commission" in page(ex)), \
+        "the disclosure is present in whichever state the credential puts us in"
+    # And the whole point: no invented inventory reached the page.
+    yield every_page(lambda h: "From \u20ac" not in h and "/night" not in h), \
+        "no page prints a nightly rate"
     yield "minimap" in page(u), "the destination carries a map"
     # The composition itself, asserted: the authored sentence is the hero and
     # the argument precedes the metadata. This is the ordering the family

@@ -694,12 +694,86 @@ def c_csp():
             fail(f"_headers no longer sets {name}")
         n += 1
 
-    # And no third-party origin, which is what makes default-src 'none' hold.
+    # AND NO THIRD-PARTY ORIGIN LOADS, WHICH IS WHAT MAKES default-src 'none'
+    # HOLD. This check used to match `src|href` together and fail on any URL
+    # to another origin, and that is a SHAPE rather than the promise: an
+    # `<a href>` is a navigation and `default-src` does not govern
+    # navigations. The Stay layer's outbound referral tripped it on the day
+    # it shipped, and the check was right that something new had happened and
+    # wrong about what.
+    #
+    # Split into the two promises that are actually being made:
+    #
+    #   1. NOTHING LOADS from another origin. Every `src`, every `srcset`,
+    #      and `href` on the elements where href means "fetch this" —
+    #      <link> and <use> — must be same-origin. That is the CSP claim and
+    #      it stays absolute.
+    #   2. NOTHING NAVIGATES to another origin unless that origin is a
+    #      declared, enabled provider in data/stay.json, and every such link
+    #      carries rel="nofollow noopener" and opens in a new tab. That pins
+    #      the set of external hosts to the registry: a new outbound host
+    #      cannot appear on this site without a row that states its
+    #      programme, its mechanism and whether it can supply inventory.
+    #
+    # Both still fail on the thing they were written for, and 2 fails on
+    # three more.
+    stayreg = json.load(open(os.path.join(ROOT, "data", "stay.json"),
+                             encoding="utf-8")) if os.path.exists(
+        os.path.join(ROOT, "data", "stay.json")) else {"providers": []}
+    allowed_hosts = {p["host"] for p in stayreg.get("providers", [])
+                     if p.get("enabled")}
+    if not allowed_hosts:
+        # Not a failure: it is the state this site was in for its whole life
+        # before the Stay layer, and the assertion below is then simply
+        # "no external navigation anywhere", which is stronger.
+        pass
+    loaders = re.compile(
+        r'<(?:link|use|img|script|iframe|source|audio|video|embed|object)\b[^>]*?'
+        r'(?:src|srcset|href|data)="(https?://[^"]+)"', re.I)
     for f in site_files():
         h = open(f, encoding="utf-8").read()
-        for m in re.finditer(r'(?:src|href)="(https?://[^"]+)"', h):
+        # 1. subresources
+        for m in re.finditer(r'\bsrc(?:set)?="(https?://[^"]+)"', h):
             if not m.group(1).startswith("https://europedoor.com"):
                 fail(f"{os.path.relpath(f, OUT)}: loads from {m.group(1)}")
+        for m in loaders.finditer(h):
+            if not m.group(1).startswith("https://europedoor.com"):
+                fail(f"{os.path.relpath(f, OUT)}: loads from {m.group(1)}")
+        # 2. navigations
+        for m in re.finditer(r'<a\b([^>]*?)href="(https?://[^"]+)"([^>]*)>', h):
+            url = m.group(2)
+            if url.startswith("https://europedoor.com"):
+                continue
+            attrs = m.group(1) + m.group(3)
+            host = url.split("/")[2]
+            if host not in allowed_hosts:
+                fail(f"{os.path.relpath(f, OUT)}: links out to {host}, which is "
+                     f"not an enabled provider in data/stay.json — an outbound "
+                     f"commercial link needs a row stating its programme and "
+                     f"its mechanism before it needs a place on a page")
+                continue
+            rel = re.search(r'rel="([^"]*)"', attrs)
+            relv = rel.group(1) if rel else ""
+            for token in ("nofollow", "noopener"):
+                if token not in relv:
+                    fail(f"{os.path.relpath(f, OUT)}: outbound link to {host} "
+                         f"has rel={relv!r}, missing {token!r}")
+                n += 1
+            if 'target="_blank"' not in attrs:
+                fail(f"{os.path.relpath(f, OUT)}: outbound link to {host} does "
+                     f"not open in a new tab; leaving the atlas must be the "
+                     f"reader's choice and not a side effect")
+            # `sponsored` is the machine-readable half of the disclosure and
+            # must track the credential, in both directions.
+            prov = next(p for p in stayreg["providers"] if p.get("host") == host)
+            paid = bool(prov.get("partner_id"))
+            if paid and "sponsored" not in relv:
+                fail(f"{os.path.relpath(f, OUT)}: {host} carries a partner id, so "
+                     f"the link must declare rel=sponsored")
+            if not paid and "sponsored" in relv:
+                fail(f"{os.path.relpath(f, OUT)}: {host} has no partner id, so "
+                     f"rel=sponsored claims a paid relationship that does not exist")
+            n += 2
         n += 1
     return n
 

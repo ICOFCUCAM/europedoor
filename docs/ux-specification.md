@@ -121,6 +121,29 @@ The action in its place is **Add to my journey**, which the brief itself
 proposes in §27 and which is better than a book button even once booking
 exists.
 
+**A referral is not a booking, and the Stay layer is the line between them.**
+One destination — Chamonix — now carries an accommodation referral: an
+outbound link to a provider's own search, with the provider named on the page
+as the party that holds the rooms, the prices and the availability and takes
+the payment. Nothing about the paragraph above changes. There is still no
+booking button, no basket, no price, no availability state and no payment
+surface, and `checks.py` refuses an outbound link to any host that is not a
+declared provider in `data/stay.json`.
+
+What is refused inside that layer is worth writing down, because the brief
+for it asked for all four: a **hotel photograph** (the register holds no
+licensed photograph and an illustration drawn from a hash would be a picture
+of nowhere standing in for a room), a **rating** (`★` may not appear on any
+page on this site, and we hold no reviews for anywhere in Europe), a
+**nightly price** (`price` is refused on every record and a price we cannot
+keep current is worse than none) and an **availability state** (we hold no
+inventory). None of the four is refused because a card is a bad idea. They
+are refused because under a link-only affiliate mechanism — which is the only
+mechanism available without an approved partner account, which needs the
+entity — there is no honest source for any of them. `stay.inventory()` is the
+seam that would fill a card and it returns nothing, and a page that gets
+nothing draws the editorial reading instead of an empty frame.
+
 ### 4. Opening hours (§18)
 
 > OPENING HOURS

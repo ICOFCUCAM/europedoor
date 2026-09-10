@@ -3386,3 +3386,65 @@ body[data-hero] .masthead { position: sticky; }
   fill: var(--map-hover); stroke: var(--sea); stroke-width: 1.3; }
 .minimap.arched .context path { stroke: color-mix(in srgb, var(--map-border) 60%, transparent); stroke-width: 0.7; }
 
+
+/* ── the Stay layer ───────────────────────────────────────────────────
+   ACCOMMODATION AS AN EDITORIAL ANSWER, NOT AN OTA CARD GRID.
+
+   The commercial purpose of this section is a referral, and the fastest way
+   to build it is the way that destroys it: four cards with a photograph, a
+   price and a star rating, which is somebody else's inventory pasted under
+   our masthead and reads as an advertisement inserted into an article. This
+   atlas holds no rooms, no prices, no availability and no ratings — see
+   tools/lib/stay.py — so it has nothing to put in a card and says instead
+   the two things it does know: where the ground puts you, and when the beds
+   go.
+
+   So the whole grammar here is rules and space. NO BORDER BOX, NO RADIUS, NO
+   SHADOW, NO FILL: those four are what say "separate object, placed here by
+   a system" and they are exactly the reading to avoid. The heavy rule over
+   each reading is a broadsheet device — it groups without enclosing — and
+   the action sits below a hairline rather than inside a panel, because a
+   panel around a commercial link is a banner. */
+.stayreads { display: grid; gap: var(--s6); }
+.stayread { border-top: 2px solid var(--ink); padding-top: var(--s3); }
+.stayread h3 { font-size: var(--t-md); margin: 0 0 var(--s3); line-height: 1.25; }
+.stayread p { margin: 0 0 var(--s3); color: var(--ink-2); max-width: 46ch; }
+.stayread p:last-child { margin-bottom: 0; }
+/* Two readings, two columns, at the breakpoint the practical band already
+   uses — a seventh breakpoint for a second instance of the same idea is a
+   breakpoint that drifts from the first one. */
+@media (min-width: 52rem) {
+  .stayreads { grid-template-columns: 1fr 1fr; gap: var(--s7); }
+}
+/* THE ACTION AND THE BOUNDARY SIT SIDE BY SIDE, AND THE FIRST VERSION DID
+   NOT. Button, who-holds-what and disclosure all stacked in the left half of
+   a 1,168px band with six hundred pixels of white beside them — the same
+   fault as the 280px card alone in its row on the old stories index, and
+   found the same way, by rendering the page rather than reading it. The
+   button takes the left track and the two sentences that say who you are
+   about to deal with take the right, so the row is full and the boundary is
+   beside the thing that crosses it rather than under it. */
+.staygo { margin-top: var(--s7); padding-top: var(--s5);
+          border-top: 1px solid var(--rule);
+          display: grid; gap: var(--s5); align-items: start; }
+.staygo p { margin: 0 0 var(--s3); }
+.staygo p:last-child { margin-bottom: 0; }
+@media (min-width: 52rem) {
+  .staygo { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s7); }
+}
+/* The provider row. A comparison, not a menu: it renders only where two or
+   more providers are enabled, because one provider is a button. */
+.staylabel { display: block; text-transform: uppercase; letter-spacing: .06em;
+             font-size: var(--t-xs); color: var(--ink-3); margin-bottom: var(--s1); }
+/* WHO HOLDS WHAT, DIRECTLY UNDER THE BUTTON THAT LEAVES. The boundary
+   between the discovery layer and the fulfilment layer is the one thing a
+   reader must not have to infer, and inferring it from a logo is how people
+   come to believe we took their money. */
+.staywho { color: var(--ink-2); max-width: 54ch; }
+.stayalso { color: var(--ink-3); }
+/* The disclosure is quiet and it is never absent. Both states carry one:
+   "we earn nothing from this" answers the reader's question as squarely as
+   "we may earn a commission", and a disclosure that appears only once we are
+   paid is an advertisement with a conscience. */
+.staydisc { color: var(--ink-3); max-width: 54ch; }
+.stay > .sourcenote { margin-top: var(--s6); }

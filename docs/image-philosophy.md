@@ -29,6 +29,16 @@ gate, all seven of which are still unanswered.
 Every other row below is a *claim* that a photograph would help. None of them
 is measured yet, and none should be bought until it is.
 
+**One row is a claim of a different kind.** The Stay row is not waiting on a
+measurement — the argument for a photograph there is as strong as the
+homepage's — it is waiting on a *source*. The images that exist for
+accommodation belong to the booking providers and come with their affiliate
+terms rather than with the three things this register requires, so "no
+photograph" there is a licence position and not an aesthetic one. Recording
+that distinction matters, because a row waiting on a measurement is answered
+by rendering something and looking at it, and a row waiting on a source is
+answered by a purchase order.
+
 ## The twelve
 
 | family | primary visual language, as built | what a photograph would do | slot |
@@ -45,6 +55,7 @@ is measured yet, and none should be bought until it is.
 | **Search** | INTELLIGENCE: graphite, the instrument, an input and its results | nothing. A photograph on a search page is decoration on a tool | never |
 | **Plan** | INTELLIGENCE: the planner, its controls beside what they act on | nothing | never |
 | **My Europe** | INTELLIGENCE: the reader's own collection, client state, no server | nothing of ours. Whatever appears here is the destination and place imagery the reader saved | inherits |
+| **Stay** | rules and space: the base as a classification, the ground under it as a measurement, one link out. No card, no frame, no fill | **the strongest measured-by-argument case in the table, and the one whose photograph we may not take.** A reader chooses where to sleep partly on what the place looks like at seven in the morning, and no arrangement of type does that. The subject is also unusually well defined — a room, a terrace, a view from a window — which normally makes a licence easy. What makes it hard is that the only images available are the **provider's**, and they arrive with the affiliate terms attached rather than with a photographer, a source and a licence. Commissioned photography of a base would be honest and is a different budget | none, and the no-image state is the SHIPPED state rather than a fallback |
 
 ## Three things this table is not
 

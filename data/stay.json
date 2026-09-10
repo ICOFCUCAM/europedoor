@@ -1,0 +1,66 @@
+{
+  "$comment": "The Stay layer: where a destination's accommodation referral goes, and what this atlas is willing to say about sleeping somewhere. EuropeDoor is the discovery layer and never the merchant of record. It holds no accommodation inventory of any kind and there is no field here for any of it — see tools/lib/stay.py, docs/stay-layer.md and docs/legal-position.md. A provider is a link mechanism plus a credential; adding one is an edit to this file and touches no page code.",
+  "providers": [
+    {
+      "slug": "booking-com",
+      "name": "Booking.com",
+      "host": "www.booking.com",
+      "enabled": true,
+      "search_url": "https://www.booking.com/searchresults.html",
+      "place_param": "ss",
+      "fixed_params": {
+        "lang": "en-gb"
+      },
+      "partner_param": "aid",
+      "partner_id": null,
+      "programme": "Affiliate Partner Programme",
+      "programme_url": "https://www.booking.com/affiliate-program/v2/index.html",
+      "mechanism": "Deep link into the public search endpoint, which takes a search string. A partner id goes in `aid` and is issued only to an approved partner.",
+      "inventory_api": "Demand API, for MANAGED affiliate partners only. It returns accommodation information and booking or redirection URLs carrying affiliate attribution, which is the one mechanism that would let a card on this site name an actual property. Not available to a non-managed partner, and therefore not available here.",
+      "gate": "Both the partner id and the Demand API require an approved partner account, which requires the operating entity that docs/legal-position.md section 3 records as not yet incorporated. Until `partner_id` is set this is a plain outbound link and the page says so."
+    },
+    {
+      "slug": "expedia",
+      "name": "Expedia",
+      "host": "www.expedia.com",
+      "enabled": false,
+      "search_url": "https://www.expedia.com/Hotel-Search",
+      "place_param": "destination",
+      "fixed_params": {},
+      "partner_param": "affcid",
+      "partner_id": null,
+      "programme": "Travel Creator Program",
+      "programme_url": "https://creator.expediagroup.com/",
+      "mechanism": "Tracked links to Expedia Group properties, including individual hotel pages. The link shape recorded here has NOT been opened from this repository, because this sandbox cannot reach the internet and a URL nobody has checked is not a URL you ship to a reader.",
+      "inventory_api": "NONE. The Creator Program does not provide general API access, so Expedia is a deep-link provider and must never be described or modelled as an inventory source. Recording that here is the point: the temptation is to assume every large provider has an API and design a card that silently has nothing to fill it.",
+      "gate": "`enabled` is false for the unverified link shape and for the same entity gate as above. It is in this file to prove the abstraction: enabling a second provider is this one field, and no page code changes."
+    },
+    {
+      "slug": "agoda",
+      "name": "Agoda",
+      "host": "www.agoda.com",
+      "enabled": false,
+      "search_url": "https://www.agoda.com/search",
+      "place_param": "city",
+      "fixed_params": {},
+      "partner_param": "cid",
+      "partner_id": null,
+      "programme": "Online Affiliate / MSE",
+      "programme_url": "https://partners.agoda.com/",
+      "mechanism": "Deep link, as above and equally unchecked from here.",
+      "inventory_api": "Search API, under the Online Affiliate / MSE model intended for sites that aggregate and compare rates. This is the provider most likely to become a genuinely API-backed source, and it is recorded now so that the eventual decision is a comparison rather than whoever answered an email first.",
+      "gate": "Third of three, deliberately unbuilt: the brief is two providers, not five, and a row here costs nothing while a fourth enabled provider costs a reader a decision they did not ask for."
+    }
+  ],
+  "accommodation_context": [
+    {
+      "city": "france/alps-and-east/chamonix",
+      "heading": "Sleep below the peaks",
+      "promise": "A good base changes what you can see.",
+      "base": "The valley floor, and the town rather than the hamlets",
+      "where": "Everything here happens from the valley: the lifts, the rack railway and the Tour du Mont Blanc all start within walking distance of the town, and the ground rises so fast on both sides that there is nowhere else level to be. Sleeping in the town is not a preference, it is the only place the valley is flat enough to put a bed and still be at the bottom of the cable car.",
+      "lead": "Book early for the summer window",
+      "when": "The four peak months are the four that fill. A bed booked in February for August is an ordinary transaction; the same bed asked for in July is somebody else's cancellation. The shoulder either side is the quiet answer to that, and the lifts are still running in most of it."
+    }
+  ]
+}

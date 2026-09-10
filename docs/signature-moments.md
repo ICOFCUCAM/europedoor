@@ -78,6 +78,45 @@ screen answered none of the questions a person arriving has.
    accommodation band, the onward stops, anything the reader would only want
    after deciding to come.
 
+#### The Stay band inside it — *a base* — question 2 answered
+
+A band rather than a family, and it needs its own nine because it is the one
+place on this site where money is involved.
+
+1. **Emotional promise** — a good base changes what you can see, and this
+   atlas has a view about which base.
+2. **Signature moment** — **not a map, and that is the answer to question 2.**
+   The moment is the *ground* stated as a consequence: 1,798 m of spread and a
+   2,752 m crest within 40 km of Chamonix, and therefore the valley floor and
+   therefore the town. A booking site can tell you what is available; only
+   this one can tell you that the geography has already decided for you. It is
+   a sentence over a measurement, and it is deliberately the only family whose
+   signature is a *derivation* rather than a drawing.
+3. **Geography** — inherited from the band above it, never redrawn. The page
+   already frames Chamonix with Annecy, Zermatt and Lauterbrunnen around it.
+4. **Imagery** — none, and this is a licence position rather than a taste one.
+   See `docs/image-philosophy.md`: the only accommodation images that exist
+   belong to the providers and arrive with affiliate terms instead of a
+   photographer, a source and a licence.
+5. **Hierarchy** — two readings side by side, then the action and the boundary
+   side by side beneath a hairline. Rules and space; no card, no fill.
+6. **Interaction** — one link out, in a new tab, `nofollow noopener`, and the
+   reader leaves only when they choose to.
+7. **Aperture** — **absent, on purpose.** A second arch four screens below the
+   first would be the signature as wallpaper — the same argument the facet
+   pages and the events band already lost. Accommodation drawn *as* geography
+   is the right long idea and it needs real coordinates, which arrive with an
+   inventory API and not before; inventing them would be the region-hull
+   failure with beds.
+8. **Data** — the relief figures, cited to the model that measured them, and
+   the country's own peak and shoulder months. Nothing else, because nothing
+   else is held.
+9. **What is deliberately absent** — a property, a photograph, a rating, a
+   nightly price, an availability state, a "book now", and a ranking. The
+   first five have no honest source under a link-only affiliate mechanism; the
+   sixth is a control that cannot do what it says; the seventh is the
+   mechanism `/for-businesses` publicly states does not exist.
+
 ### Macro region — 9 — *where in Europe this is*
 
 1. The Nordics is a place, not a list of five countries.

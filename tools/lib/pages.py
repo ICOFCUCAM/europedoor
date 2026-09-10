@@ -14,6 +14,7 @@ from urllib.parse import quote
 
 from . import cartography
 from . import geo
+from . import stay as staylib
 from . import urls
 from .render import (LD_PUBLISHER, SITE_NAME, SITE_TAGLINE, arch_rim, card, chips, crumbs,
                      esc, factlist, grid,
@@ -2383,6 +2384,13 @@ def city_page(data, c, r, t):
     nearnamed = {urls.city(n["country"], n["region"], n["city"]) for n in near}
 
     stay = nights_line(t)
+    # "Stay & eat" while that section is the honest refusal of both; "Stay"
+    # once a destination carries a real accommodation context, because the
+    # section then makes no promise at all about eating. Computed here and
+    # not inside the nav call: that call sits inside an f-string, and a
+    # comment cannot live in an f-string expression — which is how the first
+    # version of this line failed the build.
+    staytab = "Stay" if staylib.context(cid) else "Stay & eat"
 
     # Everything that points at this city. These are the graph edges: a
     # journey that stops here, a theme that names it, a story set in it.
@@ -2506,7 +2514,7 @@ def city_page(data, c, r, t):
     ("Getting near", "getting-near" if transrows else ""),
     ("Events", "events" if (festrows or widerows) else ""),
     ("Travel tips", "tips"),
-    ("Stay & eat", "stay"),
+    (staytab, "stay"),
     ("Onward", "onward"),
 ])}
 <section class="practical" aria-label="Practical">
@@ -2559,7 +2567,7 @@ def city_page(data, c, r, t):
          id="tips",
          lede=f"Practical things about {esc(c['name'])} that are not obvious from outside it.")}
 
-{section("Accommodation & restaurants", STAY_NOTE, id="stay")}
+{stay_section(data, c, r, t, cid)}
 
 {section("Nearest onward stops", f'<div class="rows">{nearrows}</div>',
          id="onward",
@@ -3267,6 +3275,147 @@ def planner_page(data):
 
 # Named on every destination page, and honestly empty. A scraped hotel list
 # would take an afternoon and would be the first unverified thing on the site.
+def stay_section(data, c, r, t, cid):
+    """Where to stay, as an EuropeDoor answer rather than an OTA one.
+
+    THE FIRST QUESTION WAS NOT "WHICH PROVIDER" BUT "WHAT DO WE ACTUALLY
+    KNOW". An accommodation section that resembles a booking site is easy and
+    is the wrong product: this atlas holds no rooms, no prices, no
+    availability and no ratings, so any card grid it drew would be somebody
+    else's inventory pasted under our masthead, and a reader would read it as
+    an advertisement inserted into an article. What it does hold, and what no
+    booking site has, is a judgement about the PLACE — how the ground here
+    constrains where a bed can sensibly be, and when the beds go.
+
+    So the section is two authored readings over one derived measurement, and
+    one link out. In order:
+
+      · the base — an authored classification ("the valley floor"), which is
+        the job, over the relief figures for this destination, which are a
+        derived measurement and carry their radius from the file that holds
+        them. Chamonix reads a 2,752 m crest and a 1,798 m spread within
+        40 km, and that is WHY the town is the only answer: the valley is the
+        only flat ground at the bottom of the lifts. Paris would read 150 and
+        102 and this paragraph would have nothing to say, which is correct —
+        it is omitted where there is no relief rather than filled with a
+        sentence about nothing.
+      · the lead time — the same peak and shoulder months the pace note above
+        prints, asked a different question. That note answers WHEN TO COME
+        and this one answers WHEN TO BOOK, and the second is not derivable
+        from the first by a reader who has not booked an Alpine August.
+      · the action, once, to the provider's own search, with the provider
+        named as the party that holds the rooms and takes the payment.
+
+    THE HEADING IS DERIVED FROM WHAT THE PLACE IS. "Hotels in Chamonix" is
+    generic listing language and also the wrong promise — what is on offer is
+    a base, and a base means something different in a valley, on an island
+    and in a capital. `staylib.heading` reads the same `city_type`
+    classification and the same relief predicate the rest of the site uses,
+    so Chamonix gets "Sleep below the peaks" and Naxos would get "Stay on the
+    island" without anybody authoring either. The lede leads with the PROMISE
+    and the boundary comes second: the first version opened on what this
+    atlas does not hold, which is honest, defensive and the wrong first
+    sentence for a reader who has just decided to come.
+
+    NO SECOND MAP. `docs/signature-moments.md` asks question 2 before an
+    aperture is added to a family, and the answer here is that this page
+    already draws one — Chamonix with Annecy, Zermatt and Lauterbrunnen
+    around it — and a second arch four screens down would be the signature as
+    wallpaper. Accommodation AS geography is the right long idea and it needs
+    accommodation coordinates, which arrive with an inventory API and not
+    before; inventing them would be the region-hull failure with beds.
+
+    NO PHOTOGRAPH, AND THAT IS THE REAL GAP. This is the one family where a
+    photograph does work the type cannot: you choose where to sleep partly on
+    what the place looks like at seven in the morning. The register holds
+    none, an illustration drawn from a hash would be a picture of nowhere
+    standing in for a room, and so there is none. The no-image state is not a
+    fallback here, it is the shipped state.
+
+    Everything commercial is read off `data/stay.json`: which providers, in
+    what order, whether we hold a credential, and whether any of them can
+    supply inventory. Adding Expedia is one field in that file.
+    """
+    row = staylib.context(cid)
+    provs = staylib.providers()
+    if not row or not provs:
+        return section("Accommodation & restaurants", STAY_NOTE, id="stay")
+
+    # The relief paragraph, only where the ground was measured to have
+    # something to say. `draws_relief` is the same predicate that decides
+    # whether this page's map carries bands, so the sentence and the drawing
+    # can never disagree about whether this is mountain country.
+    measure = cartography.relief_of(cid)
+    mountainous = cartography.draws_relief(measure)
+    ground = ""
+    if mountainous:
+        km = cartography.relief_radius_km()
+        ground = (f'<p class="sourcenote">Within {km:.0f} km of here the ground '
+                  f'spreads {measure[0]:,.0f} m and crests at {measure[1]:,.0f} m, '
+                  f'measured from the same elevation model the map above is '
+                  f'drawn from.</p>')
+
+    peak = months_line(data, c["season"]["peak"])
+    shoulder = months_line(data, c["season"].get("shoulder", []))
+    when = (f'{esc(row["when"])}</p><p class="sourcenote">Peak here is '
+            f'{esc(peak)}; the shoulder is {esc(shoulder)}.</p>'
+            if shoulder else f'{esc(row["when"])}</p>')
+
+    # THE ACTION. One primary, from the first enabled provider. The button
+    # says what it does — it opens a search somewhere else — because "Book
+    # now" on a page that cannot book is the lie `stickycta` already refuses
+    # in its own docstring.
+    #
+    # No card above it, and the seam for one is `staylib.inventory`, which
+    # returns nothing under a link-only affiliate mechanism. A card with a
+    # property, a rating and a nightly rate is the right shape the day a
+    # provider hands those over with its own figure attached; drawing an
+    # empty one now would be present-but-empty, which says "we have this"
+    # and then does not.
+    first, rest = provs[0], provs[1:]
+    compare = ""
+    if staylib.compare(t["name"], c["name"]):
+        compare = ('<p class="stayalso"><span class="staylabel">Compare places to '
+                   'stay</span> '
+                   + " · ".join(
+                       f'<a href="{esc(staylib.deep_link(p, t["name"], c["name"]))}"'
+                       f' rel="{staylib.rel(p)}" target="_blank">{esc(p["name"])}</a>'
+                       for p in provs)
+                   + "</p>")
+
+    return section(
+        staylib.heading(row, t, mountainous),
+        f"""<div class="stay">
+  <div class="stayreads">
+    <div class="stayread">
+      <h3 class="mini">{esc(row["base"])}</h3>
+      <p>{esc(row["where"])}</p>
+      {ground}
+    </div>
+    <div class="stayread">
+      <h3 class="mini">{esc(row["lead"])}</h3>
+      <p>{when}
+    </div>
+  </div>
+  <div class="staygo">
+    <div class="staygo-do">
+      <p><a class="btn" href="{esc(staylib.deep_link(first, t["name"], c["name"]))}" rel="{staylib.rel(first)}" target="_blank">Search places to stay in {esc(t["name"])}</a></p>
+      {compare}
+    </div>
+    <div class="staygo-say">
+      <p class="staywho">Opens {esc(first["name"])}\u2019s own search for {esc(t["name"])}, in a new tab. They hold the rooms, the prices and the availability, and the booking and the payment are with them. EuropeDoor holds none of the three and publishes no ratings for anywhere in Europe.</p>
+      <p class="small staydisc">{esc(staylib.disclosure(first))}</p>
+    </div>
+  </div>
+  <p class="sourcenote">Restaurants are still not listed, here or anywhere: that is a business listing rather than an editorial entry and it needs an operator who claims it and a verification tier. <a href="/for-businesses">How listings will work</a>.</p>
+</div>""",
+        id="stay",
+        lede=f"{row['promise']} What this atlas can tell you about sleeping in "
+             f"{t['name']} is where the ground puts you and when the beds go. It "
+             f"holds no hotels, and the booking happens somewhere else.",
+    )
+
+
 STAY_NOTE = """<div class="note">
   <p>EuropeDoor lists neither, yet. Both are business listings rather than editorial entries:
   they need an operator who claims them, a verification tier and a way to keep prices current,

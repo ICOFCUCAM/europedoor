@@ -113,5 +113,36 @@ There is none, deliberately: no photographs, no map tiles, no scraped
 listings, no embedded third-party scripts, no fonts loaded from a CDN. Every
 byte served is either written here or generated here.
 
-This will change — commissioned photography, an events feed, a basemap — and
-each addition needs its own licence position recorded here before it ships.
+This changed once, and here is the position for it.
+
+**The accommodation referral (the Stay layer).** One destination page carries
+an outbound link to a booking provider's own public search. What crosses the
+boundary is a reader, in a new tab, on a click — no byte of third-party
+content is served by us, so §7's claim above still holds exactly: every byte
+served is written here or generated here. `checks.py` splits the two
+questions and asserts both: nothing may LOAD from another origin, and nothing
+may NAVIGATE to another origin unless that host is a declared, enabled
+provider in `data/stay.json`.
+
+What is deliberately *not* done, and why each one is blocked:
+
+| | position |
+|---|---|
+| Tracked referral | **Not active.** A partner id is issued only to an approved partner account, which needs the entity §3 says does not exist. `partner_id` is null, the link carries no `aid`, `rel` says `nofollow noopener` and not `sponsored`, and the page states that we are not a partner and earn nothing. |
+| Inventory | **Not held, and no field for it.** Booking.com's Demand API — the one interface that would return a property with an attributed booking URL — is for managed partners only. Expedia's creator programme offers tracked links and no general API at all. So there is no honest source for a property, a price, a rating or an availability state, and `data/stay.json` refuses all four by key. |
+| Provider imagery | **Refused twice.** A photograph needs a photographer, a source and a licence in `data/images.json`, and a provider's marketing image satisfies none of the three. `checks.py` refuses an `<img>` with no register row and refuses hotlinking; `safety.img_tags` is an exact zero. |
+| Commission | **Cannot be received.** No entity, no bank account, no tax registration. This is the same gate as the Fund. |
+| Packages | **Untouched.** §5 above is the reason: combining transport with accommodation and selling it as one thing is a regulated package. A referral to a provider's search is not that, and nothing here moves toward it. |
+
+**Still to do before the referral is activated**, in this order: the entity
+(§3); the affiliate agreement itself, read rather than clicked, since it is a
+contract whose terms bind how the link may be presented and what may be said
+about the provider; a disclosure position checked against the consumer rules
+of the launch markets, because §5's disclosure duties attach to an
+intermediary and a referrer's duties are lighter but not absent; and the
+privacy question of whether an outbound click is a disclosure of anything
+about a reader (today it is not — we set no cookie and add no identifier to
+the URL, and §4's design has nothing to change).
+
+Anything further — commissioned photography, an events feed, a basemap —
+needs its own position recorded here before it ships.

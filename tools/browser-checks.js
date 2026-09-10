@@ -1956,6 +1956,105 @@ async function main() {
        `(${a.land} vs ${a.sea})`);
   }
 
+  // ── the Stay layer: a referral a reader can see the edges of ────────
+  //
+  // The commercial surface, and the one place on this site where somebody
+  // else's interest is involved. Four things are asserted in the browser
+  // because none of them can be read off the source:
+  //
+  //   1. NOTHING IS FETCHED FROM THE PROVIDER. The whole section is text and
+  //      one anchor, so loading the page must make zero requests off this
+  //      origin — no pixel, no script, no availability call. That is what
+  //      makes `default-src 'none'` true rather than merely declared, and it
+  //      is also the answer to "how does this behave on a slow network":
+  //      there is nothing to be slow.
+  //   2. THE LINK IS A REAL TARGET AND HAS A REAL NAME. WCAG 2.2 puts the
+  //      floor at 24px, and an outbound commercial link that is hard to hit
+  //      or unnamed is the worst possible one to get wrong.
+  //   3. THE DISCLOSURE IS VISIBLE, NOT MERELY PRESENT. `.askhero label` was
+  //      limestone at 76% on graphite and measured 1.00:1 — present,
+  //      labelled, keyboard-reachable and invisible. A disclosure is exactly
+  //      the element somebody would be accused of hiding, so it is measured
+  //      against what the browser paints, in both preferences.
+  //   4. IT SITS AFTER THE REASONS AND BEFORE THE EXIT. Accommodation
+  //      appears where a reader who has decided to come would look for it.
+  {
+    const u = "/europe/france/alps-and-east/chamonix";
+    for (const scheme of ["light", "dark"]) {
+      const ctx = await browser.newContext({
+        viewport: { width: 1280, height: 900 }, colorScheme: scheme,
+      });
+      const p2 = await ctx.newPage();
+      const offOrigin = [];
+      p2.on("request", (rq) => {
+        if (!rq.url().startsWith(base) && !rq.url().startsWith("data:")) {
+          offOrigin.push(rq.url());
+        }
+      });
+      await p2.goto(base + u, { waitUntil: "load" });
+      ok(offOrigin.length === 0,
+         `${u} (${scheme}): loading it reaches ${offOrigin.length} off-origin ` +
+         `URL(s): ${offOrigin.slice(0, 2).join(", ")}`);
+      const a = await p2.evaluate(() => {
+        const lum = (c) => {
+          const nums = (c.match(/-?\d*\.?\d+/g) || []).map(Number);
+          const [r, g, b] = nums.slice(0, 3).map((v) => {
+            const x = v > 1 ? v / 255 : v;
+            return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+          });
+          return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        };
+        const bgOf = (el) => {
+          let n = el;
+          while (n && n !== document.documentElement) {
+            const bg = getComputedStyle(n).backgroundColor;
+            if (bg && !/rgba\(0, 0, 0, 0\)|transparent/.test(bg)) return bg;
+            n = n.parentElement;
+          }
+          return getComputedStyle(document.body).backgroundColor;
+        };
+        const ratio = (x, y) => {
+          const [l1, l2] = [lum(x), lum(y)].sort((m, n) => n - m);
+          return (l1 + 0.05) / (l2 + 0.05);
+        };
+        const stay = document.querySelector("#stay");
+        const link = stay && stay.querySelector("a[target=_blank]");
+        const disc = stay && stay.querySelector(".staydisc");
+        const who = stay && stay.querySelector(".staywho");
+        const reasons = document.querySelector(".arrivalhead .reasons");
+        const onward = document.querySelector("#onward");
+        const r = (el) => (el ? el.getBoundingClientRect() : null);
+        const lb = r(link);
+        return {
+          hasLink: !!link,
+          name: link ? link.textContent.trim() : "",
+          w: lb && lb.width, h: lb && lb.height,
+          disc: disc ? ratio(getComputedStyle(disc).color, bgOf(disc)) : null,
+          discSize: disc ? parseFloat(getComputedStyle(disc).fontSize) : null,
+          who: who ? ratio(getComputedStyle(who).color, bgOf(who)) : null,
+          stayTop: stay ? r(stay).top + p2Scroll() : null,
+          reasonsTop: reasons ? r(reasons).top + p2Scroll() : null,
+          onwardTop: onward ? r(onward).top + p2Scroll() : null,
+        };
+        function p2Scroll() { return window.scrollY; }
+      });
+      ok(a.hasLink, `${u} (${scheme}): the stay section has no outbound link`);
+      ok(a.name.length > 8 && !/^(here|link|more)$/i.test(a.name),
+         `${u} (${scheme}): the referral's accessible name is "${a.name}"`);
+      ok(a.h >= 24 && a.w >= 24,
+         `${u} (${scheme}): the referral is ${a.w}x${a.h}, under the 24px floor`);
+      ok(a.disc !== null && a.disc >= 4.5,
+         `${u} (${scheme}): the affiliate disclosure measures ${a.disc && a.disc.toFixed(2)}:1 ` +
+         `at ${a.discSize}px — a disclosure nobody can read is not a disclosure`);
+      ok(a.who !== null && a.who >= 4.5,
+         `${u} (${scheme}): "who holds the rooms" measures ${a.who && a.who.toFixed(2)}:1`);
+      ok(a.reasonsTop < a.stayTop && a.stayTop < a.onwardTop,
+         `${u} (${scheme}): stay is not between the reasons and the onward stops ` +
+         `(${a.reasonsTop} / ${a.stayTop} / ${a.onwardTop})`);
+      await ctx.close();
+    }
+  }
+
   // ── the two worlds ─────────────────────────────────────────────────
   //
   // A palette can be correct in a token file and wrong on the page: what
@@ -2272,6 +2371,14 @@ async function main() {
     "/journeys/the-alpine-grand-tour", "/experiences", "/experiences/nature",
     "/stories/the-last-forest", "/events/oct", "/fund", "/privacy", "/accessibility",
     "/my-europe", "/sources/freshness",
+    // THE STAY EXEMPLAR WAS NOT IN THIS LIST AND ITS TEXT HAD NEVER BEEN
+    // MEASURED. The destination shape was represented by Bergen, which has
+    // no accommodation context, so the two quietest paragraphs on the new
+    // section — who holds the rooms, and the affiliate disclosure — were
+    // never contrast-checked in either colour scheme. That is the thumb-bar
+    // failure again: the suite measured five items and nothing else. A page
+    // shape is not represented by a page that does not have the thing.
+    "/europe/france/alps-and-east/chamonix",
   ];
 
   const a11yProbe = () => {
@@ -2504,7 +2611,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 870;
+  const FLOOR = 894;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +

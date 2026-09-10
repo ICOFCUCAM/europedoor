@@ -663,6 +663,102 @@ def load():
                   and all(0 <= v <= 100 for v in focal), where,
                   "focal must be [x, y] percentages")
 
+    # THE STAY REGISTRY. A provider is a link mechanism and a credential, and
+    # the validator's whole job is to keep it from becoming anything else.
+    #
+    # The refusal list is the same wall the editorial records carry, applied
+    # to the one file whose commercial purpose makes it the likeliest place
+    # for somebody to add a price "just for the exemplar". EuropeDoor holds no
+    # rooms, no prices, no availability and no ratings; a field for one of
+    # them here would be the first unverified thing on this site, and the
+    # provider is the one who has them and the one who is named as having
+    # them.
+    stay = _read(os.path.join(DATA, "stay.json")) if os.path.exists(
+        os.path.join(DATA, "stay.json")) else {"providers": [],
+                                               "accommodation_context": []}
+    # THE REFUSAL IS ON THE KEYS, AND THE FIRST VERSION READ THE PROSE. It
+    # matched the whole file, so the sentence in `$comment` saying this atlas
+    # holds "no rooms, no prices, no availability and no ratings" tripped four
+    # of its own refusals. That is the font-size-in-a-comment failure this
+    # repository already records once: an instrument that reads its own
+    # documentation as data. A price can only be PUBLISHED if there is a key
+    # for it, so the keys are the honest test — and it is the stronger claim,
+    # because it also catches a key nested inside `fixed_params`.
+    def _keys(node):
+        if isinstance(node, dict):
+            for k, v in node.items():
+                yield str(k).lower()
+                yield from _keys(v)
+        elif isinstance(node, list):
+            for v in node:
+                yield from _keys(v)
+
+    stay_keys = set(_keys(stay))
+    for unheld in ("price", "rating", "review", "reviews", "review_count",
+                   "availability", "rooms", "stars", "amenities", "discount",
+                   "commission", "featured", "rank", "boost", "sponsored"):
+        p.require(unheld not in stay_keys, "stay.json",
+                  f"carries a {unheld!r} field: this atlas holds no "
+                  f"accommodation inventory, and the provider is named on the "
+                  f"page as the one who does")
+    seen_prov = set()
+    for prov in stay.get("providers", []):
+        where = f"stay.json > {prov.get('slug')}"
+        for field in ("slug", "name", "host", "search_url", "place_param",
+                      "partner_param", "programme", "programme_url",
+                      "mechanism", "inventory_api", "gate"):
+            p.require(bool(prov.get(field)), where, f"missing {field!r}")
+        p.require(SLUG.match(prov.get("slug", "")), where, "slug is not a slug")
+        p.require(prov.get("slug") not in seen_prov, where, "duplicate provider")
+        seen_prov.add(prov.get("slug"))
+        p.require(str(prov.get("search_url", "")).startswith("https://"), where,
+                  "search_url must be https")
+        p.require(prov.get("host", "") in str(prov.get("search_url", "")), where,
+                  "host must be the host of search_url — the check that pins "
+                  "which third-party origins this site reaches reads `host`")
+        p.require("enabled" in prov, where,
+                  "enabled must be stated either way: a provider whose state "
+                  "is implied is a provider somebody turns on by accident")
+        pid = prov.get("partner_id")
+        p.require(pid is None or (isinstance(pid, str) and pid.strip()), where,
+                  "partner_id is either null or a real credential; an empty "
+                  "string would read as tracked and track nothing")
+        # EVERY PROVIDER STATES WHETHER IT CAN SUPPLY INVENTORY, IN WORDS.
+        # The brief's own warning: do not pretend a provider is an API-backed
+        # inventory source. Expedia's creator programme has no general API
+        # and Booking.com's Demand API is for managed partners only, and a
+        # design that assumes otherwise builds a card with nothing to fill
+        # it. `inventory_api` is required so that the answer is written down
+        # per provider rather than assumed once for all of them.
+        p.require(len(str(prov.get("inventory_api", ""))) >= 40, where,
+                  "`inventory_api` must say what inventory this provider can "
+                  "and cannot supply, and under what terms — 'NONE' is a "
+                  "perfectly good answer and an absent one is not")
+        p.require(str(prov.get("programme_url", "")).startswith("https://"), where,
+                  "programme_url must be the https page whose terms this row "
+                  "is claiming to sit under")
+    seen_stay = set()
+    for row in stay.get("accommodation_context", []):
+        where = f"stay.json > {row.get('city')}"
+        p.require(row.get("city") in index, where,
+                  "unknown destination — the Stay layer cannot cover a place "
+                  "this atlas does not hold")
+        p.require(row.get("city") not in seen_stay, where, "covered twice")
+        seen_stay.add(row.get("city"))
+        for field in ("promise", "base", "where", "lead", "when"):
+            p.require(bool(row.get(field)), where, f"missing {field!r}")
+        # The heading may be authored and may never be OTA language. A
+        # section called "Hotels in Chamonix" is the one thing this whole
+        # layer exists not to be.
+        p.require("hotel" not in str(row.get("heading", "")).lower(), where,
+                  "a Stay heading may not say 'hotel' — that is the generic "
+                  "listing language, and this atlas is offering a base")
+        # An authored classification is the job; an authored measurement is
+        # not. `where` may say "the valley floor" and may not say "1,035 m".
+        p.require(len(str(row.get("where", ""))) >= 80, where,
+                  "`where` is the editorial judgement this section exists to "
+                  "carry — a line shorter than that is a label")
+
     p.raise_if_any()
 
     # Reverse edges. The brief calls the dataset a knowledge graph, and a
@@ -768,6 +864,7 @@ def load():
         "stories": stories,
         "fund": fund,
         "providers": providers,
+        "stay": stay,
         "cities": index,
         "back": back,
         "categories": tax.get("categories", []),

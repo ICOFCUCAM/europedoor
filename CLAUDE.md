@@ -1429,6 +1429,108 @@ amplitude and segment count — the exact fix that took coast from 125 twins to
 motifs. And read a negative delta against what is underneath: `isles` reports
 its water as occluding, but the only thing under that water is the sky.
 
+**Accommodation is a referral, and the whole design problem is keeping that
+visible to a reader rather than only true in a contract.** The Stay layer is
+built on one exemplar, Chamonix. It sits where a reader who has decided to
+come would look for it — after the reasons, before the onward stops — and the
+UX audit has asserted that order by id since before it existed.
+
+**The first question was not "which provider" but "what do we actually
+know".** This atlas holds no rooms, no prices, no availability and no ratings,
+so any card grid it drew would be somebody else's inventory under our
+masthead. What it holds and no booking site has is a judgement about the
+PLACE: the ground within 40 km of Chamonix spreads 1,798 m and crests at
+2,752 m, and *therefore* the valley floor, and *therefore* the town. That is
+the only family whose signature moment is a derivation rather than a drawing.
+Paris reads 102 and 150, so the paragraph is omitted there rather than filled
+with a sentence about nothing.
+
+**A provider is a link mechanism and a credential, and deliberately nothing
+else.** `data/stay.json` declares `search_url`, `place_param`,
+`partner_param`, `partner_id` and — required, at least forty characters —
+`inventory_api`, which says what that provider can and cannot supply. Expedia
+says NONE in capitals, because its creator programme offers tracked links and
+no general API, and the standing temptation is to assume every large provider
+has one and design a card that silently has nothing to fill it. Adding a
+provider is an edit to that file and touches no page code.
+
+**Two honest states, and the state is read off the credential.** With no
+partner id the link is plain, `rel` is `nofollow noopener` and the page says
+we are not a partner and earn nothing; with one, the link carries it, `rel`
+gains `sponsored` and the disclosure becomes the commission sentence.
+`checks.py` asserts `sponsored` appears **if and only if** a credential
+exists, both directions proved red. **A disclosure that only appears once we
+are paid is an advertisement with a conscience** — both states carry one.
+
+**The card was asked for and is not built, and that is a sourcing fact rather
+than a taste.** A photograph, a property name, a rating, a nightly price and
+an availability state are five refusals, each enforced at least twice. None is
+refused because a card is a bad idea: under a link-only affiliate mechanism
+there is no honest source for any of them, and Booking.com's Demand API — the
+one interface that would return a property with an attributed booking URL — is
+for managed partners only, which needs the entity. `stay.inventory()` is the
+seam, it returns nothing, and a page that gets nothing draws the reading
+rather than an empty frame, because present-but-empty says "we have this" and
+then does not.
+
+**A ranking of accommodation is refused outright.** `/for-businesses`
+publishes the sentence "there is nothing in its index that could carry a
+boost", and a ranking module is the mechanism that sentence says does not
+exist. `rank`, `boost`, `featured` and `sponsored` are refused by key in the
+Stay registry as well as everywhere else.
+
+**A CHECK CONFLATED AN OUTBOUND LINK WITH A SUBRESOURCE LOAD.** "No
+third-party origin, which is what makes `default-src 'none'` hold" matched
+`src` and `href` together, so the referral tripped it on the day it shipped —
+right that something new had happened, wrong about what. `default-src` does
+not govern navigations. Split into the two real promises: nothing may LOAD
+from another origin, and nothing may NAVIGATE to another origin unless that
+host is a declared, enabled provider carrying `rel="nofollow noopener"` and
+opening in a new tab. That pins the set of external hosts to the registry, and
+five ways of breaking it were proved red.
+
+**An audit assertion pinned the literal old heading, and it was a landmine
+rather than a live failure.** `section-audit.py` required
+"Accommodation & restaurants" on a destination page — true of all 319 only
+while none of them had a Stay layer, so the day the grammar propagated it
+would have gone red for a page that had got *better*. Seventh assertion in
+this repository to protect a shape instead of a claim. It asserts both states
+now. **The heading is derived from what the place is** — "Sleep below the
+peaks" under measured relief, "Stay on the island" on Naxos — because 319
+authored headings is 319 chances to write "Hotels", and the validator refuses
+a heading containing that word.
+
+**The accessibility scan represented the destination shape with a page that
+did not have the thing.** Bergen has no accommodation context, so the two
+quietest paragraphs on the new section — who holds the rooms, and the
+disclosure — had never been contrast-checked in either preference. That is the
+thumb-bar failure again. Chamonix is in the list now, and a dedicated block
+asserts the referral is a 24px target with a real name, that the disclosure is
+*visible* rather than merely present, and that loading the page makes **zero**
+requests off this origin — which is also the answer to how it behaves on a
+slow network: there is nothing to be slow.
+
+**No photograph, and it is a licence position rather than an aesthetic one.**
+This is the family where a photograph does work type cannot — you choose where
+to sleep partly on what the place looks like at seven in the morning — and the
+only images that exist belong to the providers and arrive with affiliate terms
+instead of a photographer, a source and a licence. A row waiting on a
+measurement is answered by rendering something and looking; a row waiting on a
+source is answered by a purchase order. The no-image state here is the
+SHIPPED state, not a fallback.
+
+**No second map.** Accommodation drawn as geography is the right long idea and
+needs coordinates we do not hold; a second arch four screens below the first
+would be the signature as wallpaper, and a pin has no page here to link to,
+which makes it a dot the page cannot name.
+
+**Rules and space, and four things deliberately absent: no border box, no
+radius, no shadow, no fill.** Those four are what say "separate object, placed
+here by a system". The action and the boundary sit side by side — the first
+version stacked them in the left half of a 1,168px band with six hundred
+pixels of white beside them, the same fault as the old stories index, found
+the same way, by rendering the page instead of reading it.
+
 **Design to purpose, not to data shape.** A page's structure comes from what
 the reader is trying to do, not from the shape of the record behind it. The
 experience template renders six rows because the data is six rows, and that is

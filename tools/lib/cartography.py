@@ -342,6 +342,19 @@ def relief_of(key):
     return (doc or {}).get("relief", {}).get(key)
 
 
+def relief_radius_km():
+    """The radius the two relief figures were measured over.
+
+    Read from the file rather than written here, because the Stay layer
+    PRINTS it — "within 40 km of here the ground crests at 2,752 m" is a
+    claim to a reader, and the radius is a parameter of `relief.py` that has
+    already moved once (25 km measured sea and became 40 over land cells
+    only). A number typed into a sentence is the number that stays behind.
+    """
+    doc = geo.load(SOURCES["terrain"])
+    return (doc or {}).get("relief_radius_km")
+
+
 # HOW WIDE A FRAME MAY BE AND STILL BE A PICTURE OF SOMEWHERE.
 #
 # Relief answers "what kind of ground is this place in". Across a continent it

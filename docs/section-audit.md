@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**101 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1 refused · 1344 assertions · 0 failing**
+**101 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1 refused · 1352 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -23,7 +23,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 10 | Plan your Europe | PARTIAL | 8 | Ten of the eleven inputs are taken and every one of them moves the answer. Mobility requirements are the eleventh, and are named as unsupported rather than silently dropped — we hold no step-free access data, so a field for it would be a field that lies. |
 | 11 | Country page | BUILT | 5 | URL shape as specified, and every section on the list except visa and emergency information, which are refused as unverified. |
 | 12 | Region page | BUILT | 4 | Every travel region has one, and it aggregates the destinations, places, experiences and journeys beneath it rather than being a list of city links. |
-| 13 | Destination page | PARTIAL | 6 | Seventeen of the twenty sections, travel tips now among them. Accommodation and restaurants are named and honestly empty — the listing product is the missing piece, not the heading. |
+| 13 | Destination page | PARTIAL | 14 | Seventeen of the twenty sections, travel tips now among them. The Stay layer is built on one exemplar: Chamonix offers a base and a referral, the other 318 still say honestly that they list nothing. |
 | 14 | Place page | PARTIAL | 5 | The entity exists with 192 records. Opening hours, price and official website are refused rather than invented, and the validator rejects them. |
 | 15 | Experience system | BUILT | 23 | The specification's eight categories and their sub-categories — Renaissance was the one it named that we did not have — each page printing the rule that built its list, and every sub-category actually listing something. |
 | 16 | Journey system | BUILT | 188 | Every field on the specification's journey object except booking links, which are blocked with everything else commercial. |
