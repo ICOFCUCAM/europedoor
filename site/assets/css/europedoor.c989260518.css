@@ -2998,6 +2998,23 @@ body[data-hero] .masthead { position: sticky; }
   letter-spacing: .32em; text-transform: uppercase;
   fill: color-mix(in srgb, var(--atlas-land) 78%, transparent); }
 
+/* A RIVER'S NAME, AND IT IS THE LAST PHYSICAL FAMILY TO GET ONE. Summits,
+   ranges and seas have had labels since the plates were built; rivers were
+   drawn with a <title> and nothing on the page, so Vienna carried six
+   anonymous blue lines while the dataset names all 153 of them.
+   In the WATER's ink rather than the land's, italic like every physical
+   name, and tracked less than a sea because a river is a line and a sea is
+   an area. It takes the same `--z` compensation as its siblings — written
+   here rather than appended at the end of the file, because the scar this
+   family exists beside is precisely a label family that was added somewhere
+   else and inherited none of the rules. */
+.minimap.arched.atlas .lyr-labels .rname {
+  font-family: var(--display); font-size: calc(var(--t-xs) / var(--z)); font-style: italic;
+  letter-spacing: .06em;
+  fill: color-mix(in srgb, var(--atlas-land) 82%, transparent);
+  paint-order: stroke;
+  stroke: color-mix(in srgb, var(--ocean-deep) 55%, transparent); stroke-width: 2.0; }
+
 /* A PHYSICAL FEATURE IS SET APART FROM A POLITICAL ONE, which an atlas has
    always done with an italic serif. ALPS and PYRENEES are geography; a
    frontier is a decision. */
@@ -3299,7 +3316,8 @@ body[data-hero] .masthead { position: sticky; }
   .minimap.dense .minilabel,
   .minimap.dense .peakname,
   .minimap.dense .fname,
-  .minimap.dense .sname { display: none; }
+  .minimap.dense .sname,
+  .minimap.dense .rname { display: none; }
   /* And the names that only fit at the small size. Enlarging the type broke
      the collision rule that placed it: 434 overlapping pairs on 275 of the
      815 pages that draw a labelled map, "Hallstatt" through "Berchtesgaden"
@@ -3594,3 +3612,4 @@ body[data-hero] .masthead { position: sticky; }
 .constel-theme .constel-lit circle { r: 22px; }
 .constel-route { fill: none; stroke: var(--door); stroke-width: 5;
                  stroke-linejoin: round; opacity: .55; }
+

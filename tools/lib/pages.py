@@ -1946,6 +1946,12 @@ def countryportrait(data, c):
     for px, py, nm in cartography.water_points(proj.xy, (0, 0, w, h)):
         _try_label(px, py, nm, "sname", metric="rlabel", off=8.0,
                    prefer="over")
+    # And the rivers, last of the physical families for the same reason they
+    # are last on a destination plate: everything with a dot outranks them.
+    for rnm, ranchors in cartography.river_points(proj.xy, (0, 0, w, h)):
+        for rx, ry in ranchors:
+            if _try_label(rx, ry, rnm, "rname", off=5.0, prefer="beside"):
+                break
 
     for r_ in c["regions"]:
         pts_r = [proj.xy(t["lat"], t["lon"]) for t in r_["cities"]]
@@ -3972,6 +3978,27 @@ def minimap(data, t, span=3.2, about=None, named=None):
         for fx, fy, fnm in cartography.feature_points(_tx, (0, 0, w, h)):
             _fits(place_label_box(fx, fy, fnm, w, h, cls="fname",
                                   metric="rlabel", off=8.0, prefer="over"))
+        # A RIVER IS THE ONE PHYSICAL FAMILY THAT WAS DRAWN AND NEVER NAMED.
+        # After the seas and before nothing: it is placed last of the
+        # physical labels and the physical labels are placed after every
+        # place name, so the destination's own names win every collision and
+        # a river only gets what is left. On Vienna that is the Danube; on a
+        # frame the river merely clips, it is nothing, which is the whole
+        # point of scoring by drawn extent rather than by dataset rank.
+        # THE SUBJECT IS PASSED IN, WHICH IS THE WHOLE DIFFERENCE. Scored on
+        # extent alone, London's map named the Lek — a Rhine distributary in
+        # the Netherlands that out-measures the Thames on a frame reaching
+        # the Low Countries. A river is named because it identifies THIS
+        # place, and the anchors are tried in order from the point nearest
+        # the place outward, because a river crosses the whole picture and
+        # its name only needs one gap.
+        for rnm, ranchors in cartography.river_points(_tx, (0, 0, w, h),
+                                                      subject=(w / 2, h / 2)):
+            for rx, ry in ranchors:
+                if _fits(place_label_box(rx, ry, rnm, w, h, cls="rname",
+                                         off=5.0,
+                                         prefer="beside", clears=_free)):
+                    break
         for fx, fy, fnm in cartography.water_points(_tx, (0, 0, w, h)):
             _fits(place_label_box(fx, fy, fnm, w, h, cls="sname",
                                   metric="rlabel", off=8.0, prefer="over"))
@@ -4414,7 +4441,7 @@ def dense_class(markup):
     # called a map with six towns and four mountains sparse — so all ten were
     # scaled up on a 390px screen and two of them collided.
     names = sum(markup.count(f'<text class="{c}') for c in
-                ("minilabel", "peakname", "fname", "sname"))
+                ("minilabel", "peakname", "fname", "sname", "rname"))
     return "" if names <= 6 else " dense"
 
 

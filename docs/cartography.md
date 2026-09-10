@@ -372,3 +372,66 @@ three of them are **not build tasks**:
 Achievable next, in order of value: the ocean and neighbour **names**
 (`ATLANTIC OCEAN`, `SPAIN`), a Europe locator inset, a key, and a limestone
 rim on the arch. None needs a licence or a socket.
+
+## Naming the water: the last physical family
+
+Summits, ranges and seas have carried names since the plates were built —
+`peakname`, `fname`, `sname`, all through one placement rule and one density
+pass. **Rivers were drawn with a `<title>` and nothing on the page**, so
+Vienna's map showed six anonymous blue lines while the dataset that drew them
+names all 153 and ranks the Danube at 2.
+
+`river_points()` answers the three questions a label system has to answer —
+what deserves a name on THIS map, where does it go, when does it disappear —
+in the order subject, scale, importance, space.
+
+**Subject first, and the test set is why.** Scored on drawn extent alone,
+London's map named the **Lek**: a Rhine distributary in the Netherlands that
+out-measures the Thames on a 900-unit frame reaching the Low Countries. The
+system had learned to place a word rather than to understand a place. A river
+passing within 16% of the frame width of the destination is that
+destination's river and sorts above everything else.
+
+**Importance is drawn extent in this frame, never the dataset's rank.**
+Natural Earth's rank is a global hydrological figure. Measured across the
+file: rank ≤ 3 is Danube, Donau, Volga, Nile, the Euphrates under three names
+and three Danube delta arms — while **the Thames and the Po are rank 6**, the
+Rhône is rank 6, and the Tiber and the Douro are not in the file at all. A
+system built on rank names delta arms and never names the Thames.
+
+**The same river is several features in several languages**, so ALIASES
+merges them. That is an authored *classification*, which the Data Integrity
+Rule permits; the extent underneath it is still derived. Running it over all
+319 destinations and counting the output found two the design missed —
+"Rhin" on four pages beside "Rhine" on six, "Tajo" on three beside "Tagus" on
+three. **No single page showed both**, so looking at one map would never have
+found it.
+
+**The subject's river is all or nothing.** Bratislava named the **Tisza**,
+300 km away and on the map only because the frame is wide, because the
+Danube's anchors were all taken by place names and the next river down found
+a gap. A map of Bratislava naming the Tisza is worse than one naming no
+river: it does not fail to help a reader place themselves, it tells them
+something false. Where a river passes near the subject it is the only
+candidate; scenery is offered only on a map that has no river of its own.
+
+**Ten anchors, nearest the subject first.** Six was not enough — a river
+crosses the whole picture and its name needs one gap, and the country name
+has been offered nine anchors for the same reason.
+
+### What is open
+
+**On dense city maps the river still loses every collision.** Vienna,
+Budapest, Bratislava, Cologne, Paris and London draw no river name, not
+because the selection is wrong — the Danube is correctly first on Vienna —
+but because the label hierarchy puts every neighbouring destination's name
+above every physical one.
+
+That is a real question rather than a bug: **is the subject's own river
+scenery, or is it part of the subject's identity?** If it is identity it
+should outrank a neighbouring town's name. That changes what is drawn on 319
+maps and it is settled by rendering and looking, not by counting, so it is
+recorded here rather than guessed at.
+
+**Rome will never get a river from this data.** The Tiber is absent from the
+dataset, and inventing it is not available.

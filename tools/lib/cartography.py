@@ -52,6 +52,7 @@ failure this codebase has made three times with specificity alone.
 
 from __future__ import annotations
 
+import math
 import os
 import re
 
@@ -692,6 +693,171 @@ def rivers(proj, view, river_rank=None, lake_rank=None, thin_units=0.0,
             out.append(f'<path class="lake" d="{"".join(d)}">'
                        f'<title>{feat.get("name", "")}</title></path>')
     return "".join(out)
+
+
+# ── naming the water that is drawn ───────────────────────────────────────
+#
+# THE RIVERS WERE THE ONE PHYSICAL FAMILY DRAWN AND NEVER NAMED. Summits get
+# `peakname`, ranges and plains get `fname`, seas get `sname`, all through the
+# same placement rule and all counted by the same density pass. Rivers had a
+# `<title>` and nothing on the page — so Vienna's map carried six anonymous
+# blue lines while the dataset that drew them names all 153 of them and ranks
+# the Danube at 2.
+#
+# TWO THINGS MAKE THIS A SUBSYSTEM RATHER THAN PRINTING "DANUBE".
+#
+# 1. THE DATASET'S RANK IS NOT EUROPEAN IMPORTANCE, and building on it would
+#    have produced a map that names the Danube's delta arms and never the
+#    Thames. Measured across the file: rank <= 3 is Danube, Donau, Volga,
+#    Nile, Al Furat / Euphrates / Firat, and Bratul Chillia / Sfintu Gheorghe
+#    / Sulina — while the Thames and the Po are rank 6, the Rhône is rank 6,
+#    and the Tiber and the Douro are not in it at all. Rank is a global
+#    hydrological figure; what a European atlas needs is how much of the
+#    river is IN THIS PICTURE.
+#
+#    So importance is the drawn extent inside the frame, in the frame's own
+#    units — the same idiom as the lake cut two hundred lines up, which is a
+#    property of this drawing rather than of the dataset. On Vienna the Danube
+#    crosses the whole frame and the Morava clips a corner, and that ordering
+#    is computed rather than declared.
+#
+# 2. THE SAME RIVER IS SEVERAL FEATURES IN SEVERAL LANGUAGES. "Rhine" and
+#    "Rhein" are six separate rows; "Danube" and "Donau" are three; the Tagus
+#    is "Tejo". Naming from the file directly puts Rhine and Rhein on
+#    Cologne's map, one above the other. ALIASES is an authored
+#    CLASSIFICATION — the Data Integrity Rule permits authoring one and
+#    forbids authoring a measurement, and "the Rhein is the Rhine" is naming,
+#    not measuring. The extent is still derived.
+ALIASES = {
+    "Rhein": "Rhine", "Donau": "Danube", "Duna": "Danube", "Dunav": "Danube",
+    "Tejo": "Tagus", "Rhône": "Rhone", "Wisla": "Vistula", "Wisła": "Vistula",
+    "Tevere": "Tiber", "Loira": "Loire", "Elba": "Elbe", "Sena": "Seine",
+    "Firat": "Euphrates", "Al Furat": "Euphrates",
+    "Rio Douro": "Douro", "Dnipro": "Dnieper", "Dnepr": "Dnieper",
+    # FOUND BY RUNNING IT OVER ALL 319 AND READING THE NAMES THAT CAME OUT:
+    # "Rhin" on four pages and "Tajo" on three, beside "Rhine" on six and
+    # "Tagus" on three. The same river under two flags, and no single page
+    # showed both — which is exactly why counting the output mattered and
+    # looking at one map would not have found it.
+    "Rhin": "Rhine", "Tajo": "Tagus", "Tage": "Tagus",
+    "Rhein/Rhine": "Rhine", "Donau/Danube": "Danube",
+    "Douro/Duero": "Douro", "Duero": "Douro",
+    "Maas": "Meuse", "Mosel": "Moselle", "Weichsel": "Vistula",
+    "Theiss": "Tisza", "Tisa": "Tisza", "Drau": "Drava", "Sava/Save": "Sava",
+}
+
+# A river named on a picture it barely enters is a label about somewhere else.
+# As a fraction of the frame's shorter side, so it means the same thing on a
+# destination plate and on the continent.
+RIVER_MIN_FRAC = 0.34
+
+# HOW CLOSE A RIVER HAS TO PASS TO BE *THIS PLACE'S* RIVER, as a fraction of
+# the frame's width. THE FIRST VERSION HAD NO SUCH TEST AND THE TEST SET
+# CAUGHT IT: scoring purely by drawn extent, London's map named the **Lek** —
+# a Rhine distributary in the Netherlands, which out-measures the Thames on a
+# 900-unit frame that reaches the Low Countries. The system had learned to
+# place a word rather than to understand a place.
+#
+# The subject comes first, which is what the pipeline this was built to
+# answer says in its first line. A river that passes near the destination is
+# what a reader recognises the destination by; everything else is scenery,
+# and scenery is ranked by extent underneath it.
+RIVER_NEAR_FRAC = 0.16
+
+
+def river_points(to_xy, view, subject=None, min_frac=RIVER_MIN_FRAC, limit=3):
+    """Rivers worth naming on THIS map: (name, [anchors]), best first.
+
+    SUBJECT, THEN SCALE, THEN IMPORTANCE, THEN SPACE.
+
+    · subject — a river passing within `RIVER_NEAR_FRAC` of the place is that
+      place's river and sorts above everything, nearest first. The Thames for
+      London, the Seine for Paris, the Rhine for Cologne, the Danube for
+      Vienna and Budapest and Bratislava.
+    · scale — the extent floor and the near radius are both fractions of the
+      frame, so they mean the same thing on a destination plate and on a
+      continent.
+    · importance — drawn extent inside the frame, never the dataset's rank.
+      Natural Earth's rank is a global hydrological figure: rank <= 3 is the
+      Danube's delta arms and the Euphrates in three languages, while the
+      Thames and the Po are rank 6 and the Tiber is not in the file at all.
+    · space — several anchors are returned per river, spaced along its longest
+      run, because a river crosses the whole picture and its name only needs
+      one gap. One anchor is a name that loses a collision it never had to
+      lose; the country name has been offered nine for the same reason.
+
+    The caller places them after every place name, so the subject's own labels
+    win, and marks them for the phone pass like every other physical family.
+    """
+    doc = geo.load(SOURCES["rivers"])
+    if not doc:
+        return []
+    x, y, w, h = view
+    floor = min(w, h) * min_frac
+    near = w * RIVER_NEAR_FRAC
+    runs_by_name = {}
+    for feat in doc.get("rivers", []):
+        raw = (feat.get("name") or "").strip()
+        if not raw:
+            continue
+        name = ALIASES.get(raw, raw)
+        line = feat["line"]
+        pts = [to_xy(line[i + 1], line[i]) for i in range(0, len(line), 2)]
+        cur = []
+        for px, py in pts:
+            if x <= px <= x + w and y <= py <= y + h:
+                cur.append((px, py))
+            elif cur:
+                runs_by_name.setdefault(name, []).append(cur)
+                cur = []
+        if cur:
+            runs_by_name.setdefault(name, []).append(cur)
+
+    def length(run):
+        return sum(math.dist(run[i], run[i + 1]) for i in range(len(run) - 1))
+
+    scored = []
+    for name, runs in runs_by_name.items():
+        total = sum(length(r) for r in runs)
+        if total < floor:
+            continue
+        best = max(runs, key=length)
+        gap = None
+        if subject:
+            gap = min(math.dist(subject, p) for r in runs for p in r)
+        # Anchors along the longest run: the point nearest the subject first
+        # where there is one, then evenly spaced, so a name that cannot fit
+        # beside the place still fits somewhere on its own river.
+        # Ten anchors, evenly spread, nearest the subject first. Six was not
+        # enough: Vienna's map is dense with place names and every one of the
+        # Danube's six gaps was taken, so the river that IS Vienna went
+        # unnamed while a lesser one found a hole.
+        step = max(1, len(best) // 10)
+        idx = list(range(0, len(best), step))[:10]
+        if subject:
+            idx.sort(key=lambda i: math.dist(subject, best[i]))
+        anchors = [best[i] for i in idx]
+        # A river that passes near the subject sorts above every other, and
+        # nearest wins among those; the rest fall back to drawn extent.
+        own = gap is not None and gap <= near
+        key = (0, gap, -total) if own else (1, 0.0, -total)
+        scored.append((key, name, anchors, own))
+    scored.sort(key=lambda r: r[0])
+
+    # THE SUBJECT'S RIVER IS ALL OR NOTHING, AND THE TEST SET IS WHY.
+    # Bratislava named the **Tisza** — 300 km away, and on the map only
+    # because the frame is wide — because the Danube's anchors were all taken
+    # by place names and the next river down found a gap. A map of Bratislava
+    # that names the Tisza and not the Danube is worse than one that names no
+    # river at all: it does not merely fail to help a reader place themselves,
+    # it tells them something false about where they are.
+    #
+    # So where a river passes near the subject, it is the only candidate. The
+    # scenery below it is offered only on a map that HAS no river of its own —
+    # a country portrait, or a destination nowhere near water.
+    own_rivers = [r for r in scored if r[3]]
+    chosen = own_rivers if own_rivers else scored
+    return [(nm, anc) for _k, nm, anc, _o in chosen[:limit]]
 
 
 def area_points(path, to_xy, view, margin=22.0):
