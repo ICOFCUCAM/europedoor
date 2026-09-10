@@ -1808,6 +1808,25 @@ and calling it an itinerary. None of those was findable by reading the code.
 They launch the sandbox's own Chromium via `executablePath` because the npm
 package version will not match the installed browser build.
 
+**And that is why the suite ran against a different browser here than in CI,
+which cost eighty-nine consecutive red runs.** CI has no `/opt/pw-browsers`,
+so it downloads Chromium Headless Shell 131; this sandbox has 141. The same
+two map-layer checks were green here and red there for the life of the suite.
+**Playwright's `isHidden()` means "the element has an empty bounding box",
+and Chromium 131 returns the CHILDREN'S geometry for an SVG `<g>` whose
+computed display is `none`, where 141 returns a zero rect** — so two browsers
+that agreed exactly about the drawing disagreed about the box, and the suite
+was reading the box. The map was never wrong. That is the map-label failure in
+another family: eleven units is not eleven pixels, and an empty box is not an
+undrawn layer. A layer assertion reads the computed display now.
+
+**A failure message with no measurement in it cannot be diagnosed, and this
+one was diagnosed in one run once it carried the state.** Three theories were
+tried against a browser that cannot be launched here before the message was
+made to print `computed-display`, the box and the child count; the first line
+of that output ended it. Every other count in this repository is in its
+message for the same reason.
+
 **And one that is deliberately not a gate.** `node tools/contact-sheet.js`
 puts one page per family in a single image. `--dark` shoots the dark
 colour-scheme preference, `--phone` shoots 390px, and `--more` shoots the
