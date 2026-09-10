@@ -248,16 +248,12 @@ def s7():
     # matching a substring of its own naming scheme, which is the same
     # mistake the UX audit made in the same hour on `class="way`.
     n_maps = len(re.findall(r'class="constel(?: constel-theme)?"', h))
-    # FIVE, AND THE FIFTH IS ARGUED RATHER THAN ALLOWED. The ceiling exists
-    # because this page once carried eleven abstract plates in a column. Four
-    # is three journey routes and the lead way-in; the fifth was tried as
-    # four way-ins and reverted in the same session, because four tiles of
-    # the same coastline differing only in where the dots fall is the
-    # owner's eighth constraint — do not repeat the same Europe map
-    # treatment across adjacent cards — and side by side the two shapes read
-    # as one texture. A band gets ONE dominant element, so the band has a
-    # lead and three entries.
-    yield n_maps <= 5, f"{n_maps} drawings on the homepage — it was eleven"
+    # FOUR: three journey routes and the hero. The ways-in band drew a fifth
+    # for one commit, as a lead door carrying its own constellation, and it
+    # went when the band became a full-bleed strip of four photographic
+    # panels — a fifth picture of Europe on a page that opens on one was the
+    # owner's eighth constraint arriving from a different direction.
+    yield n_maps <= 4, f"{n_maps} drawings on the homepage — it was eleven"
     # The geography index, the twelve motions, the quiet places, the stories
     # desk and the interest index all lost their homepage band. None of them
     # lost a reader: every one is linked from all 1,072 pages.

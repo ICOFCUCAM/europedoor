@@ -122,11 +122,20 @@ function serve() {
       continue;
     }
     await page.waitForTimeout(400);
-    const hero = page.locator(".herofull").first();
-    if (!(await hero.count())) { missing.push(`${c.id}: no .herofull on the page`); continue; }
-    const box = await hero.boundingBox();
+    // THE SURFACE IS NOT ALWAYS THE HERO. The manifest names the selector,
+    // because the doors sit on the same page four screens down and shooting
+    // the top of it for them would be a finished-looking review of nothing.
+    // It is still the VIEWPORT that is photographed and not the element:
+    // an invented pad is a number nobody can check, and the reader's frame
+    // is the whole point of drawing the real page.
+    const sel = sheet.selector || ".herofull";
+    const surface = page.locator(sel).first();
+    if (!(await surface.count())) { missing.push(`${c.id}: no ${sel} on the page`); continue; }
+    await surface.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(150);
+    const box = await surface.boundingBox();
     if (!box || box.height < 100) {
-      missing.push(`${c.id}: .herofull measured ${box ? Math.round(box.height) : "no"} px tall`);
+      missing.push(`${c.id}: ${sel} measured ${box ? Math.round(box.height) : "no"} px tall`);
       continue;
     }
     c.shot = path.join(dir, `${c.id}.png`);
@@ -163,7 +172,7 @@ function serve() {
   span{color:#b9b4aa;font-size:12px}
   </style>
   <header>
-    <h1>${sheet.purpose} — candidates in the real hero</h1>
+    <h1>${sheet.purpose} — candidates in the real page</h1>
     <p>${sheet.surface}</p>
     <p>${sheet.provider} · query <strong>${(sheet.query || "").replace(/</g, "&lt;")}</strong>
        · searched ${sheet.searched || ""} · shown at ${PHONE ? "390px" : "1280px"},

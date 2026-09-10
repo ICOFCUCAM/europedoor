@@ -58,7 +58,20 @@ DEFAULT_OUT = os.path.join(acquire.ROOT, ".cache", "contact")
 # real page, so a purpose whose surface has no renderer wired here is REFUSED
 # rather than drawn as a homepage with the wrong photograph in it — which
 # would look exactly like a finished review and be about nothing.
-RENDERABLE = {"homepage-hero"}
+RENDERABLE = {"homepage-hero", "door-mountains", "door-coast",
+              "door-history", "door-food"}
+
+# WHERE ON THE PAGE EACH PURPOSE LIVES, because a sheet that shoots the top of
+# the page for a surface four screens down is a finished-looking review of
+# nothing. The doors are on the same page as the hero, which is why they can
+# be drawn at all; they just have to be scrolled to.
+SURFACE = {
+    "homepage-hero": ".herofull",
+    "door-mountains": ".wayin",
+    "door-coast": ".wayin",
+    "door-history": ".wayin",
+    "door-food": ".wayin",
+}
 
 
 def fetch_preview(url, dest):
@@ -207,6 +220,10 @@ def main(argv):
             "provider": provider, "purpose": purpose,
             "query": man.get("query"), "searched": man.get("searched"),
             "surface": spec["surface"],
+            # The selector the sheet renderer scrolls to and measures. It
+            # travels in the manifest rather than being a second table in the
+            # renderer, so one file decides which surface a purpose occupies.
+            "selector": SURFACE[purpose],
             "cells": sheet,
         }, fh, indent=2, ensure_ascii=False)
 

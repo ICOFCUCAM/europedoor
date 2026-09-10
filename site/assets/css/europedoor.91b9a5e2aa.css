@@ -3763,22 +3763,14 @@ body[data-hero] .masthead { position: sticky; }
    and on the dark one an acid continent floating in near-black. The
    cartography is world-independent by design: paper, ink, blue, wherever it
    is embedded. */
-.card-map, .wayart { background: var(--atlas-sea); display: flex; align-items: center;
+.card-map { background: var(--atlas-sea); display: flex; align-items: center;
             justify-content: center; padding: var(--s4); }
-.card-map .constel, .wayart .constel { fill: var(--atlas-land); }
+.card-map .constel { fill: var(--atlas-land); }
 .card-map .regionglyph .countries path { fill: var(--atlas-here);
   stroke: var(--atlas-coast); stroke-width: 1.1; vector-effect: non-scaling-stroke; }
 .card:hover .card-map .regionglyph .countries path { fill: #fff; }
-.card-map .constel-lit circle, .wayart .constel-lit circle { fill: var(--cobalt);
+.card-map .constel-lit circle { fill: var(--cobalt);
   stroke: var(--atlas-here); stroke-width: 1.6; }
-/* The door's own drawing, at the door's own size. `.card-map` is a tile in a
-   grid and this is the top half of a half-page block, so the radius is the
-   figure's rather than a card's, and the dots are fitted to the frame the
-   same way the openings' are. */
-.wayart { margin: 0 0 var(--s4); aspect-ratio: 16 / 9; overflow: hidden;
-          border-radius: var(--radius); padding: 0; }
-.wayart .constel { width: 100%; height: 100%; }
-.wayart .constel-lit circle { r: 9px; stroke-width: 2; }
 .card-map .constel { width: 100%; height: auto; }
 /* Bigger tiles, more dots, smaller marks: a 200-destination tile at 380px
    with the theme index's radius would be a solid field. Set here rather than
@@ -3839,34 +3831,105 @@ body[data-hero] .masthead { position: sticky; }
  * radius, no shadow, no fill. Those four are what say "separate object,
  * placed here by a system", and this is meant to read as a page rather than
  * as a component library. A rule and space do the separating. */
-/* A LEAD AND THREE, NOT FOUR EQUALS. Two by two gave four blocks the same
-   weight, and with the photograph slots empty that is four blocks of type in
-   a row — the one band on the homepage whose job is to make somebody want to
-   go somewhere, doing it entirely in words. The lead takes the drawing and
-   the width; the other three are entries under it. One dominant element per
-   band, and one Europe on the page rather than four adjacent copies of it. */
+/* ── the ways in are a full-bleed strip, and each panel is a photograph ──
+   THE BAND WAS FOUR BLOCKS OF TYPE IN THE PAGE COLUMN. The doors were
+   written for a photograph and the register is empty, so the one part of
+   this page whose job is to make somebody want to go somewhere was doing it
+   entirely in words. Two answers were tried and rejected before this one: a
+   lead door with its own constellation, which put a fifth picture of Europe
+   on a page that opens on one; and a single photograph across the whole
+   band, which cannot be art-directed, because the four names sit over it and
+   a summit captions Mountains while contradicting the other three.
+
+   One photograph per door, in one strip that runs edge to edge like the
+   hero. Every picture then answers the words on top of it, the band still
+   reads as one dominant element, and the four slots can fill ONE AT A TIME:
+   the strip is composed at every step, where a single band image is all or
+   nothing.
+
+   The panel's ground is the atlas's own water, so the empty state is a
+   composition rather than a hole, and the tokens are rebound INSIDE the
+   panel — the same move the cobalt masthead makes — so every .way rule
+   below works unchanged on a dark ground instead of being rewritten. On
+   #123f55 limestone measures 10.40:1 and its 78% tint 7.02:1. */
 .wayin {
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--s7) var(--s6); border-top: 1px solid var(--rule); padding-top: var(--s6);
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0;
+  margin: var(--s6) calc(50% - 50vw) 0;
 }
-.way.lead {
-  grid-column: 1 / -1;
-  display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
-  gap: var(--s6); align-items: center;
+.way {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; align-items: flex-end;
+  min-height: min(58vh, 33rem);
+  padding: var(--s6) var(--s5);
+  background: var(--atlas-sea);
+  text-decoration: none;
+  --ink:   var(--limestone);
+  --ink-2: color-mix(in srgb, var(--limestone) 90%, transparent);
+  --ink-3: color-mix(in srgb, var(--limestone) 78%, transparent);
+  --rule:  color-mix(in srgb, var(--limestone) 34%, transparent);
+  --door:  var(--limestone);
+  color: var(--ink);
 }
-.way.lead .wayart { margin: 0; }
-/* The lead is the biggest thing in the band and the three under it are
-   entries, so the heading steps down. `--t-xl` is already in the scale: a
-   hierarchy that needs a new size value is a decoration. */
-.way:not(.lead) h3 { font-size: var(--t-xl); }
-@media (max-width: 52rem) {
+/* A HAIRLINE, NOT A GAP. A gutter between four photographs makes four cards
+   of them; a hairline makes one strip cut into four. A BORDER rather than an
+   inset shadow: the register counts box-shadow declarations and two is the
+   whole vocabulary, a rest state and a lifted one. A divider is not a
+   shadow, and writing it as one spends a slot that means something else. */
+.way + .way { border-left: 1px solid color-mix(in srgb, var(--limestone) 20%, transparent); }
+.waytext { position: relative; z-index: 2; width: 100%; }
+.way picture { position: absolute; inset: 0; z-index: 0; display: block; }
+.way .photo {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .5s cubic-bezier(.2, .6, .2, 1);
+}
+/* THE SCRIM IS ONLY ON THE PHOTOGRAPH. Over the flat water it would darken a
+   ground that already carries the type at 10:1 and add nothing.
+
+   FIVE STOPS, NOT TWO, and it is the same finding the hero's fades already
+   record: a two-stop ramp has a crease at each end and the eye draws a line
+   along it — a Mach band, reported three times as "a hard edge" while
+   widening the ramp only moved the crease. It has to reach full strength
+   BEFORE the type starts, because the guarantee here is that limestone
+   clears AA over any photograph a person picks, not over the ones that
+   happen to be dark at the bottom. */
+.way.shot::after {
+  content: ""; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(to top,
+    rgba(9, 22, 30, .94) 0%,
+    rgba(9, 22, 30, .92) 26%,
+    rgba(9, 22, 30, .74) 44%,
+    rgba(9, 22, 30, .40) 64%,
+    rgba(9, 22, 30, .16) 82%,
+    rgba(9, 22, 30, .06) 100%);
+  transition: opacity .4s ease;
+}
+/* A PANEL IS A LINK AND HAS TO SAY SO. `.way:hover h3 { color: var(--door) }`
+   is inherited from the type-led version and --door is limestone in here, so
+   the heading changed to the colour it already was: a hover state that
+   changes nothing, which is the dead-rule failure this stylesheet has now
+   recorded four times. The picture moves instead, which is what a
+   photographic panel has to offer, and the scrim eases off it. */
+.way:hover .photo, .way:focus-visible .photo { transform: scale(1.045); }
+.way:hover.shot::after, .way:focus-visible.shot::after { opacity: .88; }
+.way:focus-visible { outline: 2px solid var(--limestone); outline-offset: -4px; }
+@media (prefers-reduced-motion: reduce) {
+  .way .photo, .way.shot::after { transition: none; }
+  .way:hover .photo, .way:focus-visible .photo { transform: none; }
+}
+@media (max-width: 60rem) {
+  .wayin { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .way { min-height: min(44vh, 24rem); }
+}
+@media (max-width: 40rem) {
   .wayin { grid-template-columns: 1fr; }
-  .way.lead { grid-template-columns: 1fr; }
-  .way.lead .wayart { margin-bottom: var(--s4); }
+  .way { min-height: 17rem; }
 }
-.way { text-decoration: none; }
+/* A PANEL HEADING, NOT A PAGE HEADLINE. The doors were half-page blocks and
+   carried a 40px serif; four panels of a strip are 320 pixels wide at 1280
+   and "Coast & islands" broke across three lines in one. `--t-xl` is already
+   in the scale: a size that exists only for this band is a decoration. */
 .way h3 {
-  font-family: var(--serif); font-size: clamp(var(--t-xl), 3.1vw, var(--t-3xl));
+  font-family: var(--serif); font-size: var(--t-xl);
   line-height: 1.12; margin: 0 0 var(--s3);
 }
 /* The editorial line is the promise and the only italic on the page: it is

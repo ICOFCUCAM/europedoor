@@ -1065,49 +1065,33 @@ def home(data):
         shot = picture(data.get("images"), d["purpose"], w=1600, h=1000,
                        alt=row["alt"], sizes="(min-width: 52rem) 50vw, 100vw"
                        ) if row else ""
-        # FOUR HEADLINES AND NOTHING TO LOOK AT. The doors were written for a
-        # photograph, and with the register empty the whole band rendered as
-        # four blocks of type: the one place on the homepage that is supposed
+        # THE BAND IS A STRIP, EDGE TO EDGE, AND EACH DOOR IS A PANEL IN IT.
+        #
+        # With the register empty this section rendered as four blocks of
+        # type in the page column: the one part of the homepage whose job is
         # to make somebody want to go somewhere, doing it entirely in words.
-        # A no-image state is a composition, not an absence, and this one had
-        # never been drawn.
+        # Two answers were tried before this one. A lead door carrying its
+        # own constellation was better and still wrong — a fifth picture of
+        # Europe on a page that already opens on one. A single photograph
+        # across the whole band was tried and abandoned for a reason no
+        # amount of art direction fixes: the four names are set over it, so
+        # a summit captions Mountains and contradicts Coast & islands,
+        # Historic cities and Food & wine in the same frame.
         #
-        # The drawing is the same one the tiles used before the doors
-        # replaced them, and it is the answer to the question the door asks:
-        # every destination carrying that tag, lit on one continent. The 63
-        # mountain places are the Alps, the Pyrenees, the Carpathians and the
-        # Scandes; the 200 with history are almost everywhere; and the reader
-        # sees the difference between those two shapes before reading either
-        # heading. ALL of them and never a selection — the count under the
-        # door is the number of dots on it.
+        # One photograph PER DOOR, in one full-bleed strip, is the only
+        # arrangement where every picture answers the words on top of it and
+        # the band still reads as one dominant element. It also arrives in
+        # pieces: four slots fill one at a time, and the strip is composed at
+        # every step rather than only when all four are licensed — which a
+        # single band image cannot do, being all or nothing.
         #
-        # NO APERTURE. The hero above is the largest arch on the site and
-        # four more under it is the signature as wallpaper, which is the rule
-        # the theme rows and the year band already keep.
-        # ONE OF THE FOUR, NOT FOUR OF THE FOUR. The first version drew all
-        # four and the section audit caught it in one run: eight drawings on
-        # the homepage against a ceiling of four. The ceiling is right, and
-        # it is the owner's eighth constraint in a check — do not repeat the
-        # same Europe map treatment across adjacent cards. Four tiles of the
-        # same coastline differing only in where the dots fall is exactly
-        # that, and side by side the two shapes read as one texture before
-        # anybody counts a dot.
-        #
-        # So the band has a LEAD. The first door in data/home.json, which is
-        # an authored editorial set of at most four, carries the drawing at
-        # size; the other three are the entries under it. One dominant
-        # element per band, which is the rule the whole redesign runs on, and
-        # the homepage's drawing count is unchanged at four.
-        lead = not doors and not shot
-        art = (
-            '<figure class="wayart">'
-            + constellation([project(n["city"]["lat"], n["city"]["lon"])
-                             for n in data["cities"].values()
-                             if d["interest"] in n["city"]["interests"]])
-            + "</figure>") if lead else ""
+        # NO DRAWING HERE. The empty panel is the atlas's own water with the
+        # door set on it, which is a composition rather than a hole, and the
+        # arch stays where it belongs: the hero above is the largest one on
+        # the site and four more under it is the signature as wallpaper.
         doors.append(
-            f"""<a class="way{' lead' if lead else ''}{' shot' if shot else ''}" href="{urls.interest(d['interest'])}">
-  {shot}{art}
+            f"""<a class="way{' shot' if shot else ''}" href="{urls.interest(d['interest'])}">
+  {shot}
   <div class="waytext">
     <h3>{esc(d['title'])}</h3>
     <p class="wayline">{esc(d['line'])}</p>
