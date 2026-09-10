@@ -7746,13 +7746,32 @@ def quiet_page(data):
     # a Galician fishing town gets the same treatment as Paris. A
     # destination here is chosen on where it is and what it is like, and
     # neither of those is a look, which is the test a card has to pass.
+    # A HUNDRED AND THIRTY ROWS IN ONE COLUMN, FIFTEEN THOUSAND PIXELS LONG.
+    #
+    # Sorted by country with nothing marking where one ended, which is the
+    # order this page had and could not show — the interest pages had exactly
+    # this and were grouped by macro region for exactly this reason. The
+    # drawing above is the argument, a distribution across the continent, and
+    # the list under it then asked a reader to scroll a hundred and thirty
+    # names to find out which part of Europe any of them is in.
+    #
+    # Grouped by macro region, in the taxonomy's own order, so the list has
+    # the same nine divisions the picture above it has.
+    by_macro = {}
+    for n in quiet:
+        by_macro.setdefault(_macro_of(data, n["country"]["slug"]), []).append(n)
     rows = "".join(
-        f'<a class="row" href="{urls.city(n["country"], n["region"], n["city"])}">'
-        f'<div><h3>{esc(n["city"]["name"])}</h3>'
-        f'<p class="rowsub">{esc(n["city"]["summary"])}</p></div>'
-        f'<p class="rowmeta">{esc(n["country"]["name"])} · '
-        f'{esc(n["region"]["name"])}</p></a>'
-        for n in quiet)
+        f'<div class="rowgroup"><p class="rowgrouphead">{esc(m["name"])}'
+        f'<span class="rowgroupn">{len(by_macro[m["slug"]])}</span></p>'
+        + "".join(
+            f'<a class="row" href="{urls.city(n["country"], n["region"], n["city"])}">'
+            f'<div><h3>{esc(n["city"]["name"])}</h3>'
+            f'<p class="rowsub">{esc(n["city"]["summary"])}</p></div>'
+            f'<p class="rowmeta">{esc(n["country"]["name"])} · '
+            f'{esc(n["region"]["name"])}</p></a>'
+            for n in by_macro[m["slug"]])
+        + "</div>"
+        for m in data["macros"] if m["slug"] in by_macro)
     # THE ARGUMENT OF THIS PAGE IS A DISTRIBUTION, AND IT WAS PROSE.
     #
     # "Too many visitors in the same eleven places" is a claim about where
