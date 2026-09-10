@@ -186,10 +186,31 @@
   if (!mine) return;
   var list = read();
   if (!list.length) {
-    mine.innerHTML = '<div class="note"><p>Nothing saved yet. Open any city in the ' +
-      '<a href="/atlas">Atlas</a> and press <em>Save to My Europe</em>. If you have saved things ' +
-      'before and this is empty, you are in a different browser or the site data was cleared — ' +
-      'there is no copy anywhere else, which is the point.</p></div>';
+    /* AN EMPTY STATE IS A PAGE, AND THIS ONE WAS A GREY BOX AND 250 PIXELS
+     * OF NOTHING. It is also the FIRST thing every reader sees here — the
+     * list is empty until they save something — so it is the state this page
+     * ships in, not a fallback, and it was the only surface on the site that
+     * explained what to do without offering a way to do it.
+     *
+     * It carries three ways in now. They are the site's own top-level
+     * surfaces rather than a curated pick, because choosing three
+     * destinations to suggest would be a ranking this Atlas does not hold.
+     *
+     * AND THE ONE LINK IT DID HAVE WAS DEAD. `/atlas` has never been a route
+     * here; the country index is `/countries`. It survived because it lives
+     * in a string in a script that only runs when nothing is saved, so the
+     * link checker — which reads shipped HTML — could not see it. A code
+     * path nothing exercises is a code path nothing checks. */
+    mine.innerHTML = '<div class="startstate">' +
+      '<h2>Nothing saved yet.</h2>' +
+      '<p>Open any destination and press <em>Save to My Europe</em>. If you have saved ' +
+      'things before and this is empty, you are in a different browser or the site data ' +
+      'was cleared — there is no copy anywhere else, which is the point.</p>' +
+      '<div class="emptyways">' +
+      '<a href="/countries"><b>Countries</b><span>Fifty, and the regions inside them</span></a>' +
+      '<a href="/discover"><b>Discover mode</b><span>Say what you travel for</span></a>' +
+      '<a href="/journeys"><b>Journeys</b><span>Routes already worked out</span></a>' +
+      '</div></div>';
     return;
   }
   /* Collections — the specification's bucket lists. A saved item carries a

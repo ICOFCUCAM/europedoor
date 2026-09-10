@@ -380,6 +380,6 @@
     })
     .catch(function () {
       out.innerHTML = '<div class="note warn"><p>The search index did not load. ' +
-        'The <a href="/atlas">Atlas</a> is fully browsable without it.</p></div>';
+        'The <a href="/countries">Atlas</a> is fully browsable without it.</p></div>';
     });
 })();

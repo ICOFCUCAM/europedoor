@@ -657,6 +657,36 @@ main.wide { max-width: 92rem; }
    constant again in a different medium. preserveAspectRatio="none" because
    the horizontal scale is the whole claim and there is no type inside the
    viewBox to be stretched with it. */
+/* AN EMPTY STATE IS A PAGE, AND /my-europe's WAS A GREY BOX AND 250 PIXELS
+   OF NOTHING. It is also the first thing every reader sees there — the list
+   is empty until they save something — so it is the state that surface
+   SHIPS in, not a fallback, and it was the only place on the site that
+   explained what to do without offering a way to do it.
+
+   Three ways in, and they are the site's own top-level surfaces rather than
+   a curated pick: choosing three destinations to suggest would be a ranking
+   this Atlas does not hold.
+
+   NOT `.emptystate`, WHICH ALREADY EXISTS. That one is a 44ch rule-marked
+   paragraph for a section with nothing in it, used by pages.py, and reusing
+   the name gave this block a 420px max-width and a border it was not asked
+   for — three cards squeezed into a third of the page while both rules
+   looked correct on their own. Found by rendering it. */
+.startstate { margin: var(--s6) 0 var(--s7); }
+.startstate h2 { font-family: var(--serif); margin: 0 0 var(--s3); }
+.startstate > p { color: var(--ink-2); margin: 0 0 var(--s6); max-width: 54ch; }
+.emptyways { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+             gap: var(--s4); }
+.emptyways a { display: grid; gap: var(--s1); text-decoration: none;
+               padding: var(--s5); border: 1px solid var(--rule);
+               border-radius: var(--radius); background: var(--paper-2); }
+.emptyways b { font-family: var(--display); font-size: var(--t-lg);
+               font-weight: 600; }
+.emptyways span { color: var(--ink-3); font-size: var(--t-sm); }
+.emptyways a:hover, .emptyways a:focus-visible { border-color: var(--door); }
+.emptyways a:hover b, .emptyways a:focus-visible b { color: var(--door); }
+@media (max-width: 44rem) { .emptyways { grid-template-columns: 1fr; } }
+
 .rowdist { display: grid; gap: var(--s1); justify-items: end; }
 .dist { width: 8.5rem; height: 12px; display: block; }
 .distaxis { fill: var(--rule); }

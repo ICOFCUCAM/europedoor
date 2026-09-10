@@ -3837,6 +3837,42 @@ def c_leg_bars():
     return n
 
 
+@check("every link a script can write points at a route this site has")
+def c_script_links():
+    # TWO DEAD LINKS LIVED IN EMPTY STATES FOR THE LIFE OF THIS SITE.
+    #
+    # /my-europe's "nothing saved yet" and /search's "the index did not load"
+    # both pointed at `/atlas`, which has never been a route here — the
+    # country index is /countries. They survived because they are strings
+    # inside JavaScript that only runs in a state the build never renders, so
+    # the link checker, which reads shipped HTML, could not see either of
+    # them. A CODE PATH NOTHING EXERCISES IS A CODE PATH NOTHING CHECKS, and
+    # an empty state is the state a page ships in, not a fallback.
+    #
+    # This reads the scripts themselves. Anything that starts with a single
+    # slash and is not an /api or /assets path has to resolve to a built page,
+    # by the same rule cleanUrls gives a reader typing it.
+    n = 0
+    for js in sorted(glob.glob(os.path.join(ROOT, "assets", "js", "*.js"))):
+        src = open(js, encoding="utf-8").read()
+        for href in sorted(set(re.findall(r'href=\\?"(/[^"\\\s#?]*)', src))):
+            n += 1
+            if href.startswith(("/api/", "/assets/")):
+                continue
+            target = os.path.join(OUT, href.strip("/"), "index.html")
+            if href == "/":
+                target = os.path.join(OUT, "index.html")
+            if not os.path.exists(target):
+                fail(f"{os.path.basename(js)} writes a link to {href}, which "
+                     f"is not a page this site builds. It is invisible to the "
+                     f"link checker because it only renders in a state the "
+                     f"build never produces.")
+    if n < 4:
+        fail(f"only {n} script-written links examined — the scan has stopped "
+             f"finding them")
+    return n
+
+
 @check("/method's score spreads are the Atlas's own, and the bar is drawn from them")
 def c_method_spread():
     # A CHART IS A CLAIM, AND THIS ONE REPLACED A CONSTANT.
