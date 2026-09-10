@@ -214,19 +214,48 @@ def country_scores(country):
 
 
 def methodology_rows():
-    """Rendered on /method. If the table above changes, that page changes."""
+    """Rendered on /method. If the table above changes, that page changes.
+
+    Each row carries its KEY as well as its label, because the page draws the
+    dimension's observed spread beside its formula and a label cannot be
+    turned back into a key without a second lookup that can disagree.
+    """
     rows = []
     for dim in ["nature", "history", "food", "culture", "adventure"]:
         parts = ", ".join(f"{t} +{p}" for t, p in sorted(WEIGHTS[dim].items(), key=lambda kv: -kv[1]))
         support = ", ".join(KIND_SUPPORT[dim])
-        rows.append((LABELS[dim], f"base {BASE}; {parts}; +4 per matching experience (max 3), kinds: {support}"))
+        rows.append((dim, LABELS[dim], f"base {BASE}; {parts}; +4 per matching experience (max 3), kinds: {support}"))
     fam = ", ".join(f"{t} +{p}" for t, p in sorted(FAMILY_TAGS.items(), key=lambda kv: -kv[1]))
-    rows.append((LABELS["family"],
+    rows.append(("family", LABELS["family"],
                  f"base {BASE}; {fam}; music & nightlife −10; +5 per experience (max 3) that "
                  f"passes the family rule published at /experiences/family"))
-    rows.append((LABELS["authenticity"],
+    rows.append(("authenticity", LABELS["authenticity"],
                  f"base {BASE} + 10; quiet +22; not the capital +8; tagged big-city −8; "
                  f"+6 per experience (max 3) of kind {', '.join(AUTHENTIC_KINDS)}; "
                  f"+2 per recorded place (max 4)"))
-    rows.append((LABELS["value"], "110 − (midpoint of the country's daily cost band − €40) × 0.382"))
+    rows.append(("value", LABELS["value"], "110 − (midpoint of the country's daily cost band − €40) × 0.382"))
     return rows
+
+
+def observed_spread(cities):
+    """What each dimension ACTUALLY scores across the whole Atlas.
+
+    /method published "0–97" beside all eight dimensions — a constant wearing
+    the clothes of a measurement, which is the failure /themes made with "8
+    PLACES" on all thirteen cards. And it was not even the right constant:
+    nothing scores 0, because every dimension starts at a base of 34; food
+    tops out at 96 and authenticity at 82, so a reader comparing Authenticity
+    with Value was told they had the same range when one spans 46 points and
+    the other 60.
+
+    What separates the eight is their SPREAD, and it is derived here from the
+    same city_scores() the destination pages print, so the page cannot state a
+    range the site does not produce. `cities` is data.load()["cities"].
+    """
+    import statistics
+    got = {}
+    for rec in cities.values():
+        for k, v in city_scores(rec["country"], rec["region"], rec["city"]).items():
+            got.setdefault(k, []).append(v)
+    return {k: (min(v), max(v), int(statistics.median(v)))
+            for k, v in got.items()}

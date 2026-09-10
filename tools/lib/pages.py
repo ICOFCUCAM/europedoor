@@ -7641,12 +7641,40 @@ def method_page(data):
         lede="Open geographic data, hosted by us, with the licence written down before the data "
              "was downloaded. No map account, no key, no third-party tile server.")
 
-    from .score import methodology_rows
+    from .score import methodology_rows, observed_spread
     from .score import REFUSED, DISCOVER_TERMS, discoverability
+
+    # "0–97" BESIDE ALL EIGHT DIMENSIONS WAS A CONSTANT WEARING THE CLOTHES
+    # OF A MEASUREMENT — the /themes failure, where every card said "8
+    # PLACES" because every theme holds eight. And it was not even the right
+    # constant. Nothing scores 0: every dimension starts at a base of 34.
+    # Food tops out at 96 and Authenticity at 82, so a reader comparing the
+    # two was told they had the same range when one spans 46 points and the
+    # other 60.
+    #
+    # What separates the eight is their SPREAD, and the spread is the whole
+    # reason a reader is on this page: Value's median is 85 and Culture's is
+    # 52, which says more about what this Atlas is for than either formula
+    # does. Drawn on ONE 0–100 axis for all eight, so the bars are comparable
+    # — a per-row axis would make every dimension look equally wide, which is
+    # the constant again in a different medium.
+    spread = observed_spread(data["cities"])
+
+    def distbar(key):
+        lo, hi, med = spread[key]
+        return (f'<span class="rowdist">'
+                f'<svg class="dist" viewBox="0 0 100 12" role="img" aria-hidden="true" '
+                f'preserveAspectRatio="none">'
+                f'<rect class="distaxis" x="0" y="5" width="100" height="2"/>'
+                f'<rect class="distspan" x="{lo}" y="2" width="{hi - lo}" height="8"/>'
+                f'<rect class="distmed" x="{med - 0.6:.1f}" y="0" width="1.2" height="12"/>'
+                f'</svg>'
+                f'<span class="distnum">{lo}–{hi}, median {med}</span></span>')
+
     rows = "".join(
         f'<div class="row"><div><h3>{esc(name)}</h3><p class="rowsub">{esc(formula)}</p></div>'
-        f'<p class="rowmeta">0–97</p></div>'
-        for name, formula in methodology_rows()
+        f'<p class="rowmeta">{distbar(key)}</p></div>'
+        for key, name, formula in methodology_rows()
     )
     refused = "".join(
         f'<div class="row"><div><h3>{esc(name)}</h3><p class="rowsub">{esc(why)}</p></div>'

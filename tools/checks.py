@@ -3837,6 +3837,63 @@ def c_leg_bars():
     return n
 
 
+@check("/method's score spreads are the Atlas's own, and the bar is drawn from them")
+def c_method_spread():
+    # A CHART IS A CLAIM, AND THIS ONE REPLACED A CONSTANT.
+    #
+    # /method published "0-97" beside all eight score dimensions: the /themes
+    # failure, where every card said "8 PLACES" because every theme holds
+    # eight. It was also wrong — nothing scores 0, every dimension starts at
+    # a base of 34, Food tops out at 96 and Authenticity at 82.
+    #
+    # Recomputed here from the same city_scores() the destination pages
+    # print, independently of pages.method_page(), and asserted against the
+    # SHIPPED HTML. And the geometry is asserted too, because correct numbers
+    # over a bar drawn from the wrong ones still reads as a finished chart:
+    # the widest block must belong to the dimension with the widest observed
+    # span, and every tick must sit inside its own block.
+    import statistics
+    d = D.load()
+    from lib import score as S
+    got = {}
+    for rec in d["cities"].values():
+        for k, v in S.city_scores(rec["country"], rec["region"], rec["city"]).items():
+            got.setdefault(k, []).append(v)
+    h = open(os.path.join(OUT, "method", "index.html"), encoding="utf-8").read()
+    if "0\u201397" in h:
+        fail("/method still prints the constant range 0-97")
+    widest = None
+    for key, label in S.LABELS.items():
+        v = got.get(key)
+        if not v:
+            fail(f"/method: no destination scores {key}")
+            continue
+        lo, hi, med = min(v), max(v), int(statistics.median(v))
+        want = f"{lo}\u2013{hi}, median {med}"
+        if want not in h:
+            fail(f"/method: the spread printed for {label} is not the Atlas's "
+                 f"own \u2014 {want!r} is not on the page. A chart is a claim.")
+        want_rect = f'class="distspan" x="{lo}" y="2" width="{hi - lo}"'
+        if want_rect not in h:
+            fail(f"/method: {label}'s bar is not drawn from its own numbers "
+                 f"\u2014 expected {want_rect!r}")
+        if not (lo <= med <= hi):
+            fail(f"/method: {label}'s median {med} is outside its own span")
+        if widest is None or hi - lo > widest[1]:
+            widest = (label, hi - lo)
+    # One axis for all eight: every block is placed on the same 0-100 scale,
+    # so the widest block IS the widest range. A per-row axis would draw them
+    # all the same width, which is the constant again in another medium.
+    spans = re.findall(r'class="distspan" x="(\d+)" y="2" width="(\d+)"', h)
+    if len(spans) != len(S.LABELS):
+        fail(f"/method draws {len(spans)} spread bars for {len(S.LABELS)} "
+             f"dimensions")
+    elif spans and max(int(w) for _, w in spans) != widest[1]:
+        fail(f"/method's widest bar is {max(int(w) for _, w in spans)} units "
+             f"but the widest range is {widest[0]}'s at {widest[1]}")
+    return len(S.LABELS) * 4
+
+
 @check("the year band draws the dataset, and both of its numbers agree with it")
 def c_year_band():
     # A CHART IS A CLAIM, AND THIS ONE IS PUBLISHED ON THIRTEEN PAGES.

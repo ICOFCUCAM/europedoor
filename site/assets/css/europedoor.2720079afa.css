@@ -646,6 +646,25 @@ main.wide { max-width: 92rem; }
 .sm-off { background: currentColor; border-radius: 0; }
 .row .rowmeta { display: flex; align-items: baseline; justify-content: flex-end; }
 
+/* THE OBSERVED SPREAD OF A SCORE DIMENSION. /method printed "0–97" beside
+   all eight, which is a constant wearing the clothes of a measurement — and
+   the wrong constant: nothing scores 0, because every dimension starts at a
+   base of 34, and Food tops out at 96 where Authenticity tops out at 82.
+
+   ONE AXIS FOR ALL EIGHT. The rule is the full 0–100 range, the block is
+   where this dimension actually lands, and the tick is its median. A
+   per-row axis would draw every dimension the same width, which is the
+   constant again in a different medium. preserveAspectRatio="none" because
+   the horizontal scale is the whole claim and there is no type inside the
+   viewBox to be stretched with it. */
+.rowdist { display: grid; gap: var(--s1); justify-items: end; }
+.dist { width: 8.5rem; height: 12px; display: block; }
+.distaxis { fill: var(--rule); }
+.distspan { fill: color-mix(in srgb, var(--signature) 34%, transparent); }
+.distmed  { fill: var(--door); }
+.distnum { font-variant-numeric: tabular-nums; text-transform: none;
+           letter-spacing: 0; color: var(--ink-3); }
+
 /* ── notes & callouts ─────────────────────────────────────── */
 .note { border-left: 3px solid var(--sea); background: var(--paper-2); padding: var(--s4) var(--s5); border-radius: 0 var(--radius) var(--radius) 0; margin: var(--s5) 0; font-size: var(--t-sm); }
 .note p:last-child { margin-bottom: 0; }
