@@ -439,6 +439,30 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
  * is the darker half. Both clear the 3:1 a drawn shape needs. Never one shape
  * at reduced opacity, which is what the mark's comment has said since it was
  * drawn. */
+/* THE MASTHEAD IS STICKY AND NOTHING KNEW HOW TALL IT WAS.
+ * `scroll-margin-top` computed to 0px on every id on the site, so every
+ * in-page anchor scrolled its target to y=0 — which is where the bar is.
+ *
+ * On a wide screen the sections' own top margin absorbed it and the heading
+ * landed 22px under the bar, touching it with no air, which is why nobody
+ * saw this. ON A PHONE THE BAR IS TWO ROWS AND 89 PIXELS AND THAT MARGIN IS
+ * 80, so the heading landed NINE PIXELS BEHIND IT — on the eight-item jump
+ * nav that every one of the 319 destination pages carries, which is the one
+ * navigation on this site whose whole job is moving a reader within a page.
+ * Measured at both widths in Chromium before it was fixed, and again after.
+ *
+ * This is the --thumbbar failure at the other end of the page: two fixed
+ * bars, and the offsets that clear them hard-coded 44px against a bar that
+ * rendered at 63. So it takes the same repair — ONE TOKEN, a CEILING on the
+ * bar and a FLOOR on everything that has to clear it, and a browser check
+ * that scrolls to a real anchor and asserts the heading is below the bar
+ * rather than behind it. The two rem values are the two measured heights
+ * rounded up, and the sticky rail and the essay margin take their offsets
+ * from the same token instead of the 5rem and 6rem they had guessed. */
+:root { --mast: 3.75rem; }
+@media (max-width: 44rem) { :root { --mast: 5.75rem; } }
+[id] { scroll-margin-top: calc(var(--mast) + var(--s4)); }
+
 .masthead { position: sticky; top: 0; z-index: 40;
             --ink:       var(--limestone);
             --ink-2:     color-mix(in srgb, var(--limestone) 85%, var(--cobalt-deep));
@@ -578,7 +602,8 @@ main.wide { max-width: 92rem; }
 
 /* ── columns of prose + rail ──────────────────────────────── */
 .split { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: var(--s7); align-items: start; }
-.rail { background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); padding: var(--s5); font-size: var(--t-sm); position: sticky; top: 5rem; }
+.rail { background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); padding: var(--s5); font-size: var(--t-sm); position: sticky;
+         top: calc(var(--mast) + var(--s5)); }
 .rail h3 { font-size: var(--t-md); margin-bottom: var(--s3); }
 .rail ul { margin: 0 0 var(--s4); padding-left: var(--s4); }
 .rail li { margin-bottom: var(--s2); }
@@ -1342,7 +1367,7 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
              grid-template-columns: minmax(0, var(--measure)) minmax(0, 1fr);
              align-items: start; }
 .essaywrap.nomargin { display: block; }
-.essaymargin { position: sticky; top: 6rem; margin: var(--s7) 0;
+.essaymargin { position: sticky; top: calc(var(--mast) + var(--s6)); margin: var(--s7) 0;
                padding-top: var(--s3); border-top: 2px solid var(--ink); }
 .mp-label { font-size: var(--t-xs); letter-spacing: .08em; text-transform: uppercase;
             color: var(--ink-3); margin: 0 0 var(--s4); font-family: var(--text);

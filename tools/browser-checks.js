@@ -1370,6 +1370,41 @@ async function main() {
   });
   ok(!wraps, "the section nav wraps instead of scrolling");
 
+  // ── AN ANCHOR MUST LAND BELOW THE STICKY MASTHEAD, NOT BEHIND IT ───
+  // Every in-page anchor on this site scrolled its target to y=0, which is
+  // where the sticky masthead is. On a wide screen the section's own top
+  // margin absorbed it; ON A PHONE the bar is two rows and 89 pixels and the
+  // margin is 80, so the heading landed nine pixels BEHIND the bar, on the
+  // jump nav all 319 destination pages carry. Proved red at 390 by deleting
+  // the scroll-margin rule and re-measuring.
+  //
+  // This asserts the PROMISE and not the number. `--mast` is a ceiling on
+  // the bar and a floor on what has to clear it, so a masthead that grows a
+  // row fails here rather than quietly eating a heading again — and it is
+  // measured by actually navigating, because a rule stating an offset is not
+  // an offset the browser applied.
+  for (const [pg, w] of [[page, 1280], [phone, 390]]) {
+    await pg.goto(base + "/europe/norway/fjord-norway/bergen", { waitUntil: "networkidle" });
+    const navs = await pg.locator(".sectionnav a").evaluateAll(
+      (as) => as.map((a) => a.getAttribute("href")));
+    ok(navs.length >= 3, `no jump nav to test at ${w}`);
+    for (const href of navs) {
+      await pg.evaluate((h) => document.querySelector(`a[href="${h}"]`).click(), href);
+      // MEASURE AFTER THE SCROLL, NOT DURING IT. The first version read the
+      // rectangle in the same frame as the click, which is a measurement of
+      // where the page was about to stop being.
+      await pg.waitForTimeout(220);
+      const r = await pg.evaluate((h) => {
+        const t = document.querySelector(h).getBoundingClientRect();
+        const m = document.querySelector(".masthead").getBoundingClientRect();
+        return { top: t.top, bar: m.bottom };
+      }, href);
+      ok(r.top >= r.bar - 1,
+         `at ${w}, jumping to ${href} put the heading at ${Math.round(r.top)} ` +
+         `with the masthead reaching ${Math.round(r.bar)} — it lands behind the bar`);
+    }
+  }
+
   // ── the map, as a list ─────────────────────────────────────────────
   // A point map is a picture; role="img" says what it is of and nothing more.
   await phone.goto(base + "/map", { waitUntil: "networkidle" });
