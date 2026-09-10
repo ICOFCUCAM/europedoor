@@ -491,7 +491,17 @@ async function main() {
   // ── the staged wait ────────────────────────────────────────────────
   // Never a bare "Loading…". Each step is ticked when its work has actually
   // finished, so a failure marks where it stopped.
-  const js = await (await page.request.get(base + "/assets/js/planner.js")).text();
+  // ASSETS ARE CONTENT-ADDRESSED, so the served URL carries a hash and the
+  // literal path 404s. Resolve it from the page that loads it — which is
+  // also the stronger test: it fetches the script this page actually runs,
+  // not one that happens to sit at a path.
+  const plannerUrl = await page.evaluate(() => {
+    const el = [...document.querySelectorAll("script[src]")]
+      .find((s) => /\/assets\/js\/planner\./.test(s.getAttribute("src")));
+    return el ? el.getAttribute("src") : null;
+  });
+  ok(!!plannerUrl, "/plan does not load a planner script");
+  const js = await (await page.request.get(base + plannerUrl)).text();
   ok(/Building your journey/.test(js), "there is no staged wait");
   ok(/Understanding what you asked for/.test(js), "the wait does not say what it is doing");
   ok(!/>Loading\.\.\.</.test(js) && !/>Loading…</.test(js),
@@ -1468,7 +1478,11 @@ async function main() {
         const PROPS = ["fill", "stroke", "display", "color",
                        "background-color", "opacity", "visibility"];
         const sheet = [...document.styleSheets]
-          .find((s) => (s.href || "").includes("europedoor.css"));
+          // The stylesheet is content-addressed — europedoor.<hash>.css — so
+          // this matched nothing the day assets were hashed and the scan's
+          // own reach assertion caught it, which is what that assertion is
+          // for. Matched by stem rather than by full filename.
+          .find((s) => /\/assets\/css\/europedoor\./.test(s.href || ""));
         if (!sheet) return [];
         const flat = [];
         // A CSSStyleRule carries an EMPTY cssRules list for CSS nesting, and
@@ -2611,7 +2625,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 894;
+  const FLOOR = 895;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +

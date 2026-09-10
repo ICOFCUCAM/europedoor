@@ -862,7 +862,11 @@ def s32():
 def s33():
     yield has("/events", "The European year")
     yield "data-kind" in page("/events"), "every fixture carries its category"
-    yield "/assets/js/events.js" in page("/events"), "and the categories filter the list"
+    # The URL carries a content hash now, so the literal path is a shape and
+    # not the promise. What matters is that the events script is the one this
+    # page loads.
+    yield bool(re.search(r'/assets/js/events\.[0-9a-f]+\.js', page("/events"))), \
+        "and the categories filter the list"
     kinds = {f.get("kind") for c in DATA["countries"].values() for f in c["festivals"]}
     yield len(kinds) >= 6, f"{len(kinds)} event categories in use"
     yield None not in kinds, "and every fixture is categorised"

@@ -1625,6 +1625,39 @@ cell. **The dead-rule scan caught the leftovers within one run** — a duplicate
 `.themerow .rowmeta` declared 2,800 lines from its twin, and a redundant
 `display: block`.
 
+**`immutable` IS A PROMISE ABOUT THE URL, AND THE STYLESHEET'S URL COULD
+CHANGE.** `/assets/(.*)` is served `public, max-age=31536000, immutable`.
+That is correct for the social cards, whose filenames ARE their content hash
+— that is what earns the header. The stylesheet and the five scripts sat at
+a **stable** path under the same rule, and `immutable` tells a browser never
+to revalidate for a year. So every returning reader kept the stylesheet they
+first downloaded, and every visual change this site has ever shipped reached
+new visitors only.
+
+It is invisible from inside: repository correct, build correct, shipped HTML
+correct, served page styled by a file from months ago. **That is the
+`site/_headers` bug again** — right in the repo, wrong in the response — and
+it is how a whole session of visual work can land and look like nothing was
+fixed. It was found by being told nothing had changed and checking the
+response rather than the repository.
+
+The fix is the one the og cards already used: **the content hash goes in the
+name**, and only the hashed name is published, because publishing both leaves
+the stale URL live and cached forever. `checks.py` now asserts that nothing
+under a directory served `immutable` sits at a URL that can change — from
+both ends, the published files and the pages that reference them — and its
+first pattern only recognised `name.<hash>.ext` and reported all 785 correctly
+addressed cards as failures, which is an instrument that does not recognise
+the good case it was written to protect.
+
+**Four assertions broke on it, every one pinning a URL rather than a
+promise** — two audits matching the literal `/assets/js/*.js`, the browser
+suite fetching the planner by path, and the dead-rule scanner finding its
+stylesheet by exact filename. **The scanner's own reach assertion caught
+it**: "examined only 0 rules — it has stopped walking the stylesheet". That
+assertion exists because its first version reported clean while collecting
+nothing, and this is the second time it has paid for itself.
+
 **Design to purpose, not to data shape.** A page's structure comes from what
 the reader is trying to do, not from the shape of the record behind it. The
 experience template renders six rows because the data is six rows, and that is

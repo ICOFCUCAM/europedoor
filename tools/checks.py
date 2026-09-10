@@ -820,6 +820,68 @@ def c_stay_lede():
     return n
 
 
+@check("nothing served immutable sits at a URL that can change")
+def c_immutable_assets():
+    """`immutable` is a promise about the URL, not about the file.
+
+    /assets/ is served `public, max-age=31536000, immutable`. That is correct
+    for a content-addressed URL and a LIE for a stable one: the browser is
+    told never to revalidate for a year, so a returning reader keeps whatever
+    stylesheet they first downloaded and every visual change reaches new
+    visitors only.
+
+    It shipped that way. The social cards were content-addressed and earned
+    the header; the stylesheet and the five scripts sat at a stable path
+    under the same rule. Invisible from inside — repository correct, build
+    correct, shipped HTML correct, served page styled by a file from months
+    ago — which is the same shape as the `site/_headers` bug this repository
+    already records: right in the repo, wrong in the response.
+
+    So: every URL under a directory served `immutable` must carry a content
+    hash in its NAME. Asserted against what the build actually published and
+    what the pages actually reference, because the promise is about the
+    response and not about the intent.
+    """
+    vercel = json.load(open(os.path.join(ROOT, "vercel.json"), encoding="utf-8"))
+    immutable_prefixes = []
+    for rule in vercel.get("headers", []):
+        for h in rule.get("headers", []):
+            if h["key"] == "Cache-Control" and "immutable" in h["value"]:
+                immutable_prefixes.append(rule["source"].replace("/(.*)", "/"))
+    if not immutable_prefixes:
+        fail("no directory is served immutable — this check is testing nothing")
+        return 0
+    # Two shapes count as content-addressed, because this site already uses
+    # both: the social cards are named entirely by their hash
+    # (`1b63284558e3ebaf.png`) and the stylesheet carries it as a segment
+    # (`europedoor.16239001ae.css`). The first version of this pattern only
+    # accepted the second and reported all 785 cards as failures — an
+    # instrument that does not recognise the good case it was written to
+    # protect.
+    hashed = re.compile(r"(?:^|\.)[0-9a-f]{8,}\.[a-z0-9]+$")
+    n = 0
+    for prefix in immutable_prefixes:
+        root = os.path.join(OUT, prefix.strip("/"))
+        for dirpath, _dirs, names in os.walk(root):
+            for name in names:
+                url = "/" + os.path.relpath(os.path.join(dirpath, name), OUT)
+                n += 1
+                if not hashed.search(name):
+                    fail(f"{url} is served immutable for a year and its name "
+                         f"carries no content hash — a returning reader will "
+                         f"never see it change")
+    # And no page may still reference an unhashed one, which is the failure
+    # from the other end: a correct file published beside a stale URL.
+    for path in site_files():
+        h = open(path, encoding="utf-8").read()
+        for m in re.finditer(r'(?:href|src)="(/assets/[^"]+)"', h):
+            n += 1
+            if not hashed.search(m.group(1)):
+                fail(f"{rel(path)} references {m.group(1)}, which is under an "
+                     f"immutable prefix and carries no content hash")
+    return n
+
+
 @check("every Stay heading this module can emit is actually drawn somewhere")
 def c_stay_headings():
     """A heading nothing reaches is dead code that looks like vocabulary.

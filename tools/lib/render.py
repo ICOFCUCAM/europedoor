@@ -15,6 +15,7 @@ from __future__ import annotations
 import hashlib
 import html
 import json
+import os
 
 from .i18n import Strings
 
@@ -1011,6 +1012,66 @@ WORLDS = ("discover", "intelligence")
 ACCENTS = ("", "heritage")
 
 
+# ── content-addressed assets ─────────────────────────────────────────
+#
+# CACHE-CONTROL SAID `immutable` ON A URL THAT WAS NOT.
+#
+# `/assets/(.*)` is served `public, max-age=31536000, immutable`, which is
+# correct for the social cards — those are content-addressed, which is
+# precisely what earns that header. The stylesheet and the scripts sat at a
+# STABLE path under the same rule, and `immutable` means the browser is told
+# never to revalidate for a year. So every returning visitor kept the
+# stylesheet they first downloaded, and every visual change this site has
+# ever shipped reached new visitors only.
+#
+# It is invisible from here: the repository is correct, the build is correct,
+# the HTML that ships is correct, and the served page is styled by a file
+# from months ago. That is the same shape as the _headers bug this repository
+# already records — right in the repo, wrong in the response — and it is the
+# reason a whole session of visual work could look like nothing had changed.
+#
+# The fix is the one the og cards already use: put the content hash IN THE
+# NAME. A URL that changes when the bytes change may honestly be immutable;
+# one that does not, may not.
+ASSET_ROOT = os.path.join(os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__)))), "assets")
+_ASSET_CACHE = {}
+
+
+def asset(rel):
+    """`css/europedoor.css` -> `/assets/css/europedoor.<hash>.css`.
+
+    Falls back to the plain path when the file is missing, so a caller cannot
+    silently emit a URL to nothing — `checks.py` fails on a dead link either
+    way, which is the behaviour that finds this rather than hides it.
+    """
+    if rel not in _ASSET_CACHE:
+        src = os.path.join(ASSET_ROOT, rel)
+        if not os.path.exists(src):
+            _ASSET_CACHE[rel] = "/assets/" + rel
+        else:
+            with open(src, "rb") as fh:
+                h = hashlib.sha256(fh.read()).hexdigest()[:10]
+            stem, ext = os.path.splitext(rel)
+            _ASSET_CACHE[rel] = f"/assets/{stem}.{h}{ext}"
+    return _ASSET_CACHE[rel]
+
+
+def asset_map():
+    """Every asset that gets a hashed name, as {source rel: published path}."""
+    out = {}
+    for sub in ("css", "js"):
+        d = os.path.join(ASSET_ROOT, sub)
+        if not os.path.isdir(d):
+            continue
+        for name in sorted(os.listdir(d)):
+            if name.endswith((".css", ".js")):
+                rel = f"{sub}/{name}"
+                out[rel] = asset(rel)
+    out["door.svg"] = asset("door.svg")
+    return out
+
+
 def page(title, body, *, path, description, trail=None, area=None, head_extra="", scripts=(), wide=False, ld_blocks=(), og=None, world="discover", accent="", hero=False):
     if world not in WORLDS:
         raise ValueError(f"{path}: unknown world {world!r}; it is one of {WORLDS}")
@@ -1020,7 +1081,11 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
     for href, label, _blurb in NAV:
         mark = ' aria-current="page"' if area == label.lower() else ''
         nav.append(f'<a href="{href}"{mark}>{esc(label)}</a>')
-    scripts_html = "".join(f'<script src="{esc(s)}" defer></script>' for s in scripts)
+    # Scripts are hashed for the same reason the stylesheet is. Callers pass
+    # "/assets/js/my-europe.js"; the published URL carries the content hash.
+    scripts_html = "".join(
+        f'<script src="{esc(asset(s[len("/assets/"):]) if s.startswith("/assets/") else s)}" defer></script>'
+        for s in scripts)
     footer_nav = "".join(f'<a href="{href}">{esc(label)}</a>' for href, label in FOOTER_NAV)
     full_title = title if title == SITE_NAME else f"{title} · {SITE_NAME}"
     return f"""<!doctype html>
@@ -1039,8 +1104,8 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 <meta property="og:url" content="https://europedoor.com{esc(path)}">
 <meta property="og:site_name" content="{esc(SITE_NAME)}">
 {og_tags(*og) if og else ''}
-<link rel="stylesheet" href="/assets/css/europedoor.css">
-<link rel="icon" href="/assets/door.svg" type="image/svg+xml">
+<link rel="stylesheet" href="{asset("css/europedoor.css")}">
+<link rel="icon" href="{asset("door.svg")}" type="image/svg+xml">
 {ld(*ld_blocks)}{head_extra}</head>
 <body class="area-{esc(area or 'none')}" data-world="{world}"{f' data-accent="{accent}"' if accent else ''}{' data-hero' if hero else ''}>
 <a class="skip" href="#main">{esc(T("skip"))}</a>

@@ -129,11 +129,22 @@ def build():
 
     # Static assets are copied, never symlinked: the output directory has to
     # stand up on its own on any static host.
-    for sub in ("css", "js"):
-        src = os.path.join(ROOT, "assets", sub)
-        if os.path.isdir(src):
-            shutil.copytree(src, os.path.join(OUT, "assets", sub))
-    shutil.copy(os.path.join(ROOT, "assets", "door.svg"), os.path.join(OUT, "assets", "door.svg"))
+    # PUBLISHED UNDER THEIR CONTENT HASH, because /assets/ is served
+    # `immutable` for a year. A stable URL under that header is a file the
+    # browser never asks about again, which is how a whole session of visual
+    # work can ship and change nothing a returning reader sees. The social
+    # cards were already content-addressed; the stylesheet and the scripts
+    # were not, and were under the same rule. See render.asset().
+    #
+    # ONLY the hashed name is written. Publishing both would leave the old
+    # URL live and cached forever, which is the bug with an extra step.
+    for rel, url in R.asset_map().items():
+        src = os.path.join(ROOT, "assets", rel)
+        if not os.path.exists(src):
+            continue
+        dst = os.path.join(OUT, url.lstrip("/"))
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        shutil.copy(src, dst)
 
     # The map geometry. Published under /api/geo/ rather than /assets/ because
     # it is data the page fetches, not an asset the page references, and

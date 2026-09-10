@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import glob
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -207,7 +208,8 @@ def s2036_7():
     d = src("assets/js/discover.js")
     yield bool(page("/discover")) and 'id="discover-mode"' in page("/discover"), \
         "Discover Mode is on the discover page"
-    yield "/assets/js/discover.js" in page("/discover"), "and runs"
+    yield bool(re.search(r'/assets/js/discover\.[0-9a-f]+\.js', page("/discover"))), \
+        "and runs"
     yield "function rate" in d, "it scores against the reader's choices"
     # The design decision the whole feature turns on: never explain the
     # constraint back. A card that repeats the filter is boilerplate, and
