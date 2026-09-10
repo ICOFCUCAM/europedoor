@@ -99,25 +99,64 @@ def context(cid):
 # Derived rather than authored-only for a reason this repository has already
 # paid for once: 319 authored headings is 319 chances to write "Hotels", and
 # a default that comes from the data cannot drift from the place.
+#
+# RELIEF DECIDES FOR ONE TYPE ONLY, AND THE FIRST VERSION LET IT DECIDE FOR
+# ALL OF THEM. Measured across the 319: putting the relief measurement above
+# `city_type` gave "Sleep below the peaks" to 147 destinations INCLUDING
+# TIRANA, which is a capital in a basin — a 600 m crest within 40 km is not a
+# reason to tell somebody they are sleeping below peaks, it is a reason the
+# map draws bands. You stay in Tirana because it is a city. That is the
+# `city_type` bias failure this repository already records one layer down,
+# where mapping all eight types above the interest pass put a universal field
+# in charge and took `forest` from 19 plates to 1.
+#
+# So `city_type` decides wherever it names the kind of place, and relief
+# decides only for `town` — the one classification that says nothing at all
+# about the setting. Chamonix is a town under 2,752 m and keeps its heading;
+# Tirana becomes a city; and "Stay in the valley" stops being dead
+# vocabulary, because the nine valley destinations were all being overridden
+# by the relief branch. 147 -> 50.
 HEADINGS = {
     "island": "Stay on the island",
     "village": "Stay in the village",
     "valley": "Stay in the valley",
     "capital": "Stay in the city",
     "city": "Stay in the city",
-    "town": "Make a base here",
     "site": "Stay near the site",
     "park": "Stay at the edge of the park",
 }
+
+# The one type whose name says nothing about the setting, so the ground gets
+# to answer instead.
+OPEN_TYPE = "town"
+PEAKS = "Sleep below the peaks"
+BASE = "Make a base here"
+FALLBACK = "Where to stay"
 
 
 def heading(row, city, mountainous=False):
     """The section heading for one destination's Stay layer."""
     if row.get("heading"):
         return row["heading"]
-    if mountainous:
-        return "Sleep below the peaks"
-    return HEADINGS.get(city.get("city_type") or "", "Where to stay")
+    kind = city.get("city_type") or ""
+    if kind in HEADINGS:
+        return HEADINGS[kind]
+    if kind == OPEN_TYPE:
+        return PEAKS if mountainous else BASE
+    return FALLBACK
+
+
+def headings_declared():
+    """Every heading this module can emit except the unclassified fallback.
+
+    `FALLBACK` is excluded because it is a guard rather than vocabulary: all
+    319 destinations carry a `city_type` today, so it is unreachable by
+    construction, and a check that demanded it be reached would be demanding
+    a broken record. Everything else must actually be drawn somewhere — a
+    heading nothing reaches is dead code that looks like vocabulary, which is
+    the rule `plates.motifs_reachable` already holds one layer down.
+    """
+    return set(HEADINGS.values()) | {PEAKS, BASE}
 
 
 # THE CARD, AND WHY THERE IS NOT ONE YET.

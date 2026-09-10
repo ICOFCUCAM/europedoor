@@ -29,6 +29,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lib import data as D
 from lib import pages as P
 from lib import score as S
+from lib import stay as STAY
+from lib import cartography as CARTO
 from lib import render as R
 from html import unescape as html_unescape
 
@@ -776,6 +778,87 @@ def c_csp():
             n += 2
         n += 1
     return n
+
+
+@check("the Stay lede promises only the readings the section actually carries")
+def c_stay_lede():
+    """A lede that promises the ground on a page where the ground says nothing.
+
+    The section opens by saying what this atlas can tell you about sleeping
+    here. That sentence was FIXED — "where the ground puts you and when the
+    beds go" — and the relief paragraph under it is correctly omitted wherever
+    the ground was not measured to have anything to say. So on a flat capital
+    the section promised a reading and then did not carry it.
+
+    It is the removing-a-claim failure in miniature: the claim went and the
+    surface pointing at it stayed. It was invisible on the exemplar, because
+    Chamonix is the one case where the sentence happens to be true, and only
+    rendering a second and third destination found it.
+
+    Asserted on the shipped HTML in both directions, because a check that only
+    caught the over-promise would pass a page that had quietly stopped
+    promising a reading it does carry.
+    """
+    n = 0
+    for path in site_files():
+        h = open(path, encoding="utf-8").read()
+        i = h.find('id="stay"')
+        if i < 0:
+            continue
+        body = h[i:h.find("</section>", i)]
+        if "stayreads" not in body:
+            continue
+        ground = "the ground spreads" in body
+        promised = "where the ground puts you" in body
+        if promised and not ground:
+            fail(f"{rel(path)}: the stay lede promises where the ground puts "
+                 f"you, and the section draws no relief reading")
+        if ground and not promised:
+            fail(f"{rel(path)}: the stay section draws the relief reading and "
+                 f"its lede does not promise it")
+        n += 2
+    return n
+
+
+@check("every Stay heading this module can emit is actually drawn somewhere")
+def c_stay_headings():
+    """A heading nothing reaches is dead code that looks like vocabulary.
+
+    The same rule as `plates.motifs_reachable`, and it caught the same class
+    of thing on its first run. The first version of `stay.heading` tested the
+    relief measurement BEFORE `city_type`, which did two wrong things at
+    once: it gave "Sleep below the peaks" to 147 destinations including
+    Tirana — a capital in a basin, where a 600 m crest within 40 km is a
+    reason the map draws bands and not a reason to tell somebody where they
+    are sleeping — and it made "Stay in the valley" unreachable, because all
+    nine valley destinations have relief and were being overridden by it.
+
+    Neither is visible in any count of the built site, because only one
+    destination carries the Stay layer today. It is visible by running the
+    derivation over all 319, which is what this does.
+
+    `FALLBACK` is deliberately excluded: every destination carries a
+    `city_type`, so it is unreachable by construction and demanding it be
+    reached would be demanding a broken record.
+    """
+    d = D.load()
+    drawn = set()
+    for cid, node in d["cities"].items():
+        drawn.add(STAY.heading({}, node["city"],
+                               CARTO.draws_relief(CARTO.relief_of(cid))))
+    declared = STAY.headings_declared()
+    for h in sorted(declared - drawn):
+        fail(f"the Stay heading {h!r} is declared and reached by no destination "
+             f"in the atlas — dead vocabulary")
+    for h in sorted(drawn - declared - {STAY.FALLBACK}):
+        fail(f"the Stay layer draws {h!r}, which `headings_declared` does not "
+             f"list — the reachability test cannot see it")
+    # And the one that matters editorially: a heading may never be OTA
+    # language, wherever it came from.
+    for h in sorted(drawn):
+        if "hotel" in h.lower():
+            fail(f"the Stay heading {h!r} says 'hotel'")
+    return len(declared) + len(drawn)
 
 
 @check("every social card exists, is a real PNG, and comes from the same drawing as the page")

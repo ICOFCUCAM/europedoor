@@ -55,12 +55,35 @@
   "accommodation_context": [
     {
       "city": "france/alps-and-east/chamonix",
-      "heading": "Sleep below the peaks",
       "promise": "A good base changes what you can see.",
       "base": "The valley floor, and the town rather than the hamlets",
       "where": "Everything here happens from the valley: the lifts, the rack railway and the Tour du Mont Blanc all start within walking distance of the town, and the ground rises so fast on both sides that there is nowhere else level to be. Sleeping in the town is not a preference, it is the only place the valley is flat enough to put a bed and still be at the bottom of the cable car.",
       "lead": "Book early for the summer window",
       "when": "The four peak months are the four that fill. A bed booked in February for August is an ordinary transaction; the same bed asked for in July is somebody else's cancellation. The shoulder either side is the quiet answer to that, and the lifts are still running in most of it."
+    },
+    {
+      "city": "austria/vienna-and-the-east/vienna",
+      "promise": "A good base changes what you can see.",
+      "base": "Anywhere central, and the choice is character rather than geography",
+      "where": "Chamonix has one answer to this because its valley has one flat place in it. Vienna has none, and saying so is more useful than inventing one: the city is dense in every direction out of the old centre, the things you would come for are not gathered at one edge of it, and no part of it is cut off from the rest by anything. So the question here is what you want to wake up in — the imperial centre, or a district that is somebody's actual neighbourhood — and this atlas has no view on that worth pretending to.",
+      "lead": "This one fills in winter too",
+      "when": "Most of Europe empties in February and Vienna does not: the ball season is in it, and the city's own peak runs through the winter as well as the summer. That makes the usual advice backwards here. There is no single quiet month to aim at, so book around what is on rather than around the weather."
+    },
+    {
+      "city": "greece/the-islands/naxos",
+      "promise": "A good base changes what you can see.",
+      "base": "The port town, or the interior — and they are different holidays",
+      "where": "Naxos is large enough that the choice actually decides your week. The town by the harbour is where the boat puts you and where everything leaves from again; the mountain villages inland are a working agricultural interior rather than a view of one, and they are quiet in a way the port is not. An island also has a fixed number of beds and no hinterland to overflow into, which is why this decision is made earlier here than in a city.",
+      "lead": "Earlier than you would book a mainland town",
+      "when": "The beds on an island do not expand to meet the summer, and the ones in the villages are few enough to be gone first. If you want the interior rather than the port, that is the booking to make early; the port itself is the fallback that will still be there."
+    },
+    {
+      "city": "italy/north-italy/ortisei",
+      "promise": "A good base changes what you can see.",
+      "base": "In the valley, under the lifts rather than along the road",
+      "where": "The Val Gardena runs east to west with the Dolomites standing over both sides of it, and the walking starts where the lifts do. That is the whole decision: a bed at the bottom of a cable car is a different week from a bed twenty minutes along the valley floor, because the second one begins every day with a journey. The ground here does not offer a third option — the valley is the only level thing for a long way in either direction.",
+      "lead": "Two seasons, and the gaps between them are real",
+      "when": "An Alpine valley has two peaks rather than one, and Italy's national months describe neither of them. The quiet weeks are the ones between the walking and the skiing, when a good deal of what you would come up here for is simply shut. That is worth checking against the lifts before booking a cheap week in them."
     }
   ]
 }

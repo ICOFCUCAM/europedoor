@@ -3357,7 +3357,14 @@ def stay_section(data, c, r, t, cid):
 
     peak = months_line(data, c["season"]["peak"])
     shoulder = months_line(data, c["season"].get("shoulder", []))
-    when = (f'{esc(row["when"])}</p><p class="sourcenote">Peak here is '
+    # "PEAK HERE" WAS A COUNTRY'S FIGURE WEARING A DESTINATION'S CLOTHES.
+    # These months belong to the country and are stated once on its own page;
+    # an Alpine valley's season is not Italy's season, and a line that says
+    # "here" while printing a national figure is the kind of quiet untruth
+    # that survives because both halves are true separately. Named for what
+    # it is, and linked to the page that argues it.
+    when = (f'{esc(row["when"])}</p><p class="sourcenote">Peak in '
+            f'<a href="{urls.country(c)}#when">{esc(c["name"])}</a> is '
             f'{esc(peak)}; the shoulder is {esc(shoulder)}.</p>'
             if shoulder else f'{esc(row["when"])}</p>')
 
@@ -3410,9 +3417,19 @@ def stay_section(data, c, r, t, cid):
   <p class="sourcenote">Restaurants are still not listed, here or anywhere: that is a business listing rather than an editorial entry and it needs an operator who claims it and a verification tier. <a href="/for-businesses">How listings will work</a>.</p>
 </div>""",
         id="stay",
+        # THE LEDE PROMISED THE GROUND ON A PAGE WHERE THE GROUND SAYS
+        # NOTHING. It was one fixed sentence — "where the ground puts you and
+        # when the beds go" — and on Vienna and Naxos the relief paragraph is
+        # correctly omitted, so the section opened by promising a reading it
+        # then did not carry. That is the removing-a-claim failure: the claim
+        # went and the surface pointing at it stayed. Only rendering the
+        # second and third destinations found it, because the exemplar is the
+        # one case where the sentence happens to be true.
         lede=f"{row['promise']} What this atlas can tell you about sleeping in "
-             f"{t['name']} is where the ground puts you and when the beds go. It "
-             f"holds no hotels, and the booking happens somewhere else.",
+             f"{t['name']} is "
+             + ("where the ground puts you" if mountainous else "where to base yourself")
+             + " and when the beds go. It holds no hotels, and the booking "
+               "happens somewhere else.",
     )
 
 

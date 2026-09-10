@@ -2,10 +2,16 @@
 
 Accommodation as a first-class part of the atlas, and never a hotel widget.
 
-**Status: one exemplar built and rendered — Chamonix. The referral is designed
-and not activated.** The other 318 destinations still carry the honest refusal
-they always carried. Propagation waits on the grammar being judged, which is
-what an exemplar is for.
+**Status: the grammar is derived and holds on four destinations. The referral
+is designed and not activated.** The other 315 still carry the honest refusal
+they always carried.
+
+Chamonix was the exemplar and it is the *easy* case: the ground decides, so
+every branch of the code that handles the ground saying nothing had never
+run. A second wave was chosen to execute the rest — **Vienna** (a flat
+capital, where geography decides nothing at all), **Naxos** (an island) and
+**Ortisei** (a valley). Four of eight headings, both relief states, and the
+grammar held. Three defects came out of it, all in the section below.
 
 ## Where it sits
 
@@ -165,6 +171,53 @@ pages and the events band already lost. And a pin has no page here to link to,
 which makes it a dot the page cannot name. It arrives, if it arrives, with an
 inventory API that supplies real coordinates; inventing them would be the
 region-hull failure with beds.
+
+## What the second wave found
+
+Three faults, none of them visible on the exemplar.
+
+**The heading derivation put the ground above what the place is.** Measured
+across all 319 rather than looked at on one: relief-first gave "Sleep below
+the peaks" to **147 destinations including Tirana**, a capital in a basin,
+where a 600 m crest within 40 km is a reason the map draws bands and not a
+reason to tell somebody where they are sleeping. You stay in Tirana because it
+is a city. It also made **"Stay in the valley" unreachable**, because all nine
+valley destinations have relief and were being overridden by it — a heading
+declared and never drawn is dead code that looks like vocabulary, which is the
+`plain` motif failure one layer down.
+
+`city_type` decides wherever it names the kind of place; relief decides only
+for `town`, the one classification that says nothing about the setting.
+Chamonix is a town under 2,752 m and keeps its heading. 147 → 50, and every
+declared heading is now reached. `checks.py` runs the derivation over all 319
+and fails on an unreachable one, which is the same contract as
+`plates.motifs_reachable`.
+
+**The lede promised the ground on pages where the ground says nothing.** It
+was one fixed sentence — "where the ground puts you and when the beds go" —
+and the relief paragraph under it is correctly omitted where nothing was
+measured. So Vienna opened by promising a reading it then did not carry: the
+removing-a-claim failure in miniature, invisible on the one destination where
+the sentence happens to be true. Asserted now in both directions, because a
+check that caught only the over-promise would pass a page that had quietly
+stopped promising a reading it does carry.
+
+**"Peak here" was a country's figure wearing a destination's clothes.** These
+months belong to the country and are argued on its own page; an Alpine
+valley's season is not Italy's season. Both halves were true separately, which
+is how that kind of line survives. It names the country and links to it now.
+
+**And one idea was measured and rejected.** For a flat destination the obvious
+substitute for the relief reading is the *spread of the places we hold* — how
+far apart the things you would come for sit, computed from coordinates already
+published. It does not survive contact with the dataset: Vienna's widest pair
+is 5 km from four recorded places, Naxos's is 13 km from two, and 194
+destinations carry no places at all. That measures **how much we have
+written**, not how spread out the city is, and it would be systematically
+biased against exactly the places it exists to describe. The same failure as
+deriving `city_type` from a list of populated places. So where the ground says
+nothing, the section says so and carries one authored reading instead of
+inventing a second.
 
 ## What it was tested at
 
