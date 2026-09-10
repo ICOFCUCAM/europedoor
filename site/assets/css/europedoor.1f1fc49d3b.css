@@ -751,6 +751,12 @@ main.wide { max-width: 92rem; }
 .rowgroupn { margin-left: auto; color: var(--ink-3);
              font-variant-numeric: tabular-nums; letter-spacing: 0; }
 
+/* A COUNT AND ITS SHARE, IN A ROW'S META COLUMN. The bar is the same
+   `hopbar` the journeys and /experiences use, so no third bar scale enters
+   the system; it needs a width here because a right-aligned inline element
+   has none of its own and rendered as a 30px stub. */
+.rowmeta .hopbar { display: block; width: 5rem; margin: var(--s2) 0 0 auto; }
+
 .rowdist { display: grid; gap: var(--s1); justify-items: end; }
 .dist { width: 8.5rem; height: 12px; display: block; }
 .distaxis { fill: var(--rule); }

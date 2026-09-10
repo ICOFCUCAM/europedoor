@@ -6079,6 +6079,45 @@ def fund_index(data):
         f'<p class="rowsub">{esc(p["summary"])}</p></div>'
         f'<p class="rowmeta">{esc(p["theme"])} · {esc(p["status"])}</p></a>'
         for p in data["fund"])
+    # "THE FOUR THEMES" OVER SEVEN CARDS, AND FOUR OF THEM SAID "1 projects".
+    #
+    # The heading was a number typed into prose — the failure this repository
+    # already has on record twice, where a figure that was true earlier stops
+    # being true and nothing notices — and the card body had no plural rule at
+    # all. Both are derived now.
+    #
+    # And a card holding a kicker and a count is what /experiences was before
+    # the nav-bar pass: border, fill, radius and shadow spent on a tile that
+    # separates nothing, in a grid of seven that leaves three empty cells. The
+    # thing that distinguishes these seven is HOW MUCH of the register each
+    # holds, and where the work is, so the rows carry the count as a bar
+    # against the largest and name the countries.
+    # AND THE FIRST VERSION PRINTED SLUGS. `p["country"]` is a key into
+    # data["countries"], not a name, so the row read "ireland,
+    # north-macedonia and romania" — the register's internal identifiers, on
+    # a page whose whole argument is that each project is named publicly with
+    # its local partner. The rows above it had always looked the name up.
+    _peak = max(len(v) for v in themes.values()) if themes else 1
+    themerows = '<div class="rows">' + "".join(
+        '<div class="row"><div><h3>' + esc(t.title()) + '</h3>'
+        '<p class="rowsub">'
+        + esc(and_list(sorted(data["countries"][p["country"]]["name"]
+                              for p in {q["country"]: q for q in v}.values())))
+        + '</p></div><p class="rowmeta">'
+        + f'{len(v)} project{"s" if len(v) != 1 else ""}<br>'
+        # THE TRACK AND THE FILL ARE TWO ELEMENTS, and the first version was
+        # one: `class="hopbar w50"` put the share on the TRACK, where
+        # `.rowmeta .hopbar { width: 5rem }` at (0,2,0) beat `.w50` at
+        # (0,1,0) and every bar came out the same length. Fifth specificity
+        # collision in this stylesheet to render as "the thing is simply
+        # wrong". `.hopbar` is the track and its child carries the width,
+        # which is how the journeys and /experiences already use it.
+        + f'<span class="hopbar" aria-hidden="true">'
+        + f'<span class="w{round(100 * len(v) / _peak)}"></span></span>'
+        + '</p></div>'
+        for t, v in sorted(themes.items(), key=lambda kv: (-len(kv[1]), kv[0]))
+    ) + "</div>"
+
     body = f"""
 {crumbs([("Europe", "/discover"), ("Fund", None)])}
 <div class="pagehead index">
@@ -6102,9 +6141,9 @@ def fund_index(data):
 {section(f"{len(data['fund'])} projects on the register", f'<div class="rows">{rows}</div>',
          lede="Chosen for being small enough that a travel platform could plausibly matter to them, and specific enough that you could go and look at the result.")}
 
-{section("The four themes", '<div class="grid cols-4">' + "".join(
-    f'<div class="card"><div class="card-body"><p class="kicker">{esc(t)}</p><h3>{len(v)} projects</h3></div></div>'
-    for t, v in sorted(themes.items())) + "</div>") if themes else ""}
+{section(f"{len(themes)} kinds of work", themerows,
+    lede="What the register is actually made of. Sorted by how much of it each "
+         "kind holds, and the bar is that share of the largest.") if themes else ""}
 """
     return "/fund/index.html", page(
         "Europe Fund", body, path="/fund", area="fund",
