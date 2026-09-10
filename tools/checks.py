@@ -3886,6 +3886,42 @@ def c_score_median():
     return n
 
 
+@check("a count agrees with its noun")
+def c_plurals():
+    # MEASURED ON THE SHIPPED SITE: "1 experiences" on 110 pages, "1 nights"
+    # on 62, "1 cities" on 35, "1 destinations" on 25, "1 regions" on 15,
+    # "1 places" on 8 and "1 countries" on 3. In meta descriptions that go to
+    # every search engine and every shared link, in the accessible name of a
+    # country map, in a destination's own facts line and in the caption under
+    # fifty country plates.
+    #
+    # Every one was a separate f-string writing `{n} things`, and each was
+    # individually invisible: the pages that trip it are the small ones —
+    # Monaco, San Marino, Liechtenstein, Andorra, a region with one
+    # destination — which is exactly the set nobody opens while checking a
+    # change. render.n_of() is the one function now.
+    #
+    # Read on the built HTML rather than the source, because the source is
+    # twenty call sites and the hundred-and-first is the one that reintroduces
+    # this. A decimal before the 1 is excluded: "€21.1 million" is not a count.
+    words = ("experiences", "nights", "cities", "destinations", "regions",
+             "places", "countries", "days", "stops", "projects", "routes",
+             "stories", "journeys", "themes", "entries", "legs", "fixtures",
+             "kinds", "pieces", "hours", "minutes", "metres", "kilometres")
+    pat = re.compile(r"(?<![\d.])1\s(" + "|".join(words) + r")\b")
+    n = 0
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        n += 1
+        m = pat.search(h)
+        if m:
+            i = max(0, m.start() - 60)
+            fail(f"{canonical_of(f)} prints {m.group(0)!r} — a count that "
+                 f"disagrees with its noun. Use render.n_of(). Context: "
+                 f"...{h[i:m.end() + 10]!r}")
+    return n
+
+
 @check("nothing on a page is escaped twice")
 def c_double_escape():
     # NINETY-THREE PAGES PRINTED "Tyrol &amp; the West".

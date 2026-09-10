@@ -159,6 +159,34 @@ def esc(s):
     return html.escape(str(s), quote=True)
 
 
+# IRREGULAR ONLY. Everything else takes an -s, which is the whole of the
+# English this site needs.
+_PLURALS = {"country": "countries", "city": "cities"}
+
+
+def n_of(n, word, *, sep=" "):
+    """A count and its noun, agreeing.
+
+    MEASURED ON THE SHIPPED SITE BEFORE THIS EXISTED: "1 experiences" on 110
+    pages, "1 nights" on 62, "1 cities" on 35, "1 destinations" on 25, "1
+    regions" on 15, "1 places" on 8 and "1 countries" on 3. In meta
+    descriptions that go to every search engine and every shared link, in the
+    accessible name of a country map, in a destination's own facts table and
+    in the figure caption under fifty country plates.
+
+    Every one of them was a separate f-string writing `{n} things`, and each
+    was individually invisible: the pages that trip it are the small ones —
+    Monaco, San Marino, Liechtenstein, Andorra, a region with one destination
+    — which is exactly the set nobody opens while checking a change.
+
+    One function, and checks.py greps the built HTML for the fault so a
+    hundred-and-first f-string cannot reintroduce it.
+    """
+    if n == 1:
+        return f"{n}{sep}{word}"
+    return f"{n}{sep}{_PLURALS.get(word, word + 's')}"
+
+
 # The illustration system.
 #
 # There are no photographs on this site yet, and until there are, every

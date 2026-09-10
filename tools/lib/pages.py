@@ -17,7 +17,7 @@ from . import geo
 from . import stay as staylib
 from . import urls
 from .render import (LD_PUBLISHER, SITE_NAME, SITE_TAGLINE, arch_rim, card, chips, crumbs,
-                     esc, factlist, grid,
+                     esc, factlist, grid, n_of,
                      jsondata, ld_breadcrumb, ld_place, ld_within, motif_for,
                      page, photo, picture, plate, section, arch_clip, arch_edge)
 from .score import city_scores, country_scores, discoverability
@@ -1420,12 +1420,12 @@ def countries_index(data):
             rows.append(
                 f"""<a class="row" href="{urls.country(c)}">
                 <div><h3>{esc(c['name'])}{adv}</h3><p class="rowsub">{esc(c['tagline'])}</p></div>
-                <p class="rowmeta">{len(c['regions'])} regions · {ncity} cities</p></a>"""
+                <p class="rowmeta">{n_of(len(c['regions']), 'region')} · {n_of(ncity, 'city')}</p></a>"""
             )
         blocks.append(
             f"""<section class="band macroband" id="{esc(m['slug'])}">
             <div class="bandtop">
-            <div class="band-head"><p class="kicker">{len(m['countries'])} countries · {mcity} destinations</p>
+            <div class="band-head"><p class="kicker">{n_of(len(m['countries']), 'country')} · {n_of(mcity, 'destination')}</p>
             <h2><a href="{urls.macro(m)}" class="nodec">{esc(m['name'])}</a></h2>
             <p class="lede">{esc(m['blurb'])}</p></div>
             <figure class="bandart">{region_glyph(m["countries"], macro_frame(data, m))}</figure>
@@ -1560,7 +1560,8 @@ def macro_page(data, m):
     for cs in m["countries"]:
         c = data["countries"][cs]
         ncity = sum(len(r["cities"]) for r in c["regions"])
-        meta = f'<p class="cardmeta">{len(c["regions"])} regions · {ncity} cities · {esc(c["budget"])} cost</p>'
+        meta = (f'<p class="cardmeta">{n_of(len(c["regions"]), "region")} · '
+                f'{n_of(ncity, "city")} · {esc(c["budget"])} cost</p>')
         cards.append(card(urls.country(c), c["capital"], c["name"], c["tagline"], seed="country:" + c["slug"],
                  meta=meta, motif=motif_for(c["interests"])))
     body = f"""
@@ -2304,7 +2305,7 @@ def country_page(data, c):
     m = next(x for x in data["macros"] if x["slug"] == c["macro_slug"])
     region_cards = []
     for r in c["regions"]:
-        meta = f'<p class="cardmeta">{len(r["cities"])} cities</p>'
+        meta = f'<p class="cardmeta">{n_of(len(r["cities"]), "city")}</p>'
         region_cards.append(
             card(urls.region(c, r), "Region", r["name"], r["summary"], seed=f"region:{c['slug']}:{r['slug']}", meta=meta)
         )
@@ -2328,8 +2329,8 @@ def country_page(data, c):
         card(urls.city(c, r, t), f"{r['name']}", t["name"], t["summary"],
              seed=f"city:{c['slug']}:{t['slug']}",
              motif=motif_for(t["interests"], t.get("city_type")),
-             meta=f'<p class="cardmeta">{len(t.get("places", []))} places · '
-                  f'{len(t.get("experiences", []))} experiences</p>')
+             meta=f'<p class="cardmeta">{n_of(len(t.get("places", [])), "place")} · '
+                  f'{n_of(len(t.get("experiences", [])), "experience")}</p>')
         for r, t in ranked[:6]
     ]
     kinds_map = data["taxonomy"]["experience_kinds"]
@@ -2543,9 +2544,9 @@ def region_page(data, c, r):
   <p class="kicker">{esc(c['name'])}</p>
   <h1>{esc(r['name'])}</h1>
   {statement(r['summary'])}
-  <p class="orient">{len(r["cities"])} destination{"s" if len(r["cities"]) != 1 else ""} ·
+  <p class="orient">{n_of(len(r["cities"]), "destination")} ·
   {len(rplaces)} place{"s" if len(rplaces) != 1 else ""} recorded ·
-  about {int(pass_nights)} nights to see it all</p>
+  about {n_of(int(pass_nights), "night")} to see it all</p>
   {chips(r["interests"], data["interests"])}
 </div>
 
@@ -2561,7 +2562,7 @@ def region_page(data, c, r):
       ("Destinations", str(len(r["cities"]))),
       ("Places recorded", str(len(rplaces))),
       ("Experiences", str(len(rexps))),
-      ("A full pass", f"about {int(pass_nights)} nights"),
+      ("A full pass", f"about {n_of(int(pass_nights), 'night')}"),
       ("Best months", esc(months_line(data, c["season"]["peak"]))),
       ("Typical day", daily_line(data, c)),
   ]), tone="quiet",
@@ -2706,7 +2707,7 @@ def city_page(data, c, r, t):
         edge_rows.append(
             f"""<a class="row" href="{urls.journey(j)}">
             <div><h3>{esc(j['name'])}</h3><p class="rowsub">{esc(leg['why'])}</p></div>
-            <p class="rowmeta">Journey · {leg['nights']} nights here</p></a>"""
+            <p class="rowmeta">Journey · {n_of(leg['nights'], 'night')} here</p></a>"""
         )
     for th in b["themes"]:
         stop = next(x for x in th["stops"] if x["city"] == cid)
@@ -3181,7 +3182,7 @@ def journeys_index(data):
             f'<h3>{esc(j["name"])}</h3>'
             f'<p class="rowsub">{" · ".join(stops)}</p>'
             f'<span class="hopbar route" aria-hidden="true">{segs}</span>'
-            f'<p class="rowmeta jfacts">{j["days"]} days · {len(countries)} countries'
+            f'<p class="rowmeta jfacts">{n_of(j["days"], "day")} · {n_of(len(countries), "country")}'
             f' · {esc(j["difficulty"])}</p></div>'
             f'<div class="jart">{route}</div></a>')
     # THE OPENING IS EVERY ROUTE AT ONCE, and no other travel product can
@@ -3378,7 +3379,7 @@ def journey_page(data, j):
   <p class="kicker">Journey</p>
   <h1>{esc(j['name'])}</h1>
   {statement(j['strapline'])}
-  <p class="orient">{j['days']} days · {len(j['legs'])} stops · {len(countries)} countries · {total_km:,} km in a straight line</p>
+  <p class="orient">{n_of(j['days'], 'day')} · {n_of(len(j['legs']), 'stop')} · {n_of(len(countries), 'country')} · {total_km:,} km in a straight line</p>
   {chips(j["interests"], data["interests"])}
 </div>
 
@@ -4066,7 +4067,7 @@ def countrymap(data, c):
         # rule is on /method and in the map's own aria-label. What stays
         # here is what a reader of THIS map needs: what it shows, what is
         # missing from it, and where to open it bigger.
-        f'<figcaption>{esc(c["name"])}, its {len(c["regions"])} regions and {shown} '
+        f'<figcaption>{esc(c["name"])}, its {n_of(len(c["regions"]), "region")} and {shown} '
         f'{"destination" if shown == 1 else "destinations"}. Region names sit at the '
         f'centre of their own destinations — they are groupings, not boundaries.{note} '
         f'Coastline and borders from <a href="/sources">Natural Earth</a>, public domain. '
@@ -4228,9 +4229,13 @@ def orient_line(t):
     kind = CITY_TYPE_NAMES.get(t.get("city_type"))
     if kind:
         bits.append(esc(kind))
-    n = t.get("nights") or []
-    if len(n) == 2:
-        bits.append(f"{n[0]}–{n[1]} nights" if n[0] != n[1] else f"{n[0]} nights")
+    # AND IT FORMATTED THE NIGHTS ITSELF, WRONGLY. `nights_line()` exists
+    # for exactly this and already says "1 night"; this line said "1 nights"
+    # on every destination the atlas gives a single night. The docstring of
+    # that function records three other surfaces getting it wrong; this was a
+    # fourth, in the ONE factual line above the argument.
+    if len(t.get("nights") or []) == 2:
+        bits.append(nights_line(t))
     return " · ".join(bits)
 
 
@@ -5149,7 +5154,7 @@ def regionmap(data, c, r):
     # a coast or a recognisable border to appear and place it.
     return pointsmap(pts, uid, cap,
                      f'Map of {r["name"]}, {c["name"]}: its '
-                     f'{len(pts)} destinations in the Atlas',
+                     f'{n_of(len(pts), "destination")} in the Atlas',
                      min_w=260.0, min_h=165.0)
 
 
@@ -5746,7 +5751,7 @@ def category_page(data, cat, sub=None):
 """
     return f"{path}/index.html", page(
         title, body, path=path, area="experiences",
-        description=f"{title}: {len(chosen)} experiences across {len(countries)} European countries, selected by a published rule.",
+        description=f"{title}: {n_of(len(chosen), 'experience')} across {n_of(len(countries), 'European country')}, selected by a published rule.",
     )
 
 
@@ -7644,8 +7649,9 @@ def events_month_page(data, month):
 <div class="pagehead overture">
   <p class="kicker">The European year</p>
   <h1>{esc(name)} in Europe</h1>
-  <p class="lede">{len(fixtures)} recurring fixtures, {len(peak)} countries at their best and
-  {len(shoulder)} in the quieter shoulder — which is usually where you should be going.</p>
+  <p class="lede">{n_of(len(fixtures), "recurring fixture")},
+  {n_of(len(peak), "country")} at their best and {len(shoulder)} in the quieter
+  shoulder — which is usually where you should be going.</p>
 </div>
 {year_band(data, month)}
 {monthmap}
@@ -8476,7 +8482,7 @@ def freshness_page(data):
         rows.append(
             f"""<a class="row" href="{urls.country(c)}">
             <div><h3>{esc(c['name'])}{tag}</h3>
-            <p class="rowsub">{ncity} cities · {esc(c['currency'])} · €{c['daily_eur'][0]}–{c['daily_eur'][1]} a day{prov}</p></div>
+            <p class="rowsub">{n_of(ncity, 'city')} · {esc(c['currency'])} · €{c['daily_eur'][0]}–{c['daily_eur'][1]} a day{prov}</p></div>
             <p class="rowmeta">{meta}</p></a>"""
         )
     n = len(data["countries"])
@@ -9189,7 +9195,7 @@ def motion_page(data, m):
 
     wants = set(m.get("interests", []))
     jrows = [j for j in data["journeys"] if wants & set(j["interests"])][:3]
-    jcards = [card(urls.journey(j), f"{j['days']} days · {len(j['legs'])} stops",
+    jcards = [card(urls.journey(j), f"{n_of(j['days'], 'day')} · {n_of(len(j['legs']), 'stop')}",
                    j["name"], j["strapline"], seed="journey:" + j["slug"],
                    motif=motif_for(j["interests"]))
               for j in jrows]
