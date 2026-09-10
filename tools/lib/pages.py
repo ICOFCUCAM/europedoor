@@ -8407,16 +8407,33 @@ def freshness_page(data):
 
 
 def not_found(data):
-    body = """
-<div class="pagehead">
-  <p class="kicker">404</p>
-  <h1>That door does not open.</h1>
-  <p class="lede">The page is not here. The continent still is.</p>
-  <div class="hero-actions">
-    <a class="btn" href="/countries">Open the Atlas</a>
-    <a class="btn ghost" href="/plan">Plan a journey</a>
-  </div>
-</div>
+    """THE COPY PROMISED A CONTINENT AND THE PAGE SHOWED TWO BUTTONS.
+
+    "The page is not here. The continent still is." — under which sat a
+    primary button, a ghost button and 250 pixels of nothing, on the one page
+    a reader arrives at having already failed to find something. A sentence
+    that names a picture and then does not draw it is the /map failure in
+    miniature: the prose was making a claim the page declined to keep.
+
+    So the continent is here, with every destination this Atlas holds lit on
+    it. Not links: 319 points at this size are 3-pixel targets and a dot the
+    page cannot name is not navigation — the ways out are the three actions
+    under the type, which is where a reader who has hit a 404 is looking.
+    """
+    pts = [project(n["city"]["lat"], n["city"]["lon"])
+           for n in data["cities"].values()]
+    body = f"""
+{constel_defs()}
+{indexhero(
+    kicker="404",
+    title="That door does not open.",
+    lede=(f"The page is not here. The continent still is — all "
+          f"{len(data['cities'])} destinations in the Atlas, on one drawing."),
+    art=constellation(pts),
+    actions='<a class="btn" href="/countries">Open the Atlas</a>'
+            '<a class="btn ghost" href="/search">Search everything</a>'
+            '<a class="btn ghost" href="/plan">Plan a journey</a>',
+    note=geo.sources_line(geo.load("europe-lod0.json")) + datacut_line())}
 """
     return "/404.html", page(
         "Not found", body, path="/404", area=None,
