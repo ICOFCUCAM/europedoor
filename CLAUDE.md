@@ -1941,11 +1941,23 @@ the rest.
     python3 tools/plate-variation.py --check  the plates have not got more alike
     python3 tools/photo-tests.py              the acquisition pipeline, against a stub provider
 
-And two more that are deliberately NOT gates, for the same reason the
-contact sheet is not: they write an image rather than a verdict.
-`node tools/hero-sheet.js` draws every discovered candidate inside the
-real hero for art direction, and `node tools/hero-shot.js` shoots the
-built homepage once a photograph is in the register.
+And three more that are deliberately NOT gates. Two write an image rather
+than a verdict: `node tools/hero-sheet.js` draws every discovered candidate
+inside the real hero for art direction, and `node tools/hero-shot.js` shoots
+the built homepage once a photograph is in the register.
+
+The third needs the internet, which is the other reason a thing is not a
+gate: **`python3 tools/deployed.py` reads the site a reader is actually
+served** and compares it with the build in `site/`. EVERY OTHER GATE HERE
+VALIDATES THE REPOSITORY AND NOT ONE OF THEM HAS EVER OPENED THE SITE — the
+gap that hid the `site/_headers` bug and the `immutable` stylesheet bug, both
+of which were correct in the repository and wrong in the response. The
+stylesheet's filename is its content hash, so a served page naming a
+different one is a served page built from different bytes: that single
+comparison is the whole test for "did the work reach readers", and it needs
+no version file and no build id. It runs in `.github/workflows/deployed.yml`,
+on push, daily and on demand, because the sandbox proxy answers 403 for
+europedoor.com.
 
 The browser checks need `npm install playwright` and take a couple of
 minutes. They earn their place repeatedly: a 47-pixel mobile overflow on

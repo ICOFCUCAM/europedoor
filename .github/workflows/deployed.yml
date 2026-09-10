@@ -1,0 +1,56 @@
+name: deployed
+
+# IS THE SITE A READER GETS THE SITE THIS REPOSITORY BUILDS?
+#
+# Every other gate validates the repository and not one of them has ever
+# opened the site. That gap has cost this project twice, both times in the
+# same shape — correct in the repository, wrong in the response: security
+# headers that lived only in site/_headers, which Vercel does not read, and a
+# stylesheet at a stable URL under an `immutable` cache header, so every
+# returning reader kept the copy they first downloaded and every visual change
+# reached new visitors only.
+#
+# It cannot run in the development sandbox: the egress proxy answers 403 to
+# CONNECT for europedoor.com, confirmed rather than assumed. A runner has
+# network, so it runs here — on every push, on a schedule, and on demand.
+#
+# IT IS NOT PART OF `checks`. A gate that needs the internet fails for reasons
+# that are not about the code, and a suite people learn to ignore is worse
+# than no suite. This one reports on its own.
+
+on:
+  workflow_dispatch:
+    inputs:
+      origin:
+        description: "the origin to read, e.g. https://europedoor.com"
+        required: false
+        default: "https://europedoor.com"
+        type: string
+  push:
+  schedule:
+    # Once a day. A deployment does not go stale on a schedule, but a
+    # certificate expires, a DNS record moves and a project gets
+    # disconnected — and all three look like "nothing has changed on the
+    # site", which is exactly the report this exists to answer.
+    - cron: "17 6 * * *"
+
+jobs:
+  deployed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # A PUSH IS NOT A DEPLOYMENT. The host builds after the push lands, so
+      # reading the origin immediately would report the PREVIOUS build as
+      # stale and teach everyone to ignore this. Two minutes, then read.
+      - name: Wait for the host to build
+        if: github.event_name == 'push'
+        run: sleep 120
+
+      - name: Read what readers are actually served
+        run: |
+          python3 tools/deployed.py \
+            --origin "${{ inputs.origin || 'https://europedoor.com' }}"
