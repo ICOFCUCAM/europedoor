@@ -7,25 +7,28 @@
 
 Fifteen files per photograph, and `checks.py` already refuses a page whose
 `src` does not resolve — so a register row without its derivatives fails the
-build rather than shipping a broken image. That is the right order: the row
-is the claim and the files are the evidence.
+build rather than shipping a broken image. That is the right order: the row is
+the claim and the files are the evidence.
 
-WHY IT SHELLS OUT. This repository is stdlib-only by design and there is no
-image library here — decoding and re-encoding AVIF in pure Python is not a
-thing anybody should attempt. ImageMagick is on the GitHub Actions runner and
-on most workstations, so this drives it and says plainly what is missing when
-it is not there, rather than failing three layers down.
+PILLOW, AND THE SISTER REPOSITORY IS WHY. It encodes 629 photographs this way
+and the shape is proven; the first version of this file shelled out to
+ImageMagick, which is one more thing to have installed and one more place for
+a quality flag to mean something different. This is not part of the build —
+the build is stdlib-only and runs with no network — it is a step somebody runs
+in the `photograph` workflow, where a dependency costs nothing.
 
-NEVER UPSCALE. A 900-pixel source does not get a 2400-pixel derivative: it
-gets the widths it can actually fill, and `picture()`'s srcset is honest about
-what exists because the browser picks from what is offered. A file named
--2400 that holds 900 pixels of detail is the same class of untruth as a
+THE ORIGINAL IS KEPT. A better encoder, or a width this ladder does not have
+yet, must not mean going back to the provider for a file we already hold —
+and after the register row exists, that file is the evidence the licence claim
+rests on.
+
+NEVER UPSCALE, and the reason is sharper than saving bytes: a browser choosing
+between a real 1260 and a fake 1800 will take the fake one. A file named
+-2400 holding 900 pixels of detail is the same class of untruth as a
 population we estimated.
 """
 
 import os
-import shutil
-import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -33,52 +36,47 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 from lib.render import IMAGE_WIDTHS                       # noqa: E402
 
 IMG_DIR = os.path.join(ROOT, "assets", "img")
-FORMATS = ("avif", "webp", "jpg")
-QUALITY = {"avif": "50", "webp": "78", "jpg": "82"}
-
-
-def tool():
-    for name in ("magick", "convert"):
-        if shutil.which(name):
-            return name
-    sys.exit("ImageMagick is not installed. `sudo apt-get install -y "
-             "imagemagick libheif1` on Debian or Ubuntu; it is already on the "
-             "GitHub Actions ubuntu runner.")
-
-
-def source_width(exe, src):
-    out = subprocess.run([exe, "identify", "-format", "%w", src]
-                         if exe == "magick" else ["identify", "-format", "%w", src],
-                         capture_output=True, text=True, check=True)
-    return int(out.stdout.strip())
+# Per-format quality, taken from the sister repository's settled values rather
+# than guessed here. AVIF carries far more at a lower number than JPEG does.
+QUALITY = {"avif": 50, "webp": 78, "jpg": 82}
 
 
 def derive(stem):
-    exe = tool()
+    try:
+        from PIL import Image
+    except ImportError:
+        sys.exit("Pillow is not installed. `pip install pillow` — and for AVIF "
+                 "either Pillow 11+ or `pip install pillow-avif-plugin`. It is "
+                 "installed by the photograph workflow; it is deliberately not "
+                 "a dependency of the build, which stays stdlib-only.")
     src = os.path.join(IMG_DIR, stem + ".src.jpg")
     if not os.path.exists(src):
         sys.exit(f"no source at {os.path.relpath(src, ROOT)} — run "
                  f"scripts/images/fetch.py first")
-    have = source_width(exe, src)
     made, skipped = [], []
-    for w in IMAGE_WIDTHS:
-        if w > have:
-            skipped.append(w)
-            continue
-        for ext in FORMATS:
-            dst = os.path.join(IMG_DIR, f"{stem}-{w}.{ext}")
-            cmd = ([exe] if exe == "magick" else []) + [
-                src, "-resize", f"{w}x", "-strip",
-                "-quality", QUALITY[ext], dst,
-            ]
-            if exe != "magick":
-                cmd = ["convert"] + cmd
-            subprocess.run(cmd, check=True)
-            made.append(os.path.basename(dst))
-    print(f"{stem}: source is {have}px, made {len(made)} derivatives")
+    with Image.open(src) as im:
+        im = im.convert("RGB")
+        for w in IMAGE_WIDTHS:
+            if w > im.width:
+                skipped.append(w)
+                continue
+            small = im.resize((w, round(im.height * w / im.width)),
+                              Image.LANCZOS)
+            for ext in ("avif", "webp", "jpg"):
+                dst = os.path.join(IMG_DIR, f"{stem}-{w}.{ext}")
+                kw = {"quality": QUALITY[ext]}
+                if ext == "webp":
+                    kw["method"] = 5
+                if ext == "jpg":
+                    kw["optimize"] = True
+                small.save(dst, **kw)
+                made.append(os.path.basename(dst))
+        width = im.width
+    print(f"{stem}: source is {width}px, made {len(made)} derivatives")
     if skipped:
-        print(f"  no upscaling: {', '.join(str(w) for w in skipped)} skipped, "
-              f"because the source cannot fill them")
+        print(f"  no upscaling: {', '.join(str(w) for w in skipped)} skipped. "
+              f"A browser choosing between a real width and a fake larger one "
+              f"takes the fake one.")
     return made
 
 

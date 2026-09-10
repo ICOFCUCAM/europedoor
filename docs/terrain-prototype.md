@@ -406,3 +406,60 @@ Neither reaches a browser.
    one. No destination plate highlights a country today, so nothing is wrong;
    a country plate that gains relief would need `selected` unfolded the same
    way `country-bounds` just was.
+
+## Vienna, and why the threshold is right
+
+Asked to give Vienna its Wienerwald, and asked for a good method rather than
+an exception. The method was: measure before changing anything.
+
+**First, a correction that changed the answer.** Vienna was reported here as
+102 m of spread and a 150 m crest. That is Paris. Vienna reads **332 m and
+480 m** — it passes the spread threshold and misses the crest threshold by
+120 m, which makes it a near miss rather than a flat city, and made the
+question worth asking properly.
+
+**The near misses are a cliff, and that is a separate finding.** 53
+destinations pass spread and fail crest, and the top of that list is not a
+gentle tail:
+
+| | spread | crest | short by |
+|---|---:|---:|---:|
+| Córdoba | 466 | 598 | **2** |
+| Athens | 586 | 598 | **2** |
+| Naples | 592 | 598 | **2** |
+| Kefalonia | 576 | 591 | 9 |
+| Rome | 576 | 587 | 13 |
+| Stavanger | 578 | 582 | 18 |
+
+**Athens is the case this measurement exists for** — `relief_at`'s own
+docstring cites it, a basin ringed by Hymettus, Penteli and Parnitha — and it
+fails by two metres. A rule where Athens gets nothing and something at 601 m
+gets four bands is a coin toss at the boundary, not a measurement. That is
+worth fixing and it is not fixed here; it needs its own experiment, because
+the honest instrument is whether the DRAWN layer is visible rather than
+whether a percentile clears a number.
+
+**And the obvious instrument for that measured the wrong thing.** Computing
+the fraction of each destination's plate frame the bands would cover gives
+Vienna 73% at 200 m and 24% at 600 m — more than Athens, more than Rome, more
+even than Paris at 27.7%. All of that is the Alps and the Carpathians and the
+Massif Central: a destination frame is 590 km across, so a frame-wide measure
+answers a question about the neighbourhood rather than about the place. That
+is the trap `relief_at` was written to avoid, walked into by the check meant
+to test it, and it is the third instrument in one session to answer a
+different question from the one asked.
+
+**Measured correctly, at 40 km, Vienna is a lowland city with wooded hills.**
+The Wienerwald is real and it is under 600 m, which the absolute band scale
+deliberately renders at 0.013 of luminance from the land tone — a layer that
+ships kilobytes and cannot be seen. The threshold is not wrong about Vienna.
+
+**So Vienna's physical identity is not relief. It is the Danube**, which is
+already drawn on its map as one of six anonymous blue lines while
+`data/geo/hydrology-lod1.json` names all 153 rivers and ranks the Danube at 2.
+The map has the name and does not print it. That is the buildable answer to
+"Vienna should look like Vienna before the visitor has read much text", and it
+needs a water-label family that takes the `--z` compensation, counts toward
+`dense_class()` and is marked by `phone_declutter()` — because the last label
+family added here inherited none of those and printed Monte Rosa through
+Chamonix's own name at 390.

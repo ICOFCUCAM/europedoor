@@ -108,8 +108,7 @@ jobs:
         if: ${{ !inputs.verify_terms && inputs.pick != '' }}
         run: |
           set -euo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq imagemagick libheif1
+          python3 -m pip install --quiet pillow pillow-avif-plugin
           # Not a heredoc: inside a YAML block scalar every line is
           # indented, and a `<<EOF` terminator that is not at column zero is
           # a terminator bash never sees.
