@@ -820,25 +820,30 @@ def c_stay_lede():
     return n
 
 
-@check("no photograph is fetched from a provider whose licence is unanswered")
+@check("no photograph enters without its licence verified against the live terms")
 def c_photo_gate():
-    """The same gate the map data has, on the one input that is somebody else's.
+    """No verified licence, no production image — and verified means READ.
 
-    `scripts/map/fetch.py` refuses to open a socket for a dataset with no
-    licence row. Photographs needed the same thing and did not have it: the
-    register was enforced at the OUTPUT — no published page may reference a
-    file with no row — and nothing stood between a person with an API key and
-    a download.
+    The gate does not ask whether anybody KNOWS what Unsplash allows. It asks
+    for the sentence, and for the archived page it was copied out of. That
+    distinction is the whole design: a model's recollection of a commercial
+    API's terms is not evidence, it is a guess wearing the clothes of one,
+    and these terms change.
 
-    Three assertions, and each is about a promise rather than a mechanism:
-      1. every provider the fetcher can reach has a row in the gate;
-      2. a provider whose row is cleared has actually answered all three
-         questions, so `self_host: true` cannot arrive without the
-         attribution string beside it;
-      3. no key is committed anywhere.
+    So a cleared provider must carry, for each of the three facts, a `value`,
+    a verbatim `quote`, and the `source` URL — and **the quote must appear in
+    the snapshot of that page under provider-terms/**. An answer typed from
+    memory fails here, because the evidence has to exist in the repository
+    beside it and has to match.
+
+    `scripts/map/fetch.py` has refused to open a socket for an unlicensed
+    dataset since the map was built. Photographs were enforced only at the
+    OUTPUT — no published page may reference a file with no register row —
+    and nothing stood between somebody with an API key and a download.
     """
     gate_path = os.path.join(ROOT, "docs", "data-licenses", "photo-providers.json")
     fetch_path = os.path.join(ROOT, "scripts", "images", "fetch.py")
+    archive = os.path.join(ROOT, "docs", "data-licenses", "provider-terms")
     if not os.path.exists(fetch_path):
         return 0
     if not os.path.exists(gate_path):
@@ -847,41 +852,87 @@ def c_photo_gate():
         return 1
     gate = json.load(open(gate_path, encoding="utf-8"))
     src = open(fetch_path, encoding="utf-8").read()
+    FACTS = ("self_host", "attribution", "download_ping")
     n = 0
+
+    # 1. Every provider the fetcher can reach has a row.
     for slug in re.findall(r'^\s{4}"([a-z]+)": \{$', src, re.M):
         n += 1
         if slug not in gate:
             fail(f"fetch.py can reach {slug!r} and the licence gate has no "
                  f"row for it")
+
     for slug, row in gate.items():
         if slug.startswith("$"):
             continue
+        answered = [row.get(f, {}).get("value") for f in FACTS]
+        cleared = all(a not in (None, "", "UNANSWERED") for a in answered)
         n += 1
-        answered = [row.get(k) for k in ("self_host", "attribution", "download_ping")]
-        if row.get("self_host") is True and any(
-                a in (None, "", "UNANSWERED") for a in answered):
-            fail(f"{slug}: self_host is cleared while another licence question "
-                 f"is unanswered — the three are one decision")
-        if row.get("self_host") is True and not row.get("read_on"):
-            fail(f"{slug}: cleared with no `read_on` date. A gate opened "
-                 f"without recording when the terms were read is a gate "
-                 f"nobody can re-check")
-    # 3. No credential, anywhere. Shape rather than name, so a key that is not
-    # one of the two we expect is caught too.
-    keyish = re.compile(r"(563492ad|[A-Za-z0-9_-]{40,})")
-    for rel_ in ("docs/data-licenses/photo-providers.json", "scripts/images/fetch.py",
-                 "data/images.json"):
+        if not cleared:
+            # Unanswered is the normal, correct state. The only thing that is
+            # wrong about it is answering ONE of three and calling it done.
+            if any(a not in (None, "", "UNANSWERED") for a in answered):
+                fail(f"{slug}: part of the licence is answered and part is "
+                     f"not — the three are one decision, and a half-open gate "
+                     f"is an open gate")
+            continue
+
+        # 2. A cleared provider carries its evidence.
+        if not row.get("read_on"):
+            fail(f"{slug}: cleared with no `read_on`. A gate opened without "
+                 f"recording when the terms were read cannot be re-checked")
+        snaps = row.get("terms_snapshot") or {}
+        for fact in FACTS:
+            f = row[fact]
+            n += 2
+            if not f.get("quote") or not f.get("source"):
+                fail(f"{slug}.{fact}: answered with no quote or no source. "
+                     f"The answer is the sentence on the page, not a summary "
+                     f"of it")
+                continue
+            name = snaps.get(f["source"])
+            if not name:
+                fail(f"{slug}.{fact}: cites {f['source']} and no snapshot of "
+                     f"that page is archived — run "
+                     f"scripts/images/verify_provider.py")
+                continue
+            path = os.path.join(archive, name)
+            if not os.path.exists(path):
+                fail(f"{slug}.{fact}: the snapshot {name} is named and missing")
+                continue
+            body = " ".join(open(path, encoding="utf-8").read().split())
+            want = " ".join(f["quote"].split())
+            if want not in body:
+                fail(f"{slug}.{fact}: the quote is not in the archived page it "
+                     f"cites. Either the terms changed, or the quote was typed "
+                     f"from memory. Re-read the page")
+
+        # 3. What a cleared answer obliges the code to do.
+        if row["self_host"]["value"] is not True:
+            fail(f"{slug}: self_host is cleared as {row['self_host']['value']!r}. "
+                 f"This site serves `img-src 'self' data:` and refuses a "
+                 f"third-party origin, so a hotlink-only provider needs an "
+                 f"owner decision that changes the CSP and that check")
+        if row["download_ping"]["value"] is True and not row.get("endpoint_download"):
+            fail(f"{slug}: a download event is required and no "
+                 f"`endpoint_download` is set, so nothing would call it")
+
+    # 4. No credential, anywhere near this.
+    keyish = re.compile(r"[A-Za-z0-9_-]{40,}")
+    for rel_ in ("docs/data-licenses/photo-providers.json",
+                 "scripts/images/fetch.py", "scripts/images/verify_provider.py",
+                 "data/images.json", ".github/workflows/photograph.yml"):
         f = os.path.join(ROOT, rel_)
         if not os.path.exists(f):
             continue
         body = open(f, encoding="utf-8").read()
         n += 1
         for m in keyish.finditer(body):
-            tok = m.group(1)
             if "://" in body[max(0, m.start() - 12):m.start()]:
-                continue        # part of a URL
-            fail(f"{rel_} contains a {len(tok)}-character token that looks like "
-                 f"a credential — keys live in repository secrets and nowhere else")
+                continue
+            fail(f"{rel_} contains a {len(m.group(0))}-character token that "
+                 f"looks like a credential — keys live in repository secrets "
+                 f"and nowhere else")
     return n
 
 

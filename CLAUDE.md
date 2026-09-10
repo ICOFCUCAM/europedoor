@@ -1681,10 +1681,31 @@ must the credit say** (the renderer changes *before* the first fetch, not
 after), and **is a download ping required**. `Pexels` and `Unsplash` were
 already valid licence values in the schema before any of this.
 
-**None of the three may be answered from memory, and this file's own rule
-says so.** They are facts about a provider's live terms, and the sandbox
-answers 403 to CONNECT for general hosts. Getting one wrong means
-republishing somebody's photograph on terms we invented.
+**THE GATE DOES NOT ASK WHETHER ANYBODY KNOWS WHAT UNSPLASH ALLOWS. IT ASKS
+FOR THE SENTENCE, AND FOR THE ARCHIVED PAGE IT WAS COPIED OUT OF.** A model's
+recollection of a commercial API's terms is not evidence — it is a guess
+wearing the clothes of one, and these terms change. So each fact is answered
+with a `value`, a **verbatim `quote`**, and the `source` URL, and `checks.py`
+asserts the quote **appears in the archived snapshot of that page**. An answer
+typed from memory fails the build, because the evidence has to exist in the
+repository beside it and has to match. Proved four ways, including the one
+that matters: a quote that is not in the page it cites.
+
+`scripts/images/verify_provider.py` fetches every terms URL, archives it with
+the date and the SHA-256 of the bytes as served, and prints the passages
+mentioning hotlinking, attribution and downloads. **It answers nothing** — a
+model summarising a licence page is the same failure as a model remembering
+one, one step further from the source. It fetches, archives and points.
+
+**It cannot run here, and that was confirmed rather than assumed**: the egress
+proxy returns 403 for pexels.com and unsplash.com, tried directly. The
+`photograph` workflow has network access and does it there.
+
+**And the suspicion about Unsplash stays a suspicion.** There is a note on
+record that their guidelines may require hotlinking, dual attribution with
+links, and a download event. It lives in the gate file marked as a suspicion,
+so somebody knows what to look for, and the check will not let it become an
+answer without the quote behind it.
 
 **The fetcher lists and stops.** It prints the photographer, the pixel width
 and the page for each candidate and refuses to pick — a photograph chosen from

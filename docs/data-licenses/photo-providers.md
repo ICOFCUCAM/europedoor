@@ -18,13 +18,27 @@ call falls back to a generated plate, which is why the site ships today.
 `tools/lib/data.py` before any of this, so the schema has always been ready
 for exactly these two.
 
-## The three questions, and why they are questions
+## The three questions, and why a quote is required
 
-`photo-providers.json` holds them. Each is a fact about the provider's live
-terms, and **each must be answered by reading those terms** — this repository
-records elsewhere that nothing may be committed against a licence gate from a
-marketing page or from memory, and that rule applies hardest here, where
-getting it wrong means republishing somebody's photograph on terms we invented.
+`photo-providers.json` holds them. **The gate does not ask whether anybody
+knows what Unsplash allows. It asks for the sentence, and for the archived
+page it was copied out of.**
+
+That distinction is the whole design. A model's recollection of a commercial
+API's terms is not evidence — it is a guess wearing the clothes of one, and
+these terms change. So each of the three facts is answered with three things:
+
+| | |
+|---|---|
+| `value` | true / false, or the required credit as a string |
+| `quote` | the sentence, **copied verbatim** from the page |
+| `source` | the URL it came from |
+
+and `checks.py` asserts **the quote appears in the archived snapshot of that
+page**. An answer typed from memory fails the build, because the evidence has
+to exist in the repository beside it and has to match. Proved four ways: a
+quote with no snapshot, a quote that is not in the page it cites, a correct
+quote that passes, and a gate half-answered.
 
 **1. May we self-host?** This site serves `img-src 'self' data:` and
 `checks.py` refuses any third-party origin. A provider whose terms require
@@ -34,12 +48,39 @@ about the security posture of every page — not a build step.
 **2. What exactly must the credit say?** `picture()` prints the photographer
 and the licence. If the terms require a link to the provider, or to the
 photographer's profile, or particular wording, **the renderer changes before
-the first fetch**, not after. A credit that is close to right is a credit that
-is wrong.
+the first fetch**, not after. A credit that is close to right is wrong.
 
-**3. Is a download ping required?** Some APIs require a request to a separate
-endpoint when an image is actually used. If so it is part of using the image,
-not an optional courtesy.
+**3. Is a download event required?** Some APIs require a request to a separate
+endpoint when an image is used. If so it is part of using the image, and a
+cleared `download_ping: true` with no `endpoint_download` fails the check,
+because nothing would call it.
+
+Then `read_on`. A gate opened without recording when the terms were read
+cannot be re-checked.
+
+## How the terms get read
+
+    python3 scripts/images/verify_provider.py --provider pexels
+
+fetches every URL in `terms_urls`, writes each into
+`provider-terms/<provider>.<page>.<date>.txt` with the SHA-256 of the bytes as
+served, and prints the passages mentioning hotlinking, attribution and
+downloads. **It answers nothing** — it fetches, archives and points, and a
+person reads.
+
+It will not run in the EuropeDoor sandbox. The egress proxy returns 403 for
+both providers, which was confirmed rather than assumed, and is precisely why
+this is a gate. Run it locally, or run the `photograph` workflow with
+**verify_terms** ticked: that runner has network access, and it opens a branch
+carrying the archived pages for you to read.
+
+**On Unsplash specifically.** There is a suspicion on record — in the gate
+file, marked as a suspicion — that their API guidelines require using the
+hotlinked URLs returned under `photo.urls`, require crediting both the
+photographer and Unsplash with links, and require triggering a download
+endpoint on use. **None of that is a fact here.** It is written down only so
+somebody knows what to look for on the page, and the check will not let it
+become an answer without the quote that supports it.
 
 ## What happens when the gate opens
 

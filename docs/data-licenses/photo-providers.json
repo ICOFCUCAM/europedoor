@@ -1,28 +1,60 @@
 {
-  "$comment": "THE LICENCE GATE FOR PHOTOGRAPHS. scripts/images/fetch.py refuses to open a socket for a provider whose questions here are unanswered. Every question is a fact about the provider's LIVE TERMS, not a preference — and this repository already records that nothing may be committed against a licence gate from a provider's marketing page or from memory. Read the terms, answer these, commit the answer with the date you read them. An UNANSWERED here is not a blocker to work around; it is the work.",
+  "$comment": "THE PHOTOGRAPH LICENCE GATE. No verified licence, no production image. Each of the three facts must be answered with a VERBATIM QUOTE and the URL it came from, and checks.py asserts that quote appears in the archived snapshot of that page under provider-terms/. That is the point: an answer cannot be typed from memory, because the evidence has to exist in the repository beside it. Run scripts/images/verify_provider.py to fetch and archive the live terms; it cannot run in the sandbox, whose egress proxy blocks both providers — which is exactly why the gate exists rather than a recollection.",
+  "$schema_note": "Each of self_host, attribution, download_ping is {value, quote, source}. value: self_host true/false, attribution a string, download_ping true/false. quote: copied verbatim from the page. source: the URL. UNANSWERED anywhere means STOP.",
   "pexels": {
-    "terms": "https://www.pexels.com/license/",
-    "api_terms": "https://www.pexels.com/api/documentation/",
+    "terms_urls": [
+      "https://www.pexels.com/license/",
+      "https://www.pexels.com/api/documentation/"
+    ],
     "read_on": null,
-    "self_host": "UNANSWERED",
-    "self_host_question": "May the file be downloaded and served from europedoor.com? This site's CSP is `img-src 'self' data:` and checks.py refuses any third-party origin, so a provider that requires hotlinking cannot be used without an owner decision that changes both.",
-    "attribution": "UNANSWERED",
-    "attribution_question": "The EXACT credit the terms require. picture() prints `<photographer> · <licence>` today. If the terms ask for a link to the provider, or to the photographer's profile, or specific wording, say so here and the renderer changes BEFORE the first fetch.",
-    "download_ping": "UNANSWERED",
-    "download_ping_question": "Does using an image require a request to a separate endpoint? If yes, set endpoint_download.",
+    "terms_snapshot": null,
+    "self_host": {
+      "value": "UNANSWERED",
+      "question": "May the file be downloaded and served from europedoor.com? This site sends `img-src 'self' data:` and checks.py refuses any third-party origin, so a provider that requires hotlinking cannot be used without an owner decision that changes both.",
+      "quote": null,
+      "source": null
+    },
+    "attribution": {
+      "value": "UNANSWERED",
+      "question": "The EXACT credit the terms require. picture() prints `<photographer> · <licence>`. If a link to the provider or to the photographer's profile or specific wording is required, the renderer changes BEFORE the first fetch.",
+      "quote": null,
+      "source": null
+    },
+    "download_ping": {
+      "value": "UNANSWERED",
+      "question": "Does using an image require a request to a separate endpoint? If yes, set endpoint_download.",
+      "quote": null,
+      "source": null
+    },
     "endpoint_download": null
   },
   "unsplash": {
-    "terms": "https://unsplash.com/license",
-    "api_terms": "https://unsplash.com/documentation",
-    "api_guidelines": "https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines",
+    "terms_urls": [
+      "https://unsplash.com/license",
+      "https://unsplash.com/documentation",
+      "https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines"
+    ],
     "read_on": null,
-    "self_host": "UNANSWERED",
-    "self_host_question": "Same question, and it is the one to read carefully for this provider: the API guidelines have historically required applications to use the hotlinked URLs returned under photo.urls. If that is still true, Unsplash cannot be used here without changing the CSP and the no-third-party-origin check, and that is an owner decision rather than a build step. Answer from the live guidelines, not from this sentence.",
-    "attribution": "UNANSWERED",
-    "attribution_question": "As above. Unsplash has historically required crediting the photographer AND Unsplash with links back. If so, picture() needs a second link before anything ships.",
-    "download_ping": "UNANSWERED",
-    "download_ping_question": "Unsplash has historically required triggering a download endpoint when a photo is used. If so, set endpoint_download and fetch.py will call it.",
+    "terms_snapshot": null,
+    "$warning": "AN ASSISTANT'S RECOLLECTION ABOUT THIS PROVIDER IS NOT A FACT AND MUST NOT BE RECORDED AS ONE. There is a suspicion on record that the API guidelines require using the hotlinked URLs returned under photo.urls, require crediting both the photographer and Unsplash with links, and require triggering a download endpoint on use. Every one of those is a SUSPICION. It exists here only so somebody knows what to look for on the page, and it may not be copied into `value` without the quote that supports it.",
+    "self_host": {
+      "value": "UNANSWERED",
+      "question": "Same question, and the one to read closely for this provider. Answer from the live guidelines, never from the warning above.",
+      "quote": null,
+      "source": null
+    },
+    "attribution": {
+      "value": "UNANSWERED",
+      "question": "As above. If both the photographer and the provider must be credited with links, picture() needs a second link before anything ships.",
+      "quote": null,
+      "source": null
+    },
+    "download_ping": {
+      "value": "UNANSWERED",
+      "question": "If a download endpoint must be triggered on use, set endpoint_download and fetch.py will call it.",
+      "quote": null,
+      "source": null
+    },
     "endpoint_download": null
   }
 }

@@ -24,6 +24,11 @@ on:
         required: true
         type: choice
         options: [pexels, unsplash]
+      verify_terms:
+        description: "fetch and archive the live terms, then stop (do this first)"
+        required: false
+        default: false
+        type: boolean
       query:
         description: "what to search for, e.g. 'Vienna Stephansdom rooftops'"
         required: true
@@ -62,7 +67,30 @@ jobs:
       - name: Validate the dataset
         run: python3 tools/build.py check
 
+      # STEP ONE, AND THE ONLY ONE THAT NEEDS DOING BEFORE THE GATE IS OPEN.
+      # This runner has network access and the EuropeDoor sandbox does not —
+      # the egress proxy blocks both providers outright, which is why the
+      # licence is a gate rather than a recollection. This fetches the terms,
+      # archives them with the date and a hash, and prints the passages worth
+      # reading. It answers nothing: a model summarising a licence page is
+      # the same failure as a model remembering one, one step further from
+      # the source.
+      - name: Verify the terms and archive them
+        if: ${{ inputs.verify_terms }}
+        run: |
+          set -euo pipefail
+          python3 scripts/images/verify_provider.py --provider "${{ inputs.provider }}"
+          git config user.name "europedoor-photographs"
+          git config user.email "noreply@europedoor.com"
+          BRANCH="terms/${{ inputs.provider }}-$(date +%Y-%m-%d)"
+          git checkout -b "$BRANCH"
+          git add docs/data-licenses
+          git commit -m "Archive ${{ inputs.provider }} terms as served today" \
+                     -m "Read the archived pages and fill in value, quote and source for each of self_host, attribution and download_ping. checks.py asserts every quote appears in the snapshot it cites."
+          git push -u origin "$BRANCH"
+
       - name: Search, or search and take one
+        if: ${{ !inputs.verify_terms }}
         env:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
@@ -77,7 +105,7 @@ jobs:
       # Everything below only does anything when a photograph was actually
       # taken. A listing run stops here, which is the intended default.
       - name: Derivatives
-        if: ${{ inputs.pick != '' }}
+        if: ${{ !inputs.verify_terms && inputs.pick != '' }}
         run: |
           set -euo pipefail
           sudo apt-get update -qq
@@ -91,7 +119,7 @@ jobs:
           KEY: ${{ inputs.key }}
 
       - name: Rebuild and check
-        if: ${{ inputs.pick != '' }}
+        if: ${{ !inputs.verify_terms && inputs.pick != '' }}
         run: |
           set -euo pipefail
           python3 tools/build.py check
@@ -104,7 +132,7 @@ jobs:
       # That is a diff somebody reads, so this opens a branch rather than
       # pushing to the default one.
       - name: Commit to a branch
-        if: ${{ inputs.pick != '' }}
+        if: ${{ !inputs.verify_terms && inputs.pick != '' }}
         run: |
           set -euo pipefail
           git config user.name "europedoor-photographs"
