@@ -4451,3 +4451,53 @@ body[data-hero] .masthead { position: sticky; }
  * third of nothing beside it — removing something can leave the same hole
  * that adding the wrong thing does. */
 .planform > div { max-width: none; }
+
+/* ── PRINT ─────────────────────────────────────────────────────────
+ *
+ * A DESTINATION PAGE IS THE ONE THING ON THIS SITE PEOPLE PRINT, and there
+ * was no print rule anywhere in 4,700 lines. Printed as it stood, a
+ * destination page put a cobalt masthead across the top of every sheet, ran
+ * the INTELLIGENCE world's near-black ground through the printer on any
+ * embedded map, and carried a thumb bar, a sticky action, a search box and
+ * a twenty-link footer onto paper where not one of them can be pressed.
+ *
+ * Three rules only, because a print stylesheet that redesigns the page is a
+ * second design nobody looks at:
+ *
+ *   1. Nothing that can only be TAPPED is printed. Navigation, the sticky
+ *      action, the save buttons, the forms, the skip link, the footer's
+ *      link columns. The footer's legal line stays: on paper it is the only
+ *      thing that says who published this.
+ *   2. Ink on paper. The two worlds are a screen idea — a dark ground is
+ *      the reader's own toner — so INTELLIGENCE prints as DISCOVER does,
+ *      and the map families take the atlas palette they already have for a
+ *      printed picture.
+ *   3. Nothing breaks across a page in the middle of a claim. A row, a
+ *      fact, a score bar and a figure with its caption each stay whole.
+ *
+ * `print-color-adjust: exact` on the drawings only: a coastline whose land
+ * and sea both come out white is not a map, and it is the one place on the
+ * page where the colour IS the information.
+ */
+@page { margin: 16mm; }
+
+@media print {
+  :root { --mast: 0rem; }
+  .masthead, .bottomnav, .stickycta, .skip, .footer-nav,
+  form, .askhero, .chips, .zbtn, .mapzoom,
+  [data-save], .sectionnav { display: none !important; }
+  body, body[data-world="intelligence"] {
+    background: #fff; color: #111; }
+  /* NOT `padding: 0`. The first version zeroed it and the page printed
+     flush to both edges of the sheet — the measure went with it and the
+     destination map ran off the right-hand side, arch and all. The sheet's
+     own margin is the gutter, so it is declared once on @page and the shell
+     keeps a small one of its own. */
+  main { padding: 0 4mm; }
+  .footer { border-top: 1px solid #ccc; background: none; padding-top: 1em; }
+  a { color: inherit; text-decoration: none; }
+  .row, .fact, .scorerow, figure, .note, .card, li { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .minimap, .plate, .constel, .yearband, .europemap {
+    print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}

@@ -1405,6 +1405,47 @@ async function main() {
     }
   }
 
+  // ── WHAT A DESTINATION PAGE PRINTS ─────────────────────────────────
+  // A destination page is the one thing on this site people print, and there
+  // was no print rule anywhere in 4,700 lines of stylesheet: a cobalt
+  // masthead across every sheet, the dark world's near-black ground through
+  // the printer on any embedded map, and a thumb bar, a sticky action and
+  // twenty footer links on paper where none of them can be pressed.
+  //
+  // Asserted in the print MEDIA rather than by reading the rules, because a
+  // declaration is not what the browser resolved.
+  {
+    const pr = await browser.newPage({ viewport: { width: 1000, height: 1200 } });
+    await pr.goto(base + "/europe/norway/fjord-norway/bergen", { waitUntil: "networkidle" });
+    await pr.emulateMedia({ media: "print" });
+    const r = await pr.evaluate(() => {
+      const disp = (s) => { const e = document.querySelector(s);
+                            return e ? getComputedStyle(e).display : "absent"; };
+      const b = getComputedStyle(document.body);
+      const m = document.querySelector(".minimap svg, .minimap");
+      return { mast: disp(".masthead"), nav: disp(".bottomnav"),
+               cta: disp(".stickycta"), fnav: disp(".footer-nav"),
+               legal: disp(".footer-legal"), map: disp(".minimap"),
+               bg: b.backgroundColor, ink: b.color,
+               right: m ? m.getBoundingClientRect().right : 0,
+               w: document.documentElement.clientWidth };
+    });
+    for (const [k, what] of [["mast", "the masthead"], ["nav", "the thumb bar"],
+                             ["cta", "the sticky action"], ["fnav", "the footer links"]])
+      ok(r[k] === "none" || r[k] === "absent", `${what} is printed (${r[k]})`);
+    // The legal line is the only thing on paper that says who published this.
+    ok(r.legal !== "none", "the footer's legal line is not printed");
+    ok(r.map !== "none", "the map is not printed — it is why the page is printed");
+    ok(/255, 255, 255/.test(r.bg),
+       `the printed ground is ${r.bg}, not paper — the dark world is a screen idea`);
+    // AND THE MEASURE. The first print rule set `main { padding: 0 }`, so the
+    // page printed flush to both edges and the destination map ran off the
+    // right-hand side, arch and all.
+    ok(r.right <= r.w - 1,
+       `the printed map reaches ${Math.round(r.right)} of ${r.w} — it runs off the sheet`);
+    await pr.close();
+  }
+
   // ── the map, as a list ─────────────────────────────────────────────
   // A point map is a picture; role="img" says what it is of and nothing more.
   await phone.goto(base + "/map", { waitUntil: "networkidle" });
