@@ -82,7 +82,11 @@ jobs:
           python3 scripts/images/verify_provider.py --provider "${{ inputs.provider }}"
           git config user.name "europedoor-photographs"
           git config user.email "noreply@europedoor.com"
-          BRANCH="terms/${{ inputs.provider }}-$(date +%Y-%m-%d)"
+          # The run number is in the branch name because a second run on the
+          # same day used to fail on `git checkout -b` with the branch already
+          # there — and a run that fetched pages and then threw them away for
+          # a naming collision is the worst of both.
+          BRANCH="terms/${{ inputs.provider }}-$(date +%Y-%m-%d)-${{ github.run_number }}"
           git checkout -b "$BRANCH"
           git add docs/data-licenses
           git commit -m "Archive ${{ inputs.provider }} terms as served today" \

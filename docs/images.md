@@ -69,6 +69,42 @@ they ask `picture()` for one and get the best thing available. That is what
 makes the library adoptable **one photograph at a time** rather than as a
 migration.
 
+## Opening the licence gate when the provider refuses the machine
+
+`scripts/images/verify_provider.py` fetches each provider's terms, archives it
+with the date and the SHA-256 of the bytes as served, and prints the passages
+worth reading. It answers nothing: `checks.py` requires a verbatim quote per
+fact and asserts that quote appears in the archived page it cites.
+
+**Both providers refuse an automated request, and that is where this stopped.**
+On a GitHub runner Pexels answers 403 and Unsplash answers 401, to a client
+that names itself honestly as `EuropeDoor licence check`. The sandbox this
+repository is developed in is refused as well, by its own egress proxy, which
+is why the gate was built as a gate in the first place.
+
+**The fix is not a browser user-agent.** Sending a Chrome string would get the
+page and would misrepresent who made the request, on the one errand here whose
+whole purpose is not misrepresenting anything — the gate exists so a claim
+about somebody else's terms is backed by the page as served to *us*. A page
+obtained by pretending to be a browser is evidence about a request we did not
+make. `Accept` and `Accept-Language` are sent because they state truthfully
+what this client can read; nothing else is.
+
+So the remaining route is a person:
+
+1. Open each URL in `terms_urls` for that provider in a normal browser.
+2. Save the page as text into `docs/data-licenses/provider-terms/`, named
+   `<provider>.<slugified-url>.<YYYY-MM-DD>.txt`, with the URL, the date and
+   the SHA-256 on the first three lines, exactly as the script writes them.
+3. Fill in `value`, `quote` and `source` for each of `self_host`,
+   `attribution` and `download_ping` in
+   `docs/data-licenses/photo-providers.json`.
+4. `python3 tools/checks.py`. Every quote is matched against the page it
+   cites, so a sentence typed from memory fails the build.
+
+A hand-saved page works exactly like a fetched one, because the check reads
+the archive rather than the fetcher.
+
 ## Until then: the plates
 
 Every surface without a photograph gets a generated plate — a small landscape

@@ -60,9 +60,27 @@ def text_of(html):
 
 
 def fetch(url):
-    req = urllib.request.Request(
-        url, headers={"User-Agent": "EuropeDoor licence check "
-                                    "(+https://europedoor.com)"})
+    """Ask for the page, saying honestly who is asking and what we can read.
+
+    THE USER-AGENT NAMES US AND KEEPS NAMING US. Both providers refused a
+    GitHub runner outright — Pexels 403, Unsplash 401 — and the temptation at
+    that point is to send a Chrome user-agent string and get the page. That is
+    misrepresenting who is making the request, on the one errand in this
+    repository whose entire purpose is not misrepresenting anything. The
+    licence gate exists so that a claim about somebody's terms is backed by
+    the page as served to US; a page obtained by pretending to be a browser
+    is evidence about a request we did not make.
+
+    `Accept` and `Accept-Language` are not that. They state what this client
+    can read, truthfully, and plenty of servers refuse a request that omits
+    them. If the page is still refused, the refusal stands and a person reads
+    it from a browser instead — see docs/images.md.
+    """
+    req = urllib.request.Request(url, headers={
+        "User-Agent": "EuropeDoor licence check (+https://europedoor.com)",
+        "Accept": "text/html,application/xhtml+xml",
+        "Accept-Language": "en",
+    })
     with urllib.request.urlopen(req, timeout=45) as r:
         return r.read()
 
@@ -80,14 +98,22 @@ def main(argv):
     today = datetime.date.today().isoformat()
     os.makedirs(ARCHIVE, exist_ok=True)
 
+    # ONE REFUSAL USED TO KILL THE WHOLE RUN. sys.exit on the first failure
+    # meant that unsplash.com answering 401 threw away help.unsplash.com and
+    # unsplash.com/documentation as well, unread — and the API guidelines are
+    # where the attribution and download-ping requirements actually live. The
+    # three facts the gate asks for do not all come from one page, and each
+    # quote is checked against the page IT cites, so a partial archive is
+    # partial evidence rather than no evidence.
     snapshots = {}
+    refused = []
     for url in row["terms_urls"]:
         try:
             raw = fetch(url)
         except Exception as exc:                       # noqa: BLE001
-            sys.exit(f"could not read {url}: {exc}\n"
-                     f"This machine may not be allowed out. Run it somewhere "
-                     f"that is; do NOT answer the gate without the page.")
+            refused.append((url, str(exc)))
+            print(f"\n{'=' * 70}\n{url}\n  REFUSED: {exc}")
+            continue
         stem = re.sub(r"[^a-z0-9]+", "-", url.lower()).strip("-")[:80]
         name = f"{args.provider}.{stem}.{today}.txt"
         body = text_of(raw.decode("utf-8", "replace"))
@@ -105,6 +131,21 @@ def main(argv):
                   "know.")
         for s in hits[:40]:
             print("  · " + s[:300])
+
+    if refused:
+        print(f"\n{'=' * 70}")
+        print(f"{len(refused)} of {len(row['terms_urls'])} pages were refused "
+              f"to this machine:")
+        for url, exc in refused:
+            print(f"  · {url}  ({exc})")
+        print("A refusal is not an answer. Open those in a browser, save the "
+              "page, and put it beside the others in "
+              "docs/data-licenses/provider-terms/ — the gate checks each quote "
+              "against the page it cites, so a hand-saved page works exactly "
+              "like a fetched one. Do NOT answer the gate without the page, "
+              "and do NOT fetch it by claiming to be a browser.")
+    if not snapshots:
+        return 1
 
     row["terms_snapshot"] = snapshots
     with open(GATE, "w", encoding="utf-8") as fh:
