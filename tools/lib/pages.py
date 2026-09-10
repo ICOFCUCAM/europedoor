@@ -1187,12 +1187,33 @@ def home(data):
 # ── atlas ─────────────────────────────────────────────────────────────
 
 def countries_index(data):
+    """Nine macro regions, each shown as the countries it is made of.
+
+    IT WAS THE PAGE ABOUT EUROPE WITH NO EUROPE ON IT. Nine headings and fifty
+    rows of name, tagline and a count — the atlas index as a contents list,
+    which is the shape of the data standing in for a design. Measured across
+    the built page, the median horizontal band used 44% of the column and 64%
+    of bands used under 60%; the argument is not that the space was empty, it
+    is that a reader choosing a region of Europe was never shown one.
+
+    Each band now opens on its own members drawn on the shared silhouette, so
+    the Nordics and the Caucasus are told apart before a word is read — the
+    same move that rebuilt /themes and the homepage tiles, on the family that
+    needed it most and had waited longest.
+
+    THE COUNTS MOVED OFF THE ROWS AND INTO THE BAND. "6 regions · 25 cities"
+    on each of fifty rows is fifty measurements a reader cannot hold; what
+    separates the nine bands is how much of this atlas each one is, and that
+    is one number per band, derived here rather than typed.
+    """
     blocks = []
     for m in data["macros"]:
         rows = []
+        mcity = 0
         for cs in m["countries"]:
             c = data["countries"][cs]
             ncity = sum(len(r["cities"]) for r in c["regions"])
+            mcity += ncity
             adv = ' <span class="tag advisory">advisory</span>' if c.get("advisory") else ""
             rows.append(
                 f"""<a class="row" href="{urls.country(c)}">
@@ -1200,14 +1221,18 @@ def countries_index(data):
                 <p class="rowmeta">{len(c['regions'])} regions · {ncity} cities</p></a>"""
             )
         blocks.append(
-            f"""<section class="band" id="{esc(m['slug'])}">
-            <div class="band-head"><p class="kicker">{len(m['countries'])} countries</p>
+            f"""<section class="band macroband" id="{esc(m['slug'])}">
+            <div class="bandtop">
+            <div class="band-head"><p class="kicker">{len(m['countries'])} countries · {mcity} destinations</p>
             <h2><a href="{urls.macro(m)}" class="nodec">{esc(m['name'])}</a></h2>
             <p class="lede">{esc(m['blurb'])}</p></div>
+            <figure class="bandart">{region_glyph(m['countries'])}</figure>
+            </div>
             <div class="rows">{''.join(rows)}</div></section>"""
         )
     body = f"""
 {crumbs([("Europe", "/discover"), ("Atlas", None)])}
+{constel_defs()}
 <div class="pagehead index">
   <p class="kicker">Every country in Europe</p>
   <h1>Europe, all the way down.</h1>
@@ -1216,6 +1241,11 @@ def countries_index(data):
   not administrative ones: they group places that feel like each other and are usually visited together.</p>
 </div>
 {''.join(blocks)}
+<p class="small">The shape beside each region is the countries that region is made
+of, drawn to the same frame so the nine can be compared. A macro region is the one
+grouping in this atlas with real borders behind it — a travel region is a set of
+destinations and is shown as those destinations rather than given a boundary it
+does not have. {geo.sources_line(geo.load("europe-lod0.json"))}</p>
 """
     return "/countries/index.html", page(
         "Countries", body, path="/countries", area="countries",
@@ -5333,10 +5363,43 @@ def experiences_index(data):
         return ('<p class="taste">' + "".join(
             f"<span>{esc(x)}</span>" for x in names) + "</p>") if names else ""
 
+    # EIGHTEEN IDENTICAL BORDERED BOXES, TWICE. Border, fill, radius and
+    # shadow each say "separate object", and spending all four on every tile
+    # of an eighteen-tile page spends them on nothing: the grid read as one
+    # texture, and what actually separates these rows — that Family holds 131
+    # entries and Luxury holds 5 — was four characters of kicker type.
+    #
+    # The count is the subject, so the count is drawn. A bar is scaled to the
+    # LARGEST IN ITS OWN GROUP rather than to the total, and that is a
+    # measured decision rather than a convenience: an experience carries ONE
+    # kind and ANY NUMBER of categories, so the ten kinds sum to 197 and the
+    # eight categories sum to 493 memberships over the same 197 experiences.
+    # A bar labelled as a share of the whole would read 250% down the
+    # category column. Both figures are derived here and the note under them
+    # says which is which.
+    def barrow(href, n, biggest, name, blurb, sel):
+        pct = 0 if not biggest else round(100.0 * n / biggest, 1)
+        return (f'<a class="row barrow" href="{href}">'
+                f'<div><h3>{esc(name)}</h3>'
+                + (f'<p class="rowsub">{esc(blurb)}</p>' if blurb else "")
+                + taste(sel)
+                + f'</div><div class="barside">'
+                f'<p class="rowmeta">{n} listed</p>'
+                # THE BAR IS `hopbar` AND THE WIDTHS ARE THE .w0-.w100 SCALE,
+                # because both already exist: a journey's legs and the score
+                # bars draw proportions exactly this way, and this is the
+                # third of them rather than the first. No new primitive until
+                # repeated structure has actually emerged — it has.
+                + f'<span class="hopbar" aria-hidden="true">'
+                  f'<span class="w{int(round(pct))}"></span></span>'
+                + '</div></a>')
+
+    catn = {cat["slug"]: len(C.select(items, cat)) for cat in data["categories"]}
+    catbig = max(catn.values()) if catn else 0
     catcards = [
-        card(urls.category(cat["slug"]), f"{len(C.select(items, cat))} listed", cat["name"],
-             cat["blurb"], meta=taste(C.select(items, cat)))
-        for cat in data["categories"]
+        barrow(urls.category(cat["slug"]), catn[cat["slug"]], catbig,
+               cat["name"], cat["blurb"], C.select(items, cat))
+        for cat in sorted(data["categories"], key=lambda c: -catn[c["slug"]])
     ]
     # NO BLURB, BECAUSE IT WAS THE SAME SENTENCE TEN TIMES. Every kind tile
     # carried "Grouped by what you actually do rather than by what it is
@@ -5344,10 +5407,11 @@ def experiences_index(data):
     # boilerplate this atlas's own rule forbids, hoisted into the section
     # lede where one copy of it belongs. `blurb=None` is the pattern the
     # homepage's eight ways-in tiles already use.
+    kindbig = max(counts.values()) if counts else 0
     cards = [
-        card(urls.experience_kind(k), f"{counts.get(k, 0)} listed", name, None,
-             meta=taste([it for it in items if it["exp"]["kind"] == k]))
-        for k, name in kinds.items()
+        barrow(urls.experience_kind(k), counts.get(k, 0), kindbig, name, None,
+               [it for it in items if it["exp"]["kind"] == k])
+        for k, name in sorted(kinds.items(), key=lambda kv: -counts.get(kv[0], 0))
     ]
     rows = "".join(
         f"""<a class="row" href="{urls.city(it['country'], it['region'], it['city'])}">
@@ -5367,10 +5431,18 @@ def experiences_index(data):
   <div class="hero-actions"><a class="btn" href="/experiences/join">List your experience</a>
   <a class="btn ghost" href="/for-businesses">For businesses</a></div>
 </div>
-{section("Eight categories", grid(catcards, 4),
-         lede="What an experience is about. Each tile carries three of its own entries, spread across the list, and each category page prints the rule that built it.")}
-{section("Ten kinds", grid(cards, 4),
-         lede="The other axis: what you physically do. A cellar visit and a cathedral are both sacred to somebody; only one of them is a walk.")}
+{section(f"{numword(len(data['categories'])).capitalize()} categories", '<div class="rows">' + "".join(catcards) + "</div>",
+         lede=f"What an experience is about, largest first. An experience may be in "
+              f"several of these at once — {len(data['categories'])} categories hold "
+              f"{sum(catn.values())} memberships across {len(items)} experiences — so each "
+              f"bar is drawn against the largest category rather than against the total. "
+              f"Each row carries three of its own entries, and each category page prints the "
+              f"rule that built it.")}
+{section(f"{numword(len(kinds)).capitalize()} kinds", '<div class="rows">' + "".join(cards) + "</div>",
+         lede=f"The other axis: what you physically do. A cellar visit and a cathedral are "
+              f"both sacred to somebody; only one of them is a walk. These do not overlap — "
+              f"every experience has exactly one kind, and the {len(kinds)} of them account "
+              f"for all {sum(counts.values())}.")}
 <!-- "Recently added" WAS A CLAIM THE DATA CANNOT SUPPORT. An experience
      carries a slug, a name, a kind, a band and a summary, and no date of
      any sort, so these 24 were simply the first 24 the loader returned in
@@ -5615,12 +5687,77 @@ def constel_defs():
     clone — the same escape the hero needed, and the trap this repository has
     now hit twice.
     """
-    ctx, ours = geo.landmass(
+    _ctx, ours = geo.landmass(
         MAPPROJ, (0.0, 0.0, float(MAP_W), float(MAP_H)),
         doc=geo.load("europe-lod0.json"), thin_units=5.0, min_units=60.0)
+    # THE CONTEXT IS DROPPED, BECAUSE A DATA CUT IS NOT A COASTLINE.
+    # data/geo/ stops at 52°E and 33°N, so Russia, Kazakhstan, the Levant and
+    # North Africa arrive here as rings sliced by the box — a straight
+    # diagonal down the right-hand side and a straight edge along the bottom.
+    # The hero has the same cut and answers it with a fade over 320 units;
+    # a 132-pixel glyph has nowhere to put a fade, and at 280 on the atlas
+    # index the trapezoid reads as a rendering fault rather than as land.
+    #
+    # The atlas countries need no such trick: they end at real coastlines and
+    # real frontiers, which is what makes the silhouette recognisable as
+    # Europe in the first place. Thirteen theme glyphs and eleven homepage
+    # tiles all got quieter and lighter for it.
     return ('<svg class="constel-defs" width="0" height="0" aria-hidden="true" '
             'focusable="false"><defs><g id="constel-eu">'
-            + ctx + ours + "</g></defs></svg>")
+            + ours + "</g></defs></svg>")
+
+
+NUMWORDS = ("no", "one", "two", "three", "four", "five", "six", "seven",
+            "eight", "nine", "ten", "eleven", "twelve", "thirteen")
+
+
+def numword(k):
+    """A small number spelled out, because a heading is prose.
+
+    "8 categories" as an <h2> is a figure standing where a word belongs, and
+    "Eight categories" typed into the template is the figure that was true two
+    hundred experiences ago — the failure this repository has already shipped
+    once on /themes and once in the search index's empty state. Derived and
+    spelled: one place, so the two families cannot disagree about how to say
+    nine.
+    """
+    return NUMWORDS[k] if 0 <= k < len(NUMWORDS) else str(k)
+
+
+def region_glyph(members):
+    """A macro region as the countries it is made of, on the shared silhouette.
+
+    THE ATLAS INDEX IS THE PAGE ABOUT COUNTRIES AND IT DREW NONE. /countries
+    was nine headings and fifty rows of name, tagline and "6 regions · 25
+    cities" — the whole of Europe as a contents list. Measured, the median
+    horizontal band of it used 44% of the column and the rest was blank, and
+    what was missing from that space is not more type: it is WHERE THE NORDICS
+    ARE, which is the one question a reader picking a region of Europe is
+    actually asking.
+
+    A macro region is the single grouping in this atlas with real polygons
+    behind it — a travel region is a set of destinations and is refused a
+    boundary, and the Nordics is five whole countries Natural Earth already
+    holds. So this is drawn rather than invented, and it is the same claim
+    `macromap()` makes on the region's own page at full size.
+
+    NOT THE DOT CONSTELLATION, DELIBERATELY. The homepage tiles and /themes
+    light destinations on this silhouette, and using the same drawing a third
+    time would make it the wallpaper its own rule warns about. This family's
+    subject is countries, so countries are what is lit.
+
+    One coastline for all nine, because the members go ON the shared clone
+    rather than carrying their own copy of Europe.
+    """
+    doc = geo.load("europe-lod0.json")
+    if not doc:
+        return ""
+    _ctx, lit = geo.landmass(
+        MAPPROJ, (0.0, 0.0, float(MAP_W), float(MAP_H)), doc=doc,
+        only=members, highlight=members, thin_units=5.0, min_units=60.0)
+    return (f'<svg class="constel regionglyph" viewBox="0 0 {MAP_W} {MAP_H}" '
+            f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
+            f'{lit}</svg>')
 
 
 def constellation(pts, extra="", route=False):
@@ -5715,11 +5852,7 @@ def themes_index(data):
     # was true two hundred destinations ago, which this repository has
     # already shipped once.
     sizes = sorted({len(t["stops"]) for t in data["themes"]})
-    words = ("no", "one", "two", "three", "four", "five", "six", "seven",
-             "eight", "nine", "ten", "eleven", "twelve")
-
-    def say(k):
-        return words[k] if k < len(words) else str(k)
+    say = numword
 
     held = (f"every one of these holds {say(sizes[0])}" if len(sizes) == 1
             else f"they hold between {say(sizes[0])} and {say(sizes[-1])}")
@@ -5878,13 +6011,45 @@ def stories_index(data):
     sections = sorted({s["section"] for s in data["stories"]})
     byline = sorted(data["stories"],
                     key=lambda s: (s["published"], s["title"]), reverse=True)
+    # AND THE CONTENTS PAGE LEFT ITS MIDDLE THIRD EMPTY. Rewriting nine
+    # one-card grids as one list was right and only half the job: what
+    # replaced the nine hash-drawn landscapes was nothing at all, so the row
+    # ran a title and a standfirst down the left and a date 550 pixels away on
+    # the right. Measured on the built page, the median horizontal band used
+    # 46% of the column.
+    #
+    # A STORY'S PICTURE IS ITS OWN PLACES, WHICH IS THE RULE THAT REMOVED THE
+    # PLATES RATHER THAN AN EXCEPTION TO IT. The story page already opens on
+    # exactly that, drawn from the validated `places` field; this is the same
+    # derivation at glyph size. It cannot be wrong about its subject because
+    # it is made of it — and it is the one thing that tells these nine apart
+    # before a word is read. "The languages with no relatives" is San
+    # Sebastián, Budapest, Helsinki and Tbilisi, corner to corner; "the city
+    # rebuilt from paintings" is Warsaw, Dresden and Rotterdam, a knot. That
+    # difference IS the piece.
+    #
+    # Not the hash, and not a photograph either: the register holds none, and
+    # a story is the family where an illustration of nowhere did real damage
+    # — the essay about the last unlogged forest in Europe opened on tower
+    # blocks for a year.
+    idx = data["cities"]
+    def glyph(s):
+        pts = []
+        for cid in s.get("places") or ():
+            n = idx.get(cid)
+            if n:
+                pts.append(project(n["city"]["lat"], n["city"]["lon"]))
+        # A story that names no place gets no drawing, on the destination
+        # page's rule: nothing in its place rather than something invented.
+        return constellation(pts, extra=" constel-theme") if pts else ""
     desks = '<div class="rows">' + "".join(
-        f'<a class="row" href="{urls.story(s)}">'
+        f'<a class="row storyrow" href="{urls.story(s)}">'
         f'<div><p class="kicker">{esc(s["section"])}</p>'
         f'<h3>{esc(s["title"])}</h3>'
         f'<p class="rowsub">{esc(s["standfirst"])}</p></div>'
+        f'<div class="themeside">{glyph(s)}'
         f'<p class="rowmeta">{esc(s["published"])}<br>'
-        f'<span class="small">{esc(s["reading"])}</span></p></a>'
+        f'<span class="small">{esc(s["reading"])}</span></p></div></a>'
         for s in byline
     ) + "</div>"
     body = f"""
@@ -5896,7 +6061,14 @@ def stories_index(data):
   food, faith, nature and culture. Every story links into the Atlas, and every Atlas page that
   a story touches links back, so reading and planning are the same motion.</p>
 </div>
+{constel_defs()}
 {desks}
+<p class="small">The shape beside each piece is the places that piece is about,
+drawn to the same frame so the nine can be compared — the same field the story
+opens on at full size, and the same reason there is no other picture here: a
+story is not a place, and a landscape chosen for it by chance once put tower
+blocks above an essay on the last unlogged forest in Europe.
+{geo.sources_line(geo.load("europe-lod0.json"))}</p>
 """
     return "/stories/index.html", page(
         "Stories", body, path="/stories", area="stories",

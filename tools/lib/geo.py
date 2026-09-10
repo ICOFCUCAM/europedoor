@@ -662,7 +662,7 @@ def distance_bands(doc, slug, proj, near=0.6, mid=1.3):
 
 
 def landmass(proj, view, doc=None, highlight=None, pad=40.0, bands=None,
-             thin_units=0.0, min_units=0.0, link=None):
+             thin_units=0.0, min_units=0.0, link=None, only=None):
     """Land under a small map, clipped to the window it is drawn in.
 
     `view` is (x, y, w, h) in the projection's own pixel space — the same
@@ -677,10 +677,19 @@ def landmass(proj, view, doc=None, highlight=None, pad=40.0, bands=None,
     doc = doc if doc is not None else load("europe-lod1.json")
     if not doc:
         return "", ""
+    # `only` DRAWS A SUBSET AND NOTHING ELSE, so a caller that already has the
+    # continent on the page can put a handful of countries ON it rather than
+    # repeat it. The atlas index needs that: nine macro regions, each shown as
+    # the countries it is made of, over ONE shared silhouette. Drawing the
+    # whole continent nine times would be the right picture at nine times the
+    # bytes, and page weight is an invariant here for a reason.
+    only = None if only is None else set(only)
     x, y, w, h = view
     box = (x - pad, y - pad, x + w + pad, y + h + pad)
     ctx, ours = [], []
     for ident, ent in sorted(doc["countries"].items()):
+        if only is not None and ent.get("slug") not in only:
+            continue
         parts = []
         for ring in ent["rings"]:
             pts = []

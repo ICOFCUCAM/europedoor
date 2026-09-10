@@ -3602,11 +3602,73 @@ body[data-hero] .masthead { position: sticky; }
    scan said so within one run — which is the argument for that scan: two
    commits to the same family, months apart in reading order, and neither
    knew about the other. */
-.themerow { align-items: center; }
+.themerow, .storyrow { align-items: center; }
+/* .storyrow is here rather than in a rule of its own because it is the SAME
+   fault: a row is baseline-aligned, which is right for two columns of type
+   and strands a drawing at the top of its cell with the text starting below
+   it. Third family to hit it; one declaration, not three. */
 @media (max-width: 44rem) {
   /* At 390 the glyph is a third of the row's width for eight dots that read
-     as a smudge — the same measurement that takes map labels off a phone. */
-  .constel { display: none; }
+     as a smudge — the same measurement that takes map labels off a phone.
+
+     NOT THE REGION GLYPH, AND THE DIFFERENCE IS SIZE RATHER THAN KIND. A
+     theme's constellation is 132px inside a row and stays 132px on a phone;
+     the atlas index gives its drawing the whole width, so at 390 the Nordics
+     are a shape a reader can name. Inheriting this rule took the one thing
+     that makes that page an atlas off every phone, which is the same
+     measurement being applied to a different number. */
+  .constel:not(.regionglyph) { display: none; }
+}
+
+/* ── two axes over one set, drawn as what separates them ──────────────
+   /experiences was eighteen identical bordered boxes in two grids of four.
+   Border, fill, radius and shadow each say "separate object", and spending
+   all four on every tile of an eighteen-tile page spends them on nothing —
+   the grid read as one texture, and the thing that actually tells these rows
+   apart, that Family holds 131 entries and Luxury holds 5, was four
+   characters of kicker type.
+
+   The count is the subject, so the count is drawn, with the bar and the
+   figure on the same line at the end of the row. No box: a rule between rows
+   is what separates them, exactly as on /themes and /journeys. */
+.barrow .barside { display: flex; flex-direction: column; align-items: flex-end;
+                   gap: 0; flex: none; width: 168px; }
+.barrow .barside .hopbar { width: 100%; margin: var(--s1) 0 0; }
+.barrow { align-items: center; }
+
+/* ── the atlas index shows where each region IS ───────────────────────
+   /countries was the page about Europe with no Europe on it: nine headings
+   and fifty rows of name, tagline and a count. Measured on the built page the
+   median horizontal band used 44% of the column — and the point is not the
+   empty space, it is that a reader picking a region of Europe was never shown
+   one.
+
+   COUNTRIES ARE LIT HERE, NOT DESTINATIONS. The homepage tiles and /themes
+   already light dots on this silhouette; a third family drawing the same
+   picture is the signature becoming wallpaper. This family's subject is
+   countries and a macro region is the one grouping with real polygons behind
+   it, so whole countries are what is filled.
+
+   The head and the drawing sit side by side because the drawing is the
+   band's subject rather than an illustration after it — the same reason the
+   Stay layer puts its action and its boundary on one line. */
+.bandtop { display: flex; align-items: center; gap: var(--s6);
+           margin-bottom: var(--s5); }
+.bandtop .band-head { flex: 1 1 auto; min-width: 0; margin-bottom: 0; }
+.bandart { flex: 0 0 auto; width: 400px; margin: 0; }
+.bandart .constel { width: 100%; }
+/* The members are real DOM rather than cloned content, so a selector reaches
+   them — it is the SHARED continent underneath that lives in a shadow tree
+   and is painted by inheritance. Both halves of the <use> trap in four
+   lines. */
+.regionglyph .countries path { fill: var(--door); }
+.macroband:hover .regionglyph .countries path { fill: var(--signature); }
+@media (max-width: 60rem) {
+  /* Below the two-column measure the drawing goes under the head at its own
+     proportion rather than being squeezed beside it — the same rule the hero
+     takes at 52rem, for the same reason. */
+  .bandtop { display: block; }
+  .bandart { width: min(100%, 380px); margin-top: var(--s4); }
 }
 
 /* ── the homepage tiles draw their own destinations ───────────────────
