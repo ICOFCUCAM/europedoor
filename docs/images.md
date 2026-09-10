@@ -127,30 +127,59 @@ table of providers, so a second provider needs no second renderer. It prints
 no download ping because the guidelines enumerate the obligations and none is
 an event, which is recorded as the `basis` for that negative.
 
-**Unsplash is REFUSED, and the suspicion on record turned out to be right.**
-Its API guidelines require hotlinking:
+**Unsplash: the LICENCE permits use and the API ROUTE is refused.** The first
+version of this said Unsplash was unusable, full stop. That was wrong, and it
+was corrected by being told so. The licence grants the thing outright:
+
+> Unsplash grants you an irrevocable, nonexclusive, worldwide copyright license
+> to download, copy, modify, distribute, perform, and use images from Unsplash
+> for free, including for commercial purposes, without permission from or
+> attributing the photographer or Unsplash.
+
+It attaches no hotlinking condition and no attribution condition. Its two
+exclusions are selling unaltered images and *compiling images from Unsplash to
+replicate a similar or competing service* — this is a European travel atlas
+illustrating the places it writes about, and is neither.
+
+What requires hotlinking is the **API**:
 
 > All API uses must use the hotlinked image URLs returned by the API under the
-> `photo.urls` properties. This applies to all uses of the image and not just
-> search results.
+> `photo.urls` properties.
 
-This site sends `img-src 'self' data:` and a check refuses any third-party
-origin on any page. Honouring that means opening the Content-Security-Policy
-on all 1,033 pages to a host we do not control — **a decision about the
-security posture of the whole site, and the owner's, not a build step.** The
-row is answered, `usable` is false, the reason is recorded, and `fetch.py`
-refuses the provider by name with that reason.
+`scripts/images/fetch.py` is an API client, so that route is refused: taking it
+would mean embedding Unsplash's CDN URLs, and this site sends
+`img-src 'self' data:` with a check enforcing it, so it would open the
+Content-Security-Policy on all 1,033 pages to a host we do not control. That is
+an owner decision about the whole site's security posture. The API route also
+carries the download event on `photo.links.download_location` and attribution
+naming both photographer and Unsplash; both are recorded against their quotes
+so that if the policy question is ever answered, what the code owes is already
+written down.
 
-Unsplash also requires a download event on
-`photo.links.download_location`, and attribution naming both the photographer
-and Unsplash with a link to the photographer's profile carrying utm
-parameters. All three are recorded against their quotes, so if the CSP
-question is ever answered, what the code owes is already written down.
+**So an Unsplash photograph enters by hand, not by pipeline.** Download it from
+the website under the licence, run it through the width ladder, and add a
+register row. No API call is made, no `download_location` exists to call, and
+the credit this site prints anyway — no image enters without a photographer, a
+source and a licence — comes out as
+`Photo by <name> on Unsplash`, with the name linked to the photo page. That is
+character for character the example the licence page itself gives.
 
-**Answered is not the same as permitted**, and the gate had no way to say so:
-its first version failed the build on any `self_host` that was not true, which
-turns "we read the terms and they forbid this" into a red CI run forever.
-`usable` is the distinction.
+**Two Unsplash documents are recorded as unread**, in the gate's `unread` field:
+`unsplash.com/terms` and `unsplash.com/api-terms`. Nothing here relies on
+either — the licence is the document that grants image rights, and the API
+terms govern a route that is refused — but an unread governing document is a
+gap, and a gap that is written down is one somebody can close.
+
+**THE REFUSED THING IS A ROUTE, NOT A PROVIDER**, and collapsing the two is the
+mistake this section records. It cost a correct provider a wrong refusal, and
+the second version of the gate answers per route: `self_host` is a reading of
+the LICENCE, `api_route` is a reading of the API guidelines, and `fetch.py`
+enforces the second because it is the thing that takes that route.
+
+**Answered is not the same as permitted**, and the gate had no way to say that
+either: its first version failed the build on any `self_host` that was not
+true, which turns "we read the terms and they forbid this" into a red CI run
+forever. `usable` is that distinction.
 
 ## Until then: the plates
 

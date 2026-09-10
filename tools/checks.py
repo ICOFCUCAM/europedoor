@@ -736,7 +736,15 @@ def c_csp():
     credit_hosts = set()
     if os.path.exists(gatef):
         for slug, prow in json.load(open(gatef, encoding="utf-8")).items():
-            if slug.startswith("$") or prow.get("usable") is not True:
+            if slug.startswith("$"):
+                continue
+            # KEYED ON self_host, NOT ON THE API ROUTE. A provider whose API
+            # is refused can still be the source of a hand-registered
+            # photograph — that is the Unsplash case — and such a photograph
+            # carries a credit that links back. Keying this on `usable` alone
+            # would have failed the build on the credit for a photograph the
+            # licence plainly permits.
+            if (prow.get("self_host") or {}).get("value") is not True:
                 continue
             for u in prow.get("terms_urls", []):
                 credit_hosts.add(u.split("/")[2])
@@ -1078,6 +1086,15 @@ def c_photo_gate():
             fail(f"{slug}: answered and does not say whether it is `usable`. "
                  f"A cleared gate is a reading of the terms, not permission "
                  f"to fetch — say which")
+        # A REFUSED ROUTE IS ALSO A REFUSAL AND ALSO NEEDS TEETH.
+        api = row.get("api_route") or {}
+        if api:
+            n += 1
+            if api.get("usable") is not True and not (api.get("because") or "").strip():
+                fail(f"{slug}: the API route is refused with no `because`")
+            if api.get("usable") is not True and "api_route" not in src:
+                fail(f"{slug}: the API route is refused and fetch.py does not "
+                     f"read `api_route` — the refusal would be a comment")
         elif usable is False:
             if not (row.get("unusable_because") or "").strip():
                 fail(f"{slug}: marked unusable with no `unusable_because`. A "

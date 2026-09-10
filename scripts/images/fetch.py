@@ -115,14 +115,27 @@ def cleared(slug):
         return False, (f"{slug}: {', '.join(unanswered)} unanswered in the "
                        f"licence gate. Read the provider's terms and answer "
                        f"them; do not answer them from memory")
-    # ANSWERED IS NOT THE SAME AS PERMITTED. Reading a provider's terms and
-    # finding they forbid what this site does is the gate working; `usable`
-    # records which of the two happened, and REFUSING here is what stops the
-    # refusal being a comment in a JSON file.
+    # ANSWERED IS NOT THE SAME AS PERMITTED, AND THE THING REFUSED IS A ROUTE
+    # RATHER THAN A PROVIDER. The first version of this conflated them and
+    # refused Unsplash outright, which was wrong and was corrected by being
+    # told so: the Unsplash LICENCE grants downloading, copying and
+    # distribution outright, with two exclusions — selling unaltered images,
+    # and compiling Unsplash images to replicate a competing service — and
+    # this atlas does neither. What requires hotlinking is the API, and this
+    # script IS an API client, so this is the refusal that belongs here. A
+    # photograph obtained from the website under the licence and registered by
+    # hand goes through no code path this function guards.
     if row.get("usable") is not True:
         return False, (f"{slug}: the licence gate is answered and this "
                        f"provider is REFUSED. "
                        + (row.get("unusable_because") or "no reason recorded"))
+    api = row.get("api_route") or {}
+    if api and api.get("usable") is not True:
+        return False, (f"{slug}: the LICENCE permits use, and the API ROUTE is "
+                       f"refused, which is the route this script takes. "
+                       + (api.get("because") or "no reason recorded")
+                       + " A photograph obtained from the website under the "
+                         "licence can still be registered by hand.")
     if value("self_host") is not True:
         return False, (f"{slug}: self_host is not true. This site serves "
                        f"`img-src 'self' data:` and refuses a third-party "

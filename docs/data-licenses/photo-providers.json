@@ -37,7 +37,9 @@
     "terms_urls": [
       "https://unsplash.com/license",
       "https://unsplash.com/documentation",
-      "https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines"
+      "https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines",
+      "https://unsplash.com/terms",
+      "https://unsplash.com/api-terms"
     ],
     "read_on": "2026-09-10",
     "terms_snapshot": {
@@ -47,26 +49,37 @@
     },
     "$warning": "AN ASSISTANT'S RECOLLECTION ABOUT THIS PROVIDER IS NOT A FACT AND MUST NOT BE RECORDED AS ONE. There is a suspicion on record that the API guidelines require using the hotlinked URLs returned under photo.urls, require crediting both the photographer and Unsplash with links, and require triggering a download endpoint on use. Every one of those is a SUSPICION. It exists here only so somebody knows what to look for on the page, and it may not be copied into `value` without the quote that supports it.",
     "self_host": {
-      "value": false,
+      "value": true,
       "question": "Same question, and the one to read closely for this provider. Answer from the live guidelines, never from the warning above.",
-      "quote": "All API uses must use the hotlinked image URLs returned by the API under the `photo.urls`  properties. This applies to all uses of the image and not just search results.",
-      "source": "https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines",
-      "basis": "The licence page says images may be downloaded and used freely, and the API guidelines say API consumers must embed Unsplash's own URLs. Both are true and the narrower one binds anything fetched through the API, which is how this pipeline would fetch."
+      "quote": "Unsplash grants you an irrevocable, nonexclusive, worldwide copyright license to download, copy, modify, distribute, perform, and use images from Unsplash for free, including for commercial purposes, without permission from or attributing the photographer or Unsplash.",
+      "source": "https://unsplash.com/license",
+      "basis": "The licence grants downloading and distribution outright and attaches no hotlinking condition; the hotlinking requirement is an API-guidelines obligation and binds API uses. Its two exclusions are selling unaltered images and compiling Unsplash images to replicate a similar or competing service — this is a European travel atlas illustrating places it writes about, and is neither. So a photograph obtained from the website under the licence, without the API, may be served from this origin."
     },
     "attribution": {
-      "value": "Unsplash and the photographer must both be named, with a link back to the photographer’s Unsplash profile carrying ?utm_source=<app>&utm_medium=referral.",
+      "value": "None required by the licence. EuropeDoor credits anyway: no image enters the register without a photographer, a source and a licence, so the credit exceeds the obligation rather than meeting it.",
       "question": "As above. If both the photographer and the provider must be credited with links, picture() needs a second link before anything ships.",
-      "quote": "When displaying a photo from Unsplash, your application must attribute Unsplash, the Unsplash photographer, and contain a link back to their Unsplash profile.",
-      "source": "https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines"
+      "quote": "No permission needed (though attribution is appreciated!)",
+      "source": "https://unsplash.com/license"
     },
     "download_ping": {
-      "value": true,
+      "value": false,
       "question": "If a download endpoint must be triggered on use, set endpoint_download and fetch.py will call it.",
-      "quote": "When your application performs something similar to a download (like when a user chooses the image to include in a blog post, set as a header, etc.), you must send a request to the download endpoint returned under the `photo.links.download_location`  property.",
-      "source": "https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines"
+      "quote": "Unsplash grants you an irrevocable, nonexclusive, worldwide copyright license to download, copy, modify, distribute, perform, and use images from Unsplash for free, including for commercial purposes, without permission from or attributing the photographer or Unsplash.",
+      "source": "https://unsplash.com/license",
+      "basis": "The download event is an API-guidelines obligation — \"you must send a request to the download endpoint returned under the `photo.links.download_location` property\" — and it binds API uses. The licence imposes no condition on use at all beyond its two exclusions. Under the licence route there is no endpoint to call and no `download_location` to call it with, because no API response is ever received. If the API route is ever opened, this flips to true and endpoint_download is already recorded."
     },
-    "endpoint_download": "photo.links.download_location, e.g. https://api.unsplash.com/photos/:id/download",
-    "usable": false,
-    "unusable_because": "Unsplash requires hotlinking: images must be served from its own CDN rather than from this origin. EuropeDoor sends `img-src 'self' data:` and checks.py refuses any third-party origin on any page, so honouring that means opening the Content-Security-Policy on all 1,033 pages to a host we do not control. That is a decision about the security posture of the whole site and belongs to the owner, not to a build step. Pexels requires no such thing, so the photograph pipeline uses Pexels and this row stays closed with its reading recorded."
+    "endpoint_download": "photo.links.download_location (API route only, currently refused)",
+    "usable": true,
+    "api_route": {
+      "usable": false,
+      "question": "May images be obtained through this provider's API? An API can impose conditions the licence does not, and scripts/images/fetch.py is an API client.",
+      "quote": "All API uses must use the hotlinked image URLs returned by the API under the `photo.urls`  properties. This applies to all uses of the image and not just search results.",
+      "source": "https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines",
+      "because": "Fetching through the Unsplash API obliges us to embed their CDN URLs rather than serve the file from this origin. EuropeDoor sends `img-src 'self' data:` and a check refuses any third-party origin on any page, so that route would mean opening the Content-Security-Policy across all 1,033 pages to a host we do not control — an owner decision about the security posture of the whole site. The API route is refused and fetch.py enforces it. The LICENCE route is not refused: see self_host."
+    },
+    "unread": {
+      "https://unsplash.com/terms": "Not yet read. The licence page links to it. It may impose conditions on any website user; nothing here relies on its contents.",
+      "https://unsplash.com/api-terms": "Not yet read. Governs the API route, which is refused, so nothing here relies on its contents."
+    }
   }
 }
