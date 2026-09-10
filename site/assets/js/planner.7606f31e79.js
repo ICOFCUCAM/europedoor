@@ -495,6 +495,91 @@
   /* One leg's line, with whatever the hoist already said removed. A leg
    * whose every clause was shared says nothing at all rather than repeating
    * the hoist — an empty paragraph is worse than an absent one. */
+  /* THE ROUTE, DRAWN. The planner is the most complex thing on this site and
+   * its output had no geography in it at all: a summary table, a budget
+   * verdict and a column of stops, on a product whose every other family
+   * draws where its places are. A reader who has just been handed five
+   * cities in two countries cannot see the shape of the trip.
+   *
+   * The same markup `pages.constellation()` emits, because there is one
+   * drawing of Europe here and this is it: a <use> of #constel-eu, which the
+   * page ships in its defs, the route as a cased line, and the stops lit.
+   * Nothing is projected in the browser — every destination arrives with the
+   * x and y the build put it at.
+   *
+   * FRAMED, like every journey row on this site. See glyphView below.
+   */
+  /* Destination names come from the dataset and never contain a quote, but
+   * an accessible name is an ATTRIBUTE and this file had no escaper at all —
+   * every other string it writes goes into element content. One place is
+   * cheaper than a rule about which strings are safe. */
+  function attr_(v) {
+    return String(v).replace(/&/g, "&amp;").replace(/"/g, "&quot;")
+                    .replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  /* THE FRAME, WHICH IS THE SAME QUESTION pages.glyph_view() ANSWERS.
+   *
+   * The first version drew the route on the whole continent, and a five-stop
+   * Italian trip came out as a two-centimetre squiggle over Tuscany on a
+   * picture of Europe — which is precisely the fault glyph_view() was lifted
+   * out of region_glyph() to fix, nine identical continents with a different
+   * corner lit.
+   *
+   * This is FRAMING and not projection: it decides which rectangle of an
+   * already-projected drawing to show, so a second implementation cannot put
+   * a place in the wrong country. It can still disagree, so a browser check
+   * asserts it returns exactly what the Python does on the routes the site
+   * already draws. The constants are the same because they are the same
+   * decision: 34% padding, a 90-unit floor on it, and a 340-unit floor on
+   * the span, below which the silhouette stops reading as Europe. */
+  var MAP_W = 1000, MAP_H = 780;
+
+  function glyphView(pts) {
+    var xs = pts.map(function (p) { return p[0]; });
+    var ys = pts.map(function (p) { return p[1]; });
+    var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs);
+    var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+    var pad = Math.max(Math.max(x1 - x0, y1 - y0) * 0.34, 90);
+    x0 -= pad; x1 += pad; y0 -= pad; y1 += pad;
+    if (x1 - x0 < 340) { var g = (340 - (x1 - x0)) / 2; x0 -= g; x1 += g; }
+    var w = x1 - x0, h = y1 - y0, want = MAP_W / MAP_H, grow;
+    if (w / h < want) { grow = (h * want - w) / 2; x0 -= grow; x1 += grow; }
+    else { grow = (w / want - h) / 2; y0 -= grow; y1 += grow; }
+    w = x1 - x0; h = y1 - y0;
+    if (w >= MAP_W) { x0 = 0; w = MAP_W; }
+    else { x0 = Math.min(Math.max(x0, 0), MAP_W - w); }
+    if (h >= MAP_H) { y0 = 0; h = MAP_H; }
+    else { y0 = Math.min(Math.max(y0, 0), MAP_H - h); }
+    return [x0, y0, w, h].map(function (v) { return Math.round(v); }).join(" ");
+  }
+  window.__europedoorGlyphView = glyphView;   /* read by the browser suite */
+
+  function routeFigure(route) {
+    var pts = [];
+    for (var i = 0; i < route.length; i++) {
+      var c = route[i].city;
+      if (typeof c.x !== "number" || typeof c.y !== "number") return "";
+      pts.push([c.x, c.y]);
+    }
+    if (pts.length < 2) return "";
+    var d = pts.map(function (p) {
+      return p[0].toFixed(0) + "," + p[1].toFixed(0);
+    }).join(" ");
+    var dots = pts.map(function (p) {
+      return '<circle cx="' + p[0].toFixed(0) + '" cy="' + p[1].toFixed(0) + '"/>';
+    }).join("");
+    var names = route.map(function (st) { return st.city.name; }).join(" to ");
+    return '<figure class="planmap">' +
+      '<svg class="constel" viewBox="' + glyphView(pts) + '" role="img" ' +
+      'aria-label="The route this planner built: ' + attr_(names) + '">' +
+      '<use href="#constel-eu"/>' +
+      '<polyline class="constel-route case" points="' + d + '"/>' +
+      '<polyline class="constel-route" points="' + d + '"/>' +
+      '<g class="constel-lit">' + dots + "</g></svg>" +
+      "</figure>";
+  }
+
   function legWhy(city, bits, shared, rate) {
     var mine = bits.filter(function (b) { return shared.indexOf(b) < 0; });
     var text = mine.length ? city.name + " is " + mine.join("; ") + "." : "";
@@ -1184,6 +1269,7 @@
         "<div><dt>Straight-line distance</dt><dd>" + totalKm.toLocaleString("en-GB") + " km</dd></div>" +
       "</dl>" +
       verdict +
+      routeFigure(route) +
       (opts.wants.length
         ? '<p class="whyall"><span>In common</span> Every stop below carries at least one of ' +
           joinList(opts.wants.map(interestName)) +

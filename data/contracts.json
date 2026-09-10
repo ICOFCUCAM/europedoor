@@ -26,7 +26,9 @@
      "months": "seasonality",
      "monthNames": "reading the query back",
      "budgets": "cost bands",
-     "currencies": "the estimate"
+     "currencies": "the estimate",
+     "cities.x": "where a destination sits on this atlas's conformal conic, projected at build time. The planner draws the route it built and never moves its frame, so it is handed the answer rather than re-deriving the projection: map.js already has a second implementation because it re-frames continuously, and a third is a third one that drifts.",
+     "cities.y": "the other half of the same point; see cities.x."
     }
    }
   },

@@ -3486,6 +3486,16 @@ def planner_api(data):
             "region": r["name"],
             "macro": c["macro_slug"],
             "lat": t["lat"], "lon": t["lon"],
+            # PROJECTED HERE, NOT IN THE BROWSER. The planner draws the route
+            # it built, and the only honest place to put a destination on
+            # this atlas's conformal conic is the function that draws every
+            # other map on the site. map.js re-derives the projection from
+            # its four angles because it re-frames continuously and cannot be
+            # handed a fixed answer; the planner never moves its frame, so it
+            # is handed the answer instead. A third implementation of the
+            # projection is a third one that drifts.
+            "x": round(project(t["lat"], t["lon"])[0], 1),
+            "y": round(project(t["lat"], t["lon"])[1], 1),
             "interests": sorted(set(t["interests"]) | set(r["interests"])),
             "nights": t["nights"],
             "budget": c["budget"],
@@ -3564,6 +3574,9 @@ def planner_page(data):
     )
     body = f"""
 {crumbs([("Europe", "/discover"), ("Plan", None)])}
+{constel_defs()}
+{jsondata("europedoor-glyphview-cases",
+          [f"{len(pts)}:" + glyph_view(pts) for pts in GLYPHVIEW_CASES])}
 <div class="pagehead instrument">
   <p class="kicker">Journey Planner</p>
   <h1>Twelve days, €2,500, history and mountains.</h1>
@@ -3710,7 +3723,11 @@ def planner_page(data):
     <p>It will not book anything, price a real hotel, or route you into a country under a
     travel advisory — those are excluded from the planning index entirely.</p>
     <p class="small">Estimates are editorial, not quotes. Check <a href="/sources">sources and
-    corrections</a>.</p>
+    corrections</a>. The route above is drawn from the coordinates in the Atlas
+    rather than from any road or rail geometry, on the same Lambert conformal conic
+    as every other map here — standard parallels {geo.LCC_P1:.0f}°N and
+    {geo.LCC_P2:.0f}°N, origin {geo.LCC_LAT0:.0f}°N, central meridian
+    {geo.LCC_LON0:.0f}°E. {geo.sources_line(geo.load("europe-lod0.json"))}</p>
   </div>
 </div>
 """
@@ -6459,6 +6476,25 @@ def route_line(pts):
     d = " ".join(f"{x:.0f},{y:.0f}" for x, y in pts)
     return (f'<polyline class="constel-route case" points="{d}"/>'
             f'<polyline class="constel-route" points="{d}"/>')
+
+
+# FOUR FRAMES THE BUILD AND THE BROWSER MUST AGREE ON.
+#
+# The planner draws the route it built, which means the browser has to frame
+# a set of points — a second implementation of glyph_view(). Framing is not
+# projection and cannot put a place in the wrong country, but it can still
+# drift, so /plan publishes what the build makes of these four and the browser
+# suite asserts its own answer is identical.
+#
+# They are chosen for the branches: a pair that needs the min_span floor, a
+# tight cluster like a five-city Italian route, a set wider than the canvas
+# that has to be clamped, and a single point.
+GLYPHVIEW_CASES = [
+    [(100.0, 100.0), (200.0, 300.0)],
+    [(420.0, 480.0), (470.0, 520.0), (500.0, 560.0)],
+    [(10.0, 10.0), (990.0, 770.0)],
+    [(500.0, 400.0)],
+]
 
 
 def glyph_view(pts, pad_frac=0.34, min_pad=90.0, min_span=340.0):

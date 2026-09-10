@@ -2082,8 +2082,24 @@ def c_api():
             contracts = json.load(fh)
 
         def _dig(doc, path):
+            """Walk a dotted path, stepping into a list at its first element.
+
+            A CONTRACT COULD ONLY NAME A TOP-LEVEL FIELD, WHICH IS NOT WHERE
+            THE COUPLING IS. `cities` is a list of objects and the planner
+            reads a dozen fields off each one; declaring the list said
+            nothing about any of them, so the rule this file enforces —
+            coupling is fine, silent coupling is not — stopped exactly one
+            level above where it mattered. A list step checks the first
+            element, which is enough: these documents are homogeneous by
+            construction, and a field missing from every row but the first is
+            a different bug from the one this catches.
+            """
             cur = doc
             for part in path.split("."):
+                if isinstance(cur, list):
+                    if not cur:
+                        return None
+                    cur = cur[0]
                 if not isinstance(cur, dict) or part not in cur:
                     return None
                 cur = cur[part]

@@ -1467,6 +1467,53 @@ async function main() {
     await bp.close();
   }
 
+  // ── THE PLANNER DRAWS THE ROUTE IT BUILT ───────────────────────────
+  // The most complex thing on this site had no geography in its output at
+  // all: a summary table, a budget verdict and a column of stops, on a
+  // product whose every other family draws where its places are.
+  //
+  // Nothing is projected in the browser — every destination arrives with the
+  // x and y the build put it at, so the projection stays decided in one
+  // place. The FRAME is a second implementation, of pages.glyph_view(), and
+  // this asserts the two agree exactly on the frames the site already draws.
+  // Framing is not projection and cannot put a place in the wrong country,
+  // but it can still drift.
+  {
+    await page.goto(base + "/plan", { waitUntil: "networkidle" });
+    await page.click('#planner button[type="submit"]');
+    await page.waitForSelector("#result .leg");
+    const fig = page.locator(".planmap svg");
+    ok(await fig.count() === 1, "the planner draws no map of the route it built");
+    const stops = await page.locator("#result .leg").count();
+    ok(await page.locator(".planmap .constel-lit circle").count() === stops,
+       "the planner's map does not draw one mark per stop");
+    ok(await page.locator(".planmap polyline").count() === 2,
+       "the planner's route has no casing — a single stroke cannot clear 3:1 " +
+       "on both the land and the water");
+    // A dot with no radius is not a dot: `.constel-lit circle` sets only a
+    // fill and every family sets its own r.
+    const r = await page.locator(".planmap .constel-lit circle").first()
+      .evaluate((c) => c.getBoundingClientRect().width);
+    ok(r > 4, `the planner's stop marks render ${r.toFixed(1)}px wide`);
+    // The two framings, on the real journeys the build already framed.
+    const cases = await page.evaluate(() => window.__europedoorGlyphView
+      ? [[[100, 100], [200, 300]], [[420, 480], [470, 520], [500, 560]],
+         [[10, 10], [990, 770]], [[500, 400]]].map(
+          (pts) => pts.length + ":" + window.__europedoorGlyphView(pts))
+      : null);
+    ok(cases !== null, "planner.js exposes no framing function to compare");
+    const want = JSON.parse(await page.evaluate(() =>
+      document.getElementById("europedoor-glyphview-cases")
+        ? document.getElementById("europedoor-glyphview-cases").textContent
+        : "null"));
+    ok(want !== null, "/plan publishes no framing cases to check the browser against");
+    if (want) {
+      ok(JSON.stringify(cases) === JSON.stringify(want),
+         `the browser frames a route differently from the build:\n  browser ` +
+         `${JSON.stringify(cases)}\n  build   ${JSON.stringify(want)}`);
+    }
+  }
+
   // ── THE INTERFACE THE BROWSER PAINTS FOR YOU ───────────────────────
   // Selection and the form controls' accent were Chromium's defaults on
   // every page: dragging across a paragraph in the graphite world gave a

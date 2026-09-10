@@ -757,6 +757,37 @@ main.wide { max-width: 92rem; }
    has none of its own and rendered as a 30px stub. */
 .rowmeta .hopbar { display: block; width: 5rem; margin: var(--s2) 0 0 auto; }
 
+/* THE ROUTE THE PLANNER BUILT. Unframed, on the whole continent: /journeys
+   frames each route because seventeen framed thumbnails is how you tell
+   seventeen routes apart, and a planner shows one at a time, where WHERE in
+   Europe it sits is part of what a reader is deciding. Capped, because the
+   drawing is 1000x780 and at full column width it would be taller than the
+   summary it belongs to. */
+.planmap { margin: var(--s6) 0; }
+/* THE SEA IS DRAWN, NOT INHERITED. `.constel` fills the land and leaves the
+   water to whatever the page is, which is right in the DISCOVER world where
+   the page is limestone. /plan is INTELLIGENCE, so the first render was pale
+   land on near-black and the Mediterranean read as a hole rather than as a
+   sea. The `.iheroart` treatment: the atlas palette's own water behind the
+   atlas palette's own land, which is the split this site draws maps on — a
+   picture is warm paper and pale water, an instrument is graphite. This is a
+   picture inside an instrument, and it takes the picture's palette. It has
+   no aperture, so painting a background is allowed here where it is not on
+   an arched figure. */
+.planmap .constel { display: block; width: 100%; max-width: 34rem;
+                    margin-inline: auto; height: auto;
+                    background: var(--atlas-sea); border-radius: var(--radius); }
+.planmap .constel > use { fill: var(--atlas-land); }
+/* A DOT WITH NO RADIUS IS NOT A DOT. `.constel-lit circle` sets only a fill;
+   every family that draws one sets its own `r`, because a stop on a framed
+   five-city route and a destination on a 200-dot interest tile are not the
+   same mark. Without this the route drew and its stops did not, which is the
+   invisible-thing failure: correct markup, nothing on the screen. */
+.planmap .constel-lit circle { r: 9px; stroke: var(--atlas-here);
+                               stroke-width: 2; }
+.planmap .constel-route { stroke-width: 7; }
+.planmap .constel-route.case { stroke-width: 14; }
+
 .rowdist { display: grid; gap: var(--s1); justify-items: end; }
 .dist { width: 8.5rem; height: 12px; display: block; }
 .distaxis { fill: var(--rule); }
