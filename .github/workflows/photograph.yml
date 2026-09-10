@@ -91,6 +91,38 @@ jobs:
         with:
           python-version: "3.11"
 
+      # WHICH SECRETS CAN THIS WORKFLOW ACTUALLY SEE?
+      #
+      # Run #3 failed with "PEXELS_API_KEY is not set" one hour after the key
+      # was added, and the log showed GitHub had substituted an empty string:
+      # `PEXELS_API_KEY:` with nothing after it. The refusal was correct and
+      # it could not say WHY, because a workflow cannot tell a misspelled
+      # secret from an absent one — both arrive as "".
+      #
+      # This prints the NAMES only, never a value: it reads them out of an
+      # env var rather than interpolating into the script, so nothing about
+      # any secret reaches the log but the fact that it exists. A name that
+      # is missing here is a name that was saved somewhere else — under
+      # Variables rather than Secrets, on an Environment rather than the
+      # repository, on another repository, or spelled differently.
+      - name: Which secret names are visible here
+        env:
+          NAMES: ${{ toJSON(secrets) }}
+        run: |
+          python3 - <<'EOF'
+          import json, os
+          names = sorted(json.loads(os.environ["NAMES"]))
+          print("secrets this workflow can see:", ", ".join(names) or "(none)")
+          if "PEXELS_API_KEY" not in names:
+              print()
+              print("PEXELS_API_KEY IS NOT AMONG THEM. It has to be a")
+              print("REPOSITORY secret on this repository, under")
+              print("Settings -> Secrets and variables -> Actions ->")
+              print("Repository secrets, named exactly PEXELS_API_KEY.")
+              print("A Variable is a different tab and an Environment")
+              print("secret is a different scope; neither reaches this.")
+          EOF
+
       - name: Search and list candidates
         env:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
