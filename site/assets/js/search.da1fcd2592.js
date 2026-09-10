@@ -203,11 +203,20 @@
     return true;
   }
 
+  /* THE RESTING STATE IS RENDERED BY THE BUILD AND PUT BACK, NOT REPLACED.
+   * /search opened on a box and 280 pixels of nothing: it said "550 records
+   * indexed" in its head and then showed a reader none of them, on the
+   * instrument holding the largest index on the site. The build now renders
+   * what the index is made of, by kind, with a way into each — and the first
+   * version of this line threw it away on load and printed one grey sentence
+   * instead. It is captured here and restored whenever the box goes empty,
+   * so backspacing to nothing returns the page you arrived on. */
+  var AT_REST = out.innerHTML;
+
   function run(qraw) {
     var q = norm(qraw.trim());
     if (q.length < 2) {
-      out.innerHTML = '<p class="small">Type two letters or more. Try a city, a country, ' +
-        'a kind of trip ("medieval", "wine", "rail"), or something you want to eat.</p>';
+      out.innerHTML = AT_REST;
       return;
     }
     var mods = parseQuery(q);
@@ -328,7 +337,15 @@
     var body = "";
     keys.forEach(function (k) {
         if (!groups[k] || !groups[k].length) return;
-        body += "<h3>" + escape_(k) + (groups[k].length > 1 ? "s" : "") + "</h3>" +
+        /* THE PLURAL COMES FROM THE INDEX, NOT FROM AN S. Five of the twelve
+           kinds this index carries do not take one, so the headings read
+           "Citys", "Countrys", "Categorys", "Storys" and "Region of Europes"
+           on the site's own search results. The build knows every kind it
+           emits; a grammar rule guessed in the browser is checked by nothing,
+           which is the same argument as the counts two functions up. */
+        var heading = groups[k].length > 1
+          ? ((INDEX && INDEX.kindPlural && INDEX.kindPlural[k]) || k + "s") : k;
+        body += "<h3>" + escape_(heading) + "</h3>" +
           '<div class="rows">' + groups[k].map(function (h) {
             var extra = mods.near && h.r.la !== undefined
               ? kmBetween(mods.near, h.r) + " km" : escape_(h.r.k);
@@ -367,7 +384,9 @@
     .then(function (r) { return r.json(); })
     .then(function (j) {
       ROWS = j.rows;
-      INDEX = { months: j.monthNames || j.months || {}, interests: j.interests || {} };
+      INDEX = { months: j.monthNames || j.months || {},
+                interests: j.interests || {},
+                kindPlural: j.kindPlural || {} };
       /* Counts from the index rather than typed into the prose. The empty
        * state used to say "50 countries and 244 cities"; the atlas had 319
        * by then, and nothing failed, because a number in a sentence is not

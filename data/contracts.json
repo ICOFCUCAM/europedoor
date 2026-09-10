@@ -1,75 +1,76 @@
 {
-  "$comment": "Declared data dependencies. Rule: no consumer may depend on a field belonging to another index unless that dependency is declared here and checked. Coupling is not the problem — SILENT coupling is. The search.json -> counts -> empty-state relationship is legitimate and load-bearing; what was wrong with it was that nothing said so, and splitting the index would have broken a sentence in a UI with no test failing. checks.py asserts every declared field exists, and refuses a consumer that fetches an index it has not declared.",
-  "consumers": [
-    {
-      "consumer": "assets/js/search.js",
-      "surface": "/search",
-      "reads": {
-        "/api/search.json": {
-          "rows": "the searchable index itself",
-          "counts.countries": "printed by the empty state",
-          "counts.cities": "printed by the empty state — this is the coupling point. If the index is ever split into search.json + counts.json, this line is what must force the consumer and its contract to be updated rather than silently falling back to a stale hard-coded number.",
-          "interests": "reading the query back",
-          "monthNames": "reading the query back"
-        }
-      }
-    },
-    {
-      "consumer": "assets/js/planner.js",
-      "surface": "/plan",
-      "reads": {
-        "/api/atlas.json": {
-          "cities": "every destination it can route through",
-          "journeys": "the curated routes it compares against",
-          "interests": "matching a stated interest to a destination",
-          "months": "seasonality",
-          "monthNames": "reading the query back",
-          "budgets": "cost bands",
-          "currencies": "the estimate"
-        }
-      }
-    },
-    {
-      "consumer": "assets/js/discover.js",
-      "surface": "/discover",
-      "reads": {
-        "/api/atlas.json": {
-          "cities": "the set Discover Mode narrows",
-          "interests": "the moods and constraints"
-        }
-      }
-    },
-    {
-      "consumer": "assets/js/my-europe.js",
-      "surface": "/my-europe",
-      "reads": {
-        "/api/atlas.json": {
-          "cities": "resolving saved ids into places, and computing Travel DNA",
-          "interests": "the DNA rows"
-        }
-      }
-    },
-    {
-      "consumer": "assets/js/map.js",
-      "surface": "/map",
-      "reads": {
-        "/api/geo/europe-lod1.json": {
-          "countries": "the finer continent outline, fetched when zoom passes 1.6x",
-          "nogeometry": "the countries too small to draw at that scale"
-        },
-        "/api/geo/country/*.json": {
-          "countries": "one country's own level of detail, fetched when it is opened",
-          "bbox": "framing"
-        }
-      }
+ "$comment": "Declared data dependencies. Rule: no consumer may depend on a field belonging to another index unless that dependency is declared here and checked. Coupling is not the problem — SILENT coupling is. The search.json -> counts -> empty-state relationship is legitimate and load-bearing; what was wrong with it was that nothing said so, and splitting the index would have broken a sentence in a UI with no test failing. checks.py asserts every declared field exists, and refuses a consumer that fetches an index it has not declared.",
+ "consumers": [
+  {
+   "consumer": "assets/js/search.js",
+   "surface": "/search",
+   "reads": {
+    "/api/search.json": {
+     "rows": "the searchable index itself",
+     "counts.countries": "printed by the empty state",
+     "counts.cities": "printed by the empty state — this is the coupling point. If the index is ever split into search.json + counts.json, this line is what must force the consumer and its contract to be updated rather than silently falling back to a stale hard-coded number.",
+     "interests": "reading the query back",
+     "monthNames": "reading the query back",
+     "kindPlural": "the plural of every kind the index emits, so the results headings are not pluralised by adding an s in the browser — five of the twelve kinds do not take one, and the page read \"Citys\" and \"Countrys\". A grammar rule guessed in a script is checked by nothing, which is the same argument as counts.cities above."
     }
-  ],
-  "published_only": {
-    "$comment": "Endpoints with no in-page consumer. They exist because the data is public and the documents are cheap. A shape change here breaks nobody inside this repository, which is exactly why the contract has to be written down: the consumers are people we cannot see.",
-    "endpoints": [
-      "/api/countries.json",
-      "/api/graph.json",
-      "/api/journeys.json"
-    ]
+   }
+  },
+  {
+   "consumer": "assets/js/planner.js",
+   "surface": "/plan",
+   "reads": {
+    "/api/atlas.json": {
+     "cities": "every destination it can route through",
+     "journeys": "the curated routes it compares against",
+     "interests": "matching a stated interest to a destination",
+     "months": "seasonality",
+     "monthNames": "reading the query back",
+     "budgets": "cost bands",
+     "currencies": "the estimate"
+    }
+   }
+  },
+  {
+   "consumer": "assets/js/discover.js",
+   "surface": "/discover",
+   "reads": {
+    "/api/atlas.json": {
+     "cities": "the set Discover Mode narrows",
+     "interests": "the moods and constraints"
+    }
+   }
+  },
+  {
+   "consumer": "assets/js/my-europe.js",
+   "surface": "/my-europe",
+   "reads": {
+    "/api/atlas.json": {
+     "cities": "resolving saved ids into places, and computing Travel DNA",
+     "interests": "the DNA rows"
+    }
+   }
+  },
+  {
+   "consumer": "assets/js/map.js",
+   "surface": "/map",
+   "reads": {
+    "/api/geo/europe-lod1.json": {
+     "countries": "the finer continent outline, fetched when zoom passes 1.6x",
+     "nogeometry": "the countries too small to draw at that scale"
+    },
+    "/api/geo/country/*.json": {
+     "countries": "one country's own level of detail, fetched when it is opened",
+     "bbox": "framing"
+    }
+   }
   }
+ ],
+ "published_only": {
+  "$comment": "Endpoints with no in-page consumer. They exist because the data is public and the documents are cheap. A shape change here breaks nobody inside this repository, which is exactly why the contract has to be written down: the consumers are people we cannot see.",
+  "endpoints": [
+   "/api/countries.json",
+   "/api/graph.json",
+   "/api/journeys.json"
+  ]
+ }
 }

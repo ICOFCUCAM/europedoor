@@ -8829,6 +8829,18 @@ def journeys_api(data):
     }
 
 
+# The kinds this index emits whose plural is not the noun plus an s. Not a
+# general pluraliser: it is a closed list, and a kind added without a row here
+# gets the -s that is right for most of them.
+_KIND_PLURAL = {
+    "City": "Cities",
+    "Country": "Countries",
+    "Category": "Categories",
+    "Story": "Stories",
+    "Region of Europe": "Regions of Europe",
+}
+
+
 def search_api(data):
     """One flat index of everything findable, built once and filtered in the
     browser. Small enough (a few hundred KB) that shipping it whole beats
@@ -8915,6 +8927,15 @@ def search_api(data):
         # failed, because a number inside a sentence in a JavaScript file is
         # checked by nothing at all.
         "counts": {"countries": len(data["countries"]), "cities": len(data["cities"])},
+        # THE RESULT HEADINGS WERE PLURALISED BY ADDING AN S IN THE BROWSER,
+        # and five of the twelve kinds this index carries do not take one:
+        # "Citys", "Countrys", "Categorys", "Storys" and "Region of Europes",
+        # on the site's own search results. The comment two lines above says a
+        # number typed into a JavaScript file is checked by nothing at all;
+        # neither is a grammar rule. The build knows every kind it emits, so
+        # it sends the plural rather than leaving the browser to guess.
+        "kindPlural": {k: v for k, v in sorted(
+            {r["k"]: _KIND_PLURAL.get(r["k"], r["k"] + "s") for r in rows}.items())},
         "monthNames": data["taxonomy"]["month_names"],
         "interests": {i["slug"]: i["name"] for i in data["taxonomy"]["interests"]},
     }
@@ -8924,6 +8945,53 @@ def search_page(data):
     n = (len(data["countries"]) + sum(len(c["regions"]) for c in data["countries"].values())
          + len(data["cities"]) + len(data["journeys"]) + len(data["themes"])
          + len(data["stories"]) + len(data["fund"]))
+    # A SEARCH PAGE AT REST WAS A BOX AND 280 PIXELS OF NOTHING.
+    #
+    # It said "550 records indexed" in the head and then showed a reader none
+    # of them. Every other instrument on this site opens on the thing it
+    # operates over — /map draws the continent, /discover draws its dots — and
+    # this one, which holds the largest index on the site, opened on an empty
+    # panel above the footer.
+    #
+    # What it shows is the index BY KIND, with the count and a way into each,
+    # every figure derived from the same structures the index is built from.
+    # It is not a list of suggested searches: a curated set of example queries
+    # would be an editorial ranking of what people should look for, and this
+    # page publishes that nobody can buy a position in it.
+    #
+    # It sits INSIDE #results, so the first keystroke replaces it. A resting
+    # state that survives the first query is a resting state a reader has to
+    # dismiss.
+    kinds = [
+        (len(data["countries"]), "countries", "/countries",
+         "Every country the Atlas holds a page for"),
+        (sum(len(c["regions"]) for c in data["countries"].values()),
+         "travel regions", "/countries", "Groupings by coast, range and shared history"),
+        (len(data["cities"]), "destinations", "/discover",
+         "Cities, villages, valleys, islands and sites"),
+        (len(data["journeys"]), "journeys", "/journeys",
+         "Cross-border routes, in order, with the nights counted"),
+        (len(data["themes"]), "themes", "/themes",
+         "Ways through Europe that ignore its borders"),
+        (len(data["stories"]), "stories", "/stories",
+         "The editorial desk, each piece linked into the Atlas"),
+        (len(data["fund"]), "Fund projects", "/fund",
+         "The public register of work worth putting something back into"),
+    ]
+    _kpeak = max(k[0] for k in kinds)
+    atrest = ('<p class="whyall"><span>In the index</span> Everything below is '
+              'searchable from the box above, and every kind is browsable '
+              'without searching at all.</p><div class="rows">'
+              + "".join(
+                  f'<a class="row" href="{href}">'
+                  f'<div><h3>{esc(label[:1].upper() + label[1:])}</h3>'
+                  f'<p class="rowsub">{esc(what)}</p></div>'
+                  f'<p class="rowmeta">{count:,}<br>'
+                  f'<span class="hopbar" aria-hidden="true">'
+                  f'<span class="w{round(100 * count / _kpeak)}"></span></span></p></a>'
+                  for count, label, href, what in kinds)
+              + "</div>")
+
     body = f"""
 {crumbs([("Europe", "/discover"), ("Search", None)])}
 <div class="pagehead instrument">
@@ -8945,7 +9013,7 @@ def search_page(data):
   </div>
 </form>
 <div class="chips" id="searchunderstood" aria-live="polite"></div>
-<div id="results" aria-live="polite"></div>
+<div id="results" aria-live="polite">{atrest}</div>
 <noscript><p class="small">Search needs JavaScript. The
 <a href="/countries">Atlas</a> is fully browsable without it.</p></noscript>
 """
