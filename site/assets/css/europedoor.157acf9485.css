@@ -4056,11 +4056,53 @@ body[data-hero] .masthead { position: sticky; }
  * of the index rather than what it is for. The counts are still here, in the
  * quiet line, because they are true and checkable; they are no longer the
  * argument. */
-.closing { max-width: 44rem; margin: var(--s9) auto 0; text-align: center; }
-.closing h2 { font-family: var(--serif); margin: 0 0 var(--s4); }
-.closing p { color: var(--ink-2); font-size: var(--t-md); margin: 0 0 var(--s5); }
-.closing .small { color: var(--ink-3); }
-.closego { margin-bottom: var(--s6); }
+/* AND THE SECOND VERSION WAS 44rem OF CENTRED PROSE OVER A DEAD GAP. Rendered
+ * at 1280 the band was a headline, two centred lines, a button, then a long
+ * centred technical note and about 150 pixels of nothing before the footer —
+ * the last thing a reader sees on the page that matters most, and the one
+ * shape on the homepage that says "the content ran out". Centring is what a
+ * page does when it has not decided where the emphasis is.
+ *
+ * The statement is a statement now: left, at display size, on the measure
+ * prose actually wants. The counts come out of the quiet line and become the
+ * one thing on the page that is allowed to be a number — the atlas's EXTENT,
+ * beside the argument rather than under it, so the band has two things in it
+ * and no gap to fill. They are still derived and still checkable. */
+.closing { margin: var(--s9) 0 0; border-top: 1px solid var(--rule);
+           padding-top: var(--s7); }
+.closein { display: grid; grid-template-columns: minmax(0, 1fr) auto;
+           gap: var(--s7) var(--s8); align-items: start; }
+.closesay { max-width: 32rem; }
+.closing h2 { font-family: var(--serif); text-wrap: balance;
+              margin: 0 0 var(--s4); }
+.closebody { color: var(--ink-2); font-size: var(--t-md); margin: 0 0 var(--s5); }
+.closego { margin: 0; }
+
+/* The extent, as a definition list, because that is what it is: three terms
+ * and the size of each. Tabular figures so the three numbers line up on their
+ * own right edge — they are read as a column, not as three sentences. */
+.closeextent { display: grid; gap: var(--s4); margin: 0; text-align: right; }
+.closeextent div { display: grid; gap: var(--s1); }
+.closeextent dt { font-size: var(--t-xs); letter-spacing: .09em;
+                  text-transform: uppercase; color: var(--ink-3); }
+/* No new type size: the extent takes the same clamp the section heads take,
+ * because a number that is the size of a heading IS a heading here. A
+ * seventeenth size was refused. */
+.closeextent dd { margin: 0; font-family: var(--serif);
+                  font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
+                  font-variant-numeric: tabular-nums; color: var(--ink); }
+
+.colophon { color: var(--ink-3); font-size: var(--t-sm);
+            margin: var(--s7) 0 0; max-width: 44rem; }
+
+@media (max-width: 52rem) {
+  /* The extent goes under the statement and lies down: three tall serif
+   * numerals stacked in a right-hand column is a shape a phone has no room
+   * for, and the numbers read perfectly well in a row. */
+  .closein { grid-template-columns: 1fr; gap: var(--s6); }
+  .closeextent { grid-template-columns: repeat(3, minmax(0, 1fr));
+                 text-align: left; }
+}
 
 @media (max-width: 52rem) {
   /* One column, and the journey route goes UNDER its text rather than into a

@@ -1308,13 +1308,21 @@ def home(data):
          more=("All " + str(len(data["stories"])) + " stories", "/stories"))}
 
 <section class="closing">
-  <h2>{esc(closing["head"])}</h2>
-  <p>{esc(closing["body"])}</p>
-  <p class="closego"><a class="btn" href="/discover">{esc(closing["cta"])} →</a></p>
-  <p class="small">EuropeDoor is pre-launch and editorial: nothing here takes a payment,
+  <div class="closein">
+    <div class="closesay">
+      <h2>{esc(closing["head"])}</h2>
+      <p class="closebody">{esc(closing["body"])}</p>
+      <p class="closego"><a class="btn" href="/discover">{esc(closing["cta"])} →</a></p>
+    </div>
+    <dl class="closeextent">
+      <div><dt>Countries</dt><dd>{ncountries}</dd></div>
+      <div><dt>Travel regions</dt><dd>{nregions}</dd></div>
+      <div><dt>Destinations</dt><dd>{ncities}</dd></div>
+    </dl>
+  </div>
+  <p class="colophon">EuropeDoor is pre-launch and editorial: nothing here takes a payment,
   holds money or makes a booking. <a href="/how-it-works">How it works</a> ·
-  <a href="/about">Who is behind it</a> · {ncountries} countries,
-  {nregions} travel regions, {ncities} destinations.</p>
+  <a href="/about">Who is behind it</a></p>
   <p class="sourcenote">{herosource} <a href="/map">Open the map →</a></p>
 </section>
 """
