@@ -146,6 +146,29 @@ def build():
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         shutil.copy(src, dst)
 
+    # PHOTOGRAPH DERIVATIVES, WHICH NOTHING PUBLISHED UNTIL RENDERING FOUND
+    # IT. asset_map() covers the stylesheet, the scripts and the mark — the
+    # files this build knows by name. A photograph's ladder is written by
+    # scripts/images/derive.py long after, so it was acquired, hashed,
+    # registered, referenced by picture() on the homepage, and never copied
+    # into site/ at all. Every gate was green: the row validated, the hashes
+    # re-verified, the HTML carried the src. The browser asked for the AVIF,
+    # got a 404, and <picture> does NOT fall back to the next source once one
+    # matches — so the homepage rendered a 1280x736 hole.
+    #
+    # They are content-addressed (`<file>.<hash>-<width>.<ext>`), which is what
+    # earns them the immutable header they inherit from /assets/.
+    img_src = os.path.join(ROOT, "assets", "img")
+    img_n = 0
+    if os.path.isdir(img_src):
+        for name in sorted(os.listdir(img_src)):
+            if not name.lower().endswith((".avif", ".webp", ".jpg")):
+                continue
+            dst = os.path.join(OUT, "assets", "img", name)
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            shutil.copy(os.path.join(img_src, name), dst)
+            img_n += 1
+
     # The map geometry. Published under /api/geo/ rather than /assets/ because
     # it is data the page fetches, not an asset the page references, and
     # because the two directories get different Cache-Control: geometry that

@@ -1,150 +1,185 @@
 name: photograph
 
-# ACQUIRING A PHOTOGRAPH IS A STEP SOMEBODY RUNS, NOT PART OF THE BUILD.
+# ACQUIRING A PHOTOGRAPH IS A STEP SOMEBODY DISPATCHES, NOT PART OF THE BUILD.
 #
 # The build must run on a machine with no internet and produce identical
 # pages, which is why the map data is committed rather than fetched. The same
-# rule applies here: this workflow fetches, derives and COMMITS, and the build
-# never reaches the network.
+# rule applies here: this workflow fetches, derives, registers and OPENS A
+# PULL REQUEST, and the build never reaches the network.
 #
-# It is manual on purpose. A schedule would mean photographs arriving on this
-# site that nobody chose, and choosing is the entire job — see
-# docs/image-philosophy.md, where the argument for buying a photograph at all
-# is that it does something the drawing cannot.
+# TWO STAGES, BECAUSE THEY ARE TWO DECISIONS.
 #
-# THE KEYS ARE REPOSITORY SECRETS AND ARE NEVER ECHOED. They are passed as
-# `env` on the one step that needs them, so they are not on a command line
-# that gets logged, and fetch.py never prints one.
+#   discover  searches and prints candidate IDs, photographers, pages and
+#             sizes. It downloads nothing. A photograph appearing in a search
+#             result is not a photograph anybody chose.
+#   acquire   takes ONE approved id and does everything after it: fetch by
+#             id, verify the returned id is the requested id, download,
+#             hash, keep the original, build the ladder, complete the
+#             provenance, run every gate, open a PR.
+#
+# THE HUMAN DECISION IS WHICH PHOTOGRAPH. Nothing here picks one. The previous
+# design took a search result BY POSITION — "--pick 3" — so the picture a
+# person approved and the picture that arrived could differ silently while
+# every provenance field was correctly recorded about the wrong one.
+#
+# THE KEY IS A REPOSITORY SECRET AND IS PASSED AS `env` ON THE STEPS THAT NEED
+# IT, never on a command line that gets logged, never into the register, never
+# into the PR body. scripts/images/acquire.py does not print it and
+# tools/checks.py greps the committed files for credential-shaped tokens.
 
 on:
   workflow_dispatch:
     inputs:
-      provider:
-        description: "pexels or unsplash"
+      stage:
+        description: "discover (search and list) or acquire (take one id)"
         required: true
         type: choice
-        options: [pexels, unsplash]
-      verify_terms:
-        description: "fetch and archive the live terms, then stop (do this first)"
-        required: false
-        default: false
-        type: boolean
-      query:
-        description: "what to search for, e.g. 'Vienna Stephansdom rooftops'"
+        options: [discover, acquire]
+        default: discover
+      provider:
+        description: "the acquisition provider — only ones the licence gate clears"
+        required: true
+        type: choice
+        options: [pexels]
+        default: pexels
+      purpose:
+        description: "why this photograph exists, e.g. homepage-hero (data/image-purposes.json)"
         required: true
         type: string
-      pick:
-        description: "which candidate — leave empty to LIST them and stop"
+      query:
+        description: "discover only: what to search for"
         required: false
         type: string
-      key:
-        description: "register key, e.g. city:austria/vienna-and-the-east/vienna"
+      photo_id:
+        description: "acquire only: the EXACT provider photo id you approved"
         required: false
         type: string
       alt:
-        description: "a caption for somebody who cannot see it, not the place name"
+        description: "acquire only: what the photograph shows, for somebody who cannot see it"
         required: false
+        type: string
+      focal:
+        description: "acquire only: focal point as x,y percentages"
+        required: false
+        default: "50,50"
         type: string
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
-  acquire:
+  discover:
+    if: ${{ inputs.stage == 'discover' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
+      - name: Search and list candidates
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        run: |
+          set -euo pipefail
+          python3 scripts/images/discover.py \
+            --provider "${{ inputs.provider }}" \
+            --purpose "${{ inputs.purpose }}" \
+            --query "${{ inputs.query }}"
+          echo
+          echo "Nothing was downloaded. Open the pages, choose ONE, then run"
+          echo "this workflow again with stage=acquire and its photo_id."
+
+  acquire:
+    if: ${{ inputs.stage == 'acquire' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       # The dataset has to be valid before anything is added to it. The
-      # LICENCE gate is not here — it lives inside fetch.py, which refuses
+      # LICENCE gate is not here — it lives inside acquire.py, which refuses
       # before it opens a socket, because that is the only place that can
-      # refuse per provider. A step here that merely ran the checks would
-      # look like a gate and gate nothing, which is worse than no step.
+      # refuse per provider AND per route. A step here that merely ran the
+      # checks would look like a gate and gate nothing.
       - name: Validate the dataset
         run: python3 tools/build.py check
 
-      # STEP ONE, AND THE ONLY ONE THAT NEEDS DOING BEFORE THE GATE IS OPEN.
-      # This runner has network access and the EuropeDoor sandbox does not —
-      # the egress proxy blocks both providers outright, which is why the
-      # licence is a gate rather than a recollection. This fetches the terms,
-      # archives them with the date and a hash, and prints the passages worth
-      # reading. It answers nothing: a model summarising a licence page is
-      # the same failure as a model remembering one, one step further from
-      # the source.
-      - name: Verify the terms and archive them
-        if: ${{ inputs.verify_terms }}
+      - name: Refuse a dispatch that is missing what acquisition needs
         run: |
           set -euo pipefail
-          python3 scripts/images/verify_provider.py --provider "${{ inputs.provider }}"
-          git config user.name "europedoor-photographs"
-          git config user.email "noreply@europedoor.com"
-          # The run number is in the branch name because a second run on the
-          # same day used to fail on `git checkout -b` with the branch already
-          # there — and a run that fetched pages and then threw them away for
-          # a naming collision is the worst of both.
-          BRANCH="terms/${{ inputs.provider }}-$(date +%Y-%m-%d)-${{ github.run_number }}"
-          git checkout -b "$BRANCH"
-          git add docs/data-licenses
-          git commit -m "Archive ${{ inputs.provider }} terms as served today" \
-                     -m "Read the archived pages and fill in value, quote and source for each of self_host, attribution and download_ping. checks.py asserts every quote appears in the snapshot it cites."
-          git push -u origin "$BRANCH"
+          test -n "${{ inputs.photo_id }}" || { echo "photo_id is required for acquire"; exit 1; }
+          test -n "${{ inputs.alt }}"      || { echo "alt is required for acquire"; exit 1; }
 
-      - name: Search, or search and take one
-        if: ${{ !inputs.verify_terms }}
+      - name: Acquire the approved photograph
         env:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
-          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
         run: |
           set -euo pipefail
-          ARGS=(--provider "${{ inputs.provider }}" --query "${{ inputs.query }}")
-          if [ -n "${{ inputs.pick }}" ]; then
-            ARGS+=(--pick "${{ inputs.pick }}" --key "${{ inputs.key }}" --alt "${{ inputs.alt }}")
-          fi
-          python3 scripts/images/fetch.py "${ARGS[@]}"
+          python3 scripts/images/acquire.py \
+            --provider "${{ inputs.provider }}" \
+            --photo-id "${{ inputs.photo_id }}" \
+            --purpose "${{ inputs.purpose }}" \
+            --alt "${{ inputs.alt }}" \
+            --focal "${{ inputs.focal }}"
 
-      # Everything below only does anything when a photograph was actually
-      # taken. A listing run stops here, which is the intended default.
-      - name: Derivatives
-        if: ${{ !inputs.verify_terms && inputs.pick != '' }}
+      - name: Build the width ladder and complete the provenance
         run: |
           set -euo pipefail
           python3 -m pip install --quiet pillow pillow-avif-plugin
-          # Not a heredoc: inside a YAML block scalar every line is
-          # indented, and a `<<EOF` terminator that is not at column zero is
-          # a terminator bash never sees.
-          STEM=$(python3 -c 'import json,os;print(json.load(open("data/images.json"))["images"][os.environ["KEY"]]["file"])')
-          python3 scripts/images/derive.py "$STEM"
-        env:
-          KEY: ${{ inputs.key }}
+          python3 scripts/images/derive.py "${{ inputs.purpose }}"
 
-      - name: Rebuild and check
-        if: ${{ !inputs.verify_terms && inputs.pick != '' }}
+      - name: Rebuild and run every gate
         run: |
           set -euo pipefail
           python3 tools/build.py check
           python3 tools/build.py
           python3 tools/checks.py
+          python3 tools/section-audit.py --check
+          python3 tools/ux-audit.py --check
           python3 tools/invariants.py --check
 
-      # A photograph moves `safety.img_tags` off zero, which is an exact
-      # invariant and the deliberate signal that licensed imagery arrived.
-      # That is a diff somebody reads, so this opens a branch rather than
-      # pushing to the default one.
-      - name: Commit to a branch
-        if: ${{ !inputs.verify_terms && inputs.pick != '' }}
+      - name: Browser and design gates
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright@1.49.0
+          npx playwright install --with-deps chromium
+          node tools/browser-checks.js
+
+      - name: Refuse to commit anything credential-shaped
+        run: python3 tools/photo-tests.py --committed-only
+
+      - name: Commit and push a branch
+        id: push
         run: |
           set -euo pipefail
           git config user.name "europedoor-photographs"
           git config user.email "noreply@europedoor.com"
-          BRANCH="photo/$(echo '${{ inputs.key }}' | tr ':/' '--')"
+          BRANCH="photo/${{ inputs.purpose }}-${{ inputs.photo_id }}"
           git checkout -b "$BRANCH"
-          git add assets/img data/images.json site
-          git commit -m "Photograph: ${{ inputs.key }} (${{ inputs.provider }})" \
-                     -m "Query: ${{ inputs.query }}" \
-                     -m "safety.img_tags leaves zero. Read the credit and the alt text before merging."
+          git add assets/img data/images.json docs site
+          git commit -m "Photograph: ${{ inputs.purpose }} (${{ inputs.provider }} ${{ inputs.photo_id }})" \
+                     -m "Acquired by GitHub Actions from an approved photo id. safety.img_tags leaves zero."
           git push -u origin "$BRANCH"
-          echo "Opened $BRANCH — review the credit, the alt text and the crop."
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+
+      # THE PR IS THE APPROVAL BOUNDARY, so it carries the evidence rather
+      # than a file listing. Every figure below is read out of the register
+      # the acquisition wrote — none of it is typed here, so the PR cannot
+      # describe a photograph other than the one committed.
+      - name: Open the pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 scripts/images/pr_body.py \
+            --purpose "${{ inputs.purpose }}" \
+            --branch "${{ steps.push.outputs.branch }}" > /tmp/pr-body.md
+          gh pr create \
+            --title "Photograph: ${{ inputs.purpose }} (${{ inputs.provider }} ${{ inputs.photo_id }})" \
+            --body-file /tmp/pr-body.md \
+            --head "${{ steps.push.outputs.branch }}" \
+            --base "${{ github.ref_name }}"

@@ -486,7 +486,13 @@ def c_images():
             # that names the reason is worth more than a silent failure.
             if src.startswith("http") and "europedoor.com" not in src:
                 fail(f"{rel(f)}: hotlinks a photograph from {src}")
+            # The published name is `<file>.<version>-<width>.<ext>`; the
+            # register is keyed on `<file>`. Strip BOTH — the version tag was
+            # added so /assets/ can honestly be served immutable, and a check
+            # that did not know about it read the tag as part of the name and
+            # reported every real photograph as unregistered.
             stem = re.sub(r"-\d+\.(jpg|webp|avif)$", "", src.split("/")[-1])
+            stem = re.sub(r"\.[0-9a-f]{8,}$", "", stem)
             if stem not in known:
                 fail(f"{rel(f)}: <img> for {stem!r} has no row in data/images.json — "
                      "no photographer, no source, no licence")
@@ -946,12 +952,12 @@ def c_photo_gate():
     and nothing stood between somebody with an API key and a download.
     """
     gate_path = os.path.join(ROOT, "docs", "data-licenses", "photo-providers.json")
-    fetch_path = os.path.join(ROOT, "scripts", "images", "fetch.py")
+    fetch_path = os.path.join(ROOT, "scripts", "images", "acquire.py")
     archive = os.path.join(ROOT, "docs", "data-licenses", "provider-terms")
     if not os.path.exists(fetch_path):
         return 0
     if not os.path.exists(gate_path):
-        fail("scripts/images/fetch.py exists and there is no licence gate "
+        fail("scripts/images/acquire.py exists and there is no licence gate "
              "beside it — the map pipeline's rule applied to photographs")
         return 1
     gate = json.load(open(gate_path, encoding="utf-8"))
@@ -963,7 +969,7 @@ def c_photo_gate():
     for slug in re.findall(r'^\s{4}"([a-z]+)": \{$', src, re.M):
         n += 1
         if slug not in gate:
-            fail(f"fetch.py can reach {slug!r} and the licence gate has no "
+            fail(f"acquire.py can reach {slug!r} and the licence gate has no "
                  f"row for it")
 
     for slug, row in gate.items():
@@ -1093,7 +1099,7 @@ def c_photo_gate():
             if api.get("usable") is not True and not (api.get("because") or "").strip():
                 fail(f"{slug}: the API route is refused with no `because`")
             if api.get("usable") is not True and "api_route" not in src:
-                fail(f"{slug}: the API route is refused and fetch.py does not "
+                fail(f"{slug}: the API route is refused and acquire.py does not "
                      f"read `api_route` — the refusal would be a comment")
         elif usable is False:
             if not (row.get("unusable_because") or "").strip():
@@ -1101,7 +1107,7 @@ def c_photo_gate():
                      f"refusal nobody can read is one somebody will quietly "
                      f"reverse")
             if f'"{slug}"' in src and "REFUSE" not in src.upper():
-                fail(f"{slug}: marked unusable and fetch.py has no refusal "
+                fail(f"{slug}: marked unusable and acquire.py has no refusal "
                      f"in it — the gate would be a comment")
         else:
             if row["self_host"]["value"] is not True:
@@ -1117,7 +1123,8 @@ def c_photo_gate():
     # 4. No credential, anywhere near this.
     keyish = re.compile(r"[A-Za-z0-9_-]{40,}")
     for rel_ in ("docs/data-licenses/photo-providers.json",
-                 "scripts/images/fetch.py", "scripts/images/verify_provider.py",
+                 "scripts/images/acquire.py", "scripts/images/discover.py",
+                 "scripts/images/pr_body.py", "scripts/images/verify_provider.py",
                  "data/images.json", ".github/workflows/photograph.yml"):
         f = os.path.join(ROOT, rel_)
         if not os.path.exists(f):
@@ -1140,6 +1147,17 @@ def c_photo_gate():
             # looser regex is how a real credential gets through.
             if m.group(0) in stems:
                 continue
+            # A 64-CHARACTER LOWERCASE HEX STRING IS A SHA-256, and the
+            # register is FULL of them: the original's hash and one per
+            # derivative. The scan would have failed the build on the first
+            # real photograph — on the provenance the whole pipeline exists to
+            # record. Matched by shape AND by the key it sits under, because
+            # "it looks like hex" alone is how a real credential gets waved
+            # through.
+            if re.fullmatch(r"[0-9a-f]{64}", m.group(0)):
+                before = body[max(0, m.start() - 40):m.start()]
+                if "sha256" in before or "hash" in before:
+                    continue
             fail(f"{rel_} contains a {len(m.group(0))}-character token that "
                  f"looks like a credential — keys live in repository secrets "
                  f"and nowhere else")
@@ -1184,7 +1202,14 @@ def c_immutable_assets():
     # accepted the second and reported all 785 cards as failures — an
     # instrument that does not recognise the good case it was written to
     # protect.
-    hashed = re.compile(r"(?:^|\.)[0-9a-f]{8,}\.[a-z0-9]+$")
+    # SECOND TIME THIS PATTERN HAS NOT RECOGNISED THE GOOD CASE IT PROTECTS.
+    # Its first version accepted only `name.<hash>.ext` and reported all 785
+    # correctly addressed social cards as failures. Now a photograph's ladder
+    # is `homepage-hero.<hash>-1260.jpg` — the tag names the SET and the width
+    # names the file — and it was refused for the same reason. An instrument
+    # that fails the thing it exists to protect is worse than no instrument,
+    # because the honest response to it is to switch it off.
+    hashed = re.compile(r"(?:^|\.)[0-9a-f]{8,}(?:-\d+)?\.[a-z0-9]+$")
     n = 0
     for prefix in immutable_prefixes:
         root = os.path.join(OUT, prefix.strip("/"))
@@ -3894,7 +3919,14 @@ def c_published_projection():
     n = 0
     named = 0
     for path in site_files():
-        h = open(path, encoding="utf-8").read()
+        # WHITESPACE IS COLLAPSED FIRST, because the homepage named this
+        # projection for the life of the drawn hero and this check never
+        # saw it: the paragraph wrapped between "conformal" and "conic" in
+        # the generated source, so the substring was not there to find. It
+        # printed no angle at all and every run was green. An instrument
+        # that a line break can defeat is reading the file rather than the
+        # claim, and the claim is what a reader gets.
+        h = " ".join(open(path, encoding="utf-8").read().split())
         low = h.lower()
         n += 1
         for bad in GONE:
@@ -4218,6 +4250,185 @@ def c_svg_hidden_is_hidden():
                      f"on an SVG group without a stylesheet rule, and a "
                      f"layer switch that depends on one is a layer switch "
                      f"that is inert whenever that request fails.")
+    return n
+
+
+@check("every registered photograph still hashes to what was recorded")
+def c_photo_bytes():
+    """The provenance is re-checked against the bytes, not trusted.
+
+    A SHA-256 WRITTEN ONCE AND NEVER COMPARED IS A DECORATION. The register
+    recorded the hash of the original at the moment it arrived and nothing
+    ever looked at it again — so a file replaced, re-compressed or swapped
+    after acquisition would carry a provenance row that agreed with itself
+    and described a different photograph. That is the failure class this
+    repository has recorded more than once: the evidence and the artefact
+    drifting apart with every gate green.
+
+    So this re-hashes the original, re-hashes every derivative the row
+    claims, and checks the pixel dimensions the row states are the pixel
+    dimensions the file has. It is the reason the untouched original is kept
+    beside the ladder: without it there is nothing to re-check against, and
+    the hash becomes a claim about a file nobody holds.
+
+    It also asserts the ladder is REACHABLE — every width and format
+    `picture()` will ask for exists — because a register row is a promise
+    that a page can be rendered, and a missing 800px webp is that promise
+    failing in one browser and not another.
+    """
+    reg_path = os.path.join(ROOT, "data", "images.json")
+    if not os.path.exists(reg_path):
+        return 0
+    reg = json.load(open(reg_path, encoding="utf-8")).get("images", {})
+    n = 0
+    for key, row in sorted(reg.items()):
+        orig = os.path.join(ROOT, row.get("original", ""))
+        n += 1
+        if not row.get("original") or not os.path.exists(orig):
+            fail(f"images.json > {key}: the original {row.get('original')!r} "
+                 f"is not in the repository. It is the evidence every other "
+                 f"hash is checked against; without it the provenance cannot "
+                 f"be re-verified by anybody, ever")
+            continue
+        body = open(orig, "rb").read()
+        got = hashlib.sha256(body).hexdigest()
+        if got != row.get("sha256"):
+            fail(f"images.json > {key}: the original hashes {got[:12]} and "
+                 f"the register says {str(row.get('sha256'))[:12]}. The file "
+                 f"is not the file that was acquired")
+        if len(body) != row.get("bytes"):
+            fail(f"images.json > {key}: the original is {len(body)} bytes and "
+                 f"the register says {row.get('bytes')}")
+        for dname, d in sorted((row.get("derivatives") or {}).items()):
+            n += 1
+            dpath = os.path.join(ROOT, "assets", "img", dname)
+            if not os.path.exists(dpath):
+                fail(f"images.json > {key}: derivative {dname} is registered "
+                     f"and missing")
+                continue
+            dbody = open(dpath, "rb").read()
+            if hashlib.sha256(dbody).hexdigest() != d.get("sha256"):
+                fail(f"images.json > {key}: derivative {dname} does not hash "
+                     f"to what the register records")
+        # The ladder picture() will actually ask for.
+        widths = (row.get("processing") or {}).get("widths") or []
+        for w in widths:
+            for ext in ("avif", "webp", "jpg"):
+                name = f"{row['file']}.{row.get('version', '')}-{w}.{ext}"
+                n += 1
+                if name not in (row.get("derivatives") or {}):
+                    fail(f"images.json > {key}: processing claims width {w} "
+                         f"and no derivative {name} is registered")
+    return n
+
+
+@check("only a provider cleared for automated acquisition can be acquired automatically")
+def c_automated_provider():
+    """Unsplash cannot reach the automated path, and the refusal has teeth.
+
+    The gate answers `automated_acquisition` per provider from the archived
+    pages. Unsplash's is false because its API guidelines require hotlinking —
+    "All API uses must use the hotlinked image URLs returned by the API" — and
+    the architecture here is acquire-then-self-host, which that forbids. That
+    answer has to bind the code rather than sit in a JSON file: this asserts
+    the acquisition script reads the field, that the workflow's provider input
+    offers only cleared providers, and that no registered photograph came from
+    an uncleared one.
+    """
+    gate_path = os.path.join(ROOT, "docs", "data-licenses", "photo-providers.json")
+    acq = os.path.join(ROOT, "scripts", "images", "acquire.py")
+    if not os.path.exists(acq) or not os.path.exists(gate_path):
+        return 0
+    gate = json.load(open(gate_path, encoding="utf-8"))
+    src = open(acq, encoding="utf-8").read()
+    n = 1
+    if "automated_acquisition" not in src:
+        fail("scripts/images/acquire.py does not read "
+             "`automated_acquisition` — the gate's answer would be a comment")
+    cleared_set = {s for s, r in gate.items()
+                   if not s.startswith("$")
+                   and (r.get("automated_acquisition") or {}).get("value") is True}
+    wf = os.path.join(ROOT, ".github", "workflows", "photograph.yml")
+    if os.path.exists(wf):
+        body = open(wf, encoding="utf-8").read()
+        # SCOPED TO THE PROVIDER INPUT. The first `options:` in that file is
+        # the stage choice — discover or acquire — and reading it as a
+        # provider list made this check report that the workflow offers a
+        # provider called "discover". A pattern that matches the first thing
+        # of its shape is a pattern that will eventually match the wrong one.
+        prov = re.search(r"provider:\n(?:.*\n)*?\s+options:\s*\[([^\]]*)\]",
+                         body)
+        m = prov
+        if m:
+            n += 1
+            offered = {o.strip() for o in m.group(1).split(",") if o.strip()}
+            extra = offered - cleared_set
+            if extra:
+                fail(f"the photograph workflow offers {sorted(extra)} as an "
+                     f"acquisition provider and the licence gate has not "
+                     f"cleared it for automated acquisition")
+    reg_path = os.path.join(ROOT, "data", "images.json")
+    if os.path.exists(reg_path):
+        for key, row in json.load(open(reg_path, encoding="utf-8")).get("images", {}).items():
+            n += 1
+            if row.get("provider") not in cleared_set:
+                fail(f"images.json > {key}: provider {row.get('provider')!r} "
+                     f"is not cleared for automated acquisition")
+    return n
+
+
+@check("a registered photograph appears on the page its purpose claims")
+def c_photo_published():
+    """The register cannot claim a surface it does not reach.
+
+    THIS CAUGHT ITSELF WITHIN A MINUTE OF EXISTING. The first purposes file
+    said the homepage hero fills `home:hero`, and the homepage asks
+    `picture()` for `home-hero` — one character apart. The acquisition ran,
+    the ladder built, every gate went green, and the photograph appeared on
+    no page at all: a register row claiming `/`, fifteen files on disk, and
+    a homepage that still drew the map.
+
+    Nothing else could have found it. The validator checks the row is
+    complete, the hash check proves the bytes are the bytes, and neither asks
+    the only question that matters to a reader — is it ON the page. So this
+    reads the SHIPPED HTML at the publication path the purpose declares and
+    looks for the file. A photograph that is registered and unpublished is
+    either a wasted acquisition or a broken surface, and both should stop the
+    build rather than wait to be noticed.
+    """
+    reg_path = os.path.join(ROOT, "data", "images.json")
+    if not os.path.exists(reg_path):
+        return 0
+    reg = json.load(open(reg_path, encoding="utf-8")).get("images", {})
+    n = 0
+    for key, row in sorted(reg.items()):
+        n += 1
+        path = row.get("publication_path", "")
+        f = os.path.join(OUT, path.strip("/"), "index.html")
+        if path == "/":
+            f = os.path.join(OUT, "index.html")
+        if not os.path.exists(f):
+            fail(f"images.json > {key}: publication_path {path!r} is not a "
+                 f"page this site builds")
+            continue
+        html = open(f, encoding="utf-8").read()
+        # AND THE FILES IT REFERENCES MUST BE SERVED. The first version of
+        # this check read the HTML and stopped there, so it passed on a
+        # homepage that referenced a ladder site/ did not contain — the
+        # reference was right and every file 404'd. A <picture> does not fall
+        # back once a <source> matches, so that is a hole where the hero is.
+        for name in sorted(row.get("derivatives") or {}):
+            n += 1
+            if not os.path.exists(os.path.join(OUT, "assets", "img", name)):
+                fail(f"images.json > {key}: {name} is registered and is not "
+                     f"published under site/assets/img/ — the page references "
+                     f"a file the site does not serve")
+        if f"{row['file']}.{row.get('version', '')}-" not in html:
+            fail(f"images.json > {key}: acquired for {row.get('purpose')!r} "
+                 f"and {path} does not reference {row['file']}. The register "
+                 f"claims a surface it does not reach — either the key is not "
+                 f"the one that page asks picture() for, or the surface never "
+                 f"asks at all")
     return n
 
 

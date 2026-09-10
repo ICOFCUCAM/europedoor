@@ -55,13 +55,45 @@ desktop and always visible on a phone. Always-visible credits on 988 pages is
 a design nobody ships; credits that live only in a data file are a licence
 risk. This is the compromise, and a screen reader reads them either way.
 
-## Adding one
+## Adding one — the automated route, which is the one to use
+
+For a provider the gate clears for automated acquisition, **nobody downloads
+or uploads anything by hand.** `.github/workflows/photograph.yml` does the
+whole of it and a person makes exactly one decision: which photograph.
+
+1. Declare the purpose in `data/image-purposes.json` if it is not there —
+   the surface, the register key, the page, the native width, the
+   orientation and the aspect range. A photograph with no declared purpose is
+   refused before the socket opens.
+2. Dispatch the workflow with **stage: discover** and a query. It prints
+   candidates — id, photographer, page, native width, and whether each meets
+   the purpose. It downloads nothing and names no winner.
+3. Open the pages. Choose one. **This is the only human step.**
+4. Dispatch again with **stage: acquire**, that photo id, and an `alt` written
+   for somebody who cannot see it. The runner fetches that id, asserts the id
+   it got back is the id asked for, downloads, hashes, keeps the untouched
+   original, builds the ladder, completes the provenance, runs every gate and
+   opens a pull request.
+5. Read the PR and merge it. Its body is generated from the register the
+   acquisition wrote, so it cannot describe a different photograph.
+
+If the id cannot be retrieved the workflow fails. It never substitutes another
+photograph, because a substitute is a picture nobody approved wearing correct
+provenance.
+
+## Adding one by hand, where that is the only cleared route
+
+Unsplash is this case: its licence permits the use and its API guidelines
+refuse the machine.
 
 1. Put the file through the width ladder as
-   `assets/img/<name>-<width>.{avif,webp,jpg}`.
+   `assets/img/<name>.<original-sha-prefix>-<width>.{avif,webp,jpg}` —
+   `scripts/images/derive.py` does the naming, and the hash in the name is
+   what earns the `immutable` header on `/assets/`.
 2. Add a row keyed by what it illustrates —
    `city:norway/fjord-norway/bergen`, `journey:<slug>`, `story:<slug>`,
-   `place:<country>/<region>/<city>/<place>`.
+   `place:<country>/<region>/<city>/<place>` — carrying the source URL, the
+   date and the SHA-256 of the bytes as served.
 3. `python3 tools/build.py check`, then build and commit.
 
 Nothing else changes. Callers never branch on whether a photograph exists:
@@ -93,9 +125,12 @@ what this client can read; nothing else is.
 So the remaining route is a person:
 
 1. Open each URL in `terms_urls` for that provider in a normal browser.
-2. Save the page as text into `docs/data-licenses/provider-terms/`, named
-   `<provider>.<slugified-url>.<YYYY-MM-DD>.txt`, with the URL, the date and
-   the SHA-256 on the first three lines, exactly as the script writes them.
+2. Save the page as text with `python3 scripts/images/save_terms.py`, which
+   writes it into `docs/data-licenses/provider-terms/` named
+   `<provider>.<slugified-url>.<YYYY-MM-DD>.txt` with the URL, the date and
+   the SHA-256 on the first three lines — and records that a person saved it
+   from a browser, because a hand-saved page and a fetched one are not the
+   same artefact and the difference should not be silent.
 3. Fill in `value`, `quote` and `source` for each of `self_host`,
    `attribution` and `download_ping` in
    `docs/data-licenses/photo-providers.json`.
@@ -146,7 +181,7 @@ What requires hotlinking is the **API**:
 > All API uses must use the hotlinked image URLs returned by the API under the
 > `photo.urls` properties.
 
-`scripts/images/fetch.py` is an API client, so that route is refused: taking it
+`scripts/images/acquire.py` is an API client, so that route is refused: taking it
 would mean embedding Unsplash's CDN URLs, and this site sends
 `img-src 'self' data:` with a check enforcing it, so it would open the
 Content-Security-Policy on all 1,033 pages to a host we do not control. That is
@@ -173,8 +208,9 @@ gap, and a gap that is written down is one somebody can close.
 **THE REFUSED THING IS A ROUTE, NOT A PROVIDER**, and collapsing the two is the
 mistake this section records. It cost a correct provider a wrong refusal, and
 the second version of the gate answers per route: `self_host` is a reading of
-the LICENCE, `api_route` is a reading of the API guidelines, and `fetch.py`
-enforces the second because it is the thing that takes that route.
+the LICENCE, `api_route` is a reading of the API guidelines, and
+`acquire.py` enforces the second because it is the thing that takes that
+route.
 
 **Answered is not the same as permitted**, and the gate had no way to say that
 either: its first version failed the build on any `self_host` that was not

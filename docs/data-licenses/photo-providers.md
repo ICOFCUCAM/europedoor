@@ -1,32 +1,56 @@
-# Photograph providers — the gate, and why it is shut
+# Photograph providers — the gate, and which route it opens
 
-**Status: the pipeline is built and no provider is cleared.** Zero
-photographs are licensed. `data/images.json` is empty and every `picture()`
-call falls back to a generated plate, which is why the site ships today.
+**Status: Pexels is cleared for automated acquisition. Unsplash is refused
+for that route and permitted for a hand-download.** The register
+(`data/images.json`) is still empty: the gate being open is not a photograph
+arriving, and nothing here may claim one was acquired unless the workflow
+actually acquired it.
 
 ## What is built
 
 | piece | state |
 |---|---|
-| the register, and its five required fields | built, enforced twice |
+| the register, and its twenty-four required fields | built, enforced twice |
 | `picture()` — a photograph if we hold one, a plate if not | built |
-| `scripts/images/fetch.py` — search, look, pick, write the row | built |
-| the licence gate | **shut, and this document is why** |
-| the derivative step — the widths and formats `picture()` asks for | not built |
+| `data/image-purposes.json` — why a photograph exists, before one exists | built |
+| `scripts/images/discover.py` — search, list, name no winner | built |
+| `scripts/images/acquire.py` — take ONE approved id, verify, download, register | built |
+| `scripts/images/derive.py` — the width ladder, hashed per derivative | built |
+| the licence gate, per provider **and per route** | built, and it refuses two of the three routes |
+| `.github/workflows/photograph.yml` — the only thing that touches the network | built |
 
 `Pexels` and `Unsplash` were already valid licence values in
 `tools/lib/data.py` before any of this, so the schema has always been ready
 for exactly these two.
 
-## The three questions, and why a quote is required
+## The gate is on the ROUTE, not on the provider
 
-`photo-providers.json` holds them. **The gate does not ask whether anybody
-knows what Unsplash allows. It asks for the sentence, and for the archived
-page it was copied out of.**
+That was the correction that produced this version. The first answer refused
+Unsplash outright, which was wrong: an image licence permitting free
+commercial use says nothing about whether the **API terms** permit automated
+acquisition followed by self-hosting, and the two questions have different
+answers for the same provider.
+
+| provider | licence permits the use | API permits automated acquisition + self-host |
+|---|---|---|
+| Pexels | yes | yes |
+| Unsplash | yes | **no** — the API guidelines require the hotlinked URLs and a download event |
+
+So `automated_acquisition` is a field of its own, `acquire.py` refuses a
+provider that is not `true` there, and `checks.py` asserts the same thing
+independently on every commit. A provider may be perfectly usable by hand and
+still be refused this route, and saying so is more useful than one verdict per
+provider.
+
+## Why a quote is required
+
+`photo-providers.json` holds the questions. **The gate does not ask whether
+anybody knows what a provider allows. It asks for the sentence, and for the
+archived page it was copied out of.**
 
 That distinction is the whole design. A model's recollection of a commercial
 API's terms is not evidence — it is a guess wearing the clothes of one, and
-these terms change. So each of the three facts is answered with three things:
+these terms change. So each fact is answered with three things:
 
 | | |
 |---|---|
@@ -43,20 +67,23 @@ quote that passes, and a gate half-answered.
 **1. May we self-host?** This site serves `img-src 'self' data:` and
 `checks.py` refuses any third-party origin. A provider whose terms require
 hotlinking cannot be used without changing both, which is an owner decision
-about the security posture of every page — not a build step.
+about the security posture of every page — not a build step. This is the
+question Unsplash fails.
 
-**2. What exactly must the credit say?** `picture()` prints the photographer
-and the licence. If the terms require a link to the provider, or to the
-photographer's profile, or particular wording, **the renderer changes before
-the first fetch**, not after. A credit that is close to right is wrong.
+**2. What exactly must the credit say?** `picture()` prints it. If the terms
+require a link to the provider, or to the photographer's profile, or
+particular wording, **the renderer changes before the first fetch**, not
+after. Pexels asks for "Photo by <photographer> on Pexels" with both linked,
+so that is what `render.picture()` emits, and it emitted it before anything
+was downloaded.
 
 **3. Is a download event required?** Some APIs require a request to a separate
-endpoint when an image is used. If so it is part of using the image, and a
-cleared `download_ping: true` with no `endpoint_download` fails the check,
-because nothing would call it.
+endpoint when an image is used. A cleared `download_ping: true` with no
+`endpoint_download` fails the check, because nothing would call it.
 
-Then `read_on`. A gate opened without recording when the terms were read
-cannot be re-checked.
+**4. May acquisition be automated at all?** The route question above. Then
+`read_on`: a gate opened without recording when the terms were read cannot be
+re-checked.
 
 ## How the terms get read
 
@@ -70,73 +97,96 @@ person reads.
 
 It will not run in the EuropeDoor sandbox. The egress proxy returns 403 for
 both providers, which was confirmed rather than assumed, and is precisely why
-this is a gate. Run it locally, or run the `photograph` workflow with
-**verify_terms** ticked: that runner has network access, and it opens a branch
-carrying the archived pages for you to read.
+this is a gate. Run it in the `photograph` workflow, which has network access.
 
-**On Unsplash specifically.** There is a suspicion on record — in the gate
-file, marked as a suspicion — that their API guidelines require using the
-hotlinked URLs returned under `photo.urls`, require crediting both the
-photographer and Unsplash with links, and require triggering a download
-endpoint on use. **None of that is a fact here.** It is written down only so
-somebody knows what to look for on the page, and the check will not let it
-become an answer without the quote that supports it.
+**A page read in a browser and pasted in is also evidence**, and
+`scripts/images/save_terms.py` archives it the same way — the date, the
+SHA-256 of the text as saved, and a header saying a person saved it from a
+browser rather than a socket. The provenance of the snapshot is recorded
+because the two are not the same kind of artefact and the difference should
+not be silent.
 
-## What happens when the gate opens
+## Acquiring one
 
-`fetch.py` lists candidates and **stops**. It will not pick one for you:
+Two stages, because they are two decisions, and they are separate inputs to
+`.github/workflows/photograph.yml` rather than two flags on one command.
 
-    python3 scripts/images/fetch.py --provider pexels --query "Vienna Stephansdom"
+**discover** searches and prints candidates — id, photographer, page, native
+width, and whether each one meets the purpose's requirements. It downloads
+nothing and it names no winner.
 
-prints the photographer, the pixel width and the page for each, and then says
-to look at them. A photograph chosen from a filename is a photograph nobody
-looked at, and this is a family — see `docs/image-philosophy.md` — where the
-whole argument for buying one is that it does a job the drawing cannot.
+    stage: discover · provider: pexels · purpose: homepage-hero
+    query: "alpine valley at dawn"
 
-Then, with a caption written for somebody who cannot see it:
+**acquire** takes ONE id that a person approved, fetches that id by id,
+**asserts the returned id is the requested id**, downloads, hashes, keeps the
+untouched original, builds the ladder, completes the provenance, runs every
+gate and opens a pull request.
 
-    python3 scripts/images/fetch.py --provider pexels --query "…" \
-      --pick 2 --key city:austria/vienna-and-the-east/vienna \
-      --alt "Rooftops and the cathedral spire from the north, early light"
+    stage: acquire · provider: pexels · purpose: homepage-hero
+    photo_id: 1234567 · alt: "…" · focal: "50,40"
 
-which writes the source file and the register row. The build will not
-reference it until the derivatives exist.
+**The previous design took a search result by POSITION** — `--pick 3` — so the
+picture a person approved and the picture that arrived could differ silently
+while every provenance field was correctly recorded about the wrong one. A
+position is not an identity. If the id cannot be retrieved the workflow fails;
+it never substitutes another photograph.
+
+## Purpose is mandatory, and it is declared first
+
+`data/image-purposes.json` names the surface a photograph is FOR, the register
+key it fills, the page it is published on, and the minimum it must be —
+native width, orientation, aspect range. `acquire.py` refuses a purpose that
+is not declared and a photograph that does not meet it; `data.py` refuses a
+register row whose purpose is unknown and two rows claiming the same one. A
+photograph acquired for the homepage hero cannot drift onto a destination page
+because it happens to be in the register.
+
+`min_width` is **native** pixels, not the ladder's widest step. A 1,200-pixel
+original upscaled to 2,400 is the same class of untruth as a population we
+estimated, and `derive.py` refuses to upscale for the same reason.
+
+## The original is kept
+
+`photographs/<key>.original.<ext>` is the bytes as served, and it is never
+overwritten by a resized or recompressed version and never deleted to make the
+repository smaller. The SHA-256 in the register is of **those** bytes, which
+is what makes "this file is the file that was licensed" a checkable claim
+rather than a sentence.
+
+`derive.py` reads it, builds the widths and formats `picture()` asks for with
+**Pillow** — the sister repository encodes 629 photographs this way, and
+ImageMagick is one more thing to have installed — and records the SHA-256,
+byte count and real pixel dimensions of every derivative. The derivative
+filenames carry the original's hash, so they sit at a URL that cannot change,
+which is what the `immutable` header on `/assets/` promises.
 
 ## Credentials
 
-`PEXELS_API_KEY` and `UNSPLASH_ACCESS_KEY`, from the environment only.
-**Never in a file, a commit, a workflow body or a log line.** GitHub
-repository secrets, passed to the step that runs the fetch. `fetch.py` exits
-with that instruction rather than a stack trace when the variable is missing,
-and it never prints a key.
+`PEXELS_API_KEY`, from the environment only. **Never in a file, a commit, a
+workflow body, a log line, generated metadata or a PR body.** A GitHub
+repository secret, passed as `env` on the single step that needs it rather
+than on a command line that gets logged. `acquire.py` exits with that
+instruction rather than a stack trace when the variable is missing, and it
+never prints a key. `tools/checks.py` greps the committed files for anything
+credential-shaped, and the workflow runs that grep again before it commits.
 
-## Running it
+## The approval boundary is the pull request
 
-`.github/workflows/photograph.yml`, on manual dispatch only. A schedule would
-mean photographs arriving on this site that nobody chose, and choosing is the
-entire job.
+The workflow opens a branch and a PR; it never pushes to the default one. The
+PR body is generated by `scripts/images/pr_body.py` **from the register the
+acquisition wrote** — photographer, licence, source page, both hashes, every
+derivative — so it cannot describe a photograph other than the one committed.
+Nothing is typed into it.
 
-Leave **pick** empty and it lists candidates and stops. Fill in **pick**,
-**key** and **alt** and it takes that one, builds the derivatives, rebuilds
-the site, runs the checks — and **opens a branch rather than pushing to the
-default one**. A photograph moves `safety.img_tags` off an exact zero, which
-is the deliberate signal that licensed imagery has arrived, so it is a diff
-somebody reads.
-
-The keys are passed as `env` on the single step that needs them rather than
-on a command line, and `fetch.py` never prints one.
-
-**Derivatives are ImageMagick**, because this repository is stdlib-only and
-re-encoding AVIF in pure Python is not a thing anybody should attempt.
-`scripts/images/derive.py` says what to install when it is missing rather
-than failing three layers down, and it **never upscales**: a 900-pixel source
-gets the widths it can fill and no more, because a file named `-2400` holding
-900 pixels of detail is the same class of untruth as a population we
-estimated.
+A photograph moves `safety.img_tags` off an exact zero and moves
+`weight.home_kb`. Both are invariants, so both have to be moved deliberately
+in that diff, which is the point: licensed imagery arriving is a thing
+somebody reads rather than a thing that happens.
 
 ## The sandbox cannot do this
 
 The proxy answers 403 to CONNECT for general hosts, and the build must run on
-a machine with no internet and produce identical pages. So acquisition is a
-human or CI step, exactly like `scripts/map/fetch.py`, and what gets committed
-is the file and its row.
+a machine with no internet and produce identical pages. So acquisition is a CI
+step, exactly like `scripts/map/fetch.py`, and what gets committed is the
+original, the derivatives and the row.

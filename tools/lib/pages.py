@@ -1110,9 +1110,44 @@ def home(data):
     # cartography.credited(); the hero builds its own SVG rather than a
     # plate, so it is the one place the same rule has to be written twice —
     # and a check asserts both say it.
-    hero = heroeurope(data)
+    # A PHOTOGRAPH REPLACES THE DRAWING; IT DOES NOT SIT BEHIND IT. Rendering
+    # both stacked them — the continent drawn over the picture, the picture
+    # showing through every gap in the coastline — and it took looking at the
+    # built page to see it, because every count was correct.
+    #
+    # Which one wins was already decided in the stylesheet, before the drawn
+    # hero existed: ".shot is added only when the register actually holds the
+    # file, and the ground below is what a reader sees until then." The
+    # drawing is the interim answer to an empty register, and it is a good
+    # one — it is why this page was shippable with no photograph at all. It
+    # is not a layer under a photograph.
+    hero = "" if heroimg else heroeurope(data)
     heroground = (" " + cartography.RELIEF_CREDIT
                   if "lyr-terrain" in hero else "")
+
+    # AND THE NOTE UNDER IT DESCRIBES WHAT IS ACTUALLY THERE. It said "the
+    # continent above is drawn from Natural Earth" unconditionally, which
+    # would have been a false claim about a photograph on the one page that
+    # opens the site — the same class as /map printing the projection it had
+    # stopped using.
+    #
+    # AND IT NAMES THE PROJECTION, so it states the four angles, from the
+    # constants the build projects with rather than typed. It named the
+    # conic before and printed no angle at all — c_published_projection
+    # never saw it, because the phrase fell across a line break in the
+    # source and the check searched the raw HTML. A claim a check cannot
+    # read is a claim nothing is holding; both ends are fixed.
+    herosource = (
+        f'The photograph above is by {esc(hero_row["photographer"])}, '
+        f'licensed under the <a href="{esc(hero_row["licence_url"])}">'
+        f'{esc(hero_row["licence"])} licence</a> and served from this origin.'
+        if hero_row else
+        "The continent above is drawn from "
+        '<a href="/sources">Natural Earth</a>, public domain, on a Lambert '
+        f"conformal conic — standard parallels {geo.LCC_P1:g}°N and "
+        f"{geo.LCC_P2:g}°N, origin {geo.LCC_LAT0:g}°N, central meridian "
+        f"{geo.LCC_LON0:g}°E — the same projection and the same file as "
+        f"every other map here.{heroground}")
 
     body = f"""
 <section class="herofull{' shot' if heroimg else ''}">
@@ -1134,9 +1169,7 @@ def home(data):
     <button class="btn" type="submit">Plan my journey</button>
   </form>
   <div class="chips hero-intents">{intentchips}</div>
-  <p class="sourcenote">The continent above is drawn from
-  <a href="/sources">Natural Earth</a>, public domain, on a Lambert conformal
-  conic — the same projection and the same file as every other map here.{heroground}
+  <p class="sourcenote">{herosource}
   <a href="/map">Open the map →</a></p>
 </div>
 

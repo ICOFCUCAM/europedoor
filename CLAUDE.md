@@ -1672,14 +1672,15 @@ is nine anchor classes now, which is what a photo editor reaches for anyway.
 row. Photographs were enforced only at the OUTPUT — no published page may
 reference a file with no register row — and nothing at all stood between
 somebody with an API key and a download.
-`docs/data-licenses/photo-providers.json` holds three questions per provider
-and `scripts/images/fetch.py` refuses before the request until they are
+`docs/data-licenses/photo-providers.json` holds four questions per provider
+and `scripts/images/acquire.py` refuses before the request until they are
 answered: **may we self-host** (this site serves `img-src 'self' data:` and
 refuses a third-party origin, so a hotlink-only provider needs a decision
 about the security posture of every page, not a build step), **what exactly
 must the credit say** (the renderer changes *before* the first fetch, not
-after), and **is a download ping required**. `Pexels` and `Unsplash` were
-already valid licence values in the schema before any of this.
+after), **is a download ping required**, and **may acquisition be automated
+at all**. `Pexels` and `Unsplash` were already valid licence values in the
+schema before any of this.
 
 **THE GATE DOES NOT ASK WHETHER ANYBODY KNOWS WHAT UNSPLASH ALLOWS. IT ASKS
 FOR THE SENTENCE, AND FOR THE ARCHIVED PAGE IT WAS COPIED OUT OF.** A model's
@@ -1707,12 +1708,95 @@ links, and a download event. It lives in the gate file marked as a suspicion,
 so somebody knows what to look for, and the check will not let it become an
 answer without the quote behind it.
 
-**The fetcher lists and stops.** It prints the photographer, the pixel width
-and the page for each candidate and refuses to pick — a photograph chosen from
-a filename is a photograph nobody looked at, and this is the family whose
-entire argument for buying one is that it does a job the drawing cannot.
-Keys come from the environment, are never printed, and a check greps the
-committed files for anything credential-shaped.
+**THE GATE IS ON THE ROUTE, NOT ON THE PROVIDER, and collapsing the two cost
+a correct provider a wrong refusal.** An image licence permitting free
+commercial use says nothing about whether the *API terms* permit automated
+acquisition followed by self-hosting, and for Unsplash the two have opposite
+answers: the licence clears the use, the API guidelines require the hotlinked
+`photo.urls` and a download event, which would open `img-src` on all 1,033
+pages to a host we do not control. So `self_host` reads the LICENCE,
+`api_route` reads the API guidelines, `automated_acquisition` is a field of
+its own, and Unsplash enters by hand or not at all. Pexels clears every route.
+**Answered is not permitted either** — the gate's first version failed the
+build on any `self_host` that was not true, which turns "we read the terms and
+they forbid this" into a red run forever.
+
+**Discovery lists and stops; acquisition takes an ID.** They are two stages of
+the workflow rather than two flags on one command, because they are two
+decisions. `discover.py` prints the photographer, the native width, the page
+and whether each candidate meets its purpose, and **names no winner** — a
+photograph chosen from a filename is a photograph nobody looked at, and this
+is the family whose entire argument for buying one is that it does a job the
+drawing cannot. `acquire.py` takes one approved id, fetches it **by id**, and
+asserts the id it got back is the id it asked for.
+
+**The previous design took a search result by POSITION** — `--pick 3` — so the
+picture a person approved and the picture that arrived could differ silently
+while every provenance field was correctly recorded about the wrong one. A
+position is not an identity, and a search result is not stable. If the id
+cannot be retrieved the workflow fails; it never substitutes another
+photograph, because a substitute is a picture nobody chose wearing correct
+provenance.
+
+**A purpose is declared before a photograph exists.**
+`data/image-purposes.json` names the surface, the register key, the page, and
+the native width, orientation and aspect a photograph must have to do that
+job. `acquire.py` refuses an undeclared purpose and a photograph that misses
+it; the validator refuses a row whose purpose is unknown and two rows claiming
+the same one, so a hero cannot drift onto a destination page because it
+happens to be in the register. `min_width` is **native** pixels rather than
+the ladder's widest step — a 1,200-pixel original upscaled to 2,400 is the
+same untruth as a population we estimated, and `derive.py` refuses to upscale.
+
+**The original is kept and never overwritten.** `photographs/` holds the bytes
+as served; the register's SHA-256 is of those bytes, which is what makes "this
+file is the file that was licensed" checkable rather than a sentence.
+Derivatives carry that hash in their names, so they sit at a URL that cannot
+change — which is what the `immutable` header on `/assets/` promises, and the
+lesson the stylesheet already taught this repository.
+
+**The pull request is the approval boundary, so it is generated from the
+register rather than typed.** `pr_body.py` reads the row the acquisition
+wrote — photographer, licence, source page, both hashes, every derivative — so
+the PR cannot describe a photograph other than the one committed. Keys come
+from the environment, are never printed, and a check greps the committed files
+for anything credential-shaped; the workflow runs that grep again before it
+commits.
+
+**A PHOTOGRAPH REPLACES THE DRAWING; IT DOES NOT SIT BEHIND IT.** The first
+render put both on the homepage — the continent drawn over the picture, the
+picture showing through every gap in the coastline — and every count was
+correct. The stylesheet had already decided it before the drawn hero existed:
+`.shot` is added only when the register holds the file, and the ground below
+is what a reader sees until then. The drawing is the interim answer to an
+empty register and a good one; it is not a layer under a photograph. **And the
+note under it describes what is actually there**, because "the continent above
+is drawn from Natural Earth" over a photograph is the `/map` failure on the
+one page that opens the site.
+
+**The derivatives were acquired, hashed, registered, referenced — and never
+copied into `site/`.** `build.py` copies `assets/` and `assets/img` was not in
+the list, so the hero was a 1280×736 hole: `<picture>` does not fall back once
+a `<source>` matches, and a matching `<source>` pointing at a 404 renders
+nothing. Every gate was green, because not one of them fetched a URL a page
+had asked for.
+
+**And two CSS rules for the photograph were dead the whole time.** `picture {
+display: block }` and `.herofull picture { display: block }` were written for
+a code path the empty register never ran; the dead-rule scan found them within
+one run of a photograph actually rendering. **A code path nothing exercises is
+a code path nothing checks** — the same reason the focal point shipped as a
+`style="` attribute the CSP forbids.
+
+**A line break defeated the projection check, on the homepage, for the life of
+the drawn hero.** `c_published_projection` requires a page that names a
+Lambert conformal conic to state its four angles in the same sentence. The
+homepage named it and printed no angle at all, and the check never fired,
+because the generated paragraph wrapped between "conformal" and "conic" and
+the substring was not there to find. Whitespace is collapsed before the search
+now, and the homepage states the angles from `geo`'s own constants. **An
+instrument a line break can defeat is reading the file rather than the
+claim**, and the claim is what a reader gets.
 
 **NO EXTERNAL LICENCE CLAIM ENTERS PRODUCTION FROM MEMORY. EVERY EXTERNALLY
 GOVERNED ASSET REQUIRES SOURCE + DATE + EVIDENCE.** One rule, stated once,
@@ -1797,6 +1881,7 @@ the rest.
     python3 tools/content-report.py --write   what is missing, against the spec's targets
     python3 tools/invariants.py --check       what a visual change may not move
     python3 tools/plate-variation.py --check  the plates have not got more alike
+    python3 tools/photo-tests.py              the acquisition pipeline, against a stub provider
 
 The browser checks need `npm install playwright` and take a couple of
 minutes. They earn their place repeatedly: a 47-pixel mobile overflow on

@@ -1587,7 +1587,12 @@ html { scroll-padding-top: 5rem; }
 .photo.f-lb { object-position:   0% 100%; }
 .photo.f-cb { object-position:  50% 100%; }
 .photo.f-rb { object-position: 100% 100%; }
-picture { display: block; position: relative; height: 100%; }
+/* No `display: block`: <picture> is display:inline by default and the UA
+   sheet does not need overriding here, because its only child is the <img>
+   that carries the layout. The dead-rule scan reported both of these the
+   first time a photograph actually rendered — two declarations written for a
+   code path the empty register never ran. */
+picture { position: relative; height: 100%; }
 /* The credit is always present in the markup and shown on hover or focus.
    Always-visible credits on 988 pages is a design nobody ships; credits that
    exist only in a data file are a licence risk. This is the compromise, and
@@ -2219,7 +2224,7 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 /* The photograph, when one is licensed, and the scrim that keeps the type
  * readable over it. A scrim is not decoration here: it is what makes the
  * contrast ratio a property of the design rather than of the picture. */
-.herofull picture { position: absolute; inset: 0; z-index: -2; display: block; }
+.herofull picture { position: absolute; inset: 0; z-index: -2; }
 .herofull .photo { width: 100%; height: 100%; object-fit: cover; }
 .herofull.shot::after {
   content: ""; position: absolute; inset: 0; z-index: -1;

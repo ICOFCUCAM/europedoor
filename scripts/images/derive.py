@@ -28,6 +28,9 @@ between a real 1260 and a fake 1800 will take the fake one. A file named
 population we estimated.
 """
 
+import datetime
+import hashlib
+import json
 import os
 import sys
 
@@ -36,12 +39,28 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 from lib.render import IMAGE_WIDTHS                       # noqa: E402
 
 IMG_DIR = os.path.join(ROOT, "assets", "img")
+REGISTER = os.path.join(ROOT, "data", "images.json")
 # Per-format quality, taken from the sister repository's settled values rather
 # than guessed here. AVIF carries far more at a lower number than JPEG does.
 QUALITY = {"avif": 50, "webp": 78, "jpg": 82}
 
 
 def derive(stem):
+    """Build the ladder from the UNTOUCHED original and record what was made.
+
+    THE ORIGINAL IS READ AND NEVER WRITTEN. `<stem>.original.jpg` is the
+    evidence the whole chain is checked against — checks.py re-hashes it on
+    every build — so this reads it, writes beside it, and leaves it exactly as
+    the provider served it.
+
+    AND IT COMPLETES THE PROVENANCE ROW rather than leaving it half-filled.
+    acquire.py writes the row with `processing` and `derivatives` set to null,
+    which the validator refuses: a photograph that has arrived but has no
+    ladder is not publishable, and the state where it LOOKS publishable is the
+    one worth making impossible. This fills both, with the hash and the real
+    pixel dimensions of every file it wrote, so a later reader can re-check
+    any step without trusting this script's word for it.
+    """
     try:
         from PIL import Image
     except ImportError:
@@ -49,11 +68,26 @@ def derive(stem):
                  "either Pillow 11+ or `pip install pillow-avif-plugin`. It is "
                  "installed by the photograph workflow; it is deliberately not "
                  "a dependency of the build, which stays stdlib-only.")
-    src = os.path.join(IMG_DIR, stem + ".src.jpg")
+    import PIL
+    src = os.path.join(ROOT, "photographs", stem + ".original.jpg")
     if not os.path.exists(src):
-        sys.exit(f"no source at {os.path.relpath(src, ROOT)} — run "
-                 f"scripts/images/fetch.py first")
-    made, skipped = [], []
+        sys.exit(f"no original at {os.path.relpath(src, ROOT)} — run "
+                 f"scripts/images/acquire.py first")
+
+    with open(src, "rb") as fh:
+        original_sha = hashlib.sha256(fh.read()).hexdigest()
+
+    # THE VERSION TAG IS THE ORIGINAL'S OWN HASH, and it is in every
+    # derivative's NAME. /assets/ is served `public, max-age=31536000,
+    # immutable`, which is a promise about the URL: a browser told that will
+    # not revalidate for a year. A ladder at `homepage-hero-1260.jpg` is a
+    # stable URL whose contents change the day the photograph is replaced —
+    # the stylesheet bug, exactly, in a new place, and the check that exists
+    # because of that bug caught this within a minute of the first real
+    # acquisition. One tag for the whole set rather than one per file,
+    # because the set changes together.
+    tag = original_sha[:10]
+    made, skipped = {}, []
     with Image.open(src) as im:
         im = im.convert("RGB")
         for w in IMAGE_WIDTHS:
@@ -63,16 +97,62 @@ def derive(stem):
             small = im.resize((w, round(im.height * w / im.width)),
                               Image.LANCZOS)
             for ext in ("avif", "webp", "jpg"):
-                dst = os.path.join(IMG_DIR, f"{stem}-{w}.{ext}")
+                name = f"{stem}.{tag}-{w}.{ext}"
+                dst = os.path.join(IMG_DIR, name)
                 kw = {"quality": QUALITY[ext]}
                 if ext == "webp":
                     kw["method"] = 5
                 if ext == "jpg":
                     kw["optimize"] = True
                 small.save(dst, **kw)
-                made.append(os.path.basename(dst))
-        width = im.width
-    print(f"{stem}: source is {width}px, made {len(made)} derivatives")
+                with open(dst, "rb") as fh:
+                    body = fh.read()
+                made[name] = {"sha256": hashlib.sha256(body).hexdigest(),
+                              "bytes": len(body),
+                              "width": small.width, "height": small.height}
+        width, height = im.width, im.height
+
+    processing = {
+        "tool": f"Pillow {PIL.__version__}",
+        "version_tag": tag,
+        "source_sha256": original_sha,
+        "source_width": width,
+        "source_height": height,
+        "widths": [w for w in IMAGE_WIDTHS if w <= width],
+        "skipped_widths": skipped,
+        "formats": ["avif", "webp", "jpg"],
+        "quality": dict(QUALITY),
+        "resample": "LANCZOS",
+        "generated_at": datetime.datetime.now(datetime.timezone.utc)
+        .replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+    }
+
+    with open(REGISTER, encoding="utf-8") as fh:
+        reg = json.load(fh)
+    keys = [k for k, r in reg["images"].items() if r.get("file") == stem]
+    if not keys:
+        sys.exit(f"no register row has file {stem!r}. derive.py completes a "
+                 f"row acquire.py wrote; it does not invent one.")
+    for k in keys:
+        row = reg["images"][k]
+        # THE LADDER MUST COME FROM THE FILE THE ROW CLAIMS. If the original
+        # on disk is not the one the register recorded, the derivatives are of
+        # some other photograph and every hash below would be true about the
+        # wrong picture.
+        if row.get("sha256") and row["sha256"] != original_sha:
+            sys.exit(f"{k}: the original on disk hashes {original_sha[:12]} "
+                     f"and the register says {row['sha256'][:12]}. The file "
+                     f"has been replaced since it was acquired. Nothing "
+                     f"written.")
+        row["version"] = tag
+        row["processing"] = processing
+        row["derivatives"] = made
+    with open(REGISTER, "w", encoding="utf-8") as fh:
+        json.dump(reg, fh, ensure_ascii=False, indent=2)
+        fh.write("\n")
+
+    print(f"{stem}: original is {width}x{height}, made {len(made)} derivatives")
+    print(f"  provenance completed on {len(keys)} register row(s)")
     if skipped:
         print(f"  no upscaling: {', '.join(str(w) for w in skipped)} skipped. "
               f"A browser choosing between a real width and a fake larger one "

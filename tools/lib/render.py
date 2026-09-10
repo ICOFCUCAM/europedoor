@@ -702,7 +702,11 @@ def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed
     if not row:
         return plate(fallback_seed or key, w, h, alt, motif=fallback_motif)
 
-    base = f"{IMAGE_HOST}/assets/img/{row['file']}"
+    # CONTENT-ADDRESSED, because /assets/ is served immutable and that is a
+    # promise about the URL. The tag is the original's own hash, written by
+    # derive.py into every derivative's name, so replacing the photograph
+    # replaces every URL and no reader is left with last year's picture.
+    base = f"{IMAGE_HOST}/assets/img/{row['file']}.{row['version']}"
     fx, fy = row.get("focal", [50, 50])
 
     def srcset(ext):

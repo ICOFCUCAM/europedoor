@@ -92,8 +92,18 @@ EVENT_KINDS = ("festival", "concert", "sport", "exhibition", "religious",
 #
 # The field names are taken from the sister repository, which has 629
 # photographs under exactly this discipline and proved the shape works.
-IMAGE_REQUIRED = ("file", "alt", "photographer", "source", "licence",
-                  "licence_url", "fetched", "sha256")
+# EVERY FIELD, BECAUSE A HALF-REGISTERED PHOTOGRAPH MUST NEVER LOOK VALID.
+# The acquisition writes the row and the derivation completes it, so there is
+# a moment when `processing` and `derivatives` are null — and if the validator
+# tolerated that, a failed derive step would leave a row the build treats as a
+# publishable photograph with no files behind it. It does not tolerate it: the
+# incomplete state fails, loudly, which is what makes the two-step safe.
+IMAGE_REQUIRED = ("purpose", "publication_path", "file", "original", "alt",
+                  "provider", "provider_photo_id", "photographer",
+                  "photographer_url", "source", "original_url", "licence",
+                  "licence_url", "terms_read_on", "terms_evidence",
+                  "fetched", "acquired_at", "sha256", "bytes", "version",
+                  "width", "height", "processing", "derivatives")
 
 # Licences we will actually publish under. A permissive list would make this
 # field decorative; the point is that adding a new one is a decision somebody
@@ -656,7 +666,9 @@ def load():
     # discarded unread — a row with no licence at all passed `build.py
     # check` cleanly. A validator that runs after the raise is not a
     # validator, it is a list nobody opens.
+    PURPOSES = _read(os.path.join(DATA, "image-purposes.json")).get("purposes", {})
     images = _read(os.path.join(DATA, "images.json")).get("images", {})
+    seen_purpose = {}
     for key, row in sorted(images.items()):
         where = f"images.json > {key}"
         for field in IMAGE_REQUIRED:
@@ -676,6 +688,67 @@ def load():
                   "fetched must be the YYYY-MM-DD the file was taken. A "
                   "licence is a claim about a moment and without the moment "
                   "it is a claim about nothing")
+        # PURPOSE, AND ONE PHOTOGRAPH PER SURFACE. A picture acquired for the
+        # homepage hero must not drift onto a destination page because it
+        # exists; the surfaces have different jobs, different aspect ratios
+        # and different type over them.
+        # TWO ROWS CANNOT CLAIM ONE PURPOSE. Not a theoretical worry: the
+        # register is keyed by surface and the purpose names the surface, so
+        # a duplicate means two photographs believe they are the homepage.
+        if row.get("purpose"):
+            p.require(row["purpose"] not in seen_purpose, where,
+                      f"purpose {row['purpose']!r} is already claimed by "
+                      f"{seen_purpose.get(row['purpose'])!r}")
+            seen_purpose[row["purpose"]] = key
+        p.require(row.get("purpose") in PURPOSES, where,
+                  f"purpose must be declared in data/image-purposes.json "
+                  f"({'/'.join(sorted(PURPOSES)) or 'none declared'})")
+        if row.get("purpose") in PURPOSES:
+            spec = PURPOSES[row["purpose"]]
+            p.require(key == spec["key"], where,
+                      f"purpose {row['purpose']!r} fills {spec['key']!r} and "
+                      f"this row is keyed {key!r} — a purpose names one "
+                      f"surface")
+            p.require(row.get("publication_path") == spec["path"], where,
+                      "publication_path must be the page the purpose declares")
+            p.require(int(row.get("width") or 0) >= spec["min_width"], where,
+                      f"native width {row.get('width')!r} is under the "
+                      f"{spec['min_width']}px this purpose needs")
+        p.require(str(row.get("provider_photo_id") or "").strip(), where,
+                  "provider_photo_id — the provider's own id for this exact "
+                  "photograph. Without it nobody can re-fetch what we took, "
+                  "and a register that cannot be re-checked is a claim")
+        p.require(re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$",
+                           str(row.get("acquired_at", ""))), where,
+                  "acquired_at must be a UTC timestamp, not a date. Two "
+                  "acquisitions on one day are two events")
+        p.require(re.match(r"^\d{4}-\d{2}-\d{2}$",
+                           str(row.get("terms_read_on", ""))), where,
+                  "terms_read_on — WHICH reading of the provider's terms this "
+                  "photograph was taken under. A licence is a claim about a "
+                  "moment")
+        p.require(isinstance(row.get("terms_evidence"), list)
+                  and row["terms_evidence"], where,
+                  "terms_evidence must name the archived pages under "
+                  "docs/data-licenses/provider-terms/ that were in force")
+        proc = row.get("processing")
+        p.require(isinstance(proc, dict) and proc.get("tool")
+                  and proc.get("quality") and proc.get("widths"), where,
+                  "processing must record the encoder, the quality values and "
+                  "the widths — a derivative nobody can reproduce is not "
+                  "evidence of anything")
+        derived = row.get("derivatives")
+        p.require(isinstance(derived, dict) and derived, where,
+                  "derivatives must record every file made, with its hash and "
+                  "its real pixel size. A row acquire.py wrote and derive.py "
+                  "never completed is INCOMPLETE and must fail here rather "
+                  "than ship as a photograph with no files")
+        if isinstance(derived, dict):
+            for dname, d in sorted(derived.items()):
+                p.require(re.match(r"^[0-9a-f]{64}$", str(d.get("sha256", ""))),
+                          where, f"derivative {dname} has no sha256")
+                p.require(int(d.get("width") or 0) > 0, where,
+                          f"derivative {dname} records no width")
         p.require(re.match(r"^[0-9a-f]{64}$", str(row.get("sha256", ""))), where,
                   "sha256 of the bytes as served — the evidence that the file "
                   "in this repository is the file that was licensed")

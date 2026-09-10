@@ -31,7 +31,14 @@
       "basis": "The API documentation's Guidelines section is where Pexels states what a consumer must do per request, and it names two obligations — a prominent link and photographer credit — and no event endpoint. No endpoint in the documentation tracks a download: the photo endpoints are search, curated and photos/:id, and the Photo resource carries no download-tracking link. Compare Unsplash, whose documentation has a `Track a photo download` endpoint and says outright that you must call it."
     },
     "endpoint_download": null,
-    "usable": true
+    "usable": true,
+    "automated_acquisition": {
+      "value": true,
+      "question": "May photographs be acquired by an automated process — a scheduled or dispatched job with no person at the keyboard — and then served from this origin? This is NOT implied by a permissive licence: an API can impose conditions the licence does not, and the delivery condition is the one that decides it.",
+      "quote": "The Pexels API enables programmatic access to the full Pexels content library, including photos, videos.",
+      "source": "https://www.pexels.com/api/documentation/",
+      "basis": "The API's stated purpose is programmatic access, and its Guidelines section — where Pexels states what a consumer must and must not do — names four things: a prominent link, photographer credit, no replicating Pexels' core functionality, and no abusing the rate limit. None is a delivery condition and none forbids automation. The limits are volume: \"Do not abuse the API. By default, the API is rate-limited to 200 requests per hour and 20,000 requests per month.\" Compare Unsplash, whose equivalent section states a hotlinking requirement outright — same kind of document, same structure, one says it and one does not, which is what makes the omission meaningful rather than merely unobserved."
+    }
   },
   "unsplash": {
     "terms_urls": [
@@ -72,7 +79,7 @@
     "usable": true,
     "api_route": {
       "usable": false,
-      "question": "May images be obtained through this provider's API? An API can impose conditions the licence does not, and scripts/images/fetch.py is an API client.",
+      "question": "May images be obtained through this provider's API? An API can impose conditions the licence does not, and scripts/images/acquire.py is an API client.",
       "quote": "All API uses must use the hotlinked image URLs returned by the API under the `photo.urls`  properties. This applies to all uses of the image and not just search results.",
       "source": "https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines",
       "because": "Fetching through the Unsplash API obliges us to embed their CDN URLs rather than serve the file from this origin. EuropeDoor sends `img-src 'self' data:` and a check refuses any third-party origin on any page, so that route would mean opening the Content-Security-Policy across all 1,033 pages to a host we do not control — an owner decision about the security posture of the whole site. The API route is refused and fetch.py enforces it. The LICENCE route is not refused: see self_host."
@@ -80,6 +87,13 @@
     "unread": {
       "https://unsplash.com/terms": "Not yet read. The licence page links to it. It may impose conditions on any website user; nothing here relies on its contents.",
       "https://unsplash.com/api-terms": "Not yet read. Governs the API route, which is refused, so nothing here relies on its contents."
+    },
+    "automated_acquisition": {
+      "value": false,
+      "question": "May photographs be acquired by an automated process — a scheduled or dispatched job with no person at the keyboard — and then served from this origin? This is NOT implied by a permissive licence: an API can impose conditions the licence does not, and the delivery condition is the one that decides it.",
+      "quote": "All API uses must use the hotlinked image URLs returned by the API under the `photo.urls`  properties. This applies to all uses of the image and not just search results.",
+      "source": "https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines",
+      "basis": "The architecture required here is acquire through the API and then self-host. This sentence forbids the second half for anything the API returns, and \"all uses of the image and not just search results\" closes the reading that it covers previews only. The two halves are not separable, so the answer is no rather than yes-with-conditions. A second clause points the same way and is recorded although the outcome does not turn on it: \"The API is to be used for non-automated, high-quality, and authentic experiences.\" The article explaining that phrase is not archived and not read, which is why it is not the reason. Unsplash's LICENCE route — a photograph obtained without the API — is unaffected and is not this architecture."
     }
   }
 }

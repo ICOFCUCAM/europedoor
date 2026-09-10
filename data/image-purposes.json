@@ -1,0 +1,36 @@
+{
+  "$comment": "WHY A PHOTOGRAPH EXISTS, declared before one is acquired. A purpose names the surface the picture is FOR, the register key it fills, the page it is published on, and the minimum a photograph must be to do that job. scripts/images/acquire.py refuses a purpose that is not here and refuses a photograph that does not meet its requirements; tools/lib/data.py refuses a register row whose purpose is unknown, and refuses two rows claiming the same one. A photograph acquired for the homepage hero must not drift onto a destination page because it happened to be in the register — the surfaces have different jobs, different aspect ratios and different type over them.",
+  "$requirements": "min_width is native pixels, not the ladder's widest step: a 1,200px original upscaled to 2,400 is the same untruth as a population we estimated, and derive.py already refuses to upscale. orientation and aspect are the mechanical half of whether a picture can do the job; the editorial half — subject placement, hierarchy, whether it looks like generic stock — is why discovery presents candidates to a person instead of picking one.",
+  "purposes": {
+    "homepage-hero": {
+      "key": "home-hero",
+      "path": "/",
+      "surface": "The full-bleed opening of the homepage, with the masthead over it and the headline beside it.",
+      "min_width": 2400,
+      "orientation": "landscape",
+      "min_aspect": 1.6,
+      "max_aspect": 2.6,
+      "note": "docs/hero-brief.md holds the editorial brief. The plate system was MEASURED as unable to carry this surface, which is the whole argument for licensing a photograph at all — so a photograph that reads as generic stock fails the brief even when it passes every number here."
+    },
+    "vienna-destination": {
+      "key": "city:austria/vienna-and-the-east/vienna",
+      "path": "/europe/austria/vienna-and-the-east/vienna",
+      "surface": "The opening image of the Vienna destination page.",
+      "min_width": 1800,
+      "orientation": "landscape",
+      "min_aspect": 1.5,
+      "max_aspect": 2.4,
+      "note": "Vienna's physical identity is the Danube and the historic centre rather than relief — its ground reads 332 m of spread and a 480 m crest, which is why it draws no terrain bands."
+    },
+    "chamonix-destination": {
+      "key": "city:france/the-alps/chamonix",
+      "path": "/europe/france/the-alps/chamonix",
+      "surface": "The opening image of the Chamonix destination page.",
+      "min_width": 1800,
+      "orientation": "landscape",
+      "min_aspect": 1.5,
+      "max_aspect": 2.4,
+      "note": "The ground within 40 km spreads 1,798 m and crests at 2,752 m. A photograph here has to carry the valley floor against the wall above it, which is the reading the Stay layer makes in words."
+    }
+  }
+}
