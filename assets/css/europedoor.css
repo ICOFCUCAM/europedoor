@@ -880,7 +880,7 @@ main.wide { max-width: 92rem; }
    of these and rendered as "the thing is simply wrong"; the escape is to
    match at the same level, not to declare louder. */
 .scorebar > .scoremed { position: absolute; inset: 0; pointer-events: none;
-                        background: none; }
+                        background-image: none; }
 .scoremed > span { display: block; height: 100%;
                    border-right: 1.5px solid color-mix(in srgb, var(--ink) 45%, transparent); }
 .scorebar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--sea), var(--signature)); }
@@ -4245,9 +4245,11 @@ body[data-hero] .masthead { position: sticky; }
 /* No new type size: the extent takes the same clamp the section heads take,
  * because a number that is the size of a heading IS a heading here. A
  * seventeenth size was refused. */
+/* No `color` here: the number already inherits --ink, and restating it is a
+   declaration that changes nothing — the dead-rule scan says so. */
 .closeextent dd { margin: 0; font-family: var(--serif);
                   font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
-                  font-variant-numeric: tabular-nums; color: var(--ink); }
+                  font-variant-numeric: tabular-nums; }
 
 .colophon { color: var(--ink-3); font-size: var(--t-sm);
             margin: var(--s7) 0 0; max-width: 44rem; }

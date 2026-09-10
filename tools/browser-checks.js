@@ -709,7 +709,12 @@ async function main() {
   const quietRows = await page.locator("#discover-results .whythis").allTextContents();
   ok(quietRows.every((t) => /discoverability/.test(t)),
      "asking for off-the-circuit places did not change what the results say");
-  const lead = await page.locator(".whyall").textContent();
+  // SCOPED TO THE RESULTS. `.whyall` is the shared-reason primitive and
+  // /discover now carries a second one: the year band's legend, which is the
+  // same promise about a different set. A bare `.whyall` on this page matched
+  // two elements and the run died in strict mode — the assertion was reading
+  // "the page has a hoisted reason" when it means "these results do".
+  const lead = await page.locator("#discover-results .whyall").textContent();
   ok(/off the obvious circuit/.test(lead),
      "the shared reason was not hoisted out of the individual cards");
   // The filter itself must not be repeated on every card — that is the
