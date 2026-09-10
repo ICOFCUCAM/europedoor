@@ -840,7 +840,31 @@ main.wide { max-width: 92rem; }
 .score { margin: var(--s6) 0; padding: var(--s5); border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper-2); }
 .scorerow { display: grid; grid-template-columns: 8.5rem 1fr 2.5rem; gap: var(--s3); align-items: center; margin-bottom: var(--s2); }
 .scorelabel { font-size: var(--t-sm); color: var(--ink-2); }
-.scorebar { height: 7px; background: var(--paper-3); border-radius: 999px; overflow: hidden; }
+.scorebar { height: 7px; background: var(--paper-3); border-radius: 999px;
+            overflow: hidden; position: relative; }
+/* THE MEDIAN TICK. Eight exact numbers with nothing to compare them to: a
+   reader met "Authenticity 66" with no way to know that dimension never
+   exceeds 82, or "Value 54" against an Atlas median of 85. Drawn as an
+   overlay whose inner span is the same .wN utility the bar itself uses — a
+   style attribute would force style-src open on all 1,033 pages — so the
+   tick sits on that span's right edge and needs no second scale. */
+/* AND `background: none` IS LOAD-BEARING. `.scorebar > span` paints the
+   gradient fill, and the median overlay is also a direct span child of the
+   bar — so the first version painted an inset:0 gradient over the whole
+   track and EVERY dimension rendered at 100%. Bergen's Value 54 was the same
+   length as its Nature 97, with the correct numbers beside them. Found by
+   screenshotting the panel; the DOM measurement of the fill span was right
+   the whole time, because the fill was never the thing that was wrong.
+
+   AND `.scoremed` ON ITS OWN LOST THE SPECIFICITY FIGHT: (0,1,0) against
+   `.scorebar > span` at (0,2,0), so the first repair changed nothing and the
+   bars stayed full. Fourth time in this stylesheet that a rule has lost one
+   of these and rendered as "the thing is simply wrong"; the escape is to
+   match at the same level, not to declare louder. */
+.scorebar > .scoremed { position: absolute; inset: 0; pointer-events: none;
+                        background: none; }
+.scoremed > span { display: block; height: 100%;
+                   border-right: 1.5px solid color-mix(in srgb, var(--ink) 45%, transparent); }
 .scorebar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--sea), var(--signature)); }
 .scorenum { font-family: var(--mono); font-size: var(--t-sm); text-align: right; color: var(--ink-2); }
 .score .small { margin: var(--s4) 0 0; }

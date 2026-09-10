@@ -3837,6 +3837,46 @@ def c_leg_bars():
     return n
 
 
+@check("a score bar's median tick is the Atlas's own median for that dimension")
+def c_score_median():
+    # EIGHT EXACT NUMBERS WITH NOTHING TO COMPARE THEM TO. Bergen read
+    # Authenticity 66 and Value 54, and a reader had no way to know that
+    # Authenticity never exceeds 82 across the Atlas while Value's median is
+    # 85 — so 66 is comfortably above the middle and 54 is well below it. The
+    # numbers were exact and the meaning was unavailable.
+    #
+    # The tick is the median, and a tick is a claim: recomputed here from the
+    # same functions the pages print, and asserted on the shipped HTML. The
+    # two families take DIFFERENT medians on purpose — a country's scores
+    # come from a different function than a city's, and marking a destination
+    # with the country median would compare a place against a continent's
+    # aggregate under the same mark.
+    d = D.load()
+    from lib import score as S
+    from lib import urls as U
+    n = 0
+    for kind, spread, sample in (
+            ("city", S.observed_spread(d["cities"]),
+             [U.city(r["country"], r["region"], r["city"])
+              for r in list(d["cities"].values())[:6]]),
+            ("country", S.country_spread(d["countries"]),
+             [U.country(c) for c in list(d["countries"].values())[:6]])):
+        for u in sample:
+            path = os.path.join(OUT, u.strip("/"), "index.html")
+            if not os.path.exists(path):
+                continue
+            h = open(path, encoding="utf-8").read()
+            for dim in S.DIMENSIONS:
+                n += 1
+                want = f'<span class="scoremed"><span class="w{spread[dim][2]}">'
+                if want not in h:
+                    fail(f"{u}: the {dim} bar's median tick is not the Atlas's "
+                         f"{kind} median of {spread[dim][2]}")
+    if n < 50:
+        fail(f"only {n} median ticks examined — the scan found no pages")
+    return n
+
+
 @check("every link a script can write points at a route this site has")
 def c_script_links():
     # TWO DEAD LINKS LIVED IN EMPTY STATES FOR THE LIFE OF THIS SITE.

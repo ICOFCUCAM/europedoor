@@ -2408,7 +2408,7 @@ def country_page(data, c):
 {section("Fixed points in the year", f'<div class="rows">{festivals}</div>',
          more=("The whole European year", "/events")) if festivals else ""}
 
-{section("The record", facts + scorebars(country_scores(c)) + provenance_block(c),
+{section("The record", facts + scorebars(country_scores(c), _spread("country", data)) + provenance_block(c),
          tone="quiet",
          lede="What we hold about " + esc(c["name"]) + ", where each figure came "
               "from, and when it was last checked. The score says what this "
@@ -2826,7 +2826,7 @@ def city_page(data, c, r, t):
     ("Population", pop_line(t)),
     ("Region", f'<a href="{urls.region(c, r)}">{esc(r["name"])}</a>'),
     ("Coordinates", f'<span class="mono">{coord_line(t)}</span>'),
-]) + scorebars(city_scores(c, r, t)), id="record", tone="quiet",
+]) + scorebars(city_scores(c, r, t), _spread("city", data)), id="record", tone="quiet",
    lede="What we hold about this place, and what our own tagging makes of it. "
         "It is the last thing on the page on purpose: it is useful when you are "
         "already interested, and it is not a reason to be.")}
@@ -5450,18 +5450,58 @@ def place_page(data, c, r, t, pl):
 
 # ── the score ─────────────────────────────────────────────────────────
 
-def scorebars(scores):
+_SPREADS = {}
+
+
+def _spread(kind, data):
+    """Memoised, because it is 319 city_scores() and 369 pages ask for it.
+
+    Computed once per build. It is derived from the same functions the pages
+    print, so a median tick can never mark a value the site does not produce.
+    """
+    if kind not in _SPREADS:
+        from . import score as S
+        _SPREADS[kind] = (S.observed_spread(data["cities"]) if kind == "city"
+                          else S.country_spread(data["countries"]))
+    return _SPREADS[kind]
+
+
+def scorebars(scores, spread=None):
+    """The eight dimensions, and — since this commit — what they are against.
+
+    EIGHT BARS WITH NOTHING TO COMPARE THEM TO. Bergen reads Nature 97,
+    Authenticity 66, Value 54, and a reader has no way to know that 97 is the
+    top of the Atlas while 66 is a little above the middle of a dimension
+    that never exceeds 82 and 54 is well BELOW a value median of 85. The
+    numbers were exact and the meaning was unavailable, which is the same
+    fault /method had when it printed one range for all eight.
+
+    So each bar carries a tick at the Atlas median for that dimension. It is
+    the same derivation /method publishes, from the same function, so the two
+    pages cannot disagree — and it is the cheapest possible answer to "is 66
+    good", which is the question every score panel is really asked.
+
+    `spread` is per-family: a country's scores come from a different function
+    than a city's, so marking a destination with the country median would
+    compare a place against a continent's aggregate under the same tick.
+    """
     from .score import DIMENSIONS, LABELS
     rows = "".join(
         f"""<div class="scorerow"><span class="scorelabel">{esc(LABELS[d])}</span>
-        <span class="scorebar"><span class="w{scores[d]}"></span></span>
+        <span class="scorebar"><span class="w{scores[d]}"></span>"""
+        + (f'<span class="scoremed"><span class="w{spread[d][2]}"></span></span>'
+           if spread and d in spread else "")
+        + f"""</span>
         <span class="scorenum">{scores[d]}</span></div>"""
         for d in DIMENSIONS
     )
+    med = ("" if not spread else
+           " The tick on each bar is the median across the whole Atlas, so a bar "
+           "short of it is a dimension this place is not for.")
     return f"""<div class="score">
     <p class="kicker">Europe Experience Score</p>{rows}
     <p class="small"><a href="/method">How this is calculated</a> — derived from our own tagging,
-    not from measurement. It says what a place is for, not how good it is.</p></div>"""
+    not from measurement. It says what a place is for, not how good it is.{med}</p></div>"""
 
 
 # ── experiences & the marketplace ─────────────────────────────────────

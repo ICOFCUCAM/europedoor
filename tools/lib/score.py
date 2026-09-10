@@ -237,6 +237,23 @@ def methodology_rows():
     return rows
 
 
+def country_spread(countries):
+    """The same measurement for the fifty country plates.
+
+    A country's scores are computed by a different function from a city's, so
+    they have a different distribution — and a destination page marked with
+    the COUNTRY median would be comparing a place against a continent's
+    aggregate, which is a different claim wearing the same tick.
+    """
+    import statistics
+    got = {}
+    for c in countries.values():
+        for k, v in country_scores(c).items():
+            got.setdefault(k, []).append(v)
+    return {k: (min(v), max(v), int(statistics.median(v)))
+            for k, v in got.items()}
+
+
 def observed_spread(cities):
     """What each dimension ACTUALLY scores across the whole Atlas.
 
