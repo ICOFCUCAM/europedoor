@@ -1441,6 +1441,44 @@ async function main() {
     await bp.close();
   }
 
+  // ── THE INTERFACE THE BROWSER PAINTS FOR YOU ───────────────────────
+  // Selection and the form controls' accent were Chromium's defaults on
+  // every page: dragging across a paragraph in the graphite world gave a
+  // pale platform highlight with the page's own light text inside it, and
+  // the planner's seventeen interest checkboxes rendered in Chrome's blue,
+  // a second slightly different blue beside the one band of signature
+  // colour this site has.
+  //
+  // Read as RESOLVED values in both worlds and both preferences, because
+  // `accent-color: auto` is what it looked like before and is a legal
+  // computed value.
+  for (const [url, w] of [["/", "discover"], ["/plan", "intelligence"]]) {
+    for (const scheme of ["light", "dark"]) {
+      const cp = await browser.newPage({ viewport: { width: 1280, height: 900 },
+                                         colorScheme: scheme });
+      await cp.goto(base + url, { waitUntil: "networkidle" });
+      const r = await cp.evaluate(() => {
+        const num = (v) => (v.match(/\d+/g) || []).map(Number).slice(0, 3);
+        const lin = (v) => { const x = v / 255;
+          return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); };
+        const rel = (c) => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
+        const cs = getComputedStyle(document.documentElement);
+        const sel = getComputedStyle(document.body, "::selection");
+        const a = rel(num(sel.color)), b = rel(num(sel.backgroundColor));
+        const [hi, lo] = [a, b].sort((x, y) => y - x);
+        return { accent: cs.accentColor, ratio: (hi + 0.05) / (lo + 0.05),
+                 bg: sel.backgroundColor, fg: sel.color };
+      });
+      ok(r.accent !== "auto",
+         `${url} in ${scheme}: accent-color is auto, so the browser picks the ` +
+         `colour of every checkbox on the page`);
+      ok(r.ratio >= 4.5,
+         `${url} in ${scheme}: selected text measures ${r.ratio.toFixed(2)}:1 ` +
+         `against its own highlight (${r.fg} on ${r.bg})`);
+      await cp.close();
+    }
+  }
+
   // ── NO GRADIENT STOP FALLS BACK TO BLACK ───────────────────────────
   // The hero's shadow is described in three places as "two rectangles of
   // graphite", and every stop of both gradients resolved to #000 for the

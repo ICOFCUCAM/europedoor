@@ -388,6 +388,31 @@ h2 { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); }
 h3 { font-size: var(--t-lg); }
 p { margin: 0 0 var(--s4); max-width: var(--measure); }
 
+/* ── WHAT THE BROWSER DRAWS FOR YOU ──────────────────────────────────
+ *
+ * Two pieces of interface on every page of this site were painted by
+ * Chromium's defaults rather than by the palette, and neither had ever been
+ * looked at.
+ *
+ * SELECTION. Dragging across a paragraph produced the platform highlight —
+ * on the graphite INTELLIGENCE world that is a pale blue block with the
+ * page's own light text inside it, which is the one combination this
+ * stylesheet spends a check on avoiding. `limestone on cobalt-deep` measures
+ * 6.31:1 and is already in docs/palette.json, because it is what the primary
+ * button uses; nothing new is claimed here. Bound to `--cobalt-deep` and
+ * `--limestone` BY NAME rather than to `--signature` and `--ink`, because
+ * the masthead rebinds both and a selection inside it would have come out
+ * limestone on limestone.
+ *
+ * ACCENT-COLOR. The planner's seventeen interest checkboxes, the discover
+ * filters and every other control the browser paints itself were rendering
+ * in Chrome's own blue — a second, slightly different blue beside the one
+ * band of signature colour this site has, on the two pages where a reader
+ * does the most clicking. One property, and the checkbox becomes ours.
+ */
+::selection { background: var(--cobalt-deep); color: var(--limestone); }
+:root { accent-color: var(--cobalt-deep); }
+
 a { color: inherit; }
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
   outline: 2px solid var(--sea); outline-offset: 3px; border-radius: 2px;
