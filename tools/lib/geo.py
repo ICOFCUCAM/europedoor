@@ -920,6 +920,23 @@ def scale_bar(proj, lat_lo, lat_hi, lon, units_per_unit, frame_w, frame_h,
             f'<text x="{x:.1f}" y="{y - tick - 4:.1f}">{km:,} km</text></g>')
 
 
+def dataset_names(doc):
+    """Just the names, for a caller that is already writing the sentence.
+
+    `sources_line()` returns a whole sentence, because five of its six
+    callers were dropping bare dataset names into the middle of a paragraph
+    with no lead-in and no full stop. The sixth was /map, which had written
+    its own lead-in — "The land comes from X, which is in the public domain
+    and which we host ourselves" — and got "The land comes from Drawn from
+    Natural Earth 1:50m admin 0 countries, public domain., which is in the
+    public domain and…". A sentence and a fragment are different things and a
+    function that returns one cannot serve both.
+    """
+    if not doc or not doc.get("sources"):
+        return ""
+    return " and ".join(sorted({s["dataset"] for s in doc["sources"]}))
+
+
 def sources_line(doc):
     """The attribution sentence for whatever drew this map.
 

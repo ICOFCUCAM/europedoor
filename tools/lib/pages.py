@@ -7232,7 +7232,12 @@ def map_page(data):
                   for r in c["regions"]],
         }
 
-    attribution = geo.sources_line(geo.load("europe-lod1.json") or doc)
+    # THE NAMES, NOT THE SENTENCE. This paragraph writes its own lead-in —
+    # "The land comes from X, which is in the public domain and which we host
+    # ourselves" — so handing it a finished sentence produced "The land comes
+    # from Drawn from Natural Earth 1:50m admin 0 countries, public domain.,
+    # which is in the public domain and…". Found on a phone contact sheet.
+    attribution = geo.dataset_names(geo.load("europe-lod1.json") or doc)
 
     # The projection, as six numbers, so the browser can place geometry it
     # fetches later at exactly the pixel the build would have put it at. Sent
