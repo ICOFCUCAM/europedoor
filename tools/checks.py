@@ -2260,8 +2260,13 @@ def c_frontend():
     # failure and the plate measurement at once, and the rest of a region
     # page was already rows. Recorded here and in the invariant register in
     # the same commit; the floor is what stops it happening by accident.
+    #
+    # 0.07 -> 0.06 WHEN THE MOTION PAGES DID THE SAME. Each of the twelve
+    # ended on three journey cards and up to three theme cards, all opening
+    # on a gradient chosen by the hash of a slug, on the family whose whole
+    # argument is that a motion is not a place.
     FLOORS = {"kicker": 0.99, "masthead": 0.99, "pagehead": 0.99, "crumbs": 0.99,
-              "row": 0.85, "card": 0.07, "band": 0.70, "note": 0.70}
+              "row": 0.85, "card": 0.06, "band": 0.70, "note": 0.70}
     total = 0
     hits = {k: 0 for k in FLOORS}
     for path in site_files():

@@ -9193,16 +9193,63 @@ def motion_page(data, m):
         + '</p>'
     )
 
+    # FIVE HASH-DRAWN LANDSCAPES AT THE FOOT OF EVERY MOTION PAGE.
+    #
+    # This is the family whose entire argument is that a motion is not a
+    # place: it has no coastline, no topography and no season, and the index
+    # that introduces these twelve pages had its plates removed for exactly
+    # that reason. The two related bands underneath kept theirs — three
+    # journey cards and up to three theme cards, each opening on a gradient
+    # chosen by the hash of a slug, on all twelve pages.
+    #
+    # /journeys and /themes both answered this already, and differently,
+    # because the two families have different subjects: a journey's picture
+    # is its ROUTE and a theme's is its SCATTER. Both are drawn from the same
+    # projection as the map above, so the three bands on the page finally
+    # agree about what Europe looks like.
+    #
+    # AND THE PAGE NEEDS `constel_defs()`. The first render was seven blue
+    # dots joined by a line, floating on nothing: `constellation()` draws its
+    # land with a <use> of #constel-eu, and a page that calls one without the
+    # other gets a route with no continent under it. Third time in this
+    # session — the same trap the 404 fell into an hour earlier.
+    idx = data["cities"]
     wants = set(m.get("interests", []))
+
+    def _pts(ids):
+        return [project(idx[c]["city"]["lat"], idx[c]["city"]["lon"])
+                for c in ids if c in idx]
+
     jrows = [j for j in data["journeys"] if wants & set(j["interests"])][:3]
-    jcards = [card(urls.journey(j), f"{n_of(j['days'], 'day')} · {n_of(len(j['legs']), 'stop')}",
-                   j["name"], j["strapline"], seed="journey:" + j["slug"],
-                   motif=motif_for(j["interests"]))
-              for j in jrows]
+    jrelated = "".join(
+        f'<a class="row journeyrow" href="{urls.journey(j)}">'
+        f'<div><p class="kicker">{esc(j["strapline"])}</p>'
+        f'<h3>{esc(j["name"])}</h3>'
+        f'<p class="rowsub">'
+        + " · ".join(esc(idx[l["city"]]["city"]["name"])
+                     for l in j["legs"] if l["city"] in idx)
+        + f'</p><p class="rowmeta jfacts">{n_of(j["days"], "day")} · '
+        f'{n_of(len(j["legs"]), "stop")} · {esc(j["difficulty"])}</p></div>'
+        f'<div class="jart">'
+        + constellation(_pts([l["city"] for l in j["legs"]]), route=True, frame=True)
+        + '</div></a>'
+        for j in jrows)
+
     trows = [t for t in data["themes"] if wants & set(t.get("interests", []))][:3]
-    tcards = [card(f"/themes/{t['slug']}", "Theme", t["name"], t["summary"],
-                   seed="theme:" + t["slug"],
-                   motif=motif_for(t.get("interests", []))) for t in trows]
+    trelated = "".join(
+        f'<a class="row themerow" href="/themes/{t["slug"]}">'
+        f'<div><p class="kicker">{esc(t["strapline"])}</p>'
+        f'<h3>{esc(t["name"])}</h3>'
+        f'<p class="rowsub">'
+        + " · ".join(esc(idx[st["city"]]["city"]["name"])
+                     for st in t["stops"] if st["city"] in idx)
+        + '</p></div><div class="themeside">'
+        + constellation(_pts([st["city"] for st in t["stops"]]),
+                        extra=" constel-theme")
+        + f'<p class="rowmeta">'
+        f'{n_of(len({idx[st["city"]]["country"]["name"] for st in t["stops"] if st["city"] in idx}), "country")}'
+        f'</p></div></a>'
+        for t in trows)
 
     body = f"""
 {crumbs([("Europe", "/discover"), ("Europe in Motion", "/europe-in"), (m["name"], None)])}
@@ -9212,13 +9259,14 @@ def motion_page(data, m):
   <p class="lede">{esc(m["lede"])}</p>
 </div>
 
+{constel_defs()}
 {motionmap}
 {querynote}
 {shared_note}
 <div class="rows">{rows}</div>
 
-{section("Journeys that go this way", grid(jcards, 3)) if jcards else ""}
-{section("Themes that run through it", grid(tcards, 3)) if tcards else ""}
+{section("Journeys that go this way", f'<div class="rows journeyrows">{jrelated}</div>') if jrows else ""}
+{section("Themes that run through it", f'<div class="rows">{trelated}</div>') if trows else ""}
 
 <div class="note mt7">
   <h2 class="mini">Build this into a route</h2>
