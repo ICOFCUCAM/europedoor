@@ -3507,3 +3507,77 @@ body[data-hero] .masthead { position: sticky; }
    paid is an advertisement with a conscience. */
 .staydisc { color: var(--ink-3); max-width: 54ch; }
 .stay > .sourcenote { margin-top: var(--s6); }
+
+/* ── the theme constellation ──────────────────────────────────────────
+   THE ARGUMENT DRAWN, BECAUSE THE ROWS WERE A WALL OF GREY TEXT.
+
+   This index went from a card grid to rows, which traded one default for
+   another: a contact sheet of twelve families showed it as one of two cells
+   that were simply text. What separates thirteen themes is REACH, and reach
+   is a shape — Renaissance Europe is a knot over Italy and France, Thermal
+   Europe is a line from Iceland to the Caucasus.
+
+   NO APERTURE ON IT. Thirteen doors on one page is the signature as
+   wallpaper, which the events band already refused for the same reason. This
+   is a glyph, not a window: no arch, no ground, no frame, no label. */
+.constel-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+.themeside { display: flex; flex-direction: column; align-items: flex-end;
+             gap: var(--s2); flex: none; }
+/* No `display: block`: the dead-rule scan caught it as a declaration that
+   matches and changes nothing, because an SVG in this position is already
+   laid out as a block. */
+.constel { width: 132px; height: auto; }
+/* The continent is context and must not compete with the eight lit points:
+   a flat wash at the weight of a rule, no stroke, no sea. */
+/* EVERY PATH, BECAUSE THE CLASS I REACHED FOR IS NOT THE CLASS geo.landmass
+   EMITS. It writes `context` and `atlas`; `.constel .countries path` matched
+   nothing and the continent painted at its inherited fill — a near-black blob
+   with the eight lit points invisible inside it. Fifth selector miss in this
+   stylesheet that rendered as "the thing is simply not there", and the same
+   lesson each time: target what the generator writes, not what you assume it
+   writes. */
+/* AND A SELECTOR CANNOT REACH INSIDE A <use>. The continent is cloned from
+   <defs> into thirteen rows, and cloned content lives in a shadow tree that
+   `.constel path` cannot match — so it painted at the SVG default, black, with
+   the eight lit points invisible inside a blob. That is the <use> trap this
+   repository already lost a day to on the hero, and the escape is the same
+   one: PAINT BY INHERITANCE. `fill` on the container is inherited through the
+   clone; the lit dots are real DOM and override it. */
+.constel { fill: var(--rule); stroke: none; }
+.constel-lit circle { fill: var(--door); }
+.themerow:hover .constel-lit circle { fill: var(--signature); }
+/* And the row is baseline-aligned, which is right for two columns of type and
+   strands a 100px drawing at the top of its cell with the text beginning
+   below it. The glyph is a figure, not a line of text. */
+/* `.themerow .rowmeta` is already declared with the count column, 2,800
+   lines up. Restating it here was a fully redundant rule and the dead-rule
+   scan said so within one run — which is the argument for that scan: two
+   commits to the same family, months apart in reading order, and neither
+   knew about the other. */
+.themerow { align-items: center; }
+@media (max-width: 44rem) {
+  /* At 390 the glyph is a third of the row's width for eight dots that read
+     as a smudge — the same measurement that takes map labels off a phone. */
+  .constel { display: none; }
+}
+
+/* ── the homepage tiles draw their own destinations ───────────────────
+   ELEVEN ABSTRACT PLATES IN A COLUMN IS PLACEHOLDER ART DOING A PICTURE'S
+   JOB. The hero is strong and everything under it was a search form, eight
+   purple gradients, three more, a grey note and three hundred pixels of
+   nothing — a SaaS body under an atlas hero. The plate system was already
+   measured as unable to carry a hero; it cannot carry this either.
+
+   What replaced them is not a better painting, it is the data: every
+   destination carrying that tag, lit on one shared silhouette. The count on
+   the tile is the number of dots on it. */
+.card-map { background: var(--paper-2); display: flex; align-items: center;
+            justify-content: center; padding: var(--s4); }
+.card-map .constel { width: 100%; height: auto; }
+/* Bigger tiles, more dots, smaller marks: a 200-destination tile at 380px
+   with the theme index's radius would be a solid field. Set here rather than
+   per circle, so 894 dots cost four characters each rather than eleven. */
+.card-map .constel-lit circle { r: 7px; }
+.constel-theme .constel-lit circle { r: 22px; }
+.constel-route { fill: none; stroke: var(--door); stroke-width: 5;
+                 stroke-linejoin: round; opacity: .55; }

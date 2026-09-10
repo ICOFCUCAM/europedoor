@@ -1094,7 +1094,8 @@ def section(title, body, *, id=None, lede=None, more=None, stage=None, tone=None
 </section>"""
 
 
-def card(href, kicker, title, blurb, *, seed=None, meta="", tall=False, motif=None):
+def card(href, kicker, title, blurb, *, seed=None, meta="", tall=False, motif=None,
+         art=None):
     """`blurb` may be None, for a tile that is a picture and a name.
 
     It is None in exactly one place — the eight ways-in tiles on the
@@ -1104,7 +1105,15 @@ def card(href, kicker, title, blurb, *, seed=None, meta="", tall=False, motif=No
     repository refuses in its JSON-LD for the same reason: a container that
     says "there is copy here" and then has none.
     """
-    art = f'<div class="card-art">{plate(seed, 640, 360, title, motif=motif)}</div>' if seed else ""
+    # `art` overrides the generated plate. It exists for the homepage, where
+    # eleven abstract plates in a column read as placeholder art — which is
+    # what they are — and are replaced by each tile's OWN destinations lit on
+    # the continent. A plate is right for a card in a grid of like things; it
+    # is wrong as the entire visual argument of a page.
+    if art is not None:
+        art = f'<div class="card-art card-map">{art}</div>'
+    else:
+        art = f'<div class="card-art">{plate(seed, 640, 360, title, motif=motif)}</div>' if seed else ""
     blurbhtml = f'<p class="blurb">{esc(blurb)}</p>' if blurb else ""
     return f"""<a class="card{' tall' if tall else ''}" href="{esc(href)}">
   {art}

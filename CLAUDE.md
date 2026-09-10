@@ -1576,6 +1576,55 @@ every page in both worlds and both colour-scheme preferences. *Look to find,
 count to conclude* cuts both ways: the eye is what finds a defect and it is
 not what confirms one.
 
+**Eleven abstract plates in a column is placeholder art doing a picture's
+job, and it was the whole homepage body.** The hero is strong and everything
+under it was a search form, eight purple gradients over "Find your kind of
+Europe", three more over the journeys, a grey note and three hundred pixels of
+nothing — a SaaS body under an atlas hero. The plate system was already
+measured as unable to carry a hero; the same measurement applies here, and the
+mosaic layout did not fix it because the *pictures* were the problem, not the
+grid.
+
+**What replaced them is not a better painting, it is the data.** Every
+destination carrying that tag, lit on one shared silhouette: Mountains is the
+Alps, the Pyrenees, the Carpathians and the Scandes; History is almost the
+whole continent; and the difference between those two shapes is the argument
+the tile exists to make. A journey draws its route, which is the one thing an
+abstract plate could never show and the same finding that rebuilt `/journeys`.
+**All of them and never a selection** — the count on the tile is the number of
+dots on it, so a reader can check, and picking "the twelve best mountain
+destinations" would be a ranking this atlas does not hold.
+`weight.home_kb` 119 → 146, recorded: the plates cost 14.7 KB and came out,
+894 dots and one lod0 coastline went in.
+
+**The same move fixed the index this session had already got wrong.** `/themes`
+went from a card grid to rows, which traded one default for another — a
+contact sheet of twelve families showed it as one of two cells that were simply
+grey text. Each row draws its own eight places now, so a knot over Italy and a
+line from Iceland to the Caucasus are told apart before a word is read.
+
+**A contact sheet is what makes "every page looks the same" arguable.**
+Eleven of twelve families open with a kicker, a serif h1, a lede and a large
+arched map in the same position. The maps differ and the architecture does
+not, which is the design-direction finding one level up from the h1 — and it
+means the aperture has become the wallpaper its own rule warns about. The
+tiles above are the first family answer that is not another arch: **a glyph,
+not a window**, because eleven doors on one page is the signature as
+wallpaper.
+
+**And a selector cannot reach inside a `<use>`.** Cloned content lives in a
+shadow tree, so `.constel path` matched nothing and the continent painted at
+the SVG default — black, with the lit points invisible inside a blob. Second
+time this repository has hit that trap; the escape is the same both times,
+**paint by inheritance**: `fill` on the container is inherited through the
+clone, and the lit dots are real DOM and override it. Two more of the same
+class in the same hour: `geo.landmass` writes `context` and `atlas`, not
+`countries`, so a rule reaching for the wrong class matched nothing; and
+`.row` is baseline-aligned, which strands a 100px drawing at the top of its
+cell. **The dead-rule scan caught the leftovers within one run** — a duplicate
+`.themerow .rowmeta` declared 2,800 lines from its twin, and a redundant
+`display: block`.
+
 **Design to purpose, not to data shape.** A page's structure comes from what
 the reader is trying to do, not from the shape of the record behind it. The
 experience template renders six rows because the data is six rows, and that is

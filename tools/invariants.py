@@ -252,7 +252,21 @@ def measure():
                 "why": "The homepage's rendered HTML in KB. A ceiling, not a "
                        "target: it is allowed to move, deliberately, in a diff "
                        "somebody reads. It is here because a 2.6x regression on "
-                       "this page passed every other gate in silence."},
+                       "this page passed every other gate in silence. "
+                       "119 -> 146 ON PURPOSE: the body was eight abstract "
+                       "plates over 'Find your kind of Europe' and three more "
+                       "over the journeys — eleven purple gradients in a "
+                       "column under an atlas hero, which is placeholder art "
+                       "doing a picture's job, and the plate system was "
+                       "already measured as unable to carry a hero. Each tile "
+                       "now draws its OWN destinations lit on one shared "
+                       "silhouette: Mountains is the Alps, the Pyrenees, the "
+                       "Carpathians and the Scandes; History is almost the "
+                       "whole continent; and that difference is what the tile "
+                       "exists to say. The plates cost 14.7 KB and came out; "
+                       "894 dots and one lod0 coastline went in. All of them "
+                       "and never a selection, so the count on the tile is the "
+                       "number of dots on it and a reader can check."},
             "weight.max_page_kb": {
                 "value": round(max(len(b) for b in bodies.values()) / 1024),
                 "kind": "ceiling",

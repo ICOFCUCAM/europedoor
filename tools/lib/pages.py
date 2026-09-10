@@ -1028,10 +1028,18 @@ def home(data):
     # wide cells, so the two largest pictures are a landscape and a coast.
     HOME_KINDS = ["mountains", "history", "food", "nature",
                   "coast", "sacred", "architecture", "cities"]
+    # THE TILE DRAWS ITS OWN DESTINATIONS, NOT A PAINTING OF NOWHERE.
+    # Every destination carrying the tag, lit on the shared silhouette: the
+    # count on the tile is the number of dots on it. Mountains is the Alps,
+    # the Pyrenees, the Carpathians and the Scandes; History is almost the
+    # whole continent; and that difference is the argument each tile exists
+    # to make. See constellation().
     kind_cards = [
         card(urls.interest(k), f"{n_by_interest[k]} destinations",
              data["interests"][k]["name"], None,
-             seed="interest:" + k, motif=motif_for([k]))
+             art=constellation([project(n["city"]["lat"], n["city"]["lon"])
+                                for n in data["cities"].values()
+                                if k in n["city"]["interests"]]))
         for k in HOME_KINDS
     ]
 
@@ -1056,11 +1064,16 @@ def home(data):
                 break
             if j["slug"] not in {p["slug"] for p in picked}:
                 picked.append(j)
+    # And a journey draws its ROUTE. The one thing that makes a journey a
+    # journey is the ordered sequence, which is exactly what an abstract
+    # plate could not show — the same finding that rebuilt /journeys.
     jcards = [
         card(urls.journey(j),
              f"{j['days']} days · {len({l['city'].split('/')[0] for l in j['legs']})} countries",
-             j["name"], j["strapline"], seed="journey:" + j["slug"], tall=True,
-             motif=motif_for(j["interests"]))
+             j["name"], j["strapline"], tall=True,
+             art=constellation([project(data["cities"][l["city"]]["city"]["lat"],
+                                        data["cities"][l["city"]]["city"]["lon"])
+                                for l in j["legs"]], route=True))
         for j in picked
     ]
 
@@ -1127,6 +1140,7 @@ def home(data):
   <a href="/map">Open the map →</a></p>
 </div>
 
+{constel_defs()}
 {section("Find your kind of Europe", '<div class="grid mosaic">' + "".join(kind_cards) + "</div>",
          stage="Discover", tone="quiet",
          lede="From iconic cities to hidden gems, from mountains to coastlines, from history "
@@ -5562,6 +5576,57 @@ def fund_page(data, p):
 
 # ── themes: experience-first discovery ────────────────────────────────
 
+def constel_defs():
+    """The continent, emitted once per page and cloned by every glyph on it.
+
+    A coarse silhouette — lod0, thinned hard — because these are 130 to 380
+    pixels wide and any more detail is bytes nobody can see. Thirteen theme
+    constellations or eleven homepage tiles therefore cost ONE coastline.
+
+    A SELECTOR CANNOT REACH INSIDE A <use>. Cloned content lives in a shadow
+    tree, so the fill is set on the containing <svg> and inherited through the
+    clone — the same escape the hero needed, and the trap this repository has
+    now hit twice.
+    """
+    ctx, ours = geo.landmass(
+        MAPPROJ, (0.0, 0.0, float(MAP_W), float(MAP_H)),
+        doc=geo.load("europe-lod0.json"), thin_units=5.0, min_units=60.0)
+    return ('<svg class="constel-defs" width="0" height="0" aria-hidden="true" '
+            'focusable="false"><defs><g id="constel-eu">'
+            + ctx + ours + "</g></defs></svg>")
+
+
+def constellation(pts, extra="", route=False):
+    """A set of real destinations lit on the shared silhouette.
+
+    THE ARGUMENT DRAWN, AND THE REASON IT REPLACED ELEVEN PAINTINGS. The
+    homepage body was eight abstract plates over "Find your kind of Europe"
+    and three more over the journeys — eleven purple gradients in a column,
+    which is placeholder art doing the job of a picture. The plate system was
+    already measured as unable to carry a hero; it cannot carry this either.
+
+    What it is replaced with is not a better painting, it is the DATA: every
+    one of the 63 mountain destinations lit across the Alps, the Pyrenees, the
+    Carpathians and the Scandes, and every one of the 200 with history lit
+    almost everywhere — and the difference between those two shapes is the
+    thing the tile is trying to say.
+
+    ALL OF THEM, NEVER A SELECTION. The count on the tile is the number of
+    dots on it, so a reader can check. Picking "the twelve best mountain
+    destinations" would be a ranking this atlas does not hold.
+
+    NO APERTURE. Eleven doors on one page is the signature as wallpaper.
+    """
+    dots = "".join(f'<circle cx="{x:.0f}" cy="{y:.0f}"/>' for x, y in pts)
+    line = ""
+    if route and len(pts) > 1:
+        line = ('<polyline class="constel-route" points="'
+                + " ".join(f"{x:.0f},{y:.0f}" for x, y in pts) + '"/>')
+    return (f'<svg class="constel{extra}" viewBox="0 0 {MAP_W} {MAP_H}" '
+            f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
+            f'{line}<g class="constel-lit">{dots}</g></svg>')
+
+
 def themes_index(data):
     """Thirteen themes, shown by how far each one reaches.
 
@@ -5593,6 +5658,31 @@ def themes_index(data):
     makes its point out of by drawing these dots with no path between them.
     """
     idx = data["cities"]
+    # THE CONSTELLATION, WHICH IS THE WHOLE ARGUMENT DRAWN.
+    #
+    # The card grid was replaced with rows and the rows were a wall of small
+    # grey text — a generic list traded for a generic grid, which is two
+    # defaults and no art direction. A contact sheet of twelve families made
+    # that unarguable: eleven of them open with a kicker, a serif h1, a lede
+    # and a large arched map in the same position, and this index was one of
+    # the two cells that were simply text.
+    #
+    # What distinguishes thirteen themes is REACH, and reach is a shape. So
+    # each row draws its own eight destinations on a coarse silhouette of the
+    # continent: Renaissance Europe is a tight knot over Italy and France,
+    # Thermal Europe is a line from Iceland to the Caucasus. You see the
+    # difference before you read a word, which is the thing a list of country
+    # names cannot do.
+    #
+    # NOT AN APERTURE. It is 150 units wide and there are thirteen of them on
+    # one page; the door at that size, thirteen times, is the signature as
+    # wallpaper, which is the failure the events band already refused. This
+    # is a glyph, not a window.
+    #
+    # The silhouette is emitted ONCE and every row is a <use> of it, so
+    # thirteen constellations cost one coastline and 104 dots.
+    silhouette = constel_defs()
+
     # DERIVED, because the note under the list states it. Every theme holds
     # eight stops today; a hard-coded eight in the prose is the figure that
     # was true two hundred destinations ago, which this repository has
@@ -5615,13 +5705,17 @@ def themes_index(data):
             if cn not in countries:
                 countries.append(cn)
             places.append(esc(n["city"]["name"]))
+        glyph = constellation(
+            [project(idx[st["city"]]["city"]["lat"], idx[st["city"]]["city"]["lon"])
+             for st in t["stops"]], extra=" constel-theme")
         rows.append(
             f'<a class="row themerow" href="/themes/{t["slug"]}">'
             f'<div><p class="kicker">{esc(t["strapline"])}</p>'
             f'<h3>{esc(t["name"])}</h3>'
             f'<p class="rowsub">{" · ".join(places)}</p></div>'
-            f'<p class="rowmeta">{len(countries)}<br>'
-            f'{"countries" if len(countries) != 1 else "country"}</p></a>')
+            f'<div class="themeside">{glyph}'
+            f'<p class="rowmeta">{len(countries)} '
+            f'{"countries" if len(countries) != 1 else "country"}</p></div></a>')
     body = f"""
 {crumbs([("Europe", "/discover"), ("Themes", None)])}
 <div class="pagehead index">
@@ -5631,8 +5725,13 @@ def themes_index(data):
   or the Europe you reach only by train. {len(data['themes'])} of them cut across the Atlas,
   and each place under one of them stays linked to the country it is actually in.</p>
 </div>
+{silhouette}
 <div class="rows">{"".join(rows)}</div>
-<p class="small">The places under each theme are not in travelling order, and
+<p class="small">Each shape beside a theme is that theme\u2019s own eight places on the
+continent, drawn to the same frame so the thirteen can be compared: a knot is an
+argument about one corner of Europe, a scatter is one about the whole of it.
+{geo.sources_line(geo.load("europe-lod0.json"))}
+The places under each theme are not in travelling order, and
 the number beside them is how many countries the theme crosses rather than how
 many places it holds — {held}. For an order that
 respects distance, put the ones you want into the <a href="/plan">Planner</a>.</p>
