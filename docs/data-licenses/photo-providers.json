@@ -7,7 +7,9 @@
       "https://www.pexels.com/api/documentation/"
     ],
     "read_on": null,
-    "terms_snapshot": null,
+    "terms_snapshot": {
+      "https://www.pexels.com/license/": "pexels.https-www-pexels-com-license.2026-09-10.txt"
+    },
     "self_host": {
       "value": "UNANSWERED",
       "question": "May the file be downloaded and served from europedoor.com? This site sends `img-src 'self' data:` and checks.py refuses any third-party origin, so a provider that requires hotlinking cannot be used without an owner decision that changes both.",

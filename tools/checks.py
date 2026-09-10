@@ -965,7 +965,42 @@ def c_photo_gate():
             if not os.path.exists(path):
                 fail(f"{slug}.{fact}: the snapshot {name} is named and missing")
                 continue
-            body = " ".join(open(path, encoding="utf-8").read().split())
+            raw = open(path, encoding="utf-8").read()
+            # A SNAPSHOT MUST SAY HOW IT GOT HERE, AND THE PASTED KIND MUST
+            # PROVE ITSELF. There are two honest ways to obtain one of these
+            # pages: the fetcher downloads it and records the SHA-256 of the
+            # bytes as served, or a person opens it in a browser — which is
+            # the only route left, because both providers refuse an automated
+            # request — and save_terms.py records the SHA-256 of the text as
+            # saved. Those are different claims and the header says which.
+            #
+            # Without this, the way to open the gate is to write the file by
+            # hand with the served-bytes line over text from anywhere,
+            # including text a model produced. That is the failure the whole
+            # gate exists to stop, arriving through the evidence rather than
+            # through the answer. The pasted kind is recomputed here, so its
+            # header cannot claim a hash its body does not have; the fetched
+            # kind hashes raw bytes that the archive deliberately does not
+            # keep, so only its declaration is required.
+            served = re.search(r"^# sha256 of the bytes as served: ([0-9a-f]{64})$",
+                               raw, re.M)
+            saved = re.search(r"^# sha256 of the text as saved: ([0-9a-f]{64})$",
+                              raw, re.M)
+            if not served and not saved:
+                fail(f"{slug}.{fact}: the snapshot {name} does not say how it "
+                     f"was obtained. It is written by "
+                     f"scripts/images/verify_provider.py or by "
+                     f"scripts/images/save_terms.py, and a page filed here by "
+                     f"hand is a page nothing can vouch for")
+            elif saved:
+                text = raw.split("\n\n", 1)[1].rstrip("\n") if "\n\n" in raw else ""
+                got = hashlib.sha256(text.encode("utf-8")).hexdigest()
+                if got != saved.group(1):
+                    fail(f"{slug}.{fact}: the snapshot {name} declares a hash "
+                         f"of the text it holds and does not match it "
+                         f"({got[:12]} against {saved.group(1)[:12]}). It has "
+                         f"been edited since it was saved")
+            body = " ".join(raw.split())
             want = " ".join(f["quote"].split())
             if want not in body:
                 fail(f"{slug}.{fact}: the quote is not in the archived page it "
