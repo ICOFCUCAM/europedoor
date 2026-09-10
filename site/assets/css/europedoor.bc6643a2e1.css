@@ -4169,7 +4169,15 @@ body[data-hero] .masthead { position: sticky; }
 .way {
   position: relative; isolation: isolate; overflow: hidden;
   display: flex; align-items: flex-end;
-  min-height: min(58vh, 33rem);
+  /* SIZED FOR WHAT IS IN IT, WHICH TODAY IS TYPE. 58vh is a photograph's
+     height, and the register holds none — so measured on the built page each
+     panel was about 300 pixels of flat teal above 230 pixels of words, four
+     across, on the homepage's second screen. A slot waiting for a picture is
+     honest; three hundred pixels of it is a hole.
+     The full height comes back with the photograph, on `.shot`, so the strip
+     composes at every step rather than only when all four are licensed —
+     which is the argument for four slots rather than one band image. */
+  min-height: 22rem;
   padding: var(--s6) var(--s5);
   background: var(--atlas-sea);
   text-decoration: none;
@@ -4185,6 +4193,7 @@ body[data-hero] .masthead { position: sticky; }
    inset shadow: the register counts box-shadow declarations and two is the
    whole vocabulary, a rest state and a lifted one. A divider is not a
    shadow, and writing it as one spends a slot that means something else. */
+.way.shot { min-height: min(58vh, 33rem); }
 .way + .way { border-left: 1px solid color-mix(in srgb, var(--limestone) 20%, transparent); }
 .waytext { position: relative; z-index: 2; width: 100%; }
 .way picture { position: absolute; inset: 0; z-index: 0; display: block; }

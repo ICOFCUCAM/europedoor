@@ -1638,6 +1638,21 @@ destinations" would be a ranking this atlas does not hold.
 `weight.home_kb` 119 → 146, recorded: the plates cost 14.7 KB and came out,
 894 dots and one lod0 coastline went in.
 
+**And then the tiles became the four doors, and the doors carry NO drawing.**
+That is the later decision and this paragraph is the earlier one: a lead door
+carrying its own constellation was better than type alone and still wrong,
+because it is a fifth picture of Europe on a page that opens on the largest
+one on the site. Each door is a panel of the atlas's own water with a
+photograph slot, one per door, so the strip composes as slots fill rather
+than only when all four are licensed. `weight.home_kb` is back to 122.
+
+**A slot waiting for a picture is honest; three hundred pixels of it is a
+hole.** The panel was sized at 58vh, which is a photograph's height, and
+measured on the built page that is about 300 pixels of flat teal above 230
+pixels of words, four across, on the homepage's second screen. It is sized
+to its content until there is a photograph, and `.shot` puts the full height
+back.
+
 **The same move fixed the index this session had already got wrong.** `/themes`
 went from a card grid to rows, which traded one default for another — a
 contact sheet of twelve families showed it as one of two cells that were simply
