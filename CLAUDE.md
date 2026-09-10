@@ -1738,6 +1738,64 @@ cannot be retrieved the workflow fails; it never substitutes another
 photograph, because a substitute is a picture nobody chose wearing correct
 provenance.
 
+**THE STEP BETWEEN DISCOVERY AND ACQUISITION IS A PERSON LOOKING, AND THE
+FIRST VERSION HAD NO ARTEFACT FOR IT.** Discovery printed ids, photographers,
+pages and pixel sizes, which answers what is *available* and cannot answer the
+only question that decides an iconic hero from a competent one: does this
+photograph work in THIS composition. The hero is a picture seen through an
+elliptical arch cut into a limestone wall, with the cobalt masthead sitting on
+its top edge, a 60px serif headline and a lede over its lower half behind a
+scrim, and a form under that — and two of the picture's corners are removed by
+the aperture. A provider's grid of rectangles shows none of it.
+
+So the phase is:
+
+    discover → contact sheet → A PERSON LOOKS → exact photo id →
+    automated acquisition → PR carrying the rendered page →
+    a person looks again → merge
+
+`contact_sheet.py` renders **the actual page** once per candidate —
+`pages.home()`, the shipped stylesheet, the same `arch_path()` — and
+`hero-sheet.js` puts them in one image at 1280, at 390 and in the dark
+preference. **The single substitution is the delivery ladder**, because a
+preview is one JPEG where `picture()` emits AVIF, WebP and JPEG at five
+widths, and that transform counts what it removed rather than assuming it: two
+`<source>` elements and one `<img>`, or it stops.
+
+**The sheet's first run cropped away its own subject.** Shooting the
+`.herofull` element gives the photograph inside its aperture and removes the
+masthead and the wall — so *is there anywhere for the masthead to sit* was the
+question it existed to answer and the one thing out of frame. It shoots the
+VIEWPORT now: an invented pad is a number nobody can check, and the viewport
+is the reader's own frame.
+
+**And it ranks nothing, deliberately.** The order is the provider's search
+order and the sheet prints that on its face; no score, no sort, no highlighted
+cell, no default — position is exactly what `--pick 3` got wrong. A candidate
+`acquire.py` would refuse is left OFF and named, because art-directing a
+photograph you cannot have wastes the one step that needs a person.
+
+**A preview is never the acquisition.** Those bytes are somebody else's
+photographs with no register row, no hash and no date, which is what the
+licence gate refuses; they go to an ignored `.cache/`, leave as a workflow
+artifact, and `checks.py` asserts from the other end that the repository holds
+none of them and that the ignore rules are still there. The acquisition
+fetches `original` by id and hashes that.
+
+**A search cache keyed on the question hands back answers from somewhere
+else.** `discover.py` cached on query, orientation and page size and not on
+the endpoint — but the URLs inside a search result point at the provider that
+answered it, so a cached payload outlived the host that served it. Invisible
+in normal use, where the base never moves; immediate in the tests, where every
+run gets a new port, which is the only reason it was found.
+
+**And the test that asserted "no winner" read its own prose.** It searched the
+whole manifest for "recommend", and the note explaining that nothing here is
+*chosen, recommended or scored* was itself the match. Same class as the
+invariant register counting a font size that existed only in a comment about
+not adding font sizes: an instrument that cannot tell code from the
+documentation of code. It reads the data now and the note is excluded.
+
 **A purpose is declared before a photograph exists.**
 `data/image-purposes.json` names the surface, the register key, the page, and
 the native width, orientation and aspect a photograph must have to do that
@@ -1882,6 +1940,12 @@ the rest.
     python3 tools/invariants.py --check       what a visual change may not move
     python3 tools/plate-variation.py --check  the plates have not got more alike
     python3 tools/photo-tests.py              the acquisition pipeline, against a stub provider
+
+And two more that are deliberately NOT gates, for the same reason the
+contact sheet is not: they write an image rather than a verdict.
+`node tools/hero-sheet.js` draws every discovered candidate inside the
+real hero for art direction, and `node tools/hero-shot.js` shoots the
+built homepage once a photograph is in the register.
 
 The browser checks need `npm install playwright` and take a couple of
 minutes. They earn their place repeatedly: a 47-pixel mobile overflow on

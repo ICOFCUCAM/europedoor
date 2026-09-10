@@ -45,8 +45,15 @@ CACHE_SECONDS = 60 * 60
 
 def cached_search(slug, query, orientation, per_page):
     os.makedirs(CACHE_DIR, exist_ok=True)
+    # THE ENDPOINT IS PART OF THE KEY. It was not, and a cached payload
+    # outlived the host that served it: the URLs inside a search result point
+    # at the provider that answered, so a cache keyed only on the question
+    # hands back answers from somewhere else. Invisible in normal use, where
+    # the base never moves, and immediate in the tests, where every run gets
+    # a new port — which is the only reason it was found.
     ident = hashlib.sha256(
-        f"{slug}|{query}|{orientation}|{per_page}".encode()).hexdigest()[:16]
+        f"{slug}|{acquire.api_base(slug)}|{query}|{orientation}|{per_page}"
+        .encode()).hexdigest()[:16]
     path = os.path.join(CACHE_DIR, f"{slug}.{ident}.json")
     if os.path.exists(path) and time.time() - os.path.getmtime(path) < CACHE_SECONDS:
         with open(path, encoding="utf-8") as fh:
@@ -73,8 +80,17 @@ def normalise(slug, payload):
                 "height": int(p.get("height") or 0),
                 "alt": p.get("alt") or "",
                 "has_original": bool(src.get("original")),
+                # THE PREVIEW IS FOR LOOKING AT AND IS NEVER THE ACQUISITION.
+                # contact_sheet.py fetches this one derivative to draw the
+                # candidate inside the real hero; acquire.py fetches
+                # `original` by id and hashes THAT. They are different bytes
+                # for different jobs, and conflating them would put a 1,880px
+                # preview in the register with a provenance record claiming
+                # it was the photograph.
+                "preview": src.get("large2x") or src.get("large") or "",
             })
-    return [c for c in out if c["id"] and c["page"] and c["has_original"]]
+    return [c for c in out
+            if c["id"] and c["page"] and c["has_original"] and c["preview"]]
 
 
 def main(argv):
@@ -86,6 +102,10 @@ def main(argv):
                          "come from data/image-purposes.json")
     ap.add_argument("--query", required=True)
     ap.add_argument("--per-page", type=int, default=15)
+    ap.add_argument("--manifest",
+                    help="also write what was found as JSON, for the contact "
+                         "sheet to draw. The order is the PROVIDER'S and "
+                         "carries no judgement; see the note it writes.")
     args = ap.parse_args(argv)
 
     ok, why = acquire.cleared(args.provider)
@@ -128,6 +148,33 @@ def main(argv):
     print("  subject placement, what the headline will sit over, and whether")
     print("  it reads as a particular morning or as generic stock are the")
     print("  actual decision, and nothing here can make it.")
+    if args.manifest:
+        # A MANIFEST IS A RECORD OF A SEARCH, NOT A SHORTLIST. It carries
+        # every candidate in the order the provider returned them, and the
+        # note travels with it because a JSON file outlives the terminal
+        # output that explained it — and the next reader of a ranked-looking
+        # list is the one who takes the top row.
+        os.makedirs(os.path.dirname(os.path.abspath(args.manifest)) or ".",
+                    exist_ok=True)
+        with open(args.manifest, "w", encoding="utf-8") as fh:
+            json.dump({
+                "$comment":
+                    "Candidates from one search. THE ORDER IS THE PROVIDER'S "
+                    "SEARCH ORDER AND IS NOT A RANKING BY THIS REPOSITORY. "
+                    "Nothing here is chosen, recommended or scored; `fits` is "
+                    "a mechanical gate against the purpose, not a judgement "
+                    "of the picture. A person chooses by looking.",
+                "provider": args.provider,
+                "purpose": args.purpose,
+                "query": args.query,
+                "searched": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "candidates": [dict(c, fits=not acquire.fits(c, spec),
+                                    fails=acquire.fits(c, spec))
+                               for c in found],
+            }, fh, indent=2, ensure_ascii=False)
+        print(f"\nwrote {args.manifest} — {len(found)} candidates, "
+              f"in the provider's own order.")
+
     print(f"\nThen acquire the ONE you chose, by its id:")
     print(f"  --provider {args.provider} --photo-id <id> --purpose {args.purpose}")
     return 0

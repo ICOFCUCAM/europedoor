@@ -8,3 +8,10 @@ node_modules/
 # Neither is a gate and neither belongs in the repository.
 contact-sheet.png
 recognition.png
+
+# The scratch directories the acquisition instruments write into. A search
+# cache and a contact sheet of candidates nobody has chosen: somebody else's
+# photographs with no register row, no hash and no date, which is exactly what
+# the licence gate refuses. checks.py asserts the repository carries none.
+.cache/
+hero-sheet.png

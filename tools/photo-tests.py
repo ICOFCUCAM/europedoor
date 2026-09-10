@@ -102,6 +102,17 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(STUB["jpeg"])
             return
+        if self.path.startswith("/preview.jpg"):
+            # DELIBERATELY NOT THE SAME BYTES AS THE ORIGINAL. A preview is
+            # for looking at and an original is what gets hashed into the
+            # register; a stub that served one file for both would let the
+            # two be confused and the suite would never notice.
+            self.send_response(200)
+            self.send_header("Content-Type", "image/jpeg")
+            self.send_header("Content-Length", str(len(STUB["preview"])))
+            self.end_headers()
+            self.wfile.write(STUB["preview"])
+            return
         if self.path.startswith("/search"):
             return self._json({"photos": [STUB["meta"]]})
         self.send_response(404)
@@ -196,13 +207,15 @@ def main(argv):
     srv = serve()
     base = f"http://127.0.0.1:{srv.server_address[1]}"
     STUB["jpeg"] = _jpeg(2560, 1440)
+    STUB["preview"] = _jpeg(1880, 1058)
     STUB["meta"] = {
         "id": int(PHOTO_ID), "width": 2560, "height": 1440,
         "url": "https://www.pexels.com/photo/stub-2014422/",
         "photographer": "Stub Photographer",
         "photographer_url": "https://www.pexels.com/@stub",
         "alt": "a generated test pattern",
-        "src": {"original": base + "/original.jpg"},
+        "src": {"original": base + "/original.jpg",
+                "large2x": base + "/preview.jpg"},
     }
     env = {"PEXELS_API_BASE": base, "PEXELS_API_KEY": "stub-key-not-a-secret"}
 
@@ -416,10 +429,129 @@ def main(argv):
         b2 = run(["scripts/images/pr_body.py", "--purpose", "chamonix-destination"], {})
         check("a PR body for a purpose nothing filled fails", b2.returncode != 0)
 
-        # ── 15. the workflow opens a PR and offers only cleared providers ─
+        # ── 15. discovery writes a manifest, and it ranks nothing ────
+        #
+        # THE STEP BETWEEN DISCOVERY AND ACQUISITION IS A PERSON LOOKING, and
+        # the sheet is what they look at. Everything asserted here is about
+        # the sheet refusing to make the choice: no winner, no score, no sort,
+        # and an order that says on its face whose order it is.
+        manifest = os.path.join(tempfile.gettempdir(), "ed-cands.json")
+        made.append(manifest)
+        dsc = run(["scripts/images/discover.py", "--provider", "pexels",
+                   "--purpose", "homepage-hero", "--query", "stub",
+                   "--manifest", manifest], env)
+        check("discovery writes a manifest", dsc.returncode == 0 and
+              os.path.exists(manifest), (dsc.stderr or "")[-200:])
+        man = json.load(open(manifest, encoding="utf-8"))
+        check("the manifest carries the query and the purpose",
+              man.get("query") == "stub" and man.get("purpose") == "homepage-hero")
+        check("the manifest says the order is the provider's",
+              "NOT A RANKING" in man.get("$comment", "").upper())
+        # THE FIRST VERSION OF THIS READ ITS OWN PROSE. It searched the whole
+        # document for "recommend" and the $comment says "nothing here is
+        # chosen, recommended or scored" — so the note explaining that there
+        # is no ranking was itself read as one. Same class as the invariant
+        # register counting a font size that existed only in a comment about
+        # not adding font sizes: an instrument that cannot tell code from the
+        # documentation of code. The DATA is what must carry no winner.
+        body = json.dumps({k: v for k, v in man.items() if k != "$comment"}).lower()
+        check("the manifest names no winner",
+              not any(k in body for k in
+                      ("recommend", '"best"', '"score"', '"rank"', '"chosen"')))
+        check("a candidate carries a preview distinct from the original",
+              man["candidates"][0]["preview"].endswith("/preview.jpg"))
+        check("discovery downloads nothing — the sheet has not been drawn yet",
+              not os.path.exists(os.path.join(tempfile.gettempdir(), "ed-sheet")))
+
+        # ── 16. the sheet draws the REAL hero, and only the ladder differs ─
+        scratch = os.path.join(tempfile.gettempdir(), "ed-sheet")
+        cs = ["scripts/images/contact_sheet.py", "--manifest", manifest,
+              "--out", scratch]
+        r = run(cs, env)
+        check("the sheet is drawn", r.returncode == 0, (r.stderr or "")[-300:])
+        page = os.path.join(scratch, f"cand-{PHOTO_ID}", "index.html")
+        check("a candidate page exists", os.path.exists(page))
+        drawn = open(page, encoding="utf-8").read() if os.path.exists(page) else ""
+        check("the candidate page is the real hero",
+              'class="herofull shot"' in drawn)
+        check("the drawing is replaced, not stacked behind the photograph",
+              "heroeurope" not in drawn)
+        check("the delivery ladder is gone", "image/avif" not in drawn)
+        check("the preview is what renders",
+              f'src="/previews/candidate-{PHOTO_ID}.jpg"' in drawn)
+        check("the credit the provider requires is still on it",
+              "Photo by" in drawn and "Stub Photographer" in drawn)
+        check("the focal anchor survived the substitution",
+              'class="photo f-cc"' in drawn)
+        check("the preview was fetched",
+              os.path.exists(os.path.join(scratch, "previews",
+                                          f"candidate-{PHOTO_ID}.jpg")))
+        # A SUITE THAT RAISES REPORTS NOTHING. When the sheet fails to draw,
+        # the twelve assertions after it must each fail and be counted, not
+        # be replaced by a traceback — the same reason the browser suite has
+        # a floor on its own count.
+        sjp = os.path.join(scratch, "sheet.json")
+        sj = json.load(open(sjp, encoding="utf-8")) if os.path.exists(sjp) else {}
+        check("the sheet states whose order it is",
+              "PROVIDER'S SEARCH ORDER" in sj.get("$comment", "").upper())
+        sbody = json.dumps({k: v for k, v in sj.items() if k != "$comment"}).lower()
+        check("the sheet carries no score or ranking field",
+              not any(k in sbody for k in
+                      ('"score"', '"rank"', '"best"', "recommend", '"chosen"')))
+
+        # NOTHING IT WROTE TOUCHED THE REPOSITORY. A preview is somebody
+        # else's photograph with no register row and no hash, and the one
+        # thing that must never happen is one of them arriving in assets/ or
+        # in the register by way of a review.
+        check("the sheet wrote nothing into the register",
+              json.load(open(REGISTER, encoding="utf-8"))["images"] == {}
+              or "candidate-" not in open(REGISTER, encoding="utf-8").read())
+        check("the sheet wrote nothing into assets/img",
+              not any(n.startswith("candidate-")
+                      for n in (os.listdir(IMG) if os.path.isdir(IMG) else [])))
+        check("the sheet wrote nothing into site/",
+              not os.path.exists(os.path.join(ROOT, "site", "previews")))
+        check("the scratch directory is ignored by git",
+              subprocess.run(["git", "check-ignore", "-q", ".cache/contact/x.jpg"],
+                             cwd=ROOT).returncode == 0)
+
+        # ── 17. a candidate acquire.py would refuse is not art-directed ───
+        narrow = dict(man)
+        narrow["candidates"] = [dict(man["candidates"][0], width=900, height=506)]
+        small = os.path.join(tempfile.gettempdir(), "ed-cands-small.json")
+        made.append(small)
+        with open(small, "w", encoding="utf-8") as fh:
+            json.dump(narrow, fh)
+        r2 = run(["scripts/images/contact_sheet.py", "--manifest", small,
+                  "--out", scratch + "-2"], env)
+        check("a sheet of unacquirable candidates refuses to draw",
+              r2.returncode != 0 and "refuse" in (r2.stdout + r2.stderr).lower())
+
+        # ── 18. a purpose with no renderer is refused rather than faked ───
+        wrong = dict(man, purpose="chamonix-destination")
+        wf3 = os.path.join(tempfile.gettempdir(), "ed-cands-wrong.json")
+        made.append(wf3)
+        with open(wf3, "w", encoding="utf-8") as fh:
+            json.dump(wrong, fh)
+        r3 = run(["scripts/images/contact_sheet.py", "--manifest", wf3,
+                  "--out", scratch + "-3"], env)
+        check("a purpose with no renderer is refused", r3.returncode != 0 and
+              "renderer" in (r3.stdout + r3.stderr))
+
+        shutil.rmtree(scratch, ignore_errors=True)
+        shutil.rmtree(scratch + "-2", ignore_errors=True)
+        shutil.rmtree(scratch + "-3", ignore_errors=True)
+
+        # ── 19. the workflow opens a PR and offers only cleared providers ─
         check("the workflow creates a pull request", "gh pr create" in wf)
         check("the workflow has both stages",
               "stage == 'discover'" in wf and "stage == 'acquire'" in wf)
+        check("discovery produces the contact sheet",
+              "contact_sheet.py" in wf and "hero-sheet.js" in wf)
+        check("the sheet leaves the run as an artifact rather than a commit",
+              "upload-artifact" in wf)
+        check("the acquisition shows the acquired photograph on the real page",
+              "--acquired" in wf or "hero-shot" in wf)
         check("the workflow offers only pexels",
               re.search(r"options: \[pexels\]", wf) is not None)
         check("the workflow runs the gates before opening the PR",

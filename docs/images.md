@@ -61,25 +61,90 @@ For a provider the gate clears for automated acquisition, **nobody downloads
 or uploads anything by hand.** `.github/workflows/photograph.yml` does the
 whole of it and a person makes exactly one decision: which photograph.
 
+    discover → contact sheet → A PERSON LOOKS → exact photo id →
+    automated acquisition → PR carrying the rendered page →
+    a person looks again → merge
+
 1. Declare the purpose in `data/image-purposes.json` if it is not there —
    the surface, the register key, the page, the native width, the
    orientation and the aspect range. A photograph with no declared purpose is
    refused before the socket opens.
-2. Dispatch the workflow with **stage: discover** and a query. It prints
-   candidates — id, photographer, page, native width, and whether each meets
-   the purpose. It downloads nothing and names no winner.
-3. Open the pages. Choose one. **This is the only human step.**
+2. Dispatch the workflow with **stage: discover** and a query. It prints the
+   candidates and **draws every one of them inside the real hero**, at 1280
+   and at 390 and in both colour-scheme preferences, and uploads the sheets as
+   an artifact of the run. It commits nothing and it names no winner.
+3. Download the artifact and **look**. This is the only human step, and it is
+   the one the pipeline exists to protect.
 4. Dispatch again with **stage: acquire**, that photo id, and an `alt` written
    for somebody who cannot see it. The runner fetches that id, asserts the id
    it got back is the id asked for, downloads, hashes, keeps the untouched
-   original, builds the ladder, completes the provenance, runs every gate and
-   opens a pull request.
-5. Read the PR and merge it. Its body is generated from the register the
-   acquisition wrote, so it cannot describe a different photograph.
+   original, builds the ladder, completes the provenance, runs every gate,
+   **shoots the finished page** and opens a pull request.
+5. Read the PR, look at the shot, merge. The PR body is generated from the
+   register the acquisition wrote, so it cannot describe a different
+   photograph.
 
 If the id cannot be retrieved the workflow fails. It never substitutes another
 photograph, because a substitute is a picture nobody approved wearing correct
 provenance.
+
+## The contact sheet, and why a list of ids was not enough
+
+**A photograph can be beautiful and still be wrong for this composition.**
+The hero is not a rectangle: it is a photograph seen through an elliptical
+arch cut into a limestone wall, with a cobalt masthead sitting on its top
+edge, a 60px serif headline and a lede over its lower half behind a scrim,
+and a search form under that. Two of the picture's corners are removed by the
+aperture. A provider's grid of thumbnails shows none of that, and neither
+does an id, a photographer and a pixel size.
+
+So `scripts/images/contact_sheet.py` renders **the actual page**, once per
+candidate, and `tools/hero-sheet.js` puts them in one image:
+
+    python3 scripts/images/discover.py --purpose homepage-hero \
+        --query "…" --manifest /tmp/cands.json
+    python3 scripts/images/contact_sheet.py --manifest /tmp/cands.json
+    node tools/hero-sheet.js hero-sheet.png [--phone] [--dark]
+
+`pages.home()` is the function the build calls, the stylesheet is the shipped
+one, the arch is cut by the same `arch_path()`. **The single substitution is
+the delivery ladder** — a preview is one JPEG and `picture()` emits AVIF,
+WebP and JPEG at five widths — and that transform asserts its own shape
+rather than assuming it: two `<source>` elements removed, one `<img>`
+repointed, or it stops.
+
+**It shoots the viewport, not the `.herofull` element**, and the first sheet
+it drew is why. The element crop removes the masthead and the wall — so "is
+there anywhere for the masthead to sit" was the question the sheet existed to
+answer and it was the one thing out of frame. An invented pad would have been
+a number nobody can check; the viewport is the reader's own frame.
+
+**It ranks nothing.** The order is the provider's search order, the sheet
+prints that on its own face, and there is no score, no sort, no highlighted
+cell and no default — position is exactly what the `--pick 3` design got
+wrong. A candidate `acquire.py` would refuse is left OFF the sheet and named
+in the output, because art-directing a photograph you cannot have wastes the
+one step that needs a person.
+
+**None of it may be committed.** The previews are somebody else's photographs
+with no register row, no hash and no date. They go to `.cache/`, which is
+ignored, they leave the run as an artifact, and `checks.py` asserts from the
+other end that the repository carries none of them and that the ignore rules
+are still there.
+
+### The open question this raises
+
+The sheet draws what the page actually renders, and **a photograph replaces
+the drawn continent rather than sitting behind it** — the two stacked badly
+and the stylesheet had settled it before the drawn hero existed. So the
+composition under review has the arch, the wall, the masthead and the type,
+and it does **not** have the European silhouette or the country labels: those
+are the empty-register state.
+
+Whether the hero should be able to carry both — a photograph with Europe
+drawn over it, or a photograph in the opening with the atlas somewhere else —
+is a design decision that has not been taken, and it changes what a
+photograph has to do. It should be answered before one is bought, not after.
 
 ## Adding one by hand, where that is the only cleared route
 

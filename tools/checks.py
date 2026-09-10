@@ -20,6 +20,7 @@ import hashlib
 import html.parser
 import json
 import os
+import subprocess
 import re
 import struct
 import sys
@@ -4319,6 +4320,46 @@ def c_photo_bytes():
                 if name not in (row.get("derivatives") or {}):
                     fail(f"images.json > {key}: processing claims width {w} "
                          f"and no derivative {name} is registered")
+    return n
+
+
+@check("nothing a candidate review produced is in the repository")
+def c_no_candidate_previews():
+    """A CONTACT SHEET IS SOMEBODY ELSE'S PHOTOGRAPHS WITH NO PROVENANCE.
+
+    The art-direction step downloads a preview of every candidate so a person
+    can see each one inside the real hero. Those are Pexels photographs that
+    nobody chose, carrying no register row, no SHA-256 of an original and no
+    date — which is precisely what "no external licence claim enters
+    production from memory" refuses. They belong in a scratch directory and
+    in a workflow artifact, and nowhere else.
+
+    So this asserts the other end of that promise, on the tracked files
+    rather than on the intention: no preview, no sheet, no scratch directory
+    is in the repository, and the ignore rules that keep them out are still
+    there. A .gitignore entry is a request; a check is the guarantee.
+    """
+    n = 0
+    tracked = subprocess.run(["git", "ls-files"], cwd=ROOT,
+                             capture_output=True, text=True).stdout.split("\n")
+    for f in tracked:
+        if not f:
+            continue
+        n += 1
+        base = os.path.basename(f)
+        if f.startswith(".cache/") or "/previews/" in f or f.startswith("previews/"):
+            fail(f"{f} is a candidate review artefact and is committed")
+        if base.startswith("candidate-"):
+            fail(f"{f}: a candidate preview has no photographer, no source, "
+                 f"no licence and no hash, and is in the repository")
+        if base in ("hero-sheet.png", "contact-sheet.png", "recognition.png"):
+            fail(f"{f} is an instrument's output, not a source file")
+    ignored = open(os.path.join(ROOT, ".gitignore"), encoding="utf-8").read()
+    for rule in (".cache/", "hero-sheet.png"):
+        n += 1
+        if rule not in ignored:
+            fail(f".gitignore no longer carries {rule!r} — the scratch the "
+                 f"contact sheet writes into would be offered up by `git add`")
     return n
 
 

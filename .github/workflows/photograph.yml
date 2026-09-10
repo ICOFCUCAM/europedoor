@@ -9,13 +9,26 @@ name: photograph
 #
 # TWO STAGES, BECAUSE THEY ARE TWO DECISIONS.
 #
-#   discover  searches and prints candidate IDs, photographers, pages and
-#             sizes. It downloads nothing. A photograph appearing in a search
-#             result is not a photograph anybody chose.
+#   discover  searches, prints candidate IDs, and DRAWS EACH ONE INSIDE THE
+#             REAL HERO — one image, uploaded as an artifact, for a person to
+#             art-direct from. It commits nothing and it names no winner.
 #   acquire   takes ONE approved id and does everything after it: fetch by
 #             id, verify the returned id is the requested id, download,
 #             hash, keep the original, build the ladder, complete the
-#             provenance, run every gate, open a PR.
+#             provenance, run every gate, shoot the finished page, open a PR.
+#
+# THE PHASE THE FIRST VERSION HAD NO STEP FOR IS ART DIRECTION.
+#
+#   discover -> contact sheet -> A PERSON LOOKS -> exact photo id ->
+#   automated acquisition -> PR carrying the rendered page -> a person looks
+#   again -> merge
+#
+# A list of ids, photographers and pixel sizes cannot answer the only
+# question that matters here: does this photograph work through an elliptical
+# arch, under a cobalt masthead, with a 60px serif headline over its lower
+# half, on a limestone wall. A photograph can be beautiful and be wrong for
+# that composition, and the reverse — and neither is visible in a provider's
+# grid of rectangles. The sheet renders the actual homepage per candidate.
 #
 # THE HUMAN DECISION IS WHICH PHOTOGRAPH. Nothing here picks one. The previous
 # design took a search result BY POSITION — "--pick 3" — so the picture a
@@ -86,10 +99,56 @@ jobs:
           python3 scripts/images/discover.py \
             --provider "${{ inputs.provider }}" \
             --purpose "${{ inputs.purpose }}" \
-            --query "${{ inputs.query }}"
-          echo
-          echo "Nothing was downloaded. Open the pages, choose ONE, then run"
-          echo "this workflow again with stage=acquire and its photo_id."
+            --query "${{ inputs.query }}" \
+            --manifest /tmp/candidates.json
+
+      # THE SHEET IS THE POINT OF THIS STAGE, so it is not optional and it is
+      # not a second dispatch. Discovery that ends at a list of ids hands the
+      # art direction back to a provider's thumbnail grid, which is a
+      # different composition than this site's.
+      - name: Draw every candidate inside the real hero
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        run: |
+          set -euo pipefail
+          # No Pillow here on purpose. The sheet re-encodes nothing: it fetches
+          # one preview per candidate and hands it to the browser, and the
+          # build it needs is the ordinary stdlib one. Installing an image
+          # library for a step that does not decode an image is how a
+          # dependency arrives without a reason.
+          python3 tools/build.py
+          python3 scripts/images/contact_sheet.py --manifest /tmp/candidates.json
+          npm install --no-save playwright@1.49.0
+          npx playwright install --with-deps chromium
+          # The suites launch the sandbox's own Chromium by path; a runner
+          # has none, so the sheet takes the one Playwright just installed.
+          HERO_SHEET_EXE="$(node -e 'console.log(require("playwright").chromium.executablePath())')"
+          export HERO_SHEET_EXE
+          node tools/hero-sheet.js /tmp/hero-sheet.png
+          node tools/hero-sheet.js /tmp/hero-sheet-phone.png --phone
+          node tools/hero-sheet.js /tmp/hero-sheet-dark.png --dark
+
+      # NEVER A COMMIT. These are somebody else's photographs with no register
+      # row, no hash and no date — the exact thing the licence gate refuses —
+      # so they leave as an artifact of the run and the repository never sees
+      # one. checks.py asserts that from the other end.
+      - name: Upload the contact sheet
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-contact-sheet
+          path: |
+            /tmp/hero-sheet.png
+            /tmp/hero-sheet-phone.png
+            /tmp/hero-sheet-dark.png
+            /tmp/candidates.json
+          retention-days: 14
+
+      - name: What to do with it
+        run: |
+          echo "Download the artifact and LOOK at the three sheets."
+          echo "Nothing was chosen for you: the order is the provider's"
+          echo "search order and position on the sheet means nothing."
+          echo "Then run this workflow again with stage=acquire and the id."
 
   acquire:
     if: ${{ inputs.stage == 'acquire' }}
@@ -148,6 +207,27 @@ jobs:
           npm install --no-save playwright@1.49.0
           npx playwright install --with-deps chromium
           node tools/browser-checks.js
+
+      # THE SECOND LOOK, and it is the one that catches a page whose every
+      # count is right. It shoots the built homepage at both widths and fails
+      # on any request the page made that came back 4xx — which is exactly
+      # how the derivatives were once registered, referenced and absent, with
+      # the hero rendering as a hole and every gate green.
+      - name: Shoot the finished page for review
+        run: |
+          set -euo pipefail
+          HERO_SHEET_EXE="$(node -e 'console.log(require("playwright").chromium.executablePath())')"
+          export HERO_SHEET_EXE
+          node tools/hero-shot.js /tmp/hero-shot
+
+      - name: Upload the rendered page
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-shot
+          path: |
+            /tmp/hero-shot-wide.png
+            /tmp/hero-shot-phone.png
+          retention-days: 30
 
       - name: Refuse to commit anything credential-shaped
         run: python3 tools/photo-tests.py --committed-only
