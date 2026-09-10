@@ -1714,6 +1714,33 @@ entire argument for buying one is that it does a job the drawing cannot.
 Keys come from the environment, are never printed, and a check greps the
 committed files for anything credential-shaped.
 
+**NO EXTERNAL LICENCE CLAIM ENTERS PRODUCTION FROM MEMORY. EVERY EXTERNALLY
+GOVERNED ASSET REQUIRES SOURCE + DATE + EVIDENCE.** One rule, stated once,
+applied to every class — a map dataset, an elevation tile, a photograph:
+
+| | |
+|---|---|
+| source | the URL it came from |
+| date | when it was taken, because **a licence is a claim about a moment and without the moment it is a claim about nothing** |
+| evidence | the SHA-256 of the bytes as served, so the file here is provably the file that was licensed |
+
+The map datasets have carried all three since the map was built — `url`,
+`fetched`, `sha256`. **Photographs carried five fields and not one was a date
+or a hash**, so a row could say "Pexels-licensed" with nothing recording when
+that was true or what bytes it was true of. That asymmetry is gone, and
+`checks.py` also fails on a register in `docs/data-licenses/` that the rule
+does not know about — a class governed by nothing is the failure the rule
+cannot otherwise see.
+
+**The field names came from the sister repository and the answers did not.**
+It holds 629 photographs (595 Pexels, 34 Unsplash), self-hosted, each with a
+photographer, a profile URL, a source page, a licence name and URL, a SHA-256
+and four timestamps — a proven shape, worth copying wholesale. But it records
+the licence *URL* without archiving what that page said on the day, so it has
+source and date and only half the evidence. **A precedent in another
+repository is a claim, not evidence**, and copying one is precisely what this
+rule exists to stop.
+
 **Design to purpose, not to data shape.** A page's structure comes from what
 the reader is trying to do, not from the shape of the record behind it. The
 experience template renders six rows because the data is six rows, and that is

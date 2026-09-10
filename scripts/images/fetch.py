@@ -30,6 +30,8 @@ marketing page or from memory.
 """
 
 import argparse
+import datetime
+import hashlib
 import json
 import os
 import sys
@@ -143,12 +145,14 @@ def candidates(slug, payload):
     if slug == "pexels":
         for ph in payload.get("photos", []):
             out.append({"id": str(ph["id"]), "photographer": ph["photographer"],
+                        "photographer_url": ph.get("photographer_url", ""),
                         "page": ph["url"], "download": ph["src"]["original"],
                         "width": ph.get("width", 0)})
     else:
         for ph in payload.get("results", []):
             out.append({"id": ph["id"],
                         "photographer": (ph.get("user") or {}).get("name", ""),
+                        "photographer_url": ((ph.get("user") or {}).get("links") or {}).get("html", ""),
                         "page": (ph.get("links") or {}).get("html", ""),
                         "download": (ph.get("urls") or {}).get("full", ""),
                         "width": ph.get("width", 0)})
@@ -197,17 +201,30 @@ def main(argv):
     dest = os.path.join(IMG_DIR, stem + ".src.jpg")
     req = urllib.request.Request(chosen["download"],
                                  headers={"User-Agent": "EuropeDoor/1.0"})
-    with urllib.request.urlopen(req, timeout=120) as r, open(dest, "wb") as fh:
-        fh.write(r.read())
+    with urllib.request.urlopen(req, timeout=120) as r:
+        blob = r.read()
+    with open(dest, "wb") as fh:
+        fh.write(blob)
 
+    # SOURCE + DATE + EVIDENCE, written at the moment the file arrives —
+    # which is the only moment any of the three is knowable. A licence is a
+    # claim about a moment; a row without the moment, and without the hash of
+    # what was actually served, is a claim about nothing. The map datasets
+    # have carried exactly this since the map was built.
     with open(REGISTER, encoding="utf-8") as fh:
         reg = json.load(fh)
     reg["images"][args.key] = {
         "file": stem,
         "alt": args.alt,
         "photographer": chosen["photographer"],
+        "photographer_url": chosen.get("photographer_url") or "",
         "source": chosen["page"],
+        "original_url": chosen["download"],
         "licence": PROVIDERS[args.provider]["licence"],
+        "licence_url": gate()[args.provider]["terms_urls"][0],
+        "fetched": datetime.date.today().isoformat(),
+        "sha256": hashlib.sha256(blob).hexdigest(),
+        "bytes": len(blob),
         "focal": [50, 50],
     }
     with open(REGISTER, "w", encoding="utf-8") as fh:

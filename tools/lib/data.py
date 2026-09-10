@@ -80,7 +80,20 @@ EVENT_KINDS = ("festival", "concert", "sport", "exhibition", "religious",
 # "unknown" and no default: an image whose licence nobody wrote down is an
 # image nobody can defend, and the cheapest moment to refuse it is the moment
 # it is added.
-IMAGE_REQUIRED = ("file", "alt", "photographer", "source", "licence")
+# NO EXTERNAL LICENCE CLAIM ENTERS PRODUCTION FROM MEMORY. EVERY EXTERNALLY
+# GOVERNED ASSET REQUIRES SOURCE + DATE + EVIDENCE.
+#
+# The map datasets have carried that since the map was built: `url`, `fetched`
+# and `sha256` in docs/data-licenses/sources.json. Photographs carried five
+# fields and none of them was a date or a hash — so a register row said "this
+# is Pexels-licensed" and nothing recorded WHEN that was true or WHAT bytes
+# it was true of. A licence is a claim about a moment; without the moment it
+# is a claim about nothing.
+#
+# The field names are taken from the sister repository, which has 629
+# photographs under exactly this discipline and proved the shape works.
+IMAGE_REQUIRED = ("file", "alt", "photographer", "source", "licence",
+                  "licence_url", "fetched", "sha256")
 
 # Licences we will actually publish under. A permissive list would make this
 # field decorative; the point is that adding a new one is a decision somebody
@@ -654,6 +667,18 @@ def load():
                   f"licence must be one of {'/'.join(IMAGE_LICENCES)}")
         p.require(str(row.get("source", "")).startswith("https://"), where,
                   "source must be an https URL you can open to check the licence")
+        # SOURCE + DATE + EVIDENCE, the same contract the map datasets have.
+        p.require(str(row.get("licence_url", "")).startswith("https://"), where,
+                  "licence_url must be the page that STATES the licence — the "
+                  "licence name alone is a claim with nowhere to check it")
+        p.require(re.match(r"^\d{4}-\d{2}-\d{2}$", str(row.get("fetched", ""))),
+                  where,
+                  "fetched must be the YYYY-MM-DD the file was taken. A "
+                  "licence is a claim about a moment and without the moment "
+                  "it is a claim about nothing")
+        p.require(re.match(r"^[0-9a-f]{64}$", str(row.get("sha256", ""))), where,
+                  "sha256 of the bytes as served — the evidence that the file "
+                  "in this repository is the file that was licensed")
         # Alt text is a caption for someone who cannot see the photograph,
         # not a keyword field. "Bergen" is the page title, not a description.
         p.require(len(str(row.get("alt", ""))) >= 12, where,

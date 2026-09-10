@@ -820,6 +820,71 @@ def c_stay_lede():
     return n
 
 
+@check("every externally governed asset carries a source, a date and evidence")
+def c_external_provenance():
+    """NO EXTERNAL LICENCE CLAIM ENTERS PRODUCTION FROM MEMORY.
+
+    Anything on this site that somebody else's terms govern — a map dataset,
+    an elevation tile, a photograph — has to answer three questions in the
+    repository, not in a person's recollection:
+
+        source    the URL it came from
+        date      when it was taken, because a licence is a claim about a
+                  MOMENT and without the moment it is a claim about nothing
+        evidence  the SHA-256 of the bytes as served, so the file here is
+                  provably the file that was licensed
+
+    The map datasets have carried all three since the map was built: `url`,
+    `fetched` and `sha256` in docs/data-licenses/sources.json. Photographs
+    carried five fields and not one of them was a date or a hash, so a row
+    could say "Pexels-licensed" with nothing recording when that was true or
+    what bytes it was true of. That asymmetry is what this check removes: one
+    rule, stated once, applied to every class.
+
+    The sister repository holds 629 photographs under exactly this shape and
+    is where the field names came from. **Its answers were not copied** — a
+    precedent in another repository is a claim, not evidence, and copying one
+    is the thing this check exists to prevent.
+    """
+    CLASSES = (
+        ("map datasets", os.path.join(ROOT, "docs", "data-licenses", "sources.json"),
+         "sources", {"source": "url", "date": "fetched", "evidence": "sha256"}),
+        ("photographs", os.path.join(ROOT, "data", "images.json"),
+         "images", {"source": "source", "date": "fetched", "evidence": "sha256"}),
+    )
+    n = 0
+    for label, path, container, fields in CLASSES:
+        if not os.path.exists(path):
+            fail(f"{label}: {os.path.relpath(path, ROOT)} is missing — a class "
+                 f"of external asset with no register at all")
+            continue
+        doc = json.load(open(path, encoding="utf-8"))
+        rows = doc.get(container, {})
+        rows = rows.values() if isinstance(rows, dict) else rows
+        for row in rows:
+            who = row.get("id") or row.get("file") or "?"
+            n += 3
+            if not str(row.get(fields["source"], "")).startswith("http"):
+                fail(f"{label}/{who}: no source URL. Where it came from is the "
+                     f"first thing anybody re-checking the licence needs")
+            if not re.match(r"^\d{4}-\d{2}-\d{2}$",
+                            str(row.get(fields["date"], ""))):
+                fail(f"{label}/{who}: no date. A licence is a claim about a "
+                     f"moment; without the moment it is a claim about nothing")
+            if not re.match(r"^[0-9a-f]{64}$", str(row.get(fields["evidence"], ""))):
+                fail(f"{label}/{who}: no sha256. Without it nothing proves the "
+                     f"file here is the file that was licensed")
+    # A class that exists and is not listed above is the failure this check
+    # cannot see, so the list is asserted against the directory it describes.
+    known = {"sources.json", "photo-providers.json"}
+    for name in sorted(os.listdir(os.path.join(ROOT, "docs", "data-licenses"))):
+        if name.endswith(".json") and name not in known:
+            fail(f"docs/data-licenses/{name} is a register this check does not "
+                 f"know about — add it to CLASSES or it is governed by nothing")
+        n += 1
+    return n
+
+
 @check("no photograph enters without its licence verified against the live terms")
 def c_photo_gate():
     """No verified licence, no production image — and verified means READ.
