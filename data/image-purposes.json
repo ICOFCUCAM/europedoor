@@ -8,9 +8,9 @@
       "surface": "The full-bleed opening of the homepage, with the masthead over it and the headline beside it.",
       "min_width": 2400,
       "orientation": "landscape",
-      "min_aspect": 1.6,
+      "min_aspect": 1.5,
       "max_aspect": 2.6,
-      "note": "docs/hero-brief.md holds the editorial brief. The plate system was MEASURED as unable to carry this surface, which is the whole argument for licensing a photograph at all — so a photograph that reads as generic stock fails the brief even when it passes every number here."
+      "note": "docs/hero-brief.md holds the editorial brief. The plate system was MEASURED as unable to carry this surface, which is the whole argument for licensing a photograph at all — so a photograph that reads as generic stock fails the brief even when it passes every number here. THE FLOOR WAS 1.6 AND IT REFUSED FIFTEEN OF FIFTEEN. Every landscape result of the first real search measured 1.50, which is 3:2, the native aspect of essentially every camera a stock photographer owns — so the one purpose on this site that asked for 1.6 was asking for a crop rather than a photograph, and refused the whole library. It was also backwards for its own brief: the brief wants a strong 21:9 desktop crop AND a viable portrait crop out of the SAME frame, and a narrower source has more room for both, not less. Cropping 3:2 to 21:9 keeps 64% of the height; cropping 2.6:1 to 3:4 keeps 29% of the width. 1.5 is what every other purpose here already asks for."
     },
     "vienna-destination": {
       "key": "city:austria/vienna-and-the-east/vienna",

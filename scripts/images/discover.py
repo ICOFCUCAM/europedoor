@@ -144,6 +144,24 @@ def main(argv):
             print(f"       ! {b.split(' — ')[0]}")
     print(f"\n{suitable} of {len(found)} meet the mechanical minimum for "
           f"{args.purpose}.")
+    # WHEN EVERY CANDIDATE FAILS THE SAME ONE NUMBER, THE NUMBER IS THE
+    # SUSPECT AND NOT THE SEARCH. The first real run of this refused fifteen
+    # of fifteen because homepage-hero asked for an aspect above 1.6 and
+    # every landscape photograph a camera takes is 3:2, which is 1.50. Read
+    # one at a time that is fifteen near misses; read together it is a floor
+    # that excludes the entire library it was written to search. A person
+    # looking at fifteen lines of "! aspect 1.50 is below 1.6" is being asked
+    # to notice a pattern the script has already computed.
+    if not suitable and found:
+        reasons = [{b.split(" — ")[0] for b in acquire.fits(c, spec)} for c in found]
+        shared = set.intersection(*reasons) if reasons else set()
+        if len(shared) == 1 and all(len(r) == 1 for r in reasons):
+            print(f"\nALL {len(found)} WERE REFUSED BY ONE NUMBER, AND IT IS THE "
+                  f"SAME ONE: {next(iter(shared))}.")
+            print("  Every one of them passes every other requirement. A floor")
+            print("  that no result of an ordinary search can clear is a floor")
+            print("  to re-argue in data/image-purposes.json, not a search to")
+            print("  run again with different words.")
     print("OPEN THE PAGES AND LOOK. These numbers are a floor, not a ranking:")
     print("  subject placement, what the headline will sit over, and whether")
     print("  it reads as a particular morning or as generic stock are the")
