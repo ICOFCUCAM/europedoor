@@ -292,7 +292,14 @@ def measure():
                 "kind": "ceiling",
                 "why": "The heaviest page on the site. Guards against a template "
                        "quietly inlining something large across a whole family, "
-                       "which is how the coastline reached 51 pages and 2.1 MB."},
+                       "which is how the coastline reached 51 pages and 2.1 MB. "
+                       "440 -> 441: /map gained the two fades that cover its "
+                       "own data cuts, which is about 900 bytes of gradient "
+                       "stops and two rectangles. The cut runs from x=747 at "
+                       "70 degrees north to x=1024 at 40 degrees south of it, "
+                       "a straight diagonal through Russia that reads as a "
+                       "rendering fault, and it had been on the instrument "
+                       "since the instrument was drawn."},
             # A CEILING, not a floor, and the direction is the point. The
             # rule is that a visual earns its position — so what needs
             # guarding is plates SPREADING back onto pages that do not need

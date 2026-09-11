@@ -220,6 +220,85 @@ def months_line(data, keys):
 
 # ── home ──────────────────────────────────────────────────────────────
 
+def cut_band(lat0, lat1, lon, before, after):
+    """A gradient axis running perpendicular to one meridian of the data cut.
+
+    `data/geo/` is cut at 52°E and at 33°N because that is where this product
+    stops writing about places, and under this conic the eastern cut runs from
+    x=747 at 70°N to x=1024 at 40°N — a clean diagonal through Russia that
+    reads as a rendering fault rather than as a frontier. The hero has faded
+    along it since the hero was drawn; /map, /plan, /discover and /search — the
+    instrument family, and the one map on this site that a reader OPERATES —
+    showed it raw for the life of the dark world.
+
+    Module level rather than nested inside the hero, because the geometry is a
+    property of the PROJECTION and there is one of those. A second copy of
+    these six lines is a second projection waiting to disagree.
+    """
+    a, b = MAPPROJ.xy(lat0, lon), MAPPROJ.xy(lat1, lon)
+    mx, my = (a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    n = math.hypot(dx, dy)
+    nx, ny = dy / n, -dx / n                 # perpendicular, pointing east
+    return (mx - nx * before, my - ny * before,
+            mx - nx * after, my - ny * after)
+
+
+def dusk_stops(lo=0.0, hi=1.0):
+    """Smoothstep in five stops, as opacity only — the colour is the caller's.
+
+    A TWO-STOP GRADIENT HAS A CREASE AT EACH END AND THE EYE DRAWS A LINE
+    ALONG IT. The ramp is linear, so its first derivative stops dead at each
+    end, and human vision sharpens exactly that discontinuity — a Mach band.
+    This picture was reported as having a hard edge three separate times while
+    "soften the gradient" never fixed it, because widening a linear ramp moves
+    the crease without removing it. Smoothstep has zero slope at both ends.
+    """
+    out = []
+    for i in range(5):
+        t = i / 4.0
+        v = t * t * (3.0 - 2.0 * t)
+        out.append(f'<stop offset="{lo + (hi - lo) * t:.4f}" '
+                   f'stop-opacity="{v:.3f}"/>')
+    return "".join(out)
+
+
+def cut_fade(idprefix, w, h):
+    """The two data cuts, faded, for an instrument that draws the atlas.
+
+    Painted rather than masked, because every country on these maps is a
+    link and a masked group hit-tests as ONE region — the hero lost fifty
+    doors to exactly that and the keyboard still worked, which is the kind of
+    half-working that ships. Two rectangles, `pointer-events: none`, above the
+    land and below the marks so a destination near the cut keeps its dot.
+
+    The eastern edge is a LINEAR gradient perpendicular to the 52°E meridian,
+    which is straight under a conic. The southern edge is a RADIAL one centred
+    on the cone apex, because **a parallel is not a horizontal line on a
+    conic**: the 33rd runs 116 units of rise between Tunisia and the Caspian,
+    so a horizontal fade placed on the Tunisian end leaves the cut showing
+    right across Anatolia. Both come from the projection's own constants.
+    """
+    ex1, ey1, ex2, ey2 = cut_band(70.0, 40.0, 52.0, 330.0, 30.0)
+    ax, ay = MAPPROJ.apex()
+    r33 = MAPPROJ.parallel_radius(33.0)
+    foot0, foot1 = (r33 - 130.0) / r33, (r33 - 4.0) / r33
+    return (
+        f'<defs>'
+        f'<linearGradient id="{idprefix}edge" gradientUnits="userSpaceOnUse"'
+        f' x1="{ex1:.1f}" y1="{ey1:.1f}" x2="{ex2:.1f}" y2="{ey2:.1f}">'
+        f'{dusk_stops()}</linearGradient>'
+        f'<radialGradient id="{idprefix}foot" gradientUnits="userSpaceOnUse"'
+        f' cx="{ax:.1f}" cy="{ay:.1f}" r="{r33:.1f}">'
+        f'{dusk_stops(foot0, foot1)}</radialGradient>'
+        f'</defs>'
+        f'<g class="mapcut" aria-hidden="true">'
+        f'<rect x="0" y="0" width="{w}" height="{h}" fill="url(#{idprefix}edge)"/>'
+        f'<rect x="0" y="0" width="{w}" height="{h}" fill="url(#{idprefix}foot)"/>'
+        f'</g>'
+    )
+
+
 def heroeurope(data):
     """Europe, entire, seen through the doorway. The homepage's picture.
 
@@ -699,15 +778,7 @@ def heroeurope(data):
     # where the cut's geometry is known exactly rather than guessed at in
     # percentages of a box the drawing is letterboxed inside. Everything west
     # of it is fully drawn.
-    def _band(lat0, lat1, lon, before, after):
-        """A gradient running perpendicular to one meridian of the data cut."""
-        a, b = MAPPROJ.xy(lat0, lon), MAPPROJ.xy(lat1, lon)
-        mx, my = (a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0
-        dx, dy = b[0] - a[0], b[1] - a[1]
-        n = math.hypot(dx, dy)
-        nx, ny = dy / n, -dx / n                 # perpendicular, pointing east
-        return (mx - nx * before, my - ny * before,
-                mx - nx * after, my - ny * after)
+    _band = cut_band
 
     # A TWO-STOP GRADIENT HAS A CREASE AT EACH END, AND THE EYE DRAWS A LINE
     # ALONG IT.
@@ -757,13 +828,7 @@ def heroeurope(data):
         group only references the gradient. The rule points at the gradients
         now and the browser suite reads the resolved value.
         """
-        out = []
-        for i in range(5):
-            t = i / 4.0
-            v = t * t * (3.0 - 2.0 * t)
-            out.append(f'<stop offset="{lo + (hi - lo) * t:.4f}" '
-                       f'stop-opacity="{v:.3f}"/>')
-        return "".join(out)
+        return dusk_stops(lo, hi)
 
     def _stops(lo=0.0, hi=1.0, invert=False):
         out = []
@@ -7492,6 +7557,7 @@ def map_page(data):
 <g id="context" class="context" aria-hidden="true">{''.join(context)}</g>
 <g id="countries" class="countries">{''.join(shapes)}</g>
 <g id="detail" class="countries"></g>
+{cut_fade('map', MAP_W, MAP_H)}
 <g id="nogeo" class="nogeo">{''.join(nogeo)}</g>
 <g id="route"></g>
 <g id="regions" hidden display="none"></g>

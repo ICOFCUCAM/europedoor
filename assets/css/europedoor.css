@@ -1367,6 +1367,18 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
  * here it is not offering anything. */
 .europemap, .minimap { --z: 1; }
 .mapwrap { background: var(--map-sea); }
+/* THE DATA CUT WAS DRAWN AS A FRONTIER ON THE ONE MAP A READER OPERATES.
+   data/geo/ stops at 52°E and 33°N because that is where this product stops
+   writing about places, and under this conic the eastern cut runs from x=747
+   at 70°N to x=1024 at 40°N — a clean straight diagonal through Russia.
+   The hero has faded along it since the hero was drawn; /map showed it raw,
+   and once the land was lifted out of the water it became the most visible
+   line in the drawing.
+   The stops carry an opacity and no colour, because the SVG default for
+   stop-color is #000 and this stylesheet has already shipped a layer that
+   said graphite and painted black. The colour is the water's. */
+.mapcut { pointer-events: none; }
+#mapedge stop, #mapfoot stop { stop-color: var(--map-sea); }
 .europemap .context path { fill: var(--map-context); stroke: none; }
 .europemap .countries path {
   fill: var(--map-land); stroke: var(--map-border);

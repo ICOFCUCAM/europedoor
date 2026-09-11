@@ -107,9 +107,9 @@
       "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it is allowed to move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence. 119 -> 146 ON PURPOSE: the body was eight abstract plates over 'Find your kind of Europe' and three more over the journeys — eleven purple gradients in a column under an atlas hero, which is placeholder art doing a picture's job, and the plate system was already measured as unable to carry a hero. Each tile now draws its OWN destinations lit on one shared silhouette: Mountains is the Alps, the Pyrenees, the Carpathians and the Scandes; History is almost the whole continent; and that difference is what the tile exists to say. The plates cost 14.7 KB and came out; 894 dots and one lod0 coastline went in. All of them and never a selection, so the count on the tile is the number of dots on it and a reader can check. 121 -> 136 ON PURPOSE: the doors that replaced those tiles were written for a photograph and the register is empty, so the band rendered as four blocks of type — the one part of the homepage whose job is to make somebody want to go somewhere, doing it entirely in words. The drawing is back under the four headings, and it is the same 512 dots the tiles carried."
     },
     "weight.max_page_kb": {
-      "value": 440,
+      "value": 441,
       "kind": "ceiling",
-      "why": "The heaviest page on the site. Guards against a template quietly inlining something large across a whole family, which is how the coastline reached 51 pages and 2.1 MB."
+      "why": "The heaviest page on the site. Guards against a template quietly inlining something large across a whole family, which is how the coastline reached 51 pages and 2.1 MB. 440 -> 441: /map gained the two fades that cover its own data cuts, which is about 900 bytes of gradient stops and two rectangles. The cut runs from x=747 at 70 degrees north to x=1024 at 40 degrees south of it, a straight diagonal through Russia that reads as a rendering fault, and it had been on the instrument since the instrument was drawn."
     },
     "map.relief_pages": {
       "value": 262,
@@ -122,7 +122,7 @@
       "why": "Pages whose geography is seen through the arch. A floor: the aperture is the identity, and a new map that forgets it is a page that stops looking like EuropeDoor."
     },
     "plates.page_share": {
-      "value": 0.057,
+      "value": 0.048,
       "kind": "ceiling",
       "why": "The share of pages carrying a generated illustration. A ceiling because the failure mode is an illustration placed because the system has one, which is the one reason the art direction forbids."
     },
