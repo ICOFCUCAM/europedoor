@@ -3531,6 +3531,77 @@ async function main() {
   }
 
 
+  /* THE DOORS STRIP WITH ONE, TWO AND THREE PHOTOGRAPHS — A STATE NOTHING
+   * COULD SEE.
+   *
+   * "The strip is composed at every step rather than only when all four are
+   * licensed" is the argument for four slots instead of one band image, and
+   * it was written into the stylesheet and never rendered. With stand-in
+   * pictures injected into the live page — `img-src 'self' data:` allows a
+   * data URI, so the state can be reached without touching the register —
+   * the strip jumped from 304px to 522 the moment the FIRST picture landed,
+   * and the three unfilled doors became 522px tall with two hundred pixels
+   * of flat teal above their type. The hole this band was emptied of,
+   * reintroduced by one acquisition, and worse than before because an empty
+   * door now sat beside a filled one. The heading size was per-door too, so
+   * two sizes appeared side by side with nothing to explain the difference
+   * but which slot happened to be filled first.
+   *
+   * The register holds no photographs, so this is a code path nothing
+   * exercises — which is how the focal point shipped as a style attribute
+   * the CSP forbids. It has an instrument on it now.
+   */
+  {
+    const dp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    const seen = [];
+    for (let n = 0; n <= 4; n++) {
+      const r = await dp.goto(base + "/", { waitUntil: "load" });
+      if (!r || r.status() !== 200) break;
+      await dp.evaluate((n) => {
+        const svg = (c) => "data:image/svg+xml;utf8," + encodeURIComponent(
+          `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000">` +
+          `<rect width="1600" height="1000" fill="${c}"/></svg>`);
+        const cs = ["#5b6b4a", "#2e5d7a", "#7a5b3a", "#6b3a4a"];
+        [...document.querySelectorAll(".way")].slice(0, n).forEach((w, i) => {
+          w.classList.add("shot");
+          const pic = document.createElement("picture");
+          const im = document.createElement("img");
+          im.className = "photo"; im.src = svg(cs[i]); im.alt = "";
+          pic.appendChild(im);
+          w.insertBefore(pic, w.firstChild);
+        });
+      }, n);
+      await dp.waitForTimeout(120);
+      seen.push(await dp.evaluate(() => ({
+        h: Math.round(document.querySelector(".wayin").getBoundingClientRect().height),
+        sizes: [...new Set([...document.querySelectorAll(".way h3")]
+          .map((h) => Math.round(parseFloat(getComputedStyle(h).fontSize))))],
+      })));
+    }
+    await dp.close();
+    if (seen.length === 5) {
+      for (let n = 0; n <= 3; n++) {
+        checked++;
+        ok(seen[n].h === seen[0].h,
+           `the doors strip is ${seen[n].h}px with ${n} of four photographs and ` +
+           `${seen[0].h}px with none. Until every door has one the strip keeps ` +
+           `the height its type needs, or the first acquisition turns the other ` +
+           `three into holes`);
+      }
+      for (let n = 0; n <= 4; n++) {
+        checked++;
+        ok(seen[n].sizes.length === 1,
+           `the doors carry ${seen[n].sizes.length} heading sizes with ${n} of ` +
+           `four photographs (${seen[n].sizes.join(", ")}px). Four names a reader ` +
+           `compares have one size, whichever slot happened to be filled first`);
+      }
+      checked++;
+      ok(seen[4].h > seen[0].h,
+         `the completed strip is ${seen[4].h}px and the empty one ${seen[0].h} — ` +
+         `with four photographs it takes the photograph's height`);
+    }
+  }
+
   /* THE YEAR BAND'S CAPTION NAMES A LINE, MEASURED ON THE PAINTED PIXEL.
    *
    * "Above the line is what is on. Below it is how many countries are in

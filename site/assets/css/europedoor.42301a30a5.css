@@ -5217,7 +5217,23 @@ body[data-hero] .masthead { position: sticky; }
    inset shadow: the register counts box-shadow declarations and two is the
    whole vocabulary, a rest state and a lifted one. A divider is not a
    shadow, and writing it as one spends a slot that means something else. */
-.way.shot { min-height: min(58vh, 33rem); }
+/* "THE STRIP IS COMPOSED AT EVERY STEP RATHER THAN ONLY WHEN ALL FOUR ARE
+   LICENSED" WAS THE ARGUMENT FOR FOUR SLOTS, AND IT WAS NOT TRUE.
+   Rendered with one, two and three stand-in photographs injected into the
+   live page — `img-src 'self' data:` allows a data URI, so the state can be
+   seen without touching the register — the strip jumped from 304px to 522
+   the moment the FIRST picture landed, and the three unfilled doors became
+   522px tall with two hundred pixels of flat teal above their type. That is
+   the hole this band was just emptied of, reintroduced by one acquisition,
+   and worse than before because an empty door now sits beside a filled one.
+
+   So the tall height is conditional on the strip being COMPLETE, not on any
+   door being filled: `:not(:has(.way:not(.shot)))` is "no door lacks a
+   photograph". Until then a filled door shows its picture at the type's own
+   height, which is 1.31 at 1280 and 1.79 at 390 — both inside the container
+   range data/image-purposes.json declares, so the crop contract holds at
+   every step too. */
+.wayin:not(:has(.way:not(.shot))) .way { min-height: min(58vh, 33rem); }
 .way + .way { border-left: 1px solid color-mix(in srgb, var(--limestone) 20%, transparent); }
 /* FOUR DOORS, FOUR DIFFERENT HEADING HEIGHTS. The panels are bottom-aligned
    so the count and the arrow line up, and the four taglines wrap to one line
@@ -5238,7 +5254,13 @@ body[data-hero] .masthead { position: sticky; }
      photograph lands, and without this the picture would have been a
      281-pixel band. */
   .wayin { grid-template-rows: auto auto auto auto auto; }
-  .wayin:has(.way.shot) { min-height: min(58vh, 33rem);
+  /* COMPLETE, not "any". The floor lives on the container because subgrid
+     cannot take a min-height on the item — and it has to ask the same
+     question the item's rule asks, or the strip grows to photograph height
+     on the first acquisition and the three unfilled doors become holes
+     again. Rendered with one, two and three stand-ins: 304px to 522 the
+     moment one picture landed. */
+  .wayin:not(:has(.way:not(.shot))) { min-height: min(58vh, 33rem);
                           grid-template-rows: 1fr auto auto auto auto; }
   .way { grid-row: 1 / -1; display: grid; grid-template-rows: subgrid;
          min-height: 0; }
@@ -5285,7 +5307,7 @@ body[data-hero] .masthead { position: sticky; }
 }
 @media (max-width: 60rem) {
   .wayin { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .way.shot { min-height: min(44vh, 24rem); }
+  .wayin:not(:has(.way:not(.shot))) .way { min-height: min(44vh, 24rem); }
 }
 /* ONE COLUMN AT 52rem, NOT 40, BECAUSE A SECOND RULE HAD ALREADY TAKEN IT.
    A `.wayin { grid-template-columns: 1fr; gap: var(--s6) }` sat three
@@ -5307,7 +5329,7 @@ body[data-hero] .masthead { position: sticky; }
      purpose declares, a 2.794 box leaves 10% of a frame guaranteed
      visible, under the 12% floor. 52vw takes over the moment the panel is
      wider than it is tall. */
-  .way.shot { min-height: max(17rem, 52vw); }
+  .wayin:not(:has(.way:not(.shot))) .way { min-height: max(17rem, 52vw); }
   /* The divider stacks with the panels: horizontal, or the strip comes
      apart into four blocks that happen to share a colour. */
   .way + .way { border-left: 0;
@@ -5332,10 +5354,16 @@ body[data-hero] .masthead { position: sticky; }
   font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
   line-height: 1.12; margin: 0 0 var(--s3); letter-spacing: -0.02em;
 }
-/* And it goes back DOWN when a photograph arrives: over a picture the name
+/* And it goes back DOWN when the strip is complete: over a picture the name
    is a caption again, and 30px of serif over somebody's landscape is the
-   thing every stock-photo travel site does. */
-.way.shot h3 { font-size: var(--t-xl); letter-spacing: 0; }
+   thing every stock-photo travel site does.
+
+   ON THE STRIP, NOT THE DOOR. Per-door it produced two heading sizes side
+   by side the moment one photograph landed — measured in the partial render
+   above: "Mountains" at --t-xl beside "Coast & islands" at --t-2xl, with
+   nothing to explain the difference but which slot happened to be filled
+   first. Four names a reader compares have one size. */
+.wayin:not(:has(.way:not(.shot))) .way h3 { font-size: var(--t-xl); letter-spacing: 0; }
 /* The editorial line is the promise and the only italic on the page: it is
  * the sentence a reader answers, where everything under it is fact. */
 .wayline { font-family: var(--display); font-style: italic; font-size: var(--t-lg);
@@ -5565,8 +5593,14 @@ body[data-hero] .masthead { position: sticky; }
  * of this file, and restating it here is the redundancy the dead-rule scan
  * exists to find — a declaration that matches its element and changes
  * nothing, which reads as a decision and is not one. */
+/* AND NO `display: grid` EITHER, for the same reason one paragraph up:
+   `.storylead` already sets it and this element carries both classes, so
+   the declaration matched its element and changed nothing. The dead-rule
+   scan found it the run after /stories lost its opening drawing, which is
+   when the two hover rules it had been carrying started winning and this
+   one took their place at the ceiling. */
 .storyleadwide {
-  display: grid; grid-template-columns: 22rem minmax(0, 1fr); gap: var(--s6);
+  grid-template-columns: 22rem minmax(0, 1fr); gap: var(--s6);
   align-items: center; text-decoration: none;
   padding: var(--s6) 0;
 }
@@ -5603,8 +5637,11 @@ body[data-hero] .masthead { position: sticky; }
  * photograph will, so the day a row lands in data/images.json nothing on the
  * page moves except what is inside that frame. */
 /* A VARIANT OF `pagehead`, sharing its role and its measure. */
+/* No `display: grid`: `.pagehead.index` already sets it and every `.ihero`
+   is one — a variant of that head rather than a head of its own, which is
+   the whole reason it is called a variant. */
 .pagehead.ihero {
-  display: grid; gap: var(--s7); align-items: center;
+  gap: var(--s7); align-items: center;
   padding: var(--s6) 0 var(--s7); border-bottom: 1px solid var(--rule); max-width: none;
 }
 .pagehead.ihero.wide { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }

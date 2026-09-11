@@ -2513,7 +2513,7 @@ too. The reasoning that put them there was right about five of the seven and
 was applied to all seven — /discover, /plan and /my-europe are in the thumb
 bar, which appears at *the same breakpoint*, so hiding those three hides
 nothing. And `.sectionnav`, a destination's own contents row, did exactly the
-same thing on 319 pages: 567px in a 358px box, with Events, Travel tips, Stay
+same thing on every destination page: 567px in a 358px box, with Events, Travel tips, Stay
 and Onward behind a swipe and no affordance at all. **A link a reader cannot
 see is not reachable because it is focusable**, and the document-overflow
 check passes on both by design, because overflow contained inside a scroller
@@ -2522,7 +2522,7 @@ is what that check was written to allow.
 **The masthead sat on a 24px gutter and every word under it on 16.** `main`
 is padded `--s4` on a phone and `.masthead-in` was left on the desk's `--s5`,
 so the wordmark and the whole navigation were indented eight pixels further
-than the h1, the breadcrumb and every line of prose, on 1,034 pages. Nothing
+than the h1, the breadcrumb and every line of prose, on every page. Nothing
 counts a gutter and at thumbnail size nothing sees one.
 
 **TWELVE PURPOSES WERE TWELVE SLOTS.** A surface, a page, a register key and
