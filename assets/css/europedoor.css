@@ -4850,16 +4850,44 @@ body[data-hero] .masthead { position: sticky; }
                       font-size: var(--t-sm); line-height: 1.5; max-width: 46rem; }
 #minecap { color: var(--ink-2); }
 .interestrow .themeside { display: grid; gap: var(--s2); }
-/* BETWEEN THE PHONE RULE AND THE DESK RULE THE GLYPH WAS 132px. Neither
-   block applies at 834, so it fell back to the theme row's intrinsic size —
-   a continent 132 pixels wide carrying two hundred marks, which is the
-   "204 pixels for the whole of Europe" measurement this stylesheet already
-   records one family over. A tablet is where a reader compares things. */
-.interestrow .themeside .constel { width: min(15rem, 100%); }
+/* THE GLYPH HAS THREE SIZES AND ONLY TWO WERE WRITTEN.
+ *
+ * There is a desk rule at 64rem and a phone rule at 44rem, and BETWEEN THEM
+ * neither applied: at 834 both row families fell back to the drawing's
+ * intrinsic size, a continent 132 pixels wide. That is the "204 pixels for
+ * the whole of Europe" measurement this stylesheet records one family over,
+ * at two thirds of it, on the width a reader is most likely to be comparing
+ * things at.
+ *
+ * A PLAIN RULE AT THE SAME SPECIFICITY, IMMEDIATELY BEFORE THE DESK BLOCK,
+ * rather than a seventh breakpoint. Two attempts failed first and both are
+ * this file's recorded traps: a base rule LATER in the file beat the 64rem
+ * block and took the desk glyph from 288 back to 240 without touching the
+ * desk rule; and writing it as `.interestrow .themeside .constel` made it
+ * (0,3,0), which beats the desk block's (0,2,0) at every width. So it is
+ * (0,2,0), it is above the block that overrides it, and the invariant
+ * register's breakpoint ceiling is what said to look for this at all —
+ * every breakpoint is a layout somebody has to test in Chromium. */
+.themeside .constel { width: min(15rem, 100%); }
 @media (min-width: 64rem) {
   .themerow .constel-theme.constel-dense .constel-lit circle { r: 11px; }
-  .themerow { grid-template-columns: minmax(0, var(--measure)) minmax(0, 1fr); }
-  .interestrow { grid-template-columns: minmax(0, 1fr) minmax(0, 15rem);
+  /* THREE HUNDRED AND THIRTY-SIX PIXELS OF NOTHING IN THE MIDDLE OF EVERY
+     ROW. Measured at 1280: the text column is 544, the drawing is 288 and
+     right-aligned inside a 608-pixel column, so a third of the row is a
+     void between the eight place names and the shape they make. The whole
+     argument of this index is that you compare the list with the shape, and
+     they were as far apart as the page allows.
+
+     The measure is for PROSE and this column holds a middot list of place
+     names, which is a sequence you scan — the same distinction this
+     stylesheet already records for `.rowsub`. So the text takes the room
+     and the drawing sits next to it. */
+  .themerow { grid-template-columns: minmax(0, 1fr) 18rem; }
+  /* Same void, different cause: an interest row's text is a name and one
+     short line, so no amount of column gives it to. The drawing takes the
+     column instead — 22rem rather than 15 — which also makes two hundred
+     marks legible where 15rem made them a texture. */
+  .interestrow { grid-template-columns: minmax(0, 1fr) minmax(0, 18rem);
                  align-items: center; gap: var(--s6); }
   .interestrow .themeside { justify-items: end; }
   .interestrow .themeside .constel { width: 100%; }
@@ -4956,10 +4984,15 @@ body[data-hero] .masthead { position: sticky; }
      of it", and on a phone it was closing on nothing.
      The mark comes down with the width, as it went up with it: 14 units at
      358 is the same 10-pixel dot the row has everywhere else. */
-  .themeside .constel { display: block; width: 100%; }
+  /* min(22rem) RATHER THAN 100%: this block runs to 44rem, so a full-width
+     glyph is 568 pixels tall at 600 and the themes page ran to 9,684 — the
+     same fault the interests rows were just fixed for, on the family the
+     interests rows were copied from. At 390 the cap is the width anyway. */
+  .themeside .constel { display: block; width: min(22rem, 100%); }
   /* NOT 100%: this block runs to 44rem, so at 600 a full-width glyph was
-     568 pixels tall and the page ran to 11,972 — seventeen rows of it.
-     A phone is 390 and everything up to 704 is not. */
+     568 pixels tall and the page ran to 11,972 — seventeen rows of it. A
+     phone is 390 and everything up to 704 is not, and 15rem is what the
+     band above this one gives a tablet. */
   .interestrow .themeside .constel { width: min(22rem, 100%); }
   .themerow .constel-theme .constel-lit circle { r: 14px; }
   .themerow .constel-theme.constel-dense .constel-lit circle { r: 7px; }
