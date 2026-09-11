@@ -1691,10 +1691,13 @@ def macro_page(data, m):
         # fault that framing exists to stop, arrived at from the other side.
         pts = [project(t["lat"], t["lon"])
                for r in c["regions"] for t in r["cities"]]
+        # level=2: the grid of member countries IS this page, so its cards
+        # are the top level under the h1. A card's heading is an h3 where the
+        # cards sit inside a band and the band's own h2 is above them.
         cards.append(card(urls.country(c), c["capital"], c["name"], c["tagline"],
                           art=country_glyph(c["slug"], cs)
                               or region_glyph([cs], pts or None, min_span=340.0),
-                          meta=meta))
+                          meta=meta, level=2))
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], None)])}
 <div class="pagehead overture">
@@ -3427,7 +3430,7 @@ def interest_page(data, i, ranking):
         f'<span class="rowgroupn">{len(by_macro[m["slug"]])}</span></p>'
         + "".join(
             f'<a class="row" href="{urls.city(n["country"], n["region"], n["city"])}">'
-            f'<div><h3>{esc(n["city"]["name"])}</h3>'
+            f'<div><h2>{esc(n["city"]["name"])}</h2>'
             f'<p class="rowsub">{esc(n["city"]["summary"])}</p></div>'
             f'<p class="rowmeta">{esc(n["country"]["name"])} · '
             f'{esc(n["region"]["name"])}</p></a>'
@@ -3560,7 +3563,7 @@ def journeys_index(data):
         rows.append(
             f'<a class="row journeyrow" href="{urls.journey(j)}">'
             f'<div><p class="kicker">{esc(j["strapline"])}</p>'
-            f'<h3>{esc(j["name"])}</h3>'
+            f'<h2>{esc(j["name"])}</h2>'
             f'<p class="rowsub">{" · ".join(stops)}</p>'
             f'<span class="hopbar route" aria-hidden="true">{segs}</span>'
             f'<p class="rowmeta jfacts">{n_of(j["days"], "day")} · {n_of(len(countries), "country")}'
@@ -5798,7 +5801,7 @@ def facet_page(data, c, r, t, key, payload):
         }[key]
 
     rowhtml = "".join(
-        f"""<a class="row" href="{esc(href)}"><div><h3>{esc(title)}</h3>
+        f"""<a class="row" href="{esc(href)}"><div><h2>{esc(title)}</h2>
         <p class="rowsub">{esc(sub)}</p></div><p class="rowmeta">{esc(meta)}</p></a>"""
         for href, title, sub, meta in rows
     )
@@ -7260,7 +7263,7 @@ def themes_index(data):
         rows.append(
             f'<a class="row themerow" href="/themes/{t["slug"]}">'
             f'<div><p class="kicker">{esc(t["strapline"])}</p>'
-            f'<h3>{esc(t["name"])}</h3>'
+            f'<h2>{esc(t["name"])}</h2>'
             f'<p class="rowsub">{" · ".join(places)}</p></div>'
             f'<div class="themeside">{glyph}'
             f'<p class="rowmeta">{len(countries)} '
@@ -7298,7 +7301,7 @@ def theme_page(data, t):
         n = idx[stop["city"]]
         rows.append(
             f"""<a class="row" href="{urls.city(n['country'], n['region'], n['city'])}">
-            <div><h3>{esc(n['city']['name'])}</h3><p class="rowsub">{esc(stop['why'])}</p></div>
+            <div><h2>{esc(n['city']['name'])}</h2><p class="rowsub">{esc(stop['why'])}</p></div>
             <p class="rowmeta">{esc(n['country']['name'])}</p></a>"""
         )
     countries = []
@@ -7457,13 +7460,13 @@ def stories_index(data):
         f'<div class="storyart">{glyph(lead)}</div>'
         f'<div><p class="kicker">{esc(lead["section"])} · {esc(lead["reading"])} · '
         f'{esc(lead["published"])}</p>'
-        f'<h3>{esc(lead["title"])}</h3>'
+        f'<h2>{esc(lead["title"])}</h2>'
         f'<p class="rowsub">{esc(lead["standfirst"])}</p>'
         f'<p class="doorgo">Read the story →</p></div></a>'
         '<div class="rows">' + "".join(
             f'<a class="row storyrow" href="{urls.story(s)}">'
             f'<div><p class="kicker">{esc(s["section"])}</p>'
-            f'<h3>{esc(s["title"])}</h3>'
+            f'<h2>{esc(s["title"])}</h2>'
             f'<p class="rowsub">{esc(s["standfirst"])}</p></div>'
             f'<p class="rowmeta">{esc(s["published"])}<br>'
             f'<span class="small">{esc(s["reading"])}</span></p></a>'
@@ -8113,7 +8116,7 @@ def events_page(data):
     most = max((len(v) for v in by_month.values()), default=1) or 1
     monthrows = "".join(
         f"""<a class="row monthrow" href="/events/{esc(m)}">
-        <div><h3>{esc(names[m])}</h3>
+        <div><h2>{esc(names[m])}</h2>
         <p class="rowsub">{len(by_month[m])} fixed point{"" if len(by_month[m]) == 1 else "s"} ·
         {shoulder[m]} countr{"y" if shoulder[m] == 1 else "ies"} in their quieter shoulder</p>
         <div class="hopbar"><span class="w{min(100, round(len(by_month[m]) / most * 100 / 5) * 5)}"></span></div></div>
@@ -8472,7 +8475,7 @@ def method_page(data):
     # a syntax error two hundred lines further down, in a place that has
     # nothing to do with the mistake.
     maprows = "".join(
-        f'<div class="row"><div><h3>{esc(h)}</h3><p class="rowsub">{b}</p></div>'
+        f'<div class="row"><div><h2>{esc(h)}</h2><p class="rowsub">{b}</p></div>'
         f'<p class="rowmeta">{esc(m)}</p></div>'
         for h, b, m in (
             ("Where the land comes from",
@@ -8547,17 +8550,17 @@ def method_page(data):
                 f'<span class="distnum">{lo}–{hi}, median {med}</span></span>')
 
     rows = "".join(
-        f'<div class="row"><div><h3>{esc(name)}</h3><p class="rowsub">{esc(formula)}</p></div>'
+        f'<div class="row"><div><h2>{esc(name)}</h2><p class="rowsub">{esc(formula)}</p></div>'
         f'<p class="rowmeta">{distbar(key)}</p></div>'
         for key, name, formula in methodology_rows()
     )
     refused = "".join(
-        f'<div class="row"><div><h3>{esc(name)}</h3><p class="rowsub">{esc(why)}</p></div>'
+        f'<div class="row"><div><h2>{esc(name)}</h2><p class="rowsub">{esc(why)}</p></div>'
         f'<p class="rowmeta">not computed</p></div>'
         for name, why in REFUSED.items()
     )
     discrows = "".join(
-        f'<div class="row"><div><h3>{esc(name)}</h3><p class="rowsub">{esc(why)}</p></div>'
+        f'<div class="row"><div><h2>{esc(name)}</h2><p class="rowsub">{esc(why)}</p></div>'
         f'<p class="rowmeta">+{pts}</p></div>'
         for name, pts, why in DISCOVER_TERMS
     )
@@ -8960,7 +8963,7 @@ def api_page(data):
     ]
     cards = "".join(
         f"""<div class="row db">
-        <h3><code>{esc(u)}</code></h3>
+        <h2><code>{esc(u)}</code></h2>
         <p class="rowsub">{esc(what)}</p>
         <p class="small"><strong>Holds:</strong> {esc(size)}</p>
         <p class="small"><strong>Note:</strong> {esc(note)}</p>
@@ -9901,7 +9904,7 @@ def motion_page(data, m):
               if all(c in w for _n, w in shown)]
     rows = "".join(
         f"""<a class="row" href="{urls.city(n['country'], n['region'], n['city'])}">
-        <div><h3>{esc(n['city']['name'])}</h3>
+        <div><h2>{esc(n['city']['name'])}</h2>
         <p class="rowsub">{esc(n['city']['summary'])}</p>
         {f'<p class="whythis">{esc(and_list([c for c in why if c not in common]))}.</p>'
          if [c for c in why if c not in common] else ""}</div>
@@ -10093,7 +10096,7 @@ def motion_index(data):
                 if motion_match(data, m, cid, x)[0])
         rows.append(
             f'<a class="row motionrow" href="/europe-in/{m["slug"]}">'
-            f'<div><h3>{esc(m["name"])}</h3>'
+            f'<div><h2>{esc(m["name"])}</h2>'
             f'<p class="rowsub">{esc(m["strapline"])}</p>'
             f'<p class="motionq">{esc(motion_query_words(data, m))}</p></div>'
             f'<p class="rowmeta">{n}<br><span class="small">destinations</span>'
@@ -10193,7 +10196,7 @@ def discover_page(data):
         <div class="card-body">
         <p class="kicker">{sum(1 for cid, x in data['cities'].items()
                                if motion_match(data, m, cid, x)[0])} destinations</p>
-        <h3>{esc(m['name'])}</h3>
+        <h2>{esc(m['name'])}</h2>
         <p class="rowsub">{esc(m['strapline'])}</p>
         <p class="motionq">{motion_query_words(data, m)}</p></div></a>"""
         for m in data["motions"][:6]

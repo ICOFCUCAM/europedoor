@@ -5041,6 +5041,50 @@ def c_automated_provider():
     return n
 
 
+@check("no page skips a heading level")
+def c_heading_outline():
+    """A LIST THAT IS THE PAGE STARTS AT h2, AND 158 PAGES STARTED AT h3.
+
+    The `row` shape carries its name in an `<h3>`, which is right when the
+    rows sit inside a band — the band's `<h2>` is the level above them. On
+    the families where the list IS the page there is no band, so the outline
+    went h1 straight to h3: every facet page, the theme pages, the motion
+    pages, the interest pages, /method, /discover and four indexes.
+
+    Nothing in WCAG fails on a skipped level, which is why it survived. What
+    it costs is real anyway: a reader navigating by heading hears "level
+    three" with no level two above it, and the document outline a screen
+    reader builds is wrong about what contains what. This repository already
+    holds the same opinion one scale down — "a heading level that jumps about
+    inside one list is worse than none" — and applied it to a group head.
+    """
+    n = bad = 0
+    first = []
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        levels = [int(m.group(1)) for m in re.finditer(r"<h([1-6])\b", h)]
+        n += 1
+        if levels.count(1) != 1:
+            bad += 1
+            if len(first) < 3:
+                first.append(f"{canonical_of(f)} has {levels.count(1)} h1")
+            continue
+        prev = 0
+        for lv in levels:
+            if prev and lv > prev + 1:
+                bad += 1
+                if len(first) < 3:
+                    first.append(f"{canonical_of(f)} jumps h{prev} to h{lv}")
+                break
+            prev = lv
+    if bad:
+        fail(f"{bad} of {n} pages skip a heading level or do not carry exactly "
+             f"one h1 — {'; '.join(first)}. A list that is the page starts at "
+             f"h2; an h3 with no h2 above it tells a screen reader the outline "
+             f"is something it is not")
+    return n
+
+
 @check("every cached social card is what the renderer produces today")
 def c_og_cache_is_current():
     """THE LIME LEFT THE PALETTE AND STAYED ON NINETY-SIX SOCIAL CARDS.

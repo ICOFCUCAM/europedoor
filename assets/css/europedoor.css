@@ -913,7 +913,7 @@ main.wide { max-width: 92rem; }
 .plate { width: 100%; height: 100%; display: block;
          border-radius: 50% 50% 0 0 / 34% 34% 0 0; }
 .card-body { padding: var(--s4); }
-.card h3 { margin-bottom: var(--s2); }
+.card :is(h2, h3) { font-size: var(--t-lg); margin-bottom: var(--s2); }
 .card .blurb { font-size: var(--t-sm); color: var(--ink-2); margin: 0; }
 .card .cardmeta { margin-top: var(--s3); font-size: var(--t-xs); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
 
@@ -951,7 +951,24 @@ main.wide { max-width: 92rem; }
 .rows { border-top: 1px solid var(--rule); }
 .row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s4); align-items: baseline; padding: var(--s4) 0; border-bottom: 1px solid var(--rule); text-decoration: none; }
 .row:hover { background: var(--paper-2); }
-.row h3 { font-size: var(--t-md); }
+/* :is(h2, h3) BECAUSE THE LEVEL IS THE OUTLINE AND THE CLASS IS THE LOOK.
+   A row's name is an h3 inside a band, where the band's own h2 is the level
+   above it, and an h2 on the families where the LIST IS THE PAGE — the facet
+   pages, the theme pages, the motion pages, the interest pages, /method,
+   /discover and four indexes. 158 pages went h1 straight to h3, which is the
+   fault the note and rail headings two thousand lines up already record:
+   styling reasoning applied to heading levels. The styling is on the class,
+   so the level is free to be correct. */
+.row :is(h2, h3) { font-size: var(--t-md); margin: 0; }
+/* `main h2 { margin-top: var(--s6); margin-bottom: var(--s4) }` is the BAND
+   heading's rule, and it started matching every row and card title the moment
+   those were promoted to h2 — 32 pixels above and 16 below, on 158 pages, for
+   a change that was meant to move nothing a reader can see. The level is the
+   outline; the class is the look, and the class has to say so out loud now
+   that both levels reach the same elements. */
+.card :is(h2, h3), .storylead :is(h2, h3), .storysm :is(h2, h3),
+.storyleadwide :is(h2, h3), .journeyrow :is(h2, h3), .jrow :is(h2, h3),
+.way :is(h2, h3) { margin: 0; }
 /* A MEASURE IS FOR PROSE, AND A ROW'S SUBLINE IS A SEQUENCE.
    `p { max-width: var(--measure) }` is right on every paragraph on the site
    and wrong on this one: `.rowsub` is a <p> holding a middot-separated list
@@ -5067,7 +5084,7 @@ body[data-hero] .masthead { position: sticky; }
              align-items: start;
              border-top: 1px solid var(--rule); padding-top: var(--s6); }
 .storylead, .storysm { display: block; text-decoration: none; }
-.storylead h3 { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); line-height: 1.12;
+.storylead :is(h2, h3) { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); line-height: 1.12;
                 margin: 0 0 var(--s3); }
 /* The lead story's own places, at the size the journeys' routes are:
  * this is the section's one dominant visual, and at 132px it was a
@@ -5107,9 +5124,9 @@ body[data-hero] .masthead { position: sticky; }
 .storyart .constel-lit circle { r: 14px; }
 .storysm { padding-bottom: var(--s5); border-bottom: 1px solid var(--rule); margin-bottom: var(--s5); }
 .storysm:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
-.storysm h3 { margin: 0 0 var(--s2); }
-.storylead:hover h3, .storysm:hover h3,
-.storylead:focus-visible h3, .storysm:focus-visible h3 { color: var(--door); }
+.storysm :is(h2, h3) { margin: 0 0 var(--s2); }
+.storylead:hover :is(h2, h3), .storysm:hover :is(h2, h3),
+.storylead:focus-visible :is(h2, h3), .storysm:focus-visible :is(h2, h3) { color: var(--door); }
 
 /* THE CLOSING STATEMENT REPLACED A ROW OF COUNTS. "319 destinations · 17
  * journeys · 50 countries" is the database introducing itself, and it was
@@ -5206,9 +5223,9 @@ body[data-hero] .masthead { position: sticky; }
 /* The name was --t-lg, a hair above the stops list under it, so seventeen
  * journeys had seventeen quiet headings. An index's rows are its subject. */
 .journeyrows .row { grid-template-columns: minmax(0, 1fr) 15rem; align-items: center; }
-.journeyrow h3 { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
+.journeyrow :is(h2, h3) { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
                  line-height: 1.12; margin: 0 0 var(--s2); }
-.journeyrow:hover h3, .journeyrow:focus-visible h3 { color: var(--door); }
+.journeyrow:hover :is(h2, h3), .journeyrow:focus-visible :is(h2, h3) { color: var(--door); }
 .jart .constel { width: 100%; }
 .jart .constel-lit circle { r: 11px; }
 .jart .constel-route { stroke-width: 8; }
@@ -5235,12 +5252,12 @@ body[data-hero] .masthead { position: sticky; }
   align-items: center; text-decoration: none;
   padding: var(--s6) 0;
 }
-.storyleadwide h3 {
+.storyleadwide :is(h2, h3) {
   font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
   line-height: 1.12; margin: 0 0 var(--s3);
 }
 .storyleadwide .rowsub { max-width: 52ch; }
-.storyleadwide:hover h3, .storyleadwide:focus-visible h3 { color: var(--door); }
+.storyleadwide:hover :is(h2, h3), .storyleadwide:focus-visible :is(h2, h3) { color: var(--door); }
 
 @media (max-width: 52rem) {
   .journeyrows .row, .storyleadwide { grid-template-columns: 1fr; gap: var(--s4); }

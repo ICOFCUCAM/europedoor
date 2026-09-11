@@ -16,7 +16,7 @@
 <meta property="og:url" content="https://europedoor.com/api-docs">
 <meta property="og:site_name" content="EuropeDoor">
 
-<link rel="stylesheet" href="/assets/css/europedoor.8ebffdd069.css">
+<link rel="stylesheet" href="/assets/css/europedoor.5ee233b7a6.css">
 <link rel="icon" href="/assets/door.49fb8a56f2.svg" type="image/svg+xml">
 </head>
 <body class="area-none" data-world="discover">
@@ -46,22 +46,22 @@
 </div>
 
 <div class="rows"><div class="row db">
-        <h3><code>/api/atlas.json</code></h3>
+        <h2><code>/api/atlas.json</code></h2>
         <p class="rowsub">The planner index: every destination with its interests, nights, cost band, season, coordinates and URL. This is the document the Journey Planner in your browser actually runs on.</p>
         <p class="small"><strong>Holds:</strong> 313 destinations</p>
         <p class="small"><strong>Note:</strong> Countries under a travel advisory (3 of them) are absent. That is a build-time exclusion, not a UI filter, so no consumer of this file can route a traveller into one by accident.</p>
         <p class="small"><a href="/api/atlas.json">Open it →</a></p></div><div class="row db">
-        <h3><code>/api/search.json</code></h3>
+        <h2><code>/api/search.json</code></h2>
         <p class="rowsub">One flat row per findable thing — country, region, destination, place, experience, journey, story, theme, event — with a name, a kind, a URL and a lowercased text blob to match against.</p>
         <p class="small"><strong>Holds:</strong> every findable thing</p>
         <p class="small"><strong>Note:</strong> Advisory countries ARE present here. A page nobody can search for is a page that does not exist, and hiding a country from search does not make anyone safer.</p>
         <p class="small"><a href="/api/search.json">Open it →</a></p></div><div class="row db">
-        <h3><code>/api/countries.json</code></h3>
+        <h2><code>/api/countries.json</code></h2>
         <p class="rowsub">Country-level facts: capital, currency, time zone, languages, membership, daily cost band, seasons, and the full region and destination tree beneath each one.</p>
         <p class="small"><strong>Holds:</strong> 50 countries</p>
         <p class="small"><strong>Note:</strong> Advisory countries are present, with the advisory attached. Every country carries its verification record, so a consumer can tell a checked fact from an unchecked one.</p>
         <p class="small"><a href="/api/countries.json">Open it →</a></p></div><div class="row db">
-        <h3><code>/api/journeys.json</code></h3>
+        <h2><code>/api/journeys.json</code></h2>
         <p class="rowsub">The curated routes, with every leg resolved to a real destination: coordinates, nights, the note for that stop, and the countries the route crosses.</p>
         <p class="small"><strong>Holds:</strong> 17 journeys</p>
         <p class="small"><strong>Note:</strong> Estimated costs are planning arithmetic from published daily bands and straight-line distances. They are not quotes and there is nothing to book.</p>

@@ -1359,6 +1359,7 @@ def section(title, body, *, id=None, lede=None, more=None, stage=None, tone=None
 
 
 def card(href, kicker, title, blurb, *, seed=None, meta="", tall=False, motif=None,
+         level=3,
          art=None):
     """`blurb` may be None, for a tile that is a picture and a name.
 
@@ -1383,7 +1384,7 @@ def card(href, kicker, title, blurb, *, seed=None, meta="", tall=False, motif=No
   {art}
   <div class="card-body">
     <p class="kicker">{esc(kicker)}</p>
-    <h3>{esc(title)}</h3>
+    <h{level}>{esc(title)}</h{level}>
     {blurbhtml}
     {meta}
   </div>
