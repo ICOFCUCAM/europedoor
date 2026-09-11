@@ -220,15 +220,28 @@
      into another shade of water. Measured: subject against neighbour 1.33,
      subject against coastal water 2.14, and the outline 11:1 on its own
      fill. */
-  --atlas-land:    #ded8ca;
-  --atlas-context: #ded8ca;
+  /* AND THE BASE WAS MORE SATURATED THAN THE GROUND IT CARRIES. The land
+     measured hue 42, sat 23; its own hypsometric bands run 14 to 20 and the
+     page's limestone runs 20 at lightness 96. So on a flat plate — the 172
+     destinations with no relief, every country, every region, every journey
+     — the most saturated thing in the drawing was the paper, and 23% of
+     yellow-orange at that lightness is sand rather than paper. THE LAND AND
+     ITS TERRAIN ARE ONE FAMILY, AND THE BASE CANNOT BE LOUDER THAN THE
+     GROUND IT CARRIES.
+     One hue held at 42 across all three steps, saturation 30 / 17 / 12
+     falling as the land recedes. Every relationship the register holds moved
+     by less than 0.02 — subject to land 1.31 against 1.33, far to land 1.26
+     against 1.28, land to water 8.68 against 8.61 — so this is the yellow
+     cast coming out and nothing else moving. */
+  --atlas-land:    #ddd9cf;
+  --atlas-context: #ddd9cf;
   /* The muted step of the same land, for context outside the subject and for
      a glyph drawn on limestone, where #ded8ca measures 1.20:1 against the
      page and is a silhouette you cannot quite see. It was a raw hex in two
      plate rules before the glyphs needed it; a colour used in two families
      is a token. */
-  --atlas-far:     #c6c0b1;
-  --atlas-here:    #faf7f0;
+  --atlas-far:     #c7c2b8;
+  --atlas-here:    #f8f6f2;
   --atlas-coast:   #1d3a4d;
   --atlas-hereline:#1d3a4d;
 
@@ -3583,10 +3596,10 @@ body[data-hero] .masthead { position: sticky; }
    the crest of the ground within 25 km — never a list of mountainous places
    typed by somebody. */
 .minimap.arched.atlas .lyr-terrain .tband { fill-rule: evenodd; }
-.minimap.arched.atlas .lyr-terrain .t200  { fill: #d8d2c6; }
-.minimap.arched.atlas .lyr-terrain .t600  { fill: #d2cabc; }
-.minimap.arched.atlas .lyr-terrain .t1200 { fill: #ccc1b1; }
-.minimap.arched.atlas .lyr-terrain .t2000 { fill: #e4e1da; }
+.minimap.arched.atlas .lyr-terrain .t200  { fill: #d7d2c8; }
+.minimap.arched.atlas .lyr-terrain .t600  { fill: #d1cabd; }
+.minimap.arched.atlas .lyr-terrain .t1200 { fill: #cbc2b2; }
+.minimap.arched.atlas .lyr-terrain .t2000 { fill: #e4e1dc; }
 
 /* THE FRONTIER, RE-DRAWN ABOVE THE RELIEF. A boundary on this map is a
    stroke on the land path, so the bands paint over it: the prototype's first

@@ -3248,7 +3248,7 @@ def c_terrain():
     css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
                encoding="utf-8").read()
     css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
-    base = (0xde, 0xd8, 0xca)                    # --atlas-land
+    base = (0xdd, 0xd9, 0xcf)                    # --atlas-land
     for lo, _hi, hexcol, _why in C.HYPSOMETRIC:
         if lo == 0:
             continue
