@@ -40,7 +40,17 @@
   /* raw — never used directly by a component, only bound below */
   --graphite:     #101214;
   --graphite-2:   #1a1e22;
-  --graphite-3:   #1d2226;
+  /* A STEP THAT MEASURES 1.045 IS A ROUNDING ERROR WITH A TOKEN NAME.
+     The light world's three surfaces step 1.09 and 1.12; the dark world's
+     stepped 1.12 and then 1.045, so --paper-3 — tracks, wells, the deepest
+     surface — was the card with a different name. Every progress track, every
+     score bar and every hopbar on a dark card was drawn on its own colour.
+     And the reason it was that small is the interesting half: graphite-3 was
+     sized so that COBALT-LIFT would still clear AA on it, which is a claim
+     about the link colour deciding the size of a surface. A surface sized by
+     something that is not a surface. The step is real now and the link colour
+     moved to keep its claim, which is the right way round. */
+  --graphite-3:   #21262b;
   --limestone:    #f7f6f3;   /* never #fff: white is a screen, limestone is paper.
                                 Kept from the previous system rather than replaced with
                                 a warmer ivory — the ground was the part of the old
@@ -52,10 +62,16 @@
                                 ground, 4.04 on --paper-3 — so it is a DRAWN colour,
                                 not a read one. See --signature below. */
   --cobalt-deep:  #2a4ad9;   /* everything cobalt that is text: 6.31 / 5.78 / 5.17 */
-  --cobalt-lift:  #627fff;   /* actions in the dark world. Chosen against the CARD, not
+  --cobalt-lift:  #6685ff;   /* actions in the dark world. Chosen against the CARD, not
                                 the ground — #5070FF clears 4.56 on #101214 and falls to
                                 4.07 on #1a1e22, where links actually sit. A dark palette
-                                has two backgrounds and the lighter one binds. */
+                                has two backgrounds and the lighter one binds.
+                                AND THE LIGHTEST OF THE THREE BINDS, which is the same
+                                sentence one surface further on. #627fff measured 4.36
+                                on the third surface once that surface became a real
+                                step — so the value that was chosen against the card is
+                                now chosen against the well: 4.62 / 5.08 / 5.69 across
+                                all three grounds, and still clearly below cobalt-air. */
   --cobalt-air:   #8398ff;   /* the accent in the dark world's DISCOVER surfaces */
   /* THERE IS NO LIME, AND THE REASON IS A MEASUREMENT THE PALETTE NEVER
      MADE: WHERE IT WAS ACTUALLY BEING SPENT. #c8ff4d was declared as the

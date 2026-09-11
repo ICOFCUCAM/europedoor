@@ -182,9 +182,9 @@
       "role": "cards and raised surfaces in the dark world"
     },
     "graphite-3": {
-      "hex": "#1d2226",
+      "hex": "#21262b",
       "name": "Graphite Deep",
-      "role": "the deepest dark surface. Chosen so cobalt-lift still clears AA on it"
+      "role": "the deepest dark surface: tracks, wells and the raised step a card's own furniture sits on. It measured 1.045 against the card — a rounding error with a token name, so every progress track and score bar on a dark card was drawn on its own colour. It was sized so cobalt-lift would clear AA on it, which is a claim about the link colour deciding the size of a surface"
     },
     "limestone": {
       "hex": "#f7f6f3",
@@ -212,9 +212,9 @@
       "role": "every cobalt that is text or an action in the light world"
     },
     "cobalt-lift": {
-      "hex": "#627fff",
+      "hex": "#6685ff",
       "name": "Cobalt Lift",
-      "role": "links and interactive elements on dark surfaces. Chosen against the CARD, not the ground: #5070FF clears 4.56 on #101214 and falls to 4.07 on #1a1e22, where links actually sit. A dark palette has two backgrounds and the lighter one binds"
+      "role": "links and interactive elements on dark surfaces. Chosen against the CARD, not the ground: #5070FF clears 4.56 on #101214 and falls to 4.07 on #1a1e22, where links actually sit. A dark palette has two backgrounds and the lighter one binds — and three once the third surface became a real step, which is where #627fff fell to 4.36. 4.62 / 5.08 / 5.69"
     },
     "cobalt-air": {
       "hex": "#8398ff",
@@ -565,6 +565,22 @@
       [
         "atlantic-lift",
         "cobalt-lift"
+      ]
+    ]
+  },
+  "surfaces": {
+    "$comment": "A SURFACE LADDER IS A LADDER, and a per-pair contrast claim cannot say so. The light world steps 1.09 and 1.12; the dark world stepped 1.12 and then 1.045, which is the card with a different name — so every track, well and score bar on a dark card was drawn on its own colour. Each consecutive pair has to be a step a reader can see.",
+    "min_step": 1.06,
+    "ladders": [
+      [
+        "limestone",
+        "limestone-2",
+        "limestone-3"
+      ],
+      [
+        "graphite",
+        "graphite-2",
+        "graphite-3"
       ]
     ]
   }

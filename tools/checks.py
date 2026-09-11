@@ -1680,6 +1680,31 @@ def c_instruction():
             fail(f"forbidden pairing {c['fg']} on {c['bg']} carries no reason")
         n += 1
 
+    # A SURFACE LADDER IS A LADDER, and a per-pair claim cannot say so.
+    # Every surface here carries a claim about the TEXT it can hold, and all
+    # of them passed while the dark world's third surface measured 1.045
+    # against its own card — the card with a different name, so every
+    # progress track, score bar and hopbar on a dark card was drawn on its
+    # own colour. The light world steps 1.09 and 1.12. This asserts the
+    # steps, which is a fact about the ladder rather than about any rung.
+    surf = pal.get("surfaces")
+    if not surf:
+        fail("docs/palette.json declares no surface ladders — the steps "
+             "between grounds are unmeasured again")
+    else:
+        for ladder in surf["ladders"]:
+            for a, b in zip(ladder, ladder[1:]):
+                if a not in tok or b not in tok:
+                    fail(f"a surface ladder names an unknown token: {a} / {b}")
+                    continue
+                r = _ratio(tok[a]["hex"], tok[b]["hex"])
+                if r < surf["min_step"]:
+                    fail(f"the surfaces {a} ({tok[a]['hex']}) and {b} "
+                         f"({tok[b]['hex']}) are {r:.3f} apart and the register "
+                         f"asks for {surf['min_step']} — a step that small is a "
+                         f"rounding error with a token name")
+                n += 1
+
     # A CONTRAST RATIO CANNOT SAY THAT TWO COLOURS ARE DIFFERENT COLOURS.
     # It is a ratio of luminances, so two hues at the same lightness always
     # measure 1.0 — and for the life of this palette the advisory red and the
