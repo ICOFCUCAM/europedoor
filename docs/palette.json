@@ -20,10 +20,86 @@
   },
   "accents": {
     "$comment": "Inside DISCOVER the accent says what KIND of thing is being read. In INTELLIGENCE there is one accent and it is cobalt-air, which was measured for that ground in the DISCOVER-dark block before it was needed here. It was electric lime until the accent was found to be drawing geography: every route, every dot and every lit country, which is not five per cent of anything.",
-    "structural": { "token": "cobalt-deep", "where": "the default: homepage, countries, regions, destinations, journeys" },
-    "cultural":   { "token": "terracotta",  "where": "stories, events, experiences — the human half of DISCOVER" },
-    "heritage":   { "token": "atlantic",    "where": "how this project knows what it claims: /method, /sources, /fund, /sources/freshness" },
-    "machine":    { "token": "cobalt-air",  "where": "INTELLIGENCE only. 7.06 on the graphite ground, 6.31 on the card and 6.04 on the deep surface, so it is a read colour on all three — which electric lime was too, and it was never the contrast that failed" }
+    "structural": {
+      "token": "cobalt-deep",
+      "where": "the default: homepage, countries, regions, destinations, journeys"
+    },
+    "cultural": {
+      "token": "terracotta",
+      "where": "stories, events, experiences — the human half of DISCOVER"
+    },
+    "heritage": {
+      "token": "atlantic",
+      "where": "how this project knows what it claims: /method, /sources, /fund, /sources/freshness"
+    },
+    "machine": {
+      "token": "cobalt-air",
+      "where": "INTELLIGENCE only. 7.06 on the graphite ground, 6.31 on the card and 6.04 on the deep surface, so it is a read colour on all three — which electric lime was too, and it was never the contrast that failed"
+    }
+  },
+  "cartography": {
+    "$comment": "THE PICTURES WERE GIVEN A CARTOGRAPHY AND THE INSTRUMENTS WERE NOT. docs/cartography.md splits every drawing on what it IS — a picture is paper, an instrument is graphite — and the picture half got a four-step ocean, a land family, an ink coast and a lit subject, every one of them measured. The instrument half kept five raw hexes invented before European Future (#0a1220, #253546, #1b2735, #4a6480, #3a6299): navy rather than graphite, in no token here, recomputed by no check. Land against water measured 7.91 on the pictures and 1.50 on /map, and a country outside the subject measured 1.24, which is not a quiet country but a country that is not drawn. These rows are the ladder, and checks.py recomputes every one from the hexes in assets/css/europedoor.css rather than from a copy kept here, so the stylesheet and the register cannot drift apart.",
+    "why_a_separation_and_not_a_claim": "A claim above says a colour may carry TEXT on a ground. These say two drawn areas must be distinguishable from each other. WCAG 2.2 SC 1.4.11 puts a graphical object's boundary at 3:1, which is why the coast rows are 3.0 and the land rows are lower: a fill that reads as a mass and an edge that is unambiguous are two different jobs, and the instrument had neither.",
+    "separations": [
+      {
+        "a": "--map-land",
+        "b": "--map-sea",
+        "min": 1.8,
+        "was": 1.5,
+        "why": "the land is a mass, not a hairline. Europe is what the light falls on — the hero's reading, applied to the instrument"
+      },
+      {
+        "a": "--map-context",
+        "b": "--map-sea",
+        "min": 1.35,
+        "was": 1.24,
+        "why": "a country outside the subject is still drawn. 1.24 is not quiet, it is absent"
+      },
+      {
+        "a": "--map-land",
+        "b": "--map-context",
+        "min": 1.25,
+        "was": 1.21,
+        "why": "three tiers — water, context, subject — and each step has to be visible or there are two"
+      },
+      {
+        "a": "--map-coast",
+        "b": "--map-sea",
+        "min": 3.0,
+        "why": "SC 1.4.11: the boundary of a graphical object. The instrument had no coast token at all"
+      },
+      {
+        "a": "--map-coast",
+        "b": "--map-land",
+        "min": 3.0,
+        "why": "the same edge read from the other side"
+      },
+      {
+        "a": "--map-border",
+        "b": "--map-land",
+        "min": 1.6,
+        "why": "a frontier is a line drawn ON land and is quieter than a coast, which is where land meets sea. Both were one stroke"
+      },
+      {
+        "a": "--map-hover",
+        "b": "--map-land",
+        "min": 3.0,
+        "was": 1.29,
+        "why": "the selected country replaces the land it sits on, so it has to clear the land. cobalt-air is the declared INTELLIGENCE accent and was already measured for this ground"
+      },
+      {
+        "a": "--atlas-land",
+        "b": "--atlas-sea",
+        "min": 6.0,
+        "why": "the picture half, recorded so the two halves are one register and the good one cannot quietly follow the bad one down"
+      },
+      {
+        "a": "--atlas-coast",
+        "b": "--atlas-land",
+        "min": 3.0,
+        "why": "the ink coast on paper — the relationship the instrument now has inverted"
+      }
+    ]
   },
   "ratio": {
     "$comment": "The ratio is the instruction, not the hex codes. A palette gives you a blue website with gold buttons; a ratio gives you European editorial design over futuristic infrastructure.",
@@ -33,66 +109,321 @@
     "accent": 5
   },
   "tokens": {
-    "graphite":     { "hex": "#101214", "name": "Deep Graphite",     "role": "the intelligence foundation. Ink in the light world, ground in the dark" },
-    "graphite-2":   { "hex": "#1a1e22", "name": "Graphite Surface",  "role": "cards and raised surfaces in the dark world" },
-    "graphite-3":   { "hex": "#1d2226", "name": "Graphite Deep",     "role": "the deepest dark surface. Chosen so cobalt-lift still clears AA on it" },
-    "limestone":    { "hex": "#f7f6f3", "name": "Limestone",         "role": "the DISCOVER ground, kept from the previous system. Never pure white" },
-    "limestone-2":  { "hex": "#eeece7", "name": "Limestone Surface", "role": "cards and raised surfaces in the light world" },
-    "limestone-3":  { "hex": "#e3e0d8", "name": "Limestone Deep",    "role": "tracks, wells and the deepest light surface" },
-    "cobalt":       { "hex": "#3157ff", "name": "European Cobalt",   "role": "the digital signature, for things DRAWN rather than read: the mark, score bars, map dots. 4.04:1 on limestone-3, so not text" },
-    "cobalt-deep":  { "hex": "#2a4ad9", "name": "Cobalt Deep",       "role": "every cobalt that is text or an action in the light world" },
-    "cobalt-lift":  { "hex": "#627fff", "name": "Cobalt Lift",       "role": "links and interactive elements on dark surfaces. Chosen against the CARD, not the ground: #5070FF clears 4.56 on #101214 and falls to 4.07 on #1a1e22, where links actually sit. A dark palette has two backgrounds and the lighter one binds" },
-    "cobalt-air":   { "hex": "#8398ff", "name": "Cobalt Air",        "role": "hover and the DISCOVER accent for a dark-preference reader" },
-    "atlantic":     { "hex": "#14483c", "name": "Atlantic Green",    "role": "heritage and provenance. The previous primary, retained with a narrow home rather than deleted" },
-    "atlantic-lift":{ "hex": "#63b79c", "name": "Atlantic Lift",     "role": "the same, for a dark-preference reader: #14483c is 1.81:1 on graphite" },
-    "terracotta":   { "hex": "#a4491f", "name": "Terracotta",        "role": "the warm cultural accent: stories, events, experiences" },
-    "terracotta-2": { "hex": "#8a3a17", "name": "Terracotta Deep",   "role": "the same, on limestone-3, where #a4491f measures 4.48 and just misses" },
-    "terracotta-lift":{ "hex": "#e08a5c", "name": "Terracotta Lift", "role": "the cultural accent for a dark-preference reader: #a4491f is 3.17:1 on graphite" },
-    "ultramarine":  { "hex": "#665cff", "name": "Ultramarine",       "role": "atmosphere only: gradients, map washes, immersive moments. Never type" }
+    "graphite": {
+      "hex": "#101214",
+      "name": "Deep Graphite",
+      "role": "the intelligence foundation. Ink in the light world, ground in the dark"
+    },
+    "graphite-2": {
+      "hex": "#1a1e22",
+      "name": "Graphite Surface",
+      "role": "cards and raised surfaces in the dark world"
+    },
+    "graphite-3": {
+      "hex": "#1d2226",
+      "name": "Graphite Deep",
+      "role": "the deepest dark surface. Chosen so cobalt-lift still clears AA on it"
+    },
+    "limestone": {
+      "hex": "#f7f6f3",
+      "name": "Limestone",
+      "role": "the DISCOVER ground, kept from the previous system. Never pure white"
+    },
+    "limestone-2": {
+      "hex": "#eeece7",
+      "name": "Limestone Surface",
+      "role": "cards and raised surfaces in the light world"
+    },
+    "limestone-3": {
+      "hex": "#e3e0d8",
+      "name": "Limestone Deep",
+      "role": "tracks, wells and the deepest light surface"
+    },
+    "cobalt": {
+      "hex": "#3157ff",
+      "name": "European Cobalt",
+      "role": "the digital signature, for things DRAWN rather than read: the mark, score bars, map dots. 4.04:1 on limestone-3, so not text"
+    },
+    "cobalt-deep": {
+      "hex": "#2a4ad9",
+      "name": "Cobalt Deep",
+      "role": "every cobalt that is text or an action in the light world"
+    },
+    "cobalt-lift": {
+      "hex": "#627fff",
+      "name": "Cobalt Lift",
+      "role": "links and interactive elements on dark surfaces. Chosen against the CARD, not the ground: #5070FF clears 4.56 on #101214 and falls to 4.07 on #1a1e22, where links actually sit. A dark palette has two backgrounds and the lighter one binds"
+    },
+    "cobalt-air": {
+      "hex": "#8398ff",
+      "name": "Cobalt Air",
+      "role": "hover and the DISCOVER accent for a dark-preference reader"
+    },
+    "atlantic": {
+      "hex": "#14483c",
+      "name": "Atlantic Green",
+      "role": "heritage and provenance. The previous primary, retained with a narrow home rather than deleted"
+    },
+    "atlantic-lift": {
+      "hex": "#63b79c",
+      "name": "Atlantic Lift",
+      "role": "the same, for a dark-preference reader: #14483c is 1.81:1 on graphite"
+    },
+    "terracotta": {
+      "hex": "#a4491f",
+      "name": "Terracotta",
+      "role": "the warm cultural accent: stories, events, experiences"
+    },
+    "terracotta-2": {
+      "hex": "#8a3a17",
+      "name": "Terracotta Deep",
+      "role": "the same, on limestone-3, where #a4491f measures 4.48 and just misses"
+    },
+    "terracotta-lift": {
+      "hex": "#e08a5c",
+      "name": "Terracotta Lift",
+      "role": "the cultural accent for a dark-preference reader: #a4491f is 3.17:1 on graphite"
+    },
+    "ultramarine": {
+      "hex": "#665cff",
+      "name": "Ultramarine",
+      "role": "atmosphere only: gradients, map washes, immersive moments. Never type"
+    }
   },
   "claims": [
-    { "fg": "graphite",        "bg": "limestone",   "text": true,  "ui": true },
-    { "fg": "graphite",        "bg": "limestone-2", "text": true,  "ui": true },
-    { "fg": "graphite",        "bg": "limestone-3", "text": true,  "ui": true },
-    { "fg": "limestone",       "bg": "graphite",    "text": true,  "ui": true },
-    { "fg": "limestone",       "bg": "graphite-2",  "text": true,  "ui": true },
-    { "fg": "limestone",       "bg": "graphite-3",  "text": true,  "ui": true },
-    { "fg": "cobalt-deep",     "bg": "limestone",   "text": true,  "ui": true },
-    { "fg": "cobalt-deep",     "bg": "limestone-2", "text": true,  "ui": true },
-    { "fg": "cobalt-deep",     "bg": "limestone-3", "text": true,  "ui": true },
-    { "fg": "limestone",       "bg": "cobalt-deep", "text": true,  "ui": true },
-    { "fg": "cobalt",          "bg": "limestone",   "text": false, "ui": true },
-    { "fg": "cobalt-lift",     "bg": "graphite",    "text": true,  "ui": true },
-    { "fg": "cobalt-lift",     "bg": "graphite-2",  "text": true,  "ui": true },
-    { "fg": "cobalt-lift",     "bg": "graphite-3",  "text": true,  "ui": true },
-    { "fg": "graphite",        "bg": "cobalt-lift", "text": true,  "ui": true },
-    { "fg": "cobalt-air",      "bg": "graphite",    "text": true,  "ui": true },
-    { "fg": "atlantic",        "bg": "limestone",   "text": true,  "ui": true },
-    { "fg": "atlantic",        "bg": "limestone-2", "text": true,  "ui": true },
-    { "fg": "limestone",       "bg": "atlantic",    "text": true,  "ui": true },
-    { "fg": "atlantic-lift",   "bg": "graphite",    "text": true,  "ui": true },
-    { "fg": "atlantic-lift",   "bg": "graphite-2",  "text": true,  "ui": true },
-    { "fg": "terracotta",      "bg": "limestone",   "text": true,  "ui": true },
-    { "fg": "terracotta",      "bg": "limestone-2", "text": true,  "ui": true },
-    { "fg": "limestone",       "bg": "terracotta",  "text": true,  "ui": true },
-    { "fg": "terracotta-2",    "bg": "limestone-3", "text": true,  "ui": true },
-    { "fg": "terracotta-lift", "bg": "graphite",    "text": true,  "ui": true },
-    { "fg": "terracotta-lift", "bg": "graphite-2",  "text": true,  "ui": true },
-    { "fg": "cobalt-air",      "bg": "graphite",    "text": true,  "ui": true },
-    { "fg": "cobalt-air",      "bg": "graphite-2",  "text": true,  "ui": true },
-    { "fg": "cobalt-air",      "bg": "graphite-3",  "text": true,  "ui": true },
-    { "fg": "ultramarine",     "bg": "limestone-3", "text": false, "ui": true }
+    {
+      "fg": "graphite",
+      "bg": "limestone",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "graphite",
+      "bg": "limestone-2",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "graphite",
+      "bg": "limestone-3",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "limestone",
+      "bg": "graphite",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "limestone",
+      "bg": "graphite-2",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "limestone",
+      "bg": "graphite-3",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "cobalt-deep",
+      "bg": "limestone",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "cobalt-deep",
+      "bg": "limestone-2",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "cobalt-deep",
+      "bg": "limestone-3",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "limestone",
+      "bg": "cobalt-deep",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "cobalt",
+      "bg": "limestone",
+      "text": false,
+      "ui": true
+    },
+    {
+      "fg": "cobalt-lift",
+      "bg": "graphite",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "cobalt-lift",
+      "bg": "graphite-2",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "cobalt-lift",
+      "bg": "graphite-3",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "graphite",
+      "bg": "cobalt-lift",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "cobalt-air",
+      "bg": "graphite",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "atlantic",
+      "bg": "limestone",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "atlantic",
+      "bg": "limestone-2",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "limestone",
+      "bg": "atlantic",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "atlantic-lift",
+      "bg": "graphite",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "atlantic-lift",
+      "bg": "graphite-2",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "terracotta",
+      "bg": "limestone",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "terracotta",
+      "bg": "limestone-2",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "limestone",
+      "bg": "terracotta",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "terracotta-2",
+      "bg": "limestone-3",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "terracotta-lift",
+      "bg": "graphite",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "terracotta-lift",
+      "bg": "graphite-2",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "cobalt-air",
+      "bg": "graphite",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "cobalt-air",
+      "bg": "graphite-2",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "cobalt-air",
+      "bg": "graphite-3",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "ultramarine",
+      "bg": "limestone-3",
+      "text": false,
+      "ui": true
+    }
   ],
   "forbidden": [
-    { "fg": "cobalt", "bg": "limestone-3", "why": "4.04 — the signature is a drawn colour, not a read one. Use cobalt-deep." },
-    { "fg": "cobalt", "bg": "graphite", "why": "3.52 — a UI edge at most, never a link. Use cobalt-lift." },
-    { "fg": "cobalt-lift", "bg": "limestone", "why": "3.13 — the dark world's link colour is a UI edge at most on light." },
-    { "fg": "cobalt-air", "bg": "limestone", "why": "2.44 — the dark world's accent is a UI edge at most on paper." },
-    { "fg": "ultramarine", "bg": "limestone", "why": "4.28 — fails body text. Ultramarine is atmosphere, never type." },
-    { "fg": "ultramarine", "bg": "graphite", "why": "4.06 — fails body text." },
-    { "fg": "terracotta", "bg": "graphite", "why": "3.17 — the cultural accent has to lift at night. Use terracotta-lift." },
-    { "fg": "atlantic", "bg": "graphite", "why": "1.81 — a heading nobody can see. Use atlantic-lift." },
-    { "fg": "terracotta", "bg": "limestone-3", "why": "4.48 — just misses. Use terracotta-2." }
+    {
+      "fg": "cobalt",
+      "bg": "limestone-3",
+      "why": "4.04 — the signature is a drawn colour, not a read one. Use cobalt-deep."
+    },
+    {
+      "fg": "cobalt",
+      "bg": "graphite",
+      "why": "3.52 — a UI edge at most, never a link. Use cobalt-lift."
+    },
+    {
+      "fg": "cobalt-lift",
+      "bg": "limestone",
+      "why": "3.13 — the dark world's link colour is a UI edge at most on light."
+    },
+    {
+      "fg": "cobalt-air",
+      "bg": "limestone",
+      "why": "2.44 — the dark world's accent is a UI edge at most on paper."
+    },
+    {
+      "fg": "ultramarine",
+      "bg": "limestone",
+      "why": "4.28 — fails body text. Ultramarine is atmosphere, never type."
+    },
+    {
+      "fg": "ultramarine",
+      "bg": "graphite",
+      "why": "4.06 — fails body text."
+    },
+    {
+      "fg": "terracotta",
+      "bg": "graphite",
+      "why": "3.17 — the cultural accent has to lift at night. Use terracotta-lift."
+    },
+    {
+      "fg": "atlantic",
+      "bg": "graphite",
+      "why": "1.81 — a heading nobody can see. Use atlantic-lift."
+    },
+    {
+      "fg": "terracotta",
+      "bg": "limestone-3",
+      "why": "4.48 — just misses. Use terracotta-2."
+    }
   ],
   "never": [
     "gold or brass as a primary, a signature, or on anything interactive",

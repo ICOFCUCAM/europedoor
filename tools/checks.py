@@ -3983,6 +3983,78 @@ def c_offframe():
     return n
 
 
+@check("the two cartographies are one register, and the ladder is recomputed")
+def c_cartography_palette():
+    """THE PICTURES WERE GIVEN A CARTOGRAPHY AND THE INSTRUMENTS WERE NOT.
+
+    `docs/cartography.md` splits every drawing on what it IS — a picture is
+    paper, an instrument is graphite — and the picture half got a four-step
+    ocean, a land family, an ink coast and a lit subject, every one measured.
+    The instrument half kept five raw hexes invented before European Future:
+    #0a1220, #253546, #1b2735, #4a6480, #3a6299. Navy rather than graphite,
+    no token in `docs/palette.json`, and recomputed by nothing.
+
+        the pictures   land on water    7.91
+        /map           land on water    1.50
+        /map           a context country on water    1.24
+
+    1.24 is not a quiet country, it is a country that is not drawn.
+
+    This reads the hexes OUT OF THE STYLESHEET rather than out of a copy kept
+    beside the claim, because a register that stores its own numbers agrees
+    with itself for ever. The rows are separations rather than claims: a
+    claim says a colour may carry TEXT on a ground; these say two drawn areas
+    have to be distinguishable, which is SC 1.4.11's 3:1 for the boundary of
+    a graphical object and something lower for a fill that only has to read
+    as a mass.
+    """
+    n = 0
+    pal = json.load(open(os.path.join(ROOT, "docs", "palette.json"), encoding="utf-8"))
+    css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"), encoding="utf-8").read()
+    rows = pal.get("cartography", {}).get("separations")
+    if not rows:
+        fail("docs/palette.json declares no cartographic separations — the "
+             "instrument half of the atlas is unmeasured again")
+        return n
+
+    def hexof(token):
+        m = re.search(re.escape(token) + r"\s*:\s*(#[0-9a-fA-F]{6})\s*;", css)
+        return m.group(1) if m else None
+
+    def lum(hexv):
+        h = hexv.lstrip("#")
+        ch = [int(h[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+        ch = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4 for c in ch]
+        return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2]
+
+    for row in rows:
+        a, b = hexof(row["a"]), hexof(row["b"])
+        if a is None or b is None:
+            fail(f"{row['a']} or {row['b']} is not a literal hex token in the "
+                 f"stylesheet, so the cartographic ladder cannot be recomputed")
+            continue
+        la, lb = lum(a), lum(b)
+        r = (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
+        if r < row["min"]:
+            fail(f"{row['a']} ({a}) against {row['b']} ({b}) measures {r:.2f} "
+                 f"and the register asks for {row['min']} — {row['why']}")
+        if not row.get("why"):
+            fail(f"the separation {row['a']} / {row['b']} carries no reason")
+        n += 1
+
+    # AND THE NAVY IS GONE FOR GOOD. The five hexes above were the instrument
+    # cartography for the life of the dark world; naming them here means the
+    # build fails if one is pasted back, the way the gold and the lime are
+    # held. A colour removed without a guard is a colour that returns.
+    for dead in ("#0a1220", "#253546", "#1b2735", "#4a6480", "#3a6299"):
+        if re.search(r"(?<![0-9a-fA-F])" + dead[1:] + r"(?![0-9a-fA-F])",
+                     re.sub(r"/\*.*?\*/", "", css, flags=re.S), re.I):
+            fail(f"{dead} is back in the stylesheet — that is the pre-European-"
+                 f"Future instrument navy, and it is out of the system")
+        n += 1
+    return n
+
+
 @check("every <use> and every url(#id) points at something on the same page")
 def c_svg_refs():
     # A <use> OF AN ID THAT IS NOT ON THE PAGE RENDERS AS NOTHING AT ALL, and

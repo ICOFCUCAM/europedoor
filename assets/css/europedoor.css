@@ -207,11 +207,52 @@
   --atlas-coast:   #1d3a4d;
   --atlas-hereline:#1d3a4d;
 
-  --map-sea:      #0a1220;
-  --map-land:     #253546;
-  --map-context:  #1b2735;
-  --map-border:   #4a6480;
-  --map-hover:    #3a6299;
+  /* ── THE INSTRUMENT CARTOGRAPHY ──────────────────────────────────────
+     THE PICTURES WERE GIVEN A CARTOGRAPHY AND THE INSTRUMENTS WERE NOT.
+     `docs/cartography.md` splits every drawing on what it IS: a picture is
+     paper, an instrument is graphite. The picture half got a four-step ocean,
+     a land family, an ink coast and a lit subject, all measured. The
+     instrument half kept five raw hexes invented before European Future —
+     #0a1220, #253546, #1b2735, #4a6480, #3a6299 — which are NAVY, are in no
+     token in `docs/palette.json`, and were recomputed by no check.
+
+     Measured, land against water, on the two halves of the same atlas:
+
+         the pictures   #ded8ca on #123f55    7.91
+         /map           #253546 on #0a1220    1.50
+         a country outside the frame          1.24
+
+     1.24 is not a quiet country, it is a country that is not drawn. And the
+     comment forty lines down this file already stated the 1.50 — the number was
+     known and had never been acted on. This is the "GIS dashboard" reading
+     the cartography split exists to escape, surviving on the one map the
+     product calls its instrument.
+
+     The fix is the hero's own sentence applied to the instrument: EUROPE IS
+     WHAT THE LIGHT FALLS ON. The water is the dark ground and the land is
+     lifted out of it, on a ladder that is ordered and measured rather than
+     picked. And the coast becomes its own token, because a coastline is
+     where land meets sea and a frontier is a line drawn on land — the exact
+     separation the picture half made and the instrument half never did.
+
+         land : sea       1.50 → 1.91     a mass rather than a hairline
+         context : sea    1.24 → 1.44     a quiet country is still a country
+         land : context   1.21 → 1.33     three tiers, ordered
+         coast : sea         —    7.33    the boundary, which is what
+         coast : land        —    3.84    SC 1.4.11 actually asks for
+         subject : land   1.29 → 3.82     cobalt-air, the declared accent
+
+     Neutral-cool graphite rather than navy: `--graphite` is #101214 and
+     these are its family. `docs/palette.json` carries the register and
+     `checks.py` recomputes every one of those separations from the hexes in
+     THIS file, so the ladder cannot be nudged without the arithmetic saying
+     so. */
+  --map-sea:      #0b0e11;   /* the water: a step below the page's own ground */
+  --map-context:  #2a2f36;   /* land outside the subject of this drawing */
+  --map-land:     #3b424c;   /* the land mass, lifted out of the water */
+  --map-coast:    #93a1ae;   /* the edge between them. 7.33 on the sea, 3.84 on the land */
+  --map-border:   #616b76;   /* a frontier, which is a line drawn ON land and lighter than a coast */
+  --map-hover:    #8398ff;   /* cobalt-air, the INTELLIGENCE accent: 3.82 on the land it replaces */
 
 
   /* type */
@@ -1215,9 +1256,9 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .heromap svg { width: 100%; height: auto; display: block;
                background: var(--map-sea); border-radius: var(--radius); }
 .heromap .context path { fill: var(--map-context); }
-.heromap .countries path { fill: var(--map-land); stroke: var(--map-border); stroke-width: 1; }
+.heromap .countries path { fill: var(--map-land); stroke: var(--map-coast); stroke-width: 1; }
 .herodot { fill: var(--signature); opacity: .8; transition: opacity .2s ease; }
-.herodot.advisory { fill: var(--map-border); opacity: .5; }
+.herodot.advisory { fill: var(--map-border); opacity: .7; }
 .heromap:hover .herodot { opacity: .85; }
 .heromap-cap { display: block; margin-top: var(--s3); font-size: var(--t-xs); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
 .heromap:hover .heromap-cap { color: var(--door); }
@@ -1400,7 +1441,7 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .maphint p:last-child { margin-bottom: 0; }
 .legend { list-style: none; padding: 0; margin: var(--s3) 0; font-size: var(--t-sm); }
 .legend li { display: flex; gap: var(--s3); align-items: baseline; margin-bottom: var(--s2); }
-.legend .sw { flex: 0 0 auto; width: 1rem; height: 1rem; border-radius: 3px; border: 1px solid var(--map-border); }
+.legend .sw { flex: 0 0 auto; width: 1rem; height: 1rem; border-radius: 3px; border: 1px solid var(--map-coast); }
 .legend .sw.land { background: var(--map-land); }
 .legend .sw.ctx { background: var(--map-context); }
 .legend .sw.dest { background: var(--sea); border-radius: 50%; border-color: var(--sea); width: .75rem; height: .75rem; }
@@ -3056,7 +3097,7 @@ body[data-hero] .masthead { position: sticky; }
   background: var(--map-sea); border-radius: var(--radius);
 }
 .routewrap .routemap .context path { fill: var(--map-context); }
-.routewrap .routemap .countries path { fill: var(--map-land); stroke: var(--map-border); stroke-width: 1; }
+.routewrap .routemap .countries path { fill: var(--map-land); stroke: var(--map-coast); stroke-width: 1; }
 
 .legs.route { margin-top: var(--s6); }
 .route .leg {
@@ -3210,8 +3251,8 @@ body[data-hero] .masthead { position: sticky; }
 .heromap.arched svg { background: none; border-radius: 0; }
 .heromap.arched .countries path,
 .heromap.arched .context path { fill: none; vector-effect: non-scaling-stroke; }
-.heromap.arched .countries path { stroke: var(--map-border); stroke-width: 1; }
-.heromap.arched .context path { stroke: color-mix(in srgb, var(--map-border) 55%, transparent); stroke-width: 0.7; }
+.heromap.arched .countries path { stroke: var(--map-coast); stroke-width: 1; }
+.heromap.arched .context path { stroke: color-mix(in srgb, var(--map-coast) 45%, transparent); stroke-width: 0.7; }
 .heromap.arched .herodot { fill: var(--cobalt-air); opacity: .95; }
 .heromap.arched .herodot.advisory { fill: var(--map-border); opacity: .6; }
 
@@ -3941,7 +3982,7 @@ body[data-hero] .masthead { position: sticky; }
                                   vector-effect: non-scaling-stroke; }
 .minimap.arched .context path { fill: var(--map-context);
                                 vector-effect: non-scaling-stroke; }
-.minimap.arched .countries path { stroke: var(--map-border); stroke-width: 1.1; }
+.minimap.arched .countries path { stroke: var(--map-coast); stroke-width: 1.1; }
 /* AND THE MACRO MEMBERS ARE FILLED, WHICH TAKES BEATING THE RULE ABOVE.
    `.macromap .countries path.here` and `.minimap.arched .countries path` are
    both (0,3,1), and the second is further down the file, so a map of the
@@ -3962,7 +4003,7 @@ body[data-hero] .masthead { position: sticky; }
    exactly the same grey as Germany. */
 .minimap.arched.countrymap .countries path.here {
   fill: var(--map-hover); stroke: var(--sea); stroke-width: 1.3; }
-.minimap.arched .context path { stroke: color-mix(in srgb, var(--map-border) 60%, transparent); stroke-width: 0.7; }
+.minimap.arched .context path { stroke: color-mix(in srgb, var(--map-coast) 45%, transparent); stroke-width: 0.7; }
 
 
 /* ── the Stay layer ───────────────────────────────────────────────────
