@@ -790,6 +790,41 @@ main.wide { max-width: 92rem; }
 .pagehead .kicker { margin-bottom: var(--s2); }
 .pagehead p.lede { font-size: var(--t-md); color: var(--ink-2); max-width: 44rem; margin-top: var(--s4); }
 .kicker { font-size: var(--t-xs); letter-spacing: .14em; text-transform: uppercase; color: var(--door); margin: 0 0 var(--s2); font-weight: 600; }
+/* AND THE ACCENT IS A MARK ON A PAGE HEAD, NOT ONLY A TINT ON ELEVEN PIXELS
+   OF TYPE.
+
+   Measured for the first time this session, over twelve pages spanning both
+   worlds: the accent paints 0.3% of what a reader is shown against the 5 the
+   ratio declares for it. Terracotta and atlantic are the entire
+   art-directional difference between a magazine story and a country
+   encyclopedia, and the only place either of them lands is a kicker at
+   --t-xs. That is the design-direction audit's finding with a number under
+   it, and it is not fixed by making the accent a ground — "generic tourism
+   blue as a page background" is on the never list and a terracotta one would
+   be the same mistake in a warmer hue.
+
+   What it is fixed by is giving the accent a FORM. An eyebrow rule is the
+   oldest device in editorial design and it costs nothing here: currentColor,
+   so it is the family's own --door without a second declaration; a page head
+   only, because `.row .kicker` is already --ink-3 for the reason three
+   paragraphs up (an accent on every row is a texture, not an accent); and no
+   new token, no new size, no new weight. */
+/* FIVE CONTAINERS, AND THE LIST IS THE POINT. A page head's kicker lives in
+   `.pagehead` on seventeen families, in `.arrivalsay` on the 319
+   destinations, `.portraitsay` on the fifty countries, `.iherotext` on the
+   five index heroes and `.essayhead` on the stories — and the same class
+   appears 409 times inside `.card-body`, 369 times inside `.score` and three
+   times inside a journey row, where it is a component's label rather than a
+   page's subject. Naming the five is what keeps this one mark per page
+   instead of the texture the paragraph above refuses. */
+.pagehead .kicker::before,
+.arrivalsay > .kicker::before,
+.portraitsay > .kicker::before,
+.iherotext > .kicker::before,
+.essayhead > .kicker::before {
+  content: ""; display: inline-block; vertical-align: .22em;
+  width: 1.7rem; height: 2px; margin-right: .75em; background: currentColor;
+}
 /* AN ACCENT ON EVERY ROW OF A LIST IS NOT AN ACCENT, IT IS A TEXTURE.
    The kicker's job is to say what KIND of thing is being read — the accent
    system's whole argument, and the reason an essay is terracotta and a
