@@ -403,10 +403,61 @@
   /* The Atlas is fetched only here, only on this page, and only to resolve
    * saved ids to the interests that produce the profile. It is the same
    * static document the planner uses, so it is almost certainly cached. */
+  /* THE SAVED PLACES, DRAWN. The page server-renders an empty continent so
+   * it is there with JavaScript off; this lights the marks once the Atlas
+   * index resolves the ids. `x` and `y` are the projected coordinates every
+   * drawing on this site is made of, so a saved dot lands exactly where
+   * /map puts it — no second projection, and nothing to keep in step.
+   *
+   * Only Place ids resolve. A saved journey, theme or story has no single
+   * point and is not given a false one; the caption says how many of the
+   * list is on the picture, so a reader is never left counting dots against
+   * rows and finding a difference nobody explained. */
+  function lightMap(atlas, saved) {
+    var g = document.querySelector(".minemap .constel-lit");
+    var cap = document.getElementById("minecap");
+    if (!g || !atlas || !atlas.cities) return;
+    var want = {};
+    saved.forEach(function (x) {
+      if (String(x.kind) === "Place") want[String(x.id).replace(/^city:/, "")] = x.label || x.id;
+    });
+    var marks = "", n = 0;
+    atlas.cities.forEach(function (c) {
+      if (!(c.id in want)) return;
+      n++;
+      marks += '<circle cx="' + c.x + '" cy="' + c.y + '" r="9"><title>' +
+               String(want[c.id]).replace(/[<&]/g, "") + "</title></circle>";
+    });
+    g.innerHTML = marks;
+    if (!cap) return;
+    /* THE TWO COUNTS HAVE TO AGREE OR THE DIFFERENCE HAS TO BE SAID. The
+     * heading under this reads "5 saved items" and only places have a
+     * point, so a list holding a journey and a story drew three dots under
+     * a heading saying five — a discrepancy a reader notices and nothing
+     * explains. This is the same rule the interest index learned about
+     * Longyearbyen: a drawing that cannot hold one of the things it is
+     * about says so. */
+    if (!n) {
+      cap.textContent = saved.length
+        ? "Nothing you have saved is a place with a point on the map — journeys, " +
+          "themes and stories are not single points and are not given one."
+        : "Nothing on it yet. Every place you save is drawn here.";
+    } else if (n === saved.length) {
+      cap.textContent = n === 1
+        ? "One place saved, drawn where it is."
+        : n + " places saved, drawn where they are.";
+    } else {
+      cap.textContent = n + " of your " + saved.length + " saved items are places " +
+        "with a point; the rest are journeys, themes and stories, which are not " +
+        "single points and are not given one.";
+    }
+  }
+
   var dnaHost = document.getElementById("dna");
   if (dnaHost) {
     fetch("/api/atlas.json").then(function (r) { return r.json(); }).then(function (atlas) {
       renderDna(dnaHost, atlas, list);
+      lightMap(atlas, list);
     }).catch(function () {
       dnaHost.innerHTML = '<div class="note"><p>The Atlas index did not load, so the ' +
         "travel profile cannot be computed. Your saved list above is unaffected.</p></div>";

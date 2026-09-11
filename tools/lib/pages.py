@@ -8633,6 +8633,29 @@ def quiet_page(data):
 # ── my europe ─────────────────────────────────────────────────────────
 
 def my_europe_page(data):
+    """The list you are building — and, until this commit, a page that never
+    drew it.
+
+    AN EMPTY STATE IS THE STATE THIS PAGE SHIPS IN. The list is empty until
+    a reader saves something, so the first thing every visitor sees here is
+    the empty case, and it was a heading, a paragraph and three bordered
+    boxes on graphite — no picture, on the one page in the product whose
+    subject is a set of PLACES.
+
+    So it draws the continent with nothing on it, and every saved place
+    lights a mark. That is the signature moment this family did not have,
+    and it is the honest shape of the emptiness rather than an apology for
+    it: a reader can see how much of Europe they have not chosen.
+
+    Server-rendered, so the silhouette is there with JavaScript off and the
+    page does not reflow when the script arrives. The marks come from
+    `/api/atlas.json`, which this page already fetches for the travel
+    profile and which already carries each destination's projected x and y —
+    the same numbers every drawing on this site is made of, so a saved dot
+    lands exactly where /map puts it. The dependency is declared in
+    data/contracts.json, because coupling is fine and silent coupling is
+    not.
+    """
     body = f"""
 {crumbs([("Europe", "/discover"), ("My Europe", None)])}
 <div class="pagehead instrument">
@@ -8642,6 +8665,14 @@ def my_europe_page(data):
   nowhere else — there is no account, no server, no email address, and nothing to leak. When
   accounts arrive, this list will be importable into one; it will never be silently uploaded.</p>
 </div>
+{constel_defs()}
+<figure class="minemap" id="minemap">
+  {constellation([], cut=True)}
+  <figcaption><span id="minecap">Nothing on it yet. Every place you save is drawn here.</span>
+  {geo.sources_line(geo.load("europe-lod0.json"))} Nothing about this list leaves your
+  browser to draw it: the outline ships with the page and the coordinates come from the
+  same public index every map here is built from.</figcaption>
+</figure>
 <div id="mine" aria-live="polite"></div>
 <div id="dna"></div>
 <div class="note">

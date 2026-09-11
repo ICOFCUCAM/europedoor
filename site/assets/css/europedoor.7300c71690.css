@@ -4790,6 +4790,41 @@ body[data-hero] .masthead { position: sticky; }
    name at the size the row is worth — seventeen rows, one screen apart, and
    the name is what a reader is choosing between. */
 .interestrow :is(h2, h3) { font-size: var(--t-lg); }
+
+/* ── MY EUROPE DRAWS THE LIST IT IS ABOUT ──────────────────────────────
+ * The empty case is the state this page SHIPS in — the list is empty until
+ * a reader saves something — and it was a heading, a paragraph and three
+ * bordered boxes on graphite, with no picture, on the one page whose
+ * subject is a set of places. The continent is drawn with nothing on it,
+ * and every saved place lights a mark: the honest shape of the emptiness
+ * rather than an apology for it.
+ *
+ * NO APERTURE. This is a glyph of what you hold, not a window onto
+ * somewhere — the same reason the theme rows and the year band refuse one,
+ * and the reason this page is not a twenty-third arch in the same position. */
+.minemap { margin: var(--s6) 0 var(--s7); }
+/* 46rem WAS THE WHOLE SCREEN. Rendered at 1280 it was a 736-pixel continent
+   filling the fold with nothing on it, which is a picture of the emptiness
+   shouting about it. 30rem is a glyph you read in one look. */
+.minemap .constel { display: block; width: min(30rem, 100%); }
+/* AND IT CAME OUT PARCHMENT ON GRAPHITE. `.constel` defaults to
+   --atlas-land, which is the PICTURE half of the cartography split, and
+   this page is data-world="intelligence" — an instrument. Pictures are
+   paper, instruments are graphite, and the split is on what the drawing IS
+   rather than on where it sits. Same land tone /map and /discover use. */
+.minemap .constel { fill: var(--map-land); }
+.minemap .constel-lit circle { fill: var(--cobalt-air); }
+/* AND THE DATA-CUT FADE CAME OUT --atlas-sea, WHICH IS THE PICTURE OCEAN.
+   Every other drawing that carries this fade sits ON a sea panel, so the
+   stop is the ground it is blending into. This glyph sits straight on the
+   page, in the dark world, so #153851 painted a visible navy rectangle
+   across the whole viewBox — the cartography split broken one commit after
+   /discover was fixed for the same thing, in the code that fixed it.
+   The ground here is the page, so the stop is the page's own paper. */
+.minemap .datacut stop { stop-color: var(--paper); }
+.minemap figcaption { margin-top: var(--s4); color: var(--ink-3);
+                      font-size: var(--t-sm); line-height: 1.5; max-width: 46rem; }
+#minecap { color: var(--ink-2); }
 .interestrow .themeside { display: grid; gap: var(--s2); }
 /* BETWEEN THE PHONE RULE AND THE DESK RULE THE GLYPH WAS 132px. Neither
    block applies at 834, so it fell back to the theme row's intrinsic size —

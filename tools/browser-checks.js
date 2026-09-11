@@ -3531,6 +3531,58 @@ async function main() {
   }
 
 
+  /* MY EUROPE DRAWS THE LIST IT IS ABOUT, and only a browser can see it.
+   *
+   * The empty case is the state this page SHIPS in — the list is empty
+   * until somebody saves something — and it was a heading, a paragraph and
+   * three bordered boxes on graphite, with no picture, on the one page
+   * whose subject is a set of PLACES. The continent is server-rendered
+   * with nothing on it and the marks are lit from /api/atlas.json.
+   *
+   * Nothing static can check this: the dots exist only after localStorage
+   * has something in it and the Atlas index has resolved the ids. So the
+   * suite writes a real saved list, reloads, and reads the drawing.
+   */
+  {
+    const mp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    const r = await mp.goto(base + "/my-europe/", { waitUntil: "load" });
+    if (r && r.status() === 200) {
+      checked++;
+      ok(await mp.$(".minemap .constel"),
+         "/my-europe draws no continent. The empty state is the state this " +
+         "page ships in and it is the one page whose subject is a set of places");
+      const empty = await mp.textContent("#minecap");
+      checked++;
+      ok(/nothing on it yet/i.test(empty || ""),
+         `/my-europe empty caption reads ${JSON.stringify(empty)} and must say the ` +
+         `drawing is empty rather than leaving a reader to count zero dots`);
+      await mp.evaluate(() => localStorage.setItem("europedoor.saved.v1", JSON.stringify([
+        { id: "city:france/alps-and-east/chamonix", kind: "Place", label: "Chamonix", url: "/x" },
+        { id: "city:norway/fjord-norway/bergen", kind: "Place", label: "Bergen", url: "/x" },
+        { id: "journey:the-alpine-grand-tour", kind: "Journey", label: "Alpine", url: "/x" }])));
+      await mp.reload({ waitUntil: "networkidle" });
+      await mp.waitForTimeout(400);
+      const got = await mp.evaluate(() => ({
+        dots: document.querySelectorAll(".minemap .constel-lit circle").length,
+        cap: (document.getElementById("minecap") || {}).textContent || "" }));
+      checked++;
+      ok(got.dots === 2,
+         `/my-europe lit ${got.dots} mark(s) for two saved places and a saved ` +
+         `journey. A journey has no single point and must not be given one`);
+      // AND THE TWO COUNTS HAVE TO AGREE OR THE DIFFERENCE HAS TO BE SAID.
+      // The heading under the drawing counts saved ITEMS and only places
+      // carry a point, so three dots under a heading reading five is a
+      // discrepancy a reader sees and nothing explains.
+      checked++;
+      ok(/2 of your 3/.test(got.cap),
+         `/my-europe caption reads ${JSON.stringify(got.cap)} — with two of three ` +
+         `saved items drawn it has to say so, or the dots and the heading ` +
+         `disagree with nothing accounting for it`);
+      await mp.evaluate(() => localStorage.removeItem("europedoor.saved.v1"));
+    }
+    await mp.close();
+  }
+
   /* A SEPARATION BETWEEN TWO TOKENS SAYS NOTHING ABOUT WHETHER EITHER IS
    * PAINTED.
    *
