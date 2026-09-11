@@ -3907,6 +3907,52 @@ def c_score_median():
     return n
 
 
+@check("no drawing quietly omits a place it is drawn from")
+def c_offframe():
+    # A CIRCLE OUTSIDE THE viewBox RENDERS AS NOTHING AND REPORTS NOTHING —
+    # the same class as a <use> of an id that is not on the page, and
+    # invisible for the same reason: the picture looks finished.
+    #
+    # One destination in 319 does it. Longyearbyen is at 78 degrees north and
+    # projects to y = -48 on the 1000x780 window every unframed constellation
+    # is drawn in, so /interests/wild printed "19 of the 319 destinations are
+    # tagged wild nature", drew nineteen circles and showed eighteen.
+    #
+    # The canvas is not going to move for one point and the comparison these
+    # drawings exist to make is destroyed by framing them individually, so
+    # the atlas does here what it already does at 52 degrees east: it says
+    # so. This asserts that a page whose drawing loses a mark carries a
+    # sentence about it, and — the other half — that a page that does NOT
+    # lose one does not carry that sentence, so the note cannot outlive the
+    # fault the way a caption for a deleted claim does.
+    n = 0
+    pat = re.compile(r'<svg class="constel[^"]*" viewBox="'
+                     r'(-?[\d.]+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+)"(.*?)</svg>',
+                     re.S)
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        lost = 0
+        for m in pat.finditer(h):
+            x0, y0, w, hh = (float(v) for v in m.groups()[:4])
+            for cx, cy in re.findall(r'<circle cx="(-?[\d.]+)" cy="(-?[\d.]+)"',
+                                     m.group(5)):
+                n += 1
+                if not (x0 <= float(cx) <= x0 + w and y0 <= float(cy) <= y0 + hh):
+                    lost += 1
+        says = "above the top of this frame" in h or "outside the frame" in h
+        if lost and not says:
+            fail(f"{canonical_of(f)}: a drawing places {lost} mark(s) outside "
+                 f"its own viewBox and the page does not say so. They render "
+                 f"as nothing and report nothing.")
+        if says and not lost:
+            fail(f"{canonical_of(f)}: the page says a place is outside the "
+                 f"frame and no mark is. A note that outlives its fault is "
+                 f"the caption-for-a-deleted-claim failure.")
+    if n < 1000:
+        fail(f"only {n} marks examined — the scan found almost none")
+    return n
+
+
 @check("every <use> and every url(#id) points at something on the same page")
 def c_svg_refs():
     # A <use> OF AN ID THAT IS NOT ON THE PAGE RENDERS AS NOTHING AT ALL, and

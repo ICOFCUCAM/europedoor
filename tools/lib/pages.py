@@ -2351,9 +2351,17 @@ def country_page(data, c):
     region_cards = []
     for r in c["regions"]:
         meta = f'<p class="cardmeta">{n_of(len(r["cities"]), "city")}</p>'
-        art = constellation([project(t["lat"], t["lon"]) for t in r["cities"]],
-                            extra=" regionmini",
-                            frame=True) if r["cities"] else ""
+        # AND A REGION WHOSE ONLY DESTINATION IS OFF THE CANVAS GETS NO
+        # DRAWING. Svalbard holds Longyearbyen, which projects to y = -48 on
+        # a 1000x780 window, so `glyph_view` clamped the frame back onto the
+        # canvas and the card drew Scandinavia with no mark on it at all —
+        # a picture of somewhere else. A drawing that cannot hold its subject
+        # is not a quieter drawing, it is the wrong one.
+        rpts = [project(t["lat"], t["lon"]) for t in r["cities"]]
+        onframe = [p for p in rpts
+                   if 0.0 <= p[0] <= MAP_W and 0.0 <= p[1] <= MAP_H]
+        art = constellation(rpts, extra=" regionmini",
+                            frame=True) if onframe else ""
         region_cards.append(
             card(urls.region(c, r), "Region", r["name"], r["summary"],
                  art=art, meta=meta)
@@ -3138,7 +3146,9 @@ def interest_page(data, i, ranking):
          + (f'. Every destination carrying the tag, drawn on one frame so the '
             f'seventeen can be compared. Coastline from '
             f'<a href="/sources">Natural Earth</a>, public domain.'
-            + datacut_line() if cities else ""))}
+            + datacut_line()
+            + offframe_line([project(n["city"]["lat"], n["city"]["lon"])
+                             for n in cities], data) if cities else ""))}
 
 {f'<div class="rows">{rows}</div>' if rows else empty_state(
       "No destination carries this tag yet.",
@@ -5949,7 +5959,9 @@ def experiences_index(data):
             '<a class="btn ghost" href="/for-businesses">For businesses</a>',
     note='Every place in the Atlas with something on this list. Coastline from '
          '<a href="/sources">Natural Earth</a>, public domain.'
-         + datacut_line())}
+         + datacut_line()
+         + offframe_line(sorted({project(it["city"]["lat"], it["city"]["lon"])
+                                 for it in items}), data))}
 <!-- "Recently added" WAS A CLAIM THE DATA CANNOT SUPPORT. An experience
      carries a slug, a name, a kind, a band and a summary, and no date of
      any sort, so these 24 were simply the first 24 the loader returned in
@@ -6602,6 +6614,49 @@ def glyph_view(pts, pad_frac=0.34, min_pad=90.0, min_span=340.0):
     else:
         y0 = min(max(y0, 0.0), MAP_H - h)
     return f"{x0:.0f} {y0:.0f} {w:.0f} {h:.0f}"
+
+
+def offframe_line(pts, data):
+    """One sentence when a drawing cannot hold one of the places it is about.
+
+    ONE DESTINATION IN THREE HUNDRED AND NINETEEN PROJECTS ABOVE THE CANVAS.
+    Longyearbyen is at 78°N and lands at y = −48 on the 1000×780 window every
+    unframed constellation is drawn in — so `/interests/wild` printed "19 of
+    the 319 destinations are tagged wild nature", drew nineteen circles, and
+    showed eighteen. The nineteenth was outside the viewBox, which renders as
+    nothing and reports nothing: the same class as a <use> of an id that is
+    not there, and invisible for the same reason — the picture looks
+    finished.
+
+    The alternatives were worse. Extending the canvas moves every map on the
+    site for one point. Framing these drawings on their own extent deletes
+    the comparison they exist to make — seventeen interest pages are only
+    comparable while all seventeen are drawn at one extent. Placing the dot
+    at the edge puts a mark where the place is not.
+
+    So the atlas does here what it already does at 52°E: it says so. The
+    sentence names the place and its latitude, and it is derived, so it
+    appears only while the fault does and says nothing the moment the canvas
+    or the dataset changes.
+    """
+    out = [p for p in pts
+           if not (0.0 <= p[0] <= MAP_W and 0.0 <= p[1] <= MAP_H)]
+    if not out:
+        return ""
+    names = []
+    for cid, rec in data["cities"].items():
+        xy = project(rec["city"]["lat"], rec["city"]["lon"])
+        if any(abs(xy[0] - x) < 0.6 and abs(xy[1] - y) < 0.6 for x, y in out):
+            names.append((rec["city"]["name"], rec["city"]["lat"]))
+    if not names:
+        return (f" {n_of(len(out), 'place')} in this set "
+                f"{'lies' if len(out) == 1 else 'lie'} outside the frame.")
+    return (" " + and_list([f"{esc(nm)} at {lat:.0f}°N" for nm, lat in names])
+            + (" is" if len(names) == 1 else " are")
+            + " above the top of this frame: the drawing stops where this "
+              "atlas's map data does, and "
+            + ("that place is " if len(names) == 1 else "those places are ")
+            + "in the list below.")
 
 
 def constellation(pts, extra="", route=False, frame=False):
@@ -7851,7 +7906,9 @@ def quiet_page(data):
         f'{len({n["country"]["slug"] for n in quiet})} countries. The tag is '
         f'editorial and we will be wrong sometimes. Names are dropped where '
         f'they would overlap; every dot is a link. Coastline from '
-        f'<a href="/sources">Natural Earth</a>, public domain.',
+        f'<a href="/sources">Natural Earth</a>, public domain.'
+        + offframe_line([project(n["city"]["lat"], n["city"]["lon"])
+                         for n in quiet], data),
         f'Map of the {len(quiet)} destinations tagged quiet') if len(qpts) >= 2 else ""
 
     swaps = "".join(
@@ -8721,7 +8778,8 @@ def not_found(data):
     actions='<a class="btn" href="/countries">Open the Atlas</a>'
             '<a class="btn ghost" href="/search">Search everything</a>'
             '<a class="btn ghost" href="/plan">Plan a journey</a>',
-    note=geo.sources_line(geo.load("europe-lod0.json")) + datacut_line())}
+    note=geo.sources_line(geo.load("europe-lod0.json")) + datacut_line()
+         + offframe_line(pts, data))}
 """
     return "/404.html", page(
         "Not found", body, path="/404", area=None,
