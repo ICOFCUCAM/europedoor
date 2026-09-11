@@ -861,7 +861,18 @@ main.wide { max-width: 92rem; }
 .row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s4); align-items: baseline; padding: var(--s4) 0; border-bottom: 1px solid var(--rule); text-decoration: none; }
 .row:hover { background: var(--paper-2); }
 .row h3 { font-size: var(--t-md); }
-.row .rowsub { font-size: var(--t-sm); color: var(--ink-2); margin: var(--s1) 0 0; }
+/* A MEASURE IS FOR PROSE, AND A ROW'S SUBLINE IS A SEQUENCE.
+   `p { max-width: var(--measure) }` is right on every paragraph on the site
+   and wrong on this one: `.rowsub` is a <p> holding a middot-separated list
+   of place names — Bruges · Siena · Tallinn · Sighișoara — and the measure
+   broke it at 544 pixels inside a 948-pixel column. Four hundred pixels of
+   nothing beside every row of /themes, /journeys, /europe-in and every other
+   row index, and the list wrapped to two lines where one would have done.
+   65 characters is the line length a reader can follow from end to start
+   again; nobody reads a list of names that way, they scan it. The row's own
+   grid is the constraint. */
+.row .rowsub { font-size: var(--t-sm); color: var(--ink-2); margin: var(--s1) 0 0;
+               max-width: none; }
 .row .rowmeta { font-size: var(--t-xs); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
 
 /* STATE IN THE FORM, NOT ONLY IN THE WORD. /how-it-works is three bands —
