@@ -1556,14 +1556,39 @@ def macromap(data, m):
 
 
 def macro_page(data, m):
+    """A macro region, and the countries it is made of.
+
+    THE CARD GRID WAS RIGHT AND ITS PICTURES WERE NOT. Five like things
+    chosen partly on look is the case a card was designed for and the reason
+    this family kept its grid when the region and month pages lost theirs.
+    But the picture on each was a landscape generated from the country's
+    slug, directly under a map that draws those same five countries filled
+    and named — so the page said "here is where Norway is" and then showed a
+    hash-drawn mountain instead of Norway.
+
+    A country's picture on this site is its SHAPE. /countries and /discover
+    both draw a macro region as `region_glyph`, and this is the same function
+    with one member lit instead of all of them, on the region's own frame —
+    so the five cards are five different outlines a reader can recognise
+    before reading a word, framed identically so they can be compared, which
+    is what a grid of like things is for.
+    """
     cards = []
     for cs in m["countries"]:
         c = data["countries"][cs]
         ncity = sum(len(r["cities"]) for r in c["regions"])
         meta = (f'<p class="cardmeta">{n_of(len(c["regions"]), "region")} · '
                 f'{n_of(ncity, "city")} · {esc(c["budget"])} cost</p>')
-        cards.append(card(urls.country(c), c["capital"], c["name"], c["tagline"], seed="country:" + c["slug"],
-                 meta=meta, motif=motif_for(c["interests"])))
+        # FRAMED ON THE COUNTRY, NOT ON THE REGION. The first version framed
+        # all five on the macro region's own extent, and the Nordics' extent
+        # is Iceland to Finnish Lapland — so every card drew almost the whole
+        # continent with one small country lit, which is the identical-picture
+        # fault that framing exists to stop, arrived at from the other side.
+        pts = [project(t["lat"], t["lon"])
+               for r in c["regions"] for t in r["cities"]]
+        cards.append(card(urls.country(c), c["capital"], c["name"], c["tagline"],
+                          art=region_glyph([cs], pts or None, min_span=340.0),
+                          meta=meta))
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], None)])}
 <div class="pagehead overture">
@@ -1571,6 +1596,7 @@ def macro_page(data, m):
   <h1>{esc(m['name'])}</h1>
   <p class="lede">{esc(m['blurb'])}</p>
 </div>
+{constel_defs()}
 {macromap(data, m)}
 {grid(cards, 3)}
 """
@@ -6343,7 +6369,7 @@ def indexhero(*, kicker, title, lede, art="", img="", actions="", note=""):
         f'{figure}</header>')
 
 
-def region_glyph(members, frame=None):
+def region_glyph(members, frame=None, min_span=0.0):
     """A macro region as the countries it is made of, on the shared silhouette.
 
     THE ATLAS INDEX IS THE PAGE ABOUT COUNTRIES AND IT DREW NONE. /countries
@@ -6396,7 +6422,13 @@ def region_glyph(members, frame=None):
     # `glyph_view`, which is this, lifted out. `min_span=0` keeps this
     # family's behaviour exactly: a macro region is big by construction and
     # has never needed the floor a two-city story does.
-    view = glyph_view(frame, min_span=0.0) if frame else f"0 0 {MAP_W} {MAP_H}"
+    # `min_span` defaults to zero, which is this family's original behaviour:
+    # a macro region is big by construction and has never needed the floor a
+    # two-city story does. A SINGLE COUNTRY does — Luxembourg framed on its
+    # own two destinations is a frame in which Europe is unrecognisable, and
+    # the silhouette is the whole reason the glyph works.
+    view = (glyph_view(frame, min_span=min_span) if frame
+            else f"0 0 {MAP_W} {MAP_H}")
     return (f'<svg class="constel regionglyph" viewBox="{view}" '
             f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
             f'{lit}</svg>')
