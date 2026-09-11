@@ -3477,6 +3477,87 @@ async function main() {
     }
   }
 
+
+  /* KEYBOARD FOCUS, MEASURED ON THE PIXELS RATHER THAN ON THE TOKEN.
+   *
+   * Every contrast assertion on this site reads a declared colour against a
+   * declared background, and a focus ring has neither: it is drawn three
+   * pixels outside its element, so what it sits on is whatever happens to be
+   * there. On the masthead that is the band itself, and #2a4ad9 on #2847d0
+   * measures 1.06:1 — focus present, correctly placed, correctly sized, and
+   * invisible, on the navigation of every page.
+   *
+   * SC 2.4.11 asks for 3:1 between the focused and unfocused states, which is
+   * literally what this measures: shoot the element's neighbourhood twice,
+   * with focus and without, and compare every pixel that changed against what
+   * was there before. No token is consulted, so a ring drawn over a picture,
+   * a gradient or a band is measured the same way as one on paper.
+   */
+  {
+    const FOCUS = [
+      ["/", ".masthead nav a", "the masthead navigation"],
+      ["/", ".wordmark", "the wordmark"],
+      ["/", ".way", "a homepage door"],
+      ["/europe/austria/", ".crumbs a", "a breadcrumb"],
+      ["/plan/", "#planner select", "a planner control"],
+      ["/search/", "input[type=text]", "the search field"],
+      ["/my-europe/", "a", "a link in the dark world"],
+    ];
+    const fp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    for (const [u, sel, what] of FOCUS) {
+      const r = await fp.goto(base + u, { waitUntil: "load" });
+      if (!r || r.status() !== 200) continue;
+      const box = await fp.evaluate((sel) => {
+        const e = document.querySelector(sel);
+        if (!e) return null;
+        e.scrollIntoView({ block: "center" });
+        const b = e.getBoundingClientRect();
+        const pad = 8;
+        return { x: Math.max(0, b.x - pad), y: Math.max(0, b.y - pad),
+                 width: Math.min(600, b.width + pad * 2),
+                 height: Math.min(300, b.height + pad * 2) };
+      }, sel);
+      if (!box || box.width < 4 || box.height < 4) continue;
+      const before = await fp.screenshot({ clip: box });
+      await fp.evaluate((sel) => document.querySelector(sel).focus(), sel);
+      // focus-visible follows keyboard intent, so give the element a real one
+      await fp.keyboard.press("Tab");
+      await fp.keyboard.press("Shift+Tab");
+      const after = await fp.screenshot({ clip: box });
+      const got = await fp.evaluate(async ([a, b]) => {
+        const load = async (s) => {
+          const i = new Image(); i.src = "data:image/png;base64," + s;
+          await i.decode();
+          const c = document.createElement("canvas");
+          c.width = i.width; c.height = i.height;
+          c.getContext("2d").drawImage(i, 0, 0);
+          return c.getContext("2d").getImageData(0, 0, c.width, c.height).data;
+        };
+        const [A, B] = [await load(a), await load(b)];
+        const lin = (v) => { v /= 255;
+          return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+        const L = (r, g, b) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+        let n = 0, best = 1;
+        for (let i = 0; i < A.length; i += 4) {
+          if (A[i] === B[i] && A[i+1] === B[i+1] && A[i+2] === B[i+2]) continue;
+          n++;
+          const la = L(A[i], A[i+1], A[i+2]), lb = L(B[i], B[i+1], B[i+2]);
+          const hi = Math.max(la, lb), lo = Math.min(la, lb);
+          best = Math.max(best, (hi + 0.05) / (lo + 0.05));
+        }
+        return { n, best };
+      }, [before.toString("base64"), after.toString("base64")]);
+      ok(got.n > 0, `focusing ${what} changes no pixel at all — the ring is ` +
+                    `either not drawn or drawn outside the element's own box`);
+      ok(got.best >= 3.0,
+         `the focus indicator on ${what} measures ${got.best.toFixed(2)}:1 ` +
+         `against what it is drawn over, and SC 2.4.11 asks for 3. A ring in ` +
+         `the same colour as the surface it sits on is focus that is present, ` +
+         `correctly placed, correctly sized and invisible`);
+    }
+    await fp.close();
+  }
+
   ok(errors.length === 0, `console errors:\n    ${errors.slice(0, 5).join("\n    ")}`);
 
   await browser.close();
@@ -3494,7 +3575,7 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 895;
+  const FLOOR = 1000;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +

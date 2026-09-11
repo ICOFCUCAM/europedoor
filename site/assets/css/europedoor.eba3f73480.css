@@ -651,6 +651,29 @@ a:where(:any-link):hover { text-decoration-thickness: 2px; }
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
   outline: 2px solid var(--sea); outline-offset: 3px; border-radius: 2px;
 }
+/* AND ON THE ONE BAND OF SIGNATURE COLOUR THE RING WAS THE SIGNATURE.
+ *
+ * --sea is cobalt-deep, the masthead is cobalt at 96%, and the outline sits
+ * three pixels OUTSIDE the link — which on every other surface puts it on the
+ * page and here puts it on the band. Measured on the shipped pixels:
+ * #2a4ad9 on #2847d0 is 1.06:1. Keyboard focus was present, correctly placed,
+ * correctly sized, and invisible, on the navigation of all 1,033 pages.
+ *
+ * It is the mark's own finding one element over: "on the signature itself a
+ * cobalt leaf measures 1.28:1 and is simply not there", and the answer is the
+ * same — the thing inverts rather than recolours. Limestone measures 6.70 on
+ * the band. The four homepage doors already did this by hand, which is this
+ * repository's other recurring sentence: a rule that exists is not a rule
+ * that is inherited.
+ *
+ * NOT A --focus TOKEN, AND THAT WAS TRIED FIRST. `:root { --focus: var(--sea) }`
+ * resolves --sea where the DECLARATION lives, so every world would inherit the
+ * light world's cobalt — which is the accent-color bug this stylesheet already
+ * has a paragraph about. An override on the surface is the only form that
+ * cannot get that wrong. */
+.masthead a:focus-visible, .masthead button:focus-visible {
+  outline-color: var(--limestone);
+}
 
 .skip { position: absolute; left: -9999px; }
 .skip:focus { left: var(--s4); top: var(--s4); z-index: 99; background: var(--paper); padding: var(--s2) var(--s4); border: 1px solid var(--ink); }
