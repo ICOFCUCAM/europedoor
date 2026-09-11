@@ -1069,10 +1069,24 @@ main.wide { max-width: 92rem; }
 #mine h3 { margin-top: var(--s6); }
 
 .rowdist { display: grid; gap: var(--s1); justify-items: end; }
-.dist { width: 8.5rem; height: 12px; display: block; }
+/* 135 PIXELS FOR THE ONE PIECE OF EVIDENCE ON THE PAGE. /method is the
+   formula and what the formula PRODUCES, and the second half was an
+   8.5rem smudge right-aligned in a 1,168px row, drawn in the signature at
+   34% — which measures 1.64:1 on limestone, under the 3:1 a graphical
+   object needs, so the bar a reader was meant to compare across eight rows
+   was barely a tint. Eight near-identical pale bands say "these are all the
+   same"; the whole reason to draw them is that Value's median is 85 and
+   Culture's is 52.
+   The span is the signature outright now — a declared colour with a claim
+   behind it in docs/palette.json, rather than an opacity nobody measured —
+   and the median tick is the page's own ink, which reads ON the span at
+   3.48:1 in light and 3.05:1 in dark. The end caps are the scale. */
+.dist { width: 8.5rem; height: 14px; display: block; }
+@media (min-width: 64rem) { .dist { width: min(19rem, 23vw); } }
 .distaxis { fill: var(--rule); }
-.distspan { fill: color-mix(in srgb, var(--signature) 34%, transparent); }
-.distmed  { fill: var(--door); }
+.distend  { fill: var(--ink-3); }
+.distspan { fill: var(--signature); }
+.distmed  { fill: var(--ink); }
 .distnum { font-variant-numeric: tabular-nums; text-transform: none;
            letter-spacing: 0; color: var(--ink-3); }
 

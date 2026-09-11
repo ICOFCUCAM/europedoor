@@ -4382,10 +4382,17 @@ def c_method_spread():
         if want not in h:
             fail(f"/method: the spread printed for {label} is not the Atlas's "
                  f"own \u2014 {want!r} is not on the page. A chart is a claim.")
-        want_rect = f'class="distspan" x="{lo}" y="2" width="{hi - lo}"'
-        if want_rect not in h:
+        # NO `y` IN THIS PATTERN. It used to read `x="{lo}" y="2" width="..."`
+        # and went red the day the chart gained end caps and grew a unit
+        # taller — the ninth assertion in this repository to pin a shape
+        # rather than the promise. What is being claimed is that the bar
+        # starts where this dimension's floor is and runs as far as its
+        # ceiling; where it sits vertically inside its own viewBox is the
+        # drawing's business.
+        want_rect = f'class="distspan" x="{lo}" y='
+        if want_rect not in h or f'width="{hi - lo}"' not in h:
             fail(f"/method: {label}'s bar is not drawn from its own numbers "
-                 f"\u2014 expected {want_rect!r}")
+                 f"\u2014 expected a distspan at x={lo} of width {hi - lo}")
         if not (lo <= med <= hi):
             fail(f"/method: {label}'s median {med} is outside its own span")
         if widest is None or hi - lo > widest[1]:
@@ -4393,7 +4400,7 @@ def c_method_spread():
     # One axis for all eight: every block is placed on the same 0-100 scale,
     # so the widest block IS the widest range. A per-row axis would draw them
     # all the same width, which is the constant again in another medium.
-    spans = re.findall(r'class="distspan" x="(\d+)" y="2" width="(\d+)"', h)
+    spans = re.findall(r'class="distspan" x="(\d+)" y="[\d.]+" width="(\d+)"', h)
     if len(spans) != len(S.LABELS):
         fail(f"/method draws {len(spans)} spread bars for {len(S.LABELS)} "
              f"dimensions")

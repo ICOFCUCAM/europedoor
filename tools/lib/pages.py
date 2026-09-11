@@ -8346,12 +8346,21 @@ def method_page(data):
 
     def distbar(key):
         lo, hi, med = spread[key]
+        # THE ENDS OF THE SCALE ARE DRAWN, because the axis alone cannot say
+        # where it starts. A hairline running the width of a cell is read as
+        # a rule under the bar rather than as an extent, so "34–97 out of a
+        # hundred" arrived only in the caption and the drawing said "wide".
+        # Two end caps turn the same hairline into a measured span, which is
+        # the difference between a chart and a decoration, and they cost
+        # nothing: the axis is already the full 0–100.
         return (f'<span class="rowdist">'
-                f'<svg class="dist" viewBox="0 0 100 12" role="img" aria-hidden="true" '
+                f'<svg class="dist" viewBox="0 0 100 14" role="img" aria-hidden="true" '
                 f'preserveAspectRatio="none">'
-                f'<rect class="distaxis" x="0" y="5" width="100" height="2"/>'
-                f'<rect class="distspan" x="{lo}" y="2" width="{hi - lo}" height="8"/>'
-                f'<rect class="distmed" x="{med - 0.6:.1f}" y="0" width="1.2" height="12"/>'
+                f'<rect class="distaxis" x="0" y="6" width="100" height="2"/>'
+                f'<rect class="distend" x="0" y="2" width="1" height="10"/>'
+                f'<rect class="distend" x="99" y="2" width="1" height="10"/>'
+                f'<rect class="distspan" x="{lo}" y="3" width="{hi - lo}" height="8"/>'
+                f'<rect class="distmed" x="{med - 0.6:.1f}" y="1" width="1.2" height="12"/>'
                 f'</svg>'
                 f'<span class="distnum">{lo}–{hi}, median {med}</span></span>')
 
