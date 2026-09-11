@@ -73,6 +73,7 @@ def build():
             key=lambda x: -sum(1 for n in d["cities"].values()
                                if x["slug"] in n["city"]["interests"]))
     ]
+    emit(P.interests_index(d, interest_ranking))
     for i in d["taxonomy"]["interests"]:
         emit(P.interest_page(d, i, interest_ranking))
     emit(P.journeys_index(d))

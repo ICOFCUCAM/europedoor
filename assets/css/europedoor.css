@@ -4774,8 +4774,36 @@ body[data-hero] .masthead { position: sticky; }
    space this row was diagnosed with: every index on this site right-aligns
    its meta column, and a rule that spans both is what makes the two ends one
    row. What was wrong was the drawing's SIZE, not its position. */
+/* A MARK SIZED FOR EIGHT STOPS, DRAWN TWO HUNDRED TIMES. The interests
+   index reuses the theme row's constellation, and a theme holds eight
+   places while History & ruins holds two hundred — at r=17 that is a solid
+   field of blue with the coastline lost underneath it, which says "a lot"
+   and nothing about shape. The whole argument of that page is that the
+   seventeen shapes differ, so above sixty points the mark comes down and
+   the fill opens up. */
+.constel-dense .constel-lit circle { r: 11px; fill-opacity: .7; }
+/* THE INTERESTS ROW IS NOT THE THEME ROW, and borrowing its proportions
+   left six hundred pixels of nothing in the middle. A theme's left column
+   holds eight place names and fills a whole measure; an interest's holds a
+   name and one short line, so the same grid put the drawing hard against
+   the right edge with a void between. Narrower drawing, closer, and the
+   name at the size the row is worth — seventeen rows, one screen apart, and
+   the name is what a reader is choosing between. */
+.interestrow :is(h2, h3) { font-size: var(--t-lg); }
+.interestrow .themeside { display: grid; gap: var(--s2); }
+/* BETWEEN THE PHONE RULE AND THE DESK RULE THE GLYPH WAS 132px. Neither
+   block applies at 834, so it fell back to the theme row's intrinsic size —
+   a continent 132 pixels wide carrying two hundred marks, which is the
+   "204 pixels for the whole of Europe" measurement this stylesheet already
+   records one family over. A tablet is where a reader compares things. */
+.interestrow .themeside .constel { width: min(15rem, 100%); }
 @media (min-width: 64rem) {
+  .themerow .constel-theme.constel-dense .constel-lit circle { r: 11px; }
   .themerow { grid-template-columns: minmax(0, var(--measure)) minmax(0, 1fr); }
+  .interestrow { grid-template-columns: minmax(0, 1fr) minmax(0, 15rem);
+                 align-items: center; gap: var(--s6); }
+  .interestrow .themeside { justify-items: end; }
+  .interestrow .themeside .constel { width: 100%; }
   .themeside .constel { width: min(18rem, 100%); }
   /* AND THE MARK HAD TO COME DOWN AS THE DRAWING WENT UP. A radius in
      viewBox units is a radius in pixels at exactly one width: 22 units is
@@ -4870,7 +4898,12 @@ body[data-hero] .masthead { position: sticky; }
      The mark comes down with the width, as it went up with it: 14 units at
      358 is the same 10-pixel dot the row has everywhere else. */
   .themeside .constel { display: block; width: 100%; }
+  /* NOT 100%: this block runs to 44rem, so at 600 a full-width glyph was
+     568 pixels tall and the page ran to 11,972 — seventeen rows of it.
+     A phone is 390 and everything up to 704 is not. */
+  .interestrow .themeside .constel { width: min(22rem, 100%); }
   .themerow .constel-theme .constel-lit circle { r: 14px; }
+  .themerow .constel-theme.constel-dense .constel-lit circle { r: 7px; }
 }
 
 /* ── two axes over one set, drawn as what separates them ──────────────

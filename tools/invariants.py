@@ -131,12 +131,34 @@ def measure():
                 "value": len(pages), "kind": "exact",
                 "why": "A visual change must not add or remove a page. If this "
                        "moves during a restyle, something is generating pages "
-                       "from a stylesheet, which is a different kind of bug."},
+                       "from a stylesheet, which is a different kind of bug."
+                       " AND THE INTERESTS INDEX ADDED ONE PAGE, 1033 -> 1034. /interests was a "
+                       "SERVER AUTOINDEX: seventeen interest pages shipped and "
+                       "their directory had no index.html, so a reader who "
+                       "trimmed a URL got a file listing with none of this site "
+                       "on it. Nothing linked to it, which is exactly why no "
+                       "check caught it — a link checker validates links that "
+                       "exist and a missing index is an absence. It cost "
+                       "something real too: every interest page draws its own "
+                       "tag and says it does so \"so the seventeen can be "
+                       "compared\", and there was nowhere they could be. The "
+                       "index is that comparison, ordered by reach."},
             "routes.hash": {
                 "value": route_hash, "kind": "exact",
                 "why": "A visual change must not move a URL. Every inbound link, "
                        "every social card and every sitemap entry depends on "
-                       "this set being stable."},
+                       "this set being stable."
+                       " AND THE INTERESTS INDEX ADDED ONE PAGE, 1033 -> 1034. /interests was a "
+                       "SERVER AUTOINDEX: seventeen interest pages shipped and "
+                       "their directory had no index.html, so a reader who "
+                       "trimmed a URL got a file listing with none of this site "
+                       "on it. Nothing linked to it, which is exactly why no "
+                       "check caught it — a link checker validates links that "
+                       "exist and a missing index is an absence. It cost "
+                       "something real too: every interest page draws its own "
+                       "tag and says it does so \"so the seventeen can be "
+                       "compared\", and there was nowhere they could be. The "
+                       "index is that comparison, ordered by reach."},
             "shell.count": {
                 "value": sum(open(os.path.join(ROOT, "tools", "lib", f),
                                   encoding="utf-8").read().count("<!doctype html>")
@@ -500,7 +522,20 @@ def measure():
                        "that there is no longer a reason to stop. Each "
                        "interest page opens on its own tag drawn instead, "
                        "every destination carrying it on one unframed "
-                       "extent, so the seventeen can be compared. AND THE REGION PASS TOOK IT 0.205 TO 0.079, ONE HUNDRED AND THIRTY PAGES, ON PURPOSE. 97 of the 130 travel regions hold one or two destinations and 26 hold exactly one, so the band that IS the subject of a region page opened with a single 280px tile and two empty columns beside it — the stories-index failure exactly, with the shape of the data deciding the layout. Each tile also drew a plate from its destination's own hash directly under a real map of the region showing where those same places are. The rest of the page was already rows — places to see, things to do, journeys — so a region page was speaking two list languages one band apart. This is the largest single move this figure has made, and the last card grid outside the country pages. AND THE FUND REGISTER COST IT ONE MORE PAGE, 0.079 to 0.078: a heading reading 'The four themes' sat over SEVEN cards and four of them read '1 projects'. A number typed into a heading and a count with no plural rule, in a grid of seven that left three empty cells, on cards holding a kicker and a figure and nothing else — which is exactly what /experiences was before the nav-bar pass. What separates the seven is how much of the register each holds and where that work is, so they are rows carrying the countries and the count as a bar against the largest. AND THE TWELVE MOTION PAGES TOOK IT 0.078 TO 0.070: each one ended on three journey cards and up to three theme cards, every one opening on a gradient chosen by the hash of a slug — sixty hash-drawn landscapes on the family whose entire argument is that a motion is NOT a place, and whose index had its own plates removed for exactly that reason. /journeys and /themes had each already answered this, and differently, because their subjects differ: a journey's picture is its ROUTE and a theme's is its SCATTER. Both drawn on the same projection as the map above them, so the three bands of a motion page now agree about what Europe looks like. AND THE TWELVE MONTH PAGES TOOK IT 0.070 TO 0.060: each ended on six abstract plates over six names, under the heading 'Where we would actually send you' — the single most useful recommendation this dataset makes, a quiet place in a country in its shoulder season THIS month, rendered as six gradients. ONE drawing for the six, not six: six framed thumbnails would be six pictures of the same continent, which is the nine-macro-regions fault. This is the last card grid on the site outside the country pages."},
+                       "extent, so the seventeen can be compared. AND THE REGION PASS TOOK IT 0.205 TO 0.079, ONE HUNDRED AND THIRTY PAGES, ON PURPOSE. 97 of the 130 travel regions hold one or two destinations and 26 hold exactly one, so the band that IS the subject of a region page opened with a single 280px tile and two empty columns beside it — the stories-index failure exactly, with the shape of the data deciding the layout. Each tile also drew a plate from its destination's own hash directly under a real map of the region showing where those same places are. The rest of the page was already rows — places to see, things to do, journeys — so a region page was speaking two list languages one band apart. This is the largest single move this figure has made, and the last card grid outside the country pages. AND THE FUND REGISTER COST IT ONE MORE PAGE, 0.079 to 0.078: a heading reading 'The four themes' sat over SEVEN cards and four of them read '1 projects'. A number typed into a heading and a count with no plural rule, in a grid of seven that left three empty cells, on cards holding a kicker and a figure and nothing else — which is exactly what /experiences was before the nav-bar pass. What separates the seven is how much of the register each holds and where that work is, so they are rows carrying the countries and the count as a bar against the largest. AND THE TWELVE MOTION PAGES TOOK IT 0.078 TO 0.070: each one ended on three journey cards and up to three theme cards, every one opening on a gradient chosen by the hash of a slug — sixty hash-drawn landscapes on the family whose entire argument is that a motion is NOT a place, and whose index had its own plates removed for exactly that reason. /journeys and /themes had each already answered this, and differently, because their subjects differ: a journey's picture is its ROUTE and a theme's is its SCATTER. Both drawn on the same projection as the map above them, so the three bands of a motion page now agree about what Europe looks like. AND THE TWELVE MONTH PAGES TOOK IT 0.070 TO 0.060: each ended on six abstract plates over six names, under the heading 'Where we would actually send you' — the single most useful recommendation this dataset makes, a quiet place in a country in its shoulder season THIS month, rendered as six gradients. ONE drawing for the six, not six: six framed thumbnails would be six pictures of the same continent, which is the nine-macro-regions fault. This is the last card grid on the site outside the country pages."
+                       "AND THE INTERESTS INDEX MOVED FOUR OF THEM BY A "
+                       "THOUSANDTH, WHICH IS WHAT ADDING A PAGE DOES. "
+                       "/interests was a SERVER AUTOINDEX: seventeen interest "
+                       "pages shipped and their directory had no index.html, "
+                       "so a reader who trimmed a URL got a file listing with "
+                       "none of this site on it. Nothing linked to it, which is "
+                       "exactly why no check caught it — a link checker "
+                       "validates links that exist and a missing index is an "
+                       "absence. band, note, facts and chip each fall about a "
+                       "thousandth because one page in 1,034 composes without "
+                       "them: the index is seventeen rows and a shared "
+                       "silhouette, ordered by reach, and it carries no note "
+                       "panel, no facts table and no chip row."},
         },
     }
 

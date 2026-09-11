@@ -140,7 +140,7 @@ def c_built():
     expect += len(D.all_places(d["countries"]))
     expect += sum(len(P.facets_for(d, c, r, t))
                   for c in d["countries"].values() for r in c["regions"] for t in r["cities"])
-    expect += len(d["taxonomy"]["interests"])
+    expect += 1 + len(d["taxonomy"]["interests"])   # /interests and its seventeen
     expect += 1 + len(d["journeys"])
     expect += 1 + len(d["themes"])
     expect += 1 + len(d["stories"])

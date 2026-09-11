@@ -863,6 +863,11 @@ FOOTER_GROUPS = [
         ("/themes", T("footer.themes")),
         ("/europe-in", T("footer.motion")),
         ("/beyond-the-obvious", T("footer.beyond")),
+        # SEVENTEEN PAGES SHIPPED AND THEIR INDEX WAS A SERVER AUTOINDEX.
+        # Nothing linked to /interests, which is exactly why no check caught
+        # it: the link checker validates links that exist, and a missing
+        # index is an absence.
+        ("/interests", T("footer.interests")),
         ("/my-europe", T("footer.myeurope")),
     ]),
     ("The project", [

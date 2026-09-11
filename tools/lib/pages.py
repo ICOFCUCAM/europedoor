@@ -1200,6 +1200,11 @@ def home(data):
     # hero already records: eleven abstract plates in a column is placeholder
     # art doing a picture's job, and it was this exact section. So a door
     # asks the register directly and, with no photograph, is type and space.
+    # "EVERY WAY IN" WENT TO /discover, WHICH IS NOT THE SET OF WAYS IN.
+    # It is the filter instrument. The seventeen interest tags ARE the set,
+    # and until this commit they had no index to point at — /interests was
+    # a server autoindex, because nothing linked to it and a link checker
+    # validates links that exist.
     doors = []
     for d in data["home"]["doors"]:
         interest = data["interests"][d["interest"]]
@@ -1475,7 +1480,7 @@ def home(data):
          lede="Four ways in, not a list of everything we hold. Each one opens on a "
               "real list of destinations, and the map is there rather than here — "
               "on the page it belongs to, at the size it deserves.",
-         more=("Every way in", "/discover"))}
+         more=("All seventeen ways in", "/interests"))}
 
 {section("Journeys worth taking", '<div class="jrows">' + "".join(jrows) + "</div>"
          if jrows else '<p class="small">Curated journeys are being written.</p>',
@@ -3414,6 +3419,115 @@ def _macro_of(data, country_slug):
             for c in m["countries"]:
                 _MACRO_OF[c] = m["slug"]
     return _MACRO_OF[country_slug]
+
+
+def interests_index(data, ranking):
+    """Seventeen ways to travel, compared — a family that had no index at all.
+
+    SEVENTEEN PAGES SHIPPED AND `/interests/` WAS A SERVER AUTOINDEX. Nothing
+    linked to it, which is exactly why no check caught it: the link checker
+    validates links that exist, and a missing index is an absence. A reader
+    who trimmed a URL, or who followed a search result to the directory, got
+    Apache's own file listing with the site's masthead nowhere on it.
+
+    And the absence cost something real. Every interest page draws its own
+    tag — every destination carrying it, on the shared silhouette — and the
+    reason written into that page is "so the seventeen can be compared". They
+    could not be. A reader could see Mountains, then navigate away and see
+    Islands, and hold two pictures in their head.
+
+    So the index is the comparison, and it is the one thing seventeen
+    separate pages cannot do. THE SHAPES ARE THE ARGUMENT: History is 200
+    destinations in 47 countries and covers almost the whole continent;
+    Festivals is three places in three countries. You see the difference
+    before you read a number, which is the /themes finding one family over,
+    and the silhouette is emitted ONCE with every row a <use> of it.
+
+    ORDERED BY REACH, NOT ALPHABETICALLY. The ranking already exists — the
+    interest pages take it to print "the eighth widest of 17 tags" — and it
+    is the only order that makes the page an argument rather than a list.
+    Every row carries the judgement the individual page makes about its own
+    tag, from the same INTEREST_BANDS table, so the index cannot say
+    something the page it links to would not.
+    """
+    idx = data["cities"]
+    total = len(idx)
+    silhouette = constel_defs()
+    by_slug = {i["slug"]: i for i in data["taxonomy"]["interests"]}
+    rows = []
+    drawn = []
+    for slug in ranking:
+        i = by_slug[slug]
+        cities = [c for c in idx.values() if slug in c["city"]["interests"]]
+        ncountry = len({c["country"]["slug"] for c in cities})
+        pct = round(100.0 * len(cities) / total) if total else 0
+        # THE JUDGEMENT SENTENCE WAS A CONSTANT ON FIVE ROWS AT A TIME.
+        # The first version printed INTEREST_BANDS here, which is three
+        # sentences for seventeen tags — so History and Food carried the
+        # same words, and so did Architecture and Wild nature, four rows
+        # apart. That is the /themes failure exactly, reproduced by the
+        # commit that was written to avoid it: "8 PLACES" was on all
+        # thirteen cards because every theme holds eight, and a sentence
+        # that is true of five rows is not telling a reader which row they
+        # are reading. The band belongs on the tag's OWN page, where it is
+        # a judgement about one thing and there is nothing to compare it to.
+        #
+        # What differs, and is the thing somebody scanning actually wants,
+        # is WHERE. The three countries carrying the most of each tag are
+        # different for almost every one of the seventeen — Mountains is
+        # Switzerland, Austria, France and Islands is Greece, Croatia,
+        # Italy — and it is derived, so it cannot drift from the set.
+        tally = {}
+        for c in cities:
+            tally[c["country"]["name"]] = tally.get(c["country"]["name"], 0) + 1
+        lead = [nm for nm, _ in sorted(tally.items(), key=lambda kv: (-kv[1], kv[0]))[:3]]
+        where = (and_list(lead) + (" carry the most of it" if len(lead) > 1
+                                   else " carries all of it")
+                 if lead else "Nothing carries it yet.")
+        pts = [project(c["city"]["lat"], c["city"]["lon"]) for c in cities]
+        drawn.extend(pts)
+        # THE MARK SIZE HAS TO FOLLOW THE COUNT. `.constel-theme` was sized
+        # for a theme's EIGHT stops; two hundred dots at that radius is a
+        # solid blue mass with the coastline lost under it, which says "a
+        # lot" and nothing else — and the whole argument of this page is
+        # that you can see the difference between the shapes.
+        dense = " constel-dense" if len(pts) > 60 else ""
+        glyph = constellation(pts, extra=" constel-theme" + dense)
+        rows.append(
+            f'<a class="row themerow interestrow" href="{urls.interest(slug)}">'
+            f'<div><p class="kicker">{pct}% of the Atlas · '
+            f'{n_of(ncountry, "country")}</p>'
+            f'<h2>{esc(i["name"])}</h2>'
+            f'<p class="rowsub">{esc(where)}</p></div>'
+            f'<div class="themeside">{glyph}'
+            f'<p class="rowmeta">{n_of(len(cities), "destination")}</p>'
+            f'</div></a>')
+    body = f"""
+{crumbs([("Europe", "/discover"), ("Ways to travel", None)])}
+<div class="pagehead index">
+  <p class="kicker">What you are travelling for</p>
+  <h1>Seventeen ways to cross a continent.</h1>
+  <p class="lede">Not a list of everything Europe has. {numword(len(ranking), cap=True)} tags
+  that each narrow {numword(total)} destinations to a set worth reading — and the useful
+  ones are not the biggest. History covers almost the whole Atlas and tells you
+  very little; the narrow ones are where a filter earns its place.</p>
+</div>
+{silhouette}
+<div class="rows">{"".join(rows)}</div>
+<p class="small">Each shape is that tag\u2019s own destinations on the continent, drawn
+to the same frame so the {numword(len(ranking))} can be compared: a knot is an argument
+about one corner of Europe, a scatter is one about the whole of it.
+{geo.sources_line(geo.load("europe-lod0.json"))}{offframe_line(drawn, data, listed=False)}
+The order is reach \u2014 how much of the Atlas each tag carries \u2014 rather than
+alphabetical, and the sentence under each name is the same judgement its own page
+makes. Two of them can be combined in
+<a href="/discover">Discover Mode</a>, which is where a narrow tag does its real work.</p>
+"""
+    return "/interests/index.html", page(
+        "Ways to travel", body, path="/interests", area="countries",
+        description="Seventeen ways into Europe — history, food, mountains, islands, "
+                    "sacred places, rail — each one drawn as the destinations that carry it.",
+    )
 
 
 def interest_page(data, i, ranking):

@@ -74,7 +74,7 @@ Food & drink.
 | language | coverage | ships |
 |---|---:|---|
 | en | 100% | yes |
-| fr | 29% | held |
+| fr | 28% | held |
 
 A catalogue ships at 100% of the interface **and** localised destination copy.
 A half-translated site is worse than an English one.
