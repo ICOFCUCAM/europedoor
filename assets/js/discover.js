@@ -32,6 +32,14 @@
 
   function fmt(list) {
     if (list.length === 1) return list[0];
+    /* SEMICOLONS WHEN A CLAUSE ALREADY CARRIES AN "and". "Berlin also art &
+     * museums and music & nightlife and is one we have written up properly"
+     * is three conjunctions in one sentence, two of them joining things that
+     * are not alike. The planner learned this and joined its clauses with
+     * semicolons; this page joins the same kind of list and did not. */
+    if (list.some(function (c) { return / and /.test(c); })) {
+      return list.join("; ");
+    }
     if (list.length === 2) return list[0] + " and " + list[1];
     return list.slice(0, -1).join(", ") + " and " + list[list.length - 1];
   }
@@ -182,18 +190,43 @@
       ". Showing the closest " + shown.length +
       ", at most two per country so the list is Europe rather than one corner of it:";
 
+    /* THE HOIST ONLY LOOKED AT WHAT THE READER ASKED FOR. `asked` is the
+     * clauses that come from the filters and `extra` is what the place adds
+     * on its own, and only the first was being hoisted — so "is one we have
+     * written up properly" was on all twelve rows, under a line explaining
+     * that what follows is what else is true of EACH one. Measured on a
+     * History & ruins search: twelve rows, twelve identical closing clauses.
+     *
+     * This is the planner's fault on the sibling surface, and this page is
+     * where the rule was written: never explain the constraint back, a
+     * reason shared by every result goes in one line above the list. */
     var common = shown[0].asked.filter(function (clause) {
       return shown.every(function (r) { return r.asked.indexOf(clause) >= 0; });
     });
-    var lead = common.length
-      ? '<p class="whyall"><span>In common</span> All ' + shown.length + " " +
-        fmt(common) + " — because you asked for that. What follows is what else " +
-        "is true of each one.</p>"
-      : "";
+    var shared = shown[0].extra.filter(function (clause) {
+      return shown.every(function (r) { return r.extra.indexOf(clause) >= 0; });
+    });
+    var lead = "";
+    if (common.length || shared.length) {
+      lead = '<p class="whyall"><span>In common</span> ';
+      if (common.length) {
+        lead += "All " + shown.length + " " + fmt(common) +
+                " — because you asked for that. ";
+      }
+      if (shared.length) {
+        /* "Every one of them", not "Every one of them also": these clauses
+         * begin with their own verb — "is one we have written up properly" —
+         * so an adverb in front of them produces "also is". */
+        lead += (common.length ? "Every one of them " : "All " +
+                 shown.length + " ") + fmt(shared) + ". ";
+      }
+      lead += "What follows is what else is true of each one.</p>";
+    }
 
     out.innerHTML = lead + '<div class="rows">' + shown.map(function (r) {
       var c = r.city;
-      var mine = r.extra.concat(r.asked.filter(function (x) { return common.indexOf(x) < 0; }));
+      var mine = r.extra.filter(function (x) { return shared.indexOf(x) < 0; })
+        .concat(r.asked.filter(function (x) { return common.indexOf(x) < 0; }));
       var line = mine.length
         ? '<p class="whythis"><span>Why this</span> ' + c.name + " " + fmt(mine) + ".</p>"
         : '<p class="whythis"><span>Why this</span> nothing beyond what you asked for — ' +

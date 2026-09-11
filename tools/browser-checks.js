@@ -748,6 +748,32 @@ async function main() {
   ok(!quietRows.some((t) => /carries every one of/.test(t)),
      "each card still restates the filter the reader set");
 
+  // AND THE GENERAL FORM, WHICH THE NAMED ONE WAS STANDING IN FOR. The
+  // hoist looked only at the clauses coming from the reader's filters, not
+  // at the ones a place adds on its own — so "is one we have written up
+  // properly" was on all twelve rows, under a line saying that what follows
+  // is what else is true of EACH one. Same fault the planner had, on the
+  // page where this rule was written.
+  // Read from the state this section has already built rather than
+  // navigating: the assertions that follow depend on the off-the-circuit
+  // filter being set, and reloading the page to run this test silently
+  // cleared it — two capitals "survived" a filter that was no longer on.
+  {
+    const rows = quietRows;
+    const seen = {};
+    for (const t of rows) {
+      const own = new Set(t.replace(/^Why this \S+ /, "")
+                           .split(/[;.] ?/).map((x) => x.trim())
+                           .filter((x) => x.length > 10));
+      for (const c of own) seen[c] = (seen[c] || 0) + 1;
+    }
+    const everywhere = Object.keys(seen).filter((k) => seen[k] === rows.length);
+    ok(rows.length >= 3, "Discover Mode returned too few rows to test the hoist");
+    ok(everywhere.length === 0,
+       `a clause is on all ${rows.length} Discover Mode rows and was not ` +
+       `hoisted: ${everywhere.map((c) => JSON.stringify(c.slice(0, 60))).join(", ")}`);
+  }
+
   // No capital should survive the off-the-circuit filter, since not being
   // one is the largest single term in the score.
   await page.selectOption("#discover-month", "oct");
