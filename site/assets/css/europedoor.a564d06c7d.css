@@ -5856,3 +5856,39 @@ main > .pagehead:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom
   .minimap, .plate, .constel, .yearband, .europemap {
     print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }
+
+/* ── the country band ───────────────────────────────────────────────── */
+/* FIFTY COUNTRY PAGES WERE THE LARGEST FAMILY ON THIS SITE WITH NO
+   PHOTOGRAPH ANYWHERE — seven thousand pixels each, and the page a reader
+   most often reaches from a search for "Austria travel". The band is what a
+   whole country feels like, above its name.
+
+   IT IS AN ADDITION AND NOT A REPLACEMENT. The country portrait stays
+   exactly where it is: it is this family's signature moment and it is the
+   thing that says which country this page is about. And with no photograph
+   there is no band at all — no empty frame, no plate — which is the
+   homepage's own finding, that a slot waiting for a picture is honest and
+   three hundred pixels of one is a hole.
+
+   THE ASPECT IS DECLARED AT EVERY WIDTH AND NOTHING BESIDE IT DECIDES ITS
+   HEIGHT, which is what makes this crop checkable by arithmetic where
+   `.placeband-art` is not: that one is as tall as the map next to it, so its
+   crop is decided by a neighbour and can be neither art-directed nor
+   checked. 16/9 below 62rem and 21/9 above it gives a guaranteed 52% of a
+   source frame, against the homepage hero's 15%. */
+.countryband {
+  margin: 0 0 var(--s6);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--paper-2);
+}
+@media (min-width: 62rem) { .countryband { aspect-ratio: 21 / 9; } }
+.countryband picture,
+.countryband img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* The credit belongs under the picture and never over it, and it takes the
+   size the site already has for a caption. A SIXTEENTH FONT SIZE WAS TRIED
+   AND THE INVARIANT REGISTER REFUSED IT: `css.font_sizes` is a ceiling of
+   fifteen with the reason written out, and 12px for one caption is exactly
+   the kind of value that makes a sibling repository measure 418 of them. */
+.countryband figcaption { margin-top: var(--s2); color: var(--ink-2); }

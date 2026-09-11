@@ -11,6 +11,22 @@
   }
  },
  "slots": {
+  "country-hero": {
+   "role": "country-signature",
+   "min_width": 2000,
+   "orientation": "landscape",
+   "min_aspect": 1.5,
+   "max_aspect": 2.2,
+   "note": "What a whole country feels like, above its name. Never a single famous landmark and never a city skyline: a landmark is a place INSIDE the country and the capital has its own role. Fifty of these are seen one after another by a reader moving through /countries, so the SET is part of the brief exactly as it is for the four doors — different light, different season and different palette between neighbours. THE BAND IS AN ADDITION AND NOT A REPLACEMENT: the country portrait stays exactly where it is, because it is this family's signature moment and it is the thing that says which country the page is about. With no photograph there is no band at all, which is today's page unchanged — a slot waiting for a picture is honest and three hundred pixels of it is a hole.",
+   "search": [
+    "{name} landscape",
+    "{name} countryside",
+    "{name} coast",
+    "{name} mountains",
+    "{name} village",
+    "{name} aerial landscape"
+   ]
+  },
   "destination-hero": {
    "role": "destination-portrait",
    "min_width": 1800,
@@ -298,6 +314,506 @@
     "empty street dawn",
     "quiet cafe Europe"
    ]
+  },
+  {
+   "purpose": "country-hero@albania",
+   "slot": "country-hero",
+   "target": "albania",
+   "key": "country:albania",
+   "path": "/europe/albania",
+   "surface": "The opening band of the Albania country page — a full-width photograph above the name.",
+   "country": "albania",
+   "country_name": "Albania"
+  },
+  {
+   "purpose": "country-hero@andorra",
+   "slot": "country-hero",
+   "target": "andorra",
+   "key": "country:andorra",
+   "path": "/europe/andorra",
+   "surface": "The opening band of the Andorra country page — a full-width photograph above the name.",
+   "country": "andorra",
+   "country_name": "Andorra"
+  },
+  {
+   "purpose": "country-hero@armenia",
+   "slot": "country-hero",
+   "target": "armenia",
+   "key": "country:armenia",
+   "path": "/europe/armenia",
+   "surface": "The opening band of the Armenia country page — a full-width photograph above the name.",
+   "country": "armenia",
+   "country_name": "Armenia"
+  },
+  {
+   "purpose": "country-hero@austria",
+   "slot": "country-hero",
+   "target": "austria",
+   "key": "country:austria",
+   "path": "/europe/austria",
+   "surface": "The opening band of the Austria country page — a full-width photograph above the name.",
+   "country": "austria",
+   "country_name": "Austria"
+  },
+  {
+   "purpose": "country-hero@azerbaijan",
+   "slot": "country-hero",
+   "target": "azerbaijan",
+   "key": "country:azerbaijan",
+   "path": "/europe/azerbaijan",
+   "surface": "The opening band of the Azerbaijan country page — a full-width photograph above the name.",
+   "country": "azerbaijan",
+   "country_name": "Azerbaijan"
+  },
+  {
+   "purpose": "country-hero@belarus",
+   "slot": "country-hero",
+   "target": "belarus",
+   "key": "country:belarus",
+   "path": "/europe/belarus",
+   "surface": "The opening band of the Belarus country page — a full-width photograph above the name.",
+   "country": "belarus",
+   "country_name": "Belarus"
+  },
+  {
+   "purpose": "country-hero@belgium",
+   "slot": "country-hero",
+   "target": "belgium",
+   "key": "country:belgium",
+   "path": "/europe/belgium",
+   "surface": "The opening band of the Belgium country page — a full-width photograph above the name.",
+   "country": "belgium",
+   "country_name": "Belgium"
+  },
+  {
+   "purpose": "country-hero@bosnia-and-herzegovina",
+   "slot": "country-hero",
+   "target": "bosnia-and-herzegovina",
+   "key": "country:bosnia-and-herzegovina",
+   "path": "/europe/bosnia-and-herzegovina",
+   "surface": "The opening band of the Bosnia and Herzegovina country page — a full-width photograph above the name.",
+   "country": "bosnia-and-herzegovina",
+   "country_name": "Bosnia and Herzegovina"
+  },
+  {
+   "purpose": "country-hero@bulgaria",
+   "slot": "country-hero",
+   "target": "bulgaria",
+   "key": "country:bulgaria",
+   "path": "/europe/bulgaria",
+   "surface": "The opening band of the Bulgaria country page — a full-width photograph above the name.",
+   "country": "bulgaria",
+   "country_name": "Bulgaria"
+  },
+  {
+   "purpose": "country-hero@croatia",
+   "slot": "country-hero",
+   "target": "croatia",
+   "key": "country:croatia",
+   "path": "/europe/croatia",
+   "surface": "The opening band of the Croatia country page — a full-width photograph above the name.",
+   "country": "croatia",
+   "country_name": "Croatia"
+  },
+  {
+   "purpose": "country-hero@cyprus",
+   "slot": "country-hero",
+   "target": "cyprus",
+   "key": "country:cyprus",
+   "path": "/europe/cyprus",
+   "surface": "The opening band of the Cyprus country page — a full-width photograph above the name.",
+   "country": "cyprus",
+   "country_name": "Cyprus"
+  },
+  {
+   "purpose": "country-hero@czechia",
+   "slot": "country-hero",
+   "target": "czechia",
+   "key": "country:czechia",
+   "path": "/europe/czechia",
+   "surface": "The opening band of the Czechia country page — a full-width photograph above the name.",
+   "country": "czechia",
+   "country_name": "Czechia"
+  },
+  {
+   "purpose": "country-hero@denmark",
+   "slot": "country-hero",
+   "target": "denmark",
+   "key": "country:denmark",
+   "path": "/europe/denmark",
+   "surface": "The opening band of the Denmark country page — a full-width photograph above the name.",
+   "country": "denmark",
+   "country_name": "Denmark"
+  },
+  {
+   "purpose": "country-hero@estonia",
+   "slot": "country-hero",
+   "target": "estonia",
+   "key": "country:estonia",
+   "path": "/europe/estonia",
+   "surface": "The opening band of the Estonia country page — a full-width photograph above the name.",
+   "country": "estonia",
+   "country_name": "Estonia"
+  },
+  {
+   "purpose": "country-hero@finland",
+   "slot": "country-hero",
+   "target": "finland",
+   "key": "country:finland",
+   "path": "/europe/finland",
+   "surface": "The opening band of the Finland country page — a full-width photograph above the name.",
+   "country": "finland",
+   "country_name": "Finland"
+  },
+  {
+   "purpose": "country-hero@france",
+   "slot": "country-hero",
+   "target": "france",
+   "key": "country:france",
+   "path": "/europe/france",
+   "surface": "The opening band of the France country page — a full-width photograph above the name.",
+   "country": "france",
+   "country_name": "France"
+  },
+  {
+   "purpose": "country-hero@georgia",
+   "slot": "country-hero",
+   "target": "georgia",
+   "key": "country:georgia",
+   "path": "/europe/georgia",
+   "surface": "The opening band of the Georgia country page — a full-width photograph above the name.",
+   "country": "georgia",
+   "country_name": "Georgia"
+  },
+  {
+   "purpose": "country-hero@germany",
+   "slot": "country-hero",
+   "target": "germany",
+   "key": "country:germany",
+   "path": "/europe/germany",
+   "surface": "The opening band of the Germany country page — a full-width photograph above the name.",
+   "country": "germany",
+   "country_name": "Germany"
+  },
+  {
+   "purpose": "country-hero@greece",
+   "slot": "country-hero",
+   "target": "greece",
+   "key": "country:greece",
+   "path": "/europe/greece",
+   "surface": "The opening band of the Greece country page — a full-width photograph above the name.",
+   "country": "greece",
+   "country_name": "Greece"
+  },
+  {
+   "purpose": "country-hero@hungary",
+   "slot": "country-hero",
+   "target": "hungary",
+   "key": "country:hungary",
+   "path": "/europe/hungary",
+   "surface": "The opening band of the Hungary country page — a full-width photograph above the name.",
+   "country": "hungary",
+   "country_name": "Hungary"
+  },
+  {
+   "purpose": "country-hero@iceland",
+   "slot": "country-hero",
+   "target": "iceland",
+   "key": "country:iceland",
+   "path": "/europe/iceland",
+   "surface": "The opening band of the Iceland country page — a full-width photograph above the name.",
+   "country": "iceland",
+   "country_name": "Iceland"
+  },
+  {
+   "purpose": "country-hero@ireland",
+   "slot": "country-hero",
+   "target": "ireland",
+   "key": "country:ireland",
+   "path": "/europe/ireland",
+   "surface": "The opening band of the Ireland country page — a full-width photograph above the name.",
+   "country": "ireland",
+   "country_name": "Ireland"
+  },
+  {
+   "purpose": "country-hero@italy",
+   "slot": "country-hero",
+   "target": "italy",
+   "key": "country:italy",
+   "path": "/europe/italy",
+   "surface": "The opening band of the Italy country page — a full-width photograph above the name.",
+   "country": "italy",
+   "country_name": "Italy"
+  },
+  {
+   "purpose": "country-hero@kosovo",
+   "slot": "country-hero",
+   "target": "kosovo",
+   "key": "country:kosovo",
+   "path": "/europe/kosovo",
+   "surface": "The opening band of the Kosovo country page — a full-width photograph above the name.",
+   "country": "kosovo",
+   "country_name": "Kosovo"
+  },
+  {
+   "purpose": "country-hero@latvia",
+   "slot": "country-hero",
+   "target": "latvia",
+   "key": "country:latvia",
+   "path": "/europe/latvia",
+   "surface": "The opening band of the Latvia country page — a full-width photograph above the name.",
+   "country": "latvia",
+   "country_name": "Latvia"
+  },
+  {
+   "purpose": "country-hero@liechtenstein",
+   "slot": "country-hero",
+   "target": "liechtenstein",
+   "key": "country:liechtenstein",
+   "path": "/europe/liechtenstein",
+   "surface": "The opening band of the Liechtenstein country page — a full-width photograph above the name.",
+   "country": "liechtenstein",
+   "country_name": "Liechtenstein"
+  },
+  {
+   "purpose": "country-hero@lithuania",
+   "slot": "country-hero",
+   "target": "lithuania",
+   "key": "country:lithuania",
+   "path": "/europe/lithuania",
+   "surface": "The opening band of the Lithuania country page — a full-width photograph above the name.",
+   "country": "lithuania",
+   "country_name": "Lithuania"
+  },
+  {
+   "purpose": "country-hero@luxembourg",
+   "slot": "country-hero",
+   "target": "luxembourg",
+   "key": "country:luxembourg",
+   "path": "/europe/luxembourg",
+   "surface": "The opening band of the Luxembourg country page — a full-width photograph above the name.",
+   "country": "luxembourg",
+   "country_name": "Luxembourg"
+  },
+  {
+   "purpose": "country-hero@malta",
+   "slot": "country-hero",
+   "target": "malta",
+   "key": "country:malta",
+   "path": "/europe/malta",
+   "surface": "The opening band of the Malta country page — a full-width photograph above the name.",
+   "country": "malta",
+   "country_name": "Malta"
+  },
+  {
+   "purpose": "country-hero@moldova",
+   "slot": "country-hero",
+   "target": "moldova",
+   "key": "country:moldova",
+   "path": "/europe/moldova",
+   "surface": "The opening band of the Moldova country page — a full-width photograph above the name.",
+   "country": "moldova",
+   "country_name": "Moldova"
+  },
+  {
+   "purpose": "country-hero@monaco",
+   "slot": "country-hero",
+   "target": "monaco",
+   "key": "country:monaco",
+   "path": "/europe/monaco",
+   "surface": "The opening band of the Monaco country page — a full-width photograph above the name.",
+   "country": "monaco",
+   "country_name": "Monaco"
+  },
+  {
+   "purpose": "country-hero@montenegro",
+   "slot": "country-hero",
+   "target": "montenegro",
+   "key": "country:montenegro",
+   "path": "/europe/montenegro",
+   "surface": "The opening band of the Montenegro country page — a full-width photograph above the name.",
+   "country": "montenegro",
+   "country_name": "Montenegro"
+  },
+  {
+   "purpose": "country-hero@netherlands",
+   "slot": "country-hero",
+   "target": "netherlands",
+   "key": "country:netherlands",
+   "path": "/europe/netherlands",
+   "surface": "The opening band of the Netherlands country page — a full-width photograph above the name.",
+   "country": "netherlands",
+   "country_name": "Netherlands"
+  },
+  {
+   "purpose": "country-hero@north-macedonia",
+   "slot": "country-hero",
+   "target": "north-macedonia",
+   "key": "country:north-macedonia",
+   "path": "/europe/north-macedonia",
+   "surface": "The opening band of the North Macedonia country page — a full-width photograph above the name.",
+   "country": "north-macedonia",
+   "country_name": "North Macedonia"
+  },
+  {
+   "purpose": "country-hero@norway",
+   "slot": "country-hero",
+   "target": "norway",
+   "key": "country:norway",
+   "path": "/europe/norway",
+   "surface": "The opening band of the Norway country page — a full-width photograph above the name.",
+   "country": "norway",
+   "country_name": "Norway"
+  },
+  {
+   "purpose": "country-hero@poland",
+   "slot": "country-hero",
+   "target": "poland",
+   "key": "country:poland",
+   "path": "/europe/poland",
+   "surface": "The opening band of the Poland country page — a full-width photograph above the name.",
+   "country": "poland",
+   "country_name": "Poland"
+  },
+  {
+   "purpose": "country-hero@portugal",
+   "slot": "country-hero",
+   "target": "portugal",
+   "key": "country:portugal",
+   "path": "/europe/portugal",
+   "surface": "The opening band of the Portugal country page — a full-width photograph above the name.",
+   "country": "portugal",
+   "country_name": "Portugal"
+  },
+  {
+   "purpose": "country-hero@romania",
+   "slot": "country-hero",
+   "target": "romania",
+   "key": "country:romania",
+   "path": "/europe/romania",
+   "surface": "The opening band of the Romania country page — a full-width photograph above the name.",
+   "country": "romania",
+   "country_name": "Romania"
+  },
+  {
+   "purpose": "country-hero@russia",
+   "slot": "country-hero",
+   "target": "russia",
+   "key": "country:russia",
+   "path": "/europe/russia",
+   "surface": "The opening band of the Russia country page — a full-width photograph above the name.",
+   "country": "russia",
+   "country_name": "Russia"
+  },
+  {
+   "purpose": "country-hero@san-marino",
+   "slot": "country-hero",
+   "target": "san-marino",
+   "key": "country:san-marino",
+   "path": "/europe/san-marino",
+   "surface": "The opening band of the San Marino country page — a full-width photograph above the name.",
+   "country": "san-marino",
+   "country_name": "San Marino"
+  },
+  {
+   "purpose": "country-hero@serbia",
+   "slot": "country-hero",
+   "target": "serbia",
+   "key": "country:serbia",
+   "path": "/europe/serbia",
+   "surface": "The opening band of the Serbia country page — a full-width photograph above the name.",
+   "country": "serbia",
+   "country_name": "Serbia"
+  },
+  {
+   "purpose": "country-hero@slovakia",
+   "slot": "country-hero",
+   "target": "slovakia",
+   "key": "country:slovakia",
+   "path": "/europe/slovakia",
+   "surface": "The opening band of the Slovakia country page — a full-width photograph above the name.",
+   "country": "slovakia",
+   "country_name": "Slovakia"
+  },
+  {
+   "purpose": "country-hero@slovenia",
+   "slot": "country-hero",
+   "target": "slovenia",
+   "key": "country:slovenia",
+   "path": "/europe/slovenia",
+   "surface": "The opening band of the Slovenia country page — a full-width photograph above the name.",
+   "country": "slovenia",
+   "country_name": "Slovenia"
+  },
+  {
+   "purpose": "country-hero@spain",
+   "slot": "country-hero",
+   "target": "spain",
+   "key": "country:spain",
+   "path": "/europe/spain",
+   "surface": "The opening band of the Spain country page — a full-width photograph above the name.",
+   "country": "spain",
+   "country_name": "Spain"
+  },
+  {
+   "purpose": "country-hero@sweden",
+   "slot": "country-hero",
+   "target": "sweden",
+   "key": "country:sweden",
+   "path": "/europe/sweden",
+   "surface": "The opening band of the Sweden country page — a full-width photograph above the name.",
+   "country": "sweden",
+   "country_name": "Sweden"
+  },
+  {
+   "purpose": "country-hero@switzerland",
+   "slot": "country-hero",
+   "target": "switzerland",
+   "key": "country:switzerland",
+   "path": "/europe/switzerland",
+   "surface": "The opening band of the Switzerland country page — a full-width photograph above the name.",
+   "country": "switzerland",
+   "country_name": "Switzerland"
+  },
+  {
+   "purpose": "country-hero@turkiye",
+   "slot": "country-hero",
+   "target": "turkiye",
+   "key": "country:turkiye",
+   "path": "/europe/turkiye",
+   "surface": "The opening band of the Türkiye country page — a full-width photograph above the name.",
+   "country": "turkiye",
+   "country_name": "Türkiye"
+  },
+  {
+   "purpose": "country-hero@ukraine",
+   "slot": "country-hero",
+   "target": "ukraine",
+   "key": "country:ukraine",
+   "path": "/europe/ukraine",
+   "surface": "The opening band of the Ukraine country page — a full-width photograph above the name.",
+   "country": "ukraine",
+   "country_name": "Ukraine"
+  },
+  {
+   "purpose": "country-hero@united-kingdom",
+   "slot": "country-hero",
+   "target": "united-kingdom",
+   "key": "country:united-kingdom",
+   "path": "/europe/united-kingdom",
+   "surface": "The opening band of the United Kingdom country page — a full-width photograph above the name.",
+   "country": "united-kingdom",
+   "country_name": "United Kingdom"
+  },
+  {
+   "purpose": "country-hero@vatican-city",
+   "slot": "country-hero",
+   "target": "vatican-city",
+   "key": "country:vatican-city",
+   "path": "/europe/vatican-city",
+   "surface": "The opening band of the Vatican City country page — a full-width photograph above the name.",
+   "country": "vatican-city",
+   "country_name": "Vatican City"
   },
   {
    "purpose": "destination-hero@albania/the-albanian-alps/theth",

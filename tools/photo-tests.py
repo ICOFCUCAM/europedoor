@@ -70,6 +70,7 @@ def check(name, cond, detail=""):
 # no binary.
 
 PHOTO_ID = "2014422"
+PHOTO2_ID = "3110000"
 STUB = {}
 
 
@@ -135,6 +136,15 @@ class Handler(http.server.BaseHTTPRequestHandler):
             body["src"]["original"] = body["src"]["original"].replace(
                 "/original.jpg", "/notajpeg.bin")
             return self._json(body)
+        if self.path.startswith("/photos/" + PHOTO2_ID):
+            return self._json(STUB["meta2"])
+        if self.path.startswith("/original2.jpg"):
+            self.send_response(200)
+            self.send_header("Content-Type", "image/jpeg")
+            self.send_header("Content-Length", str(len(STUB["jpeg2"])))
+            self.end_headers()
+            self.wfile.write(STUB["jpeg2"])
+            return
         if self.path.startswith("/photos/"):
             self.send_response(404)
             self.end_headers()
@@ -255,6 +265,10 @@ def main(argv):
     # Large enough to clear the ten-kilobyte floor and the wrong size, which
     # is exactly the case the floor cannot see.
     STUB["small"] = _jpeg(1200, 675)
+    # A SECOND PHOTOGRAPH, BECAUSE ONE ID MAY NOT FILL TWO SURFACES. The
+    # register refuses that in both directions and this suite asserts both,
+    # so exercising a slot instance needs its own id and its own bytes.
+    STUB["jpeg2"] = _jpeg(2600, 1300)
     STUB["notajpeg"] = b"\x89PNG\r\n\x1a\n" + b"\0" * 40000
     STUB["meta"] = {
         "id": int(PHOTO_ID), "width": 2560, "height": 1440,
@@ -263,6 +277,15 @@ def main(argv):
         "photographer_url": "https://www.pexels.com/@stub",
         "alt": "a generated test pattern",
         "src": {"original": base + "/original.jpg",
+                "large2x": base + "/preview.jpg"},
+    }
+    STUB["meta2"] = {
+        "id": int(PHOTO2_ID), "width": 2600, "height": 1300,
+        "url": "https://www.pexels.com/photo/stub-3110000/",
+        "photographer": "Second Stub Photographer",
+        "photographer_url": "https://www.pexels.com/@stub2",
+        "alt": "a second generated test pattern",
+        "src": {"original": base + "/original2.jpg",
                 "large2x": base + "/preview.jpg"},
     }
     env = {"PEXELS_API_BASE": base, "PEXELS_API_KEY": "stub-key-not-a-secret"}
@@ -283,7 +306,14 @@ def main(argv):
                 # `door-mountains` is the second-purpose test's own artefact
                 # and is cleaned up here for the same reason as the hero: a
                 # suite that writes into the repository owns taking it out.
-                if f.startswith("homepage-hero") or f.startswith("door-mountains"):
+                # AND A SLOT INSTANCE, whose stem carries an `@`. The list
+                # is a prefix match rather than a set of full names because a
+                # derivative's name is the stem plus a hash plus a width plus
+                # an extension — and a suite that writes into the repository
+                # owns taking it out, or the next run of checks.py finds an
+                # original with no register row and says so.
+                if (f.startswith("homepage-hero") or f.startswith("door-mountains")
+                        or f.startswith("country-hero@")):
                     os.remove(os.path.join(d, f))
         # AND site/ IS REBUILT, because these tests build it. Restoring the
         # register without rebuilding leaves the shipped homepage carrying an
@@ -300,6 +330,7 @@ def main(argv):
 
     try:
         A = ["scripts/images/acquire.py", "--provider", "pexels"]
+        A2 = list(A)
 
         # ── 2. an exact photo id is required ─────────────────────────
         r = run(A + ["--purpose", "homepage-hero", "--alt", "a test pattern image"], env)
@@ -483,6 +514,52 @@ def main(argv):
         check("the site builds with a photograph in it", b.returncode == 0,
               (b.stderr or "")[-200:])
 
+        # ── A SLOT INSTANCE, END TO END, ON A REAL PAGE ──────────────
+        #
+        # A CODE PATH NOTHING EXERCISES IS A CODE PATH NOTHING CHECKS, and
+        # this suite has now been caught by that rule twice: the focal point
+        # shipped as a `style="` attribute the CSP forbids, and two CSS rules
+        # for the photograph were dead the whole time. Both survived because
+        # the register was empty.
+        #
+        # The country band is the newest container and it renders NOTHING
+        # with no photograph, by design — so with an empty register it is
+        # exactly as unexercised as those were. This acquires one for a real
+        # country, derives it, rebuilds, and asserts the band is on that
+        # page and on no other.
+        r = run(A2 + ["--photo-id", PHOTO2_ID, "--purpose", "country-hero@austria",
+                      "--alt", "a test pattern standing in for a country"], env)
+        check("a slot instance acquires", r.returncode == 0,
+              (r.stdout + r.stderr)[-400:])
+        d2 = run(["scripts/images/derive.py", "country-hero@austria"], {})
+        check("a slot instance derives", d2.returncode == 0,
+              (d2.stdout + d2.stderr)[-400:])
+        b2 = run(["tools/build.py"], {})
+        check("the site builds with a country band in it", b2.returncode == 0,
+              (b2.stderr or "")[-200:])
+        at = os.path.join(ROOT, "site", "europe", "austria", "index.html")
+        austria = open(at, encoding="utf-8").read() if os.path.exists(at) else ""
+        check("the band renders on the country it was acquired for",
+              "countryband" in austria)
+        # AND THE PORTRAIT IS STILL THERE. The band is an addition, not a
+        # replacement: the country plate is this family's signature moment
+        # and it is what says which country the page is about.
+        check("and the country portrait is still on the page",
+              "countrymap" in austria)
+        # A photograph is a photograph and not a plate, on the page and in
+        # the markup: `picture()` returns a generated plate when the register
+        # has no row, and the band asks the register directly for exactly
+        # that reason.
+        check("the band carries a photograph rather than a plate",
+              "<picture" in austria and "countryband" in austria)
+        bt = os.path.join(ROOT, "site", "europe", "belgium", "index.html")
+        belgium = open(bt, encoding="utf-8").read() if os.path.exists(bt) else ""
+        check("and no band at all on a country with no photograph",
+              bool(belgium) and "countryband" not in belgium)
+        v2 = run(["tools/build.py", "check"], {})
+        check("the dataset still validates with a slot instance registered",
+              v2.returncode == 0, (v2.stdout + v2.stderr)[-300:])
+
         # ── 11. the hash can be re-verified, and a swap is caught ────
         # SCOPED TO THE PHOTOGRAPH CHECKS. Running the whole suite here would
         # also assert `safety.img_tags` is zero and the homepage is under its
@@ -528,7 +605,12 @@ def main(argv):
         check("both surfaces now name the same photograph",
               str(reg2.get("door-mountains", {}).get("provider_photo_id")) == PHOTO_ID
               and str(reg2.get("home-hero", {}).get("provider_photo_id")) == PHOTO_ID)
-        del reg2["door-mountains"]
+        # A CRASH HERE HID EVERY FAILURE THE RUN HAD ALREADY COLLECTED.
+        # `check()` gathers and the summary prints at the end, so a KeyError
+        # in the cleanup after a failed acquisition threw away the one line
+        # that said what went wrong. Same rule as the render suite: a red run
+        # that cannot say why is worse than a red one that can.
+        reg2.pop("door-mountains", None)
         with open(REGISTER, "w", encoding="utf-8") as fh:
             json.dump({"$comment": json.load(open(REGISTER + ".none", encoding="utf-8"))
                        ["$comment"] if False else

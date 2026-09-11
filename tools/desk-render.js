@@ -345,11 +345,19 @@ for (const width of [1280, 390]) {
   /* ── the library, scoped to a country ── */
   await page.click('[data-view="library"]');
   await page.waitForSelector("#lib .slotrow");
+  /* THE EXTENT IS READ OUT OF THE REGISTRY, NOT TYPED HERE. The first
+     version asserted the literal 593 and went red the day a fourth slot was
+     declared — which is an assertion pinning a NUMBER rather than the
+     promise, the fault this repository has recorded ten times. What matters
+     is that an unscoped count is the whole set's own extent and a scoped one
+     is not. */
+  const total = String(REG.purposes.length);
   const wide = (await page.textContent("#lib-count")) || "";
-  ok(/593/.test(wide), `${width}: the library count is not the whole set: ${wide}`);
+  ok(wide.includes(total),
+     `${width}: the library count is not the whole set (${total}): ${wide}`);
   await page.selectOption("#lib-country", "norway");
   const narrow = (await page.textContent("#lib-count")) || "";
-  ok(/Norway/.test(narrow) && !/593/.test(narrow),
+  ok(/Norway/.test(narrow) && !narrow.includes(total),
      `${width}: the scoped count still reports the whole set: ${narrow}`);
   const rows = await page.locator("#lib .slotrow").count();
   ok(rows > 0 && rows < 100, `${width}: Norway listed ${rows} slots`);

@@ -705,8 +705,15 @@ def load():
                       f"purpose {row['purpose']!r} is already claimed by "
                       f"{seen_purpose.get(row['purpose'])!r}")
             seen_purpose[row["purpose"]] = key
+        # EVERY SOURCE A SLOT CAN NAME, because `targets()` reads whichever
+        # key the slot declares — so adding `country-hero` added a
+        # requirement on every caller that hands this function a PARTIAL
+        # dataset, and this was the one that had one. It failed as a
+        # KeyError inside the validator rather than as a sentence, which is
+        # why `targets()` now says which key is missing.
         spec = imageslots.resolve(row.get("purpose") or "",
-                                  {"cities": index, "stories": stories}) \
+                                  {"cities": index, "stories": stories,
+                                   "countries": countries}) \
             if row.get("purpose") else None
         p.require(spec is not None, where,
                   f"purpose must be declared in data/image-purposes.json, or "

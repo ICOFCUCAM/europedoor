@@ -528,8 +528,9 @@
         "{name} village",
         "{name} aerial landscape"
       ],
-      "purposes_today": [],
-      "trigger": "A purpose exists for this the day a country page grows a photograph container. That is the largest family on the site with none — fifty pages of about seven thousand pixels each — and the decision it waits on is where a photograph sits against the country PORTRAIT, which is that family's signature moment today. See docs/media-desk-audit.md §7."
+      "purposes_today": [
+        "country-hero"
+      ]
     },
     "capital-city": {
       "does": "A capital as a place people live in rather than a monument they visit: one establishing frame, one street, one room or façade.",
@@ -782,6 +783,30 @@
         "rural road Europe"
       ],
       "search_reason": "A STORY'S NAME IS A TITLE AND NOT A SUBJECT. Every other templated slot can search for the entity it is about — Bergen, Hohensalzburg Fortress — and a story cannot: a provider has no photographs of “The languages with no relatives”. So the concepts are the editorial register the role describes, and the editor supplies the subject from the piece they have read. checks.py requires either a role whose concepts name the entity or a slot that declares its own and says why, because the alternative is 264 places searched with the same eight words — which is what `detail-texture` was doing until this check was written."
+    },
+    "country-hero": {
+      "role": "country-signature",
+      "targets": "countries",
+      "key": "country:{target}",
+      "surface": "The opening band of the {name} country page — a full-width photograph above the name.",
+      "min_width": 2000,
+      "orientation": "landscape",
+      "min_aspect": 1.5,
+      "max_aspect": 2.2,
+      "note": "What a whole country feels like, above its name. Never a single famous landmark and never a city skyline: a landmark is a place INSIDE the country and the capital has its own role. Fifty of these are seen one after another by a reader moving through /countries, so the SET is part of the brief exactly as it is for the four doors — different light, different season and different palette between neighbours. THE BAND IS AN ADDITION AND NOT A REPLACEMENT: the country portrait stays exactly where it is, because it is this family's signature moment and it is the thing that says which country the page is about. With no photograph there is no band at all, which is today's page unchanged — a slot waiting for a picture is honest and three hundred pixels of it is a hole.",
+      "container": {
+        "selector": ".countryband",
+        "min_aspect": 1.778,
+        "min_at": "declared",
+        "max_aspect": 2.333,
+        "max_at": "declared",
+        "declared": "`.countryband` is aspect-ratio 16/9 below 62rem and 21/9 above it, at every width, with nothing beside it deciding its height. That is why this container is measurable by arithmetic where `.placeband-art` is not: a slot whose crop is decided by a neighbour cannot be art-directed and cannot be checked."
+      },
+      "safe_area": {
+        "width": 0.808,
+        "height": 0.643,
+        "frame": 0.52
+      }
     }
   }
 }

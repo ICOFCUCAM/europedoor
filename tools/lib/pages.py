@@ -2917,8 +2917,39 @@ def country_page(data, c):
             f'budget or the pace and build it again.</p>'
             '</div></div>'
         )
+    # THE COUNTRY BAND, AND IT IS AN ADDITION RATHER THAN A REPLACEMENT.
+    #
+    # Fifty country pages were the largest family on this site with no
+    # photograph anywhere — seven thousand pixels each, and the page a reader
+    # most often arrives on from a search for "Austria travel". The brief
+    # that named it calls this the country SIGNATURE: what a whole country
+    # feels like, above its name.
+    #
+    # What it must not do is take the portrait's place. The country plate is
+    # this family's signature moment and it is the thing that says which
+    # country the page is about; a photograph replacing it would be the /map
+    # failure, where a page went on stating a claim about a drawing that was
+    # no longer there. So the band sits ABOVE the head and the portrait stays
+    # exactly where it is.
+    #
+    # AND WITH NO PHOTOGRAPH THERE IS NO BAND AT ALL — not an empty frame,
+    # not a plate. `picture()` returns a generated plate when the register
+    # has no row, which is right on a card and wrong here for the reason the
+    # homepage already records: a slot waiting for a picture is honest and
+    # three hundred pixels of one is a hole. So this asks the register
+    # directly, exactly as the hero does.
+    crow = (data.get("images") or {}).get(f"country:{c['slug']}")
+    band = ""
+    if crow:
+        band = (
+            '<figure class="countryband">'
+            + picture(data.get("images"), f"country:{c['slug']}",
+                      w=2400, h=1030, alt=crow["alt"], eager=True,
+                      sizes="100vw")
+            + "</figure>")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)), (c["name"], None)])}
+{band}
 <div class="pagehead overture portraithead">
   <div class="portraitsay">
     <p class="kicker">{esc(m['name'])}</p>

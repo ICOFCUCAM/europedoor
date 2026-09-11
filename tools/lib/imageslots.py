@@ -17,16 +17,19 @@ and an instance. That is what this module is.
     resolve(name, data)          a spec for `slot@target` OR a declared purpose
     names(data)                  every purpose that could exist today
 
-THREE TEMPLATES, AND NOT TWELVE, BECAUSE A SLOT NOBODY CAN FILL IS THE THING
-`$requirements` ALREADY REFUSES. The brief lists twelve slot families across
-six page families. This site renders a photograph in exactly four places —
-`.herofull.shot`, `.way.shot`, `.iheroart.shot` and `.card-art` — and only
-three of those vary per entity: a destination, a place inside a destination,
-and a story. A country page, a region page, an experience and a journey have
-no photograph container in the markup at all, so declaring `country.hero`
-would be declaring a slot that cannot be filled and cannot be checked. The
-note against `/plan` in that file says the same thing in one sentence: the
-honest answer is no slot rather than a slot nobody should fill.
+FOUR TEMPLATES NOW, AND EACH ONE ARRIVED WITH A CONTAINER RATHER THAN BEFORE
+ONE. A slot nobody can fill is the thing `$requirements` refuses: this site
+renders a photograph only where the markup has somewhere to put it, so
+declaring `country-hero` meant BUILDING the country band first and declaring
+the slot second. Three of the four vary per entity — a destination, a place
+inside one, a story — and the fourth is the country, which was the largest
+family on the site with no photograph anywhere: fifty pages of about seven
+thousand pixels each.
+
+A region page, an experience and a journey still have none, and their roles
+carry a trigger naming the container that would create a purpose. The note
+against `/plan` says the same thing in one sentence: the honest answer is no
+slot rather than a slot nobody should fill.
 
 THE INSTANCE NAME CARRIES BOTH HALVES. `destination-hero@france/the-alps/
 chamonix` says which template and which entity, and the register key is
@@ -43,6 +46,18 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 SPEC = os.path.join(ROOT, "data", "image-purposes.json")
 
 SEP = "@"
+
+# WHICH DATASET KEY EACH SOURCE READS, because they are not the same word.
+# `places` is derived from `cities` rather than being a key of its own, so a
+# guard written against the source NAME reported a missing `places` on a
+# dataset that had everything it needed. Stated once, here, rather than
+# inferred at each use.
+SOURCE_KEY = {
+    "countries": "countries",
+    "cities": "cities",
+    "places": "cities",
+    "stories": "stories",
+}
 
 
 def _doc():
@@ -70,6 +85,20 @@ def targets(slot, data):
     places" on thirteen cards.
     """
     kind = slot.get("targets")
+    # A MISSING SOURCE MUST SAY SO IN WORDS. Several callers hand this module
+    # a PARTIAL dataset — the validator builds one from two indexes — so a
+    # slot naming a source that caller did not include used to surface as a
+    # bare KeyError from inside a loop, with nothing saying which key or
+    # which slot. Adding `country-hero` produced exactly that.
+    need = SOURCE_KEY.get(kind)
+    if need and need not in data:
+        raise KeyError(
+            f"slot targets {kind!r}, which reads data[{need!r}], and the "
+            f"dataset handed to imageslots has no {need!r} — a caller "
+            f"building a partial dataset has to include every source a slot "
+            f"can name")
+    if kind == "countries":
+        return sorted(data["countries"])
     if kind == "cities":
         return sorted(data["cities"])
     if kind == "places":
@@ -87,6 +116,8 @@ def label(slot_name, target, data):
     """What a person calls this instance — the entity's own name."""
     slot = slots()[slot_name]
     kind = slot.get("targets")
+    if kind == "countries":
+        return data["countries"][target]["name"]
     if kind == "cities":
         n = data["cities"][target]
         return f"{n['city']['name']}, {n['country']['name']}"
@@ -109,6 +140,8 @@ def path(slot_name, target, data):
     """The page this instance is published on."""
     slot = slots()[slot_name]
     kind = slot.get("targets")
+    if kind == "countries":
+        return "/europe/" + target
     if kind == "cities":
         return "/europe/" + target
     if kind == "places":
