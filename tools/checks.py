@@ -4069,30 +4069,59 @@ def c_warn_is_a_warning():
     collision one level up: not two colours that look alike, but one colour
     doing two jobs.
 
-    The stylesheet cannot enforce this — `.note.warn` is a class a page
-    chooses. So this counts the panels in the OUTPUT and asserts that the
-    tinted one is rare and that the provenance one is not, which is the shape
-    of the failure rather than a list of allowed headings.
+    AND THE PROVENANCE PASS REACHED 262 PANELS AND MISSED 465 MORE. It gave
+    the heritage rule to five call sites and left the rest on --sea, the
+    INTERACTIVE colour — including the 445 destination pages saying we list
+    neither hotels nor restaurants, the 130 region pages saying why food and
+    practicalities are on the country page, and the seventeen interest pages
+    explaining that their own tag is too wide to be a filter. Every one of
+    those is a statement about what this atlas holds, refuses to hold, or has
+    not built.
+
+    So the DEFAULT is provenance now, because a default should be the common
+    case, and the exceptions are the two rare kinds: `.warn` for a panel that
+    is meant to stop you, and `.onward` for one that hands a reader to
+    another surface and may wear the interactive colour. `.sourced` is gone
+    rather than kept as a synonym for the default.
+
+    The stylesheet cannot enforce which class a page chooses, so this counts
+    the panels in the OUTPUT and asserts the shape of the failure: both
+    exceptions rare, neither at zero, and — read off the stylesheet — the
+    default still bound to the provenance token rather than to the
+    interactive one. A count of classes cannot see a colour swap.
     """
     n = 0
-    warn = sourced = 0
+    warn = onward = plain = 0
     for f in site_files():
         h = open(f, encoding="utf-8").read()
         warn += h.count('class="note warn"')
-        sourced += h.count('class="note sourced"')
+        onward += len(re.findall(r'class="note onward\b', h))
+        plain += len(re.findall(r'class="note(?: mt7)?"', h))
         n += 1
     if warn > 12:
         fail(f"{warn} pages carry the advisory panel. It is for a government "
              f"travel advisory and a planner that could not build a route; "
-             f"provenance and policy are `note sourced`, in the heritage "
+             f"provenance and policy are the plain `note`, in the heritage "
              f"accent. At this count the tint has stopped meaning anything")
     if warn < 1:
         fail("no page carries the advisory panel — the advisory countries "
              "still exist and their pages still have to say so")
-    if sourced < 200:
-        fail(f"only {sourced} pages carry a provenance note, and 255 place "
-             f"pages state what this atlas does not hold about a place. A "
-             f"policy that stops being stated is a policy nobody can check")
+    if onward > 60:
+        fail(f"{onward} pages carry the onward panel, which wears the "
+             f"INTERACTIVE colour. It is for a note that hands a reader to "
+             f"another surface, and at this count it has become the default "
+             f"again by the back door")
+    if plain < 400:
+        fail(f"only {plain} pages carry a provenance note, and 445 place "
+             f"pages alone state what this atlas refuses to list. A policy "
+             f"that stops being stated is a policy nobody can check")
+    css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
+               encoding="utf-8").read()
+    if not re.search(r"^\.note \{ border-left-color: var\(--provenance\); \}",
+                     css, re.M):
+        fail("the plain note is no longer bound to --provenance. 843 pages "
+             "state what this atlas does not hold, and --sea is the colour "
+             "of things a reader can act on")
     return n
 
 

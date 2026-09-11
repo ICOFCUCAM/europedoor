@@ -5926,7 +5926,7 @@ def place_page(data, c, r, t, pl):
 
 <div>
   <div>
-    <div class="note sourced">
+    <div class="note">
       <h2 class="mini">We do not hold opening hours, prices or a website for this</h2>
       <p>Those are the three fields that go stale fastest and the three you are most damaged
       by being wrong about, so this site does not carry them at all rather than carrying an
@@ -6561,7 +6561,7 @@ def fund_index(data):
   {len(data['fund'])} projects, listed publicly, with the local partner named on each.</p>
 </div>
 
-<div class="note sourced">
+<div class="note">
   <h2 class="mini">The Fund holds no money, and will not until three things are true</h2>
   <p>There is an operating entity; a regulated payment path with a named payee; and a written
   answer on how contributions are treated in each country we would collect in. Until then this
@@ -8533,7 +8533,7 @@ def method_page(data):
 {section("Discoverability", f'<div class="rows">{discrows}</div>', id="discoverability",
          lede="A second, separate score, used by Discover Mode and by Beyond the Obvious. It answers one narrow question: how far is this place from being the obvious choice?")}
 
-<div class="note sourced">
+<div class="note">
   <h2 class="mini">What discoverability is not</h2>
   <p><strong>It is not a crowd measurement.</strong> We hold no visitor numbers, no search
   volume and no occupancy data for anywhere in Europe — every product that sells those is
@@ -9142,7 +9142,7 @@ def freshness_page(data):
   rather than left to be assumed.</p>
 </div>
 
-<div class="note sourced">
+<div class="note">
   <h2 class="mini">What "unverified" means here</h2>
   <p>The entry was written editorially by someone who knows the place. It is a considered
   first draft, not a citation-backed reference, and no one has yet gone back through it
@@ -9988,7 +9988,7 @@ def motion_page(data, m):
 {section("Journeys that go this way", f'<div class="rows journeyrows">{jrelated}</div>') if jrows else ""}
 {section("Themes that run through it", f'<div class="rows">{trelated}</div>') if trows else ""}
 
-<div class="note mt7">
+<div class="note onward mt7">
   <h2 class="mini">Build this into a route</h2>
   <p>The Journey Planner weights the same tags this page queries on, so choosing
   {esc(and_list([data["interests"][w]["name"] for w in m.get("interests", [])]) or "these interests")}
@@ -10268,7 +10268,7 @@ def _plain(title, kicker, lede, blocks, *, path, description, crumb):
     return f"{path}/index.html", page(title, body, path=path, area=None, description=description)
 
 
-PRELAUNCH = """<div class="note sourced">
+PRELAUNCH = """<div class="note">
   <h2 class="mini">This is a pre-launch draft, and it says so rather than pretending</h2>
   <p>There is no incorporated company behind EuropeDoor yet, so there is no legal person to
   be bound by this document and no data controller to be accountable under it. What follows

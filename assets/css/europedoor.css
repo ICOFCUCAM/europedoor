@@ -1130,8 +1130,34 @@ main.wide { max-width: 92rem; }
    A warning keeps the tinted ground, because a warning is meant to stop
    you. A provenance note is an ordinary note with the heritage rule down
    its edge — the same green as /method, /sources and /fund. */
+/* AND THE PROVENANCE PASS REACHED 262 PANELS AND MISSED 465 THAT SAY THE
+   SAME KIND OF THING. Counted in the shipped HTML after that commit, the
+   notes still carrying the INTERACTIVE colour were:
+
+       445   "EuropeDoor lists neither, yet — both are business listings
+              rather than editorial entries, and all three things they need
+              are blocked on the same thing as everything else commercial"
+       130   "Food, events and practicalities are on the country page"
+        17   "Why this page tells you its own tag is wide"
+        12   "Build this into a route"
+         6   what a facet page is, what the AI rule is, what this drawing is
+
+   Every one of those except "Build this into a route" is a statement about
+   what this atlas holds, refuses to hold, or has not built — which is the
+   heritage accent's stated home. --sea is the INTERACTIVE colour: links,
+   focus rings, the thing you can act on. It was edging a panel that says we
+   will not list restaurants, on 445 destination pages.
+
+   SO THE DEFAULT IS THE COMMON CASE, which is what a default is for. A note
+   here is provenance unless it says otherwise; `.onward` is the one that
+   hands a reader to another surface and takes the interactive colour, and
+   `.warn` keeps the tinted ground because a warning is meant to stop you.
+   `.sourced` is gone rather than kept as a synonym for the default: a second
+   name for one thing is two things waiting to disagree, which is the same
+   sentence this stylesheet just wrote about --atlas-context. */
+.note { border-left-color: var(--provenance); }
 .note.warn { border-left-color: var(--warn); background: var(--warn-bg); }
-.note.sourced { border-left-color: var(--provenance); }
+.note.onward { border-left-color: var(--sea); }
 .note h3 { font-size: var(--t-md); margin-bottom: var(--s2); }
 
 /* ── the itinerary/leg timeline ───────────────────────────── */
