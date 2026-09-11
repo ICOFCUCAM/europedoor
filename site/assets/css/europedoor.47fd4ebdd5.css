@@ -182,11 +182,36 @@
      Measured: the four steps are 1.53 to 1.86 apart, which is a ramp you
      can see and not a set of stripes; limestone against the deep is 10.4:1,
      so the aperture reads by tone again as well as by its cut edge. */
-  --ocean-deep:    #123f55;
-  --ocean-mid:     #28657a;
-  --ocean-shallow: #5d91a0;
-  --ocean-coastal: #8eb2b5;
-  --atlas-sea:     #123f55;
+  /* AND THE RAMP DRIFTED TOWARD CYAN-GREEN AS IT LIGHTENED, WHICH IS THE
+     ONE DIRECTION IT MUST NOT GO. Measured on the values it held:
+
+         step             hue  sat  light
+         deep             200   65   20     <- the most saturated colour here
+         mid              195   51   32
+         shallow          193   26   50
+         coastal          185   21   63     <- teal, 17 degrees off the deep
+
+     Two faults. The deep was 65% saturated, which made a flat teal covering
+     the whole Atlantic the loudest thing in an atlas that says height is
+     FELT and the typography dominates. And the hue walked toward green as
+     the water lightened, so the shallow step — the one that meets the
+     shore — was the furthest from both the deep water and the warm land it
+     touches. Against a land family at 14-20% saturation that pairing is the
+     muddiest one available: khaki against teal.
+
+     One hue now, 205 to 202, which is the graphite's own family rather than
+     a teal beside it. Saturation FALLS as the water lightens, 58 to 22, so
+     the water quietens toward the shore instead of shouting at it. The
+     lightness ramp is what carries the reading, exactly as it does on the
+     land: steps of 1.63, 1.98 and 1.62 against 1.73, 1.86 and 1.53 before.
+     Limestone measures 11.32 on the deep against 10.40, so the aperture
+     reads by tone MORE than it did, and the land clears the water at 8.61
+     against 7.91. Every number moved the right way. */
+  --ocean-deep:    #153851;
+  --ocean-mid:     #2c5977;
+  --ocean-shallow: #5789a8;
+  --ocean-coastal: #95adbb;
+  --atlas-sea:     #153851;
   /* LAND IS ONE FAMILY, AND THE SUBJECT IS THE BRIGHTEST OF IT. The subject
      used to be a light blue, which worked against pale water and reads as
      SEA against an Atlantic one — Greece came out the same family of blue as

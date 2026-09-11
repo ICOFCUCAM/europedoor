@@ -48,10 +48,10 @@ compositions that earn it rather than being the default for all 824 figures.
 
 ## The ocean, in four steps
 
-    Deep ocean     #123f55
-    Mid ocean      #28657a
-    Shallow water  #5d91a0
-    Coastal water  #8eb2b5
+    Deep ocean     #153851
+    Mid ocean      #2c5977
+    Shallow water  #5789a8
+    Coastal water  #95adbb
 
 A flat pale fill made the water a surface the land was pasted onto. These
 four are **cast, not stroked**: three soft shadows of the land silhouette,
@@ -60,6 +60,20 @@ widest and deepest first, so the water lightens as it approaches a shore.
 **It is distance from land, and never a claim about depth.** The coastline is
 the one thing that can tell us this, the atlas holds no bathymetry, and
 nothing here implies a number of metres.
+
+**And the ramp drifted toward cyan-green as it lightened, which is the one
+direction it must not go.** Measured on the values it held: deep 200°/65%,
+mid 195°/51%, shallow 193°/26%, coastal 185°/21%. Two faults. The deep was
+the most saturated colour in the atlas, so a flat teal covering the whole
+Atlantic was the loudest thing on a drawing that says height is *felt* and
+the typography dominates. And the hue walked toward green as the water
+lightened, so the step that meets the shore was the furthest from both the
+deep water and the warm land it touches — khaki against teal, which is the
+muddiest pair available. One hue now, 205° → 202°, the graphite's own family
+rather than a teal beside it, with saturation **falling** 58 → 22 as the
+water lightens. Steps of 1.63, 1.98 and 1.62 against 1.73, 1.86 and 1.53;
+limestone measures 11.32 on the deep against 10.40, and the land clears the
+water at 8.61 against 7.91.
 
 The first version was three `<use>` of the land group and **painted nothing at
 all**. A `<use>` shadow tree is still matched by the selectors that style the
