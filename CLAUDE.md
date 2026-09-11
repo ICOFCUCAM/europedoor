@@ -2491,6 +2491,133 @@ its proportions and the drawing became 288, the phone case had become the case
 the same block already makes an exception for, where a journey's route and a
 story's places get the whole width. The reason had expired and the rule had not.
 
+**A SEPARATION BETWEEN TWO TOKENS SAYS NOTHING ABOUT WHETHER EITHER IS
+PAINTED.** `docs/palette.json` declares `--map-land` against `--map-sea` at
+1.8 with the reason written out — *the land is a mass, not a hairline* — and
+`checks.py` recomputes that from the hexes in the stylesheet, so it has been
+green since the day it was written. **/discover drew all fifty countries with
+`fill: none`**: unfilled outlines at one pixel on `#0b0e11` under 319 dots, a
+wireframe continent on black, on the page whose whole job is to open one. The
+rule was older than its only user — written for a homepage hero map that was
+removed, where an outline WAS the look. Filling it then exposed the 52°E data
+cut as a hard diagonal, which is why that map now draws a fade it never
+needed: **with nothing filled, there was nothing to cut.** The browser suite
+reads the painted fill now, not the token.
+
+**THE SAME DEFECT TWICE, IN TWO COMPONENTS, BECAUSE ONE FIX DID NOT LOOK FOR
+THE OTHER.** Below 44rem the masthead's seven sections were one line that
+scrolled sideways and the rule's own comment called the mask fade "the
+affordance saying so": measured at 390, 552px of content in a 366px box, so
+**Plan, Stories and Events were wholly off-screen**, and at 320 Journeys was
+too. The reasoning that put them there was right about five of the seven and
+was applied to all seven — /discover, /plan and /my-europe are in the thumb
+bar, which appears at *the same breakpoint*, so hiding those three hides
+nothing. And `.sectionnav`, a destination's own contents row, did exactly the
+same thing on 319 pages: 567px in a 358px box, with Events, Travel tips, Stay
+and Onward behind a swipe and no affordance at all. **A link a reader cannot
+see is not reachable because it is focusable**, and the document-overflow
+check passes on both by design, because overflow contained inside a scroller
+is what that check was written to allow.
+
+**The masthead sat on a 24px gutter and every word under it on 16.** `main`
+is padded `--s4` on a phone and `.masthead-in` was left on the desk's `--s5`,
+so the wordmark and the whole navigation were indented eight pixels further
+than the h1, the breadcrumb and every line of prose, on 1,034 pages. Nothing
+counts a gutter and at thumbnail size nothing sees one.
+
+**TWELVE PURPOSES WERE TWELVE SLOTS.** A surface, a page, a register key and
+a minimum width answer where a photograph goes and not one word about what it
+must be a picture OF — so the pipeline could have acquired a technically
+perfect 2,400px landscape for the Mountains door that was a summit portrait,
+passing every number and contradicting the door's own sentence. `roles` is
+the vocabulary now and a purpose instantiates one: subject rule, crop rule,
+brief, and the refusals that disqualify a candidate which passes every
+number. Three roles have no purpose and each says why — two carry a trigger,
+`accommodation` is refused on the Stay layer's licence position — because **a
+role nothing reaches is a dead motif wearing the clothes of vocabulary.**
+
+**THE HERO'S CROP BOX SWINGS 8.6x AND NOBODY HAD MEASURED IT.** Safe area is
+arithmetic: a container narrower than its source crops width, a wider one
+crops height, so the guaranteed frame is `container_min / source_max` by
+`source_min / container_max`. Measured in Chromium by adding the class a
+photograph would add and removing the drawing it would replace: the homepage
+hero ran 0.435 to 3.720, which left **7% of a photograph's frame guaranteed
+visible**. A slot that destroys whatever is put in it. A 43vw floor on the
+hero's height caps it at 2.33 — which also fixed a thing a reader sees today,
+because at 1920 the arch had stopped reading as a doorway — and the 2.6
+aspect ceiling came down to 1.9. 7% to 15%. `checks.py` refuses a safe area
+under 12% and the browser suite re-measures the boxes: **a layout change that
+would have ruined the first four photographs anybody licenses now fails in
+the commit that causes it.** It already has.
+
+**AN INDEX OPENING THAT IS A CONTINENT WITH A DIFFERENT NUMBER OF DOTS ON IT
+IS NOT A DIFFERENT OPENING.** Six were: /countries, /experiences, /stories,
+/interests, /beyond-the-obvious and the 404, in the same arch in the same
+position. At opening size 197 dots and 130 are the same picture. Two came
+off, chosen because their subject is not a shape — a map answers WHERE, and
+where earns the opening only where the subject IS one. /experiences was still
+emitting the silhouette with nothing using it, 13,791 bytes, a third of the
+page, and the coastline-credit check caught it in one run.
+
+**/interests HAD NO INDEX AND NOTHING LINKED TO IT.** Seventeen pages shipped
+and the directory autoindexed. A link checker validates links that exist, and
+a missing index is an absence — which is also why it cost something invisible:
+every interest page says it draws its tag "so the seventeen can be compared",
+and there was nowhere they could be.
+
+**THE COUNTRY PAGES WERE THE LAST GRID OF ABSTRACT PLATES, AND THE DENSITY
+RULE WAS NOT THE QUESTION.** "Four cards in a grid of like things is the case
+a card was designed for" kept six per page. What nobody had measured is
+whether the six are six PICTURES: 207 cards across fifty pages drawing 146
+motifs on their own page, and **France draws five skylines out of six**,
+Belgium four of five, Bosnia and Herzegovina four towers out of four.
+`plate-variation.py` cannot see it — it measures duplication across the
+corpus and this is duplication on one screen. And the page draws the real
+geography four hundred pixels above them.
+
+**A CHART'S CAPTION NAMED A LINE THAT MEASURED 1.16:1.** The year band says
+"above the line is what is on" and the axis was `--rule` — the hairline
+between two list rows — sampled at rgb(231,230,223) against a page of
+rgb(247,246,243). The two series measured 1.19 against *each other*: 150° of
+hue apart, so a colour-sighted reader tells them apart instantly, which is
+the `distinct` block's own trap. And **1px was not enough**: the band is
+drawn `preserveAspectRatio="none"`, so a one-unit line does not land on a
+device pixel and `--ink-2` at 1px sampled 2.59 while the token is far darker.
+The ratio a reader gets is the ratio of the pixel.
+
+**A COMMENT IN EMITTED MARKUP SHIPS.** A paragraph of reasoning went into the
+homepage's HTML and the weight invariant caught it in one run. A reason
+belongs in the source that writes the page — the same rule as a reason
+belonging in `tools/invariants.py` rather than in the register it generates.
+And an f-string cannot contain a comment at all, which is where that one was
+trying to go.
+
+**`data-rotate` HELD FOUR ALTERNATIVE PLACEHOLDERS AND NOTHING HAS EVER READ
+IT.** The homepage loads no JavaScript — its only `<script>` is the inert
+JSON-LD block — so 232 bytes of copy shipped on the most-visited page for the
+life of the band, waiting for a rotator nobody wrote. **The dead-rule scan
+does not read attributes.**
+
+**THE GLYPH HAD THREE SIZES AND ONLY TWO WERE WRITTEN.** A desk rule at 64rem
+and a phone rule at 44rem, and between them neither applies: at 834 the theme
+and interest rows fell back to the drawing's intrinsic size, **a continent 132
+pixels wide**. And the phone rule runs to 704, which is not a phone: a
+full-width glyph at 600 made /interests 11,972 pixels tall. Two repairs failed
+first and both are traps this file already records — a base rule later in the
+file beat the 64rem block, and writing it at (0,3,0) beat the block at every
+width. The third worked and **the invariant register refused it for adding a
+seventh breakpoint**; a plain rule at the right specificity in the right place
+does the same job and adds none.
+
+**AND ONE THING WAS BUILT, RENDERED AND REMOVED.** The homepage's three
+journey rows have no dominant element, so the first was given a 34rem column.
+A route is FRAMED on its own extent — which is what makes each of the three a
+picture of its own corner rather than three identical continents — and the
+Arctic-to-Mediterranean extent is tall, so the wider column produced a
+490-pixel picture beside 140 pixels of type and three hundred pixels of empty
+row. **The thing that makes each one legible is what stops one of them being
+the wide element.**
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

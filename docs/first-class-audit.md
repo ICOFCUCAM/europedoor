@@ -312,6 +312,44 @@ reason each item is where it is.
 9. **Render, critique, refine, render again** — at 1280, 834 and 390, in
    both colour-scheme preferences, as contact sheets.
 
+---
+
+## Part 5 — What has been done against it
+
+Written as the work landed, so the audit and the record do not drift.
+
+| # | done | measured before → after |
+|---|---|---|
+| 1 | the audit and the benchmark, with the blocked half labelled | — |
+| 2 | twelve photography ROLES, a purpose instantiates one | 12 slots → 12 roles + 12 purposes |
+| 3 | mobile navigation: three sections behind a gesture | 552px in 366 → nothing off-screen; chrome 149 → 145 |
+| 4 | the crop rule, derived and checked at both ends | hero 7% of a frame → 15% |
+| 5 | the doors band stopped reserving picture height | 1440: 352 → 245; 390: 1,184 → 920 |
+| 6 | the chips stopped naming the four doors below them | 4 duplicated categories → 4 worked examples |
+| 7 | the section nav, the same defect on 319 pages | 567px in 358 → nothing off-screen |
+| 8 | the experience list leads with the place; the category's shape drawn | invisible sort key → legible |
+| 9 | `/discover` fills its land | `fill: none` → 1.91:1 against the water |
+| 10 | `/interests` exists | server autoindex → an index ordered by reach |
+| 11 | My Europe draws the list it is about | 0% of the phone's first screen → 17% |
+| 12 | the doors' crop box, caught by the check added in 4 | 2.794 → 1.923 |
+| 13 | the year band's axis | 1.16:1 → 4.76 at 1280, 9.25 at 390 |
+| 14 | two index openings that were a generic continent | /stories 23% → 36% of the phone's first screen |
+| 15 | the country pages' last grid of abstract plates | 207 plates → 0 |
+| 16 | the glyph's missing middle size | 132px at 834 → 240 |
+| 17 | a lead journey at size — built, rendered, removed | recorded as a negative result |
+
+**Finding 1, re-measured**: seven surfaces with no picture on the phone's
+first screen became six, and `/stories` and `/my-europe` both gained one.
+**Finding 2**: five families now open on something no other family does —
+`/experiences`, `/stories`, `/interests`, `/my-europe`, `/discover`.
+**Finding 3**: the homepage's second screen is a strip rather than four
+holes, and the transition from the continent to the form has air in it.
+
+**Still open**, and each blocked on something that is not design work: the
+destination page has no photograph and its order is already correct; the
+experience category page has no picture anywhere and no honest source for
+one; `/plan` and `/search` are instruments and read as instruments.
+
 **What is not on the list, deliberately.** Acquiring photographs: the
 proxy refuses both providers and acquisition is a GitHub Actions step with
 a repository secret. Weakening the licence gate to get pictures on the
