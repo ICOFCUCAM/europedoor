@@ -207,6 +207,18 @@ dialog { border: 0; border-radius: var(--radius); padding: 0;
          background: var(--limestone); color: var(--ink);
          display: flex; flex-direction: column; overflow: hidden; }
 dialog > * { display: flex; flex-direction: column; min-height: 0; }
+/* AND SETTING `display` ON A DIALOG UNCLOSES IT. The user agent hides a
+   closed one with `dialog:not([open]) { display: none }`, and an AUTHOR rule
+   beats a UA rule at any specificity — so `dialog { display: flex }` laid out
+   both dialogues, on every screen, permanently: the acquire panel and the
+   progress panel rendered in normal flow at the foot of the page with no way
+   to dismiss them, because they were never open.
+   THAT IS THE `[hidden]` FAILURE IN A THIRD ELEMENT. `.gate { display: grid }`
+   beat the UA's `[hidden] { display: none }` and laid out the hidden sign-in
+   screen; `.find > div[hidden]` needed the same guard the moment the country
+   field could be hidden. A rule that sets `display` on something the browser
+   hides for you must say when it does not apply. */
+dialog:not([open]) { display: none; }
 /* AND A STICKY BAR INSIDE A PADDED SCROLLER ONLY COVERS THE CONTENT BOX.
    Its background stopped at the padding, so the list scrolled past it and
    showed through on both sides — half a line of text either side of an
@@ -297,3 +309,69 @@ menu { display: flex; gap: var(--s3); justify-content: flex-end;
 #alt { width: 100%; resize: vertical; font: inherit; font-size: 15px;
   line-height: 1.45; padding: var(--s3); border: 1px solid var(--ink-3);
   border-radius: var(--radius); background: var(--paper); color: var(--ink); }
+
+/* ── finding a place by its name ────────────────────────────────────── */
+/* The results are a list under the field rather than a dropdown, because a
+   dropdown that overlays the form hides the slot and the country the reader
+   just chose — and those are what decide which places are in the list. */
+.places { list-style: none; margin: var(--s2) 0 0; padding: 0;
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  max-height: 15rem; overflow: auto; background: var(--paper-2); }
+.places li { border-bottom: 1px solid var(--rule); }
+.places li:last-child { border-bottom: 0; }
+.places button { display: block; width: 100%; text-align: left; cursor: pointer;
+  font: inherit; font-size: 14px; background: none; border: 0;
+  padding: var(--s3); color: var(--ink); }
+.places button:hover { background: var(--paper-3); }
+.places .where { display: block; font-family: var(--mono); font-size: 11px;
+  color: var(--ink-3); margin-top: 2px; }
+.places .more { padding: var(--s3); font-size: 12px; color: var(--ink-3); }
+.chosen { font-size: 13px; color: var(--ink); margin: var(--s2) 0 0;
+  padding-left: 1.1em; text-indent: -1.1em; }
+.chosen::before { content: "✓ "; color: var(--atlantic); }
+
+/* ── fill a country ─────────────────────────────────────────────────── */
+/* THE BAR IS STICKY BECAUSE THE GRID IS LONGER THAN THE SCREEN. Thirteen
+   tiles is about four screens, and an Acquire button at the bottom is a
+   button you tick towards rather than one you press when you have decided.
+   It sets its own background: a sticky element inside a padded scroller only
+   covers its content box, which showed the list through on either side of an
+   opaque middle the first time this was tried on the acquire dialogue. */
+.sweepbar { position: sticky; top: 0; z-index: 5; display: flex; gap: var(--s3);
+  align-items: center; flex-wrap: wrap; padding: var(--s3) 0;
+  margin: var(--s4) 0; border-bottom: 1px solid var(--rule);
+  background: var(--limestone); }
+.sweepbar .sw-count { margin: 0 auto 0 var(--s3); font-size: 13px;
+  color: var(--ink-2); }
+.sweepbar .go { padding: .6rem 1.2rem; border: 0; cursor: pointer;
+  border-radius: var(--radius); background: var(--cobalt-deep);
+  color: var(--limestone); font-weight: 600; font: inherit; font-weight: 600; }
+.sweepbar .go[disabled] { background: var(--paper-3); color: var(--ink-3);
+  cursor: not-allowed; }
+
+.sweep { display: grid; gap: var(--s5);
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); }
+.swcell { display: flex; flex-direction: column; gap: var(--s2); }
+.swcell figure { margin: 0; aspect-ratio: 3 / 2; overflow: hidden;
+  border-radius: var(--radius); background: var(--paper-3); }
+.swcell figure img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* The tick and the name are one target, because the name is what the tick is
+   about — and a 16px checkbox alone is under the 24px a target needs. */
+.swpick { display: flex; gap: var(--s3); align-items: baseline; cursor: pointer;
+  padding: var(--s2) 0; font-weight: 600; font-size: 15px; }
+.swpick input { width: 1.15rem; height: 1.15rem; flex: none; }
+.swalt { display: block; font-size: 12px; color: var(--ink-2); }
+.swalt span { display: block; text-transform: uppercase; letter-spacing: .08em;
+  font-size: 11px; color: var(--ink-3); margin-bottom: 2px; }
+.swalt textarea { width: 100%; resize: vertical; font: inherit; font-size: 13px;
+  line-height: 1.4; padding: var(--s2); border: 1px solid var(--rule);
+  border-radius: var(--radius); background: var(--paper); color: var(--ink); }
+.swcell.none { opacity: .8; }
+.warnhint { color: var(--terracotta); }
+
+/* ── an opening is a door ───────────────────────────────────────────── */
+button.slotrow { width: 100%; text-align: left; font: inherit; cursor: pointer;
+  background: none; border: 0; border-bottom: 1px solid var(--rule); }
+button.slotrow:hover { background: var(--paper-2); }
+button.slotrow:hover .findit { color: var(--cobalt-deep); }
+.findit { color: var(--ink-3); }

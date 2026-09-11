@@ -74,6 +74,14 @@ let NEXT = null;                     // what the next fetch should answer
 globalThis.fetch = async (url, init = {}) => {
   CALLS.push({ url: String(url), init });
   if (NEXT) { const r = NEXT; NEXT = null; return r; }
+  /* GitHub answers a workflow dispatch with 204 and no body, which is the
+     whole reason the acquire route has to sign a time window instead of
+     holding a run id. A stub that answered 200 would let a route that got
+     that wrong pass. A 204 carries no body: `new Response("", {status:204})`
+     throws. */
+  if (String(url).includes("/dispatches")) {
+    return new Response(null, { status: 204 });
+  }
   return new Response(JSON.stringify({ photos: [] }), {
     status: 200, headers: { "content-type": "application/json" },
   });
@@ -112,7 +120,7 @@ async function call(file, opts = {}) {
   return rs;
 }
 
-const ROUTES = ["registry.js", "search.js", "thumb.js", "status.js"];
+const ROUTES = ["registry.js", "search.js", "thumb.js", "status.js", "sweep.js"];
 const POSTS = ["acquire.js", "signout.js"];
 
 /* ── 1. the session ─────────────────────────────────────────────── */
@@ -360,6 +368,129 @@ await t("a provider the licence gate refuses cannot be acquired", async () => {
   assert.strictEqual(CALLS.length, 0);
 });
 
+/* ── 6b. a batch is many acquisitions and one decision ───────────── */
+
+await t("a batch refuses one bad entry and dispatches nothing", async () => {
+  CALLS = [];
+  const r = await acq({ provider: "pexels", batch: [
+    { purpose: "door-coast", photo_id: "111", alt: "a long enough description" },
+    { purpose: "door-food", photo_id: "not-an-id", alt: "another description" },
+  ] });
+  assert.strictEqual(r.statusCode, 400);
+  assert.match(r.json().error, /entry 2/);
+  assert.strictEqual(CALLS.length, 0, "a malformed batch reached the network");
+});
+
+await t("one surface may not be ticked twice in a batch", async () => {
+  CALLS = [];
+  const r = await acq({ provider: "pexels", batch: [
+    { purpose: "door-coast", photo_id: "111", alt: "a long enough description" },
+    { purpose: "door-coast", photo_id: "222", alt: "another description" },
+  ] });
+  assert.strictEqual(r.statusCode, 400);
+  assert.match(r.json().error, /ticked twice/);
+  assert.strictEqual(CALLS.length, 0);
+});
+
+await t("one photograph may not be ticked for two surfaces in a batch",
+  async () => {
+    /* The register cannot refuse this one: neither row exists yet. It is the
+     * same promise from inside the batch. */
+    CALLS = [];
+    const r = await acq({ provider: "pexels", batch: [
+      { purpose: "door-coast", photo_id: "111", alt: "a long enough description" },
+      { purpose: "door-food", photo_id: "111", alt: "another description" },
+    ] });
+    assert.strictEqual(r.statusCode, 400);
+    assert.match(r.json().error, /two surfaces/);
+    assert.strictEqual(CALLS.length, 0);
+  });
+
+await t("a batch bigger than one sitting is refused", async () => {
+  CALLS = [];
+  const many = Array.from({ length: 31 }, (_, i) => (
+    { purpose: "door-coast", photo_id: String(i + 1), alt: "a description here" }));
+  const r = await acq({ provider: "pexels", batch: many });
+  assert.strictEqual(r.statusCode, 400);
+  assert.match(r.json().error, /one sitting/);
+  assert.strictEqual(CALLS.length, 0);
+});
+
+await t("an empty batch is refused", async () => {
+  CALLS = [];
+  const r = await acq({ provider: "pexels", batch: [] });
+  assert.strictEqual(r.statusCode, 400);
+  assert.strictEqual(CALLS.length, 0);
+});
+
+await t("a valid batch dispatches the batch stage with every id", async () => {
+  /* THE ONLY TEST HERE THAT LETS A DISPATCH THROUGH, and it inspects what
+   * went out: the stage, and that every entry travels as an ID. A list of
+   * ids is as incapable of choosing as a single id is — `--pick 3` was wrong
+   * because a POSITION is not an identity, which has nothing to do with how
+   * many identities travel together. */
+  CALLS = [];
+  /* The default stub answers `{"photos":[]}` with a 200, which `register()`
+     reads as a register holding nothing — which is true, and is the state
+     this product is actually in. The dispatch that follows gets the same
+     answer; the assertions below read what went OUT rather than what came
+     back. */
+  const r = await acq({ provider: "pexels", batch: [
+    { purpose: "door-coast", photo_id: "111", alt: "a long enough description" },
+    { purpose: "door-food", photo_id: "222", alt: "another long description" },
+  ] });
+  const dispatch = CALLS.find((c) => c.url.includes("/dispatches"));
+  assert.ok(dispatch, "no dispatch was made");
+  const body = JSON.parse(dispatch.init.body);
+  assert.strictEqual(body.inputs.stage, "batch");
+  const sent = JSON.parse(body.inputs.batch);
+  assert.strictEqual(sent.length, 2);
+  assert.ok(sent.every((e) => /^[0-9]+$/.test(e.photo_id) && e.purpose && e.alt),
+            "an entry travelled without an id, a purpose or a description");
+  assert.ok(!("key" in sent[0]) && !("surface" in sent[0]),
+            "the dispatch carried the desk's own bookkeeping");
+  assert.strictEqual(r.statusCode, 200);
+  assert.strictEqual(r.json().count, 2);
+});
+
+/* ── 6c. the sweep proposes and does not choose ──────────────────── */
+
+await t("the sweep refuses a slot that is not one", async () => {
+  CALLS = [];
+  const r = await call("sweep.js", {
+    url: "/api/sweep?provider=pexels&slot=nope&country=norway",
+    headers: { cookie: session() },
+  });
+  assert.strictEqual(r.statusCode, 400);
+  assert.strictEqual(CALLS.length, 0);
+});
+
+await t("the sweep refuses a provider the licence gate refuses", async () => {
+  CALLS = [];
+  const r = await call("sweep.js", {
+    url: "/api/sweep?provider=unsplash&slot=destination-hero&country=norway",
+    headers: { cookie: session() },
+  });
+  assert.strictEqual(r.statusCode, 400);
+  assert.match(r.json().error, /REFUSED/);
+  assert.strictEqual(CALLS.length, 0);
+});
+
+await t("the sweep's query is the surface's own name, not its slug", async () => {
+  /* A slug gives "alps and east" and "hohensalzburg"; the atlas writes the
+   * name inside the surface sentence, so that is where it comes from. */
+  const { queryFor } = await import(path.join(API, "sweep.js"));
+  assert.strictEqual(
+    queryFor({ surface: "The opening image of the Bergen, Norway destination page.",
+               target: "norway/fjord-norway/bergen" }),
+    "Bergen, Norway");
+  assert.strictEqual(
+    queryFor({ surface: "The opening image of the Hohensalzburg Fortress, "
+                      + "Salzburg place page.",
+               target: "austria/x/salzburg/hohensalzburg" }),
+    "Hohensalzburg Fortress, Salzburg");
+});
+
 /* ── 7. no credential anywhere ──────────────────────────────────── */
 
 await t("no response body or header carries a key", async () => {
@@ -460,5 +591,11 @@ if (failures.length) {
   console.log(`\n${passed} passed, ${failures.length} failed`);
   process.exit(1);
 }
-console.log(`all ${passed} checks passed — and nothing was acquired, `
-          + `dispatched or fetched.`);
+/* THE CLOSING LINE SAYS WHAT IS TRUE AND NOT WHAT IT USED TO SAY. It read
+   "nothing was acquired, dispatched or fetched" and one test now lets a
+   dispatch through on purpose, to inspect what goes out. A suite whose
+   summary is a sentence nobody re-read is the same failure as a green run
+   that has stopped counting: the output still looks like a result. */
+console.log(`all ${passed} checks passed. Every request went to a replaced `
+          + `fetch, so no provider was reached and no workflow was started; `
+          + `one test inspects a dispatch that never left this process.`);

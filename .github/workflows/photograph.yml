@@ -44,10 +44,10 @@ on:
   workflow_dispatch:
     inputs:
       stage:
-        description: "discover (search and list) or acquire (take one id)"
+        description: "discover (search and list), acquire (one id) or batch (a list)"
         required: true
         type: choice
-        options: [discover, acquire]
+        options: [discover, acquire, batch]
         default: discover
       provider:
         description: "the acquisition provider — only ones the licence gate clears"
@@ -56,8 +56,12 @@ on:
         options: [pexels]
         default: pexels
       purpose:
-        description: "the surface, from data/image-purposes.json. DISCOVER takes a comma-separated list"
-        required: true
+        # NOT REQUIRED, BECAUSE A BATCH CARRIES ITS PURPOSES INSIDE `batch`.
+        # A required input a caller must fill with a placeholder is a field
+        # that teaches the caller to send nonsense; discover and acquire
+        # refuse a missing one themselves, in their own words.
+        description: "the surface, from data/image-purposes.json. DISCOVER takes a comma-separated list. Not used by BATCH"
+        required: false
         type: string
       query:
         description: "discover only: what to search for — one, or one per purpose, comma-separated"
@@ -75,6 +79,10 @@ on:
         description: "acquire only: focal point as x,y percentages"
         required: false
         default: "50,50"
+        type: string
+      batch:
+        description: "batch only: JSON array of {purpose, photo_id, alt}"
+        required: false
         type: string
 
 permissions:
@@ -130,6 +138,12 @@ jobs:
       # purpose still gets its own search, its own manifest and its own
       # sheets: this batches the RUN, never the acquisition, which stays one
       # approved id at a time with one provenance record behind it.
+      - name: Refuse a dispatch with nothing to search for
+        run: |
+          test -n "${{ inputs.purpose }}" || {
+            echo "purpose is required for discover — one, or several separated by commas"
+            exit 1; }
+
       - name: Search and list candidates
         env:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
@@ -234,6 +248,7 @@ jobs:
       - name: Refuse a dispatch that is missing what acquisition needs
         run: |
           set -euo pipefail
+          test -n "${{ inputs.purpose }}"  || { echo "purpose is required for acquire"; exit 1; }
           test -n "${{ inputs.photo_id }}" || { echo "photo_id is required for acquire"; exit 1; }
           test -n "${{ inputs.alt }}"      || { echo "alt is required for acquire"; exit 1; }
 
@@ -324,6 +339,140 @@ jobs:
             --branch "${{ steps.push.outputs.branch }}" > /tmp/pr-body.md
           gh pr create \
             --title "Photograph: ${{ inputs.purpose }} (${{ inputs.provider }} ${{ inputs.photo_id }})" \
+            --body-file /tmp/pr-body.md \
+            --head "${{ steps.push.outputs.branch }}" \
+            --base "${{ github.ref_name }}"
+
+  batch:
+    if: ${{ inputs.stage == 'batch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate the dataset
+        run: python3 tools/build.py check
+
+      # THE PLAN IS READ AND REFUSED BEFORE A SOCKET OPENS. A batch that
+      # stops halfway leaves a branch holding some of what was approved, and
+      # a reviewer cannot tell the difference between "these six were chosen"
+      # and "these six arrived before it broke". So the shape is checked
+      # first: a JSON array, every entry carrying a purpose, a numeric id and
+      # an alt, no purpose twice, and no more than the cap.
+      - name: Read the plan
+        env:
+          BATCH: ${{ inputs.batch }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' > /tmp/plan.tsv
+          import json, os, sys
+          raw = os.environ.get("BATCH") or ""
+          try:
+              plan = json.loads(raw)
+          except Exception as e:
+              sys.exit(f"batch is not JSON: {e}")
+          if not isinstance(plan, list) or not plan:
+              sys.exit("batch must be a non-empty JSON array")
+          # A CAP, BECAUSE A RUNAWAY BATCH IS A RUNAWAY DOWNLOAD. Thirty is
+          # the largest country's destination count with room over it; a
+          # bigger set is two sittings, which is also how a person should
+          # look at it.
+          if len(plan) > 30:
+              sys.exit(f"{len(plan)} entries is more than one sitting. "
+                       f"The cap is 30.")
+          seen = set()
+          for i, e in enumerate(plan):
+              if not isinstance(e, dict):
+                  sys.exit(f"entry {i} is not an object")
+              p, pid, alt = e.get("purpose"), str(e.get("photo_id", "")), e.get("alt")
+              if not p or p in seen:
+                  sys.exit(f"entry {i}: missing or repeated purpose {p!r}. "
+                           f"One surface holds one photograph.")
+              seen.add(p)
+              if not pid.isdigit():
+                  sys.exit(f"entry {i}: {pid!r} is not a photo id. An id is "
+                           f"an identity; a position is not.")
+              if not alt or not str(alt).strip():
+                  sys.exit(f"entry {i}: no alt text. A photograph nobody can "
+                           f"describe is a photograph nobody can use.")
+              print(f"{p}\t{pid}\t{str(alt).strip()}")
+          print(f"{len(plan)} approved photographs", file=sys.stderr)
+          PY
+          cat /tmp/plan.tsv
+
+      # ONE AT A TIME, THROUGH THE SAME SCRIPT. acquire.py is by id and
+      # asserts the id it got back; derive.py reads the untouched original
+      # and refuses to upscale. Neither knows it is in a batch, which is what
+      # makes the batch safe: there is no second implementation to get wrong.
+      - name: Acquire each approved photograph
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pillow pillow-avif-plugin
+          while IFS=$'\t' read -r purpose pid alt; do
+            echo "── $purpose ── $pid"
+            python3 scripts/images/acquire.py \
+              --provider "${{ inputs.provider }}" \
+              --photo-id "$pid" \
+              --purpose "$purpose" \
+              --alt "$alt" \
+              --focal "50,50"
+            python3 scripts/images/derive.py "$purpose"
+          done < /tmp/plan.tsv
+
+      # EVERY GATE, ONCE, OVER THE FINISHED SET. Running them between
+      # acquisitions would check thirteen half-built states and never the one
+      # that ships.
+      - name: Rebuild and run every gate
+        run: |
+          set -euo pipefail
+          python3 tools/build.py check
+          python3 tools/build.py
+          python3 tools/checks.py
+          python3 tools/section-audit.py --check
+          python3 tools/ux-audit.py --check
+          python3 tools/invariants.py --check
+
+      - name: Browser and design gates
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright@1.49.0
+          npx playwright install --with-deps chromium
+          node tools/browser-checks.js
+
+      - name: Refuse to commit anything credential-shaped
+        run: python3 tools/photo-tests.py --committed-only
+
+      - name: Commit and push a branch
+        id: push
+        run: |
+          set -euo pipefail
+          git config user.name "europedoor-photographs"
+          git config user.email "noreply@europedoor.com"
+          N=$(wc -l < /tmp/plan.tsv)
+          BRANCH="photo/batch-$(date -u +%Y%m%d-%H%M%S)"
+          git checkout -b "$BRANCH"
+          git add assets/img data/images.json docs site photographs
+          git commit -m "Photographs: $N acquired from approved ids" \
+                     -m "Acquired by GitHub Actions from ids approved in the Media Desk. Each fetched by id, hashed, derived without upscaling, and registered."
+          git push -u origin "$BRANCH"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "count=$N" >> "$GITHUB_OUTPUT"
+
+      - name: Open the pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          PURPOSES=$(cut -f1 /tmp/plan.tsv | paste -sd,)
+          python3 scripts/images/pr_body.py \
+            --purpose "$PURPOSES" \
+            --branch "${{ steps.push.outputs.branch }}" > /tmp/pr-body.md
+          gh pr create \
+            --title "Photographs: ${{ steps.push.outputs.count }} acquired" \
             --body-file /tmp/pr-body.md \
             --head "${{ steps.push.outputs.branch }}" \
             --base "${{ github.ref_name }}"

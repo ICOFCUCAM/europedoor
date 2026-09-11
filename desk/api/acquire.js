@@ -28,53 +28,120 @@ export default async function handler(req, res) {
 
   const b = await body(req);
   const provider = String(b.provider || "pexels");
-  const photoId = String(b.photo_id || "").trim();
-  const purpose = String(b.purpose || "").trim();
-  const alt = String(b.alt || "").trim();
 
   const reg = registry();
   const verdict = reg.providers[provider];
   if (!verdict) { send(res, 400, { error: `${provider} is not a provider this desk knows` }); return; }
   if (!verdict.cleared) { send(res, 400, { error: "REFUSED: " + verdict.because }); return; }
 
-  /* A PHOTO ID IS AN IDENTITY, so it is checked as one. Anything else in
-   * this field is a string being handed to a workflow input, and a field
-   * that accepts anything is the field somebody puts a shell fragment in. */
-  if (!/^[0-9]{1,20}$/.test(photoId)) {
-    send(res, 400, { error: "a photo id is digits — that is not one" });
+  /* ONE OR MANY, THROUGH ONE SET OF REFUSALS.
+   *
+   * A batch is not a second route with its own idea of what a photo id is —
+   * that is how two implementations of one rule end up disagreeing, which
+   * this repository has recorded four times. The list below is ONE entry for
+   * a single acquisition and N for a batch, and every check after this point
+   * runs over every entry either way.
+   *
+   * IT IS STILL NOT A SELECTION. The desk sends ids a person ticked while
+   * looking at the photographs; a list of ids is as incapable of choosing as
+   * a single id is. `--pick 3` was wrong because a POSITION is not an
+   * identity, which has nothing to do with how many identities travel
+   * together. */
+  const many = Array.isArray(b.batch);
+  const plan = many ? b.batch : [b];
+  if (!plan.length) { send(res, 400, { error: "nothing was ticked" }); return; }
+  if (plan.length > 30) {
+    send(res, 400, { error: `${plan.length} is more than one sitting. The cap `
+                          + `is 30 — a bigger set is two sittings, which is `
+                          + `also how a person should look at it.` });
     return;
   }
-  const spec = specOf(purpose);
-  if (!spec) { send(res, 400, { error: `${purpose} is not a purpose` }); return; }
-  if (!alt) {
-    send(res, 400, { error: "say what the photograph shows, for somebody who "
-                          + "cannot see it" });
-    return;
+
+  /* SHAPE FIRST, AND THE REGISTER ONLY AFTER IT.
+   *
+   * The duplicate checks need the register, which is a request to GitHub —
+   * and reading it before the shape is checked means a malformed id, an
+   * empty alt or an invented purpose costs a network round trip before it is
+   * refused. The suite caught it in the form it actually matters: "a photo
+   * id that is not an identity is refused — it dispatched something", which
+   * was six register reads for six malformed requests. A request this desk
+   * can refuse on its own contents must reach nothing at all. */
+  const clean = [];
+  const seen = new Set();
+  for (let i = 0; i < plan.length; i += 1) {
+    const e = plan[i] || {};
+    const where = many ? `entry ${i + 1}: ` : "";
+    const photoId = String(e.photo_id || "").trim();
+    const purpose = String(e.purpose || "").trim();
+    const alt = String(e.alt || "").trim();
+
+    /* A PHOTO ID IS AN IDENTITY, so it is checked as one. Anything else in
+     * this field is a string being handed to a workflow input, and a field
+     * that accepts anything is the field somebody puts a shell fragment in. */
+    if (!/^[0-9]{1,20}$/.test(photoId)) {
+      send(res, 400, { error: where + "a photo id is digits — that is not one" });
+      return;
+    }
+    const spec = specOf(purpose);
+    if (!spec) { send(res, 400, { error: where + `${purpose} is not a purpose` }); return; }
+    if (!alt) {
+      send(res, 400, { error: where + "say what the photograph shows, for "
+                             + "somebody who cannot see it" });
+      return;
+    }
+    if (alt.length > 240) { send(res, 400, { error: where + "alt text is too long" }); return; }
+
+    /* ONE SURFACE HOLDS ONE PHOTOGRAPH, inside the batch as well as against
+     * the register. Two entries naming the same purpose would have the
+     * second overwrite the first inside a single run, and the PR would
+     * describe whichever one landed last. */
+    if (seen.has(purpose)) {
+      send(res, 400, { error: `${purpose} is ticked twice. One surface holds `
+                            + `one photograph.` });
+      return;
+    }
+    seen.add(purpose);
+
+    /* NOT TWICE INSIDE THE BATCH EITHER, and this one needs no register: a
+     * sweep can offer the same photograph for two surfaces when a provider
+     * returns it for two neighbouring names, and the register cannot refuse
+     * that because neither row exists yet. */
+    if (clean.some((x) => x.photo_id === photoId)) {
+      send(res, 400, { error: `photograph ${photoId} is ticked for two `
+                            + `surfaces in this batch. One photograph is not `
+                            + `automatically meant for two.` });
+      return;
+    }
+    clean.push({ purpose, photo_id: photoId, alt, key: spec.key,
+                 surface: spec.surface });
   }
-  if (alt.length > 240) { send(res, 400, { error: "alt text is too long" }); return; }
 
   /* TWO DUPLICATE REFUSALS, BECAUSE THEY ARE TWO QUESTIONS. One surface may
    * not be taken over by a second photograph, and one photograph is not
    * automatically meant for two surfaces — the second was answerable by
    * nothing at all until the register was asked from this end. */
   const rows = (await register()) || {};
-  if (rows[spec.key]) {
-    send(res, 409, { error: `${spec.surface} already holds a photograph. `
-                          + `Replacing one is a different act from filling an `
-                          + `empty slot, and it is not this button.` });
-    return;
+  for (const e of clean) {
+    if (rows[e.key]) {
+      send(res, 409, { error: `${e.surface} already holds a photograph. `
+                            + `Replacing one is a different act from filling `
+                            + `an empty slot, and it is not this button.` });
+      return;
+    }
+    const elsewhere = Object.entries(rows)
+      .filter(([, r]) => r.provider === provider
+                      && String(r.provider_photo_id) === e.photo_id)
+      .map(([k, r]) => r.purpose || k);
+    if (elsewhere.length) {
+      send(res, 409, { error: `that photograph is already registered, for `
+                            + `${elsewhere.join(", ")}. Twice is sometimes `
+                            + `right and is never an accident, so it is a `
+                            + `deliberate flag on acquire.py rather than a `
+                            + `click here.` });
+      return;
+    }
   }
-  const elsewhere = Object.entries(rows)
-    .filter(([, r]) => r.provider === provider
-                    && String(r.provider_photo_id) === photoId)
-    .map(([k, r]) => r.purpose || k);
-  if (elsewhere.length) {
-    send(res, 409, { error: `that photograph is already registered, for `
-                          + `${elsewhere.join(", ")}. Twice is sometimes right `
-                          + `and is never an accident, so it is a deliberate `
-                          + `flag on acquire.py rather than a click here.` });
-    return;
-  }
+  for (const e of clean) { delete e.key; delete e.surface; }
 
   /* THE MOMENT BEFORE THE DISPATCH IS THE ONLY HANDLE ON THE RUN.
    * `workflow_dispatch` answers 204 with no body and no run id — GitHub
@@ -83,15 +150,13 @@ export default async function handler(req, res) {
    * is signed so a caller cannot widen it and read somebody else's run. */
   const since = Date.now() - 5000;
   const { slug, branch, workflow } = repo();
+  const inputs = many
+    ? { stage: "batch", provider, batch: JSON.stringify(clean) }
+    : { stage: "acquire", provider, purpose: clean[0].purpose,
+        photo_id: clean[0].photo_id, alt: clean[0].alt, focal: "50,50" };
   const r = await gh(`/repos/${slug}/actions/workflows/${workflow}/dispatches`, {
     method: "POST",
-    body: JSON.stringify({
-      ref: branch,
-      inputs: {
-        stage: "acquire", provider, purpose, photo_id: photoId, alt,
-        focal: "50,50",
-      },
-    }),
+    body: JSON.stringify({ ref: branch, inputs }),
   });
   if (r.status !== 204) {
     const text = await r.text();
@@ -106,8 +171,13 @@ export default async function handler(req, res) {
    * — and a progress panel that shows a step the run does not have is the
    * ninth thing in this repository to pin a shape rather than a promise. */
   send(res, 200, {
-    job: sign({ since, purpose, photo_id: photoId,
+    job: sign({ since, batch: many, count: clean.length,
+                purpose: clean[0].purpose, photo_id: clean[0].photo_id,
                 exp: Date.now() + 6 * 60 * 60 * 1000 }),
-    branch: `photo/${purpose}-${photoId}`,
+    /* A BATCH'S BRANCH IS NAMED BY THE RUN, so the desk cannot state it
+     * before the run exists. The status route finds the pull request by the
+     * run instead, which is the honest handle either way. */
+    branch: many ? "" : `photo/${clean[0].purpose}-${clean[0].photo_id}`,
+    count: clean.length,
   });
 }

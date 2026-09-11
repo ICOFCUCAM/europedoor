@@ -64,6 +64,18 @@ const CANDIDATES = [
             + "derive.py refuses to upscale"], already: [] },
 ];
 
+/* Four real Norwegian destination surfaces out of the registry, so the sweep
+   stub answers about the same entities the registry holds. */
+const SWEEP_TARGETS = REG.purposes
+  .filter((p) => p.slot === "destination-hero" && p.country === "norway")
+  .slice(0, 4)
+  .map((p) => ({
+    target: p.target, surface: p.surface,
+    name: (/of the (.+?) destination page/.exec(p.surface) || [, p.target])[1],
+  }));
+
+const DISPATCHED = [];
+
 function serve() {
   return new Promise((res) => {
     const s = http.createServer((req, rq) => {
@@ -91,6 +103,49 @@ function serve() {
           order: "the provider's own search order, carrying no judgement",
         }), "application/json");
       }
+      if (u.pathname === "/api/sweep") {
+        const rows = SWEEP_TARGETS.map((t, i) => ({
+          purpose: "destination-hero@" + t.target,
+          surface: t.surface, target: t.target, query: t.name,
+          /* ONE SURFACE WITH NOTHING OFFERED, because a grid that silently
+             omits it reads as a complete answer about the country. */
+          candidate: i === 1 ? null : {
+            id: String(700000 + i), photographer: "Someone " + i,
+            photographer_url: "https://example.invalid/@s",
+            page: "https://example.invalid/p/" + i,
+            width: 4000, height: 2400,
+            /* AND ONE WITH NO DESCRIPTION, which must not be acquirable
+               until somebody writes one. */
+            alt: i === 2 ? "" : `A ${t.name} photograph, described by the `
+                              + `photographer who took it.`,
+            thumb: "t" + i, alternatives: 2,
+          },
+          why_none: i === 1 ? "nothing in this provider's first page of "
+                            + "results for this name meets the slot" : "",
+        }));
+        return send(200, JSON.stringify({
+          rows, stopped: "", surfaces: rows.length, swept: rows.length,
+          needs: { min_width: 1800, orientation: "landscape",
+                   min_aspect: 1.5, max_aspect: 2.4 },
+          order: "each row is the provider's own first result for that "
+               + "surface's own name that meets the slot.",
+        }), "application/json");
+      }
+      if (u.pathname === "/api/acquire") {
+        let raw = "";
+        req.on("data", (c) => { raw += c; });
+        return req.on("end", () => {
+          let b = {};
+          try { b = JSON.parse(raw || "{}"); } catch { b = {}; }
+          DISPATCHED.push(b);
+          send(200, JSON.stringify({ job: "stub-job", count: (b.batch || []).length }),
+               "application/json");
+        });
+      }
+      if (u.pathname === "/api/status") {
+        return send(200, JSON.stringify({ state: "running", steps: [], run: "" }),
+                    "application/json");
+      }
       if (u.pathname === "/api/thumb") return send(200, PIXEL, "image/jpeg");
       /* The browser asks for one unprompted and a 404 is a console error,
          which this suite counts. The real deployment serves its own. */
@@ -109,6 +164,14 @@ function serve() {
 
 /* A document that scrolls sideways is the defect this repository has now
    recorded four times, in four components. */
+/* A <dialog> LEFT OPEN SWALLOWS EVERY CLICK AFTER IT, and Escape closes only
+   one the browser considers focused — which, after a programmatic click on a
+   button inside it, it may not. Closing them by name is the reliable form,
+   and a suite that moves between screens has to do it deliberately. */
+const closeDialogs = (page) => page.evaluate(() => {
+  document.querySelectorAll("dialog[open]").forEach((d) => d.close());
+});
+
 const overflows = (page) => page.evaluate(() =>
   document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
 
@@ -146,7 +209,15 @@ const browser = await chromium.launch(
 
 const errors = [];
 
+/* A CRASH MID-RUN MUST STILL PRINT WHAT WAS ALREADY FOUND. Removing the
+   `dialog:not([open])` guard makes an invisible panel swallow every click
+   after it, so the suite died on a 30-second timeout — and the assertion that
+   had ALREADY caught the real fault, at the top of the run, was never
+   printed. A red run that cannot say why is the failure this repository
+   records one level up: a message with no measurement in it cannot be
+   diagnosed. */
 for (const width of [1280, 390]) {
+  try {
   const page = await browser.newPage({ viewport: { width, height: 900 } });
   page.on("pageerror", (e) => errors.push(`${width}: ${e.message}`));
   page.on("console", (m) => { if (m.type() === "error") errors.push(`${width}: ${m.text()}`); });
@@ -154,6 +225,15 @@ for (const width of [1280, 390]) {
 
   ok(await page.locator("#desk").isVisible(), `${width}: the desk did not open`);
   ok(await page.locator("#gate").isHidden(), `${width}: the sign-in screen is laid out behind the desk`);
+  /* A CLOSED DIALOG IS HIDDEN BY THE USER AGENT AND AN AUTHOR RULE BEATS A UA
+     RULE. `dialog { display: flex }` laid out both panels in normal flow at
+     the foot of every screen, permanently, with no way to dismiss them
+     because they were never open — the `[hidden]` failure in a third
+     element. */
+  for (const d of ["#acquire", "#progress"]) {
+    ok(await page.locator(d).isHidden(),
+       `${width}: ${d} is laid out while closed`);
+  }
   ok(!(await overflows(page)), `${width}: the document scrolls sideways`);
 
   /* ── the country field, which is what this pass was written for ── */
@@ -165,18 +245,33 @@ for (const width of [1280, 390]) {
   await page.selectOption("#slot", "destination-hero");
   ok(await page.locator("#country-wrap").isVisible(),
      `${width}: destination-hero was not offered a country`);
-  const all = await page.locator("#targets option").count();
+
+  /* A PLACE IS FOUND BY ITS NAME. The datalist this replaced matched the
+     typed string against a path — `austria/salzburg-and-the-lakes/salzburg`
+     — so "Hohensalzburg Fortress" matched nothing and a reader who knows a
+     place by its name could not find it. */
   await page.selectOption("#country", "norway");
-  const few = await page.locator("#targets option").count();
-  ok(few > 0 && few < all,
-     `${width}: choosing Norway narrowed ${all} targets to ${few}`);
-  const first = await page.locator("#targets option").first().getAttribute("value");
-  ok((first || "").startsWith("norway/"),
-     `${width}: the narrowed list starts with ${first}`);
+  await page.fill("#target-q", "bergen");
+  await page.waitForSelector("#target-hits button");
+  const label = await page.locator("#target-hits button").first().textContent();
+  ok(/Bergen/i.test(label || ""),
+     `${width}: searching for a name returned "${label}"`);
+  await page.locator("#target-hits button").first().click();
+  const chosen = await page.inputValue("#target");
+  ok(chosen.startsWith("norway/"), `${width}: picking a name set ${chosen}`);
+  ok(await page.locator("#target-chosen").isVisible(),
+     `${width}: nothing on screen says which place is chosen`);
+
+  /* AND A NAME FROM ANOTHER COUNTRY IS NOT IN THE LIST, because the country
+     above it is what decides the pool. */
+  await page.fill("#target-q", "salzburg");
+  await page.waitForTimeout(60);
+  const wrongCountry = await page.locator("#target-hits button").count();
+  ok(wrongCountry === 0,
+     `${width}: an Austrian place was offered while Norway was chosen`);
 
   /* A COUNTRY THAT IS STILL SET WHEN THE SLOT CHANGES MUST NOT STRAND A
      TARGET FROM THE OLD ONE. */
-  await page.fill("#target", first);
   await page.selectOption("#slot", "place-hero");
   const kept = await page.inputValue("#target");
   ok(kept === "" || kept.startsWith("norway/"),
@@ -219,7 +314,7 @@ for (const width of [1280, 390]) {
     ok(box && box.y >= 0 && box.y + box.height <= 900 + 1,
        `${width}: ${id} is outside the viewport at y=${box && Math.round(box.y)}`);
   }
-  await page.keyboard.press("Escape");
+  await closeDialogs(page);
 
   /* ── the library, scoped to a country ── */
   await page.click('[data-view="library"]');
@@ -234,10 +329,78 @@ for (const width of [1280, 390]) {
   ok(rows > 0 && rows < 100, `${width}: Norway listed ${rows} slots`);
   ok(!(await overflows(page)), `${width}: the library makes the document scroll sideways`);
 
+  /* ── fill a country ───────────────────────────────────────────── */
+  await closeDialogs(page);
+  await page.click('[data-view="sweep"]');
+  ok(await page.locator("#view-sweep").isVisible(), `${width}: the sweep view did not open`);
+  const swCountries = await page.locator("#sw-country option").count();
+  ok(swCountries > 40, `${width}: the sweep offers ${swCountries} countries`);
+  await page.selectOption("#sw-slot", "destination-hero");
+  await page.selectOption("#sw-country", "norway");
+  await page.click("#sweep button[type=submit]");
+  await page.waitForSelector(".swcell");
+  ok(await page.locator(".swcell").count() === 4,
+     `${width}: the grid drew the wrong number of surfaces`);
+  ok(await page.locator(".swcell.none").count() === 1,
+     `${width}: the surface with no candidate was dropped rather than named`);
+
+  /* NOTHING ARRIVES TICKED. A grid that arrives pre-ticked makes the default
+     "acquire everything the provider happened to return first". */
+  ok(await page.locator("#sw-grid input:checked").count() === 0,
+     `${width}: the grid arrived with rows already ticked`);
+  ok(await page.locator("#sw-go").isDisabled(),
+     `${width}: Acquire was live with nothing ticked`);
+
+  await page.click("#sw-all");
+  const tickedNow = await page.locator("#sw-grid input:checked").count();
+  ok(tickedNow === 3, `${width}: Select all ticked ${tickedNow} of 3 offerable rows`);
+
+  /* A TICKED ROW WITH NO DESCRIPTION IS NOT ACQUIRABLE, and the bar says so
+     rather than the dispatch failing four screens later. */
+  ok(await page.locator("#sw-go").isDisabled(),
+     `${width}: Acquire was live with a ticked row that has no description`);
+  ok(/no description/.test(await page.textContent("#sw-count") || ""),
+     `${width}: the bar does not say why Acquire is refused`);
+
+  await page.locator("#sw-grid textarea").nth(1).fill(
+    "A harbour at first light, with the fishing boats still tied up.");
+  await page.waitForTimeout(30);
+  ok(!(await page.locator("#sw-go").isDisabled()),
+     `${width}: Acquire stayed disabled after every description was written`);
+
+  /* THE DISPATCH CARRIES IDS, NEVER POSITIONS. */
+  DISPATCHED.length = 0;
+  await page.click("#sw-go");
+  await page.waitForFunction(() => true);
+  await page.waitForTimeout(200);
+  const sent = DISPATCHED[0] || {};
+  ok(Array.isArray(sent.batch) && sent.batch.length === 3,
+     `${width}: the dispatch carried ${(sent.batch || []).length} entries`);
+  ok((sent.batch || []).every((e) => /^[0-9]+$/.test(String(e.photo_id))
+        && e.purpose && e.alt),
+     `${width}: an entry travelled without an id, a purpose or a description`);
+  await closeDialogs(page);
+  await page.click('[data-view="library"]');
+  await page.waitForSelector("#lib .slotrow");
+
+  /* ── an opening is a door ─────────────────────────────────────── */
+  ok(await page.locator("#lib button.slotrow").count() > 0,
+     `${width}: an empty library row is still a dead end`);
+  await page.locator("#lib button.slotrow").first().click();
+  ok(await page.locator("#view-find").isVisible(),
+     `${width}: clicking an opening did not take the reader to the search`);
+  ok((await page.inputValue("#q")).length > 0,
+     `${width}: it arrived at the search with an empty query`);
+  await page.click('[data-view="library"]');
+  await page.waitForSelector("#lib .slotrow");
+
   const cut = await clipped(page);
   ok(cut.length === 0, `${width}: text is cut off in ${cut.length}: ${cut.slice(0, 3).join(" | ")}`);
 
   await page.close();
+  } catch (e) {
+    failures.push(`${width}: the run stopped — ${String(e).split("\n")[0]}`);
+  }
 }
 
 await browser.close();

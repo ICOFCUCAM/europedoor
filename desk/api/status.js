@@ -76,16 +76,39 @@ export default async function handler(req, res) {
   if (state === "done") {
     /* THE PULL REQUEST IS THE DELIVERABLE, so the desk hands over the link
      * rather than saying "acquired". Nothing is published until somebody
-     * merges it, and the wording here has to keep that true. */
-    const branch = `photo/${job.purpose}-${job.photo_id}`;
+     * merges it, and the wording here has to keep that true.
+     *
+     * A SINGLE ACQUISITION HAS A BRANCH NAME THIS DESK CAN PREDICT AND A
+     * BATCH DOES NOT: the batch names its branch from the clock inside the
+     * run, because thirteen purposes cannot make one branch name that means
+     * anything. So a batch is found by TIME instead — the pull requests this
+     * repository opened since the instant the dispatch went out, which is the
+     * same signed window the run itself was found by. */
     const owner = slug.split("/")[0];
-    const pr = await gh(`/repos/${slug}/pulls?head=${encodeURIComponent(
-      `${owner}:${branch}`)}&state=all`);
-    if (pr.ok) {
-      const list = await pr.json();
-      if (list.length) { out.pr = list[0].html_url; out.pr_number = list[0].number; }
+    if (!job.batch) {
+      const branch = `photo/${job.purpose}-${job.photo_id}`;
+      const pr = await gh(`/repos/${slug}/pulls?head=${encodeURIComponent(
+        `${owner}:${branch}`)}&state=all`);
+      if (pr.ok) {
+        const list = await pr.json();
+        if (list.length) { out.pr = list[0].html_url; out.pr_number = list[0].number; }
+      }
+      out.branch = branch;
+    } else {
+      const pr = await gh(`/repos/${slug}/pulls?state=all&sort=created`
+                        + `&direction=desc&per_page=20`);
+      if (pr.ok) {
+        const list = await pr.json();
+        const mine = list.find((x) => (x.head && x.head.ref || "").startsWith("photo/batch-")
+          && new Date(x.created_at).getTime() >= job.since - 60000);
+        if (mine) {
+          out.pr = mine.html_url;
+          out.pr_number = mine.number;
+          out.branch = mine.head.ref;
+        }
+      }
+      out.count = job.count;
     }
-    out.branch = branch;
   }
 
   if (state === "failed") {

@@ -37,6 +37,7 @@
     <p class="mark">EuropeDoor <span>Media Desk</span></p>
     <nav class="areas">
       <button type="button" class="area on" data-view="find">Find images</button>
+      <button type="button" class="area" data-view="sweep">Fill a country</button>
       <button type="button" class="area" data-view="library">Library</button>
       <button type="button" class="area" data-view="provenance">Provenance</button>
     </nav>
@@ -61,11 +62,19 @@
         <label for="country">Country</label>
         <select id="country"></select>
       </div>
+      <!-- SEARCHED BY NAME, NOT BY SLUG. A datalist matches a typed string
+           against an option's VALUE, and the value here is a path —
+           `austria/salzburg-and-the-lakes/salzburg`. So typing "Hohensalzburg
+           Fortress" matched nothing, and a reader who knows a place by its
+           name could not find it. The list below matches the SURFACE
+           sentence, which is where the atlas writes the name. -->
       <div class="f-target" id="target-wrap" hidden>
-        <label for="target">Target</label>
-        <input id="target" list="targets" autocomplete="off"
-               placeholder="start typing a destination">
-        <datalist id="targets"></datalist>
+        <label for="target-q">Place</label>
+        <input id="target-q" type="search" autocomplete="off"
+               placeholder="type a name — Salzburg, Trondheim, Theth">
+        <input id="target" type="hidden">
+        <p class="chosen" id="target-chosen" hidden></p>
+        <ul class="places" id="target-hits" hidden></ul>
       </div>
       <div class="f-q">
         <label for="q">Search</label>
@@ -83,6 +92,27 @@
 
     <p class="sheet-note" id="sheet-note"></p>
     <div class="sheet" id="sheet"></div>
+  </section>
+
+  <!-- FILL A COUNTRY. One sitting, one grid, one pull request. -->
+  <section id="view-sweep" class="view" hidden>
+    <form id="sweep" class="find">
+      <div><label for="sw-slot">Slot</label><select id="sw-slot"></select></div>
+      <div><label for="sw-country">Country</label><select id="sw-country"></select></div>
+      <button type="submit">Find one for every empty surface</button>
+    </form>
+    <p class="needs" id="sw-note"></p>
+    <!-- NOTHING IS TICKED WHEN THE GRID ARRIVES. "Select all" is a button a
+         person presses, which makes ticking an act; a grid that arrives
+         pre-ticked is a grid where the default is "acquire everything the
+         provider happened to return first". -->
+    <div class="sweepbar" id="sw-bar" hidden>
+      <button type="button" id="sw-all" class="quiet">Select all</button>
+      <button type="button" id="sw-none" class="quiet">Clear</button>
+      <p class="sw-count" id="sw-count"></p>
+      <button type="button" id="sw-go" class="go" disabled>Acquire</button>
+    </div>
+    <div class="sweep" id="sw-grid"></div>
   </section>
 
   <!-- LIBRARY -->
@@ -107,6 +137,11 @@
                placeholder="a surface or a target"></div>
     </form>
     <p class="needs" id="lib-count"></p>
+    <!-- AN EMPTY ROW IS AN OPENING, AND AN OPENING SHOULD BE A DOOR. The
+         library listed 593 slots and every one of them was a dead end: you
+         read that /countries has no photograph and then went back to the
+         other tab and retyped it. A row is a button now — it fills the search
+         form with that slot and that place and takes you there. -->
     <div class="lib" id="lib"></div>
   </section>
 

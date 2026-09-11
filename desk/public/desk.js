@@ -97,7 +97,13 @@
     fillCountries();
     if (!sel.dataset.wired) { sel.dataset.wired = "1";
       sel.addEventListener("change", onSlot);
-      el("country").addEventListener("change", onCountry); }
+      el("country").addEventListener("change", onCountry);
+      el("target-q").addEventListener("input", hits);
+      el("sw-slot").addEventListener("change", swSlots);
+      el("sweep").addEventListener("submit", sweep);
+      el("sw-all").addEventListener("click", function () { tickAll(true); });
+      el("sw-none").addEventListener("click", function () { tickAll(false); });
+      el("sw-go").addEventListener("click", acquireTicked); }
     onSlot();
   }
 
@@ -144,15 +150,13 @@
     if (!keepCountry && !hasCountry) el("country").value = "";
     if (isSlot) {
       var c = hasCountry ? el("country").value : "";
-      var shown = c ? rows.filter(function (p) { return p.country === c; }) : rows;
-      el("targets").innerHTML = shown.slice(0, 2000).map(function (p) {
-        return '<option value="' + esc(p.target) + '">' + esc(p.surface) + "</option>";
-      }).join("");
-      if (!keepCountry) el("target").value = "";
-      else if (el("target").value && shown.every(function (p) {
+      POOL = c ? rows.filter(function (p) { return p.country === c; }) : rows;
+      if (!keepCountry) setTarget(null);
+      else if (el("target").value && POOL.every(function (p) {
         return p.target !== el("target").value;
-      })) el("target").value = "";
-    }
+      })) setTarget(null);
+      hits();
+    } else { POOL = []; setTarget(null); }
     var spec = specOf(isSlot ? rows[0] : REG.purposes.filter(function (p) {
       return p.purpose === v;
     })[0]);
@@ -180,6 +184,62 @@
       "This slot needs <b>" + p.min_width + "px</b> native width, <b>" +
       esc(p.orientation) + "</b>, aspect <b>" + p.min_aspect + "–" +
       p.max_aspect + "</b>. Those come from the slot, not from this form.";
+  }
+
+  /* ── finding a place by its name ──────────────────────────────────
+     A datalist matches the typed string against an option's VALUE, and the
+     value here is a path: `austria/salzburg-and-the-lakes/salzburg`. So
+     "Hohensalzburg Fortress" matched nothing and a reader who knows a place
+     by its name could not find it. This matches the SURFACE sentence, which
+     is where the atlas writes the name, and shows what it matched rather
+     than a slug. */
+  var POOL = [];
+
+  function hits() {
+    var q = el("target-q").value.trim().toLowerCase();
+    var box = el("target-hits");
+    if (!q || !POOL.length) { box.hidden = true; box.innerHTML = ""; return; }
+    var found = POOL.filter(function (p) {
+      return (p.surface + " " + p.target).toLowerCase().indexOf(q) >= 0;
+    });
+    /* THE COUNT IS THE SET'S OWN EXTENT, not the number on the screen. A
+       list that shows twelve of forty and says nothing reads as forty. */
+    var show = found.slice(0, 12);
+    box.hidden = false;
+    box.innerHTML = show.map(function (p) {
+      return '<li><button type="button" data-t="' + esc(p.target) + '">' +
+        esc(placeName(p)) + '<span class="where">' + esc(p.target) +
+        "</span></button></li>";
+    }).join("") + (found.length > show.length
+      ? '<li class="more">' + (found.length - show.length) +
+        " more match — keep typing.</li>"
+      : (found.length ? "" : '<li class="more">Nothing here matches that.</li>'));
+    box.querySelectorAll("[data-t]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        setTarget(POOL.filter(function (p) {
+          return p.target === b.dataset.t;
+        })[0]);
+      });
+    });
+  }
+
+  /* The atlas writes the name inside the surface sentence, so it is read out
+     of there rather than rebuilt from a slug — which would give "alps and
+     east" and "hohensalzburg". */
+  function placeName(p) {
+    var m = /of the (.+?) (?:destination|place) page/.exec(p.surface || "");
+    if (m) return m[1];
+    var m2 = /of the story “(.+?)”/.exec(p.surface || "");
+    if (m2) return m2[1];
+    return p.surface || p.target;
+  }
+
+  function setTarget(p) {
+    el("target").value = p ? p.target : "";
+    el("target-chosen").hidden = !p;
+    el("target-chosen").textContent = p ? placeName(p) + " · " + p.target : "";
+    el("target-hits").hidden = true;
+    if (p) el("target-q").value = "";
   }
 
   function currentPurpose() {
@@ -409,6 +469,159 @@
     stop(); el("progress").close();
   });
 
+  /* ── fill a country ───────────────────────────────────────────────
+     ONE SITTING, ONE GRID, ONE PULL REQUEST. Filling a country one surface
+     at a time is thirteen searches, thirteen dialogues and thirteen pull
+     requests for what is one editorial decision.
+
+     IT PROPOSES AND IT DOES NOT CHOOSE, and the difference is what the
+     editor can see. `--pick 3` was wrong because a POSITION is not an
+     identity: the photograph approved and the photograph that arrived could
+     differ silently while every provenance field was correct about the wrong
+     one. That cannot happen here — every tile shows its photograph, carries
+     its own id, and the id on the tile is the id dispatched. NOTHING ARRIVES
+     TICKED: "Select all" is a button somebody presses. */
+  var SWEEP = { rows: [], ticked: {} };
+
+  function swSlots() {
+    var slotNames = Object.keys(REG.slots || {});
+    if (!el("sw-slot").options.length) {
+      el("sw-slot").innerHTML = slotNames.map(function (n) {
+        return '<option value="' + esc(n) + '">' + esc(n) + "</option>";
+      }).join("");
+    }
+    var countryOf = {};
+    REG.purposes.forEach(function (p) {
+      if (p.slot && p.country) (countryOf[p.slot] = countryOf[p.slot] || {})[p.country] = p.country_name;
+    });
+    var map = countryOf[el("sw-slot").value] || {};
+    var ks = Object.keys(map).sort(function (a, b) {
+      return map[a].localeCompare(map[b]);
+    });
+    el("sw-country").innerHTML = ks.map(function (k) {
+      return '<option value="' + esc(k) + '">' + esc(map[k]) + "</option>";
+    }).join("") || '<option value="">(this slot has no countries)</option>';
+  }
+
+  function sweep(e) {
+    e.preventDefault();
+    el("sw-grid").innerHTML = "";
+    el("sw-bar").hidden = true;
+    el("sw-note").textContent = "Searching once per empty surface…";
+    SWEEP = { rows: [], ticked: {} };
+    api("/api/sweep?provider=pexels&slot=" +
+        encodeURIComponent(el("sw-slot").value) + "&country=" +
+        encodeURIComponent(el("sw-country").value)).then(function (r) {
+      if (!r.ok || r.j.error) {
+        el("sw-note").textContent = (r.j && r.j.error) || "the sweep failed";
+        return;
+      }
+      SWEEP.rows = r.j.rows;
+      var withPhoto = r.j.rows.filter(function (x) { return x.candidate; }).length;
+      el("sw-note").textContent =
+        (r.j.note ? r.j.note + " " : "") +
+        (r.j.rows.length
+          ? r.j.swept + " empty surface" + (r.j.swept === 1 ? "" : "s") +
+            " of " + r.j.surfaces + " searched, " + withPhoto +
+            " with a photograph that meets the slot. " + r.j.order
+          : "");
+      if (r.j.stopped) el("sw-note").textContent += " " + r.j.stopped;
+      drawSweep();
+    });
+  }
+
+  function drawSweep() {
+    el("sw-bar").hidden = !SWEEP.rows.length;
+    el("sw-grid").innerHTML = SWEEP.rows.map(function (x) {
+      if (!x.candidate) {
+        return '<article class="swcell none"><h3>' + esc(x.query) +
+          '</h3><p class="dims">Searched for &ldquo;' + esc(x.query) +
+          '&rdquo;</p><p class="verdict no">No photograph offered &mdash; ' +
+          esc(x.why_none) + ". Search for this one on its own with a " +
+          "different wording.</p></article>";
+      }
+      var c = x.candidate;
+      return '<article class="swcell" data-p="' + esc(x.purpose) + '">' +
+        '<label class="swpick"><input type="checkbox" data-tick="' +
+          esc(x.purpose) + '"><span>' + esc(x.query) + "</span></label>" +
+        '<figure><img loading="lazy" alt="' +
+          esc(c.alt || ("photograph " + c.id)) + '" src="/api/thumb?t=' +
+          encodeURIComponent(c.thumb) + '"></figure>' +
+        '<p class="by">' + esc(c.photographer) + " · Pexels · id " + esc(c.id) + "</p>" +
+        '<p class="dims">' + c.width + " × " + c.height +
+          (c.alternatives ? " · " + c.alternatives + " other candidates met this slot" : "") +
+          "</p>" +
+        '<label class="swalt"><span>What it shows</span>' +
+        '<textarea data-alt="' + esc(x.purpose) + '" maxlength="240" rows="2">' +
+          esc(c.alt) + "</textarea></label>" +
+        (c.alt ? '<p class="hint">The photographer\u2019s own description. ' +
+                 "Edit it if it is wrong.</p>"
+               : '<p class="hint warnhint">This photograph carries no ' +
+                 "description. Write one, or leave it unticked.</p>") +
+        '<p class="acts"><a href="' + esc(c.page) +
+          '" target="_blank" rel="noopener noreferrer">View on Pexels</a></p>' +
+        "</article>";
+    }).join("");
+    el("sw-grid").querySelectorAll("[data-tick]").forEach(function (b) {
+      b.addEventListener("change", function () {
+        SWEEP.ticked[b.dataset.tick] = b.checked;
+        countTicked();
+      });
+    });
+    el("sw-grid").querySelectorAll("[data-alt]").forEach(function (t) {
+      t.addEventListener("input", countTicked);
+    });
+    countTicked();
+  }
+
+  function tickAll(on) {
+    el("sw-grid").querySelectorAll("[data-tick]").forEach(function (b) {
+      b.checked = on;
+      SWEEP.ticked[b.dataset.tick] = on;
+    });
+    countTicked();
+  }
+
+  /* A TICKED ROW WITH NO DESCRIPTION IS NOT ACQUIRABLE, and the count says
+     so rather than the dispatch failing four screens later. */
+  function ticked() {
+    var out = [];
+    el("sw-grid").querySelectorAll("[data-tick]").forEach(function (b) {
+      if (!b.checked) return;
+      var p = b.dataset.tick;
+      var row = SWEEP.rows.filter(function (x) { return x.purpose === p; })[0];
+      var ta = el("sw-grid").querySelector('[data-alt="' + p.replace(/"/g, '\\"') + '"]');
+      out.push({ purpose: p, photo_id: row.candidate.id,
+                 alt: (ta && ta.value || "").trim() });
+    });
+    return out;
+  }
+
+  function countTicked() {
+    var t = ticked();
+    var noAlt = t.filter(function (x) { return !x.alt; }).length;
+    el("sw-count").textContent = t.length
+      ? t.length + " ticked" + (noAlt ? ", " + noAlt + " with no description" : "")
+      : "Nothing ticked.";
+    el("sw-go").disabled = !t.length || !!noAlt;
+    el("sw-go").textContent = t.length
+      ? "Acquire " + t.length + " photograph" + (t.length === 1 ? "" : "s")
+      : "Acquire";
+  }
+
+  function acquireTicked() {
+    var t = ticked();
+    if (!t.length) return;
+    el("sw-go").disabled = true;
+    api("/api/acquire", { method: "POST",
+      body: JSON.stringify({ provider: "pexels", batch: t }) })
+      .then(function (r) {
+        el("sw-go").disabled = false;
+        if (!r.ok) { alert(r.j.error || "could not start"); return; }
+        watch(r.j.job);
+      });
+  }
+
   /* ── library ──────────────────────────────────────────────── */
   function fillLibrary() {
     var f = el("lib-filters");
@@ -454,17 +667,46 @@
         : "Matching " + rows.length + ", listing " + showing.length + ".");
     el("lib").innerHTML = showing.map(function (p) {
       var spec = specOf(p);
-      return '<div class="slotrow"><span class="pill ' + p.status + '">' +
+      /* AN EMPTY ROW IS AN OPENING, AND AN OPENING SHOULD BE A DOOR. The
+         library listed 593 slots and every one was a dead end: you read that
+         /countries has no photograph and then went to the other tab and
+         retyped it. A filled row stays a record — there is nothing to go and
+         do about a surface that already holds one. */
+      var open = p.status !== "PUBLISHED";
+      var tag = open ? "button" : "div";
+      var attrs = open ? ' type="button" class="slotrow open" data-go="' +
+        esc(p.purpose) + '"' : ' class="slotrow"';
+      return "<" + tag + attrs + '><span class="pill ' + p.status + '">' +
         p.status + "</span><div><h3>" + esc(p.surface) + '</h3><p class="where">' +
         esc(p.purpose) + " · " + esc(p.path) + "</p></div>" +
         '<p class="meta">' + (p.photograph
           ? esc(p.photograph.photographer) + "<br>" +
             esc((p.photograph.sha256 || "").slice(0, 16))
-          : spec.min_width + "px · " + spec.min_aspect + "–" + spec.max_aspect) +
-        "</p></div>";
+          : spec.min_width + "px · " + spec.min_aspect + "–" + spec.max_aspect +
+            '<br><span class="findit">Find one →</span>') +
+        "</p></" + tag + ">";
     }).join("") + (tail.length > 60
       ? '<p class="hint">' + (tail.length - 60) + " more empty slots not listed.</p>"
       : "");
+    el("lib").querySelectorAll("[data-go]").forEach(function (b) {
+      b.addEventListener("click", function () { goFind(b.dataset.go); });
+    });
+  }
+
+  /* Take the reader to the search with this surface already chosen. Setting
+     the fields and leaving them on a hidden tab would be the `for=` failure
+     in another costume: correct, and invisible. */
+  function goFind(purpose) {
+    var row = REG.purposes.filter(function (p) { return p.purpose === purpose; })[0];
+    if (!row) return;
+    show_view("find");
+    el("slot").value = row.slot || row.purpose;
+    onSlot();
+    if (row.country) { el("country").value = row.country; onSlot(true); }
+    if (row.slot) setTarget(row);
+    el("q").value = placeName(row);
+    el("q").focus();
+    el("q").select();
   }
 
   function fillProvenance() {
@@ -485,15 +727,19 @@
   }
 
   /* ── views ────────────────────────────────────────────────── */
-  document.querySelectorAll(".area").forEach(function (b) {
-    b.addEventListener("click", function () {
-      document.querySelectorAll(".area").forEach(function (x) {
-        x.classList.toggle("on", x === b);
-      });
-      ["find", "library", "provenance"].forEach(function (v) {
-        el("view-" + v).hidden = v !== b.dataset.view;
-      });
+  var VIEWS = ["find", "sweep", "library", "provenance"];
+
+  function show_view(name) {
+    document.querySelectorAll(".area").forEach(function (x) {
+      x.classList.toggle("on", x.dataset.view === name);
     });
+    VIEWS.forEach(function (v) { el("view-" + v).hidden = v !== name; });
+    if (name === "sweep") swSlots();
+    window.scrollTo(0, 0);
+  }
+
+  document.querySelectorAll(".area").forEach(function (b) {
+    b.addEventListener("click", function () { show_view(b.dataset.view); });
   });
 
   api("/api/session").then(function (r) { show(!!(r.j && r.j.signed_in)); });
