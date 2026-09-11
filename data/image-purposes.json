@@ -3,6 +3,7 @@
   "$requirements": "min_width is native pixels, not the ladder's widest step: a 1,200px original upscaled to 2,400 is the same untruth as a population we estimated, and derive.py already refuses to upscale. orientation and aspect are the mechanical half of whether a picture can do the job; the editorial half — subject placement, hierarchy, whether it looks like generic stock — is why discovery presents candidates to a person instead of picking one. AND /plan HAS NO HERO SLOT ON PURPOSE. A purpose was declared for it and removed in the same session: the planner is an instrument, its title is a label rather than a headline because the page IS the tool, and that came from a measurement — the magazine head pushed the control to y=436 and half the first screen of a tool was a headline and four lines of prose. A photograph above the sentence box would undo exactly that, so the honest answer is no slot rather than a slot nobody should fill.",
   "purposes": {
     "homepage-hero": {
+      "role": "hero",
       "key": "home-hero",
       "path": "/",
       "surface": "The full-bleed opening of the homepage, with the masthead over it and the headline beside it.",
@@ -13,6 +14,7 @@
       "note": "docs/hero-brief.md holds the editorial brief. The plate system was MEASURED as unable to carry this surface, which is the whole argument for licensing a photograph at all — so a photograph that reads as generic stock fails the brief even when it passes every number here. THE FLOOR WAS 1.6 AND IT REFUSED FIFTEEN OF FIFTEEN. Every landscape result of the first real search measured 1.50, which is 3:2, the native aspect of essentially every camera a stock photographer owns — so the one purpose on this site that asked for 1.6 was asking for a crop rather than a photograph, and refused the whole library. It was also backwards for its own brief: the brief wants a strong 21:9 desktop crop AND a viable portrait crop out of the SAME frame, and a narrower source has more room for both, not less. Cropping 3:2 to 21:9 keeps 64% of the height; cropping 2.6:1 to 3:4 keeps 29% of the width. 1.5 is what every other purpose here already asks for."
     },
     "vienna-destination": {
+      "role": "destination-portrait",
       "key": "city:austria/vienna-and-the-east/vienna",
       "path": "/europe/austria/vienna-and-the-east/vienna",
       "surface": "The opening image of the Vienna destination page.",
@@ -23,6 +25,7 @@
       "note": "Vienna's physical identity is the Danube and the historic centre rather than relief — its ground reads 332 m of spread and a 480 m crest, which is why it draws no terrain bands."
     },
     "chamonix-destination": {
+      "role": "destination-portrait",
       "key": "city:france/the-alps/chamonix",
       "path": "/europe/france/the-alps/chamonix",
       "surface": "The opening image of the Chamonix destination page.",
@@ -33,6 +36,7 @@
       "note": "The ground within 40 km spreads 1,798 m and crests at 2,752 m. A photograph here has to carry the valley floor against the wall above it, which is the reading the Stay layer makes in words."
     },
     "door-mountains": {
+      "role": "landscape",
       "key": "door-mountains",
       "path": "/",
       "surface": "The Mountains door on the homepage — a large editorial card under “Find your Europe”.",
@@ -43,6 +47,7 @@
       "note": "An alpine morning above cloud — a valley floor against the wall over it, not a summit portrait. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own."
     },
     "door-coast": {
+      "role": "landscape",
       "key": "door-coast",
       "path": "/",
       "surface": "The Coast & islands door on the homepage — a large editorial card under “Find your Europe”.",
@@ -53,6 +58,7 @@
       "note": "Where land ends. A cliff, a harbour or an island shore with the sea doing the work. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own."
     },
     "door-history": {
+      "role": "architecture",
       "key": "door-history",
       "path": "/",
       "surface": "The Historic cities door on the homepage — a large editorial card under “Find your Europe”.",
@@ -63,6 +69,7 @@
       "note": "A lived-in old street, not a monument. Somebody's Tuesday in a two-thousand-year-old city. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own."
     },
     "door-food": {
+      "role": "food",
       "key": "door-food",
       "path": "/",
       "surface": "The Food & wine door on the homepage — a large editorial card under “Find your Europe”.",
@@ -73,6 +80,7 @@
       "note": "A table, a market or a vineyard that could only be where it is. Never a styled plate on a board. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own."
     },
     "journeys-hero": {
+      "role": "journey-atmosphere",
       "key": "journeys-hero",
       "path": "/journeys",
       "surface": "The opening of the journeys index — a wide editorial image beside the headline.",
@@ -83,6 +91,7 @@
       "note": "A road, a rail line or a pass with distance in it: the feeling of crossing a border on purpose. Never a map, and never a single landmark. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening."
     },
     "experiences-hero": {
+      "role": "experience-action",
       "key": "experiences-hero",
       "path": "/experiences",
       "surface": "The opening of the experiences index.",
@@ -93,6 +102,7 @@
       "note": "Somebody DOING the thing — hands, a workshop, a kitchen, a boat. A person at work in a real place, not a posed portrait and not an empty interior. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening."
     },
     "stories-hero": {
+      "role": "editorial-story",
       "key": "stories-hero",
       "path": "/stories",
       "surface": "The opening of the stories index.",
@@ -103,6 +113,7 @@
       "note": "A human moment that could be the opening frame of a long read. Faces are welcome; a landmark is not. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening."
     },
     "events-hero": {
+      "role": "cultural-scene",
       "key": "events-hero",
       "path": "/events",
       "surface": "The opening of the events index.",
@@ -113,6 +124,7 @@
       "note": "A European gathering in progress — a procession, a market, a festival crowd at dusk. It must read as a fixture in a real town, not a stadium. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening."
     },
     "countries-hero": {
+      "role": "landscape",
       "key": "countries-hero",
       "path": "/countries",
       "surface": "The opening of the atlas index — a wide editorial image beside the headline.",
@@ -121,6 +133,178 @@
       "min_aspect": 1.3,
       "max_aspect": 2.1,
       "note": "One country seen whole from the ground: a valley, a coast or a plain with enough of it in frame that the eye reads a country rather than a spot. Never an aerial, never a flag, never a monument, and never a composite of several places — the page's argument is that Europe is fifty separate countries, and a picture that could be anywhere argues the opposite. The drawing it replaces is the fifty drawn as fifty, so a photograph has to be at least as specific as that. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening."
+    }
+  },
+  "$roles": "TWELVE ROLES, and a purpose instantiates one. A role is the vocabulary — what a picture of this kind is FOR, what must be in frame, what must survive the crop, and what disqualifies a candidate that passes every number. A purpose is an instance: one surface, one page, one register key. Roles are declared before photographs exist because that is this repository's standing rule for anything externally governed, and because an undirected slot is how a library fills up with pictures nobody chose. THREE ROLES HAVE NO PURPOSE TODAY and each says why: two carry a trigger naming the design decision that would create one, and accommodation is REFUSED outright with the reason. A role with neither is a dead motif wearing the clothes of vocabulary — the exact failure plate-variation.py exists to catch one family over.",
+  "roles": {
+    "hero": {
+      "does": "The one photograph that decides whether a visitor stays. It is the first thing on the page, full-bleed, with the masthead standing on it and a 60px headline over its lower half.",
+      "min_width": 2400,
+      "orientation": "landscape",
+      "min_aspect": 1.5,
+      "max_aspect": 2.6,
+      "subject": "A place, seen whole, at a particular hour. A horizon, a middle distance and a foreground — three depths, so the eye has somewhere to travel. NOT a landmark portrait, NOT a person's face, NOT a composed 'travel' tableau.",
+      "crop": "The subject must survive an extreme re-crop: this slot runs from 0.53 on a phone to 2.17 on a wide desktop. Anything the picture is ABOUT sits in the middle third horizontally.",
+      "brief": "The atmosphere of one morning in Europe, not a summary of Europe. It must be a place somebody could go, and it must not be identifiable as the cover of any other travel product. Weather is allowed to be bad. Low sun, high cloud, mist in a valley, rain on stone — all better than a blue sky, which is what every stock search returns first and what every competitor already has.",
+      "refuses": "A blue-sky panorama. A drone shot directly down. Anything with a visible model release look — posed figures at the centre. Heavy colour grading, especially teal-and-orange. A landmark so famous it names the picture instead of the continent.",
+      "note": "The hero is the one surface where the DRAWING is currently better than any stock photograph would be, and that is measured: no other travel product can draw Europe on its own conformal conic through its own aperture, and a licensed stock photograph is by definition a thing anyone can also license. So this role's bar is higher than the rest: a photograph replaces the drawing only if it does something the drawing cannot. See docs/hero-brief.md.",
+      "purposes_today": [
+        "homepage-hero"
+      ]
+    },
+    "destination-portrait": {
+      "does": "The opening image of one destination page — the answer to 'what is this place actually like'.",
+      "min_width": 1800,
+      "orientation": "landscape",
+      "min_aspect": 1.5,
+      "max_aspect": 2.4,
+      "subject": "THE PLACE, not an activity in it and not a detail of it. The relationship between the settlement and its ground — a valley floor against the wall above it, a town against its water, a city against its plain. The measured relief in data/geo/terrain-lod1.json says which of those this destination is.",
+      "crop": "Held in the page column, so the crop range is narrow. The horizon may sit anywhere; the settlement may not be cut by an edge.",
+      "brief": "What a person would see on the walk in. Ordinary weather, ordinary hour, no event. The photograph's job is to make the reader believe the page's own sentence about the ground, so a picture that contradicts the measurement — a flat frame for a place whose ground spreads 1,798 m — fails even at full resolution.",
+      "refuses": "The one view every postcard of this place uses. A festival, unless the page is about the festival. Anything shot from inside a hotel or a restaurant.",
+      "purposes_today": [
+        "chamonix-destination",
+        "vienna-destination"
+      ]
+    },
+    "landscape": {
+      "does": "Ground without a settlement: what a stretch of Europe is made of. Used on the interest doors and on macro-region openings.",
+      "min_width": 1600,
+      "orientation": "landscape",
+      "min_aspect": 1.2,
+      "max_aspect": 2.1,
+      "subject": "One landform, legibly. Mountains means a range with depth, not one peak. Coast means the meeting of the two, not a beach. A landscape role picture has no principal human subject and no building larger than incidental.",
+      "crop": "Two container families, so the range is the union of both and each purpose tightens it. The four doors sit abreast in one strip and are cropped hard and differently at every width — the landform must read at 320px wide. A macro-region opening is held in the page column and crops gently. THE ROLE IS THE FLOOR AND THE PURPOSE IS THE FLOOR RAISED: the doors declare 1.2-1.9 and countries-hero declares 1.3-2.1, and a check refuses a purpose looser than its role rather than the other way round.",
+      "brief": "Four of these are seen at once and they must not read as four results of one stock search. Different light, different season, different palette between neighbours, and a set that is deliberately not all at golden hour. This is the only role where the SET is the brief and an individually excellent picture can fail on it.",
+      "refuses": "Golden hour on more than one door in the same set. A hiker in silhouette on a ridge. A road disappearing into the distance.",
+      "purposes_today": [
+        "countries-hero",
+        "door-coast",
+        "door-mountains"
+      ]
+    },
+    "cultural-scene": {
+      "does": "Something happening that is part of the place's year — a market, a procession, a harvest, a fixture. Used on the events surface.",
+      "min_width": 2000,
+      "orientation": "landscape",
+      "min_aspect": 1.3,
+      "max_aspect": 2.1,
+      "subject": "An event in its real setting, with the setting legible. The event must be one that recurs, because this atlas publishes only recurring fixtures and a one-off photograph would be a claim about a date.",
+      "crop": "Held in an index opening; moderate crop range.",
+      "brief": "The year has a shape and this is the picture of the shape. It should read as a place that does this every year, not as a photographer's lucky afternoon.",
+      "refuses": "A crowd photographed as a crowd. A staged 'traditional costume' set-up. Anything a tourist board commissioned.",
+      "purposes_today": [
+        "events-hero"
+      ]
+    },
+    "food": {
+      "does": "What a region tastes of. The Food & wine door, and any surface whose subject is the table.",
+      "min_width": 1600,
+      "orientation": "landscape",
+      "min_aspect": 1.2,
+      "max_aspect": 1.9,
+      "subject": "Food in its place — a counter, a cellar, a table where it is made or sold. The region must be inferable from the frame.",
+      "crop": "Same four-abreast strip as landscape; must read at 320px.",
+      "brief": "A market or a cellar rather than a plated dish. A plated dish is a restaurant's photograph and this atlas lists no restaurants; a counter is a place's photograph. Warm ground, real light, no overhead flat-lay.",
+      "refuses": "A flat-lay. A styled plate on a rustic board. Anything shot on a white background. Hands holding a coffee cup.",
+      "purposes_today": [
+        "door-food"
+      ]
+    },
+    "architecture": {
+      "does": "Built Europe as the subject: the Historic cities door, and any surface whose argument is what people built.",
+      "min_width": 1600,
+      "orientation": "landscape",
+      "min_aspect": 1.2,
+      "max_aspect": 1.9,
+      "subject": "A street, a square or a facade in use. Architecture with people in it at ordinary scale — the building is the subject, the people are the evidence that it is still lived in.",
+      "crop": "Four-abreast strip; must read at 320px.",
+      "brief": "Two thousand years, still lived in. A street somebody walks down to get somewhere, not a monument photographed as a monument.",
+      "refuses": "An empty square at dawn shot to remove people. A cathedral interior with a wide-angle bulge. Anything symmetrical to the centre line.",
+      "purposes_today": [
+        "door-history"
+      ]
+    },
+    "human-life": {
+      "does": "A person or people, at the scale of a life rather than a portrait: the evidence that a place is inhabited.",
+      "min_width": 1800,
+      "orientation": "landscape",
+      "min_aspect": 1.3,
+      "max_aspect": 2.1,
+      "subject": "People doing something they would be doing anyway. Faces may be present and must not be the composition.",
+      "crop": "Depends on the surface. No purpose instantiates this yet.",
+      "brief": "This is the role most likely to produce a photograph that reads as stock, because the stock libraries are full of exactly this shot done badly. The test: could this person be anywhere in the world? If yes, it fails — the place must be doing as much work as the person.",
+      "refuses": "A model release look. A back-of-head traveller gazing at a view. A couple laughing at a map.",
+      "purposes_today": [],
+      "trigger": "A purpose exists for this the day a destination page grows a second image slot below its opening, which is a composition decision that has not been made. Declaring a slot for it sooner would put a hole on 319 pages — see docs/first-class-audit.md, Finding 3."
+    },
+    "journey-atmosphere": {
+      "does": "The feeling of moving through Europe rather than being in one part of it. The journeys surface.",
+      "min_width": 2000,
+      "orientation": "landscape",
+      "min_aspect": 1.3,
+      "max_aspect": 2.1,
+      "subject": "Transit, seen from inside it or beside it: a train window, a ferry deck, a pass road, a platform. The destination must NOT be identifiable — a journey crosses many and a recognisable one contradicts the rest.",
+      "crop": "Index opening; moderate range.",
+      "brief": "Seventeen routes cross borders on purpose, and this picture is the argument for why that is the point. Motion, weather, distance. A window is better than a vehicle.",
+      "refuses": "A specific famous train. A car on an empty road. Anything that identifies one country.",
+      "purposes_today": [
+        "journeys-hero"
+      ]
+    },
+    "experience-action": {
+      "does": "A verb. What people actually do here — the experiences surface.",
+      "min_width": 2000,
+      "orientation": "landscape",
+      "min_aspect": 1.3,
+      "max_aspect": 2.1,
+      "subject": "An activity mid-action, by somebody who does it rather than somebody visiting it. The maker, the fisherman, the cellarman.",
+      "crop": "Index opening; moderate range.",
+      "brief": "This atlas lists no adverts and 197 experiences, and the difference is that an experience here is something that happens whether a visitor comes or not. The photograph has to carry that.",
+      "refuses": "A guided group. A branded uniform. Anything that looks like it was shot for the operator.",
+      "purposes_today": [
+        "experiences-hero"
+      ]
+    },
+    "detail-texture": {
+      "does": "One small true thing at close range: a material, a surface, a mark. Punctuation between large pictures.",
+      "min_width": 1600,
+      "orientation": "landscape",
+      "min_aspect": 1.2,
+      "max_aspect": 1.9,
+      "subject": "A surface that belongs to somewhere: stone, water, tile, timber, snow, paper. No horizon, no face, no landmark.",
+      "crop": "Punctuation, so it is cropped hard by design.",
+      "brief": "This is the role that stops a page of large pictures reading as a slideshow. It is quiet on purpose and must never be the loudest thing on its page.",
+      "refuses": "A pattern so abstract the place is gone. A macro shot of food, which is the food role done small.",
+      "purposes_today": [],
+      "trigger": "A purpose exists the day a family's composition has a rhythm that needs punctuation — which is a page-design decision, not a sourcing one."
+    },
+    "editorial-story": {
+      "does": "The image of an essay: not a place but an argument. The stories surface.",
+      "min_width": 2000,
+      "orientation": "landscape",
+      "min_aspect": 1.3,
+      "max_aspect": 2.1,
+      "subject": "Whatever the piece is about, photographed as the piece sees it. A story about an unlogged forest is a forest photographed as age, not as green.",
+      "crop": "Index opening; moderate range.",
+      "brief": "A STORY IS NOT A PLACE and its picture may never be drawn from a hash — that rule already exists here and cost nine social cards. The same reasoning binds a photograph: an essay's picture is chosen for the essay, so this role can never be filled by a general search on a destination name.",
+      "refuses": "A stock illustration of the topic. Anything that would serve equally well on three other stories.",
+      "purposes_today": [
+        "stories-hero"
+      ]
+    },
+    "accommodation": {
+      "does": "Where a visitor would sleep.",
+      "min_width": 1800,
+      "orientation": "landscape",
+      "min_aspect": 1.5,
+      "max_aspect": 2.4,
+      "subject": "n/a",
+      "crop": "n/a",
+      "brief": "n/a",
+      "refuses": "n/a",
+      "purposes_today": [],
+      "refused": "REFUSED, on a licence position rather than a taste. This is the family where a photograph does work type cannot — you choose where to sleep partly on what a place looks like at seven in the morning — and the only images that exist for it belong to the accommodation providers and arrive with affiliate terms instead of a photographer, a source and a licence. The Stay layer's no-image state is the SHIPPED state, not a fallback. A row waiting on a measurement is answered by rendering something and looking; a row waiting on a source is answered by a purchase order."
     }
   }
 }

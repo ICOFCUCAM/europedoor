@@ -5314,6 +5314,98 @@ def c_hero_dusk_reach():
     return n
 
 
+@check("every image purpose instantiates a declared role, and no role is dead")
+def c_photo_roles():
+    """A ROLE IS THE VOCABULARY AND A PURPOSE IS AN INSTANCE.
+
+    Twelve purposes existed before twelve roles did, and they were twelve
+    SLOTS: a surface, a page, a register key and a minimum width. That
+    answers where a photograph goes and not one word about what it must be
+    a picture OF — so the pipeline could have acquired a technically
+    perfect photograph for the Mountains door that was a summit portrait,
+    passed every number, and contradicted the door's own sentence.
+
+    So each purpose now names a role, and the role carries the subject
+    rule, the crop rule, the brief and the refusals. This asserts three
+    things the file cannot enforce about itself:
+
+    A purpose's role must exist. A typo here is the `home:hero` /
+    `home-hero` failure one check down — silently correct-looking and
+    completely inert.
+
+    A purpose may be STRICTER than its role and never looser. The role is
+    the floor: a door may demand more width than `landscape` does, and a
+    door that quietly halved its minimum would be a role that means
+    nothing.
+
+    AND A ROLE WITH NO PURPOSE MUST SAY WHY. Three have none. Two carry a
+    `trigger` naming the design decision that would create one and one is
+    `refused` with the reason. A role with neither is a dead motif wearing
+    the clothes of vocabulary — `plain` was declared for the life of the
+    plate system and never drawn, and reachability has been an invariant
+    since. `purposes_today` is DERIVED here rather than trusted, because a
+    hand-typed list of which purposes use a role is a list that is wrong
+    one commit after somebody adds a purpose.
+    """
+    spec = json.load(open(os.path.join(ROOT, "data", "image-purposes.json"),
+                          encoding="utf-8"))
+    roles, purposes = spec.get("roles", {}), spec.get("purposes", {})
+    n = 0
+    if not roles:
+        fail("data/image-purposes.json declares no roles")
+        return 0
+    used = {}
+    for name, pur in sorted(purposes.items()):
+        n += 1
+        r = pur.get("role")
+        if r not in roles:
+            fail(f"image-purposes.json > {name}: role {r!r} is not declared. "
+                 f"Known: {', '.join(sorted(roles))}")
+            continue
+        used.setdefault(r, []).append(name)
+        role = roles[r]
+        # stricter is allowed; looser makes the role meaningless
+        n += 1
+        if pur.get("min_width", 0) < role.get("min_width", 0):
+            fail(f"image-purposes.json > {name}: min_width "
+                 f"{pur.get('min_width')} is below what the {r!r} role "
+                 f"requires ({role.get('min_width')}). A purpose may ask for "
+                 f"more than its role and never for less")
+        for key, worse in (("min_aspect", float.__lt__), ("max_aspect", float.__gt__)):
+            if key in pur and key in role:
+                n += 1
+                if worse(float(pur[key]), float(role[key])):
+                    fail(f"image-purposes.json > {name}: {key} {pur[key]} is "
+                         f"outside the {r!r} role's {key} {role[key]}")
+        if pur.get("orientation") and role.get("orientation") \
+                and pur["orientation"] != role["orientation"]:
+            n += 1
+            fail(f"image-purposes.json > {name}: orientation "
+                 f"{pur['orientation']!r} contradicts the {r!r} role's "
+                 f"{role['orientation']!r}")
+    for name, role in sorted(roles.items()):
+        n += 1
+        mine = sorted(used.get(name, []))
+        if mine != sorted(role.get("purposes_today", [])):
+            fail(f"image-purposes.json > roles > {name}: purposes_today says "
+                 f"{role.get('purposes_today')} and the purposes that name "
+                 f"this role are {mine}. It is derived, so rewrite it rather "
+                 f"than arguing with it")
+        if not mine and not role.get("trigger") and not role.get("refused"):
+            fail(f"image-purposes.json > roles > {name}: no purpose "
+                 f"instantiates this role and it carries neither a trigger "
+                 f"nor a refusal. A role nothing reaches is dead vocabulary — "
+                 f"say what would create a purpose for it, or say it is "
+                 f"refused and why")
+        for field in ("does", "subject", "crop", "brief", "refuses"):
+            n += 1
+            if not str(role.get(field, "")).strip():
+                fail(f"image-purposes.json > roles > {name}: {field!r} is "
+                     f"empty. A role without a subject rule and a brief is a "
+                     f"slot with a longer name")
+    return n
+
+
 @check("a registered photograph appears on the page its purpose claims")
 def c_photo_published():
     """The register cannot claim a surface it does not reach.
