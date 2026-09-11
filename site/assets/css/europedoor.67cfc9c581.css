@@ -4988,8 +4988,21 @@ body[data-hero] .masthead { position: sticky; }
      The full height comes back with the photograph, on `.shot`, so the strip
      composes at every step rather than only when all four are licensed —
      which is the argument for four slots rather than one band image. */
-  min-height: 22rem;
-  padding: var(--s6) var(--s5);
+  /* NO FLOOR WITHOUT A PICTURE. This said "SIZED FOR WHAT IS IN IT, WHICH
+     TODAY IS TYPE" over a fixed 22rem, which is not that — it halved the
+     hole rather than closing it. RENDERED and measured: at 1440 each panel
+     is 352px holding about 180px of words, so 170 pixels of flat teal sit
+     above every heading; at 834 the 2x2 reserves 24rem a panel and the band
+     is more than half empty; at 390 the strip runs 1,184px of which roughly
+     six hundred are colour. A slot waiting for a picture is honest and this
+     was four of them, on the homepage's second screen, reading as images
+     that failed to load.
+
+     The floor lives on `.shot` alone now, at every breakpoint. With no
+     photograph a door is exactly its type in an edge-to-edge dark strip —
+     which is a decision, and the only dark band in the body, and therefore
+     the dominant element the section needs. */
+  padding: var(--s7) var(--s5) var(--s6);
   background: var(--atlas-sea);
   text-decoration: none;
   --ink:   var(--limestone);
@@ -5024,9 +5037,9 @@ body[data-hero] .masthead { position: sticky; }
      path nothing exercises yet: `.way.shot` asks for 58vh the day a
      photograph lands, and without this the picture would have been a
      281-pixel band. */
-  .wayin { min-height: 22rem;
-           grid-template-rows: 1fr auto auto auto auto; }
-  .wayin:has(.way.shot) { min-height: min(58vh, 33rem); }
+  .wayin { grid-template-rows: auto auto auto auto auto; }
+  .wayin:has(.way.shot) { min-height: min(58vh, 33rem);
+                          grid-template-rows: 1fr auto auto auto auto; }
   .way { grid-row: 1 / -1; display: grid; grid-template-rows: subgrid;
          min-height: 0; }
   .waytext { display: grid; grid-row: 2 / -1; grid-template-rows: subgrid; }
@@ -5072,20 +5085,49 @@ body[data-hero] .masthead { position: sticky; }
 }
 @media (max-width: 60rem) {
   .wayin { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .way { min-height: min(44vh, 24rem); }
+  .way.shot { min-height: min(44vh, 24rem); }
 }
-@media (max-width: 40rem) {
+/* ONE COLUMN AT 52rem, NOT 40, BECAUSE A SECOND RULE HAD ALREADY TAKEN IT.
+   A `.wayin { grid-template-columns: 1fr; gap: var(--s6) }` sat three
+   hundred lines further down in the 52rem block and won on order — so
+   between 640 and 832 the strip was one column with 32px gutters between
+   the panels, which is four cards of what this band exists not to be. The
+   rule twelve lines above says it in words: "A HAIRLINE, NOT A GAP. A
+   gutter between four photographs makes four cards of them; a hairline
+   makes one strip cut into four." Third time a duplicate declaration a
+   screen away from its twin has quietly reversed a decision here. */
+@media (max-width: 52rem) {
   .wayin { grid-template-columns: 1fr; }
-  .way { min-height: 17rem; }
+  .way { padding: var(--s6) var(--s4); }
+  .way.shot { min-height: 17rem; }
+  /* The divider stacks with the panels: horizontal, or the strip comes
+     apart into four blocks that happen to share a colour. */
+  .way + .way { border-left: 0;
+                border-top: 1px solid color-mix(in srgb, var(--limestone) 20%, transparent); }
 }
 /* A PANEL HEADING, NOT A PAGE HEADLINE. The doors were half-page blocks and
    carried a 40px serif; four panels of a strip are 320 pixels wide at 1280
    and "Coast & islands" broke across three lines in one. `--t-xl` is already
    in the scale: a size that exists only for this band is a decoration. */
 .way h3 {
-  font-size: var(--t-xl);
-  line-height: 1.12; margin: 0 0 var(--s3);
+  /* UP ONE STEP, BECAUSE THE TYPE IS NOW THE WHOLE DOOR. --t-xl was set
+     when the name was a caption over a photograph; with no picture it is
+     the thing itself.
+
+     AND IT IS A CLAMP THAT ALREADY EXISTS RATHER THAN A NEW DECLARATION.
+     `var(--t-2xl)` bare was the sixteenth distinct font-size in this file
+     and `line-height: 1.1` the fifth leading, and the invariant register
+     caught both in one run — a ceiling is a ceiling. The clamp is the same
+     one five other headings use: 30px on a desktop where a door is a
+     quarter of the strip, 24 on a phone where it is the whole width, which
+     is the behaviour that was wanted anyway. */
+  font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
+  line-height: 1.12; margin: 0 0 var(--s3); letter-spacing: -0.02em;
 }
+/* And it goes back DOWN when a photograph arrives: over a picture the name
+   is a caption again, and 30px of serif over somebody's landscape is the
+   thing every stock-photo travel site does. */
+.way.shot h3 { font-size: var(--t-xl); letter-spacing: 0; }
 /* The editorial line is the promise and the only italic on the page: it is
  * the sentence a reader answers, where everything under it is fact. */
 .wayline { font-family: var(--display); font-style: italic; font-size: var(--t-lg);
@@ -5246,7 +5288,6 @@ body[data-hero] .masthead { position: sticky; }
 @media (max-width: 52rem) {
   /* One column, and the journey route goes UNDER its text rather than into a
    * 13rem column that is no longer 13rem wide. */
-  .wayin { grid-template-columns: 1fr; gap: var(--s6); }
   .jrow, .storyband { grid-template-columns: 1fr; gap: var(--s4); }
   .jrowart { max-width: 20rem; }
 }
