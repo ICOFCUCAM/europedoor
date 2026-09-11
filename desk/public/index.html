@@ -38,6 +38,13 @@
     <nav class="areas">
       <button type="button" class="area on" data-view="find">Find images</button>
       <button type="button" class="area" data-view="sweep">Fill a country</button>
+      <!-- THE BASKET IS AN AREA, NOT A DRAWER. It is where a sitting's work
+           accumulates, so it has to be somewhere you can leave and come back
+           to; a panel that slides out of a corner is a place work goes to be
+           forgotten. The count is on the tab because the one question an
+           editor asks between searches is "how many have I got". -->
+      <button type="button" class="area" data-view="basket">Basket<span
+        class="badge" id="basket-n" hidden>0</span></button>
       <button type="button" class="area" data-view="library">Library</button>
       <button type="button" class="area" data-view="provenance">Provenance</button>
     </nav>
@@ -117,6 +124,7 @@
     <div class="sweepbar" id="sw-bar" hidden>
       <button type="button" id="sw-all" class="quiet">Select all</button>
       <button type="button" id="sw-none" class="quiet">Clear</button>
+      <button type="button" id="sw-bag" class="quiet">Add ticked to basket</button>
       <p class="sw-count" id="sw-count"></p>
       <button type="button" id="sw-go" class="go" disabled>Acquire</button>
     </div>
@@ -151,6 +159,34 @@
          other tab and retyped it. A row is a button now — it fills the search
          form with that slot and that place and takes you there. -->
     <div class="lib" id="lib"></div>
+  </section>
+
+  <!-- THE BASKET. One sitting's working set, held in this browser.
+       ==========================================================
+       WHY IT IS IN THE BROWSER AND NOT ON A SERVER. This desk holds no
+       state anywhere — two serverless invocations share no memory, which is
+       why a session and a preview token are SIGNED VALUES rather than
+       dictionary entries. A basket on the server would be the first stored
+       thing in the product, and it would be shared between everyone signed
+       in with the one passcode, with no notion of whose it is. So it is one
+       editor's working set in one editor's browser, and the interface says
+       that plainly rather than implying a queue somebody else can see.
+
+       AND IT IS KEYED ON THE PURPOSE, because a surface holds one
+       photograph. Adding a second for a surface already in the basket
+       replaces it and says so — the register refuses that pair at the far
+       end, and a basket you can fill with a set the dispatch will reject is
+       a basket that wastes the sitting it exists to collect. -->
+  <section id="view-basket" class="view" hidden>
+    <p class="needs" id="bk-note"></p>
+    <div class="sweepbar" id="bk-bar" hidden>
+      <button type="button" id="bk-all" class="quiet">Select all</button>
+      <button type="button" id="bk-none" class="quiet">Clear selection</button>
+      <button type="button" id="bk-drop" class="quiet">Remove ticked</button>
+      <p class="sw-count" id="bk-count"></p>
+      <button type="button" id="bk-go" class="go" disabled>Acquire</button>
+    </div>
+    <div class="sweep" id="bk-grid"></div>
   </section>
 
   <!-- PROVENANCE -->

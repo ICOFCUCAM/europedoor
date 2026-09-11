@@ -95,7 +95,15 @@ input:focus, select:focus { border-color: var(--cobalt); }
 }
 .top .mark { color: var(--limestone); margin: 0; }
 .top .mark span { color: #98a1a9; }
-.areas { display: flex; gap: var(--s1); margin-left: auto; }
+/* AND SO DOES THE ROW INSIDE IT, which the fix above did not reach. `.top`
+   was given `flex-wrap` when Sign out went off the right edge at 390, and
+   `.areas` — the row that actually holds the tabs — was left a single
+   unbreakable line. Five tabs fitted at 390 and six did not, so adding the
+   basket put the document back into sideways scroll on every screen: the
+   same defect, one element in, found by the render suite in the run that
+   introduced it. A rule that exists is not a rule that is inherited. */
+.areas { display: flex; flex-wrap: wrap; gap: var(--s1); row-gap: var(--s2);
+  margin-left: auto; }
 .area {
   background: none; border: 0; cursor: pointer; color: #c3c9cf;
   padding: .45rem .8rem; border-radius: var(--radius); font-size: 14px;
@@ -270,7 +278,23 @@ menu { display: flex; gap: var(--s3); justify-content: flex-end;
    commit is where it stopped. This one ends on a PULL REQUEST, which is a
    question somebody has to answer — so the link is the last thing on the
    panel and it is the only thing that looks like an action. */
-.prog li.running .tick { color: var(--sea); }
+/* AN UNRESOLVABLE var() IS NOT A MISSING VALUE, IT IS A DIFFERENT ONE — and
+   this stylesheet had two, found by grepping for the fault while adding the
+   basket rather than by anything that runs. The whole declaration is invalid
+   at computed-value time and the property takes its INHERITED value, so
+   `--sea` (which has never existed here; the token is `--cobalt`) left the
+   running step's tick painting whatever the list item inherits, and
+   `--paper` (the token is `--limestone`) left both textareas taking their
+   parent's background rather than the field colour — including the alt
+   field, the one control on this desk that must be read in full before it is
+   approved.
+
+   The main stylesheet records exactly this failure at length: `--serif` for
+   `--display`, twelve rules deep, silently replacing the right font on most
+   of the largest headings on the site. This desk was written afterwards and
+   inherited none of it. A rule that exists is not a rule that is inherited,
+   and the hosted suite compares the two sets now. */
+.prog li.running .tick { color: var(--cobalt); }
 .prog li.skipped { opacity: .55; }
 .prog .runlink, .prog .prlink { display: inline-block; margin-top: var(--s4);
   font-size: 14px; }
@@ -308,7 +332,7 @@ menu { display: flex; gap: var(--s3); justify-content: flex-end;
    that must be read in full before it is approved. */
 #alt { width: 100%; resize: vertical; font: inherit; font-size: 15px;
   line-height: 1.45; padding: var(--s3); border: 1px solid var(--ink-3);
-  border-radius: var(--radius); background: var(--paper); color: var(--ink); }
+  border-radius: var(--radius); background: var(--limestone); color: var(--ink); }
 
 /* ── finding a place by its name ────────────────────────────────────── */
 /* The results are a list under the field rather than a dropdown, because a
@@ -365,9 +389,39 @@ menu { display: flex; gap: var(--s3); justify-content: flex-end;
   font-size: 11px; color: var(--ink-3); margin-bottom: 2px; }
 .swalt textarea { width: 100%; resize: vertical; font: inherit; font-size: 13px;
   line-height: 1.4; padding: var(--s2); border: 1px solid var(--rule);
-  border-radius: var(--radius); background: var(--paper); color: var(--ink); }
+  border-radius: var(--radius); background: var(--limestone); color: var(--ink); }
 .swcell.none { opacity: .8; }
 .warnhint { color: var(--terracotta); }
+
+/* ── the basket ──────────────────────────────────────────────────────
+   THE COUNT RIDES ON THE TAB, because the one question an editor asks
+   between two searches is how many they have got, and a number they have to
+   change area to read is a number they stop checking. It is a span inside
+   the button rather than a second element beside it, so the whole thing
+   stays one target. */
+.area .badge { display: inline-block; min-width: 1.35rem; margin-left: .45rem;
+  padding: 0 .3rem; border-radius: 999px; font-size: 12px; font-weight: 700;
+  line-height: 1.35rem; text-align: center;
+  background: var(--cobalt-deep); color: var(--limestone); }
+.area.on .badge { background: var(--graphite); color: var(--limestone); }
+
+/* A SENT ENTRY IS NOT A FINISHED ONE, and it must not look like one either.
+   It is greyed and untickable and it stays, because a dispatch is a question
+   and removing it at the moment the question is asked would say the work is
+   done. */
+.swcell.gone { opacity: .55; }
+
+/* A DEAD PREVIEW IS A MISSING PICTURE AND NEVER A MISSING ENTRY. The token
+   dies with the session; the photograph's id does not, and the workflow
+   fetches by id. So the frame says which of the two has happened rather than
+   showing a broken image and letting the editor conclude the wrong one. */
+.expired { margin: 0; padding: var(--s3); font-size: 12px; line-height: 1.45;
+  color: var(--ink-3); background: var(--paper-3); height: 100%;
+  display: flex; align-items: center; border-radius: var(--radius); }
+
+/* KEPT IS SAID WHERE THE EDITOR IS LOOKING. A tab count changing in the
+   corner is not feedback for a button under the cursor. */
+.kept { font-size: 12px; color: var(--atlantic); }
 
 /* ── an opening is a door ───────────────────────────────────────────── */
 button.slotrow { width: 100%; text-align: left; font: inherit; cursor: pointer;

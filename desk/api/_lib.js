@@ -90,6 +90,23 @@ export function authed(req) {
   return !!verify(cookieFrom(req));
 }
 
+/* WHEN THIS EDITOR'S SESSION ENDS, in epoch milliseconds.
+ *
+ * A PREVIEW TOKEN SHOULD NOT OUTLIVE THE SESSION AND SHOULD NOT DIE BEFORE
+ * IT. `/api/thumb` runs `requireSession` first, so the session is already
+ * the gate; the token's own expiry is a second bound and it was a flat hour,
+ * chosen when a sitting was one search and one Acquire. The basket made a
+ * sitting hours long — that is what it is FOR — and an hour meant a basket
+ * built at nine could not be looked at at eleven, while every identity in it
+ * was still perfectly good. Shorter than the session buys nothing the
+ * session does not already give; longer would let a leaked token outlive the
+ * access it was minted under. So it is exactly the session's, read off the
+ * cookie rather than approximated from a constant. */
+export function sessionExpiry(req) {
+  const p = verify(cookieFrom(req));
+  return p ? p.exp : Date.now();
+}
+
 /* EVERY RESPONSE CARRIES THE HEADERS THE SITE CARRIES. A tool is not the
  * exception to a posture; it is where the credential is. */
 export function send(res, code, body, extra = {}) {

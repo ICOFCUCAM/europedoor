@@ -15,7 +15,7 @@
 
 import {
   requireSession, send, registry, specOf,
-  providerSearch, normalise, fits, sign, register,
+  providerSearch, normalise, fits, sign, register, sessionExpiry,
 } from "./_lib.js";
 
 export default async function handler(req, res) {
@@ -61,7 +61,7 @@ export default async function handler(req, res) {
     }
   }
 
-  const exp = Date.now() + 60 * 60 * 1000;
+  const exp = sessionExpiry(req);
   const candidates = normalise(provider, r.payload).map((c) => {
     const bad = fits(c, spec);
     return {

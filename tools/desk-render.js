@@ -433,6 +433,117 @@ for (const width of [1280, 390]) {
         && e.purpose && e.alt),
      `${width}: an entry travelled without an id, a purpose or a description`);
   await closeDialogs(page);
+
+  /* ── the basket ────────────────────────────────────────────────────
+     WHAT THE BASKET HAS TO BE IS A PLACE WORK SURVIVES, so the assertions
+     are about surviving: a candidate kept from a search is still there when
+     the search is gone, a whole sweep can be kept instead of sent, a purpose
+     cannot be in it twice, and it comes back after a reload. None of that is
+     visible in a count of anything. */
+  await page.click('[data-view="basket"]');
+  ok(await page.locator("#view-basket").isVisible(),
+     `${width}: the basket view did not open`);
+  ok(/empty/.test(await page.textContent("#bk-note") || ""),
+     `${width}: an empty basket does not say it is empty`);
+  ok(!(await page.locator("#bk-bar").isVisible()),
+     `${width}: an empty basket still offers Acquire`);
+
+  /* KEEP FROM A SEARCH. The one-at-a-time path is untouched; this is the
+     act that costs nothing and leaves the editor in the search. */
+  await page.click('[data-view="find"]');
+  await page.selectOption("#slot", "countries-hero");
+  await page.fill("#q", "a european coast");
+  await page.click("#find button[type=submit]");
+  await page.waitForSelector(".cand");
+  ok(await page.locator("[data-bag]").count() > 1,
+     `${width}: a candidate offers no way to keep it without acquiring it`);
+  await page.locator("[data-bag]").first().click();
+  ok(/Kept/.test(await page.textContent("[data-bag] >> nth=0") || ""),
+     `${width}: keeping a candidate said nothing where the editor was looking`);
+  ok((await page.textContent("#basket-n") || "") === "1",
+     `${width}: the tab count did not move`);
+
+  /* A SURFACE HOLDS ONE PHOTOGRAPH, and replacing says so. The register
+     refuses that pair at the far end, so a basket that can hold it wastes
+     the sitting it exists to collect. */
+  const second = page.locator(".cand").nth(1).locator("[data-bag]");
+  await second.click();
+  ok((await page.textContent("#basket-n") || "") === "1",
+     `${width}: a second photograph for one surface was added rather than `
+     + `replacing the first`);
+  ok(/Replaced/.test(
+       await page.locator(".cand").nth(1).locator(".kept").textContent() || ""),
+     `${width}: it replaced a pick silently`);
+
+  /* KEEP A WHOLE SWEEP WITHOUT DISPATCHING IT. */
+  await page.click('[data-view="sweep"]');
+  await page.waitForSelector(".swcell");
+  await page.click("#sw-all");
+  DISPATCHED.length = 0;
+  await page.click("#sw-bag");
+  await page.waitForTimeout(50);
+  ok(DISPATCHED.length === 0, `${width}: keeping a sweep dispatched a run`);
+  const held = Number(await page.textContent("#basket-n") || "0");
+  ok(held === 4, `${width}: the basket holds ${held} after keeping 3 and 1`);
+
+  await page.click('[data-view="basket"]');
+  await page.waitForSelector("#bk-grid .swcell");
+  ok(await page.locator("#bk-grid .swcell").count() === 4,
+     `${width}: the basket drew the wrong number of entries`);
+  ok(/held in this browser/.test(await page.textContent("#bk-note") || ""),
+     `${width}: the basket does not say whose it is or where it lives`);
+
+  ok(await page.locator("#bk-grid input:checked").count() === 0,
+     `${width}: the basket arrived with entries already ticked`);
+  ok(await page.locator("#bk-go").isDisabled(),
+     `${width}: Acquire was live with nothing ticked`);
+
+  /* AN ENTRY WITH NO DESCRIPTION CANNOT BE TICKED AT ALL, which is a
+     stronger promise than the sweep's — there the row is ticked and the bar
+     explains, and here the basket is a list you come back to, where a tick
+     that cannot be acted on is a tick that misleads. */
+  const undesc = await page.locator("#bk-grid input:disabled").count();
+  ok(undesc === 1,
+     `${width}: ${undesc} entries with no description were tickable`);
+
+  await page.click("#bk-all");
+  const bkOn = await page.locator("#bk-grid input:checked").count();
+  ok(bkOn === 3, `${width}: Select all ticked ${bkOn} of 3 acquirable entries`);
+  ok(!(await page.locator("#bk-go").isDisabled()),
+     `${width}: Acquire stayed disabled with three entries ready`);
+
+  /* IT SURVIVES A RELOAD, which is the whole point of it. */
+  await page.reload();
+  await page.waitForSelector("#desk:not([hidden])");
+  await page.click('[data-view="basket"]');
+  await page.waitForSelector("#bk-grid .swcell");
+  ok(await page.locator("#bk-grid .swcell").count() === 4,
+     `${width}: the basket did not survive a reload`);
+
+  await page.click("#bk-all");
+  DISPATCHED.length = 0;
+  await page.click("#bk-go");
+  await page.waitForTimeout(250);
+  const bkSent = DISPATCHED[0] || {};
+  ok(Array.isArray(bkSent.batch) && bkSent.batch.length === 3,
+     `${width}: the basket dispatched ${(bkSent.batch || []).length} entries`);
+  ok((bkSent.batch || []).every((e) => /^[0-9]+$/.test(String(e.photo_id))),
+     `${width}: an entry travelled without an id`);
+  await closeDialogs(page);
+
+  /* A DISPATCH IS NOT A MERGE, so a sent entry stays and says so. Removing
+     it would call the work done at the moment the question is asked, and a
+     red run would leave the editor hunting for every photograph again. */
+  ok(await page.locator("#bk-grid .swcell.gone").count() === 3,
+     `${width}: sent entries were dropped rather than marked`);
+  ok(await page.locator("#bk-grid input:checked").count() === 0,
+     `${width}: a sent entry is still ticked and can be sent twice`);
+
+  /* AND THE BASKET IS EMPTIED BY HAND. */
+  await page.click("#bk-all");
+  await page.click("#bk-drop");
+  await page.waitForTimeout(50);
+
   await page.click('[data-view="library"]');
   await page.waitForSelector("#lib .slotrow");
 

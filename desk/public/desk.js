@@ -19,6 +19,10 @@
   "use strict";
 
   var REG = { purposes: [], slots: {}, providers: {} };
+  /* THE SAME NUMBER THE DISPATCH ENFORCES, and the dispatch is the one
+     that counts — this copy exists so the button can say what will
+     happen instead of the editor finding out from a 400. */
+  var BK_CAP = 60;
   var CHOSEN = null;
   var POLL = null;
 
@@ -47,7 +51,7 @@
   function show(signedIn) {
     el("gate").hidden = signedIn;
     el("desk").hidden = !signedIn;
-    if (signedIn) loadRegistry();
+    if (signedIn) { basketLoad(); basketBadge(); loadRegistry(); }
     else el("passcode").focus();
   }
 
@@ -353,8 +357,16 @@
             c.already.map(esc).join(", ") + "</p>"
           : "") +
         '<p class="acts">' +
+          /* TWO ACTS, AND THE BASKET ONE IS FIRST BECAUSE IT IS THE ONE
+             THAT COSTS NOTHING. Acquire opens the approval dialogue and
+             ends in a pull request; Keep puts the candidate aside and
+             leaves the editor in the search they are already in. The
+             one-at-a-time path is kept exactly as it was — this family
+             of surface is sometimes a single deliberate purchase. */
           (c.suits && !c.already.length
-            ? '<button type="button" class="go" data-id="' + esc(c.id) + '">Acquire</button>'
+            ? '<button type="button" class="quiet" data-bag="' + esc(c.id) +
+                '">Keep</button>' +
+              '<button type="button" class="go" data-id="' + esc(c.id) + '">Acquire</button>'
             : "") +
           '<a href="' + esc(c.page) + '" target="_blank" rel="noopener noreferrer">View on Pexels</a>' +
         "</p></article>";
@@ -363,6 +375,20 @@
       b.addEventListener("click", function () {
         var c = res.candidates.filter(function (x) { return x.id === b.dataset.id; })[0];
         openAcquire(c, purpose, res.surface);
+      });
+    });
+    /* KEPT, NOT ACQUIRED — and the card says which, where the editor is
+       looking, rather than only the tab count changing somewhere else. */
+    el("sheet").querySelectorAll("[data-bag]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var c = res.candidates.filter(function (x) { return x.id === b.dataset.bag; })[0];
+        var said = basketAdd(purpose, c);
+        b.textContent = "Kept";
+        b.disabled = true;
+        var note = document.createElement("span");
+        note.className = "kept";
+        note.textContent = said;
+        b.parentNode.appendChild(note);
       });
     });
   }
@@ -806,8 +832,285 @@
     }).join("");
   }
 
+  /* ── the basket ───────────────────────────────────────────────────
+     ONE SITTING'S WORKING SET, HELD IN THIS BROWSER.
+
+     The desk existed as two one-shot paths: find one photograph and approve
+     it, or sweep a country and approve that grid. Both end in a dispatch, so
+     the only way to exploit the whole library was to make a decision every
+     few minutes and get a pull request for each. The basket is the missing
+     middle — look at everything, keep what is right, approve once.
+
+     WHY IT IS IN THE BROWSER. This desk holds no state anywhere: two
+     serverless invocations share no memory, which is why a session and a
+     preview token are signed values rather than dictionary entries. A basket
+     on the server would be the first stored thing in the product and it
+     would be shared by everyone who signs in with the one passcode, with no
+     notion of whose it is. One editor's working set, in one editor's
+     browser, and the interface says so rather than implying a queue.
+
+     AND IT STORES ONLY WHAT CANNOT BE DERIVED. The surface sentence, the
+     slot's requirements and whether that surface is already filled all come
+     from the registry on every render — the same rule that keeps a country
+     off a register row, because a stored copy is a copy that goes stale. */
+  var BKEY = "europedoor.desk.basket.v1";
+  var BASKET = [];
+  var BSTORE = true;
+
+  function basketLoad() {
+    try {
+      var raw = window.localStorage.getItem(BKEY);
+      BASKET = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(BASKET)) BASKET = [];
+    } catch (e) {
+      /* A PRIVATE WINDOW OR BLOCKED SITE DATA THROWS, and a basket that
+         cannot persist still works for the sitting it is open. What must not
+         happen is the editor finding out at the end. */
+      BASKET = [];
+      BSTORE = false;
+    }
+  }
+
+  function basketSave() {
+    try { window.localStorage.setItem(BKEY, JSON.stringify(BASKET)); }
+    catch (e) { BSTORE = false; }
+  }
+
+  function basketBadge() {
+    var live = BASKET.filter(function (x) { return !x.sent; }).length;
+    var b = el("basket-n");
+    b.hidden = !BASKET.length;
+    b.textContent = String(live || BASKET.length);
+  }
+
+  /* A SURFACE HOLDS ONE PHOTOGRAPH, so the basket is keyed on the purpose.
+     The register refuses a second row for a purpose at the far end; a basket
+     that can hold a pair the dispatch will reject wastes the sitting it
+     exists to collect. Replacing says so out loud, because silently
+     dropping the first pick is the desk deciding. */
+  function basketAdd(purpose, c) {
+    var had = BASKET.filter(function (x) { return x.purpose === purpose; })[0];
+    BASKET = BASKET.filter(function (x) { return x.purpose !== purpose; });
+    BASKET.push({
+      purpose: purpose, photo_id: c.id, alt: c.alt || "",
+      photographer: c.photographer, width: c.width, height: c.height,
+      page: c.page, thumb: c.thumb, added: Date.now(), sent: 0,
+    });
+    basketSave();
+    basketBadge();
+    if (BASKET.length) basketDraw();
+    return had
+      ? "Replaced " + had.photo_id + " — a surface holds one photograph."
+      : "In the basket.";
+  }
+
+  function basketDrop(purpose) {
+    BASKET = BASKET.filter(function (x) { return x.purpose !== purpose; });
+    basketSave();
+    basketBadge();
+    basketDraw();
+  }
+
+  function basketRow(purpose) {
+    return REG.purposes.filter(function (p) { return p.purpose === purpose; })[0];
+  }
+
+  /* A BASKET ENTRY CAN GO STALE IN TWO WAYS AND ONLY ONE OF THEM MATTERS.
+     The preview token dies with the session and the photograph's identity
+     does not, so an expired thumbnail is a missing picture and never a
+     missing entry — the workflow fetches BY ID and the id is still exactly
+     right. What does disqualify one is the surface being filled while the
+     basket sat there, which the registry answers on every render. */
+  function basketState(x) {
+    var p = basketRow(x.purpose);
+    if (!p) return { ok: false, why: "this surface is no longer in the registry" };
+    if (p.status === "PUBLISHED") {
+      return { ok: false, why: "filled since you added it — remove this one" };
+    }
+    if (x.sent) return { ok: false, why: "sent to a run at " + hhmm(x.sent) };
+    if (!String(x.alt || "").trim()) return { ok: false, why: "needs a description" };
+    return { ok: true, why: "" };
+  }
+
+  function hhmm(ms) {
+    var d = new Date(ms);
+    return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+  }
+
+  function basketDraw() {
+    var live = BASKET.filter(function (x) { return !x.sent; });
+    el("bk-bar").hidden = !BASKET.length;
+    if (!BASKET.length) {
+      el("bk-note").innerHTML = "The basket is empty. Search or sweep, and "
+        + "put candidates in here as you go — it keeps what you picked while "
+        + "you carry on looking, and you approve the whole set once.";
+      el("bk-grid").innerHTML = "";
+      return;
+    }
+    var ready = BASKET.filter(function (x) { return basketState(x).ok; }).length;
+    el("bk-note").innerHTML =
+      "<b>" + BASKET.length + "</b> in the basket, <b>" + ready +
+      "</b> ready to acquire" +
+      (BASKET.length - live.length
+        ? ", " + (BASKET.length - live.length) + " already sent to a run"
+        : "") + ". " +
+      (BSTORE
+        ? "This basket is held in this browser only. Nobody else signed in "
+          + "sees it, and clearing site data clears it."
+        : "<b>This browser is refusing to store it</b>, so it will not "
+          + "survive a reload. Acquire before you leave the page.") +
+      " " + BK_CAP + " is what one pull request carries.";
+
+    el("bk-grid").innerHTML = BASKET.map(function (x) {
+      var p = basketRow(x.purpose);
+      var st = basketState(x);
+      return '<article class="swcell' + (x.sent ? " gone" : "") +
+        '" data-p="' + esc(x.purpose) + '">' +
+        '<label class="swpick"><input type="checkbox" data-btick="' +
+          esc(x.purpose) + '"' + (st.ok ? "" : " disabled") + '><span>' +
+          esc(p ? p.surface : x.purpose) + "</span></label>" +
+        /* A DEAD PREVIEW IS A MISSING PICTURE AND NEVER A MISSING ENTRY.
+           `onerror` swaps in a note rather than leaving a broken frame,
+           because the entry is still perfectly acquirable. */
+        '<figure><img loading="lazy" alt="' +
+          esc(x.alt || ("photograph " + x.photo_id)) + '" src="/api/thumb?t=' +
+          encodeURIComponent(x.thumb) + '" data-dead="' + esc(x.purpose) +
+          '"></figure>' +
+        '<p class="by">' + esc(x.photographer) + " · Pexels · id " +
+          esc(x.photo_id) + "</p>" +
+        '<p class="dims">' + x.width + " × " + x.height + " · added " +
+          hhmm(x.added) + "</p>" +
+        '<label class="swalt"><span>What it shows</span>' +
+        '<textarea data-balt="' + esc(x.purpose) + '" maxlength="240" rows="2"' +
+          (x.sent ? " readonly" : "") + ">" + esc(x.alt) + "</textarea></label>" +
+        (st.ok
+          ? '<p class="hint">The photographer’s own description. Edit it '
+            + "if it is wrong.</p>"
+          : '<p class="verdict no">' + esc(st.why) + "</p>") +
+        '<p class="acts"><a href="' + esc(x.page) +
+          '" target="_blank" rel="noopener noreferrer">View on Pexels</a>' +
+        '<button type="button" class="quiet" data-bdrop="' + esc(x.purpose) +
+          '">Remove</button></p>' +
+        "</article>";
+    }).join("");
+
+    el("bk-grid").querySelectorAll("[data-dead]").forEach(function (img) {
+      img.addEventListener("error", function () {
+        img.parentNode.innerHTML = '<p class="expired">The preview expired '
+          + "with your last session. The photograph is unchanged — it is "
+          + "fetched by id, and the id is still right.</p>";
+      });
+    });
+    el("bk-grid").querySelectorAll("[data-btick]").forEach(function (b) {
+      b.addEventListener("change", basketCount);
+    });
+    el("bk-grid").querySelectorAll("[data-balt]").forEach(function (t) {
+      t.addEventListener("input", function () {
+        var e2 = BASKET.filter(function (x) { return x.purpose === t.dataset.balt; })[0];
+        if (e2) { e2.alt = t.value; basketSave(); }
+        basketCount();
+      });
+    });
+    el("bk-grid").querySelectorAll("[data-bdrop]").forEach(function (b) {
+      b.addEventListener("click", function () { basketDrop(b.dataset.bdrop); });
+    });
+    basketCount();
+  }
+
+  function basketTicked() {
+    var out = [];
+    el("bk-grid").querySelectorAll("[data-btick]").forEach(function (b) {
+      if (!b.checked || b.disabled) return;
+      var x = BASKET.filter(function (y) { return y.purpose === b.dataset.btick; })[0];
+      if (x) out.push(x);
+    });
+    return out;
+  }
+
+  function basketCount() {
+    var t = basketTicked();
+    var over = t.length > BK_CAP;
+    el("bk-count").textContent = t.length
+      ? t.length + " ticked" + (over
+          ? " — the first " + BK_CAP + " will go, the rest stay in the basket"
+          : "")
+      : "Nothing ticked.";
+    el("bk-go").disabled = !t.length;
+    var n = Math.min(t.length, BK_CAP);
+    el("bk-go").textContent = t.length
+      ? "Acquire " + n + " photograph" + (n === 1 ? "" : "s")
+      : "Acquire";
+  }
+
+  function basketAcquire() {
+    var t = basketTicked().slice(0, BK_CAP);
+    if (!t.length) return;
+    el("bk-go").disabled = true;
+    api("/api/acquire", { method: "POST",
+      body: JSON.stringify({ provider: "pexels",
+        batch: t.map(function (x) {
+          return { purpose: x.purpose, photo_id: x.photo_id,
+                   alt: String(x.alt || "").trim() };
+        }) }) })
+      .then(function (r) {
+        el("bk-go").disabled = false;
+        if (!r.ok) { alert(r.j.error || "could not start"); return; }
+        /* A DISPATCH IS NOT A MERGE, so a sent entry is not a finished one.
+           Removing it here would say the work is done at the exact moment
+           the question is being asked — and if the run goes red the editor
+           would have to find every photograph again. It is marked instead,
+           greyed, untickable, and cleared by hand once the pull request is
+           merged. */
+        var now = Date.now();
+        t.forEach(function (x) { x.sent = now; });
+        basketSave();
+        basketBadge();
+        basketDraw();
+        watch(r.j.job);
+      });
+  }
+
+  el("bk-all").addEventListener("click", function () {
+    el("bk-grid").querySelectorAll("[data-btick]").forEach(function (b) {
+      if (!b.disabled) b.checked = true;
+    });
+    basketCount();
+  });
+  el("bk-none").addEventListener("click", function () {
+    el("bk-grid").querySelectorAll("[data-btick]").forEach(function (b) {
+      b.checked = false;
+    });
+    basketCount();
+  });
+  el("bk-drop").addEventListener("click", function () {
+    var gone = {};
+    el("bk-grid").querySelectorAll("[data-btick]").forEach(function (b) {
+      if (b.checked) gone[b.dataset.btick] = 1;
+    });
+    BASKET = BASKET.filter(function (x) { return !gone[x.purpose]; });
+    basketSave();
+    basketBadge();
+    basketDraw();
+  });
+  el("bk-go").addEventListener("click", basketAcquire);
+
+  /* ADD TICKED FROM A SWEEP. The sweep already asks the right question of a
+     whole country; what it could not do was let the answer wait. */
+  el("sw-bag").addEventListener("click", function () {
+    var t = ticked();
+    t.forEach(function (row) {
+      var x = SWEEP.rows.filter(function (y) { return y.purpose === row.purpose; })[0];
+      if (x && x.candidate) {
+        basketAdd(row.purpose, Object.assign({}, x.candidate, { alt: row.alt }));
+      }
+    });
+    el("sw-count").textContent = t.length
+      ? t.length + " added to the basket."
+      : "Nothing ticked.";
+  });
+
   /* ── views ────────────────────────────────────────────────── */
-  var VIEWS = ["find", "sweep", "library", "provenance"];
+  var VIEWS = ["find", "sweep", "basket", "library", "provenance"];
 
   function show_view(name) {
     document.querySelectorAll(".area").forEach(function (x) {
@@ -815,6 +1118,7 @@
     });
     VIEWS.forEach(function (v) { el("view-" + v).hidden = v !== name; });
     if (name === "sweep") swSlots();
+    if (name === "basket") basketDraw();
     window.scrollTo(0, 0);
   }
 

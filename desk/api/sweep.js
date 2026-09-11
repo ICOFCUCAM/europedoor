@@ -30,7 +30,7 @@
 
 import {
   requireSession, send, registry, specOf,
-  providerSearch, normalise, fits, sign, register,
+  providerSearch, normalise, fits, sign, register, sessionExpiry,
 } from "./_lib.js";
 
 export const MAX_SURFACES = 24;
@@ -90,7 +90,7 @@ export default async function handler(req, res) {
   }
 
   const spec0 = specOf(surfaces[0].purpose);
-  const exp = Date.now() + 60 * 60 * 1000;
+  const exp = sessionExpiry(req);
   const rows = [];
   let stopped = "";
 

@@ -2909,6 +2909,106 @@ is sometimes right and is never an accident: `--second-purpose` is the
 escape, the refusal names every purpose the id already fills, and the desk
 simply renders no Acquire button on a candidate that is already registered.
 
+**THE DESK COULD SEARCH THE WHOLE LIBRARY AND COULD NOT HOLD ANYTHING.**
+Two one-shot paths — find one photograph and approve it, or sweep a country
+and approve that grid — and both end in a dispatch, so the only way to
+exploit 837 purposes was to make a decision every few minutes and take a
+pull request for each. The **basket** is the missing middle: keep candidates
+as you go, from a search or from a whole sweep, read and edit every
+description in one place, approve once. It is **keyed on the purpose**,
+because a surface holds one photograph and the register refuses that pair at
+the far end — a basket you can fill with a set the dispatch will reject
+wastes the sitting it exists to collect, so a second pick for a surface
+replaces the first and says so.
+
+**IT LIVES IN THE BROWSER, AND THAT IS THE SAME DECISION AS THE SIGNED
+SESSION.** This desk holds no state anywhere: two serverless invocations
+share no memory, which is why a session and a preview token are signed
+values rather than dictionary entries. A basket on the server would be the
+first stored thing in the product, and it would be shared by everyone who
+signs in with the one passcode with no notion of whose it is. So it is one
+editor's working set in `localStorage`, the panel says so in those words,
+and a browser that refuses to store it says **that** rather than losing the
+sitting silently.
+
+**A DISPATCH IS NOT A MERGE, so a sent entry stays in the basket.** Removing
+it would call the work done at the moment the question is being asked, and a
+red run would leave the editor hunting for every photograph again. Sent
+entries are greyed, untickable and cleared by hand.
+
+**A DEAD PREVIEW IS A MISSING PICTURE AND NEVER A MISSING ENTRY.** The
+thumbnail token was a flat hour, chosen when a sitting was one search; a
+basket makes a sitting hours long, which is what it is for. The token's
+lifetime is **the session's own**, read off the cookie rather than
+approximated — `/api/thumb` runs `requireSession` first, so anything shorter
+buys nothing the session does not already give and anything longer lets a
+leaked token outlive the access it was minted under. And where a preview
+does expire the entry stays acquirable, because the workflow fetches BY ID
+and the id has not changed.
+
+**THE CAP WAS 30 FOR A REASON MEASUREMENT DID NOT SUPPORT.** It said "more
+than one sitting", which is a claim about how long the work takes. Run 18
+settled it: eight photographs fetched, verified, hashed, derived and
+registered in **34 seconds** — 4.25s each — against **215 seconds of fixed
+cost** (rebuild 28s, register 5s, static gates 37s, browser and design gates
+145s). The acquisition is the small half and it is linear; the gates are the
+big half and cost the same for one photograph as for sixty. So the cap was
+never about the workflow. It is about what one **pull request** can carry a
+reviewer through, and it is 60. The basket itself has no cap: it holds the
+working set, the dispatch holds what one question can ask, and a fuller
+basket is two sittings rather than a refusal. **And the old test sent 31
+copies of ONE purpose**, so raising the cap made it read the duplicate
+refusal instead — a test that was checking a different rule than the one it
+named. Sixty is now asserted from both sides, because a cap nothing reaches
+is a cap nobody has tested the far side of.
+
+**THE PHOTOGRAPH CREDIT WAS THE SITE'S CAPTION INK ON NEAR-BLACK: 2.01:1.**
+`.pageband figcaption` said "the credit belongs under the picture and never
+over it" and set `margin-top` and `color` to say so. `.credit` is
+`position: absolute` at the foot of the picture, on a near-black scrim, at
+`opacity: 0` until hover — six declarations — and (0,1,1) beats (0,1,0). So
+the COLOUR was overridden and the position, the scrim and the opacity were
+not, on every family that opens on a photograph, on the two links Pexels'
+terms require. `margin-top` on an absolutely positioned element does nothing
+at all, so **a rule that changes two properties of a six-property component**
+achieved exactly one thing and that thing was the defect. "Under the
+picture" was never available to it either: `picture()` emits the figcaption
+INSIDE the `<picture>` and `.pageband` is an `aspect-ratio` box with
+`overflow: hidden`, so a static caption there is clipped away rather than
+moved below — the rule described a layout the markup cannot produce.
+
+**And the scrim was one twentieth above the floor by accident.** This is the
+only contrast on the site that cannot be read off two tokens: the credit
+sits on a photograph nobody has licensed yet. The scrim is what makes the
+ratio a property of the DESIGN rather than of the picture, and nothing had
+done the arithmetic — worst case is a white frame, 55% black composites to
+`rgb(115,115,115)`, white on that is **4.74:1**. At 72% it is `rgb(71,71,71)`
+and **9.2:1** whatever the photograph does. `checks.py` recomputes both from
+the declaration. **The override half was put in `checks.py` first and was
+wrong**: written as a CSS rule it refused seven MAP captions, which are real
+captions under real drawings — an instrument that cannot tell a caption from
+a credit is reading the selector rather than the element. It lives in
+`photo-tests.py`, which reads the shipped markup for every class actually
+standing over a `<figcaption class="credit">`, because that needs a credit to
+exist and that suite makes one.
+
+**AN UNRESOLVABLE `var()` REACHED THE DESK STYLESHEET, one screen from the
+rule that documents it.** `--sea` (the token is `--cobalt`) and `--paper`
+(it is `--limestone`), in three declarations including both textareas — one
+of which is the alt field, the single control on that desk that must be read
+in full before it is approved. The declaration is invalid at computed-value
+time and the property takes its INHERITED value, so nothing that counts
+declarations sees it and nothing that renders does either, because the wrong
+value is a real value. The main stylesheet already records this at length.
+The hosted suite compares the two sets now; it costs a millisecond.
+
+**AND THE WRAP WAS ON THE HEADER AND NOT ON THE ROW INSIDE IT.** `.top` was
+given `flex-wrap` when *Sign out* went off the right edge at 390; `.areas`,
+the row that actually holds the tabs, stayed one unbreakable line. Five tabs
+fitted at 390 and six did not, so adding the basket put the document back
+into sideways scroll on every screen — the same defect, one element in,
+caught by `desk-render.js` in the run that introduced it.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
@@ -2929,7 +3029,7 @@ the rest.
     python3 tools/photo-tests.py              the acquisition pipeline, against a stub provider
     python3 tools/desk-tests.py               the Media Desk: the sign-in, and what the browser may send
     node tools/hosted-desk-tests.js           the HOSTED desk: signed sessions, signed thumbnails, the dispatch
-    node tools/desk-render.js                 the HOSTED desk's screens, rendered at 1280 and 390
+    node tools/desk-render.js                 the HOSTED desk's screens and its basket, at 1280 and 390
 
 And three more that are deliberately NOT gates. Two write an image rather
 than a verdict: `node tools/hero-sheet.js` draws every discovered candidate

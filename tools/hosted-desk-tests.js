@@ -326,6 +326,32 @@ await t("fits() refuses an original too small to derive from", () => {
   assert.match(bad.join(" "), /upscale/);
 });
 
+/* ── the stylesheet's own tokens ────────────────────────────────── */
+
+/* AN UNRESOLVABLE var() IS NOT A MISSING VALUE, IT IS A DIFFERENT ONE: the
+ * whole declaration is invalid at computed-value time and the property takes
+ * its INHERITED value. The main stylesheet records this failure at length —
+ * `--serif` for `--display`, in twelve rules, silently replacing the right
+ * font on most of the largest headings on the site — and this desk was
+ * written afterwards and had two of its own: `--sea` where the token is
+ * `--cobalt`, leaving the running step's tick painting whatever it inherits,
+ * and `--paper` where it is `--limestone`, on both textareas including the
+ * one control here that must be read in full before it is approved.
+ *
+ * Nothing that counts declarations can see it and nothing that renders can
+ * either, because the wrong value is a real value. Comparing the two sets is
+ * the only instrument, and it costs a millisecond. */
+await t("every custom property the desk spends is one it declares", () => {
+  const css = fs.readFileSync(path.join(ROOT, "desk", "public", "desk.css"),
+                              "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+  const declared = new Set([...css.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]));
+  const used = new Set([...css.matchAll(/var\((--[a-z0-9-]+)/g)].map((m) => m[1]));
+  const missing = [...used].filter((n) => !declared.has(n));
+  assert.deepStrictEqual(missing, [],
+    `these resolve to nothing, so the rules that ask for them take the `
+    + `INHERITED value instead: ${missing.join(", ")}`);
+});
+
 /* ── 6. acquisition refuses before it dispatches ────────────────── */
 
 const acq = (json) => call("acquire.js", {
@@ -406,14 +432,43 @@ await t("one photograph may not be ticked for two surfaces in a batch",
     assert.strictEqual(CALLS.length, 0);
   });
 
-await t("a batch bigger than one sitting is refused", async () => {
+/* THE CAP IS WHAT ONE PULL REQUEST CARRIES, and the number moved when the
+ * basket arrived: 30 was a claim about how long a sitting takes, and run 18
+ * measured it at 4.25 seconds a photograph against 215 seconds of fixed
+ * cost, so the workflow was never the constraint. The basket is where a
+ * sitting accumulates; this is where one question stops.
+ *
+ * ITS FIRST VERSION SENT 31 COPIES OF ONE PURPOSE and asserted the cap
+ * message, which passed for as long as the cap was under 31 and then started
+ * reporting the DUPLICATE refusal instead — a test that was reading a
+ * different rule than the one it named. Distinct purposes, taken from the
+ * registry rather than typed, so it is asking the question it says it is. */
+await t("a batch bigger than one pull request can carry is refused", async () => {
   CALLS = [];
-  const many = Array.from({ length: 31 }, (_, i) => (
-    { purpose: "door-coast", photo_id: String(i + 1), alt: "a description here" }));
+  const reg = lib.registry();
+  const many = reg.purposes.slice(0, 61).map((p, i) => (
+    { purpose: p.purpose, photo_id: String(i + 1), alt: "a description here" }));
+  assert.strictEqual(many.length, 61, "the registry holds fewer than 61 purposes");
   const r = await acq({ provider: "pexels", batch: many });
   assert.strictEqual(r.statusCode, 400);
-  assert.match(r.json().error, /one sitting/);
+  assert.match(r.json().error, /cap is 60/);
   assert.strictEqual(CALLS.length, 0);
+});
+
+/* AND SIXTY IS ACCEPTED, because a cap nothing reaches is a cap nobody has
+ * tested the far side of. The old suite asserted only the refusal, so a cap
+ * of one would have passed it. */
+await t("and exactly sixty is dispatched as one run", async () => {
+  CALLS = [];
+  const reg = lib.registry();
+  const sixty = reg.purposes.slice(0, 60).map((p, i) => (
+    { purpose: p.purpose, photo_id: String(i + 1), alt: "a description here" }));
+  const r = await acq({ provider: "pexels", batch: sixty });
+  assert.strictEqual(r.statusCode, 200, JSON.stringify(r.json()));
+  const sent = CALLS.filter((c) => c.url.includes("/dispatches"));
+  assert.strictEqual(sent.length, 1, `it made ${sent.length} dispatches`);
+  const inputs = JSON.parse(sent[0].init.body).inputs;
+  assert.strictEqual(JSON.parse(inputs.batch).length, 60);
 });
 
 await t("an empty batch is refused", async () => {

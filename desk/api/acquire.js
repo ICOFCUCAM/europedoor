@@ -50,10 +50,35 @@ export default async function handler(req, res) {
   const many = Array.isArray(b.batch);
   const plan = many ? b.batch : [b];
   if (!plan.length) { send(res, 400, { error: "nothing was ticked" }); return; }
-  if (plan.length > 30) {
-    send(res, 400, { error: `${plan.length} is more than one sitting. The cap `
-                          + `is 30 — a bigger set is two sittings, which is `
-                          + `also how a person should look at it.` });
+  /* THE CAP WAS 30 FOR A REASON THAT MEASUREMENT DID NOT SUPPORT.
+   *
+   * It said "more than one sitting", which is a claim about how long the
+   * work takes — and run 18 settled it: EIGHT photographs were fetched,
+   * verified, hashed, derived and registered in 34 seconds, 4.25s each,
+   * against 215 seconds of FIXED cost (rebuild 28s, register 5s, the static
+   * gates 37s, the browser and design gates 145s). The acquisition is the
+   * small half of the run and it is linear; the gates are the big half and
+   * they cost the same for one photograph as for sixty. So the cap was
+   * never about the workflow at all.
+   *
+   * WHAT IT IS ABOUT IS THE PULL REQUEST. One dispatch is one branch is one
+   * PR, and a PR is a question somebody has to answer by looking at every
+   * photograph in it. It is also all-or-nothing: a batch that fails on the
+   * last entry rebuilds nothing and commits nothing.
+   *
+   * Sixty, because that is what the basket is for — the editor accumulates
+   * over a whole sitting and approves in one act — and because a person who
+   * has already looked at sixty photographs one at a time while building the
+   * basket is not meeting them for the first time in the PR. The basket
+   * itself has no cap: it holds the working set, this holds what one
+   * question can carry, and a fuller basket is two sittings rather than a
+   * refusal. */
+  if (plan.length > 60) {
+    send(res, 400, { error: `${plan.length} is more than one pull request `
+                          + `should carry. The cap is 60 — the basket holds `
+                          + `as many as you like, and this is what one `
+                          + `question can ask. Acquire 60 and the rest stay `
+                          + `in the basket.` });
     return;
   }
 
