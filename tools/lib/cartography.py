@@ -142,8 +142,37 @@ HYPSOMETRIC = (
     (200,  600,  "#d4cfc4", "foothill, a half-step of warmth"),
     (600,  1200, "#cbc2b4", "upland, warm paper"),
     (1200, 2000, "#c2b5a3", "high ground, pale earth"),
-    (2000, None, "#e8e6e3", "mountain, light stone"),
+    (2000, None, "#b7a994", "mountain, the ramp's last step"),
 )
+# AND THE TOP BAND USED TO GO BACK THE OTHER WAY, WHICH PUT THE HIGHEST
+# GROUND AND THE LOWEST AT THE SAME TONE.
+#
+# It was #e8e6e3, "mountain, light stone" — the printed-atlas convention for
+# permanent ice. Measured as the plates actually draw them, mixed 65% toward
+# the land tone:
+#
+#     band      drawn      L       step from the one below
+#     0-200     #dedad2   0.703
+#     200-600   #d7d2c8   0.647    1.081
+#     600-1200  #d1cabd   0.595    1.081
+#     1200-2000 #cbc2b2   0.545    1.084
+#     2000+     #e4e1dc   0.755    1.353  <- upwards
+#
+# Four even steps and then a reversal, and the consequences are both
+# measurable: the top band against the LOWLAND is 1.069, so on an Alpine
+# plate the ground above 2,000 m and the ground below 200 are the same
+# colour; and against the page's own limestone, which is what the aperture
+# shows outside the arch, it is 1.207 — the highest ground reads as a hole in
+# the drawing. Three sentences up this file says "LIGHTNESS carries the
+# height, evenly", and it did for four steps out of five.
+#
+# White for the top band is right when the top band is ICE. This DEM has no
+# ice class: 2,000 m in the Alps is pasture, rock and snow in season, and the
+# same band carries the Norwegian plateau. So the ramp runs the whole way
+# down instead: 1.081, 1.081, 1.084, 1.087, which is the evenness the
+# paragraph already claimed, and the Alps become the darkest ground on the
+# plate rather than the lightest — which is what a five-band hypsometric
+# scheme without an ice class has always done.
 
 # THE CHAIN THE TERRAIN LAYERS RUN IN, which is the owner's and is the order
 # a printed atlas is built in: the ground first, the light on it second, the

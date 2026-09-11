@@ -117,11 +117,27 @@ an argument.
 | 200–600 m | `#d4cfc4` | foothill, a half-step of warmth |
 | 600–1200 m | `#cbc2b4` | upland, warm paper |
 | 1200–2000 m | `#c2b5a3` | high ground, pale earth |
-| 2000 m+ | `#e8e6e3` | mountain, light stone |
+| 2000 m+ | `#b7a994` | mountain, the ramp's last step |
 
 Five steps, because four cannot show a foothill and six begin to read as a
 legend a reader has to consult. Warm as it rises and never saturated: height
 is **felt**, and the typography stays dominant over the ground.
+
+**And the top band used to go back the other way, which put the highest
+ground and the lowest at the same tone.** It was `#e8e6e3`, "mountain, light
+stone", which is the printed-atlas convention for permanent ICE. Measured as
+the plates actually draw them, mixed 65% toward the land tone, the ramp ran
+1.081, 1.081, 1.084 and then **1.353 upwards** — so the ground above 2,000 m
+measured **1.069** against the ground below 200, and **1.207** against the
+page's own limestone, which is what the aperture shows outside the arch. On
+an Alpine plate the highest ground was the same colour as the lowland and
+very nearly the same colour as a hole in the drawing.
+
+This DEM has no ice class: 2,000 m in the Alps is pasture, rock and snow in
+season, and the same band carries the Norwegian plateau. So the ramp runs the
+whole way down — 1.081, 1.081, 1.084, 1.087 — which is the evenness the
+paragraph above already claimed, and the Alps become the darkest ground on
+the plate rather than the lightest.
 
 **And for the life of the scale it was neither of those things.** Measured on
 the values it used to hold:

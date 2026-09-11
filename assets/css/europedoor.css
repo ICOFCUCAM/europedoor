@@ -2976,7 +2976,7 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    terrain third. */
 .heroeurope .lyr-terrain .t600  { fill: color-mix(in srgb, #cbc2b4 52%, transparent); }
 .heroeurope .lyr-terrain .t1200 { fill: color-mix(in srgb, #c2b5a3 62%, transparent); }
-.heroeurope .lyr-terrain .t2000 { fill: color-mix(in srgb, #e8e6e3 74%, transparent); }
+.heroeurope .lyr-terrain .t2000 { fill: color-mix(in srgb, #b7a994 74%, transparent); }
 /* THE RANGES, AS AN EDGE RATHER THAN AS A NAME. The brief asked for the
    Alps, the Pyrenees, the Carpathians, the Scandes and the Caucasus to be
    recognisable, with no labels. They are already in the drawing — those five
@@ -3993,7 +3993,7 @@ body[data-hero] .masthead { position: sticky; }
 .minimap.arched.atlas .lyr-terrain .t200  { fill: #d7d2c8; }
 .minimap.arched.atlas .lyr-terrain .t600  { fill: #d1cabd; }
 .minimap.arched.atlas .lyr-terrain .t1200 { fill: #cbc2b2; }
-.minimap.arched.atlas .lyr-terrain .t2000 { fill: #e4e1dc; }
+.minimap.arched.atlas .lyr-terrain .t2000 { fill: #c4baa9; }
 
 /* THE FRONTIER, RE-DRAWN ABOVE THE RELIEF. A boundary on this map is a
    stroke on the land path, so the bands paint over it: the prototype's first
