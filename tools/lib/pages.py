@@ -2329,11 +2329,34 @@ def countryportrait(data, c):
 
 def country_page(data, c):
     m = next(x for x in data["macros"] if x["slug"] == c["macro_slug"])
+    # A TRAVEL REGION'S PICTURE IS WHERE IT IS, and it was a landscape
+    # generated from the slug — directly under a plate of the country that
+    # draws every one of those regions' destinations as a named mark. The
+    # macro pages had the same fault a level up and took the same repair.
+    #
+    # A region is refused a boundary here, deliberately: we hold which
+    # destinations belong to it and not its geometry, so a hull round Bergen
+    # and Ålesund labelled Vestland would look like an answer and be a guess.
+    # What a region IS, in this dataset, is its set of destinations — which
+    # is exactly what the region's own page draws and what /themes draws for
+    # FRAMED ON EACH REGION, NOT ON THE COUNTRY. One shared frame was tried
+    # first, so the six regions of Norway would be six views of one scale and
+    # a reader could see that Fjord Norway is the west and Northern Norway is
+    # the top. NORWAY HOLDS SVALBARD AT 78°N. One destination 1,300 km off
+    # the mainland blows the shared extent out to the whole canvas, and all
+    # six cards drew Europe with two or three dots on it — the identical-
+    # picture fault a third time in one commit. A single outlier destroys a
+    # shared frame, and this atlas has several: Svalbard, the Azores, the
+    # Canaries, Madeira. Each region gets its own.
     region_cards = []
     for r in c["regions"]:
         meta = f'<p class="cardmeta">{n_of(len(r["cities"]), "city")}</p>'
+        art = constellation([project(t["lat"], t["lon"]) for t in r["cities"]],
+                            extra=" regionmini",
+                            frame=True) if r["cities"] else ""
         region_cards.append(
-            card(urls.region(c, r), "Region", r["name"], r["summary"], seed=f"region:{c['slug']}:{r['slug']}", meta=meta)
+            card(urls.region(c, r), "Region", r["name"], r["summary"],
+                 art=art, meta=meta)
         )
     festivals = "".join(
         f"""<a class="row" href="{urls.month(f['month'])}"><div><h3>{esc(f['name'])}</h3>
@@ -2455,6 +2478,7 @@ def country_page(data, c):
   </div>
 </section>
 
+{constel_defs()}
 {section("Travel regions", countrymap(data, c) + grid(region_cards, 3), id="regions",
          lede=f"{len(c['regions'])} editorial regions, each opening onto its cities.")}
 

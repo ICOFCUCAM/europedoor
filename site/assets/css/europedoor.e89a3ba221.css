@@ -4094,6 +4094,10 @@ body[data-hero] .masthead { position: sticky; }
    and on the dark one an acid continent floating in near-black. The
    cartography is world-independent by design: paper, ink, blue, wherever it
    is embedded. */
+/* A region's marks are bigger than a 200-destination tile's, because a
+   region holds two or three and the tile holds two hundred. */
+.card-map .regionmini .constel-lit circle { r: 11px; stroke: var(--atlas-here);
+                                            stroke-width: 2; }
 .card-map { background: var(--atlas-sea); display: flex; align-items: center;
             justify-content: center; padding: var(--s4); }
 .card-map .constel { fill: var(--atlas-land); }
