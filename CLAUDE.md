@@ -2175,6 +2175,92 @@ under it — journeys, themes, stories, fund projects — rendered between 2.4 a
 chart on which four of seven series cannot be seen is the wrong track, not the
 wrong data.**
 
+**A `<stop>` that no rule reaches is black, and the SVG default is the one
+colour this palette does not contain.** `datacut()` emitted its two gradients
+in a `<defs>` BESIDE the group rather than inside it, so
+`.minimap.arched.atlas .datacut stop` matched none of the ten stops on any
+page — and the ramp that exists to stop a straight data cut reading as a
+rendering fault was itself a black smear at the eastern edge of the parchment,
+on every picture plate the site draws. It survived because the gradient is anchored at 52°E and most
+plates are framed hundreds of units west of it, at zero opacity: invisible on
+three hundred pages and plain on the twenty framed on the whole continent.
+Nothing counts a gradient stop; the browser's computed value is the only
+instrument that could have seen it.
+
+**A FADE WRITTEN TO KEEP A PICTURE HONEST WAS UNLIGHTING THE ATLAS.**
+`data/geo/` stops at 52°E and 33°N, so the hero ramps into shadow along each
+cut. The widths of those ramps — 360 units east, 150 south — were chosen by
+eye for atmosphere, and nothing ever asked what was underneath them:
+
+| | | | |
+|---|---|---|---|
+| Baku | 100% | Paphos | 92% |
+| Tbilisi | 89% | Heraklion | 85% |
+| Moscow | 71% | Chania, Crete | 83% |
+| Helsinki | 28% | Valletta | 77% |
+
+**Forty-six of 319 destinations were dimmed past half**, and five countries —
+Azerbaijan, Georgia, Armenia, Cyprus and Malta — were effectively unlit on a
+picture whose own accessible label says every country is a link. It is the
+fault `cartography.datacut` already records one file over, in the family that
+learned it. `pages.dusk_reach()` derives the widths from the outermost
+destination east and south, inverting smoothstep in closed form, so adding a
+destination further out narrows the fade on the next build. The ceiling is the
+one number here that is art direction and it was **rendered three ways and
+looked at**: at 0.50 the band is 52 units and the terminator reads as a hard
+shadow cutting the continent — the same rendering fault, arrived at from the
+other side. 46 past half becomes 9. **/map takes none of it**: its marks are
+drawn ABOVE the fade so a destination near the cut keeps its dot, and
+narrowing it made the 52°E diagonal a hard edge on the instrument.
+
+**The subject of every country portrait was drawn cold, and only a pixel
+sample found it.** `path.here` was a translucent white — "a wash, not a fill,
+so whatever is under it survives" — written on the premise that the land tone
+is underneath. On a portrait there is no land underneath: `lyr-ocean` is a
+rect of `--atlas-sea` across the whole frame and the subject is painted once,
+with this fill. So 62% white sat on `#153851`: **Austria rendered `#ccd9e1`
+and its neighbours `#d3cfc5`** — a cold blue-grey country in a warm parchment
+frame, on all fifty portraits, reading as water. At thumbnail size it looks
+like a slightly lighter country, which is why no contact sheet found it.
+Opaque `--atlas-here`, the token that existed for exactly this and had no
+user, and both steps are separations in `docs/palette.json` now.
+
+**Nine portraits set their country's name on somebody else's ground.** The
+hero has three rules for placing a country name and the portrait had none of
+them: its anchors were offsets of a radius round the centre of the subject's
+bounding box, tested against the aperture and the labels already down and
+nothing else. Measured with the browser's own `isPointInFill`, **AUSTRIA,
+DENMARK and FRANCE were ten samples out of ten on a neighbour** — AUSTRIA set
+across Czechia on the one plate whose job is to say which country this page
+is about. `pages.NameGround` is the hero's rule at module level, because
+**there are two drawings that name countries and for the life of both only
+one had the rule.**
+
+**And a bounding box is not a country came back through the ANCHORS.** The
+moment the name had to sit on its own ground, ITALY, NORWAY and SPAIN lost
+theirs — Italy's bounding-box centre is in the Adriatic and its radius is half
+the peninsula, so not one of the nine anchors was on Italy. The anchors are a
+grid over the box keeping the cells inside the real polygon, ordered from the
+middle outwards and **not truncated**: keeping the seventy nearest the middle
+cost NORWAY its name, because the cells near the centre of Norway's box are
+all in the crowded south. Three rungs — zero crossings, two, five — because a
+portrait that cannot name its subject is worse than a name whose end overlaps
+a neighbour. 43 of 43 named, none off its own ground.
+
+**A `.pyc` outlived its source, and a sweep of a constant reported the same
+number four times.** `DUSK_CEILING` was edited and re-imported three times and
+every run printed the value from a stale `__pycache__`, while `inspect.getsource`
+— which reads the FILE — showed the new code. `python3 -B` does not help: it
+stops Python WRITING bytecode, not reading it. Delete `tools/**/__pycache__`
+before measuring a constant you have just changed, or the measurement is of
+the last build.
+
+**The browser suite crashed mid-run because `site/` was rebuilt under it.**
+`ENOENT: site/404.html`, the same concurrency failure this file already
+records as a green run that had stopped counting. Do not build while the
+browser suite is running; it takes half an hour and the rebuild takes thirty
+seconds.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
