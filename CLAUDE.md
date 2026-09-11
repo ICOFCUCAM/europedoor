@@ -2929,6 +2929,7 @@ the rest.
     python3 tools/photo-tests.py              the acquisition pipeline, against a stub provider
     python3 tools/desk-tests.py               the Media Desk: the sign-in, and what the browser may send
     node tools/hosted-desk-tests.js           the HOSTED desk: signed sessions, signed thumbnails, the dispatch
+    node tools/desk-render.js                 the HOSTED desk's screens, rendered at 1280 and 390
 
 And three more that are deliberately NOT gates. Two write an image rather
 than a verdict: `node tools/hero-sheet.js` draws every discovered candidate

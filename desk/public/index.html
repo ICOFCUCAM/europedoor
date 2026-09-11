@@ -50,6 +50,17 @@
         <label for="slot">Slot</label>
         <select id="slot" required></select>
       </div>
+      <!-- COUNTRY FIRST, BECAUSE THAT IS HOW AN EDITOR THINKS. 583 of the
+           593 purposes are one country's, and a datalist of 583 entries is
+           a list nobody can use — the same finding that split slot from
+           target in the first place, one level up. It is derived from the
+           target rather than typed: the country is the first segment, and
+           its NAME comes out of the atlas because a title-cased slug reads
+           "Bosnia And Herzegovina". -->
+      <div class="f-country" id="country-wrap" hidden>
+        <label for="country">Country</label>
+        <select id="country"></select>
+      </div>
       <div class="f-target" id="target-wrap" hidden>
         <label for="target">Target</label>
         <input id="target" list="targets" autocomplete="off"
@@ -89,6 +100,8 @@
         </select></div>
       <div><label for="lib-slot">Slot</label>
         <select id="lib-slot"><option value="">Any</option></select></div>
+      <div><label for="lib-country">Country</label>
+        <select id="lib-country"><option value="">Every country</option></select></div>
       <div><label for="lib-q">Find</label>
         <input id="lib-q" type="search" autocomplete="off"
                placeholder="a surface or a target"></div>
@@ -115,8 +128,24 @@
     <figure id="ack-shot"></figure>
     <dl id="ack-facts"></dl>
     <label for="alt">What the photograph shows</label>
-    <input id="alt" required maxlength="240"
-           placeholder="for somebody who cannot see it — not the place name">
+    <!-- A TEXTAREA, BECAUSE THE FIELD HOLDS UP TO 240 CHARACTERS AND AN
+         INPUT SHOWED ABOUT FORTY. The render pass caught it the moment the
+         photographer's own description could be taken with one click: the
+         sentence went in whole and the editor could see the first third of
+         the thing they were about to ship. That is the sticky phone action
+         cutting its place name on 146 destination pages, in a control whose
+         entire job is to be read before it is approved. -->
+    <textarea id="alt" required maxlength="240" rows="3"
+              placeholder="for somebody who cannot see it — not the place name"></textarea>
+    <!-- THE SUGGESTION IS THE PHOTOGRAPHER'S OWN SENTENCE AND THERE IS ONLY
+         EVER ONE. A list of alternatives would have to be written by
+         something that has not seen the photograph, which is the same
+         failure as answering a licence question from memory: a guess wearing
+         the clothes of evidence. Pexels publishes an `alt` per photograph;
+         that is a real description by somebody who looked, so it is offered
+         verbatim, and it is a starting point rather than an answer. -->
+    <div id="alt-suggest" class="suggest" hidden></div>
+    <p class="hint" id="alt-warn" hidden></p>
     <p class="hint">The page already carries the place name. This is the
     thing in the frame.</p>
     <ul class="willdo">

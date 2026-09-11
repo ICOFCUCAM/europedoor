@@ -94,26 +94,64 @@
     });
     sel.innerHTML = html;
     libSel.innerHTML = '<option value="">Any</option>' + html;
+    fillCountries();
     if (!sel.dataset.wired) { sel.dataset.wired = "1";
-      sel.addEventListener("change", onSlot); }
+      sel.addEventListener("change", onSlot);
+      el("country").addEventListener("change", onCountry); }
     onSlot();
   }
+
+  /* EVERY COUNTRY THE REGISTRY KNOWS, ONCE, IN ITS OWN NAME. Derived from
+     the rows rather than listed anywhere, so a country added to the atlas
+     appears here on the next build and one removed disappears — the same
+     reason the targets come from the atlas and not from the spec file. */
+  function countries() {
+    var seen = {};
+    REG.purposes.forEach(function (p) {
+      if (p.country) seen[p.country] = p.country_name;
+    });
+    return Object.keys(seen).sort(function (a, b) {
+      return seen[a].localeCompare(seen[b]);
+    }).map(function (k) { return [k, seen[k]]; });
+  }
+
+  function fillCountries() {
+    var opts = countries().map(function (c) {
+      return '<option value="' + esc(c[0]) + '">' + esc(c[1]) + "</option>";
+    }).join("");
+    el("country").innerHTML = '<option value="">Every country</option>' + opts;
+    el("lib-country").innerHTML =
+      '<option value="">Every country</option>' + opts;
+  }
+
+  function onCountry() { onSlot(true); }
 
   function instancesOf(slot) {
     return REG.purposes.filter(function (p) { return p.slot === slot; });
   }
 
-  function onSlot() {
+  function onSlot(keepCountry) {
     var v = el("slot").value;
     var rows = instancesOf(v);
     var isSlot = rows.length > 0;
+    /* A COUNTRY IS ONLY A QUESTION WHERE THE SLOT HAS ONE. A story-hero has
+       no country — its places are in several — so offering the filter there
+       would be offering a control that can only ever empty the list. */
+    var hasCountry = rows.some(function (p) { return !!p.country; });
+    el("country-wrap").hidden = !hasCountry;
     el("target-wrap").hidden = !isSlot;
     el("target").required = isSlot;
+    if (!keepCountry && !hasCountry) el("country").value = "";
     if (isSlot) {
-      el("targets").innerHTML = rows.slice(0, 2000).map(function (p) {
+      var c = hasCountry ? el("country").value : "";
+      var shown = c ? rows.filter(function (p) { return p.country === c; }) : rows;
+      el("targets").innerHTML = shown.slice(0, 2000).map(function (p) {
         return '<option value="' + esc(p.target) + '">' + esc(p.surface) + "</option>";
       }).join("");
-      el("target").value = "";
+      if (!keepCountry) el("target").value = "";
+      else if (el("target").value && shown.every(function (p) {
+        return p.target !== el("target").value;
+      })) el("target").value = "";
     }
     var spec = specOf(isSlot ? rows[0] : REG.purposes.filter(function (p) {
       return p.purpose === v;
@@ -225,9 +263,73 @@
       "<dt>Purpose</dt><dd>" + esc(purpose) + "</dd>" +
       "<dt>Surface</dt><dd>" + esc(surface) + "</dd>";
     el("alt").value = "";
+    offerAlt(c, purpose);
     el("acquire").showModal();
     el("alt").focus();
   }
+
+  /* ── what the photograph shows ─────────────────────────────────────
+     THE FIELD IS NOT PREFILLED, AND THAT IS THE WHOLE DESIGN. A prefilled
+     alt is an alt nobody reads: the editor tabs past it and a sentence
+     written by somebody who was describing a stock photograph ships as this
+     site's description of its own hero. It is offered as a button instead —
+     one click to take it, and taking it is a decision.
+
+     ONE SUGGESTION, AND IT IS THE PHOTOGRAPHER'S. Generating three
+     alternatives would mean writing descriptions of a photograph nothing
+     here has seen, which is the licence-from-memory failure in another
+     costume. Pexels publishes `alt` per photograph, written by somebody who
+     looked at it; that is a source. Where a photograph has none, the panel
+     says so rather than inventing one. */
+  function offerAlt(c, purpose) {
+    var box = el("alt-suggest");
+    if (!c.alt) {
+      box.hidden = false;
+      box.innerHTML = '<p class="nosuggest">This photograph carries no ' +
+        "description from the photographer, so there is nothing to offer. " +
+        "Write what is in the frame.</p>";
+      return;
+    }
+    box.hidden = false;
+    box.innerHTML = '<p class="suggest-lab">The photographer\u2019s own ' +
+      'description</p><button type="button" class="chip" id="alt-take">' +
+      esc(c.alt) + "</button>";
+    el("alt-take").addEventListener("click", function () {
+      el("alt").value = c.alt;
+      el("alt").focus();
+      warnAlt(purpose);
+    });
+    warnAlt(purpose);
+  }
+
+  /* THE HINT SAYS "NOT THE PLACE NAME" AND A HINT IS NOT A CHECK. The first
+     acquisition typed exactly the place name into it, one line under the
+     sentence saying not to — so the panel now reads what is there and says
+     what is wrong with it, which is what a hint cannot do. It never blocks:
+     an editor who means it types it anyway. */
+  function warnAlt(purpose) {
+    var w = el("alt-warn");
+    var v = el("alt").value.trim();
+    var t = (purpose.split("@")[1] || "").split("/").pop().replace(/-/g, " ");
+    var bare = v.toLowerCase().replace(/[^a-z0-9 ]+/g, " ")
+                .replace(/\s+/g, " ").trim();
+    var why = "";
+    if (v && v.length < 15) {
+      why = "That is too short to describe a photograph to somebody who " +
+            "cannot see it.";
+    } else if (t && bare && (bare === t || bare.indexOf(t) === 0
+               && bare.length < t.length + 12)) {
+      why = "That is the place name, and the page already carries it. " +
+            "Say what is in the frame \u2014 the light, the water, the " +
+            "buildings, the weather.";
+    }
+    w.hidden = !why;
+    w.textContent = why;
+  }
+
+  el("alt").addEventListener("input", function () {
+    if (CHOSEN) warnAlt(CHOSEN.purpose);
+  });
 
   el("acquire").addEventListener("close", function () {
     if (el("acquire").returnValue !== "go" || !CHOSEN) return;
@@ -317,14 +419,27 @@
     }
     var status = el("lib-status").value;
     var slot = el("lib-slot").value;
+    var country = el("lib-country").value;
     var q = el("lib-q").value.trim().toLowerCase();
     var rows = REG.purposes.filter(function (p) {
       if (status && p.status !== status) return false;
       if (slot && (p.slot || p.purpose) !== slot) return false;
+      if (country && p.country !== country) return false;
       if (q && (p.surface + " " + p.purpose).toLowerCase().indexOf(q) < 0) return false;
       return true;
     });
-    var filled = REG.purposes.filter(function (p) { return p.status === "PUBLISHED"; }).length;
+    /* THE HEADLINE COUNT IS THE COUNT OF WHAT WAS ASKED FOR. Picking Norway
+       and being told "0 of 593 slots hold a photograph" answers a question
+       nobody asked — a number that is not the set's own extent reads as one,
+       which is the failure /europe-in already records. With a country chosen
+       the denominator is that country's. */
+    var scope = country
+      ? REG.purposes.filter(function (p) { return p.country === country; })
+      : REG.purposes;
+    var scopeName = country
+      ? (scope.length && scope[0].country_name) || country
+      : "";
+    var filled = scope.filter(function (p) { return p.status === "PUBLISHED"; }).length;
     /* THE COUNT SAYS WHAT IS ON THE SCREEN. The first version said
        "Showing 593" while listing 60 — a number that is not the set's own
        extent reads as one. */
@@ -332,7 +447,8 @@
     var tail = rows.filter(function (p) { return p.status !== "PUBLISHED"; });
     var showing = head.concat(tail.slice(0, 60));
     el("lib-count").innerHTML = "<b>" + filled + "</b> of <b>" +
-      REG.purposes.length + "</b> slots hold a photograph. " +
+      scope.length + "</b> " + (scopeName ? esc(scopeName) + " " : "") +
+      "slots hold a photograph. " +
       (rows.length === showing.length
         ? "Listing all " + rows.length + " that match."
         : "Matching " + rows.length + ", listing " + showing.length + ".");

@@ -145,6 +145,39 @@ def _value(row, fact):
     return f.get("value") if isinstance(f, dict) else f
 
 
+def jpeg_size(blob):
+    """(width, height) from a JPEG's own SOF marker, or None.
+
+    A JPEG is a chain of segments: 0xFFD8, then markers each carrying a
+    two-byte big-endian length. The frame header — SOF0 through SOF15, minus
+    the four that are not frame headers — holds height then width as two-byte
+    values three bytes in. Walking to it reads a few dozen bytes and proves
+    the file is a JPEG at the same time, because a walk that falls off the end
+    of a truncated or non-JPEG file returns None rather than a number.
+    """
+    if not blob.startswith(b"\xff\xd8"):
+        return None
+    i, n = 2, len(blob)
+    while i + 9 < n:
+        if blob[i] != 0xFF:
+            return None
+        marker = blob[i + 1]
+        if marker in (0xD8, 0x01) or 0xD0 <= marker <= 0xD7:
+            i += 2
+            continue
+        seg = int.from_bytes(blob[i + 2:i + 4], "big")
+        if seg < 2:
+            return None
+        # SOF0-SOF15 except DHT (C4), JPG (C8) and DAC (CC), which share the
+        # range and are not frame headers.
+        if 0xC0 <= marker <= 0xCF and marker not in (0xC4, 0xC8, 0xCC):
+            h = int.from_bytes(blob[i + 5:i + 7], "big")
+            w = int.from_bytes(blob[i + 7:i + 9], "big")
+            return (w, h) if w and h else None
+        i += 2 + seg
+    return None
+
+
 def cleared(slug):
     """(ok, why) for the AUTOMATED route. The gate is the only authority."""
     row = gate().get(slug)
@@ -391,6 +424,39 @@ def main(argv):
     if len(blob) < 10_000:
         sys.exit(f"the original is {len(blob)} bytes, which is an error page "
                  f"rather than a photograph. Nothing written.")
+
+    # THE BYTES ARE VERIFIED AGAINST WHAT THE API PROMISED, AND A LENGTH
+    # FLOOR IS NOT THAT.
+    #
+    # Everything before this point checks the METADATA: the id came back the
+    # id we asked for, the photographer is present, the declared width suits
+    # the slot. Then a URL out of that same payload is fetched and the result
+    # was accepted on one test — "more than ten kilobytes" — which passes for
+    # a truncated transfer, a differently-sized re-encode, and any image at
+    # all that happens to be large.
+    #
+    # It matters because the DECLARED size is what cleared the slot. Pexels
+    # said 12000x9000 and `fits()` admitted the candidate on that number; if
+    # the bytes are 1200x900 then a photograph that does not meet the slot has
+    # been hashed, registered and committed with a correct-looking provenance
+    # row, and the only thing that would ever notice is derive.py refusing to
+    # upscale — a step later, in a different script, with the register already
+    # written.
+    #
+    # NO PILLOW HERE, DELIBERATELY. This script has no image dependency and
+    # installing one to read two numbers out of a header is how a dependency
+    # arrives without a reason; derive.py installs Pillow because it decodes
+    # pixels. A JPEG's own SOF marker carries the dimensions in six bytes.
+    got = jpeg_size(blob)
+    if got is None:
+        sys.exit(f"the bytes from {args.provider} are not a JPEG. The "
+                 f"provenance row would record a hash of something this "
+                 f"pipeline cannot derive from. Nothing written.")
+    if got != (norm["width"], norm["height"]):
+        sys.exit(f"{args.provider} described photo {args.photo_id} as "
+                 f"{norm['width']}x{norm['height']} and served "
+                 f"{got[0]}x{got[1]}. The description is what cleared this "
+                 f"slot, so the file does not. Nothing written.")
 
     digest = hashlib.sha256(blob).hexdigest()
     acquired_at = datetime.datetime.now(datetime.timezone.utc).replace(

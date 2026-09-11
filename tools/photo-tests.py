@@ -102,6 +102,39 @@ class Handler(http.server.BaseHTTPRequestHandler):
             body = dict(STUB["meta"])
             body["id"] = 999999
             return self._json(body)
+        if self.path.startswith("/photos/undersized"):
+            # A 200 DESCRIBING ONE PHOTOGRAPH AND SERVING ANOTHER SIZE.
+            # The declared width is what cleared the slot, so bytes that do
+            # not match it are a photograph that does not meet the slot
+            # wearing a provenance row that says it does. This route keeps
+            # the metadata and points `original` at the small file.
+            body = dict(STUB["meta"])
+            body["id"] = "undersized"
+            body["src"] = dict(body["src"])
+            body["src"]["original"] = body["src"]["original"].replace(
+                "/original.jpg", "/small.jpg")
+            return self._json(body)
+        if self.path.startswith("/small.jpg"):
+            self.send_response(200)
+            self.send_header("Content-Type", "image/jpeg")
+            self.send_header("Content-Length", str(len(STUB["small"])))
+            self.end_headers()
+            self.wfile.write(STUB["small"])
+            return
+        if self.path.startswith("/notajpeg.bin"):
+            self.send_response(200)
+            self.send_header("Content-Type", "image/jpeg")
+            self.send_header("Content-Length", str(len(STUB["notajpeg"])))
+            self.end_headers()
+            self.wfile.write(STUB["notajpeg"])
+            return
+        if self.path.startswith("/photos/notajpeg"):
+            body = dict(STUB["meta"])
+            body["id"] = "notajpeg"
+            body["src"] = dict(body["src"])
+            body["src"]["original"] = body["src"]["original"].replace(
+                "/original.jpg", "/notajpeg.bin")
+            return self._json(body)
         if self.path.startswith("/photos/"):
             self.send_response(404)
             self.end_headers()
@@ -219,6 +252,10 @@ def main(argv):
     base = f"http://127.0.0.1:{srv.server_address[1]}"
     STUB["jpeg"] = _jpeg(2560, 1440)
     STUB["preview"] = _jpeg(1880, 1058)
+    # Large enough to clear the ten-kilobyte floor and the wrong size, which
+    # is exactly the case the floor cannot see.
+    STUB["small"] = _jpeg(1200, 675)
+    STUB["notajpeg"] = b"\x89PNG\r\n\x1a\n" + b"\0" * 40000
     STUB["meta"] = {
         "id": int(PHOTO_ID), "width": 2560, "height": 1440,
         "url": "https://www.pexels.com/photo/stub-2014422/",
@@ -338,6 +375,28 @@ def main(argv):
         check("a mismatched returned id fails", r.returncode != 0)
         check("and nothing is written",
               "Nothing written" in (r.stdout + r.stderr))
+
+        # ── the BYTES are verified, not just their length ────────────
+        #
+        # Everything above checks the metadata and then fetches a URL out of
+        # that same payload. The result used to be accepted on one test —
+        # more than ten kilobytes — which passes for a truncated transfer,
+        # for a re-encode at a different size, and for any large image at
+        # all. The DECLARED size is what cleared the slot, so bytes that
+        # disagree with it are a photograph that does not meet the slot
+        # carrying a provenance row that says it does; the only thing that
+        # would ever have noticed is derive.py refusing to upscale, a step
+        # later, in another script, with the register already written.
+        r = run(A + ["--photo-id", "undersized", "--purpose", "homepage-hero",
+                     "--alt", "a test pattern image"], env)
+        out = r.stdout + r.stderr
+        check("bytes that are not the declared size fail",
+              r.returncode != 0 and "1200x675" in out and "Nothing written" in out)
+        r = run(A + ["--photo-id", "notajpeg", "--purpose", "homepage-hero",
+                     "--alt", "a test pattern image"], env)
+        out = r.stdout + r.stderr
+        check("bytes that are not a JPEG fail",
+              r.returncode != 0 and "not a JPEG" in out)
         check("and the original on disk is exactly what it was",
               snapshot()[0] == before[0])
         check("and the register is exactly what it was",

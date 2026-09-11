@@ -109,12 +109,24 @@ input:focus, select:focus { border-color: var(--cobalt); }
 /* The controls are ONE LINE, not a panel. A search box that is the page does
    not need a border box round it — the same finding the site's own /search
    page already records. */
-.find { display: grid; gap: var(--s4); align-items: end;
-        grid-template-columns: 1fr; }
-@media (min-width: 60rem) {
-  .find { grid-template-columns: 18rem 18rem 1fr auto; }
-  .find:not(:has(.f-target:not([hidden]))) { grid-template-columns: 18rem 1fr auto; }
-}
+/* A FIXED COLUMN COUNT IS A COLUMN COUNT THAT BREAKS WHEN A FIELD IS ADDED,
+   and adding the country field is what proved it: `18rem 18rem 1fr auto` had
+   to grow a third track and a second `:has` exception, and the next field
+   would need a fourth and a third. Flex-wrap has neither — a field that is
+   hidden takes no track, and a row too narrow for all of them wraps instead
+   of overflowing. That is the same repair the site's own masthead and section
+   nav took, where a flex row with no wrap put Sign out and three sections off
+   the right edge at 390. `[hidden]` is left to the user agent here on
+   purpose: nothing below sets `display` on these children, so the UA's
+   `display: none` is unopposed — the collision that laid out the hidden
+   sign-in screen came from a class that did set one. */
+.find { display: flex; flex-wrap: wrap; gap: var(--s4); align-items: end; }
+.find > div { flex: 1 1 12rem; min-width: 0; }
+.find > div[hidden] { display: none; }
+/* The search box is the field the page is FOR, so it takes the space the
+   others do not need rather than an equal share of it. */
+.find .f-q { flex: 3 1 18rem; }
+.find button[type=submit] { flex: 0 0 auto; }
 .find button[type=submit] {
   padding: .6rem 1.2rem; border: 0; cursor: pointer; border-radius: var(--radius);
   background: var(--cobalt-deep); color: var(--limestone); font-weight: 600;
@@ -255,3 +267,33 @@ menu { display: flex; gap: var(--s3); justify-content: flex-end;
    the word an editor will reach for and it is wrong: the photograph is in a
    branch, behind a pull request, and nothing on europedoor.com has changed. */
 .prog .notyet { color: var(--ink-2); font-size: 13px; margin-top: var(--s3); }
+
+/* ── what the photograph shows ──────────────────────────────────────── */
+/* THE SUGGESTION IS A BUTTON AND NOT A PREFILLED FIELD, so it has to look
+   like something you press. Rules and space, and the four things that say
+   "separate object, placed here by a system" stay off it — no border box, no
+   radius beyond the control's own, no shadow, no fill — which is the grammar
+   the Stay layer and the country hand-off already use on the site itself. */
+.suggest { margin: var(--s2) 0 var(--s3); }
+.suggest-lab { font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-3); margin: 0 0 var(--s2); }
+.suggest .chip { display: block; width: 100%; text-align: left; cursor: pointer;
+  font: inherit; font-size: 14px; line-height: 1.45; color: var(--ink);
+  background: var(--paper-2); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: var(--s3); }
+.suggest .chip:hover { background: var(--paper-3); border-color: var(--ink-3); }
+.suggest .nosuggest { font-size: 13px; color: var(--ink-2); margin: 0; }
+/* The warning is the one place on this screen that is allowed to be loud,
+   because it is telling the editor the thing they typed will ship. */
+#alt-warn { color: var(--terracotta); }
+
+/* The country field sits between the slot and its target, because that is
+   the order the question is asked in: which kind of image, for where, of
+   what. Same column behaviour as the other two. */
+.f-country select { width: 100%; }
+/* The alt field is a textarea for one measured reason: at 240 characters an
+   input shows about forty of them, and this is the one control on the screen
+   that must be read in full before it is approved. */
+#alt { width: 100%; resize: vertical; font: inherit; font-size: 15px;
+  line-height: 1.45; padding: var(--s3); border: 1px solid var(--ink-3);
+  border-radius: var(--radius); background: var(--paper); color: var(--ink); }

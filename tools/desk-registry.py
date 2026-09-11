@@ -73,7 +73,8 @@ def build():
         slots[sn] = {k: slot.get(k) for k in REQS}
         for t in imageslots.targets(slot, data):
             spec = imageslots.resolve(f"{sn}{imageslots.SEP}{t}", data)
-            rows.append(_row(f"{sn}{imageslots.SEP}{t}", spec, templated=True))
+            rows.append(_row(f"{sn}{imageslots.SEP}{t}", spec, templated=True,
+                             data=data))
     providers = {}
     for slug in sorted(k for k in acquire.gate() if not k.startswith("$")):
         ok, why = acquire.cleared(slug)
@@ -99,13 +100,26 @@ def build():
     }
 
 
-def _row(name, spec, templated):
+def _row(name, spec, templated, data=None):
     """Identity always; requirements only where they are the row's OWN.
 
     A templated instance inherits every number and the brief from its slot,
     and the desk reads them from there — which is also what the interface
     says out loud, because an editor should never have to know that a
     destination portrait wants 1,800 native pixels.
+
+    THE COUNTRY IS DERIVED, NEVER TYPED. A target is `country/region/city`
+    for a destination and one segment deeper for a place, so the country is
+    the first segment — but the desk needs the country's NAME, and a slug
+    title-cased is "Bosnia And Herzegovina" and "Turkiye". So it comes out of
+    the atlas, which is where the name is written, for the same reason
+    `targets()` reads the atlas rather than a list in the spec file: a list
+    typed into JSON is wrong the first time somebody adds a country.
+
+    A story has no country. It has `places`, which are in several, so a
+    single country field would be a claim the data does not make — and the
+    honest answer is an absent field rather than a guess, exactly as a
+    destination with no population figure prints none.
     """
     row = {
         "purpose": name,
@@ -117,6 +131,12 @@ def _row(name, spec, templated):
     }
     if not templated:
         row.update({k: spec.get(k) for k in REQS})
+    elif data is not None:
+        cslug = (spec.get("target") or "").split("/")[0]
+        country = data["countries"].get(cslug)
+        if country:
+            row["country"] = cslug
+            row["country_name"] = country["name"]
     return row
 
 
