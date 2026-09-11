@@ -2449,6 +2449,46 @@ neighbourhood twice, focused and not, because a focus ring has no declared
 background; the clipping check asserts that no element anywhere holds more
 text than it shows.
 
+**`tools/photo-tests.py` BUILDS THE SITE, and running it beside the browser
+suite killed the suite.** It exercises the acquisition pipeline end to end
+against a stub provider, which means it wipes and rebuilds `site/` — so the
+suite's own server read `site/404.html` while the directory was being
+recreated and the run died with ENOENT. That is the concurrency failure this
+file already records twice, arriving through a gate nobody thinks of as a
+build. **Run the browser suite alone.** It takes about forty minutes and
+everything else here takes seconds; there is never a reason to overlap them.
+
+**A floor that is one page away from its threshold is a check that fails
+without saying anything.** The palette ratio's accent floor was 0.2% against a
+measured 0.3, and the run reported "the accent paints 0.00%" and nothing about
+where it went. Both halves were wrong: a site-wide share is the wrong quantity
+for a colour that has a HOME — the families whose `--door` is terracotta or
+atlantic — and a message carrying one aggregate number cannot be diagnosed.
+Every page's figure is in the message now, which is the same rule the map-layer
+failure was fixed by: *a failure message with no measurement in it cannot be
+diagnosed.*
+
+**AND THE RATIO'S CLASSIFIER LOST A BOUND WHEN IT WAS COMPRESSED.** Water is
+185–218 degrees of hue and cobalt is 218–270; everything else — and everything
+else is mostly the warm end, terracotta at 20 — is the accent. Written into
+the suite as `h < 218 ? water : h <= 270 ? cobalt : accent`, the first clause
+swallowed every warm hue on the site, so the run reported the accent at 0.00%
+on all twelve pages while the prototype, which kept `h >= 185 &&`, reported
+0.3. The numbers in `docs/palette.json` came from the prototype and are right;
+the check was measuring something else for two runs. **A condition that is
+correct in a prototype can lose a bound when it is compressed into a ternary**,
+and the only reason this surfaced is that the failure message was made to print
+every page's figure — twelve zeroes is a classifier fault and one zero is a
+page fault.
+
+**And a rule's reason can stop being true when the drawing changes.**
+`.constel:not(.regionglyph) { display: none }` takes the glyph off a phone, and
+its comment says a theme's constellation "is 132px inside a row and stays 132px
+on a phone" — which was right while it WAS a 132-pixel mark. Once the row stated
+its proportions and the drawing became 288, the phone case had become the case
+the same block already makes an exception for, where a journey's route and a
+story's places get the whole width. The reason had expired and the rule had not.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

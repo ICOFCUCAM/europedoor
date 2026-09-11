@@ -3410,7 +3410,16 @@ async function main() {
           // cleanly and --map-land, at 215, is already a neutral by chroma.
           // Split, cobalt measures 7.0 and sits UNDER its budget on all
           // twelve pages.
-          out[h < 218 ? "water" : h <= 270 ? "cobalt" : "accent"]++;
+          // THE LOWER BOUND, WHICH THIS TERNARY DROPPED. Water is 185 to
+          // 218 degrees and cobalt is 218 to 270; everything else — and
+          // "everything else" is mostly the warm end, terracotta at 20 —
+          // is the accent. Written as `h < 218 ? water : ...` the first
+          // clause swallowed every warm hue on the site, so the run
+          // reported the accent at 0.00% on all twelve pages and water 0.3
+          // high. The condition that was correct in the prototype lost a
+          // bound when it was compressed.
+          out[h >= 185 && h < 218 ? "water"
+              : h >= 218 && h <= 270 ? "cobalt" : "accent"]++;
         }
         return out;
       }, buf.toString("base64"));
