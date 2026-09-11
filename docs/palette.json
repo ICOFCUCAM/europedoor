@@ -98,8 +98,37 @@
         "b": "--atlas-land",
         "min": 3.0,
         "why": "the ink coast on paper — the relationship the instrument now has inverted"
+      },
+      {
+        "a": "--map-shore-1",
+        "b": "--map-sea",
+        "min": 1.35,
+        "why": "the shore band nearest the coast. The instrument's sea was ONE value where the picture's is four, so the Baltic, the Adriatic and the open Atlantic were the same near-black and an inland sea read as a hole in the continent"
+      },
+      {
+        "a": "--map-shore-2",
+        "b": "--map-sea",
+        "min": 1.18,
+        "why": "the middle step of the same cast"
+      },
+      {
+        "a": "--map-shore-3",
+        "b": "--map-sea",
+        "min": 1.06,
+        "why": "the widest and faintest, far from any coast"
       }
-    ]
+    ],
+    "ladder": {
+      "$comment": "ORDER IS THE CLAIM, and a per-pair minimum cannot state it. The water lightens as it approaches a shore — that is DISTANCE FROM LAND, the one thing a coastline can tell us, and never a claim about depth: this atlas holds no bathymetry. A ramp whose middle step is darker than its outer one is still three distinct colours and passes every pairwise floor while drawing the opposite of what it says.",
+      "tokens": [
+        "--map-sea",
+        "--map-shore-3",
+        "--map-shore-2",
+        "--map-shore-1",
+        "--map-land"
+      ],
+      "direction": "increasing"
+    }
   },
   "ratio": {
     "$comment": "The ratio is the instruction, not the hex codes. A palette gives you a blue website with gold buttons; a ratio gives you European editorial design over futuristic infrastructure.",

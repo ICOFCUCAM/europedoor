@@ -253,6 +253,24 @@
   --map-coast:    #93a1ae;   /* the edge between them. 7.33 on the sea, 3.84 on the land */
   --map-border:   #616b76;   /* a frontier, which is a line drawn ON land and lighter than a coast */
   --map-hover:    #8398ff;   /* cobalt-air, the INTELLIGENCE accent: 3.82 on the land it replaces */
+  /* AND THE INSTRUMENT'S SEA WAS ONE VALUE WHERE THE PICTURE'S IS FOUR.
+     `docs/cartography.md`: "A flat pale fill made the water a surface the
+     land was pasted onto. These four are CAST, not stroked — three soft
+     shadows of the land silhouette, widest and deepest first, so the water
+     lightens as it approaches a shore." True of the 824 plates since the
+     ocean ramp was built, and the instrument had one flat near-black: the
+     Baltic, the Adriatic, the Black Sea and the open Atlantic were the same
+     value, so an inland sea read as a hole in the continent rather than as
+     water.
+     Three graphite steps, the same cast and the same argument — it is
+     DISTANCE FROM LAND, the one thing a coastline can tell us, and never a
+     claim about depth. Measured against the water: 1.09, 1.23, 1.45, and the
+     land is 1.91, so the ramp is ordered and stays under the land it
+     approaches. Cooler than the land at every step, because the thing being
+     drawn is water. */
+  --map-shore-3:  #101920;   /* the widest and faintest, far from any coast */
+  --map-shore-2:  #18242e;
+  --map-shore-1:  #22313e;   /* the narrowest and lightest, against the shore */
 
 
   /* type */
@@ -1378,6 +1396,18 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
    stop-color is #000 and this stylesheet has already shipped a layer that
    said graphite and painted black. The colour is the water's. */
 .mapcut { pointer-events: none; }
+/* THE SHORE BAND, CAST RATHER THAN STROKED — the picture family's own
+   technique, applied to the instrument that never got it. A filter needs no
+   second copy of Europe's geometry and cannot lose a cascade fight, which is
+   why the plates use one: their first version was three `<use>` of the land
+   group and painted nothing at all, because a <use> clone IS matched by the
+   selectors that style the original where the original sits.
+   The shadow is of the group's UNION, so an internal frontier casts none —
+   exactly the coast, and never a border. */
+.europemap #countries, .europemap #detail {
+  filter: drop-shadow(0 0 2px var(--map-shore-1))
+          drop-shadow(0 0 7px var(--map-shore-2))
+          drop-shadow(0 0 16px var(--map-shore-3)); }
 #mapedge stop, #mapfoot stop { stop-color: var(--map-sea); }
 .europemap .context path { fill: var(--map-context); stroke: none; }
 .europemap .countries path {

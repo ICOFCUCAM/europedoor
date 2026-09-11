@@ -4042,6 +4042,29 @@ def c_cartography_palette():
             fail(f"the separation {row['a']} / {row['b']} carries no reason")
         n += 1
 
+    # ORDER IS THE CLAIM, AND A PER-PAIR MINIMUM CANNOT STATE IT. The water
+    # lightens as it approaches a shore, which is distance from land and
+    # never a claim about depth. A ramp whose middle step is darker than its
+    # outer one is still three distinct colours: it clears every pairwise
+    # floor above and draws the opposite of what the register says.
+    lad = pal["cartography"].get("ladder")
+    if lad:
+        vals = []
+        for t in lad["tokens"]:
+            h = hexof(t)
+            if h is None:
+                fail(f"{t} is in the cartographic ladder and is not a literal "
+                     f"hex token in the stylesheet")
+                vals = None
+                break
+            vals.append((t, h, lum(h)))
+        if vals:
+            for (t0, h0, l0), (t1, h1, l1) in zip(vals, vals[1:]):
+                if not l1 > l0:
+                    fail(f"the cartographic ladder is out of order: {t1} ({h1}) "
+                         f"is not lighter than {t0} ({h0}) — {lad['$comment'][:80]}")
+                n += 1
+
     # AND THE NAVY IS GONE FOR GOOD. The five hexes above were the instrument
     # cartography for the life of the dark world; naming them here means the
     # build fails if one is pasted back, the way the gold and the lime are
