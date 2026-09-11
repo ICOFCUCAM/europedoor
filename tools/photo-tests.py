@@ -667,6 +667,65 @@ def main(argv):
         check("and the UX audit does too",
               ua.returncode == 0, (ua.stdout + ua.stderr)[-400:])
 
+        # ── the credit, measured on the element rather than on a selector ──
+        # A RULE THAT CHANGES TWO PROPERTIES OF A SIX-PROPERTY COMPONENT IS
+        # NOT A DIFFERENT DESIGN, IT IS A BROKEN ONE. `.pageband figcaption`
+        # set `margin-top` and `color` to say "the credit belongs under the
+        # picture and never over it". `.credit` is `position: absolute` at the
+        # foot of the picture on a near-black scrim at `opacity: 0`, and
+        # (0,1,1) beats (0,1,0) — so the colour was overridden and the
+        # position, the scrim and the opacity were not. The site's caption
+        # ink, a dark grey for a light page, landed on 55% black at 2.01:1,
+        # on the two links Pexels' terms require, on every family that opens
+        # on a photograph. `margin-top` on an absolutely positioned element
+        # does nothing, so the rule achieved exactly one thing and that thing
+        # was the defect.
+        #
+        # IT IS ASSERTED ON THE ELEMENT AND NOT ON THE SELECTOR, because the
+        # first attempt was a CSS rule in checks.py — "no figcaption selector
+        # carries a colour" — and it refused seven MAP captions, which are
+        # real captions under real drawings. The question is which rules can
+        # reach a `<figcaption class="credit">`, and that needs a credit to
+        # exist, which is exactly what this suite has just made.
+        credited = []
+        for root, _dirs, files in os.walk(os.path.join(ROOT, "site")):
+            for fn in files:
+                if not fn.endswith(".html"):
+                    continue
+                h = open(os.path.join(root, fn), encoding="utf-8").read()
+                if 'class="credit"' in h:
+                    credited.append((os.path.join(root, fn), h))
+        check("a photograph publishes a credit a rule can be tested against",
+              bool(credited), f"{len(credited)} pages carry one")
+
+        css_path = os.path.join(ROOT, "assets", "css", "europedoor.css")
+        css_src = re.sub(r"/\*.*?\*/", "", open(css_path, encoding="utf-8").read(),
+                         flags=re.S)
+        # Every ancestor class actually standing over a credit in the shipped
+        # markup, read from the markup rather than from a list here — a list
+        # is wrong the first time a family starts opening on a photograph.
+        over = set()
+        for _f, h in credited:
+            for chunk in h.split('class="credit"'):
+                for cls in re.findall(r'class="([^"]*)"', chunk[-4000:]):
+                    over.update(cls.split())
+        over.discard("credit")
+
+        offenders = []
+        for sel, block in re.findall(r"([^{}@]+)\{([^}]*)\}", css_src):
+            sel = sel.strip().split("\n")[-1].strip()
+            if "figcaption" not in sel or ".credit" in sel:
+                continue
+            if not re.search(r"(^|;|\s)color\s*:", block):
+                continue
+            scope = re.findall(r"\.([A-Za-z0-9_-]+)", sel)
+            if scope and all(c in over for c in scope):
+                offenders.append(sel)
+        check("and no rule recolours it from outside the component",
+              not offenders,
+              "these reach a credit and give it a colour of their own: "
+              + ", ".join(sorted(offenders)))
+
         bt = os.path.join(ROOT, "site", "europe", "belgium", "index.html")
         belgium = open(bt, encoding="utf-8").read() if os.path.exists(bt) else ""
         check("and no band at all on a country with no photograph",

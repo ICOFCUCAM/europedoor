@@ -2625,9 +2625,19 @@ picture { position: relative; height: 100%; }
    Always-visible credits on 988 pages is a design nobody ships; credits that
    exist only in a data file are a licence risk. This is the compromise, and
    it is readable to a screen reader either way. */
+/* THE SCRIM IS 72% AND THE ARITHMETIC IS WHY, not taste. A credit sits on
+   a photograph nobody has seen yet, so its contrast cannot be read off two
+   tokens — it is whatever the picture underneath happens to be. The scrim is
+   what makes the ratio a property of the DESIGN rather than of the picture,
+   which is the sentence the homepage hero already uses, and 55% did not
+   deliver it: the worst case is a white frame, 55% black over white
+   composites to rgb(115,115,115), and white on that measures 4.74:1 — over
+   the AA floor by a twentieth, on a value nobody had computed. At 72% the
+   composite is rgb(71,71,71) and the floor is 9.2:1 whatever the photograph
+   does. checks.py recomputes both numbers from this declaration. */
 .credit { position: absolute; right: 0; bottom: 0; margin: 0;
           font-size: var(--t-xs); letter-spacing: .03em;
-          padding: 3px 8px; color: #fff; background: rgba(0,0,0,.55);
+          padding: 3px 8px; color: #fff; background: rgba(0,0,0,.72);
           opacity: 0; transition: opacity .16s ease; }
 picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 @media (max-width: 44rem) { .credit { opacity: 1; } }
@@ -5886,9 +5896,23 @@ main > .pagehead:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom
 @media (min-width: 62rem) { .pageband { aspect-ratio: 21 / 9; } }
 .pageband picture,
 .pageband img { display: block; width: 100%; height: 100%; object-fit: cover; }
-/* The credit belongs under the picture and never over it, and it takes the
-   size the site already has for a caption. A SIXTEENTH FONT SIZE WAS TRIED
-   AND THE INVARIANT REGISTER REFUSED IT: `css.font_sizes` is a ceiling of
-   fifteen with the reason written out, and 12px for one caption is exactly
-   the kind of value that makes a sibling repository measure 418 of them. */
-.pageband figcaption { margin-top: var(--s2); color: var(--ink-2); }
+/* A RULE THAT CHANGES TWO PROPERTIES OF AN ELEMENT GOVERNED BY SIX IS NOT A
+   DIFFERENT DESIGN, IT IS A BROKEN ONE — and this one shipped on the first
+   real acquisition. It said "the credit belongs under the picture and never
+   over it" and set `margin-top` and `color` to say so. `.credit` is
+   `position: absolute` at the foot of the picture, on a near-black scrim, at
+   `opacity: 0` until hover; `.pageband figcaption` is (0,1,1) against
+   `.credit`'s (0,1,0), so the COLOUR was overridden and the position, the
+   scrim and the opacity were not. The result was the site's caption ink —
+   `--ink-2`, a dark grey for a light page — laid on 55% black: **2.01:1**,
+   on the two links Pexels' terms require, on every family that opens on a
+   photograph. `margin-top` on an absolutely positioned element does nothing
+   at all, so the rule achieved exactly one thing and that thing was the
+   defect.
+
+   AND "UNDER THE PICTURE" WAS NOT AVAILABLE TO IT. `picture()` emits the
+   figcaption INSIDE the `<picture>`, and `.pageband` is an `aspect-ratio`
+   box with `overflow: hidden` — so a static caption in there is clipped
+   away entirely rather than moved below. The rule was describing a layout
+   the markup cannot produce. One credit design, everywhere, is what this
+   stylesheet is for; the exception is deleted rather than completed. */

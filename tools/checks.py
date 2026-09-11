@@ -6057,6 +6057,97 @@ def c_photo_published():
     return n
 
 
+@check("the photograph credit reads on any photograph, not on a lucky one")
+def c_credit_scrim():
+    """THE ONE CONTRAST ON THIS SITE THAT CANNOT BE READ OFF TWO TOKENS.
+
+    Every other contrast claim here is a colour against a colour, recomputed
+    from `docs/palette.json` or sampled off a painted pixel. The photograph
+    credit has neither: it sits at the foot of a picture nobody has licensed
+    yet, so what is underneath it is unknown at build time and different on
+    every page. A ratio measured against one photograph is a statement about
+    that photograph.
+
+    The scrim is what turns it into a statement about the DESIGN — the
+    homepage hero already says so in those words — and until the first real
+    acquisition nothing had done the arithmetic on it. The worst case is a
+    white frame, because the scrim composites over the picture and white is
+    the brightest thing that can be under it:
+
+        composite = (1 - alpha) * 255      per channel, over white
+        ratio     = (1.05) / (L(composite) + 0.05)
+
+    At the 55% it shipped with, that is rgb(115,115,115) and 4.74:1 — over
+    the AA floor by a twentieth, by accident. This recomputes both numbers
+    from the declaration itself, so lightening the scrim for the look of it
+    fails in the commit that does it rather than on somebody's photograph.
+
+    THE OTHER HALF OF THE DEFECT IS NOT HERE, AND THE FIRST VERSION PUT IT
+    HERE AND WAS WRONG. What actually shipped was `.pageband figcaption`
+    setting `color` and `margin-top` on an element `.credit` governs with six
+    declarations: it won the colour on specificity and left the position, the
+    scrim and the opacity behind, so the site's dark caption ink landed on
+    near-black at 2.01:1. Written as a CSS rule — "no figcaption selector may
+    carry a colour" — that refused seven MAP captions, which are real
+    captions under real drawings and have nothing to do with a photograph.
+    An instrument that cannot tell a caption from a credit is reading the
+    selector rather than the element.
+
+    The element is what decides it, so that half lives in `photo-tests.py`,
+    which is the suite that puts a real `<figcaption class="credit">` into
+    real markup. A code path nothing exercises is a code path nothing checks,
+    and this is the same sentence one file over.
+    """
+    css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
+               encoding="utf-8").read()
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    n = 0
+
+    m = re.search(r"\.credit\s*\{[^}]*?background:\s*rgba\(0,\s*0,\s*0,\s*"
+                  r"([0-9.]+)\)", css, re.S)
+    if not m:
+        fail("the credit no longer declares an rgba black scrim, so the one "
+             "contrast on this site that depends on arithmetic rather than on "
+             "two tokens can no longer be computed")
+        return n
+    alpha = float(m.group(1))
+    n += 1
+
+    fg = re.search(r"\.credit\s*\{[^}]*?color:\s*(#[0-9a-fA-F]{3,6})", css, re.S)
+    if not fg:
+        fail("the credit no longer declares a literal colour, so its ratio "
+             "against the scrim cannot be recomputed")
+        return n
+    n += 1
+
+    def lum(rgb):
+        ch = [c / 255 for c in rgb]
+        ch = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+              for c in ch]
+        return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2]
+
+    h = fg.group(1).lstrip("#")
+    if len(h) == 3:
+        h = "".join(c * 2 for c in h)
+    ink = lum([int(h[i:i + 2], 16) for i in (0, 2, 4)])
+
+    # OVER WHITE, because that is the brightest ground a photograph can put
+    # under the scrim and therefore the worst case for light type on it.
+    worst = (1 - alpha) * 255
+    ground = lum([worst, worst, worst])
+    ratio = (max(ink, ground) + 0.05) / (min(ink, ground) + 0.05)
+    n += 1
+    if ratio < 4.5:
+        fail(f"the photograph credit measures {ratio:.2f}:1 over the "
+             f"brightest photograph it can sit on — {alpha:.0%} black "
+             f"composites to rgb({worst:.0f},{worst:.0f},{worst:.0f}) and AA "
+             f"asks for 4.5. The scrim is what makes this a property of the "
+             f"design rather than of the picture, so it is the scrim that "
+             f"moves, not the floor")
+
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0
