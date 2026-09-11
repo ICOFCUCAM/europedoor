@@ -5093,8 +5093,21 @@ body[data-hero] .masthead { position: sticky; }
    above, and restating it is a declaration that changes nothing — which the
    dead-rule scan says out loud. */
 .card-map .regionmini .constel-lit circle { r: 11px; }
+/* A MAP CARD IS NOT 16:9, AND THE LETTERBOX WAS INVISIBLE BECAUSE IT WAS THE
+   SAME SEA. `.card-art` is 16/9 because that is a PHOTOGRAPH's proportion;
+   every drawing that has ever been put inside one is 1.282, because
+   `constellation()` fits every frame to 1000x780 — 129 region minis, 44
+   country glyphs and the nine region tiles, all of them. So the drawing fits
+   to the box's HEIGHT and a third of its width is padding: on /discover at
+   1280 the tile is 345 wide and the continent is 231 of it, and at 834 the
+   whole of Europe renders 138 pixels wide, two-thirds of the 204 that
+   `/themes` already measured as too small. It survived because `.card-map`
+   paints `--atlas-sea` and so does the drawing's own ocean, so the wasted
+   third reads as more sea rather than as a frame that does not fit. The
+   padding keeps the drawing off the card edge and is inside the ratio. */
 .card-map { background: var(--atlas-sea); display: flex; align-items: center;
-            justify-content: center; padding: var(--s4); }
+            justify-content: center; padding: var(--s4);
+            aspect-ratio: 1000 / 780; }
 .card-map .constel { fill: var(--atlas-land); }
 .card-map .regionglyph .countries path { fill: var(--atlas-here);
   stroke: var(--atlas-coast); stroke-width: 1.1; vector-effect: non-scaling-stroke; }
