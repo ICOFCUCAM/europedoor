@@ -3014,8 +3014,15 @@ def region_page(data, c, r):
   <a href="{urls.country(c)}">{esc(c['name'])} →</a></p>
 </div>
 """
+    # AND THE FOURTH: Vatican City is a travel region holding a destination
+    # called Vatican City, in a country called Vatican City — so the region
+    # page and the destination page both composed "Vatican City, Vatican
+    # City". A region is a grouping and a destination is a place, and the
+    # title is where that has to be legible when the two sit next to each
+    # other in a search result.
     return f"/europe/{c['slug']}/{r['slug']}/index.html", page(
-        f"{r['name']}, {c['name']}", body, path=urls.region(c, r), area="countries",
+        f"{r['name']}, a travel region in {c['name']}", body,
+        path=urls.region(c, r), area="countries",
         description=r["summary"][:180],
         og=(f"region:{c['slug']}:{r['slug']}", motif_for(r["interests"]),
             f"{r['name']}, {c['name']}"),
@@ -3670,8 +3677,16 @@ def interest_page(data, i, ranking):
   you see here is what it will build from.</p>
 </div>
 """
+    # FOUR TITLES COLLIDED ACROSS THE SITE and this is one of them:
+    # /interests/architecture and /experiences/culture/architecture both
+    # read "Architecture · EuropeDoor" in a tab, a bookmark, a search result
+    # and this site's own index. They are different things — destinations
+    # TAGGED architecture against experiences that are about it — and the
+    # page says so in its kicker and not in its title. The kicker is the
+    # disambiguation, so the title takes it.
     return f"/interests/{slug}/index.html", page(
-        i["name"], body, path=urls.interest(slug), area="countries",
+        f"Travelling for {i['name'].lower()}", body,
+        path=urls.interest(slug), area="countries",
         description=f"Where in Europe to go for {i['name'].lower()}: {len(cities)} cities across {len(countries)} countries.",
     )
 
@@ -6655,8 +6670,14 @@ def experience_kind_page(data, kind, name):
       "authored per experience. An empty page here means nobody has written "
       "one, not that Europe has none.")}</ol>
 """
+    # AND THE OTHER TWO COLLISIONS ARE INSIDE THIS FAMILY, between its own
+    # two axes. "Music & performance" is a sub-category of Culture and a
+    # KIND; "On the water" is a sub-category of Adventure and a kind. The
+    # /experiences index states the difference in as many words — "the other
+    # axis: what you physically do" — and the titles did not carry it.
     return f"/experiences/kind/{kind}/index.html", page(
-        name, body, path=urls.experience_kind(kind), area="experiences",
+        f"{name} — what you do", body,
+        path=urls.experience_kind(kind), area="experiences",
         description=f"{name} experiences across Europe, by city and country.",
     )
 

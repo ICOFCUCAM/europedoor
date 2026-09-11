@@ -5406,6 +5406,53 @@ def c_photo_roles():
     return n
 
 
+@check("no two pages share a title")
+def c_titles_unique():
+    """A TITLE IS WHAT A PAGE IS CALLED EVERYWHERE IT IS NOT ITSELF.
+
+    In a browser tab, a bookmark, a search result, a shared link and this
+    site's own index, the title is the whole of a page. Four pairs shared
+    one, and each pair was two genuinely different things:
+
+      /interests/architecture and /experiences/culture/architecture — the
+      destinations TAGGED architecture against the experiences that are
+      about it. Both read "Architecture".
+
+      /experiences/culture/music and /experiences/kind/stage, and
+      /experiences/adventure/water and /experiences/kind/water — the same
+      family's two axes colliding on a name. /experiences states the
+      difference in as many words, "the other axis: what you physically
+      do", and the titles did not carry it.
+
+      /europe/vatican-city/vatican and the destination inside it — a travel
+      region called Vatican City, in a country called Vatican City, holding
+      a destination called Vatican City. Both composed "Vatican City,
+      Vatican City".
+
+    Every one of them names its own kind in its KICKER, which a tab does not
+    show. The disambiguation existed on the page and not in the one string
+    that travels.
+    """
+    seen, n = {}, 0
+    for f in sorted(site_files()):
+        html = open(f, encoding="utf-8").read()
+        m = re.search(r"<title>(.*?)</title>", html, re.S)
+        if not m:
+            fail(f"{os.path.relpath(f, OUT)} has no <title>")
+            continue
+        t = m.group(1).strip()
+        n += 1
+        if t in seen:
+            fail(f"two pages share the title {t!r}: "
+                 f"/{os.path.relpath(os.path.dirname(seen[t]), OUT)} and "
+                 f"/{os.path.relpath(os.path.dirname(f), OUT)}. A tab, a "
+                 f"bookmark and a search result show the title and not the "
+                 f"kicker that tells them apart")
+        else:
+            seen[t] = f
+    return n
+
+
 @check("a category's sub-counts are drawn from its own data and never as a partition")
 def c_category_shares():
     """THE FOUR NUMBERS ARE THE SHAPE OF A CATEGORY AND WERE FOUR NUMBERS.
