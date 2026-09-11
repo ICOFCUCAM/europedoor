@@ -10023,6 +10023,36 @@ def accessibility_page(data):
 
 
 def help_page(data):
+    # "FIVE COUNTRIES HAVE BEEN TAKEN TO DEPTH SO FAR" WAS TYPED, AND THE
+    # LINK BESIDE IT PROMISED SOMETHING /countries DOES NOT DO.
+    #
+    # It was also true, which is how a typed number survives: Italy, Norway,
+    # Spain, France and Greece each carry between 67 and 86 recorded
+    # destinations, places and things to do, and the sixth country carries
+    # 28. That gap is the real answer to "why is my country's page thin" and
+    # the sentence was standing in front of it — and "which is which" pointed
+    # at an index that lists fifty countries and says nothing about depth.
+    #
+    # So the answer names them, from the count, with the median beside it.
+    # This is a ranking of OUR OWN COVERAGE and not of places, which is the
+    # one kind this atlas does publish: docs/content-report.md ranks the same
+    # thing from the other end.
+    import statistics
+    held = sorted(
+        ((sum(len(r["cities"]) for r in c["regions"])
+          + sum(len(t.get("places", [])) for r in c["regions"] for t in r["cities"])
+          + sum(len(t.get("experiences", [])) for r in c["regions"] for t in r["cities"])),
+         c["name"])
+        for c in data["countries"].values())
+    top = [nm for _, nm in held[-5:]][::-1]
+    lo, hi = held[-5][0], held[-1][0]
+    mid = int(statistics.median(n for n, _ in held))
+    depth_answer = (
+        f'{and_list([esc(t) for t in top])} are written deepest: between {lo} and '
+        f'{hi} recorded destinations, places and things to do each, where the '
+        f'median country holds {mid}. The rest are at a solid first pass, and '
+        f'<a href="/sources/freshness">the freshness board</a> says when each '
+        f"country's practical facts were last checked.")
     cx = data["taxonomy"].get("currencies", {})
     rates_note = (f"Indicative, recorded by hand on {esc(cx.get('as_of', '—'))}, covering "
                   f"{len(cx.get('rates', {}))} currencies. Rounded hard on purpose.")
@@ -10050,8 +10080,12 @@ def help_page(data):
     <p>It is a considered editorial first draft that has not been verified source by source.
     <a href="/sources/freshness">The board says so per country →</a></p>
     <h3>Why are there no photographs?</h3>
-    <p>Every illustration is generated from the place's own name. No licence to expire, no
-    stock library, and no risk of publishing somebody's holiday photograph.</p>
+    <p>Because none is licensed yet, and the register that would hold one is empty. What you
+    see instead is geography: a country drawn from its own outline, a journey drawn as its
+    route, a tag drawn as every destination carrying it. Where there is nothing real to draw,
+    the illustration is generated from the place's own name — no licence to expire, no stock
+    library, and no risk of publishing somebody's holiday photograph.
+    <a href="/sources">Where the geography comes from →</a></p>
     <h3 id="currency">Why are the local-currency figures marked indicative?</h3>
     <p>Because they are. The rates are recorded by hand, dated on this page, rounded hard, and
     not refreshed automatically. They exist so that "€90 a day" in Norway means something to
@@ -10063,8 +10097,7 @@ def help_page(data):
     private window or cleared site data means an empty list — which is the cost of not having
     an account system, and we think it is the right trade for now.</p>
     <h3>Why is my country's page thin?</h3>
-    <p>Five countries have been taken to depth so far. The rest are at a solid first pass.
-    <a href="/countries">Which is which →</a></p>
+    <p>{depth_answer}</p>
   </div>
   <aside class="rail">
     <h2 class="mini">Currency rates</h2>
