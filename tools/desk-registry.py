@@ -78,7 +78,11 @@ def build():
     for sn in sorted(imageslots.slots()):
         slot = imageslots.slots()[sn]
         slots[sn] = {k: slot.get(k) for k in REQS}
-        slots[sn]["search"] = (roles.get(slot.get("role")) or {}).get("search", [])
+        # A SLOT'S OWN CONCEPTS WIN OVER ITS ROLE'S, because the one slot
+        # that declares them does so for a reason the role cannot know: a
+        # story's entity name is a title, not a subject.
+        slots[sn]["search"] = (slot.get("search")
+                               or (roles.get(slot.get("role")) or {}).get("search", []))
         for t in imageslots.targets(slot, data):
             spec = imageslots.resolve(f"{sn}{imageslots.SEP}{t}", data)
             rows.append(_row(f"{sn}{imageslots.SEP}{t}", spec, templated=True,

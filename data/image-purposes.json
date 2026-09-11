@@ -233,7 +233,7 @@
       }
     }
   },
-  "$roles": "TWELVE ROLES, and a purpose instantiates one. A role is the vocabulary — what a picture of this kind is FOR, what must be in frame, what must survive the crop, and what disqualifies a candidate that passes every number. A purpose is an instance: one surface, one page, one register key. Roles are declared before photographs exist because that is this repository's standing rule for anything externally governed, and because an undirected slot is how a library fills up with pictures nobody chose. THREE ROLES HAVE NO PURPOSE TODAY and each says why: two carry a trigger naming the design decision that would create one, and accommodation is REFUSED outright with the reason. A role with neither is a dead motif wearing the clothes of vocabulary — the exact failure plate-variation.py exists to catch one family over. EVERY ROLE CARRIES ITS OWN SEARCH CONCEPTS, and that is what makes this a vocabulary rather than a list of sizes. A brief arrived proposing an eighteen-family photographic taxonomy — country signature, capital, natural landscape, architecture broken into Gothic and Baroque and Byzantine, food, people and local life, journey, transport, seasonal, quiet, night, aerial, detail, weather, regional identity — and read against this file it is THIS BLOCK with its search terms written out. Twelve roles already say what a picture of each kind is for, what must be in frame, what must survive the crop and what disqualifies a candidate that passes every number; what none of them said is what to TYPE. A second vocabulary beside this one would be a second answer to 'what kind of picture is this', which is the failure this repository has recorded four times in other forms. `{name}` is substituted with the surface's own subject, so a destination's concepts are that destination's and thirteen searches are one decision.",
+  "$roles": "TWELVE ROLES, and a purpose instantiates one. A role is the vocabulary — what a picture of this kind is FOR, what must be in frame, what must survive the crop, and what disqualifies a candidate that passes every number. A purpose is an instance: one surface, one page, one register key. Roles are declared before photographs exist because that is this repository's standing rule for anything externally governed, and because an undirected slot is how a library fills up with pictures nobody chose. THREE ROLES HAVE NO PURPOSE TODAY and each says why: two carry a trigger naming the design decision that would create one, and accommodation is REFUSED outright with the reason. A role with neither is a dead motif wearing the clothes of vocabulary — the exact failure plate-variation.py exists to catch one family over. EVERY ROLE CARRIES ITS OWN SEARCH CONCEPTS, and that is what makes this a vocabulary rather than a list of sizes. A brief arrived proposing an eighteen-family photographic taxonomy — country signature, capital, natural landscape, architecture broken into Gothic and Baroque and Byzantine, food, people and local life, journey, transport, seasonal, quiet, night, aerial, detail, weather, regional identity — and read against this file it is THIS BLOCK with its search terms written out. Twelve roles already say what a picture of each kind is for, what must be in frame, what must survive the crop and what disqualifies a candidate that passes every number; what none of them said is what to TYPE. A second vocabulary beside this one would be a second answer to 'what kind of picture is this', which is the failure this repository has recorded four times in other forms. `{name}` is substituted with the surface's own subject, so a destination's concepts are that destination's and thirteen searches are one decision. NINE MORE ROLES ARRIVED WITH A TAXONOMY BRIEF AND NONE OF THEM HAS A PURPOSE. country-signature, capital-city, transport, seasonal, quiet-ground, night, aerial, atmosphere and regional-identity are declared because the vocabulary belongs before the surface — that is this file's standing rule and the reason `roles` exists at all — and every one of them carries a TRIGGER naming the container that would create a purpose for it. Two of those triggers are the largest families on this site with no photograph anywhere: fifty country pages and 129 region pages. A role with neither a purpose nor a trigger is a dead motif wearing the clothes of vocabulary, and checks.py refuses one.",
   "roles": {
     "hero": {
       "does": "The one photograph that decides whether a visitor stays. It is the first thing on the page, full-bleed, with the masthead standing on it and a 60px headline over its lower half.",
@@ -456,12 +456,14 @@
       ],
       "trigger": "A purpose exists the day a family's composition has a rhythm that needs punctuation — which is a page-design decision, not a sourcing one.",
       "search": [
-        "Portuguese tiles",
-        "wooden door detail",
+        "{name}",
+        "{name} detail",
+        "{name} interior",
+        "{name} facade",
+        "carved door detail",
         "local ceramics",
         "market produce close up",
-        "stone wall texture",
-        "shop sign Europe"
+        "stone and plaster texture"
       ]
     },
     "editorial-story": {
@@ -507,6 +509,200 @@
         "seaside hotel terrace",
         "chalet interior"
       ]
+    },
+    "country-signature": {
+      "does": "What a whole country FEELS like, in one frame. The opening photography of a country page, and the one picture a reader meets before any list.",
+      "min_width": 2000,
+      "orientation": "landscape",
+      "min_aspect": 1.4,
+      "max_aspect": 2.2,
+      "subject": "The country's characteristic GROUND, not its most photographed object. Norway is a fjord wall meeting water; Italy is a worked hillside; Greece is limestone, whitewash and sea. A landmark may be in frame and may never be the subject, because a landmark is a place inside the country and this picture is about the country.",
+      "crop": "The country plate sits beside it at every width above 62rem and under it below, so the photograph crops height on a wide screen and width on a narrow one. NOT MEASURABLE UNTIL THE CONTAINER EXISTS — a country page has no photograph container today, and a crop rule written against a container nobody has built is a number nobody can check.",
+      "brief": "Fifty of these will be seen one after another by a reader moving through /countries, so the SET is part of the brief exactly as it is for the four doors. Different light, different season and different palette between neighbours, and never fifty golden hours.",
+      "refuses": "A single famous landmark filling the frame. A city skyline, which is the capital's job one role over. A flag, a map, or anything that says the name rather than showing the place.",
+      "search": [
+        "{name} landscape",
+        "{name} countryside",
+        "{name} coast",
+        "{name} mountains",
+        "{name} village",
+        "{name} aerial landscape"
+      ],
+      "purposes_today": [],
+      "trigger": "A purpose exists for this the day a country page grows a photograph container. That is the largest family on the site with none — fifty pages of about seven thousand pixels each — and the decision it waits on is where a photograph sits against the country PORTRAIT, which is that family's signature moment today. See docs/media-desk-audit.md §7."
+    },
+    "capital-city": {
+      "does": "A capital as a place people live in rather than a monument they visit: one establishing frame, one street, one room or façade.",
+      "min_width": 2000,
+      "orientation": "landscape",
+      "min_aspect": 1.3,
+      "max_aspect": 2.1,
+      "subject": "The city's grain. A street with people on it at the scale they walk; a skyline that says which river and which hills; a façade or an interior that says which century. Vienna is architecture, streets, cafés and the Danube, and the Schönbrunn is the smallest part of that.",
+      "crop": "NOT MEASURABLE UNTIL THE CONTAINER EXISTS. A capital has a destination page like any other, so the first version of this may simply be the destination portrait — and the reason it is a separate role is that a capital is where the country's public life is, which is a different subject from what a destination is like to be in.",
+      "brief": "Three per capital and they must not be three views of one square. Establishing, street-level, and one architectural or cultural frame is the set, and the second of the three is the one nobody shoots.",
+      "refuses": "The single most photographed monument, alone, centred. An empty square at dawn, which is the quiet role and a different page. A tourist in front of a thing.",
+      "search": [
+        "{name} skyline",
+        "{name} old town",
+        "{name} street",
+        "{name} architecture",
+        "{name} evening",
+        "{name} aerial"
+      ],
+      "purposes_today": [],
+      "trigger": "A purpose exists for this the day a capital's destination page carries more than one photograph, or a country page grows a second slot under its signature. Today a capital has exactly one surface and it is `destination-hero`, which is already declared."
+    },
+    "transport": {
+      "does": "The means of moving through Europe, as a subject in its own right: the train, the ferry, the road, the bicycle, the station.",
+      "min_width": 1800,
+      "orientation": "landscape",
+      "min_aspect": 1.4,
+      "max_aspect": 2.2,
+      "subject": "The vehicle or the way, in the landscape it crosses. A railway on a viaduct with the valley under it; a ferry deck with a coast behind it; a station concourse. The mode has to be identifiable, because this picture's job is to answer 'how'.",
+      "crop": "NOT MEASURABLE UNTIL THE CONTAINER EXISTS. Its home is the planner and the journey pages, both of which are INTELLIGENCE-world instruments where a photograph has never been part of the composition.",
+      "brief": "This is the family that says EuropeDoor is about getting there rather than booking a room. A sleeper compartment at night and a mountain railway in snow are the two ends of it.",
+      "refuses": "An aircraft interior or an airport, which is the one part of European travel this atlas has nothing to say about. A car advertisement. An empty platform with no sense of where it is.",
+      "search": [
+        "scenic European railway",
+        "mountain railway viaduct",
+        "sleeper train compartment",
+        "European ferry deck",
+        "European train station concourse",
+        "road trip mountain pass",
+        "cycling countryside Europe",
+        "walking trail Europe"
+      ],
+      "purposes_today": [],
+      "trigger": "A purpose exists for this the day `/plan` or a journey page carries a photograph. Both are instruments today and `docs/signature-moments.md` records why an instrument opens on its control rather than on a picture; a photograph there is a composition decision, not a slot."
+    },
+    "seasonal": {
+      "does": "One place in one season, so that a reader planning a month can see what that month looks like there.",
+      "min_width": 1800,
+      "orientation": "landscape",
+      "min_aspect": 1.4,
+      "max_aspect": 2.2,
+      "subject": "The season has to be the reason the picture exists: snow on the roofs, vines turning, a shuttered promenade, meltwater. A picture that could have been taken in any month is a destination portrait and belongs to that role.",
+      "crop": "NOT MEASURABLE UNTIL THE CONTAINER EXISTS. Its home is the events family and the planner, where the subject is TIME — and `year_band()` already draws that as a chart rather than a picture.",
+      "brief": "Four per destination is four times 319, which is why this role's trigger is a container AND a policy: the honest first version is a season for the destinations whose season is the whole point, not for all of them.",
+      "refuses": "A generic winter scene that names no place. Autumn colour used as decoration on a page about something else.",
+      "search": [
+        "{name} winter",
+        "{name} autumn",
+        "{name} spring",
+        "{name} summer",
+        "{name} snow",
+        "{name} in bloom"
+      ],
+      "purposes_today": [],
+      "trigger": "A purpose exists for this the day an events or month page carries a photograph, or a destination page carries a seasonal strip. The events index draws the year as a chart today and `docs/signature-moments.md` records why."
+    },
+    "quiet-ground": {
+      "does": "A photograph made to be LOOKED THROUGH: the ground a headline sits on. The premium editorial register, and the one family whose success is that you do not notice it first.",
+      "min_width": 2400,
+      "orientation": "landscape",
+      "min_aspect": 1.5,
+      "max_aspect": 2.2,
+      "subject": "A place at its least busy hour, with a large area of low, even tone where type can sit — mist over a valley, a wet street before anyone is out, a wall in flat light. The subject is real and the composition leaves room.",
+      "crop": "A ground picture is cropped hardest of all, because it is full-bleed behind a column of type at every width. The safe area arithmetic in `$crop` binds this role more than any other: `checks.py` refuses a safe area under 12%, and a hero ran 7% before the 43vw floor was added.",
+      "brief": "Not every photograph should shout. This is the family that makes the difference between a website with pictures on it and an editorial atlas — and the test is to lay the real headline over it and read the contrast, which `tools/hero-shot.js` does.",
+      "refuses": "Anything with a bright, busy quarter where the type goes. A sunset, which is the loudest thing a landscape can do. People looking at the camera.",
+      "search": [
+        "quiet European village",
+        "European morning street",
+        "misty European landscape",
+        "European countryside morning",
+        "European village evening",
+        "empty street dawn",
+        "quiet Mediterranean village"
+      ],
+      "purposes_today": [],
+      "trigger": "A purpose exists for this the day a surface declares that its photograph sits UNDER type rather than beside it. `homepage-hero` is the candidate and is currently declared as `hero`; splitting it is a decision about that one picture, and it is the next one worth making."
+    },
+    "night": {
+      "does": "Europe after the light goes: a square lit from its own windows, a waterfront, a village on a hillside.",
+      "min_width": 1800,
+      "orientation": "landscape",
+      "min_aspect": 1.4,
+      "max_aspect": 2.2,
+      "subject": "Artificial light doing the drawing, with enough ambient left that the place is still legible. Blue hour rather than black sky, because a black sky is a picture of lamps.",
+      "crop": "NOT MEASURABLE UNTIL THE CONTAINER EXISTS. Its natural home is a second hero on a page that already has one, which is a composition decision nobody has made.",
+      "brief": "Very little tourism photography is made at this hour and that is exactly why it reads as editorial. One per country would be plenty.",
+      "refuses": "Long-exposure traffic trails. A floodlit monument with no city around it. Fireworks.",
+      "search": [
+        "European city dusk",
+        "old town at night",
+        "illuminated European square",
+        "European waterfront night",
+        "mountain village evening lights",
+        "blue hour European street"
+      ],
+      "purposes_today": [],
+      "trigger": "A purpose exists for this the day any family declares a second, contrasting hero. Recorded now because the vocabulary should exist before the surface does; that is this file's standing rule."
+    },
+    "aerial": {
+      "does": "Geography established from above: how a coast is shaped, how a town sits in its valley, where a river goes.",
+      "min_width": 2000,
+      "orientation": "landscape",
+      "min_aspect": 1.4,
+      "max_aspect": 2.4,
+      "subject": "The LAND's structure, oblique rather than straight down. A vertical drone frame reads as a pattern and this atlas already draws patterns; what a photograph adds here is the third dimension.",
+      "crop": "NOT MEASURABLE UNTIL THE CONTAINER EXISTS.",
+      "brief": "Used sparingly and never as a house style. An aerial answers WHERE, which is the question this site's maps already answer better — so it earns a place only where the shape of the ground is the subject and a map would be too abstract to feel it.",
+      "refuses": "A straight-down drone frame. A resort from above. Anything that would read as a stock aerial of anywhere.",
+      "search": [
+        "coastline aerial",
+        "mountain valley aerial",
+        "island aerial",
+        "historic town aerial",
+        "river delta aerial",
+        "vineyard terraces aerial"
+      ],
+      "purposes_today": [],
+      "trigger": "A purpose exists for this the day a family decides a photograph should answer WHERE. `docs/signature-moments.md` currently answers that with a map on every family that asks it, which is why this role has no purpose and may never get one."
+    },
+    "atmosphere": {
+      "does": "Weather as the subject: fog, rain on stone, snow falling, the light at each end of the day.",
+      "min_width": 1800,
+      "orientation": "landscape",
+      "min_aspect": 1.3,
+      "max_aspect": 2.2,
+      "subject": "The air, doing something visible, over a place that is still identifiable as European ground. This is the role that gives the editorial system emotional range without a human subject.",
+      "crop": "NOT MEASURABLE UNTIL THE CONTAINER EXISTS.",
+      "brief": "A set of these is what lets a story about November not open on a photograph of July. Their value is in being available rather than in any one of them.",
+      "refuses": "A lightning strike, a rainbow, or any weather that reads as an event. Heavy colour grading.",
+      "search": [
+        "fog over valley",
+        "rain on cobblestones",
+        "snow falling village",
+        "golden hour hillside",
+        "blue hour harbour",
+        "mist over lake",
+        "dramatic clouds coast",
+        "winter light forest"
+      ],
+      "purposes_today": [],
+      "trigger": "A purpose exists for this the day a story page carries a second image, or a month page carries one at all. Stories have one surface today and it is `story-hero`."
+    },
+    "regional-identity": {
+      "does": "What distinguishes one region of a country from the others in it. Provence is not France; Brittany is not France; and a region page that reuses the country photograph says they are.",
+      "min_width": 1800,
+      "orientation": "landscape",
+      "min_aspect": 1.4,
+      "max_aspect": 2.2,
+      "subject": "The material a region is made of — its stone, its roofs, its crop, its water. A reader who knows the country should be able to say which region this is without the caption.",
+      "crop": "NOT MEASURABLE UNTIL THE CONTAINER EXISTS. A region page draws its own destinations as a constellation today and holds no region geometry, which is a deliberate refusal recorded in CLAUDE.md — the photograph would be the first thing on that page that is about the region as a whole.",
+      "brief": "129 regions is the second-largest family on the site. The failure to avoid is one country photograph reused six times, which is the failure this role exists to name.",
+      "refuses": "The country's own signature picture. A single village that is famous in its own right and would be read as a destination.",
+      "search": [
+        "{name} landscape",
+        "{name} countryside",
+        "{name} village",
+        "{name} coast",
+        "{name} hills",
+        "{name} traditional architecture"
+      ],
+      "purposes_today": [],
+      "trigger": "A purpose exists for this the day a region page grows a photograph container. 129 pages, second only to the destinations, and the decision it waits on is where a photograph sits against the region constellation. See docs/media-desk-audit.md §7."
     }
   },
   "$crop": "SAFE AREA IS THE FRACTION OF A SOURCE FRAME GUARANTEED VISIBLE AT EVERY VIEWPORT, and it is arithmetic rather than taste: a container narrower than the source crops width, a container wider crops height, so the guaranteed width is container_min / source_max and the guaranteed height is source_min / container_max, each capped at 1. `container` is MEASURED in Chromium by adding the class a photograph would add and removing the drawing a photograph would replace, over a sweep of fifteen widths and five heights; `safe_area` is recomputed from it by checks.py and by the browser suite, so a number typed here that the arithmetic does not support fails the build. THE NUMBER IS THE POINT: the homepage hero guarantees 15% of a frame and the four doors 14%, which means the subject of either must sit in the middle of the picture and an off-centre composition is unusable however good it is. Nobody knew that before it was measured, and a purpose file that declares a minimum width and says nothing about this is answering the easy half.",
@@ -574,7 +770,18 @@
         "width": 0.847,
         "height": 0.844,
         "frame": 0.714
-      }
+      },
+      "search": [
+        "quiet European village",
+        "European morning street",
+        "misty village",
+        "European village evening",
+        "empty street dawn",
+        "quiet cafe Europe",
+        "hands at work craft",
+        "rural road Europe"
+      ],
+      "search_reason": "A STORY'S NAME IS A TITLE AND NOT A SUBJECT. Every other templated slot can search for the entity it is about — Bergen, Hohensalzburg Fortress — and a story cannot: a provider has no photographs of “The languages with no relatives”. So the concepts are the editorial register the role describes, and the editor supplies the subject from the piece they have read. checks.py requires either a role whose concepts name the entity or a slot that declares its own and says why, because the alternative is 264 places searched with the same eight words — which is what `detail-texture` was doing until this check was written."
     }
   }
 }

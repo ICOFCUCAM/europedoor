@@ -35,12 +35,14 @@
    "max_aspect": 1.9,
    "note": "A place is one thing inside a destination — a bridge, a cellar, a cable car — so this is the closest frame the site has. It must be that thing and not the town around it: the destination page one level up already carries the wider picture, and a page that shows the same view as its parent has said nothing. Without a photograph this container draws a minimap, so a picture here REPLACES geography and has to earn it.",
    "search": [
-    "Portuguese tiles",
-    "wooden door detail",
+    "{name}",
+    "{name} detail",
+    "{name} interior",
+    "{name} facade",
+    "carved door detail",
     "local ceramics",
     "market produce close up",
-    "stone wall texture",
-    "shop sign Europe"
+    "stone and plaster texture"
    ]
   },
   "story-hero": {
@@ -56,7 +58,9 @@
     "misty village",
     "European village evening",
     "empty street dawn",
-    "quiet cafe Europe"
+    "quiet cafe Europe",
+    "hands at work craft",
+    "rural road Europe"
    ]
   }
  },

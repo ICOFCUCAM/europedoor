@@ -5460,17 +5460,26 @@ def c_role_search():
     this" is the failure this repository has recorded four times in other
     forms.
 
-    AND `{name}` IS A PROMISE THAT SOMETHING SUBSTITUTES IT. A concept
-    carrying the placeholder is only usable where a purpose knows its
-    subject, which is a templated slot; on a one-of-a-kind purpose the
-    placeholder would reach an editor as literal text, which is the
-    `monaster*` failure — publishing a pattern as though it were a word.
+    AND `{name}` IS A PROMISE THAT SOMETHING SUBSTITUTES IT — WHICH IS A
+    CLAIM ABOUT A PURPOSE, NOT ABOUT A ROLE.
+
+    The first version asserted it of roles and went red on nine that had just
+    been declared ahead of their containers. It was testing the wrong
+    subject: a role nobody can reach cannot show an editor anything, and a
+    `{name}` in its concepts is a correct statement about the templated
+    container its trigger names. What actually fails is a purpose THE DESK
+    OFFERS whose concepts carry a placeholder it has no target to fill —
+    then the editor is shown `{name}` as though it were a word, which is the
+    `monaster*` finding one family over.
+
+    That is exactly the fault it caught on the run it was written: `food` was
+    reached only by the Food door, which is about Europe rather than a named
+    place, and the browser was quietly filling in "Europe" — a substitution
+    rule living in the client rather than in the vocabulary.
     """
     spec = json.load(open(os.path.join(ROOT, "data", "image-purposes.json"),
                           encoding="utf-8"))
     roles = spec.get("roles", {})
-    slots = spec.get("slots", {})
-    templated = {s.get("role") for s in slots.values()}
     n = 0
     for name, role in sorted(roles.items()):
         terms = role.get("search") or []
@@ -5480,13 +5489,43 @@ def c_role_search():
                  f"on it.")
         for t in terms:
             n += 1
-            if "{name}" in t and name not in templated:
-                fail(f"role {name} concept {t!r} carries {{name}} and no slot "
-                     f"instantiates this role, so nothing substitutes it — "
-                     f"an editor would be shown the placeholder as a word.")
             if "{" in t.replace("{name}", ""):
                 fail(f"role {name} concept {t!r} carries a placeholder this "
                      f"desk does not fill")
+
+    # THE CLAIM, on every purpose an editor can actually be offered.
+    for pname, purpose in sorted(spec.get("purposes", {}).items()):
+        terms = (roles.get(purpose.get("role")) or {}).get("search") or []
+        for t in terms:
+            n += 1
+            if "{name}" in t:
+                fail(f"purpose {pname} is one-of-a-kind and its role's "
+                     f"concept {t!r} carries {{name}}. It has no target, so "
+                     f"nothing substitutes it and the placeholder reaches the "
+                     f"editor as a word.")
+    for sname, slot in sorted(spec.get("slots", {}).items()):
+        n += 1
+        own = slot.get("search")
+        if own:
+            # A SLOT MAY OVERRIDE ITS ROLE AND MUST SAY WHY. `story-hero` is
+            # the one templated slot whose entity name is a TITLE rather than
+            # a subject — a provider has no photographs of "The languages
+            # with no relatives" — so it declares its own concepts. An
+            # override with no reason is an exception nobody can re-check.
+            if len(own) < 4:
+                fail(f"slot {sname} declares {len(own)} concepts of its own")
+            if not (slot.get("search_reason") or "").strip():
+                fail(f"slot {sname} overrides its role's search concepts and "
+                     f"gives no reason. An exception nobody can re-check is a "
+                     f"decision that decays into an accident.")
+            continue
+        terms = (roles.get(slot.get("role")) or {}).get("search") or []
+        if not any("{name}" in t for t in terms):
+            fail(f"slot {sname} instantiates its role per entity and not one "
+                 f"of that role's search concepts names the entity, so every "
+                 f"one of its targets would be searched for with the same "
+                 f"words. Either the role names the entity or the slot "
+                 f"declares its own concepts and says why.")
     return n
 
 
