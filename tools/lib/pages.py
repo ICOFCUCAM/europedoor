@@ -1652,7 +1652,8 @@ def macro_page(data, m):
         pts = [project(t["lat"], t["lon"])
                for r in c["regions"] for t in r["cities"]]
         cards.append(card(urls.country(c), c["capital"], c["name"], c["tagline"],
-                          art=region_glyph([cs], pts or None, min_span=340.0),
+                          art=country_glyph(c["slug"], cs)
+                              or region_glyph([cs], pts or None, min_span=340.0),
                           meta=meta))
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], None)])}
@@ -6709,6 +6710,51 @@ GLYPHVIEW_CASES = [
     [(10.0, 10.0), (990.0, 770.0)],
     [(500.0, 400.0)],
 ]
+
+
+def country_glyph(slug, cs):
+    """A country card's picture is the COUNTRY, not Europe with one bit lit.
+
+    Five Nordic cards drew five pictures of Europe differing only in which
+    shape was white, and four of the five were the same corner of the
+    continent at almost the same scale. Measured on the viewBoxes the build
+    emitted: Norway 789 units wide — 79% of the canvas — because the frame is
+    held to the canvas proportion and Norway is 616 units tall; Denmark and
+    Iceland both exactly 340, which is `glyph_view`'s own floor.
+
+    None of that is a bug. A tall country genuinely needs a wide 16:9 frame,
+    and the floor exists because the shared silhouette stops reading as Europe
+    below it. The conclusion is that the SHARED SILHOUETTE IS THE WRONG
+    DRAWING FOR THIS CARD: it answers "where in Europe", the macro map at the
+    top of the same page already answers that at full size, and repeating it
+    five times is the aperture-as-wallpaper rule in a different drawing.
+
+    What a reader choosing between five countries wants is which. Norway is
+    long and ragged, Sweden is a blade, Denmark is a scatter, Finland is a
+    fist, Iceland is an island — five genuinely different pictures, and the
+    one thing the row could not show before.
+
+    lod1 rather than the lod0 clone, because this is the country at its own
+    size rather than a corner of a continent, and `principal_frame` rather
+    than the raw bbox, because Portugal's bbox is 1,400 km of Atlantic with
+    the Azores in the far corner and the mainland filling nine per cent of it.
+    """
+    doc = geo.load("europe-lod1.json")
+    if not doc:
+        return ""
+    _ctx, lit = geo.landmass(
+        MAPPROJ, (0.0, 0.0, float(MAP_W), float(MAP_H)), doc=doc,
+        only=[cs], highlight=[cs], thin_units=1.1, min_units=6.0)
+    if not lit:
+        return ""
+    bb, _outside = geo.principal_frame(doc, slug)
+    if not bb:
+        return ""
+    corners = [project(lat, lon)
+               for lon in (bb[0], bb[2]) for lat in (bb[1], bb[3])]
+    view = glyph_view(corners, pad_frac=0.16, min_pad=10.0, min_span=0.0)
+    return (f'<svg class="constel countryglyph" viewBox="{view}" '
+            f'aria-hidden="true" focusable="false">{lit}</svg>')
 
 
 def glyph_view(pts, pad_frac=0.34, min_pad=90.0, min_span=340.0):

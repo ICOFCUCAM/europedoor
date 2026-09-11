@@ -4593,6 +4593,14 @@ body[data-hero] .masthead { position: sticky; }
    had its north cut off by the card. The letterbox costs nothing here
    because the box is already painted in the sea the drawing sits on. */
 .card-map .constel { width: 100%; height: 100%; }
+/* A COUNTRY CARD'S PICTURE IS THE COUNTRY. Five Nordic cards drew five
+   pictures of Europe differing only in which shape was white — see
+   country_glyph(). No context here at all: the macro map at the top of the
+   same page answers "where in Europe" once, at full size, and a card that
+   repeats it is the signature as wallpaper in a second drawing. */
+.card-map .countryglyph .countries path { fill: var(--atlas-here);
+  stroke: var(--atlas-coast); stroke-width: 1.1; vector-effect: non-scaling-stroke; }
+.card:hover .card-map .countryglyph .countries path { fill: #fff; }
 /* Bigger tiles, more dots, smaller marks: a 200-destination tile at 380px
    with the theme index's radius would be a solid field. Set here rather than
    per circle, so 894 dots cost four characters each rather than eleven. */
