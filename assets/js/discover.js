@@ -139,14 +139,61 @@
     return { city: city, pts: pts, asked: asked, extra: extra };
   }
 
+  /* THE DRAWING IS THE OUTPUT, NOT THE DECORATION.
+   *
+   * /discover was a filter panel with a picture of Europe under it, and the
+   * picture did not respond to the panel — 319 dots on graphite beside a form
+   * is the single most GIS-application surface this product had, and a GIS
+   * application is the first thing the brief says EuropeDoor must never feel
+   * like. The whole Atlas is already in this browser and `render()` already
+   * computes the matching set; the map simply was never told.
+   *
+   * The join is the destination id, which the build writes onto each dot as
+   * `data-city` and `/api/atlas.json` carries as `city.id`. That crosses a
+   * boundary — markup on one side, an index on the other — so the contract
+   * says so.
+   *
+   * `null` means at rest: every dot as drawn, because a page nobody has
+   * touched should show the whole continent rather than a dimmed one. An
+   * ARRAY means a search has run, and a place not in it goes quiet rather
+   * than away: the shape of Europe is the point, and a map that deleted its
+   * unlit places would be a different continent for every query.
+   *
+   * ADVISORY PLACES ARE NEVER LIT, and that falls out rather than being
+   * written: atlas.json is stripped of advisory countries at build time, so
+   * they cannot appear in `scored`. They keep their dot and their own class.
+   */
+  var DOTS = null;
+  function light(ids) {
+    if (DOTS === null) {
+      var map = el("discover-map");
+      DOTS = map ? [].slice.call(map.querySelectorAll("[data-city]")) : [];
+    }
+    if (!DOTS.length) return;
+    var on = null;
+    if (ids) { on = {}; for (var i = 0; i < ids.length; i++) on[ids[i]] = 1; }
+    for (var j = 0; j < DOTS.length; j++) {
+      var d = DOTS[j];
+      d.classList.toggle("lit", !!on && !!on[d.getAttribute("data-city")]);
+      d.classList.toggle("unlit", !!on && !on[d.getAttribute("data-city")]);
+    }
+    var link = el("discover-map");
+    if (link) {
+      link.setAttribute("aria-label", ids
+        ? ids.length + " of " + DOTS.length + " places lit. Open the full map"
+        : "Map of all " + DOTS.length + " places");
+    }
+  }
+
   function render() {
     var wants = Object.keys(picked);
     var out = el("discover-results");
     if (!wants.length && !constraints.month && !constraints.budget &&
         !constraints.quiet && !constraints.rail) {
-      out.innerHTML = '<p class="lede">Choose what you are travelling for. ' +
-        "Europe will narrow itself.</p>";
-      el("discover-count").textContent = "";
+      out.innerHTML = "";
+      el("discover-count").textContent =
+        "Choose what you are travelling for. Europe will narrow itself.";
+      light(null);
       return;
     }
 
@@ -161,7 +208,12 @@
       out.innerHTML = '<div class="note warn"><p><strong>Nothing in the Atlas fits all of ' +
         "that.</strong> That is usually several interests at once that no one place carries, " +
         "or a cheap band with an expensive country. Drop one and try again.</p></div>";
-      el("discover-count").textContent = "";
+      el("discover-count").textContent = "Nothing fits all of that.";
+      /* THE DRAWING HAS TO BE RESET HERE TOO. Returning early without it left
+       * the previous search's places lit under a sentence saying nothing
+       * fits — a map contradicting the line above it, which is worse than a
+       * map that says nothing. */
+      light([]);
       return;
     }
 
@@ -184,11 +236,15 @@
     var allCountries = {};
     scored.forEach(function (r) { allCountries[r.city.countrySlug] = true; });
     var n = Object.keys(allCountries).length;
+
+    /* TWO NUMBERS, TWO PLACES, BECAUSE THEY ARE ABOUT TWO DIFFERENT THINGS.
+     * The first is what the DRAWING now shows and sits above it; the second
+     * is what the LIST shows and sits above the list. They were one sentence
+     * under a map that did not respond to either of them. */
     el("discover-count").textContent =
       scored.length + (scored.length === 1 ? " place fits" : " places fit") +
-      ", in " + n + (n === 1 ? " country" : " countries") +
-      ". Showing the closest " + shown.length +
-      ", at most two per country so the list is Europe rather than one corner of it:";
+      ", in " + n + (n === 1 ? " country" : " countries") + ".";
+    light(scored.map(function (r) { return r.city.id || r.city.slug; }));
 
     /* THE HOIST ONLY LOOKED AT WHAT THE READER ASKED FOR. `asked` is the
      * clauses that come from the filters and `extra` is what the place adds
@@ -206,9 +262,10 @@
     var shared = shown[0].extra.filter(function (clause) {
       return shown.every(function (r) { return r.extra.indexOf(clause) >= 0; });
     });
-    var lead = "";
+    var lead = '<p class="small listlead">Showing the closest ' + shown.length +
+      ", at most two per country so the list is Europe rather than one corner of it.</p>";
     if (common.length || shared.length) {
-      lead = '<p class="whyall"><span>In common</span> ';
+      lead += '<p class="whyall"><span>In common</span> ';
       if (common.length) {
         lead += "All " + shown.length + " " + fmt(common) +
                 " — because you asked for that. ";

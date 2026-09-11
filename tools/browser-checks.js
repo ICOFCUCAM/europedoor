@@ -733,6 +733,19 @@ async function main() {
   ok(await page.locator("#discover-results .row").count() === 0,
      "Discover Mode showed results before anything was chosen");
 
+  // THE DRAWING IS THE OUTPUT, AND AT REST IT IS THE WHOLE CONTINENT.
+  //
+  // /discover was a filter panel with a picture of Europe under it that did
+  // not respond to the panel — the GIS-application reading, and the one the
+  // brief names first. These assert the PROMISE rather than the markup: a
+  // page nobody has touched draws every place as itself, a narrowing lights
+  // exactly what the page says it found, a place that drops out keeps its
+  // dot, and an advisory place is never lit.
+  const dotsAll = await page.locator("#discover-map [data-city]").count();
+  ok(dotsAll > 300, `the discover map draws ${dotsAll} places`);
+  ok(await page.locator("#discover-map .unlit, #discover-map .lit").count() === 0,
+     "a page nobody has touched drew a dimmed Europe");
+
   for (const i of ["mountains", "history", "food"]) {
     await page.click(`[data-interest="${i}"]`);
   }
@@ -743,6 +756,31 @@ async function main() {
      "a chosen interest does not report itself pressed");
   const picked = await page.locator("#discover-results .row").count();
   ok(picked > 0 && picked <= 12, `Discover Mode returned ${picked} rows`);
+
+  // The number above the map and the number of lit places are the same
+  // claim, and a drawing that disagrees with the sentence over it is worse
+  // than a drawing that says nothing.
+  const stateLine = (await page.locator("#discover-count").textContent()).trim();
+  const stated = Number((stateLine.match(/^(\d+) plac/) || [])[1]);
+  const litNow = await page.locator("#discover-map .lit").count();
+  ok(stated > 0 && litNow === stated,
+     `the page says ${stated} places fit and the map lights ${litNow}`);
+  // Nothing is deleted: the shape of Europe is the point of the drawing.
+  ok(await page.locator("#discover-map [data-city]").count() === dotsAll,
+     "narrowing removed places from the map instead of dimming them");
+  ok(await page.locator("#discover-map .advisory.lit").count() === 0,
+     "an advisory country's place was lit by Discover Mode");
+  // A dimmed place has to be visibly dimmer than a lit one, or "narrows
+  // itself" is a sentence with no picture behind it. Measured on the
+  // computed values, because both are painted by a class.
+  const step = await page.evaluate(() => {
+    const g = (sel) => { const e = document.querySelector(sel); if (!e) return null;
+      const c = getComputedStyle(e); return [Number(c.opacity), Number(c.r.replace('px',''))]; };
+    return { lit: g("#discover-map .lit"), unlit: g("#discover-map .unlit") };
+  });
+  ok(step.lit && step.unlit && step.lit[0] > step.unlit[0] && step.lit[1] > step.unlit[1],
+     `a lit place measures ${JSON.stringify(step.lit)} and an unlit one ` +
+     `${JSON.stringify(step.unlit)} — no step, so the map says nothing`);
 
   // Every result explains itself. This is the point of the feature.
   const whys = await page.locator("#discover-results .whythis").count();
@@ -820,6 +858,8 @@ async function main() {
      "clearing Discover Mode left the previous results on screen");
   ok(await page.locator('[data-interest="mountains"]').getAttribute("aria-pressed") === "false",
      "clearing left a chip still pressed");
+  ok(await page.locator("#discover-map .unlit, #discover-map .lit").count() === 0,
+     "clearing left the previous search lit on the map");
 
   // The score behind it is published, or it is a ranking nobody should trust.
   const method = await page.request.get(base + "/method");

@@ -10508,11 +10508,14 @@ def discover_page(data):
     )
     months = data["taxonomy"]["months"]
     names = data["taxonomy"]["month_names"]
+    # EACH DOT CARRIES ITS ID, BECAUSE THE DRAWING IS THE INSTRUMENT'S OUTPUT
+    # AND NOT ITS DECORATION. See the note above the figure below.
     dots = []
     for cid, n in sorted(data["cities"].items()):
         x, y = project(n["city"]["lat"], n["city"]["lon"])
         cls = " advisory" if n["country"].get("advisory") else ""
-        dots.append(f'<circle class="herodot{cls}" cx="{x:.1f}" cy="{y:.1f}" r="4"/>')
+        dots.append(f'<circle class="herodot{cls}" data-city="{esc(cid)}" '
+                    f'cx="{x:.1f}" cy="{y:.1f}" r="4"/>')
     quiet = sum(1 for n in data["cities"].values() if n["city"].get("quiet"))
 
     # Land under the dots: /discover had the same scatter-plot fault that
@@ -10577,16 +10580,21 @@ def discover_page(data):
     </div>
   </div>
   <p class="small"><button type="button" class="linkish" id="discover-clear">Clear everything</button></p>
-  <p class="small" id="discover-count" aria-live="polite"></p>
+
+  <p class="lede discoverstate" id="discover-count" aria-live="polite">Choose what you are
+  travelling for. Europe will narrow itself.</p>
+
+  <a class="heromap wide-map arched discovermap" data-role="instrument" href="/map"
+     id="discover-map" aria-label="Map of all {len(data['cities'])} places">
+    <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true"><defs>{arch_clip("disc", MAP_W, MAP_H)}</defs><g clip-path="url(#arch-disc)"><rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>{dctx}{dland}{cut_fade('disc', MAP_W, MAP_H)}{''.join(dots)}</g>{arch_edge(MAP_W, MAP_H)}</svg>
+    <span class="heromap-cap">Coastline from Natural Earth, public domain.
+    Open the full map, with layers →</span>
+  </a>
+
   <div id="discover-results"></div>
 </section>
 
 
-<a class="heromap wide-map arched" data-role="instrument" href="/map" aria-label="Map of all {len(data['cities'])} places">
-  <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true"><defs>{arch_clip("disc", MAP_W, MAP_H)}</defs><g clip-path="url(#arch-disc)"><rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>{dctx}{dland}{cut_fade('disc', MAP_W, MAP_H)}{''.join(dots)}</g>{arch_edge(MAP_W, MAP_H)}</svg>
-  <span class="heromap-cap">Coastline from Natural Earth, public domain.
-  Open the full map, with layers →</span>
-</a>
 
 {constel_defs()}
 {section("By where it is", grid(macro_cards, 3),

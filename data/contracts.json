@@ -37,7 +37,7 @@
       "surface": "/discover",
       "reads": {
         "/api/atlas.json": {
-          "cities": "the set Discover Mode narrows",
+          "cities": "the set Discover Mode narrows. `city.id` is also the join to the map: the build writes it on every dot as `data-city`, and a renamed id would leave the drawing lighting nothing with no error anywhere",
           "interests": "the moods and constraints"
         }
       }

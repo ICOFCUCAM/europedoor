@@ -3909,8 +3909,25 @@ body[data-hero] .masthead { position: sticky; }
 .heromap.arched .context path { fill: var(--map-context);
                                 stroke: color-mix(in srgb, var(--map-coast) 45%, transparent);
                                 stroke-width: 0.7; vector-effect: non-scaling-stroke; }
-.heromap.arched .herodot { fill: var(--cobalt-air); opacity: .95; }
+.heromap.arched .herodot { fill: var(--cobalt-air); opacity: .95;
+                           transition: opacity .2s ease, r .2s ease, fill .2s ease; }
 .heromap.arched .herodot.advisory { fill: var(--map-border); opacity: .6; }
+
+/* WHAT A NARROWED EUROPE LOOKS LIKE.
+ *
+ * A place that drops out GOES QUIET, it does not go away: the shape of the
+ * continent is the point of the drawing, and a map that deleted its unlit
+ * places would be a different Europe for every query. So the unlit dot takes
+ * the LAND's own tone rather than a dimmed accent — it stops being a place
+ * and becomes ground, which is exactly what "does not fit what you asked
+ * for" means here.
+ *
+ * `r` is a presentation attribute and CSS may set it, which is how
+ * `.constel-dense` already sizes its marks. Two-tenths of a second, on the
+ * one property that carries the meaning, and the global reduced-motion rule
+ * takes it off. */
+.heromap.arched .herodot.unlit { fill: var(--map-land); opacity: .5; r: 3; }
+.heromap.arched .herodot.lit { fill: var(--cobalt-air); opacity: 1; r: 5.5; }
 
 /* THE SCALE BAR, WHICH THE PROJECTION EARNED.
  *
