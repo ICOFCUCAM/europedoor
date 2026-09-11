@@ -89,6 +89,8 @@ function serve() {
         /* The real registry, with every row EMPTY — which is the state the
            product is actually in, and the state the library has to render. */
         return send(200, JSON.stringify({
+          dispatch: { repo: "ICOFCUCAM/europedoor", branch: "main",
+                      workflow: "photograph.yml" },
           providers: REG.providers, slots: REG.slots,
           purposes: REG.purposes.map((p) => ({ ...p, status: "EMPTY", photograph: null })),
         }), "application/json");
@@ -224,6 +226,12 @@ for (const width of [1280, 390]) {
   await page.goto(base + "/", { waitUntil: "networkidle" });
 
   ok(await page.locator("#desk").isVisible(), `${width}: the desk did not open`);
+  /* WHERE AN ACQUISITION WILL RUN, ON THE SCREEN. A target the editor cannot
+     see is a target nobody checks, and the first real batch was refused by
+     GitHub for an input the target branch had never heard of. */
+  ok(/ICOFCUCAM\/europedoor · main/.test(
+       await page.textContent("#target-branch") || ""),
+     `${width}: the masthead does not say which branch a dispatch goes to`);
   ok(await page.locator("#gate").isHidden(), `${width}: the sign-in screen is laid out behind the desk`);
   /* A CLOSED DIALOG IS HIDDEN BY THE USER AGENT AND AN AUTHOR RULE BEATS A UA
      RULE. `dialog { display: flex }` laid out both panels in normal flow at

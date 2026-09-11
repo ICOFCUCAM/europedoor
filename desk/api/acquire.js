@@ -160,8 +160,7 @@ export default async function handler(req, res) {
   });
   if (r.status !== 204) {
     const text = await r.text();
-    send(res, 502, { error: `GitHub refused the dispatch (${r.status}). `
-                          + text.slice(0, 400) });
+    send(res, 502, { error: explain(r.status, text, branch, many) });
     return;
   }
 
@@ -180,4 +179,54 @@ export default async function handler(req, res) {
     branch: many ? "" : `photo/${clean[0].purpose}-${clean[0].photo_id}`,
     count: clean.length,
   });
+}
+
+
+/* A RELAYED ERROR IS NOT A DIAGNOSIS.
+ *
+ * The first real batch came back as GitHub's own words — `Unexpected inputs
+ * provided: ["batch"]` with a documentation link — which is accurate, is
+ * about a JSON field the editor never typed, and says nothing about what to
+ * do. It is the failure this repository already records one level up: a
+ * message with no measurement in it cannot be diagnosed.
+ *
+ * WHAT IT ACTUALLY MEANS IS A BRANCH. GitHub validates a dispatch's inputs
+ * against the workflow file ON THE REF BEING DISPATCHED, so an input the
+ * desk knows about and the target branch has never heard of is a desk that
+ * is newer than the branch it is firing at. `DESK_BRANCH` decides that ref
+ * and defaults to `main`.
+ */
+export function explain(status, text, branch, many) {
+  let body = {};
+  try { body = JSON.parse(text); } catch { body = {}; }
+  const msg = String(body.message || text || "").slice(0, 300);
+
+  if (status === 422 && /Unexpected inputs/i.test(msg)) {
+    const named = (msg.match(/\[(.+?)\]/) || [, ""])[1]
+      .replace(/[\\"']/g, "") || "an input";
+    return `The workflow on branch "${branch}" does not accept ${named}, so `
+         + `GitHub refused before anything ran. Nothing was acquired.\n\n`
+         + `This desk dispatches to the branch named by DESK_BRANCH, which `
+         + `defaults to main — and the branch it is firing at is older than `
+         + `this desk. Either merge the branch carrying the acquisition `
+         + `pipeline into "${branch}", or set DESK_BRANCH to that branch in `
+         + `this deployment's environment variables and redeploy.`
+         + (many ? `\n\nA single acquisition would fail the same way for a `
+                 + `different reason: that branch's acquire.py does not know `
+                 + `slot instances either.` : "");
+  }
+  if (status === 404) {
+    return `GitHub cannot find the workflow, or the branch "${branch}", or `
+         + `the token cannot see this repository. Nothing was acquired. `
+         + `Check DESK_REPO, DESK_BRANCH, and that DESK_GITHUB_TOKEN has `
+         + `Actions read and write on this repository.`;
+  }
+  if (status === 403) {
+    return `GitHub refused the dispatch as unauthorised. Nothing was `
+         + `acquired. DESK_GITHUB_TOKEN needs Actions: Read and write; a `
+         + `fine-grained token on an organisation may also be waiting for an `
+         + `owner to approve it.`;
+  }
+  return `GitHub refused the dispatch (${status}) on branch "${branch}". `
+       + `Nothing was acquired. ${msg}`;
 }

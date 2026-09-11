@@ -453,6 +453,36 @@ await t("a valid batch dispatches the batch stage with every id", async () => {
   assert.strictEqual(r.json().count, 2);
 });
 
+await t("a dispatch GitHub refuses is explained, not relayed", async () => {
+  /* THE FIRST REAL BATCH CAME BACK AS GITHUB'S OWN WORDS — "Unexpected
+   * inputs provided: [batch]" with a documentation link. Accurate, about a
+   * JSON field the editor never typed, and silent about the only thing that
+   * mattered: the desk was dispatching at a branch older than itself. A
+   * message with no measurement in it cannot be diagnosed. */
+  const { explain } = await import(path.join(API, "acquire.js"));
+  const m = explain(422, JSON.stringify(
+    { message: 'Unexpected inputs provided: ["batch"]' }), "main", true);
+  assert.match(m, /branch "main"/);
+  assert.match(m, /DESK_BRANCH/);
+  assert.match(m, /Nothing was acquired/);
+  assert.ok(!/documentation_url/.test(m), "it relayed GitHub's raw body");
+  for (const [code, want] of [[404, /DESK_REPO/], [403, /Read and write/]]) {
+    assert.match(explain(code, "{}", "main", false), want);
+  }
+  /* AND AN UNKNOWN FAILURE STILL CARRIES THE BRANCH AND THE REASON, because
+   * a catch-all that drops the state is the same fault one step along. */
+  const other = explain(500, JSON.stringify({ message: "boom" }), "trunk", false);
+  assert.match(other, /trunk/);
+  assert.match(other, /boom/);
+});
+
+await t("the registry says where a dispatch will go", async () => {
+  const r = await call("registry.js", { headers: { cookie: session() } });
+  const d = r.json().dispatch || {};
+  assert.ok(d.repo && d.branch && d.workflow,
+            "the desk cannot say which branch it fires at");
+});
+
 /* ── 6c. the sweep proposes and does not choose ──────────────────── */
 
 await t("the sweep refuses a slot that is not one", async () => {

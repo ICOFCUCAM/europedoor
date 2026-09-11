@@ -73,6 +73,7 @@
     api("/api/registry").then(function (r) {
       if (!r.ok) return show(false);
       REG = r.j;
+      showTarget();
       fillSlots();
       fillLibrary();
       fillProvenance();
@@ -131,6 +132,18 @@
   }
 
   function onCountry() { onSlot(true); }
+
+  /* An acquisition runs on a branch, and the desk used to say so nowhere.
+     The first real batch was refused by GitHub for an input the target
+     branch had never heard of — accurate, about a field the editor never
+     typed, and silent about the only thing that mattered. */
+  function showTarget() {
+    var d = REG.dispatch;
+    if (!d) { el("target-branch").textContent = ""; return; }
+    el("target-branch").textContent = d.repo + " · " + d.branch;
+    el("target-branch").title =
+      "Acquisitions are dispatched to this branch. Set DESK_BRANCH to change it.";
+  }
 
   function instancesOf(slot) {
     return REG.purposes.filter(function (p) { return p.slot === slot; });

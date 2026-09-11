@@ -18,7 +18,7 @@
  * register by hand.
  */
 
-import { requireSession, send, register, registry } from "./_lib.js";
+import { requireSession, send, register, registry, repo } from "./_lib.js";
 
 export default async function handler(req, res) {
   if (!requireSession(req, res)) return;
@@ -31,7 +31,14 @@ export default async function handler(req, res) {
     return { ...p, status: row ? "PUBLISHED" : "EMPTY", photograph: row };
   });
 
+  const { slug, branch, workflow } = repo();
   send(res, 200, {
+    /* WHERE A DISPATCH WILL GO, SAID BEFORE IT GOES. The first real batch
+     * failed with GitHub's own "Unexpected inputs provided: [batch]",
+     * because the desk was dispatching at a branch older than itself and
+     * nothing on the screen said which branch that was. A target the editor
+     * cannot see is a target nobody checks. */
+    dispatch: { repo: slug, branch, workflow },
     providers: reg.providers,
     slots: reg.slots,
     purposes,

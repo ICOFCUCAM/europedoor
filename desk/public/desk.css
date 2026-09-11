@@ -388,3 +388,11 @@ button.slotrow:hover .findit { color: var(--cobalt-deep); }
   border-radius: var(--radius); padding: .3rem .7rem; }
 .concept:hover { background: var(--paper-3); border-color: var(--ink-3); }
 .concept[disabled] { color: var(--ink-3); cursor: default; opacity: .7; }
+
+/* WHERE AN ACQUISITION WILL RUN, said in the masthead. It is the quietest
+   thing on the bar because it is right almost always — and the one time it
+   is wrong, GitHub's own refusal is about a JSON field the editor never
+   typed and says nothing about a branch. */
+.target { font-family: var(--mono); font-size: 11px; color: var(--ink-3);
+  margin: 0 var(--s4) 0 auto; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; max-width: 22rem; }
