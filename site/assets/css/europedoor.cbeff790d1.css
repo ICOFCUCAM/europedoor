@@ -5387,6 +5387,16 @@ body[data-hero] .masthead { position: sticky; }
 .jrowart .constel-lit circle { r: 9px; }
 .jrowart .constel-route { stroke-width: 7; }
 .jrow:hover h3, .jrow:focus-visible h3 { color: var(--door); }
+/* A LEAD JOURNEY AT SIZE WAS TRIED AND MEASURED OUT. Three identical rows
+   give the band three medium elements and no dominant one, which is the
+   shape every section under the hero has — so the first of the three, which
+   crosses seven countries from 69°N to 38°N, was given a 34rem column.
+   Rendered, that is the fault it was meant to fix: a route is FRAMED on its
+   own extent, and the Arctic-to-Mediterranean extent is tall, so a wider
+   column makes a 490-pixel picture beside 140 pixels of type and three
+   hundred pixels of empty row under it. The thing that makes each of these
+   legible — its own frame — is what stops one of them being the wide
+   element. Three rows, kept. */
 
 /* Stories: one lead with its own places drawn at size, two beside it. */
 .storyband { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--s6);
