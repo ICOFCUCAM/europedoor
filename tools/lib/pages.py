@@ -9974,7 +9974,17 @@ def search_page(data):
         (len(data["fund"]), "Fund projects", "/fund",
          "The public register of work worth putting something back into"),
     ]
-    _kpeak = max(k[0] for k in kinds)
+    # AND THE BAR BESIDE EACH COUNT CAME OFF. "A chart on which four of
+    # seven series cannot be seen is the wrong track, not the wrong data" is
+    # this repository's own line about this exact element, and the repair it
+    # got was a wider track: 80 pixels to 224. Measured after: the seven
+    # fills are 36, 92, 224, 11, 9, 7 and 9 pixels, so four of the seven are
+    # still under twelve. Widening a linear track cannot fix a 45:1 range —
+    # 319 destinations against 9 stories — it only moves where the floor is.
+    #
+    # The bar was trying to say "the index is mostly destinations", and the
+    # numbers beside it say that already, in one glance, exactly. A drawing
+    # that four of seven rows cannot use is four rows of noise.
     # AN H2 ABOVE THE ROWS, BECAUSE A ROW'S NAME IS AN H3. The first version
     # put the rows straight under the page's h1 and the accessibility scan
     # caught it in one run: h1 → h3 at "Countries". Every other place this
@@ -9989,9 +9999,7 @@ def search_page(data):
                   f'<a class="row" href="{href}">'
                   f'<div><h3>{esc(label[:1].upper() + label[1:])}</h3>'
                   f'<p class="rowsub">{esc(what)}</p></div>'
-                  f'<p class="rowmeta">{count:,}<br>'
-                  f'<span class="hopbar" aria-hidden="true">'
-                  f'<span class="w{round(100 * count / _kpeak)}"></span></span></p></a>'
+                  f'<p class="rowmeta">{count:,}</p></a>'
                   for count, label, href, what in kinds)
               + "</div>")
 
