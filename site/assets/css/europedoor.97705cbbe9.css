@@ -1798,6 +1798,16 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .form.ask textarea {
   font: inherit; font-size: var(--t-md); min-height: 3.4rem;
 }
+/* AND 3.4rem IS TWO LINES, WHICH IS TWO OF THE FOUR THE PLACEHOLDER TAKES
+   ON A PHONE. Measured at 390: the box is 88px and the placeholder needs
+   116, so "mountains and food" was cut off below the fold of a box a reader
+   is being asked to type a sentence into — on the one control that IS this
+   page. The example is what teaches somebody what the parser reads, so the
+   sentence stays and the box grows: four lines at the width where it wraps
+   to four. */
+@media (max-width: 44rem) {
+  .form.ask textarea { min-height: 7.6rem; }
+}
 
 /* ── a journey drawn over the map ─────────────────────────────────── */
 .routeline { fill: none; stroke: var(--door); stroke-width: 2.5; stroke-linejoin: round; stroke-dasharray: 7 5; opacity: .9; }

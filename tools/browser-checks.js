@@ -3594,6 +3594,42 @@ async function main() {
   }
 
 
+  /* A PLACEHOLDER A READER CANNOT READ IS A TUTORIAL WITH ITS LAST LINE
+   * MISSING.
+   *
+   * The planner's sentence box is the one control that page IS, and its
+   * example is what teaches somebody what the parser reads — days, budget,
+   * a starting city, interests. At 390 the box was 88px and the placeholder
+   * needed 116, so "mountains and food" was cut off below the fold of a box
+   * two lines tall. The clipped-text scan cannot see it: a textarea is a
+   * scroll container, and scrolling IS the right answer inside one once
+   * there is content. It is not the right answer for a hint.
+   */
+  {
+    const tp = await browser.newPage({ viewport: { width: 390, height: 900 } });
+    for (const W of [320, 390, 834, 1280]) {
+      await tp.setViewportSize({ width: W, height: 900 });
+      const r = await tp.goto(base + "/plan/", { waitUntil: "load" });
+      if (!r || r.status() !== 200) continue;
+      const got = await tp.evaluate(() => {
+        const t = document.querySelector("#ask");
+        if (!t) return null;
+        const v = t.value;
+        t.value = t.placeholder;
+        const o = { c: Math.round(t.clientHeight), s: Math.round(t.scrollHeight) };
+        t.value = v;
+        return o;
+      });
+      if (!got) { checked++; ok(false, `/plan at ${W}: no sentence box`); continue; }
+      checked++;
+      ok(got.s <= got.c + 1,
+         `/plan at ${W}: the sentence box shows ${got.c}px of a placeholder ` +
+         `that needs ${got.s}. The example is what teaches a reader what the ` +
+         `planner understands, and its last line was under the fold of the box`);
+    }
+    await tp.close();
+  }
+
   /* NO HEADING ENDS ON AN ORPHAN.
    *
    * `text-wrap: balance` was on seven elements, chosen one at a time
