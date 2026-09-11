@@ -582,88 +582,20 @@ def heroeurope(data):
     NAME_INSET = 14.0
     taken = []
 
-    # WHOSE GROUND IS THIS? A name may run out over the SEA — a printed atlas
-    # does that with Norway and with Chile — and may never run over a
-    # neighbour. Keeping the name's middle on its own country was not enough
-    # by half: SWITZERLAND ran from Bordeaux to Munich correctly centred,
-    # CROATIA lay across Bosnia, AUSTRIA across Hungary, GREECE into Türkiye.
-    # A bounding box is not a country either — Croatia's box has its middle in
-    # Bosnia — so the test is the real polygon.
-    #
-    # Every country's rings are indexed once, with a bounding box in front of
-    # each so that almost every sample is rejected by four comparisons.
-    def _rings_of(d):
-        out = []
-        for sub in d.split("Z"):
-            pts = [(float(a), float(b))
-                   for a, b in re.findall(r"[ML](-?[\d.]+) (-?[\d.]+)", sub)]
-            if len(pts) >= 3:
-                xs = [q[0] for q in pts]
-                ys = [q[1] for q in pts]
-                out.append(((min(xs), min(ys), max(xs), max(ys)), pts))
-        return out
-
-    def _inside(pts, x, y):
-        """Even-odd crossing test — the standard one, and it is exact."""
-        hit = False
-        j = len(pts) - 1
-        for i, (px_, py_) in enumerate(pts):
-            qx, qy = pts[j]
-            if (py_ > y) != (qy > y) and \
-                    x < (qx - px_) * (y - py_) / (qy - py_) + px_:
-                hit = not hit
-            j = i
-        return hit
-
-    shapes = []
-    for _m in re.finditer(r'<path d="([^"]*)"><title>([^<]*)</title></path>',
-                          land):
-        shapes.append(_rings_of(_m.group(1)))
-
-    def _crosses(mine, x, y):
-        for k, rings in enumerate(shapes):
-            if k == mine:
-                continue
-            for bb_, pts in rings:
-                if not (bb_[0] <= x <= bb_[2] and bb_[1] <= y <= bb_[3]):
-                    continue
-                if _inside(pts, x, y):
-                    return True
-        return False
-
-    # AND "NOT ONE PIXEL ON A NEIGHBOUR" WAS THE WRONG RULE, MEASURED.
-    #
-    # Forbidding every crossing left ten names — and it dropped GERMANY,
-    # POLAND, SWEDEN, NORWAY, FINLAND and UNITED KINGDOM, which are exactly
-    # the countries a reader orients by. A printed atlas lets the ends of a
-    # name touch a neighbour; what it never does is lay a name ACROSS one.
-    # So the test is a fraction rather than a flag: ten samples along the
-    # name, at most two of them on somebody else's ground.
-    #
-    # It is tried at zero first and at two only if nothing fits, which makes
-    # the four positions and nine anchors choose the cleanest placement
-    # available rather than the first tolerable one — the routine returns the
-    # first that fits, so the tolerance is the pass and not a score.
-    CROSS_OK = 2
-
-    def _crossings(mine, x0, y0, w0, h0):
-        mid_y = y0 + h0 / 2.0
-        cap_y = y0 + h0 * 0.34
-        n_ = 0
-        for i in range(7):
-            if _crosses(mine, x0 + w0 * i / 6.0, mid_y):
-                n_ += 1
-        for i in range(3):
-            if _crosses(mine, x0 + w0 * (0.15 + 0.35 * i), cap_y):
-                n_ += 1
-        return n_
+    # WHOSE GROUND IS THIS? The two rules and the tolerance now live in
+    # NameGround at module level, because there are TWO drawings on this site
+    # that set a country's name across it and for the life of both only this
+    # one had them. See the class.
+    ground = NameGround([m_.group(1) for m_ in re.finditer(
+        r'<path d="([^"]*)"><title>([^<]*)</title></path>', land)])
+    shapes = ground.shapes
+    CROSS_OK = NameGround.CROSS_OK
 
     def _own(mine, x, y):
-        for bb_, pts in shapes[mine]:
-            if (bb_[0] <= x <= bb_[2] and bb_[1] <= y <= bb_[3]
-                    and _inside(pts, x, y)):
-                return True
-        return False
+        return ground.own(mine, x, y)
+
+    def _crossings(mine, x0, y0, w0, h0):
+        return ground.crossings(mine, x0, y0, w0, h0)
 
     def _clear(lx, ly, lw, lh):
         b = (lx - LABEL_CLEAR, ly - LABEL_CLEAR,
@@ -2037,6 +1969,156 @@ def locator_inset(slug, size=132.0):
             f'<figcaption>in Europe</figcaption></figure>')
 
 
+# ── whose ground is this ──────────────────────────────────────────────
+
+
+def path_rings(d):
+    """Every closed subpath of an emitted `d`, each behind its bounding box.
+
+    The box in front means almost every sample is rejected by four
+    comparisons rather than by a crossing test over a few hundred points.
+    """
+    out = []
+    for sub in d.split("Z"):
+        pts = [(float(a), float(b))
+               for a, b in re.findall(r"[ML](-?[\d.]+) (-?[\d.]+)", sub)]
+        if len(pts) >= 3:
+            xs = [q[0] for q in pts]
+            ys = [q[1] for q in pts]
+            out.append(((min(xs), min(ys), max(xs), max(ys)), pts))
+    return out
+
+
+def ring_hit(pts, x, y):
+    """Even-odd crossing test — the standard one, and it is exact."""
+    hit = False
+    j = len(pts) - 1
+    for i, (px_, py_) in enumerate(pts):
+        qx, qy = pts[j]
+        if (py_ > y) != (qy > y) and \
+                x < (qx - px_) * (y - py_) / (qy - py_) + px_:
+            hit = not hit
+        j = i
+    return hit
+
+
+class NameGround:
+    """Whose country a point is on, for one drawing's set of country paths.
+
+    A NAME MAY RUN OUT OVER THE SEA AND MAY NEVER RUN ACROSS A NEIGHBOUR.
+    That is what a printed atlas does with Norway and with Chile, and it is
+    two rules rather than one: the name's MIDDLE has to be on the country it
+    names, so it cannot float off into the Atlantic, and the BAR of type has
+    to stay off everybody else's ground, so it cannot lie across Bosnia.
+    A bounding box is not a country — the middle of Croatia's box is in
+    Bosnia — so both tests are against the real polygon.
+
+    And "not one sample on a neighbour" is the wrong rule, measured: it left
+    the hero ten names and dropped GERMANY, POLAND, SWEDEN, NORWAY, FINLAND
+    and UNITED KINGDOM, which are exactly the countries a reader orients by.
+    A printed atlas lets the ENDS of a name touch a neighbour. So the test is
+    a fraction — ten samples, at most `CROSS_OK` of them elsewhere — and it
+    is tried at zero first so the anchors choose the cleanest placement
+    available rather than the first tolerable one.
+
+    MODULE LEVEL BECAUSE THERE ARE TWO DRAWINGS THAT NAME COUNTRIES, and for
+    the life of both only one of them had this. The hero carried these rules
+    nested inside it; the country portrait composed its own name against the
+    FRAME and against the labels already down, and against nothing else — so
+    it was free to put the name anywhere that fit. Measured on the shipped
+    pages with the browser's own isPointInFill: nine of the forty-three
+    portraits that carry a name printed it entirely off its own country, and
+    AUSTRIA, DENMARK and FRANCE were ten samples out of ten on somebody
+    else's ground. That is the hero's own finding, one family over, and it is
+    what a second copy of a rule always costs.
+    """
+
+    CROSS_OK = 2
+
+    def __init__(self, ds):
+        self.shapes = [path_rings(d) for d in ds]
+
+    def own(self, mine, x, y):
+        for bb, pts in self.shapes[mine]:
+            if (bb[0] <= x <= bb[2] and bb[1] <= y <= bb[3]
+                    and ring_hit(pts, x, y)):
+                return True
+        return False
+
+    def crosses(self, mine, x, y):
+        for k, rings in enumerate(self.shapes):
+            if k == mine:
+                continue
+            for bb, pts in rings:
+                if not (bb[0] <= x <= bb[2] and bb[1] <= y <= bb[3]):
+                    continue
+                if ring_hit(pts, x, y):
+                    return True
+        return False
+
+    def crossings(self, mine, x0, y0, w0, h0):
+        """Ten samples along the bar of type: seven on the baseline, three at
+        cap height, because a name is a bar rather than a point."""
+        mid_y = y0 + h0 / 2.0
+        cap_y = y0 + h0 * 0.34
+        n = 0
+        for i in range(7):
+            if self.crosses(mine, x0 + w0 * i / 6.0, mid_y):
+                n += 1
+        for i in range(3):
+            if self.crosses(mine, x0 + w0 * (0.15 + 0.35 * i), cap_y):
+                n += 1
+        return n
+
+    def fits(self, mine, x0, y0, w0, h0, tol=0):
+        return (self.own(mine, x0 + w0 / 2.0, y0 + h0 / 2.0)
+                and self.crossings(mine, x0, y0, w0, h0) <= tol)
+
+    def anchors(self, mine, grid=13):
+        """Points to try the name at, and every one of them is ON the country.
+
+        AN OFFSET OF A RADIUS IS NOT A POINT INSIDE A COUNTRY. The portrait
+        offered its name nine positions round the centre of the subject's
+        bounding box, at fractions of `max(width, height) / 2` — which for a
+        long thin country is a circle mostly in the sea. The moment the name
+        was required to sit on its own ground, ITALY, NORWAY and SPAIN lost
+        theirs: Italy's bounding-box centre is in the Adriatic and its radius
+        is half the length of the peninsula, so not one of the nine anchors
+        was on Italy. That is the hero's own lesson — a bounding box is not a
+        country — arriving through the anchors instead of through the test.
+
+        A grid over the bounding box, keeping the cells that fall inside the
+        real polygon, ordered from the middle outwards so the centre-most
+        placement is tried first. For a country the grid misses entirely
+        (a microstate at this scale) the list is empty and the name is
+        dropped, which is what happens today.
+
+        AND THE LIST IS NOT TRUNCATED. Keeping the seventy closest to the
+        middle was the obvious economy and it cost NORWAY its name: the cells
+        nearest the centre of Norway's bounding box are all in the crowded
+        south where the place labels already are, and the empty north was
+        past the cut. An ordering is free; a truncation is a judgement about
+        which half of a country a name may sit in.
+        """
+        boxes = [bb for bb, _ in self.shapes[mine]]
+        if not boxes:
+            return []
+        x0 = min(b[0] for b in boxes)
+        y0 = min(b[1] for b in boxes)
+        x1 = max(b[2] for b in boxes)
+        y1 = max(b[3] for b in boxes)
+        cx, cy = (x0 + x1) / 2.0, (y0 + y1) / 2.0
+        out = []
+        for i in range(grid):
+            for j in range(grid):
+                x = x0 + (x1 - x0) * (i + 0.5) / grid
+                y = y0 + (y1 - y0) * (j + 0.5) / grid
+                if self.own(mine, x, y):
+                    out.append((math.hypot(x - cx, y - cy), x, y))
+        out.sort()
+        return [(x, y) for _d, x, y in out]
+
+
 def _highlight_box(land):
     """Centre and radius of the highlighted shape in an emitted <g>.
 
@@ -2215,7 +2297,7 @@ def countryportrait(data, c):
 
 
     def _try_label(px, py, text, cls, metric="minilabel", off=10.0,
-                   prefer="beside", wrap=None):
+                   prefer="beside", wrap=None, fits=None):
         """Place a label if it fits the aperture and hits nothing already there.
 
         One placement routine for every level of the hierarchy, so a region
@@ -2235,7 +2317,7 @@ def countryportrait(data, c):
 
         got = place_label_box(px, py, text, w, h, cls=cls, off=off,
                               prefer=prefer, metric=metric, clears=_free,
-                              wrap=wrap)
+                              wrap=wrap, fits=fits)
         if not got:
             return False
         lhtml, lx, ly, lw, lh = got
@@ -2311,16 +2393,62 @@ def countryportrait(data, c):
     # name may sit anywhere inside its own country, so it is tried at the
     # centroid and then at eight points around it, inside the country's own
     # drawn radius.
-    _cbox = _highlight_box(land)
-    if _cbox:
-        _ccx, _ccy, _cr = _cbox
-        _anchors = ((0, 0), (0, -0.45), (0, 0.45), (-0.5, 0), (0.5, 0),
-                    (-0.4, -0.4), (0.4, -0.4), (-0.4, 0.4), (0.4, 0.4))
+    # AND THE NAME HAS TO BE ON THE COUNTRY IT NAMES, which this plate never
+    # tested. The anchors below are offered inside the subject's own drawn
+    # radius, but the only thing they were tested against was the APERTURE
+    # and the labels already down — so nine anchors and four positions were
+    # enough freedom to leave, exactly as the hero's own comment predicted
+    # for the hero. Measured on the shipped pages with the browser's
+    # isPointInFill: nine of the forty-three portraits that carry a name
+    # printed it entirely off its own country, and AUSTRIA, DENMARK and
+    # FRANCE were ten samples out of ten on somebody else's ground — AUSTRIA
+    # set across Czechia on the one plate whose whole job is to say which
+    # country this page is about.
+    #
+    # NameGround is the hero's rule at module level, so there is one of it.
+    _dsq = [_m.group(1) for _m in re.finditer(
+        r'<path[^>]*\sd="([^"]+)"', ctx + land)]
+    _here_i = next((_i for _i, _m in enumerate(re.finditer(
+        r'<path([^>]*)\sd="[^"]+"', ctx + land))
+        if "here" in (_m.group(1) or "")), None)
+    _ground = NameGround(_dsq)
+
+    def _cname_fits(x, y, wide, anchor, tol=0, metric="cname"):
+        up_, down_ = LABEL_METRICS[metric][2:]
+        if not label_fits(x, y, wide, anchor, w, h, up_, down_):
+            return False
+        if _here_i is None:
+            return True
+        return _ground.fits(_here_i, *_label_box(x, y, wide, anchor,
+                                                 up_, down_), tol=tol)
+
+    _anchors = _ground.anchors(_here_i) if _here_i is not None else []
+    if _anchors:
         _up = c["name"].upper()
-        _placed_name = any(
-            _try_label(_ccx + fx * _cr, _ccy + fy * _cr, _up, "cname",
-                       metric="cname", off=10.0, prefer="over")
-            for fx, fy in _anchors)
+        # THREE RUNGS, AND THE THIRD IS WHAT KEEPS EVERY PLATE NAMED. Zero
+        # crossings first, then two, so the anchors choose the cleanest
+        # placement available rather than the first tolerable one — and then
+        # five, because a portrait that cannot name its subject is a worse
+        # defect than a name whose end overlaps a neighbour. The recognition
+        # instrument strips the wordmark and the page title, so the plate is
+        # all that is left to say which country this is. On a crowded plate
+        # — France and Spain each carry fifteen place labels — every position
+        # that satisfies the tighter rule can already be taken: with two
+        # rungs FRANCE, NORWAY and SPAIN lost their names outright.
+        #
+        # Measured on the shipped pages: all forty-three plates that have a
+        # polygon keep their name, none is off its own ground, and the three
+        # that take the third rung land at exactly four samples of ten. A
+        # free rung below this one is never reached, so there is not one.
+        _placed_name = False
+        for _tol in (0, NameGround.CROSS_OK, 5):
+            _placed_name = any(
+                _try_label(ax, ay, _up, "cname",
+                           metric="cname", off=10.0, prefer="over",
+                           fits=lambda *a, _t=_tol: _cname_fits(*a, tol=_t))
+                for ax, ay in _anchors)
+            if _placed_name:
+                break
         # A NAME TOO WIDE FOR ITS OWN COUNTRY GOES ON TWO LINES, which is what
         # a printed atlas does and what this one was doing by accident: BOSNIA
         # AND HERZEGOVINA measures 392 units against a plate 391 wide, and
@@ -2340,10 +2468,13 @@ def countryportrait(data, c):
                         f'<tspan x="{x:.1f}" dy="{CNAME_LEAD:.1f}">'
                         f'{esc(_b)}</tspan></text>')
 
-            for fx, fy in _anchors:
-                if _try_label(_ccx + fx * _cr, _ccy + fy * _cr, _long,
+            for ax, ay in _anchors:
+                if _try_label(ax, ay, _long,
                               "cname", metric="cname2", off=10.0,
-                              prefer="over", wrap=_two):
+                              prefer="over", wrap=_two,
+                              fits=lambda *a: _cname_fits(
+                                  *a, tol=NameGround.CROSS_OK,
+                                  metric="cname2")):
                     break
     # THE PLATE NAMES ITS OWN SUBJECT. An atlas plate has the country's name
     # set across it, and there is a second reason here: the recognition test
