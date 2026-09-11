@@ -4714,7 +4714,31 @@ body[data-hero] .masthead { position: sticky; }
    shadow, and writing it as one spends a slot that means something else. */
 .way.shot { min-height: min(58vh, 33rem); }
 .way + .way { border-left: 1px solid color-mix(in srgb, var(--limestone) 20%, transparent); }
+/* FOUR DOORS, FOUR DIFFERENT HEADING HEIGHTS. The panels are bottom-aligned
+   so the count and the arrow line up, and the four taglines wrap to one line
+   or two — so measured on the built page the headings sat at y=140, 117, 174
+   and 174. Four across, on the homepage's second screen, and the one thing a
+   reader compares is the four names.
+   Subgrid, so the four ROWS are shared: name, tagline, where, meta. Each
+   panel still sizes to its own content and the strip still bottom-aligns;
+   what changes is that the four rows are one set of rows rather than four.
+   Chromium has had subgrid since 117 and CI runs 131. */
 .waytext { position: relative; z-index: 2; width: 100%; }
+@media (min-width: 64rem) {
+  /* The 1fr row is the slot. `min-height` on the PANEL cannot survive
+     subgrid — a grid item spanning rows is as tall as those rows, and the
+     rows are sized by their content — so the floor moves to the container
+     and a flexible first row absorbs the slack. That matters for a code
+     path nothing exercises yet: `.way.shot` asks for 58vh the day a
+     photograph lands, and without this the picture would have been a
+     281-pixel band. */
+  .wayin { min-height: 22rem;
+           grid-template-rows: 1fr auto auto auto auto; }
+  .wayin:has(.way.shot) { min-height: min(58vh, 33rem); }
+  .way { grid-row: 1 / -1; display: grid; grid-template-rows: subgrid;
+         min-height: 0; }
+  .waytext { display: grid; grid-row: 2 / -1; grid-template-rows: subgrid; }
+}
 .way picture { position: absolute; inset: 0; z-index: 0; display: block; }
 .way .photo {
   width: 100%; height: 100%; object-fit: cover;
