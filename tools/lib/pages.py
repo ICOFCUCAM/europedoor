@@ -263,7 +263,93 @@ def dusk_stops(lo=0.0, hi=1.0):
     return "".join(out)
 
 
-def cut_fade(idprefix, w, h):
+# ── how far a data cut may reach ──────────────────────────────────────
+
+DUSK_CEILING = 0.80
+_DUSK_REACH = {}
+
+
+def dusk_reach(data):
+    """How wide each data-cut fade may be, measured against the destinations.
+
+    THE FADE WAS EXTINGUISHING THE PLACES IT EXISTS TO KEEP LEGIBLE. `data/geo/`
+    stops at 52°E and 33°N, and both cuts are straight lines through real land,
+    so the drawing ramps into the graphite ground rather than ending. The widths
+    of those two ramps — 330 units east, 130 south — were chosen by eye for
+    atmosphere, and nothing ever asked what was underneath them. Measured on the
+    homepage, over destinations this atlas writes a page about:
+
+        Baku            100%        Paphos            92%
+        Tbilisi          89%        Chania, Crete     83%
+        Moscow           71%        Valletta          77%
+        Helsinki         28%        Heraklion         85%
+
+    Five countries — Azerbaijan, Georgia, Armenia, Cyprus and Malta — were
+    effectively unlit on a picture whose caption says every country is a link,
+    and Baku, which is a destination in this atlas, was solid graphite. That is
+    exactly the fault `cartography.datacut` already records one file over: a
+    fade that dims the thing it exists to keep legible has swapped one rendering
+    fault for another.
+
+    So the width is derived rather than chosen. `DUSK_CEILING` is the most a
+    destination may be dimmed; smoothstep is inverted in closed form to find
+    where on the band that value falls, and the band is stretched so the
+    outermost destination sits exactly there. Add a destination further east
+    and the fade narrows on the next build; there is no number to remember.
+
+    THE CEILING ITSELF WAS RENDERED THREE WAYS AND LOOKED AT, because it is the
+    one number here that is art direction rather than arithmetic. It trades one
+    fault against the other: at 0.50 the band is 52 units and the terminator
+    reads as a hard shadow edge cutting the continent, which is the rendering
+    fault the fade exists to remove arrived at from the other side; at 0.86 it
+    is 105 and Baku is nearly out again. 0.80 is 87 east and 102 south, and the
+    measurement it buys is destinations dimmed past half: 46 of 319 before, 9
+    after — Cyprus, Malta, Crete and Baku, which sit on the cut itself.
+
+    ONLY THE HERO TAKES IT. /map draws the same two fades and keeps the wide
+    reach, because its marks are drawn ABOVE the cut and stay lit: a destination
+    near the cut keeps its dot, which is the rule `cartography.datacut` already
+    states. The hero has no dots — its countries ARE the marks, and its names
+    are under the fade — so it is the one drawing where dimming the ground
+    dims the subject.
+
+    Returns (east_before, east_after, south_before, south_after) in projection
+    units. The `after` ends are the small clearances that carry the ramp past
+    the cut itself, so the cut is fully covered rather than merely approached.
+    """
+    if "v" in _DUSK_REACH:
+        return _DUSK_REACH["v"]
+    a, b = MAPPROJ.xy(70.0, 52.0), MAPPROJ.xy(40.0, 52.0)
+    mx, my = (a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    n = math.hypot(dx, dy) or 1.0
+    nx, ny = dy / n, -dx / n                     # perpendicular, pointing east
+    ax, ay = MAPPROJ.apex()
+    r33 = MAPPROJ.parallel_radius(33.0)
+    east = south = 1e9
+    for v in data["cities"].values():
+        t = v["city"]
+        x, y = MAPPROJ.xy(t["lat"], t["lon"])
+        east = min(east, -((x - mx) * nx + (y - my) * ny))
+        south = min(south, r33 - math.hypot(x - ax, y - ay))
+    # The clearance past the cut. Small, and not zero: a ramp that reaches full
+    # exactly ON the cut leaves the outermost pixel of parchment undimmed, which
+    # is the bright hairline the hero already lost a commit to.
+    ea, sa = 4.0, 3.0
+    # Smoothstep inverted: the point on the band where the ramp equals the
+    # ceiling. Closed form rather than a search, so the width is exact.
+    v = min(max(DUSK_CEILING, 0.02), 0.98)
+    t = 0.5 - math.sin(math.asin(1.0 - 2.0 * v) / 3.0)
+
+    def width(d, a):
+        return max((d - t * a) / (1.0 - t), 24.0)
+
+    out = (width(east, ea), ea, width(south, sa), sa)
+    _DUSK_REACH["v"] = out
+    return out
+
+
+def cut_fade(idprefix, w, h, reach=None):
     """The two data cuts, faded, for an instrument that draws the atlas.
 
     Painted rather than masked, because every country on these maps is a
@@ -279,10 +365,11 @@ def cut_fade(idprefix, w, h):
     so a horizontal fade placed on the Tunisian end leaves the cut showing
     right across Anatolia. Both come from the projection's own constants.
     """
-    ex1, ey1, ex2, ey2 = cut_band(70.0, 40.0, 52.0, 330.0, 30.0)
+    eb, ea, sb, sa = reach or (330.0, 30.0, 130.0, 4.0)
+    ex1, ey1, ex2, ey2 = cut_band(70.0, 40.0, 52.0, eb, ea)
     ax, ay = MAPPROJ.apex()
     r33 = MAPPROJ.parallel_radius(33.0)
-    foot0, foot1 = (r33 - 130.0) / r33, (r33 - 4.0) / r33
+    foot0, foot1 = (r33 - sb) / r33, (r33 - sa) / r33
     return (
         f'<defs>'
         f'<linearGradient id="{idprefix}edge" gradientUnits="userSpaceOnUse"'
@@ -846,7 +933,12 @@ def heroeurope(data):
     # left the mask 7% opaque along it, and 7% of a bright coastline against
     # the water is still a straight line across the north-east — the exact
     # thing the fade exists to remove.
-    ex1, ey1, ex2, ey2 = _band(70.0, 40.0, 52.0, 360.0, 40.0)
+    # WIDTHS DERIVED FROM THE ATLAS'S OWN OUTERMOST DESTINATIONS. They were
+    # 360 east and 150 south, chosen by eye for atmosphere, and nothing asked
+    # what was underneath them: Baku read 100% graphite and Paphos 92% on the
+    # one picture that opens this site. See dusk_reach().
+    _eb, _ea, _sb, _sa = dusk_reach(data)
+    ex1, ey1, ex2, ey2 = _band(70.0, 40.0, 52.0, _eb, _ea)
     # THE GROUND'S OWN FADE-IN WAS DELETED AND ITS AXIS WAS LEFT BEHIND.
     # `gx1, gy1, gx2, gy2 = _band(70, 40, 52, 150, 40)` sat here, unread by
     # anything, with a paragraph above it explaining a fade the drawing no
@@ -873,7 +965,7 @@ def heroeurope(data):
     # projection ever moves this moves with it.
     ax, ay = MAPPROJ.apex()
     r33 = MAPPROJ.parallel_radius(33.0)
-    foot0, foot1 = (r33 - 150.0) / r33, (r33 - 6.0) / r33
+    foot0, foot1 = (r33 - _sb) / r33, (r33 - _sa) / r33
     return (
         # NOT aria-hidden ANY MORE. It held fifty links the moment the
         # countries became doors, and aria-hidden over focusable content is

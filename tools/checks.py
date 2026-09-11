@@ -20,6 +20,7 @@ import hashlib
 import html.parser
 import colorsys
 import json
+import math
 import os
 import subprocess
 import re
@@ -5001,6 +5002,87 @@ def c_automated_provider():
             if row.get("provider") not in cleared_set:
                 fail(f"images.json > {key}: provider {row.get('provider')!r} "
                      f"is not cleared for automated acquisition")
+    return n
+
+
+@check("no destination is extinguished by the hero's data-cut fades")
+def c_hero_dusk_reach():
+    """THE FADE WAS PUT THERE TO KEEP THE PICTURE HONEST AND IT WAS UNLIGHTING
+    THE ATLAS.
+
+    `data/geo/` stops at 52°E and 33°N, and both cuts are straight lines
+    through real land, so the hero ramps into shadow along each rather than
+    ending. The widths of those two ramps were chosen by eye — 360 units east,
+    150 south — and nothing ever asked what was underneath them. Measured over
+    the 319 destinations this atlas writes a page about: Baku 100%, Paphos 92%,
+    Tbilisi 89%, Chania 83%, Valletta 77%, Moscow 71%, and 46 destinations
+    dimmed past half. Five countries were effectively unlit on a picture whose
+    own label says every country is a link.
+
+    READ OFF THE SHIPPED HTML, NOT THE CONSTANTS. `pages.dusk_reach` derives
+    the widths and a check re-running that derivation would only ever agree
+    with it; the gradient the browser is handed is what a reader gets. The two
+    gradients are parsed out of the hero, the ramp is evaluated at every
+    destination's projected coordinate, and the ceiling is the promise.
+    """
+    h = open(os.path.join(OUT, "index.html"), encoding="utf-8").read()
+
+    def grad(gid):
+        m = re.search(r'<(linear|radial)Gradient id="%s"([^>]*)>(.*?)</\1Gradient>'
+                      % gid, h, re.S)
+        if not m:
+            fail(f"/: the hero has no gradient #{gid} — the data-cut fade this "
+                 f"check measures is not in the shipped page")
+            return None, None
+        attrs = dict(re.findall(r'([\w-]+)="([^"]+)"', m.group(2)))
+        stops = sorted({(float(o), float(v)) for o, v in re.findall(
+            r'<stop offset="([\d.]+)" stop-opacity="([\d.]+)"', m.group(3))})
+        if not stops:
+            fail(f"/: gradient #{gid} carries no stops this check can read")
+            return None, None
+        return attrs, stops
+
+    ea, estops = grad("heroedge")
+    fa, fstops = grad("herofootg")
+    if not ea or not fa:
+        return 1
+
+    def ramp(t, stops):
+        if t <= stops[0][0]:
+            return stops[0][1]
+        if t >= stops[-1][0]:
+            return stops[-1][1]
+        for (o0, v0), (o1, v1) in zip(stops, stops[1:]):
+            if o0 <= t <= o1:
+                f = 0.0 if o1 == o0 else (t - o0) / (o1 - o0)
+                return v0 + (v1 - v0) * f
+        return stops[-1][1]
+
+    x1, y1 = float(ea["x1"]), float(ea["y1"])
+    x2, y2 = float(ea["x2"]), float(ea["y2"])
+    dx, dy = x2 - x1, y2 - y1
+    L2 = dx * dx + dy * dy or 1.0
+    cx, cy, rr = float(fa["cx"]), float(fa["cy"]), float(fa["r"])
+
+    data = D.load()
+    worst, n = [], 0
+    for v in data["cities"].values():
+        t = v["city"]
+        x, y = P.MAPPROJ.xy(t["lat"], t["lon"])
+        e = ramp(((x - x1) * dx + (y - y1) * dy) / L2, estops)
+        f = ramp(math.hypot(x - cx, y - cy) / rr, fstops)
+        n += 1
+        worst.append((max(e, f), t["name"]))
+    worst.sort(reverse=True)
+    ceiling = P.DUSK_CEILING + 0.02        # the stop list is sampled, not exact
+    for dusk, name in worst:
+        if dusk > ceiling:
+            fail(f"/: the hero's data-cut fade paints {name} at {dusk * 100:.0f}% "
+                 f"of the shadow, above the {P.DUSK_CEILING * 100:.0f}% ceiling. "
+                 f"A fade that dims the places it exists to keep legible has "
+                 f"swapped one rendering fault for another — see "
+                 f"pages.dusk_reach()")
+            break
     return n
 
 
