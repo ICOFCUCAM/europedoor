@@ -1341,16 +1341,56 @@ def home(data):
     # chip and a typed sentence take the identical path. A chip that went to
     # a different destination from the input above it would teach the reader
     # that the input is decorative.
+    # THE FOUR CHIPS NAMED THE FOUR DOORS, TWO HUNDRED PIXELS ABOVE THEM.
+    # Mountain escapes / Historic cities / Food experiences / Coastal
+    # journeys, against Mountains / Coast & islands / Historic cities / Food
+    # & wine — the same four categories twice, in two components, on one
+    # screen. The doors carry a count, a promise and a real list behind
+    # them; the chips carried a word. Saying the same four things twice is
+    # this atlas's own rule about never explaining the constraint back,
+    # arriving as a duplicated section rather than a repeated sentence.
+    #
+    # So the chips demonstrate the INSTRUMENT instead, and each one exercises
+    # a dimension the doors cannot express: time, money, pace and a place to
+    # start, and a named region. Every one of those is something parseAsk()
+    # actually reads — days, budget, month, pace, a start city, a GEO group
+    # — so a chip is a worked example rather than a slogan.
+    #
+    # AND THE LABEL IS THE QUERY. The old pairs showed one sentence and sent
+    # another ("Mountain escapes" -> "I want a quiet mountain escape"), so
+    # the one surface that could teach a reader what to type into the box
+    # taught them a category name instead. The motion pages settled this
+    # already: the query is the proof, and it is printed.
     INTENTS = [
-        ("Mountain escapes", "I want a quiet mountain escape."),
-        ("Historic cities", "Show me Europe's most historic cities."),
-        ("Food experiences", "Authentic food experiences, wherever they are."),
-        ("Coastal journeys", "A coastal journey, ten days, no crowds."),
+        "Ten days in October",
+        "Two weeks, under €2,000",
+        "Slowly, starting in Lisbon",
+        "Somewhere in the Balkans",
     ]
     intentchips = "".join(
-        f'<a class="chip" href="/plan?ask={quote(q)}">{esc(label)}</a>'
-        for label, q in INTENTS
+        f'<a class="chip" href="/plan?ask={quote(q)}">{esc(q)}</a>'
+        for q in INTENTS
     )
+
+    # THE PLACEHOLDER WAS CUT MID-WORD ON A PHONE AND CARRIED FOUR DEAD
+    # SENTENCES. `data-rotate` held four alternative placeholders and
+    # NOTHING HAS EVER READ IT: the homepage loads no JavaScript at all —
+    # its only <script> is the inert JSON-LD block — so 232 bytes of copy
+    # shipped on the most-visited page in the product for the life of the
+    # band, waiting for a rotator nobody wrote. That is a dead CSS rule in
+    # markup, and the scan that finds those does not look at attributes.
+    #
+    # And the placeholder that IS shown rendered as "I want a quiet mountain
+    # escape in Oct" at 390 — cut, in the box this page exists to get
+    # somebody to type in. The clipped-text check cannot see it: an input is
+    # a scroll container and scrolling is the right answer inside one.
+    #
+    # THE FIRST FIX PUT THAT REASONING IN AN HTML COMMENT and the weight
+    # invariant caught it in one run: a comment in emitted markup SHIPS, on
+    # 1,033 pages if it is in the shell and on the most-visited one here.
+    # A reason belongs in the source that writes the page, which is the same
+    # rule as a reason belonging in tools/invariants.py rather than in the
+    # generated register.
 
     # The hero photograph, when one is licensed. `picture()` already returns
     # a plate when the register has no row — which is right everywhere else
@@ -1423,8 +1463,7 @@ def home(data):
   <form class="askhero" action="/plan" method="get">
     <label for="homeask">Where would you like to go — or what would you like to discover?</label>
     <input type="text" id="homeask" name="ask" autocomplete="off"
-           placeholder="I want a quiet mountain escape in October."
-           data-rotate="Show me Europe&#39;s most historic cities.|Plan 10 days through Italy.|Where can I experience authentic Mediterranean culture?|I have 10 days in September. I love mountains, history and local food.">
+           placeholder="A quiet mountain escape, October.">
     <button class="btn" type="submit">Plan my journey</button>
   </form>
   <div class="chips hero-intents">{intentchips}</div>

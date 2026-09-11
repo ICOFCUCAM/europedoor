@@ -2669,6 +2669,14 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
                    border-bottom: 1px solid var(--rule);
                    margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw);
                    padding: var(--s8) calc(50vw - 50%); }
+/* THE STRIP IS THE END OF THE BAND. `.wayin` breaks out of this band's
+   own padding to run edge to edge, so the 72px below it plus the more
+   link's 24px left a hundred and twelve pixels of empty grey with one
+   small link floating in it — measured at 1440 under a strip that had just
+   been tightened from 352px to 245. Closing a band with a hole undoes the
+   band above it. */
+.band.tone-quiet:has(.wayin) { padding-bottom: var(--s5); }
+.wayin + .more { margin-top: var(--s4); }
 .band.tone-quiet .band-head h2 { max-width: 20ch; }
 .band.tone-quiet .lede { max-width: 46rem; }
 
@@ -3040,7 +3048,14 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    first screen a search box with a picture behind it; the invitation is the
    continent, and the control belongs directly under it where it reads as the
    answer to "how". */
-.askband { margin: calc(var(--s7) * -1) 0 var(--s7); }
+/* THERE WAS NO SPACE AT ALL BETWEEN THE CONTINENT AND THE FORM. The hero
+   carries margin-bottom: --s7 and this pulled --s7 back off it, so the net
+   gap was zero: the arch's flat bottom edge, dark, then a small grey label
+   on white, then an input. Rendered, that is the strongest image on the
+   site handing straight to a text field with no breath — and the band reads
+   as a form somebody bolted under a picture rather than the first question
+   on the other side of the door. */
+.askband { margin: 0 0 var(--s8); }
 .askband .hero-intents { margin-top: var(--s4); }
 
 /* COUNTRY = IDENTITY. The name beside the shape, and the shape in a tall
@@ -3305,7 +3320,12 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 /* AND THE BAND CAME OFF THE HERO, so the label stopped being a micro-caption
    over a photograph and became the first thing anybody is asked. A shouty
    uppercase label reads as a form; this is meant to read as a question. */
-.askhero label { font-family: var(--display); font-size: var(--t-lg);
+/* THE QUESTION IS THE PROPOSITION, so it is set at the size an opening
+   line is set at. --t-lg was the size of a form label, which is what this
+   looked like. The clamp is the one five other headings already use — a
+   sixteenth font-size has been refused in this file twice. */
+.askhero label { font-family: var(--display); font-size: clamp(var(--t-lg), 2.4vw, var(--t-2xl));
+  line-height: 1.25; text-wrap: balance;
                  color: var(--ink-2); }
 .askhero input { width: 100%; font: inherit; font-size: var(--t-md);
                  padding: var(--s4); border: 1px solid transparent; border-radius: var(--radius);
