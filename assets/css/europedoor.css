@@ -1333,9 +1333,25 @@ main.wide { max-width: 92rem; }
    the fold, because that promise was only ever kept on a 1200px-tall screen
    and cost a third of the instrument to make. An instrument gets the width;
    the reader scrolls. */
+/* THE INSTRUMENT'S OPENING IS A WELL, AND IT WAS A CHART FRAME.
+   /map sat in a 1px `--rule` rectangle with sixteen pixels of sea matted
+   round the drawing — a panel with a border, which is the association the
+   cartography split exists to escape, on the page that IS the instrument.
+   Every picture on this site is seen through an aperture and none of them
+   has a border.
+   THE ANSWER IS ALREADY WRITTEN DOWN, for the dark preference of the arch:
+   two near-blacks are always about 1:1, so an opening cannot be read by the
+   step from the wall and is read the way a real one is — by its CUT EDGE.
+   The plates went 1.03 to 2.18 that way. This is the same relationship
+   inverted: a dark page, a darker well, and a fine LIT line at the cut,
+   measuring 2.15 on the water. An `outline` rather than an inset shadow,
+   because the register counts shadows and two is the whole vocabulary.
+   And the mat comes off: an instrument's water runs to the cut. */
 .mapwrap {
-  border: 1px solid var(--rule); border-radius: var(--radius);
-  background: var(--paper-2); padding: var(--s4); margin: var(--s3) 0 var(--s5);
+  border: 0; border-radius: var(--radius);
+  outline: 1px solid color-mix(in srgb, var(--limestone) 26%, transparent);
+  outline-offset: -1px;
+  background: var(--paper-2); padding: 0; margin: var(--s3) 0 var(--s5);
   overflow-x: auto; max-width: min(100%, calc(88vh * 1.282)); margin-inline: auto;
 }
 .europemap { width: 100%; height: auto; display: block; min-width: 34rem; }
