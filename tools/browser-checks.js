@@ -2368,7 +2368,12 @@ async function main() {
   for (const scheme of ["light", "dark"]) {
     const ctx = await browser.newContext({ colorScheme: scheme });
     const pg = await ctx.newPage();
+    // AND A DESTINATION IS IN THE LIST NOW. 319 pages, the largest family
+    // that draws this aperture, and the one where the ground under the crown
+    // is land rather than sea — which is the case the declared measurement
+    // cannot see.
     for (const u of ["/europe/austria", "/europe/austria/tyrol",
+                     "/europe/france/alps-and-east/chamonix",
                      "/journeys/the-alpine-grand-tour", "/beyond-the-obvious",
                      "/events/oct"]) {
       await pg.goto(base + u, { waitUntil: "load" });
@@ -2403,6 +2408,64 @@ async function main() {
         return (hi + 0.05) / (lo + 0.05);
       };
       ok(m.edge !== null, `${u} in ${scheme}: the aperture has no cut edge`);
+      // AND THE STEP IS MEASURED ON THE PAINTED PIXEL, because `.archground`
+      // is the SEA RECT and on an inland frame a reader never sees it. The
+      // declared step on Chamonix is 11.32:1 — limestone against
+      // --atlas-sea — and the ground actually under the crown is the land
+      // tone, which measures 1.39. Same class as every other contrast claim
+      // read off a declaration: the ratio a reader gets is the ratio of the
+      // pixel. The door still reads there, on its cut edge at 3.55, which is
+      // exactly why this had to be split — the reveal was carrying a plate
+      // the step was being credited for.
+      const shot = (await pg.screenshot()).toString("base64");
+      const px = await pg.evaluate(async (d) => {
+        const fig = document.querySelector("figure.minimap.arched svg");
+        if (!fig) return null;
+        const b = fig.getBoundingClientRect();
+        const img = await new Promise((res) => {
+          const i = new Image(); i.onload = () => res(i);
+          i.src = "data:image/png;base64," + d;
+        });
+        const c = document.createElement("canvas");
+        c.width = img.width; c.height = img.height;
+        const x = c.getContext("2d");
+        x.drawImage(img, 0, 0);
+        const at = (px2, py) => [...x.getImageData(px2, py, 1, 1).data].slice(0, 3);
+        const cx = Math.round(b.x + b.width / 2);
+        const top = Math.round(b.y);
+        // outside the arch, on the cut, and inside the crown
+        const out = at(cx, Math.max(0, top - 6));
+        const lin2 = (v) => { const q = v / 255;
+          return q <= 0.03928 ? q / 12.92 : Math.pow((q + 0.055) / 1.055, 2.4); };
+        const rel2 = (p2) => 0.2126 * lin2(p2[0]) + 0.7152 * lin2(p2[1]) + 0.0722 * lin2(p2[2]);
+        const cr2 = (a2, b2) => { const [h, l] = [rel2(a2), rel2(b2)].sort((m, n) => n - m);
+          return (h + 0.05) / (l + 0.05); };
+        // THE DARKEST PIXEL IS THE WRONG ONE IN THE DARK PREFERENCE. The
+        // reveal is `--limestone` — the wall's own face laid over the
+        // drawing's edge — so on a graphite page it is the LIGHTEST thing at
+        // the cut, and a sampler hunting for the darkest reported 1.00:1 on
+        // /beyond-the-obvious where the real figure is 17.37. The instrument
+        // has to look for the greatest step from the wall, in either
+        // direction, which is what a cut edge is.
+        let cut = out, best = 0;
+        for (let dy = -3; dy <= 8; dy++) {
+          const p2 = at(cx, Math.min(c.height - 1, top + dy));
+          const v = cr2(p2, out);
+          if (v > best) { best = v; cut = p2; }
+        }
+        return { out, cut, in: at(cx, Math.min(c.height - 1, top + 16)) };
+      }, shot);
+      if (px) {
+        const stepPx = ratio(px.out, px.in);
+        const edgePx = ratio(px.out, px.cut);
+        checked++;
+        ok(Math.max(stepPx, edgePx) >= 3.0,
+           `${u} in ${scheme}: the aperture measures ${stepPx.toFixed(2)}:1 as a ` +
+           `step and ${edgePx.toFixed(2)}:1 on its cut edge, ON THE PAINTED ` +
+           `PIXEL. One of the two has to clear 3:1 — SC 1.4.11 puts the ` +
+           `boundary of a graphical object there, and the declared step is ` +
+           `the sea rect a reader does not see on an inland frame`);
+      }
       const byWall = ratio(m.wall, m.ground);
       const byEdge = m.edge ? ratio(m.edge, m.ground) : 1;
       ok(Math.max(byWall, byEdge) >= 1.5,
