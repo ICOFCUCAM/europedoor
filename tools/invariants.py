@@ -205,7 +205,19 @@ def measure():
                        "Chromium at two viewports."},
             "css.shadows": {
                 "value": len(set(re.findall(r"box-shadow:\s*([^;]+);", css))),
-                "kind": "ceiling", "why": "Two: a rest state and a lifted one."},
+                "kind": "ceiling",
+                "why": "Two, and THE REASON HERE USED TO DESCRIBE A "
+                       "VOCABULARY THIS STYLESHEET DOES NOT HAVE. It said "
+                       "'a rest state and a lifted one', and there is no "
+                       "rest state: nothing on this site carries a shadow "
+                       "until it is hovered. A --shadow token was declared "
+                       "in all three world blocks and referenced by no rule "
+                       "for the life of the palette. The two values this "
+                       "counts are --shadow-lift and an inset 1.5px ring, "
+                       "which is a focus outline rather than a shadow. A "
+                       "count can be right while the sentence under it is "
+                       "wrong, and the sentence is what the next person "
+                       "reads."},
             "css.gold": {
                 "value": len([h for h in re.findall(r"#[0-9a-fA-F]{6}", css)
                               if 90 <= int(h[1:3], 16) <= 215

@@ -5012,6 +5012,61 @@ def c_automated_provider():
     return n
 
 
+@check("the palette register and the stylesheet are the same palette")
+def c_palette_is_the_stylesheet():
+    """THE REGISTER WAS DOING ARITHMETIC ABOUT COLOURS NOBODY SHIPS.
+
+    `docs/palette.json` declares eighteen tokens with a hex each, and every
+    contrast claim, every forbidden pair and every cartographic separation is
+    recomputed from those hexes. Nothing compared them with the stylesheet.
+    Deleting `--ultramarine` from europedoor.css entirely left this suite
+    green: the register went on asserting that ultramarine clears 3:1 on
+    limestone-3 for a colour the site no longer had. A palette that cannot
+    drift from the pages is the whole point of keeping it as data.
+
+    Two directions, and the second is the one the dead-rule scan is for one
+    level down: a token declared in the stylesheet and never spent is
+    vocabulary that looks like a decision. `--atlas-context` was identical to
+    `--atlas-land` and unreferenced, `--shadow` was declared in three world
+    blocks while only `--shadow-lift` was ever used, and `--ultramarine` was
+    declared for the life of the palette and spent nowhere.
+
+    A token may be declared BY VALUE rather than by name — the three `-lift`
+    colours are bound to `--door` and `--warn` inside the dark blocks — so
+    the register's promise is that the HEX is in the stylesheet, and where
+    the name is declared too, that the two agree.
+    """
+    path = os.path.join(ROOT, "assets", "css", "europedoor.css")
+    css = re.sub(r"/\*.*?\*/", "", open(path, encoding="utf-8").read(), flags=re.S)
+    pal = json.load(open(os.path.join(ROOT, "docs", "palette.json"),
+                        encoding="utf-8"))
+    named = {}
+    for m in re.finditer(r"(--[a-z0-9-]+)\s*:\s*(#[0-9a-fA-F]{6})\s*;", css):
+        named.setdefault(m.group(1)[2:], set()).add(m.group(2).lower())
+    every = {h.lower() for h in re.findall(r"#[0-9a-fA-F]{6}", css)}
+    n = 0
+    for name, row in sorted(pal["tokens"].items()):
+        hexv = str(row.get("hex", "")).lower()
+        n += 1
+        if name in named:
+            if hexv not in named[name]:
+                fail(f"palette.json: {name} is {hexv} in the register and "
+                     f"{'/'.join(sorted(named[name]))} in the stylesheet. "
+                     f"Every claim about it is arithmetic on the wrong colour")
+        elif hexv not in every:
+            fail(f"palette.json: {name} ({hexv}) is not in the stylesheet at "
+                 f"all, by name or by value. The register is asserting "
+                 f"contrast for a colour the site does not ship")
+    declared = set(re.findall(r"(--[a-z0-9-]+)\s*:", css))
+    used = set(re.findall(r"var\((--[a-z0-9-]+)", css))
+    for tok in sorted(declared - used):
+        n += 1
+        fail(f"europedoor.css declares {tok} and nothing ever spends it. "
+             f"A token nobody references is vocabulary that looks like a "
+             f"decision — the dead-rule scan's finding, one level up")
+    return n
+
+
 @check("no destination is extinguished by the hero's data-cut fades")
 def c_hero_dusk_reach():
     """THE FADE WAS PUT THERE TO KEEP THE PICTURE HONEST AND IT WAS UNLIGHTING

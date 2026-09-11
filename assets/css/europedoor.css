@@ -92,7 +92,14 @@
      longer tell the two worlds apart by hue — and the worlds were never a
      hue: INTELLIGENCE is dark in BOTH preferences, which is the whole of
      that distinction in the preference most readers are in. */
-  --ultramarine:  #665cff;   /* atmosphere only: gradients, map washes. Never type. */
+  /* NO --ultramarine. It was declared here for the life of this palette —
+     "atmosphere only: gradients, map washes, never type" — and no rule ever
+     spent it. Ultramarine is real in this product and it is not a CSS
+     colour: it is the violet end of the PLATE ramp, hue 244° in
+     render.PLATE_HUES, drawn in Python. A custom property nothing
+     references is vocabulary that looks like a decision, and the register
+     was recomputing a contrast claim about it against limestone-3 on every
+     build. docs/palette.json > never. */
 
   /* Retained from the previous system, with narrow homes rather than as
      leftovers. Both are DISCOVER colours and neither appears in
@@ -265,7 +272,11 @@
      against 1.28, land to water 8.68 against 8.61 — so this is the yellow
      cast coming out and nothing else moving. */
   --atlas-land:    #ddd9cf;
-  --atlas-context: #ddd9cf;
+  /* NO --atlas-context. It was the same value as --atlas-land and nothing
+     referenced it: context IS the same land, which is the rule the layer
+     comment three thousand lines down already states and demonstrates by
+     painting `.context path` with --atlas-land. A second name for one
+     colour is two colours waiting to disagree. */
   /* The muted step of the same land, for context outside the subject and for
      a glyph drawn on limestone, where #ded8ca measures 1.20:1 against the
      page and is a silhouette you cannot quite see. It was a raw hex in two
@@ -396,7 +407,13 @@
   --measure: 34rem;
   --page: 76rem;
   --radius: 3px;
-  --shadow: 0 1px 2px rgba(20,22,30,.06), 0 8px 24px -12px rgba(20,22,30,.18);
+  /* NO --shadow. The register called the vocabulary "a rest state and a
+     lifted one" and there is no rest state: nothing on this site carries a
+     shadow until it is hovered. Declared in all three world blocks, spent in
+     none of them. The two `box-shadow` values this stylesheet really has are
+     --shadow-lift and an inset 1.5px ring, which is a focus outline rather
+     than a shadow — so the reason in docs/invariants.json was describing a
+     vocabulary the stylesheet does not have. */
   --shadow-lift: 0 2px 4px rgba(20,22,30,.08), 0 18px 40px -18px rgba(20,22,30,.30);
 }
 
@@ -486,7 +503,6 @@ body[data-world="intelligence"] {
   --warn-bg:      #271719;
   --provenance:   var(--atlantic-lift);
 
-  --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 24px -12px rgba(0,0,0,.7);
   --shadow-lift: 0 2px 4px rgba(0,0,0,.55), 0 18px 40px -18px rgba(0,0,0,.8);
 
   color-scheme: dark;
@@ -524,7 +540,6 @@ body[data-world="intelligence"] {
     --warn-bg:      #271719;
   --provenance:   var(--atlantic-lift);
 
-    --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 24px -12px rgba(0,0,0,.7);
     --shadow-lift: 0 2px 4px rgba(0,0,0,.55), 0 18px 40px -18px rgba(0,0,0,.8);
   }
 }

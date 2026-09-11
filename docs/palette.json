@@ -258,11 +258,6 @@
       "name": "Terracotta Lift",
       "role": "the cultural accent for a dark-preference reader: #a4491f is 3.17:1 on graphite"
     },
-    "ultramarine": {
-      "hex": "#665cff",
-      "name": "Ultramarine",
-      "role": "atmosphere only: gradients, map washes, immersive moments. Never type"
-    },
     "warn": {
       "hex": "#981f31",
       "name": "Advisory Red",
@@ -456,12 +451,6 @@
       "ui": true
     },
     {
-      "fg": "ultramarine",
-      "bg": "limestone-3",
-      "text": false,
-      "ui": true
-    },
-    {
       "fg": "warn",
       "bg": "limestone",
       "text": true,
@@ -508,16 +497,6 @@
       "why": "2.44 — the dark world's accent is a UI edge at most on paper."
     },
     {
-      "fg": "ultramarine",
-      "bg": "limestone",
-      "why": "4.28 — fails body text. Ultramarine is atmosphere, never type."
-    },
-    {
-      "fg": "ultramarine",
-      "bg": "graphite",
-      "why": "4.06 — fails body text."
-    },
-    {
       "fg": "terracotta",
       "bg": "graphite",
       "why": "3.17 — the cultural accent has to lift at night. Use terracotta-lift."
@@ -548,7 +527,8 @@
     "stock-tourist photography",
     "imagery that reads as AI-generated",
     "the letters A and I in the masthead, the navigation, or any h1",
-    "electric lime, anywhere: it was the dark world's accent and it ended up drawing continents"
+    "electric lime, anywhere: it was the dark world's accent and it ended up drawing continents",
+    "ultramarine as a CSS colour. It is real in this product and it is not a page colour: it is the violet end of the PLATE ramp, hue 244° in render.PLATE_HUES. As a custom property it was declared for the life of this palette and spent by no rule, while the register went on recomputing a contrast claim about it on every build — arithmetic about a colour the site does not ship"
   ],
   "distinct": {
     "$comment": "A CONTRAST RATIO CANNOT SAY THAT TWO COLOURS ARE DIFFERENT COLOURS. It is a ratio of luminances, so two hues at the same lightness always measure 1.0 — and every contrast check on this site passed while the advisory red and the cultural accent sat fourteen degrees apart at identical saturation and identical lightness. A travel advisory and a story kicker were the same colour to the eye, on the map, on the tags and in the notes. These pairs must be told apart by HUE, which is the property a ratio cannot see.",
