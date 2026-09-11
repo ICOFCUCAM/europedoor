@@ -2626,6 +2626,47 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
   -webkit-mask-image: linear-gradient(to bottom, #000 46%, transparent 84%);
   mask-image: linear-gradient(to bottom, #000 46%, transparent 84%); }
 
+/* AND THE SCRIM WAS GATED ON A PHOTOGRAPH THE REGISTER DOES NOT HOLD.
+ *
+ * "A scrim is not decoration here: it is what makes the contrast ratio a
+ * property of the design rather than of the picture" — written on the rule
+ * below, which is `.herofull.shot::after` and therefore applies only once a
+ * photograph is licensed. The drawn hero, which is what every reader has
+ * actually seen, had no scrim at all: its type sat straight on the drawing,
+ * so the ratio was a property of the picture, which is the thing the
+ * sentence one line up says a scrim exists to prevent.
+ *
+ * The declared figures above are real and were measured against the WATER —
+ * 7.7:1 bare, 6.9:1 on the lightest pool. The continent is drawn over that
+ * water now, and the standfirst's right-hand end runs across the lit
+ * parchment of Iberia: sampled off the rendered pixels with the type
+ * hidden, limestone at 88% over that ground measures 3.39:1, under the 4.5
+ * AA floor, on the most-seen page on the site. Every contrast check here
+ * reads a declared token against a declared background, and not one of them
+ * had ever asked what colour is actually under the words.
+ *
+ * A bottom-left wash rather than a full scrim, because the picture is the
+ * product: the type occupies one corner and the continent must stay
+ * luminous everywhere else. Five stops rather than two — a two-stop ramp
+ * has a crease at each end and the eye draws a line along it, which this
+ * hero has already been fixed for twice. */
+/* z-index 0 rather than -1, and the type lifted to 1: `.heroeurope` is at 0
+ * and a wash under the drawing is a wash under the thing it has to darken.
+ * The first version was at -1, the sea behind the type went from 30,84,105
+ * to 22,44,53 and the lit parchment of Iberia — the only place the ratio
+ * actually failed — did not move by one value. */
+.herofull::after {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(86% 78% at 2% 104%,
+    color-mix(in srgb, var(--graphite) 76%, transparent) 0%,
+    color-mix(in srgb, var(--graphite) 72%, transparent) 26%,
+    color-mix(in srgb, var(--graphite) 56%, transparent) 50%,
+    color-mix(in srgb, var(--graphite) 28%, transparent) 70%,
+    color-mix(in srgb, var(--graphite) 8%, transparent) 86%,
+    transparent 100%);
+}
+
 /* The photograph, when one is licensed, and the scrim that keeps the type
  * readable over it. A scrim is not decoration here: it is what makes the
  * contrast ratio a property of the design rather than of the picture. */
@@ -2640,7 +2681,7 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 }
 .herofull .credit { position: absolute; right: var(--s4); bottom: var(--s3); z-index: 1;
                     font-size: var(--t-xs); color: color-mix(in srgb, var(--limestone) 70%, transparent); }
-.herobody { max-width: 46rem; }
+.herobody { max-width: 46rem; position: relative; z-index: 1; }
 .herofull .kicker { color: color-mix(in srgb, var(--limestone) 78%, transparent); }
 /* The kicker repeats the headline verbatim, so it is decoration to a
  * screen reader and is hidden from one rather than read twice. */

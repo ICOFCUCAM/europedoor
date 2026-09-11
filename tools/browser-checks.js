@@ -2071,6 +2071,100 @@ async function main() {
   }
   await page.setViewportSize({ width: 1280, height: 900 });
 
+  // ── THE CONTRAST UNDER THE GLYPHS, NOT UNDER THE TOKEN ─────────────
+  //
+  // Every contrast assertion in this suite reads a declared colour against a
+  // declared background, and the hero has neither: its type sits on a
+  // drawing of Europe, so the ratio varies from letter to letter and the
+  // number in the stylesheet's own comment ("7.7:1 bare, 6.9:1 on the
+  // lightest pool") was measured against the WATER, before the continent was
+  // drawn over it. Nothing here had ever asked what colour is actually under
+  // the words.
+  //
+  // The instrument shoots the page twice, with the type and without it. A
+  // pixel that differs between the two is a pixel a glyph paints, and the
+  // ground under exactly those pixels is what the reader's eye is up
+  // against. MEASURING THE BOX INSTEAD IS WRONG AND SAYS SO LOUDLY: the h1's
+  // measure is 14ch and the headline does not fill it, so a scan over the
+  // rectangle reported the bright parchment in the gutter past the last
+  // letter as a failure of the type — 2.15:1 against a real 9.58.
+  //
+  // The screenshots come back into the page as data: URLs, which `img-src
+  // 'self' data:` already allows, rather than through a PNG decoder here.
+  {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(base + "/", { waitUntil: "networkidle" });
+    await page.waitForTimeout(400);
+    const SEL = [[".herobody h1", 3.0], [".herobody .lede", 4.5]];
+    const withType = (await page.screenshot()).toString("base64");
+    await page.evaluate((sels) => {
+      sels.forEach((s) => document.querySelectorAll(s)
+        .forEach((e) => { e.style.visibility = "hidden"; }));
+    }, SEL.map(([s]) => s));
+    const noType = (await page.screenshot()).toString("base64");
+    const measured = await page.evaluate(async ({ a, b, sels }) => {
+      const load = (d) => new Promise((res) => {
+        const i = new Image(); i.onload = () => res(i); i.src = "data:image/png;base64," + d;
+      });
+      const grab = async (d) => {
+        const img = await load(d);
+        const c = document.createElement("canvas");
+        c.width = img.width; c.height = img.height;
+        c.getContext("2d").drawImage(img, 0, 0);
+        return c.getContext("2d").getImageData(0, 0, img.width, img.height);
+      };
+      const A = await grab(a), B = await grab(b);
+      const lum = (r, g, bl) => {
+        const f = (v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+        return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(bl);
+      };
+      const out = [];
+      for (const sel of sels) {
+        const e = document.querySelector(sel);
+        if (!e) { out.push({ sel, missing: true }); continue; }
+        const r = e.getBoundingClientRect();
+        const col = getComputedStyle(e).color;
+        let fg = [255, 255, 255], al = 1;
+        const m = col.match(/color\(srgb ([\d.]+) ([\d.]+) ([\d.]+)(?: \/ ([\d.]+))?\)/);
+        if (m) { fg = [m[1] * 255, m[2] * 255, m[3] * 255]; al = m[4] ? +m[4] : 1; }
+        else { const n = (col.match(/[\d.]+/g) || []).map(Number); fg = n.slice(0, 3); al = n[3] === undefined ? 1 : n[3]; }
+        let worst = Infinity, at = null, painted = 0;
+        const dpr = A.width / innerWidth;
+        for (let y = Math.round(r.top * dpr); y < Math.round(r.bottom * dpr); y++) {
+          for (let x = Math.round(r.left * dpr); x < Math.round(r.right * dpr); x++) {
+            const i = (y * A.width + x) * 4;
+            const d = Math.abs(A.data[i] - B.data[i]) + Math.abs(A.data[i + 1] - B.data[i + 1])
+                    + Math.abs(A.data[i + 2] - B.data[i + 2]);
+            if (d < 40) continue;             // no glyph paints here
+            painted++;
+            const g = [B.data[i], B.data[i + 1], B.data[i + 2]];
+            const Lb = lum(g[0], g[1], g[2]);
+            const Lf = lum(fg[0] * al + g[0] * (1 - al), fg[1] * al + g[1] * (1 - al),
+                           fg[2] * al + g[2] * (1 - al));
+            const cr = (Math.max(Lf, Lb) + 0.05) / (Math.min(Lf, Lb) + 0.05);
+            if (cr < worst) { worst = cr; at = [x, y, g]; }
+          }
+        }
+        out.push({ sel, worst, at, painted });
+      }
+      return out;
+    }, { a: withType, b: noType, sels: SEL.map(([s]) => s) });
+    for (const [sel, floor] of SEL) {
+      const r = measured.find((x) => x.sel === sel);
+      ok(r && !r.missing, `${sel} is not on the homepage to measure`);
+      if (!r || r.missing) continue;
+      // A count of the glyph pixels, because a diff that finds none reports
+      // Infinity and passes — the same shape as a suite that stops counting.
+      ok(r.painted > 400,
+         `${sel}: only ${r.painted} glyph pixels found — the two shots did ` +
+         "not differ, so this measured nothing and would pass on anything");
+      ok(r.worst >= floor,
+         `${sel} over the drawn hero measures ${r.worst.toFixed(2)}:1 at its ` +
+         `worst glyph pixel, under the ${floor}:1 floor — ground ` +
+         `rgb(${(r.at || [])[2]}) at ${(r.at || []).slice(0, 2)}`);
+    }
+  }
+
   // ── a divider with nothing on the other side of it ─────────────────
   //
   // A separator belongs to the RELATIONSHIP, not to the element, and the
@@ -2087,7 +2181,16 @@ async function main() {
       document.querySelectorAll("main > *").forEach((e) => {
         if (e.nextElementSibling) return;
         const c = getComputedStyle(e);
-        if (parseFloat(c.borderBottomWidth) > 0) out.push(e.className || e.tagName);
+        // A DIVIDER, NOT A BOX. The first version asked only whether a bottom
+        // border existed, and /map's `.maplist` is a bordered panel whose
+        // fourth side is not a separator from anything — the check was
+        // pinning a shape where the promise is "a rule with nothing on the
+        // other side of it". A divider is a bottom edge and three bare ones.
+        const box = ["Top", "Left", "Right"]
+          .some((k) => parseFloat(c["border" + k + "Width"]) > 0);
+        if (!box && parseFloat(c.borderBottomWidth) > 0) {
+          out.push(e.className || e.tagName);
+        }
       });
       return out;
     });
