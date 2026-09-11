@@ -299,11 +299,20 @@ def main(argv):
     env = {"PEXELS_API_BASE": base, "PEXELS_API_KEY": "stub-key-not-a-secret"}
 
     reg_backup = open(REGISTER, encoding="utf-8").read()
+    # THE SUITE NOW REWRITES THE INVARIANT REGISTER, so it owns putting it
+    # back. `docs/invariants.json` is generated exactly like `site/`, and a
+    # test that leaves it moved leaves the repository claiming a photograph
+    # is licensed after the photograph has been deleted — which is the same
+    # class of loss as leaving a stub original on disk.
+    INVARIANTS = os.path.join(ROOT, "docs", "invariants.json")
+    inv_backup = open(INVARIANTS, encoding="utf-8").read()
     made = []
 
     def cleanup():
         with open(REGISTER, "w", encoding="utf-8") as fh:
             fh.write(reg_backup)
+        with open(INVARIANTS, "w", encoding="utf-8") as fh:
+            fh.write(inv_backup)
         for f in made:
             if os.path.exists(f):
                 os.remove(f)
@@ -604,6 +613,43 @@ def main(argv):
             check(f"{purpose.split('@')[0]} renders its band on its own page",
                   "pageband" in html and "<picture" in html,
                   f"{where}: {'no file' if not html else 'no band'}")
+
+        # ── THE ORDER THE WORKFLOW HAS TO RUN THESE IN ──────────────
+        #
+        # `tools/checks.py` RUNS THE INVARIANT REGISTER AS ONE OF ITS OWN
+        # CHECKS. So a workflow that rewrites the register AFTER its gate step
+        # never reaches the rewrite: the run dies inside checks.py on the very
+        # row the rewrite exists to move. That is the ordering mistake this
+        # repository already recorded once, in the local desk, in exactly
+        # those words — "the fix was in the right place and the wrong order" —
+        # and it was made again in the workflow, where it cost a real
+        # acquisition that had already fetched, hashed, derived and
+        # registered eight photographs.
+        #
+        # The sequence is BUILD, then rewrite, then gate. Asserted here in
+        # that order, with the middle step's necessity proved rather than
+        # assumed: before the rewrite the register must FAIL, because a
+        # photograph landing is exactly what `safety.img_tags` is recorded to
+        # notice.
+        iv = run(["tools/invariants.py", "--check"], {})
+        check("the invariant register refuses until it is rewritten",
+              iv.returncode != 0,
+              "a photograph landed and no invariant moved — the register has "
+              "stopped noticing")
+        ck = run(["tools/checks.py"], {})
+        check("and checks.py fails too, because it runs the register",
+              ck.returncode != 0,
+              "checks.py passed with a register that invariants.py refuses, "
+              "so the two disagree about the same rows")
+        w = run(["tools/invariants.py", "--write"], {})
+        check("the register rewrites", w.returncode == 0,
+              (w.stdout + w.stderr)[-300:])
+        iv2 = run(["tools/invariants.py", "--check"], {})
+        check("and then holds", iv2.returncode == 0,
+              (iv2.stdout + iv2.stderr)[-300:])
+        ck2 = run(["tools/checks.py"], {})
+        check("and checks.py passes with a photograph in the register",
+              ck2.returncode == 0, (ck2.stdout + ck2.stderr)[-600:])
 
         bt = os.path.join(ROOT, "site", "europe", "belgium", "index.html")
         belgium = open(bt, encoding="utf-8").read() if os.path.exists(bt) else ""

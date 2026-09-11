@@ -270,15 +270,41 @@ jobs:
           python3 -m pip install --quiet pillow pillow-avif-plugin
           python3 scripts/images/derive.py "${{ inputs.purpose }}"
 
-      - name: Rebuild and run every gate
+      - name: Rebuild
         run: |
           set -euo pipefail
           python3 tools/build.py check
           python3 tools/build.py
+
+      - name: Let the invariant register move, and say what moved
+        run: |
+          set -euo pipefail
+          if python3 tools/invariants.py --check; then
+            echo "no invariant moved"
+          else
+            echo "── an invariant moved; rewriting the register ──"
+            python3 tools/invariants.py --write
+            git --no-pager diff --unified=0 -- docs/invariants.json \
+              | grep -E '^[+-] ' || true
+            python3 tools/invariants.py --check
+          fi
+
+      - name: Run every gate
+        run: |
+          set -euo pipefail
           python3 tools/checks.py
           python3 tools/section-audit.py --check
           python3 tools/ux-audit.py --check
 
+      # AND IT RUNS BEFORE checks.py, NOT AFTER IT. `tools/checks.py` runs
+      # the invariant register as one of its own checks, so a rewrite placed
+      # after the gate step never executes — the run dies inside checks.py on
+      # the very row the rewrite exists to move. THAT IS THE SAME ORDERING
+      # MISTAKE THIS REPOSITORY ALREADY RECORDED ONCE, in the local desk,
+      # in exactly these words: "the fix was in the right place and the wrong
+      # order". It needs the site BUILT first, because the register measures
+      # built output, which is why the build is now its own step above.
+      #
       # THE INVARIANT REGISTER IS MEANT TO MOVE ON THE FIRST PHOTOGRAPH.
       #
       # `safety.img_tags` is recorded as zero with the reason written out —
@@ -294,19 +320,6 @@ jobs:
       # derived them, registered them, rebuilt the site, passed all 95 static
       # checks — and then refused itself on the one row that moving proves it
       # worked. Every moved row is named in the log and in the commit.
-      - name: Let the invariant register move, and say what moved
-        run: |
-          set -euo pipefail
-          if python3 tools/invariants.py --check; then
-            echo "no invariant moved"
-          else
-            echo "── an invariant moved; rewriting the register ──"
-            python3 tools/invariants.py --write
-            git --no-pager diff --unified=0 -- docs/invariants.json \
-              | grep -E '^[+-] ' || true
-            python3 tools/invariants.py --check
-          fi
-
       - name: Browser and design gates
         run: |
           set -euo pipefail
@@ -482,15 +495,41 @@ jobs:
       # EVERY GATE, ONCE, OVER THE FINISHED SET. Running them between
       # acquisitions would check thirteen half-built states and never the one
       # that ships.
-      - name: Rebuild and run every gate
+      - name: Rebuild
         run: |
           set -euo pipefail
           python3 tools/build.py check
           python3 tools/build.py
+
+      - name: Let the invariant register move, and say what moved
+        run: |
+          set -euo pipefail
+          if python3 tools/invariants.py --check; then
+            echo "no invariant moved"
+          else
+            echo "── an invariant moved; rewriting the register ──"
+            python3 tools/invariants.py --write
+            git --no-pager diff --unified=0 -- docs/invariants.json \
+              | grep -E '^[+-] ' || true
+            python3 tools/invariants.py --check
+          fi
+
+      - name: Run every gate
+        run: |
+          set -euo pipefail
           python3 tools/checks.py
           python3 tools/section-audit.py --check
           python3 tools/ux-audit.py --check
 
+      # AND IT RUNS BEFORE checks.py, NOT AFTER IT. `tools/checks.py` runs
+      # the invariant register as one of its own checks, so a rewrite placed
+      # after the gate step never executes — the run dies inside checks.py on
+      # the very row the rewrite exists to move. THAT IS THE SAME ORDERING
+      # MISTAKE THIS REPOSITORY ALREADY RECORDED ONCE, in the local desk,
+      # in exactly these words: "the fix was in the right place and the wrong
+      # order". It needs the site BUILT first, because the register measures
+      # built output, which is why the build is now its own step above.
+      #
       # THE INVARIANT REGISTER IS MEANT TO MOVE ON THE FIRST PHOTOGRAPH.
       #
       # `safety.img_tags` is recorded as zero with the reason written out —
@@ -506,19 +545,6 @@ jobs:
       # derived them, registered them, rebuilt the site, passed all 95 static
       # checks — and then refused itself on the one row that moving proves it
       # worked. Every moved row is named in the log and in the commit.
-      - name: Let the invariant register move, and say what moved
-        run: |
-          set -euo pipefail
-          if python3 tools/invariants.py --check; then
-            echo "no invariant moved"
-          else
-            echo "── an invariant moved; rewriting the register ──"
-            python3 tools/invariants.py --write
-            git --no-pager diff --unified=0 -- docs/invariants.json \
-              | grep -E '^[+-] ' || true
-            python3 tools/invariants.py --check
-          fi
-
       - name: Browser and design gates
         run: |
           set -euo pipefail
