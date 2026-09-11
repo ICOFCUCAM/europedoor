@@ -2071,6 +2071,31 @@ async function main() {
   }
   await page.setViewportSize({ width: 1280, height: 900 });
 
+  // ── a divider with nothing on the other side of it ─────────────────
+  //
+  // A separator belongs to the RELATIONSHIP, not to the element, and the
+  // index hero's rule had been written as a property of the head. On the
+  // 404 — whose drawing is the entire body — that shipped as a hairline
+  // across the column followed by two hundred and seventy pixels of nothing
+  // above the footer, on the one page a reader reaches having already failed
+  // to find something. No count sees an empty band, and no check reads a
+  // divider for what is on the other side of it.
+  for (const u of ["/404", "/", "/countries", "/map"]) {
+    await page.goto(base + u, { waitUntil: "load" });
+    const bad = await page.evaluate(() => {
+      const out = [];
+      document.querySelectorAll("main > *").forEach((e) => {
+        if (e.nextElementSibling) return;
+        const c = getComputedStyle(e);
+        if (parseFloat(c.borderBottomWidth) > 0) out.push(e.className || e.tagName);
+      });
+      return out;
+    });
+    ok(bad.length === 0,
+       `${u}: the last thing in main draws a bottom rule with nothing under ` +
+       `it — ${bad.join(", ")}`);
+  }
+
   // ── a macro region has to look like one ────────────────────────────
   //
   // A macro region is the only grouping in this atlas with real polygons

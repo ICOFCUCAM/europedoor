@@ -4565,6 +4565,15 @@ body[data-hero] .masthead { position: sticky; }
   padding: var(--s6) 0 var(--s7); border-bottom: 1px solid var(--rule); max-width: none;
 }
 .pagehead.ihero.wide { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
+/* A SEPARATOR BELONGS TO THE RELATIONSHIP, NOT THE ELEMENT, and this one had
+ * been written as a property of the head. Every index hero draws a rule under
+ * itself to part the opening from the set below it — right on twenty-one
+ * families and wrong on the 404, whose drawing IS the body: the rendered page
+ * showed a hairline across the column and then two hundred and seventy pixels
+ * of nothing above the footer, on the one page a reader arrives at having
+ * already failed to find something. Nothing counts an empty band, and no
+ * check reads a divider for what is on the other side of it. */
+main > .pagehead:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
 .iherotext h1 {
   font-family: var(--serif); font-size: clamp(var(--t-3xl), 5.2vw, var(--t-5xl));
   line-height: 1.12; margin: 0 0 var(--s4); text-wrap: balance;

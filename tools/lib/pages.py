@@ -6011,7 +6011,12 @@ def experiences_index(data):
          '<a href="/sources">Natural Earth</a>, public domain.'
          + datacut_line()
          + offframe_line(sorted({project(it["city"]["lat"], it["city"]["lon"])
-                                 for it in items}), data))}
+                                 for it in items}), data, listed=False))}
+<!-- listed=False on the off-frame note: the drawing plots every place in
+     the Atlas with an experience, and the body under it shows twenty-four
+     of the 197 — so "that place is in the list below" pointed at a list
+     that does not hold the place it names. Found by the check written for
+     the 404, on a page the 404's own fix would have walked past. -->
 <!-- "Recently added" WAS A CLAIM THE DATA CANNOT SUPPORT. An experience
      carries a slug, a name, a kind, a band and a summary, and no date of
      any sort, so these 24 were simply the first 24 the loader returned in
@@ -6692,7 +6697,7 @@ def glyph_view(pts, pad_frac=0.34, min_pad=90.0, min_span=340.0):
     return f"{x0:.0f} {y0:.0f} {w:.0f} {h:.0f}"
 
 
-def offframe_line(pts, data):
+def offframe_line(pts, data, listed=True):
     """One sentence when a drawing cannot hold one of the places it is about.
 
     ONE DESTINATION IN THREE HUNDRED AND NINETEEN PROJECTS ABOVE THE CANVAS.
@@ -6714,6 +6719,17 @@ def offframe_line(pts, data):
     sentence names the place and its latitude, and it is derived, so it
     appears only while the fault does and says nothing the moment the canvas
     or the dataset changes.
+
+    AND `listed` IS THERE BECAUSE THE SENTENCE MADE A CLAIM ABOUT THE PAGE
+    AROUND IT. It ended "that place is in the list below" unconditionally,
+    which is true of the three callers that print a list of their own set and
+    false of the 404, whose drawing is the whole body — so the one page a
+    reader reaches having already failed to find something pointed them at a
+    list that is not there. A shared function cannot know what follows it,
+    so the caller says. That is the same failure as the journey map caption
+    promising a note under the leg after the note was removed: removing or
+    never having a surface leaves the prose pointing at it, and only
+    rendering the page finds it.
     """
     out = [p for p in pts
            if not (0.0 <= p[0] <= MAP_W and 0.0 <= p[1] <= MAP_H)]
@@ -6727,10 +6743,13 @@ def offframe_line(pts, data):
     if not names:
         return (f" {n_of(len(out), 'place')} in this set "
                 f"{'lies' if len(out) == 1 else 'lie'} outside the frame.")
-    return (" " + and_list([f"{esc(nm)} at {lat:.0f}°N" for nm, lat in names])
+    said = (" " + and_list([f"{esc(nm)} at {lat:.0f}°N" for nm, lat in names])
             + (" is" if len(names) == 1 else " are")
             + " above the top of this frame: the drawing stops where this "
-              "atlas's map data does, and "
+              "atlas's map data does")
+    if not listed:
+        return said + "."
+    return (said + ", and "
             + ("that place is " if len(names) == 1 else "those places are ")
             + "in the list below.")
 
@@ -8860,7 +8879,7 @@ def not_found(data):
             '<a class="btn ghost" href="/search">Search everything</a>'
             '<a class="btn ghost" href="/plan">Plan a journey</a>',
     note=geo.sources_line(geo.load("europe-lod0.json")) + datacut_line()
-         + offframe_line(pts, data))}
+         + offframe_line(pts, data, listed=False))}
 """
     return "/404.html", page(
         "Not found", body, path="/404", area=None,

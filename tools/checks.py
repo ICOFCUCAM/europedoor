@@ -3948,6 +3948,36 @@ def c_offframe():
             fail(f"{canonical_of(f)}: the page says a place is outside the "
                  f"frame and no mark is. A note that outlives its fault is "
                  f"the caption-for-a-deleted-claim failure.")
+        # AND THE SENTENCE MAKES A CLAIM ABOUT THE PAGE AROUND IT. It ends
+        # "that place is in the list below", which was written into the
+        # shared function and is therefore true of whatever page happens to
+        # print a list — the 404's drawing is its whole body, so for the life
+        # of that sentence the one page a reader reaches after failing to
+        # find something pointed them at a list that is not there. The
+        # journey caption promising "a note under the leg" failed exactly
+        # this way, and a source-level check passed on it.
+        # COMMENTS OUT FIRST. This repository has now made the same mistake
+        # three times — the invariant register counted a font size that
+        # existed only in a comment about not adding font sizes, a photo
+        # test matched the note explaining that nothing is recommended, and
+        # this one went red on the HTML comment recording WHY /experiences
+        # does not make the claim. An instrument that cannot tell code from
+        # the documentation of code is reading the file rather than the page.
+        vis = re.sub(r"<!--.*?-->", "", h, flags=re.S)
+        m = re.search(r"([A-Z][^.<>]{2,40}?) at \d+°N (?:is|are) above the "
+                      r"top of this frame", vis)
+        if m and "in the list below" in vis:
+            name = m.group(1).split(" and ")[-1].strip()
+            # BELOW IS DOCUMENT ORDER FROM THE SENTENCE ITSELF, not
+            # "after </header>" — the masthead is a <header> too, so the
+            # first close tag on every page is above the note rather than
+            # below it, and the slice then contained the sentence's own
+            # words. It reported clean on the page it was written for.
+            end = vis.find("</main>", m.end())
+            body = vis[m.end():end if end > 0 else len(vis)]
+            if name not in body:
+                fail(f"{canonical_of(f)}: the note says {name!r} is in the "
+                     f"list below and nothing below the head names it.")
     if n < 1000:
         fail(f"only {n} marks examined — the scan found almost none")
     return n
