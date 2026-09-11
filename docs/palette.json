@@ -250,6 +250,16 @@
       "hex": "#665cff",
       "name": "Ultramarine",
       "role": "atmosphere only: gradients, map washes, immersive moments. Never type"
+    },
+    "warn": {
+      "hex": "#981f31",
+      "name": "Advisory Red",
+      "role": "a travel advisory, a failed step, a destructive action. The one colour that must not read as the brand, and — measured as a hue distance rather than as a contrast ratio — must not read as the cultural accent either"
+    },
+    "warn-lift": {
+      "hex": "#ee8192",
+      "name": "Advisory Lift",
+      "role": "the same, on the graphite ground, where #981f31 measures 1.84"
     }
   },
   "claims": [
@@ -438,6 +448,30 @@
       "bg": "limestone-3",
       "text": false,
       "ui": true
+    },
+    {
+      "fg": "warn",
+      "bg": "limestone",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "warn",
+      "bg": "limestone-2",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "warn-lift",
+      "bg": "graphite",
+      "text": true,
+      "ui": true
+    },
+    {
+      "fg": "warn-lift",
+      "bg": "graphite-2",
+      "text": true,
+      "ui": true
     }
   ],
   "forbidden": [
@@ -485,6 +519,11 @@
       "fg": "terracotta",
       "bg": "limestone-3",
       "why": "4.48 — just misses. Use terracotta-2."
+    },
+    {
+      "fg": "warn",
+      "bg": "graphite",
+      "why": "1.84 — an advisory nobody can see. Use warn-lift."
     }
   ],
   "never": [
@@ -498,5 +537,35 @@
     "imagery that reads as AI-generated",
     "the letters A and I in the masthead, the navigation, or any h1",
     "electric lime, anywhere: it was the dark world's accent and it ended up drawing continents"
-  ]
+  ],
+  "distinct": {
+    "$comment": "A CONTRAST RATIO CANNOT SAY THAT TWO COLOURS ARE DIFFERENT COLOURS. It is a ratio of luminances, so two hues at the same lightness always measure 1.0 — and every contrast check on this site passed while the advisory red and the cultural accent sat fourteen degrees apart at identical saturation and identical lightness. A travel advisory and a story kicker were the same colour to the eye, on the map, on the tags and in the notes. These pairs must be told apart by HUE, which is the property a ratio cannot see.",
+    "min_hue_degrees": 25,
+    "pairs": [
+      [
+        "warn",
+        "terracotta"
+      ],
+      [
+        "warn-lift",
+        "terracotta-lift"
+      ],
+      [
+        "warn",
+        "cobalt-deep"
+      ],
+      [
+        "atlantic",
+        "cobalt-deep"
+      ],
+      [
+        "warn-lift",
+        "cobalt-air"
+      ],
+      [
+        "atlantic-lift",
+        "cobalt-lift"
+      ]
+    ]
+  }
 }

@@ -18,6 +18,7 @@ from __future__ import annotations
 import glob
 import hashlib
 import html.parser
+import colorsys
 import json
 import os
 import subprocess
@@ -1678,6 +1679,42 @@ def c_instruction():
         if not c.get("why"):
             fail(f"forbidden pairing {c['fg']} on {c['bg']} carries no reason")
         n += 1
+
+    # A CONTRAST RATIO CANNOT SAY THAT TWO COLOURS ARE DIFFERENT COLOURS.
+    # It is a ratio of luminances, so two hues at the same lightness always
+    # measure 1.0 — and for the life of this palette the advisory red and the
+    # cultural accent sat fourteen degrees apart at IDENTICAL saturation and
+    # IDENTICAL lightness. #a32a1e against #a4491f measures 1.22, and every
+    # contrast assertion here passed while a travel advisory and a story
+    # kicker were the same colour to the eye: on the map dots, on the tags,
+    # in the notes. The dark pair was worse at 1.27, and both were salmon.
+    #
+    # So these pairs are told apart by HUE, which is the property a ratio
+    # cannot see. Circular distance, because 356 and 4 are eight degrees
+    # apart and not three hundred and fifty two.
+    dis = pal.get("distinct")
+    if not dis:
+        fail("docs/palette.json declares no hue distances — the only property "
+             "that can tell an advisory from an accent is unmeasured again")
+    else:
+        def _hue(hexv):
+            h = hexv.lstrip("#")
+            r, g, b = (int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))
+            return colorsys.rgb_to_hls(r, g, b)[0] * 360.0
+        for a, b in dis["pairs"]:
+            if a not in tok or b not in tok:
+                fail(f"a hue distance names an unknown token: {a} / {b}")
+                continue
+            ha, hb = _hue(tok[a]["hex"]), _hue(tok[b]["hex"])
+            d = abs(ha - hb) % 360.0
+            d = min(d, 360.0 - d)
+            if d < dis["min_hue_degrees"]:
+                fail(f"{a} ({tok[a]['hex']}, hue {ha:.0f}) and {b} "
+                     f"({tok[b]['hex']}, hue {hb:.0f}) are {d:.0f} degrees "
+                     f"apart and the register asks for "
+                     f"{dis['min_hue_degrees']} — a contrast ratio cannot see "
+                     f"this, which is how they stayed the same colour")
+            n += 1
 
     if sum(pal["ratio"][k] for k in pal["ratio"] if not k.startswith("$")) != 100:
         fail("the palette ratio does not add to 100")

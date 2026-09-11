@@ -138,9 +138,23 @@
   --signature:    var(--cobalt);
 
   /* Warnings are the one thing that must not be the brand colour, or an
-     advisory reads as a link. A brick red, measured: 6.46 on ivory. */
-  --warn:         #a32a1e;
-  --warn-bg:      #f7ebe8;
+     advisory reads as a link. A brick red, measured: 6.46 on ivory.
+     AND IT WAS THE CULTURAL ACCENT INSTEAD. #a32a1e is hue 5, saturation
+     69, lightness 38. Terracotta -- stories, events, experiences -- is hue
+     19, saturation 68, lightness 38. Fourteen degrees apart at identical
+     saturation and identical lightness, which measures 1.22:1 against each
+     other, so a travel advisory and a story kicker are the same colour to
+     the eye. The dark pair was worse: #f0a090 against terracotta-lift's
+     #e08a5c measures 1.27, and both are salmon.
+     A CONTRAST RATIO CANNOT SAY THAT TWO COLOURS ARE DIFFERENT COLOURS.
+     It is a ratio of luminances, so two hues at the same lightness always
+     measure 1.0 and every contrast check on this site said these were
+     fine. docs/palette.json states this one as a HUE DISTANCE instead: 28
+     degrees from terracotta and 30 from terracotta-lift, against the 25 the
+     rule asks for. True red rather than brick, and the contrast went 6.46
+     to 7.54 on limestone on the way past. */
+  --warn:         #981f31;
+  --warn-bg:      #f8ecee;
 
   /* THE CARTOGRAPHY — always INTELLIGENCE, wherever it is embedded.
      PAPER, INK, BLUE. The first version of these five was near-black water
@@ -451,8 +465,8 @@ body[data-world="intelligence"] {
   --door-dark:    #a3b4ff;
   --signature:    var(--cobalt-lift);
 
-  --warn:         #f0a090;
-  --warn-bg:      #2a1a17;
+  --warn:         #ee8192;
+  --warn-bg:      #271719;
 
   --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 24px -12px rgba(0,0,0,.7);
   --shadow-lift: 0 2px 4px rgba(0,0,0,.55), 0 18px 40px -18px rgba(0,0,0,.8);
@@ -488,8 +502,8 @@ body[data-world="intelligence"] {
     --door-dark:    #a3b4ff;
     --signature:    var(--cobalt-lift);
 
-    --warn:         #f0a090;
-    --warn-bg:      #2a1a17;
+    --warn:         #ee8192;
+    --warn-bg:      #271719;
 
     --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 24px -12px rgba(0,0,0,.7);
     --shadow-lift: 0 2px 4px rgba(0,0,0,.55), 0 18px 40px -18px rgba(0,0,0,.8);
