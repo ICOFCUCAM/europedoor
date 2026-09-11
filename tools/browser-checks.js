@@ -1552,6 +1552,52 @@ async function main() {
     }
   }
 
+  // ── MY EUROPE WITH SOMETHING IN IT ─────────────────────────────────
+  // Every check and every screenshot of /my-europe has looked at the empty
+  // state, because that is what a fresh browser gets. The POPULATED state is
+  // what a returning reader always gets, and it had two faults nobody could
+  // have seen from the other one: the portable list rendered at the browser's
+  // default twenty columns — 182 by 66 pixels holding the whole saved list
+  // as JSON, on the control whose purpose is to be copied from — and a
+  // collection heading sat exactly on the bottom edge of the panel above it.
+  for (const w of [1280, 390]) {
+    const mp = await browser.newPage({ viewport: { width: w, height: 900 } });
+    await mp.goto(base + "/my-europe", { waitUntil: "networkidle" });
+    await mp.evaluate(() => {
+      localStorage.setItem("europedoor.saved.v1", JSON.stringify([
+        { id: "city:norway/fjord-norway/bergen", kind: "City", label: "Bergen",
+          url: "/europe/norway/fjord-norway/bergen" },
+        { id: "city:austria/vienna-and-the-east/vienna", kind: "City",
+          label: "Vienna", url: "/europe/austria/vienna-and-the-east/vienna" },
+      ]));
+    });
+    await mp.reload({ waitUntil: "networkidle" });
+    await mp.waitForSelector("#mine .row, #mine h3");
+    const r = await mp.evaluate(() => {
+      const ta = document.querySelector("#portable");
+      const panel = document.querySelector("#mine .form");
+      const h = [...document.querySelectorAll("#mine h3")]
+        .find((x) => /Everything else/.test(x.textContent));
+      return {
+        over: document.documentElement.scrollWidth
+              - document.documentElement.clientWidth,
+        col: document.querySelector("main").getBoundingClientRect().width,
+        ta: ta ? ta.getBoundingClientRect().width : 0,
+        gap: (panel && h)
+          ? Math.round(h.getBoundingClientRect().top
+                       - panel.getBoundingClientRect().bottom)
+          : null,
+      };
+    });
+    ok(r.over <= 1, `a populated /my-europe overflows by ${r.over}px at ${w}`);
+    ok(r.ta > r.col * 0.6,
+       `at ${w} the portable list is ${Math.round(r.ta)}px in a ` +
+       `${Math.round(r.col)}px column — it exists to be copied from`);
+    ok(r.gap === null || r.gap >= 8,
+       `at ${w} a collection heading sits ${r.gap}px from the panel above it`);
+    await mp.close();
+  }
+
   // ── THE INTERFACE THE BROWSER PAINTS FOR YOU ───────────────────────
   // Selection and the form controls' accent were Chromium's defaults on
   // every page: dragging across a paragraph in the graphite world gave a
