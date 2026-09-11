@@ -3531,6 +3531,69 @@ async function main() {
   }
 
 
+  /* THE OTHER END OF THE CROP RULE: the box a photograph would sit in.
+   *
+   * data/image-purposes.json declares a `container` aspect range per slot
+   * and derives `safe_area` from it, and checks.py owns that arithmetic.
+   * Arithmetic on a declared number proves nothing about the page — the
+   * palette register asserted a contrast for a colour the stylesheet no
+   * longer had, for exactly this reason. So this end MEASURES.
+   *
+   * The measurement is possible without a photograph because the class a
+   * photograph adds can be added here: `.shot` on the element, and the
+   * drawing a photograph would replace removed. That is DOM, not style
+   * injection — the CSP forbids the second and is right to.
+   *
+   * The numbers this produced the first time are the whole reason the rule
+   * exists: the homepage hero's box swings 0.435 to 2.326, so 15% of a
+   * source frame is guaranteed visible, and the four doors 14%. An
+   * off-centre composition is unusable in either.
+   */
+  {
+    const purposes = JSON.parse(fs.readFileSync(
+      path.join(__dirname, "..", "data", "image-purposes.json"), "utf8")).purposes;
+    const BOX = [
+      { url: "/", sel: ".herofull", drop: ".heroeurope", of: "homepage-hero" },
+      { url: "/", sel: ".way", drop: null, of: "door-mountains" },
+      { url: "/journeys/", sel: ".iheroart", drop: null, of: "journeys-hero" },
+    ];
+    const WS = [320, 390, 480, 760, 834, 980, 1280, 1440, 1800, 2000];
+    const HS = [640, 900];
+    for (const b of BOX) {
+      const want = purposes[b.of] && purposes[b.of].container;
+      if (!want) { ok(false, `${b.of} declares no container`); continue; }
+      let lo = Infinity, hi = -Infinity, loAt = "", hiAt = "";
+      for (const w of WS) for (const h of HS) {
+        const bp = await browser.newPage({ viewport: { width: w, height: h } });
+        const r = await bp.goto(base + b.url, { waitUntil: "load" });
+        if (!r || r.status() !== 200) { await bp.close(); continue; }
+        await bp.evaluate(([sel, drop]) => {
+          if (drop) for (const e of document.querySelectorAll(drop)) e.remove();
+          for (const e of document.querySelectorAll(sel)) e.classList.add("shot");
+        }, [b.sel, b.drop]);
+        const got = await bp.evaluate((sel) => [...document.querySelectorAll(sel)]
+          .map((e) => e.getBoundingClientRect())
+          .filter((r) => r.width > 4 && r.height > 4)
+          .map((r) => r.width / r.height), b.sel);
+        await bp.close();
+        for (const a of got) {
+          if (a < lo) { lo = a; loAt = `${w}x${h}`; }
+          if (a > hi) { hi = a; hiAt = `${w}x${h}`; }
+        }
+      }
+      checked++;
+      ok(lo >= want.min_aspect - 0.02,
+         `${b.of}: the container measures ${lo.toFixed(3)} at ${loAt} and the ` +
+         `file declares a floor of ${want.min_aspect}. A box narrower than ` +
+         `declared crops more width than the safe area allows`);
+      checked++;
+      ok(hi <= want.max_aspect + 0.02,
+         `${b.of}: the container measures ${hi.toFixed(3)} at ${hiAt} and the ` +
+         `file declares a ceiling of ${want.max_aspect}. A box wider than ` +
+         `declared crops more height than the safe area allows`);
+    }
+  }
+
   /* A LINK A READER CANNOT SEE IS NOT REACHABLE BECAUSE IT IS FOCUSABLE.
    *
    * Below 44rem the masthead's seven sections were one line that scrolled

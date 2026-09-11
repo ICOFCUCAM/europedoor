@@ -5406,6 +5406,82 @@ def c_photo_roles():
     return n
 
 
+@check("every crop rule is the arithmetic of its measured container")
+def c_photo_safe_area():
+    """SAFE AREA IS DERIVED, SO A NUMBER TYPED HERE MUST BE RECOMPUTED.
+
+    A container narrower than its source crops width, a container wider
+    crops height. So the fraction of a source frame guaranteed visible at
+    every viewport is container_min / source_max horizontally and
+    source_min / container_max vertically, each capped at 1. That is the
+    whole of it, and it had never been written down: `min_width` and an
+    aspect range answer whether a photograph can go in the slot and say
+    nothing about how much of it survives being there.
+
+    The numbers are the reason this exists. The homepage hero's container
+    swings 0.435 to 2.326 — a phone renders it as a tall portrait and a
+    wide desktop as a band — so with the declared source range **15% of a
+    photograph's frame is guaranteed visible**, and the four doors are at
+    14%. An off-centre composition is unusable in either however good it
+    is, and nobody knew that before the box was measured.
+
+    The container is MEASURED in Chromium (see browser-checks.js, which
+    asserts the same boxes still lay out that way, by adding the class a
+    photograph would add). This end owns the arithmetic; that end owns the
+    measurement. Neither can drift without the other noticing.
+    """
+    spec = json.load(open(os.path.join(ROOT, "data", "image-purposes.json"),
+                          encoding="utf-8"))
+    n = 0
+    for name, pur in sorted(spec.get("purposes", {}).items()):
+        con = pur.get("container")
+        n += 1
+        if not con:
+            fail(f"image-purposes.json > {name}: no container. Every slot has "
+                 f"a box, and a crop rule that does not know the box is a "
+                 f"preference")
+            continue
+        if con.get("unmeasurable"):
+            n += 1
+            if not con.get("trigger"):
+                fail(f"image-purposes.json > {name}: the container is called "
+                     f"unmeasurable and carries no trigger. An unmeasurable "
+                     f"box is a defect with a fix, not a fact")
+            if pur.get("safe_area"):
+                fail(f"image-purposes.json > {name}: the container is "
+                     f"unmeasurable and a safe_area is declared anyway — that "
+                     f"is a derived number with nothing under it")
+            continue
+        sa = pur.get("safe_area") or {}
+        want_w = min(1.0, con["min_aspect"] / pur["max_aspect"])
+        want_h = min(1.0, pur["min_aspect"] / con["max_aspect"])
+        for key, want in (("width", want_w), ("height", want_h),
+                          ("frame", want_w * want_h)):
+            n += 1
+            got = sa.get(key)
+            if got is None or abs(float(got) - want) > 0.0015:
+                fail(f"image-purposes.json > {name}: safe_area.{key} is "
+                     f"{got!r} and the container {con['min_aspect']}-"
+                     f"{con['max_aspect']} against a source "
+                     f"{pur['min_aspect']}-{pur['max_aspect']} gives "
+                     f"{want:.3f}. It is derived — rewrite it rather than "
+                     f"arguing with it")
+        # A SLOT THAT GUARANTEES ALMOST NOTHING IS A SLOT THAT DESTROYS
+        # PHOTOGRAPHS. This is a floor on the DESIGN, not on the file: the
+        # answer when it trips is to narrow the container's swing or the
+        # source range, never to lower this.
+        n += 1
+        if want_w * want_h < 0.12:
+            fail(f"image-purposes.json > {name}: only "
+                 f"{want_w * want_h * 100:.0f}% of a source frame is "
+                 f"guaranteed visible ({want_w * 100:.0f}% of the width, "
+                 f"{want_h * 100:.0f}% of the height). Narrow the "
+                 f"container's aspect swing or the source range — do not "
+                 f"lower this floor, which exists because the hero measured "
+                 f"7% before anyone looked")
+    return n
+
+
 @check("a registered photograph appears on the page its purpose claims")
 def c_photo_published():
     """The register cannot claim a surface it does not reach.

@@ -3115,7 +3115,23 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 .herofull {
   position: relative; isolation: isolate; overflow: hidden;
   margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw);
-  min-height: min(84vh, 46rem);
+  /* THE HERO'S CONTAINER SWUNG 0.435 TO 3.720 AND NOBODY HAD MEASURED IT.
+     An 8.6x range of aspect, which with the declared source range left 7%
+     of a photograph's frame guaranteed visible — a slot that destroys
+     whatever is put in it rather than a slot that can be art-directed.
+
+     The wide end is this line: at 2000x640, min(84vh, 46rem) is 538 and the
+     block is 2000 wide. 43vw is a floor on the height that only engages
+     when the window is wider than it is tall, so the aspect cannot pass
+     100/43 = 2.33 at any size.
+
+     It is not only about a photograph nobody has licensed yet. RENDERED at
+     1920 the arch stopped reading as a doorway: the head's curve goes so
+     shallow it is an ellipse, the continent floats in the middle of it, and
+     a third of the picture is empty sea either side of a headline. The cap
+     is what a printed atlas does with a spread — the frame has proportions
+     of its own and does not simply take the paper's. */
+  min-height: max(min(84vh, 46rem), 43vw);
   display: grid; align-items: end;
   padding: calc(var(--s8) * 2) calc(50vw - 50%) var(--s8);
   margin-bottom: var(--s7);
