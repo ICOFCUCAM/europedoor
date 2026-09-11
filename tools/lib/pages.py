@@ -269,7 +269,7 @@ DUSK_CEILING = 0.80
 _DUSK_REACH = {}
 
 
-def dusk_reach(data):
+def dusk_reach(data=None):
     """How wide each data-cut fade may be, measured against the destinations.
 
     THE FADE WAS EXTINGUISHING THE PLACES IT EXISTS TO KEEP LEGIBLE. `data/geo/`
@@ -319,6 +319,13 @@ def dusk_reach(data):
     """
     if "v" in _DUSK_REACH:
         return _DUSK_REACH["v"]
+    if data is None:
+        # The glyph families reach this without a `data` in hand. Loading it
+        # here costs one read per build because the result is memoised, and
+        # the alternative is threading the whole dataset through four drawing
+        # functions that do not otherwise want it.
+        from . import data as _D
+        data = _D.load()
     a, b = MAPPROJ.xy(70.0, 52.0), MAPPROJ.xy(40.0, 52.0)
     mx, my = (a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0
     dx, dy = b[0] - a[0], b[1] - a[1]
@@ -349,7 +356,7 @@ def dusk_reach(data):
     return out
 
 
-def cut_fade(idprefix, w, h, reach=None):
+def cut_fade(idprefix, w, h, reach=None, cls="mapcut"):
     """The two data cuts, faded, for an instrument that draws the atlas.
 
     Painted rather than masked, because every country on these maps is a
@@ -370,7 +377,17 @@ def cut_fade(idprefix, w, h, reach=None):
     ax, ay = MAPPROJ.apex()
     r33 = MAPPROJ.parallel_radius(33.0)
     foot0, foot1 = (r33 - sb) / r33, (r33 - sa) / r33
+    # THE DEFS GO INSIDE THE GROUP, AND THIS IS THE SECOND IMPLEMENTATION TO
+    # GET IT WRONG. `cartography.datacut()` emitted them beside the group and
+    # every stop took the SVG default — black — because the rule that colours
+    # them is a class selector on the group. That was found and fixed one file
+    # over; this function had the same shape and nobody looked, because /map
+    # colours its stops by ID (`#mapedge stop`) and so was green. The moment a
+    # second caller asked for the class-scoped `.datacut`, the southern ramp
+    # came out as a black wash across North Africa on 21 index openings.
+    # Inside the group, the selector's own claim is true of the markup.
     return (
+        f'<g class="{cls}" aria-hidden="true">'
         f'<defs>'
         f'<linearGradient id="{idprefix}edge" gradientUnits="userSpaceOnUse"'
         f' x1="{ex1:.1f}" y1="{ey1:.1f}" x2="{ex2:.1f}" y2="{ey2:.1f}">'
@@ -379,7 +396,6 @@ def cut_fade(idprefix, w, h, reach=None):
         f' cx="{ax:.1f}" cy="{ay:.1f}" r="{r33:.1f}">'
         f'{dusk_stops(foot0, foot1)}</radialGradient>'
         f'</defs>'
-        f'<g class="mapcut" aria-hidden="true">'
         f'<rect x="0" y="0" width="{w}" height="{h}" fill="url(#{idprefix}edge)"/>'
         f'<rect x="0" y="0" width="{w}" height="{h}" fill="url(#{idprefix}foot)"/>'
         f'</g>'
@@ -3436,7 +3452,7 @@ def interest_page(data, i, ranking):
     # AND NO APERTURE. The refusal in signature-moments was about the door,
     # not about geography, and it still holds: this is a glyph.
     art = constellation([project(n["city"]["lat"], n["city"]["lon"])
-                         for n in cities]) if cities else ""
+                         for n in cities], cut=True) if cities else ""
     body = f"""
 {crumbs([("Europe", "/discover"), ("Experiences", "/experiences"), (i["name"], None)])}
 {constel_defs()}
@@ -3579,6 +3595,7 @@ def journeys_index(data):
     heroart = (f'<svg class="constel allroutes" viewBox="0 0 {MAP_W} {MAP_H}" '
                f'preserveAspectRatio="xMidYMid slice" '
                f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
+               f'{cut_fade("ih", MAP_W, MAP_H, dusk_reach(), cls="datacut")}'
                f'{allroutes}</svg>')
     body = f"""
 {crumbs([("Europe", "/discover"), ("Journeys", None)])}
@@ -6307,7 +6324,7 @@ def experiences_index(data):
          f"an unchecked listing says so on its face rather than hiding behind a star "
          f"rating.",
     art=constellation(sorted({project(it["city"]["lat"], it["city"]["lon"])
-                              for it in items})),
+                              for it in items}), cut=True),
     img=photo(data.get("images"), "experiences-hero", w=2000, h=1200,
               sizes="(min-width: 60rem) 52vw, 100vw"),
     actions='<a class="btn" href="/experiences/join">List your experience</a>'
@@ -6851,9 +6868,12 @@ def region_glyph(members, frame=None, min_span=0.0):
     # the silhouette is the whole reason the glyph works.
     view = (glyph_view(frame, min_span=min_span) if frame
             else f"0 0 {MAP_W} {MAP_H}")
+    # The data cut only where the drawing is at the full extent: a framed
+    # glyph is a window on one region and the cut is not in it.
+    _cut = "" if frame else cut_fade("rg", MAP_W, MAP_H, dusk_reach(), cls="datacut")
     return (f'<svg class="constel regionglyph" viewBox="{view}" '
             f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
-            f'{lit}</svg>')
+            f'{_cut}{lit}</svg>')
 
 
 def head_extent(pairs):
@@ -7104,7 +7124,7 @@ def offframe_line(pts, data, listed=True):
             + "in the list below.")
 
 
-def constellation(pts, extra="", route=False, frame=False):
+def constellation(pts, extra="", route=False, frame=False, cut=False):
     """A set of real destinations lit on the shared silhouette.
 
     THE ARGUMENT DRAWN, AND THE REASON IT REPLACED ELEVEN PAINTINGS. The
@@ -7140,9 +7160,24 @@ def constellation(pts, extra="", route=False, frame=False):
     # comparison only exists while all thirteen are drawn at one extent.
     # Framing them would delete the argument the family is making.
     view = glyph_view(pts) if (frame and pts) else f"0 0 {MAP_W} {MAP_H}"
+    # THE DATA CUT SHOWED RAW ON EVERY INDEX OPENING. All 21 `.iheroart`
+    # drawings are at the full extent, which means the straight diagonal at
+    # 52°E runs right through the arch — and there it is the worst case on
+    # the site, because the ground behind these is the sea panel, so the cut
+    # is a hard edge between parchment and deep navy rather than between
+    # parchment and paper. The plates have faded along it since the picture
+    # half got its data cuts and the hero since the hero was drawn; this
+    # family said it in a sentence under the picture and showed it raw above.
+    # A sentence and a fade are not alternatives: /map does both.
+    #
+    # Above the ground and below the marks, which is datacut()'s own rule, so
+    # a lit destination east of the cut keeps its dot. The wide reach rather
+    # than the measured one for the same reason.
+    cut = cut_fade("ih", MAP_W, MAP_H, dusk_reach(), cls="datacut") if cut and not (
+        frame and pts) else ""
     return (f'<svg class="constel{extra}" viewBox="{view}" '
             f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
-            f'{line}<g class="constel-lit">{dots}</g></svg>')
+            f'{cut}{line}<g class="constel-lit">{dots}</g></svg>')
 
 
 def themes_index(data):
@@ -7444,7 +7479,7 @@ def stories_index(data):
          f"food, faith, nature and culture. Every story links into the Atlas, and every "
          f"Atlas page that a story touches links back, so reading and planning are the "
          f"same motion.",
-    art=constellation(allplaces),
+    art=constellation(allplaces, cut=True),
     img=photo(data.get("images"), "stories-hero", w=2000, h=1200,
               sizes="(min-width: 60rem) 52vw, 100vw"),
     note='Every place these nine pieces are set in, on one frame. Coastline from '
@@ -9234,7 +9269,7 @@ def not_found(data):
     title="That door does not open.",
     lede=(f"The page is not here. The continent still is — all "
           f"{len(data['cities'])} destinations in the Atlas, on one drawing."),
-    art=constellation(pts),
+    art=constellation(pts, cut=True),
     actions='<a class="btn" href="/countries">Open the Atlas</a>'
             '<a class="btn ghost" href="/search">Search everything</a>'
             '<a class="btn ghost" href="/plan">Plan a journey</a>',

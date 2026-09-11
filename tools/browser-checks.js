@@ -1686,7 +1686,17 @@ async function main() {
   // and change none of them, and a rule matching no element at all is a
   // different fault. Reading the RESOLVED value is the only honest
   // instrument, and this palette contains no black at all.
-  for (const url of ["/", "/map", "/europe/norway/fjord-norway/bergen"]) {
+  //
+  // AND THE LIST GREW BECAUSE THE SAME MISTAKE WAS MADE TWICE MORE. The
+  // picture plates' `datacut()` emitted its defs BESIDE the group rather than
+  // inside it, so `.datacut stop` matched none of them; and `cut_fade()` had
+  // exactly the same shape and stayed green only because /map colours its
+  // stops by ID. The moment a class-scoped caller arrived — the 21 index
+  // openings — the southern ramp came out as a black wash across North
+  // Africa. Every family that draws a gradient is in this list now.
+  for (const url of ["/", "/map", "/europe/norway/fjord-norway/bergen",
+                     "/interests/mountains", "/journeys", "/countries",
+                     "/stories", "/experiences", "/404.html"]) {
     const sp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
     await sp.goto(base + url, { waitUntil: "networkidle" });
     const stops = await sp.evaluate(() =>
