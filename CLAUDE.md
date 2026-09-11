@@ -2022,6 +2022,64 @@ first: **the four homepage doors**, not the hero, because the drawn hero is
 the one thing here no competitor can reproduce and a licensed stock
 photograph is by definition a thing anyone can also license.
 
+**A CONTRAST RATIO MEASURED AGAINST A TOKEN IS NOT THE RATIO A READER
+GETS.** Every contrast assertion on this site read a declared colour against
+a declared background, and the hero has neither: its type sits on a drawing
+of Europe, so the ratio varies letter by letter. The stylesheet's own
+figures — 7.7:1 bare, 6.9:1 on the lightest pool — are real and were measured
+against the **water**, before the continent was drawn over it. The standfirst
+runs across the lit parchment of Iberia and measured **4.36:1**, under the
+4.5 AA floor, on the most-seen page on the site.
+
+Worse, the scrim that exists to stop exactly this was `.herofull.shot::after`
+— **gated on a photograph the register does not hold**, so the comment saying
+"a scrim is what makes the contrast ratio a property of the design rather
+than of the picture" sat on a rule no reader has ever had applied. A
+bottom-left wash, ungated, six stops: 4.36 → 7.76 for the standfirst, 7.04 →
+9.58 for the headline, and the continent stays luminous where there is no
+type. Its first version painted at `z-index: -1`, **under** `.heroeurope` —
+the sea behind the type darkened and the lit parchment, the only place the
+ratio failed, did not move by one value.
+
+**Measure where the glyphs are, not where the box is.** The instrument shoots
+the page twice, with the type and without, and a pixel that differs is a
+pixel a glyph paints. Scanning the RECTANGLE instead reported 2.15:1 against
+a real 9.58, because an h1's measure is 14ch and the headline does not fill
+it, so the bright parchment in the gutter past the last letter was read as a
+failure of the type. The check counts the glyph pixels it found, because a
+diff that finds none reports infinity and passes.
+
+**A role is a claim about the markup under it.** The planner's add-a-stop
+results were a `<ul role="listbox">` whose `<li>` children carried no role at
+all, so assistive technology was told there was a listbox, asked for its
+options and got none, while eight real buttons sat on the screen — and the
+at-rest line was itself an `<li>` inside it. A plain list now, with the
+sentence that CHANGES moved into a `role="status"` line, which is where a
+change is heard. **And a disclosure that takes focus has to give it back**:
+the panel focused its search box on open and had no keyboard exit at all.
+
+**"In the list below" was a claim about the page around the sentence.**
+`offframe_line()` ended that way unconditionally — true of the three callers
+that print their own set, false on the 404, whose drawing IS the body. That
+is the journey caption promising "a note under the leg" after the note was
+removed, one family over. A shared function cannot know what follows it, so
+the caller says. The check written for it **sliced the page at the first
+`</header>`, which is the masthead's**, so the "below" it examined contained
+the sentence's own words and it reported clean on the page it was written
+for; fixed, it immediately found a second instance on `/experiences`, which
+plots every place with an experience and lists twenty-four of the 197. Then
+it went red on the HTML **comment** recording why — the third time an
+instrument here has read the documentation of code as code.
+
+**A separator belongs to the relationship, not to the element.** The index
+hero drew its own bottom rule: right on twenty-one families, and on the 404 a
+hairline across the column followed by two hundred and seventy pixels of
+nothing above the footer — the one page a reader reaches having already
+failed to find something. Nothing counts an empty band. The check for it was
+itself pinning a shape on its first run, flagging `/map`'s bordered list: a
+panel has a bottom border because it has four, and its fourth side separates
+nothing. **A divider is a bottom edge and three bare ones.**
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
