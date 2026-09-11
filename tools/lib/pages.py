@@ -8164,7 +8164,7 @@ def method_page(data):
 </div>
 <div class="rows">{rows}</div>
 
-{section("Two dimensions this refuses to compute", f'<div class="rows">{refused}</div>',
+{section(f"{numword(len(REFUSED), cap=True)} dimensions this refuses to compute", f'<div class="rows">{refused}</div>',
          lede="The specification this came from lists ten. Eight are computable from the dataset. These two are not, and an approximation would be worse than the gap.")}
 
 {section("Discoverability", f'<div class="rows">{discrows}</div>', id="discoverability",
@@ -8373,7 +8373,7 @@ def how_it_works_page(data):
   and anybody evaluating this can see the actual state in one screen.</p>
 </div>
 
-{section("Four doors", '<div class="grid cols-4 doors">' + pillars + "</div>",
+{section(f"{numword(len(DOORS), cap=True)} doors", '<div class="grid cols-4 doors">' + pillars + "</div>",
          lede="Discover, then understand, then experience, then journey. Each one is only "
               "worth anything once the one before it has happened — which is why this is a "
               "sequence and not a menu, and why it is not search-then-book.")}
@@ -8557,7 +8557,7 @@ def api_page(data):
 {crumbs([("Europe", "/discover"), ("Sources & corrections", "/sources"), ("The public API", None)])}
 <div class="pagehead">
   <p class="kicker">The public API</p>
-  <h1>Four read-only endpoints. No key, no quota, no sign-up.</h1>
+  <h1>{numword(len(rows), cap=True)} read-only endpoints. No key, no quota, no sign-up.</h1>
   <p class="lede">Everything the site knows is published as static JSON on the same domain,
   cacheable and versionless. They are the same documents this site's own planner, search and
   map run on — not a reduced copy of them, which is the only way an API stays true.</p>
