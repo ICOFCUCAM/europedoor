@@ -58,6 +58,33 @@ def fail(msg):
     FAILURES.append(msg)
 
 
+
+def in_url_path(body, at):
+    """Is the token at `at` a path segment of a URL?
+
+    LIFTED OUT OF THE CHECK SO IT CAN BE TESTED ON ITS OWN. A predicate that
+    can only be exercised by running the whole scan over a real file is a
+    predicate whose edge cases are argued about rather than measured — and
+    this one has to be narrow in a specific way: a credential travels as a
+    query parameter or a fragment, essentially never as a path segment, so
+    exempting anything past the `?` would be exempting the place a key
+    actually goes.
+    """
+    stops = "\"'` \t\n<>()[]{},"
+    start = at
+    while start > 0 and body[start - 1] not in stops:
+        start -= 1
+    end = at
+    while end < len(body) and body[end] not in stops:
+        end += 1
+    token = body[start:end]
+    if not token.startswith(("http://", "https://")):
+        return False
+    cut = min([i for i in (token.find("?"), token.find("#")) if i >= 0]
+              or [len(token)])
+    return (at - start) < cut
+
+
 def site_files():
     return sorted(glob.glob(os.path.join(OUT, "**", "*.html"), recursive=True))
 
@@ -1125,6 +1152,7 @@ def c_photo_gate():
 
     # 4. No credential, anywhere near this.
     keyish = re.compile(r"[A-Za-z0-9_-]{40,}")
+
     for rel_ in ("docs/data-licenses/photo-providers.json",
                  "scripts/images/acquire.py", "scripts/images/discover.py",
                  "scripts/images/pr_body.py", "scripts/images/verify_provider.py",
@@ -1138,7 +1166,27 @@ def c_photo_gate():
         stems = {n.rsplit(".", 1)[0] for n in archive_names}
         stems |= {part for n in stems for part in n.split(".")}
         for m in keyish.finditer(body):
-            if "://" in body[max(0, m.start() - 12):m.start()]:
+            # A TOKEN INSIDE A URL PATH IS PART OF AN ADDRESS.
+            #
+            # The old test looked twelve characters back for `://`, which
+            # exempts a token immediately after the scheme and nothing
+            # deeper. Pexels builds its photo page URL out of the
+            # photographer's own description —
+            # `/photo/a-group-of-hikers-trekking-through-foggy-countryside-17707933/`
+            # is 61 characters of letters, digits and hyphens, which is
+            # exactly the shape this hunts for. Seven of them failed the
+            # first real batch, on the `source` field the licence gate exists
+            # to record: the run acquired eight photographs, derived them,
+            # registered them, rebuilt the site and passed all 95 checks, and
+            # then refused to commit its own provenance.
+            #
+            # SCOPED TO THE PATH, NOT THE WHOLE URL. A credential travels as
+            # a query parameter or a header, essentially never as a path
+            # segment — so exempting `?key=...` would be exempting the place
+            # a key actually goes. The enclosing token is read back to its
+            # JSON quote or whitespace and has to start with a scheme, and
+            # the match has to sit before any `?`.
+            if in_url_path(body, m.start()):
                 continue
             # A LONG TOKEN THAT NAMES A FILE ON DISK IS A FILE NAME. The
             # Unsplash guidelines archive is
