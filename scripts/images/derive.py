@@ -48,6 +48,16 @@ QUALITY = {"avif": 50, "webp": 78, "jpg": 82}
 def derive(stem):
     """Build the ladder from the UNTOUCHED original and record what was made.
 
+    THE DIRECTORY IS CREATED HERE, AND NOT DOING SO WOULD HAVE FAILED THE
+    FIRST REAL ACQUISITION. `assets/img/` holds only generated derivatives,
+    so it is empty and git does not track an empty directory — a fresh clone
+    does not have it, and that includes the checkout the `photograph`
+    workflow runs on. `acquire.py` has always made `photographs/` for exactly
+    this reason and this script never made its own. It survived because every
+    local run happened in a tree where an earlier run had already created it:
+    a code path nothing exercises is a code path nothing checks, and the only
+    thing that found it was running the desk's acquisition in a clean clone.
+
     THE ORIGINAL IS READ AND NEVER WRITTEN. `<stem>.original.jpg` is the
     evidence the whole chain is checked against — checks.py re-hashes it on
     every build — so this reads it, writes beside it, and leaves it exactly as
@@ -96,6 +106,7 @@ def derive(stem):
                 continue
             small = im.resize((w, round(im.height * w / im.width)),
                               Image.LANCZOS)
+            os.makedirs(IMG_DIR, exist_ok=True)
             for ext in ("avif", "webp", "jpg"):
                 name = f"{stem}.{tag}-{w}.{ext}"
                 dst = os.path.join(IMG_DIR, name)

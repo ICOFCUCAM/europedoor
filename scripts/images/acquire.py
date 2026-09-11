@@ -297,6 +297,9 @@ def main(argv):
                          "see it — not the place name, which is the page title")
     ap.add_argument("--focal", default="50,50",
                     help="focal point as x,y percentages")
+    ap.add_argument("--second-purpose", action="store_true",
+                    help="this photograph is already in the register for a "
+                         "DIFFERENT purpose and that is intended")
     args = ap.parse_args(argv)
 
     ok, why = cleared(args.provider)
@@ -324,6 +327,28 @@ def main(argv):
                  f"Remove that row deliberately if it is being replaced — a "
                  f"surface changing its picture is an editorial act, not a "
                  f"side effect of running this twice.")
+
+    # AND ONE PHOTOGRAPH IS NOT AUTOMATICALLY MEANT FOR TWO SURFACES.
+    #
+    # The rule above is about a SURFACE and reads the register by key; this is
+    # the same question from the other end and the register had no answer for
+    # it — the same provider id could be acquired again, for a second purpose,
+    # and nothing anywhere would say so. Twice is sometimes right: a
+    # photograph good enough for a door may be right for the index it opens.
+    # What is never right is arriving there by accident, so it is a refusal
+    # with an escape rather than a warning nobody reads, and the refusal names
+    # every purpose the id already fills.
+    elsewhere = sorted(
+        (row.get("purpose") or key)
+        for key, row in reg["images"].items()
+        if row.get("provider") == args.provider
+        and str(row.get("provider_photo_id")) == str(args.photo_id)
+        and key != spec["key"])
+    if elsewhere and not args.second_purpose:
+        sys.exit(f"{args.provider} {args.photo_id} is already in the register, "
+                 f"for {', '.join(elsewhere)}. One photograph on two surfaces "
+                 f"is sometimes right and is never an accident — pass "
+                 f"--second-purpose if that is what this is.")
 
     if len(args.alt) < 12:
         sys.exit("--alt must describe the photograph. A row without a real "

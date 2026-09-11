@@ -3592,13 +3592,35 @@ def c_hero_frame():
 
     # And the shipped page must actually carry that viewBox, because both
     # numbers above are read from the source rather than from the HTML.
+    #
+    # UNLESS A PHOTOGRAPH FILLS THE HERO, IN WHICH CASE THERE IS NO DRAWING
+    # TO ASSERT ANYTHING ABOUT. A photograph REPLACES the drawing — `.shot`
+    # is added only when the register holds the file and `heroeurope()` is
+    # not called at all — so this line failed on the first end-to-end
+    # acquisition, which is the ninth assertion in this repository to pin a
+    # SHAPE rather than a promise. The promise is: whichever of the two the
+    # homepage carries, it carries one of them and the page says which. Both
+    # halves still fail on the thing this was written for, because the
+    # branch is chosen by the register rather than by this check.
     html = open(os.path.join(ROOT, "site", "index.html"),
                 encoding="utf-8").read()
-    assert f'viewBox="{vx:.0f} {vy:.0f} {vw:.0f} {vh:.0f}"' in html, (
-        "the homepage does not carry the hero viewBox this check just "
-        "asserted two things about")
+    photo_hero = bool(_register().get("home-hero"))
+    if photo_hero:
+        assert 'class="herofull shot"' in html and "<picture>" in html, (
+            "the register holds a homepage hero photograph and the shipped "
+            "page carries neither `.shot` nor a <picture> — the drawing was "
+            "removed and nothing replaced it")
+    else:
+        assert f'viewBox="{vx:.0f} {vy:.0f} {vw:.0f} {vh:.0f}"' in html, (
+            "the homepage does not carry the hero viewBox this check just "
+            "asserted two things about")
     n += 1
     return n
+
+
+def _register():
+    with open(os.path.join(ROOT, "data", "images.json"), encoding="utf-8") as fh:
+        return json.load(fh).get("images", {})
 
 
 @check("every page that draws relief names the survey that measured it")
@@ -5255,6 +5277,20 @@ def c_hero_dusk_reach():
     """
     h = open(os.path.join(OUT, "index.html"), encoding="utf-8").read()
 
+    # A PHOTOGRAPH REPLACES THE DRAWING, AND A FADE OVER A DATA CUT IS A
+    # PROPERTY OF THE DRAWING. With `home-hero` in the register the homepage
+    # draws no continent, has no data cut and needs no fade, so there is
+    # nothing here to measure — and this check failed on the first end-to-end
+    # acquisition asking for two gradients that correctly do not exist. It
+    # asserts the ABSENCE in that case, because "no fade" and "no drawing"
+    # must not be allowed to look the same.
+    if _register().get("home-hero"):
+        assert "heroeurope" not in h, (
+            "the register holds a hero photograph and the homepage still "
+            "carries the drawn continent — a photograph REPLACES the drawing, "
+            "it does not sit behind it")
+        return 1
+
     def grad(gid):
         m = re.search(r'<(linear|radial)Gradient id="%s"([^>]*)>(.*?)</\1Gradient>'
                       % gid, h, re.S)
@@ -5366,6 +5402,43 @@ def c_planner_alphabet():
              f"name this place in the sentence box, and the planner cannot report "
              f"a word it never saw")
     return n
+
+
+@check("every original in photographs/ is named by a register row")
+def c_originals_registered():
+    """A PHOTOGRAPH IN THE REPOSITORY WITH NO ROW IS THE THING THE LICENCE
+    GATE EXISTS TO REFUSE, AND NOTHING WAS LOOKING AT THAT DIRECTORY.
+
+    The register is enforced from the OUTPUT end — no published page may
+    reference a file with no row — and from the acquisition end, where
+    `acquire.py` writes the row and the file together. Neither covers a file
+    that arrives some other way, and one did: a stub original was left behind
+    by a test and swept into a commit by `git add -A`, and every gate stayed
+    green. Those bytes are somebody's photograph with no photographer, no
+    source, no licence, no date and no hash — the exact state
+    `docs/data-licenses/photo-providers.json` exists to make impossible.
+
+    It is the same assertion already made about the preview cache, from the
+    other side: that one says the repository holds no bytes it did not
+    license, and this one says it holds no bytes it cannot account for.
+    """
+    d = os.path.join(ROOT, "photographs")
+    reg = D.load()["images"]
+    want = {os.path.basename(row.get("original", "")) for row in reg.values()}
+    n = 0
+    if not os.path.isdir(d):
+        return 1
+    for name in sorted(os.listdir(d)):
+        if name.startswith("."):
+            continue
+        n += 1
+        if name not in want:
+            fail(f"photographs/{name} is in the repository and no row in "
+                 f"data/images.json names it. An original with no row has no "
+                 f"photographer, no source, no licence, no date and no hash — "
+                 f"delete it, or acquire it properly so the register carries "
+                 f"the evidence")
+    return max(n, 1)
 
 
 @check("a sub-category keyword selects a word it is a form of")

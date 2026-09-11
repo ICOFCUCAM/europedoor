@@ -2812,6 +2812,49 @@ the working tree are untouched by the suite.** It never acquires: a test that
 did would write a register row, build the site and make a commit in the
 repository it is testing.
 
+**THE FIRST REAL PHOTOGRAPH WOULD HAVE FAILED THE BUILD IN FIVE PLACES, AND
+THE ONLY THING THAT FOUND IT WAS RUNNING AN ACQUISITION FOR REAL.** The desk
+was built, its own suite passed and its screens were rendered; none of that
+touches the acquisition, because the desk's own suite deliberately never
+acquires. So the pipeline was run end to end against the stub **in a fresh
+clone**, and it stopped five times:
+
+| | |
+|---|---|
+| `derive.py` never made `assets/img/` | it holds only generated files, so git does not track it and **a fresh clone does not have it** — including the checkout the `photograph` workflow runs on. `acquire.py` has always made `photographs/`. Every local run had worked because an earlier run had already created the directory |
+| the homepage's own credit link | `rel=''`, no new tab — **a photograph credit in breach of the site's own outbound-link policy**, on the page that opens the site. `picture()`'s figcaption had it right; this is a second, hand-written credit in `pages.home()` |
+| the land credit was attached to the HERO | with a photograph the sentence stopped naming Natural Earth and the page went on drawing land in its journey rows. Coverage that depends on a different element being present is worse than none — the `pop_line` finding, one surface over |
+| `c_hero_frame` asserted the drawn hero's viewBox | a photograph REPLACES the drawing, so the assertion had no subject. **The ninth assertion here to pin a shape rather than a promise** |
+| `c_dusk_reach` asked for two gradients | a fade over a data cut is a property of a drawing that no longer exists. It asserts the ABSENCE now, because "no fade" and "no drawing" must not look the same |
+
+**And two more that only the SECOND run found.** `checks.py` runs the
+invariant register as one of its own checks, so handling the register after
+it meant the run died before reaching the handling written for it — the fix
+was in the right place and the wrong order. Then `photo-tests.py` went red in
+the clone on three assertions reading *"no file exists"* and *"nothing is
+registered"*, which hold exactly while the register is empty: **the gate
+suite that guards photographs would have gone permanently red the day the
+product it guards started working.** What a refusal actually promises is that
+it wrote nothing, so the state after is asserted equal to the state before,
+whatever that state was.
+
+**The invariant register is MEANT to move on the first photograph.**
+`safety.img_tags` is recorded as zero with the reason written out — "this
+moving is the signal that licensed imagery arrived" — so `--check` fails by
+design and a desk that stopped there could never acquire a first photograph
+at all. The register's rule is not *never move*, it is that **moving one
+silently is not allowed**, and `--write` in the same commit is the deliberate
+act. The desk runs the check, rewrites on failure, re-checks, and names every
+row that moved in the step detail and in the commit message.
+
+**One photograph is not automatically meant for two surfaces.** The register
+already refused a SURFACE being taken over by a different id; the same
+question from the other end had no answer, so the same provider id could be
+acquired again for a second purpose and nothing anywhere would say so. Twice
+is sometimes right and is never an accident: `--second-purpose` is the
+escape, the refusal names every purpose the id already fills, and the desk
+simply renders no Acquire button on a candidate that is already registered.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

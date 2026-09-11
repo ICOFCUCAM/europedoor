@@ -231,10 +231,66 @@ def acquire_job(jid, provider, photo_id, purpose, alt, focal):
             return
         job_step(jid, "build", "done", out.splitlines()[-1] if out else "")
 
-        gates = [("tools/build.py", ["check"]), ("tools/checks.py", []),
-                 ("tools/invariants.py", ["--check"]),
-                 ("tools/photo-tests.py", [])]
+        # THE INVARIANT REGISTER IS MEANT TO MOVE HERE, AND THAT IS THE ONE
+        # GATE THAT CANNOT SIMPLY BE RUN.
+        #
+        # IT ALSO HAS TO HAPPEN FIRST. `checks.py` runs the register as one
+        # of its own checks, so leaving this until after it meant the run
+        # died on `checks.py` and never reached the handling written for it —
+        # the fix was in the wrong order and the end-to-end run said so.
+        #
+        # `safety.img_tags` is recorded as zero with the reason written out:
+        # "This moving is the signal that licensed imagery arrived." So the
+        # first photograph makes `--check` fail BY DESIGN, and a desk that
+        # stopped there could never acquire a first photograph at all.
+        #
+        # The register's own rule is not "never move" — it is "moving one
+        # SILENTLY is not allowed", and `--write` in the same commit is the
+        # deliberate act. So the desk runs the check, and if it fails it
+        # regenerates the register, re-runs the check, and NAMES EVERY ROW
+        # THAT MOVED in the step detail and in the commit message. The diff
+        # is the record and the pull request is where a person reads it.
+        # If the check still fails after a rewrite, that is a real failure
+        # and it stops here.
         lines = []
+        ok, out = run(["tools/invariants.py", "--check"], env)
+        moved = ""
+        if not ok:
+            # THE LINES ARE `FAIL name: got, recorded want — reason`. The
+            # first version filtered on the word "invariant", which appears
+            # only in the summary line — so the register moved, was rewritten,
+            # and the commit message said nothing about it. That is exactly
+            # the silence the register exists to prevent, arriving through the
+            # code written to prevent it. Caught by reading the commit the
+            # end-to-end run produced rather than the code that produced it.
+            moved = "\n".join("  " + l[len("FAIL "):].split(" — ")[0]
+                               for l in out.splitlines() if l.startswith("FAIL "))
+            ok2, _ = run(["tools/invariants.py", "--write"], env)
+            ok3, out3 = run(["tools/invariants.py", "--check"], env)
+            if not moved:
+                job_fail(jid, "gates", "the invariant register failed and "
+                                       "this could not read which rows moved, "
+                                       "so the commit would not say:\n" + out)
+                return
+            if not (ok2 and ok3):
+                job_fail(jid, "gates", "the invariant register did not settle "
+                                       "after a rewrite:\n" + out3)
+                return
+            lines = ["invariants moved and were rewritten:\n" + moved]
+        else:
+            lines = [(out.splitlines() or [""])[-1]]
+
+        # AND `photo-tests.py` IS NOT ONE OF THESE, WHICH COST A FULL RUN TO
+        # LEARN. It is a destructive suite: it acquires the homepage hero
+        # against the stub, wipes and rebuilds `site/`, then restores the
+        # register and deletes what it made. Run here it deleted the
+        # photograph the five steps above had just produced, and `checks.py`
+        # then failed because the register named files no longer on disk —
+        # every step green and the artefact gone. CLAUDE.md already records
+        # that this file builds the site; owning the REGISTER is the sharper
+        # half, and a gate that rewrites the thing it is checking is not a
+        # gate at all.
+        gates = [("tools/build.py", ["check"]), ("tools/checks.py", [])]
         for script, extra in gates:
             ok, out = run([script] + extra, env)
             lines.append((out.splitlines() or [""])[-1])
@@ -263,7 +319,10 @@ def acquire_job(jid, provider, photo_id, purpose, alt, focal):
                f"{row.get('source', '')}\n"
                f"sha256 {row.get('sha256', '')}\n\n"
                f"Acquired through the Media Desk, which runs the same "
-               f"scripts the photograph workflow runs.")
+               f"scripts the photograph workflow runs."
+               + (f"\n\nThe invariant register moved and was rewritten in "
+                  f"this commit, which is the deliberate act it asks for:\n"
+                  + moved if moved else ""))
         ok, out = git("commit", "-m", msg)
         if not ok:
             job_fail(jid, "commit", out)

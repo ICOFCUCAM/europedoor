@@ -22,11 +22,21 @@ workflow.
 Every test asserts a REFUSAL as well as an acceptance where one exists. A test
 that only shows the good path passing is a test that would still pass with the
 guard deleted.
+
+THIS SUITE IS DESTRUCTIVE AND IS NOT A POST-ACQUISITION GATE. It acquires the
+homepage hero against the stub, wipes and rebuilds `site/`, and then restores
+the register and deletes what it made. Run beside a live acquisition it
+deletes THAT — which is what happened the first time the Media Desk ran it as
+a gate in a clean clone: every earlier step succeeded and this one removed the
+photograph they had just produced, then the checks failed because the register
+named files no longer on disk. CLAUDE.md already records that this file builds
+the site; it also owns the register, and that is the sharper half.
 """
 
 from __future__ import annotations
 
 import http.server
+import hashlib
 import io
 import json
 import os
@@ -39,6 +49,7 @@ import threading
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IMG = os.path.join(ROOT, "assets", "img")
+IMG_DIR = os.path.join(ROOT, "assets", "img")
 REGISTER = os.path.join(ROOT, "data", "images.json")
 
 FAILURES = []
@@ -232,7 +243,10 @@ def main(argv):
             if not os.path.isdir(d):
                 continue
             for f in os.listdir(d):
-                if f.startswith("homepage-hero"):
+                # `door-mountains` is the second-purpose test's own artefact
+                # and is cleaned up here for the same reason as the hero: a
+                # suite that writes into the repository owns taking it out.
+                if f.startswith("homepage-hero") or f.startswith("door-mountains"):
                     os.remove(os.path.join(d, f))
         # AND site/ IS REBUILT, because these tests build it. Restoring the
         # register without rebuilding leaves the shipped homepage carrying an
@@ -300,21 +314,41 @@ def main(argv):
         check("a slot instance with an unknown target fails", r.returncode != 0)
 
         # ── 5. a returned id that is not the requested id stops ──────
+        #
+        # ASSERTED AS *UNCHANGED* RATHER THAN *ABSENT*, AND THAT IS NOT A
+        # WEAKER CLAIM — it is the only one that stays true. These three read
+        # "no file exists" and "nothing is registered", which hold exactly
+        # while the register is empty. The first real acquisition puts a
+        # homepage hero on disk permanently, so this whole suite would have
+        # gone RED FOREVER on the day the product it guards started working.
+        # Found by running the desk's acquisition in a clean clone and then
+        # running the gates in that clone.
+        #
+        # What the refusal actually promises is that it wrote NOTHING: the
+        # state after is the state before, whatever that state was.
+        def snapshot():
+            path = os.path.join(ROOT, "photographs", "homepage-hero.original.jpg")
+            blob = open(path, "rb").read() if os.path.exists(path) else None
+            return (hashlib.sha256(blob).hexdigest() if blob else None,
+                    open(REGISTER, encoding="utf-8").read())
+
+        before = snapshot()
         r = run(A + ["--photo-id", "mismatch", "--purpose", "homepage-hero",
                      "--alt", "a test pattern image"], env)
         check("a mismatched returned id fails", r.returncode != 0)
         check("and nothing is written",
               "Nothing written" in (r.stdout + r.stderr))
-        check("and no file appeared",
-              not os.path.exists(os.path.join(ROOT, "photographs", "homepage-hero.original.jpg")))
+        check("and the original on disk is exactly what it was",
+              snapshot()[0] == before[0])
+        check("and the register is exactly what it was",
+              snapshot()[1] == before[1])
 
         # ── 6. an id that does not exist stops, with no substitute ───
+        before = snapshot()
         r = run(A + ["--photo-id", "404404", "--purpose", "homepage-hero",
                      "--alt", "a test pattern image"], env)
         check("a missing id fails rather than substituting", r.returncode != 0)
-        check("and no photograph was registered",
-              "homepage-hero" not in json.load(open(REGISTER, encoding="utf-8"))
-              .get("images", {}).get("home-hero", {}).get("purpose", ""))
+        check("and no photograph was registered by it", snapshot() == before)
 
         # ── 7. Unsplash cannot enter the automated path ──────────────
         r = run(["scripts/images/acquire.py", "--provider", "unsplash",
@@ -355,7 +389,17 @@ def main(argv):
               "derivatives" in (v.stdout + v.stderr))
 
         # ── 10. the ladder completes it ──────────────────────────────
+        # THE DIRECTORY MUST NOT HAVE TO EXIST. `assets/img/` holds only
+        # generated files, so git does not track it and a fresh clone — the
+        # workflow's own checkout included — does not have it. Removing it
+        # here is the only way this is tested, because every local run after
+        # the first happens in a tree where an earlier run made it.
+        if os.path.isdir(IMG_DIR) and not os.listdir(IMG_DIR):
+            os.rmdir(IMG_DIR)
         d = run(["scripts/images/derive.py", "homepage-hero"], {})
+        check("derive works in a tree with no assets/img",
+              d.returncode == 0 and os.path.isdir(IMG_DIR),
+              (d.stdout + d.stderr)[-400:])
         check("derive builds the ladder", d.returncode == 0,
               (d.stderr or d.stdout)[-300:])
         reg = json.load(open(REGISTER, encoding="utf-8"))["images"]
@@ -397,6 +441,39 @@ def main(argv):
                            capture_output=True, text=True)
         check("the photograph checks pass with it registered", c.returncode == 0,
               (c.stdout + c.stderr)[-300:])
+
+        # ── ONE PHOTOGRAPH IS NOT AUTOMATICALLY MEANT FOR TWO SURFACES ──
+        #
+        # The register already refused a SURFACE being taken over by a
+        # different id. The same question from the other end had no answer:
+        # the same provider id could be acquired again for a second purpose
+        # and nothing anywhere would say so. Twice is sometimes right and is
+        # never an accident, so it is a refusal with an explicit escape.
+        r = run(["scripts/images/acquire.py", "--provider", "pexels",
+                 "--photo-id", PHOTO_ID, "--purpose", "door-mountains",
+                 "--alt", "the same test pattern, a second time"], env)
+        check("the same id for a second purpose is refused", r.returncode != 0,
+              (r.stdout + r.stderr)[-300:])
+        check("and the refusal names where it is already used",
+              "homepage-hero" in (r.stdout + r.stderr))
+        check("and nothing was written for the second purpose",
+              "door-mountains" not in
+              open(REGISTER, encoding="utf-8").read())
+        r = run(["scripts/images/acquire.py", "--provider", "pexels",
+                 "--photo-id", PHOTO_ID, "--purpose", "door-mountains",
+                 "--alt", "the same test pattern, a second time",
+                 "--second-purpose"], env)
+        check("and --second-purpose lets it through", r.returncode == 0,
+              (r.stdout + r.stderr)[-400:])
+        reg2 = json.load(open(REGISTER, encoding="utf-8"))["images"]
+        check("both surfaces now name the same photograph",
+              str(reg2.get("door-mountains", {}).get("provider_photo_id")) == PHOTO_ID
+              and str(reg2.get("home-hero", {}).get("provider_photo_id")) == PHOTO_ID)
+        del reg2["door-mountains"]
+        with open(REGISTER, "w", encoding="utf-8") as fh:
+            json.dump({"$comment": json.load(open(REGISTER + ".none", encoding="utf-8"))
+                       ["$comment"] if False else
+                       json.loads(reg_backup)["$comment"], "images": reg2}, fh, indent=2)
         with open(original, "ab") as fh:
             fh.write(b"tampered")
         c = subprocess.run(photo_checks, shell=True, cwd=ROOT,

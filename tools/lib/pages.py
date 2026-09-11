@@ -1441,17 +1441,42 @@ def home(data):
     # never saw it, because the phrase fell across a line break in the
     # source and the check searched the raw HTML. A claim a check cannot
     # read is a claim nothing is holding; both ends are fixed.
-    herosource = (
-        f'The photograph above is by {esc(hero_row["photographer"])}, '
-        f'licensed under the <a href="{esc(hero_row["licence_url"])}">'
-        f'{esc(hero_row["licence"])} licence</a> and served from this origin.'
+    # AND THE LAND CREDIT BELONGS TO THE DRAWING, NOT TO THE HERO.
+    #
+    # This sentence carried both claims and the photograph branch dropped the
+    # second one — so the day a photograph fills the hero, the homepage went
+    # on drawing land in its journey rows and named no dataset for it.
+    # `c_map_coastline_credit` caught it on the first end-to-end acquisition
+    # and was right: coverage that depends on a different element being
+    # present is worse than none, which is the same finding `pop_line` made
+    # when a destination with no population figure credited nothing.
+    #
+    # The projection sentence stays attached to the HERO, because it is a
+    # claim about that drawing's own geometry. The Natural Earth credit is
+    # unconditional, because the page draws land either way.
+    #
+    # AND BOTH LINKS LEAVE THIS ORIGIN, so both take the rule the Stay layer
+    # established: `rel="noopener"` and a new tab. The first version of this
+    # credit had neither and `c_outbound_links` failed it — a photograph
+    # credit in breach of the site's own outbound-link policy, on the one
+    # page that opens it.
+    out = ' rel="noopener" target="_blank"'
+    landsource = (
+        '<a href="/sources">Natural Earth</a>, public domain'
         if hero_row else
-        "The continent above is drawn from "
         '<a href="/sources">Natural Earth</a>, public domain, on a Lambert '
         f"conformal conic — standard parallels {geo.LCC_P1:g}°N and "
         f"{geo.LCC_P2:g}°N, origin {geo.LCC_LAT0:g}°N, central meridian "
         f"{geo.LCC_LON0:g}°E — the same projection and the same file as "
         f"every other map here.{heroground}")
+    herosource = (
+        (f'The photograph above is by <a href="{esc(hero_row["source"])}"{out}>'
+         f'{esc(hero_row["photographer"])}</a>, licensed under the '
+         f'<a href="{esc(hero_row["licence_url"])}"{out}>'
+         f'{esc(hero_row["licence"])} licence</a> and served from this origin. '
+         f'The maps on this page are drawn from {landsource}.'
+         if hero_row else
+         f"The continent above is drawn from {landsource}"))
 
     body = f"""
 <section class="herofull{' shot' if heroimg else ''}">
