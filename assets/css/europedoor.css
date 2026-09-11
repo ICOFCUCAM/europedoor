@@ -1700,7 +1700,24 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
    stop-color is #000 and this stylesheet has already shipped a layer that
    said graphite and painted black. */
 .datacut { pointer-events: none; }
-.minimap.arched.atlas .datacut stop { stop-color: var(--atlas-sea); }
+/* A <stop> THAT NO RULE REACHES IS BLACK, AND THE FIRST VERSION OF THIS
+   SELECTOR REACHED NONE OF THEM. The gradients were emitted in a <defs>
+   beside the group rather than inside it, so `.datacut stop` matched
+   nothing and 596 picture plates faded to the SVG default — a black smear
+   arriving at the eastern edge of the parchment, which is precisely the
+   rendering fault the fade exists to remove, arrived at from the other
+   side. Invisible on most pages because the ramp sits at 52°E and most
+   plates are framed far west of it at zero opacity; plain on the twenty
+   framed on the whole continent. The defs moved inside the group.
+
+   The `.atlas` qualifier came off with it. Every plate that emits a data
+   cut is a picture plate — the group is placed at the `cities` slot and the
+   instrument family does not draw one — so the class was restating what the
+   markup already guarantees, and an instrument variant written for a case
+   that does not exist is the dead rule the scan refuses. /map fades to
+   `--map-sea` through `.mapcut`, which is a different mechanism because it
+   is a different drawing. */
+.datacut stop { stop-color: var(--atlas-sea); }
 .europemap .context path { fill: var(--map-context); stroke: none; }
 .europemap .countries path {
   fill: var(--map-land); stroke: var(--map-border);

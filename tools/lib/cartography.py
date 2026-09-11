@@ -353,7 +353,21 @@ def datacut(uid, proj, view):
                        f'stop-opacity="{v:.3f}"/>')
         return "".join(out)
 
+    # THE <defs> GOES INSIDE THE GROUP, AND PUTTING IT OUTSIDE PAINTED THE
+    # FADE BLACK ON EVERY PICTURE PLATE. `.minimap.arched.atlas .datacut stop`
+    # is what gives these stops the sea tone, and a <stop> that no rule
+    # reaches takes the SVG default, which is black — so the ramp this
+    # function exists to make honest was itself a black smear arriving out of
+    # nowhere at the eastern edge, which is the exact rendering fault the
+    # fade was written to remove, arrived at from the other side. It survived
+    # because the gradient is positioned at 52°E and most plates are framed
+    # far west of it, where the ramp is at zero opacity: a defect that is
+    # invisible on 300 pages and plain on the twenty that matter. Moving the
+    # defs inside makes the selector's own claim true — these gradients ARE
+    # the data cut — rather than depending on a second selector agreeing with
+    # it.
     return (
+        f'<g class="datacut" aria-hidden="true">'
         f'<defs>'
         f'<linearGradient id="cut-{uid}-e" gradientUnits="userSpaceOnUse"'
         f' x1="{ex1:.1f}" y1="{ey1:.1f}" x2="{ex2:.1f}" y2="{ey2:.1f}">'
@@ -361,7 +375,6 @@ def datacut(uid, proj, view):
         f'<radialGradient id="cut-{uid}-s" gradientUnits="userSpaceOnUse"'
         f' cx="{ax:.1f}" cy="{ay:.1f}" r="{r33:.1f}">{stops(f0, f1)}</radialGradient>'
         f'</defs>'
-        f'<g class="datacut" aria-hidden="true">'
         f'<rect x="{x0:.1f}" y="{y0:.1f}" width="{vw:.1f}" height="{vh:.1f}"'
         f' fill="url(#cut-{uid}-e)"/>'
         f'<rect x="{x0:.1f}" y="{y0:.1f}" width="{vw:.1f}" height="{vh:.1f}"'
