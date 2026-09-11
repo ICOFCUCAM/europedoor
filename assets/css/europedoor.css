@@ -253,6 +253,22 @@
   --map-coast:    #93a1ae;   /* the edge between them. 7.33 on the sea, 3.84 on the land */
   --map-border:   #616b76;   /* a frontier, which is a line drawn ON land and lighter than a coast */
   --map-hover:    #8398ff;   /* cobalt-air, the INTELLIGENCE accent: 3.82 on the land it replaces */
+  /* AND THE SUBJECT OF A DRAWING IS NOT PAINTED IN THE ACCENT. Binding the
+     selected state to cobalt-air was right for /map, where hover lifts one
+     country under the cursor for as long as the cursor is there — five per
+     cent of a screen, which is what an accent is. The SAME token filled the
+     subject permanently on the fifty country reference maps, so Italy came
+     out a quarter of the drawing in periwinkle: a continent drawn in the
+     accent, which is the exact failure that removed electric lime, arriving
+     through a different token one commit after the token changed.
+     The picture half already answered it: "An atlas separates the country it
+     is about by making it the brightest land with the finest heaviest edge,
+     not by turning it into another shade of water" — and not by turning it
+     into the accent either. Measured: the subject is 2.07 above its
+     neighbours and 3.94 above the water, with a fine pale edge rather than a
+     loud fill. Hover keeps the accent, because hover is momentary. */
+  --map-here:     #66727f;   /* the subject: the brightest land. 2.07 on the land, 3.94 on the sea */
+  --map-hereline: #ccd5dd;   /* its edge — the finest and the heaviest line on the drawing */
   /* AND THE INSTRUMENT'S SEA WAS ONE VALUE WHERE THE PICTURE'S IS FOUR.
      `docs/cartography.md`: "A flat pale fill made the water a surface the
      land was pasted onto. These four are CAST, not stroked — three soft
@@ -1432,7 +1448,8 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
    selectors that style the original where the original sits.
    The shadow is of the group's UNION, so an internal frontier casts none —
    exactly the coast, and never a border. */
-.europemap #countries, .europemap #detail {
+.europemap #countries, .europemap #detail,
+.minimap.arched:not(.atlas) .countries {
   filter: drop-shadow(0 0 2px var(--map-shore-1))
           drop-shadow(0 0 7px var(--map-shore-2))
           drop-shadow(0 0 16px var(--map-shore-3)); }
@@ -4072,7 +4089,8 @@ body[data-hero] .masthead { position: sticky; }
    seeing whether anything moved. Austria was drawn on Austria's page in
    exactly the same grey as Germany. */
 .minimap.arched.countrymap .countries path.here {
-  fill: var(--map-hover); stroke: var(--sea); stroke-width: 1.3; }
+  fill: var(--map-here); stroke: var(--map-hereline); stroke-width: 1.3;
+  vector-effect: non-scaling-stroke; }
 .minimap.arched .context path { stroke: color-mix(in srgb, var(--map-coast) 45%, transparent); stroke-width: 0.7; }
 
 

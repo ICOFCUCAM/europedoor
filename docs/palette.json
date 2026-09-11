@@ -116,16 +116,36 @@
         "b": "--map-sea",
         "min": 1.06,
         "why": "the widest and faintest, far from any coast"
+      },
+      {
+        "a": "--map-here",
+        "b": "--map-land",
+        "min": 1.9,
+        "why": "the subject is the brightest LAND, not the accent. Binding it to cobalt-air filled a quarter of every country reference map in periwinkle — a continent drawn in the accent, which is the failure that removed electric lime, arriving through a different token"
+      },
+      {
+        "a": "--map-here",
+        "b": "--map-sea",
+        "min": 3.0,
+        "why": "and it still has to clear the water it sits in"
+      },
+      {
+        "a": "--map-hereline",
+        "b": "--map-here",
+        "min": 3.0,
+        "why": "the finest heaviest edge. An atlas separates its subject by an edge rather than by a loud fill"
       }
     ],
     "ladder": {
-      "$comment": "ORDER IS THE CLAIM, and a per-pair minimum cannot state it. The water lightens as it approaches a shore — that is DISTANCE FROM LAND, the one thing a coastline can tell us, and never a claim about depth: this atlas holds no bathymetry. A ramp whose middle step is darker than its outer one is still three distinct colours and passes every pairwise floor while drawing the opposite of what it says.",
+      "$comment": "ORDER IS THE CLAIM, and a per-pair minimum cannot state it. The water lightens as it approaches a shore — that is DISTANCE FROM LAND, the one thing a coastline can tell us, and never a claim about depth: this atlas holds no bathymetry. A ramp whose middle step is darker than its outer one is still three distinct colours and passes every pairwise floor while drawing the opposite of what it says. The subject and its edge are the top of the same ladder: an atlas's subject is the brightest land, so it belongs on the land's own scale rather than beside it.",
       "tokens": [
         "--map-sea",
         "--map-shore-3",
         "--map-shore-2",
         "--map-shore-1",
-        "--map-land"
+        "--map-land",
+        "--map-here",
+        "--map-hereline"
       ],
       "direction": "increasing"
     }
