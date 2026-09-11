@@ -2261,6 +2261,119 @@ records as a green run that had stopped counting. Do not build while the
 browser suite is running; it takes half an hour and the rebuild takes thirty
 seconds.
 
+**AN UNRESOLVABLE `var()` IS NOT A MISSING VALUE, IT IS A DIFFERENT ONE.**
+The whole declaration is invalid at computed-value time and the property takes
+its INHERITED value. Two tokens were being referenced and had never been
+declared. **`--serif` has never existed** — the token is `--display` — and
+twelve rules asked for it; nine of those sit on an h1/h2/h3 that
+`h1, h2, h3, h4 { font-family: var(--display) }` had already set correctly, so
+those rules **actively replaced the right value with an invalid one** and the
+heading fell back to the sans body face: the index hero h1 on five indexes,
+the journey rows, the story lead on `/stories` and on the homepage, the four
+doors and their waylines, the closing statement. The display serif is the
+whole voice of this product and it was absent from most of the largest
+headings on the site. And **`--atlantic-lift`** was referenced by
+`--provenance` inside both dark blocks, so the heritage rule down the side of
+843 provenance panels painted limestone — the text colour — in the dark
+preference and across the whole INTELLIGENCE world. Neither is visible to a
+check that counts declarations, to the dead-rule scan (the rule matches and
+does change something: it changes the font to the wrong one), or to any
+contrast assertion, because those read tokens rather than the pixels a
+heading is painted in.
+
+**The palette register and the stylesheet had never been compared.**
+`docs/palette.json` declares eighteen tokens with a hex each and every claim,
+forbidden pair and cartographic separation is recomputed from those hexes —
+and deleting `--ultramarine` from the stylesheet entirely left the whole suite
+green. The register went on asserting a contrast for a colour the site no
+longer had. `checks.py` reads both directions now: every token's hex must be
+in the stylesheet by name or by value, and **every custom property the
+stylesheet declares must be spent by some rule**, which is the dead-rule
+scan's finding one level up. Three were dead — `--atlas-context` (identical to
+`--atlas-land`), `--shadow` (declared in all three world blocks, referenced by
+none), and `--ultramarine`, which is real in this product as the violet end of
+the PLATE ramp and was never a page colour.
+
+**THE RATIO WAS THE INSTRUCTION AND NOTHING HAD EVER MEASURED IT.** 60
+limestone, 25 graphite, 10 cobalt, 5 accent — and the only assertion on it was
+that the four numbers add to 100. Measured on the pixels a reader is painted,
+over twelve pages spanning both worlds and six families:
+
+| | measured | declared |
+|---|---|---|
+| limestone | 64.2% | 60 |
+| graphite | 18.9% | 25 |
+| cobalt | 16.6% | 10 |
+| accent | **0.3%** | 5 |
+
+Three say the instruction is being followed. The fourth does not: terracotta
+and atlantic are the entire art-directional difference between a magazine
+story and a country encyclopedia, and they are spent on an 11px kicker.
+**Classified by CHROMA rather than by HSL saturation** — limestone is `#f7f6f3`
+and HSL calls that 20% saturated, so the first version counted the paper as an
+accent and reported the site 60% terracotta.
+
+**The interactive colour was edging 465 panels about what we refuse.** The
+provenance pass gave the heritage rule to five call sites and left the rest on
+`--sea`: 445 destination pages saying we list neither hotels nor restaurants,
+130 region pages, seventeen interest pages. Every one except "Build this into
+a route" is a statement about what this atlas holds, refuses to hold, or has
+not built. **The default is the common case now** — a note is provenance
+unless it says otherwise, `.onward` is the one that hands a reader somewhere
+and keeps the interactive colour, `.warn` keeps the tinted ground. `.sourced`
+is gone rather than kept as a synonym for the default.
+
+**KEYBOARD FOCUS WAS INVISIBLE ON THE NAVIGATION OF EVERY PAGE.** The ring is
+`--sea` and sits three pixels OUTSIDE its link, which on every other surface
+puts it on the page and on the masthead puts it on the band: **1.06:1**,
+present, correctly placed, correctly sized and unseeable. It is the mark's own
+finding one element over, and it takes the same answer — the thing inverts
+rather than recolours, and limestone measures 6.70 on the band. The four
+homepage doors already did this by hand. **A `--focus` token was tried and
+refused**: `:root { --focus: var(--sea) }` resolves `--sea` where the
+declaration lives, so every world inherits the light world's cobalt, which is
+the `accent-color` bug one paragraph over. The check shoots the element's
+neighbourhood twice, focused and not, and compares every pixel that changed —
+because a focus ring has no declared background.
+
+**A word cut in half is a rendering fault, and one family had it on 146
+pages.** The destination page's sticky phone action carried the place name in
+a flexed span with an ellipsis, and two buttons take 230 pixels of a 390-pixel
+bar: 46% of destinations rendered a cut word, "Innsbr…" and "Gura Humorului &
+the painted monasteries" 255 pixels over its slot. The name is also redundant
+where it is not broken — the reader is on the page — so it moved into the
+buttons' own accessible labels, which is where a screen reader needs it. The
+check is general: no element anywhere may hold more text than it shows.
+
+**The subject of every country portrait was drawn cold, and only a pixel
+sample found it.** `path.here` was a translucent white written on the premise
+that the land tone is underneath; on a portrait there is no land underneath,
+only the sea rect, so 62% white sat on `#153851` and **Austria rendered
+`#ccd9e1` against `#d3cfc5` neighbours** — a cold country in a warm frame, on
+all fifty. At thumbnail size it looks like a slightly lighter country.
+
+**Nine portraits set their country's name on somebody else's ground.** The
+hero has three rules for that and the portrait had none of them.
+`pages.NameGround` is the hero's rule at module level, because **there are two
+drawings on this site that name countries and for the life of both only one
+had the rule**. And *a bounding box is not a country* came back through the
+ANCHORS: the moment the name had to sit on its own ground, ITALY, NORWAY and
+SPAIN lost theirs, because Italy's bounding-box centre is in the Adriatic. The
+anchors are a grid over the box keeping the cells inside the real polygon, and
+**not truncated** — keeping the seventy nearest the middle cost NORWAY its
+name, because the cells near the centre of Norway's box are all in the crowded
+south.
+
+**204 pixels for the whole of Europe, on the page whose subject is reach.**
+`/themes` closes with "a knot is an argument about one corner of Europe, a
+scatter is one about the whole of it" and drew it at 204 pixels, where eight
+stops are four pixels apart. Now 18rem — and **the mark had to come down as
+the drawing went up**, because a radius in viewBox units is a radius in pixels
+at exactly one width: 22 units is 4.5 pixels at 204 and 10.5 at 480. The width
+is capped by the page's own length rather than by taste: at 22rem the page ran
+to 5,739 pixels, within fifty of the old stories index this repository threw
+away for being 5,792.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
