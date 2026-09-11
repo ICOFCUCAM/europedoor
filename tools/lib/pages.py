@@ -6510,9 +6510,28 @@ def experiences_index(data):
         <p class="rowmeta">{esc(it['city']['name'])} · {esc(it['country']['name'])}</p></a>"""
         for it in items[:24]
     )
+    # NO DRAWING ON THIS OPENING, AND THE REASON IS THE BRIEF'S OWN.
+    #
+    # It opened on 197 dots at the full extent, which says "a lot of them"
+    # and nothing about what any of them IS — and it was the same continent,
+    # in the same arch, in the same position, as /stories, /countries,
+    # /interests and the 404. Six index openings drawn as one silhouette
+    # with a different number of marks on it is the map catalogue this
+    # product must not be, and at opening size the difference between 197
+    # dots and 130 is not a difference a reader perceives.
+    #
+    # A map answers WHERE, and where is not this family's question. The
+    # subject is what people DO, and the thing no competitor can say is
+    # already in the lede: every listing carries the name of who runs it and
+    # the tier of checking it has passed. The kinds and the categories are
+    # drawn below, as bars, where the shape is a real comparison.
+    #
+    # `img` stays. When a photograph of the experience-action role is
+    # licensed it fills the slot and replaces nothing, which is what
+    # indexhero does with an empty art and a filled img.
     body = f"""
 {crumbs([("Europe", "/discover"), ("Experiences", None)])}
-{constel_defs()}
+
 {indexhero(
     kicker="Local Experiences",
     title="What people actually do here.",
@@ -6520,17 +6539,10 @@ def experiences_index(data):
          f"lists carries the name of who runs it and the tier of checking it has passed — "
          f"an unchecked listing says so on its face rather than hiding behind a star "
          f"rating.",
-    art=constellation(sorted({project(it["city"]["lat"], it["city"]["lon"])
-                              for it in items}), cut=True),
     img=photo(data.get("images"), "experiences-hero", w=2000, h=1200,
               sizes="(min-width: 60rem) 52vw, 100vw"),
     actions='<a class="btn" href="/experiences/join">List your experience</a>'
-            '<a class="btn ghost" href="/for-businesses">For businesses</a>',
-    note='Every place in the Atlas with something on this list. Coastline from '
-         '<a href="/sources">Natural Earth</a>, public domain.'
-         + datacut_line()
-         + offframe_line(sorted({project(it["city"]["lat"], it["city"]["lon"])
-                                 for it in items}), data, listed=False))}
+            '<a class="btn ghost" href="/for-businesses">For businesses</a>')}
 <!-- listed=False on the off-frame note: the drawing plots every place in
      the Atlas with an experience, and the body under it shows twenty-four
      of the 197 — so "that place is in the list below" pointed at a list
@@ -7666,6 +7678,22 @@ def stories_index(data):
             f'<span class="small">{esc(s["reading"])}</span></p></a>'
             for s in rest
         ) + "</div>")
+    # NO DRAWING HERE EITHER, AND FOR A SHARPER REASON.
+    #
+    # This is the one family on the site whose material is WRITING, and it
+    # opened on the same continent as five other indexes with a different
+    # number of dots on it — the places nine essays happen to be set in,
+    # which is a fact about the essays and not an argument about any of
+    # them.
+    #
+    # The page already refuses a picture per story on exactly this ground:
+    # "a story is not a place, and a landscape chosen for it by chance once
+    # put tower blocks above an essay on the last unlogged forest in
+    # Europe." A scatter of nine stories' places is that rule's own
+    # loophole — not chosen by a hash, and still a picture of nothing in
+    # particular standing in front of nine pieces of writing. The lead piece
+    # keeps its own storymap, which IS about one essay, and it comes up the
+    # page now that nothing is in front of it.
     body = f"""
 {crumbs([("Europe", "/discover"), ("Stories", None)])}
 {constel_defs()}
@@ -7676,12 +7704,8 @@ def stories_index(data):
          f"food, faith, nature and culture. Every story links into the Atlas, and every "
          f"Atlas page that a story touches links back, so reading and planning are the "
          f"same motion.",
-    art=constellation(allplaces, cut=True),
     img=photo(data.get("images"), "stories-hero", w=2000, h=1200,
-              sizes="(min-width: 60rem) 52vw, 100vw"),
-    note='Every place these nine pieces are set in, on one frame. Coastline from '
-         '<a href="/sources">Natural Earth</a>, public domain.'
-         + datacut_line())}
+              sizes="(min-width: 60rem) 52vw, 100vw"))}
 {desks}
 <p class="small">The shape above the lead piece is the places it is about, drawn
 on the same projection as every other map here — and the same reason there is no
