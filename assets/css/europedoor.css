@@ -1064,6 +1064,24 @@ main.wide { max-width: 92rem; }
   font-size: var(--t-md); padding: var(--s4) var(--s4);
   border-color: color-mix(in srgb, var(--ink-3) 55%, transparent); }
 #searchform .field input[type="text"]:focus { border-color: var(--sea); }
+/* AND THE PLANNER IS THE SAME PAGE WITH TWO OF THEM. The ask box — the one
+   control the lede points at, "say what you have and what you like, in a
+   sentence" — sat in a grey card, and the fifteen-field form sat in a second
+   identical grey card underneath it. Two equal panels say the two paths are
+   equal; the page's own sentence says one leads and the other is "or the
+   form below".
+   Same treatment as the search box for the lead control, and the form keeps
+   a surface — it IS a grouped set of controls, which is the case a panel was
+   designed for — but as a rule and space rather than as a filled box. Four
+   things deliberately absent, which is the Stay layer's rule and the reason
+   its action band reads as part of the page. */
+#askform.form { background: none; border: 0; border-radius: 0; padding: 0; }
+#askform .field textarea {
+  font-size: var(--t-md); padding: var(--s4);
+  border-color: color-mix(in srgb, var(--ink-3) 55%, transparent); }
+#askform .field textarea:focus { border-color: var(--sea); }
+#planner.form { background: none; border: 0; border-radius: 0;
+  border-top: 1px solid var(--rule); padding: var(--s6) 0 0; }
 /* AND FOUR OF THE SEVEN BARS UNDER IT WERE A SPECK. The index extent is
    drawn as a share of its largest kind on an 80-pixel track, and the largest
    kind is 319 of 550 — so journeys, themes, stories and fund projects
