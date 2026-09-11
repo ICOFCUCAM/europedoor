@@ -995,9 +995,16 @@ def s36():
     # page had stopped saying where you are, on a page that had just gained a
     # kicker, a title, a lede and a drawing of the continent. Eighth
     # assertion in this repository to pin a shape instead of a promise.
+    # AND THE SAME FIX WAS NOT INHERITED BY THE LINE IT WAS WRITTEN ON.
+    # `pagehead` was loosened to `[ "]` and the two hero classes beside it
+    # were left matching a literal closing quote — so the day the homepage
+    # acquired a photograph and its class became `herofull shot`, this
+    # reported that the most-visited page on the site had stopped saying
+    # where you are. Ninth assertion here to pin a shape instead of a
+    # promise, and the second time on this exact line. A rule that exists is
+    # not a rule that is inherited.
     yield every_page(lambda h: 'class="crumbs"' in h
-                     or re.search(r'class="pagehead[ "]', h)
-                     or 'class="hero"' in h or 'class="herofull"' in h,
+                     or re.search(r'class="(pagehead|hero|herofull)[ "]', h),
                      "every page says where you are")
     yield "Nearest onward stops" in CITY, "and where you can go next"
     yield "This place, in the rest of the site" in page(

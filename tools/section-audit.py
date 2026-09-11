@@ -94,6 +94,60 @@ def every_page(pred, label="the rule"):
     return (not bad, f"{len(bad)} pages fail: {label} (e.g. {os.path.relpath(bad[0], OUT) if bad else ''})")
 
 
+
+def registered_images():
+    """Every derivative filename the register accounts for.
+
+    THE PROMISE WAS NEVER "NO PHOTOGRAPHS". Two sections asserted `<img` is
+    absent from every page and called that the rule — §39 "Image management"
+    and §83 "Visual direction" — so both went red on the day the pipeline
+    they describe started working, on the one page that had acquired a
+    photograph. That is the tenth and eleventh assertion in this repository
+    to pin a SHAPE rather than a CLAIM, and it is the same failure as
+    `c_hero_frame` asserting a drawn hero's viewBox after a photograph
+    replaced the drawing.
+
+    The standing rule is written in one line in CLAUDE.md and it is not
+    absence: NO IMAGE WITHOUT A PHOTOGRAPHER, A SOURCE AND A LICENCE. So the
+    assertion is that every image a reader is served traces to a register row
+    carrying all three, which is true of zero photographs and stays true of
+    eighteen hundred.
+    """
+    reg = json.load(open(os.path.join(ROOT, "data", "images.json"),
+                         encoding="utf-8"))["images"]
+    names, rows = set(), []
+    for row in reg.values():
+        rows.append(row)
+        for name in (row.get("derivatives") or {}):
+            names.add(name)
+    return names, rows
+
+
+def images_are_licensed():
+    """(ok, message) — every `<img>` on every page is a registered file."""
+    names, rows = registered_images()
+    missing = [r.get("purpose") for r in rows
+               if not (r.get("photographer") and r.get("source")
+                       and r.get("licence"))]
+    if missing:
+        return False, (f"{len(missing)} register rows are missing a "
+                       f"photographer, a source or a licence "
+                       f"(e.g. {missing[0]})")
+    orphans = []
+    for f in ALL_HTML:
+        h = open(f, encoding="utf-8").read()
+        for m in re.finditer(r'<img[^>]*\ssrc="([^"]+)"', h):
+            base = m.group(1).rsplit("/", 1)[-1]
+            if base not in names:
+                orphans.append(f"{os.path.relpath(f, OUT)} -> {base}")
+    if orphans:
+        return False, (f"{len(orphans)} images are served by no register row "
+                       f"(e.g. {orphans[0]})")
+    return True, (f"{len(rows)} photographs, every one with a photographer, "
+                  f"a source and a licence, and no image on any page that "
+                  f"the register does not account for")
+
+
 SECTIONS = []
 
 
@@ -1003,14 +1057,20 @@ def s38():
     yield len(unchecked) == NCOUNTRY, f"{len(unchecked)} of {NCOUNTRY} unverified — and the board says so"
 
 
-@section(39, "Image management", "REFUSED",
-         "There are no photographs at all. Every illustration is generated "
-         "from the place's own slug, which makes the licensing question "
-         "disappear rather than be managed.")
+@section(39, "Image management", "BUILT",
+         "Every image is acquired by id through a gated pipeline, kept "
+         "untouched, hashed, derived without upscaling and registered with "
+         "its photographer, source, licence, date and evidence. Surfaces "
+         "with no photograph draw a generated illustration instead, so the "
+         "library fills one photograph at a time rather than in a "
+         "migration.")
 def s39():
-    yield every_page(lambda h: "<img" not in h, "no img tag anywhere")
+    # THE RULE IS NOT ABSENCE. This asserted `<img` appears nowhere and
+    # called that image management, so it went red the day the pipeline it
+    # describes acquired its first photograph.
+    yield images_are_licensed()
     yield "plate(" in src("tools/lib/render.py"), "illustrations are generated"
-    yield doc_covers("docs/legal-position.md", "no photographs"), "and the position is recorded"
+    yield doc_covers("docs/images.md", "photographer"), "and the position is recorded"
 
 
 @section(40, "SEO architecture", "BUILT",
@@ -1532,14 +1592,16 @@ def s82():
 
 @section(83, "Visual direction", "PARTIAL",
          "Editorial, map-led, generous whitespace, one type scale. The "
-         "specification asks for large photography; there are no "
-         "photographs at all, which is a licensing decision, not an "
-         "aesthetic one.")
+         "specification asks for large photography and the containers now "
+         "exist on every family that opens on one; what is in them is "
+         "whatever has been licensed, and the rest of the site is drawn.")
 def s83():
     css = src("assets/css/europedoor.css")
     yield "--t-xs" in css and "--t-6xl" in css, "one published type scale"
     yield "prefers-color-scheme" in css, "and a dark palette"
-    yield every_page(lambda h: "<img" not in h, "no photography, by decision")
+    # NOT "no photography". The specification asks for large photography, so
+    # asserting there is none was asserting the site never satisfies it.
+    yield images_are_licensed()
     yield doc_covers("docs/architecture.md", "generated illustrations") or \
         "deterministic SVG" in src("docs/architecture.md"), "with the reason recorded"
 

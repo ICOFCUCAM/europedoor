@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**101 sections · 39 partial · 30 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1 refused · 1366 assertions · 0 failing**
+**101 sections · 39 partial · 31 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1366 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -50,7 +50,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 36 | Database model | PARTIAL | 12 | Every entity in the specification's list exists as validated data; the ones that need a write from someone other than a committer exist as DDL, with the migration trigger named. |
 | 37 | Relationship model | BUILT | 4 | The hierarchy in both directions, plus place → journey, place → story, destination → theme. |
 | 38 | Data quality | PARTIAL | 8 | All four exist now: a dated verification record, per-field provenance naming which claim was checked against what, an optional source URL, and a confidence score derived from the source kind and the age of the check rather than typed by hand. What has not happened is the checking — 0 of 50 countries, and the board says so on the site. |
-| 39 | Image management | REFUSED | 3 | There are no photographs at all. Every illustration is generated from the place's own slug, which makes the licensing question disappear rather than be managed. |
+| 39 | Image management | BUILT | 3 | Every image is acquired by id through a gated pipeline, kept untouched, hashed, derived without upscaling and registered with its photographer, source, licence, date and evidence. Surfaces with no photograph draw a generated illustration instead, so the library fills one photograph at a time rather than in a migration. |
 | 40 | SEO architecture | BUILT | 22 | The specification's URL shapes including the facet pages, its own thin-page warning enforced as a threshold, and structured data on every entity — which claims nothing the product does not hold. |
 | 41 | Internal linking | BUILT | 3 | Every page reaches its parents, its siblings and the curation that names it. |
 | 42 | Technical architecture | BUILT (deliberately smaller) | 4 | Python standard library and static output. Each proposed component has a named trigger rather than a date. |
@@ -94,7 +94,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 80 | Crowd-aware discovery | PARTIAL | 2 | The specification says not to manufacture crowd data, so we have not. The quiet tag is editorial and labelled as editorial; there is no busy/moderate/quiet indicator pretending to be measured. |
 | 81 | Responsible travel | BUILT | 3 | In the mechanism, not only the copy: shoulder months score up, quiet places score up, and no page calls anywhere undiscovered. |
 | 82 | Brand personality | RECORDED | 2 | Intelligent, welcoming, culturally careful — and specifically not a booking engine, which the whole product is arranged around. |
-| 83 | Visual direction | PARTIAL | 4 | Editorial, map-led, generous whitespace, one type scale. The specification asks for large photography; there are no photographs at all, which is a licensing decision, not an aesthetic one. |
+| 83 | Visual direction | PARTIAL | 4 | Editorial, map-led, generous whitespace, one type scale. The specification asks for large photography and the containers now exist on every family that opens on one; what is in them is whatever has been licensed, and the rest of the site is drawn. |
 | 84 | Design system | BUILT | 13 | Every component on the specification's list exists as one CSS class in one stylesheet, and a page may not ship its own style block. |
 | 85 | Core user flow | PARTIAL | 4 | Discover → destination → experience → planner → journey → customise → save → share all work. Book, travel, review and return need the blocked half. |
 | 86 | Business user flow | PARTIAL | 2 | Discover, understand the tiers and the price all work. Create an account onwards needs authentication. |

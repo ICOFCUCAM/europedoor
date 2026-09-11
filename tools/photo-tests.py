@@ -651,6 +651,22 @@ def main(argv):
         check("and checks.py passes with a photograph in the register",
               ck2.returncode == 0, (ck2.stdout + ck2.stderr)[-600:])
 
+        # AND THE AUDITS, which is where the next two failures came from.
+        # §39 "Image management" and §83 "Visual direction" both asserted
+        # `<img` appears on NO page and called that the rule — so both went
+        # red on the first acquisition, on the one page that had a
+        # photograph. The tenth and eleventh assertion here to pin a SHAPE
+        # rather than a CLAIM, and the same failure as `c_hero_frame`
+        # asserting a drawn hero's viewBox after a photograph replaced the
+        # drawing. The rule was never absence: no image without a
+        # photographer, a source and a licence.
+        sa = run(["tools/section-audit.py", "--check"], {})
+        check("the section audit passes with a photograph in the register",
+              sa.returncode == 0, (sa.stdout + sa.stderr)[-600:])
+        ua = run(["tools/ux-audit.py", "--check"], {})
+        check("and the UX audit does too",
+              ua.returncode == 0, (ua.stdout + ua.stderr)[-400:])
+
         bt = os.path.join(ROOT, "site", "europe", "belgium", "index.html")
         belgium = open(bt, encoding="utf-8").read() if os.path.exists(bt) else ""
         check("and no band at all on a country with no photograph",
