@@ -1,0 +1,102 @@
+/* WHAT THE ACQUISITION IS DOING, READ FROM THE RUN ITSELF.
+ *
+ * THE STEPS ARE THE WORKFLOW'S OWN AND ARE NOT RESTATED HERE. The local desk
+ * owned its eight steps because it ran them; this desk runs nothing, so a
+ * list of step names in this file would be a copy of `photograph.yml`'s
+ * shape that drifts the first time somebody adds a step — the ninth thing in
+ * this repository to pin a shape rather than a promise. GitHub reports every
+ * step it actually ran, with its conclusion, and that is what is shown.
+ *
+ * FINDING THE RUN. `workflow_dispatch` answers 204 with no body, so there is
+ * no run id to hold. The acquire route signs the instant before it
+ * dispatched; this asks for dispatches of `photograph.yml` created since
+ * then and takes the oldest. The window is inside a signed token, so a
+ * caller cannot widen it to read a run they did not start.
+ *
+ * A RUN THAT HAS NOT APPEARED YET IS QUEUED, NOT FAILED. GitHub takes a few
+ * seconds to create it, and a desk that said "failed" in that gap would be
+ * reporting a verdict nobody has reached — which is the same error as
+ * calling an open pull request PUBLISHED.
+ */
+
+import { requireSession, send, verify, repo, gh } from "./_lib.js";
+
+export default async function handler(req, res) {
+  if (!requireSession(req, res)) return;
+
+  const url = new URL(req.url, "http://desk");
+  const job = verify(url.searchParams.get("job") || "");
+  if (!job || typeof job.since !== "number") {
+    send(res, 400, { error: "that job token is not one this desk minted, or "
+                          + "it has expired" });
+    return;
+  }
+
+  const { slug, workflow } = repo();
+  const created = `>=${new Date(job.since).toISOString()}`;
+  const q = new URLSearchParams({
+    event: "workflow_dispatch", created, per_page: "20",
+  });
+  const r = await gh(`/repos/${slug}/actions/workflows/${workflow}/runs?${q}`);
+  if (!r.ok) {
+    send(res, 502, { error: `GitHub answered ${r.status} for the run list` });
+    return;
+  }
+  const runs = (await r.json()).workflow_runs || [];
+  const mine = runs
+    .filter((x) => new Date(x.created_at).getTime() >= job.since - 60000)
+    .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))[0];
+
+  if (!mine) {
+    send(res, 200, {
+      state: "queued", steps: [],
+      note: "GitHub has not created the run yet. It takes a few seconds.",
+    });
+    return;
+  }
+
+  const jr = await gh(`/repos/${slug}/actions/runs/${mine.id}/jobs`);
+  const jobs = jr.ok ? ((await jr.json()).jobs || []) : [];
+  const steps = jobs.flatMap((j) =>
+    (j.steps || []).map((s) => ({
+      label: s.name,
+      /* GitHub's vocabulary, mapped once: `status` is where it is and
+       * `conclusion` is how it ended, and only a finished step has both. */
+      state: s.conclusion === "success" ? "done"
+           : s.conclusion === "skipped" ? "skipped"
+           : s.conclusion ? "failed"
+           : s.status === "in_progress" ? "running" : "waiting",
+    })));
+
+  const state = mine.status !== "completed" ? "running"
+              : mine.conclusion === "success" ? "done" : "failed";
+
+  const out = { state, steps, run: mine.html_url, run_id: mine.id };
+
+  if (state === "done") {
+    /* THE PULL REQUEST IS THE DELIVERABLE, so the desk hands over the link
+     * rather than saying "acquired". Nothing is published until somebody
+     * merges it, and the wording here has to keep that true. */
+    const branch = `photo/${job.purpose}-${job.photo_id}`;
+    const owner = slug.split("/")[0];
+    const pr = await gh(`/repos/${slug}/pulls?head=${encodeURIComponent(
+      `${owner}:${branch}`)}&state=all`);
+    if (pr.ok) {
+      const list = await pr.json();
+      if (list.length) { out.pr = list[0].html_url; out.pr_number = list[0].number; }
+    }
+    out.branch = branch;
+  }
+
+  if (state === "failed") {
+    /* NEVER SILENTLY CONTINUE: which step failed, and the fact that nothing
+     * was published — which is true, because the pull request is the last
+     * step and a failure before it leaves no branch behind. */
+    const bad = steps.filter((s) => s.state === "failed").map((s) => s.label);
+    out.failure = (bad.length ? `Failed at: ${bad.join(", ")}. ` : "")
+      + "Nothing was published and no pull request was opened. "
+      + "The run's log has what it said.";
+  }
+
+  send(res, 200, out);
+}

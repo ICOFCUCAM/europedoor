@@ -1,0 +1,7 @@
+{
+  "name": "europedoor-media-desk",
+  "private": true,
+  "type": "module",
+  "description": "The hosted Media Acquisition Desk. Deployed as its own Vercel project from this directory; it is not part of europedoor.com and adds nothing to it.",
+  "engines": { "node": ">=18" }
+}

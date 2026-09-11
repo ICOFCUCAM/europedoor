@@ -226,3 +226,134 @@ one photograph, and re-acquiring the same id for the same purpose is a replay
 while a different id is refused). And no slot exists for a country, region,
 experience or journey hero, because those pages have no photograph container
 in the markup: a slot nobody can fill is what `$requirements` already refuses.
+
+## 6 · The hosted desk, and why it is a second Vercel project
+
+The desk above runs on the editor's own machine. It was the right first
+answer and it is not the answer to the brief, which asks for a desk an
+editor **signs in to** — so it is now also deployed from `desk/`, as a
+project of its own.
+
+**IT IS NOT ON europedoor.com, AND THAT IS THE WHOLE POINT.** The
+production site is `default-src 'none'`, no server, no session, no database,
+no `api/` directory and an empty `buildCommand`. Putting a
+credential-holding, authenticated service on that origin would change the
+security posture of all 1,034 pages to serve one internal tool. A second
+Vercel project from the same repository, root directory `desk/`, keeps the
+site exactly as strict as it is now and costs one deployment configured
+once.
+
+**THE LOCAL DESK HELD STATE AND THIS ONE CANNOT.** `tools/desk/serve.py` is
+one process: a session is a random token in a dictionary and a thumbnail is
+a token in a map. Two serverless invocations share no memory, so a
+dictionary here would work on the request that wrote it and fail on the
+next — the classic port of a stateful design that appears to work in testing
+because testing hits one warm instance. Both became **signed values**: a
+session is a signed expiry, a thumbnail is a signed URL, and the server can
+verify it minted the thing without having remembered it.
+
+That is not the allowlist-in-front-of-an-SSRF the local desk refused. The
+objection there was that a route fetching a caller-supplied address is
+guarded by something the next person widens. **A signature is not a guard on
+a caller's address; it is proof the address came from a search this desk
+performed** — and the host allowlist stays as well, because two independent
+reasons to refuse is the posture this repository takes everywhere else. One
+of the 38 checks is exactly that: a correctly signed token pointing at
+`169.254.169.254` fetches nothing.
+
+**A SERVERLESS FUNCTION CANNOT IMPORT `tools/lib` OR READ `data/`.** So the
+slot answer arrives as data: `tools/desk-registry.py` resolves every purpose
+through `imageslots.resolve()` — the same resolver `acquire.py` uses — and
+writes `desk/registry.json`, generated and committed exactly like `site/`,
+with `checks.py` failing when it is stale. The slots are still declared once
+in `data/image-purposes.json` and the targets still come from the atlas.
+
+A templated row carries **no requirements of its own**: they are the slot's,
+stated once under `slots`. 590 copies of one 300-word brief is half a
+megabyte saying one thing, and a value repeated 590 times is 590 places for
+it to differ. 519 KB → 225 KB, and one answer to "what does this slot need".
+
+**The register is read live and the licence verdict is generated**, because
+they have different lifetimes. A photograph appears when somebody merges a
+pull request, so a status baked into a build goes stale within the hour; a
+provider's clearance changes when somebody edits
+`docs/data-licenses/photo-providers.json`, which is the same act that
+regenerates this file. The verdict here is **not the gate** — `acquire.py`
+refuses before it opens a socket, inside the workflow, where the key is —
+and it can only ever refuse more than the gate, never less.
+
+**The status is read off the DEFAULT BRANCH.** A photograph sitting in an
+open pull request has been acquired and has not been accepted, and a desk
+that called it PUBLISHED would be reporting the reviewer's decision before
+the reviewer made it.
+
+### What happens when an editor clicks Acquire
+
+    browser  →  /api/acquire      provider, photo id, purpose, alt text
+    function →  workflow_dispatch  photograph.yml, stage=acquire
+    Actions  →  fetch by id · verify the id · keep and hash the original ·
+                build the ladder · write provenance · run every gate ·
+                shoot the page · open a pull request
+    browser  →  /api/status        the run's own steps, then the PR link
+
+The browser never holds a key, never calls a provider, and never fetches an
+image from anywhere but this deployment.
+
+**THE PROGRESS PANEL HOLDS NO LIST OF STEPS.** The local desk owned its
+eight because it ran them; this desk runs nothing, so a list here would be a
+copy of `photograph.yml`'s shape that drifts the first time somebody adds a
+step to it — the ninth thing in this repository to pin a shape rather than a
+promise. GitHub reports every step it actually ran, with its conclusion, and
+that is what is shown.
+
+**`workflow_dispatch` answers 204 with no run id**, so there is nothing to
+hold. The acquire route signs the instant before it dispatched and the
+status route asks for dispatches created since then. The window is inside a
+signed token, so a caller cannot widen it to read a run they did not start.
+A run GitHub has not created yet reads **queued**, never failed: a verdict
+nobody has reached is the same error as calling an open PR published.
+
+### The three secrets, and where each lives
+
+| environment variable | what it is for |
+|---|---|
+| `DESK_PASSCODE` | the one passcode. No user store: a single-operator tool with accounts, roles and password hashes is security theatre with a migration attached |
+| `DESK_SESSION_SECRET` | signs sessions and thumbnail tokens. **Separate from the passcode** — rotating one should not invalidate the other, and a signing key should never be something a person types. Unset, the desk refuses to sign rather than falling back to a constant |
+| `PEXELS_API_KEY` | the provider key. It exists on this deployment and in GitHub Actions, and nowhere else |
+| `DESK_GITHUB_TOKEN` | dispatches the workflow and reads the register. Needs `actions:write`, `contents:read` and `pull_requests:read` on this repository and nothing more |
+
+Optional: `DESK_REPO` (default `ICOFCUCAM/europedoor`) and `DESK_BRANCH`
+(default `main`).
+
+**A failed sign-in costs a fixed 700 ms.** Not a lockout — a lockout on a
+single-operator tool locks the operator out — but the passcode cannot be
+walked quickly. On 127.0.0.1 the threat was anything running as that user;
+on a public origin it is everyone, and the delay is the difference.
+
+### Deploying it
+
+1. New Vercel project, same repository, **root directory `desk`**.
+2. Framework preset: Other. `desk/vercel.json` carries the rest —
+   `outputDirectory: public`, the functions, and headers as strict as the
+   site's, including `X-Robots-Tag: noindex` and a CSP with no
+   `unsafe-inline` and `img-src 'self'`.
+3. Set the four environment variables above. None of them is ever written
+   to a file, a commit, a log line or a response, and one of the 38 checks
+   greps `desk/` for anything credential-shaped.
+4. Point a hostname at it — `desk.europedoor.com` — or use the deployment
+   URL. Nothing about europedoor.com changes either way.
+
+### What it still does not do
+
+It does not search (`providerSearch` calls the provider once and a 429 is
+reported rather than retried around), does not download a photograph, does
+not write a register row, does not build a derivative and does not compose a
+PR body. Four scripts already do all of that, and a second implementation of
+any of them is a second chance to make its mistake.
+
+It does not merge. **A pull request is a question, not a publication**, and
+the panel says so in those words: the run going green says the photograph is
+in a branch with its provenance, its rendered page and both hashes, and that
+nothing on europedoor.com has changed.
+
+    node tools/hosted-desk-tests.js     38 — the hosted boundary

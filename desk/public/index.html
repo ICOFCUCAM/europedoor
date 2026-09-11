@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Media Desk — EuropeDoor</title>
+<link rel="stylesheet" href="/desk.css">
+</head>
+<body>
+
+<!-- SIGN IN. One passcode, one operator — and this one is on the public
+     internet, so a failed attempt costs a fixed 700ms and the hint says
+     where the passcode lives rather than anything about it. -->
+<main id="gate" class="gate" hidden>
+  <div class="gate-in">
+    <p class="mark">EuropeDoor</p>
+    <h1>Media Desk</h1>
+    <p class="lede">An editorial acquisition tool. Sign in to browse
+    candidates and send an approved photograph through EuropeDoor&rsquo;s own
+    gated pipeline. You never handle a file and never see a key.</p>
+    <form id="signin">
+      <label for="passcode">Passcode</label>
+      <input id="passcode" name="passcode" type="password" autocomplete="off"
+             autofocus required>
+      <p class="hint">The passcode is <code>DESK_PASSCODE</code> in this
+      deployment&rsquo;s environment variables. Nobody here can read it out
+      to you.</p>
+      <button type="submit">Sign in</button>
+      <p class="err" id="gate-err" role="alert"></p>
+    </form>
+  </div>
+</main>
+
+<div id="desk" class="desk" hidden>
+  <header class="top">
+    <p class="mark">EuropeDoor <span>Media Desk</span></p>
+    <nav class="areas">
+      <button type="button" class="area on" data-view="find">Find images</button>
+      <button type="button" class="area" data-view="library">Library</button>
+      <button type="button" class="area" data-view="provenance">Provenance</button>
+    </nav>
+    <button type="button" id="signout" class="quiet">Sign out</button>
+  </header>
+
+  <!-- FIND IMAGES -->
+  <section id="view-find" class="view">
+    <form id="find" class="find">
+      <div class="f-slot">
+        <label for="slot">Slot</label>
+        <select id="slot" required></select>
+      </div>
+      <div class="f-target" id="target-wrap" hidden>
+        <label for="target">Target</label>
+        <input id="target" list="targets" autocomplete="off"
+               placeholder="start typing a destination">
+        <datalist id="targets"></datalist>
+      </div>
+      <div class="f-q">
+        <label for="q">Search</label>
+        <input id="q" type="search" autocomplete="off" required
+               placeholder="Amalfi Coast at first light">
+      </div>
+      <button type="submit">Search</button>
+    </form>
+
+    <!-- THE REQUIREMENTS COME FROM THE SLOT, never from this interface. An
+         editor should not have to know that a destination portrait wants
+         1,800 native pixels; the slot says so and this line reads it out. -->
+    <p class="needs" id="needs"></p>
+    <div class="brief" id="slot-note"></div>
+
+    <p class="sheet-note" id="sheet-note"></p>
+    <div class="sheet" id="sheet"></div>
+  </section>
+
+  <!-- LIBRARY -->
+  <section id="view-library" class="view" hidden>
+    <!-- EACH LABEL AND ITS CONTROL ARE ONE CELL. Loose in the grid they
+         became separate cells, so "Slot" rendered to the RIGHT of the status
+         select and every label sat beside the wrong control. `for=` was
+         correct the whole time, which is exactly why no check saw it. -->
+    <form class="lib-filters" id="lib-filters">
+      <div><label for="lib-status">Status</label>
+        <select id="lib-status">
+          <option value="">Every slot</option>
+          <option value="PUBLISHED">Filled</option>
+          <option value="EMPTY">Empty</option>
+        </select></div>
+      <div><label for="lib-slot">Slot</label>
+        <select id="lib-slot"><option value="">Any</option></select></div>
+      <div><label for="lib-q">Find</label>
+        <input id="lib-q" type="search" autocomplete="off"
+               placeholder="a surface or a target"></div>
+    </form>
+    <p class="needs" id="lib-count"></p>
+    <div class="lib" id="lib"></div>
+  </section>
+
+  <!-- PROVENANCE -->
+  <section id="view-provenance" class="view" hidden>
+    <h2>What is recorded for every photograph</h2>
+    <p class="lede">Source, date and evidence — the same contract the map
+    datasets have. A row missing any of it fails the build rather than
+    shipping.</p>
+    <div class="prov" id="prov"></div>
+  </section>
+</div>
+
+<!-- ACQUIRE. The wording is Acquire rather than Download: the editor is
+     authorising EuropeDoor's own gated process, not saving a file. -->
+<dialog id="acquire">
+  <form method="dialog" class="ack">
+    <h2>Acquire to EuropeDoor</h2>
+    <figure id="ack-shot"></figure>
+    <dl id="ack-facts"></dl>
+    <label for="alt">What the photograph shows</label>
+    <input id="alt" required maxlength="240"
+           placeholder="for somebody who cannot see it — not the place name">
+    <p class="hint">The page already carries the place name. This is the
+    thing in the frame.</p>
+    <ul class="willdo">
+      <li>Fetch by id in GitHub Actions, and refuse anything that is not that id</li>
+      <li>Keep the untouched original and hash it</li>
+      <li>Build the width ladder, never upscaling</li>
+      <li>Write the provenance row and the attribution from it</li>
+      <li>Run every gate, shoot the finished page, open a pull request</li>
+    </ul>
+    <p class="hint">A pull request is a question, not a publication. Nothing
+    on europedoor.com changes until somebody merges it.</p>
+    <menu>
+      <button value="cancel" class="quiet">Cancel</button>
+      <button value="go" id="ack-go" class="go">Acquire to EuropeDoor</button>
+    </menu>
+  </form>
+</dialog>
+
+<!-- PROGRESS. Every step, in order, with what failed and what it said. -->
+<dialog id="progress">
+  <div class="prog">
+    <h2 id="prog-title">Acquiring photograph…</h2>
+    <ol id="prog-steps"></ol>
+    <pre class="why" id="prog-why" hidden></pre>
+    <menu><button type="button" id="prog-close" class="quiet">Close</button></menu>
+  </div>
+</dialog>
+
+<script src="/desk.js"></script>
+</body>
+</html>

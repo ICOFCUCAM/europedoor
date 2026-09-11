@@ -27,7 +27,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | naming, branding, domains | **`docs/brand-lock.md`** — settled, enforced, and the trademark is contested: EUROPEDOOR is in use in the doors trade, so no ®, no ™, nothing announced |
 | **colour, the mark, voice, the manifesto** | **`docs/brand.md`** — the Brand Bible as built, including the four logo directions that were rejected and why |
 | **which family gets a photograph, and what it must do there** | **`docs/image-philosophy.md`** — twelve families, twelve visual languages. One row is measured (the homepage); six are claims and none may be bought until measured; three families get none ever |
-| **acquiring a photograph without touching a file — the desk, the sign-in, what the browser may send** | **`docs/media-desk-audit.md`** — Phase 1 of the Media Desk brief: what the pipeline already is, which of its thirty sections were already satisfied, and the finding that shaped everything after (there is no Backdoor, no server and no database anywhere in this product). Then run `python3 tools/desk/serve.py` |
+| **acquiring a photograph without touching a file — the desk, the sign-in, what the browser may send** | **`docs/media-desk-audit.md`** — Phase 1 of the Media Desk brief: what the pipeline already is, which of its thirty sections were already satisfied, and the finding that shaped everything after (there is no Backdoor, no server and no database anywhere in this product). Then run `python3 tools/desk/serve.py` for the local desk, or read **Part 6** for the hosted one, which is a second Vercel project from `desk/` and adds nothing to europedoor.com |
 | photographs, or "why is there no picture here" | **`docs/images.md`** — the pipeline is built and enforced; the library is empty |
 | **the Postgres/PostGIS model, the API, Next.js, auth, search, the AI pipeline** | **`docs/technical-foundation.md`** — a destination with a trigger, not a plan for Monday. Nothing in it should be built yet |
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
@@ -2756,6 +2756,60 @@ one destination each and the three advisory countries are stripped from the
 planner index, so 44 of 50 carry it and the six that do not are decided by
 the route rather than by a threshold somebody picked.
 
+**AND THEN IT WAS ALSO HOSTED, AS A SECOND VERCEL PROJECT FROM `desk/`.**
+The brief asks for a desk an editor signs in to, and "run a Python process"
+is not that. What did not change is the reason the paragraph below exists:
+the hosted desk is **not on europedoor.com**. A credential-holding,
+authenticated service on that origin would change the posture of all 1,034
+pages to serve one internal tool; a second project, root directory `desk/`,
+costs one deployment configured once and leaves the site exactly as strict.
+
+**THE LOCAL DESK HELD STATE AND A SERVERLESS FUNCTION CANNOT.** A session
+was a token in a dictionary and a thumbnail was a token in a map — two
+invocations share no memory, so a dictionary works on the request that wrote
+it and fails on the next, which is the port that appears to work in testing
+because testing hits one warm instance. Both are **signed values** now. That
+is not the allowlist-in-front-of-an-SSRF the local desk refused: **a
+signature is not a guard on a caller's address, it is proof the address came
+from a search this desk performed** — and the host allowlist stays anyway,
+because a signature proves nothing about where an address points and would
+go on proving nothing if the signing key leaked. One check signs
+`169.254.169.254` correctly and asserts nothing is fetched.
+
+**A FUNCTION CANNOT IMPORT `tools/lib` OR READ `data/`, so the slot answer is
+generated.** `tools/desk-registry.py` resolves every purpose through the same
+`imageslots.resolve()` `acquire.py` uses and writes `desk/registry.json` —
+committed, and `checks.py` fails when it is stale, exactly like `site/`. **A
+templated row carries no requirements of its own**: they belong to the slot,
+stated once. 590 copies of one brief is half a megabyte saying one thing and
+590 places for it to differ; 519 KB became 225.
+
+**Three things are read live rather than baked, and each for its own
+lifetime.** The register comes from `data/images.json` on the **default
+branch**, because a photograph in an open pull request has been acquired and
+not accepted, and calling it PUBLISHED reports the reviewer's decision before
+the reviewer makes it. The licence verdict IS generated, because it changes
+with a commit rather than with an acquisition — and it is **not the gate**:
+`acquire.py` refuses before it opens a socket, inside the workflow, where the
+key is, so this copy can only ever refuse more than the gate.
+
+**THE PROGRESS PANEL HOLDS NO LIST OF STEPS.** The local desk owned its eight
+because it ran them; this desk runs nothing, so a list here would be a copy
+of `photograph.yml`'s shape that drifts the first time somebody adds a step —
+**the ninth thing in this repository to pin a shape rather than a promise.**
+GitHub reports the steps it actually ran. And `workflow_dispatch` answers 204
+with no run id, so there is nothing to hold: the acquire route signs the
+instant before it dispatched and the status route asks for dispatches since
+then, inside a signed token so a caller cannot widen the window to read
+somebody else's run. **A run GitHub has not created yet reads queued, never
+failed** — a verdict nobody has reached is the same error as calling an open
+PR published.
+
+**And the word for a green run is not "published".** It is the word an editor
+will reach for and the panel refuses it: the photograph is in a branch behind
+a pull request, and nothing on europedoor.com has changed until somebody
+merges. A check reads that sentence out of the shipped script.
+
 **THE MEDIA DESK IS A LOCAL PROCESS, AND THAT IS A SECURITY DECISION RATHER
 THAN A CONVENIENCE.** An editor signs in at `127.0.0.1:8765`, browses
 candidates, approves one, and the photograph is acquired, hashed, derived,
@@ -2874,6 +2928,7 @@ the rest.
     python3 tools/plate-variation.py --check  the plates have not got more alike
     python3 tools/photo-tests.py              the acquisition pipeline, against a stub provider
     python3 tools/desk-tests.py               the Media Desk: the sign-in, and what the browser may send
+    node tools/hosted-desk-tests.js           the HOSTED desk: signed sessions, signed thumbnails, the dispatch
 
 And three more that are deliberately NOT gates. Two write an image rather
 than a verdict: `node tools/hero-sheet.js` draws every discovered candidate

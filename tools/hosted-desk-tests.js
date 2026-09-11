@@ -1,0 +1,464 @@
+/* THE HOSTED MEDIA DESK — the boundary, and only the boundary.
+ *
+ *     node tools/hosted-desk-tests.js
+ *
+ * `tools/photo-tests.py` already proves the pipeline: fetch by id, refusing
+ * a mismatched id, keeping the original, never upscaling, generating the PR
+ * body from the register. `tools/desk-tests.py` proves the local desk's own
+ * boundary. Re-testing either through this one would be testing one thing
+ * twice and calling it coverage.
+ *
+ * WHAT IS NEW HERE IS THAT THE DESK IS ON THE PUBLIC INTERNET AND HOLDS
+ * THREE CREDENTIALS, and that every piece of state it used to keep in a
+ * dictionary is now a signed value a caller holds. So this asserts the
+ * things that changed:
+ *
+ *   every route refuses without a session; a forged or expired session is
+ *   not a session; a signature made with another key is not a signature; a
+ *   POST without the desk header is refused; the signed thumbnail token is
+ *   NOT the only thing standing between a caller and an arbitrary fetch;
+ *   the licence gate's refusal reaches the search route; an acquisition
+ *   refuses a photo id that is not an identity, an empty alt, a purpose
+ *   that is not one, and a duplicate from either end; and no response and
+ *   no log line anywhere contains a key.
+ *
+ * IT NEVER ACQUIRES AND NEVER REACHES A PROVIDER. `fetch` is replaced for
+ * the whole run, so a test that accidentally dispatched a workflow would
+ * fail rather than dispatch one — a suite that could write to the
+ * repository it is testing is the failure `desk-tests.py` records.
+ */
+
+import assert from "node:assert";
+import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.dirname(HERE);
+const API = path.join(ROOT, "desk", "api");
+
+/* A key shaped like a real one, so a test that leaked it would be visible.
+ * It is invented here and exists nowhere else. */
+const FAKE_KEY = "TESTKEYTESTKEYTESTKEYTESTKEYTESTKEYTESTKEY0123456789";
+const FAKE_GH = "ghp_TESTTESTTESTTESTTESTTESTTESTTESTTEST";
+
+process.env.DESK_SESSION_SECRET = "test-signing-secret-not-a-real-one";
+process.env.DESK_PASSCODE = "open-sesame";
+process.env.PEXELS_API_KEY = FAKE_KEY;
+process.env.DESK_GITHUB_TOKEN = FAKE_GH;
+process.env.DESK_REPO = "ICOFCUCAM/europedoor";
+process.env.DESK_BRANCH = "main";
+
+let passed = 0;
+const failures = [];
+const LOG = [];
+
+/* Everything printed during the run is captured, because "the key is absent
+ * from the desk's own log" is one of the promises and a promise nobody
+ * measures is a sentence. */
+const realLog = console.log, realErr = console.error;
+console.log = (...a) => LOG.push(a.join(" "));
+console.error = (...a) => LOG.push(a.join(" "));
+
+function t(name, fn) {
+  return Promise.resolve()
+    .then(fn)
+    .then(() => { passed += 1; })
+    .catch((e) => { failures.push(`${name}: ${e.message}`); });
+}
+
+/* ── the network, replaced ──────────────────────────────────────── */
+let CALLS = [];
+let NEXT = null;                     // what the next fetch should answer
+globalThis.fetch = async (url, init = {}) => {
+  CALLS.push({ url: String(url), init });
+  if (NEXT) { const r = NEXT; NEXT = null; return r; }
+  return new Response(JSON.stringify({ photos: [] }), {
+    status: 200, headers: { "content-type": "application/json" },
+  });
+};
+
+/* ── a request and a response, enough of each ───────────────────── */
+function req(opts = {}) {
+  return {
+    method: opts.method || "GET",
+    url: opts.url || "/api/x",
+    headers: Object.assign({}, opts.headers || {}),
+    body: opts.json,
+  };
+}
+
+function res() {
+  const r = {
+    statusCode: 0, headers: {}, body: "",
+    setHeader(k, v) { this.headers[k.toLowerCase()] = v; },
+    end(b) { this.body = b == null ? "" : String(b); this.done = true; },
+  };
+  r.json = () => { try { return JSON.parse(r.body); } catch { return {}; } };
+  return r;
+}
+
+const lib = await import(path.join(API, "_lib.js"));
+
+function session() {
+  return `${lib.COOKIE}=${lib.sign({ exp: Date.now() + 3600e3 })}`;
+}
+
+async function call(file, opts = {}) {
+  const mod = await import(path.join(API, file));
+  const rq = req(opts), rs = res();
+  await mod.default(rq, rs);
+  return rs;
+}
+
+const ROUTES = ["registry.js", "search.js", "thumb.js", "status.js"];
+const POSTS = ["acquire.js", "signout.js"];
+
+/* ── 1. the session ─────────────────────────────────────────────── */
+
+for (const f of ROUTES) {
+  await t(`${f} refuses without a session`, async () => {
+    const r = await call(f);
+    assert.strictEqual(r.statusCode, 401, `answered ${r.statusCode}`);
+  });
+}
+
+await t("acquire refuses without a session", async () => {
+  const r = await call("acquire.js", {
+    method: "POST", headers: { "x-desk": "1" }, json: {},
+  });
+  assert.strictEqual(r.statusCode, 401);
+});
+
+await t("a session signed with another key is not a session", async () => {
+  const other = crypto.createHmac("sha256", "a different secret")
+    .update(Buffer.from(JSON.stringify({ exp: Date.now() + 3600e3 }))
+      .toString("base64url")).digest().toString("base64url");
+  const body = Buffer.from(JSON.stringify({ exp: Date.now() + 3600e3 }))
+    .toString("base64url");
+  assert.strictEqual(lib.verify(`${body}.${other}`), null);
+});
+
+await t("an expired session is not a session", () => {
+  assert.strictEqual(lib.verify(lib.sign({ exp: Date.now() - 1 })), null);
+});
+
+await t("a token of the wrong shape is refused rather than crashing", () => {
+  /* timingSafeEqual THROWS on a length mismatch, which is both a leak of one
+   * bit and a 500 from the function. Lengths are compared first, and this is
+   * the assertion that says so. */
+  for (const bad of ["", "x", "a.b", "....", "a.".repeat(50)]) {
+    assert.strictEqual(lib.verify(bad), null, `${bad} was accepted`);
+  }
+});
+
+await t("a wrong passcode does not issue a cookie", async () => {
+  const r = await call("signin.js", {
+    method: "POST", headers: { "x-desk": "1" }, json: { passcode: "wrong" },
+  });
+  assert.notStrictEqual(r.statusCode, 200);
+  assert.ok(!r.headers["set-cookie"], "it set a cookie anyway");
+});
+
+await t("the right passcode issues an HttpOnly, Secure, SameSite cookie",
+  async () => {
+    const r = await call("signin.js", {
+      method: "POST", headers: { "x-desk": "1" },
+      json: { passcode: "open-sesame" },
+    });
+    assert.strictEqual(r.statusCode, 200);
+    const c = String(r.headers["set-cookie"]);
+    for (const flag of ["HttpOnly", "Secure", "SameSite=Strict", "Path=/"]) {
+      assert.ok(c.includes(flag), `the cookie is missing ${flag}`);
+    }
+  });
+
+/* ── 2. the second CSRF control ─────────────────────────────────── */
+
+for (const f of POSTS.concat(["signin.js"])) {
+  await t(`${f} refuses a POST with no desk header`, async () => {
+    const r = await call(f, { method: "POST", headers: { cookie: session() },
+                              json: { passcode: "open-sesame" } });
+    assert.strictEqual(r.statusCode, 400, `answered ${r.statusCode}`);
+  });
+  await t(`${f} refuses a GET`, async () => {
+    const r = await call(f, { headers: { cookie: session() } });
+    assert.strictEqual(r.statusCode, 405);
+  });
+}
+
+/* ── 3. the thumbnail, which is the shape that looks like an SSRF ─ */
+
+await t("an unsigned thumbnail token serves nothing", async () => {
+  const r = await call("thumb.js", {
+    url: "/api/thumb?t=" + encodeURIComponent("https://images.pexels.com/a.jpg"),
+    headers: { cookie: session() },
+  });
+  assert.strictEqual(r.statusCode, 400);
+  assert.strictEqual(CALLS.length, 0, "it fetched something");
+});
+
+await t("a SIGNED token for a host that is not a provider serves nothing",
+  async () => {
+    /* THE SIGNATURE IS NOT THE ONLY CONTROL, and this is the assertion that
+     * says so. A signature proves this desk minted the address; it proves
+     * nothing about where the address points, and it would go on proving
+     * nothing if the signing secret ever leaked. */
+    CALLS = [];
+    const tok = lib.sign({ u: "https://169.254.169.254/latest/meta-data/",
+                           exp: Date.now() + 3600e3 });
+    const r = await call("thumb.js", {
+      url: "/api/thumb?t=" + encodeURIComponent(tok),
+      headers: { cookie: session() },
+    });
+    assert.strictEqual(r.statusCode, 400);
+    assert.strictEqual(CALLS.length, 0, "it fetched the link-local address");
+  });
+
+await t("a signed token for http rather than https serves nothing", async () => {
+  CALLS = [];
+  const tok = lib.sign({ u: "http://images.pexels.com/a.jpg",
+                         exp: Date.now() + 3600e3 });
+  const r = await call("thumb.js", {
+    url: "/api/thumb?t=" + encodeURIComponent(tok),
+    headers: { cookie: session() },
+  });
+  assert.strictEqual(r.statusCode, 400);
+  assert.strictEqual(CALLS.length, 0);
+});
+
+await t("an expired thumbnail token serves nothing", async () => {
+  CALLS = [];
+  const tok = lib.sign({ u: "https://images.pexels.com/a.jpg", exp: Date.now() - 1 });
+  const r = await call("thumb.js", {
+    url: "/api/thumb?t=" + encodeURIComponent(tok),
+    headers: { cookie: session() },
+  });
+  assert.strictEqual(r.statusCode, 400);
+  assert.strictEqual(CALLS.length, 0);
+});
+
+await t("a provider host that answers something that is not an image is refused",
+  async () => {
+    CALLS = [];
+    NEXT = new Response("<html>", { status: 200,
+      headers: { "content-type": "text/html" } });
+    const tok = lib.sign({ u: "https://images.pexels.com/a.jpg",
+                           exp: Date.now() + 3600e3 });
+    const r = await call("thumb.js", {
+      url: "/api/thumb?t=" + encodeURIComponent(tok),
+      headers: { cookie: session() },
+    });
+    assert.strictEqual(r.statusCode, 502);
+  });
+
+/* ── 4. the licence gate reaches the search route ───────────────── */
+
+await t("the search route refuses a provider the licence gate refuses",
+  async () => {
+    CALLS = [];
+    const r = await call("search.js", {
+      url: "/api/search?provider=unsplash&purpose=homepage-hero&q=alps",
+      headers: { cookie: session() },
+    });
+    assert.strictEqual(r.statusCode, 400);
+    assert.match(r.json().error, /REFUSED/);
+    assert.strictEqual(CALLS.length, 0, "it searched anyway");
+  });
+
+await t("the search route refuses a purpose that is not one", async () => {
+  CALLS = [];
+  const r = await call("search.js", {
+    url: "/api/search?provider=pexels&purpose=not-a-purpose&q=alps",
+    headers: { cookie: session() },
+  });
+  assert.strictEqual(r.statusCode, 400);
+  assert.strictEqual(CALLS.length, 0);
+});
+
+await t("the search route refuses an empty query", async () => {
+  CALLS = [];
+  const r = await call("search.js", {
+    url: "/api/search?provider=pexels&purpose=homepage-hero&q=",
+    headers: { cookie: session() },
+  });
+  assert.strictEqual(r.statusCode, 400);
+  assert.strictEqual(CALLS.length, 0);
+});
+
+await t("a rate limit is reported and never retried around", async () => {
+  CALLS = [];
+  NEXT = new Response("{}", { status: 429 });
+  const r = await call("search.js", {
+    url: "/api/search?provider=pexels&purpose=homepage-hero&q=alps",
+    headers: { cookie: session() },
+  });
+  assert.strictEqual(r.statusCode, 429);
+  assert.strictEqual(CALLS.length, 1, `it made ${CALLS.length} attempts`);
+});
+
+/* ── 5. the requirements come from the SLOT ─────────────────────── */
+
+await t("a templated instance inherits its slot's numbers", () => {
+  const reg = lib.registry();
+  const row = reg.purposes.find((p) => p.slot);
+  assert.ok(row, "the registry declares no templated purposes at all");
+  assert.strictEqual(row.min_width, undefined,
+    "a templated row carries its own copy of the slot's numbers");
+  const spec = lib.specOf(row.purpose);
+  assert.strictEqual(spec.min_width, reg.slots[row.slot].min_width);
+  assert.ok(spec.note && spec.note.length > 40, "it inherited no brief");
+});
+
+await t("fits() refuses an original too small to derive from", () => {
+  const bad = lib.fits({ width: 800, height: 500 },
+                       { min_width: 1800, orientation: "landscape" });
+  assert.ok(bad.length, "an 800px original passed an 1800px slot");
+  assert.match(bad.join(" "), /upscale/);
+});
+
+/* ── 6. acquisition refuses before it dispatches ────────────────── */
+
+const acq = (json) => call("acquire.js", {
+  method: "POST", headers: { "x-desk": "1", cookie: session() }, json,
+});
+
+await t("a photo id that is not an identity is refused", async () => {
+  CALLS = [];
+  for (const id of ["", "abc", "12 3", "1;rm -rf /", "../../etc/passwd",
+                    "9".repeat(30)]) {
+    const r = await acq({ provider: "pexels", photo_id: id,
+                          purpose: "homepage-hero", alt: "a valley" });
+    assert.strictEqual(r.statusCode, 400, `${id} was accepted`);
+  }
+  assert.strictEqual(CALLS.length, 0, "it dispatched something");
+});
+
+await t("an empty alt text is refused", async () => {
+  CALLS = [];
+  const r = await acq({ provider: "pexels", photo_id: "12345",
+                        purpose: "homepage-hero", alt: "   " });
+  assert.strictEqual(r.statusCode, 400);
+  assert.strictEqual(CALLS.length, 0);
+});
+
+await t("a purpose that is not one is refused", async () => {
+  CALLS = [];
+  const r = await acq({ provider: "pexels", photo_id: "12345",
+                        purpose: "homepage-hero@nowhere", alt: "a valley" });
+  assert.strictEqual(r.statusCode, 400);
+  assert.strictEqual(CALLS.length, 0);
+});
+
+await t("a provider the licence gate refuses cannot be acquired", async () => {
+  CALLS = [];
+  const r = await acq({ provider: "unsplash", photo_id: "12345",
+                        purpose: "homepage-hero", alt: "a valley" });
+  assert.strictEqual(r.statusCode, 400);
+  assert.match(r.json().error, /REFUSED/);
+  assert.strictEqual(CALLS.length, 0);
+});
+
+/* ── 7. no credential anywhere ──────────────────────────────────── */
+
+await t("no response body or header carries a key", async () => {
+  const seen = [];
+  NEXT = null;
+  for (const f of ["registry.js", "search.js", "status.js"]) {
+    const r = await call(f, {
+      url: "/api/x?provider=pexels&purpose=homepage-hero&q=alps&job=nope",
+      headers: { cookie: session() },
+    });
+    seen.push(r.body, JSON.stringify(r.headers));
+  }
+  const all = seen.join("\n");
+  assert.ok(!all.includes(FAKE_KEY), "a response carried the provider key");
+  assert.ok(!all.includes(FAKE_GH), "a response carried the GitHub token");
+});
+
+await t("nothing printed during this run carries a key", () => {
+  const all = LOG.join("\n");
+  assert.ok(!all.includes(FAKE_KEY), "the log carried the provider key");
+  assert.ok(!all.includes(FAKE_GH), "the log carried the GitHub token");
+});
+
+await t("no committed desk file carries anything credential-shaped", () => {
+  /* The key is an environment variable on the deployment and nowhere else.
+   * This is the same grep `photo-tests.py --committed-only` runs over the
+   * repository, pointed at the directory that was added after it. */
+  const bad = [];
+  const walk = (d) => {
+    for (const name of fs.readdirSync(d)) {
+      const p = path.join(d, name);
+      if (fs.statSync(p).isDirectory()) { walk(p); continue; }
+      if (!/\.(js|json|html|css)$/.test(name)) continue;
+      const text = fs.readFileSync(p, "utf8");
+      for (const m of text.match(/\b(ghp_|github_pat_|sk-|Bearer\s+[A-Za-z0-9]{20,})\S*/g) || []) {
+        /* A NAME IS NOT A VALUE. `Bearer ${token}` is the code that sends
+         * one; a literal is the thing being looked for. */
+        if (!m.includes("${") && !m.includes("token")) bad.push(`${p}: ${m}`);
+      }
+      for (const m of text.match(/[A-Za-z0-9_-]{40,}/g) || []) {
+        if (/^[A-Za-z0-9]{40,}$/.test(m) && !/^[a-f0-9]+$/i.test(m)) {
+          bad.push(`${p}: a 40-character token-shaped literal`);
+        }
+      }
+    }
+  };
+  walk(path.join(ROOT, "desk"));
+  assert.deepStrictEqual(bad, [], bad.join("\n"));
+});
+
+await t("the desk directory declares no runtime dependency", () => {
+  const pkg = JSON.parse(
+    fs.readFileSync(path.join(ROOT, "desk", "package.json"), "utf8"));
+  assert.ok(!pkg.dependencies, "a dependency arrived");
+  assert.strictEqual(pkg.type, "module",
+    "the functions are ESM and the package does not say so");
+});
+
+await t("the deployment's headers are as strict as the site's", () => {
+  const v = JSON.parse(
+    fs.readFileSync(path.join(ROOT, "desk", "vercel.json"), "utf8"));
+  const h = {};
+  for (const rule of v.headers) for (const x of rule.headers) h[x.key] = x.value;
+  const csp = h["Content-Security-Policy"];
+  assert.match(csp, /default-src 'none'/);
+  assert.ok(!csp.includes("unsafe-inline"), "the desk's CSP allows inline");
+  assert.match(csp, /img-src 'self'/);      // never a provider CDN
+  assert.match(csp, /frame-ancestors 'none'/);
+  assert.match(h["X-Robots-Tag"] || "", /noindex/);
+  assert.match(h["Strict-Transport-Security"] || "", /max-age=\d{7,}/);
+});
+
+await t("the desk page loads no inline script and no style attribute", () => {
+  const html = fs.readFileSync(
+    path.join(ROOT, "desk", "public", "index.html"), "utf8");
+  assert.ok(!/<script(?![^>]*\bsrc=)/.test(html), "an inline script");
+  assert.ok(!/\sstyle="/.test(html), "a style attribute");
+});
+
+/* ── 8. what a green run is called ──────────────────────────────── */
+
+await t("the desk never calls an unmerged acquisition published", () => {
+  /* A pull request is a question. The local desk stopped at a branch and
+   * said so; this one has to say the same thing about a PR, because
+   * "acquired" is the word an editor will reach for and it is wrong. */
+  const js = fs.readFileSync(
+    path.join(ROOT, "desk", "public", "desk.js"), "utf8");
+  assert.ok(!/textContent = "Published/.test(js));
+  assert.match(js, /Nothing on europedoor\.com has changed/);
+});
+
+console.log = realLog; console.error = realErr;
+
+console.log("EuropeDoor — the hosted Media Desk\n");
+if (failures.length) {
+  console.log(`${failures.length} failure(s):`);
+  for (const f of failures) console.log("  - " + f);
+  console.log(`\n${passed} passed, ${failures.length} failed`);
+  process.exit(1);
+}
+console.log(`all ${passed} checks passed — and nothing was acquired, `
+          + `dispatched or fetched.`);

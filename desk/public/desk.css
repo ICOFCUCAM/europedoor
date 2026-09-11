@@ -1,0 +1,257 @@
+/* THE MEDIA DESK — AN EDITORIAL TOOL, NOT AN ADMIN CRUD TABLE.
+ *
+ * The photograph is the primary object and the metadata is secondary, so the
+ * contact sheet is the page and the controls are a single line above it. No
+ * card borders on the candidates: a contact sheet is images in a grid with
+ * their facts under them, and a border round each one turns it into a
+ * marketplace listing — which is exactly what §23 says this must not become.
+ *
+ * It takes the site's own palette because it is the same product's tool, and
+ * it is unmistakably internal: a graphite bar, no masthead, no aperture. The
+ * aperture is how EuropeDoor draws GEOGRAPHY, and there is none here. */
+
+:root {
+  --limestone: #f7f6f3;
+  --paper-2: #f1efe9;
+  --paper-3: #e8e5dc;
+  --graphite: #14181c;
+  --graphite-2: #1d2328;
+  --ink: #14181c;
+  --ink-2: #4a5158;
+  --ink-3: #767d84;
+  --rule: #e0ddd4;
+  --cobalt: #3157ff;
+  --cobalt-deep: #2440c8;
+  --terracotta: #a4491f;
+  --atlantic: #1f5f4a;
+  --radius: 4px;
+  --s1: .25rem; --s2: .5rem; --s3: .75rem; --s4: 1rem;
+  --s5: 1.5rem; --s6: 2rem; --s7: 3rem; --s8: 4rem;
+  --display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+/* `[hidden]` IS A UA `display: none` AND A CLASS BEATS IT. `.gate` is
+   `display: grid`, so the hidden sign-in screen went on laying itself out —
+   138 pixels of empty page above the desk's own header, on every screen.
+   That is this repository's recurring specificity failure arriving in a new
+   file: a rule wins a fight nobody knew it was in, and the result renders as
+   something simply being there. */
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--limestone); color: var(--ink);
+  font: 15px/1.55 var(--sans);
+}
+h1, h2, h3 { font-family: var(--display); font-weight: 600; line-height: 1.15;
+             margin: 0; letter-spacing: -0.01em; }
+p { margin: 0 0 var(--s3); }
+a { color: var(--cobalt-deep); }
+button { font: inherit; }
+
+:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 2px; }
+
+.lede { color: var(--ink-2); max-width: 42rem; }
+.hint { color: var(--ink-3); font-size: 13px; margin: var(--s2) 0 0; }
+.err { color: var(--terracotta); font-size: 14px; min-height: 1.4em; margin: var(--s3) 0 0; }
+
+/* ── sign in ─────────────────────────────────────────────────── */
+.gate { display: grid; place-items: center; min-height: 100vh; padding: var(--s5); }
+.gate-in { width: min(26rem, 100%); }
+.mark { font-family: var(--display); font-size: 15px; letter-spacing: .02em;
+        color: var(--ink-2); margin: 0 0 var(--s2); }
+.mark span { color: var(--ink-3); }
+.gate h1 { font-size: 34px; margin-bottom: var(--s3); }
+.gate form { margin-top: var(--s6); }
+label { display: block; font-size: 11px; text-transform: uppercase;
+        letter-spacing: .08em; color: var(--ink-2); margin-bottom: var(--s2); }
+input, select {
+  width: 100%; padding: .6rem .7rem; font: inherit; color: var(--ink);
+  background: #fff; border: 1px solid var(--rule); border-radius: var(--radius);
+}
+input:focus, select:focus { border-color: var(--cobalt); }
+.gate button[type=submit], .go {
+  margin-top: var(--s4); padding: .6rem 1.1rem; border: 0; cursor: pointer;
+  border-radius: var(--radius); background: var(--cobalt-deep);
+  color: var(--limestone); font-weight: 600;
+}
+.gate button[type=submit] { width: 100%; }
+.quiet { background: none; border: 0; color: var(--ink-2); cursor: pointer;
+         text-decoration: underline; text-underline-offset: 3px; padding: .4rem; }
+
+/* ── the desk ────────────────────────────────────────────────── */
+.desk { min-height: 100vh; }
+/* IT WRAPS, BECAUSE IT DID NOT AND `Sign out` WAS OFF THE RIGHT EDGE AT 390.
+   A link a reader cannot see is not reachable because it is focusable — the
+   masthead and the section nav on the site itself both had this, twice, and
+   it arrived here the same way: a flex row with no wrap. */
+.top {
+  display: flex; align-items: center; gap: var(--s4); flex-wrap: wrap;
+  row-gap: var(--s2);
+  padding: var(--s3) var(--s5); background: var(--graphite);
+  color: var(--limestone); position: sticky; top: 0; z-index: 5;
+}
+.top .mark { color: var(--limestone); margin: 0; }
+.top .mark span { color: #98a1a9; }
+.areas { display: flex; gap: var(--s1); margin-left: auto; }
+.area {
+  background: none; border: 0; cursor: pointer; color: #c3c9cf;
+  padding: .45rem .8rem; border-radius: var(--radius); font-size: 14px;
+}
+.area:hover { color: var(--limestone); background: var(--graphite-2); }
+.area.on { color: var(--graphite); background: var(--limestone); font-weight: 600; }
+.top .quiet { color: #98a1a9; margin-left: var(--s3); }
+
+.view { padding: var(--s6) var(--s5) var(--s8); max-width: 84rem; margin: 0 auto; }
+
+/* The controls are ONE LINE, not a panel. A search box that is the page does
+   not need a border box round it — the same finding the site's own /search
+   page already records. */
+.find { display: grid; gap: var(--s4); align-items: end;
+        grid-template-columns: 1fr; }
+@media (min-width: 60rem) {
+  .find { grid-template-columns: 18rem 18rem 1fr auto; }
+  .find:not(:has(.f-target:not([hidden]))) { grid-template-columns: 18rem 1fr auto; }
+}
+.find button[type=submit] {
+  padding: .6rem 1.2rem; border: 0; cursor: pointer; border-radius: var(--radius);
+  background: var(--cobalt-deep); color: var(--limestone); font-weight: 600;
+}
+.needs { color: var(--ink-2); font-size: 13px; margin: var(--s4) 0 0;
+         padding-top: var(--s3); border-top: 1px solid var(--rule); }
+/* THE SLOT'S NOTE IS WRITTEN FOR SOMEBODY READING THE JSON, and rendered
+   whole under the control it pushed the search box 900 pixels down and the
+   contact sheet off the screen. Its first sentence is the art direction and
+   everything after it is how the numbers were chosen — so the first sentence
+   is the hint and the rest is a disclosure, which is what it always was. */
+.brief { color: var(--ink-2); font-size: 13px; max-width: 46rem;
+         margin: var(--s2) 0 0; }
+.brief details { margin-top: var(--s2); }
+.brief summary { cursor: pointer; color: var(--ink-3); }
+.brief .rest { margin: var(--s2) 0 0; color: var(--ink-3); }
+.needs b { color: var(--ink); font-weight: 600; }
+.sheet-note { color: var(--ink-3); font-size: 13px; margin: var(--s2) 0 var(--s5); }
+
+/* ── the contact sheet ───────────────────────────────────────── */
+.sheet { display: grid; gap: var(--s6) var(--s5);
+         grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); }
+.cand { display: flex; flex-direction: column; gap: var(--s3); }
+.cand figure { margin: 0; background: var(--paper-3); aspect-ratio: 3 / 2;
+               overflow: hidden; border-radius: var(--radius); }
+.cand img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cand h3 { font-size: 17px; }
+.cand .by { color: var(--ink-2); font-size: 13px; margin: 0; }
+.cand .dims { color: var(--ink-3); font-size: 12px; font-family: var(--mono);
+              margin: 0; }
+.verdict { font-size: 13px; margin: 0; }
+.verdict.ok { color: var(--atlantic); }
+.verdict.no { color: var(--terracotta); }
+.verdict ul { margin: var(--s1) 0 0; padding-left: 1.1em; }
+.cand .acts { display: flex; gap: var(--s3); align-items: center;
+              margin-top: auto; padding-top: var(--s2); }
+.cand .acts .go { margin: 0; padding: .45rem .9rem; font-size: 14px; }
+.cand .acts a { font-size: 13px; }
+/* ALREADY REGISTERED IS SAID ON THE CANDIDATE, not discovered at the end.
+   §25, in the direction the pipeline was missing: it refused a purpose
+   already filled and never said "this photograph is already somewhere". */
+.dupe { font-size: 13px; color: var(--terracotta); margin: 0;
+        border-left: 2px solid var(--terracotta); padding-left: var(--s3); }
+
+/* ── library ─────────────────────────────────────────────────── */
+.lib-filters { display: grid; gap: var(--s4); align-items: end;
+               grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); }
+.lib { display: grid; gap: 0; margin-top: var(--s5); }
+.slotrow { display: grid; gap: var(--s3); padding: var(--s4) 0;
+           border-bottom: 1px solid var(--rule); align-items: baseline; }
+@media (min-width: 52rem) {
+  .slotrow { grid-template-columns: 7rem 1fr 12rem; }
+}
+.slotrow h3 { font-size: 16px; }
+.slotrow .where { color: var(--ink-2); font-size: 13px; margin: var(--s1) 0 0; }
+.slotrow .meta { color: var(--ink-3); font-size: 12px; font-family: var(--mono); }
+.pill { display: inline-block; font-size: 11px; letter-spacing: .06em;
+        text-transform: uppercase; padding: .18rem .5rem; border-radius: 2px; }
+.pill.EMPTY { background: var(--paper-3); color: var(--ink-2); }
+.pill.PUBLISHED { background: var(--atlantic); color: var(--limestone); }
+
+/* ── provenance ──────────────────────────────────────────────── */
+.prov { margin-top: var(--s5); }
+.prov dl { display: grid; grid-template-columns: 12rem 1fr; gap: var(--s2) var(--s4);
+           font-size: 14px; margin: 0 0 var(--s6); padding-bottom: var(--s5);
+           border-bottom: 1px solid var(--rule); }
+.prov dt { color: var(--ink-2); }
+.prov dd { margin: 0; font-family: var(--mono); font-size: 13px; word-break: break-word; }
+
+/* ── dialogs ─────────────────────────────────────────────────── */
+/* THE DIALOG SCROLLS AND ITS ACTION DOES NOT. Adding the photograph made
+   the acquire dialogue taller than the viewport and pushed both buttons off
+   the bottom — a confirmation whose confirm button cannot be seen. The body
+   scrolls, the action bar is pinned to the foot of it, and the figure is
+   capped so the facts are on screen with it. */
+dialog { border: 0; border-radius: var(--radius); padding: 0;
+         max-width: min(38rem, 92vw); max-height: 88vh;
+         background: var(--limestone); color: var(--ink);
+         display: flex; flex-direction: column; overflow: hidden; }
+dialog > * { display: flex; flex-direction: column; min-height: 0; }
+/* AND A STICKY BAR INSIDE A PADDED SCROLLER ONLY COVERS THE CONTENT BOX.
+   Its background stopped at the padding, so the list scrolled past it and
+   showed through on both sides — half a line of text either side of an
+   opaque middle. The bar spans the padding with a negative margin and the
+   scroller carries enough bottom padding for the last line to clear it. */
+.ack > menu, .prog > menu {
+  position: sticky; bottom: calc(var(--s6) * -1); background: var(--limestone);
+  padding: var(--s4) var(--s6) var(--s6); margin: auto calc(var(--s6) * -1)
+  calc(var(--s6) * -1); border-top: 1px solid var(--rule); }
+dialog::backdrop { background: rgba(20, 24, 28, .55); }
+.ack, .prog { padding: var(--s6); overflow: auto; }
+.ack > .willdo:last-of-type, .ack > .hint:last-of-type { margin-bottom: var(--s5); }
+.ack h2, .prog h2 { font-size: 24px; margin-bottom: var(--s4); }
+.ack dl { display: grid; grid-template-columns: 9rem 1fr; gap: var(--s2) var(--s4);
+          font-size: 14px; margin: 0 0 var(--s5); }
+/* THE PHOTOGRAPH IS THE PRIMARY OBJECT, INCLUDING HERE. The first version of
+   this dialogue listed five facts about a picture it did not show, which is
+   the one screen where the editor is committing to a specific frame. */
+.ack figure { margin: 0 0 var(--s5); aspect-ratio: 3 / 2; max-height: 34vh;
+              flex: none; overflow: hidden;
+              border-radius: var(--radius); background: var(--paper-3); }
+.ack figure img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ack dt { color: var(--ink-2); }
+.ack dd { margin: 0; }
+.willdo { margin: var(--s4) 0 0; padding-left: 1.1em; color: var(--ink-2);
+          font-size: 13px; }
+.willdo li { margin-bottom: var(--s1); }
+menu { display: flex; gap: var(--s3); justify-content: flex-end;
+       margin: var(--s5) 0 0; padding: 0; }
+
+.prog ol { list-style: none; margin: 0; padding: 0; }
+.prog li { display: flex; gap: var(--s3); align-items: baseline;
+           padding: var(--s2) 0; border-bottom: 1px solid var(--rule); }
+.prog .tick { width: 1.2em; font-family: var(--mono); color: var(--ink-3); }
+.prog li.done .tick { color: var(--atlantic); }
+.prog li.failed .tick { color: var(--terracotta); }
+.prog li.failed .lbl { color: var(--terracotta); font-weight: 600; }
+.prog li.waiting .lbl { color: var(--ink-3); }
+.prog .det { color: var(--ink-3); font-size: 12px; font-family: var(--mono);
+             margin-left: auto; max-width: 18rem; text-align: right;
+             overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.why { background: var(--paper-3); padding: var(--s4); border-radius: var(--radius);
+       font-size: 12px; white-space: pre-wrap; max-height: 14rem; overflow: auto;
+       margin: var(--s4) 0 0; }
+.branch { font-family: var(--mono); font-size: 13px; }
+
+/* ── the hosted desk only ───────────────────────────────────────────── */
+/* The local desk's progress panel ended on a branch name, because a local
+   commit is where it stopped. This one ends on a PULL REQUEST, which is a
+   question somebody has to answer — so the link is the last thing on the
+   panel and it is the only thing that looks like an action. */
+.prog li.running .tick { color: var(--sea); }
+.prog li.skipped { opacity: .55; }
+.prog .runlink, .prog .prlink { display: inline-block; margin-top: var(--s4);
+  font-size: 14px; }
+.prog .prlink { font-weight: 600; }
+/* WHAT A GREEN RUN MEANS, said on the screen that reports it. "Acquired" is
+   the word an editor will reach for and it is wrong: the photograph is in a
+   branch, behind a pull request, and nothing on europedoor.com has changed. */
+.prog .notyet { color: var(--ink-2); font-size: 13px; margin-top: var(--s3); }

@@ -45,6 +45,20 @@ jobs:
       - name: Checks
         run: python3 tools/checks.py
 
+      # WHAT A VISUAL CHANGE MAY NOT MOVE. `invariants.py` was run by hand
+      # and by nothing else, which makes it a gate that holds only while
+      # somebody remembers it — and the register's whole point is that
+      # moving a row silently is not allowed.
+      - name: The invariant register
+        run: python3 tools/invariants.py --check
+
+      # THE MEDIA DESK, BOTH HALVES. Neither suite acquires, neither reaches
+      # a provider, and the local one asserts that the register and the
+      # working tree are untouched by its own run — which is why they can sit
+      # here, before the staleness checks would notice a rebuild.
+      - name: The Media Desk — the local boundary
+        run: python3 tools/desk-tests.py
+
       - name: Audit the brief, section by section
         run: python3 tools/section-audit.py --check
 
@@ -86,6 +100,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+
+      - name: The Media Desk — the hosted boundary
+        run: node tools/hosted-desk-tests.js
 
       - name: Browser checks
         run: |

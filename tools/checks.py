@@ -5441,6 +5441,43 @@ def c_originals_registered():
     return max(n, 1)
 
 
+@check("desk/registry.json is not stale")
+def c_desk_registry():
+    """THE HOSTED DESK SERVES A GENERATED FILE, SO IT CAN BE STALE.
+
+    `tools/desk/serve.py` resolves a purpose by calling `imageslots.resolve()`
+    against the loaded dataset — it cannot be out of date, because it is the
+    dataset. A Vercel function has no repository, no Python and no atlas, so
+    the same answer is generated into `desk/registry.json` and committed, and
+    a committed derivation is a derivation that can disagree with its source.
+
+    That is the `site/` contract and it gets the `site/` check: add a
+    destination, forget to regenerate, and the desk offers 592 targets while
+    the atlas holds 593 — or worse, offers one that no longer exists and
+    dispatches an acquisition for a purpose `acquire.py` will refuse. The
+    failure would surface in a workflow run rather than in a build, which is
+    the slowest place in this product to find anything.
+
+    IT ALSO CATCHES A LICENCE VERDICT GOING STALE. The file carries what
+    `acquire.cleared()` says about each provider, so a provider whose terms
+    were re-read and whose gate now refuses cannot go on being offered by a
+    desk built before that commit.
+    """
+    import importlib.util
+    path = os.path.join(ROOT, "tools", "desk-registry.py")
+    spec = importlib.util.spec_from_file_location("desk_registry", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    want = json.dumps(mod.build(), indent=1, ensure_ascii=False) + "\n"
+    out = os.path.join(ROOT, "desk", "registry.json")
+    have = open(out, encoding="utf-8").read() if os.path.exists(out) else ""
+    if have != want:
+        fail("desk/registry.json is stale. Run "
+             "`python3 tools/desk-registry.py --write` and commit it in the "
+             "same commit, exactly like site/.")
+    return 1
+
+
 @check("a sub-category keyword selects a word it is a form of")
 def c_sub_keywords():
     """`cell` CAUGHT `cellar`, SO THE MONASTERIES PAGE WAS EIGHTEEN WINE
