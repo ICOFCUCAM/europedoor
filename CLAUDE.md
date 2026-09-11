@@ -2374,6 +2374,81 @@ is capped by the page's own length rather than by taste: at 22rem the page ran
 to 5,739 pixels, within fifty of the old stories index this repository threw
 away for being 5,792.
 
+**THE RATIO'S FIRST MEASUREMENT COUNTED THE SEA AS THE SIGNATURE.** Everything
+blue went into one bucket and cobalt came back at 16.6% against a declared 10
+— a finding about the masthead that was mostly the Atlantic. The families do
+not overlap: the ocean ramp and the atlas water run 202–205° of hue and every
+cobalt runs 228–230°. Split at 218:
+
+| | measured | declared |
+|---|---|---|
+| limestone | 64.1% | 60 |
+| graphite | 18.9% | 25 |
+| water | 9.7% | unbudgeted |
+| cobalt | **7.0%** | 10 |
+| accent | 0.3% | 5 |
+
+Cobalt sits UNDER its budget on all twelve pages and varies between six and
+eight per cent — the masthead and the links, and almost nothing else. **The
+correction matters more than the original reading**: the conclusion was that
+the signature was overspent, and it is not. Water gets no line in the ratio
+because it is the DRAWINGS rather than the interface, and a ceiling keeps that
+true. The accent is the one number that still disagrees, and it stays recorded
+rather than closed — making terracotta a ground is "generic tourism blue as a
+page background" in a warmer hue.
+
+**A LIST THAT IS THE PAGE STARTS AT h2, AND A SIXTH OF THE SITE STARTED AT
+h3.** The
+`row` shape carries its name in an `<h3>`, which is right inside a band where
+the band's `<h2>` is the level above it — and wrong on every family where the
+list IS the page: the facet pages, the theme pages, the motion pages, the
+interest pages, the macro pages, `/method`, `/api-docs`, `/discover`,
+`/stories`, `/themes` and three indexes. Nothing in WCAG fails on a skipped
+level, which is why it survived every gate; what it costs is that a reader
+navigating by heading hears "level three" with no level two above it. The
+stylesheet already held this opinion for notes and rails. **The level is the
+outline and the class is the look**, so the selectors are `:is(h2, h3)` and
+`render.card()` takes a `level`. **And `main h2` started matching all of
+them** — 32 pixels above and 16 below — so a change meant to move nothing
+moved something on every one of them until the components stated their own
+margins.
+
+**THE ELECTRIC LIME WAS STILL ON NINETY-SIX SOCIAL CARDS.** A card is
+content-addressed on the seed, the motif, the size and a **hand-typed version
+tag**, and the tag is the only part of that key that notices a change to the
+DRAWING — `render.og_key` says so, in a paragraph about the last time it was
+forgotten. When lime left the palette it left the plate's night moon too, and
+nothing produced a new filename: two stylesheet guards, a browser probe on the
+painted colour and `css.lime` in the register, and **not one of them reads a
+PNG**. #697d4b, 1,586 pixels, on 96 of 785. Found by building a contact sheet
+of eight cards and seeing an olive disc in a palette with no green in it. The
+build writes `assets/og/cards.json` now and `checks.py` re-renders a sample and
+compares BYTES.
+
+**The data cut ran raw through all 21 index openings**, which is the worst
+surface for it: the ground behind those glyphs is the sea panel, so the cut is
+a hard edge between parchment and deep navy. **And the defs were outside the
+group again** — `cut_fade()` has the same shape `cartography.datacut()` had,
+and stayed green only because `/map` colours its stops by ID rather than by
+class. A second implementation of a thing is a second chance to make its
+mistake.
+
+**The terrain's top band went back the other way.** 2000 m+ was `#e8e6e3`,
+"light stone", which is the convention for permanent ICE. Measured as the
+plates draw them the ramp ran 1.081, 1.081, 1.084 and then **1.353 upwards**,
+so the ground above 2,000 m measured **1.069 against the ground below 200**
+and **1.207 against the page's own limestone** — the highest ground read as a
+hole in the drawing. This DEM has no ice class, so the ramp runs the whole way
+down and the Alps are the darkest ground rather than the lightest.
+
+**Keyboard focus was invisible on the navigation of every page**, and the
+**sticky phone action cut its own place name on 146 of 319 destinations**.
+Both are in the same family of fault: a thing that is present, correctly
+placed, correctly sized and unusable. The focus check shoots the element's
+neighbourhood twice, focused and not, because a focus ring has no declared
+background; the clipping check asserts that no element anywhere holds more
+text than it shows.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
