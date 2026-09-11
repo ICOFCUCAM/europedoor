@@ -5314,6 +5314,71 @@ def c_hero_dusk_reach():
     return n
 
 
+@check("a sub-category keyword selects a word it is a form of")
+def c_sub_keywords():
+    """`cell` CAUGHT `cellar`, SO THE MONASTERIES PAGE WAS EIGHTEEN WINE
+    CELLARS, A LAMBIC BREWERY AND THREE DISTILLERIES.
+
+    A keyword was matched as a bare prefix. `matches_sub`'s own docstring
+    records exactly this failure for the CITY name and fixes it there —
+    `hall` catching Hallstatt, `snow` catching Snowdonia — and never asked
+    whether the same prefix was doing the same thing inside the experience's
+    own text. It was, on five of the 38 sub-pages: villa/village 11 times,
+    cell/cellar 18, and opera/operator, ski/skip and wall/wallet twice each.
+    39 wrong listings out of 401.
+
+    A keyword is a whole word plus one English inflection now, and a keyword
+    that really is a STEM says so with a trailing `*`. This check cannot
+    assert the matching itself — re-running the model would only ever agree
+    with it, which is the instrument fault this repository has made three
+    times. It asserts the two things around the model that DO have content:
+
+    A STAR IS BOUNDED. A stem is a licence to match anything that starts
+    with it, so the four stars are the one place a new false positive can
+    enter silently. `monaster*` reaches monastery (+1) and monasteries (+3);
+    `sled*` reaches sledding (+4). A star that starts catching a word far
+    longer than its stem has stopped being an inflection and is a different
+    word — the check fails and names it, and a person decides.
+
+    AND A STAR NEVER REACHES A READER. It is an instruction to the matcher;
+    the sub-pages publish the terms they selected on, and a page printing
+    `monaster*` would be publishing a regular expression as though it were
+    a word.
+    """
+    from lib.data import all_experiences
+    from lib import categories as C
+
+    data = D.load()
+    items = all_experiences(data["countries"])
+    texts = [C.text_of(it["exp"]) for it in items]
+    n = 0
+    STAR_GAP = 4
+    for cat in data["categories"]:
+        for sub in cat.get("subs", []):
+            for k in sub["keywords"]:
+                n += 1
+                if not k.endswith("*"):
+                    continue
+                stem = k[:-1].lower()
+                caught = set()
+                for t in texts:
+                    for m in re.finditer(r"\b" + re.escape(stem) + r"\w*", t):
+                        caught.add(m.group(0))
+                far = sorted(w for w in caught if len(w) - len(stem) > STAR_GAP)
+                if far:
+                    fail(f"the stem `{k}` in {cat['slug']}/{sub['slug']} catches "
+                         f"{', '.join(far)} — more than {STAR_GAP} characters past "
+                         f"the stem is a different word, not an inflection of one")
+    for path in sorted(glob.glob(os.path.join(OUT, "experiences", "**", "index.html"),
+                                 recursive=True)):
+        html = open(path).read()
+        n += 1
+        if re.search(r">[^<]*\b\w+\*", html):
+            fail(f"{path} publishes a keyword with its `*` on it — a stem is an "
+                 f"instruction to the matcher and is not a word a reader can check")
+    return n
+
+
 @check("every image purpose instantiates a declared role, and no role is dead")
 def c_photo_roles():
     """A ROLE IS THE VOCABULARY AND A PURPOSE IS AN INSTANCE.

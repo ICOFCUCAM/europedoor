@@ -386,7 +386,7 @@
             "snow",
             "ice",
             "glacier",
-            "sled",
+            "sled*",
             "snowshoe",
             "aurora",
             "bobsleigh"
@@ -674,7 +674,7 @@
             "pintxo",
             "tapas",
             "meze",
-            "lunch",
+            "lunch*",
             "dinner",
             "breakfast",
             "kahvalti",
@@ -751,7 +751,7 @@
             "basilica",
             "chapel",
             "minster",
-            "dom",
+            "dom*",
             "nave",
             "fresco"
           ]
@@ -760,7 +760,7 @@
           "slug": "monasteries",
           "name": "Monasteries",
           "keywords": [
-            "monaster",
+            "monaster*",
             "abbey",
             "convent",
             "hermitage",

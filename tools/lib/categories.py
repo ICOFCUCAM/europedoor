@@ -59,7 +59,53 @@ def matches_sub(exp, sub, city=None):
     rejected: it would break the four keywords that are stems on purpose.
     """
     t = text_of(exp)
-    return any(re.search(r"\b" + re.escape(k.lower()), t) for k in sub["keywords"])
+    return any(keyword_re(k).search(t) for k in sub["keywords"])
+
+
+# A KEYWORD MATCHED AS A BARE PREFIX AND `cell` CAUGHT `cellar`, SO THE
+# MONASTERIES PAGE WAS EIGHTEEN WINE CELLARS, A LAMBIC BREWERY AND THREE
+# DISTILLERIES.
+#
+# `matches_sub`'s own docstring records this failure for the CITY name and
+# fixes it there — `\bhall` catching Hallstatt, `\bsnow` catching Snowdonia —
+# and never asked whether the same prefix was doing the same thing inside the
+# experience's own text. It was, on five sub-pages:
+#
+#     cell   -> cellar       18 wine listings under Monasteries
+#     villa  -> village      11 villages under Architecture
+#     opera  -> operator      2 under Music, incl. a reindeer-herding afternoon
+#     ski    -> skip          2 under Skiing, incl. a Saint-Émilion cellar
+#     wall   -> wallet        2 under Medieval and Modern history
+#
+# The docstring also names the reason a trailing \b was rejected: it would
+# break the keywords that are stems on purpose. That was right about the
+# evidence and wrong about the conclusion — the answer is not one rule for
+# everything but to SAY WHICH ARE STEMS. A keyword written with a trailing
+# `*` matches any continuation; every other keyword matches the word itself
+# or the word plus one English inflection, and nothing else.
+#
+# Measured over all 38 sub-pages: 401 listings to 362. Every one of the 39
+# removed is a word that is not the word, and no page empties — Monasteries
+# holds four monasteries, which is what this dataset actually contains.
+# `boatman`, `musicians` and `lunchtime` are in the suffix set or declared,
+# because losing those would trade a false positive for a false negative.
+INFLECTIONS = "s|es|ed|d|ing|er|ers|r|rs|ies|man|men|ian|ians"
+
+
+def keyword_re(k):
+    """The one place a sub-category keyword becomes a pattern."""
+    k = k.lower()
+    if k.endswith("*"):
+        return re.compile(r"\b" + re.escape(k[:-1]))
+    return re.compile(r"\b" + re.escape(k) + "(?:" + INFLECTIONS + r")?\b")
+
+
+def keyword_text(k):
+    """What the page prints. The `*` is an instruction to the matcher and
+    means nothing to a reader, so it never reaches the page — and the page
+    still cannot overstate itself, because `live_keywords` decides what is
+    printed from the same pattern the selection used."""
+    return k[:-1] if k.endswith("*") else k
 
 
 def live_keywords(sub, texts):
@@ -85,8 +131,9 @@ def live_keywords(sub, texts):
     """
     live, idle = [], []
     for k in sub["keywords"]:
-        pat = re.compile(r"\b" + re.escape(k.lower()))
-        (live if any(pat.search(t) for t in texts) else idle).append(k)
+        pat = keyword_re(k)
+        (live if any(pat.search(t) for t in texts)
+         else idle).append(keyword_text(k))
     return live, idle
 
 
