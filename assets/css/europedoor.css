@@ -755,7 +755,8 @@ main.wide { max-width: 92rem; }
    `hopbar` the journeys and /experiences use, so no third bar scale enters
    the system; it needs a width here because a right-aligned inline element
    has none of its own and rendered as a 30px stub. */
-.rowmeta .hopbar { display: block; width: 5rem; margin: var(--s2) 0 0 auto; }
+/* No `display`: `.hopbar` is already a block. Width and offset only. */
+.rowmeta .hopbar { width: 5rem; margin: var(--s2) 0 0 auto; }
 
 /* THE ROUTE THE PLANNER BUILT. Unframed, on the whole continent: /journeys
    frames each route because seventeen framed thumbnails is how you tell
@@ -4096,8 +4097,10 @@ body[data-hero] .masthead { position: sticky; }
    is embedded. */
 /* A region's marks are bigger than a 200-destination tile's, because a
    region holds two or three and the tile holds two hundred. */
-.card-map .regionmini .constel-lit circle { r: 11px; stroke: var(--atlas-here);
-                                            stroke-width: 2; }
+/* Only the radius: the stroke is already `--atlas-here` at 1.6 from the rule
+   above, and restating it is a declaration that changes nothing — which the
+   dead-rule scan says out loud. */
+.card-map .regionmini .constel-lit circle { r: 11px; }
 .card-map { background: var(--atlas-sea); display: flex; align-items: center;
             justify-content: center; padding: var(--s4); }
 .card-map .constel { fill: var(--atlas-land); }
@@ -4462,9 +4465,12 @@ body[data-hero] .masthead { position: sticky; }
 .jart .constel { width: 100%; }
 .jart .constel-lit circle { r: 11px; }
 .jart .constel-route { stroke-width: 8; }
+/* No `color`: `.row .rowmeta` already sets --ink-3 and every .jfacts is
+   one, so restating it is a declaration that changes nothing. It only became
+   visible when the dead-rule scan started visiting a motion page. */
 .journeyrow .jfacts {
   text-align: left; margin: var(--s3) 0 0; font-size: var(--t-sm);
-  letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3);
+  letter-spacing: .06em; text-transform: uppercase;
 }
 
 /* And /stories was nine of the same row with a 132px grey Europe at the end

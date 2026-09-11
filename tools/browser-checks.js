@@ -1854,11 +1854,23 @@ async function main() {
     // raising it without reading is what the ceiling exists to stop.
     const DEAD_CEILING = 25;
     const seen = new Map();
+    // AND THE PAGE SET IS THE INSTRUMENT'S REACH. `.regionglyph .countries
+    // path` was reported dead and it is what paints the nine lit regions on
+    // /countries — a whole family this scan had never visited, so a rule that
+    // wins on the atlas index looked like one that wins nowhere. A ceiling
+    // raised for that would have been a ceiling raised for a gap in the
+    // scan. Five families added: the atlas index, an interest page, a
+    // motion, the search instrument and the Fund. Adding pages does NOT only
+    // lower the count, which was the first guess and was wrong: a rule that
+    // matched no element anywhere in the old set was not counted at all, and
+    // a new page can make it match and still not win.
     for (const u of ["/", "/europe/austria", "/europe/austria/tyrol",
                      "/europe/austria/tyrol/innsbruck",
                      "/journeys/the-alpine-grand-tour", "/discover/nordic",
                      "/events/oct", "/beyond-the-obvious", "/map", "/plan",
-                     "/stories", "/themes"]) {
+                     "/stories", "/themes", "/countries",
+                     "/interests/mountains", "/europe-in/by-rail",
+                     "/search", "/fund"]) {
       await page.goto(base + u, { waitUntil: "load" });
       const rows = await page.evaluate(() => {
         const PROPS = ["fill", "stroke", "display", "color",
@@ -1897,8 +1909,19 @@ async function main() {
           try { els = document.querySelectorAll(rule.selectorText); }
           catch (e) { continue; }
           if (!els.length) continue;
-          const read = () => [...els].slice(0, 40)
-            .map((e) => props.map((p) => getComputedStyle(e)[p]).join("|"));
+          // SAMPLED ACROSS THE MATCHES, NOT OFF THE FRONT. This was
+          // `.slice(0, 40)`, and on /countries the first forty elements
+          // matching `.regionglyph .countries path` are all inside the hero
+          // glyph, where `.iheroart` overrides the fill — so the rule that
+          // paints the nine lit macro regions further down the page was
+          // measured only where it loses, and reported as dead. A cap is
+          // fine; taking it off one end is not.
+          const pick = [...els];
+          const step = Math.max(1, Math.ceil(pick.length / 40));
+          const sample = pick.filter((_, i) => i % step === 0).slice(0, 40);
+          const read = () => sample
+            .map((e) => props.map((p) => getComputedStyle(e).getPropertyValue(p))
+                             .join("|"));
           const before = read();
           const saved = props.map((p) => [p, rule.style.getPropertyValue(p),
                                           rule.style.getPropertyPriority(p)]);
