@@ -3623,7 +3623,8 @@ async function main() {
    * gutter, and at thumbnail size nothing sees one.
    */
   {
-    const NAVPAGES = ["/", "/europe/austria/", "/journeys/", "/stories/", "/events/"];
+    const NAVPAGES = ["/", "/europe/austria/", "/journeys/", "/stories/", "/events/",
+                      "/europe/france/alps-and-east/chamonix/"];
     for (const W of [320, 390, 430]) {
       const np = await browser.newPage({ viewport: { width: W, height: 844 } });
       for (const u of NAVPAGES) {
@@ -3635,7 +3636,10 @@ async function main() {
             return b.width > 0 && b.height > 0 && getComputedStyle(e).display !== "none";
           };
           const out = [];
-          for (const a of document.querySelectorAll(".masthead a")) {
+          // The masthead AND the page's own contents row: the same defect
+          // was in both, and the second one hid half the sections of the
+          // richest family in the product.
+          for (const a of document.querySelectorAll(".masthead a, .sectionnav a")) {
             if (!vis(a)) continue;
             const b = a.getBoundingClientRect();
             if (b.right > window.innerWidth + 1 || b.left < -1)

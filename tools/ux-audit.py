@@ -550,15 +550,31 @@ def s15():
 
 
 @section(16, "Destination page", "BUILT",
-         "The brief's section navigation, scrolling sideways on a phone and "
-         "listing only the sections this page actually has.")
+         "The brief's section navigation, listing only the sections this page "
+         "actually has and putting every one of them on the screen.")
 def s16():
+    # THE ASSERTION PINNED `overflow-x: auto` AND THE SHAPE WAS THE DEFECT.
+    # The brief asks for a section navigation and this required the
+    # particular way the first version built it — scrolling sideways on a
+    # phone. Measured at 390: 567px of links in a 358px box, so Events,
+    # Travel tips, Stay and Onward were off-screen, with no affordance at
+    # all, on 319 pages. The assertion went red when that was fixed, which
+    # is the eighth time an assertion in this repository has protected a
+    # layout instead of a promise.
+    #
+    # The promise is that a reader can reach every section of the page they
+    # are on. It is asserted here as "nothing is hidden behind a gesture" —
+    # a horizontal scroller in this component is exactly that — and the
+    # browser suite measures the boxes at 320, 390 and 430.
     yield "def sectionnav" in PAGES, "the section nav exists"
     yield 'class="sectionnav"' in CITY, "and is on a destination page"
-    yield "overflow-x: auto" in CSS.split(".sectionnav {")[1].split("}")[0], \
-        "it scrolls rather than wraps"
+    rule = CSS.split(".sectionnav {")[1].split("}")[0]
+    yield "overflow-x: auto" not in rule and "flex-wrap: wrap" in rule, \
+        "every item is on the screen rather than behind a sideways scroll"
     yield "scroll-padding-top" in CSS, "and its anchors clear the sticky masthead"
     yield "section nav links to" in BROWSER, "with a check that every tab has a target"
+    yield "masthead link(s) outside the" in BROWSER, \
+        "and the browser suite measures in-page navigation at 320, 390 and 430"
 
 
 @section(17, "Content hierarchy", "ALREADY",

@@ -56,44 +56,66 @@ either.**
 
 ## Part 1 — The three findings
 
-### Finding 1 — On a phone, twenty-one of twenty-two surfaces show a visitor nothing but type
+### Finding 1 — On a phone, half the product's entry points open with no picture in them
 
-**MEASURED.** Viewport 390×844. Chrome (masthead + thumb bar) is 93px, 11%
-of the screen. `first-visual-y` is the document position of the first
-figure, picture or SVG larger than 40×40.
+**MEASURED.** Viewport 390×844. The masthead is 89px and the thumb bar 56,
+so 699px of the screen is content. The figure below is the number of those
+699 pixels that any figure, drawing or photograph actually occupies.
 
-| surface | first visual at | on the first screen? |
-|---|---:|---|
-| homepage | **233** | **yes** |
-| map | 418 | no |
-| events | 490 | no |
-| journey | 541 | no |
-| story | 545 | no |
-| region | 563 | no |
-| quiet | 566 | no |
-| interest | 574 | no |
-| country | 591 | no |
-| motion | 620 | no |
-| stories | 630 | no |
-| theme | 640 | no |
-| themes | 663 | no |
-| 404 | 655 | no |
-| journeys | 742 | no |
-| countries | 764 | no |
-| experiences | 807 | no |
-| destinations (`/discover`) | 1228 | no |
-| experience category | **none on the page** | no |
-| plan · search · my-europe | **none on the page** | no |
+| surface | first visual at | picture on the first screen |
+|---|---:|---:|
+| map | 418 | 53% |
+| homepage | 233 | 40% |
+| journey | 541 | 35% |
+| region | 563 | 32% |
+| quiet | 566 | 32% |
+| interest | 574 | 31% |
+| story | 545 | 30% |
+| country | 591 | 28% |
+| motion | 620 | 24% |
+| stories | 630 | 23% |
+| theme | 640 | 21% |
+| 404 | 655 | 19% |
+| themes | 663 | 18% |
+| events | 490 | 12% |
+| journeys | 742 | **7%** |
+| countries | 764 | **3%** |
+| **destination** | 795 | **0%** |
+| experiences | 807 | **0%** |
+| discover | 1702 | **0%** |
+| experience category | none on the page | **0%** |
+| plan · search · my-europe | none on the page | **0%** |
 
-The homepage is the only entry point in the product where a visitor sees
-Europe before they read about it. Everywhere else the first screen is:
-cobalt band, breadcrumb, kicker, serif h1, paragraph, metadata row — and
-then the fold.
+**Seven of twenty-three surfaces have no picture on the first screen at all,
+and five more have under a fifth of it.** Twelve of twenty-three — just over
+half — are effectively type to the fold.
 
-**This is the finding the whole mandate turns on.** The sequence asked for
-is desire → orientation → discovery → planning → action. The built product
-opens with *orientation* on 21 of 22 surfaces and reaches desire, if at
-all, on the second screen.
+**A CORRECTION.** The first version of this table said twenty-one of
+twenty-two surfaces "show a visitor nothing but type", and that was wrong.
+The instrument that produced it recorded whether a figure *intersected* the
+first screen and then the document position of the first one, and the
+document position was read as though it were the answer — so a region page
+whose map begins at 563 and runs to the fold was counted with an experiences
+index whose art begins at 807 and is not on the screen at all. The
+directional finding survives and the number does not: it is twelve of
+twenty-three, not twenty-one of twenty-two, and the right measure is how
+many pixels of the first screen are a picture rather than where the first
+one starts.
+
+The three that matter most:
+
+- **The destination page is 0%**, on 319 pages, and it is the richest family
+  in the product. Its first 795 pixels are a kicker, a 38px name, a lede, a
+  metadata line, three interest chips and three numbered reasons to go.
+- **The experience category page has no picture anywhere on it, at any
+  scroll position, at any width.**
+- **`/discover` reaches its first drawing at 1,702** — under a filter row.
+
+And the destination page's order is not the fault. Name, what the place is,
+why go, then where it is, is exactly the sequence the brief asks for — 
+desire before orientation. The fault is that with no photograph in the
+register, desire is being carried entirely by type, and the type is set at
+the same size as every other family's.
 
 ### Finding 2 — The site has one composition, rendered 1,033 times
 

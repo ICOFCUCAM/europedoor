@@ -2409,11 +2409,20 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
  * without it the sticky masthead covers the heading you just jumped to, and
  * the page looks like it went to the wrong place.
  */
+/* THE SAME HIDDEN NAVIGATION AS THE MASTHEAD, IN A SECOND COMPONENT, ON
+   319 PAGES. This row is a destination's own contents and it scrolled
+   sideways on a phone: measured at 390, 567px of links in a 358px box, so
+   Events, Travel tips, Stay and Onward were off-screen — half the sections
+   of the richest family in the product, behind a swipe with no affordance
+   at all (not even the masthead's mask fade).
+
+   It wraps. A contents list is page content rather than persistent chrome,
+   so a second line costs nothing: the masthead had to fight for one row
+   because it is on every screen of every page, and this is not. */
 .sectionnav {
   display: flex; gap: var(--s4); margin: var(--s5) 0;
   padding-bottom: var(--s2); border-bottom: 1px solid var(--rule);
-  overflow-x: auto; -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
+  flex-wrap: wrap; row-gap: var(--s1);
 }
 .sectionnav a {
   white-space: nowrap; text-decoration: none; color: var(--ink-2);

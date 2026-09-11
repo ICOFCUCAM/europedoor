@@ -8,7 +8,7 @@ its requirements are about how something looks and nobody can check a feeling.
 So every row here asserts against the generated HTML, the CSS and the JavaScript
 as they actually are.
 
-**52 sections · 22 built · 13 already · 12 partial · 2 built (deliberately smaller) · 1 refused · 1 locked · 1 deferred · 374 assertions · 0 failing**
+**52 sections · 22 built · 13 already · 12 partial · 2 built (deliberately smaller) · 1 refused · 1 locked · 1 deferred · 375 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -35,7 +35,7 @@ as they actually are.
 | 13 | Day cards | ALREADY | 2 | A card per day with what is on it and what the day costs. |
 | 14 | Journey customisation | BUILT | 15 | Reorder, remove and lengthen or shorten any stop; the days, the distances and the estimate all recompute from the reader's version. Buttons rather than drag handles, deliberately — and the edited route is what gets shared, not the inputs that made it. |
 | 15 | Country page | ALREADY | 1 | Hero, regions, popular destinations, experiences and journeys, in the brief's order. |
-| 16 | Destination page | BUILT | 5 | The brief's section navigation, scrolling sideways on a phone and listing only the sections this page actually has. |
+| 16 | Destination page | BUILT | 6 | The brief's section navigation, listing only the sections this page actually has and putting every one of them on the screen. |
 | 17 | Content hierarchy | ALREADY | 2 | Why visit, then what to see, then what to do, then where to stay, then how to turn it into a journey. Discovery-first, as asked. |
 | 18 | Place page | PARTIAL | 4 | About, location, nearby and a save action. Refused: the photograph, the star rating and the opening hours — the last of these is rejected by the validator, not merely omitted. |
 | 19 | Experience page | PARTIAL | 3 | What it is, where, when and who runs it. Refused: the rating and the book button. |
