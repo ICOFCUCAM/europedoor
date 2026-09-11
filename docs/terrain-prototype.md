@@ -200,7 +200,7 @@ At medium, each band is 65% of the way from `--atlas-land` to its
 | band | colour at C | |
 |---|---|---|
 | ≥ 200 m | `#dbd7c2` | foothill |
-| ≥ 600 m | `#d8ceb4` | upland |
+| ≥ 600 m | `#d2cabc` | upland |
 | ≥ 1,200 m | `#d3c5ac` | high ground |
 | ≥ 2,000 m | `#e3ddd2` | mountain, light stone |
 
@@ -268,7 +268,7 @@ room for. It was wrong twice over:
   from the land tone at that strength — a layer that ships 23 KB and renders
   as nothing, which is what this repository calls dead code that looks like a
   decision.
-* **It broke the scale.** Two strengths make `#d8ceb4` mean 600 m on one page
+* **It broke the scale.** Two strengths make the 600 m tint mean 600 m on one page
   and something else on another. A hypsometric scale that is not absolute is
   decoration that looks like one.
 

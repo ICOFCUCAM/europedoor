@@ -99,15 +99,38 @@ an argument.
 
 | band | tint | reads as |
 |---|---|---|
-| 0–200 m | `#dfe0cf` | lowland, muted green-grey |
-| 200–600 m | `#d9d6bd` | foothill, soft olive |
-| 600–1200 m | `#d5c9a8` | upland, warm ochre |
-| 1200–2000 m | `#cdbb9c` | high ground, pale brown |
-| 2000 m+ | `#e6e0d6` | mountain, light stone |
+| 0–200 m | `#dedbd3` | lowland, the land's own tone |
+| 200–600 m | `#d4cfc4` | foothill, a half-step of warmth |
+| 600–1200 m | `#cbc2b4` | upland, warm paper |
+| 1200–2000 m | `#c2b5a3` | high ground, pale earth |
+| 2000 m+ | `#e8e6e3` | mountain, light stone |
 
 Five steps, because four cannot show a foothill and six begin to read as a
 legend a reader has to consult. Warm as it rises and never saturated: height
 is **felt**, and the typography stays dominant over the ground.
+
+**And for the life of the scale it was neither of those things.** Measured on
+the values it used to hold:
+
+| band | hue | saturation | lightness |
+|---|---|---|---|
+| 0–200 | 64° | 22% | 85% |
+| 200–600 | 54° | 27% | 80% |
+| 600–1200 | 44° | **35%** | 75% |
+| 1200–2000 | 38° | 33% | 71% |
+| 2000+ | 37° | 24% | 87% |
+
+A 27° hue swing, starting yellow-**green** 22° off the land it sits on, and a
+saturation that **peaks in the middle** — so the loudest colour on a plate
+whose typography is meant to dominate was the 600–1200 m band. A reader saw a
+green lowland, a yellow foothill and a tan upland: three materials, where the
+thing being drawn is one ground at three heights.
+
+One warm family now, 42° → 35° as it rises, saturation 14 → 20 and then 9 for
+stone, and **lightness carries the height**. Mixed 65% toward the land as the
+plates draw them, the steps measure 1.06, 1.08, 1.09 and 1.36 against 1.02,
+1.08, 1.09 and 1.26 before — cleaner *and* better separated, which is the
+argument: the hue swing was buying nothing.
 
 ## Three voices of context
 

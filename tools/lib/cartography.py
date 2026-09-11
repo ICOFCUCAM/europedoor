@@ -113,12 +113,36 @@ CLASSES = {name: f"lyr-{name}" for name in ORDER}
 # The colours are of this palette's own family — the land tone at the bottom
 # and the warm accent at the top — so a terrain plate is recognisably the
 # same atlas as a flat one, which a stock hypsometric ramp would not be.
+# THE RAMP SWUNG 27 DEGREES OF HUE AND PEAKED IN SATURATION AT ITS MIDDLE.
+# Measured on the values this tuple used to hold:
+#
+#     band        hue  sat  light
+#     0-200        64   22   85     <- yellow-GREEN
+#     200-600      54   27   80
+#     600-1200     44   35   75     <- the loudest thing on the plate
+#     1200-2000    38   33   71
+#     2000+        37   24   87
+#
+# Three sentences above this one say "the land tone at the bottom" and "warm
+# as it rises, and never saturated". The bottom was 22 degrees off the land it
+# sat on and green rather than warm; the middle was the most saturated colour
+# in the drawing, on a plate whose typography is meant to dominate. A reader
+# saw a green lowland, a yellow foothill and a tan upland — three materials,
+# where the thing being drawn is ONE ground at three heights.
+#
+# One warm family now, drifting 42 -> 35 degrees as it rises, which is the
+# printed-atlas convention and is what the paragraph above already claimed.
+# Saturation rises gently to 20 and drops for stone; LIGHTNESS carries the
+# height, evenly — mixed 65% toward the land as the plates draw them, the
+# steps measure 1.06, 1.08, 1.09 and 1.36, against 1.02, 1.08, 1.09 and 1.26
+# before. Cleaner AND better separated, which is the argument: the hue swing
+# was buying nothing.
 HYPSOMETRIC = (
-    (0,    200,  "#dfe0cf", "lowland, a muted green-grey"),
-    (200,  600,  "#d9d6bd", "foothill, soft olive"),
-    (600,  1200, "#d5c9a8", "upland, warm ochre"),
-    (1200, 2000, "#cdbb9c", "high ground, pale brown"),
-    (2000, None, "#e6e0d6", "mountain, light stone"),
+    (0,    200,  "#dedbd3", "lowland, the land's own tone"),
+    (200,  600,  "#d4cfc4", "foothill, a half-step of warmth"),
+    (600,  1200, "#cbc2b4", "upland, warm paper"),
+    (1200, 2000, "#c2b5a3", "high ground, pale earth"),
+    (2000, None, "#e8e6e3", "mountain, light stone"),
 )
 
 # THE CHAIN THE TERRAIN LAYERS RUN IN, which is the owner's and is the order
