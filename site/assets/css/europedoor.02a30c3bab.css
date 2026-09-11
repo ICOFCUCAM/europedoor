@@ -4382,7 +4382,18 @@ body[data-hero] .masthead { position: sticky; }
 /* No `display: block`: the dead-rule scan caught it as a declaration that
    matches and changes nothing, because an SVG in this position is already
    laid out as a block. */
+/* 132 PIXELS FOR THE WHOLE OF EUROPE, ON THE PAGE WHOSE ARGUMENT IS THE
+   SHAPE. /themes closes with "a knot is an argument about one corner of
+   Europe, a scatter is one about the whole of it" — and at 132 pixels the
+   continent is 132 pixels, so eight lit points across Italy are three pixels
+   apart and a knot and a scatter are the same smudge. The row is 1,168 wide
+   and 180 tall and the text beside it wraps at 62 characters; the drawing
+   was sized to what was left rather than to what it has to say.
+   204 on a row wide enough to hold it, and the 132 stays below 64rem, where
+   the row stacks and the glyph is a thumbnail again. Nothing else moves: the
+   row's height is set by the prose, not by this. */
 .constel { width: 132px; height: auto; }
+@media (min-width: 64rem) { .themeside .constel { width: 204px; } }
 /* The continent is context and must not compete with the eight lit points:
    a flat wash at the weight of a rule, no stroke, no sea. */
 /* EVERY PATH, BECAUSE THE CLASS I REACHED FOR IS NOT THE CLASS geo.landmass
