@@ -134,6 +134,12 @@
         "b": "--map-here",
         "min": 3.0,
         "why": "the finest heaviest edge. An atlas separates its subject by an edge rather than by a loud fill"
+      },
+      {
+        "a": "--atlas-frontier",
+        "b": "--atlas-land",
+        "min": 3.0,
+        "why": "a frontier is a claim ABOUT the ground and a coastline is the ground, and both were drawn in the same ink at 8.44 on the land — so the hierarchy the cartography document states was two tenths of a unit of stroke width. It still has to clear 3:1, because an invisible border is not restraint"
       }
     ],
     "ladder": {
@@ -148,6 +154,13 @@
         "--map-hereline"
       ],
       "direction": "increasing"
+    },
+    "hierarchy": {
+      "$comment": "The coast must be decisively heavier than the frontier, or the two lines say the same thing. Stated as a RATIO of their contrasts against the land rather than as two absolute numbers, because what matters is the gap between them.",
+      "stronger": "--atlas-coast",
+      "weaker": "--atlas-frontier",
+      "against": "--atlas-land",
+      "min_gap": 1.8
     }
   },
   "ratio": {

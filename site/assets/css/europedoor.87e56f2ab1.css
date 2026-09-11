@@ -244,6 +244,19 @@
   --atlas-here:    #f8f6f2;
   --atlas-coast:   #1d3a4d;
   --atlas-hereline:#1d3a4d;
+  /* A FRONTIER AND A COASTLINE WERE THE SAME INK, AND THE HIERARCHY WAS TWO
+     TENTHS OF A UNIT OF WIDTH. `docs/cartography.md` says "a frontier is the
+     lightest because it is context, a coast is the edge of the subject's
+     world" — and both were drawn in `--atlas-coast`, which measures 8.44 on
+     the land. A political border at 8.44:1 is the strongest line on a plate
+     whose subject is a valley, and on the 147 destinations and six journeys
+     that carry relief it is drawn as its own pass, so the weights were the
+     only thing separating them.
+     A frontier is a claim about the ground; a coastline is the ground. 4.00
+     on the land against the coast's 8.44, and it still clears 3:1 on the
+     darkest and the palest hypsometric band, so it reads over relief as well
+     as over flat paper. */
+  --atlas-frontier:#4e6b7e;
 
   /* ── THE INSTRUMENT CARTOGRAPHY ──────────────────────────────────────
      THE PICTURES WERE GIVEN A CARTOGRAPHY AND THE INSTRUMENTS WERE NOT.
@@ -3553,7 +3566,14 @@ body[data-hero] .masthead { position: sticky; }
    went quiet by becoming sea. Parchment stays parchment and simply recedes. */
 .minimap.arched.atlas .lyr-land .countries path.mid,
 .minimap.arched.atlas .lyr-land .context path.mid {
-  fill: #d6d0c1; stroke: color-mix(in srgb, var(--atlas-coast) 62%, transparent); }
+  /* DERIVED FROM THE FAMILY RATHER THAN TYPED. This was the raw hex
+     #d6d0c1, chosen by eye to sit between the land and the far band — and
+     when the land family moved it stayed exactly where it was, so the middle
+     voice of the context hierarchy was the one step that no longer belonged
+     to its own ramp. A mix of the two steps it sits between cannot drift
+     from them. */
+  fill: color-mix(in srgb, var(--atlas-land) 55%, var(--atlas-far));
+  stroke: color-mix(in srgb, var(--atlas-coast) 62%, transparent); }
 .minimap.arched.atlas .lyr-land .countries path.far,
 .minimap.arched.atlas .lyr-land .context path.far {
   fill: var(--atlas-far); stroke: color-mix(in srgb, var(--atlas-coast) 38%, transparent); }
@@ -3614,7 +3634,7 @@ body[data-hero] .masthead { position: sticky; }
    failure the moment it was written without this line, one screen away from
    the rule that already documents it. */
 .minimap.arched.atlas .lyr-country-bounds .bnd {
-  fill: none; stroke: var(--atlas-coast); stroke-width: 0.9;
+  fill: none; stroke: var(--atlas-frontier); stroke-width: 0.9;
   vector-effect: non-scaling-stroke; }
 .minimap.arched.atlas .lyr-country-bounds .bnd.here {
   stroke: var(--atlas-hereline); stroke-width: 1.1; }

@@ -4042,6 +4042,29 @@ def c_cartography_palette():
             fail(f"the separation {row['a']} / {row['b']} carries no reason")
         n += 1
 
+    # AND A HIERARCHY IS A GAP, NOT TWO NUMBERS. The coast has to be
+    # decisively heavier than the frontier against the land they both cross,
+    # or the two lines say the same thing — which is what they did for the
+    # life of the plate system, separated by two tenths of a unit of stroke
+    # width and nothing else.
+    hier = pal["cartography"].get("hierarchy")
+    if hier:
+        hs, hw, hg = (hexof(hier[k]) for k in ("stronger", "weaker", "against"))
+        if None in (hs, hw, hg):
+            fail("the boundary hierarchy names a token that is not a literal "
+                 "hex in the stylesheet")
+        else:
+            def _r(a, b):
+                la, lb = lum(a), lum(b)
+                return (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
+            strong, weak = _r(hs, hg), _r(hw, hg)
+            if strong / weak < hier["min_gap"]:
+                fail(f"the coast measures {strong:.2f} on the land and the "
+                     f"frontier {weak:.2f} — a gap of {strong / weak:.2f} "
+                     f"where the register asks for {hier['min_gap']}. Two lines "
+                     f"that say the same thing are one line drawn twice")
+            n += 1
+
     # ORDER IS THE CLAIM, AND A PER-PAIR MINIMUM CANNOT STATE IT. The water
     # lightens as it approaches a shore, which is distance from land and
     # never a claim about depth. A ramp whose middle step is darker than its
