@@ -3376,7 +3376,7 @@ async function main() {
                    "/experiences/food/", "/method/", "/beyond-the-obvious/",
                    "/events/"];
     const rc = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-    const tot = { limestone: 0, graphite: 0, cobalt: 0, accent: 0 };
+    const tot = { limestone: 0, graphite: 0, water: 0, cobalt: 0, accent: 0 };
     let px = 0;
     for (const u of PAGES) {
       const r = await rc.goto(base + u, { waitUntil: "load" });
@@ -3391,7 +3391,7 @@ async function main() {
         const x = c.getContext("2d");
         x.drawImage(img, 0, 0);
         const d = x.getImageData(0, 0, c.width, c.height).data;
-        const out = { limestone: 0, graphite: 0, cobalt: 0, accent: 0 };
+        const out = { limestone: 0, graphite: 0, water: 0, cobalt: 0, accent: 0 };
         for (let i = 0; i < d.length; i += 4) {
           const R = d[i] / 255, G = d[i + 1] / 255, B = d[i + 2] / 255;
           const mx = Math.max(R, G, B), mn = Math.min(R, G, B);
@@ -3400,7 +3400,16 @@ async function main() {
           let h = mx === R ? ((G - B) / dl) % 6
                 : mx === G ? (B - R) / dl + 2 : (R - G) / dl + 4;
           h *= 60; if (h < 0) h += 360;
-          out[h >= 185 && h <= 270 ? "cobalt" : "accent"]++;
+          // WATER IS NOT THE SIGNATURE, AND THE FIRST VERSION COUNTED IT AS
+          // ONE. Everything blue went into a single bucket and cobalt came
+          // back at 16.6% against a declared 10 — a finding about the
+          // masthead that was mostly the Atlantic. The two families do not
+          // overlap: the ocean ramp and the atlas water run 202-205 degrees
+          // of hue and every cobalt runs 228-230, so 218 separates them
+          // cleanly and --map-land, at 215, is already a neutral by chroma.
+          // Split, cobalt measures 7.0 and sits UNDER its budget on all
+          // twelve pages.
+          out[h < 218 ? "water" : h <= 270 ? "cobalt" : "accent"]++;
         }
         return out;
       }, buf.toString("base64"));
@@ -3420,18 +3429,24 @@ async function main() {
     ok(pc.graphite >= 8,
        `graphite paints ${pc.graphite.toFixed(1)}% (${say}). It is the ink, ` +
        `the dark world and every map opening — below 8 one of those has gone`);
-    ok(pc.cobalt <= 24,
+    ok(pc.cobalt <= 13,
        `cobalt paints ${pc.cobalt.toFixed(1)}% of the measured pages and the ` +
        `ratio gives it 10 (${say}). A continent drawn in the signature is a ` +
        `network diagram, which is the association the cartography split ` +
-       `exists to escape`);
+       `exists to escape. The ceiling is 13 rather than 24 because water is ` +
+       `counted separately now and the old figure was mostly the Atlantic`);
+    ok(pc.water <= 24,
+       `the water families paint ${pc.water.toFixed(1)}% (${say}). They have ` +
+       `no line in the declared ratio because they are the DRAWINGS rather ` +
+       `than the interface, and a ceiling is what keeps that true: above ` +
+       `this the maps have stopped being figures on a page`);
     ok(pc.accent >= 0.2,
        `the accent paints ${pc.accent.toFixed(2)}% (${say}). Terracotta and ` +
        `atlantic are declared at 5 and are the entire art-directional ` +
        `difference between a story and a country encyclopedia; below this ` +
        `they have stopped existing as colours`);
     console.log(`    palette ratio measured: ${say}  ` +
-                `(declared 60/25/10/5)`);
+                `(declared 60/25/10/5, water unbudgeted)`);
   }
 
 
