@@ -1666,6 +1666,15 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
           drop-shadow(0 0 7px var(--map-shore-2))
           drop-shadow(0 0 16px var(--map-shore-3)); }
 #mapedge stop, #mapfoot stop { stop-color: var(--map-sea); }
+/* THE SAME CUT, ON THE PICTURE HALF. Every plate framed on the continent
+   drew the 52°E diagonal and the 33°N arc raw — /beyond-the-obvious, the
+   thirteen themes, the twelve motions, the nine stories, the seventeen
+   interests. The colour is the water's, because that is what the land is
+   dissolving into, and the stops carry an opacity only: the SVG default for
+   stop-color is #000 and this stylesheet has already shipped a layer that
+   said graphite and painted black. */
+.datacut { pointer-events: none; }
+.minimap.arched.atlas .datacut stop { stop-color: var(--atlas-sea); }
 .europemap .context path { fill: var(--map-context); stroke: none; }
 .europemap .countries path {
   fill: var(--map-land); stroke: var(--map-border);

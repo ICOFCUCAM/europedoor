@@ -302,6 +302,73 @@ def _bands():
     return _BANDS
 
 
+def datacut(uid, proj, view):
+    """The drawing fades where what this atlas HOLDS ends.
+
+    `data/geo/` stops at 52°E and 33°N because that is where this product
+    stops writing about places. Under this conic the eastern cut runs from
+    x=747 at 70°N to x=1024 at 40°N — a clean straight diagonal through
+    Russia that a reader can only read as a rendering fault, and the southern
+    one is a circle about the cone apex crossing North Africa. The hero has
+    faded along both since the hero was drawn, and /map since the land was
+    lifted out of its water; every PICTURE plate framed on the continent
+    still showed them raw — /beyond-the-obvious, the thirteen themes, the
+    twelve motions, the nine stories, the seventeen interests.
+
+    Emitted BETWEEN the ground and the marks rather than over everything: at
+    49.8°E the eastern ramp is about a third opaque, and Baku is at 49.8°E.
+    A fade that dims the thing it exists to keep legible has swapped one
+    rendering fault for another.
+
+    NOT A `lyr-` LAYER, and `geo.LAYERS` is right to have no row for it.
+    Every layer there is a fact about the ground; this is a fact about the
+    DATASET, and it belongs with the aperture's cut edge — the other thing
+    this renderer draws about its own frame rather than about Europe.
+
+    Both gradients come from the projection's own constants, so a projection
+    change moves them. A meridian is straight under a conic and a parallel is
+    a circle about the apex, which is why one is linear and the other radial:
+    the 33rd rises 116 units between Tunisia and the Caspian, and a
+    horizontal fade placed on the Tunisian end leaves the cut showing right
+    across Anatolia.
+    """
+    x0, y0, vw, vh = view
+    a, b = proj.xy(70.0, 52.0), proj.xy(40.0, 52.0)
+    mx, my = (a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    n = math.hypot(dx, dy) or 1.0
+    nx, ny = dy / n, -dx / n                    # perpendicular, pointing east
+    ex1, ey1 = mx - nx * 330.0, my - ny * 330.0
+    ex2, ey2 = mx - nx * 30.0, my - ny * 30.0
+    ax, ay = proj.apex()
+    r33 = proj.parallel_radius(33.0)
+    f0, f1 = (r33 - 130.0) / r33, (r33 - 4.0) / r33
+
+    def stops(lo=0.0, hi=1.0):
+        out = []
+        for i in range(5):
+            t = i / 4.0
+            v = t * t * (3.0 - 2.0 * t)         # smoothstep: no Mach band
+            out.append(f'<stop offset="{lo + (hi - lo) * t:.4f}" '
+                       f'stop-opacity="{v:.3f}"/>')
+        return "".join(out)
+
+    return (
+        f'<defs>'
+        f'<linearGradient id="cut-{uid}-e" gradientUnits="userSpaceOnUse"'
+        f' x1="{ex1:.1f}" y1="{ey1:.1f}" x2="{ex2:.1f}" y2="{ey2:.1f}">'
+        f'{stops()}</linearGradient>'
+        f'<radialGradient id="cut-{uid}-s" gradientUnits="userSpaceOnUse"'
+        f' cx="{ax:.1f}" cy="{ay:.1f}" r="{r33:.1f}">{stops(f0, f1)}</radialGradient>'
+        f'</defs>'
+        f'<g class="datacut" aria-hidden="true">'
+        f'<rect x="{x0:.1f}" y="{y0:.1f}" width="{vw:.1f}" height="{vh:.1f}"'
+        f' fill="url(#cut-{uid}-e)"/>'
+        f'<rect x="{x0:.1f}" y="{y0:.1f}" width="{vw:.1f}" height="{vh:.1f}"'
+        f' fill="url(#cut-{uid}-s)"/></g>'
+    )
+
+
 def stroke_only(markup):
     """The same country geometry again, as a stroke with no fill.
 
@@ -1064,6 +1131,10 @@ def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
         elif name == "summits":
             body.append(_group(name, summits))
         elif name == "cities":
+            # The data cut goes here: above the ground and below every mark.
+            # See datacut() — at 49.8°E the eastern ramp is a third opaque
+            # and Baku is at 49.8°E.
+            body.append(placed(datacut(uid, proj, view)))
             body.append(_group(name, cities))
         elif name == "destinations":
             body.append(_group(name, destinations))
