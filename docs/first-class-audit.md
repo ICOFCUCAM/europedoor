@@ -268,6 +268,7 @@ mandate, not against the tests.
 ### 28 · Internal linking and conversion paths
 - **Q** From any page, what is the next thing?
 - **VERDICT** 3,716 derived edges and every removed band keeps its page. But the *conversion* path — the sequence desire → orientation → discovery → planning → action — is not composed anywhere. A destination page's actions are Save and Add to journey, in a sticky bar, at the bottom. **COMPOSE THE PATH.**
+- **MEASURED, after.** Every action on three families, at 1280 and 390: a destination page has Save to My Europe at 1,675 of 6,864 and hands the planner its own city; a journey page opens in the Planner. A **country page had nothing at all** — 7,016 pixels, no button, no save, and only the masthead's `/plan`. That is now a hand-off in the Stay layer's grammar on 44 of the 50, and the six without it are the three advisory countries and the three that hold one destination, where no route exists to build.
 
 ---
 
@@ -340,6 +341,8 @@ Written as the work landed, so the audit and the record do not drift.
 | 18 | a map card takes the drawing's ratio, not a photograph's | 834: Europe 138px wide → 208 |
 | 19 | `/discover`'s map narrows with the control it sat beside | decoration → 125 of 319 lit, and the count above it |
 | 20 | five sub-category pages selected on the wrong word | 39 wrong listings of 401; Monasteries 22 → 4 |
+| 21 | the country pages got an action, in the Stay layer's grammar | 50 pages with none → 44 hand-offs |
+| 22 | and building it found the planner could not be handed a name | 77 of 313 destinations unnameable → 0 |
 
 **Finding 1, re-measured**: seven surfaces with no picture on the phone's
 first screen became six, and `/stories` and `/my-europe` both gained one.

@@ -2705,6 +2705,56 @@ need a bucket the page has no name for and would print some invitations
 twice. **The page is thin because the register holds no photographs, which
 is a licence position and not a design one.**
 
+**A QUARTER OF THE ATLAS COULD NOT BE TYPED INTO THE PLANNER'S OWN SENTENCE
+BOX.** `words()` lowercases the sentence and strips everything outside
+`[a-z0-9]` to a space; the names it is compared against were only lowercased.
+So the sentence became *"start from krakow"* while the name stayed
+*"kraków"*, and the two never met — **77 of 313 destinations** (Kraków,
+Málaga, Córdoba, Reykjavík, Tromsø, Brașov, Gdańsk, Évora, San Sebastián,
+Lübeck) and **Türkiye**, the one country whose own name carries a diacritic.
+A reader typing "Ten days from Kraków" got a route that ignored Kraków. It is
+the worst surface on the site for a silent failure: this planner's whole
+pitch is that it *"shows you exactly what it understood, naming anything it
+could not take account of rather than quietly dropping it"* — **and it cannot
+name a word it never saw.**
+
+**NFD fixes half of it.** ø, þ, ð, ħ, ł, æ and ß have no combining
+decomposition, so Tromsø, Þingvellir, Ísafjörður, Ħaġar Qim and Białowieża
+survived the first repair. A transliteration table is not an optimisation
+here, it is the other half of the alphabet Europe writes in. And folding the
+letters and not the punctuation still left 41: *"Kardamyli & the Mani"* keeps
+its ampersand where the sentence has lost it. **The rule is one normaliser,
+both sides** — every name goes through `words()` now, the same function the
+sentence goes through, and the count is 77 → 0. The guard is on the DATA
+rather than the matcher: every letter any destination or country name is
+spelled with must reduce to a–z under NFD or be in the planner's own table,
+so it goes red the day somebody adds a spelling this repository has not seen,
+naming the place.
+
+**FIFTY COUNTRY PAGES, SEVEN THOUSAND PIXELS EACH, AND NOWHERE TO ACT.** A
+destination page carries *Save to My Europe* a quarter of the way down and
+hands the planner its own city; a journey page opens in the Planner. A
+country page had **nothing** — not a button, not a save, and only the `/plan`
+link every page carries in its masthead. It is the second-largest family here
+and the one a reader most often arrives on from a search for "Austria
+travel", and it ended on *The record*. `?ask=` fills the sentence box and runs
+it, which is how the homepage already hands over.
+
+**And the hand-off is an ACTION, not a note.** The first version used
+`.note.onward`, which wears the interactive colour and is deliberately rare;
+fifty country pages took it to 62 and `c_note_tones` failed with *"it has
+become the default again by the back door"*, which is exactly what had
+happened. The Stay layer already composes an action — a rule, the action
+beside the sentence saying what it will do, and no border box, radius, shadow
+or fill — so this takes that grammar rather than inventing a second one.
+**The days are derived**: the sum of the shortest stay this atlas records for
+each of the country's own destinations, 8 for Austria and 49 for Greece,
+because "a week in Austria" reads better and is a trip length nobody chose.
+**And a route needs two places** — Monaco, San Marino and Vatican City hold
+one destination each and the three advisory countries are stripped from the
+planner index, so 44 of 50 carry it and the six that do not are decided by
+the route rather than by a threshold somebody picked.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
