@@ -1070,8 +1070,23 @@ OG_WANTED = {}
 # and the only symptom would have been a shared link that no longer matched
 # its page — invisible from here, because a card is rendered inside somebody
 # else's product.
+# v2 -> v3 IS THE PALETTE, AND THE TAG IS A THING SOMEBODY HAS TO REMEMBER.
+# The comment above says so and it was not remembered. When the electric lime
+# went out of the system it went out of the plate's night moon too — two
+# guards on the stylesheet, a browser probe on the painted colour, and
+# `css.lime` in the invariant register — and not one of them reads a PNG. The
+# cards are keyed on the seed, the motif, the size and this tag, and none of
+# those changed, so 96 of the 785 cached cards kept their acid-green moon
+# under a filename that still looked current. Measured on the bytes on disk:
+# #697d4b, 1,586 pixels, on Poprad's card among others.
+#
+# The tag is bumped and, because a tag is exactly the kind of promise that
+# gets forgotten twice, `assets/og/cards.json` now records the inputs behind
+# every cached file and `checks.py` re-renders a sample and compares BYTES.
+# The next palette change that forgets this fails in the suite rather than on
+# somebody else's timeline.
 def og_key(seed, motif):
-    return hashlib.sha256(f"{seed}|{motif}|{OG_W}x{OG_H}|v2-arch".encode()).hexdigest()[:16]
+    return hashlib.sha256(f"{seed}|{motif}|{OG_W}x{OG_H}|v3-palette".encode()).hexdigest()[:16]
 
 
 def og_tags(seed, motif, alt):

@@ -223,6 +223,18 @@ def build():
         if fn.endswith(".png") and fn[:-4] not in wanted:
             os.remove(os.path.join(og_dir, fn))
             pruned += 1
+    # THE INPUTS BEHIND EVERY CACHED FILE, WRITTEN DOWN. The key is a hash of
+    # the seed, the motif, the size and a hand-typed version tag, and the tag
+    # is the only part that notices a change to the DRAWING — so when the
+    # electric lime left the palette the plate's night moon kept it on 96
+    # cached cards under filenames that still looked current. A manifest
+    # makes the cache auditable from outside the build: checks.py re-renders
+    # a sample against it and compares bytes, so the next change that forgets
+    # the tag fails in the suite rather than on somebody else's timeline.
+    with open(os.path.join(og_dir, "cards.json"), "w", encoding="utf-8") as fh:
+        json.dump({k: list(v) for k, v in sorted(wanted.items())}, fh,
+                  indent=0, sort_keys=True)
+        fh.write("\n")
     os.makedirs(os.path.join(OUT, "assets", "og"), exist_ok=True)
     for key in wanted:
         shutil.copy(os.path.join(og_dir, key + ".png"),

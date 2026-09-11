@@ -5041,6 +5041,69 @@ def c_automated_provider():
     return n
 
 
+@check("every cached social card is what the renderer produces today")
+def c_og_cache_is_current():
+    """THE LIME LEFT THE PALETTE AND STAYED ON NINETY-SIX SOCIAL CARDS.
+
+    A card is content-addressed on the seed, the motif, the size and a
+    hand-typed version tag — and the tag is the only part of that key that
+    notices a change to the DRAWING. `render.og_key`'s own comment says so,
+    in a paragraph about the last time it was forgotten. When the electric
+    lime went out of the system it went out of the plate's night moon too,
+    and nothing produced a new filename: two stylesheet guards, a browser
+    probe on the painted colour and `css.lime` in the invariant register, not
+    one of which reads a PNG. Measured on the bytes on disk: #697d4b, 1,586
+    pixels, on 96 of 785 cards including Poprad's.
+
+    A card is the one surface nobody here ever looks at, because it is
+    rendered inside somebody else's product. So this re-renders a sample from
+    `assets/og/cards.json` — the manifest the build now writes — and compares
+    BYTES. A tag that should have been bumped fails here instead of on
+    somebody's timeline.
+
+    Sampled rather than exhaustive: a card costs about 23 ms and this suite
+    runs every few minutes. The sample is deterministic, so a drift that
+    misses it this build is caught the next time the set changes.
+    """
+    og = os.path.join(ROOT, "assets", "og")
+    man = os.path.join(og, "cards.json")
+    if not os.path.exists(man):
+        fail("assets/og/cards.json is missing — the card cache records no "
+             "inputs, so nothing outside the build can tell what is in it")
+        return 1
+    cards = json.load(open(man, encoding="utf-8"))
+    on_disk = {f[:-4] for f in os.listdir(og) if f.endswith(".png")}
+    if set(cards) != on_disk:
+        extra = sorted(on_disk - set(cards))[:3]
+        missing = sorted(set(cards) - on_disk)[:3]
+        fail(f"the card cache and its manifest disagree: {len(on_disk - set(cards))} "
+             f"file(s) no manifest row claims {extra}, "
+             f"{len(set(cards) - on_disk)} row(s) with no file {missing}")
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from lib import raster                                            # noqa: E402
+    keys = sorted(set(cards) & on_disk)
+    step = max(1, len(keys) // 24)
+    n = 0
+    for key in keys[::step]:
+        seed, motif = cards[key]
+        if R.og_key(seed, motif) != key:
+            fail(f"assets/og/{key}.png is filed under a key its own inputs do "
+                 f"not produce — {seed!r}/{motif!r} hashes to "
+                 f"{R.og_key(seed, motif)}")
+            continue
+        shapes = R.plate_shapes(seed, R.OG_W, R.OG_H, motif)
+        want = raster.plate_png(shapes, R.OG_W, R.OG_H)
+        got = open(os.path.join(og, key + ".png"), "rb").read()
+        n += 1
+        if want != got:
+            fail(f"assets/og/{key}.png ({seed}) is {len(got)} bytes and the "
+                 f"renderer produces {len(want)} today. The drawing changed "
+                 f"and the version tag in render.og_key did not, so a shared "
+                 f"link carries a picture the page no longer draws")
+            break
+    return n
+
+
 @check("the palette register and the stylesheet are the same palette")
 def c_palette_is_the_stylesheet():
     """THE REGISTER WAS DOING ARITHMETIC ABOUT COLOURS NOBODY SHIPS.
