@@ -1309,7 +1309,7 @@ def home(data):
   {hero}
   <div class="herobody">
     <h1>Open the door to Europe.</h1>
-    <p class="lede">One continent, drawn as we hold it. Fifty countries, and
+    <p class="lede">One continent, drawn as we hold it. {numword(ncountries, cap=True)} countries, and
     somewhere in them the thing you have not thought of yet.</p>
   </div>
 </section>
@@ -1464,7 +1464,7 @@ def countries_index(data):
 {indexhero(
     kicker="Every country in Europe",
     title="Europe, all the way down.",
-    lede=f"Nine regions, {len(data['countries'])} countries, "
+    lede=f"{numword(len(data['macros']), cap=True)} regions, {len(data['countries'])} countries, "
          f"{sum(len(c['regions']) for c in data['countries'].values())} travel regions "
          f"and {len(data['cities'])} cities. The regions below are editorial travel "
          f"regions rather than administrative ones: they group places that feel like "
@@ -5947,7 +5947,7 @@ def experiences_index(data):
 {indexhero(
     kicker="Local Experiences",
     title="What people actually do here.",
-    lede=f"{len(items)} experiences across the Atlas, in ten kinds. Anything a business "
+    lede=f"{len(items)} experiences across the Atlas, in {numword(len(data['taxonomy']['experience_kinds']))} kinds. Anything a business "
          f"lists carries the name of who runs it and the tier of checking it has passed — "
          f"an unchecked listing says so on its face rather than hiding behind a star "
          f"rating.",
@@ -6015,6 +6015,11 @@ def experience_kind_page(data, kind, name):
     # other axis of the same family. Two lists of experiences laid out two
     # ways is the design system forking inside one family.
     #
+    # Bound to a local rather than dug out inside the f-string: the empty-state
+    # check reads the generator's source and pulls string literals out of the
+    # reason, and a subscript like ["experience_kinds"] puts quotes inside the
+    # expression where that regex sees them as the reason itself.
+    nkinds = numword(len(data["taxonomy"]["experience_kinds"]))
     # The kind is not printed on a kind page: every row on it is that kind
     # by definition, which is the constraint explained back.
     rows = "".join(
@@ -6033,7 +6038,7 @@ def experience_kind_page(data, kind, name):
 </div>
 <ol class="invites">{rows or empty_state(
       "Nothing in the Atlas is classified this way yet.",
-      "This is one of ten kinds an experience can be given, and the kind is "
+      f"This is one of {nkinds} kinds an experience can be given, and the kind is "
       "authored per experience. An empty page here means nobody has written "
       "one, not that Europe has none.")}</ol>
 """
@@ -6305,10 +6310,13 @@ def constel_defs():
 
 
 NUMWORDS = ("no", "one", "two", "three", "four", "five", "six", "seven",
-            "eight", "nine", "ten", "eleven", "twelve", "thirteen")
+            "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen",
+            "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty")
+_TENS = {30: "thirty", 40: "forty", 50: "fifty", 60: "sixty", 70: "seventy",
+         80: "eighty", 90: "ninety"}
 
 
-def numword(k):
+def numword(k, *, cap=False):
     """A small number spelled out, because a heading is prose.
 
     "8 categories" as an <h2> is a figure standing where a word belongs, and
@@ -6317,8 +6325,26 @@ def numword(k):
     once on /themes and once in the search index's empty state. Derived and
     spelled: one place, so the two families cannot disagree about how to say
     nine.
+
+    IT STOPPED AT THIRTEEN, AND THE PROSE DID NOT. "Fifty countries" opened
+    the homepage and the 404, "Nine regions" opened /countries, "ten kinds"
+    opened /experiences — every one a literal in an f-string on a page whose
+    whole argument is that its figures are derived and checkable. They were
+    also all correct, which is how a typed number survives: it is right on
+    the day it is written and nothing fails when it stops being. Twenty, then
+    the tens, then digits, which is the ordinary editorial rule and the
+    reason these were words in the first place.
     """
-    return NUMWORDS[k] if 0 <= k < len(NUMWORDS) else str(k)
+    k = int(k)
+    if 0 <= k < len(NUMWORDS):
+        w = NUMWORDS[k]
+    elif k in _TENS:
+        w = _TENS[k]
+    elif 20 < k < 100 and (k - k % 10) in _TENS:
+        w = f"{_TENS[k - k % 10]}-{NUMWORDS[k % 10]}"
+    else:
+        return str(k)
+    return w[:1].upper() + w[1:] if cap else w
 
 
 def macro_frame(data, macro):
@@ -8237,7 +8263,9 @@ def how_it_works_page(data):
         ("European Journeys", f"{len(data['journeys'])} curated cross-border routes with validated night counts", "built"),
         ("Themes", f"{len(data['themes'])} experience-first routes that ignore borders", "built"),
         ("Map", "Point map of every city, filterable, no third-party tiles", "built"),
-        ("Experience listings", "Ten kinds, tiered, with the verification model published", "built"),
+        ("Experience listings",
+         f"{numword(len(data['taxonomy']['experience_kinds']), cap=True)} kinds, tiered, "
+         f"with the verification model published", "built"),
         ("Europe Experience Score", "Six dimensions, formula published on /method", "built"),
         ("Stories", "Editorial desk with pieces linked into the Atlas", "built"),
         ("My Europe", "Saved places, in your browser only", "built"),
@@ -8260,7 +8288,7 @@ def how_it_works_page(data):
     # door; this is the page that explains what is behind it.
     DOORS = [
         ("Door one", "Discover", "/discover",
-         "Find places. Fifty countries, their travel regions and their cities — including the "
+         f"Find places. {numword(len(data['countries']), cap=True)} countries, their travel regions and their cities — including the "
          "ones nobody puts on a list."),
         ("Door two", "Understand", "/stories",
          "Learn the story behind them. Why a valley speaks a different language from the next "
