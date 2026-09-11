@@ -2080,6 +2080,101 @@ itself pinning a shape on its first run, flagging `/map`'s bordered list: a
 panel has a bottom border because it has four, and its fourth side separates
 nothing. **A divider is a bottom edge and three bare ones.**
 
+**THE PICTURES WERE GIVEN A CARTOGRAPHY AND THE INSTRUMENTS WERE NOT.**
+`docs/cartography.md` splits every drawing on what it IS — a picture is
+paper, an instrument is graphite — and the picture half got a four-step
+ocean, a land family, an ink coast and a lit subject, every one measured.
+The instrument half kept five raw hexes invented before European Future:
+`#0a1220`, `#253546`, `#1b2735`, `#4a6480`, `#3a6299`. Navy rather than
+graphite, in no token, recomputed by nothing. Land against water measured
+**7.91 on the pictures and 1.50 on `/map`**, and a country outside the
+subject measured **1.24**, which is not a quiet country but a country that
+is not drawn — and the stylesheet already *stated* the 1.50, forty lines
+from the tokens that produced it. The fix is the hero's own sentence applied
+to the instrument: **Europe is what the light falls on.** `docs/palette.json`
+carries a `cartography` block whose rows are **separations** rather than
+claims — a claim says a colour may carry TEXT, these say two drawn areas must
+be distinguishable — recomputed from the hexes in the stylesheet, and the
+five navy hexes are refused by name the way the gold and the lime are.
+
+**And the subject of a drawing is not painted in the accent.** Binding the
+selected state to cobalt-air was right for `/map`, where hover lifts one
+country under the cursor. The same token filled the subject *permanently* on
+the fifty country reference maps, so Italy came out a quarter of the drawing
+in periwinkle — a continent drawn in the accent, which is the failure that
+removed electric lime, arriving through a different token one commit after
+that token changed. Self-inflicted, and only rendering a country page found
+it: every separation was green, because the register asked whether the
+subject clears its neighbours and not what the subject IS.
+
+**A `<use>` clone takes whatever matches the ORIGINAL in its own position,
+and inherits from the `<use>` only what nothing else has claimed.** This
+repository held two contradictory records of that — the cartography note says
+a selector reaches in, the constellation note says it cannot. Both describe
+the same rule from opposite sides. Settled with a two-case probe: a clone
+paints red when the source is inside the scoping class, green when the source
+sits in a `<defs>` outside it.
+
+**Colour is more than luminance, and every instrument here measured only
+luminance.** Three separate defects, none of which a contrast ratio can see:
+
+- **The hypsometric ramp swung 27° of hue and peaked in saturation at its
+  middle** — 64° yellow-*green* at the bottom, 35% saturation at 600–1200 m —
+  on a file whose own comment says "the land tone at the bottom" and "warm as
+  it rises, and never saturated". A reader saw a green lowland, a yellow
+  foothill and a tan upland: three materials, where the thing drawn is one
+  ground at three heights. One warm family now, 42° → 35°, lightness carrying
+  the height, and the mixed steps came out *better* separated as well as
+  cleaner.
+- **The ocean drifted toward cyan-green as it lightened**, 200° → 185°, with
+  the deep at 65% saturation — the most saturated colour in the atlas,
+  covering the whole Atlantic. Khaki against teal is the muddiest pair
+  available and it was the whole look. One hue, 205° → 202°, saturation
+  *falling* toward the shore.
+- **The advisory red and the cultural accent were the same colour.** `#a32a1e`
+  and `#a4491f`: fourteen degrees apart at identical saturation and identical
+  lightness, which measures **1.22:1**. A contrast ratio is a ratio of
+  luminances, so two hues at the same lightness always measure 1.0 and every
+  check here passed. `docs/palette.json` carries a `distinct` block now — pairs
+  that must be told apart, and the minimum circular **hue distance** between
+  them.
+
+**A step that measures 1.045 is a rounding error with a token name.** The
+light world's surfaces step 1.09 and 1.12; the dark world's stepped 1.12 and
+then 1.045, so `--paper-3` was the card with a different name and every track,
+score bar and hopbar on a dark card was drawn on its own colour. The reason is
+the interesting half: `graphite-3` was sized so `cobalt-lift` would clear AA
+on it — **a claim about the link colour deciding the size of a surface.** The
+step is real now and the link colour moved to keep its claim, which is the
+right way round. The register asserts the **steps** rather than the rungs: a
+claim about a rung cannot say anything about a ladder.
+
+**An accent on every row of a list is not an accent, it is a texture.** The
+kicker says what KIND of thing is being read — one per page head answers that;
+inside a row it answers nothing, because every row is the same kind.
+Seventeen cobalt uppercase lines down `/journeys`, thirteen down `/themes`.
+That is aperture-as-wallpaper arriving in colour, and on `/themes` it inverted
+the hierarchy it sat in: the kicker is the theme's *argument* and the h3 is
+its name, so the brightest thing in every row was the subtitle.
+
+**Four premium defects that were all "nobody decided".**
+
+| | |
+|---|---|
+| prose links | no `text-underline-offset` anywhere, so every page on the site drew a rule through every descender |
+| the footer | `main` pads its bottom by `--s9` and the footer added another: **224 pixels** of empty page above the band, on every page |
+| a row's subline | `p { max-width }` broke a middot list of place names at 544 px inside a 948 px column. A measure is for prose; a list is a sequence and you scan it |
+| the theme glyphs | 132 px for the whole of Europe, on the page whose closing sentence is *"a knot is an argument about one corner of Europe, a scatter is one about the whole of it"* |
+
+**And the search box was the page, in a card.** Border, fill, radius and
+shadow each say "separate object, placed here by a system", and saying it
+about the one control a page exists to be is the wrong sentence. Its help line
+started at the exact pixel the input's box ended, and four of the seven bars
+under it — journeys, themes, stories, fund projects — rendered between 2.4 and
+4 pixels wide, because the extent is a share of 319 on an 80-pixel track. **A
+chart on which four of seven series cannot be seen is the wrong track, not the
+wrong data.**
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
