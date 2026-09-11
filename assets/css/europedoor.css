@@ -4842,7 +4842,28 @@ body[data-hero] .masthead { position: sticky; }
    was one of nine in a column; it is one of one now, at the top of a band,
    and held to 288px in a 440px column it left a third of the row empty
    beside it — the same measured gap that rebuilt this index. */
+/* AND THE LEAD'S PICTURE WAS STACKED ABOVE ITS TYPE IN A COLUMN TWICE ITS
+   WIDTH. Measured on the built homepage: `.storyart` is 663 pixels wide, the
+   drawing inside it caps at 26rem — 416 — and the headline starts 332 pixels
+   below the top of the band. So the lead story, the one piece this section
+   exists to lead with, began a third of a screen lower than the two
+   secondary headlines beside it, with 247 pixels of empty paper to the right
+   of its own picture.
+   The stories index already answered this one row over: `.storyleadwide` is
+   a drawing and its type SIDE BY SIDE. Same composition here, at the width
+   this column has — which also puts all three headlines on one line, which
+   is what makes a lead read as a lead. */
 .storyart .constel { width: 100%; max-width: 26rem; }
+@media (min-width: 64rem) {
+  .storylead { display: grid; grid-template-columns: 15rem minmax(0, 1fr);
+               gap: 0 var(--s5); align-items: start;
+               /* min-content, or the four type rows share the drawing's
+                  height between them and the standfirst floats away from
+                  the headline it belongs to. */
+               grid-auto-rows: min-content; }
+  .storyart { margin-bottom: 0; grid-row: 1 / span 4; }
+  .storyart .constel { max-width: none; }
+}
 .storyart .constel-lit circle { r: 14px; }
 .storysm { padding-bottom: var(--s5); border-bottom: 1px solid var(--rule); margin-bottom: var(--s5); }
 .storysm:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
