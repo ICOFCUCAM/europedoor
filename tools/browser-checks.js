@@ -3518,6 +3518,15 @@ async function main() {
                  height: Math.min(300, b.height + pad * 2) };
       }, sel);
       if (!box || box.width < 4 || box.height < 4) continue;
+      // BLUR FIRST. /search autofocuses its field, so the "before" shot
+      // already had the ring in it and the diff came back empty — which this
+      // check correctly reported as "focusing changes no pixel at all" about
+      // an instrument fault rather than a site one. An unfocused baseline has
+      // to be made, not assumed.
+      await fp.evaluate(() => {
+        if (document.activeElement && document.activeElement.blur)
+          document.activeElement.blur();
+      });
       const before = await fp.screenshot({ clip: box });
       await fp.evaluate((sel) => document.querySelector(sel).focus(), sel);
       // focus-visible follows keyboard intent, so give the element a real one
