@@ -2340,9 +2340,16 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
     backdrop-filter: saturate(1.4) blur(10px);
     border-top: 1px solid var(--rule);
   }
-  .stickycta-where { flex: 1; font-weight: 600; font-size: var(--t-sm);
-                     overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .stickycta .btn { min-height: 44px; display: inline-flex; align-items: center; }
+  /* NO `.stickycta-where`. It held the destination's name in a flexed span
+     with an ellipsis, and on a 390-pixel phone two buttons leave it about a
+     hundred pixels: measured on all 319 destinations, 146 of them rendered a
+     cut word. The name is in the buttons' own accessible labels now, which
+     is where it does some work. */
+  .stickycta .btn { min-height: 44px; display: inline-flex; align-items: center;
+                    justify-content: center; }
+  /* The primary takes the room the name was wasting; the secondary is sized
+     by its own word. Both keep the 44px target. */
+  .stickycta .btn:not(.ghost) { flex: 1; }
   /* Room for both bars, or the last section of every destination page is
    * permanently underneath them. */
   body.area-countries .footer {

@@ -3275,13 +3275,29 @@ def stickycta(data, c, r, t):
     Phone only, and only on a destination page. A bar pinned over every page
     at every width is a bar that is in the way most of the time.
     """
+    # AND THE NAME CAME OUT OF THE BAR, BECAUSE IT WAS A BROKEN WORD ON
+    # 146 OF 319 PAGES. The bar carried the destination's name in a flexed
+    # span with an ellipsis, and two buttons take 230 of a 390-pixel phone:
+    # measured on every destination at 390, 46% of them rendered a cut word —
+    # "Innsbr...", and "Gura Humorului & the painted monasteries" 255 pixels
+    # over its slot. A name sliced mid-word reads as a broken renderer, which
+    # is the rule this repository already applies to a map label.
+    #
+    # It is also redundant where it is not broken. A reader is ON the page;
+    # the h1 two screens up is the answer, and what the save actually records
+    # comes from `data-label` rather than from this span. So the subject
+    # moves INTO the actions, which is where a screen reader needs it anyway:
+    # "Save Innsbruck" and "Add Innsbruck to my journey" name the thing being
+    # acted on at the moment of acting, and the visible labels stay short
+    # enough to be read on a phone.
     return f'''<div class="stickycta">
-  <span class="stickycta-where">{esc(t["name"])}</span>
   <button class="btn ghost" type="button" data-short
           data-save="city:{esc(c['slug'])}/{esc(r['slug'])}/{esc(t['slug'])}"
           data-kind="Place" data-label="{esc(t['name'])}, {esc(c['name'])}"
-          data-url="{urls.city(c, r, t)}">Save</button>
-  <a class="btn" href="/plan?from={esc(c['slug'])}%2F{esc(r['slug'])}%2F{esc(t['slug'])}">Add to my journey</a>
+          data-url="{urls.city(c, r, t)}"
+          aria-label="Save {esc(t['name'])}">Save</button>
+  <a class="btn" href="/plan?from={esc(c['slug'])}%2F{esc(r['slug'])}%2F{esc(t['slug'])}"
+     aria-label="Add {esc(t['name'])} to my journey">Add to my journey</a>
 </div>'''
 
 

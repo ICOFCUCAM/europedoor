@@ -3424,6 +3424,59 @@ async function main() {
                 `(declared 60/25/10/5)`);
   }
 
+
+  /* A WORD CUT IN HALF IS A RENDERING FAULT, and one family had it on 146
+   * pages. The destination page's sticky phone action carried the place name
+   * in a flexed span with an ellipsis, and two buttons take 230 pixels of a
+   * 390-pixel bar: measured on all 319 destinations, 46% rendered a cut word.
+   * "Innsbr...", and "Gura Humorului & the painted monasteries" 255 pixels
+   * over its slot. This repository already refuses a map label sliced by the
+   * aperture for exactly this reason — a name drawn through another name, or
+   * cut mid-word, is the one defect a reader cannot work around.
+   *
+   * So the rule is general rather than about that bar: no element anywhere
+   * may hold more text than it shows. Scroll containers are excluded because
+   * scrolling IS the answer there, and `.visually-hidden` is excluded because
+   * clipping is how it hides.
+   */
+  {
+    const CLIPPED = ["/", "/europe/austria/", "/europe/austria/tyrol/innsbruck/",
+                     "/themes/", "/journeys/", "/stories/", "/map/", "/plan/",
+                     "/experiences/food/", "/method/", "/beyond-the-obvious/",
+                     "/events/", "/search/", "/my-europe/", "/europe-in/islands/",
+                     "/interests/mountains/", "/sources/", "/about/"];
+    for (const W of [390, 1280]) {
+      const cp = await browser.newPage({ viewport: { width: W, height: 900 } });
+      const hits = [];
+      for (const u of CLIPPED) {
+        const r = await cp.goto(base + u, { waitUntil: "load" });
+        if (!r || r.status() !== 200) continue;
+        const got = await cp.evaluate(() => {
+          const out = [];
+          for (const e of document.querySelectorAll("*")) {
+            if (!e.clientWidth) continue;
+            if (e.closest(".visually-hidden")) continue;
+            const cs = getComputedStyle(e);
+            if (cs.overflowX !== "hidden" && cs.overflowX !== "clip") continue;
+            if (e.scrollWidth > e.clientWidth + 1 && e.textContent.trim())
+              out.push(`${e.tagName.toLowerCase()}.${(e.className || "")
+                .toString().trim().split(/\s+/)[0]} "${e.textContent.trim()
+                .slice(0, 30)}" ${e.scrollWidth - e.clientWidth}px over`);
+          }
+          return out;
+        });
+        for (const g of got) hits.push(`${u} ${g}`);
+        checked++;                     // one page read, at this width
+      }
+      await cp.close();
+      ok(hits.length === 0,
+         `${hits.length} element(s) hold more text than they show at ${W}px — ` +
+         `${hits.slice(0, 3).join("; ")}. A word cut in half reads as a broken ` +
+         `renderer, which is why a map label sliced by the aperture is dropped ` +
+         `rather than drawn`);
+    }
+  }
+
   ok(errors.length === 0, `console errors:\n    ${errors.slice(0, 5).join("\n    ")}`);
 
   await browser.close();
