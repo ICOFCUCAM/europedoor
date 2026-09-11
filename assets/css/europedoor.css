@@ -3858,10 +3858,34 @@ body[data-hero] .masthead { position: sticky; }
 /* The homepage hero is the same aperture. It is an <a>, not a <figure>, so
    it takes the same treatment by name rather than by inheritance. */
 .heromap.arched svg { background: none; border-radius: 0; }
-.heromap.arched .countries path,
-.heromap.arched .context path { fill: none; vector-effect: non-scaling-stroke; }
-.heromap.arched .countries path { stroke: var(--map-coast); stroke-width: 1; }
-.heromap.arched .context path { stroke: color-mix(in srgb, var(--map-coast) 45%, transparent); stroke-width: 0.7; }
+/* THE REGISTER SAYS THE LAND IS A MASS AND THIS DREW A HAIRLINE.
+ *
+ * docs/palette.json declares --map-land against --map-sea at 1.8 with the
+ * reason written out: "the land is a mass, not a hairline. Europe is what
+ * the light falls on — the hero's reading, applied to the instrument." And
+ * checks.py recomputes that ratio from the hexes in this file, so it has
+ * been green since the day it was written.
+ *
+ * `fill: none` here made it false of the only page that uses this class.
+ * /discover drew all fifty countries as unfilled outlines at 1px on
+ * #0b0e11, with 319 dots over them — a wireframe continent on black, which
+ * is the exact thing the brief names as what this product must never feel
+ * like. The rule is older than the class's current user: it was written for
+ * a homepage hero map that was removed, where an outline WAS the look.
+ *
+ * A separation measured between two tokens says nothing about whether
+ * either is ever painted. That is the same gap as a contrast claim read
+ * off a declaration rather than off the pixels a reader gets, and the
+ * browser suite now asks the second question.
+ *
+ * /map fills its land with --map-land and strokes it with the coast, and
+ * /discover links straight to /map: two instruments drawing one continent
+ * two ways was the inconsistency underneath the defect. */
+.heromap.arched .countries path { fill: var(--map-land); stroke: var(--map-coast);
+                                  stroke-width: 1; vector-effect: non-scaling-stroke; }
+.heromap.arched .context path { fill: var(--map-context);
+                                stroke: color-mix(in srgb, var(--map-coast) 45%, transparent);
+                                stroke-width: 0.7; vector-effect: non-scaling-stroke; }
 .heromap.arched .herodot { fill: var(--cobalt-air); opacity: .95; }
 .heromap.arched .herodot.advisory { fill: var(--map-border); opacity: .6; }
 

@@ -10292,6 +10292,24 @@ def discover_page(data):
 
     # Land under the dots: /discover had the same scatter-plot fault that
     # the homepage hero and the destination locator both had.
+    #
+    # AND THE LAND WAS THEN DRAWN AS AN OUTLINE, so the fix was only half
+    # applied for the life of the page: `.heromap.arched .countries path`
+    # carried `fill: none`, written for a homepage hero map that has since
+    # been removed and where an outline WAS the look. Fifty unfilled
+    # countries at 1px on #0b0e11 under 319 dots is a wireframe continent on
+    # black, which is exactly what this product must not feel like — and
+    # docs/palette.json has declared --map-land against --map-sea at 1.8
+    # ("the land is a mass, not a hairline") the whole time, green, because a
+    # separation between two tokens says nothing about whether either is
+    # painted.
+    #
+    # FILLING IT EXPOSED THE DATA CUT, which is the reason this map now draws
+    # a fade it never needed before: data/geo/ stops at 52°E and 33°N, and
+    # with nothing filled those two edges were invisible. With the land lit
+    # they are a straight diagonal across Russia and a flat line under North
+    # Africa — the rendering fault the fade exists for, arriving the moment
+    # there was something to cut. Same function every other instrument uses.
     dctx, dland = geo.landmass(MAPPROJ, (0, 0, MAP_W, MAP_H))
     body = f"""
 {crumbs([("Europe", "/discover"), ("Discover", None)])}
@@ -10340,7 +10358,7 @@ def discover_page(data):
 
 
 <a class="heromap wide-map arched" data-role="instrument" href="/map" aria-label="Map of all {len(data['cities'])} places">
-  <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true"><defs>{arch_clip("disc", MAP_W, MAP_H)}</defs><g clip-path="url(#arch-disc)"><rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>{dctx}{dland}{''.join(dots)}</g>{arch_edge(MAP_W, MAP_H)}</svg>
+  <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true"><defs>{arch_clip("disc", MAP_W, MAP_H)}</defs><g clip-path="url(#arch-disc)"><rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>{dctx}{dland}{cut_fade('disc', MAP_W, MAP_H)}{''.join(dots)}</g>{arch_edge(MAP_W, MAP_H)}</svg>
   <span class="heromap-cap">Coastline from Natural Earth, public domain.
   Open the full map, with layers →</span>
 </a>

@@ -3531,6 +3531,84 @@ async function main() {
   }
 
 
+  /* A SEPARATION BETWEEN TWO TOKENS SAYS NOTHING ABOUT WHETHER EITHER IS
+   * PAINTED.
+   *
+   * docs/palette.json declares --map-land against --map-sea at 1.8, with
+   * the reason spelled out: "the land is a mass, not a hairline. Europe is
+   * what the light falls on — the hero's reading, applied to the
+   * instrument." checks.py recomputes that ratio from the hexes in the
+   * stylesheet, and it has been green since the day it was written.
+   *
+   * /discover drew all fifty countries with `fill: none`. Unfilled outlines
+   * at one pixel on #0b0e11 under 319 dots — a wireframe continent on
+   * black, on the page whose whole job is to make a continent explorable.
+   * The rule was older than its only user: it was written for a homepage
+   * hero map that has since been removed, where an outline WAS the look.
+   *
+   * This is the pixel end of that claim. Every instrument that draws the
+   * atlas has to PAINT the land, and the painted land has to clear the
+   * painted water by what the register says. Reading the computed fill
+   * rather than the token is the whole point: `none` and `#3b424c` are the
+   * same declaration as far as the register is concerned.
+   */
+  {
+    const palette = JSON.parse(fs.readFileSync(
+      path.join(__dirname, "..", "docs", "palette.json"), "utf8"));
+    const wantLand = (palette.cartography.separations.find(
+      (r) => r.a === "--map-land" && r.b === "--map-sea") || {}).min || 1.8;
+    const ip = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    for (const u of ["/discover/", "/map/"]) {
+      const r = await ip.goto(base + u, { waitUntil: "load" });
+      if (!r || r.status() !== 200) continue;
+      const got = await ip.evaluate(() => {
+        const svg = [...document.querySelectorAll("svg")]
+          .find((e) => e.getBoundingClientRect().width > 400);
+        if (!svg) return null;
+        // EVERY drawn country path, not the <a> or <g> around it. Those
+        // paint nothing and compute to the SVG default black, and the
+        // first version of this check read one of them and reported /map
+        // at 1.12 against a real 1.91 — an instrument that does not
+        // recognise the good case it was written to protect, which this
+        // repository has now built twice.
+        const paths = [...svg.querySelectorAll(".countries path")];
+        const tally = {};
+        for (const e of paths) {
+          const f = getComputedStyle(e).fill;
+          tally[f] = (tally[f] || 0) + 1;
+        }
+        const land = Object.keys(tally).sort((a, c) => tally[c] - tally[a])[0];
+        const ground = svg.querySelector(".archground") ||
+                       svg.querySelector(".lyr-ocean rect");
+        const bg = getComputedStyle(document.body).backgroundColor;
+        return { land: land || null, n: paths.length,
+                 fills: Object.keys(tally).length,
+                 sea: ground ? getComputedStyle(ground).fill : bg };
+      });
+      checked++;
+      if (!got || !got.land) { ok(false, `${u}: no drawn country shape found`); continue; }
+      ok(got.land !== "none" && !/rgba\(0, 0, 0, 0\)/.test(got.land),
+         `${u}: the land computes to ${got.land} — the atlas is drawn as an ` +
+         `outline, and docs/palette.json says the land is a mass rather than ` +
+         `a hairline`);
+      const rgb = (c) => (c.match(/[\d.]+/g) || []).slice(0, 3).map(Number);
+      const lum = (c) => { const v = rgb(c); if (v.length < 3) return null;
+        const f = v.map((x) => { x /= 255; return x <= 0.03928 ? x / 12.92
+          : Math.pow((x + 0.055) / 1.055, 2.4); });
+        return 0.2126 * f[0] + 0.7152 * f[1] + 0.0722 * f[2]; };
+      const a = lum(got.land), bl = got.sea ? lum(got.sea) : null;
+      if (a !== null && bl !== null) {
+        const cr = (Math.max(a, bl) + 0.05) / (Math.min(a, bl) + 0.05);
+        checked++;
+        ok(cr >= wantLand - 0.02,
+           `${u}: the painted land measures ${cr.toFixed(2)}:1 against the ` +
+           `painted water and docs/palette.json requires ${wantLand}. ` +
+           `Measured on the pixels, not on the tokens`);
+      }
+    }
+    await ip.close();
+  }
+
   /* THE OTHER END OF THE CROP RULE: the box a photograph would sit in.
    *
    * data/image-purposes.json declares a `container` aspect range per slot
