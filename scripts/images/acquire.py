@@ -115,6 +115,26 @@ def purposes():
         return json.load(fh)["purposes"]
 
 
+# A PURPOSE IS EITHER DECLARED OR IS AN INSTANCE OF A SLOT.
+#
+# `vienna-destination` and `chamonix-destination` were two hand-written rows
+# saying the same thing about two of 319 destination pages, and the other 317
+# could not be acquired for at all. A slot is the template and
+# `destination-hero@france/alps-and-east/chamonix` is the instance; the
+# register key is derived from the template, so a row cannot claim a key the
+# slot would not produce. tools/lib/imageslots.py owns the resolution and is
+# the only place that does it — the Media Desk, the validator and this script
+# all ask it, so none of them can disagree about what a purpose is.
+sys.path.insert(0, os.path.join(ROOT, "tools"))
+
+
+def spec_for(name):
+    """The spec for a purpose name, and the data needed to resolve a slot."""
+    from lib import imageslots
+    from lib.data import load
+    return imageslots.resolve(name, load()), imageslots
+
+
 def register():
     with open(REGISTER, encoding="utf-8") as fh:
         return json.load(fh)
@@ -284,12 +304,14 @@ def main(argv):
         sys.exit("REFUSED: " + why)
 
     specs = purposes()
-    if args.purpose not in specs:
-        sys.exit(f"{args.purpose!r} is not a declared purpose. Declare it in "
+    spec, imageslots = spec_for(args.purpose)
+    if spec is None:
+        sys.exit(f"{args.purpose!r} is not a purpose. Declare it in "
                  f"data/image-purposes.json with the surface it fills and "
-                 f"what a photograph must be to fill it. Known: "
-                 + ", ".join(sorted(specs)))
-    spec = specs[args.purpose]
+                 f"what a photograph must be to fill it, or name an instance "
+                 f"of a slot as slot@target.\n"
+                 f"  declared: " + ", ".join(sorted(specs)) + "\n"
+                 f"  slots:    " + ", ".join(sorted(imageslots.slots())))
 
     reg = register()
     # A PURPOSE HOLDS ONE PHOTOGRAPH. Re-acquiring the SAME id for the same

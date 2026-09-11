@@ -282,8 +282,22 @@ def main(argv):
         check("acquisition without --purpose fails", r.returncode != 0)
         r = run(A + ["--photo-id", PHOTO_ID, "--purpose", "not-a-purpose",
                      "--alt", "a test pattern image"], env)
+        # THE PROMISE, NOT THE PHRASE. This asserted the literal words
+        # "declared purpose" and went red when slots arrived and the message
+        # started naming both the declared purposes and the slot templates —
+        # the same class as every other assertion here that pinned a string.
+        # What matters is that it refuses AND tells the reader both ways a
+        # purpose can exist, so the fix is in the message.
+        out = r.stdout + r.stderr
         check("an undeclared purpose fails", r.returncode != 0
-              and "declared purpose" in (r.stdout + r.stderr))
+              and "homepage-hero" in out and "destination-hero" in out)
+        # And a slot instance whose TARGET is not a real entity is refused
+        # exactly as an invented purpose name is: a template is not a licence
+        # to name anything after the @.
+        r = run(A + ["--photo-id", PHOTO_ID,
+                     "--purpose", "destination-hero@not/a/place",
+                     "--alt", "a test pattern image"], env)
+        check("a slot instance with an unknown target fails", r.returncode != 0)
 
         # ── 5. a returned id that is not the requested id stops ──────
         r = run(A + ["--photo-id", "mismatch", "--purpose", "homepage-hero",
@@ -528,7 +542,7 @@ def main(argv):
               r2.returncode != 0 and "refuse" in (r2.stdout + r2.stderr).lower())
 
         # ── 18. a purpose with no renderer is refused rather than faked ───
-        wrong = dict(man, purpose="chamonix-destination")
+        wrong = dict(man, purpose="destination-hero@france/alps-and-east/chamonix")
         wf3 = os.path.join(tempfile.gettempdir(), "ed-cands-wrong.json")
         made.append(wf3)
         with open(wf3, "w", encoding="utf-8") as fh:

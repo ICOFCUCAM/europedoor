@@ -666,6 +666,11 @@ def load():
     # discarded unread — a row with no licence at all passed `build.py
     # check` cleanly. A validator that runs after the raise is not a
     # validator, it is a list nobody opens.
+    # A PURPOSE IS EITHER DECLARED OR IS AN INSTANCE OF A SLOT, and the
+    # validator has to know both — `destination-hero@france/…/chamonix`
+    # resolves through the template, so 319 destination pages have a purpose
+    # without 319 rows being typed into the spec file.
+    from . import imageslots
     PURPOSES = _read(os.path.join(DATA, "image-purposes.json")).get("purposes", {})
     images = _read(os.path.join(DATA, "images.json")).get("images", {})
     seen_purpose = {}
@@ -700,11 +705,15 @@ def load():
                       f"purpose {row['purpose']!r} is already claimed by "
                       f"{seen_purpose.get(row['purpose'])!r}")
             seen_purpose[row["purpose"]] = key
-        p.require(row.get("purpose") in PURPOSES, where,
-                  f"purpose must be declared in data/image-purposes.json "
-                  f"({'/'.join(sorted(PURPOSES)) or 'none declared'})")
-        if row.get("purpose") in PURPOSES:
-            spec = PURPOSES[row["purpose"]]
+        spec = imageslots.resolve(row.get("purpose") or "",
+                                  {"cities": index, "stories": stories}) \
+            if row.get("purpose") else None
+        p.require(spec is not None, where,
+                  f"purpose must be declared in data/image-purposes.json, or "
+                  f"be an instance of a slot written slot@target "
+                  f"({'/'.join(sorted(PURPOSES)) or 'none declared'}; slots "
+                  f"{'/'.join(sorted(imageslots.slots())) or 'none'})")
+        if spec is not None:
             p.require(key == spec["key"], where,
                       f"purpose {row['purpose']!r} fills {spec['key']!r} and "
                       f"this row is keyed {key!r} — a purpose names one "

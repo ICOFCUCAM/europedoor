@@ -162,15 +162,20 @@ def main(argv):
 
     purpose = man.get("purpose") or ""
     specs = acquire.purposes()
-    if purpose not in specs:
-        sys.exit(f"{purpose!r} is not a declared purpose.")
-    if purpose not in RENDERABLE:
-        sys.exit(f"no renderer is wired for {purpose!r}. The sheet draws the "
+    spec, _slots = acquire.spec_for(purpose)
+    if spec is None:
+        sys.exit(f"{purpose!r} is not a purpose — neither a declared one nor "
+                 f"an instance of a slot written slot@target.")
+    # THE RENDERER IS WIRED PER SLOT OR PER DECLARED PURPOSE, and a slot
+    # instance asks for its template: `destination-hero@…` is 319 pages of
+    # one composition, so one renderer answers for all of them.
+    wanted = spec.get("slot") or purpose
+    if wanted not in RENDERABLE:
+        sys.exit(f"no renderer is wired for {wanted!r}. The sheet draws the "
                  f"REAL page for a purpose or it does not draw it: a "
                  f"destination photograph judged inside a homepage hero is a "
                  f"review of the wrong composition. Wire "
-                 f"{specs[purpose]['path']} into RENDERABLE first.")
-    spec = specs[purpose]
+                 f"{spec['path']} into RENDERABLE first.")
 
     cands = man.get("candidates") or []
     usable = [c for c in cands if not acquire.fits(c, spec)]

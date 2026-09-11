@@ -25,38 +25,6 @@
         "frame": 0.148
       }
     },
-    "vienna-destination": {
-      "role": "destination-portrait",
-      "key": "city:austria/vienna-and-the-east/vienna",
-      "path": "/europe/austria/vienna-and-the-east/vienna",
-      "surface": "The opening image of the Vienna destination page.",
-      "min_width": 1800,
-      "orientation": "landscape",
-      "min_aspect": 1.5,
-      "max_aspect": 2.4,
-      "note": "Vienna's physical identity is the Danube and the historic centre rather than relief — its ground reads 332 m of spread and a 480 m crest, which is why it draws no terrain bands.",
-      "container": {
-        "selector": ".placeband-art",
-        "unmeasurable": "NOT MEASURABLE, AND THAT IS THE DEFECT. `.placeband-art` is aspect-ratio 16/9 below 62rem and `aspect-ratio: auto` above it, inside a 5fr/7fr grid with align-items: stretch — so above 62rem the photograph's container is exactly as tall as the MAP BESIDE IT, and the map's height depends on the destination. A slot whose crop is decided by a neighbour cannot be art-directed and cannot be checked. It renders only when a photograph exists, so changing it today would be changing a code path nothing exercises — the failure this repository already made with the focal point, which shipped as a style attribute the CSP forbids because nothing ever ran it.",
-        "trigger": "Give it a declared aspect at every width in the same commit as the first destination photograph, and measure it then."
-      }
-    },
-    "chamonix-destination": {
-      "role": "destination-portrait",
-      "key": "city:france/the-alps/chamonix",
-      "path": "/europe/france/the-alps/chamonix",
-      "surface": "The opening image of the Chamonix destination page.",
-      "min_width": 1800,
-      "orientation": "landscape",
-      "min_aspect": 1.5,
-      "max_aspect": 2.4,
-      "note": "The ground within 40 km spreads 1,798 m and crests at 2,752 m. A photograph here has to carry the valley floor against the wall above it, which is the reading the Stay layer makes in words.",
-      "container": {
-        "selector": ".placeband-art",
-        "unmeasurable": "NOT MEASURABLE, AND THAT IS THE DEFECT. `.placeband-art` is aspect-ratio 16/9 below 62rem and `aspect-ratio: auto` above it, inside a 5fr/7fr grid with align-items: stretch — so above 62rem the photograph's container is exactly as tall as the MAP BESIDE IT, and the map's height depends on the destination. A slot whose crop is decided by a neighbour cannot be art-directed and cannot be checked. It renders only when a photograph exists, so changing it today would be changing a code path nothing exercises — the failure this repository already made with the focal point, which shipped as a style attribute the CSP forbids because nothing ever ran it.",
-        "trigger": "Give it a declared aspect at every width in the same commit as the first destination photograph, and measure it then."
-      }
-    },
     "door-mountains": {
       "role": "landscape",
       "key": "door-mountains",
@@ -293,8 +261,7 @@
       "brief": "What a person would see on the walk in. Ordinary weather, ordinary hour, no event. The photograph's job is to make the reader believe the page's own sentence about the ground, so a picture that contradicts the measurement — a flat frame for a place whose ground spreads 1,798 m — fails even at full resolution.",
       "refuses": "The one view every postcard of this place uses. A festival, unless the page is about the festival. Anything shot from inside a hotel or a restaurant.",
       "purposes_today": [
-        "chamonix-destination",
-        "vienna-destination"
+        "destination-hero"
       ]
     },
     "landscape": {
@@ -406,7 +373,9 @@
       "crop": "Punctuation, so it is cropped hard by design.",
       "brief": "This is the role that stops a page of large pictures reading as a slideshow. It is quiet on purpose and must never be the loudest thing on its page.",
       "refuses": "A pattern so abstract the place is gone. A macro shot of food, which is the food role done small.",
-      "purposes_today": [],
+      "purposes_today": [
+        "place-hero"
+      ],
       "trigger": "A purpose exists the day a family's composition has a rhythm that needs punctuation — which is a page-design decision, not a sourcing one."
     },
     "editorial-story": {
@@ -420,7 +389,8 @@
       "brief": "A STORY IS NOT A PLACE and its picture may never be drawn from a hash — that rule already exists here and cost nine social cards. The same reasoning binds a photograph: an essay's picture is chosen for the essay, so this role can never be filled by a general search on a destination name.",
       "refuses": "A stock illustration of the topic. Anything that would serve equally well on three other stories.",
       "purposes_today": [
-        "stories-hero"
+        "stories-hero",
+        "story-hero"
       ]
     },
     "accommodation": {
@@ -437,5 +407,72 @@
       "refused": "REFUSED, on a licence position rather than a taste. This is the family where a photograph does work type cannot — you choose where to sleep partly on what a place looks like at seven in the morning — and the only images that exist for it belong to the accommodation providers and arrive with affiliate terms instead of a photographer, a source and a licence. The Stay layer's no-image state is the SHIPPED state, not a fallback. A row waiting on a measurement is answered by rendering something and looking; a row waiting on a source is answered by a purchase order."
     }
   },
-  "$crop": "SAFE AREA IS THE FRACTION OF A SOURCE FRAME GUARANTEED VISIBLE AT EVERY VIEWPORT, and it is arithmetic rather than taste: a container narrower than the source crops width, a container wider crops height, so the guaranteed width is container_min / source_max and the guaranteed height is source_min / container_max, each capped at 1. `container` is MEASURED in Chromium by adding the class a photograph would add and removing the drawing a photograph would replace, over a sweep of fifteen widths and five heights; `safe_area` is recomputed from it by checks.py and by the browser suite, so a number typed here that the arithmetic does not support fails the build. THE NUMBER IS THE POINT: the homepage hero guarantees 15% of a frame and the four doors 14%, which means the subject of either must sit in the middle of the picture and an off-centre composition is unusable however good it is. Nobody knew that before it was measured, and a purpose file that declares a minimum width and says nothing about this is answering the easy half."
+  "$crop": "SAFE AREA IS THE FRACTION OF A SOURCE FRAME GUARANTEED VISIBLE AT EVERY VIEWPORT, and it is arithmetic rather than taste: a container narrower than the source crops width, a container wider crops height, so the guaranteed width is container_min / source_max and the guaranteed height is source_min / container_max, each capped at 1. `container` is MEASURED in Chromium by adding the class a photograph would add and removing the drawing a photograph would replace, over a sweep of fifteen widths and five heights; `safe_area` is recomputed from it by checks.py and by the browser suite, so a number typed here that the arithmetic does not support fails the build. THE NUMBER IS THE POINT: the homepage hero guarantees 15% of a frame and the four doors 14%, which means the subject of either must sit in the middle of the picture and an off-centre composition is unusable however good it is. Nobody knew that before it was measured, and a purpose file that declares a minimum width and says nothing about this is answering the easy half.",
+  "$slots": "A SLOT IS A TEMPLATE AND A PURPOSE IS AN INSTANCE OF ONE. Twelve purposes were declared and every one was one surface on ONE page — right for the surfaces there is exactly one of, and hopeless for the ones there are hundreds of: `vienna-destination` and `chamonix-destination` were two hand-written rows saying the same thing about two of 319 destination pages, and the other 317 had no slot at all, so a photograph could not be acquired for them. A slot instance is named `slot@target` and its register key is DERIVED from the template, so a row cannot claim a key the slot would not produce. THREE TEMPLATES AND NOT TWELVE: this site renders a photograph in exactly four places, and only three of those vary per entity — a destination, a place inside one, and a story. A country page, a region page, an experience and a journey have no photograph container in the markup, so declaring `country.hero` would declare a slot nobody can fill and no check can see, which is what the /plan note in $requirements already refuses. tools/lib/imageslots.py resolves them and derives the targets from the atlas rather than from a list in this file.",
+  "slots": {
+    "destination-hero": {
+      "role": "destination-portrait",
+      "targets": "cities",
+      "key": "city:{target}",
+      "surface": "The opening image of the {name} destination page.",
+      "min_width": 1800,
+      "orientation": "landscape",
+      "min_aspect": 1.5,
+      "max_aspect": 2.4,
+      "note": "A destination portrait has to say what it is like to BE there — the valley floor against the wall above it, the water the town turns towards. Never a monument alone and never an aerial: the page already draws where the place is, four hundred pixels above this, so a photograph that answers 'where' duplicates the map.",
+      "container": {
+        "selector": ".placeband-art",
+        "unmeasurable": "NOT MEASURABLE, AND THAT IS THE DEFECT. `.placeband-art` is aspect-ratio 16/9 below 62rem and `aspect-ratio: auto` above it, inside a 5fr/7fr grid with align-items: stretch — so above 62rem the photograph's container is exactly as tall as the MAP BESIDE IT, and the map's height depends on the destination. A slot whose crop is decided by a neighbour cannot be art-directed and cannot be checked. It renders only when a photograph exists, so changing it today would be changing a code path nothing exercises — the failure this repository already made with the focal point, which shipped as a style attribute the CSP forbids because nothing ever ran it.",
+        "trigger": "Give it a declared aspect at every width in the same commit as the first destination photograph, and measure it then."
+      }
+    },
+    "place-hero": {
+      "role": "detail-texture",
+      "targets": "places",
+      "key": "place:{target}",
+      "surface": "The opening image of the {name} place page.",
+      "min_width": 1600,
+      "orientation": "landscape",
+      "min_aspect": 1.5,
+      "max_aspect": 1.9,
+      "note": "A place is one thing inside a destination — a bridge, a cellar, a cable car — so this is the closest frame the site has. It must be that thing and not the town around it: the destination page one level up already carries the wider picture, and a page that shows the same view as its parent has said nothing. Without a photograph this container draws a minimap, so a picture here REPLACES geography and has to earn it.",
+      "container": {
+        "selector": ".card-art.frame",
+        "min_aspect": 1.778,
+        "min_at": "declared",
+        "max_aspect": 1.778,
+        "max_at": "declared",
+        "declared": "`.card-art` is aspect-ratio 16/9 at every width and `.frame` adds only a border, so this container is measurable by arithmetic rather than in Chromium — the one photograph container on the site that is."
+      },
+      "safe_area": {
+        "width": 0.936,
+        "height": 0.844,
+        "frame": 0.789
+      }
+    },
+    "story-hero": {
+      "role": "editorial-story",
+      "targets": "stories",
+      "key": "story:{target}",
+      "surface": "The opening image of the story “{name}”.",
+      "min_width": 2000,
+      "orientation": "landscape",
+      "min_aspect": 1.5,
+      "max_aspect": 2.1,
+      "note": "A human moment that could be the opening frame of this particular long read — not a landmark, and not a generic European scene that would serve any of the nine. Without a photograph this container draws the story's own places on the atlas, which is a real claim about the piece, so a photograph here replaces something honest and has to be better than it. A STORY IS NOT A PLACE: its picture may never be drawn from a hash, which is the rule this container exists to hold.",
+      "container": {
+        "selector": ".card-art.frame",
+        "min_aspect": 1.778,
+        "min_at": "declared",
+        "max_aspect": 1.778,
+        "max_at": "declared",
+        "declared": "`.card-art` is aspect-ratio 16/9 at every width and `.frame` adds only a border, so this container is measurable by arithmetic rather than in Chromium."
+      },
+      "safe_area": {
+        "width": 0.847,
+        "height": 0.844,
+        "frame": 0.714
+      }
+    }
+  }
 }

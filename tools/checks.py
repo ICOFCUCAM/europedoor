@@ -5469,12 +5469,19 @@ def c_photo_roles():
     spec = json.load(open(os.path.join(ROOT, "data", "image-purposes.json"),
                           encoding="utf-8"))
     roles, purposes = spec.get("roles", {}), spec.get("purposes", {})
+    # A SLOT INSTANTIATES A ROLE EXACTLY AS A PURPOSE DOES, AND COUNTS ONCE.
+    # `destination-hero` covers 319 pages and is ONE editorial decision, so
+    # the role bookkeeping counts the template rather than the instances —
+    # 319 names in `purposes_today` would be a list nobody can read that is
+    # wrong the first time a destination is added.
+    checked = dict(purposes)
+    checked.update(spec.get("slots", {}))
     n = 0
     if not roles:
         fail("data/image-purposes.json declares no roles")
         return 0
     used = {}
-    for name, pur in sorted(purposes.items()):
+    for name, pur in sorted(checked.items()):
         n += 1
         r = pur.get("role")
         if r not in roles:
@@ -5661,7 +5668,11 @@ def c_photo_safe_area():
     spec = json.load(open(os.path.join(ROOT, "data", "image-purposes.json"),
                           encoding="utf-8"))
     n = 0
-    for name, pur in sorted(spec.get("purposes", {}).items()):
+    # A SLOT'S CROP RULE IS THE SAME CLAIM AS A PURPOSE'S, and a template that
+    # escaped this check would be 319 pages of unchecked crop.
+    crops = dict(spec.get("purposes", {}))
+    crops.update(spec.get("slots", {}))
+    for name, pur in sorted(crops.items()):
         con = pur.get("container")
         n += 1
         if not con:
