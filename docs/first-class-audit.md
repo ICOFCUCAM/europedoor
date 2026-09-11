@@ -337,6 +337,9 @@ Written as the work landed, so the audit and the record do not drift.
 | 15 | the country pages' last grid of abstract plates | 207 plates → 0 |
 | 16 | the glyph's missing middle size | 132px at 834 → 240 |
 | 17 | a lead journey at size — built, rendered, removed | recorded as a negative result |
+| 18 | a map card takes the drawing's ratio, not a photograph's | 834: Europe 138px wide → 208 |
+| 19 | `/discover`'s map narrows with the control it sat beside | decoration → 125 of 319 lit, and the count above it |
+| 20 | five sub-category pages selected on the wrong word | 39 wrong listings of 401; Monasteries 22 → 4 |
 
 **Finding 1, re-measured**: seven surfaces with no picture on the phone's
 first screen became six, and `/stories` and `/my-europe` both gained one.
@@ -349,6 +352,18 @@ holes, and the transition from the continent to the form has air in it.
 destination page has no photograph and its order is already correct; the
 experience category page has no picture anywhere and no honest source for
 one; `/plan` and `/search` are instruments and read as instruments.
+
+**The experience category page was taken up and put down again, twice.** It
+is the family Part 3 records as reading like a tourism database, so the
+obvious answer is to draw its set — and the eight categories really are
+distinct, 27 of 28 pairs overlapping under 0.31. `docs/signature-moments.md`
+refuses geography there for a reason that survives re-checking: *48 dots
+scattered over Europe would say "food is everywhere", which is true and is
+not an insight.* The second idea was to group the list under the four
+sub-category bars the page already draws, and the data refuses that: six of
+48 experiences are in no sub-category and eight are in two, so the grouping
+needs a bucket the page has no name for and prints some invitations twice.
+What the page is missing is a photograph, and the register is empty.
 
 **What is not on the list, deliberately.** Acquiring photographs: the
 proxy refuses both providers and acquisition is a GitHub Actions step with

@@ -2618,6 +2618,93 @@ Arctic-to-Mediterranean extent is tall, so the wider column produced a
 row. **The thing that makes each one legible is what stops one of them being
 the wide element.**
 
+**A MAP CARD IS NOT 16:9, AND THE LETTERBOX WAS INVISIBLE BECAUSE IT WAS THE
+SAME SEA.** `.card-art` is 16/9 because that is a *photograph's* proportion,
+and every drawing ever put inside one is 1.282 — `constellation()` fits every
+frame to 1000×780, so all 129 region minis, all 44 country glyphs and the
+nine region tiles on `/discover` share it. The drawing therefore fits to the
+box's HEIGHT and a third of its width is padding: at 1280 the tile is 345
+wide and the continent is 231 of it, and **at 834 the whole of Europe renders
+138 pixels wide** — two-thirds of the 204 that `/themes` already measured as
+too small, on the page whose second band is *where a region is*. It survived
+every gate because `.card-map` paints `--atlas-sea` and so does the drawing's
+own ocean, so the wasted third reads as more sea rather than as a frame that
+does not fit. **Nothing counts a letterbox, and the box was what every
+measurement reported.**
+
+**THE DRAWING ON `/discover` WAS DECORATION BESIDE A FORM.** 319 dots on
+graphite under seventeen chips and four fields, and the picture did not
+respond to the panel — the single most GIS-application surface in the
+product, and a GIS application is the first thing the brief says EuropeDoor
+must never feel like. The whole Atlas is already in the reader's browser and
+`render()` already computed the matching set; the map was simply never told.
+The join is the destination id, written on every dot as `data-city` and
+carried by `/api/atlas.json` as `city.id`, declared in `data/contracts.json`
+because it crosses a boundary — markup one side, an index the other, and a
+renamed id would light nothing with no error anywhere. **A place that drops
+out goes quiet, it does not go away**: the unlit dot takes the LAND's tone
+rather than a dimmed accent, because a map that deleted its unlit places
+would be a different Europe for every query. Advisory places are never lit,
+and that falls out rather than being written — atlas.json is stripped of them
+at build time.
+
+**And the drawing had to stop MOVING when the reader picked.** It sat above
+`#discover-results`, so the first choice pushed the one thing that had just
+become meaningful off the screen. It sits between the control and the list
+now, and the two counts were split because they are two claims: what the MAP
+shows goes above it, what the LIST shows goes above the list. Moving it up
+also left "Choose what you are travelling for" 950 pixels below the chips it
+describes — the instrument-head rule broken by the commit applying it.
+
+**`cell` CAUGHT `cellar`, SO `/experiences/faith/monasteries` WAS EIGHTEEN
+WINE CELLARS, A LAMBIC BREWERY AND THREE DISTILLERIES.** A sub-category
+keyword is matched as a bare prefix. `matches_sub`'s own docstring records
+that failure for the CITY name and fixes it there — `hall` catching
+Hallstatt, `snow` catching Snowdonia — and never asked whether the same
+prefix was doing the same thing inside the experience's own text:
+
+| | | |
+|---|---|---|
+| `cell` → cellar | 18 | Monasteries: Port, Tokaj, the crayères |
+| `villa` → village | 11 | Architecture: a ferry, a scythe, a hiking trail |
+| `opera` → operator | 2 | Music: a Sámi reindeer-herding afternoon |
+| `ski` → skip | 2 | Skiing: a Saint-Émilion cellar |
+| `wall` → wallet | 2 | Medieval and Modern history: fried pizza |
+
+39 wrong listings of 401. The page published its rule honestly — "Selected
+by name and description against monaster, hermitage, cell and monk" — which
+is what made it look right: **a reader who checked would find `cell` in
+`cellar` and believe it.** The docstring was right about the evidence and
+wrong about the conclusion: it rejected a trailing boundary because that
+"would break the four keywords that are stems on purpose", which is true, and
+100 of the 111 prefix matches are ordinary plurals and gerunds. The answer is
+not one rule for everything, it is to **say which are stems** — `monaster*`
+matches any continuation, every other keyword matches the word plus one
+English inflection. `boatman`, `musicians` and `dancers` are in the suffix set
+because losing them would trade a false positive for a false negative.
+
+**And the check for it cannot be the matcher.** Re-running the model would
+only ever agree with it — the instrument fault this file already records
+three times. It asserts the two things AROUND the model: a star is
+**bounded**, because a stem is the one place a new false positive can enter
+silently, so a star catching a word more than four characters past its stem
+fails and names it (`mon*` → "catches monastery, monument"); and a star
+**never reaches a reader**, because a page printing `monaster*` publishes a
+regular expression as though it were a word.
+
+**A RECORDED REFUSAL IS EVIDENCE, AND IT STOPPED A GOOD-LOOKING CHANGE.** The
+experience category page is 4,980 pixels of one row shape and reads as a
+tourism database, so the obvious move is to draw its set — and the eight
+categories are genuinely distinct (27 of 28 pairs overlap under 0.31). But
+`docs/signature-moments.md` already refuses geography there with a reason
+that survives re-checking: *48 dots scattered over Europe would say "food is
+everywhere", which is true and is not an insight.* Grouping the list under
+the four sub-category bars was the second idea and the data refuses it: six
+of 48 are in no sub-category and eight are in two, so the grouping would
+need a bucket the page has no name for and would print some invitations
+twice. **The page is thin because the register holds no photographs, which
+is a licence position and not a design one.**
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
