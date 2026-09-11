@@ -3531,6 +3531,65 @@ async function main() {
   }
 
 
+  /* THE YEAR BAND'S CAPTION NAMES A LINE, MEASURED ON THE PAINTED PIXEL.
+   *
+   * "Above the line is what is on. Below it is how many countries are in
+   * their quieter shoulder" — and the axis that sentence depends on was
+   * --rule, which sampled rgb(231,230,223) against a page of
+   * rgb(247,246,243): 1.16:1. A reader had to infer the line from where the
+   * bars stop.
+   *
+   * It is measured on the PIXEL rather than on the token because a 1px line
+   * in a viewBox scaled by preserveAspectRatio="none" does not land on a
+   * device pixel: --ink-2 at 1px sampled 2.59 where the token itself is far
+   * darker, and only 1.5 clears the 3:1 that SC 1.4.11 puts on the boundary
+   * of a graphical object. The declaration was never the thing a reader
+   * gets.
+   */
+  {
+    for (const [u, W] of [["/events/", 1280], ["/events/", 390]]) {
+      const yp = await browser.newPage({ viewport: { width: W, height: 900 } });
+      const r = await yp.goto(base + u, { waitUntil: "load" });
+      if (!r || r.status() !== 200) { await yp.close(); continue; }
+      await yp.waitForTimeout(150);
+      const box = await yp.evaluate(() => {
+        const e = document.querySelector(".ybars");
+        if (!e) return null;
+        const b = e.getBoundingClientRect();
+        // BASE is 66 of the 104-unit viewBox; the box scales vertically.
+        return { x: Math.round(b.x + 4), y: Math.round(b.y + 4),
+                 base: Math.round(b.y + 66 * (b.height / 104)) };
+      });
+      if (!box) { checked++; ok(false, `${u} at ${W}: no year band`); await yp.close(); continue; }
+      const shot = (await yp.screenshot()).toString("base64");
+      const got = await yp.evaluate(async ({ d, pts }) => {
+        const img = await new Promise((res) => {
+          const i = new Image(); i.onload = () => res(i);
+          i.src = "data:image/png;base64," + d;
+        });
+        const c = document.createElement("canvas");
+        c.width = img.width; c.height = img.height;
+        const x = c.getContext("2d");
+        x.drawImage(img, 0, 0);
+        const lum = (p) => {
+          const f = (v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+          return 0.2126 * f(p[0]) + 0.7152 * f(p[1]) + 0.0722 * f(p[2]);
+        };
+        const at = (px, py) => lum(x.getImageData(px, py, 1, 1).data);
+        return { base: at(pts.x, pts.base), page: at(pts.x, pts.y) };
+      }, { d: shot, pts: box });
+      await yp.close();
+      const cr = (Math.max(got.base, got.page) + 0.05) /
+                 (Math.min(got.base, got.page) + 0.05);
+      checked++;
+      ok(cr >= 3.0,
+         `${u} at ${W}: the year band's baseline measures ${cr.toFixed(2)}:1 ` +
+         `against the page on the painted pixel. The caption says "above the ` +
+         `line" and a reader has to be able to see the line — SC 1.4.11 puts ` +
+         `the boundary of a graphical object at 3:1`);
+    }
+  }
+
   /* MY EUROPE DRAWS THE LIST IT IS ABOUT, and only a browser can see it.
    *
    * The empty case is the state this page SHIPS in — the list is empty

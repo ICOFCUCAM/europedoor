@@ -4562,9 +4562,33 @@ body[data-hero] .masthead { position: sticky; }
    place, and twelve little arches would be the signature as wallpaper. */
 .yearband { margin: var(--s5) 0 var(--s6); }
 .yearband .ybars { display: block; width: 100%; height: 104px; }
-.yearband .ybase { stroke: var(--rule); stroke-width: 1; }
-.yearband .ybar { fill: color-mix(in srgb, var(--terracotta) 26%, transparent); }
-.yearband .yshoulder { fill: color-mix(in srgb, var(--sea) 34%, transparent); }
+/* THE CAPTION NAMES A LINE AND THE LINE MEASURED 1.16:1.
+ *
+ * "Above the line is what is on. Below it is how many countries are in
+ * their quieter shoulder" — and the axis that sentence depends on was
+ * --rule, sampled off the rendered pixels at rgb(231,230,223) against a
+ * page of rgb(247,246,243). A reader had to infer the line from where the
+ * bars stop. This is the ONE axis on the site and it is load-bearing prose,
+ * not a hairline between two list rows, which is what --rule is for.
+ *
+ * And the two series measured 1.46 and 1.74 against the page and 1.19
+ * against EACH OTHER. They are 150 degrees apart in hue, so a
+ * colour-sighted reader tells them apart instantly — which is exactly the
+ * trap docs/palette.json records in its `distinct` block: a contrast ratio
+ * is a ratio of luminances, two hues at one lightness always measure about
+ * 1.0, and every check here passed. Position carries them too (one is
+ * above the axis and one below), so they do not need 3:1 from each other —
+ * but a chart whose bars are 1.46 from the paper is a chart you have to
+ * look for. */
+/* 1.5, NOT 1. A one-pixel line in a viewBox scaled by
+   preserveAspectRatio="none" does not land on a device pixel, so the
+   painted pixel is a blend: --ink-2 at 1px sampled 2.59:1 against the page
+   where the token itself is far darker. The ratio a reader gets is the
+   ratio of the pixel, not of the declaration — which is the whole reason
+   the contrast work on this site moved to sampling. */
+.yearband .ybase { stroke: var(--ink-2); stroke-width: 1.5; }
+.yearband .ybar { fill: color-mix(in srgb, var(--terracotta) 52%, transparent); }
+.yearband .yshoulder { fill: color-mix(in srgb, var(--sea) 44%, transparent); }
 /* The month you are on is the only one that gets the full accent. */
 .yearband .ybar.on { fill: var(--terracotta); }
 .yearband .yshoulder.on { fill: color-mix(in srgb, var(--sea) 78%, transparent); }
