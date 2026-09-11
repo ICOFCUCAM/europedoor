@@ -1129,7 +1129,17 @@ main.wide { max-width: 92rem; }
 .tag.advisory { background: var(--warn-bg); color: var(--warn); }
 
 /* ── footer ───────────────────────────────────────────────── */
-.footer { border-top: 1px solid var(--rule); background: var(--paper-2); margin-top: var(--s9); }
+/* THE GAP BELOW THE LAST WORD WAS STATED TWICE, BY TWO ELEMENTS THAT DO
+   NOT KNOW ABOUT EACH OTHER. `main` pads its bottom by --s9 and this rule
+   added another --s9 above the band: 224 pixels of empty page between the
+   last sentence and the footer rule, on all 1,072 pages. Measured on
+   /themes, where the closing note ends at y=2862, main ends at 2990 and the
+   footer starts at 3102.
+   Neither declaration was wrong on its own, which is why it survived — the
+   content wants air under it and a band wants separation from what it
+   follows. But that is ONE relationship and it belongs to one of them. It
+   is main's, because main is what the reader has been reading. */
+.footer { border-top: 1px solid var(--rule); background: var(--paper-2); }
 .footer-in { max-width: var(--page); margin: 0 auto; padding: var(--s7) var(--s5); }
 .footer-lede { font-family: var(--display); font-size: var(--t-lg); max-width: 34rem; }
 /* TWENTY LINKS IN ONE FLAT ROW, ON ALL 1,033 PAGES. Every one the same
