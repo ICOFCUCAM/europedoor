@@ -5027,9 +5027,13 @@ body[data-hero] .masthead { position: sticky; }
  * own places drawn at size; the other eight are the row without the glyph. */
 /* No border-top: the opening above already closes with one, and two rules
  * with a gap between them reads as a mistake rather than as a division. */
+/* No `color: inherit`: `a { color: inherit }` is the global rule at the top
+ * of this file, and restating it here is the redundancy the dead-rule scan
+ * exists to find — a declaration that matches its element and changes
+ * nothing, which reads as a decision and is not one. */
 .storyleadwide {
   display: grid; grid-template-columns: 22rem minmax(0, 1fr); gap: var(--s6);
-  align-items: center; text-decoration: none; color: inherit;
+  align-items: center; text-decoration: none;
   padding: var(--s6) 0;
 }
 .storyleadwide h3 {
@@ -5083,7 +5087,9 @@ main > .pagehead:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom
   font-family: var(--serif); font-size: clamp(var(--t-3xl), 5.2vw, var(--t-5xl));
   line-height: 1.12; margin: 0 0 var(--s4); text-wrap: balance;
 }
-.iherotext .lede { font-size: var(--t-md); color: var(--ink-2); max-width: 42ch; margin: 0; }
+/* No `color`: `.lede` already resolves to --ink-2, and the scan reads a
+ * restatement of an inherited value as a rule that changes nothing. */
+.iherotext .lede { font-size: var(--t-md); max-width: 42ch; margin: 0; }
 .iherotext .chips { margin-top: var(--s5); }
 .iherotext .small { margin-top: var(--s4); color: var(--ink-3); }
 
