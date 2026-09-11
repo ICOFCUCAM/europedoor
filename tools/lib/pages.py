@@ -5401,6 +5401,7 @@ def facets_for(data, c, r, t):
 
 def facet_page(data, c, r, t, key, payload):
     name = urls.FACETS[key]
+    facetart = ""
     rows = []
     if key == "journeys":
         for j in payload["journeys"]:
@@ -5413,6 +5414,53 @@ def facet_page(data, c, r, t, key, payload):
             rows.append((urls.story(st), st["title"], st["standfirst"], st["reading"]))
         lede = (f"Every curated route, theme and story in the Atlas that passes through "
                 f"{t['name']}. None of them was written to fill this page.")
+        # THE ONE FACET WHOSE SUBJECT IS A SHAPE, AND IT DREW NOTHING.
+        #
+        # `docs/signature-moments.md` refuses a map on this family, and the
+        # reason is exact: a facet exists to be left quickly and must not
+        # repeat its parent's map. This is not the parent's map. The parent
+        # draws a locator — where Vienna is — and this page's subject is
+        # every route that passes THROUGH Vienna, which is five different
+        # lines converging on one point and is the only thing on the page a
+        # sentence cannot carry.
+        #
+        # ONE drawing for all of them, which is the /journeys opening scoped
+        # to a place: five framed thumbnails would be five pictures of the
+        # same continent. The casings are drawn before the cores, all of
+        # them, because a per-route casing lays the next route's pale stroke
+        # over the last route's cobalt one and every crossing becomes a
+        # break — the rule pages.route_line() exists for.
+        idx = data["cities"]
+        routes, allpts = [], []
+        for j in payload["journeys"]:
+            pts = [project(idx[l["city"]]["city"]["lat"], idx[l["city"]]["city"]["lon"])
+                   for l in j["legs"] if l["city"] in idx]
+            if len(pts) > 1:
+                routes.append(pts)
+                allpts.extend(pts)
+        here = project(t["lat"], t["lon"])
+        if routes:
+            allpts.append(here)
+            lines = ("".join(f'<polyline class="constel-route case" points="'
+                             + " ".join(f"{x:.0f},{y:.0f}" for x, y in pts) + '"/>'
+                             for pts in routes)
+                     + "".join(f'<polyline class="constel-route" points="'
+                               + " ".join(f"{x:.0f},{y:.0f}" for x, y in pts) + '"/>'
+                               for pts in routes))
+            facetart = (
+                f'<figure class="facetart">'
+                f'<svg class="constel allroutes" viewBox="{glyph_view(allpts)}" '
+                f'role="img" aria-label="The '
+                f'{n_of(len(routes), "route")} in the Atlas that pass through '
+                f'{esc(t["name"])}">'
+                f'<use href="#constel-eu"/>{lines}'
+                f'<g class="constel-lit"><circle cx="{here[0]:.0f}" '
+                f'cy="{here[1]:.0f}"/></g></svg>'
+                f'<figcaption>{n_of(len(routes), "curated route")} through '
+                f'{esc(t["name"])}, drawn end to end on the same projection as '
+                f'every other map here. '
+                f'{geo.sources_line(geo.load("europe-lod0.json"))}</figcaption>'
+                f'</figure>')
     else:
         for pl in payload["places"]:
             rows.append((urls.place(c, r, t, pl), pl["name"], pl["summary"],
@@ -5446,6 +5494,8 @@ def facet_page(data, c, r, t, key, payload):
   <h1>{esc(name)} in {esc(t['name'])}</h1>
   <p class="lede">{esc(lede)}</p>
 </div>
+{constel_defs() if facetart else ""}
+{facetart}
 <div class="rows">{rowhtml}</div>
 {extra}
 <div class="note mt7">

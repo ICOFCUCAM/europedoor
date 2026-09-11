@@ -810,6 +810,20 @@ main.wide { max-width: 92rem; }
   .quietart { max-width: 22rem; }
 }
 
+/* EVERY ROUTE THROUGH ONE PLACE. The /journeys opening scoped to a
+   destination: one frame, all the routes, the place itself lit. Capped at a
+   readable width rather than the column, because the drawing is 4:3 and a
+   full-column one would be taller than the list it introduces. */
+.facetart { margin: var(--s6) 0 var(--s7); }
+.facetart .constel { display: block; width: 100%; max-width: 32rem;
+                     margin-inline: auto; height: auto;
+                     background: var(--atlas-sea); border-radius: var(--radius); }
+.facetart .constel > use { fill: var(--atlas-land); }
+.facetart .constel-lit circle { r: 9px; stroke: var(--atlas-here);
+                                stroke-width: 2; }
+.facetart figcaption { margin-top: var(--s3); font-size: var(--t-xs);
+                       color: var(--ink-3); }
+
 .rowdist { display: grid; gap: var(--s1); justify-items: end; }
 .dist { width: 8.5rem; height: 12px; display: block; }
 .distaxis { fill: var(--rule); }
