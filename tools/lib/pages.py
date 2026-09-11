@@ -8708,8 +8708,11 @@ def sources_page(data):
     <p>Every country, and the date its practical facts were last checked.
     <a href="/sources/freshness">The board →</a></p>
     <h2 class="mini">Tell us</h2>
-    <p>Corrections are wanted, including blunt ones. A correction channel goes up with the entity;
-    until then, the repository's issue tracker is the honest answer.</p>
+    <p>Corrections are wanted, including blunt ones — and there is nowhere on this site to
+    send one yet. A channel needs an inbox, an inbox needs a controller and a retention
+    period, and none of those exists before the entity does. If you hold the repository, its
+    issue tracker is the channel and every correction is public that way. If you do not,
+    there is no way to reach us, and this page is not going to paper over that.</p>
     <h2 class="mini">No photographs</h2>
     <p>Every illustration on this site is generated from the place's own name — a deterministic
     drawing, unique per place, owned outright. No stock library, no licence expiry, no
@@ -10204,8 +10207,10 @@ def contact_page(data):
     <h2>What to do instead</h2>
     <ul class="stack">
       <li><strong>A correction</strong> — a wrong fact, a closed museum, a price that moved.
-      The repository's issue tracker is the honest channel while this is a pre-launch
-      editorial project, and every correction is public that way, which is better.</li>
+      If you hold the repository, its issue tracker is the channel and every correction is
+      public that way, which is better than an inbox. If you do not, there is no route yet:
+      this is the one thing on the list with no answer, and naming a channel a reader cannot
+      reach would be worse than saying so.</li>
       <li><strong>You run a business we list, or should</strong> — read
       <a href="/for-businesses">how listings work</a> first. Applications are not open, and
       the page says why.</li>
