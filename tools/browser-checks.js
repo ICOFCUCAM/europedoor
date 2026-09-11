@@ -1649,7 +1649,14 @@ async function main() {
         const lin = (v) => { const x = v / 255;
           return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); };
         const rel = (c) => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
-        const cs = getComputedStyle(document.documentElement);
+        // THE BODY, NOT THE ROOT. `accent-color` moved off `:root` because a
+        // var() resolves where the DECLARATION lives and the world tokens sit
+        // on `body[data-world]`, so the root resolved the light world's value
+        // and inherited that one number into the dark one. This check read
+        // the root and went red on the fix — pinning the element rather than
+        // the promise. What a reader gets is the value on the element their
+        // checkbox is inside.
+        const cs = getComputedStyle(document.body);
         const sel = getComputedStyle(document.body, "::selection");
         const a = rel(num(sel.color)), b = rel(num(sel.backgroundColor));
         const [hi, lo] = [a, b].sort((x, y) => y - x);
@@ -2070,6 +2077,47 @@ async function main() {
        dead.join(";\n    "));
   }
   await page.setViewportSize({ width: 1280, height: 900 });
+
+  // ── the colour the BROWSER paints, on the ground it paints it on ───
+  //
+  // `accent-color` is what a checkbox, a radio and a range thumb are drawn
+  // in, and it was bound on `:root` to a light-world token. A var() in a
+  // declaration resolves where the DECLARATION lives, and the world tokens
+  // sit on `body[data-world]` — a descendant — so every world inherited the
+  // light world's number: cobalt-deep, which is 6.31:1 on limestone and
+  // **2.75:1 on the graphite ground**, under the 3:1 SC 1.4.11 asks of a
+  // user interface component. On the five INTELLIGENCE pages, which are the
+  // pages that hold the checkboxes the property was added for.
+  //
+  // Read off the browser rather than off the stylesheet, because the failure
+  // was invisible in the source: the rule said var(--sea) and meant it.
+  for (const u of ["/plan", "/discover", "/events", "/fund", "/"]) {
+    await page.goto(base + u, { waitUntil: "load" });
+    const m = await page.evaluate(() => {
+      const px = (c) => (c.match(/[\d.]+/g) || []).slice(0, 3).map(Number);
+      const lum = ([r, g, b]) => {
+        const f = (v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+        return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+      };
+      const ground = (el) => {
+        for (let e = el; e; e = e.parentElement) {
+          const b = getComputedStyle(e).backgroundColor;
+          const p = px(b);
+          if (p.length === 3 && !/rgba\(.*,\s*0\)/.test(b)) return p;
+        }
+        return [255, 255, 255];
+      };
+      const b = document.body;
+      const a = px(getComputedStyle(b).accentColor);
+      const g = ground(b);
+      const la = lum(a), lg = lum(g);
+      return { accent: a, ground: g,
+               ratio: (Math.max(la, lg) + 0.05) / (Math.min(la, lg) + 0.05) };
+    });
+    ok(m.ratio >= 3.0,
+       `${u}: accent-color rgb(${m.accent}) measures ${m.ratio.toFixed(2)}:1 on ` +
+       `rgb(${m.ground}) — a checkbox the browser paints needs 3:1`);
+  }
 
   // ── THE CONTRAST UNDER THE GLYPHS, NOT UNDER THE TOKEN ─────────────
   //

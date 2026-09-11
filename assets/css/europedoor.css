@@ -468,9 +468,37 @@ p { margin: 0 0 var(--s4); max-width: var(--measure); }
  * in Chrome's own blue — a second, slightly different blue beside the one
  * band of signature colour this site has, on the two pages where a reader
  * does the most clicking. One property, and the checkbox becomes ours.
+ *
+ * AND IT WAS BOUND TO A LIGHT-WORLD TOKEN ON EVERY WORLD. `--cobalt-deep`
+ * is 6.31:1 on limestone and **2.75:1 on the graphite ground, 2.46:1 on the
+ * card** — under the 3:1 SC 1.4.11 asks of a user interface component, on
+ * the five INTELLIGENCE pages, which are exactly the pages that hold the
+ * checkboxes this property was added for. A checked box a reader cannot see
+ * is the same class as the hero's invisible label: present, labelled,
+ * keyboard-reachable, and not there.
+ *
+ * `--sea` rather than `--door`: the interactive colour rather than the
+ * editorial accent. A checkbox is a control and stays one colour across the
+ * site; `--door` carries the terracotta and atlantic that say what KIND of
+ * thing is being READ, and a green tick on /fund is the accent doing a job
+ * that belongs to the interactive token. cobalt-deep on paper, cobalt-lift
+ * at 5.36 on graphite and 4.79 on the card.
+ *
+ * That also removes two special cases. `.checks input` and `.inlinecheck
+ * input` each set their own `accent-color: var(--door)`, so the planner's
+ * seventeen interest boxes were cobalt-air while every other control on the
+ * same page was cobalt-deep — two blues, one form.
  */
 ::selection { background: var(--cobalt-deep); color: var(--limestone); }
-:root { accent-color: var(--cobalt-deep); }
+/* ON `body`, NOT ON `:root`. A var() in a declaration resolves where the
+   DECLARATION lives, and the world tokens are set on `body[data-world]`,
+   which is a descendant of `:root` — so `:root { accent-color: var(--sea) }`
+   resolved against the light world's value and then inherited that one
+   number into every world. It reported cobalt-deep on the graphite planner,
+   which is the 2.75:1 this rule exists to fix, while looking correct in the
+   source. An inherited property carries the value it computed, not the
+   expression that produced it. */
+body { accent-color: var(--sea); }
 
 a { color: inherit; }
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
@@ -942,7 +970,7 @@ main.wide { max-width: 92rem; }
 .fieldset { border: 0; padding: 0; margin: 0; }
 .checks { display: flex; flex-wrap: wrap; gap: var(--s2); }
 .checks label { font-size: var(--t-sm); border: 1px solid var(--rule); background: var(--paper); border-radius: 999px; padding: var(--s2) var(--s4); cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: var(--s2); }
-.checks input { accent-color: var(--door); margin: 0; }
+.checks input { margin: 0; }
 .checks label:has(input:checked) { border-color: var(--door); background: color-mix(in srgb, var(--door) 12%, var(--paper)); color: var(--ink); }
 .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: var(--s4); }
 
@@ -1617,7 +1645,7 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
  * style is the only thing that could ever have caught this. */
 .inlinecheck { display: flex; align-items: baseline; gap: var(--s2); font-size: var(--t-sm);
   text-transform: none; letter-spacing: normal; color: var(--ink-2); font-weight: 400; }
-.inlinecheck input { accent-color: var(--door); margin: 0; }
+.inlinecheck input { margin: 0; }
 
 /* ── layout utilities, and why they are not inline styles ─────────
  *
