@@ -775,16 +775,28 @@
       'placeholder="Type a city — Ghent, Ohrid, Trieste…" ' +
       'aria-describedby="addhelp' + after + '">' +
       '<p class="small" id="addhelp' + after + '">Anywhere in the Atlas. Distance is ' +
-      'from ' + from.name + ', so you can see what a stop actually costs you.</p>' +
-      '<ul class="addhits" role="listbox" aria-label="Places to add"></ul>';
+      'from ' + from.name + ', so you can see what a stop actually costs you. ' +
+      'Escape closes this.</p>' +
+      // role="status" rather than a line inside the list, because the
+      // result of typing has to be ANNOUNCED. The first version put "Two
+      // letters is enough to start" in an <li> inside a role="listbox"
+      // whose children carried no role at all — so assistive technology was
+      // told there was a listbox, asked it for its options, and got none.
+      // A role is a claim about the markup under it, and that one was not
+      // kept. The list is a plain list of buttons now, and the sentence
+      // that changes lives in a live region where a change is heard.
+      '<p class="small addsay" role="status"></p>' +
+      '<ul class="addhits"></ul>';
 
     var box = panel.querySelector(".addq");
     var hits = panel.querySelector(".addhits");
+    var say = panel.querySelector(".addsay");
 
     function render() {
       var q = fold(box.value.trim());
       if (q.length < 2) {
-        hits.innerHTML = '<li class="small">Two letters is enough to start.</li>';
+        hits.innerHTML = "";
+        say.textContent = "Two letters is enough to start.";
         return;
       }
       var found = [];
@@ -805,8 +817,13 @@
         hits.innerHTML = '<li class="small">Nothing in the Atlas matches that. ' +
           'It may be somewhere we have not written up yet — ' +
           '<a href="/countries">the countries page</a> shows what we hold.</li>';
+        say.textContent = "Nothing matches " + box.value.trim() + ".";
         return;
       }
+      var shown = Math.min(found.length, 8);
+      say.textContent = found.length > shown
+        ? shown + " of " + found.length + " matches, nearest first."
+        : shown + (shown === 1 ? " match." : " matches, nearest first.");
       hits.innerHTML = found.slice(0, 8).map(function (f) {
         return '<li><button type="button" class="addhit" data-city="' + f.c.id + '">' +
           "<span>" + f.c.name + ' <span class="small">· ' + f.c.country + "</span></span>" +
@@ -832,6 +849,20 @@
     }
 
     box.addEventListener("input", render);
+    // A disclosure that takes focus has to give it back. Without this a
+    // keyboard reader who opens the panel and changes their mind can only
+    // leave it by shift-tabbing back over the trigger; there was no way to
+    // CLOSE it at all without a mouse.
+    box.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape" && e.key !== "Esc") return;
+      e.preventDefault();
+      var trigger = panel.parentNode.querySelector('[data-add="' + after + '"]');
+      panel.hidden = true;
+      if (trigger) {
+        trigger.setAttribute("aria-expanded", "false");
+        trigger.focus();
+      }
+    });
     render();
     box.focus();
   }

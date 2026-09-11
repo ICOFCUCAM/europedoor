@@ -456,6 +456,36 @@ async function main() {
      "a city already on the route was offered again");
   await page.click('.leg:nth-child(1) [data-add]');   // close it
 
+  // A disclosure that TAKES focus has to give it back. The panel focused its
+  // search box on open and offered no keyboard way out at all: shift-tab
+  // over the trigger was the only exit, and nothing closed it.
+  await page.click('.leg:nth-child(1) [data-add]');
+  await page.waitForSelector(".addstop:not([hidden]) .addq");
+  await page.press(".addstop:not([hidden]) .addq", "Escape");
+  await page.waitForTimeout(150);
+  ok(await page.locator(".addstop:not([hidden])").count() === 0,
+     "Escape did not close the add-a-stop panel");
+  ok(await page.evaluate(() => document.activeElement &&
+                               document.activeElement.hasAttribute("data-add")),
+     "Escape closed the panel and dropped focus to nowhere");
+
+  // The result of typing has to be ANNOUNCED. It used to be an <li> inside a
+  // role="listbox" whose children carried no role — a listbox reporting zero
+  // options while eight buttons were on the screen.
+  ok(await page.locator("#result [role=listbox]").count() === 0,
+     "the add-a-stop results still claim to be a listbox");
+  await page.click('.leg:nth-child(1) [data-add]');
+  await page.waitForSelector(".addstop:not([hidden]) .addq");
+  const sayRest = await page.locator(".addstop:not([hidden]) .addsay").innerText();
+  ok(/letters/.test(sayRest), `the add panel says nothing at rest: "${sayRest}"`);
+  await page.fill(".addstop:not([hidden]) .addq", "gh");
+  await page.waitForTimeout(150);
+  const sayHits = await page.locator(".addstop:not([hidden]) .addsay").innerText();
+  const nHits = await page.locator(".addstop:not([hidden]) .addhit").count();
+  ok(new RegExp("\\b" + nHits + "\\b").test(sayHits),
+     `the status says "${sayHits}" over ${nHits} rows`);
+  await page.press(".addstop:not([hidden]) .addq", "Escape");
+
   // Sharing an edited plan must carry the EDIT, not the inputs. This is the
   // whole point of the frozen route: regenerating from the form would run
   // the planner again, and the planner jitters.
