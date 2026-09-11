@@ -687,6 +687,27 @@ main.wide { max-width: 92rem; }
 .pagehead .kicker { margin-bottom: var(--s2); }
 .pagehead p.lede { font-size: var(--t-md); color: var(--ink-2); max-width: 44rem; margin-top: var(--s4); }
 .kicker { font-size: var(--t-xs); letter-spacing: .14em; text-transform: uppercase; color: var(--door); margin: 0 0 var(--s2); font-weight: 600; }
+/* AN ACCENT ON EVERY ROW OF A LIST IS NOT AN ACCENT, IT IS A TEXTURE.
+   The kicker's job is to say what KIND of thing is being read — the accent
+   system's whole argument, and the reason an essay is terracotta and a
+   country is cobalt. One per page head answers that. Inside a row it
+   answers nothing, because every row on the page is the same kind, and the
+   ratio gives the accent five per cent of a screen:
+
+       /journeys      17 rows, 17 chromatic lines
+       /themes        13
+       /countries      9
+       /stories        9
+
+   Seventeen cobalt uppercase lines down a page is the aperture-as-wallpaper
+   finding in colour — a signal shared by every result carries no
+   information, which is the same sentence as "never explain the constraint
+   back", one system over. And it inverts the hierarchy it sits in: on
+   /themes the kicker is the theme's ARGUMENT and the h3 is its name, so the
+   brightest thing in the row was the subtitle.
+   In a row it is ink: same size, same tracking, same weight, so it still
+   reads as a label. The head keeps the accent, where it is true. */
+.row .kicker, .card .kicker { color: var(--ink-3); }
 .lede { color: var(--ink-2); }
 
 /* ── hero ─────────────────────────────────────────────────── */
