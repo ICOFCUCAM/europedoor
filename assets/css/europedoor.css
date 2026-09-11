@@ -597,7 +597,24 @@ p { margin: 0 0 var(--s4); max-width: var(--measure); }
    expression that produced it. */
 body { accent-color: var(--sea); }
 
+/* PROSE LINKS WORE THE BROWSER'S DEFAULT UNDERLINE, WHICH SITS ON THE
+   BASELINE. Nothing in this stylesheet declared `text-underline-offset` or
+   `text-decoration-thickness`, so every link inside a sentence — the source
+   credits under all 824 maps, the corrections link, "the full map", every
+   cross-reference in every country's prose — was drawn with a rule through
+   the descender of every g, j, p, q and y. It is the most visible
+   typographic tell there is between a document and a web page, and it was
+   on 1,072 pages because the default is what happens when nobody decides.
+   One decision: the line drops clear of the baseline, and thickens on
+   hover rather than changing colour, because a colour change on hover is a
+   second statement about what the link IS. `from-font` where the face
+   offers a position and 1px where it does not. */
 a { color: inherit; }
+a:where(:any-link) {
+  text-underline-offset: 0.17em;
+  text-decoration-thickness: 1px;
+}
+a:where(:any-link):hover { text-decoration-thickness: 2px; }
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
   outline: 2px solid var(--sea); outline-offset: 3px; border-radius: 2px;
 }
