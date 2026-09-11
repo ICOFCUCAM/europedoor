@@ -3853,7 +3853,10 @@ async function main() {
    * checks than it did last time. Raise this when the real number grows;
    * it is a ratchet, not a target.
    */
-  const FLOOR = 1000;
+  // 1000 -> 1150. The suite grew by the navigation-reachability block, the
+  // container measurement, the painted-land probe and 320 joining the
+  // clipping widths: 1,071 -> 1,182. A ratchet, not a target.
+  const FLOOR = 1150;
   if (checked < FLOOR) {
     console.log(`\nonly ${checked} browser checks ran, and this suite has ${FLOOR}+. ` +
                 "Something exited early or stopped counting — that is a failure, " +

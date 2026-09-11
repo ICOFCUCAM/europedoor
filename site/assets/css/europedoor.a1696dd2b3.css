@@ -5207,7 +5207,15 @@ body[data-hero] .masthead { position: sticky; }
 @media (max-width: 52rem) {
   .wayin { grid-template-columns: 1fr; }
   .way { padding: var(--s6) var(--s4); }
-  .way.shot { min-height: 17rem; }
+  /* 17rem IS A PHONE'S HEIGHT AND THIS BLOCK RUNS TO 832. A single-column
+     door at 760 wide and 272 tall is 2.794:1 — a letterbox — and the
+     container check caught it the run after the strip moved to one column
+     here. That matters for a photograph nobody has licensed yet and the
+     check is why it is not a surprise later: with the source range this
+     purpose declares, a 2.794 box leaves 10% of a frame guaranteed
+     visible, under the 12% floor. 52vw takes over the moment the panel is
+     wider than it is tall. */
+  .way.shot { min-height: max(17rem, 52vw); }
   /* The divider stacks with the panels: horizontal, or the strip comes
      apart into four blocks that happen to share a colour. */
   .way + .way { border-left: 0;

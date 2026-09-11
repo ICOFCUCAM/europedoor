@@ -71,13 +71,13 @@
         "selector": ".way.shot",
         "min_aspect": 0.464,
         "min_at": "980x1100",
-        "max_aspect": 2.047,
+        "max_aspect": 1.923,
         "max_at": "760x640"
       },
       "safe_area": {
         "width": 0.244,
-        "height": 0.586,
-        "frame": 0.143
+        "height": 0.624,
+        "frame": 0.152
       }
     },
     "door-coast": {
@@ -94,13 +94,13 @@
         "selector": ".way.shot",
         "min_aspect": 0.464,
         "min_at": "980x1100",
-        "max_aspect": 2.047,
+        "max_aspect": 1.923,
         "max_at": "760x640"
       },
       "safe_area": {
         "width": 0.244,
-        "height": 0.586,
-        "frame": 0.143
+        "height": 0.624,
+        "frame": 0.152
       }
     },
     "door-history": {
@@ -117,13 +117,13 @@
         "selector": ".way.shot",
         "min_aspect": 0.464,
         "min_at": "980x1100",
-        "max_aspect": 2.047,
+        "max_aspect": 1.923,
         "max_at": "760x640"
       },
       "safe_area": {
         "width": 0.244,
-        "height": 0.586,
-        "frame": 0.143
+        "height": 0.624,
+        "frame": 0.152
       }
     },
     "door-food": {
@@ -140,13 +140,13 @@
         "selector": ".way.shot",
         "min_aspect": 0.464,
         "min_at": "980x1100",
-        "max_aspect": 2.047,
+        "max_aspect": 1.923,
         "max_at": "760x640"
       },
       "safe_area": {
         "width": 0.244,
-        "height": 0.586,
-        "frame": 0.143
+        "height": 0.624,
+        "frame": 0.152
       }
     },
     "journeys-hero": {
