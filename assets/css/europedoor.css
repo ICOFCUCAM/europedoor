@@ -4762,13 +4762,20 @@ body[data-hero] .masthead { position: sticky; }
    button takes the left track and the two sentences that say who you are
    about to deal with take the right, so the row is full and the boundary is
    beside the thing that crosses it rather than under it. */
-.staygo { margin-top: var(--s7); padding-top: var(--s5);
+/* THE COUNTRY PAGE'S HAND-OFF TAKES THIS GRAMMAR RATHER THAN INVENTING ONE.
+   Fifty country pages had no action at all — not a button, not a save, and
+   only the planner link every page carries in its masthead. What they needed
+   is what the Stay layer already composes: a rule, the action beside the
+   sentence that says what it will do. The first attempt used `.note.onward`
+   and `c_note_tones` failed it at 62 pages, correctly — that panel wears the
+   interactive colour and is deliberately rare. */
+.staygo, .handoff { margin-top: var(--s7); padding-top: var(--s5);
           border-top: 1px solid var(--rule);
           display: grid; gap: var(--s5); align-items: start; }
-.staygo p { margin: 0 0 var(--s3); }
-.staygo p:last-child { margin-bottom: 0; }
+.staygo p, .handoff p { margin: 0 0 var(--s3); }
+.staygo p:last-child, .handoff p:last-child { margin-bottom: 0; }
 @media (min-width: 52rem) {
-  .staygo { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s7); }
+  .staygo, .handoff { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s7); }
 }
 /* The provider row. A comparison, not a menu: it renders only where two or
    more providers are enabled, because one provider is a button. */

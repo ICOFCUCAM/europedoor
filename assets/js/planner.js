@@ -759,8 +759,39 @@
    * thing; both had it before this picker existed, and a reader who can
    * find a city in search and not in the planner would be right to think
    * one of them is broken. */
+  /* A QUARTER OF THE ATLAS COULD NOT BE NAMED IN THE SENTENCE BOX.
+   *
+   * `words()` lowercases and then strips everything outside [a-z0-9] to a
+   * space, and the names it was compared against were only lowercased. So
+   * the sentence became "start from krakow" while the name stayed "kraków",
+   * and the two never met: 77 of 313 destinations — Kraków, Málaga,
+   * Córdoba, Reykjavík, Tromsø, Brașov, Gdańsk, Évora, San Sebastián,
+   * Lübeck — and Türkiye, the only country whose own name carries a
+   * diacritic. A reader typing "Ten days from Kraków" got a route that
+   * ignored Kraków.
+   *
+   * It is the worst possible place for a silent failure: this planner's
+   * whole pitch is that it "shows you exactly what it understood, naming
+   * anything it could not take account of rather than quietly dropping it",
+   * and here it never saw the word at all, so there was nothing to name.
+   *
+   * NFD ALONE FIXES HALF OF IT. ø, þ, ð, ħ, ł, æ and ß have no combining
+   * decomposition, so Tromsø, Þingvellir, Ísafjörður, Ħaġar Qim and
+   * Białowieża survived the first repair — a transliteration table is not
+   * an optimisation here, it is the other half of the alphabet Europe
+   * actually uses.
+   *
+   * AND THE REAL RULE IS ONE NORMALISER, BOTH SIDES. Folding the names and
+   * not the punctuation still left 41: "Kardamyli & the Mani" keeps its
+   * ampersand while the sentence has lost it. Every name is put through
+   * `words()` now, the same function the sentence goes through, and the
+   * count is 0 of 313. */
+  var TRANSLIT = { "ø": "o", "þ": "th", "ð": "d", "ħ": "h", "ł": "l",
+                   "æ": "ae", "œ": "oe", "ß": "ss", "đ": "d", "ı": "i" };
   function fold(x) {
-    return String(x).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    return String(x).toLowerCase().replace(/[øþðħłæœßđı]/g, function (ch) {
+      return TRANSLIT[ch];
+    }).normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   }
 
   function addPanel(panel, route, opts, after) {
@@ -1288,8 +1319,13 @@
     for (i = 1; i < route.length; i++) totalKm += km(route[i - 1].city, route[i].city);
 
     out.innerHTML =
-      '<h2 class="mt7">' + opts.days + " days, " + route.length +
-        " stops, " + countries.length + (countries.length === 1 ? " country" : " countries") + "</h2>" +
+      /* The country was pluralised and the days and the stops were not, so a
+       * short trip read "3 days, 1 stops, 1 country" — two thirds of one
+       * line correct. Found by following a country page's own hand-off into
+       * Andorra, which is the shortest route this atlas can build. */
+      '<h2 class="mt7">' + opts.days + (opts.days === 1 ? " day, " : " days, ") +
+        route.length + (route.length === 1 ? " stop, " : " stops, ") +
+        countries.length + (countries.length === 1 ? " country" : " countries") + "</h2>" +
       '<dl class="result-summary">' +
         "<div><dt>Estimated total</dt><dd>" + money(c.total) + "</dd></div>" +
         "<div><dt>Accommodation</dt><dd>" + money(c.beds) + "</dd></div>" +
@@ -1435,7 +1471,7 @@
     [["honeymoon","anniversary","birthday","proposal"], "the occasion behind a trip"]
   ];
 
-  function words(t) { return " " + t.toLowerCase().replace(/[^a-z0-9€$£.,\-]+/g, " ") + " "; }
+  function words(t) { return " " + fold(t).replace(/[^a-z0-9€$£.,\-]+/g, " ") + " "; }
 
   var HAS = {};
   function has(t, term) {
@@ -1509,7 +1545,7 @@
     // eaten by "bath". Only counts when the sentence says start or from.
     var byLength = cities.slice().sort(function (a, b) { return b.name.length - a.name.length; });
     for (var c = 0; c < byLength.length; c++) {
-      var name = byLength[c].name.toLowerCase().split(" (")[0];
+      var name = words(byLength[c].name.split(" (")[0]).trim();
       if (name.length < 4) continue;
       var at = t.indexOf(" " + name);
       if (at < 0) continue;
@@ -1539,7 +1575,7 @@
     }
     var seenCountry = {};
     for (var ck = 0; ck < cities.length; ck++) {
-      var cn = cities[ck].country.toLowerCase();
+      var cn = words(cities[ck].country).trim();
       if (seenCountry[cn]) continue;
       seenCountry[cn] = true;
       if (has(t, cn)) geo[cities[ck].countrySlug] = true;

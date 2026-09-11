@@ -2828,6 +2828,70 @@ def country_page(data, c):
         ("Quieter months", esc(months_line(data, c["season"].get("shoulder", [])))),
         ("Facts checked", checked_line(c)),
     ])
+    # FIFTY PAGES, SEVEN THOUSAND PIXELS EACH, AND NOWHERE TO ACT.
+    #
+    # Measured across three families: a destination page carries "Save to My
+    # Europe" a quarter of the way down and hands the planner its own city
+    # (`/plan?from=france/alps-and-east/chamonix`); a journey page opens in
+    # the Planner. A COUNTRY PAGE HAD NOTHING — not one button, not one save,
+    # and its only planner link was the one in the masthead that every page
+    # on the site carries. It is the second-largest family here and the one a
+    # reader most often arrives on from a search for "Austria travel", and it
+    # ended on `The record`.
+    #
+    # The brief's sequence is desire, orientation, discovery, planning,
+    # action. This page did the first three and stopped.
+    #
+    # THE LINK CARRIES THE COUNTRY AND NOTHING ELSE. `/plan?ask=` fills the
+    # sentence box and runs it, which is how the homepage already hands over,
+    # and the planner already understands a bare country name: it confines
+    # the route to that country and uses its own defaults for everything
+    # else. "A week in Austria" would read better and would be a trip length
+    # nobody chose — the same class of invention as a population we
+    # estimated. The planner states what it assumed and every field is
+    # editable, so what a reader gets is a real route they can argue with.
+    #
+    # IT IS NOT A NOTE, AND THE CHECK THAT SAYS SO WAS RIGHT. The first
+    # version used `.note.onward`, which wears the INTERACTIVE colour and is
+    # deliberately rare — 12 pages. Fifty country pages took it to 62 and
+    # `c_note_tones` failed with "it has become the default again by the back
+    # door", which is exactly what had happened. This is an ACTION, and the
+    # Stay layer already composes one: a rule above it, the action on the
+    # left, the sentence naming what you are about to deal with on the right,
+    # and no border box, radius, shadow or fill. The same grammar, not a
+    # second one.
+    #
+    # AND THE DAYS ARE DERIVED, NOT TYPED. "A week in Austria" reads better
+    # and is a trip length nobody chose. The number here is the sum of the
+    # shortest stay this atlas records for each of the country's own
+    # destinations — 1 night for Monaco, 49 for Greece — which is arithmetic
+    # on held data, the same thing the planner itself does.
+    #
+    # AND A ROUTE NEEDS TWO PLACES. Monaco, San Marino and Vatican City hold
+    # one destination each, and the advisory countries are stripped from the
+    # planner index entirely, so for them the planner answers "we could not
+    # build a journey we would stand behind" — honestly, and after a click
+    # that promised one. No link there: a link to a refusal is worse than no
+    # link, and the rule is the route's, not a threshold somebody picked.
+    c_dests = [n["city"] for n in data["cities"].values()
+               if n["country"]["slug"] == c["slug"]]
+    plan_nights = sum(d["nights"][0] for d in c_dests)
+    plan_handoff = ""
+    if len(c_dests) > 1 and not c.get("advisory"):
+        _ask = f"{plan_nights} days in {c['name']}"
+        plan_handoff = (
+            '<div class="handoff">'
+            '<div class="handoff-do">'
+            f'<p><a class="btn" href="/plan?ask={quote(_ask)}">Build a route '
+            f'through {esc(c["name"])}</a></p></div>'
+            '<div class="handoff-say">'
+            f'<p>The Journey Planner holds all {len(c_dests)} of these '
+            f'destinations and the real distances between them. It opens on '
+            f'{plan_nights} days, which is the shortest stay this atlas records '
+            f'for each of them added up — change the length, the month, the '
+            f'budget or the pace and build it again.</p>'
+            '</div></div>'
+        )
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)), (c["name"], None)])}
 <div class="pagehead overture portraithead">
@@ -2878,6 +2942,8 @@ def country_page(data, c):
          more=("Every experience category", "/experiences")) if cexps else ""}
 
 {section("Journeys through " + c["name"], f'<div class="rows">{cjourneys}</div>') if cjourneys else ""}
+
+{plan_handoff}
 
 {section("Stories set here", f'<div class="rows">{cstories}</div>') if cstories else ""}
 

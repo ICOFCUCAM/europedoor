@@ -5314,6 +5314,60 @@ def c_hero_dusk_reach():
     return n
 
 
+@check("every letter Europe spells its places with survives the planner's normaliser")
+def c_planner_alphabet():
+    """A QUARTER OF THE ATLAS COULD NOT BE NAMED IN THE PLANNER'S SENTENCE
+    BOX, AND THE PLANNER'S WHOLE PITCH IS THAT IT NAMES WHAT IT COULD NOT USE.
+
+    `words()` stripped everything outside [a-z0-9] to a space and the names
+    it compared against were only lowercased, so the sentence became "start
+    from krakow" while the name stayed "kraków". 77 of 313 destinations —
+    Kraków, Málaga, Reykjavík, Tromsø, Brașov, Gdańsk, Évora, San Sebastián
+    — and Türkiye, the only country whose own name carries a diacritic. The
+    planner could not report what it had not seen, so this was the one
+    failure it dropped silently.
+
+    Half of it is NFD. The other half is the letters that have no combining
+    decomposition at all — ø, þ, ð, ħ, ł, æ, ß — which is not an edge case
+    but the other half of the alphabet Europe writes in.
+
+    So the check is on the DATA rather than on the matcher: every letter
+    that appears in a destination or country name must either reduce to
+    a–z under NFD or be in the planner's own transliteration table. It goes
+    red the day somebody adds a destination spelling this repository has not
+    seen, which is exactly when a reader stops being able to type it.
+    """
+    import unicodedata
+    src = open(os.path.join(ROOT, "assets", "js", "planner.js")).read()
+    m = re.search(r"var TRANSLIT = \{(.*?)\};", src, re.S)
+    if not m:
+        fail("the planner has no transliteration table; a name spelled with ø "
+             "or þ cannot be typed into its sentence box")
+        return 1
+    table = set(re.findall(r'"(.)"\s*:', m.group(1)))
+    data = D.load()
+    names = [c["name"] for c in data["cities"].values() for c in [c["city"]]]
+    names += [c["name"] for c in data["countries"].values()]
+    n = 0
+    unseen = {}
+    for name in names:
+        n += 1
+        for ch in name.lower():
+            if ch.isalpha() and ord(ch) > 127:
+                base = "".join(x for x in unicodedata.normalize("NFD", ch)
+                               if unicodedata.category(x) != "Mn")
+                if base.isascii() and base.isalpha():
+                    continue
+                if ch not in table:
+                    unseen.setdefault(ch, name)
+    for ch, name in sorted(unseen.items()):
+        fail(f"{name!r} is spelled with {ch!r}, which has no NFD decomposition and "
+             f"is not in the planner's transliteration table — a reader cannot "
+             f"name this place in the sentence box, and the planner cannot report "
+             f"a word it never saw")
+    return n
+
+
 @check("a sub-category keyword selects a word it is a form of")
 def c_sub_keywords():
     """`cell` CAUGHT `cellar`, SO THE MONASTERIES PAGE WAS EIGHTEEN WINE

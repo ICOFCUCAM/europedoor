@@ -544,6 +544,30 @@ async function main() {
   ok(/over budget/.test(assumed),
      "an expensive plan on an assumed budget said nothing about the cost");
 
+  // A NAME THIS PLANNER CANNOT SEE IS THE ONE THING IT CANNOT REPORT.
+  //
+  // `words()` stripped the sentence to [a-z0-9] and compared it against names
+  // that were only lowercased, so 77 of 313 destinations and Türkiye could
+  // not be typed at all — and the planner's whole pitch is that it names
+  // anything it could not take account of. It cannot name a word it never
+  // saw. One name per spelling this repository actually has to handle: a
+  // combining acute, a stroked o with no decomposition, a compound name
+  // whose ampersand the sentence loses, and the one country.
+  for (const [typed, expect] of [["Ten days from Kraków", "Kraków"],
+                                 ["A week from Tromsø", "Tromsø"],
+                                 ["Five days from Kardamyli & the Mani", "Kardamyli"],
+                                 ["Twelve days in Türkiye", "Türkiye"]]) {
+    await page.goto(base + "/plan", { waitUntil: "networkidle" });
+    await page.fill("#ask", typed);
+    await page.click('#askform button[type="submit"]');
+    await page.waitForSelector("#result");
+    const read = await page.locator("#result").innerText();
+    ok(read.includes(expect),
+       `the planner read ${JSON.stringify(typed)} and its readback never `
+       + `mentions ${expect} — a name it cannot see is the one failure it `
+       + `cannot report`);
+  }
+
   // ── the staged wait ────────────────────────────────────────────────
   // Never a bare "Loading…". Each step is ticked when its work has actually
   // finished, so a failure marks where it stopped.
