@@ -4045,6 +4045,56 @@ def c_offframe():
     return n
 
 
+@check("the advisory treatment marks advisories, and nothing else")
+def c_warn_is_a_warning():
+    """THE ADVISORY COLOUR WAS SPENT 263 TIMES ON THINGS THAT ARE NOT
+    ADVISORIES AND 3 TIMES ON THINGS THAT ARE.
+
+    Counted in the shipped HTML before the fix:
+
+        255   "We do not hold opening hours, prices or a website for this"
+          4   "This is a pre-launch draft, and it says so"
+          3   "Check government travel advice before planning anything here"
+          1   "What discoverability is not"
+          1   "What 'unverified' means here"
+          1   "The Fund holds no money, and will not until three things are true"
+
+    Three of those are a travel advisory. The rest are provenance and policy,
+    which is the HERITAGE accent's stated home — "how this project knows what
+    it claims". A reader who has learned that the tinted panel means STOP AND
+    READ meets it on every place page saying we do not list opening hours,
+    and the one time it means a country under a government travel advisory it
+    looks exactly like Schönbrunn. That is the advisory-and-terracotta
+    collision one level up: not two colours that look alike, but one colour
+    doing two jobs.
+
+    The stylesheet cannot enforce this — `.note.warn` is a class a page
+    chooses. So this counts the panels in the OUTPUT and asserts that the
+    tinted one is rare and that the provenance one is not, which is the shape
+    of the failure rather than a list of allowed headings.
+    """
+    n = 0
+    warn = sourced = 0
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        warn += h.count('class="note warn"')
+        sourced += h.count('class="note sourced"')
+        n += 1
+    if warn > 12:
+        fail(f"{warn} pages carry the advisory panel. It is for a government "
+             f"travel advisory and a planner that could not build a route; "
+             f"provenance and policy are `note sourced`, in the heritage "
+             f"accent. At this count the tint has stopped meaning anything")
+    if warn < 1:
+        fail("no page carries the advisory panel — the advisory countries "
+             "still exist and their pages still have to say so")
+    if sourced < 200:
+        fail(f"only {sourced} pages carry a provenance note, and 255 place "
+             f"pages state what this atlas does not hold about a place. A "
+             f"policy that stops being stated is a policy nobody can check")
+    return n
+
+
 @check("the two cartographies are one register, and the ladder is recomputed")
 def c_cartography_palette():
     """THE PICTURES WERE GIVEN A CARTOGRAPHY AND THE INSTRUMENTS WERE NOT.

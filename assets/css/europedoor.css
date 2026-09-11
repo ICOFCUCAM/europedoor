@@ -109,6 +109,7 @@
                    and terracotta marks the human and cultural. That is a
                    real editorial distinction, not decoration. */
   --atlantic:     #14483c;
+  --provenance:   var(--atlantic);   /* the heritage rule on a provenance note */
   --atlantic-2:   #0e3630;
   --terracotta:   #a4491f;
   --terracotta-2: #8a3a17;   /* the deeper one, for text on --paper-3 where
@@ -483,6 +484,7 @@ body[data-world="intelligence"] {
 
   --warn:         #ee8192;
   --warn-bg:      #271719;
+  --provenance:   var(--atlantic-lift);
 
   --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 24px -12px rgba(0,0,0,.7);
   --shadow-lift: 0 2px 4px rgba(0,0,0,.55), 0 18px 40px -18px rgba(0,0,0,.8);
@@ -520,6 +522,7 @@ body[data-world="intelligence"] {
 
     --warn:         #ee8192;
     --warn-bg:      #271719;
+  --provenance:   var(--atlantic-lift);
 
     --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 24px -12px rgba(0,0,0,.7);
     --shadow-lift: 0 2px 4px rgba(0,0,0,.55), 0 18px 40px -18px rgba(0,0,0,.8);
@@ -1076,7 +1079,30 @@ main.wide { max-width: 92rem; }
 /* ── notes & callouts ─────────────────────────────────────── */
 .note { border-left: 3px solid var(--sea); background: var(--paper-2); padding: var(--s4) var(--s5); border-radius: 0 var(--radius) var(--radius) 0; margin: var(--s5) 0; font-size: var(--t-sm); }
 .note p:last-child { margin-bottom: 0; }
+/* THE ADVISORY COLOUR WAS SPENT 263 TIMES ON THINGS THAT ARE NOT
+   ADVISORIES AND 3 TIMES ON THINGS THAT ARE. Counted in the shipped HTML:
+
+       255   "We do not hold opening hours, prices or a website for this"
+         4   "This is a pre-launch draft, and it says so"
+         3   "Check government travel advice before planning anything here"
+         1   "What discoverability is not"
+         1   "What 'unverified' means here"
+         1   "The Fund holds no money, and will not until three things are true"
+
+   Three of those are a travel advisory. The rest are provenance and policy —
+   what this atlas holds, what it refuses to hold, and why — which is the
+   HERITAGE accent's stated home: "how this project knows what it claims".
+   A reader who has learned that the tinted panel means *read this carefully*
+   meets it on all 255 place pages saying we do not list opening hours, and
+   the one time it means a country under a travel advisory it says exactly
+   what it said on Schönbrunn. That is the advisory-and-terracotta collision
+   one level up: not two colours that look alike, one colour doing two jobs.
+
+   A warning keeps the tinted ground, because a warning is meant to stop
+   you. A provenance note is an ordinary note with the heritage rule down
+   its edge — the same green as /method, /sources and /fund. */
 .note.warn { border-left-color: var(--warn); background: var(--warn-bg); }
+.note.sourced { border-left-color: var(--provenance); }
 .note h3 { font-size: var(--t-md); margin-bottom: var(--s2); }
 
 /* ── the itinerary/leg timeline ───────────────────────────── */
