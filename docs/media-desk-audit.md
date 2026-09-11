@@ -53,7 +53,7 @@ already built.
 | file | what it holds |
 |---|---|
 | `data/images.json` | the register. Every row needs file, alt, photographer, source, licence, **and** a date and a SHA-256. Currently `{}` — nothing has been licensed |
-| `data/image-purposes.json` | `purposes` (2 declared), `roles` (12), `$requirements`, `$crop`. A purpose declares a role, a register key, a page, a `min_width` in **native** pixels, an orientation, an aspect band, a `container` and a `safe_area` |
+| `data/image-purposes.json` | `purposes` (12 declared), `roles` (12), `$requirements`, `$crop`. A purpose declares a role, a register key, a page, a `min_width` in **native** pixels, an orientation, an aspect band, a `container` and a `safe_area` |
 | `docs/data-licenses/photo-providers.json` | four questions per provider — may we self-host, what must the credit say, is a download ping required, may acquisition be automated — each answered with a `value`, a **verbatim quote** and a `source` URL, and the quote must appear in the archived snapshot |
 
 ### The workflow — `.github/workflows/photograph.yml`
@@ -104,7 +104,7 @@ measured container, and the credential grep.
 | 17 | Backdoor shows pipeline progress | the workflow log is the progress view; **no UI** |
 | 18 | media library | **NOT BUILT** |
 | 19 | replacement workflow | **NOT BUILT.** `acquire.py` refuses a purpose already filled, which is the safe half and not the workflow |
-| 20 | image slots tied to the editorial architecture | **partial.** Twelve roles and a purpose schema exist; only 2 purposes are declared, against a site with 22 page families |
+| 20 | image slots tied to the editorial architecture | **partial, and the gap is structural.** Twelve roles and twelve purposes exist — the homepage hero, four doors, five index openings and two named destinations. But a purpose is one surface on **one page**, so a slot that applies to 319 destinations needs 319 purposes. The brief's own model is the fix: `purpose: destination_hero` plus `target: amalfi-coast`, a template and an instance |
 | 21 | requirements come from the slot, not the UI | **DONE** in the data; nothing reads it from a UI because there is none |
 | 22 | Backdoor designed as an editorial tool | **no Backdoor exists** |
 | 23 | do not turn EuropeDoor into Pexels | **DONE** — there is no public search surface and cannot be |
@@ -126,9 +126,16 @@ require an application that does not exist.**
 These are worth building whichever host the Backdoor gets, because every
 option needs them and none of them is a UI:
 
-1. **The slot system at full coverage** (§20, §21). Twelve roles exist and
-   two purposes. The brief names twelve slot families across six page
-   families. A slot is declared data and the requirements come from it.
+1. **The slot system as a TEMPLATE** (§20, §21). Twelve roles and twelve
+   purposes exist, and the requirements already come from the purpose rather
+   than from a caller. What is missing is that a purpose is one surface on
+   one page — `vienna-destination` and `chamonix-destination` are two rows
+   saying the same thing about two of 319 pages. The brief's split of
+   `purpose` from `target` is the shape that scales.
+
+   **A CORRECTION.** The first version of this row said "only 2 purposes are
+   declared". That was a miscount of the file's top-level keys, not of its
+   purposes; there are twelve. The gap is the template, not the coverage.
 2. **Duplicate protection on provider + photo_id** (§25), in the direction
    that is missing, with the answer naming where the id is already used.
 3. **The media status machine** (§15), derived rather than stored — the
