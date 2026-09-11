@@ -4737,6 +4737,21 @@ body[data-hero] .masthead { position: sticky; }
      Europe is a line you can read, and where the alternative is a journey
      row explaining itself with nothing. Same rule, different number. */
   .jrowart .constel, .storyart .constel { display: block; }
+  /* AND /themes, FOR THE SAME REASON AND THE SAME NUMBER — but the reason
+     only became true when the drawing changed. The rule above says a theme's
+     constellation "is 132px inside a row and stays 132px on a phone", which
+     was right while it was a 132-pixel mark: at that size the eight stops of
+     Renaissance Europe are four pixels apart and there is nothing to see.
+     The row states its proportions now and the drawing is 288 on a desktop,
+     and at 390 the row is a single 358-pixel column — which is exactly the
+     case this block already makes an exception for, where a journey's route
+     and a story's places get the whole width. The page closes on "a knot is
+     an argument about one corner of Europe, a scatter is one about the whole
+     of it", and on a phone it was closing on nothing.
+     The mark comes down with the width, as it went up with it: 14 units at
+     358 is the same 10-pixel dot the row has everywhere else. */
+  .themeside .constel { display: block; width: 100%; }
+  .themerow .constel-theme .constel-lit circle { r: 14px; }
 }
 
 /* ── two axes over one set, drawn as what separates them ──────────────

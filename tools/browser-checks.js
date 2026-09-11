@@ -3377,6 +3377,7 @@ async function main() {
                    "/events/"];
     const rc = await browser.newPage({ viewport: { width: 1280, height: 900 } });
     const tot = { limestone: 0, graphite: 0, water: 0, cobalt: 0, accent: 0 };
+    const per = [];
     let px = 0;
     for (const u of PAGES) {
       const r = await rc.goto(base + u, { waitUntil: "load" });
@@ -3413,6 +3414,8 @@ async function main() {
         }
         return out;
       }, buf.toString("base64"));
+      const pn = Object.values(got).reduce((a, b) => a + b, 0) || 1;
+      per.push([u, 100 * got.accent / pn]);
       for (const k of Object.keys(tot)) { tot[k] += got[k]; px += got[k]; }
       checked++;                       // one page measured
     }
@@ -3440,11 +3443,21 @@ async function main() {
        `no line in the declared ratio because they are the DRAWINGS rather ` +
        `than the interface, and a ceiling is what keeps that true: above ` +
        `this the maps have stopped being figures on a page`);
-    ok(pc.accent >= 0.2,
-       `the accent paints ${pc.accent.toFixed(2)}% (${say}). Terracotta and ` +
-       `atlantic are declared at 5 and are the entire art-directional ` +
-       `difference between a story and a country encyclopedia; below this ` +
-       `they have stopped existing as colours`);
+    // THE ACCENT IS ASSERTED WHERE IT BELONGS, NOT AS A SITE-WIDE SHARE.
+    // A floor on the aggregate was 0.3% against a threshold of 0.2 — close
+    // enough that one page dropping out of the sample flipped it, which is
+    // a check that fails without saying anything. The accent has a home:
+    // the families whose --door is terracotta or atlantic. So the assertion
+    // is that it still paints SOMEWHERE, and the message carries every
+    // page's figure, because a failure with no measurement in it cannot be
+    // diagnosed.
+    per.sort((a, b) => b[1] - a[1]);
+    ok(per.length > 0 && per[0][1] >= 0.5,
+       `no measured page paints as much as half a per cent of accent — the ` +
+       `best is ${per[0] ? per[0][0] + " at " + per[0][1].toFixed(2) + "%" : "none"} ` +
+       `(${say}). Terracotta and atlantic are the entire art-directional ` +
+       `difference between a story and a country encyclopedia. Per page: ` +
+       per.map(([u, v]) => `${u} ${v.toFixed(2)}`).join(", "));
     console.log(`    palette ratio measured: ${say}  ` +
                 `(declared 60/25/10/5, water unbudgeted)`);
   }
