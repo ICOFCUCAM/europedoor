@@ -512,6 +512,19 @@
           "request carries the rendered page, the provenance row and both " +
           "hashes; merging it is what publishes.</p>");
         loadRegistry();
+      } else if (job.state === "approval") {
+        /* A RUN WAITING FOR A PERSON IS NOT A FAILED RUN. The panel said
+           "Acquisition failed" and pointed at a log that does not exist,
+           because nothing had run. */
+        stop();
+        el("prog-title").textContent = "Waiting for approval on GitHub";
+        el("prog-why").hidden = false;
+        el("prog-why").textContent = job.failure || "";
+      } else if (job.state === "cancelled") {
+        stop();
+        el("prog-title").textContent = "The run was cancelled";
+        el("prog-why").hidden = false;
+        el("prog-why").textContent = job.failure || "";
       } else if (job.state === "failed") {
         stop();
         el("prog-title").textContent = "Acquisition failed";

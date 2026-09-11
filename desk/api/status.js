@@ -68,8 +68,24 @@ export default async function handler(req, res) {
            : s.status === "in_progress" ? "running" : "waiting",
     })));
 
+  /* GITHUB HAS SEVEN CONCLUSIONS AND THIS TREATED SIX OF THEM AS "FAILED".
+   *
+   * The first batch to reach GitHub came back `action_required`: the run was
+   * created, held for approval, and concluded two seconds later having run
+   * NOTHING. The desk called that a failure and told the editor "the run's
+   * log has what it said" — and there is no log, because there are no jobs.
+   * A verdict nobody reached, reported as a verdict, which is the same error
+   * as calling an open pull request published.
+   *
+   * `action_required` is a question waiting for a person. `cancelled` is a
+   * person's own decision. `timed_out` and `stale` are the platform. Only a
+   * real `failure` is the pipeline saying no, and only that one has a log
+   * worth reading. */
   const state = mine.status !== "completed" ? "running"
-              : mine.conclusion === "success" ? "done" : "failed";
+              : mine.conclusion === "success" ? "done"
+              : mine.conclusion === "action_required" ? "approval"
+              : mine.conclusion === "cancelled" ? "cancelled"
+              : "failed";
 
   const out = { state, steps, run: mine.html_url, run_id: mine.id };
 
@@ -111,14 +127,34 @@ export default async function handler(req, res) {
     }
   }
 
+  if (state === "approval") {
+    out.failure =
+      "GitHub created the run and is holding it for approval, so nothing "
+      + "has run yet — there are no steps and no log. Open the run and press "
+      + "Approve and run; GitHub's own banner there says which policy asked. "
+      + "Nothing was acquired and nothing was published.";
+  }
+
+  if (state === "cancelled") {
+    out.failure = "The run was cancelled before it finished. Nothing was "
+                + "acquired and no pull request was opened.";
+  }
+
   if (state === "failed") {
     /* NEVER SILENTLY CONTINUE: which step failed, and the fact that nothing
      * was published — which is true, because the pull request is the last
      * step and a failure before it leaves no branch behind. */
+    /* AND THE FAILURE SENTENCE ONLY PROMISES A LOG WHEN THERE IS ONE. A run
+     * with no jobs has nothing to read, and sending an editor to look for it
+     * is the journey caption promising "a note under the leg" after the note
+     * was removed. */
     const bad = steps.filter((s) => s.state === "failed").map((s) => s.label);
     out.failure = (bad.length ? `Failed at: ${bad.join(", ")}. ` : "")
       + "Nothing was published and no pull request was opened. "
-      + "The run's log has what it said.";
+      + (steps.length
+         ? "The run's log has what it said."
+         : "The run produced no steps at all, so there is no log — it was "
+           + "stopped before any job started.");
   }
 
   send(res, 200, out);

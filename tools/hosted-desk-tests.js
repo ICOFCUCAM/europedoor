@@ -476,6 +476,54 @@ await t("a dispatch GitHub refuses is explained, not relayed", async () => {
   assert.match(other, /boom/);
 });
 
+await t("a run GitHub is holding is not reported as a failure", async () => {
+  /* THE FIRST BATCH TO REACH GITHUB CAME BACK `action_required`: created,
+   * held for approval, concluded two seconds later having run NOTHING. The
+   * desk called that a failure and told the editor "the run's log has what
+   * it said" — and there is no log, because there are no jobs. A verdict
+   * nobody reached, reported as a verdict. */
+  const run = {
+    id: 1, html_url: "https://github.invalid/run/1",
+    created_at: new Date().toISOString(), status: "completed",
+  };
+  const cases = [
+    ["action_required", "approval", /Approve and run/],
+    ["cancelled", "cancelled", /cancelled/i],
+    ["failure", "failed", /no steps at all/],
+    ["success", "done", null],
+  ];
+  for (const [conclusion, want, saying] of cases) {
+    CALLS = [];
+    let n = 0;
+    const real = globalThis.fetch;
+    globalThis.fetch = async (u) => {
+      n += 1;
+      if (String(u).includes("/jobs")) {
+        return new Response(JSON.stringify({ jobs: [] }), { status: 200 });
+      }
+      if (String(u).includes("/runs?")) {
+        return new Response(JSON.stringify(
+          { workflow_runs: [{ ...run, conclusion }] }), { status: 200 });
+      }
+      return new Response(JSON.stringify([]), { status: 200 });
+    };
+    const job = lib.sign({ since: Date.now() - 1000, batch: false,
+                           purpose: "door-coast", photo_id: "1",
+                           exp: Date.now() + 3600e3 });
+    const r = await call("status.js", {
+      url: "/api/status?job=" + encodeURIComponent(job),
+      headers: { cookie: session() },
+    });
+    globalThis.fetch = real;
+    const j = r.json();
+    assert.strictEqual(j.state, want, `${conclusion} read as ${j.state}`);
+    if (saying) assert.match(j.failure || "", saying);
+    if (conclusion === "success") {
+      assert.ok(!j.failure, "a successful run carried a failure sentence");
+    }
+  }
+});
+
 await t("the registry says where a dispatch will go", async () => {
   const r = await call("registry.js", { headers: { cookie: session() } });
   const d = r.json().dispatch || {};
