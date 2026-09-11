@@ -5406,6 +5406,68 @@ def c_photo_roles():
     return n
 
 
+@check("a category's sub-counts are drawn from its own data and never as a partition")
+def c_category_shares():
+    """THE FOUR NUMBERS ARE THE SHAPE OF A CATEGORY AND WERE FOUR NUMBERS.
+
+    Food & drink is 5 markets, 13 places to eat, 25 cellars and 7 producers
+    — half of it is wine — and Nature is 1, 3, 7 and 15. Those are
+    different arguments about what a category IS, and a reader had to read
+    four figures and hold them in their head.
+
+    The bars are a share of the LARGEST sub rather than of the whole,
+    because the subs overlap: an experience can answer more than one
+    keyword set, and Food's four sum to 50 against a total of 48. A stacked
+    bar would claim a partition the data does not have.
+
+    So this asserts what a reader can check on the shipped page: every bar
+    on a category page is scaled against the widest one there, the widest
+    is full, and wherever the sub-counts exceed the total the page SAYS SO.
+    A drawing that states something untrue is worse than no drawing, and a
+    correct bar under a missing caveat is exactly that.
+    """
+    n = 0
+    for path in sorted(glob.glob(os.path.join(OUT, "experiences", "*", "index.html"))):
+        html = open(path, encoding="utf-8").read()
+        if 'class="sublinks shares"' not in html:
+            continue
+        block = html.split('class="sublinks shares"', 1)[1].split("</ul>", 1)[0]
+        widths = [int(m) for m in re.findall(r'<span class="w(\d+)">', block)]
+        counts = [int(m) for m in re.findall(r"<span>(\d+)</span>", block)]
+        where = "/" + os.path.relpath(os.path.dirname(path), OUT)
+        n += 1
+        if not widths or len(widths) != len(counts):
+            fail(f"{where}: {len(widths)} bar(s) against {len(counts)} count(s) "
+                 f"— every sub-category link carries one bar or none does")
+            continue
+        n += 1
+        if max(widths) != 100:
+            fail(f"{where}: the widest bar is {max(widths)}% and must be 100 — "
+                 f"the scale is the largest sub, so one of them is the track")
+        top = max(counts)
+        for c, w in zip(counts, widths):
+            n += 1
+            want = max(5, round(c / top * 100 / 5) * 5)
+            if w != want:
+                fail(f"{where}: a sub-category of {c} against a largest of "
+                     f"{top} draws {w}% and the scale gives {want}%. The bar "
+                     f"is derived — a correct label over a drawing scaled "
+                     f"from the wrong number still reads as a finished chart")
+        # The total is printed in the head as "N ACROSS M COUNTRIES".
+        m = re.search(r">(\d+) across (\d+) countries<", html)
+        if m:
+            n += 1
+            total = int(m.group(1))
+            if sum(counts) > total and "share of the largest" not in html:
+                fail(f"{where}: the sub-counts sum to {sum(counts)} against a "
+                     f"total of {total} and the page does not say the bars are "
+                     f"shares of the largest rather than of the whole. A bar "
+                     f"chart that looks like a partition and is not is a claim")
+    if not n:
+        fail("no category page draws its sub-category shares")
+    return n
+
+
 @check("every crop rule is the arithmetic of its measured container")
 def c_photo_safe_area():
     """SAFE AREA IS DERIVED, SO A NUMBER TYPED HERE MUST BE RECOMPUTED.

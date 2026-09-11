@@ -1634,9 +1634,16 @@ main.wide { max-width: 92rem; }
 .invite h2 { font-size: var(--t-md); line-height: 1.25;
              margin: 0 0 var(--s2); color: var(--ink); font-weight: 700; }
 .invite a:hover h2, .invite a:focus-visible h2 { color: var(--door); }
-.invite-sum { margin: 0 0 var(--s2); color: var(--ink-2); max-width: 46ch; }
-.invite-where { margin: 0; font-size: var(--t-xs); letter-spacing: .08em;
-                text-transform: uppercase; color: var(--ink-3); }
+.invite-sum { margin: 0; color: var(--ink-2); max-width: 46ch; }
+/* THE PLACE IS THE KICKER, so it takes the kicker's ink rather than the
+   footnote's. It was --ink-3 when it sat at the bottom of the entry as the
+   last thing a reader reached; it is the first thing now, and the thing a
+   reader scanning twenty-six countries is actually looking for. It is not
+   a `.kicker` — that primitive carries the eyebrow rule and is one per page
+   head, and forty-eight eyebrows in a column is the accent as texture,
+   which this stylesheet has already recorded once on /journeys. */
+.invite-where { margin: 0 0 var(--s1); font-size: var(--t-xs); letter-spacing: .08em;
+                text-transform: uppercase; color: var(--ink-2); }
 /* The selection rule, under the list it selected — a band with its own
    heading used to stand in front of it. */
 .listrule { margin: var(--s7) 0 0; max-width: 60ch; font-size: var(--t-sm);
@@ -1647,7 +1654,22 @@ main.wide { max-width: 92rem; }
             display: flex; flex-wrap: wrap; gap: var(--s3) var(--s5); }
 .sublinks a { text-decoration: none; color: var(--door); font-weight: 600; }
 .sublinks a:hover { text-decoration: underline; }
-.sublinks span { font-family: var(--mono); color: var(--ink-3); font-weight: 400; }
+.sublinks a span { font-family: var(--mono); color: var(--ink-3); font-weight: 400; }
+/* THE SHAPE OF A CATEGORY, drawn from its own sub-counts. Column, so the
+   bar sits under the name it measures; a fixed track width so four bars are
+   comparable, which is the entire point of drawing them at all. */
+.sublinks.shares { display: grid; gap: var(--s4);
+                   grid-template-columns: repeat(auto-fit, minmax(9rem, 12rem)); }
+.sublinks.shares li { display: grid; gap: var(--s3); align-content: start; }
+/* A BAR DIRECTLY UNDER A LINK READS AS AN UNDERLINE, and these links carry
+   a real underline on hover. Space, and a track with visible ends, so it
+   reads as a measure with a scale rather than as a decoration of the word
+   above it. */
+.sublinks.shares .hopbar { margin: 0; height: 5px; }
+/* The overlap note is about the bars and must not touch them: stacked one
+   per row on a phone it ran straight on from the last track and read as a
+   caption on that one sub-category rather than on the set. */
+.sublinks.shares + .small { margin-top: var(--s5); }
 @media (min-width: 62rem) {
   .invites { grid-template-columns: repeat(2, minmax(0, 1fr));
              column-gap: var(--s8); }

@@ -6143,14 +6143,28 @@ def category_page(data, cat, sub=None):
     # shares is hoisted above the list; only what differs stays on the row.
     kindsin = {it["exp"]["kind"] for it in chosen}
     kindname = data["taxonomy"]["experience_kinds"]
+    # THE PLACE LEADS, AND FOR A YEAR IT WAS THE LAST LINE IN GREY.
+    #
+    # The comment four paragraphs up says "The country leads, because the
+    # spread across Europe IS the offer on this family" — and the markup put
+    # the city and country at the BOTTOM of every entry, in 11px uppercase
+    # ink-3, under the name and the summary. The list is sorted by country
+    # and then by city, so the order a reader is given is alphabetical by a
+    # key they cannot see: forty-eight entries in two columns that read as
+    # random because the sort key is the least prominent thing on each one.
+    #
+    # It is a kicker now. Scanning the column gives Vienna, Mostar, Split,
+    # Mikulov, Copenhagen, Bordeaux — the order becomes legible, and the
+    # first thing a reader gets is the discriminator they are actually
+    # scanning for on a page that spans twenty-six countries.
     rows = "".join(
         f"""<li class="invite"><a href="{urls.city(it['country'], it['region'], it['city'])}">
-        <h2>{esc(it['exp']['name'])}</h2>
-        <p class="invite-sum">{esc(it['exp']['summary'])}</p>
         <p class="invite-where">{esc(it['city']['name'])}, {esc(it['country']['name'])}"""
         + (f" · {esc(kindname.get(it['exp']['kind'], it['exp']['kind']))}"
            if len(kindsin) > 1 else "")
-        + f""" · {esc(it['exp']['band'])}</p></a></li>"""
+        + f""" · {esc(it['exp']['band'])}</p>
+        <h2>{esc(it['exp']['name'])}</h2>
+        <p class="invite-sum">{esc(it['exp']['summary'])}</p></a></li>"""
         for it in chosen
     )
     subcards = ""
@@ -6160,11 +6174,38 @@ def category_page(data, cat, sub=None):
         # NAME. Four grey boxes with nothing in them, taking a full band and
         # 150 pixels of the page above the list they narrow. They are what
         # they always were: four links with a number each.
-        subcards = '<ul class="sublinks">' + "".join(
+        # AND THE FOUR NUMBERS ARE THE SHAPE OF THE CATEGORY, printed as
+        # four numbers. Food & drink is 5 markets, 13 places to eat, 25
+        # cellars and 7 producers — half of it is wine — and Nature is 1,
+        # 3, 7 and 15. Those are different arguments about what a category
+        # IS, and a reader had to read four figures and hold them.
+        #
+        # The bar is `hopbar` and the widths are the .w0-.w100 scale, both
+        # of which this stylesheet already has: no new primitive, which is
+        # the standing rule. Each bar is a share of the LARGEST sub rather
+        # than of the whole, because the subs OVERLAP — an experience can
+        # match more than one keyword set, and Food's four sum to 50
+        # against a total of 48. A stacked bar would claim a partition the
+        # data does not have, which is the "present-but-empty" failure in
+        # its other direction: a drawing that states something untrue is
+        # worse than no drawing.
+        top = max(counts.values()) or 1
+        subcards = '<ul class="sublinks shares">' + "".join(
             f"""<li><a href="{urls.subcategory(cat['slug'], sb['slug'])}">"""
-            f"""{esc(sb['name'])} <span>{counts[sb['slug']]}</span></a></li>"""
+            f"""{esc(sb['name'])} <span>{counts[sb['slug']]}</span></a>"""
+            f"""<span class="hopbar" aria-hidden="true"><span class="w"""
+            f"""{max(5, round(counts[sb['slug']] / top * 100 / 5) * 5)}"></span>"""
+            f"""</span></li>"""
             for sb in cat["subs"]
         ) + "</ul>"
+        # The overlap is stated where it exists rather than everywhere: a
+        # note on a category whose subs happen to partition cleanly would
+        # be explaining a constraint that is not operating.
+        if sum(counts.values()) > len(chosen):
+            subcards += (f'<p class="small mw44">The {numword(len(cat["subs"]))} bars '
+                         f'are each a share of the largest rather than of the whole: '
+                         f'an experience can answer more than one of these, so they '
+                         f'sum to {sum(counts.values())} against {len(chosen)}.</p>')
 
     countries = sorted({it["country"]["name"] for it in chosen})
     title = sub["name"] if sub else cat["name"]
