@@ -277,6 +277,32 @@ for (const width of [1280, 390]) {
   ok(kept === "" || kept.startsWith("norway/"),
      `${width}: changing the slot left ${kept} in the target field`);
 
+  /* ── what to search for ────────────────────────────────────────
+     Twelve roles said what a picture of each kind is for and none of them
+     said what to TYPE, so every acquisition started from whatever wording
+     came to mind — which is how a library drifts generic one search at a
+     time. */
+  await page.selectOption("#slot", "destination-hero");
+  await page.selectOption("#country", "norway");
+  ok(await page.locator("#concepts .concept").count() > 3,
+     `${width}: the slot offered no search concepts`);
+  const placeholder = await page.locator("#concepts .concept").first().textContent();
+  ok(!/\{name\}/.test(placeholder || ""),
+     `${width}: a concept still shows its template: ${placeholder}`);
+  ok(await page.locator("#concepts .concept[disabled]").count() > 0,
+     `${width}: a concept needing a place was live before one was chosen`);
+
+  await page.fill("#target-q", "bergen");
+  await page.waitForSelector("#target-hits button");
+  await page.locator("#target-hits button").first().click();
+  await page.waitForTimeout(40);
+  const withName = await page.locator("#concepts .concept").first().textContent();
+  ok(/Bergen/i.test(withName || ""),
+     `${width}: choosing a place did not fill the concepts: ${withName}`);
+  await page.locator("#concepts .concept").nth(1).click();
+  ok(/Bergen/i.test(await page.inputValue("#q")),
+     `${width}: pressing a concept did not fill the search box`);
+
   /* ── the sheet, and the alt panel ── */
   await page.selectOption("#slot", "countries-hero");
   await page.fill("#q", "norway");

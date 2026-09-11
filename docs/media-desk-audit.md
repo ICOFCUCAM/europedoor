@@ -357,3 +357,113 @@ in a branch with its provenance, its rendered page and both hashes, and that
 nothing on europedoor.com has changed.
 
     node tools/hosted-desk-tests.js     38 — the hosted boundary
+
+## 7 · The photography taxonomy, answered against the built system
+
+A brief arrived proposing an eighteen-family photographic taxonomy for
+Europe — country signature, capital, signature destinations, natural
+landscapes, architecture broken down to Gothic and Baroque and Byzantine,
+food and drink, people and local life, journey photography, transport,
+seasonal, experience-specific, quiet, accommodation, night, aerial, detail,
+weather, regional identity — with a folder tree, a per-candidate metadata
+schema, and a target of about 1,800 originals.
+
+Read against this repository, three of those four things already exist under
+different names, one is right and not yet built, and one would be a second
+filing system. Taking them in order.
+
+### The taxonomy is `roles`, and what it was missing is the search terms
+
+`data/image-purposes.json` has declared twelve **roles** since the day a
+purpose stopped being a slot: what a picture of each kind is FOR, what must
+be in frame, what must survive the crop, and what disqualifies a candidate
+that passes every number. The brief's families map onto them almost one to
+one — natural landscape onto `landscape`, people and local life onto
+`human-life`, journey and transport onto `journey-atmosphere`, quiet onto
+`editorial-story`, detail and macro onto `detail-texture`.
+
+What no role said is **what to type**. Every acquisition therefore began from
+whatever wording came to the editor's mind, and a library drifts generic one
+search at a time — which is the failure the roles vocabulary exists to
+prevent, arriving through the one step it did not cover. Every role carries
+its own concepts now, `{name}` is substituted with the surface's own subject,
+and the desk shows them as a row of terms to press.
+
+**A second vocabulary beside `roles` was refused.** Two answers to "what kind
+of picture is this" is the failure this repository has recorded four times in
+other forms, most recently as a second implementation of a gradient that made
+the same mistake the first one had already been fixed for.
+
+And the check paid for itself on the run it was written: the `food` role's
+concepts carried `{name}` while the only purpose reaching that role is the
+Food door, which is about Europe rather than a named place — so the browser
+was quietly filling in "Europe", a substitution rule living in the client
+rather than in the vocabulary.
+
+### The metadata schema is nineteen twentieths already there
+
+| the brief asks for | today |
+|---|---|
+| `photo_id` | `provider_photo_id` |
+| `country`, `region`, `destination` | **derived** from the purpose, never stored — `destination-hero@norway/fjord-norway/bergen` says all three, and a stored copy is a copy that can disagree |
+| `experience`, `journey` | no slot exists yet; see below |
+| `subject`, `visual_role` | `role`, plus its subject rule, crop rule, brief and refusals |
+| `orientation`, `width`, `height` | `width`/`height`; orientation is derived, because a stored one can contradict the pixels |
+| `photographer`, `photographer_url` | both |
+| `source_url`, `pexels_url` | `source` — one field, because they are the same page and two names for it is two things to keep in step |
+| `sha256` | of the bytes as served |
+| `downloaded_at` | `acquired_at`, to the second, plus `fetched` |
+| `processed_at`, `derivatives` | inside `processing` and `derivatives`, written by `derive.py` |
+| `license_evidence` | `terms_evidence`, which is the archived page and its own hash — stricter than a licence URL, and the thing the sister repository's 629 rows do not have |
+| `approved` | **the merged pull request IS this.** A field would be a second, weaker record of the same fact, and one a script could set |
+
+### The folder tree is refused, and the reason is a header
+
+    photos/countries/norway/signature/…
+
+A photograph is Norway AND coast AND quiet AND autumn. A folder makes you
+pick one, and every later question — "what have we got that is quiet?" —
+becomes a walk of a tree that was filed under a different question. The
+register answers all of them because it is an index rather than a location.
+
+**And the derivatives cannot move at all.** `/assets/` is served
+`public, max-age=31536000, immutable`, which is a promise about a URL, and
+the derivative filenames carry the content hash precisely so they can keep
+it. This repository has already shipped a stale stylesheet to every returning
+reader for months by putting a changeable URL under that header. A subject
+tree would be a second organising principle over files whose names are not
+free.
+
+What the tree is really asking for is **coverage you can see**, and that is a
+view rather than a directory. The library reads by country today; by role is
+the same query with a different key.
+
+### The 1,800 target needs containers first, and that is the real work
+
+This site renders a photograph in four places: `.herofull.shot`, `.way.shot`,
+`.iheroart.shot` and `.card-art`. Three vary per entity, which is why there
+are 593 purposes — 319 destinations, 264 places, ten stories — plus ten
+one-of-a-kind surfaces.
+
+A country page, a region page, an experience, a journey and the editorial
+modules **have no photograph container in the markup at all.** So of the
+brief's 1,800, about 640 have somewhere to go today and the rest do not. A
+slot nobody can fill is what `$requirements` already refuses, and acquiring
+against one fills the register with photographs no page shows — which is
+`plain`, the motif that was declared for the life of the plate system and
+never drawn, at a thousand times the cost.
+
+So the order is containers, then purposes, then acquisition, and the first
+four are the ones that carry the most pages:
+
+| container | pages | what has to be decided |
+|---|---|---|
+| country hero | 50 | where a photograph sits against the country portrait, which is that family's signature moment today |
+| region hero | 129 | the same question one level down, where the drawing is the region's own destinations |
+| journey opening | 17 | the route is the subject; a photograph replaces or accompanies it |
+| experience category | 8 | `docs/signature-moments.md` refuses geography here; a photograph is the open question it leaves |
+
+Each needs a measured crop box — `checks.py` refuses a safe area under 12%
+and has already failed a layout change that would have ruined the first four
+photographs anybody licenses — and each is a design decision about a family's
+signature moment rather than a build step.

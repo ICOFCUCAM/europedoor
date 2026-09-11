@@ -61,16 +61,24 @@ OUT = os.path.join(ROOT, "desk", "registry.json")
 
 REQS = ("role", "min_width", "orientation", "min_aspect", "max_aspect", "note")
 
+# THE ROLE'S SEARCH CONCEPTS TRAVEL WITH THE SLOT. They are what turns a
+# purpose from a size into a subject — "what do I type to find a picture of
+# this kind" — and the desk has no data/ to read them from. `{name}` is left
+# unsubstituted here and filled per surface in the browser, because one
+# template is one decision and 593 substitutions are 593 copies of it.
+
 
 def build():
     data = load()
     rows = []
     for name in sorted(imageslots.declared()):
         rows.append(_row(name, imageslots.resolve(name, data), templated=False))
+    roles = imageslots._doc().get("roles", {})
     slots = {}
     for sn in sorted(imageslots.slots()):
         slot = imageslots.slots()[sn]
         slots[sn] = {k: slot.get(k) for k in REQS}
+        slots[sn]["search"] = (roles.get(slot.get("role")) or {}).get("search", [])
         for t in imageslots.targets(slot, data):
             spec = imageslots.resolve(f"{sn}{imageslots.SEP}{t}", data)
             rows.append(_row(f"{sn}{imageslots.SEP}{t}", spec, templated=True,
@@ -131,6 +139,8 @@ def _row(name, spec, templated, data=None):
     }
     if not templated:
         row.update({k: spec.get(k) for k in REQS})
+        roles = imageslots._doc().get("roles", {})
+        row["search"] = (roles.get(spec.get("role")) or {}).get("search", [])
     elif data is not None:
         cslug = (spec.get("target") or "").split("/")[0]
         country = data["countries"].get(cslug)

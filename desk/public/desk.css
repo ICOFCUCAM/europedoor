@@ -375,3 +375,16 @@ button.slotrow { width: 100%; text-align: left; font: inherit; cursor: pointer;
 button.slotrow:hover { background: var(--paper-2); }
 button.slotrow:hover .findit { color: var(--cobalt-deep); }
 .findit { color: var(--ink-3); }
+
+/* ── what to search for ─────────────────────────────────────────────── */
+/* The concepts sit under the brief, where the art direction already is, and
+   read as a row of things to press rather than a paragraph to read. */
+.concepts { margin: var(--s3) 0 0; display: flex; flex-wrap: wrap;
+  gap: var(--s2); align-items: baseline; }
+.concepts .suggest-lab { flex: 0 0 100%; margin: 0 0 var(--s1); }
+.concepts .hint { flex: 0 0 100%; margin: var(--s1) 0 0; }
+.concept { font: inherit; font-size: 13px; cursor: pointer; color: var(--ink);
+  background: var(--paper-2); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: .3rem .7rem; }
+.concept:hover { background: var(--paper-3); border-color: var(--ink-3); }
+.concept[disabled] { color: var(--ink-3); cursor: default; opacity: .7; }

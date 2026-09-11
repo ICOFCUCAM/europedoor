@@ -233,7 +233,7 @@
       }
     }
   },
-  "$roles": "TWELVE ROLES, and a purpose instantiates one. A role is the vocabulary — what a picture of this kind is FOR, what must be in frame, what must survive the crop, and what disqualifies a candidate that passes every number. A purpose is an instance: one surface, one page, one register key. Roles are declared before photographs exist because that is this repository's standing rule for anything externally governed, and because an undirected slot is how a library fills up with pictures nobody chose. THREE ROLES HAVE NO PURPOSE TODAY and each says why: two carry a trigger naming the design decision that would create one, and accommodation is REFUSED outright with the reason. A role with neither is a dead motif wearing the clothes of vocabulary — the exact failure plate-variation.py exists to catch one family over.",
+  "$roles": "TWELVE ROLES, and a purpose instantiates one. A role is the vocabulary — what a picture of this kind is FOR, what must be in frame, what must survive the crop, and what disqualifies a candidate that passes every number. A purpose is an instance: one surface, one page, one register key. Roles are declared before photographs exist because that is this repository's standing rule for anything externally governed, and because an undirected slot is how a library fills up with pictures nobody chose. THREE ROLES HAVE NO PURPOSE TODAY and each says why: two carry a trigger naming the design decision that would create one, and accommodation is REFUSED outright with the reason. A role with neither is a dead motif wearing the clothes of vocabulary — the exact failure plate-variation.py exists to catch one family over. EVERY ROLE CARRIES ITS OWN SEARCH CONCEPTS, and that is what makes this a vocabulary rather than a list of sizes. A brief arrived proposing an eighteen-family photographic taxonomy — country signature, capital, natural landscape, architecture broken into Gothic and Baroque and Byzantine, food, people and local life, journey, transport, seasonal, quiet, night, aerial, detail, weather, regional identity — and read against this file it is THIS BLOCK with its search terms written out. Twelve roles already say what a picture of each kind is for, what must be in frame, what must survive the crop and what disqualifies a candidate that passes every number; what none of them said is what to TYPE. A second vocabulary beside this one would be a second answer to 'what kind of picture is this', which is the failure this repository has recorded four times in other forms. `{name}` is substituted with the surface's own subject, so a destination's concepts are that destination's and thirteen searches are one decision.",
   "roles": {
     "hero": {
       "does": "The one photograph that decides whether a visitor stays. It is the first thing on the page, full-bleed, with the masthead standing on it and a 60px headline over its lower half.",
@@ -248,6 +248,13 @@
       "note": "The hero is the one surface where the DRAWING is currently better than any stock photograph would be, and that is measured: no other travel product can draw Europe on its own conformal conic through its own aperture, and a licensed stock photograph is by definition a thing anyone can also license. So this role's bar is higher than the rest: a photograph replaces the drawing only if it does something the drawing cannot. See docs/hero-brief.md.",
       "purposes_today": [
         "homepage-hero"
+      ],
+      "search": [
+        "Europe landscape",
+        "European coastline aerial",
+        "misty European landscape",
+        "European countryside morning",
+        "European mountains golden hour"
       ]
     },
     "destination-portrait": {
@@ -262,6 +269,14 @@
       "refuses": "The one view every postcard of this place uses. A festival, unless the page is about the festival. Anything shot from inside a hotel or a restaurant.",
       "purposes_today": [
         "destination-hero"
+      ],
+      "search": [
+        "{name}",
+        "{name} landscape",
+        "{name} old town",
+        "{name} aerial",
+        "{name} travel",
+        "{name} evening"
       ]
     },
     "landscape": {
@@ -278,6 +293,18 @@
         "countries-hero",
         "door-coast",
         "door-mountains"
+      ],
+      "search": [
+        "fjord landscape",
+        "alpine mountains",
+        "coastal cliffs",
+        "rolling hills",
+        "vineyard landscape",
+        "northern forest",
+        "glacier landscape",
+        "volcanic landscape",
+        "Arctic landscape",
+        "Mediterranean coast"
       ]
     },
     "cultural-scene": {
@@ -292,6 +319,14 @@
       "refuses": "A crowd photographed as a crowd. A staged 'traditional costume' set-up. Anything a tourist board commissioned.",
       "purposes_today": [
         "events-hero"
+      ],
+      "search": [
+        "European festival",
+        "folk musicians",
+        "craft workshop",
+        "village market",
+        "local traditions Europe",
+        "street procession"
       ]
     },
     "food": {
@@ -306,6 +341,14 @@
       "refuses": "A flat-lay. A styled plate on a rustic board. Anything shot on a white background. Hands holding a coffee cup.",
       "purposes_today": [
         "door-food"
+      ],
+      "search": [
+        "European food market",
+        "traditional European dish",
+        "village bakery",
+        "vineyard harvest",
+        "food preparation kitchen",
+        "market stall produce"
       ]
     },
     "architecture": {
@@ -320,6 +363,16 @@
       "refuses": "An empty square at dawn shot to remove people. A cathedral interior with a wide-angle bulge. Anything symmetrical to the centre line.",
       "purposes_today": [
         "door-history"
+      ],
+      "search": [
+        "medieval street",
+        "old town square",
+        "castle",
+        "Gothic cathedral",
+        "Baroque facade",
+        "Romanesque church",
+        "European boulevard",
+        "historic city square"
       ]
     },
     "human-life": {
@@ -333,7 +386,15 @@
       "brief": "This is the role most likely to produce a photograph that reads as stock, because the stock libraries are full of exactly this shot done badly. The test: could this person be anywhere in the world? If yes, it fails — the place must be doing as much work as the person.",
       "refuses": "A model release look. A back-of-head traveller gazing at a view. A couple laughing at a map.",
       "purposes_today": [],
-      "trigger": "A purpose exists for this the day a destination page grows a second image slot below its opening, which is a composition decision that has not been made. Declaring a slot for it sooner would put a hole on 319 pages — see docs/first-class-audit.md, Finding 3."
+      "trigger": "A purpose exists for this the day a destination page grows a second image slot below its opening, which is a composition decision that has not been made. Declaring a slot for it sooner would put a hole on 319 pages — see docs/first-class-audit.md, Finding 3.",
+      "search": [
+        "locals walking street",
+        "cafe culture Europe",
+        "fishermen harbour",
+        "artisan at work",
+        "farmers market Europe",
+        "everyday life village"
+      ]
     },
     "journey-atmosphere": {
       "does": "The feeling of moving through Europe rather than being in one part of it. The journeys surface.",
@@ -347,6 +408,15 @@
       "refuses": "A specific famous train. A car on an empty road. Anything that identifies one country.",
       "purposes_today": [
         "journeys-hero"
+      ],
+      "search": [
+        "scenic European railway",
+        "mountain railway",
+        "sleeper train Europe",
+        "European ferry",
+        "road trip Europe",
+        "European train station",
+        "cycling countryside Europe"
       ]
     },
     "experience-action": {
@@ -361,6 +431,14 @@
       "refuses": "A guided group. A branded uniform. Anything that looks like it was shot for the operator.",
       "purposes_today": [
         "experiences-hero"
+      ],
+      "search": [
+        "hiking mountain trail",
+        "sea kayaking",
+        "cycling road Europe",
+        "ski touring",
+        "rock climbing Europe",
+        "wild swimming"
       ]
     },
     "detail-texture": {
@@ -376,7 +454,15 @@
       "purposes_today": [
         "place-hero"
       ],
-      "trigger": "A purpose exists the day a family's composition has a rhythm that needs punctuation — which is a page-design decision, not a sourcing one."
+      "trigger": "A purpose exists the day a family's composition has a rhythm that needs punctuation — which is a page-design decision, not a sourcing one.",
+      "search": [
+        "Portuguese tiles",
+        "wooden door detail",
+        "local ceramics",
+        "market produce close up",
+        "stone wall texture",
+        "shop sign Europe"
+      ]
     },
     "editorial-story": {
       "does": "The image of an essay: not a place but an argument. The stories surface.",
@@ -391,6 +477,14 @@
       "purposes_today": [
         "stories-hero",
         "story-hero"
+      ],
+      "search": [
+        "quiet European village",
+        "European morning street",
+        "misty village",
+        "European village evening",
+        "empty street dawn",
+        "quiet cafe Europe"
       ]
     },
     "accommodation": {
@@ -404,7 +498,15 @@
       "brief": "n/a",
       "refuses": "n/a",
       "purposes_today": [],
-      "refused": "REFUSED, on a licence position rather than a taste. This is the family where a photograph does work type cannot — you choose where to sleep partly on what a place looks like at seven in the morning — and the only images that exist for it belong to the accommodation providers and arrive with affiliate terms instead of a photographer, a source and a licence. The Stay layer's no-image state is the SHIPPED state, not a fallback. A row waiting on a measurement is answered by rendering something and looking; a row waiting on a source is answered by a purchase order."
+      "refused": "REFUSED, on a licence position rather than a taste. This is the family where a photograph does work type cannot — you choose where to sleep partly on what a place looks like at seven in the morning — and the only images that exist for it belong to the accommodation providers and arrive with affiliate terms instead of a photographer, a source and a licence. The Stay layer's no-image state is the SHIPPED state, not a fallback. A row waiting on a measurement is answered by rendering something and looking; a row waiting on a source is answered by a purchase order.",
+      "search": [
+        "boutique hotel room",
+        "mountain lodge",
+        "historic hotel",
+        "countryside guesthouse",
+        "seaside hotel terrace",
+        "chalet interior"
+      ]
     }
   },
   "$crop": "SAFE AREA IS THE FRACTION OF A SOURCE FRAME GUARANTEED VISIBLE AT EVERY VIEWPORT, and it is arithmetic rather than taste: a container narrower than the source crops width, a container wider crops height, so the guaranteed width is container_min / source_max and the guaranteed height is source_min / container_max, each capped at 1. `container` is MEASURED in Chromium by adding the class a photograph would add and removing the drawing a photograph would replace, over a sweep of fifteen widths and five heights; `safe_area` is recomputed from it by checks.py and by the browser suite, so a number typed here that the arithmetic does not support fails the build. THE NUMBER IS THE POINT: the homepage hero guarantees 15% of a frame and the four doors 14%, which means the subject of either must sit in the middle of the picture and an off-centre composition is unusable however good it is. Nobody knew that before it was measured, and a purpose file that declares a minimum width and says nothing about this is answering the easy half.",

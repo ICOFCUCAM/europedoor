@@ -162,7 +162,46 @@
     })[0]);
     showBrief(spec);
     showNeeds(spec);
+    showConcepts(spec, isSlot ? null : v);
   }
+
+  /* THE ROLE'S SEARCH CONCEPTS, WITH THE SURFACE'S NAME IN THEM.
+     `{name}` is substituted here rather than in the generated registry,
+     because one template is one decision and 593 substitutions of it are 593
+     copies. Without a chosen place the templated concepts are shown with the
+     placeholder visible, so an editor can see the shape before picking one. */
+  function showConcepts(spec, declared) {
+    var box = el("concepts");
+    var list = (spec && spec.search) || [];
+    if (!list.length) { box.hidden = true; box.innerHTML = ""; return; }
+    var row = REG.purposes.filter(function (p) {
+      return p.target && p.target === el("target").value;
+    })[0];
+    var name = row ? placeName(row) : "";
+    box.hidden = false;
+    box.innerHTML = '<p class="suggest-lab">What to search for</p>' +
+      list.map(function (c) {
+        var q = c.replace(/\{name\}/g, name || "…");
+        return '<button type="button" class="concept"' +
+          (name || c.indexOf("{name}") < 0 ? ' data-q="' + esc(q) + '"' : " disabled") +
+          ">" + esc(q) + "</button>";
+      }).join("") +
+      (name ? "" : '<p class="hint">Choose a place and these fill in.</p>');
+    box.querySelectorAll("[data-q]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        el("q").value = b.dataset.q;
+        el("q").focus();
+      });
+    });
+  }
+
+  /* A ONE-OF-A-KIND PURPOSE HAS NO SUBSTITUTION, AND HAD ONE FOR ONE COMMIT.
+     The first version filled `{name}` with "Europe" for a declared purpose,
+     which is a substitution rule living in the browser rather than in the
+     vocabulary — and it hid a real fault: the `food` role's concepts carried
+     a placeholder that no slot instantiates. checks.py caught it the run it
+     was written. A declared purpose's concepts say what they mean.
+     */
 
   /* The first sentence is the art direction; the rest is how the numbers
      were chosen, which an editor wants once and not on every search. */
@@ -236,6 +275,11 @@
 
   function setTarget(p) {
     el("target").value = p ? p.target : "";
+    if (p) window.setTimeout(function () {
+      var v = el("slot").value;
+      var rows = instancesOf(v);
+      showConcepts(specOf(rows.length ? rows[0] : p), rows.length ? null : v);
+    }, 0);
     el("target-chosen").hidden = !p;
     el("target-chosen").textContent = p ? placeName(p) + " · " + p.target : "";
     el("target-hits").hidden = true;

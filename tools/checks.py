@@ -5441,6 +5441,55 @@ def c_originals_registered():
     return max(n, 1)
 
 
+@check("every role says what to search for, and a template has a substituter")
+def c_role_search():
+    """A ROLE THAT CANNOT SAY WHAT TO TYPE IS A SIZE WITH A PARAGRAPH ON IT.
+
+    Twelve roles already declare what a picture of each kind is FOR, what
+    must be in frame, what must survive the crop and what disqualifies a
+    candidate that passes every number. None of them said what to SEARCH
+    for, so every acquisition began from whatever wording came to the
+    editor's mind — and a library drifts generic one search at a time, which
+    is the failure the roles vocabulary exists to prevent, arriving through
+    the one step the vocabulary did not cover.
+
+    A brief proposing an eighteen-family photographic taxonomy is what
+    surfaced it. Read against this file that taxonomy IS this block with its
+    search terms written out, so the terms went here rather than into a
+    second vocabulary beside it — two answers to "what kind of picture is
+    this" is the failure this repository has recorded four times in other
+    forms.
+
+    AND `{name}` IS A PROMISE THAT SOMETHING SUBSTITUTES IT. A concept
+    carrying the placeholder is only usable where a purpose knows its
+    subject, which is a templated slot; on a one-of-a-kind purpose the
+    placeholder would reach an editor as literal text, which is the
+    `monaster*` failure — publishing a pattern as though it were a word.
+    """
+    spec = json.load(open(os.path.join(ROOT, "data", "image-purposes.json"),
+                          encoding="utf-8"))
+    roles = spec.get("roles", {})
+    slots = spec.get("slots", {})
+    templated = {s.get("role") for s in slots.values()}
+    n = 0
+    for name, role in sorted(roles.items()):
+        terms = role.get("search") or []
+        if len(terms) < 4:
+            fail(f"role {name} offers {len(terms)} search concepts. A role "
+                 f"that cannot say what to type is a size with a paragraph "
+                 f"on it.")
+        for t in terms:
+            n += 1
+            if "{name}" in t and name not in templated:
+                fail(f"role {name} concept {t!r} carries {{name}} and no slot "
+                     f"instantiates this role, so nothing substitutes it — "
+                     f"an editor would be shown the placeholder as a word.")
+            if "{" in t.replace("{name}", ""):
+                fail(f"role {name} concept {t!r} carries a placeholder this "
+                     f"desk does not fill")
+    return n
+
+
 @check("desk/registry.json is not stale")
 def c_desk_registry():
     """THE HOSTED DESK SERVES A GENERATED FILE, SO IT CAN BE STALE.
