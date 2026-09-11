@@ -962,6 +962,12 @@ main.wide { max-width: 92rem; }
      most" — pushed the page 47px wide. Stack, and let it wrap. */
   .row { grid-template-columns: 1fr; gap: var(--s2); }
   .row .rowmeta { white-space: normal; }
+  /* A bar that right-aligns itself inside a right-aligned column is left
+     hanging when the column stacks and goes left. Measured on /search's
+     resting state at 390: the count sat at the left margin and its bar at
+     the right, forty pixels of empty between two halves of one figure. */
+  .rowmeta .hopbar { margin-left: 0; }
+  .rowdist { justify-items: start; }
   .scorerow { grid-template-columns: 7rem 1fr 2.2rem; gap: var(--s2); }
 }
 /* MOTION: CONSIDERED, TRIED, AND REMOVED.
