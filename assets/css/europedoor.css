@@ -3805,15 +3805,30 @@ body[data-hero] .masthead { position: sticky; }
 .minimap.arched.atlas .lyr-land .context path.far {
   fill: var(--atlas-far); stroke: color-mix(in srgb, var(--atlas-coast) 38%, transparent); }
 
-/* THE SUBJECT IS A WASH, NOT A FILL, so whatever is under it survives. An
-   opaque country hides everything the terrain layers will eventually put
-   there — the Alps, the Massif Central, the Loire basin — and a plate whose
-   subject is the one place you cannot see the ground is the wrong way round.
-   A white wash lifts it above its neighbours and lets them through; today
-   there is nothing under it but the land tone, and the day there is, this
-   does not have to change. */
+/* THE WASH HAD NOTHING UNDER IT BUT THE SEA, AND SO THE SUBJECT OF EVERY
+   COUNTRY PORTRAIT WAS DRAWN COLD.
+
+   The rule that stood here was a translucent white — "a wash, not a fill, so
+   whatever is under it survives" — written on the premise that the land tone
+   is underneath and that terrain would be one day. On a portrait there is no
+   land underneath: `lyr-ocean` is a rect of --atlas-sea across the whole
+   frame, the countries are painted on top of it, and the subject is painted
+   ONCE, with this fill. So 62% white sat on #153851 and Austria measured
+   #ccd9e1 on the shipped page while its neighbours measured #d3cfc5 — a cold
+   blue-grey country in a warm parchment frame, on all fifty portraits, which
+   reads as water rather than as the subject. Sampled from the rendered page,
+   not guessed: at thumbnail size it looks like a slightly lighter country.
+
+   Opaque --atlas-here, which is the token that exists for exactly this and
+   had no user. 1.31 against the neighbours' --atlas-land, which is the
+   editorial atlas convention — the subject is the paper and the neighbours
+   are a half-tone — with --atlas-hereline carrying the frontier at 11.03.
+   Both are separations in docs/palette.json now, so the step cannot be
+   tuned away. No portrait draws terrain (fifty plates, none with the class),
+   so there is nothing under the subject for a wash to preserve; the day one
+   does, the translucency comes back for that family and not for this one. */
 .minimap.arched.atlas .lyr-land .countries path.here {
-  fill: color-mix(in srgb, #ffffff 62%, transparent);
+  fill: var(--atlas-here);
   stroke: var(--atlas-hereline); }
 /* THE TERRAIN, AND THE CEILING ON IT.
 

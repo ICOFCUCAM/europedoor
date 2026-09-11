@@ -140,6 +140,18 @@
         "b": "--atlas-land",
         "min": 3.0,
         "why": "a frontier is a claim ABOUT the ground and a coastline is the ground, and both were drawn in the same ink at 8.44 on the land — so the hierarchy the cartography document states was two tenths of a unit of stroke width. It still has to clear 3:1, because an invisible border is not restraint"
+      },
+      {
+        "a": "--atlas-here",
+        "b": "--atlas-land",
+        "min": 1.25,
+        "why": "the picture half's subject against its neighbours. It had no separation because it had no COLOUR: the fill was a translucent white, and on a portrait there is no land under it — only the sea rect — so Austria shipped at #ccd9e1 against #d3cfc5 neighbours, a cold country in a warm frame. 1.31 is the editorial atlas convention, the subject as paper and the neighbours as a half-tone"
+      },
+      {
+        "a": "--atlas-hereline",
+        "b": "--atlas-here",
+        "min": 3.0,
+        "why": "SC 1.4.11 on the subject's own frontier. The step between subject and neighbour is deliberately small, so the line is what carries the boundary and it has to clear it"
       }
     ],
     "ladder": {
