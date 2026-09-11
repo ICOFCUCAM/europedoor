@@ -4552,7 +4552,45 @@ body[data-hero] .masthead { position: sticky; }
    the row stacks and the glyph is a thumbnail again. Nothing else moves: the
    row's height is set by the prose, not by this. */
 .constel { width: 132px; height: auto; }
-@media (min-width: 64rem) { .themeside .constel { width: 204px; } }
+/* 204 PIXELS FOR THE WHOLE OF EUROPE, BESIDE FIVE HUNDRED PIXELS OF
+   NOTHING. The row is 1,168 wide; the kicker, the name and the eight places
+   end at 488, and the drawing sat in a 204-pixel box hard against the right
+   edge with half a column of paper between them. That is the fault this
+   repository has now named four times — the old stories index, the Stay
+   action band, the ask panel, /themes itself when it was a card grid — and
+   it was still here, on the page whose closing sentence is "a knot is an
+   argument about one corner of Europe, a scatter is one about the whole of
+   it". At 204 pixels the eight dots of Renaissance Europe are four pixels
+   apart and a knot and a scatter are one smudge.
+   The row's proportions are stated instead of inferred: the type column at
+   the measure, which is what the type was using anyway, and the drawing
+   takes what is left up to 22rem. Same glyph, same shared extent —
+   thirteen themes are only comparable if every one is drawn on the same
+   Europe — and what grows is the only quantity this drawing carries, the
+   DISTANCE between the eight marks. Renaissance Europe's knot over Italy
+   and France measures 69 pixels across where it measured 40.
+   The space between the type and the drawing stays, and it is not the dead
+   space this row was diagnosed with: every index on this site right-aligns
+   its meta column, and a rule that spans both is what makes the two ends one
+   row. What was wrong was the drawing's SIZE, not its position. */
+@media (min-width: 64rem) {
+  .themerow { grid-template-columns: minmax(0, var(--measure)) minmax(0, 1fr); }
+  .themeside .constel { width: min(18rem, 100%); }
+  /* AND THE MARK HAD TO COME DOWN AS THE DRAWING WENT UP. A radius in
+     viewBox units is a radius in pixels at exactly one width: 22 units is
+     4.5 pixels at 204 and 10.5 at 480, so the first attempt at this drew
+     eight blue discs the size of Switzerland and the continent under them
+     disappeared. Same arithmetic as the map labels that do not resolve into
+     glyphs on a phone, in the other direction. 17 units at 288 is the
+     9-pixel dot the row has always had; what grows is the DISTANCE between
+     them, which is the only thing this drawing is for.
+     AND THE WIDTH IS CAPPED BY THE PAGE'S OWN LENGTH RATHER THAN BY TASTE.
+     The viewBox is 1000x780, so every pixel of width costs 0.78 of row
+     height thirteen times over: at 22rem the rows were 351 tall and the page
+     ran to 5,739 pixels, which is within fifty of the old stories index this
+     repository threw away for being 5,792. 18rem holds the rows at 282. */
+  .themerow .constel-theme .constel-lit circle { r: 17px; }
+}
 /* The continent is context and must not compete with the eight lit points:
    a flat wash at the weight of a rule, no stroke, no sea. */
 /* EVERY PATH, BECAUSE THE CLASS I REACHED FOR IS NOT THE CLASS geo.landmass
