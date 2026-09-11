@@ -409,7 +409,7 @@ def main(argv):
                  + "\nChoose another candidate; do not lower the purpose.")
 
     grow = gate()[args.provider]
-    stem = args.purpose
+    stem = imageslots.stem(args.purpose)
     os.makedirs(ORIG_DIR, exist_ok=True)
     original = os.path.join(ORIG_DIR, stem + ".original.jpg")
 

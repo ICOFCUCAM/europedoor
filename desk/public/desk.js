@@ -542,9 +542,19 @@
     var ks = Object.keys(map).sort(function (a, b) {
       return map[a].localeCompare(map[b]);
     });
+    /* A SLOT WITH NO COUNTRIES HIDES THE FIELD RATHER THAN OFFERING AN
+       EMPTY ONE. Seventeen journeys, seventeen interests, nine macro
+       regions, thirteen themes and eight categories are not per-country, and
+       they are exactly the families small enough to fill in one sitting —
+       so the button that fills a whole family must not be gated on a control
+       that can never be satisfied. */
+    var wrap = el("sw-country").parentNode;
+    wrap.hidden = !ks.length;
     el("sw-country").innerHTML = ks.map(function (k) {
       return '<option value="' + esc(k) + '">' + esc(map[k]) + "</option>";
-    }).join("") || '<option value="">(this slot has no countries)</option>';
+    }).join("");
+    el("sw-note").textContent = ks.length ? ""
+      : "This family is not per-country, so one sweep covers all of it.";
   }
 
   function sweep(e) {

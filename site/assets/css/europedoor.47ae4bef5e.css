@@ -5876,19 +5876,19 @@ main > .pagehead:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom
    crop is decided by a neighbour and can be neither art-directed nor
    checked. 16/9 below 62rem and 21/9 above it gives a guaranteed 52% of a
    source frame, against the homepage hero's 15%. */
-.countryband {
+.pageband {
   margin: 0 0 var(--s6);
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: var(--radius);
   background: var(--paper-2);
 }
-@media (min-width: 62rem) { .countryband { aspect-ratio: 21 / 9; } }
-.countryband picture,
-.countryband img { display: block; width: 100%; height: 100%; object-fit: cover; }
+@media (min-width: 62rem) { .pageband { aspect-ratio: 21 / 9; } }
+.pageband picture,
+.pageband img { display: block; width: 100%; height: 100%; object-fit: cover; }
 /* The credit belongs under the picture and never over it, and it takes the
    size the site already has for a caption. A SIXTEENTH FONT SIZE WAS TRIED
    AND THE INVARIANT REGISTER REFUSED IT: `css.font_sizes` is a ceiling of
    fifteen with the reason written out, and 12px for one caption is exactly
    the kind of value that makes a sibling repository measure 418 of them. */
-.countryband figcaption { margin-top: var(--s2); color: var(--ink-2); }
+.pageband figcaption { margin-top: var(--s2); color: var(--ink-2); }

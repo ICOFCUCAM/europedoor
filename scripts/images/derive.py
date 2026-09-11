@@ -45,6 +45,17 @@ REGISTER = os.path.join(ROOT, "data", "images.json")
 QUALITY = {"avif": 50, "webp": 78, "jpg": 82}
 
 
+def _stem(name):
+    """ACCEPT A PURPOSE OR A STEM, because a caller has the purpose.
+
+    The workflow and the desk both hand this script the PURPOSE they just
+    acquired — `region-hero@austria/tyrol-and-vorarlberg` — and the file on
+    disk is named with the slashes folded. Asking every caller to fold them
+    itself is asking every caller to know a rule that lives in one place.
+    """
+    return name.replace("/", "__")
+
+
 def derive(stem):
     """Build the ladder from the UNTOUCHED original and record what was made.
 
@@ -79,6 +90,7 @@ def derive(stem):
                  "installed by the photograph workflow; it is deliberately not "
                  "a dependency of the build, which stays stdlib-only.")
     import PIL
+    stem = _stem(stem)
     src = os.path.join(ROOT, "photographs", stem + ".original.jpg")
     if not os.path.exists(src):
         sys.exit(f"no original at {os.path.relpath(src, ROOT)} — run "

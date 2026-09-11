@@ -1729,6 +1729,40 @@ def macromap(data, m):
               f'the rest of Europe behind them'))
 
 
+def pageband(data, key, alt_fallback=""):
+    """The opening photograph of a page family, or nothing at all.
+
+    ONE FUNCTION FOR EVERY FAMILY THAT OPENS ON A PHOTOGRAPH. Six copies of
+    the same eight lines is six places for the rule to drift, which is what
+    happened to map-label placement in four families before
+    `place_label_box()` was written — three of them offered one position and
+    the fourth offered four.
+
+    AND IT RENDERS NOTHING WITH NO PHOTOGRAPH. `picture()` returns a
+    generated plate when the register has no row, which is right on a card
+    and wrong at the top of a page: a slot waiting for a picture is honest
+    and three hundred pixels of one is a hole, which the homepage measured
+    and the four doors were resized for. So this asks the register directly,
+    exactly as the hero does, and a family with no photograph is the page it
+    is today, unchanged.
+
+    THE BAND IS ALWAYS AN ADDITION AND NEVER A REPLACEMENT. Every one of
+    these families already opens on a DRAWING that is its signature moment —
+    a country portrait, a region constellation, a route, a tag drawn across
+    Europe — and each of those says something a photograph cannot. Replacing
+    one would be the /map failure: a page going on stating a claim about a
+    drawing that is no longer there.
+    """
+    row = (data.get("images") or {}).get(key)
+    if not row:
+        return ""
+    return ('<figure class="pageband">'
+            + picture(data.get("images"), key, w=2400, h=1030,
+                      alt=row.get("alt") or alt_fallback, eager=True,
+                      sizes="100vw")
+            + "</figure>")
+
+
 def macro_page(data, m):
     """A macro region, and the countries it is made of.
 
@@ -1767,8 +1801,10 @@ def macro_page(data, m):
                           art=country_glyph(c["slug"], cs)
                               or region_glyph([cs], pts or None, min_span=340.0),
                           meta=meta, level=2))
+    photoband = pageband(data, f"macro:{m['slug']}")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], None)])}
+{photoband}
 <div class="pagehead overture">
   <p class="kicker">Region of Europe</p>
   <h1>{esc(m['name'])}</h1>
@@ -2938,18 +2974,10 @@ def country_page(data, c):
     # homepage already records: a slot waiting for a picture is honest and
     # three hundred pixels of one is a hole. So this asks the register
     # directly, exactly as the hero does.
-    crow = (data.get("images") or {}).get(f"country:{c['slug']}")
-    band = ""
-    if crow:
-        band = (
-            '<figure class="countryband">'
-            + picture(data.get("images"), f"country:{c['slug']}",
-                      w=2400, h=1030, alt=crow["alt"], eager=True,
-                      sizes="100vw")
-            + "</figure>")
+    photoband = pageband(data, f"country:{c['slug']}")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)), (c["name"], None)])}
-{band}
+{photoband}
 <div class="pagehead overture portraithead">
   <div class="portraitsay">
     <p class="kicker">{esc(m['name'])}</p>
@@ -3096,9 +3124,11 @@ def region_page(data, c, r):
         f'{esc(CITY_TYPE_NAMES.get(t.get("city_type"), "Destination"))}<br>'
         f'<span class="small">{nights_line(t)}</span></p></a>'
         for t in r["cities"])
+    photoband = pageband(data, f"region:{c['slug']}/{r['slug']}")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)),
          (c["name"], urls.country(c)), (r["name"], None)])}
+{photoband}
 <div class="pagehead overture">
   <p class="kicker">{esc(c['name'])}</p>
   <h1>{esc(r['name'])}</h1>
@@ -3765,8 +3795,10 @@ def interest_page(data, i, ranking):
     # not about geography, and it still holds: this is a glyph.
     art = constellation([project(n["city"]["lat"], n["city"]["lon"])
                          for n in cities], cut=True) if cities else ""
+    photoband = pageband(data, f"interest:{i['slug']}")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Experiences", "/experiences"), (i["name"], None)])}
+{photoband}
 {constel_defs()}
 {indexhero(
     kicker="Travelling for",
@@ -4075,8 +4107,10 @@ def journey_page(data, j):
             continue
         seen_food.add(cc["slug"])
         jfood += f"<li><strong>{esc(cc['name'])}</strong> — {esc(cc['food'][0])}</li>"
+    photoband = pageband(data, f"journey:{j['slug']}")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Journeys", "/journeys"), (j["name"], None)])}
+{photoband}
 <div class="pagehead overture">
   <p class="kicker">Journey</p>
   <h1>{esc(j['name'])}</h1>
@@ -6522,8 +6556,10 @@ def category_page(data, cat, sub=None):
                          f'gap in the writing rather than a fact about Europe.')
         rulenote += "</p>"
 
+    photoband = pageband(data, f"category:{cat['slug']}")
     body = f"""
 {crumbs(trail)}
+{photoband}
 <!-- AN INDEX, NOT AN OVERTURE. This page is a SET — 48 experiences across
      26 countries — and it carried the head of a page about one thing: a
      60px h1 at y=212 with the extent under it. The three roles are what the
@@ -7712,8 +7748,10 @@ def theme_page(data, t):
         f'<a href="/sources">Natural Earth</a>, public domain.',
         f'Map of the {len(tpts)} places in {t["name"]}, unlinked') if len(tpts) >= 2 else ""
 
+    photoband = pageband(data, f"theme:{t['slug']}")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Themes", "/themes"), (t["name"], None)])}
+{photoband}
 <div class="pagehead overture">
   <p class="kicker">{esc(t['strapline'])}</p>
   <h1>{esc(t['name'])}</h1>

@@ -54,10 +54,55 @@ SEP = "@"
 # inferred at each use.
 SOURCE_KEY = {
     "countries": "countries",
+    "regions": "countries",      # a region lives inside its country
     "cities": "cities",
     "places": "cities",
     "stories": "stories",
+    "journeys": "journeys",
+    "interests": "interests",
+    "macros": "macros",
+    "themes": "themes",
+    "categories": "categories",
 }
+
+
+def _regions(data):
+    """(country, region) pairs as `country/region`.
+
+    A REGION IS NOT A TOP-LEVEL COLLECTION and that is the whole reason this
+    function exists: regions live inside their countries, so the target has
+    to carry both halves or `provence` and `the-valleys` would collide across
+    fifty countries. It is the same shape `places` already uses one level
+    down.
+    """
+    out = []
+    for cs, c in data["countries"].items():
+        for r in c.get("regions", []):
+            out.append(f"{cs}/{r['slug']}")
+    return sorted(out)
+
+
+def _slugs(coll):
+    """A COLLECTION IS A LIST OR A DICT HERE, AND BOTH ARE LOAD-BEARING.
+    `interests` is keyed by slug and everything else is a list of records
+    carrying one, so a single reader that assumed either shape would have
+    been right about five of six — which is exactly the kind of near-miss
+    that ships. Stated once, here."""
+    if isinstance(coll, dict):
+        return list(coll)
+    return [r["slug"] for r in coll]
+
+
+def _by_slug(coll, target):
+    if isinstance(coll, dict):
+        row = coll.get(target)
+        if row is None:
+            raise KeyError(target)
+        return row if isinstance(row, dict) else {"name": row, "slug": target}
+    for r in coll:
+        if r.get("slug") == target:
+            return r
+    raise KeyError(target)
 
 
 def _doc():
@@ -99,6 +144,10 @@ def targets(slot, data):
             f"can name")
     if kind == "countries":
         return sorted(data["countries"])
+    if kind == "regions":
+        return _regions(data)
+    if kind in ("journeys", "interests", "macros", "themes", "categories"):
+        return sorted(_slugs(data[kind]))
     if kind == "cities":
         return sorted(data["cities"])
     if kind == "places":
@@ -118,6 +167,12 @@ def label(slot_name, target, data):
     kind = slot.get("targets")
     if kind == "countries":
         return data["countries"][target]["name"]
+    if kind == "regions":
+        cs, _, rs = target.partition("/")
+        c = data["countries"][cs]
+        return f"{_by_slug(c['regions'], rs)['name']}, {c['name']}"
+    if kind in ("journeys", "interests", "macros", "themes", "categories"):
+        return _by_slug(data[kind], target)["name"]
     if kind == "cities":
         n = data["cities"][target]
         return f"{n['city']['name']}, {n['country']['name']}"
@@ -142,6 +197,23 @@ def path(slot_name, target, data):
     kind = slot.get("targets")
     if kind == "countries":
         return "/europe/" + target
+    if kind == "regions":
+        cs, _, rs = target.partition("/")
+        return f"/europe/{cs}/{rs}"
+    if kind == "journeys":
+        return "/journeys/" + target
+    if kind == "interests":
+        return "/interests/" + target
+    if kind == "macros":
+        # /discover/<slug>, not /europe/<slug>. The path is a CLAIM about
+        # where the photograph is published and `checks.py` asserts a
+        # registered photograph appears on the page its purpose names, so a
+        # wrong one here is a check that can never pass.
+        return "/discover/" + target
+    if kind == "themes":
+        return "/themes/" + target
+    if kind == "categories":
+        return "/experiences/" + target
     if kind == "cities":
         return "/europe/" + target
     if kind == "places":
@@ -150,6 +222,34 @@ def path(slot_name, target, data):
     if kind == "stories":
         return "/stories/" + target
     raise KeyError(kind)
+
+
+def stem(purpose):
+    """A PURPOSE IS A NAME AND A FILENAME IS NOT THE SAME THING.
+
+    `acquire.py` used the purpose verbatim as the file stem, which worked for
+    every one-of-a-kind purpose and for a story, and could never have worked
+    for the families whose TARGET carries a path:
+
+        place-hero@austria/salzburg-and-the-lakes/salzburg/hohensalzburg
+        region-hero@austria/tyrol-and-vorarlberg
+        destination-hero@norway/fjord-norway/bergen
+
+    `photographs/<stem>.original.jpg` then names a file three directories
+    deep, and `acquire.py` makes only `photographs/` — so the first real
+    acquisition for any of 704 slot instances would have died on a missing
+    directory. It survived because no test had ever acquired one: the same
+    empty-register blindness that shipped a `style="` attribute the CSP
+    forbids and two dead CSS rules. Six new families is what finally made a
+    test try it.
+
+    `/` becomes `__` rather than `-`, because a slug may contain a hyphen
+    and `a/b-c` and `a-b/c` would then collide — and checks.py asserts no two
+    purposes reduce to one stem, because a collision here means two
+    photographs overwriting each other's original with every provenance
+    field correct about the wrong one.
+    """
+    return purpose.replace("/", "__")
 
 
 def split(name):

@@ -48,7 +48,21 @@ export default async function handler(req, res) {
   if (!verdict) { send(res, 400, { error: `${provider} is not a provider this desk knows` }); return; }
   if (!verdict.cleared) { send(res, 400, { error: "REFUSED: " + verdict.because }); return; }
   if (!reg.slots[slot]) { send(res, 400, { error: `${slot} is not a slot` }); return; }
-  if (!country) { send(res, 400, { error: "choose a country" }); return; }
+
+  /* A COUNTRY IS ONLY A QUESTION WHERE THE SLOT HAS ONE.
+   *
+   * Six of the ten slots are per-country — a destination, a place, a region,
+   * a country itself — and four are not: seventeen journeys, seventeen
+   * interests, nine macro regions, thirteen themes, eight experience
+   * categories. Requiring a country of those would make the one button that
+   * fills a whole family unreachable for exactly the families small enough
+   * to fill in one sitting. So the country NARROWS where it applies and is
+   * absent where it does not. */
+  const perCountry = reg.purposes.some((p) => p.slot === slot && p.country);
+  if (perCountry && !country) {
+    send(res, 400, { error: "choose a country" });
+    return;
+  }
 
   const held = (await register()) || {};
   const used = {};
@@ -63,10 +77,12 @@ export default async function handler(req, res) {
    * filled surface would be proposing to replace a photograph somebody
    * already approved, which is a different act and is not this button. */
   const surfaces = reg.purposes.filter(
-    (p) => p.slot === slot && p.country === country && !held[p.key]);
+    (p) => p.slot === slot && (!perCountry || p.country === country)
+           && !held[p.key]);
   if (!surfaces.length) {
     send(res, 200, {
-      rows: [], note: "Every surface of this kind in this country already "
+      rows: [], note: "Every surface of this kind "
+                    + (perCountry ? "in this country " : "") + "already "
                     + "holds a photograph. Replacing one is a different act "
                     + "from filling an empty slot, and it is not this button.",
     });

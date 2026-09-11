@@ -367,8 +367,19 @@ for (const width of [1280, 390]) {
   await closeDialogs(page);
   await page.click('[data-view="sweep"]');
   ok(await page.locator("#view-sweep").isVisible(), `${width}: the sweep view did not open`);
+  /* THE COUNTRY LIST BELONGS TO THE SLOT, so the slot is chosen first. The
+     first version read the count before choosing and passed only while every
+     slot happened to be per-country; the day four slots arrived that are
+     not, it reported "the sweep offers 1 countries" — an assertion that was
+     reading a default rather than a promise. */
+  await page.selectOption("#sw-slot", "destination-hero");
   const swCountries = await page.locator("#sw-country option").count();
   ok(swCountries > 40, `${width}: the sweep offers ${swCountries} countries`);
+  ok(await page.locator("#sw-country").isVisible(),
+     `${width}: a per-country slot was not offered a country`);
+  await page.selectOption("#sw-slot", "journey-hero");
+  ok(!(await page.locator("#sw-country").isVisible()),
+     `${width}: a slot with no countries still offers the field`);
   await page.selectOption("#sw-slot", "destination-hero");
   await page.selectOption("#sw-country", "norway");
   await page.click("#sweep button[type=submit]");

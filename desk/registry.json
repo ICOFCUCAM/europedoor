@@ -11,6 +11,22 @@
   }
  },
  "slots": {
+  "category-hero": {
+   "role": "experience-action",
+   "min_width": 2000,
+   "orientation": "landscape",
+   "min_aspect": 1.5,
+   "max_aspect": 2.1,
+   "note": "One of the eight discovery categories, each with its own photographic language: Nature is forest, water and wildlife; Adventure is a body doing something; Food is hands and produce rather than a plated dish. The category page is 4,980 pixels of one row shape and reads as a tourism database — docs/signature-moments.md refuses a MAP here and records why, and records that the thinness is a licence position rather than a design one. This is the answer to it.",
+   "search": [
+    "{name} Europe",
+    "{name} experience",
+    "{name} outdoors",
+    "{name} people",
+    "{name} landscape",
+    "{name} hands"
+   ]
+  },
   "country-hero": {
    "role": "country-signature",
    "min_width": 2000,
@@ -43,6 +59,56 @@
     "{name} evening"
    ]
   },
+  "interest-hero": {
+   "role": "experience-action",
+   "min_width": 2000,
+   "orientation": "landscape",
+   "min_aspect": 1.5,
+   "max_aspect": 2.1,
+   "note": "What this way of travelling LOOKS like, being done. Seventeen of these are seen against each other by a reader moving through /interests, so the set is part of the brief: Mountains and Coast must not both be a view from a summit. The page draws its own tag across Europe under this, which answers where; the photograph answers what it is like.",
+   "search": [
+    "{name} Europe",
+    "{name} travel",
+    "{name} landscape",
+    "{name} outdoors",
+    "{name} people",
+    "{name} detail"
+   ]
+  },
+  "journey-hero": {
+   "role": "journey-atmosphere",
+   "min_width": 2000,
+   "orientation": "landscape",
+   "min_aspect": 1.5,
+   "max_aspect": 2.1,
+   "note": "The journey's own atmosphere rather than any one of its stops: movement, or the landscape changing, or the reward at the end. A journey page draws its route four hundred pixels below this, so a photograph answering WHERE would duplicate the map. THE FIVE-STAGE SEQUENCE — departure, movement, transition, arrival, reward — is not this slot: it is five photographs per journey and needs five containers, which is a composition nobody has designed. This is the one that says what the trip feels like.",
+   "search": [
+    "scenic European railway",
+    "mountain railway viaduct",
+    "European ferry deck",
+    "road through mountain pass",
+    "valley opening out",
+    "arrival on a coast",
+    "sleeper train compartment",
+    "landscape changing from a train"
+   ]
+  },
+  "macro-hero": {
+   "role": "landscape",
+   "min_width": 2000,
+   "orientation": "landscape",
+   "min_aspect": 1.5,
+   "max_aspect": 2.1,
+   "note": "A continental quarter in one frame: the ground five countries share. The Nordics is long light and folded coast; Iberia is dry upland and terraced hill. Nine of these and they are the widest claim any photograph on this site makes, so no single landmark and no single country may stand for the group.",
+   "search": [
+    "{name} landscape",
+    "{name} coast",
+    "{name} countryside",
+    "{name} mountains",
+    "{name} light",
+    "{name} villages"
+   ]
+  },
   "place-hero": {
    "role": "detail-texture",
    "min_width": 1600,
@@ -61,6 +127,22 @@
     "stone and plaster texture"
    ]
   },
+  "region-hero": {
+   "role": "regional-identity",
+   "min_width": 1800,
+   "orientation": "landscape",
+   "min_aspect": 1.5,
+   "max_aspect": 2.2,
+   "note": "What distinguishes this region from the others in its country. NEVER THE COUNTRY'S OWN PICTURE: Provence is not France and Brittany is not France, and a region page that reuses the country photograph says they are. The material a region is made of — its stone, its roofs, its crop, its water — so a reader who knows the country can say which region this is without the caption. 130 of these, the second-largest family on the site.",
+   "search": [
+    "{name} landscape",
+    "{name} countryside",
+    "{name} village",
+    "{name} coast",
+    "{name} hills",
+    "{name} traditional architecture"
+   ]
+  },
   "story-hero": {
    "role": "editorial-story",
    "min_width": 2000,
@@ -77,6 +159,22 @@
     "quiet cafe Europe",
     "hands at work craft",
     "rural road Europe"
+   ]
+  },
+  "theme-hero": {
+   "role": "cultural-scene",
+   "min_width": 2000,
+   "orientation": "landscape",
+   "min_aspect": 1.5,
+   "max_aspect": 2.1,
+   "note": "A theme is an ARGUMENT about Europe rather than a place in it — Medieval Europe, Thermal Europe — so the photograph is the argument's subject caught once: a guild square, a bathhouse, a painted ceiling. The page draws the theme's eight stops as a constellation beneath, which is the reach; this is the substance.",
+   "search": [
+    "{name}",
+    "{name} Europe",
+    "{name} architecture",
+    "{name} interior",
+    "{name} town",
+    "{name} tradition"
    ]
   }
  },
@@ -314,6 +412,70 @@
     "empty street dawn",
     "quiet cafe Europe"
    ]
+  },
+  {
+   "purpose": "category-hero@adventure",
+   "slot": "category-hero",
+   "target": "adventure",
+   "key": "category:adventure",
+   "path": "/experiences/adventure",
+   "surface": "The opening band of the Adventure experiences category."
+  },
+  {
+   "purpose": "category-hero@culture",
+   "slot": "category-hero",
+   "target": "culture",
+   "key": "category:culture",
+   "path": "/experiences/culture",
+   "surface": "The opening band of the Culture experiences category."
+  },
+  {
+   "purpose": "category-hero@faith",
+   "slot": "category-hero",
+   "target": "faith",
+   "key": "category:faith",
+   "path": "/experiences/faith",
+   "surface": "The opening band of the Faith & heritage experiences category."
+  },
+  {
+   "purpose": "category-hero@family",
+   "slot": "category-hero",
+   "target": "family",
+   "key": "category:family",
+   "path": "/experiences/family",
+   "surface": "The opening band of the Family experiences category."
+  },
+  {
+   "purpose": "category-hero@food",
+   "slot": "category-hero",
+   "target": "food",
+   "key": "category:food",
+   "path": "/experiences/food",
+   "surface": "The opening band of the Food & drink experiences category."
+  },
+  {
+   "purpose": "category-hero@history",
+   "slot": "category-hero",
+   "target": "history",
+   "key": "category:history",
+   "path": "/experiences/history",
+   "surface": "The opening band of the History experiences category."
+  },
+  {
+   "purpose": "category-hero@luxury",
+   "slot": "category-hero",
+   "target": "luxury",
+   "key": "category:luxury",
+   "path": "/experiences/luxury",
+   "surface": "The opening band of the Luxury experiences category."
+  },
+  {
+   "purpose": "category-hero@nature",
+   "slot": "category-hero",
+   "target": "nature",
+   "key": "category:nature",
+   "path": "/experiences/nature",
+   "surface": "The opening band of the Nature experiences category."
   },
   {
    "purpose": "country-hero@albania",
@@ -4006,6 +4168,350 @@
    "country_name": "Vatican City"
   },
   {
+   "purpose": "interest-hero@architecture",
+   "slot": "interest-hero",
+   "target": "architecture",
+   "key": "interest:architecture",
+   "path": "/interests/architecture",
+   "surface": "The opening band of the Architecture interest page."
+  },
+  {
+   "purpose": "interest-hero@art",
+   "slot": "interest-hero",
+   "target": "art",
+   "key": "interest:art",
+   "path": "/interests/art",
+   "surface": "The opening band of the Art & museums interest page."
+  },
+  {
+   "purpose": "interest-hero@cities",
+   "slot": "interest-hero",
+   "target": "cities",
+   "key": "interest:cities",
+   "path": "/interests/cities",
+   "surface": "The opening band of the Big cities interest page."
+  },
+  {
+   "purpose": "interest-hero@coast",
+   "slot": "interest-hero",
+   "target": "coast",
+   "key": "interest:coast",
+   "path": "/interests/coast",
+   "surface": "The opening band of the Coast & beaches interest page."
+  },
+  {
+   "purpose": "interest-hero@design",
+   "slot": "interest-hero",
+   "target": "design",
+   "key": "interest:design",
+   "path": "/interests/design",
+   "surface": "The opening band of the Design & making interest page."
+  },
+  {
+   "purpose": "interest-hero@festivals",
+   "slot": "interest-hero",
+   "target": "festivals",
+   "key": "interest:festivals",
+   "path": "/interests/festivals",
+   "surface": "The opening band of the Festivals interest page."
+  },
+  {
+   "purpose": "interest-hero@food",
+   "slot": "interest-hero",
+   "target": "food",
+   "key": "interest:food",
+   "path": "/interests/food",
+   "surface": "The opening band of the Food interest page."
+  },
+  {
+   "purpose": "interest-hero@history",
+   "slot": "interest-hero",
+   "target": "history",
+   "key": "interest:history",
+   "path": "/interests/history",
+   "surface": "The opening band of the History & ruins interest page."
+  },
+  {
+   "purpose": "interest-hero@islands",
+   "slot": "interest-hero",
+   "target": "islands",
+   "key": "interest:islands",
+   "path": "/interests/islands",
+   "surface": "The opening band of the Islands interest page."
+  },
+  {
+   "purpose": "interest-hero@mountains",
+   "slot": "interest-hero",
+   "target": "mountains",
+   "key": "interest:mountains",
+   "path": "/interests/mountains",
+   "surface": "The opening band of the Mountains interest page."
+  },
+  {
+   "purpose": "interest-hero@music",
+   "slot": "interest-hero",
+   "target": "music",
+   "key": "interest:music",
+   "path": "/interests/music",
+   "surface": "The opening band of the Music & nightlife interest page."
+  },
+  {
+   "purpose": "interest-hero@nature",
+   "slot": "interest-hero",
+   "target": "nature",
+   "key": "interest:nature",
+   "path": "/interests/nature",
+   "surface": "The opening band of the Wild nature interest page."
+  },
+  {
+   "purpose": "interest-hero@rail",
+   "slot": "interest-hero",
+   "target": "rail",
+   "key": "interest:rail",
+   "path": "/interests/rail",
+   "surface": "The opening band of the Slow travel by rail interest page."
+  },
+  {
+   "purpose": "interest-hero@sacred",
+   "slot": "interest-hero",
+   "target": "sacred",
+   "key": "interest:sacred",
+   "path": "/interests/sacred",
+   "surface": "The opening band of the Sacred places interest page."
+  },
+  {
+   "purpose": "interest-hero@wild",
+   "slot": "interest-hero",
+   "target": "wild",
+   "key": "interest:wild",
+   "path": "/interests/wild",
+   "surface": "The opening band of the Wildlife watching interest page."
+  },
+  {
+   "purpose": "interest-hero@wine",
+   "slot": "interest-hero",
+   "target": "wine",
+   "key": "interest:wine",
+   "path": "/interests/wine",
+   "surface": "The opening band of the Wine & drink interest page."
+  },
+  {
+   "purpose": "interest-hero@winter",
+   "slot": "interest-hero",
+   "target": "winter",
+   "key": "interest:winter",
+   "path": "/interests/winter",
+   "surface": "The opening band of the Snow & winter interest page."
+  },
+  {
+   "purpose": "journey-hero@arctic-to-mediterranean",
+   "slot": "journey-hero",
+   "target": "arctic-to-mediterranean",
+   "key": "journey:arctic-to-mediterranean",
+   "path": "/journeys/arctic-to-mediterranean",
+   "surface": "The opening band of the Arctic to Mediterranean journey page."
+  },
+  {
+   "purpose": "journey-hero@arctic-to-the-baltic",
+   "slot": "journey-hero",
+   "target": "arctic-to-the-baltic",
+   "key": "journey:arctic-to-the-baltic",
+   "path": "/journeys/arctic-to-the-baltic",
+   "surface": "The opening band of the Arctic to the Baltic journey page."
+  },
+  {
+   "purpose": "journey-hero@atlantic-to-the-mediterranean",
+   "slot": "journey-hero",
+   "target": "atlantic-to-the-mediterranean",
+   "key": "journey:atlantic-to-the-mediterranean",
+   "path": "/journeys/atlantic-to-the-mediterranean",
+   "surface": "The opening band of the Atlantic to the Mediterranean journey page."
+  },
+  {
+   "purpose": "journey-hero@camino-and-sacred-europe",
+   "slot": "journey-hero",
+   "target": "camino-and-sacred-europe",
+   "key": "journey:camino-and-sacred-europe",
+   "path": "/journeys/camino-and-sacred-europe",
+   "surface": "The opening band of the Camino & Sacred Europe journey page."
+  },
+  {
+   "purpose": "journey-hero@carpathian-arc",
+   "slot": "journey-hero",
+   "target": "carpathian-arc",
+   "key": "journey:carpathian-arc",
+   "path": "/journeys/carpathian-arc",
+   "surface": "The opening band of the The Carpathian Arc journey page."
+  },
+  {
+   "purpose": "journey-hero@european-heritage-route",
+   "slot": "journey-hero",
+   "target": "european-heritage-route",
+   "key": "journey:european-heritage-route",
+   "path": "/journeys/european-heritage-route",
+   "surface": "The opening band of the The European Heritage Route journey page."
+  },
+  {
+   "purpose": "journey-hero@iberian-circle",
+   "slot": "journey-hero",
+   "target": "iberian-circle",
+   "key": "journey:iberian-circle",
+   "path": "/journeys/iberian-circle",
+   "surface": "The opening band of the The Iberian Circle journey page."
+  },
+  {
+   "purpose": "journey-hero@mediterranean-arc",
+   "slot": "journey-hero",
+   "target": "mediterranean-arc",
+   "key": "journey:mediterranean-arc",
+   "path": "/journeys/mediterranean-arc",
+   "surface": "The opening band of the The Mediterranean Arc journey page."
+  },
+  {
+   "purpose": "journey-hero@scandinavia-to-central-europe",
+   "slot": "journey-hero",
+   "target": "scandinavia-to-central-europe",
+   "key": "journey:scandinavia-to-central-europe",
+   "path": "/journeys/scandinavia-to-central-europe",
+   "surface": "The opening band of the Scandinavia to Central Europe journey page."
+  },
+  {
+   "purpose": "journey-hero@the-adriatic-run",
+   "slot": "journey-hero",
+   "target": "the-adriatic-run",
+   "key": "journey:the-adriatic-run",
+   "path": "/journeys/the-adriatic-run",
+   "surface": "The opening band of the The Adriatic Run journey page."
+  },
+  {
+   "purpose": "journey-hero@the-alpine-grand-tour",
+   "slot": "journey-hero",
+   "target": "the-alpine-grand-tour",
+   "key": "journey:the-alpine-grand-tour",
+   "path": "/journeys/the-alpine-grand-tour",
+   "surface": "The opening band of the The Alpine Grand Tour journey page."
+  },
+  {
+   "purpose": "journey-hero@the-baltic-crossing",
+   "slot": "journey-hero",
+   "target": "the-baltic-crossing",
+   "key": "journey:the-baltic-crossing",
+   "path": "/journeys/the-baltic-crossing",
+   "surface": "The opening band of the The Baltic Crossing journey page."
+  },
+  {
+   "purpose": "journey-hero@the-classical-mediterranean",
+   "slot": "journey-hero",
+   "target": "the-classical-mediterranean",
+   "key": "journey:the-classical-mediterranean",
+   "path": "/journeys/the-classical-mediterranean",
+   "surface": "The opening band of the The Classical Mediterranean journey page."
+  },
+  {
+   "purpose": "journey-hero@the-cold-north",
+   "slot": "journey-hero",
+   "target": "the-cold-north",
+   "key": "journey:the-cold-north",
+   "path": "/journeys/the-cold-north",
+   "surface": "The opening band of the The Cold North journey page."
+  },
+  {
+   "purpose": "journey-hero@the-danube-line",
+   "slot": "journey-hero",
+   "target": "the-danube-line",
+   "key": "journey:the-danube-line",
+   "path": "/journeys/the-danube-line",
+   "surface": "The opening band of the The Danube Line journey page."
+  },
+  {
+   "purpose": "journey-hero@the-hanseatic-arc",
+   "slot": "journey-hero",
+   "target": "the-hanseatic-arc",
+   "key": "journey:the-hanseatic-arc",
+   "path": "/journeys/the-hanseatic-arc",
+   "surface": "The opening band of the The Hanseatic Arc journey page."
+  },
+  {
+   "purpose": "journey-hero@the-white-villages",
+   "slot": "journey-hero",
+   "target": "the-white-villages",
+   "key": "journey:the-white-villages",
+   "path": "/journeys/the-white-villages",
+   "surface": "The opening band of the The White South journey page."
+  },
+  {
+   "purpose": "macro-hero@adriatic-balkans",
+   "slot": "macro-hero",
+   "target": "adriatic-balkans",
+   "key": "macro:adriatic-balkans",
+   "path": "/discover/adriatic-balkans",
+   "surface": "The opening band of the The Adriatic & Balkans macro-region page."
+  },
+  {
+   "purpose": "macro-hero@alpine-central",
+   "slot": "macro-hero",
+   "target": "alpine-central",
+   "key": "macro:alpine-central",
+   "path": "/discover/alpine-central",
+   "surface": "The opening band of the Alpine & Central Europe macro-region page."
+  },
+  {
+   "purpose": "macro-hero@baltic",
+   "slot": "macro-hero",
+   "target": "baltic",
+   "key": "macro:baltic",
+   "path": "/discover/baltic",
+   "surface": "The opening band of the The Baltic States macro-region page."
+  },
+  {
+   "purpose": "macro-hero@british-isles",
+   "slot": "macro-hero",
+   "target": "british-isles",
+   "key": "macro:british-isles",
+   "path": "/discover/british-isles",
+   "surface": "The opening band of the Britain & Ireland macro-region page."
+  },
+  {
+   "purpose": "macro-hero@caucasus-bosphorus",
+   "slot": "macro-hero",
+   "target": "caucasus-bosphorus",
+   "key": "macro:caucasus-bosphorus",
+   "path": "/discover/caucasus-bosphorus",
+   "surface": "The opening band of the The Caucasus & the Bosphorus macro-region page."
+  },
+  {
+   "purpose": "macro-hero@eastern",
+   "slot": "macro-hero",
+   "target": "eastern",
+   "key": "macro:eastern",
+   "path": "/discover/eastern",
+   "surface": "The opening band of the Eastern Europe macro-region page."
+  },
+  {
+   "purpose": "macro-hero@mediterranean",
+   "slot": "macro-hero",
+   "target": "mediterranean",
+   "key": "macro:mediterranean",
+   "path": "/discover/mediterranean",
+   "surface": "The opening band of the The Mediterranean macro-region page."
+  },
+  {
+   "purpose": "macro-hero@nordic",
+   "slot": "macro-hero",
+   "target": "nordic",
+   "key": "macro:nordic",
+   "path": "/discover/nordic",
+   "surface": "The opening band of the The Nordics macro-region page."
+  },
+  {
+   "purpose": "macro-hero@western",
+   "slot": "macro-hero",
+   "target": "western",
+   "key": "macro:western",
+   "path": "/discover/western",
+   "surface": "The opening band of the Western Europe macro-region page."
+  },
+  {
    "purpose": "place-hero@austria/salzburg-and-the-lakes/salzburg/hohensalzburg",
    "slot": "place-hero",
    "target": "austria/salzburg-and-the-lakes/salzburg/hohensalzburg",
@@ -6556,6 +7062,1306 @@
    "country_name": "Sweden"
   },
   {
+   "purpose": "region-hero@albania/the-albanian-alps",
+   "slot": "region-hero",
+   "target": "albania/the-albanian-alps",
+   "key": "region:albania/the-albanian-alps",
+   "path": "/europe/albania/the-albanian-alps",
+   "surface": "The opening band of the The Albanian Alps, Albania region page.",
+   "country": "albania",
+   "country_name": "Albania"
+  },
+  {
+   "purpose": "region-hero@albania/tirana-and-the-south",
+   "slot": "region-hero",
+   "target": "albania/tirana-and-the-south",
+   "key": "region:albania/tirana-and-the-south",
+   "path": "/europe/albania/tirana-and-the-south",
+   "surface": "The opening band of the Tirana, the Riviera & the South, Albania region page.",
+   "country": "albania",
+   "country_name": "Albania"
+  },
+  {
+   "purpose": "region-hero@andorra/the-valleys",
+   "slot": "region-hero",
+   "target": "andorra/the-valleys",
+   "key": "region:andorra/the-valleys",
+   "path": "/europe/andorra/the-valleys",
+   "surface": "The opening band of the The Valleys, Andorra region page.",
+   "country": "andorra",
+   "country_name": "Andorra"
+  },
+  {
+   "purpose": "region-hero@armenia/north-and-south",
+   "slot": "region-hero",
+   "target": "armenia/north-and-south",
+   "key": "region:armenia/north-and-south",
+   "path": "/europe/armenia/north-and-south",
+   "surface": "The opening band of the The North & South, Armenia region page.",
+   "country": "armenia",
+   "country_name": "Armenia"
+  },
+  {
+   "purpose": "region-hero@armenia/yerevan-and-ararat",
+   "slot": "region-hero",
+   "target": "armenia/yerevan-and-ararat",
+   "key": "region:armenia/yerevan-and-ararat",
+   "path": "/europe/armenia/yerevan-and-ararat",
+   "surface": "The opening band of the Yerevan & the Ararat Plain, Armenia region page.",
+   "country": "armenia",
+   "country_name": "Armenia"
+  },
+  {
+   "purpose": "region-hero@austria/salzburg-and-the-lakes",
+   "slot": "region-hero",
+   "target": "austria/salzburg-and-the-lakes",
+   "key": "region:austria/salzburg-and-the-lakes",
+   "path": "/europe/austria/salzburg-and-the-lakes",
+   "surface": "The opening band of the Salzburg & the Salzkammergut, Austria region page.",
+   "country": "austria",
+   "country_name": "Austria"
+  },
+  {
+   "purpose": "region-hero@austria/tyrol",
+   "slot": "region-hero",
+   "target": "austria/tyrol",
+   "key": "region:austria/tyrol",
+   "path": "/europe/austria/tyrol",
+   "surface": "The opening band of the Tyrol & the West, Austria region page.",
+   "country": "austria",
+   "country_name": "Austria"
+  },
+  {
+   "purpose": "region-hero@austria/vienna-and-the-east",
+   "slot": "region-hero",
+   "target": "austria/vienna-and-the-east",
+   "key": "region:austria/vienna-and-the-east",
+   "path": "/europe/austria/vienna-and-the-east",
+   "surface": "The opening band of the Vienna & the East, Austria region page.",
+   "country": "austria",
+   "country_name": "Austria"
+  },
+  {
+   "purpose": "region-hero@azerbaijan/baku-and-the-caspian",
+   "slot": "region-hero",
+   "target": "azerbaijan/baku-and-the-caspian",
+   "key": "region:azerbaijan/baku-and-the-caspian",
+   "path": "/europe/azerbaijan/baku-and-the-caspian",
+   "surface": "The opening band of the Baku & the Caspian, Azerbaijan region page.",
+   "country": "azerbaijan",
+   "country_name": "Azerbaijan"
+  },
+  {
+   "purpose": "region-hero@azerbaijan/the-north-west",
+   "slot": "region-hero",
+   "target": "azerbaijan/the-north-west",
+   "key": "region:azerbaijan/the-north-west",
+   "path": "/europe/azerbaijan/the-north-west",
+   "surface": "The opening band of the The Northwest & the Mountains, Azerbaijan region page.",
+   "country": "azerbaijan",
+   "country_name": "Azerbaijan"
+  },
+  {
+   "purpose": "region-hero@belarus/minsk-and-the-centre",
+   "slot": "region-hero",
+   "target": "belarus/minsk-and-the-centre",
+   "key": "region:belarus/minsk-and-the-centre",
+   "path": "/europe/belarus/minsk-and-the-centre",
+   "surface": "The opening band of the Minsk & the Centre, Belarus region page.",
+   "country": "belarus",
+   "country_name": "Belarus"
+  },
+  {
+   "purpose": "region-hero@belarus/the-forests",
+   "slot": "region-hero",
+   "target": "belarus/the-forests",
+   "key": "region:belarus/the-forests",
+   "path": "/europe/belarus/the-forests",
+   "surface": "The opening band of the The Forests, Belarus region page.",
+   "country": "belarus",
+   "country_name": "Belarus"
+  },
+  {
+   "purpose": "region-hero@belgium/brussels-and-wallonia",
+   "slot": "region-hero",
+   "target": "belgium/brussels-and-wallonia",
+   "key": "region:belgium/brussels-and-wallonia",
+   "path": "/europe/belgium/brussels-and-wallonia",
+   "surface": "The opening band of the Brussels & Wallonia, Belgium region page.",
+   "country": "belgium",
+   "country_name": "Belgium"
+  },
+  {
+   "purpose": "region-hero@belgium/flanders",
+   "slot": "region-hero",
+   "target": "belgium/flanders",
+   "key": "region:belgium/flanders",
+   "path": "/europe/belgium/flanders",
+   "surface": "The opening band of the Flanders, Belgium region page.",
+   "country": "belgium",
+   "country_name": "Belgium"
+  },
+  {
+   "purpose": "region-hero@bosnia-and-herzegovina/herzegovina",
+   "slot": "region-hero",
+   "target": "bosnia-and-herzegovina/herzegovina",
+   "key": "region:bosnia-and-herzegovina/herzegovina",
+   "path": "/europe/bosnia-and-herzegovina/herzegovina",
+   "surface": "The opening band of the Herzegovina, Bosnia and Herzegovina region page.",
+   "country": "bosnia-and-herzegovina",
+   "country_name": "Bosnia and Herzegovina"
+  },
+  {
+   "purpose": "region-hero@bosnia-and-herzegovina/sarajevo-and-central-bosnia",
+   "slot": "region-hero",
+   "target": "bosnia-and-herzegovina/sarajevo-and-central-bosnia",
+   "key": "region:bosnia-and-herzegovina/sarajevo-and-central-bosnia",
+   "path": "/europe/bosnia-and-herzegovina/sarajevo-and-central-bosnia",
+   "surface": "The opening band of the Sarajevo & Central Bosnia, Bosnia and Herzegovina region page.",
+   "country": "bosnia-and-herzegovina",
+   "country_name": "Bosnia and Herzegovina"
+  },
+  {
+   "purpose": "region-hero@bulgaria/sofia-and-the-mountains",
+   "slot": "region-hero",
+   "target": "bulgaria/sofia-and-the-mountains",
+   "key": "region:bulgaria/sofia-and-the-mountains",
+   "path": "/europe/bulgaria/sofia-and-the-mountains",
+   "surface": "The opening band of the Sofia & the Mountains, Bulgaria region page.",
+   "country": "bulgaria",
+   "country_name": "Bulgaria"
+  },
+  {
+   "purpose": "region-hero@bulgaria/thrace-and-the-black-sea",
+   "slot": "region-hero",
+   "target": "bulgaria/thrace-and-the-black-sea",
+   "key": "region:bulgaria/thrace-and-the-black-sea",
+   "path": "/europe/bulgaria/thrace-and-the-black-sea",
+   "surface": "The opening band of the Thrace & the Black Sea, Bulgaria region page.",
+   "country": "bulgaria",
+   "country_name": "Bulgaria"
+  },
+  {
+   "purpose": "region-hero@croatia/dalmatia",
+   "slot": "region-hero",
+   "target": "croatia/dalmatia",
+   "key": "region:croatia/dalmatia",
+   "path": "/europe/croatia/dalmatia",
+   "surface": "The opening band of the Dalmatia, Croatia region page.",
+   "country": "croatia",
+   "country_name": "Croatia"
+  },
+  {
+   "purpose": "region-hero@croatia/inland-croatia",
+   "slot": "region-hero",
+   "target": "croatia/inland-croatia",
+   "key": "region:croatia/inland-croatia",
+   "path": "/europe/croatia/inland-croatia",
+   "surface": "The opening band of the Inland Croatia, Croatia region page.",
+   "country": "croatia",
+   "country_name": "Croatia"
+  },
+  {
+   "purpose": "region-hero@croatia/istria-and-kvarner",
+   "slot": "region-hero",
+   "target": "croatia/istria-and-kvarner",
+   "key": "region:croatia/istria-and-kvarner",
+   "path": "/europe/croatia/istria-and-kvarner",
+   "surface": "The opening band of the Istria & Kvarner, Croatia region page.",
+   "country": "croatia",
+   "country_name": "Croatia"
+  },
+  {
+   "purpose": "region-hero@cyprus/south-coast-and-nicosia",
+   "slot": "region-hero",
+   "target": "cyprus/south-coast-and-nicosia",
+   "key": "region:cyprus/south-coast-and-nicosia",
+   "path": "/europe/cyprus/south-coast-and-nicosia",
+   "surface": "The opening band of the Nicosia & the South Coast, Cyprus region page.",
+   "country": "cyprus",
+   "country_name": "Cyprus"
+  },
+  {
+   "purpose": "region-hero@cyprus/troodos",
+   "slot": "region-hero",
+   "target": "cyprus/troodos",
+   "key": "region:cyprus/troodos",
+   "path": "/europe/cyprus/troodos",
+   "surface": "The opening band of the The Troodos Mountains, Cyprus region page.",
+   "country": "cyprus",
+   "country_name": "Cyprus"
+  },
+  {
+   "purpose": "region-hero@czechia/moravia",
+   "slot": "region-hero",
+   "target": "czechia/moravia",
+   "key": "region:czechia/moravia",
+   "path": "/europe/czechia/moravia",
+   "surface": "The opening band of the Moravia, Czechia region page.",
+   "country": "czechia",
+   "country_name": "Czechia"
+  },
+  {
+   "purpose": "region-hero@czechia/prague-and-bohemia",
+   "slot": "region-hero",
+   "target": "czechia/prague-and-bohemia",
+   "key": "region:czechia/prague-and-bohemia",
+   "path": "/europe/czechia/prague-and-bohemia",
+   "surface": "The opening band of the Prague & Bohemia, Czechia region page.",
+   "country": "czechia",
+   "country_name": "Czechia"
+  },
+  {
+   "purpose": "region-hero@denmark/jutland",
+   "slot": "region-hero",
+   "target": "denmark/jutland",
+   "key": "region:denmark/jutland",
+   "path": "/europe/denmark/jutland",
+   "surface": "The opening band of the Jutland, Denmark region page.",
+   "country": "denmark",
+   "country_name": "Denmark"
+  },
+  {
+   "purpose": "region-hero@denmark/zealand",
+   "slot": "region-hero",
+   "target": "denmark/zealand",
+   "key": "region:denmark/zealand",
+   "path": "/europe/denmark/zealand",
+   "surface": "The opening band of the Zealand & Copenhagen, Denmark region page.",
+   "country": "denmark",
+   "country_name": "Denmark"
+  },
+  {
+   "purpose": "region-hero@estonia/islands-and-south",
+   "slot": "region-hero",
+   "target": "estonia/islands-and-south",
+   "key": "region:estonia/islands-and-south",
+   "path": "/europe/estonia/islands-and-south",
+   "surface": "The opening band of the The Islands & the South, Estonia region page.",
+   "country": "estonia",
+   "country_name": "Estonia"
+  },
+  {
+   "purpose": "region-hero@estonia/tallinn-and-the-north",
+   "slot": "region-hero",
+   "target": "estonia/tallinn-and-the-north",
+   "key": "region:estonia/tallinn-and-the-north",
+   "path": "/europe/estonia/tallinn-and-the-north",
+   "surface": "The opening band of the Tallinn & the North Coast, Estonia region page.",
+   "country": "estonia",
+   "country_name": "Estonia"
+  },
+  {
+   "purpose": "region-hero@finland/finnish-lapland",
+   "slot": "region-hero",
+   "target": "finland/finnish-lapland",
+   "key": "region:finland/finnish-lapland",
+   "path": "/europe/finland/finnish-lapland",
+   "surface": "The opening band of the Finnish Lapland, Finland region page.",
+   "country": "finland",
+   "country_name": "Finland"
+  },
+  {
+   "purpose": "region-hero@finland/helsinki-and-the-coast",
+   "slot": "region-hero",
+   "target": "finland/helsinki-and-the-coast",
+   "key": "region:finland/helsinki-and-the-coast",
+   "path": "/europe/finland/helsinki-and-the-coast",
+   "surface": "The opening band of the Helsinki & the Southern Coast, Finland region page.",
+   "country": "finland",
+   "country_name": "Finland"
+  },
+  {
+   "purpose": "region-hero@finland/lakeland",
+   "slot": "region-hero",
+   "target": "finland/lakeland",
+   "key": "region:finland/lakeland",
+   "path": "/europe/finland/lakeland",
+   "surface": "The opening band of the The Lakeland, Finland region page.",
+   "country": "finland",
+   "country_name": "Finland"
+  },
+  {
+   "purpose": "region-hero@france/alps-and-east",
+   "slot": "region-hero",
+   "target": "france/alps-and-east",
+   "key": "region:france/alps-and-east",
+   "path": "/europe/france/alps-and-east",
+   "surface": "The opening band of the The Alps & the East, France region page.",
+   "country": "france",
+   "country_name": "France"
+  },
+  {
+   "purpose": "region-hero@france/auvergne",
+   "slot": "region-hero",
+   "target": "france/auvergne",
+   "key": "region:france/auvergne",
+   "path": "/europe/france/auvergne",
+   "surface": "The opening band of the The Auvergne & the Massif Central, France region page.",
+   "country": "france",
+   "country_name": "France"
+  },
+  {
+   "purpose": "region-hero@france/champagne-and-the-north",
+   "slot": "region-hero",
+   "target": "france/champagne-and-the-north",
+   "key": "region:france/champagne-and-the-north",
+   "path": "/europe/france/champagne-and-the-north",
+   "surface": "The opening band of the Champagne & the North, France region page.",
+   "country": "france",
+   "country_name": "France"
+  },
+  {
+   "purpose": "region-hero@france/corsica",
+   "slot": "region-hero",
+   "target": "france/corsica",
+   "key": "region:france/corsica",
+   "path": "/europe/france/corsica",
+   "surface": "The opening band of the Corsica, France region page.",
+   "country": "france",
+   "country_name": "France"
+  },
+  {
+   "purpose": "region-hero@france/loire-and-the-southwest",
+   "slot": "region-hero",
+   "target": "france/loire-and-the-southwest",
+   "key": "region:france/loire-and-the-southwest",
+   "path": "/europe/france/loire-and-the-southwest",
+   "surface": "The opening band of the The Loire & the Southwest, France region page.",
+   "country": "france",
+   "country_name": "France"
+  },
+  {
+   "purpose": "region-hero@france/normandy-brittany",
+   "slot": "region-hero",
+   "target": "france/normandy-brittany",
+   "key": "region:france/normandy-brittany",
+   "path": "/europe/france/normandy-brittany",
+   "surface": "The opening band of the Normandy & Brittany, France region page.",
+   "country": "france",
+   "country_name": "France"
+  },
+  {
+   "purpose": "region-hero@france/paris-and-ile-de-france",
+   "slot": "region-hero",
+   "target": "france/paris-and-ile-de-france",
+   "key": "region:france/paris-and-ile-de-france",
+   "path": "/europe/france/paris-and-ile-de-france",
+   "surface": "The opening band of the Paris & Île-de-France, France region page.",
+   "country": "france",
+   "country_name": "France"
+  },
+  {
+   "purpose": "region-hero@france/provence-and-the-south",
+   "slot": "region-hero",
+   "target": "france/provence-and-the-south",
+   "key": "region:france/provence-and-the-south",
+   "path": "/europe/france/provence-and-the-south",
+   "surface": "The opening band of the Provence & the Mediterranean, France region page.",
+   "country": "france",
+   "country_name": "France"
+  },
+  {
+   "purpose": "region-hero@georgia/tbilisi-and-kakheti",
+   "slot": "region-hero",
+   "target": "georgia/tbilisi-and-kakheti",
+   "key": "region:georgia/tbilisi-and-kakheti",
+   "path": "/europe/georgia/tbilisi-and-kakheti",
+   "surface": "The opening band of the Tbilisi & Kakheti, Georgia region page.",
+   "country": "georgia",
+   "country_name": "Georgia"
+  },
+  {
+   "purpose": "region-hero@georgia/the-caucasus",
+   "slot": "region-hero",
+   "target": "georgia/the-caucasus",
+   "key": "region:georgia/the-caucasus",
+   "path": "/europe/georgia/the-caucasus",
+   "surface": "The opening band of the The Greater Caucasus, Georgia region page.",
+   "country": "georgia",
+   "country_name": "Georgia"
+  },
+  {
+   "purpose": "region-hero@germany/bavaria-and-the-alps",
+   "slot": "region-hero",
+   "target": "germany/bavaria-and-the-alps",
+   "key": "region:germany/bavaria-and-the-alps",
+   "path": "/europe/germany/bavaria-and-the-alps",
+   "surface": "The opening band of the Bavaria & the Alps, Germany region page.",
+   "country": "germany",
+   "country_name": "Germany"
+  },
+  {
+   "purpose": "region-hero@germany/berlin-and-the-east",
+   "slot": "region-hero",
+   "target": "germany/berlin-and-the-east",
+   "key": "region:germany/berlin-and-the-east",
+   "path": "/europe/germany/berlin-and-the-east",
+   "surface": "The opening band of the Berlin & the East, Germany region page.",
+   "country": "germany",
+   "country_name": "Germany"
+  },
+  {
+   "purpose": "region-hero@germany/north-germany",
+   "slot": "region-hero",
+   "target": "germany/north-germany",
+   "key": "region:germany/north-germany",
+   "path": "/europe/germany/north-germany",
+   "surface": "The opening band of the The North, Germany region page.",
+   "country": "germany",
+   "country_name": "Germany"
+  },
+  {
+   "purpose": "region-hero@germany/rhine-and-the-west",
+   "slot": "region-hero",
+   "target": "germany/rhine-and-the-west",
+   "key": "region:germany/rhine-and-the-west",
+   "path": "/europe/germany/rhine-and-the-west",
+   "surface": "The opening band of the The Rhine & the West, Germany region page.",
+   "country": "germany",
+   "country_name": "Germany"
+  },
+  {
+   "purpose": "region-hero@greece/athens-and-the-peloponnese",
+   "slot": "region-hero",
+   "target": "greece/athens-and-the-peloponnese",
+   "key": "region:greece/athens-and-the-peloponnese",
+   "path": "/europe/greece/athens-and-the-peloponnese",
+   "surface": "The opening band of the Athens & the Peloponnese, Greece region page.",
+   "country": "greece",
+   "country_name": "Greece"
+  },
+  {
+   "purpose": "region-hero@greece/northern-greece",
+   "slot": "region-hero",
+   "target": "greece/northern-greece",
+   "key": "region:greece/northern-greece",
+   "path": "/europe/greece/northern-greece",
+   "surface": "The opening band of the Northern Greece, Greece region page.",
+   "country": "greece",
+   "country_name": "Greece"
+  },
+  {
+   "purpose": "region-hero@greece/the-islands",
+   "slot": "region-hero",
+   "target": "greece/the-islands",
+   "key": "region:greece/the-islands",
+   "path": "/europe/greece/the-islands",
+   "surface": "The opening band of the The Islands, Greece region page.",
+   "country": "greece",
+   "country_name": "Greece"
+  },
+  {
+   "purpose": "region-hero@hungary/balaton-and-the-wine-country",
+   "slot": "region-hero",
+   "target": "hungary/balaton-and-the-wine-country",
+   "key": "region:hungary/balaton-and-the-wine-country",
+   "path": "/europe/hungary/balaton-and-the-wine-country",
+   "surface": "The opening band of the Balaton & the Wine Country, Hungary region page.",
+   "country": "hungary",
+   "country_name": "Hungary"
+  },
+  {
+   "purpose": "region-hero@hungary/budapest-and-the-danube-bend",
+   "slot": "region-hero",
+   "target": "hungary/budapest-and-the-danube-bend",
+   "key": "region:hungary/budapest-and-the-danube-bend",
+   "path": "/europe/hungary/budapest-and-the-danube-bend",
+   "surface": "The opening band of the Budapest & the Danube Bend, Hungary region page.",
+   "country": "hungary",
+   "country_name": "Hungary"
+  },
+  {
+   "purpose": "region-hero@iceland/reykjavik-and-the-southwest",
+   "slot": "region-hero",
+   "target": "iceland/reykjavik-and-the-southwest",
+   "key": "region:iceland/reykjavik-and-the-southwest",
+   "path": "/europe/iceland/reykjavik-and-the-southwest",
+   "surface": "The opening band of the Reykjavík & the Southwest, Iceland region page.",
+   "country": "iceland",
+   "country_name": "Iceland"
+  },
+  {
+   "purpose": "region-hero@iceland/south-coast-and-east",
+   "slot": "region-hero",
+   "target": "iceland/south-coast-and-east",
+   "key": "region:iceland/south-coast-and-east",
+   "path": "/europe/iceland/south-coast-and-east",
+   "surface": "The opening band of the The South Coast & East, Iceland region page.",
+   "country": "iceland",
+   "country_name": "Iceland"
+  },
+  {
+   "purpose": "region-hero@iceland/westfjords-and-north",
+   "slot": "region-hero",
+   "target": "iceland/westfjords-and-north",
+   "key": "region:iceland/westfjords-and-north",
+   "path": "/europe/iceland/westfjords-and-north",
+   "surface": "The opening band of the The Westfjords & North, Iceland region page.",
+   "country": "iceland",
+   "country_name": "Iceland"
+  },
+  {
+   "purpose": "region-hero@ireland/dublin-and-the-east",
+   "slot": "region-hero",
+   "target": "ireland/dublin-and-the-east",
+   "key": "region:ireland/dublin-and-the-east",
+   "path": "/europe/ireland/dublin-and-the-east",
+   "surface": "The opening band of the Dublin & the East, Ireland region page.",
+   "country": "ireland",
+   "country_name": "Ireland"
+  },
+  {
+   "purpose": "region-hero@ireland/the-west",
+   "slot": "region-hero",
+   "target": "ireland/the-west",
+   "key": "region:ireland/the-west",
+   "path": "/europe/ireland/the-west",
+   "surface": "The opening band of the The West & the Atlantic, Ireland region page.",
+   "country": "ireland",
+   "country_name": "Ireland"
+  },
+  {
+   "purpose": "region-hero@italy/north-italy",
+   "slot": "region-hero",
+   "target": "italy/north-italy",
+   "key": "region:italy/north-italy",
+   "path": "/europe/italy/north-italy",
+   "surface": "The opening band of the The North & the Dolomites, Italy region page.",
+   "country": "italy",
+   "country_name": "Italy"
+  },
+  {
+   "purpose": "region-hero@italy/rome-and-lazio",
+   "slot": "region-hero",
+   "target": "italy/rome-and-lazio",
+   "key": "region:italy/rome-and-lazio",
+   "path": "/europe/italy/rome-and-lazio",
+   "surface": "The opening band of the Rome & Lazio, Italy region page.",
+   "country": "italy",
+   "country_name": "Italy"
+  },
+  {
+   "purpose": "region-hero@italy/south-italy-and-islands",
+   "slot": "region-hero",
+   "target": "italy/south-italy-and-islands",
+   "key": "region:italy/south-italy-and-islands",
+   "path": "/europe/italy/south-italy-and-islands",
+   "surface": "The opening band of the The South & the Islands, Italy region page.",
+   "country": "italy",
+   "country_name": "Italy"
+  },
+  {
+   "purpose": "region-hero@italy/tuscany-and-the-centre",
+   "slot": "region-hero",
+   "target": "italy/tuscany-and-the-centre",
+   "key": "region:italy/tuscany-and-the-centre",
+   "path": "/europe/italy/tuscany-and-the-centre",
+   "surface": "The opening band of the Tuscany & the Centre, Italy region page.",
+   "country": "italy",
+   "country_name": "Italy"
+  },
+  {
+   "purpose": "region-hero@italy/umbria-and-the-marches",
+   "slot": "region-hero",
+   "target": "italy/umbria-and-the-marches",
+   "key": "region:italy/umbria-and-the-marches",
+   "path": "/europe/italy/umbria-and-the-marches",
+   "surface": "The opening band of the Umbria & the Marches, Italy region page.",
+   "country": "italy",
+   "country_name": "Italy"
+  },
+  {
+   "purpose": "region-hero@kosovo/pristina-and-the-plain",
+   "slot": "region-hero",
+   "target": "kosovo/pristina-and-the-plain",
+   "key": "region:kosovo/pristina-and-the-plain",
+   "path": "/europe/kosovo/pristina-and-the-plain",
+   "surface": "The opening band of the Pristina & the Plain, Kosovo region page.",
+   "country": "kosovo",
+   "country_name": "Kosovo"
+  },
+  {
+   "purpose": "region-hero@kosovo/prizren-and-the-mountains",
+   "slot": "region-hero",
+   "target": "kosovo/prizren-and-the-mountains",
+   "key": "region:kosovo/prizren-and-the-mountains",
+   "path": "/europe/kosovo/prizren-and-the-mountains",
+   "surface": "The opening band of the Prizren & the Mountains, Kosovo region page.",
+   "country": "kosovo",
+   "country_name": "Kosovo"
+  },
+  {
+   "purpose": "region-hero@latvia/kurzeme",
+   "slot": "region-hero",
+   "target": "latvia/kurzeme",
+   "key": "region:latvia/kurzeme",
+   "path": "/europe/latvia/kurzeme",
+   "surface": "The opening band of the Kurzeme & the Coast, Latvia region page.",
+   "country": "latvia",
+   "country_name": "Latvia"
+  },
+  {
+   "purpose": "region-hero@latvia/riga-and-around",
+   "slot": "region-hero",
+   "target": "latvia/riga-and-around",
+   "key": "region:latvia/riga-and-around",
+   "path": "/europe/latvia/riga-and-around",
+   "surface": "The opening band of the Riga & Around, Latvia region page.",
+   "country": "latvia",
+   "country_name": "Latvia"
+  },
+  {
+   "purpose": "region-hero@liechtenstein/rhine-valley-and-mountains",
+   "slot": "region-hero",
+   "target": "liechtenstein/rhine-valley-and-mountains",
+   "key": "region:liechtenstein/rhine-valley-and-mountains",
+   "path": "/europe/liechtenstein/rhine-valley-and-mountains",
+   "surface": "The opening band of the The Rhine Valley & the Mountains, Liechtenstein region page.",
+   "country": "liechtenstein",
+   "country_name": "Liechtenstein"
+  },
+  {
+   "purpose": "region-hero@lithuania/coast-and-centre",
+   "slot": "region-hero",
+   "target": "lithuania/coast-and-centre",
+   "key": "region:lithuania/coast-and-centre",
+   "path": "/europe/lithuania/coast-and-centre",
+   "surface": "The opening band of the The Coast & Centre, Lithuania region page.",
+   "country": "lithuania",
+   "country_name": "Lithuania"
+  },
+  {
+   "purpose": "region-hero@lithuania/vilnius-and-the-east",
+   "slot": "region-hero",
+   "target": "lithuania/vilnius-and-the-east",
+   "key": "region:lithuania/vilnius-and-the-east",
+   "path": "/europe/lithuania/vilnius-and-the-east",
+   "surface": "The opening band of the Vilnius & the East, Lithuania region page.",
+   "country": "lithuania",
+   "country_name": "Lithuania"
+  },
+  {
+   "purpose": "region-hero@luxembourg/capital-and-moselle",
+   "slot": "region-hero",
+   "target": "luxembourg/capital-and-moselle",
+   "key": "region:luxembourg/capital-and-moselle",
+   "path": "/europe/luxembourg/capital-and-moselle",
+   "surface": "The opening band of the The Capital & the Moselle, Luxembourg region page.",
+   "country": "luxembourg",
+   "country_name": "Luxembourg"
+  },
+  {
+   "purpose": "region-hero@luxembourg/mullerthal-and-ardennes",
+   "slot": "region-hero",
+   "target": "luxembourg/mullerthal-and-ardennes",
+   "key": "region:luxembourg/mullerthal-and-ardennes",
+   "path": "/europe/luxembourg/mullerthal-and-ardennes",
+   "surface": "The opening band of the Mullerthal & the Ardennes, Luxembourg region page.",
+   "country": "luxembourg",
+   "country_name": "Luxembourg"
+  },
+  {
+   "purpose": "region-hero@malta/gozo",
+   "slot": "region-hero",
+   "target": "malta/gozo",
+   "key": "region:malta/gozo",
+   "path": "/europe/malta/gozo",
+   "surface": "The opening band of the Gozo & Comino, Malta region page.",
+   "country": "malta",
+   "country_name": "Malta"
+  },
+  {
+   "purpose": "region-hero@malta/malta-island",
+   "slot": "region-hero",
+   "target": "malta/malta-island",
+   "key": "region:malta/malta-island",
+   "path": "/europe/malta/malta-island",
+   "surface": "The opening band of the Malta, Malta region page.",
+   "country": "malta",
+   "country_name": "Malta"
+  },
+  {
+   "purpose": "region-hero@moldova/chisinau-and-the-cellars",
+   "slot": "region-hero",
+   "target": "moldova/chisinau-and-the-cellars",
+   "key": "region:moldova/chisinau-and-the-cellars",
+   "path": "/europe/moldova/chisinau-and-the-cellars",
+   "surface": "The opening band of the Chișinău & the Cellars, Moldova region page.",
+   "country": "moldova",
+   "country_name": "Moldova"
+  },
+  {
+   "purpose": "region-hero@moldova/orheiul-vechi",
+   "slot": "region-hero",
+   "target": "moldova/orheiul-vechi",
+   "key": "region:moldova/orheiul-vechi",
+   "path": "/europe/moldova/orheiul-vechi",
+   "surface": "The opening band of the Orheiul Vechi & the North, Moldova region page.",
+   "country": "moldova",
+   "country_name": "Moldova"
+  },
+  {
+   "purpose": "region-hero@monaco/the-rock-and-the-harbour",
+   "slot": "region-hero",
+   "target": "monaco/the-rock-and-the-harbour",
+   "key": "region:monaco/the-rock-and-the-harbour",
+   "path": "/europe/monaco/the-rock-and-the-harbour",
+   "surface": "The opening band of the The Rock & the Harbour, Monaco region page.",
+   "country": "monaco",
+   "country_name": "Monaco"
+  },
+  {
+   "purpose": "region-hero@montenegro/bay-of-kotor",
+   "slot": "region-hero",
+   "target": "montenegro/bay-of-kotor",
+   "key": "region:montenegro/bay-of-kotor",
+   "path": "/europe/montenegro/bay-of-kotor",
+   "surface": "The opening band of the The Bay of Kotor & the Coast, Montenegro region page.",
+   "country": "montenegro",
+   "country_name": "Montenegro"
+  },
+  {
+   "purpose": "region-hero@montenegro/durmitor-and-the-north",
+   "slot": "region-hero",
+   "target": "montenegro/durmitor-and-the-north",
+   "key": "region:montenegro/durmitor-and-the-north",
+   "path": "/europe/montenegro/durmitor-and-the-north",
+   "surface": "The opening band of the Durmitor & the North, Montenegro region page.",
+   "country": "montenegro",
+   "country_name": "Montenegro"
+  },
+  {
+   "purpose": "region-hero@netherlands/north-and-islands",
+   "slot": "region-hero",
+   "target": "netherlands/north-and-islands",
+   "key": "region:netherlands/north-and-islands",
+   "path": "/europe/netherlands/north-and-islands",
+   "surface": "The opening band of the The North & the Wadden Islands, Netherlands region page.",
+   "country": "netherlands",
+   "country_name": "Netherlands"
+  },
+  {
+   "purpose": "region-hero@netherlands/randstad",
+   "slot": "region-hero",
+   "target": "netherlands/randstad",
+   "key": "region:netherlands/randstad",
+   "path": "/europe/netherlands/randstad",
+   "surface": "The opening band of the The Randstad, Netherlands region page.",
+   "country": "netherlands",
+   "country_name": "Netherlands"
+  },
+  {
+   "purpose": "region-hero@north-macedonia/ohrid-and-the-southwest",
+   "slot": "region-hero",
+   "target": "north-macedonia/ohrid-and-the-southwest",
+   "key": "region:north-macedonia/ohrid-and-the-southwest",
+   "path": "/europe/north-macedonia/ohrid-and-the-southwest",
+   "surface": "The opening band of the Ohrid & the Southwest, North Macedonia region page.",
+   "country": "north-macedonia",
+   "country_name": "North Macedonia"
+  },
+  {
+   "purpose": "region-hero@north-macedonia/skopje-and-the-north",
+   "slot": "region-hero",
+   "target": "north-macedonia/skopje-and-the-north",
+   "key": "region:north-macedonia/skopje-and-the-north",
+   "path": "/europe/north-macedonia/skopje-and-the-north",
+   "surface": "The opening band of the Skopje & the North, North Macedonia region page.",
+   "country": "north-macedonia",
+   "country_name": "North Macedonia"
+  },
+  {
+   "purpose": "region-hero@norway/fjord-norway",
+   "slot": "region-hero",
+   "target": "norway/fjord-norway",
+   "key": "region:norway/fjord-norway",
+   "path": "/europe/norway/fjord-norway",
+   "surface": "The opening band of the Fjord Norway, Norway region page.",
+   "country": "norway",
+   "country_name": "Norway"
+  },
+  {
+   "purpose": "region-hero@norway/nord-norge",
+   "slot": "region-hero",
+   "target": "norway/nord-norge",
+   "key": "region:norway/nord-norge",
+   "path": "/europe/norway/nord-norge",
+   "surface": "The opening band of the Northern Norway, Norway region page.",
+   "country": "norway",
+   "country_name": "Norway"
+  },
+  {
+   "purpose": "region-hero@norway/ostlandet",
+   "slot": "region-hero",
+   "target": "norway/ostlandet",
+   "key": "region:norway/ostlandet",
+   "path": "/europe/norway/ostlandet",
+   "surface": "The opening band of the Østlandet & the East, Norway region page.",
+   "country": "norway",
+   "country_name": "Norway"
+  },
+  {
+   "purpose": "region-hero@norway/sorlandet",
+   "slot": "region-hero",
+   "target": "norway/sorlandet",
+   "key": "region:norway/sorlandet",
+   "path": "/europe/norway/sorlandet",
+   "surface": "The opening band of the Sørlandet & the South Coast, Norway region page.",
+   "country": "norway",
+   "country_name": "Norway"
+  },
+  {
+   "purpose": "region-hero@norway/svalbard",
+   "slot": "region-hero",
+   "target": "norway/svalbard",
+   "key": "region:norway/svalbard",
+   "path": "/europe/norway/svalbard",
+   "surface": "The opening band of the Svalbard, Norway region page.",
+   "country": "norway",
+   "country_name": "Norway"
+  },
+  {
+   "purpose": "region-hero@norway/trondelag",
+   "slot": "region-hero",
+   "target": "norway/trondelag",
+   "key": "region:norway/trondelag",
+   "path": "/europe/norway/trondelag",
+   "surface": "The opening band of the Trøndelag, Norway region page.",
+   "country": "norway",
+   "country_name": "Norway"
+  },
+  {
+   "purpose": "region-hero@poland/lesser-poland",
+   "slot": "region-hero",
+   "target": "poland/lesser-poland",
+   "key": "region:poland/lesser-poland",
+   "path": "/europe/poland/lesser-poland",
+   "surface": "The opening band of the Lesser Poland & the South, Poland region page.",
+   "country": "poland",
+   "country_name": "Poland"
+  },
+  {
+   "purpose": "region-hero@poland/masovia-and-the-centre",
+   "slot": "region-hero",
+   "target": "poland/masovia-and-the-centre",
+   "key": "region:poland/masovia-and-the-centre",
+   "path": "/europe/poland/masovia-and-the-centre",
+   "surface": "The opening band of the Masovia & the Centre, Poland region page.",
+   "country": "poland",
+   "country_name": "Poland"
+  },
+  {
+   "purpose": "region-hero@poland/pomerania-and-the-east",
+   "slot": "region-hero",
+   "target": "poland/pomerania-and-the-east",
+   "key": "region:poland/pomerania-and-the-east",
+   "path": "/europe/poland/pomerania-and-the-east",
+   "surface": "The opening band of the Pomerania & the East, Poland region page.",
+   "country": "poland",
+   "country_name": "Poland"
+  },
+  {
+   "purpose": "region-hero@portugal/alentejo-and-the-south",
+   "slot": "region-hero",
+   "target": "portugal/alentejo-and-the-south",
+   "key": "region:portugal/alentejo-and-the-south",
+   "path": "/europe/portugal/alentejo-and-the-south",
+   "surface": "The opening band of the The Alentejo & the South, Portugal region page.",
+   "country": "portugal",
+   "country_name": "Portugal"
+  },
+  {
+   "purpose": "region-hero@portugal/lisbon-and-the-west",
+   "slot": "region-hero",
+   "target": "portugal/lisbon-and-the-west",
+   "key": "region:portugal/lisbon-and-the-west",
+   "path": "/europe/portugal/lisbon-and-the-west",
+   "surface": "The opening band of the Lisbon & the West, Portugal region page.",
+   "country": "portugal",
+   "country_name": "Portugal"
+  },
+  {
+   "purpose": "region-hero@portugal/porto-and-the-douro",
+   "slot": "region-hero",
+   "target": "portugal/porto-and-the-douro",
+   "key": "region:portugal/porto-and-the-douro",
+   "path": "/europe/portugal/porto-and-the-douro",
+   "surface": "The opening band of the Porto & the Douro, Portugal region page.",
+   "country": "portugal",
+   "country_name": "Portugal"
+  },
+  {
+   "purpose": "region-hero@romania/bucharest-and-the-danube",
+   "slot": "region-hero",
+   "target": "romania/bucharest-and-the-danube",
+   "key": "region:romania/bucharest-and-the-danube",
+   "path": "/europe/romania/bucharest-and-the-danube",
+   "surface": "The opening band of the Bucharest & the Danube Delta, Romania region page.",
+   "country": "romania",
+   "country_name": "Romania"
+  },
+  {
+   "purpose": "region-hero@romania/bucovina-and-maramures",
+   "slot": "region-hero",
+   "target": "romania/bucovina-and-maramures",
+   "key": "region:romania/bucovina-and-maramures",
+   "path": "/europe/romania/bucovina-and-maramures",
+   "surface": "The opening band of the Bucovina & Maramureș, Romania region page.",
+   "country": "romania",
+   "country_name": "Romania"
+  },
+  {
+   "purpose": "region-hero@romania/transylvania",
+   "slot": "region-hero",
+   "target": "romania/transylvania",
+   "key": "region:romania/transylvania",
+   "path": "/europe/romania/transylvania",
+   "surface": "The opening band of the Transylvania, Romania region page.",
+   "country": "romania",
+   "country_name": "Romania"
+  },
+  {
+   "purpose": "region-hero@russia/moscow-and-the-golden-ring",
+   "slot": "region-hero",
+   "target": "russia/moscow-and-the-golden-ring",
+   "key": "region:russia/moscow-and-the-golden-ring",
+   "path": "/europe/russia/moscow-and-the-golden-ring",
+   "surface": "The opening band of the Moscow & the Golden Ring, Russia region page.",
+   "country": "russia",
+   "country_name": "Russia"
+  },
+  {
+   "purpose": "region-hero@russia/north-west-russia",
+   "slot": "region-hero",
+   "target": "russia/north-west-russia",
+   "key": "region:russia/north-west-russia",
+   "path": "/europe/russia/north-west-russia",
+   "surface": "The opening band of the The Northwest, Russia region page.",
+   "country": "russia",
+   "country_name": "Russia"
+  },
+  {
+   "purpose": "region-hero@san-marino/monte-titano",
+   "slot": "region-hero",
+   "target": "san-marino/monte-titano",
+   "key": "region:san-marino/monte-titano",
+   "path": "/europe/san-marino/monte-titano",
+   "surface": "The opening band of the Monte Titano, San Marino region page.",
+   "country": "san-marino",
+   "country_name": "San Marino"
+  },
+  {
+   "purpose": "region-hero@serbia/belgrade-and-vojvodina",
+   "slot": "region-hero",
+   "target": "serbia/belgrade-and-vojvodina",
+   "key": "region:serbia/belgrade-and-vojvodina",
+   "path": "/europe/serbia/belgrade-and-vojvodina",
+   "surface": "The opening band of the Belgrade & Vojvodina, Serbia region page.",
+   "country": "serbia",
+   "country_name": "Serbia"
+  },
+  {
+   "purpose": "region-hero@serbia/western-serbia",
+   "slot": "region-hero",
+   "target": "serbia/western-serbia",
+   "key": "region:serbia/western-serbia",
+   "path": "/europe/serbia/western-serbia",
+   "surface": "The opening band of the Western & Southern Serbia, Serbia region page.",
+   "country": "serbia",
+   "country_name": "Serbia"
+  },
+  {
+   "purpose": "region-hero@slovakia/bratislava-and-the-southwest",
+   "slot": "region-hero",
+   "target": "slovakia/bratislava-and-the-southwest",
+   "key": "region:slovakia/bratislava-and-the-southwest",
+   "path": "/europe/slovakia/bratislava-and-the-southwest",
+   "surface": "The opening band of the Bratislava & the Southwest, Slovakia region page.",
+   "country": "slovakia",
+   "country_name": "Slovakia"
+  },
+  {
+   "purpose": "region-hero@slovakia/tatras-and-the-north",
+   "slot": "region-hero",
+   "target": "slovakia/tatras-and-the-north",
+   "key": "region:slovakia/tatras-and-the-north",
+   "path": "/europe/slovakia/tatras-and-the-north",
+   "surface": "The opening band of the The Tatras & the North, Slovakia region page.",
+   "country": "slovakia",
+   "country_name": "Slovakia"
+  },
+  {
+   "purpose": "region-hero@slovenia/julian-alps",
+   "slot": "region-hero",
+   "target": "slovenia/julian-alps",
+   "key": "region:slovenia/julian-alps",
+   "path": "/europe/slovenia/julian-alps",
+   "surface": "The opening band of the The Julian Alps, Slovenia region page.",
+   "country": "slovenia",
+   "country_name": "Slovenia"
+  },
+  {
+   "purpose": "region-hero@slovenia/ljubljana-karst-coast",
+   "slot": "region-hero",
+   "target": "slovenia/ljubljana-karst-coast",
+   "key": "region:slovenia/ljubljana-karst-coast",
+   "path": "/europe/slovenia/ljubljana-karst-coast",
+   "surface": "The opening band of the Ljubljana, the Karst & the Coast, Slovenia region page.",
+   "country": "slovenia",
+   "country_name": "Slovenia"
+  },
+  {
+   "purpose": "region-hero@spain/andalusia",
+   "slot": "region-hero",
+   "target": "spain/andalusia",
+   "key": "region:spain/andalusia",
+   "path": "/europe/spain/andalusia",
+   "surface": "The opening band of the Andalusia, Spain region page.",
+   "country": "spain",
+   "country_name": "Spain"
+  },
+  {
+   "purpose": "region-hero@spain/aragon-and-the-pyrenees",
+   "slot": "region-hero",
+   "target": "spain/aragon-and-the-pyrenees",
+   "key": "region:spain/aragon-and-the-pyrenees",
+   "path": "/europe/spain/aragon-and-the-pyrenees",
+   "surface": "The opening band of the Aragón & the Pyrenees, Spain region page.",
+   "country": "spain",
+   "country_name": "Spain"
+  },
+  {
+   "purpose": "region-hero@spain/balearics",
+   "slot": "region-hero",
+   "target": "spain/balearics",
+   "key": "region:spain/balearics",
+   "path": "/europe/spain/balearics",
+   "surface": "The opening band of the The Balearic Islands, Spain region page.",
+   "country": "spain",
+   "country_name": "Spain"
+  },
+  {
+   "purpose": "region-hero@spain/catalonia-and-the-east",
+   "slot": "region-hero",
+   "target": "spain/catalonia-and-the-east",
+   "key": "region:spain/catalonia-and-the-east",
+   "path": "/europe/spain/catalonia-and-the-east",
+   "surface": "The opening band of the Catalonia & the East, Spain region page.",
+   "country": "spain",
+   "country_name": "Spain"
+  },
+  {
+   "purpose": "region-hero@spain/extremadura",
+   "slot": "region-hero",
+   "target": "spain/extremadura",
+   "key": "region:spain/extremadura",
+   "path": "/europe/spain/extremadura",
+   "surface": "The opening band of the Extremadura, Spain region page.",
+   "country": "spain",
+   "country_name": "Spain"
+  },
+  {
+   "purpose": "region-hero@spain/green-spain",
+   "slot": "region-hero",
+   "target": "spain/green-spain",
+   "key": "region:spain/green-spain",
+   "path": "/europe/spain/green-spain",
+   "surface": "The opening band of the Green Spain, Spain region page.",
+   "country": "spain",
+   "country_name": "Spain"
+  },
+  {
+   "purpose": "region-hero@spain/madrid-and-the-centre",
+   "slot": "region-hero",
+   "target": "spain/madrid-and-the-centre",
+   "key": "region:spain/madrid-and-the-centre",
+   "path": "/europe/spain/madrid-and-the-centre",
+   "surface": "The opening band of the Madrid & the Centre, Spain region page.",
+   "country": "spain",
+   "country_name": "Spain"
+  },
+  {
+   "purpose": "region-hero@sweden/south-sweden",
+   "slot": "region-hero",
+   "target": "sweden/south-sweden",
+   "key": "region:sweden/south-sweden",
+   "path": "/europe/sweden/south-sweden",
+   "surface": "The opening band of the Skåne & the South, Sweden region page.",
+   "country": "sweden",
+   "country_name": "Sweden"
+  },
+  {
+   "purpose": "region-hero@sweden/stockholm-and-the-archipelago",
+   "slot": "region-hero",
+   "target": "sweden/stockholm-and-the-archipelago",
+   "key": "region:sweden/stockholm-and-the-archipelago",
+   "path": "/europe/sweden/stockholm-and-the-archipelago",
+   "surface": "The opening band of the Stockholm & the Archipelago, Sweden region page.",
+   "country": "sweden",
+   "country_name": "Sweden"
+  },
+  {
+   "purpose": "region-hero@sweden/swedish-lapland",
+   "slot": "region-hero",
+   "target": "sweden/swedish-lapland",
+   "key": "region:sweden/swedish-lapland",
+   "path": "/europe/sweden/swedish-lapland",
+   "surface": "The opening band of the Swedish Lapland, Sweden region page.",
+   "country": "sweden",
+   "country_name": "Sweden"
+  },
+  {
+   "purpose": "region-hero@switzerland/bernese-oberland",
+   "slot": "region-hero",
+   "target": "switzerland/bernese-oberland",
+   "key": "region:switzerland/bernese-oberland",
+   "path": "/europe/switzerland/bernese-oberland",
+   "surface": "The opening band of the The Bernese Oberland, Switzerland region page.",
+   "country": "switzerland",
+   "country_name": "Switzerland"
+  },
+  {
+   "purpose": "region-hero@switzerland/graubunden",
+   "slot": "region-hero",
+   "target": "switzerland/graubunden",
+   "key": "region:switzerland/graubunden",
+   "path": "/europe/switzerland/graubunden",
+   "surface": "The opening band of the Graubünden & the East, Switzerland region page.",
+   "country": "switzerland",
+   "country_name": "Switzerland"
+  },
+  {
+   "purpose": "region-hero@switzerland/valais-and-the-south",
+   "slot": "region-hero",
+   "target": "switzerland/valais-and-the-south",
+   "key": "region:switzerland/valais-and-the-south",
+   "path": "/europe/switzerland/valais-and-the-south",
+   "surface": "The opening band of the Valais, Ticino & the South, Switzerland region page.",
+   "country": "switzerland",
+   "country_name": "Switzerland"
+  },
+  {
+   "purpose": "region-hero@turkiye/aegean-and-mediterranean",
+   "slot": "region-hero",
+   "target": "turkiye/aegean-and-mediterranean",
+   "key": "region:turkiye/aegean-and-mediterranean",
+   "path": "/europe/turkiye/aegean-and-mediterranean",
+   "surface": "The opening band of the The Aegean & Mediterranean, Türkiye region page.",
+   "country": "turkiye",
+   "country_name": "Türkiye"
+  },
+  {
+   "purpose": "region-hero@turkiye/central-anatolia",
+   "slot": "region-hero",
+   "target": "turkiye/central-anatolia",
+   "key": "region:turkiye/central-anatolia",
+   "path": "/europe/turkiye/central-anatolia",
+   "surface": "The opening band of the Central Anatolia, Türkiye region page.",
+   "country": "turkiye",
+   "country_name": "Türkiye"
+  },
+  {
+   "purpose": "region-hero@turkiye/istanbul-and-thrace",
+   "slot": "region-hero",
+   "target": "turkiye/istanbul-and-thrace",
+   "key": "region:turkiye/istanbul-and-thrace",
+   "path": "/europe/turkiye/istanbul-and-thrace",
+   "surface": "The opening band of the Istanbul & Thrace, Türkiye region page.",
+   "country": "turkiye",
+   "country_name": "Türkiye"
+  },
+  {
+   "purpose": "region-hero@ukraine/kyiv-and-the-centre",
+   "slot": "region-hero",
+   "target": "ukraine/kyiv-and-the-centre",
+   "key": "region:ukraine/kyiv-and-the-centre",
+   "path": "/europe/ukraine/kyiv-and-the-centre",
+   "surface": "The opening band of the Kyiv & the Centre, Ukraine region page.",
+   "country": "ukraine",
+   "country_name": "Ukraine"
+  },
+  {
+   "purpose": "region-hero@ukraine/western-ukraine",
+   "slot": "region-hero",
+   "target": "ukraine/western-ukraine",
+   "key": "region:ukraine/western-ukraine",
+   "path": "/europe/ukraine/western-ukraine",
+   "surface": "The opening band of the Western Ukraine, Ukraine region page.",
+   "country": "ukraine",
+   "country_name": "Ukraine"
+  },
+  {
+   "purpose": "region-hero@united-kingdom/london-and-the-south-east",
+   "slot": "region-hero",
+   "target": "united-kingdom/london-and-the-south-east",
+   "key": "region:united-kingdom/london-and-the-south-east",
+   "path": "/europe/united-kingdom/london-and-the-south-east",
+   "surface": "The opening band of the London & the South East, United Kingdom region page.",
+   "country": "united-kingdom",
+   "country_name": "United Kingdom"
+  },
+  {
+   "purpose": "region-hero@united-kingdom/northern-ireland",
+   "slot": "region-hero",
+   "target": "united-kingdom/northern-ireland",
+   "key": "region:united-kingdom/northern-ireland",
+   "path": "/europe/united-kingdom/northern-ireland",
+   "surface": "The opening band of the Northern Ireland, United Kingdom region page.",
+   "country": "united-kingdom",
+   "country_name": "United Kingdom"
+  },
+  {
+   "purpose": "region-hero@united-kingdom/scotland",
+   "slot": "region-hero",
+   "target": "united-kingdom/scotland",
+   "key": "region:united-kingdom/scotland",
+   "path": "/europe/united-kingdom/scotland",
+   "surface": "The opening band of the Scotland, United Kingdom region page.",
+   "country": "united-kingdom",
+   "country_name": "United Kingdom"
+  },
+  {
+   "purpose": "region-hero@united-kingdom/the-north",
+   "slot": "region-hero",
+   "target": "united-kingdom/the-north",
+   "key": "region:united-kingdom/the-north",
+   "path": "/europe/united-kingdom/the-north",
+   "surface": "The opening band of the Northern England, United Kingdom region page.",
+   "country": "united-kingdom",
+   "country_name": "United Kingdom"
+  },
+  {
+   "purpose": "region-hero@united-kingdom/wales",
+   "slot": "region-hero",
+   "target": "united-kingdom/wales",
+   "key": "region:united-kingdom/wales",
+   "path": "/europe/united-kingdom/wales",
+   "surface": "The opening band of the Wales, United Kingdom region page.",
+   "country": "united-kingdom",
+   "country_name": "United Kingdom"
+  },
+  {
+   "purpose": "region-hero@united-kingdom/west-country",
+   "slot": "region-hero",
+   "target": "united-kingdom/west-country",
+   "key": "region:united-kingdom/west-country",
+   "path": "/europe/united-kingdom/west-country",
+   "surface": "The opening band of the The West Country, United Kingdom region page.",
+   "country": "united-kingdom",
+   "country_name": "United Kingdom"
+  },
+  {
+   "purpose": "region-hero@vatican-city/vatican",
+   "slot": "region-hero",
+   "target": "vatican-city/vatican",
+   "key": "region:vatican-city/vatican",
+   "path": "/europe/vatican-city/vatican",
+   "surface": "The opening band of the Vatican City, Vatican City region page.",
+   "country": "vatican-city",
+   "country_name": "Vatican City"
+  },
+  {
    "purpose": "story-hero@a-language-with-no-relatives",
    "slot": "story-hero",
    "target": "a-language-with-no-relatives",
@@ -6626,6 +8432,110 @@
    "key": "story:what-a-pilgrimage-is-for",
    "path": "/stories/what-a-pilgrimage-is-for",
    "surface": "The opening image of the story “What a pilgrimage is for when you do not believe”."
+  },
+  {
+   "purpose": "theme-hero@grand-tour-europe",
+   "slot": "theme-hero",
+   "target": "grand-tour-europe",
+   "key": "theme:grand-tour-europe",
+   "path": "/themes/grand-tour-europe",
+   "surface": "The opening band of the The Grand Tour theme page."
+  },
+  {
+   "purpose": "theme-hero@island-europe",
+   "slot": "theme-hero",
+   "target": "island-europe",
+   "key": "theme:island-europe",
+   "path": "/themes/island-europe",
+   "surface": "The opening band of the Island Europe theme page."
+  },
+  {
+   "purpose": "theme-hero@jewish-europe",
+   "slot": "theme-hero",
+   "target": "jewish-europe",
+   "key": "theme:jewish-europe",
+   "path": "/themes/jewish-europe",
+   "surface": "The opening band of the Jewish Europe theme page."
+  },
+  {
+   "purpose": "theme-hero@medieval-europe",
+   "slot": "theme-hero",
+   "target": "medieval-europe",
+   "key": "theme:medieval-europe",
+   "path": "/themes/medieval-europe",
+   "surface": "The opening band of the Medieval Europe theme page."
+  },
+  {
+   "purpose": "theme-hero@modernist-europe",
+   "slot": "theme-hero",
+   "target": "modernist-europe",
+   "key": "theme:modernist-europe",
+   "path": "/themes/modernist-europe",
+   "surface": "The opening band of the Modernist Europe theme page."
+  },
+  {
+   "purpose": "theme-hero@mountain-europe",
+   "slot": "theme-hero",
+   "target": "mountain-europe",
+   "key": "theme:mountain-europe",
+   "path": "/themes/mountain-europe",
+   "surface": "The opening band of the Mountain Europe theme page."
+  },
+  {
+   "purpose": "theme-hero@rail-europe",
+   "slot": "theme-hero",
+   "target": "rail-europe",
+   "key": "theme:rail-europe",
+   "path": "/themes/rail-europe",
+   "surface": "The opening band of the Rail Europe theme page."
+  },
+  {
+   "purpose": "theme-hero@renaissance-europe",
+   "slot": "theme-hero",
+   "target": "renaissance-europe",
+   "key": "theme:renaissance-europe",
+   "path": "/themes/renaissance-europe",
+   "surface": "The opening band of the Renaissance Europe theme page."
+  },
+  {
+   "purpose": "theme-hero@roman-europe",
+   "slot": "theme-hero",
+   "target": "roman-europe",
+   "key": "theme:roman-europe",
+   "path": "/themes/roman-europe",
+   "surface": "The opening band of the Roman Europe theme page."
+  },
+  {
+   "purpose": "theme-hero@sacred-europe",
+   "slot": "theme-hero",
+   "target": "sacred-europe",
+   "key": "theme:sacred-europe",
+   "path": "/themes/sacred-europe",
+   "surface": "The opening band of the Sacred Europe theme page."
+  },
+  {
+   "purpose": "theme-hero@thermal-europe",
+   "slot": "theme-hero",
+   "target": "thermal-europe",
+   "key": "theme:thermal-europe",
+   "path": "/themes/thermal-europe",
+   "surface": "The opening band of the Thermal Europe theme page."
+  },
+  {
+   "purpose": "theme-hero@viking-europe",
+   "slot": "theme-hero",
+   "target": "viking-europe",
+   "key": "theme:viking-europe",
+   "path": "/themes/viking-europe",
+   "surface": "The opening band of the Viking Europe theme page."
+  },
+  {
+   "purpose": "theme-hero@wine-europe",
+   "slot": "theme-hero",
+   "target": "wine-europe",
+   "key": "theme:wine-europe",
+   "path": "/themes/wine-europe",
+   "surface": "The opening band of the Wine Europe theme page."
   }
  ]
 }

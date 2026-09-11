@@ -138,6 +138,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return self._json(body)
         if self.path.startswith("/photos/" + PHOTO2_ID):
             return self._json(STUB["meta2"])
+        # EVERY FAMILY NEEDS ITS OWN ID, because one photograph may not fill
+        # two surfaces and the register refuses it in both directions.
+        want = self.path.split("/photos/")[-1].split("?")[0]
+        if want in STUB.get("extra", {}):
+            body = dict(STUB["meta2"])
+            body["id"] = int(want)
+            return self._json(body)
         if self.path.startswith("/original2.jpg"):
             self.send_response(200)
             self.send_header("Content-Type", "image/jpeg")
@@ -269,6 +276,7 @@ def main(argv):
     # register refuses that in both directions and this suite asserts both,
     # so exercising a slot instance needs its own id and its own bytes.
     STUB["jpeg2"] = _jpeg(2600, 1300)
+    STUB["extra"] = {}
     STUB["notajpeg"] = b"\x89PNG\r\n\x1a\n" + b"\0" * 40000
     STUB["meta"] = {
         "id": int(PHOTO_ID), "width": 2560, "height": 1440,
@@ -313,7 +321,7 @@ def main(argv):
                 # owns taking it out, or the next run of checks.py finds an
                 # original with no register row and says so.
                 if (f.startswith("homepage-hero") or f.startswith("door-mountains")
-                        or f.startswith("country-hero@")):
+                        or "-hero@" in f or f.startswith("country-hero")):
                     os.remove(os.path.join(d, f))
         # AND site/ IS REBUILT, because these tests build it. Restoring the
         # register without rebuilding leaves the shipped homepage carrying an
@@ -540,7 +548,7 @@ def main(argv):
         at = os.path.join(ROOT, "site", "europe", "austria", "index.html")
         austria = open(at, encoding="utf-8").read() if os.path.exists(at) else ""
         check("the band renders on the country it was acquired for",
-              "countryband" in austria)
+              "pageband" in austria)
         # AND THE PORTRAIT IS STILL THERE. The band is an addition, not a
         # replacement: the country plate is this family's signature moment
         # and it is what says which country the page is about.
@@ -551,11 +559,56 @@ def main(argv):
         # has no row, and the band asks the register directly for exactly
         # that reason.
         check("the band carries a photograph rather than a plate",
-              "<picture" in austria and "countryband" in austria)
+              "<picture" in austria and "pageband" in austria)
+        # ── AND EVERY OTHER FAMILY THAT OPENS ON ONE ──────────────────
+        #
+        # Six page families grew a container in one commit and five of them
+        # would otherwise have been exactly as unexercised as the country
+        # band was: `pageband()` renders nothing with an empty register, so
+        # an empty register tests none of them. Each is acquired against the
+        # stub, derived, and asserted ON ITS OWN PAGE — which is the only
+        # place the question can be answered, because a band computed into a
+        # variable and never interpolated into the body is invisible to every
+        # count. This suite has already been paid for by that exact fault
+        # twice: a `style="` attribute the CSP forbids, and two dead CSS
+        # rules, both surviving because the register was empty.
+        FAMILIES = [
+            ("region-hero@austria/tyrol",
+             os.path.join("site", "europe", "austria", "tyrol")),
+            ("journey-hero@arctic-to-the-baltic",
+             os.path.join("site", "journeys", "arctic-to-the-baltic")),
+            ("interest-hero@architecture",
+             os.path.join("site", "interests", "architecture")),
+            ("macro-hero@nordic", os.path.join("site", "discover", "nordic")),
+            ("theme-hero@medieval-europe",
+             os.path.join("site", "themes", "medieval-europe")),
+            ("category-hero@nature",
+             os.path.join("site", "experiences", "nature")),
+        ]
+        for i, (purpose, where) in enumerate(FAMILIES):
+            pid = str(4000000 + i)
+            STUB["extra"][pid] = purpose
+            r = run(A + ["--photo-id", pid, "--purpose", purpose,
+                         "--alt", f"a test pattern for {purpose}"], env)
+            check(f"{purpose.split('@')[0]} acquires", r.returncode == 0,
+                  (r.stdout + r.stderr)[-300:])
+            dz = run(["scripts/images/derive.py", purpose], {})
+            check(f"{purpose.split('@')[0]} derives", dz.returncode == 0,
+                  (dz.stdout + dz.stderr)[-300:])
+        b3 = run(["tools/build.py"], {})
+        check("the site builds with every family's band in it",
+              b3.returncode == 0, (b3.stderr or "")[-300:])
+        for purpose, where in FAMILIES:
+            f = os.path.join(ROOT, where, "index.html")
+            html = open(f, encoding="utf-8").read() if os.path.exists(f) else ""
+            check(f"{purpose.split('@')[0]} renders its band on its own page",
+                  "pageband" in html and "<picture" in html,
+                  f"{where}: {'no file' if not html else 'no band'}")
+
         bt = os.path.join(ROOT, "site", "europe", "belgium", "index.html")
         belgium = open(bt, encoding="utf-8").read() if os.path.exists(bt) else ""
         check("and no band at all on a country with no photograph",
-              bool(belgium) and "countryband" not in belgium)
+              bool(belgium) and "pageband" not in belgium)
         v2 = run(["tools/build.py", "check"], {})
         check("the dataset still validates with a slot instance registered",
               v2.returncode == 0, (v2.stdout + v2.stderr)[-300:])

@@ -674,6 +674,30 @@ def load():
     PURPOSES = _read(os.path.join(DATA, "image-purposes.json")).get("purposes", {})
     images = _read(os.path.join(DATA, "images.json")).get("images", {})
     seen_purpose = {}
+    # EVERY SOURCE A SLOT CAN NAME, IN ONE PLACE.
+    #
+    # `targets()` reads whichever key the slot declares, so each new slot
+    # family added a requirement on every caller that hands this module a
+    # PARTIAL dataset — and this is the one that has one. It was patched for
+    # `countries` and broke again the moment six more arrived, which is the
+    # signature of a list that should not be a list: it is derived from
+    # `imageslots.SOURCE_KEY` now, so a seventh source cannot be forgotten
+    # here. A missing key would surface as a bare KeyError from inside a
+    # loop, which is how the first one did.
+    _AVAILABLE = {"countries": countries, "cities": index, "stories": stories,
+                  "journeys": journeys, "themes": themes,
+                  "interests": interests, "categories": categories,
+                  "macros": tax["macros"]}
+    slot_sources = {k: _AVAILABLE[k] for k in set(imageslots.SOURCE_KEY.values())
+                    if k in _AVAILABLE}
+    _missing = set(imageslots.SOURCE_KEY.values()) - set(_AVAILABLE)
+    if _missing:
+        raise KeyError(
+            f"imageslots declares sources reading {sorted(_missing)} and this "
+            f"validator has no such collection in scope — a slot family was "
+            f"added without telling the one caller that builds a partial "
+            f"dataset")
+
     for key, row in sorted(images.items()):
         where = f"images.json > {key}"
         for field in IMAGE_REQUIRED:
@@ -711,9 +735,7 @@ def load():
         # dataset, and this was the one that had one. It failed as a
         # KeyError inside the validator rather than as a sentence, which is
         # why `targets()` now says which key is missing.
-        spec = imageslots.resolve(row.get("purpose") or "",
-                                  {"cities": index, "stories": stories,
-                                   "countries": countries}) \
+        spec = imageslots.resolve(row.get("purpose") or "", slot_sources) \
             if row.get("purpose") else None
         p.require(spec is not None, where,
                   f"purpose must be declared in data/image-purposes.json, or "

@@ -5529,6 +5529,41 @@ def c_role_search():
     return n
 
 
+@check("no two purposes reduce to one file stem")
+def c_purpose_stems():
+    """A COLLISION HERE IS TWO PHOTOGRAPHS OVERWRITING EACH OTHER'S ORIGINAL
+    WITH EVERY PROVENANCE FIELD CORRECT ABOUT THE WRONG ONE.
+
+    A purpose is a name and a filename is not the same thing: a slot
+    instance carries a path in its target, and `photographs/<stem>.jpg` with
+    a slash in it names a file three directories deep — which is why
+    `imageslots.stem()` folds `/` to `__`. That fold is where a collision
+    could enter, so this asserts it cannot: 837 purposes, 837 stems.
+
+    `__` rather than `-` for exactly this reason — a slug may contain a
+    hyphen, so `a/b-c` and `a-b/c` would fold to the same name.
+    """
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "islots", os.path.join(ROOT, "tools", "lib", "imageslots.py"))
+    islots = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(islots)
+    reg = json.load(open(os.path.join(ROOT, "desk", "registry.json"),
+                         encoding="utf-8"))
+    seen = {}
+    for row in reg["purposes"]:
+        st = islots.stem(row["purpose"])
+        if "/" in st:
+            fail(f"purpose {row['purpose']} still folds to {st!r}, which "
+                 f"names a file in a directory nothing creates")
+        if st in seen:
+            fail(f"purposes {seen[st]} and {row['purpose']} both reduce to "
+                 f"the stem {st!r} — two photographs would overwrite each "
+                 f"other's original")
+        seen[st] = row["purpose"]
+    return len(seen)
+
+
 @check("desk/registry.json is not stale")
 def c_desk_registry():
     """THE HOSTED DESK SERVES A GENERATED FILE, SO IT CAN BE STALE.
