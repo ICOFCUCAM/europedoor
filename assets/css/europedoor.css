@@ -1048,6 +1048,35 @@ main.wide { max-width: 92rem; }
 
 /* ── forms (the planner) ──────────────────────────────────── */
 .form { display: grid; gap: var(--s5); background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); padding: var(--s5); }
+/* THE SEARCH BOX IS THE PAGE, AND IT WAS IN A CARD.
+   /search is an instrument whose entire interface is one field; wrapping it
+   in a bordered, filled, rounded panel says "separate object, placed here by
+   a system" about the one thing the page exists to be. That is the Stay
+   layer's own rule — no border box, no radius, no shadow, no fill — applied
+   to the control instead of to a band.
+   The field takes the weight the panel was carrying: a larger box, the label
+   at instrument weight above it, and the help under it at a caption's
+   measure. Nothing new is declared; --t-md is the lede size and the padding
+   is a step already on the scale. */
+#searchform.form { background: none; border: 0; border-radius: 0; padding: 0; }
+#searchform .field > label { font-size: var(--t-sm); letter-spacing: .12em; }
+#searchform .field input[type="text"] {
+  font-size: var(--t-md); padding: var(--s4) var(--s4);
+  border-color: color-mix(in srgb, var(--ink-3) 55%, transparent); }
+#searchform .field input[type="text"]:focus { border-color: var(--sea); }
+/* AND FOUR OF THE SEVEN BARS UNDER IT WERE A SPECK. The index extent is
+   drawn as a share of its largest kind on an 80-pixel track, and the largest
+   kind is 319 of 550 — so journeys, themes, stories and fund projects
+   rendered at 5, 4, 3 and 4 per cent, which is between 2.4 and 4 pixels
+   wide and three tall. A chart on which four of seven series cannot be seen
+   is the wrong track, not the wrong data: the shares are true and the
+   drawing has to be able to show them.
+   Wider, and with the floor the journeys index already uses on its own
+   segments — `min-width` on the fill, because a share that rounds to two
+   pixels should still be a mark rather than nothing. 9 of 319 goes from 2.4
+   pixels to 6.3. */
+#results .rowmeta .hopbar { width: min(14rem, 30vw); }
+#results .rowmeta .hopbar > span { min-width: 3px; }
 /* :not(.inlinecheck) is load-bearing. The first attempt at this changed the
    group heading from a <label> to a <p class="fieldhead"> and left the rule
    as `.field > label` — but the checkbox's own wrapper IS a <label> and IS a
@@ -1067,6 +1096,15 @@ main.wide { max-width: 92rem; }
   width: 100%; font: inherit; padding: var(--s3); border: 1px solid var(--rule); border-radius: var(--radius);
   background: var(--paper); color: var(--ink);
 }
+/* A HELP LINE IS A CAPTION FOR THE CONTROL ABOVE IT AND IT WAS TOUCHING
+   THE BORDER. Measured on /search: the input's box ends at y=454 and the
+   paragraph explaining what the box understands starts at y=454 — zero
+   pixels, so it reads as text that has fallen inside the field. The label
+   above has eight. And the measure was the panel's: 1,118 pixels of box with
+   a 544-pixel paragraph in it and 574 of empty card beside, which is the
+   "six hundred pixels of white beside it" fault this stylesheet already
+   records twice, at the size of a caption. */
+.field > .small { margin-top: var(--s3); max-width: 62ch; }
 .field textarea { resize: vertical; min-height: 6rem; font-family: var(--mono);
                   font-size: var(--t-sm); }
 .fieldset { border: 0; padding: 0; margin: 0; }
