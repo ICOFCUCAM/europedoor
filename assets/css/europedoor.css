@@ -1438,21 +1438,49 @@ main.wide { max-width: 92rem; }
     display: grid; grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas: "brand util" "nav nav";
     align-items: center; gap: var(--s2) var(--s4);
+    /* THE MASTHEAD SAT ON A 24px GUTTER AND EVERY WORD UNDER IT ON 16.
+       `main` is padded --s4 at this breakpoint and `.masthead-in` was left
+       on the desk's --s5, so the wordmark and the whole navigation were
+       indented eight pixels further than the h1, the breadcrumb and every
+       line of prose, on 1,033 pages at phone width. Nothing counts a
+       gutter. It also happens to be the sixteen pixels the section row
+       needs to fit on one line at 390. */
+    padding-inline: var(--s4);
   }
   .masthead-in .wordmark { grid-area: brand; }
   .masthead-in .navutil  { grid-area: util; }
-  .masthead-in .nav {
-    grid-area: nav; flex-wrap: nowrap; overflow-x: auto;
-    scrollbar-width: none; -webkit-overflow-scrolling: touch;
-    /* The scroll is contained here rather than on the page: the browser
-       suite fails on a document that scrolls sideways at 390, which is how
-       the 47-pixel city-page overflow was found. */
-    margin-right: calc(var(--s5) * -1); padding-right: var(--s5);
-    -webkit-mask-image: linear-gradient(to right, #000 88%, transparent);
-    mask-image: linear-gradient(to right, #000 88%, transparent);
-  }
-  .masthead-in .nav::-webkit-scrollbar { display: none; }
-  .nav { gap: var(--s4); font-size: var(--t-xs); }
+  .masthead-in .nav { grid-area: nav; flex-wrap: wrap; row-gap: var(--s2); }
+  /* THE ROW THAT SCROLLED SIDEWAYS HID THREE SECTIONS AND CALLED THE FADE
+     AN AFFORDANCE. Measured at 390: content 552px in a 366px box, so Plan,
+     Stories and Events were entirely off-screen, and at 320 Journeys was
+     too. The only signal was a 44px mask fade at the right edge. A link a
+     reader cannot see is not reachable because it is focusable.
+
+     The old comment framed the choice as "drop them and lose the tab order"
+     against "scroll them and keep it", and it was right about five items
+     and wrong to apply that to all seven. /discover, /plan and /my-europe
+     are in the thumb bar, which appears at THIS EXACT breakpoint — so
+     hiding those three here hides nothing from anybody, and showing them
+     was a duplication that cost the other four their place on the screen.
+     Explore and Discover are the same URL under two names, one bar apart.
+
+     What is left wraps instead of scrolling: Countries, Experiences,
+     Journeys, Stories and Events, all visible, all tappable, no gesture. */
+  .masthead-in .nav a.inthumb, .masthead-in .navutil a.inthumb { display: none; }
+  /* ONE ROW, AND THE ROW IS WHAT THE MEASUREMENT BOUGHT. Five sections at
+     the desk tracking measured 332px of content plus four 16px gaps in a
+     366px box, so they wrapped to two rows and the masthead grew from 93px
+     to 120 — 21% of a 844px phone in navigation, which is the opposite of
+     what this change is for. Tracking is the lever: .04em over ~40
+     uppercase characters at 12px is 19px of pure letter-spacing, and a
+     nav label is read as a shape rather than spelled out, so it loses
+     nothing at .015em. With an 8px gap that is 332 -> 301 in a 342px box
+     at 390 and one row.
+
+     320 STILL TAKES TWO, and that is stated rather than hidden: 272px of
+     usable width cannot hold five words at any honest size. The layout
+     adapts; it does not pretend. */
+  .nav { gap: var(--s2); font-size: var(--t-xs); letter-spacing: .015em; }
   .nav a { white-space: nowrap; }
   main { padding: var(--s5) var(--s4) var(--s8); }
   .leg { grid-template-columns: 1fr; gap: var(--s2); }

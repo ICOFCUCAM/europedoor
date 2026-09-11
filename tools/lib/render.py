@@ -1271,10 +1271,28 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
         raise ValueError(f"{path}: unknown world {world!r}; it is one of {WORLDS}")
     if accent not in ACCENTS:
         raise ValueError(f"{path}: unknown accent {accent!r}; it is one of {ACCENTS}")
+    # A LINK THE THUMB BAR ALSO CARRIES IS MARKED, and the set is derived
+    # from BOTTOM_NAV rather than typed here, because a hand-listed copy of
+    # another list is a list that is wrong one commit after somebody edits
+    # the other one.
+    #
+    # WHY IT MATTERS: below 44rem the masthead's seven sections used to be
+    # one line that scrolled sideways, on the reasoning that dropping them
+    # would take them out of the tab order too. That reasoning is right
+    # about five of them and was applied to all seven — /discover and /plan
+    # are in the thumb bar, which appears at exactly the same 44rem
+    # breakpoint, so hiding those two in the masthead hides nothing from
+    # anybody. Measured before: at 390 the row's content was 552px in a
+    # 366px box, so Plan, Stories and Events were WHOLLY off-screen behind
+    # a horizontal swipe inside a 24px strip whose only affordance was a
+    # 44px mask fade; at 320 Journeys was off too. Three of seven primary
+    # sections reachable on a phone only by a gesture nobody discovers.
     nav = []
+    thumbed = {href for href, _l, _d in BOTTOM_NAV}
     for href, label, _blurb in NAV:
         mark = ' aria-current="page"' if area == label.lower() else ''
-        nav.append(f'<a href="{href}"{mark}>{esc(label)}</a>')
+        dup = ' class="inthumb"' if href in thumbed else ''
+        nav.append(f'<a href="{href}"{mark}{dup}>{esc(label)}</a>')
     # Scripts are hashed for the same reason the stylesheet is. Callers pass
     # "/assets/js/my-europe.js"; the published URL carries the content hash.
     scripts_html = "".join(
@@ -1317,7 +1335,7 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
     <nav class="nav" aria-label="{esc(T("nav.aria.primary"))}">{"".join(nav)}</nav>
     <div class="navutil">
       <a class="navsearch" href="/search"><span aria-hidden="true">⌕</span> {esc(T("nav.search"))}</a>
-      <a class="navmine" href="/my-europe">{esc(T("nav.myeurope"))}</a>
+      <a class="navmine inthumb" href="/my-europe">{esc(T("nav.myeurope"))}</a>
     </div>
   </div>
 </header>

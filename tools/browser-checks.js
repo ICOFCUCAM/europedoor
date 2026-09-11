@@ -3492,7 +3492,13 @@ async function main() {
                      "/experiences/food/", "/method/", "/beyond-the-obvious/",
                      "/events/", "/search/", "/my-europe/", "/europe-in/islands/",
                      "/interests/mountains/", "/sources/", "/about/"];
-    for (const W of [390, 1280]) {
+    // 320 IS IN THE LIST BECAUSE THE WORDMARK WAS CUT THERE AND NOWHERE
+    // ELSE. This ran at 390 and 1280 and reported clean while `.wordmark`
+    // measured 116px of content in a 90px box at 320 — the brand name,
+    // sliced, on the narrowest phone still in use, because the masthead's
+    // two utility links were taking the width. A clipping check that only
+    // runs at the design width tests the width somebody already looked at.
+    for (const W of [320, 390, 1280]) {
       const cp = await browser.newPage({ viewport: { width: W, height: 900 } });
       const hits = [];
       for (const u of CLIPPED) {
@@ -3521,6 +3527,77 @@ async function main() {
          `${hits.slice(0, 3).join("; ")}. A word cut in half reads as a broken ` +
          `renderer, which is why a map label sliced by the aperture is dropped ` +
          `rather than drawn`);
+    }
+  }
+
+
+  /* A LINK A READER CANNOT SEE IS NOT REACHABLE BECAUSE IT IS FOCUSABLE.
+   *
+   * Below 44rem the masthead's seven sections were one line that scrolled
+   * sideways, and the comment above the rule called the mask fade at its
+   * right edge "the affordance saying so". Measured: at 390 the row held
+   * 552px of content in a 366px box, so PLAN, STORIES and EVENTS were
+   * wholly off-screen, and at 320 JOURNEYS was too — three of seven
+   * primary sections behind a horizontal swipe inside a 24px strip, with a
+   * 44px gradient as the only signal that there was anything to swipe to.
+   *
+   * Nothing counted it. Every link was in the DOM, in the tab order, of
+   * the right size and the right colour, and the document did not scroll
+   * sideways — which is the thing the suite DID assert, because that is
+   * the 47-pixel city-page overflow it was written for. Overflow contained
+   * inside a scroller passes that check by design.
+   *
+   * So this asserts the promise instead: every visible link in the
+   * masthead is inside the viewport. It is deliberately about VISIBLE
+   * links — /discover, /plan and /my-europe are hidden here at this
+   * breakpoint because the thumb bar carries all three at the same
+   * breakpoint, and hiding a duplicate is not hiding a destination.
+   *
+   * AND THE GUTTERS MUST AGREE. `main` is padded --s4 on a phone and
+   * `.masthead-in` was left on the desk's --s5, so the wordmark and the
+   * whole navigation were indented eight pixels further than the h1, the
+   * breadcrumb and every line of prose, on every page. Nothing counts a
+   * gutter, and at thumbnail size nothing sees one.
+   */
+  {
+    const NAVPAGES = ["/", "/europe/austria/", "/journeys/", "/stories/", "/events/"];
+    for (const W of [320, 390, 430]) {
+      const np = await browser.newPage({ viewport: { width: W, height: 844 } });
+      for (const u of NAVPAGES) {
+        const r = await np.goto(base + u, { waitUntil: "load" });
+        if (!r || r.status() !== 200) continue;
+        const got = await np.evaluate(() => {
+          const vis = (e) => {
+            const b = e.getBoundingClientRect();
+            return b.width > 0 && b.height > 0 && getComputedStyle(e).display !== "none";
+          };
+          const out = [];
+          for (const a of document.querySelectorAll(".masthead a")) {
+            if (!vis(a)) continue;
+            const b = a.getBoundingClientRect();
+            if (b.right > window.innerWidth + 1 || b.left < -1)
+              out.push(`${(a.textContent || "").trim()} @${Math.round(b.left)}..${Math.round(b.right)}`);
+          }
+          const g = (s) => {
+            const e = document.querySelector(s);
+            return e ? Math.round(e.getBoundingClientRect().left) : null;
+          };
+          return { off: out, mast: g(".masthead-in .wordmark"), main: g("main h1") };
+        });
+        checked++;
+        ok(got.off.length === 0,
+           `${u} at ${W}: ${got.off.length} masthead link(s) outside the ` +
+           `viewport — ${got.off.slice(0, 4).join(", ")}. A section a reader ` +
+           `cannot see is reachable only by a gesture nobody discovers`);
+        if (got.mast !== null && got.main !== null) {
+          checked++;
+          ok(Math.abs(got.mast - got.main) <= 1,
+             `${u} at ${W}: the masthead starts at ${got.mast}px and the page ` +
+             `content at ${got.main}px. The brand and the navigation must sit ` +
+             `on the same gutter as the words underneath them`);
+        }
+      }
+      await np.close();
     }
   }
 
