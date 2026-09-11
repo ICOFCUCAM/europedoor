@@ -571,7 +571,16 @@ body {
   font-synthesis-weight: none;
 }
 
-h1, h2, h3, h4 { font-family: var(--display); font-weight: 600; line-height: 1.12; margin: 0; letter-spacing: -0.01em; }
+/* `text-wrap: balance` ON EVERY HEADING, NOT ON SEVEN OF THEM. It was on
+   the manifesto, the closing statement, the essay hed and four others —
+   chosen one at a time, wherever somebody looked. Measured across 668
+   headings on twenty-two pages: 30 run to more than one line at 390 and
+   FIVE of those end on an orphan under a third of the widest line, the worst
+   a 24-pixel last line under a 341-pixel one on /how-it-works. It is one
+   declaration and it is the browser's own line-breaker; the seven
+   per-element copies are gone. */
+h1, h2, h3, h4 { font-family: var(--display); font-weight: 600; line-height: 1.12;
+                 margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
 h1 { font-size: clamp(var(--t-3xl), 5.2vw, var(--t-5xl)); }
 h2 { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); }
 h3 { font-size: var(--t-lg); }
@@ -788,7 +797,11 @@ main.wide { max-width: 92rem; }
 /* ── page heads ───────────────────────────────────────────── */
 .pagehead { margin-bottom: var(--s7); }
 .pagehead .kicker { margin-bottom: var(--s2); }
-.pagehead p.lede { font-size: var(--t-md); color: var(--ink-2); max-width: 44rem; margin-top: var(--s4); }
+/* No `color`: `.lede` already sets --ink-2 and every one of these is a
+   `.lede`, so this restated the value it was about to inherit — the
+   redundancy the dead-rule scan exists to find, and the one that took the
+   count over its ceiling. */
+.pagehead p.lede { font-size: var(--t-md); max-width: 44rem; margin-top: var(--s4); }
 .kicker { font-size: var(--t-xs); letter-spacing: .14em; text-transform: uppercase; color: var(--door); margin: 0 0 var(--s2); font-weight: 600; }
 /* AND THE ACCENT IS A MARK ON A PAGE HEAD, NOT ONLY A TINT ON ELEVEN PIXELS
    OF TYPE.
@@ -2212,7 +2225,7 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .essayhead h1 {
   font-size: clamp(var(--t-3xl), 5.2vw, var(--t-5xl));
   line-height: 1.12; letter-spacing: -.022em; max-width: 20ch;
-  text-wrap: balance; margin: var(--s4) 0 0;
+  margin: var(--s4) 0 0;
 }
 .essayhead .deck {
   font-family: var(--display); font-size: clamp(var(--t-lg), 2.4vw, var(--t-2xl));
@@ -4516,8 +4529,7 @@ body[data-hero] .masthead { position: sticky; }
    projection, what the map is not — belongs below the instrument, and on
    /map it already lived there. */
 .pagehead.instrument { display: grid; gap: var(--s2); padding-bottom: var(--s3); }
-.pagehead.instrument h1 { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); max-width: 46ch;
-                          text-wrap: balance; }
+.pagehead.instrument h1 { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); max-width: 46ch; }
 .pagehead.instrument .kicker { margin: 0; }
 .pagehead.instrument .lede { font-size: var(--t-md); max-width: 52ch; margin: 0; }
 
@@ -5498,7 +5510,7 @@ body[data-hero] .masthead { position: sticky; }
 .closein { display: grid; grid-template-columns: minmax(0, 1fr) auto;
            gap: var(--s7) var(--s8); align-items: start; }
 .closesay { max-width: 32rem; }
-.closing h2 { text-wrap: balance;
+.closing h2 {
               margin: 0 0 var(--s4); }
 .closebody { color: var(--ink-2); font-size: var(--t-md); margin: 0 0 var(--s5); }
 .closego { margin: 0; }
@@ -5656,7 +5668,7 @@ body[data-hero] .masthead { position: sticky; }
 main > .pagehead:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
 .iherotext h1 {
   font-size: clamp(var(--t-3xl), 5.2vw, var(--t-5xl));
-  line-height: 1.12; margin: 0 0 var(--s4); text-wrap: balance;
+  line-height: 1.12; margin: 0 0 var(--s4);
 }
 /* No `color`: `.lede` already resolves to --ink-2, and the scan reads a
  * restatement of an inherited value as a rule that changes nothing. */

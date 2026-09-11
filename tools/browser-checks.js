@@ -3531,6 +3531,69 @@ async function main() {
   }
 
 
+  /* NO HEADING ENDS ON AN ORPHAN.
+   *
+   * `text-wrap: balance` was on seven elements, chosen one at a time
+   * wherever somebody looked at a page. Measured across 668 headings on
+   * twenty-two pages at 390: thirty run to more than one line and FIVE of
+   * those ended on a last line under a third of the widest — the worst a
+   * 24-pixel last line under a 341-pixel one on /how-it-works, which is two
+   * characters alone under a heading.
+   *
+   * It is one declaration on `h1, h2, h3, h4` now, and this is what keeps
+   * it: a heading that breaks badly is a typographic defect nothing else
+   * here counts, and the browser's own line-breaker is the only thing that
+   * can see it. Measured with Range rects, because a heading's box tells
+   * you nothing about where its lines fall.
+   */
+  {
+    const OP = ["/", "/countries/", "/europe/italy/", "/europe/austria/tyrol/",
+      "/europe/france/alps-and-east/chamonix/", "/experiences/",
+      "/journeys/", "/stories/", "/events/", "/themes/", "/interests/",
+      "/beyond-the-obvious/", "/about/", "/method/", "/how-it-works/", "/fund/"];
+    for (const W of [390, 1280]) {
+      const op = await browser.newPage({ viewport: { width: W, height: 900 } });
+      const bad = [];
+      let seen = 0;
+      for (const u of OP) {
+        const r = await op.goto(base + u, { waitUntil: "load" });
+        if (!r || r.status() !== 200) continue;
+        const got = await op.evaluate(() => {
+          const out = [];
+          const range = document.createRange();
+          for (const h of document.querySelectorAll("main h1, main h2, main h3")) {
+            const t = (h.textContent || "").trim();
+            if (!t || h.closest(".visually-hidden")) continue;
+            range.selectNodeContents(h);
+            const rects = [...range.getClientRects()].filter((x) => x.width > 1);
+            const tops = [...new Set(rects.map((x) => Math.round(x.top)))];
+            if (tops.length < 2) { out.push([t, false]); continue; }
+            const wide = (tp) => rects.filter((x) => Math.round(x.top) === tp)
+              .reduce((a, x) => a + x.width, 0);
+            const last = wide(Math.max(...tops));
+            const full = Math.max(...tops.map(wide));
+            out.push([t, last < full * 0.34, Math.round(last), Math.round(full)]);
+          }
+          return out;
+        });
+        for (const [t, isOrphan, lw, fw] of got) {
+          seen++;
+          if (isOrphan) bad.push(`${u} "${t.slice(0, 40)}" ${lw}/${fw}px`);
+        }
+      }
+      await op.close();
+      checked++;
+      ok(seen > 300,
+         `the orphan scan read ${seen} headings at ${W} and this site has ` +
+         `hundreds — it has stopped finding them`);
+      checked++;
+      ok(bad.length === 0,
+         `${bad.length} heading(s) end on a line under a third of their widest ` +
+         `at ${W}: ${bad.slice(0, 3).join("; ")}. text-wrap: balance is on every ` +
+         `heading and something is overriding it`);
+    }
+  }
+
   /* THE DOORS STRIP WITH ONE, TWO AND THREE PHOTOGRAPHS — A STATE NOTHING
    * COULD SEE.
    *
