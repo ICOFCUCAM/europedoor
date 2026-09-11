@@ -173,6 +173,10 @@ publishes the contact sheet as an artifact, the editor approves by
 dispatching acquire with the id. This is what exists today, and it is the
 reason fourteen of thirty sections are already satisfied.
 
+**CHOSEN: (b), by the owner.** What follows was built against it, and no
+real photograph is acquired — everything is tested against the existing stub
+provider, as the brief's closing line instructs.
+
 **Recommendation: (b).** It gives the brief's actual acceptance criterion —
 "an editor can discover, evaluate, acquire, provenance, process, approve and
 publish without manually downloading a file, while the credential remains
@@ -186,3 +190,39 @@ status machine are worth building either way.
 **This is the owner's call and the work below it is blocked on nothing** —
 section 3's six items are being built first, because all three options need
 all six.
+
+
+---
+
+## 5 · What the desk is, as built
+
+`python3 tools/desk/serve.py` → `http://127.0.0.1:8765`, sign in, browse,
+approve, and the photograph lands on a branch.
+
+| § | now |
+|---|---|
+| 2 · navigation | Find images · Library · Provenance |
+| 3 · discovery | a search box, the slot's own requirements read out beside it |
+| 4 · candidate card | a contact sheet: the photograph, photographer, native size, aspect, id, whether it meets the slot and why not, and whether it is already registered |
+| 5 · purpose first-class | the slot picker is the first control; there is no way to search without one |
+| 6 · acquisition dialogue | the photograph, the five facts, what will happen, and the word Acquire |
+| 7 · security | the key is in the process and never in a response, a log, the DOM or a commit; the browser sends a provider, a photo id, a purpose and an alt text |
+| 9 · never by position | the approval carries an id; there is no index anywhere in either half |
+| 11 · storage | the register is the asset record and the desk reads it; moving the bytes to object storage changes `derive.py`'s output path and nothing in the desk |
+| 15 · status machine | DERIVED, never stored — a stored state goes stale the moment somebody edits the register by hand |
+| 17 · progress | eight steps with a state each, and on failure the step, what it said, and that nothing was published |
+| 18 · library | every slot with its status, filterable by status, slot and text |
+| 20 · slots | three templates covering 583 entities, plus ten one-of-a-kind purposes |
+| 21 · requirements from the slot | the line under the search box is read out of the slot, not typed into the form |
+| 24 · rate limits | a 429 is reported and never retried around |
+| 25 · duplicates | a candidate already in the register says so, and names every purpose it fills |
+| 26 · tests | `tools/desk-tests.py`, 50 checks against the stub, three of them proved red |
+| 27 · render tests | every screen rendered at 1440 and 390; six defects found and fixed, none of which any count could see |
+
+**Still not built, and each says why.** A PR is not opened by the desk —
+sending work outward is a person's decision, and the branch is left for them.
+The replacement workflow's UI is not built; its data half is (a purpose holds
+one photograph, and re-acquiring the same id for the same purpose is a replay
+while a different id is refused). And no slot exists for a country, region,
+experience or journey hero, because those pages have no photograph container
+in the markup: a slot nobody can fill is what `$requirements` already refuses.

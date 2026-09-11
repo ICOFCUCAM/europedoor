@@ -27,6 +27,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | naming, branding, domains | **`docs/brand-lock.md`** — settled, enforced, and the trademark is contested: EUROPEDOOR is in use in the doors trade, so no ®, no ™, nothing announced |
 | **colour, the mark, voice, the manifesto** | **`docs/brand.md`** — the Brand Bible as built, including the four logo directions that were rejected and why |
 | **which family gets a photograph, and what it must do there** | **`docs/image-philosophy.md`** — twelve families, twelve visual languages. One row is measured (the homepage); six are claims and none may be bought until measured; three families get none ever |
+| **acquiring a photograph without touching a file — the desk, the sign-in, what the browser may send** | **`docs/media-desk-audit.md`** — Phase 1 of the Media Desk brief: what the pipeline already is, which of its thirty sections were already satisfied, and the finding that shaped everything after (there is no Backdoor, no server and no database anywhere in this product). Then run `python3 tools/desk/serve.py` |
 | photographs, or "why is there no picture here" | **`docs/images.md`** — the pipeline is built and enforced; the library is empty |
 | **the Postgres/PostGIS model, the API, Next.js, auth, search, the AI pipeline** | **`docs/technical-foundation.md`** — a destination with a trigger, not a plan for Monday. Nothing in it should be built yet |
 | what to build next | **`docs/roadmap.md`**, and **`docs/content-report.md`** for where the dataset is thin |
@@ -2755,6 +2756,62 @@ one destination each and the three advisory countries are stripped from the
 planner index, so 44 of 50 carry it and the six that do not are decided by
 the route rather than by a threshold somebody picked.
 
+**THE MEDIA DESK IS A LOCAL PROCESS, AND THAT IS A SECURITY DECISION RATHER
+THAN A CONVENIENCE.** An editor signs in at `127.0.0.1:8765`, browses
+candidates, approves one, and the photograph is acquired, hashed, derived,
+registered, gated and committed to a branch — without ever handling a file or
+seeing a key. The key never reaches the browser, which is the brief's own
+first constraint, so the desk needs a trusted server-side half; putting that
+half on europedoor.com would add a credential-holding, authenticated service
+to the production origin of a product whose whole posture is `default-src
+'none'`, no server, no session and no database. **Nothing is added to the
+site, and the CSP does not move.**
+
+**It reuses the pipeline rather than becoming a second one.** It does not
+search (that is `discover.cached_search`, so one cache and one rate limit),
+does not download (that is `acquire.py`, by id, asserting the returned id is
+the requested one), and does not write a register row, build a derivative or
+compose a PR body. **It does not push and does not open a pull request** —
+sending work outward is a decision a person makes, not a side effect of
+clicking Acquire.
+
+**THE BROWSER NEVER HOLDS A PROVIDER URL, AND THAT IS NOT THE SAME AS NOT
+FETCHING ONE.** The first version gave each candidate its preview URL and
+proxied `/api/thumb?u=<url>` behind a host allowlist. That works and is the
+wrong shape: a route that fetches an address a caller supplies is a
+server-side request forgery with a guard in front of it, and a guard is
+something the next person widens. A search records `token → url` in the
+process and the candidate carries only the token, so **there is no
+caller-supplied address to check.**
+
+**Four defects only rendering the screens found**, which is the §27 rule
+earning its place immediately:
+
+| | |
+|---|---|
+| `[hidden]` is a UA `display: none` and `.gate { display: grid }` beat it | the hidden sign-in screen laid itself out — 138 pixels of empty page above the header, on every screen |
+| a slot's note is written for somebody reading the JSON | rendered whole it pushed the search box 900px down and the contact sheet off screen. First sentence is the hint; the rest is a disclosure |
+| each filter label and its control were separate grid cells | "Slot" rendered to the RIGHT of the status select. `for=` was correct throughout, which is exactly why no check saw it |
+| the header was a flex row with no wrap | **Sign out** was off the right edge at 390 — the masthead and the section nav on the site itself both had this, twice |
+
+And two more from one change: adding the photograph to the acquisition
+dialogue pushed **both buttons off the bottom** — a confirmation whose
+confirm button cannot be seen — and pinning the bar then showed that **a
+sticky element inside a padded scroller only covers the content box**, so the
+list scrolled past it and showed through on either side of an opaque middle.
+
+**The tests own the boundary and not the pipeline.** `photo-tests.py` already
+proves fetch-by-id, refusing a mismatched id, keeping the original, never
+upscaling and generating the PR body from the register; re-testing those
+through the desk would be testing one thing twice and calling it coverage.
+`desk-tests.py` asserts what is new — every route refuses without a session,
+a wrong passcode costs time and issues nothing, a POST without the desk
+header is refused, the key is absent from every response and from the desk's
+own log, an unknown thumbnail token serves nothing, and **the register and
+the working tree are untouched by the suite.** It never acquires: a test that
+did would write a register row, build the site and make a commit in the
+repository it is testing.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
@@ -2773,6 +2830,7 @@ the rest.
     python3 tools/invariants.py --check       what a visual change may not move
     python3 tools/plate-variation.py --check  the plates have not got more alike
     python3 tools/photo-tests.py              the acquisition pipeline, against a stub provider
+    python3 tools/desk-tests.py               the Media Desk: the sign-in, and what the browser may send
 
 And three more that are deliberately NOT gates. Two write an image rather
 than a verdict: `node tools/hero-sheet.js` draws every discovered candidate
