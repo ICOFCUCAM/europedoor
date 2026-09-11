@@ -3335,6 +3335,95 @@ async function main() {
     await lc.close();
   }
 
+
+  /* THE RATIO IS THE INSTRUCTION, AND NOTHING HAD EVER MEASURED IT.
+   *
+   * docs/palette.json opens with "the ratio is the instruction, not the hex
+   * codes: a palette gives you a blue website with gold buttons; a ratio
+   * gives you European editorial design over futuristic infrastructure" —
+   * 60 limestone, 25 graphite, 10 cobalt, 5 accent. The only assertion on it
+   * was that the four numbers add to 100. A declaration nobody measures is a
+   * mood board with a schema.
+   *
+   * Measured here on the pixels a reader is actually painted, over twelve
+   * pages chosen to span the families rather than to flatter: both worlds,
+   * an index, a destination, a country, an instrument, a prose page.
+   * Classified by CHROMA rather than by HSL saturation, because limestone is
+   * #f7f6f3 and HSL calls that 20% saturated — the first version of this
+   * counted the paper as an accent and reported the site 60% terracotta.
+   * Chroma (max - min) is 0.016 for limestone and 0.055 for the atlas
+   * parchment, so a tenth separates the neutrals from everything that is a
+   * colour.
+   *
+   * The bands are wide on purpose. This is not a target to hit per page — a
+   * country page is nearly all paper and /map is nearly all graphite, and
+   * both are correct. It is a guard against the two ways a palette dies:
+   * the ground stops being the ground, and the accent eats the page.
+   */
+  {
+    const PAGES = ["/", "/europe/austria/", "/europe/norway/fjord-norway/bergen/",
+                   "/themes/", "/journeys/", "/stories/", "/map/", "/plan/",
+                   "/experiences/food/", "/method/", "/beyond-the-obvious/",
+                   "/events/"];
+    const rc = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    const tot = { limestone: 0, graphite: 0, cobalt: 0, accent: 0 };
+    let px = 0;
+    for (const u of PAGES) {
+      const r = await rc.goto(base + u, { waitUntil: "load" });
+      if (!r || r.status() !== 200) continue;
+      const buf = await rc.screenshot();
+      const got = await rc.evaluate(async (b64) => {
+        const img = new Image();
+        img.src = "data:image/png;base64," + b64;
+        await img.decode();
+        const c = document.createElement("canvas");
+        c.width = img.width; c.height = img.height;
+        const x = c.getContext("2d");
+        x.drawImage(img, 0, 0);
+        const d = x.getImageData(0, 0, c.width, c.height).data;
+        const out = { limestone: 0, graphite: 0, cobalt: 0, accent: 0 };
+        for (let i = 0; i < d.length; i += 4) {
+          const R = d[i] / 255, G = d[i + 1] / 255, B = d[i + 2] / 255;
+          const mx = Math.max(R, G, B), mn = Math.min(R, G, B);
+          const l = (mx + mn) / 2, dl = mx - mn;
+          if (dl < 0.10) { out[l > 0.55 ? "limestone" : "graphite"]++; continue; }
+          let h = mx === R ? ((G - B) / dl) % 6
+                : mx === G ? (B - R) / dl + 2 : (R - G) / dl + 4;
+          h *= 60; if (h < 0) h += 360;
+          out[h >= 185 && h <= 270 ? "cobalt" : "accent"]++;
+        }
+        return out;
+      }, buf.toString("base64"));
+      for (const k of Object.keys(tot)) { tot[k] += got[k]; px += got[k]; }
+      checked++;                       // one page measured
+    }
+    await rc.close();
+    const pc = {};
+    for (const k of Object.keys(tot)) pc[k] = 100 * tot[k] / (px || 1);
+    const say = Object.entries(pc)
+      .map(([k, v]) => `${k} ${v.toFixed(1)}%`).join(", ");
+    ok(px > 0, "the palette-ratio measurement examined no pixels at all");
+    ok(pc.limestone >= 45 && pc.limestone <= 78,
+       `limestone paints ${pc.limestone.toFixed(1)}% of the measured pages ` +
+       `and the ratio makes it the ground at 60 (${say}). Outside 45-78 the ` +
+       `paper has stopped being what the site is made of`);
+    ok(pc.graphite >= 8,
+       `graphite paints ${pc.graphite.toFixed(1)}% (${say}). It is the ink, ` +
+       `the dark world and every map opening — below 8 one of those has gone`);
+    ok(pc.cobalt <= 24,
+       `cobalt paints ${pc.cobalt.toFixed(1)}% of the measured pages and the ` +
+       `ratio gives it 10 (${say}). A continent drawn in the signature is a ` +
+       `network diagram, which is the association the cartography split ` +
+       `exists to escape`);
+    ok(pc.accent >= 0.2,
+       `the accent paints ${pc.accent.toFixed(2)}% (${say}). Terracotta and ` +
+       `atlantic are declared at 5 and are the entire art-directional ` +
+       `difference between a story and a country encyclopedia; below this ` +
+       `they have stopped existing as colours`);
+    console.log(`    palette ratio measured: ${say}  ` +
+                `(declared 60/25/10/5)`);
+  }
+
   ok(errors.length === 0, `console errors:\n    ${errors.slice(0, 5).join("\n    ")}`);
 
   await browser.close();

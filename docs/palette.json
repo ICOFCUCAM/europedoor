@@ -180,7 +180,8 @@
     "limestone": 60,
     "graphite": 25,
     "cobalt": 10,
-    "accent": 5
+    "accent": 5,
+    "$measured": "MEASURED FOR THE FIRST TIME on the pixels a reader is painted, over twelve pages spanning both worlds and six families at 1280x900, classified by chroma: limestone 64.2, graphite 18.9, cobalt 16.6, accent 0.3. Three of the four are close enough that the instruction is being followed. The fourth is not: the accent is declared at 5 and delivers 0.3, which is the design-direction audit's finding with a number under it at last — terracotta and atlantic are the entire art-directional difference between a magazine story and a country encyclopedia, and they are spent on an 11px kicker. tools/browser-checks.js measures this on every run and holds bands rather than targets: a country page is nearly all paper and /map is nearly all graphite, and both are correct."
   },
   "tokens": {
     "graphite": {
