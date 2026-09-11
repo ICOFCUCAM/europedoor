@@ -5093,6 +5093,36 @@ def c_palette_is_the_stylesheet():
         fail(f"europedoor.css declares {tok} and nothing ever spends it. "
              f"A token nobody references is vocabulary that looks like a "
              f"decision — the dead-rule scan's finding, one level up")
+    # AND THE OTHER DIRECTION, WHICH IS THE ONE THAT WAS ACTUALLY BROKEN.
+    #
+    # An unresolvable var() does not fall back to something sensible: the
+    # whole declaration is invalid at computed-value time and the property
+    # takes its INHERITED value. So a misspelt token is not a missing colour,
+    # it is a DIFFERENT one, and it can be the text colour.
+    #
+    # Two were live. `--serif` was referenced by twelve rules and has never
+    # existed — the token is `--display` — and nine of those twelve sit on an
+    # h1/h2/h3 that `h1, h2, h3, h4 { font-family: var(--display) }` had
+    # already set correctly, so the rule ACTIVELY REPLACED the right value
+    # with an invalid one and the heading inherited the sans body face. The
+    # index hero h1 on five indexes, the journey rows, the story lead, the
+    # homepage's four doors and the closing statement were all set in the
+    # body font on a site whose whole voice is an editorial serif. And
+    # `--atlantic-lift` was referenced by `--provenance` inside both dark
+    # blocks, so the heritage rule down the side of 843 provenance panels
+    # painted limestone in the dark preference and in the INTELLIGENCE world.
+    #
+    # Neither is visible to a check that counts declarations, to the
+    # dead-rule scan (the rule matches and does change something — it changes
+    # the font to the wrong one), or to any contrast assertion.
+    for tok in sorted(used - declared):
+        n += 1
+        where = [ln for ln in css.splitlines() if "var(" + tok in ln][:1]
+        fail(f"europedoor.css references {tok} and never declares it. An "
+             f"unresolvable var() makes the whole declaration invalid and "
+             f"the property falls back to its INHERITED value, so this is "
+             f"not a missing value, it is a different one"
+             + (f" — {where[0].strip()[:70]}" if where else ""))
     return n
 
 

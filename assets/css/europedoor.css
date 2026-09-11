@@ -121,6 +121,20 @@
   --terracotta:   #a4491f;
   --terracotta-2: #8a3a17;   /* the deeper one, for text on --paper-3 where
                                 #a4491f measures 4.48 and just misses */
+  /* THE LIFTED STEPS, AND ONE OF THEM WAS BEING REFERENCED WITHOUT EXISTING.
+     Both accents have to lift for a dark-preference reader — #14483c is
+     1.81:1 on graphite — and the lifted values lived as raw hexes inside the
+     dark blocks while `--provenance` in both of those blocks said
+     `var(--atlantic-lift)`, a token this stylesheet has never declared. An
+     unresolvable var() makes the whole declaration invalid at computed-value
+     time and the property falls back to its INHERITED value, so the heritage
+     rule down the side of 843 provenance panels painted in the text colour
+     — limestone — in the dark preference and in the whole INTELLIGENCE
+     world. Named here, once, and referenced everywhere they were typed. */
+  --atlantic-lift:   #63b79c;
+  --atlantic-lift-2: #77c7ad;
+  --terracotta-lift:   #e08a5c;
+  --terracotta-lift-2: #ea9a6c;
 
   /* There is no gold. Brass was the only gold token in the previous system,
      it was already forbidden on anything interactive, and European Future
@@ -178,6 +192,7 @@
      rule asks for. True red rather than brick, and the contrast went 6.46
      to 7.54 on limestone on the way past. */
   --warn:         #981f31;
+  --warn-lift:    #ee8192;   /* the dark-preference step, named rather than typed twice */
   --warn-bg:      #f8ecee;
 
   /* THE CARTOGRAPHY — always INTELLIGENCE, wherever it is embedded.
@@ -448,12 +463,12 @@ body[data-accent="heritage"] {
    the old palette's homework carried straight over. */
 @media (prefers-color-scheme: dark) {
   body.area-stories, body.area-events, body.area-experiences {
-    --door:      #e08a5c;
-    --door-dark: #ea9a6c;
+    --door:      var(--terracotta-lift);
+    --door-dark: var(--terracotta-lift-2);
   }
   body[data-accent="heritage"] {
-    --door:      #63b79c;
-    --door-dark: #77c7ad;
+    --door:      var(--atlantic-lift);
+    --door-dark: var(--atlantic-lift-2);
   }
 }
 
@@ -499,7 +514,7 @@ body[data-world="intelligence"] {
   --door-dark:    #a3b4ff;
   --signature:    var(--cobalt-lift);
 
-  --warn:         #ee8192;
+  --warn:         var(--warn-lift);
   --warn-bg:      #271719;
   --provenance:   var(--atlantic-lift);
 
@@ -536,7 +551,7 @@ body[data-world="intelligence"] {
     --door-dark:    #a3b4ff;
     --signature:    var(--cobalt-lift);
 
-    --warn:         #ee8192;
+    --warn:         var(--warn-lift);
     --warn-bg:      #271719;
   --provenance:   var(--atlantic-lift);
 
@@ -955,7 +970,7 @@ main.wide { max-width: 92rem; }
    for — three cards squeezed into a third of the page while both rules
    looked correct on their own. Found by rendering it. */
 .startstate { margin: var(--s6) 0 var(--s7); }
-.startstate h2 { font-family: var(--serif); margin: 0 0 var(--s3); }
+.startstate h2 { margin: 0 0 var(--s3); }
 .startstate > p { color: var(--ink-2); margin: 0 0 var(--s6); max-width: 54ch; }
 .emptyways { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
              gap: var(--s4); }
@@ -1106,7 +1121,18 @@ main.wide { max-width: 92rem; }
            letter-spacing: 0; color: var(--ink-3); }
 
 /* ── notes & callouts ─────────────────────────────────────── */
-.note { border-left: 3px solid var(--sea); background: var(--paper-2); padding: var(--s4) var(--s5); border-radius: 0 var(--radius) var(--radius) 0; margin: var(--s5) 0; font-size: var(--t-sm); }
+/* A PANEL TWICE AS WIDE AS ITS OWN TYPE. Every paragraph on this site is
+   capped at the measure — 34rem, about 65 characters, the line length a
+   reader can follow from end to start again — and this panel had no width of
+   its own, so on a 1,168px column it drew 1,168 pixels of fill behind 550
+   pixels of text. Six hundred pixels of tinted ground saying nothing, on 843
+   pages, with the rule that identifies it three columns away from the last
+   word of every line. A fill is what says "this is one object"; a fill that
+   runs half a column past the object is a band.
+   Capped at the measure plus its own padding, so the panel is the shape of
+   what is in it. Nothing about the type changes — this is the ground
+   catching up with a rule the type has always had. */
+.note { border-left: 3px solid var(--sea); background: var(--paper-2); padding: var(--s4) var(--s5); border-radius: 0 var(--radius) var(--radius) 0; margin: var(--s5) 0; font-size: var(--t-sm); max-width: calc(var(--measure) + 2 * var(--s5) + 3px); }
 .note p:last-child { margin-bottom: 0; }
 /* THE ADVISORY COLOUR WAS SPENT 263 TIMES ON THINGS THAT ARE NOT
    ADVISORIES AND 3 TIMES ON THINGS THAT ARE. Counted in the shipped HTML:
@@ -1502,7 +1528,7 @@ main.wide { max-width: 92rem; }
    invitation IS a top-level item of this page, so h2 is what it was all
    along; the size is set here because a heading's level is its place in the
    document and not its size. */
-.invite h2 { font-family: var(--serif); font-size: var(--t-md); line-height: 1.25;
+.invite h2 { font-size: var(--t-md); line-height: 1.25;
              margin: 0 0 var(--s2); color: var(--ink); font-weight: 700; }
 .invite a:hover h2, .invite a:focus-visible h2 { color: var(--door); }
 .invite-sum { margin: 0 0 var(--s2); color: var(--ink-2); max-width: 46ch; }
@@ -3153,7 +3179,7 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 /* AND THE BAND CAME OFF THE HERO, so the label stopped being a micro-caption
    over a photograph and became the first thing anybody is asked. A shouty
    uppercase label reads as a form; this is meant to read as a question. */
-.askhero label { font-family: var(--serif); font-size: var(--t-lg);
+.askhero label { font-family: var(--display); font-size: var(--t-lg);
                  color: var(--ink-2); }
 .askhero input { width: 100%; font: inherit; font-size: var(--t-md);
                  padding: var(--s4); border: 1px solid transparent; border-radius: var(--radius);
@@ -4878,12 +4904,12 @@ body[data-hero] .masthead { position: sticky; }
    and "Coast & islands" broke across three lines in one. `--t-xl` is already
    in the scale: a size that exists only for this band is a decoration. */
 .way h3 {
-  font-family: var(--serif); font-size: var(--t-xl);
+  font-size: var(--t-xl);
   line-height: 1.12; margin: 0 0 var(--s3);
 }
 /* The editorial line is the promise and the only italic on the page: it is
  * the sentence a reader answers, where everything under it is fact. */
-.wayline { font-family: var(--serif); font-style: italic; font-size: var(--t-lg);
+.wayline { font-family: var(--display); font-style: italic; font-size: var(--t-lg);
             color: var(--ink-2); margin: 0 0 var(--s3); }
 .waywhere { color: var(--ink-3); margin: 0 0 var(--s4); max-width: 34ch; }
 .waymeta {
@@ -4914,7 +4940,7 @@ body[data-hero] .masthead { position: sticky; }
   align-items: center; padding: var(--s6) 0; border-bottom: 1px solid var(--rule);
   text-decoration: none; color: inherit;
 }
-.jrow h3 { font-family: var(--serif); font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); line-height: 1.12;
+.jrow h3 { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); line-height: 1.12;
            margin: 0 0 var(--s2); }
 .jrowsub { color: var(--ink-3); margin: 0 0 var(--s4); max-width: 52ch; }
 .jrowmeta {
@@ -4938,7 +4964,7 @@ body[data-hero] .masthead { position: sticky; }
              align-items: start;
              border-top: 1px solid var(--rule); padding-top: var(--s6); }
 .storylead, .storysm { display: block; text-decoration: none; }
-.storylead h3 { font-family: var(--serif); font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); line-height: 1.12;
+.storylead h3 { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); line-height: 1.12;
                 margin: 0 0 var(--s3); }
 /* The lead story's own places, at the size the journeys' routes are:
  * this is the section's one dominant visual, and at 132px it was a
@@ -5005,7 +5031,7 @@ body[data-hero] .masthead { position: sticky; }
 .closein { display: grid; grid-template-columns: minmax(0, 1fr) auto;
            gap: var(--s7) var(--s8); align-items: start; }
 .closesay { max-width: 32rem; }
-.closing h2 { font-family: var(--serif); text-wrap: balance;
+.closing h2 { text-wrap: balance;
               margin: 0 0 var(--s4); }
 .closebody { color: var(--ink-2); font-size: var(--t-md); margin: 0 0 var(--s5); }
 .closego { margin: 0; }
@@ -5022,7 +5048,7 @@ body[data-hero] .masthead { position: sticky; }
  * seventeenth size was refused. */
 /* No `color` here: the number already inherits --ink, and restating it is a
    declaration that changes nothing — the dead-rule scan says so. */
-.closeextent dd { margin: 0; font-family: var(--serif);
+.closeextent dd { margin: 0; font-family: var(--display);
                   font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
                   font-variant-numeric: tabular-nums; }
 
@@ -5077,7 +5103,7 @@ body[data-hero] .masthead { position: sticky; }
 /* The name was --t-lg, a hair above the stops list under it, so seventeen
  * journeys had seventeen quiet headings. An index's rows are its subject. */
 .journeyrows .row { grid-template-columns: minmax(0, 1fr) 15rem; align-items: center; }
-.journeyrow h3 { font-family: var(--serif); font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
+.journeyrow h3 { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
                  line-height: 1.12; margin: 0 0 var(--s2); }
 .journeyrow:hover h3, .journeyrow:focus-visible h3 { color: var(--door); }
 .jart .constel { width: 100%; }
@@ -5107,7 +5133,7 @@ body[data-hero] .masthead { position: sticky; }
   padding: var(--s6) 0;
 }
 .storyleadwide h3 {
-  font-family: var(--serif); font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
+  font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
   line-height: 1.12; margin: 0 0 var(--s3);
 }
 .storyleadwide .rowsub { max-width: 52ch; }
@@ -5154,7 +5180,7 @@ body[data-hero] .masthead { position: sticky; }
  * check reads a divider for what is on the other side of it. */
 main > .pagehead:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
 .iherotext h1 {
-  font-family: var(--serif); font-size: clamp(var(--t-3xl), 5.2vw, var(--t-5xl));
+  font-size: clamp(var(--t-3xl), 5.2vw, var(--t-5xl));
   line-height: 1.12; margin: 0 0 var(--s4); text-wrap: balance;
 }
 /* No `color`: `.lede` already resolves to --ink-2, and the scan reads a
