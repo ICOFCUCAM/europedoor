@@ -1852,6 +1852,13 @@ async function main() {
     //
     // The list was read before this number moved. Raising it is allowed;
     // raising it without reading is what the ceiling exists to stop.
+    //
+    // IT SITS EXACTLY AT 25 TODAY, over 256 rules and seventeen pages. Two
+    // repairs to the instrument in one commit — sampling across the matches
+    // instead of off the front, and measuring background-color at all — took
+    // it from 28 back to the ceiling rather than through it. The margin is
+    // zero, which is worth knowing before the next visual change: the next
+    // redundant declaration fails here, and that is the check working.
     const DEAD_CEILING = 25;
     const seen = new Map();
     // AND THE PAGE SET IS THE INSTRUMENT'S REACH. `.regionglyph .countries
@@ -1919,6 +1926,15 @@ async function main() {
           const pick = [...els];
           const step = Math.max(1, Math.ceil(pick.length / 40));
           const sample = pick.filter((_, i) => i % step === 0).slice(0, 40);
+          // AND `getPropertyValue`, NOT INDEXING. This read
+          // `getComputedStyle(e)[p]`, and `p` is a hyphenated CSS name —
+          // `getComputedStyle(e)["background-color"]` is `undefined` for
+          // every element that has ever existed. So one of the seven
+          // properties this scan claims to measure was never measured at
+          // all: before and after both read "undefined", they matched, and
+          // any rule whose only measured property was a background was
+          // reported dead. The other six survive indexing because their
+          // names have no hyphen, which is exactly why nobody noticed.
           const read = () => sample
             .map((e) => props.map((p) => getComputedStyle(e).getPropertyValue(p))
                              .join("|"));
