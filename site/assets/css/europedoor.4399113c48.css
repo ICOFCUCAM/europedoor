@@ -824,6 +824,14 @@ main.wide { max-width: 92rem; }
 .facetart figcaption { margin-top: var(--s3); font-size: var(--t-xs);
                        color: var(--ink-3); }
 
+/* A COLLECTION HEADING SAT EXACTLY ON THE PANEL ABOVE IT. Measured on the
+   populated My Europe: the "Start a collection" form ends at 596 and the
+   "Everything else" heading begins at 596 — no gap at all, the heading's
+   own rule running into the panel's border. `main h2` carries a top margin
+   and `h3` does not, which is right everywhere a heading follows prose and
+   wrong where it follows a bordered box. */
+#mine h3 { margin-top: var(--s6); }
+
 .rowdist { display: grid; gap: var(--s1); justify-items: end; }
 .dist { width: 8.5rem; height: 12px; display: block; }
 .distaxis { fill: var(--rule); }
@@ -858,10 +866,20 @@ main.wide { max-width: 92rem; }
    rendering in capitals. The browser check written in the same commit is
    what said so; reading the CSS said it was fixed. */
 .field > label:not(.inlinecheck), .field > .fieldhead, .fieldset > legend { display: block; font-size: var(--t-xs); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--s2); font-weight: 600; }
-.field input[type="number"], .field input[type="text"], .field select {
+/* AND `textarea`, WHICH WAS MISSING FROM THIS LIST. The only textarea
+   outside the planner's ask box is My Europe's portable list, and it took
+   the browser default of twenty columns: a 182x66 pixel window holding the
+   whole saved list as JSON, on the one control whose entire purpose is
+   "copy it, paste it into the same box on another device". `resize:
+   vertical` because a reader with forty saved places needs to see them and
+   nobody needs to drag it sideways. */
+.field input[type="number"], .field input[type="text"], .field select,
+.field textarea {
   width: 100%; font: inherit; padding: var(--s3); border: 1px solid var(--rule); border-radius: var(--radius);
   background: var(--paper); color: var(--ink);
 }
+.field textarea { resize: vertical; min-height: 6rem; font-family: var(--mono);
+                  font-size: var(--t-sm); }
 .fieldset { border: 0; padding: 0; margin: 0; }
 .checks { display: flex; flex-wrap: wrap; gap: var(--s2); }
 .checks label { font-size: var(--t-sm); border: 1px solid var(--rule); background: var(--paper); border-radius: 999px; padding: var(--s2) var(--s4); cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: var(--s2); }
@@ -1210,10 +1228,15 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 
 /* ── the sentence box on the planner ──────────────────────────────── */
 .form.ask { margin-bottom: var(--s6); border-color: var(--door); }
+/* ONLY WHAT DIFFERS. `.field textarea` carries the width, the padding, the
+   border, the ground and the ink for every textarea on the site now, so
+   everything this rule used to repeat was a declaration changing nothing —
+   the dead-rule scan said so the moment the shared rule existed. What is
+   left is the two things that are genuinely this box's own: it takes a
+   sentence rather than a blob of JSON, so it is set in the reading face at
+   reading size, and it starts at two lines rather than six. */
 .form.ask textarea {
-  width: 100%; font: inherit; font-size: var(--t-md); padding: var(--s3);
-  border: 1px solid var(--rule); border-radius: var(--radius);
-  background: var(--paper); color: var(--ink); resize: vertical; min-height: 3.4rem;
+  font: inherit; font-size: var(--t-md); min-height: 3.4rem;
 }
 
 /* ── a journey drawn over the map ─────────────────────────────────── */
