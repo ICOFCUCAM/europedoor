@@ -2734,14 +2734,41 @@ def country_page(data, c):
         key=lambda rt: -(len(rt[1].get("places", [])) * 2 + len(rt[1].get("experiences", []))
                          + len(rt[1]["highlights"])),
     )
-    popular = [
-        card(urls.city(c, r, t), f"{r['name']}", t["name"], t["summary"],
-             seed=f"city:{c['slug']}:{t['slug']}",
-             motif=motif_for(t["interests"], t.get("city_type")),
-             meta=f'<p class="cardmeta">{n_of(len(t.get("places", [])), "place")} · '
-                  f'{n_of(len(t.get("experiences", [])), "experience")}</p>')
+    # THE LAST CARD GRID OF ABSTRACT PLATES ON THE SITE, AND IT WAS MEASURED
+    # RATHER THAN ARGUED.
+    #
+    # The plate system's rule here is density — "four cards in a grid of like
+    # things is the case a card was designed for", against eleven in a column
+    # or forty-three on a page — and six passed it. What nobody had measured
+    # is whether the six are six PICTURES. Across all fifty country pages:
+    # 207 cards drawing 146 motifs on their own page, so 29% of every card
+    # repeats a motif already beside it, and at the bad end FRANCE DRAWS FIVE
+    # SKYLINES OUT OF SIX, Belgium four of five, Bosnia and Herzegovina four
+    # towers out of four. A grid of six whose job is to tell six places apart,
+    # showing one picture five times.
+    #
+    # And this family has an argument the others did not: the page draws the
+    # REAL geography four hundred pixels above, with every region named and
+    # its cities on it. A reader who wants to know where Florence is has it.
+    # Six abstract gradients under a real map of Italy is two visual
+    # languages on one page, and the weaker one is underneath.
+    #
+    # So rows, which is what /interests, the region pages, /journeys,
+    # /themes, /europe-in and the stories index all landed on, for the reason
+    # that governs all of them: a card is the right shape for a set of like
+    # things chosen on LOOK, and a destination is chosen on where it is and
+    # what it is like. Neither of those is a look. It also gives this page
+    # one visual language below the map — the experiences, the journeys, the
+    # stories and the fixtures under it were already rows.
+    popular = "".join(
+        f'<a class="row" href="{urls.city(c, r, t)}">'
+        f'<div><h3>{esc(t["name"])}</h3>'
+        f'<p class="rowsub">{esc(t["summary"])}</p></div>'
+        f'<p class="rowmeta">{esc(r["name"])} · '
+        f'{n_of(len(t.get("places", [])), "place")} · '
+        f'{n_of(len(t.get("experiences", [])), "experience")}</p></a>'
         for r, t in ranked[:6]
-    ]
+    )
     kinds_map = data["taxonomy"]["experience_kinds"]
     # Slice the list, never the HTML: truncating the joined string cut a
     # closing tag in half and produced one malformed page.
@@ -2842,7 +2869,7 @@ def country_page(data, c):
 {section("Travel regions", countrymap(data, c) + grid(region_cards, 3), id="regions",
          lede=f"{len(c['regions'])} editorial regions, each opening onto its cities.")}
 
-{section("Popular destinations", grid(popular, 3),
+{section("Popular destinations", f'<div class="rows">{popular}</div>',
          lede="The destinations we have written most about, which is not the same as the ones most people go to — and is the only ranking we can honestly compute.",
          more=("Every region", "#regions")) if popular else ""}
 
