@@ -49,7 +49,12 @@ import threading
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
-from checks import in_url_path                        # noqa: E402
+# ONE CREDENTIAL DECISION, IMPORTED RATHER THAN RESTATED. This file had
+# its own copy, and the copies disagreed twice in two runs: run 19 died
+# on a URL path segment this one had not learned about, run 20 on a slug
+# neither had. `checks.py` owns the rule; a suite that re-implements the
+# thing it is testing is testing its own restatement.
+from checks import credential_shaped, in_url_path     # noqa: E402
 IMG = os.path.join(ROOT, "assets", "img")
 IMG_DIR = os.path.join(ROOT, "assets", "img")
 REGISTER = os.path.join(ROOT, "data", "images.json")
@@ -203,33 +208,6 @@ def run(args, env):
                           capture_output=True, text=True)
 
 
-def credential_shaped(body, m, stems=()):
-    """Is this run of word characters a credential, or provenance?
-
-    ONE DECISION, IN ONE PLACE, BECAUSE THE SCAN AND THE TEST OF THE SCAN
-    BOTH NEED IT. The first version of the test re-implemented the URL half
-    and left the SHA-256 half out, so it reported a hash as a credential —
-    which is the same fault it was written to catch, in the instrument
-    rather than in the thing measured. This repository has recorded "a
-    second implementation of a thing is a second chance to make its mistake"
-    four times; a test is an implementation.
-    """
-    tok = m.group(0)
-    if in_url_path(body, m.start()):
-        return False
-    if tok in stems:
-        return False
-    # A 64-CHARACTER LOWERCASE HEX STRING IS A SHA-256, and the register is
-    # FULL of them: the original's hash and one per derivative. Matched by
-    # shape AND by the key it sits under, because "it looks like hex" alone
-    # is how a real credential gets waved through.
-    if re.fullmatch(r"[0-9a-f]{64}", tok):
-        before = body[max(0, m.start() - 40):m.start()]
-        if "sha256" in before or "hash" in before:
-            return False
-    return True
-
-
 def main(argv):
     only_secrets = "--committed-only" in argv
 
@@ -311,6 +289,62 @@ def main(argv):
     check("a real provider URL is not read as a credential",
           not slug,
           "these would stop the commit: " + ", ".join(s[:50] for s in slug))
+
+    # AND A SLUG IS WORDS, WHICH IS WHAT RUN 20 DIED ON.
+    #
+    # Exactly one identifier in 837 purposes reaches forty characters:
+    # `the-city-that-was-rebuilt-from-paintings`, a story slug an editor
+    # chose months ago. It appears about twenty times in that story's
+    # register row — purpose, file stem, publication path, the original's
+    # path, every derivative name — so acquiring that ONE photograph
+    # produced twenty identical failures, and the message named none of
+    # them because it printed a length and not the token.
+    #
+    # The rule is that a key is one long unbroken run of mixed-case
+    # alphanumerics and a slug is short lower-case words with separators.
+    # Asserted on the real slug rather than an invented one, because the
+    # thing that broke was a real slug and the next one will be too.
+    SLUG = "the-city-that-was-rebuilt-from-paintings"
+    row = json.dumps({"images": {"story-hero@" + SLUG: {
+        "purpose": "story-hero@" + SLUG,
+        "file": "story-hero@" + SLUG,
+        "publication_path": "/stories/" + SLUG,
+        "original": "photographs/story-hero@" + SLUG + ".jpg",
+        "derivatives": {"story-hero@" + SLUG + ".abc12345-2400.avif": 1},
+    }}}, indent=2)
+    slugs = [m.group(0) for m in keyish.finditer(row)
+             if credential_shaped(row, m)]
+    check("a long slug is an identifier, not a credential",
+          not slugs, "these would stop the commit: " + ", ".join(slugs[:3]))
+    check("and the slug this actually failed on is forty characters",
+          len(SLUG) == 40, f"it is {len(SLUG)}")
+
+    # AND AN UNDECLARED SLUG IS NOT ONE. The exclusion is a lookup in the
+    # registry, not a judgement about shape, so a token that merely LOOKS
+    # like one of this product's identifiers is still refused.
+    body = '"x": "a-story-slug-that-nobody-ever-declared-here"'
+    check("a slug the product does not declare is still refused",
+          credential_shaped(body, next(keyish.finditer(body))))
+
+    # A KEY IS STILL A KEY. The slug rule must not become "anything long is
+    # fine": a provider key is what this whole scan exists for, so real
+    # shapes are put through it and every one has to be refused.
+    #
+    # THE FOURTH IS THE ONE THAT MATTERS. The first attempt at the slug rule
+    # was a SHAPE — "every hyphen-separated part is a short lower-case
+    # word" — and `abcdefgh-ijklmnop-qrstuvwx-yzabcdef-ghijklmn` is 44
+    # characters of key that satisfies it. That is why the rule is a lookup
+    # in `desk/registry.json` instead, and why this case is in the list.
+    for shape in (
+        "TESTKEYTESTKEYTESTKEYTESTKEYTESTKEYTESTKEY0123456789",
+        "ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij0123456789",
+        "a" * 44,
+        "abcdefgh-ijklmnop-qrstuvwx-yzabcdef-ghijklmn",
+    ):
+        body = '"secret": "' + shape + '"'
+        m = next(keyish.finditer(body))
+        check("a real key shape is still refused", credential_shaped(body, m),
+              f"{shape[:24]}… was waved through")
 
     # AND THE PREDICATE IS NARROW IN THE DIRECTION THAT MATTERS. A key
     # travels as a query parameter or a fragment and essentially never as a

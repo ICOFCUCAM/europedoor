@@ -3037,6 +3037,40 @@ version of that test re-implemented the URL half and left the SHA-256 half
 out, so it reported a hash as a credential**, which is the fault it was
 written to catch, in the instrument.
 
+**AND THEN THE SAME RULE FAILED A THIRD TIME, IN THE COPY THAT HAD BEEN
+RIGHT.** Run 20 acquired ten photographs and died in `checks.py` on twenty
+identical failures: *"data/images.json contains a 40-character token that
+looks like a credential"*, twenty times, naming none of them. All twenty
+were **one story slug**. `the-city-that-was-rebuilt-from-paintings` is the
+only identifier in 837 purposes that reaches forty characters, and it
+appears about twenty times in that story's register row — the purpose, the
+file stem, the publication path, the original's path and every derivative
+name — so acquiring that ONE photograph failed the build twenty times on a
+slug an editor chose months ago.
+
+**A failure message with no measurement in it cannot be diagnosed**, and
+this one printed a LENGTH and not the token. That rule is already in this
+file, about a map layer; it now applies to the scan as well.
+
+**The exclusion is a lookup, never a shape.** The first attempt was
+"every hyphen-separated part is a short lower-case word", which is wrong in
+a way that looks airtight: `abcdefgh-ijklmnop-qrstuvwx-yzabcdef-ghijklmn` is
+44 characters of key and satisfies it. The archive-stem exclusion three
+lines up already states the rule — *checked against the directory rather
+than by pattern, because a looser regex is how a real credential gets
+through* — so this reads `desk/registry.json`, which declares every purpose,
+path and target, is generated, and fails CI when stale. A key is not in the
+registry. Both directions are asserted, including that contrived shape and
+an undeclared slug.
+
+**AND THERE IS ONE IMPLEMENTATION NOW.** Three real acquisitions died on
+this rule in three different ways, each time because one copy knew
+something the other did not: run 19 on a URL path segment `checks.py` had
+already learned, run 20 on a slug neither had. `checks.py` owns
+`credential_shaped()` and `photo-tests.py` imports it. *A second
+implementation of a thing is a second chance to make its mistake* — and the
+answer, on the third occurrence, is to stop having a second implementation.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

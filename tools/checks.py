@@ -85,6 +85,96 @@ def in_url_path(body, at):
     return (at - start) < cut
 
 
+def credential_shaped(body, m, stems=()):
+    """Is this run of word characters a credential, or is it provenance?
+
+    ONE DECISION, IN ONE PLACE, AND THIS IS THE THIRD TIME IT HAS BEEN
+    WRITTEN. `checks.py` and `photo-tests.py --committed-only` scan the same
+    files for credential-shaped tokens, and the rule has now failed three
+    real acquisitions in three different ways — each time because one copy
+    knew something the other did not. Run 19 died on a Pexels title slug the
+    other copy already excluded; run 20 died here on a rule neither copy had.
+    A second implementation of a thing is a second chance to make its
+    mistake; the answer is to stop having a second implementation.
+    `photo-tests.py` imports this rather than restating it.
+
+    Four things are not credentials, and each is checked against something
+    real rather than by a looser pattern, because a looser regex is how a
+    real key gets waved through:
+
+    A TOKEN INSIDE A URL PATH is part of an address. Pexels builds a photo
+    page out of the photographer's own description, so `/photo/a-close-up-of
+    -party-appetizers-served-on-plates-at-a-gathering-39122376/` is a
+    71-character run of exactly the shape this hunts for. Scoped to the path
+    and never past a `?`, because a key travels as a query parameter and
+    essentially never as a path segment.
+
+    A TOKEN THAT NAMES A FILE ON DISK is a file name, checked against the
+    archive directory.
+
+    A 64-CHARACTER LOWERCASE HEX STRING under a `sha256` or `hash` key is a
+    digest, and the register is full of them.
+
+    AND AN IDENTIFIER THIS PRODUCT DECLARES is an identifier. This is the
+    one run 20 needed. Exactly one slug in 837 purposes reaches forty
+    characters — `the-city-that-was-rebuilt-from-paintings` — and it appears
+    about twenty times in that story's register row: the purpose, the file
+    stem, the publication path, the original's path and every derivative
+    name. So acquiring that ONE photograph produced twenty identical
+    failures, on a story slug an editor chose months ago.
+
+    CHECKED AGAINST THE REGISTRY AND NEVER BY SHAPE, which is the rule the
+    archive-stem exclusion three lines up already states: a looser regex is
+    how a real credential gets through. The first attempt here was a shape —
+    "every hyphen-separated part is a short lower-case word" — and it is
+    wrong in a way worth recording, because it looks airtight and is not:
+    `abcdefgh-ijklmnop-qrstuvwx-yzabcdef-ghijklmn` is 44 characters of key
+    and passes it. `desk/registry.json` declares every purpose, path and
+    target this product has, it is generated and CI fails when it is stale,
+    so a token is an identifier if the product actually declares it and a
+    credential otherwise. A key is not in the registry.
+    """
+    tok = m.group(0)
+    if in_url_path(body, m.start()):
+        return False
+    if tok in stems:
+        return False
+    if re.fullmatch(r"[0-9a-f]{64}", tok):
+        before = body[max(0, m.start() - 40):m.start()]
+        if "sha256" in before or "hash" in before:
+            return False
+    if tok in declared_slugs():
+        return False
+    return True
+
+
+_SLUGS = None
+
+
+def declared_slugs():
+    """Every long identifier this product declares, from the generated file.
+
+    `desk/registry.json` is written by `tools/desk-registry.py` from the same
+    `imageslots.resolve()` the acquisition uses, is committed, and
+    `c_desk_registry` fails when it is stale — so it cannot drift from the
+    purposes a photograph can actually be acquired for. Only tokens long
+    enough to reach the scan's own floor are collected; a shorter one was
+    never going to be looked at.
+    """
+    global _SLUGS
+    if _SLUGS is None:
+        _SLUGS = set()
+        f = os.path.join(ROOT, "desk", "registry.json")
+        if os.path.exists(f):
+            doc = json.load(open(f, encoding="utf-8"))
+            for row in doc.get("purposes", []):
+                text = " ".join(str(row.get(k) or "")
+                                for k in ("purpose", "path", "target", "key"))
+                _SLUGS |= {t for t in re.split(r"[^A-Za-z0-9_-]+", text)
+                           if len(t) >= 40}
+    return _SLUGS
+
+
 def site_files():
     return sorted(glob.glob(os.path.join(OUT, "**", "*.html"), recursive=True))
 
@@ -1166,52 +1256,17 @@ def c_photo_gate():
         stems = {n.rsplit(".", 1)[0] for n in archive_names}
         stems |= {part for n in stems for part in n.split(".")}
         for m in keyish.finditer(body):
-            # A TOKEN INSIDE A URL PATH IS PART OF AN ADDRESS.
-            #
-            # The old test looked twelve characters back for `://`, which
-            # exempts a token immediately after the scheme and nothing
-            # deeper. Pexels builds its photo page URL out of the
-            # photographer's own description —
-            # `/photo/a-group-of-hikers-trekking-through-foggy-countryside-17707933/`
-            # is 61 characters of letters, digits and hyphens, which is
-            # exactly the shape this hunts for. Seven of them failed the
-            # first real batch, on the `source` field the licence gate exists
-            # to record: the run acquired eight photographs, derived them,
-            # registered them, rebuilt the site and passed all 95 checks, and
-            # then refused to commit its own provenance.
-            #
-            # SCOPED TO THE PATH, NOT THE WHOLE URL. A credential travels as
-            # a query parameter or a header, essentially never as a path
-            # segment — so exempting `?key=...` would be exempting the place
-            # a key actually goes. The enclosing token is read back to its
-            # JSON quote or whitespace and has to start with a scheme, and
-            # the match has to sit before any `?`.
-            if in_url_path(body, m.start()):
+            if not credential_shaped(body, m, stems):
                 continue
-            # A LONG TOKEN THAT NAMES A FILE ON DISK IS A FILE NAME. The
-            # Unsplash guidelines archive is
-            # `unsplash.https-help-unsplash-com-en-articles-2511245-unsplash-api-guidelines.<date>.txt`,
-            # whose middle segment is 67 characters of letters, digits and
-            # hyphens — which is exactly the shape this pattern hunts for, and
-            # it failed the build on the evidence the gate exists to collect.
-            # Checked against the directory rather than by pattern, because a
-            # looser regex is how a real credential gets through.
-            if m.group(0) in stems:
-                continue
-            # A 64-CHARACTER LOWERCASE HEX STRING IS A SHA-256, and the
-            # register is FULL of them: the original's hash and one per
-            # derivative. The scan would have failed the build on the first
-            # real photograph — on the provenance the whole pipeline exists to
-            # record. Matched by shape AND by the key it sits under, because
-            # "it looks like hex" alone is how a real credential gets waved
-            # through.
-            if re.fullmatch(r"[0-9a-f]{64}", m.group(0)):
-                before = body[max(0, m.start() - 40):m.start()]
-                if "sha256" in before or "hash" in before:
-                    continue
+            # A FAILURE MESSAGE WITH NO MEASUREMENT IN IT CANNOT BE
+            # DIAGNOSED. This printed only a LENGTH, so run 20 reported
+            # "data/images.json contains a 40-character token" twenty times
+            # and named none of them — and all twenty were one story slug.
+            # Every other count in this repository is in its message for
+            # exactly this reason.
             fail(f"{rel_} contains a {len(m.group(0))}-character token that "
                  f"looks like a credential — keys live in repository secrets "
-                 f"and nowhere else")
+                 f"and nowhere else: {m.group(0)[:60]!r}")
     return n
 
 
