@@ -45,6 +45,34 @@ REGISTER = os.path.join(ROOT, "data", "images.json")
 QUALITY = {"avif": 50, "webp": 78, "jpg": 82}
 
 
+def _original_of(stem):
+    """The path the REGISTER records for this stem, never a reconstruction.
+
+    `acquire.py` writes `original` into the row it creates, and it names the
+    file for the format the provider actually served — `.jpg`, `.png` or
+    `.webp`. Rebuilding that name here from a convention is a second
+    implementation of one fact, which this repository has now paid for six
+    times; the sixth was a number and this would have been a file extension.
+    """
+    if not os.path.exists(REGISTER):
+        sys.exit("there is no register — run scripts/images/acquire.py first")
+    with open(REGISTER, encoding="utf-8") as fh:
+        reg = json.load(fh)
+    paths = {r["original"] for r in reg.get("images", {}).values()
+             if r.get("file") == stem and r.get("original")}
+    if not paths:
+        sys.exit(f"no register row has file {stem!r} with an original — run "
+                 f"scripts/images/acquire.py first")
+    if len(paths) > 1:
+        sys.exit(f"{stem} is claimed by {len(paths)} different originals: "
+                 f"{', '.join(sorted(paths))}. One file, one stem.")
+    src = os.path.join(ROOT, paths.pop())
+    if not os.path.exists(src):
+        sys.exit(f"the register names {os.path.relpath(src, ROOT)} and no "
+                 f"such file exists — the acquisition did not finish")
+    return src
+
+
 def _stem(name):
     """ACCEPT A PURPOSE OR A STEM, because a caller has the purpose.
 
@@ -69,10 +97,18 @@ def derive(stem):
     a code path nothing exercises is a code path nothing checks, and the only
     thing that found it was running the desk's acquisition in a clean clone.
 
-    THE ORIGINAL IS READ AND NEVER WRITTEN. `<stem>.original.jpg` is the
-    evidence the whole chain is checked against — checks.py re-hashes it on
-    every build — so this reads it, writes beside it, and leaves it exactly as
-    the provider served it.
+    THE ORIGINAL IS READ AND NEVER WRITTEN. It is the evidence the whole
+    chain is checked against — checks.py re-hashes it on every build — so
+    this reads it, writes beside it, and leaves it exactly as the provider
+    served it.
+
+    AND ITS PATH IS READ OUT OF THE REGISTER RATHER THAN RECONSTRUCTED.
+    This script used to build `photographs/<stem>.original.jpg` from the
+    convention, which was true while the only readable format was JPEG and
+    became a second implementation of a fact `acquire.py` already recorded
+    the moment a PNG could be acquired. The row carries `original`; that is
+    the path, and a file named for a format it is not is exactly what this
+    directory exists to make impossible.
 
     AND IT COMPLETES THE PROVENANCE ROW rather than leaving it half-filled.
     acquire.py writes the row with `processing` and `derivatives` set to null,
@@ -91,10 +127,7 @@ def derive(stem):
                  "a dependency of the build, which stays stdlib-only.")
     import PIL
     stem = _stem(stem)
-    src = os.path.join(ROOT, "photographs", stem + ".original.jpg")
-    if not os.path.exists(src):
-        sys.exit(f"no original at {os.path.relpath(src, ROOT)} — run "
-                 f"scripts/images/acquire.py first")
+    src = _original_of(stem)
 
     with open(src, "rb") as fh:
         original_sha = hashlib.sha256(fh.read()).hexdigest()

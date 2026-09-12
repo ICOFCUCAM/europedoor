@@ -561,7 +561,20 @@
               "rendered page, the provenance row and both hashes.</p>"
             : '<p class="notyet">Nothing on europedoor.com has changed. The ' +
               "pull request carries the rendered page, the provenance row " +
-              "and both hashes; merging it is what publishes.</p>"));
+              "and both hashes; merging it is what publishes.</p>") +
+          /* AND A BATCH MAY NOT HAVE TAKEN EVERYTHING IT WAS SENT.
+             One candidate that does not suit its slot used to end the run
+             and discard every finished acquisition with it — run 23 lost
+             eighteen that way — so a refusal is recorded and the rest
+             carry on. That makes "acquired" a number this panel does not
+             know, and the honest answer is to say where the number is
+             rather than to parse it out of a title: the pull request names
+             every refusal, and the Library below refreshes to the register
+             on the default branch, where a refused surface still reads
+             EMPTY. Nothing was substituted for it. */
+          '<p class="notyet">Any candidate that did not suit its slot was ' +
+          "refused rather than ending the run; the pull request names each " +
+          "one and that surface is still empty.</p>");
         loadRegistry();
       } else if (job.state === "approval") {
         /* A RUN WAITING FOR A PERSON IS NOT A FAILED RUN. The panel said

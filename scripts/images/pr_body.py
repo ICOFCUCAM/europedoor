@@ -48,11 +48,12 @@ def _row_for(purpose):
     return rows[0]
 
 
-def body(purposes, branch, repo_slug=""):
+def body(purposes, branch, repo_slug="", skipped=()):
     """One photograph or many. The evidence per photograph never changes."""
     names = [p.strip() for p in purposes.split(",") if p.strip()]
     if len(names) == 1:
-        return _one(names[0], branch, repo_slug) + _checklist()
+        return (_one(names[0], branch, repo_slug)
+                + _skipped(skipped) + _checklist())
     parts = _summary(names, branch)
     for n in names:
         key, r = _row_for(n)
@@ -61,7 +62,32 @@ def body(purposes, branch, repo_slug=""):
                       f"</summary>", ""]
         parts.append(_one(n, branch, repo_slug))
         parts += ["", "</details>"]
-    return "\n".join(parts) + "\n" + _checklist()
+    return ("\n".join(parts) + "\n" + _skipped(skipped) + _checklist())
+
+
+def _skipped(rows):
+    """WHAT DID NOT ARRIVE, AND WHY, BESIDE WHAT DID.
+
+    A batch used to be all-or-nothing: one candidate that did not suit its
+    slot ended the job, so run 23 discarded eighteen finished acquisitions
+    over the nineteenth. A batch that carries on has to say what it left
+    behind, or a reviewer cannot tell "these are the sixty that were
+    approved" from "these are the ones that happened to work" — which is the
+    reason all-or-nothing was chosen in the first place, and it is answered
+    by naming them rather than by losing the sitting.
+
+    The surfaces below are still EMPTY. Nothing was substituted for them.
+    """
+    if not rows:
+        return ""
+    out = ["", f"### {len(rows)} approved and not acquired", "",
+           "These surfaces are still empty and nothing was substituted for "
+           "them. Pick again for any that are worth another look — the "
+           "basket keeps what you already chose.", "",
+           "| surface | id | why |", "|---|---|---|"]
+    for purpose, pid, why in rows:
+        out.append(f"| `{purpose}` | {pid} | {why} |")
+    return "\n".join(out) + "\n"
 
 
 def _summary(names, branch):
@@ -157,8 +183,20 @@ def main(argv):
                     help="one purpose, or several separated by commas")
     ap.add_argument("--branch", default="")
     ap.add_argument("--repo", default=os.environ.get("GITHUB_REPOSITORY", ""))
+    ap.add_argument("--skipped", default="",
+                    help="a TSV of purpose, id and reason for every approved "
+                         "candidate the acquisition refused — read from a "
+                         "file rather than the register, because the whole "
+                         "point of these rows is that they have none")
     args = ap.parse_args(argv)
-    sys.stdout.write(body(args.purpose, args.branch, args.repo))
+    skipped = []
+    if args.skipped and os.path.exists(args.skipped):
+        with open(args.skipped, encoding="utf-8") as fh:
+            for line in fh:
+                bits = line.rstrip("\n").split("\t")
+                if len(bits) >= 3 and bits[0]:
+                    skipped.append((bits[0], bits[1], bits[2]))
+    sys.stdout.write(body(args.purpose, args.branch, args.repo, skipped))
     return 0
 
 

@@ -530,22 +530,59 @@ jobs:
       # asserts the id it got back; derive.py reads the untouched original
       # and refuses to upscale. Neither knows it is in a batch, which is what
       # makes the batch safe: there is no second implementation to get wrong.
+      #
+      # AND ONE REFUSED CANDIDATE NO LONGER DISCARDS THE SITTING. Run 23
+      # acquired eighteen photographs, hashed them, derived their ladders and
+      # completed their provenance — and threw every one away because the
+      # nineteenth was a PNG. `set -e` ended the job and the branch was never
+      # pushed.
+      #
+      # acquire.py exits 3 for a refusal that is about ONE candidate (it does
+      # not suit the slot, its bytes cannot be sized, the served size is not
+      # the declared one, the id already fills a surface) and 1 for anything
+      # a next candidate would hit too (no key, a refused gate, a rate limit,
+      # an id the provider swapped). Three is recorded and skipped; one stops
+      # the run. The line is whether the next candidate could succeed.
+      #
+      # A SKIP IS NEVER SILENT: it is named here, in the step summary, and in
+      # the pull request beside the photographs that did arrive, and the
+      # surface it was for stays empty. And a sitting where NOTHING was
+      # acquired fails, because "found nothing suitable" and "could not run"
+      # must not look the same.
       - name: Acquire each approved photograph
+        id: acquire
         env:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: |
-          set -euo pipefail
+          set -uo pipefail
           python3 -m pip install --quiet pillow pillow-avif-plugin
-          while IFS=$'\t' read -r purpose pid alt; do
-            echo "── $purpose ── $pid"
-            python3 scripts/images/acquire.py \
-              --provider "${{ inputs.provider }}" \
-              --photo-id "$pid" \
-              --purpose "$purpose" \
-              --alt "$alt" \
-              --focal "50,50"
-            python3 scripts/images/derive.py "$purpose"
-          done < /tmp/plan.tsv
+          bash scripts/images/batch.sh "${{ inputs.provider }}" \
+               /tmp/plan.tsv /tmp/skipped.txt | tee /tmp/batch.log
+          rc=${PIPESTATUS[0]}
+          [ "$rc" = 0 ] || exit "$rc"
+          took=$(sed -n 's/^took=\([0-9]\{1,\}\)$/\1/p' /tmp/batch.log | tail -1)
+          skips=$(sed -n 's/^skipped=\([0-9]\{1,\}\)$/\1/p' /tmp/batch.log | tail -1)
+          # AN EMPTY COUNT IS NOT A ZERO COUNT. Without -e a failed read
+          # leaves these blank, the commit message says "Photographs:
+          # acquired" and the PR title with it — a number that is not the
+          # set's own extent, arriving as no number at all.
+          case "$took$skips" in
+            ""|*[!0-9]*) echo "batch.sh printed no counts; see /tmp/batch.log"
+                         exit 1 ;;
+          esac
+          echo "took=$took" >> "$GITHUB_OUTPUT"
+          echo "skipped=$skips" >> "$GITHUB_OUTPUT"
+          echo "### $took acquired, $skips skipped" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$skips" != 0 ]; then
+            {
+              echo
+              echo "| surface | id | why |"
+              echo "|---|---|---|"
+              while IFS=$'\t' read -r pp ii ww; do
+                echo "| \`$pp\` | $ii | $ww |"
+              done < /tmp/skipped.txt
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       # EVERY GATE, ONCE, OVER THE FINISHED SET. Running them between
       # acquisitions would check thirteen half-built states and never the one
@@ -616,12 +653,24 @@ jobs:
           set -euo pipefail
           git config user.name "europedoor-photographs"
           git config user.email "noreply@europedoor.com"
-          N=$(wc -l < /tmp/plan.tsv)
+          # WHAT ARRIVED, NOT WHAT WAS ASKED FOR. This counted the PLAN,
+          # which was the same number until a batch could skip a candidate
+          # — and a count that is not the set's own extent reads as one.
+          N="${{ steps.acquire.outputs.took }}"
+          SK="${{ steps.acquire.outputs.skipped }}"
           BRANCH="photo/batch-$(date -u +%Y%m%d-%H%M%S)"
           git checkout -b "$BRANCH"
           git add assets/img data/images.json docs site photographs
-          git commit -m "Photographs: $N acquired from approved ids" \
-                     -m "Acquired by GitHub Actions from ids approved in the Media Desk. Each fetched by id, hashed, derived without upscaling, and registered."
+          {
+            echo "Photographs: $N acquired from approved ids"
+            echo
+            echo "Acquired by GitHub Actions from ids approved in the Media Desk. Each fetched by id, hashed, derived without upscaling, and registered."
+            if [ "$SK" != 0 ]; then
+              echo
+              echo "$SK approved candidates were refused and are named in the pull request. Those surfaces are still empty and nothing was substituted for them."
+            fi
+          } > /tmp/commit-msg.txt
+          git commit -F /tmp/commit-msg.txt
           git push -u origin "$BRANCH"
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
           echo "count=$N" >> "$GITHUB_OUTPUT"
@@ -631,9 +680,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          PURPOSES=$(cut -f1 /tmp/plan.tsv | paste -sd,)
+          # THE PURPOSES THAT ARRIVED, NOT THE PURPOSES THAT WERE ASKED
+          # FOR. pr_body.py reads the register and refuses a purpose with no
+          # row — correctly, because a PR describing nothing must not open —
+          # so listing the whole plan would kill the step on the first skip.
+          # The skipped ones go in as their own section, named.
+          comm -23 <(cut -f1 /tmp/plan.tsv | sort) \
+                   <(cut -f1 /tmp/skipped.txt | sort) > /tmp/took.txt
+          PURPOSES=$(paste -sd, /tmp/took.txt)
           python3 scripts/images/pr_body.py \
             --purpose "$PURPOSES" \
+            --skipped /tmp/skipped.txt \
             --branch "${{ steps.push.outputs.branch }}" > /tmp/pr-body.md
           TITLE="Photographs: ${{ steps.push.outputs.count }} acquired"
           BRANCH="${{ steps.push.outputs.branch }}"

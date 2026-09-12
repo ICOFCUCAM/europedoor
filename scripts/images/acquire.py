@@ -75,6 +75,40 @@ IMG_DIR = os.path.join(ROOT, "assets", "img")
 # re-checked against.
 ORIG_DIR = os.path.join(ROOT, "photographs")
 
+# The extension each format is kept under. `jpg` rather than
+# `jpeg` because every original acquired before PNG and WebP
+# were readable is named that way, and renaming them would
+# move a URL the register already records.
+EXT = {"jpeg": "jpg", "png": "png", "webp": "webp"}
+
+# TWO KINDS OF NO, AND FOR ELEVEN RUNS THEY WERE THE SAME EXIT CODE.
+#
+# Run 23 acquired EIGHTEEN photographs, hashed them, derived their ladders
+# and completed their provenance, and then threw every one of them away
+# because the nineteenth candidate was a PNG. The loop runs under
+# `set -e`, so the first non-zero exit ends the job and the branch is never
+# pushed: one unsuitable picture out of sixty costs the whole sitting, and
+# the sitting is what the basket exists to collect.
+#
+# All-or-nothing was a deliberate property and it is the right one for a
+# malformed PLAN — a reviewer cannot tell "these six were chosen" from
+# "these six arrived before it broke", so the plan's shape is checked in
+# full before a socket opens. It is the wrong property for a judgement
+# about ONE candidate, because with sixty automatic picks a rejection is
+# expected rather than exceptional.
+#
+# So a refusal that is about this photograph and nothing else exits 3 and
+# the batch records it and carries on; everything else exits 1 and the run
+# stops. THE LINE IS WHETHER THE NEXT CANDIDATE COULD SUCCEED: a missing
+# key, a refused gate, a rate limit or an id the provider swapped are all
+# true of the next one too, and skipping sixty of those would report a
+# sitting that acquired nothing as a sitting that found nothing suitable.
+#
+# NOTHING HERE IS EVER SILENT AND NOTHING IS EVER SUBSTITUTED. A skip is
+# named in the step summary and in the pull request beside the photographs
+# that did arrive, and the surface it was for stays empty.
+SKIP = 3
+
 USER_AGENT = "EuropeDoor/1.0 (+https://europedoor.com)"
 
 # The licence VALUES tools/lib/data.py already accepts. Adding a provider is
@@ -145,8 +179,74 @@ def _value(row, fact):
     return f.get("value") if isinstance(f, dict) else f
 
 
-def jpeg_size(blob):
-    """(width, height) from a JPEG's own SOF marker, or None.
+def image_size(blob):
+    """(width, height, format) from the bytes' own header, or None.
+
+    THIS READ JPEG ONLY, AND THE SENTENCE IT PRINTED WAS FALSE. Run 23
+    acquired eighteen photographs and stopped on the nineteenth with "the
+    bytes from pexels are not a JPEG ... this pipeline cannot derive from"
+    — which is not true of a PNG: `derive.py` decodes with Pillow and reads
+    PNG and WebP as readily as JPEG. Pexels serves an original in whatever
+    format the photographer uploaded, so one PNG in a sitting of sixty
+    discarded the other fifty-nine.
+
+    What the reader is actually FOR is the size check under it: the declared
+    dimensions are what cleared the slot, so the served bytes must be shown
+    to match, and that needs a header this script can read without Pillow.
+    So the answer is to read the two other formats a provider serves rather
+    than to drop the check — a refusal whose stated reason is wrong is worse
+    than a missing check, because it reads as a considered position.
+    """
+    if blob.startswith(b"\xff\xd8"):
+        return _jpeg_size(blob)
+    if blob.startswith(b"\x89PNG\r\n\x1a\n"):
+        return _png_size(blob)
+    if blob[:4] == b"RIFF" and blob[8:12] == b"WEBP":
+        return _webp_size(blob)
+    return None
+
+
+def _png_size(blob):
+    """A PNG's IHDR is the first chunk and always 13 bytes at offset 8.
+
+    Length, type, then width and height as four-byte big-endian values. The
+    type is asserted rather than assumed, because a file whose signature is a
+    PNG's and whose first chunk is not IHDR is not a PNG.
+    """
+    if len(blob) < 33 or blob[12:16] != b"IHDR":
+        return None
+    w = int.from_bytes(blob[16:20], "big")
+    h = int.from_bytes(blob[20:24], "big")
+    return (w, h, "png") if w and h else None
+
+
+def _webp_size(blob):
+    """Three sub-formats, three headers, and the lossy one is 14 bits each.
+
+    VP8 (lossy) carries a three-byte start code then width and height as
+    little-endian 16-bit values whose top two bits are a scale field; VP8L
+    (lossless) packs width-1 and height-1 into 14 bits each of a 32-bit
+    little-endian word; VP8X (extended) carries each as a three-byte
+    little-endian value of size-1.
+    """
+    tag, n = blob[12:16], len(blob)
+    if tag == b"VP8 " and n >= 30 and blob[23:26] == b"\x9d\x01\x2a":
+        w = int.from_bytes(blob[26:28], "little") & 0x3FFF
+        h = int.from_bytes(blob[28:30], "little") & 0x3FFF
+    elif tag == b"VP8L" and n >= 25 and blob[20] == 0x2F:
+        bits = int.from_bytes(blob[21:25], "little")
+        w = (bits & 0x3FFF) + 1
+        h = ((bits >> 14) & 0x3FFF) + 1
+    elif tag == b"VP8X" and n >= 30:
+        w = int.from_bytes(blob[24:27], "little") + 1
+        h = int.from_bytes(blob[27:30], "little") + 1
+    else:
+        return None
+    return (w, h, "webp") if w and h else None
+
+
+def _jpeg_size(blob):
+    """(width, height, "jpeg") from a JPEG's own SOF marker, or None.
 
     A JPEG is a chain of segments: 0xFFD8, then markers each carrying a
     two-byte big-endian length. The frame header — SOF0 through SOF15, minus
@@ -155,8 +255,6 @@ def jpeg_size(blob):
     the file is a JPEG at the same time, because a walk that falls off the end
     of a truncated or non-JPEG file returns None rather than a number.
     """
-    if not blob.startswith(b"\xff\xd8"):
-        return None
     i, n = 2, len(blob)
     while i + 9 < n:
         if blob[i] != 0xFF:
@@ -173,9 +271,22 @@ def jpeg_size(blob):
         if 0xC0 <= marker <= 0xCF and marker not in (0xC4, 0xC8, 0xCC):
             h = int.from_bytes(blob[i + 5:i + 7], "big")
             w = int.from_bytes(blob[i + 7:i + 9], "big")
-            return (w, h) if w and h else None
+            return (w, h, "jpeg") if w and h else None
         i += 2 + seg
     return None
+
+
+def skip(msg):
+    """Refuse THIS candidate and say so in a way a batch can act on.
+
+    The word is CANDIDATE rather than "skipped", because this script is also
+    run for one photograph on its own, where there is nothing to skip to and
+    "skipped" would describe a request that simply failed. What is true in
+    both places is that the refusal is about this candidate: a batch reads
+    the exit code and carries on, a single acquisition ends.
+    """
+    print("CANDIDATE REFUSED: " + msg, file=sys.stderr)
+    sys.exit(SKIP)
 
 
 def cleared(slug):
@@ -355,7 +466,7 @@ def main(argv):
     # a surface is the drift this field exists to stop.
     existing = reg["images"].get(spec["key"])
     if existing and str(existing.get("provider_photo_id")) != str(args.photo_id):
-        sys.exit(f"{args.purpose} is already filled by "
+        skip(f"{args.purpose} is already filled by "
                  f"{existing.get('provider')} {existing.get('provider_photo_id')}. "
                  f"Remove that row deliberately if it is being replaced — a "
                  f"surface changing its picture is an editorial act, not a "
@@ -378,7 +489,7 @@ def main(argv):
         and str(row.get("provider_photo_id")) == str(args.photo_id)
         and key != spec["key"])
     if elsewhere and not args.second_purpose:
-        sys.exit(f"{args.provider} {args.photo_id} is already in the register, "
+        skip(f"{args.provider} {args.photo_id} is already in the register, "
                  f"for {', '.join(elsewhere)}. One photograph on two surfaces "
                  f"is sometimes right and is never an accident — pass "
                  f"--second-purpose if that is what this is.")
@@ -404,14 +515,13 @@ def main(argv):
 
     bad = fits(norm, spec)
     if bad:
-        sys.exit(f"photo {args.photo_id} does not suit {args.purpose}:\n  - "
+        skip(f"photo {args.photo_id} does not suit {args.purpose}:\n  - "
                  + "\n  - ".join(bad)
                  + "\nChoose another candidate; do not lower the purpose.")
 
     grow = gate()[args.provider]
     stem = imageslots.stem(args.purpose)
     os.makedirs(ORIG_DIR, exist_ok=True)
-    original = os.path.join(ORIG_DIR, stem + ".original.jpg")
 
     req = urllib.request.Request(norm["download"],
                                  headers={"User-Agent": USER_AGENT})
@@ -422,7 +532,7 @@ def main(argv):
         sys.exit(f"downloading {norm['download']} answered {exc.code}. "
                  f"Nothing written.")
     if len(blob) < 10_000:
-        sys.exit(f"the original is {len(blob)} bytes, which is an error page "
+        skip(f"the original is {len(blob)} bytes, which is an error page "
                  f"rather than a photograph. Nothing written.")
 
     # THE BYTES ARE VERIFIED AGAINST WHAT THE API PROMISED, AND A LENGTH
@@ -447,16 +557,27 @@ def main(argv):
     # installing one to read two numbers out of a header is how a dependency
     # arrives without a reason; derive.py installs Pillow because it decodes
     # pixels. A JPEG's own SOF marker carries the dimensions in six bytes.
-    got = jpeg_size(blob)
+    got = image_size(blob)
     if got is None:
-        sys.exit(f"the bytes from {args.provider} are not a JPEG. The "
-                 f"provenance row would record a hash of something this "
-                 f"pipeline cannot derive from. Nothing written.")
-    if got != (norm["width"], norm["height"]):
-        sys.exit(f"{args.provider} described photo {args.photo_id} as "
+        # AND THE MESSAGE CARRIES THE BYTES. Run 23 printed "not a JPEG" and
+        # nothing about what it WAS, so the only way to learn which format
+        # had arrived was to fetch the photograph by hand.
+        skip(f"the bytes from {args.provider} are not a JPEG, a PNG or a "
+                 f"WebP — they begin {blob[:12]!r}. The provenance row would "
+                 f"record a hash of something this pipeline cannot read the "
+                 f"size of, and the declared size is what cleared this slot. "
+                 f"Nothing written.")
+    width, height, fmt = got
+    if (width, height) != (norm["width"], norm["height"]):
+        skip(f"{args.provider} described photo {args.photo_id} as "
                  f"{norm['width']}x{norm['height']} and served "
-                 f"{got[0]}x{got[1]}. The description is what cleared this "
+                 f"{width}x{height}. The description is what cleared this "
                  f"slot, so the file does not. Nothing written.")
+
+    # THE ORIGINAL IS NAMED FOR WHAT IT IS. A PNG saved as `.original.jpg`
+    # is a file whose name is a claim about its contents that is false, and
+    # the one thing this directory exists to be is evidence.
+    original = os.path.join(ORIG_DIR, f"{stem}.original.{EXT[fmt]}")
 
     digest = hashlib.sha256(blob).hexdigest()
     acquired_at = datetime.datetime.now(datetime.timezone.utc).replace(

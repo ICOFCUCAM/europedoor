@@ -5704,6 +5704,49 @@ def c_desk_registry():
     return 1
 
 
+@check("an original is named for the format its own bytes are")
+def c_original_format():
+    """A FILE NAMED `.jpg` THAT IS A PNG IS A CLAIM ABOUT ITS CONTENTS THAT
+    IS FALSE, AND THIS DIRECTORY EXISTS TO BE EVIDENCE.
+
+    `acquire.py` read JPEG headers only and refused everything else with
+    "this pipeline cannot derive from" — which is untrue of a PNG, because
+    `derive.py` decodes with Pillow. Pexels serves an original in whatever
+    format the photographer uploaded, so run 23 acquired eighteen
+    photographs and discarded all of them on the nineteenth, which was not a
+    JPEG. Three formats are readable now and each is kept under its own
+    extension.
+
+    The register's `original` is the one path, read by `derive.py` rather
+    than reconstructed from a convention — so this asserts the two ends
+    agree: the bytes on disk are one of the three, and the extension the row
+    records is the one those bytes are.
+    """
+    magic = [(b"\xff\xd8", "jpg"), (b"\x89PNG\r\n\x1a\n", "png")]
+    reg = D.load()["images"]
+    n = 0
+    for key, row in sorted(reg.items()):
+        rel = row.get("original") or ""
+        f = os.path.join(ROOT, rel)
+        if not rel or not os.path.exists(f):
+            continue
+        with open(f, "rb") as fh:
+            head = fh.read(16)
+        got = next((e for sig, e in magic if head.startswith(sig)), None)
+        if got is None and head[:4] == b"RIFF" and head[8:12] == b"WEBP":
+            got = "webp"
+        if got is None:
+            fail(f"{rel} is not a JPEG, a PNG or a WebP — it begins "
+                 f"{head[:12]!r}. Nothing in this pipeline can read its size, "
+                 f"and the declared size is what cleared the slot.")
+        if not rel.endswith("." + got):
+            fail(f"{key} records its original as {rel} and those bytes are a "
+                 f"{got.upper()}. A file named for a format it is not is a "
+                 f"claim about its own contents that is false.")
+        n += 1
+    return n + 1
+
+
 @check("the dispatch cap has exactly one home")
 def c_dispatch_cap():
     """FOUR COPIES OF ONE NUMBER, AND THE ONE THAT WAS A GATE WAS THE ONE

@@ -97,6 +97,32 @@ def _jpeg(width, height):
     return buf.getvalue()
 
 
+def _png(width, height):
+    """A REAL PNG, because a photographer may upload one and Pexels serves
+    the original in whatever format it arrived as.
+
+    Run 23 acquired eighteen photographs and discarded every one of them on
+    the nineteenth, which was not a JPEG — and the refusal's stated reason,
+    that the pipeline cannot derive from it, is false: derive.py decodes
+    with Pillow. The suite had only ever put a JPEG in front of the
+    acquisition, so the one thing that could have found it never ran. A code
+    path nothing exercises is a code path nothing checks.
+    """
+    from PIL import Image
+    im = Image.new("RGB", (width, height))
+    px = im.load()
+    for y in range(0, height, 16):
+        for x in range(0, width, 16):
+            v = (x * 5 + y * 11) % 255
+            for dy in range(16):
+                for dx in range(16):
+                    if x + dx < width and y + dy < height:
+                        px[x + dx, y + dy] = (v, (v + 90) % 255, 255 - v)
+    buf = io.BytesIO()
+    im.save(buf, "PNG")
+    return buf.getvalue()
+
+
 class Handler(http.server.BaseHTTPRequestHandler):
     def log_message(self, *a):
         pass
@@ -129,6 +155,23 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(STUB["small"])
             return
+        if self.path.startswith("/original.png"):
+            self.send_response(200)
+            self.send_header("Content-Type", "image/png")
+            self.send_header("Content-Length", str(len(STUB["png"])))
+            self.end_headers()
+            self.wfile.write(STUB["png"])
+            return
+        if self.path.startswith("/photos/pngshot"):
+            # A PROVIDER SERVING A PNG ORIGINAL, which is the ordinary case
+            # this pipeline refused for the life of the acquisition.
+            body = dict(STUB["meta"])
+            body["id"] = "pngshot"
+            body["width"], body["height"] = 2600, 1400
+            body["src"] = dict(body["src"])
+            body["src"]["original"] = body["src"]["original"].replace(
+                "/original.jpg", "/original.png")
+            return self._json(body)
         if self.path.startswith("/notajpeg.bin"):
             self.send_response(200)
             self.send_header("Content-Type", "image/jpeg")
@@ -205,6 +248,20 @@ def run(args, env):
     e = dict(os.environ)
     e.update(env)
     return subprocess.run([sys.executable] + args, cwd=ROOT, env=e,
+                          capture_output=True, text=True)
+
+
+def sh(args, env):
+    """The same, for the one thing here that is not a Python script.
+
+    `run()` prepends the interpreter, so handing it a shell script silently
+    ran Python against bash source and the assertions read a file the loop
+    had never created. The batch loop is shell because it is what the
+    workflow step was, and moving it into a file is what made it testable.
+    """
+    e = dict(os.environ)
+    e.update(env)
+    return subprocess.run(args, cwd=ROOT, env=e,
                           capture_output=True, text=True)
 
 
@@ -392,6 +449,11 @@ def main(argv):
     # so exercising a slot instance needs its own id and its own bytes.
     STUB["jpeg2"] = _jpeg(2600, 1300)
     STUB["extra"] = {}
+    STUB["png"] = _png(2600, 1400)
+    # A PNG SIGNATURE WITH NO IHDR, which is the case that must still be
+    # refused now that a real PNG is accepted: the signature says PNG and the
+    # first chunk is zeroes, so nothing can read a size out of it. The name
+    # is history — it was the only non-JPEG case when it was written.
     STUB["notajpeg"] = b"\x89PNG\r\n\x1a\n" + b"\0" * 40000
     STUB["meta"] = {
         "id": int(PHOTO_ID), "width": 2560, "height": 1440,
@@ -527,10 +589,18 @@ def main(argv):
         # What the refusal actually promises is that it wrote NOTHING: the
         # state after is the state before, whatever that state was.
         def snapshot():
-            path = os.path.join(ROOT, "photographs", "homepage-hero.original.jpg")
-            blob = open(path, "rb").read() if os.path.exists(path) else None
-            return (hashlib.sha256(blob).hexdigest() if blob else None,
-                    open(REGISTER, encoding="utf-8").read())
+            # THE WHOLE DIRECTORY, NOT ONE HARD-CODED `.original.jpg`. This
+            # named the JPEG by convention, so once an original could arrive
+            # as a PNG it would have reported "unchanged" about a file that
+            # is not the one the acquisition wrote. A refusal promises it
+            # wrote nothing ANYWHERE.
+            d = os.path.join(ROOT, "photographs")
+            files = {}
+            if os.path.isdir(d):
+                for f in sorted(os.listdir(d)):
+                    with open(os.path.join(d, f), "rb") as fh:
+                        files[f] = hashlib.sha256(fh.read()).hexdigest()
+            return (files, open(REGISTER, encoding="utf-8").read())
 
         before = snapshot()
         r = run(A + ["--photo-id", "mismatch", "--purpose", "homepage-hero",
@@ -538,6 +608,12 @@ def main(argv):
         check("a mismatched returned id fails", r.returncode != 0)
         check("and nothing is written",
               "Nothing written" in (r.stdout + r.stderr))
+        # AND IT IS NOT A SKIP. A provider that answers with a different
+        # photograph than the one asked for is true of the next request too,
+        # and the standing rule is to fail rather than ever substitute — so
+        # this must never become one of sixty quietly-recorded skips.
+        check("and a swapped id stops the run rather than being skipped",
+              r.returncode == 1)
 
         # ── the BYTES are verified, not just their length ────────────
         #
@@ -558,18 +634,73 @@ def main(argv):
         r = run(A + ["--photo-id", "notajpeg", "--purpose", "homepage-hero",
                      "--alt", "a test pattern image"], env)
         out = r.stdout + r.stderr
-        check("bytes that are not a JPEG fail",
-              r.returncode != 0 and "not a JPEG" in out)
+        check("bytes no header reader can size fail",
+              r.returncode != 0 and "not a JPEG, a PNG or a WebP" in out)
+        # AND IT SAYS SO AS A SKIP RATHER THAN AS A STOP. Exit 3 is "this
+        # candidate"; exit 1 is "the next one would fail too". Run 23's
+        # eighteen finished acquisitions were discarded because the two were
+        # the same code.
+        check("and it exits 3, so a batch records it and carries on",
+              r.returncode == 3 and "CANDIDATE REFUSED:" in out)
+        # A FAILURE MESSAGE WITH NO MEASUREMENT IN IT CANNOT BE DIAGNOSED.
+        # Run 23 printed "not a JPEG" and nothing about what had arrived, so
+        # the only way to learn the format was to fetch the photograph by
+        # hand. It prints the leading bytes now.
+        check("and it says what the bytes actually were",
+              "\\x89PNG" in out or "PNG" in out)
         check("and the original on disk is exactly what it was",
               snapshot()[0] == before[0])
         check("and the register is exactly what it was",
               snapshot()[1] == before[1])
+
+        # ── 5b. A PNG ORIGINAL IS ACQUIRED, NOT REFUSED ──────────────
+        #
+        # The pipeline read JPEG headers only and said everything else was
+        # something "this pipeline cannot derive from", which is false:
+        # derive.py decodes with Pillow. Pexels serves an original in
+        # whatever format the photographer uploaded, so run 23 acquired
+        # eighteen photographs and threw all of them away on the nineteenth.
+        # The suite had only ever put a JPEG in front of it.
+        r = run(A + ["--photo-id", "pngshot", "--purpose", "homepage-hero",
+                     "--alt", "a test pattern image"], env)
+        out = r.stdout + r.stderr
+        check("a PNG original is acquired", r.returncode == 0, out[-400:])
+        png = os.path.join(ROOT, "photographs", "homepage-hero.original.png")
+        check("and it is kept under the extension its bytes are",
+              os.path.exists(png))
+        check("and no .jpg was written for it",
+              not os.path.exists(os.path.join(
+                  ROOT, "photographs", "homepage-hero.original.jpg")))
+        row = (json.load(open(REGISTER, encoding="utf-8"))["images"]
+               .get("home-hero") or {})
+        check("and the register records that path, not a convention",
+              row.get("original") == "photographs/homepage-hero.original.png")
+        check("and its hash is of the bytes as served",
+              row.get("sha256") == hashlib.sha256(
+                  open(png, "rb").read()).hexdigest())
+
+        # AND DERIVE READS THE PATH OUT OF THE ROW. It used to rebuild
+        # `<stem>.original.jpg` from the convention, which is a second
+        # implementation of a fact acquire.py already recorded — the sixth
+        # time in this repository, and the first where it would have been a
+        # file extension.
+        r = run(["scripts/images/derive.py", "homepage-hero"], env)
+        out = r.stdout + r.stderr
+        check("derive builds the ladder from a PNG original",
+              r.returncode == 0, out[-400:])
+        row = json.load(open(REGISTER, encoding="utf-8"))["images"]["home-hero"]
+        check("and the ladder is still AVIF, WebP and JPEG",
+              {f.rsplit(".", 1)[1] for f in row["derivatives"]}
+              == {"avif", "webp", "jpg"})
+        before = snapshot()
 
         # ── 6. an id that does not exist stops, with no substitute ───
         before = snapshot()
         r = run(A + ["--photo-id", "404404", "--purpose", "homepage-hero",
                      "--alt", "a test pattern image"], env)
         check("a missing id fails rather than substituting", r.returncode != 0)
+        check("and a missing id stops the run rather than being skipped",
+              r.returncode == 1)
         check("and no photograph was registered by it", snapshot() == before)
 
         # ── 7. Unsplash cannot enter the automated path ──────────────
@@ -1075,6 +1206,119 @@ def main(argv):
               "--acquired" in wf or "hero-shot" in wf)
         check("the workflow offers only pexels",
               re.search(r"options: \[pexels\]", wf) is not None)
+
+        # ── 19b. ONE REFUSED CANDIDATE DOES NOT DISCARD THE SITTING ───
+        #
+        # Run 23 acquired eighteen photographs, hashed them, derived their
+        # ladders and completed their provenance — and lost every one,
+        # because the nineteenth candidate was a PNG and the loop ran under
+        # `set -e`. The branch was never pushed.
+        #
+        # THIS RUNS THE LOOP RATHER THAN READING THE YAML. The promise is
+        # behavioural — "the others still arrive" — and a promise asserted
+        # as a string inside a workflow body is a shape, which this
+        # repository has now protected instead of a promise eleven times.
+        # So the loop is `scripts/images/batch.sh`, the workflow calls it,
+        # and this puts a plan through it whose middle entry the pipeline
+        # will refuse.
+        plan = os.path.join(tempfile.gettempdir(), "ed-batch-plan.tsv")
+        skips = os.path.join(tempfile.gettempdir(), "ed-batch-skips.tsv")
+        made += [plan, skips]
+        with open(plan, "w", encoding="utf-8") as fh:
+            # THE THIRD ENTRY'S SLOT HAS TO ACCEPT THE SECOND STUB'S SHAPE.
+            # `door-coast` caps aspect at 1.9 and the stub is 2.00, so the
+            # first version of this test had the loop refuse two of three
+            # and still called it a pass — a test whose subject was the
+            # skip could not tell a deliberate refusal from an accidental
+            # one. `country-hero` admits up to 2.2.
+            fh.write(f"homepage-hero\t{PHOTO_ID}\ta test pattern image\n")
+            fh.write("door-mountains\tnotajpeg\ta test pattern image\n")
+            fh.write(f"country-hero@austria\t{PHOTO2_ID}\ta test pattern "
+                     f"image\n")
+        r = sh(["bash", "scripts/images/batch.sh", "pexels", plan, skips],
+               env)
+        out = r.stdout + r.stderr
+        check("a plan with one unusable candidate still succeeds",
+              r.returncode == 0, out[-500:])
+        check("and it acquired the other two", "took=2" in out)
+        check("and recorded exactly one skip", "skipped=1" in out)
+        rows = [l.split("\t") for l in
+                open(skips, encoding="utf-8").read().splitlines() if l]
+        check("and the skip names the surface, the id and the reason",
+              len(rows) == 1 and rows[0][0] == "door-mountains"
+              and rows[0][1] == "notajpeg" and len(rows[0][2]) > 20,
+              str(rows))
+        # AND THE REASON IS acquire.py's OWN SENTENCE. A summary composed by
+        # the loop would be a second opinion about a refusal it did not make.
+        check("and the reason is the refusal's own words",
+              "not a JPEG, a PNG or a WebP" in rows[0][2])
+        # AND IT ARRIVES WHOLE, ON ONE LINE. A multi-line reason in a
+        # tab-separated field makes the rest of it look like more skipped
+        # candidates, and taking only the first line drops the measurement:
+        # "does not suit door-coast:" with nothing after the colon.
+        check("and it is one line, so the record is not corrupted",
+              "\n" not in rows[0][2] and rows[0][2].endswith("Nothing written."))
+        reg_after = json.load(open(REGISTER, encoding="utf-8"))["images"]
+        check("and the refused surface has no register row",
+              not any(v.get("purpose") == "door-mountains"
+                      for v in reg_after.values()))
+
+        # A SITTING THAT ACQUIRED NOTHING IS A FAILED RUN, however politely
+        # each entry was refused: "found nothing suitable" and "could not
+        # run" must not look the same.
+        with open(plan, "w", encoding="utf-8") as fh:
+            fh.write("door-history\tnotajpeg\ta test pattern image\n")
+        r = sh(["bash", "scripts/images/batch.sh", "pexels", plan, skips],
+               env)
+        out = r.stdout + r.stderr
+        check("a plan where everything is refused fails",
+              r.returncode != 0 and "nothing to review" in out)
+
+        # AND A REFUSAL THAT IS NOT ABOUT ONE CANDIDATE STILL STOPS IT. A
+        # provider answering with a different photograph is true of the next
+        # request too, and the standing rule is to fail rather than ever
+        # substitute — so it must never become one of sixty quiet skips.
+        with open(plan, "w", encoding="utf-8") as fh:
+            fh.write("door-food\tmismatch\ta test pattern image\n")
+            fh.write(f"door-history\t{PHOTO_ID}\ta test pattern image\n")
+        r = sh(["bash", "scripts/images/batch.sh", "pexels", plan, skips],
+               env)
+        out = r.stdout + r.stderr
+        check("a swapped id stops the batch rather than being skipped",
+              r.returncode == 1 and "not about one candidate" in out)
+        check("and it stopped rather than carrying on to the next entry",
+              "door-history" not in out.split("not about one candidate")[0]
+              .split("door-food")[-1])
+
+        check("the workflow calls the one loop rather than holding a copy",
+              "scripts/images/batch.sh" in wf)
+        # AND IT HOLDS NO LOOP OF ITS OWN. A second copy of this would be a
+        # second chance to make its mistake, which is the finding the cap
+        # commit before this one recorded — there the disagreeing copies
+        # were a number, and here they would be a policy about exit codes.
+        # THE PROMISE IS THAT THE BATCH JOB DOES NOT ACQUIRE. A reintroduced
+        # loop with renamed variables would evade a check on the variable
+        # names; what it cannot evade is calling the acquisition.
+        # AND THE COMMENTS ARE STRIPPED FIRST. The batch job's own prose
+        # explains what acquire.py does and why it exits 3, so reading the
+        # raw text reports the documentation of code as code — the fourth
+        # time an instrument here has done that.
+        batch_job = "\n".join(
+            l for l in wf.split("\n  batch:\n", 1)[-1].splitlines()
+            if not l.lstrip().startswith("#"))
+        check("and the batch job never calls the acquisition itself",
+              "acquire.py" not in batch_job)
+        # A COUNT THAT IS NOT THE SET'S OWN EXTENT READS AS ONE. The commit
+        # message counted the PLAN, which was the same number until a batch
+        # could skip.
+        check("and the commit counts what arrived, not what was asked for",
+              "steps.acquire.outputs.took" in wf
+              and "N=$(wc -l < /tmp/plan.tsv)" not in wf)
+        # AND THE PR BODY IS ASKED ONLY ABOUT WHAT ARRIVED, because
+        # pr_body.py refuses a purpose with no register row — correctly —
+        # so handing it the whole plan would kill the step on the first skip.
+        check("and the PR body is built from the purposes that arrived",
+              "/tmp/took.txt" in wf and "--skipped /tmp/skipped.txt" in wf)
         check("the workflow runs the gates before opening the PR",
               wf.index("tools/checks.py") < wf.index("gh pr create"))
     finally:

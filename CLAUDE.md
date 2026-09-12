@@ -3199,6 +3199,65 @@ interpolated, the disagreement would have been in the first log line. *A
 failure message with no measurement in it cannot be diagnosed*, applied to a
 constant rather than to a measurement.
 
+**THE PIPELINE REFUSED A PNG AND SAID SOMETHING FALSE ABOUT WHY, AND ONE
+REFUSED CANDIDATE THREW AWAY EIGHTEEN FINISHED ACQUISITIONS.** With the cap
+fixed, run 23 fetched, verified, hashed, derived and registered eighteen
+photographs across every family, and then died on the nineteenth:
+
+    the bytes from pexels are not a JPEG. The provenance row would record a
+    hash of something this pipeline cannot derive from. Nothing written.
+
+**The second sentence is not true.** `derive.py` decodes with Pillow and reads
+PNG and WebP as readily as JPEG; what the header reader is actually FOR is the
+size check under it, because the DECLARED dimensions are what cleared the
+slot, so the served bytes have to be shown to match — and that needs a header
+this script can read without an image dependency. Pexels serves an original in
+whatever format the photographer uploaded. So `image_size()` reads all three
+now, from their own headers, and **an original is kept under the extension its
+bytes actually are** — a file named `.jpg` that is a PNG is a claim about its
+own contents that is false, in the one directory that exists to be evidence.
+**And `derive.py` reads that path out of the register** instead of rebuilding
+`<stem>.original.jpg` from the convention: the seventh time a second
+implementation of one fact has cost something here, and the first where it
+would have been a file extension.
+
+**Two kinds of no had the same exit code.** All-or-nothing is right for a
+malformed PLAN — a reviewer cannot tell *these six were chosen* from *these
+six arrived before it broke*, which is why the plan's shape is checked in full
+before a socket opens — and **wrong for a judgement about one candidate**,
+because with sixty automatic picks from the Fill button a rejection is
+expected rather than exceptional. `acquire.py` exits **3** for a refusal about
+this photograph and nothing else (does not suit the slot, bytes nothing can
+size, served size not the declared one, the id already fills a surface) and
+**1** for anything a next candidate would hit too (no key, a refused gate, a
+rate limit, an id the provider swapped). **The line is whether the next
+candidate could succeed** — and a swapped or missing id stays hard, because
+the standing rule is to fail rather than ever substitute.
+
+**Nothing is silent and nothing is substituted.** Each skip is named in the
+step summary, in the commit message and in its own section of the pull
+request, which says in those words that the surface is still empty. **A
+sitting that acquired nothing fails**, because "found nothing suitable" and
+"could not run" must not look the same. And the commit counts what ARRIVED:
+it counted the plan, which was the same number until a batch could skip, and
+a count that is not the set's own extent reads as one.
+
+**THE LOOP MOVED OUT OF THE WORKFLOW BODY INTO `scripts/images/batch.sh`, so
+the promise could be tested rather than asserted as a string.** "The others
+still arrive" is behavioural, and a behavioural promise pinned as YAML text is
+a shape — the eleventh time that has happened here. `photo-tests.py` now runs
+that script against the stub with a three-entry plan whose middle candidate
+the pipeline refuses, and reads the result: two acquired, one skipped, the
+skip carrying `acquire.py`'s own sentence rather than a summary composed by
+the loop, and no register row for the refused surface. Proved the other two
+ways as well — everything refused fails, and a swapped id stops before the
+next entry.
+
+**And the suite had only ever put a JPEG in front of the acquisition**, which
+is why the one thing that could have found this never ran. *A code path
+nothing exercises is a code path nothing checks*, said about the stub's
+fixtures rather than about the code.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
@@ -3216,7 +3275,8 @@ the rest.
     python3 tools/content-report.py --write   what is missing, against the spec's targets
     python3 tools/invariants.py --check       what a visual change may not move
     python3 tools/plate-variation.py --check  the plates have not got more alike
-    python3 tools/photo-tests.py              the acquisition pipeline, against a stub provider
+    python3 tools/photo-tests.py              the acquisition pipeline
+                                              and its batch loop, against a stub provider
     python3 tools/desk-tests.py               the Media Desk: the sign-in, and what the browser may send
     node tools/hosted-desk-tests.js           the HOSTED desk: signed sessions, signed thumbnails, the dispatch
     node tools/desk-render.js                 the HOSTED desk's screens and its basket, at 1280 and 390
