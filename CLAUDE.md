@@ -3258,6 +3258,22 @@ is why the one thing that could have found this never ran. *A code path
 nothing exercises is a code path nothing checks*, said about the stub's
 fixtures rather than about the code.
 
+**RUNNING IT FOUND FOUR MORE THINGS AND READING COULD NOT HAVE FOUND ONE OF
+THEM.** `run()` prepends the interpreter, so handing it a shell script ran
+Python against bash source and every assertion read a file the loop had never
+created. A **multi-line reason** — "does not suit" names each requirement it
+missed — put the rest of itself on following lines of a tab-separated record,
+and taking only the first line instead left *"does not suit door-coast:"* with
+nothing after the colon, which is the failure-message rule arriving in the
+record rather than in a message. The plan's third entry named a slot capping
+aspect at 1.9 against a 2.00 stub, so a test whose whole subject is the SKIP
+could not tell a deliberate refusal from an accidental one. **And the block
+inherited the register every block above it had written** — the PNG block
+fills the homepage hero, the second-purpose block puts one id on two surfaces
+— so entry one was refused as *already filled*, counted as a skip, and the run
+reported two skips where it expected one. **A test about skipping has to own
+its starting state**, which is the same fault as a test that cannot fail.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

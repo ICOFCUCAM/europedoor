@@ -1221,6 +1221,16 @@ def main(argv):
         # So the loop is `scripts/images/batch.sh`, the workflow calls it,
         # and this puts a plan through it whose middle entry the pipeline
         # will refuse.
+        # AND IT STARTS FROM THE REGISTER IT WAS HANDED. Every block above
+        # leaves rows behind — the PNG block fills `homepage-hero`, the
+        # second-purpose block puts one id on two surfaces — so the first
+        # version of this test had entry one refused as "already filled",
+        # counted it as a skip, and reported two skips where it expected
+        # one. A test whose whole subject is the SKIP could not tell a
+        # deliberate refusal from an accidental one, which is the same fault
+        # as a test that cannot fail. The block owns its own starting state.
+        with open(REGISTER, "w", encoding="utf-8") as fh:
+            fh.write(reg_backup)
         plan = os.path.join(tempfile.gettempdir(), "ed-batch-plan.tsv")
         skips = os.path.join(tempfile.gettempdir(), "ed-batch-skips.tsv")
         made += [plan, skips]
