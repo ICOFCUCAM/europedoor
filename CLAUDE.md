@@ -3274,6 +3274,29 @@ fills the homepage hero, the second-purpose block puts one id on two surfaces
 reported two skips where it expected one. **A test about skipping has to own
 its starting state**, which is the same fault as a test that cannot fail.
 
+**THE FIRST RUN AFTER THE ELEVEN THEME HEROES MERGED DELETED THEIR
+DERIVATIVES.** `photo-tests.py` cleans up after itself by prefix —
+`homepage-hero`, `door-mountains`, `country-hero`, and **`-hero@`**, which
+matches every slot instance. That list was written when the register was
+empty and every `-hero@` file on disk was a stub the suite had just made. The
+moment real photographs carried those names, a green suite run swept 165
+licensed derivatives out of `assets/img`, and the only thing that noticed was
+`checks.py` failing on 147 pages referencing files that were no longer there.
+**The restored register is the authority on what belongs**: anything it names
+is somebody's licensed photograph, and a suite that writes into the
+repository owns taking out only what it put in.
+
+**And two of the desk suite's own assertions were the empty-register fault
+again, one file over from where it is recorded.** *"With an empty register
+every status is EMPTY"* is a claim about the product's contents wearing the
+clothes of a claim about the desk's derivation, and *"the register is
+untouched"* was written as `reg_now == {}`. Both went red the day eleven
+photographs merged — for a desk that had got better. **A derivation promises
+it AGREES with its source**, so the first asserts PUBLISHED if and only if
+the register holds that purpose, in both directions; and **untouched means
+unchanged, not empty**, so the second compares against the state read at the
+start, whatever that state was. Proved red three ways.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

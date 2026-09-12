@@ -138,6 +138,9 @@ def jbody(raw):
         return {}
 
 
+reg_before = {}
+
+
 def main():
     srv = PT.serve()
     base = f"http://127.0.0.1:{srv.server_address[1]}"
@@ -169,6 +172,15 @@ def main():
 
 
 def run(desk):
+    # THE STATE BEFORE, whatever it is. This suite's central promise is that
+    # it never acquires, and the honest form of that is "the register after
+    # equals the register before" — not "the register is empty", which was
+    # a claim about the product's contents wearing the clothes of a claim
+    # about this suite's behaviour.
+    global reg_before
+    reg_before = json.load(open(os.path.join(ROOT, "data", "images.json"),
+                                encoding="utf-8"))["images"]
+
     # ── 1. nothing is reachable before signing in ────────────────────
     for path in ("/api/registry", "/api/search?purpose=homepage-hero&q=x",
                  "/api/thumb?t=anything", "/api/job/x"):
@@ -231,8 +243,24 @@ def run(desk):
           bool(cham) and cham["min_width"] == 1800 and cham["orientation"] == "landscape")
     check("every row carries a status", all(
         p["status"] in ("EMPTY", "PUBLISHED") for p in purposes))
-    check("and with an empty register every status is EMPTY", all(
-        p["status"] == "EMPTY" for p in purposes))
+    # AND THE STATUS IS DERIVED FROM THE REGISTER, NOT ASSERTED TO BE EMPTY.
+    #
+    # This read "with an empty register every status is EMPTY", which was a
+    # claim about the register's contents dressed as a claim about the
+    # desk's derivation — true of all 837 rows only while nothing was
+    # licensed. The eleven theme heroes merged and it went red for a desk
+    # that had got BETTER. That is the same failure photo-tests.py already
+    # records in these words: the gate suite that guards photographs would
+    # have gone permanently red the day the product it guards started
+    # working, and what a derivation actually promises is that it AGREES
+    # with its source.
+    held = {r.get("purpose") for r in json.load(
+        open(os.path.join(ROOT, "data", "images.json"),
+             encoding="utf-8"))["images"].values()}
+    wrong = [p["purpose"] for p in purposes
+             if (p["status"] == "PUBLISHED") != (p["purpose"] in held)]
+    check("and PUBLISHED means the register holds it, EMPTY that it does not",
+          not wrong, f"{len(wrong)} disagree, e.g. {wrong[:3]}")
 
     # ── 5. searching goes through the desk, never the browser ────────
     code, body, _ = desk.get(
@@ -310,9 +338,14 @@ def run(desk):
     check("and the session is gone", code == 401, f"got {code}")
 
     # ── 10. nothing was written ──────────────────────────────────────
+    # UNTOUCHED MEANS UNCHANGED, NOT EMPTY. The same fault one screen up:
+    # what this suite promises is that it never acquires, and the state
+    # after is the state before — whatever that state was. `reg_before` is
+    # read at the top, so this holds with eleven photographs licensed and
+    # with none.
     reg_now = json.load(open(os.path.join(ROOT, "data", "images.json"),
                              encoding="utf-8"))["images"]
-    check("the register is untouched by this suite", reg_now == {},
+    check("the register is untouched by this suite", reg_now == reg_before,
           f"{len(reg_now)} rows")
     dirty = subprocess.run(["git", "status", "--porcelain"], cwd=ROOT,
                            capture_output=True, text=True).stdout

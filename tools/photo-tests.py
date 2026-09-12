@@ -485,6 +485,16 @@ def main(argv):
     inv_backup = open(INVARIANTS, encoding="utf-8").read()
     made = []
 
+    # EVERY FILE THE REGISTER ALREADY NAMED, so cleanup cannot delete a
+    # licensed photograph or one of its derivatives. Read from the BACKUP
+    # rather than from the live register, because the live one is whatever
+    # the suite has just written into it.
+    keep = set()
+    for row in json.loads(reg_backup).get("images", {}).values():
+        if row.get("original"):
+            keep.add(os.path.basename(row["original"]))
+        keep |= set(row.get("derivatives") or {})
+
     def cleanup():
         with open(REGISTER, "w", encoding="utf-8") as fh:
             fh.write(reg_backup)
@@ -506,6 +516,21 @@ def main(argv):
                 # an extension — and a suite that writes into the repository
                 # owns taking it out, or the next run of checks.py finds an
                 # original with no register row and says so.
+                # AND NEVER A FILE THE REGISTER STILL NAMES. This was a
+                # list of prefixes, written when the register was empty —
+                # and `-hero@` matches every slot instance, including the
+                # eleven theme heroes that have since been licensed and
+                # committed. The first run after they merged DELETED their
+                # derivatives out of `assets/img`, and the only reason it
+                # was caught is that `checks.py` then failed on 147 pages
+                # referencing files that were no longer there.
+                #
+                # The restored register is the authority on what belongs:
+                # anything it names is somebody's licensed photograph, and
+                # a suite that writes into the repository owns taking out
+                # ONLY what it put in.
+                if f in keep:
+                    continue
                 if (f.startswith("homepage-hero") or f.startswith("door-mountains")
                         or "-hero@" in f or f.startswith("country-hero")):
                     os.remove(os.path.join(d, f))
@@ -692,6 +717,23 @@ def main(argv):
         check("and the ladder is still AVIF, WebP and JPEG",
               {f.rsplit(".", 1)[1] for f in row["derivatives"]}
               == {"avif", "webp", "jpg"})
+
+        # AND IT PUTS BACK WHAT IT TOOK, because it acquired for the same
+        # surface the eight blocks after it use. Without this the homepage
+        # hero stays filled by `pngshot` and every one of them is refused
+        # with "already filled by" — thirteen failures, all correct, none
+        # about the thing being tested. A block that writes the register
+        # owns restoring it, which is the rule the SUITE already follows at
+        # the end and the blocks inside it did not have to until one of them
+        # acquired for a surface it did not own.
+        with open(REGISTER, "w", encoding="utf-8") as fh:
+            fh.write(reg_backup)
+        for d in (os.path.join(ROOT, "photographs"), IMG):
+            if not os.path.isdir(d):
+                continue
+            for f in os.listdir(d):
+                if f.startswith("homepage-hero") and f not in keep:
+                    os.remove(os.path.join(d, f))
         before = snapshot()
 
         # ── 6. an id that does not exist stops, with no substitute ───
