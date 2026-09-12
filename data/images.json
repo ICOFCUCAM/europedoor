@@ -1,4 +1,1655 @@
 {
   "$comment": "The photograph register. EVERY entry needs file, alt, photographer, source and licence; tools/lib/data.py refuses one that does not, and tools/checks.py refuses a published page that references a file with no row here. It is empty because nothing has been licensed yet — see docs/images.md. An empty register is a true statement; a register with a placeholder row in it is not.",
-  "images": {}
+  "images": {
+    "theme:grand-tour-europe": {
+      "purpose": "theme-hero@grand-tour-europe",
+      "publication_path": "/themes/grand-tour-europe",
+      "file": "theme-hero@grand-tour-europe",
+      "original": "photographs/theme-hero@grand-tour-europe.original.jpg",
+      "alt": "A gondola with passengers cruising through Venice's picturesque canals against historic architecture.",
+      "provider": "pexels",
+      "provider_photo_id": "39345440",
+      "photographer": "Helena Jankovičová Kováčová",
+      "photographer_url": "https://www.pexels.com/@helen1",
+      "source": "https://www.pexels.com/photo/venetian-gondola-ride-along-historic-canals-39345440/",
+      "original_url": "https://images.pexels.com/photos/39345440/pexels-photo-39345440.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-12",
+      "acquired_at": "2026-09-12T09:40:48Z",
+      "sha256": "607522adda774e1a66caf5e8bbdb904b76a16e78b2c13aca08cb8c1659b4a0fc",
+      "bytes": 6285353,
+      "width": 6720,
+      "height": 4480,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "607522adda",
+        "source_sha256": "607522adda774e1a66caf5e8bbdb904b76a16e78b2c13aca08cb8c1659b4a0fc",
+        "source_width": 6720,
+        "source_height": 4480,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-12T09:40:54Z"
+      },
+      "derivatives": {
+        "theme-hero@grand-tour-europe.607522adda-480.avif": {
+          "sha256": "0492c472b4d4464d84f9e57a94767261e7b5b1f147f8320421abbe3ea707f61f",
+          "bytes": 23242,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@grand-tour-europe.607522adda-480.webp": {
+          "sha256": "ac721e70d52ac722e397fb9429dae613199d53cb53450f60b1209512bb721ab6",
+          "bytes": 48442,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@grand-tour-europe.607522adda-480.jpg": {
+          "sha256": "79e80c1cd307a8aa4ee9ba60e5b4a1e8f46b8ea3828a893f6937a8c038063a2c",
+          "bytes": 57033,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@grand-tour-europe.607522adda-800.avif": {
+          "sha256": "0f9dc050652df0ea55590fc2894c06da70700994e3b7e6ce075df272d09f98b6",
+          "bytes": 60492,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@grand-tour-europe.607522adda-800.webp": {
+          "sha256": "874cc2c4ca930463f8a513df7828906fa5a8513a1a9bcc66557fb06498cb4bb5",
+          "bytes": 124124,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@grand-tour-europe.607522adda-800.jpg": {
+          "sha256": "8f81d4383b14bb5a8c13def9c7519ef255c8f91cce911fad0c89af866fe9139a",
+          "bytes": 149842,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@grand-tour-europe.607522adda-1260.avif": {
+          "sha256": "85ba9c827b1004712b605ccaa72b1fb06949d0fef53ca2398725d298a20fb370",
+          "bytes": 132287,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@grand-tour-europe.607522adda-1260.webp": {
+          "sha256": "9c0b76f7f604b7cb27ab4338cd56b53de9f4dc4a5ab8ec1c769a5665a8d14dc7",
+          "bytes": 274796,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@grand-tour-europe.607522adda-1260.jpg": {
+          "sha256": "957967a3d55201dbb72ef07ee4f18edee75a08b5cd97faa06a46fc8b9cc3caad",
+          "bytes": 343491,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@grand-tour-europe.607522adda-1800.avif": {
+          "sha256": "481584c3fa7ba3511480283096f711d493608e5bd09bdc5ee3e42333663bd2ab",
+          "bytes": 241556,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@grand-tour-europe.607522adda-1800.webp": {
+          "sha256": "7d008a6727573ae54080aca805480fd3805c197489c1eab716e314333f9691d0",
+          "bytes": 502576,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@grand-tour-europe.607522adda-1800.jpg": {
+          "sha256": "85b091189498705226a8ff58b258b9f0e70aae2d6f280d24016d92be426bada1",
+          "bytes": 647144,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@grand-tour-europe.607522adda-2400.avif": {
+          "sha256": "365c04e9a36d1b6839b4fee0dcb99ac29d4bb70a2887d00fd2368cc4684b5438",
+          "bytes": 384019,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@grand-tour-europe.607522adda-2400.webp": {
+          "sha256": "5f6a6ea4476f24b71577cea6c95e27606f3597d47a186597f2fcc4836be58031",
+          "bytes": 806990,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@grand-tour-europe.607522adda-2400.jpg": {
+          "sha256": "749de0fa00efbe5e41d4940614eb5f0687f3e71a0c305c797c6fb77a0c41a75b",
+          "bytes": 1069943,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "607522adda"
+    },
+    "theme:island-europe": {
+      "purpose": "theme-hero@island-europe",
+      "publication_path": "/themes/island-europe",
+      "file": "theme-hero@island-europe",
+      "original": "photographs/theme-hero@island-europe.original.jpg",
+      "alt": "Stunning aerial view of Fira's iconic white architecture against the Aegean Sea.",
+      "provider": "pexels",
+      "provider_photo_id": "37844509",
+      "photographer": "K",
+      "photographer_url": "https://www.pexels.com/@kelly",
+      "source": "https://www.pexels.com/photo/aerial-view-of-fira-santorini-s-white-structures-37844509/",
+      "original_url": "https://images.pexels.com/photos/37844509/pexels-photo-37844509.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-12",
+      "acquired_at": "2026-09-12T09:40:54Z",
+      "sha256": "e7eaf112349ae3f452f5598ee9ebf91879ce413a8ee10d57d3a6e83050154fd4",
+      "bytes": 8371505,
+      "width": 12288,
+      "height": 6912,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "e7eaf11234",
+        "source_sha256": "e7eaf112349ae3f452f5598ee9ebf91879ce413a8ee10d57d3a6e83050154fd4",
+        "source_width": 12288,
+        "source_height": 6912,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-12T09:41:01Z"
+      },
+      "derivatives": {
+        "theme-hero@island-europe.e7eaf11234-480.avif": {
+          "sha256": "791c0d86973fc6c005cb726a7ddb8f8227b26c481cf8358cc5baccfe7df96615",
+          "bytes": 13539,
+          "width": 480,
+          "height": 270
+        },
+        "theme-hero@island-europe.e7eaf11234-480.webp": {
+          "sha256": "c62b82109cc94516cb360847e3c7f7d0f23b4a6d6fba0f86cfbfed959de30cfc",
+          "bytes": 25024,
+          "width": 480,
+          "height": 270
+        },
+        "theme-hero@island-europe.e7eaf11234-480.jpg": {
+          "sha256": "1bc2c527c2693e7ddf8505451695967dbc8e11027699f13077ace71e1b9df16d",
+          "bytes": 33933,
+          "width": 480,
+          "height": 270
+        },
+        "theme-hero@island-europe.e7eaf11234-800.avif": {
+          "sha256": "84c926c586ccd5d04a20cd9d06b239eddf3de7df3a1dc541b25d1e62d709313b",
+          "bytes": 32992,
+          "width": 800,
+          "height": 450
+        },
+        "theme-hero@island-europe.e7eaf11234-800.webp": {
+          "sha256": "d7f25bc8060ef41c08536873d80f4024f249c9d5dc909e9593d884b974f4e819",
+          "bytes": 61182,
+          "width": 800,
+          "height": 450
+        },
+        "theme-hero@island-europe.e7eaf11234-800.jpg": {
+          "sha256": "676437097121d3e51553c0253a0562976c0b111bcfd810974d26428eca021c4c",
+          "bytes": 85288,
+          "width": 800,
+          "height": 450
+        },
+        "theme-hero@island-europe.e7eaf11234-1260.avif": {
+          "sha256": "0f48cbaf84f2a7442dba8ea93158f451647c7d13a5ed41e68a27a83f885aff22",
+          "bytes": 71306,
+          "width": 1260,
+          "height": 709
+        },
+        "theme-hero@island-europe.e7eaf11234-1260.webp": {
+          "sha256": "a8d17ffbe6f14de7247e2672143b8758cc09a0ec1bfebf18bf2ee14f6c51ecfb",
+          "bytes": 132346,
+          "width": 1260,
+          "height": 709
+        },
+        "theme-hero@island-europe.e7eaf11234-1260.jpg": {
+          "sha256": "736a21bd2df37f291d2ee6ed889bbdb8c8b6486a2355cf12aa7c877a344ec525",
+          "bytes": 191916,
+          "width": 1260,
+          "height": 709
+        },
+        "theme-hero@island-europe.e7eaf11234-1800.avif": {
+          "sha256": "d00ea26f8bb0dff1fd431136273be2971ceb4172b663f69bfa06ca19a9d5080c",
+          "bytes": 127924,
+          "width": 1800,
+          "height": 1012
+        },
+        "theme-hero@island-europe.e7eaf11234-1800.webp": {
+          "sha256": "5603a51404d14702fcbe52111f1807c376080bf84662a7fbd2d2657332cdc7b7",
+          "bytes": 234350,
+          "width": 1800,
+          "height": 1012
+        },
+        "theme-hero@island-europe.e7eaf11234-1800.jpg": {
+          "sha256": "3db0591477d14f8f05536ab54935f2772fdf161b2932218bf574fa5ae242fe38",
+          "bytes": 358923,
+          "width": 1800,
+          "height": 1012
+        },
+        "theme-hero@island-europe.e7eaf11234-2400.avif": {
+          "sha256": "57c1d4e4bf6ff9b765e98c55bdf920b0398338088668642aac7985efeee5c0ca",
+          "bytes": 206540,
+          "width": 2400,
+          "height": 1350
+        },
+        "theme-hero@island-europe.e7eaf11234-2400.webp": {
+          "sha256": "f70d34ebab48fcb37fc865d5b2e581fa5d6d48abcfa427287afb6b7a96dd8e3c",
+          "bytes": 369034,
+          "width": 2400,
+          "height": 1350
+        },
+        "theme-hero@island-europe.e7eaf11234-2400.jpg": {
+          "sha256": "2ec0672d976652c4c68ef483d9b1ea03fd351a8ab1f46ba9b1a1febbe802a1e1",
+          "bytes": 590237,
+          "width": 2400,
+          "height": 1350
+        }
+      },
+      "version": "e7eaf11234"
+    },
+    "theme:modernist-europe": {
+      "purpose": "theme-hero@modernist-europe",
+      "publication_path": "/themes/modernist-europe",
+      "file": "theme-hero@modernist-europe",
+      "original": "photographs/theme-hero@modernist-europe.original.jpg",
+      "alt": "Intriguing Brutalist architecture of the Skopje Post Office captured in golden hour.",
+      "provider": "pexels",
+      "provider_photo_id": "7816752",
+      "photographer": "Eda Ayan",
+      "photographer_url": "https://www.pexels.com/@eda-ayan-1841392",
+      "source": "https://www.pexels.com/photo/facade-of-a-concrete-building-7816752/",
+      "original_url": "https://images.pexels.com/photos/7816752/pexels-photo-7816752.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-12",
+      "acquired_at": "2026-09-12T09:41:01Z",
+      "sha256": "a3eeae150010da67062920540946183ec74524a511f188ffcc2a0167b49a699e",
+      "bytes": 3245234,
+      "width": 7864,
+      "height": 3996,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "a3eeae1500",
+        "source_sha256": "a3eeae150010da67062920540946183ec74524a511f188ffcc2a0167b49a699e",
+        "source_width": 7864,
+        "source_height": 3996,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-12T09:41:05Z"
+      },
+      "derivatives": {
+        "theme-hero@modernist-europe.a3eeae1500-480.avif": {
+          "sha256": "83a491a3dba276a8c5361a711947a74cd4ba6986d6d86ad1b5f0815e871ee3b1",
+          "bytes": 10355,
+          "width": 480,
+          "height": 244
+        },
+        "theme-hero@modernist-europe.a3eeae1500-480.webp": {
+          "sha256": "8daed057dece7ed41e2cc8076cf837adc89e71b4bd0dc4126d2ff7c568037ad4",
+          "bytes": 19130,
+          "width": 480,
+          "height": 244
+        },
+        "theme-hero@modernist-europe.a3eeae1500-480.jpg": {
+          "sha256": "c16b12e005350512c73ee97ed1b40d3f73590b2f9ad8699738f47950171bb868",
+          "bytes": 28094,
+          "width": 480,
+          "height": 244
+        },
+        "theme-hero@modernist-europe.a3eeae1500-800.avif": {
+          "sha256": "a84aabe657eaa766742627012dfb48c25f9863350340e1a1462dd1df54c1cbc8",
+          "bytes": 26216,
+          "width": 800,
+          "height": 407
+        },
+        "theme-hero@modernist-europe.a3eeae1500-800.webp": {
+          "sha256": "4cb4a28cf706577c656e3a67180ef8e6c9b0c07ef6ad447b7d6ac8d73529cc82",
+          "bytes": 48622,
+          "width": 800,
+          "height": 407
+        },
+        "theme-hero@modernist-europe.a3eeae1500-800.jpg": {
+          "sha256": "9a459372308c61afd0ffbe79075d3e8a2ef532f23bbaa7eb4254d1eb15ac68dc",
+          "bytes": 71494,
+          "width": 800,
+          "height": 407
+        },
+        "theme-hero@modernist-europe.a3eeae1500-1260.avif": {
+          "sha256": "b27ea6252b90fea9b34c2de1c5c7e6167e8dde7fd16ac4c17c35aef96ac1c7de",
+          "bytes": 60656,
+          "width": 1260,
+          "height": 640
+        },
+        "theme-hero@modernist-europe.a3eeae1500-1260.webp": {
+          "sha256": "8b14ee52ad7d23545b4391c0cfd0938172381ba8b6a6bcddb675a656b6a2eee4",
+          "bytes": 119160,
+          "width": 1260,
+          "height": 640
+        },
+        "theme-hero@modernist-europe.a3eeae1500-1260.jpg": {
+          "sha256": "d27575ab0a8d568832a5bfba8dddea14eb8f60c69cbcd36832d3728211522c8e",
+          "bytes": 170921,
+          "width": 1260,
+          "height": 640
+        },
+        "theme-hero@modernist-europe.a3eeae1500-1800.avif": {
+          "sha256": "499fb445e79d672748bdf858942c10722db92cb64492512b23ca9d55c817d34d",
+          "bytes": 117355,
+          "width": 1800,
+          "height": 915
+        },
+        "theme-hero@modernist-europe.a3eeae1500-1800.webp": {
+          "sha256": "64c4cf070153ebba55fdd49cf0e2f8a3146214b91a638e9dfd351d41cb0db1f3",
+          "bytes": 236424,
+          "width": 1800,
+          "height": 915
+        },
+        "theme-hero@modernist-europe.a3eeae1500-1800.jpg": {
+          "sha256": "754685da424d2b0997c0461f7e6fd8fd2064675dbd6ef486492961cd69668823",
+          "bytes": 336500,
+          "width": 1800,
+          "height": 915
+        },
+        "theme-hero@modernist-europe.a3eeae1500-2400.avif": {
+          "sha256": "dd68735675ec73ff89b2b85530c5684dcdc5c75f565e46738243fa68d9407690",
+          "bytes": 192483,
+          "width": 2400,
+          "height": 1220
+        },
+        "theme-hero@modernist-europe.a3eeae1500-2400.webp": {
+          "sha256": "5386a446b9f5b27dbdd2bc0761694d632a19375705fb1ec57417d22f38188a84",
+          "bytes": 386436,
+          "width": 2400,
+          "height": 1220
+        },
+        "theme-hero@modernist-europe.a3eeae1500-2400.jpg": {
+          "sha256": "00750ea0b45031749d2e2e698e55794461a6a2d09243b9d8eaf76d9de044769d",
+          "bytes": 557470,
+          "width": 2400,
+          "height": 1220
+        }
+      },
+      "version": "a3eeae1500"
+    },
+    "theme:mountain-europe": {
+      "purpose": "theme-hero@mountain-europe",
+      "publication_path": "/themes/mountain-europe",
+      "file": "theme-hero@mountain-europe",
+      "original": "photographs/theme-hero@mountain-europe.original.jpg",
+      "alt": "Stunning view of the Matterhorn peak in Zermatt, Switzerland during a clear day. Perfect for nature lovers.",
+      "provider": "pexels",
+      "provider_photo_id": "11917565",
+      "photographer": "Ryan Klaus",
+      "photographer_url": "https://www.pexels.com/@ryank",
+      "source": "https://www.pexels.com/photo/scenic-view-of-trees-on-the-mountains-11917565/",
+      "original_url": "https://images.pexels.com/photos/11917565/pexels-photo-11917565.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-12",
+      "acquired_at": "2026-09-12T09:41:06Z",
+      "sha256": "f3c1e5d3bf9f05c0c146bc1f08339ef6dc16e2c71a82e3a833bcc8d36604b216",
+      "bytes": 3294547,
+      "width": 6720,
+      "height": 4480,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "f3c1e5d3bf",
+        "source_sha256": "f3c1e5d3bf9f05c0c146bc1f08339ef6dc16e2c71a82e3a833bcc8d36604b216",
+        "source_width": 6720,
+        "source_height": 4480,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-12T09:41:10Z"
+      },
+      "derivatives": {
+        "theme-hero@mountain-europe.f3c1e5d3bf-480.avif": {
+          "sha256": "f86cb8bd657404aed013cc503c7616134dde5511998307a4565828f26e3450dc",
+          "bytes": 11700,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@mountain-europe.f3c1e5d3bf-480.webp": {
+          "sha256": "6e4d000e5679d2d5ecf15e0d7559e8e353adbad9991f2521dc9c6a6d10c9e2d7",
+          "bytes": 18956,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@mountain-europe.f3c1e5d3bf-480.jpg": {
+          "sha256": "eb47780418ac80190f931ac39e3fda8a5c26d2a4966663e7733e7c40f24d5799",
+          "bytes": 29354,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@mountain-europe.f3c1e5d3bf-800.avif": {
+          "sha256": "5b416e34a349d8510e20bc80e9de9c0926b0b1b2275aba7fdea24be92c8bd9ca",
+          "bytes": 29004,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@mountain-europe.f3c1e5d3bf-800.webp": {
+          "sha256": "04f23b97ab0f696b52707350da3a197942ad82981489fe20da1c8b6371162fd3",
+          "bytes": 47706,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@mountain-europe.f3c1e5d3bf-800.jpg": {
+          "sha256": "73da9d1e18e4121f2aa4bc8c68aba9ac3ee53509a87d97adef4907b15bbd5e21",
+          "bytes": 76205,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@mountain-europe.f3c1e5d3bf-1260.avif": {
+          "sha256": "6a0f2901b951265cd74f5bb465efee331d343b69bd096263dcd5039c387f5ee5",
+          "bytes": 67218,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@mountain-europe.f3c1e5d3bf-1260.webp": {
+          "sha256": "69335d861b1f709a04905c4931bd6d32d4f73606a41a380b1ffd7e9dc1689ae7",
+          "bytes": 110078,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@mountain-europe.f3c1e5d3bf-1260.jpg": {
+          "sha256": "d85da6c596b1421ef34a059281bce8a32e59ce559d1a35f69a176d8e6b531e8a",
+          "bytes": 178392,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@mountain-europe.f3c1e5d3bf-1800.avif": {
+          "sha256": "2c382a4a5b69413910edf4cd46c4128cf0fb669106bbe10784c1e93e7cda8e12",
+          "bytes": 130399,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@mountain-europe.f3c1e5d3bf-1800.webp": {
+          "sha256": "43008dd773cce19c5affd82c9be508c5fec3003d66196bd2b25d85cb5bf3ae83",
+          "bytes": 211928,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@mountain-europe.f3c1e5d3bf-1800.jpg": {
+          "sha256": "44d1c0a8b4949cff797cf3f811efe4c9549cfba8c91188b664c474b64be88b8e",
+          "bytes": 351118,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@mountain-europe.f3c1e5d3bf-2400.avif": {
+          "sha256": "3a87a2f7a4a815884b5885fc0ab36ee536aeb62c491f8ec6e38da941fe39cc66",
+          "bytes": 224518,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@mountain-europe.f3c1e5d3bf-2400.webp": {
+          "sha256": "84a337f8a10024b32c5eea7e745c7d0102f3fae2a888005c7c04aae2755740ec",
+          "bytes": 359128,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@mountain-europe.f3c1e5d3bf-2400.jpg": {
+          "sha256": "30165ef6a9ee4137902d62ba2315fe13a9180af0cde9adcea0fbf29b8d9e9e55",
+          "bytes": 605536,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "f3c1e5d3bf"
+    },
+    "theme:rail-europe": {
+      "purpose": "theme-hero@rail-europe",
+      "publication_path": "/themes/rail-europe",
+      "file": "theme-hero@rail-europe",
+      "original": "photographs/theme-hero@rail-europe.original.jpg",
+      "alt": "View of railway tracks stretching through the lush green UK countryside under a clear blue sky.",
+      "provider": "pexels",
+      "provider_photo_id": "11996682",
+      "photographer": "Mike Bird",
+      "photographer_url": "https://www.pexels.com/@mikebird",
+      "source": "https://www.pexels.com/photo/a-train-tracks-under-the-blue-sky-11996682/",
+      "original_url": "https://images.pexels.com/photos/11996682/pexels-photo-11996682.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-12",
+      "acquired_at": "2026-09-12T09:41:11Z",
+      "sha256": "744d02847c45eab95785e39033ee9a356695d4130abc26e0e7928d4293315963",
+      "bytes": 4472835,
+      "width": 6000,
+      "height": 4000,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "744d02847c",
+        "source_sha256": "744d02847c45eab95785e39033ee9a356695d4130abc26e0e7928d4293315963",
+        "source_width": 6000,
+        "source_height": 4000,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-12T09:41:17Z"
+      },
+      "derivatives": {
+        "theme-hero@rail-europe.744d02847c-480.avif": {
+          "sha256": "6dfed0ab892501a22614fc655b847b847ca9fbf3ac3629a88570c883c8c5356d",
+          "bytes": 21876,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@rail-europe.744d02847c-480.webp": {
+          "sha256": "c13ce1514e5779a023c0109d2b13f8c69d562c6ecbe00825270106a2d5a02259",
+          "bytes": 44528,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@rail-europe.744d02847c-480.jpg": {
+          "sha256": "beae0465c99ded0d88c7e109ec69fd36c56cbf3c594ed63596f7e10300d90c5e",
+          "bytes": 53948,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@rail-europe.744d02847c-800.avif": {
+          "sha256": "c73a1e6a39f1f840ee1df99c74c00eaeed86d2afd76f15f17500652b0ee5c907",
+          "bytes": 57811,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@rail-europe.744d02847c-800.webp": {
+          "sha256": "75c54eeaf0b50195cf14365b1ac96152ab80fd9e98436a6e52bc31914aa17250",
+          "bytes": 119720,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@rail-europe.744d02847c-800.jpg": {
+          "sha256": "c570404bca9f5bbf14b63408481840066a46a772e772bb1eb32eaeb4d14dea2c",
+          "bytes": 145543,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@rail-europe.744d02847c-1260.avif": {
+          "sha256": "4292af50685f8799413b0f43e80f6ab04a089025071732d2a86a6a9037fb6c22",
+          "bytes": 135018,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@rail-europe.744d02847c-1260.webp": {
+          "sha256": "f3cb970bbe68178c6c9eabd995d92062768445c9cd02b824db700cb68161a704",
+          "bytes": 280544,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@rail-europe.744d02847c-1260.jpg": {
+          "sha256": "b35571c6fd51e367bffadd50b501ed9df22771f471ce60f221819ba2e05d9d7f",
+          "bytes": 345480,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@rail-europe.744d02847c-1800.avif": {
+          "sha256": "ee92e1359e5bf7abe51a3cf9dcdd8ef25012eaa8672d1fe0cecee8a78f8b4bd4",
+          "bytes": 258627,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@rail-europe.744d02847c-1800.webp": {
+          "sha256": "d23d50d2eb683168e6138a742ed5dfcfefd28eb68efba53b4f83d69696428f19",
+          "bytes": 523132,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@rail-europe.744d02847c-1800.jpg": {
+          "sha256": "bd17d93a25b557b3cd4ef2584f3d1cf3eb744d0f1d4869b6c427b96a76c2ebd3",
+          "bytes": 663448,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@rail-europe.744d02847c-2400.avif": {
+          "sha256": "c2b593b5bb8c272b3107988ac191947283931dc5c9233be4744b3594babecd51",
+          "bytes": 423193,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@rail-europe.744d02847c-2400.webp": {
+          "sha256": "cf6c4303c7dd7b012594d30055456ef2aaee8e966682f38152f1b593b6ae04a5",
+          "bytes": 851088,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@rail-europe.744d02847c-2400.jpg": {
+          "sha256": "fbe76b9c538617c8d658915418179d2928f1eaa19d708fcef53e369f90f2d9a8",
+          "bytes": 1096111,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "744d02847c"
+    },
+    "theme:renaissance-europe": {
+      "purpose": "theme-hero@renaissance-europe",
+      "publication_path": "/themes/renaissance-europe",
+      "file": "theme-hero@renaissance-europe",
+      "original": "photographs/theme-hero@renaissance-europe.original.jpg",
+      "alt": "Historical map of Italy located in the Vatican Museums, showcasing Renaissance artistry.",
+      "provider": "pexels",
+      "provider_photo_id": "27063859",
+      "photographer": "Josh Withers",
+      "photographer_url": "https://www.pexels.com/@hellojoshwithers",
+      "source": "https://www.pexels.com/photo/photo-of-the-map-of-italy-27063859/",
+      "original_url": "https://images.pexels.com/photos/27063859/pexels-photo-27063859.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-12",
+      "acquired_at": "2026-09-12T09:41:17Z",
+      "sha256": "2aa2d4a99fbbb9e13fde5a7856597e69711affab55b0e6f220f07bee5f9877f4",
+      "bytes": 27368436,
+      "width": 16092,
+      "height": 10728,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "2aa2d4a99f",
+        "source_sha256": "2aa2d4a99fbbb9e13fde5a7856597e69711affab55b0e6f220f07bee5f9877f4",
+        "source_width": 16092,
+        "source_height": 10728,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-12T09:41:30Z"
+      },
+      "derivatives": {
+        "theme-hero@renaissance-europe.2aa2d4a99f-480.avif": {
+          "sha256": "4106801c282859d585765f03936f9fccb52e915f0e2f425848309fa86248b8ed",
+          "bytes": 22501,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@renaissance-europe.2aa2d4a99f-480.webp": {
+          "sha256": "eed5e6dfc94015af652e3b9deab714354fe59144b5141a28c6a72bd4f13f80f1",
+          "bytes": 48576,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@renaissance-europe.2aa2d4a99f-480.jpg": {
+          "sha256": "fe99d20334510f3af3538eca77ccdeb6b2d38133660e7bb2b64c960459763927",
+          "bytes": 55141,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@renaissance-europe.2aa2d4a99f-800.avif": {
+          "sha256": "deedc6def37f2e1346a44e51354ddd3f9063b9d7c6e51c3ac7ac16a60f95ff34",
+          "bytes": 58702,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@renaissance-europe.2aa2d4a99f-800.webp": {
+          "sha256": "b97742d1f69badb3c5aed89a77ae9898daef5bbf1fb1cb8651de80e5b06988fc",
+          "bytes": 125324,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@renaissance-europe.2aa2d4a99f-800.jpg": {
+          "sha256": "7ea364c82689853fdc7d8d8eced92b2fa9e93580c50753ff02e12938bc30a409",
+          "bytes": 146950,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@renaissance-europe.2aa2d4a99f-1260.avif": {
+          "sha256": "54d5010ba878159da8843a9bf84308a460069fb2c1cc1ae6b903c0cb26f4238d",
+          "bytes": 129497,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@renaissance-europe.2aa2d4a99f-1260.webp": {
+          "sha256": "ed561fc51215ab1ac451a6e73c636d60a19f6386743269f0f2fa9dd23466e395",
+          "bytes": 270450,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@renaissance-europe.2aa2d4a99f-1260.jpg": {
+          "sha256": "887fe081351f93ffa10f3c3060a033689a974f3d8ed4b200e6e91593bc31efe0",
+          "bytes": 336201,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@renaissance-europe.2aa2d4a99f-1800.avif": {
+          "sha256": "6670c711c17c3698f5bc080040060c11bebd2fb2a11638d2d9001a2bca5d5b7e",
+          "bytes": 237733,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@renaissance-europe.2aa2d4a99f-1800.webp": {
+          "sha256": "30c3eb6976c0e92c205e31892ab39c6d25bbdaa4b053921006045c485185c5f8",
+          "bytes": 492164,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@renaissance-europe.2aa2d4a99f-1800.jpg": {
+          "sha256": "a030026e282d5fe5f678627178bdcf398a35cbb2ecc5c03a1bef0faae4e9db15",
+          "bytes": 627873,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@renaissance-europe.2aa2d4a99f-2400.avif": {
+          "sha256": "077cc92a343ee5a6c4d78cf66eb47f2c41f5228e8f385b01fc2a31df1ceb2fe3",
+          "bytes": 381824,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@renaissance-europe.2aa2d4a99f-2400.webp": {
+          "sha256": "9e1e7fb2fadabf8eddbdaefb9a24f02ac8302aafce425a056ac3fbe183d4dc0c",
+          "bytes": 782730,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@renaissance-europe.2aa2d4a99f-2400.jpg": {
+          "sha256": "e191bb53ff56ee90f447a0ae6f2fe6b74e81160db889275cdb75bc42e79b172b",
+          "bytes": 1030510,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "2aa2d4a99f"
+    },
+    "theme:roman-europe": {
+      "purpose": "theme-hero@roman-europe",
+      "publication_path": "/themes/roman-europe",
+      "file": "theme-hero@roman-europe",
+      "original": "photographs/theme-hero@roman-europe.original.jpg",
+      "alt": "Close-up of the ancient Colosseum in Rome showcasing its majestic Roman architecture.",
+      "provider": "pexels",
+      "provider_photo_id": "27112031",
+      "photographer": "C1 Superstar",
+      "photographer_url": "https://www.pexels.com/@c1superstar",
+      "source": "https://www.pexels.com/photo/colosseo-a-roma-27112031/",
+      "original_url": "https://images.pexels.com/photos/27112031/pexels-photo-27112031.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-12",
+      "acquired_at": "2026-09-12T09:41:30Z",
+      "sha256": "ede8ff9310786d5e770797ee37a70abf92d3e349555bf62dbdfe94437012440f",
+      "bytes": 3437267,
+      "width": 6000,
+      "height": 4000,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "ede8ff9310",
+        "source_sha256": "ede8ff9310786d5e770797ee37a70abf92d3e349555bf62dbdfe94437012440f",
+        "source_width": 6000,
+        "source_height": 4000,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-12T09:41:35Z"
+      },
+      "derivatives": {
+        "theme-hero@roman-europe.ede8ff9310-480.avif": {
+          "sha256": "d694f1ce452e06c27db0e399b9a004685e46a211bd687a8ec5f5e110bded8068",
+          "bytes": 12088,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@roman-europe.ede8ff9310-480.webp": {
+          "sha256": "6ead14dd5ff8c2616db0ecff25bd1da4997bcf287845f56bb6971ffa77548c19",
+          "bytes": 23674,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@roman-europe.ede8ff9310-480.jpg": {
+          "sha256": "60caf3961af3a2028ecc00b695a3c8b701360954b27be8c51a5353895749d729",
+          "bytes": 33810,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@roman-europe.ede8ff9310-800.avif": {
+          "sha256": "407cded468e0dcf4dfbaa58e8f1ec85f0a8045af01b993c7762e8e89690c5be2",
+          "bytes": 33411,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@roman-europe.ede8ff9310-800.webp": {
+          "sha256": "0c0b29510e379d77243ec60df7e349b9632be6902f542e52e62848eff41e21c2",
+          "bytes": 65308,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@roman-europe.ede8ff9310-800.jpg": {
+          "sha256": "c40995ff9eeb231878b00157b46ab13c99396edd5f780fb42eb0dd51d2c963c9",
+          "bytes": 91076,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@roman-europe.ede8ff9310-1260.avif": {
+          "sha256": "df822acf4682d5349f3ab442ecabb324a226293c3fa573c97d4c67ff07b4a400",
+          "bytes": 83722,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@roman-europe.ede8ff9310-1260.webp": {
+          "sha256": "c027da2c36bba5ae7377c008dd1d3f496b3e933a037eb03f76fa7d901c378001",
+          "bytes": 166600,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@roman-europe.ede8ff9310-1260.jpg": {
+          "sha256": "c4f38af828ec3b00fca888fc8b7787345f56cc7a947fd22e2702640432008a48",
+          "bytes": 226771,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@roman-europe.ede8ff9310-1800.avif": {
+          "sha256": "99eb906734e4f4076ec33818781cec4aba41fd38e284a4fdc4b69b01f2eeb1a0",
+          "bytes": 168886,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@roman-europe.ede8ff9310-1800.webp": {
+          "sha256": "ff2e2ad7ae1150c6f57552d7a87b2db92cc8ff4adbff54eda079faeaca79acc0",
+          "bytes": 336500,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@roman-europe.ede8ff9310-1800.jpg": {
+          "sha256": "f6cd376b6d6caa8b8822eec5ce44eecb51395a01dc8ad131425e9f087faeec03",
+          "bytes": 459942,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@roman-europe.ede8ff9310-2400.avif": {
+          "sha256": "7c3d4ea9b9819a41fb031d4ee7fa8282d7fd69d9272531f2569061f9e7f14d4c",
+          "bytes": 295908,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@roman-europe.ede8ff9310-2400.webp": {
+          "sha256": "d7da1cf20f0a27fc86b1b5c437e4ec2e4918f58dd7588d27052c2b69c5d8328d",
+          "bytes": 576922,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@roman-europe.ede8ff9310-2400.jpg": {
+          "sha256": "eb32ad103a888b3af1af4754498fe70ad87907f83b53c0e5b6bcfee8cb533c87",
+          "bytes": 796725,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "ede8ff9310"
+    },
+    "theme:sacred-europe": {
+      "purpose": "theme-hero@sacred-europe",
+      "publication_path": "/themes/sacred-europe",
+      "file": "theme-hero@sacred-europe",
+      "original": "photographs/theme-hero@sacred-europe.original.jpg",
+      "alt": "Stunning architectural shot of the iconic Sacré-Cœur Basilica against a clear sky in Paris.",
+      "provider": "pexels",
+      "provider_photo_id": "17577024",
+      "photographer": "Alina  Rossoshanska",
+      "photographer_url": "https://www.pexels.com/@alina-rossoshanska-338724645",
+      "source": "https://www.pexels.com/photo/sacre-coeur-basilica-with-tower-17577024/",
+      "original_url": "https://images.pexels.com/photos/17577024/pexels-photo-17577024.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-12",
+      "acquired_at": "2026-09-12T09:41:35Z",
+      "sha256": "59a4b551174ff196d654da002ed532bd35d5a4ef227c29c893f09f89ef17a05f",
+      "bytes": 2348064,
+      "width": 6720,
+      "height": 4480,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "59a4b55117",
+        "source_sha256": "59a4b551174ff196d654da002ed532bd35d5a4ef227c29c893f09f89ef17a05f",
+        "source_width": 6720,
+        "source_height": 4480,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-12T09:41:40Z"
+      },
+      "derivatives": {
+        "theme-hero@sacred-europe.59a4b55117-480.avif": {
+          "sha256": "1d058ca7f0b5c1d7d774b1514b1f7084757bb53ee0e8d21dd9eaab682e336480",
+          "bytes": 10927,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@sacred-europe.59a4b55117-480.webp": {
+          "sha256": "bbd3cc094b75ceed02f9edb95150d7bb18f27ce3cd948c3074b8e51c9593ef9f",
+          "bytes": 20032,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@sacred-europe.59a4b55117-480.jpg": {
+          "sha256": "bb53790026f3331fb0707ef43ceda1f8a288f924321ace3b7a0679705db48e18",
+          "bytes": 30144,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@sacred-europe.59a4b55117-800.avif": {
+          "sha256": "c806be5179c429fa7981110a5b125da382532d8b656516ecb052acc7fe5492d6",
+          "bytes": 26244,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@sacred-europe.59a4b55117-800.webp": {
+          "sha256": "99d7777fa13560d1e542b26f32ba6fecf59507c312b3a560e399d15180bb05ce",
+          "bytes": 48944,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@sacred-europe.59a4b55117-800.jpg": {
+          "sha256": "6ae2e19bc4b8487b299eb6b0b48cf6bd8fc5f1481ae1999ce5bf65803f1f932d",
+          "bytes": 76044,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@sacred-europe.59a4b55117-1260.avif": {
+          "sha256": "883d3852642719a538e7c06ebd969c91f25a8aabd7f306d5f9f499f06f6f954a",
+          "bytes": 59042,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@sacred-europe.59a4b55117-1260.webp": {
+          "sha256": "5da5efe4fa842a62e11fe5881bc6b5171d244f4b2c4661e86036536ffb16a047",
+          "bytes": 112718,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@sacred-europe.59a4b55117-1260.jpg": {
+          "sha256": "42c0f8a1ff3fa99f8a92c38c243b1ad1dda21615ca349c588be54ede5d09f328",
+          "bytes": 175493,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@sacred-europe.59a4b55117-1800.avif": {
+          "sha256": "df5bc726d3dfe5ebd0916bc3ce9628a1b257f0f143013e8ae24f7d9b68f129a3",
+          "bytes": 115509,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@sacred-europe.59a4b55117-1800.webp": {
+          "sha256": "45316db196b5ef87fc7a46f22558f49788762e537c426f3fd88930168e93061a",
+          "bytes": 220338,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@sacred-europe.59a4b55117-1800.jpg": {
+          "sha256": "1ebf1f380985565c765c832bb7f3ba1d3468fb2620d8577463f9af8c48f38f05",
+          "bytes": 343191,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@sacred-europe.59a4b55117-2400.avif": {
+          "sha256": "4429c1d99e4099f128f70c9dd0dfff1b4b8e6caf82f4bda65352717355c4f206",
+          "bytes": 196724,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@sacred-europe.59a4b55117-2400.webp": {
+          "sha256": "2e65b991d3b830e9302c9fcb5a223f351d04f76d84ee8ead2b41b5f13f8c6452",
+          "bytes": 375166,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@sacred-europe.59a4b55117-2400.jpg": {
+          "sha256": "c5f20a1220016831ec751855e5c3091d07fac2a13b6b4d8fc6520777d8c0c064",
+          "bytes": 583903,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "59a4b55117"
+    },
+    "theme:thermal-europe": {
+      "purpose": "theme-hero@thermal-europe",
+      "publication_path": "/themes/thermal-europe",
+      "file": "theme-hero@thermal-europe",
+      "original": "photographs/theme-hero@thermal-europe.original.jpg",
+      "alt": "Geysers and steam in a serene Icelandic landscape surrounded by hills and trees.",
+      "provider": "pexels",
+      "provider_photo_id": "18696926",
+      "photographer": "Jamaal Hutchinson",
+      "photographer_url": "https://www.pexels.com/@jamaal-hutchinson-675024091",
+      "source": "https://www.pexels.com/photo/hot-spring-in-iceland-18696926/",
+      "original_url": "https://images.pexels.com/photos/18696926/pexels-photo-18696926.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-12",
+      "acquired_at": "2026-09-12T09:41:41Z",
+      "sha256": "037cc1e5c48041b15052376f39a67c6d0b73a2f18b824f6360ad875a6765c032",
+      "bytes": 3256592,
+      "width": 6000,
+      "height": 4000,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "037cc1e5c4",
+        "source_sha256": "037cc1e5c48041b15052376f39a67c6d0b73a2f18b824f6360ad875a6765c032",
+        "source_width": 6000,
+        "source_height": 4000,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-12T09:41:45Z"
+      },
+      "derivatives": {
+        "theme-hero@thermal-europe.037cc1e5c4-480.avif": {
+          "sha256": "fbd02101caf44895e7643ccf49b5d4fd5408610231521e742691654d6490cc0b",
+          "bytes": 12748,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@thermal-europe.037cc1e5c4-480.webp": {
+          "sha256": "3831ec4d1fb3de9b816ad9fafb40a9600b61b65307898c0c9fa3672b03d17286",
+          "bytes": 23842,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@thermal-europe.037cc1e5c4-480.jpg": {
+          "sha256": "ea5387876e471bc6a7705b622649594bc7aed70ac5ceeeff095a9796a22dffb8",
+          "bytes": 33360,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@thermal-europe.037cc1e5c4-800.avif": {
+          "sha256": "d56bc5c51365662fb8308f29dcc9e743d9992ee4787643e2023e3944593278e9",
+          "bytes": 34600,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@thermal-europe.037cc1e5c4-800.webp": {
+          "sha256": "ffa14dc608807f43428bcb56d69f0281cf4d9745b4a5b79b3b760a4fc2b83d14",
+          "bytes": 66092,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@thermal-europe.037cc1e5c4-800.jpg": {
+          "sha256": "684386faa0b80f9116e7002f423e0fe708e21200786377d9b1c803eaec741d45",
+          "bytes": 90573,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@thermal-europe.037cc1e5c4-1260.avif": {
+          "sha256": "c1650d3d78f7812715a00762925bbdfaba59fa7a356f4a46f510acc06b45280e",
+          "bytes": 81031,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@thermal-europe.037cc1e5c4-1260.webp": {
+          "sha256": "5e0dce4ac51cfd5c1864b61d3c8107db3cb0590d9d36c12670a7dd042673eae4",
+          "bytes": 158286,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@thermal-europe.037cc1e5c4-1260.jpg": {
+          "sha256": "595bee4b9f7b0fcb7dfb5f7fbbb0a98e27ea8c6bb6ae14a59f386290b04c5366",
+          "bytes": 215183,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@thermal-europe.037cc1e5c4-1800.avif": {
+          "sha256": "5a217816eb404bb1795c627a557f0eb15550a6a226ae7e76ce46e4c7e7796187",
+          "bytes": 154883,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@thermal-europe.037cc1e5c4-1800.webp": {
+          "sha256": "2d923685dc575d03deaa94bb578402bcb6ed7b0c837b25e40bc0c467193f5367",
+          "bytes": 295442,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@thermal-europe.037cc1e5c4-1800.jpg": {
+          "sha256": "e6ab9fa68eaaae9c687b2c15e3e573aa94d3d761d523f44ef295cae597598950",
+          "bytes": 415715,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@thermal-europe.037cc1e5c4-2400.avif": {
+          "sha256": "67728f6886d2994e860c09101cd1c6dc3bd1bf12c526710d13fb39212a7c576e",
+          "bytes": 253860,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@thermal-europe.037cc1e5c4-2400.webp": {
+          "sha256": "47fbc9ecdfe40bab444668c2445bc2769d42a0ec6cee55ffead073a60d552643",
+          "bytes": 480474,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@thermal-europe.037cc1e5c4-2400.jpg": {
+          "sha256": "85f6669ffc24b988585985179ce32c2306b76526ff0ed12ba64b014ddbeafa5e",
+          "bytes": 698350,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "037cc1e5c4"
+    },
+    "theme:viking-europe": {
+      "purpose": "theme-hero@viking-europe",
+      "publication_path": "/themes/viking-europe",
+      "file": "theme-hero@viking-europe",
+      "original": "photographs/theme-hero@viking-europe.original.jpg",
+      "alt": "Scenic view of cruise boat on the Danube River with Budapest architecture.",
+      "provider": "pexels",
+      "provider_photo_id": "28958865",
+      "photographer": "Uiliam Nörnberg",
+      "photographer_url": "https://www.pexels.com/@uiliamnornberg",
+      "source": "https://www.pexels.com/photo/danube-river-cruise-boat-in-budapest-hungary-28958865/",
+      "original_url": "https://images.pexels.com/photos/28958865/pexels-photo-28958865.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-12",
+      "acquired_at": "2026-09-12T09:41:45Z",
+      "sha256": "3d21c242c6960a9bc9ab95d708050b6209e55650f4dddb6b8c33265a79c7e75e",
+      "bytes": 3287133,
+      "width": 6000,
+      "height": 4000,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "3d21c242c6",
+        "source_sha256": "3d21c242c6960a9bc9ab95d708050b6209e55650f4dddb6b8c33265a79c7e75e",
+        "source_width": 6000,
+        "source_height": 4000,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-12T09:41:50Z"
+      },
+      "derivatives": {
+        "theme-hero@viking-europe.3d21c242c6-480.avif": {
+          "sha256": "353eb69f64279695fda9b7ed95d9268cf9c4f2497ba9424d19550804f1545d8d",
+          "bytes": 13960,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@viking-europe.3d21c242c6-480.webp": {
+          "sha256": "2fc4844f3eed745bee36fd7873249e77a14264df8b621ebec9c3ab3c123d4e10",
+          "bytes": 27740,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@viking-europe.3d21c242c6-480.jpg": {
+          "sha256": "80cc02a4c05934f7378e8ecbe705a531ef5f2079e4961452ffbb138fe870e6fc",
+          "bytes": 37368,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@viking-europe.3d21c242c6-800.avif": {
+          "sha256": "7b0cd3fb27b4579a0cd6257f0437b95a5c35671b9a3cb885966c0b137261bab3",
+          "bytes": 35634,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@viking-europe.3d21c242c6-800.webp": {
+          "sha256": "102eeac8e31a915173070a196e3ba8fa94208d1bb7aa21ebff34f2cad81b87b5",
+          "bytes": 72830,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@viking-europe.3d21c242c6-800.jpg": {
+          "sha256": "0d9de6c4c014247ded103f7890bbabb26fa497fbdbdcae5c3e28af56d7521d9d",
+          "bytes": 98376,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@viking-europe.3d21c242c6-1260.avif": {
+          "sha256": "59e6ad3e2b3f9f8599cdcbf9aeea99fbe5d6be2fe44058a410c95c588a0525e2",
+          "bytes": 81000,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@viking-europe.3d21c242c6-1260.webp": {
+          "sha256": "8ef440603f573eb2d6e181a6cf0b9bdaa93a509c7071894bd7528cb326c1b0a8",
+          "bytes": 168232,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@viking-europe.3d21c242c6-1260.jpg": {
+          "sha256": "d906d4924a8ff911a0e8e746ddb5e786df91eaa018717f1628d523e922d798bf",
+          "bytes": 229336,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@viking-europe.3d21c242c6-1800.avif": {
+          "sha256": "8427bc9dd0152227e9d4dd8e8f28719019fae2164e3118752e5bc5be42d220c9",
+          "bytes": 152091,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@viking-europe.3d21c242c6-1800.webp": {
+          "sha256": "b6d271867ba0b86013b948d607763729d0e25d7d27f9de0cb3747478f3eaf6f6",
+          "bytes": 315480,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@viking-europe.3d21c242c6-1800.jpg": {
+          "sha256": "aa555334991ec81fb2ce0e2cd8a04fe0f3ce73b8d81d7409b5fa57e7529666bf",
+          "bytes": 439928,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@viking-europe.3d21c242c6-2400.avif": {
+          "sha256": "46942740af49fc78119a66f2f6e82e6fd5b04fc7278c2fc2ec0b00f30c1bd974",
+          "bytes": 249100,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@viking-europe.3d21c242c6-2400.webp": {
+          "sha256": "af9a06ac938416a61baa78e208b96692fa0775b5605a2d86750f2aba05aecd03",
+          "bytes": 513198,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@viking-europe.3d21c242c6-2400.jpg": {
+          "sha256": "d5cc2a634794d76c2e4d5e55860e4563a3921f16359a0c5581abef7122eabe38",
+          "bytes": 735215,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "3d21c242c6"
+    },
+    "theme:wine-europe": {
+      "purpose": "theme-hero@wine-europe",
+      "publication_path": "/themes/wine-europe",
+      "file": "theme-hero@wine-europe",
+      "original": "photographs/theme-hero@wine-europe.original.jpg",
+      "alt": "A window display at Meyer Wines & Bites showcasing various bottles in Naarden-Vesting.",
+      "provider": "pexels",
+      "provider_photo_id": "32910842",
+      "photographer": "Haberdoedas Photography",
+      "photographer_url": "https://www.pexels.com/@haberdoedas",
+      "source": "https://www.pexels.com/photo/wine-shop-window-display-in-naarden-vesting-32910842/",
+      "original_url": "https://images.pexels.com/photos/32910842/pexels-photo-32910842.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-12",
+      "acquired_at": "2026-09-12T09:41:50Z",
+      "sha256": "71f92b7d1e5f0f41de2b95192318ea39f968dc85587b7bb83a616686176a3e51",
+      "bytes": 2061525,
+      "width": 7728,
+      "height": 5152,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "71f92b7d1e",
+        "source_sha256": "71f92b7d1e5f0f41de2b95192318ea39f968dc85587b7bb83a616686176a3e51",
+        "source_width": 7728,
+        "source_height": 5152,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-12T09:41:55Z"
+      },
+      "derivatives": {
+        "theme-hero@wine-europe.71f92b7d1e-480.avif": {
+          "sha256": "d681b835a2bf4b92d3289c67408c157d8b2adfa4880a5775f0553ba9062eabf4",
+          "bytes": 6436,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@wine-europe.71f92b7d1e-480.webp": {
+          "sha256": "6800d90df2b49bf474c5a02ad94a332a596368a4dc619ceedb97fa2f7c577189",
+          "bytes": 9724,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@wine-europe.71f92b7d1e-480.jpg": {
+          "sha256": "4e4d0b583b6455065d4a59654629900750265441575477c9a679936107af301b",
+          "bytes": 19522,
+          "width": 480,
+          "height": 320
+        },
+        "theme-hero@wine-europe.71f92b7d1e-800.avif": {
+          "sha256": "7e9229ec047aeac2ef8296adaa56a49d2e038950712c005e0c5e2ca70627d26f",
+          "bytes": 12473,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@wine-europe.71f92b7d1e-800.webp": {
+          "sha256": "c3cd708788eab5bd668e5c5954a0c7e674365b96c6ed723abd8a369d99c973c7",
+          "bytes": 18616,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@wine-europe.71f92b7d1e-800.jpg": {
+          "sha256": "7a5d0c19a246be7a45bff92a2beb37a59697044a518360d99da99530697c63d8",
+          "bytes": 41282,
+          "width": 800,
+          "height": 533
+        },
+        "theme-hero@wine-europe.71f92b7d1e-1260.avif": {
+          "sha256": "5bb9036f0c5374a7cc387933ef9f05c9cd73841fb38ab61e36e53c4ee84641f2",
+          "bytes": 22443,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@wine-europe.71f92b7d1e-1260.webp": {
+          "sha256": "c75c97f4e29e01dc72e7e0cf02f97b0bdbc4e3477b25360e48d04a7fa4e535ff",
+          "bytes": 32662,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@wine-europe.71f92b7d1e-1260.jpg": {
+          "sha256": "9935012f9bb48ff41e8e4a8eaeabaf234ac50e23418d47ef799878261260baf7",
+          "bytes": 79634,
+          "width": 1260,
+          "height": 840
+        },
+        "theme-hero@wine-europe.71f92b7d1e-1800.avif": {
+          "sha256": "cf53bab7651e57bdd6e1f607a85bd75144e8878b0cf1de9d3201066a53bb1e65",
+          "bytes": 35202,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@wine-europe.71f92b7d1e-1800.webp": {
+          "sha256": "6d72560a317ad475442fc62340e3a3985681ff24708bd194a08f7a4cd1e897d7",
+          "bytes": 50102,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@wine-europe.71f92b7d1e-1800.jpg": {
+          "sha256": "d6a186020569141cca8c9f6410b21db6a257369a0887cbf43d7c05215ec2271b",
+          "bytes": 135567,
+          "width": 1800,
+          "height": 1200
+        },
+        "theme-hero@wine-europe.71f92b7d1e-2400.avif": {
+          "sha256": "35217e9b7512cfeb8cdc556db03abbf73258d48fe96de1c5f8bf3163f0b7f700",
+          "bytes": 51479,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@wine-europe.71f92b7d1e-2400.webp": {
+          "sha256": "6a6b4544332a02af8276bc8401461a5322055c3cb5e7e856b6130c400e8c8911",
+          "bytes": 73650,
+          "width": 2400,
+          "height": 1600
+        },
+        "theme-hero@wine-europe.71f92b7d1e-2400.jpg": {
+          "sha256": "adf18fa212908751cf428c97e48816fd77192c52dc2d587da00b25293e2d6a32",
+          "bytes": 217735,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "71f92b7d1e"
+    }
+  }
 }

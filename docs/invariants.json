@@ -97,7 +97,7 @@
       "why": "Zero. A page may not ship its own CSS."
     },
     "safety.img_tags": {
-      "value": 0,
+      "value": 11,
       "kind": "exact",
       "why": "Zero today, because zero photographs are licensed. This moving is the signal that licensed imagery arrived — which must go through the licence register first."
     },
@@ -122,7 +122,7 @@
       "why": "Pages whose geography is seen through the arch. A floor: the aperture is the identity, and a new map that forgets it is a page that stops looking like EuropeDoor."
     },
     "plates.page_share": {
-      "value": 0.048,
+      "value": 0.042,
       "kind": "ceiling",
       "why": "The share of pages carrying a generated illustration. A ceiling because the failure mode is an illustration placed because the system has one, which is the one reason the art direction forbids."
     },
@@ -147,7 +147,7 @@
         "band": 0.758,
         "note": 0.818,
         "facts": 0.758,
-        "btn": 0.6,
+        "btn": 0.642,
         "chip": 0.522
       },
       "kind": "floor",
