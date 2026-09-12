@@ -522,21 +522,36 @@
 
       if (job.state === "done") {
         stop();
-        el("prog-title").textContent = "Acquired, and waiting for you";
-        /* THE WORD IS NOT "PUBLISHED", AND THAT IS THE WHOLE BOUNDARY. The
-           photograph is in a branch behind a pull request; europedoor.com is
-           unchanged until somebody merges it. A desk that said "published"
-           would be reporting the reviewer's decision for them. */
+        /* THE WORD FOLLOWS THE PULL REQUEST, NEVER THE RUN.
+           The run merges itself now, and `gh pr merge` can still be refused
+           by branch protection, a required review or a conflict — and the
+           workflow deliberately does not fail on that, because by then the
+           photographs are acquired, registered, gated and pushed, and a red
+           run would report a loss that did not happen. So a green run does
+           not mean a merged one. `merged` is read off the pull request's own
+           `merged_at`, and this says one of two different things because
+           they ARE two different things. Calling an unmerged acquisition
+           published was the boundary this panel was built to hold; calling a
+           merged one "waiting for you" is the same fault reversed, and the
+           sentence under it has to move with the mechanism. */
+        el("prog-title").textContent = job.merged
+          ? "Acquired and merged"
+          : "Acquired, and waiting for you";
         el("prog-steps").insertAdjacentHTML("beforeend",
           (job.pr
             ? '<a class="prlink" href="' + esc(job.pr) + '" target="_blank" ' +
-              'rel="noopener noreferrer">Review pull request #' +
+              'rel="noopener noreferrer">' +
+              (job.merged ? "Pull request #" : "Review pull request #") +
               esc(job.pr_number) + "</a>"
             : '<p class="notyet">The branch is <span class="branch">' +
               esc(job.branch) + "</span>.</p>") +
-          '<p class="notyet">Nothing on europedoor.com has changed. The pull ' +
-          "request carries the rendered page, the provenance row and both " +
-          "hashes; merging it is what publishes.</p>");
+          (job.merged
+            ? '<p class="notyet">Merged. europedoor.com carries it from the ' +
+              "next deployment. The pull request stays as the record: the " +
+              "rendered page, the provenance row and both hashes.</p>"
+            : '<p class="notyet">Nothing on europedoor.com has changed. The ' +
+              "pull request carries the rendered page, the provenance row " +
+              "and both hashes; merging it is what publishes.</p>"));
         loadRegistry();
       } else if (job.state === "approval") {
         /* A RUN WAITING FOR A PERSON IS NOT A FAILED RUN. The panel said

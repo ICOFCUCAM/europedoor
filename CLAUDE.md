@@ -3071,6 +3071,42 @@ already learned, run 20 on a slug neither had. `checks.py` owns
 implementation of a thing is a second chance to make its mistake* — and the
 answer, on the third occurrence, is to stop having a second implementation.
 
+**AND THEN THE OWNER REMOVED THE LAST MANUAL STEP.** The brief said *"I
+should only have to review and merge the PR"*, and eleven runs later the
+measured reality was that the review had become the one step a person still
+had to remember — while every check it waited behind had already passed:
+fetch by the approved id, id verified, original kept and hashed, ladder
+derived without upscaling, provenance complete, every static gate, the
+browser and design gates, the credential scan. A green run merges itself now.
+
+**WHAT IS LOST IS NAMED RATHER THAN GLOSSED.** Nothing looks at the
+photograph inside the rendered page before it is live. Every gate verifies
+provenance, dimensions, contrast, the crop arithmetic and the licence; none
+can say whether a gondola is the right opening for the Grand Tour. The art
+direction is entirely in the basket now — where it always was for the first
+look, and is now the only one. **The pull request is still the record**: it
+carries the rendered page, the provenance row and both hashes, and it is
+kept rather than skipped.
+
+**THE MERGE MAY NEVER BE THE THING THAT REPORTS SUCCESS.** `gh pr merge` can
+be refused by branch protection, a required review or a conflict, and the
+workflow deliberately does NOT fail on that — by then the photographs are
+acquired, registered, gated and pushed, and a red run would report a loss
+that did not happen. So the step is green either way and **its state says
+nothing about the outcome**. The desk reads `merged_at` off the pull request
+instead. Reporting it from the step would be the `action_required` failure
+again: a verdict nobody has reached.
+
+**And the sentence had to move with the mechanism.** The panel's own rule was
+that the word for a green run is not "published" — true while a run stopped
+at a question, and the same fault reversed once it stops at an answer.
+Calling a merged acquisition "waiting for you" is as wrong as calling an
+unmerged one published. Two endings, told apart by the pull request rather
+than by the run, and the merged one says **next deployment** rather than
+"live", because a merge is a commit to the default branch and a reader sees
+it when the deployment runs. *Removing a claim leaves surfaces pointing at
+it* — the check that guarded the old wording now guards both.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

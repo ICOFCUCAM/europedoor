@@ -94,6 +94,17 @@ export default async function handler(req, res) {
      * rather than saying "acquired". Nothing is published until somebody
      * merges it, and the wording here has to keep that true.
      *
+     * THE RUN MERGES ITSELF NOW, AND THE DESK STILL MAY NOT ASSUME IT.
+     * `gh pr merge` can be refused — branch protection, a required review, a
+     * conflict — and the workflow deliberately does NOT fail on that, because
+     * the photographs are acquired, registered, gated and pushed by then and
+     * a red run would report a loss that did not happen. So the step is green
+     * either way and its state says nothing about the outcome. The only
+     * honest source is the pull request itself, which carries `merged_at`
+     * in the same listing this already reads for the URL. Reporting the
+     * merge from the STEP would be the `action_required` failure again: a
+     * verdict nobody has reached.
+     *
      * A SINGLE ACQUISITION HAS A BRANCH NAME THIS DESK CAN PREDICT AND A
      * BATCH DOES NOT: the batch names its branch from the clock inside the
      * run, because thirteen purposes cannot make one branch name that means
@@ -107,7 +118,11 @@ export default async function handler(req, res) {
         `${owner}:${branch}`)}&state=all`);
       if (pr.ok) {
         const list = await pr.json();
-        if (list.length) { out.pr = list[0].html_url; out.pr_number = list[0].number; }
+        if (list.length) {
+          out.pr = list[0].html_url;
+          out.pr_number = list[0].number;
+          out.merged = !!list[0].merged_at;
+        }
       }
       out.branch = branch;
     } else {
@@ -121,6 +136,7 @@ export default async function handler(req, res) {
           out.pr = mine.html_url;
           out.pr_number = mine.number;
           out.branch = mine.head.ref;
+          out.merged = !!mine.merged_at;
         }
       }
       out.count = job.count;

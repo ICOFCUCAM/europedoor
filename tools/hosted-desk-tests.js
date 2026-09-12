@@ -706,13 +706,46 @@ await t("the desk page loads no inline script and no style attribute", () => {
 /* ── 8. what a green run is called ──────────────────────────────── */
 
 await t("the desk never calls an unmerged acquisition published", () => {
-  /* A pull request is a question. The local desk stopped at a branch and
-   * said so; this one has to say the same thing about a PR, because
-   * "acquired" is the word an editor will reach for and it is wrong. */
+  /* A pull request is a question until something answers it. The run merges
+   * itself now, so the panel has two endings — and the promise this check
+   * protects is not a string, it is that the two are TOLD APART. `gh pr
+   * merge` can be refused by branch protection, a required review or a
+   * conflict, and the workflow deliberately stays green on that because the
+   * photographs are already acquired, registered, gated and pushed. So a
+   * green run is not a merged one, and the desk must read `merged` off the
+   * pull request rather than infer it from the step.
+   *
+   * The unmerged sentence is the one that must survive verbatim: it is the
+   * boundary the whole design is built on. */
   const js = fs.readFileSync(
     path.join(ROOT, "desk", "public", "desk.js"), "utf8");
   assert.ok(!/textContent = "Published/.test(js));
   assert.match(js, /Nothing on europedoor\.com has changed/);
+  assert.match(js, /job\.merged/,
+    "the panel reports one outcome for two different states");
+  /* AND THE MERGED SENTENCE MAY NOT CLAIM THE SITE HAS ALREADY CHANGED.
+   * A merge is a commit to the default branch; a reader sees it when the
+   * deployment runs, which is a different moment. */
+  assert.match(js, /next deployment/);
+});
+
+await t("the merge is read from the pull request, never from the run", () => {
+  /* THE STEP IS GREEN WHETHER THE MERGE HAPPENED OR NOT — that is a
+   * deliberate choice in the workflow, so that a refused merge does not
+   * report a loss that did not occur. Which makes the step useless as
+   * evidence, and `merged_at` on the pull request the only honest source.
+   * Reporting it from the step would be the `action_required` failure
+   * again: a verdict nobody has reached. */
+  const st = fs.readFileSync(path.join(API, "status.js"), "utf8");
+  assert.match(st, /merged_at/);
+  const wf = fs.readFileSync(
+    path.join(ROOT, ".github", "workflows", "photograph.yml"), "utf8");
+  const merges = wf.match(/gh pr merge/g) || [];
+  assert.strictEqual(merges.length, 2,
+    `both the single and the batch job merge: found ${merges.length}`);
+  /* IT RUNS AFTER EVERY GATE, so it cannot reach a red run. */
+  assert.ok(wf.indexOf("Run every gate") < wf.indexOf("gh pr merge"),
+    "the merge runs before the gates");
 });
 
 console.log = realLog; console.error = realErr;

@@ -412,6 +412,53 @@ jobs:
             exit 1
           fi
 
+
+      # ── AND THEN IT MERGES ITSELF ────────────────────────────────────
+      #
+      # THE PULL REQUEST IS STILL THE RECORD; IT IS NO LONGER THE QUEUE.
+      # The brief asked for "review and merge the PR", and eleven runs later
+      # the measured reality is that the review was the ONE step a person
+      # still had to remember — and every check it was waiting behind had
+      # already passed: fetch by the approved id, id verified, original kept
+      # and hashed, ladder derived without upscaling, provenance complete,
+      # every static gate, the browser and design gates, the credential
+      # scan. The owner decided that is enough, which is a decision about
+      # THEIR product and not one this workflow gets to keep making for them.
+      #
+      # WHAT IS LOST IS NAMED RATHER THAN GLOSSED. Nothing now looks at the
+      # photograph inside the rendered page before it is live. Every gate
+      # verifies provenance, dimensions, contrast, the crop arithmetic and
+      # the licence; none can say whether a gondola is the right opening for
+      # the Grand Tour. The art direction moved entirely to the basket,
+      # where the editor ticks a candidate — which is where it always was for
+      # the first look, and is now where it is for the only one.
+      #
+      # THE MERGE IS NEVER THE THING THAT REPORTS SUCCESS. It runs after
+      # every gate, so it cannot reach a red run; and if the repository
+      # refuses it — branch protection, a required review, a conflict — the
+      # work is already pushed and the pull request is already open, so this
+      # says so and leaves it for a person rather than failing a run that
+      # did everything right. A refusal here is a queue, not a loss.
+      - name: Merge it
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          BRANCH="${{ steps.push.outputs.branch }}"
+          if gh pr merge "$BRANCH" --merge --delete-branch; then
+            echo "merged $BRANCH into ${{ github.ref_name }}"
+            echo "europedoor.com updates on the next deployment."
+          else
+            echo
+            echo "── THE MERGE WAS REFUSED AND NOTHING IS LOST ──"
+            echo "Every photograph is acquired, registered, gated and pushed,"
+            echo "and the pull request is open. Merge it by hand:"
+            echo "  https://github.com/${{ github.repository }}/pulls"
+            echo
+            echo "The usual causes are a branch-protection rule requiring a"
+            echo "review, or a conflict with ${{ github.ref_name }}."
+          fi
+
   batch:
     if: ${{ inputs.stage == 'batch' }}
     runs-on: ubuntu-latest
@@ -606,4 +653,50 @@ jobs:
             echo "approve pull requests', which is a separate switch from the"
             echo "permissions this workflow requests."
             exit 1
+          fi
+
+      # ── AND THEN IT MERGES ITSELF ────────────────────────────────────
+      #
+      # THE PULL REQUEST IS STILL THE RECORD; IT IS NO LONGER THE QUEUE.
+      # The brief asked for "review and merge the PR", and eleven runs later
+      # the measured reality is that the review was the ONE step a person
+      # still had to remember — and every check it was waiting behind had
+      # already passed: fetch by the approved id, id verified, original kept
+      # and hashed, ladder derived without upscaling, provenance complete,
+      # every static gate, the browser and design gates, the credential
+      # scan. The owner decided that is enough, which is a decision about
+      # THEIR product and not one this workflow gets to keep making for them.
+      #
+      # WHAT IS LOST IS NAMED RATHER THAN GLOSSED. Nothing now looks at the
+      # photograph inside the rendered page before it is live. Every gate
+      # verifies provenance, dimensions, contrast, the crop arithmetic and
+      # the licence; none can say whether a gondola is the right opening for
+      # the Grand Tour. The art direction moved entirely to the basket,
+      # where the editor ticks a candidate — which is where it always was for
+      # the first look, and is now where it is for the only one.
+      #
+      # THE MERGE IS NEVER THE THING THAT REPORTS SUCCESS. It runs after
+      # every gate, so it cannot reach a red run; and if the repository
+      # refuses it — branch protection, a required review, a conflict — the
+      # work is already pushed and the pull request is already open, so this
+      # says so and leaves it for a person rather than failing a run that
+      # did everything right. A refusal here is a queue, not a loss.
+      - name: Merge it
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          BRANCH="${{ steps.push.outputs.branch }}"
+          if gh pr merge "$BRANCH" --merge --delete-branch; then
+            echo "merged $BRANCH into ${{ github.ref_name }}"
+            echo "europedoor.com updates on the next deployment."
+          else
+            echo
+            echo "── THE MERGE WAS REFUSED AND NOTHING IS LOST ──"
+            echo "Every photograph is acquired, registered, gated and pushed,"
+            echo "and the pull request is open. Merge it by hand:"
+            echo "  https://github.com/${{ github.repository }}/pulls"
+            echo
+            echo "The usual causes are a branch-protection rule requiring a"
+            echo "review, or a conflict with ${{ github.ref_name }}."
           fi
