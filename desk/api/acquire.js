@@ -73,12 +73,19 @@ export default async function handler(req, res) {
    * itself has no cap: it holds the working set, this holds what one
    * question can carry, and a fuller basket is two sittings rather than a
    * refusal. */
-  if (plan.length > 60) {
+  /* AND IT IS READ RATHER THAN TYPED, because for one commit it was typed
+   * in four places and the four disagreed. This copy said sixty, the
+   * workflow's said thirty, and the workflow's is the gate — so run 22
+   * gathered sixty photographs across every family, dispatched, and died on
+   * the first step of the run. `dispatch_cap` is declared once in
+   * tools/desk-registry.py and generated into the registry. */
+  const cap = reg.dispatch_cap;
+  if (plan.length > cap) {
     send(res, 400, { error: `${plan.length} is more than one pull request `
-                          + `should carry. The cap is 60 — the basket holds `
-                          + `as many as you like, and this is what one `
-                          + `question can ask. Acquire 60 and the rest stay `
-                          + `in the basket.` });
+                          + `should carry. The cap is ${cap} — the basket `
+                          + `holds as many as you like, and this is what one `
+                          + `question can ask. Acquire ${cap} and the rest `
+                          + `stay in the basket.` });
     return;
   }
 

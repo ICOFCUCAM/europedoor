@@ -19,10 +19,14 @@
   "use strict";
 
   var REG = { purposes: [], slots: {}, providers: {} };
-  /* THE SAME NUMBER THE DISPATCH ENFORCES, and the dispatch is the one
-     that counts — this copy exists so the button can say what will
-     happen instead of the editor finding out from a 400. */
-  var BK_CAP = 60;
+  /* THE NUMBER THE DISPATCH ENFORCES, SERVED RATHER THAN TYPED. This copy
+     exists so the button can say what will happen instead of the editor
+     finding out from a 400 — and for one commit it was a typed 60 beside a
+     workflow that still said 30, so the screen promised a sitting the gate
+     refused. It arrives with the registry now. The fallback is the smallest
+     honest thing to say before the registry has loaded, not a second
+     opinion about the cap. */
+  var BK_CAP = 1;
   var CHOSEN = null;
   var POLL = null;
 
@@ -77,6 +81,7 @@
     api("/api/registry").then(function (r) {
       if (!r.ok) return show(false);
       REG = r.j;
+      if (REG.dispatch_cap) { BK_CAP = REG.dispatch_cap; }
       showTarget();
       fillSlots();
       fillLibrary();

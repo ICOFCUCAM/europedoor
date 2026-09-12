@@ -39,6 +39,10 @@ export default async function handler(req, res) {
      * nothing on the screen said which branch that was. A target the editor
      * cannot see is a target nobody checks. */
     dispatch: { repo: slug, branch, workflow },
+    /* THE CAP THE DISPATCH ENFORCES, SO THE BUTTON CAN SAY IT RATHER THAN
+     * HOLD ITS OWN COPY. Four copies of this number existed and the one
+     * that is the gate — the workflow's — was the one left behind. */
+    dispatch_cap: reg.dispatch_cap,
     providers: reg.providers,
     slots: reg.slots,
     purposes,

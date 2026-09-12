@@ -54,6 +54,32 @@ sys.path.insert(0, os.path.join(ROOT, "scripts", "images"))
 
 import acquire                                            # noqa: E402
 from lib import imageslots                                # noqa: E402
+
+# THE DISPATCH CAP, DECLARED ONCE BECAUSE FOUR COPIES OF IT DISAGREED.
+#
+# How many photographs one press may send is enforced in four places: the
+# desk's Acquire route refuses a longer batch before it dispatches, the
+# Fill button gathers exactly this many, the basket says so on its face,
+# and the WORKFLOW refuses the plan again before a socket opens. The last
+# one is the only gate — it is the copy that runs where the key is.
+#
+# Run 22 sent sixty and died on `60 entries is more than one sitting. The
+# cap is 30.` The desk had been raised to sixty and the workflow had not,
+# so the editor's own screen promised something the gate would refuse,
+# which is worse than a low cap: it spends a whole sitting before saying
+# no. A SECOND IMPLEMENTATION OF A THING IS A SECOND CHANCE TO MAKE ITS
+# MISTAKE, and on the recurrence the answer is to stop having one — the
+# number lives here, is generated into `desk/registry.json`, and all four
+# read it from there.
+#
+# Sixty, measured: run 18 fetched, verified, hashed, derived and
+# registered eight photographs in 34 seconds — 4.25s each — against 215
+# seconds of fixed cost. The acquisition is the small, linear half; the
+# gates are the big half and cost the same for one as for sixty. So the
+# cap is not about the workflow at all. It is about what one PULL REQUEST
+# can carry a reviewer through.
+DISPATCH_CAP = 60
+
 from lib.data import load                                 # noqa: E402
 
 OUT = os.path.join(ROOT, "desk", "registry.json")
@@ -105,7 +131,11 @@ def build():
             "the key is. A TEMPLATED ROW CARRIES NO REQUIREMENTS: they are "
             "the SLOT's, stated once under `slots`, because 590 copies of "
             "the same 300-word brief is half a megabyte saying one thing, "
-            "and a value repeated 590 times is 590 places for it to differ."),
+            "and a value repeated 590 times is 590 places for it to differ. "
+            "`dispatch_cap` is here for the same reason one level up: four "
+            "copies of that number disagreed and the one that mattered was "
+            "the workflow's."),
+        "dispatch_cap": DISPATCH_CAP,
         "providers": providers,
         "slots": slots,
         "purposes": rows,

@@ -491,13 +491,21 @@ jobs:
               sys.exit(f"batch is not JSON: {e}")
           if not isinstance(plan, list) or not plan:
               sys.exit("batch must be a non-empty JSON array")
-          # A CAP, BECAUSE A RUNAWAY BATCH IS A RUNAWAY DOWNLOAD. Thirty is
-          # the largest country's destination count with room over it; a
-          # bigger set is two sittings, which is also how a person should
-          # look at it.
-          if len(plan) > 30:
-              sys.exit(f"{len(plan)} entries is more than one sitting. "
-                       f"The cap is 30.")
+          # A CAP, BECAUSE A RUNAWAY BATCH IS A RUNAWAY DOWNLOAD — AND IT
+          # IS READ, NEVER TYPED. This number is enforced in four places
+          # and only this one is the gate. It was typed here and typed
+          # again in the desk, and when the desk was raised to sixty this
+          # copy stayed at thirty: run 22 gathered sixty photographs
+          # across every family and died on the first step with "the cap
+          # is 30", after the editor had already approved them. A cap the
+          # editor's own screen contradicts is worse than a low cap. The
+          # number is declared once in tools/desk-registry.py and
+          # generated into desk/registry.json, which is committed and
+          # fails CI when stale.
+          cap = json.load(open("desk/registry.json"))["dispatch_cap"]
+          if len(plan) > cap:
+              sys.exit(f"{len(plan)} entries is more than one pull request "
+                       f"should carry. The cap is {cap}.")
           seen = set()
           for i, e in enumerate(plan):
               if not isinstance(e, dict):

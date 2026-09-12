@@ -91,6 +91,10 @@ function serve() {
         return send(200, JSON.stringify({
           dispatch: { repo: "ICOFCUCAM/europedoor", branch: "main",
                       workflow: "photograph.yml" },
+          /* AND THE CAP, because the basket states it on its face and the
+             browser holds no copy of it. A stub that omitted it would render
+             the screens the editor never sees. */
+          dispatch_cap: REG.dispatch_cap,
           providers: REG.providers, slots: REG.slots,
           purposes: REG.purposes.map((p) => ({ ...p, status: "EMPTY", photograph: null })),
         }), "application/json");
@@ -568,6 +572,17 @@ for (const width of [1280, 390]) {
      `${width}: the basket drew the wrong number of entries`);
   ok(/held in this browser/.test(await page.textContent("#bk-note") || ""),
      `${width}: the basket does not say whose it is or where it lives`);
+
+  /* AND IT STATES THE CAP THE DISPATCH WILL ACTUALLY ENFORCE. The browser
+     holds no copy of that number: it arrives with the registry, because
+     four typed copies is how the desk offered sixty while the workflow
+     refused anything over thirty — a full sitting gathered, approved,
+     dispatched, and refused on the first step of the run. A screen that
+     states a cap it did not read is the screen that made that promise. */
+  const capsaid = await page.textContent("#bk-note") || "";
+  ok(new RegExp(`\\b${REG.dispatch_cap}\\b`).test(capsaid),
+     `${width}: the basket does not state the registry's cap of `
+     + `${REG.dispatch_cap} — it said ${JSON.stringify(capsaid.slice(-90))}`);
 
   ok(await page.locator("#bk-grid input:checked").count() === 0,
      `${width}: the basket arrived with entries already ticked`);

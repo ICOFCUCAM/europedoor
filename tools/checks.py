@@ -5704,6 +5704,78 @@ def c_desk_registry():
     return 1
 
 
+@check("the dispatch cap has exactly one home")
+def c_dispatch_cap():
+    """FOUR COPIES OF ONE NUMBER, AND THE ONE THAT WAS A GATE WAS THE ONE
+    LEFT BEHIND.
+
+    How many photographs one press may send is stated to the editor by the
+    basket, bounded by the Fill button, refused early by the acquire route,
+    and refused FOR REAL by `photograph.yml` before a socket opens. Only the
+    last is a gate; the other three exist so the screen can say what will
+    happen instead of the editor finding out from a 400.
+
+    All four were typed. Three were raised to sixty and the workflow was
+    not, so run 22 gathered sixty photographs across every family, put them
+    in the basket, dispatched, and died on the first step of the run with
+    `60 entries is more than one sitting. The cap is 30.` A cap the
+    editor's own screen contradicts is worse than a low cap: it spends the
+    whole sitting before saying no.
+
+    So the number is declared once in `tools/desk-registry.py`, generated
+    into `desk/registry.json` (committed, and stale-checked above), and read
+    by every consumer. THE PROMISE IS THAT NOBODY MAY WRITE IT AGAIN — this
+    refuses a numeric literal in any of the four places and requires each of
+    them to read `dispatch_cap`. A check that merely compared the four
+    numbers would go green the moment somebody typed the same value twice,
+    which is precisely the state this failed from.
+    """
+    reg = os.path.join(ROOT, "desk", "registry.json")
+    doc = json.load(open(reg, encoding="utf-8"))
+    cap = doc.get("dispatch_cap")
+    if not isinstance(cap, int) or cap < 1:
+        fail(f"desk/registry.json declares no usable dispatch_cap: {cap!r}. "
+             f"It is the one home for that number.")
+    n = 1
+
+    # (file, the pattern that would be a SECOND declaration, the read)
+    seats = [
+        (".github/workflows/photograph.yml",
+         r"len\(plan\)\s*>\s*[0-9]", 'json.load(open("desk/registry.json"))'),
+        ("desk/api/acquire.js",
+         r"plan\.length\s*>\s*[0-9]", "reg.dispatch_cap"),
+        ("desk/api/topup.js",
+         r"MAX_FILL\s*=\s*[0-9]", "dispatch_cap"),
+        ("desk/public/desk.js",
+         r"BK_CAP\s*=\s*(?!1\b)[0-9]", "REG.dispatch_cap"),
+    ]
+    for rel, literal, reads in seats:
+        body = open(os.path.join(ROOT, rel), encoding="utf-8").read()
+        m = re.search(literal, body)
+        if m:
+            fail(f"{rel} writes the dispatch cap as a literal "
+                 f"({m.group(0)!r}). It is declared in "
+                 f"tools/desk-registry.py and generated into "
+                 f"desk/registry.json — four copies of this number is how "
+                 f"the workflow stayed at 30 while the desk offered 60.")
+        if reads not in body:
+            fail(f"{rel} does not read the dispatch cap from the registry "
+                 f"(expected {reads!r}). A place that enforces the cap and "
+                 f"does not read it is enforcing a different number.")
+        n += 1
+
+    # AND THE GATE'S MESSAGE MUST CARRY THE NUMBER IT REFUSED BY. Run 22's
+    # said "The cap is 30" from a hard-coded string; had it interpolated,
+    # the disagreement would have been visible in the log the first time.
+    wf = open(os.path.join(ROOT, ".github/workflows/photograph.yml"),
+              encoding="utf-8").read()
+    if "The cap is {cap}" not in wf:
+        fail("the workflow's refusal does not print the cap it used. A "
+             "failure message with no measurement in it cannot be "
+             "diagnosed.")
+    return n + 1
+
+
 @check("a sub-category keyword selects a word it is a form of")
 def c_sub_keywords():
     """`cell` CAUGHT `cellar`, SO THE MONASTERIES PAGE WAS EIGHTEEN WINE

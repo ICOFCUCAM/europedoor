@@ -455,29 +455,35 @@ await t("one photograph may not be ticked for two surfaces in a batch",
 await t("a batch bigger than one pull request can carry is refused", async () => {
   CALLS = [];
   const reg = lib.registry();
-  const many = reg.purposes.slice(0, 61).map((p, i) => (
+  /* AND THE SIZES COME FROM THE REGISTRY, not from a typed 61. A test that
+   * types the cap is a fifth copy of it, and copies of this number are the
+   * defect being guarded against. */
+  const cap = reg.dispatch_cap;
+  const many = reg.purposes.slice(0, cap + 1).map((p, i) => (
     { purpose: p.purpose, photo_id: String(i + 1), alt: "a description here" }));
-  assert.strictEqual(many.length, 61, "the registry holds fewer than 61 purposes");
+  assert.strictEqual(many.length, cap + 1,
+    `the registry holds fewer than ${cap + 1} purposes`);
   const r = await acq({ provider: "pexels", batch: many });
   assert.strictEqual(r.statusCode, 400);
-  assert.match(r.json().error, /cap is 60/);
+  assert.match(r.json().error, new RegExp(`cap is ${cap}\\b`));
   assert.strictEqual(CALLS.length, 0);
 });
 
 /* AND SIXTY IS ACCEPTED, because a cap nothing reaches is a cap nobody has
  * tested the far side of. The old suite asserted only the refusal, so a cap
  * of one would have passed it. */
-await t("and exactly sixty is dispatched as one run", async () => {
+await t("and a batch of exactly the cap is dispatched as one run", async () => {
   CALLS = [];
   const reg = lib.registry();
-  const sixty = reg.purposes.slice(0, 60).map((p, i) => (
+  const cap = reg.dispatch_cap;
+  const full = reg.purposes.slice(0, cap).map((p, i) => (
     { purpose: p.purpose, photo_id: String(i + 1), alt: "a description here" }));
-  const r = await acq({ provider: "pexels", batch: sixty });
+  const r = await acq({ provider: "pexels", batch: full });
   assert.strictEqual(r.statusCode, 200, JSON.stringify(r.json()));
   const sent = CALLS.filter((c) => c.url.includes("/dispatches"));
   assert.strictEqual(sent.length, 1, `it made ${sent.length} dispatches`);
   const inputs = JSON.parse(sent[0].init.body).inputs;
-  assert.strictEqual(JSON.parse(inputs.batch).length, 60);
+  assert.strictEqual(JSON.parse(inputs.batch).length, cap);
 });
 
 await t("an empty batch is refused", async () => {
@@ -785,8 +791,8 @@ await t("one press cannot make 837 requests against the rate limit", async () =>
   const r = await call("topup.js", {
     url: "/api/topup?provider=pexels&n=60", headers: { cookie: session() } });
   assert.strictEqual(r.statusCode, 200);
-  assert.ok(n <= topup.MAX_LOOKS,
-    `it made ${n} provider requests for a ceiling of ${topup.MAX_LOOKS}`);
+  assert.ok(n <= topup.maxLooks(),
+    `it made ${n} provider requests for a ceiling of ${topup.maxLooks()}`);
   assert.ok(r.json().stopped, "it stopped early and did not say so");
   restoreFetch();
 });
@@ -835,11 +841,33 @@ await t("it never proposes one photograph for two surfaces", async () => {
 });
 
 await t("it gathers no more than the dispatch will accept", async () => {
+  /* AND BOTH READ THE ONE DECLARATION, because for one commit they did
+   * not: three copies of this number were raised to sixty and the
+   * WORKFLOW — the only one that is a gate — stayed at thirty, so a full
+   * sitting was gathered, approved, dispatched and refused on the first
+   * step. The earlier version of this test compared the two JS copies to
+   * each other and could never have seen that, because the copy it could
+   * not read was the one that mattered. `checks.py` owns the four-way
+   * assertion; this one asserts the route actually spends it. */
   const topup = await import(path.join(API, "topup.js"));
-  const acq = fs.readFileSync(path.join(API, "acquire.js"), "utf8");
-  const cap = Number((/plan\.length > (\d+)/.exec(acq) || [])[1]);
-  assert.strictEqual(topup.MAX_FILL, cap,
-    `the button gathers ${topup.MAX_FILL} and the dispatch takes ${cap}`);
+  const cap = lib.registry().dispatch_cap;
+  assert.ok(Number.isInteger(cap) && cap > 0,
+    `the registry declares no dispatch_cap: ${cap}`);
+  assert.strictEqual(topup.maxFill(), cap,
+    `the button gathers ${topup.maxFill()} and the dispatch takes ${cap}`);
+  assert.strictEqual(topup.maxLooks(), 2 * cap,
+    `it looks at ${topup.maxLooks()} surfaces to take ${cap}`);
+});
+
+await t("the registry route serves the cap, so the basket can state it", async () => {
+  /* The browser holds no copy: `desk.js` reads `REG.dispatch_cap` and says
+   * the number on the basket's own face. A route that did not serve it
+   * would leave the button guessing, which is where the typed copy came
+   * from in the first place. */
+  const r = await call("registry.js", { headers: { cookie: session() } });
+  assert.strictEqual(r.statusCode, 200, `registry answered ${r.statusCode}`);
+  assert.strictEqual(r.json().dispatch_cap, lib.registry().dispatch_cap,
+    "the registry route does not serve dispatch_cap");
 });
 
 await t("the query is the role's own concept, with the name in it", () => {

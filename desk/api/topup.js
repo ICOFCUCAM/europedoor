@@ -48,9 +48,12 @@ import {
 } from "./_lib.js";
 import { queryFor } from "./sweep.js";
 
-/* The dispatch's own cap, restated so the button cannot gather a set the
- * acquire route will refuse. `acquire.js` is the one that counts. */
-export const MAX_FILL = 60;
+/* THE DISPATCH'S OWN CAP, READ RATHER THAN RESTATED. A restated number is
+ * a number that drifts: this one was typed here, in acquire.js, in desk.js
+ * and in the workflow, and when three were raised to sixty the fourth — the
+ * only one that is a gate — stayed at thirty. It is declared once in
+ * tools/desk-registry.py and generated into desk/registry.json. */
+export function maxFill() { return registry().dispatch_cap; }
 
 /* Serial provider requests, and a function that does not get to run for
  * ever. Twenty seconds leaves room for the register read and the response
@@ -67,19 +70,22 @@ export const BUDGET_MS = 20000;
  * `MAX_SURFACES` exists for one file over, dropped by writing the cap on the
  * wrong quantity. Found because a TEST could not tell round-robin from
  * registry order: both cover every family once you have looked at all of
- * them, and that only happens if the looking is unbounded. Twice the fill,
- * because taking sixty means expecting to reject some. */
-export const MAX_LOOKS = 120;
+ * them, and that only happens if the looking is unbounded. TWICE THE FILL,
+ * derived rather than typed, because taking sixty means expecting to reject
+ * some — and a ceiling written as a number stops being twice the fill the
+ * day the fill moves, which is exactly how the cap itself went wrong. */
+export function maxLooks() { return 2 * maxFill(); }
 
 export default async function handler(req, res) {
   if (!requireSession(req, res)) return;
 
   const url = new URL(req.url, "http://desk");
   const provider = url.searchParams.get("provider") || "pexels";
-  const want = Math.min(
-    Number(url.searchParams.get("n")) || MAX_FILL, MAX_FILL);
-
   const reg = registry();
+  const cap = reg.dispatch_cap;
+  const looks = 2 * cap;
+  const want = Math.min(Number(url.searchParams.get("n")) || cap, cap);
+
   const verdict = reg.providers[provider];
   if (!verdict) { send(res, 400, { error: `${provider} is not a provider this desk knows` }); return; }
   if (!verdict.cleared) { send(res, 400, { error: "REFUSED: " + verdict.because }); return; }
@@ -124,7 +130,7 @@ export default async function handler(req, res) {
 
   for (const p of order) {
     if (rows.length >= want) break;
-    if (looked >= MAX_LOOKS) {
+    if (looked >= looks) {
       stopped = `It looked at ${looked} of the ${order.length} empty `
               + `surfaces and found ${rows.length}. Press it again for the `
               + `next tranche.`;
@@ -183,7 +189,7 @@ export default async function handler(req, res) {
     empty: order.length,
     looked,
     covered: [...covered].sort(),
-    cap: MAX_FILL,
+    cap,
     order: "one surface from each family in turn, so a press fills every "
          + "category rather than one country. Each row is the provider's own "
          + "first result for that surface's role-written query that meets the "

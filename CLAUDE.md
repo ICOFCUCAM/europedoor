@@ -3170,6 +3170,35 @@ row still lands in the basket — not as a step to click past, since the
 dispatch follows immediately, but because a set that publishes without leaving
 a trace of what it chose is a set nobody can audit afterwards.
 
+**FOUR COPIES OF THE DISPATCH CAP, AND THE ONE THAT WAS A GATE WAS THE ONE
+LEFT BEHIND.** How many photographs one press may send is stated by the
+basket, bounded by the Fill button, refused early by the acquire route, and
+refused *for real* by `photograph.yml` before a socket opens — and only the
+last is a gate. All four were typed. Three were raised to sixty when the
+basket was built and the workflow was not, so run 22 gathered sixty
+photographs across every family, put them in the basket, dispatched, and died
+on the first step with **`60 entries is more than one sitting. The cap is
+30.`** **A cap the editor's own screen contradicts is worse than a low cap**:
+it spends the whole sitting before saying no, on the one number the desk
+promises about effort.
+
+*A second implementation of a thing is a second chance to make its mistake* —
+sixth occurrence, and the first where the disagreeing copies were a *number*
+rather than a predicate. The number is declared once in
+`tools/desk-registry.py`, generated into `desk/registry.json` (committed, and
+stale-checked like `site/`), and read by all four. **The check refuses a
+numeric literal in each of the four places and requires each to read
+`dispatch_cap`** — comparing the four values would go green the moment
+somebody typed the same number twice, which is exactly the state this failed
+from. `MAX_LOOKS` is derived as twice the fill for the same reason: a ceiling
+written as a number stops being twice the fill the day the fill moves.
+
+**And the refusal now prints the number it refused by.** Run 22's message was
+a hard-coded `The cap is 30` beside a hard-coded `> 30`; had either
+interpolated, the disagreement would have been in the first log line. *A
+failure message with no measurement in it cannot be diagnosed*, applied to a
+constant rather than to a measurement.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
