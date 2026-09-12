@@ -3107,6 +3107,69 @@ than by the run, and the merged one says **next deployment** rather than
 it when the deployment runs. *Removing a claim leaves surfaces pointing at
 it* — the check that guarded the old wording now guards both.
 
+**THE DESK HAD TWO WAYS IN AND BOTH ASKED WHERE FIRST.** Find asks which
+surface, Fill a country asks which country — and with 837 purposes and an
+empty library that is a lot of deciding before any picture arrives, on the
+question an editor has least appetite for, because *"which of the 826 empty
+surfaces next"* is not an editorial question at all. **Fill the library** asks
+it once, for them: every empty surface, as far as one sitting reaches, in one
+press. Press it again for the next tranche. Nothing else changed — this is a
+third door into the same machinery, and the same dispatch with the same
+refusals.
+
+**ROUND-ROBIN ACROSS FAMILIES, WHICH IS THE WHOLE POINT OF THE ORDER.** Taken
+in registry order one press is sixty Austrian destinations: a complete answer
+about Austria and no answer about the product. One from each family in turn
+means a press touches themes, countries, journeys, interests, macro regions,
+categories, stories, regions, destinations and places, so every family gets
+its first photograph early — which is when a photograph is worth the most.
+
+**The query is the ROLE's own first concept, not the bare name.** The sweep
+searches for "Austria" because a person is about to look at the grid and
+judge; nothing looks here, so the query has to carry the intent the eye would
+have. `country-hero` declares `{name} landscape` and `destination-hero`
+declares `{name}`, and that difference is exactly the editorial knowledge the
+roles were written to hold.
+
+**IT REQUIRES THE PHOTOGRAPHER'S OWN DESCRIPTION AND SKIPS A CANDIDATE
+WITHOUT ONE.** Every acquisition needs an alt and the alternative to a real
+one is writing a description of a photograph nothing here has seen, which is
+the licence-from-memory failure in another costume. A candidate with no `alt`
+is not unusable — it is **un-automatable**, which is a different thing, and it
+stays available to the two paths where a person is looking.
+
+**THE CAP WAS ON THE WRONG QUANTITY, and a test that could not fail is what
+found it.** The first version bounded how many it TAKES. A surface whose
+search returns nothing qualifying costs a request and yields no row, so the
+loop walked all 837 empty surfaces making 837 requests against a rate limit
+nobody here owns — the thing `MAX_SURFACES` has guarded one file over since
+the sweep was written. It surfaced because the ordering assertion could not
+tell round-robin from registry order: **look at everything and every order
+covers every family.** A test that cannot fail and a route that cannot stop
+were the same bug. `MAX_LOOKS` is 120, twice the fill, because taking sixty
+means expecting to reject some.
+
+**And the promise had to become observable.** The ordering test read the
+interleave function directly, so swapping `interleave(empty)` for `empty`
+inside the handler left it green — the same gap as proving a predicate and
+never putting it in the path. The response reports which families the press
+actually touched, and the assertion reads that.
+
+**A SENT BASKET ENTRY COULD NOT BE CLEARED**, caught by `desk-render.js` in
+the run that added the button. Sent entries are deliberately untickable so
+they cannot be sent twice — so *Select all* skips them and *Remove ticked*
+works on ticks, and between them the two controls that look like they would
+empty the basket could not touch the only thing that accumulates in it. The
+per-entry Remove worked all along, which is fine for one and useless for
+sixty. **Clear sent** is one press.
+
+**One click is a promise about effort and never about surprise.** The band
+states how many surfaces are empty, how many this press takes, that nothing
+here has looked at the pictures, and that a green run now merges itself. Every
+row still lands in the basket — not as a step to click past, since the
+dispatch follows immediately, but because a set that publishes without leaving
+a trace of what it chose is a set nobody can audit afterwards.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

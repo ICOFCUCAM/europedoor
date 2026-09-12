@@ -81,6 +81,11 @@
       fillSlots();
       fillLibrary();
       fillProvenance();
+      /* THE BAND IS DERIVED FROM THE REGISTER AND REDRAWN WHENEVER IT IS
+         RE-READ, so the count it states is the count the library actually
+         holds rather than the one it held when the desk opened. A figure
+         that goes stale reads as a measurement and is not one. */
+      topupState();
     });
   }
 
@@ -963,6 +968,9 @@
       return;
     }
     var ready = BASKET.filter(function (x) { return basketState(x).ok; }).length;
+    var sent = BASKET.length - live.length;
+    el("bk-sent").hidden = !sent;
+    el("bk-sent").textContent = "Clear " + sent + " sent";
     el("bk-note").innerHTML =
       "<b>" + BASKET.length + "</b> in the basket, <b>" + ready +
       "</b> ready to acquire" +
@@ -1107,6 +1115,12 @@
     basketBadge();
     basketDraw();
   });
+  el("bk-sent").addEventListener("click", function () {
+    BASKET = BASKET.filter(function (x) { return !x.sent; });
+    basketSave();
+    basketBadge();
+    basketDraw();
+  });
   el("bk-go").addEventListener("click", basketAcquire);
 
   /* ADD TICKED FROM A SWEEP. The sweep already asks the right question of a
@@ -1123,6 +1137,102 @@
       ? t.length + " added to the basket."
       : "Nothing ticked.";
   });
+
+  /* ── fill the library ─────────────────────────────────────────────
+     ONE PRESS, EVERY CATEGORY, THE NEXT TRANCHE — and it is one press
+     rather than two because that is what was asked for. Find asks which
+     surface and Fill a country asks which country; this asks nothing, so it
+     is the thing an editor meets on the way in.
+
+     IT STILL GOES THROUGH THE BASKET. Not as a step to click past — the
+     dispatch follows immediately — but because the basket is the record of
+     what went out, and a set that publishes without leaving a trace of what
+     it chose is a set nobody can audit afterwards. Every row lands there,
+     is marked sent, and keeps its photograph, its id, its photographer and
+     its description.
+
+     AND IT SAYS WHAT IT WILL DO BEFORE IT DOES IT. "One click" is a promise
+     about effort, never about surprise: the band states how many surfaces
+     are empty, how many this press takes, and that a green run now merges
+     itself. */
+  function topupState() {
+    if (!REG.purposes.length) return;
+    var empty = REG.purposes.filter(function (p) {
+      return p.status !== "PUBLISHED";
+    }).length;
+    var filled = REG.purposes.length - empty;
+    el("topup").hidden = false;
+    el("topup-go").disabled = !empty;
+    if (!empty) {
+      el("topup-head").textContent = "The library is full";
+      el("topup-note").textContent = "All " + REG.purposes.length +
+        " surfaces this product declares hold a photograph.";
+      el("topup-fine").textContent = "";
+      el("topup-go").textContent = "Nothing left to fill";
+      return;
+    }
+    var take = Math.min(empty, BK_CAP);
+    el("topup-head").textContent = "Fill the library";
+    el("topup-note").innerHTML = "<b>" + filled + "</b> of <b>" +
+      REG.purposes.length + "</b> surfaces hold a photograph. This takes the " +
+      "next <b>" + take + "</b> — one from each family in turn, so a press " +
+      "fills every category rather than one country. Press it again for more.";
+    el("topup-fine").textContent =
+      "It takes the provider's own first result for each surface that meets " +
+      "the slot and carries the photographer's own description; nothing is " +
+      "ranked and nothing here has looked at the pictures. A green run " +
+      "merges itself, so these reach europedoor.com on the next deployment. " +
+      "Every one lands in the basket, so you can see afterwards what went.";
+    el("topup-go").textContent = "Fill the next " + take;
+  }
+
+  function topup() {
+    var btn = el("topup-go");
+    btn.disabled = true;
+    btn.textContent = "Looking…";
+    api("/api/topup?provider=pexels&n=" + BK_CAP).then(function (r) {
+      if (!r.ok || (r.j && r.j.error)) {
+        topupState();
+        el("topup-note").textContent = (r.j && r.j.error) || "the search failed";
+        return;
+      }
+      var rows = r.j.rows || [];
+      if (!rows.length) {
+        topupState();
+        el("topup-note").textContent = r.j.note || r.j.stopped
+          || "Nothing this provider returned for the empty surfaces met "
+           + "their slots. Try the search, where you can change the wording.";
+        return;
+      }
+      rows.forEach(function (x) { basketAdd(x.purpose, x.candidate); });
+      show_view("basket");
+      /* THE DISPATCH IS THE SAME ONE EVERY OTHER PATH USES. A second way to
+         acquire would be a second set of refusals to disagree with the
+         first, which this repository has paid for five times. */
+      api("/api/acquire", { method: "POST",
+        body: JSON.stringify({ provider: "pexels",
+          batch: rows.map(function (x) {
+            return { purpose: x.purpose, photo_id: x.candidate.id,
+                     alt: String(x.candidate.alt || "").trim() };
+          }) }) })
+        .then(function (a) {
+          topupState();
+          if (!a.ok) { alert(a.j.error || "could not start"); return; }
+          var now = Date.now();
+          rows.forEach(function (x) {
+            var e2 = BASKET.filter(function (y) {
+              return y.purpose === x.purpose; })[0];
+            if (e2) e2.sent = now;
+          });
+          basketSave();
+          basketBadge();
+          basketDraw();
+          watch(a.j.job);
+        });
+    });
+  }
+
+  el("topup-go").addEventListener("click", topup);
 
   /* ── views ────────────────────────────────────────────────── */
   var VIEWS = ["find", "sweep", "basket", "library", "provenance"];

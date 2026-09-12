@@ -133,6 +133,34 @@ function serve() {
                + "surface's own name that meets the slot.",
         }), "application/json");
       }
+      /* FILL THE LIBRARY. Three rows from three different families, because
+         the one thing this button promises that the sweep does not is that a
+         press covers every category rather than one country. */
+      if (u.pathname === "/api/topup") {
+        const rows = [
+          ["theme-hero@medieval-europe", "Medieval Europe theme"],
+          ["country-hero@austria", "Austria country"],
+          ["interest-hero@architecture", "Architecture interest"],
+        ].map(([purpose, name], i) => ({
+          purpose,
+          surface: `The opening band of the ${name} page.`,
+          target: purpose.split("@")[1],
+          query: name,
+          candidate: {
+            id: String(800000 + i), photographer: "Filler " + i,
+            photographer_url: "https://example.invalid/@f",
+            page: "https://example.invalid/f/" + i,
+            width: 5000, height: 3000,
+            alt: `A ${name} photograph, described by the photographer.`,
+            thumb: "f" + i,
+          },
+        }));
+        return send(200, JSON.stringify({
+          rows, stopped: "", empty: 826, looked: 3, cap: 60,
+          covered: ["country-hero", "interest-hero", "theme-hero"],
+          order: "one surface from each family in turn.",
+        }), "application/json");
+      }
       if (u.pathname === "/api/acquire") {
         let raw = "";
         req.on("data", (c) => { raw += c; });
@@ -433,6 +461,54 @@ for (const width of [1280, 390]) {
         && e.purpose && e.alt),
      `${width}: an entry travelled without an id, a purpose or a description`);
   await closeDialogs(page);
+
+  /* ── fill the library ──────────────────────────────────────────────
+     THE ONE PRESS THAT NEEDS NO DECISION FIRST, so what it has to be is
+     PRESENT on the way in and honest about what it will do. An editor
+     opening a desk with 826 empty slots should meet the button before the
+     filters, and should not be surprised by it afterwards. */
+  await page.click('[data-view="find"]');
+  ok(await page.locator("#topup").isVisible(),
+     `${width}: the fill band is not on the screen an editor arrives at`);
+  const band = await page.textContent("#topup") || "";
+  ok(/\d/.test(band), `${width}: the fill band states no count`);
+  ok(/merges itself|deployment|europedoor\.com/.test(band),
+     `${width}: the fill band does not say that a green run publishes`);
+  ok(/nothing is ranked|nothing here has looked/i.test(band),
+     `${width}: the fill band claims a judgement nothing here makes`);
+  ok(!(await page.locator("#topup-go").isDisabled()),
+     `${width}: the fill button is dead with 826 surfaces empty`);
+
+  /* ONE PRESS: it gathers, it puts every row in the basket, and it
+     dispatches — and the basket keeps them, because a set that publishes
+     without leaving a trace of what it chose is a set nobody can audit. */
+  DISPATCHED.length = 0;
+  await page.click("#topup-go");
+  await page.waitForTimeout(400);
+  const filled = DISPATCHED[0] || {};
+  ok(Array.isArray(filled.batch) && filled.batch.length === 3,
+     `${width}: the fill dispatched ${(filled.batch || []).length} entries`);
+  ok((filled.batch || []).every((e) => /^[0-9]+$/.test(String(e.photo_id))
+        && e.purpose && e.alt),
+     `${width}: an entry travelled without an id, a purpose or a description`);
+  const fams = new Set((filled.batch || []).map((e) => e.purpose.split("@")[0]));
+  ok(fams.size === 3,
+     `${width}: one press covered ${fams.size} families, not every category`);
+  await closeDialogs(page);
+  await page.click('[data-view="basket"]');
+  await page.waitForSelector("#bk-grid .swcell");
+  ok(await page.locator("#bk-grid .swcell.gone").count() === 3,
+     `${width}: what the fill sent left no trace in the basket`);
+  /* AND A SENT ENTRY CAN BE CLEARED. It is deliberately untickable so it
+     cannot be sent twice, which means Select all skips it and Remove ticked
+     cannot reach it — so the two controls that look like they would empty
+     the basket could not touch the only thing that accumulates in it. */
+  ok(await page.locator("#bk-sent").isVisible(),
+     `${width}: sent entries cannot be cleared except one at a time`);
+  await page.click("#bk-sent");
+  await page.waitForTimeout(50);
+  ok(await page.locator("#bk-grid .swcell").count() === 0,
+     `${width}: Clear sent left entries behind`);
 
   /* ── the basket ────────────────────────────────────────────────────
      WHAT THE BASKET HAS TO BE IS A PLACE WORK SURVIVES, so the assertions

@@ -108,6 +108,15 @@ function res() {
 }
 
 const lib = await import(path.join(API, "_lib.js"));
+const { queryOf: topupQuery, interleave } =
+  await import(path.join(API, "topup.js"));
+
+/* The replaced fetch is restored by name rather than by copying the
+ * literal back in three places, because three copies of one stub is
+ * three chances for them to drift — which this suite has now watched
+ * happen to a predicate twice. */
+const BASE_FETCH = globalThis.fetch;
+function restoreFetch() { globalThis.fetch = BASE_FETCH; }
 
 function session() {
   return `${lib.COOKIE}=${lib.sign({ exp: Date.now() + 3600e3 })}`;
@@ -701,6 +710,152 @@ await t("the desk page loads no inline script and no style attribute", () => {
     path.join(ROOT, "desk", "public", "index.html"), "utf8");
   assert.ok(!/<script(?![^>]*\bsrc=)/.test(html), "an inline script");
   assert.ok(!/\sstyle="/.test(html), "a style attribute");
+});
+
+/* ── fill the library ───────────────────────────────────────────── */
+
+await t("the fill route refuses without a session", async () => {
+  const r = await call("topup.js");
+  assert.strictEqual(r.statusCode, 401, `answered ${r.statusCode}`);
+});
+
+await t("it round-robins the families rather than draining one", () => {
+  /* THE ORDER IS THE WHOLE POINT OF THE BUTTON. Taken in registry order one
+   * press is sixty Austrian destinations — a complete answer about Austria
+   * and no answer about the product. One from each family in turn means a
+   * press touches themes, countries, journeys, interests, macro regions,
+   * categories, stories, regions, destinations and places.
+   *
+   * THE FIRST VERSION OF THIS COUNTED SEARCHES and asserted "at least ten",
+   * which is true of registry order too — so replacing the round-robin with
+   * `const order = empty` left it green. It reads the ordering itself now.  */
+  const reg = lib.registry();
+  const order = interleave(reg.purposes);
+  const families = (p) => p.slot || p.purpose;
+  const lanes = new Set(reg.purposes.map(families));
+  const head = order.slice(0, lanes.size).map(families);
+  assert.strictEqual(new Set(head).size, lanes.size,
+    `the first ${lanes.size} surfaces cover ${new Set(head).size} of `
+    + `${lanes.size} families — it is draining one queue`);
+  assert.strictEqual(order.length, reg.purposes.length,
+    "interleaving lost or duplicated a surface");
+});
+
+await t("and the route itself walks that order", async () => {
+  /* THE FUNCTION BEING RIGHT IS NOT THE ROUTE USING IT. The assertion above
+   * reads `interleave` directly, so swapping `interleave(empty)` for `empty`
+   * inside the handler left it green — the same gap as a test that proves a
+   * predicate and never puts it in the path. The response reports which
+   * families the press touched, so this reads the route's own answer. */
+  globalThis.fetch = async () => new Response(JSON.stringify({ photos: [] }), {
+    status: 200, headers: { "content-type": "application/json" } });
+  const r = await call("topup.js", {
+    url: "/api/topup?provider=pexels&n=60", headers: { cookie: session() } });
+  const j = r.json();
+  const reg = lib.registry();
+  const lanes = new Set(reg.purposes.map((p) => p.slot || p.purpose));
+  assert.ok(j.looked > 0, "it looked at nothing");
+  assert.strictEqual(j.covered.length, Math.min(j.looked, lanes.size),
+    `it looked at ${j.looked} surfaces across only ${j.covered.length} `
+    + `families — the route is draining one queue`);
+  restoreFetch();
+});
+
+await t("one press cannot make 837 requests against the rate limit", async () => {
+  /* THE CAP WAS ON THE WRONG QUANTITY. A surface whose search returns
+   * nothing qualifying costs a request and yields no row, so bounding only
+   * the TAKE let the loop walk every empty surface on a provider having a
+   * bad day — 837 requests against a rate limit nobody here owns. The sweep
+   * has had `MAX_SURFACES` for exactly this since it was written.
+   *
+   * It surfaced because the ordering test could not discriminate: look at
+   * everything and every order covers every family. A test that cannot fail
+   * and a route that cannot stop were the same bug. */
+  /* COUNTED BY HOST, because the route also reads the register from GitHub
+   * and the first version of this counted that as a provider request and
+   * reported 121 against a ceiling of 120. An assertion that names the rate
+   * limit has to count the thing the rate limit governs. */
+  let n = 0;
+  globalThis.fetch = async (url) => {
+    if (/pexels/.test(String(url))) n += 1;
+    return new Response(JSON.stringify({ photos: [] }), {
+      status: 200, headers: { "content-type": "application/json" } });
+  };
+  const topup = await import(path.join(API, "topup.js"));
+  const r = await call("topup.js", {
+    url: "/api/topup?provider=pexels&n=60", headers: { cookie: session() } });
+  assert.strictEqual(r.statusCode, 200);
+  assert.ok(n <= topup.MAX_LOOKS,
+    `it made ${n} provider requests for a ceiling of ${topup.MAX_LOOKS}`);
+  assert.ok(r.json().stopped, "it stopped early and did not say so");
+  restoreFetch();
+});
+
+await t("a candidate with no description is never taken automatically",
+  async () => {
+    /* THE ALTERNATIVE TO A REAL DESCRIPTION IS WRITING ONE ABOUT A
+     * PHOTOGRAPH NOTHING HERE HAS SEEN, which is the licence-from-memory
+     * failure in another costume. A candidate without the photographer's own
+     * alt is not unusable — it is un-AUTOMATABLE, and it stays available to
+     * the two paths where a person is looking. */
+    globalThis.fetch = async () => new Response(JSON.stringify({ photos: [{
+      id: 999001, width: 6000, height: 4000, alt: "",
+      photographer: "Nobody", photographer_url: "https://www.pexels.com/@x",
+      url: "https://www.pexels.com/photo/x-999001/",
+      src: { original: "https://images.pexels.com/photos/999001/x.jpg",
+             large: "https://images.pexels.com/photos/999001/x.jpg" },
+    }] }), { status: 200, headers: { "content-type": "application/json" } });
+    const r = await call("topup.js", {
+      url: "/api/topup?provider=pexels&n=3", headers: { cookie: session() } });
+    assert.strictEqual(r.statusCode, 200);
+    assert.strictEqual((r.json().rows || []).length, 0,
+      "it took a photograph it would have had to invent a description for");
+    restoreFetch();
+  });
+
+await t("it never proposes one photograph for two surfaces", async () => {
+  /* The provider returns the same picture for neighbouring queries, and the
+   * register refuses one id against two purposes — so a set this button
+   * gathers must not contain a pair the dispatch will reject four screens
+   * later. */
+  globalThis.fetch = async () => new Response(JSON.stringify({ photos: [{
+    id: 999002, width: 6000, height: 4000, alt: "a wide landscape",
+    photographer: "Somebody", photographer_url: "https://www.pexels.com/@y",
+    url: "https://www.pexels.com/photo/y-999002/",
+    src: { original: "https://images.pexels.com/photos/999002/y.jpg",
+           large: "https://images.pexels.com/photos/999002/y.jpg" },
+  }] }), { status: 200, headers: { "content-type": "application/json" } });
+  const r = await call("topup.js", {
+    url: "/api/topup?provider=pexels&n=8", headers: { cookie: session() } });
+  const ids = (r.json().rows || []).map((x) => x.candidate.id);
+  assert.strictEqual(ids.length, new Set(ids).size,
+    `it offered one id for ${ids.length - new Set(ids).size + 1} surfaces`);
+  assert.ok(ids.length <= 1, `it offered ${ids.length} rows from one photograph`);
+  restoreFetch();
+});
+
+await t("it gathers no more than the dispatch will accept", async () => {
+  const topup = await import(path.join(API, "topup.js"));
+  const acq = fs.readFileSync(path.join(API, "acquire.js"), "utf8");
+  const cap = Number((/plan\.length > (\d+)/.exec(acq) || [])[1]);
+  assert.strictEqual(topup.MAX_FILL, cap,
+    `the button gathers ${topup.MAX_FILL} and the dispatch takes ${cap}`);
+});
+
+await t("the query is the role's own concept, with the name in it", () => {
+  /* A country wants `{name} landscape` and a destination wants `{name}`, and
+   * that difference is the editorial knowledge the roles were written to
+   * hold. Nothing looks at these pictures, so the query has to carry the
+   * intent the eye would have. */
+  const reg = lib.registry();
+  const row = reg.purposes.find((p) => p.slot === "country-hero");
+  assert.ok(row, "the registry declares no country heroes");
+  const spec = lib.specOf(row.purpose);
+  assert.ok((spec.search || []).length, "the slot declares no concepts");
+  assert.ok(!/\{name\}/.test(topupQuery(row, spec)),
+    "the placeholder reached the provider unsubstituted");
+  assert.notStrictEqual(topupQuery(row, spec), row.target,
+    "it searched the slug rather than the subject");
 });
 
 /* ── 8. what a green run is called ──────────────────────────────── */

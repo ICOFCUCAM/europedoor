@@ -52,6 +52,25 @@
     <button type="button" id="signout" class="quiet">Sign out</button>
   </header>
 
+  <!-- FILL THE LIBRARY. The one press that needs no decision first.
+       ==============================================================
+       IT SITS ABOVE THE AREAS AND NOT INSIDE ONE, because it belongs to none
+       of them: Find asks which surface, Fill a country asks which country,
+       and this asks nothing. An editor opening the desk with 826 empty slots
+       should not have to answer a question to get a photograph.
+
+       IT SAYS WHAT IT WILL DO BEFORE IT DOES IT — how many are empty, how
+       many this press takes, and that it publishes — because "one click" is
+       a promise about effort and never about surprise. -->
+  <section id="topup" class="topup" hidden>
+    <div class="topup-in">
+      <h2 id="topup-head">Fill the library</h2>
+      <p class="topup-note" id="topup-note"></p>
+      <p class="topup-fine" id="topup-fine"></p>
+    </div>
+    <button type="button" id="topup-go" class="go">Fill the library</button>
+  </section>
+
   <!-- FIND IMAGES -->
   <section id="view-find" class="view">
     <form id="find" class="find">
@@ -183,6 +202,15 @@
       <button type="button" id="bk-all" class="quiet">Select all</button>
       <button type="button" id="bk-none" class="quiet">Clear selection</button>
       <button type="button" id="bk-drop" class="quiet">Remove ticked</button>
+      <!-- A SENT ENTRY COULD NOT BE CLEARED, which the render suite caught
+           in the run that added the fill button. Sent entries are
+           deliberately untickable so they cannot be sent twice — and
+           "Select all" skips a disabled tick and "Remove ticked" works on
+           ticks, so between them the two controls that look like they
+           would clear the basket could not touch the one thing that
+           accumulates in it. The per-entry Remove worked all along, which
+           is fine for one and useless for sixty. -->
+      <button type="button" id="bk-sent" class="quiet" hidden>Clear sent</button>
       <p class="sw-count" id="bk-count"></p>
       <button type="button" id="bk-go" class="go" disabled>Acquire</button>
     </div>

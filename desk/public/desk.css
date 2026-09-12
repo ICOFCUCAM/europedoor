@@ -450,3 +450,30 @@ button.slotrow:hover .findit { color: var(--cobalt-deep); }
 .target { font-family: var(--mono); font-size: 11px; color: var(--ink-3);
   margin: 0 var(--s4) 0 auto; white-space: nowrap; overflow: hidden;
   text-overflow: ellipsis; max-width: 22rem; }
+
+/* ── fill the library ────────────────────────────────────────────────
+   THE ONE PRESS THAT NEEDS NO DECISION FIRST, so it sits above the areas
+   rather than inside one: Find asks which surface, Fill a country asks which
+   country, and this asks nothing. It is the widest thing on the screen and
+   the only band of signature colour on the desk, because an editor opening a
+   desk with 826 empty slots should meet the button before the filters.
+
+   IT IS A BAND AND NOT A CARD. Border, radius, fill and shadow each say
+   "separate object placed here by a system", which is the wrong sentence
+   about the thing the page is for — the site's own Stay layer and search box
+   both record that finding. A rule, the words, the action beside them. */
+.topup { display: flex; flex-wrap: wrap; gap: var(--s5); align-items: center;
+  max-width: 84rem; margin: 0 auto; padding: var(--s5);
+  border-bottom: 1px solid var(--rule); }
+.topup-in { flex: 1 1 22rem; }
+.topup h2 { margin: 0 0 var(--s2); font-family: var(--display);
+  font-size: 22px; font-weight: 600; }
+.topup-note { margin: 0; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.topup-fine { margin: var(--s2) 0 0; font-size: 12px; line-height: 1.5;
+  color: var(--ink-3); }
+.topup .go { flex: none; padding: .75rem 1.4rem; border: 0; cursor: pointer;
+  border-radius: var(--radius); font: inherit; font-weight: 600;
+  background: var(--cobalt-deep); color: var(--limestone); }
+.topup .go[disabled] { background: var(--paper-3); color: var(--ink-3);
+  cursor: default; }
+@media (max-width: 44rem) { .topup .go { width: 100%; } }
