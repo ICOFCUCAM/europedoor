@@ -48,6 +48,8 @@ import tempfile
 import threading
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "tools"))
+from checks import in_url_path                        # noqa: E402
 IMG = os.path.join(ROOT, "assets", "img")
 IMG_DIR = os.path.join(ROOT, "assets", "img")
 REGISTER = os.path.join(ROOT, "data", "images.json")
@@ -201,6 +203,33 @@ def run(args, env):
                           capture_output=True, text=True)
 
 
+def credential_shaped(body, m, stems=()):
+    """Is this run of word characters a credential, or provenance?
+
+    ONE DECISION, IN ONE PLACE, BECAUSE THE SCAN AND THE TEST OF THE SCAN
+    BOTH NEED IT. The first version of the test re-implemented the URL half
+    and left the SHA-256 half out, so it reported a hash as a credential —
+    which is the same fault it was written to catch, in the instrument
+    rather than in the thing measured. This repository has recorded "a
+    second implementation of a thing is a second chance to make its mistake"
+    four times; a test is an implementation.
+    """
+    tok = m.group(0)
+    if in_url_path(body, m.start()):
+        return False
+    if tok in stems:
+        return False
+    # A 64-CHARACTER LOWERCASE HEX STRING IS A SHA-256, and the register is
+    # FULL of them: the original's hash and one per derivative. Matched by
+    # shape AND by the key it sits under, because "it looks like hex" alone
+    # is how a real credential gets waved through.
+    if re.fullmatch(r"[0-9a-f]{64}", tok):
+        before = body[max(0, m.start() - 40):m.start()]
+        if "sha256" in before or "hash" in before:
+            return False
+    return True
+
+
 def main(argv):
     only_secrets = "--committed-only" in argv
 
@@ -227,25 +256,77 @@ def main(argv):
         scanned += 1
         body = open(path, encoding="utf-8").read()
         for m in keyish.finditer(body):
-            if "://" in body[max(0, m.start() - 12):m.start()]:
+            # A SECOND IMPLEMENTATION OF A THING IS A SECOND CHANCE TO MAKE
+            # ITS MISTAKE, and this one made it and was fixed alone.
+            #
+            # `checks.py` and this scan both read the same eight files for
+            # credential-shaped tokens, and both had to learn that a Pexels
+            # source URL carries the photograph's own title as a path
+            # segment: `/photo/a-close-up-of-party-appetizers-served-on-
+            # plates-at-a-gathering-39122376/` is a 71-character run of word
+            # characters and hyphens. `checks.py` was taught with
+            # `in_url_path`, which walks back to the start of the token and
+            # asks whether it begins `https://` and whether the match falls
+            # before any `?` or `#` — narrow on purpose, because a credential
+            # travels as a query parameter and essentially never as a path
+            # segment.
+            #
+            # THIS COPY KEPT A TWELVE-CHARACTER LOOKBEHIND for `://`, which
+            # is true of a token straight after the host and false of one
+            # after `/photo/`. So the workflow's own pre-commit scan failed
+            # run 19 on seven register rows — after the acquisition, after
+            # the rebuild, after every gate including the browser suite — on
+            # the provenance the whole pipeline exists to record. It is the
+            # same predicate now, imported rather than restated.
+            if not credential_shaped(body, m, stems):
                 continue
-            if m.group(0) in stems:
-                continue
-            # A 64-CHARACTER LOWERCASE HEX STRING IS A SHA-256, and the
-            # register is FULL of them: the original's hash and one per
-            # derivative. The scan would have failed the build on the first
-            # real photograph — on the provenance the whole pipeline exists to
-            # record. Matched by shape AND by the key it sits under, because
-            # "it looks like hex" alone is how a real credential gets waved
-            # through.
-            if re.fullmatch(r"[0-9a-f]{64}", m.group(0)):
-                before = body[max(0, m.start() - 40):m.start()]
-                if "sha256" in before or "hash" in before:
-                    continue
             check("no credential in committed files", False,
                   f"{rel} carries a {len(m.group(0))}-character token")
     check("the secret scan actually read the pipeline files", scanned >= 6,
           f"scanned {scanned}")
+
+    # AND IT HAD ONLY EVER READ AN EMPTY REGISTER, WHICH IS WHY IT PASSED.
+    #
+    # The scan runs over `data/images.json` among eight files, and until run
+    # 19 that file held `{"images": {}}` here and in CI. The full suite does
+    # acquire — against a stub whose source URL is `http://127.0.0.1:PORT/...`
+    # with no title in it — so the one shape that breaks the predicate, a
+    # provider URL carrying the photograph's own title as a path segment,
+    # was never once put in front of it. A code path nothing exercises is a
+    # code path nothing checks, and this is that sentence about a PREDICATE
+    # rather than about a renderer.
+    #
+    # So the rows are synthesised here, from the real thing: seven register
+    # rows failed run 19 and every one of them failed on this.
+    sample = json.dumps({"images": {"door-food": {
+        "source": "https://www.pexels.com/photo/a-close-up-of-party-"
+                  "appetizers-served-on-plates-at-a-gathering-39122376/",
+        "photographer_url": "https://www.pexels.com/@dave-garcia-1234567",
+        "licence_url": "https://www.pexels.com/license/",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b"
+                  "7852b855",
+    }}}, indent=2)
+    slug = [m.group(0) for m in keyish.finditer(sample)
+            if credential_shaped(sample, m)]
+    check("a real provider URL is not read as a credential",
+          not slug,
+          "these would stop the commit: " + ", ".join(s[:50] for s in slug))
+
+    # AND THE PREDICATE IS NARROW IN THE DIRECTION THAT MATTERS. A key
+    # travels as a query parameter or a fragment and essentially never as a
+    # path segment, so exempting everything after `https://` would exempt
+    # exactly where one goes. Both directions, because a guard that only
+    # says yes is a guard that says nothing.
+    for body, at_text, want in (
+        ("https://www.pexels.com/photo/a-very-long-title-here-12345/",
+         "a-very-long-title-here-12345", True),
+        ("https://api.example.com/v1?key=" + "K" * 44, "K" * 44, False),
+        ("https://example.com/x#" + "K" * 44, "K" * 44, False),
+        ('"' + "K" * 44 + '"', "K" * 44, False),
+    ):
+        got = in_url_path(body, body.index(at_text))
+        check("the URL predicate answers both ways", got == want,
+              f"{at_text[:24]}… in {body[:40]}… returned {got}, wanted {want}")
     # The key must never be echoed by the workflow either.
     wf = open(os.path.join(ROOT, ".github", "workflows", "photograph.yml"),
               encoding="utf-8").read()

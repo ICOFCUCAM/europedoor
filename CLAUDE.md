@@ -3009,6 +3009,34 @@ fitted at 390 and six did not, so adding the basket put the document back
 into sideways scroll on every screen — the same defect, one element in,
 caught by `desk-render.js` in the run that introduced it.
 
+**THE PRE-COMMIT SECRET SCAN FAILED ON THE PROVENANCE IT EXISTS TO PROTECT.**
+`checks.py` and `photo-tests.py --committed-only` read the same eight files
+for credential-shaped tokens, and both had to learn the same thing: a Pexels
+source URL carries the photograph's own title as a path segment, and
+`/photo/a-close-up-of-party-appetizers-served-on-plates-at-a-gathering-39122376/`
+is a 71-character run of word characters and hyphens. `checks.py` was taught
+with `in_url_path` — walk back to the start of the token, is it `https://`,
+does the match fall before any `?` or `#` — narrow on purpose, because a
+credential travels as a query parameter and essentially never as a path
+segment. **The other copy kept a twelve-character lookbehind for `://`**,
+which is true of a token straight after the host and false of one after
+`/photo/`. So run 19 acquired seven photographs, rebuilt, passed every gate
+including the browser suite, and was stopped by its own pre-commit scan on
+seven register rows. *A second implementation of a thing is a second chance
+to make its mistake* — fifth time, and the first where the fix had already
+been written and simply not shared.
+
+**And it survived because the scan had only ever read an EMPTY register.**
+The suite does acquire, against a stub whose source URL is
+`http://127.0.0.1:PORT/...` with no title in it, so the one shape that breaks
+the predicate was never put in front of it. *A code path nothing exercises is
+a code path nothing checks*, said about a predicate rather than a renderer.
+The rows are synthesised from the real thing now, and `credential_shaped()`
+is one decision both the scan and the test of the scan call — **the first
+version of that test re-implemented the URL half and left the SHA-256 half
+out, so it reported a hash as a credential**, which is the fault it was
+written to catch, in the instrument.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
