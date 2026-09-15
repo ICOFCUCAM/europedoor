@@ -8719,11 +8719,10 @@ def story_page(data, s):
     # of where this happens rather than a plate whose motif was chosen by a
     # hash and was, on the forest story, a skyline.
     has_photo = bool((data.get("images") or {}).get("story:" + s["slug"]))
-    storyart = (f'<div class="card-art frame">'
-                + picture(data["images"], "story:" + s["slug"], w=1260, h=540,
-                          alt=s["title"], eager=True,
-                          sizes="(min-width: 76rem) 76rem, 100vw")
-                + '</div>') if has_photo else storymap(data, s)
+    storyart = (f'<figure class="ed-bleed ed-bleed-tall">'
+                + picture(data["images"], "story:" + s["slug"], w=2400, h=1030,
+                          alt=s["title"], eager=True, sizes="100vw")
+                + '</figure>') if has_photo else storymap(data, s)
     # WHERE THIS HAPPENS MOVES INTO THE MARGIN.
     #
     # It was a full section of rows below the save button — the last thing
@@ -8749,13 +8748,13 @@ def story_page(data, s):
     body = f"""
 {crumbs([("Europe", "/discover"), ("Stories", "/stories"), (s["title"], None)])}
 <article class="essay">
-<div class="pagehead overture essayhead">
-  <p class="kicker">{esc(s['section'])} · {esc(s['reading'])}</p>
+<header class="ed-story-opening">
+  <p class="ed-story-meta"><span>{esc(s['section'])}</span><span>{esc(s['reading'])}</span>
+  <span><time datetime="{esc(s['published'])}">{esc(s['published'])}</time></span>
+  <span>{esc(s['author'])}</span></p>
   <h1>{esc(s['title'])}</h1>
-  <p class="deck">{esc(s['standfirst'])}</p>
-  <p class="byline">By {esc(s['author'])} · published
-  <time datetime="{esc(s['published'])}">{esc(s['published'])}</time>{updated}</p>
-</div>
+  <p class="ed-intro">{esc(s['standfirst'])}</p>
+</header>
 {storyart}
 <div class="essaywrap{'' if margin else ' nomargin'}">
   <div class="essaybody">{paras}</div>

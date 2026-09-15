@@ -7849,8 +7849,12 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
   font-size: var(--ed-display-1);
   line-height: .96; letter-spacing: -.05em; margin: 0; max-width: none;
 }
+/* THE GAP AND THE SEPARATOR WERE BOTH DOING IT. A flex gap of 1.5rem plus
+   a drawn middot reads as two separators: `FAITH   ·   8 MIN`. One or the
+   other — the middot, because it is what a publication's index line uses
+   and it survives a wrap. */
 .ed-story-meta {
-  display: flex; flex-wrap: wrap; gap: var(--s5); margin: 0 0 var(--s6);
+  display: flex; flex-wrap: wrap; gap: 0; margin: 0 0 var(--s6);
   font-family: var(--ed-mono); font-size: var(--t-xs); text-transform: uppercase;
   letter-spacing: .1em; color: var(--ink-3);
 }
@@ -8289,3 +8293,18 @@ main { counter-reset: band; }
 }
 .ed-index dt { letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
 .ed-index dd { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
+
+/* THE STORY OPENING, AND THE BYLINE BECAME METADATA. It was a kicker, an
+   h1, a deck and a sentence beginning "By" — four paragraph shapes doing
+   one job. A publication sets the section, the reading time, the date and
+   the author as one line of index type above the headline, and gives the
+   headline the whole measure: that is the difference between an article
+   page and an essay. */
+.ed-story-opening .ed-intro {
+  max-width: 34ch; margin-top: var(--s6);
+  font-size: var(--ed-read); line-height: 1.5; color: var(--ink-2);
+}
+.ed-story-opening .ed-story-meta span + span::before {
+  content: "·"; margin-inline: var(--s3); color: var(--ink-3);
+}
+.essay .ed-bleed { margin-block: var(--s7) 0; }

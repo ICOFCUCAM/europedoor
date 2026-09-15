@@ -2687,7 +2687,8 @@ def c_frontend():
     # family that drops the idea altogether still fails.
     FLOORS = {"kicker": 0.99, "masthead": 0.99, "pagehead": 0.99, "crumbs": 0.99,
               "row": 0.85, "card": 0.05, "band": 0.70, "note": 0.70}
-    ALSO = {"pagehead": ("ed-opening", "ed-arrival", "ed-journey-hero"),
+    ALSO = {"pagehead": ("ed-opening", "ed-arrival", "ed-journey-hero",
+                         "ed-story-opening", "ed-institution"),
             "kicker": ("ed-eyebrow", "ed-section-index"),
             "row": ("ed-row",), "band": ("ed-section",)}
     total = 0
@@ -5392,10 +5393,10 @@ def c_index_extent():
         # repeated fault and would have said so about a page that had got
         # better. Both, joined, because a family mid-migration has one or the
         # other and the promise is about the page.
-        head = (_element_text(h, "pagehead") + " "
-                + _element_text(h, "ed-opening") + " "
-                + _element_text(h, "ed-arrival") + " "
-                + _element_text(h, "ed-journey-hero"))
+        head = " ".join(_element_text(h, c) for c in
+                        ("pagehead", "ed-opening", "ed-arrival",
+                         "ed-journey-hero", "ed-story-opening",
+                         "ed-institution"))
         nums = {int(x) for x in re.findall(r"\b(\d{1,5})\b", head)}
         n += 1
         if size not in nums:
@@ -5685,9 +5686,15 @@ def c_pagehead_role():
             # destination pages a band rather than a stage — a photograph
             # full-bleed with the name set into its foot — which is a head
             # that happens not to be called one.
+            # EACH FAMILY'S HEAD IS ITS OWN SHAPE, which is the point of
+            # the eight rooms: a story opens on a publication's index line
+            # and an institutional page on a typographic monument, and
+            # neither is a `pagehead`. What they share is the promise —
+            # every page declares what kind of page it is.
             if re.search(r'class="ed-opening ed-family-([a-z]+)"', h) or \
-                    'class="ed-arrival"' in h or \
-                    'class="ed-journey-hero"' in h:
+                    any(f'class="{c}"' in h for c in
+                        ("ed-arrival", "ed-journey-hero", "ed-story-opening",
+                         "ed-institution")):
                 n += 1
                 continue
             if r not in NO_HEAD:
