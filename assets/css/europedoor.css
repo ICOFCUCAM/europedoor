@@ -2301,8 +2301,15 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
    `.minimap.arched .rlabel text` wins it — so a region name was styled for a
    light panel and drawn on a dark opening. What is left is the geometry,
    which is what this selector actually decides. */
+/* AND 15 IS FIFTEEN UNITS. The country reference map is a 1000-unit
+   viewBox scaled to its container, so a region name rendered 6.0 pixels at
+   390 on all fifty country pages — the same arithmetic as the place names,
+   the peaks, the features, the rivers and the scale bar, on the sixth and
+   last family to be sized this way. The collision pass has always re-tested
+   these boxes at the phone's scale, so it was reserving room for type that
+   was never drawn at that size. */
 .countrymap .rlabel text {
-  font-size: 15px; font-weight: 700; text-anchor: middle;
+  font-size: calc(15px / var(--z)); font-weight: 700; text-anchor: middle;
   paint-order: stroke; stroke-linejoin: round;
 }
 /* A MACRO REGION IS A SET OF WHOLE COUNTRIES, AND THEY HAVE TO READ AS ONE.
@@ -4923,8 +4930,14 @@ body[data-hero] .masthead { position: sticky; }
    point, and neither has a boundary drawn round it here. Quieter than a
    place name and placed after them: a grouping is the thing a reader can
    most afford to lose. */
-.minimap.arched.atlas .lyr-labels .rname {
-  font-size: var(--t-xs); letter-spacing: .18em; font-weight: 600;
+/* AND IT HAD THE SAME SELECTOR AS THE RIVER RULE TWENTY LINES UP, so the
+   two families were one: a river was drawn in this spaced uppercase and
+   this rule's own size beat `calc(var(--t-xs) / var(--z))`, which is how
+   both of them arrived on a phone at 5.2 and 6.0 pixels. Its own class,
+   and the compensation restated rather than inherited. */
+.minimap.arched.atlas .lyr-labels .gname {
+  font-family: var(--text); font-style: normal;
+  font-size: calc(var(--t-xs) / var(--z)); letter-spacing: .18em; font-weight: 600;
   fill: color-mix(in srgb, var(--atlas-hereline) 62%, transparent);
   paint-order: stroke; stroke: var(--atlas-here); stroke-width: 2.4; }
 
@@ -5221,7 +5234,8 @@ body[data-hero] .masthead { position: sticky; }
   .minimap.dense .peakname,
   .minimap.dense .fname,
   .minimap.dense .sname,
-  .minimap.dense .rname { display: none; }
+  .minimap.dense .rname,
+  .minimap.dense .gname { display: none; }
   /* And the names that only fit at the small size. Enlarging the type broke
      the collision rule that placed it: 434 overlapping pairs on 275 of the
      815 pages that draw a labelled map, "Hallstatt" through "Berchtesgaden"

@@ -1792,7 +1792,7 @@ def macromap(data, m):
             labels.append(got)
     drawn = "".join(phone_declutter(_declutter(
         [(0, x0, y0 + 14.0, lw + 8, lh + 4, html)
-         for html, x0, y0, lw, lh in labels], w, h)))
+         for html, x0, y0, lw, lh in labels], w, h), frame=(w, h)))
     n = sum(len(data["countries"][cs]["regions"]) for cs in m["countries"]
             if cs in data["countries"])
     cap = (f'The {len(members)} countries of {esc(m["name"])}, filled, with the '
@@ -2786,7 +2786,16 @@ def countryportrait(data, c):
             continue
         _try_label(sum(p[0] for p in pts_r) / len(pts_r),
                    sum(p[1] for p in pts_r) / len(pts_r),
-                   r_["name"].upper(), "rname", metric="rlabel", off=9.0,
+                   # TWO LABEL FAMILIES WORE ONE CLASS NAME, and the
+                   # stylesheet held two rules with the IDENTICAL selector.
+                   # A river is a line with an italic serif name and a
+                   # travel region is an area with a spaced uppercase one —
+                   # they are placed by different metrics here and were
+                   # painted by whichever rule came last in the file. So the
+                   # river treatment was dead on every plate and the region
+                   # treatment was on every river, and neither took the
+                   # phone compensation the later rule dropped.
+                   r_["name"].upper(), "gname", metric="rlabel", off=9.0,
                    prefer="over")
 
     # A PLATE DRAWS WHAT IT CAN NAME. Every destination used to get a mark,
@@ -2840,7 +2849,8 @@ def countryportrait(data, c):
                 if b[5].split()[0] != "pname"]
     for i, html in zip(_phone_i, phone_declutter(
             [boxed_[i][:5] + (1.0 if boxed_[i][5].split()[0] == "cname"
-                              else PHONE_LABEL_SCALE,) for i in _phone_i])):
+                              else PHONE_LABEL_SCALE,) for i in _phone_i],
+            frame=(w, h))):
         labs_[i] = html
 
     namemarks = "".join(labs_)
@@ -4978,7 +4988,7 @@ def countrymap(data, c):
         more = f' and {len(offframe) - 4} more' if len(offframe) > 4 else ""
         note = (f' {len(offframe)} outside this frame: {links}{more} — too far from the '
                 f'mainland to draw at this scale without emptying the map.')
-    drawn = "".join(phone_declutter(_declutter(labels, w, h)))
+    drawn = "".join(phone_declutter(_declutter(labels, w, h), frame=(w, h)))
     return (
         f'<figure class="minimap countrymap arched{dense_class(drawn)}" data-role="instrument">'
         f'<svg viewBox="0 0 {w} {h}" role="img" data-world="intelligence" '
@@ -5463,7 +5473,7 @@ def minimap(data, t, span=3.2, about=None, named=None):
     if not _peaks_done[0]:
         _physical()
 
-    drawnlabels = "".join(phone_declutter(labels))
+    drawnlabels = "".join(phone_declutter(labels, frame=(w, h)))
 
     # RELIEF, WHERE THE GROUND SAYS SO AND NOWHERE ELSE. The strength is
     # derived from the elevation model — the 95th minus the 5th percentile of
@@ -5771,7 +5781,7 @@ def hit_radius(pts, vw, cap=34.0, floor=6.0):
 PHONE_LABEL_SCALE = 26.0 / 11.0
 
 
-def phone_declutter(placed, reserve=()):
+def phone_declutter(placed, reserve=(), frame=None):
     """Which of these labels still fit once a phone enlarges them.
 
     ENLARGING THE TYPE BROKE THE RULE THAT PLACED IT.
@@ -5804,6 +5814,15 @@ def phone_declutter(placed, reserve=()):
     # `placed` and cannot lose; the destination plate has seeded it as a
     # zero-markup entry since the day the bar was added and `pointsmap` never
     # did. It matters now the bar's own type takes the phone enlargement.
+    # AND THE APERTURE IS NOT A FIXED SIZE EITHER. `place_label_box` tests
+    # every candidate position against the real curve at the size the build
+    # draws it; this pass then multiplies that box by 2.36 and only ever
+    # asked whether it now hits ANOTHER label. So the moment a family's type
+    # actually took the phone enlargement, "Vienna & the East" grew off the
+    # right-hand side of its own frame and was sliced by the arch — which is
+    # the defect place_label_box exists to prevent, arriving one pass later.
+    # A name that no longer fits the opening loses it exactly as a colliding
+    # one does: it keeps its dot, its <title> and its row below.
     kept, out = list(reserve), []
     # THE SAME CLEARANCE EVERY OTHER PASS KEEPS, scaled with the boxes. This
     # tested bare overlap, so two names could be placed touching: measured at
@@ -5822,6 +5841,12 @@ def phone_declutter(placed, reserve=()):
         clash = any(box[0] < k[0] + k[2] and k[0] < box[0] + box[2]
                     and box[1] < k[1] + k[3] and k[1] < box[1] + box[3]
                     for k in kept)
+        if not clash and frame is not None and scale > 1.0:
+            fw, fh = frame
+            clash = not all(
+                in_arch(cx_, cy_, fw, fh)
+                for cx_ in (box[0], box[0] + box[2])
+                for cy_ in (box[1], box[1] + box[3]))
         if clash:
             # ANY LABEL, NOT ONLY A PLACE NAME. This matched `class="minilabel`
             # and nothing else, so the physical names added later — a peak, a
@@ -5855,7 +5880,8 @@ def dense_class(markup):
     # called a map with six towns and four mountains sparse — so all ten were
     # scaled up on a 390px screen and two of them collided.
     names = sum(markup.count(f'<text class="{c}') for c in
-                ("minilabel", "peakname", "fname", "sname", "rname"))
+                ("minilabel", "peakname", "fname", "sname", "rname",
+                 "gname"))
     return "" if names <= 6 else " dense"
 
 
@@ -6110,7 +6136,8 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
     bx, by, bw_, bh_ = bar_box
     bcx, bcy = bx + bw_ / 2.0, by + bh_ / 2.0
     gw, gh = bw_ * PHONE_LABEL_SCALE, bh_ * PHONE_LABEL_SCALE
-    lab = phone_declutter(lab, reserve=[(bcx - gw / 2.0, bcy - gh / 2.0, gw, gh)])
+    lab = phone_declutter(lab, reserve=[(bcx - gw / 2.0, bcy - gh / 2.0, gw, gh)],
+                          frame=(vw, vh))
     dense = dense_class("".join(lab))
     # ONE RENDERER FOR EVERY PICTURE. A region, a journey, a story and a
     # motion are all "these places, on the real coastline, through the door",
