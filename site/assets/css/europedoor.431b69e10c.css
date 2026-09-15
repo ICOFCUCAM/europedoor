@@ -4839,8 +4839,20 @@ body[data-hero] .masthead { position: sticky; }
 @media (min-width: 52rem) {
   /* The kicker and the title on one line, baseline-aligned: two stacked
      labels above a tool is one label too many. */
-  .pagehead.instrument { grid-template-columns: auto 1fr auto; align-items: baseline;
-                         column-gap: var(--s4); }
+  /* THE TITLE HAS A FLOOR AND THE EXTENT IS THE COLUMN THAT GIVES. A grid
+     hands an `auto` track its max-content width before an `fr` track takes
+     what is left, and the extent's max-content is the whole of "319
+     destinations scored · 50 countries · 17 routes already built". Measured
+     at 834, the width the tablet sheet is shot at: /plan's h1 had 127 pixels
+     and set 43 characters on FIVE lines, /map two, /discover two — and all
+     of them are one line at 704, where the head is still one column, and one
+     line again by 1024. A head that is worse in the middle of its own range
+     than at either end is a track sizing fault rather than a design.
+
+     `.headextent` is a wrapping flex list, which is exactly the thing that
+     should give: it wraps to two lines and the title keeps one. */
+  .pagehead.instrument { grid-template-columns: auto minmax(20rem, 1fr) auto;
+                         align-items: baseline; column-gap: var(--s4); }
   .pagehead.instrument .lede { grid-column: 1 / -1; }
   .headextent { justify-content: flex-end; text-align: right; }
 }
