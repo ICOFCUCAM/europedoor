@@ -3017,6 +3017,78 @@ async function main() {
   }
   await page.setViewportSize({ width: 1280, height: 900 });
 
+  // ── a country plate names its OWN mountain ─────────────────────────
+  //
+  // A SINGLE TRIANGLE WITH A HEIGHT READS AS THIS COUNTRY'S MOUNTAIN, and
+  // thirty of the fifty portraits named somebody else's. `summit_points`
+  // returns the highest peaks in FRAME and a country plate frames its
+  // neighbours, so the tallest thing on screen is usually across the border:
+  // Austria named Triglav, which is Slovenian, Switzerland named Mont Blanc,
+  // Germany named Finsteraarhorn, Greece named Musala, and Croatia named
+  // three peaks of which none was Croatian.
+  //
+  // THE MODEL CANNOT CHECK ITSELF. The build decides this with a ray-cast
+  // against the same rings it draws, so a static check re-running it would
+  // only ever agree — the instrument fault this repository already records
+  // three times. `isPointInFill` is the browser asking the rendered path,
+  // which is a different implementation of the same question, and it is what
+  // the one-off measurement behind the country-name rule used.
+  //
+  // The subject's own name is asserted here too, for the same reason and with
+  // the same instrument: nine portraits once set it entirely on a neighbour.
+  {
+    const PLATES = ["/europe/austria", "/europe/switzerland", "/europe/germany",
+                    "/europe/croatia", "/europe/greece", "/europe/slovakia",
+                    "/europe/hungary", "/europe/france", "/europe/italy",
+                    "/europe/norway", "/europe/portugal", "/europe/turkiye"];
+    let checked = 0;
+    for (const u of PLATES) {
+      await page.goto(base + u, { waitUntil: "load" });
+      const off = await page.evaluate(() => {
+        const svg = document.querySelector("figure.minimap.portrait svg");
+        if (!svg) return null;
+        const here = svg.querySelector("path.here") || svg.querySelector(".countries path.here");
+        if (!here) return null;
+        /* A MARK'S POINT IS WHERE IT POINTS. A peak is drawn as a triangle
+           AROUND its coordinate, so the bounding box's centre is a little
+           north of the summit itself — and on Sněžka, whose summit is
+           literally the Czech-Polish frontier, that 0.8 units is the whole
+           question. Either the box's middle or its foot being on the country
+           is enough; a peak that is actually in the next country, like
+           Triglav on Austria's plate, is sixty units away and fails both. */
+        const inside = (el) => {
+          const b = el.getBBox();
+          const p = svg.createSVGPoint();
+          p.x = b.x + b.width / 2;
+          for (const y of [b.y + b.height / 2, b.y + b.height]) {
+            p.y = y;
+            if (here.isPointInFill(p)) return true;
+          }
+          return false;
+        };
+        const bad = [];
+        /* THE MARK, NOT THE LABEL. A peak's name is set beside its triangle,
+           and a printed atlas lets a name run over a neighbour — that is the
+           country name's own rule. What must be on this country is the
+           TRIANGLE. Testing the label's box instead reported Zugspitze off
+           Germany, which is where the build had just correctly put it. */
+        for (const t of svg.querySelectorAll("path.peak"))
+          if (!inside(t)) bad.push(`peak "${(t.querySelector("title") || {}).textContent || "?"}"`);
+        for (const t of svg.querySelectorAll("text.cname"))
+          if (!inside(t)) bad.push(`name "${t.textContent.trim()}"`);
+        return bad;
+      });
+      if (off === null) continue;
+      checked++;
+      ok(off.length === 0,
+         `${u} sets ${off.length} label(s) off its own country: ${off.join(", ")}`);
+    }
+    ok(checked >= 10,
+       `only ${checked} of ${PLATES.length} country portraits were examined — `
+       + "the plate or its subject path has been renamed and this check has "
+       + "stopped looking at anything");
+  }
+
   // ── the signature does not eat the content ─────────────────────────
   //
   // THE APERTURE WAS DELETING THE NAMES IT EXISTS TO FRAME.

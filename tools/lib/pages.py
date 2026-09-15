@@ -2260,7 +2260,21 @@ class NameGround:
         return n
 
     def fits(self, mine, x0, y0, w0, h0, tol=0):
-        return (self.own(mine, x0 + w0 / 2.0, y0 + h0 / 2.0)
+        """THE MIDDLE IS THREE SAMPLES, NOT ONE. `LABEL_METRICS` is a fitted
+        UPPER envelope on the width of a name, so the box this rule reasons
+        about is a few units wider than the one the browser draws and their
+        centres do not coincide. On a fragmented coast a few units is the
+        difference between land and water: GREECE passed here and the
+        browser's own `isPointInFill` put the rendered name's middle in the
+        Aegean, which is the one instrument that can settle it because it is
+        asking the drawing rather than the model.
+
+        Chasing the model would not fix it — a fitted envelope will always
+        differ from the render. What fixes it is not letting the decision
+        hinge on a single point.
+        """
+        mid_y = y0 + h0 / 2.0
+        return (all(self.own(mine, x0 + w0 * f, mid_y) for f in (0.42, 0.5, 0.58))
                 and self.crossings(mine, x0, y0, w0, h0) <= tol)
 
     def anchors(self, mine, grid=13):
