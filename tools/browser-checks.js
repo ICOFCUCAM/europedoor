@@ -3017,6 +3017,94 @@ async function main() {
   }
   await page.setViewportSize({ width: 1280, height: 900 });
 
+  // ── a country on the instrument is drawn, not merely declared ──────
+  //
+  // `docs/palette.json` declares --map-context against --map-sea at 1.35
+  // with the reason written out — "a country outside the subject is still
+  // drawn; 1.24 is not quiet, it is absent" — and `checks.py` recomputes it
+  // from the token hexes, so it has been green since it was written. The
+  // DATA-CUT FADE paints on top of both and nothing measured the result.
+  //
+  // A SEPARATION BETWEEN TWO TOKENS SAYS NOTHING ABOUT WHETHER EITHER IS
+  // PAINTED. That sentence is already in this repository, about /discover
+  // drawing fifty countries with `fill: none` under a rule that declared
+  // 1.8. This is the same fault through a different mechanism: the tokens
+  // were right and an overlay put Armenia at 1.06 against the sea.
+  //
+  // Sampled inside each real polygon, because a bounding-box centre is in
+  // the Adriatic for Italy and in the Aegean for Greece — a bounding box is
+  // not a country, which this atlas has now learned three times.
+  {
+    /* ON /map, WHERE THE CLAIM IS SHARPEST. /discover draws the same fade
+       and took the same cap, but its countries are context rather than
+       links — the page is a filter, not a navigator — so the one page where
+       every country is a door is the one asserted. */
+    for (const u of ["/map"]) {
+      await page.setViewportSize({ width: 1280, height: 1400 });
+      await page.goto(base + u, { waitUntil: "networkidle" });
+      await page.waitForTimeout(400);
+      const shot = (await page.screenshot({ fullPage: true })).toString("base64");
+      const m = await page.evaluate(async (d) => {
+        const img = await new Promise((r) => {
+          const i = new Image(); i.onload = () => r(i); i.src = "data:image/png;base64," + d; });
+        const c = document.createElement("canvas");
+        c.width = img.width; c.height = img.height;
+        c.getContext("2d").drawImage(img, 0, 0);
+        const D = c.getContext("2d").getImageData(0, 0, img.width, img.height);
+        const dpr = D.width / innerWidth;
+        const lum = (r, g, bl) => { const f = (v) => { v /= 255;
+          return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(bl); };
+        const at = (x, y) => { const i = ((Math.round(y) * D.width) + Math.round(x)) * 4;
+          return lum(D.data[i], D.data[i + 1], D.data[i + 2]); };
+        const ratio = (a, b) => { const [h, l] = [a, b].sort((x, y) => y - x);
+          return (h + 0.05) / (l + 0.05); };
+        const svg = document.querySelector(".europemap svg") || document.querySelector("svg.europemap");
+        if (!svg) return null;
+        const sr = svg.getBoundingClientRect();
+        /* Mid-Atlantic: sea on every frame this atlas draws. */
+        const sea = at((sr.left + sr.width * 0.12) * dpr, (sr.top + scrollY + sr.height * 0.55) * dpr);
+        const pt = svg.createSVGPoint();
+        const bad = []; let seen = 0;
+        for (const s of document.querySelectorAll(".europemap .cshape")) {
+          const path = s.tagName === "path" ? s : s.querySelector("path");
+          if (!path) continue;
+          const bb = path.getBBox();
+          if (bb.width < 2 || bb.height < 2) continue;
+          let inside = null;
+          for (let gy = 1; gy < 8 && !inside; gy++)
+            for (let gx = 1; gx < 8 && !inside; gx++) {
+              pt.x = bb.x + bb.width * gx / 8; pt.y = bb.y + bb.height * gy / 8;
+              if (path.isPointInFill(pt)) inside = [pt.x, pt.y];
+            }
+          if (!inside) continue;
+          seen++;
+          const t = path.getScreenCTM();
+          const sx = t.a * inside[0] + t.c * inside[1] + t.e;
+          const sy = t.b * inside[0] + t.d * inside[1] + t.f;
+          const r = ratio(at(sx * dpr, (sy + scrollY) * dpr), sea);
+          if (r < 1.35) {
+            const ti = s.querySelector("title");
+            bad.push(`${ti ? ti.textContent.trim() : "?"} ${r.toFixed(2)}`);
+          }
+        }
+        return { seen, bad };
+      }, shot);
+      ok(m !== null, `${u}: no instrument map to measure`);
+      if (!m) continue;
+      ok(m.bad.length === 0,
+         `${u}: ${m.bad.length} country/countries painted under the 1.35 that `
+         + `docs/palette.json declares against the sea — ${m.bad.join(", ")}. `
+         + "The tokens clear it; the data-cut fade paints on top of them, and a "
+         + "separation between two tokens says nothing about whether either is "
+         + "painted.");
+      ok(m.seen >= 40,
+         `${u}: only ${m.seen} countries were sampled — the shapes or their `
+         + "fills have been renamed and this check is reporting on nothing");
+    }
+    await page.setViewportSize({ width: 1280, height: 900 });
+  }
+
   // ── a control a reader can see the edge of ─────────────────────────
   //
   // THE HOMEPAGE'S ASK FIELD PAINTED rgb(247,246,243) ON A BODY OF
