@@ -4980,12 +4980,14 @@ def countrymap(data, c):
         # rule is on /method and in the map's own aria-label. What stays
         # here is what a reader of THIS map needs: what it shows, what is
         # missing from it, and where to open it bigger.
-        f'<figcaption>{esc(c["name"])}, its {n_of(len(c["regions"]), "region")} and {shown} '
+        f'<figcaption><span class="capsay">{esc(c["name"])}, its '
+        f'{n_of(len(c["regions"]), "region")} and {shown} '
         f'{"destination" if shown == 1 else "destinations"}. Region names sit at the '
-        f'centre of their own destinations — they are groupings, not boundaries.{note} '
+        f'centre of their own destinations — they are groupings, not boundaries.'
+        f'</span><span class="capsrc">{note} '
         f'Coastline and borders from <a href="/sources">Natural Earth</a>, public domain. '
         f'<a href="/map?c={esc(c["slug"])}">Open {esc(c["name"])} on the full map →</a>'
-        f'</figcaption></figure>'
+        f'</span></figcaption></figure>'
     )
 
 
@@ -6373,10 +6375,12 @@ def facet_page(data, c, r, t, key, payload):
                 f'<use href="#constel-eu"/>{lines}'
                 f'<g class="constel-lit"><circle cx="{here[0]:.0f}" '
                 f'cy="{here[1]:.0f}"/></g></svg>'
-                f'<figcaption>{n_of(len(routes), "curated route")} through '
+                f'<figcaption><span class="capsay">'
+                f'{n_of(len(routes), "curated route")} through '
                 f'{esc(t["name"])}, drawn end to end on the same projection as '
-                f'every other map here. '
-                f'{geo.sources_line(geo.load("europe-lod0.json"))}</figcaption>'
+                f'every other map here.</span><span class="capsrc">'
+                f'{geo.sources_line(geo.load("europe-lod0.json"))}</span>'
+                f'</figcaption>'
                 f'</figure>')
     else:
         for pl in payload["places"]:
@@ -7423,10 +7427,11 @@ def fund_page(data, p):
     c = data["countries"][p["country"]]
     glyph = country_glyph(c["slug"], p["country"])
     art = (f'<figure class="pagehead-art fundart">{glyph}'
-           f'<figcaption>{esc(c["name"])}, where this project is. The register '
-           f'records the country and no finer position — coastline and '
-           f'frontiers from <a href="/sources">Natural Earth</a>, public '
-           f'domain.</figcaption></figure>') if glyph else ""
+           f'<figcaption><span class="capsay">{esc(c["name"])}, where this '
+           f'project is.</span><span class="capsrc">The register records the '
+           f'country and no finer position — coastline and frontiers from '
+           f'<a href="/sources">Natural Earth</a>, public domain.</span>'
+           f'</figcaption></figure>') if glyph else ""
     body = f"""
 {crumbs([("Europe", "/discover"), ("Fund", "/fund"), (p["name"], None)])}
 <div class="pagehead overture fundhead">

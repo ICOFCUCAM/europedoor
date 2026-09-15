@@ -2032,9 +2032,13 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
    step: there is no size below 13 and a seventeenth would be refused, so the
    hierarchy is made by raising the sentence rather than quieting the credit
    further. */
-.minimap figcaption .capsay { display: block; max-width: 62ch;
+/* SCOPED TO THE SPANS THEMSELVES, not to `.minimap`. Three more families
+   caption a drawing that is not a `.minimap` — the country view on /map, a
+   facet's route figure and a fund project's locator — and a rule that names
+   one container is a rule the next family does not inherit. */
+figcaption .capsay { display: block; max-width: 62ch;
   font-size: var(--t-sm); color: var(--ink-2); }
-.minimap figcaption .capsrc { display: block; max-width: 78ch;
+figcaption .capsrc { display: block; max-width: 78ch;
   margin-top: var(--s2); font-size: var(--t-xs); color: var(--ink-3); }
 .minimap figcaption { font-size: var(--t-xs); color: var(--ink-3); margin-top: var(--s3); }
 
