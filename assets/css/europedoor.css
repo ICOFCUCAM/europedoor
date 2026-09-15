@@ -3241,7 +3241,7 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    after the portrait is a DOM change rather than a rule, because they sat
    inside `.portraitsay` and a grid can only place what it can address.
    Measured after: the portrait begins at 395. */
-.portraitmeta { display: grid; gap: var(--s3); }
+
 @media (min-width: 52rem) {
   /* `auto` rather than a fixed track: the door takes the width its country
      needs and the type takes the rest, so a narrow country does not leave a
@@ -3260,7 +3260,7 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
                            column-gap: var(--s8); row-gap: var(--s5);
                            align-items: start; }
   .pagehead.portraithead .portraitsay  { grid-column: 1; grid-row: 2; }
-  .pagehead.portraithead .portraitmeta { grid-column: 1; grid-row: 3; }
+  .pagehead.portraithead .headmeta { grid-column: 1; grid-row: 3; }
   .pagehead.portraithead .plate { grid-column: 2; grid-row: 1 / -1;
                                   align-self: center; justify-self: end; }
 }
@@ -3723,8 +3723,8 @@ body[data-hero] .masthead { position: sticky; }
  * the fourth element rather than the sixth, region 585 -> the same.
  *
  * `.headmeta` on all three, because the third time a repair is made by hand
- * it should stop being made by hand — the country head's `.portraitmeta`
- * and this are one class now. */
+ * it should stop being made by hand, so the country head's own meta
+ * block was renamed to this in the same breath: one class, three families. */
 .headmeta { display: grid; gap: var(--s3); justify-items: start; }
 .headmeta .orient { margin: 0; }
 .headmeta .chips { margin: 0; }

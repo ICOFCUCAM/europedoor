@@ -3053,7 +3053,7 @@ def country_page(data, c):
     {statement(c['tagline'])}
   </div>
   {countryportrait(data, c)}
-  <div class="portraitmeta">
+  <div class="headmeta">
     <p class="orient">{country_orient(c)}</p>
     {chips(c["interests"], data["interests"])}
   </div>
