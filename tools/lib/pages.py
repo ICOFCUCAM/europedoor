@@ -20,7 +20,8 @@ from .render import (LD_PUBLISHER, ORIGIN, SITE_NAME, SITE_TAGLINE, arch_rim, ca
                      esc, factlist, grid, n_of,
                      jsondata, ld_breadcrumb, ld_place, ld_within, motif_for,
                      page, photo, picture, plate, section, arch_clip, arch_edge,
-                     ed_opening, ed_photo, ed_rows, ed_section_head, ed_split)
+                     ed_opening, ed_photo, ed_rows, ed_section_head, ed_split,
+                     ed_bleed, ed_declare, ed_feature, ed_mosaic, ed_strip, held)
 from .score import city_scores, country_scores, discoverability
 
 HOME = ("Europe", "/discover")
@@ -3078,6 +3079,28 @@ def country_page(data, c):
         data, ckey, cportrait,
         f"{esc(c['name'])} drawn from Natural Earth, with its capital and the "
         f"destinations this atlas holds in it.")
+    # THE COUNTRY'S OWN DESTINATIONS, AS A SEQUENCE RATHER THAN A GRID.
+    # A country page's second question is "what is in it", and the answer it
+    # had was a grid of region cards four hundred pixels below a map. The
+    # strip is that answer as pictures, in the order the atlas writes them,
+    # and it is built from `destination-hero@<target>` — a slot this product
+    # already declares 319 times. Nothing new is invented; it renders when
+    # the register holds one and is absent when it does not.
+    cstrip_items = []
+    for _r in c["regions"]:
+        for _t in _r["cities"]:
+            cstrip_items.append({
+                "key": f"destination:{c['slug']}/{_r['slug']}/{_t['slug']}",
+                "alt": _t["name"],
+                "label": _t["name"],
+                "href": urls.city(c, _r, _t)})
+    _shots = ed_strip(data.get("images"), cstrip_items, limit=8)
+    cstrip = (f'<section class="ed-section">'
+              + ed_section_head("02", "In the country",
+                                f"Where {esc(c['name'])} is worth going",
+                                f"{n_of(sum(len(r['cities']) for r in c['regions']), 'destination')} "
+                                f"across {n_of(len(c['regions']), 'travel region')}.")
+              + _shots + "</section>") if _shots else ""
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)), (c["name"], None)])}
 {ed_opening(
@@ -3099,7 +3122,12 @@ def country_page(data, c):
 <div class="measure lead">
   <p>{esc(c['summary'])}</p>
 </div>
+{ed_bleed(data.get("images"), f"country:{c['slug']}",
+          alt=f"{c['name']} seen whole",
+          caption=f"{c['name']}", shape="tall")}
 </section>
+
+{cstrip}
 
 <section class="practical" aria-label="Practical">
   <div>
@@ -3496,6 +3524,26 @@ def city_page(data, c, r, t):
                              sizes="(min-width: 76rem) 44rem, 100vw")
                    + '</div>') if has_photo else ""
 
+    # THE PLACE IS THE PICTURE AND ITS PLACES ARE THE SEQUENCE.
+    # A destination page had one map and a column of rows; the directive is
+    # right that this is the family that should be most heavily image-led.
+    # Both of these are built from slots this product already declares —
+    # `destination:<target>` for the wide turn and `place:<target>` for each
+    # thing in it — and both are absent until the register holds them, so
+    # the page composes rather than filling a hole.
+    tkey = f"destination:{c['slug']}/{r['slug']}/{t['slug']}"
+    tbleed = ed_bleed(data.get("images"), tkey, alt=t["name"],
+                      caption=f"{t['name']}, {c['name']}", shape="tall")
+    tstrip_items = [{
+        "key": f"place:{c['slug']}/{r['slug']}/{t['slug']}/{pl['slug']}",
+        "alt": pl["name"], "label": pl["name"],
+        "href": urls.place(c, r, t, pl)} for pl in t.get("places", [])]
+    _tshots = ed_strip(data.get("images"), tstrip_items, limit=8)
+    tstrip = (f'<section class="ed-section">'
+              + ed_section_head("02", "In the place",
+                                f"What {esc(t['name'])} is made of",
+                                f"{n_of(len(t.get('places', [])), 'place')} recorded here.")
+              + _tshots + "</section>") if _tshots else ""
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)),
          (c["name"], urls.country(c)), (r["name"], urls.region(c, r)), (t["name"], None)])}
@@ -3519,6 +3567,8 @@ def city_page(data, c, r, t):
   {chips(t["interests"], data["interests"])}
 </div>
 </section>
+{tbleed}
+{tstrip}
 {sectionnav([
     ("Overview", "why-visit"),
     ("Places", "places" if placerows else ""),
@@ -4227,6 +4277,29 @@ def journey_page(data, j):
         seen_food.add(cc["slug"])
         jfood += f"<li><strong>{esc(cc['name'])}</strong> — {esc(cc['food'][0])}</li>"
     photoband = pageband(data, f"journey:{j['slug']}")
+    # A JOURNEY IS A SEQUENCE AND THE STOPS ARE THE PICTURES. This family
+    # already draws the one thing an abstract plate never could — the route
+    # — and the thing it could not show is what the stops LOOK like, in
+    # order. `destination-hero@<target>` is declared for every one of them,
+    # so the strip is the journey's own legs and nothing is invented.
+    jstrip_items = []
+    for _leg in j["legs"]:
+        _n = idx.get(_leg["city"])
+        if not _n:
+            continue
+        _t, _r, _c = _n["city"], _n["region"], _n["country"]
+        jstrip_items.append({
+            "key": f"destination:{_c['slug']}/{_r['slug']}/{_t['slug']}",
+            "alt": _t["name"], "label": _t["name"],
+            "href": urls.city(_c, _r, _t)})
+    _jshots = ed_strip(data.get("images"), jstrip_items, limit=10)
+    jbleed = ed_bleed(data.get("images"), f"journey:{j['slug']}",
+                      alt=j["name"], caption=j["name"], shape="tall")
+    jstrip = (f'<section class="ed-section">'
+              + ed_section_head("01", "The route",
+                                "What the journey passes through",
+                                f"{n_of(len(j['legs']), 'stop')}, in order.")
+              + _jshots + "</section>") if _jshots else ""
     body = f"""
 {crumbs([("Europe", "/discover"), ("Journeys", "/journeys"), (j["name"], None)])}
 {photoband}
@@ -4238,6 +4311,8 @@ def journey_page(data, j):
     <p class="ed-journey-facts">{n_of(j['days'], 'day')} · {n_of(len(j['legs']), 'stop')} · {n_of(len(countries), 'country')} · {total_km:,} km in a straight line</p>
   </div>
 </section>
+{jbleed}
+{jstrip}
 <div class="headmeta ed-section">{chips(j["interests"], data["interests"])}</div>
 
 <div class="routewrap">{routemap(data, j)}</div>
@@ -8379,6 +8454,24 @@ def theme_page(data, t):
     # desire, and the standfirst under it is where a standfirst has always
     # been. Both states take it, because the fault was the family's and not
     # the photograph's.
+    # THE THEME'S OWN EIGHT STOPS, IN PICTURES. This is the one family whose
+    # register rows are filled today — eleven theme heroes — so the opening
+    # is a real photograph, and the eight destinations under it are the
+    # sequence that says what the theme MEANS rather than where it goes.
+    tmstrip_items = []
+    for _stop in t["stops"]:
+        _n = data["cities"].get(_stop["city"])
+        if not _n:
+            continue
+        _t2, _r, _c = _n["city"], _n["region"], _n["country"]
+        tmstrip_items.append({
+            "key": f"destination:{_c['slug']}/{_r['slug']}/{_t2['slug']}",
+            "alt": _t2["name"], "label": _t2["name"],
+            "href": urls.city(_c, _r, _t2)})
+    _tmshots = ed_strip(data.get("images"), tmstrip_items, limit=8)
+    tmstrip = (f'<section class="ed-section">'
+               + ed_section_head("01", "The theme", "Where it takes you")
+               + _tmshots + "</section>") if _tmshots else ""
     body = f"""
 {crumbs([("Europe", "/discover"), ("Themes", "/themes"), (t["name"], None)])}
 {ed_opening(
@@ -8387,6 +8480,7 @@ def theme_page(data, t):
     intro=t["summary"],
     visual=headpic,
     family="discovery")}
+{tmstrip}
 <div class="headmeta ed-section">
   <p class="orient">{len(t['stops'])} places across {len(countries)}
   {"countries" if len(countries) != 1 else "country"} · not an itinerary</p>

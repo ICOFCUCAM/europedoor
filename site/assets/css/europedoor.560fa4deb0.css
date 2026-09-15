@@ -5418,10 +5418,19 @@ body[data-hero] .masthead { position: sticky; }
    the fourth time in this stylesheet that a treatment rendered as the thing
    simply not being there. A filter needs no second copy of Europe's
    geometry and cannot lose a cascade fight. */
+/* AND IT INVERTED WHEN THE WATER DID. Three shadows in the ocean ramp's
+   own steps were right against a near-black Atlantic — the land glowed
+   faintly into a dark sea — and on #DDE8E7 water the same three steps are
+   the DARKEST thing in the drawing, so every coast wore a turquoise halo
+   and the eye read it as the subject. A shore band is distance from land,
+   which on a pale sea means the water is slightly deeper away from the
+   coast and not that the coast is lit. The ramp runs the other way now:
+   the widest cast is the palest step and the tightest is the deepest, so
+   the tone falls toward the open sea. Softened to two, because three
+   shadows of a coastline at these values is a glow rather than a gradient. */
 .minimap.arched.atlas .lyr-land {
-  filter: drop-shadow(0 0 3px var(--ocean-coastal))
-          drop-shadow(0 0 9px var(--ocean-shallow))
-          drop-shadow(0 0 20px var(--ocean-mid)); }
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--ocean-shallow) 55%, transparent))
+          drop-shadow(0 0 14px color-mix(in srgb, var(--ocean-coastal) 70%, transparent)); }
 
 /* THE BOUNDARY HIERARCHY. One weight for everything made a frontier and a
    coast the same statement, and put the country this plate is about at the
@@ -8196,4 +8205,25 @@ body[data-family="journey"] .masthead .wordmark { color: var(--bone); }
   .ed-mosaic-3 { grid-template-columns: 1fr; grid-template-rows: none; }
   .ed-mosaic-3 > :first-child { grid-row: auto; }
   .ed-bleed-tall { aspect-ratio: 4 / 3; }
+}
+
+/* THE PHOTOGRAPH HAS TO REACH THE SLOT'S EDGES, and three wrappers sat
+   between it and them. `picture()` emits `<figure class="headshot">` around
+   a `<picture>` around an `<img>`, so a rule naming only `img, picture`
+   left the FIGURE at its content's height — a band of --ed-paper-2 under
+   the Grand Tour's gondolas, which reads as a frame that does not fit. The
+   same letterbox the map card was measured on, in a different component.
+   Every level, because a slot is a composition and the picture fills it. */
+.ed-opening-visual > figure,
+.ed-opening-visual .headshot { margin: 0; width: 100%; height: 100%; }
+.ed-opening-visual .headshot picture,
+.ed-opening-visual .headshot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* THE META ROW IS A LINE, NOT A SECTION. `.headmeta` was given
+   `.ed-section` when the heads moved, which pads it by up to 140px top and
+   bottom and draws a rule above it: a chip row and an orientation sentence
+   sat in two hundred pixels of nothing between the opening and the first
+   band. It keeps the stage's width and loses the section's air. */
+.headmeta.ed-section {
+  padding-block: var(--s6) 0; border-top: 0;
 }
