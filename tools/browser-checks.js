@@ -2330,6 +2330,101 @@ async function main() {
        `name under it`);
   }
 
+  // ── a head that is worse in the middle of its own range ────────────
+  //
+  // Two commits found the same fault at the same width in two different
+  // heads, and neither was visible at 390 or at 1280. The country portrait
+  // head splits into two columns at 52rem with the door on an `auto` track,
+  // so at 834 the type column was 174 pixels and the tagline set on five
+  // lines of three words. The instrument head is `auto 1fr auto`, and a grid
+  // hands an `auto` track its max-content before an `fr` track takes what is
+  // left, so /plan's title had 127 pixels and set 43 characters on FIVE
+  // lines — against one at 704, where the head has not split yet, and two at
+  // 1280.
+  //
+  // THE PROMISE IS RELATIVE, BECAUSE AN ABSOLUTE ONE IS WRONG. "Tyrol & the
+  // West" sets on two lines at every width from 390 to 1600 and that is the
+  // overture's own design — a narrow measure and air above it, where the
+  // name is the event. Eight characters per line is not a defect there. What
+  // IS a defect is a head that takes two more lines at some width than at
+  // both a narrower and a wider one: nothing about the content changed, only
+  // the track sizing, and a layout that is worse in the middle of its range
+  // than at either end is a sizing fault rather than a design.
+  //
+  // Both elements, because the two faults landed on different ones: the
+  // instrument's was its `h1` and the country's was its tagline.
+  {
+    const WIDTHS = [390, 704, 834, 900, 1024, 1280, 1600];
+    const seen = new Map();
+    for (const vw of WIDTHS) {
+      const hp = await browser.newPage({ viewport: { width: vw, height: 900 } });
+      for (const u of ["/", "/countries", "/europe/austria",
+                       "/europe/austria/tyrol",
+                       "/europe/austria/tyrol/innsbruck", "/journeys",
+                       "/journeys/the-alpine-grand-tour", "/themes",
+                       "/interests/mountains", "/europe-in/northern-lights",
+                       "/events", "/beyond-the-obvious", "/map", "/plan",
+                       "/search", "/discover", "/my-europe", "/experiences"]) {
+        const r = await hp.goto(base + u, { waitUntil: "load" });
+        if (!r || r.status() !== 200) continue;
+        const d = await hp.evaluate(() => {
+          const out = {};
+          for (const sel of ["h1", ".statement"]) {
+            const el = document.querySelector(".pagehead " + sel);
+            if (!el) continue;
+            const lh = parseFloat(getComputedStyle(el).lineHeight);
+            out[sel] = { lines: Math.max(1, Math.round(
+              el.getBoundingClientRect().height / lh)),
+              chars: el.textContent.trim().length };
+          }
+          return out;
+        });
+        for (const [sel, v] of Object.entries(d)) {
+          const k = u + " " + sel;
+          if (!seen.has(k)) seen.set(k, {});
+          seen.get(k)[vw] = v;
+        }
+      }
+      await hp.close();
+    }
+    // AGAINST THE BEST NARROWER AND THE BEST WIDER, not the immediate
+    // neighbours. A fault can ramp: the country tagline set 3 lines at 704,
+    // 5 at 834 and 4 at 900, so comparing with the neighbour on each side
+    // misses it while the shape — worse in the middle than at either end —
+    // is exactly the same.
+    let worst = null, bad = 0;
+    for (const [k, m] of seen) {
+      const at = (w) => (m[w] ? m[w].lines : null);
+      for (let i = 1; i < WIDTHS.length - 1; i++) {
+        const c = m[WIDTHS[i]];
+        if (!c) continue;
+        const below = WIDTHS.slice(0, i).map(at).filter((v) => v !== null);
+        const above = WIDTHS.slice(i + 1).map(at).filter((v) => v !== null);
+        if (!below.length || !above.length) continue;
+        const a = Math.min(...below), e = Math.min(...above);
+        if (c.lines >= a + 2 && c.lines >= e + 2) {
+          bad++;
+          const gap = Math.min(c.lines - a, c.lines - e);
+          if (!worst || gap > worst.gap) {
+            worst = { gap, k, vw: WIDTHS[i], c, a: { lines: a },
+                      e: { lines: e }, wa: "any narrower", we: "any wider" };
+          }
+        }
+      }
+    }
+    checked++;
+    ok(seen.size > 20,
+       `the head-range scan collected only ${seen.size} elements — it has ` +
+       "stopped finding the heads it is about");
+    ok(bad === 0, worst
+      ? `${bad} head(s) take two or more extra lines in the middle of their ` +
+        `own range: ${worst.k} at ${worst.vw}px sets ${worst.c.chars} ` +
+        `characters on ${worst.c.lines} lines, against ${worst.a.lines} at ` +
+        `${worst.wa} and ${worst.e.lines} at ${worst.we}. Nothing about the ` +
+        `content changed, only the track sizing.`
+      : "no head is worse in the middle of its range");
+  }
+
   // ── an option that does not fit the box it closes into ─────────────
   //
   // The planner's spending style read `{name} — {note}` and "Generous —
