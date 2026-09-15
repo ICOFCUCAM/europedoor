@@ -10712,17 +10712,44 @@ def motion_index(data):
     `motion_query_words()` the twelve pages use, so the index cannot state a
     query the page it links to would not.
     """
+    # AND THE ANSWER IS DRAWN, WHICH IS A THIRD OPTION THE REFUSAL ABOVE
+    # NEVER CONSIDERED. What was refused is a PLATE — an abstract landscape
+    # picked from the hash of a slug, a picture of nowhere standing in for a
+    # sentence — and that refusal still holds word for word. This is not
+    # that. The motion PAGE's own signature moment, recorded one function
+    # over, is "the query drawn as a shape: everywhere above 63 north is
+    # eight lit points across Iceland, Norway, Sweden and Finnish Lapland,
+    # and you see the latitude before you read it" — and the index that
+    # introduces the twelve drew none of it.
+    #
+    # It is computed from the query, by the same `motion_match` that produces
+    # the count beside it, so the drawing cannot state a set the page it
+    # links to would not — the same contract the printed query already has.
+    # And it is the shape that separates them: autumn lights 309 dots and is
+    # nearly the whole continent, rail is a corridor, the islands are a rim,
+    # above 63 north is the far north and nothing else. Twelve rows of type
+    # cannot be compared; twelve shapes can, which is the argument /themes
+    # and /interests already make with the same primitive.
     rows = []
     for m in data["motions"]:
-        n = sum(1 for cid, x in data["cities"].items()
-                if motion_match(data, m, cid, x)[0])
+        hits = [x for cid, x in data["cities"].items()
+                if motion_match(data, m, cid, x)[0]]
+        n = len(hits)
+        pts = [project(x["city"]["lat"], x["city"]["lon"]) for x in hits]
+        # The mark size follows the count, exactly as it does on /interests:
+        # three hundred dots at a theme's radius is a solid blue mass with the
+        # coastline lost under it, which says "a lot" and nothing else — and
+        # the whole argument of this page is that the shapes differ.
+        dense = " constel-dense" if len(pts) > 60 else ""
+        glyph = constellation(pts, extra=" constel-theme" + dense) if pts else ""
         rows.append(
-            f'<a class="row motionrow" href="/europe-in/{m["slug"]}">'
+            f'<a class="row themerow motionrow" href="/europe-in/{m["slug"]}">'
             f'<div><h2>{esc(m["name"])}</h2>'
             f'<p class="rowsub">{esc(m["strapline"])}</p>'
             f'<p class="motionq">{esc(motion_query_words(data, m))}</p></div>'
+            f'<div class="themeside">{glyph}'
             f'<p class="rowmeta">{n}<br><span class="small">destinations</span>'
-            f'</p></a>')
+            f'</p></div></a>')
     body = f"""
 {crumbs([("Europe", "/discover"), ("Europe in Motion", None)])}
 <div class="pagehead index">
@@ -10733,7 +10760,13 @@ def motion_index(data):
   made it. A list somebody curated by hand looks identical to one a query produced — on
   the day it ships, and never again.</p>
 </div>
+{constel_defs()}
 <div class="rows">{"".join(rows)}</div>
+<p class="small">The shape beside each query is the destinations that query
+actually matched, drawn to the same frame so the {numword(len(data['motions']))} can be
+compared — computed by the same pass that produced the number beside it, so a
+drawing here cannot show a set the page it links to would not.
+{geo.sources_line(geo.load("europe-lod0.json"))}</p>
 
 <div class="note mt7">
   <h2 class="mini">Why this is not a set of tags</h2>
