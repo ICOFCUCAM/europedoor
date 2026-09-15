@@ -5118,7 +5118,7 @@ def minimap(data, t, span=3.2, about=None, named=None):
     # its box before anything else is placed is what takes the site's last two
     # overlapping pairs to zero; the subject's own name still ignores it,
     # because the subject is never moved for anything.
-    labels.append(("", *geo.scale_bar_box(w, h)))
+    labels.append(("", *geo.scale_bar_box(w, h, PHONE_LABEL_SCALE), 1.0))
     inframe = []
 
     # PHYSICAL GEOGRAPHY ON THE TWO FAMILIES THAT MOST NEED IT. Rendered and
@@ -5146,7 +5146,12 @@ def minimap(data, t, span=3.2, about=None, named=None):
         """
         bx = (lx - LABEL_CLEAR, ly - LABEL_CLEAR,
               lx + lw + LABEL_CLEAR, ly + lh + LABEL_CLEAR)
-        for _hh, qx, qy, qw, qh in labels:
+        # `[:5]` BECAUSE AN ENTRY MAY CARRY ITS OWN PHONE SCALE. The scale
+        # bar's reservation does — it is pre-grown to the size a phone draws
+        # it and then told not to grow again — and a fixed five-way unpack
+        # stopped the whole build on it.
+        for _e in labels:
+            _hh, qx, qy, qw, qh = _e[:5]
             q = (qx - LABEL_CLEAR, qy - LABEL_CLEAR,
                  qx + qw + LABEL_CLEAR, qy + qh + LABEL_CLEAR)
             if not (bx[2] < q[0] or bx[0] > q[2]
@@ -5161,7 +5166,12 @@ def minimap(data, t, span=3.2, about=None, named=None):
         _lh, lx, ly, lw, lh = got
         bx = (lx - LABEL_CLEAR, ly - LABEL_CLEAR,
               lx + lw + LABEL_CLEAR, ly + lh + LABEL_CLEAR)
-        for _hh, qx, qy, qw, qh in labels:
+        # `[:5]` BECAUSE AN ENTRY MAY CARRY ITS OWN PHONE SCALE. The scale
+        # bar's reservation does — it is pre-grown to the size a phone draws
+        # it and then told not to grow again — and a fixed five-way unpack
+        # stopped the whole build on it.
+        for _e in labels:
+            _hh, qx, qy, qw, qh = _e[:5]
             q = (qx - LABEL_CLEAR, qy - LABEL_CLEAR,
                  qx + qw + LABEL_CLEAR, qy + qh + LABEL_CLEAR)
             if not (bx[2] < q[0] or bx[0] > q[2]

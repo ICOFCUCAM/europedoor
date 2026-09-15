@@ -772,8 +772,21 @@ async function main() {
   // The surface that answers "I don't know where I want to go", and the
   // only one on the site where every recommendation has to justify itself.
   await page.goto(base + "/discover", { waitUntil: "networkidle" });
-  ok(await page.locator("#discover-interests .chip.pick").count() >= 16,
-     "the interest chips did not render from the Atlas");
+  // IT PINNED THE LOOK OF THE CONTROL AND THE LOOK WAS THE THING THAT
+  // CHANGED. `.chip.pick` was the outlined pill; Decision 2 made the
+  // seventeen large type, and the assertion went red for a page that had
+  // got better — the twelfth shape pinned instead of a promise here. What
+  // matters is that seventeen interests are on the page as real controls a
+  // reader can press, so it reads `data-interest`, which is the contract
+  // the application binds to, and asserts the control rather than its skin.
+  {
+    const picks = page.locator("#discover-interests [data-interest]");
+    ok(await picks.count() >= 16,
+       `Discover offers ${await picks.count()} interests to choose from`);
+    ok(await page.locator('#discover-interests button[aria-pressed]').count()
+       === await picks.count(),
+       "every interest is a button that reports whether it is pressed");
+  }
   ok(await page.locator("#discover-results .row").count() === 0,
      "Discover Mode showed results before anything was chosen");
 
@@ -2294,7 +2307,12 @@ async function main() {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(base + "/", { waitUntil: "networkidle" });
     await page.waitForTimeout(400);
-    const SEL = [[".herobody h1", 3.0], [".herobody .lede", 4.5]];
+    // `.herobody` WAS THE DRAWN HERO'S TYPE AND THE PLATE SEQUENCE REPLACED
+    // IT, so this measured nothing and said so. The successor is plate 03,
+    // which is the one surface on the homepage where type stands over a
+    // PHOTOGRAPH — exactly the case a token-based ratio cannot answer and
+    // this instrument exists for.
+    const SEL = [[".sheet-landscape .mega", 3.0], [".sheet-landscape .lede", 4.5]];
     const withType = (await page.screenshot()).toString("base64");
     await page.evaluate((sels) => {
       sels.forEach((s) => document.querySelectorAll(s)
@@ -2388,7 +2406,12 @@ async function main() {
     const r = await page.goto(base + u, { waitUntil: "load" });
     if (!r || r.status() !== 200) continue;
     const k = await page.evaluate((SIGBAND) => {
-      const all = [...document.querySelectorAll(".kicker")];
+      // `.actname` IS A KICKER. The plate sequence labels each band with one
+      // — THE DOOR, THE QUESTION — and carries no `.kicker` at all, so this
+      // probe examined zero elements on the homepage and its own
+      // stopped-finding guard fired. The promise is about a label painted
+      // in the accent inside a link, and an act name is that kind of label.
+      const all = [...document.querySelectorAll(".kicker, .actname")];
       const hot = all.filter((e) => {
         const m = getComputedStyle(e).color.match(/\d+/g).map(Number);
         // THE SIGNATURE FAMILY, BY HUE. This tested `blue > red + 40`,

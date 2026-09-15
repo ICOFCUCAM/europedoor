@@ -858,7 +858,7 @@ def _bar_anchor(frame_w, frame_h):
             max(3.0, frame_h * BAR_TICK))
 
 
-def scale_bar_box(frame_w, frame_h):
+def scale_bar_box(frame_w, frame_h, text_scale=1.0):
     """The rectangle a scale bar occupies, so a name can be kept out of it.
 
     THE LABEL PASS DID NOT KNOW THE BAR WAS THERE. After the destination map
@@ -866,9 +866,19 @@ def scale_bar_box(frame_w, frame_h):
     site were both a peak name lying across "100 km" — the one piece of type
     on these plates that is placed by arithmetic rather than by the placement
     rule, and so the one piece it had never been told about.
+
+    AND THEN THE RESERVATION WAS THE WRONG SHAPE ON A PHONE. The bar's own
+    type takes the phone enlargement like every other label, and it grows
+    UPWARD from the tick because that is where its baseline sits — while the
+    declutter pass, handed this box as an ordinary entry, grew it about its
+    CENTRE. So the reserved region and the drawn text disagreed at the top
+    edge and "Olympia" was placed 7px into "100 km" on the Athens plate at
+    390. `text_scale` grows the band the way the bar actually grows, and the
+    caller then passes the box through the pass at scale 1.0 so it is not
+    grown twice, in the wrong direction, on top of that.
     """
     x, y, tick = _bar_anchor(frame_w, frame_h)
-    top = y - tick - frame_h * BAR_TEXT
+    top = y - tick - frame_h * BAR_TEXT * text_scale
     return (x, top, frame_w * BAR_MAXW, (y - top) + 2.0)
 
 

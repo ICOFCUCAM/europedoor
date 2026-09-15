@@ -2967,7 +2967,7 @@ html { scroll-padding-top: 5rem; }
    a style attribute anywhere — one of them forces style-src open on every
    page. The register was empty, so the path was never rendered and the
    contradiction sat there waiting for photograph number one. */
-.photo { display: block; width: 100%; height: 100%; object-fit: cover;
+.photo { width: 100%; height: 100%; object-fit: cover;
          object-position: 50% 50%; }
 .photo.f-lt { object-position:   0%   0%; }
 .photo.f-ct { object-position:  50%   0%; }
@@ -3898,8 +3898,7 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    looked like. The clamp is the one five other headings already use — a
    sixteenth font-size has been refused in this file twice. */
 .askhero label { font-family: var(--display); font-size: clamp(var(--t-lg), 2.4vw, var(--t-2xl));
-  line-height: 1.25; text-wrap: balance;
-                 color: var(--ink-2); }
+  line-height: 1.25; text-wrap: balance; }
 /* AND THE CONTROL IS SIZED BY ITS OWN EXAMPLE. `--t-md` is the lede size and
    right for the largest control on the site at desk width; raising the
    reading scale 17 to 19 made "A quiet mountain escape, October." six pixels
@@ -5234,6 +5233,21 @@ body[data-hero] .masthead { position: sticky; }
    rather than a hairline rule. */
 .minimap.arched.atlas .archedge { stroke: var(--graphite); stroke-width: 1.2;
                                   opacity: .55; }
+/* AND IN THE DARK PREFERENCE THAT IS INK ON INK — the signature invisible,
+   on every page that draws a picture plate.
+   *Light wall, dark opening* is the whole reading of the aperture, and in
+   the dark preference there is no step to read: the wall is graphite and
+   the opening is --atlas-sea, 1.23:1, which is why the door is read by its
+   CUT EDGE instead and why the rule forty lines up lifts that edge to
+   limestone below. The atlas skin arrived later at (0,3,1), the dark rule
+   is (0,2,1), AND A MEDIA QUERY ADDS NO SPECIFICITY — so the skin won in
+   both preferences and put the reveal back to graphite. The exact failure
+   this stylesheet already records twice, reintroduced by a later component
+   over the fix for it. 1.23:1 to 2.24. */
+@media (prefers-color-scheme: dark) {
+  .minimap.arched.atlas .archedge { stroke: color-mix(in srgb, var(--limestone) 26%, transparent);
+                                    opacity: 1; }
+}
 
 /* THE TAP TARGET IS NOT THE DOT.
    A .minidot is r=5.5 in a 1000-unit viewBox, which renders at 3.9px across
@@ -6641,7 +6655,7 @@ body[data-hero] main { max-width: none; padding: 0; }
                font-size: clamp(var(--t-4xl), 7vw, var(--t-6xl));
                line-height: .96; letter-spacing: -.02em; }
 .sheet .lede { font-family: var(--display); font-size: var(--t-md); line-height: 1.55;
-               color: var(--ink-2); max-width: 38ch; margin: 0; }
+               max-width: 38ch; margin: 0; }
 .sheettext { display: grid; gap: var(--s5); justify-items: start; }
 .sheetside { display: grid; gap: var(--s6); justify-items: start; }
 /* THE ONE LINK SHAPE ON THE PAGE: a drawn mark, a rule, a tracked label.
@@ -6719,7 +6733,6 @@ body[data-hero] main { max-width: none; padding: 0; }
         gap: var(--s3); width: 100%; }
 .qtile { text-decoration: none; color: inherit; display: grid; gap: var(--s2);
          min-width: 0; }
-.qtile picture { display: block; }
 .qtile img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
 .qname { font-family: var(--text); font-size: var(--t-xs); letter-spacing: .16em;
          text-transform: uppercase; color: var(--ink-3); }
@@ -6729,8 +6742,18 @@ body[data-hero] main { max-width: none; padding: 0; }
 .goright .gomark { transform: scaleX(-1); }
 
 /* 03 · the landscape — the one full-bleed photographic plate */
+/* THE PLATE PAINTS ITS OWN GROUND, AND THE SCRIM BELOW IS NOT ENOUGH.
+   The type here is limestone over a photograph, so with no background of
+   its own the plate measured 1.00:1 — limestone on the page's limestone —
+   and the browser suite was right to say so even though a reader sees the
+   picture: `<picture>` does not fall back once a <source> matches, and a
+   matching source pointing at a 404 renders NOTHING, which this repository
+   has already shipped once. The picture covers this ground completely; the
+   ground is what the type is readable against when the picture does not
+   arrive. */
 .sheet-landscape { grid-template-columns: 1fr; padding: 0; min-height: 76vh;
-                   align-content: end; border-bottom: 0; }
+                   align-content: end; border-bottom: 0;
+                   background: var(--graphite); }
 .sheet-landscape .shotfull { position: absolute; inset: 0; }
 .sheet-landscape .shotfull picture,
 .sheet-landscape .shotfull img { display: block; width: 100%; height: 100%;
@@ -6768,7 +6791,7 @@ body[data-hero] main { max-width: none; padding: 0; }
               margin: 0; line-height: 1; }
 .figures dt { font-family: var(--text); font-size: var(--t-xs); letter-spacing: .22em;
               text-transform: uppercase; color: var(--ink-3); }
-.paperplate svg { width: 100%; height: auto; display: block; }
+.paperplate svg { width: 100%; height: auto; }
 /* THE PAPER SKIN. Every other route on this site is drawn on the atlas's
    night water; this one is a printed sheet — pale ground, a hairline coast,
    an ink route and tracked capitals for the stops. It is the same geometry
@@ -6794,7 +6817,15 @@ body[data-hero] main { max-width: none; padding: 0; }
   text-transform: uppercase; fill: var(--ink-2); }
 
 /* 05 · the atlas — the count is the event, the names are the evidence */
-.sheet-atlas { background: var(--door-dark); color: var(--limestone);
+/* `--door-dark` IS AN ACCENT, NOT A GROUND, AND IT FLIPS. It is a semantic
+   token — terracotta on stories, atlantic on countries — and the dark
+   preference redefines it to #a3b4ff, so this plate rendered as a pale
+   periwinkle field carrying limestone type at 1.75:1. A plate that is dark
+   green in one colour-scheme preference and lilac in the other is two
+   plates. `--pine-deep` is a raw palette token, declared once, and the
+   INTELLIGENCE world's own rule applies: the ground says where the reader
+   is, not how they like their screen. */
+.sheet-atlas { background: var(--pine-deep); color: var(--limestone);
                grid-template-columns: minmax(0, 34%) minmax(0, 1fr);
                gap: var(--s6) var(--s7); align-items: start; }
 .sheet-atlas .mega, .sheet-atlas .lede, .sheet-atlas .go,
@@ -6802,7 +6833,7 @@ body[data-hero] main { max-width: none; padding: 0; }
 .sheet-atlas .lede { opacity: .82; }
 .sheet-atlas .actno { border-bottom-color: color-mix(in srgb, var(--limestone) 45%, transparent); }
 .sheet-atlas .gomark::before { background: none; }
-.sheet-atlas .sheettext { display: grid; grid-template-columns: auto minmax(0, 1fr);
+.sheet-atlas .sheettext { grid-template-columns: auto minmax(0, 1fr);
                           gap: var(--s5); align-items: start; }
 .hugecount { margin: 0; }
 .hc { font-family: var(--display); font-size: clamp(5rem, 11vw, 11rem); line-height: .78;
@@ -6822,7 +6853,7 @@ body[data-hero] main { max-width: none; padding: 0; }
                  opacity: .88; break-inside: avoid; }
 .countrycols a:hover { opacity: 1; text-decoration: underline;
                        text-underline-offset: .18em; }
-.sheet-atlas .goright { color: var(--limestone); bottom: var(--s6); top: auto; }
+.sheet-atlas .goright { bottom: var(--s6); top: auto; }
 
 /* 06 · the message — a plate with almost nothing on it */
 .sheet-message { padding-block: var(--s9); border-bottom: 0; align-items: start; }
@@ -6833,7 +6864,11 @@ body[data-hero] main { max-width: none; padding: 0; }
    go: a right-hand margin is a property of a sheet wide enough to have
    one, and at 390 it is four words in a 60px gutter. */
 @media (max-width: 62rem) {
-  .sheet, .sheet-door, .sheet-journey, .sheet-atlas { grid-template-columns: 1fr; }
+  /* `minmax(0, 1fr)` RATHER THAN `1fr`, WHICH IS `minmax(auto, 1fr)`:
+     an `auto` minimum is the content's min-content, so one unbreakable
+     child makes the track wider than the page. The same sentence as
+     `min-width: 0` on a grid item, one level up. */
+  .sheet, .sheet-door, .sheet-journey, .sheet-atlas { grid-template-columns: minmax(0, 1fr); }
   .sheet-door { padding-right: var(--page-gutter); }
   .sheet-door .sheettext { padding: 0 0 var(--s6); }
   .sheet-door .opening { min-height: 52vh; }
@@ -6847,9 +6882,24 @@ body[data-hero] main { max-width: none; padding: 0; }
   .sheet-atlas .sheettext { grid-template-columns: 1fr; }
 }
 @media (max-width: 44rem) {
+  /* THE PLATES AND THE MASTHEAD SAT ON DIFFERENT GUTTERS. `main` pads a
+     phone by --s4 and every other page's words start there; --page-gutter's
+     floor is --s5, so on the two plate-sequence pages the masthead began at
+     16px and the headline under it at 24. Nothing counts a gutter and at
+     thumbnail size nothing sees one — this repository has already shipped
+     that defect once, the other way round. The floor follows `main`. */
+  :root { --page-gutter: max(var(--s4), calc(50vw - 36rem)); }
   .qrow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .countrycols { columns: 2; }
-  .figures { gap: var(--s5); }
+  /* THREE `auto` TRACKS ARE THREE MIN-CONTENTS, AND THE JOURNEY PLATE RAN
+     THE HOMEPAGE FIVE PIXELS OFF A 320px SCREEN. "4,993 km", "7 countries"
+     and "13 stops" with labels tracked at .22em need 301px and the column
+     is 272 — and because the narrow rule gave the sheet `1fr`, which is
+     `minmax(auto, 1fr)`, the TRACK grew to fit them and took the page with
+     it. A reader cannot put a sideways-scrolling page back. Two columns and
+     the third wraps. */
+  .figures { gap: var(--s5) var(--s6); grid-template-columns: repeat(2, auto);
+             justify-content: start; }
 }
 /* the row pays its attribution once, under the eight */
 .rowcred { position: static; font-size: var(--t-xs); letter-spacing: .04em;
@@ -6926,7 +6976,14 @@ body[data-hero] main { max-width: none; padding: 0; }
 .instrfields { display: flex; flex-wrap: wrap; align-items: end;
         gap: var(--s4) var(--s5); width: 100%;
         padding-right: var(--page-gutter); }
+/* `min-width: 0` LET THE SELECT SHRINK UNDER ITS OWN OPTIONS. It was added
+   so a field could never blow out the flex row, and it did that by letting
+   the control fall to 86px while "Any month" needs 93 — a select clips
+   without an ellipsis, so a reader is shown part of their own choice and it
+   does not look like a truncation. The floor is the widest thing the
+   control has to say. */
 .instrfields .field { min-width: 0; margin: 0; }
+.instrfields select { min-width: 9rem; }
 .instrfields .inlinecheck { padding-bottom: var(--s2); }
 /* THE RESET IS NOT A FIELD. As a flex item beside four controls it wrapped
    onto the last one's line and the two shared a baseline, so "Clear

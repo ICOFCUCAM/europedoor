@@ -931,15 +931,34 @@ FOOTER_NAV = [row for _, rows in FOOTER_GROUPS for row in rows]
 # DISCOVER world in the light preference is limestone, and DISCOVER-dark and
 # INTELLIGENCE in both preferences are graphite. Composited:
 #
-#   #2a4ad9 at 96% over limestone #f7f6f3  ->  #3251da
-#   #2a4ad9 at 96% over graphite  #101214  ->  #2948d1
+# AND THEY WERE TYPED, SO THE PALETTE CHANGE LEFT THEM BEHIND. Bone & Pine
+# moved the bar from cobalt to `--pine-deep` and these two stayed at the old
+# composites, so every Android phone showed a blue strip directly above a
+# green masthead — on all 1,034 pages, until the browser suite sampled the
+# painted bar and named both values. That is the `vercel.json`/`HEADERS`
+# arrangement working, and it is also the reason not to have the arrangement
+# at all where the value can simply be computed: a hex that must equal a
+# composite of two other hexes is a second implementation of them.
 #
-# These are stated here and asserted in the browser suite against the colour
-# Chromium actually paints, in both worlds and both preferences — the same
-# arrangement `vercel.json` has against `render.HEADERS`, for the same
-# reason: two places that must agree, and a check on the drift.
-THEME_COLOR_LIGHT = "#3251da"
-THEME_COLOR_DARK = "#2948d1"
+# Composited here from `docs/palette.json`, which is the register every
+# other colour claim on this site is recomputed from, so moving a token
+# moves the address bar with it and the suite's assertion becomes a check on
+# the ARITHMETIC rather than on somebody's memory.
+_REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+with open(os.path.join(_REPO, "docs", "palette.json"), encoding="utf-8") as _f:
+    _PALETTE = json.load(_f)
+
+
+def _over(fg, bg, a):
+    """`fg` at opacity `a` composited over `bg`, both as #rrggbb."""
+    f = [int(fg[i:i + 2], 16) for i in (1, 3, 5)]
+    b = [int(bg[i:i + 2], 16) for i in (1, 3, 5)]
+    return "#" + "".join(f"{round(a * f[i] + (1 - a) * b[i]):02x}" for i in range(3))
+
+
+_HEX = {k: v["hex"] for k, v in _PALETTE["tokens"].items()}
+THEME_COLOR_LIGHT = _over(_HEX["pine-deep"], _HEX["limestone"], 0.96)
+THEME_COLOR_DARK = _over(_HEX["pine-deep"], _HEX["graphite"], 0.96)
 
 
 def theme_color_meta(world):
