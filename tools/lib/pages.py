@@ -5856,7 +5856,7 @@ def dense_class(markup):
 
 def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
               min_w=120.0, min_h=75.0, line=False, extra="", relief=False,
-              note=""):
+              note="", highlight=None):
     """A set of places on the continent, through the aperture.
 
     `pts` is [(x, y, href, name)] in projection space. Extracted from
@@ -6072,7 +6072,12 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
                      + f"{(x - x0) * k:.1f} {(y - y0) * k:.1f}"
                      for i, (x, y, _h, _n) in enumerate(pts))
         route = f'<path class="routeline" d="{d}"/>'
-    ctx, land = geo.landmass(MAPPROJ, (x0, y0, w, h))
+    # THE COUNTRY IS THE ONE THING THIS FRAME CAN LIGHT WITHOUT INVENTING A
+    # SHAPE. A region has no geometry here on purpose; the country it is in
+    # has real polygons, and the highlight is already built. Only the region
+    # family passes it — a journey, a story, a theme, a month and a motion
+    # each cross several countries, so there is nothing to light.
+    ctx, land = geo.landmass(MAPPROJ, (x0, y0, w, h), highlight=highlight)
     # The frame's own latitude span, back out of projection space, so the bar
     # is drawn only where one number is true across the whole picture.
     lat_hi = _lat_at(y0)
@@ -6152,10 +6157,15 @@ def regionmap(data, c, r):
     if not pts:
         return ""
     uid = "rg" + "".join(ch for ch in f'{c["slug"]}{r["slug"]}' if ch.isalnum())[:14]
-    cap = (f'{esc(r["name"])} is the {len(pts)} destination'
-           f'{"s" if len(pts) != 1 else ""} below, not a boundary — this atlas '
-           f'holds which places belong to a region and deliberately not a line '
-           f'round them.')
+    # A DOT IN A TANGLE OF FRONTIERS COULD BE ANYWHERE. Twenty-five of the
+    # 130 regions hold one destination, so the picture was one mark in 1,100
+    # km of unlabelled border. The country is filled now — which is the one
+    # shape this atlas really holds at this level — so the caption names it
+    # rather than leaving a reader to guess what the lit land is.
+    cap = (f'{esc(c["name"])} filled, with the {len(pts)} destination'
+           f'{"s" if len(pts) != 1 else ""} {esc(r["name"])} holds. The region '
+           f'is those places, not a boundary — this atlas deliberately holds '
+           f'no line round them.')
     note = (f'Coastline from <a href="/sources">Natural Earth</a>, '
             f'public domain. <a href="/map?c={esc(c["slug"])}">Open '
             f'{esc(c["name"])} on the full map →</a>')
@@ -6169,8 +6179,9 @@ def regionmap(data, c, r):
     # width from the height, so `min_w` was DEAD and 165 x 2.6 decided both.
     # Stated at the target proportion the aspect pass has nothing to do.
     return pointsmap(pts, uid, cap, note=note, aria=f'Map of {r["name"]}, {c["name"]}: its '
-                     f'{n_of(len(pts), "destination")} in the Atlas',
-                     min_w=170.0, min_h=170.0 / 2.6)
+                     f'{n_of(len(pts), "destination")} in the Atlas, '
+                     f'with {c["name"]} filled',
+                     min_w=170.0, min_h=170.0 / 2.6, highlight=c["slug"])
 
 
 def storymap(data, s):
