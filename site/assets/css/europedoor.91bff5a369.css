@@ -4833,8 +4833,11 @@ body[data-hero] .masthead { position: sticky; }
    a printed atlas keeps a name legible over a coastline. */
 /* A dot's ground is its own paper ring, for the same reason a name's is:
    the ring is what separates it from a coastline or a deep sea behind it. */
+/* 1.0, not 1.6. On a 3.6-unit dot a 1.6-unit ring is nearly half the mark
+   again, so at reading size the ring competed with the dot and a map of 130
+   places read as a field of buttons. A ring separates; it does not announce. */
 .minimap.arched.atlas .lyr-destinations .minidot circle { fill: var(--atlas-hereline);
-  stroke: var(--atlas-land); stroke-width: 1.6; paint-order: stroke; }
+  stroke: var(--atlas-land); stroke-width: 1; paint-order: stroke; }
 .minimap.arched.atlas .lyr-destinations .minidot.here circle { fill: var(--cobalt-deep);
   stroke: var(--atlas-land); stroke-width: 2; paint-order: stroke; }
 /* AND THE LAST STOP STAYS HOLLOW. This rule lost to the one above the moment
@@ -4844,12 +4847,17 @@ body[data-hero] .masthead { position: sticky; }
    backwards. Found by the dead-rule scan in the run that shipped the
    migration. */
 .minimap.arched.atlas .lyr-destinations .minidot.last circle:not(.hit) {
-  fill: var(--atlas-here); stroke: var(--cobalt-deep); stroke-width: 2.4; }
+  fill: var(--atlas-here); stroke: var(--cobalt-deep); stroke-width: 1.8; }
 .minimap.arched.atlas .lyr-destinations .minidot .hit,
 .minimap.arched.atlas .lyr-destinations .minidot.here .hit { fill: transparent; stroke: none; }
+/* THE HALO WAS 2.6 UNITS ON 11-UNIT TYPE, which is a quarter of the cap
+   height in stroke and reads as fog rather than as separation — worst over
+   water, where a parchment halo puts a pale slug behind every name in the
+   sea. A halo exists to stop a letter dissolving into what is under it; 1.6
+   does that and leaves the name a name. */
 .minimap.arched.atlas .lyr-labels .minilabel { fill: var(--graphite);
                                    paint-order: stroke;
-                                   stroke: var(--atlas-land); stroke-width: 2.6; }
+                                   stroke: var(--atlas-land); stroke-width: 1.6; }
 /* THE SIGNATURE IS A COLOUR THAT GETS DRAWN, NOT READ — the rule that
    already separated `--signature` from `--door` on the rest of the site,
    met again here. Cobalt-deep names the place you are reading about and
