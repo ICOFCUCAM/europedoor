@@ -3691,6 +3691,67 @@ carrying the photographer's own description, no surface the register already
 holds, and **the register and the working tree unchanged**, because planning
 is deciding what to ask for and only the acquisition may write one down.
 
+**THE NON-HOME REDESIGN: EIGHT ROOMS, AND THE HELPERS WERE WHAT FORCED THE
+GRAMMAR.** The directive's central finding is that changing a page's colours,
+spacing and card styles produces another variation of the same site, and that
+the fix is to redesign the presentation layer rather than decorate it. Three
+helpers were doing the forcing and all three changed rather than their call
+sites:
+
+| helper | was | is |
+|---|---|---|
+| `render.section()` | a small h2 with a lede under it, on three-quarters of the pages | the title at display size with its lede beside it and a **CSS counter** down the left, because a number typed per call site is wrong the day somebody reorders a page |
+| `render.indexhero()` | a 60px h1 in a narrow column beside a 4:3 figure, on five indexes | the 2036 opening, keeping the three classes that are read as promises |
+| `.pagehead` with no role | the institutional family, looking exactly like a travel page | a typographic monument — the head selected by what it is NOT, so a fourth role token cannot drift out of step with itself |
+
+**THE MASTHEAD WAS THE LARGEST SINGLE REASON TWELVE FAMILIES READ AS ONE.** A
+solid pine band across every document meant the first 63 pixels were identical
+and the most saturated thing in frame, whatever changed underneath. It is the
+page's own paper now, with pine spent on the mark and the current section, and
+it inverts **only where there is a picture under it** — keyed with `:has()` on
+the composition rather than on the family, because /journeys is family
+`journey` and opens on bone, and the first version put a graphite scrim and a
+white wordmark on a cream index.
+
+**SEVEN IMAGE SCALES, BECAUSE THE FAILURE WAS NEVER "TOO FEW PHOTOGRAPHS".**
+It was every photograph the same size in the same 16/9 card. A bleed leaves
+the column and is a change of movement; a feature is asymmetric at 1.35 against
+.65, because two equal columns read as a layout and an unequal pair reads as a
+picture with something to say; a strip SCROLLS rather than wrapping, because
+wrapping an order into rows turns a sequence into a grid; a mosaic is one
+dominant picture and two beside it and returns nothing below three, since two
+in a three-cell grid is a grid with a hole; a declaration is type over a
+picture behind a scrim that makes the ratio a property of the design.
+
+**AND EACH FAMILY'S SEQUENCE IS ITS OWN SET.** A country's strip is its
+destinations, a destination's is its places, a journey's is its legs in order,
+a theme's is its eight stops — every one built from slots this product already
+declares, which is "use the actual existing images" read as "use the actual
+existing declarations". **The keys were wrong on all four**: they built
+`destination:<target>` and the register writes `city:<target>`, so not one
+could ever have matched even after the library fills. Found because an empty
+slot can print its own brief and three of them printed nothing.
+
+**A DECLARED SLOT IS NEITHER A PHOTOGRAPH NOR A HOLE.** 826 of 837 surfaces
+are empty, so a redesign built around photography could not be *seen*:
+returning nothing kept the page honest and made the composition invisible, and
+a hash-drawn landscape would put back the exact thing this site measured out —
+189 `.card-art` elements and every one a map. The slot prints the surface's own
+brief from `desk/registry.json`: which surface, what the picture must be of,
+and how large. No `<img>`, no register row, nothing for the licence gate to
+refuse, and **the acquisition list is the page itself**. It is sized to what it
+SAYS rather than to the bleed's 21:9 — 581 pixels of mineral with three lines
+at the bottom is the hole it exists to remove — and the photograph that
+replaces it takes the full proportion back.
+
+**A `minmax(0, …)` TRACK SHRINKS BELOW ITS CONTENT, and at 108px that reads as
+a broken name.** "Kunsthistorisches Museum" came out as *Kunsthistoris / ches
+Museum*. The h1 asks for `min-width: min-content` — the fix this stylesheet
+already recorded, a `ch` being the width of a zero — and an explicit 0 floor on
+the track overrules it, so the box could not grow and the browser broke the
+word instead. It held at 60px and stopped holding at 108, because min-content
+is computed at the current size.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
