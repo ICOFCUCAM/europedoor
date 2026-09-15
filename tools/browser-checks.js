@@ -928,22 +928,33 @@ async function main() {
   // weaker assertion than the one it replaces, deliberately: a check that
   // demands six bands is a check that forbids restraint.
   await page.goto(base + "/", { waitUntil: "networkidle" });
-  const CANON = ["Open", "Discover", "Wonder", "Understand", "Browse", "Plan", "Go"];
-  const stages = await page.locator(".stage").allTextContents();
-  const seq = stages.join(">");
-  ok(stages.length >= 2, `the homepage names ${stages.length} steps`);
-  const ranks = stages.map((t) => CANON.indexOf(t.trim()));
-  ok(ranks.every((r) => r >= 0),
-     `the homepage names a step that is not in the progression: ${seq}`);
-  ok(ranks.every((r, i) => i === 0 || ranks[i - 1] < r),
-     `the progression is out of order: ${seq}`);
-  // It still ends on Go: the last thing the homepage asks for is a journey.
-  ok(stages[stages.length - 1].trim() === "Go",
-     `the homepage ends on ${stages[stages.length - 1]} rather than Go`);
-  // The wonder band changes ground, so the rhythm is felt rather than
-  // merely intended — and it must not blow out the page at any width.
-  ok(await page.locator(".band.tone-quiet").count() === 1,
-     "the wonder band is missing or duplicated");
+  // THE PROGRESSION IS NUMBERED NOW, NOT CHIPPED. This read `.stage`, which
+  // `render.section()` emits and which the homepage stopped using when it
+  // became a plate sequence — so it found an empty list and died on
+  // `stages[-1].trim()`, taking the whole suite down before check one.
+  // Eighteenth assertion here to pin a mechanism rather than a promise.
+  const acts = await page.locator(".actmark").evaluateAll((els) => els.map((e) => [
+    e.querySelector(".actno") ? e.querySelector(".actno").textContent.trim() : "",
+    e.querySelector(".actname") ? e.querySelector(".actname").textContent.trim() : ""]));
+  const seq = acts.map((a) => a[1]).join(" > ");
+  ok(acts.length >= 4, `the homepage names ${acts.length} plates (${seq})`);
+  ok(acts.every((a, i) => a[0] === String(i + 1).padStart(2, "0")),
+     `the plates are not numbered in order: ${acts.map((a) => a[0]).join(",")}`);
+  ok(acts.length > 0 && /door/i.test(acts[0][1]),
+     `the sequence opens on ${acts.length ? acts[0][1] : "nothing"} rather than the door`);
+  // AND IT HANDS THE READER ONWARD AT THE END, which is what "ends on Go"
+  // was claiming. The last plate carries a link out of the page.
+  ok(await page.locator("section:last-of-type .go").count() >= 1,
+     "the last plate does not hand the reader anywhere");
+  // One plate changes ground, so the rhythm is felt rather than merely
+  // intended. It was `.band.tone-quiet`; it is the atlas plate now.
+  const grounds = await page.locator("main section").evaluateAll((els) => {
+    const seen = new Set();
+    for (const e of els) seen.add(getComputedStyle(e).backgroundColor);
+    return Array.from(seen);
+  });
+  ok(grounds.length >= 2,
+     `every plate is on the same ground (${grounds.join(", ")}) — no rhythm`);
   for (const w of [1280, 390]) {
     await page.setViewportSize({ width: w, height: 900 });
     const over = await page.evaluate(() =>
