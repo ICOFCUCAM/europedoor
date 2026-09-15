@@ -957,8 +957,19 @@ def _over(fg, bg, a):
 
 
 _HEX = {k: v["hex"] for k, v in _PALETTE["tokens"].items()}
-THEME_COLOR_LIGHT = _over(_HEX["pine-deep"], _HEX["bone"], 0.96)
-THEME_COLOR_DARK = _over(_HEX["pine-deep"], _HEX["graphite"], 0.96)
+# AND THE MASTHEAD STOPPED BEING A BAND OF SIGNATURE COLOUR, so the strip
+# above it had to stop being one too. The non-home redesign made the bar the
+# page's own paper — pine is spent on the mark and the current section rather
+# than on the field behind all seven — and these two went on compositing
+# `pine-deep`, so every Android phone showed a dark green strip above a cream
+# page. The browser suite named both values in one run, which is the same
+# assertion catching the same class of drift for the second time.
+#
+# The masthead paints `--paper` at 92% over the page, and the page is
+# `--paper`: so the composite IS paper, in whichever preference. No blend is
+# needed and stating one would be a third implementation of a colour.
+THEME_COLOR_LIGHT = _HEX["bone-light"]
+THEME_COLOR_DARK = _HEX["graphite"]
 
 
 def theme_color_meta(world):

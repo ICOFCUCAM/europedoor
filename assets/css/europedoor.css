@@ -576,6 +576,17 @@
      stepped from --s5 to --s4 at one breakpoint; these interpolate, so the
      margin at 390 is 22px, at 900 is 36 and at 1800 is 72 — and no
      breakpoint was added, which the invariant register counts. */
+  /* A PAGE HAS ONE GUTTER AND THIS WAS THE SECOND. `main` already pads the
+     document — 24px at 1280, 16 on a phone — and every ed- component then
+     computed `100% - 2 * --ed-gutter` INSIDE that, so a band sat at 75px
+     where an h1 on any older family sat at 24 and the masthead sat at 16.
+     The browser suite reads it as the masthead disagreeing with the words
+     under it, on the four families whose first element is an ed- component,
+     which is a true report of a real inconsistency and names the wrong half:
+     it is the ed- layer that is indented, not the masthead that is out.
+     The token stays, because `.ed-declare-say` uses it as its own inset and
+     that is a different job; inside `main` it is zero, and the page gutter
+     is the page's. */
   --ed-gutter: clamp(22px, 4vw, 72px);
   --ed-gap: clamp(24px, 3vw, 56px);
   /* ONE EASING, NAMED. Transitions on this site each typed their own
@@ -658,6 +669,11 @@ body[data-accent="natural"] { --door: var(--olive-2); --door-dark: var(--olive);
    the previous system already used at night — this is the one place where
    the old palette's homework carried straight over. */
 @media (prefers-color-scheme: dark) {
+  /* PINE AS INK LIFTS WITH THE GROUND. #0F433E measures 1.74 on graphite:
+     the wordmark, the current-section marker and every `ed-eyebrow` were
+     below AA on about forty pages in this preference. One token, declared
+     on `body` above, redefined here. */
+  body { --pine-ink: var(--pine-air); }
   body.area-stories, body.area-events, body.area-experiences {
     --door:      var(--terracotta-lift);
     --door-dark: var(--terracotta-lift-2);
@@ -715,6 +731,9 @@ body[data-accent="natural"] { --door: var(--olive-2); --door-dark: var(--olive);
 body[data-world="intelligence"] {
   --door:      var(--cobalt-air);
   --door-dark: var(--cobalt-lift);
+  /* The instrument world is graphite in BOTH preferences on purpose, so its
+     pine has to lift here as well as under the media query. */
+  --pine-ink:  var(--pine-air);
 }
 
 /* ── WORLD 02 — INTELLIGENCE ───────────────────────────────────
@@ -982,8 +1001,19 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
  * light world's cobalt — which is the accent-color bug this stylesheet already
  * has a paragraph about. An override on the surface is the only form that
  * cannot get that wrong. */
+/* AND THE BAND STOPPED BEING DARK, SO THE BONE RING STOPPED BEING VISIBLE.
+   Everything above is the reasoning for inverting the ring on a cobalt band;
+   the non-home redesign made the masthead the page's own paper, and bone on
+   paper measures 2.62 against the navigation and 2.91 against the wordmark,
+   under the 3:1 SC 2.4.11 asks for. That is the same defect the paragraph
+   above records, arrived at from the other side: the ring inverted once and
+   then the ground inverted under it.
+   `--ink` is what the band's own type is painted in and is therefore the one
+   colour guaranteed to read on it in every preference — graphite on paper,
+   bone on graphite — which is exactly the inversion this rule wanted and
+   could not get from a fixed hex. */
 .masthead a:focus-visible, .masthead button:focus-visible {
-  outline-color: var(--bone);
+  outline-color: var(--ink);
 }
 
 .skip { position: absolute; left: -9999px; }
@@ -1080,15 +1110,20 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .masthead { position: sticky; top: 0; z-index: 40;
             --rule:      color-mix(in srgb, var(--ink) 16%, transparent);
             background: color-mix(in srgb, var(--paper) 92%, transparent);
-            color: var(--ink);
             /* AND THE COLOUR ITSELF, WHICH THE FIRST TOKEN VERSION FORGOT.
              * Redefining --ink is not enough: the wordmark sets no colour of
              * its own and inherited graphite from <body>, so it measured
              * 2.75:1 on the cobalt band — present, legible-looking in a
              * thumbnail, and below AA. The two-worlds block one screen up
              * has always set `color: var(--ink)` for exactly this reason;
-             * this is a third world and needed the same line. It is stated
-             * once, above, now that the band is the page's own paper. */
+             * this is a third world and needed the same line.
+             * AND THEN THE BAND BECAME THE PAGE'S OWN PAPER AND THE LINE
+             * BECAME A RESTATEMENT. `body` already sets `color: var(--ink)`
+             * and the masthead inherits it; the inverting block below
+             * redefines `--ink` itself, so its own `color` said the same
+             * thing twice. The dead-rule scan found both in the run that
+             * shipped them — a declaration that restates what the element
+             * already gets is the commonest thing that scan finds. */
             backdrop-filter: saturate(1.4) blur(10px);
             border-bottom: 1px solid var(--rule); }
 .masthead-in { max-width: var(--page); margin: 0 auto; padding: var(--s3) var(--s5); display: flex; align-items: center; gap: var(--s6); justify-content: space-between; }
@@ -5367,10 +5402,32 @@ body[data-hero] .masthead { position: sticky; }
    shows and where the eye reads depth from. Both are struck from the same
    `arch_path()` as the clip and the reveal: three curves that disagree by a
    pixel is three signatures. */
-.minimap.arched.atlas .archrim { fill: none; stroke: var(--bone);
+/* THE REVEAL WENT WITH THE GROUND, AND BOTH HALVES OF IT DID.
+   The wall's face was struck in `--bone` and the wall became `--paper` when
+   the page ground moved — #F3F0E6 against #F8F6EF is a step of 1.058, which
+   is the "rounding error with a token name" this stylesheet already refuses
+   for a surface ladder, here drawn as a line nobody can see. And the ink
+   line inside it was graphite at 38%, which composites to 1.96 against the
+   paper: measured on the painted pixel, an inland region frame read 1.37 as
+   a step and 1.96 on its cut edge, where SC 1.4.11 asks one of the two to
+   clear 3.
+   It cannot be fixed by the step. On an inland frame there is no water in
+   the opening — bone wall, stone opening — and two tones a reader is meant
+   to read as one material are always close, which is the point of the atlas
+   being drawn on one stone. So the door is read by its cut edge, and the
+   edge takes the map's own border ink at full opacity: the colour that
+   already separates a frontier from the land it is drawn on, which is the
+   same job one scale up.
+   AND A STROKE IN USER UNITS IS NOT A STROKE IN PIXELS. At 1.4 the ink
+   measured 2.69 on the painted pixel against a token that computes 4.4: the
+   line is struck in the viewBox's own units and scaled to the container, so
+   it lands between device pixels and the sampler reads a blend. That is the
+   year band's own finding — "1px was not enough … the ratio a reader gets is
+   the ratio of the pixel" — one component over. 2.6 units reads 4.66. */
+.minimap.arched.atlas .archrim { fill: none; stroke: var(--paper);
                                  stroke-width: 6; }
-.minimap.arched.atlas .archrim.inner { stroke: var(--graphite);
-                                       stroke-width: 1; opacity: .38; }
+.minimap.arched.atlas .archrim.inner { stroke: var(--map-border);
+                                       stroke-width: 2.6; opacity: 1; }
 
 /* THE PLATE FOOT: where in Europe this is, and what the marks mean. Both are
    on the benchmark and both are cheap; a key is how a map stops needing a
@@ -5743,7 +5800,16 @@ body[data-hero] .masthead { position: sticky; }
    where the token itself is far darker. The ratio a reader gets is the
    ratio of the pixel, not of the declaration — which is the whole reason
    the contrast work on this site moved to sampling. */
-.yearband .ybase { stroke: var(--ink-2); stroke-width: 1.5; }
+/* AND 1.5 UNITS IS 1.5 PIXELS AT EXACTLY ONE WIDTH. The note above is
+   right about the mechanism and fixed it at the width it was measured at:
+   `preserveAspectRatio="none"` scales y by height/viewBox-height, so the
+   same 1.5 that reads at 1280 is sub-pixel at 390 and the baseline sampled
+   1.00:1 — the caption says "above the line is what is on" and a reader on
+   a phone had no line. `non-scaling-stroke` is what this stylesheet already
+   uses for a framed route, and it means the declaration is in device pixels
+   at every size rather than at one. */
+.yearband .ybase { stroke: var(--ink-2); stroke-width: 2;
+                   vector-effect: non-scaling-stroke; }
 .yearband .ybar { fill: color-mix(in srgb, var(--terracotta) 52%, transparent); }
 .yearband .yshoulder { fill: color-mix(in srgb, var(--sea) 44%, transparent); }
 /* The month you are on is the only one that gets the full accent. */
@@ -7612,18 +7678,38 @@ body { position: relative; overflow-x: hidden; }
    shipped that bug once, in `accent-color`, and the note is forty lines from
    here. */
 body {
+  /* PINE AS INK, WHICH IS A DIFFERENT COLOUR IN EACH PREFERENCE.
+     `--pine` is #0F433E — 4.93 on bone paper and **1.74 on graphite**, so
+     every wordmark, every current-section marker and every eyebrow measured
+     below AA the moment the masthead became paper and a dark-preference
+     reader opened any of them: 116 browser failures, about forty of them
+     this one colour. The thing INVERTS rather than recolours, which this
+     stylesheet has now recorded for the mark on the cobalt band, for the
+     focus ring on the navigation and for the journey hero's own eyebrow.
+     `--pine-air` was already measured for the dark world's DISCOVER
+     surfaces, so nothing new is introduced — what is new is that ONE token
+     carries the decision, because the alternative is a rule per element and
+     this failed on three unrelated families at once. Declared on `body` and
+     not `:root`: a `var()` resolves where the DECLARATION lives, so a
+     :root alias would hand every world the light preference's pine, which
+     is the `accent-color` bug this file records twice. */
+  --pine-ink:       var(--pine);
   --ed-bone:        var(--bone);
   --ed-paper:       var(--bone-light);
   --ed-mineral:     var(--mineral);
-  --ed-pine:        var(--pine);
+  --ed-pine:        var(--pine-ink);
   --ed-pine-deep:   var(--pine-deep);
   --ed-graphite:    var(--graphite);
   --ed-ink:         var(--ink);
   --ed-cobalt:      var(--cobalt);
   --ed-sky:         var(--sky);
   --ed-terracotta:  var(--terracotta);
-  --ed-ochre:       var(--ochre);
-  --ed-olive:       var(--olive);
+  /* `--ed-ochre` and `--ed-olive` were declared here and their only users
+     were the family-accent rules, which now take `--door-dark` because a
+     raw hex knows about one ground. A token nobody references is vocabulary
+     that looks like a decision — this stylesheet already deleted three on
+     that reasoning — and the family colours themselves are not lost: they
+     are what `--door` resolves to, per family, in each world. */
   --ed-serif:       var(--display);
   --ed-sans:        var(--text);
   --ed-mono:        var(--mono);
@@ -7649,17 +7735,27 @@ body {
    identified by its LABEL rather than by a tinted ground, because the same
    brief refuses the colourful page in the next sentence. One declaration
    per family, on the two marks that say what kind of thing is being read. */
+/* A FAMILY ACCENT NAMED THE HEX AND THE HEXES WERE ALL SIZED ON BONE.
+   Terracotta reads 3.51 on graphite, olive 3.66, cobalt 2.98 — so every
+   arrival eyebrow, every institutional section index and every atlas label
+   was below AA for a reader in the dark preference, on about thirty pages.
+   `--door` is the token that already carries "this family's accent, in this
+   world": the dark blocks above lift it to `--terracotta-lift`,
+   `--olive-lift` and `--cobalt-air`, and those lifts were measured against
+   graphite when they were written. Naming the raw hex here was a second
+   implementation of the family accent that knew about one ground.
+   The families are still distinguished — `--door` differs per family by the
+   same `area-` and `data-accent` rules the rest of the site uses — and the
+   one that is NOT is the instrument, which is graphite in both preferences
+   and therefore states its own. */
 body[data-family="arrival"] :is(.ed-eyebrow, .ed-section-index),
-body[data-family="editorial"] :is(.ed-eyebrow, .ed-section-index) {
-  color: var(--ed-terracotta); }
-body[data-family="time"] :is(.ed-eyebrow, .ed-section-index) {
-  color: var(--ed-ochre); }
-body[data-family="institutional"] :is(.ed-eyebrow, .ed-section-index) {
-  color: var(--ed-olive); }
+body[data-family="editorial"] :is(.ed-eyebrow, .ed-section-index),
+body[data-family="time"] :is(.ed-eyebrow, .ed-section-index),
+body[data-family="institutional"] :is(.ed-eyebrow, .ed-section-index),
 body[data-family="atlas"] :is(.ed-eyebrow, .ed-section-index),
 body[data-family="discovery"] :is(.ed-eyebrow, .ed-section-index),
 body[data-family="journey"] :is(.ed-eyebrow, .ed-section-index) {
-  color: var(--ed-cobalt); }
+  color: var(--door-dark); }
 body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
   color: var(--cobalt-air); }
 
@@ -7672,8 +7768,7 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
    ground is the semantic surface, never a palette hex: that is what the
    two-worlds split is for, and hard-coding it here would also have made
    every INSTRUMENT page cream. */
-.ed-page { background: var(--paper); color: var(--ink);
-           font-family: var(--ed-sans); }
+.ed-page { background: var(--paper); font-family: var(--ed-sans); }
 
 .ed-opening {
   width: min(var(--ed-max), calc(100% - 2 * var(--ed-gutter)));
@@ -7757,6 +7852,17 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
    arriving from the empty state rather than from the filled one. */
 .ed-opening-visual:has(> .ed-slot) { min-height: 0; background: none; }
 .ed-opening-visual svg { width: 100%; height: auto; display: block; }
+/* AN `<svg>` SIZED IN PERCENT STILL CONTRIBUTES 300 PIXELS TO INTRINSIC
+   SIZING. That is the SVG default intrinsic width, and a grid track sized
+   `auto` asks its items for max-content — so the single phone column came
+   out 304.609 inside a 288-pixel page and the place family scrolled
+   sideways, with the h1, the eyebrow and the intro all dragged out with it
+   because they share the track. The h1's own min-content was a red herring
+   measuring the same 304: two independent things both wanted the column
+   wider and only one of them was a word.
+   `min-width: 0` lets the track shrink to the page; the drawing is already
+   `overflow: hidden` and scales to whatever it is given. */
+.ed-opening-visual { min-width: 0; }
 
 /* ── SECTION ─────────────────────────────────────────────── */
 .ed-section {
@@ -8070,7 +8176,17 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
    eight from another, so snapping costs nothing a reader can measure and
    adds no breakpoint at all. */
 @media (max-width: 52rem) {
-  .ed-opening { grid-template-columns: 1fr; min-height: auto; }
+  /* `1fr` IS NOT `minmax(0, 1fr)`, AND THE DIFFERENCE IS A PAGE THAT
+     SCROLLS. A `1fr` track has an automatic minimum, so it never shrinks
+     below its items' max-content — and an `<svg>` sized in percent still
+     contributes the SVG default 300 pixels to that, so the phone column
+     came out 304.609 inside 288 and dragged the h1, the eyebrow and the
+     intro out with it. A zero floor is exactly what this stylesheet
+     already records as dangerous the OTHER way, where `minmax(0, …)` let a
+     track shrink under a heading and broke a word at 108px — and that case
+     is now answered where it belongs, by `overflow-wrap` on the heading,
+     rather than by making every track refuse to fit the page. */
+  .ed-opening { grid-template-columns: minmax(0, 1fr); min-height: auto; }
   .ed-opening-visual { min-height: 26rem; }
   .ed-section-head { grid-template-columns: 1fr; gap: var(--s4); }
   .ed-split, .ed-arrival, .ed-mosaic, .ed-instrument-grid { grid-template-columns: 1fr; }
@@ -8130,7 +8246,14 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
    container three levels up stayed at its content's width. Both, and the
    `.headmeta` legend beside it moved under the drawing. */
 .ed-opening-visual .plate { width: 100%; height: auto; }
-.ed-opening-visual .portrait svg { width: 100%; height: auto; }
+/* NOT `svg`, WHICH REACHES THE LOCATOR TOO. A country portrait holds two
+   drawings — the plate and the little "in Europe" inset — and this rule was
+   written for the first and matched both, at (0,2,1) against `.locator svg`
+   at (0,1,1). So the inset, which is 7rem everywhere else on the site,
+   rendered at 100% of a grid column sized by the plate: 300 pixels inside a
+   288-pixel box at 320, overflowing the one element on the page that clips.
+   The plate has its own rule one line up and does not need a second. */
+.ed-opening-visual .locator svg { width: 7rem; max-width: 100%; }
 .ed-opening-visual .portrait { display: grid; gap: var(--s4); }
 
 /* THE ARRIVAL BAND'S OWN TYPE, on pine-deep rather than on paper.
@@ -8144,6 +8267,16 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
   font-family: var(--ed-serif); font-weight: 400;
   font-size: var(--ed-display-2); line-height: .96; margin: 0; max-width: none;
 }
+/* AND THE ARRIVAL BAND IS DARK IN BOTH PREFERENCES, so its eyebrow states
+   its own colour and has to out-specify the family rule to do it — the
+   journey hero's finding, one family over, in the commit that recorded it.
+   `body[data-family="arrival"] :is(.ed-eyebrow, …)` is (0,2,1) and this was
+   (0,2,0), so binding the family accent to `--door-dark` handed this band
+   the LIGHT preference's dark terracotta on a graphite ground: 2.12:1,
+   which is the same defect the bind was fixing, arrived at from the other
+   side. A band that is dark whatever the preference needs a colour that is
+   light whatever the preference. */
+body[data-family="arrival"] .ed-arrival-copy .ed-eyebrow,
 .ed-arrival-copy .ed-eyebrow { color: var(--terracotta-lift); }
 .ed-arrival-copy p { font-size: var(--ed-read); line-height: 1.5; }
 /* `.ed-arrival-copy p` IS (0,2,0) AND `.ed-arrival-where` IS (0,1,0), so
@@ -8234,7 +8367,6 @@ body:has(main .ed-journey-hero) .masthead {
               color-mix(in srgb, var(--graphite) 52%, transparent),
               transparent);
   border-bottom-color: transparent;
-  color: var(--bone);
   --ink:       var(--bone);
   --ink-2:     color-mix(in srgb, var(--bone) 86%, transparent);
   --ink-3:     color-mix(in srgb, var(--bone) 72%, transparent);
@@ -8245,8 +8377,8 @@ body:has(main .ed-journey-hero) .masthead {
 /* AND THE PINE IS SPENT ON THE MARK AND THE CURRENT SECTION, which is where
    an identity belongs: the two things a reader actually looks at in a
    navigation, rather than the field behind all seven. */
-.masthead .wordmark { color: var(--pine); }
-.masthead .nav a[aria-current="page"] { color: var(--pine); border-bottom-color: var(--pine); }
+.masthead .wordmark { color: var(--pine-ink); }
+.masthead .nav a[aria-current="page"] { color: var(--pine-ink); border-bottom-color: var(--pine-ink); }
 body[data-hero] .masthead .wordmark,
 body:has(main .ed-arrival) .masthead .wordmark,
 body:has(main .ed-journey-hero) .masthead .wordmark { color: var(--bone); }
@@ -8352,7 +8484,7 @@ body:has(main .ed-journey-hero) .masthead .wordmark { color: var(--bone); }
 }
 .ed-declare-say {
   position: relative; z-index: 1; color: var(--bone); text-align: center;
-  padding: var(--ed-gutter); max-width: 34ch;
+  padding: clamp(22px, 4vw, 72px); max-width: 34ch;
 }
 .ed-declare-say p {
   font-family: var(--ed-serif); font-weight: 400;
@@ -8409,7 +8541,7 @@ body:has(main .ed-journey-hero) .masthead .wordmark { color: var(--bone); }
    repository's most repeated finding about counts — and the band's
    position is the only honest source for it. `main` resets, every `.band`
    increments, and the number is drawn in the margin. */
-main { counter-reset: band; }
+main { --ed-gutter: 0px; counter-reset: band; }
 .band { counter-increment: band; }
 .band > .band-head {
   display: grid;
@@ -8550,7 +8682,13 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    surface, what the picture must be of, and how large. A grey box with a
    camera glyph would be a missing image; this is a commissioned one. */
 .ed-slot {
-  background: var(--mineral);
+  /* THE SLOT'S GROUND IS A SURFACE, NOT A HEX. `--mineral` is the light
+     map's land and it is the same colour in every preference, so in the
+     dark world the slot painted a pale panel and its own note took the
+     dark world's light ink: 1.12:1, on a component whose entire job is to
+     be read. `--paper-3` is the third surface in the ladder and moves with
+     the world, which is what the two-worlds split is for. */
+  background: var(--paper-3);
   border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
   display: flex; flex-direction: column; justify-content: flex-end;
   gap: var(--s2); padding: var(--s5); overflow: hidden;
@@ -8642,4 +8780,26 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
 .pagehead.overture:not(.ed-opening) > h1 {
   max-width: min(100%, 18ch); overflow-wrap: normal; hyphens: none;
 }
-.ed-opening h1 { min-width: min-content; overflow-wrap: normal; }
+/* A FLOOR AT min-content IS A FLOOR AT THE LONGEST WORD, AND ONE WORD IS
+   WIDER THAN A 320-PIXEL SCREEN. The floor exists because a `minmax(0, …)`
+   track shrinks below its content and broke "Kunsthistorisches Museum" mid
+   word at 108px — and at 320 the same word's min-content is 304.61 inside a
+   288-pixel column, so the floor pushed the copy 16 pixels past the page and
+   the place family scrolled sideways. `min(100%, min-content)` is the form
+   this stylesheet already settled on for a measure, for the same reason: a
+   `ch` is a character count wearing a length's clothes and min-content is a
+   word wearing one.
+   AND `min(100%, min-content)` DOES NOT RESOLVE HERE. A percentage in
+   `min-width` resolves against the containing block, and the containing
+   block is a grid track being sized BY this item — so the constraint is
+   circular, the browser treats the percentage as indefinite, and the floor
+   stayed at min-content: still 304.61 in a 288-pixel column, still a page
+   that scrolls sideways. That form works for a `max-width` on a measure,
+   where the container is already sized, and not for a floor on the thing
+   doing the sizing.
+   So the floor goes and `overflow-wrap: break-word` does the whole job. It
+   breaks ONLY where the alternative is overflow, which means the 108px
+   mid-word break the floor was written to prevent does not come back at any
+   width where the word fits — and at 320, where it does not fit, a broken
+   word beats a page a reader cannot put back. */
+.ed-opening h1 { overflow-wrap: break-word; }

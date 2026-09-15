@@ -2464,7 +2464,14 @@ async function main() {
       // probe examined zero elements on the homepage and its own
       // stopped-finding guard fired. The promise is about a label painted
       // in the accent inside a link, and an act name is that kind of label.
-      const all = [...document.querySelectorAll(".kicker, .actname")];
+      // AND `.ed-eyebrow` IS A KICKER TOO. The non-home redesign gave eight
+      // families a new opening whose label is `ed-eyebrow`, so /countries
+      // carried no `.kicker` at all and this probe's own stopped-finding
+      // guard fired — correctly, about a page that had got better. A check
+      // on a class name is a check on a shape; the promise is about a label
+      // painted in the accent inside a link.
+      const all = [...document.querySelectorAll(
+        ".kicker, .actname, .ed-eyebrow, .ed-section-index")];
       const hot = all.filter((e) => {
         // AN ACCENT IS A FAMILY, NOT A HUE WINDOW. This tested `blue > red +
         // 40`, which is a claim about cobalt rather than about the accent —
@@ -2531,7 +2538,15 @@ async function main() {
         const d = await hp.evaluate(() => {
           const out = {};
           for (const sel of ["h1", ".statement"]) {
-            const el = document.querySelector(".pagehead " + sel);
+            // THE HEAD IS NO LONGER ONLY `.pagehead`. Eight families open
+            // on `ed-opening`, `ed-arrival`, `ed-journey-hero` or
+            // `ed-story-opening`, so this scan collected 11 elements of the
+            // 20 its own reach assertion asks for — it had stopped finding
+            // most of the heads it is about, which is exactly what that
+            // assertion exists to say.
+            const el = document.querySelector(
+              ":is(.pagehead, .ed-opening, .ed-arrival, .ed-journey-hero, " +
+              ".ed-story-opening, .ed-institution) " + sel);
             if (!el) continue;
             const lh = parseFloat(getComputedStyle(el).lineHeight);
             out[sel] = { lines: Math.max(1, Math.round(
