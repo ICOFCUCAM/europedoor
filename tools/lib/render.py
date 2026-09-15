@@ -914,7 +914,7 @@ FOOTER_NAV = [row for _, rows in FOOTER_GROUPS for row in rows]
 # element that appears on all 1,033 pages; the strip touching it is the first
 # thing a reader sees and the only part of the page we were not colouring.
 #
-# TWO VALUES, BECAUSE THE BAR IS TRANSLUCENT. It is `--cobalt-deep` at 96%
+# TWO VALUES, BECAUSE THE BAR IS TRANSLUCENT. It is `--pine-deep` at 96%
 # over whatever ground is behind it, and the ground differs by world: the
 # DISCOVER world in the light preference is limestone, and DISCOVER-dark and
 # INTELLIGENCE in both preferences are graphite. Composited:

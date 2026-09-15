@@ -1848,6 +1848,49 @@ def c_instruction():
 
     if sum(pal["ratio"][k] for k in pal["ratio"] if not k.startswith("$")) != 100:
         fail("the palette ratio does not add to 100")
+
+    # A BAND IS A CLAIM ABOUT WHERE A COLOUR IS, and the two hue windows the
+    # ratio is measured in were typed into a ternary in the browser suite.
+    # Moving the signature from 229 degrees to 156 would have reclassified
+    # every pixel of it as the accent and reported the signature at zero —
+    # a palette change silently breaking the instrument that measures
+    # palettes. They are data now, and this asserts they still contain the
+    # tokens they are named for.
+    bands = pal["ratio"].get("$bands")
+    if not bands:
+        fail("docs/palette.json declares no hue bands — the ratio's classifier "
+             "is carrying two typed numbers again")
+    else:
+        def _hue(hexv):
+            h = hexv.lstrip("#")
+            r_, g_, b_ = (int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))
+            return colorsys.rgb_to_hls(r_, g_, b_)[0] * 360.0
+        WANT = {"signature": ("pine", "pine-deep", "pine-lift", "pine-air")}
+        for band, names in WANT.items():
+            lo, hi = bands[band]
+            for name in names:
+                h = _hue(tok[name]["hex"])
+                if not (lo <= h <= hi):
+                    fail(f"{name} ({tok[name]['hex']}) is at hue {h:.0f} and the "
+                         f"{band!r} band is {lo}-{hi} — the ratio would count it "
+                         f"as the accent and report the signature at zero")
+                n += 1
+        # And the water band has to hold the water, which lives in the
+        # stylesheet rather than in the register.
+        lo, hi = bands["water"]
+        _css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
+                    encoding="utf-8").read()
+        for name in ("--atlas-sea", "--ocean-deep", "--ocean-mid",
+                     "--ocean-shallow", "--ocean-coastal"):
+            m = re.search(rf"{re.escape(name)}\s*:\s*(#[0-9a-fA-F]{{6}})", _css)
+            if not m:
+                fail(f"{name} is not declared in the stylesheet")
+                continue
+            h = _hue(m.group(1))
+            if not (lo <= h <= hi):
+                fail(f"{name} ({m.group(1)}) is at hue {h:.0f} and the water "
+                     f"band is {lo}-{hi}")
+            n += 1
     n += 1
 
     # Gold is out of the system entirely, and this is the assertion that keeps
@@ -1889,13 +1932,20 @@ def c_instruction():
         fail("docs/instruction.md is missing or a stub")
     else:
         body = open(doc, encoding="utf-8").read()
-        for token in ("#101214", "#F7F6F3", "#3157FF", "#8398FF", "#14483C", "#A4491F"):
-            if token not in body:
-                fail(f"docs/instruction.md does not name {token}")
+        # AND THE SIX HEXES WERE TYPED HERE, so a palette change had to be
+        # made in three places and the third was this check. They are read
+        # from the register now — one implementation, the same repair this
+        # file has already made for the font-size count and for
+        # credential_shaped().
+        NAMED = ("graphite", "limestone", "pine", "pine-air", "atlantic", "terracotta")
+        for name in NAMED:
+            token = tok[name]["hex"].upper()
+            if token not in body.upper():
+                fail(f"docs/instruction.md does not name {token} ({name})")
             n += 1
         # The readable table and the register must agree on the values the
         # instruction reasons about by name.
-        for name in ("graphite", "limestone", "cobalt", "cobalt-air", "atlantic", "terracotta"):
+        for name in NAMED:
             if tok[name]["hex"].upper() not in body.upper():
                 fail(f"docs/instruction.md and docs/palette.json disagree about {name}")
             n += 1
@@ -3449,7 +3499,13 @@ def c_terrain():
     css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
                encoding="utf-8").read()
     css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
-    base = (0xdd, 0xd9, 0xcf)                    # --atlas-land
+    # AND THE LAND TONE WAS A COPY. `base` was three bytes typed here, so a
+    # palette change moved the fills the stylesheet declares and left the
+    # check asserting a mix of the OLD ground — the same class of fault as
+    # the six hexes this file used to type for docs/instruction.md. It is
+    # read from the stylesheet now; the constant is the approved FRACTION.
+    _land = re.search(r"--atlas-land\s*:\s*#([0-9a-fA-F]{6})", css).group(1)
+    base = tuple(int(_land[i:i + 2], 16) for i in (0, 2, 4))
     for lo, _hi, hexcol, _why in C.HYPSOMETRIC:
         if lo == 0:
             continue

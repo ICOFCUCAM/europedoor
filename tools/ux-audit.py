@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import glob
 import os
+import json
 import re
 import sys
 
@@ -877,8 +878,8 @@ def sb3():
          "and terracotta retained with narrow homes; gold removed entirely. "
          "Deliberately not EU blue and gold, and no longer green-primary.")
 def sb4():
-    for token in ("--graphite:", "--limestone:", "--cobalt:", "--cobalt-lift:",
-                  "--cobalt-air:", "--atlantic:", "--terracotta:", "--paper:", "--ink:"):
+    for token in ("--graphite:", "--limestone:", "--pine:", "--pine-lift:",
+                  "--pine-air:", "--atlantic:", "--terracotta:", "--paper:", "--ink:"):
         yield token in CSS, f"{token} is defined"
     # AND LIME IS OUT OF THE SYSTEM THE WAY BRASS IS. It was the dark world's
     # accent and it ended up drawing geography — every route, every dot, every
@@ -901,12 +902,21 @@ def sb4():
     # the browser suite at 4.36:1 on a card, which is the instruction's own
     # sentence arriving as a build failure.
     yield "--signature:" in CSS, "the signature is separated from the text accent"
-    yield "--door:         var(--cobalt-deep);" in CSS, \
+    yield "--door:         var(--pine-deep);" in CSS, \
         "so anything cobalt that is read uses the deeper one"
     yield "prefers-color-scheme: dark" in CSS, "and the palette has a night form"
-    yield "#63b79c" in CSS and "#e08a5c" in CSS, \
+    # AND THESE TWO PINNED VALUES RATHER THAN THE PROMISE. `#63b79c` was
+    # atlantic-lift's hex and `cobalt-lift` was a token NAME, so a palette
+    # change — the exact event this section exists to govern — broke the
+    # assertion for the right reason and the wrong claim. The promise is
+    # that every retained accent HAS a lift declared for the dark form, and
+    # that the register is the place it is declared.
+    _reg = json.loads(open(os.path.join(ROOT, "docs", "palette.json"),
+                           encoding="utf-8").read())
+    _lifts = [k for k in _reg["tokens"] if k.endswith("-lift")]
+    yield len(_lifts) >= 3 and all(_reg["tokens"][k]["hex"] in CSS for k in _lifts), \
         "which lifts the retained accents rather than inverting them"
-    yield doc_covers("docs/palette.json", "cobalt-lift"), \
+    yield all(doc_covers("docs/palette.json", k) for k in _reg["tokens"]), \
         "and the whole palette is machine-checkable"
 
 

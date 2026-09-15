@@ -235,16 +235,16 @@ bug.
 
 | token | hex | what it is |
 |---|---|---|
-| Deep Graphite | `#101214` | the intelligence foundation. Ink in the light world, ground in the dark |
-| Graphite Surface | `#1A1E22` | cards and raised surfaces in the dark world |
-| **Limestone** | `#F7F6F3` | the DISCOVER ground, kept from the previous system. **Never pure white** |
-| Limestone Surface | `#EEECE7` | cards and raised surfaces in the light world |
-| **European Cobalt** | `#3157FF` | the digital signature — for things **drawn**, not read |
-| Cobalt Deep | `#2A4AD9` | every cobalt that is text or an action, in the light world |
-| Cobalt Lift | `#627FFF` | links and interactive elements on dark surfaces |
-| Atlantic Green | `#14483C` | heritage and provenance. The previous primary, retained with a narrow home |
+| Deep Graphite | `#121612` | the intelligence foundation. Ink in the light world, ground in the dark |
+| Graphite Surface | `#1A201A` | cards and raised surfaces in the dark world |
+| **Bone** | `#F2F0E8` | the DISCOVER ground. **Never pure white**, and warmer than the limestone it replaced |
+| Bone Surface | `#E8E5DA` | cards and raised surfaces in the light world |
+| **European Pine** | `#2E7157` | the digital signature — for things **drawn**, not read |
+| Pine Deep | `#1E4636` | every pine that is text or an action, in the light world |
+| Pine Lift | `#55A07E` | links and interactive elements on dark surfaces |
+| Olive | `#4A5326` | heritage and provenance. It moved off Atlantic Green, which sat ten degrees of hue from the new signature |
 | Terracotta | `#A4491F` | the warm cultural accent |
-| **Cobalt Air** | `#8398FF` | the dark-world accent, in both worlds' dark surfaces. It replaced Electric Lime `#C8FF4D`, which is out of the system |
+| **Pine Air** | `#7FBFA1` | the dark-world accent, in both worlds' dark surfaces. It replaced Electric Lime `#C8FF4D`, which is out of the system |
 | Ultramarine | `#665CFF` | atmosphere only: gradients, map washes, immersive moments |
 | ~~Gold / Brass~~ | — | **none.** See below |
 
@@ -257,7 +257,7 @@ neutral grey now, which is also more honest about what that tier is.
 
 Gold says *luxury · premium · heritage · wealth*. This product has to say
 *Europe · discovery · movement · intelligence · culture · future*. Gold
-against anything reads as a luxury travel agency; cobalt against graphite
+against anything reads as a luxury travel agency; pine against graphite
 reads as European digital infrastructure. `checks.py` fails the build on a
 gold or brass token **and** on a raw gold hex smuggled into a rule — verified
 by reintroducing `#8a6d34` as a token and `#c2a165` as a value, and watching
@@ -271,7 +271,7 @@ as a boundary dataset.
 
 | accent | colour | where |
 |---|---|---|
-| structural | Cobalt Deep | the default — homepage, countries, regions, destinations, journeys |
+| structural | Pine Deep | the default — homepage, countries, regions, destinations, journeys |
 | cultural | Terracotta | stories, events, experiences — the human half of DISCOVER |
 | heritage | Atlantic Green | how this project knows what it claims: `/method`, `/sources`, `/fund`, `/sources/freshness` |
 | electric | Electric Lime | **INTELLIGENCE only**, in every colour-scheme preference |
@@ -285,7 +285,7 @@ either section as current. The accent depended on it, which is how it showed.
 
     60%  limestone
     25%  graphite
-    10%  cobalt
+    10%  pine
      5%  the accent
 
 A palette gives you *blue website with gold buttons*. A ratio gives you
@@ -293,7 +293,7 @@ A palette gives you *blue website with gold buttons*. A ratio gives you
 screen does not hold roughly this distribution, the palette has been applied
 and the instruction has not.
 
-The most visible tenth of that cobalt is the primary button. A graphite button
+The most visible tenth of that pine is the primary button. A graphite button
 is correct and says nothing, and a signature that never appears on the one
 thing the reader is meant to press is a signature that exists only in the
 documentation.
@@ -305,17 +305,17 @@ are computed, and `checks.py` recomputes all thirty-one claimed pairings from
 `docs/palette.json` on every build — so a hex nudged "slightly warmer" in a
 redesign cannot quietly take a contrast ratio with it.
 
-| | on limestone | on the light card | on graphite |
+| | on bone | on the light card | on graphite |
 |---|---|---|---|
-| Graphite | **17.37** | **15.90** | — |
-| Limestone | — | — | **17.37** |
-| Cobalt `#3157FF` | 4.93 | 4.52 | 3.52 ✗ |
-| Cobalt Deep `#2A4AD9` | **6.31** ✓ | **5.78** ✓ | — |
-| Cobalt Lift `#627FFF` | 3.13 ✗ | — | **5.36** ✓ |
-| Atlantic `#14483C` | **9.61** ✓ | **8.80** ✓ | 1.81 ✗ |
-| Terracotta `#A4491F` | **5.47** ✓ | **5.01** ✓ | 3.17 ✗ |
-| Cobalt Air `#8398FF` | 2.44 ✗ | 2.24 ✗ | **7.06** ✓ |
-| Ultramarine `#665CFF` | 4.28 ✗ | 4.15 ✗ | 4.06 ✗ |
+| Graphite | **16.01** | **14.49** | — |
+| Bone | — | — | **16.01** |
+| Pine `#2E7157` | **5.09** ✓ | **4.61** ✓ | 3.15 ✗ |
+| Pine Deep `#1E4636` | **9.27** ✓ | **8.39** ✓ | 1.73 ✗ |
+| Pine Lift `#55A07E` | 2.74 ✗ | 2.48 ✗ | **5.84** ✓ |
+| Olive `#4A5326` | **7.20** ✓ | **6.51** ✓ | 2.22 ✗ |
+| Terracotta `#A4491F` | **5.18** ✓ | **4.69** ✓ | 3.09 ✗ |
+| Pine Air `#7FBFA1` | 1.86 ✗ | 1.69 ✗ | **8.59** ✓ |
+| Ultramarine `#665CFF` | 4.09 ✗ | 3.96 ✗ | 4.31 ✗ |
 
 Five consequences that are not negotiable, because they are arithmetic:
 
@@ -328,13 +328,13 @@ Five consequences that are not negotiable, because they are arithmetic:
   near-black ground. That is a network diagram, and it is the exact
   association the cartography split was written to escape, arriving through
   the accent rather than through the ground. The dark world's accent is
-  `cobalt-air`, which this palette had already measured for that ground.
+  `pine-air`, which this palette had already measured for that ground.
   Lime is out of the system the way brass is: removed, not rehomed, with a
   check on each end.
 - **Ultramarine is never type.** It fails on every ground we hold. It is a
   gradient, a map wash, a glow behind a route. The moment a word is set in it,
   somebody cannot read that word.
-- **The signature is a drawn colour, not a read one.** `#3157FF` is 4.93 on
+- **The signature is a drawn colour, not a read one.** `#2E7157` is 5.09 on
   limestone, 4.52 on a card and 4.04 on the deepest light surface. It belongs
   to the mark, the score bars and the dots on the map; anything cobalt that is
   *text* is `cobalt-deep`. This was learned the hard way — see below.

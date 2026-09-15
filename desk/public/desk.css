@@ -20,8 +20,8 @@
   --ink-2: #4a5158;
   --ink-3: #767d84;
   --rule: #e0ddd4;
-  --cobalt: #3157ff;
-  --cobalt-deep: #2440c8;
+  --pine: #3157ff;
+  --pine-deep: #2440c8;
   --terracotta: #a4491f;
   --atlantic: #1f5f4a;
   --radius: 4px;
@@ -48,10 +48,10 @@ body {
 h1, h2, h3 { font-family: var(--display); font-weight: 600; line-height: 1.15;
              margin: 0; letter-spacing: -0.01em; }
 p { margin: 0 0 var(--s3); }
-a { color: var(--cobalt-deep); }
+a { color: var(--pine-deep); }
 button { font: inherit; }
 
-:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--pine); outline-offset: 2px; }
 
 .lede { color: var(--ink-2); max-width: 42rem; }
 .hint { color: var(--ink-3); font-size: 13px; margin: var(--s2) 0 0; }
@@ -71,10 +71,10 @@ input, select {
   width: 100%; padding: .6rem .7rem; font: inherit; color: var(--ink);
   background: #fff; border: 1px solid var(--rule); border-radius: var(--radius);
 }
-input:focus, select:focus { border-color: var(--cobalt); }
+input:focus, select:focus { border-color: var(--pine); }
 .gate button[type=submit], .go {
   margin-top: var(--s4); padding: .6rem 1.1rem; border: 0; cursor: pointer;
-  border-radius: var(--radius); background: var(--cobalt-deep);
+  border-radius: var(--radius); background: var(--pine-deep);
   color: var(--limestone); font-weight: 600;
 }
 .gate button[type=submit] { width: 100%; }
@@ -137,7 +137,7 @@ input:focus, select:focus { border-color: var(--cobalt); }
 .find button[type=submit] { flex: 0 0 auto; }
 .find button[type=submit] {
   padding: .6rem 1.2rem; border: 0; cursor: pointer; border-radius: var(--radius);
-  background: var(--cobalt-deep); color: var(--limestone); font-weight: 600;
+  background: var(--pine-deep); color: var(--limestone); font-weight: 600;
 }
 .needs { color: var(--ink-2); font-size: 13px; margin: var(--s4) 0 0;
          padding-top: var(--s3); border-top: 1px solid var(--rule); }
@@ -282,7 +282,7 @@ menu { display: flex; gap: var(--s3); justify-content: flex-end;
    this stylesheet had two, found by grepping for the fault while adding the
    basket rather than by anything that runs. The whole declaration is invalid
    at computed-value time and the property takes its INHERITED value, so
-   `--sea` (which has never existed here; the token is `--cobalt`) left the
+   `--sea` (which has never existed here; the token is `--pine`) left the
    running step's tick painting whatever the list item inherits, and
    `--paper` (the token is `--limestone`) left both textareas taking their
    parent's background rather than the field colour — including the alt
@@ -294,7 +294,7 @@ menu { display: flex; gap: var(--s3); justify-content: flex-end;
    of the largest headings on the site. This desk was written afterwards and
    inherited none of it. A rule that exists is not a rule that is inherited,
    and the hosted suite compares the two sets now. */
-.prog li.running .tick { color: var(--cobalt); }
+.prog li.running .tick { color: var(--pine); }
 .prog li.skipped { opacity: .55; }
 .prog .runlink, .prog .prlink { display: inline-block; margin-top: var(--s4);
   font-size: 14px; }
@@ -368,7 +368,7 @@ menu { display: flex; gap: var(--s3); justify-content: flex-end;
 .sweepbar .sw-count { margin: 0 auto 0 var(--s3); font-size: 13px;
   color: var(--ink-2); }
 .sweepbar .go { padding: .6rem 1.2rem; border: 0; cursor: pointer;
-  border-radius: var(--radius); background: var(--cobalt-deep);
+  border-radius: var(--radius); background: var(--pine-deep);
   color: var(--limestone); font-weight: 600; font: inherit; font-weight: 600; }
 .sweepbar .go[disabled] { background: var(--paper-3); color: var(--ink-3);
   cursor: not-allowed; }
@@ -402,7 +402,7 @@ menu { display: flex; gap: var(--s3); justify-content: flex-end;
 .area .badge { display: inline-block; min-width: 1.35rem; margin-left: .45rem;
   padding: 0 .3rem; border-radius: 999px; font-size: 12px; font-weight: 700;
   line-height: 1.35rem; text-align: center;
-  background: var(--cobalt-deep); color: var(--limestone); }
+  background: var(--pine-deep); color: var(--limestone); }
 .area.on .badge { background: var(--graphite); color: var(--limestone); }
 
 /* A SENT ENTRY IS NOT A FINISHED ONE, and it must not look like one either.
@@ -427,7 +427,7 @@ menu { display: flex; gap: var(--s3); justify-content: flex-end;
 button.slotrow { width: 100%; text-align: left; font: inherit; cursor: pointer;
   background: none; border: 0; border-bottom: 1px solid var(--rule); }
 button.slotrow:hover { background: var(--paper-2); }
-button.slotrow:hover .findit { color: var(--cobalt-deep); }
+button.slotrow:hover .findit { color: var(--pine-deep); }
 .findit { color: var(--ink-3); }
 
 /* ── what to search for ─────────────────────────────────────────────── */
@@ -473,7 +473,7 @@ button.slotrow:hover .findit { color: var(--cobalt-deep); }
   color: var(--ink-3); }
 .topup .go { flex: none; padding: .75rem 1.4rem; border: 0; cursor: pointer;
   border-radius: var(--radius); font: inherit; font-weight: 600;
-  background: var(--cobalt-deep); color: var(--limestone); }
+  background: var(--pine-deep); color: var(--limestone); }
 .topup .go[disabled] { background: var(--paper-3); color: var(--ink-3);
   cursor: default; }
 @media (max-width: 44rem) { .topup .go { width: 100%; } }

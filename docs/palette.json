@@ -1,27 +1,27 @@
 {
   "$comment": "The EuropeDoor palette, as data rather than as prose. tools/checks.py recomputes the WCAG 2.2 contrast of every pair below and fails the build if a role claimed here is not one the colour can actually hold. A palette written only in a document is a palette that drifts: a hex nudged 'slightly warmer' in a redesign takes a contrast ratio with it, and nothing complains until somebody cannot read a link. This file has already failed its own author twice — see the notes on cobalt-lift and on cobalt.",
   "philosophy": "European Future — editorial x architectural x cinematic x intelligent",
-  "gold": "None. Brass was the only gold token in the previous system and it is removed. Gold says luxury, premium, heritage, wealth; this product has to say Europe, discovery, movement, intelligence, culture, future. Cobalt against graphite reads as European digital infrastructure; gold against anything reads as a luxury travel agency.",
+  "gold": "None. Brass was the only gold token in the previous system and it is removed. Gold says luxury, premium, heritage, wealth; this product has to say Europe, discovery, movement, intelligence, culture, future. Pine against graphite reads as European digital infrastructure; gold against anything reads as a luxury travel agency.",
   "worlds": {
     "discover": {
       "role": "Light, warm, editorial, human. Where people fall in love with Europe: the homepage, destinations, places, experiences, culture, food, stories, photography-led browsing.",
       "ground": "limestone",
       "surface": "limestone-2",
       "ink": "graphite",
-      "action": "cobalt-deep"
+      "action": "pine-deep"
     },
     "intelligence": {
       "role": "Dark, graphite, quietly luminous. Where people meet the machine: the map, the planner, My Europe, search and filter intelligence, journey construction, personalisation, saved journeys, route intelligence, EuropeDoor Guide.",
       "ground": "graphite",
       "surface": "graphite-2",
       "ink": "limestone",
-      "action": "cobalt-lift"
+      "action": "pine-lift"
     }
   },
   "accents": {
     "$comment": "Inside DISCOVER the accent says what KIND of thing is being read. In INTELLIGENCE there is one accent and it is cobalt-air, which was measured for that ground in the DISCOVER-dark block before it was needed here. It was electric lime until the accent was found to be drawing geography: every route, every dot and every lit country, which is not five per cent of anything.",
     "structural": {
-      "token": "cobalt-deep",
+      "token": "pine-deep",
       "where": "the default: homepage, countries, regions, destinations, journeys"
     },
     "cultural": {
@@ -33,7 +33,7 @@
       "where": "how this project knows what it claims: /method, /sources, /fund, /sources/freshness"
     },
     "machine": {
-      "token": "cobalt-air",
+      "token": "pine-air",
       "where": "INTELLIGENCE only. 7.06 on the graphite ground, 6.31 on the card and 6.04 on the deep surface, so it is a read colour on all three — which electric lime was too, and it was never the contrast that failed"
     }
   },
@@ -179,70 +179,81 @@
     "$comment": "The ratio is the instruction, not the hex codes. A palette gives you a blue website with gold buttons; a ratio gives you European editorial design over futuristic infrastructure.",
     "limestone": 60,
     "graphite": 25,
-    "cobalt": 10,
+    "pine": 10,
     "accent": 5,
-    "$measured": "MEASURED ON THE PIXELS A READER IS PAINTED, over twelve pages spanning both worlds and six families at 1280x900, classified by chroma: limestone 64.1, graphite 18.9, water 9.7, cobalt 7.0, accent 0.3. THE FIRST VERSION OF THIS MEASUREMENT COUNTED THE SEA AS THE SIGNATURE and reported cobalt at 16.6 against a declared 10 — a finding about the masthead that was mostly the Atlantic. The two families do not overlap: the ocean ramp and the atlas water run 202-205 degrees of hue and every cobalt runs 228-230. Split, cobalt sits UNDER its budget on all twelve pages and varies between 6 and 8 — the masthead and the links, and almost nothing else. Water has no line here because it is the DRAWINGS rather than the interface; it is measured and held under a ceiling so that stays true. The one number that disagrees with its declaration is the accent: 5 declared, 0.3 delivered, which is the design-direction audit's finding with a figure under it. Terracotta and atlantic are the whole art-directional difference between a magazine story and a country encyclopedia and they are spent on an 11px kicker and its eyebrow rule. Making them a GROUND is refused - 'generic tourism blue as a page background' is on the never list and a terracotta one is the same mistake in a warmer hue - so the gap is recorded rather than closed. tools/browser-checks.js measures this on every run and holds bands rather than targets: a country page is nearly all paper and /map is nearly all graphite, and both are correct."
+    "$measured": "MEASURED ON THE PIXELS A READER IS PAINTED, over twelve pages spanning both worlds and six families at 1280x900, classified by chroma: limestone 64.1, graphite 18.9, water 9.7, cobalt 7.0, accent 0.3. THE FIRST VERSION OF THIS MEASUREMENT COUNTED THE SEA AS THE SIGNATURE and reported cobalt at 16.6 against a declared 10 — a finding about the masthead that was mostly the Atlantic. The two families do not overlap: the ocean ramp and the atlas water run 202-205 degrees of hue and every cobalt runs 228-230. Split, cobalt sits UNDER its budget on all twelve pages and varies between 6 and 8 — the masthead and the links, and almost nothing else. Water has no line here because it is the DRAWINGS rather than the interface; it is measured and held under a ceiling so that stays true. The one number that disagrees with its declaration is the accent: 5 declared, 0.3 delivered, which is the design-direction audit's finding with a figure under it. Terracotta and atlantic are the whole art-directional difference between a magazine story and a country encyclopedia and they are spent on an 11px kicker and its eyebrow rule. Making them a GROUND is refused - 'generic tourism blue as a page background' is on the never list and a terracotta one is the same mistake in a warmer hue - so the gap is recorded rather than closed. tools/browser-checks.js measures this on every run and holds bands rather than targets: a country page is nearly all paper and /map is nearly all graphite, and both are correct.",
+    "$bands": {
+      "$comment": "The hue windows the ratio is measured in, as DATA rather than as a condition typed into the suite. Everything outside them is the accent. checks.py asserts that the tokens each band is named for actually fall inside it, so moving a colour without moving its band fails the build.",
+      "water": [
+        190,
+        218
+      ],
+      "signature": [
+        140,
+        178
+      ]
+    }
   },
   "tokens": {
     "graphite": {
-      "hex": "#101214",
+      "hex": "#121612",
       "name": "Deep Graphite",
       "role": "the intelligence foundation. Ink in the light world, ground in the dark"
     },
     "graphite-2": {
-      "hex": "#1a1e22",
+      "hex": "#1a201a",
       "name": "Graphite Surface",
       "role": "cards and raised surfaces in the dark world"
     },
     "graphite-3": {
-      "hex": "#21262b",
+      "hex": "#232a22",
       "name": "Graphite Deep",
       "role": "the deepest dark surface: tracks, wells and the raised step a card's own furniture sits on. It measured 1.045 against the card — a rounding error with a token name, so every progress track and score bar on a dark card was drawn on its own colour. It was sized so cobalt-lift would clear AA on it, which is a claim about the link colour deciding the size of a surface"
     },
     "limestone": {
-      "hex": "#f7f6f3",
-      "name": "Limestone",
-      "role": "the DISCOVER ground, kept from the previous system. Never pure white"
+      "hex": "#f2f0e8",
+      "name": "Bone",
+      "role": "the DISCOVER ground. Never pure white, and warmer than the limestone it replaced: this palette is bone paper, pine ink and a warm cultural accent"
     },
     "limestone-2": {
-      "hex": "#eeece7",
-      "name": "Limestone Surface",
+      "hex": "#e8e5da",
+      "name": "Bone Surface",
       "role": "cards and raised surfaces in the light world"
     },
     "limestone-3": {
-      "hex": "#e3e0d8",
-      "name": "Limestone Deep",
+      "hex": "#dcd8c9",
+      "name": "Bone Deep",
       "role": "tracks, wells and the deepest light surface"
     },
-    "cobalt": {
-      "hex": "#3157ff",
-      "name": "European Cobalt",
-      "role": "the digital signature, for things DRAWN rather than read: the mark, score bars, map dots. 4.04:1 on limestone-3, so not text"
+    "pine": {
+      "hex": "#2e7157",
+      "name": "European Pine",
+      "role": "the signature, for things DRAWN rather than read: the mark, score bars, map marks. 5.09 on bone and 4.07 on bone-deep, so not text"
     },
-    "cobalt-deep": {
-      "hex": "#2a4ad9",
-      "name": "Cobalt Deep",
-      "role": "every cobalt that is text or an action in the light world"
+    "pine-deep": {
+      "hex": "#1e4636",
+      "name": "Pine Deep",
+      "role": "every pine that is text or an action in the light world"
     },
-    "cobalt-lift": {
-      "hex": "#6685ff",
-      "name": "Cobalt Lift",
-      "role": "links and interactive elements on dark surfaces. Chosen against the CARD, not the ground: #5070FF clears 4.56 on #101214 and falls to 4.07 on #1a1e22, where links actually sit. A dark palette has two backgrounds and the lighter one binds — and three once the third surface became a real step, which is where #627fff fell to 4.36. 4.62 / 5.08 / 5.69"
+    "pine-lift": {
+      "hex": "#55a07e",
+      "name": "Pine Lift",
+      "role": "links and interactive elements on dark surfaces. Chosen against the THIRD surface, not the ground: 5.84 / 5.31 / 4.71"
     },
-    "cobalt-air": {
-      "hex": "#8398ff",
-      "name": "Cobalt Air",
+    "pine-air": {
+      "hex": "#7fbfa1",
+      "name": "Pine Air",
       "role": "hover and the DISCOVER accent for a dark-preference reader"
     },
     "atlantic": {
-      "hex": "#14483c",
-      "name": "Atlantic Green",
-      "role": "heritage and provenance. The previous primary, retained with a narrow home rather than deleted"
+      "hex": "#4a5326",
+      "name": "Olive",
+      "role": "heritage and provenance. IT HAD TO MOVE. Atlantic green sat ten degrees of hue from the new pine and the register refuses that pair at 25 — a contrast ratio cannot see it, which is exactly why the rule exists. Olive is 84 degrees from pine and 53 from terracotta"
     },
     "atlantic-lift": {
-      "hex": "#63b79c",
-      "name": "Atlantic Lift",
-      "role": "the same, for a dark-preference reader: #14483c is 1.81:1 on graphite"
+      "hex": "#a3b167",
+      "name": "Olive Lift",
+      "role": "the same, for a dark-preference reader: #4a5326 is 2.22:1 on graphite"
     },
     "terracotta": {
       "hex": "#a4491f",
@@ -308,61 +319,61 @@
       "ui": true
     },
     {
-      "fg": "cobalt-deep",
+      "fg": "pine-deep",
       "bg": "limestone",
       "text": true,
       "ui": true
     },
     {
-      "fg": "cobalt-deep",
+      "fg": "pine-deep",
       "bg": "limestone-2",
       "text": true,
       "ui": true
     },
     {
-      "fg": "cobalt-deep",
+      "fg": "pine-deep",
       "bg": "limestone-3",
       "text": true,
       "ui": true
     },
     {
       "fg": "limestone",
-      "bg": "cobalt-deep",
+      "bg": "pine-deep",
       "text": true,
       "ui": true
     },
     {
-      "fg": "cobalt",
+      "fg": "pine",
       "bg": "limestone",
       "text": false,
       "ui": true
     },
     {
-      "fg": "cobalt-lift",
+      "fg": "pine-lift",
       "bg": "graphite",
       "text": true,
       "ui": true
     },
     {
-      "fg": "cobalt-lift",
+      "fg": "pine-lift",
       "bg": "graphite-2",
       "text": true,
       "ui": true
     },
     {
-      "fg": "cobalt-lift",
+      "fg": "pine-lift",
       "bg": "graphite-3",
       "text": true,
       "ui": true
     },
     {
       "fg": "graphite",
-      "bg": "cobalt-lift",
+      "bg": "pine-lift",
       "text": true,
       "ui": true
     },
     {
-      "fg": "cobalt-air",
+      "fg": "pine-air",
       "bg": "graphite",
       "text": true,
       "ui": true
@@ -434,19 +445,19 @@
       "ui": true
     },
     {
-      "fg": "cobalt-air",
+      "fg": "pine-air",
       "bg": "graphite",
       "text": true,
       "ui": true
     },
     {
-      "fg": "cobalt-air",
+      "fg": "pine-air",
       "bg": "graphite-2",
       "text": true,
       "ui": true
     },
     {
-      "fg": "cobalt-air",
+      "fg": "pine-air",
       "bg": "graphite-3",
       "text": true,
       "ui": true
@@ -478,22 +489,22 @@
   ],
   "forbidden": [
     {
-      "fg": "cobalt",
+      "fg": "pine",
       "bg": "limestone-3",
       "why": "4.04 — the signature is a drawn colour, not a read one. Use cobalt-deep."
     },
     {
-      "fg": "cobalt",
+      "fg": "pine",
       "bg": "graphite",
       "why": "3.52 — a UI edge at most, never a link. Use cobalt-lift."
     },
     {
-      "fg": "cobalt-lift",
+      "fg": "pine-lift",
       "bg": "limestone",
       "why": "3.13 — the dark world's link colour is a UI edge at most on light."
     },
     {
-      "fg": "cobalt-air",
+      "fg": "pine-air",
       "bg": "limestone",
       "why": "2.44 — the dark world's accent is a UI edge at most on paper."
     },
@@ -545,19 +556,19 @@
       ],
       [
         "warn",
-        "cobalt-deep"
+        "pine-deep"
       ],
       [
         "atlantic",
-        "cobalt-deep"
+        "pine-deep"
       ],
       [
         "warn-lift",
-        "cobalt-air"
+        "pine-air"
       ],
       [
         "atlantic-lift",
-        "cobalt-lift"
+        "pine-lift"
       ]
     ]
   },

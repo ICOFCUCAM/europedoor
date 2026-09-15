@@ -8,7 +8,7 @@ its requirements are about how something looks and nobody can check a feeling.
 So every row here asserts against the generated HTML, the CSS and the JavaScript
 as they actually are.
 
-**52 sections · 22 built · 13 already · 12 partial · 2 built (deliberately smaller) · 1 refused · 1 locked · 1 deferred · 375 assertions · 0 failing**
+**52 sections · 22 built · 13 already · 12 partial · 2 built (deliberately smaller) · 1 refused · 1 locked · 1 deferred · 377 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -49,7 +49,7 @@ as they actually are.
 | 27 | Mobile-first behaviour | BUILT | 6 | The sticky thumb bar, and a persistent action that says Add to my journey rather than Book now — the brief's own suggestion, and the only honest one here. |
 | 28 | Component library | PARTIAL | 14 | The brief's 24 components exist as CSS classes in one stylesheet rather than as objects in a library. A page may not ship its own style block, and now may not ship a style attribute either. |
 | 29 | Design states | PARTIAL | 5 | Default, hover, focus and disabled are in the stylesheet; loading, empty and error are real states in the planner and My Europe. The gap the brief exposed was a real bug: one place saved from two buttons only relabelled the button that was pressed. |
-| 30 | AI loading experience | BUILT | 5 | Five named steps, ticked when the work they name has actually finished — so a failure marks where it stopped instead of replacing everything with an apology. |
+| 30 | AI loading experience | BUILT | 7 | Five named steps, ticked when the work they name has actually finished — so a failure marks where it stopped instead of replacing everything with an apology. And the wait belongs to a BUILD: at rest the page reports no work at all. |
 | 31 | Empty states | ALREADY | 2 | Every empty surface says what it is empty of and what to do, and the empty state is a real state rather than a spinner. |
 | 32 | Error states | BUILT | 6 | The brief's sharpest line — do not fabricate a result just to avoid an error — described what this planner did, because it scores every city and so can always return something. |
 | 33 | Accessibility | PARTIAL | 7 | Keyboard, focus, reduced motion, zoom and touch targets are all enforced in a browser on every build, and the map now has a real text alternative. A screen-reader audit by a person has not happened, and /accessibility says so. |

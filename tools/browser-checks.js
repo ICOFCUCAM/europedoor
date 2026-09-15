@@ -20,6 +20,26 @@ const path = require("path");
 const ROOT = path.join(__dirname, "..");
 const OUT = path.join(ROOT, "site");
 
+// THE REGISTER IS WHERE A COLOUR IS DECIDED, and this suite used to carry
+// copies: a literal `#8398ff` for the INTELLIGENCE accent, two hue bounds
+// typed into a ternary, and a "blue > red + 40" test for the signature
+// family. All three are claims about cobalt, and all three would have gone
+// silently wrong the day the signature stopped being cobalt — an instrument
+// that cannot survive the change it exists to police.
+const PALETTE = JSON.parse(fs.readFileSync(
+  path.join(ROOT, "docs", "palette.json"), "utf8"));
+
+function rgbOf(v) {
+  const m = String(v).match(/\d+/g);
+  if (m && m.length >= 3) return m.slice(0, 3).map(Number);
+  const h = String(v).replace("#", "");
+  return h.length === 6 ? [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)) : null;
+}
+function sameColour(a, b, tol = 2) {
+  const x = rgbOf(a), y = rgbOf(b);
+  return !!x && !!y && x.every((v, i) => Math.abs(v - y[i]) <= tol);
+}
+
 const TYPES = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -2356,16 +2376,27 @@ async function main() {
                    "/countries/", "/beyond-the-obvious/"]) {
     const r = await page.goto(base + u, { waitUntil: "load" });
     if (!r || r.status() !== 200) continue;
-    const k = await page.evaluate(() => {
+    const k = await page.evaluate((SIGBAND) => {
       const all = [...document.querySelectorAll(".kicker")];
       const hot = all.filter((e) => {
         const m = getComputedStyle(e).color.match(/\d+/g).map(Number);
-        return m[2] > m[0] + 40 && m[2] > 120;   // the cobalt family
+        // THE SIGNATURE FAMILY, BY HUE. This tested `blue > red + 40`,
+        // which is a claim about cobalt rather than about the signature —
+        // so the day the signature became pine it matched nothing and the
+        // check reported every page clean. Hue is the property that
+        // survives a palette change; the band is docs/palette.json's own.
+        const mx = Math.max(...m) / 255, mn = Math.min(...m) / 255;
+        if (mx - mn < 0.1) return false;                // a neutral
+        const [R, G2, B] = m.map((v) => v / 255);
+        let h = mx === R ? (G2 - B) / (mx - mn) % 6
+              : mx === G2 ? (B - R) / (mx - mn) + 2 : (R - G2) / (mx - mn) + 4;
+        h *= 60; if (h < 0) h += 360;
+        return h >= SIGBAND[0] && h <= SIGBAND[1];
       });
       const inLink = hot.filter((e) => e.closest("a"));
       return { all: all.length,
                bad: inLink.map((e) => e.textContent.trim().slice(0, 40)) };
-    });
+    }, PALETTE.ratio.$bands.signature);
     checked++;
     ok(k.all > 0, `${u}: no kicker at all — this check has stopped finding ` +
        `the element it is about`);
@@ -3603,8 +3634,13 @@ async function main() {
       // than a promise. The promise is that INTELLIGENCE has ONE accent, it
       // is readable on the card as well as the ground, and it is not the
       // colour that ended up drawing continents.
-      ok(/131,\s*152,\s*255|#8398ff/i.test(r.door),
-         `${scheme} ${url}: the INTELLIGENCE accent is ${r.door}, not cobalt-air`);
+      // AND IT WAS PINNED BY ITS LITERAL VALUE, which is the sixth
+      // assertion in this suite to protect a number rather than a promise.
+      // The promise is that INTELLIGENCE has ONE accent and it is the
+      // register's declared one; the register is where that is decided.
+      ok(sameColour(r.door, PALETTE.tokens["pine-air"].hex),
+         `${scheme} ${url}: the INTELLIGENCE accent is ${r.door}, not ` +
+         `pine-air (${PALETTE.tokens["pine-air"].hex})`);
       ok(!r.limeAnywhere, `${scheme} ${url}: electric lime is painted — ${r.limeAnywhere}`);
     }
 
@@ -4172,14 +4208,15 @@ async function main() {
                    "/experiences/food/", "/method/", "/beyond-the-obvious/",
                    "/events/"];
     const rc = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-    const tot = { limestone: 0, graphite: 0, water: 0, cobalt: 0, accent: 0 };
+    const BANDS = PALETTE.ratio.$bands;
+    const tot = { limestone: 0, graphite: 0, water: 0, pine: 0, accent: 0 };
     const per = [];
     let px = 0;
     for (const u of PAGES) {
       const r = await rc.goto(base + u, { waitUntil: "load" });
       if (!r || r.status() !== 200) continue;
       const buf = await rc.screenshot();
-      const got = await rc.evaluate(async (b64) => {
+      const got = await rc.evaluate(async ({ b64, BANDS }) => {
         const img = new Image();
         img.src = "data:image/png;base64," + b64;
         await img.decode();
@@ -4214,11 +4251,19 @@ async function main() {
           // reported the accent at 0.00% on all twelve pages and water 0.3
           // high. The condition that was correct in the prototype lost a
           // bound when it was compressed.
-          out[h >= 185 && h < 218 ? "water"
-              : h >= 218 && h <= 270 ? "cobalt" : "accent"]++;
+          // AND THE BANDS ARE DATA NOW. They were two numbers typed into
+          // this ternary, so moving the signature from 229 degrees to 156
+          // would have reclassified every pixel of it as the accent and
+          // reported the signature at zero — a palette change silently
+          // breaking the instrument that measures palettes. They come from
+          // docs/palette.json, and checks.py asserts each band actually
+          // contains the tokens it is named for.
+          out[h >= BANDS.water[0] && h < BANDS.water[1] ? "water"
+              : h >= BANDS.signature[0] && h <= BANDS.signature[1]
+                ? "pine" : "accent"]++;
         }
         return out;
-      }, buf.toString("base64"));
+      }, { b64: buf.toString("base64"), BANDS });
       const pn = Object.values(got).reduce((a, b) => a + b, 0) || 1;
       per.push([u, 100 * got.accent / pn]);
       for (const k of Object.keys(tot)) { tot[k] += got[k]; px += got[k]; }
@@ -4237,8 +4282,8 @@ async function main() {
     ok(pc.graphite >= 8,
        `graphite paints ${pc.graphite.toFixed(1)}% (${say}). It is the ink, ` +
        `the dark world and every map opening — below 8 one of those has gone`);
-    ok(pc.cobalt <= 13,
-       `cobalt paints ${pc.cobalt.toFixed(1)}% of the measured pages and the ` +
+    ok(pc.pine <= 13,
+       `the signature paints ${pc.pine.toFixed(1)}% of the measured pages and the ` +
        `ratio gives it 10 (${say}). A continent drawn in the signature is a ` +
        `network diagram, which is the association the cartography split ` +
        `exists to escape. The ceiling is 13 rather than 24 because water is ` +
