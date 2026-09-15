@@ -3119,7 +3119,7 @@ def country_page(data, c):
          lede="The destinations we have written most about, which is not the same as the ones most people go to — and is the only ranking we can honestly compute.",
          more=("Every region", "#regions")) if popular else ""}
 
-{section("Experiences here", f'<div class="rows">{cexps}</div>',
+{section("Experiences here", f'<div class="rows">{cexps}</div>', opens=True,
          lede=f"A sample of what is listed across {c['name']}.",
          more=("Every experience category", "/experiences")) if cexps else ""}
 
@@ -3549,7 +3549,7 @@ def city_page(data, c, r, t):
                'public domain, hosted by us. The distance is a straight line, which is the only '
                'thing a coordinate can honestly tell you: 43 km across the Accursed Mountains is '
                'four hours, and we hold no timetables, operators or fares.</p>',
-             id="getting-near") if transrows else ""}
+             id="getting-near", opens=True) if transrows else ""}
     {section("Events here", f'<div class="rows">{festrows}</div>', id="events",
              lede=f"Fixtures tied to {t['name']} itself.") if festrows else ""}
     {section(f"Elsewhere in {c['name']}" if festrows else "Events",
@@ -3566,7 +3566,7 @@ def city_page(data, c, r, t):
   </aside>
 </div>
 {section("Travel tips", '<ul class="stack">' + "".join(f"<li>{esc(k)}</li>" for k in c["know"]) + "</ul>",
-         id="tips",
+         id="tips", opens=True,
          lede=f"Practical things about {c['name']} that are not obvious from outside it.")}
 
 {stay_section(data, c, r, t, cid)}

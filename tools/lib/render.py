@@ -1373,7 +1373,8 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 """
 
 
-def section(title, body, *, id=None, lede=None, more=None, stage=None, tone=None):
+def section(title, body, *, id=None, lede=None, more=None, stage=None, tone=None,
+            opens=False):
     """A band.
 
     `stage` prints a small step marker above the heading. It exists for the
@@ -1384,6 +1385,14 @@ def section(title, body, *, id=None, lede=None, more=None, stage=None, tone=None
     """
     idattr = f' id="{esc(id)}"' if id else ""
     toneattr = f" tone-{esc(tone)}" if tone else ""
+    # `opens` MARKS A CHANGE OF MOVEMENT, and it exists because the rhythm was
+    # one constant. Measured across the built site: a destination page runs
+    # eight bands with every gap at 104px and every head the same size in the
+    # same place, a country page six — a table of contents rendered as a page.
+    # A destination is not eight peers: what is here, how you reach it, what
+    # to do once you have decided, and where the record came from. Space and
+    # a rule are the only things that can say so without adding a word.
+    toneattr += " opens" if opens else ""
     stagehtml = f'<p class="stage">{esc(stage)}</p>' if stage else ""
     ledehtml = f'<p class="lede">{esc(lede)}</p>' if lede else ""
     morehtml = f'<p class="more"><a href="{esc(more[1])}">{esc(more[0])} →</a></p>' if more else ""

@@ -930,6 +930,14 @@ a .kicker { color: var(--ink-3); }
 
 /* ── bands & grids ────────────────────────────────────────── */
 .band { margin: var(--s8) 0; }
+/* A MOVEMENT OPENS ON A RULE AND MORE AIR. See render.section(`opens`): the
+   section rhythm is one value, so eight bands in a column read as eight equal
+   claims and the page has no shape. A border-top rather than a margin because
+   a bordered box does not collapse its top margin into the band above it, and
+   because the rule is the relationship — it says the band above ended, which
+   is the thing 104px of nothing cannot say. */
+.band.opens { margin-top: var(--s9); border-top: 1px solid var(--rule);
+              padding-top: var(--s7); }
 .band-head { margin-bottom: var(--s5); }
 .band-head h2 { margin-bottom: var(--s2); }
 /* THE BAND HEAD WAS A COLUMN OF TYPE WITH HALF THE PAGE EMPTY BESIDE IT.
