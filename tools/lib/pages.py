@@ -5478,15 +5478,23 @@ def minimap(data, t, span=3.2, about=None, named=None):
     # second is the site's own source-note scale, which is what it is for.
     # `credited()` still inserts before the map link, so the relief credit
     # lands with the other credits and not in the sentence.
+    # AND THE LINE BETWEEN THEM IS WHAT YOU ARE LOOKING AT AGAINST HOW IT WAS
+    # MADE. The first split left the whole sentence in the caption, and on a
+    # place page that sentence carries the projection disclosure — measured at
+    # 390, 199 pixels of caption under a 127-pixel drawing, a caption taller
+    # than the picture it captions. The scale of the projection and the size
+    # of the frame are facts about the instrument, not about the place, and
+    # they belong with the datasets that drew it.
     cap = (
         f'<figcaption><span class="capsay">'
-        + (f'{esc(about)} is in {esc(t["name"])}, and this is {esc(t["name"])} '
-           f'— the atlas draws Europe in one projection whose finest unit is '
-           f'about four kilometres, so it maps the town rather than the '
-           f'street. The frame is about ' if about else
-           f'{esc(t["name"])} and its neighbours in the Atlas — the frame is about ') +
-        f'{km_w:,} km across and {km_h:,} km deep at this latitude.</span>'
-        f'<span class="capsrc">'
+        + (f'{esc(about)} is in {esc(t["name"])}, and this is {esc(t["name"])}.'
+           f'</span><span class="capsrc">The atlas draws Europe in one '
+           f'projection whose finest unit is about four kilometres, so it maps '
+           f'the town rather than the street. ' if about else
+           f'{esc(t["name"])} and its neighbours in the Atlas.</span>'
+           f'<span class="capsrc">') +
+        f'The frame is about {km_w:,} km across and {km_h:,} km deep at this '
+        f'latitude. '
         # THE CREDIT, WHICH 318 PAGES DID NOT CARRY AND 274 CARRIED BY
         # ACCIDENT. A destination page named Natural Earth because pop_line
         # prints the dataset behind its population — so the 45 destinations
