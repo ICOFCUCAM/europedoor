@@ -61,8 +61,17 @@ const FAMILIES = ALL.slice((SET - 1) * PER, SET * PER);
 // have and the one this programme kept measuring and never LOOKING at. The
 // scale is higher because the frame is narrower; the sheet stays one image.
 const PHONE = process.argv.includes("--phone");
-const SCALE = PHONE ? 0.62 : 0.31, COLS = PHONE ? 6 : 4;
-const W = PHONE ? 390 : 1280, H = PHONE ? 1400 : 1500;
+/* AND A THIRD WIDTH, BECAUSE THE TABLET IS WHERE A RULE FALLS BETWEEN TWO
+ * BREAKPOINTS. `--tablet` shoots 834: the glyph's missing middle size was
+ * found there and nowhere else — a desk rule at 64rem and a phone rule at
+ * 44rem, and between them neither applied, so a continent rendered 132
+ * pixels wide on the width a reader is most likely to be comparing things
+ * at. Two widths cannot find a rule that is wrong only between them. */
+const TABLET = process.argv.includes("--tablet");
+const SCALE = PHONE ? 0.62 : TABLET ? 0.42 : 0.31;
+const COLS = PHONE ? 6 : TABLET ? 5 : 4;
+const W = PHONE ? 390 : TABLET ? 834 : 1280;
+const H = PHONE ? 1400 : TABLET ? 1500 : 1500;
 
 (async () => {
   const cells = FAMILIES.map(

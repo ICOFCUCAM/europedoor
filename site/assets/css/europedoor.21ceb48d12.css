@@ -3242,7 +3242,37 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    inside `.portraitsay` and a grid can only place what it can address.
    Measured after: the portrait begins at 395. */
 
-@media (min-width: 52rem) {
+/* AND THE TWO COLUMNS START AT 64rem, NOT 52. `auto` gives the door the width
+   its country needs and the type whatever is left, which is right at 1280 and
+   catastrophic just above the old breakpoint. Measured on Austria, whose door
+   is the widest at 541px:
+
+       704   type 672px   one column
+       834   type 174px   the tagline sets on five lines of three words
+       900   type 240px   four lines
+      1024   type 364px
+      1180   type 520px   the composition it was designed as
+
+   A 60px name, a display-serif tagline, an extent line and six chips in 174
+   pixels beside a 540-pixel drawing is not a two-column head; it is a column
+   of nothing with a picture next to it. 834 is also the width the glyph's own
+   missing middle size was found at, for the same reason: two widths cannot
+   find a rule that is wrong only between them.
+
+   The door needs 541 and the type needs about 22rem to set that name, so the
+   pair needs roughly 1,005 pixels of column. 64rem is the next breakpoint this
+   stylesheet already has, and below it the head takes the phone's order —
+   which is the composition the destination head switches to at 62rem. No new
+   breakpoint value enters the register. */
+@media (min-width: 52rem) and (max-width: 64rem) {
+  /* Centred, as on a phone: between the two the door is at full height and
+     stands alone under the name. On `.plate` rather than `.portrait` —
+     `.plate` is `width: min-content`, so centring the figure inside it moves
+     nothing and the door stays against the left edge with two hundred pixels
+     of paper beside it. The box that has slack is the one to centre. */
+  .portraithead .plate { margin-inline: auto; }
+}
+@media (min-width: 64rem) {
   /* `auto` rather than a fixed track: the door takes the width its country
      needs and the type takes the rest, so a narrow country does not leave a
      column of nothing beside it. The placement is EXPLICIT because the
