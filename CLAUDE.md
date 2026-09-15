@@ -3348,6 +3348,116 @@ the register holds that purpose, in both directions; and **untouched means
 unchanged, not empty**, so the second compares against the state read at the
 start, whatever that state was. Proved red three ways.
 
+**THE READING TYPE WAS A DOCUMENTATION SCALE.** Measured on a destination
+page: 5,226 of its ~6,700 characters at 15px or under, 2,606 of those at 13 or
+under, against a 76px h1 — and the stylesheet spent 99 of its font-size
+declarations on the two smallest steps and four on the body. Body 15 → 17,
+secondary 13 → 15, captions 12 → 13. **`--t-lg` did not move**: it is a length
+in a 1,120-unit viewBox and `LABEL_METRICS` carries a width model fitted at
+that size.
+
+**And a label scale is not a reading scale.** `--t-sm` served both, so the
+rise also enlarged the masthead navigation and three meta lines — uppercase at
+.06em is a third wider at 15 than at 13, and "200 DESTINATIONS" stopped fitting
+beside EXPLORE on a 240px door. Those five rules take the caption step.
+
+**Raising it broke five things at narrow widths and the browser suite found
+every one.** A `min-width: min-content` floor on the overture h1 — added to
+stop four headlines being cut mid-word — pushed the place page 53px off a
+320px screen uncapped; `19 DAYS · 5 COUNTRIES · MODERATE` was `nowrap` and
+fitted at 13 and not at 15; "Travel regions" cannot fit a third of 288px; and
+both sentence boxes were wider than the placeholder that teaches them.
+
+**A MEASURE MAY NEVER BE NARROWER THAN ITS LONGEST WORD.** `14ch` is a
+character count wearing a length's clothes — a `ch` is the width of a zero —
+so Elbphilharmonie measured 214px inside a 210px box and dropped its last
+glyph onto a line of its own, on four pages of 1,033. `min(100%, min-content)`.
+
+**A MARK IN USER UNITS IS A DIFFERENT SIZE ON EVERY FRAMED DRAWING.**
+`glyph_view()` fits the frame to the route, so the three journeys on the
+homepage are drawn at 1000, 422 and 340 units and rendered at the same 690
+pixels: a 5-unit dot came out 3.4px on one row and 10.1 on the next, and the
+route stroke 3px against 9px. The build normalises the frame away and the
+family states its own size; framed strokes are `non-scaling-stroke`.
+
+**THIRTY COUNTRY PLATES NAMED A MOUNTAIN AND MOST NAMED A FOREIGN ONE.**
+`summit_points` returns the highest peaks IN FRAME and a country plate frames
+its neighbours, so the tallest thing on screen is usually across the border:
+Austria named Triglav, Switzerland named Mont Blanc, Croatia named three peaks
+and none was Croatian. A summit must be on the subject now — `NameGround`'s own
+test — and 13 of 50 name one, Austria's being Grossglockner.
+
+**And the model cannot check itself, so the browser does.** A check reads every
+country portrait with `isPointInFill`, which is a different implementation of
+the same question. Its first run found GREECE set with its middle in the
+Aegean: `LABEL_METRICS` is a fitted UPPER envelope, so the modelled box and the
+drawn one differ by a few units and on a fragmented coast that is land against
+water. The middle is three samples now, not one — 43 portraits named to 39, all
+true where the old 43 were measured by the model that placed them.
+
+**A CONTROL A READER CANNOT SEE THE EDGE OF.** The homepage ask field painted
+`rgb(247,246,243)` on a body of `rgb(247,246,243)` with a transparent border:
+present, labelled, keyboard-reachable, no edge. It was right inside the hero,
+where paper on graphite is a field, and moved to the light band keeping the
+fill — the same move its own LABEL made, which was found at 1.00:1 and fixed
+while the fill was left. A browser check crosses every control's edge pixel by
+pixel against the 3:1 of WCAG 1.4.11, and found four more: `--rule` is the
+hairline between two list rows and it bounded every form field on the site, so
+the planner's days, budget and month each read **1.43:1**.
+
+**EVERY POSSESSIVE WAS A TYPEWRITER APOSTROPHE** — 2,165 of them, on two pages in three.
+Curled at the data loader, not in the renderer: the first version ran on the
+emitted HTML, which skips `<script>`, so the page said Europe’s and the JSON-LD
+breadcrumb beside it said Europe's and `checks.py` failed on exactly the
+promise it exists to hold. One representation, and never in a slug or a URL.
+
+**One paragraph in ten ended on a single word** — 106 widows of 998 multi-line
+paragraphs. `text-wrap: pretty` on running text; `balance` stays on headings.
+
+**EIGHT SECTIONS AT ONE GAP READ AS EIGHT EQUAL CLAIMS.** The section rhythm is
+a single constant, so a destination page ran eight bands 104px apart with every
+head the same size in the same place. `render.section(opens=True)` marks a
+change of movement with a rule and more air. And `mini` did not mean small:
+scoped to a note and a rail it left 587 of 1,288 headings at full section size,
+every one of them a fact under a head.
+
+**A CAPTION SAYS WHAT THE PICTURE IS; A SOURCE NOTE SAYS WHERE IT CAME FROM.**
+They were one paragraph, so on a place page 199 pixels of caption sat under a
+127-pixel drawing. The scale of the projection and the size of the frame are
+facts about the instrument, not about the place. 852 of 917 figcaptions carry
+the two tiers; the rest are two-word locator labels and photo credits. The
+sizes sit on the SPANS — four containers set a caption's size and
+`.placeband figcaption` is the same specificity as `.minimap figcaption` and
+further down the file.
+
+**A THIRD OF THE HERO WAS CROPPED AWAY ON A WIDE MONITOR.** `slice` is right —
+the frame is 1120×800 where every other map is 1000×780 — but the drawing's
+width is capped at the column while its height fills a hero whose floor is
+43vw, so the taller the window the more of the WIDTH goes: 1,078 units shown at
+1280, 961 at 1920 where AZERBAIJAN was sliced, and 721 at 2560. Bounded at
+1,050, the margin the frame was given. **The dusk was checked against the names
+and cleared**: it dims a name and its ground together, so all fifteen measure
+1.95–2.13:1 in light or shadow.
+
+**THE BODY MAPS HAD NO WATER, NO COAST AND CRACKS THROUGH THE LAND.** The glyph
+family was one flat silhouette on the page's own paper: no sea, so a bay and
+the margin were the same colour; lod0 rings simplified per country, so
+independently thinned neighbours left white cracks; and the 52°E cut ran raw.
+`.card-map` had painted water since the cartography split and this family never
+got it.
+
+**RULES AND SPACE, NOT A CARD — and two surfaces were the last holdouts.**
+Border, fill, radius and shadow each say "separate object, placed here by a
+system", and three surfaces had already given that up. The rail kept all four
+on every family that carries one, and the Europe Experience Score was a card inside a `tone-quiet`
+band whose fill is within a step of its own.
+
+**`tools/voids.js` measures empty page per family**, and is NOT a gate on
+`opening.js`'s reason: a ceiling on empty page is satisfied by tightening the
+section rhythm, and the 104px between two bands is not a hole. Its first
+version read `h2/p/li/figure` and reported 1,702px on a destination page
+against a real 804 — the score bars are divs and it could not see them.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
@@ -3429,6 +3539,12 @@ satisfied by shuffling bands. Both read `tools/lib/families.js`, which is the
 one list of rendered families and is enumerated against the built site — a
 template missing from it is a family no instrument here can see, which is how
 the fund project page shipped at 0% picture for the life of the family.
+
+**And a third, on the same reasoning.** `node tools/voids.js` measures bands
+over 90px with nothing painted in them, per family, at 1280 or (`--phone`) at
+390. It reports and cannot fail: the fault it looks for is an outlier — a
+296px column beside a picture, a standfirst alone in the right half — and the
+section rhythm it would otherwise punish is what says two bands are separate.
 
 **And one that is deliberately not a gate.** `node tools/contact-sheet.js`
 puts one page per family in a single image. `--dark` shoots the dark
