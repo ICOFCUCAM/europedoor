@@ -7879,7 +7879,67 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
   background: var(--ed-cobalt); color: var(--ed-bone);
   padding: clamp(4.375rem, 9vw, 8.75rem) var(--ed-gutter);
 }
-.ed-journey-hero-inner { width: min(var(--ed-max), 100%); margin-inline: auto; }
+/* THE HERO CARRIES THE ROUTE, AND THAT IS WHAT CLOSED THE VOID IN IT.
+   480 pixels of flat cobalt with a name in the top half and 250 pixels of
+   empty blue under the meta line. The index was rebuilt out of a card grid
+   on the finding that the ordered sequence of places is the one thing that
+   makes a journey a journey; the page it links to did not have it either.
+   Asymmetric, because two equal columns read as a layout and an unequal
+   pair reads as a picture with something to say about it — the same .65/1.35
+   the feature scale already uses. */
+.ed-journey-hero-inner {
+  width: min(var(--ed-max), 100%); margin-inline: auto;
+  display: grid; gap: clamp(var(--s6), 4vw, var(--s8)); align-items: center;
+}
+/* 52rem, WHICH IS THE BREAKPOINT THIS SYSTEM ALREADY HAS. The first version
+   wrote 58 because that is where this particular pair stops fitting, and the
+   invariant register refused it for adding a seventh — every breakpoint is a
+   layout somebody has to test in Chromium at two viewports, and the register
+   has refused a seventh once before for the same reason. */
+@media (min-width: 52rem) {
+  .ed-journey-hero-inner { grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); }
+}
+.ed-journey-say > :last-child { margin-bottom: 0; }
+.ed-journey-line { display: grid; justify-items: stretch; }
+.ed-journey-line .constel { width: 100%; max-width: none; }
+/* A LINE ON A FIELD, NOT A MAP ON PAPER. `.constel` paints the atlas palette
+   — warm land, pale water, an ink frontier — which is right everywhere it is
+   a picture of somewhere and wrong inside a solid cobalt band, where a sheet
+   of parchment would be a second panel rather than a drawing. The ground the
+   drawing sits on is already there, so the sea is the band itself and the
+   land is the band lightened.
+
+   TWO TRANSLUCENT LAYERS OVER ONE ANOTHER ARE A THIRD TONE. The first
+   version gave `glyph-land` and `glyph-beyond` the same 22% bone, and they
+   OVERLAP — the ground beyond the atlas is drawn across the whole frame and
+   Europe is drawn on top of it — so Europe came out at 39% against a 22%
+   rectangle, and the rectangle read as a pasted panel with a hard edge
+   against the band. It is the black-fringe finding from the hero, where two
+   levels of detail of the same coast were stacked and the disagreement read
+   as a drop shadow. On a field there is no context to give: the ground
+   beyond is not drawn at all, and what is left is Europe on cobalt. */
+.constel-onfield { fill: color-mix(in srgb, var(--ed-bone) 26%, transparent); }
+.constel-onfield :is(.glyph-sea, .glyph-beyond) { fill: none; stroke: none; }
+.constel-onfield .glyph-land {
+  fill: color-mix(in srgb, var(--ed-bone) 26%, transparent);
+  stroke: color-mix(in srgb, var(--ed-bone) 26%, transparent);
+}
+.constel-onfield .glyph-bounds { stroke: var(--ed-bone); opacity: .20; }
+/* THE CASING IS THE GROUND, NEVER THE ROUTE'S OWN COLOUR. Every printed map
+   answers a stroke crossing two grounds with a wider stroke in the ground's
+   tone under a narrower one in the route's — and the first version painted
+   both bone, which is a nine-pixel white band with no line in it. Here the
+   ground is the band. */
+.constel-onfield .constel-route.case { stroke: var(--ed-cobalt); }
+.constel-onfield .constel-route:not(.case) { stroke: var(--ed-bone); }
+.constel-onfield circle { fill: var(--ed-bone); }
+/* AND THE 52°E CUT HAS TO FADE INTO WHATEVER IT IS DRAWN ON. `data/geo/`
+   stops where this atlas stops writing about places, so a filled land ends
+   in a knife-straight diagonal through Russia that reads as a rendering
+   fault. The fade exists for that and its stops take their colour from the
+   ground — which here is the band, not paper. A `<stop>` no rule reaches is
+   black, and black is the one colour this palette does not contain. */
+.constel-onfield .datacut stop { stop-color: var(--ed-cobalt); }
 .ed-journey-hero h1 {
   max-width: 62.5rem; font-family: var(--ed-serif); font-weight: 400;
   font-size: var(--ed-display-1);
@@ -8118,6 +8178,16 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
    are the one thing that decides whether a reader can take it — days,
    stops, countries — and they belong in the hero rather than in a meta line
    under it. Bone at 82% measures 5.0 on the cobalt ground. */
+/* THE FAMILY ACCENT PAINTED A LABEL THE COLOUR OF ITS OWN GROUND.
+   `body[data-family="journey"] :is(.ed-eyebrow, .ed-section-index)` is
+   (0,2,1) — an attribute plus a class — and `.ed-journey-hero .ed-eyebrow`
+   is (0,2,0), so the family colour won on the one element that sits ON the
+   accent: cobalt type on a cobalt field, 1.00:1, present and placed and
+   unseeable. That is the masthead focus ring one element over, and the
+   `--focus` token one file over, and the answer is the same both times —
+   the thing INVERTS rather than recolours, and the rule that says so has to
+   out-specify the one that made it a family colour. */
+body[data-family="journey"] .ed-journey-hero .ed-eyebrow,
 .ed-journey-hero .ed-eyebrow { color: var(--ed-bone); }
 .ed-journey-hero .ed-intro {
   max-width: 44ch; margin-top: var(--s5);

@@ -4396,15 +4396,40 @@ def journey_page(data, j):
                                 "What the journey passes through",
                                 f"{n_of(len(j['legs']), 'stop')}, in order.")
               + _jshots + "</section>") if _jshots else ""
+    # THE ONE THING THAT MAKES A JOURNEY A JOURNEY WAS NOT IN ITS HERO.
+    #
+    # /journeys was rebuilt from a grid of four abstract plates into rows
+    # carrying each route, on the finding that "the ordered sequence of
+    # places is the one thing that makes a journey a journey, and it was the
+    # only thing not on the page". The DETAIL page then opened on 480 pixels
+    # of flat cobalt with a name, a strapline and a meta line in the top
+    # half — the same omission, on the page the index links to, with 250
+    # pixels of empty blue under it.
+    #
+    # It is the index's own drawing, framed on this journey's own extent, so
+    # the row a reader clicked and the hero they land on are the same
+    # picture. Drawn in the hero's own ink rather than in the atlas palette:
+    # this is a line on a field, not a map on paper, and `constellation`
+    # takes the ground it is given.
+    _heroroute = constellation(
+        [project(data["cities"][l["city"]]["city"]["lat"],
+                 data["cities"][l["city"]]["city"]["lon"])
+         for l in j["legs"] if l["city"] in data["cities"]],
+        route=True, frame=True, cut=True, aspect=1.35, mark=7, term=11,
+        extra=" constel-onfield")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Journeys", "/journeys"), (j["name"], None)])}
 {photoband}
+{constel_defs()}
 <section class="ed-journey-hero">
   <div class="ed-journey-hero-inner">
-    <p class="ed-eyebrow">Journey</p>
-    <h1>{esc(j['name'])}</h1>
-    <p class="ed-intro">{esc(j['strapline'])}</p>
-    <p class="ed-journey-facts">{n_of(j['days'], 'day')} · {n_of(len(j['legs']), 'stop')} · {n_of(len(countries), 'country')} · {total_km:,} km in a straight line</p>
+    <div class="ed-journey-say">
+      <p class="ed-eyebrow">Journey</p>
+      <h1>{esc(j['name'])}</h1>
+      <p class="ed-intro">{esc(j['strapline'])}</p>
+      <p class="ed-journey-facts">{n_of(j['days'], 'day')} · {n_of(len(j['legs']), 'stop')} · {n_of(len(countries), 'country')} · {total_km:,} km in a straight line</p>
+    </div>
+    <div class="ed-journey-line">{_heroroute}</div>
   </div>
 </section>
 {jbleed}
@@ -8330,8 +8355,27 @@ def constellation(pts, extra="", route=False, frame=False, cut=False,
     # Above the ground and below the marks, which is datacut()'s own rule, so
     # a lit destination east of the cut keeps its dot. The wide reach rather
     # than the measured one for the same reason.
-    cut = cut_fade("ih", MAP_W, MAP_H, dusk_reach(), cls="datacut") if cut and not (
-        frame and pts) else ""
+    #
+    # AND A FRAMED DRAWING WAS REFUSED THE FADE BY A FLAG RATHER THAN BY A
+    # MEASUREMENT. The suppression read `not (frame and pts)` — a framed
+    # glyph is usually a small window on one corner of Europe and the cut is
+    # usually outside it, which is true and is not the same as never. The
+    # Arctic-to-Mediterranean journey runs 69°N to 38°N, so its frame IS the
+    # whole canvas, and its hero drew a knife-straight diagonal through
+    # Russia: the exact rendering fault this fade exists to remove, on the
+    # largest drawing in the family.
+    #
+    # The fade's gradients are `userSpaceOnUse` in the projection's own
+    # coordinates and a framed viewBox is a WINDOW on those same coordinates
+    # rather than a transform of them, so emitting it is geometrically
+    # correct at any frame — it simply falls outside a small one. What
+    # decides is therefore whether the window reaches the cut, which is
+    # arithmetic on the viewBox and not a flag on the caller.
+    _vx, _vy, _vw, _vh = (float(v) for v in view.split())
+    _reaches = (_vx + _vw) > (MAP_W - dusk_reach()[0]) or (_vy + _vh) > (
+        MAP_H - dusk_reach()[2])
+    cut = (cut_fade("ih", MAP_W, MAP_H, dusk_reach(), cls="datacut")
+           if cut and (not (frame and pts) or _reaches) else "")
     # WATER, A COAST AND CLOSED SEAMS — the three things this drawing never
     # had. It was one flat grey silhouette on the page's own paper: no sea,
     # so a bay and the margin are the same colour; no coast, so the edge is
