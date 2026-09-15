@@ -1170,7 +1170,7 @@ a .kicker { color: var(--ink-3); }
 .quietsend { display: grid; grid-template-columns: 20rem minmax(0, 1fr);
              gap: var(--s6); align-items: start; }
 .quietart { margin: 0; }
-.quietart .constel { display: block; width: 100%; height: auto; }
+.quietart .constel { width: 100%; height: auto; }
 /* NOT `.constel-theme`, WHOSE MARKS ARE 22 UNITS. That radius is right for a
    themes row, drawn unframed at the whole continent; this drawing is FRAMED
    on six places, so the same number rendered as six blue discs the size of
@@ -5109,7 +5109,7 @@ body[data-hero] .masthead { position: sticky; }
                       font-size: var(--t-sm); line-height: 1.5; max-width: 46rem; }
 #minecap { color: var(--ink-2); }
 .rowart { margin: 0; }
-.rowart .constel { width: min(15rem, 100%); display: block; }
+.rowart .constel { width: min(15rem, 100%); }
 /* THE GLYPH HAS THREE SIZES AND ONLY TWO WERE WRITTEN.
  *
  * There is a desk rule at 64rem and a phone rule at 44rem, and BETWEEN THEM
@@ -5268,7 +5268,11 @@ body[data-hero] .masthead { position: sticky; }
 
    `display: block` stays, on every one of them: an `<svg>` is inline by
    default and sits on a text baseline, which is the third fault this
-   stylesheet records about drawings in rows. */
+   stylesheet records about drawings in rows. Stated ONCE here — three
+   families were each restating it (`.quietart`, `.rowart`, `.iheroart`) and
+   the dead-rule scan reported all three within a run of this moving, which
+   is what that scan is for: a declaration that matches its element and
+   changes nothing reads as a decision and is not one. */
 .constel { display: block; }
 
 @media (max-width: 44rem) {
@@ -6005,7 +6009,7 @@ main > .pagehead:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom
      cartography, whatever the drawing is embedded in. */
   background: var(--atlas-sea);
 }
-.iheroart .constel, .iheroart svg { width: 100%; height: 100%; display: block; }
+.iheroart .constel, .iheroart svg { width: 100%; height: 100%; }
 .iheroart.shot picture, .iheroart.shot img {
   display: block; width: 100%; height: 100%; object-fit: cover;
 }
