@@ -7765,6 +7765,21 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
   padding-block: clamp(4.375rem, 9vw, 8.75rem);
   border-top: 1px solid color-mix(in srgb, var(--ed-ink) 18%, transparent);
 }
+/* TWO COMPONENTS EACH PAYING FOR THE SAME GAP. Measured on /interests/
+   mountains at 1280: the head ends its content at y=664, pays 178 pixels of
+   its own bottom padding, and the first section then pays 115 more before a
+   word — 341 pixels between the lede and the next heading, which `voids.js`
+   reports as the largest single hole on the site (304px before "Mountains,
+   in eight places"). Neither padding is wrong on its own: a head needs air
+   under it and a band needs air above it. What is wrong is charging both
+   when they are adjacent, which is the margin-doubling this stylesheet
+   already records about `main`'s bottom padding and the footer's, where the
+   two summed to 224 pixels of empty page on every page of the site.
+
+   The break is still there — the rule above the section is what says two
+   bands are separate, and that is the whole reason `voids.js` cannot fail on
+   the section rhythm. It is paid once. */
+:is(.pagehead, .ed-opening) + :is(.ed-section, .practical) { padding-top: var(--s7); }
 .ed-section-head {
   display: grid; grid-template-columns: minmax(9.375rem, .3fr) minmax(0, 1fr);
   gap: var(--s6); margin-bottom: var(--s8);
@@ -8372,6 +8387,13 @@ body:has(main .ed-journey-hero) .masthead .wordmark { color: var(--bone); }
 .headmeta.ed-section {
   padding-block: var(--s6) 0; border-top: 0;
 }
+/* AND THE META ROW DOES NOT RESET THE ADJACENCY. It is part of the head —
+   its own rule says so, and it takes none of the section's air — so the band
+   after it is still the band after the HEAD, and was being charged the full
+   gap because the selector was looking at its immediate sibling rather than
+   at what that sibling is. 235 pixels before "What Tyrol & the West is made
+   of", where the head above had already paid. */
+.headmeta.ed-section + :is(.ed-section, .practical) { padding-top: var(--s7); }
 
 /* =========================================================
    THE BAND HEAD TAKES THE SECTION GRAMMAR
