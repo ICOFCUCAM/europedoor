@@ -333,7 +333,16 @@ def measure():
                        "— the one part of the homepage whose job is to make "
                        "somebody want to go somewhere, doing it entirely in "
                        "words. The drawing is back under the four headings, "
-                       "and it is the same 512 dots the tiles carried."},
+                       "and it is the same 512 dots the tiles carried. "
+                       "122 -> 123 ON PURPOSE: the editorial desk publishes an "
+                       "Atom feed, and feed discovery is a convention that "
+                       "reads the document it is handed rather than the one "
+                       "page the feed is about — so the <link rel=alternate> "
+                       "is emitted by the one function that emits <head>, "
+                       "which costs every page on the site about 200 bytes. "
+                       "Declaring it on /stories alone would be cheaper and "
+                       "would mean a reader standing on a destination page "
+                       "cannot subscribe from where they are."},
             "weight.max_page_kb": {
                 "value": round(max(len(b) for b in bodies.values()) / 1024),
                 "kind": "ceiling",

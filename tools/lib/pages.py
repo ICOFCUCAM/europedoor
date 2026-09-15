@@ -16,7 +16,7 @@ from . import cartography
 from . import geo
 from . import stay as staylib
 from . import urls
-from .render import (LD_PUBLISHER, SITE_NAME, SITE_TAGLINE, arch_rim, card, chips, crumbs,
+from .render import (LD_PUBLISHER, ORIGIN, SITE_NAME, SITE_TAGLINE, arch_rim, card, chips, crumbs,
                      esc, factlist, grid, n_of,
                      jsondata, ld_breadcrumb, ld_place, ld_within, motif_for,
                      page, photo, picture, plate, section, arch_clip, arch_edge)
@@ -28,7 +28,7 @@ HOME = ("Europe", "/discover")
 # itself rather than only on a page, because a JSON file gets copied and the
 # page it was linked from does not travel with it.
 API_LICENCE = {
-    "terms": "https://europedoor.com/terms",
+    "terms": ORIGIN + "/terms",
     "use": "Free to read, cache and build on, with attribution to EuropeDoor. "
            "Estimates are planning arithmetic, not quotes. Nothing here is "
            "entry, visa or safety advice.",
@@ -1587,7 +1587,7 @@ def home(data):
         og=("europedoor:home", "peaks", "EuropeDoor — open the door to Europe"),
         ld_blocks=[
             {"@context": "https://schema.org", "@type": "WebSite",
-             "name": SITE_NAME, "url": "https://europedoor.com",
+             "name": SITE_NAME, "url": ORIGIN,
              "description": SITE_TAGLINE,
              "inLanguage": "en",
              "publisher": LD_PUBLISHER,
@@ -1597,7 +1597,7 @@ def home(data):
              "potentialAction": {
                  "@type": "SearchAction",
                  "target": {"@type": "EntryPoint",
-                            "urlTemplate": "https://europedoor.com/search?q={search_term_string}"},
+                            "urlTemplate": ORIGIN + "/search?q={search_term_string}"},
                  "query-input": "required name=search_term_string"}},
         ],
     )
@@ -4273,7 +4273,7 @@ def journey_page(data, j):
             # bands, not a quote, and serialising it as an offer would turn a
             # caveat into a machine-readable commitment.
             {"@context": "https://schema.org", "@type": "TouristTrip",
-             "name": j["name"], "url": "https://europedoor.com" + urls.journey(j),
+             "name": j["name"], "url": ORIGIN + urls.journey(j),
              "description": j["summary"],
              "touristType": [data["interests"][i]["name"] for i in j["interests"]
                              if i in data["interests"]],
@@ -8241,6 +8241,15 @@ def stories_index(data):
     img=photo(data.get("images"), "stories-hero", w=2000, h=1200,
               sizes="(min-width: 60rem) 52vw, 100vw"))}
 {desks}
+<!-- THE ONE THING A DESK OWES ITS READERS THAT THIS ONE DID NOT HAVE. Nine
+     dated, authored essays, a public JSON API, a sitemap — and no way at all
+     to be told when a tenth arrives. The link is declared in the shell for
+     every reader whose browser or reader looks for it, and stated here in
+     words for every reader who does not have one. -->
+<p class="note onward"><a href="/stories/feed.xml">Follow the desk &rarr;</a>
+An Atom feed of every story, newest first, with the desk it was filed to and
+the standfirst as written. No tracking parameter, no email address, and
+nothing to sign up to.</p>
 <p class="small">The shape above the lead piece is the places it is about, drawn
 on the same projection as every other map here — and the same reason there is no
 other picture on this page: a story is not a place, and a landscape chosen for it
@@ -8344,7 +8353,7 @@ def story_page(data, s):
                            (s["title"], f"/stories/{s['slug']}")]),
             {"@context": "https://schema.org", "@type": "Article",
              "headline": s["title"], "description": s["standfirst"],
-             "url": f"https://europedoor.com/stories/{s['slug']}",
+             "url": ORIGIN + urls.story(s),
              "articleSection": s["section"],
              "keywords": s["tags"],
              "author": {"@type": "Organization", "name": s["author"]},
@@ -9773,6 +9782,13 @@ def api_page(data):
     on this page, because a JSON file gets copied and the page it was linked from does not
     travel with it.</p>
 
+    <h2 class="mt7">And one document that is not JSON</h2>
+    <p>The editorial desk publishes an <a href="/stories/feed.xml">Atom feed</a> at
+    <code>/stories/feed.xml</code> — every story, newest first, with its desk, its two
+    dates and its standfirst. It is not counted above because it is not an endpoint:
+    there is nothing to query, it is a document a reader subscribes to, and the four
+    above are the ones this site's own planner, search and map run on.</p>
+
     <h2 class="mt7">What they are not</h2>
     <ul class="stack">
       <li><strong>Not advice.</strong> Nothing here is entry, visa, border or safety
@@ -10068,9 +10084,74 @@ def not_found(data):
     )
 
 
+def stories_feed(data):
+    """The nine essays as an Atom document, at /stories/feed.xml.
+
+    THE ONE THING AN EDITORIAL DESK OWES ITS READERS THAT THIS ONE DID NOT
+    HAVE. Every publication with a masthead publishes a feed; this site has
+    nine dated, authored essays, a public JSON API with four endpoints, a
+    sitemap, and no way at all to be told when a tenth arrives. A reader who
+    wants to follow the desk has to come back and look.
+
+    ATOM RATHER THAN RSS, for the same reason the JSON-LD is written the way
+    it is: Atom specifies what a date means, requires a permanent id per
+    entry, and says what `type` a piece of text is. RSS 2.0 leaves all three
+    to convention, and a convention is what every consumer gets to interpret
+    differently.
+
+    IT CLAIMS ONLY WHAT THE REGISTER HOLDS, which is the rule `checks.py`
+    already enforces on the structured data: a feed is a machine-readable
+    claim republished by people who cannot check it. So the id is the
+    canonical URL, `published` and `updated` are the story's own two dates
+    rather than the build's, the category is the desk it was filed to, and
+    the summary is the standfirst as written. There is no `<content>`: the
+    body is nine paragraphs of set editorial and putting a second copy of it
+    in a second format is a second thing to go stale.
+
+    THE DATES ARE DATES AND ATOM WANTS TIMESTAMPS. A story carries a day and
+    no time, and inventing one — 09:00, or the build's own clock — would be
+    authoring a measurement. Midnight UTC is the only reading of a bare date
+    that adds nothing, and it is what the day means.
+    """
+    items = sorted(data["stories"], key=lambda s: (s["updated"], s["slug"]))
+    newest = items[-1]["updated"] if items else "1970-01-01"
+
+    def stamp(day):
+        return f"{day}T00:00:00Z"
+
+    entries = "".join(
+        "<entry>"
+        f"<title>{esc(s['title'])}</title>"
+        f'<link rel="alternate" type="text/html" href="{ORIGIN}{urls.story(s)}"/>'
+        f"<id>{ORIGIN}{urls.story(s)}</id>"
+        f"<published>{stamp(s['published'])}</published>"
+        f"<updated>{stamp(s['updated'])}</updated>"
+        f'<category term="{esc(s["section"])}"/>'
+        f"<author><name>{esc(s['author'])}</name></author>"
+        f'<summary type="text">{esc(s["standfirst"])}</summary>'
+        "</entry>"
+        for s in reversed(items)
+    )
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<feed xmlns="http://www.w3.org/2005/Atom">'
+        "<title>EuropeDoor stories</title>"
+        f'<subtitle type="text">A continent is people before it is places. '
+        f"{numword(len(items), cap=True)} essays, filed to "
+        f'{numword(len({s["section"] for s in items}))} desks.</subtitle>'
+        f"<id>{ORIGIN}/stories</id>"
+        f"<updated>{stamp(newest)}</updated>"
+        f'<link rel="self" type="application/atom+xml" href="{ORIGIN}/stories/feed.xml"/>'
+        f'<link rel="alternate" type="text/html" href="{ORIGIN}/stories"/>'
+        "<rights>Editorial text is EuropeDoor's own. Reproduce with "
+        "attribution and a link.</rights>"
+        + entries + "</feed>\n"
+    )
+
+
 def sitemap(paths):
     urlset = "".join(
-        f"<url><loc>https://europedoor.com{p}</loc></url>" for p in sorted(paths)
+        f"<url><loc>{ORIGIN}{p}</loc></url>" for p in sorted(paths)
     )
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -10854,7 +10935,7 @@ def motion_page(data, m):
                            (m["name"], f"/europe-in/{m['slug']}")]),
             {"@context": "https://schema.org", "@type": "ItemList",
              "name": m["name"], "description": m["lede"],
-             "url": f"https://europedoor.com/europe-in/{m['slug']}",
+             "url": ORIGIN + f"/europe-in/{m['slug']}",
              "numberOfItems": len(shown),
              "itemListElement": [
                  {"@type": "ListItem", "position": i,

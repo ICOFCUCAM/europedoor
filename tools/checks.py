@@ -4918,6 +4918,112 @@ def _element_text(html, cls):
     return " ".join(g.out)
 
 
+@check("the stories feed is the register, and every page declares it")
+def c_stories_feed():
+    """A FEED IS A MACHINE-READABLE CLAIM REPUBLISHED BY PEOPLE WHO CANNOT
+    CHECK IT, which is the sentence already written about the JSON-LD, and
+    the reason the same shape of check applies here: an entry that says
+    something `data/stories.json` does not say will be read by an aggregator
+    that has no way of knowing.
+
+    So every field is asserted against the register rather than against the
+    generator — title, desk, both dates, standfirst — and the feed's own
+    `updated` must be the newest story's, because a feed whose timestamp does
+    not move is a feed readers stop polling.
+
+    AND IT IS PARSED RATHER THAN GREPPED. An unescaped ampersand in a
+    standfirst is a feed no reader will open, and it produces a file that
+    every substring assertion passes.
+    """
+    import xml.etree.ElementTree as ET
+    NS = "{http://www.w3.org/2005/Atom}"
+    d = D.load()
+    path = os.path.join(OUT, "stories", "feed.xml")
+    if not os.path.exists(path):
+        fail("site/stories/feed.xml was not built")
+        return 0
+    try:
+        root = ET.parse(path).getroot()
+    except ET.ParseError as e:
+        fail(f"stories/feed.xml is not well-formed XML: {e}")
+        return 0
+
+    want = {s["slug"]: s for s in d["stories"]}
+    entries = root.findall(NS + "entry")
+    n = 0
+    if len(entries) != len(want):
+        fail(f"the feed carries {len(entries)} entries and the register holds "
+             f"{len(want)} stories")
+    seen = []
+    for e in entries:
+        eid = (e.findtext(NS + "id") or "")
+        slug = eid.rsplit("/", 1)[-1]
+        seen.append(slug)
+        st = want.get(slug)
+        if not st:
+            fail(f"the feed carries an entry for {slug!r}, which is not a story")
+            continue
+        n += 1
+        page_path = os.path.join(OUT, "stories", slug, "index.html")
+        if not os.path.exists(page_path):
+            fail(f"the feed links {slug!r} and no such page was built")
+        for label, got, expect in (
+                ("title", e.findtext(NS + "title"), st["title"]),
+                ("summary", e.findtext(NS + "summary"), st["standfirst"]),
+                ("published", e.findtext(NS + "published"), st["published"] + "T00:00:00Z"),
+                ("updated", e.findtext(NS + "updated"), st["updated"] + "T00:00:00Z"),
+                ("author", e.findtext(f"{NS}author/{NS}name"), st["author"])):
+            if got != expect:
+                fail(f"the feed's {label} for {slug!r} is {got!r}, the register "
+                     f"says {expect!r}")
+        cat = e.find(NS + "category")
+        if cat is None or cat.get("term") != st["section"]:
+            fail(f"the feed files {slug!r} to "
+                 f"{cat.get('term') if cat is not None else None!r}, the "
+                 f"register says {st['section']!r}")
+    # NEWEST FIRST, because a feed read as a list is read in the order it is
+    # written and every reader that does not sort will show the oldest essay
+    # as the news.
+    order = [s for s in sorted(want.values(), key=lambda x: (x["updated"], x["slug"]),
+                               reverse=True)]
+    if seen and seen != [s["slug"] for s in order]:
+        fail(f"the feed is not newest first: it opens with {seen[0]!r}")
+    newest = max(s["updated"] for s in want.values())
+    if root.findtext(NS + "updated") != newest + "T00:00:00Z":
+        fail(f"the feed's own updated is {root.findtext(NS + 'updated')!r} and "
+             f"the newest story is {newest}")
+    # `if not element` IS FALSE FOR AN ELEMENT WITH NO CHILDREN, which is
+    # every <link/> ever written, so the obvious spelling of this assertion
+    # fails on a feed that is correct. `is None` is the one that asks the
+    # question.
+    if root.find(f'{NS}link[@rel="self"]') is None:
+        fail("the feed does not say where it lives (no rel=self link)")
+    # IT CLAIMS ONLY WHAT THE REGISTER HOLDS, AND THE VOCABULARY IS THE
+    # ASSERTION. The first version grepped the file for "rating", "price" and
+    # "sponsor" — and a standfirst reads "public transport, priced as public
+    # transport", so a correct feed failed on a word in an essay. What this
+    # promises is about ELEMENTS, not about prose: a tag outside this set is a
+    # claim nothing in data/stories.json can fill, and `<content>` in
+    # particular is a second copy of nine paragraphs of editorial in a second
+    # format, which is a second thing to go stale.
+    allowed = {"feed", "title", "subtitle", "id", "updated", "link", "rights",
+               "entry", "published", "category", "author", "name", "summary"}
+    for el in root.iter():
+        tag = el.tag.replace(NS, "")
+        if tag not in allowed:
+            fail(f"the feed carries a <{tag}> element, which is outside what "
+                 f"the register can fill")
+
+    # AND A FEED NOBODY CAN FIND IS NOT A FEED. Declared in the one place that
+    # emits <head>, so this is a floor on every page rather than on /stories.
+    missing = [rel(f) for f in site_files()
+               if 'type="application/atom+xml"' not in open(f, encoding="utf-8").read()]
+    if missing:
+        fail(f"{len(missing)} pages do not declare the feed, e.g. {missing[0]}")
+    n += len(site_files())
+    return n
+
+
 @check("an index states the extent of its own set, and the number is the real one")
 def c_index_extent():
     # AN INDEX EXISTS TO SAY HOW BIG A SET IS, AND FIVE OF EIGHT DID NOT.

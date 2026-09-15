@@ -18,6 +18,12 @@
 
 <link rel="stylesheet" href="/assets/css/europedoor.b8c9186fcf.css">
 <link rel="icon" href="/assets/door.49fb8a56f2.svg" type="image/svg+xml">
+<!-- ON EVERY PAGE, NOT ONLY ON /stories. Feed discovery is a browser and
+     reader convention that looks at the document it is given, and a reader
+     who wants to follow this desk is as likely to be standing on a
+     destination page as on the index. One document, one feed, declared in
+     the one place that emits <head>. -->
+<link rel="alternate" type="application/atom+xml" href="/stories/feed.xml" title="EuropeDoor stories">
 </head>
 <body class="area-none" data-world="discover">
 <a class="skip" href="#main">Skip to content</a>
@@ -74,6 +80,13 @@
     permission is written into each document as a <code>licence</code> field rather than left
     on this page, because a JSON file gets copied and the page it was linked from does not
     travel with it.</p>
+
+    <h2 class="mt7">And one document that is not JSON</h2>
+    <p>The editorial desk publishes an <a href="/stories/feed.xml">Atom feed</a> at
+    <code>/stories/feed.xml</code> — every story, newest first, with its desk, its two
+    dates and its standfirst. It is not counted above because it is not an endpoint:
+    there is nothing to query, it is a document a reader subscribes to, and the four
+    above are the ones this site's own planner, search and map run on.</p>
 
     <h2 class="mt7">What they are not</h2>
     <ul class="stack">

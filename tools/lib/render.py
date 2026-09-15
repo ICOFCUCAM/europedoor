@@ -25,6 +25,13 @@ from .i18n import Strings
 T = Strings("en")
 
 SITE_NAME = "EuropeDoor"
+# THE ORIGIN, ONCE. It was typed as a literal in six places — the sitemap,
+# four JSON-LD blocks and the publisher record — and the Atom feed would have
+# been the seventh. A canonical URL is a claim to a machine that cannot check
+# it, and six copies of a claim are six chances for one of them to say
+# something else the day the domain moves. `docs/brand-lock.md` says it does
+# not move; that is a reason to write it once, not a reason not to.
+ORIGIN = "https://europedoor.com"
 SITE_TAGLINE = "Open the door to Europe."
 # The operating company is not incorporated yet. Nothing on this site may
 # name an entity that does not exist; see docs/legal-position.md.
@@ -1097,7 +1104,7 @@ def og_key(seed, motif):
 def og_tags(seed, motif, alt):
     key = og_key(seed, motif)
     OG_WANTED[key] = (seed, motif)
-    url = f"https://europedoor.com/assets/og/{key}.png"
+    url = f"{ORIGIN}/assets/og/{key}.png"
     return (f'<meta property="og:image" content="{url}">'
             f'<meta property="og:image:width" content="{OG_W}">'
             f'<meta property="og:image:height" content="{OG_H}">'
@@ -1132,7 +1139,7 @@ def og_tags(seed, motif, alt):
 # A wrong rich result is worse than none: it is a claim, machine-readable,
 # republished by somebody who cannot check it.
 
-LD_PUBLISHER = {"@type": "Organization", "name": SITE_NAME, "url": "https://europedoor.com"}
+LD_PUBLISHER = {"@type": "Organization", "name": SITE_NAME, "url": ORIGIN}
 
 
 def ld(*blocks):
@@ -1159,7 +1166,7 @@ def ld_breadcrumb(trail):
     for i, (label, href) in enumerate(trail, start=1):
         item = {"@type": "ListItem", "position": i, "name": label}
         if href:
-            item["item"] = "https://europedoor.com" + href
+            item["item"] = ORIGIN + href
         items.append(item)
     return {"@context": "https://schema.org", "@type": "BreadcrumbList",
             "itemListElement": items}
@@ -1168,7 +1175,7 @@ def ld_breadcrumb(trail):
 def ld_place(kind, *, name, url, description, lat=None, lon=None, within=None,
              extra=None):
     out = {"@context": "https://schema.org", "@type": kind,
-           "name": name, "url": "https://europedoor.com" + url,
+           "name": name, "url": ORIGIN + url,
            "description": description}
     if lat is not None:
         out["geo"] = {"@type": "GeoCoordinates", "latitude": lat, "longitude": lon}
@@ -1185,7 +1192,7 @@ def ld_place(kind, *, name, url, description, lat=None, lon=None, within=None,
 
 
 def ld_within(kind, name, url):
-    return {"@type": kind, "name": name, "url": "https://europedoor.com" + url}
+    return {"@type": kind, "name": name, "url": ORIGIN + url}
 
 
 # The two worlds. A surface belongs to one of them and does not blend.
@@ -1319,15 +1326,21 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 {theme_color_meta(world)}
 <title>{esc(full_title)}</title>
 <meta name="description" content="{esc(description)}">
-<link rel="canonical" href="https://europedoor.com{esc(path)}">
+<link rel="canonical" href="{ORIGIN}{esc(path)}">
 <meta property="og:title" content="{esc(full_title)}">
 <meta property="og:description" content="{esc(description)}">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://europedoor.com{esc(path)}">
+<meta property="og:url" content="{ORIGIN}{esc(path)}">
 <meta property="og:site_name" content="{esc(SITE_NAME)}">
 {og_tags(*og) if og else ''}
 <link rel="stylesheet" href="{asset("css/europedoor.css")}">
 <link rel="icon" href="{asset("door.svg")}" type="image/svg+xml">
+<!-- ON EVERY PAGE, NOT ONLY ON /stories. Feed discovery is a browser and
+     reader convention that looks at the document it is given, and a reader
+     who wants to follow this desk is as likely to be standing on a
+     destination page as on the index. One document, one feed, declared in
+     the one place that emits <head>. -->
+<link rel="alternate" type="application/atom+xml" href="/stories/feed.xml" title="EuropeDoor stories">
 {ld(*ld_blocks)}{head_extra}</head>
 <body class="area-{esc(area or 'none')}" data-world="{world}"{f' data-accent="{accent}"' if accent else ''}{' data-hero' if hero else ''}>
 <a class="skip" href="#main">{esc(T("skip"))}</a>

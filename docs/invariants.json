@@ -102,9 +102,9 @@
       "why": "Zero today, because zero photographs are licensed. This moving is the signal that licensed imagery arrived — which must go through the licence register first."
     },
     "weight.home_kb": {
-      "value": 122,
+      "value": 123,
       "kind": "ceiling",
-      "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it is allowed to move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence. 119 -> 146 ON PURPOSE: the body was eight abstract plates over 'Find your kind of Europe' and three more over the journeys — eleven purple gradients in a column under an atlas hero, which is placeholder art doing a picture's job, and the plate system was already measured as unable to carry a hero. Each tile now draws its OWN destinations lit on one shared silhouette: Mountains is the Alps, the Pyrenees, the Carpathians and the Scandes; History is almost the whole continent; and that difference is what the tile exists to say. The plates cost 14.7 KB and came out; 894 dots and one lod0 coastline went in. All of them and never a selection, so the count on the tile is the number of dots on it and a reader can check. 121 -> 136 ON PURPOSE: the doors that replaced those tiles were written for a photograph and the register is empty, so the band rendered as four blocks of type — the one part of the homepage whose job is to make somebody want to go somewhere, doing it entirely in words. The drawing is back under the four headings, and it is the same 512 dots the tiles carried."
+      "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it is allowed to move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence. 119 -> 146 ON PURPOSE: the body was eight abstract plates over 'Find your kind of Europe' and three more over the journeys — eleven purple gradients in a column under an atlas hero, which is placeholder art doing a picture's job, and the plate system was already measured as unable to carry a hero. Each tile now draws its OWN destinations lit on one shared silhouette: Mountains is the Alps, the Pyrenees, the Carpathians and the Scandes; History is almost the whole continent; and that difference is what the tile exists to say. The plates cost 14.7 KB and came out; 894 dots and one lod0 coastline went in. All of them and never a selection, so the count on the tile is the number of dots on it and a reader can check. 121 -> 136 ON PURPOSE: the doors that replaced those tiles were written for a photograph and the register is empty, so the band rendered as four blocks of type — the one part of the homepage whose job is to make somebody want to go somewhere, doing it entirely in words. The drawing is back under the four headings, and it is the same 512 dots the tiles carried. 122 -> 123 ON PURPOSE: the editorial desk publishes an Atom feed, and feed discovery is a convention that reads the document it is handed rather than the one page the feed is about — so the <link rel=alternate> is emitted by the one function that emits <head>, which costs every page on the site about 200 bytes. Declaring it on /stories alone would be cheaper and would mean a reader standing on a destination page cannot subscribe from where they are."
     },
     "weight.max_page_kb": {
       "value": 441,
@@ -145,7 +145,7 @@
         "row": 0.887,
         "card": 0.06,
         "band": 0.758,
-        "note": 0.818,
+        "note": 0.819,
         "facts": 0.758,
         "btn": 0.642,
         "chip": 0.522
