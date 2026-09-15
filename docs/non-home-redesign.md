@@ -196,6 +196,18 @@ Each of these was invisible to every counting check:
    and the next heading.
 8. **A name in a meta row is not a byline** — the word that says so had gone.
 
+9. **A colour sized on one ground fails on the other** — pine reads 4.93 on
+   bone paper and 1.74 on graphite, so seventy of one browser run's 116
+   failures were the wordmark, the current-section marker and the family
+   eyebrows, all below AA for a reader in the dark preference.
+10. **`1fr` is not `minmax(0, 1fr)`**, and an `<svg>` sized in percent still
+    contributes 300 pixels to intrinsic sizing — a phone column came out
+    304.609 inside 288 and the place family scrolled sideways.
+11. **A page had two gutters** — `main`'s and the component layer's — so a
+    band sat at 75px where an h1 on an older family sat at 24.
+12. **A stroke in user units is not a stroke in pixels**, on a chart whose
+    caption names the line and on the aperture's own cut edge.
+
 And one the eye reported and the browser refused: the phone contact sheet
 appeared to show the masthead navigation struck through the wordmark on six of
 twelve families. Measured at 390, the wordmark ends at y=45 and the navigation

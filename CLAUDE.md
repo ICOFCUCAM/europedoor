@@ -1995,6 +1995,76 @@ and a country encyclopedia is one 11px kicker changing hue — terracotta on
 `area-stories`, cobalt on `area-countries`. The accent system is not broken; it
 is doing almost no work. See `docs/design-direction-audit.md`.
 
+**A COLOUR SIZED ON ONE GROUND IS A COLOUR THAT FAILS ON THE OTHER, AND
+SEVENTY OF ONE BROWSER RUN'S 116 FAILURES WERE THAT.** `--pine` is #0F433E:
+4.93 on bone paper and **1.74 on graphite**. The moment the masthead stopped
+being a band of signature colour and became the page's own paper, every
+wordmark and every current-section marker was below AA for a reader in the
+dark preference — and the family accents were the same fault one layer over,
+with `--ed-terracotta`, `--ed-ochre` and `--ed-olive` naming raw hexes that
+read 3.51, 3.66 and 2.98 on graphite. `--door` is the token that already
+carries *this family's accent, in this world*, and its lifts were measured
+against graphite when they were written; naming the hex was a second
+implementation that knew about one ground. Pine as ink is `--pine-ink`,
+declared on `body` and never `:root`, because a `var()` resolves where the
+DECLARATION lives.
+
+**AND BINDING A FAMILY ACCENT TO THE WORLD BROKE THE ONE BAND THAT IS DARK IN
+BOTH.** The arrival head is graphite whatever the preference, so `--door-dark`
+handed it the LIGHT preference's dark terracotta on a dark ground: 2.12:1, the
+same defect arrived at from the other side, in the commit that fixed it. A
+band that is dark whatever the preference needs a colour that is light
+whatever the preference, and the rule saying so has to out-specify the family
+rule — `body[data-family=…] :is(.ed-eyebrow, …)` is (0,2,1).
+
+**A PAGE HAS ONE GUTTER, AND A COMPONENT LAYER QUIETLY ADDED A SECOND.**
+`main` already pads the document — 24px at 1280, 16 on a phone — and every ed-
+component then computed `100% - 2 * --ed-gutter` INSIDE that, so a band sat at
+75px where an h1 on an older family sat at 24 and the masthead sat at 16. The
+browser suite reports it as the masthead disagreeing with the words under it,
+which is a true report of a real inconsistency naming the wrong half: it is
+the component layer that is indented, not the masthead that is out.
+
+**`1fr` IS NOT `minmax(0, 1fr)`, AND AN `<svg>` SIZED IN PERCENT STILL
+CONTRIBUTES 300 PIXELS TO INTRINSIC SIZING.** A `1fr` track has an automatic
+minimum and never shrinks below its items' max-content; the SVG default
+intrinsic width is 300. So a phone column came out 304.609 inside a 288-pixel
+page and dragged the h1, the eyebrow and the intro out with it, and the place
+family scrolled sideways. **`min(100%, min-content)` does not resolve on a
+floor**: a percentage in `min-width` resolves against the containing block,
+and the containing block is a track being sized BY this item, so the
+constraint is circular and the browser treats the percentage as indefinite.
+That form works for a `max-width` on a measure, where the container is already
+sized, and not for a floor on the thing doing the sizing. The track takes the
+zero floor and the heading takes `overflow-wrap: break-word`, which breaks
+ONLY where the alternative is overflow — so the 108px mid-word break that
+floor was written to prevent does not come back at any width where the word
+fits, and at 320, where it does not fit, a broken word beats a page a reader
+cannot put back.
+
+**A STROKE IN USER UNITS IS NOT A STROKE IN PIXELS, AND THE FIX FOR THAT WAS
+MADE AT ONE WIDTH TWICE.** The year band already records it — *1px was not
+enough … the ratio a reader gets is the ratio of the pixel* — and the same 1.5
+that reads at 1280 is sub-pixel at 390 under `preserveAspectRatio="none"`, so
+the baseline sampled 1.00:1 on a phone, on the chart whose caption says "above
+the line is what is on". `vector-effect: non-scaling-stroke` states the width
+in device pixels at every size. The aperture's reveal had it too: 1.4 units
+measured 2.69 against a token computing 4.4.
+
+**AND THE REVEAL WENT WITH THE GROUND, BOTH HALVES OF IT.** The wall's face
+was struck in `--bone` and the wall became `--paper` — #F3F0E6 against
+#F8F6EF is a step of 1.058, the *rounding error with a token name* this file
+refuses for a surface ladder, drawn here as a line nobody can see. The cut
+edge takes the map's own border ink at full opacity, which is the colour that
+already separates a frontier from the land it is drawn on.
+
+**A DERIVED META VALUE FOLLOWS THE THING IT DESCRIBES OR IT IS A SECOND
+IMPLEMENTATION OF IT.** `theme-color` composited `pine-deep` over the ground,
+correctly, until the masthead became paper — and then every Android phone
+showed a dark green strip above a cream page. The masthead paints `--paper`
+over a page that IS `--paper`, so the composite is paper and no blend is
+needed; stating one would be a third implementation of a colour.
+
 **A SUITE THAT CRASHES HAS STOPPED COUNTING, AND IT TAKES THE REST OF THE
 SUITE WITH IT.** The browser run died forty minutes in on
 `document.querySelector(h)` returning null — a destination's contents row
