@@ -1990,7 +1990,16 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
    small because they are asides, not because they are subordinate — styling
    reasoning applied to heading levels produced h1 → h3 skips on every page
    with a note above the first real section. */
-.note h2.mini, .rail h2.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1.25; }
+/* AND `mini` MEANS SMALL WHEREVER IT IS WRITTEN, which it did not. Scoped to
+   a note and a rail, it left 587 of the 1,288 headings carrying the class at
+   full section size — every one of them in `.practical`, which is the three
+   facts under a destination's head (Give it 2-4 nights, When to come, Getting
+   there) and the four under a country's. A fact set at the same weight as
+   Places to see, which has twelve rows beneath it, is the flat hierarchy this
+   page's own movements were added to fix, arriving through a class whose name
+   already said what it wanted. Every use of it on the site is a label over a
+   sentence; none is a section head. */
+h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1.25; }
 .rail h2.mini + p { margin-top: 0; }
 .rail h2.mini:not(:first-child) { margin-top: var(--s4); }
 
@@ -3294,6 +3303,20 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    on the other side of the door. */
 .askband { margin: 0 0 var(--s8); }
 .askband .hero-intents { margin-top: var(--s4); }
+/* THE 464 PIXELS BESIDE THE ONE CONTROL THE HOMEPAGE EXISTS FOR. The form is
+   held at a 44rem measure — right for a label and an input, and it leaves the
+   other four hundred of a 1,168px band empty — while the four examples that
+   show what the box understands sat UNDER it, where a reader who has already
+   looked past the input does not go back up. Beside it they are read in the
+   same glance as the thing they are examples of, and the band is composed
+   rather than left-aligned. */
+@media (min-width: 62rem) {
+  .askband { display: grid; grid-template-columns: minmax(0, 44rem) minmax(0, 1fr);
+             column-gap: var(--s7); align-items: end; }
+  .askband .hero-intents { margin: 0; flex-direction: column; align-items: start;
+                           gap: var(--s2); }
+}
+
 /* COUNTRY = IDENTITY. The name beside the shape, and the shape in a tall
    door. The homepage's opening is wide because a continent is wide; a
    country is a figure and stands in a figure's doorway. The aperture's
