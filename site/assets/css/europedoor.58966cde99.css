@@ -3714,10 +3714,24 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    its example by 6px at 390 and 37px at 320. A hint a reader cannot read is
    worse than no hint. Below the width where the example fits, the box takes
    the body size, which is still the second largest type on the page. */
+/* THE FIELD HAD NO EDGE. `--paper` on a `--paper` band with a transparent
+   border: measured on the shipped page, the input painted rgb(247,246,243)
+   and so did the body, so the one control the homepage exists to be was an
+   invisible rectangle with a hint floating in it. It is the label's own
+   failure, two rules down and already written up — limestone on limestone,
+   1.00:1 — and the fill was left behind when the label was fixed. It was
+   right while the form sat INSIDE the hero, where paper on graphite is a
+   field; it moved out to the light band and kept it.
+
+   A RULE, NOT A BOX. `/search` already decided this: border, fill, radius
+   and shadow each say "separate object, placed here by a system", and that
+   is the wrong sentence about the control a page exists to be. A line under
+   the words is what a form has always been on paper. */
 .askhero input { width: 100%; font: inherit; font-size: var(--t-md);
-                 padding: var(--s4); border: 1px solid transparent; border-radius: var(--radius);
-                 background: var(--paper); color: var(--ink); }
-.askhero input:focus-visible { border-color: var(--signature); }
+                 padding: var(--s3) 0; border: 0; border-bottom: 2px solid var(--ink-3);
+                 border-radius: 0; background: none; color: var(--ink); }
+.askhero input::placeholder { color: var(--ink-3); }
+.askhero input:focus-visible { outline: none; border-bottom-color: var(--signature); }
 /* AFTER the base rule, not before it. A media query adds no specificity, so
    written above `.askhero input` this lost to it at every width and changed
    nothing — the same trap this stylesheet already records about the 64rem
