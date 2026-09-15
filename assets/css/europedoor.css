@@ -4551,7 +4551,19 @@ body[data-hero] .masthead { position: sticky; }
 /* 11px, not 10: the map labels are already 11 and a scale bar is not worth
    a seventeenth font size on a site that holds sixteen. The invariant
    register caught it in the same commit that introduced it. */
-.scalebar text { font-family: var(--text); font-size: 11px; letter-spacing: .06em;
+/* AND IT IS THE FIFTH LABEL FAMILY TO BE SIZED IN VIEWBOX UNITS AND CALLED
+   PIXELS. 11 units in a 1000-unit viewBox is 11 x (width/1000) on screen:
+   15px at 1280, 10 at 834 and **5 at 390**. The place names, the peaks, the
+   physical features and the range names each hit this and each took the --z
+   compensation; the bar was written after all four and inherited none of it,
+   on the one piece of type that exists to be read as a MEASUREMENT. A
+   distance nobody can read is the journey-page failure in a different
+   costume.
+
+   It takes --z on its own group rather than through `.minimap:not(.dense)`,
+   because a dense map hides its place names and must still say how far. */
+.scalebar text { font-family: var(--text); font-size: calc(11px / var(--z));
+                 letter-spacing: .06em;
                  fill: color-mix(in srgb, var(--limestone) 62%, transparent); }
 
 /* The aperture draws in its OWN ink, not the page's.
@@ -5196,6 +5208,8 @@ body[data-hero] .masthead { position: sticky; }
    an 11px label to 9.4px at 390. */
 @media (max-width: 44rem) {
   .minimap:not(.dense) { --z: .42; }
+  /* The scale bar, on a dense map too — see the note beside `.scalebar`. */
+  .minimap .scalebar { --z: .42; }
   /* A LABEL IS A LABEL. The physical names were written after this rule and
      inherited none of it: `.peakname`, `.fname` and `.sname` were sized in
      a fixed px inside a scaled viewBox, which is the defect the paragraph

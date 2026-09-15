@@ -5771,7 +5771,7 @@ def hit_radius(pts, vw, cap=34.0, floor=6.0):
 PHONE_LABEL_SCALE = 26.0 / 11.0
 
 
-def phone_declutter(placed):
+def phone_declutter(placed, reserve=()):
     """Which of these labels still fit once a phone enlarges them.
 
     ENLARGING THE TYPE BROKE THE RULE THAT PLACED IT.
@@ -5799,7 +5799,12 @@ def phone_declutter(placed):
     on a desk and a box grown by 2.36 about it is a box around nothing. Every
     other family here does take the rule, which is why the default is it.
     """
-    kept, out = [], []
+    # A BOX THIS PASS MUST KEEP OUT OF AND NEVER DROP. The scale bar is placed
+    # by arithmetic rather than by the placement rule, so it is not in
+    # `placed` and cannot lose; the destination plate has seeded it as a
+    # zero-markup entry since the day the bar was added and `pointsmap` never
+    # did. It matters now the bar's own type takes the phone enlargement.
+    kept, out = list(reserve), []
     # THE SAME CLEARANCE EVERY OTHER PASS KEEPS, scaled with the boxes. This
     # tested bare overlap, so two names could be placed touching: measured at
     # 390 px, four plates had a pair meeting by up to two pixels. Not visible,
@@ -6102,7 +6107,10 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
     # knows. A map with two names can afford to draw them at two and a half
     # times the size on a phone; one with forty-one cannot, and its names are
     # in the list underneath the figure on every page that draws it.
-    lab = phone_declutter(lab)
+    bx, by, bw_, bh_ = bar_box
+    bcx, bcy = bx + bw_ / 2.0, by + bh_ / 2.0
+    gw, gh = bw_ * PHONE_LABEL_SCALE, bh_ * PHONE_LABEL_SCALE
+    lab = phone_declutter(lab, reserve=[(bcx - gw / 2.0, bcy - gh / 2.0, gw, gh)])
     dense = dense_class("".join(lab))
     # ONE RENDERER FOR EVERY PICTURE. A region, a journey, a story and a
     # motion are all "these places, on the real coastline, through the door",
