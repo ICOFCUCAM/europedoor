@@ -8263,6 +8263,21 @@ Europe. Coastline from <a href="/sources">Natural Earth</a>, public domain.</p>
 
 
 def story_page(data, s):
+    # THE ESSAY HEAD IS A `pagehead` VARIANT, like the other five family
+    # heads. It was a free-standing `.essayhead`, which cost two things
+    # nobody had counted: nine pages declared no head ROLE, because the role
+    # check reads a `.pagehead` and there was none to read, and the
+    # `pagehead` primitive's reach floor was nine pages short of the truth.
+    # An essay is an overture by that check's own definition — one thing, and
+    # the name is the event. Visually neutral, because `.essayhead`'s rules
+    # sit later in the stylesheet at equal specificity, so its margin and its
+    # type scale still win.
+    #
+    # AND THE REASON ABOVE WAS FIRST WRITTEN AS AN HTML COMMENT, which ships.
+    # This file already records that failure once, on the homepage, where the
+    # weight invariant caught it; here it was `c_no_fake_entity`, because the
+    # sentence contained the word "AS" and \bAS\b is a Norwegian company
+    # form. A reason belongs in the source that writes the page.
     paras = "".join(f"<p>{esc(p)}</p>" for p in s["body"])
     updated = ("" if s["updated"] == s["published"]
                else f', updated <time datetime="{esc(s["updated"])}">{esc(s["updated"])}</time>')
@@ -8307,7 +8322,7 @@ def story_page(data, s):
     body = f"""
 {crumbs([("Europe", "/discover"), ("Stories", "/stories"), (s["title"], None)])}
 <article class="essay">
-<div class="essayhead">
+<div class="pagehead overture essayhead">
   <p class="kicker">{esc(s['section'])} · {esc(s['reading'])}</p>
   <h1>{esc(s['title'])}</h1>
   <p class="deck">{esc(s['standfirst'])}</p>

@@ -5304,13 +5304,34 @@ def c_pagehead_role():
         "/api-docs", "/experiences/join", "/for-businesses",
         "/for-tourism-boards", "/sources/freshness",
     }
+    # AND A PAGE WITH NO HEAD AT ALL WAS SILENTLY SKIPPED, WHICH IS THE HOLE
+    # THIS CHECK EXISTS TO CLOSE. Two of them, measured: the pattern read
+    # `<div class="pagehead`, and `indexhero` emits a `<header>` — so the
+    # twenty-three index heroes were never examined, every one of them
+    # correctly declaring `index`. And nine story pages carried a
+    # free-standing `.essayhead` rather than a `pagehead` variant, so the
+    # family that most needs a declared role had none and nothing said so.
+    # A page whose head this cannot find is now named or it fails, which is
+    # the same rule the prose list below already states.
+    NO_HEAD = {
+        # The homepage's head IS the hero: the masthead stands on the
+        # limestone wall above an arch cut at the largest size it appears
+        # anywhere, and a `pagehead` under it would be a second one.
+        "/",
+    }
     ROLES = ("overture", "index", "instrument")
     n = 0
     for path in site_files():
         r = canonical_of(path)
         h = open(path, encoding="utf-8").read()
-        m = re.search(r'<div class="pagehead([^"]*)"', h)
+        m = re.search(r'<(?:div|header) class="pagehead([^"]*)"', h)
         if not m:
+            if r not in NO_HEAD:
+                fail(f"{r}: no page head at all. Every page declares what kind "
+                     f"of page it is through the `pagehead` primitive, or it "
+                     f"is named in this check with the reason — a family that "
+                     f"grows its own head is a family with no role, which is "
+                     f"how twenty-one of them ended up sharing one.")
             continue
         n += 1
         got = [x for x in ROLES if x in m.group(1)]
