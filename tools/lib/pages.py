@@ -7865,7 +7865,8 @@ def offframe_line(pts, data, listed=True):
             + "in the list below.")
 
 
-def constellation(pts, extra="", route=False, frame=False, cut=False):
+def constellation(pts, extra="", route=False, frame=False, cut=False,
+                  ocean=True):
     """A set of real destinations lit on the shared silhouette.
 
     THE ARGUMENT DRAWN, AND THE REASON IT REPLACED ELEVEN PAINTINGS. The
@@ -7916,8 +7917,28 @@ def constellation(pts, extra="", route=False, frame=False, cut=False):
     # than the measured one for the same reason.
     cut = cut_fade("ih", MAP_W, MAP_H, dusk_reach(), cls="datacut") if cut and not (
         frame and pts) else ""
+    # WATER, A COAST AND CLOSED SEAMS — the three things this drawing never
+    # had. It was one flat grey silhouette on the page's own paper: no sea,
+    # so a bay and the margin are the same colour; no coast, so the edge is
+    # mushy; and the lod0 rings are simplified per country, so independently
+    # thinned neighbours leave white cracks running through the landmass.
+    # `.card-map` has painted the water since the cartography split and this
+    # family never got it.
+    #
+    # The ocean is a rect on the glyph's own frame rather than a background on
+    # whatever contains it, because the containers disagreed: a card painted
+    # it, a row did not, and the same drawing came out a picture in one and a
+    # stain in the other. The coast is a `<use>` UNDER the land stroked wider
+    # — only the half outside the fill shows, which is exactly the coast and
+    # never an internal frontier, because a neighbour's fill covers it.
+    vx, vy, vw, vh = (float(n) for n in view.split())
+    ground = (f'<rect class="glyph-sea" x="{vx:.0f}" y="{vy:.0f}" '
+              f'width="{vw:.0f}" height="{vh:.0f}"/>') if ocean else ""
+    bounds = '<use class="glyph-bounds" href="#constel-eu"/>' if ocean else ""
     return (f'<svg class="constel{extra}" viewBox="{view}" '
-            f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
+            f'aria-hidden="true" focusable="false">{ground}'
+            f'<use class="glyph-land" href="#constel-eu"/>'
+            f'{bounds}'
             f'{cut}{line}<g class="constel-lit">{dots}</g></svg>')
 
 

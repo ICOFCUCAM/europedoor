@@ -5408,7 +5408,25 @@ body[data-hero] .masthead { position: sticky; }
    colour this palette reserves for things DRAWN rather than read — and a
    mark carries a hairline of the ground so it separates from whatever it
    sits on. Nothing here is a new colour. */
-.constel { fill: var(--atlas-far); stroke: none; }
+/* THE GLYPH IS A MAP, SO IT HAS WATER. It was one flat grey silhouette on
+   the page's own paper — no sea, no coast, and white cracks between
+   countries where lod0 thins each ring on its own. Three declarations fix
+   all three: the sea is drawn, the land carries a stroke in its own colour
+   to close the seams, and a wider stroke under it shows only outside the
+   fill, which is exactly the coast. Same four tones the plates and the card
+   maps already use. */
+.constel { fill: var(--atlas-land); stroke: none; }
+.constel .glyph-sea { fill: var(--atlas-sea); }
+.constel .glyph-land { fill: var(--atlas-land); stroke: var(--atlas-land);
+                       stroke-width: 1.4; stroke-linejoin: round; }
+/* Frontiers rather than a coast pass. A coastline in ink is invisible against
+   deep water — the land/sea step already IS the coast — and what the drawing
+   actually lacked is the hairline between one country and the next, which is
+   what makes a shape read as an atlas rather than a silhouette. Fill none, so
+   the same clone draws every ring. */
+.constel .glyph-bounds { fill: none; stroke: var(--atlas-coast);
+                         stroke-width: .9; stroke-linejoin: round;
+                         opacity: .45; }
 .constel-lit circle { fill: var(--cobalt); }
 .themerow:hover .constel-lit circle { fill: var(--cobalt-deep); }
 /* And the row is baseline-aligned, which is right for two columns of type and
