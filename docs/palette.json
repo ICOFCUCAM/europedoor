@@ -1,591 +1,585 @@
 {
-  "$comment": "The EuropeDoor palette, as data rather than as prose. tools/checks.py recomputes the WCAG 2.2 contrast of every pair below and fails the build if a role claimed here is not one the colour can actually hold. A palette written only in a document is a palette that drifts: a hex nudged 'slightly warmer' in a redesign takes a contrast ratio with it, and nothing complains until somebody cannot read a link. This file has already failed its own author twice — see the notes on cobalt-lift and on cobalt.",
-  "philosophy": "European Future — editorial x architectural x cinematic x intelligent",
-  "gold": "None. Brass was the only gold token in the previous system and it is removed. Gold says luxury, premium, heritage, wealth; this product has to say Europe, discovery, movement, intelligence, culture, future. Pine against graphite reads as European digital infrastructure; gold against anything reads as a luxury travel agency.",
-  "worlds": {
-    "discover": {
-      "role": "Light, warm, editorial, human. Where people fall in love with Europe: the homepage, destinations, places, experiences, culture, food, stories, photography-led browsing.",
-      "ground": "limestone",
-      "surface": "limestone-2",
-      "ink": "graphite",
-      "action": "pine-deep"
-    },
-    "intelligence": {
-      "role": "Dark, graphite, quietly luminous. Where people meet the machine: the map, the planner, My Europe, search and filter intelligence, journey construction, personalisation, saved journeys, route intelligence, EuropeDoor Guide.",
-      "ground": "graphite",
-      "surface": "graphite-2",
-      "ink": "limestone",
-      "action": "pine-lift"
-    }
+ "$comment": "The EuropeDoor palette, as data rather than as prose. tools/checks.py recomputes the WCAG 2.2 contrast of every pair below and fails the build if a role claimed here is not one the colour can actually hold. A palette written only in a document is a palette that drifts: a hex nudged 'slightly warmer' in a redesign takes a contrast ratio with it, and nothing complains until somebody cannot read a link. This file has already failed its own author twice — see the notes on cobalt-lift and on cobalt.",
+ "philosophy": "European Future — editorial x architectural x cinematic x intelligent",
+ "gold": "None. Brass was the only gold token in the previous system and it is removed. Gold says luxury, premium, heritage, wealth; this product has to say Europe, discovery, movement, intelligence, culture, future. Pine against graphite reads as European digital infrastructure; gold against anything reads as a luxury travel agency.",
+ "worlds": {
+  "discover": {
+   "role": "Light, warm, editorial, human. Where people fall in love with Europe: the homepage, destinations, places, experiences, culture, food, stories, photography-led browsing.",
+   "ground": "limestone",
+   "surface": "limestone-2",
+   "ink": "graphite",
+   "action": "pine-deep"
   },
-  "accents": {
-    "$comment": "Inside DISCOVER the accent says what KIND of thing is being read. In INTELLIGENCE there is one accent and it is cobalt-air, which was measured for that ground in the DISCOVER-dark block before it was needed here. It was electric lime until the accent was found to be drawing geography: every route, every dot and every lit country, which is not five per cent of anything.",
-    "structural": {
-      "token": "pine-deep",
-      "where": "the default: homepage, countries, regions, destinations, journeys"
-    },
-    "cultural": {
-      "token": "terracotta",
-      "where": "stories, events, experiences — the human half of DISCOVER"
-    },
-    "heritage": {
-      "token": "atlantic",
-      "where": "how this project knows what it claims: /method, /sources, /fund, /sources/freshness"
-    },
-    "machine": {
-      "token": "pine-air",
-      "where": "INTELLIGENCE only. 7.06 on the graphite ground, 6.31 on the card and 6.04 on the deep surface, so it is a read colour on all three — which electric lime was too, and it was never the contrast that failed"
-    }
-  },
-  "cartography": {
-    "$comment": "THE PICTURES WERE GIVEN A CARTOGRAPHY AND THE INSTRUMENTS WERE NOT. docs/cartography.md splits every drawing on what it IS — a picture is paper, an instrument is graphite — and the picture half got a four-step ocean, a land family, an ink coast and a lit subject, every one of them measured. The instrument half kept five raw hexes invented before European Future (#0a1220, #253546, #1b2735, #4a6480, #3a6299): navy rather than graphite, in no token here, recomputed by no check. Land against water measured 7.91 on the pictures and 1.50 on /map, and a country outside the subject measured 1.24, which is not a quiet country but a country that is not drawn. These rows are the ladder, and checks.py recomputes every one from the hexes in assets/css/europedoor.css rather than from a copy kept here, so the stylesheet and the register cannot drift apart.",
-    "why_a_separation_and_not_a_claim": "A claim above says a colour may carry TEXT on a ground. These say two drawn areas must be distinguishable from each other. WCAG 2.2 SC 1.4.11 puts a graphical object's boundary at 3:1, which is why the coast rows are 3.0 and the land rows are lower: a fill that reads as a mass and an edge that is unambiguous are two different jobs, and the instrument had neither.",
-    "separations": [
-      {
-        "a": "--map-land",
-        "b": "--map-sea",
-        "min": 1.8,
-        "was": 1.5,
-        "why": "the land is a mass, not a hairline. Europe is what the light falls on — the hero's reading, applied to the instrument"
-      },
-      {
-        "a": "--map-context",
-        "b": "--map-sea",
-        "min": 1.35,
-        "was": 1.24,
-        "why": "a country outside the subject is still drawn. 1.24 is not quiet, it is absent"
-      },
-      {
-        "a": "--map-land",
-        "b": "--map-context",
-        "min": 1.25,
-        "was": 1.21,
-        "why": "three tiers — water, context, subject — and each step has to be visible or there are two"
-      },
-      {
-        "a": "--map-coast",
-        "b": "--map-sea",
-        "min": 3.0,
-        "why": "SC 1.4.11: the boundary of a graphical object. The instrument had no coast token at all"
-      },
-      {
-        "a": "--map-coast",
-        "b": "--map-land",
-        "min": 3.0,
-        "why": "the same edge read from the other side"
-      },
-      {
-        "a": "--map-border",
-        "b": "--map-land",
-        "min": 1.6,
-        "why": "a frontier is a line drawn ON land and is quieter than a coast, which is where land meets sea. Both were one stroke"
-      },
-      {
-        "a": "--map-hover",
-        "b": "--map-land",
-        "min": 3.0,
-        "was": 1.29,
-        "why": "the selected country replaces the land it sits on, so it has to clear the land. cobalt-air is the declared INTELLIGENCE accent and was already measured for this ground"
-      },
-      {
-        "a": "--atlas-land",
-        "b": "--atlas-sea",
-        "min": 6.0,
-        "why": "the picture half, recorded so the two halves are one register and the good one cannot quietly follow the bad one down"
-      },
-      {
-        "a": "--atlas-coast",
-        "b": "--atlas-land",
-        "min": 3.0,
-        "why": "the ink coast on paper — the relationship the instrument now has inverted"
-      },
-      {
-        "a": "--map-shore-1",
-        "b": "--map-sea",
-        "min": 1.35,
-        "why": "the shore band nearest the coast. The instrument's sea was ONE value where the picture's is four, so the Baltic, the Adriatic and the open Atlantic were the same near-black and an inland sea read as a hole in the continent"
-      },
-      {
-        "a": "--map-shore-2",
-        "b": "--map-sea",
-        "min": 1.18,
-        "why": "the middle step of the same cast"
-      },
-      {
-        "a": "--map-shore-3",
-        "b": "--map-sea",
-        "min": 1.06,
-        "why": "the widest and faintest, far from any coast"
-      },
-      {
-        "a": "--map-here",
-        "b": "--map-land",
-        "min": 1.9,
-        "why": "the subject is the brightest LAND, not the accent. Binding it to cobalt-air filled a quarter of every country reference map in periwinkle — a continent drawn in the accent, which is the failure that removed electric lime, arriving through a different token"
-      },
-      {
-        "a": "--map-here",
-        "b": "--map-sea",
-        "min": 3.0,
-        "why": "and it still has to clear the water it sits in"
-      },
-      {
-        "a": "--map-hereline",
-        "b": "--map-here",
-        "min": 3.0,
-        "why": "the finest heaviest edge. An atlas separates its subject by an edge rather than by a loud fill"
-      },
-      {
-        "a": "--atlas-frontier",
-        "b": "--atlas-land",
-        "min": 3.0,
-        "why": "a frontier is a claim ABOUT the ground and a coastline is the ground, and both were drawn in the same ink at 8.44 on the land — so the hierarchy the cartography document states was two tenths of a unit of stroke width. It still has to clear 3:1, because an invisible border is not restraint"
-      },
-      {
-        "a": "--atlas-here",
-        "b": "--atlas-land",
-        "min": 1.25,
-        "why": "the picture half's subject against its neighbours. It had no separation because it had no COLOUR: the fill was a translucent white, and on a portrait there is no land under it — only the sea rect — so Austria shipped at #ccd9e1 against #d3cfc5 neighbours, a cold country in a warm frame. 1.31 is the editorial atlas convention, the subject as paper and the neighbours as a half-tone"
-      },
-      {
-        "a": "--atlas-hereline",
-        "b": "--atlas-here",
-        "min": 3.0,
-        "why": "SC 1.4.11 on the subject's own frontier. The step between subject and neighbour is deliberately small, so the line is what carries the boundary and it has to clear it"
-      }
-    ],
-    "ladder": {
-      "$comment": "ORDER IS THE CLAIM, and a per-pair minimum cannot state it. The water lightens as it approaches a shore — that is DISTANCE FROM LAND, the one thing a coastline can tell us, and never a claim about depth: this atlas holds no bathymetry. A ramp whose middle step is darker than its outer one is still three distinct colours and passes every pairwise floor while drawing the opposite of what it says. The subject and its edge are the top of the same ladder: an atlas's subject is the brightest land, so it belongs on the land's own scale rather than beside it.",
-      "tokens": [
-        "--map-sea",
-        "--map-shore-3",
-        "--map-shore-2",
-        "--map-shore-1",
-        "--map-land",
-        "--map-here",
-        "--map-hereline"
-      ],
-      "direction": "increasing"
-    },
-    "hierarchy": {
-      "$comment": "The coast must be decisively heavier than the frontier, or the two lines say the same thing. Stated as a RATIO of their contrasts against the land rather than as two absolute numbers, because what matters is the gap between them.",
-      "stronger": "--atlas-coast",
-      "weaker": "--atlas-frontier",
-      "against": "--atlas-land",
-      "min_gap": 1.8
-    }
-  },
-  "ratio": {
-    "$comment": "The ratio is the instruction, not the hex codes. A palette gives you a blue website with gold buttons; a ratio gives you European editorial design over futuristic infrastructure.",
-    "limestone": 60,
-    "graphite": 25,
-    "pine": 10,
-    "accent": 5,
-    "$measured": "MEASURED ON THE PIXELS A READER IS PAINTED, over twelve pages spanning both worlds and six families at 1280x900, classified by chroma: limestone 64.1, graphite 18.9, water 9.7, cobalt 7.0, accent 0.3. THE FIRST VERSION OF THIS MEASUREMENT COUNTED THE SEA AS THE SIGNATURE and reported cobalt at 16.6 against a declared 10 — a finding about the masthead that was mostly the Atlantic. The two families do not overlap: the ocean ramp and the atlas water run 202-205 degrees of hue and every cobalt runs 228-230. Split, cobalt sits UNDER its budget on all twelve pages and varies between 6 and 8 — the masthead and the links, and almost nothing else. Water has no line here because it is the DRAWINGS rather than the interface; it is measured and held under a ceiling so that stays true. The one number that disagrees with its declaration is the accent: 5 declared, 0.3 delivered, which is the design-direction audit's finding with a figure under it. Terracotta and atlantic are the whole art-directional difference between a magazine story and a country encyclopedia and they are spent on an 11px kicker and its eyebrow rule. Making them a GROUND is refused - 'generic tourism blue as a page background' is on the never list and a terracotta one is the same mistake in a warmer hue - so the gap is recorded rather than closed. tools/browser-checks.js measures this on every run and holds bands rather than targets: a country page is nearly all paper and /map is nearly all graphite, and both are correct.",
-    "$bands": {
-      "$comment": "The hue windows the ratio is measured in, as DATA rather than as a condition typed into the suite. Everything outside them is the accent. checks.py asserts that the tokens each band is named for actually fall inside it, so moving a colour without moving its band fails the build.",
-      "water": [
-        190,
-        218
-      ],
-      "signature": [
-        140,
-        178
-      ]
-    }
-  },
-  "tokens": {
-    "graphite": {
-      "hex": "#121612",
-      "name": "Deep Graphite",
-      "role": "the intelligence foundation. Ink in the light world, ground in the dark"
-    },
-    "graphite-2": {
-      "hex": "#1a201a",
-      "name": "Graphite Surface",
-      "role": "cards and raised surfaces in the dark world"
-    },
-    "graphite-3": {
-      "hex": "#232a22",
-      "name": "Graphite Deep",
-      "role": "the deepest dark surface: tracks, wells and the raised step a card's own furniture sits on. It measured 1.045 against the card — a rounding error with a token name, so every progress track and score bar on a dark card was drawn on its own colour. It was sized so cobalt-lift would clear AA on it, which is a claim about the link colour deciding the size of a surface"
-    },
-    "limestone": {
-      "hex": "#f2f0e8",
-      "name": "Bone",
-      "role": "the DISCOVER ground. Never pure white, and warmer than the limestone it replaced: this palette is bone paper, pine ink and a warm cultural accent"
-    },
-    "limestone-2": {
-      "hex": "#e8e5da",
-      "name": "Bone Surface",
-      "role": "cards and raised surfaces in the light world"
-    },
-    "limestone-3": {
-      "hex": "#dcd8c9",
-      "name": "Bone Deep",
-      "role": "tracks, wells and the deepest light surface"
-    },
-    "pine": {
-      "hex": "#2e7157",
-      "name": "European Pine",
-      "role": "the signature, for things DRAWN rather than read: the mark, score bars, map marks. 5.09 on bone and 4.07 on bone-deep, so not text"
-    },
-    "pine-deep": {
-      "hex": "#1e4636",
-      "name": "Pine Deep",
-      "role": "every pine that is text or an action in the light world"
-    },
-    "pine-lift": {
-      "hex": "#55a07e",
-      "name": "Pine Lift",
-      "role": "links and interactive elements on dark surfaces. Chosen against the THIRD surface, not the ground: 5.84 / 5.31 / 4.71"
-    },
-    "pine-air": {
-      "hex": "#7fbfa1",
-      "name": "Pine Air",
-      "role": "hover and the DISCOVER accent for a dark-preference reader"
-    },
-    "atlantic": {
-      "hex": "#4a5326",
-      "name": "Olive",
-      "role": "heritage and provenance. IT HAD TO MOVE. Atlantic green sat ten degrees of hue from the new pine and the register refuses that pair at 25 — a contrast ratio cannot see it, which is exactly why the rule exists. Olive is 84 degrees from pine and 53 from terracotta"
-    },
-    "atlantic-lift": {
-      "hex": "#a3b167",
-      "name": "Olive Lift",
-      "role": "the same, for a dark-preference reader: #4a5326 is 2.22:1 on graphite"
-    },
-    "terracotta": {
-      "hex": "#a4491f",
-      "name": "Terracotta",
-      "role": "the warm cultural accent: stories, events, experiences"
-    },
-    "terracotta-2": {
-      "hex": "#8a3a17",
-      "name": "Terracotta Deep",
-      "role": "the same, on limestone-3, where #a4491f measures 4.48 and just misses"
-    },
-    "terracotta-lift": {
-      "hex": "#e08a5c",
-      "name": "Terracotta Lift",
-      "role": "the cultural accent for a dark-preference reader: #a4491f is 3.17:1 on graphite"
-    },
-    "warn": {
-      "hex": "#981f31",
-      "name": "Advisory Red",
-      "role": "a travel advisory, a failed step, a destructive action. The one colour that must not read as the brand, and — measured as a hue distance rather than as a contrast ratio — must not read as the cultural accent either"
-    },
-    "warn-lift": {
-      "hex": "#ee8192",
-      "name": "Advisory Lift",
-      "role": "the same, on the graphite ground, where #981f31 measures 1.84"
-    }
-  },
-  "claims": [
-    {
-      "fg": "graphite",
-      "bg": "limestone",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "graphite",
-      "bg": "limestone-2",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "graphite",
-      "bg": "limestone-3",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "limestone",
-      "bg": "graphite",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "limestone",
-      "bg": "graphite-2",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "limestone",
-      "bg": "graphite-3",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "pine-deep",
-      "bg": "limestone",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "pine-deep",
-      "bg": "limestone-2",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "pine-deep",
-      "bg": "limestone-3",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "limestone",
-      "bg": "pine-deep",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "pine",
-      "bg": "limestone",
-      "text": false,
-      "ui": true
-    },
-    {
-      "fg": "pine-lift",
-      "bg": "graphite",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "pine-lift",
-      "bg": "graphite-2",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "pine-lift",
-      "bg": "graphite-3",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "graphite",
-      "bg": "pine-lift",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "pine-air",
-      "bg": "graphite",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "atlantic",
-      "bg": "limestone",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "atlantic",
-      "bg": "limestone-2",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "limestone",
-      "bg": "atlantic",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "atlantic-lift",
-      "bg": "graphite",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "atlantic-lift",
-      "bg": "graphite-2",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "terracotta",
-      "bg": "limestone",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "terracotta",
-      "bg": "limestone-2",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "limestone",
-      "bg": "terracotta",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "terracotta-2",
-      "bg": "limestone-3",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "terracotta-lift",
-      "bg": "graphite",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "terracotta-lift",
-      "bg": "graphite-2",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "pine-air",
-      "bg": "graphite",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "pine-air",
-      "bg": "graphite-2",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "pine-air",
-      "bg": "graphite-3",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "warn",
-      "bg": "limestone",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "warn",
-      "bg": "limestone-2",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "warn-lift",
-      "bg": "graphite",
-      "text": true,
-      "ui": true
-    },
-    {
-      "fg": "warn-lift",
-      "bg": "graphite-2",
-      "text": true,
-      "ui": true
-    }
-  ],
-  "forbidden": [
-    {
-      "fg": "pine",
-      "bg": "limestone-3",
-      "why": "4.04 — the signature is a drawn colour, not a read one. Use cobalt-deep."
-    },
-    {
-      "fg": "pine",
-      "bg": "graphite",
-      "why": "3.52 — a UI edge at most, never a link. Use cobalt-lift."
-    },
-    {
-      "fg": "pine-lift",
-      "bg": "limestone",
-      "why": "3.13 — the dark world's link colour is a UI edge at most on light."
-    },
-    {
-      "fg": "pine-air",
-      "bg": "limestone",
-      "why": "2.44 — the dark world's accent is a UI edge at most on paper."
-    },
-    {
-      "fg": "terracotta",
-      "bg": "graphite",
-      "why": "3.17 — the cultural accent has to lift at night. Use terracotta-lift."
-    },
-    {
-      "fg": "atlantic",
-      "bg": "graphite",
-      "why": "1.81 — a heading nobody can see. Use atlantic-lift."
-    },
-    {
-      "fg": "terracotta",
-      "bg": "limestone-3",
-      "why": "4.48 — just misses. Use terracotta-2."
-    },
-    {
-      "fg": "warn",
-      "bg": "graphite",
-      "why": "1.84 — an advisory nobody can see. Use warn-lift."
-    }
-  ],
-  "never": [
-    "gold or brass as a primary, a signature, or on anything interactive",
-    "navy and gold as the primary pair",
-    "generic tourism blue as a page background",
-    "neon cyberpunk",
-    "gradient as decoration rather than as atmosphere",
-    "glassmorphism",
-    "stock-tourist photography",
-    "imagery that reads as AI-generated",
-    "the letters A and I in the masthead, the navigation, or any h1",
-    "electric lime, anywhere: it was the dark world's accent and it ended up drawing continents",
-    "ultramarine as a CSS colour. It is real in this product and it is not a page colour: it is the violet end of the PLATE ramp, hue 244° in render.PLATE_HUES. As a custom property it was declared for the life of this palette and spent by no rule, while the register went on recomputing a contrast claim about it on every build — arithmetic about a colour the site does not ship"
-  ],
-  "distinct": {
-    "$comment": "A CONTRAST RATIO CANNOT SAY THAT TWO COLOURS ARE DIFFERENT COLOURS. It is a ratio of luminances, so two hues at the same lightness always measure 1.0 — and every contrast check on this site passed while the advisory red and the cultural accent sat fourteen degrees apart at identical saturation and identical lightness. A travel advisory and a story kicker were the same colour to the eye, on the map, on the tags and in the notes. These pairs must be told apart by HUE, which is the property a ratio cannot see.",
-    "min_hue_degrees": 25,
-    "pairs": [
-      [
-        "warn",
-        "terracotta"
-      ],
-      [
-        "warn-lift",
-        "terracotta-lift"
-      ],
-      [
-        "warn",
-        "pine-deep"
-      ],
-      [
-        "atlantic",
-        "pine-deep"
-      ],
-      [
-        "warn-lift",
-        "pine-air"
-      ],
-      [
-        "atlantic-lift",
-        "pine-lift"
-      ]
-    ]
-  },
-  "surfaces": {
-    "$comment": "A SURFACE LADDER IS A LADDER, and a per-pair contrast claim cannot say so. The light world steps 1.09 and 1.12; the dark world stepped 1.12 and then 1.045, which is the card with a different name — so every track, well and score bar on a dark card was drawn on its own colour. Each consecutive pair has to be a step a reader can see.",
-    "min_step": 1.06,
-    "ladders": [
-      [
-        "limestone",
-        "limestone-2",
-        "limestone-3"
-      ],
-      [
-        "graphite",
-        "graphite-2",
-        "graphite-3"
-      ]
-    ]
+  "intelligence": {
+   "role": "Dark, graphite, quietly luminous. Where people meet the machine: the map, the planner, My Europe, search and filter intelligence, journey construction, personalisation, saved journeys, route intelligence, EuropeDoor Guide.",
+   "ground": "graphite",
+   "surface": "graphite-2",
+   "ink": "limestone",
+   "action": "pine-lift"
   }
+ },
+ "accents": {
+  "$comment": "Inside DISCOVER the accent says what KIND of thing is being read. In INTELLIGENCE there is one accent and it is cobalt-air, which was measured for that ground in the DISCOVER-dark block before it was needed here. It was electric lime until the accent was found to be drawing geography: every route, every dot and every lit country, which is not five per cent of anything.",
+  "structural": {
+   "token": "pine-deep",
+   "where": "the default: homepage, countries, regions, destinations, journeys"
+  },
+  "cultural": {
+   "token": "terracotta",
+   "where": "stories, events, experiences — the human half of DISCOVER"
+  },
+  "heritage": {
+   "token": "atlantic",
+   "where": "how this project knows what it claims: /method, /sources, /fund, /sources/freshness"
+  },
+  "machine": {
+   "token": "pine-air",
+   "where": "INTELLIGENCE only. 7.06 on the graphite ground, 6.31 on the card and 6.04 on the deep surface, so it is a read colour on all three — which electric lime was too, and it was never the contrast that failed"
+  }
+ },
+ "cartography": {
+  "$comment": "THE PICTURES WERE GIVEN A CARTOGRAPHY AND THE INSTRUMENTS WERE NOT. docs/cartography.md splits every drawing on what it IS — a picture is paper, an instrument is graphite — and the picture half got a four-step ocean, a land family, an ink coast and a lit subject, every one of them measured. The instrument half kept five raw hexes invented before European Future (#0a1220, #253546, #1b2735, #4a6480, #3a6299): navy rather than graphite, in no token here, recomputed by no check. Land against water measured 7.91 on the pictures and 1.50 on /map, and a country outside the subject measured 1.24, which is not a quiet country but a country that is not drawn. These rows are the ladder, and checks.py recomputes every one from the hexes in assets/css/europedoor.css rather than from a copy kept here, so the stylesheet and the register cannot drift apart.",
+  "why_a_separation_and_not_a_claim": "A claim above says a colour may carry TEXT on a ground. These say two drawn areas must be distinguishable from each other. WCAG 2.2 SC 1.4.11 puts a graphical object's boundary at 3:1, which is why the coast rows are 3.0 and the land rows are lower: a fill that reads as a mass and an edge that is unambiguous are two different jobs, and the instrument had neither.",
+  "separations": [
+   {
+    "a": "--map-land",
+    "b": "--map-sea",
+    "min": 6.0,
+    "was": 1.8,
+    "why": "the land is a mass, not a hairline — and 1.8 was a floor two dark greens could satisfy while being optically one thing. This row now also carries the promise the coast-against-field row used to stand in for, at the picture half's own figure: land and sea unambiguously distinct"
+   },
+   {
+    "a": "--map-context",
+    "b": "--map-sea",
+    "min": 1.35,
+    "was": 1.24,
+    "why": "a country outside the subject is still drawn. 1.24 is not quiet, it is absent"
+   },
+   {
+    "a": "--map-land",
+    "b": "--map-context",
+    "min": 1.25,
+    "was": 1.21,
+    "why": "three tiers — water, context, subject — and each step has to be visible or there are two"
+   },
+   {
+    "a": "--map-coast",
+    "b": "--map-land",
+    "min": 3.0,
+    "why": "the same edge read from the other side"
+   },
+   {
+    "a": "--map-border",
+    "b": "--map-land",
+    "min": 1.6,
+    "why": "a frontier is a line drawn ON land and is quieter than a coast, which is where land meets sea. Both were one stroke"
+   },
+   {
+    "a": "--map-hover",
+    "b": "--map-land",
+    "min": 3.0,
+    "was": 1.29,
+    "why": "the selected country replaces the land it sits on. On a pale continent the accent INVERTS rather than recolours — the same reading the mark takes on the pine masthead and the focus ring takes on the band — so this is pine-deep, dark on light, 4.70"
+   },
+   {
+    "a": "--atlas-land",
+    "b": "--atlas-sea",
+    "min": 6.0,
+    "why": "the picture half, recorded so the two halves are one register and the good one cannot quietly follow the bad one down"
+   },
+   {
+    "a": "--atlas-coast",
+    "b": "--atlas-land",
+    "min": 3.0,
+    "why": "the ink coast on paper — the relationship the instrument now has inverted"
+   },
+   {
+    "a": "--map-shore-1",
+    "b": "--map-sea",
+    "min": 1.35,
+    "why": "the shore band nearest the coast. The instrument's sea was ONE value where the picture's is four, so the Baltic, the Adriatic and the open Atlantic were the same near-black and an inland sea read as a hole in the continent"
+   },
+   {
+    "a": "--map-shore-2",
+    "b": "--map-sea",
+    "min": 1.18,
+    "why": "the middle step of the same cast"
+   },
+   {
+    "a": "--map-shore-3",
+    "b": "--map-sea",
+    "min": 1.06,
+    "why": "the widest and faintest, far from any coast"
+   },
+   {
+    "a": "--map-here",
+    "b": "--map-land",
+    "min": 1.9,
+    "why": "the subject is the brightest LAND and it is now the page's own limestone: paper seen through the opening. Binding it to the accent filled a quarter of every country reference map in periwinkle — a continent drawn in the accent, the failure that removed electric lime, arriving through a different token"
+   },
+   {
+    "a": "--map-here",
+    "b": "--map-sea",
+    "min": 3.0,
+    "why": "and it still has to clear the water it sits in"
+   },
+   {
+    "a": "--map-hereline",
+    "b": "--map-here",
+    "min": 3.0,
+    "why": "the finest heaviest edge. An atlas separates its subject by an edge rather than by a loud fill — and with a paper-coloured subject that edge is INK ON PALE GROUND, exactly as --atlas-hereline is, rather than the brightest thing on the drawing"
+   },
+   {
+    "a": "--atlas-frontier",
+    "b": "--atlas-land",
+    "min": 3.0,
+    "why": "a frontier is a claim ABOUT the ground and a coastline is the ground, and both were drawn in the same ink at 8.44 on the land — so the hierarchy the cartography document states was two tenths of a unit of stroke width. It still has to clear 3:1, because an invisible border is not restraint"
+   },
+   {
+    "a": "--atlas-here",
+    "b": "--atlas-land",
+    "min": 1.25,
+    "why": "the picture half's subject against its neighbours. It had no separation because it had no COLOUR: the fill was a translucent white, and on a portrait there is no land under it — only the sea rect — so Austria shipped at #ccd9e1 against #d3cfc5 neighbours, a cold country in a warm frame. 1.31 is the editorial atlas convention, the subject as paper and the neighbours as a half-tone"
+   },
+   {
+    "a": "--atlas-hereline",
+    "b": "--atlas-here",
+    "min": 3.0,
+    "why": "SC 1.4.11 on the subject's own frontier. The step between subject and neighbour is deliberately small, so the line is what carries the boundary and it has to clear it"
+   }
+  ],
+  "ladder": {
+   "$comment": "ORDER IS THE CLAIM, and a per-pair minimum cannot state it. The water lightens as it approaches a shore — that is DISTANCE FROM LAND, the one thing a coastline can tell us, and never a claim about depth: this atlas holds no bathymetry. A ramp whose middle step is darker than its outer one is still three distinct colours and passes every pairwise floor while drawing the opposite of what it says. The subject is the top of that ladder, because an atlas's subject is the brightest land. Its EDGE is not: it left the tail when the continent went pale, because a rung says where a tone sits between water and land and the subject's frontier is now ink drawn on top of it.",
+   "tokens": [
+    "--map-sea",
+    "--map-shore-3",
+    "--map-shore-2",
+    "--map-shore-1",
+    "--map-land",
+    "--map-here"
+   ],
+   "direction": "increasing"
+  },
+  "hierarchy": {
+   "$comment": "The coast must be decisively heavier than the frontier, or the two lines say the same thing. Stated as a RATIO of their contrasts against the land rather than as two absolute numbers, because what matters is the gap between them.",
+   "stronger": "--atlas-coast",
+   "weaker": "--atlas-frontier",
+   "against": "--atlas-land",
+   "min_gap": 1.8
+  },
+  "why_the_coast_has_one_row_and_not_two": "A COAST AGAINST THE FIELD AT 3.0 IS ARITHMETICALLY IMPOSSIBLE ONCE THE CONTINENT IS PALE. The coast must be dark enough to bound the land (luminance <= 0.106) and light enough to clear the field (>= 0.113), and those do not overlap — so the row could only be kept by keeping the continent dark, which was the fault. It is not a promise dropped: what it stood in for was land and sea being unambiguously distinct, and that is --map-land against --map-sea at 6.0. The edge keeps its own row against the land it bounds, which is the half SC 1.4.11 is actually about."
+ },
+ "ratio": {
+  "$comment": "The ratio is the instruction, not the hex codes. A palette gives you a blue website with gold buttons; a ratio gives you European editorial design over futuristic infrastructure.",
+  "limestone": 60,
+  "graphite": 25,
+  "pine": 10,
+  "accent": 5,
+  "$measured": "MEASURED ON THE PIXELS A READER IS PAINTED, over twelve pages spanning both worlds and six families at 1280x900, classified by chroma: limestone 64.1, graphite 18.9, water 9.7, cobalt 7.0, accent 0.3. THE FIRST VERSION OF THIS MEASUREMENT COUNTED THE SEA AS THE SIGNATURE and reported cobalt at 16.6 against a declared 10 — a finding about the masthead that was mostly the Atlantic. The two families do not overlap: the ocean ramp and the atlas water run 202-205 degrees of hue and every cobalt runs 228-230. Split, cobalt sits UNDER its budget on all twelve pages and varies between 6 and 8 — the masthead and the links, and almost nothing else. Water has no line here because it is the DRAWINGS rather than the interface; it is measured and held under a ceiling so that stays true. The one number that disagrees with its declaration is the accent: 5 declared, 0.3 delivered, which is the design-direction audit's finding with a figure under it. Terracotta and atlantic are the whole art-directional difference between a magazine story and a country encyclopedia and they are spent on an 11px kicker and its eyebrow rule. Making them a GROUND is refused - 'generic tourism blue as a page background' is on the never list and a terracotta one is the same mistake in a warmer hue - so the gap is recorded rather than closed. tools/browser-checks.js measures this on every run and holds bands rather than targets: a country page is nearly all paper and /map is nearly all graphite, and both are correct.",
+  "$bands": {
+   "$comment": "The hue windows the ratio is measured in, as DATA rather than as a condition typed into the suite. Everything outside them is the accent. checks.py asserts that the tokens each band is named for actually fall inside it, so moving a colour without moving its band fails the build.",
+   "water": [
+    190,
+    218
+   ],
+   "signature": [
+    140,
+    178
+   ]
+  }
+ },
+ "tokens": {
+  "graphite": {
+   "hex": "#121612",
+   "name": "Deep Graphite",
+   "role": "the intelligence foundation. Ink in the light world, ground in the dark"
+  },
+  "graphite-2": {
+   "hex": "#1a201a",
+   "name": "Graphite Surface",
+   "role": "cards and raised surfaces in the dark world"
+  },
+  "graphite-3": {
+   "hex": "#232a22",
+   "name": "Graphite Deep",
+   "role": "the deepest dark surface: tracks, wells and the raised step a card's own furniture sits on. It measured 1.045 against the card — a rounding error with a token name, so every progress track and score bar on a dark card was drawn on its own colour. It was sized so cobalt-lift would clear AA on it, which is a claim about the link colour deciding the size of a surface"
+  },
+  "limestone": {
+   "hex": "#f2f0e8",
+   "name": "Bone",
+   "role": "the DISCOVER ground. Never pure white, and warmer than the limestone it replaced: this palette is bone paper, pine ink and a warm cultural accent"
+  },
+  "limestone-2": {
+   "hex": "#e8e5da",
+   "name": "Bone Surface",
+   "role": "cards and raised surfaces in the light world"
+  },
+  "limestone-3": {
+   "hex": "#dcd8c9",
+   "name": "Bone Deep",
+   "role": "tracks, wells and the deepest light surface"
+  },
+  "pine": {
+   "hex": "#2e7157",
+   "name": "European Pine",
+   "role": "the signature, for things DRAWN rather than read: the mark, score bars, map marks. 5.09 on bone and 4.07 on bone-deep, so not text"
+  },
+  "pine-deep": {
+   "hex": "#1e4636",
+   "name": "Pine Deep",
+   "role": "every pine that is text or an action in the light world"
+  },
+  "pine-lift": {
+   "hex": "#55a07e",
+   "name": "Pine Lift",
+   "role": "links and interactive elements on dark surfaces. Chosen against the THIRD surface, not the ground: 5.84 / 5.31 / 4.71"
+  },
+  "pine-air": {
+   "hex": "#7fbfa1",
+   "name": "Pine Air",
+   "role": "hover and the DISCOVER accent for a dark-preference reader"
+  },
+  "atlantic": {
+   "hex": "#4a5326",
+   "name": "Olive",
+   "role": "heritage and provenance. IT HAD TO MOVE. Atlantic green sat ten degrees of hue from the new pine and the register refuses that pair at 25 — a contrast ratio cannot see it, which is exactly why the rule exists. Olive is 84 degrees from pine and 53 from terracotta"
+  },
+  "atlantic-lift": {
+   "hex": "#a3b167",
+   "name": "Olive Lift",
+   "role": "the same, for a dark-preference reader: #4a5326 is 2.22:1 on graphite"
+  },
+  "terracotta": {
+   "hex": "#a4491f",
+   "name": "Terracotta",
+   "role": "the warm cultural accent: stories, events, experiences"
+  },
+  "terracotta-2": {
+   "hex": "#8a3a17",
+   "name": "Terracotta Deep",
+   "role": "the same, on limestone-3, where #a4491f measures 4.48 and just misses"
+  },
+  "terracotta-lift": {
+   "hex": "#e08a5c",
+   "name": "Terracotta Lift",
+   "role": "the cultural accent for a dark-preference reader: #a4491f is 3.17:1 on graphite"
+  },
+  "warn": {
+   "hex": "#981f31",
+   "name": "Advisory Red",
+   "role": "a travel advisory, a failed step, a destructive action. The one colour that must not read as the brand, and — measured as a hue distance rather than as a contrast ratio — must not read as the cultural accent either"
+  },
+  "warn-lift": {
+   "hex": "#ee8192",
+   "name": "Advisory Lift",
+   "role": "the same, on the graphite ground, where #981f31 measures 1.84"
+  }
+ },
+ "claims": [
+  {
+   "fg": "graphite",
+   "bg": "limestone",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "graphite",
+   "bg": "limestone-2",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "graphite",
+   "bg": "limestone-3",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "limestone",
+   "bg": "graphite",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "limestone",
+   "bg": "graphite-2",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "limestone",
+   "bg": "graphite-3",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "pine-deep",
+   "bg": "limestone",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "pine-deep",
+   "bg": "limestone-2",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "pine-deep",
+   "bg": "limestone-3",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "limestone",
+   "bg": "pine-deep",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "pine",
+   "bg": "limestone",
+   "text": false,
+   "ui": true
+  },
+  {
+   "fg": "pine-lift",
+   "bg": "graphite",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "pine-lift",
+   "bg": "graphite-2",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "pine-lift",
+   "bg": "graphite-3",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "graphite",
+   "bg": "pine-lift",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "pine-air",
+   "bg": "graphite",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "atlantic",
+   "bg": "limestone",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "atlantic",
+   "bg": "limestone-2",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "limestone",
+   "bg": "atlantic",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "atlantic-lift",
+   "bg": "graphite",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "atlantic-lift",
+   "bg": "graphite-2",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "terracotta",
+   "bg": "limestone",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "terracotta",
+   "bg": "limestone-2",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "limestone",
+   "bg": "terracotta",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "terracotta-2",
+   "bg": "limestone-3",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "terracotta-lift",
+   "bg": "graphite",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "terracotta-lift",
+   "bg": "graphite-2",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "pine-air",
+   "bg": "graphite",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "pine-air",
+   "bg": "graphite-2",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "pine-air",
+   "bg": "graphite-3",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "warn",
+   "bg": "limestone",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "warn",
+   "bg": "limestone-2",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "warn-lift",
+   "bg": "graphite",
+   "text": true,
+   "ui": true
+  },
+  {
+   "fg": "warn-lift",
+   "bg": "graphite-2",
+   "text": true,
+   "ui": true
+  }
+ ],
+ "forbidden": [
+  {
+   "fg": "pine",
+   "bg": "limestone-3",
+   "why": "4.04 — the signature is a drawn colour, not a read one. Use cobalt-deep."
+  },
+  {
+   "fg": "pine",
+   "bg": "graphite",
+   "why": "3.52 — a UI edge at most, never a link. Use cobalt-lift."
+  },
+  {
+   "fg": "pine-lift",
+   "bg": "limestone",
+   "why": "3.13 — the dark world's link colour is a UI edge at most on light."
+  },
+  {
+   "fg": "pine-air",
+   "bg": "limestone",
+   "why": "2.44 — the dark world's accent is a UI edge at most on paper."
+  },
+  {
+   "fg": "terracotta",
+   "bg": "graphite",
+   "why": "3.17 — the cultural accent has to lift at night. Use terracotta-lift."
+  },
+  {
+   "fg": "atlantic",
+   "bg": "graphite",
+   "why": "1.81 — a heading nobody can see. Use atlantic-lift."
+  },
+  {
+   "fg": "terracotta",
+   "bg": "limestone-3",
+   "why": "4.48 — just misses. Use terracotta-2."
+  },
+  {
+   "fg": "warn",
+   "bg": "graphite",
+   "why": "1.84 — an advisory nobody can see. Use warn-lift."
+  }
+ ],
+ "never": [
+  "gold or brass as a primary, a signature, or on anything interactive",
+  "navy and gold as the primary pair",
+  "generic tourism blue as a page background",
+  "neon cyberpunk",
+  "gradient as decoration rather than as atmosphere",
+  "glassmorphism",
+  "stock-tourist photography",
+  "imagery that reads as AI-generated",
+  "the letters A and I in the masthead, the navigation, or any h1",
+  "electric lime, anywhere: it was the dark world's accent and it ended up drawing continents",
+  "ultramarine as a CSS colour. It is real in this product and it is not a page colour: it is the violet end of the PLATE ramp, hue 244° in render.PLATE_HUES. As a custom property it was declared for the life of this palette and spent by no rule, while the register went on recomputing a contrast claim about it on every build — arithmetic about a colour the site does not ship"
+ ],
+ "distinct": {
+  "$comment": "A CONTRAST RATIO CANNOT SAY THAT TWO COLOURS ARE DIFFERENT COLOURS. It is a ratio of luminances, so two hues at the same lightness always measure 1.0 — and every contrast check on this site passed while the advisory red and the cultural accent sat fourteen degrees apart at identical saturation and identical lightness. A travel advisory and a story kicker were the same colour to the eye, on the map, on the tags and in the notes. These pairs must be told apart by HUE, which is the property a ratio cannot see.",
+  "min_hue_degrees": 25,
+  "pairs": [
+   [
+    "warn",
+    "terracotta"
+   ],
+   [
+    "warn-lift",
+    "terracotta-lift"
+   ],
+   [
+    "warn",
+    "pine-deep"
+   ],
+   [
+    "atlantic",
+    "pine-deep"
+   ],
+   [
+    "warn-lift",
+    "pine-air"
+   ],
+   [
+    "atlantic-lift",
+    "pine-lift"
+   ]
+  ]
+ },
+ "surfaces": {
+  "$comment": "A SURFACE LADDER IS A LADDER, and a per-pair contrast claim cannot say so. The light world steps 1.09 and 1.12; the dark world stepped 1.12 and then 1.045, which is the card with a different name — so every track, well and score bar on a dark card was drawn on its own colour. Each consecutive pair has to be a step a reader can see.",
+  "min_step": 1.06,
+  "ladders": [
+   [
+    "limestone",
+    "limestone-2",
+    "limestone-3"
+   ],
+   [
+    "graphite",
+    "graphite-2",
+    "graphite-3"
+   ]
+  ]
+ }
 }

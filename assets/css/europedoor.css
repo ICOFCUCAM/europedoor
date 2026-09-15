@@ -355,12 +355,61 @@
      `checks.py` recomputes every one of those separations from the hexes in
      THIS file, so the ladder cannot be nudged without the arithmetic saying
      so. */
-  --map-sea:      #0c100c;   /* the water: a step below the page's own ground */
-  --map-context:  #2d332d;   /* land outside the subject of this drawing */
-  --map-land:     #3f483f;   /* the land mass, lifted out of the water */
-  --map-coast:    #99a899;   /* the edge between them. 7.33 on the sea, 3.84 on the land */
-  --map-border:   #667166;   /* a frontier, which is a line drawn ON land and lighter than a coast */
-  --map-hover:    #7fbfa1;   /* cobalt-air, the INTELLIGENCE accent: 3.82 on the land it replaces */
+  /* AND THEN THE INSTRUMENT WENT INTO THE SWAMP, because it was given the
+     page's own graphite and the page's graphite is green.
+
+     The values above this note were a family of `--graphite` (#121612), so
+     every one of them carried its olive cast — and the land was DARKER than
+     the water lightened toward the shore, three near-blacks apart. Rendered
+     at 1280 on /discover the drawing read as an atmospheric night map of a
+     marsh: no coastline you could follow, no country you could pick out,
+     319 dots floating on a field with no ground under them. It satisfied
+     every separation in the register while being unreadable, because a
+     ratio of 1.91 between two dark greens is arithmetically a step and
+     optically nothing.
+
+     Two things change and they are the same change. The field is NEUTRAL —
+     #0d0e10 has no hue at all, where the old sea was (12,16,12) — and the
+     continent is PALE MINERAL rather than a slightly lighter dark. That is
+     the hero's sentence stated at last on the instrument: Europe is what
+     the light falls on. Land against field goes 1.91 → 8.58, which is the
+     picture half's own figure (7.91) reached from the other side, and a
+     coastline becomes a line you can follow across the page.
+
+         land : field     1.91 → 8.58    the separation that was the fault
+         context : field  1.44 → 3.84    a quiet country is legible
+         land : context   1.33 → 2.24    three tiers, further apart
+         coast : land     3.84 → 3.42    still over SC 1.4.11's 3.0
+         subject : land   3.82 → 1.97    a lift, because it no longer shouts
+         subject : field     —   16.93
+
+     TWO ROWS OF THE REGISTER HAD TO MOVE AND NEITHER WAS SILENT.
+
+     `--map-coast` against `--map-sea` at 3.0 is now ARITHMETICALLY
+     IMPOSSIBLE: with the land pale, a coast must be dark enough to bound it
+     (luminance ≤ 0.106) and light enough to clear the field (≥ 0.113), and
+     those do not overlap. The promise that row was standing in for — land
+     and sea unambiguously distinct — is not lost, it was never the coast's
+     to keep: it is `--map-land` against `--map-sea` at 6.0, which mirrors
+     the row the picture half has always carried.
+
+     And `--map-hereline` leaves the tail of the ladder. It was the
+     brightest thing on the drawing because the subject was dark; with a
+     paper-coloured subject the subject's frontier is INK ON PALE GROUND,
+     exactly as `--atlas-hereline` is. A ladder rung is about where a tone
+     sits between water and land, and this is no longer one of those.
+
+     The two cartographies stay split, which is the whole point: a picture
+     is warm paper and pale water, an instrument is neutral graphite and a
+     mineral continent. They are not the same palette reached from two
+     directions — the field here carries no hue and the picture's sea is
+     202° of it. */
+  --map-sea:      #0d0e10;   /* the field: neutral near-black, no hue of its own */
+  --map-context:  #6e6f71;   /* land outside the subject. 3.84 on the field */
+  --map-land:     #aeada7;   /* the continent: pale mineral. 8.58 on the field, 2.24 on context */
+  --map-coast:    #525356;   /* the edge between them: 3.42 on the land it bounds */
+  --map-border:   #7d7e80;   /* a frontier: a line drawn ON land, 1.81, quieter than a coast */
+  --map-hover:    #1e4636;   /* pine-deep: on a pale continent the accent inverts. 4.70 */
   /* AND THE SUBJECT OF A DRAWING IS NOT PAINTED IN THE ACCENT. Binding the
      selected state to cobalt-air was right for /map, where hover lifts one
      country under the cursor for as long as the cursor is there — five per
@@ -375,8 +424,8 @@
      into the accent either. Measured: the subject is 2.07 above its
      neighbours and 3.94 above the water, with a fine pale edge rather than a
      loud fill. Hover keeps the accent, because hover is momentary. */
-  --map-here:     #6c796c;   /* the subject: the brightest land. 2.07 on the land, 3.94 on the sea */
-  --map-hereline: #d0d9d0;   /* its edge — the finest and the heaviest line on the drawing */
+  --map-here:     #f2f0e8;   /* the subject IS limestone: the page's own paper. 1.97 / 16.93 */
+  --map-hereline: #2b2c2e;   /* its edge — ink on pale ground now, 12.25, not the brightest rung */
   /* AND THE INSTRUMENT'S SEA WAS ONE VALUE WHERE THE PICTURE'S IS FOUR.
      `docs/cartography.md`: "A flat pale fill made the water a surface the
      land was pasted onto. These four are CAST, not stroked — three soft
@@ -392,9 +441,9 @@
      land is 1.91, so the ramp is ordered and stays under the land it
      approaches. Cooler than the land at every step, because the thing being
      drawn is water. */
-  --map-shore-3:  #141c14;   /* the widest and faintest, far from any coast */
-  --map-shore-2:  #1d291d;
-  --map-shore-1:  #283828;   /* the narrowest and lightest, against the shore */
+  --map-shore-3:  #141619;   /* the widest and faintest, far from any coast */
+  --map-shore-2:  #1e2025;
+  --map-shore-1:  #282b30;   /* the narrowest and lightest, against the shore */
 
 
   /* type */
@@ -6906,10 +6955,37 @@ body[data-hero] main { max-width: none; padding: 0; }
                       box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--limestone) 34%, transparent),
                                   0 0 0 1px color-mix(in srgb, var(--graphite) 16%, transparent); }
 
+/* 02 · the question — the sentence box, then eight photographs.
+
+   `.askhero label` is set at clamp(--t-lg, 2.4vw, --t-2xl) because it was
+   written to BE the hero's headline on a page that no longer exists. Beside
+   a mega h2 and a lede it is a second headline arguing with the first, so on
+   this plate the label is what it now is: the caption on a control. No new
+   size — it takes --t-xs, the caption step the meta lines already use. */
+.sheet-question .askhero { margin-top: 0; width: 100%; max-width: 32rem; }
+.sheet-question .askhero label { font-family: var(--text); font-size: var(--t-xs);
+        letter-spacing: .16em; text-transform: uppercase; color: var(--ink-3); }
+
 /* 02 · the question — eight photographs at thumbnail size */
+/* THE ROW SPANS THE PLATE, AND EIGHT NAMES BLEW OUT EIGHT TRACKS.
+
+   It sat inside `.sheetside`, the plate's right column — 619px at 1280, so
+   eight columns of 66.9px. A grid item's automatic minimum size is its
+   MIN-CONTENT, and `.qtile` never said otherwise, so RENAISSANCE (115px of
+   tracked uppercase) and MOUNTAIN (87px) refused to shrink and overflowed
+   their tracks: three tile widths in a row of eight equal columns, two
+   pictures larger than the other six and two names on a lower baseline.
+   Every track was exactly 1fr and the computed style said so, which is why
+   reading the rule could not find it.
+
+   `min-width: 0` is the guard and it is not the fix. The fix is that eight
+   photographs at 67px is a contact strip rather than a row of ways in, so
+   the row spans both columns of the plate and each tile gets ~135px. */
+.qwrap { grid-column: 1 / -1; display: grid; gap: var(--s4); width: 100%; }
 .qrow { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr));
         gap: var(--s3); width: 100%; }
-.qtile { text-decoration: none; color: inherit; display: grid; gap: var(--s2); }
+.qtile { text-decoration: none; color: inherit; display: grid; gap: var(--s2);
+         min-width: 0; }
 .qtile picture { display: block; }
 .qtile img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
 .qname { font-family: var(--text); font-size: var(--t-xs); letter-spacing: .16em;

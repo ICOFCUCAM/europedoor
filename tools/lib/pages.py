@@ -281,11 +281,29 @@ def dusk_stops(lo=0.0, hi=1.0, top=1.0):
 
 DUSK_CEILING = 0.80
 
-# HOW DEEP THE CUT MAY GO ON AN INSTRUMENT. /map and /discover draw every
-# country as a link, and `docs/palette.json` requires a country to clear the
-# sea by 1.35 with the reason written out: 1.24 is not quiet, it is absent.
-# Fitted against the painted pixels rather than chosen.
-DUSK_INSTRUMENT_TOP = 0.50
+# HOW DEEP THE CUT MAY GO ON AN INSTRUMENT, AND IT IS NOW THE PICTURE'S OWN
+# NUMBER. /map and /discover draw every country as a link, and
+# `docs/palette.json` requires a country to clear the field by 1.35 with the
+# reason written out: 1.24 is not quiet, it is absent.
+#
+# It was 0.50 over a reach of 330 units — WIDE AND SHALLOW, fitted against
+# the painted pixels of a land that was #3f483f. Dimming a dark green by half
+# moves almost nothing, so a band a third of the continent wide cost nothing
+# and hid the cut. The moment the continent became pale mineral the same band
+# washed Russia, Ukraine, Türkiye, the Caucasus and the whole Levant from
+# bright to black across a third of the drawing, and ENDED ON A HARD DIAGONAL
+# where the ramp ran out — which is the exact rendering fault a data fade
+# exists to remove, arrived at from the other side. Every separation stayed
+# green, because a separation is between two TOKENS and says nothing about a
+# gradient painted over one of them.
+#
+# Narrow and deep is the picture family's answer and it is now this one's:
+# `dusk_reach()` derives the width from the outermost destination east and
+# south, so a place near the cut keeps its ground, and DUSK_CEILING is the
+# depth. Refitted against the pale land, 0.80 leaves a dimmed country at
+# 1.42:1 on the field and 0.83 takes it to 1.33 — so the ceiling the picture
+# already uses is also the deepest this register allows, and the instrument
+# stops carrying a second number for the same decision.
 _DUSK_REACH = {}
 
 
@@ -1235,6 +1253,17 @@ def home(data):
               'A continent of possibility')}"""
 
     # ── 02 · THE QUESTION ────────────────────────────────────────────
+    # THE SEQUENCE DROPPED THE ONE CONTROL THE HOMEPAGE IS REQUIRED TO
+    # CARRY, and the browser suite died on check one rather than reporting
+    # it: `page.fill("#homeask")` timed out, the run threw, and the ~1,500
+    # assertions after it — every one of Discover's among them — never ran.
+    # A missing element is a CRASH in that suite and a red line in this one,
+    # so the whole gate went dark on a regression it was written to name.
+    #
+    # The plate is called The question and its headline is "Europe changes
+    # with what you seek", so the box belongs here rather than back on the
+    # door: the tiles are eight pre-formed answers to that question and the
+    # sentence box is the open one. The door keeps its link to the planner.
     # Eight photographs at thumbnail size, each one the picture the theme
     # it links to opens on. THE REGISTER DECIDES WHICH EIGHT: a theme with
     # no licensed photograph is not in this row, because a row of eight
@@ -1265,6 +1294,14 @@ def home(data):
     <p class="lede">Mountains or coastlines. Cities or quiet places. Food, culture,
     history or the wild. There is no single Europe: choose your instinct, and the
     continent reorders itself around it.</p>
+    <form class="askhero" action="/plan" method="get">
+      <label for="homeask">Say it in your own words.</label>
+      <input type="text" id="homeask" name="ask" autocomplete="off"
+             placeholder="Somewhere quiet, in October.">
+      <button class="btn" type="submit">Plan my journey</button>
+    </form>
+  </div>
+  <div class="qwrap">
     <div class="qrow">{tiles}</div>
     <p class="sheetcred rowcred">{qcredit}</p>
   </div>
@@ -8721,7 +8758,7 @@ def map_page(data):
 <g id="context" class="context" aria-hidden="true">{''.join(context)}</g>
 <g id="countries" class="countries">{''.join(shapes)}</g>
 <g id="detail" class="countries"></g>
-{cut_fade('map', MAP_W, MAP_H, top=DUSK_INSTRUMENT_TOP)}
+{cut_fade('map', MAP_W, MAP_H, dusk_reach())}
 <g id="nogeo" class="nogeo">{''.join(nogeo)}</g>
 <g id="route"></g>
 <g id="regions" hidden display="none"></g>
@@ -11261,7 +11298,7 @@ def discover_page(data):
 
   <a class="heromap wide-map arched discovermap" data-role="instrument" href="/map"
      id="discover-map" aria-label="Map of all {len(data['cities'])} places">
-    <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true"><defs>{arch_clip("disc", MAP_W, MAP_H)}</defs><g clip-path="url(#arch-disc)"><rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>{dctx}{dland}{cut_fade('disc', MAP_W, MAP_H, top=DUSK_INSTRUMENT_TOP)}{''.join(dots)}</g>{arch_edge(MAP_W, MAP_H)}</svg>
+    <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true"><defs>{arch_clip("disc", MAP_W, MAP_H)}</defs><g clip-path="url(#arch-disc)"><rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>{dctx}{dland}{cut_fade('disc', MAP_W, MAP_H, dusk_reach())}{''.join(dots)}</g>{arch_edge(MAP_W, MAP_H)}</svg>
     <span class="heromap-cap">Coastline from Natural Earth, public domain.
     Open the full map, with layers →</span>
   </a>
