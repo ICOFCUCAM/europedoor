@@ -895,14 +895,28 @@ def sb3():
 
 
 @section("B4", "Colour", "BUILT",
-         "European Future: graphite foundation, limestone ground, cobalt "
-         "signature, cobalt-air in the dark world only. Atlantic green "
-         "and terracotta retained with narrow homes; gold removed entirely. "
-         "Deliberately not EU blue and gold, and no longer green-primary.")
+         "The owner's palette: bone ground, pine signature, graphite "
+         "instrument, and five accents that identify a content FAMILY "
+         "rather than decorate a page — cobalt, ochre, terracotta, olive, "
+         "sky. Two map sets, light and dark. Gold narrowed to the ochre "
+         "family and refused everywhere a reader clicks. Deliberately not "
+         "EU blue and gold.")
 def sb4():
-    for token in ("--graphite:", "--limestone:", "--pine:", "--pine-lift:",
-                  "--pine-air:", "--atlantic:", "--terracotta:", "--paper:", "--ink:"):
-        yield token in CSS, f"{token} is defined"
+    # THE TOKEN LIST WAS TYPED AND TWO OF ITS NAMES STOPPED EXISTING.
+    # `--limestone` became `--bone` and `--atlantic` became `--olive` when
+    # the owner's palette landed, and this loop went red for the right event
+    # and the wrong claim — the tenth assertion in this repository to pin a
+    # shape rather than a promise, and the second in this file to pin a
+    # palette VALUE. The promise is that every token the register declares
+    # is really in the stylesheet, which is a question the register can be
+    # asked. Case-insensitively, because the register writes #F3F0E6 and a
+    # stylesheet is free to write #f3f0e6 — a rename is a real failure and
+    # a capital letter is not.
+    _pal = json.loads(open(os.path.join(ROOT, "docs", "palette.json"),
+                           encoding="utf-8").read())
+    _css_lower = CSS.lower()
+    for token in _pal["tokens"]:
+        yield f"--{token}:" in _css_lower, f"--{token}: is defined"
     # AND LIME IS OUT OF THE SYSTEM THE WAY BRASS IS. It was the dark world's
     # accent and it ended up drawing geography — every route, every dot, every
     # lit country — which is not five per cent of anything. Removed rather
@@ -924,8 +938,21 @@ def sb4():
     # the browser suite at 4.36:1 on a card, which is the instruction's own
     # sentence arriving as a build failure.
     yield "--signature:" in CSS, "the signature is separated from the text accent"
-    yield "--door:         var(--pine-deep);" in CSS, \
-        "so anything cobalt that is read uses the deeper one"
+    # And the default family's accent is the deeper pine rather than the
+    # signature: a signature is a colour that gets DRAWN, and bound to text
+    # it failed seven pages at 4.36 on a card.
+    yield re.search(r"--door:\s*var\(--pine-deep\)", CSS) is not None, \
+        "so anything pine that is read uses the deeper one"
+    # THE TWO MAPS, which are the first thing the brief changes.
+    yield all(f"--{t}:" in _css_lower for t in
+              ("map-land", "map-water", "map-border", "map-ink")), \
+        "the light map is declared — the European atlas"
+    yield all(f"--{t}:" in _css_lower for t in
+              ("map-dark-bg", "map-dark-land", "map-dark-border")), \
+        "and the dark map, for the instrument"
+    yield "--atlas-land:var(--map-land)" in re.sub(r"\s+", "", CSS), \
+        "and the picture cartography is bound to the light set rather than "\
+        "keeping a second palette beside it"
     yield "prefers-color-scheme: dark" in CSS, "and the palette has a night form"
     # AND THESE TWO PINNED VALUES RATHER THAN THE PROMISE. `#63b79c` was
     # atlantic-lift's hex and `cobalt-lift` was a token NAME, so a palette
@@ -936,7 +963,8 @@ def sb4():
     _reg = json.loads(open(os.path.join(ROOT, "docs", "palette.json"),
                            encoding="utf-8").read())
     _lifts = [k for k in _reg["tokens"] if k.endswith("-lift")]
-    yield len(_lifts) >= 3 and all(_reg["tokens"][k]["hex"] in CSS for k in _lifts), \
+    yield len(_lifts) >= 3 and all(
+        _reg["tokens"][k]["hex"].lower() in _css_lower for k in _lifts), \
         "which lifts the retained accents rather than inverting them"
     yield all(doc_covers("docs/palette.json", k) for k in _reg["tokens"]), \
         "and the whole palette is machine-checkable"

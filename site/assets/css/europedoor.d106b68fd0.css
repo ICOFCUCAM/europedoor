@@ -38,8 +38,8 @@
    */
 
   /* raw — never used directly by a component, only bound below */
-  --graphite:     #121612;
-  --graphite-2:   #1a201a;
+  --graphite:     #07100F;
+  --graphite-2:   #101917;
   /* A STEP THAT MEASURES 1.045 IS A ROUNDING ERROR WITH A TOKEN NAME.
      The light world's three surfaces step 1.09 and 1.12; the dark world's
      stepped 1.12 and then 1.045, so --paper-3 — tracks, wells, the deepest
@@ -50,18 +50,21 @@
      about the link colour deciding the size of a surface. A surface sized by
      something that is not a surface. The step is real now and the link colour
      moved to keep its claim, which is the right way round. */
-  --graphite-3:   #232a22;
-  --limestone:    #f2f0e8;   /* never #fff: white is a screen, limestone is paper.
+  --graphite-3:   #18211f;
+  --bone:    #F3F0E6;   /* never #fff: white is a screen, limestone is paper.
                                 Kept from the previous system rather than replaced with
                                 a warmer ivory — the ground was the part of the old
                                 palette that was already right, and the owner's table
                                 names it. */
-  --limestone-2:  #e8e5da;
-  --limestone-3:  #dcd8c9;
-  --pine:       #2e7157;   /* the signature. 4.93 on limestone, 4.52 on the card
+  --bone-2:  #e5e2d6;
+  --mineral:  #D8D4C7;
+  --bone-light:   #F7F4EA;   /* the LIFT above the page: a card, a field. The
+                                owner's third foundation, and the one surface that
+                                goes up rather than down. */
+  --pine:       #0F433E;   /* the signature. 4.93 on limestone, 4.52 on the card
                                 ground, 4.04 on --paper-3 — so it is a DRAWN colour,
                                 not a read one. See --signature below. */
-  --pine-deep:  #1e4636;   /* everything cobalt that is text: 6.31 / 5.78 / 5.17 */
+  --pine-deep:  #07302B;   /* everything cobalt that is text: 6.31 / 5.78 / 5.17 */
   --pine-lift:  #55a07e;   /* actions in the dark world. Chosen against the CARD, not
                                 the ground — #5070FF clears 4.56 on #121612 and falls to
                                 4.07 on #1a201a, where links actually sit. A dark palette
@@ -73,6 +76,58 @@
                                 now chosen against the well: 4.62 / 5.08 / 5.69 across
                                 all three grounds, and still clearly below cobalt-air. */
   --pine-air:   #7fbfa1;   /* the accent in the dark world's DISCOVER surfaces */
+
+  /* ── THE OWNER'S ACCENTS ─────────────────────────────────────────────
+     Given as a block and taken as given, with one rule stated over the top
+     of them: UI RESTRAINED, PHOTOGRAPHY RICH, MAPS PRECISE, TYPOGRAPHY
+     DRAMATIC. So these identify a content FAMILY and are not sprayed across
+     components — the brief is explicit that a site going green, blue,
+     orange, yellow, pink, purple would destroy the premium quality, and the
+     eight-hue OKLCH wheel this replaces was exactly that.
+
+     THE DEEPS ARE DERIVED, NOT PICKED, and the arithmetic is why they exist:
+     measured on bone, cobalt is 5.68 and olive 4.62 and both can carry text,
+     terracotta is 3.58 and is a graphic, and ochre (2.28) and sky (2.12) are
+     GROUNDS. A family whose accent is ochre still needs a kicker a reader
+     can read, so each of those three gets one step down its own hue at 4.5.
+     Nothing is invented: same hue, same chroma, lower lightness. */
+  --cobalt:          #2457C5;   /* 5.68 on bone — text, links, the geographic accent */
+  --cobalt-lift:     #4076E7;   /* 4.55 on graphite: cobalt itself is 2.98 there */
+  --cobalt-air:      #619BFF;   /* 7.01 on graphite — the instrument's accent */
+  --sky:             #76AFC2;   /* 2.12 on bone: a ground, never text */
+  --ochre:           #C49A52;   /* 2.28 on bone: a ground */
+  --ochre-deep:      #8E6618;   /* 4.53 — territorial type, on regions and events */
+  /* --terracotta-deep WAS A SECOND NAME FOR #A6573A, which is
+     --terracotta-2 declared sixty lines down. One hex, two tokens, and the
+     palette register could only ever describe one of them — the
+     --atlas-context fault this file already records. Deleted; the family
+     bindings take --terracotta-2. */
+  --terracotta-3:    #8C4930;   /* 6.35 on bone — the hover step */
+  --cobalt-2:        #1C46A0;   /* 8.06 on bone — cobalt's hover step */
+  --ochre-deep-2:    #6F4F11;   /* 6.57 — ochre where it is emphasis, not a ground */
+
+  /* ── THE TWO MAPS, AND THE SWAMP IS WHAT WENT ───────────────────────
+     The instrument was a graphite field under a pale continent and the
+     objection was not the darkness, it was the GREEN: a near-black green
+     ground under olive-green land reads as a marsh. These are the owner's,
+     and the correction is stated in the brief — "no olive. The continent
+     becomes pale against graphite."
+
+     LAND AGAINST WATER IS 1.18 ON THE LIGHT MAP, which is the whole reason
+     it needs its own ink: a luminance step cannot carry that boundary, so
+     the BORDER does (3.39 on land, 4.02 on water) and the coastline is the
+     thing a reader follows. Every other map on this site has had land and
+     sea six or eight steps apart; this one is a printed atlas instead, told
+     apart by hue and by line. */
+  --map-land:        #D8D4C7;
+  --map-water:       #DDE8E7;
+  --map-border:      #68716E;
+  --map-ink:         #1A2725;
+
+  --map-dark-bg:     #07100F;
+  --map-dark-land:   #F3F0E6;   /* 16.90 on the ground */
+  --map-dark-border: #B9C1BA;
+  --map-dark-ink:    #F3F0E6;
   /* THERE IS NO LIME, AND THE REASON IS A MEASUREMENT THE PALETTE NEVER
      MADE: WHERE IT WAS ACTUALLY BEING SPENT. #c8ff4d was declared as the
      dark world's accent — links, kickers, one button — and it ended up
@@ -105,7 +160,7 @@
      leftovers. Both are DISCOVER colours and neither appears in
      INTELLIGENCE, where the only accent is cobalt-air.
 
-     --atlantic    heritage and provenance. The pages that talk about how
+     --olive    heritage and provenance. The pages that talk about how
                    this project knows what it claims: /method, /sources,
                    /brand, /honest, /fund. It was the primary for a year and
                    it is the right colour for the parts of the product that
@@ -115,24 +170,24 @@
                    geographic — countries, regions, destinations, journeys —
                    and terracotta marks the human and cultural. That is a
                    real editorial distinction, not decoration. */
-  --atlantic:     #4a5326;
-  --provenance:   var(--atlantic);   /* the heritage rule on a provenance note */
-  --atlantic-2:   #3a411e;
-  --terracotta:   #a4491f;
-  --terracotta-2: #8a3a17;   /* the deeper one, for text on --paper-3 where
+  --olive:     #687044;
+  --provenance:   var(--olive);   /* the heritage rule on a provenance note */
+  --olive-2:   #545a36;
+  --terracotta:   #B9684A;
+  --terracotta-2: #A6573A;   /* the deeper one, for text on --paper-3 where
                                 #a4491f measures 4.48 and just misses */
   /* THE LIFTED STEPS, AND ONE OF THEM WAS BEING REFERENCED WITHOUT EXISTING.
      Both accents have to lift for a dark-preference reader — #4a5326 is
      1.81:1 on graphite — and the lifted values lived as raw hexes inside the
      dark blocks while `--provenance` in both of those blocks said
-     `var(--atlantic-lift)`, a token this stylesheet has never declared. An
+     `var(--olive-lift)`, a token this stylesheet has never declared. An
      unresolvable var() makes the whole declaration invalid at computed-value
      time and the property falls back to its INHERITED value, so the heritage
      rule down the side of 843 provenance panels painted in the text colour
      — limestone — in the dark preference and in the whole INTELLIGENCE
      world. Named here, once, and referenced everywhere they were typed. */
-  --atlantic-lift:   #a3b167;
-  --atlantic-lift-2: #b4c179;
+  --olive-lift:   #a3b167;
+  --olive-lift-2: #b4c179;
   --terracotta-lift:   #e08a5c;
   --terracotta-lift-2: #ea9a6c;
 
@@ -144,10 +199,15 @@
      neutral grey now, which is also more honest about what that tier is. */
 
   /* ── WORLD 01 — DISCOVER, light ────────────────────────────── */
-  --paper:        var(--limestone);
-  --paper-2:      var(--limestone-2);
-  --paper-3:      var(--limestone-3);
-  --ink:          var(--graphite);
+  --paper:        var(--bone);
+  --paper-2:      var(--bone-2);
+  --paper-3:      var(--mineral);
+  /* THE OWNER'S TABLE NAMES TWO NEAR-BLACKS AND THEY DO DIFFERENT JOBS:
+     graphite (#07100F) is the near-black GREEN and it is a ground, ink
+     (#141716) is the very dark charcoal and it is TYPE. This was an alias
+     for graphite, which collapsed the distinction — so the instrument's
+     field and the letterforms on a page were the same colour. */
+  --ink:          #141716;
   --ink-2:        #3b443a;
   --ink-3:        #5d675b;   /* 5.05 on --paper-3; #5c636c measured 4.15 there and failed */
   --rule:         #cfcbbb;
@@ -172,15 +232,12 @@
   /* The default family's graphic step and ground tint. Every accent block
      below rebinds all four, so a component spends `--door-mark` or
      `--door-wash` once and every family gets its own. */
-  --door-mark:    #03986e;
-  --door-wash:    #c0f1da;
+  --door-mark:    var(--sky);
   /* THE TWO NEIGHBOURS ON THE WHEEL, so the ribbon runs across three hues
      the way the reference's does rather than through one hue's own steps —
      which is a tint ramp and reads as shading, not as colour. They are the
      ADJACENT families' marks, so the gradient is always between hues that
      are one even OKLCH step apart and cannot go grey through the middle. */
-  --door-near:    #09949b;
-  --door-far:     #7c8d36;
 
   /* The signature at full strength, for things that are drawn rather than
      read. WCAG asks 3:1 of a graphic, not 4.5:1, so this is where #2e7157
@@ -272,11 +329,47 @@
      Limestone measures 11.32 on the deep against 10.40, so the aperture
      reads by tone MORE than it did, and the land clears the water at 8.61
      against 7.91. Every number moved the right way. */
-  --ocean-deep:    #0a2030;
-  --ocean-mid:     #16384e;
-  --ocean-shallow: #2e5c79;
-  --ocean-coastal: #5c879e;
-  --atlas-sea:     #0e2a3c;
+  /* AND THE RAMP HAD TO GO WITH THE WATER, OR THE SWAMP COMES BACK AS A
+     HALO. The four steps are the shore band under every coast, the rivers
+     and lakes on 824 plates, and the hero's own Atlantic — and they were a
+     near-black navy, written when the sea was #0e2a3c. Left alone under the
+     light map they drew a dark blue fringe round every pale coastline: the
+     exact thing the brief calls the green/black treatment, surviving as an
+     outline after the fill had been fixed. Measured on a contact sheet of
+     twelve families, which is the only instrument that could see it.
+
+     One hue, 175, which is the owner's own #DDE8E7 read back as HSL, with
+     saturation RISING as the water deepens. And the deep step is sized by
+     what it has to do rather than by how a sea looks: a river is a line on
+     the LAND, so #346F6A is 3.90 on the stone and 4.62 on the water, where
+     anything paler is a river you cannot follow. 5.08 on bone and 3.33 on
+     graphite, so it reads in either world. */
+  --ocean-deep:    #346F6A;
+  --ocean-mid:     #549C96;
+  --ocean-shallow: #93BDBA;
+  --ocean-coastal: #D2DFDE;
+  /* ── THE LIGHT MAP IS THE EUROPEAN ATLAS, AND THE WATER WAS THE WHOLE
+     OBJECTION. The owner's brief names the previous treatment by what it
+     looked like — a green/black swamp — and the diagnosis is the water: a
+     #0e2a3c Atlantic under a khaki continent is a satellite photograph at
+     night, and no amount of tuning the land fixes a drawing whose largest
+     area is near-black. The replacement is four values and they are the
+     owner's own: land #D8D4C7, water #DDE8E7, border #68716E, ink #1A2725.
+
+     LAND AGAINST WATER IS 1.18, WHICH IS THE POINT RATHER THAN A DEFECT.
+     This is how a printed atlas is drawn: stone on pale water, and the
+     COASTLINE is what separates them. `docs/palette.json` says so in the
+     map-border row — "on this map the boundary IS the map" — so the ink went
+     up as the tone difference came down, and the border ink measures 3.39 on
+     the land and 4.02 on the water, and the coast that carries the
+     separation measures 6.74 and 7.98 — where before both were a hairline
+     doing nothing over an 8.6 tonal step.
+
+     The ocean ramp below is NOT repointed: it is the hero's own water, a
+     drawing of the Atlantic at 1120 units where four measured steps of depth
+     are real work, and the brief's objection was to the map treatment rather
+     than to that. Two water treatments, told apart by scale. */
+  --atlas-sea:     var(--map-water);
   /* LAND IS ONE FAMILY, AND THE SUBJECT IS THE BRIGHTEST OF IT. The subject
      used to be a light blue, which worked against pale water and reads as
      SEA against an Atlantic one — Greece came out the same family of blue as
@@ -298,7 +391,7 @@
      by less than 0.02 — subject to land 1.31 against 1.33, far to land 1.26
      against 1.28, land to water 8.68 against 8.61 — so this is the yellow
      cast coming out and nothing else moving. */
-  --atlas-land:    #d9d3c4;
+  --atlas-land:    var(--map-land);
   /* NO --atlas-context. It was the same value as --atlas-land and nothing
      referenced it: context IS the same land, which is the rule the layer
      comment three thousand lines down already states and demonstrates by
@@ -309,10 +402,26 @@
      page and is a silhouette you cannot quite see. It was a raw hex in two
      plate rules before the glyphs needed it; a colour used in two families
      is a token. */
-  --atlas-far:     #b4ae9e;
-  --atlas-here:    #fffdf6;
-  --atlas-coast:   #081a26;
-  --atlas-hereline:#081a26;
+  /* The muted step of the same stone, for context outside the subject. It
+     has to sit BETWEEN the land and the water now rather than below both,
+     because the water went pale: #C3BFB2 measures 1.24 under the land and
+     1.47 over the water, so a quiet country is still a country and is still
+     quieter than the subject's neighbours. */
+  --atlas-far:     #C3BFB2;
+  /* THE SUBJECT IS THE BRIGHTEST STONE AND IT IS A DECLARED TOKEN NOW.
+     `--bone-light` is the one surface in this palette that goes UP rather
+     than down, which is exactly what a lit country is, and it had no user at
+     all — declared for a card that never took it. Subject against its
+     neighbours 1.35, against the water 1.14 with the coast between them. */
+  --atlas-here:    var(--bone-light);
+  /* THE COAST AND THE SUBJECT'S EDGE ARE THE MAP'S OWN BORDER INK, DARKENED.
+     A coastline on a pale-water atlas is carrying the separation the tone no
+     longer carries, so it is the heaviest line in the drawing: 6.74 on the
+     land, against #68716E's 3.39, and the frontier below stays the lighter
+     of the two because a frontier is a claim about the ground and a coast is
+     the ground. */
+  --atlas-coast:   #3D4441;
+  --atlas-hereline:#3D4441;
   /* A FRONTIER AND A COASTLINE WERE THE SAME INK, AND THE HIERARCHY WAS TWO
      TENTHS OF A UNIT OF WIDTH. `docs/cartography.md` says "a frontier is the
      lightest because it is context, a coast is the edge of the subject's
@@ -325,7 +434,7 @@
      on the land against the coast's 8.44, and it still clears 3:1 on the
      darkest and the palest hypsometric band, so it reads over relief as well
      as over flat paper. */
-  --atlas-frontier:#40647c;
+  --atlas-frontier:var(--map-border);
 
   /* ── THE INSTRUMENT CARTOGRAPHY ──────────────────────────────────────
      THE PICTURES WERE GIVEN A CARTOGRAPHY AND THE INSTRUMENTS WERE NOT.
@@ -457,57 +566,49 @@
  * INTELLIGENCE overrides all of it below — in the dark world there is one
  * accent and nothing else, which is what makes crossing worlds legible. */
 body.area-stories, body.area-events, body.area-experiences {
-  --door:      var(--terracotta);
-  --door-dark: var(--terracotta-2);
-  --door-mark: #e55900;
-  --door-wash: #fee1d5;
-  --door-near: #7c8d36;
-  --door-far: #cf57ba;
+  --door:      var(--terracotta-2);
+  --door-dark: var(--terracotta-3);
+  --door-mark: var(--terracotta);
 }
 body[data-accent="heritage"] {
-  --door:      var(--atlantic);
-  --door-dark: var(--atlantic-2);
-  --door-mark: #7c8d36;
-  --door-wash: #e0ecbf;
-  --door-near: #03986e;
-  --door-far: #e55900;
+  --door:      var(--olive-2);
+  --door-dark: var(--olive);
+  --door-mark: var(--olive-lift);
 }
 
-/* FIVE MORE, AND THEY ARE WHAT MAKES THE RATIO TRUE.
+/* AND THE EIGHT-HUE WHEEL CAME OUT AGAIN, ONE COMMIT AFTER IT WENT IN.
  *
- * The accent is declared at five per cent of a screen and measured at 0.3.
- * Two accents over nine `area-` classes could never close that: 897 pages
- * are one area, so most of the atlas was one colour whatever the hue, and
- * what colour there was went on an 11px kicker.
+ * It was generated in OKLCH at even hue steps and every step was measured,
+ * and it was still the wrong answer: the brief that replaced it says UI
+ * RESTRAINED, PHOTOGRAPHY RICH, MAPS PRECISE, TYPOGRAPHY DRAMATIC — and
+ * names the failure exactly, that a site going green, blue, orange, yellow,
+ * pink, purple destroys the premium quality. Eight families each with their
+ * own hue, a tinted ground and a gradient ribbon is that site.
  *
- * Generated in OKLCH at even hue steps, so the eight read as one system
- * rather than as eight picks, and every one is measured against limestone:
- * the ink clears 4.5 as text, the mark clears 3:1 as a graphic, and the
- * wash is a GROUND — 1.09 against the paper, which is a tint you can see,
- * and still holding its own ink at 4.7. The wash is the half that changes
- * how the site reads, because an accent that is only ever ink can never be
- * five per cent of anything.
- *
- * THE GOLD BAND IS STEPPED AROUND rather than avoided by taste: `checks.py`
- * refuses a mid-lightness saturated yellow by arithmetic, so the generator
- * tests every candidate against that same predicate and drops the chroma or
- * the hue until it passes. Two evenly-spaced hues came out dull for exactly
- * that reason and were left out of the set instead of shipped weak. */
-body[data-accent="lagoon"]   { --door: #086f74; --door-dark: #05575b;
-                               --door-mark: #09949b; --door-wash: #b6f1f4;
-                               --door-near: #0c8dce; --door-far: #03986e; }
-body[data-accent="adriatic"] { --door: #016a9d; --door-dark: #01537b;
-                               --door-mark: #0c8dce; --door-wash: #cfeafe;
-                               --door-near: #5e7cfa; --door-far: #09949b; }
-body[data-accent="indigo"]   { --door: #4058d3; --door-dark: #3346a8;
-                               --door-mark: #5e7cfa; --door-wash: #dee6fd;
-                               --door-near: #9f6aec; --door-far: #0c8dce; }
-body[data-accent="amethyst"] { --door: #7d45c5; --door-dark: #63369c;
-                               --door-mark: #9f6aec; --door-wash: #ebe2ff;
-                               --door-near: #cf57ba; --door-far: #5e7cfa; }
-body[data-accent="cassis"]   { --door: #a83095; --door-dark: #862676;
-                               --door-mark: #cf57ba; --door-wash: #feddf6;
-                               --door-near: #e55900; --door-far: #9f6aec; }
+ * What replaces it is the owner's own table, which is a smaller idea doing
+ * more work: five accents, each identifying a content FAMILY, spent on the
+ * kicker, the rules and the marks — and the brighter colour coming from the
+ * photographs instead. An incredibly colourful Dolomites beside a very
+ * restrained editorial interface, which is the sentence the brief ends on. */
+/* AND NOT ONE RAW HEX, because a value typed here is a value the palette
+ * register cannot see. Seven of them were: #1c46a0 twice, #6f4f11, #8c4930,
+ * and three survivors of the eight-hue wheel — #03986e a bright green,
+ * #e55900 an orange, #7c8d36. docs/palette.json recomputes every contrast
+ * claim from the tokens, so a family whose accent is a literal is a family
+ * whose accent is unmeasured; deleting --ultramarine from the stylesheet
+ * once left the whole suite green for exactly this reason. */
+body.area-countries { --door: var(--cobalt);      --door-dark: var(--cobalt-2);
+                      --door-mark: var(--mineral); }
+body[data-accent="territory"] { --door: var(--ochre-deep);
+                                --door-dark: var(--ochre-deep-2);
+                                --door-mark: var(--ochre); }
+body[data-accent="human"] { --door: var(--terracotta-2);
+                            --door-dark: var(--terracotta-3);
+                            --door-mark: var(--terracotta); }
+body[data-accent="movement"] { --door: var(--cobalt); --door-dark: var(--cobalt-2);
+                               --door-mark: var(--sky); }
+body[data-accent="natural"] { --door: var(--olive-2); --door-dark: var(--olive);
+                              --door-mark: var(--sky); }
 
 /* Both accents have to lift for a dark-preference reader, and the browser
    suite is what said so: #a4491f is 3.17:1 on graphite and #4a5326 is
@@ -520,8 +621,8 @@ body[data-accent="cassis"]   { --door: #a83095; --door-dark: #862676;
     --door-dark: var(--terracotta-lift-2);
   }
   body[data-accent="heritage"] {
-    --door:      var(--atlantic-lift);
-    --door-dark: var(--atlantic-lift-2);
+    --door:      var(--olive-lift);
+    --door-dark: var(--olive-lift-2);
   }
 }
 
@@ -531,8 +632,8 @@ body[data-accent="cassis"]   { --door: #a83095; --door-dark: #862676;
    would keep terracotta on a graphite ground — 3.17:1, and invisible. No
    page is in that position today; the rule is here so none ever is. */
 body[data-world="intelligence"] {
-  --door:      var(--pine-air);
-  --door-dark: #a3b4ff;
+  --door:      var(--cobalt-air);
+  --door-dark: var(--cobalt-lift);
 }
 
 /* ── WORLD 02 — INTELLIGENCE ───────────────────────────────────
@@ -552,28 +653,68 @@ body[data-world="intelligence"] {
  * via the same attribute on that element. That is the door working as a design
  * language rather than as a glyph: a window into the machine, cut into an
  * editorial page. */
-/* AND THEN THE OWNER SAID: NO DARK PAGES.
+/* NO DARK PAGES — AND ONE DARK FAMILY, WHICH THE OWNER NAMED.
  *
- * Everything above this rule is the argument for a dark INTELLIGENCE, and
- * it is kept because it is the reasoning the decision reverses rather than
- * a mistake: the world was dark in both colour-scheme preferences so that
- * it said WHERE A READER IS rather than how they like their screen, and so
- * that it could not collapse into a theme toggle.
+ * This block was emptied to three light surfaces on the instruction "avoid
+ * dark pages", and that reading was too wide by exactly one family. The
+ * palette brief that followed assigns a colour set to each family and the
+ * Discover row reads GRAPHITE + BONE + COBALT, with four words after it:
+ * "This is the instrument." Every other row in that table is bone-led. So
+ * the general instruction is the editorial families and the exception is
+ * stated, by name, in the same document.
  *
- * It collapses now, deliberately. Five pages were graphite — /map, /plan,
- * /my-europe, /search, /discover — and the country map figure carried the
- * world into fifty editorial pages as a dark window. A reader arriving from
- * a country page met a different product.
+ * It matters which way round that is. A light page cannot carry a graphite
+ * FIGURE — the drawing becomes a hole cut in the paper, which is what the
+ * removal fixed — and a graphite page carries a graphite figure with no
+ * hole at all, because the ground and the opening are the same material.
+ * The five instruments go back to the ground they had; what does NOT go
+ * back is the dark window cut into fifty editorial country pages, which is
+ * the half of the old behaviour a reader actually met by accident.
  *
- * WHAT STILL TELLS AN INSTRUMENT FROM A PAGE, now that the ground does not:
- * the SURFACES step further apart here than in the editorial world and the
- * rule is stronger, because a tool is a set of controls and a page is a
- * column of prose. That is a smaller distinction than a ground, and it is
- * the honest size of the one that is left. */
+ * THE FIGURE INSIDE IT IS THE OWNER'S DARK MAP, AND THAT IS THE NEW HALF.
+ * Graphite ground, #F3F0E6 continent, #B9C1BA frontier — "the continent
+ * becomes pale against graphite. That gives you the dramatic map without
+ * the swamp appearance." The picture maps take the light set eighty lines
+ * up; the instruments take this one; the two cartographies are two sets of
+ * four values instead of two palettes that drifted for a year. */
 [data-world="intelligence"] {
-  --paper-2:      #eceade;
-  --paper-3:      #e2dfd0;
-  --rule:         #c6c2b0;
+  --paper:        var(--graphite);
+  --paper-2:      var(--graphite-2);
+  --paper-3:      var(--graphite-3);
+  --ink:          var(--bone);
+  --ink-2:        #c5cac5;
+  --ink-3:        #97a097;
+  --rule:         #2d352d;
+  --sea:          var(--cobalt-lift);
+  --sea-dark:     var(--cobalt-air);
+  --signature:    var(--cobalt-air);
+  --warn:         var(--warn-lift);
+  --warn-bg:      #271719;
+  --provenance:   var(--olive-lift);
+
+  /* THE DARK MAP. Four values, and the land is the page's own bone: an
+     instrument's continent is the brightest thing in its own frame, which
+     is the hero's sentence — Europe is what the light falls on — applied to
+     the tool rather than to the door.
+     THE COASTLINE IS THE TONE AND THE FRONTIER IS THE LINE, which is the
+     light map's rule inverted and the reason it needs no extra ink: land
+     against ground measures 16.90, so the coast is the strongest edge in
+     the drawing without a stroke at all, and #B9C1BA at 1.62 on the land is
+     a faint internal hairline — a frontier, drawn the way a pale-continent
+     atlas draws one. The SUBJECT is the one thing that cannot be brighter
+     than the land, because the land is already the brightest value in the
+     palette, so it is outlined in graphite at 16.90 instead. A quiet
+     country outside the frame is #6C736E: 3.96 on the ground and 4.27 under
+     the lit land, three tiers, ordered. No olive anywhere in it, which is
+     the brief's own note. */
+  --atlas-sea:      var(--map-dark-bg);
+  --atlas-land:     var(--map-dark-land);
+  --atlas-far:      #6C736E;
+  --atlas-here:     var(--map-dark-land);
+  --atlas-coast:    var(--map-dark-border);
+  --atlas-hereline: var(--graphite);
+  --atlas-frontier: var(--map-dark-border);
+  --map-ink:        var(--map-dark-ink);
 }
 
 /* DISCOVER, for a reader who prefers dark.
@@ -591,7 +732,7 @@ body[data-world="intelligence"] {
     --paper:        var(--graphite);
     --paper-2:      var(--graphite-2);
     --paper-3:      var(--graphite-3);
-    --ink:          var(--limestone);
+    --ink:          var(--bone);
     --ink-2:        #c5cac5;
     --ink-3:        #97a097;
     --rule:         #2d352d;
@@ -599,12 +740,12 @@ body[data-world="intelligence"] {
     --sea:          var(--pine-lift);
     --sea-dark:     var(--pine-air);
     --door:         var(--pine-air);
-    --door-dark:    #a3b4ff;
+    --door-dark:    var(--pine-lift);
     --signature:    var(--pine-lift);
 
     --warn:         var(--warn-lift);
     --warn-bg:      #271719;
-  --provenance:   var(--atlantic-lift);
+  --provenance:   var(--olive-lift);
 
     --shadow-lift: 0 2px 4px rgba(0,0,0,.55), 0 18px 40px -18px rgba(0,0,0,.8);
   }
@@ -678,7 +819,7 @@ p { margin: 0 0 var(--s4); max-width: var(--measure); }
  * stylesheet spends a check on avoiding. `limestone on cobalt-deep` measures
  * 6.31:1 and is already in docs/palette.json, because it is what the primary
  * button uses; nothing new is claimed here. Bound to `--pine-deep` and
- * `--limestone` BY NAME rather than to `--signature` and `--ink`, because
+ * `--bone` BY NAME rather than to `--signature` and `--ink`, because
  * the masthead rebinds both and a selection inside it would have come out
  * limestone on limestone.
  *
@@ -708,7 +849,7 @@ p { margin: 0 0 var(--s4); max-width: var(--measure); }
  * seventeen interest boxes were cobalt-air while every other control on the
  * same page was cobalt-deep — two blues, one form.
  */
-::selection { background: var(--pine-deep); color: var(--limestone); }
+::selection { background: var(--pine-deep); color: var(--bone); }
 /* ON `body`, NOT ON `:root`. A var() in a declaration resolves where the
    DECLARATION lives, and the world tokens are set on `body[data-world]`,
    which is a descendant of `:root` — so `:root { accent-color: var(--sea) }`
@@ -761,7 +902,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
  * has a paragraph about. An override on the surface is the only form that
  * cannot get that wrong. */
 .masthead a:focus-visible, .masthead button:focus-visible {
-  outline-color: var(--limestone);
+  outline-color: var(--bone);
 }
 
 .skip { position: absolute; left: -9999px; }
@@ -835,12 +976,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 [id] { scroll-margin-top: calc(var(--mast) + var(--s4)); }
 
 .masthead { position: sticky; top: 0; z-index: 40;
-            --ink:       var(--limestone);
-            --ink-2:     color-mix(in srgb, var(--limestone) 85%, var(--pine-deep));
-            --ink-3:     color-mix(in srgb, var(--limestone) 70%, var(--pine-deep));
-            --signature: color-mix(in srgb, var(--limestone) 70%, var(--pine-deep));
-            --door:      var(--limestone);
-            --rule:      color-mix(in srgb, var(--limestone) 34%, transparent);
+            --ink:       var(--bone);
+            --ink-2:     color-mix(in srgb, var(--bone) 85%, var(--pine-deep));
+            --ink-3:     color-mix(in srgb, var(--bone) 70%, var(--pine-deep));
+            --signature: color-mix(in srgb, var(--bone) 70%, var(--pine-deep));
+            --door:      var(--bone);
+            --rule:      color-mix(in srgb, var(--bone) 34%, transparent);
             background: color-mix(in srgb, var(--pine-deep) 96%, transparent);
             /* AND THE COLOUR ITSELF, WHICH THE FIRST TOKEN VERSION FORGOT.
              * Redefining --ink is not enough: the wordmark sets no colour of
@@ -1184,7 +1325,7 @@ a .kicker { color: var(--ink-3); }
 .statemark { display: inline-block; width: .62em; height: .62em; flex: none;
              margin-right: .55em; border-radius: 999px; position: relative;
              border: 1.5px solid currentColor; vertical-align: baseline; }
-.sm-on   { background: var(--atlantic); border-color: var(--atlantic); }
+.sm-on   { background: var(--olive); border-color: var(--olive); }
 .sm-part { background: linear-gradient(to right,
              currentColor 0 50%, transparent 50% 100%); }
 .sm-draft { background: none; }
@@ -1951,7 +2092,7 @@ a .kicker { color: var(--ink-3); }
    And the mat comes off: an instrument's water runs to the cut. */
 .mapwrap {
   border: 0; border-radius: var(--radius);
-  outline: 1px solid color-mix(in srgb, var(--limestone) 26%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--bone) 26%, transparent);
   outline-offset: -1px;
   background: var(--paper-2); padding: 0; margin: var(--s3) 0 var(--s5);
   overflow-x: auto; max-width: min(100%, calc(88vh * 1.282)); margin-inline: auto;
@@ -2377,7 +2518,7 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
    seventeenth. The FILL is further down, next to the rule that was beating
    it. */
 .macromap .mmlabel {
-  fill: color-mix(in srgb, var(--limestone) 92%, transparent);
+  fill: color-mix(in srgb, var(--bone) 92%, transparent);
   font-family: var(--display); font-size: 15px; font-weight: 700;
   paint-order: stroke; stroke: var(--atlas-sea); stroke-width: 3; stroke-linejoin: round;
 }
@@ -2535,7 +2676,7 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
  *   the byline, four grey pills between the standfirst and the story, and
  *   it is the least urgent thing on the page — a search link. It is at the
  *   foot now, with the save action, where a reader who has finished is.
- */
+ *
  * ONE new font size, and four line-heights unchanged. The first draft of
  * this block cost two sizes and four line-heights, and the invariant
  * register caught all six: css.font_sizes 15 -> 17, css.line_heights 4 -> 8.
@@ -3328,8 +3469,19 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    Constant width, because it is a drawing convention and not a claim about
    depth — nothing in this repository holds a sounding, and real bathymetry
    is not a constant band. */
+/* AND ON A DARK MAP A SHORE BAND IS A SHADOW, NOT A HIGHLIGHT. The band is
+   the land's own silhouette blurred four units, so its colour is read
+   against whatever the sea is — and the sea here is the graphite ground. At
+   `--ocean-shallow` it drew a pale halo round every coast INCLUDING the
+   context land east of the atlas, which rendered as a hard-edged bright
+   wedge over Russia that looks like a beam of light somebody left on. That
+   is the LIT AURA this rule's own comment already records, arriving from the
+   other side: the first version was too soft, this one was too bright.
+   The deep step at a third, so the water darkens toward the land instead of
+   glowing away from it — which is also what a shelf sea does on a night
+   image, and the only version of this band that is true in both maps. */
 .heroeurope .lyr-coastal-water use {
-  fill: color-mix(in srgb, var(--ocean-shallow) 76%, transparent); }
+  fill: color-mix(in srgb, var(--ocean-deep) 34%, transparent); }
 /* THE COAST, HEAVIER THAN A FRONTIER. Only the outer half of this stroke is
    ever seen: the land's own fill covers the rest, and a neighbour's fill
    covers it along every internal border. So one declaration gives the
@@ -3379,6 +3531,21 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    `#heroland { fill }` would come back filled inside the copy. Nothing
    selects the path: fill and stroke sit on the group and are inherited, so
    the clone inherits from its own parent instead. See heroeurope(). */
+/* THE HERO IS THE DARK MAP, AND IT WAS DRAWN WITH THE LIGHT MAP'S LAND.
+   The brief gives two map sets and the hero is unmistakably the second one:
+   a continent on a graphite ground with the light stopping at the edge of
+   the atlas. It was painting `--atlas-land` — the LIGHT map's stone, which
+   is right on pale water and reads as grey-brown on near-black, so the one
+   picture on the site was a dim continent in the dark rather than a lit one.
+   #F3F0E6 on #07100F measures 16.90 where the stone measured 11.96, and the
+   brief's own sentence is the test: the continent becomes pale against
+   graphite.
+   REBOUND RATHER THAN RESTATED, so the coast, the frontier, the seams and
+   the hover lift all follow from one declaration. Six rules downstream mix
+   against `--atlas-land`, and setting the fill here and leaving those would
+   have drawn a bone continent with a coastline computed from a colour that
+   is no longer in the picture. */
+.heroeurope { --atlas-land: var(--map-dark-land); }
 .heroeurope .herolandg, .heroeurope .heroctxg {
   fill: var(--atlas-land); stroke: var(--atlas-land);
   stroke-width: 1.4; stroke-linejoin: round; }
@@ -3401,10 +3568,18 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
   .heroeurope a path { transition: none; }
 }
 .heroeurope a:hover path, .heroeurope a:focus-visible path {
-  fill: color-mix(in srgb, var(--limestone) 62%, var(--atlas-land)); }
+  fill: color-mix(in srgb, var(--bone) 62%, var(--atlas-land)); }
 .heroeurope a:focus-visible { outline: 3px solid var(--signature);
                               outline-offset: 2px; }
-.heroeurope .heroctxg { opacity: .30; }
+/* THE CONTEXT IS UNLIT GROUND AND IT TOOK THE SUBJECT'S NEW COLOUR. Binding
+   `--atlas-land` on `.heroeurope` gave the bone continent to the land AND to
+   the context beyond it, so Asia and North Africa came up to 30% of #F3F0E6
+   — quieter Europe, which is the exact reading this drawing replaced when
+   the ground became graphite. The context keeps the light map's stone: it is
+   a different material from the subject, which is the whole sentence the
+   hero makes. */
+.heroeurope .heroctxg { opacity: .30;
+  fill: var(--map-land); stroke: var(--map-land); }
 /* FIFTY COUNTRIES, FELT RATHER THAN READ. Not a political map — at reading
    distance nobody should think "I see borders", and everybody should know
    this is a map of Europe rather than a relief sculpture of it. One ink,
@@ -3777,9 +3952,9 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    * this is the same ocean, further up its own ramp. */
   background:
     radial-gradient(58% 54% at 46% 74%, color-mix(in srgb, var(--ocean-mid) 40%, transparent), transparent 70%),
-    radial-gradient(70% 60% at 10% 30%, color-mix(in srgb, var(--atlantic) 18%, transparent), transparent 66%),
+    radial-gradient(70% 60% at 10% 30%, color-mix(in srgb, var(--olive) 18%, transparent), transparent 66%),
     color-mix(in srgb, var(--ocean-mid) 55%, var(--ocean-deep));
-  color: var(--limestone);
+  color: var(--bone);
 }
 /* THE REVEAL — THE ONE PART OF THE SIGNATURE THE HERO DID NOT HAVE.
  *
@@ -3861,9 +4036,9 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
     color-mix(in srgb, var(--graphite) 86%, transparent) 100%);
 }
 .herofull .credit { position: absolute; right: var(--s4); bottom: var(--s3); z-index: 1;
-                    font-size: var(--t-xs); color: color-mix(in srgb, var(--limestone) 70%, transparent); }
+                    font-size: var(--t-xs); color: color-mix(in srgb, var(--bone) 70%, transparent); }
 .herobody { max-width: 46rem; position: relative; z-index: 1; }
-.herofull .kicker { color: color-mix(in srgb, var(--limestone) 78%, transparent); }
+.herofull .kicker { color: color-mix(in srgb, var(--bone) 78%, transparent); }
 /* The kicker repeats the headline verbatim, so it is decoration to a
  * screen reader and is hidden from one rather than read twice. */
 .herofull .kicker { visibility: hidden; }
@@ -3871,7 +4046,7 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    scan said so; what this selector really decides is the measure. */
 .herofull h1 { max-width: 14ch;
                font-size: clamp(var(--t-4xl), 7vw, var(--t-6xl)); }
-.herofull .lede { color: color-mix(in srgb, var(--limestone) 88%, transparent);
+.herofull .lede { color: color-mix(in srgb, var(--bone) 88%, transparent);
                   max-width: 34rem; }
 
 /* The discovery field belongs to the picture, not to a form below it. */
@@ -4570,7 +4745,7 @@ body[data-hero] .masthead { position: sticky; }
 .instrmap .context path { fill: var(--atlas-far);
                                 stroke: color-mix(in srgb, var(--atlas-coast) 45%, transparent);
                                 stroke-width: 0.7; vector-effect: non-scaling-stroke; }
-.instrmap .herodot { fill: var(--pine-air); opacity: .95;
+.instrmap .herodot { fill: var(--cobalt-air); opacity: .95;
                            transition: opacity .2s ease, r .2s ease, fill .2s ease; }
 .instrmap .herodot.advisory { fill: var(--atlas-frontier); opacity: .6; }
 
@@ -4596,8 +4771,16 @@ body[data-hero] .masthead { position: sticky; }
  * sides: the dot is now a darker mark ON the land, 2.15:1 against it —
  * ground rather than accent, which is what the rule is about, and present,
  * which is what it promises. */
-.instrmap .herodot.unlit { fill: var(--atlas-coast); opacity: .7; r: 3; }
-.instrmap .herodot.lit { fill: var(--pine-air); opacity: 1; r: 5.5; }
+/* THE INSTRUMENT'S MARKS ARE COBALT, WHICH IS THE BRIEF'S OWN THIRD WORD.
+   Discover reads GRAPHITE + BONE + COBALT and the dots were `--pine-air`, a
+   mint green: 319 of them over a pale continent, which is the site's
+   signature hue spent on the one family the brief hands to a different one.
+   And an unlit dot took `--atlas-coast`, which on this map is the dark map's
+   #B9C1BA frontier — pale grey on a pale continent, so a place that dropped
+   out of a query did not go quiet, it went missing. `--atlas-far` is the
+   context step: 4.27 under the lit land, visible and plainly not chosen. */
+.instrmap .herodot.unlit { fill: var(--atlas-far); opacity: .8; r: 3; }
+.instrmap .herodot.lit { fill: var(--cobalt-air); opacity: 1; r: 5.5; }
 
 /* THE SCALE BAR, WHICH THE PROJECTION EARNED.
  *
@@ -4611,7 +4794,7 @@ body[data-hero] .masthead { position: sticky; }
  * Drawn like an instrument, not like a label: a hairline in the map's own
  * limestone, sitting in the negative space the conic's fan leaves at the
  * bottom of the aperture. */
-.scalebar path { fill: none; stroke: color-mix(in srgb, var(--limestone) 62%, transparent);
+.scalebar path { fill: none; stroke: color-mix(in srgb, var(--bone) 62%, transparent);
                  stroke-width: 1.1; vector-effect: non-scaling-stroke; }
 /* 11px, not 10: the map labels are already 11 and a scale bar is not worth
    a seventeenth font size on a site that holds sixteen. The invariant
@@ -4629,7 +4812,7 @@ body[data-hero] .masthead { position: sticky; }
    because a dense map hides its place names and must still say how far. */
 .scalebar text { font-family: var(--text); font-size: calc(11px / var(--z));
                  letter-spacing: .06em;
-                 fill: color-mix(in srgb, var(--limestone) 62%, transparent); }
+                 fill: color-mix(in srgb, var(--bone) 62%, transparent); }
 
 /* The aperture draws in its OWN ink, not the page's.
  *
@@ -4654,7 +4837,7 @@ body[data-hero] .masthead { position: sticky; }
    started reading the fills and compositing the alpha itself. 5.86:1
    now. */
 .minimap.arched .minidot circle { opacity: 1;
-  fill: color-mix(in srgb, var(--limestone) 55%, transparent); }
+  fill: color-mix(in srgb, var(--bone) 55%, transparent); }
 .minimap.arched .minidot.here circle { fill: var(--pine-air); }
 /* AND WHICH END IT STARTS AT. A route line drawn in order is the same
    drawing as the same route travelled backwards, so the last stop is hollow
@@ -4668,8 +4851,18 @@ body[data-hero] .masthead { position: sticky; }
    (0,4,1) both, so the later one wins and the earlier one is dead. */
 /* (deleted: superseded by the atlas rule below, which is where every
    route map now lives) */
-.minimap.arched .minilabel { fill: color-mix(in srgb, var(--limestone) 72%, transparent); }
-.minimap.arched .minilabel.here { fill: var(--limestone); font-weight: 600; }
+/* PALE TYPE IN THE OPENING WAS RIGHT WHEN THE OPENING WAS A DARK SEA, AND
+   THE FIFTY COUNTRY MAPS ARE THE ONES THAT STILL TAKE IT. Measured on the
+   built site: 618 figures carry `minimap arched atlas` and 50 carry
+   `minimap countrymap arched` with no atlas skin, so these two rules are
+   superseded on nine maps in ten and are the ONLY label colour on the
+   country portraits' companion map. Bone at 72% on the light map's stone is
+   1.16:1 — a name that is placed, measured, decluttered and invisible,
+   which is this stylesheet's most-repeated failure. The map's own ink, with
+   the stone as the halo, exactly as the atlas skin sets it. */
+.minimap.arched .minilabel { fill: var(--map-ink); paint-order: stroke;
+                             stroke: var(--atlas-land); stroke-width: 1.6; }
+.minimap.arched .minilabel.here { font-weight: 600; }
 /* The region names, which the aperture left behind. .countrymap .rlabel
    still resolved --ink-2 against the drawing's INTELLIGENCE world and haloed
    it in --map-hover, a mid-navy, four pixels wide: at 15px bold that reads
@@ -4677,9 +4870,9 @@ body[data-hero] .masthead { position: sticky; }
    it was meant to knock out of. The halo is the ground colour now — it
    exists to cut the coastline out from behind the type and to do nothing
    else — and the fill is stated, like every other mark inside the arch. */
-.minimap.arched .rlabel text { fill: color-mix(in srgb, var(--limestone) 88%, transparent);
-  stroke: var(--atlas-sea); stroke-width: 3; }
-.minimap.arched .rlabel:hover text { fill: var(--pine-air); }
+.minimap.arched .rlabel text { fill: var(--map-ink);
+  stroke: var(--atlas-land); stroke-width: 3; }
+.minimap.arched .rlabel:hover text { fill: var(--door); }
 
 /* THREE ROLES, AND EVERY PAGE HAS ONE.
    Measured across twenty-two rendered families: twenty-one placed a 60px h1
@@ -4806,7 +4999,7 @@ body[data-hero] .masthead { position: sticky; }
 .minimap.arched .archedge { fill: none; stroke: var(--rule); stroke-width: 1; }
 @media (prefers-color-scheme: dark) {
   /* Where it is the only thing saying "opening", it carries more weight. */
-  .minimap.arched .archedge { stroke: color-mix(in srgb, var(--limestone) 26%, transparent); }
+  .minimap.arched .archedge { stroke: color-mix(in srgb, var(--bone) 26%, transparent); }
 }
 
 /* THE ATLAS SKIN. Specificity is deliberate and generous: every rule it
@@ -4911,10 +5104,10 @@ body[data-hero] .masthead { position: sticky; }
    the crest of the ground within 25 km — never a list of mountainous places
    typed by somebody. */
 .minimap.arched.atlas .lyr-terrain .tband { fill-rule: evenodd; }
-.minimap.arched.atlas .lyr-terrain .t200  { fill: #d6d0c4; }
-.minimap.arched.atlas .lyr-terrain .t600  { fill: #d0c8ba; }
-.minimap.arched.atlas .lyr-terrain .t1200 { fill: #cac0af; }
-.minimap.arched.atlas .lyr-terrain .t2000 { fill: #c3b8a5; }
+.minimap.arched.atlas .lyr-terrain .t200  { fill: #d5d1c5; }
+.minimap.arched.atlas .lyr-terrain .t600  { fill: #d0c8bb; }
+.minimap.arched.atlas .lyr-terrain .t1200 { fill: #cac0b0; }
+.minimap.arched.atlas .lyr-terrain .t2000 { fill: #c3b8a6; }
 
 /* THE FRONTIER, RE-DRAWN ABOVE THE RELIEF. A boundary on this map is a
    stroke on the land path, so the bands paint over it: the prototype's first
@@ -5059,7 +5252,7 @@ body[data-hero] .masthead { position: sticky; }
    shows and where the eye reads depth from. Both are struck from the same
    `arch_path()` as the clip and the reveal: three curves that disagree by a
    pixel is three signatures. */
-.minimap.arched.atlas .archrim { fill: none; stroke: var(--limestone);
+.minimap.arched.atlas .archrim { fill: none; stroke: var(--bone);
                                  stroke-width: 6; }
 .minimap.arched.atlas .archrim.inner { stroke: var(--graphite);
                                        stroke-width: 1; opacity: .38; }
@@ -5071,8 +5264,8 @@ body[data-hero] .masthead { position: sticky; }
              margin-top: var(--s4); }
 .locator { margin: 0; flex: 0 0 auto; }
 .locator svg { display: block; width: 7rem; height: auto; }
-.locator .countries path { fill: var(--limestone-3); stroke: none; }
-.locator .context path { fill: var(--limestone-3); stroke: none; }
+.locator .countries path { fill: var(--mineral); stroke: none; }
+.locator .context path { fill: var(--mineral); stroke: none; }
 .locator .countries path.here { fill: var(--door); stroke: none; }
 .locator .locring { fill: none; stroke: var(--door); stroke-width: 1.2; }
 .locator figcaption { font-size: var(--t-xs); color: var(--ink-3);
@@ -5199,49 +5392,61 @@ body[data-hero] .masthead { position: sticky; }
    water, where a parchment halo puts a pale slug behind every name in the
    sea. A halo exists to stop a letter dissolving into what is under it; 1.6
    does that and leaves the name a name. */
-.minimap.arched.atlas .lyr-labels .minilabel { fill: var(--graphite);
+/* A PLACE NAME IS THE MAP'S OWN INK, WHICH IS NOT THE PAGE'S INK. The
+   labels were `--graphite`, the near-black GREEN the dark world is grounded
+   in, on a warm-stone continent — right by luminance and wrong by family,
+   and `--map-ink` (#1A2725) is the value the owner's table gives for exactly
+   this: type on the light map's land, 10.41 on the stone. */
+.minimap.arched.atlas .lyr-labels .minilabel { fill: var(--map-ink);
                                    paint-order: stroke;
                                    stroke: var(--atlas-land); stroke-width: 1.6; }
 /* THE SIGNATURE IS A COLOUR THAT GETS DRAWN, NOT READ — the rule that
    already separated `--signature` from `--door` on the rest of the site,
    met again here. Cobalt-deep names the place you are reading about and
    measures 4.27:1 on this water, under AA. So the DOT is cobalt and the
-   NAME is ink in bold: the accent is drawn, the text is read. */
+   NAME is ink in bold: the accent is drawn, the text is read.
    The `fill` is NOT restated here: the base `.minilabel` rule above already
    sets ink, and a declaration that restates what the element already has is
    a dead rule — the scan counts it, and it counted this one. */
 .minimap.arched.atlas .lyr-labels .minilabel.here { font-weight: 700; }
-.minimap.arched.atlas .lyr-labels .rlabel text { fill: var(--graphite); paint-order: stroke;
+.minimap.arched.atlas .lyr-labels .rlabel text { fill: var(--map-ink); paint-order: stroke;
                                      stroke: var(--atlas-land); stroke-width: 3; }
-/* The scale bar in coast measured 2.57:1 on the water it is drawn over — a
-   rule you cannot read is not a scale. A slate that clears AA on both the
-   water and the land, because a bar crosses from one to the other. */
+/* AND THE SCALE BAR WAS PAPER WITH AN INK HALO, WHICH INVERTED THE MOMENT
+   THE WATER DID. It was stone-on-navy, readable on both because the two
+   grounds were eight stops apart; on the light map the water is #DDE8E7 and
+   a stone bar on it measures 1.18 — a rule you cannot read is not a scale,
+   which is the sentence this block was written with. It is the map's ink
+   with a bone halo now, the same way round as a place name: 10.41 on the
+   land and 12.32 on the water. */
 .minimap.arched.atlas .lyr-labels .scalebar line,
-.minimap.arched.atlas .lyr-labels .scalebar path { stroke: var(--atlas-land); }
-/* The bar crosses water and land alike, so it is paper with an ink
-   halo: the reverse of a name, and readable on both. */
-.minimap.arched.atlas .lyr-labels .scalebar text { fill: var(--atlas-land);
-  paint-order: stroke; stroke: var(--ocean-deep); stroke-width: 2.4; }
+.minimap.arched.atlas .lyr-labels .scalebar path { stroke: var(--map-ink); }
+.minimap.arched.atlas .lyr-labels .scalebar text { fill: var(--map-ink);
+  paint-order: stroke; stroke: var(--bone); stroke-width: 2.4; }
 
-/* On paper the reveal is the whole reading of the opening, so it is ink
-   rather than a hairline rule. */
-.minimap.arched.atlas .archedge { stroke: var(--graphite); stroke-width: 1.2;
-                                  opacity: .55; }
-/* AND IN THE DARK PREFERENCE THAT IS INK ON INK — the signature invisible,
-   on every page that draws a picture plate.
-   *Light wall, dark opening* is the whole reading of the aperture, and in
-   the dark preference there is no step to read: the wall is graphite and
-   the opening is --atlas-sea, 1.23:1, which is why the door is read by its
-   CUT EDGE instead and why the rule forty lines up lifts that edge to
-   limestone below. The atlas skin arrived later at (0,3,1), the dark rule
-   is (0,2,1), AND A MEDIA QUERY ADDS NO SPECIFICITY — so the skin won in
-   both preferences and put the reveal back to graphite. The exact failure
-   this stylesheet already records twice, reintroduced by a later component
-   over the fix for it. 1.23:1 to 2.24. */
-@media (prefers-color-scheme: dark) {
-  .minimap.arched.atlas .archedge { stroke: color-mix(in srgb, var(--limestone) 26%, transparent);
-                                    opacity: 1; }
-}
+/* THE CUT EDGE IS THE MAP'S OWN BORDER INK, AND THAT IS WHAT MAKES THE
+   APERTURE MEASURABLE AT ALL.
+   *Light wall, dark opening* stopped being true when the water went pale:
+   on an inland frame there is no water in the opening, so the wall is bone
+   #F3F0E6 and the opening is stone #D8D4C7 and the STEP measures 1.10 — the
+   browser suite failed Austria and Chamonix on exactly that, and it is
+   right to, because SC 1.4.11 puts the boundary of a graphical object at
+   3:1 and a doorway is a graphical object. A step of 1.10 cannot be fixed
+   by tuning the land: two tones a reader is meant to read as one material
+   are always going to be close, which is the whole point of the atlas being
+   drawn on one stone.
+   So the door is read the way a real opening in masonry is, by its REVEAL,
+   and the reveal is the same ink the coastline and the frontier are: 4.41
+   against the wall and 3.39 against the land, from #68716E at full opacity
+   rather than graphite at 55%, which composited to 2.49. `--map-border`'s
+   own row in docs/palette.json says it — on this map the boundary IS the
+   map — and a doorway is a boundary.
+   AND ONE VALUE IN BOTH PREFERENCES, where there used to be two. The dark
+   override existed because the opening was a near-black sea under a
+   graphite wall; the opening is pale stone in every preference now, so a
+   second value would be the signature changing shape with a system
+   setting. */
+.minimap.arched.atlas .archedge { stroke: var(--map-border); stroke-width: 1.2;
+                                  opacity: 1; }
 
 /* THE TAP TARGET IS NOT THE DOT.
    A .minidot is r=5.5 in a 1000-unit viewBox, which renders at 3.9px across
@@ -6699,7 +6904,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    plates cut, at the largest size the arch appears anywhere. */
 .sheet-door .reveal { position: absolute; inset: 0; border-radius: inherit;
                       pointer-events: none;
-                      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--limestone) 34%, transparent),
+                      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--bone) 34%, transparent),
                                   0 0 0 1px color-mix(in srgb, var(--graphite) 16%, transparent); }
 
 /* 02 · the question — the sentence box, then eight photographs.
@@ -6779,12 +6984,12 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    matching rule beats inheritance at any specificity, so the standfirst
    went dark on a near-black plate the moment the override was removed. A
    declared colour is overridden, never inherited away. */
-.sheet-landscape { color: var(--limestone); }
+.sheet-landscape { color: var(--bone); }
 .sheet-landscape .mega, .sheet-landscape .lede,
 .sheet-landscape .go, .sheet-landscape .actno, .sheet-landscape .actname,
 .sheet-landscape .marginnote span, .sheet-landscape .sheetcred,
-.sheet-landscape .sheetcred a { color: var(--limestone); }
-.sheet-landscape .actno { border-bottom-color: color-mix(in srgb, var(--limestone) 50%, transparent); }
+.sheet-landscape .sheetcred a { color: var(--bone); }
+.sheet-landscape .actno { border-bottom-color: color-mix(in srgb, var(--bone) 50%, transparent); }
 .sheet-landscape .gomark::before { background: none; }
 .sheet-landscape .actmark { position: absolute; top: var(--s6);
                             left: var(--page-gutter); margin: 0; }
@@ -6864,9 +7069,9 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    share of the plate the list gets and the size it is set at. */
 .countrycols { columns: 5; column-gap: var(--s5); font-family: var(--display);
                font-size: var(--t-sm); line-height: 2;
-               border-left: 1px solid color-mix(in srgb, var(--limestone) 22%, transparent);
+               border-left: 1px solid color-mix(in srgb, var(--bone) 22%, transparent);
                padding-left: var(--s6); }
-.countrycols a { display: block; text-decoration: none; color: var(--limestone);
+.countrycols a { display: block; text-decoration: none; color: var(--bone);
                  opacity: .88; break-inside: avoid; }
 .countrycols a:hover { opacity: 1; text-decoration: underline;
                        text-underline-offset: .18em; }
@@ -6894,7 +7099,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
   .goright .gomark { transform: none; }
   .qrow { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .countrycols { columns: 3; border-left: 0; padding-left: 0;
-                 border-top: 1px solid color-mix(in srgb, var(--limestone) 22%, transparent);
+                 border-top: 1px solid color-mix(in srgb, var(--bone) 22%, transparent);
                  padding-top: var(--s5); }
   .sheet-atlas .sheettext { grid-template-columns: 1fr; }
 }
@@ -7213,36 +7418,12 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    is generated in OKLCH at even steps precisely so that a blend between
    adjacent families cannot go grey through the middle, which is the Mach
    band reasoning the hero's data fades already carry. */
-/* AND THEN IT COVERED THE PAGE, WHICH IS THE FAULT IT WAS MEANT TO FIX.
-   At 82% over the right two-thirds and the full height of the viewport it
-   stopped being an event and became a wash — running behind body copy on
-   every prose page, which is a legibility fault as well as a design one. On
-   the reference the ribbon lives in the HERO BAND and the type sits clear of
-   it; below the fold that page is white.
-
-   So it is bounded to the head's own depth, kept to the right half where
-   every family already puts its figure, and taken down to a little over a
-   third of its opacity. Concentrated is the whole idea and concentrated has
-   an edge: colour everywhere is a theme, colour in one place is a signature. */
-body::before {
-  content: ""; position: absolute; top: 0; right: 0;
-  width: 54%; height: 34rem; z-index: 0; pointer-events: none;
-  opacity: .30;
-  background: linear-gradient(118deg,
-    transparent 8%,
-    var(--door-wash) 20%,
-    var(--door-far) 34%,
-    var(--door-mark) 48%,
-    var(--door) 58%,
-    var(--door-near) 72%,
-    var(--door-wash) 86%,
-    transparent 97%);
-  filter: blur(34px) saturate(120%);
-}
-/* The two plate pages open on a full-bleed composition of their own and
-   carry it at full strength, because there the ribbon IS the opening rather
-   than something behind one. */
-body[data-hero]::before { opacity: .62; height: 44rem; }
+/* THE RIBBON IS GONE, AND IT IS THE CLEAREST THING THE BRIEF SETTLED.
+   Three versions of it are in this file's history — radial blooms that read
+   as weather, a page-wide band that ran behind body copy, and a bounded one
+   in the head. The third was defensible and it is still a coloured gradient
+   behind an editorial page, which is the opposite of "UI restrained". The
+   colour comes from photographs now. */
 body { position: relative; overflow-x: hidden; }
 .masthead, main, .sitefoot, .thumbbar { position: relative; z-index: 1; }
 /* The two plate pages paint their own grounds, so the ribbon reads through
@@ -7258,11 +7439,15 @@ body { position: relative; overflow-x: hidden; }
 /* The second spend: the headline's own second clause. On the reference the
    sentence changes colour halfway through and that is the whole of the type
    treatment — no rules, no boxes, no tinted panels. */
-.tint { color: var(--door); }
 
-/* The third: the primary action, solid, in the family's ink. */
-.btn { background: var(--door); border-color: var(--door); color: var(--limestone); }
-.btn:hover { background: var(--door-dark); border-color: var(--door-dark); }
+/* THE PRIMARY ACTION WAS GIVEN THE FAMILY'S COLOUR HERE AND IT IS BACK ON
+   THE INTERACTIVE ONE. `.btn { background: var(--door) }` is one line and it
+   undid the whole argument sixty lines up — a checkbox, a link and a button
+   are CONTROLS and stay one colour across the site, while `--door` says what
+   kind of thing is being READ. It also put a gold button on every region and
+   every month page, which is the one thing the narrowed gold rule refuses by
+   name. `.btn` takes `--sea` from its own declaration and nothing is needed
+   here. */
 
 /* The section opener's rule stays the one structural mark that takes the
    graphic step: it says a movement changed and it was drawn in the hairline

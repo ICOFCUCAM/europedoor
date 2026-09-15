@@ -8,7 +8,7 @@ its requirements are about how something looks and nobody can check a feeling.
 So every row here asserts against the generated HTML, the CSS and the JavaScript
 as they actually are.
 
-**52 sections · 23 built · 13 already · 12 partial · 1 built (deliberately smaller) · 1 refused · 1 locked · 1 deferred · 376 assertions · 0 failing**
+**52 sections · 23 built · 13 already · 12 partial · 1 built (deliberately smaller) · 1 refused · 1 locked · 1 deferred · 409 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -56,7 +56,7 @@ as they actually are.
 | B1 | Name, casing and the trademark position | LOCKED | 5 | EuropeDoor, one word, title case. The mark is NOT cleared — it is in use in the doors trade — so the site carries no ® or ™ and the brand is working rather than announced. |
 | B2 | Tagline and promise | BUILT | 6 | Open the door to Europe. One primary line; the six campaign lines are not in the shell, because a site with six taglines has none. |
 | B3 | The four doors | BUILT | 8 | Discover, understand, experience, journey — as a numbered sequence of links, not a menu of equals. It replaced five pillars that described our components rather than the reader's path. It lives on /how-it-works, not the homepage: the homepage is the door, and this is the page that says what is behind it. |
-| B4 | Colour | BUILT | 18 | European Future: graphite foundation, limestone ground, cobalt signature, cobalt-air in the dark world only. Atlantic green and terracotta retained with narrow homes; gold removed entirely. Deliberately not EU blue and gold, and no longer green-primary. |
+| B4 | Colour | BUILT | 51 | The owner's palette: bone ground, pine signature, graphite instrument, and five accents that identify a content FAMILY rather than decorate a page — cobalt, ochre, terracotta, olive, sky. Two map sets, light and dark. Gold narrowed to the ochre family and refused everywhere a reader clicks. Deliberately not EU blue and gold. |
 | B4a | The two worlds | BUILT | 15 | DISCOVER is light and editorial; INTELLIGENCE is dark and luminous, in both colour-scheme preferences. One attribute on <body>, one set of components. |
 | B5 | The mark | BUILT | 6 | Concept B: two vertical forms, and the negative space between them is the symbol. It replaced a literal door with a knob, which the Bible explicitly rules out. |
 | B6 | Voice, manifesto and trust | BUILT | 13 | The manifesto is a page rather than a slide, and the four labels that say where every claim comes from are on the same page underneath it. That second half is what stops the first half being advertising copy. |

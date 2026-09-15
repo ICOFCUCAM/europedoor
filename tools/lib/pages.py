@@ -3248,6 +3248,7 @@ def region_page(data, c, r):
     return f"/europe/{c['slug']}/{r['slug']}/index.html", page(
         f"{r['name']}, a travel region in {c['name']}", body,
         path=urls.region(c, r), area="countries",
+        accent="territory",
         description=r["summary"][:180],
         og=(f"region:{c['slug']}:{r['slug']}", motif_for(r["interests"]),
             f"{r['name']}, {c['name']}"),
@@ -3563,6 +3564,7 @@ def city_page(data, c, r, t):
 """
     return f"/europe/{c['slug']}/{r['slug']}/{t['slug']}/index.html", page(
         f"{t['name']}, {c['name']}", body, path=urls.city(c, r, t), area="countries",
+        accent="human",
         description=t["summary"][:180],
         scripts=["/assets/js/my-europe.js"],
         og=(f"city:{c['slug']}:{t['slug']}",
@@ -3790,7 +3792,7 @@ makes. Two of them can be combined in
 """
     return "/interests/index.html", page(
         "Ways to travel", body, path="/interests", area="countries",
-        accent="amethyst",
+        accent="natural",
         description="Seventeen ways into Europe — history, food, mountains, islands, "
                     "sacred places, rail — each one drawn as the destinations that carry it.",
     )
@@ -3921,7 +3923,7 @@ def interest_page(data, i, ranking):
     return f"/interests/{slug}/index.html", page(
         f"Travelling for {i['name'].lower()}", body,
         path=urls.interest(slug), area="countries",
-        accent="amethyst",
+        accent="natural",
         description=f"Where in Europe to go for {i['name'].lower()}: {len(cities)} cities across {len(countries)} countries.",
     )
 
@@ -4058,7 +4060,7 @@ coordinates; what they mean on the ground is on the journey's own page.</p>
 """
     return "/journeys/index.html", page(
         "Journeys", body, path="/journeys", area="journeys",
-        accent="adriatic",
+        accent="movement",
         description="Curated multi-country routes across Europe — Arctic to Baltic, Atlantic to Mediterranean, the Alpine grand tour and more.",
     )
 
@@ -4257,7 +4259,7 @@ def journey_page(data, j):
                                  urls.city(n["country"], n["region"], n["city"])))
     return f"/journeys/{j['slug']}/index.html", page(
         j["name"], body, path=urls.journey(j), area="journeys",
-        accent="adriatic",
+        accent="movement",
         description=j["summary"][:180],
         scripts=["/assets/js/my-europe.js"],
         og=("journey:" + j["slug"], motif_for(j["interests"]),
@@ -6587,6 +6589,7 @@ def place_page(data, c, r, t, pl):
 """
     return f"{urls.place(c, r, t, pl)}/index.html", page(
         f"{pl['name']}, {t['name']}", body, path=urls.place(c, r, t, pl), area="countries",
+        accent="human",
         description=pl["summary"][:180],
         scripts=["/assets/js/my-europe.js"],
         og=(f"place:{c['slug']}:{t['slug']}:{pl['slug']}", motif_for(t["interests"]),
@@ -6890,7 +6893,7 @@ def category_page(data, cat, sub=None):
 """
     return f"{path}/index.html", page(
         title, body, path=path, area="experiences",
-        accent="lagoon",
+        
         description=f"{title}: {n_of(len(chosen), 'experience')} across {n_of(len(countries), 'European country')}, selected by a published rule.",
     )
 
@@ -7106,7 +7109,7 @@ def experiences_index(data):
 """
     return "/experiences/index.html", page(
         "Experiences", body, path="/experiences", area="experiences",
-        accent="lagoon",
+        
         description="Guides, kitchens, cellars, boats and museums across Europe — every listing named, tiered and checked.",
     )
 
@@ -7156,7 +7159,7 @@ def experience_kind_page(data, kind, name):
     return f"/experiences/kind/{kind}/index.html", page(
         f"{name} — what you do", body,
         path=urls.experience_kind(kind), area="experiences",
-        accent="lagoon",
+        
         description=f"{name} experiences across Europe, by city and country.",
     )
 
@@ -8236,7 +8239,7 @@ respects distance, put the ones you want into the <a href="/plan">Planner</a>.</
 """
     return "/themes/index.html", page(
         "Themes", body, path="/themes", area="countries",
-        accent="indigo",
+        accent="territory",
         description="Cross-border ways into Europe: medieval, sacred, Viking, alpine, maritime and rail Europe, each a real sequence of places.",
     )
 
@@ -8364,7 +8367,7 @@ def theme_page(data, t):
 """
     return f"/themes/{t['slug']}/index.html", page(
         t["name"], body, path=f"/themes/{t['slug']}", area="countries",
-        accent="indigo",
+        accent="territory",
         description=t["summary"][:180],
         scripts=["/assets/js/my-europe.js"],
     )
@@ -11213,7 +11216,7 @@ def motion_page(data, m):
 """
     return f"/europe-in/{m['slug']}/index.html", page(
         m["name"], body, path=f"/europe-in/{m['slug']}", area="discover",
-        accent="cassis",
+        accent="territory",
         description=f"{m['strapline']} {len(hits)} destinations match, queried from the Atlas on every build.",
         og=("motion:" + m["slug"], motif_for(m.get("interests", [])),
             f"{m['name']} — {m['strapline']}"),
@@ -11317,7 +11320,7 @@ drawing here cannot show a set the page it links to would not.
 """
     return "/europe-in/index.html", page(
         "Europe in Motion", body, path="/europe-in", area="discover",
-        accent="cassis",
+        accent="territory",
         description=f"A dozen ways to cut the continent — each a real query run against all {len(data['cities'])} destinations on every build, with the query printed on the page.",
         og=("motion:index", "peaks", "Europe in Motion"),
         ld_blocks=[ld_breadcrumb([("Europe", "/discover"),

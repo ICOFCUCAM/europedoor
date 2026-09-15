@@ -229,61 +229,135 @@ worlds because a component was convenient.
 
 ### The palette
 
-Canonical values live in `docs/palette.json`, which is checked. This table is
-the readable copy; if the two disagree, the JSON is right and this table is a
-bug.
+**The owner's palette, and the three that carry it.** Canonical values live in
+`docs/palette.json`, which is checked: every contrast figure below is
+recomputed from the hexes actually in `assets/css/europedoor.css`, so if this
+table and the JSON disagree, the JSON is right and this table is a bug.
+
+    BONE #F3F0E6      the page
+    PINE #0F433E      the masthead and the signature
+    GRAPHITE #07100F  the instrument's ground
+
+Those three are the product. Everything else identifies a **content family**,
+and the brief is explicit that this is the critical half:
+
+> And I would NOT make every page colorful. This is critical. The colors
+> should identify different content families.
+
+> UI = restrained, PHOTOGRAPHY = rich, MAPS = precise, TYPOGRAPHY = dramatic.
+> So you can have an incredibly colorful photograph of the Dolomites beside a
+> very restrained editorial interface. That's much more sophisticated.
+
+An eight-hue wheel with a tinted ground and a gradient ribbon per family was
+generated in OKLCH, measured, shipped and removed one commit later, because
+it is the site the second quotation names: *green blue orange yellow pink
+purple*. What replaced it is smaller and does more work — the accent is spent
+on the kicker, the section rule and the marks, and the bright colour comes
+from the photographs.
 
 | token | hex | what it is |
 |---|---|---|
-| Deep Graphite | `#121612` | the intelligence foundation. Ink in the light world, ground in the dark |
-| Graphite Surface | `#1A201A` | cards and raised surfaces in the dark world |
-| **Bone** | `#F2F0E8` | the DISCOVER ground. **Never pure white**, and warmer than the limestone it replaced |
-| Bone Surface | `#E8E5DA` | cards and raised surfaces in the light world |
-| **European Pine** | `#2E7157` | the digital signature — for things **drawn**, not read |
-| Pine Deep | `#1E4636` | every pine that is text or an action, in the light world |
-| Pine Lift | `#55A07E` | links and interactive elements on dark surfaces |
-| Olive | `#4A5326` | heritage and provenance. It moved off Atlantic Green, which sat ten degrees of hue from the new signature |
-| Terracotta | `#A4491F` | the warm cultural accent |
-| **Pine Air** | `#7FBFA1` | the dark-world accent, in both worlds' dark surfaces. It replaced Electric Lime `#C8FF4D`, which is out of the system |
-| Ultramarine | `#665CFF` | atmosphere only: gradients, map washes, immersive moments |
-| ~~Gold / Brass~~ | — | **none.** See below |
+| `--bone` | `#F3F0E6` | the page. The owner's main background, and never #fff: white is a screen and bone is paper |
+| `--bone-light` | `#F7F4EA` | the LIFT above the page — a card, a field. The one surface that goes up rather than down |
+| `--bone-2` | `#E5E2D6` | the middle rung of the surface ladder, derived so bone -> bone-2 -> mineral is monotonic and every step is one a reader can see |
+| `--mineral` | `#D8D4C7` | warm stone: the third surface, and the land on the light map. One token for both, because they are the same material |
+| `--ink` | `#141716` | type. The owner's table names two near-blacks and this is the charcoal one; it was an alias for graphite, which made a page's letterforms and the instrument's field the same colour |
+| `--pine` | `#0F433E` | the masthead and the signature. A drawn colour before a read one |
+| `--pine-deep` | `#07302B` | everything pine that is text, and the interactive colour on light |
+| `--pine-lift` | `#55A07E` | actions in the dark world |
+| `--pine-air` | `#7FBFA1` | the accent on the dark world's editorial surfaces |
+| `--graphite` | `#07100F` | the near-black GREEN: a ground, and the instrument's field |
+| `--graphite-2` | `#101917` | the dark world's card |
+| `--graphite-3` | `#18211F` | the dark world's well — tracks, score bars, the deepest surface |
+| `--cobalt` | `#2457C5` | the geographic accent. Countries and journeys, and text at 5.68 on bone |
+| `--cobalt-2` | `#1C46A0` | cobalt where it is pressed — the hover step under a cobalt link or kicker |
+| `--cobalt-lift` | `#4076E7` | cobalt where the ground is graphite, because cobalt itself is 2.98 there |
+| `--cobalt-air` | `#619BFF` | the instrument's accent on the instrument's own ground |
+| `--sky` | `#76AFC2` | the Mediterranean and Alpine accent. A GROUND on light and a read colour on graphite |
+| `--ochre` | `#C49A52` | the territorial accent: regions and events. A ground and a mark, never an action |
+| `--ochre-deep` | `#8E6618` | ochre where it has to be read — a kicker on a region or a month |
+| `--ochre-deep-2` | `#6F4F11` | ochre as emphasis rather than a ground: the year band’s current month, at 6.57 on bone |
+| `--terracotta` | `#B9684A` | the warm architectural accent: destinations and stories. A graphic at 3.58 |
+| `--terracotta-2` | `#A6573A` | terracotta where it has to be read |
+| `--terracotta-3` | `#8C4930` | terracotta where it is pressed, at 6.35 on bone |
+| `--terracotta-lift` | `#E08A5C` | the same accent on a dark ground |
+| `--terracotta-lift-2` | `#EA9A6C` | and its deeper step there |
+| `--olive` | `#687044` | the restrained natural accent: provenance, heritage, the fund |
+| `--olive-2` | `#545A36` | olive where it has to be read on a lighter surface |
+| `--olive-lift` | `#A3B167` | olive on a dark ground |
+| `--olive-lift-2` | `#B4C179` | and its deeper step there |
+| `--warn` | `#981F31` | a travel advisory, and nothing else ever |
+| `--warn-lift` | `#EE8192` | the same warning on a dark ground |
+| `--map-land` | `#D8D4C7` | the light map's land. Mineral, because it is the same stone |
+| `--map-water` | `#DDE8E7` | the light map's water — and land against it is 1.18, which is why the border carries the coast |
+| `--map-border` | `#68716E` | the coastline and the frontier on the light map. On this map the boundary IS the map |
+| `--map-ink` | `#1A2725` | a place name on the light map's land |
+| `--map-dark-bg` | `#07100F` | the dark map's ground |
+| `--map-dark-land` | `#F3F0E6` | the continent, pale against graphite — the whole of the dark map |
+| `--map-dark-border` | `#B9C1BA` | its frontier |
+| `--map-dark-ink` | `#F3F0E6` | type on the dark map |
 
-### There is no gold
-
-Brass `#8A6D34` was the only gold in the previous system, it was already
-forbidden on anything interactive, and European Future removes it outright.
-The one place it survived — the "computed" tier on a source badge — is a
-neutral grey now, which is also more honest about what that tier is.
-
-Gold says *luxury · premium · heritage · wealth*. This product has to say
-*Europe · discovery · movement · intelligence · culture · future*. Gold
-against anything reads as a luxury travel agency; pine against graphite
-reads as European digital infrastructure. `checks.py` fails the build on a
-gold or brass token **and** on a raw gold hex smuggled into a rule — verified
-by reintroducing `#8a6d34` as a token and `#c2a165` as a value, and watching
-both go red.
-
-### Three accents inside DISCOVER, one inside INTELLIGENCE
+### The family accents
 
 The accent says what **kind** of thing is being read. A reader will never name
-this and will feel it: an essay about a festival should not be the same blue
-as a boundary dataset.
+it and will feel it: an essay about a festival should not be the same blue as
+a boundary dataset.
 
-| accent | colour | where |
+| accent | token | where |
 |---|---|---|
-| structural | Pine Deep | the default — homepage, countries, regions, destinations, journeys |
-| cultural | Terracotta | stories, events, experiences — the human half of DISCOVER |
-| heritage | Atlantic Green | how this project knows what it claims: `/method`, `/sources`, `/fund`, `/sources/freshness` |
-| electric | Electric Lime | **INTELLIGENCE only**, in every colour-scheme preference |
+| geographic | `--cobalt` (`#2457C5`) | countries and journeys: where a thing IS, and movement between. Bone + cobalt + mineral |
+| territorial | `--ochre` (`#C49A52`) | regions and the events calendar: an area and a season. Bone + ochre + mineral |
+| architectural | `--terracotta` (`#B9684A`) | destinations, stories and experiences — the human half. Bone + terracotta + photography |
+| natural | `--olive` (`#687044`) | provenance, heritage and the Fund: how this project knows what it claims |
+| mediterranean | `--sky` (`#76AFC2`) | a GROUND and a mark, never text: the section rule under a journey or a region |
+| machine | `--cobalt-air` (`#619BFF`) | INTELLIGENCE only — /map, /plan, /my-europe, /search, /discover, which the brief names graphite + bone + cobalt and calls the instrument |
 
-Bound by the nav area the shell already sets, so most of it cost no page
-change. Setting it surfaced a navigation bug that had been there for months:
-`stories` and `events` passed no area at all, so the masthead never marked
-either section as current. The accent depended on it, which is how it showed.
+**The primary action is not the family's colour.** `--sea` is the interactive
+colour — links, focus rings, controls, the primary button — and it is one
+value across the whole site in each world. For one commit `.btn` took
+`--door`, which made the region family's primary button a gold one; a control
+that changes hue by family is the family-coloured UI the brief refuses.
+
+### The two maps
+
+The brief changes the maps before it changes anything else, and names the old
+treatment by what it looked like: *I would not use the current green/black map
+treatment.* The diagnosis is the water — a `#0e2a3c` Atlantic under a khaki
+continent is a satellite photograph at night — so there are two sets of four
+values and a drawing takes one of them by what it IS.
+
+| | land | water / ground | border | ink |
+|---|---|---|---|---|
+| **light** — the European atlas: the 824 plates, the country portraits, the region glyphs | `#D8D4C7` | `#DDE8E7` | `#68716E` | `#1A2725` |
+| **dark** — the instrument: `/map`, `/plan`, `/my-europe`, `/search`, `/discover` | `#F3F0E6` | `#07100F` | `#B9C1BA` | `#F3F0E6` |
+
+*Notice: no olive.* On the light map the land is stone on pale water and the
+**coastline** carries the separation the tone does not — land against water is
+1.18, and the border ink measures 3.39 on the land. On the dark map that
+inverts: the continent is bone against graphite at 16.90, so the coast is the
+strongest edge in the drawing with no stroke at all and `#B9C1BA`
+is a faint internal frontier at 1.62. The continent becomes pale against
+graphite, which is the dramatic map without the swamp appearance.
+
+### There is no gold, and ochre is admitted
+
+Brass `#8A6D34` and `#C2A165` were the previous system's only golds, they were
+already forbidden on anything interactive, and they stay out **by value**.
+Gold says *luxury · premium · heritage · wealth*; this product has to say
+*Europe · discovery · movement · intelligence · culture · future*.
+
+The owner's palette then names **ochre `#C49A52`** as the territorial accent,
+and that is a different job from a gold button: a ground and a kicker on the
+regions and the events calendar, never the colour a reader clicks. So the
+refusal was narrowed to what it was actually protecting rather than deleted —
+no gold on an action, a link, a focus ring or the mark — and the arithmetic
+that catches a gold stays exactly as strict as it was, with the register
+declaring which golds are the ochre family by hex. Loosening the arithmetic
+until ochre passed would have loosened it until a brass passed too.
 
 ### The ratio is the instruction, not the hex codes
 
-    60%  limestone
+    60%  bone
     25%  graphite
     10%  pine
      5%  the accent
@@ -291,12 +365,12 @@ either section as current. The accent depended on it, which is how it showed.
 A palette gives you *blue website with gold buttons*. A ratio gives you
 *European editorial design over futuristic digital infrastructure*. If a
 screen does not hold roughly this distribution, the palette has been applied
-and the instruction has not.
-
-The most visible tenth of that pine is the primary button. A graphite button
-is correct and says nothing, and a signature that never appears on the one
-thing the reader is meant to press is a signature that exists only in the
-documentation.
+and the instruction has not. It is measured on the pixels a reader is painted,
+over twelve pages spanning both worlds, and the reading on the previous
+palette was bone 64.1, graphite 18.9, water 9.7, signature 7.0 and **accent
+0.3** against a declared 5 — which is the finding this palette answers, by
+giving five families an accent that identifies them rather than two that tint
+an 11px kicker.
 
 ### Where each colour may go, measured rather than asserted
 

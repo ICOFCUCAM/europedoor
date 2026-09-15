@@ -957,7 +957,7 @@ def _over(fg, bg, a):
 
 
 _HEX = {k: v["hex"] for k, v in _PALETTE["tokens"].items()}
-THEME_COLOR_LIGHT = _over(_HEX["pine-deep"], _HEX["limestone"], 0.96)
+THEME_COLOR_LIGHT = _over(_HEX["pine-deep"], _HEX["bone"], 0.96)
 THEME_COLOR_DARK = _over(_HEX["pine-deep"], _HEX["graphite"], 0.96)
 
 
@@ -1267,7 +1267,11 @@ WORLDS = ("discover", "intelligence")
 # hue steps so the set reads as a system rather than as eight picks. Every
 # one clears 4.5 on limestone as text, carries a 3:1 graphic step and a
 # ground tint that still holds its own ink at 4.7.
-ACCENTS = ("", "heritage", "lagoon", "adriatic", "indigo", "amethyst", "cassis")
+# THE OWNER'S FAMILY TABLE, and the names are what the colour MEANS rather
+# than what it is: a region is territorial, a destination is human, a journey
+# is movement, a fund project is natural. The eight colour-named accents this
+# replaces were a wheel, and a wheel is a theme.
+ACCENTS = ("", "heritage", "territory", "human", "movement", "natural")
 
 
 # ── content-addressed assets ─────────────────────────────────────────

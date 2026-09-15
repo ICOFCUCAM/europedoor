@@ -58,6 +58,21 @@ def _css():
     return re.sub(r"/\*.*?\*/", "", css, flags=re.S)
 
 
+def _ochre():
+    """The golds the palette register declares, as a lookup.
+
+    THE EXCLUSION IS A LOOKUP, NEVER A SHAPE — the sentence this repository
+    already wrote about the credential scan. Loosening the gold arithmetic
+    until ochre passed would loosen it until a brass passed too, so the
+    arithmetic is untouched and the register names which golds are the
+    territorial accent.
+    """
+    pal = json.load(open(os.path.join(ROOT, "docs", "palette.json"),
+                         encoding="utf-8"))
+    return {t["hex"].lower() for name, t in pal["tokens"].items()
+            if name.startswith("ochre")}
+
+
 def _size_of(value):
     """The type size a declaration states, with the --z compensation removed.
 
@@ -286,10 +301,24 @@ def measure():
                               if 90 <= int(h[1:3], 16) <= 215
                               and abs(int(h[1:3], 16) - int(h[3:5], 16)) < 55
                               and int(h[3:5], 16) - int(h[5:7], 16) > 45
-                              and int(h[1:3], 16) - int(h[5:7], 16) > 70]),
+                              and int(h[1:3], 16) - int(h[5:7], 16) > 70
+                              and h.lower() not in _ochre()]),
                 "kind": "exact",
-                "why": "Zero. Gold says luxury, premium, wealth; this product "
-                       "has to say Europe, discovery, movement, intelligence."},
+                "why": "Zero golds OUTSIDE the declared ochre family, which "
+                       "is not the same row it was. It counted every gold and "
+                       "read zero, because European Future had none; the "
+                       "owner's palette then named ochre #C49A52 as the "
+                       "TERRITORIAL accent for the regions and the events "
+                       "calendar, so three arrived at once and the honest "
+                       "reading is 3, not a moved ceiling. Recording 3 would "
+                       "put a number here and no rule: a fourth gold pasted "
+                       "in would keep it at 3 only by luck. So the count is "
+                       "of golds the register does not declare, it stays at "
+                       "zero, and the register is where a new one has to be "
+                       "argued for. Gold still says luxury, premium, wealth; "
+                       "what changed is that a ground and a kicker on two "
+                       "families is not a gold button, and the two brasses "
+                       "#8a6d34 and #c2a165 stay out by value."},
             "css.lime": {
                 "value": len(re.findall(r":\s*#c8ff4d", css, re.I))
                          + len(re.findall(r"--lime:", css)),

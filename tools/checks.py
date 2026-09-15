@@ -48,6 +48,46 @@ FAILURES = []
 CHECKS = []
 
 
+def bare_css(css):
+    """The stylesheet with its comments removed.
+
+    AN INSTRUMENT THAT READS ITS OWN DOCUMENTATION AS CODE IS WRONG. This
+    file already records that about the font-size count — a comment saying
+    "the first version wrote font-size: 26px" was itself counted as a
+    seventeenth size — and it happened twice more within an hour of the
+    owner's palette landing: the paragraph recording that #6f4f11 was
+    REMOVED from a family binding was read as a gold still in the
+    stylesheet, and the paragraph recording that `.btn { background:
+    var(--door) }` had been taken out was read as the rule itself. Six
+    places did this independently; this is the one implementation.
+    """
+    return re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+
+
+def css_hex(css, token, _depth=0):
+    """The literal hex a token resolves to, following var() hops.
+
+    A TOKEN THAT POINTS AT ANOTHER TOKEN IS NOT A MISSING TOKEN. Six checks
+    read a palette value with `--name\s*:\s*(#......)` and every one of
+    them reported "--atlas-sea is not declared in the stylesheet" the moment
+    the picture cartography was bound to the owner's map set — which is
+    true of the pattern and false of the stylesheet. The declaration is read
+    through as many hops as it takes, and the FIRST declaration wins, because
+    that is the :root one and the rebindings below it are a world's own.
+    """
+    bare = bare_css(css)
+    m = re.search(re.escape(token) + r"\s*:\s*([^;]+);", bare)
+    if not m:
+        return None
+    value = m.group(1).strip()
+    if re.fullmatch(r"#[0-9a-fA-F]{6}", value):
+        return value
+    hop = re.fullmatch(r"var\(\s*(--[a-z0-9-]+)\s*\)", value)
+    if hop and _depth < 6:
+        return css_hex(css, hop.group(1), _depth + 1)
+    return None
+
+
 def check(name):
     def deco(fn):
         CHECKS.append((name, fn))
@@ -1838,12 +1878,32 @@ def c_instruction():
             ha, hb = _hue(tok[a]["hex"]), _hue(tok[b]["hex"])
             d = abs(ha - hb) % 360.0
             d = min(d, 360.0 - d)
-            if d < dis["min_hue_degrees"]:
+            # HUE OR LIGHTNESS, BECAUSE EITHER ONE TELLS TWO COLOURS APART
+            # AND THE FIRST VERSION ASKED ONLY FOR HUE. The owner's palette
+            # names ochre (#C49A52, hue 38) and terracotta (#B9684A, hue 16)
+            # as the territorial and the architectural accent, which is 22
+            # degrees against a floor of 25 — and they are not remotely the
+            # same colour, because ochre is 0.355 of luminance and
+            # terracotta is 0.207 and the pair measures 1.57 against each
+            # other. A hue floor alone would have refused a real distinction
+            # and then been lowered until it refused nothing.
+            #
+            # The pair that created this block fails BOTH: #a32a1e against
+            # #a4491f is fourteen degrees apart AND 1.22, which is the
+            # definition of the same colour. So the rule is a disjunction
+            # rather than a weaker hue floor, and it is still red on the
+            # thing it was written for — proved by putting those two hexes
+            # back in.
+            r = _ratio(tok[a]["hex"], tok[b]["hex"])
+            if d < dis["min_hue_degrees"] and r < dis["min_ratio"]:
                 fail(f"{a} ({tok[a]['hex']}, hue {ha:.0f}) and {b} "
                      f"({tok[b]['hex']}, hue {hb:.0f}) are {d:.0f} degrees "
-                     f"apart and the register asks for "
-                     f"{dis['min_hue_degrees']} — a contrast ratio cannot see "
-                     f"this, which is how they stayed the same colour")
+                     f"apart and measure {r:.2f} against each other; the "
+                     f"register asks for {dis['min_hue_degrees']} degrees OR "
+                     f"{dis['min_ratio']} of ratio, and neither holds — a "
+                     f"contrast ratio alone cannot see the first of those, "
+                     f"which is how an advisory and an accent stayed the "
+                     f"same colour")
             n += 1
 
     if sum(pal["ratio"][k] for k in pal["ratio"] if not k.startswith("$")) != 100:
@@ -1882,24 +1942,40 @@ def c_instruction():
                     encoding="utf-8").read()
         for name in ("--atlas-sea", "--ocean-deep", "--ocean-mid",
                      "--ocean-shallow", "--ocean-coastal"):
-            m = re.search(rf"{re.escape(name)}\s*:\s*(#[0-9a-fA-F]{{6}})", _css)
-            if not m:
+            hexv = css_hex(_css, name)
+            if not hexv:
                 fail(f"{name} is not declared in the stylesheet")
                 continue
-            h = _hue(m.group(1))
+            h = _hue(hexv)
             if not (lo <= h <= hi):
-                fail(f"{name} ({m.group(1)}) is at hue {h:.0f} and the water "
+                fail(f"{name} ({hexv}) is at hue {h:.0f} and the water "
                      f"band is {lo}-{hi}")
             n += 1
     n += 1
 
-    # Gold is out of the system entirely, and this is the assertion that keeps
-    # it out: no token in the palette, and no rule in the stylesheet, may be a
-    # gold or brass. Gold says luxury, premium, heritage, wealth. The product
-    # has to say Europe, discovery, movement, intelligence, culture, future.
-    if not pal.get("gold", "").startswith("None"):
-        fail("docs/palette.json no longer states that there is no gold")
-    css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"), encoding="utf-8").read()
+    # GOLD IS ADMITTED AS A GROUND AND A MARK, AND THE RULE THAT REFUSED IT
+    # IS NARROWED RATHER THAN DELETED.
+    #
+    # The old assertion was "no token and no rule may be a gold", by
+    # arithmetic, and the reason was what gold SAYS: luxury, premium,
+    # heritage, wealth, where this product has to say Europe, discovery,
+    # movement, intelligence, culture, future. The owner's palette names
+    # ochre (#C49A52) as the TERRITORIAL accent — the regions and the events
+    # calendar — and that is a different job from a gold button: a ground and
+    # a kicker on two families, and never the thing a reader clicks.
+    #
+    # So the refusal now names what it was protecting. Two brasses stay out
+    # BY VALUE, because they were the previous system's luxury livery and
+    # nothing in the owner's table replaces them. And no gold may be the
+    # interactive colour, the focus ring or the mark, which is where "premium
+    # travel brand" would actually arrive — asserted below, not stated.
+    if "#8a6d34" not in pal.get("gold", "").lower() or \
+            "#c2a165" not in pal.get("gold", "").lower():
+        fail("docs/palette.json no longer names the two brasses that stay "
+             "out by value; a narrowed rule that stops naming what it "
+             "removed is a deleted rule")
+    css = bare_css(open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
+                        encoding="utf-8").read())
     if re.search(r"--(brass|gold)\s*:", css):
         fail("assets/css/europedoor.css defines a gold or brass token; "
              "European Future has no gold")
@@ -1915,17 +1991,69 @@ def c_instruction():
     if "--lime:" in css or re.search(r":\s*#c8ff4d", css, re.I):
         fail("assets/css/europedoor.css still declares electric lime; it was "
              "removed rather than rehomed, like the brass")
-    for hexv, token in re.findall(r"(#[0-9a-fA-F]{6})", css) and \
-            [(m, m) for m in re.findall(r"#[0-9a-fA-F]{6}", css)]:
+    for brass in ("#8a6d34", "#c2a165"):
+        if re.search(brass, css, re.I):
+            fail(f"assets/css/europedoor.css contains {brass}, one of the "
+                 f"two brasses the previous system was stripped of")
+        n += 1
+
+    # THE ADMITTED SET IS A LOOKUP, NEVER A SHAPE. A gold is a mid-lightness
+    # saturated yellow — red high, green close behind, blue far back — and
+    # that arithmetic catches both brasses, ochre, ochre-deep and any gold a
+    # future hand pastes in. Loosening the arithmetic until ochre passes
+    # would loosen it until a brass passes too, which is the same mistake
+    # this file records about the credential scan's hyphen pattern. So the
+    # arithmetic stays exactly as it was and the register declares WHICH
+    # golds are the territorial accent, by hex, with a role each.
+    admitted = {t["hex"].lower() for name, t in tok.items()
+                if name.startswith("ochre")}
+    if not admitted:
+        fail("docs/palette.json declares no ochre family, so every gold in "
+             "the stylesheet is unaccounted for")
+    for hexv in set(re.findall(r"#[0-9a-fA-F]{6}", css)):
         r_, g_, b_ = (int(hexv[i:i + 2], 16) for i in (1, 3, 5))
-        # A gold is a mid-lightness, saturated yellow: red high, green close
-        # behind, blue far back. This catches #8a6d34 and #c2a165, the two
-        # brasses that were in the previous system, without catching the
-        # limestone ground (which is barely saturated) or terracotta (whose
-        # green sits far below its red).
-        if 90 <= r_ <= 215 and abs(r_ - g_) < 55 and (g_ - b_) > 45 and (r_ - b_) > 70:
-            fail(f"assets/css/europedoor.css still contains a gold: {hexv}")
+        if 90 <= r_ <= 215 and abs(r_ - g_) < 55 and (g_ - b_) > 45 \
+                and (r_ - b_) > 70 and hexv.lower() not in admitted:
+            fail(f"assets/css/europedoor.css contains a gold the register "
+                 f"does not declare: {hexv}. The ochre family is "
+                 f"{', '.join(sorted(admitted))}; a gold outside it is the "
+                 f"luxury livery arriving by the back door")
     n += 2
+
+    # AND NO GOLD ON AN ACTION, A LINK, A FOCUS RING OR THE MARK. That is the
+    # sentence the old blanket refusal was really making, and it is the half
+    # that could not be inferred from a list of hexes: ochre is admitted as a
+    # GROUND and a kicker, so the thing to assert is that it never becomes
+    # the colour a reader clicks. `--sea` is the interactive colour on every
+    # world (links, focus rings, controls) and `--signature` is the mark; a
+    # family rebinds `--door`, which is editorial, and for one commit `.btn`
+    # took `--door` — so the region family's primary button was a gold one
+    # and the whole reason for the split had been undone in a late rule.
+    for prop in ("--sea", "--sea-dark", "--signature"):
+        for value in re.findall(rf"{re.escape(prop)}\s*:\s*([^;]+);", css):
+            value = value.strip()
+            m = re.match(r"var\(\s*(--[a-z0-9-]+)", value)
+            if m:
+                name = m.group(1)[2:]
+                if name in tok:
+                    value = tok[name]["hex"]
+            if not value.startswith("#") or len(value) != 7:
+                continue
+            r_, g_, b_ = (int(value[i:i + 2], 16) for i in (1, 3, 5))
+            if 90 <= r_ <= 215 and abs(r_ - g_) < 55 and (g_ - b_) > 45 \
+                    and (r_ - b_) > 70:
+                fail(f"{prop} resolves to {value}, which is a gold. Ochre is "
+                     f"a ground and a mark and never the colour a reader "
+                     f"clicks")
+            n += 1
+    # `.btn` is the primary action and takes the interactive colour, not the
+    # family's. A rule binding its background to `--door` is how that got
+    # lost once already.
+    if re.search(r"\.btn\s*\{[^}]*background:\s*var\(--door", css):
+        fail("the primary action takes var(--door), so it is a different "
+             "colour on every family — including a gold one on the regions. "
+             "A control stays one colour across the site")
+    n += 1
 
     doc = os.path.join(ROOT, "docs", "instruction.md")
     if not os.path.exists(doc) or os.path.getsize(doc) < 4000:
@@ -1937,7 +2065,18 @@ def c_instruction():
         # from the register now — one implementation, the same repair this
         # file has already made for the font-size count and for
         # credential_shaped().
-        NAMED = ("graphite", "limestone", "pine", "pine-air", "atlantic", "terracotta")
+        # THE INSTRUCTION NAMES THE OWNER'S OWN PALETTE, AND NOTHING ELSE.
+        # This tuple was the previous system's six — limestone, atlantic,
+        # pine-air — and two of those tokens no longer exist, so the check
+        # died with a KeyError rather than failing: an instrument that
+        # crashes reports nothing about the thing it guards. It is the three
+        # the brief calls the most important, plus every accent that names a
+        # family, plus both map sets, because a palette document that does
+        # not state the maps is not this product's palette document.
+        NAMED = ("bone", "mineral", "pine", "pine-deep", "graphite", "ink",
+                 "cobalt", "sky", "terracotta", "ochre", "olive",
+                 "map-land", "map-water", "map-border", "map-ink",
+                 "map-dark-bg", "map-dark-land", "map-dark-border")
         for name in NAMED:
             token = tok[name]["hex"].upper()
             if token not in body.upper():
@@ -3509,7 +3648,7 @@ def c_terrain():
     # check asserting a mix of the OLD ground — the same class of fault as
     # the six hexes this file used to type for docs/instruction.md. It is
     # read from the stylesheet now; the constant is the approved FRACTION.
-    _land = re.search(r"--atlas-land\s*:\s*#([0-9a-fA-F]{6})", css).group(1)
+    _land = css_hex(css, "--atlas-land").lstrip("#")
     base = tuple(int(_land[i:i + 2], 16) for i in (0, 2, 4))
     for lo, _hi, hexcol, _why in C.HYPSOMETRIC:
         if lo == 0:
@@ -4544,7 +4683,8 @@ def c_cartography_palette():
         return n
 
     def hexof(token):
-        m = re.search(re.escape(token) + r"\s*:\s*(#[0-9a-fA-F]{6})\s*;", css)
+        m = re.search(re.escape(token) + r"\s*:\s*(#[0-9a-fA-F]{6})\s*;",
+                      bare_css(css))
         return m.group(1) if m else None
 
     def lum(hexv):
