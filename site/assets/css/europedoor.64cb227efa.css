@@ -918,6 +918,22 @@ a .kicker { color: var(--ink-3); }
 .band { margin: var(--s8) 0; }
 .band-head { margin-bottom: var(--s5); }
 .band-head h2 { margin-bottom: var(--s2); }
+/* THE BAND HEAD WAS A COLUMN OF TYPE WITH HALF THE PAGE EMPTY BESIDE IT.
+   A stage, a 40px title and a two-line lede, all stacked in the left 55% of a
+   1,168px band, on every band on every page — which is the shape that makes
+   this site read as an encyclopedia rather than as a magazine. The index
+   page head has put the lede BESIDE the name since the three head roles were
+   built; a band head is the same object one level down and never got it.
+   Baseline-aligned, so the lede sits on the title's last line rather than
+   floating against its cap height. */
+@media (min-width: 62rem) {
+  .band-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+               column-gap: var(--s7); align-items: baseline; }
+  .band-head .stage { grid-column: 1; }
+  .band-head h2 { grid-column: 1; margin-bottom: 0; }
+  .band-head .lede { grid-column: 2; grid-row: 2; margin: 0; align-self: start;
+                     max-width: 46ch; }
+}
 .band .more { margin-top: var(--s5); font-size: var(--t-sm); }
 .band .more a { text-decoration: none; border-bottom: 1px solid var(--door); color: var(--door); }
 
