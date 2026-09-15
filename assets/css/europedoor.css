@@ -402,11 +402,25 @@
   --text: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 
-  /* the whole type scale — eleven steps, no more */
-  --t-xs:   0.75rem;
-  --t-sm:   0.8125rem;
-  --t-base: 0.9375rem;
-  --t-md:   1.0625rem;
+  /* THE WHOLE TYPE SCALE — ELEVEN STEPS, NO MORE, AND THE READING END WAS
+     A DOCUMENTATION SCALE. Measured on a destination page: 2,620 characters
+     at 15px, 1,422 at 13px and 1,184 at 12px — 5,226 of the page's ~6,700
+     characters at 15 or under, against a 76px h1. And the stylesheet spent
+     99 of its font-size declarations on the two smallest steps and four on
+     the body. An encyclopedia sets small dense type because it is consulted;
+     a page that is read sets 17. The three reading steps moved up one and
+     the bottom two stopped being one pixel apart.
+
+     --t-lg DID NOT MOVE. It is a length in a 1,120-unit viewBox — the
+     country names on the hero and on the fifty plates — and LABEL_METRICS
+     carries a width model fitted at that size, so changing it silently
+     invalidates the placement. That is the enlarging-the-type failure this
+     stylesheet already records. --t-md is 19 against its 20: they are one
+     apart and they are two different faces, sans lede against serif h3. */
+  --t-xs:   0.8125rem;
+  --t-sm:   0.9375rem;
+  --t-base: 1.0625rem;
+  --t-md:   1.1875rem;
   --t-lg:   1.25rem;
   --t-xl:   1.5rem;
   --t-2xl:  1.875rem;
