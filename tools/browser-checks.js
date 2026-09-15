@@ -2524,6 +2524,34 @@ async function main() {
       // pixel. The door still reads there, on its cut edge at 3.55, which is
       // exactly why this had to be split — the reveal was carrying a plate
       // the step was being credited for.
+      // AND THE FIGURE HAS TO BE IN THE PICTURE BEING SAMPLED. This shoots
+      // the VIEWPORT and then reads pixels at the figure's own box, and
+      // nothing checked that the two overlap: on /events/oct the arch sits
+      // at y=750 in a 720-tall viewport, so every sample fell off the bottom
+      // of the canvas, `getImageData` handed back transparent black for both
+      // points, and the check reported 1.12:1 — a red run measuring nothing,
+      // which is the green-run-that-stopped-counting failure with the sign
+      // flipped. It surfaced when an overture's h1 grew and pushed the month
+      // map below the fold: the drawing never changed.
+      //
+      // Scroll it into view, then shoot, then read the box — in that order,
+      // because the box is read page-side after the screenshot and a rect
+      // taken before a scroll describes a different picture.
+      //
+      // A QUARTER DOWN, NOT CENTRED. `scrollIntoView({block:"center"})` puts
+      // the figure's MIDDLE at the middle of the viewport, and the crown is
+      // what this measures: on /beyond-the-obvious, whose arch is taller
+      // than the viewport, that put its top at y=-81 and the sampler read
+      // off the top of the canvas instead of off the bottom — the same fault
+      // in the other direction, and it reported 2.98:1 against a real 17.37.
+      // A quarter down clears the sticky masthead and leaves the crown and
+      // the sixteen pixels under it inside the shot at any figure height.
+      await pg.evaluate(() => {
+        const f = document.querySelector("figure.minimap.arched");
+        if (!f) return;
+        window.scrollBy(0, f.getBoundingClientRect().top
+                           - Math.round(innerHeight * 0.25));
+      });
       const shot = (await pg.screenshot()).toString("base64");
       const px = await pg.evaluate(async (d) => {
         const fig = document.querySelector("figure.minimap.arched svg");
@@ -2560,8 +2588,20 @@ async function main() {
           const v = cr2(p2, out);
           if (v > best) { best = v; cut = p2; }
         }
-        return { out, cut, in: at(cx, Math.min(c.height - 1, top + 16)) };
+        return { out, cut, in: at(cx, Math.min(c.height - 1, top + 16)),
+                 // The sample window, so a failure can be told apart from a
+                 // sampler that missed the figure. A failure message with no
+                 // measurement in it cannot be diagnosed.
+                 win: [cx, top, c.width, c.height] };
       }, shot);
+      if (px) {
+        const [sx, sy, sw, sh] = px.win;
+        ok(sx >= 0 && sx < sw && sy - 6 >= 0 && sy + 16 < sh,
+           `${u} in ${scheme}: the aperture sampler read outside the image — ` +
+           `x=${sx} y=${sy} on a ${sw}x${sh} shot. Every sample would come ` +
+           `back transparent black and the ratio would be about the canvas, ` +
+           `not about the door.`);
+      }
       if (px) {
         const stepPx = ratio(px.out, px.in);
         const edgePx = ratio(px.out, px.cut);
