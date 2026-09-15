@@ -3026,22 +3026,32 @@ def country_page(data, c):
     # homepage already records: a slot waiting for a picture is honest and
     # three hundred pixels of one is a hole. So this asks the register
     # directly, exactly as the hero does.
-    photoband = pageband(data, f"country:{c['slug']}")
+    # THE OPENING SPREAD. The portrait already sat beside the name, so a
+    # photograph takes its place in the head and the portrait moves to a band
+    # of its own with the caption that explains it. A country with no
+    # photograph is exactly the page it was.
+    ckey = f"country:{c['slug']}"
+    cportrait = countryportrait(data, c)
+    cpic = head_figure(data, ckey, cportrait, alt_fallback=c["name"])
+    cbelow = moved_drawing(
+        data, ckey, cportrait,
+        f"{esc(c['name'])} drawn from Natural Earth, with its capital and the "
+        f"destinations this atlas holds in it.")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)), (c["name"], None)])}
-{photoband}
 <div class="pagehead overture portraithead">
   <div class="portraitsay">
     <p class="kicker">{esc(m['name'])}</p>
     <h1>{esc(c['name'])}</h1>
     {statement(c['tagline'])}
   </div>
-  {countryportrait(data, c)}
+  {cpic}
   <div class="headmeta">
     <p class="orient">{country_orient(c)}</p>
     {chips(c["interests"], data["interests"])}
   </div>
 </div>
+{cbelow}
 {advisory_note(c)}
 
 <div class="measure lead">

@@ -38,45 +38,26 @@
   }
  },
  "cartography": {
-  "$comment": "THE PICTURES WERE GIVEN A CARTOGRAPHY AND THE INSTRUMENTS WERE NOT. docs/cartography.md splits every drawing on what it IS — a picture is paper, an instrument is graphite — and the picture half got a four-step ocean, a land family, an ink coast and a lit subject, every one of them measured. The instrument half kept five raw hexes invented before European Future (#0a1220, #253546, #1b2735, #4a6480, #3a6299): navy rather than graphite, in no token here, recomputed by no check. Land against water measured 7.91 on the pictures and 1.50 on /map, and a country outside the subject measured 1.24, which is not a quiet country but a country that is not drawn. These rows are the ladder, and checks.py recomputes every one from the hexes in assets/css/europedoor.css rather than from a copy kept here, so the stylesheet and the register cannot drift apart.",
+  "$comment": "THE PICTURES WERE GIVEN A CARTOGRAPHY AND THE INSTRUMENTS WERE NOT. docs/cartography.md splits every drawing on what it IS — a picture is paper, an instrument is graphite — and the picture half got a four-step ocean, a land family, an ink coast and a lit subject, every one of them measured. The instrument half kept five raw hexes invented before European Future (#0a1220, #253546, #1b2735, #4a6480, #3a6299): navy rather than graphite, in no token here, recomputed by no check. Land against water measured 7.91 on the pictures and 1.50 on /map, and a country outside the subject measured 1.24, which is not a quiet country but a country that is not drawn. These rows are the ladder, and checks.py recomputes every one from the hexes in assets/css/europedoor.css rather than from a copy kept here, so the stylesheet and the register cannot drift apart. AND THEN THE TWO CARTOGRAPHIES BECAME ONE, because the owner's instruction is that there are no dark pages and a light page cannot carry a graphite instrument — the figure becomes a hole cut in the paper. The instrument takes the picture's own palette, so every row here is now measured on the --atlas-* family and five of them were deleted rather than renamed: they asserted, in the instrument's names, exactly what the picture half already asserts in its own. What is left of the split is that an instrument DRAWS differently — every country a link, a graticule, a scale bar — and not that it is made of something else.",
   "why_a_separation_and_not_a_claim": "A claim above says a colour may carry TEXT on a ground. These say two drawn areas must be distinguishable from each other. WCAG 2.2 SC 1.4.11 puts a graphical object's boundary at 3:1, which is why the coast rows are 3.0 and the land rows are lower: a fill that reads as a mass and an edge that is unambiguous are two different jobs, and the instrument had neither.",
   "separations": [
    {
-    "a": "--map-land",
-    "b": "--map-sea",
-    "min": 6.0,
-    "was": 1.8,
-    "why": "the land is a mass, not a hairline — and 1.8 was a floor two dark greens could satisfy while being optically one thing. This row now also carries the promise the coast-against-field row used to stand in for, at the picture half's own figure: land and sea unambiguously distinct"
-   },
-   {
-    "a": "--map-context",
-    "b": "--map-sea",
+    "a": "--atlas-far",
+    "b": "--atlas-sea",
     "min": 1.35,
     "was": 1.24,
     "why": "a country outside the subject is still drawn. 1.24 is not quiet, it is absent"
    },
    {
-    "a": "--map-land",
-    "b": "--map-context",
+    "a": "--atlas-land",
+    "b": "--atlas-far",
     "min": 1.25,
     "was": 1.21,
     "why": "three tiers — water, context, subject — and each step has to be visible or there are two"
    },
    {
-    "a": "--map-coast",
-    "b": "--map-land",
-    "min": 3.0,
-    "why": "the same edge read from the other side"
-   },
-   {
-    "a": "--map-border",
-    "b": "--map-land",
-    "min": 1.6,
-    "why": "a frontier is a line drawn ON land and is quieter than a coast, which is where land meets sea. Both were one stroke"
-   },
-   {
-    "a": "--map-hover",
-    "b": "--map-land",
+    "a": "--pine",
+    "b": "--atlas-land",
     "min": 3.0,
     "was": 1.29,
     "why": "the selected country replaces the land it sits on. On a pale continent the accent INVERTS rather than recolours — the same reading the mark takes on the pine masthead and the focus ring takes on the band — so this is pine-deep, dark on light, 4.70"
@@ -94,40 +75,28 @@
     "why": "the ink coast on paper — the relationship the instrument now has inverted"
    },
    {
-    "a": "--map-shore-1",
-    "b": "--map-sea",
+    "a": "--ocean-coastal",
+    "b": "--atlas-sea",
     "min": 1.35,
     "why": "the shore band nearest the coast. The instrument's sea was ONE value where the picture's is four, so the Baltic, the Adriatic and the open Atlantic were the same near-black and an inland sea read as a hole in the continent"
    },
    {
-    "a": "--map-shore-2",
-    "b": "--map-sea",
+    "a": "--ocean-shallow",
+    "b": "--atlas-sea",
     "min": 1.18,
     "why": "the middle step of the same cast"
    },
    {
-    "a": "--map-shore-3",
-    "b": "--map-sea",
+    "a": "--ocean-mid",
+    "b": "--atlas-sea",
     "min": 1.06,
     "why": "the widest and faintest, far from any coast"
    },
    {
-    "a": "--map-here",
-    "b": "--map-land",
-    "min": 1.9,
-    "why": "the subject is the brightest LAND and it is now the page's own limestone: paper seen through the opening. Binding it to the accent filled a quarter of every country reference map in periwinkle — a continent drawn in the accent, the failure that removed electric lime, arriving through a different token"
-   },
-   {
-    "a": "--map-here",
-    "b": "--map-sea",
+    "a": "--atlas-here",
+    "b": "--atlas-sea",
     "min": 3.0,
     "why": "and it still has to clear the water it sits in"
-   },
-   {
-    "a": "--map-hereline",
-    "b": "--map-here",
-    "min": 3.0,
-    "why": "the finest heaviest edge. An atlas separates its subject by an edge rather than by a loud fill — and with a paper-coloured subject that edge is INK ON PALE GROUND, exactly as --atlas-hereline is, rather than the brightest thing on the drawing"
    },
    {
     "a": "--atlas-frontier",
@@ -149,14 +118,14 @@
    }
   ],
   "ladder": {
-   "$comment": "ORDER IS THE CLAIM, and a per-pair minimum cannot state it. The water lightens as it approaches a shore — that is DISTANCE FROM LAND, the one thing a coastline can tell us, and never a claim about depth: this atlas holds no bathymetry. A ramp whose middle step is darker than its outer one is still three distinct colours and passes every pairwise floor while drawing the opposite of what it says. The subject is the top of that ladder, because an atlas's subject is the brightest land. Its EDGE is not: it left the tail when the continent went pale, because a rung says where a tone sits between water and land and the subject's frontier is now ink drawn on top of it.",
+   "$comment": "ORDER IS THE CLAIM, and a per-pair minimum cannot state it. The water lightens as it approaches a shore — that is DISTANCE FROM LAND, the one thing a coastline can tell us, and never a claim about depth: this atlas holds no bathymetry. A ramp whose middle step is darker than its outer one is still three distinct colours and passes every pairwise floor while drawing the opposite of what it says. The subject is the top of that ladder, because an atlas's subject is the brightest land. Its EDGE is not: it left the tail when the continent went pale, because a rung says where a tone sits between water and land and the subject's frontier is now ink drawn on top of it. The rungs are the ocean ramp now: the cast that lightens the water toward a shore was the instrument's own three greys and is the picture's four blues, which is the same claim about distance from land drawn in one palette.",
    "tokens": [
-    "--map-sea",
-    "--map-shore-3",
-    "--map-shore-2",
-    "--map-shore-1",
-    "--map-land",
-    "--map-here"
+    "--atlas-sea",
+    "--ocean-mid",
+    "--ocean-shallow",
+    "--ocean-coastal",
+    "--atlas-land",
+    "--atlas-here"
    ],
    "direction": "increasing"
   },

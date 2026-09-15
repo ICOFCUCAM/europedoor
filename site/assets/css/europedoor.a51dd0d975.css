@@ -355,95 +355,29 @@
      `checks.py` recomputes every one of those separations from the hexes in
      THIS file, so the ladder cannot be nudged without the arithmetic saying
      so. */
-  /* AND THEN THE INSTRUMENT WENT INTO THE SWAMP, because it was given the
-     page's own graphite and the page's graphite is green.
+  /* THE TWO CARTOGRAPHIES ARE ONE, AND THE OWNER'S INSTRUCTION IS WHY.
 
-     The values above this note were a family of `--graphite` (#121612), so
-     every one of them carried its olive cast — and the land was DARKER than
-     the water lightened toward the shore, three near-blacks apart. Rendered
-     at 1280 on /discover the drawing read as an atmospheric night map of a
-     marsh: no coastline you could follow, no country you could pick out,
-     319 dots floating on a field with no ground under them. It satisfied
-     every separation in the register while being unreadable, because a
-     ratio of 1.91 between two dark greens is arithmetically a step and
-     optically nothing.
+     `docs/cartography.md` split every drawing on what it IS — a picture is
+     warm paper and an instrument is graphite — and the instrument half was
+     re-tinted this morning to a neutral near-black field under a pale
+     mineral continent, measured at 8.58 land-to-field against the 1.91 it
+     had. That work is not undone: the PALE CONTINENT is what survived. What
+     went is the near-black field, because the field was the page, and the
+     instruction is that there are no dark pages.
 
-     Two things change and they are the same change. The field is NEUTRAL —
-     #0d0e10 has no hue at all, where the old sea was (12,16,12) — and the
-     continent is PALE MINERAL rather than a slightly lighter dark. That is
-     the hero's sentence stated at last on the instrument: Europe is what
-     the light falls on. Land against field goes 1.91 → 8.58, which is the
-     picture half's own figure (7.91) reached from the other side, and a
-     coastline becomes a line you can follow across the page.
+     A light page cannot carry a graphite instrument — the figure becomes a
+     hole cut in the paper — so the instrument takes the picture's own
+     palette: `--atlas-*` for the ground, the frontier and the subject, and
+     the ocean ramp for the cast that lightens the water toward a shore.
+     Every separation the register asserts is the picture half's, already
+     measured, and there is one fewer palette to keep honest.
 
-         land : field     1.91 → 8.58    the separation that was the fault
-         context : field  1.44 → 3.84    a quiet country is legible
-         land : context   1.33 → 2.24    three tiers, further apart
-         coast : land     3.84 → 3.42    still over SC 1.4.11's 3.0
-         subject : land   3.82 → 1.97    a lift, because it no longer shouts
-         subject : field     —   16.93
-
-     TWO ROWS OF THE REGISTER HAD TO MOVE AND NEITHER WAS SILENT.
-
-     `--map-coast` against `--map-sea` at 3.0 is now ARITHMETICALLY
-     IMPOSSIBLE: with the land pale, a coast must be dark enough to bound it
-     (luminance ≤ 0.106) and light enough to clear the field (≥ 0.113), and
-     those do not overlap. The promise that row was standing in for — land
-     and sea unambiguously distinct — is not lost, it was never the coast's
-     to keep: it is `--map-land` against `--map-sea` at 6.0, which mirrors
-     the row the picture half has always carried.
-
-     And `--map-hereline` leaves the tail of the ladder. It was the
-     brightest thing on the drawing because the subject was dark; with a
-     paper-coloured subject the subject's frontier is INK ON PALE GROUND,
-     exactly as `--atlas-hereline` is. A ladder rung is about where a tone
-     sits between water and land, and this is no longer one of those.
-
-     The two cartographies stay split, which is the whole point: a picture
-     is warm paper and pale water, an instrument is neutral graphite and a
-     mineral continent. They are not the same palette reached from two
-     directions — the field here carries no hue and the picture's sea is
-     202° of it. */
-  --map-sea:      #0d0e10;   /* the field: neutral near-black, no hue of its own */
-  --map-context:  #6e6f71;   /* land outside the subject. 3.84 on the field */
-  --map-land:     #aeada7;   /* the continent: pale mineral. 8.58 on the field, 2.24 on context */
-  --map-coast:    #525356;   /* the edge between them: 3.42 on the land it bounds */
-  --map-border:   #7d7e80;   /* a frontier: a line drawn ON land, 1.81, quieter than a coast */
-  --map-hover:    #1e4636;   /* pine-deep: on a pale continent the accent inverts. 4.70 */
-  /* AND THE SUBJECT OF A DRAWING IS NOT PAINTED IN THE ACCENT. Binding the
-     selected state to cobalt-air was right for /map, where hover lifts one
-     country under the cursor for as long as the cursor is there — five per
-     cent of a screen, which is what an accent is. The SAME token filled the
-     subject permanently on the fifty country reference maps, so Italy came
-     out a quarter of the drawing in periwinkle: a continent drawn in the
-     accent, which is the exact failure that removed electric lime, arriving
-     through a different token one commit after the token changed.
-     The picture half already answered it: "An atlas separates the country it
-     is about by making it the brightest land with the finest heaviest edge,
-     not by turning it into another shade of water" — and not by turning it
-     into the accent either. Measured: the subject is 2.07 above its
-     neighbours and 3.94 above the water, with a fine pale edge rather than a
-     loud fill. Hover keeps the accent, because hover is momentary. */
-  --map-here:     #f2f0e8;   /* the subject IS limestone: the page's own paper. 1.97 / 16.93 */
-  --map-hereline: #2b2c2e;   /* its edge — ink on pale ground now, 12.25, not the brightest rung */
-  /* AND THE INSTRUMENT'S SEA WAS ONE VALUE WHERE THE PICTURE'S IS FOUR.
-     `docs/cartography.md`: "A flat pale fill made the water a surface the
-     land was pasted onto. These four are CAST, not stroked — three soft
-     shadows of the land silhouette, widest and deepest first, so the water
-     lightens as it approaches a shore." True of the 824 plates since the
-     ocean ramp was built, and the instrument had one flat near-black: the
-     Baltic, the Adriatic, the Black Sea and the open Atlantic were the same
-     value, so an inland sea read as a hole in the continent rather than as
-     water.
-     Three graphite steps, the same cast and the same argument — it is
-     DISTANCE FROM LAND, the one thing a coastline can tell us, and never a
-     claim about depth. Measured against the water: 1.09, 1.23, 1.45, and the
-     land is 1.91, so the ramp is ordered and stays under the land it
-     approaches. Cooler than the land at every step, because the thing being
-     drawn is water. */
-  --map-shore-3:  #141619;   /* the widest and faintest, far from any coast */
-  --map-shore-2:  #1e2025;
-  --map-shore-1:  #282b30;   /* the narrowest and lightest, against the shore */
+     WHAT IS LOST IS NAMED RATHER THAN GLOSSED. An instrument no longer
+     announces itself by its ground, so /map and /discover are told from a
+     country page by what they DO and not by what they are made of. The
+     drawing on an instrument still differs — it carries every country as a
+     link, a graticule and a scale bar — and that is now the whole of the
+     distinction. */
 
 
   /* type */
@@ -562,30 +496,28 @@ body[data-world="intelligence"] {
  * via the same attribute on that element. That is the door working as a design
  * language rather than as a glyph: a window into the machine, cut into an
  * editorial page. */
+/* AND THEN THE OWNER SAID: NO DARK PAGES.
+ *
+ * Everything above this rule is the argument for a dark INTELLIGENCE, and
+ * it is kept because it is the reasoning the decision reverses rather than
+ * a mistake: the world was dark in both colour-scheme preferences so that
+ * it said WHERE A READER IS rather than how they like their screen, and so
+ * that it could not collapse into a theme toggle.
+ *
+ * It collapses now, deliberately. Five pages were graphite — /map, /plan,
+ * /my-europe, /search, /discover — and the country map figure carried the
+ * world into fifty editorial pages as a dark window. A reader arriving from
+ * a country page met a different product.
+ *
+ * WHAT STILL TELLS AN INSTRUMENT FROM A PAGE, now that the ground does not:
+ * the SURFACES step further apart here than in the editorial world and the
+ * rule is stronger, because a tool is a set of controls and a page is a
+ * column of prose. That is a smaller distinction than a ground, and it is
+ * the honest size of the one that is left. */
 [data-world="intelligence"] {
-  --paper:        var(--graphite);
-  --paper-2:      var(--graphite-2);
-  --paper-3:      var(--graphite-3);
-  --ink:          var(--limestone);
-  --ink-2:        #c5cac5;
-  --ink-3:        #97a097;
-  --rule:         #2d352d;
-
-  --sea:          var(--pine-lift);
-  --sea-dark:     var(--pine-air);
-  --door:         var(--pine-air); /* the accent, ~5%. It was electric lime */
-  --door-dark:    #a3b4ff;
-  --signature:    var(--pine-lift);
-
-  --warn:         var(--warn-lift);
-  --warn-bg:      #271719;
-  --provenance:   var(--atlantic-lift);
-
-  --shadow-lift: 0 2px 4px rgba(0,0,0,.55), 0 18px 40px -18px rgba(0,0,0,.8);
-
-  color-scheme: dark;
-  background: var(--paper);
-  color: var(--ink);
+  --paper-2:      #eceade;
+  --paper-3:      #e2dfd0;
+  --rule:         #c6c2b0;
 }
 
 /* DISCOVER, for a reader who prefers dark.
@@ -2035,7 +1967,7 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .instrstage { display: grid; gap: var(--s5); align-content: start; min-width: 0; }
 .instrcount { margin: 0; max-width: 44rem; }
 .herodot { fill: var(--signature); opacity: .8; transition: opacity .2s ease; }
-.herodot.advisory { fill: var(--map-border); opacity: .7; }
+.herodot.advisory { fill: var(--atlas-frontier); opacity: .7; }
 .instrmap:hover .herodot { opacity: .85; }
 /* A CREDIT IS NOT A LABEL. This one was set uppercase at .1em of tracking —
    the site's own label treatment, which is for a kicker or a meta line — so
@@ -2045,8 +1977,8 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
    `.capsrc`: the caption step, sentence case, the third ink. */
 .instrcap { display: block; margin-top: var(--s3); max-width: 78ch;
             padding-right: var(--page-gutter);
-            font-size: var(--t-xs); color: var(--map-land); }
-.instrmap:hover .instrcap { color: var(--limestone); }
+            font-size: var(--t-xs); color: var(--ink-3); }
+.instrmap:hover .instrcap { color: var(--door); }
 @media (min-width: 64rem) {
   .hero { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); }
 }
@@ -2220,7 +2152,7 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
  * primary green is allowed to be a surface rather than an action, because
  * here it is not offering anything. */
 .europemap, .minimap { --z: 1; }
-.mapwrap { background: var(--map-sea); }
+.mapwrap { background: var(--atlas-sea); }
 /* THE DATA CUT WAS DRAWN AS A FRONTIER ON THE ONE MAP A READER OPERATES.
    data/geo/ stops at 52°E and 33°N because that is where this product stops
    writing about places, and under this conic the eastern cut runs from x=747
@@ -2242,10 +2174,10 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
    exactly the coast, and never a border. */
 .europemap #countries, .europemap #detail,
 .minimap.arched:not(.atlas) .countries {
-  filter: drop-shadow(0 0 2px var(--map-shore-1))
-          drop-shadow(0 0 7px var(--map-shore-2))
-          drop-shadow(0 0 16px var(--map-shore-3)); }
-#mapedge stop, #mapfoot stop { stop-color: var(--map-sea); }
+  filter: drop-shadow(0 0 2px var(--ocean-coastal))
+          drop-shadow(0 0 7px var(--ocean-shallow))
+          drop-shadow(0 0 16px var(--ocean-mid)); }
+#mapedge stop, #mapfoot stop { stop-color: var(--atlas-sea); }
 /* THE SAME CUT, ON THE PICTURE HALF. Every plate framed on the continent
    drew the 52°E diagonal and the 33°N arc raw — /beyond-the-obvious, the
    thirteen themes, the twelve motions, the nine stories, the seventeen
@@ -2272,26 +2204,26 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
    `--map-sea` through `.mapcut`, which is a different mechanism because it
    is a different drawing. */
 .datacut stop { stop-color: var(--atlas-sea); }
-.europemap .context path { fill: var(--map-context); stroke: none; }
+.europemap .context path { fill: var(--atlas-far); stroke: none; }
 .europemap .countries path {
-  fill: var(--map-land); stroke: var(--map-border);
+  fill: var(--atlas-land); stroke: var(--atlas-frontier);
   stroke-width: calc(1px / var(--z)); stroke-linejoin: round;
 }
 .europemap.noborders .countries path { stroke: none; }
 .europemap .cshape { cursor: pointer; }
 .europemap .cshape path { transition: fill .15s ease; }
-.europemap .cshape:hover path { fill: var(--map-hover); stroke: var(--sea); }
+.europemap .cshape:hover path { fill: var(--pine); stroke: var(--sea); }
 .europemap .cshape:focus-visible path { stroke: var(--sea); stroke-width: calc(2.5px / var(--z)); }
-.europemap .cshape.on path { fill: var(--map-hover); stroke: var(--sea); stroke-width: calc(1.6px / var(--z)); }
+.europemap .cshape.on path { fill: var(--pine); stroke: var(--sea); stroke-width: calc(1.6px / var(--z)); }
 /* Monaco is 2 km² and Vatican City is 0.44 km². Natural Earth has no polygon
  * for either at 1:50m, so they are a ringed point rather than a shape we
  * invented — the ring is what says "this is a marker, not a country the size
  * of a village". */
 .europemap .nogeo circle {
-  fill: var(--map-land); stroke: var(--ink-3);
+  fill: var(--atlas-land); stroke: var(--ink-3);
   stroke-width: calc(1.4px / var(--z)); r: calc(5px / var(--z));
 }
-.europemap .nogeo a:hover circle { stroke: var(--sea); fill: var(--map-hover); }
+.europemap .nogeo a:hover circle { stroke: var(--sea); fill: var(--pine); }
 
 .europemap .dot circle { r: calc(4.2px / var(--z)); }
 .europemap .dot:hover circle { r: calc(7px / var(--z)); }
@@ -2306,7 +2238,7 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
 .europemap .rtie { stroke: var(--sea); stroke-width: calc(.75px / var(--z)); opacity: .3; }
 .europemap .rlabel text {
   fill: var(--ink-2); font-size: calc(11px / var(--z)); font-weight: 600;
-  text-anchor: middle; paint-order: stroke; stroke: var(--map-land);
+  text-anchor: middle; paint-order: stroke; stroke: var(--atlas-land);
   stroke-width: calc(3px / var(--z)); stroke-linejoin: round;
 }
 .europemap .rlabel:hover text { fill: var(--sea); }
@@ -2346,17 +2278,17 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
 .maphint p:last-child { margin-bottom: 0; }
 .legend { list-style: none; padding: 0; margin: var(--s3) 0; font-size: var(--t-sm); }
 .legend li { display: flex; gap: var(--s3); align-items: baseline; margin-bottom: var(--s2); }
-.legend .sw { flex: 0 0 auto; width: 1rem; height: 1rem; border-radius: 3px; border: 1px solid var(--map-coast); }
-.legend .sw.land { background: var(--map-land); }
-.legend .sw.ctx { background: var(--map-context); }
+.legend .sw { flex: 0 0 auto; width: 1rem; height: 1rem; border-radius: 3px; border: 1px solid var(--atlas-coast); }
+.legend .sw.land { background: var(--atlas-land); }
+.legend .sw.ctx { background: var(--atlas-far); }
 .legend .sw.dest { background: var(--sea); border-radius: 50%; border-color: var(--sea); width: .75rem; height: .75rem; }
-.legend .sw.ring { background: var(--map-land); border-radius: 50%; border-color: var(--ink-3); border-width: 2px; width: .8rem; height: .8rem; }
+.legend .sw.ring { background: var(--atlas-land); border-radius: 50%; border-color: var(--ink-3); border-width: 2px; width: .8rem; height: .8rem; }
 /* Land under the small maps. The country map is the middle rung of
  * Europe -> country -> region -> destination, and before there was geometry
  * it did not exist: a country page could list its regions and could not show
  * you where any of them were. */
-.countrymap svg { background: var(--map-sea); border-radius: var(--radius); }
-.countrymap .context path { fill: var(--map-context); }
+.countrymap svg { background: var(--atlas-sea); border-radius: var(--radius); }
+.countrymap .context path { fill: var(--atlas-far); }
 /* The two rules that were here — `.countrymap .countries path` and the same
    with `.here` — set a fill and a stroke and never won anywhere. Both are
    (0,3,1) against `.minimap.arched .countries path`, which is further down
@@ -2391,7 +2323,7 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
 .macromap .mmlabel {
   fill: color-mix(in srgb, var(--limestone) 92%, transparent);
   font-family: var(--display); font-size: 15px; font-weight: 700;
-  paint-order: stroke; stroke: var(--map-sea); stroke-width: 3; stroke-linejoin: round;
+  paint-order: stroke; stroke: var(--atlas-sea); stroke-width: 3; stroke-linejoin: round;
 }
 .countrymap .rlabel:hover text { fill: var(--sea); }
 
@@ -4399,10 +4331,10 @@ body[data-hero] .masthead { position: sticky; }
 .routewrap .routemap svg {
   display: block; margin-inline: auto;
   height: min(70vh, 640px); width: auto; max-width: 100%;
-  background: var(--map-sea); border-radius: var(--radius);
+  background: var(--atlas-sea); border-radius: var(--radius);
 }
-.routewrap .routemap .context path { fill: var(--map-context); }
-.routewrap .routemap .countries path { fill: var(--map-land); stroke: var(--map-coast); stroke-width: 1; }
+.routewrap .routemap .context path { fill: var(--atlas-far); }
+.routewrap .routemap .countries path { fill: var(--atlas-land); stroke: var(--atlas-coast); stroke-width: 1; }
 
 .legs.route { margin-top: var(--s6); }
 .route .leg {
@@ -4530,7 +4462,7 @@ body[data-hero] .masthead { position: sticky; }
  * sea; outside it there is nothing — the page itself shows through. A dark
  * rectangle with a slightly darker arch on it is a panel; a doorway with
  * the page visible around it is an opening, and that is the whole idea. */
-.archground { fill: var(--map-sea); }
+.archground { fill: var(--atlas-sea); }
 
 /* A LIGHT WALL WITH A DARK OPENING.
  *
@@ -4577,14 +4509,14 @@ body[data-hero] .masthead { position: sticky; }
  * /map fills its land with --map-land and strokes it with the coast, and
  * /discover links straight to /map: two instruments drawing one continent
  * two ways was the inconsistency underneath the defect. */
-.instrmap .countries path { fill: var(--map-land); stroke: var(--map-coast);
+.instrmap .countries path { fill: var(--atlas-land); stroke: var(--atlas-coast);
                                   stroke-width: 1; vector-effect: non-scaling-stroke; }
-.instrmap .context path { fill: var(--map-context);
-                                stroke: color-mix(in srgb, var(--map-coast) 45%, transparent);
+.instrmap .context path { fill: var(--atlas-far);
+                                stroke: color-mix(in srgb, var(--atlas-coast) 45%, transparent);
                                 stroke-width: 0.7; vector-effect: non-scaling-stroke; }
 .instrmap .herodot { fill: var(--pine-air); opacity: .95;
                            transition: opacity .2s ease, r .2s ease, fill .2s ease; }
-.instrmap .herodot.advisory { fill: var(--map-border); opacity: .6; }
+.instrmap .herodot.advisory { fill: var(--atlas-frontier); opacity: .6; }
 
 /* WHAT A NARROWED EUROPE LOOKS LIKE.
  *
@@ -4608,7 +4540,7 @@ body[data-hero] .masthead { position: sticky; }
  * sides: the dot is now a darker mark ON the land, 2.15:1 against it —
  * ground rather than accent, which is what the rule is about, and present,
  * which is what it promises. */
-.instrmap .herodot.unlit { fill: var(--map-coast); opacity: .7; r: 3; }
+.instrmap .herodot.unlit { fill: var(--atlas-coast); opacity: .7; r: 3; }
 .instrmap .herodot.lit { fill: var(--pine-air); opacity: 1; r: 5.5; }
 
 /* THE SCALE BAR, WHICH THE PROJECTION EARNED.
@@ -4690,7 +4622,7 @@ body[data-hero] .masthead { position: sticky; }
    exists to cut the coastline out from behind the type and to do nothing
    else — and the fill is stated, like every other mark inside the arch. */
 .minimap.arched .rlabel text { fill: color-mix(in srgb, var(--limestone) 88%, transparent);
-  stroke: var(--map-sea); stroke-width: 3; }
+  stroke: var(--atlas-sea); stroke-width: 3; }
 .minimap.arched .rlabel:hover text { fill: var(--pine-air); }
 
 /* THREE ROLES, AND EVERY PAGE HAS ONE.
@@ -5497,11 +5429,11 @@ body[data-hero] .masthead { position: sticky; }
    hairline. That is the failure the editorial rule names — black land on
    black water — and an instrument is exempt from the PAPER, not from being
    legible. `--map-land` against `--map-sea` is a measured 1.50 step. */
-.minimap.arched .countries path { fill: var(--map-land);
+.minimap.arched .countries path { fill: var(--atlas-land);
                                   vector-effect: non-scaling-stroke; }
-.minimap.arched .context path { fill: var(--map-context);
+.minimap.arched .context path { fill: var(--atlas-far);
                                 vector-effect: non-scaling-stroke; }
-.minimap.arched .countries path { stroke: var(--map-coast); stroke-width: 1.1; }
+.minimap.arched .countries path { stroke: var(--atlas-coast); stroke-width: 1.1; }
 /* AND THE MACRO MEMBERS ARE FILLED, WHICH TAKES BEATING THE RULE ABOVE.
    `.macromap .countries path.here` and `.minimap.arched .countries path` are
    both (0,3,1), and the second is further down the file, so a map of the
@@ -5521,9 +5453,9 @@ body[data-hero] .masthead { position: sticky; }
    seeing whether anything moved. Austria was drawn on Austria's page in
    exactly the same grey as Germany. */
 .minimap.arched.countrymap .countries path.here {
-  fill: var(--map-here); stroke: var(--map-hereline); stroke-width: 1.3;
+  fill: var(--atlas-here); stroke: var(--atlas-hereline); stroke-width: 1.3;
   vector-effect: non-scaling-stroke; }
-.minimap.arched .context path { stroke: color-mix(in srgb, var(--map-coast) 45%, transparent); stroke-width: 0.7; }
+.minimap.arched .context path { stroke: color-mix(in srgb, var(--atlas-coast) 45%, transparent); stroke-width: 0.7; }
 
 
 /* ── the Stay layer ───────────────────────────────────────────────────
@@ -5687,7 +5619,7 @@ body[data-hero] .masthead { position: sticky; }
    this page is data-world="intelligence" — an instrument. Pictures are
    paper, instruments are graphite, and the split is on what the drawing IS
    rather than on where it sits. Same land tone /map and /discover use. */
-.minemap .constel { fill: var(--map-land); }
+.minemap .constel { fill: var(--atlas-land); }
 .minemap .constel-lit circle { fill: var(--pine-air); }
 /* AND THE DATA-CUT FADE CAME OUT --atlas-sea, WHICH IS THE PICTURE OCEAN.
    Every other drawing that carries this fade sits ON a sea panel, so the
@@ -6637,6 +6569,12 @@ main > .pagehead:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom
    homepage carries `data-hero`, which is the body attribute the single
    stylesheet already reacts to — never a second shell. */
 body[data-hero] main { max-width: none; padding: 0; }
+/* THE BREADCRUMB LOST ITS GUTTER WHEN THE MAIN WENT FULL-BLEED. A plate
+   pads itself with --page-gutter; the crumbs are not in a plate, so on the
+   two plate-sequence pages they started at pixel zero, hard against the
+   window edge, while every word under them sat on the gutter. Nothing
+   counts a gutter. */
+body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 
 .sheet { position: relative; display: grid; gap: var(--s6) var(--s8);
          padding: var(--s8) var(--page-gutter) var(--s8);
@@ -6841,13 +6779,20 @@ body[data-hero] main { max-width: none; padding: 0; }
    plates. `--pine-deep` is a raw palette token, declared once, and the
    INTELLIGENCE world's own rule applies: the ground says where the reader
    is, not how they like their screen. */
-.sheet-atlas { background: var(--pine-deep); color: var(--limestone);
+/* THE LAST DARK BAND ON THE HOMEPAGE, AND IT WENT FOR THE SAME REASON THE
+   INTELLIGENCE WORLD DID: there are no dark pages. A solid pine field across
+   a whole plate is a dark page with a light one above and below it, which is
+   the thing the instruction is about even though it is one band rather than
+   one document. It keeps a ground — a plate that says "this is the record"
+   should not be the same paper as the plate before it — and takes the
+   surface step instead, which is what a surface step is for. */
+.sheet-atlas { background: var(--paper-2); color: var(--ink);
                grid-template-columns: minmax(0, 34%) minmax(0, 1fr);
                gap: var(--s6) var(--s7); align-items: start; }
 .sheet-atlas .mega, .sheet-atlas .lede, .sheet-atlas .go,
-.sheet-atlas .actno, .sheet-atlas .actname { color: var(--limestone); }
-.sheet-atlas .lede { opacity: .82; }
-.sheet-atlas .actno { border-bottom-color: color-mix(in srgb, var(--limestone) 45%, transparent); }
+.sheet-atlas .actno, .sheet-atlas .actname { color: var(--ink); }
+.sheet-atlas .lede { color: var(--ink-2); }
+.sheet-atlas .actno { border-bottom-color: var(--ink-3); }
 .sheet-atlas .gomark::before { background: none; }
 .sheet-atlas .sheettext { grid-template-columns: auto minmax(0, 1fr);
                           gap: var(--s5); align-items: start; }
@@ -6942,12 +6887,12 @@ body[data-hero] main { max-width: none; padding: 0; }
    docs/signature-moments.md records /map as the place the door is
    correctly absent — an instrument is not a picture of somewhere — and
    this draws the same instrument. */
-.sheet-instrument { background: var(--map-sea); color: var(--limestone);
+.sheet-instrument { background: var(--paper-2); color: var(--ink);
         grid-template-columns: minmax(0, 34rem) minmax(0, 1fr);
         gap: var(--s6) var(--s7); align-items: start;
         padding-right: 0; border-bottom: none; }
 .sheet-instrument .pagehead { margin: 0; }
-.sheet-instrument h1, .sheet-instrument .keyhead { color: var(--limestone); }
+.sheet-instrument h1, .sheet-instrument .keyhead { color: var(--ink); }
 /* `min-width: 0` BECAUSE A GRID ITEM'S AUTOMATIC MINIMUM IS ITS MIN-CONTENT,
    and this column holds seventeen unbreakable display words. Without it the
    key blew past its 34rem track and "Art & museums 58" ran under the map:
@@ -6961,7 +6906,7 @@ body[data-hero] main { max-width: none; padding: 0; }
    as a row does. */
 .sheet-instrument .headextent { justify-content: start; text-align: left; }
 .keyhead { font-family: var(--display); font-size: var(--t-xl); margin: 0; }
-.keynote { margin: 0; font-size: var(--t-sm); color: var(--map-land); }
+.keynote { margin: 0; font-size: var(--t-sm); color: var(--ink-3); }
 
 /* THE CONTROLS LOOK LIKE TYPOGRAPHY, WHICH IS THE WHOLE DECISION.
    Border, fill, radius and shadow each say "separate object, placed here
@@ -6976,10 +6921,10 @@ body[data-hero] main { max-width: none; padding: 0; }
         border: 0; padding: var(--s2) 0; margin: 0; cursor: pointer;
         display: inline-flex; align-items: baseline; gap: .4em;
         font-family: var(--display); font-size: var(--t-xl); line-height: 1.12;
-        color: var(--map-land); border-bottom: 2px solid transparent; }
-.pickword:hover .pickname { color: var(--limestone); }
-.pickword[aria-pressed="true"] { color: var(--limestone);
-        border-bottom-color: var(--pine-air); }
+        color: var(--ink-2); border-bottom: 2px solid transparent; }
+.pickword:hover .pickname { color: var(--door); }
+.pickword[aria-pressed="true"] { color: var(--ink);
+        border-bottom-color: var(--door); }
 .pickn { font-family: var(--text); font-size: var(--t-xs);
         font-variant-numeric: tabular-nums; opacity: .7; }
 
@@ -7009,10 +6954,10 @@ body[data-hero] main { max-width: none; padding: 0; }
    onto the last one's line and the two shared a baseline, so "Clear
    everything" read as a fifth thing you could switch on. Its own line. */
 .instrfields .small { flex: 1 0 100%; margin: var(--s2) 0 0; }
-.sheet-instrument label, .sheet-instrument .small { color: var(--map-land); }
-.sheet-instrument select { background: var(--map-shore-1); color: var(--limestone);
-        border-color: var(--map-border); }
-.sheet-instrument .linkish { color: var(--pine-air); }
+.sheet-instrument label, .sheet-instrument .small { color: var(--ink-3); }
+.sheet-instrument select { background: var(--paper); color: var(--ink);
+        border-color: var(--ink-3); }
+.sheet-instrument .linkish { color: var(--door); }
 
 
 /* 02 · THE RESULT — rows, and never cards. The application already emits
@@ -7058,14 +7003,14 @@ body[data-hero] main { max-width: none; padding: 0; }
    `docs/cartography.md` splits every drawing on what it IS, and inside a
    tool a locator is instrumentation, not a picture of somewhere. Same
    geometry, same subject, the instrument's own field and land. */
-.sheet-where .constel { fill: var(--map-land); }
-.sheet-where .constel .glyph-sea { fill: var(--map-sea); }
+.sheet-where .constel { fill: var(--atlas-land); }
+.sheet-where .constel .glyph-sea { fill: var(--atlas-sea); }
 .sheet-where .constel .glyph-beyond,
-.sheet-where .constel .glyph-land { fill: var(--map-context); stroke: var(--map-context); }
-.sheet-where .constel .glyph-bounds { stroke: var(--map-border); }
-.sheet-where .regionglyph .countries path { fill: var(--map-here);
-        stroke: var(--map-hereline); }
-.sheet-where .row:hover .regionglyph .countries path { fill: var(--map-hover); }
+.sheet-where .constel .glyph-land { fill: var(--atlas-far); stroke: var(--atlas-far); }
+.sheet-where .constel .glyph-bounds { stroke: var(--atlas-frontier); }
+.sheet-where .regionglyph .countries path { fill: var(--atlas-here);
+        stroke: var(--atlas-hereline); }
+.sheet-where .row:hover .regionglyph .countries path { fill: var(--pine); }
 
 /* 04 · EUROPE IN MOTION — twelve printed queries. A motion has no
    coastline, no topography and no season, so a picture drawn for one is a
