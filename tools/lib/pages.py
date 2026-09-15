@@ -3094,6 +3094,28 @@ def country_page(data, c):
                 "alt": _t["name"],
                 "label": _t["name"],
                 "href": urls.city(c, _r, _t)})
+    # THE ATLAS INDEX, WHICH IS THE ONE THING THAT BELONGS BESIDE THE PROSE.
+    # The portrait band was a 34rem measure inside a 90rem stage, so half of
+    # it was empty page — the void this system exists to remove, arriving
+    # from the section that is most purely text. What goes there is not an
+    # illustration and not a pull quote: it is what an atlas prints in the
+    # margin, set in the mono face, derived and checkable. Absent fields are
+    # ABSENT rather than estimated, which is this product's data rule.
+    _facts = [("Capital", c.get("capital") or ""),
+              ("Travel regions", str(len(c["regions"]))),
+              ("Destinations", str(sum(len(r["cities"]) for r in c["regions"]))),
+              ("Places recorded", str(sum(len(t.get("places", []))
+                                          for r in c["regions"] for t in r["cities"]))),
+              ("Region of Europe", m["name"])]
+    _gf = (geo.facts() or {}).get(c["slug"]) if hasattr(geo, "facts") else None
+    if _gf and _gf.get("iso3"):
+        _facts.append(("ISO 3166", _gf["iso3"]))
+    if _gf and _gf.get("population"):
+        _facts.append(("Population", f"{_gf['population']:,}"))
+    cindex = ('<dl class="ed-index">'
+              + "".join(f"<dt>{esc(k)}</dt><dd>{esc(v)}</dd>"
+                        for k, v in _facts if v)
+              + "</dl>")
     _shots = ed_strip(data.get("images"), cstrip_items, limit=8)
     cstrip = (f'<section class="ed-section">'
               + ed_section_head("02", "In the country",
@@ -3119,8 +3141,11 @@ def country_page(data, c):
 <section class="ed-section">
 {ed_section_head("01", "The portrait",
                  f"Why {esc(c['name'])} belongs in your Europe.")}
-<div class="measure lead">
-  <p>{esc(c['summary'])}</p>
+<div class="ed-split">
+  <div class="ed-split-copy measure lead">
+    <p>{esc(c['summary'])}</p>
+  </div>
+  <div class="ed-split-media">{cindex}</div>
 </div>
 {ed_bleed(data.get("images"), f"country:{c['slug']}",
           alt=f"{c['name']} seen whole",

@@ -8227,3 +8227,65 @@ body[data-family="journey"] .masthead .wordmark { color: var(--bone); }
 .headmeta.ed-section {
   padding-block: var(--s6) 0; border-top: 0;
 }
+
+/* =========================================================
+   THE BAND HEAD TAKES THE SECTION GRAMMAR
+   =========================================================
+   `section()` prints a band on three-quarters of the pages here, and it
+   printed a small h2 with a lede under it — identical on every family. So
+   the 2036 grammar reached the openings and stopped at the first band: a
+   reader met a magazine head and then six of the old ones. Rewriting nine
+   hundred call sites was the alternative; changing the head is one rule.
+
+   THE INDEX IS A CSS COUNTER, not a number in the markup. A figure typed
+   per call site is wrong the day somebody reorders a page — this
+   repository's most repeated finding about counts — and the band's
+   position is the only honest source for it. `main` resets, every `.band`
+   increments, and the number is drawn in the margin. */
+main { counter-reset: band; }
+.band { counter-increment: band; }
+.band > .band-head {
+  display: grid;
+  grid-template-columns: minmax(6rem, .22fr) minmax(0, 1fr);
+  gap: var(--s5) var(--s6);
+  align-items: start;
+  margin-bottom: var(--s7);
+}
+.band > .band-head::before {
+  content: "0" counter(band);
+  font-family: var(--ed-mono); font-size: var(--t-xs); letter-spacing: .12em;
+  color: var(--ed-pine); padding-top: .55em;
+}
+.band > .band-head > h2 {
+  grid-column: 2; font-family: var(--ed-serif); font-weight: 400;
+  font-size: var(--ed-display-2); line-height: .96; letter-spacing: -.03em;
+  max-width: 22ch; margin: 0;
+}
+.band > .band-head > .lede {
+  grid-column: 2; font-size: var(--ed-read); line-height: 1.5;
+  color: var(--ink-2); max-width: 46ch; margin: var(--s4) 0 0;
+}
+.band > .band-head > .stage { grid-column: 2; }
+/* A BAND THAT OPENS A MOVEMENT KEEPS ITS RULE and gains the air; the
+   rhythm note this replaces is still the reason it exists. */
+.band.opens { padding-top: var(--s8); }
+@media (max-width: 52rem) {
+  .band > .band-head { grid-template-columns: 1fr; gap: var(--s3); }
+  .band > .band-head::before { padding-top: 0; }
+  .band > .band-head > :is(h2, .lede, .stage) { grid-column: 1; }
+}
+
+/* THE ATLAS INDEX — what an atlas prints in the margin. Mono, hairlines,
+   the label quiet and the figure the thing you read. It is the answer to a
+   void rather than an ornament: a 34rem measure inside a 90rem stage left
+   half the portrait band empty, and what belongs beside a country's own
+   prose is what the atlas knows about it. */
+.ed-index { margin: 0; display: grid; grid-template-columns: auto 1fr;
+            column-gap: var(--s5); row-gap: 0; align-content: start; }
+.ed-index dt, .ed-index dd {
+  font-family: var(--ed-mono); font-size: var(--t-xs); line-height: 1;
+  padding: var(--s4) 0; border-top: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  margin: 0;
+}
+.ed-index dt { letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.ed-index dd { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }

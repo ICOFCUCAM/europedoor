@@ -1514,6 +1514,26 @@ def section(title, body, *, id=None, lede=None, more=None, stage=None, tone=None
 </section>"""
 
 
+# ONE BAND HEAD, FOR EVERY FAMILY AT ONCE.
+#
+# `section()` is on three-quarters of the pages here and it prints a small
+# h2 with a lede under it, left-aligned, identical on all of them — so the
+# 2036 grammar applied to the OPENINGS and stopped at the first band, and a
+# reader met a magazine head followed by six of the old ones. The
+# alternative was rewriting nine hundred call sites.
+#
+# The band's head takes the section grammar instead: the title at display
+# size with its lede beside it rather than under it, and an index down the
+# left. THE INDEX IS DERIVED FROM POSITION — a number typed per call site
+# is a number that is wrong the day somebody reorders the page, which is
+# this repository's most repeated finding about counts — so the stylesheet
+# counts them with a CSS counter and the markup carries none.
+#
+# `stage` is untouched. It is the homepage's named progression and the
+# homepage is out of scope.
+SECTION_GRAMMAR = True
+
+
 def card(href, kicker, title, blurb, *, seed=None, meta="", tall=False, motif=None,
          level=3,
          art=None):
