@@ -1630,7 +1630,16 @@ a .kicker { color: var(--ink-3); }
    is the whole difference between a corner of the continent and an argument
    that crosses it. Right-aligned and tabular so the column reads as a range
    down the page rather than as thirteen unrelated numerals. */
-.themerow .rowmeta { text-align: right; font-variant-numeric: tabular-nums; }
+/* LEFT, BECAUSE THE COLUMN IT WAS ALIGNED TO IS GONE. It was right-aligned
+   against a right-hand count column; with the drawing on the left and one
+   text block beside it, the count is a line of that block, and
+   right-aligning a line of text to the end of a PROSE MEASURE puts it at a
+   pixel nothing else on the page uses. The reason expired with the layout,
+   which is the failure mode a rule with a reason in it exists to make
+   visible. Tabular still: the column of counts reads as a range down the
+   page. */
+.themerow .rowmeta { font-variant-numeric: tabular-nums;
+                     margin-top: var(--s3); }
 /* The stop's number in the order — a real sequence, so a numeral says
    something true rather than decorating a list. */
 .leg-no { display: block; font-family: var(--mono); font-size: var(--t-sm);
@@ -4998,8 +5007,12 @@ body[data-hero] .masthead { position: sticky; }
    wallpaper, which the events band already refused for the same reason. This
    is a glyph, not a window: no arch, no ground, no frame, no label. */
 .constel-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
-.themeside { display: flex; flex-direction: column; align-items: flex-end;
-             gap: var(--s2); flex: none; }
+/* ONE ROW SHAPE FOR THE THREE INDEXES THAT DRAW THEIR SET. `.themeside` was
+   a right-hand column holding the drawing and a count, and it is gone: with
+   the drawing on the left and one text block beside it there is no second
+   column to hold, and the count is a line of the text like the others.
+   Deleted rather than kept as a synonym, which is what was done to
+   `.sourced` for the same reason. */
 /* No `display: block`: the dead-rule scan caught it as a declaration that
    matches and changes nothing, because an SVG in this position is already
    laid out as a block. */
@@ -5101,12 +5114,12 @@ body[data-hero] .masthead { position: sticky; }
  * rather than a seventh breakpoint. Two attempts failed first and both are
  * this file's recorded traps: a base rule LATER in the file beat the 64rem
  * block and took the desk glyph from 288 back to 240 without touching the
- * desk rule; and writing it as `.interestrow .themeside .constel` made it
+ * desk rule; and writing it as `.interestrow .rowart .constel` made it
  * (0,3,0), which beats the desk block's (0,2,0) at every width. So it is
  * (0,2,0), it is above the block that overrides it, and the invariant
  * register's breakpoint ceiling is what said to look for this at all —
  * every breakpoint is a layout somebody has to test in Chromium. */
-.themeside .constel { width: min(15rem, 100%); }
+
 @media (min-width: 64rem) {
   .themerow .constel-theme.constel-dense .constel-lit circle { r: 11px; }
   /* THREE HUNDRED AND THIRTY-SIX PIXELS OF NOTHING IN THE MIDDLE OF EVERY
@@ -5120,7 +5133,7 @@ body[data-hero] .masthead { position: sticky; }
      names, which is a sequence you scan — the same distinction this
      stylesheet already records for `.rowsub`. So the text takes the room
      and the drawing sits next to it. */
-  .themerow { grid-template-columns: minmax(0, 1fr) 18rem; }
+  .themerow { grid-template-columns: 18rem minmax(0, 1fr); }
   /* Same void, different cause: an interest row's text is a name and one
      short line, so no amount of column gives it to. The drawing takes the
      column instead — 22rem rather than 15 — which also makes two hundred
@@ -5150,12 +5163,8 @@ body[data-hero] .masthead { position: sticky; }
      already reads as a table. The drawing does NOT grow: its width is
      capped by the page's own length, recorded below, and this costs no row
      height at all. */
-  .interestrow, .motionrow {
-    grid-template-columns: 18rem minmax(0, 1fr);
-    align-items: center; gap: var(--s6); }
-  .interestrow .rowart .constel,
-  .motionrow .rowart .constel { width: 100%; }
-  .themeside .constel { width: min(18rem, 100%); }
+  .interestrow, .motionrow { align-items: center; gap: var(--s6); }
+  .rowart .constel { width: 18rem; }
   /* AND THE MARK HAD TO COME DOWN AS THE DRAWING WENT UP. A radius in
      viewBox units is a radius in pixels at exactly one width: 22 units is
      4.5 pixels at 204 and 10.5 at 480, so the first attempt at this drew
@@ -5267,7 +5276,7 @@ body[data-hero] .masthead { position: sticky; }
      glyph is 568 pixels tall at 600 and the themes page ran to 9,684 — the
      same fault the interests rows were fixed for, on the family they were
      copied from. At 390 the cap is the width anyway. */
-  :is(.themeside, .rowart) .constel { display: block; width: min(22rem, 100%); }
+  .rowart .constel { display: block; width: min(22rem, 100%); }
   .themerow .constel-theme .constel-lit circle { r: 14px; }
   .themerow .constel-theme.constel-dense .constel-lit circle { r: 7px; }
 }

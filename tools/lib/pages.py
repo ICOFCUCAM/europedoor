@@ -7836,10 +7836,10 @@ def themes_index(data):
              for st in t["stops"]], extra=" constel-theme")
         rows.append(
             f'<a class="row themerow" href="/themes/{t["slug"]}">'
+            f'<div class="rowart">{glyph}</div>'
             f'<div><p class="kicker">{esc(t["strapline"])}</p>'
             f'<h2>{esc(t["name"])}</h2>'
-            f'<p class="rowsub">{" · ".join(places)}</p></div>'
-            f'<div class="themeside">{glyph}'
+            f'<p class="rowsub">{" · ".join(places)}</p>'
             f'<p class="rowmeta">{len(countries)} '
             f'{"countries" if len(countries) != 1 else "country"}</p></div></a>')
     body = f"""
@@ -10639,15 +10639,16 @@ def motion_page(data, m):
     trows = [t for t in data["themes"] if wants & set(t.get("interests", []))][:3]
     trelated = "".join(
         f'<a class="row themerow" href="/themes/{t["slug"]}">'
-        f'<div><p class="kicker">{esc(t["strapline"])}</p>'
+        + '<div class="rowart">'
+        + constellation(_pts([st["city"] for st in t["stops"]]),
+                        extra=" constel-theme")
+        + '</div>'
+        + f'<div><p class="kicker">{esc(t["strapline"])}</p>'
         f'<h3>{esc(t["name"])}</h3>'
         f'<p class="rowsub">'
         + " · ".join(esc(idx[st["city"]]["city"]["name"])
                      for st in t["stops"] if st["city"] in idx)
-        + '</p></div><div class="themeside">'
-        + constellation(_pts([st["city"] for st in t["stops"]]),
-                        extra=" constel-theme")
-        + f'<p class="rowmeta">'
+        + f'</p><p class="rowmeta">'
         f'{n_of(len({idx[st["city"]]["country"]["name"] for st in t["stops"] if st["city"] in idx}), "country")}'
         f'</p></div></a>'
         for t in trows)
