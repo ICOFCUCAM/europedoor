@@ -5235,57 +5235,48 @@ body[data-hero] .masthead { position: sticky; }
    fault: a row is baseline-aligned, which is right for two columns of type
    and strands a drawing at the top of its cell with the text starting below
    it. Third family to hit it; one declaration, not three. */
+/* A DRAWING HIDDEN ON A PHONE, AND THE EXCEPTION LIST GREW FOUR TIMES
+   BEFORE THE RULE WAS MEASURED.
+
+   `.constel:not(.regionglyph) { display: none }` below 44rem was written
+   when a constellation was a 132-pixel mark inside a desk row: at that size
+   eight stops are four pixels apart and there is nothing to see. Every
+   family that afterwards gave its drawing the WIDTH on a phone had to be
+   excepted by name — the journey rows, a story's places, /themes, then
+   /interests and /europe-in when their wrapper was renamed — and each time
+   the drawing had been invisible for at least one build.
+
+   Measured in Chromium at 390 by reading the computed display of every
+   `svg.constel` on ten surfaces:
+
+       /europe/austria           3 region minis    HIDDEN
+       /discover/adriatic-…      9 country glyphs  HIDDEN
+       /journeys                17 route drawings  HIDDEN
+
+   That is 129 region cards across the fifty country pages, 50 country cards
+   across the nine macro pages and every row on the journeys index — about
+   196 drawings, each leaving a 279-pixel panel of flat sea with nothing in
+   it, because `.card-map` paints the same ocean the drawing sits on. A hole
+   that is the colour of the picture is a hole nothing counts.
+
+   And with those three shown, NOTHING IS LEFT HIDDEN: every constellation on
+   the site is either in a card that is full width on a phone or in a row
+   that stacks to full width. A rule with no remaining user is dead code that
+   looks like a decision, so it is deleted rather than given a fifth
+   exception. The page length does not move by a pixel — the panels were
+   already there and already that size.
+
+   `display: block` stays, on every one of them: an `<svg>` is inline by
+   default and sits on a text baseline, which is the third fault this
+   stylesheet records about drawings in rows. */
+.constel { display: block; }
+
 @media (max-width: 44rem) {
-  /* At 390 the glyph is a third of the row's width for eight dots that read
-     as a smudge — the same measurement that takes map labels off a phone.
-
-     NOT THE REGION GLYPH, AND THE DIFFERENCE IS SIZE RATHER THAN KIND. A
-     theme's constellation is 132px inside a row and stays 132px on a phone;
-     the atlas index gives its drawing the whole width, so at 390 the Nordics
-     are a shape a reader can name. Inheriting this rule took the one thing
-     that makes that page an atlas off every phone, which is the same
-     measurement being applied to a different number. */
-  .constel:not(.regionglyph) { display: none; }
-  /* THIRD TIME THIS RULE HAS TAKEN A DRAWING OFF A PAGE THAT NEEDED IT, and
-     the measurement is the same one every time: 132px is a mark and the
-     whole width is a picture. On a phone the homepage stacks, so a journey's
-     route and a story's places get 390px — where a route down the length of
-     Europe is a line you can read, and where the alternative is a journey
-     row explaining itself with nothing. Same rule, different number. */
-  .jrowart .constel, .storyart .constel { display: block; }
-  /* AND /themes, FOR THE SAME REASON AND THE SAME NUMBER — but the reason
-     only became true when the drawing changed. The rule above says a theme's
-     constellation "is 132px inside a row and stays 132px on a phone", which
-     was right while it was a 132-pixel mark: at that size the eight stops of
-     Renaissance Europe are four pixels apart and there is nothing to see.
-     The row states its proportions now and the drawing is 288 on a desktop,
-     and at 390 the row is a single 358-pixel column — which is exactly the
-     case this block already makes an exception for, where a journey's route
-     and a story's places get the whole width. The page closes on "a knot is
-     an argument about one corner of Europe, a scatter is one about the whole
-     of it", and on a phone it was closing on nothing.
-     The mark comes down with the width, as it went up with it: 14 units at
-     358 is the same 10-pixel dot the row has everywhere else. */
-  /* min(22rem) RATHER THAN 100%: this block runs to 44rem, so a full-width
-     glyph is 568 pixels tall at 600 and the themes page ran to 9,684 — the
-     same fault the interests rows were just fixed for, on the family the
-     interests rows were copied from. At 390 the cap is the width anyway. */
-  /* `.rowart` AS WELL AS `.themeside`, AND THE OMISSION COST BOTH FAMILIES
-     THEIR PICTURE FOR ONE BUILD. When /interests and /europe-in moved the
-     drawing to the left of the text their wrapper changed name, and this
-     exception — which is the whole reason a glyph survives a phone — still
-     named the old one. Measured: both went from a drawing on the first
-     screen to 0%, silently, because the general rule above hides every
-     constellation and an exception that stops matching just stops. It is
-     the same class of fault as the four label families that each named a
-     class instead of the thing, one stylesheet over, and the answer is the
-     same: name what it IS. A row's drawing is a row's drawing.
-
-     min(22rem) rather than 100%: this block runs to 44rem, so a full-width
+  /* min(22rem) rather than 100%: this block runs to 44rem, so a full-width
      glyph is 568 pixels tall at 600 and the themes page ran to 9,684 — the
      same fault the interests rows were fixed for, on the family they were
      copied from. At 390 the cap is the width anyway. */
-  .rowart .constel { display: block; width: min(22rem, 100%); }
+  .rowart .constel { width: min(22rem, 100%); }
   .themerow .constel-theme .constel-lit circle { r: 14px; }
   .themerow .constel-theme.constel-dense .constel-lit circle { r: 7px; }
 }
@@ -5924,7 +5915,13 @@ body[data-hero] .masthead { position: sticky; }
 
 @media (max-width: 52rem) {
   .journeyrows .row, .storyleadwide { grid-template-columns: 1fr; gap: var(--s4); }
-  .jart { max-width: 18rem; }
+  /* `min(22rem, 100%)`, the same cap every other stacked row drawing takes.
+     It was a flat 18rem, chosen while these seventeen routes were hidden
+     below 44rem entirely — so the number was only ever about the band
+     between 44 and 52rem, and at 390 it left 88 pixels of paper down the
+     right of every row. The cap is still there for the top of the band,
+     where a full-width glyph is 546 pixels tall seventeen times over. */
+  .jart .constel { width: min(22rem, 100%); }
 }
 
 /* ── THE EDITORIAL INDEX OPENING ──────────────────────────────────────
