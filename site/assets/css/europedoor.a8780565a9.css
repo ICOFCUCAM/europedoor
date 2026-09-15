@@ -914,6 +914,21 @@ a .kicker { color: var(--ink-3); }
  * The class is named for a count, so above the layout breakpoint it keeps
  * that count. Below it auto-fill still does the right thing, which is why
  * this is a floor on width rather than a rewrite. */
+/* AND BETWEEN THE TWO BREAKPOINTS auto-fill GAVE THREE, so the only cols-4
+ * grid on the site — the four doors on /how-it-works — rendered 3 + 1, one
+ * door alone with two empty cells beside it, at 704 and at 834. Measured
+ * across all 44 families at 390/704/834/1024/1280 for any grid whose last
+ * row is emptier than it is full: this was the only one. A count that
+ * divides the set is what a grid is for, so four items take two columns
+ * here; at 390 auto-fill still gives one, and above 64rem they are four
+ * across. Found on the TABLET contact sheet — invisible at both the widths
+ * everything else is shot at. THE UPPER BOUND IS 64rem RATHER THAN A
+ * FRACTION UNDER IT: at exactly 1024 both blocks match and the four-column
+ * one is written after, so it wins. A 63.999rem would have been a seventh
+ * breakpoint, and the register counts them. */
+@media (min-width: 44rem) and (max-width: 64rem) {
+  .grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+}
 @media (min-width: 64rem) { .grid.cols-4 { grid-template-columns: repeat(4, 1fr); } }
 /* AND cols-3 HAD NO RULE AT ALL, so it fell through to the default track and
  * packed FOUR at 1280. Nine macro regions came out 4 + 4 + 1 with the ninth
