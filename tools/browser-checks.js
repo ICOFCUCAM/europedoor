@@ -3017,6 +3017,70 @@ async function main() {
   }
   await page.setViewportSize({ width: 1280, height: 900 });
 
+  // ── a heading is not cut in half ───────────────────────────────────
+  //
+  // A WORD BROKEN MID-WORD IS A RENDERING FAULT, AND IT HAS HAPPENED TWICE.
+  // `overflow-wrap: break-word` is right and stays — a headline running off
+  // the right edge is worse, and hyphenation is refused because an English
+  // dictionary breaks Norwegian compounds wrongly. What is wrong when it
+  // fires is the SIZE or the MEASURE.
+  //
+  // First: `.overture h1` is held at 14ch, which is a character count wearing
+  // a length's clothes — a `ch` is the width of a zero — so Elbphilharmonie
+  // measured 214px inside a 210px box and dropped its last glyph onto a line
+  // of its own, on four pages. Then the fix for that was capped with
+  // `min(100%, min-content)` to stop a 320px screen scrolling, which is
+  // INVALID CSS: an intrinsic keyword is not allowed inside a math function,
+  // so the declaration was dropped, min-width computed to 0 and the four
+  // broke again. Nothing saw it — the overflow sweep passed BECAUSE the fix
+  // was off — and it was found by looking at a contact sheet.
+  //
+  // A HYPHENATED WORD BREAKING AT ITS HYPHEN IS CORRECT TYPOGRAPHY, not a
+  // fault: the break is where the author put one. Only a break inside an
+  // unbroken run of letters counts.
+  {
+    const { ALL } = require("./lib/families.js");
+    const CUT = [];
+    let looked = 0;
+    for (const w of [320, 390]) {
+      await page.setViewportSize({ width: w, height: 844 });
+      for (const [name, u] of ALL) {
+        const res = await page.goto(base + u, { waitUntil: "load" });
+        if (!res || res.status() !== 200) continue;
+        looked++;
+        const bad = await page.evaluate(() => {
+          const out = [];
+          const rg = document.createRange();
+          for (const h of document.querySelectorAll("main :is(h1,h2,h3)")) {
+            for (const n of h.childNodes) {
+              if (n.nodeType !== 3) continue;
+              let i = 0;
+              for (const word of n.textContent.split(/(\s+)/)) {
+                if (word.trim() && !/[-‐‑]/.test(word.slice(1, -1))) {
+                  rg.setStart(n, i); rg.setEnd(n, i + word.length);
+                  const tops = new Set([...rg.getClientRects()]
+                    .filter((r) => r.width > 0).map((r) => Math.round(r.top)));
+                  if (tops.size > 1) out.push(word);
+                }
+                i += word.length;
+              }
+            }
+          }
+          return out;
+        });
+        for (const word of bad) CUT.push(`${name} at ${w}: "${word}"`);
+      }
+    }
+    await page.setViewportSize({ width: 1280, height: 900 });
+    ok(CUT.length === 0,
+       `${CUT.length} heading word(s) cut in half: ${CUT.slice(0, 6).join(", ")}. `
+       + "overflow-wrap is right; the size or the measure is what is wrong when "
+       + "it fires.");
+    ok(looked >= 80,
+       `only ${looked} pages were examined for a cut heading across two widths `
+       + "— the family list or the h1 selector has stopped matching");
+  }
+
   // ── a country on the instrument is drawn, not merely declared ──────
   //
   // `docs/palette.json` declares --map-context against --map-sea at 1.35
