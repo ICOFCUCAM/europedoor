@@ -8308,3 +8308,61 @@ main { counter-reset: band; }
   content: "·"; margin-inline: var(--s3); color: var(--ink-3);
 }
 .essay .ed-bleed { margin-block: var(--s7) 0; }
+
+/* =========================================================
+   INSTITUTION — the typographic monument
+   =========================================================
+   Sixteen pages carry a BARE `.pagehead`: no `index`, no `overture`, no
+   `instrument`. That is not an omission, it is the fourth head this site
+   has always had and never named — the manifesto, the method, the sources,
+   the API, the legal pages, /how-it-works. They are the one family that
+   must NOT look like a travel page, and they looked exactly like one: the
+   same 60px h1 in the same place with the same kicker over it.
+
+   The monument is what the directive asks for and what the subject wants:
+   almost no imagery, very large type, very large margins, a narrow measure
+   and few links. A reader arrives here to be told something true rather
+   than to be sold somewhere, so the page reads like a statement carved
+   into a wall and not like a brochure with less colour.
+
+   SELECTED BY WHAT IT IS NOT, deliberately. A fourth role token would have
+   to be added to sixteen call sites and `c_head_roles` would then require
+   it everywhere; the absence of the other three is already the signal, and
+   it cannot drift out of step with itself. */
+.pagehead:not(.index):not(.overture):not(.instrument):not(.essayhead):not(.opening) {
+  max-width: min(56rem, 100%);
+  margin-inline: auto;
+  padding-block: clamp(5rem, 11vw, 10rem) clamp(2.5rem, 5vw, 4.5rem);
+  text-align: left;
+}
+.pagehead:not(.index):not(.overture):not(.instrument):not(.essayhead):not(.opening) > .kicker {
+  font-family: var(--ed-mono); font-size: var(--t-xs); letter-spacing: .16em;
+  color: var(--olive); margin-bottom: var(--s6);
+}
+.pagehead:not(.index):not(.overture):not(.instrument):not(.essayhead):not(.opening) > h1 {
+  font-size: var(--ed-display-1); line-height: .96; letter-spacing: -.04em;
+  max-width: 18ch; margin: 0;
+}
+.pagehead:not(.index):not(.overture):not(.instrument):not(.essayhead):not(.opening) > .lede {
+  margin-top: var(--s7); max-width: 40ch;
+  font-size: var(--ed-read); line-height: 1.55; color: var(--ink-2);
+}
+/* AND THE BODY UNDER IT READS AT THE SAME MEASURE. An institutional page is
+   long-form prose, so the column that follows the monument is the column
+   the monument sits in — not the 90rem stage, which is for pictures. */
+body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) {
+  max-width: min(56rem, 100%); margin-inline: auto;
+}
+/* THE MANIFESTO IS THE ONE PAGE THAT IS ONLY TYPE. Eight lines, each its
+   own thought, at the size a reader cannot skim. No imagery at all, which
+   is the directive's word for it and this product's own position: there is
+   nothing to photograph about a sentence. */
+.manifesto p {
+  font-family: var(--ed-serif); font-weight: 400;
+  font-size: var(--ed-display-2); line-height: 1.12; letter-spacing: -.03em;
+  max-width: 22ch; margin: 0 0 var(--s7); color: var(--ink);
+}
+.manifesto p:nth-child(even) { margin-left: auto; text-align: right; }
+@media (max-width: 52rem) {
+  .manifesto p:nth-child(even) { margin-left: 0; text-align: left; }
+}
