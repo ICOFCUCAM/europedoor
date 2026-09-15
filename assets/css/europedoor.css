@@ -5929,8 +5929,13 @@ body[data-hero] .masthead { position: sticky; }
    A 9-unit dot on a framed route is a blob that hides the stop it marks; the
    hairline is the ground's own tone, so a stop separates from the water and
    from the land without a second colour. */
-.jrowart .constel-lit circle { r: 6px; stroke: var(--atlas-sea);
+.jrowart .constel-lit circle { r: 5px; stroke: var(--atlas-sea);
                                stroke-width: 2; }
+/* The two ends of the line, in the transit convention: a ring whose core is
+   the ground, so a terminal reads as a station and a stop between them reads
+   as a stop. */
+.jrowart .constel-lit circle.term { r: 8px; fill: var(--atlas-land);
+                                    stroke: var(--cobalt); stroke-width: 5; }
 .jrowart .constel-route { stroke-width: 4.5; }
 .jrowart .constel-route.case { stroke-width: 9; stroke: var(--atlas-land);
                                opacity: .55; }

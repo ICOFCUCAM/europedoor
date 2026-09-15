@@ -7887,7 +7887,17 @@ def constellation(pts, extra="", route=False, frame=False, cut=False,
 
     NO APERTURE. Eleven doors on one page is the signature as wallpaper.
     """
-    dots = "".join(f'<circle cx="{x:.0f}" cy="{y:.0f}"/>' for x, y in pts)
+    # A ROUTE HAS A DIRECTION AND THE DRAWING DID NOT SHOW IT. Thirteen
+    # identical dots on a line say "these places"; a journey says "this one,
+    # then that one, ending there", which is the whole thing the row's own
+    # kicker spells out in arrows. The terminals take the transit convention —
+    # a ring with the ground's colour in its core — and the stops between them
+    # stay plain, so the eye reads the ends first and the sequence after.
+    last = len(pts) - 1
+    dots = "".join(
+        f'<circle class="{"term" if route and i in (0, last) else ""}" '
+        f'cx="{x:.0f}" cy="{y:.0f}"/>'
+        for i, (x, y) in enumerate(pts))
     line = route_line(pts) if route else ""
     # FRAMED ON ITS OWN GROUND WHERE THE SUBJECT IS A ROUTE OR A SET OF
     # PLACES, and never where the subject is REACH. Three featured journeys
