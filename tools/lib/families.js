@@ -76,6 +76,23 @@ const EXTRA = [
   ['about', '/about/'],
   ['manifesto', '/manifesto/'],
   ['sources', '/sources/'],
+  /* THE PROSE PAGES, WHICH NOTHING HAD EVER PHOTOGRAPHED. Fifteen documents
+   * — the two business pages, the public API, the accessibility statement,
+   * the four legal ones, contact and help — carry the same shell, the same
+   * head roles and the same primitives as everything above, and not one of
+   * them had appeared on a contact sheet. A page nobody looks at is a page
+   * that drifts, and these are the ones a reader reaches when they have a
+   * question about the product rather than about Europe. */
+  ['for businesses', '/for-businesses/'],
+  ['tourism boards', '/for-tourism-boards/'],
+  ['api docs', '/api-docs/'],
+  ['accessibility', '/accessibility/'],
+  ['contact', '/contact/'],
+  ['help', '/help/'],
+  ['privacy', '/privacy/'],
+  ['terms', '/terms/'],
+  ['cookies', '/cookies/'],
+  ['join', '/experiences/join/'],
 ];
 
 module.exports = { FAMILIES, EXTRA, ALL: FAMILIES.concat(EXTRA), pick, ROOT };

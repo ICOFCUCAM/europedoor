@@ -2330,6 +2330,47 @@ async function main() {
        `name under it`);
   }
 
+  // ── a placeholder that does not fit the box it is in ───────────────
+  //
+  // The homepage's own placeholder was cut mid-word at 390 and was fixed;
+  // /search's was not, and it is the one control that page exists to be. It
+  // carried three examples joined by middots — 84 characters — and rendered
+  // as "quiet beaches in september · medieva". A rule that exists is not a
+  // rule that is inherited.
+  //
+  // MEASURED AGAINST THE BOX, NOT COUNTED IN CHARACTERS. A character ceiling
+  // is a proxy for a width and would be wrong the day the face or the
+  // padding changes; the honest test is to put the placeholder in the field
+  // as a value and ask the browser whether the field has to scroll. An input
+  // is a scroll container, which is why the clipped-text check cannot see
+  // this: scrolling is the right answer inside one, and a HINT nobody can
+  // read is not.
+  await page.setViewportSize({ width: 390, height: 800 });
+  for (const u of ["/", "/search", "/plan"]) {
+    await page.goto(base + u, { waitUntil: "load" });
+    const cut = await page.evaluate(() => {
+      const out = [];
+      for (const el of document.querySelectorAll("input[placeholder], textarea[placeholder]")) {
+        const ph = el.getAttribute("placeholder");
+        if (!ph) continue;
+        const was = el.value;
+        el.value = ph;
+        const over = el.scrollWidth - el.clientWidth;
+        el.value = was;
+        // A textarea wraps, so only a single-line field can cut sideways.
+        if (el.tagName === "INPUT" && over > 1) out.push([ph, over]);
+      }
+      return out;
+    });
+    checked++;
+    ok(cut.length === 0,
+       `${u} at 390: ${cut.length} placeholder(s) wider than the field — ` +
+       `"${(cut[0] || [""])[0]}" overflows by ${(cut[0] || [0, 0])[1]}px. A hint ` +
+       `a reader cannot read is worse than no hint, and it is in the one ` +
+       `control these pages exist to be.`);
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+
   // ── a divider with nothing on the other side of it ─────────────────
   //
   // A separator belongs to the RELATIONSHIP, not to the element, and the

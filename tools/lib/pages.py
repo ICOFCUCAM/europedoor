@@ -1424,6 +1424,15 @@ def home(data):
     # somebody to type in. The clipped-text check cannot see it: an input is
     # a scroll container and scrolling is the right answer inside one.
     #
+    # AND /search HAD THE SAME DEFECT, WRITTEN BY THE SAME HAND, UNTOUCHED BY
+    # THIS FIX. Its box carried three examples joined by middots — 84
+    # characters — and rendered as "quiet beaches in september · medieva" at
+    # 390, on the one control that page exists to be. A rule that exists is
+    # not a rule that is inherited. One example in the box now and the other
+    # two in the help line under it, which is where a reader can actually
+    # read them, and the browser suite measures the placeholder against the
+    # box it sits in rather than counting its characters.
+    #
     # THE FIRST FIX PUT THAT REASONING IN AN HTML COMMENT and the weight
     # invariant caught it in one run: a comment in emitted markup SHIPS, on
     # 1,033 pages if it is in the shell and on the most-visited one here.
@@ -10386,10 +10395,12 @@ def search_page(data):
   <div class="field">
     <label for="q">Search Europe</label>
     <input type="text" id="q" name="q" autocomplete="off" autofocus
-           placeholder="quiet beaches in september · medieval castles near prague · cheap mountains">
+           placeholder="quiet beaches in september">
     <p class="small">It reads more than words: <em>cheap</em> and <em>quiet</em> filter,
     a month narrows to places that are good in it, and <em>near Prague</em> means within
-    300 kilometres of Prague. Whatever it understood is shown back to you as chips.</p>
+    300 kilometres of Prague — so <em>medieval castles near Prague</em> and
+    <em>cheap mountains</em> both work. Whatever it understood is shown back to you as
+    chips.</p>
   </div>
 </form>
 <div class="chips" id="searchunderstood" aria-live="polite"></div>
