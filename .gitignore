@@ -15,3 +15,10 @@ recognition.png
 # the licence gate refuses. checks.py asserts the repository carries none.
 .cache/
 hero-sheet.png
+
+# A THROWAWAY PROBE IS NOT A TOOL, AND `git add -A` CANNOT TELL. Measuring
+# something here means writing a short Playwright script, and twice now a
+# handful of them have been committed by accident — four in one commit, five
+# in another — because they were sitting beside the instruments that are real.
+# The convention is a leading dot; this makes the convention binding.
+tools/**/.*.js
