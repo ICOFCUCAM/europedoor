@@ -10910,9 +10910,20 @@ def discover_page(data):
 <section class="band" id="discover-mode">
   <div class="band-head">
     <h2>Discover mode</h2>
-    <p class="lede">Pick as many as you like. Nothing is submitted; the whole Atlas is in
-    your browser and the list re-sorts as you choose.</p>
   </div>
+
+  <p class="lede discoverstate" id="discover-count" aria-live="polite">Choose what you are
+  travelling for. Europe will narrow itself.</p>
+
+  <a class="heromap wide-map arched discovermap" data-role="instrument" href="/map"
+     id="discover-map" aria-label="Map of all {len(data['cities'])} places">
+    <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true"><defs>{arch_clip("disc", MAP_W, MAP_H)}</defs><g clip-path="url(#arch-disc)"><rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>{dctx}{dland}{cut_fade('disc', MAP_W, MAP_H)}{''.join(dots)}</g>{arch_edge(MAP_W, MAP_H)}</svg>
+    <span class="heromap-cap">Coastline from Natural Earth, public domain.
+    Open the full map, with layers →</span>
+  </a>
+
+  <p class="lede mt7">Pick as many as you like. Nothing is submitted; the whole Atlas is in
+  your browser and the list re-sorts as you choose.</p>
   <div class="chips picks" id="discover-interests"></div>
   <div class="form-row mt5">
     <div class="field">
@@ -10935,16 +10946,6 @@ def discover_page(data):
     </div>
   </div>
   <p class="small"><button type="button" class="linkish" id="discover-clear">Clear everything</button></p>
-
-  <p class="lede discoverstate" id="discover-count" aria-live="polite">Choose what you are
-  travelling for. Europe will narrow itself.</p>
-
-  <a class="heromap wide-map arched discovermap" data-role="instrument" href="/map"
-     id="discover-map" aria-label="Map of all {len(data['cities'])} places">
-    <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true"><defs>{arch_clip("disc", MAP_W, MAP_H)}</defs><g clip-path="url(#arch-disc)"><rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>{dctx}{dland}{cut_fade('disc', MAP_W, MAP_H)}{''.join(dots)}</g>{arch_edge(MAP_W, MAP_H)}</svg>
-    <span class="heromap-cap">Coastline from Natural Earth, public domain.
-    Open the full map, with layers →</span>
-  </a>
 
   <div id="discover-results"></div>
 </section>

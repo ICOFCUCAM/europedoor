@@ -1799,7 +1799,17 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
  * It rendered as a solid black silhouette the first time, because the land
  * paths are styled only under .europemap and .countrymap and an unstyled
  * <path> fills black. Nothing failed; the map simply arrived as a blot. */
-.heromap { display: none; text-decoration: none; }
+/* A RULE OLDER THAN ITS ONLY USER, AND IT HID THAT USER'S ONLY PICTURE ON
+ * EVERY PHONE. `display: none` with a `display: block` at 64rem was written
+ * for the homepage hero map — an instrument with a filter row that really
+ * did need a desk — and that map was removed. The one element left carrying
+ * this class is /discover's continent, the single drawing on the page whose
+ * job is to open one, and it has not existed below 1024px since. Nothing
+ * counts a drawing that is not drawn: the first-screen instrument reported
+ * /discover's first figure at 1686 and was reading the year band eight
+ * screens down. Same sentence as `fill: none` on the same page, two commits
+ * over — a rule older than its only user. */
+.heromap { display: block; text-decoration: none; }
 .heromap svg { width: 100%; height: auto; display: block;
                background: var(--map-sea); border-radius: var(--radius); }
 .heromap .context path { fill: var(--map-context); }
@@ -1811,7 +1821,6 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .heromap:hover .heromap-cap { color: var(--door); }
 @media (min-width: 64rem) {
   .hero { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); }
-  .heromap { display: block; }
 }
 
 /* ── the sentence box on the planner ──────────────────────────────── */
