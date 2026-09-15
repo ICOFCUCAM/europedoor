@@ -892,7 +892,11 @@ main.wide { max-width: 92rem; }
 
 /* ── breadcrumbs ──────────────────────────────────────────── */
 .crumbs { font-size: var(--t-sm); color: var(--ink-3); margin-bottom: var(--s5); display: flex; flex-wrap: wrap; gap: var(--s2); align-items: baseline; }
-.crumbs a { text-decoration: none; color: var(--ink-3); border-bottom: 1px solid var(--rule); }
+/* No `color` here: `.crumbs` already sets --ink-3 and the link inherits it.
+   The dead-rule scan counts a declaration that restates what the element
+   already has, and it is right to — a reader of this file would take it
+   as the place the breadcrumb link's colour is decided, and it is not. */
+.crumbs a { text-decoration: none; border-bottom: 1px solid var(--rule); }
 .crumbs a:hover { color: var(--door); border-bottom-color: var(--door); }
 .crumbs .sep { opacity: .5; }
 
@@ -6770,6 +6774,16 @@ body[data-hero] main { max-width: none; padding: 0; }
     transparent 100%); }
 .sheet-landscape > * { position: relative; z-index: 2; }
 .sheet-landscape .sheettext { padding: var(--s8) var(--page-gutter); max-width: 44rem; }
+/* THE PLATE SETS ITS OWN INK *AND* STILL NAMES THE CHILDREN THAT HAVE ONE.
+   The list missed the two CONTAINERS — `.actmark` and `.marginnote`
+   inherited the page's graphite onto a graphite ground at 1.00:1, with only
+   their spans lifted — so the plate declares its ink and they inherit it.
+   Replacing the list with that inheritance was the obvious next step and it
+   is WRONG: `.lede` has its own `color: var(--ink-2)` at (0,1,0), and a
+   matching rule beats inheritance at any specificity, so the standfirst
+   went dark on a near-black plate the moment the override was removed. A
+   declared colour is overridden, never inherited away. */
+.sheet-landscape { color: var(--limestone); }
 .sheet-landscape .mega, .sheet-landscape .lede,
 .sheet-landscape .go, .sheet-landscape .actno, .sheet-landscape .actname,
 .sheet-landscape .marginnote span, .sheet-landscape .sheetcred,
@@ -6904,7 +6918,7 @@ body[data-hero] main { max-width: none; padding: 0; }
 /* the row pays its attribution once, under the eight */
 .rowcred { position: static; font-size: var(--t-xs); letter-spacing: .04em;
            text-transform: none; color: var(--ink-3); max-width: 62ch; margin: 0; }
-.qtile picture { position: relative; display: block; }
+.qtile picture { position: relative; }
 /* One name is longer than any column this plate can give it. A hyphenated
    break mid-word is what an index does; the alternative is a sixth column
    nobody can read. */
@@ -6983,7 +6997,11 @@ body[data-hero] main { max-width: none; padding: 0; }
    does not look like a truncation. The floor is the widest thing the
    control has to say. */
 .instrfields .field { min-width: 0; margin: 0; }
-.instrfields select { min-width: 9rem; }
+/* 11rem, NOT 9. The floor has to clear the widest option AFTER the
+   dropdown arrow the platform draws over it — about 28px that the
+   content box does not account for — so 9rem left "Any month" needing
+   93px in an effective 90. */
+.instrfields select { min-width: 11rem; }
 .instrfields .inlinecheck { padding-bottom: var(--s2); }
 /* THE RESET IS NOT A FIELD. As a flex item beside four controls it wrapped
    onto the last one's line and the two shared a baseline, so "Clear
