@@ -16,6 +16,7 @@ comment on each explaining which.
 from __future__ import annotations
 
 import glob
+import importlib
 import hashlib
 import html.parser
 import colorsys
@@ -2465,10 +2466,23 @@ def c_frontend():
         n += 1
 
     # 4. The scale stays small.
-    sizes = set(re.findall(r"font-size:\s*([^;]+);", css))
+    #
+    # AND THIS WAS A SECOND IMPLEMENTATION OF A COUNT THAT ALREADY EXISTED,
+    # which is the seventh time that has cost something here. `invariants.py`
+    # learned twice what this copy never did: it strips comments (`_css`), because
+    # this stylesheet's style is long notes naming the failure behind each
+    # rule and one of them quotes a `font-size: 26px` that was refused; and
+    # it removes the `calc(X / var(--z))` compensation, because a constant
+    # correcting for a scaled viewBox is not a typographic choice. This copy
+    # counted the prose as a size and counted `11px` and its own compensated
+    # form as two, so giving the scale bar the fix every other label family
+    # has failed the build on a size nobody added. One implementation.
+    inv = importlib.import_module("invariants")
+    sizes = {inv._size_of(v)
+             for v in re.findall(r"font-size:\s*([^;]+);", inv._css())}
     if len(sizes) > 20:
         fail(f"{len(sizes)} distinct font-size values; the audit measured 13 and the "
-             f"sibling repository measured 418")
+             f"sibling repository measured 418: " + ", ".join(sorted(sizes)))
     bps = set(re.findall(r"@media[^{]*\(m(?:in|ax)-width:\s*([^)]+)\)", css))
     if len(bps) > 10:
         fail(f"{len(bps)} breakpoints; the audit measured 6")
