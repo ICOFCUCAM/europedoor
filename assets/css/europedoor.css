@@ -1084,8 +1084,17 @@ a .kicker { color: var(--ink-3); }
 
 /* ── columns of prose + rail ──────────────────────────────── */
 .split { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: var(--s7); align-items: start; }
-.rail { background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); padding: var(--s5); font-size: var(--t-sm); position: sticky;
-         top: calc(var(--mast) + var(--s5)); }
+/* RULES AND SPACE, NOT A CARD. Border, fill, radius and shadow each say
+   "separate object, placed here by a system", and this site has now taken
+   that sentence away from three surfaces for the same reason: the search box
+   that IS its page, the Stay layer's referral, and the country hand-off. The
+   rail was the last one, on 362 pages — and on a destination page it is the
+   only bordered, filled object anywhere, four screens above a Stay layer
+   whose own comment names the four things it deliberately does without.
+   A top rule says where it begins; the space says the rest. */
+.rail { border-top: 2px solid var(--ink); padding: var(--s4) 0 0;
+        font-size: var(--t-sm); position: sticky;
+        top: calc(var(--mast) + var(--s5)); }
 .rail h3 { font-size: var(--t-md); margin-bottom: var(--s3); }
 .rail ul { margin: 0 0 var(--s4); padding-left: var(--s4); }
 .rail li { margin-bottom: var(--s2); }
