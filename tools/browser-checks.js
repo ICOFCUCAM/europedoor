@@ -2287,6 +2287,49 @@ async function main() {
     }
   }
 
+  // ── an accent on every row is a texture, and the rule named classes ─
+  //
+  // A kicker says what KIND of thing is being read. One per head answers
+  // that; inside a repeated item it answers nothing, because every sibling
+  // carries the same signal — which is "never explain the constraint back"
+  // arriving in colour, and on /themes it inverted the hierarchy it sat in.
+  // That was fixed as `.row .kicker, .card .kicker`, which names two classes
+  // rather than the situation, so it reached neither family on the HOMEPAGE:
+  // measured here across nine surfaces, every index came back at zero accent
+  // kickers inside a link and the homepage came back at SIX — three journey
+  // rows carrying their country chain in cobalt uppercase above a serif
+  // name, and three story cards carrying their desk. The chain is the
+  // journey's own route, which is content rather than a label, and it was
+  // the brightest thing in the row on the one page that opens the site.
+  //
+  // The situation is the rule now: a kicker inside a LINK labels one item in
+  // a set, a kicker outside one labels the page or the band. This reads the
+  // colour the browser PAINTS rather than the selector, because the defect
+  // was invisible to a selector — two correct rules that matched nothing.
+  for (const u of ["/", "/journeys/", "/themes/", "/interests/", "/stories/",
+                   "/countries/", "/beyond-the-obvious/"]) {
+    const r = await page.goto(base + u, { waitUntil: "load" });
+    if (!r || r.status() !== 200) continue;
+    const k = await page.evaluate(() => {
+      const all = [...document.querySelectorAll(".kicker")];
+      const hot = all.filter((e) => {
+        const m = getComputedStyle(e).color.match(/\d+/g).map(Number);
+        return m[2] > m[0] + 40 && m[2] > 120;   // the cobalt family
+      });
+      const inLink = hot.filter((e) => e.closest("a"));
+      return { all: all.length,
+               bad: inLink.map((e) => e.textContent.trim().slice(0, 40)) };
+    });
+    checked++;
+    ok(k.all > 0, `${u}: no kicker at all — this check has stopped finding ` +
+       `the element it is about`);
+    ok(k.bad.length === 0,
+       `${u}: ${k.bad.length} of ${k.all} kickers are painted in the accent ` +
+       `inside a link — "${k.bad[0]}". A signal every sibling carries is a ` +
+       `texture, not an accent, and it makes the label brighter than the ` +
+       `name under it`);
+  }
+
   // ── a divider with nothing on the other side of it ─────────────────
   //
   // A separator belongs to the RELATIONSHIP, not to the element, and the

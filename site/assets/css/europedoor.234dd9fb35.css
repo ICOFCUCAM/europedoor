@@ -857,8 +857,27 @@ main.wide { max-width: 92rem; }
    /themes the kicker is the theme's ARGUMENT and the h3 is its name, so the
    brightest thing in the row was the subtitle.
    In a row it is ink: same size, same tracking, same weight, so it still
-   reads as a label. The head keeps the accent, where it is true. */
-.row .kicker, .card .kicker { color: var(--ink-3); }
+   reads as a label. The head keeps the accent, where it is true.
+
+   AND THE RULE NAMED TWO CLASSES INSTEAD OF THE SITUATION, so it missed the
+   page it mattered most on. Measured in Chromium across fifteen surfaces by
+   reading the computed colour of every kicker and asking which sit outside
+   a head: every index came back at zero and the HOMEPAGE came back at six —
+   three journey rows carrying their country chain in cobalt uppercase above
+   a serif name, and three story cards carrying their desk. `.jrow` and
+   `.storylead` are not `.row` and not `.card`, so the repair written for
+   exactly this reached neither, on the one page that opens the site. It is
+   also the sharpest case of the inversion: the chain is the journey's own
+   ROUTE, which is content rather than a label, and it was the brightest
+   thing in the row.
+
+   The situation is what the selector says now. A kicker inside a LINK is
+   labelling one item in a set, where every sibling carries the same signal
+   and the signal therefore carries nothing; a kicker outside one is
+   labelling the page or the band, where it is the only one and it is true.
+   That is one rule for every family that has been invented and every family
+   that has not, which is what the two class names could never be. */
+a .kicker { color: var(--ink-3); }
 .lede { color: var(--ink-2); }
 
 /* ── hero ─────────────────────────────────────────────────── */
