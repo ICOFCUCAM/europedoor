@@ -7355,13 +7355,27 @@ def indexhero(*, kicker, title, lede, art="", img="", actions="", note=""):
     # extent check reads the count out of the head — so replacing the head
     # silently dropped both promises. A variant keeps all three and is what
     # the design system is for.
+    # AND THE PICTURE WAS THE FOURTH THING ON A PHONE, ON EVERY INDEX THAT
+    # HAS ONE. Below 60rem this head is one column and the whole text block
+    # came first: on /countries that is a kicker, a 38px name, a four-line
+    # lede, two buttons and a three-line provenance note — 550 pixels of type
+    # before the drawing that is the reason the opening exists, so the arch
+    # began at 740 and the first screen carried no picture at all.
+    #
+    # The actions and the note are not the opening. An action is what a
+    # reader does AFTER seeing the set, and the note describes the DRAWING,
+    # so it belongs under it and not four hundred pixels above it. They move
+    # after the figure — a DOM change rather than a rule, because they sat
+    # inside `.iherotext` and a grid can only place what it can address,
+    # which is the same repair the destination and country heads took.
+    foot = (f'{f"<div class=chips>{actions}</div>" if actions else ""}'
+            f'{f"<p class=small>{note}</p>" if note else ""}')
     return (
         f'<header class="pagehead index ihero{" wide" if figure else ""}">'
         f'<div class="iherotext"><p class="kicker">{kicker}</p>'
-        f'<h1>{title}</h1><p class="lede">{lede}</p>'
-        f'{f"<div class=chips>{actions}</div>" if actions else ""}'
-        f'{f"<p class=small>{note}</p>" if note else ""}</div>'
-        f'{figure}</header>')
+        f'<h1>{title}</h1><p class="lede">{lede}</p></div>'
+        f'{figure}'
+        f'{f"<div class=iherofoot>{foot}</div>" if foot else ""}</header>')
 
 
 def region_glyph(members, frame=None, min_span=0.0):

@@ -5881,7 +5881,26 @@ body[data-hero] .masthead { position: sticky; }
   gap: var(--s7); align-items: center;
   padding: var(--s6) 0 var(--s7); border-bottom: 1px solid var(--rule); max-width: none;
 }
-.pagehead.ihero.wide { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
+.pagehead.ihero.wide { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+                       grid-template-rows: 1fr auto auto 1fr;
+                       row-gap: var(--s6); }
+/* EXPLICIT, BECAUSE THE PHONE ORDER NOW DIFFERS FROM THE DESK ONE. In
+   document order the actions and the note follow the picture, so a phone
+   meets the drawing before them; on a desk they belong under the lede in
+   column one, and auto-flow would put them in column two under the arch.
+   The two `1fr` rows above and below the pair are what keeps the group
+   centred against a figure taller than it — with two auto rows the leftover
+   height is split BETWEEN them, which on the country head rendered 350
+   pixels of white between the tagline and the chips. The slack belongs
+   outside the group. */
+.pagehead.ihero.wide > .iherotext { grid-column: 1; grid-row: 2; }
+.pagehead.ihero.wide > .iherofoot { grid-column: 1; grid-row: 3; }
+.pagehead.ihero.wide > .iheroart  { grid-column: 2; grid-row: 1 / -1;
+                                    align-self: center; }
+/* The foot is its own stack, so the space above it is the grid's row-gap
+   and the space inside it is this gap — one of each, rather than a margin
+   on the chips that the row-gap then adds to. */
+.iherofoot { display: grid; gap: var(--s4); justify-items: start; }
 /* A SEPARATOR BELONGS TO THE RELATIONSHIP, NOT THE ELEMENT, and this one had
  * been written as a property of the head. Every index hero draws a rule under
  * itself to part the opening from the set below it — right on twenty-one
@@ -5898,8 +5917,8 @@ main > .pagehead:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom
 /* No `color`: `.lede` already resolves to --ink-2, and the scan reads a
  * restatement of an inherited value as a rule that changes nothing. */
 .iherotext .lede { font-size: var(--t-md); max-width: 42ch; margin: 0; }
-.iherotext .chips { margin-top: var(--s5); }
-.iherotext .small { margin-top: var(--s4); color: var(--ink-3); }
+.iherofoot .chips { margin: 0; }
+.iherofoot .small { margin: 0; color: var(--ink-3); }
 
 /* The aperture, once per page rather than once per card. An index opening is
  * exactly where the signature belongs — it is the one large drawing on the
@@ -5963,7 +5982,14 @@ main > .pagehead:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom
 .allroutes .constel-route.case { stroke-width: 9; }
 
 @media (max-width: 60rem) {
-  .pagehead.ihero.wide { grid-template-columns: 1fr; gap: var(--s5); }
+  .pagehead.ihero.wide { grid-template-columns: 1fr;
+                         grid-template-rows: none; gap: var(--s5); }
+  /* One column, and the three blocks take document order: name, picture,
+     then what to do about it. `initial` rather than restating a row number —
+     a placement written for two columns is not a placement at all here. */
+  .pagehead.ihero.wide > .iherotext,
+  .pagehead.ihero.wide > .iherofoot,
+  .pagehead.ihero.wide > .iheroart { grid-column: auto; grid-row: auto; }
   .iheroart { aspect-ratio: 3 / 2; }
 }
 
