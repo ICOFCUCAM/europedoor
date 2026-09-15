@@ -1917,19 +1917,54 @@
     "Estimating what it costs",
   ];
 
-  function stage(done, failedAt) {
+  /* stage() no longer takes a failedAt, and losing it is the point rather
+   * than a tidy-up. The only thing in this pipeline that can fail is the
+   * index fetch, and that happens during the BOOT — every one of these five
+   * steps runs in single-digit milliseconds of synchronous arithmetic after
+   * the index is already here. So the failure mark lives on the one step
+   * that can miss, and `if (failedAt === i)` was a branch nothing had
+   * reached since the day the two were separated. */
+  function stage(done) {
     var html = '<div class="note staged" role="status"><h2 class="mini">Building your journey</h2><ul class="stages">';
     for (var i = 0; i < STEPS.length; i++) {
       var mark = i < done ? "done" : (i === done ? "now" : "todo");
-      if (failedAt === i) mark = "failed";
-      var glyph = mark === "done" ? "✓" : mark === "failed" ? "✕" : mark === "now" ? "●" : "○";
+      var glyph = mark === "done" ? "✓" : mark === "now" ? "●" : "○";
       html += '<li class="' + mark + '"><span aria-hidden="true">' + glyph + "</span> " +
-              STEPS[i] + (mark === "failed" ? " — this is where it stopped" : "") + "</li>";
+              STEPS[i] + "</li>";
     }
     result.innerHTML = html + "</ul></div>";
   }
 
-  stage(0);
+  /* THE BOOT IS NOT A BUILD, AND FOR THE LIFE OF THIS PAGE IT WORE THE
+   * BUILD'S CLOTHES. stage(0) ran on load and stage(1) ran when the index
+   * arrived, and nothing ever cleared it — so a reader who had asked for
+   * nothing arrived at a panel headed "Building your journey" with
+   * "Understanding what you asked for" marked as happening now, and it sat
+   * there for as long as the page was open. Measured at rest across all 44
+   * families: /plan was the only page on the site whose live region claimed
+   * work in progress, and the other six say what they actually are
+   * ("Nothing saved yet", "Choose what you are travelling for").
+   *
+   * The five steps are real and each is ticked when its work has finished,
+   * which is exactly why lending them to the index fetch is wrong: only the
+   * first of them is happening and the other four are waiting on the reader.
+   * A progress report that cannot finish is worse than none, because it
+   * reports a failure that has not happened.
+   *
+   * So the boot says what the boot is doing, in its own words, and REMOVES
+   * itself the moment the index is here. The rest state of an instrument is
+   * the instrument. */
+  booting();
+
+  function booting(failed) {
+    result.innerHTML = '<div class="note staged" role="status">' +
+      '<p>The planner runs in your browser rather than on a server, so it ' +
+      'reads the whole index before it can score anything against it.</p>' +
+      '<ul class="stages"><li class="' + (failed ? "failed" : "now") + '">' +
+      '<span aria-hidden="true">' + (failed ? "✕" : "●") + '</span> ' +
+      "Loading the Atlas" + (failed ? " — this is where it stopped" : "") +
+      "</li></ul></div>";
+  }
 
   fetch("/api/atlas.json")
     .then(function (r) {
@@ -1938,7 +1973,7 @@
     })
     .then(function (json) {
       ATLAS = json;
-      stage(1);
+      result.innerHTML = "";
       fillStarts();
       applyUrlState();
       form.addEventListener("submit", go);
@@ -1956,7 +1991,12 @@
        * generic apology: "the index did not load" is a different problem
        * from "the planner crashed", and the reader can tell which from
        * this. */
-      stage(0, 0);
+      /* And the failure marks the step it stopped on, in the boot's own
+       * vocabulary rather than the build's. It used to mark step one of five
+       * under "Building your journey", which named the right step and lied
+       * about what was happening — and the four steps under it were waiting
+       * on a reader who had done nothing. */
+      booting(true);
       result.insertAdjacentHTML("beforeend",
         '<div class="note warn"><p>The Atlas index did not load, so the planner ' +
         'cannot run. That is our end, not yours — reloading often fixes it. ' +

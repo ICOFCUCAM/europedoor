@@ -733,12 +733,31 @@ def s29():
 @section(30, "AI loading experience", "BUILT",
          "Five named steps, ticked when the work they name has actually "
          "finished — so a failure marks where it stopped instead of "
-         "replacing everything with an apology.")
+         "replacing everything with an apology. And the wait belongs to a "
+         "BUILD: at rest the page reports no work at all.")
 def s30():
     yield "Building your journey" in PLANNER, "the staged wait"
     yield "Understanding what you asked for" in PLANNER, "with real steps"
     yield 'role="status"' in PLANNER, "announced to a screen reader"
-    yield "stage(0, 0)" in PLANNER, "and a failure marks the step it died on"
+    # THIS ASSERTED `stage(0, 0)` — a literal call expression, which is a
+    # SHAPE. The promise behind it is that something marks the step that
+    # stopped, and the moment the boot was split from the build that call
+    # moved: the only thing in this pipeline that can fail is the index
+    # fetch, so the failure mark went onto the one step that can miss.
+    # Thirteenth assertion in this repository to pin a shape rather than a
+    # claim, and it went red for a page that had got better.
+    yield '"failed"' in PLANNER and "this is where it stopped" in PLANNER, \
+        "and a failure marks the step it died on"
+    # AND THE WAIT MUST NOT BE THE REST STATE. The boot borrowed these five
+    # steps to say the index was loading and never took them down, so /plan
+    # opened on "Building your journey — Understanding what you asked for",
+    # permanently, for a reader who had asked for nothing. The boot has its
+    # own one-step vocabulary now; asserted here at the source and again in
+    # the browser suite, which reads every live region on every application
+    # page after load.
+    yield "function booting" in PLANNER, "the boot is not a build"
+    yield "a live region reports work in progress with nothing" in BROWSER, \
+        "and nothing at rest says work is happening"
     # Not "no occurrence of the word" — the comment above the code explains
     # why a bare one is banned, and a check that fails on its own rationale is
     # a check nobody will keep. Every step has to say what it is doing.

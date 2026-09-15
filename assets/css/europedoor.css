@@ -2618,6 +2618,13 @@ html { scroll-padding-top: 5rem; }
  * Not decoration: each line is ticked when the work it names has actually
  * finished, and a failure marks the step it stopped on. role="status" means
  * a screen reader hears the change without the focus being stolen.
+ *
+ * .staged carries TWO shapes, and for the life of this page it carried one
+ * of them at the wrong moment. The five-step list belongs to a build. The
+ * boot — reading the Atlas index before the reader has asked for anything —
+ * is a single sentence with no list at all, because four of those five steps
+ * are waiting on the reader and a progress report that cannot finish is
+ * worse than none. See the comment on booting() in planner.js.
  */
 .staged .stages { list-style: none; padding: 0; margin: var(--s3) 0 0; }
 .staged .stages li { display: flex; gap: var(--s3); align-items: baseline;

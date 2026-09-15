@@ -1599,6 +1599,52 @@ async function main() {
     await bp.close();
   }
 
+  // ── AN INSTRUMENT AT REST REPORTS NO WORK IN PROGRESS ──────────────
+  // /plan opened on a panel headed "Building your journey" with
+  // "Understanding what you asked for" marked as happening now, and it
+  // stayed there for as long as the page was open. Nothing was being built:
+  // the boot borrowed the build's five-step progress report to say the index
+  // was loading, ticked the first step when it arrived, and never took it
+  // down. A reader who had asked for nothing was shown a machine working on
+  // their behalf, permanently stuck on step two.
+  //
+  // The promise is the one thing a live region owes: what it says is true at
+  // the moment it says it. Measured across every live region visible at rest
+  // on all 44 families, /plan was the only one claiming work in progress —
+  // the other six say what they actually are ("Nothing saved yet", "Choose
+  // what you are travelling for"). So this reads every ARIA live region on
+  // every application page after load and nothing else, and fails on a
+  // progressive verb of work.
+  //
+  // It counts the regions it read, because a page that has stopped
+  // publishing a live region at all would pass this silently, and an empty
+  // scan that reports clean is the failure this suite already records twice.
+  {
+    const REST = ["/plan", "/discover", "/search", "/my-europe", "/map"];
+    const WORKING = /\b(building|loading|scoring|estimating|working|calculating|please wait|one moment)\b/i;
+    let regions = 0;
+    for (const u of REST) {
+      const rp = await page.goto(base + u, { waitUntil: "load" });
+      if (!rp || rp.status() !== 200) { ok(false, `${u} did not load`); continue; }
+      // networkidle would hide exactly the defect this is about: the index
+      // fetch is what the panel was reporting, and the panel survived it.
+      await page.waitForTimeout(1500);
+      const found = await page.evaluate(() =>
+        [...document.querySelectorAll("[role=status], [aria-live], .staged")]
+          .filter((e) => e.getClientRects().length)
+          .map((e) => e.textContent.replace(/\s+/g, " ").trim()));
+      regions += found.length;
+      for (const t of found) {
+        ok(!WORKING.test(t),
+           `${u} at rest: a live region reports work in progress with nothing ` +
+           `asked for — "${t.slice(0, 110)}"`);
+      }
+    }
+    ok(regions >= 4,
+       `the at-rest scan found only ${regions} live regions across ` +
+       `${REST.length} application pages — it has stopped finding them`);
+  }
+
   // ── THE PLANNER DRAWS THE ROUTE IT BUILT ───────────────────────────
   // The most complex thing on this site had no geography in its output at
   // all: a summary table, a budget verdict and a column of stops, on a
