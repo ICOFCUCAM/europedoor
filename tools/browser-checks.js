@@ -2537,16 +2537,30 @@ async function main() {
         if (!r || r.status() !== 200) continue;
         const d = await hp.evaluate(() => {
           const out = {};
-          for (const sel of ["h1", ".statement"]) {
+          // `.ed-intro` IS THE REDESIGN'S STANDFIRST, WHICH IS WHAT
+          // `.statement` WAS. The scan measures how many lines a head's
+          // largest elements take at each width, and the eight rebuilt
+          // families carry their standfirst in `.ed-intro` — so counting
+          // only `.statement` asked about a class most heads no longer
+          // have. The promise is about the head's own type, not about one
+          // spelling of it.
+          for (const sel of ["h1", ".statement", ".ed-intro"]) {
             // THE HEAD IS NO LONGER ONLY `.pagehead`. Eight families open
             // on `ed-opening`, `ed-arrival`, `ed-journey-hero` or
             // `ed-story-opening`, so this scan collected 11 elements of the
             // 20 its own reach assertion asks for — it had stopped finding
             // most of the heads it is about, which is exactly what that
             // assertion exists to say.
+            // AND THE HOMEPAGE'S HEAD IS A SHEET, NOT A `pagehead`. It is
+            // the one family that opens on an act rather than on a page
+            // head — `.sheet-door` carries the `h1.mega` — so adding the
+            // eight redesigned head shapes took the scan from 11 to 19 and
+            // left it one under its own floor of 20. A scan that cannot see
+            // the largest heading on the most-visited page is not measuring
+            // the thing it is about.
             const el = document.querySelector(
               ":is(.pagehead, .ed-opening, .ed-arrival, .ed-journey-hero, " +
-              ".ed-story-opening, .ed-institution) " + sel);
+              ".ed-story-opening, .ed-institution, .sheet) " + sel);
             if (!el) continue;
             const lh = parseFloat(getComputedStyle(el).lineHeight);
             out[sel] = { lines: Math.max(1, Math.round(
@@ -4823,13 +4837,31 @@ async function main() {
       const r = await yp.goto(base + u, { waitUntil: "load" });
       if (!r || r.status() !== 200) { await yp.close(); continue; }
       await yp.waitForTimeout(150);
+      // SCROLL IT INTO THE SHOT FIRST. `screenshot()` without `fullPage`
+      // photographs the VIEWPORT, and the year band sits at y=905 on a
+      // 900-pixel page — so every sample landed outside the image and came
+      // back as the canvas, which reads 1.00:1 whatever the drawing does.
+      // The check reported the baseline invisible at both widths on a band
+      // whose line measures 9.36, and it would have gone on doing that for
+      // any change that made /events one band taller. That is the aperture
+      // sampler's own recorded failure, in a check written after it and
+      // without its guard.
+      await yp.locator(".ybars").first().scrollIntoViewIfNeeded();
+      await yp.waitForTimeout(120);
       const box = await yp.evaluate(() => {
         const e = document.querySelector(".ybars");
         if (!e) return null;
         const b = e.getBoundingClientRect();
         // BASE is 66 of the 104-unit viewBox; the box scales vertically.
+        // The arithmetic was right all along — with the band in the shot,
+        // `b.y + 66 * (b.height / 104)` lands on the stroke at both widths.
+        // An offset was tried and moved the sample OFF it, which is worth
+        // recording: when a sampler reports 1.00 the first question is
+        // whether it is looking at the drawing at all, not whether it is
+        // looking a pixel too high.
         return { x: Math.round(b.x + 4), y: Math.round(b.y + 4),
-                 base: Math.round(b.y + 66 * (b.height / 104)) };
+                 base: Math.round(b.y + 66 * (b.height / 104)),
+                 h: Math.round(window.innerHeight) };
       });
       if (!box) { checked++; ok(false, `${u} at ${W}: no year band`); await yp.close(); continue; }
       const shot = (await yp.screenshot()).toString("base64");
@@ -4853,6 +4885,12 @@ async function main() {
       const cr = (Math.max(got.base, got.page) + 0.05) /
                  (Math.min(got.base, got.page) + 0.05);
       checked++;
+      // A sampler that reads outside its own image reports the canvas. Say
+      // so, rather than reporting the drawing.
+      ok(box.base < box.h && box.y >= 0,
+         `${u} at ${W}: the year-band sampler read outside the shot — ` +
+         `baseline at ${box.base} on a ${box.h}px viewport. Every sample ` +
+         `comes back as the canvas and the ratio is about nothing`);
       ok(cr >= 3.0,
          `${u} at ${W}: the year band's baseline measures ${cr.toFixed(2)}:1 ` +
          `against the page on the painted pixel. The caption says "above the ` +
