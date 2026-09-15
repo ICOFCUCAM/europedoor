@@ -329,7 +329,7 @@ values and a drawing takes one of them by what it IS.
 | | land | water / ground | border | ink |
 |---|---|---|---|---|
 | **light** — the European atlas: the 824 plates, the country portraits, the region glyphs | `#D8D4C7` | `#DDE8E7` | `#68716E` | `#1A2725` |
-| **dark** — the instrument: `/map`, `/plan`, `/my-europe`, `/search`, `/discover` | `#F3F0E6` | `#07100F` | `#B9C1BA` | `#F3F0E6` |
+| **dark** — the instrument and the hero: `/map`, `/plan`, `/my-europe`, `/search`, `/discover`, and the homepage opening | `#F3F0E6` | `#07100F` | `#B9C1BA` | `#F3F0E6` |
 
 *Notice: no olive.* On the light map the land is stone on pale water and the
 **coastline** carries the separation the tone does not — land against water is

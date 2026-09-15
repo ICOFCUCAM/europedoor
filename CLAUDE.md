@@ -3458,6 +3458,109 @@ section rhythm, and the 104px between two bands is not a hole. Its first
 version read `h2/p/li/figure` and reported 1,702px on a destination page
 against a real 804 — the score bars are divs and it could not see them.
 
+**THE OWNER'S PALETTE, AND THE FIRST THING IT CHANGES IS THE MAPS.** Bone
+`#F3F0E6`, pine `#0F433E`, graphite `#07100F`, and five accents that identify a
+content FAMILY rather than decorate a page. The brief is explicit about the
+half that is easy to get wrong — *"I would NOT make every page colorful. This
+is critical"* and *"UI = restrained, PHOTOGRAPHY = rich, MAPS = precise,
+TYPOGRAPHY = dramatic"* — so an eight-hue wheel with a tinted ground and a
+gradient ribbon per family was generated in OKLCH, measured, shipped and
+removed one commit later, because it is the site the second sentence names.
+
+**There are two map sets now and a drawing takes one of them by what it IS.**
+The light map is the European atlas: `#D8D4C7` land on `#DDE8E7` water, which
+is **1.18 against each other and that is the point** — a printed atlas is
+stone on pale water and the COASTLINE is what separates them, so the ink went
+up as the tone step came down. The dark map is the instrument and the hero:
+`#F3F0E6` continent on `#07100F` at 16.90, where the coast needs no stroke at
+all and `#B9C1BA` is a faint internal frontier at 1.62. *Notice: no olive.*
+
+**AND THE APERTURE STOPPED BEING MEASURABLE THE MOMENT THE WATER WENT PALE.**
+*Light wall, dark opening* was the whole reading, and on an inland frame there
+is now no water in the opening: bone wall, stone opening, **1.10:1**, which
+the browser suite failed Austria and Chamonix on and was right to. It cannot
+be fixed by tuning the land — two tones a reader is meant to read as one
+material are always close, which is the point of the atlas being drawn on one
+stone. So the door is read by its REVEAL, and the reveal is the map's own
+border ink: 4.41 against the wall, 3.39 against the land, from `#68716E` at
+full opacity where graphite at 55% composited to 2.49. **One value in both
+preferences**, where there used to be two, because the opening is pale in
+either now.
+
+**THE OCEAN RAMP HAD TO GO WITH THE WATER, OR THE SWAMP COMES BACK AS A
+HALO.** Four steps of near-black navy — the shore band under every coast, the
+rivers and lakes on 824 plates, the hero's own Atlantic — left alone under the
+light map drew a dark blue fringe round every pale coastline: the exact
+treatment the brief objects to, surviving as an outline after the fill had
+been fixed. One hue at 175, saturation rising with depth, and **the deep step
+is sized by what it has to do rather than by how a sea looks**: a river is a
+line on the LAND, so `#346F6A` is 3.90 on the stone. Found on a contact sheet
+of twelve families, which is the only instrument that could see it.
+
+**GOLD IS NARROWED TO WHAT IT WAS PROTECTING RATHER THAN DELETED.** The old
+rule refused every gold by arithmetic, and the reason was what gold SAYS. The
+owner's palette then names ochre `#C49A52` as the territorial accent for the
+regions and the events calendar, which is a different job from a gold button.
+So: the two brasses stay out **by value**, the arithmetic is **untouched** —
+loosening it until ochre passed would loosen it until a brass passed, which is
+the credential scan's own lesson — the register declares which golds are the
+ochre family, and **no gold may be `--sea`, `--sea-dark`, `--signature` or the
+primary action**. That last clause is not decoration: `.btn { background:
+var(--door) }` was one late line that gave every family its own button colour,
+and on the regions that button was gold. `css.gold` counts golds the register
+does not declare, so it is still zero and a fourth one has to be argued for.
+
+**A DISTINCT PAIR IS TOLD APART BY HUE *OR* BY LUMINANCE.** The block was
+written because a contrast ratio cannot see hue — the advisory red and the
+cultural accent sat fourteen degrees apart at identical lightness and measured
+1.22. Asked only for hue, it then refused the owner's own ochre and terracotta
+at 22 degrees, which are not remotely the same colour: 0.355 of luminance
+against 0.207, **1.57 against each other**. A hue floor alone would have
+refused a real distinction and then been lowered until it refused nothing. The
+disjunction is still red on the pair that created it, which fails both.
+
+**TWO STRAY `*/` HAD EACH BEEN SWALLOWING THE RULE AFTER IT.** An edit closed
+a comment one line early, twice, and the continuation prose then sat in the
+stylesheet as raw text — which a CSS parser reads as the start of a selector
+until it finds a `{`. So the next whole rule was consumed into an invalid
+selector and dropped: `.essay { --measure: 38rem }`, the entire measure of the
+story family, and `.minilabel.here { font-weight: 700 }`, which is how a map
+says which place you are reading about. **Nothing counts a dropped rule** —
+not the dead-rule scan, which walks rules the browser parsed, and not the
+invariant register, which counts declarations. A four-line scan for a `*/`
+outside a comment finds both in a second.
+
+**AN INSTRUMENT THAT READS ITS OWN DOCUMENTATION AS CODE IS WRONG, AND SIX
+PLACES DID IT INDEPENDENTLY.** This file already records it about the
+font-size count. Within an hour of the palette landing it happened twice more:
+the paragraph recording that `#6f4f11` had been REMOVED was read as a gold
+still in the stylesheet, and the paragraph recording that `.btn` had stopped
+taking `--door` was read as the rule itself. `bare_css()` is the one
+implementation now, and `css_hex()` beside it — **a token that points at
+another token is not a missing token**, which six checks reported as
+"`--atlas-sea` is not declared in the stylesheet" the moment the cartography
+was bound to the owner's map set.
+
+**AND THE UX AUDIT PINNED TWO TOKEN NAMES THAT STOPPED EXISTING.**
+`--limestone` became `--bone` and `--atlantic` became `--olive`, so §B4 went
+red for the right event and the wrong claim — the tenth assertion here to pin
+a shape rather than a promise. It reads the register's own token list now, and
+case-insensitively, because a rename is a real failure and a capital letter is
+not.
+
+**THE HERO WAS THE DARK MAP DRAWN WITH THE LIGHT MAP'S LAND.** It painted
+`--atlas-land`, which is right on pale water and reads as grey-brown on
+near-black, so the one picture on the site was a dim continent in the dark.
+Rebound rather than restated — six rules downstream mix against that token, so
+setting the fill alone would have drawn a bone continent with a coastline
+computed from a colour no longer in the picture. **Two things only rendering
+found**: the context land beyond the atlas came up to 30% of bone and became
+*quieter Europe*, which is the exact reading the graphite ground replaced; and
+the shore band, blurred and pale, drew a hard-edged bright wedge over Russia
+that looks like a beam somebody left on. **On a dark map a shore band is a
+shadow, not a highlight** — the lit-aura failure this stylesheet already
+records, arrived at from the other side.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
