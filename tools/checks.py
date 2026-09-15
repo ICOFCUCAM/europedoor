@@ -5078,51 +5078,75 @@ def c_index_extent():
 
 @check("one thing, one picture — a plate is never chosen twice for the same record")
 def c_one_plate_per_thing():
-    # THE SAME PLACE HAD TWO LANDSCAPES DEPENDING ON WHICH PAGE YOU MET IT ON.
-    #
-    # `card()` takes an optional `motif`; without one, plate_shapes() picks
-    # from the seed. Fourteen of the twenty call sites passed no motif —
-    # including every destination card on a country page and a region page,
-    # while the quiet index passed one. So Hallstatt drew its own topography
-    # on /beyond-the-obvious and whatever the hash of its slug happened to
-    # choose everywhere else.
-    #
-    # Measured before the fix: 272 of 319 destinations, 15 of 17 journeys and
-    # 11 of 13 themes were drawn one way on one page and another way on the
-    # next. The rule already existed for stories — "a story is not a place,
-    # and its picture may not be drawn from a hash" — and this is the same
-    # failure across every other record that knows what it is.
-    #
-    # The plate is content-addressed, so two pictures also means two cached
-    # PNGs and two social cards for one thing.
-    #
-    # Asserted against the SHIPPED HTML by comparing the plate each page drew
-    # for a given seed. A source check on the call sites would pass the day
-    # somebody adds a fifteenth.
-    seen = {}
-    n = 0
-    for path in site_files():
-        h = open(path, encoding="utf-8").read()
-        # every plate carries its seed's identity in the gradient/clip ids
+    """THE SAME PLACE HAD TWO LANDSCAPES DEPENDING ON WHICH PAGE YOU MET IT ON.
+
+    `card()` takes an optional `motif`; without one, `plate_shapes()` picks
+    from the seed. Fourteen of the twenty call sites passed no motif — every
+    destination card on a country page and a region page among them, while
+    the quiet index passed one — so Hallstatt drew its own topography on
+    /beyond-the-obvious and whatever the hash of its slug chose everywhere
+    else. Measured before the fix: 272 of 319 destinations, 15 of 17 journeys
+    and 11 of 13 themes.
+
+    AND THIS CHECK HAD STOPPED COUNTING. It read the shipped HTML for a
+    `.card-art` holding a plate, which was the right subject when it was
+    written and is not one the site has any more: every abstract plate has
+    come off the pages, one family at a time, for the reason recorded on each
+    — the homepage, /journeys, /europe-in, the stories index, the seventeen
+    interest pages, the country pages. Measured now: **189 `.card-art`
+    elements on the whole site and every one of them is a map**, so this
+    returned zero and passed, for an unknown number of builds. A green run
+    that has stopped counting is worse than a red one, because nobody looks
+    at it — this file records that about the browser suite and it had
+    happened here.
+
+    THE PROMISE IS UNCHANGED AND ITS SURFACE MOVED. A plate is still drawn
+    785 times, on the one surface a reader never sees from here: the social
+    card, rendered inside somebody else's product. "One record, one picture"
+    is exactly as true there, and it is checkable exactly — `assets/og/
+    cards.json` is written by the build and maps each content-addressed card
+    to the seed and motif it was rendered from, so a record with two cards is
+    a record drawn two ways.
+
+    It counts what it examined and fails at zero, because that is the failure
+    this check has already had.
+    """
+    path = os.path.join(ROOT, "assets", "og", "cards.json")
+    if not os.path.exists(path):
+        fail("assets/og/cards.json was not written; the social cards cannot "
+             "be checked against the records they are cards for")
+        return 0
+    cards = json.load(open(path, encoding="utf-8"))
+    by_seed = {}
+    for key, (seed, motif) in cards.items():
+        by_seed.setdefault(seed, []).append((key, motif))
+    for seed, drawn in sorted(by_seed.items()):
+        if len(drawn) > 1:
+            fail(f"{seed} has {len(drawn)} social cards, drawn "
+                 f"{', '.join(sorted(m for _k, m in drawn))}. One record, one "
+                 f"picture — a landscape chosen by hash on one page and by "
+                 f"what the place is on another is two things to a reader and "
+                 f"two cards to a crawler.")
+    if not by_seed:
+        fail("the plate check examined no records at all — it has lost its "
+             "subject, which is how it passed silently once already")
+    # AND THE PAGES MUST STILL BE FREE OF THEM. The plates came off the pages
+    # deliberately and one family at a time; this is the floor that says so,
+    # rather than leaving "no page draws a plate" as a thing that happens to
+    # be true. A plate names its own gradient after the seed's hash, so the
+    # id is the identity in the shipped markup.
+    on_pages = 0
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
         for m in re.finditer(r'<div class="card-art[^"]*">(.*?)</div>', h, re.S):
-            art = m.group(1)
-            # A plate names its own gradient and clip after the seed's hash,
-            # so the id IS the record's identity in the shipped markup.
-            key = re.search(r'id="sky([a-z0-9]+)"', art)
-            if not key:
-                continue
-            n += 1
-            k = key.group(1)
-            # the drawing itself, with the identity stripped back out
-            draw = art.replace(k, "")
-            if k in seen and seen[k][0] != draw:
-                fail(f"{canonical_of(path)}: the plate for {k} is not the "
-                     f"plate {seen[k][1]} drew for it. One record, one "
-                     f"picture — a landscape chosen by hash on one page and "
-                     f"by what the place is on another is two things to a "
-                     f"reader and two social cards to a crawler.")
-            seen.setdefault(k, (draw, canonical_of(path)))
-    return n
+            if re.search(r'id="sky[a-z0-9]+"', m.group(1)):
+                on_pages += 1
+    if on_pages:
+        fail(f"{on_pages} abstract plates are drawn on pages. They came off "
+             f"one family at a time, each with a measurement: a plate is a "
+             f"picture of nowhere standing in for a sentence, and the "
+             f"social card is the one surface it belongs on.")
+    return len(by_seed)
 
 
 @check("a story's picture is never drawn from a hash, on any page")

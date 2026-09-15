@@ -85,20 +85,38 @@ be seeded, because a directory of businesses that have not claimed their
 entry is the thing this project refuses to publish. Stories and journeys are
 about a day of writing each and the honest position is that they are behind.
 
-### 3.4 Eight hundred and sixty plates remain — A DECISION, NOT A BUG
+### 3.4 CLOSED — no page draws an abstract plate any more
 
-| family | plates | pages | per page |
-|---|---:|---:|---:|
-| country and region pages | 699 | 180 | 3.9 |
-| month pages | 54 | 10 | 5.4 |
-| macro region pages | 50 | 9 | 5.6 |
-| motion pages | 45 | 9 | 5.0 |
+This section used to read *"eight hundred and sixty plates remain — a
+decision, not a bug"*, over a table of 699 on the country and region pages,
+54 on the months, 50 on the macros and 45 on the motions. Every one of those
+came off, one family at a time, each with its own measurement written where
+the change was made: the homepage's eleven in a column, the seventeen
+interest pages' forty-three, the stories index, `/journeys`, `/europe-in`,
+`/themes`, and finally the country pages, where the six destination cards
+were 207 cards drawing 146 motifs and **France drew five skylines out of
+six**.
 
-None of these is a wall. Four cards in a grid of like things is the case a
-card was designed for, and the measured failure has always been density:
-eleven in a column on the homepage, forty-three on an interest page. **The
-line is drawn at density rather than at the plate**, and it moves the day
-photographs exist for destinations, not before.
+Measured on the built site: **189 `.card-art` elements, and every one of them
+is a map.** Zero abstract plates on any page.
+
+Two things follow, and both had gone unrecorded:
+
+- **`c_one_plate_per_thing` had stopped counting.** It read the shipped HTML
+  for a `.card-art` holding a plate, found none, and reported green — the
+  failure this repository already records about the browser suite, in its own
+  check suite. The promise is unchanged and its surface moved: a plate is
+  still drawn 785 times, on the social cards, and `assets/og/cards.json` maps
+  each content-addressed card to the seed it came from, so "one record, one
+  picture" is now checkable exactly rather than by comparing markup. It also
+  carries a floor on the pages, so *no page draws a plate* is a stated rule
+  rather than a thing that happens to be true.
+- **The plate system is now exclusively the social-card language.** That is a
+  defensible place for it and was never decided: a card is rendered inside
+  somebody else's product, where an illustration drawn from what the place is
+  beats no picture at all, and it is the one surface nobody here ever looks
+  at. `render.plate()` — the SVG renderer — has no live caller and is kept as
+  the reference the raster is checked against.
 
 ### 3.5 What is deliberately not built
 

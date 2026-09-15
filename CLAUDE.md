@@ -2576,6 +2576,21 @@ Belgium four of five, Bosnia and Herzegovina four towers out of four.
 corpus and this is duplication on one screen. And the page draws the real
 geography four hundred pixels above them.
 
+**AND THAT WAS THE LAST ONE, WHICH MADE A CHECK STOP COUNTING.** Measured
+across the built site: **189 `.card-art` elements and every one is a map** —
+zero abstract plates on any page. `c_one_plate_per_thing` read the shipped
+HTML for a `.card-art` holding a plate, so it has been examining nothing and
+reporting green, which is the failure this file already records about the
+browser suite, arriving in the static suite. The promise did not change and
+its surface did: a plate is still drawn 785 times on the social cards, and
+`assets/og/cards.json` maps each content-addressed card to the seed it came
+from, so *one record, one picture* is checkable exactly instead of by
+comparing markup. It carries a floor on the pages too, because *no page
+draws a plate* should be a rule rather than a thing that happens to be true.
+**The plate system is now exclusively the social-card language** — the one
+surface nobody here ever looks at, rendered inside somebody else's product,
+where an illustration drawn from what the place IS beats no picture at all.
+
 **A CHART'S CAPTION NAMED A LINE THAT MEASURED 1.16:1.** The year band says
 "above the line is what is on" and the axis was `--rule` — the hairline
 between two list rows — sampled at rgb(231,230,223) against a page of
