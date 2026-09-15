@@ -4389,9 +4389,29 @@ def planner_page(data):
         f'<option value="{esc(code)}"{" selected" if code == "EUR" else ""}>{esc(code)}</option>'
         for code in sorted(cx.get("rates", {}))
     )
+    # AN OPTION IS A LABEL, AND ONE OF THESE WAS A SENTENCE.
+    #
+    # The option read `{name} — {note}`, and "Generous — Well-reviewed
+    # hotels, restaurants that book out, flights and first-class rail where
+    # it saves a day." is 118 characters. Measured in Chromium against the
+    # box it closes into: it needs 810 pixels in a 325-pixel field at 1280
+    # and a 304-pixel one at 390, so the reader who picks it is shown about
+    # forty per cent of their own choice, cut mid-word, at every width. A
+    # `<select>` clips without an ellipsis, so it does not even look like a
+    # truncation — it looks like the label.
+    #
+    # The taxonomy already holds `name` and `note` as two fields, which is
+    # the right shape; the page was joining them. The option is the name and
+    # the notes go under the method, beside the button that runs it, which
+    # is where this page already puts how the planner scores. Nothing is
+    # lost — every note is still on the page, and now it can be read.
     budgets = "".join(
         f'<option value="{esc(b["slug"])}"{" selected" if b["slug"] == "moderate" else ""}>'
-        f'{esc(b["name"])} — {esc(b["note"])}</option>'
+        f'{esc(b["name"])}</option>'
+        for b in data["taxonomy"]["budgets"]
+    )
+    budget_notes = "".join(
+        f'<li><strong>{esc(b["name"])}</strong> — {esc(b["note"])}</li>'
         for b in data["taxonomy"]["budgets"]
     )
     body = f"""
@@ -4541,6 +4561,8 @@ def planner_page(data):
     in a row start to push the fourth choice towards the alternative; nights come from the
     range on each destination page; and anything above what your budget can afford per day is
     damped.</p>
+    <h2 class="mini">What the spending styles mean</h2>
+    <ul>{budget_notes}</ul>
     <h2 class="mini">What it will not do</h2>
     <p>It will not book anything, price a real hotel, or route you into a country under a
     travel advisory — those are excluded from the planning index entirely.</p>
