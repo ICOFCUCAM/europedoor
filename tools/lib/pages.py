@@ -3286,6 +3286,42 @@ def region_page(data, c, r):
         f'<span class="small">{nights_line(t)}</span></p></a>'
         for t in r["cities"])
     photoband = pageband(data, f"region:{c['slug']}/{r['slug']}")
+    # A REGION IS ITS DESTINATIONS AND THE PAGE LISTED THEM AS SENTENCES.
+    #
+    # `docs/data-model.md`'s own line is that a region is a GROUPING and not
+    # a boundary — we hold which destinations belong to it and no geometry —
+    # so the map above draws the region as its own destinations with the name
+    # at the middle of them. That is the honest drawing and it is a small one,
+    # and under it the page was a lede, a chip row and four lists. On the
+    # contact sheet this family and the place page were the two cells that
+    # read as grey text.
+    #
+    # The strip is the same set the map plots and the rows below carry, in
+    # the same order. Nothing is chosen: a region holds two to eight
+    # destinations and the strip takes all of them.
+    _rstrip = ed_strip(data.get("images"), [
+        {"key": f"city:{c['slug']}/{r['slug']}/{t['slug']}",
+         "alt": t["name"], "label": t["name"], "href": urls.city(c, r, t)}
+        for t in r["cities"]], limit=8)
+    if _rstrip:
+        _rstrip = ('<section class="ed-section">'
+                   + ed_section_head("01", "In the region",
+                                     f"What {r['name']} is made of",
+                                     # A COUNT CANNOT BE DROPPED INTO A
+                                     # SENTENCE THAT ASSUMES A PLURAL. A
+                                     # region holds one to eight
+                                     # destinations, and Tyrol & the West
+                                     # holds one, so the first version read
+                                     # "1 destination, the same ones the
+                                     # drawing above plots" — the tag-name
+                                     # agreement failure two families over,
+                                     # made again by the commit that
+                                     # recorded it.
+                                     ("The one destination the drawing above "
+                                      "plots." if len(r["cities"]) == 1 else
+                                      f"All {numword(len(r['cities']))} of them, "
+                                      f"the same set the drawing above plots."))
+                   + _rstrip + "</section>")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)),
          (c["name"], urls.country(c)), (r["name"], None)])}
@@ -3302,7 +3338,7 @@ def region_page(data, c, r):
   about {n_of(int(pass_nights), "night")} to see it all</p>
   {chips(r["interests"], data["interests"])}
 </div>
-
+{_rstrip}
 {section("Destinations", f'<div class="rows">{destrows}</div>')}
 {section("Places to see", f'<div class="rows">{placerows}</div>',
          lede=f"Everything recorded across {r['name']}, in one list.") if placerows else ""}
@@ -6757,6 +6793,31 @@ def place_page(data, c, r, t, pl):
                           sizes="(min-width: 76rem) 76rem, 100vw")
                 + '</div>') if has_photo else minimap(data, t, span="auto", about=pl["name"])
 
+    # THE THINNEST PAGE ON THE CONTACT SHEET, AND THIS IS THE FAMILY WITH
+    # THE MOST DECLARED SURFACES BEHIND IT. 255 `place:` purposes exist and
+    # a place page reached exactly one of them — its own — and only when the
+    # register held it. "Other places in Vienna" was five sentences in a
+    # column under a facts table, on a page whose subject is a single
+    # building somebody is deciding whether to walk to.
+    #
+    # THE OPENING KEEPS THE MAP. That is not a hole waiting for a picture:
+    # this atlas draws in one projection whose finest unit is about four
+    # kilometres, so there is no honest map of a building — but there is an
+    # honest map of where the building is, and for a reader who arrived from
+    # a search that is the orientation they lack. The strip is where the
+    # photographs go, and where the ones nobody has licensed say so.
+    _pstrip = ed_strip(data.get("images"), [
+        {"key": f"place:{cid}/{x['slug']}", "alt": f"{x['name']}, {t['name']}",
+         "label": x["name"], "href": urls.place(c, r, t, x)}
+        for x in others], limit=8)
+    if _pstrip:
+        _pstrip = ('<section class="ed-section">'
+                   + ed_section_head(
+                       "01", "Nearby",
+                       f"The rest of {t['name']}",
+                       f"{n_of(len(others), 'other place')} recorded in the "
+                       f"same town, each one its own page.")
+                   + _pstrip + "</section>")
     facts = factlist([
         ("Kind", esc(PLACE_KIND_NAMES[pl["kind"]])),
         ("Give it", esc(pl["duration"])),
@@ -6813,19 +6874,31 @@ def place_page(data, c, r, t, pl):
 
 <div>
   <div>
-    <div class="note">
-      <h2 class="mini">We do not hold opening hours, prices or a website for this</h2>
-      <p>Those are the three fields that go stale fastest and the three you are most damaged
-      by being wrong about, so this site does not carry them at all rather than carrying an
-      unverified version. Check the operator or the municipality on the day. The estimate of
-      how long to give it, and the season, are editorial judgements and are usually stable.</p>
+    <!-- THE BOUNDARY AND THE ACTION SIT SIDE BY SIDE, which is the grammar
+         the Stay layer already composed and named `.handoff`: a rule, what
+         this atlas will not tell you, and the one thing you can do about it.
+         Stacked, the note was 600 pixels wide in a 1,168-pixel band with six
+         hundred pixels of white beside it and the button alone under it —
+         the void this repository has now named five times, on the family the
+         contact sheet showed as the emptiest. No new component: a second
+         implementation of a two-column band is a second chance to make its
+         mistakes. -->
+    <div class="handoff">
+      <div class="note">
+        <h2 class="mini">We do not hold opening hours, prices or a website for this</h2>
+        <p>Those are the three fields that go stale fastest and the three you are most damaged
+        by being wrong about, so this site does not carry them at all rather than carrying an
+        unverified version. Check the operator or the municipality on the day. The estimate of
+        how long to give it, and the season, are editorial judgements and are usually stable.</p>
+      </div>
+      <p><button class="btn ghost" type="button" data-save="place:{esc(cid)}/{esc(pl['slug'])}"
+         data-kind="Place" data-label="{esc(pl['name'])}, {esc(t['name'])}"
+         data-url="{urls.place(c, r, t, pl)}">Save to My Europe</button></p>
     </div>
-    <p><button class="btn ghost" type="button" data-save="place:{esc(cid)}/{esc(pl['slug'])}"
-       data-kind="Place" data-label="{esc(pl['name'])}, {esc(t['name'])}"
-       data-url="{urls.place(c, r, t, pl)}">Save to My Europe</button></p>
     {section("What happens here", f'<div class="rows">{doing}</div>',
              lede="Experiences tied to this place, and how each one is tied to it — "
                   "standing on it, starting from it, or looking at it.") if doing else ""}
+    {_pstrip}
     {section("Other places in " + t["name"], f'<div class="rows">{nearby}</div>') if nearby else ""}
     {section("Journeys that stop here", f'<div class="rows">{jrows}</div>') if jrows else ""}
   </div>
