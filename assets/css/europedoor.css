@@ -650,6 +650,28 @@ body[data-accent="heritage"] {
  * claim from the tokens, so a family whose accent is a literal is a family
  * whose accent is unmeasured; deleting --ultramarine from the stylesheet
  * once left the whole suite green for exactly this reason. */
+/* PINE AS INK, WHICH IS A DIFFERENT COLOUR IN EACH PREFERENCE.
+   `--pine` is #0F433E — 4.93 on bone paper and **1.74 on graphite** — so
+   every wordmark and every current-section marker was below AA for a
+   dark-preference reader the moment the masthead became paper. The thing
+   INVERTS rather than recolours, and `--pine-air` was already measured for
+   the dark world's DISCOVER surfaces, so one token carries the decision.
+
+   AND IT HAS TO BE DECLARED HERE, ABOVE THE DARK BLOCK. The first version
+   put it in the `--ed-` alias block 7,000 lines further down, which is the
+   trap this stylesheet already records: **a media query adds no
+   specificity**. `body` inside `@media (prefers-color-scheme: dark)` and
+   `body` at the end of the file are both (0,0,1), so the later one won and
+   the token stayed #0F433E in both preferences — 45 failures in a run that
+   was supposed to have fixed them, on the same 45 elements, reporting the
+   same 1.74.
+
+   `body` and not `:root`, for two reasons. A `var()` resolves where the
+   DECLARATION lives, so a `:root` alias hands every world the light
+   preference's value — the `accent-color` bug one file over. And `:root` is
+   a pseudo-class at (0,1,0) where `body` is a type selector at (0,0,1), so
+   a `:root` base would out-specify every world override below it. */
+body { --pine-ink: var(--pine); }
 body.area-countries { --door: var(--cobalt);      --door-dark: var(--cobalt-2);
                       --door-mark: var(--mineral); }
 body[data-accent="territory"] { --door: var(--ochre-deep);
@@ -1171,7 +1193,17 @@ main.wide { max-width: 92rem; }
    redundancy the dead-rule scan exists to find, and the one that took the
    count over its ceiling. */
 .pagehead p.lede { font-size: var(--t-md); max-width: 44rem; margin-top: var(--s4); }
-.kicker { font-size: var(--t-xs); letter-spacing: .14em; text-transform: uppercase; color: var(--door); margin: 0 0 var(--s2); font-weight: 600; }
+/* `--door` IS THE ACCENT AND `--door-dark` IS THE ACCENT AS TEXT, and a
+   kicker is text. The two exist because a colour that gets DRAWN and a
+   colour that gets READ are different requirements — this stylesheet
+   records the same split for the signature, where `--signature` is the mark
+   and `--door` is anything that is words. The ground swap to the owner's
+   near-white paper is what exposed it: terracotta-2 measured 4.16 against
+   #F8F6EF where it cleared on #F3F0E6, on the Europe Experience Score's own
+   label and on the three verification steps at /experiences/join. A lighter
+   page makes every accent's ratio worse, and the answer is the token that
+   was sized for reading. */
+.kicker { font-size: var(--t-xs); letter-spacing: .14em; text-transform: uppercase; color: var(--door-dark); margin: 0 0 var(--s2); font-weight: 600; }
 /* AND THE ACCENT IS A MARK ON A PAGE HEAD, NOT ONLY A TINT ON ELEVEN PIXELS
    OF TYPE.
 
@@ -7715,7 +7747,6 @@ body {
      not `:root`: a `var()` resolves where the DECLARATION lives, so a
      :root alias would hand every world the light preference's pine, which
      is the `accent-color` bug this file records twice. */
-  --pine-ink:       var(--pine);
   --ed-bone:        var(--bone);
   --ed-paper:       var(--bone-light);
   --ed-mineral:     var(--mineral);
@@ -7963,6 +7994,16 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
 .ed-arrival-copy {
   padding: clamp(2.25rem, 5vw, 5rem);
   display: flex; flex-direction: column; justify-content: flex-end;
+}
+/* AND THE SIDE INSET COMES OFF ON A PHONE, THE SAME WAY THE MAP'S PAD DID.
+   36 pixels inside a 288-pixel column is 12% of the width, and it puts the
+   destination's own name out of line with the breadcrumb above it, the
+   masthead above that and every word below — which the browser suite reads,
+   correctly, as the brand not sitting on the same gutter as the words. An
+   inset reads as a composition on a desk, where the band has width to
+   spare. The top and bottom stay: those are what make the band a band. */
+@media (max-width: 52rem) {
+  .ed-arrival-copy { padding-inline: 0; }
 }
 .ed-arrival-copy h2 {
   font-family: var(--ed-serif); font-weight: 400;
