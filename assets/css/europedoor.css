@@ -1692,7 +1692,13 @@ a .kicker { color: var(--ink-3); }
 }
 
 /* ── the Europe Experience Score ──────────────────────────── */
-.score { margin: var(--s6) 0; padding: var(--s5); border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper-2); }
+/* AND THE SCORE WAS A CARD INSIDE A BAND THAT ALREADY SHADES IT. On a
+   destination and a country page it sits in `tone-quiet`, whose fill is
+   within a step of `--paper-2`, so the border drew a box round something the
+   band had already separated — directly under a facts row that uses rules and
+   space, in the same band. Two vocabularies, one band. */
+.score { margin: var(--s6) 0; padding: var(--s5) 0 0;
+         border-top: 1px solid var(--rule); }
 .scorerow { display: grid; grid-template-columns: 8.5rem 1fr 2.5rem; gap: var(--s3); align-items: center; margin-bottom: var(--s2); }
 .scorelabel { font-size: var(--t-sm); color: var(--ink-2); }
 .scorebar { height: 7px; background: var(--paper-3); border-radius: 999px;
