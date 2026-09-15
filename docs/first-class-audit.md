@@ -189,6 +189,48 @@ element that *is* on every one of them — the cobalt masthead — is the most
 repeated object in the product. One shell, one stylesheet and eleven
 primitives are an engineering achievement. They are not a design.
 
+**AND THE OTHER HALF OF THE CLAIM HAD NEVER BEEN MEASURED AT ALL.** The
+finding is about a COMPOSITION and everything above is about an h1: the
+sentence says the page is the same page, and the evidence only ever covered
+the first 250 pixels of it. `tools/composition.js` reads the rest — the
+ordered sequence of band shapes under the head, in the vocabulary the eleven
+primitives actually emit (rows, cards, figure, facts, list, note, a band of
+prose), with consecutive repeats collapsed because three `rows` bands and one
+are the same composition holding different amounts of content.
+
+**29 distinct body shapes over 47 families.** The clusters, largest first:
+
+| families | shape |
+|---:|---|
+| 8 | `HEAD rows` — experiences, journeys, stories, themes, interests, search, for businesses, tourism boards |
+| 5 | `HEAD list` — category, subcategory, about, accessibility, help |
+| 5 | `HEAD note list` — plan, contact, privacy, terms, cookies |
+| 3 | `HEAD rows note` — interest, europe-in, facet |
+| 2 | `HEAD figure rows note` — motion, quiet |
+| 2 | `HEAD figure note` — map, my-europe |
+| 1 each | the remaining 22 |
+
+The eight in the largest cluster are the families whose subject genuinely IS
+a list, plus two prose pages that are also lists. That is a shape doing its
+job, not a shape nobody chose. What the number says is that the claim as
+written — one composition, 1,033 times — is no longer true of the body, and
+the heads have gone with it:
+
+| | at 1280 |
+|---|---|
+| h1 sizes in use | 30 (instrument), 60 (index), 76 (overture) |
+| h1 top | 136–745 |
+| head height | 82–1018 |
+| share of the head's own width its content reaches | 60%–144% |
+
+Against the original reading of 60px at 150–312 on seventeen of twenty-two.
+The four heads at 60% are overtures with nothing beside the name, which is
+the role working as written; the four past 100% are carrying a drawing wider
+than the type. **This is a reported measurement and not a gate**, for the
+same reason `opening.js` is not one: a threshold on "distinct shapes" is a
+number to satisfy by shuffling bands, and the fault it exists to find is a
+page that is dull.
+
 ### Finding 3 — The homepage decays monotonically after the hero
 
 **MEASURED**, at 1440 wide, full page 4,934px:

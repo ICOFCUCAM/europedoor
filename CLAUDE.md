@@ -14,7 +14,7 @@ Via Europa. Take their architecture and drop their branding section. See
 
 | doing | read |
 |---|---|
-| **the mandate: what a first-class gateway to Europe would be, and where this one is not** | **`docs/first-class-audit.md`** — 27 surfaces rendered at 1280 and 390 and then measured. Three findings, and Finding 1 is now closed on the numbers: it read 12 of 23 surfaces effectively type to the fold with seven showing no picture at all, and reads **3 of 27 with none and none under a fifth**, median share 24% → 34.4% (CORRECTED twice — the first version said 21 of 22 and was reading where the first figure STARTS rather than how much of the screen it fills). `tools/opening.js` is the instrument, so the number is checkable in a minute. The eight benchmark sites are BLOCKED by the egress proxy and the benchmark half is labelled second-hand |
+| **the mandate: what a first-class gateway to Europe would be, and where this one is not** | **`docs/first-class-audit.md`** — 27 surfaces rendered at 1280 and 390 and then measured. Three findings, and Finding 1 is now closed on the numbers: it read 12 of 23 surfaces effectively type to the fold with seven showing no picture at all, and reads **3 of 30 with none and none under a fifth**, median share 24% → 35.6% (CORRECTED twice — the first version said 21 of 22 and was reading where the first figure STARTS rather than how much of the screen it fills). `tools/opening.js` is the instrument, so the number is checkable in a minute. **Finding 2's other half is measured too** — it says the page is the same page and its evidence only ever covered the first 250 pixels: `tools/composition.js` reads the band sequence under the head and finds **29 distinct body shapes over 47 families**, and three h1 sizes at tops 136–745 where the original reading was one size at 150–312. The eight benchmark sites are BLOCKED by the egress proxy and the benchmark half is labelled second-hand |
 | **the design language — what makes a page EuropeDoor with the logo removed, and which movements each family takes** | **`docs/design-language.md`** — the ARCHITECT step. Five marks that could not have been made by anybody else, the six-movement composition grammar per family, the three head roles, what the language forbids, and how a change is proved |
 | **anything at all — read this first, every session** | **`docs/instruction.md`** — the standing instruction. Part 1 is how work is done here (audit first, deviate with numbers, STOP on licensing, never invent data, prove every check can fail). Part 2 is the visual instruction: **European Future**, the two worlds, the palette, the 60/25/10/5 ratio and the measured contrast limits. `docs/palette.json` is the checkable form |
 | **the transformation brief, and the three decisions waiting on the owner** | **`docs/EUROPEDOOR_2036_TRANSFORMATION.md`** — the 2036 audit, what to keep/replace/redesign, and a five-phase roadmap. Phases B and C are unblocked; A waits on a map-licensing decision |
@@ -3366,6 +3366,18 @@ tried against a browser that cannot be launched here before the message was
 made to print `computed-display`, the box and the child count; the first line
 of that output ended it. Every other count in this repository is in its
 message for the same reason.
+
+**Two more that are deliberately not gates, and answer the two halves of the
+mandate's first two findings.** `node tools/opening.js` measures how much of
+the first screen is a picture, per family, at 390 and (`--wide`) at 1280;
+`node tools/composition.js` measures the band sequence UNDER the head, the
+h1's size and position, and how much of its own width each head reaches.
+Neither has a threshold and neither can fail, for the same reason: the fault
+they exist to find is a page that is DULL, and a number to satisfy is
+satisfied by shuffling bands. Both read `tools/lib/families.js`, which is the
+one list of rendered families and is enumerated against the built site — a
+template missing from it is a family no instrument here can see, which is how
+the fund project page shipped at 0% picture for the life of the family.
 
 **And one that is deliberately not a gate.** `node tools/contact-sheet.js`
 puts one page per family in a single image. `--dark` shoots the dark
