@@ -244,8 +244,22 @@ def cut_band(lat0, lat1, lon, before, after):
             mx - nx * after, my - ny * after)
 
 
-def dusk_stops(lo=0.0, hi=1.0):
+def dusk_stops(lo=0.0, hi=1.0, top=1.0):
     """Smoothstep in five stops, as opacity only — the colour is the caller's.
+
+    `top` CAPS HOW DEEP THE FADE GOES, which is a different lever from how
+    WIDE it is. Narrowing /map's fade was tried and refused — it makes the
+    52°E cut a hard edge on the instrument — and that refusal answered a
+    question about DOTS: the marks are drawn above the fade, so a destination
+    near the cut keeps its own. Nobody asked about the COUNTRIES, and every
+    one of them on /map is a link. Measured on the painted pixels against the
+    painted sea, sampling a point inside each real polygon: Armenia 1.06,
+    Azerbaijan 1.11, Türkiye 1.14, Russia 1.18 — at or under the 1.24 that
+    `docs/palette.json` itself calls "not quiet, it is absent", and five
+    countries under its declared 1.35 floor.
+
+    So the cut stays as soft as it was and stops short of erasing what it
+    crosses.
 
     A TWO-STOP GRADIENT HAS A CREASE AT EACH END AND THE EYE DRAWS A LINE
     ALONG IT. The ramp is linear, so its first derivative stops dead at each
@@ -257,7 +271,7 @@ def dusk_stops(lo=0.0, hi=1.0):
     out = []
     for i in range(5):
         t = i / 4.0
-        v = t * t * (3.0 - 2.0 * t)
+        v = t * t * (3.0 - 2.0 * t) * top
         out.append(f'<stop offset="{lo + (hi - lo) * t:.4f}" '
                    f'stop-opacity="{v:.3f}"/>')
     return "".join(out)
@@ -266,6 +280,12 @@ def dusk_stops(lo=0.0, hi=1.0):
 # ── how far a data cut may reach ──────────────────────────────────────
 
 DUSK_CEILING = 0.80
+
+# HOW DEEP THE CUT MAY GO ON AN INSTRUMENT. /map and /discover draw every
+# country as a link, and `docs/palette.json` requires a country to clear the
+# sea by 1.35 with the reason written out: 1.24 is not quiet, it is absent.
+# Fitted against the painted pixels rather than chosen.
+DUSK_INSTRUMENT_TOP = 0.50
 _DUSK_REACH = {}
 
 
@@ -356,7 +376,7 @@ def dusk_reach(data=None):
     return out
 
 
-def cut_fade(idprefix, w, h, reach=None, cls="mapcut"):
+def cut_fade(idprefix, w, h, reach=None, cls="mapcut", top=1.0):
     """The two data cuts, faded, for an instrument that draws the atlas.
 
     Painted rather than masked, because every country on these maps is a
@@ -391,10 +411,10 @@ def cut_fade(idprefix, w, h, reach=None, cls="mapcut"):
         f'<defs>'
         f'<linearGradient id="{idprefix}edge" gradientUnits="userSpaceOnUse"'
         f' x1="{ex1:.1f}" y1="{ey1:.1f}" x2="{ex2:.1f}" y2="{ey2:.1f}">'
-        f'{dusk_stops()}</linearGradient>'
+        f'{dusk_stops(0.0, 1.0, top)}</linearGradient>'
         f'<radialGradient id="{idprefix}foot" gradientUnits="userSpaceOnUse"'
         f' cx="{ax:.1f}" cy="{ay:.1f}" r="{r33:.1f}">'
-        f'{dusk_stops(foot0, foot1)}</radialGradient>'
+        f'{dusk_stops(foot0, foot1, top)}</radialGradient>'
         f'</defs>'
         f'<rect x="0" y="0" width="{w}" height="{h}" fill="url(#{idprefix}edge)"/>'
         f'<rect x="0" y="0" width="{w}" height="{h}" fill="url(#{idprefix}foot)"/>'
@@ -8861,7 +8881,7 @@ def map_page(data):
 <g id="context" class="context" aria-hidden="true">{''.join(context)}</g>
 <g id="countries" class="countries">{''.join(shapes)}</g>
 <g id="detail" class="countries"></g>
-{cut_fade('map', MAP_W, MAP_H)}
+{cut_fade('map', MAP_W, MAP_H, top=DUSK_INSTRUMENT_TOP)}
 <g id="nogeo" class="nogeo">{''.join(nogeo)}</g>
 <g id="route"></g>
 <g id="regions" hidden display="none"></g>
@@ -11401,7 +11421,7 @@ def discover_page(data):
 
   <a class="heromap wide-map arched discovermap" data-role="instrument" href="/map"
      id="discover-map" aria-label="Map of all {len(data['cities'])} places">
-    <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true"><defs>{arch_clip("disc", MAP_W, MAP_H)}</defs><g clip-path="url(#arch-disc)"><rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>{dctx}{dland}{cut_fade('disc', MAP_W, MAP_H)}{''.join(dots)}</g>{arch_edge(MAP_W, MAP_H)}</svg>
+    <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true"><defs>{arch_clip("disc", MAP_W, MAP_H)}</defs><g clip-path="url(#arch-disc)"><rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>{dctx}{dland}{cut_fade('disc', MAP_W, MAP_H, top=DUSK_INSTRUMENT_TOP)}{''.join(dots)}</g>{arch_edge(MAP_W, MAP_H)}</svg>
     <span class="heromap-cap">Coastline from Natural Earth, public domain.
     Open the full map, with layers →</span>
   </a>
