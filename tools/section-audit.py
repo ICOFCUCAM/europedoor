@@ -836,7 +836,18 @@ def s24():
     yield "near" in js and "kmBetween" in js, "proximity search"
     yield "cheap" in js, "budget search"
     yield "INDEX.months" in js, "seasonal search"
-    yield has("/search", "quiet beaches in september", "near prague")
+    # THE PAGE PUBLISHES THE QUERY LANGUAGE IT ACTUALLY IMPLEMENTS, and this
+    # asserted two literal example sentences out of the placeholder instead.
+    # It went red when /search's placeholder was shortened — it was cut
+    # mid-word at 390, on the one control that page exists to be — for a page
+    # that had got better, which is the shape-not-promise fault this
+    # repository has now recorded a dozen times. What a reader needs is that
+    # every operator the script understands is named on the page in words
+    # they can read; the case of the example is not the claim.
+    low = page("/search").lower()
+    yield (all(t in low for t in ("near ", "cheap", "quiet", "month")),
+           "/search names the operators search.js implements: near, cheap, "
+           "quiet and a month")
 
 
 @section(25, "Search result types", "BUILT",
