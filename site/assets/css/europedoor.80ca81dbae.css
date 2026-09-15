@@ -7732,6 +7732,13 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
    loses its floor when it holds a drawing, and the drawing keeps its own
    height. */
 .ed-opening-visual:has(svg) { min-height: 0; background: none; }
+/* AND A DECLARED SLOT IS SIZED TO WHAT IT SAYS, which is the reason written
+   on `.ed-slot-wide` one screen down: a slot is a panel of type until the
+   photograph arrives, and a floor written for a photograph leaves a band of
+   `--paper-3` under the type with a hairline above it — a box that does not
+   fit, which is the same letterbox this component was just fixed for, now
+   arriving from the empty state rather than from the filled one. */
+.ed-opening-visual:has(> .ed-slot) { min-height: 0; background: none; }
 .ed-opening-visual svg { width: 100%; height: auto; display: block; }
 
 /* ── SECTION ─────────────────────────────────────────────── */

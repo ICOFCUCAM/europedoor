@@ -3880,16 +3880,48 @@ def interests_index(data, ranking):
             f'{pct}% of the Atlas · {n_of(ncountry, "country")}</p>'
             f'<h2>{esc(i["name"])}</h2>'
             f'<p class="rowsub">{esc(where)}</p></div></a>')
+    # THE SEVENTEEN GLYPHS ARE A GEOGRAPHY AND THIS FAMILY'S SUBJECT IS NOT.
+    #
+    # A tag answers what you are travelling FOR, and the page answered it in
+    # seventeen drawings of the same continent with a different number of
+    # marks on it — which is the index-opening finding exactly, arriving
+    # seventeen times down one page instead of once across six pages. The
+    # shapes stay, because reach IS the argument this index makes and no
+    # single tag page can make it. What was missing is the other half: what
+    # any of it LOOKS like.
+    #
+    # The strip is the tag's own photograph, the same `interest:` purpose the
+    # seventeen pages already declare, so nothing new is invented and the
+    # slots that are empty say which photograph they are waiting for. Eight
+    # of the seventeen, in the page's own order, which is reach — the strip
+    # scrolls, and a strip of seventeen is a grid that has been rotated.
+    _istrip = ed_strip(data.get("images"), [
+        {"key": f"interest:{slug}", "alt": by_slug[slug]["name"],
+         "label": by_slug[slug]["name"], "href": urls.interest(slug)}
+        for slug in ranking], limit=8)
     body = f"""
 {crumbs([("Europe", "/discover"), ("Ways to travel", None)])}
-<div class="pagehead index">
-  <p class="kicker">What you are travelling for</p>
-  <h1>Seventeen ways to cross a continent.</h1>
-  <p class="lede">Not a list of everything Europe has. {numword(len(ranking), cap=True)} tags
-  that each narrow {numword(total)} destinations to a set worth reading — and the useful
-  ones are not the biggest. History covers almost the whole Atlas and tells you
-  very little; the narrow ones are where a filter earns its place.</p>
-</div>
+{ed_opening(
+    eyebrow="What you are travelling for",
+    title="Seventeen ways to cross a continent.",
+    intro=f"Not a list of everything Europe has. {numword(len(ranking), cap=True)} tags "
+          f"that each narrow {numword(total)} destinations to a set worth reading — and the "
+          f"useful ones are not the biggest. History covers almost the whole Atlas and "
+          f"tells you very little; the narrow ones are where a filter earns its place.",
+    visual=photo(data.get("images"), "interests-hero", w=2000, h=1200,
+                 sizes="(min-width: 52rem) 58vw, 100vw")
+           or ed_slot("interests-hero", shape="square",
+                      label="What you are travelling for"),
+    family="discovery")}
+{(f'<section class="ed-section">'
+  + ed_section_head("01", "The seventeen",
+                    "What each one is a picture of",
+                    "The widest eight, in the order this page argues them.")
+  + _istrip + "</section>") if _istrip else ""}
+<section class="ed-section">
+{ed_section_head("02", "Reach",
+                 "How much of the Atlas each one carries",
+                 "Every destination with the tag, drawn on one frame.")}
 {silhouette}
 <div class="rows">{"".join(rows)}</div>
 <p class="small">Each shape is that tag\u2019s own destinations on the continent, drawn
@@ -3900,6 +3932,7 @@ The order is reach \u2014 how much of the Atlas each tag carries \u2014 rather t
 alphabetical, and the sentence under each name is the same judgement its own page
 makes. Two of them can be combined in
 <a href="/discover">Discover Mode</a>, which is where a narrow tag does its real work.</p>
+</section>
 """
     return "/interests/index.html", page(
         "Ways to travel", body, path="/interests", area="countries",
@@ -3989,6 +4022,42 @@ def interest_page(data, i, ranking):
     art = constellation([project(n["city"]["lat"], n["city"]["lon"])
                          for n in cities], cut=True) if cities else ""
     photoband = pageband(data, f"interest:{i['slug']}")
+    # SIXTY-THREE ROWS OF PLACE NAMES IS NOT A PICTURE OF ANYTHING.
+    #
+    # The page opens on a photograph of the tag and a drawing of its reach,
+    # and then hands the reader a flat column of names grouped by macro
+    # region — correct, complete, and the exact shape §23 names: text,
+    # whitespace, a small map and rows. The destinations are the content,
+    # and every one of them already declares a `city:` purpose.
+    #
+    # WIDEST-FIRST WOULD BE A RANKING THIS ATLAS DOES NOT HOLD, so the strip
+    # takes the list's own order — country then name, the order the rows
+    # below are in — and stops at eight. The reader who wants all of them
+    # scrolls to the rows; the strip exists to say what a tag looks like,
+    # not to choose for anybody.
+    _ishots = ed_strip(data.get("images"), [
+        {"key": f"city:{n['country']['slug']}/{n['region']['slug']}/{n['city']['slug']}",
+         "alt": n["city"]["name"], "label": n["city"]["name"],
+         "href": urls.city(n["country"], n["region"], n["city"])}
+        for n in cities], limit=8)
+    if _ishots:
+        # A TAG NAME CANNOT BE THE SUBJECT OF A VERB HERE. "What mountains
+        # looks like" — seventeen tags, some plural, some a compound with an
+        # ampersand, and no single conjugation is right for all of them. A
+        # heading that has to guess at agreement is a heading generated from
+        # a name it does not know the grammar of, so the name is a noun
+        # phrase and the count carries the sentence. Derived, because the
+        # strip takes eight OR the whole set, whichever is smaller, and a
+        # heading saying eight over five pictures is the constant-wearing-a
+        # -measurement's-clothes failure this atlas has already made twice.
+        _n = min(8, len(cities))
+        _ishots = ('<section class="ed-section">'
+                   + ed_section_head("01", "Travelling for it",
+                                     f"{i['name']}, in {numword(_n)} places",
+                                     f"{numword(_n, cap=True)} of the {len(cities)} "
+                                     f"destinations carrying the tag, in the order "
+                                     f"the list below is in.")
+                   + _ishots + "</section>")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Experiences", "/experiences"), (i["name"], None)])}
 {photoband}
@@ -4008,6 +4077,7 @@ def interest_page(data, i, ranking):
             + offframe_line([project(n["city"]["lat"], n["city"]["lon"])
                              for n in cities], data) if cities else ""))}
 
+{_ishots}
 {f'<div class="rows">{rows}</div>' if rows else empty_state(
       "No destination carries this tag yet.",
       "The tag exists in the taxonomy and the Journey Planner already weights "
