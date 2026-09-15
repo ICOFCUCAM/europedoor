@@ -8213,19 +8213,49 @@ def theme_page(data, t):
         f'Map of the {len(tpts)} places in {t["name"]}, unlinked') if len(tpts) >= 2 else ""
 
     photoband = pageband(data, f"theme:{t['slug']}")
+    # ONE ARCHITECTURE, TWO PICTURES. Eleven of the thirteen themes carry a
+    # photograph and two do not, and the two without were not a designed
+    # state — they were what is left when the band is removed: an overture
+    # head whose measure is 14ch inside a 1,168px column, so the first 780
+    # pixels of the page were a headline with seven hundred and fifty of
+    # nothing beside it, and the theme's own map began below the fold.
+    #
+    # A theme's map is its signature moment — eight places and no line
+    # between them, which is the whole argument the family makes — so where
+    # there is no photograph it takes the opening the photograph would have
+    # had. The two states then differ in what the picture IS and not in the
+    # shape of the page. Where a photograph exists the map keeps its place
+    # under the head, because a picture and a drawing say different things
+    # and neither replaces the other.
+    opening, below = (photoband, thememap) if photoband else (thememap, "")
+    # AND THE NAME COMES BEFORE THE PICTURE. Measured at 1280x900: with the
+    # photograph opening the page the h1 sat at y=750 and with the map at
+    # 1,019 — so a reader on a laptop met a gondola, or eight dots, and had
+    # to scroll to find out what either was about. `want=2.6` is already
+    # asked of the drawing and geography refuses it: Tallinn to Rhodes is
+    # tall, and a frame cannot be wider than the canvas. So the picture does
+    # not become a band; the name goes above it.
+    #
+    # Kicker, name, picture, then the sentence — which is a magazine opening
+    # and not an invention: the headline announces, the picture carries the
+    # desire, and the standfirst under it is where a standfirst has always
+    # been. Both states take it, because the fault was the family's and not
+    # the photograph's.
     body = f"""
 {crumbs([("Europe", "/discover"), ("Themes", "/themes"), (t["name"], None)])}
-{photoband}
-<div class="pagehead overture">
+<div class="pagehead overture themetop">
   <p class="kicker">{esc(t['strapline'])}</p>
   <h1>{esc(t['name'])}</h1>
+</div>
+{opening}
+<div class="pagehead overture themesay">
   {statement(t['summary'])}
   <p class="orient">{len(t['stops'])} places across {len(countries)}
   {"countries" if len(countries) != 1 else "country"} · not an itinerary</p>
   {chips(t["interests"], data["interests"])}
 </div>
 
-{thememap}
+{below}
 
 <div class="rows">{''.join(rows)}</div>
 

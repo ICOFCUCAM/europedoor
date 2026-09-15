@@ -3349,6 +3349,12 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    country is a figure and stands in a figure's doorway. The aperture's
    proportion follows its subject — a signature that is the same shape at
    every size is a stamp. */
+/* A THEME ANNOUNCES, THEN SHOWS, THEN EXPLAINS. The head is split around the
+   opening picture, so the two halves must not each pay the head's own top and
+   bottom air — that would put 200 pixels between the name and the thing it
+   names. */
+.pagehead.themetop { padding-bottom: 0; margin-bottom: var(--s5); }
+.pagehead.themesay { padding-top: 0; margin-top: var(--s5); }
 .pagehead.portraithead { display: grid; gap: var(--s6); align-items: center; }
 /* THE PLATE: the figure and its foot. The locator and the key started
    INSIDE the figure and inherited the whole atlas skin through the cascade —
