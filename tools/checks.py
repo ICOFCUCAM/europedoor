@@ -4096,6 +4096,67 @@ def c_score_median():
 
 
 @check("no drawing quietly omits a place it is drawn from")
+@check("a page claiming one frame draws one frame")
+def c_same_frame():
+    """"Drawn to the same frame so the nine can be compared" was not true.
+
+    /countries, /themes and /interests each close with a sentence saying
+    their row glyphs are drawn to one frame, which is the whole argument for
+    having them: a knot is an argument about one corner of Europe and a
+    scatter is one about the whole of it, and neither reading survives nine
+    drawings at nine scales. Measured on the shipped HTML by reading the
+    viewBox off every `.constel` svg:
+
+        /themes      13 glyphs, 1 viewBox
+        /interests   17 glyphs, 1 viewBox
+        /countries   10 glyphs, 10 viewBoxes
+
+    The drawing on /countries is RIGHT and the sentence was wrong.
+    `region_glyph` carries a recorded refusal — all nine at the continental
+    extent is nine identical pictures of Europe with a different corner lit,
+    which is the homepage's eleven-maps failure on the page directly under
+    it — so the band frames on its own members and the sentence now says so.
+
+    A CLAIM ABOUT A DRAWING IS CHECKED AGAINST THE DRAWING. This one is
+    exactly the /map projection failure: three renderers were made to agree
+    and no check read the prose. Both directions, because a sentence that
+    outlives the thing it describes is the other half of the same defect —
+    and whitespace is collapsed first, because a line break between "same"
+    and "frame" is what defeated the projection check for a year.
+    """
+    n = pages = 0
+    pat = re.compile(r'<svg class="constel[^"]*" viewBox="([^"]+)"')
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        vbs = pat.findall(h)
+        if len(vbs) < 2:
+            continue
+        pages += 1
+        n += len(vbs)
+        says = "drawn to the same frame" in " ".join(
+            re.sub(r"<[^>]+>", " ", h).split())
+        same = len(set(vbs)) == 1
+        if says and not same:
+            fail(f"{canonical_of(f)}: the page says its shapes are drawn to "
+                 f"the same frame and its {len(vbs)} glyphs carry "
+                 f"{len(set(vbs))} different viewBoxes — "
+                 f"{sorted(set(vbs))[:3]}. Nine drawings at nine scales "
+                 f"cannot be compared, which is what the sentence promises.")
+        if same and not says:
+            fail(f"{canonical_of(f)}: {len(vbs)} glyphs share one viewBox "
+                 f"({vbs[0]}) and nothing on the page says so. Comparability "
+                 f"is the reason for one frame and a reader cannot see a "
+                 f"viewBox.")
+    # ITS OWN REACH. The pattern reads a class and a viewBox in one fixed
+    # order, so a renderer that emits the attributes the other way round
+    # would leave this green while examining nothing — which is the dead-rule
+    # scanner's own first run, and the reason that one asserts its reach too.
+    if pages < 3:
+        fail(f"c_same_frame examined only {pages} pages carrying more than "
+             f"one glyph — it has stopped finding the family it is about.")
+    return n
+
+
 def c_offframe():
     # A CIRCLE OUTSIDE THE viewBox RENDERS AS NOTHING AND REPORTS NOTHING —
     # the same class as a <use> of an id that is not on the page, and

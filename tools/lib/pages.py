@@ -1686,7 +1686,9 @@ def countries_index(data):
          f"so the frontiers are the picture.{cutsay}")}
 {''.join(blocks)}
 <p class="small">The shape beside each region is the countries that region is made
-of, drawn to the same frame so the nine can be compared. A macro region is the one
+of, framed on its own ground rather than on the continent: the drawing changes
+scale between bands, so what tells the Nordics from the Baltic States is the
+shape of the region and not its share of one map. A macro region is the one
 grouping in this atlas with real borders behind it — a travel region is a set of
 destinations and is shown as those destinations rather than given a boundary it
 does not have. {geo.sources_line(geo.load("europe-lod0.json"))}</p>
