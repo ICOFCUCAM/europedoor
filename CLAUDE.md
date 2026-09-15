@@ -2603,8 +2603,9 @@ maps** and reported green. Matched on the class LIST now, which is what a
 class attribute is, with a floor that fails when it stops finding the family
 — 1,293 dots, all inside their frames. **A count is only evidence if
 somebody reads it**, and `c_cut_word` was returning the number of ellipses
-it found, which ought to be zero, so a healthy check reading all 1,034 pages
-printed "(0)" and looked exactly like the two broken ones. It counts pages.
+it found, which ought to be zero, so a healthy check reading every page on
+the site printed "(0)" and looked exactly like the two broken ones. It
+counts pages.
 
 **A CHART'S CAPTION NAMED A LINE THAT MEASURED 1.16:1.** The year band says
 "above the line is what is on" and the axis was `--rule` — the hairline
