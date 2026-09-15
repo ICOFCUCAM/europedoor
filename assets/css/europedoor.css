@@ -2225,21 +2225,50 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
  * existed. They were snapped to values the site already had and nothing
  * about the page changed that a reader could name.
  *
- * The sixth is real and is kept: the hed's own clamp. The whole finding
- * behind this family is that eleven of twelve rendered families place an
- * identically-sized h1 at an identical vertical position, and there is no
- * way to stop doing that with a size that already exists.
+ * The sixth was said to be real and was not. "The hed's own clamp" was
+ * declared here as the one difference that survived — and it was
+ * `clamp(var(--t-3xl), 5.2vw, var(--t-5xl))`, which is the base `h1` rule
+ * copied out character for character. A declaration that restates what the
+ * element already inherits is the redundancy the dead-rule scan exists to
+ * find, and this one was carrying the whole argument for the family.
+ *
+ * So the finding it was written against stood: eleven of twelve families
+ * place an identically sized h1 at an identical height, and the family
+ * whose entire claim is that it is EDITORIAL rather than reference was one
+ * of the eleven.
+ *
+ * A HED IS NOT A NAME. The overture takes the hero's clamp because its
+ * subject is one word — Vienna, Chamonix — and the name is the event. A
+ * story title is a SENTENCE, 27 to 48 characters across the nine, and a
+ * sentence set at a name's size and a name's 14ch measure is four lines of
+ * shouting. It takes the same ceiling and a lower floor, over a measure
+ * half as wide again: big enough that the page opens like a magazine and
+ * loose enough that "What a pilgrimage is for when you do not believe"
+ * reads as one thought.
+ *
+ * ONLY THE CEILING MOVES, and that is the invariant register's doing. The
+ * first version set a 6.2vw middle term and a 1.06 leading, which reads
+ * better and is two values this stylesheet does not have — `css.font_sizes`
+ * and `css.line_heights` both went red, on a rule whose own comment claimed
+ * it introduced nothing. The register was right and the comment was wrong.
+ * What is left uses the site's own numbers throughout: the same 5.2vw rate
+ * every h1 rises at, the same 1.12 leading every heading has, and a ceiling
+ * that is already a token and already spent by the hero and the overture.
  */
 .essay { --measure: 38rem; }
 .essayhead { margin: var(--s6) 0 var(--s7); }
 .essayhead h1 {
-  font-size: clamp(var(--t-3xl), 5.2vw, var(--t-5xl));
-  line-height: 1.12; letter-spacing: -.022em; max-width: 20ch;
+  font-size: clamp(var(--t-3xl), 5.2vw, var(--t-6xl));
+  line-height: 1.12; letter-spacing: -.022em; max-width: 21ch;
   margin: var(--s4) 0 0;
 }
+/* AND THE DECK IS A PARAGRAPH, NOT A COLUMN. At 30ch under a hed set to
+   21ch the standfirst ran to six lines against the hed's two, so the
+   shape of the opening was a wide title over a narrow grey ribbon. A deck
+   is read at a glance; the measure is the one prose already uses here. */
 .essayhead .deck {
   font-family: var(--display); font-size: clamp(var(--t-lg), 2.4vw, var(--t-2xl));
-  line-height: 1.25; color: var(--ink-2); max-width: 30ch;
+  line-height: 1.25; color: var(--ink-2); max-width: 40ch;
   margin-top: var(--s5);
 }
 .essayhead .byline {

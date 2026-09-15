@@ -203,16 +203,29 @@ def measure():
                               re.findall(r"font-size:\s*([^;]+);", css)}),
                 "kind": "ceiling",
                 "why": "A ceiling, not a target. The sibling repository measures "
-                       "418; that is what happens without a line. It moved to "
-                       "16 for the essay hed, and for nothing else: the design "
-                       "audit's central finding is that eleven of twelve "
-                       "rendered families place an identically-sized h1 at an "
-                       "identical vertical position, and no size that already "
-                       "existed could stop that. The same commit's other five "
-                       "candidate type values — a serif leading, a tighter "
-                       "hed, a deck clamp one decimal off one already in the "
-                       "file — were snapped back to what the site had, and no "
-                       "reader could name the difference."},
+                       "418; that is what happens without a line. It is 16 for "
+                       "the essay hed and for nothing else: the design audit's "
+                       "central finding is that eleven of twelve rendered "
+                       "families place an identically-sized h1 at an identical "
+                       "vertical position, and no size that already existed "
+                       "could stop that. "
+                       "AND FOR TWO COMMITS THIS REASON WAS TRUE OF NOTHING. "
+                       "The value was snapped back to 15 and the hed was left "
+                       "declaring `clamp(--t-3xl, 5.2vw, --t-5xl)` — the base "
+                       "h1 rule copied out character for character, a "
+                       "declaration restating what the element already "
+                       "inherits, which is the redundancy the dead-rule scan "
+                       "exists to find. The one difference the family claimed "
+                       "did nothing, and this register carried the argument "
+                       "for a size that was not being spent. The hed takes the "
+                       "--t-6xl ceiling now and the sixteenth size is real: a "
+                       "story title is a SENTENCE where an overture's is a "
+                       "name, so it cannot borrow the hero clamp the overture "
+                       "borrowed, and every other value in the rule — the "
+                       "5.2vw rate, the 1.12 leading, the -.022em — is the "
+                       "site\'s own. The same commit\'s first version also "
+                       "moved the leading to 1.06 and the rate to 6.2vw; both "
+                       "went red here, both were wrong, and both came out."},
             "css.font_weights": {
                 "value": len(set(re.findall(r"font-weight:\s*([^;]+);", css))),
                 "kind": "ceiling", "why": "Four is enough for an editorial system."},
