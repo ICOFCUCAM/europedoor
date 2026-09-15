@@ -6519,6 +6519,43 @@ def category_page(data, cat, sub=None):
                          f'sum to {sum(counts.values())} against {len(chosen)}.</p>')
 
     countries = sorted({it["country"]["name"] for it in chosen})
+    # REACH IS THE ARGUMENT AND IT WAS A NUMBER IN A GREY LINE.
+    #
+    # `docs/signature-moments.md` refuses GEOGRAPHY on this family and the
+    # reason survives re-checking: 48 dots scattered over Europe would say
+    # "food is everywhere", which is true and is not an insight. That
+    # refusal is about the forty-eight DOTS, and it is kept — nothing here
+    # plots an experience.
+    #
+    # What is drawn instead is the thing this page's own code already claims
+    # is its offer, four hundred lines up: "the country leads, because the
+    # SPREAD ACROSS EUROPE is the offer on this family". Measured, that
+    # spread is the one quantity that separates the eight categories:
+    #
+    #     Luxury       5 experiences   2 countries
+    #     Nature      28              18
+    #     History     30              21
+    #     Faith       42              23
+    #     Food        48              26
+    #     Culture     52              27
+    #     Family     131              42
+    #     Adventure  124              44
+    #
+    # Two countries against forty-four is not "everywhere". It is the same
+    # argument /themes was rebuilt around — a knot is a claim about one
+    # corner of Europe and a scatter is one about the whole of it — and it
+    # is drawn with that family's own component rather than a new one.
+    #
+    # AT THE FULL EXTENT, NEVER FRAMED. Eight categories are only comparable
+    # while every one is drawn on the same Europe; framing each on its own
+    # members would delete the comparison, which is exactly why /themes is
+    # not framed and the nine macro regions are.
+    #
+    # COUNTRIES, NOT DOTS, and that is the second half of keeping the
+    # refusal. The homepage tiles and /themes light DESTINATIONS on this
+    # silhouette; this lights whole countries, which is what the sentence
+    # under it claims and all it claims.
+    reach = sorted({it["country"]["slug"] for it in chosen})
     title = sub["name"] if sub else cat["name"]
     path = urls.subcategory(cat["slug"], sub["slug"]) if sub else urls.category(cat["slug"])
     trail = [("Europe", "/discover"), ("Experiences", "/experiences")]
@@ -6564,9 +6601,14 @@ def category_page(data, cat, sub=None):
      60px h1 at y=212 with the extent under it. The three roles are what the
      reader is doing, and an index's extent sits beside its name so the set
      starts sooner. Measured across the twenty-two families: 538 to 347. -->
-<div class="pagehead index">
+{constel_defs()}
+<div class="pagehead index reachhead">
   <p class="kicker">{esc(cat['name']) if sub else 'Experience category'}</p>
   <h1>{esc(title)}</h1>
+  <div class="reach">
+    {region_glyph(reach)}
+    <p class="reachnote">{esc(and_list([c for c in countries]) if len(countries) < 4 else f"{len(countries)} of Europe's {len(data['countries'])} countries")}, filled. Nothing here plots an experience: the spread is the offer and a dot per invitation would only say it is everywhere. {geo.sources_line(geo.load("europe-lod0.json"))}</p>
+  </div>
   <!-- `.lede`, not `.statement`. An index head places its extent beside the
        name in column two, row two, and the display-size statement is
        three lines to the h1's one — so the row grew to 128px and pushed the

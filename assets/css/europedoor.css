@@ -4095,6 +4095,65 @@ body[data-hero] .masthead { position: sticky; }
   .pagehead.index .lede { grid-column: 2; grid-row: 2; margin: 0;
                           align-self: start; }
 }
+/* REACH, DRAWN, ON THE ONE FAMILY WHOSE OFFER IS THE SPREAD.
+ *
+ * The first-class audit calls the experience category page the
+ * worst-composed page in the product: no visual element anywhere on it, at
+ * any width, at any scroll position — a database printout. Two rebuilds
+ * since then gave it the invitation as its unit and the sub-category shares
+ * as a bar, and both were right; what it still had no answer for is that
+ * its own stated offer, the spread across Europe, was a figure in a grey
+ * line.
+ *
+ * `docs/signature-moments.md` refuses geography here and the refusal is
+ * KEPT rather than overruled: forty-eight dots would say "food is
+ * everywhere", which is true and is not an insight. Countries are not dots.
+ * Luxury lights two of fifty and Adventure forty-four, and that comparison
+ * only exists while all eight are drawn at the same extent — which is why
+ * this glyph is unframed and the nine macro regions are framed.
+ *
+ * A GLYPH, NOT A WINDOW. Six index families already open on the same arch
+ * in the same position and two of them were removed for it: an index
+ * opening that is a continent with a different number of marks on it is not
+ * a different opening. So no `.iheroart`, no aperture, no sea panel — the
+ * /themes treatment, which is a mark on the page's own paper.
+ *
+ * AND THE DATA CUT FADES INTO THE PAGE, NOT INTO THE ATLANTIC. `.datacut
+ * stop` is `--atlas-sea`, which is right where the land dissolves into
+ * water on a picture plate and paints a navy wash across a bare glyph on
+ * limestone. `.minemap` already answers this the same way. Third family to
+ * need it; the rule is the ground the drawing is standing on.
+ *
+ * IT IS PLACED AFTER THE INDEX ROLE'S OWN MEDIA QUERY, because it varies
+ * it. The first version sat above that query at equal specificity, so the
+ * base rule won on every count and the lede rendered on top of the map. */
+.reachhead .reach { display: grid; gap: var(--s2); justify-items: start; }
+.reachhead .reach .constel { width: 100%; max-width: 22rem;
+                             fill: var(--atlas-far); }
+.reachhead .datacut stop { stop-color: var(--paper); }
+.reachhead .reachnote { font-size: var(--t-xs); color: var(--ink-3);
+                        max-width: 36ch; margin: 0; }
+@media (min-width: 62rem) {
+  /* FOUR ROWS, NAMED, AND THE SLACK GOES IN THE LAST ONE. A cell spanning
+     every row distributes its height across all of them, so the drawing
+     being taller than the type opened a 250-pixel hole between the name and
+     the extent — the same mechanic that once dropped /beyond-the-obvious's
+     title sixty pixels below its own kicker, two rules up this file. */
+  .pagehead.index.reachhead { grid-template-columns: minmax(0, 1.05fr) minmax(0, 22rem);
+                              grid-template-rows: auto auto auto 1fr;
+                              align-items: start; }
+  /* The lede and the extent come back under the name in column one, because
+     column two is now carrying the picture. A variant that adds an element
+     has to say where the ones it displaces go, or they land on top of it.
+     AND IT MUST OUT-SPECIFY WHAT IT DISPLACES: `.pagehead.index .lede` is
+     three classes and `.reachhead .lede` is two, so the first version lost
+     and the lede rendered on top of the map. That is the collision this
+     stylesheet has now recorded four times. */
+  .pagehead.index.reachhead .lede   { grid-column: 1; grid-row: 3; max-width: 52ch; }
+  .pagehead.index.reachhead .orient { grid-column: 1; grid-row: 4; align-self: start; }
+  .pagehead.index.reachhead .reach  { grid-column: 2; grid-row: 1 / -1;
+                                      align-self: start; }
+}
 
 /* THE REVEAL — the cut edge of the aperture.
    "Light wall, dark opening" is the whole reading of the door, and it only
