@@ -2015,7 +2015,32 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .navutil a:hover { color: var(--door); border-bottom-color: var(--door); }
 .navsearch { color: var(--door); }
 .navsearch span { font-size: 1.1em; line-height: 1; }
-@media (max-width: 60rem) { .masthead-in { flex-wrap: wrap; } }
+/* A MASTHEAD WORSE IN THE MIDDLE OF ITS RANGE THAN AT EITHER END. Below
+   60rem it was a flex row told to wrap, which orders its three items and
+   lets them fall where they fit — so the utility links landed BETWEEN the
+   wordmark and the navigation. Measured on a country page:
+
+       704px   89px   the phone grid: wordmark and util, then nav
+       760px  170px   three rows, every one of them left-aligned
+       834px  113px   nav beside the wordmark, util orphaned below it
+       900px  113px
+      1024px   57px   one row, util at the right
+
+   Three times the desk height at 760, on every page, in the band that is
+   every tablet in portrait and every laptop in a split window. The phone
+   already knows the answer — brand and util on one row, nav on the next —
+   and the only reason this band did not use it is that the phone's block
+   also hides the links the thumb bar carries, which there is no thumb bar
+   to carry here. The AREAS are what this band needs; the rest stays at
+   44rem where it belongs. */
+@media (max-width: 60rem) {
+  .masthead-in { display: grid; grid-template-columns: minmax(0, 1fr) auto;
+                 grid-template-areas: "brand util" "nav nav";
+                 align-items: center; gap: var(--s2) var(--s4); }
+  .masthead-in .wordmark { grid-area: brand; }
+  .masthead-in .navutil  { grid-area: util; justify-self: end; }
+  .masthead-in .nav      { grid-area: nav; flex-wrap: wrap; row-gap: var(--s2); }
+}
 
 /* ── the small map on a destination page ──────────────────────────── */
 .minimap {
