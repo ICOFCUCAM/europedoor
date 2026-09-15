@@ -44,10 +44,10 @@ on:
   workflow_dispatch:
     inputs:
       stage:
-        description: "discover (search and list), acquire (one id) or batch (a list)"
+        description: "discover (search and list), acquire (one id), batch (an approved list) or fill (every empty surface, planned here)"
         required: true
         type: choice
-        options: [discover, acquire, batch]
+        options: [discover, acquire, batch, fill]
         default: discover
       provider:
         description: "the acquisition provider — only ones the licence gate clears"
@@ -83,6 +83,11 @@ on:
       batch:
         description: "batch only: JSON array of {purpose, photo_id, alt}"
         required: false
+        type: string
+      take:
+        description: "fill only: how many surfaces this dispatch may fill, up to the cap"
+        required: false
+        default: "60"
         type: string
 
 permissions:
@@ -458,6 +463,119 @@ jobs:
             echo "The usual causes are a branch-protection rule requiring a"
             echo "review, or a conflict with ${{ github.ref_name }}."
           fi
+
+  # FILL THE LIBRARY, DISPATCHABLE. Everything after the plan is the batch
+  # job's own machinery — `batch.sh` runs `acquire.py` once per entry, keeps
+  # going past a refusal that is about one candidate, and stops on one a next
+  # candidate would hit too. What is new here is only that the PLAN is built
+  # inside the run, where the key is, instead of being approved in a browser
+  # and pasted in.
+  #
+  # NOTHING LOOKS AT THESE PHOTOGRAPHS BEFORE THEY LAND, and that is named
+  # rather than glossed. Every gate still runs: fetch by the planned id, the
+  # id verified against the request, the original kept and hashed, the ladder
+  # derived without upscaling, provenance complete, the licence gate, the
+  # credential scan, the static suite and the browser suite. None of them can
+  # say whether a gondola is the right opening for the Grand Tour. The pull
+  # request carries the rendered page and is the record.
+  fill:
+    if: ${{ inputs.stage == 'fill' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate the dataset
+        run: python3 tools/build.py check
+
+      - name: Plan the tranche
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          TAKE: ${{ inputs.take }}
+        run: |
+          set -euo pipefail
+          python3 scripts/images/fill.py \
+            --provider "${{ inputs.provider }}" \
+            --take "${TAKE:-60}" \
+            --out /tmp/plan.json
+          python3 - <<'PY' > /tmp/plan.tsv
+          import json
+          for row in json.load(open("/tmp/plan.json")):
+              print(row["purpose"], row["photo_id"], row["alt"], sep="\t")
+          PY
+          echo "planned $(wc -l < /tmp/plan.tsv) surfaces"
+
+      - name: Acquire every one of them
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        run: |
+          set -euo pipefail
+          bash scripts/images/batch.sh "${{ inputs.provider }}" \
+            /tmp/plan.tsv /tmp/skipped.tsv | tee /tmp/batch.log
+          tail -2 /tmp/batch.log >> "$GITHUB_ENV"
+
+      # THE TRANCHE IS PUSHED BEFORE THE GATES RUN, AND THAT IS THE WHOLE
+      # LESSON OF RUNS 24 TO 28.
+      #
+      # Those five dispatches acquired, verified, hashed, derived and
+      # registered hundreds of photographs — the log of run 28 reads "every
+      # registered photograph still hashes to what was recorded (372)" — and
+      # every one of them was thrown away, because the last gate in the list
+      # failed on a sentence in CLAUDE.md that said "147 pages". A prose
+      # check about documentation, discarding a day of acquisition, five
+      # times, with nothing pushed and nothing to resume from.
+      #
+      # `batch.sh` already learned this at the level of ONE candidate: run
+      # 23 lost eighteen finished acquisitions to a nineteenth that was a
+      # PNG, and the answer was that a judgement about one candidate must
+      # not end the sitting. This is the same failure one level up, where
+      # the thing ending the sitting is not even about a photograph.
+      #
+      # So the branch is pushed first and the gates run against it. A red
+      # gate now costs a pull request somebody has to fix, which is
+      # recoverable and visible; it used to cost the whole tranche, which is
+      # neither. The merge step still requires the gates to have passed, so
+      # nothing reaches the default branch unchecked — what changed is only
+      # that the WORK survives a failure.
+      - name: Rebuild and register
+        run: |
+          set -euo pipefail
+          python3 tools/build.py
+          python3 tools/invariants.py --check || python3 tools/invariants.py --write
+          python3 tools/section-audit.py --write
+          python3 tools/ux-audit.py --write
+          python3 tools/content-report.py --write
+
+      - name: Refuse to commit anything credential-shaped
+        run: python3 tools/photo-tests.py --committed-only
+
+      - name: Push the tranche before anything can discard it
+        run: |
+          set -euo pipefail
+          git config user.name  "europedoor-photograph"
+          git config user.email "noreply@europedoor.com"
+          branch="photographs/fill-$(date -u +%Y%m%d-%H%M%S)"
+          echo "BRANCH=$branch" >> "$GITHUB_ENV"
+          git checkout -b "$branch"
+          git add -A
+          git commit -m "Fill the library: ${took:-0} photographs, ${skipped:-0} skipped
+
+          Planned inside the run from the declared purposes, round-robin
+          across families, the provider's first result per surface that meets
+          the slot and carries the photographer's own description. Every
+          acquisition fetched by id, id verified, original kept and hashed.
+
+          Nothing looked at these photographs before they landed. The
+          rendered pages are in this pull request, which is the record."
+          git push -u origin "$branch"
+
+      - name: Gate what was pushed
+        run: |
+          set -euo pipefail
+          python3 tools/invariants.py --check
+          python3 tools/checks.py
 
   batch:
     if: ${{ inputs.stage == 'batch' }}

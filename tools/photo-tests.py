@@ -376,6 +376,34 @@ def main(argv):
     check("and the slug this actually failed on is forty characters",
           len(SLUG) == 40, f"it is {len(SLUG)}")
 
+    # AND A PLACE IS DECLARED WITH SLASHES AND WRITTEN WITH UNDERSCORES,
+    # WHICH IS WHAT STOPPED FIVE REAL ACQUISITIONS.
+    #
+    # The registry declares `austria/salzburg-and-the-lakes/salzburg/
+    # hohensalzburg`; a file stem cannot hold a slash, so the register
+    # writes `austria__salzburg-and-the-lakes__salzburg__hohensalzburg`.
+    # The scan split the registry's target on every non-word character, so
+    # the declared identifier became four short tokens and none of them was
+    # collected, while the stem arrived as one 56-character run with
+    # nothing to match it against. Run 26 registered 2,201 photographs,
+    # passed every other gate and died on 86 of these; nothing was pushed,
+    # so all of it was lost, five dispatches running.
+    #
+    # ONE NORMALISER, BOTH SIDES — the planner's diacritics rule, in a
+    # credential scan, with separators instead of accents. Asserted on the
+    # real ones, because the thing that broke was real.
+    for real in ("austria__salzburg-and-the-lakes__salzburg__hohensalzburg",
+                 "albania__tirana-and-the-south__gjirokaster",
+                 "austria__salzburg-and-the-lakes__salzburg__mirabell-gardens"):
+        body = f'"file": "place-hero@{real}"'
+        check(f"a place stem is an identifier, not a credential ({len(real)} chars)",
+              not credential_shaped(body, next(keyish.finditer(body))), real)
+    # AND THE SLASHED SPELLING IS STILL ONE. Normalising must work in both
+    # directions or it has only moved which side is wrong.
+    body = '"key": "place:austria/salzburg-and-the-lakes/salzburg/hohensalzburg"'
+    check("and so is the spelling the registry itself declares",
+          not any(credential_shaped(body, m) for m in keyish.finditer(body)))
+
     # AND AN UNDECLARED SLUG IS NOT ONE. The exclusion is a lookup in the
     # registry, not a judgement about shape, so a token that merely LOOKS
     # like one of this product's identifiers is still refused.
@@ -1341,6 +1369,51 @@ def main(argv):
         check("and it stopped rather than carrying on to the next entry",
               "door-history" not in out.split("not about one candidate")[0]
               .split("door-food")[-1])
+
+        # ── THE FILL STAGE PLANS AND NEVER ACQUIRES ──────────────────
+        #
+        # `fill.py` is the hosted desk's own button, moved into the workflow
+        # so it can be dispatched without a browser. Its whole job is to
+        # write a PLAN: it must not download, must not register, and must
+        # not name a photograph twice — the register refuses one id against
+        # two purposes at the far end, so a plan containing such a pair
+        # wastes the tranche it exists to collect.
+        planj = os.path.join(tempfile.gettempdir(), "ed-fill-plan.json")
+        before_reg = open(REGISTER, encoding="utf-8").read()
+        r = sh([sys.executable, "scripts/images/fill.py", "--provider", "pexels",
+                "--take", "6", "--out", planj], env)
+        out = r.stdout + r.stderr
+        check("fill plans a tranche against the provider", r.returncode == 0,
+              out[-600:])
+        rows = json.load(open(planj, encoding="utf-8")) if os.path.exists(planj) else []
+        check("and it wrote a plan the batch loop can read",
+              bool(rows) and all({"purpose", "photo_id", "alt"} <= set(x) for x in rows),
+              repr(rows[:2]))
+        check("no purpose is planned twice",
+              len({x["purpose"] for x in rows}) == len(rows))
+        check("no provider id is planned twice — the register refuses that pair",
+              len({x["photo_id"] for x in rows}) == len(rows))
+        check("every planned entry carries the photographer's own description",
+              all(x["alt"].strip() for x in rows))
+        # THE REGISTER AND THE WORKING TREE ARE UNTOUCHED. Planning is a
+        # decision about what to ask for; `acquire.py` is the only thing
+        # here that may write one down. UNTOUCHED MEANS UNCHANGED RATHER
+        # THAN EMPTY — the desk suite already had to learn that, the day
+        # eleven photographs merged.
+        check("planning writes nothing into the register",
+              open(REGISTER, encoding="utf-8").read() == before_reg)
+        # AND IT REFUSES A SURFACE THAT ALREADY HOLDS ONE. Re-offering a
+        # filled surface is proposing to replace a photograph somebody
+        # accepted, which is a different act.
+        _held = set()
+        for _k, _row in json.loads(before_reg).get("images", {}).items():
+            _held.add(_row.get("purpose") or _k)
+        check("and it never plans a surface the register already holds",
+              not ({x["purpose"] for x in rows} & _held),
+              f"held={sorted(_held)[:4]}")
+        check("the fill stage runs the same loop rather than a second one",
+              "scripts/images/fill.py" in wf and
+              wf.count("scripts/images/batch.sh") >= 2)
 
         check("the workflow calls the one loop rather than holding a copy",
               "scripts/images/batch.sh" in wf)

@@ -184,9 +184,38 @@ def credential_shaped(body, m, stems=()):
         before = body[max(0, m.start() - 40):m.start()]
         if "sha256" in before or "hash" in before:
             return False
-    if tok in declared_slugs():
+    if tok in declared_slugs() or _canon(tok) in declared_slugs():
         return False
     return True
+
+
+def _canon(tok):
+    """One spelling for an identifier, whatever separator wrote it.
+
+    THE REGISTRY DECLARES A PLACE AS `austria/salzburg-and-the-lakes/
+    salzburg/hohensalzburg` AND THE REGISTER WRITES IT AS
+    `austria__salzburg-and-the-lakes__salzburg__hohensalzburg`, because a
+    file stem cannot contain a slash. The scan splits on everything that is
+    not a word character, so the registry's four-part target became four
+    short tokens — none of them long enough to collect — while the file stem
+    arrived as ONE 56-character run with nothing to match it against.
+
+    That is what stopped runs 24 to 28. Run 26 fetched, verified, hashed,
+    derived and registered **2,201 photographs** across every family, passed
+    every other gate, and died on 86 identical failures naming place slugs:
+    Hohensalzburg, Gjirokastër, the Mirabell Gardens. Nothing was pushed, so
+    all of it was thrown away — five times, which is why this product has
+    eleven photographs against 837 declared surfaces.
+
+    THE RULE IS ONE NORMALISER, BOTH SIDES. The planner's own diacritics fix
+    records that sentence: it lowercased the sentence and not the names, so
+    a quarter of the atlas could not be typed into it. Same failure, in a
+    credential scan, with separators instead of accents. A hyphen is kept
+    because it is inside the declared identifier; everything else that can
+    separate one becomes a single underscore, on the token and on the
+    registry alike, so the two are compared in the same alphabet.
+    """
+    return re.sub(r"[^A-Za-z0-9-]+", "_", tok).strip("_")
 
 
 _SLUGS = None
@@ -209,10 +238,18 @@ def declared_slugs():
         if os.path.exists(f):
             doc = json.load(open(f, encoding="utf-8"))
             for row in doc.get("purposes", []):
-                text = " ".join(str(row.get(k) or "")
-                                for k in ("purpose", "path", "target", "key"))
-                _SLUGS |= {t for t in re.split(r"[^A-Za-z0-9_-]+", text)
-                           if len(t) >= 40}
+                for k in ("purpose", "path", "target", "key"):
+                    text = str(row.get(k) or "")
+                    if not text:
+                        continue
+                    # THE WHOLE IDENTIFIER, NOT ONLY ITS PARTS. Splitting
+                    # first threw away exactly the thing a file stem is: one
+                    # run with the separators removed.
+                    whole = _canon(text)
+                    if len(whole) >= 40:
+                        _SLUGS.add(whole)
+                    _SLUGS |= {t for t in re.split(r"[^A-Za-z0-9_-]+", text)
+                               if len(t) >= 40}
     return _SLUGS
 
 

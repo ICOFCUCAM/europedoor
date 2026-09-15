@@ -3561,6 +3561,136 @@ that looks like a beam somebody left on. **On a dark map a shore band is a
 shadow, not a highlight** — the lit-aura failure this stylesheet already
 records, arrived at from the other side.
 
+**THE 2036 PAGE SYSTEM: EIGHT FAMILIES, ONE GRAMMAR, AND NOT FORTY-SEVEN
+REDESIGNS.** The owner's brief makes the finding this repository had already
+half-made — several families had converged on kicker → h1 → lede → rows — and
+draws the right conclusion from it: build eight rooms and map every page into
+one, so the site reads as one institution rather than as forty-seven
+templates. Atlas, Arrival, Discovery, Journey, Editorial, Time, Instrument,
+Institutional.
+
+**THE FAMILY IS DERIVED FROM THE ROUTE, so no page builder changed.**
+`render.ed_family(path)` is one table. Forty-seven builders each passing a
+family string is forty-seven chances for two pages in one family to disagree,
+which is the failure this repository already has recorded about the fourteen
+call sites that forgot to pass a motif — and a family is what a route IS:
+`/europe/<c>/<r>/<city>` is an arrival because of where it sits. Order
+matters twice, because `/discover/` is Discovery and `/discover/<macro>` is a
+macro region, and `/experiences/<cat>/<sub>` is Time while
+`/experiences/<cat>` is Discovery.
+
+**THE PRIMITIVES ARE THE BRIEF'S AND THE DEPARTURES ARE MEASURED.** Three of
+them:
+
+| | |
+|---|---|
+| `ed_photo` returns the drawing, never "" | the brief's version returns an empty string with no photograph, which would leave 826 of 837 surfaces as a hole. *A slot waiting for a picture is honest and three hundred pixels of one is a hole* — already measured, on the homepage doors |
+| `ed_rows` derives the number | the brief passes `number` per row, and a figure typed into data is the figure that was true two hundred destinations ago |
+| `ed_photo` takes a register key, never a URL | `picture()` is the one function that knows whether the register holds one; a component that took `src` would be a second way into the library with none of the licence gate behind it |
+
+**FOUR NEW TYPE VALUES FOR EIGHT FAMILIES, WHERE THE BRIEF WRITES NINE
+CLAMPS.** Each of its components carries its own, a few pixels from its
+neighbour — and nine arbitrary clamps is a second type scale wearing the
+first one's clothes, which is how the sibling repository reached 418 font
+sizes. `--ed-display-1` is every opening, hero and institutional head;
+`--ed-display-2` every section title, split and arrival; `--ed-display-3`
+every row and route stop; `--ed-read` the standfirst under all of them. **No
+new breakpoint**: the brief's 850 and 520 are 52rem and 44rem, which this
+stylesheet already has, and the register refused a seventh once. **No new
+line-height**: the eight the site had already cover it.
+
+**THE `--ed-*` LAYER IS ONE-DIRECTIONAL AND A CHECK PROVES IT.** The brief
+writes its components against `--ed-` names and this stylesheet's register
+refuses a second NAME for a colour — *a second name for one colour is two
+colours waiting to disagree*, which is why `--atlas-context` was deleted. It
+refuses an unresolvable `var()` harder still. Between those two, an alias
+that can be PROVED not to diverge is the smaller fault: every `--ed-` colour
+is a bare `var()` of a registered token and never a literal. **On `body`
+rather than `:root`**, because a `var()` resolves where the declaration lives
+and the world tokens are set on `body[data-world]` — the `accent-color` bug,
+forty lines from the note about it.
+
+**AND THE PRIMITIVE FLOORS ARE ON THE PROMISE RATHER THAN THE CLASS NAME.**
+`ed-opening` is a page head, `ed-arrival` is a page head, `ed-journey-hero`
+is a page head, `ed-eyebrow` is a kicker, `ed-row` is a row. A floor counting
+only the old spelling read the migration as *a page family has grown its own
+components* — which is the exact thing it exists to catch, reported about a
+page that had just stopped doing it. Three head checks and one reach check
+had to learn it, one family at a time, each discovered by a build failing on
+fifty or three hundred pages at once.
+
+**THE THIRTEENTH AND FOURTEENTH SHAPES PINNED.** §13 required
+`class="statement"` on a destination and §17 on a journey — and both went red
+for compositions that do MORE of what they protect, the arrival band and the
+cobalt hero. Both measure document order now: the place's own sentence before
+any metadata, the strapline before the numbers. Proved red.
+
+**AND THE INVARIANT FAILURE MESSAGE LEADS WITH THE MEASUREMENT AGAIN.**
+`primitives.reach` carries every deliberate move that figure has ever made,
+correctly, and printed all four thousand words of it on each of sixteen
+sub-keys: a run reporting three one-page migrations printed twelve thousand
+words, and the three numbers that diagnose it were in the first line of each.
+*A failure message with no measurement in it cannot be diagnosed*, and the
+corollary is that a measurement buried in an essay is not in the message
+either.
+
+**THE LIBRARY HAS ELEVEN PHOTOGRAPHS BECAUSE A CREDENTIAL SCAN COULD NOT
+SPELL A PLACE, AND FIVE ACQUISITIONS WERE THROWN AWAY ONE AFTER ANOTHER.**
+
+Runs 24 to 28 were dispatched by the owner and every one of them failed. They
+were not failing to acquire: run 26's own log reads *"every registered
+photograph still hashes to what was recorded (2,201)"* and *"a registered
+photograph appears on the page its purpose claims (1,136)"*. It fetched,
+verified by id, hashed, derived the ladder, completed the provenance and
+passed every gate on the list — and then died on **86 identical failures**,
+all of them the pre-commit credential scan, naming place slugs:
+
+    austria__salzburg-and-the-lakes__salzburg__hohensalzburg    56 chars
+    albania__tirana-and-the-south__gjirokaster                  42
+    austria__salzburg-and-the-lakes__salzburg__mirabell-gardens 59
+
+**The registry declares a place with SLASHES and a file stem cannot hold
+one.** `desk/registry.json` has
+`austria/salzburg-and-the-lakes/salzburg/hohensalzburg`; `derive.py` writes
+`austria__salzburg-...`. The scan split the registry's target on every
+non-word character, so the declared identifier became four short tokens and
+not one of them reached the forty-character floor to be collected — while the
+stem arrived as a single 56-character run with nothing to match it against.
+The exclusion was a lookup, correctly, and the two sides were written in
+different alphabets.
+
+**THE RULE IS ONE NORMALISER, BOTH SIDES.** That sentence is already in this
+file, about the planner: it lowercased the sentence and not the names, so a
+quarter of the atlas could not be typed into its own search box. Same fault,
+in a credential scan, with separators instead of accents. Fourth time this
+one rule has stopped a real acquisition, and the first where the two
+disagreeing copies were a *separator*.
+
+**AND THE TRANCHE IS PUSHED BEFORE THE GATES RUN NOW.** `batch.sh` learned
+this at the level of one candidate — run 23 lost eighteen finished
+acquisitions to a nineteenth that was a PNG — and the same failure one level
+up cost thousands, where the thing ending the sitting was not even about a
+photograph: run 28 died on a sentence in `CLAUDE.md` that said *"147 pages"*,
+a prose check about documentation discarding a day of acquisition. A red gate
+costs a pull request somebody has to fix, which is recoverable and visible; it
+used to cost the whole sitting, which is neither. The merge step still
+requires the gates, so nothing reaches the default branch unchecked — what
+changed is that the WORK survives a failure.
+
+**`stage: fill` IS THE DESK'S OWN BUTTON, DISPATCHABLE.** The hosted Media
+Desk has had *Fill the library* since the basket was built and it works; it
+is also a second Vercel project somebody has to be signed in to, and eleven
+photographs against 837 surfaces says nobody pressed it fourteen times.
+`scripts/images/fill.py` is that decision inside the workflow, where the key
+is: it reads the registry, takes the empty surfaces round-robin across
+families, searches, and writes a PLAN. It does not download, does not hash,
+does not register and does not build a derivative — `acquire.py` does all of
+that and `batch.sh` runs it once per entry. `photo-tests.py` asserts the
+boundary: a plan with no purpose twice, no provider id twice, every entry
+carrying the photographer's own description, no surface the register already
+holds, and **the register and the working tree unchanged**, because planning
+is deciding what to ask for and only the acquisition may write one down.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
@@ -3579,7 +3709,8 @@ the rest.
     python3 tools/invariants.py --check       what a visual change may not move
     python3 tools/plate-variation.py --check  the plates have not got more alike
     python3 tools/photo-tests.py              the acquisition pipeline
-                                              and its batch loop, against a stub provider
+                                              its batch loop and its fill planner,
+                                              against a stub provider
     python3 tools/desk-tests.py               the Media Desk: the sign-in, and what the browser may send
     node tools/hosted-desk-tests.js           the HOSTED desk: signed sessions, signed thumbnails, the dispatch
     node tools/desk-render.js                 the HOSTED desk's screens and its basket, at 1280 and 390
