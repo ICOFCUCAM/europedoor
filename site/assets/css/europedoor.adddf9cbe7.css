@@ -7638,7 +7638,15 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
   margin-inline: auto;
   min-height: min(78vh, 820px);
   display: grid;
-  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
+  /* `minmax(0, ...)` LETS A TRACK SHRINK BELOW ITS CONTENT, and at 108px
+     that is how "Kunsthistorisches Museum" came out as "Kunsthistoris /
+     ches Museum". The h1 asks for `min-width: min-content` — the fix this
+     stylesheet already recorded, a `ch` being the width of a zero — and an
+     explicit 0 floor on the track overrules it, so the box could not grow
+     and the browser broke the word instead. `auto` is the min-content
+     floor; the picture keeps an 18rem floor of its own so a long name
+     cannot squeeze it away. A place name is never broken. */
+  grid-template-columns: minmax(auto, .82fr) minmax(18rem, 1.18fr);
   gap: clamp(2rem, 6vw, 6.25rem);
   align-items: center;
   padding-block: clamp(4.5rem, 10vw, 9.375rem) clamp(4rem, 8vw, 7.5rem);
@@ -8438,3 +8446,51 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
 .pagehead.index.ed-opening h1 { margin: 0 0 var(--s6); }
 .pagehead.index.ed-opening .lede { margin-top: 0; }
 .pagehead.index.ed-opening .iherofoot { margin-top: var(--s6); display: grid; gap: var(--s5); }
+
+/* =========================================================
+   THE TWO REMAINING HEAD ROLES TAKE THE SYSTEM'S TYPE
+   =========================================================
+   Nine call sites still emit a bare `.pagehead overture` or `.pagehead
+   index`: a month, a macro region, a facet, an interest, a motion, an
+   experience kind, the quiet index. They are not wrong shapes — an
+   overture is one thing and an index is a set, which is the distinction
+   the three roles exist to draw — but they were sized for the old scale,
+   so a reader met a 60px h1 after a 108px one and read it as a smaller
+   page rather than as a different kind.
+
+   The ROLE keeps its composition and takes the system's type. An index
+   still puts its extent beside the name and an overture still opens on a
+   narrow measure with air above it; both do it at the size the rest of the
+   site now speaks at. No new head, no new role, and the three assertions
+   that read these classes are untouched. */
+.pagehead.overture:not(.ed-opening) > h1,
+.pagehead.index:not(.ed-opening) > h1 {
+  font-size: var(--ed-display-1); line-height: .96; letter-spacing: -.04em;
+}
+.pagehead.overture:not(.ed-opening) > .kicker,
+.pagehead.index:not(.ed-opening) > .kicker {
+  font-family: var(--ed-mono); letter-spacing: .16em;
+}
+.pagehead.overture:not(.ed-opening) > .lede,
+.pagehead.index:not(.ed-opening) > .lede {
+  font-size: var(--ed-read); line-height: 1.5;
+}
+
+/* "KUNSTHISTORIS / CHES MUSEUM" — A NAME BROKEN MID-WORD, at the one size
+   where it is unmissable. `.overture h1` carries `min-width: min-content`,
+   which is the fix this stylesheet already recorded for exactly this: a
+   `ch` is the width of a zero, so a 14ch measure is narrower than
+   Elbphilharmonie and the last glyph dropped onto a line of its own. It
+   held at 60px and stopped holding at 108: min-content is computed from the
+   longest word AT THE CURRENT SIZE, and the display step made that word
+   wider than the column the grid gives it, so the box could not grow and
+   the browser broke the word instead.
+   The measure widens with the type — 14ch of a 108px face is a different
+   length from 14ch of a 60px one — and `overflow-wrap: normal` says
+   plainly that a place name is never broken. Where it still cannot fit, it
+   wraps between words and the h1 takes three lines, which is what a
+   magazine does with a long name. */
+.pagehead.overture:not(.ed-opening) > h1 {
+  max-width: min(100%, 18ch); overflow-wrap: normal; hyphens: none;
+}
+.ed-opening h1 { min-width: min-content; overflow-wrap: normal; }
