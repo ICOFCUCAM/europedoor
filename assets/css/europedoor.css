@@ -5377,7 +5377,10 @@ body[data-hero] .masthead { position: sticky; }
      already reads as a table. The drawing does NOT grow: its width is
      capped by the page's own length, recorded below, and this costs no row
      height at all. */
-  .interestrow, .motionrow { align-items: center; gap: var(--s6); }
+  /* START, not centre, for the same reason the journey rows take it: a
+     three-line text block centred against a 230-pixel drawing puts the slop
+     at both ends, and a shared top edge reads as a decision. */
+  .interestrow, .motionrow, .themerow { align-items: start; gap: var(--s6); }
   .rowart .constel { width: 18rem; }
   /* AND THE MARK HAD TO COME DOWN AS THE DRAWING WENT UP. A radius in
      viewBox units is a radius in pixels at exactly one width: 22 units is
@@ -6021,7 +6024,7 @@ body[data-hero] .masthead { position: sticky; }
    is what makes a lead read as a lead. */
 .storyart .constel { width: 100%; max-width: 26rem; }
 @media (min-width: 64rem) {
-  .storylead { display: grid; grid-template-columns: 15rem minmax(0, 1fr);
+  .storylead { display: grid; grid-template-columns: 20rem minmax(0, 1fr);
                gap: 0 var(--s5); align-items: start;
                /* min-content, or the four type rows share the drawing's
                   height between them and the standfirst floats away from
