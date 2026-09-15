@@ -927,6 +927,11 @@ a .kicker { color: var(--ink-3); }
    Baseline-aligned, so the lede sits on the title's last line rather than
    floating against its cap height. */
 @media (min-width: 62rem) {
+  /* NOT WHERE A DRAWING ALREADY HAS THE RIGHT-HAND COLUMN. `.bandtop` puts
+     the head beside the band's own map, so splitting the head as well makes
+     three columns of content in a band that has room for two, and the lede
+     ends up in a 200px gutter between a title and a picture. */
+  .bandtop .band-head { display: block; }
   .band-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
                column-gap: var(--s7); align-items: baseline; }
   .band-head .stage { grid-column: 1; }
@@ -5549,7 +5554,7 @@ body[data-hero] .masthead { position: sticky; }
    The head and the drawing sit side by side because the drawing is the
    band's subject rather than an illustration after it — the same reason the
    Stay layer puts its action and its boundary on one line. */
-.bandtop { display: flex; align-items: center; gap: var(--s6);
+.bandtop { display: flex; align-items: start; gap: var(--s6);
            margin-bottom: var(--s5); }
 .bandtop .band-head { flex: 1 1 auto; min-width: 0; margin-bottom: 0; }
 .bandart { flex: 0 0 auto; width: 400px; margin: 0; }
