@@ -2650,7 +2650,8 @@ def c_frontend():
     # family that drops the idea altogether still fails.
     FLOORS = {"kicker": 0.99, "masthead": 0.99, "pagehead": 0.99, "crumbs": 0.99,
               "row": 0.85, "card": 0.05, "band": 0.70, "note": 0.70}
-    ALSO = {"pagehead": ("ed-opening",), "kicker": ("ed-eyebrow", "ed-section-index"),
+    ALSO = {"pagehead": ("ed-opening", "ed-arrival"),
+            "kicker": ("ed-eyebrow", "ed-section-index"),
             "row": ("ed-row",), "band": ("ed-section",)}
     total = 0
     hits = {k: 0 for k in FLOORS}
@@ -5340,7 +5341,8 @@ def c_index_extent():
         # better. Both, joined, because a family mid-migration has one or the
         # other and the promise is about the page.
         head = (_element_text(h, "pagehead") + " "
-                + _element_text(h, "ed-opening"))
+                + _element_text(h, "ed-opening") + " "
+                + _element_text(h, "ed-arrival"))
         nums = {int(x) for x in re.findall(r"\b(\d{1,5})\b", head)}
         n += 1
         if size not in nums:
@@ -5626,7 +5628,12 @@ def c_pagehead_role():
             # body say what KIND of page this is, which is what the three
             # roles were a first approximation of. A page that carries one
             # is not a page with no head.
-            if re.search(r'class="ed-opening ed-family-([a-z]+)"', h):
+            # `ed-arrival` IS THE ARRIVAL FAMILY'S HEAD. The brief gives the
+            # destination pages a band rather than a stage — a photograph
+            # full-bleed with the name set into its foot — which is a head
+            # that happens not to be called one.
+            if re.search(r'class="ed-opening ed-family-([a-z]+)"', h) or \
+                    'class="ed-arrival"' in h:
                 n += 1
                 continue
             if r not in NO_HEAD:

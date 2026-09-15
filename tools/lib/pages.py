@@ -3236,17 +3236,17 @@ def region_page(data, c, r):
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)),
          (c["name"], urls.country(c)), (r["name"], None)])}
 {photoband}
-<div class="pagehead overture reghead">
-  <p class="kicker">{esc(c['name'])}</p>
-  <h1>{esc(r['name'])}</h1>
-  {statement(r['summary'])}
-  {regionmap(data, c, r)}
-  <div class="headmeta">
-    <p class="orient">{n_of(len(r["cities"]), "destination")} ·
-    {len(rplaces)} place{"s" if len(rplaces) != 1 else ""} recorded ·
-    about {n_of(int(pass_nights), "night")} to see it all</p>
-    {chips(r["interests"], data["interests"])}
-  </div>
+{ed_opening(
+    eyebrow=f"Travel region · {c['name']}",
+    title=r["name"],
+    intro=r["summary"],
+    visual=regionmap(data, c, r),
+    family="atlas")}
+<div class="headmeta ed-section">
+  <p class="orient">{n_of(len(r["cities"]), "destination")} ·
+  {len(rplaces)} place{"s" if len(rplaces) != 1 else ""} recorded ·
+  about {n_of(int(pass_nights), "night")} to see it all</p>
+  {chips(r["interests"], data["interests"])}
 </div>
 
 {section("Destinations", f'<div class="rows">{destrows}</div>')}
@@ -3499,26 +3499,26 @@ def city_page(data, c, r, t):
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)),
          (c["name"], urls.country(c)), (r["name"], urls.region(c, r)), (t["name"], None)])}
-<div class="pagehead overture arrivalhead">
-  <div class="arrivalsay">
-    <p class="kicker">{esc(r['name'])}, {esc(c['name'])}</p>
-    <h1>{esc(t['name'])}</h1>
-    {statement(t['summary'])}
-  </div>
-  <div class="placeband{'' if has_photo else ' maponly'}">
+<section class="ed-arrival">
+  <div class="ed-arrival-media{'' if has_photo else ' maponly'}">
     {photo_block}
     <div class="placeband-map">{minimap(data, t, span="auto", named=nearnamed)}</div>
-    <p class="sourcenote">{esc(t["name"])} is at <span class="mono">{coord_line(t)}</span>.</p>
   </div>
-  <section class="whygo" aria-labelledby="why-visit">
-    <h2 id="why-visit">Why go</h2>
-    <ol class="reasons">{reasons}</ol>
-  </section>
-  <div class="headmeta">
-    <p class="orient">{orient_line(t)}</p>
-    {chips(t["interests"], data["interests"])}
+  <div class="ed-arrival-copy">
+    <p class="ed-eyebrow">Arrival · {esc(c['name'])}</p>
+    <h1>{esc(t['name'])}</h1>
+    <p>{esc(t['summary'])}</p>
+    <p class="ed-arrival-where">{esc(r['name'])} — <span class="mono">{coord_line(t)}</span></p>
   </div>
+</section>
+<section class="ed-section" aria-labelledby="why-visit">
+{ed_section_head("01", "Understand", "Why go")}
+<ol class="reasons">{reasons}</ol>
+<div class="headmeta">
+  <p class="orient">{orient_line(t)}</p>
+  {chips(t["interests"], data["interests"])}
 </div>
+</section>
 {sectionnav([
     ("Overview", "why-visit"),
     ("Places", "places" if placerows else ""),

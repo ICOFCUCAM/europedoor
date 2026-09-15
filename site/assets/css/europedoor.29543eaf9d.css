@@ -7962,3 +7962,59 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
 .ed-opening-visual .plate { width: 100%; height: auto; }
 .ed-opening-visual .portrait svg { width: 100%; height: auto; }
 .ed-opening-visual .portrait { display: grid; gap: var(--s4); }
+
+/* THE ARRIVAL BAND'S OWN TYPE, on pine-deep rather than on paper.
+   The h1 is the page's name and the component styled only an h2, because
+   the brief's arrival is a section inside a page and this one IS the page.
+   The eyebrow is the one measurement here: terracotta is the architectural
+   family's accent and it reads 3.54 on pine-deep, under the 4.5 a label
+   needs — its lifted step is 5.49, which is the same relationship every
+   other accent has with the dark world and the reason those lifts exist. */
+.ed-arrival-copy h1 {
+  font-family: var(--ed-serif); font-weight: 400;
+  font-size: var(--ed-display-2); line-height: .96; margin: 0; max-width: none;
+}
+.ed-arrival-copy .ed-eyebrow { color: var(--terracotta-lift); }
+.ed-arrival-copy p { font-size: var(--ed-read); line-height: 1.5; }
+/* `.ed-arrival-copy p` IS (0,2,0) AND `.ed-arrival-where` IS (0,1,0), so
+   the reading size won and the coordinate line rendered at 24px. Later in
+   the file only decides a tie. The same fight this stylesheet has now lost
+   five times, and the fix is the same: say where the element is. */
+.ed-arrival-copy .ed-arrival-where {
+  font-family: var(--ed-mono); font-size: var(--t-xs); letter-spacing: .08em;
+  text-transform: uppercase; margin-top: var(--s5); line-height: 1.5;
+  color: color-mix(in srgb, var(--ed-paper) 70%, transparent);
+}
+/* AND THE MAP'S OWN CAPTIONS WERE PAPER INK ON PINE. Every figcaption on
+   this site is sized and coloured for a light page; the arrival band is the
+   first place a map figure sits on a dark ground, so the two lines that say
+   what the drawing is and where its coastline came from measured about
+   1.4:1. They are the band's own paper at 70 and 62 per cent — 8.9 and 7.9
+   on pine-deep — which is the same relationship a caption has with the page
+   everywhere else. */
+/* THE TWO TIERS ARE ON THE SPANS, not on the figcaption — `.capsay` is
+   what the picture IS and `.capsrc` is where it came from, each with its
+   own declared colour, so a rule on the container changes neither. The
+   caption note eight hundred lines up says exactly this and it still cost a
+   run to remember. */
+.ed-arrival-media :is(figcaption, .sourcenote, .sourcenote a, .capsrc, .capsrc a) {
+  color: color-mix(in srgb, var(--ed-paper) 72%, transparent);
+}
+.ed-arrival-media .capsay {
+  color: color-mix(in srgb, var(--ed-paper) 88%, transparent);
+}
+/* AND THE BAND'S FLOOR CUT THE DRAWING OFF. 620px is a photograph's height
+   and the media here is a map, a caption and a source note stacked: the
+   aperture's own foot fell below the fold of the band and `overflow:
+   hidden` removed it. A photograph is cropped to the slot because a slot is
+   a composition; a map is the thing itself, so where there is no photograph
+   the content sets the height. */
+.ed-arrival-media { position: relative; overflow: hidden; }
+.ed-arrival:has(.maponly) { min-height: 0; }
+.ed-arrival-media.maponly { min-height: 0; overflow: visible; }
+.ed-arrival-media :is(picture, img) { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* WITH NO PHOTOGRAPH THE MAP IS THE MEDIA, and it is the whole slot rather
+   than a strip: 826 of 837 surfaces hold no photograph today, so the state
+   this family actually ships in is the one that has to compose. */
+.ed-arrival-media.maponly { display: grid; place-items: center; padding: var(--s6); }
+.ed-arrival-media .placeband-map { width: 100%; }

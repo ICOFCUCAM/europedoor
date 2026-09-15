@@ -521,7 +521,19 @@ def s13():
     # regressed to a database record, and that is the specific failure the
     # design audit found on eleven of twelve families.
     h = page(u)
-    yield 'class="statement"' in h, "the authored sentence is set as the hero"
+    # AND IT PINNED THE CLASS RATHER THAN THE COMPOSITION. `.statement` was
+    # how the overture set an authored sentence large; the arrival band sets
+    # the same sentence inside `.ed-arrival-copy`, at the same weight, over
+    # a photograph — which is MORE of what this assertion is about, and it
+    # went red for it. The twelfth shape pinned here. The promise is the
+    # ordering: the place's own sentence comes before any metadata about it,
+    # so that is measured on the document rather than on a selector.
+    _h1 = h.find("<h1")
+    _say = h.find("<p", _h1) if _h1 > 0 else -1
+    _meta = min([i for i in (h.find('class="orient"'), h.find('class="facts"'),
+                             h.find('class="chips"')) if i > 0] or [len(h)])
+    yield _h1 > 0 and _say > _h1 and _say < _meta, \
+        "the authored sentence is set as the hero, before any metadata"
     yield ("Kind of place" not in h) or (h.index("Why go") < h.index("Kind of place")), \
         "the argument comes before the metadata"
     # Count the CLASS TOKEN, not the exact attribute: the locator gained
