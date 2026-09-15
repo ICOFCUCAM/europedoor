@@ -5417,6 +5417,12 @@ body[data-hero] .masthead { position: sticky; }
    maps already use. */
 .constel { fill: var(--atlas-land); stroke: none; }
 .constel .glyph-sea { fill: var(--atlas-sea); }
+/* The land outside what this atlas writes about, in the SAME tone as the land
+   inside it. The two abut along the 52°E cut, so one colour means there is no
+   seam to fade and the continent carries on to the frame edge instead of
+   ending in a knife-straight diagonal through Russia. */
+.constel .glyph-beyond { fill: var(--atlas-land); stroke: var(--atlas-land);
+                         stroke-width: 1.4; stroke-linejoin: round; }
 .constel .glyph-land { fill: var(--atlas-land); stroke: var(--atlas-land);
                        stroke-width: 1.4; stroke-linejoin: round; }
 /* Frontiers rather than a coast pass. A coastline in ink is invisible against

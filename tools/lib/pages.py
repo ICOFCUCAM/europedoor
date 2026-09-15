@@ -7408,9 +7408,23 @@ def constel_defs():
     # real frontiers, which is what makes the silhouette recognisable as
     # Europe in the first place. Thirteen theme glyphs and eleven homepage
     # tiles all got quieter and lighter for it.
+    # AND EUROPE IS NOT AN ISLAND. data/geo/ stops at 52°E, so every glyph at
+    # the full extent carried a knife-straight diagonal through Russia — the
+    # rendering fault the hero was rebuilt to remove, still shipping on the
+    # family with the most drawings. The same anonymous rings the hero uses,
+    # thinned harder for this size, in the LAND's own tone: the two abut along
+    # the cut, so with one colour there is nothing to fade and the continent
+    # simply carries on to the frame edge. 5 KB, emitted once per page and
+    # cloned by every glyph on it.
+    beyond = "".join(
+        f'<path d="{d}"/>' for d in geo.beyondmass(
+            MAPPROJ, (0.0, 0.0, float(MAP_W), float(MAP_H)),
+            thin_units=6.0, min_units=120.0, pad=0.0) if d)
     return ('<svg class="constel-defs" width="0" height="0" aria-hidden="true" '
             'focusable="false"><defs><g id="constel-eu">'
-            + ours + "</g></defs></svg>")
+            + ours + "</g>"
+            + (f'<g id="constel-beyond">{beyond}</g>' if beyond else "")
+            + "</defs></svg>")
 
 
 NUMWORDS = ("no", "one", "two", "three", "four", "five", "six", "seven",
@@ -7945,6 +7959,8 @@ def constellation(pts, extra="", route=False, frame=False, cut=False,
     ground = (f'<rect class="glyph-sea" x="{vx:.0f}" y="{vy:.0f}" '
               f'width="{vw:.0f}" height="{vh:.0f}"/>') if ocean else ""
     bounds = '<use class="glyph-bounds" href="#constel-eu"/>' if ocean else ""
+    if ocean:
+        ground += '<use class="glyph-beyond" href="#constel-beyond"/>'
     return (f'<svg class="constel{extra}" viewBox="{view}" '
             f'aria-hidden="true" focusable="false">{ground}'
             f'<use class="glyph-land" href="#constel-eu"/>'
