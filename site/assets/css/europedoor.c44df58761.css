@@ -3712,6 +3712,32 @@ body[data-hero] .masthead { position: sticky; }
  * The map is what this product spends where the benchmark spends a
  * photograph, and it was below the fold on 319 pages. */
 .arrivalhead .placeband { margin: 0; }
+/* AND THE EXTENT AND THE TAGS COME AFTER THE VIEW, ON THE THREE FAMILIES
+ * WHOSE OPENING IS A PICTURE.
+ *
+ * The country page went first and the measurement was the same everywhere:
+ * "5 destinations across 3 regions · capital Vienna" and six interest chips
+ * are 139 pixels of RECORD sitting between the sentence a reader came for
+ * and the drawing that answers where it is. The record is what every band
+ * below the fold is for. Measured at 390: destination 574 -> the picture is
+ * the fourth element rather than the sixth, region 585 -> the same.
+ *
+ * `.headmeta` on all three, because the third time a repair is made by hand
+ * it should stop being made by hand — the country head's `.portraitmeta`
+ * and this are one class now. */
+.headmeta { display: grid; gap: var(--s3); justify-items: start; }
+.headmeta .orient { margin: 0; }
+.headmeta .chips { margin: 0; }
+/* A REGION'S OPENING IS ITS MAP, and it was a band after the head. Same
+ * move, same order: the name, what the region is, where it is, then the
+ * record. The map is 2.6:1 and cannot stand beside the type the way a
+ * country's portrait does, so this head stays one column at every width and
+ * the order is the document's. */
+.reghead .minimap { margin: var(--s5) 0 0; }
+/* The region head is flow rather than grid, so the space above the record
+   is a margin here where the arrival head gets it from the grid's row-gap.
+   Without it the extent line starts on the pixel the map's caption ends. */
+.reghead .headmeta { margin-top: var(--s5); }
 @media (min-width: 62rem) {
   .pagehead.overture.arrivalhead {
     grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
@@ -3719,6 +3745,7 @@ body[data-hero] .masthead { position: sticky; }
   .arrivalhead .arrivalsay { grid-column: 1; grid-row: 1; }
   .arrivalhead .whygo      { grid-column: 2; grid-row: 1; }
   .arrivalhead .placeband  { grid-column: 1 / -1; grid-row: 2; }
+  .arrivalhead .headmeta   { grid-column: 1 / -1; grid-row: 3; }
   /* One column in the head, not three: the reasons are a list read down
      beside the name, and the three-across arrangement below the fold was
      the shape of a band, not of an answer. */

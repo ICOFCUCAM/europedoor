@@ -3199,17 +3199,18 @@ def region_page(data, c, r):
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)),
          (c["name"], urls.country(c)), (r["name"], None)])}
 {photoband}
-<div class="pagehead overture">
+<div class="pagehead overture reghead">
   <p class="kicker">{esc(c['name'])}</p>
   <h1>{esc(r['name'])}</h1>
   {statement(r['summary'])}
-  <p class="orient">{n_of(len(r["cities"]), "destination")} ·
-  {len(rplaces)} place{"s" if len(rplaces) != 1 else ""} recorded ·
-  about {n_of(int(pass_nights), "night")} to see it all</p>
-  {chips(r["interests"], data["interests"])}
+  {regionmap(data, c, r)}
+  <div class="headmeta">
+    <p class="orient">{n_of(len(r["cities"]), "destination")} ·
+    {len(rplaces)} place{"s" if len(rplaces) != 1 else ""} recorded ·
+    about {n_of(int(pass_nights), "night")} to see it all</p>
+    {chips(r["interests"], data["interests"])}
+  </div>
 </div>
-
-{regionmap(data, c, r)}
 
 {section("Destinations", f'<div class="rows">{destrows}</div>')}
 {section("Places to see", f'<div class="rows">{placerows}</div>',
@@ -3465,8 +3466,6 @@ def city_page(data, c, r, t):
     <p class="kicker">{esc(r['name'])}, {esc(c['name'])}</p>
     <h1>{esc(t['name'])}</h1>
     {statement(t['summary'])}
-    <p class="orient">{orient_line(t)}</p>
-    {chips(t["interests"], data["interests"])}
   </div>
   <div class="placeband{'' if has_photo else ' maponly'}">
     {photo_block}
@@ -3477,6 +3476,10 @@ def city_page(data, c, r, t):
     <h2 id="why-visit">Why go</h2>
     <ol class="reasons">{reasons}</ol>
   </section>
+  <div class="headmeta">
+    <p class="orient">{orient_line(t)}</p>
+    {chips(t["interests"], data["interests"])}
+  </div>
 </div>
 {sectionnav([
     ("Overview", "why-visit"),
