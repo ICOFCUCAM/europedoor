@@ -370,6 +370,28 @@
    ]
   },
   {
+   "purpose": "interests-hero",
+   "slot": null,
+   "target": null,
+   "key": "interests-hero",
+   "path": "/interests",
+   "surface": "The opening of the interests index — a wide editorial image beside the headline.",
+   "role": "human-life",
+   "min_width": 2000,
+   "orientation": "landscape",
+   "min_aspect": 1.3,
+   "max_aspect": 2.1,
+   "note": "Somebody travelling FOR something: walking, eating, listening, swimming. A person or their hands in the frame, because the seventeen tags on this page are reasons rather than places. Never an empty landscape, which is what every other index here already opens on.",
+   "search": [
+    "locals walking street",
+    "cafe culture Europe",
+    "fishermen harbour",
+    "artisan at work",
+    "farmers market Europe",
+    "everyday life village"
+   ]
+  },
+  {
    "purpose": "journeys-hero",
    "slot": null,
    "target": null,
@@ -412,6 +434,28 @@
     "European village evening",
     "empty street dawn",
     "quiet cafe Europe"
+   ]
+  },
+  {
+   "purpose": "themes-hero",
+   "slot": null,
+   "target": null,
+   "key": "themes-hero",
+   "path": "/themes",
+   "surface": "The opening of the themes index — a wide editorial image beside the headline.",
+   "role": "cultural-scene",
+   "min_width": 2000,
+   "orientation": "landscape",
+   "min_aspect": 1.3,
+   "max_aspect": 2.1,
+   "note": "A way of SEEING Europe rather than a place in it: a reader looking at something old, a hand on a stone, a room full of people who came for the same reason. Never a landmark portrait and never a map — the page's whole argument is that a theme crosses borders, so a picture of one border is the opposite of it.",
+   "search": [
+    "European festival",
+    "folk musicians",
+    "craft workshop",
+    "village market",
+    "local traditions Europe",
+    "street procession"
    ]
   },
   {

@@ -1750,8 +1750,36 @@ def ed_rows(rows, *, numbered=True):
 # none is a second way into the image system with the licence gate missing.
 # ============================================================
 
+def held(images, key):
+    """Does the register hold a photograph for this surface?
+
+    THE INTERIM FOR AN ABSENT PHOTOGRAPH IS NOT ALWAYS A DRAWING. `picture()`
+    returns a generated plate when the register has no row, which is right on
+    a card — a reader gets the best thing available and the library becomes
+    adoptable one photograph at a time. It is wrong for the scales below.
+
+    This site measured that once and acted on it: 189 `.card-art` elements
+    and every one is a map, zero abstract plates on any page, because forty
+    hash-drawn landscapes in a column is placeholder art doing a picture's
+    job. A strip of eight plates or a full-bleed one would put that straight
+    back, at the largest sizes on the site, on every family at once.
+
+    So the big scales ASK. A composition that would be carried by a
+    photograph renders when there is one and is omitted when there is not,
+    and the page composes around its absence rather than filling it. That is
+    the homepage doors' own rule — a slot waiting for a picture is honest,
+    three hundred pixels of it is a hole — applied to seven more scales.
+    """
+    return bool((images or {}).get(key))
+
+
+def held_any(images, keys):
+    """The subset of these surfaces the register actually holds."""
+    return [k for k in keys if held(images, k)]
+
+
 def ed_bleed(images, key, *, alt, seed=None, motif=None, caption="",
-             shape="tall", eager=False):
+             shape="tall", eager=False, only_if_held=True):
     """A picture that leaves the column. Used for a change of movement.
 
     It is the one image scale that is not inside the measure, which is what
@@ -1761,6 +1789,8 @@ def ed_bleed(images, key, *, alt, seed=None, motif=None, caption="",
     because a full-bleed element that needs its parent to cooperate is an
     element every caller can get wrong.
     """
+    if only_if_held and not held(images, key):
+        return ""
     cls = {"tall": "ed-bleed-tall", "deep": "ed-bleed-deep"}.get(shape, "ed-bleed-tall")
     inner = picture(images, key, w=2400, h=1030, alt=alt, eager=eager,
                     sizes="100vw", fallback_seed=seed or key,
@@ -1770,7 +1800,7 @@ def ed_bleed(images, key, *, alt, seed=None, motif=None, caption="",
 
 
 def ed_feature(images, key, *, title, body, alt, seed=None, motif=None,
-               right=False, level=3, eager=False):
+               right=False, level=3, eager=False, only_if_held=False):
     """A dominant picture with its own words beside it.
 
     ASYMMETRIC ON PURPOSE — 1.35 against .65, not a half-and-half split. Two
@@ -1778,6 +1808,8 @@ def ed_feature(images, key, *, title, body, alt, seed=None, motif=None,
     has something to say about it. `right` alternates the side down a page,
     which is what stops three features in a row becoming a pattern.
     """
+    if only_if_held and not held(images, key):
+        return ""
     inner = picture(images, key, w=1600, h=1200, alt=alt, eager=eager,
                     sizes="(max-width: 52rem) 100vw, 55vw",
                     fallback_seed=seed or key, fallback_motif=motif)
@@ -1797,6 +1829,7 @@ def ed_strip(images, items, *, limit=8):
     into rows turns an order into a grid, which is the thing this whole
     system is replacing.
     """
+    items = [it for it in items if held(images, it["key"])]
     out = []
     for it in items[:limit]:
         inner = picture(images, it["key"], w=900, h=1200, alt=it.get("alt", ""),
@@ -1813,6 +1846,12 @@ def ed_strip(images, items, *, limit=8):
 
 def ed_mosaic(images, items, *, limit=3):
     """One dominant picture and two beside it. Never four equal tiles."""
+    items = [it for it in items if held(images, it["key"])]
+    if len(items) < 3:
+        # A MOSAIC IS A COMPOSITION OF THREE, and two pictures in a
+        # three-cell grid is a grid with a hole in it. Below three it is not
+        # a smaller mosaic, it is a different component's job.
+        return ""
     out = []
     for i, it in enumerate(items[:limit]):
         big = i == 0
@@ -1826,7 +1865,8 @@ def ed_mosaic(images, items, *, limit=3):
     return f'<div class="ed-mosaic-3">{"".join(out)}</div>' if out else ""
 
 
-def ed_declare(images, key, *, statement, alt, seed=None, motif=None):
+def ed_declare(images, key, *, statement, alt, seed=None, motif=None,
+               only_if_held=True):
     """A typographic statement over a picture — the directive's own diagram.
 
     THE SCRIM IS NOT AN EFFECT, it is what makes the contrast a property of
@@ -1836,6 +1876,8 @@ def ed_declare(images, key, *, statement, alt, seed=None, motif=None):
     TOKEN is not the ratio a reader gets. 72% graphite composites to
     rgb(71,71,71) and bone on that is 9.2:1 whatever the picture does.
     """
+    if only_if_held and not held(images, key):
+        return ""
     inner = picture(images, key, w=2400, h=1400, alt=alt,
                     sizes="100vw", fallback_seed=seed or key,
                     fallback_motif=motif)
