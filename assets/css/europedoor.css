@@ -3843,6 +3843,16 @@ body[data-hero] .masthead { position: sticky; }
    is a margin here where the arrival head gets it from the grid's row-gap.
    Without it the extent line starts on the pixel the map's caption ends. */
 .reghead .headmeta { margin-top: var(--s5); }
+/* AND A PLACE IS THE FOURTH FAMILY, on the same reasoning and with the same
+   two rules. Its drawing measures 1168x467 at 1280 — 2.5:1, the region's own
+   figure — so it stays one column at every width and the order is the
+   document's. `.card-art` is here because the register will one day hold a
+   photograph of a place, and the slot has to be spaced like the drawing it
+   replaces rather than discovering that on the day it is filled: a code path
+   nothing exercises is a code path nothing checks. */
+.placehead .minimap,
+.placehead .card-art { margin: var(--s5) 0 0; }
+.placehead .headmeta { margin-top: var(--s5); }
 @media (min-width: 62rem) {
   .pagehead.overture.arrivalhead {
     grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);

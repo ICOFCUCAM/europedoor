@@ -81,7 +81,7 @@ so 699px of the screen is content. The figure below is the number of those
 | themes | 541 | 36% |
 | story | 520 | 35% |
 | events | 490 | 34% |
-| place | 588 | 34% |
+| place | 506 | 34% |
 | journey | 599 | 32% |
 | 404 | 358 | 32% |
 | countries | 488 | 32% |

@@ -6441,14 +6441,29 @@ def place_page(data, c, r, t, pl):
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (c["name"], urls.country(c)),
          (r["name"], urls.region(c, r)), (t["name"], urls.city(c, r, t)), (pl["name"], None)])}
-<div class="pagehead overture">
+<!-- THE VIEW IS PART OF THE OPENING, AND THIS WAS THE FOURTH FAMILY AND
+     THE ONE THAT MISSED IT. The country, the region and the destination all
+     bring their drawing inside the head and put the RECORD after it — the
+     rule `.headmeta` was named for, whose own comment says "one class, three
+     families". A place kept the older order: the name, the sentence, the
+     coordinates, and then the picture, so 40 pixels of latitude and longitude
+     sat between what a reader came for and the drawing that answers where it
+     is, on 255 pages.
+
+     ONE COLUMN, LIKE THE REGION AND UNLIKE THE COUNTRY. Measured at 1280
+     the drawing is 1168x467, which is 2.5:1 — the region's own figure, and
+     the reason recorded there applies unchanged: a plate that wide cannot
+     stand beside the type the way a country's portrait does. -->
+<div class="pagehead overture placehead">
   <p class="kicker">{esc(PLACE_KIND_NAMES[pl['kind']])} · {esc(t['name'])}, {esc(c['name'])}</p>
   <h1>{esc(pl['name'])}</h1>
   {statement(pl['summary'])}
-  <p class="orient">Give it {esc(pl['duration'])} · {esc(SEASON_NAMES[pl['season']])} ·
-  <span class="mono">{pl["lat"]:.3f}°N, {pl["lon"]:.3f}°E</span></p>
+  {placeart}
+  <div class="headmeta">
+    <p class="orient">Give it {esc(pl['duration'])} · {esc(SEASON_NAMES[pl['season']])} ·
+    <span class="mono">{pl["lat"]:.3f}°N, {pl["lon"]:.3f}°E</span></p>
+  </div>
 </div>
-{placeart}
 
 <section class="practical" aria-label="Practical">
   <div>
