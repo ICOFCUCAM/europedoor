@@ -823,7 +823,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .mark { width: 1.05em; height: 1.05em; flex: none; }
 .mark-frame { fill: var(--ink); }
 .mark-leaf  { fill: var(--signature); }
-.nav { display: flex; gap: var(--s5); flex-wrap: wrap; font-size: var(--t-sm); letter-spacing: .04em; text-transform: uppercase; }
+/* A LABEL SCALE AND A READING SCALE ARE DIFFERENT THINGS, and `--t-sm` was
+   serving both. Raising the reading end of the scale — 13 to 15 for secondary
+   text — was right for a row's subline and a source note and wrong for the
+   five rules that set uppercase tracked type: the masthead navigation, the
+   utility links, and three meta lines. Uppercase with .06em of tracking at 15
+   is a third wider than at 13, and it showed: "200 DESTINATIONS" stopped
+   fitting beside EXPLORE on a 240px door, so two of the four doors put their
+   count on a second line and two did not, and a row of four read as ragged.
+
+   These are captions, so they take the caption step. */
+.nav { display: flex; gap: var(--s5); flex-wrap: wrap; font-size: var(--t-xs); letter-spacing: .04em; text-transform: uppercase; }
 .nav a { text-decoration: none; color: var(--ink-2); padding-bottom: 2px; border-bottom: 1.5px solid transparent; }
 .nav a:hover { color: var(--ink); border-bottom-color: var(--door); }
 .nav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--door); }
@@ -1978,7 +1988,7 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 .routedot { fill: var(--door); stroke: var(--paper); stroke-width: 2; }
 
 /* ── masthead utilities: search and My Europe sit apart from the nav ── */
-.navutil { display: flex; gap: var(--s4); align-items: center; font-size: var(--t-sm); letter-spacing: .04em; text-transform: uppercase; }
+.navutil { display: flex; gap: var(--s4); align-items: center; font-size: var(--t-xs); letter-spacing: .04em; text-transform: uppercase; }
 .navutil a { text-decoration: none; color: var(--ink-2); border-bottom: 1.5px solid transparent; padding-bottom: 2px; }
 .navutil a:hover { color: var(--door); border-bottom-color: var(--door); }
 .navsearch { color: var(--door); }
@@ -6069,7 +6079,7 @@ body[data-hero] .masthead { position: sticky; }
              font-size: var(--t-sm); line-height: 1.5; }
 .waymeta {
   display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4);
-  font-size: var(--t-sm); letter-spacing: .06em; text-transform: uppercase;
+  font-size: var(--t-xs); letter-spacing: .06em; text-transform: uppercase;
   color: var(--ink-3); border-top: 1px solid var(--rule); padding-top: var(--s3); margin: 0;
 }
 .waygo { color: var(--door); font-weight: 600; white-space: nowrap; }
@@ -6128,7 +6138,7 @@ body[data-hero] .masthead { position: sticky; }
 .jrow .hopbar { margin-bottom: var(--s4); }
 .jrowmeta {
   display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4);
-  font-size: var(--t-sm); letter-spacing: .06em; text-transform: uppercase;
+  font-size: var(--t-xs); letter-spacing: .06em; text-transform: uppercase;
   color: var(--ink-3); margin: 0;
 }
 /* .constel is a 132px glyph — the size it is on a theme row, where it is a
@@ -6327,7 +6337,7 @@ body[data-hero] .masthead { position: sticky; }
    one, so restating it is a declaration that changes nothing. It only became
    visible when the dead-rule scan started visiting a motion page. */
 .journeyrow .jfacts {
-  text-align: left; margin: var(--s3) 0 0; font-size: var(--t-sm);
+  text-align: left; margin: var(--s3) 0 0; font-size: var(--t-xs);
   letter-spacing: .06em; text-transform: uppercase;
 }
 
