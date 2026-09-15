@@ -7070,6 +7070,43 @@ def category_page(data, cat, sub=None):
         rulenote += "</p>"
 
     photoband = pageband(data, f"category:{cat['slug']}")
+    # FORTY-EIGHT INVITATIONS AND NOTHING TO LOOK AT.
+    #
+    # `docs/signature-moments.md` refuses geography here and the refusal
+    # holds: 48 dots over Europe says food is everywhere, which is true and
+    # is not an insight. It says nothing about PHOTOGRAPHS, and this is the
+    # family whose own recorded finding is that it "is thin because the
+    # register holds no photographs, which is a licence position and not a
+    # design one". A licence position is not an excuse for a page that does
+    # not say which photographs it is waiting for.
+    #
+    # THE PICTURE IS OF THE PLACE, NEVER OF THE EXPERIENCE. An experience
+    # carries a slug, a name, a kind, a band and a summary — no image
+    # purpose, and declaring 197 of them would be 197 surfaces nobody has a
+    # brief for. The town it happens in has one, already, so the strip is
+    # the distinct cities in the list's own order. Distinct, because six
+    # markets in Vienna would otherwise be six copies of one photograph.
+    _seen, _cshots = set(), []
+    for _it in chosen:
+        _k = f"city:{_it['country']['slug']}/{_it['region']['slug']}/{_it['city']['slug']}"
+        if _k in _seen:
+            continue
+        _seen.add(_k)
+        _cshots.append({"key": _k, "alt": _it["city"]["name"],
+                        "label": _it["city"]["name"],
+                        "href": urls.city(_it["country"], _it["region"], _it["city"])})
+    _cstrip = ed_strip(data.get("images"), _cshots, limit=8)
+    if _cstrip:
+        _n = min(8, len(_cshots))
+        _cstrip = ('<section class="ed-section">'
+                   + ed_section_head(
+                       "01", "Where they happen",
+                       f"{numword(_n, cap=True)} of the "
+                       f"{n_of(len(_seen), 'town')} on this list",
+                       "The picture is of the place, not of the invitation: an "
+                       "experience has no photograph of its own here, and the "
+                       "town it happens in does.")
+                   + _cstrip + "</section>")
     body = f"""
 {crumbs(trail)}
 {photoband}
@@ -7084,7 +7121,7 @@ def category_page(data, cat, sub=None):
   <h1>{esc(title)}</h1>
   <div class="reach">
     {region_glyph(reach)}
-    <p class="reachnote">{esc(and_list([c for c in countries]) if len(countries) < 4 else f"{len(countries)} of Europe's {len(data['countries'])} countries")}, filled. Nothing here plots an experience: the spread is the offer and a dot per invitation would only say it is everywhere. {geo.sources_line(geo.load("europe-lod0.json"))}</p>
+    <p class="reachnote">{esc(and_list([c for c in countries]) if len(countries) < 4 else f"{len(countries)} of Europe's {len(data['countries'])} countries")}, filled. Nothing here plots an experience: the spread is the offer and a dot per invitation would only say it is everywhere.<span class="srcnote">{geo.sources_line(geo.load("europe-lod0.json"))}</span></p>
   </div>
   <!-- `.lede`, not `.statement`. An index head places its extent beside the
        name in column two, row two, and the display-size statement is
@@ -7097,6 +7134,7 @@ def category_page(data, cat, sub=None):
 </div>
 {f'<p class="countryspread lead">{country_spread(countries)}</p>' if sub and countries else ""}
 {f'<nav class="sublinkwrap" aria-label="Sub-categories">{subcards}</nav>' if subcards else ""}
+{_cstrip}
 <!-- THE MECHANISM WAS STANDING IN FRONT OF THE ANSWER. "How this list is
      built" was a full section with its own h2 and a lede, ABOVE the list,
      so a reader met the selection rule before they met a single thing to
@@ -7228,6 +7266,18 @@ def experiences_index(data):
                   f'<span class="w{int(round(pct))}"></span></span>'
                 + '</div></a>')
 
+    # THE EIGHT CATEGORIES ARE THE ONLY THING ON THIS PAGE WITH A PURPOSE
+    # DECLARED FOR IT, and the index that introduces them showed none of
+    # them. Eight `category:` surfaces exist in the registry and are reached
+    # by the eight category pages; the index reached none, so the page a
+    # reader meets the family on was eighteen bars and twenty-four lines of
+    # prose. Largest first, which is the order the bars below are in — the
+    # strip and the rows must not argue about which category is which.
+    _xstrip = ed_strip(data.get("images"), [
+        {"key": f"category:{cat['slug']}", "alt": cat["name"],
+         "label": cat["name"], "href": urls.category(cat["slug"])}
+        for cat in sorted(data["categories"],
+                          key=lambda c: -len(C.select(items, c)))], limit=8)
     catn = {cat["slug"]: len(C.select(items, cat)) for cat in data["categories"]}
     catbig = max(catn.values()) if catn else 0
     catcards = [
@@ -7297,6 +7347,11 @@ def experiences_index(data):
      any sort, so these 24 were simply the first 24 the loader returned in
      country order — Austria to Croatia, called recent. A false ordering is
      worse than none, because a reader takes it for a signal. -->
+{(f'<section class="ed-section">'
+  + ed_section_head("01", "What they are about",
+                    f"{numword(len(data['categories']), cap=True)} categories",
+                    "Largest first — the same order the bars below are in.")
+  + _xstrip + "</section>") if _xstrip else ""}
 {section("Twenty-four of them", f'<div class="rows">{rows}</div>',
          lede="What people actually do, in country order — there is no date on an "
               "experience here, so this is a sample and not a recency. Every one is a "
@@ -11452,6 +11507,33 @@ def motion_page(data, m):
         f'</p></div></a>'
         for t in trows)
 
+    # THE ANSWER TO A QUERY IS A SET OF PLACES, AND NONE OF THEM WAS SHOWN.
+    #
+    # This family's own rule is that a motion is not a place — it has no
+    # coastline, no topography and no season — and that rule took the plates
+    # off the index and off the foot of these twelve pages. It says nothing
+    # about the RESULTS, which are real destinations that each declare a
+    # `city:` purpose. The shape of the answer is drawn above; what the
+    # answer looks like was nowhere on the page.
+    #
+    # The strip takes the SHOWN set rather than every match, for the reason
+    # already written about the map one screen up: the two-per-country cap is
+    # what the reader is reading, and a strip drawn from 83 matches under a
+    # list of 65 would be a different answer to the same question.
+    _mstrip = ed_strip(data.get("images"), [
+        {"key": f"city:{n['country']['slug']}/{n['region']['slug']}/{n['city']['slug']}",
+         "alt": n["city"]["name"], "label": n["city"]["name"],
+         "href": urls.city(n["country"], n["region"], n["city"])}
+        for n, _w in shown], limit=8)
+    if _mstrip:
+        _mn = min(8, len(shown))
+        _mstrip = ('<section class="ed-section">'
+                   + ed_section_head("01", "The answer",
+                                     f"{numword(_mn, cap=True)} of them",
+                                     "The same set the list below is, in the same "
+                                     "order — not the whole match, which the query "
+                                     "note above counts.")
+                   + _mstrip + "</section>")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Europe in Motion", "/europe-in"), (m["name"], None)])}
 <div class="pagehead overture">
@@ -11464,6 +11546,7 @@ def motion_page(data, m):
 {motionmap}
 {querynote}
 {shared_note}
+{_mstrip}
 <div class="rows">{rows}</div>
 
 {section("Journeys that go this way", f'<div class="rows journeyrows">{jrelated}</div>') if jrows else ""}

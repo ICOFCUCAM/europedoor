@@ -5051,8 +5051,18 @@ body[data-hero] .masthead { position: sticky; }
    the number. */
 .reachhead .reach .constel { width: 100%; max-width: 22rem; }
 .reachhead .datacut stop { stop-color: var(--paper); }
-.reachhead .reachnote { font-size: var(--t-xs); color: var(--ink-3);
+/* A CAPTION SAYS WHAT THE PICTURE IS; A SOURCE NOTE SAYS WHERE IT CAME FROM,
+   and this one ran the two together in one paragraph at one size. That is the
+   finding already recorded about the 852 figcaptions on this site, unfixed on
+   the one caption that sits INSIDE a page head — where its extra two lines are
+   what makes column two taller than column one and opens the gap above. The
+   claim keeps reading size; the provenance takes the caption step. */
+.reachhead .reachnote { font-size: var(--t-sm); color: var(--ink-2);
                         max-width: 36ch; margin: 0; }
+.reachhead .reachnote .srcnote {
+  display: block; margin-top: var(--s2);
+  font-size: var(--t-xs); color: var(--ink-3);
+}
 @media (min-width: 62rem) {
   /* FOUR ROWS, NAMED, AND THE SLACK GOES IN THE LAST ONE. A cell spanning
      every row distributes its height across all of them, so the drawing
@@ -5070,6 +5080,13 @@ body[data-hero] .masthead { position: sticky; }
      and the lede rendered on top of the map. That is the collision this
      stylesheet has now recorded four times. */
   .pagehead.index.reachhead .lede   { grid-column: 1; grid-row: 3; max-width: 52ch; }
+  /* THE EXTENT STAYS WITH THE LEDE, AND THE HOLE WAS NEVER THE ALIGNMENT.
+     Row 4 is `1fr`, and 175 pixels of empty page sat under the extent on
+     every category page at 1280. Setting `align-self: end` moved that gap to
+     ABOVE the extent and closed nothing — it cannot, because the gap IS the
+     difference between a column of four short elements and a column holding
+     a drawing and its caption, and no alignment removes a difference. It was
+     measured both ways before the real cause was looked for. */
   .pagehead.index.reachhead .orient { grid-column: 1; grid-row: 4; align-self: start; }
   .pagehead.index.reachhead .reach  { grid-column: 2; grid-row: 1 / -1;
                                       align-self: start; }
