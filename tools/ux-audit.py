@@ -311,14 +311,20 @@ def s2036_6():
     # rather than twice, because restating them is the family's own rule
     # broken by the page that states it.
     from lib import pages as _P
-    from lib.render import esc as _esc
+    from lib.render import esc as _esc, curl as _curl
     _d = DATA
     for m in motions:
         h = page("/europe-in/" + m["slug"])
         yield bool(h), f"/europe-in/{m['slug']} is served"
         md = next(x for x in _d["motions"] if x["slug"] == m["slug"])
         q = _P.motion_query_words(_d, md)
-        yield _esc(q) in h, f"{m['slug']} prints the query its own data produced"
+        # THROUGH THE SAME TYPOGRAPHIC PASS THE PAGE WENT THROUGH. The query
+        # is generated prose, and `render.curl` turns its apostrophes into
+        # typographic ones on the way out — so an expectation built from the
+        # generator and not rendered is comparing the wrong string. The
+        # promise is unchanged: the page must print the query its own data
+        # produced.
+        yield _curl(_esc(q)) in h, f"{m['slug']} prints the query its own data produced"
         yield "nothing here is hand-picked" in h.lower(), \
             f"{m['slug']} says it is a query and not a list"
         yield h.count("matched the query") + h.lower().count(" match, in ") == 1, \

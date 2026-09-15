@@ -16,6 +16,7 @@ import hashlib
 import html
 import json
 import os
+import re
 from urllib.parse import urlsplit
 
 from .i18n import Strings
@@ -1278,6 +1279,61 @@ def asset_map():
     return out
 
 
+# ── typography: the apostrophe ─────────────────────────────────────────
+#
+# 2,165 STRAIGHT APOSTROPHES ON 722 PAGES. Every possessive and every
+# contraction on a site whose whole voice is a display serif was set with a
+# typewriter quote — `atlas's`, `Europe's`, `Brunelleschi's`. It is the
+# oldest tell of type nobody attended to, and it is the same family as the
+# underline through every descender and the 224 pixels above the footer:
+# nobody decided it, so it defaulted.
+#
+# THE PASS RUNS ON THE WHOLE DOCUMENT AND ONLY IN TEXT. Doing it inside
+# `esc()` would corrupt every attribute and every URL that function also
+# escapes; doing it at 37 call sites would miss the 38th. So it walks the
+# emitted HTML, skips anything between `<` and `>`, and skips the contents
+# of script, style, code and pre outright — the JSON-LD block and the inert
+# data blocks are scripts, and a code sample means the character it prints.
+#
+# NARROW ON PURPOSE: only an apostrophe with a word character on both sides,
+# which is every possessive and every contraction and nothing else. A
+# leading apostrophe ('90s) and a quotation mark both need to know which end
+# they are, and this atlas writes neither.
+_SKIP = ("script", "style", "code", "pre", "textarea")
+
+
+def curl(html):
+    out, i, n = [], 0, len(html)
+    skip_until = None
+    while i < n:
+        lt = html.find("<", i)
+        if lt < 0:
+            out.append(html[i:] if skip_until else _curl_text(html[i:]))
+            break
+        chunk = html[i:lt]
+        out.append(chunk if skip_until else _curl_text(chunk))
+        gt = html.find(">", lt)
+        if gt < 0:
+            out.append(html[lt:])
+            break
+        tag = html[lt:gt + 1]
+        out.append(tag)
+        name = tag[1:].split()[0].lower().rstrip(">/") if len(tag) > 1 else ""
+        if skip_until:
+            if name == "/" + skip_until:
+                skip_until = None
+        elif name in _SKIP and not tag.endswith("/>"):
+            skip_until = name
+        i = gt + 1
+    return "".join(out)
+
+
+def _curl_text(t):
+    if "&#x27;" not in t and "'" not in t:
+        return t
+    return re.sub(r"(?<=\w)(?:&#x27;|')(?=\w)", "&#8217;", t)
+
+
 def page(title, body, *, path, description, trail=None, area=None, head_extra="", scripts=(), wide=False, ld_blocks=(), og=None, world="discover", accent="", hero=False):
     if world not in WORLDS:
         raise ValueError(f"{path}: unknown world {world!r}; it is one of {WORLDS}")
@@ -1316,7 +1372,7 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
         + "</div>"
         for head, rows in FOOTER_GROUPS)
     full_title = title if title == SITE_NAME else f"{title} · {SITE_NAME}"
-    return f"""<!doctype html>
+    return curl(f"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1370,7 +1426,7 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 </footer>
 {scripts_html}</body>
 </html>
-"""
+""")
 
 
 def section(title, body, *, id=None, lede=None, more=None, stage=None, tone=None,

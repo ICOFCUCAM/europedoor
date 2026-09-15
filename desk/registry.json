@@ -4668,7 +4668,7 @@
    "target": "belgium/flanders/ghent/st-bavo",
    "key": "place:belgium/flanders/ghent/st-bavo",
    "path": "/europe/belgium/flanders/ghent/place/st-bavo",
-   "surface": "The opening image of the Saint Bavo's Cathedral, Ghent place page.",
+   "surface": "The opening image of the Saint Bavo’s Cathedral, Ghent place page.",
    "country": "belgium",
    "country_name": "Belgium"
   },
@@ -4688,7 +4688,7 @@
    "target": "croatia/dalmatia/dubrovnik/rectors-palace",
    "key": "place:croatia/dalmatia/dubrovnik/rectors-palace",
    "path": "/europe/croatia/dalmatia/dubrovnik/place/rectors-palace",
-   "surface": "The opening image of the Rector's Palace, Dubrovnik place page.",
+   "surface": "The opening image of the Rector’s Palace, Dubrovnik place page.",
    "country": "croatia",
    "country_name": "Croatia"
   },
@@ -4698,7 +4698,7 @@
    "target": "croatia/dalmatia/split/diocletians-palace",
    "key": "place:croatia/dalmatia/split/diocletians-palace",
    "path": "/europe/croatia/dalmatia/split/place/diocletians-palace",
-   "surface": "The opening image of the Diocletian's Palace, Split place page.",
+   "surface": "The opening image of the Diocletian’s Palace, Split place page.",
    "country": "croatia",
    "country_name": "Croatia"
   },
@@ -4978,7 +4978,7 @@
    "target": "france/auvergne/le-puy-en-velay/saint-michel-aiguilhe",
    "key": "place:france/auvergne/le-puy-en-velay/saint-michel-aiguilhe",
    "path": "/europe/france/auvergne/le-puy-en-velay/place/saint-michel-aiguilhe",
-   "surface": "The opening image of the Saint-Michel d'Aiguilhe, Le Puy-en-Velay place page.",
+   "surface": "The opening image of the Saint-Michel d’Aiguilhe, Le Puy-en-Velay place page.",
    "country": "france",
    "country_name": "France"
   },
@@ -4998,7 +4998,7 @@
    "target": "france/corsica/bonifacio/escalier-du-roi-daragon",
    "key": "place:france/corsica/bonifacio/escalier-du-roi-daragon",
    "path": "/europe/france/corsica/bonifacio/place/escalier-du-roi-daragon",
-   "surface": "The opening image of the Escalier du Roi d'Aragon, Bonifacio place page.",
+   "surface": "The opening image of the Escalier du Roi d’Aragon, Bonifacio place page.",
    "country": "france",
    "country_name": "France"
   },
@@ -5028,7 +5028,7 @@
    "target": "france/loire-and-the-southwest/bordeaux/place-de-la-bourse",
    "key": "place:france/loire-and-the-southwest/bordeaux/place-de-la-bourse",
    "path": "/europe/france/loire-and-the-southwest/bordeaux/place/place-de-la-bourse",
-   "surface": "The opening image of the Place de la Bourse & Miroir d'eau, Bordeaux place page.",
+   "surface": "The opening image of the Place de la Bourse & Miroir d’eau, Bordeaux place page.",
    "country": "france",
    "country_name": "France"
   },
@@ -5118,7 +5118,7 @@
    "target": "france/paris-and-ile-de-france/paris/musee-dorsay",
    "key": "place:france/paris-and-ile-de-france/paris/musee-dorsay",
    "path": "/europe/france/paris-and-ile-de-france/paris/place/musee-dorsay",
-   "surface": "The opening image of the Musée d'Orsay, Paris place page.",
+   "surface": "The opening image of the Musée d’Orsay, Paris place page.",
    "country": "france",
    "country_name": "France"
   },
@@ -5708,7 +5708,7 @@
    "target": "hungary/budapest-and-the-danube-bend/budapest/fishermans-bastion",
    "key": "place:hungary/budapest-and-the-danube-bend/budapest/fishermans-bastion",
    "path": "/europe/hungary/budapest-and-the-danube-bend/budapest/place/fishermans-bastion",
-   "surface": "The opening image of the Fisherman's Bastion, Budapest place page.",
+   "surface": "The opening image of the Fisherman’s Bastion, Budapest place page.",
    "country": "hungary",
    "country_name": "Hungary"
   },
@@ -5858,7 +5858,7 @@
    "target": "italy/north-italy/trieste/piazza-unita",
    "key": "place:italy/north-italy/trieste/piazza-unita",
    "path": "/europe/italy/north-italy/trieste/place/piazza-unita",
-   "surface": "The opening image of the Piazza Unità d'Italia, Trieste place page.",
+   "surface": "The opening image of the Piazza Unità d’Italia, Trieste place page.",
    "country": "italy",
    "country_name": "Italy"
   },
@@ -5898,7 +5898,7 @@
    "target": "italy/north-italy/venice/accademia",
    "key": "place:italy/north-italy/venice/accademia",
    "path": "/europe/italy/north-italy/venice/place/accademia",
-   "surface": "The opening image of the Gallerie dell'Accademia, Venice place page.",
+   "surface": "The opening image of the Gallerie dell’Accademia, Venice place page.",
    "country": "italy",
    "country_name": "Italy"
   },
@@ -6188,7 +6188,7 @@
    "target": "italy/tuscany-and-the-centre/florence/duomo-dome",
    "key": "place:italy/tuscany-and-the-centre/florence/duomo-dome",
    "path": "/europe/italy/tuscany-and-the-centre/florence/place/duomo-dome",
-   "surface": "The opening image of the Brunelleschi's Dome, Florence place page.",
+   "surface": "The opening image of the Brunelleschi’s Dome, Florence place page.",
    "country": "italy",
    "country_name": "Italy"
   },
@@ -6228,7 +6228,7 @@
    "target": "italy/tuscany-and-the-centre/lucca/piazza-anfiteatro",
    "key": "place:italy/tuscany-and-the-centre/lucca/piazza-anfiteatro",
    "path": "/europe/italy/tuscany-and-the-centre/lucca/place/piazza-anfiteatro",
-   "surface": "The opening image of the Piazza dell'Anfiteatro, Lucca place page.",
+   "surface": "The opening image of the Piazza dell’Anfiteatro, Lucca place page.",
    "country": "italy",
    "country_name": "Italy"
   },

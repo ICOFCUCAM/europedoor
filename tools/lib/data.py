@@ -174,9 +174,46 @@ class Problems:
             )
 
 
+# AN APOSTROPHE IS A PROPERTY OF THE TEXT, NOT OF THE RENDERING.
+#
+# The first version of this curled the emitted HTML and left the JSON-LD
+# alone, because that block is a <script> and the pass skips scripts. So a
+# reader saw "Europe’s islands" and the structured breadcrumb said
+# "Europe's islands", and `checks.py` failed on exactly the promise it is
+# written to hold: a machine-readable claim must match what the page shows.
+# Twelve motion pages and four experiences, all of them the same fault.
+#
+# Curling here means one representation. Every surface that quotes a name —
+# the page, the JSON-LD, the social card's alt, /api/atlas.json and every
+# check that compares a name to a page — gets the same string, so none of
+# them can disagree with another.
+#
+# NARROW, AND NOT IN AN IDENTIFIER. Only an apostrophe with a word character
+# on both sides, which is every possessive and contraction this atlas
+# writes; never in a slug, a code, a URL or a hash, because an identifier
+# that changes shape is a broken link.
+_NOT_PROSE = {"slug", "id", "code", "iso3", "url", "href", "sha256", "file",
+              "path", "param", "key", "search_url", "place_param",
+              "partner_param", "partner_id", "source", "licence_url",
+              "license_url", "profile_url", "page_url"}
+_APOS = re.compile(r"(?<=\w)'(?=\w)")
+
+
+def _curl(v, key=None):
+    if isinstance(v, str):
+        if key in _NOT_PROSE or "://" in v or v.startswith("/"):
+            return v
+        return _APOS.sub("\u2019", v)
+    if isinstance(v, list):
+        return [_curl(x, key) for x in v]
+    if isinstance(v, dict):
+        return {k: _curl(x, k) for k, x in v.items()}
+    return v
+
+
 def _read(path):
     with open(path, "r", encoding="utf-8") as fh:
-        return json.load(fh)
+        return _curl(json.load(fh))
 
 
 def load():
