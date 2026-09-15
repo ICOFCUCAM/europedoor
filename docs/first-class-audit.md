@@ -452,15 +452,34 @@ Written as the work landed, so the audit and the record do not drift.
 | 37 | the contact sheet named one family wrong and missed four | 23 of 27 covered → 34 pages in three sets, from one list |
 | 38 | 196 drawings were hidden on a phone behind a dead rule | region, macro and journey cards blank → drawn |
 | 39 | the record moved after the picture on the other two families | destination 574 → 443; region 585 → 438 |
+| 40 | the four doors rendered 3 + 1 between the two breakpoints | 30 grids measured, 1 with a mostly-empty last row → 0 |
+| 41 | the planner opened on a progress panel for work nobody asked for | 7 live regions at rest, 1 claiming work → 0 |
+| 42 | three templates the instruments had never reached | 27 families on the list → 30, and 63 pages that had never been measured |
+| 43 | the Fund family had no geography at all | project page 0% of the phone's first screen → 42% |
+| 44 | a place put its coordinates between the sentence and the view | desk 31.6% → 38.9%; first figure 634 → 572 |
+| 45 | Finding 2's other half, which had never been measured | one composition asserted → 29 body shapes over 47 families |
+| 46 | the editorial desk had no feed | nine dated essays, no way to follow them → /stories/feed.xml |
+| 47 | a check that had stopped counting, and a document 860 plates stale | 0 of 785 records examined → 785 |
+| 48 | the check that found Longyearbyen, blind since the atlas skin | 0 dots of 1,293 → 1,293 |
+| 49 | thirty-three pages never reached the head-role check | 1,001 heads of 1,034 → 1,033 |
+| 50 | a headline ran off the right edge of a phone, at the design width | /place +7px at 390, +77 at 320 → 0 at every width, on every family |
 
-**Finding 1, re-measured twice**: seven surfaces with no picture on the
-phone's first screen became six, and then **three of twenty-seven, with none
-under a fifth** — and two of the three are instruments whose opening is
-their control. The median share is 24% → 34.4%. `tools/opening.js` is the
-instrument, so this number can be checked in a minute rather than
-re-audited by hand.
+**Finding 1, re-measured three times**: seven surfaces with no picture on
+the phone's first screen became six, then three of twenty-seven, and now
+**three of thirty, with none under a fifth** — all three of them an
+instrument or a recorded refusal. The median share is 24% → 35.6%. The table
+grew by three because `tools/lib/families.js` had never carried a month
+page, a sub-category page or a fund project page, and the last of those was
+the find: no figure anywhere on it, at any width, on the register whose
+whole argument is that each entry is a real thing in a real place.
+`tools/opening.js` is the instrument, so this number can be checked in a
+minute rather than re-audited by hand.
 **Finding 2**: five families now open on something no other family does —
-`/experiences`, `/stories`, `/interests`, `/my-europe`, `/discover`.
+`/experiences`, `/stories`, `/interests`, `/my-europe`, `/discover` — and
+the other half of the finding, which is about the BODY and had never been
+measured at all, reads **29 distinct shapes over 47 families**, three h1
+sizes and head tops from 136 to 745. `tools/composition.js` is that
+instrument.
 **Finding 3**: the homepage's second screen is a strip rather than four
 holes, and the transition from the continent to the form has air in it.
 Measured band by band at 1280, the page is not monotonic: hero 91% ink,
