@@ -614,6 +614,19 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 600; line-height: 1.1
 h1 { font-size: clamp(var(--t-3xl), 5.2vw, var(--t-5xl)); }
 h2 { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); }
 h3 { font-size: var(--t-lg); }
+/* ONE PARAGRAPH IN TEN ENDED ON A SINGLE WORD. Measured across all 47
+   families at 1280: 106 widows of 998 multi-line paragraphs. A word alone on
+   the last line is the oldest mark of typography nobody attended to, and it
+   is the fifth of the "nobody decided" defects this stylesheet records — the
+   underline through every descender, the 224 pixels above the footer, the
+   measure broken across a list of place names, the 132px continent.
+
+   `balance` is for headings, where every line matters and there are three of
+   them; `pretty` is for running text, where only the last line is at risk and
+   the browser must not re-break the whole paragraph to fix it. Both are the
+   browser doing what a compositor did by hand, and neither adds a rule that
+   has to be maintained. */
+p, li { text-wrap: pretty; }
 p { margin: 0 0 var(--s4); max-width: var(--measure); }
 
 /* ── WHAT THE BROWSER DRAWS FOR YOU ──────────────────────────────────
