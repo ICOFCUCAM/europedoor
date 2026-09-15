@@ -97,9 +97,9 @@
       "why": "Zero. A page may not ship its own CSS."
     },
     "safety.img_tags": {
-      "value": 20,
+      "value": 31,
       "kind": "exact",
-      "why": "Zero today, because zero photographs are licensed. This moving is the signal that licensed imagery arrived — which must go through the licence register first."
+      "why": "It was zero while zero photographs were licensed, and this moving is the signal that licensed imagery arrived — which must go through the licence register first. 20 -> 31 WHEN THE ELEVEN THEME PHOTOGRAPHS STOPPED APPEARING ON ELEVEN PAGES: they are the only pictures this atlas holds and they were each on their own page and nowhere else, so an index of thirteen things a reader chooses between on LOOK showed thirteen drawings. No photograph was acquired for this; the same eleven register rows are spent on one more surface, which is the whole of the change."
     },
     "weight.home_kb": {
       "value": 141,
@@ -144,7 +144,7 @@
         "crumbs": 0.998,
         "row": 0.888,
         "card": 0.059,
-        "band": 0.756,
+        "band": 0.767,
         "note": 0.819,
         "facts": 0.758,
         "btn": 0.642,

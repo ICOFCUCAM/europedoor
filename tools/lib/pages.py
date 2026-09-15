@@ -1665,7 +1665,7 @@ def pageband(data, key, alt_fallback=""):
             + "</figure>")
 
 
-def head_figure(data, key, fallback, alt_fallback=""):
+def head_figure(data, key, fallback, alt_fallback="", credit=True, eager=True):
     """The right-hand side of a page's opening: a photograph, or the drawing.
 
     THE BENCHMARK PUTS THE PICTURE BESIDE THE TYPE AND THIS PUT IT ABOVE IT.
@@ -1688,10 +1688,18 @@ def head_figure(data, key, fallback, alt_fallback=""):
     row = (data.get("images") or {}).get(key)
     if not row:
         return fallback
+    # `credit=False` WHERE THE FIGURE SITS INSIDE A LINK, AND AN <a> MAY NOT
+    # CONTAIN AN <a>. `picture()`'s credit carries the photographer and the
+    # provider as links, so a figure placed inside a row anchor makes the
+    # parser SPLIT that anchor: the themes index rendered thirteen rows as a
+    # mixture of full rows, 33-pixel empty ones and a picture with no text
+    # beside it. The homepage's row of eight lost a whole layout to this and
+    # the escape is the same — the container pays the attribution once — so
+    # the caller says which case it is rather than finding out.
     return ('<figure class="headshot">'
             + picture(data.get("images"), key, w=1600, h=1200,
-                      alt=row.get("alt") or alt_fallback, eager=True,
-                      sizes="(min-width: 60rem) 46vw, 100vw")
+                      alt=row.get("alt") or alt_fallback, eager=eager,
+                      sizes="(min-width: 60rem) 46vw, 100vw", credit=credit)
             + "</figure>")
 
 
@@ -3782,6 +3790,7 @@ makes. Two of them can be combined in
 """
     return "/interests/index.html", page(
         "Ways to travel", body, path="/interests", area="countries",
+        accent="amethyst",
         description="Seventeen ways into Europe — history, food, mountains, islands, "
                     "sacred places, rail — each one drawn as the destinations that carry it.",
     )
@@ -3912,6 +3921,7 @@ def interest_page(data, i, ranking):
     return f"/interests/{slug}/index.html", page(
         f"Travelling for {i['name'].lower()}", body,
         path=urls.interest(slug), area="countries",
+        accent="amethyst",
         description=f"Where in Europe to go for {i['name'].lower()}: {len(cities)} cities across {len(countries)} countries.",
     )
 
@@ -4048,6 +4058,7 @@ coordinates; what they mean on the ground is on the journey's own page.</p>
 """
     return "/journeys/index.html", page(
         "Journeys", body, path="/journeys", area="journeys",
+        accent="adriatic",
         description="Curated multi-country routes across Europe — Arctic to Baltic, Atlantic to Mediterranean, the Alpine grand tour and more.",
     )
 
@@ -4246,6 +4257,7 @@ def journey_page(data, j):
                                  urls.city(n["country"], n["region"], n["city"])))
     return f"/journeys/{j['slug']}/index.html", page(
         j["name"], body, path=urls.journey(j), area="journeys",
+        accent="adriatic",
         description=j["summary"][:180],
         scripts=["/assets/js/my-europe.js"],
         og=("journey:" + j["slug"], motif_for(j["interests"]),
@@ -6878,6 +6890,7 @@ def category_page(data, cat, sub=None):
 """
     return f"{path}/index.html", page(
         title, body, path=path, area="experiences",
+        accent="lagoon",
         description=f"{title}: {n_of(len(chosen), 'experience')} across {n_of(len(countries), 'European country')}, selected by a published rule.",
     )
 
@@ -7093,6 +7106,7 @@ def experiences_index(data):
 """
     return "/experiences/index.html", page(
         "Experiences", body, path="/experiences", area="experiences",
+        accent="lagoon",
         description="Guides, kitchens, cellars, boats and museums across Europe — every listing named, tiered and checked.",
     )
 
@@ -7142,6 +7156,7 @@ def experience_kind_page(data, kind, name):
     return f"/experiences/kind/{kind}/index.html", page(
         f"{name} — what you do", body,
         path=urls.experience_kind(kind), area="experiences",
+        accent="lagoon",
         description=f"{name} experiences across Europe, by city and country.",
     )
 
@@ -8166,12 +8181,38 @@ def themes_index(data):
              for st in t["stops"]], extra=" constel-theme")
         rows.append(
             f'<a class="row themerow" href="/themes/{t["slug"]}">'
-            f'<div class="rowart">{glyph}</div>'
+            # THE PHOTOGRAPH IF THERE IS ONE, AND THE DRAWING IF THERE IS NOT.
+            # Eleven of the thirteen themes are the only licensed photographs
+            # this atlas holds, and until now they appeared on exactly eleven
+            # pages — their own. An index of thirteen things the reader is
+            # choosing between on LOOK is the one place a photograph does work
+            # the drawing cannot, and the reach the glyph argues is still one
+            # click away on the page itself.
+            f'<div class="rowart">'
+            f'{head_figure(data, "theme:" + t["slug"], glyph, alt_fallback=t["name"], credit=False, eager=False)}'
+            f'</div>'
             f'<div><p class="kicker">{esc(t["strapline"])}</p>'
             f'<h2>{esc(t["name"])}</h2>'
             f'<p class="rowsub">{" · ".join(places)}</p>'
             f'<p class="rowmeta">{len(countries)} '
             f'{"countries" if len(countries) != 1 else "country"}</p></div></a>')
+    # THE ROWS OWE THEIR ATTRIBUTION AND PAY IT ONCE, under the list. The
+    # photograph inside a row carries no figcaption, because a credit's own
+    # links inside a row's link split the anchor — so the container pays,
+    # exactly as the homepage's row of eight does. The licence asks for the
+    # photographer and the provider, not for one caption per thumbnail.
+    _imgs = data.get("images") or {}
+    _shot = [t for t in data["themes"] if ("theme:" + t["slug"]) in _imgs]
+    themecred = ""
+    if _shot:
+        _who = ", ".join(dict.fromkeys(
+            f'<a href="{esc(_imgs["theme:" + t["slug"]]["source"])}" rel="noopener" '
+            f'target="_blank">{esc(_imgs["theme:" + t["slug"]]["photographer"])}</a>'
+            for t in _shot))
+        _n = len(data["themes"]) - len(_shot)
+        themecred = (f'<p class="sheetcred rowcred">Photographs by {_who} on Pexels.'
+                     + (f' The {numword(_n)} without one draw their own places instead.'
+                        if _n else "") + '</p>')
     body = f"""
 {crumbs([("Europe", "/discover"), ("Themes", None)])}
 <div class="pagehead index">
@@ -8183,6 +8224,7 @@ def themes_index(data):
 </div>
 {silhouette}
 <div class="rows">{"".join(rows)}</div>
+{themecred}
 <p class="small">Each shape beside a theme is that theme\u2019s own eight places on the
 continent, drawn to the same frame so the thirteen can be compared: a knot is an
 argument about one corner of Europe, a scatter is one about the whole of it.
@@ -8194,6 +8236,7 @@ respects distance, put the ones you want into the <a href="/plan">Planner</a>.</
 """
     return "/themes/index.html", page(
         "Themes", body, path="/themes", area="countries",
+        accent="indigo",
         description="Cross-border ways into Europe: medieval, sacred, Viking, alpine, maritime and rail Europe, each a real sequence of places.",
     )
 
@@ -8321,6 +8364,7 @@ def theme_page(data, t):
 """
     return f"/themes/{t['slug']}/index.html", page(
         t["name"], body, path=f"/themes/{t['slug']}", area="countries",
+        accent="indigo",
         description=t["summary"][:180],
         scripts=["/assets/js/my-europe.js"],
     )
@@ -11169,6 +11213,7 @@ def motion_page(data, m):
 """
     return f"/europe-in/{m['slug']}/index.html", page(
         m["name"], body, path=f"/europe-in/{m['slug']}", area="discover",
+        accent="cassis",
         description=f"{m['strapline']} {len(hits)} destinations match, queried from the Atlas on every build.",
         og=("motion:" + m["slug"], motif_for(m.get("interests", [])),
             f"{m['name']} — {m['strapline']}"),
@@ -11272,6 +11317,7 @@ drawing here cannot show a set the page it links to would not.
 """
     return "/europe-in/index.html", page(
         "Europe in Motion", body, path="/europe-in", area="discover",
+        accent="cassis",
         description=f"A dozen ways to cut the continent — each a real query run against all {len(data['cities'])} destinations on every build, with the query printed on the page.",
         og=("motion:index", "peaks", "Europe in Motion"),
         ld_blocks=[ld_breadcrumb([("Europe", "/discover"),

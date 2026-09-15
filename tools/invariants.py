@@ -322,9 +322,17 @@ def measure():
             "safety.img_tags": {
                 "value": sum(b.count("<img") for b in bodies.values()),
                 "kind": "exact",
-                "why": "Zero today, because zero photographs are licensed. This "
-                       "moving is the signal that licensed imagery arrived — "
-                       "which must go through the licence register first."},
+                "why": "It was zero while zero photographs were licensed, and "
+                       "this moving is the signal that licensed imagery arrived "
+                       "— which must go through the licence register first. "
+                       "20 -> 31 WHEN THE ELEVEN THEME PHOTOGRAPHS STOPPED "
+                       "APPEARING ON ELEVEN PAGES: they are the only pictures "
+                       "this atlas holds and they were each on their own page "
+                       "and nowhere else, so an index of thirteen things a "
+                       "reader chooses between on LOOK showed thirteen "
+                       "drawings. No photograph was acquired for this; the "
+                       "same eleven register rows are spent on one more "
+                       "surface, which is the whole of the change."},
             # The homepage is the flagship page and the one most likely to
             # gain weight, because every good idea wants to live on it. It
             # already carried a 2.6x regression unnoticed: a commit that cut

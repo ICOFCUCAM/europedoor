@@ -1247,7 +1247,27 @@ WORLDS = ("discover", "intelligence")
 # cultural accent is bound by the nav area the shell already sets. Only
 # heritage — the pages about how this project knows what it claims — needs
 # saying out loud, because those pages have no nav area of their own.
-ACCENTS = ("", "heritage")
+# EIGHT ACCENTS, NOT TWO, AND THE MEASUREMENT IS WHY.
+#
+# `docs/palette.json` declares the accent at five per cent of a screen and
+# the browser suite measures it at 0.3 — the one number in the ratio that
+# disagrees with its instruction, and the design-direction audit's finding
+# with a figure under it: "terracotta and atlantic are the entire
+# art-directional difference between a magazine story and a country
+# encyclopedia, and they are spent on an 11px kicker."
+#
+# Two accents over nine `area-` classes could not do better than that: 897 of
+# the site's pages are one area, so binding colour there paints most of the
+# atlas one colour whatever the hue. The family is the right grain and this
+# is the hook that has it.
+#
+# The hues are an EXTENSION of the four this palette already had rather than
+# a replacement for them — pine is the signature and is bound into a dozen
+# contrast claims and the masthead — and they are generated in OKLCH at even
+# hue steps so the set reads as a system rather than as eight picks. Every
+# one clears 4.5 on limestone as text, carries a 3:1 graphic step and a
+# ground tint that still holds its own ink at 4.7.
+ACCENTS = ("", "heritage", "lagoon", "adriatic", "indigo", "amethyst", "cassis")
 
 
 # ── content-addressed assets ─────────────────────────────────────────

@@ -169,6 +169,18 @@
      ratio is graphite, not another colour. */
   --door:         var(--pine-deep);
   --door-dark:    #173528;
+  /* The default family's graphic step and ground tint. Every accent block
+     below rebinds all four, so a component spends `--door-mark` or
+     `--door-wash` once and every family gets its own. */
+  --door-mark:    #03986e;
+  --door-wash:    #c0f1da;
+  /* THE TWO NEIGHBOURS ON THE WHEEL, so the ribbon runs across three hues
+     the way the reference's does rather than through one hue's own steps —
+     which is a tint ramp and reads as shading, not as colour. They are the
+     ADJACENT families' marks, so the gradient is always between hues that
+     are one even OKLCH step apart and cannot go grey through the middle. */
+  --door-near:    #09949b;
+  --door-far:     #7c8d36;
 
   /* The signature at full strength, for things that are drawn rather than
      read. WCAG asks 3:1 of a graphic, not 4.5:1, so this is where #2e7157
@@ -447,11 +459,55 @@
 body.area-stories, body.area-events, body.area-experiences {
   --door:      var(--terracotta);
   --door-dark: var(--terracotta-2);
+  --door-mark: #e55900;
+  --door-wash: #fee1d5;
+  --door-near: #7c8d36;
+  --door-far: #cf57ba;
 }
 body[data-accent="heritage"] {
   --door:      var(--atlantic);
   --door-dark: var(--atlantic-2);
+  --door-mark: #7c8d36;
+  --door-wash: #e0ecbf;
+  --door-near: #03986e;
+  --door-far: #e55900;
 }
+
+/* FIVE MORE, AND THEY ARE WHAT MAKES THE RATIO TRUE.
+ *
+ * The accent is declared at five per cent of a screen and measured at 0.3.
+ * Two accents over nine `area-` classes could never close that: 897 pages
+ * are one area, so most of the atlas was one colour whatever the hue, and
+ * what colour there was went on an 11px kicker.
+ *
+ * Generated in OKLCH at even hue steps, so the eight read as one system
+ * rather than as eight picks, and every one is measured against limestone:
+ * the ink clears 4.5 as text, the mark clears 3:1 as a graphic, and the
+ * wash is a GROUND — 1.09 against the paper, which is a tint you can see,
+ * and still holding its own ink at 4.7. The wash is the half that changes
+ * how the site reads, because an accent that is only ever ink can never be
+ * five per cent of anything.
+ *
+ * THE GOLD BAND IS STEPPED AROUND rather than avoided by taste: `checks.py`
+ * refuses a mid-lightness saturated yellow by arithmetic, so the generator
+ * tests every candidate against that same predicate and drops the chroma or
+ * the hue until it passes. Two evenly-spaced hues came out dull for exactly
+ * that reason and were left out of the set instead of shipped weak. */
+body[data-accent="lagoon"]   { --door: #086f74; --door-dark: #05575b;
+                               --door-mark: #09949b; --door-wash: #b6f1f4;
+                               --door-near: #0c8dce; --door-far: #03986e; }
+body[data-accent="adriatic"] { --door: #016a9d; --door-dark: #01537b;
+                               --door-mark: #0c8dce; --door-wash: #cfeafe;
+                               --door-near: #5e7cfa; --door-far: #09949b; }
+body[data-accent="indigo"]   { --door: #4058d3; --door-dark: #3346a8;
+                               --door-mark: #5e7cfa; --door-wash: #dee6fd;
+                               --door-near: #9f6aec; --door-far: #0c8dce; }
+body[data-accent="amethyst"] { --door: #7d45c5; --door-dark: #63369c;
+                               --door-mark: #9f6aec; --door-wash: #ebe2ff;
+                               --door-near: #cf57ba; --door-far: #5e7cfa; }
+body[data-accent="cassis"]   { --door: #a83095; --door-dark: #862676;
+                               --door-mark: #cf57ba; --door-wash: #feddf6;
+                               --door-near: #e55900; --door-far: #9f6aec; }
 
 /* Both accents have to lift for a dark-preference reader, and the browser
    suite is what said so: #a4491f is 3.17:1 on graphite and #4a5326 is
@@ -7105,3 +7161,110 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .pstile:hover .psname { color: var(--door); }
 @media (max-width: 64rem) { .pstrip { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 44rem) { .pstrip { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+
+/* ══ SPENDING THE ACCENT ═══════════════════════════════════════════════
+   THE RATIO ASKED FOR FIVE PER CENT AND THE PAGE DELIVERED 0.3.
+
+   Not because the accents were wrong — measured, they are the entire
+   art-directional difference between a magazine story and a country
+   encyclopedia — but because they were only ever INK, and almost all of it
+   on an 11px kicker. A colour that is never a ground cannot be five per
+   cent of a screen.
+
+   So the wash becomes a ground on the three surfaces every family already
+   has, and the mark carries the rules and the marks that were `--rule` and
+   `--ink-3` before. Nothing new is placed on the page: what changes is what
+   the things already there are made of. */
+
+/* AND THE FIRST VERSION SPREAD IT, WHICH IS THE OPPOSITE OF THE REFERENCE.
+ *
+ * It tinted every note and every quiet band in the family's wash, on the
+ * reasoning that an accent which is never a ground cannot be five per cent
+ * of a screen. That reasoning is right and the conclusion was wrong, and
+ * the reference settles it: the page it is drawn from is NEAR-WHITE and
+ * restrained, and its colour is CONCENTRATED — one enormous multi-hue
+ * ribbon across the opening, a second colour inside the headline, and a
+ * solid primary button. Nothing else on it is tinted at all.
+ *
+ * Scattered colour reads as a theme; concentrated colour reads as a
+ * signature. So the wash is spent in one place per page and the rest of the
+ * document keeps the paper it had.
+ *
+ * THE RIBBON IS DRAWN FROM THE FAMILY'S OWN THREE NEIGHBOURS ON THE WHEEL.
+ * That is why the wheel is generated in OKLCH at even hue steps rather than
+ * picked: a gradient between two hues that are not evenly spaced in a
+ * perceptual space bands and goes grey through the middle, which is the
+ * same Mach-band reasoning the hero's data fades already carry. */
+/* A RIBBON, NOT A CLOUD, AND ONE PER PAGE RATHER THAN ONE PER FAMILY.
+   The first version was three wide radial blooms across a plate and read as
+   weather — a green fog over the headline. The second was a narrow angled
+   band, which is right, and it was attached to the head class the theme
+   family happens to use: two pages of forty-seven.
+
+   On the reference it is ONE event at the top of the document, sweeping in
+   from a corner, with the type kept on the clean side and the rest of the
+   page white. So it hangs off the body, takes the family's accent through
+   `--door`, and every page gets it without a page builder changing — which
+   is also the only version of this that cannot drift family by family.
+
+   THE HUES ARE THE FAMILY'S THREE NEIGHBOURS ON THE WHEEL. A gradient
+   through one hue's own steps is a tint ramp and reads as shading; the wheel
+   is generated in OKLCH at even steps precisely so that a blend between
+   adjacent families cannot go grey through the middle, which is the Mach
+   band reasoning the hero's data fades already carry. */
+/* AND THEN IT COVERED THE PAGE, WHICH IS THE FAULT IT WAS MEANT TO FIX.
+   At 82% over the right two-thirds and the full height of the viewport it
+   stopped being an event and became a wash — running behind body copy on
+   every prose page, which is a legibility fault as well as a design one. On
+   the reference the ribbon lives in the HERO BAND and the type sits clear of
+   it; below the fold that page is white.
+
+   So it is bounded to the head's own depth, kept to the right half where
+   every family already puts its figure, and taken down to a little over a
+   third of its opacity. Concentrated is the whole idea and concentrated has
+   an edge: colour everywhere is a theme, colour in one place is a signature. */
+body::before {
+  content: ""; position: absolute; top: 0; right: 0;
+  width: 54%; height: 34rem; z-index: 0; pointer-events: none;
+  opacity: .30;
+  background: linear-gradient(118deg,
+    transparent 8%,
+    var(--door-wash) 20%,
+    var(--door-far) 34%,
+    var(--door-mark) 48%,
+    var(--door) 58%,
+    var(--door-near) 72%,
+    var(--door-wash) 86%,
+    transparent 97%);
+  filter: blur(34px) saturate(120%);
+}
+/* The two plate pages open on a full-bleed composition of their own and
+   carry it at full strength, because there the ribbon IS the opening rather
+   than something behind one. */
+body[data-hero]::before { opacity: .62; height: 44rem; }
+body { position: relative; overflow-x: hidden; }
+.masthead, main, .sitefoot, .thumbbar { position: relative; z-index: 1; }
+/* The two plate pages paint their own grounds, so the ribbon reads through
+   the door plate (which is transparent by design) and is covered by the
+   plates that are not — which is the correct order rather than an accident:
+   a plate with a ground is a surface, and a surface sits on the paper. */
+
+/* `.aurora` was the per-family span and is gone; these keep their stacking
+   context because the plates and the opening still layer their own children. */
+.pagehead.opening, .sheet-door { position: relative; }
+.pagehead.opening > *, .sheet-door > * { position: relative; z-index: 1; }
+
+/* The second spend: the headline's own second clause. On the reference the
+   sentence changes colour halfway through and that is the whole of the type
+   treatment — no rules, no boxes, no tinted panels. */
+.tint { color: var(--door); }
+
+/* The third: the primary action, solid, in the family's ink. */
+.btn { background: var(--door); border-color: var(--door); color: var(--limestone); }
+.btn:hover { background: var(--door-dark); border-color: var(--door-dark); }
+
+/* The section opener's rule stays the one structural mark that takes the
+   graphic step: it says a movement changed and it was drawn in the hairline
+   that separates two list rows. */
+.band.opens { border-top-color: var(--door-mark); }
