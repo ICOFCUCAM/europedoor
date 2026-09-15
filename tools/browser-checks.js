@@ -3992,6 +3992,57 @@ async function main() {
   }
 
 
+  /* ── NOT ONE PAGE SCROLLS SIDEWAYS, ON EVERY FAMILY, AT EVERY PHONE ──
+   *
+   * There were four overflow assertions in this suite and every one of them
+   * named a page by hand: the homepage's full-bleed band, a populated
+   * /my-europe, /map, and the clipping sweep's list of eighteen. None of
+   * them is a place page, so the place family scrolled sideways at 390 — the
+   * width every gate here runs at — and nothing said so.
+   *
+   * What it was: Europe writes `Jugendstilsenteret`, `Kunsthistorisches` and
+   * `Groeningemuseum`, an h1 is set at 76px, and a word longer than the
+   * column ran off the right edge. Measured before the fix: Groeningemuseum
+   * 381 units of word in a 336-pixel box at 390, pushing the document 7px
+   * sideways; 37 at 360 and 77 at 320. And separately the country door,
+   * sized by height on a frame held to a constant 1.299, is always 312
+   * pixels wide against a 288-pixel column at 320.
+   *
+   * THE LIST IS `tools/lib/families.js`, which is the one list of rendered
+   * families and is enumerated against the built site. A hand-typed list is
+   * how three templates went unmeasured until a fund project page was found
+   * shipping at 0% picture, and it is how this went unmeasured too.
+   *
+   * 360 is in the widths because the fault was 7px at 390 and 37 at 360: a
+   * defect that is one pixel under the threshold at the design width is a
+   * defect somebody will call a rounding error.
+   */
+  {
+    const FAM = require("./lib/families.js").ALL;
+    for (const W of [320, 360, 390]) {
+      const op = await browser.newPage({ viewport: { width: W, height: 900 } });
+      const hits = [];
+      let seen = 0;
+      for (const [name, url] of FAM) {
+        const r = await op.goto(base + url, { waitUntil: "load" });
+        if (!r || r.status() !== 200) continue;
+        seen++;
+        const over = await op.evaluate(() =>
+          document.documentElement.scrollWidth
+          - document.documentElement.clientWidth);
+        if (over > 1) hits.push(`${name} +${over}px`);
+      }
+      await op.close();
+      checked += seen;
+      ok(seen >= 40,
+         `the sideways-scroll sweep read only ${seen} families at ${W} — it ` +
+         `has stopped finding them`);
+      ok(hits.length === 0,
+         `${hits.length} of ${seen} families scroll sideways at ${W}px: ` +
+         `${hits.slice(0, 5).join(", ")}. A reader cannot put the page back.`);
+    }
+  }
+
   /* A PLACEHOLDER A READER CANNOT READ IS A TUTORIAL WITH ITS LAST LINE
    * MISSING.
    *

@@ -579,8 +579,24 @@ body {
    a 24-pixel last line under a 341-pixel one on /how-it-works. It is one
    declaration and it is the browser's own line-breaker; the seven
    per-element copies are gone. */
+/* AND A WORD LONGER THAN THE COLUMN RAN OFF THE SCREEN. Europe writes
+   `Jugendstilsenteret`, `Kunsthistorisches` and `Groeningemuseum`, and an h1
+   is set at 76px: measured on the built pages, Groeningemuseum is 381 units
+   of word in a 336-pixel box AT 390 — the width every gate here runs at —
+   and it pushes the whole document 7px sideways; at 360 that is 37 and at
+   320 it is 77. A headline running off the right edge of a phone is the
+   defect this stylesheet already refuses of a map label sliced by the
+   aperture and of a place name cut in a sticky bar, arriving on the one
+   piece of type a reader reads first.
+
+   `break-word` rather than `anywhere`: it breaks a word ONLY when the word
+   cannot fit on a line of its own, so nothing that fits today moves by a
+   pixel. Hyphenation is refused instead — `hyphens: auto` would hyphenate
+   Norwegian and Dutch compounds against this document's `lang="en"`
+   dictionary, which is a wrong break rather than no break. */
 h1, h2, h3, h4 { font-family: var(--display); font-weight: 600; line-height: 1.12;
-                 margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+                 margin: 0; letter-spacing: -0.01em; text-wrap: balance;
+                 overflow-wrap: break-word; }
 h1 { font-size: clamp(var(--t-3xl), 5.2vw, var(--t-5xl)); }
 h2 { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); }
 h3 { font-size: var(--t-lg); }
@@ -3321,7 +3337,20 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
      height: at 26rem the widest door is 541px, wider than the screen, and
      the character line has to arrive before the picture in any case. */
   .portrait { margin-inline: auto; }
-  .portrait svg { height: 15rem; }
+  /* AND 15rem IS TOO TALL BELOW 360. The door is sized by HEIGHT so that
+     fifty countries hang at one height, and its frame is held to a constant
+     1.299 — measured on all fifty built portraits, every one of them a
+     508x391 viewBox — so 15rem is always 312 pixels wide. At 320 the column
+     is 288 and the page scrolled sideways by 8 on every country page, which
+     is the narrowest phone still in use and the one this stylesheet already
+     records the wordmark being sliced at.
+
+     The cap is arithmetic rather than a guess: the column is the viewport
+     less two phone gutters, and the divisor is the frame's own proportion,
+     which `checks.py` asserts against the built plates so it cannot go
+     stale silently. At 390 it resolves to 276 and the min keeps 240, so no
+     ordinary phone moves. */
+  .portrait svg { height: min(15rem, calc((100vw - 2 * var(--s4)) / 1.299)); }
 }
 
 /* ── a fund project: a thing, in a country ────────────────────────

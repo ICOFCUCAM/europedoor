@@ -5272,6 +5272,55 @@ def c_og_never_hashed():
     return n
 
 
+@check("the portrait cap in the stylesheet is the portraits' own proportion")
+def c_portrait_cap():
+    """A NUMBER IN THE STYLESHEET THAT IS A FACT ABOUT THE DRAWINGS.
+
+    The country door is sized by HEIGHT, so that fifty countries hang at one
+    height and only the shape inside differs — which is the whole claim that
+    figure makes. Its frame is held to a constant proportion, so a fixed
+    height is also a fixed width, and at 15rem that is 312 pixels: at a
+    320-pixel viewport the column is 288 and every country page scrolled
+    sideways by 8.
+
+    The phone rule caps it by arithmetic — the column, divided by the frame's
+    proportion — and that divisor is the second copy of a number the build
+    already owns. This is the assertion that keeps the two the same, because
+    a cap written for a 1.299 frame is silently wrong on a 1.6 one and the
+    only symptom is a page that scrolls sideways on the narrowest phone.
+    """
+    css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
+               encoding="utf-8").read()
+    m = re.search(r"\.portrait svg \{ height: min\([^,]+, "
+                  r"calc\(\(100vw - 2 \* var\(--s4\)\) / ([\d.]+)\)\); \}", css)
+    if not m:
+        fail("the phone portrait rule no longer caps the door by the frame's "
+             "proportion; at 320 the door is wider than the column")
+        return 0
+    assumed = float(m.group(1))
+    n = 0
+    worst = (0.0, "")
+    for f in glob.glob(os.path.join(OUT, "europe", "*", "index.html")):
+        h = open(f, encoding="utf-8").read()
+        v = re.search(r'<figure class="[^"]*\bportrait\b[^"]*"[^>]*>\s*'
+                      r'<svg viewBox="0 0 ([\d.]+) ([\d.]+)"', h)
+        if not v:
+            continue
+        n += 1
+        ratio = float(v.group(1)) / float(v.group(2))
+        if ratio > worst[0]:
+            worst = (ratio, rel(f))
+    if n < 40:
+        fail(f"the portrait cap check found only {n} portraits — it has "
+             f"stopped matching the markup")
+    elif worst[0] > assumed + 0.001:
+        fail(f"the stylesheet caps the country door at a frame of {assumed} "
+             f"and {worst[1]} draws {worst[0]:.3f}. The door is sized by "
+             f"height, so a wider frame is a wider door: at 320 it will run "
+             f"past the column and scroll the page sideways.")
+    return n
+
+
 @check("every page head declares what kind of page it is")
 def c_pagehead_role():
     # TWENTY-ONE OF TWENTY-TWO FAMILIES PLACED AN IDENTICAL h1 IN AN
