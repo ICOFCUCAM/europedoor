@@ -1555,7 +1555,7 @@ def home(data):
   <form class="askhero" action="/plan" method="get">
     <label for="homeask">Where would you like to go — or what would you like to discover?</label>
     <input type="text" id="homeask" name="ask" autocomplete="off"
-           placeholder="A quiet mountain escape, October.">
+           placeholder="Somewhere quiet, in October.">
     <button class="btn" type="submit">Plan my journey</button>
   </form>
   <div class="chips hero-intents">{intentchips}</div>

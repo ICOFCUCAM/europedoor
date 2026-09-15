@@ -1717,6 +1717,12 @@ a .kicker { color: var(--ink-3); }
                       color: var(--ink-2); margin: var(--s2) 0 0;
                       max-width: 62ch; }
 .motionrow .rowmeta { text-align: right; font-variant-numeric: tabular-nums; }
+/* NOWRAP IS A PROMISE THE LINE CAN KEEP ONLY AT ITS OWN SIZE. "19 DAYS ·
+   5 COUNTRIES · MODERATE" fitted a 288px column at 13px and does not at 15,
+   so raising the reading scale pushed /journeys 13 pixels off the right edge
+   of a 320px screen. The rule is there to stop "19 DAYS" breaking after the
+   number; below the width where the whole line fits, wrapping between the
+   middots is what it should have done all along. */
 .journeyrow .rowmeta { text-align: right; white-space: nowrap; }
 /* HOW FAR THE THEME REACHES, WHICH IS THE ONLY FIGURE ON THIS INDEX THAT
    VARIES. Every theme holds eight places, so the count the cards used to
@@ -3288,7 +3294,6 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    on the other side of the door. */
 .askband { margin: 0 0 var(--s8); }
 .askband .hero-intents { margin-top: var(--s4); }
-
 /* COUNTRY = IDENTITY. The name beside the shape, and the shape in a tall
    door. The homepage's opening is wide because a continent is wide; a
    country is a figure and stands in a figure's doorway. The aperture's
@@ -3679,10 +3684,25 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 .askhero label { font-family: var(--display); font-size: clamp(var(--t-lg), 2.4vw, var(--t-2xl));
   line-height: 1.25; text-wrap: balance;
                  color: var(--ink-2); }
+/* AND THE CONTROL IS SIZED BY ITS OWN EXAMPLE. `--t-md` is the lede size and
+   right for the largest control on the site at desk width; raising the
+   reading scale 17 to 19 made "A quiet mountain escape, October." six pixels
+   wider than the field it teaches, and the planner's sentence box short of
+   its example by 6px at 390 and 37px at 320. A hint a reader cannot read is
+   worse than no hint. Below the width where the example fits, the box takes
+   the body size, which is still the second largest type on the page. */
 .askhero input { width: 100%; font: inherit; font-size: var(--t-md);
                  padding: var(--s4); border: 1px solid transparent; border-radius: var(--radius);
                  background: var(--paper); color: var(--ink); }
 .askhero input:focus-visible { border-color: var(--signature); }
+/* AFTER the base rule, not before it. A media query adds no specificity, so
+   written above `.askhero input` this lost to it at every width and changed
+   nothing — the same trap this stylesheet already records about the 64rem
+   glyph block, made again one screen from where it is written down. */
+@media (max-width: 44rem) {
+  .askhero input, #askform .field textarea,
+  #searchform .field input[type="text"] { font-size: var(--t-sm); }
+}
 /* The chips were limestone on a graphite scrim because they sat inside the
    hero. On the light band that treatment is a grey pill, which is the shape
    this stylesheet uses for something INERT — and these are the fastest way
@@ -3835,7 +3855,14 @@ body[data-hero] .masthead { position: sticky; }
    Kunsthistorisches, Groeningemuseum and Jugendstilsenteret did the same, on
    four pages of 1,033. `min-content` is the floor that cannot be wrong,
    because it is measured from the glyphs rather than modelled from a count. */
-.overture h1 { max-width: 14ch; min-width: min-content;
+/* AND THE FLOOR IS CAPPED BY THE CONTAINER. `min-content` alone is the width
+   of the longest word whatever that costs, so Kunsthistorisches pushed the
+   place page 53 pixels off the right edge of a 320px screen — a document that
+   scrolls sideways, which is worse than the broken word this was fixing.
+   Below the width where the word fits, it goes back to breaking, which is the
+   right answer there: a headline running off the edge is the worst of the
+   three. */
+.overture h1 { max-width: 14ch; min-width: min(100%, min-content);
                font-size: clamp(var(--t-4xl), 7vw, var(--t-6xl)); }
 /* The authored sentence, at display scale. It was a .lede — 17px grey body
  * copy — which is how the best-written thing on the page ended up looking
@@ -6174,7 +6201,11 @@ body[data-hero] .masthead { position: sticky; }
    * numerals stacked in a right-hand column is a shape a phone has no room
    * for, and the numbers read perfectly well in a row. */
   .closein { grid-template-columns: 1fr; gap: var(--s6); }
-  .closeextent { grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* auto-fit rather than repeat(3): "Travel regions" and "Destinations" are
+     single words at 13px uppercase with .09em of tracking, so a third of a
+     288px column cannot hold either of them and the homepage ran 9px off a
+     320px screen. Three tracks where three fit, two where they do not. */
+  .closeextent { grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
                  text-align: left; }
 }
 
@@ -6260,6 +6291,12 @@ body[data-hero] .masthead { position: sticky; }
 
 @media (max-width: 52rem) {
   .journeyrows .row, .storyleadwide { grid-template-columns: 1fr; gap: var(--s4); }
+  /* And the facts line wraps. nowrap is a promise the line can keep only at
+     its own size: "19 DAYS · 5 COUNTRIES · MODERATE" fitted a 288px column at
+     13px and does not at 15, so raising the reading scale pushed /journeys 13
+     pixels off a 320px screen. Above this width it still fits, so this costs
+     nothing there. */
+  .journeyrow .rowmeta { white-space: normal; }
   /* `min(22rem, 100%)`, the same cap every other stacked row drawing takes.
      It was a flat 18rem, chosen while these seventeen routes were hidden
      below 44rem entirely — so the number was only ever about the band
