@@ -3556,19 +3556,47 @@ async function main() {
                    "/europe/greece/athens-and-the-peloponnese/hydra"]) {
     await page.goto(base + u, { waitUntil: "load" });
     const a = await page.evaluate(() => {
-      const r = document.querySelector(".arrivalhead .reasons");
-      const v = document.querySelector(".placeband-map figure.minimap");
-      const land = document.querySelector(".placeband-map .countries path");
-      const sea = document.querySelector(".placeband-map .archground");
+      const top = (e) => (e ? e.getBoundingClientRect().top + scrollY : null);
+      const r = document.querySelector(".reasons");
+      const v = document.querySelector("figure.minimap");
+      const land = document.querySelector(".countries path");
+      const sea = document.querySelector(".archground");
+      // The place's own sentence, wherever the composition puts it.
+      const say = document.querySelector(
+        ".ed-arrival-copy p, .arrivalhead .statement, .arrivalhead p");
+      const onward = document.querySelector("#onward, [id='onward']");
+      const stay = document.querySelector("#stay, [id='stay']");
       return {
-        reasons: r ? r.getBoundingClientRect().top + scrollY : null,
-        view: v ? v.getBoundingClientRect().top + scrollY : null,
+        reasons: top(r), view: top(v), say: top(say),
+        onward: top(onward), stay: top(stay),
         land: land && getComputedStyle(land).fill,
         sea: sea && getComputedStyle(sea).fill,
       };
     });
-    ok(a.reasons !== null && a.view !== null && a.reasons < a.view,
-       `${u}: the reasons are not above the view (${a.reasons} / ${a.view})`);
+    // THE ARGUMENT COMES BEFORE THE TRANSACTION, AND THE VIEW IS NOW IN THE
+    // HEAD. This asserted `.arrivalhead .reasons` above `.placeband-map`,
+    // which was the order when the view was a band BELOW the head — and the
+    // arrival composition puts the map in the opening with the place's name
+    // and its own sentence over it, so the reasons follow at 1065 where the
+    // drawing starts at 275. That is a deliberate change and this assertion
+    // is deliberately weaker for it: it no longer says where the drawing is.
+    //
+    // What it says instead is the part that was always the point. The
+    // place's own sentence — its one-line argument — must be at or above the
+    // view rather than below it, so a reader meets what this place IS before
+    // they read the instrument; and the reasons must come before anything
+    // transactional, which is the order `docs/ux-specification.md` has
+    // asserted by id since before the Stay layer existed.
+    ok(a.say !== null && a.view !== null && a.say <= a.view + 1,
+       `${u}: the place's own sentence is below the view (${a.say} / ` +
+       `${a.view}) — a reader meets the instrument before they are told ` +
+       `what the place is`);
+    for (const [k, what] of [["stay", "the Stay layer"],
+                             ["onward", "the onward stops"]])
+      if (a[k] !== null)
+        ok(a.reasons !== null && a.reasons < a[k],
+           `${u}: the reasons are not above ${what} (${a.reasons} / ` +
+           `${a[k]}) — the argument has to come before the transaction`);
     ok(a.view !== null && a.view < 900,
        `${u}: the view starts at ${a.view}, below the first screen`);
     ok(a.land && a.land !== "none" && a.land !== a.sea,

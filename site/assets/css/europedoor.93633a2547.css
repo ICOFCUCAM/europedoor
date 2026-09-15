@@ -8341,7 +8341,19 @@ body[data-family="arrival"] .ed-arrival-copy .ed-eyebrow,
 /* WITH NO PHOTOGRAPH THE MAP IS THE MEDIA, and it is the whole slot rather
    than a strip: 826 of 837 surfaces hold no photograph today, so the state
    this family actually ships in is the one that has to compose. */
+/* AND THE PAD COMES OFF ON A PHONE, BECAUSE IT IS CHARGED IN LABELS.
+   `--s6` is 32px, so at 390 the drawing rendered 294 of the 358 available —
+   18% of its width spent on air inside a box that already sits on the page
+   gutter. A map label is sized in viewBox units and what a reader gets is
+   `units × (width / viewBox)`, so that 18% took Innsbruck, Hallstatt and
+   Malbun to 8.6px: not small type, type that does not resolve into glyphs,
+   which is the measurement that took labels off narrow screens on eight
+   hundred pages. 294 to 358 is 8.6 to 10.4. The pad is air on a desk, where
+   the drawing has width to spare; on a phone it is three names. */
 .ed-arrival-media.maponly { display: grid; place-items: center; padding: var(--s6); }
+@media (max-width: 52rem) {
+  .ed-arrival-media.maponly { padding: 0; }
+}
 .ed-arrival-media .placeband-map { width: 100%; }
 
 /* THE JOURNEY HERO'S OWN FACTS LINE, on cobalt. A journey's three numbers
