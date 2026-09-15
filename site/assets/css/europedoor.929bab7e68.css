@@ -3515,7 +3515,31 @@ body[data-hero] .masthead { position: sticky; }
  * and the argument starts higher. Written mobile-first and widened at an
  * EXISTING breakpoint, so the breakpoint ceiling does not move. */
 .overture { padding-top: var(--s4); }
-.overture h1 { max-width: 14ch; }
+/* THE NAME IS THE EVENT, AND IT WAS SET AT AN INDEX LABEL'S SIZE.
+ *
+ * The three head roles were built to differ in measure, position and air,
+ * and a seventeenth type size was refused twice on the grounds that a role
+ * needing a new scale value is a decoration. That refusal is right and is
+ * kept: this introduces no token and no value. What was never measured is
+ * that `h1 { clamp(--t-3xl, 5.2vw, --t-5xl) }` has a fluid term worth 20px
+ * at 390, so THE FLOOR WINS ON EVERY PAGE ON THE SITE AT PHONE WIDTH —
+ * `tools/opening.js` reports 21 of 27 families at exactly 38px. The scale is
+ * fluid on a desktop and fixed on a phone, so at the width most readers
+ * arrive at, an overture and an index were the same size to the pixel and
+ * the whole distinction rested on measure and air.
+ *
+ * An overture is ONE THING and its name is the event; `docs/image-philosophy.md`
+ * and the first-class audit both say the same thing from different ends —
+ * with no photograph in the register, desire is carried entirely by type,
+ * and the type was set at the size every other family uses.
+ *
+ * THE VALUE IS THE HERO'S OWN, verbatim from `.herofull h1` further up this
+ * file: 48px at a phone, 76px at the widest. Nothing new is declared, the
+ * scale stays at sixteen sizes, and the one page that already decided what
+ * "this is the event" looks like now lends it to the eight families whose
+ * subject is a single named thing. */
+.overture h1 { max-width: 14ch;
+               font-size: clamp(var(--t-4xl), 7vw, var(--t-6xl)); }
 /* The authored sentence, at display scale. It was a .lede — 17px grey body
  * copy — which is how the best-written thing on the page ended up looking
  * like a caption. 66 to 144 characters across the atlas, median 103, so the
