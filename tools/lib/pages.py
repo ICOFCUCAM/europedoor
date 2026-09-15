@@ -2701,8 +2701,27 @@ def countryportrait(data, c):
     # nothing else, and this plate's whole rule is that it draws what it can
     # name. Never more than a few either — a plate is not a field of
     # triangles.
+    #
+    # AND IT MUST BE THIS COUNTRY'S MOUNTAIN. `summit_points` returns the
+    # highest peaks IN FRAME, and a country plate frames its neighbours too —
+    # so the tallest thing on screen is very often across the border. Measured
+    # across the fifty: thirty plates named a summit and most named a foreign
+    # one. Austria named Triglav, which is Slovenian, and not Grossglockner;
+    # Switzerland named Mont Blanc; Germany named Finsteraarhorn, which is
+    # Swiss; Greece named Musala, which is Bulgarian; Croatia named three
+    # peaks and not one of them Croatian. A single triangle with a height on
+    # a page about one country reads as that country's mountain, which is the
+    # class of small lie this repository refuses everywhere else.
+    #
+    # The test is NameGround's, already built above for the country's own
+    # name, and it is point-in-polygon against the drawn geometry rather than
+    # an authored list of which peak belongs to whom. Where a country has no
+    # named summit in the dataset it names none, which is what twenty plates
+    # already do.
     summitmarks = ""
     for px, py, nm, m in cartography.summit_points(proj.xy, (0, 0, w, h)):
+        if _here_i is not None and not _ground.own(_here_i, px, py):
+            continue
         if _try_label(px, py, f"{nm} {m:,} m", "peakname", off=8.0):
             summitmarks += (f'<path class="peak" d="M{px:.1f} {py - 4.2:.1f}'
                             f'L{px + 4.0:.1f} {py + 2.6:.1f}'
