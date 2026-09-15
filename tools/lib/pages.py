@@ -3500,7 +3500,7 @@ def city_page(data, c, r, t):
   </div>
   <div>
     <h2 class="mini">Getting there</h2>
-    <p>{esc(c['getting_around'][:150])}…
+    <p>{esc(first_sentence(c['getting_around']))}
     <a href="{urls.country(c)}#getting-around">All of {esc(c['name'])} →</a></p>
   </div>
 </section>
@@ -4910,6 +4910,17 @@ def first_sentence(text):
     printed on 400 place pages, that reads as a rendering fault rather than
     as a summary. A sentence boundary is the one place a text can be cut
     without looking broken.
+
+    AND THE DESTINATION PAGE'S "GETTING THERE" PANEL NEVER TOOK IT. It kept
+    `getting_around[:150] + "…"`, which is the exact expression this function
+    replaced, one screen away from the function that replaced it: 30 of the
+    50 countries are cut mid-WORD at 150 characters, so **213 of 319
+    destination pages** printed "Rural France needs a car; the re…". A rule
+    that exists is not a rule that is inherited.
+
+    It fits, measured rather than hoped: the first sentence of
+    `getting_around` runs 8 to 171 characters with a median of 80, against
+    the 150 the panel was already giving it.
     """
     for stop in (". ", "! ", "? "):
         i = text.find(stop)

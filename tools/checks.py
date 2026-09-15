@@ -4096,6 +4096,46 @@ def c_score_median():
 
 
 @check("no drawing quietly omits a place it is drawn from")
+@check("no page prints a word cut in half")
+def c_cut_word():
+    """`first_sentence()` exists, and the page it was written for did not use it.
+
+    The helper carries its own reason: `text[:140] + "…"` cut "…and cost less
+    than the equivalent flight if booked early. Coastal Norway…" on 400 place
+    pages, "a truncation mid-clause that reads as a rendering fault rather
+    than as a summary. A sentence boundary is the one place a text can be cut
+    without looking broken."
+
+    The destination page's "Getting there" panel kept
+    `getting_around[:150] + "…"` — the exact expression that helper replaced,
+    one screen from the helper. Measured on the data: 30 of the 50 countries
+    are cut mid-WORD at 150 characters, so **213 of 319 destination pages**
+    printed "Rural France needs a car; the re…". A rule that exists is not a
+    rule that is inherited, which this repository has now recorded of a
+    label family, a collision pass and a truncation.
+
+    THE CHECK IS ON THE SHIPPED HTML, NOT ON THE CALL SITES, because the next
+    one will be written somewhere this list has never heard of. A `<span
+    class="mono">` is exempt and is the only exemption: a SHA-256 shown as
+    its first twelve characters is a prefix rather than a sentence, and it is
+    checked against the class rather than by pattern because a looser rule is
+    how a real truncation gets back in.
+    """
+    n = 0
+    mono = re.compile(r'<span class="mono">.*?</span>', re.S)
+    for f in site_files():
+        h = mono.sub(" ", open(f, encoding="utf-8").read())
+        n += h.count("…")
+        for m in re.finditer(r"(\w{0,20})…", h):
+            word = m.group(1)
+            if word and word[-1].isalnum():
+                fail(f"{canonical_of(f)} prints \"{word}…\" — an ellipsis "
+                     f"inside a word. A text cut at a fixed character count "
+                     f"reads as a rendering fault; `first_sentence()` cuts at "
+                     f"the one boundary that does not.")
+    return n
+
+
 @check("a page claiming one frame draws one frame")
 def c_same_frame():
     """"Drawn to the same frame so the nine can be compared" was not true.
