@@ -1909,49 +1909,52 @@ def c_instruction():
     if sum(pal["ratio"][k] for k in pal["ratio"] if not k.startswith("$")) != 100:
         fail("the palette ratio does not add to 100")
 
-    # A BAND IS A CLAIM ABOUT WHERE A COLOUR IS, and the two hue windows the
-    # ratio is measured in were typed into a ternary in the browser suite.
-    # Moving the signature from 229 degrees to 156 would have reclassified
-    # every pixel of it as the accent and reported the signature at zero —
-    # a palette change silently breaking the instrument that measures
-    # palettes. They are data now, and this asserts they still contain the
-    # tokens they are named for.
-    bands = pal["ratio"].get("$bands")
-    if not bands:
-        fail("docs/palette.json declares no hue bands — the ratio's classifier "
-             "is carrying two typed numbers again")
+    # A FAMILY IS A CLAIM ABOUT WHICH COLOURS ARE WHICH, and the ratio's
+    # classifier used to carry two HUE WINDOWS to answer it. That worked
+    # while the signature was cobalt at 229 degrees and the water at 202,
+    # and it stopped working the moment the owner's palette put pine at
+    # 174.2 and the map water at 174.5 — three tenths of a degree, so the
+    # water window swallowed the masthead and the run reported the
+    # signature at 0.1% against a declared 10. The windows were already
+    # DATA rather than a ternary, which is the only reason that reading
+    # could be diagnosed; data was not enough, because two overlapping
+    # windows are two windows whichever file they live in.
+    #
+    # A pixel is classified by the token it is NEAREST to now, so what this
+    # asserts is that the lookup is COMPLETE: every declared token belongs
+    # to exactly one family, and every family names only declared tokens.
+    # A token in no family is a colour the instrument counts as nothing;
+    # a token in two is a share counted twice.
+    fam = pal["ratio"].get("$families")
+    if not fam:
+        fail("docs/palette.json declares no ratio families — the classifier "
+             "is carrying typed hue windows again, and the last pair of "
+             "those could not tell the signature from the sea")
     else:
-        def _hue(hexv):
-            h = hexv.lstrip("#")
-            r_, g_, b_ = (int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))
-            return colorsys.rgb_to_hls(r_, g_, b_)[0] * 360.0
-        WANT = {"signature": ("pine", "pine-deep", "pine-lift", "pine-air")}
-        for band, names in WANT.items():
-            lo, hi = bands[band]
-            for name in names:
-                h = _hue(tok[name]["hex"])
-                if not (lo <= h <= hi):
-                    fail(f"{name} ({tok[name]['hex']}) is at hue {h:.0f} and the "
-                         f"{band!r} band is {lo}-{hi} — the ratio would count it "
-                         f"as the accent and report the signature at zero")
-                n += 1
-        # And the water band has to hold the water, which lives in the
-        # stylesheet rather than in the register.
-        lo, hi = bands["water"]
-        _css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
-                    encoding="utf-8").read()
-        for name in ("--atlas-sea", "--ocean-deep", "--ocean-mid",
-                     "--ocean-shallow", "--ocean-coastal"):
-            hexv = css_hex(_css, name)
-            if not hexv:
-                fail(f"{name} is not declared in the stylesheet")
+        if not isinstance(fam.get("max_distance"), (int, float)):
+            fail("the ratio families declare no max_distance, so a "
+                 "photograph's pixels would be assigned to whichever token "
+                 "they happen to be least unlike")
+        seen = {}
+        for family, names in fam.items():
+            if not isinstance(names, list):
                 continue
-            h = _hue(hexv)
-            if not (lo <= h <= hi):
-                fail(f"{name} ({hexv}) is at hue {h:.0f} and the water "
-                     f"band is {lo}-{hi}")
+            for name in names:
+                if name not in tok:
+                    fail(f"the ratio family {family!r} names {name!r}, which "
+                         f"is not a declared token")
+                if name in seen:
+                    fail(f"{name} is in two ratio families ({seen[name]} and "
+                         f"{family}), so its pixels are counted twice")
+                seen[name] = family
+                n += 1
+        for name in tok:
+            if name not in seen:
+                fail(f"palette token {name} is in no ratio family, so every "
+                     f"pixel painted in it is counted as nothing and the "
+                     f"shares under it are wrong by however much of the "
+                     f"screen it covers")
             n += 1
-    n += 1
 
     # GOLD IS ADMITTED AS A GROUND AND A MARK, AND THE RULE THAT REFUSED IT
     # IS NARROWED RATHER THAN DELETED.
@@ -2669,7 +2672,14 @@ def c_frontend():
     inv = importlib.import_module("invariants")
     sizes = {inv._size_of(v)
              for v in re.findall(r"font-size:\s*([^;]+);", inv._css())}
-    if len(sizes) > 20:
+    # 24 RATHER THAN 20, AND THE FOUR ARE THE 2036 SYSTEM'S WHOLE SCALE.
+    # Eight page families, four display values: an opening, a section, a row
+    # and the reading step under them. The brief wrote nine clamps, one per
+    # component, each a few pixels from its neighbour — and nine arbitrary
+    # clamps is a second type scale wearing the first one's clothes, which
+    # is how the sibling repository reached 418. The ceiling moves by what
+    # was actually added and no further.
+    if len(sizes) > 24:
         fail(f"{len(sizes)} distinct font-size values; the audit measured 13 and the "
              f"sibling repository measured 418: " + ", ".join(sorted(sizes)))
     bps = set(re.findall(r"@media[^{]*\(m(?:in|ax)-width:\s*([^)]+)\)", css))

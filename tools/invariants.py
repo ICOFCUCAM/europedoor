@@ -268,7 +268,22 @@ def measure():
                        "5.2vw rate, the 1.12 leading, the -.022em — is the "
                        "site\'s own. The same commit\'s first version also "
                        "moved the leading to 1.06 and the rate to 6.2vw; both "
-                       "went red here, both were wrong, and both came out."},
+                       "went red here, both were wrong, and both came out."
+                       " AND IT IS 22 FOR THE 2036 PAGE SYSTEM: four "
+                       "values for eight page families. The brief writes nine "
+                       "clamps, one per component, each a few pixels from its "
+                       "neighbour, and nine arbitrary clamps is a second type "
+                       "scale wearing the first one's clothes — which is how "
+                       "the sibling repository reached 418. --ed-display-1 is "
+                       "every opening, every hero and every institutional head; "
+                       "--ed-display-2 is every section title, split and arrival; "
+                       "--ed-display-3 is every row and route stop; --ed-read is "
+                       "the standfirst under all of them. A system is what a set "
+                       "of components have in COMMON, not what each of them "
+                       "declares, and the two bare steps the first draft also "
+                       "spent were folded in rather than counted — the second "
+                       "of them a narrow-screen override restating what its own "
+                       "clamp already computes at that width."},
             "css.font_weights": {
                 "value": len(set(re.findall(r"font-weight:\s*([^;]+);", css))),
                 "kind": "ceiling", "why": "Four is enough for an editorial system."},

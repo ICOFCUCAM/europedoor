@@ -4907,8 +4907,22 @@ def countrymap(data, c):
                 f'mainland to draw at this scale without emptying the map.')
     drawn = "".join(phone_declutter(_declutter(labels, w, h), frame=(w, h)))
     return (
+        # AND THE FIFTY COUNTRY MAPS WERE STILL CARRYING THE INSTRUMENT WORLD
+        # INTO AN EDITORIAL PAGE. `data-world="intelligence"` was taken off
+        # the FIGURE and left on the `<svg>` inside it, so every token the
+        # dark world rebinds still resolved dark for everything in the
+        # drawing — which nothing could see while the drawing was dark
+        # anyway. Under the light map it is plain: `--map-ink` resolved to
+        # the dark map's bone and every place name on Italy was painted
+        # #F3F0E6 on #D8D4C7 stone. 1.00:1, on all fifty, on the only label
+        # colour those maps have.
+        #
+        # A country map is a PICTURE — `docs/cartography.md` splits the two
+        # families on what the drawing IS — so it takes the page's world and
+        # the light map with it. `data-role` keeps saying it is an
+        # instrument-shaped figure, which is a different claim.
         f'<figure class="minimap countrymap arched{dense_class(drawn)}" data-role="instrument">'
-        f'<svg viewBox="0 0 {w} {h}" role="img" data-world="intelligence" '
+        f'<svg viewBox="0 0 {w} {h}" role="img" '
         f'aria-label="Map of {esc(c["name"])} showing its regions and the destinations in the '
         f'Atlas"><defs>{arch_clip("cm" + c["slug"][:14].replace(chr(45), ""), w, h)}</defs>'
         f'<g clip-path="url(#arch-{"cm" + c["slug"][:14].replace(chr(45), "")})">'

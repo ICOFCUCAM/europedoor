@@ -258,9 +258,12 @@ from the photographs.
 | token | hex | what it is |
 |---|---|---|
 | `--bone` | `#F3F0E6` | the page. The owner's main background, and never #fff: white is a screen and bone is paper |
-| `--bone-light` | `#F7F4EA` | the LIFT above the page — a card, a field. The one surface that goes up rather than down |
-| `--bone-2` | `#E5E2D6` | the middle rung of the surface ladder, derived so bone -> bone-2 -> mineral is monotonic and every step is one a reader can see |
+| `--bone-light` | `#F8F6EF` | the LIFT above the page — a card, a field. The one surface that goes up rather than down |
+| `--bone-2` | `#EAE6DA` | the middle rung of the surface ladder, derived so bone -> bone-2 -> mineral is monotonic and every step is one a reader can see |
 | `--mineral` | `#D8D4C7` | warm stone: the third surface, and the land on the light map. One token for both, because they are the same material |
+| `--ink-2` | `#3B443A` | secondary type: a caption, a meta line, a subline |
+| `--ink-3` | `#5D675B` | the quietest type this palette allows on paper |
+| `--rule` | `#CFCBBB` | the hairline between two list rows, and nothing that is a boundary |
 | `--ink` | `#141716` | type. The owner's table names two near-blacks and this is the charcoal one; it was an alias for graphite, which made a page's letterforms and the instrument's field the same colour |
 | `--pine` | `#0F433E` | the masthead and the signature. A drawn colour before a read one |
 | `--pine-deep` | `#07302B` | everything pine that is text, and the interactive colour on light |
@@ -273,7 +276,7 @@ from the photographs.
 | `--cobalt-2` | `#1C46A0` | cobalt where it is pressed — the hover step under a cobalt link or kicker |
 | `--cobalt-lift` | `#4076E7` | cobalt where the ground is graphite, because cobalt itself is 2.98 there |
 | `--cobalt-air` | `#619BFF` | the instrument's accent on the instrument's own ground |
-| `--sky` | `#76AFC2` | the Mediterranean and Alpine accent. A GROUND on light and a read colour on graphite |
+| `--sky` | `#78B4C7` | the Mediterranean and Alpine accent. A GROUND on light and a read colour on graphite |
 | `--ochre` | `#C49A52` | the territorial accent: regions and events. A ground and a mark, never an action |
 | `--ochre-deep` | `#8E6618` | ochre where it has to be read — a kicker on a region or a month |
 | `--ochre-deep-2` | `#6F4F11` | ochre as emphasis rather than a ground: the year band’s current month, at 6.57 on bone |
@@ -296,6 +299,10 @@ from the photographs.
 | `--map-dark-land` | `#F3F0E6` | the continent, pale against graphite — the whole of the dark map |
 | `--map-dark-border` | `#B9C1BA` | its frontier |
 | `--map-dark-ink` | `#F3F0E6` | type on the dark map |
+| `--ocean-deep` | `#346F6A` | a river on the land and the deepest sea: 3.90 on the stone, 4.62 on the water |
+| `--ocean-mid` | `#549C96` | the step between, and the hero's own Atlantic |
+| `--ocean-shallow` | `#93BDBA` | near water — the shore band under every coast |
+| `--ocean-coastal` | `#D2DFDE` | the shallowest step, where the sea meets the stone |
 
 ### The family accents
 

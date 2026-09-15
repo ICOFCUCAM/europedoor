@@ -29,6 +29,31 @@ const OUT = path.join(ROOT, "site");
 const PALETTE = JSON.parse(fs.readFileSync(
   path.join(ROOT, "docs", "palette.json"), "utf8"));
 
+/* ONE CLASSIFIER, BUILT FROM THE REGISTER, USED BY EVERY CHECK THAT ASKS
+ * "WHAT FAMILY IS THIS COLOUR IN".
+ *
+ * Two checks asked it with a HUE WINDOW and both broke on the same palette
+ * change: the ratio reported the signature at 0.1% because pine (174.2) and
+ * the owner's map water (174.5) are three tenths of a degree apart, and the
+ * kicker probe asked whether a label is "in the accent" by the signature
+ * band, which is a different question wearing the same numbers. A second
+ * implementation of a thing is a second chance to make its mistake — sixth
+ * occurrence here, and this one is the fix rather than the occurrence.
+ *
+ * `SWATCH` is every declared token with the family the register puts it in;
+ * `familyOf` returns that family for a painted colour, or "" when the colour
+ * is further than `max_distance` from every token, which is what a
+ * photograph, a blend or a shadow is. */
+const SWATCH = (() => {
+  const out = [];
+  for (const [family, names] of Object.entries(PALETTE.ratio.$families)) {
+    if (!Array.isArray(names)) continue;
+    for (const nm of names) out.push({ family, hex: PALETTE.tokens[nm].hex });
+  }
+  return out;
+})();
+const MAXD = PALETTE.ratio.$families.max_distance;
+
 function rgbOf(v) {
   const m = String(v).match(/\d+/g);
   if (m && m.length >= 3) return m.slice(0, 3).map(Number);
@@ -2405,7 +2430,35 @@ async function main() {
                    "/countries/", "/beyond-the-obvious/"]) {
     const r = await page.goto(base + u, { waitUntil: "load" });
     if (!r || r.status() !== 200) continue;
-    const k = await page.evaluate((SIGBAND) => {
+    const k = await page.evaluate(({ SWATCH, MAXD }) => {
+      const srgb = (c) => (c <= 0.04045 ? c / 12.92
+                                        : Math.pow((c + 0.055) / 1.055, 2.4));
+      const oklab = (R, G, B) => {
+        const r = srgb(R), g = srgb(G), b = srgb(B);
+        const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+        const m2 = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+        const s2 = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+        return [0.2104542553 * l + 0.7936177850 * m2 - 0.0040720468 * s2,
+                1.9779984951 * l - 2.4285922050 * m2 + 0.4505937099 * s2,
+                0.0259040371 * l + 0.7827717662 * m2 - 0.8086757660 * s2];
+      };
+      const marks = SWATCH.map((t) => ({
+        family: t.family,
+        lab: oklab(parseInt(t.hex.slice(1, 3), 16) / 255,
+                   parseInt(t.hex.slice(3, 5), 16) / 255,
+                   parseInt(t.hex.slice(5, 7), 16) / 255),
+      }));
+      const familyOf = (rgb) => {
+        const lab = oklab(rgb[0] / 255, rgb[1] / 255, rgb[2] / 255);
+        let best = "", bd = Infinity;
+        for (const m of marks) {
+          const dl = lab[0] - m.lab[0], da = lab[1] - m.lab[1],
+                db = lab[2] - m.lab[2];
+          const dist = dl * dl + da * da + db * db;
+          if (dist < bd) { bd = dist; best = m.family; }
+        }
+        return Math.sqrt(bd) > MAXD ? "" : best;
+      };
       // `.actname` IS A KICKER. The plate sequence labels each band with one
       // — THE DOOR, THE QUESTION — and carries no `.kicker` at all, so this
       // probe examined zero elements on the homepage and its own
@@ -2413,24 +2466,21 @@ async function main() {
       // in the accent inside a link, and an act name is that kind of label.
       const all = [...document.querySelectorAll(".kicker, .actname")];
       const hot = all.filter((e) => {
-        const m = getComputedStyle(e).color.match(/\d+/g).map(Number);
-        // THE SIGNATURE FAMILY, BY HUE. This tested `blue > red + 40`,
-        // which is a claim about cobalt rather than about the signature —
+        // AN ACCENT IS A FAMILY, NOT A HUE WINDOW. This tested `blue > red +
+        // 40`, which is a claim about cobalt rather than about the accent —
         // so the day the signature became pine it matched nothing and the
-        // check reported every page clean. Hue is the property that
-        // survives a palette change; the band is docs/palette.json's own.
-        const mx = Math.max(...m) / 255, mn = Math.min(...m) / 255;
-        if (mx - mn < 0.1) return false;                // a neutral
-        const [R, G2, B] = m.map((v) => v / 255);
-        let h = mx === R ? (G2 - B) / (mx - mn) % 6
-              : mx === G2 ? (B - R) / (mx - mn) + 2 : (R - G2) / (mx - mn) + 4;
-        h *= 60; if (h < 0) h += 360;
-        return h >= SIGBAND[0] && h <= SIGBAND[1];
+        // check reported every page clean. Rewritten as a hue band it then
+        // read the SIGNATURE's window, which the owner's palette made
+        // three tenths of a degree from the water's. The register says
+        // which family a colour is in; the question here is whether the
+        // label is painted in one of the two families that ARE accents.
+        const f = familyOf(getComputedStyle(e).color.match(/\d+/g).map(Number));
+        return f === "accent" || f === "pine";
       });
       const inLink = hot.filter((e) => e.closest("a"));
       return { all: all.length,
                bad: inLink.map((e) => e.textContent.trim().slice(0, 40)) };
-    }, PALETTE.ratio.$bands.signature);
+    }, { SWATCH, MAXD });
     checked++;
     ok(k.all > 0, `${u}: no kicker at all — this check has stopped finding ` +
        `the element it is about`);
@@ -4242,7 +4292,21 @@ async function main() {
                    "/experiences/food/", "/method/", "/beyond-the-obvious/",
                    "/events/"];
     const rc = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-    const BANDS = PALETTE.ratio.$bands;
+    /* A HUE BAND CANNOT SEPARATE THE SIGNATURE FROM THE SEA ANY MORE.
+     * pine is at hue 174.2 and the owner's map water at 174.5 — three
+     * tenths of a degree — so the water window swallowed the masthead and
+     * this instrument reported the signature at 0.1% against a declared 10.
+     * The bands were already DATA rather than a ternary, which is the only
+     * reason the reading could be diagnosed at all, and data was not
+     * enough: two overlapping windows are two windows whichever file they
+     * live in.
+     * A pixel is classified by the TOKEN IT IS NEAREST TO now, in OKLab,
+     * and the register says which family each token belongs to. A lookup,
+     * never a shape. Pixels further than max_distance from every token are
+     * neither — a photograph, a blend, a shadow — and are left out of the
+     * denominator rather than called paper. SWATCH and MAXD are built once
+     * at the top of this file, because two checks ask this question and two
+     * implementations of it is how both hue windows got written. */
     const tot = { limestone: 0, graphite: 0, water: 0, pine: 0, accent: 0 };
     const per = [];
     let px = 0;
@@ -4250,7 +4314,7 @@ async function main() {
       const r = await rc.goto(base + u, { waitUntil: "load" });
       if (!r || r.status() !== 200) continue;
       const buf = await rc.screenshot();
-      const got = await rc.evaluate(async ({ b64, BANDS }) => {
+      const got = await rc.evaluate(async ({ b64, SWATCH, MAXD }) => {
         const img = new Image();
         img.src = "data:image/png;base64," + b64;
         await img.decode();
@@ -4261,54 +4325,51 @@ async function main() {
         const d = x.getImageData(0, 0, c.width, c.height).data;
         // AND THE BUCKET THE CLASSIFIER WRITES MUST BE ONE THIS DECLARES.
         // The palette rename moved the signature from `cobalt` to `pine` in
-        // the ternary below and left this line saying `cobalt`, so
+        // the classifier below and left this line saying `cobalt`, so
         // `out.pine++` was `undefined++` — NaN. NaN propagated into the
         // total, `px || 1` is 1 because NaN is falsy, and every share came
         // back as a raw pixel count wearing a percent sign: "limestone
-        // 956561700.0%". The instrument that measures the palette was broken
-        // BY a palette change, which is the failure its own `$bands` note
-        // one screen down was written to prevent, arriving through a
-        // different door. The assertion under it fails loudly on a NaN now,
-        // because a share that is not a number is not a small share.
+        // 956561700.0%". The assertion under it fails loudly on a NaN now,
+        // because a share that is not a number is not a small share. The
+        // buckets are built FROM the register here, so the two cannot
+        // disagree at all.
+        const srgb = (c) => (c <= 0.04045 ? c / 12.92
+                                          : Math.pow((c + 0.055) / 1.055, 2.4));
+        const oklab = (R, G, B) => {
+          const r = srgb(R), g = srgb(G), b = srgb(B);
+          const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+          const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+          const s2 = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+          return [0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s2,
+                  1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s2,
+                  0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s2];
+        };
+        const marks = SWATCH.map((t) => ({
+          family: t.family,
+          lab: oklab(parseInt(t.hex.slice(1, 3), 16) / 255,
+                     parseInt(t.hex.slice(3, 5), 16) / 255,
+                     parseInt(t.hex.slice(5, 7), 16) / 255),
+        }));
         const out = { limestone: 0, graphite: 0, water: 0, pine: 0, accent: 0 };
+        const NAME = { bone: "limestone", graphite: "graphite", pine: "pine",
+                       water: "water", accent: "accent" };
+        let other = 0;
         for (let i = 0; i < d.length; i += 4) {
-          const R = d[i] / 255, G = d[i + 1] / 255, B = d[i + 2] / 255;
-          const mx = Math.max(R, G, B), mn = Math.min(R, G, B);
-          const l = (mx + mn) / 2, dl = mx - mn;
-          if (dl < 0.10) { out[l > 0.55 ? "limestone" : "graphite"]++; continue; }
-          let h = mx === R ? ((G - B) / dl) % 6
-                : mx === G ? (B - R) / dl + 2 : (R - G) / dl + 4;
-          h *= 60; if (h < 0) h += 360;
-          // WATER IS NOT THE SIGNATURE, AND THE FIRST VERSION COUNTED IT AS
-          // ONE. Everything blue went into a single bucket and cobalt came
-          // back at 16.6% against a declared 10 — a finding about the
-          // masthead that was mostly the Atlantic. The two families do not
-          // overlap: the ocean ramp and the atlas water run 202-205 degrees
-          // of hue and every cobalt runs 228-230, so 218 separates them
-          // cleanly and --map-land, at 215, is already a neutral by chroma.
-          // Split, cobalt measures 7.0 and sits UNDER its budget on all
-          // twelve pages.
-          // THE LOWER BOUND, WHICH THIS TERNARY DROPPED. Water is 185 to
-          // 218 degrees and cobalt is 218 to 270; everything else — and
-          // "everything else" is mostly the warm end, terracotta at 20 —
-          // is the accent. Written as `h < 218 ? water : ...` the first
-          // clause swallowed every warm hue on the site, so the run
-          // reported the accent at 0.00% on all twelve pages and water 0.3
-          // high. The condition that was correct in the prototype lost a
-          // bound when it was compressed.
-          // AND THE BANDS ARE DATA NOW. They were two numbers typed into
-          // this ternary, so moving the signature from 229 degrees to 156
-          // would have reclassified every pixel of it as the accent and
-          // reported the signature at zero — a palette change silently
-          // breaking the instrument that measures palettes. They come from
-          // docs/palette.json, and checks.py asserts each band actually
-          // contains the tokens it is named for.
-          out[h >= BANDS.water[0] && h < BANDS.water[1] ? "water"
-              : h >= BANDS.signature[0] && h <= BANDS.signature[1]
-                ? "pine" : "accent"]++;
+          const lab = oklab(d[i] / 255, d[i + 1] / 255, d[i + 2] / 255);
+          let best = null, bd = Infinity;
+          for (const m of marks) {
+            const dl = lab[0] - m.lab[0], da = lab[1] - m.lab[1],
+                  db = lab[2] - m.lab[2];
+            const dist = dl * dl + da * da + db * db;
+            if (dist < bd) { bd = dist; best = m; }
+          }
+          if (Math.sqrt(bd) > MAXD) { other++; continue; }
+          out[NAME[best.family]]++;
         }
+        out.$other = other;
         return out;
-      }, { b64: buf.toString("base64"), BANDS });
+      }, { b64: buf.toString("base64"), SWATCH, MAXD });
+      delete got.$other;   // counted, and deliberately not in the denominator
       const pn = Object.values(got).reduce((a, b) => a + b, 0) || 1;
       per.push([u, 100 * got.accent / pn]);
       for (const k of Object.keys(tot)) { tot[k] += got[k]; px += got[k]; }

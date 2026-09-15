@@ -96,22 +96,72 @@
     }
   },
   "ratio": {
-    "$comment": "The ratio is the instruction, not the hex codes. A palette gives you a blue website with gold buttons; a ratio gives you European editorial design over futuristic infrastructure.",
+    "$comment": "The ratio is the instruction, not the hex codes. A palette gives you a blue website with gold buttons; a ratio gives you European editorial design over futuristic infrastructure. It is measured on the pixels a reader is painted, over twelve pages spanning both worlds.",
     "bone": 60,
     "graphite": 25,
     "pine": 10,
     "accent": 5,
-    "$bands": {
-      "water": [
-        170,
-        218
+    "$measured": "TO BE REMEASURED ON THIS PALETTE. The last reading on the previous one was bone 64.1, graphite 18.9, water 9.7, signature 7.0, accent 0.3 — and that 0.3 against a declared 5 is the finding this palette answers, by giving five families an accent that identifies them rather than two that tint a kicker.",
+    "$families": {
+      "$comment": "A HUE BAND CANNOT SEPARATE THE SIGNATURE FROM THE SEA ANY MORE, AND THAT IS ARITHMETIC RATHER THAN AN OPINION. The instrument classified every painted pixel by hue: water 170-218 degrees, signature 140-200, everything else the accent. The owner's palette puts pine at 174.2 and the map water at 174.5 — THREE TENTHS OF A DEGREE — so the water band swallowed the masthead and the run reported the signature at 0.1% against a declared 10. The bands were already data rather than a ternary, which is what let the failure be read at all, and data was not enough: two overlapping windows are two windows whichever file they live in. So a pixel is classified by the token it is NEAREST to, in OKLab, and the token says which family it belongs to. A lookup, never a shape — the sentence this repository already wrote about the credential scan and about the admitted golds. A pixel further than `max_distance` from every token is counted as neither: that is a photograph, a blend or a shadow, and calling it paper would be the instrument inventing a reading.",
+      "max_distance": 0.1,
+      "bone": [
+        "bone",
+        "bone-light",
+        "bone-2",
+        "mineral",
+        "map-land",
+        "map-dark-land",
+        "map-dark-ink"
       ],
-      "signature": [
-        140,
-        200
+      "graphite": [
+        "ink",
+        "ink-2",
+        "ink-3",
+        "rule",
+        "graphite",
+        "graphite-2",
+        "graphite-3",
+        "map-dark-bg",
+        "map-ink",
+        "map-border",
+        "map-dark-border"
+      ],
+      "pine": [
+        "pine",
+        "pine-deep",
+        "pine-lift",
+        "pine-air"
+      ],
+      "water": [
+        "ocean-deep",
+        "ocean-mid",
+        "ocean-shallow",
+        "ocean-coastal",
+        "map-water"
+      ],
+      "accent": [
+        "cobalt",
+        "cobalt-2",
+        "cobalt-lift",
+        "cobalt-air",
+        "sky",
+        "ochre",
+        "ochre-deep",
+        "ochre-deep-2",
+        "terracotta",
+        "terracotta-2",
+        "terracotta-3",
+        "terracotta-lift",
+        "terracotta-lift-2",
+        "olive",
+        "olive-2",
+        "olive-lift",
+        "olive-lift-2",
+        "warn",
+        "warn-lift"
       ]
-    },
-    "$measured": "TO BE REMEASURED ON THIS PALETTE. The last reading on the previous one was bone 64.1, graphite 18.9, water 9.7, signature 7.0, accent 0.3 — and that 0.3 against a declared 5 is the finding this palette answers, by giving five families an accent that identifies them rather than two that tint a kicker."
+    }
   },
   "tokens": {
     "bone": {
@@ -119,16 +169,28 @@
       "role": "the page. The owner's main background, and never #fff: white is a screen and bone is paper"
     },
     "bone-light": {
-      "hex": "#F7F4EA",
+      "hex": "#F8F6EF",
       "role": "the LIFT above the page — a card, a field. The one surface that goes up rather than down"
     },
     "bone-2": {
-      "hex": "#E5E2D6",
+      "hex": "#EAE6DA",
       "role": "the middle rung of the surface ladder, derived so bone -> bone-2 -> mineral is monotonic and every step is one a reader can see"
     },
     "mineral": {
       "hex": "#D8D4C7",
       "role": "warm stone: the third surface, and the land on the light map. One token for both, because they are the same material"
+    },
+    "ink-2": {
+      "hex": "#3B443A",
+      "role": "secondary type: a caption, a meta line, a subline"
+    },
+    "ink-3": {
+      "hex": "#5D675B",
+      "role": "the quietest type this palette allows on paper"
+    },
+    "rule": {
+      "hex": "#CFCBBB",
+      "role": "the hairline between two list rows, and nothing that is a boundary"
     },
     "ink": {
       "hex": "#141716",
@@ -179,7 +241,7 @@
       "role": "the instrument's accent on the instrument's own ground"
     },
     "sky": {
-      "hex": "#76AFC2",
+      "hex": "#78B4C7",
       "role": "the Mediterranean and Alpine accent. A GROUND on light and a read colour on graphite"
     },
     "ochre": {
@@ -269,6 +331,22 @@
     "map-dark-ink": {
       "hex": "#F3F0E6",
       "role": "type on the dark map"
+    },
+    "ocean-deep": {
+      "hex": "#346F6A",
+      "role": "a river on the land and the deepest sea: 3.90 on the stone, 4.62 on the water"
+    },
+    "ocean-mid": {
+      "hex": "#549C96",
+      "role": "the step between, and the hero's own Atlantic"
+    },
+    "ocean-shallow": {
+      "hex": "#93BDBA",
+      "role": "near water — the shore band under every coast"
+    },
+    "ocean-coastal": {
+      "hex": "#D2DFDE",
+      "role": "the shallowest step, where the sea meets the stone"
     }
   },
   "claims": [

@@ -1453,7 +1453,7 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
      the one place that emits <head>. -->
 <link rel="alternate" type="application/atom+xml" href="/stories/feed.xml" title="EuropeDoor stories">
 {ld(*ld_blocks)}{head_extra}</head>
-<body class="area-{esc(area or 'none')}" data-world="{world}"{f' data-accent="{accent}"' if accent else ''}{' data-hero' if hero else ''}>
+<body class="ed-page ed-family-{ed_family(path)} area-{esc(area or 'none')}" data-family="{ed_family(path)}" data-world="{world}"{f' data-accent="{accent}"' if accent else ''}{' data-hero' if hero else ''}>
 <a class="skip" href="#main">{esc(T("skip"))}</a>
 <header class="masthead">
   <div class="masthead-in">
@@ -1575,3 +1575,157 @@ def jsondata(id, obj):
     # Only `</` can end the block early; escaping it is the whole requirement.
     payload = payload.replace("</", "<\\/")
     return f'<script type="application/json" id="{esc(id)}">{payload}</script>'
+
+
+# ============================================================
+# THE 2036 PAGE SYSTEM — EIGHT FAMILIES, ONE GRAMMAR
+#
+# The brief's own finding, and it is the right one: several families had
+# converged on kicker -> h1 -> lede -> rows, and the answer is NOT to
+# redesign forty-seven pages independently. It is to build eight families
+# and map every page into one of them, so the site reads as one institution
+# with different rooms.
+#
+# These are primitives in the sense the eleven already here are: a page
+# builder composes them and changing one changes every page that uses it.
+# They do not replace `section()`, `card()` or `row()` — a family that is
+# already right keeps what it has, and this is the grammar a family adopts
+# when it is rebuilt.
+# ============================================================
+
+ED_FAMILIES = ("atlas", "arrival", "discovery", "journey", "editorial",
+               "time", "instrument", "institutional")
+
+
+def ed_family(path):
+    """Which of the eight rooms a page is in, from its own route.
+
+    ONE TABLE, AND NO PAGE BUILDER CHANGES. Forty-seven builders each
+    passing a family string is forty-seven chances for two pages in one
+    family to disagree, and this repository has that failure recorded about
+    the fourteen call sites that forgot to pass a motif. The route is what a
+    family IS — /europe/<country>/<region>/<city> is an arrival because of
+    where it sits, not because somebody typed "arrival" — so it is derived.
+
+    Order matters twice. `/discover/` is the Discovery family and
+    `/discover/<macro>` is a macro region, which the brief puts in Atlas;
+    and `/experiences/<category>/<sub>` is a Time page while
+    `/experiences/<category>` is Discovery.
+    """
+    p = "/" + (path or "").strip("/")
+    seg = [s for s in p.split("/") if s]
+    if not seg:
+        return "institutional"
+    head = seg[0]
+
+    if head == "europe":
+        # /europe/<country> · /europe/<c>/<region>      -> atlas
+        # /europe/<c>/<r>/<city> · .../place/<x>        -> arrival
+        return "arrival" if len(seg) >= 4 else "atlas"
+    if head == "countries":
+        return "atlas"
+    if head == "discover":
+        return "discovery" if len(seg) == 1 else "atlas"
+    if head == "experiences":
+        return "time" if len(seg) >= 3 else "discovery"
+    if head in ("interests", "themes", "europe-in"):
+        return "discovery"
+    if head == "journeys":
+        return "journey"
+    if head == "stories":
+        return "editorial"
+    if head == "events":
+        return "time"
+    if head in ("map", "plan", "search", "my-europe"):
+        return "instrument"
+    return "institutional"
+
+
+def ed_section_head(number, label, title, lede=""):
+    """A numbered section head: the index beside the title, not above it."""
+    return (
+        '<header class="ed-section-head">'
+        f'<div><p class="ed-section-index">{esc(str(number))} · {esc(label)}</p></div>'
+        f'<div><h2 class="ed-section-title">{esc(title)}</h2>'
+        + (f'<p class="ed-intro">{esc(lede)}</p>' if lede else "")
+        + "</div></header>"
+    )
+
+
+def ed_photo(images, key, *, w=1800, h=1000, alt="", eager=False,
+             ratio="wide", seed=None, motif=None, credit=True):
+    """A large photograph, through the pipeline that owns provenance.
+
+    IT NEVER TAKES A URL, which is the whole point of routing it here:
+    `picture()` is the one function that knows whether the register holds a
+    photograph for this key, emits the AVIF/WebP/JPEG ladder at five widths
+    when it does, and draws the plate when it does not. A component that
+    took `src` would be a second way into the library with none of the
+    gate behind it.
+
+    AND IT DOES NOT RETURN AN EMPTY STRING WHEN THE REGISTER IS EMPTY. The
+    brief's version does, which would leave 826 of 837 surfaces as a hole in
+    the page — and this repository has already measured that a slot waiting
+    for a picture is honest and three hundred pixels of it is a hole. The
+    interim answer is the drawing, exactly as it is everywhere else.
+    """
+    cls = {"wide": "ed-photo-wide", "landscape": "ed-photo-landscape",
+           "portrait": "ed-photo-portrait"}.get(ratio, "ed-photo-wide")
+    inner = picture(images, key, w=w, h=h, alt=alt, eager=eager,
+                    sizes="(max-width: 52rem) 100vw, 70vw",
+                    fallback_seed=seed or key, fallback_motif=motif,
+                    credit=credit)
+    return f'<figure class="ed-photo {cls}">{inner}</figure>'
+
+
+def ed_opening(*, eyebrow, title, intro="", visual="", family="atlas"):
+    """The stage every rebuilt family opens on: type beside a picture.
+
+    `family` is on the SECTION as well as the body, because a page can hold
+    a second opening — a journey inside an atlas page — and the grammar has
+    to follow the content rather than the document.
+    """
+    return (
+        f'<section class="ed-opening ed-family-{esc(family)}">'
+        '<div class="ed-opening-copy">'
+        f'<p class="ed-eyebrow">{esc(eyebrow)}</p>'
+        f'<h1>{esc(title)}</h1>'
+        + (f'<p class="ed-intro">{esc(intro)}</p>' if intro else "")
+        + "</div>"
+        f'<div class="ed-opening-visual">{visual}</div>'
+        "</section>"
+    )
+
+
+def ed_split(*, title, body, media="", reverse=False):
+    """Copy and a picture, alternating sides down a page."""
+    return (
+        '<section class="ed-section">'
+        f'<div class="ed-split{" reverse" if reverse else ""}">'
+        f'<div class="ed-split-copy"><h2>{esc(title)}</h2>{body}</div>'
+        f'<div class="ed-split-media">{media}</div>'
+        "</div></section>"
+    )
+
+
+def ed_rows(rows, *, numbered=True):
+    """An index as a set of rules, not a grid of cards.
+
+    THE NUMBER IS DERIVED AND NEVER PASSED. The brief's version takes a
+    `number` per row, which is a figure typed into data — and a figure typed
+    into data is the figure that was true two hundred destinations ago, which
+    is this repository's most repeated finding about counts. It is the row's
+    position, formatted here.
+    """
+    out = []
+    for i, row in enumerate(rows, 1):
+        num = f"{i:02d}" if numbered else ""
+        meta = row.get("meta", "")
+        out.append(
+            f'<a class="ed-row" href="{esc(row["href"])}">'
+            f'<span class="ed-row-number">{num}</span>'
+            f'<div><h3>{esc(row["title"])}</h3></div>'
+            f'<span class="ed-row-meta">{esc(meta)}</span>'
+            '<span class="ed-row-arrow" aria-hidden="true">&#8594;</span>'
+            "</a>")
+    return '<div class="ed-rows">' + "".join(out) + "</div>"

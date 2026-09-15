@@ -981,19 +981,28 @@ def sb4a():
         yield 'data-world="intelligence"' in page(path), f"{path} is INTELLIGENCE"
     for path in ("/", "/europe/norway", "/stories", "/method"):
         yield 'data-world="discover"' in page(path), f"{path} is DISCOVER"
-    # A map is INTELLIGENCE wherever it is embedded — a window into the
-    # machine cut into an editorial page, which is the door as a design
-    # language rather than as a glyph.
-    # The world moved from the <figure> to the <svg> when the map became an
-    # aperture cut into the page: it describes the MAP, and carrying it on
-    # the figure also resolved --paper to graphite, which put a dark arch on
-    # a dark panel and turned the caption light-on-light. The promise is
-    # unchanged and still asserted — an embedded map reads as INTELLIGENCE
-    # wherever it sits — but it is asserted on the element it describes.
+    # AND A MAP IS NOT AUTOMATICALLY AN INSTRUMENT, which is what this
+    # assertion said for the life of the two worlds. "A window into the
+    # machine cut into an editorial page" was the design language, and
+    # `docs/cartography.md` had already split every drawing the other way —
+    # a picture is paper, an instrument is graphite — so the fifty country
+    # maps were pictures wearing the instrument's world. It cost nothing
+    # while the picture palette was dark too; under the owner's light map
+    # `--map-ink` resolved to the DARK map's bone and every place name on
+    # Italy was painted #F3F0E6 on #D8D4C7 stone, 1.00:1, on all fifty.
+    # The eleventh assertion here to pin a shape rather than a promise. What
+    # it was protecting is that a world is never ambient — a surface belongs
+    # to one and says which — so that is what it asserts: the five
+    # instrument pages declare it, and a picture embedded in an editorial
+    # page does not claim it.
+    for _u in ("/map", "/plan", "/discover", "/search", "/my-europe"):
+        yield 'data-world="intelligence"' in page(_u), \
+            f"{_u} declares the instrument world"
     _h = page("/europe/italy")
     _i = _h.index('class="minimap countrymap')
-    yield 'data-world="intelligence"' in _h[_i:_i + 260], \
-        "and an embedded map carries the world on the element"
+    yield 'data-world="intelligence"' not in _h[_i:_i + 260], \
+        "and a country map is a PICTURE, so it takes the page's world " \
+        "rather than cutting a dark window into an editorial page"
     # Three accents inside DISCOVER, one inside INTELLIGENCE.
     yield "body.area-stories, body.area-events, body.area-experiences" in CSS, \
         "the cultural accent is bound to the cultural areas"
