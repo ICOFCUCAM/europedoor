@@ -2330,6 +2330,60 @@ async function main() {
        `name under it`);
   }
 
+  // ── an option that does not fit the box it closes into ─────────────
+  //
+  // The planner's spending style read `{name} — {note}` and "Generous —
+  // Well-reviewed hotels, restaurants that book out, flights and
+  // first-class rail where it saves a day." is 118 characters: 810 pixels
+  // in a 325-pixel field. A `<select>` clips without an ellipsis, so a
+  // reader was shown forty per cent of their own choice and it did not even
+  // look like a truncation.
+  //
+  // THE LINE IS HAND-WRITTEN ENUM AGAINST A LIST OF RECORDS. `#start` and
+  // `#end` carry 314 real destinations and the longest is "Gura Humorului &
+  // the painted monasteries, Romania" — the only repair available there is
+  // truncating a place name, which this atlas refuses, and opening the
+  // select is what a reader does to read the list. A list somebody TYPED
+  // has no such excuse: every option in it is copy, and copy that does not
+  // fit its control is copy in the wrong place. Thirty is the line and
+  // every enum on the site is under five.
+  for (const [vw, vh] of [[1280, 900], [390, 800]]) {
+    const sp = await browser.newPage({ viewport: { width: vw, height: vh } });
+    for (const u of ["/plan", "/discover", "/events", "/search"]) {
+      const r = await sp.goto(base + u, { waitUntil: "load" });
+      if (!r || r.status() !== 200) continue;
+      const over = await sp.evaluate(() => {
+        const out = [];
+        for (const s of document.querySelectorAll("select")) {
+          if (s.options.length > 30) continue;      // a list of records
+          const cs = getComputedStyle(s);
+          // the arrow the UA draws, plus the field's own padding
+          const box = s.clientWidth - parseFloat(cs.paddingLeft)
+                    - parseFloat(cs.paddingRight) - 28;
+          const m = document.createElement("span");
+          m.style.cssText = "position:absolute;visibility:hidden;white-space:pre;font:" + cs.font;
+          document.body.appendChild(m);
+          for (const o of s.options) {
+            m.textContent = o.textContent;
+            const w = m.getBoundingClientRect().width;
+            if (w > box) out.push([s.id || s.name, o.textContent.slice(0, 40),
+                                   Math.round(w), Math.round(box)]);
+          }
+          m.remove();
+        }
+        return out;
+      });
+      checked++;
+      ok(over.length === 0,
+         `${u} at ${vw}: ${over.length} hand-written option(s) wider than the ` +
+         `select they close into — #${(over[0] || [])[0]} "${(over[0] || [])[1]}" ` +
+         `needs ${(over[0] || [])[2]}px in ${(over[0] || [])[3]}px. A select ` +
+         `clips without an ellipsis, so the reader is shown part of their own ` +
+         `choice and it does not look like a truncation.`);
+    }
+    await sp.close();
+  }
+
   // ── a placeholder that does not fit the box it is in ───────────────
   //
   // The homepage's own placeholder was cut mid-word at 390 and was fixed;
