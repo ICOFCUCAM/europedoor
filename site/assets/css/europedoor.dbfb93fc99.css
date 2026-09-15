@@ -1110,6 +1110,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .masthead { position: sticky; top: 0; z-index: 40;
             --rule:      color-mix(in srgb, var(--ink) 16%, transparent);
             background: color-mix(in srgb, var(--paper) 92%, transparent);
+            color: var(--ink);
             /* AND THE COLOUR ITSELF, WHICH THE FIRST TOKEN VERSION FORGOT.
              * Redefining --ink is not enough: the wordmark sets no colour of
              * its own and inherited graphite from <body>, so it measured
@@ -8347,41 +8348,32 @@ body[data-family="journey"] .ed-journey-hero .ed-eyebrow,
   color: color-mix(in srgb, var(--ed-bone) 82%, transparent);
 }
 
-/* ── THE MASTHEAD OVER A PICTURE ─────────────────────────────────────────
-   Three families open on a dark composition that reaches the top of the
-   document: the homepage hero, the destination's arrival band and the
-   journey's cobalt hero. On those the paper band would be a pale bar
-   floating over an image, so it inverts — transparent, bone type, the mark
-   in bone. It is the same masthead with the ground removed, not a second
-   one; `render.page()` emits one header and always has. */
-/* KEYED ON WHAT IS ACTUALLY UNDERNEATH, NOT ON THE FAMILY. The first
-   version named the family, and /journeys is family `journey` and opens on
-   bone — so the index got a graphite scrim over a cream page and the
-   wordmark went white on paper. A family says what KIND of page this is;
-   whether the masthead has a picture under it is a fact about this
-   document, and `:has()` is how a stylesheet asks that. */
-body[data-hero] .masthead,
-body:has(main .ed-arrival) .masthead,
-body:has(main .ed-journey-hero) .masthead {
-  background: linear-gradient(to bottom,
-              color-mix(in srgb, var(--graphite) 52%, transparent),
-              transparent);
-  border-bottom-color: transparent;
-  --ink:       var(--bone);
-  --ink-2:     color-mix(in srgb, var(--bone) 86%, transparent);
-  --ink-3:     color-mix(in srgb, var(--bone) 72%, transparent);
-  --door:      var(--bone);
-  --rule:      color-mix(in srgb, var(--bone) 30%, transparent);
-  backdrop-filter: none;
-}
+/* ── THE MASTHEAD NEVER SITS ON THE PICTURE, AND THAT WAS A PREMISE ─────
+   This block inverted the masthead on three families — the homepage hero,
+   the destination's arrival band and the journey's cobalt hero — on the
+   reasoning that each "opens on a dark composition that reaches the top of
+   the document". Measured on the painted pixel at 1280, the ground behind
+   the wordmark is rgb(188,188,183) on ALL THREE: the breadcrumb sits above
+   each of those compositions, so the masthead is over the page's own paper
+   under a partial graphite scrim, and bone type on it measured 1.67:1.
+
+   The first version of this keyed on the FAMILY and was corrected to key on
+   the composition with `:has()`, which was the right move and did not go far
+   enough — `:has(main .ed-arrival)` asks whether the document contains a
+   dark band, not whether one is UNDER THE BAR. Nothing in a stylesheet can
+   ask that, because it is a question about scroll position and stacking.
+
+   So there is one masthead in one treatment: the page's own paper, the mark
+   and the current section in pine, everywhere. That is also what a reader
+   has actually been getting on every page that is not one of these three.
+   `body[data-hero]` still exists and still does its other jobs; what it no
+   longer does is recolour a bar that is not over a picture. */
+
 /* AND THE PINE IS SPENT ON THE MARK AND THE CURRENT SECTION, which is where
    an identity belongs: the two things a reader actually looks at in a
    navigation, rather than the field behind all seven. */
 .masthead .wordmark { color: var(--pine-ink); }
 .masthead .nav a[aria-current="page"] { color: var(--pine-ink); border-bottom-color: var(--pine-ink); }
-body[data-hero] .masthead .wordmark,
-body:has(main .ed-arrival) .masthead .wordmark,
-body:has(main .ed-journey-hero) .masthead .wordmark { color: var(--bone); }
 
 /* =========================================================
    PHOTOGRAPHY AS A CONTENT LAYER
@@ -8713,9 +8705,14 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
   font-family: var(--ed-sans); font-size: var(--t-sm); line-height: 1.5;
   color: var(--ink-2);
 }
+/* `--ink-3` IS SIZED ON THE PAGE AND THE SLOT IS NOT THE PAGE. It is the
+   quietest ink in the system, measured against `--paper`; the slot's ground
+   is `--paper-3`, a step and a half darker, so the spec line came out 3.98
+   on every page carrying a slot. A quiet colour is quiet relative to
+   something, and the something here is two rungs down the ladder. */
 .ed-slot-spec {
   font-family: var(--ed-mono); font-size: var(--t-xs); letter-spacing: .08em;
-  color: var(--ink-3);
+  color: var(--ink-2);
 }
 /* In a strip the cells are 15rem wide: the brief does not fit and the
    surface name does, so the note comes off rather than being clipped —
