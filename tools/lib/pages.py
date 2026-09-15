@@ -1758,6 +1758,7 @@ def macromap(data, m):
     # the standard forbids for editorial geography.
     return cartography.plate(
         uid=uid, w=w, h=h, proj=MAPPROJ, view=(0, 0, w, h),
+        cut_reach=dusk_reach(),
         land=f"{ctx}{land}", labels=drawn,
         caption=f'<figcaption>{cap}</figcaption>',
         figure_class=f"minimap macromap arched atlas{dense_class(drawn)}",
@@ -2791,6 +2792,7 @@ def countryportrait(data, c):
         f'<div class="plate">'
         + cartography.plate(
             uid=uid, w=w, h=h, proj=proj, view=(0, 0, w, h),
+            cut_reach=dusk_reach(),
             land=land, context=ctx,
             destinations=dotmarks, labels=namemarks,
             summits=summitmarks,
@@ -5406,6 +5408,7 @@ def minimap(data, t, span=3.2, about=None, named=None):
         uid=uid, w=w, h=h, proj=MAPPROJ, view=view,
         transform=(f'translate({w/2 - cx*span:.2f},'
                    f'{h/2 - cy*span:.2f}) scale({span})'),
+        cut_reach=dusk_reach(),
         land=land, context=ctx, relief=tdraw, frame_km=km_w,
         destinations="".join(dots), labels=drawnlabels + bar,
         rim=False, caption=cap,
@@ -5987,6 +5990,7 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
     return cartography.plate(
         uid=uid, w=vw, h=vh, proj=MAPPROJ, view=(x0, y0, w, h),
         transform=f"scale({k:.4f}) translate({-x0:.1f},{-y0:.1f})",
+        cut_reach=dusk_reach(),
         land=land, context=ctx, relief=relief, frame_km=frame_km,
         route=route, destinations="".join(dots),
         labels="".join(lab) + bar,

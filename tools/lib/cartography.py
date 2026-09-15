@@ -331,7 +331,7 @@ def _bands():
     return _BANDS
 
 
-def datacut(uid, proj, view):
+def datacut(uid, proj, view, reach=None):
     """The drawing fades where what this atlas HOLDS ends.
 
     `data/geo/` stops at 52°E and 33°N because that is where this product
@@ -349,6 +349,26 @@ def datacut(uid, proj, view):
     A fade that dims the thing it exists to keep legible has swapped one
     rendering fault for another.
 
+    AND THE WIDTHS WERE THE ONES `pages.dusk_reach()` WAS WRITTEN TO REPLACE.
+    330 east and 130 south were chosen by eye for atmosphere, and the hero's
+    own measurement replaced them with a width DERIVED from the outermost
+    destination — because a ramp that swallows Baku is the fault above, in
+    the family that records it. That measurement never reached here: 330 and
+    130 were typed into this function, so every picture plate on the site
+    went on drawing the wide fade. Measured over all 319 destinations, as the
+    opacity the ramp paints at each one's own position:
+
+        wide (what the plates drew)   25 of 319 dimmed past half
+        dusk_reach (what the hero drew) 6 of 319
+
+    Baku 93%, Xınalıq 88%, Sheki 84%, Paphos 83%. The region plate for Baku &
+    the Caspian rendered as an almost uniform dark field with one dot on it:
+    the marks survive — they are above this — and the picture does not, which
+    is not what "a destination near the cut keeps its dot" was promising.
+    A second implementation of a thing is a second chance to make its
+    mistake, and this one made it by hard-coding a constant the other had
+    already derived.
+
     NOT A `lyr-` LAYER, and `geo.LAYERS` is right to have no row for it.
     Every layer there is a fact about the ground; this is a fact about the
     DATASET, and it belongs with the aperture's cut edge — the other thing
@@ -362,16 +382,17 @@ def datacut(uid, proj, view):
     across Anatolia.
     """
     x0, y0, vw, vh = view
+    eb, ea, sb, sa = reach or (330.0, 30.0, 130.0, 4.0)
     a, b = proj.xy(70.0, 52.0), proj.xy(40.0, 52.0)
     mx, my = (a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0
     dx, dy = b[0] - a[0], b[1] - a[1]
     n = math.hypot(dx, dy) or 1.0
     nx, ny = dy / n, -dx / n                    # perpendicular, pointing east
-    ex1, ey1 = mx - nx * 330.0, my - ny * 330.0
-    ex2, ey2 = mx - nx * 30.0, my - ny * 30.0
+    ex1, ey1 = mx - nx * eb, my - ny * eb
+    ex2, ey2 = mx - nx * ea, my - ny * ea
     ax, ay = proj.apex()
     r33 = proj.parallel_radius(33.0)
-    f0, f1 = (r33 - 130.0) / r33, (r33 - 4.0) / r33
+    f0, f1 = (r33 - sb) / r33, (r33 - sa) / r33
 
     def stops(lo=0.0, hi=1.0):
         out = []
@@ -1086,7 +1107,7 @@ def region_bounds(proj, view):
 
 
 def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
-          transform="", relief=False, frame_km=None,
+          transform="", relief=False, frame_km=None, cut_reach=None,
           cities="", destinations="", labels="", route="", caption="",
           features="", waters="", summits="",
           role="illustration", figure_class="minimap arched atlas",
@@ -1176,7 +1197,7 @@ def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
             # The data cut goes here: above the ground and below every mark.
             # See datacut() — at 49.8°E the eastern ramp is a third opaque
             # and Baku is at 49.8°E.
-            body.append(placed(datacut(uid, proj, view)))
+            body.append(placed(datacut(uid, proj, view, cut_reach)))
             body.append(_group(name, cities))
         elif name == "destinations":
             body.append(_group(name, destinations))

@@ -4096,6 +4096,61 @@ def c_score_median():
 
 
 @check("no drawing quietly omits a place it is drawn from")
+@check("a picture plate fades by the derived reach, not by a typed one")
+def c_cut_reach():
+    """`dusk_reach()` was derived and `cartography.datacut()` typed it again.
+
+    The fade over the 52°E and 33°N data cuts had its widths chosen by eye —
+    330 units east, 130 south — and the hero's own measurement replaced them
+    with a width DERIVED from the outermost destination, because a ramp that
+    swallows Baku is the fault the fade exists to avoid, arrived at from the
+    other side. That measurement never reached the plates: 330 and 130 were
+    typed into `cartography.datacut()`, so every region, theme, motion,
+    story, country portrait and destination plate went on drawing the wide
+    one. Measured over all 319 destinations, as the opacity the ramp paints
+    at each one's own position: 25 dimmed past half against 6.
+
+    THE SPLIT IS PICTURE AGAINST INSTRUMENT AND IT IS DELIBERATE. /map and
+    /discover keep the wide reach and say so — their marks are drawn above
+    the fade, the ground is graphite, and the ramp is atmosphere. A plate is
+    a picture OF somewhere and its ground is the subject, which is why
+    Baku & the Caspian rendered as a uniform dark field with one dot on it.
+
+    Asserted on the shipped SVG rather than on the call sites: both endpoints
+    sit WEST of the 52°E meridian — `eb` units and `ea` units — so the ramp
+    spans `eb - ea` and reaches full opacity `ea` short of the cut, which an
+    SVG gradient then pads eastward over it. That is readable off the markup.
+    A source check would pass the day somebody adds a fifth caller.
+    """
+    import math
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from lib import pages as _P
+    eb, ea, _sb, _sa = _P.dusk_reach()
+    want = eb - ea
+    n = 0
+    pat = re.compile(r'<linearGradient id="cut-[^"]*-e"[^>]*'
+                     r'x1="([-\d.]+)" y1="([-\d.]+)" '
+                     r'x2="([-\d.]+)" y2="([-\d.]+)"')
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        if "datacut" not in h:
+            continue
+        for m in pat.finditer(h):
+            x1, y1, x2, y2 = (float(v) for v in m.groups())
+            got = math.hypot(x2 - x1, y2 - y1)
+            n += 1
+            if abs(got - want) > 0.5:
+                fail(f"{canonical_of(f)}: a picture plate's eastern data-cut "
+                     f"ramp is {got:.0f} projection units wide and the reach "
+                     f"derived from the outermost destination is {want:.0f}. "
+                     f"A width typed into the renderer is a width nothing "
+                     f"re-derives when a destination moves.")
+    if n < 100:
+        fail(f"c_cut_reach examined only {n} picture-plate ramps — it has "
+             f"stopped finding the family it is about.")
+    return n
+
+
 @check("no page prints a word cut in half")
 def c_cut_word():
     """`first_sentence()` exists, and the page it was written for did not use it.
