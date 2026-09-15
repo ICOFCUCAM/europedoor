@@ -5925,8 +5925,15 @@ body[data-hero] .masthead { position: sticky; }
  * asked to carry a category. */
 .jrowart { align-self: center; }
 .jrowart .constel { width: 100%; }
-.jrowart .constel-lit circle { r: 9px; }
-.jrowart .constel-route { stroke-width: 7; }
+/* Marks sized for a 352px drawing, not for the 132px thumbnail this was.
+   A 9-unit dot on a framed route is a blob that hides the stop it marks; the
+   hairline is the ground's own tone, so a stop separates from the water and
+   from the land without a second colour. */
+.jrowart .constel-lit circle { r: 6px; stroke: var(--atlas-sea);
+                               stroke-width: 2; }
+.jrowart .constel-route { stroke-width: 4.5; }
+.jrowart .constel-route.case { stroke-width: 9; stroke: var(--atlas-land);
+                               opacity: .55; }
 .jrow:hover h3, .jrow:focus-visible h3 { color: var(--door); }
 /* A LEAD JOURNEY AT SIZE WAS TRIED AND MEASURED OUT. Three identical rows
    give the band three medium elements and no dominant one, which is the
