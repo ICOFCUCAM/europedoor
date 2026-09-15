@@ -19,7 +19,8 @@ from . import urls
 from .render import (LD_PUBLISHER, ORIGIN, SITE_NAME, SITE_TAGLINE, arch_rim, card, chips, crumbs,
                      esc, factlist, grid, n_of,
                      jsondata, ld_breadcrumb, ld_place, ld_within, motif_for,
-                     page, photo, picture, plate, section, arch_clip, arch_edge)
+                     page, photo, picture, plate, section, arch_clip, arch_edge,
+                     ed_opening, ed_photo, ed_rows, ed_section_head, ed_split)
 from .score import city_scores, country_scores, discoverability
 
 HOME = ("Europe", "/discover")
@@ -1489,21 +1490,29 @@ def countries_index(data):
             c = data["countries"][cs]
             ncity = sum(len(r["cities"]) for r in c["regions"])
             mcity += ncity
-            adv = ' <span class="tag advisory">advisory</span>' if c.get("advisory") else ""
-            rows.append(
-                f"""<a class="row" href="{urls.country(c)}">
-                <div><h3>{esc(c['name'])}{adv}</h3><p class="rowsub">{esc(c['tagline'])}</p></div>
-                <p class="rowmeta">{n_of(len(c['regions']), 'region')} · {n_of(ncity, 'city')}</p></a>"""
-            )
+            rows.append({"href": urls.country(c), "title": c["name"],
+                         "sub": c["tagline"],
+                         "meta": f"{n_of(len(c['regions']), 'region')} · "
+                                 f"{n_of(ncity, 'city')}",
+                         "flag": "advisory" if c.get("advisory") else ""})
+        # THE NINE BANDS KEEP THEIR GLYPHS AND TAKE THE SYSTEM'S ROWS.
+        # The brief's /countries is opening -> the continent -> one flat list
+        # of fifty, and flattening is the one thing that would cost this page
+        # something it already has: each band's own members drawn on their own
+        # frame is what tells the Nordics from the Caucasus before a word is
+        # read, and it is the measurement that rebuilt this family. So the
+        # sequence is the brief's and the grouping is kept — the rows inside
+        # each band are `ed_rows` now, which is where the upgrade actually
+        # lands.
         blocks.append(
             f"""<section class="band macroband" id="{esc(m['slug'])}">
             <div class="bandtop">
-            <div class="band-head"><p class="kicker">{n_of(len(m['countries']), 'country')} · {n_of(mcity, 'destination')}</p>
+            <div class="band-head"><p class="ed-eyebrow">{n_of(len(m['countries']), 'country')} · {n_of(mcity, 'destination')}</p>
             <h2><a href="{urls.macro(m)}" class="nodec">{esc(m['name'])}</a></h2>
             <p class="lede">{esc(m['blurb'])}</p></div>
             <figure class="bandart">{region_glyph(m["countries"], macro_frame(data, m))}</figure>
             </div>
-            <div class="rows">{''.join(rows)}</div></section>"""
+            {ed_rows(rows)}</section>"""
         )
     # THE PAGE ABOUT FIFTY COUNTRIES OPENED ON NONE OF THEM. Nine bands each
     # carrying a regional glyph is three densities from the second band down
@@ -1531,25 +1540,49 @@ def countries_index(data):
     lim = (geo.load("europe-lod1.json") or {}).get("bbox", [None, None, None])[2]
     cutsay = (f" Russia's outline stops at {lim:.0f}°E, where this atlas's map "
               f"data ends, not at a border.") if lim is not None else ""
+    # THE 2036 SEQUENCE: A MAP, THEN THE CONTINENT DIVIDED, THEN THE ROWS.
+    # The brief's /countries opens on the stage, states where the countries
+    # sit, and then lets a reader choose one — which is the order a person
+    # actually uses an atlas in, and it is not the order this page had. What
+    # it does NOT do is flatten the nine macro regions into one list of
+    # fifty: each band drawing its own members on its own frame is what tells
+    # the Nordics from the Caucasus before a word is read, and that is the
+    # measurement that rebuilt this family in the first place. So the
+    # sequence is the brief's and the grouping is kept.
     body = f"""
 {crumbs([("Europe", "/discover"), ("Atlas", None)])}
 {constel_defs()}
-{indexhero(
-    kicker="Every country in Europe",
-    title="Europe, all the way down.",
-    lede=f"{numword(len(data['macros']), cap=True)} regions, {len(data['countries'])} countries, "
-         f"{sum(len(c['regions']) for c in data['countries'].values())} travel regions "
-         f"and {len(data['cities'])} cities. The regions below are editorial travel "
-         f"regions rather than administrative ones: they group places that feel like "
-         f"each other and are usually visited together.",
-    art=heroart,
-    img=photo(data.get("images"), "countries-hero", w=2000, h=1500,
-              sizes="(min-width: 60rem) 52vw, 100vw"),
-    actions='<a class="btn" href="/map">Open the map</a>'
-            '<a class="btn ghost" href="/discover">Start from what you like</a>',
-    note=f"Each of the {len(data['countries'])} countries above is drawn on its own, "
-         f"so the frontiers are the picture.{cutsay}")}
+{ed_opening(
+    eyebrow="The Atlas",
+    title="Europe, country by country.",
+    intro=f"{numword(len(data['macros']), cap=True)} regions, "
+          f"{len(data['countries'])} countries, "
+          f"{sum(len(c['regions']) for c in data['countries'].values())} travel regions "
+          f"and {len(data['cities'])} cities — every one of them written here rather "
+          f"than imported.",
+    visual=photo(data.get("images"), "countries-hero", w=2000, h=1500,
+                 sizes="(min-width: 52rem) 58vw, 100vw") or heroart,
+    family="atlas")}
+
+<section class="ed-section">
+{ed_section_head("01", "The continent", "Where the countries sit",
+                 "A geographic beginning before the alphabetical one. Each of "
+                 f"the {len(data['countries'])} countries is drawn on its own, so "
+                 f"the frontiers are the picture.{cutsay}")}
+{heroart}
+<p class="actions">
+  <a class="btn" href="/map">Open the map</a>
+  <a class="btn ghost" href="/discover">Start from what you like</a>
+</p>
+</section>
+
+<section class="ed-section">
+{ed_section_head("02", "The Atlas", "Choose a country",
+                 "The regions below are editorial travel regions rather than "
+                 "administrative ones: they group places that feel like each "
+                 "other and are usually visited together.")}
 {''.join(blocks)}
+</section>
 <p class="small">The shape beside each region is the countries that region is made
 of, framed on its own ground rather than on the continent: the drawing changes
 scale between bands, so what tells the Nordics from the Baltic States is the

@@ -113,8 +113,19 @@ def measure():
     route_hash = hashlib.sha256("\n".join(routes).encode()).hexdigest()[:16]
 
     prim_floor = {}
+    # AND THE 2036 SYSTEM'S OWN PRIMITIVES ARE TRACKED HERE TOO, from the
+    # commit that introduced them. A migration moves reach from one set to
+    # another, and a register that counts only the set being LEFT reads every
+    # step of it as a loss — so the eight families' grammar has a floor of
+    # its own and the two numbers can be read against each other. `ed-row`
+    # and `row` are both counted: a page that moved is one that fell on the
+    # first list and rose on the second, and a page that simply stopped
+    # listing anything falls on both, which is the failure this exists to
+    # catch and the only reading the old register could not tell apart.
     for prim in ("kicker", "masthead", "pagehead", "crumbs", "row", "card",
-                 "band", "note", "facts", "btn", "chip"):
+                 "band", "note", "facts", "btn", "chip",
+                 "ed-opening", "ed-section", "ed-row", "ed-eyebrow",
+                 "ed-photo", "ed-split"):
         # \b is the wrong boundary for a CSS class name, because a hyphen is
         # a word boundary: `\bcard\b` matched `class="card-art frame"`, and
         # `\brow\b` matches `rowsub` and `rowmeta`. The card floor of 0.785
@@ -642,7 +653,7 @@ def measure():
                        "thousandth because one page in 1,034 composes without "
                        "them: the index is seventeen rows and a shared "
                        "silhouette, ordered by reach, and it carries no note "
-                       "panel, no facts table and no chip row."},
+                       "panel, no facts table and no chip row. AND THE 2036 PAGE SYSTEM IS A MIGRATION, which is what these numbers do from here: /countries moved its fifty rows from `row` to `ed-row` and the old figure fell by one page, 0.888 to 0.887, while the new one rose from nothing. Six ed- primitives are counted from this commit so the transfer is visible as a transfer — a register watching only the set being left reads every step of a deliberate migration as a loss, and cannot tell it from a family that quietly stopped listing anything at all."},
         },
     }
 

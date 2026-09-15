@@ -7649,9 +7649,23 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
   position: relative; min-height: clamp(26rem, 52vw, 43.75rem);
   overflow: hidden; background: var(--ed-paper-2);
 }
-.ed-opening-visual :is(img, picture, svg) {
+.ed-opening-visual :is(img, picture) {
   width: 100%; height: 100%; display: block; object-fit: cover;
 }
+/* AND A DRAWING IS NOT A PHOTOGRAPH, WHICH `object-fit` CANNOT SAY.
+   `object-fit: cover` does nothing to an inline `<svg>` — the property
+   applies to replaced content and an inline SVG is not that — so the
+   drawing fell back to `preserveAspectRatio="xMidYMid meet"` inside a box
+   sized by a clamp, and letterboxed: a band of `--ed-paper-2` under the
+   continent, which reads as a frame that does not fit. The map-card
+   finding, one component over, where a third of every tile was padding the
+   same colour as the sea.
+   A photograph is cropped to its slot because a slot is a composition; a
+   map is the thing itself and the slot takes ITS proportion. So the box
+   loses its floor when it holds a drawing, and the drawing keeps its own
+   height. */
+.ed-opening-visual:has(svg) { min-height: 0; background: none; }
+.ed-opening-visual svg { width: 100%; height: auto; display: block; }
 
 /* ── SECTION ─────────────────────────────────────────────── */
 .ed-section {
@@ -7914,4 +7928,21 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
   .ed-photo-wide { aspect-ratio: 4 / 3; }
   .ed-year { grid-template-columns: repeat(4, 1fr); }
   .ed-route { grid-template-columns: 3rem 1fr; }
+}
+
+/* The row's own subline, which is what tells one of fifty from the next.
+   It sits under the name rather than beside it, because the meta column is
+   a measurement and this is a sentence. */
+.ed-row .rowsub {
+  margin: var(--s2) 0 0; font-family: var(--ed-sans); font-size: var(--t-sm);
+  line-height: 1.55; color: var(--ink-2); max-width: 44ch;
+}
+
+/* THE TWO ACTIONS MOVED UNDER THE DRAWING THEY ACT ON, which is where the
+   instrument-head rule has always put them: "Open the map" belongs beside
+   the picture of the continent and not in a head three screens above it.
+   The 2036 opening carries no actions on purpose — it is a stage — so this
+   is the section owning its own. */
+.ed-section .actions {
+  display: flex; flex-wrap: wrap; gap: var(--s4); margin: var(--s6) 0 0;
 }

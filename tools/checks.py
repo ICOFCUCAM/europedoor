@@ -5320,7 +5320,15 @@ def c_index_extent():
         # because the lede happens to sit inside the child that closes first.
         #
         # See `_element_text`: parsed, not sliced and not bracket-counted.
-        head = _element_text(h, "pagehead")
+        # AND THE 2036 SYSTEM'S OPENING IS A HEAD. `.ed-opening` carries the
+        # eyebrow, the h1 and the standfirst in one element, which is what a
+        # `pagehead` is; a check that knows only the old class reads the new
+        # one as a page with no head at all, which is this repository's most
+        # repeated fault and would have said so about a page that had got
+        # better. Both, joined, because a family mid-migration has one or the
+        # other and the promise is about the page.
+        head = (_element_text(h, "pagehead") + " "
+                + _element_text(h, "ed-opening"))
         nums = {int(x) for x in re.findall(r"\b(\d{1,5})\b", head)}
         n += 1
         if size not in nums:
@@ -5600,6 +5608,15 @@ def c_pagehead_role():
         h = open(path, encoding="utf-8").read()
         m = re.search(r'<(?:div|header) class="pagehead([^"]*)"', h)
         if not m:
+            # THE 2036 OPENING DECLARES ITS ROLE AS A FAMILY, not as one of
+            # the three head roles, and that is the same promise one level
+            # up: `ed-family-atlas` on the section and `data-family` on the
+            # body say what KIND of page this is, which is what the three
+            # roles were a first approximation of. A page that carries one
+            # is not a page with no head.
+            if re.search(r'class="ed-opening ed-family-([a-z]+)"', h):
+                n += 1
+                continue
             if r not in NO_HEAD:
                 fail(f"{r}: no page head at all. Every page declares what kind "
                      f"of page it is through the `pagehead` primitive, or it "

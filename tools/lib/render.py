@@ -1720,12 +1720,20 @@ def ed_rows(rows, *, numbered=True):
     out = []
     for i, row in enumerate(rows, 1):
         num = f"{i:02d}" if numbered else ""
-        meta = row.get("meta", "")
+        # A SUBLINE IS PART OF THE ROW AND A FLAG IS NOT PROSE. The brief's
+        # row carries a title and a meta; every index on this site also has
+        # a sentence that says what distinguishes this one from the fifty
+        # under it, and three of them carry a travel advisory, which is a
+        # STATE rather than a word and has its own tone.
+        sub = (f'<p class="rowsub">{esc(row["sub"])}</p>'
+               if row.get("sub") else "")
+        flag = (f' <span class="tag advisory">{esc(row["flag"])}</span>'
+                if row.get("flag") else "")
         out.append(
             f'<a class="ed-row" href="{esc(row["href"])}">'
             f'<span class="ed-row-number">{num}</span>'
-            f'<div><h3>{esc(row["title"])}</h3></div>'
-            f'<span class="ed-row-meta">{esc(meta)}</span>'
+            f'<div><h3>{esc(row["title"])}{flag}</h3>{sub}</div>'
+            f'<span class="ed-row-meta">{esc(row.get("meta", ""))}</span>'
             '<span class="ed-row-arrow" aria-hidden="true">&#8594;</span>'
             "</a>")
     return '<div class="ed-rows">' + "".join(out) + "</div>"
