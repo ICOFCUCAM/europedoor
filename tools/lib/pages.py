@@ -1665,6 +1665,82 @@ def pageband(data, key, alt_fallback=""):
             + "</figure>")
 
 
+def head_figure(data, key, fallback, alt_fallback=""):
+    """The right-hand side of a page's opening: a photograph, or the drawing.
+
+    THE BENCHMARK PUTS THE PICTURE BESIDE THE TYPE AND THIS PUT IT ABOVE IT.
+    `pageband()` renders the opening photograph as a full-width band over the
+    head, which is a magazine's cover and not its opening spread: the reader
+    meets a picture, then a headline, then the drawing that headline is
+    about, and the three never compose into one statement. Every one of these
+    families ALREADY lays its head out as type beside a figure — the country
+    portrait, the region constellation, a journey's route — so the
+    photograph belongs in that figure's place, and the drawing moves down to
+    a band of its own where its caption still explains it.
+
+    AND THE DRAWING IS NEVER LOST, which is the rule `pageband` was written
+    under: "replacing one would be the /map failure — a page going on stating
+    a claim about a drawing that is no longer there." The caller emits it
+    below with `moved_drawing()` when a photograph took its place; with no
+    photograph this returns the drawing itself and the page is exactly what
+    it is today.
+    """
+    row = (data.get("images") or {}).get(key)
+    if not row:
+        return fallback
+    return ('<figure class="headshot">'
+            + picture(data.get("images"), key, w=1600, h=1200,
+                      alt=row.get("alt") or alt_fallback, eager=True,
+                      sizes="(min-width: 60rem) 46vw, 100vw")
+            + "</figure>")
+
+
+def moved_drawing(data, key, drawing, caption):
+    """The family's own drawing, below, on the pages where a photograph took
+    the head. Returns nothing at all when there is no photograph, because
+    then the drawing never moved."""
+    if not (data.get("images") or {}).get(key) or not drawing:
+        return ""
+    return section("Where it is", f'<div class="movedraw">{drawing}</div>',
+                   lede=caption)
+
+
+def photostrip(data, items, limit=6):
+    """A rail of photographs of the things below — and only the ones that
+    exist.
+
+    THE BENCHMARK CARRIES FOUR TO SIX PHOTOGRAPHS ACROSS THE FOOT OF NEARLY
+    EVERY PAGE, and this atlas draws maps there instead. Both are right: a
+    map answers WHERE and a photograph answers WHAT IT LOOKS LIKE, and the
+    second is the question a reader browsing a country is actually asking.
+
+    It composes as the library fills, which is the property the homepage's
+    theme row already has: `items` is [(register key, name, url)] and a key
+    the register does not hold is simply not in the rail. With none of them
+    held the rail is not drawn at all — a slot waiting for a picture is
+    honest, and a row of six empty frames is a page saying the library is
+    thin.
+    """
+    reg = data.get("images") or {}
+    have = [(k, n, u) for k, n, u in items if k in reg][:limit]
+    if not have:
+        return ""
+    cells = "".join(
+        f'<a class="pstile" href="{esc(u)}">'
+        + picture(reg, k, w=560, h=700, alt=reg[k].get("alt") or n,
+                  sizes="(min-width: 60rem) 16vw, 40vw", credit=False)
+        + f'<span class="psname">{esc(n)}</span></a>'
+        for k, n, u in have)
+    # THE RAIL PAYS ITS ATTRIBUTION ONCE, under the row, exactly as the
+    # homepage's row of eight does: six figcaptions under six thumbnails is
+    # noise, and the licence asks for the photographer and the provider.
+    who = ", ".join(dict.fromkeys(
+        f'<a href="{esc(reg[k]["source"])}" rel="noopener" target="_blank">'
+        f'{esc(reg[k]["photographer"])}</a>' for k, _n, _u in have))
+    return (f'<div class="pstrip">{cells}</div>'
+            f'<p class="sheetcred rowcred">Photographs by {who} on Pexels.</p>')
+
+
 def macro_page(data, m):
     """A macro region, and the countries it is made of.
 
@@ -8170,7 +8246,19 @@ def theme_page(data, t):
     # shape of the page. Where a photograph exists the map keeps its place
     # under the head, because a picture and a drawing say different things
     # and neither replaces the other.
-    opening, below = (photoband, thememap) if photoband else (thememap, "")
+    # THE PICTURE SITS BESIDE THE NAME NOW, WHICH IS WHAT THE MEASUREMENT
+    # BELOW WAS ASKING FOR. Stacked, one of the two states always loses: the
+    # photograph pushed the h1 to y=750 and the map pushed it to 1,019, so a
+    # reader met a gondola or eight dots and had to scroll to learn what
+    # either was about. Beside it, both are above the fold and neither is
+    # first — which is the opening spread of a magazine rather than its
+    # cover, and the grammar the whole atlas is being rebuilt to.
+    key = f"theme:{t['slug']}"
+    headpic = head_figure(data, key, thememap, alt_fallback=t["name"])
+    below = moved_drawing(
+        data, key, thememap,
+        "Where the eight places are, and how far apart. A theme is not a "
+        "route, so there is no line between them.")
     # AND THE NAME COMES BEFORE THE PICTURE. Measured at 1280x900: with the
     # photograph opening the page the h1 sat at y=750 and with the map at
     # 1,019 — so a reader on a laptop met a gondola, or eight dots, and had
@@ -8186,16 +8274,16 @@ def theme_page(data, t):
     # the photograph's.
     body = f"""
 {crumbs([("Europe", "/discover"), ("Themes", "/themes"), (t["name"], None)])}
-<div class="pagehead overture themetop">
-  <p class="kicker">{esc(t['strapline'])}</p>
-  <h1>{esc(t['name'])}</h1>
-</div>
-{opening}
-<div class="pagehead overture themesay">
-  {statement(t['summary'])}
-  <p class="orient">{len(t['stops'])} places across {len(countries)}
-  {"countries" if len(countries) != 1 else "country"} · not an itinerary</p>
-  {chips(t["interests"], data["interests"])}
+<div class="pagehead overture opening">
+  <div class="openingsay">
+    <p class="kicker">{esc(t['strapline'])}</p>
+    <h1>{esc(t['name'])}</h1>
+    {statement(t['summary'])}
+    <p class="orient">{len(t['stops'])} places across {len(countries)}
+    {"countries" if len(countries) != 1 else "country"} · not an itinerary</p>
+    {chips(t["interests"], data["interests"])}
+  </div>
+  {headpic}
 </div>
 
 {below}

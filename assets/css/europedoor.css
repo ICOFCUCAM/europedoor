@@ -3517,8 +3517,10 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    opening picture, so the two halves must not each pay the head's own top and
    bottom air — that would put 200 pixels between the name and the thing it
    names. */
-.pagehead.themetop { padding-bottom: 0; margin-bottom: var(--s5); }
-.pagehead.themesay { padding-top: 0; margin-top: var(--s5); }
+/* `.themetop` and `.themesay` were the two halves of the theme head, above
+   and below a full-width photograph. The opening spread put the picture
+   beside the type and the head became one element, so both rules lost their
+   subject in the same commit that removed the markup. */
 .pagehead.portraithead { display: grid; gap: var(--s6); align-items: center; }
 /* THE PLATE: the figure and its foot. The locator and the key started
    INSIDE the figure and inherited the whole atlas skin through the cascade —
@@ -7105,3 +7107,56 @@ body[data-hero] main { max-width: none; padding: 0; }
   .whererows .row { grid-template-columns: 6rem minmax(0, 1fr); }
   .whererows .rowmeta { grid-column: 2; }
 }
+
+/* ══ THE OPENING SPREAD ════════════════════════════════════════════════
+   TYPE BESIDE THE PICTURE, ON EVERY FAMILY THAT HAS ONE.
+
+   Seven families opened on a full-width photograph above the head and the
+   rest opened on a drawing under it. Stacked, one of the two always loses:
+   measured on a theme page at 1280x900 the photograph pushed the h1 to
+   y=750 and the map pushed it to 1,019, so a reader met a picture and had
+   to scroll to learn what it was of. Beside it, the name and the picture
+   are both above the fold and neither is first — a magazine's opening
+   spread rather than its cover.
+
+   THE RIGHT-HAND SIDE IS A PHOTOGRAPH OR THE FAMILY'S OWN DRAWING, and the
+   markup does not know which: `head_figure()` hands back one or the other,
+   so a family with an empty slot is the page it is today and fills in
+   without its layout moving. That is the property the homepage's row of
+   eight already has, and the reason the four doors were resized. */
+.pagehead.opening { display: grid; gap: var(--s6) var(--s7); align-items: center;
+                    grid-template-columns: minmax(0, 1fr); }
+.openingsay { display: grid; gap: var(--s4); justify-items: start; min-width: 0; }
+.openingsay .statement { margin: 0; }
+.headshot { margin: 0; position: relative; }
+.headshot picture { display: block; }
+.headshot img { width: 100%; height: 100%; object-fit: cover; display: block;
+                aspect-ratio: 4 / 3; }
+@media (min-width: 60rem) {
+  .pagehead.opening { grid-template-columns: minmax(0, 1fr) minmax(0, 46%); }
+}
+/* The drawing that the photograph displaced, in a band of its own. It keeps
+   its caption, because a page may never go on stating a claim about a
+   drawing that is no longer there. */
+.movedraw { max-width: 52rem; }
+
+/* ══ THE PHOTOGRAPH RAIL ═══════════════════════════════════════════════
+   Four to six pictures of the things below. A map answers WHERE and a
+   photograph answers WHAT IT LOOKS LIKE, and the second is the question a
+   reader browsing a country is actually asking — so this is an addition to
+   the geography and never a replacement for it.
+
+   It draws only the slots the register holds and is not drawn at all when
+   it holds none: a row of six empty frames is a page saying the library is
+   thin, which is the hole the four homepage doors were measured for. */
+.pstrip { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
+          gap: var(--s3); width: 100%; }
+.pstile { text-decoration: none; color: inherit; display: grid; gap: var(--s2);
+          min-width: 0; }
+.pstile picture { display: block; }
+.pstile img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block; }
+.psname { font-family: var(--text); font-size: var(--t-xs); letter-spacing: .1em;
+          text-transform: uppercase; color: var(--ink-3); }
+.pstile:hover .psname { color: var(--door); }
+@media (max-width: 64rem) { .pstrip { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 44rem) { .pstrip { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
