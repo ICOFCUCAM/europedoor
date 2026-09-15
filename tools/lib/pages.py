@@ -2451,6 +2451,7 @@ def countryportrait(data, c):
                                t["name"], iscap, kind_))
     order_.sort()
     dotmarks, boxes_, minor, marks_, named_ = "", [], [], [], set()
+    boxed_ = []
 
 
 
@@ -2482,6 +2483,7 @@ def countryportrait(data, c):
         boxes_.append((lx - LABEL_CLEAR, ly - LABEL_CLEAR,
                        lx + lw + LABEL_CLEAR, ly + lh + LABEL_CLEAR))
         labs_.append(lhtml)
+        boxed_.append((lhtml, lx, ly, lw, lh, cls))
         return True
 
     def _mark(px, py, nm, iscap, kind):
@@ -2728,6 +2730,34 @@ def countryportrait(data, c):
     for px, py, nm, iscap, kind in marks_:
         if iscap or nm in named_:
             dotmarks += _mark(px, py, nm, iscap, kind)
+
+    # THE FIFTH DRAWING THAT NAMES THINGS, AND THE ONLY ONE WITH NEITHER
+    # PASS. The macro map, the country reference map, the destination plate
+    # and pointsmap all run `phone_declutter`, because a phone enlarges a
+    # sparse map's labels and enlarging the type breaks the rule that placed
+    # it. The portrait was written afterwards and inherited none of it —
+    # which is the `.peakname` scar one function over, met again at the level
+    # of the PASS rather than of the declaration.
+    #
+    # Measured with the browser's own getBoundingClientRect on all fifty
+    # portraits: zero overlapping pairs at 1280, and at 390 **32 pairs on 18
+    # of them**, the worst "Mount Ararat 5,137 m" through "PONTIC MOUNTAINS"
+    # by 158 pixels. Not one label was under 9px: size was already right and
+    # arrangement was never asked.
+    #
+    # The set tested is the set a phone DRAWS. `.pname` is display:none below
+    # 62rem — the place names are all in the regions band — so measuring
+    # against their boxes would drop a summit for colliding with a name that
+    # is not there. And the country's own name is first in this list by
+    # construction, so it wins every contest: a portrait that cannot name its
+    # subject is a worse defect than a collision, which is already why it
+    # takes a third placement rung.
+    _phone_i = [i for i, b in enumerate(boxed_)
+                if b[5].split()[0] != "pname"]
+    for i, html in zip(_phone_i, phone_declutter(
+            [boxed_[i][:5] + (1.0 if boxed_[i][5].split()[0] == "cname"
+                              else PHONE_LABEL_SCALE,) for i in _phone_i])):
+        labs_[i] = html
 
     namemarks = "".join(labs_)
     uid = "cp" + "".join(ch for ch in c["slug"] if ch.isalnum())[:14]
@@ -5612,7 +5642,14 @@ def phone_declutter(placed):
     on a wide screen and are not drawn on a narrow one. The dot, the <title>
     and the row below survive either way, as they do for a collision.
 
-    `placed` is [(html, x0, y0, w, h)]; returns the html, in order.
+    `placed` is [(html, x0, y0, w, h)] or [(html, x0, y0, w, h, scale)];
+    returns the html, in order.
+
+    THE SCALE IS PER LABEL BECAUSE ONE FAMILY DOES NOT TAKE THE PHONE RULE.
+    A country plate's own name is set in `--t-lg`, a length in the viewBox
+    rather than a `--z`-compensated one, so it is the same size on a phone as
+    on a desk and a box grown by 2.36 about it is a box around nothing. Every
+    other family here does take the rule, which is why the default is it.
     """
     kept, out = [], []
     # THE SAME CLEARANCE EVERY OTHER PASS KEEPS, scaled with the boxes. This
@@ -5621,10 +5658,12 @@ def phone_declutter(placed):
     # and not a number to leave in a check's tolerance either — a threshold
     # that forgives two pixels forgives the next regression that lands on
     # two.
-    clear = LABEL_CLEAR * PHONE_LABEL_SCALE
-    for html, x0, y0, w, h in placed:
+    for item in placed:
+        html, x0, y0, w, h = item[:5]
+        scale = item[5] if len(item) > 5 else PHONE_LABEL_SCALE
+        clear = LABEL_CLEAR * scale
         cx, cy = x0 + w / 2.0, y0 + h / 2.0
-        bw, bh = w * PHONE_LABEL_SCALE, h * PHONE_LABEL_SCALE
+        bw, bh = w * scale, h * scale
         box = (cx - bw / 2.0 - clear, cy - bh / 2.0 - clear,
                bw + 2 * clear, bh + 2 * clear)
         clash = any(box[0] < k[0] + k[2] and k[0] < box[0] + box[2]

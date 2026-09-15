@@ -3422,6 +3422,18 @@ async function main() {
    *
    * Both widths, because the two passes are different rules: 1280 is where
    * the placement decides, 390 is where the enlargement re-decides.
+   *
+   * AND THE SAMPLE REPRESENTED THE PORTRAIT WITH TWO PLATES THAT DID NOT
+   * HAVE THE THING. /europe/armenia and /europe/cyprus were here because a
+   * country name once landed on top of whatever was at the middle of the
+   * country — and neither of them carries a physical name, so neither could
+   * ever have shown the defect underneath: the portrait was the fifth
+   * drawing that names things and the only one that never ran
+   * `phone_declutter`. Measured across all fifty at 390: **32 overlapping
+   * pairs on 18 plates**, the worst "Mount Ararat 5,137 m" through "PONTIC
+   * MOUNTAINS" by 158 pixels, and zero at 1280 — size was right and
+   * arrangement was never asked. Türkiye, Ukraine and Switzerland are the
+   * three deepest, so the sample now contains the case.
    */
   for (const [vw, vh] of [[1280, 900], [390, 800]]) {
     const lc = await browser.newPage({ viewport: { width: vw, height: vh } });
@@ -3435,6 +3447,9 @@ async function main() {
                      "/europe/armenia/yerevan-and-ararat/yerevan",
                      "/europe/armenia",
                      "/europe/cyprus",
+                     "/europe/turkiye",
+                     "/europe/ukraine",
+                     "/europe/switzerland",
                      "/journeys/the-alpine-grand-tour",
                      "/europe-in/islands",
                      "/europe/italy/north-italy"]) {
