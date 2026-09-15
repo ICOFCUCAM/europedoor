@@ -1156,6 +1156,12 @@ def home(data):
         i["slug"]: sum(1 for n in data["cities"].values() if i["slug"] in n["city"]["interests"])
         for i in data["taxonomy"]["interests"]
     }
+    # The destinations behind each tag, in atlas order, so a door can name
+    # four of its own rather than describe itself twice.
+    by_interest = {}
+    for node in data["cities"].values():
+        for slug in node["city"]["interests"]:
+            by_interest.setdefault(slug, []).append(node)
 
     # Eight ways in, not seventeen. The design this follows asks for
     # Mountains, History, Food, Nature, Faith & Heritage, Beaches, Adventure
@@ -1237,13 +1243,41 @@ def home(data):
         # door set on it, which is a composition rather than a hole, and the
         # arch stays where it belongs: the hero above is the largest one on
         # the site and four more under it is the signature as wallpaper.
+        # AND THE PANEL CARRIES THE OFFER RATHER THAN A SECOND TAGLINE.
+        #
+        # With the register empty a door was a name, an italic line, a
+        # second line saying roughly the same thing again — "From the Alps
+        # to the Caucasus" under "A morning above the clouds" — and a count.
+        # The first-class audit reads the four as flat panels of atlas water
+        # "reading as unloaded images", and two of the four lines were
+        # orienting twice where nothing was orienting once.
+        #
+        # What this atlas holds and a tagline does not is WHICH PLACES. Four
+        # real destination names under Mountains — Chamonix, Zermatt, Theth,
+        # Mestia — are the thing the door opens onto, and they say "from the
+        # Alps to the Caucasus" by BEING it. Same move as /journeys, which
+        # was rebuilt around the ordered sequence, and /themes, which was
+        # rebuilt around its eight stops: show the data rather than a
+        # sentence about the data.
+        #
+        # AND IT ADDS NO PICTURE OF EUROPE, which is the constraint that
+        # governs this band. A door carrying its own constellation was built,
+        # rendered and removed for being a fifth drawing of the continent on
+        # a page that opens on the largest one on the site; that refusal is
+        # what makes names rather than marks the available answer here.
+        #
+        # Taken from the interest's own destinations, in the order the atlas
+        # holds them, spread across the set rather than off the top — four
+        # adjacent alphabetical neighbours would be four places in one
+        # country, which is the opposite of what the door claims.
+        picks = spread_names(by_interest.get(d["interest"], []), 4)
         doors.append(
             f"""<a class="way{' shot' if shot else ''}" href="{urls.interest(d['interest'])}">
   {shot}
   <div class="waytext">
     <h3>{esc(d['title'])}</h3>
     <p class="wayline">{esc(d['line'])}</p>
-    <p class="waywhere">{esc(d['where'])}</p>
+    <p class="wayplaces">{esc(" · ".join(picks))}</p>
     <p class="waymeta"><span>{n} destinations</span><span class="waygo">Explore →</span></p>
   </div>
 </a>"""
@@ -6640,6 +6674,31 @@ def category_page(data, cat, sub=None):
         title, body, path=path, area="experiences",
         description=f"{title}: {n_of(len(chosen), 'experience')} across {n_of(len(countries), 'European country')}, selected by a published rule.",
     )
+
+
+def spread_names(nodes, n=4):
+    """`n` destination names taken ACROSS a set rather than off the top.
+
+    `data["cities"]` is ordered by country, so the first four mountain
+    destinations are four Albanian ones — which is the opposite of the claim
+    a door makes by listing them. Evenly spaced indices give Chamonix,
+    Zermatt, Theth and Mestia: the same spread the tagline was asserting in
+    words, stated by the places themselves.
+
+    THE SAME FAULT THE EXPERIENCE TILES HAD, one family over, where
+    `sample_names` was written for exactly this reason. Two callers now, and
+    they take different shapes — an experience node and an atlas node — so
+    the arithmetic is shared and the extraction is not.
+    """
+    if not nodes:
+        return []
+    k = min(n, len(nodes))
+    step = len(nodes) / float(k)
+    # THE MIDDLE OF EACH BAND, NOT ITS EDGE. Starting at index 0 takes the
+    # first destination in atlas order, which is the same Albanian one for
+    # every tag it carries — Historic cities and Food & wine both opened on
+    # Tirana, four columns apart, on the second screen of the front door.
+    return [nodes[int((i + 0.5) * step)]["city"]["name"] for i in range(k)]
 
 
 def sample_names(items, n=3):
