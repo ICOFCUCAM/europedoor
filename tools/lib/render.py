@@ -1661,12 +1661,28 @@ def ed_family(path):
     return "institutional"
 
 
-def ed_section_head(number, label, title, lede=""):
-    """A numbered section head: the index beside the title, not above it."""
+def ed_section_head(number, label, title, lede="", hid=""):
+    """A numbered section head: the index beside the title, not above it.
+
+    `hid` GOES ON THE HEADING, AND LEAVING IT OUT BROKE TWO THINGS AT ONCE.
+    `section()` emitted `<h2 id="...">` and every caller that moved to this
+    head kept its `aria-labelledby` and its entry in the page's own contents
+    row — so a destination page pointed at `#why-visit`, which no longer
+    existed anywhere in the document. The section claimed a label it did not
+    have, and the jump nav linked to nothing: the browser suite died on
+    `document.querySelector(h)` returning null rather than reporting a
+    failure, which is the one shape of regression a suite cannot describe.
+
+    Neither half is visible in any count. A dangling `aria-labelledby` is not
+    a missing name in the markup, it is a name that resolves to nothing, and a
+    jump link to a missing id scrolls nowhere and raises nothing.
+    """
     return (
         '<header class="ed-section-head">'
         f'<div><p class="ed-section-index">{esc(str(number))} · {esc(label)}</p></div>'
-        f'<div><h2 class="ed-section-title">{esc(title)}</h2>'
+        f'<div><h2 class="ed-section-title"'
+        + (f' id="{esc(hid)}"' if hid else "")
+        + f'>{esc(title)}</h2>'
         + (f'<p class="ed-intro">{esc(lede)}</p>' if lede else "")
         + "</div></header>"
     )

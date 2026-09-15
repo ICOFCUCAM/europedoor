@@ -3622,7 +3622,7 @@ def city_page(data, c, r, t):
   </div>
 </section>
 <section class="ed-section" aria-labelledby="why-visit">
-{ed_section_head("01", "Understand", "Why go")}
+{ed_section_head("01", "Understand", "Why go", hid="why-visit")}
 <ol class="reasons">{reasons}</ol>
 <div class="headmeta">
   <p class="orient">{orient_line(t)}</p>
@@ -7376,6 +7376,13 @@ def experiences_index(data):
          "label": cat["name"], "href": urls.category(cat["slug"])}
         for cat in sorted(data["categories"],
                           key=lambda c: -len(C.select(items, c)))], limit=8)
+    # THE "HOW THIS LIST IS CUT" LINK NAMED THE SECOND OF THE TWO BANDS THAT
+    # ANSWER IT, AND NEITHER CARRIED THE ID. The question is answered by the
+    # categories AND the kinds — what an experience is about and what you
+    # physically do — and the categories come first, so that is where a reader
+    # following the link should land. The id is named for the question rather
+    # than for one of its two answers, and the anchor is emitted by the same
+    # call that draws the band, so the two cannot drift.
     catn = {cat["slug"]: len(C.select(items, cat)) for cat in data["categories"]}
     catbig = max(catn.values()) if catn else 0
     catcards = [
@@ -7455,7 +7462,7 @@ def experiences_index(data):
               "experience here, so this is a sample and not a recency. Every one is a "
               "real, named thing in a real place, and every one links to the page of "
               "the place it happens in.",
-         more=("How this list is cut", "#kinds"))}
+         more=("How this list is cut", "#how-its-cut"))}
 
 <!-- THE TWO AXES CAME AFTER THE EXPERIENCES, and the order is the whole
      change. The page opened on eighteen taxonomy rows — eight categories,
@@ -7468,7 +7475,7 @@ def experiences_index(data):
      They are now the answer to "how is this list cut", asked after the
      list. -->
 {section(f"{numword(len(data['categories'])).capitalize()} categories", '<div class="rows">' + "".join(catcards) + "</div>",
-         tone="quiet",
+         id="how-its-cut", tone="quiet",
          lede=f"What an experience is about, largest first. An experience may be in "
               f"several of these at once — {len(data['categories'])} categories hold "
               f"{sum(catn.values())} memberships across {len(items)} experiences — so each "

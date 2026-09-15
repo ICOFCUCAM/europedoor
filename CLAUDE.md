@@ -15,6 +15,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | doing | read |
 |---|---|
 | **the mandate: what a first-class gateway to Europe would be, and where this one is not** | **`docs/first-class-audit.md`** — 27 surfaces rendered at 1280 and 390 and then measured. Three findings, and Finding 1 is now closed on the numbers: it read 12 of 23 surfaces effectively type to the fold with seven showing no picture at all, and reads **3 of 30 with none and none under a fifth**, median share 24% → 35.6% (CORRECTED twice — the first version said 21 of 22 and was reading where the first figure STARTS rather than how much of the screen it fills). `tools/opening.js` is the instrument, so the number is checkable in a minute. **Finding 2's other half is measured too** — it says the page is the same page and its evidence only ever covered the first 250 pixels: `tools/composition.js` reads the band sequence under the head and finds **29 distinct body shapes over 47 families**, and three h1 sizes at tops 136–745 where the original reading was one size at 150–312. The eight benchmark sites are BLOCKED by the egress proxy and the benchmark half is labelled second-hand |
+| **the eight page families, and what each room does differently** | **`docs/non-home-redesign.md`** — the non-home redesign answered A-J. The eight rooms derived from the route, the three helpers that were forcing one grammar, the seven image scales, 1,626 declared surfaces, and the defects only rendering found |
 | **the design language — what makes a page EuropeDoor with the logo removed, and which movements each family takes** | **`docs/design-language.md`** — the ARCHITECT step. Five marks that could not have been made by anybody else, the six-movement composition grammar per family, the three head roles, what the language forbids, and how a change is proved |
 | **anything at all — read this first, every session** | **`docs/instruction.md`** — the standing instruction. Part 1 is how work is done here (audit first, deviate with numbers, STOP on licensing, never invent data, prove every check can fail). Part 2 is the visual instruction: **European Future**, the two worlds, the palette, the 60/25/10/5 ratio and the measured contrast limits. `docs/palette.json` is the checkable form |
 | **the transformation brief, and the three decisions waiting on the owner** | **`docs/EUROPEDOOR_2036_TRANSFORMATION.md`** — the 2036 audit, what to keep/replace/redesign, and a five-phase roadmap. Phases B and C are unblocked; A waits on a map-licensing decision |
@@ -1993,6 +1994,114 @@ position**, and the entire art-directional difference between a magazine story
 and a country encyclopedia is one 11px kicker changing hue — terracotta on
 `area-stories`, cobalt on `area-countries`. The accent system is not broken; it
 is doing almost no work. See `docs/design-direction-audit.md`.
+
+**A SUITE THAT CRASHES HAS STOPPED COUNTING, AND IT TAKES THE REST OF THE
+SUITE WITH IT.** The browser run died forty minutes in on
+`document.querySelector(h)` returning null — a destination's contents row
+linked to `#why-visit` and no element in the document carried that id.
+`section()` emitted `<h2 id="...">` and `ed_section_head()` did not, so every
+family that moved to the new head kept a jump target and an
+`aria-labelledby` pointing at a heading that had stopped existing. Neither
+half is visible in any count: a dangling `aria-labelledby` is not a missing
+name in the markup, it is a name that resolves to nothing and the browser
+hands the element its content instead, so the section reads as labelled and
+is not. This file already says a green run that has stopped counting is worse
+than a red one; a run that ENDS on a TypeError reports no failure and leaves
+every later check unrun, which is the same fault louder. `c_fragments_resolve`
+costs a second, says which page and which fragment, and found a second one in
+its first run — `/experiences` pointed at `#kinds`, and neither of the two
+bands that answer "how this list is cut" carried it.
+
+**AN F-STRING EXPRESSION CANNOT CONTAIN A COMMENT**, which this file already
+records about a paragraph that tried to go into emitted markup. It applies to
+a keyword argument inside an f-string too: the reason for an anchor's name
+went beside `more=(...)` and the build stopped with *"f-string expression part
+cannot include '#'"*. A reason belongs in the function that composes the page.
+
+**THE EYE FINDS A DEFECT AND IT DOES NOT CONFIRM ONE, AND THAT CUTS BOTH
+WAYS ON A CONTACT SHEET.** The phone sheet showed the masthead navigation
+apparently struck through the wordmark on six of twelve families — a
+collision, in the component this file already records two narrow-width fixes
+for. Measured in Chromium at 390 the wordmark occupies y=12 to y=45 and the
+navigation starts at y=53, and what the thumbnail showed was a 273-pixel
+wordmark LINK whose text sits at its left, read at a twelfth of scale. Same
+finding as the masthead's own colour, where sampling the pixels said cobalt on
+every page while a screen-shot-sized reading said graphite.
+
+**TWO COMPONENTS CAN EACH PAY FOR THE SAME GAP.** `voids.js` reported 304
+pixels before a section heading on /interests/mountains — the largest single
+hole on the site — and it was not a composition fault: the head pays 178
+pixels of its own bottom padding and the band then pays 115 more. Neither is
+wrong alone; charging both when they are adjacent is the margin-doubling this
+file already records about `main` and the footer, which summed to 224 pixels
+of empty page on every page. `.headmeta` is part of the HEAD, so the band
+after it is still the band after the head — the first version looked at the
+immediate sibling rather than at what that sibling is. 18,216 empty pixels of
+239,404 to 17,411 of 238,950.
+
+**A FAMILY ACCENT CAN PAINT A LABEL THE COLOUR OF ITS OWN GROUND.**
+`body[data-family="journey"] :is(.ed-eyebrow, .ed-section-index)` is (0,2,1)
+and `.ed-journey-hero .ed-eyebrow` is (0,2,0), so the family colour won on the
+one element that sits ON the accent: cobalt type on a cobalt field, 1.00:1.
+That is the masthead focus ring one element over and the `--focus` token one
+file over, and the answer is the same all three times — the thing INVERTS
+rather than recolours, and the rule saying so has to out-specify the one that
+made it a family colour.
+
+**TWO TRANSLUCENT LAYERS OVER ONE ANOTHER ARE A THIRD TONE.** The journey
+hero's route drawing gave its land and the ground beyond it the same 22% bone,
+and they OVERLAP — the ground beyond is drawn across the whole frame and
+Europe on top of it — so Europe came out at 39% against a 22% rectangle that
+read as a pasted panel with a hard edge. The hero's own black-fringe finding,
+where two levels of detail of one coast were stacked and the disagreement read
+as a drop shadow.
+
+**A FRAMED DRAWING WAS REFUSED THE DATA-CUT FADE BY A FLAG RATHER THAN BY A
+MEASUREMENT.** `not (frame and pts)` reads "a framed glyph is a small window
+and the cut is outside it", which is true and is not the same as never: the
+Arctic-to-Mediterranean journey runs 69°N to 38°N so its frame IS the whole
+canvas. The fade's gradients are `userSpaceOnUse` and a framed viewBox is a
+WINDOW on those same coordinates rather than a transform of them, so what
+decides is whether the window reaches the cut — arithmetic on the viewBox, not
+a flag on the caller.
+
+**`height: 100%` AGAINST A `min-height` PARENT RESOLVES TO `auto`**, because
+the percentage has no definite height to be a percentage of. A photograph sat
+at its intrinsic height inside a slot sized by a clamp, with a band of
+`--paper-3` under it. A grid row stretches its item by default, so the box
+became a grid and the child fills whatever the min-height resolved to without
+asking for a percentage.
+
+**A NAME GENERATED INTO A SENTENCE CANNOT BE THE SUBJECT OF A VERB, AND A
+COUNT CANNOT ASSUME A PLURAL.** "What mountains looks like here" — seventeen
+tags, some plural, some a compound with an ampersand, no conjugation right for
+all of them. "1 destination, the same ones the drawing above plots" — a region
+holds one to eight. Both branches get written, or the name becomes a noun
+phrase and a derived count carries the sentence.
+
+**A NAME IN A META ROW IS NOT A BYLINE.** The story head printed the author
+bare among the desk, the reading time and the date, so the fourth token was a
+proper noun among three facts. The section audit caught it on all nine stories
+in the run that shipped the head, and nothing a contact sheet or a count could
+see: the name is present, placed and legible. The claim was never that the
+author is on the page.
+
+**A DECLARED SLOT IS SIZED TO WHAT IT SAYS, NOT TO THE PHOTOGRAPH THAT WILL
+REPLACE IT.** `ed_slot()` renders the purpose key, the first sentence of the
+brief and the native width and orientation wanted; an opening's floor is
+written for a picture, so an empty slot in one left a band of `--paper-3` with
+a hairline above it. And `ed_photo()` is the wrong helper for an opening: it
+falls back to a generated PLATE, which is placeholder art doing a picture's
+job and says nothing about what is missing. `photo() or ed_slot()` marks the
+surface and names the acquisition. **1,626 declared surfaces across 479
+pages** — `grep -ro 'class="ed-slot ' site --include=index.html | wc -l`.
+
+**EIGHT ROOMS, DERIVED FROM THE ROUTE.** `render.ed_family()` is the one table
+mapping a path to ATLAS, ARRIVAL, DISCOVERY, JOURNEY, EDITORIAL, TIME,
+INSTRUMENT or INSTITUTION, and no page builder passes a family string —
+forty-seven builders each passing one is forty-seven chances for two pages in
+one family to disagree, which is the fourteen-call-sites-forgot-the-motif
+failure waiting to happen again. See `docs/non-home-redesign.md`.
 
 **Look to find, count to conclude.** A contact sheet of forty plates suggested
 skylines were about 38% of them; measured across every destination they are

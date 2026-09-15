@@ -6793,6 +6793,53 @@ def c_titles_unique():
     return n
 
 
+@check("every in-page link and every aria-labelledby resolves to an id on the page")
+def c_fragments_resolve():
+    """A LINK TO A MISSING ID SCROLLS NOWHERE AND RAISES NOTHING.
+
+    The destination page's contents row linked to `#why-visit` and the
+    section under it claimed `aria-labelledby="why-visit"` — and no element
+    in the document carried that id. `section()` used to emit
+    `<h2 id="...">`; `ed_section_head()` did not, so every family that moved
+    to the new head kept a label and a jump target pointing at a heading that
+    had stopped existing.
+
+    NEITHER HALF IS VISIBLE IN ANY COUNT. A dangling `aria-labelledby` is not
+    a missing name in the markup, it is a name that resolves to nothing, and
+    the browser hands the element its content instead — so the section reads
+    as labelled and is not. A jump link to a missing id scrolls nowhere.
+
+    It was found by the BROWSER SUITE DYING: `document.querySelector(h)`
+    returned null and the run ended on a TypeError forty minutes in, with no
+    failure reported and every later check unrun. That is worse than a red
+    run, which is this repository's own standing complaint about a green one
+    that has stopped counting — a suite that crashes has stopped counting
+    too, and it takes the rest of the suite with it. A static check costs a
+    second and says which page and which fragment.
+
+    `#` and `#top` are the two fragments that legitimately resolve to the
+    document rather than to an element.
+    """
+    n = 0
+    for f in sorted(site_files()):
+        html = open(f, encoding="utf-8").read()
+        ids = set(re.findall(r'\sid="([^"]+)"', html))
+        rel = "/" + os.path.relpath(os.path.dirname(f), OUT)
+        for frag in set(re.findall(r'href="#([^"]+)"', html)):
+            n += 1
+            if frag not in ids:
+                fail(f"{rel} links to #{frag} and nothing on the page carries "
+                     f"that id — the link scrolls nowhere and raises nothing")
+        for ref in set(re.findall(r'aria-labelledby="([^"]+)"', html)):
+            for one in ref.split():
+                n += 1
+                if one not in ids:
+                    fail(f"{rel} has aria-labelledby={one!r} and nothing on "
+                         f"the page carries that id — the element reads as "
+                         f"labelled and is not")
+    return n
+
+
 @check("a category's sub-counts are drawn from its own data and never as a partition")
 def c_category_shares():
     """THE FOUR NUMBERS ARE THE SHAPE OF A CATEGORY AND WERE FOUR NUMBERS.
