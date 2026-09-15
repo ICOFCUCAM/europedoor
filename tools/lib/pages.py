@@ -5833,7 +5833,8 @@ def dense_class(markup):
 
 
 def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
-              min_w=120.0, min_h=75.0, line=False, extra="", relief=False):
+              min_w=120.0, min_h=75.0, line=False, extra="", relief=False,
+              note=""):
     """A set of places on the continent, through the aperture.
 
     `pts` is [(x, y, href, name)] in projection space. Extracted from
@@ -6099,7 +6100,16 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
         land=land, context=ctx, relief=relief, frame_km=frame_km,
         route=route, destinations="".join(dots),
         labels="".join(lab) + bar,
-        caption=f'<figcaption>{caption}</figcaption>',
+        # A CAPTION SAYS WHAT THE PICTURE IS AND A NOTE SAYS HOW IT WAS
+        # MADE. `minimap` was given the two tiers and the seven families that
+        # draw through here were not, so the same atlas captioned its plates
+        # two different ways — and in one of them the coastline credit, the
+        # projection's limits and an editorial sentence all read at the same
+        # weight. `credited()` appends the relief credit at the end, which is
+        # inside the note where the other credits are.
+        caption=('<figcaption><span class="capsay">' + caption + '</span>'
+                 + (f'<span class="capsrc">{note}</span>' if note else "")
+                 + '</figcaption>'),
         figure_class=(f"minimap pointsmap arched atlas{dense}"
                       + (" terrain" if relief else "")),
         aria=esc(aria))
@@ -6123,9 +6133,10 @@ def regionmap(data, c, r):
     cap = (f'{esc(r["name"])} is the {len(pts)} destination'
            f'{"s" if len(pts) != 1 else ""} below, not a boundary — this atlas '
            f'holds which places belong to a region and deliberately not a line '
-           f'round them. Coastline from <a href="/sources">Natural Earth</a>, '
-           f'public domain. <a href="/map?c={esc(c["slug"])}">Open '
-           f'{esc(c["name"])} on the full map →</a>')
+           f'round them.')
+    note = (f'Coastline from <a href="/sources">Natural Earth</a>, '
+            f'public domain. <a href="/map?c={esc(c["slug"])}">Open '
+            f'{esc(c["name"])} on the full map →</a>')
     # A REGION NEEDS THE COUNTRY AROUND IT, NOT A CLOSE-UP OF ITSELF.
     # Tyrol & the West holds one destination; at the default floor that is a
     # single dot in 250 km of unlabelled frontier line, which could be
@@ -6135,8 +6146,7 @@ def regionmap(data, c, r):
     # 2,916 km: the floor was 260 x 165 and the aspect pass recomputes the
     # width from the height, so `min_w` was DEAD and 165 x 2.6 decided both.
     # Stated at the target proportion the aspect pass has nothing to do.
-    return pointsmap(pts, uid, cap,
-                     f'Map of {r["name"]}, {c["name"]}: its '
+    return pointsmap(pts, uid, cap, note=note, aria=f'Map of {r["name"]}, {c["name"]}: its '
                      f'{n_of(len(pts), "destination")} in the Atlas',
                      min_w=170.0, min_h=170.0 / 2.6)
 
@@ -6186,11 +6196,12 @@ def storymap(data, s):
     # which is naming the places. The register is the honest form of that
     # sentence and it is one click away, so the caption points at it rather
     # than reciting it.
-    cap = (f'Where this happens: {esc(where)}. Coastline and borders from '
-           f'<a href="/sources">Natural Earth</a>, public domain. '
-           f'<a href="/map">The full map →</a>')
+    cap = f'Where this happens: {esc(where)}.'
+    note = (f'Coastline and borders from '
+            f'<a href="/sources">Natural Earth</a>, public domain. '
+            f'<a href="/map">The full map →</a>')
     return pointsmap(pts, uid, cap,
-                     f'Map of where {s["title"]} happens: {where}')
+                     f'Map of where {s["title"]} happens: {where}', note=note)
 
 
 def routemap(data, j):
@@ -6223,9 +6234,9 @@ def routemap(data, j):
                     n["city"]["name"]))
     uid = "rt" + "".join(ch for ch in j["slug"] if ch.isalnum())[:14]
     cap = ('Straight lines between stops, in order, ending at the hollow dot '
-           '— the order is real, the lines are not routes. Coastline from '
-           '<a href="/sources">Natural Earth</a>, public domain. '
-           '<a href="/map">The whole map, with every journey →</a>')
+           '— the order is real, the lines are not routes.')
+    note = ('Coastline from <a href="/sources">Natural Earth</a>, public '
+            'domain. <a href="/map">The whole map, with every journey →</a>')
     # A JOURNEY DRAWS RELIEF IF ANY OF ITS STOPS DOES. A route is one picture
     # of one crossing, and "this journey goes into the mountains" is what the
     # map is for; requiring every stop to qualify would drop the Alpine Grand
@@ -6236,7 +6247,7 @@ def routemap(data, j):
             f'{idx[leg["city"]]["region"]["slug"]}/'
             f'{idx[leg["city"]]["city"]["slug"]}' for leg in j["legs"]))
     return pointsmap(pts, uid, cap, f'Route map for {j["name"]}',
-                     line=True, relief=rel)
+                     line=True, relief=rel, note=note)
 
 
 # ── destination facets ────────────────────────────────────────────────
@@ -8227,9 +8238,10 @@ def theme_page(data, t):
         tpts, "th" + "".join(ch for ch in t["slug"] if ch.isalnum())[:14],
         f'{len(tpts)} places in {len(countries)} countries, and no line between '
         f'them: a theme is a way of seeing rather than a route, and these are '
-        f'not in travelling order. Coastline from '
-        f'<a href="/sources">Natural Earth</a>, public domain.',
-        f'Map of the {len(tpts)} places in {t["name"]}, unlinked') if len(tpts) >= 2 else ""
+        f'not in travelling order.',
+        f'Map of the {len(tpts)} places in {t["name"]}, unlinked',
+        note=f'Coastline from <a href="/sources">Natural Earth</a>, '
+             f'public domain.') if len(tpts) >= 2 else ""
 
     photoband = pageband(data, f"theme:{t['slug']}")
     # ONE ARCHITECTURE, TWO PICTURES. Eleven of the thirteen themes carry a
@@ -9255,17 +9267,17 @@ def events_month_page(data, month):
         rest = len(fixtures) - len(mapped)
         cap = (f'{len(mapped)} of the {len(fixtures)} fixture'
                f'{"s" if len(fixtures) != 1 else ""} in {esc(name)} happen in a '
-               f'destination this atlas holds, and those are the ones drawn. '
-               + (f'The other {rest} '
-                  f'{"are" if rest != 1 else "is"} in the list below: a season, '
-                  f'a region or a whole country is not a point, and pinning '
-                  f'one to a capital to fill the map would be inventing a '
-                  f'location. ' if rest else '')
-               + f'Coastline from <a href="/sources">Natural Earth</a>, public '
-                 f'domain. <a href="/map">The full map →</a>')
+               f'destination this atlas holds, and those are the ones drawn.')
+        note = ((f'The other {rest} '
+                 f'{"are" if rest != 1 else "is"} in the list below: a season, '
+                 f'a region or a whole country is not a point, and pinning '
+                 f'one to a capital to fill the map would be inventing a '
+                 f'location. ' if rest else '')
+                + f'Coastline from <a href="/sources">Natural Earth</a>, public '
+                  f'domain. <a href="/map">The full map →</a>')
         monthmap = pointsmap(pts, "ev" + month, cap,
                              f'Map of the {len(mapped)} fixtures in {name} that '
-                             f'happen in a destination in the Atlas')
+                             f'happen in a destination in the Atlas', note=note)
 
     body = f"""
 {crumbs([("Europe", "/discover"), ("Events", "/events"), (name, None)])}
@@ -9352,12 +9364,13 @@ def quiet_page(data):
         f'Every destination carrying the quiet tag: {len(quiet)} of '
         f'{len(data["cities"])}, in '
         f'{len({n["country"]["slug"] for n in quiet})} countries. The tag is '
-        f'editorial and we will be wrong sometimes. Names are dropped where '
-        f'they would overlap; every dot is a link. Coastline from '
-        f'<a href="/sources">Natural Earth</a>, public domain.'
-        + offframe_line([project(n["city"]["lat"], n["city"]["lon"])
-                         for n in quiet], data),
-        f'Map of the {len(quiet)} destinations tagged quiet') if len(qpts) >= 2 else ""
+        f'editorial and we will be wrong sometimes.',
+        f'Map of the {len(quiet)} destinations tagged quiet',
+        note=f'Names are dropped where they would overlap; every dot is a link. '
+             f'Coastline from <a href="/sources">Natural Earth</a>, public '
+             f'domain.'
+             + offframe_line([project(n["city"]["lat"], n["city"]["lon"])
+                              for n in quiet], data)) if len(qpts) >= 2 else ""
 
     swaps = "".join(
         f"""<div class="row"><div><h3>{esc(a)}</h3><p class="rowsub">{esc(why)}</p></div>
@@ -11023,9 +11036,10 @@ def motion_page(data, m):
             for n, _w in shown]
     motionmap = pointsmap(
         mpts, "mo" + "".join(ch for ch in m["slug"] if ch.isalnum())[:14],
-        f'Names are dropped where they would overlap; every dot is a link. '
-        f'Coastline from <a href="/sources">Natural Earth</a>, public domain.',
-        f'Map of the {len(shown)} destinations in {m["name"]}') if len(mpts) >= 2 else ""
+        f'Names are dropped where they would overlap; every dot is a link.',
+        f'Map of the {len(shown)} destinations in {m["name"]}',
+        note=f'Coastline from <a href="/sources">Natural Earth</a>, '
+             f'public domain.') if len(mpts) >= 2 else ""
 
     # THE QUERY IS THE PROOF, AND IT WAS A GREY BOX IN FRONT OF THE ANSWER.
     #
