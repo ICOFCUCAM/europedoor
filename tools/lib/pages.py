@@ -21,7 +21,8 @@ from .render import (LD_PUBLISHER, ORIGIN, SITE_NAME, SITE_TAGLINE, arch_rim, ca
                      jsondata, ld_breadcrumb, ld_place, ld_within, motif_for,
                      page, photo, picture, plate, section, arch_clip, arch_edge,
                      ed_opening, ed_photo, ed_rows, ed_section_head, ed_split,
-                     ed_bleed, ed_declare, ed_feature, ed_mosaic, ed_strip, held)
+                     ed_bleed, ed_declare, ed_feature, ed_mosaic, ed_strip, held,
+                     ed_slot)
 from .score import city_scores, country_scores, discoverability
 
 HOME = ("Europe", "/discover")
@@ -7790,12 +7791,26 @@ def indexhero(*, kicker, title, lede, art="", img="", actions="", note=""):
     # which is the same repair the destination and country heads took.
     foot = (f'{f"<div class=chips>{actions}</div>" if actions else ""}'
             f'{f"<p class=small>{note}</p>" if note else ""}')
+    # AND THE HELPER IS WHAT WAS FORCING THE GRAMMAR, so the helper changed.
+    #
+    # Five indexes call this and every one of them opened on a 60px h1 in a
+    # narrow column beside a 4:3 figure — which is precisely the "one
+    # template with the title, image and description substituted" the
+    # directive names as the thing to stop. Rewriting five call sites would
+    # have left the sixth to arrive next month with the old shape.
+    #
+    # It emits the 2036 opening now: the eyebrow in mono, the name at
+    # display size, the standfirst under it, and the figure taking the wide
+    # half of the stage. The classes the checks read — `pagehead index`, the
+    # kicker, the extent in the head — are kept, because those are promises
+    # rather than shapes and three separate assertions read them.
     return (
-        f'<header class="pagehead index ihero{" wide" if figure else ""}">'
-        f'<div class="iherotext"><p class="kicker">{kicker}</p>'
-        f'<h1>{title}</h1><p class="lede">{lede}</p></div>'
-        f'{figure}'
-        f'{f"<div class=iherofoot>{foot}</div>" if foot else ""}</header>')
+        f'<header class="pagehead index ed-opening ed-family-discovery">'
+        f'<div class="ed-opening-copy iherotext">'
+        f'<p class="kicker ed-eyebrow">{kicker}</p>'
+        f'<h1>{title}</h1><p class="lede ed-intro">{lede}</p>'
+        f'{f"<div class=iherofoot>{foot}</div>" if foot else ""}</div>'
+        f'<div class="ed-opening-visual">{figure}</div></header>')
 
 
 def region_glyph(members, frame=None, min_span=0.0):
@@ -9341,15 +9356,16 @@ def events_page(data):
     )
     body = f"""
 {crumbs([("Europe", "/discover"), ("Events", None)])}
-{indexhero(
-    kicker="The European year",
+{ed_opening(
+    eyebrow="The European year",
     title="What is on, and when.",
-    lede=f"{total} recurring fixtures — festivals, markets, pilgrimages, harvests and the "
-         f"handful of natural events worth planning a year around. These are the annual, "
-         f"dependable ones. Dated listings for a given year need a live events feed, "
-         f"which is Stage 2.",
-    img=photo(data.get("images"), "events-hero", w=2000, h=1200,
-              sizes="(min-width: 60rem) 52vw, 100vw"))}
+    intro=f"{total} recurring fixtures — festivals, markets, pilgrimages, harvests and "
+          f"the handful of natural events worth planning a year around. The annual, "
+          f"dependable ones.",
+    visual=photo(data.get("images"), "events-hero", w=2000, h=1200,
+                 sizes="(min-width: 52rem) 58vw, 100vw")
+           or ed_slot("events-hero", shape="square", label="The European year"),
+    family="time")}
 <!-- NO DRAWING IN THE OPENING, AND THAT IS THE ONE EXCEPTION. Four of the
      five indexes put their subject in the arch beside the headline; this
      family's subject is TIME, and the year band under this head is a

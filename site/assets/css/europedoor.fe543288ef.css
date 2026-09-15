@@ -8071,9 +8071,15 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
    floating over an image, so it inverts — transparent, bone type, the mark
    in bone. It is the same masthead with the ground removed, not a second
    one; `render.page()` emits one header and always has. */
+/* KEYED ON WHAT IS ACTUALLY UNDERNEATH, NOT ON THE FAMILY. The first
+   version named the family, and /journeys is family `journey` and opens on
+   bone — so the index got a graphite scrim over a cream page and the
+   wordmark went white on paper. A family says what KIND of page this is;
+   whether the masthead has a picture under it is a fact about this
+   document, and `:has()` is how a stylesheet asks that. */
 body[data-hero] .masthead,
-body[data-family="arrival"] .masthead,
-body[data-family="journey"] .masthead {
+body:has(main .ed-arrival) .masthead,
+body:has(main .ed-journey-hero) .masthead {
   background: linear-gradient(to bottom,
               color-mix(in srgb, var(--graphite) 52%, transparent),
               transparent);
@@ -8092,8 +8098,8 @@ body[data-family="journey"] .masthead {
 .masthead .wordmark { color: var(--pine); }
 .masthead .nav a[aria-current="page"] { color: var(--pine); border-bottom-color: var(--pine); }
 body[data-hero] .masthead .wordmark,
-body[data-family="arrival"] .masthead .wordmark,
-body[data-family="journey"] .masthead .wordmark { color: var(--bone); }
+body:has(main .ed-arrival) .masthead .wordmark,
+body:has(main .ed-journey-hero) .masthead .wordmark { color: var(--bone); }
 
 /* =========================================================
    PHOTOGRAPHY AS A CONTENT LAYER
@@ -8422,3 +8428,13 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
 @container (max-width: 20rem) {
   .ed-slot-note, .ed-slot-spec { display: none; }
 }
+
+/* THE INDEX H1 RAN INTO ITS OWN LEDE. `.pagehead.index h1` sets `margin: 0`
+   from the head-roles pass, which was right at 60px with a lede in the
+   NEXT column and wrong at 108px with the lede under it: "on purpose."
+   printed through "17 routes". The opening's own rule has to state the
+   space it needs, because the class it inherits from was written for a
+   different arrangement. */
+.pagehead.index.ed-opening h1 { margin: 0 0 var(--s6); }
+.pagehead.index.ed-opening .lede { margin-top: 0; }
+.pagehead.index.ed-opening .iherofoot { margin-top: var(--s6); display: grid; gap: var(--s5); }
