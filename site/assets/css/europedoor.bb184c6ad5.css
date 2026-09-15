@@ -1690,8 +1690,13 @@ a .kicker { color: var(--ink-3); }
    new primitive until repeated structure has actually emerged. The hairline
    between segments is what makes the legs countable; without it the bar is a
    length and says nothing about the rhythm. */
-.hopbar.route { display: flex; gap: 1px; background: none; }
-.hopbar.route > span { background: var(--door); border-radius: 999px;
+/* AND THE SEGMENTS ARE SQUARE. Rounding each end of a 3px segment eats 1.5px
+   off both, so a 1px hairline rendered as a 4px gap and thirteen legs read as
+   a dashed rule rather than as one bar divided thirteen times — which is the
+   opposite of what the bar is for. The track stays behind them, so a division
+   is the track showing through. */
+.hopbar.route { display: flex; gap: 1px; }
+.hopbar.route > span { background: var(--door); border-radius: 0;
                        min-width: 2px; }
 .journeyrow .rowsub { margin-bottom: 0; }
 /* THE QUERY, ON THE INDEX THAT LISTS TWELVE OF THEM. Set in the mono face
@@ -5972,14 +5977,27 @@ body[data-hero] .masthead { position: sticky; }
  * the explanation of a journey and it has to be readable to explain
  * anything: at 22rem the Arctic-to-Mediterranean line is a line. */
 .jrow {
-  display: grid; grid-template-columns: minmax(0, 27rem) minmax(0, 1fr);
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 28rem);
   gap: var(--s7);
   /* START, not centre. A 250-pixel block of type centred against a 530-pixel
      picture leaves 140 above and 140 below, and centring slop reads as a
      mistake where a shared top edge reads as a decision. */
-  align-items: start; padding: var(--s6) 0; border-bottom: 1px solid var(--rule);
+  align-items: stretch; padding: var(--s6) 0; border-bottom: 1px solid var(--rule);
   text-decoration: none; color: inherit;
 }
+/* THE VOID UNDER THE TYPE IS STRUCTURE, NOT SLOP. A journey row is 237px of
+   type beside a 374px picture, so something has to give: centring the type
+   leaves 68 above and 68 below and reads as a mistake, and leaving it at the
+   top leaves 224 in one piece. The row's last line is its facts and its call,
+   and a facts line sitting on the picture's bottom edge is what a printed
+   page does with a caption — so the block holds the top and the meta holds
+   the floor. Nothing was added to fill it. */
+.jrowtext { display: flex; flex-direction: column; }
+/* The rhythm bar goes to the floor WITH the facts, because it is one of them:
+   how the trip is paced belongs beside how long it is, not floating a hundred
+   pixels above it. */
+.jrowtext .hopbar { margin-top: auto; }
+.jrowtext .jrowmeta { padding-top: var(--s1); }
 /* THE COLUMNS WERE THE WRONG WAY ROUND FOR THE CONTENT IN THEM. `1fr 22rem`
    gave a three-word title, a six-word line and a meta row 784 pixels and gave
    the drawing 352 — so two thirds of every row was a short headline with four
