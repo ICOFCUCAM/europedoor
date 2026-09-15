@@ -3017,6 +3017,95 @@ async function main() {
   }
   await page.setViewportSize({ width: 1280, height: 900 });
 
+  // ── a control a reader can see the edge of ─────────────────────────
+  //
+  // THE HOMEPAGE'S ASK FIELD PAINTED rgb(247,246,243) ON A BODY OF
+  // rgb(247,246,243), with a transparent border. Present, labelled,
+  // keyboard-reachable, correctly sized, and no edge at all — the one
+  // control that page exists to be. It was right while the form sat INSIDE
+  // the hero, where paper on graphite is a field; it moved out to the light
+  // band and kept the fill. Its own LABEL had made the same move and gone
+  // limestone on limestone at 1.00:1, and that half was found and fixed
+  // while the fill was left behind.
+  //
+  // Nothing could see it. A field has no text of its own, so every contrast
+  // assertion here had nothing to measure; the dead-rule scan is happy
+  // because the rule applies and does change something; and at thumbnail
+  // size a pale field on a pale page looks like a field.
+  //
+  // WCAG 1.4.11 puts a user-interface component's boundary at 3:1, and the
+  // only honest way to ask is the pixels: a control may be bounded by a
+  // border, a fill, an underline or a shadow, and a declaration check would
+  // have to know all four. So the strip that crosses each edge is read, and
+  // the question is whether ANY step along it reaches 3:1.
+  {
+    const FORMS = ["/", "/search", "/plan", "/discover", "/my-europe"];
+    let seen = 0;
+    for (const u of FORMS) {
+      await page.goto(base + u, { waitUntil: "networkidle" });
+      await page.waitForTimeout(200);
+      const shot = (await page.screenshot()).toString("base64");
+      const weak = await page.evaluate(async (d) => {
+        const img = await new Promise((res) => {
+          const i = new Image(); i.onload = () => res(i); i.src = "data:image/png;base64," + d;
+        });
+        const c = document.createElement("canvas");
+        c.width = img.width; c.height = img.height;
+        c.getContext("2d").drawImage(img, 0, 0);
+        const D = c.getContext("2d").getImageData(0, 0, img.width, img.height);
+        const dpr = D.width / innerWidth;
+        const lum = (r, g, b) => { const f = (v) => { v /= 255;
+          return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+        const at = (x, y) => { const i = ((y * D.width) + x) * 4;
+          return lum(D.data[i], D.data[i + 1], D.data[i + 2]); };
+        const step = (a, b) => { const [hi, lo] = [a, b].sort((x, y) => y - x);
+          return (hi + 0.05) / (lo + 0.05); };
+        const out = [];
+        for (const e of document.querySelectorAll("input:not([type=hidden]), textarea, select")) {
+          const r = e.getBoundingClientRect();
+          if (r.width < 8 || r.height < 8) continue;
+          if (getComputedStyle(e).visibility === "hidden") continue;
+          if (r.top < 0 || r.bottom > innerHeight || r.left < 6 || r.right > innerWidth - 6) continue;
+          /* Four crossings: left, right, top, bottom. A control bounded on
+             one side only — a ruled field — passes, because that is a real
+             and deliberate boundary and a reader sees it. */
+          const mx = Math.round((r.left + r.width / 2) * dpr);
+          const my = Math.round((r.top + r.height / 2) * dpr);
+          const cross = [
+            [Math.round((r.left - 5) * dpr), my, Math.round((r.left + 3) * dpr), my],
+            [Math.round((r.right + 5) * dpr), my, Math.round((r.right - 3) * dpr), my],
+            [mx, Math.round((r.top - 5) * dpr), mx, Math.round((r.top + 3) * dpr)],
+            [mx, Math.round((r.bottom + 5) * dpr), mx, Math.round((r.bottom - 3) * dpr)],
+          ];
+          let best = 1;
+          for (const [ox, oy, ix, iy] of cross) {
+            if (ox < 0 || oy < 0 || ix < 0 || iy < 0
+                || ox >= D.width || ix >= D.width || oy >= D.height || iy >= D.height) continue;
+            /* The strongest pixel anywhere across the edge, not just the two
+               ends: a 2px rule sits between them. */
+            const ax = Math.sign(ix - ox), ay = Math.sign(iy - oy);
+            const n = Math.max(Math.abs(ix - ox), Math.abs(iy - oy));
+            const outside = at(ox, oy);
+            for (let k = 0; k <= n; k++)
+              best = Math.max(best, step(outside, at(ox + ax * k, oy + ay * k)));
+          }
+          if (best < 3.0)
+            out.push(`${e.tagName.toLowerCase()}${e.id ? "#" + e.id : ""} at ${best.toFixed(2)}:1`);
+        }
+        return out;
+      }, shot);
+      seen++;
+      ok(weak.length === 0,
+         `${u}: ${weak.length} form control(s) whose edge does not reach 3:1 `
+         + `against what is behind it — ${weak.join(", ")}. A field a reader `
+         + `cannot see the edge of is the homepage's own ask box, which `
+         + `painted the page's exact colour with a transparent border.`);
+    }
+    ok(seen === FORMS.length,
+       `only ${seen} of ${FORMS.length} form pages were examined`);
+  }
+
   // ── a country plate names its OWN mountain ─────────────────────────
   //
   // A SINGLE TRIANGLE WITH A HEIGHT READS AS THIS COUNTRY'S MOUNTAIN, and

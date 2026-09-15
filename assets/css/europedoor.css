@@ -1409,7 +1409,7 @@ a .kicker { color: var(--ink-3); }
 #searchform .field > label { font-size: var(--t-sm); letter-spacing: .12em; }
 #searchform .field input[type="text"] {
   font-size: var(--t-md); padding: var(--s4) var(--s4);
-  border-color: color-mix(in srgb, var(--ink-3) 55%, transparent); }
+  border-color: var(--ink-3); }
 #searchform .field input[type="text"]:focus { border-color: var(--sea); }
 /* AND THE PLANNER IS THE SAME PAGE WITH TWO OF THEM. The ask box — the one
    control the lede points at, "say what you have and what you like, in a
@@ -1423,9 +1423,12 @@ a .kicker { color: var(--ink-3); }
    things deliberately absent, which is the Stay layer's rule and the reason
    its action band reads as part of the page. */
 #askform.form { background: none; border: 0; border-radius: 0; padding: 0; }
+/* AT FULL STRENGTH, not 55% of it: mixed toward transparent the sentence box
+   measured 2.82:1 against the panel, a fifth under the 3:1 a control's edge
+   needs. */
 #askform .field textarea {
   font-size: var(--t-md); padding: var(--s4);
-  border-color: color-mix(in srgb, var(--ink-3) 55%, transparent); }
+  border-color: var(--ink-3); }
 #askform .field textarea:focus { border-color: var(--sea); }
 #planner.form { background: none; border: 0; border-radius: 0;
   border-top: 1px solid var(--rule); padding: var(--s6) 0 0; }
@@ -1456,9 +1459,20 @@ a .kicker { color: var(--ink-3); }
    "copy it, paste it into the same box on another device". `resize:
    vertical` because a reader with forty saved places needs to see them and
    nobody needs to drag it sideways. */
+/* AND `--rule` IS NOT A BOUNDARY. It is the hairline between two list rows,
+   which is meant to be almost invisible — this stylesheet already records it
+   measuring 1.16:1 as a chart axis — and it was bounding every form control
+   on the site. Measured on the painted pixels at /plan: the days field, the
+   budget field and the month select each read 1.43:1 against the panel
+   behind them, on the page that is the product's flagship instrument. WCAG
+   1.4.11 puts a control's boundary at 3:1, and a box a reader cannot find is
+   the homepage ask field's fault three more times.
+
+   `--ink-3` is what the two sentence boxes already use, and it is a token
+   this palette declares for exactly this job. */
 .field input[type="number"], .field input[type="text"], .field select,
 .field textarea {
-  width: 100%; font: inherit; padding: var(--s3); border: 1px solid var(--rule); border-radius: var(--radius);
+  width: 100%; font: inherit; padding: var(--s3); border: 1px solid var(--ink-3); border-radius: var(--radius);
   background: var(--paper); color: var(--ink);
 }
 /* A HELP LINE IS A CAPTION FOR THE CONTROL ABOVE IT AND IT WAS TOUCHING
