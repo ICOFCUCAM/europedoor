@@ -1352,7 +1352,8 @@ def home(data):
     <p class="jrowmeta">{esc(" · ".join(facts))}<span class="waygo">Explore journey →</span></p>
   </div>
   <div class="jrowart">{constellation(
-        [project(c["lat"], c["lon"]) for c in legs], route=True, frame=True)}</div>
+        [project(c["lat"], c["lon"]) for c in legs], route=True, frame=True,
+        mark=7, term=11)}</div>
 </a>"""
         )
 
@@ -1369,7 +1370,8 @@ def home(data):
     def story_glyph(st):
         pts = [project(idx[cid]["city"]["lat"], idx[cid]["city"]["lon"])
                for cid in (st.get("places") or ()) if cid in idx]
-        return constellation(pts, extra=" constel-theme", frame=True) if pts else ""
+        return constellation(pts, extra=" constel-theme", frame=True,
+                             mark=14) if pts else ""
 
     recent = sorted(data["stories"], key=lambda st: st["published"], reverse=True)[:3]
     storyband = ""
@@ -2867,8 +2869,8 @@ def country_page(data, c):
         rpts = [project(t["lat"], t["lon"]) for t in r["cities"]]
         onframe = [p for p in rpts
                    if 0.0 <= p[0] <= MAP_W and 0.0 <= p[1] <= MAP_H]
-        art = constellation(rpts, extra=" regionmini",
-                            frame=True) if onframe else ""
+        art = constellation(rpts, extra=" regionmini", frame=True,
+                            mark=11) if onframe else ""
         region_cards.append(
             card(urls.region(c, r), "Region", r["name"], r["summary"],
                  art=art, meta=meta)
@@ -4011,7 +4013,7 @@ def journeys_index(data):
         route = constellation(
             [project(data["cities"][l["city"]]["city"]["lat"],
                      data["cities"][l["city"]]["city"]["lon"]) for l in j["legs"]],
-            route=True, frame=True)
+            route=True, frame=True, mark=19)
         rows.append(
             f'<a class="row journeyrow" href="{urls.journey(j)}">'
             f'<div><p class="kicker">{esc(j["strapline"])}</p>'
@@ -7915,7 +7917,7 @@ def offframe_line(pts, data, listed=True):
 
 
 def constellation(pts, extra="", route=False, frame=False, cut=False,
-                  ocean=True, aspect=None):
+                  ocean=True, aspect=None, mark=None, term=None):
     """A set of real destinations lit on the shared silhouette.
 
     THE ARGUMENT DRAWN, AND THE REASON IT REPLACED ELEVEN PAINTINGS. The
@@ -7943,10 +7945,6 @@ def constellation(pts, extra="", route=False, frame=False, cut=False,
     # a ring with the ground's colour in its core — and the stops between them
     # stay plain, so the eye reads the ends first and the sequence after.
     last = len(pts) - 1
-    dots = "".join(
-        f'<circle class="{"term" if route and i in (0, last) else ""}" '
-        f'cx="{x:.0f}" cy="{y:.0f}"/>'
-        for i, (x, y) in enumerate(pts))
     line = route_line(pts) if route else ""
     # FRAMED ON ITS OWN GROUND WHERE THE SUBJECT IS A ROUTE OR A SET OF
     # PLACES, and never where the subject is REACH. Three featured journeys
@@ -7992,12 +7990,36 @@ def constellation(pts, extra="", route=False, frame=False, cut=False,
     # — only the half outside the fill shows, which is exactly the coast and
     # never an internal frontier, because a neighbour's fill covers it.
     vx, vy, vw, vh = (float(n) for n in view.split())
+    # A MARK IS SIZED IN USER UNITS AND A FRAMED DRAWING'S UNITS ARE NOT THE
+    # SAME SIZE TWICE. `glyph_view()` fits the frame to the route, so the
+    # three journeys on the homepage were drawn at 1000, 422 and 340 units
+    # across and rendered at the same 690 pixels — and a 5-unit dot is 3.4
+    # pixels on the first and 10.1 on the last. Measured: a 2.9x swing in
+    # apparent mark size between two rows of one band, which is why the
+    # Hanseatic Arc read as two blobs joined by a rope. It is the /themes
+    # finding one family over: a radius in viewBox units is a radius in
+    # pixels at exactly one width.
+    #
+    # So the build normalises the frame away and the family keeps its own
+    # size: `mark` is the radius at the reference 1000-unit frame, scaled by
+    # what this frame actually is, and the drawing is marked `framed` so the
+    # stylesheet's own radii stand aside. A CSS `r` beats a presentation
+    # attribute and there is no value that hands it back, so the guard has
+    # to be on the selector.
+    z = vw / MAP_W
+    rattr = (lambda m: f' r="{m * z:.2f}"') if (frame and pts and mark) else (lambda m: "")
+    dots = "".join(
+        f'<circle class="{"term" if route and i in (0, last) else ""}"'
+        f'{rattr(term if (route and i in (0, last) and term) else mark)} '
+        f'cx="{x:.0f}" cy="{y:.0f}"/>'
+        for i, (x, y) in enumerate(pts))
+    framed = " framed" if (frame and pts and mark) else ""
     ground = (f'<rect class="glyph-sea" x="{vx:.0f}" y="{vy:.0f}" '
               f'width="{vw:.0f}" height="{vh:.0f}"/>') if ocean else ""
     bounds = '<use class="glyph-bounds" href="#constel-eu"/>' if ocean else ""
     if ocean:
         ground += '<use class="glyph-beyond" href="#constel-beyond"/>'
-    return (f'<svg class="constel{extra}" viewBox="{view}" '
+    return (f'<svg class="constel{extra}{framed}" viewBox="{view}" '
             f'aria-hidden="true" focusable="false">{ground}'
             f'<use class="glyph-land" href="#constel-eu"/>'
             f'{bounds}'
@@ -8256,7 +8278,8 @@ def stories_index(data):
                 pts.append(project(n["city"]["lat"], n["city"]["lon"]))
         # A story that names no place gets no drawing, on the destination
         # page's rule: nothing in its place rather than something invented.
-        return constellation(pts, extra=" constel-theme", frame=True) if pts else ""
+        return constellation(pts, extra=" constel-theme", frame=True,
+                             mark=14) if pts else ""
     # A LEAD, AND THEN THE REST. Nine identical rows with a 132px grey Europe
     # at the right-hand end is a contents page with a decoration on it: the
     # glyph was too small to name a place, the text stopped at a third of the
@@ -9101,7 +9124,7 @@ def events_month_page(data, month):
     qshown = quiet[:6]
     qart = constellation(
         [project(n["city"]["lat"], n["city"]["lon"]) for n in qshown],
-        frame=True) if qshown else ""
+        frame=True, mark=13) if qshown else ""
     qrows = "".join(
         f'<a class="row" href="{urls.city(n["country"], n["region"], n["city"])}">'
         f'<div><h3>{esc(n["city"]["name"])}</h3>'
@@ -10991,7 +11014,8 @@ def motion_page(data, m):
         + f'</p><p class="rowmeta jfacts">{n_of(j["days"], "day")} · '
         f'{n_of(len(j["legs"]), "stop")} · {esc(j["difficulty"])}</p></div>'
         f'<div class="jart">'
-        + constellation(_pts([l["city"] for l in j["legs"]]), route=True, frame=True, aspect=1.75)
+        + constellation(_pts([l["city"] for l in j["legs"]]), route=True, frame=True,
+                        aspect=1.75, mark=7, term=11)
         + '</div></a>'
         for j in jrows)
 

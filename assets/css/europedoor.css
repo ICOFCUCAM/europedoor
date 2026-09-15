@@ -1257,7 +1257,7 @@ a .kicker { color: var(--ink-3); }
    on six places, so the same number rendered as six blue discs the size of
    Switzerland. A radius in viewBox units is not a radius in pixels — the
    same arithmetic that took the map labels off narrow screens. */
-.quietart .constel-lit circle { r: 10px; stroke: var(--atlas-here);
+.quietart .constel:not(.framed) .constel-lit circle { r: 10px; stroke: var(--atlas-here);
                                 stroke-width: 2; }
 @media (max-width: 60rem) {
   .quietsend { grid-template-columns: 1fr; }
@@ -5311,7 +5311,7 @@ body[data-hero] .masthead { position: sticky; }
    and nothing about shape. The whole argument of that page is that the
    seventeen shapes differ, so above sixty points the mark comes down and
    the fill opens up. */
-.constel-dense .constel-lit circle { r: 11px; fill-opacity: .7; }
+.constel-dense:not(.framed) .constel-lit circle { r: 11px; fill-opacity: .7; }
 /* THE INTERESTS ROW IS NOT THE THEME ROW, and borrowing its proportions
    left six hundred pixels of nothing in the middle. A theme's left column
    holds eight place names and fills a whole measure; an interest's holds a
@@ -5631,7 +5631,7 @@ body[data-hero] .masthead { position: sticky; }
 /* Only the radius: the stroke is already `--atlas-here` at 1.6 from the rule
    above, and restating it is a declaration that changes nothing — which the
    dead-rule scan says out loud. */
-.card-map .regionmini .constel-lit circle { r: 11px; }
+.card-map .regionmini:not(.framed) .constel-lit circle { r: 11px; }
 /* A MAP CARD IS NOT 16:9, AND THE LETTERBOX WAS INVISIBLE BECAUSE IT WAS THE
    SAME SEA. `.card-art` is 16/9 because that is a PHOTOGRAPH's proportion;
    every drawing that has ever been put inside one is 1.282, because
@@ -5669,8 +5669,8 @@ body[data-hero] .masthead { position: sticky; }
 /* Bigger tiles, more dots, smaller marks: a 200-destination tile at 380px
    with the theme index's radius would be a solid field. Set here rather than
    per circle, so 894 dots cost four characters each rather than eleven. */
-.card-map .constel-lit circle { r: 7px; }
-.constel-theme .constel-lit circle { r: 22px; }
+.card-map .constel:not(.framed) .constel-lit circle { r: 7px; }
+.constel-theme:not(.framed) .constel-lit circle { r: 22px; }
 /* A CASING, THEN A CORE — see `pages.route_line`. No single colour clears
    3:1 on both cream land and the deep Atlantic; the arithmetic has no
    solution, so the answer is the one every printed map uses. The casing is
@@ -6010,13 +6010,19 @@ body[data-hero] .masthead { position: sticky; }
    A 9-unit dot on a framed route is a blob that hides the stop it marks; the
    hairline is the ground's own tone, so a stop separates from the water and
    from the land without a second colour. */
-.jrowart .constel-lit circle { r: 5px; stroke: var(--atlas-sea);
+.jrowart .constel:not(.framed) .constel-lit circle { r: 5px; stroke: var(--atlas-sea);
                                stroke-width: 2; }
 /* The two ends of the line, in the transit convention: a ring whose core is
    the ground, so a terminal reads as a station and a stop between them reads
    as a stop. */
-.jrowart .constel-lit circle.term { r: 8px; fill: var(--atlas-land);
+.jrowart .constel:not(.framed) .constel-lit circle.term { r: 8px; fill: var(--atlas-land);
                                     stroke: var(--cobalt); stroke-width: 5; }
+/* AND A STROKE HAS THE SAME FAULT AS A RADIUS. 4.5 user units is 3 pixels on
+   a 1000-unit frame and 9 on a 340-unit one, so the Hanseatic Arc's route was
+   three times the weight of the Arctic one in the same band. A framed drawing
+   wants a line of constant WEIGHT, which is what non-scaling-stroke is: the
+   stroke-width becomes CSS pixels and the frame stops deciding it. */
+.constel.framed .constel-route { vector-effect: non-scaling-stroke; }
 .jrowart .constel-route { stroke-width: 4.5; }
 .jrowart .constel-route.case { stroke-width: 9; stroke: var(--atlas-land);
                                opacity: .55; }
@@ -6074,7 +6080,7 @@ body[data-hero] .masthead { position: sticky; }
   .storyart { margin-bottom: 0; grid-row: 1 / span 4; }
   .storyart .constel { max-width: none; }
 }
-.storyart .constel-lit circle { r: 14px; }
+.storyart .constel:not(.framed) .constel-lit circle { r: 14px; }
 .storysm { padding-bottom: var(--s5); border-bottom: 1px solid var(--rule); margin-bottom: var(--s5); }
 .storysm:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
 .storysm :is(h2, h3) { margin: 0 0 var(--s2); }
@@ -6179,7 +6185,7 @@ body[data-hero] .masthead { position: sticky; }
                  line-height: 1.12; margin: 0 0 var(--s2); }
 .journeyrow:hover :is(h2, h3), .journeyrow:focus-visible :is(h2, h3) { color: var(--door); }
 .jart .constel { width: 100%; }
-.jart .constel-lit circle { r: 11px; }
+.jart .constel:not(.framed) .constel-lit circle { r: 11px; }
 .jart .constel-route { stroke-width: 8; }
 /* No `color`: `.row .rowmeta` already sets --ink-3 and every .jfacts is
    one, so restating it is a declaration that changes nothing. It only became
