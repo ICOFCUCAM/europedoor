@@ -4869,6 +4869,55 @@ def c_published_projection():
     return n
 
 
+VOID_TAGS = frozenset("area base br col embed hr img input link meta source "
+                     "track wbr".split())
+
+
+def _element_text(html, cls):
+    """The visible text of the first element carrying `cls`, children included.
+
+    Written for the index-extent check, which used to slice to the first
+    `</div>` and therefore read only as far as a head's first CHILD.
+
+    PARSED RATHER THAN COUNTED. The obvious repair is to balance `<` and
+    `</` from the opening tag, and it is wrong on this site's own markup:
+    an SVG is full of `<path …/>` and a `<br>` in a headline is void, so a
+    depth counter that treats either as an open never returns to zero and
+    the "element" becomes the rest of the page — an instrument that fails
+    OPEN, which is worse than the one it replaced.
+    """
+    from html.parser import HTMLParser
+
+    class Grab(HTMLParser):
+        def __init__(self):
+            super().__init__(convert_charrefs=True)
+            self.depth = 0
+            self.out = []
+            self.done = False
+
+        def handle_starttag(self, tag, attrs):
+            if tag in VOID_TAGS or self.done:
+                return
+            if self.depth:
+                self.depth += 1
+            elif cls in dict(attrs).get("class", "").split():
+                self.depth = 1
+
+        def handle_endtag(self, tag):
+            if self.depth:
+                self.depth -= 1
+                if not self.depth:
+                    self.done = True
+
+        def handle_data(self, data):
+            if self.depth:
+                self.out.append(data)
+
+    g = Grab()
+    g.feed(html)
+    return " ".join(g.out)
+
+
 @check("an index states the extent of its own set, and the number is the real one")
 def c_index_extent():
     # AN INDEX EXISTS TO SAY HOW BIG A SET IS, AND FIVE OF EIGHT DID NOT.
@@ -4903,8 +4952,16 @@ def c_index_extent():
             fail(f"{url}: index is missing")
             continue
         h = open(path, encoding="utf-8").read()
-        i = h.find('class="pagehead')
-        head = re.sub(r"<[^>]+>", " ", h[i:h.find("</div>", i)]) if i >= 0 else ""
+        # THE SLICE RAN TO THE FIRST `</div>`, WHICH IS A SHAPE. A page head
+        # with no nested element ends at its own closing tag, and every index
+        # had one when this was written; they do not now — `.iherotext`,
+        # `.reach` and `.headmeta` are all children of a head — so the slice
+        # ended at the first CHILD's closing tag and the check was reading a
+        # fraction of the element it names. It passed on /countries by luck,
+        # because the lede happens to sit inside the child that closes first.
+        #
+        # See `_element_text`: parsed, not sliced and not bracket-counted.
+        head = _element_text(h, "pagehead")
         nums = {int(x) for x in re.findall(r"\b(\d{1,5})\b", head)}
         n += 1
         if size not in nums:

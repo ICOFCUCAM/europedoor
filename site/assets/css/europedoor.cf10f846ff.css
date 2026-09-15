@@ -3324,6 +3324,59 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
   .portrait svg { height: 15rem; }
 }
 
+/* ── a fund project: a thing, in a country ────────────────────────
+   THE WHOLE FUND FAMILY HAD NO GEOGRAPHY. Measured by tools/opening.js, a
+   project page was 0% picture on the first screen — no figure anywhere on
+   the page, at any width — on the one register whose argument is that every
+   entry is a real thing in a real place with a named local partner. It was
+   invisible because the family list the instruments read had never carried a
+   fund project page, a month page or a sub-category page at all.
+
+   A GLYPH, NOT A WINDOW, which is the reach head's own rule twenty lines up
+   and the reason two index openings came off. A country page's aperture is
+   the country as SUBJECT; here the subject is the project and the country is
+   where it is. Twelve doorways under the fifty on /countries would be the
+   signature as wallpaper.
+
+   PAINTED, NOT INHERITED, and the first two versions were both wrong in
+   ways this stylesheet already records. `.countryglyph` has exactly one
+   paint rule anywhere and it is scoped to `.card-map`, so outside a card
+   this drawing takes the SVG default, which is black — the `<stop>` no rule
+   reached. Then `--atlas-here` measured rgb(248,246,242) on a limestone page
+   of rgb(247,246,243) and Ireland rendered as a 1.1px outline of nothing:
+   that is `path.here` on the country portraits exactly, a fill written on
+   the premise that there is water underneath it, used where there is not.
+   `--cobalt` is what `.regionglyph .countries path` already lights a country
+   with on this ground, and it needs no sea to be read.
+
+   Hung at one height like the portraits, for the same reason: sized by
+   width, Romania and Norway would set the head at two different heights on
+   two pages a reader meets one after the other. */
+.pagehead.fundhead { display: grid; gap: var(--s6); align-items: center; }
+.fundart { margin: 0; }
+.fundart .countryglyph { display: block; width: auto; height: 14rem; }
+.fundart .countryglyph .countries path { fill: var(--cobalt); }
+.fundart figcaption { margin-top: var(--s3); max-width: 28ch;
+                      font-size: var(--t-xs); color: var(--ink-3); }
+@media (min-width: 64rem) {
+  /* `auto` for the drawing, as on the country head: a narrow country takes
+     the width its shape needs and the name takes the rest. 64rem rather
+     than 52 for the reason measured there — between the two breakpoints a
+     project name is a 60px serif line in whatever is left beside a picture,
+     and four of these names run to five words. */
+  .pagehead.fundhead { grid-template-columns: minmax(0, 1fr) auto;
+                       column-gap: var(--s8); align-items: center; }
+}
+@media (max-width: 52rem) {
+  /* 13rem rather than the portrait's proportional cut. A door is 26rem and
+     comes down to 15; this is already a small mark and taking a third off it
+     put Ireland at 100 pixels on a 390 screen, which is the size a country
+     stops being a shape and becomes a blob. The glyph's own frame is held to
+     the canvas proportion, so what a phone actually constrains is the WIDTH,
+     and at 13rem that is 267 of the 358 available. */
+  .fundart .countryglyph { height: 13rem; }
+}
+
 /* THE HERO IS THE DOORWAY, AND EUROPE IS WHAT IS THROUGH IT.
    Stripped of its mark and set beside eight other families, this page was a
    navy gradient, a headline, a search box and four chips — a travel product

@@ -69,6 +69,7 @@ so 699px of the screen is content. The figure below is the number of those
 | month | 433 | 50% |
 | my-europe | 478 | 48% |
 | macro | 459 | 48% |
+| fund project | 426 | 42% |
 | motion | 515 | 39% |
 | stories | 536 | 37% |
 | homepage | 233 | 37% |
@@ -91,19 +92,17 @@ so 699px of the screen is content. The figure below is the number of those
 | theme | 159 | 27% |
 | discover | 649 | 26% |
 | experiences | none on the page | **0%** |
-| fund project | none on the page | **0%** |
 | plan | none on the page | **0%** |
 | search | none on the page | **0%** |
 
 **RE-MEASURED, AND THE TABLE ABOVE IS THE CURRENT ONE.** It read seven of
 twenty-three surfaces with no picture on the first screen at all and five
 more under a fifth of it — twelve of twenty-three, just over half,
-effectively type to the fold. It is now **four of thirty with none, and none
+effectively type to the fold. It is now **three of thirty with none, and none
 under a fifth**: `/plan` and `/search` are instruments whose opening is the
-control they exist to be, `/experiences` carries a recorded refusal of a map
-that survives re-checking, and the fourth is new to this table and is a real
-defect — see below. The median share is 34.6%, against 24% when this was
-first measured.
+control they exist to be, and `/experiences` carries a recorded refusal of a
+map that survives re-checking. The median share is 35.6%, against 24% when
+this was first measured.
 
 **AND THE TABLE GREW BY THREE BECAUSE THE INSTRUMENT HAD NEVER REACHED THEM.**
 `tools/lib/families.js` is the one list `opening.js` and `contact-sheet.js`
@@ -117,13 +116,22 @@ A family's index and its leaf are different templates with different heads and
 different jobs, which is exactly why this list already carried an `interest`
 beside `interests` and a `theme` beside `themes`.
 
-Two of the three measure well — the month page is the second-strongest
-opening on the site at 50%, and the sub-category page 36%. **The third, a
-fund project page, has no figure anywhere on it at any width**: the register
-whose entire argument is that each entry is a real thing in a real place with
-a named local partner was the last DISCOVER surface opening on type alone.
-Nothing had ever photographed or measured it. *An instrument that cannot
-reach a family cannot find a defect in it.*
+Two of the three measured well on the first run — the month page is the
+second-strongest opening on the site at 50%, and the sub-category page 36%.
+**The third, a fund project page, had no figure anywhere on it at any
+width**: the register whose entire argument is that each entry is a real
+thing in a real place with a named local partner was the last DISCOVER
+surface opening on type alone. Nothing had ever photographed or measured it.
+*An instrument that cannot reach a family cannot find a defect in it.*
+
+It is answered. What the register holds about a place is its COUNTRY and no
+finer position, so that is what is drawn and nothing else: the project page
+opens on its own country at the country's own size, and the index on the nine
+lit together. **0% → 42%**, first visual at 426. And the index took the reach
+head rather than a fifth arch — a sea panel with nine countries lit is the
+glyph `/experiences/food` already draws, in a doorway, and this audit has
+already removed two openings for being a continent with a different number of
+marks on it.
 
 The original reading, kept because the measurement is the record:
 

@@ -7225,14 +7225,50 @@ def fund_index(data):
         for t, v in sorted(themes.items(), key=lambda kv: (-len(kv[1]), kv[0]))
     ) + "</div>"
 
+    # THE WHOLE FUND FAMILY HAD NO GEOGRAPHY, on the one register whose
+    # argument is that every entry is a real thing in a real place with a
+    # named local partner beside it. The index opened on type alone and the
+    # twelve project pages measured 0% picture on the first screen — the last
+    # DISCOVER surface on the site to do so, and the only one that is not an
+    # instrument, where a picture is correctly absent.
+    #
+    # What the register holds about a place is its COUNTRY, so that is what
+    # is drawn and nothing else. Nine countries lit from Inis Mór to
+    # Svaneti, and that scatter is the argument: this is not a Romanian
+    # heritage charity with a website, it is the same kind of work in nine
+    # places that have nothing else in common.
+    #
+    # `region_glyph` with no frame, deliberately: the nine ARE the continent's
+    # own extent, so framing them would zoom to a picture of Europe.
+    fund_countries = sorted({p["country"] for p in data["fund"]})
+    fund_names = [data["countries"][cs]["name"] for cs in fund_countries]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Fund", None)])}
-<div class="pagehead index">
+{constel_defs()}
+<!-- NOT A FIFTH ARCH. `indexhero` was the obvious move and this page is the
+     one where it is wrong: the audit already took two index openings off for
+     being "a continent with a different number of dots on it", and a sea
+     panel with nine countries lit is the reach glyph the experience category
+     page already draws, in a doorway. The structure has appeared twice, so
+     it is the same component — which is what "no new primitive until
+     repeated structure has emerged" means from the other side. A glyph, not
+     a window; a mark on the page's own paper. -->
+<div class="pagehead index reachhead">
   <p class="kicker">Europe Fund</p>
   <h1>What travel leaves behind.</h1>
+  <div class="reach">
+    {region_glyph(fund_countries)}
+    <p class="reachnote">{esc(and_list(fund_names)) if len(fund_names) < 4
+        else f"{numword(len(fund_names), cap=True)} of Europe's {len(data['countries'])} countries"}, filled.
+    The register records which country a project is in and no finer position than
+    that, so these are whole countries rather than pins.
+    {geo.sources_line(geo.load("europe-lod0.json"))}</p>
+  </div>
   <p class="lede">Tourism arrives in a place and takes something out of it — a path, a language,
-  a harbour wall, a summer. The Fund is the mechanism for putting something back:
-  {len(data['fund'])} projects, listed publicly, with the local partner named on each.</p>
+  a harbour wall, a summer. The Fund is the mechanism for putting something back: the same
+  kind of work in places that have nothing else in common, listed publicly, with the local
+  partner named on each.</p>
+  <p class="orient">{len(data['fund'])} projects across {numword(len(fund_names))} countries</p>
 </div>
 
 <div class="note">
@@ -7261,12 +7297,47 @@ def fund_index(data):
 
 
 def fund_page(data, p):
+    """A project page opens on the country it is in, at the country's own size.
+
+    Measured by `tools/opening.js` across every rendered family: this one was
+    0% picture on the first screen — no figure anywhere on the page, on the
+    one family whose argument is that each entry is a real thing in a real
+    place. It was invisible because the family list the instruments read had
+    never carried a fund project page at all; adding the three templates that
+    list had missed found it in one run.
+
+    `country_glyph` rather than the shared silhouette with one bit lit. The
+    index above already answers "where in Europe" for all twelve at once, and
+    repeating that drawing twelve times is the aperture-as-wallpaper rule in a
+    different picture. What this page wants is WHICH country, and Ireland,
+    Romania and Georgia are three shapes a reader tells apart before reading a
+    word.
+
+    AND FOUR OF THE TWELVE DRAW ROMANIA, which is a fact about the register
+    rather than a fault in the drawing: four Romanian projects are four
+    projects in Romania. A reader meets one project page at a time and the
+    comparison happens on the index, which is exactly why the index draws all
+    nine countries together and each page draws its own.
+
+    The register holds a country and no finer position, so the caption says
+    so. Inventing a point for the Aran Islands would be authoring a
+    measurement, which is the one thing this data model refuses.
+    """
     c = data["countries"][p["country"]]
+    glyph = country_glyph(c["slug"], p["country"])
+    art = (f'<figure class="pagehead-art fundart">{glyph}'
+           f'<figcaption>{esc(c["name"])}, where this project is. The register '
+           f'records the country and no finer position — coastline and '
+           f'frontiers from <a href="/sources">Natural Earth</a>, public '
+           f'domain.</figcaption></figure>') if glyph else ""
     body = f"""
 {crumbs([("Europe", "/discover"), ("Fund", "/fund"), (p["name"], None)])}
-<div class="pagehead overture">
-  <p class="kicker">{esc(p['theme'])} · {esc(c['name'])}</p>
-  <h1>{esc(p['name'])}</h1>
+<div class="pagehead overture fundhead">
+  <div class="fundsay">
+    <p class="kicker">{esc(p['theme'])} · {esc(c['name'])}</p>
+    <h1>{esc(p['name'])}</h1>
+  </div>
+  {art}
 </div>
 <div class="split">
   <div>
