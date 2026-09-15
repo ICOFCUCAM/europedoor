@@ -3080,24 +3080,26 @@ def country_page(data, c):
         f"destinations this atlas holds in it.")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Countries", "/countries"), (m["name"], urls.macro(m)), (c["name"], None)])}
-<div class="pagehead overture portraithead">
-  <div class="portraitsay">
-    <p class="kicker">{esc(m['name'])}</p>
-    <h1>{esc(c['name'])}</h1>
-    {statement(c['tagline'])}
-  </div>
-  {cpic}
-  <div class="headmeta">
-    <p class="orient">{country_orient(c)}</p>
-    {chips(c["interests"], data["interests"])}
-  </div>
+{ed_opening(
+    eyebrow=f"Country · {m['name']}",
+    title=c["name"],
+    intro=c["tagline"],
+    visual=cpic or cportrait,
+    family="atlas")}
+<div class="headmeta ed-section">
+  <p class="orient">{country_orient(c)}</p>
+  {chips(c["interests"], data["interests"])}
 </div>
 {cbelow}
 {advisory_note(c)}
 
+<section class="ed-section">
+{ed_section_head("01", "The portrait",
+                 f"Why {esc(c['name'])} belongs in your Europe.")}
 <div class="measure lead">
   <p>{esc(c['summary'])}</p>
 </div>
+</section>
 
 <section class="practical" aria-label="Practical">
   <div>

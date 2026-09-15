@@ -2640,15 +2640,27 @@ def c_frontend():
     # ended on three journey cards and up to three theme cards, all opening
     # on a gradient chosen by the hash of a slug, on the family whose whole
     # argument is that a motion is not a place.
+    # AND A FLOOR IS ON THE PROMISE, NOT ON THE CLASS NAME. The 2036 page
+    # system replaces three of these with its own: `ed-opening` IS a page
+    # head, `ed-eyebrow` IS a kicker, `ed-row` IS a row. A floor that counts
+    # only the old spelling reads a migration as a family growing its own
+    # components — which is the exact thing it exists to catch, reported
+    # about a page that had just stopped doing it. Each floor names every
+    # class that satisfies it, so the promise survives the migration and a
+    # family that drops the idea altogether still fails.
     FLOORS = {"kicker": 0.99, "masthead": 0.99, "pagehead": 0.99, "crumbs": 0.99,
               "row": 0.85, "card": 0.05, "band": 0.70, "note": 0.70}
+    ALSO = {"pagehead": ("ed-opening",), "kicker": ("ed-eyebrow", "ed-section-index"),
+            "row": ("ed-row",), "band": ("ed-section",)}
     total = 0
     hits = {k: 0 for k in FLOORS}
     for path in site_files():
         body = open(path, encoding="utf-8").read()
         total += 1
         for prim in FLOORS:
-            if re.search(r'class="[^"]*(?<![\w-])' + prim + r'(?![\w-])', body):
+            names = (prim,) + ALSO.get(prim, ())
+            if any(re.search(r'class="[^"]*(?<![\w-])' + nm + r'(?![\w-])', body)
+                   for nm in names):
                 hits[prim] += 1
     for prim, floor in FLOORS.items():
         got = hits[prim] / total

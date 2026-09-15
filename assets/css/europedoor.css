@@ -7946,3 +7946,19 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
 .ed-section .actions {
   display: flex; flex-wrap: wrap; gap: var(--s4); margin: var(--s6) 0 0;
 }
+
+/* THE COUNTRY PORTRAIT IN THE OPENING'S VISUAL SLOT, and it needs the
+   override because it is sized by HEIGHT everywhere else. `.portrait svg`
+   is `width: auto; height: 26rem`, which is right in a band where the
+   drawing sets its own size and wrong in a slot that is 58% of a 1,440px
+   stage: Austria rendered about 180 pixels of arch beside a 108px headline,
+   with the locator and the legend stacked under it in a column of their
+   own. The slot is the composition here, so the drawing fills its width and
+   the legend sits under it rather than beside it. */
+/* `.plate { width: min-content }` is what actually held it, and the first
+   fix went to `.portrait svg` — the rule the eye blames — while the
+   container three levels up stayed at its content's width. Both, and the
+   `.headmeta` legend beside it moved under the drawing. */
+.ed-opening-visual .plate { width: 100%; height: auto; }
+.ed-opening-visual .portrait svg { width: 100%; height: auto; }
+.ed-opening-visual .portrait { display: grid; gap: var(--s4); }
