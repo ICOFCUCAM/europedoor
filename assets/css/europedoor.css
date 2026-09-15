@@ -5591,6 +5591,17 @@ body[data-hero] .masthead { position: sticky; }
 #minecap { color: var(--ink-2); }
 .rowart { margin: 0; }
 .rowart .constel { width: min(15rem, 100%); }
+/* THREE SIBLING INDEXES SHARE ONE SHAPE AND DREW IT AT THREE SIZES.
+   The art column was `auto`, so the track took each drawing's own
+   max-content width — and every constellation is framed on its own extent,
+   so the track was a measurement of the extent rather than a decision.
+   At 834: /interests 266, /themes 241, /europe-in 210. A reader comparing
+   Europe across three pages was comparing three scales.
+   Stated once, on the class all three carry. It sits ABOVE the 64rem block
+   that widens it to 18rem and above the 44rem block that stacks it, because
+   both are the same specificity and a later rule wins — the trap recorded
+   one screen up. */
+.themerow { grid-template-columns: 15rem minmax(0, 1fr); }
 /* THE GLYPH HAS THREE SIZES AND ONLY TWO WERE WRITTEN.
  *
  * There is a desk rule at 64rem and a phone rule at 44rem, and BETWEEN THEM
@@ -5789,6 +5800,9 @@ body[data-hero] .masthead { position: sticky; }
      same fault the interests rows were fixed for, on the family they were
      copied from. At 390 the cap is the width anyway. */
   .rowart .constel { width: min(22rem, 100%); }
+  /* restated after the base rule above, which is later in the file than
+     the stack `.row` declares for this width. */
+  .themerow { grid-template-columns: 1fr; }
   .themerow .constel-theme .constel-lit circle { r: 14px; }
   .themerow .constel-theme.constel-dense .constel-lit circle { r: 7px; }
 }
