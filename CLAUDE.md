@@ -3281,7 +3281,7 @@ matches every slot instance. That list was written when the register was
 empty and every `-hero@` file on disk was a stub the suite had just made. The
 moment real photographs carried those names, a green suite run swept 165
 licensed derivatives out of `assets/img`, and the only thing that noticed was
-`checks.py` failing on 147 pages referencing files that were no longer there.
+`checks.py` failing on every page referencing files that were no longer there.
 **The restored register is the authority on what belongs**: anything it names
 is somebody's licensed photograph, and a suite that writes into the
 repository owns taking out only what it put in.
