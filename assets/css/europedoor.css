@@ -3826,7 +3826,16 @@ body[data-hero] .masthead { position: sticky; }
  * scale stays at sixteen sizes, and the one page that already decided what
  * "this is the event" looks like now lends it to the eight families whose
  * subject is a single named thing. */
-.overture h1 { max-width: 14ch;
+/* AND A MEASURE MAY NEVER BE NARROWER THAN ITS LONGEST WORD. `14ch` is a
+   character count wearing a length's clothes, and the character count is the
+   model this repository has already measured as wrong: a `ch` is the width of
+   a zero, so 14ch holds fourteen zeros and not fourteen letters.
+   Elbphilharmonie measured 214px inside a 210px box and dropped its last
+   glyph to a line of its own — 30 pixels of type carrying one "e" — and
+   Kunsthistorisches, Groeningemuseum and Jugendstilsenteret did the same, on
+   four pages of 1,033. `min-content` is the floor that cannot be wrong,
+   because it is measured from the glyphs rather than modelled from a count. */
+.overture h1 { max-width: 14ch; min-width: min-content;
                font-size: clamp(var(--t-4xl), 7vw, var(--t-6xl)); }
 /* The authored sentence, at display scale. It was a .lede — 17px grey body
  * copy — which is how the best-written thing on the page ended up looking
