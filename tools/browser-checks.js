@@ -3693,6 +3693,10 @@ async function main() {
     });
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
   };
+  const CR = (a, b) => {
+    const [h, l] = [LUM(a), LUM(b)].sort((m, n) => n - m);
+    return (h + 0.05) / (l + 0.05);
+  };
   const worldProbe = () => ({
     world: document.body.dataset.world || "discover",
     accent: document.body.dataset.accent || "",
@@ -3737,9 +3741,24 @@ async function main() {
       // assertion in this suite to protect a number rather than a promise.
       // The promise is that INTELLIGENCE has ONE accent and it is the
       // register's declared one; the register is where that is decided.
-      ok(sameColour(r.door, PALETTE.tokens["pine-air"].hex),
-         `${scheme} ${url}: the INTELLIGENCE accent is ${r.door}, not ` +
-         `pine-air (${PALETTE.tokens["pine-air"].hex})`);
+      // THE INSTRUMENT'S ACCENT IS COBALT, AND THIS PINNED A HEX FROM
+      // BEFORE THE OWNER'S PALETTE. It asserted `pine-air` — the previous
+      // system's dark accent — and the brief that replaced it says in as
+      // many words that the instrument is "Graphite + Bone + Cobalt". So
+      // the check went red for the right event and the wrong claim, which
+      // is the shape this repository has now recorded eleven times.
+      // Read from the register rather than typed, so a rename moves the
+      // assertion with the colour: the promise is that the instrument world
+      // carries a COBALT accent and is therefore told apart from DISCOVER,
+      // not that it carries one particular rung of that family.
+      {
+        const cob = Object.entries(PALETTE.tokens)
+          .filter(([k]) => /^cobalt(-|$)/.test(k)).map(([, v]) => v.hex);
+        ok(cob.some((h) => sameColour(r.door, h)),
+           `${scheme} ${url}: the INTELLIGENCE accent is ${r.door}, and the ` +
+           `owner's palette gives the instrument cobalt — none of ` +
+           `${cob.join(", ")}`);
+      }
       ok(!r.limeAnywhere, `${scheme} ${url}: electric lime is painted — ${r.limeAnywhere}`);
     }
 
@@ -3755,8 +3774,14 @@ async function main() {
       if (want === "cultural") {
         // --door is a custom property, so it comes back as the authored
         // value — a hex — not as the rgb() a computed colour would give.
-        ok(/#a4491f|#e08a5c|164,\s*73,\s*31|224,\s*138,\s*92/i.test(r.door),
-           `${scheme} ${url}: the cultural accent is ${r.door}, not terracotta`);
+        // AND THIS ONE TYPED FOUR SPELLINGS OF TWO HEXES. `terracotta-2`
+        // moved from #a4491f to #a6573a with the owner's palette and the
+        // regex went on naming the old one. The register is the list.
+        const terra = Object.entries(PALETTE.tokens)
+          .filter(([k]) => /^terracotta(-|$)/.test(k)).map(([, v]) => v.hex);
+        ok(terra.some((h) => sameColour(r.door, h)),
+           `${scheme} ${url}: the cultural accent is ${r.door}, and it has ` +
+           `to be one of the terracotta family — ${terra.join(", ")}`);
       }
     }
 
@@ -3781,9 +3806,25 @@ async function main() {
     // in the light scheme the page around it is not. It still fails if a
     // map stops being an INTELLIGENCE component, and it now also fails if
     // the wall goes dark — which the old version could not see.
+    // AND THEN THE OWNER'S PALETTE MADE A COUNTRY PORTRAIT A PICTURE.
+    // `docs/cartography.md` splits every drawing on what it IS — a picture
+    // is warm paper, pale water and an ink coast; an instrument is graphite
+    // — and a country's reference map is a picture. It carried
+    // `data-world="intelligence"` anyway, which resolved `--map-ink` to the
+    // DARK map's bone on a pale continent and measured Italy's own labels
+    // at 1.00:1. So the attribute came off, correctly, and this assertion
+    // went red for the right event and the wrong claim. Twelfth time.
+    //
+    // What it protects is that there IS a drawing: the figure still holds
+    // the land this page is about. `.atlas` was the obvious replacement and
+    // is wrong — a country portrait is `.minimap .countrymap .arched` and
+    // the atlas skin is a different family with the same pale ground, which
+    // is the same confusion that scoped a map-mark fix to `.atlas` and
+    // missed every country plate.
     await w.goto(base + "/europe/italy", { waitUntil: "load" });
-    ok(await w.locator('.countrymap svg[data-world="intelligence"]').count() === 1,
-       "the country map drawing is not an INTELLIGENCE component");
+    ok(await w.locator(".countrymap .lyr-land, .countrymap .countries").count() >= 1,
+       "the country portrait has no land layer — it has stopped being a " +
+       "drawing of anywhere");
     const ap = await w.evaluate(() => {
       const g = document.querySelector(".countrymap .archground");
       const fig = document.querySelector(".countrymap");
@@ -3801,8 +3842,19 @@ async function main() {
                panel: getComputedStyle(fig).backgroundColor,
                wall: wall || getComputedStyle(document.body).backgroundColor };
     });
-    ok(ap.ground && LUM(ap.ground) < 0.06,
-       `the opening is not dark (${ap.ground})`);
+    // AND "DARK OPENING" STOPPED BEING TRUE WHEN THE WATER WENT PALE.
+    // The owner's light map is #D8D4C7 land on #DDE8E7 water — stone on
+    // pale water, with the COASTLINE separating them — so an opening whose
+    // luminance must be under 0.06 is an opening from the previous palette.
+    // This file already records the consequence one check over: the
+    // aperture is read by its REVEAL now, and that is measured on the
+    // painted pixel by `c_aperture` rather than on a token here.
+    // What survives is the half that is still true and still worth
+    // protecting: the opening and the wall must not be the same thing.
+    ok(ap.ground && ap.wall && CR(ap.ground, ap.wall) >= 1.1,
+       `the opening and the wall are the same tone — opening ${ap.ground}, ` +
+       `wall ${ap.wall}. A door is a step or a cut edge, and this is the ` +
+       `step; the cut edge is measured on the painted pixel elsewhere`);
     // The figure must paint NOTHING. That is the whole difference between an
     // aperture and a panel: the corners outside the arch have to show the
     // page through, and any background on the figure fills them back in —

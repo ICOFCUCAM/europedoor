@@ -4970,9 +4970,25 @@ body[data-hero] .masthead { position: sticky; }
    neither a CSS colour nor a CSS background — until the browser suite
    started reading the fills and compositing the alpha itself. 5.86:1
    now. */
+/* AND BONE AT 55% IS A MARK ON GRAPHITE, NOT ON PALE WATER. Everything
+   above is right about the opacity and was measured when an arched map WAS
+   a dark opening. The owner's light map is stone on #DDE8E7 and a country
+   portrait no longer carries the instrument world, so Italy's own marks
+   painted bone on pale water: 1.05:1 inside the aperture they sit in. Every
+   mark on a country plate carries a name and the capital's is drawn
+   unconditionally, so that is not a quiet dot, it is a dot that is not
+   there.
+   `--atlas-hereline` is the answer because it is declared PER WORLD — the
+   ink on the light map's stone, graphite on the dark map's bone land — so a
+   mark bound to it follows its ground instead of assuming one. The
+   destination layer already uses it, with a hairline of the land so the
+   mark separates from whatever it sits on; this is the same mark one family
+   over, and scoping it to `.atlas` missed `.countrymap`, which is a
+   different skin with the same pale ground. */
 .minimap.arched .minidot circle { opacity: 1;
-  fill: color-mix(in srgb, var(--bone) 55%, transparent); }
-.minimap.arched .minidot.here circle { fill: var(--pine-air); }
+  fill: var(--atlas-hereline);
+  stroke: var(--atlas-land); stroke-width: 1; paint-order: stroke; }
+.minimap.arched .minidot.here circle { fill: var(--pine-deep); }
 /* AND WHICH END IT STARTS AT. A route line drawn in order is the same
    drawing as the same route travelled backwards, so the last stop is hollow
    and the first is not, and the caption says which is which — an unexplained
@@ -6929,7 +6945,12 @@ main > .pagehead:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom
   .masthead, .bottomnav, .stickycta, .skip, .footer-nav,
   form, .askhero, .chips, .zbtn, .mapzoom,
   [data-save], .sectionnav { display: none !important; }
-  body, body[data-world="intelligence"] {
+  /* `.ed-page` IS ON <body> AND (0,1,0) BEATS (0,0,1), so the print rule
+     lost to it and a page printed the screen's cream ground. Second time
+     that class has out-specified a `body` selector — the ground swap hit
+     the same thing — and the lesson is the same: a rule targeting `body` by
+     TYPE cannot assume it is the only rule targeting body. */
+  body, body.ed-page, body[data-world="intelligence"] {
     background: #fff; color: #111; }
   /* NOT `padding: 0`. The first version zeroed it and the page printed
      flush to both edges of the sheet — the measure went with it and the
