@@ -9654,6 +9654,31 @@ def events_month_page(data, month):
                              f'Map of the {len(mapped)} fixtures in {name} that '
                              f'happen in a destination in the Atlas', note=note)
 
+    # A MONTH IS A SHAPE AND IT WAS ALSO A PLACE, AND ONLY THE SHAPE WAS
+    # DRAWN. The year band says what is on, the map says where, and between
+    # them a reader still had no idea what October in Europe LOOKS like —
+    # which is the one thing a month page is really being asked.
+    #
+    # The strip is the fixtures that could be MAPPED, which is the same set
+    # the map draws and for the same recorded reason: a season, a region or
+    # a whole country is not a point, and a town pinned to it to fill a
+    # frame would be inventing a location. A photograph of a place that is
+    # not where the fixture is would be the same invention, one medium over.
+    _evshots = ed_strip(data.get("images"), [
+        {"key": f"city:{n['country']['slug']}/{n['region']['slug']}/{n['city']['slug']}",
+         "alt": n["city"]["name"], "label": n["city"]["name"],
+         "href": urls.city(n["country"], n["region"], n["city"])}
+        for _f, n in mapped], limit=8)
+    if _evshots:
+        _en = min(8, len(mapped))
+        _evshots = ('<section class="ed-section">'
+                    + ed_section_head(
+                        "01", "The month",
+                        f"{numword(_en, cap=True)} places {name} happens in",
+                        f"The same {n_of(len(mapped), 'fixture')} the drawing "
+                        f"above plots — the rest of the list is a season or a "
+                        f"region, and neither is a place to photograph.")
+                    + _evshots + "</section>")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Events", "/events"), (name, None)])}
 <div class="pagehead overture">
@@ -9666,6 +9691,7 @@ def events_month_page(data, month):
 {constel_defs() if qshown else ""}
 {year_band(data, month)}
 {monthmap}
+{_evshots}
 {section(f"On in {name}", f'<div class="checks" id="eventkinds">{kindfilters}</div>' + f'<p class="small" id="eventcount"></p>' + f'<div class="rows">{rows}</div>') if rows else ""}
 {section(f"At their best in {name}", f'<div class="rows">{country_rows(peak)}</div>',
          lede="Peak season: the weather works, everything is open, and so is everyone else's calendar.") if peak else ""}
@@ -9759,6 +9785,38 @@ def quiet_page(data):
             ("Barcelona in August", "Girona and the Empordà", "An hour by train from the thing everyone else is queueing for."),
         ]
     )
+    # THE ALTERNATIVE TO SANTORINI HAS TO BE SEEN TO BE AN ALTERNATIVE.
+    #
+    # This page's whole argument is that a Galician fishing town deserves the
+    # same page as Paris, and it made that argument with a map, a hundred and
+    # thirty names and six typed swaps. A reader deciding between Santorini
+    # and Sifnos is deciding partly on what the place looks like, and this is
+    # the page that asks them to make exactly that swap with nothing to look
+    # at — which is the fault that took 130 hash-drawn plates off it, still
+    # unanswered on the other side.
+    #
+    # NOT THE FIRST EIGHT. The list is sorted by country, so the first eight
+    # would be Albania and Andorra — a claim about the alphabet rather than
+    # about Europe. One per macro region, in the taxonomy's own order, which
+    # is the same nine divisions the list below is grouped into and the same
+    # spread the drawing above is an argument about.
+    _qpick = [by_macro[m["slug"]][0] for m in data["macros"]
+              if m["slug"] in by_macro]
+    _qshots = ed_strip(data.get("images"), [
+        {"key": f"city:{n['country']['slug']}/{n['region']['slug']}/{n['city']['slug']}",
+         "alt": n["city"]["name"], "label": n["city"]["name"],
+         "href": urls.city(n["country"], n["region"], n["city"])}
+        for n in _qpick], limit=9)
+    if _qshots:
+        _qshots = ('<section class="ed-section">'
+                   + ed_section_head(
+                       "01", "Instead",
+                       "One from each corner of the continent",
+                       f"The first quiet destination in each of the "
+                       f"{numword(len(_qpick))} macro regions — not the first "
+                       f"eight of {len(quiet)}, which would be a claim about "
+                       f"the alphabet.")
+                   + _qshots + "</section>")
     body = f"""
 {crumbs([("Europe", "/discover"), ("Beyond the obvious", None)])}
 <div class="pagehead index">
@@ -9771,6 +9829,7 @@ def quiet_page(data):
   instead.</p>
 </div>
 {quietmap}
+{_qshots}
 {section(f"{len(quiet)} places we would send you instead", f'<div class="rows">{rows}</div>',
          lede="Tagged quiet in the dataset: places with the goods and without the crowd. The tag is editorial and we will be wrong sometimes.")}
 {section("Six straight swaps", f'<div class="rows">{swaps}</div>',
