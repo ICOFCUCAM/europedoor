@@ -5086,7 +5086,8 @@ body[data-hero] .masthead { position: sticky; }
 .minemap figcaption { margin-top: var(--s4); color: var(--ink-3);
                       font-size: var(--t-sm); line-height: 1.5; max-width: 46rem; }
 #minecap { color: var(--ink-2); }
-.interestrow .themeside { display: grid; gap: var(--s2); }
+.rowart { margin: 0; }
+.rowart .constel { width: min(15rem, 100%); display: block; }
 /* THE GLYPH HAS THREE SIZES AND ONLY TWO WERE WRITTEN.
  *
  * There is a desk rule at 64rem and a phone rule at 44rem, and BETWEEN THEM
@@ -5124,10 +5125,36 @@ body[data-hero] .masthead { position: sticky; }
      short line, so no amount of column gives it to. The drawing takes the
      column instead — 22rem rather than 15 — which also makes two hundred
      marks legible where 15rem made them a texture. */
-  .interestrow { grid-template-columns: minmax(0, 1fr) minmax(0, 18rem);
-                 align-items: center; gap: var(--s6); }
-  .interestrow .themeside { justify-items: end; }
-  .interestrow .themeside .constel { width: 100%; }
+  /* FIVE HUNDRED AND SEVENTY-ONE PIXELS, WHICH IS HALF THE ROW. The note
+     above says "the drawing takes the column instead" and only half of it
+     was applied: the column became 18rem and the drawing stayed pinned to
+     the far edge of it, so a 288-pixel continent sat at x=880 with the text
+     ink stopping at 350. Measured across every two-column row family at
+     1280, as the distance from the last painted glyph in the text block to
+     the left edge of the next column:
+
+         /themes      17%   /countries   36%
+         /stories     28%   /journeys    38%
+         /europe-in   48%   /interests   49%
+
+     What separates the top of that list from the bottom is the LENGTH OF
+     THE TEXT, not the family: /themes carries a middot list of eight place
+     names and fills its column; an interest row is a name and one short
+     line, and a motion row is a name, a line and a query. No column gives
+     that text more to say, so the answer is not a wider text column — it is
+     to stop spending the whole row on one.
+
+     Three columns: what it is, the shape it makes, how many. The drawing
+     comes in beside the text where the two can be read together, and the
+     count keeps the right edge, which is the two-edge convention /countries
+     already reads as a table. The drawing does NOT grow: its width is
+     capped by the page's own length, recorded below, and this costs no row
+     height at all. */
+  .interestrow, .motionrow {
+    grid-template-columns: 18rem minmax(0, 1fr);
+    align-items: center; gap: var(--s6); }
+  .interestrow .rowart .constel,
+  .motionrow .rowart .constel { width: 100%; }
   .themeside .constel { width: min(18rem, 100%); }
   /* AND THE MARK HAD TO COME DOWN AS THE DRAWING WENT UP. A radius in
      viewBox units is a radius in pixels at exactly one width: 22 units is
@@ -5225,12 +5252,22 @@ body[data-hero] .masthead { position: sticky; }
      glyph is 568 pixels tall at 600 and the themes page ran to 9,684 — the
      same fault the interests rows were just fixed for, on the family the
      interests rows were copied from. At 390 the cap is the width anyway. */
-  .themeside .constel { display: block; width: min(22rem, 100%); }
-  /* NOT 100%: this block runs to 44rem, so at 600 a full-width glyph was
-     568 pixels tall and the page ran to 11,972 — seventeen rows of it. A
-     phone is 390 and everything up to 704 is not, and 15rem is what the
-     band above this one gives a tablet. */
-  .interestrow .themeside .constel { width: min(22rem, 100%); }
+  /* `.rowart` AS WELL AS `.themeside`, AND THE OMISSION COST BOTH FAMILIES
+     THEIR PICTURE FOR ONE BUILD. When /interests and /europe-in moved the
+     drawing to the left of the text their wrapper changed name, and this
+     exception — which is the whole reason a glyph survives a phone — still
+     named the old one. Measured: both went from a drawing on the first
+     screen to 0%, silently, because the general rule above hides every
+     constellation and an exception that stops matching just stops. It is
+     the same class of fault as the four label families that each named a
+     class instead of the thing, one stylesheet over, and the answer is the
+     same: name what it IS. A row's drawing is a row's drawing.
+
+     min(22rem) rather than 100%: this block runs to 44rem, so a full-width
+     glyph is 568 pixels tall at 600 and the themes page ran to 9,684 — the
+     same fault the interests rows were fixed for, on the family they were
+     copied from. At 390 the cap is the width anyway. */
+  :is(.themeside, .rowart) .constel { display: block; width: min(22rem, 100%); }
   .themerow .constel-theme .constel-lit circle { r: 14px; }
   .themerow .constel-theme.constel-dense .constel-lit circle { r: 7px; }
 }

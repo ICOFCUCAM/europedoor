@@ -3746,15 +3746,20 @@ def interests_index(data, ranking):
         # that you can see the difference between the shapes.
         dense = " constel-dense" if len(pts) > 60 else ""
         glyph = constellation(pts, extra=" constel-theme" + dense)
+        # THE SHAPE COMES FIRST, AND THE THREE COUNTS ARE ONE LINE. A gap
+        # AFTER the last element is a margin; a gap BETWEEN two of them is a
+        # hole, and this row had 571 pixels of hole. With the drawing on the
+        # left and one text block beside it, the only empty space left is the
+        # ragged right edge of a short line, which is what a ragged right
+        # edge is. The destination count was a third column standing alone at
+        # the far edge and is a count like the other two, so it joins them.
         rows.append(
             f'<a class="row themerow interestrow" href="{urls.interest(slug)}">'
-            f'<div><p class="kicker">{pct}% of the Atlas · '
-            f'{n_of(ncountry, "country")}</p>'
+            f'<div class="rowart">{glyph}</div>'
+            f'<div><p class="kicker">{n_of(len(cities), "destination")} · '
+            f'{pct}% of the Atlas · {n_of(ncountry, "country")}</p>'
             f'<h2>{esc(i["name"])}</h2>'
-            f'<p class="rowsub">{esc(where)}</p></div>'
-            f'<div class="themeside">{glyph}'
-            f'<p class="rowmeta">{n_of(len(cities), "destination")}</p>'
-            f'</div></a>')
+            f'<p class="rowsub">{esc(where)}</p></div></a>')
     body = f"""
 {crumbs([("Europe", "/discover"), ("Ways to travel", None)])}
 <div class="pagehead index">
@@ -10744,12 +10749,11 @@ def motion_index(data):
         glyph = constellation(pts, extra=" constel-theme" + dense) if pts else ""
         rows.append(
             f'<a class="row themerow motionrow" href="/europe-in/{m["slug"]}">'
-            f'<div><h2>{esc(m["name"])}</h2>'
+            f'<div class="rowart">{glyph}</div>'
+            f'<div><p class="kicker">{n_of(n, "destination")}</p>'
+            f'<h2>{esc(m["name"])}</h2>'
             f'<p class="rowsub">{esc(m["strapline"])}</p>'
-            f'<p class="motionq">{esc(motion_query_words(data, m))}</p></div>'
-            f'<div class="themeside">{glyph}'
-            f'<p class="rowmeta">{n}<br><span class="small">destinations</span>'
-            f'</p></div></a>')
+            f'<p class="motionq">{esc(motion_query_words(data, m))}</p></div></a>')
     body = f"""
 {crumbs([("Europe", "/discover"), ("Europe in Motion", None)])}
 <div class="pagehead index">
