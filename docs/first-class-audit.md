@@ -66,6 +66,7 @@ so 699px of the screen is content. The figure below is the number of those
 |---|---:|---:|
 | map | 418 | 56% |
 | country | 415 | 52% |
+| month | 433 | 50% |
 | my-europe | 478 | 48% |
 | macro | 459 | 48% |
 | motion | 515 | 39% |
@@ -73,33 +74,56 @@ so 699px of the screen is content. The figure below is the number of those
 | homepage | 233 | 37% |
 | quiet | 566 | 37% |
 | category | 230 | 36% |
-| themes | 541 | 36% |
-| interests | 549 | 36% |
 | europe-in | 549 | 36% |
+| interests | 549 | 36% |
+| subcategory | 259 | 36% |
+| themes | 541 | 36% |
 | story | 520 | 35% |
 | events | 490 | 34% |
 | place | 588 | 34% |
 | journey | 599 | 32% |
-| countries | 488 | 32% |
-| journeys | 488 | 32% |
-| interest | 390 | 32% |
 | 404 | 358 | 32% |
+| countries | 488 | 32% |
+| interest | 390 | 32% |
+| journeys | 488 | 32% |
 | region | 462 | 30% |
 | destination | 443 | 28% |
 | theme | 159 | 27% |
 | discover | 649 | 26% |
 | experiences | none on the page | **0%** |
+| fund project | none on the page | **0%** |
 | plan | none on the page | **0%** |
 | search | none on the page | **0%** |
 
 **RE-MEASURED, AND THE TABLE ABOVE IS THE CURRENT ONE.** It read seven of
 twenty-three surfaces with no picture on the first screen at all and five
 more under a fifth of it — twelve of twenty-three, just over half,
-effectively type to the fold. It is now **three of twenty-seven with none,
-and none under a fifth**: `/plan` and `/search` are instruments whose
-opening is the control they exist to be, and `/experiences` carries a
-recorded refusal of a map that survives re-checking. The median share is
-34.4%, against 24% when this was first measured.
+effectively type to the fold. It is now **four of thirty with none, and none
+under a fifth**: `/plan` and `/search` are instruments whose opening is the
+control they exist to be, `/experiences` carries a recorded refusal of a map
+that survives re-checking, and the fourth is new to this table and is a real
+defect — see below. The median share is 34.6%, against 24% when this was
+first measured.
+
+**AND THE TABLE GREW BY THREE BECAUSE THE INSTRUMENT HAD NEVER REACHED THEM.**
+`tools/lib/families.js` is the one list `opening.js` and `contact-sheet.js`
+both read, and it carried twenty-seven rendered families. Enumerated against
+the built site by page depth, three templates were missing — the month page
+under `/events` (12 pages), the sub-category page under an experience
+category (39) and a fund project page (12), 63 pages in all. In every one of
+the three the family's INDEX was on the list and the page it indexes was not,
+which is the shape of the omission: the index is the surface somebody names.
+A family's index and its leaf are different templates with different heads and
+different jobs, which is exactly why this list already carried an `interest`
+beside `interests` and a `theme` beside `themes`.
+
+Two of the three measure well — the month page is the second-strongest
+opening on the site at 50%, and the sub-category page 36%. **The third, a
+fund project page, has no figure anywhere on it at any width**: the register
+whose entire argument is that each entry is a real thing in a real place with
+a named local partner was the last DISCOVER surface opening on type alone.
+Nothing had ever photographed or measured it. *An instrument that cannot
+reach a family cannot find a defect in it.*
 
 The original reading, kept because the measurement is the record:
 

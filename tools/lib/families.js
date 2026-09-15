@@ -55,6 +55,22 @@ const FAMILIES = [
   ['europe-in', '/europe-in/'],
   ['motion', '/' + pick('europe-in', 'europe-in/above-the-arctic-circle')],
   ['events', '/events/'],
+  /* THREE TEMPLATES THIS LIST HAD NEVER REACHED, and each is the SECOND half
+   * of a family whose index was already here. The month page under /events
+   * (12), the sub-category page under an experience category (39) and a fund
+   * project page (12): 63 pages, three distinct templates, never photographed
+   * and never measured by either instrument that reads this file.
+   *
+   * The pattern is the same in all three — the index was added because it is
+   * the surface somebody names, and the page it indexes was not. A family's
+   * index and its leaf are different templates with different heads and
+   * different jobs, which is exactly why this atlas has an `interest` beside
+   * `interests` and a `theme` beside `themes`. Enumerated against the built
+   * site rather than by memory: every page depth in site/ now has a family
+   * on this list. */
+  ['month', '/' + pick('events', 'events/oct')],
+  ['subcategory', '/' + pick('experiences/food', 'experiences/food/cellars')],
+  ['fund project', '/' + pick('fund', 'fund/dry-stone-walls-aran')],
   ['quiet', '/beyond-the-obvious/'],
   ['map', '/map/'],
   ['discover', '/discover/'],
