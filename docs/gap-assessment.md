@@ -13,17 +13,30 @@ solvable by more code.
 
 ## 1. What is built and holds
 
-Seven suites, all green, run on every commit:
+Eleven suites, all green, run on every commit. **NO TOTALS HERE, AND THAT IS
+THE SECOND VERSION OF THIS TABLE.** The first carried one per row — 72 static
+checks, 905 browser assertions, 74 on the acquisition pipeline — and by the
+time anybody read them they were 103, about 1,790, and 157, with four suites
+missing from the list entirely. `CLAUDE.md`'s own gate list made this
+decision already, in as many words: *no counts here on purpose, every total
+here grew during a single session, and this list spent weeks understating the
+static and browser suites by a wide margin while looking authoritative.* Each
+command prints its own total; a document that copies one is a document that
+is wrong within a week.
 
 | suite | what it holds |
 |---|---|
-| `checks.py` | 72 static checks, ~128,000 things examined |
-| `browser-checks.js` | 905 assertions in Chromium, including contrast and target size |
-| `section-audit.py` | 1,366 assertions against the two specifications |
-| `ux-audit.py` | 374 assertions against the design brief and the Brand Bible |
-| `invariants.py` | 28 things a visual change may not move silently |
-| `plate-variation.py` | 7 motif families, none more alike than recorded |
-| `photo-tests.py` | 74 checks on the acquisition pipeline, against a stub provider |
+| `checks.py` | the static checks: the data, the shipped HTML, the licences, the palette |
+| `browser-checks.js` | Chromium: contrast, target size, focus, the painted pixel, and no family scrolling sideways |
+| `section-audit.py` | every spec section asserted against the real build |
+| `ux-audit.py` | the design brief and the Brand Bible |
+| `invariants.py` | what a visual change may not move silently |
+| `plate-variation.py` | the motif families, none more alike than recorded |
+| `photo-tests.py` | the acquisition pipeline and its batch loop, against a stub provider |
+| `desk-tests.py` | the local Media Desk: the sign-in, and what the browser may send |
+| `hosted-desk-tests.js` | the hosted desk: signed sessions, signed thumbnails, the dispatch |
+| `desk-render.js` | the hosted desk's screens and its basket, at 1280 and 390 |
+| `build.py check` | the validator, which refuses a record before any of the above runs |
 
 One page shell. One stylesheet. Eleven primitives. Zero webfonts, zero inline
 styles, zero `<img>` tags outside the register, zero third-party requests. A
@@ -34,7 +47,7 @@ the pages are built so it can.
 
 | gap | measured before | now |
 |---|---|---|
-| Abstract plates on index families | 1,718 on 227 pages | 860 on 209 pages |
+| Abstract plates on index families | 1,718 on 227 pages | **none on any page** — see §3.4 |
 | The seventeen interest pages | 728 plates, list truncated at 60 | an opening drawing and the whole set as rows |
 | `/beyond-the-obvious` | 130 plates under its own map | rows |
 | `/fund` | 12 plates | rows |
