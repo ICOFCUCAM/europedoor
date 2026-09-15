@@ -2970,12 +2970,29 @@ def c_map_dots_in_frame():
     # No amount of looking at the other 129 region maps would have found it.
     # What found it was asserting the thing a map must be true of: the
     # subject is inside the picture. One of 191 failed.
+    #
+    # AND IT MATCHED AN EXACT CLASS STRING, SO IT HAS BEEN BLIND SINCE THE
+    # CARTOGRAPHY SKIN SHIPPED. The pattern was `pointsmap arched"><svg`,
+    # which requires `arched` to be the LAST class on the figure; the atlas
+    # palette added ` atlas` after it, and from that commit this check
+    # examined nothing and reported green. Measured: 0 dots, on a site with
+    # 130 region maps. That is the second check in this file found examining
+    # nothing in one sweep, and the reason both were found is that the run
+    # prints a count per check and somebody read the column.
+    #
+    # Matched on the class LIST now, which is what a class attribute is, and
+    # it asserts its own reach — a floor derived from the region maps the
+    # build actually wrote rather than typed, so it cannot go stale the way
+    # the pattern did.
     n = 0
+    figs = 0
     for f in site_files():
         html = open(f, encoding="utf-8").read()
-        for m in re.finditer(r'pointsmap arched"><svg viewBox="0 0 ([\d.]+) ([\d.]+)"'
-                             r'(.*?)</svg>', html, re.S):
-            w, h, frag = float(m.group(1)), float(m.group(2)), m.group(3)
+        for m in re.finditer(
+                r'<figure class="([^"]*\bpointsmap\b[^"]*)"[^>]*>\s*'
+                r'<svg viewBox="0 0 ([\d.]+) ([\d.]+)"(.*?)</svg>', html, re.S):
+            figs += 1
+            w, h, frag = float(m.group(2)), float(m.group(3)), m.group(4)
             for c in re.finditer(r'<circle cx="([\d.-]+)" cy="([\d.-]+)"', frag):
                 x, y = float(c.group(1)), float(c.group(2))
                 if not (0 <= x <= w and 0 <= y <= h):
@@ -2983,6 +3000,10 @@ def c_map_dots_in_frame():
                          f"{w:.0f}x{h:.0f} frame — outside the picture, so it "
                          f"is not drawn and nothing says it is missing")
                 n += 1
+    if figs < 100:
+        fail(f"the dot-in-frame check found only {figs} point maps — it has "
+             f"stopped matching the markup, which is exactly how it spent the "
+             f"life of the atlas skin reporting zero")
     return n
 
 
@@ -4176,11 +4197,18 @@ def c_cut_word():
     checked against the class rather than by pattern because a looser rule is
     how a real truncation gets back in.
     """
+    # AND THE COUNT IS PAGES, NOT ELLIPSES. It used to report how many
+    # ellipses it found, which is a quantity that ought to be zero — so a
+    # check reading all 1,034 pages printed "(0)" and read, in the column
+    # this suite prints, exactly like a check that has stopped matching the
+    # markup. Two of those were found in one sweep of that column; an
+    # instrument that looks like one of them while being healthy is a
+    # instrument that gets the real ones ignored.
     n = 0
     mono = re.compile(r'<span class="mono">.*?</span>', re.S)
     for f in site_files():
+        n += 1
         h = mono.sub(" ", open(f, encoding="utf-8").read())
-        n += h.count("…")
         for m in re.finditer(r"(\w{0,20})…", h):
             word = m.group(1)
             if word and word[-1].isalnum():

@@ -2591,6 +2591,21 @@ draws a plate* should be a rule rather than a thing that happens to be true.
 surface nobody here ever looks at, rendered inside somebody else's product,
 where an illustration drawn from what the place IS beats no picture at all.
 
+**AND A SECOND CHECK WAS BLIND, FOUND BY READING THE COLUMN OF COUNTS.**
+`checks.py` prints how many things each check examined, and two of the
+hundred read zero. The other one is the check that found Longyearbyen drawn
+at y = −317 on a viewBox starting at 0 — a dot outside its own frame, on an
+empty sea, with nothing on the page saying a place was missing. It matched
+the literal string `pointsmap arched"><svg`, which requires `arched` to be
+the LAST class on the figure, and the cartography skin added ` atlas` after
+it: from that commit the check examined **0 dots on a site with 130 region
+maps** and reported green. Matched on the class LIST now, which is what a
+class attribute is, with a floor that fails when it stops finding the family
+— 1,293 dots, all inside their frames. **A count is only evidence if
+somebody reads it**, and `c_cut_word` was returning the number of ellipses
+it found, which ought to be zero, so a healthy check reading all 1,034 pages
+printed "(0)" and looked exactly like the two broken ones. It counts pages.
+
 **A CHART'S CAPTION NAMED A LINE THAT MEASURED 1.16:1.** The year band says
 "above the line is what is on" and the axis was `--rule` — the hairline
 between two list rows — sampled at rgb(231,230,223) against a page of
