@@ -5800,6 +5800,31 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
     # its own map. Rendering found it; the numbers said the frame was the
     # right size and never asked where it was.
     cx, cy = (x0 + x1) / 2.0, (y0 + y1) / 2.0
+    # THE FLOOR IS ONE NUMBER AT THE TARGET PROPORTION, BECAUSE TWO WERE ONE.
+    #
+    # It used to be `min_w` and `min_h` applied independently, and the aspect
+    # pass below then recomputes the width from the height — so whenever
+    # `min_h * want` exceeded `min_w`, the width floor was DEAD and the
+    # height floor silently decided both. It always did. The region map asked
+    # for 260 x 165 with a comment reading "roughly 1,100 x 700 km" and
+    # shipped 429 x 165, which is 2,916 x 1,087 km at 47°N: two and a half
+    # times the width the comment states, on all 129 region maps.
+    #
+    # And 429 units is wider than the padded span of every region in the
+    # atlas, so all 129 drew the IDENTICAL window with only the translate
+    # differing — a family whose caption says "its N destinations" and whose
+    # picture was the same quarter of Europe each time. "Framed to fit" was
+    # not happening at all, and no count could see it: the viewBox is 1000
+    # wide on every one of them, and the frame is in the transform.
+    #
+    # A CALLER'S FLOOR HAS TO BE A FRAME AT `want`, OR IT IS NOT THE FLOOR IT
+    # LOOKS LIKE. The fix is at the call site rather than here: deriving the
+    # height from the width for everybody changes the TALL frames too — a
+    # narrow, tall route grows by GROW_MAX of its own width, so raising the
+    # width floor widens it even when it was never at the floor, and four
+    # journeys silently lost their relief to `TERRAIN_MAX_KM` the first time
+    # this was tried. The two floors stay independent, and a caller that
+    # wants a particular frame states both at the target proportion.
     w, h = max(min_w, x1 - x0), max(min_h, y1 - y0)
     x0, y0 = cx - w / 2.0, cy - h / 2.0
     # ONE PROPORTION ACROSS EVERY MAP OF THIS KIND, or the family has no
@@ -5995,12 +6020,16 @@ def regionmap(data, c, r):
     # A REGION NEEDS THE COUNTRY AROUND IT, NOT A CLOSE-UP OF ITSELF.
     # Tyrol & the West holds one destination; at the default floor that is a
     # single dot in 250 km of unlabelled frontier line, which could be
-    # anywhere in the Alps. 260 x 165 is roughly 1,100 x 700 km — enough for
-    # a coast or a recognisable border to appear and place it.
+    # anywhere in the Alps. 170 units is about 1,120 km at 47°N — enough for
+    # a coast or a recognisable border to appear and place it, and it is the
+    # figure this comment has always named. What shipped was 429 units and
+    # 2,916 km: the floor was 260 x 165 and the aspect pass recomputes the
+    # width from the height, so `min_w` was DEAD and 165 x 2.6 decided both.
+    # Stated at the target proportion the aspect pass has nothing to do.
     return pointsmap(pts, uid, cap,
                      f'Map of {r["name"]}, {c["name"]}: its '
                      f'{n_of(len(pts), "destination")} in the Atlas',
-                     min_w=260.0, min_h=165.0)
+                     min_w=170.0, min_h=170.0 / 2.6)
 
 
 def storymap(data, s):
