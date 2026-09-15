@@ -4004,7 +4004,7 @@ body[data-hero] .masthead { position: sticky; }
    Below the width where the word fits, it goes back to breaking, which is the
    right answer there: a headline running off the edge is the worst of the
    three. */
-.overture h1 { max-width: 14ch; min-width: min(100%, min-content);
+.overture h1 { max-width: 14ch; min-width: min-content;
                font-size: clamp(var(--t-4xl), 7vw, var(--t-6xl)); }
 /* The authored sentence, at display scale. It was a .lede — 17px grey body
  * copy — which is how the best-written thing on the page ended up looking
@@ -4120,6 +4120,24 @@ body[data-hero] .masthead { position: sticky; }
    photograph of a place, and the slot has to be spaced like the drawing it
    replaces rather than discovering that on the day it is filled: a code path
    nothing exercises is a code path nothing checks. */
+/* AND THE FLOOR NEEDS THE SIZE TO COME WITH IT. `min-width: min-content`
+   makes the box as wide as the longest word, which is the fix — and on a
+   place page that word is Kunsthistorisches, so at 320 the box became wider
+   than the screen and the document scrolled sideways. Capping it with
+   `min(100%, min-content)` looked like the answer and is INVALID CSS: an
+   intrinsic keyword is not allowed inside a math function, so the whole
+   declaration was dropped and min-width computed to 0 — the fix silently
+   turned itself off and the four headlines broke again, which only rendering
+   the page found.
+
+   Two levers, and one is not enough. There is no breakpoint between 390 and
+   44rem and the register refuses a seventh, so the other lever is the size:
+   a place name is routinely one long compound noun, and at the step below
+   the overture's floor Kunsthistorisches fits a 320px screen. 1,029
+   headlines on other families are untouched. */
+@media (max-width: 44rem) {
+  .placehead h1 { font-size: var(--t-2xl); }
+}
 .placehead .minimap,
 .placehead .card-art { margin: var(--s5) 0 0; }
 .placehead .headmeta { margin-top: var(--s5); }
