@@ -199,7 +199,26 @@
      neutral grey now, which is also more honest about what that tier is. */
 
   /* ── WORLD 01 — DISCOVER, light ────────────────────────────── */
-  --paper:        var(--bone);
+  /* THE GROUND IS THE LIGHT PAPER, NOT THE CREAM — and that is the
+     Stripe reference the owner gave, applied rather than admired.
+     #F3F0E6 is 94.5% lightness and #F8F6EF is 97.0%: side by side the
+     first reads as a warm document and the second as a lit page, which is
+     the difference between an archive and a product. The reference is a
+     near-white ground with the colour CONCENTRATED — a cream field spends
+     its warmth everywhere and leaves nothing for the accent to be brighter
+     than.
+     BOTH HEXES ARE THE OWNER'S OWN. The palette block names bone, paper
+     and mineral in that order; what changed is which of them is the field.
+     THE LADDER SKIPS BONE, AND THE ARITHMETIC IS WHY. Paper to bone is a
+     step of 1.058 — "a rounding error with a token name", which is this
+     register's own phrase for the 1.045 it refused once already — so a
+     card in bone on a paper page would be a card you cannot see. The
+     surfaces step 1.164 and 1.203 through paper, bone-2 and mineral.
+     Bone keeps every job it had that is not a SURFACE: it is the brand's
+     ground colour, the wall the aperture is cut into, the type on the
+     instrument and the masthead over a picture. It is no longer the whole
+     screen. */
+  --paper:        var(--bone-light);
   --paper-2:      var(--bone-2);
   --paper-3:      var(--mineral);
   /* THE OWNER'S TABLE NAMES TWO NEAR-BLACKS AND THEY DO DIFFERENT JOBS:
@@ -7578,7 +7597,6 @@ body { position: relative; overflow-x: hidden; }
 body {
   --ed-bone:        var(--bone);
   --ed-paper:       var(--bone-light);
-  --ed-paper-2:     var(--bone-2);
   --ed-mineral:     var(--mineral);
   --ed-pine:        var(--pine);
   --ed-pine-deep:   var(--pine-deep);
@@ -7630,7 +7648,14 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
 
 /* THE STAGE. `min()` against the gutter rather than a padded wrapper, so a
    full-bleed child can escape by leaving the class off. */
-.ed-page { background: var(--ed-bone); color: var(--ed-ink);
+/* `.ed-page` IS ON <body> AND PAINTED THE CREAM OVER THE LIGHT PAPER.
+   The 2036 block was written when bone was the ground and it names bone
+   directly, so it won over `body { background: var(--paper) }` further up —
+   the ground moved in the token and did not move on the screen. A page's
+   ground is the semantic surface, never a palette hex: that is what the
+   two-worlds split is for, and hard-coding it here would also have made
+   every INSTRUMENT page cream. */
+.ed-page { background: var(--paper); color: var(--ink);
            font-family: var(--ed-sans); }
 
 .ed-opening {
@@ -7679,9 +7704,17 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
   font-size: var(--ed-read);
   line-height: 1.5; color: var(--ink-2);
 }
+/* `height: 100%` AGAINST A `min-height` PARENT RESOLVES TO auto, which is
+   why the photograph stopped short and left a band of mineral under the
+   gondolas twice. A percentage height needs a DEFINITE height to resolve
+   against and `min-height` is not one — the oldest trap in CSS layout, and
+   the reason the first two fixes went to the picture rather than to the box
+   it is in. A grid row stretches its item by default, so the child fills
+   whatever the min-height resolved to without asking for a percentage. */
 .ed-opening-visual {
   position: relative; min-height: clamp(26rem, 52vw, 43.75rem);
-  overflow: hidden; background: var(--ed-paper-2);
+  overflow: hidden; background: var(--paper-3);
+  display: grid; grid-template-rows: 1fr;
 }
 .ed-opening-visual :is(img, picture) {
   width: 100%; height: 100%; display: block; object-fit: cover;
@@ -7690,7 +7723,7 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
    `object-fit: cover` does nothing to an inline `<svg>` — the property
    applies to replaced content and an inline SVG is not that — so the
    drawing fell back to `preserveAspectRatio="xMidYMid meet"` inside a box
-   sized by a clamp, and letterboxed: a band of `--ed-paper-2` under the
+   sized by a clamp, and letterboxed: a band of `--paper-3` under the
    continent, which reads as a frame that does not fit. The map-card
    finding, one component over, where a third of every tile was padding the
    same colour as the sea.
@@ -8228,7 +8261,7 @@ body:has(main .ed-journey-hero) .masthead .wordmark { color: var(--bone); }
 /* THE PHOTOGRAPH HAS TO REACH THE SLOT'S EDGES, and three wrappers sat
    between it and them. `picture()` emits `<figure class="headshot">` around
    a `<picture>` around an `<img>`, so a rule naming only `img, picture`
-   left the FIGURE at its content's height — a band of --ed-paper-2 under
+   left the FIGURE at its content's height — a band of --paper-3 under
    the Grand Tour's gondolas, which reads as a frame that does not fit. The
    same letterbox the map card was measured on, in a different component.
    Every level, because a slot is a composition and the picture fills it. */

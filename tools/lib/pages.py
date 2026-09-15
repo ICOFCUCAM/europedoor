@@ -8760,13 +8760,21 @@ def story_page(data, s):
         margin = (f'<aside class="essaymargin" aria-label="Where this happens">'
                   f'<h2 class="mp-label">Where this happens</h2>{rows}'
                   f'<p class="mp-note">Every one of them is in the Atlas.</p></aside>')
+    # A NAME IN A META ROW IS NOT A BYLINE, AND THE NEW HEAD DROPPED THE ONE
+    # WORD THAT SAYS SO. The row carries four tokens — the desk, the reading
+    # time, the date and the author — and with "By" removed the fourth is a
+    # proper noun among three facts, which a reader has to guess at. The
+    # section audit caught it on all nine stories in the run that shipped the
+    # head; nothing a contact sheet or a count could see, because the name is
+    # present, placed and legible. The claim was never that the author is on
+    # the page, it is that the reader can tell it IS the author.
     body = f"""
 {crumbs([("Europe", "/discover"), ("Stories", "/stories"), (s["title"], None)])}
 <article class="essay">
 <header class="ed-story-opening">
   <p class="ed-story-meta"><span>{esc(s['section'])}</span><span>{esc(s['reading'])}</span>
   <span><time datetime="{esc(s['published'])}">{esc(s['published'])}</time></span>
-  <span>{esc(s['author'])}</span></p>
+  <span>By {esc(s['author'])}</span></p>
   <h1>{esc(s['title'])}</h1>
   <p class="ed-intro">{esc(s['standfirst'])}</p>
 </header>
