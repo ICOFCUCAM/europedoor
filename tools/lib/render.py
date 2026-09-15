@@ -1798,6 +1798,80 @@ def held_any(images, keys):
     return [k for k in keys if held(images, k)]
 
 
+# THE SLOTS ARE DECLARED, SO AN EMPTY ONE CAN SAY WHAT BELONGS IN IT.
+#
+# The first version of the scales below returned "" when the register held
+# nothing, to keep hash-drawn landscapes off the page — a measured decision
+# this repository already made once, 189 `.card-art` elements and every one
+# a map. That is right about the plate and wrong about the hole: with 826
+# of 837 surfaces empty it meant the redesign could not be SEEN, and a
+# composition nobody can look at cannot be judged.
+#
+# A DECLARED PLACEHOLDER IS NEITHER. It is not a photograph and never
+# pretends to be one: no <img>, no register row, nothing for the licence
+# gate to refuse. It is the slot's own brief, rendered where the slot is —
+# the purpose, what the picture must be OF, and the size it must be — which
+# is exactly what `docs/image-purposes.json` already declares and what the
+# directive asks for in its own words: mark the slot clearly and identify
+# the required acquisition. The page composes, a reader sees the shape of
+# the design, and the acquisition list is the page itself.
+_SLOTNOTES = None
+
+
+def slot_brief(key):
+    """The one-line brief for an unfilled surface, from the declarations."""
+    global _SLOTNOTES
+    if _SLOTNOTES is None:
+        _SLOTNOTES = {}
+        try:
+            import json as _json
+            import os as _os
+            # `render` HAS NO ROOT AND NEVER NEEDED ONE. Every other path
+            # in this module is a URL; this is the first file it reads, so
+            # the repository is derived from the module's own location
+            # rather than from a constant somebody has to keep true.
+            here = _os.path.dirname(_os.path.abspath(__file__))
+            root = _os.path.dirname(_os.path.dirname(here))
+            path = _os.path.join(root, "desk", "registry.json")
+            with open(path, encoding="utf-8") as fh:
+                doc = _json.load(fh)
+            slots = doc.get("slots", {})
+            for row in doc.get("purposes", []):
+                spec = dict(slots.get(row.get("slot") or "", {}))
+                spec.update({k: v for k, v in row.items() if v is not None})
+                _SLOTNOTES[row["key"]] = spec
+        except Exception:                                    # noqa: BLE001
+            _SLOTNOTES = {}
+    return _SLOTNOTES.get(key) or {}
+
+
+def ed_slot(key, *, shape="wide", label=""):
+    """An empty surface, saying what belongs in it.
+
+    THE FIRST SENTENCE OF THE NOTE AND NOT THE WHOLE NOTE. A slot's brief is
+    written for somebody reading the JSON and runs to a paragraph; rendered
+    whole it would be the page. The desk already learned this — its own slot
+    note pushed the search box nine hundred pixels down — and the answer is
+    the same: the first sentence is the hint.
+    """
+    spec = slot_brief(key)
+    note = (spec.get("note") or "").strip()
+    first = note.split(". ")[0].rstrip(".") if note else ""
+    want = ""
+    if spec.get("min_width"):
+        want = f'{spec["min_width"]}px {spec.get("orientation") or "landscape"}'
+    cls = {"wide": "ed-slot-wide", "tall": "ed-slot-tall",
+           "portrait": "ed-slot-portrait", "square": "ed-slot-square"}.get(
+        shape, "ed-slot-wide")
+    return (
+        f'<div class="ed-slot {cls}" role="note" '
+        f'aria-label="A photograph is not yet licensed for this surface">'
+        f'<p class="ed-slot-key">Photograph · {esc(label or key)}</p>'
+        + (f'<p class="ed-slot-note">{esc(first)}</p>' if first else "")
+        + (f'<p class="ed-slot-spec">{esc(want)}</p>' if want else "")
+        + "</div>")
+
+
 def ed_bleed(images, key, *, alt, seed=None, motif=None, caption="",
              shape="tall", eager=False, only_if_held=True):
     """A picture that leaves the column. Used for a change of movement.
@@ -1810,7 +1884,7 @@ def ed_bleed(images, key, *, alt, seed=None, motif=None, caption="",
     element every caller can get wrong.
     """
     if only_if_held and not held(images, key):
-        return ""
+        return ed_slot(key, shape="wide", label=alt or key)
     cls = {"tall": "ed-bleed-tall", "deep": "ed-bleed-deep"}.get(shape, "ed-bleed-tall")
     inner = picture(images, key, w=2400, h=1030, alt=alt, eager=eager,
                     sizes="100vw", fallback_seed=seed or key,
@@ -1829,7 +1903,7 @@ def ed_feature(images, key, *, title, body, alt, seed=None, motif=None,
     which is what stops three features in a row becoming a pattern.
     """
     if only_if_held and not held(images, key):
-        return ""
+        return ed_slot(key, shape="square", label=alt or key)
     inner = picture(images, key, w=1600, h=1200, alt=alt, eager=eager,
                     sizes="(max-width: 52rem) 100vw, 55vw",
                     fallback_seed=seed or key, fallback_motif=motif)
@@ -1849,9 +1923,17 @@ def ed_strip(images, items, *, limit=8):
     into rows turns an order into a grid, which is the thing this whole
     system is replacing.
     """
-    items = [it for it in items if held(images, it["key"])]
     out = []
     for it in items[:limit]:
+        if not held(images, it["key"]):
+            label = esc(it.get("label", ""))
+            if it.get("href"):
+                label = f'<a href="{esc(it["href"])}">{label}</a>'
+            out.append(
+                '<figure>'
+                + ed_slot(it["key"], shape="portrait", label=it.get("label", ""))
+                + f'<figcaption>{label}</figcaption></figure>')
+            continue
         inner = picture(images, it["key"], w=900, h=1200, alt=it.get("alt", ""),
                         sizes="(max-width: 52rem) 60vw, 18rem",
                         fallback_seed=it.get("seed") or it["key"],
@@ -1866,7 +1948,6 @@ def ed_strip(images, items, *, limit=8):
 
 def ed_mosaic(images, items, *, limit=3):
     """One dominant picture and two beside it. Never four equal tiles."""
-    items = [it for it in items if held(images, it["key"])]
     if len(items) < 3:
         # A MOSAIC IS A COMPOSITION OF THREE, and two pictures in a
         # three-cell grid is a grid with a hole in it. Below three it is not
@@ -1875,6 +1956,10 @@ def ed_mosaic(images, items, *, limit=3):
     out = []
     for i, it in enumerate(items[:limit]):
         big = i == 0
+        if not held(images, it["key"]):
+            out.append(ed_slot(it["key"], shape="square",
+                               label=it.get("label", "")))
+            continue
         inner = picture(images, it["key"], w=1400 if big else 800,
                         h=1400 if big else 800, alt=it.get("alt", ""),
                         sizes="(max-width: 52rem) 100vw, "
@@ -1897,7 +1982,7 @@ def ed_declare(images, key, *, statement, alt, seed=None, motif=None,
     rgb(71,71,71) and bone on that is 9.2:1 whatever the picture does.
     """
     if only_if_held and not held(images, key):
-        return ""
+        return ed_slot(key, shape="wide", label=alt or key)
     inner = picture(images, key, w=2400, h=1400, alt=alt,
                     sizes="100vw", fallback_seed=seed or key,
                     fallback_motif=motif)

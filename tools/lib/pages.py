@@ -3090,7 +3090,7 @@ def country_page(data, c):
     for _r in c["regions"]:
         for _t in _r["cities"]:
             cstrip_items.append({
-                "key": f"destination:{c['slug']}/{_r['slug']}/{_t['slug']}",
+                "key": f"city:{c['slug']}/{_r['slug']}/{_t['slug']}",
                 "alt": _t["name"],
                 "label": _t["name"],
                 "href": urls.city(c, _r, _t)})
@@ -3119,7 +3119,7 @@ def country_page(data, c):
     _shots = ed_strip(data.get("images"), cstrip_items, limit=8)
     cstrip = (f'<section class="ed-section">'
               + ed_section_head("02", "In the country",
-                                f"Where {esc(c['name'])} is worth going",
+                                f"Where {c['name']} is worth going",
                                 f"{n_of(sum(len(r['cities']) for r in c['regions']), 'destination')} "
                                 f"across {n_of(len(c['regions']), 'travel region')}.")
               + _shots + "</section>") if _shots else ""
@@ -3140,7 +3140,7 @@ def country_page(data, c):
 
 <section class="ed-section">
 {ed_section_head("01", "The portrait",
-                 f"Why {esc(c['name'])} belongs in your Europe.")}
+                 f"Why {c['name']} belongs in your Europe.")}
 <div class="ed-split">
   <div class="ed-split-copy measure lead">
     <p>{esc(c['summary'])}</p>
@@ -3553,10 +3553,10 @@ def city_page(data, c, r, t):
     # A destination page had one map and a column of rows; the directive is
     # right that this is the family that should be most heavily image-led.
     # Both of these are built from slots this product already declares —
-    # `destination:<target>` for the wide turn and `place:<target>` for each
+    # `city:<target>` for the wide turn and `place:<target>` for each
     # thing in it — and both are absent until the register holds them, so
     # the page composes rather than filling a hole.
-    tkey = f"destination:{c['slug']}/{r['slug']}/{t['slug']}"
+    tkey = f"city:{c['slug']}/{r['slug']}/{t['slug']}"
     tbleed = ed_bleed(data.get("images"), tkey, alt=t["name"],
                       caption=f"{t['name']}, {c['name']}", shape="tall")
     tstrip_items = [{
@@ -3566,7 +3566,7 @@ def city_page(data, c, r, t):
     _tshots = ed_strip(data.get("images"), tstrip_items, limit=8)
     tstrip = (f'<section class="ed-section">'
               + ed_section_head("02", "In the place",
-                                f"What {esc(t['name'])} is made of",
+                                f"What {t['name']} is made of",
                                 f"{n_of(len(t.get('places', [])), 'place')} recorded here.")
               + _tshots + "</section>") if _tshots else ""
     body = f"""
@@ -4314,7 +4314,7 @@ def journey_page(data, j):
             continue
         _t, _r, _c = _n["city"], _n["region"], _n["country"]
         jstrip_items.append({
-            "key": f"destination:{_c['slug']}/{_r['slug']}/{_t['slug']}",
+            "key": f"city:{_c['slug']}/{_r['slug']}/{_t['slug']}",
             "alt": _t["name"], "label": _t["name"],
             "href": urls.city(_c, _r, _t)})
     _jshots = ed_strip(data.get("images"), jstrip_items, limit=10)
@@ -8490,7 +8490,7 @@ def theme_page(data, t):
             continue
         _t2, _r, _c = _n["city"], _n["region"], _n["country"]
         tmstrip_items.append({
-            "key": f"destination:{_c['slug']}/{_r['slug']}/{_t2['slug']}",
+            "key": f"city:{_c['slug']}/{_r['slug']}/{_t2['slug']}",
             "alt": _t2["name"], "label": _t2["name"],
             "href": urls.city(_c, _r, _t2)})
     _tmshots = ed_strip(data.get("images"), tmstrip_items, limit=8)

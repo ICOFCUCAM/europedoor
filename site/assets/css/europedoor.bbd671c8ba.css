@@ -8366,3 +8366,59 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
 @media (max-width: 52rem) {
   .manifesto p:nth-child(even) { margin-left: 0; text-align: left; }
 }
+
+/* =========================================================
+   THE DECLARED SLOT — an empty surface that says what belongs in it
+   =========================================================
+   826 of 837 declared surfaces hold no photograph, so a redesign built
+   around photography could not be SEEN. Returning nothing kept the page
+   honest and made the composition invisible; drawing a hash-chosen
+   landscape would put back the exact thing this site measured out.
+
+   A declared slot is neither. It is not a photograph and never pretends to
+   be one — no <img>, no register row, nothing for the licence gate to
+   refuse — and it is not decoration either: it prints the surface's own
+   brief, which is what the acquisition needs and what the directive asks
+   for in its own words. The page composes, a reader sees the design, and
+   the acquisition list IS the page.
+
+   IT LOOKS LIKE A PLATE-MAKER'S MARK, NOT LIKE A BROKEN IMAGE. Mineral
+   ground, a hairline, mono type, and the three facts that matter: which
+   surface, what the picture must be of, and how large. A grey box with a
+   camera glyph would be a missing image; this is a commissioned one. */
+.ed-slot {
+  background: var(--mineral);
+  border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  gap: var(--s2); padding: var(--s5); overflow: hidden;
+  container-type: inline-size;
+}
+/* A WIDE SLOT IS NOT 21:9 OF EMPTY GROUND. The bleed's own proportion is
+   right for a photograph and wrong for a panel of type: at 1,356px wide
+   that is 581 pixels of mineral with three lines at the bottom of it,
+   which is the hole this was written to remove. A declared slot is sized
+   to what it SAYS — the brief plus air — and the photograph that replaces
+   it takes the full proportion back. */
+.ed-slot-wide { min-height: 13rem; }
+.ed-slot-tall { aspect-ratio: 16 / 9; }
+.ed-slot-square { aspect-ratio: 4 / 3; }
+.ed-slot-portrait { aspect-ratio: 3 / 4; }
+.ed-slot p { margin: 0; max-width: 46ch; }
+.ed-slot-key {
+  font-family: var(--ed-mono); font-size: var(--t-xs); letter-spacing: .12em;
+  text-transform: uppercase; color: var(--ed-pine);
+}
+.ed-slot-note {
+  font-family: var(--ed-sans); font-size: var(--t-sm); line-height: 1.5;
+  color: var(--ink-2);
+}
+.ed-slot-spec {
+  font-family: var(--ed-mono); font-size: var(--t-xs); letter-spacing: .08em;
+  color: var(--ink-3);
+}
+/* In a strip the cells are 15rem wide: the brief does not fit and the
+   surface name does, so the note comes off rather than being clipped —
+   this site refuses an element holding more text than it shows. */
+@container (max-width: 20rem) {
+  .ed-slot-note, .ed-slot-spec { display: none; }
+}
