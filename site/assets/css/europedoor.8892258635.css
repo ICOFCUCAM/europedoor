@@ -6808,3 +6808,245 @@ main > .pagehead:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom
    away entirely rather than moved below. The rule was describing a layout
    the markup cannot produce. One credit design, everywhere, is what this
    stylesheet is for; the exception is deleted rather than completed. */
+
+/* ══ THE HOMEPAGE IS A PLATE SEQUENCE ═══════════════════════════════════
+ *
+ * IT WAS A STACK OF SECTIONS AND EVERY PROPOSAL FOR REPLACING IT WAS THE
+ * SAME STACK WITH THE BLOCKS MOVED. Four page concepts and four grammars
+ * were rendered from the real data before the fault was named, and the
+ * fault was never the styling: nav, hero, rule, text, cards, map, text,
+ * cards — the spatial grammar repeated, so the page read as a
+ * content-management template whatever was in it.
+ *
+ * What replaced it is six numbered PLATES, each a band rather than a
+ * viewport, each with its own identity and its own margins: monumental,
+ * typographic, photographic, cartographic, typographic, empty. The act
+ * number is the only thing that repeats, which is what makes six bands read
+ * as one sequence rather than as six sections.
+ *
+ * NO CARDS ANYWHERE ON IT. Border, fill, radius and shadow each say
+ * "separate object, placed here by a system", and this page has none of the
+ * four. What separates two plates is a rule, a change of ground, or air. */
+/* A PLATE IS THE WIDTH OF THE SHEET, NOT OF THE COLUMN. `main` is capped at
+   --page and padded, which is right for every reading page and wrong for a
+   sequence of plates: the first render put a 176px headline in a 230px
+   column with an empty right half, because the plate's own grid was being
+   laid out inside a box already two gutters narrower than the window. The
+   homepage carries `data-hero`, which is the body attribute the single
+   stylesheet already reacts to — never a second shell. */
+body[data-hero] main { max-width: none; padding: 0; }
+
+.sheet { position: relative; display: grid; gap: var(--s6) var(--s8);
+         padding: var(--s8) var(--page-gutter) var(--s8);
+         grid-template-columns: minmax(0, 40%) minmax(0, 1fr);
+         align-items: center; border-bottom: 1px solid var(--rule); }
+:root { --page-gutter: max(var(--s5), calc(50vw - 36rem)); }
+/* THE ACT MARK: a number at reading size, a rule, a name at label size.
+   It spans both columns because it belongs to the plate rather than to
+   either half of it — the same reason a printed plate's sheet number sits
+   above the frame and not inside it. */
+.sheet > .actmark { grid-column: 1 / -1; display: grid; justify-items: start;
+                    gap: var(--s2); margin: 0 0 var(--s4); }
+.actno { font-family: var(--text); font-size: var(--t-md); font-variant-numeric: tabular-nums;
+         color: var(--ink-3); line-height: 1;
+         border-bottom: 1px solid var(--ink-3); padding-bottom: var(--s2); min-width: 2.2rem; }
+.actname { font-family: var(--text); font-size: var(--t-xs); letter-spacing: .3em;
+           text-transform: uppercase; color: var(--ink-3); }
+/* EXTREME TYPE CONTRAST is the whole editorial argument: an 11px tracked
+   label against a 120px display serif, and nothing in between competing
+   with either. No new size is introduced — both ends already exist. */
+.sheet .mega { font-family: var(--display); font-weight: 400; margin: 0;
+               font-size: clamp(var(--t-4xl), 7vw, var(--t-6xl));
+               line-height: .96; letter-spacing: -.02em; }
+.sheet .lede { font-family: var(--display); font-size: var(--t-md); line-height: 1.55;
+               color: var(--ink-2); max-width: 38ch; margin: 0; }
+.sheettext { display: grid; gap: var(--s5); justify-items: start; }
+.sheetside { display: grid; gap: var(--s6); justify-items: start; }
+/* THE ONE LINK SHAPE ON THE PAGE: a drawn mark, a rule, a tracked label.
+   `.waygo`'s bare arrow reads as a button that has lost its box, and this
+   page has no boxes — so the affordance is drawn rather than typed, which
+   is the family everything else here belongs to. */
+.go { display: inline-flex; align-items: center; gap: var(--s3);
+      text-decoration: none; color: inherit; }
+.gomark { flex: none; width: 2.6rem; height: 1px; background: currentColor;
+          position: relative; opacity: .5; }
+.gomark::before { content: ""; position: absolute; left: 0; top: 50%;
+                  width: .75rem; height: .75rem; margin-top: -.375rem;
+                  border: 1px solid currentColor; border-radius: 50%;
+                  background: var(--paper); }
+.golabel { font-family: var(--text); font-size: var(--t-xs); letter-spacing: .22em;
+           text-transform: uppercase; }
+.go:hover .golabel { color: var(--door); }
+.go:hover .gomark { opacity: 1; }
+/* THE MARGIN, which is what a plate has and a section does not. Tracked
+   capitals against the outer edge, where a printed sheet carries its series
+   and its projection. aria-hidden and unlinked: it is the sheet's own
+   furniture, not something a reader is asked to read. */
+.marginnote { position: absolute; top: var(--s8); right: var(--s5);
+              display: grid; gap: var(--s4); text-align: right; margin: 0;
+              max-width: 7rem; }
+.marginnote span { font-family: var(--text); font-size: var(--t-xs);
+                   letter-spacing: .26em; text-transform: uppercase;
+                   color: var(--ink-3); line-height: 1.5; }
+
+/* 01 · the door — the wall is paper and the opening is the only dark thing */
+.sheet-door { grid-template-columns: minmax(0, 44%) minmax(0, 1fr);
+              padding-right: 0; align-items: stretch; border-bottom: 0; }
+.sheet-door .sheettext { align-content: center; padding: var(--s7) var(--s7) var(--s7) 0; }
+.sheet-door .opening { position: relative; overflow: hidden; min-height: 62vh;
+                       background: var(--graphite);
+                       border-radius: 50% 50% 0 0 / 30% 30% 0 0; }
+.sheet-door .heroeurope { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* The reveal: the wall's own face laid over the drawing's edge, and a fine
+   line just inside it. That is what an opening in masonry actually shows,
+   and it is where the eye reads depth from — the same two marks the 824
+   plates cut, at the largest size the arch appears anywhere. */
+.sheet-door .reveal { position: absolute; inset: 0; border-radius: inherit;
+                      pointer-events: none;
+                      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--limestone) 34%, transparent),
+                                  0 0 0 1px color-mix(in srgb, var(--graphite) 16%, transparent); }
+
+/* 02 · the question — eight photographs at thumbnail size */
+.qrow { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr));
+        gap: var(--s3); width: 100%; }
+.qtile { text-decoration: none; color: inherit; display: grid; gap: var(--s2); }
+.qtile picture { display: block; }
+.qtile img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+.qname { font-family: var(--text); font-size: var(--t-xs); letter-spacing: .16em;
+         text-transform: uppercase; color: var(--ink-3); }
+.qtile:hover .qname { color: var(--door); }
+.goright { position: absolute; top: var(--s8); right: var(--page-gutter);
+           flex-direction: row-reverse; }
+.goright .gomark { transform: scaleX(-1); }
+
+/* 03 · the landscape — the one full-bleed photographic plate */
+.sheet-landscape { grid-template-columns: 1fr; padding: 0; min-height: 76vh;
+                   align-content: end; border-bottom: 0; }
+.sheet-landscape .shotfull { position: absolute; inset: 0; }
+.sheet-landscape .shotfull picture,
+.sheet-landscape .shotfull img { display: block; width: 100%; height: 100%;
+                                 object-fit: cover; }
+/* A SCRIM IS WHAT MAKES THE CONTRAST A PROPERTY OF THE DESIGN RATHER THAN
+   OF THE PICTURE. The homepage already learned this once, on type over a
+   drawing of Europe: measured letter by letter the standfirst ran 4.36:1
+   over lit parchment while every token-based check reported it fine. */
+.sheet-landscape::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(100deg,
+    color-mix(in srgb, var(--graphite) 82%, transparent) 0%,
+    color-mix(in srgb, var(--graphite) 58%, transparent) 38%,
+    color-mix(in srgb, var(--graphite) 16%, transparent) 72%,
+    transparent 100%); }
+.sheet-landscape > * { position: relative; z-index: 2; }
+.sheet-landscape .sheettext { padding: var(--s8) var(--page-gutter); max-width: 44rem; }
+.sheet-landscape .mega, .sheet-landscape .lede,
+.sheet-landscape .go, .sheet-landscape .actno, .sheet-landscape .actname,
+.sheet-landscape .marginnote span, .sheet-landscape .sheetcred,
+.sheet-landscape .sheetcred a { color: var(--limestone); }
+.sheet-landscape .actno { border-bottom-color: color-mix(in srgb, var(--limestone) 50%, transparent); }
+.sheet-landscape .gomark::before { background: none; }
+.sheet-landscape .actmark { position: absolute; top: var(--s6);
+                            left: var(--page-gutter); margin: 0; }
+.sheetcred { position: absolute; right: var(--s5); bottom: var(--s5); margin: 0;
+             font-family: var(--text); font-size: var(--t-xs); letter-spacing: .2em;
+             text-transform: uppercase; }
+
+/* 04 · the journey — a paper plate: pale ground, an ink route, named stops */
+.sheet-journey { grid-template-columns: minmax(0, 38%) minmax(0, 1fr); }
+.figures { display: grid; grid-template-columns: repeat(3, auto); gap: var(--s6);
+           margin: var(--s2) 0 0; justify-content: start; }
+.figures div { display: grid; gap: var(--s2); }
+.figures dd { font-family: var(--display); font-size: var(--t-2xl);
+              margin: 0; line-height: 1; }
+.figures dt { font-family: var(--text); font-size: var(--t-xs); letter-spacing: .22em;
+              text-transform: uppercase; color: var(--ink-3); }
+.paperplate svg { width: 100%; height: auto; display: block; }
+/* THE PAPER SKIN. Every other route on this site is drawn on the atlas's
+   night water; this one is a printed sheet — pale ground, a hairline coast,
+   an ink route and tracked capitals for the stops. It is the same geometry
+   and the same projection; what changes is which of the two cartographies
+   docs/cartography.md splits on it belongs to. */
+/* A PRINTED PLATE'S SEA IS PAPER AND ITS LAND IS INK-ON-PAPER, and the
+   first version made them the same: --atlas-land at 46% over the page is
+   within a step of the page, so the continent read as a faint stain rather
+   than as land. The sea is the sheet; the land is a tone on it. */
+.constel-paper .glyph-sea { fill: var(--paper); }
+.constel-paper .glyph-land { fill: color-mix(in srgb, var(--atlas-land) 78%, var(--paper)); }
+.constel-paper .glyph-beyond { fill: color-mix(in srgb, var(--atlas-land) 40%, var(--paper)); }
+.constel-paper .glyph-bounds { fill: none;
+  stroke: color-mix(in srgb, var(--ink-3) 30%, transparent); stroke-width: .6;
+  vector-effect: non-scaling-stroke; }
+.constel-paper .constel-route { stroke: var(--ink); stroke-width: 1.4;
+  vector-effect: non-scaling-stroke; }
+.constel-paper .constel-route.case { stroke: var(--paper); stroke-width: 4;
+  vector-effect: non-scaling-stroke; }
+.constel-paper .constel-lit circle { fill: var(--ink); stroke: var(--paper);
+  stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+.constel-paper .constel-names text { font-family: var(--text); letter-spacing: .18em;
+  text-transform: uppercase; fill: var(--ink-2); }
+
+/* 05 · the atlas — the count is the event, the names are the evidence */
+.sheet-atlas { background: var(--door-dark); color: var(--limestone);
+               grid-template-columns: minmax(0, 34%) minmax(0, 1fr);
+               gap: var(--s6) var(--s7); align-items: start; }
+.sheet-atlas .mega, .sheet-atlas .lede, .sheet-atlas .go,
+.sheet-atlas .actno, .sheet-atlas .actname { color: var(--limestone); }
+.sheet-atlas .lede { opacity: .82; }
+.sheet-atlas .actno { border-bottom-color: color-mix(in srgb, var(--limestone) 45%, transparent); }
+.sheet-atlas .gomark::before { background: none; }
+.sheet-atlas .sheettext { display: grid; grid-template-columns: auto minmax(0, 1fr);
+                          gap: var(--s5); align-items: start; }
+.hugecount { margin: 0; }
+.hc { font-family: var(--display); font-size: clamp(5rem, 11vw, 11rem); line-height: .78;
+      letter-spacing: -.045em; display: block; }
+.hugesay { display: grid; gap: var(--s4); justify-items: start; }
+.hugesay .mega { font-size: clamp(var(--t-xl), 3.1vw, var(--t-3xl)); }
+/* FIVE COLUMNS AND THE NAMES BROKE IN HALF. "North Macedonia", "United
+   Kingdom" and "Bosnia and Herzegovina" wrapped across two lines in a
+   124-pixel column — an index whose entries do not fit its own measure. The
+   column count is the one the benchmark sets; what had to give was the
+   share of the plate the list gets and the size it is set at. */
+.countrycols { columns: 5; column-gap: var(--s5); font-family: var(--display);
+               font-size: var(--t-sm); line-height: 2;
+               border-left: 1px solid color-mix(in srgb, var(--limestone) 22%, transparent);
+               padding-left: var(--s6); }
+.countrycols a { display: block; text-decoration: none; color: var(--limestone);
+                 opacity: .88; break-inside: avoid; }
+.countrycols a:hover { opacity: 1; text-decoration: underline;
+                       text-underline-offset: .18em; }
+.sheet-atlas .goright { color: var(--limestone); bottom: var(--s6); top: auto; }
+
+/* 06 · the message — a plate with almost nothing on it */
+.sheet-message { padding-block: var(--s9); border-bottom: 0; align-items: start; }
+.sheet-message .lede { font-size: var(--t-lg); max-width: 30ch; }
+
+/* ── the plate sequence on a narrow screen ──────────────────────────
+   Every plate becomes one column, in its own order, and the margin notes
+   go: a right-hand margin is a property of a sheet wide enough to have
+   one, and at 390 it is four words in a 60px gutter. */
+@media (max-width: 62rem) {
+  .sheet, .sheet-door, .sheet-journey, .sheet-atlas { grid-template-columns: 1fr; }
+  .sheet-door { padding-right: var(--page-gutter); }
+  .sheet-door .sheettext { padding: 0 0 var(--s6); }
+  .sheet-door .opening { min-height: 52vh; }
+  .marginnote { display: none; }
+  .goright { position: static; flex-direction: row; }
+  .goright .gomark { transform: none; }
+  .qrow { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .countrycols { columns: 3; border-left: 0; padding-left: 0;
+                 border-top: 1px solid color-mix(in srgb, var(--limestone) 22%, transparent);
+                 padding-top: var(--s5); }
+  .sheet-atlas .sheettext { grid-template-columns: 1fr; }
+}
+@media (max-width: 44rem) {
+  .qrow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .countrycols { columns: 2; }
+  .figures { gap: var(--s5); }
+}
+/* the row pays its attribution once, under the eight */
+.rowcred { position: static; font-size: var(--t-xs); letter-spacing: .04em;
+           text-transform: none; color: var(--ink-3); max-width: 62ch; margin: 0; }
+.qtile picture { position: relative; display: block; }
+/* One name is longer than any column this plate can give it. A hyphenated
+   break mid-word is what an index does; the alternative is a sixth column
+   nobody can read. */
+.countrycols a { hyphens: auto; }

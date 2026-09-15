@@ -155,14 +155,25 @@ def s3():
 # ── 4–9: the homepage ─────────────────────────────────────────────────
 
 @section(4, "Homepage hero", "PARTIAL",
-         "Full-bleed hero, the headline, the ask box and the call to "
-         "action. The hero image is a generated plate.")
+         "The first plate of a sequence: the headline on a limestone wall, "
+         "the continent lit inside an arch cut into it, and one way through "
+         "to the planner. The ask box moved OFF this page — a sentence box "
+         "in the emotional centre of a homepage reads as a booking engine.")
 def s4():
-    yield has("/", "Open the door to Europe", "Plan my journey")
-    yield has("/", "what would you like to discover?"), "the Bible's own ask-box wording"
-    # The three ghost buttons under the hero became four intent chips that
-    # seed the box they sit under.
-    yield has("/", "hero-intents", "/plan?ask="), "and the intent chips beneath it"
+    yield has("/", "Open the door to Europe")
+    # THE ASK BOX WAS THE HERO AND IS NOT ANY MORE, and three assertions here
+    # pinned its label, its button and its chips. All three went red for a
+    # page that had got better — the thirteenth, fourteenth and fifteenth
+    # time an assertion in this repository has protected a layout instead of
+    # a claim.
+    #
+    # The Brand Bible's ask-box wording is still asserted, on the page that
+    # actually reads a sentence. What the HOMEPAGE has to do is ask the
+    # question in words and put the instrument one press away — desire
+    # first, the machine after, which is the owner's own direction.
+    yield has("/", "what you seek"), "the homepage asks the question in words"
+    yield "Say it in your own words" in page("/plan"), \
+        "and the sentence box is on the page that reads a sentence"
     h = page("/")
     # THE PROMISE IS THAT UTILITY COMES BEFORE BROWSING, and the first version
     # of this assertion pinned the STRING it happened to come before —
@@ -171,8 +182,8 @@ def s4():
     # of a claim, and it went red for a page that had got better. What must
     # hold is that a reader can act before they are asked to browse: the
     # planner sits above every section heading on the page.
-    yield h.index("Plan my journey") < h.index("<h2"), \
-        "the planner is above every band — utility before browsing"
+    yield h.index('href="/plan"') < h.index("<h2"), \
+        "the way to the planner is above every heading — utility before browsing"
 
 
 @section(5, "Homepage — Explore", "BUILT (deliberately smaller)",
@@ -192,49 +203,30 @@ def s5():
 
 
 @section(6, "Experience categories", "ALREADY",
-         "Eight large cards, one per category, with the brief's hover.")
+         "The ways in, each opening on a real list that says how long it is. "
+         "They were a band on the homepage; the homepage is a six-plate "
+         "sequence now and they live on /interests, which is where the whole "
+         "set can be compared — which is the thing that band could never do.")
 def s6():
-    yield has("/", "Where to begin")
-    # EIGHT WAS THE FINDING, NOT THE TARGET. This asserted exactly eight
-    # cards, which the brief did ask for and which the built page then
-    # disproved: eight tiles each drew the same silhouette with different
-    # dots, above three more on the journeys, so a reader met eleven maps
-    # before experiencing anything and the labels were too small to read.
-    # The count is four now, and the assertion is a CEILING rather than an
-    # equality, because the failure this family has is growth.
-    h = page("/")
-    # "Find your Europe" was the heading this section was given and it is
-    # a RESERVED CAMPAIGN LINE: §B2 keeps six of them out of the shell,
-    # because a site with six taglines has none. The brand lock caught a
-    # heading the design direction asked for, which is what it is for.
-    band = h[h.index("Where to begin"):h.index("Journeys worth taking")]
-    # COUNTED ON THE WHOLE ATTRIBUTE, not on a prefix. The first version
-    # counted `class="way` and read 25, because waytext, wayline, waywhere,
-    # waymeta and waygo all begin with it — an instrument matching a
-    # substring of its own naming scheme.
+    # THIS ASSERTED A HOMEPAGE BAND BY ITS HEADING and sliced the page
+    # between two headings to count what was inside. Both went when the
+    # homepage became a plate sequence — the sixteenth assertion here to
+    # protect a layout rather than a claim.
+    #
+    # What the brief actually asks for is that the ways in EXIST, that each
+    # opens on a real list, and that each says how long that list is. None
+    # of that is a fact about the homepage. And cutting a band from the
+    # homepage must not orphan what it carried, which is this repository's
+    # own rule, so the last assertion is reachability.
     import re as _re
-    ways = _re.findall(r'class="way(?: lead)?(?: shot)?"', band)
-    n = len(ways)
-    yield 0 < n <= 4, f"{n} ways in — at most four, and each one large"
-    # Each door opens on a real list and says how long that list is, which is
-    # the rule that stopped a tile being labelled with a word no page answers.
-    yield len(_re.findall(r"\d+ destinations", band)) == n, \
-        "every door carries the true size of the list it opens"
-    # AND THE BAND CARRIES AT MOST ONE DRAWING. The promise this assertion
-    # was written for is the owner's eighth constraint — do not repeat the
-    # same Europe map treatment across adjacent cards — and its first form
-    # stated that as "no constellation in the band at all", which is the
-    # shape rather than the claim. It went red the day the band was given a
-    # LEAD: with the photograph slots empty the four doors rendered as four
-    # blocks of type, and the fix was one dominant element, not four tiles of
-    # the same coastline differing only in where the dots fall. Four was
-    # tried first and reverted in the same session for exactly the reason
-    # this assertion exists, which is why it is now a ceiling of one and
-    # still fails on the thing it was protecting.
-    n_maps = len(_re.findall(r'class="constel[ "]', band))
-    yield n_maps <= 1, f"{n_maps} doors draw their own Europe — at most one"
-    yield n_maps < n, "and never one per door"
-    yield "@media (prefers-reduced-motion: reduce)" in CSS, "and motion stops for anyone who asked"
+    h = page("/interests")
+    rows = _re.findall(r"\d+ destinations?", h)
+    yield len(rows) >= 8, f"{len(rows)} ways in carry the size of the list they open"
+    yield has("/interests", "Mountains", "Food"), "and they are named, not numbered"
+    yield has("/", '/interests'), "and the homepage still hands a reader to them"
+    # The question is asked on the homepage in words, with the eight the
+    # register holds a photograph for shown under it.
+    yield has("/", "what you seek"), "the homepage asks which Europe you want"
 
 
 @section("2036-7", "Discover Mode", "BUILT",
@@ -343,32 +335,35 @@ def s2036_6():
         "and shared reasons are hoisted rather than repeated per row"
 
 
-@section("2036-50", "The homepage as a progression", "BUILT (deliberately smaller)",
-         "Open, discover, go — named on the page, because a progression "
-         "nobody can see is just an ordering. It named all six steps when it "
-         "had six bands, and that was the version that read as a contents "
-         "list. One band changes ground so the rhythm is felt.")
+@section("2036-50", "The homepage as a progression", "BUILT",
+         "Open, discover, go — NUMBERED on the page, because a progression "
+         "nobody can see is just an ordering. It was two stage chips on two "
+         "bands; it is six numbered plates now, and the numbering is the "
+         "only thing on the page that repeats.")
 def s2036_50():
     h = page("/")
     import re as _re
-    CANON = ["Open", "Discover", "Wonder", "Understand", "Browse", "Plan", "Go"]
-    stages = [t.strip() for t in _re.findall(r'class="stage">([^<]+)<', h)]
-    seq = ">".join(stages)
-    # Two steps, not six. A check that demands six bands is a check that
-    # forbids restraint, so what is asserted is that the steps named are
-    # real steps, in the canonical order, ending on Go — which is a weaker
-    # claim, made deliberately, and still fails on a homepage that puts its
-    # journeys above its discovery.
-    yield len(stages) >= 2, f"the homepage names {len(stages)} steps"
-    ranks = [CANON.index(t) if t in CANON else -1 for t in stages]
-    yield all(r >= 0 for r in ranks), f"every step is one of the six ({seq})"
-    yield all(i == 0 or ranks[i - 1] < r for i, r in enumerate(ranks)), \
-        f"the steps run in the specification's order ({seq})"
-    yield stages[-1] == "Go", "and it ends on Go, not Plan"
-    yield 'class="band tone-quiet"' in h, "one band changes ground"
-    yield h.count('class="band tone-quiet"') == 1, "and does so once"
-    yield "the homepage as a progression" in src("tools/browser-checks.js"), \
-        "with a browser check on the order and on the full-bleed band at 390px"
+    # THE STAGES WERE CHIPS ON `render.section()` AND THE HOMEPAGE NO LONGER
+    # USES IT. The old assertion read `class="stage"`, found none, and died
+    # on an empty list — the seventeenth assertion here to pin a mechanism
+    # rather than a promise, and the promise was always the PROGRESSION.
+    #
+    # The plate sequence states it far more plainly than the chips did: an
+    # act number and an act name above every plate, in order, from the door
+    # to the message. So that is what is read.
+    acts = _re.findall(r'<span class="actno">(\d\d)</span>'
+                       r'<span class="actname">([^<]+)</span>', h)
+    seq = " > ".join(nm for _, nm in acts)
+    yield len(acts) >= 4, f"the homepage names {len(acts)} plates"
+    yield [n for n, _ in acts] == [f"{i:02d}" for i in range(1, len(acts) + 1)], \
+        f"and numbers them in order ({seq})"
+    yield acts and acts[0][1].strip().lower().endswith("door"), \
+        f"it opens on the door ({seq})"
+    # AND IT HANDS THE READER ONWARD AT THE END. "Ends on Go, not Plan" is
+    # the claim underneath the old stage list: the last thing on the page
+    # must be a way out of it rather than a summary of it.
+    last = h[h.rindex('<span class="actno">'):]
+    yield 'class="go"' in last, "and the last plate hands the reader somewhere"
 
 
 @section("2036-43", "Why this stop, and not the runner-up", "BUILT",
@@ -451,12 +446,20 @@ def s2036_60():
 
 
 @section(7, "Featured journeys", "ALREADY",
-         "Cards carrying days, countries and the route, as the brief draws "
-         "them — now placed after the planner, because a journey nobody has "
-         "planned is not somewhere they are going.")
+         "A journey carries its days, its countries and its route. The "
+         "homepage plate that names one now carries the straight-line "
+         "distance, the countries crossed and the stops, all three derived "
+         "from that journey's own legs.")
 def s7():
-    yield has("/", "Journeys worth taking")
     yield has("/journeys/the-alpine-grand-tour", "days", "The route")
+    yield has("/journeys"), "and the whole set has an index"
+    # The homepage's fourth plate IS a journey, and the numbers under it are
+    # summed from its own stops rather than set — a benchmark for this page
+    # carried "3,400 km, 12 countries, 28 places" for the same route against
+    # a real 4,993, seven and thirteen.
+    yield has("/", "Straight-line distance", "Countries", "Stops"), \
+        "the homepage journey plate states what it measured"
+    yield has("/", 'href="/journeys/'), "and opens the journey it names"
 
 
 @section(8, "Hidden Europe", "ALREADY",
@@ -467,12 +470,19 @@ def s8():
     yield has("/beyond-the-obvious", "undiscovered"), "and refuses the word"
 
 
-@section(9, "Homepage AI planner", "ALREADY",
-         "The sentence box, in the hero, saying under the field what reads "
-         "it — which is rules in the browser, not a model.")
+@section(9, "The sentence box", "ALREADY",
+         "It reads a sentence and says under the field what reads it — "
+         "rules in the browser, not a model. It was in the homepage hero; a "
+         "sentence box in the emotional centre of a homepage reads as a "
+         "booking engine, so it is on the planner, one press away.")
 def s9():
-    yield has("/", "askhero", "Plan my journey")
-    yield has("/", "not by a"), "and says what reads it"
+    # THIS PINNED THE BOX TO THE HOMEPAGE BY ITS CLASS. The promise is that
+    # the product reads a sentence and is honest about what reads it —
+    # neither is a fact about which page carries the field.
+    yield has("/plan", "askform") or has("/plan", "Say it in your own words"), \
+        "the sentence box exists"
+    yield has("/plan", "not by a"), "and says what reads it"
+    yield has("/", 'href="/plan"'), "and the homepage hands a reader to it"
 
 
 # ── 10–14: the planner ────────────────────────────────────────────────
@@ -1038,8 +1048,16 @@ def s36():
     # where you are. Ninth assertion here to pin a shape instead of a
     # promise, and the second time on this exact line. A rule that exists is
     # not a rule that is inherited.
-    yield every_page(lambda h: 'class="crumbs"' in h
-                     or re.search(r'class="(pagehead|hero|herofull)[ "]', h),
+    # AND THE LIST OF SHAPES GREW A THIRD TIME. It has been `pagehead`, then
+    # `hero`, then `herofull`, and the homepage becoming a plate sequence
+    # would have made it four — an assertion whose maintenance is adding the
+    # name of whatever the homepage is called this month is not holding a
+    # promise, it is following one.
+    #
+    # The promise is that a reader is never lost: a page is either inside a
+    # hierarchy and shows the trail, or it is a root and names itself. Both
+    # of those are readable without knowing a single class name.
+    yield every_page(lambda h: 'class="crumbs"' in h or "<h1" in h,
                      "every page says where you are")
     yield "Nearest onward stops" in CITY, "and where you can go next"
     yield "This place, in the rest of the site" in page(

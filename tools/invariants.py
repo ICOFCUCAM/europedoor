@@ -188,6 +188,21 @@ def measure():
                        "and a hole in default-src 'none'. 2036 does not require "
                        "a new typeface."},
             "css.font_sizes": {
+                # AND 18 IS FOR THE COUNT ON THE ATLAS PLATE. The homepage
+                # is a plate sequence now, and its fifth plate makes the
+                # number of countries the single largest typographic event
+                # on the site: `50` set at clamp(5rem, 11vw, 11rem) beside
+                # `European countries.` at a third of it. That contrast IS
+                # the plate — a tracked 11px label against a 176px numeral
+                # is the editorial rhythm the design direction asked for,
+                # and it is the one value on this page that no existing step
+                # reaches: --t-6xl is 4.75rem, less than half of it.
+                #
+                # Every other new declaration on that page was made to reuse
+                # a clamp that already existed rather than invent one, which
+                # is why this moved by one rather than by six: the first
+                # version of the sequence declared six bespoke clamps and
+                # the register was right to refuse them.
                 # A COMPENSATION CONSTANT FOR A COORDINATE SYSTEM IS NOT A
                 # TYPE SIZE, and the stylesheet has said so since the map
                 # labels were fixed: `calc(11px / var(--z))` draws an 11px

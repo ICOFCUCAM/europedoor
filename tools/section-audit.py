@@ -234,8 +234,24 @@ def s5():
          "promise that does not, and it says so under the field.")
 def s6():
     yield has("/", "Open the door to Europe")
-    yield has("/", "what would you like to discover?", "Plan my journey"), \
-        "the question is asked on the homepage, not one click away"
+    # AND THE QUESTION IS A QUESTION, NOT A FORM FIELD. This asserted the
+    # label and the button of a search box that sat on the homepage — the
+    # twelfth assertion in this repository to pin a shape rather than a
+    # promise, and it went red the day the page got better. A sentence box
+    # in the emotional centre of the page reads as a booking engine, which
+    # is the one thing the brief says this product must never feel like, so
+    # the question moved to being a question — "Europe changes with what you
+    # seek", the eight ways in under it — and the instrument itself is one
+    # press away, where a reader who has decided goes.
+    #
+    # What has to be true is the PATH: the homepage asks the question, and a
+    # reader can reach the planner from it without scrolling past the first
+    # plate.
+    h = page("/")
+    yield has("/", "what you seek"), "the homepage asks the question"
+    yield has("/", 'href="/plan"'), "and the planner is one press from it"
+    yield h.index('href="/plan"') < h.index("<h2"), \
+        "the way to the planner is above every heading on the page"
     # The hero used to carry "read by rules in your browser — not by a model,
     # and not sent anywhere". It moved OFF the homepage with the cinematic
     # rebuild, and that is right: the promise belongs on the page that
@@ -253,10 +269,6 @@ def s6():
     # conversion comes before anything that invites browsing. So the claim is
     # that the planner is above every section heading on the page, which is
     # the same promise and survives the headings changing.
-    h = page("/")
-    yield h.index("Plan my journey") < h.index("<h2"), \
-        "the CTA hierarchy is the wrong way round"
-    yield has("/", "/plan?ask="), "the intent chips seed the planner, not a dead end"
     yield "Say it in your own words" in page("/plan"), "the planner takes the same sentence"
 
 
@@ -274,9 +286,25 @@ def s7():
     # what IS there and — more usefully — asserts that the removed surfaces
     # did not become unreachable, which is the only way cutting a homepage
     # section can actually cost anything.
-    yield has("/", "Where to begin", "Journeys worth taking")
-    yield h.index("Where to begin") < h.index("Journeys worth taking"), \
-        "ways in before journeys"
+    # AND IT IS A SEQUENCE NOW, NOT A SET OF BANDS. Both halves of this
+    # assertion named the headings of two sections that no longer exist —
+    # the eleventh and twelfth time an assertion here has protected a layout
+    # instead of a claim, and both went red for a page that had got better.
+    #
+    # The page is six numbered PLATES: the door, the question, the
+    # landscape, the journey, the atlas, the message. What has to be true is
+    # that the sequence is a sequence — every plate numbered, in order, each
+    # with a name — because that numbering is the only thing that repeats
+    # and it is what makes six bands read as one page rather than six
+    # sections.
+    acts = re.findall(r'<span class="actno">(\d\d)</span>'
+                      r'<span class="actname">([^<]+)</span>', h)
+    yield [n for n, _ in acts] == [f"{i:02d}" for i in range(1, len(acts) + 1)], \
+        f"the plates are numbered {[n for n, _ in acts]} — a sequence is in order"
+    yield 4 <= len(acts) <= 8, \
+        f"{len(acts)} plates. Under four is not a sequence and over eight is the " \
+        f"contents list this page was rebuilt to stop being"
+    yield all(nm.strip() for _, nm in acts), "every plate is named"
     # FOUR BANDS, AND THE CEILING MOVED ON PURPOSE. It was two — a floor and
     # a ceiling, written when this page had been cut from eight, because
     # restraint erodes one defensible section at a time.
@@ -289,8 +317,11 @@ def s7():
     # type-led doors, three journey rows carrying a route, a story lead, and
     # a closing statement — and the ceiling is what stops a fifth arriving
     # without the same argument being made again.
-    n = h.count("<h2>")
-    yield n == 4, f"{n} bands under the hero (ways in, journeys, stories, the statement)"
+    # The ceiling stays, on the same reasoning and against the new shape: a
+    # plate carries one statement, so one h2 per plate after the first.
+    n = h.count("<h2 ") + h.count("<h2>")
+    yield n <= 7, f"{n} statements on the page — restraint erodes one defensible " \
+                  f"plate at a time"
     # AND NO TWO ADJACENT BANDS DRAW THE SAME PICTURE. That is the finding
     # the ceiling used to stand in for: eight tiles and three journey cards
     # each carrying the same beige silhouette with different blue dots, so a

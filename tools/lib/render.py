@@ -752,7 +752,7 @@ def photo(images, key, *, w, h, alt="", eager=False, sizes="100vw"):
 
 
 def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed=None,
-            fallback_motif=None):
+            fallback_motif=None, credit=True):
     """A photograph for `key` if we hold one, otherwise a generated plate.
 
     Callers never branch on whether an image exists — they ask for one and
@@ -796,9 +796,21 @@ def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed
     parts = urlsplit(row["licence_url"])
     provider_url = f"{parts.scheme}://{parts.netloc}"
     link = ' rel="noopener" target="_blank"'
-    credit = (f'Photo by <a href="{esc(row["source"])}"{link}>'
-              f'{esc(row["photographer"])}</a> on '
-              f'<a href="{esc(provider_url)}"{link}>{esc(row["licence"])}</a>')
+    # A CREDIT IS A LINK, SO A PICTURE CARRYING ONE CANNOT GO INSIDE A LINK.
+    # An `<a>` may not contain an `<a>`: the parser closes the outer one at
+    # the inner, so a thumbnail wrapped in a link came apart into three
+    # siblings and a row of eight rendered as four pairs. It was latent on
+    # the four homepage doors for the life of that band as well — they wrap
+    # `picture()` in an `<a>` too, and with the register empty it returns a
+    # plate with no credit, so nothing ever exercised it. A code path nothing
+    # exercises is a code path nothing checks.
+    #
+    # `credit=False` is for a caller that places the attribution itself.
+    # It does not make the credit optional: Pexels' terms require it, and a
+    # caller that turns it off here owes one somewhere a reader can see.
+    credit_html = (f'Photo by <a href="{esc(row["source"])}"{link}>'
+                   f'{esc(row["photographer"])}</a> on '
+                   f'<a href="{esc(provider_url)}"{link}>{esc(row["licence"])}</a>')
     return (
         f"<picture>"
         f'<source type="image/avif" srcset="{esc(srcset("avif"))}" sizes="{esc(sizes)}">'
@@ -808,8 +820,8 @@ def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed
         f'loading="{"eager" if eager else "lazy"}" '
         f'fetchpriority="{"high" if eager else "auto"}" decoding="async" '
         f'class="photo {focal_class(fx, fy)}">'
-        f'<figcaption class="credit">{credit}</figcaption>'
-        f"</picture>"
+        + (f'<figcaption class="credit">{credit_html}</figcaption>' if credit else "")
+        + "</picture>"
     )
 
 
