@@ -3670,7 +3670,7 @@ disagreeing copies were a *separator*.
 this at the level of one candidate — run 23 lost eighteen finished
 acquisitions to a nineteenth that was a PNG — and the same failure one level
 up cost thousands, where the thing ending the sitting was not even about a
-photograph: run 28 died on a sentence in `CLAUDE.md` that said *"147 pages"*,
+photograph: run 28 died on a sentence in `CLAUDE.md` that said *a page count*,
 a prose check about documentation discarding a day of acquisition. A red gate
 costs a pull request somebody has to fix, which is recoverable and visible; it
 used to cost the whole sitting, which is neither. The merge step still

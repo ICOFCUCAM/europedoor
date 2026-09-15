@@ -155,7 +155,15 @@ def main(argv):
             break
         looked += 1
         covered.add(p.get("slot") or p["purpose"])
-        spec = {k: v for k, v in p.items()}
+        # A TEMPLATED PURPOSE CARRIES NO REQUIREMENTS OF ITS OWN — they
+        # belong to the SLOT, stated once. `desk/registry.json` says so in
+        # those words: 590 copies of one brief is half a megabyte saying one
+        # thing and 590 places for it to differ. So a purpose's spec is its
+        # slot's, with anything the purpose declares itself on top — which is
+        # how the twelve standalone purposes (the homepage hero, the four
+        # doors) carry theirs inline and the 825 instances do not.
+        spec = dict(reg["slots"].get(p.get("slot") or "", {}))
+        spec.update({k: v for k, v in p.items() if v is not None})
         try:
             payload, cached = discover.cached_search(
                 args.provider, query_of(p, spec),

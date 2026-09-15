@@ -1037,22 +1037,39 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 @media (max-width: 44rem) { :root { --mast: 5.75rem; } }
 [id] { scroll-margin-top: calc(var(--mast) + var(--s4)); }
 
+/* THE MASTHEAD STOPPED BEING THE LOUDEST THING ON EVERY PAGE.
+ *
+ * A solid pine band across the top of 1,034 documents was the single
+ * largest reason a contact sheet of twelve families read as twelve copies
+ * of one page: whatever else changed underneath, the first 63 pixels were
+ * identical and they were the most saturated thing in frame. The band was
+ * borrowed from a booking site's navy and the measurement that justified it
+ * was about the COLOUR — ours is the brighter blue — and never about the
+ * COVERAGE, which is what actually differed.
+ *
+ * It sits in the editorial surface now: the page's own paper, a hairline
+ * under it, ink type, and pine spent on the mark and the current section
+ * rather than on a field. The identity is carried by the two things a
+ * reader looks at rather than by the background behind them.
+ *
+ * ON A PAGE THAT OPENS ON A PICTURE IT INVERTS, and that is not a second
+ * masthead: `body[data-hero]` already existed for the homepage, and the
+ * arrival band and the journey hero are the same situation — type over a
+ * dark composition, where paper-on-paper would be a bar floating on an
+ * image. One rule, keyed on what is underneath.
+ */
 .masthead { position: sticky; top: 0; z-index: 40;
-            --ink:       var(--bone);
-            --ink-2:     color-mix(in srgb, var(--bone) 85%, var(--pine-deep));
-            --ink-3:     color-mix(in srgb, var(--bone) 70%, var(--pine-deep));
-            --signature: color-mix(in srgb, var(--bone) 70%, var(--pine-deep));
-            --door:      var(--bone);
-            --rule:      color-mix(in srgb, var(--bone) 34%, transparent);
-            background: color-mix(in srgb, var(--pine-deep) 96%, transparent);
+            --rule:      color-mix(in srgb, var(--ink) 16%, transparent);
+            background: color-mix(in srgb, var(--paper) 92%, transparent);
+            color: var(--ink);
             /* AND THE COLOUR ITSELF, WHICH THE FIRST TOKEN VERSION FORGOT.
              * Redefining --ink is not enough: the wordmark sets no colour of
              * its own and inherited graphite from <body>, so it measured
              * 2.75:1 on the cobalt band — present, legible-looking in a
              * thumbnail, and below AA. The two-worlds block one screen up
              * has always set `color: var(--ink)` for exactly this reason;
-             * this is a third world and needed the same line. */
-            color: var(--ink);
+             * this is a third world and needed the same line. It is stated
+             * once, above, now that the band is the page's own paper. */
             backdrop-filter: saturate(1.4) blur(10px);
             border-bottom: 1px solid var(--rule); }
 .masthead-in { max-width: var(--page); margin: 0 auto; padding: var(--s3) var(--s5); display: flex; align-items: center; gap: var(--s6); justify-content: space-between; }
@@ -8032,4 +8049,151 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
   font-family: var(--ed-mono); font-size: var(--t-xs); letter-spacing: .1em;
   text-transform: uppercase; margin: var(--s6) 0 0;
   color: color-mix(in srgb, var(--ed-bone) 82%, transparent);
+}
+
+/* ── THE MASTHEAD OVER A PICTURE ─────────────────────────────────────────
+   Three families open on a dark composition that reaches the top of the
+   document: the homepage hero, the destination's arrival band and the
+   journey's cobalt hero. On those the paper band would be a pale bar
+   floating over an image, so it inverts — transparent, bone type, the mark
+   in bone. It is the same masthead with the ground removed, not a second
+   one; `render.page()` emits one header and always has. */
+body[data-hero] .masthead,
+body[data-family="arrival"] .masthead,
+body[data-family="journey"] .masthead {
+  background: linear-gradient(to bottom,
+              color-mix(in srgb, var(--graphite) 52%, transparent),
+              transparent);
+  border-bottom-color: transparent;
+  color: var(--bone);
+  --ink:       var(--bone);
+  --ink-2:     color-mix(in srgb, var(--bone) 86%, transparent);
+  --ink-3:     color-mix(in srgb, var(--bone) 72%, transparent);
+  --door:      var(--bone);
+  --rule:      color-mix(in srgb, var(--bone) 30%, transparent);
+  backdrop-filter: none;
+}
+/* AND THE PINE IS SPENT ON THE MARK AND THE CURRENT SECTION, which is where
+   an identity belongs: the two things a reader actually looks at in a
+   navigation, rather than the field behind all seven. */
+.masthead .wordmark { color: var(--pine); }
+.masthead .nav a[aria-current="page"] { color: var(--pine); border-bottom-color: var(--pine); }
+body[data-hero] .masthead .wordmark,
+body[data-family="arrival"] .masthead .wordmark,
+body[data-family="journey"] .masthead .wordmark { color: var(--bone); }
+
+/* =========================================================
+   PHOTOGRAPHY AS A CONTENT LAYER
+   =========================================================
+
+   THE DIRECTIVE'S OWN WORDS: photography must become one of the PRIMARY
+   CONTENT LAYERS, and a page that is text plus whitespace plus a small map
+   plus rows is not an appropriate visual language for a travel platform.
+   That is a fair description of what this site currently is, and the reason
+   is a licence position rather than a taste: 826 of 837 declared surfaces
+   hold no photograph, so every composition was designed around their
+   absence and then looked like it.
+
+   SEVEN SCALES, AND THE POINT IS THAT THEY DIFFER. The failure this
+   replaces is not "too few images", it is "every image the same size in the
+   same box": a 16/9 card thumbnail, four across. A hero is immersive, a
+   feature dominates its own band, an editorial image sits beside prose, a
+   strip is a sequence, a detail supports, and a full bleed is a change of
+   movement.
+
+   EVERY ONE OF THEM GOES THROUGH `picture()`, which is the only function
+   that knows whether the register holds a photograph for a key — so each
+   draws the interim illustration until the library fills, and none of them
+   is a second way into the image system with the licence gate missing. */
+
+/* 1 · FULL BLEED — the transition. It leaves the column entirely. */
+.ed-bleed {
+  margin-inline: calc(50% - 50vw); width: 100vw;
+  position: relative; overflow: hidden; background: var(--mineral);
+}
+.ed-bleed :is(img, picture) { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ed-bleed-tall { aspect-ratio: 21 / 9; }
+.ed-bleed-deep { aspect-ratio: 16 / 9; }
+/* The caption under a bleed returns to the column: a credit belongs at
+   reading width even when the picture does not. */
+.ed-bleed + .ed-caption,
+.ed-bleed figcaption {
+  width: min(var(--ed-max), calc(100% - 2 * var(--ed-gutter)));
+  margin: var(--s4) auto 0; font-size: var(--t-xs); color: var(--ink-3);
+  font-family: var(--ed-mono); letter-spacing: .06em; text-transform: uppercase;
+}
+
+/* 2 · FEATURE — a dominant picture with its own words beside it, and the
+   asymmetry is the composition rather than a 50/50 split. */
+.ed-feature {
+  display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, .65fr);
+  gap: var(--ed-gap); align-items: end;
+}
+.ed-feature.right { grid-template-columns: minmax(0, .65fr) minmax(0, 1.35fr); }
+.ed-feature.right .ed-feature-media { order: 2; }
+.ed-feature-media { aspect-ratio: 4 / 3; overflow: hidden; background: var(--mineral); }
+.ed-feature-media :is(img, picture, svg) { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ed-feature-say h3, .ed-feature-say h2 {
+  font-family: var(--ed-serif); font-weight: 400;
+  font-size: var(--ed-display-2); line-height: .96; margin: 0 0 var(--s4);
+  letter-spacing: -.03em;
+}
+.ed-feature-say p { font-size: var(--t-md); line-height: 1.55; color: var(--ink-2); }
+
+/* 3 · THE STRIP — a sequence, not a grid. It scrolls on a phone because a
+   sequence is read along rather than wrapped. */
+.ed-strip {
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(15rem, 1fr);
+  gap: var(--s4); overflow-x: auto; scroll-snap-type: x proximity;
+  padding-bottom: var(--s3);
+}
+.ed-strip > * { scroll-snap-align: start; }
+.ed-strip figure { margin: 0; }
+.ed-strip .ed-shot { aspect-ratio: 3 / 4; }
+.ed-strip .ed-shot :is(img, picture, svg) { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ed-shot { overflow: hidden; background: var(--mineral); }
+.ed-strip figcaption {
+  margin-top: var(--s3); font-family: var(--ed-mono); font-size: var(--t-xs);
+  letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
+}
+
+/* 4 · THE MOSAIC — one dominant picture and two beside it, which is the
+   asymmetric composition the directive draws. Never four equal tiles. */
+.ed-mosaic-3 {
+  display: grid; gap: var(--s4);
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+.ed-mosaic-3 > :first-child { grid-row: span 2; }
+.ed-mosaic-3 .ed-shot { height: 100%; min-height: 11rem; }
+.ed-mosaic-3 .ed-shot :is(img, picture, svg) { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* 5 · THE TYPOGRAPHIC STATEMENT OVER A PICTURE — the directive's third
+   diagram. A scrim makes the ratio a property of the design rather than of
+   the photograph, which is the rule the homepage hero already carries:
+   72% black composites to rgb(71,71,71) and bone on that is 9.2:1 whatever
+   the picture does. */
+.ed-declare { position: relative; display: grid; place-items: center;
+              min-height: min(62vh, 40rem); overflow: hidden; }
+.ed-declare :is(img, picture) { position: absolute; inset: 0; width: 100%; height: 100%;
+                                object-fit: cover; }
+.ed-declare::after {
+  content: ""; position: absolute; inset: 0;
+  background: color-mix(in srgb, var(--graphite) 72%, transparent);
+}
+.ed-declare-say {
+  position: relative; z-index: 1; color: var(--bone); text-align: center;
+  padding: var(--ed-gutter); max-width: 34ch;
+}
+.ed-declare-say p {
+  font-family: var(--ed-serif); font-weight: 400;
+  font-size: var(--ed-display-2); line-height: 1.12; margin: 0; color: var(--bone);
+}
+
+@media (max-width: 52rem) {
+  .ed-feature, .ed-feature.right { grid-template-columns: 1fr; }
+  .ed-feature.right .ed-feature-media { order: initial; }
+  .ed-mosaic-3 { grid-template-columns: 1fr; grid-template-rows: none; }
+  .ed-mosaic-3 > :first-child { grid-row: auto; }
+  .ed-bleed-tall { aspect-ratio: 4 / 3; }
 }

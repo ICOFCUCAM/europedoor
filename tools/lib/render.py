@@ -1737,3 +1737,108 @@ def ed_rows(rows, *, numbered=True):
             '<span class="ed-row-arrow" aria-hidden="true">&#8594;</span>'
             "</a>")
     return '<div class="ed-rows">' + "".join(out) + "</div>"
+
+
+# ============================================================
+# PHOTOGRAPHY AS A CONTENT LAYER — SEVEN SCALES
+#
+# The failure these replace is not "too few photographs", it is every
+# photograph the same size in the same box. Each of these is a different
+# editorial job, and every one of them routes through `picture()`, which is
+# the one function that knows whether the register holds a photograph for a
+# key — so each draws the interim illustration until the library fills and
+# none is a second way into the image system with the licence gate missing.
+# ============================================================
+
+def ed_bleed(images, key, *, alt, seed=None, motif=None, caption="",
+             shape="tall", eager=False):
+    """A picture that leaves the column. Used for a change of movement.
+
+    It is the one image scale that is not inside the measure, which is what
+    makes it read as a transition rather than as another illustration: the
+    page stops, the continent or the city is the whole width, and the page
+    resumes. `margin-inline: calc(50% - 50vw)` rather than a second wrapper,
+    because a full-bleed element that needs its parent to cooperate is an
+    element every caller can get wrong.
+    """
+    cls = {"tall": "ed-bleed-tall", "deep": "ed-bleed-deep"}.get(shape, "ed-bleed-tall")
+    inner = picture(images, key, w=2400, h=1030, alt=alt, eager=eager,
+                    sizes="100vw", fallback_seed=seed or key,
+                    fallback_motif=motif)
+    cap = f'<figcaption class="ed-caption">{esc(caption)}</figcaption>' if caption else ""
+    return f'<figure class="ed-bleed {cls}">{inner}</figure>{cap}'
+
+
+def ed_feature(images, key, *, title, body, alt, seed=None, motif=None,
+               right=False, level=3, eager=False):
+    """A dominant picture with its own words beside it.
+
+    ASYMMETRIC ON PURPOSE — 1.35 against .65, not a half-and-half split. Two
+    equal columns read as a layout; an unequal pair reads as a picture that
+    has something to say about it. `right` alternates the side down a page,
+    which is what stops three features in a row becoming a pattern.
+    """
+    inner = picture(images, key, w=1600, h=1200, alt=alt, eager=eager,
+                    sizes="(max-width: 52rem) 100vw, 55vw",
+                    fallback_seed=seed or key, fallback_motif=motif)
+    h = f"h{level}"
+    return (
+        f'<div class="ed-feature{" right" if right else ""}">'
+        f'<figure class="ed-feature-media">{inner}</figure>'
+        f'<div class="ed-feature-say"><{h}>{esc(title)}</{h}>{body}</div>'
+        "</div>")
+
+
+def ed_strip(images, items, *, limit=8):
+    """A horizontal sequence: a visual journey rather than a grid.
+
+    `items` are dicts of key, alt, label and optionally href. It SCROLLS
+    rather than wrapping, because a sequence is read along — wrapping it
+    into rows turns an order into a grid, which is the thing this whole
+    system is replacing.
+    """
+    out = []
+    for it in items[:limit]:
+        inner = picture(images, it["key"], w=900, h=1200, alt=it.get("alt", ""),
+                        sizes="(max-width: 52rem) 60vw, 18rem",
+                        fallback_seed=it.get("seed") or it["key"],
+                        fallback_motif=it.get("motif"))
+        label = esc(it.get("label", ""))
+        if it.get("href"):
+            label = f'<a href="{esc(it["href"])}">{label}</a>'
+        out.append(f'<figure><div class="ed-shot">{inner}</div>'
+                   f'<figcaption>{label}</figcaption></figure>')
+    return f'<div class="ed-strip">{"".join(out)}</div>' if out else ""
+
+
+def ed_mosaic(images, items, *, limit=3):
+    """One dominant picture and two beside it. Never four equal tiles."""
+    out = []
+    for i, it in enumerate(items[:limit]):
+        big = i == 0
+        inner = picture(images, it["key"], w=1400 if big else 800,
+                        h=1400 if big else 800, alt=it.get("alt", ""),
+                        sizes="(max-width: 52rem) 100vw, "
+                              + ("40vw" if big else "28vw"),
+                        fallback_seed=it.get("seed") or it["key"],
+                        fallback_motif=it.get("motif"))
+        out.append(f'<div class="ed-shot">{inner}</div>')
+    return f'<div class="ed-mosaic-3">{"".join(out)}</div>' if out else ""
+
+
+def ed_declare(images, key, *, statement, alt, seed=None, motif=None):
+    """A typographic statement over a picture — the directive's own diagram.
+
+    THE SCRIM IS NOT AN EFFECT, it is what makes the contrast a property of
+    the design rather than of the photograph. This site has measured that
+    once already, on the homepage hero: type over a drawing measured 4.36:1
+    on the lit parchment of Iberia, under AA, because a ratio against a
+    TOKEN is not the ratio a reader gets. 72% graphite composites to
+    rgb(71,71,71) and bone on that is 9.2:1 whatever the picture does.
+    """
+    inner = picture(images, key, w=2400, h=1400, alt=alt,
+                    sizes="100vw", fallback_seed=seed or key,
+                    fallback_motif=motif)
+    return (f'<figure class="ed-declare">{inner}'
+            f'<figcaption class="ed-declare-say"><p>{esc(statement)}</p>'
+            f"</figcaption></figure>")
