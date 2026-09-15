@@ -29,39 +29,33 @@ const BASE = process.env.BASE || "http://localhost:8899";
 // the path is a tool people run wrong once and then stop running.
 const OUT = process.argv.slice(2).find((a) => !a.startsWith("--")) || "contact-sheet.png";
 
-// One exemplar per rendered family. Add a row when a family appears; the
-// point of the sheet is that every family is in one field of view.
-// --more shoots the OTHER twelve: the families the first sheet does not
-// include, which is exactly the set nobody had looked at.
-const MORE = [
-  ["macro", "/countries/"],
-  ["place", "/europe/austria/vienna-and-the-east/vienna/place/schonbrunn/"],
-  ["facet", "/europe/austria/vienna-and-the-east/vienna/things-to-do/"],
-  ["interest", "/interests/mountains/"],
-  ["experiences", "/experiences/"],
-  ["category", "/experiences/food/"],
-  ["how it works", "/how-it-works/"],
-  ["fund project", "/fund/"],
-  ["method", "/method/"],
-  ["about", "/about/"],
-  ["manifesto", "/manifesto/"],
-  ["sources", "/sources/"],
-];
+// ONE EXEMPLAR PER RENDERED FAMILY, AND THE LIST IS NOT TYPED HERE.
+//
+// It was, and it disagreed with `opening.js`'s: this file carried
+// `["macro", "/countries/"]` — the countries INDEX under the macro family's
+// name — so no macro page has ever been on a contact sheet, and neither has
+// a story, a theme, /journeys, /interests, /europe-in, /events, /discover,
+// /search, /my-europe or the 404. The comment above that list said "the
+// point of the sheet is that every family is in one field of view" while it
+// covered 23 of 27 and named one of them wrong. A second implementation of a
+// thing is a second chance to make its mistake, and a list is a thing.
+//
+// `--set N` pages through them twelve at a time; `--more` is set 2, which is
+// what it always meant. The sheet prints which set it drew and how many
+// there are, because a sheet that silently stops at twelve is the same
+// failure as a suite that silently stops counting.
+const ALL = require("./lib/families.js").ALL;
+const PER = 12;
+const SETS = Math.ceil(ALL.length / PER);
+const setArg = process.argv.find((a) => a.startsWith("--set="));
+const SET = process.argv.includes("--more") ? 2
+  : setArg ? Number(setArg.slice(6)) : 1;
+if (!(SET >= 1 && SET <= SETS)) {
+  console.error(`contact sheet: --set must be 1..${SETS}`);
+  process.exit(1);
+}
+const FAMILIES = ALL.slice((SET - 1) * PER, SET * PER);
 
-const FAMILIES = process.argv.includes("--more") ? MORE : [
-  ["home", "/"],
-  ["country", "/europe/austria/"],
-  ["region", "/europe/austria/tyrol/"],
-  ["destination", "/europe/austria/tyrol/innsbruck/"],
-  ["journey", "/journeys/the-alpine-grand-tour/"],
-  ["motion", "/europe-in/northern-lights/"],
-  ["month", "/events/oct/"],
-  ["stories", "/stories/"],
-  ["themes", "/themes/"],
-  ["quiet", "/beyond-the-obvious/"],
-  ["map", "/map/"],
-  ["plan", "/plan/"],
-];
 
 // --phone shoots the same twelve at 390px, which is the width most readers
 // have and the one this programme kept measuring and never LOOKING at. The
@@ -135,5 +129,5 @@ figcaption{position:absolute;top:0;left:0;background:#111;color:#fff;
   await page.screenshot({ path: OUT });
   await browser.close();
   fs.rmSync(dir, { recursive: true, force: true });
-  console.log(`${FAMILIES.length} families → ${OUT}`);
+  console.log(`set ${SET} of ${SETS}: ${FAMILIES.map((f) => f[0]).join(", ")} → ${OUT}`);
 })();

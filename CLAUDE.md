@@ -3369,10 +3369,16 @@ message for the same reason.
 
 **And one that is deliberately not a gate.** `node tools/contact-sheet.js`
 puts one page per family in a single image. `--dark` shoots the dark
-colour-scheme preference, `--phone` shoots 390px, and `--more` shoots the
-twelve families the default set leaves out — macro, place, facet, interest,
-experiences, category, how-it-works, fund, method, about, manifesto,
-sources. Each of those three found a defect the whole gate suite was green
+colour-scheme preference, `--phone` shoots 390px, and `--set=N` pages
+through the whole list twelve at a time (`--more` is `--set=2`). **The list
+is `tools/lib/families.js` and both this and `opening.js` read it**, because
+the sheet used to type its own and the two disagreed: it carried
+`["macro", "/countries/"]` — the countries INDEX under the macro family's
+name — so no macro page had ever been on a contact sheet, and neither had a
+story, a theme, `/journeys`, `/interests`, `/europe-in`, `/events`,
+`/discover`, `/search`, `/my-europe` or the 404. Its own comment said "every
+family is in one field of view" while it covered 23 of 27 and named one of
+them wrong. Each of those three found a defect the whole gate suite was green
 on. **It refuses to draw a page that is not 200**: the second sheet
 photographed a 404 as a blank white cell, which is the same failure as a
 suite that stops counting — the output still looks like a result. A sheet cannot fail, and a gate

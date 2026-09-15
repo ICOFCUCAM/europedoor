@@ -33,44 +33,11 @@ const MIME = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript
   '.jpg': 'image/jpeg', '.webp': 'image/webp', '.avif': 'image/avif',
   '.xml': 'application/xml', '.txt': 'text/plain' };
 
-/* ONE PAGE PER FAMILY, and the slugs are read off the built site rather than
- * typed, because a typed slug is a 404 that reports 0% and looks like a
- * finding. The first run of this said `journey`, `macro` and `place` were
- * the three worst surfaces in the product; all three were bad URLs. */
-function pick(dir, fallback) {
-  try { const e = fs.readdirSync(path.join(ROOT, dir)).filter(n => !n.includes('.')).sort();
-        return e.length ? dir + '/' + e[0] : fallback; } catch { return fallback; }
-}
-const VIENNA = 'europe/austria/vienna-and-the-east/vienna';
-const FAMILIES = [
-  ['homepage', '/'],
-  ['countries', '/countries/'],
-  ['macro', '/' + pick('discover', 'discover/nordic')],
-  ['country', '/europe/austria/'],
-  ['region', '/europe/austria/tyrol/'],
-  ['destination', '/' + VIENNA + '/'],
-  ['place', '/' + pick(VIENNA + '/place', VIENNA + '/place/schonbrunn')],
-  ['experiences', '/experiences/'],
-  ['category', '/experiences/food/'],
-  ['journeys', '/journeys/'],
-  ['journey', '/' + pick('journeys', 'journeys/carpathian-arc')],
-  ['stories', '/stories/'],
-  ['story', '/' + pick('stories', 'stories/a-language-with-no-relatives')],
-  ['themes', '/themes/'],
-  ['theme', '/' + pick('themes', 'themes/wine-europe')],
-  ['interests', '/interests/'],
-  ['interest', '/interests/mountains/'],
-  ['europe-in', '/europe-in/'],
-  ['motion', '/' + pick('europe-in', 'europe-in/above-the-arctic-circle')],
-  ['events', '/events/'],
-  ['quiet', '/beyond-the-obvious/'],
-  ['map', '/map/'],
-  ['discover', '/discover/'],
-  ['plan', '/plan/'],
-  ['search', '/search/'],
-  ['my-europe', '/my-europe/'],
-  ['404', '/404.html'],
-];
+/* ONE PAGE PER FAMILY, AND THE LIST LIVES IN ONE PLACE. It used to be typed
+ * here and typed again in `tools/contact-sheet.js`, and the two disagreed:
+ * the sheet carried `["macro", "/countries/"]` and had therefore never
+ * photographed a macro page. See tools/lib/families.js. */
+const { FAMILIES } = require('./lib/families.js');
 
 function serve() {
   return http.createServer((q, r) => {
