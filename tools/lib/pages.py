@@ -11172,80 +11172,92 @@ drawing here cannot show a set the page it links to would not.
 
 
 def discover_page(data):
-    """The specification's first navigation item, and the honest answer to
-    "where do I start". Four ways in — by region, by what you travel for, by
-    a curated route, and by month — plus the map, because most people mean
-    the map when they say discover."""
-    # THE LAST FIFTEEN ABSTRACT PLATES ON THE SITE WERE ON THIS PAGE.
-    #
-    # Nine macro cards and six motion cards each opened on a landscape chosen
-    # by the hash of a slug — the exact thing measured as "placeholder art
-    # doing a picture's job" when it was removed from the homepage, still
-    # here, on the page whose whole subject is how to choose. A reader
-    # scrolling /discover met fifteen purple gradients that agree with
-    # nothing on the page and tell them nothing about what is behind the
-    # link.
-    #
-    # A MACRO REGION IS THE ONE GROUPING IN THIS ATLAS WITH REAL POLYGONS.
-    # A travel region is a set of destinations and is refused a boundary; the
-    # Nordics is five whole countries Natural Earth already holds. So the
-    # card draws its own members, which is the same claim `macromap()` makes
-    # on the region's own page and the same drawing /countries uses — and
-    # nine of them are nine different shapes, where nine plates were nine
-    # pictures of nowhere.
-    macro_cards = [
-        card(urls.macro(m), f"{len(m['countries'])} countries", m["name"], m["blurb"],
-             art=region_glyph(m["countries"], macro_frame(data, m)))
-        for m in data["macros"]
-    ]
+    """Five plates: the instrument, the result, where it is, in motion, by month.
+
+    THE PAGE WAS A TOOL WEARING A CATALOGUE'S CLOTHES. 6,449 pixels, twelve
+    `<h2>` bands, fifteen cards, seventeen outlined chips and two
+    cartographies on one screen — and the thing it exists to be, an
+    instrument that answers a question, was one figure among the twelve.
+
+    The governing correction is that DISCOVER MUST LEAD WITH DISCOVERY,
+    NOT WITH CONTROLS. A visitor should feel an instrument responding to
+    their curiosity rather than a catalogue asking them to filter a
+    database, so the map IS the first plate and the seventeen things you
+    can travel for are set ON it as type, in the ocean where a printed
+    atlas puts its key. Choosing one re-lights the continent in place.
+
+    AND THE CHIPS ARE GONE — the whole vocabulary of them. Border, fill,
+    radius and shadow each say "separate object, placed here by a system",
+    and a page spent all four on seventeen one-word tags and then again on
+    twelve months. A tag with a count beside it is a REGISTER ENTRY; set as
+    type at reading size it is a thing a person chooses. Nothing about the
+    control changed — same buttons, same aria-pressed, same application —
+    only that it stopped looking like a database front end.
+    """
     n_by_interest = {
         i["slug"]: sum(1 for n in data["cities"].values() if i["slug"] in n["city"]["interests"])
         for i in data["taxonomy"]["interests"]
     }
-    # SEVENTEEN CARDS, EACH HOLDING ONE WORD AND A NUMBER.
-    #
-    # Border, fill, radius and shadow each say "separate object, placed here
-    # by a system", and a four-column grid spent all four of them on a tag
-    # name — the /experiences finding, on the page whose whole subject is how
-    # to choose. It is also the brief's ninth constraint word for word: no
-    # grid should require the reader to read tiny labels. A tag with a count
-    # on it is a REGISTER ENTRY, and the register directly below it, the
-    # twelve months, was already drawn as chips.
-    #
-    # ORDERED BY THE COUNT, WHICH IS A MEASUREMENT RATHER THAN A RANKING. The
-    # taxonomy's own order is editorial and says nothing to a reader; what
-    # this atlas is mostly about is derived on every build and is the one
-    # thing the seventeen can be compared on. Nothing is promoted: every tag
-    # is here and the number beside it is the number of destinations that
-    # carry it, so a reader can check it against the page it opens.
-    interest_chips = "".join(
-        f'<a class="chip countchip" href="{urls.interest(i["slug"])}">'
-        f'<span aria-hidden="true">{esc(i["icon"])}</span> {esc(i["name"])}'
-        f'<span class="chipn">{n_by_interest[i["slug"]]}</span></a>'
+    # THE SEVENTEEN ARE SERVER-RENDERED NOW, AND THAT IS NOT A DETAIL.
+    # They were an empty div the application filled, so a reader with no
+    # JavaScript met the page's whole subject as blank space — and the same
+    # seventeen were ALSO printed further down as a chip index, so the page
+    # carried two interest surfaces that could disagree. One surface: the
+    # markup is the index (real links to each tag's own page are kept in the
+    # line under it), and the application upgrades it in place.
+    interest_words = "".join(
+        f'<button type="button" class="pickword" data-interest="{esc(i["slug"])}"'
+        f' aria-pressed="false"><span class="pickname">{esc(i["name"])}</span>'
+        f'<span class="pickn">{n_by_interest[i["slug"]]}</span></button>'
         for i in sorted(data["taxonomy"]["interests"],
                         key=lambda i: (-n_by_interest[i["slug"]], i["name"]))
     )
-    # AND A MOTION IS A QUERY, NOT A PLACE. It has no coastline, no
-    # topography and no season, so a plate drawn for one is a picture of
-    # nowhere standing in for a sentence — the finding that rebuilt
-    # /europe-in, which prints its twelve queries as queries. This is the
-    # same family two clicks away and it was still drawing landscapes.
-    # The query is generated by the function the twelve pages use, so this
-    # index cannot state a query the page it links to would not.
-    motion_cards = "".join(
-        f"""<a class="card motioncard" href="/europe-in/{esc(m['slug'])}">
-        <div class="card-body">
-        <p class="kicker">{sum(1 for cid, x in data['cities'].items()
-                               if motion_match(data, m, cid, x)[0])} destinations</p>
-        <h2>{esc(m['name'])}</h2>
-        <p class="rowsub">{esc(m['strapline'])}</p>
-        <p class="motionq">{motion_query_words(data, m)}</p></div></a>"""
-        for m in data["motions"][:6]
+
+    # A MACRO REGION IS THE ONE GROUPING IN THIS ATLAS WITH REAL POLYGONS.
+    # A travel region is a set of destinations and is refused a boundary; the
+    # Nordics is five whole countries Natural Earth already holds. The cards
+    # became rows for the reason every other index here did: a card is the
+    # right shape for like things chosen on LOOK, and a region of Europe is
+    # chosen on where it is — which is the drawing, so the drawing leads and
+    # the glyph is the row's own picture rather than a thumbnail on a panel.
+    macro_rows = "".join(
+        f'<a class="row macrorow" href="{urls.macro(m)}">'
+        f'<div class="rowart">{region_glyph(m["countries"], macro_frame(data, m))}</div>'
+        f'<div><h3>{esc(m["name"])}</h3>'
+        f'<p class="rowsub">{esc(m["blurb"])}</p></div>'
+        # NO TRUNCATED LIST HERE, AND `c_cut_word` CAUGHT IT IN ONE RUN.
+        # The first version printed the first three country names with an
+        # ellipsis after them — a word cut in half and a count that is not
+        # the set's own extent, both of which this repository has already
+        # paid for once. The glyph beside the row says WHICH countries by
+        # drawing them, and the region's own page names them all.
+        f'<p class="rowmeta">{len(m["countries"])}<br>'
+        f'<span class="small">countries</span></p></a>'
+        for m in data["macros"]
     )
-    months = data["taxonomy"]["months"]
-    names = data["taxonomy"]["month_names"]
+
+    # A MOTION IS A QUERY, AND IT IS PRINTED AS ONE. Six of the twelve were
+    # cards carrying a generated landscape — "a picture of nowhere standing
+    # in for a sentence", the finding that rebuilt /europe-in, still shipping
+    # two clicks away on the index that introduces the family. All twelve
+    # now, because a printed line is cheap enough that there is no longer a
+    # reason to stop at six, and the query under each is generated by the
+    # function the twelve pages use, so this page cannot state a query the
+    # page it links to would not.
+    motion_lines = "".join(
+        f'<a class="qq" href="/europe-in/{esc(m["slug"])}">'
+        f'<h3 class="qqname">{esc(m["name"])}</h3>'
+        f'<p class="qqsub">{esc(m["strapline"])}</p>'
+        f'<p class="qqquery">{motion_query_words(data, m)}</p>'
+        f'<p class="qqn">{sum(1 for cid, x in data["cities"].items() if motion_match(data, m, cid, x)[0])}'
+        f' <span>destinations</span></p></a>'
+        for m in data["motions"]
+    )
+
     # EACH DOT CARRIES ITS ID, BECAUSE THE DRAWING IS THE INSTRUMENT'S OUTPUT
-    # AND NOT ITS DECORATION. See the note above the figure below.
+    # AND NOT ITS DECORATION. The join is the destination id, declared in
+    # data/contracts.json because it crosses a boundary: markup one side, an
+    # index the other, and a renamed id would light nothing with no error.
     dots = []
     for cid, n in sorted(data["cities"].items()):
         x, y = project(n["city"]["lat"], n["city"]["lon"])
@@ -11254,122 +11266,149 @@ def discover_page(data):
                     f'cx="{x:.1f}" cy="{y:.1f}" r="4"/>')
     quiet = sum(1 for n in data["cities"].values() if n["city"].get("quiet"))
 
-    # Land under the dots: /discover had the same scatter-plot fault that
-    # the homepage hero and the destination locator both had.
+    # THE COUNT GOES UNDER THE MAP, NOT OVER THE LIST. What the MAP shows
+    # and what the LIST shows are two claims, and this is the first: the
+    # drawing re-lights and the sentence under it says how much of Europe is
+    # still on. It also fills the one real void this plate had — the key
+    # column runs taller than the drawing beside it, so 450 pixels of the
+    # right-hand side were empty page, measured on the built page.
     #
-    # AND THE LAND WAS THEN DRAWN AS AN OUTLINE, so the fix was only half
-    # applied for the life of the page: `.heromap.arched .countries path`
-    # carried `fill: none`, written for a homepage hero map that has since
-    # been removed and where an outline WAS the look. Fifty unfilled
-    # countries at 1px on #0b0e11 under 319 dots is a wireframe continent on
-    # black, which is exactly what this product must not feel like — and
-    # docs/palette.json has declared --map-land against --map-sea at 1.8
-    # ("the land is a mass, not a hairline") the whole time, green, because a
-    # separation between two tokens says nothing about whether either is
-    # painted.
-    #
-    # FILLING IT EXPOSED THE DATA CUT, which is the reason this map now draws
-    # a fade it never needed before: data/geo/ stops at 52°E and 33°N, and
-    # with nothing filled those two edges were invisible. With the land lit
-    # they are a straight diagonal across Russia and a flat line under North
-    # Africa — the rendering fault the fade exists for, arriving the moment
-    # there was something to cut. Same function every other instrument uses.
+    # And plate 02 cannot be empty at rest, which is where the application
+    # used to leave it. "Present but empty says we have this and then does
+    # not" — so at rest the result plate says what it IS showing, which is
+    # everything.
+    # NO ARCH ON THIS ONE, AND THE RULE ALREADY SAID SO.
+    # `docs/signature-moments.md` records where the door is CORRECTLY absent
+    # and names /map first: it is the instrument rather than a picture of
+    # somewhere. /discover draws the same instrument and had been carrying an
+    # aperture anyway — a picture's frame around a tool. Full-bleed, and the
+    # plate's ground is `--map-sea` itself, so the drawing has no edge on the
+    # left: it simply continues into the page and the key is set in its
+    # ocean. That is the difference between a map ON a plate and a map that
+    # IS one.
     dctx, dland = geo.landmass(MAPPROJ, (0, 0, MAP_W, MAP_H))
+    mapsvg = (f'<svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true">'
+              f'<rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>'
+              f'{dctx}{dland}{cut_fade("disc", MAP_W, MAP_H, dusk_reach())}'
+              f'{"".join(dots)}</svg>')
+
     body = f"""
 {crumbs([("Europe", "/discover"), ("Discover", None)])}
-<div class="pagehead instrument">
-  <p class="kicker">Discover</p>
-  <h1>Where will Europe take you?</h1>
-  {head_extent([(len(data['cities']), 'destinations'),
-                (len(data['countries']), 'countries'),
-                (len(data['taxonomy']['interests']), 'things to travel for')])}
-  <p class="lede">Every other page here asks you to already know where you want to go — a
-  country, a region, a sentence. This one does not. Say what you are travelling for and the
-  list narrows itself, and each place left on it will tell you why it is there.</p>
-</div>
 
-<section class="band" id="discover-mode">
-  <div class="band-head">
-    <h2>Discover mode</h2>
+<section class="sheet sheet-instrument" id="discover-mode">
+  {actmark(1, "The instrument")}
+  <div class="instrkey">
+    <div class="pagehead instrument">
+      <p class="kicker">Discover</p>
+      <h1>Where will Europe take you?</h1>
+      {head_extent([(len(data['cities']), 'destinations'),
+                    (len(data['countries']), 'countries'),
+                    (len(data['taxonomy']['interests']), 'things to travel for')])}
+    </div>
+    <p class="keyhead">Say what you are travelling for.</p>
+    <div class="picks" id="discover-interests">{interest_words}</div>
+    <p class="keynote">Pick as many as you like. Nothing is submitted — the whole Atlas is
+    already in your browser, and the continent re-lights as you choose.
+    <a href="/interests">Every tag also has its own page</a>.</p>
   </div>
 
-  <p class="lede discoverstate" id="discover-count" aria-live="polite">Choose what you are
-  travelling for. Europe will narrow itself.</p>
-
-  <a class="heromap wide-map arched discovermap" data-role="instrument" href="/map"
-     id="discover-map" aria-label="Map of all {len(data['cities'])} places">
-    <svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true"><defs>{arch_clip("disc", MAP_W, MAP_H)}</defs><g clip-path="url(#arch-disc)"><rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>{dctx}{dland}{cut_fade('disc', MAP_W, MAP_H, dusk_reach())}{''.join(dots)}</g>{arch_edge(MAP_W, MAP_H)}</svg>
-    <span class="heromap-cap">Coastline from Natural Earth, public domain.
-    Open the full map, with layers →</span>
-  </a>
-
-  <p class="lede mt7">Pick as many as you like. Nothing is submitted; the whole Atlas is in
-  your browser and the list re-sorts as you choose.</p>
-  <div class="chips picks" id="discover-interests"></div>
-  <div class="form-row mt5">
-    <div class="field">
-      <label for="discover-month">Travelling in</label>
-      <select id="discover-month"></select>
-    </div>
-    <div class="field">
-      <label for="discover-budget">Spending band</label>
-      <select id="discover-budget"></select>
-    </div>
-    <div class="field">
-      <p class="fieldhead">Off the obvious circuit</p>
-      <label class="inlinecheck"><input type="checkbox" id="discover-quiet">
-      Only places with a high discoverability score</label>
-    </div>
-    <div class="field">
-      <p class="fieldhead">Reachable slowly</p>
-      <label class="inlinecheck"><input type="checkbox" id="discover-rail">
-      Favour places on the slow-rail list</label>
+  <div class="instrstage">
+    <a class="instrmap" data-role="instrument" href="/map"
+       id="discover-map" aria-label="Map of all {len(data['cities'])} places">
+      {mapsvg}
+      <span class="instrcap">Coastline from Natural Earth, public domain.
+      Open the full map, with layers →</span>
+    </a>
+    <p class="lede instrcount" id="discover-count" aria-live="polite">Choose what you are
+    travelling for. Europe will narrow itself.</p>
+    <div class="instrfields">
+      <div class="field">
+        <label for="discover-month">Travelling in</label>
+        <select id="discover-month"><option value="">Any month</option></select>
+      </div>
+      <div class="field">
+        <label for="discover-budget">Spending band</label>
+        <select id="discover-budget"><option value="">Any budget</option></select>
+      </div>
+      <div class="field">
+        <label class="inlinecheck"><input type="checkbox" id="discover-quiet">
+        Off the obvious circuit</label>
+      </div>
+      <div class="field">
+        <label class="inlinecheck"><input type="checkbox" id="discover-rail">
+        Reachable slowly, by rail</label>
+      </div>
+      <p class="small"><button type="button" class="linkish" id="discover-clear">Clear
+      everything</button></p>
     </div>
   </div>
-  <p class="small"><button type="button" class="linkish" id="discover-clear">Clear everything</button></p>
-
-  <div id="discover-results"></div>
 </section>
 
-
+<section class="sheet sheet-result" id="discover-result">
+  {actmark(2, "The result")}
+  <div class="sheettext">
+    <h2>What is left</h2>
+    <p class="lede">Ranked by the terms you chose and nothing else. Each row says why it is
+    on the list — the actual terms that fired, not "recommended for you".</p>
+    {golink("/method", "How the ranking works")}
+  </div>
+  <div class="resultside" id="discover-results"></div>
+</section>
 
 {constel_defs()}
-{section("By where it is", grid(macro_cards, 3),
-         lede="Nine regions of Europe, grouped by shared coast, shared mountain range and shared history rather than by alphabet.",
-         more=("Every country, A to Z", "/countries"))}
 
-{section("By what you travel for", f'<div class="chips">{interest_chips}</div>',
-         lede=f"{numword(len(data['taxonomy']['interests'])).capitalize()} tags, biggest "
-              f"first, with the number of destinations carrying each. The Journey Planner "
-              f"weights the same ones, so what you see here is what it will build from.",
-         more=("Cross-border themes", "/themes"))}
+<section class="sheet sheet-where" id="discover-where">
+  {actmark(3, "By where it is")}
+  <div class="sheettext">
+    <h2>Nine regions, by shared ground</h2>
+    <p class="lede">Grouped by shared coast, shared mountain range and shared history rather
+    than by alphabet. Each one draws its own member countries, so a region is a shape before
+    it is a name.</p>
+    {golink("/countries", "Every country, A to Z")}
+  </div>
+  <div class="rows whererows">{macro_rows}</div>
+</section>
 
-{section("Europe in Motion", '<div class="grid cols-3">' + motion_cards + "</div>",
-         lede="A dozen ways to cut the continent, each one a query run against every destination on every build rather than a list somebody chose. Each page prints the query that made it.",
-         more=("All twelve", "/europe-in"))}
+<section class="sheet sheet-motion" id="discover-motion">
+  {actmark(4, "Europe in motion")}
+  <div class="sheettext">
+    <h2>Twelve ways to cut the continent</h2>
+    <p class="lede">Each one is a query run against every destination on every build, not a
+    list somebody chose. The query is printed under the name, and it is the same query the
+    page itself prints.</p>
+    {golink("/europe-in", "Open the twelve")}
+  </div>
+  <div class="qqlist">{motion_lines}</div>
+</section>
 
-{section("By month", year_band(data),
-         lede="What is on, which countries are at their best, and which are in the quieter shoulder — which is usually where you should be going.",
-         more=("The whole European year", "/events"))}
-
-<div class="note">
-  <h2 class="mini">What "off the obvious circuit" means, exactly</h2>
-  <p>It is a computed score, not a mood. A place scores higher for not being a capital, for
-  being marked quiet by an editor who knows the region, for having no curated route through
-  it, for not being tagged with the things a continent is famous for, and for sitting in a
-  country the Atlas has written thinly. Every term and its points are
-  <a href="/method#discoverability">published on the method page</a>.</p>
-  <p class="small">It measures obscurity <em>within this Atlas</em> — which is a smaller and
-  truer claim than "undiscovered". We hold no visitor numbers for anywhere, and a proxy for
-  crowding presented as evidence is the thing this project exists not to do.
-  {quiet} places carry the editorial quiet tag; <a href="/beyond-the-obvious">Beyond the
-  obvious</a> collects them.</p>
-</div>
+<section class="sheet sheet-month" id="discover-month-band">
+  {actmark(5, "By month")}
+  <div class="sheettext">
+    <h2>And the year itself</h2>
+    <p class="lede">What is on, and which countries are in their quieter shoulder — which is
+    usually where you should be going. The two disagree, and the disagreement is the point.</p>
+    {golink("/events", "The whole European year")}
+  </div>
+  <div class="monthside">{year_band(data)}</div>
+  <div class="note qualify">
+    <h2 class="mini">What "off the obvious circuit" means, exactly</h2>
+    <p>It is a computed score, not a mood. A place scores higher for not being a capital, for
+    being marked quiet by an editor who knows the region, for having no curated route through
+    it, for not being tagged with the things a continent is famous for, and for sitting in a
+    country the Atlas has written thinly. Every term and its points are
+    <a href="/method#discoverability">published on the method page</a>.</p>
+    <p class="small">It measures obscurity <em>within this Atlas</em> — which is a smaller and
+    truer claim than "undiscovered". We hold no visitor numbers for anywhere, and a proxy for
+    crowding presented as evidence is the thing this project exists not to do.
+    {quiet} places carry the editorial quiet tag; <a href="/beyond-the-obvious">Beyond the
+    obvious</a> collects them.</p>
+  </div>
+</section>
 """
     return "/discover/index.html", page(
         "Discover Europe", body, path="/discover", area="discover",
         description=f"Say what you are travelling for and {len(data['cities'])} places across {len(data['countries'])} countries narrow themselves — each one saying why it is on the list.",
-        scripts=["/assets/js/discover.js"],
+        scripts=["/assets/js/discover.js"], hero=True,
         # INTELLIGENCE — filter intelligence — Discover Mode is a tool, not a browse surface. /discover/<macro> stays editorial
         world="intelligence"
     )

@@ -8,7 +8,7 @@ its requirements are about how something looks and nobody can check a feeling.
 So every row here asserts against the generated HTML, the CSS and the JavaScript
 as they actually are.
 
-**52 sections · 23 built · 13 already · 12 partial · 1 built (deliberately smaller) · 1 refused · 1 locked · 1 deferred · 375 assertions · 0 failing**
+**52 sections · 23 built · 13 already · 12 partial · 1 built (deliberately smaller) · 1 refused · 1 locked · 1 deferred · 376 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -16,7 +16,7 @@ as they actually are.
 | 2 | Global navigation | BUILT | 15 | The brief's desktop masthead exactly, and the five-item thumb bar on a phone. Both name the product EuropeDoor, not Europe Atlas. |
 | 3 | Design tokens | PARTIAL | 6 | One 8px-derived spacing scale, one type scale, the brief's radii. The named webfonts are refused: a font CDN would hand every reader's address to a third party and contradict /privacy. |
 | 4 | Homepage hero | PARTIAL | 4 | The first plate of a sequence: the headline on a limestone wall, the continent lit inside an arch cut into it, and one way through to the planner. The ask box moved OFF this page — a sentence box in the emotional centre of a homepage reads as a booking engine. |
-| 5 | Homepage — Explore | BUILT (deliberately smaller) | 8 | The map is on the homepage, drawn from real coastlines. Its filter row is NOT: eleven chips under a map are eleven links into filtered views of the map the reader is already looking at. The filters live on /map, which is one tap away and is where they act. |
+| 5 | Homepage — Explore | BUILT (deliberately smaller) | 9 | The map is on the homepage, drawn from real coastlines. Its filter row is NOT: eleven chips under a map are eleven links into filtered views of the map the reader is already looking at. The filters live on /map, which is one tap away and is where they act. |
 | 6 | Experience categories | ALREADY | 4 | The ways in, each opening on a real list that says how long it is. They were a band on the homepage; the homepage is a six-plate sequence now and they live on /interests, which is where the whole set can be compared — which is the thing that band could never do. |
 | 2036-7 | Discover Mode | BUILT | 8 | The surface that answers "I do not know where I want to go". Pick moods and constraints and the continent narrows — and every recommendation says why, naming the terms that actually fired. |
 | 2036-18 | Discoverability, computed | BUILT | 8 | Hidden Europe was an editorial tag — the most interesting claim on the site and the one nobody could check. It is now a published score with five named terms, and it says plainly that it measures obscurity within this Atlas rather than crowds. |

@@ -406,7 +406,14 @@ def measure():
                 "kind": "floor",
                 "why": "Pages whose geography is seen through the arch. A floor: "
                        "the aperture is the identity, and a new map that forgets "
-                       "it is a page that stops looking like EuropeDoor."},
+                       "it is a page that stops looking like EuropeDoor. "
+                       "825 -> 824 WHEN /discover's MAP BECAME ITS FIRST PLATE, "
+                       "and that is the rule being obeyed rather than bent: "
+                       "docs/signature-moments.md records /map as the place the "
+                       "door is CORRECTLY absent, because an instrument is not a "
+                       "picture of somewhere, and /discover draws the same "
+                       "instrument. It had been carrying a picture's frame around "
+                       "a tool. One page, decided, and the floor holds under it."},
             "plates.page_share": {
                 "value": round(sum(1 for b in bodies.values()
                                    if re.search(r'class="[^"]*(?<![\w-])plate(?![\w-])', b))
@@ -432,7 +439,17 @@ def measure():
                        "that quietly stops using one has grown its own "
                        "components and the design system has forked without "
                        "anybody deciding — which is the failure this floor "
-                       "exists to catch. A family that stops using one ON "
+                       "exists to catch. AND /discover MOVED THREE OF THEM, "
+                       "which is Decision 2 of the Discover rebuild: the page "
+                       "carried seventeen outlined chips for the interests and "
+                       "nine macro cards and six motion cards beneath them — "
+                       "border, fill, radius and shadow spent over and over on "
+                       "one-word tags, on the page whose whole subject is how to "
+                       "choose. The chips became type at reading size and the "
+                       "cards became rows and printed queries. card 0.060 to "
+                       "0.059, band 0.757 to 0.756, chip 0.521 to 0.520 — one "
+                       "page each, which is what a single family leaving a "
+                       "primitive looks like. A family that stops using one ON "
                        "PURPOSE is the other thing that moves it, and the "
                        "difference is whether the drop is recorded here in the "
                        "same commit with the composition that caused it. The "

@@ -3345,7 +3345,12 @@ def c_map_roles():
     # illustration must carry the atlas skin, and an instrument must not.
     # Declaring a role and then styling the other way is worse than not
     # declaring one, because it reads as a decision.
-    pat = re.compile(r'<(?:figure|a|svg)[^>]*class="([^"]*(?:minimap|heromap|'
+    # `heromap` was renamed to `instrmap` when the map became /discover's
+    # first plate. A pattern naming a class that no longer exists is a check
+    # that quietly stops examining a family — this file already records two
+    # that did exactly that and reported green — so the count below is a
+    # floor as well as an assertion.
+    pat = re.compile(r'<(?:figure|a|svg)[^>]*class="([^"]*(?:minimap|instrmap|'
                      r'europemap)[^"]*)"[^>]*>')
     n = illus = instr = 0
     for path in site_files():

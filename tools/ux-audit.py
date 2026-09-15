@@ -107,7 +107,13 @@ def section(num, title, verdict, note):
          "pipeline and zero licensed photographs — the architecture is "
          "built, the library is empty, and those are different claims.")
 def s1():
-    yield has("/", "heromap"), "maps provide context, on the homepage itself"
+    # IT ASSERTED A CLASS NAME AND THE CLASS WAS RENAMED TWICE UNDER IT.
+    # `heromap` belonged to a homepage hero map removed long ago; the
+    # promise is that the homepage shows a reader real geography rather
+    # than a scatter of dots, and it does — 44 countries of Natural Earth
+    # coastline drawn through the aperture. Asserted on the drawing.
+    yield has("/", '<g class="countries"', "Natural Earth"), \
+        "maps provide context, on the homepage itself"
     yield every_page(lambda h: "book now" not in h.lower(),
                      "booking never dominates, because there is none")
     yield "def picture" in RENDER, "there is a photograph layer"
@@ -192,14 +198,20 @@ def s4():
          "views of the map the reader is already looking at. The filters live "
          "on /map, which is one tap away and is where they act.")
 def s5():
-    yield has("/", "heromap"), "the hero map is there"
-    yield has("/", '<g class="countries"'), "and draws land, not a scatter of dots"
+    yield has("/", '<g class="countries"'), "the homepage opens on a drawing of Europe"
+    yield has("/", "herolandg"), "and draws land, not a scatter of dots"
     yield has("/", 'href="/map"'), "and opens the real map"
     # The requirement is still checked — at the surface that serves it.
     for layer in ("nature", "history", "food", "coast"):
         yield f'value="{layer}"' in page("/map") or f"layer={layer}" in page("/map"), \
             f"the {layer} filter, on the map"
-    yield has("/map", "Hidden Europe") or has("/", "Hidden Europe"), "and the quiet layer"
+    # AND THE QUIET LAYER WAS A STRING THAT LEFT IN COMMIT 0fd83aa.
+    # "Hidden Europe" was a homepage band; /map's layers are the seventeen
+    # interests and never carried it. The requirement is that a reader can
+    # see the places off the obvious circuit, and it is asserted at the two
+    # surfaces that serve it — the index, and the control on /discover.
+    yield has("/beyond-the-obvious", "quiet"), "the quiet places have an index"
+    yield has("/discover", 'id="discover-quiet"'), "and Discover can ask for them"
 
 
 @section(6, "Experience categories", "ALREADY",
@@ -1077,15 +1089,44 @@ def s37():
 
 
 def run():
+    """TWENTY-FIVE OF THESE ASSERTIONS COULD NOT FAIL, AND THE FIX WAS ALREADY
+    WRITTEN IN THE OTHER AUDIT.
+
+    `has()` and `every_page()` return their own `(ok, why)` pair, so
+    `yield has("/", "heromap"), "the hero map is there"` yields a tuple
+    INSIDE a tuple. This unpacked `good = (False, "/: missing [...]")` — a
+    non-empty tuple, which is truthy — so the assertion passed while its own
+    helper was saying no. The homepage has had no `heromap` since it became a
+    plate sequence and both sections asserting one went on reading green.
+
+    `section-audit.py` normalises exactly this and says so in a comment three
+    lines long. A second implementation of a thing is a second chance to make
+    its mistake — and this is the first time here that the fix existed in the
+    sibling file and had simply not been shared.
+
+    The guard is the other half. Normalising a shape you KNOW is right;
+    silently `bool()`-ing one you do not is how this passed in the first
+    place, so anything that does not reduce to a real bool stops the run and
+    names its section.
+    """
     rows, failures = [], []
     for num, title, verdict, note, fn in SECTIONS:
         bad, n = [], 0
         for result in fn():
             n += 1
-            if isinstance(result, tuple):
+            if isinstance(result, tuple) and result and isinstance(result[0], tuple):
+                inner, label = result[0], result[1] if len(result) > 1 else ""
+                good, why = inner
+                detail = f"{label} — {why}" if label else why
+            elif isinstance(result, tuple):
                 good, detail = result
             else:
                 good, detail = bool(result), ""
+            if not isinstance(good, bool):
+                raise TypeError(
+                    f"§{num} {title}: assertion {n} is a {type(good).__name__}, "
+                    f"not a bool. An assertion whose truth value is not a bool is an "
+                    f"assertion that cannot fail; see this function's docstring.")
             if not good:
                 bad.append(detail or f"assertion {n}")
         rows.append((num, title, verdict, note, n, bad))

@@ -2010,23 +2010,48 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
  * /discover's first figure at 1686 and was reading the year band eight
  * screens down. Same sentence as `fill: none` on the same page, two commits
  * over — a rule older than its only user. */
-.heromap { display: block; text-decoration: none; }
-.heromap svg { width: 100%; height: auto; display: block;
-               background: var(--map-sea); border-radius: var(--radius); }
-.heromap .context path { fill: var(--map-context); }
-.heromap .countries path { fill: var(--map-land); stroke: var(--map-coast); stroke-width: 1; }
+/* THE INSTRUMENT MAP, AND IT WAS CALLED `.heromap` UNTIL THE MAP BECAME THE
+   PLATE. That name came from a homepage hero map removed long ago; /discover
+   inherited it and was the only page left carrying it, with an arched
+   variant that superseded these base fills on the only page they could ever
+   have applied to. Renaming it to what it is collapsed the two into one and
+   took the aperture off, which docs/signature-moments.md had already asked
+   for: /map is named there as the place the door is CORRECTLY absent,
+   because an instrument is not a picture of somewhere, and this draws the
+   same instrument.
+
+   RENAMING A COMPONENT IS HOW ITS STYLING SILENTLY DIES. The first version
+   of this plate changed the markup and left the rules on the old name, so
+   every fill lost its selector and fifty countries painted at the SVG
+   default — black on near-black, a continent that was simply not there,
+   with the dots still green because they are styled by their own class.
+   It is the clone trap and the two specificity collisions this stylesheet
+   already records, arriving through a rename. */
+.instrmap { display: block; position: relative; text-decoration: none; }
+/* THE MAP, WHAT IT SAYS, AND WHAT NARROWS IT ARE ONE STACK.
+   The count was auto-placed into column one, so "114 places fit, in 32
+   countries" sat at the foot of the controls rather than under the drawing
+   it is about. And the key column ran four hundred pixels taller than the
+   drawing beside it, so the map's column ended in a void — which is what
+   put the four constraints here: the seventeen interests are the question
+   and the month, the budget and the two switches are what narrow it, so
+   they belong with the thing they narrow. The two columns now balance
+   because the content does, not because a height was set. */
+.instrstage { display: grid; gap: var(--s5); align-content: start; min-width: 0; }
+.instrcount { margin: 0; max-width: 44rem; }
 .herodot { fill: var(--signature); opacity: .8; transition: opacity .2s ease; }
 .herodot.advisory { fill: var(--map-border); opacity: .7; }
-.heromap:hover .herodot { opacity: .85; }
+.instrmap:hover .herodot { opacity: .85; }
 /* A CREDIT IS NOT A LABEL. This one was set uppercase at .1em of tracking —
    the site's own label treatment, which is for a kicker or a meta line — so
    "COASTLINE FROM NATURAL EARTH, PUBLIC DOMAIN. OPEN THE FULL MAP, WITH
    LAYERS →" ran the full width of /discover's map and shouted the one thing
    every other map on the site now says quietly. The provenance vocabulary is
    `.capsrc`: the caption step, sentence case, the third ink. */
-.heromap-cap { display: block; margin-top: var(--s3); max-width: 78ch;
-               font-size: var(--t-xs); color: var(--ink-3); }
-.heromap:hover .heromap-cap { color: var(--door); }
+.instrcap { display: block; margin-top: var(--s3); max-width: 78ch;
+            padding-right: var(--page-gutter);
+            font-size: var(--t-xs); color: var(--map-land); }
+.instrmap:hover .instrcap { color: var(--limestone); }
 @media (min-width: 64rem) {
   .hero { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); }
 }
@@ -2443,7 +2468,6 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
 .askhome input:focus { border-color: var(--door); }
 .askhome button { justify-self: start; }
 .askhome-note { margin-top: var(--s2); }
-.heromap-filters { margin-top: var(--s4); }
 @media (min-width: 40rem) { .askhome { grid-template-columns: 1fr auto; align-items: end; } .askhome label { grid-column: 1 / -1; margin-bottom: calc(var(--s2) * -1); } }
 
 /* A checkbox that sits inside a field rather than in a chip row.
@@ -4541,7 +4565,7 @@ body[data-hero] .masthead { position: sticky; }
 .minimap.arched figcaption { color: var(--ink-3); }
 /* The homepage hero is the same aperture. It is an <a>, not a <figure>, so
    it takes the same treatment by name rather than by inheritance. */
-.heromap.arched svg { background: none; border-radius: 0; }
+.instrmap svg { background: none; border-radius: 0; }
 /* THE REGISTER SAYS THE LAND IS A MASS AND THIS DREW A HAIRLINE.
  *
  * docs/palette.json declares --map-land against --map-sea at 1.8 with the
@@ -4565,14 +4589,14 @@ body[data-hero] .masthead { position: sticky; }
  * /map fills its land with --map-land and strokes it with the coast, and
  * /discover links straight to /map: two instruments drawing one continent
  * two ways was the inconsistency underneath the defect. */
-.heromap.arched .countries path { fill: var(--map-land); stroke: var(--map-coast);
+.instrmap .countries path { fill: var(--map-land); stroke: var(--map-coast);
                                   stroke-width: 1; vector-effect: non-scaling-stroke; }
-.heromap.arched .context path { fill: var(--map-context);
+.instrmap .context path { fill: var(--map-context);
                                 stroke: color-mix(in srgb, var(--map-coast) 45%, transparent);
                                 stroke-width: 0.7; vector-effect: non-scaling-stroke; }
-.heromap.arched .herodot { fill: var(--pine-air); opacity: .95;
+.instrmap .herodot { fill: var(--pine-air); opacity: .95;
                            transition: opacity .2s ease, r .2s ease, fill .2s ease; }
-.heromap.arched .herodot.advisory { fill: var(--map-border); opacity: .6; }
+.instrmap .herodot.advisory { fill: var(--map-border); opacity: .6; }
 
 /* WHAT A NARROWED EUROPE LOOKS LIKE.
  *
@@ -4587,8 +4611,17 @@ body[data-hero] .masthead { position: sticky; }
  * `.constel-dense` already sizes its marks. Two-tenths of a second, on the
  * one property that carries the meaning, and the global reduced-motion rule
  * takes it off. */
-.heromap.arched .herodot.unlit { fill: var(--map-land); opacity: .5; r: 3; }
-.heromap.arched .herodot.lit { fill: var(--pine-air); opacity: 1; r: 5.5; }
+/* AND A PALE CONTINENT MADE THE UNLIT DOT DISAPPEAR ENTIRELY. The rule
+ * above is right and its colour was an artefact of a dark land: taking
+ * "the LAND's own tone" meant 50% of #3f483f on #3f483f, which reads as
+ * quiet; it means 50% of #aeada7 on #aeada7, which reads as NOTHING. 205
+ * of 319 places left the drawing the moment a reader chose an interest, on
+ * the page whose whole argument is that they stay. The ink is what changed
+ * sides: the dot is now a darker mark ON the land, 2.15:1 against it —
+ * ground rather than accent, which is what the rule is about, and present,
+ * which is what it promises. */
+.instrmap .herodot.unlit { fill: var(--map-coast); opacity: .7; r: 3; }
+.instrmap .herodot.lit { fill: var(--pine-air); opacity: 1; r: 5.5; }
 
 /* THE SCALE BAR, WHICH THE PROJECTION EARNED.
  *
@@ -4794,12 +4827,10 @@ body[data-hero] .masthead { position: sticky; }
    itself, and it is stated in both preferences rather than only the one that
    needs it — a signature that changes shape with a system setting is two
    signatures. */
-.minimap.arched .archedge,
-.heromap .archedge { fill: none; stroke: var(--rule); stroke-width: 1; }
+.minimap.arched .archedge { fill: none; stroke: var(--rule); stroke-width: 1; }
 @media (prefers-color-scheme: dark) {
   /* Where it is the only thing saying "opening", it carries more weight. */
-  .minimap.arched .archedge,
-  .heromap .archedge { stroke: color-mix(in srgb, var(--limestone) 26%, transparent); }
+  .minimap.arched .archedge { stroke: color-mix(in srgb, var(--limestone) 26%, transparent); }
 }
 
 /* THE ATLAS SKIN. Specificity is deliberate and generous: every rule it
@@ -7126,3 +7157,174 @@ body[data-hero] main { max-width: none; padding: 0; }
    break mid-word is what an index does; the alternative is a sixth column
    nobody can read. */
 .countrycols a { hyphens: auto; }
+
+/* ══ /discover — five plates ═══════════════════════════════════════════
+   DISCOVER MUST LEAD WITH DISCOVERY, NOT WITH CONTROLS. The page was
+   6,449 pixels of twelve bands, fifteen cards and seventeen outlined
+   chips, with the instrument one figure among them. These five give it
+   the homepage's own plate grammar — but the grammar is not copied, it is
+   answered: a plate here is a step in one operation rather than an act in
+   a sequence, so the act mark reads as a stage and the plates share the
+   dark ground the instrument needs. */
+
+/* 01 · THE INSTRUMENT — the map is the plate, and the key is in the ocean.
+   The ground is --map-sea, the drawing's OWN field, so the map has no
+   visible left edge: it continues into the page and the type sits in the
+   Atlantic where a printed atlas puts its key. No aperture, because
+   docs/signature-moments.md records /map as the place the door is
+   correctly absent — an instrument is not a picture of somewhere — and
+   this draws the same instrument. */
+.sheet-instrument { background: var(--map-sea); color: var(--limestone);
+        grid-template-columns: minmax(0, 34rem) minmax(0, 1fr);
+        gap: var(--s6) var(--s7); align-items: start;
+        padding-right: 0; border-bottom: none; }
+.sheet-instrument .pagehead { margin: 0; }
+.sheet-instrument h1, .sheet-instrument .keyhead { color: var(--limestone); }
+/* `min-width: 0` BECAUSE A GRID ITEM'S AUTOMATIC MINIMUM IS ITS MIN-CONTENT,
+   and this column holds seventeen unbreakable display words. Without it the
+   key blew past its 34rem track and "Art & museums 58" ran under the map:
+   the same blowout as the homepage's row of eight, in the same session, one
+   plate over. The track is the promise and the item has to honour it. */
+.instrkey { display: grid; gap: var(--s5); justify-items: start;
+        min-width: 0; z-index: 2; }
+/* AN INSTRUMENT'S EXTENT IS A READING, NOT A MASTHEAD FIGURE. Right-aligned
+   in a 34rem column the three counts stacked into a ragged stair with "17
+   things to / travel for" broken across two lines. Left, in a row, wrapping
+   as a row does. */
+.sheet-instrument .headextent { justify-content: start; text-align: left; }
+.keyhead { font-family: var(--display); font-size: var(--t-xl); margin: 0; }
+.keynote { margin: 0; font-size: var(--t-sm); color: var(--map-land); }
+
+/* THE CONTROLS LOOK LIKE TYPOGRAPHY, WHICH IS THE WHOLE DECISION.
+   Border, fill, radius and shadow each say "separate object, placed here
+   by a system" — seventeen of them said it seventeen times about one-word
+   tags, and the page read as a database front end. A word at reading size
+   with its count beside it is a thing a person chooses; the rule under it
+   appears only when it is chosen, so the SELECTED set is what carries ink
+   and the unselected set is quiet. Nothing about the control changed:
+   still a button, still aria-pressed, still 44px of target. */
+.picks { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); }
+.pickword { -webkit-appearance: none; appearance: none; background: none;
+        border: 0; padding: var(--s2) 0; margin: 0; cursor: pointer;
+        display: inline-flex; align-items: baseline; gap: .4em;
+        font-family: var(--display); font-size: var(--t-xl); line-height: 1.12;
+        color: var(--map-land); border-bottom: 2px solid transparent; }
+.pickword:hover .pickname { color: var(--limestone); }
+.pickword[aria-pressed="true"] { color: var(--limestone);
+        border-bottom-color: var(--pine-air); }
+.pickn { font-family: var(--text); font-size: var(--t-xs);
+        font-variant-numeric: tabular-nums; opacity: .7; }
+
+/* `align-items: end` BECAUSE A LABELLED SELECT AND A BARE CHECKBOX ARE
+   DIFFERENT HEIGHTS. Stretched, the two checkboxes floated to the top of
+   their tracks: "Off the obvious circuit" sat up on the selects' LABEL line
+   and "Reachable slowly" dropped to a row of its own, so four controls read
+   as three unrelated things. They are one row of four and they sit on one
+   baseline. */
+.instrfields { display: flex; flex-wrap: wrap; align-items: end;
+        gap: var(--s4) var(--s5); width: 100%;
+        padding-right: var(--page-gutter); }
+.instrfields .field { min-width: 0; margin: 0; }
+.instrfields .inlinecheck { padding-bottom: var(--s2); }
+/* THE RESET IS NOT A FIELD. As a flex item beside four controls it wrapped
+   onto the last one's line and the two shared a baseline, so "Clear
+   everything" read as a fifth thing you could switch on. Its own line. */
+.instrfields .small { flex: 1 0 100%; margin: var(--s2) 0 0; }
+.sheet-instrument label, .sheet-instrument .small { color: var(--map-land); }
+.sheet-instrument select { background: var(--map-shore-1); color: var(--limestone);
+        border-color: var(--map-border); }
+.sheet-instrument .linkish { color: var(--pine-air); }
+
+
+/* 02 · THE RESULT — rows, and never cards. The application already emits
+   `.row`, which is the primitive on 86% of pages; what it lacked was a
+   plate to stand in, so the count and the list sat in the same band as
+   the controls that produced them. */
+.sheet-result { grid-template-columns: minmax(0, 24rem) minmax(0, 1fr);
+        align-items: start; }
+/* A LIST PLATE PUTS ITS HEAD ABOVE, NOT BESIDE.
+   The homepage's plates are balanced pairs — a headline against a picture —
+   and these three are a three-line caption against a list sixteen hundred
+   pixels long. Two columns stranded the caption in the middle of that and
+   left 1,400 pixels of empty page beside it, which `tools/voids.js` exists
+   to find and which the two-column default produced by construction. One
+   column: the head across the top with a reading measure, the list at full
+   width underneath, which is also the width nine region names and twelve
+   printed queries were asking for. */
+.sheet-where, .sheet-motion, .sheet-month {
+        grid-template-columns: minmax(0, 1fr); align-items: start;
+        gap: var(--s6); }
+.sheet-where .sheettext, .sheet-motion .sheettext, .sheet-month .sheettext {
+        max-width: 44rem; }
+.resultside { min-width: 0; }
+.sheet-result:not(:has(.row)) { padding-bottom: var(--s6); }
+
+/* 03 · BY WHERE IT IS — the glyph leads, because a region of Europe is
+   chosen on where it is. A card would spend a border, a fill, a radius
+   and a shadow saying "separate object" about nine things that are
+   already told apart by their shape. */
+.whererows .row { grid-template-columns: 14rem minmax(0, 1fr) auto; align-items: center; }
+.rowart { min-width: 0; }
+/* (0,2,1) BECAUSE `.constel` IS (0,2,0) AND PINS 132px BY HAND.
+   `.rowart svg` is (0,1,1) and lost, so the drawing computed to 288px
+   inside a 144px track and the row's own text was set on top of it. Fifth
+   specificity collision this stylesheet has lost, and the fourth that
+   rendered as two things occupying one space. */
+.whererows .rowart svg { display: block; width: 100%; height: auto; }
+
+/* AND THE GLYPHS TOOK THE PICTURE PALETTE ON AN INSTRUMENT PAGE.
+   Nine navy-and-parchment panels down a graphite plate is the "two
+   cartographies on one screen" fault this rebuild exists to remove — and
+   the cartography rule is not being bent to fix it, it is being applied:
+   `docs/cartography.md` splits every drawing on what it IS, and inside a
+   tool a locator is instrumentation, not a picture of somewhere. Same
+   geometry, same subject, the instrument's own field and land. */
+.sheet-where .constel { fill: var(--map-land); }
+.sheet-where .constel .glyph-sea { fill: var(--map-sea); }
+.sheet-where .constel .glyph-beyond,
+.sheet-where .constel .glyph-land { fill: var(--map-context); stroke: var(--map-context); }
+.sheet-where .constel .glyph-bounds { stroke: var(--map-border); }
+.sheet-where .regionglyph .countries path { fill: var(--map-here);
+        stroke: var(--map-hereline); }
+.sheet-where .row:hover .regionglyph .countries path { fill: var(--map-hover); }
+
+/* 04 · EUROPE IN MOTION — twelve printed queries. A motion has no
+   coastline, no topography and no season, so a picture drawn for one is a
+   picture of nowhere standing in for a sentence: the finding that rebuilt
+   /europe-in, which was still shipping as six cards on the index that
+   introduces the family. The query is the proof and goes under the name
+   it proves. */
+.qqlist { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--s6) var(--s7); min-width: 0; }
+.qq { display: grid; gap: var(--s2); text-decoration: none; color: inherit;
+        padding-bottom: var(--s4); border-bottom: 1px solid var(--rule); }
+.qqname { font-size: var(--t-2xl); margin: 0; }
+.qq:hover .qqname { color: var(--door); }
+.qqsub { margin: 0; color: var(--ink-2); }
+.qqquery { margin: 0; font-size: var(--t-sm); color: var(--ink-3); }
+.qqn { margin: 0; font-size: var(--t-xs); letter-spacing: .16em;
+        text-transform: uppercase; color: var(--door);
+        font-variant-numeric: tabular-nums; }
+
+/* 05 · BY MONTH. The closing note took the reading measure and left an
+   equal width of empty page beside it, which on a plate this wide reads as
+   an unfinished column rather than as a measure. Its two paragraphs are a
+   definition and a disclaimer — two separate things — so they sit side by
+   side and the plate ends on a full line. */
+.monthside { min-width: 0; }
+.sheet-month .qualify { grid-column: 1 / -1; max-width: none; }
+.sheet-month .qualify p { max-width: 42rem; }
+@media (min-width: 64rem) {
+  .sheet-month .qualify { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: var(--s4) var(--s7); align-items: start; }
+  .sheet-month .qualify h2 { grid-column: 1 / -1; }
+}
+
+@media (max-width: 64rem) {
+  .sheet-instrument, .sheet-result { grid-template-columns: minmax(0, 1fr); }
+  .sheet-instrument { padding-right: var(--page-gutter); }
+  .instrcap { padding-right: 0; }
+  .qqlist { grid-template-columns: minmax(0, 1fr); }
+  .whererows .row { grid-template-columns: 6rem minmax(0, 1fr); }
+  .whererows .rowmeta { grid-column: 2; }
+}

@@ -352,7 +352,13 @@ def s7():
     # reader met on a page whose job is to make them want to go somewhere,
     # and it inlined 90 KB of coastline — 76% of the page — to do it. The
     # map is a discovery mechanism and it lives at /map.
-    yield 'class="heromap"' not in h, "the map is not in the hero"
+    # AND IT PINNED THE CLASS NAME, so renaming the component made it true
+    # forever. What it protects is that the homepage does not inline an
+    # instrument: the drawing there is a continent, not a data surface with
+    # 319 dots and a filter row on it. Asserted on the declared ROLE, which
+    # is what every map on this site carries and what the class was standing
+    # in for.
+    yield 'data-role="instrument"' not in h, "the map is not in the hero"
     yield has("/", 'href="/map"'), "and is one tap away"
     # /map draws its land as .cshape paths, not the <g class="countries">
     # wrapper the small embedded maps use. Asserted against what the page
