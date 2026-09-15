@@ -3398,16 +3398,15 @@ def city_page(data, c, r, t):
     <p class="orient">{orient_line(t)}</p>
     {chips(t["interests"], data["interests"])}
   </div>
+  <div class="placeband{'' if has_photo else ' maponly'}">
+    {photo_block}
+    <div class="placeband-map">{minimap(data, t, span="auto", named=nearnamed)}</div>
+    <p class="sourcenote">{esc(t["name"])} is at <span class="mono">{coord_line(t)}</span>.</p>
+  </div>
   <section class="whygo" aria-labelledby="why-visit">
     <h2 id="why-visit">Why go</h2>
     <ol class="reasons">{reasons}</ol>
   </section>
-</div>
-
-<div class="placeband{'' if has_photo else ' maponly'}">
-  {photo_block}
-  <div class="placeband-map">{minimap(data, t, span="auto", named=nearnamed)}</div>
-  <p class="sourcenote">{esc(t["name"])} is at <span class="mono">{coord_line(t)}</span>.</p>
 </div>
 {sectionnav([
     ("Overview", "why-visit"),

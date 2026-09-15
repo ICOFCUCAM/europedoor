@@ -3599,10 +3599,35 @@ body[data-hero] .masthead { position: sticky; }
    first look round. */
 .pagehead.overture.arrivalhead { display: grid; gap: var(--s6); }
 .arrivalhead .whygo { border-top: none; margin-top: 0; padding-top: 0; }
+/* AND THE VIEW IS PART OF THE OPENING, NOT THE BAND AFTER IT.
+ *
+ * This head's own comment already says it — "the head is not a headline any
+ * more, it is a first look round" — and the one thing a first look round is
+ * actually made of was outside it. Measured at 390 the destination page
+ * reached its first drawing at 950 and `tools/opening.js` reported 0% of
+ * the first screen as picture, on the largest family in the product and the
+ * one the first-class audit calls the richest page and the most punished by
+ * having no photograph.
+ *
+ * The ORDER is not the fault and is not changed: name, what the place is,
+ * why go — desire before orientation, which is the brief's own sequence.
+ * What changes is that "where it is" stops being a separate band four
+ * hundred pixels down and joins the two it sits between. On a phone the
+ * column reads name → sentence → the view → why go; on a desk the two
+ * columns are exactly what they were and the view comes up full width under
+ * both, which is where it already was. The desktop composition does not
+ * move at all; the phone gets the drawing it never had.
+ *
+ * The map is what this product spends where the benchmark spends a
+ * photograph, and it was below the fold on 319 pages. */
+.arrivalhead .placeband { margin: 0; }
 @media (min-width: 62rem) {
   .pagehead.overture.arrivalhead {
     grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
     column-gap: var(--s8); align-items: start; }
+  .arrivalhead .arrivalsay { grid-column: 1; grid-row: 1; }
+  .arrivalhead .whygo      { grid-column: 2; grid-row: 1; }
+  .arrivalhead .placeband  { grid-column: 1 / -1; grid-row: 2; }
   /* One column in the head, not three: the reasons are a list read down
      beside the name, and the three-across arrangement below the fold was
      the shape of a band, not of an answer. */
