@@ -491,7 +491,7 @@ protecting — a homepage that puts journeys above discovery still goes red.
 
 Nothing, for six of the seven removed surfaces: `/discover`, `/europe-in`,
 `/beyond-the-obvious`, `/stories`, `/themes`, `/map` and `/journeys` are
-linked from the masthead or footer of all 1,072 pages, and the section audit
+linked from the masthead or footer of every page, and the section audit
 now asserts that rather than assuming it.
 
 **The seventh cost something.** The four doors — Discover, Understand,

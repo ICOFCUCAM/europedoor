@@ -249,7 +249,7 @@ What requires hotlinking is the **API**:
 `scripts/images/acquire.py` is an API client, so that route is refused: taking it
 would mean embedding Unsplash's CDN URLs, and this site sends
 `img-src 'self' data:` with a check enforcing it, so it would open the
-Content-Security-Policy on all 1,033 pages to a host we do not control. That is
+Content-Security-Policy on every page to a host we do not control. That is
 an owner decision about the whole site's security posture. The API route also
 carries the download event on `photo.links.download_location` and attribution
 naming both photographer and Unsplash; both are recorded against their quotes

@@ -427,7 +427,7 @@ accent, and the two worlds those make possible.
       → SVG plate re-toning
       → --map-* verification
       → social card verification
-      → 1,072 pages regenerated
+      → every page regenerated
       → 30 static checks
       → 561 browser checks
       → 1,282 section assertions

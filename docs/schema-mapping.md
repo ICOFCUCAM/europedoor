@@ -42,7 +42,7 @@ one JSON file.
 > *A page is a view of data. The data is the product.*
 
 Already true and enforced. `site/` is deleted and rewritten on every build,
-1,072 pages come from `data/`, and a hand-edited page vanishes on the next
+Every page comes from `data/`, and a hand-edited page vanishes on the next
 build with no failing check. There is no CMS and no page anybody typed.
 
 ## §2.1 The hierarchy

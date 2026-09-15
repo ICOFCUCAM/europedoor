@@ -184,7 +184,7 @@ Each of these is enforced, and each exists because somebody nearly did it.
 | | |
 |---|---|
 | a second page shell | `render.page()` is the only function that emits `<html>` |
-| an inline `<style>` or a `style="…"` attribute | CSP hashes do not apply to style attributes; one would force `style-src` open on 1,034 pages |
+| an inline `<style>` or a `style="…"` attribute | CSP hashes do not apply to style attributes; one would force `style-src` open on every page |
 | a webfont | zero, and it is an invariant |
 | gold, electric lime, and five pre-European-Future navies | refused by name in the stylesheet and again on the painted pixel |
 | `rank`, `boost`, `featured`, `sponsored` on a place | the wall between editorial and directory, enforced in the schema |
