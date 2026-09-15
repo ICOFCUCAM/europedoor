@@ -212,12 +212,44 @@ is run against a deliberately broken version first, and the count is printed
 in the failure message — *a failure message with no measurement in it cannot
 be diagnosed.*
 
-**An assertion pins a promise, never a shape.** Twelve times now an
+**An assertion pins a promise, never a shape.** Thirteen times now an
 assertion in this repository has gone red because a page got better: it
 counted `<circle>`, or `.card`, or required `overflow-x: auto`, or demanded
 six `<h2>` bands, or held two example sentences out of a placeholder that
-was shortened because it was cut mid-word. Each was rewritten to the claim
-it was protecting, and each still fails on the thing it was written for.
+was shortened because it was cut mid-word, or named the literal call
+expression `stage(0, 0)` when what it meant was *a failure marks the step it
+stopped on*. Each was rewritten to the claim it was protecting, and each
+still fails on the thing it was written for.
+
+**AND THE OTHER HALF OF THAT IS A CHECK THAT CANNOT GO RED AT ALL.** An
+assertion pinned to a shape fails loudly when the shape moves. An assertion
+that MATCHES a shape simply stops matching, and reports green forever —
+which is worse, because there is nothing to read. Four of them were found in
+one session, all by the same move: reading the column of counts the suite
+prints beside each check.
+
+| what it read | what changed | what it reported |
+|---|---|---|
+| a `.card-art` holding a plate | every abstract plate came off the pages | 0 of 785 |
+| `pointsmap arched"><svg` | the atlas skin added a class after `arched` | 0 of 130 |
+| `<div class="pagehead` | `indexhero` emits a `<header>`; the essays have their own head | 1,001 of 1,034 |
+| four overflow assertions, each naming its own pages | a family was added that none of them names | a place page scrolled sideways at the design width |
+
+So three rules, and the third is the one that makes the first two hold:
+
+1. **A check counts what it examined**, and the count is a quantity that
+   should be LARGE. `c_cut_word` returned the number of ellipses it found —
+   a number that ought to be zero — so a healthy check reading every page
+   printed "(0)" and looked exactly like the broken ones beside it.
+2. **A check asserts its own reach**, with a floor derived from the build
+   rather than typed, so it fails when it stops finding the family it is
+   about rather than when the family is wrong.
+3. **A check that sweeps pages reads `tools/lib/families.js`**, which is the
+   one list of rendered families and is enumerated against the built site by
+   page depth. A hand-typed list of surfaces is a list of the surfaces
+   somebody thought of: three templates were missing from that file itself,
+   and a fund project page shipped with no picture anywhere on it, at any
+   width, for the life of the family.
 
 **A rule that exists is not a rule that is inherited.** This is the other
 half of the same fault and it costs more, because nothing goes red at all: a
