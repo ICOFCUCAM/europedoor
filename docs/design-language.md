@@ -114,6 +114,7 @@ bands.
 | story | the headline | the standfirst | — | its own places | the essay | the places it touches |
 | theme · motion | the shape of the query | the query, printed once | the set | the shape | — | — |
 | experience category | the kinds, drawn | what the category is | the invitations | — | — | — |
+| an index that draws its set | the shape, left of the row | one line | the rows | the shape | — | — |
 | an index | its own extent | one line | the set | where it applies | — | — |
 | an instrument | the control | — | the results | the drawing | — | the result |
 
@@ -135,6 +136,26 @@ constraint back — on the family that exists to state it.
 whose subject IS a shape: a journey's route, a theme's scatter, a motion's
 query, a country's outline. On the rest it goes where it belongs, at the
 size it deserves.
+
+**The record goes AFTER the picture, never between the sentence and it.**
+An extent line and a row of interest chips — "5 destinations across 3
+regions · capital Vienna", six tags — are about 139 pixels of RECORD, and on
+the three families whose opening is a picture they sat between the tagline a
+reader came for and the drawing that answers where the place is. The record
+is what every band below the fold is for. Measured at 390, the first figure
+on each: country 591 → 415, destination 574 → 443, region 585 → 438. One
+class, `.headmeta`, on all three; the third time a repair is made by hand it
+should stop being made by hand.
+
+**A row that draws its set leads with the drawing.** /themes, /interests and
+/europe-in are one row family drawing one thing — which destinations a
+theme, a tag or a query gathers, lit on one silhouette at one frame — and
+two of them put the drawing at the far edge of an 18rem column with the text
+ink stopping at 350 pixels. Measured at 1280 as the distance from the last
+painted glyph to the next column: 49% and 48% of the row was a hole. **A gap
+after the last element is a margin; a gap between two of them is a hole.**
+The shape goes first and one text block sits beside it, and the drawing does
+not grow by a pixel.
 
 ---
 
@@ -191,8 +212,22 @@ is run against a deliberately broken version first, and the count is printed
 in the failure message — *a failure message with no measurement in it cannot
 be diagnosed.*
 
-**An assertion pins a promise, never a shape.** Nine times now an assertion
-in this repository has gone red because a page got better: it counted
-`<circle>`, or `.card`, or required `overflow-x: auto`, or demanded six
-`<h2>` bands. Each was rewritten to the claim it was protecting, and each
-still fails on the thing it was written for.
+**An assertion pins a promise, never a shape.** Twelve times now an
+assertion in this repository has gone red because a page got better: it
+counted `<circle>`, or `.card`, or required `overflow-x: auto`, or demanded
+six `<h2>` bands, or held two example sentences out of a placeholder that
+was shortened because it was cut mid-word. Each was rewritten to the claim
+it was protecting, and each still fails on the thing it was written for.
+
+**A rule that exists is not a rule that is inherited.** This is the other
+half of the same fault and it costs more, because nothing goes red at all: a
+collision pass four map families ran and the country portrait did not, a
+truncation helper written to replace `[:140] + "…"` with the expression
+`[:150] + "…"` one screen away still in the code, a placeholder shortened on
+the homepage and left cut on /search, a phone exception that named a wrapper
+class after the wrapper was renamed. The repair is the same every time:
+state the SITUATION rather than the class — a row's drawing is a row's
+drawing, a kicker inside a link is labelling one item in a set — and then
+put the assertion on the shipped HTML rather than on the call sites, because
+the next one will be written somewhere a list of call sites has never heard
+of.
