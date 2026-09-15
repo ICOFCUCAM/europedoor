@@ -3562,20 +3562,30 @@ async function main() {
   // on every page shape, in both colour schemes. The audit that matters —
   // somebody using a screen reader daily — is named as missing on
   // /accessibility rather than implied by a green tick here.
+  // AND THE LIST WAS TWENTY PAGES TYPED BY HAND, WHICH LEFT TWENTY-SIX PAGE
+  // SHAPES NEVER SCANNED IN EITHER COLOUR SCHEME — a macro region, a theme,
+  // a motion, a month, a sub-category, a fund project, a facet list, the
+  // four legal pages, the public API, contact, help and the manifesto among
+  // them. That is the same fault as the four overflow assertions that each
+  // named their pages, and as the family list that had never carried a fund
+  // project page: a hand-typed list of surfaces is a list of the surfaces
+  // somebody thought of. `tools/lib/families.js` is the one list of rendered
+  // families and is enumerated against the built site, so a template that
+  // exists is a template this scan opens.
+  //
+  // The extras below are STATES rather than families, which is the one thing
+  // that list cannot hold.
   const a11yPages = [
-    "/", "/discover", "/countries", "/europe/norway", "/europe/norway/fjord-norway/bergen",
-    "/europe/norway/fjord-norway/bergen/place/bryggen", "/plan", "/search", "/map",
-    "/journeys/the-alpine-grand-tour", "/experiences", "/experiences/nature",
-    "/stories/the-last-forest", "/events/oct", "/fund", "/privacy", "/accessibility",
-    "/my-europe", "/sources/freshness",
-    // THE STAY EXEMPLAR WAS NOT IN THIS LIST AND ITS TEXT HAD NEVER BEEN
-    // MEASURED. The destination shape was represented by Bergen, which has
-    // no accommodation context, so the two quietest paragraphs on the new
-    // section — who holds the rooms, and the affiliate disclosure — were
-    // never contrast-checked in either colour scheme. That is the thumb-bar
-    // failure again: the suite measured five items and nothing else. A page
-    // shape is not represented by a page that does not have the thing.
+    ...require("./lib/families.js").ALL.map(([, url]) => url),
+    // THE STAY EXEMPLAR. The destination shape was represented by Bergen,
+    // which has no accommodation context, so the two quietest paragraphs on
+    // that section — who holds the rooms, and the affiliate disclosure —
+    // were never contrast-checked in either colour scheme.
     "/europe/france/alps-and-east/chamonix",
+    // A place page that is not the one families.js picks, and the freshness
+    // board, which is a table nothing else in this suite opens.
+    "/europe/norway/fjord-norway/bergen/place/bryggen",
+    "/sources/freshness",
   ];
 
   const a11yProbe = () => {
@@ -3657,8 +3667,20 @@ async function main() {
       const text = (a.textContent || "").trim() || a.getAttribute("aria-label") || a.querySelector("svg[aria-label]");
       if (!text) out.emptyLinks.push(a.getAttribute("href") || "(no href)");
     }
+    // A GRAPHIC IS NAMED OR IT IS HIDDEN, AND NEVER BOTH. `role="img"`
+    // announces a meaningful image and `aria-hidden` removes it, so the two
+    // together are an image with no name; in practice aria-hidden wins, so
+    // nothing is broken for a reader and nothing goes red either — which is
+    // why eight of them sat on /method until this scan was pointed at every
+    // family instead of at twenty typed URLs. The message names the element,
+    // because "svg without a name" on a page with eleven of them is a
+    // failure message with no measurement in it.
     for (const g of document.querySelectorAll('svg[role="img"]')) {
-      if (!g.getAttribute("aria-label") && !g.querySelector("title")) out.noAlt.push("svg without a name");
+      const who = `<svg class="${(g.getAttribute("class") || "(none)")}">`;
+      if (g.getAttribute("aria-hidden") === "true")
+        out.noAlt.push(`${who} claims role="img" and hides itself`);
+      else if (!g.getAttribute("aria-label") && !g.querySelector("title"))
+        out.noAlt.push(`${who} has role="img" and no name`);
     }
     if (!document.querySelector("main")) out.issues.push("no <main> landmark");
     if (!document.querySelector('nav[aria-label]')) out.issues.push("no labelled nav");

@@ -1554,6 +1554,26 @@ asserts the referral is a 24px target with a real name, that the disclosure is
 requests off this origin — which is also the answer to how it behaves on a
 slow network: there is nothing to be slow.
 
+**AND THEN THE SAME FAULT ONE LEVEL UP: THE LIST WAS TWENTY URLs TYPED BY
+HAND.** Adding Chamonix fixed the STATE that list was missing and left the
+shape of the list alone — twenty-six page shapes had never been scanned in
+either colour scheme, among them a macro region, a theme, a motion, a month,
+a sub-category, a fund project, a facet list, the four legal pages, the
+public API, contact, help and the manifesto. It reads `tools/lib/families.js`
+now, which is the one list of rendered families and is enumerated against the
+built site, plus the three entries that are a STATE rather than a family
+(Chamonix with its Stay layer, a second place page, the freshness board).
+The suite gained close to four hundred and fifty assertions, and the first run found eight graphics on
+`/method` **claiming `role="img"` and hiding themselves** — an image with no
+name, on the one page whose subject is how a number is arrived at. Nothing
+was broken for a reader, which is why nothing had ever gone red: `aria-hidden`
+wins in practice, so the markup was a contradiction rather than a barrier.
+Hidden is the right answer rather than a label, because `.distnum` beside it
+prints the same drawing in words. **A graphic is named or it is hidden, and
+never both** — asserted now, with the element named in the message, because
+"svg without a name" on a page with eleven of them is a failure message with
+no measurement in it.
+
 **No photograph, and it is a licence position rather than an aesthetic one.**
 This is the family where a photograph does work type cannot — you choose where
 to sleep partly on what the place looks like at seven in the morning — and the
@@ -3412,8 +3432,12 @@ the fund project page shipped at 0% picture for the life of the family.
 
 **And one that is deliberately not a gate.** `node tools/contact-sheet.js`
 puts one page per family in a single image. `--dark` shoots the dark
-colour-scheme preference, `--phone` shoots 390px, and `--set=N` pages
-through the whole list twelve at a time (`--more` is `--set=2`). **The list
+colour-scheme preference, `--phone` shoots 390px, `--tablet` shoots 834, and
+`--set=N` pages through the whole list twelve at a time (`--more` is
+`--set=2`). **834 is the width that finds a two-column layout collapsing a
+column just above its own breakpoint** — two heads and the four doors on
+/how-it-works were each wrong only between the breakpoints, and invisible at
+both the widths everything else is shot at. **The list
 is `tools/lib/families.js` and both this and `opening.js` read it**, because
 the sheet used to type its own and the two disagreed: it carried
 `["macro", "/countries/"]` — the countries INDEX under the macro family's

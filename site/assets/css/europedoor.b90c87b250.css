@@ -4390,8 +4390,14 @@ body[data-hero] .masthead { position: sticky; }
  * it. The first version sat above that query at equal specificity, so the
  * base rule won on every count and the lede rendered on top of the map. */
 .reachhead .reach { display: grid; gap: var(--s2); justify-items: start; }
-.reachhead .reach .constel { width: 100%; max-width: 22rem;
-                             fill: var(--atlas-far); }
+/* THE FILL IS GONE AND THE SIZE IS WHAT THIS RULE IS FOR. `.constel` already
+   sets `fill: var(--atlas-far)` further down the file, so this restated it at
+   higher specificity and changed nothing — the dead-rule scan found it the
+   run after /fund joined this head, which is the ceiling doing its job. A
+   declaration that restates what the element already gets is the commonest
+   thing that scan finds, and the answer is to delete it rather than to raise
+   the number. */
+.reachhead .reach .constel { width: 100%; max-width: 22rem; }
 .reachhead .datacut stop { stop-color: var(--paper); }
 .reachhead .reachnote { font-size: var(--t-xs); color: var(--ink-3);
                         max-width: 36ch; margin: 0; }

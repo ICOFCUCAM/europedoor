@@ -9346,7 +9346,21 @@ def method_page(data):
         # the difference between a chart and a decoration, and they cost
         # nothing: the axis is already the full 0–100.
         return (f'<span class="rowdist">'
-                f'<svg class="dist" viewBox="0 0 100 14" role="img" aria-hidden="true" '
+                # NOT `role="img"`. A graphic is named or it is hidden, and
+                # this one claimed both: `role="img"` announces a meaningful
+                # image to assistive technology and `aria-hidden` removes it,
+                # so it was an image with no name — eight of them, on the one
+                # page whose subject is how a number is arrived at. In
+                # practice aria-hidden wins and the markup was a contradiction
+                # rather than a barrier, which is why nothing had ever gone
+                # red: the accessibility scan's page list was twenty typed
+                # URLs and /method was not among them.
+                #
+                # Hidden is the right answer rather than a label, because
+                # `.distnum` beside it prints the same drawing in words —
+                # "34-97, median 63" — so a name here would be the sentence a
+                # reader already has, said twice.
+                f'<svg class="dist" viewBox="0 0 100 14" aria-hidden="true" '
                 f'preserveAspectRatio="none">'
                 f'<rect class="distaxis" x="0" y="6" width="100" height="2"/>'
                 f'<rect class="distend" x="0" y="2" width="1" height="10"/>'
