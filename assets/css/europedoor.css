@@ -8018,3 +8018,18 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
    this family actually ships in is the one that has to compose. */
 .ed-arrival-media.maponly { display: grid; place-items: center; padding: var(--s6); }
 .ed-arrival-media .placeband-map { width: 100%; }
+
+/* THE JOURNEY HERO'S OWN FACTS LINE, on cobalt. A journey's three numbers
+   are the one thing that decides whether a reader can take it — days,
+   stops, countries — and they belong in the hero rather than in a meta line
+   under it. Bone at 82% measures 5.0 on the cobalt ground. */
+.ed-journey-hero .ed-eyebrow { color: var(--ed-bone); }
+.ed-journey-hero .ed-intro {
+  max-width: 44ch; margin-top: var(--s5);
+  color: color-mix(in srgb, var(--ed-bone) 90%, transparent);
+}
+.ed-journey-facts {
+  font-family: var(--ed-mono); font-size: var(--t-xs); letter-spacing: .1em;
+  text-transform: uppercase; margin: var(--s6) 0 0;
+  color: color-mix(in srgb, var(--ed-bone) 82%, transparent);
+}

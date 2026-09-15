@@ -2650,7 +2650,7 @@ def c_frontend():
     # family that drops the idea altogether still fails.
     FLOORS = {"kicker": 0.99, "masthead": 0.99, "pagehead": 0.99, "crumbs": 0.99,
               "row": 0.85, "card": 0.05, "band": 0.70, "note": 0.70}
-    ALSO = {"pagehead": ("ed-opening", "ed-arrival"),
+    ALSO = {"pagehead": ("ed-opening", "ed-arrival", "ed-journey-hero"),
             "kicker": ("ed-eyebrow", "ed-section-index"),
             "row": ("ed-row",), "band": ("ed-section",)}
     total = 0
@@ -2804,6 +2804,21 @@ def c_invariants():
         return 0
     with open(path, encoding="utf-8") as fh:
         want = json.load(fh)["invariants"]
+    # THE MEASUREMENT FIRST, THEN AS MUCH REASON AS A PERSON WILL READ.
+    # `primitives.reach` carries a four-thousand-word reason — every
+    # deliberate move this figure has ever made, which is exactly what it
+    # should carry, and it is printed in full on every one of the sixteen
+    # sub-keys it can fail on. A run reporting three one-page migrations
+    # printed twelve thousand words, and the three numbers that diagnose it
+    # were in the first line of each. This file's own rule is that a failure
+    # message with no measurement in it cannot be diagnosed; the corollary
+    # is that a measurement buried in an essay is not in the message either.
+    # The register keeps the whole reason and `--check` prints its opening.
+    def _why(spec):
+        w = " ".join(spec.get("why", "").split())
+        return w if len(w) <= 240 else w[:240].rsplit(" ", 1)[0] + \
+            " … (the rest of the reason is in docs/invariants.json)"
+
     n = 0
     for name, spec in sorted(want.items()):
         now = got.get(name, {}).get("value")
@@ -2814,15 +2829,15 @@ def c_invariants():
             for k, v in exp.items():
                 if now.get(k, 0) < v:
                     fail(f"invariant {name}.{k} fell to {now.get(k)} from {v} — "
-                         f"{spec['why']}")
+                         f"{_why(spec)}")
                 n += 1
         elif kind == "ceiling":
             if now > exp:
-                fail(f"invariant {name} rose to {now} above {exp} — {spec['why']}")
+                fail(f"invariant {name} rose to {now} above {exp} — {_why(spec)}")
             n += 1
         else:
             if now != exp:
-                fail(f"invariant {name} is {now!r}, recorded {exp!r} — {spec['why']}")
+                fail(f"invariant {name} is {now!r}, recorded {exp!r} — {_why(spec)}")
             n += 1
     return n
 
@@ -5342,7 +5357,8 @@ def c_index_extent():
         # other and the promise is about the page.
         head = (_element_text(h, "pagehead") + " "
                 + _element_text(h, "ed-opening") + " "
-                + _element_text(h, "ed-arrival"))
+                + _element_text(h, "ed-arrival") + " "
+                + _element_text(h, "ed-journey-hero"))
         nums = {int(x) for x in re.findall(r"\b(\d{1,5})\b", head)}
         n += 1
         if size not in nums:
@@ -5633,7 +5649,8 @@ def c_pagehead_role():
             # full-bleed with the name set into its foot — which is a head
             # that happens not to be called one.
             if re.search(r'class="ed-opening ed-family-([a-z]+)"', h) or \
-                    'class="ed-arrival"' in h:
+                    'class="ed-arrival"' in h or \
+                    'class="ed-journey-hero"' in h:
                 n += 1
                 continue
             if r not in NO_HEAD:

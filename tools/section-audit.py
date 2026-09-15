@@ -658,7 +658,17 @@ def s17():
     # and the eleven-item fact table moved BELOW the legs. It used to open on
     # that table, with the sequence four screens down as a bulleted list.
     h = page(u)
-    yield 'class="statement"' in h, "the strapline is the hero, not an 11px kicker"
+    # THE THIRTEENTH SHAPE PINNED HERE, and the same one as §13's: the
+    # strapline moved from `.statement` on paper to `.ed-intro` inside a
+    # cobalt hero, which is more of what this asserts and not less. The
+    # promise is that the sentence outranks the numbers — a journey page
+    # that opens on an eleven-row fact table has regressed to a timetable.
+    _h1 = h.find("<h1")
+    _say = h.find("<p", _h1) if _h1 > 0 else -1
+    _facts = min([i for i in (h.find('class="facts"'), h.find('class="orient"'),
+                              h.find("ed-journey-facts")) if i > 0] or [len(h)])
+    yield _h1 > 0 and _say > _h1 and _say < _facts, \
+        "the strapline is the hero, not an 11px kicker, and it precedes the numbers"
     yield 'class="legs route"' in h, "the legs are drawn as a route, not listed"
     # Assert the FACT TABLE's position, not the heading order. The first
     # version of this compared two headings, and moving the facts above the

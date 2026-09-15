@@ -4230,13 +4230,15 @@ def journey_page(data, j):
     body = f"""
 {crumbs([("Europe", "/discover"), ("Journeys", "/journeys"), (j["name"], None)])}
 {photoband}
-<div class="pagehead overture">
-  <p class="kicker">Journey</p>
-  <h1>{esc(j['name'])}</h1>
-  {statement(j['strapline'])}
-  <p class="orient">{n_of(j['days'], 'day')} · {n_of(len(j['legs']), 'stop')} · {n_of(len(countries), 'country')} · {total_km:,} km in a straight line</p>
-  {chips(j["interests"], data["interests"])}
-</div>
+<section class="ed-journey-hero">
+  <div class="ed-journey-hero-inner">
+    <p class="ed-eyebrow">Journey</p>
+    <h1>{esc(j['name'])}</h1>
+    <p class="ed-intro">{esc(j['strapline'])}</p>
+    <p class="ed-journey-facts">{n_of(j['days'], 'day')} · {n_of(len(j['legs']), 'stop')} · {n_of(len(countries), 'country')} · {total_km:,} km in a straight line</p>
+  </div>
+</section>
+<div class="headmeta ed-section">{chips(j["interests"], data["interests"])}</div>
 
 <div class="routewrap">{routemap(data, j)}</div>
 
@@ -6582,15 +6584,15 @@ def place_page(data, c, r, t, pl):
      the drawing is 1168x467, which is 2.5:1 — the region's own figure, and
      the reason recorded there applies unchanged: a plate that wide cannot
      stand beside the type the way a country's portrait does. -->
-<div class="pagehead overture placehead">
-  <p class="kicker">{esc(PLACE_KIND_NAMES[pl['kind']])} · {esc(t['name'])}, {esc(c['name'])}</p>
-  <h1>{esc(pl['name'])}</h1>
-  {statement(pl['summary'])}
-  {placeart}
-  <div class="headmeta">
-    <p class="orient">Give it {esc(pl['duration'])} · {esc(SEASON_NAMES[pl['season']])} ·
-    <span class="mono">{pl["lat"]:.3f}°N, {pl["lon"]:.3f}°E</span></p>
-  </div>
+{ed_opening(
+    eyebrow=f"{PLACE_KIND_NAMES[pl['kind']]} · {t['name']}, {c['name']}",
+    title=pl["name"],
+    intro=pl["summary"],
+    visual=placeart,
+    family="arrival")}
+<div class="headmeta ed-section">
+  <p class="orient">Give it {esc(pl['duration'])} · {esc(SEASON_NAMES[pl['season']])} ·
+  <span class="mono">{pl["lat"]:.3f}°N, {pl["lon"]:.3f}°E</span></p>
 </div>
 
 <section class="practical" aria-label="Practical">
@@ -8379,16 +8381,16 @@ def theme_page(data, t):
     # the photograph's.
     body = f"""
 {crumbs([("Europe", "/discover"), ("Themes", "/themes"), (t["name"], None)])}
-<div class="pagehead overture opening">
-  <div class="openingsay">
-    <p class="kicker">{esc(t['strapline'])}</p>
-    <h1>{esc(t['name'])}</h1>
-    {statement(t['summary'])}
-    <p class="orient">{len(t['stops'])} places across {len(countries)}
-    {"countries" if len(countries) != 1 else "country"} · not an itinerary</p>
-    {chips(t["interests"], data["interests"])}
-  </div>
-  {headpic}
+{ed_opening(
+    eyebrow=t["strapline"],
+    title=t["name"],
+    intro=t["summary"],
+    visual=headpic,
+    family="discovery")}
+<div class="headmeta ed-section">
+  <p class="orient">{len(t['stops'])} places across {len(countries)}
+  {"countries" if len(countries) != 1 else "country"} · not an itinerary</p>
+  {chips(t["interests"], data["interests"])}
 </div>
 
 {below}

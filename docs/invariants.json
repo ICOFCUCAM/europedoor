@@ -138,9 +138,9 @@
     },
     "primitives.reach": {
       "value": {
-        "kicker": 0.872,
+        "kicker": 0.597,
         "masthead": 1.0,
-        "pagehead": 0.515,
+        "pagehead": 0.24,
         "crumbs": 0.998,
         "row": 0.887,
         "card": 0.059,
@@ -149,10 +149,10 @@
         "facts": 0.758,
         "btn": 0.642,
         "chip": 0.52,
-        "ed-opening": 0.175,
-        "ed-section": 0.484,
+        "ed-opening": 0.434,
+        "ed-section": 0.759,
         "ed-row": 0.001,
-        "ed-eyebrow": 0.484,
+        "ed-eyebrow": 0.759,
         "ed-photo": 0.0,
         "ed-split": 0.0
       },
