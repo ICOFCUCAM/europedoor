@@ -5618,7 +5618,6 @@ body[data-hero] .masthead { position: sticky; }
 .card-map { background: var(--atlas-sea); display: flex; align-items: center;
             justify-content: center; padding: var(--s4);
             aspect-ratio: 1000 / 780; }
-.card-map .constel { fill: var(--atlas-land); }
 .card-map .regionglyph .countries path { fill: var(--atlas-here);
   stroke: var(--atlas-coast); stroke-width: 1.1; vector-effect: non-scaling-stroke; }
 .card:hover .card-map .regionglyph .countries path { fill: #fff; }
@@ -6295,7 +6294,6 @@ main > .pagehead:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom
  * was fixed. Neither was a decision about a MAP. Cream land on the
  * Atlantic, marks in the signature, and every mark carries a hairline of
  * the land so it separates from the water it may be sitting beside. */
-.iheroart .constel { fill: var(--atlas-land); }
 .iheroart .constel-lit circle { fill: var(--cobalt); r: 9px;
   stroke: var(--atlas-here); stroke-width: 1.8; }
 /* r:9, not the theme row's 22. A glyph's radius is fitted to a 132px mark
