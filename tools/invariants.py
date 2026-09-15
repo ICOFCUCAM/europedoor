@@ -328,7 +328,9 @@ def measure():
                        "cut so the continent stops ending in a "
                        "knife-straight diagonal through Russia. 5 KB of "
                        "anonymous rings, emitted once and cloned by "
-                       "every glyph on the page."},
+                       "every glyph on the page.\n"
+                       "  129 -> 130 the homepage journey rows got the stops "
+                       "in order and the trip's rhythm bar."},
             "weight.max_page_kb": {
                 "value": round(max(len(b) for b in bodies.values()) / 1024),
                 "kind": "ceiling",

@@ -102,9 +102,9 @@
       "why": "Zero today, because zero photographs are licensed. This moving is the signal that licensed imagery arrived — which must go through the licence register first."
     },
     "weight.home_kb": {
-      "value": 129,
+      "value": 130,
       "kind": "ceiling",
-      "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it may move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence.\n  25 -> 109  the drawn hero: Europe on its own conic, relief, rivers, the ground beyond.\n  119 -> 146 eleven abstract plates out, the data in: every destination carrying each tag.\n  121 -> 136 the four doors got their drawing back; 146 -> 122 when they became photograph slots sized to their content.\n  122 -> 123 the Atom feed, declared in the one function that emits <head>.\n  123 -> 129 the body glyphs got a cartography: water, frontiers, and the land beyond the 52°E cut so the continent stops ending in a knife-straight diagonal through Russia. 5 KB of anonymous rings, emitted once and cloned by every glyph on the page."
+      "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it may move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence.\n  25 -> 109  the drawn hero: Europe on its own conic, relief, rivers, the ground beyond.\n  119 -> 146 eleven abstract plates out, the data in: every destination carrying each tag.\n  121 -> 136 the four doors got their drawing back; 146 -> 122 when they became photograph slots sized to their content.\n  122 -> 123 the Atom feed, declared in the one function that emits <head>.\n  123 -> 129 the body glyphs got a cartography: water, frontiers, and the land beyond the 52°E cut so the continent stops ending in a knife-straight diagonal through Russia. 5 KB of anonymous rings, emitted once and cloned by every glyph on the page.\n  129 -> 130 the homepage journey rows got the stops in order and the trip's rhythm bar."
     },
     "weight.max_page_kb": {
       "value": 441,

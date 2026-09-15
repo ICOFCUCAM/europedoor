@@ -5912,13 +5912,28 @@ body[data-hero] .masthead { position: sticky; }
  * the explanation of a journey and it has to be readable to explain
  * anything: at 22rem the Arctic-to-Mediterranean line is a line. */
 .jrow {
-  display: grid; grid-template-columns: minmax(0, 1fr) 22rem; gap: var(--s6);
-  align-items: center; padding: var(--s6) 0; border-bottom: 1px solid var(--rule);
+  display: grid; grid-template-columns: minmax(0, 27rem) minmax(0, 1fr);
+  gap: var(--s7);
+  /* START, not centre. A 250-pixel block of type centred against a 530-pixel
+     picture leaves 140 above and 140 below, and centring slop reads as a
+     mistake where a shared top edge reads as a decision. */
+  align-items: start; padding: var(--s6) 0; border-bottom: 1px solid var(--rule);
   text-decoration: none; color: inherit;
 }
+/* THE COLUMNS WERE THE WRONG WAY ROUND FOR THE CONTENT IN THEM. `1fr 22rem`
+   gave a three-word title, a six-word line and a meta row 784 pixels and gave
+   the drawing 352 — so two thirds of every row was a short headline with four
+   hundred pixels of nothing after it, and the one thing a journey is chosen
+   on was a thumbnail. A journey is chosen on where it goes in order, so the
+   route takes the width and the type takes a measure that suits its length. */
 .jrow h3 { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); line-height: 1.12;
            margin: 0 0 var(--s2); }
 .jrowsub { color: var(--ink-3); margin: 0 0 var(--s4); max-width: 52ch; }
+/* The stops, in order. A middot list rather than a measure: this is a
+   sequence to scan, not prose to read. */
+.jrowstops { font-size: var(--t-sm); line-height: 1.5; color: var(--ink-2);
+             margin: 0 0 var(--s3); max-width: none; }
+.jrow .hopbar { margin-bottom: var(--s4); }
 .jrowmeta {
   display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4);
   font-size: var(--t-sm); letter-spacing: .06em; text-transform: uppercase;

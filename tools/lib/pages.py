@@ -1326,12 +1326,29 @@ def home(data):
         km = j.get("km")
         facts = [f"{j['days']} days", f"{len(countries)} countries",
                  f"{len(j['legs'])} stops"]
+        # THE STOPS IN ORDER, AND THE TRIP'S RHYTHM — the two things /journeys
+        # gives every one of its seventeen rows and the homepage gave none of
+        # its three. Without them the left column held a three-word title and
+        # a six-word line beside a picture twice its height, so the row was
+        # mostly nothing. A journey is chosen on where it goes in order; this
+        # is that, and the bar is each hop's share of the whole trip.
+        hops, prev = [], None
+        for c in legs:
+            if prev is not None:
+                hops.append(haversine(prev, c))
+            prev = c
+        total = sum(hops)
+        segs = "".join(
+            f'<span class="w{max(1, int(round(h / total * 100)))}"></span>'
+            for h in hops) if total else ""
         jrows.append(
             f"""<a class="jrow" href="{urls.journey(j)}">
   <div class="jrowtext">
     <p class="kicker">{esc(" → ".join(countries))}</p>
     <h3>{esc(j['name'])}</h3>
     <p class="jrowsub">{esc(j['strapline'])}</p>
+    <p class="jrowstops">{" · ".join(esc(c["name"]) for c in legs)}</p>
+    <span class="hopbar route" aria-hidden="true">{segs}</span>
     <p class="jrowmeta">{esc(" · ".join(facts))}<span class="waygo">Explore journey →</span></p>
   </div>
   <div class="jrowart">{constellation(
@@ -7771,7 +7788,8 @@ def country_glyph(slug, cs):
             f'aria-hidden="true" focusable="false">{lit}</svg>')
 
 
-def glyph_view(pts, pad_frac=0.34, min_pad=90.0, min_span=340.0):
+def glyph_view(pts, pad_frac=0.34, min_pad=90.0, min_span=340.0,
+               aspect=None):
     """The viewBox that frames a set of projected points, held to the canvas.
 
     Lifted out of `region_glyph`, which had it inline, because the same
@@ -7800,7 +7818,11 @@ def glyph_view(pts, pad_frac=0.34, min_pad=90.0, min_span=340.0):
     # Held to the canvas proportion, so a set of glyphs is a set of boxes of
     # the same shape and only the geography inside them differs.
     w, h = x1 - x0, y1 - y0
-    want = MAP_W / MAP_H
+    # The frame's proportion is the canvas's unless the caller asks for
+    # another. A journey row is a wide band and a route is usually wide, so
+    # framing one at 1.28 makes a tall picture beside a short paragraph and
+    # four hundred pixels of nothing under it.
+    want = aspect or (MAP_W / MAP_H)
     if w / h < want:
         grow = (h * want - w) / 2
         x0, x1 = x0 - grow, x1 + grow
@@ -7880,7 +7902,7 @@ def offframe_line(pts, data, listed=True):
 
 
 def constellation(pts, extra="", route=False, frame=False, cut=False,
-                  ocean=True):
+                  ocean=True, aspect=None):
     """A set of real destinations lit on the shared silhouette.
 
     THE ARGUMENT DRAWN, AND THE REASON IT REPLACED ELEVEN PAINTINGS. The
@@ -7925,7 +7947,8 @@ def constellation(pts, extra="", route=False, frame=False, cut=False,
     # how far each one reaches, three countries against seven, and that
     # comparison only exists while all thirteen are drawn at one extent.
     # Framing them would delete the argument the family is making.
-    view = glyph_view(pts) if (frame and pts) else f"0 0 {MAP_W} {MAP_H}"
+    view = (glyph_view(pts, aspect=aspect) if (frame and pts)
+            else f"0 0 {MAP_W} {MAP_H}")
     # THE DATA CUT SHOWED RAW ON EVERY INDEX OPENING. All 21 `.iheroart`
     # drawings are at the full extent, which means the straight diagonal at
     # 52°E runs right through the arch — and there it is the worst case on
@@ -10955,7 +10978,7 @@ def motion_page(data, m):
         + f'</p><p class="rowmeta jfacts">{n_of(j["days"], "day")} · '
         f'{n_of(len(j["legs"]), "stop")} · {esc(j["difficulty"])}</p></div>'
         f'<div class="jart">'
-        + constellation(_pts([l["city"] for l in j["legs"]]), route=True, frame=True)
+        + constellation(_pts([l["city"] for l in j["legs"]]), route=True, frame=True, aspect=1.75)
         + '</div></a>'
         for j in jrows)
 
