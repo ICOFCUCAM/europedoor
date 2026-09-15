@@ -3017,10 +3017,12 @@ def country_page(data, c):
     <p class="kicker">{esc(m['name'])}</p>
     <h1>{esc(c['name'])}</h1>
     {statement(c['tagline'])}
+  </div>
+  {countryportrait(data, c)}
+  <div class="portraitmeta">
     <p class="orient">{country_orient(c)}</p>
     {chips(c["interests"], data["interests"])}
   </div>
-  {countryportrait(data, c)}
 </div>
 {advisory_note(c)}
 

@@ -3194,13 +3194,38 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    further down the file, so this one matched fifty elements and changed
    none of them. The dead-rule scan found it in the same run that shipped
    the skin, which is what that scan is for. */
+/* THE SHAPE IS THE ANSWER AND ON A PHONE IT WAS THE SIXTH THING. Measured
+   at 390 on /europe/austria: masthead 89, breadcrumb 52, kicker 20, name 54,
+   tagline 81, extent 40, six interest chips 99 — and the door itself began
+   at 591, two hundred pixels below the fold, on the one family whose whole
+   claim is that a reader keeps the shape, the name and one sentence. The
+   extent and the chips are the RECORD, which is what every band below the
+   fold is for; they are not what a country page opens on. Moving them
+   after the portrait is a DOM change rather than a rule, because they sat
+   inside `.portraitsay` and a grid can only place what it can address.
+   Measured after: the portrait begins at 395. */
+.portraitmeta { display: grid; gap: var(--s3); }
 @media (min-width: 52rem) {
   /* `auto` rather than a fixed track: the door takes the width its country
      needs and the type takes the rest, so a narrow country does not leave a
-     column of nothing beside it. */
+     column of nothing beside it. The placement is EXPLICIT because the
+     phone order now differs from the desk one: in document order the meta
+     block follows the door, and on a desk it belongs under the name in
+     column one. Stated rather than left to auto-flow, which would put it
+     in column two under the picture. The two `1fr` rows ABOVE and BELOW the
+     pair are what keeps the old composition: a door is 416px and the name
+     and its extent are about 300, so with two auto rows the leftover was
+     split BETWEEN them and the page rendered 350 pixels of white between
+     the tagline and the chips. The slack belongs outside the group, not
+     inside it. */
   .pagehead.portraithead { grid-template-columns: minmax(0, 1fr) auto;
-                           column-gap: var(--s8); }
-  .plate { justify-self: end; }
+                           grid-template-rows: 1fr auto auto 1fr;
+                           column-gap: var(--s8); row-gap: var(--s5);
+                           align-items: start; }
+  .pagehead.portraithead .portraitsay  { grid-column: 1; grid-row: 2; }
+  .pagehead.portraithead .portraitmeta { grid-column: 1; grid-row: 3; }
+  .pagehead.portraithead .plate { grid-column: 2; grid-row: 1 / -1;
+                                  align-self: center; justify-self: end; }
 }
 @media (max-width: 52rem) {
   /* On a phone the portrait goes under the name and loses a third of its
