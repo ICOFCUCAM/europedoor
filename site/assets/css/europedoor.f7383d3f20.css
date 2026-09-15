@@ -3093,7 +3093,21 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
                  stack on a phone. It is a gradient along the 33rd parallel
                  now, inside the SVG, applied to the atlas groups only: the
                  ground below it is real land and stays. See heroeurope(). */ }
-.heroeurope svg { width: 100%; height: 100%; }
+/* THE CROP IS BOUNDED BY THE MARGIN THE FRAME WAS GIVEN, and it was not.
+   `slice` is right — the atlas frame is 1120x800 where every other map is
+   1000x780, and those extra units east and south exist to be cropped. But
+   the drawing's width is capped at the column (62rem) while its height fills
+   a hero whose own floor is 43vw, so the taller the window the more of the
+   WIDTH is cut. Measured: 1,078 of 1,120 units shown at 1280 and 1600, 961
+   at 1920 — where AZERBAIJAN is sliced 12 pixels past the frame — and 721 at
+   2560, a third of the drawing thrown away and the country names placed
+   against a rectangle no reader sees.
+
+   1050 of 1120 is the margin, so that is the floor. The drawing keeps its
+   own proportion past the width where the hero grows taller than it, and
+   centres in the ground the hero already paints. */
+.heroeurope svg { width: 100%; height: 100%;
+                  max-height: calc(min(78vw, 62rem) * 800 / 1050); }
 
 /* AND ON A NARROW SCREEN THE SIDE-BY-SIDE COMPOSITION HAS NOWHERE TO PUT THE
    CONTINENT. The desktop hero is type on the left and Europe on the right,
