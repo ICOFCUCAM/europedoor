@@ -5468,14 +5468,25 @@ def minimap(data, t, span=3.2, about=None, named=None):
     # cartography.credited(). Building the sentence out here and handing it
     # over costs nothing and removes the one place in this file that took a
     # renderer's output apart with a string index.
+    # THE PROVENANCE WAS AS LOUD AS THE PICTURE. Measured at 390 on a
+    # destination page: the map draws 250 pixels tall and the one paragraph
+    # under it runs six lines and 160 — a caption, a frame measurement, a
+    # coastline credit and a relief credit, all in one run of the same type.
+    # Every one of them has to be there, and nobody had decided how loudly.
+    #
+    # Two lines: what the picture IS, and where the data came from. The
+    # second is the site's own source-note scale, which is what it is for.
+    # `credited()` still inserts before the map link, so the relief credit
+    # lands with the other credits and not in the sentence.
     cap = (
-        f'<figcaption>'
+        f'<figcaption><span class="capsay">'
         + (f'{esc(about)} is in {esc(t["name"])}, and this is {esc(t["name"])} '
            f'— the atlas draws Europe in one projection whose finest unit is '
            f'about four kilometres, so it maps the town rather than the '
            f'street. The frame is about ' if about else
            f'{esc(t["name"])} and its neighbours in the Atlas — the frame is about ') +
-        f'{km_w:,} km across and {km_h:,} km deep at this latitude. '
+        f'{km_w:,} km across and {km_h:,} km deep at this latitude.</span>'
+        f'<span class="capsrc">'
         # THE CREDIT, WHICH 318 PAGES DID NOT CARRY AND 274 CARRIED BY
         # ACCIDENT. A destination page named Natural Earth because pop_line
         # prints the dataset behind its population — so the 45 destinations
@@ -5484,7 +5495,7 @@ def minimap(data, t, span=3.2, about=None, named=None):
         # is worse than none, because it looks like a policy. One clause, the
         # same one the region and story maps carry.
         f'Coastline from <a href="/sources">Natural Earth</a>, public domain. '
-        f'<a href="/map">The full map →</a></figcaption>')
+        f'<a href="/map">The full map →</a></span></figcaption>')
     return cartography.plate(
         # TWO SPACES, NAMED SEPARATELY. `view` is the window in the
         # continent projection this plate shows; `transform` is what
