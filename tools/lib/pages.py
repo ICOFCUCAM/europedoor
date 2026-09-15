@@ -7643,8 +7643,18 @@ def region_glyph(members, frame=None, min_span=0.0):
     # The data cut only where the drawing is at the full extent: a framed
     # glyph is a window on one region and the cut is not in it.
     _cut = "" if frame else cut_fade("rg", MAP_W, MAP_H, dusk_reach(), cls="datacut")
+    # The same cartography `constellation()` draws, because this is the same
+    # drawing: water, the land beyond the cut, frontiers. Built here rather
+    # than there only because this one lights countries instead of dots, and
+    # two glyph families with two cartographies is what this pass is undoing.
+    vx, vy, vw, vh = (float(n) for n in view.split())
     return (f'<svg class="constel regionglyph" viewBox="{view}" '
-            f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
+            f'aria-hidden="true" focusable="false">'
+            f'<rect class="glyph-sea" x="{vx:.0f}" y="{vy:.0f}" '
+            f'width="{vw:.0f}" height="{vh:.0f}"/>'
+            f'<use class="glyph-beyond" href="#constel-beyond"/>'
+            f'<use class="glyph-land" href="#constel-eu"/>'
+            f'<use class="glyph-bounds" href="#constel-eu"/>'
             f'{_cut}{lit}</svg>')
 
 
@@ -7784,8 +7794,11 @@ def country_glyph(slug, cs):
     corners = [project(lat, lon)
                for lon in (bb[0], bb[2]) for lat in (bb[1], bb[3])]
     view = glyph_view(corners, pad_frac=0.16, min_pad=10.0, min_span=0.0)
+    vx, vy, vw, vh = (float(n) for n in view.split())
     return (f'<svg class="constel countryglyph" viewBox="{view}" '
-            f'aria-hidden="true" focusable="false">{lit}</svg>')
+            f'aria-hidden="true" focusable="false">'
+            f'<rect class="glyph-sea" x="{vx:.0f}" y="{vy:.0f}" '
+            f'width="{vw:.0f}" height="{vh:.0f}"/>{lit}</svg>')
 
 
 def glyph_view(pts, pad_frac=0.34, min_pad=90.0, min_span=340.0,
