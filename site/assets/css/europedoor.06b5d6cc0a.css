@@ -5848,8 +5848,27 @@ body[data-hero] .masthead { position: sticky; }
    them — it is the SHARED continent underneath that lives in a shadow tree
    and is painted by inheritance. Both halves of the <use> trap in four
    lines. */
-.regionglyph .countries path { fill: var(--cobalt); }
-.macroband:hover .regionglyph .countries path { fill: var(--cobalt-deep); }
+/* THE SUBJECT OF A DRAWING IS NOT PAINTED IN THE ACCENT, and this was the
+   last family still doing it. Nine macro bands lit their member countries
+   in `--cobalt` — the signature, a five-per-cent colour — as a filled AREA
+   over cream land and a navy sea, so the Nordics read as a selection state
+   in a user interface rather than as land with the light on it. It is the
+   fifty country portraits exactly, which were fixed for the same thing, and
+   the reason electric lime was removed before that: a continent drawn in
+   the accent is a network diagram.
+
+   The card version of this glyph has been right all along —`--atlas-here`
+   over `--atlas-land` with an ink frontier, a separation `docs/palette.json`
+   already declares and recomputes. This is that, so the same drawing is the
+   same drawing on both surfaces. Cobalt stays where cobalt belongs on a
+   map: the MARKS.
+
+   (`.fundart` keeps the accent fill and says why above: it hangs on bare
+   limestone with no water under it, where `--atlas-here` measured 1.0
+   against the page.) */
+.regionglyph .countries path { fill: var(--atlas-here);
+  stroke: var(--atlas-coast); stroke-width: 1.1; vector-effect: non-scaling-stroke; }
+.macroband:hover .regionglyph .countries path { fill: #fff; }
 @media (max-width: 60rem) {
   /* Below the two-column measure the drawing goes under the head at its own
      proportion rather than being squeezed beside it — the same rule the hero
