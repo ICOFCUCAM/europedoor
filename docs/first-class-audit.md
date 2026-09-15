@@ -64,31 +64,44 @@ so 699px of the screen is content. The figure below is the number of those
 
 | surface | first visual at | picture on the first screen |
 |---|---:|---:|
-| map | 418 | 53% |
-| homepage | 233 | 40% |
-| journey | 541 | 35% |
-| region | 563 | 32% |
-| quiet | 566 | 32% |
-| interest | 574 | 31% |
-| story | 545 | 30% |
-| country | 591 | 28% |
-| motion | 620 | 24% |
-| stories | 630 | 23% |
-| theme | 640 | 21% |
-| 404 | 655 | 19% |
-| themes | 663 | 18% |
-| events | 490 | 12% |
-| journeys | 742 | **7%** |
-| countries | 764 | **3%** |
-| **destination** | 795 | **0%** |
-| experiences | 807 | **0%** |
-| discover | 1702 | **0%** |
-| experience category | none on the page | **0%** |
-| plan · search · my-europe | none on the page | **0%** |
+| map | 418 | 56% |
+| country | 415 | 52% |
+| my-europe | 478 | 48% |
+| macro | 459 | 48% |
+| motion | 515 | 39% |
+| stories | 536 | 37% |
+| homepage | 233 | 37% |
+| quiet | 566 | 37% |
+| category | 230 | 36% |
+| themes | 541 | 36% |
+| interests | 549 | 36% |
+| europe-in | 549 | 36% |
+| story | 520 | 35% |
+| events | 490 | 34% |
+| place | 588 | 34% |
+| journey | 599 | 32% |
+| countries | 488 | 32% |
+| journeys | 488 | 32% |
+| interest | 390 | 32% |
+| 404 | 358 | 32% |
+| region | 462 | 30% |
+| destination | 443 | 28% |
+| theme | 159 | 27% |
+| discover | 649 | 26% |
+| experiences | none on the page | **0%** |
+| plan | none on the page | **0%** |
+| search | none on the page | **0%** |
 
-**Seven of twenty-three surfaces have no picture on the first screen at all,
-and five more have under a fifth of it.** Twelve of twenty-three — just over
-half — are effectively type to the fold.
+**RE-MEASURED, AND THE TABLE ABOVE IS THE CURRENT ONE.** It read seven of
+twenty-three surfaces with no picture on the first screen at all and five
+more under a fifth of it — twelve of twenty-three, just over half,
+effectively type to the fold. It is now **three of twenty-seven with none,
+and none under a fifth**: `/plan` and `/search` are instruments whose
+opening is the control they exist to be, and `/experiences` carries a
+recorded refusal of a map that survives re-checking. The median share is
+34.4%, against 24% when this was first measured.
+
+The original reading, kept because the measurement is the record:
 
 **A CORRECTION.** The first version of this table said twenty-one of
 twenty-two surfaces "show a visitor nothing but type", and that was wrong.
@@ -102,14 +115,19 @@ twenty-three, not twenty-one of twenty-two, and the right measure is how
 many pixels of the first screen are a picture rather than where the first
 one starts.
 
-The three that matter most:
+The three that mattered most, and what each of them is now:
 
-- **The destination page is 0%**, on 319 pages, and it is the richest family
-  in the product. Its first 795 pixels are a kicker, a 38px name, a lede, a
-  metadata line, three interest chips and three numbered reasons to go.
-- **The experience category page has no picture anywhere on it, at any
-  scroll position, at any width.**
-- **`/discover` reaches its first drawing at 1,702** — under a filter row.
+- **The destination page was 0%**, on 319 pages, and it is the richest
+  family in the product. Its first 795 pixels were a kicker, a 38px name, a
+  lede, a metadata line, three interest chips and three numbered reasons to
+  go. The view moved into the opening and the record moved after it: 443,
+  28%.
+- **The experience category page had no picture anywhere on it, at any
+  scroll position, at any width.** It draws its own reach now — the
+  countries its invitations are spread across, filled — at 230, 36%.
+- **`/discover` reached its first drawing at 1,702** under a filter row, and
+  the drawing did not exist below 1024px at all. It leads with the continent
+  now: 649, 26%.
 
 And the destination page's order is not the fault. Name, what the place is,
 why go, then where it is, is exactly the sequence the brief asks for — 
@@ -343,18 +361,43 @@ Written as the work landed, so the audit and the record do not drift.
 | 20 | five sub-category pages selected on the wrong word | 39 wrong listings of 401; Monasteries 22 → 4 |
 | 21 | the country pages got an action, in the Stay layer's grammar | 50 pages with none → 44 hand-offs |
 | 22 | and building it found the planner could not be handed a name | 77 of 313 destinations unnameable → 0 |
+| 23 | an instrument for the first screen, so Finding 1 is re-measurable | measured once by hand → `tools/opening.js` |
+| 24 | an overture's name was an index label's size on nine families | h1 38px → 48 at 390 |
+| 25 | the country page's record moved after its portrait | first figure 591 → 415; 33.6% → 52% |
+| 26 | the country portrait never ran the phone collision pass | 32 overlapping label pairs on 18 of 50 plates → 0 |
+| 27 | the index opening's actions and note moved after the figure | countries 740 → 488; journeys 718 → 488 |
+| 28 | a page claimed its nine shapes were drawn to one frame | 10 viewBoxes → the sentence the drawing supports |
+| 29 | the kicker rule named two classes rather than the situation | 6 accent kickers inside a link on the homepage → 0 |
+| 30 | the motion index draws the answer each query produced | /europe-in 0% → 20%, then 36% |
+| 31 | half of every row on two indexes was empty in the middle | 49% and 48% interior gap → 3% |
+| 32 | one row shape for the three indexes that draw their set | two layouts → one |
+| 33 | the aperture check was sampling pixels outside its own shot | /events/oct 1.12:1 reported against a real 17.37 |
+| 34 | 213 of 319 destinations printed a word cut in half | `[:150]…` → `first_sentence()`, and a check on the shipped HTML |
+| 35 | all 129 region maps drew the identical window | 2,916 km on every one → 1,117 at the floor, 27 framed on their own |
+| 36 | the plates drew the fade the hero had measured away | 25 of 319 destinations dimmed past half → 6 |
+| 37 | the contact sheet named one family wrong and missed four | 23 of 27 covered → 34 pages in three sets, from one list |
+| 38 | 196 drawings were hidden on a phone behind a dead rule | region, macro and journey cards blank → drawn |
+| 39 | the record moved after the picture on the other two families | destination 574 → 443; region 585 → 438 |
 
-**Finding 1, re-measured**: seven surfaces with no picture on the phone's
-first screen became six, and `/stories` and `/my-europe` both gained one.
+**Finding 1, re-measured twice**: seven surfaces with no picture on the
+phone's first screen became six, and then **three of twenty-seven, with none
+under a fifth** — and two of the three are instruments whose opening is
+their control. The median share is 24% → 34.4%. `tools/opening.js` is the
+instrument, so this number can be checked in a minute rather than
+re-audited by hand.
 **Finding 2**: five families now open on something no other family does —
 `/experiences`, `/stories`, `/interests`, `/my-europe`, `/discover`.
 **Finding 3**: the homepage's second screen is a strip rather than four
 holes, and the transition from the continent to the form has air in it.
+Measured band by band at 1280, the page is not monotonic: hero 91% ink,
+doors 99%, journeys 13%, stories 7%, close 5% — a loud opening, a loud
+second screen and three quiet bands, which is rhythm rather than decay.
 
 **Still open**, and each blocked on something that is not design work: the
-destination page has no photograph and its order is already correct; the
-experience category page has no picture anywhere and no honest source for
-one; `/plan` and `/search` are instruments and read as instruments.
+destination page has no photograph and its order is already correct;
+`/experiences` has no picture on its first screen and a recorded refusal of
+the only one it could draw; `/plan` and `/search` are instruments and read
+as instruments.
 
 **The experience category page was taken up and put down again, twice.** It
 is the family Part 3 records as reading like a tourism database, so the
