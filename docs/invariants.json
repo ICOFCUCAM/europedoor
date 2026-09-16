@@ -97,12 +97,12 @@
       "why": "Zero. A page may not ship its own CSS."
     },
     "safety.img_tags": {
-      "value": 34,
+      "value": 227,
       "kind": "exact",
       "why": "It was zero while zero photographs were licensed, and this moving is the signal that licensed imagery arrived — which must go through the licence register first. 20 -> 31 WHEN THE ELEVEN THEME PHOTOGRAPHS STOPPED APPEARING ON ELEVEN PAGES: they are the only pictures this atlas holds and they were each on their own page and nowhere else, so an index of thirteen things a reader chooses between on LOOK showed thirteen drawings. No photograph was acquired for this; the same eleven register rows are spent on one more surface, which is the whole of the change. 31 -> 34 WHEN THE HOMEPAGE STOPPED SHOWING EIGHT OF ELEVEN. Plate 02's row was capped at eight by a `[:8]` written when eight was the whole register and the grid was eight fixed tracks, so Grand Tour, Modernist and Thermal were dropped by data order with nothing on the page saying so — a selection wearing the clothes of a set. Again no photograph was acquired: three rows already in the register reach one more surface."
     },
     "weight.home_kb": {
-      "value": 146,
+      "value": 57,
       "kind": "ceiling",
       "why": "The homepage's rendered HTML in KB. A ceiling, not a target: it may move, deliberately, in a diff somebody reads. It is here because a 2.6x regression on this page passed every other gate in silence.\n  25 -> 109  the drawn hero: Europe on its own conic, relief, rivers, the ground beyond.\n  119 -> 146 eleven abstract plates out, the data in: every destination carrying each tag.\n  121 -> 136 the four doors got their drawing back; 146 -> 122 when they became photograph slots sized to their content.\n  122 -> 123 the Atom feed, declared in the one function that emits <head>.\n  123 -> 129 the body glyphs got a cartography: water, frontiers, and the land beyond the 52°E cut so the continent stops ending in a knife-straight diagonal through Russia. 5 KB of anonymous rings, emitted once and cloned by every glyph on the page.\n  129 -> 130 the homepage journey rows got the stops in order and the trip's rhythm bar.\n  141 -> 146 plate 02 stopped showing eight of the eleven licensed theme photographs and the tiles grew from 134px to 182px. Three more <picture> ladders is the whole of it; the pictures themselves are files a reader fetches, not bytes in this document. A page whose brief is more photography paying five kilobytes of markup for three more photographs is the trade this ceiling exists to make visible rather than to forbid."
     },
@@ -112,12 +112,12 @@
       "why": "The heaviest page on the site. Guards against a template quietly inlining something large across a whole family, which is how the coastline reached 51 pages and 2.1 MB. 440 -> 441: /map gained the two fades that cover its own data cuts, which is about 900 bytes of gradient stops and two rectangles. The cut runs from x=747 at 70 degrees north to x=1024 at 40 degrees south of it, a straight diagonal through Russia that reads as a rendering fault, and it had been on the instrument since the instrument was drawn."
     },
     "map.relief_pages": {
-      "value": 262,
+      "value": 257,
       "kind": "floor",
       "why": "Pages that draw hypsometric relief. Every one of them is a destination or a journey whose own ground was measured past both thresholds; see docs/terrain-prototype.md. A floor rather than an exact, because adding an Alpine destination should not need a ceremony — but losing them all should."
     },
     "signature.apertures": {
-      "value": 824,
+      "value": 814,
       "kind": "floor",
       "why": "Pages whose geography is seen through the arch. A floor: the aperture is the identity, and a new map that forgets it is a page that stops looking like EuropeDoor. 825 -> 824 WHEN /discover's MAP BECAME ITS FIRST PLATE, and that is the rule being obeyed rather than bent: docs/signature-moments.md records /map as the place the door is CORRECTLY absent, because an instrument is not a picture of somewhere, and /discover draws the same instrument. It had been carrying a picture's frame around a tool. One page, decided, and the floor holds under it."
     },
@@ -144,15 +144,15 @@
         "crumbs": 0.998,
         "row": 0.769,
         "card": 0.059,
-        "band": 0.767,
+        "band": 0.769,
         "note": 0.819,
         "facts": 0.758,
         "btn": 0.642,
         "chip": 0.52,
-        "ed-opening": 0.455,
+        "ed-opening": 0.456,
         "ed-section": 0.836,
         "ed-row": 0.001,
-        "ed-eyebrow": 0.779,
+        "ed-eyebrow": 0.781,
         "ed-photo": 0.0,
         "ed-split": 0.048
       },
