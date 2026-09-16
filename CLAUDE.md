@@ -4197,6 +4197,23 @@ still passes because a subset is not a regression. Proved red by adding one
 redundant declaration, which was named alone against a printed 36-of-335.
 
 
+**AND THE FIFTH DEAD `display` ON A PHOTOGRAPH CONTAINER ARRIVED THE DAY THE
+HOMEPAGE HERO WAS FILLED.** Run #32 acquired sixty photographs, among them
+`home-hero`, and the tranche survived the red gate because commit 38 made
+`batch` push before it gates — the branch carried the register at seventy-one
+where it had held eleven. The browser suite came back with one failure and it was
+`.sheet-door .opening :is(picture, img) {display}`: **an absolutely positioned
+box is blockified by the layout**, so `display: block` beside `position:
+absolute` restates what the box already computes and can never change a pixel.
+It had never been reported because `.opening` had never held a `<picture>` —
+the same *a code path nothing exercises is a code path nothing checks* that
+produced the other four, each found in the first run where a photograph
+actually rendered in that container. Verified the way this repository requires
+rather than on the scan's word: the real homepage shot at 1280 and at 390
+against that seventy-one-photograph register, with the declaration and
+without, **byte-identical at both widths**.
+
+
 **RUN 31 ACQUIRED SIXTY PHOTOGRAPHS, PASSED EVERYTHING ELSE, AND THREW ALL
 SIXTY AWAY OVER THREE CHARACTERS.** The desk's own *Fill the library* button
 dispatches `stage: batch`, and `batch` gated BEFORE it pushed — so the tranche
