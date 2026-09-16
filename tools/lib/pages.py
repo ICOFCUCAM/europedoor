@@ -1295,7 +1295,18 @@ def home(data):
     # where two are empty frames is a row that says the library is thin.
     # It grows to the full thirteen as the library fills and the layout
     # does not change, which is the same property the four doors had.
-    shot_themes = [t for t in data["themes"] if ("theme:" + t["slug"]) in images][:8]
+    # AND `[:8]` MADE THAT COMMENT FALSE THE DAY AN ELEVENTH WAS LICENSED.
+    # The cap was written when eight was the whole of what the register
+    # held and the grid was eight fixed tracks, so it read as a statement
+    # about the layout. Eleven themes carry a photograph now and three of
+    # them — Grand Tour, Modernist, Thermal — were dropped by data order,
+    # silently, on the plate whose sentence is that the continent reorders
+    # itself around what you seek. A row that shows eight of eleven and
+    # says nothing is a SELECTION wearing the clothes of a set, which is
+    # the rule this atlas already holds about picking twelve mountain
+    # destinations. The register decides, and the grid follows the count
+    # rather than the count following the grid.
+    shot_themes = [t for t in data["themes"] if ("theme:" + t["slug"]) in images]
     def _tile(t):
         key = "theme:" + t["slug"]
         pic = picture(images, key, w=560, h=560, alt=images[key]["alt"],

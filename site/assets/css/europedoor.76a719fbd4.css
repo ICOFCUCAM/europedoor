@@ -7207,8 +7207,26 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    photographs at 67px is a contact strip rather than a row of ways in, so
    the row spans both columns of the plate and each tile gets ~135px. */
 .qwrap { grid-column: 1 / -1; display: grid; gap: var(--s4); width: 100%; }
-.qrow { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr));
-        gap: var(--s3); width: 100%; }
+/* AND EIGHT TRACKS WERE A NUMBER RATHER THAN A RULE. The row is every
+   theme the register holds a photograph for, which was eight when this was
+   written and is eleven now — so three were dropped by the builder to fit
+   the grid, which is the grid deciding the content. `auto-fill` at a
+   minimum tile size lets the count decide instead: it holds one row while
+   the tiles stay above the floor and takes a second when they would not,
+   and the floor is what makes a tile a way in rather than a contact strip.
+   `auto-fill` rather than `auto-fit` because `auto-fit` collapses the empty
+   tracks and stretches a short last row to full width — eleven tiles would
+   come out as eight small ones and three large.
+   THE FLOOR IS 10rem RATHER THAN A SMALLER ONE BECAUSE THE NAME UNDER THE
+   TILE SETS THE FLOOR, NOT THE PICTURE. `RENAISSANCE` is 115px of uppercase
+   tracked at .16em and this row has already overflowed once on exactly
+   that; and eleven tiles across 1,152px would be 90px each, which is the
+   contact strip the paragraph above rejected. At 10rem the plate holds six
+   and the row is six and five with the pictures at 178px — a third larger
+   than the eight it replaced, on a page whose brief is more photography
+   rather than more frames. */
+.qrow { display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+        gap: var(--s3) var(--s3); width: 100%; }
 .qtile { text-decoration: none; color: inherit; display: grid; gap: var(--s2);
          min-width: 0; }
 .qtile img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
@@ -7454,7 +7472,6 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
   .marginnote { display: none; }
   .goright { position: static; flex-direction: row; }
   .goright .gomark { transform: none; }
-  .qrow { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .countrycols { columns: 3; border-left: 0; padding-left: 0;
                  border-top: 1px solid color-mix(in srgb, var(--bone) 22%, transparent);
                  padding-top: var(--s5); }
@@ -7468,7 +7485,6 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
      thumbnail size nothing sees one — this repository has already shipped
      that defect once, the other way round. The floor follows `main`. */
   :root { --page-gutter: max(var(--s4), calc(50vw - 36rem)); }
-  .qrow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .countrycols { columns: 2; }
   /* THREE `auto` TRACKS ARE THREE MIN-CONTENTS, AND THE JOURNEY PLATE RAN
      THE HOMEPAGE FIVE PIXELS OFF A 320px SCREEN. "4,993 km", "7 countries"
@@ -7481,8 +7497,20 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
              justify-content: start; }
 }
 /* the row pays its attribution once, under the eight */
+/* A MEASURE IS FOR PROSE, AND THIS IS A LIST. `max-width: 62ch` capped
+   eleven photographers' names at 513px inside a 1,152px row: three lines of
+   commas in the left 45% with 639 pixels of empty plate beside them, and
+   the credit the longest paragraph in its own band. This repository already
+   recorded the identical fault about a middot list of place names broken at
+   544px inside a 948px column — a measure exists so the eye can find the
+   next line of a sentence, and nobody reads a credit line as a sentence.
+   The names run the width of the row they credit.
+   AND `max-width: none` IS THE DECLARATION, NOT THE ABSENCE OF ONE: this is
+   a <p>, and `p { max-width: var(--measure) }` was what capped it at 544 —
+   deleting the local rule left it on the base measure, four lines from the
+   comment saying a measure is the wrong idea here. */
 .rowcred { position: static; font-size: var(--t-xs); letter-spacing: .04em;
-           text-transform: none; color: var(--ink-3); max-width: 62ch; margin: 0; }
+           text-transform: none; color: var(--ink-3); margin: 0; max-width: none; }
 .qtile picture { position: relative; }
 /* One name is longer than any column this plate can give it. A hyphenated
    break mid-word is what an index does; the alternative is a sixth column

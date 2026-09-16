@@ -387,7 +387,16 @@ def measure():
                        "reader chooses between on LOOK showed thirteen "
                        "drawings. No photograph was acquired for this; the "
                        "same eleven register rows are spent on one more "
-                       "surface, which is the whole of the change."},
+                       "surface, which is the whole of the change. "
+                       "31 -> 34 WHEN THE HOMEPAGE STOPPED SHOWING EIGHT OF "
+                       "ELEVEN. Plate 02's row was capped at eight by a "
+                       "`[:8]` written when eight was the whole register and "
+                       "the grid was eight fixed tracks, so Grand Tour, "
+                       "Modernist and Thermal were dropped by data order with "
+                       "nothing on the page saying so — a selection wearing "
+                       "the clothes of a set. Again no photograph was "
+                       "acquired: three rows already in the register reach "
+                       "one more surface."},
             # The homepage is the flagship page and the one most likely to
             # gain weight, because every good idea wants to live on it. It
             # already carried a 2.6x regression unnoticed: a commit that cut
@@ -421,7 +430,16 @@ def measure():
                        "anonymous rings, emitted once and cloned by "
                        "every glyph on the page.\n"
                        "  129 -> 130 the homepage journey rows got the stops "
-                       "in order and the trip's rhythm bar."},
+                       "in order and the trip's rhythm bar.\n"
+                       "  141 -> 146 plate 02 stopped showing eight of the "
+                       "eleven licensed theme photographs and the tiles grew "
+                       "from 134px to 182px. Three more <picture> ladders is "
+                       "the whole of it; the pictures themselves are files a "
+                       "reader fetches, not bytes in this document. A page "
+                       "whose brief is more photography paying five "
+                       "kilobytes of markup for three more photographs is "
+                       "the trade this ceiling exists to make visible rather "
+                       "than to forbid."},
             "weight.max_page_kb": {
                 "value": round(max(len(b) for b in bodies.values()) / 1024),
                 "kind": "ceiling",
