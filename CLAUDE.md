@@ -4077,6 +4077,73 @@ call to action and the credit are both in the measured set now — they were
 outside it while the instrument could not see anything at all.
 
 
+**A ROW THAT SHOWS EIGHT OF ELEVEN AND SAYS NOTHING IS A SELECTION.** Plate
+02's photograph row was `[:8]` — a cap written when eight was the whole of
+what the register held and the grid was eight fixed tracks, so it read as a
+statement about the layout. The comment directly above it already said the
+opposite: *the register decides which eight … it grows to the full thirteen
+as the library fills and the layout does not change.* Eleven themes carry a
+photograph now and Grand Tour, Modernist and Thermal were dropped by data
+order, silently, on the plate whose sentence is that the continent reorders
+itself around what you seek. **The code had stopped matching its own
+comment.** The register decides and the grid follows the count:
+`repeat(auto-fill, minmax(10rem, 1fr))` — `auto-fill` rather than
+`auto-fit`, because `auto-fit` collapses the empty tracks and stretches a
+short last row to full width, so eleven tiles come out as eight small
+pictures and three large ones. **The floor is the NAME under the tile, not
+the picture**: RENAISSANCE is 115px of uppercase tracked at .16em and this
+row has already overflowed once on exactly that, while eleven across 1,152px
+would be 90px each, which is the contact strip the rule above it rejects. Six
+and five, at 182px against the 134 they replaced, and two media rules pinning
+four and two columns are gone because auto-fill already answers them.
+
+**AND THE CREDIT UNDER IT WAS A LIST SET TO A PROSE MEASURE.** `max-width:
+62ch` capped eleven photographers' names at 513px inside a 1,152px row: three
+lines of commas in the left 45% with 639 pixels of empty plate beside them,
+and the credit the longest paragraph in its own band. This file already
+records the identical fault about a middot list of place names broken at
+544px inside a 948px column — a measure exists so the eye can find the next
+line of a sentence, and nobody reads a credit line as a sentence. **Deleting
+the local rule was not the fix**: this is a `<p>`, and `p { max-width:
+var(--measure) }` then capped it at 544, four lines from the comment saying a
+measure is the wrong idea here. `max-width: none` is a declaration, not the
+absence of one.
+
+**A RULE STATED ONCE AND APPLIED TO ONE OF ITS FOUR CALL SITES.** *A declared
+slot is sized to what it SAYS, not to the photograph that will replace it* is
+written out on `.ed-slot-wide`, whose 21:9 left 581 pixels of mineral with
+three lines at the bottom — and it was applied to `.ed-slot-wide`.
+`.ed-slot-tall`, `.ed-slot-square` and `.ed-slot-portrait` kept an
+`aspect-ratio`, which is the photograph's proportion and therefore the exact
+thing the rule refuses. Measured on the two openings carrying a square slot:
+**682 × 511 with the brief in the bottom third, 361 pixels of `--paper-3`,
+71% of the box** — proportionally worse than the case the rule was written
+for. The container's floor had already been fixed one line above
+(`.ed-opening-visual:has(> .ed-slot) { min-height: 0 }`), so half the job was
+done and **the half left standing was the visible half.**
+
+**THE DISTINCTION THE RULE DID NOT MAKE IS WHERE THE SLOT IS.** In a STRIP a
+portrait slot renders 240 × 320 and its proportion is what makes the strip a
+row of like things — eight tiles that each shrink to their own caption is not
+a strip, it is a ragged list — so every one of those is untouched
+(`grep -ro 'ed-slot ed-slot-portrait' site --include=index.html | wc -l`). In an OPENING the slot is alone, nothing is beside it to be ragged
+against, and reserving a picture nobody has licensed is reserving a hole.
+511px → 208px, empty ground 361px → 58px, `voids.js` unmoved.
+
+**THE LIBRARY IS THE BINDING CONSTRAINT AND NO AMOUNT OF LAYOUT FIXES IT.**
+Eleven photographs against 1,626 declared surfaces. The homepage now spends
+every one of them twice — eleven at 182px on plate 02 and one at full bleed
+through the window on plate 03 — and there is no third place to put them that
+would not be the same eleven a third time. `docs/gap-assessment.md` already
+says this in general; it is worth saying again at the point somebody asks why
+a touristic site has so few pictures. **The next photograph is a
+`workflow_dispatch` of `photograph.yml` with `stage: fill`**, which plans
+every empty surface round-robin across families, acquires by id, hashes,
+derives, registers, gates and merges itself on green. It is one action and it
+is the owner's, because the key is a repository secret and because nothing
+here may acquire a real photograph unasked.
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
