@@ -2716,8 +2716,17 @@ def c_frontend():
     # about a page that had just stopped doing it. Each floor names every
     # class that satisfies it, so the promise survives the migration and a
     # family that drops the idea altogether still fails.
+    # `row` 0.85 -> 0.75 BECAUSE 255 PLACE PAGES STOPPED PRINTING THEIR SET
+    # TWICE. A place page rendered the other places in its town as a strip —
+    # picture, name, link — and then again, directly underneath, as rows
+    # carrying the sentence saying what each one is: two bands, one set, on
+    # 220 of the 255. The tile takes the sentence now and the second band is
+    # gone, so the pages that had no other list lost their last `.row`. That
+    # is a deliberate removal of duplication rather than a family growing its
+    # own components, which is what this floor exists to catch — and the
+    # place family still uses `row` wherever it has a second list to show.
     FLOORS = {"kicker": 0.99, "masthead": 0.99, "pagehead": 0.99, "crumbs": 0.99,
-              "row": 0.85, "card": 0.05, "band": 0.70, "note": 0.70}
+              "row": 0.75, "card": 0.05, "band": 0.70, "note": 0.70}
     ALSO = {"pagehead": ("ed-opening", "ed-arrival", "ed-journey-hero",
                          "ed-story-opening", "ed-institution"),
             "kicker": ("ed-eyebrow", "ed-section-index"),

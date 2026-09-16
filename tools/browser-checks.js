@@ -5547,6 +5547,76 @@ async function main() {
     }
   }
 
+  /* A PAGE'S BAND NUMBERS RUN 01, 02, 03 — AND ON 753 PAGES TWO OF THEM WERE
+   * THE SAME NUMBER.
+   *
+   * There were two numbering systems. `section()` draws its index from a CSS
+   * counter — `main` resets `band`, every `.band` increments it — with the
+   * reason written on that rule: a number typed per call site is wrong the
+   * day somebody reorders a page. The 2036 section head was then given the
+   * number as its FIRST ARGUMENT, so a page carrying both shapes numbered
+   * each sequence from one. A place page opened "01 · NEARBY / The rest of
+   * Vienna" and then, directly under it, "01 / Other places in Vienna".
+   *
+   * THE DIGITS A READER SEES CANNOT BE READ BACK. `content` on a pseudo
+   * element computes to the SPECIFIED value — `"0" counter(band)` — not to
+   * the resolved string, so a first version of this check regex-matched that
+   * literal "0" and reported nineteen of forty-seven families broken when
+   * not one of them was. That is this repository's own instrument fault
+   * again: the reading came from the model rather than from the page.
+   *
+   * So the assertion is the STRUCTURE that makes the sequence right, which
+   * is exact and needs no digits. One reset on `main`; every element that
+   * increments `band` also draws an index; every drawn index sits inside an
+   * element that increments. Given those three, the numbers are 1..n by
+   * construction — and each half is a real defect this has already had:
+   * `.ed-section` drew an index and did not increment (two systems, the same
+   * number twice), and `div.headmeta.ed-section` incremented and drew
+   * nothing (every later number one too high, and no 01 on the page). */
+  {
+    const { ALL } = require("./lib/families.js");
+    const seen = new Set();
+    for (const [fam, url] of ALL) {
+      if (seen.has(url)) continue;
+      seen.add(url);
+      const r = await page.goto(base + url, { waitUntil: "load" });
+      if (!r || r.status() !== 200) continue;
+      const st = await page.evaluate(() => {
+        const incs = [], draws = [];
+        for (const e of document.querySelectorAll("*")) {
+          const ci = getComputedStyle(e).counterIncrement || "";
+          if (/\bband\b/.test(ci)) incs.push(e);
+          const head = e.matches(".band > .band-head")
+            || e.matches(".ed-section-head > div > .ed-section-index");
+          if (head) draws.push(e);
+        }
+        const name = (e) => e.tagName.toLowerCase()
+          + (e.className ? "." + String(e.className).trim().replace(/\s+/g, ".") : "");
+        const resets = [...document.querySelectorAll("*")].filter(
+          (e) => /\bband\b/.test(getComputedStyle(e).counterReset || ""));
+        return {
+          resets: resets.length,
+          silent: incs.filter((e) => !draws.some((d) => e.contains(d))).map(name),
+          orphan: draws.filter((d) => !incs.some((e) => e.contains(d))).map(name),
+          n: draws.length,
+        };
+      });
+      checked++;   // one page read
+      ok(st.resets === 1,
+         `${fam} (${url}): the band counter is reset ${st.resets} times and `
+         + `must be reset exactly once, on main — a second reset restarts the `
+         + `numbering part-way down the page`);
+      ok(st.silent.length === 0,
+         `${fam} (${url}): ${st.silent.join(", ")} increments the band `
+         + `counter and draws no number, so every band after it is one too `
+         + `high and the page has no 01`);
+      ok(st.orphan.length === 0,
+         `${fam} (${url}): ${st.orphan.join(", ")} draws a band number and `
+         + `nothing above it increments the counter, which is how two `
+         + `numbering systems printed the same number on one page`);
+    }
+  }
+
   /* A LINK A READER CANNOT SEE IS NOT REACHABLE BECAUSE IT IS FOCUSABLE.
    *
    * Below 44rem the masthead's seven sections were one line that scrolled

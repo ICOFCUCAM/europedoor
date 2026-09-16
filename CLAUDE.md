@@ -4421,6 +4421,70 @@ one** — the remedy it points at is separate selectors, not one number.
 
 
 
+**TWO NUMBERING SYSTEMS ON ONE PAGE, AND 753 PAGES PRINTED THE SAME NUMBER
+TWICE.** `section()` draws its index from a CSS counter — `main` resets
+`band`, every `.band` increments it — and the reason is written on that rule:
+*a number typed per call site is wrong the day somebody reorders a page*. The
+2036 section head was then written with the number as its **first argument**,
+so every page carrying both shapes numbered each sequence from one. Measured
+across the built site: **753 of the 829 documents that carried a typed index
+printed a number a band counter also printed.** A place page opened *"01 · NEARBY /
+The rest of Vienna"* and then, directly under it, *"01 / Other places in
+Vienna"*. Nothing counted it, because each system was internally correct.
+
+`ed_section_head()` lost its `number` parameter — an ignored argument is dead
+code that looks like a decision — and `.ed-section` increments the same
+counter the bands do.
+
+**AND THE SAME SET WAS BEING PRINTED TWICE TO SAY TWO THINGS.** Those two
+bands were not merely adjacent, they were the same places: the strip carried
+the picture, the name and the link, and the rows underneath carried the one
+thing the strip could not — the sentence saying what each one IS. **220 of
+the 255 place pages.** Neither band was wrong and neither was complete, so
+deleting one would have been the page saying less: `ed_strip` takes an
+optional `note` and the tile carries the sentence. `others` never exceeds
+four on any page in this dataset, so the strip's own limit never selects.
+
+**A COUNTER THAT COUNTS WHAT IT DOES NOT DRAW IS WRONG FROM ITS SECOND ENTRY
+ON, AND BOTH HALVES OF THIS HAD IT.** The first repair scoped the increment
+to `.ed-section` and immediately caught `<div class="headmeta ed-section">` —
+the accessibility, getting-there and up-a-level block, a real section with no
+head — so the place page opened at "02" and ended at "04" with nothing
+numbered 01. And `.band` had the identical fault, unnoticed for longer:
+`/countries` draws its nine macro regions as `<section class="band
+macroband">` whose head sits inside a `.bandtop` wrapper, so `.band >
+.band-head::before` never matched them. **Nine silent increments, and the two
+numbered sections after them would have printed "010" and "011".** The rule
+is the same on both: **the selector that COUNTS is the selector that DRAWS.**
+
+**AND THE CHECK'S FIRST VERSION READ THE MODEL RATHER THAN THE PAGE.** It
+tried to read the digits back with `getComputedStyle(e, "::before").content`
+— which computes to the SPECIFIED value, `"0" counter(band)`, never to the
+resolved string. The regex matched that literal `"0"` and the sweep reported
+**nineteen of forty-seven families broken when not one of them was.** The
+digits a reader sees cannot be read back from the DOM at all, so the
+assertion is the STRUCTURE that makes the sequence right and needs no digits:
+one reset on `main`, every element that increments also draws, every drawn
+index sits inside something that increments. Given those three the numbers
+are 1..n by construction — and each half is a defect this has already had.
+
+**AND THE INVARIANT REGISTER ASKED THE RIGHT QUESTION ABOUT THE MERGE.**
+`primitives.reach.row` fell 0.887 → 0.769, because the pages whose only other
+list was that duplicate band lost their last `.row`. The floor exists to
+catch *a family growing its own components*, and this is the opposite — a
+removal of duplication onto a primitive that already existed — so it moved
+deliberately, with the reason in `tools/invariants.py` rather than in the
+register it generates.
+
+**And two tokens that do not exist reached the stylesheet in the commit that
+documents them.** `--sans` has never been declared (the token is `--ed-sans`,
+itself `var(--text)`), and `line-height: 1.45` would have been a ninth where
+the register holds eight. Both were caught in the same run — the first by the
+unresolvable-`var()` check, the second by `css.line_heights` — which is the
+whole argument for those two guards existing.
+
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
