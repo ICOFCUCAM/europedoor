@@ -338,7 +338,7 @@ def main(argv):
     #
     # So the rows are synthesised here, from the real thing: seven register
     # rows failed run 19 and every one of them failed on this.
-    sample = json.dumps({"images": {"door-food": {
+    sample = json.dumps({"images": {"experiences-hero": {
         "source": "https://www.pexels.com/photo/a-close-up-of-party-"
                   "appetizers-served-on-plates-at-a-gathering-39122376/",
         "photographer_url": "https://www.pexels.com/@dave-garcia-1234567",
@@ -540,7 +540,7 @@ def main(argv):
             if not os.path.isdir(d):
                 continue
             for f in os.listdir(d):
-                # `door-mountains` is the second-purpose test's own artefact
+                # `stories-hero` is the second-purpose test's own artefact
                 # and is cleaned up here for the same reason as the hero: a
                 # suite that writes into the repository owns taking it out.
                 # AND A SLOT INSTANCE, whose stem carries an `@`. The list
@@ -564,7 +564,9 @@ def main(argv):
                 # ONLY what it put in.
                 if f in keep:
                     continue
-                if (f.startswith("homepage-hero") or f.startswith("door-mountains")
+                if (f.startswith("homepage-hero") or f.startswith("stories-hero")
+                        or f.startswith("interests-hero")
+                        or f.startswith("experiences-hero")
                         or "-hero@" in f or f.startswith("country-hero")):
                     os.remove(os.path.join(d, f))
         # AND site/ IS REBUILT, because these tests build it. Restoring the
@@ -1101,31 +1103,31 @@ def main(argv):
         # and nothing anywhere would say so. Twice is sometimes right and is
         # never an accident, so it is a refusal with an explicit escape.
         r = run(["scripts/images/acquire.py", "--provider", "pexels",
-                 "--photo-id", PHOTO_ID, "--purpose", "door-mountains",
+                 "--photo-id", PHOTO_ID, "--purpose", "stories-hero",
                  "--alt", "the same test pattern, a second time"], env)
         check("the same id for a second purpose is refused", r.returncode != 0,
               (r.stdout + r.stderr)[-300:])
         check("and the refusal names where it is already used",
               "homepage-hero" in (r.stdout + r.stderr))
         check("and nothing was written for the second purpose",
-              "door-mountains" not in
+              "stories-hero" not in
               open(REGISTER, encoding="utf-8").read())
         r = run(["scripts/images/acquire.py", "--provider", "pexels",
-                 "--photo-id", PHOTO_ID, "--purpose", "door-mountains",
+                 "--photo-id", PHOTO_ID, "--purpose", "stories-hero",
                  "--alt", "the same test pattern, a second time",
                  "--second-purpose"], env)
         check("and --second-purpose lets it through", r.returncode == 0,
               (r.stdout + r.stderr)[-400:])
         reg2 = json.load(open(REGISTER, encoding="utf-8"))["images"]
         check("both surfaces now name the same photograph",
-              str(reg2.get("door-mountains", {}).get("provider_photo_id")) == PHOTO_ID
+              str(reg2.get("stories-hero", {}).get("provider_photo_id")) == PHOTO_ID
               and str(reg2.get("home-hero", {}).get("provider_photo_id")) == PHOTO_ID)
         # A CRASH HERE HID EVERY FAILURE THE RUN HAD ALREADY COLLECTED.
         # `check()` gathers and the summary prints at the end, so a KeyError
         # in the cleanup after a failed acquisition threw away the one line
         # that said what went wrong. Same rule as the render suite: a red run
         # that cannot say why is worse than a red one that can.
-        reg2.pop("door-mountains", None)
+        reg2.pop("stories-hero", None)
         with open(REGISTER, "w", encoding="utf-8") as fh:
             json.dump({"$comment": json.load(open(REGISTER + ".none", encoding="utf-8"))
                        ["$comment"] if False else
@@ -1338,13 +1340,13 @@ def main(argv):
         made += [plan, skips]
         with open(plan, "w", encoding="utf-8") as fh:
             # THE THIRD ENTRY'S SLOT HAS TO ACCEPT THE SECOND STUB'S SHAPE.
-            # `door-coast` caps aspect at 1.9 and the stub is 2.00, so the
+            # `door-coast` capped aspect at 1.9 and the stub is 2.00, so the
             # first version of this test had the loop refuse two of three
             # and still called it a pass — a test whose subject was the
             # skip could not tell a deliberate refusal from an accidental
             # one. `country-hero` admits up to 2.2.
             fh.write(f"homepage-hero\t{PHOTO_ID}\ta test pattern image\n")
-            fh.write("door-mountains\tnotajpeg\ta test pattern image\n")
+            fh.write("stories-hero\tnotajpeg\ta test pattern image\n")
             fh.write(f"country-hero@austria\t{PHOTO2_ID}\ta test pattern "
                      f"image\n")
         r = sh(["bash", "scripts/images/batch.sh", "pexels", plan, skips],
@@ -1357,7 +1359,7 @@ def main(argv):
         rows = [l.split("\t") for l in
                 open(skips, encoding="utf-8").read().splitlines() if l]
         check("and the skip names the surface, the id and the reason",
-              len(rows) == 1 and rows[0][0] == "door-mountains"
+              len(rows) == 1 and rows[0][0] == "stories-hero"
               and rows[0][1] == "notajpeg" and len(rows[0][2]) > 20,
               str(rows))
         # AND THE REASON IS acquire.py's OWN SENTENCE. A summary composed by
@@ -1372,14 +1374,14 @@ def main(argv):
               "\n" not in rows[0][2] and rows[0][2].endswith("Nothing written."))
         reg_after = json.load(open(REGISTER, encoding="utf-8"))["images"]
         check("and the refused surface has no register row",
-              not any(v.get("purpose") == "door-mountains"
+              not any(v.get("purpose") == "stories-hero"
                       for v in reg_after.values()))
 
         # A SITTING THAT ACQUIRED NOTHING IS A FAILED RUN, however politely
         # each entry was refused: "found nothing suitable" and "could not
         # run" must not look the same.
         with open(plan, "w", encoding="utf-8") as fh:
-            fh.write("door-history\tnotajpeg\ta test pattern image\n")
+            fh.write("interests-hero\tnotajpeg\ta test pattern image\n")
         r = sh(["bash", "scripts/images/batch.sh", "pexels", plan, skips],
                env)
         out = r.stdout + r.stderr
@@ -1391,16 +1393,16 @@ def main(argv):
         # request too, and the standing rule is to fail rather than ever
         # substitute — so it must never become one of sixty quiet skips.
         with open(plan, "w", encoding="utf-8") as fh:
-            fh.write("door-food\tmismatch\ta test pattern image\n")
-            fh.write(f"door-history\t{PHOTO_ID}\ta test pattern image\n")
+            fh.write("experiences-hero\tmismatch\ta test pattern image\n")
+            fh.write(f"interests-hero\t{PHOTO_ID}\ta test pattern image\n")
         r = sh(["bash", "scripts/images/batch.sh", "pexels", plan, skips],
                env)
         out = r.stdout + r.stderr
         check("a swapped id stops the batch rather than being skipped",
               r.returncode == 1 and "not about one candidate" in out)
         check("and it stopped rather than carrying on to the next entry",
-              "door-history" not in out.split("not about one candidate")[0]
-              .split("door-food")[-1])
+              "interests-hero" not in out.split("not about one candidate")[0]
+              .split("experiences-hero")[-1])
 
         # ── THE FILL STAGE PLANS AND NEVER ACQUIRES ──────────────────
         #

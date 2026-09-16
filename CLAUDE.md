@@ -4197,6 +4197,294 @@ still passes because a subset is not a regression. Proved red by adding one
 redundant declaration, which was named alone against a printed 36-of-335.
 
 
+**RUN 31 ACQUIRED SIXTY PHOTOGRAPHS, PASSED EVERYTHING ELSE, AND THREW ALL
+SIXTY AWAY OVER THREE CHARACTERS.** The desk's own *Fill the library* button
+dispatches `stage: batch`, and `batch` gated BEFORE it pushed — so the tranche
+died in `checks.py` with the push step three steps below it. Two causes, both
+invisible to every local run.
+
+**THE LENGTH FLOOR WAS ON THE WRONG SIDE OF THE NORMALISER, WHICH IS THE OTHER
+HALF OF THE BUG THAT STOPPED RUNS 24–28.** `_canon()` collapses every
+separator to ONE underscore so a registry target and a file stem are compared
+in the same alphabet — and `derive.py` writes a stem with TWO, so **the
+canonical form is always shorter than the token that has to match it.** The
+declarations were then filtered by the length of that shorter form:
+
+| | |
+|---|---:|
+| `derive.py` writes | `austria__tyrol__innsbruck__goldenes-dachl` — **41** |
+| its canon | `austria_tyrol_innsbruck_goldenes-dachl` — 38 |
+| the registry declares | `austria/tyrol/innsbruck/goldenes-dachl` — 38 |
+
+41 is long enough to be SCANNED and 38 is too short to be DECLARED, so the
+floor discarded exactly the declaration the scan needed. There is no length of
+a declaration that predicts the length of its token, so any floor there is a
+guess: it is gone, and the canonical form is collected whatever it measures.
+*One normaliser, both sides* was right and incomplete — **a test applied to a
+normalised value has to be normalised with it.**
+
+**AND FIVE PURPOSES POINTED AT SURFACES THAT HAD BEEN DELETED.** `door-coast`,
+`door-food`, `door-history`, `door-mountains` and `themes-hero` appear nowhere
+in `site/` at all: the four doors went when the homepage became the plate
+sequence, `themes-hero` went when the themes index stopped opening on a map,
+and neither removal took its purpose with it. *Removing a claim leaves
+surfaces pointing at it*, five times, in a repository whose own rule that is.
+
+**IT PASSED EVERY LOCAL RUN BECAUSE `c_photo_published` CAN ONLY ASK ABOUT A
+PURPOSE THE REGISTER ALREADY HOLDS.** Eleven theme heroes were registered, so
+it examined eleven surfaces and said nothing about the other 828 — the
+empty-register fault again, and the check cannot be fixed into seeing it,
+because the question it asks needs a photograph to exist. `c_purpose_reaches`
+asks the other question: does a page builder ask `picture()` for this key at
+all. **The absence is what has to be tested and absence is not in the shipped
+HTML** — an unfilled surface renders `ed_slot()`, which prints the page's own
+label rather than the register key, so a page that asks for `door-coast` and a
+page that has never heard of it are the same bytes. That is why this one is
+asserted at the SOURCE, exactly as `c_og_no_hash_motif` is.
+
+The five are deleted rather than restored, because both removals were
+deliberate and recorded. `purposes_today` is derived, so it is re-derived
+rather than edited; `architecture` and `food` lost their only purpose and take
+a **trigger** rather than a refusal, because the argument each serves is real
+and unbuilt — a role nothing reaches is dead vocabulary only when nothing
+would ever create one.
+
+**AND `batch` PUSHES BEFORE IT GATES NOW, WHICH IS THE THIRD PLACE THIS RULE
+HAS HAD TO BE LEARNED.** `batch.sh` learned it for one candidate (run 23 lost
+eighteen acquisitions to a nineteenth that was a PNG); `fill` learned it for a
+tranche; **the job the Media Desk actually dispatches never did.** A red gate
+costs a pull request somebody has to fix, which is recoverable and visible; it
+used to cost the sitting, which is neither. Nothing reaches the default branch
+unchecked — the gates still run and the merge step is still skipped when they
+fail.
+
+**AND REORDERING FOR ONE PROMISE ALMOST DROPPED ANOTHER.** The first version
+moved the push above the gates and left the credential scan below it — turning
+a PRE-COMMIT guard into a report filed after the key had already reached the
+remote. `fill` had the right order all along. The scan goes in front of the
+push in both.
+
+
+**THE CROP-BOX MEASUREMENT WAS ASSERTING NOTHING ABOUT SIX OF ITS SEVEN
+SURFACES, AND THE SEVENTH WAS MEASURING A STATE A PHOTOGRAPH REMOVES.**
+`checks.py` owns the safe-area arithmetic and `browser-checks.js` owns the
+measurement, and the comment on each says the other exists so that *neither
+can drift without the other noticing*. The measuring end had a list of three
+entries typed by hand, and it had drifted on all three.
+
+Two named elements the site no longer has. `.way` left when the four
+homepage doors became the plate sequence; `.herofull` left in the same
+commit, and `homepage-hero` renders inside `.opening` on plate 01. **A
+selector that matches nothing has no aspect ratio**, so `lo` stayed
+`Infinity` and `hi` stayed `-Infinity` — and `Infinity >= min_aspect` and
+`-Infinity <= max_aspect` are BOTH true. Two green assertions per run, about
+nothing, for the life of the plate sequence.
+
+That is this repository's own recorded failure twice over: the check matching
+`pointsmap arched"><svg` that examined 0 dots on a site with 130 region maps,
+and `c_one_plate_per_thing` reading zero once the last abstract plate came
+off. Both of those were caught by **reading the column of counts**, which
+does not exist here — `ok()` counts an assertion MADE, and an assertion about
+an empty set counts exactly like one about a page.
+
+**AND THE THIRD ENTRY WAS WORSE THAN THE TWO THAT MATCHED NOTHING, BECAUSE IT
+MATCHED AND MEASURED THE WRONG STATE.** `.iheroart` holds the drawing until a
+photograph replaces it. The check added `.shot` — the class the build adds —
+and left the drawing where it was, so it measured the box with the thing a
+photograph removes still inside it:
+
+| `.iheroart` at twenty viewports | | |
+|---|---|---|
+| with the drawing in it | 1.333 – 1.500 | what was declared |
+| with a photograph in it | 0.692 – 1.500 | what a photograph gets |
+
+So the declared floor was a fact about the page as it is rather than the page
+a photograph makes, and the guaranteed frame it produced — **55%** — was
+nearly double the real **29%**. *A code path nothing exercises is a code path
+nothing checks*, about the one measurement whose entire subject is a state the
+register has never been in. The simulation is the whole substitution now: the
+drawing and any empty slot come out, a picture goes in, `.shot` goes on.
+
+**THE SET IS DERIVED AND THE GROUPING IS BY COMPONENT.** Every purpose that
+declares a container is measured, on the path `desk/registry.json` gives it,
+so a purpose deleted with its surface leaves no entry behind and a new one is
+measured the day it is declared. Surfaces group by SELECTOR because **a crop
+box is a property of a component rather than of a page** — `.iheroart.shot`
+exists on `/journeys` and not yet on `/experiences` or `/stories`, whose
+openings render no figure at all until a photograph exists, and measuring the
+component once is the only way to say anything true about either. Two
+purposes on one component may not declare two boxes, which is asserted rather
+than silently picked between. Each group asserts its own REACH.
+
+Re-measured, and three of the seven had moved to a different component
+entirely — `events`, `countries` and `interests` went from `indexhero()` to
+`ed_opening()` and their container is `.ed-opening-visual`:
+
+| | container | frame |
+|---|---|---|
+| homepage-hero | `.opening` 0.615 – 2.801 | 15% → **17%** |
+| journeys / experiences / stories | `.iheroart.shot` 0.692 – 1.500 | 55% → **29%** |
+| events / countries / interests | `.ed-opening-visual` 0.692 – 1.643 | 55% → **26%** |
+
+All three clear the 12% floor, so nothing about the design has to change —
+what changes is that the numbers are now about boxes that exist.
+
+**AND THE TEMPLATED SLOTS ARE THE SAME FAULT AT A HUNDRED TIMES THE SCALE,
+WHICH IS THE NEXT COMMIT RATHER THAN THIS ONE.** `checks.py` computes a safe
+area for the ten `slots` as well, and the typed list never held one of them,
+so not one has ever been measured. Seven declare `.pageband`, which the built site does not
+contain at all — `grep -rlo 'class="pageband' site --include=index.html | wc -l`
+is zero — and two declare `.card-art.frame`, where
+`grep -rho 'class="card-art[^"]*"' site --include=index.html | sort -u`
+returns `class="card-art card-map"` and nothing else. The eleven licensed
+theme photographs render in `.ed-opening-visual > figure.headshot` and their
+declared box describes a component that was removed. It is recorded here
+rather than fixed in the same commit because it needs its own measurement
+pass over nine families, and because a check that reports a known gap without
+failing is a gate people stop running.
+
+**AND THE SISTER SUITE'S FIXTURES WERE A SECOND DECLARATION OF WHICH PURPOSES
+EXIST.** `tools/hosted-desk-tests.js` named `door-coast` and `door-food` in
+four tests, and both purposes were deleted with the doors. `specOf()` then
+refused them at entry ONE — so the assertions about entry TWO, about a
+surface ticked twice, and about one photograph on two surfaces were every one
+pre-empted by a refusal none of them was written for. **A suite whose subject
+is the batch boundary stopped reaching the batch boundary**, and reported four
+honest failures naming the wrong thing. `photo-tests.py` had the identical
+fixtures and was repaired in the commit that deleted the purposes; this file
+was not looked at — *a rule stated once and applied to one of its call sites*,
+in the commit that wrote that sentence down. The two fixtures come out of
+`desk/registry.json` now, which is the same document `specOf()` consults, is
+generated, and fails CI when stale.
+
+
+
+**THE TEN TEMPLATED SLOTS DECLARED A CROP BOX EACH AND FOUR NAMED THE WRONG
+COMPONENT — AND THE FILE SAID SO IN A FIELD NOBODY READ.** Every slot's
+`min_at` and `max_at` read the literal string **`"declared"`**, where a purpose
+carries a viewport like `320x900`. That is the whole finding in one word: the
+five that were right were right because somebody read the stylesheet, and the
+four that were wrong had nothing to catch them, because `browser-checks.js`
+never held one slot in its list and `c_photo_safe_area` recomputes arithmetic
+from the numbers rather than asking what they are about.
+
+| slot | declared | renders | measured |
+|---|---|---|---|
+| theme-hero | `.pageband` | `.headshot` in `.ed-opening-visual` | 0.692 – 1.333 |
+| country-hero | `.pageband` | `.headshot` in `.pagehead.opening` | 0.941 – 1.129 |
+| story-hero | `.card-art.frame` | `.ed-bleed.ed-bleed-tall` | 1.333 – 2.333 |
+| place-hero | `.card-art.frame` | `.card-art.frame` — **correct** | 16/9, from the stylesheet |
+
+The five `.pageband` families (macro, region, interest, journey, category) are
+right: `pageband()` emits that figure and the stylesheet gives it `16/9` below
+62rem and `21/9` above, which is exactly the 1.778 – 2.333 declared. They have
+still never been measured, because `pageband()` returns nothing at all without
+a photograph and none of those five families has one.
+
+**A CHECK THAT CANNOT FAIL ON THE CASE THAT MOTIVATED IT IS THE FAULT IT WAS
+WRITTEN TO CATCH.** `c_container_is_emitted` asks the prior question nothing
+asked — is this selector a thing this site emits — and its first version
+collected class TOKENS. `card-art` is emitted and `frame` is emitted, and the
+defect was that they are never emitted TOGETHER: every `.card-art` on the
+built site is `card-art card-map`. A set of bare tokens said yes. **A compound
+selector is a claim about one element**, so the attribute groupings are kept
+and each compound is tested whole. Read out of `class="..."` rather than by
+substring, because a class named only in a comment is the
+instrument-reads-its-own-documentation fault recorded six times above.
+
+**AND IT IMMEDIATELY REFUSED ONE OF THE FOUR "CORRECTIONS".** `place-hero` was
+moved to `.ed-strip .ed-shot` on the evidence that a place photograph appears
+as a strip tile on its destination's page — and the check said `.card-art.frame`
+IS emitted, by `pages.py` line 6834, on the place's own page. Both are true:
+**that key renders in two containers at once**, 16/9 on the page the purpose is
+FOR and 3/4 in the strip beside it, and the register has one field for it. The
+declaration follows the purpose's own surface and the reuse is undeclared —
+which is the same shape as a theme photograph appearing at 182px on the
+homepage's plate 02 and full-bleed through the window on plate 03. **A
+photograph is cropped by every surface it appears on and the register declares
+one.** Recorded, not closed.
+
+**AND `.headshot` PROVED COMMIT 39's GROUPING PRINCIPLE WRONG IN GENERAL.**
+That commit grouped surfaces by selector and asserted two purposes on one
+component may not declare two boxes, "because a crop box is a property of the
+component". True of `.iheroart`, whose own rule is `aspect-ratio: 4/3`; false
+of a component sized by its parent. Measured: `.headshot` is **0.692 – 1.333**
+inside a theme page's `.ed-opening-visual` and **0.941 – 1.129** inside a
+country page's `.pagehead.opening` — one class, two real boxes, because the
+class sets no ratio of its own and the two families put it in different grids.
+The assertion was green and unsound, which is the landmine this file already
+records about a pinned heading, so it is gone. Nothing is lost: the group
+measures the UNION over every path its purposes declare, so two families whose
+real boxes differ produce a union wider than either declaration and the two
+bounds fail and name it. **The union is both the stronger test and the honest
+one** — the remedy it points at is separate selectors, not one number.
+
+
+
+**TWO NUMBERING SYSTEMS ON ONE PAGE, AND 753 PAGES PRINTED THE SAME NUMBER
+TWICE.** `section()` draws its index from a CSS counter — `main` resets
+`band`, every `.band` increments it — and the reason is written on that rule:
+*a number typed per call site is wrong the day somebody reorders a page*. The
+2036 section head was then written with the number as its **first argument**,
+so every page carrying both shapes numbered each sequence from one. Measured
+across the built site: **753 of the 829 documents that carried a typed index
+printed a number a band counter also printed.** A place page opened *"01 · NEARBY /
+The rest of Vienna"* and then, directly under it, *"01 / Other places in
+Vienna"*. Nothing counted it, because each system was internally correct.
+
+`ed_section_head()` lost its `number` parameter — an ignored argument is dead
+code that looks like a decision — and `.ed-section` increments the same
+counter the bands do.
+
+**AND THE SAME SET WAS BEING PRINTED TWICE TO SAY TWO THINGS.** Those two
+bands were not merely adjacent, they were the same places: the strip carried
+the picture, the name and the link, and the rows underneath carried the one
+thing the strip could not — the sentence saying what each one IS. **220 of
+the 255 place pages.** Neither band was wrong and neither was complete, so
+deleting one would have been the page saying less: `ed_strip` takes an
+optional `note` and the tile carries the sentence. `others` never exceeds
+four on any page in this dataset, so the strip's own limit never selects.
+
+**A COUNTER THAT COUNTS WHAT IT DOES NOT DRAW IS WRONG FROM ITS SECOND ENTRY
+ON, AND BOTH HALVES OF THIS HAD IT.** The first repair scoped the increment
+to `.ed-section` and immediately caught `<div class="headmeta ed-section">` —
+the accessibility, getting-there and up-a-level block, a real section with no
+head — so the place page opened at "02" and ended at "04" with nothing
+numbered 01. And `.band` had the identical fault, unnoticed for longer:
+`/countries` draws its nine macro regions as `<section class="band
+macroband">` whose head sits inside a `.bandtop` wrapper, so `.band >
+.band-head::before` never matched them. **Nine silent increments, and the two
+numbered sections after them would have printed "010" and "011".** The rule
+is the same on both: **the selector that COUNTS is the selector that DRAWS.**
+
+**AND THE CHECK'S FIRST VERSION READ THE MODEL RATHER THAN THE PAGE.** It
+tried to read the digits back with `getComputedStyle(e, "::before").content`
+— which computes to the SPECIFIED value, `"0" counter(band)`, never to the
+resolved string. The regex matched that literal `"0"` and the sweep reported
+**nineteen of forty-seven families broken when not one of them was.** The
+digits a reader sees cannot be read back from the DOM at all, so the
+assertion is the STRUCTURE that makes the sequence right and needs no digits:
+one reset on `main`, every element that increments also draws, every drawn
+index sits inside something that increments. Given those three the numbers
+are 1..n by construction — and each half is a defect this has already had.
+
+**AND THE INVARIANT REGISTER ASKED THE RIGHT QUESTION ABOUT THE MERGE.**
+`primitives.reach.row` fell 0.887 → 0.769, because the pages whose only other
+list was that duplicate band lost their last `.row`. The floor exists to
+catch *a family growing its own components*, and this is the opposite — a
+removal of duplication onto a primitive that already existed — so it moved
+deliberately, with the reason in `tools/invariants.py` rather than in the
+register it generates.
+
+**And two tokens that do not exist reached the stylesheet in the commit that
+documents them.** `--sans` has never been declared (the token is `--ed-sans`,
+itself `var(--text)`), and `line-height: 1.45` would have been a ninth where
+the register holds eight. Both were caught in the same run — the first by the
+unresolvable-`var()` check, the second by `css.line_heights` — which is the
+whole argument for those two guards existing.
+
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

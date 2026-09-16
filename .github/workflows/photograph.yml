@@ -724,6 +724,60 @@ jobs:
             python3 tools/invariants.py --check
           fi
 
+      # AND THE CREDENTIAL SCAN STAYS IN FRONT OF THE PUSH, because it is a
+      # PRE-COMMIT guard. Moving the push earlier and leaving this behind it
+      # would let a key reach the remote and be reported afterwards, which
+      # is not a guard at all. `fill` already has this order.
+      # REORDERING FOR ONE PROMISE MUST NOT QUIETLY DROP ANOTHER.
+      - name: Refuse to commit anything credential-shaped
+        run: python3 tools/photo-tests.py --committed-only
+
+      # THE TRANCHE IS PUSHED BEFORE THE GATES RUN, AND RUN 31 IS WHY.
+      #
+      # `batch.sh` learned this at the level of ONE candidate — run 23 lost
+      # eighteen finished acquisitions to a nineteenth that was a PNG — and
+      # `fill` learned it at the level of a tranche. THIS JOB, WHICH IS THE
+      # ONE THE MEDIA DESK ACTUALLY DISPATCHES, never did. So run 31 fetched
+      # sixty photographs across every family, verified every id, hashed
+      # every original, derived every ladder, wrote complete provenance —
+      # and then died in `checks.py` on a file stem three characters too
+      # short for a length floor, with the push step three steps below it.
+      # Sixty acquisitions, gone, for a defect in a scan.
+      #
+      # A red gate now costs a pull request somebody has to fix, which is
+      # recoverable and visible. It used to cost the whole sitting, which is
+      # neither. NOTHING REACHES THE DEFAULT BRANCH UNCHECKED: the gates
+      # still run, and the merge step below still requires them — what
+      # changed is only that the WORK survives a failure.
+
+      - name: Commit and push a branch
+        id: push
+        run: |
+          set -euo pipefail
+          git config user.name "europedoor-photographs"
+          git config user.email "noreply@europedoor.com"
+          # WHAT ARRIVED, NOT WHAT WAS ASKED FOR. This counted the PLAN,
+          # which was the same number until a batch could skip a candidate
+          # — and a count that is not the set's own extent reads as one.
+          N="${{ steps.acquire.outputs.took }}"
+          SK="${{ steps.acquire.outputs.skipped }}"
+          BRANCH="photo/batch-$(date -u +%Y%m%d-%H%M%S)"
+          git checkout -b "$BRANCH"
+          git add assets/img data/images.json docs site photographs
+          {
+            echo "Photographs: $N acquired from approved ids"
+            echo
+            echo "Acquired by GitHub Actions from ids approved in the Media Desk. Each fetched by id, hashed, derived without upscaling, and registered."
+            if [ "$SK" != 0 ]; then
+              echo
+              echo "$SK approved candidates were refused and are named in the pull request. Those surfaces are still empty and nothing was substituted for them."
+            fi
+          } > /tmp/commit-msg.txt
+          git commit -F /tmp/commit-msg.txt
+          git push -u origin "$BRANCH"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "count=$N" >> "$GITHUB_OUTPUT"
+
       - name: Run every gate
         run: |
           set -euo pipefail
@@ -761,37 +815,6 @@ jobs:
           npm install --no-save playwright@1.49.0
           npx playwright install --with-deps chromium
           node tools/browser-checks.js
-
-      - name: Refuse to commit anything credential-shaped
-        run: python3 tools/photo-tests.py --committed-only
-
-      - name: Commit and push a branch
-        id: push
-        run: |
-          set -euo pipefail
-          git config user.name "europedoor-photographs"
-          git config user.email "noreply@europedoor.com"
-          # WHAT ARRIVED, NOT WHAT WAS ASKED FOR. This counted the PLAN,
-          # which was the same number until a batch could skip a candidate
-          # — and a count that is not the set's own extent reads as one.
-          N="${{ steps.acquire.outputs.took }}"
-          SK="${{ steps.acquire.outputs.skipped }}"
-          BRANCH="photo/batch-$(date -u +%Y%m%d-%H%M%S)"
-          git checkout -b "$BRANCH"
-          git add assets/img data/images.json docs site photographs
-          {
-            echo "Photographs: $N acquired from approved ids"
-            echo
-            echo "Acquired by GitHub Actions from ids approved in the Media Desk. Each fetched by id, hashed, derived without upscaling, and registered."
-            if [ "$SK" != 0 ]; then
-              echo
-              echo "$SK approved candidates were refused and are named in the pull request. Those surfaces are still empty and nothing was substituted for them."
-            fi
-          } > /tmp/commit-msg.txt
-          git commit -F /tmp/commit-msg.txt
-          git push -u origin "$BRANCH"
-          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
-          echo "count=$N" >> "$GITHUB_OUTPUT"
 
       - name: Open the pull request
         env:

@@ -8136,6 +8136,28 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
   font-family: var(--ed-mono); font-size: var(--t-xs); letter-spacing: .12em;
   text-transform: uppercase; color: var(--ed-pine); margin: 0;
 }
+/* ONE COUNTER FOR BOTH BAND SHAPES, BECAUSE TWO NUMBERING SYSTEMS ON ONE PAGE
+   PRINTED THE SAME NUMBER TWICE ON 753 PAGES. `main` resets `band` and every
+   `.band` increments it, and the reason is written on that rule: a number
+   typed per call site is wrong the day somebody reorders a page. The 2036
+   section head was then given the number as its first ARGUMENT, so a page
+   carrying both shapes numbered each sequence from one — a place page opened
+   "01 · NEARBY" and then, directly under it, "01 Other places in Vienna".
+   Each system was internally correct, which is why nothing counted it.
+   `.ed-section` increments the same counter now and the digits are drawn
+   here, so a band's number is its position in the document whichever shape
+   it takes. Scoped inside `.ed-section` because `.ed-section-index` shares
+   its family-accent rules with `.ed-eyebrow`, and an eyebrow is not a band. */
+/* AND IT INCREMENTS ONLY WHERE IT DRAWS, because the first version counted a
+   band that shows no number and pushed every later one up by one. A place
+   page carries `<div class="headmeta ed-section">` — the accessibility,
+   getting-there and up-a-level block — which is an ed-section with no head,
+   so the page opened at "02 · NEARBY" and ended at "04 The record" with
+   nothing anywhere numbered 01. A counter that counts what it does not draw
+   is a numbering system that is silently wrong from its second entry on, and
+   nothing counts a missing number. */
+.ed-section:has(> .ed-section-head) { counter-increment: band; }
+.ed-section .ed-section-index::before { content: "0" counter(band) " · "; }
 .ed-section-title {
   font-family: var(--ed-serif); font-weight: 400;
   font-size: var(--ed-display-2);
@@ -8723,6 +8745,17 @@ body[data-family="journey"] .ed-journey-hero .ed-eyebrow,
   margin-top: var(--s3); font-family: var(--ed-mono); font-size: var(--t-xs);
   letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
 }
+/* THE SENTENCE UNDER A TILE'S NAME. The caption is a tracked uppercase label
+   and a sentence set that way is unreadable at any length, so the note steps
+   out of the label's type entirely: sentence case, the reading size, the
+   body face. It exists because a place page printed its town's other places
+   twice — once as pictures and once as rows carrying this sentence — and the
+   merge had to keep both halves rather than pick one. */
+.ed-strip .ed-strip-note {
+  display: block; margin-top: var(--s2);
+  font-family: var(--ed-sans); font-size: var(--t-sm); line-height: 1.5;
+  letter-spacing: 0; text-transform: none; color: var(--ink-2);
+}
 
 /* 4 · THE MOSAIC — one dominant picture and two beside it, which is the
    asymmetric composition the directive draws. Never four equal tiles. */
@@ -8808,7 +8841,14 @@ body[data-family="journey"] .ed-journey-hero .ed-eyebrow,
    position is the only honest source for it. `main` resets, every `.band`
    increments, and the number is drawn in the margin. */
 main { --ed-gutter: 0px; counter-reset: band; }
-.band { counter-increment: band; }
+/* A BAND INCREMENTS ONLY WHERE IT DRAWS, and the blanket rule made
+   /countries print "010" and "011". Its nine macro regions are
+   `<section class="band macroband">` whose head sits inside a `.bandtop`
+   wrapper, so `.band > .band-head::before` never matched them: nine silent
+   increments, and the two numbered sections after them landed at ten and
+   eleven. The same fault as `div.headmeta.ed-section` one rule down, and
+   the same answer — the selector that COUNTS is the selector that DRAWS. */
+.band:has(> .band-head) { counter-increment: band; }
 /* `display: grid` LOOKS LIKE A DUPLICATE OF `.band-head` FURTHER UP AND IS
    NOT: that one is INSIDE a media query, so below its breakpoint this is the
    only declaration and removing it drops the band head to block layout on

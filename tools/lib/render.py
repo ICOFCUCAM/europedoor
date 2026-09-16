@@ -1672,8 +1672,27 @@ def ed_family(path):
     return "institutional"
 
 
-def ed_section_head(number, label, title, lede="", hid=""):
+def ed_section_head(label, title, lede="", hid=""):
     """A numbered section head: the index beside the title, not above it.
+
+    THE NUMBER IS THE COUNTER'S, NOT A CALLER'S, AND FOR THE LIFE OF THIS
+    HELPER IT WAS BOTH. `section()` numbers its bands from a CSS counter —
+    `main` resets `band`, every `.band` increments it — with the reason
+    written on that rule: *a number typed per call site is wrong the day
+    somebody reorders a page*. This helper was then written with the number
+    as its FIRST ARGUMENT, so the redesign put a second numbering system on
+    the same pages as the first.
+
+    They did not merely disagree, they collided: measured across the built
+    site, **753 of the 829 pages carrying a typed index printed a number a
+    band counter also printed**. A place page opened "01 · NEARBY / The rest
+    of Vienna" and then, immediately under it, "01 / Other places in
+    Vienna". Nothing counted it, because each system was internally correct.
+
+    So `.ed-section` increments the same counter and the index is drawn by
+    CSS from it, exactly as `.band` already does. The label stays real text;
+    only the digits are generated, which is what the sibling component had
+    settled on before this one existed.
 
     `hid` GOES ON THE HEADING, AND LEAVING IT OUT BROKE TWO THINGS AT ONCE.
     `section()` emitted `<h2 id="...">` and every caller that moved to this
@@ -1690,7 +1709,7 @@ def ed_section_head(number, label, title, lede="", hid=""):
     """
     return (
         '<header class="ed-section-head">'
-        f'<div><p class="ed-section-index">{esc(str(number))} · {esc(label)}</p></div>'
+        f'<div><p class="ed-section-index">{esc(label)}</p></div>'
         f'<div><h2 class="ed-section-title"'
         + (f' id="{esc(hid)}"' if hid else "")
         + f'>{esc(title)}</h2>'
@@ -1942,13 +1961,27 @@ def ed_feature(images, key, *, title, body, alt, seed=None, motif=None,
         "</div>")
 
 
+def _strip_note(it):
+    """The sentence under a strip tile's name, or nothing at all."""
+    note = (it.get("note") or "").strip()
+    return f'<span class="ed-strip-note">{esc(note)}</span>' if note else ""
+
+
 def ed_strip(images, items, *, limit=8):
     """A horizontal sequence: a visual journey rather than a grid.
 
-    `items` are dicts of key, alt, label and optionally href. It SCROLLS
-    rather than wrapping, because a sequence is read along — wrapping it
-    into rows turns an order into a grid, which is the thing this whole
+    `items` are dicts of key, alt, label and optionally href and note. It
+    SCROLLS rather than wrapping, because a sequence is read along — wrapping
+    it into rows turns an order into a grid, which is the thing this whole
     system is replacing.
+
+    `note` EXISTS BECAUSE A SET WAS BEING PRINTED TWICE TO SAY TWO THINGS.
+    A place page rendered its town's other places as a strip — picture, name,
+    link — and then again, directly underneath, as rows carrying the one
+    thing the strip could not: the sentence saying what each one IS. Two
+    bands, one set, on 220 of the 255 place pages. Neither band was wrong and
+    neither was complete, so the answer is not to delete one: the tile takes
+    the sentence and the second band goes.
     """
     out = []
     for it in items[:limit]:
@@ -1959,7 +1992,7 @@ def ed_strip(images, items, *, limit=8):
             out.append(
                 '<figure>'
                 + ed_slot(it["key"], shape="portrait", label=it.get("label", ""))
-                + f'<figcaption>{label}</figcaption></figure>')
+                + f'<figcaption>{label}{_strip_note(it)}</figcaption></figure>')
             continue
         inner = picture(images, it["key"], w=900, h=1200, alt=it.get("alt", ""),
                         sizes="(max-width: 52rem) 60vw, 18rem",
@@ -1969,7 +2002,7 @@ def ed_strip(images, items, *, limit=8):
         if it.get("href"):
             label = f'<a href="{esc(it["href"])}">{label}</a>'
         out.append(f'<figure><div class="ed-shot">{inner}</div>'
-                   f'<figcaption>{label}</figcaption></figure>')
+                   f'<figcaption>{label}{_strip_note(it)}</figcaption></figure>')
     return f'<div class="ed-strip">{"".join(out)}</div>' if out else ""
 
 

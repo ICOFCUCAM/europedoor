@@ -11,110 +11,18 @@
       "orientation": "landscape",
       "min_aspect": 1.5,
       "max_aspect": 1.9,
-      "note": "docs/hero-brief.md holds the editorial brief. The plate system was MEASURED as unable to carry this surface, which is the whole argument for licensing a photograph at all — so a photograph that reads as generic stock fails the brief even when it passes every number here. THE FLOOR WAS 1.6 AND IT REFUSED FIFTEEN OF FIFTEEN. Every landscape result of the first real search measured 1.50, which is 3:2, the native aspect of essentially every camera a stock photographer owns — so the one purpose on this site that asked for 1.6 was asking for a crop rather than a photograph, and refused the whole library. It was also backwards for its own brief: the brief wants a strong 21:9 desktop crop AND a viable portrait crop out of the SAME frame, and a narrower source has more room for both, not less. Cropping 3:2 to 21:9 keeps 64% of the height; cropping 2.6:1 to 3:4 keeps 29% of the width. 1.5 is what every other purpose here already asks for. AND THE CEILING WAS 2.6, WHICH WAS THE SAME MISTAKE AT THE OTHER END. The container this sits in was measured for the first time and swings 0.435 to 2.326 — at 320x900 the block is a tall portrait and at a wide desktop it is a band. A 2.6:1 source in a 0.435 container shows 17% of its own width, so the ceiling admitted a shape that cannot survive the narrow end AND that, by this file's own note, essentially no stock photographer supplies. 1.9 costs nothing real and takes the guaranteed frame from 11% to 15%.",
+      "note": "docs/hero-brief.md holds the editorial brief. The plate system was MEASURED as unable to carry this surface, which is the whole argument for licensing a photograph at all — so a photograph that reads as generic stock fails the brief even when it passes every number here. THE FLOOR WAS 1.6 AND IT REFUSED FIFTEEN OF FIFTEEN. Every landscape result of the first real search measured 1.50, which is 3:2, the native aspect of essentially every camera a stock photographer owns — so the one purpose on this site that asked for 1.6 was asking for a crop rather than a photograph, and refused the whole library. It was also backwards for its own brief: the brief wants a strong 21:9 desktop crop AND a viable portrait crop out of the SAME frame, and a narrower source has more room for both, not less. Cropping 3:2 to 21:9 keeps 64% of the height; cropping 2.6:1 to 3:4 keeps 29% of the width. 1.5 is what every other purpose here already asks for. AND THE CEILING WAS 2.6, WHICH WAS THE SAME MISTAKE AT THE OTHER END. The container this sits in was measured for the first time and swings 0.435 to 2.326 — at 320x900 the block is a tall portrait and at a wide desktop it is a band. A 2.6:1 source in a 0.435 container shows 17% of its own width, so the ceiling admitted a shape that cannot survive the narrow end AND that, by this file's own note, essentially no stock photographer supplies. 1.9 costs nothing real and takes the guaranteed frame from 11% to 15%. AND BOTH OF THOSE NUMBERS WERE ABOUT A BOX THAT NO LONGER EXISTS. `.herofull` left the homepage when the plate sequence landed and this purpose renders inside `.opening` on plate 01; the measurement that produced 0.435-2.326 went on passing only because a selector matching nothing has no aspect ratio, and an empty set satisfies a floor and a ceiling at once. Re-measured on the real container at twenty viewports: 0.615 at 320x900 to 2.801 at 980x640, which is a WIDER swing and still a better guarantee, because the narrow end rose further than the wide end did. The frame is 17%, against the 15% this note claims above. The source range is unchanged: the argument for 1.5-1.9 was about what stock photographers supply and what a 21:9 and a 3:4 crop each cost, and none of that depended on the container.",
       "container": {
-        "selector": ".herofull.shot",
-        "min_aspect": 0.435,
+        "selector": ".opening",
+        "min_aspect": 0.615,
         "min_at": "320x900",
-        "max_aspect": 2.326,
-        "max_at": "1440x640"
+        "max_aspect": 2.801,
+        "max_at": "980x640"
       },
       "safe_area": {
-        "width": 0.229,
-        "height": 0.645,
-        "frame": 0.148
-      }
-    },
-    "door-mountains": {
-      "role": "landscape",
-      "key": "door-mountains",
-      "path": "/",
-      "surface": "The Mountains door on the homepage — a large editorial card under “Find your Europe”.",
-      "min_width": 1600,
-      "orientation": "landscape",
-      "min_aspect": 1.2,
-      "max_aspect": 1.9,
-      "note": "An alpine morning above cloud — a valley floor against the wall over it, not a summit portrait. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own.",
-      "container": {
-        "selector": ".way.shot",
-        "min_aspect": 0.464,
-        "min_at": "980x1100",
-        "max_aspect": 1.923,
-        "max_at": "760x640"
-      },
-      "safe_area": {
-        "width": 0.244,
-        "height": 0.624,
-        "frame": 0.152
-      }
-    },
-    "door-coast": {
-      "role": "landscape",
-      "key": "door-coast",
-      "path": "/",
-      "surface": "The Coast & islands door on the homepage — a large editorial card under “Find your Europe”.",
-      "min_width": 1600,
-      "orientation": "landscape",
-      "min_aspect": 1.2,
-      "max_aspect": 1.9,
-      "note": "Where land ends. A cliff, a harbour or an island shore with the sea doing the work. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own.",
-      "container": {
-        "selector": ".way.shot",
-        "min_aspect": 0.464,
-        "min_at": "980x1100",
-        "max_aspect": 1.923,
-        "max_at": "760x640"
-      },
-      "safe_area": {
-        "width": 0.244,
-        "height": 0.624,
-        "frame": 0.152
-      }
-    },
-    "door-history": {
-      "role": "architecture",
-      "key": "door-history",
-      "path": "/",
-      "surface": "The Historic cities door on the homepage — a large editorial card under “Find your Europe”.",
-      "min_width": 1600,
-      "orientation": "landscape",
-      "min_aspect": 1.2,
-      "max_aspect": 1.9,
-      "note": "A lived-in old street, not a monument. Somebody's Tuesday in a two-thousand-year-old city. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own.",
-      "container": {
-        "selector": ".way.shot",
-        "min_aspect": 0.464,
-        "min_at": "980x1100",
-        "max_aspect": 1.923,
-        "max_at": "760x640"
-      },
-      "safe_area": {
-        "width": 0.244,
-        "height": 0.624,
-        "frame": 0.152
-      }
-    },
-    "door-food": {
-      "role": "food",
-      "key": "door-food",
-      "path": "/",
-      "surface": "The Food & wine door on the homepage — a large editorial card under “Find your Europe”.",
-      "min_width": 1600,
-      "orientation": "landscape",
-      "min_aspect": 1.2,
-      "max_aspect": 1.9,
-      "note": "A table, a market or a vineyard that could only be where it is. Never a styled plate on a board. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own.",
-      "container": {
-        "selector": ".way.shot",
-        "min_aspect": 0.464,
-        "min_at": "980x1100",
-        "max_aspect": 1.923,
-        "max_at": "760x640"
-      },
-      "safe_area": {
-        "width": 0.244,
-        "height": 0.624,
-        "frame": 0.152
+        "width": 0.324,
+        "height": 0.536,
+        "frame": 0.173
       }
     },
     "journeys-hero": {
@@ -129,15 +37,15 @@
       "note": "A road, a rail line or a pass with distance in it: the feeling of crossing a border on purpose. Never a map, and never a single landmark. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening.",
       "container": {
         "selector": ".iheroart.shot",
-        "min_aspect": 1.333,
-        "min_at": "980x640",
+        "min_aspect": 0.692,
+        "min_at": "320x640",
         "max_aspect": 1.5,
-        "max_at": "360x640"
+        "max_at": "760x640"
       },
       "safe_area": {
-        "width": 0.635,
+        "width": 0.33,
         "height": 0.867,
-        "frame": 0.55
+        "frame": 0.286
       }
     },
     "experiences-hero": {
@@ -152,15 +60,15 @@
       "note": "Somebody DOING the thing — hands, a workshop, a kitchen, a boat. A person at work in a real place, not a posed portrait and not an empty interior. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening.",
       "container": {
         "selector": ".iheroart.shot",
-        "min_aspect": 1.333,
-        "min_at": "980x640",
+        "min_aspect": 0.692,
+        "min_at": "320x640",
         "max_aspect": 1.5,
-        "max_at": "360x640"
+        "max_at": "760x640"
       },
       "safe_area": {
-        "width": 0.635,
+        "width": 0.33,
         "height": 0.867,
-        "frame": 0.55
+        "frame": 0.286
       }
     },
     "stories-hero": {
@@ -175,15 +83,15 @@
       "note": "A human moment that could be the opening frame of a long read. Faces are welcome; a landmark is not. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening.",
       "container": {
         "selector": ".iheroart.shot",
-        "min_aspect": 1.333,
-        "min_at": "980x640",
+        "min_aspect": 0.692,
+        "min_at": "320x640",
         "max_aspect": 1.5,
-        "max_at": "360x640"
+        "max_at": "760x640"
       },
       "safe_area": {
-        "width": 0.635,
+        "width": 0.33,
         "height": 0.867,
-        "frame": 0.55
+        "frame": 0.286
       }
     },
     "events-hero": {
@@ -197,16 +105,16 @@
       "max_aspect": 2.1,
       "note": "A European gathering in progress — a procession, a market, a festival crowd at dusk. It must read as a fixture in a real town, not a stadium. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening.",
       "container": {
-        "selector": ".iheroart.shot",
-        "min_aspect": 1.333,
-        "min_at": "980x640",
-        "max_aspect": 1.5,
-        "max_at": "360x640"
+        "selector": ".ed-opening-visual",
+        "min_aspect": 0.692,
+        "min_at": "320x640",
+        "max_aspect": 1.643,
+        "max_at": "980x640"
       },
       "safe_area": {
-        "width": 0.635,
-        "height": 0.867,
-        "frame": 0.55
+        "width": 0.33,
+        "height": 0.791,
+        "frame": 0.261
       }
     },
     "countries-hero": {
@@ -220,39 +128,16 @@
       "max_aspect": 2.1,
       "note": "One country seen whole from the ground: a valley, a coast or a plain with enough of it in frame that the eye reads a country rather than a spot. Never an aerial, never a flag, never a monument, and never a composite of several places — the page's argument is that Europe is fifty separate countries, and a picture that could be anywhere argues the opposite. The drawing it replaces is the fifty drawn as fifty, so a photograph has to be at least as specific as that. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening.",
       "container": {
-        "selector": ".iheroart.shot",
-        "min_aspect": 1.333,
-        "min_at": "980x640",
-        "max_aspect": 1.5,
-        "max_at": "360x640"
+        "selector": ".ed-opening-visual",
+        "min_aspect": 0.692,
+        "min_at": "320x640",
+        "max_aspect": 1.643,
+        "max_at": "980x640"
       },
       "safe_area": {
-        "width": 0.635,
-        "height": 0.867,
-        "frame": 0.55
-      }
-    },
-    "themes-hero": {
-      "role": "cultural-scene",
-      "key": "themes-hero",
-      "path": "/themes",
-      "surface": "The opening of the themes index — a wide editorial image beside the headline.",
-      "min_width": 2000,
-      "orientation": "landscape",
-      "min_aspect": 1.3,
-      "max_aspect": 2.1,
-      "note": "A way of SEEING Europe rather than a place in it: a reader looking at something old, a hand on a stone, a room full of people who came for the same reason. Never a landmark portrait and never a map — the page's whole argument is that a theme crosses borders, so a picture of one border is the opposite of it.",
-      "container": {
-        "selector": ".iheroart.shot",
-        "min_aspect": 1.333,
-        "min_at": "980x640",
-        "max_aspect": 1.5,
-        "max_at": "360x640"
-      },
-      "safe_area": {
-        "width": 0.635,
-        "height": 0.867,
-        "frame": 0.55
+        "width": 0.33,
+        "height": 0.791,
+        "frame": 0.261
       }
     },
     "interests-hero": {
@@ -266,16 +151,16 @@
       "max_aspect": 2.1,
       "note": "Somebody travelling FOR something: walking, eating, listening, swimming. A person or their hands in the frame, because the seventeen tags on this page are reasons rather than places. Never an empty landscape, which is what every other index here already opens on.",
       "container": {
-        "selector": ".iheroart.shot",
-        "min_aspect": 1.333,
-        "min_at": "980x640",
-        "max_aspect": 1.5,
-        "max_at": "360x640"
+        "selector": ".ed-opening-visual",
+        "min_aspect": 0.692,
+        "min_at": "320x640",
+        "max_aspect": 1.643,
+        "max_at": "980x640"
       },
       "safe_area": {
-        "width": 0.635,
-        "height": 0.867,
-        "frame": 0.55
+        "width": 0.33,
+        "height": 0.791,
+        "frame": 0.261
       }
     }
   },
@@ -337,8 +222,6 @@
       "refuses": "Golden hour on more than one door in the same set. A hiker in silhouette on a ridge. A road disappearing into the distance.",
       "purposes_today": [
         "countries-hero",
-        "door-coast",
-        "door-mountains",
         "macro-hero"
       ],
       "search": [
@@ -366,8 +249,7 @@
       "refuses": "A crowd photographed as a crowd. A staged 'traditional costume' set-up. Anything a tourist board commissioned.",
       "purposes_today": [
         "events-hero",
-        "theme-hero",
-        "themes-hero"
+        "theme-hero"
       ],
       "search": [
         "European festival",
@@ -388,9 +270,7 @@
       "crop": "Same four-abreast strip as landscape; must read at 320px.",
       "brief": "A market or a cellar rather than a plated dish. A plated dish is a restaurant's photograph and this atlas lists no restaurants; a counter is a place's photograph. Warm ground, real light, no overhead flat-lay.",
       "refuses": "A flat-lay. A styled plate on a rustic board. Anything shot on a white background. Hands holding a coffee cup.",
-      "purposes_today": [
-        "door-food"
-      ],
+      "purposes_today": [],
       "search": [
         "European food market",
         "traditional European dish",
@@ -398,7 +278,8 @@
         "vineyard harvest",
         "food preparation kitchen",
         "market stall produce"
-      ]
+      ],
+      "trigger": "A purpose exists for this the day a surface argues about the table. It had one — the Food & wine door — and the door went with the other three when the homepage became the plate sequence. `/experiences/food` is the obvious candidate and is refused a photograph today for a different reason, recorded in docs/signature-moments.md: forty-eight dots over Europe would say food is everywhere, which is true and is not an insight. A photograph would answer that where the map cannot, so this is the next role likely to gain a purpose."
     },
     "architecture": {
       "does": "Built Europe as the subject: the Historic cities door, and any surface whose argument is what people built.",
@@ -410,9 +291,7 @@
       "crop": "Four-abreast strip; must read at 320px.",
       "brief": "Two thousand years, still lived in. A street somebody walks down to get somewhere, not a monument photographed as a monument.",
       "refuses": "An empty square at dawn shot to remove people. A cathedral interior with a wide-angle bulge. Anything symmetrical to the centre line.",
-      "purposes_today": [
-        "door-history"
-      ],
+      "purposes_today": [],
       "search": [
         "medieval street",
         "old town square",
@@ -422,7 +301,8 @@
         "Romanesque church",
         "European boulevard",
         "historic city square"
-      ]
+      ],
+      "trigger": "A purpose exists for this the day a surface argues about what people BUILT. It had one — the Historic cities door on the homepage — and the door went when that page became the plate sequence, because a lead door carrying its own picture is a fifth image of Europe on a page that opens on the largest one on the site. The role is kept rather than deleted because the argument it serves is real and unbuilt: a destination or country page whose opening is a street in use rather than a map would instantiate it unchanged."
     },
     "human-life": {
       "does": "A person or people, at the scale of a life rather than a portrait: the evidence that a place is inhabited.",
@@ -794,8 +674,7 @@
         "min_aspect": 1.778,
         "min_at": "declared",
         "max_aspect": 1.778,
-        "max_at": "declared",
-        "declared": "`.card-art` is aspect-ratio 16/9 at every width and `.frame` adds only a border, so this container is measurable by arithmetic rather than in Chromium — the one photograph container on the site that is."
+        "max_at": "declared"
       },
       "safe_area": {
         "width": 0.936,
@@ -814,17 +693,16 @@
       "max_aspect": 2.1,
       "note": "A human moment that could be the opening frame of this particular long read — not a landmark, and not a generic European scene that would serve any of the nine. Without a photograph this container draws the story's own places on the atlas, which is a real claim about the piece, so a photograph here replaces something honest and has to be better than it. A STORY IS NOT A PLACE: its picture may never be drawn from a hash, which is the rule this container exists to hold.",
       "container": {
-        "selector": ".card-art.frame",
-        "min_aspect": 1.778,
-        "min_at": "declared",
-        "max_aspect": 1.778,
-        "max_at": "declared",
-        "declared": "`.card-art` is aspect-ratio 16/9 at every width and `.frame` adds only a border, so this container is measurable by arithmetic rather than in Chromium."
+        "selector": ".ed-bleed.ed-bleed-tall",
+        "min_aspect": 1.333,
+        "min_at": "320x640",
+        "max_aspect": 2.333,
+        "max_at": "834x640"
       },
       "safe_area": {
-        "width": 0.847,
-        "height": 0.844,
-        "frame": 0.714
+        "width": 0.635,
+        "height": 0.643,
+        "frame": 0.408
       },
       "search": [
         "quiet European village",
@@ -849,17 +727,16 @@
       "max_aspect": 2.2,
       "note": "What a whole country feels like, above its name. Never a single famous landmark and never a city skyline: a landmark is a place INSIDE the country and the capital has its own role. Fifty of these are seen one after another by a reader moving through /countries, so the SET is part of the brief exactly as it is for the four doors — different light, different season and different palette between neighbours. THE BAND IS AN ADDITION AND NOT A REPLACEMENT: the country portrait stays exactly where it is, because it is this family's signature moment and it is the thing that says which country the page is about. With no photograph there is no band at all, which is today's page unchanged — a slot waiting for a picture is honest and three hundred pixels of it is a hole.",
       "container": {
-        "selector": ".pageband",
-        "min_aspect": 1.778,
-        "min_at": "declared",
-        "max_aspect": 2.333,
-        "max_at": "declared",
-        "declared": "`.pageband` is aspect-ratio 16/9 below 62rem and 21/9 above it, at every width, with nothing beside it deciding its height. ONE CLASS SERVES EVERY FAMILY that opens on a photograph, so the crop rule is written once and every container that uses it is measurable by the same arithmetic — which `.placeband-art` is not, because its height is the height of the map next to it."
+        "selector": ".headshot",
+        "min_aspect": 0.941,
+        "min_at": "320x640",
+        "max_aspect": 1.129,
+        "max_at": "980x640"
       },
       "safe_area": {
-        "width": 0.808,
-        "height": 0.643,
-        "frame": 0.52
+        "width": 0.428,
+        "height": 1.0,
+        "frame": 0.428
       }
     },
     "region-hero": {
@@ -998,17 +875,16 @@
       "max_aspect": 2.1,
       "note": "A theme is an ARGUMENT about Europe rather than a place in it — Medieval Europe, Thermal Europe — so the photograph is the argument's subject caught once: a guild square, a bathhouse, a painted ceiling. The page draws the theme's eight stops as a constellation beneath, which is the reach; this is the substance.",
       "container": {
-        "selector": ".pageband",
-        "min_aspect": 1.778,
-        "min_at": "declared",
-        "max_aspect": 2.333,
-        "max_at": "declared",
-        "declared": "`.pageband` is aspect-ratio 16/9 below 62rem and 21/9 above it, at every width, with nothing beside it deciding its height. ONE CLASS SERVES EVERY FAMILY that opens on a photograph, so the crop rule is written once and every container that uses it is measurable by the same arithmetic — which `.placeband-art` is not, because its height is the height of the map next to it."
+        "selector": ".headshot",
+        "min_aspect": 0.692,
+        "min_at": "320x640",
+        "max_aspect": 1.333,
+        "max_at": "760x640"
       },
       "safe_area": {
-        "width": 0.847,
-        "height": 0.643,
-        "frame": 0.544
+        "width": 0.33,
+        "height": 1.0,
+        "frame": 0.33
       },
       "search": [
         "{name}",

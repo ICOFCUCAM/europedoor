@@ -1611,7 +1611,7 @@ def countries_index(data):
     family="atlas")}
 
 <section class="ed-section">
-{ed_section_head("01", "The continent", "Where the countries sit",
+{ed_section_head("The continent", "Where the countries sit",
                  "A geographic beginning before the alphabetical one. Each of "
                  f"the {len(data['countries'])} countries is drawn on its own, so "
                  f"the frontiers are the picture.{cutsay}")}
@@ -1623,7 +1623,7 @@ def countries_index(data):
 </section>
 
 <section class="ed-section">
-{ed_section_head("02", "The Atlas", "Choose a country",
+{ed_section_head("The Atlas", "Choose a country",
                  "The regions below are editorial travel regions rather than "
                  "administrative ones: they group places that feel like each "
                  "other and are usually visited together.")}
@@ -3163,7 +3163,7 @@ def country_page(data, c):
               + "</dl>")
     _shots = ed_strip(data.get("images"), cstrip_items, limit=8)
     cstrip = (f'<section class="ed-section">'
-              + ed_section_head("02", "In the country",
+              + ed_section_head("In the country",
                                 f"Where {c['name']} is worth going",
                                 f"{n_of(sum(len(r['cities']) for r in c['regions']), 'destination')} "
                                 f"across {n_of(len(c['regions']), 'travel region')}.")
@@ -3184,7 +3184,7 @@ def country_page(data, c):
 {advisory_note(c)}
 
 <section class="ed-section">
-{ed_section_head("01", "The portrait",
+{ed_section_head("The portrait",
                  f"Why {c['name']} belongs in your Europe.")}
 <div class="ed-split">
   <div class="ed-split-copy measure lead">
@@ -3349,7 +3349,7 @@ def region_page(data, c, r):
         for t in r["cities"]], limit=8)
     if _rstrip:
         _rstrip = ('<section class="ed-section">'
-                   + ed_section_head("01", "In the region",
+                   + ed_section_head("In the region",
                                      f"What {r['name']} is made of",
                                      # A COUNT CANNOT BE DROPPED INTO A
                                      # SENTENCE THAT ASSUMES A PLURAL. A
@@ -3646,7 +3646,7 @@ def city_page(data, c, r, t):
         "href": urls.place(c, r, t, pl)} for pl in t.get("places", [])]
     _tshots = ed_strip(data.get("images"), tstrip_items, limit=8)
     tstrip = (f'<section class="ed-section">'
-              + ed_section_head("02", "In the place",
+              + ed_section_head("In the place",
                                 f"What {t['name']} is made of",
                                 f"{n_of(len(t.get('places', [])), 'place')} recorded here.")
               + _tshots + "</section>") if _tshots else ""
@@ -3666,7 +3666,7 @@ def city_page(data, c, r, t):
   </div>
 </section>
 <section class="ed-section" aria-labelledby="why-visit">
-{ed_section_head("01", "Understand", "Why go", hid="why-visit")}
+{ed_section_head("Understand", "Why go", hid="why-visit")}
 <ol class="reasons">{reasons}</ol>
 <div class="headmeta">
   <p class="orient">{orient_line(t)}</p>
@@ -3994,12 +3994,12 @@ def interests_index(data, ranking):
                       label="What you are travelling for"),
     family="discovery")}
 {(f'<section class="ed-section">'
-  + ed_section_head("01", "The seventeen",
+  + ed_section_head("The seventeen",
                     "What each one is a picture of",
                     "The widest eight, in the order this page argues them.")
   + _istrip + "</section>") if _istrip else ""}
 <section class="ed-section">
-{ed_section_head("02", "Reach",
+{ed_section_head("Reach",
                  "How much of the Atlas each one carries",
                  "Every destination with the tag, drawn on one frame.")}
 {silhouette}
@@ -4132,7 +4132,7 @@ def interest_page(data, i, ranking):
         # -measurement's-clothes failure this atlas has already made twice.
         _n = min(8, len(cities))
         _ishots = ('<section class="ed-section">'
-                   + ed_section_head("01", "Travelling for it",
+                   + ed_section_head("Travelling for it",
                                      f"{i['name']}, in {numword(_n)} places",
                                      f"{numword(_n, cap=True)} of the {len(cities)} "
                                      f"destinations carrying the tag, in the order "
@@ -4472,7 +4472,7 @@ def journey_page(data, j):
     jbleed = ed_bleed(data.get("images"), f"journey:{j['slug']}",
                       alt=j["name"], caption=j["name"], shape="tall")
     jstrip = (f'<section class="ed-section">'
-              + ed_section_head("01", "The route",
+              + ed_section_head("The route",
                                 "What the journey passes through",
                                 f"{n_of(len(j['legs']), 'stop')}, in order.")
               + _jshots + "</section>") if _jshots else ""
@@ -6800,12 +6800,6 @@ def place_page(data, c, r, t, pl):
         for link in e.get("at", []) if link["place"] == pl["slug"]
     )
     others = [x for x in t.get("places", []) if x is not pl]
-    nearby = "".join(
-        f"""<a class="row" href="{urls.place(c, r, t, x)}">
-        <div><h3>{esc(x['name'])}</h3><p class="rowsub">{esc(x['summary'])}</p></div>
-        <p class="rowmeta">{esc(PLACE_KIND_NAMES[x['kind']])}</p></a>"""
-        for x in others
-    )
     cid = f"{c['slug']}/{r['slug']}/{t['slug']}"
     b = data["back"][cid]
     jrows = "".join(
@@ -6852,12 +6846,17 @@ def place_page(data, c, r, t, pl):
     # photographs go, and where the ones nobody has licensed say so.
     _pstrip = ed_strip(data.get("images"), [
         {"key": f"place:{cid}/{x['slug']}", "alt": f"{x['name']}, {t['name']}",
-         "label": x["name"], "href": urls.place(c, r, t, x)}
+         "label": x["name"], "href": urls.place(c, r, t, x),
+         # THE SENTENCE THE SECOND BAND USED TO CARRY. Printing this set once
+         # as pictures and again as rows was the page saying one thing twice;
+         # printing it once without the sentence would be the page saying
+         # less. `others` is at most four on any page in this dataset, so the
+         # strip's own limit never selects.
+         "note": x["summary"]}
         for x in others], limit=8)
     if _pstrip:
         _pstrip = ('<section class="ed-section">'
-                   + ed_section_head(
-                       "01", "Nearby",
+                   + ed_section_head("Nearby",
                        f"The rest of {t['name']}",
                        f"{n_of(len(others), 'other place')} recorded in the "
                        f"same town, each one its own page.")
@@ -6943,7 +6942,6 @@ def place_page(data, c, r, t, pl):
              lede="Experiences tied to this place, and how each one is tied to it — "
                   "standing on it, starting from it, or looking at it.") if doing else ""}
     {_pstrip}
-    {section("Other places in " + t["name"], f'<div class="rows">{nearby}</div>') if nearby else ""}
     {section("Journeys that stop here", f'<div class="rows">{jrows}</div>') if jrows else ""}
   </div>
 </div>
@@ -7241,8 +7239,7 @@ def category_page(data, cat, sub=None):
     if _cstrip:
         _n = min(8, len(_cshots))
         _cstrip = ('<section class="ed-section">'
-                   + ed_section_head(
-                       "01", "Where they happen",
+                   + ed_section_head("Where they happen",
                        f"{numword(_n, cap=True)} of the "
                        f"{n_of(len(_seen), 'town')} on this list",
                        "The picture is of the place, not of the invitation: an "
@@ -7497,7 +7494,7 @@ def experiences_index(data):
      country order — Austria to Croatia, called recent. A false ordering is
      worse than none, because a reader takes it for a signal. -->
 {(f'<section class="ed-section">'
-  + ed_section_head("01", "What they are about",
+  + ed_section_head("What they are about",
                     f"{numword(len(data['categories']), cap=True)} categories",
                     "Largest first — the same order the bars below are in.")
   + _xstrip + "</section>") if _xstrip else ""}
@@ -8809,7 +8806,7 @@ def theme_page(data, t):
             "href": urls.city(_c, _r, _t2)})
     _tmshots = ed_strip(data.get("images"), tmstrip_items, limit=8)
     tmstrip = (f'<section class="ed-section">'
-               + ed_section_head("01", "The theme", "Where it takes you")
+               + ed_section_head("The theme", "Where it takes you")
                + _tmshots + "</section>") if _tmshots else ""
     body = f"""
 {crumbs([("Europe", "/discover"), ("Themes", "/themes"), (t["name"], None)])}
@@ -9846,8 +9843,7 @@ def events_month_page(data, month):
     if _evshots:
         _en = min(8, len(mapped))
         _evshots = ('<section class="ed-section">'
-                    + ed_section_head(
-                        "01", "The month",
+                    + ed_section_head("The month",
                         f"{numword(_en, cap=True)} places {name} happens in",
                         f"The same {n_of(len(mapped), 'fixture')} the drawing "
                         f"above plots — the rest of the list is a season or a "
@@ -9983,8 +9979,7 @@ def quiet_page(data):
         for n in _qpick], limit=9)
     if _qshots:
         _qshots = ('<section class="ed-section">'
-                   + ed_section_head(
-                       "01", "Instead",
+                   + ed_section_head("Instead",
                        "One from each corner of the continent",
                        f"The first quiet destination in each of the "
                        f"{numword(len(_qpick))} macro regions — not the first "
@@ -11761,7 +11756,7 @@ def motion_page(data, m):
     if _mstrip:
         _mn = min(8, len(shown))
         _mstrip = ('<section class="ed-section">'
-                   + ed_section_head("01", "The answer",
+                   + ed_section_head("The answer",
                                      f"{numword(_mn, cap=True)} of them",
                                      "The same set the list below is, in the same "
                                      "order — not the whole match, which the query "

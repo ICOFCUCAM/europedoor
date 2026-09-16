@@ -227,9 +227,31 @@ def declared_slugs():
     `desk/registry.json` is written by `tools/desk-registry.py` from the same
     `imageslots.resolve()` the acquisition uses, is committed, and
     `c_desk_registry` fails when it is stale — so it cannot drift from the
-    purposes a photograph can actually be acquired for. Only tokens long
-    enough to reach the scan's own floor are collected; a shorter one was
-    never going to be looked at.
+    purposes a photograph can actually be acquired for.
+
+    AND THE LENGTH FLOOR WAS APPLIED ON THE WRONG SIDE OF THE NORMALISER,
+    WHICH IS THE OTHER HALF OF THE BUG THAT STOPPED RUNS 24 TO 28 AND WAS
+    NOT FIXED WITH IT. `_canon` collapses every separator to ONE underscore
+    so both spellings are compared alike — and `derive.py` writes a file
+    stem with TWO, so the canonical form is always SHORTER than the token
+    that has to match it. Then this filtered the declarations by the length
+    of that shorter form:
+
+        derive.py writes   austria__tyrol__innsbruck__goldenes-dachl   41
+        its canon          austria_tyrol_innsbruck_goldenes-dachl      38
+        registry target    austria/tyrol/innsbruck/goldenes-dachl
+        its canon          austria_tyrol_innsbruck_goldenes-dachl      38
+
+    41 is long enough to be scanned and 38 is too short to be DECLARED, so
+    the floor discarded exactly the declaration the scan needed and the
+    Goldenes Dachl was reported as a credential seventeen times. Run 31
+    acquired sixty photographs, passed everything else, and died on it.
+
+    The floor is on the raw text now, where the scan's own floor is, and the
+    canonical form is collected whatever length it comes out — a set of two
+    or three thousand declared identifiers is not a cost, and a key is still
+    not in it. *One normaliser, both sides* was right and incomplete: a test
+    APPLIED to a normalised value has to be normalised with it.
     """
     global _SLUGS
     if _SLUGS is None:
@@ -245,9 +267,18 @@ def declared_slugs():
                     # THE WHOLE IDENTIFIER, NOT ONLY ITS PARTS. Splitting
                     # first threw away exactly the thing a file stem is: one
                     # run with the separators removed.
-                    whole = _canon(text)
-                    if len(whole) >= 40:
-                        _SLUGS.add(whole)
+                    # NO FLOOR ON THE CANONICAL FORM AT ALL, and moving it
+                    # to the raw text was not enough either: the registry's
+                    # `target` is 38 characters BOTH WAYS, and the stem that
+                    # has to match it is 41 only because `derive.py` doubles
+                    # every separator. There is no length of the declaration
+                    # that predicts the length of the token, so any floor
+                    # here is a guess. It cost nothing to drop: a declared
+                    # identifier shorter than the scan's own floor can never
+                    # be matched by a raw token anyway, and the one way it
+                    # CAN be reached — a longer token whose canon is short —
+                    # is precisely the case this exists for.
+                    _SLUGS.add(_canon(text))
                     _SLUGS |= {t for t in re.split(r"[^A-Za-z0-9_-]+", text)
                                if len(t) >= 40}
     return _SLUGS
@@ -2685,8 +2716,17 @@ def c_frontend():
     # about a page that had just stopped doing it. Each floor names every
     # class that satisfies it, so the promise survives the migration and a
     # family that drops the idea altogether still fails.
+    # `row` 0.85 -> 0.75 BECAUSE 255 PLACE PAGES STOPPED PRINTING THEIR SET
+    # TWICE. A place page rendered the other places in its town as a strip —
+    # picture, name, link — and then again, directly underneath, as rows
+    # carrying the sentence saying what each one is: two bands, one set, on
+    # 220 of the 255. The tile takes the sentence now and the second band is
+    # gone, so the pages that had no other list lost their last `.row`. That
+    # is a deliberate removal of duplication rather than a family growing its
+    # own components, which is what this floor exists to catch — and the
+    # place family still uses `row` wherever it has a second list to show.
     FLOORS = {"kicker": 0.99, "masthead": 0.99, "pagehead": 0.99, "crumbs": 0.99,
-              "row": 0.85, "card": 0.05, "band": 0.70, "note": 0.70}
+              "row": 0.75, "card": 0.05, "band": 0.70, "note": 0.70}
     ALSO = {"pagehead": ("ed-opening", "ed-arrival", "ed-journey-hero",
                          "ed-story-opening", "ed-institution"),
             "kicker": ("ed-eyebrow", "ed-section-index"),
@@ -6999,6 +7039,75 @@ def c_photo_safe_area():
     return n
 
 
+@check("every declared container is a class some renderer emits")
+def c_container_is_emitted():
+    """A CROP BOX DECLARED AGAINST A COMPONENT NOTHING RENDERS IS A NUMBER
+    ABOUT NOTHING, AND FOUR OF THE TEN TEMPLATED SLOTS WERE THAT.
+
+    `c_photo_safe_area` recomputes the arithmetic and browser-checks.js
+    measures the box, and between them they were supposed to make drift
+    impossible. Neither asks the prior question — is this selector a thing
+    this site emits at all — and the answer for `.card-art.frame` was no:
+    every `.card-art` on the site is `card-art card-map`, and the `frame`
+    variant left when the story opening became a bleed and a place became a
+    strip tile. `theme-hero` and `country-hero` named `.pageband`, which is
+    real and is what five OTHER families use; these two render
+    `head_figure()`, which emits `.headshot`.
+
+    The measuring end cannot catch it. Those elements render only when the
+    register holds a photograph, so a selector that matches nothing today is
+    indistinguishable from a selector that is simply waiting — which is
+    exactly why commit 39's reach guard had to group by component rather
+    than fail per page. **The absence is what has to be tested and absence
+    is not in the shipped HTML**, so this is asserted at the SOURCE, the same
+    reasoning as `c_purpose_reaches` and `c_og_no_hash_motif`.
+
+    Read out of `class="..."` attributes rather than by substring, because a
+    class named only in a comment is the instrument-reads-its-own-
+    documentation fault this repository has recorded six times.
+    """
+    # THE FIRST VERSION COLLECTED TOKENS AND COULD NOT FAIL ON THE CASE THAT
+    # MOTIVATED IT. `.card-art.frame` is two classes that are each emitted
+    # somewhere and are never emitted TOGETHER — every `.card-art` on the
+    # site is `card-art card-map` — so a set of bare tokens said yes. A
+    # compound selector is a claim about one element, so the attribute
+    # groupings are kept and each compound is tested against them whole.
+    # Proved red on exactly that selector.
+    emitted = []
+    for mod in ("pages.py", "render.py"):
+        src = open(os.path.join(ROOT, "tools", "lib", mod), encoding="utf-8").read()
+        for attr in re.findall(r'class="([^"]*)"', src):
+            # an f-string placeholder is not a class name, and dropping it
+            # leaves the literal classes beside it, which are still a real
+            # grouping of an element this site emits
+            emitted.append({t for t in attr.split()
+                            if "{" not in t and "}" not in t})
+    spec = json.load(open(os.path.join(ROOT, "data", "image-purposes.json"),
+                          encoding="utf-8"))
+    crops = dict(spec.get("purposes", {}))
+    crops.update(spec.get("slots", {}))
+    n = 0
+    for name, pur in sorted(crops.items()):
+        con = pur.get("container") or {}
+        if con.get("unmeasurable") or not con.get("selector"):
+            continue
+        for part in con["selector"].split():
+            want = set(re.findall(r'\.([A-Za-z0-9_-]+)', part))
+            if not want:
+                continue
+            n += 1
+            if any(want <= group for group in emitted):
+                continue
+            fail(f"image-purposes.json > {name}: the container names "
+                 f"'{part}' and no renderer emits an element carrying "
+                 f"{sorted(want)} together. A crop box declared against a "
+                 f"component nothing renders is a number about nothing — "
+                 f"and it cannot be caught by measuring, because a "
+                 f"photograph slot that renders nothing today looks exactly "
+                 f"the same")
+    return n
+
+
 @check("a registered photograph appears on the page its purpose claims")
 def c_photo_published():
     """The register cannot claim a surface it does not reach.
@@ -7051,6 +7160,61 @@ def c_photo_published():
                  f"claims a surface it does not reach — either the key is not "
                  f"the one that page asks picture() for, or the surface never "
                  f"asks at all")
+    return n
+
+
+@check("every declared purpose reaches a surface, photograph or not")
+def c_purpose_reaches():
+    """A PURPOSE WHOSE SURFACE WAS DELETED IS INVISIBLE UNTIL SOMEBODY BUYS
+    A PHOTOGRAPH FOR IT.
+
+    `c_photo_published` asks whether a REGISTERED photograph appears on the
+    page its purpose claims, which is the right question and can only be
+    asked about a purpose the register already holds. With eleven theme
+    heroes registered it examined eleven surfaces and said nothing about the
+    other 828 — so five purposes whose pages had stopped referencing them sat
+    green through every local run, and were found by run 31, which acquired
+    sixty photographs, passed every other gate and died on them.
+
+    The five were `door-coast`, `door-food`, `door-history`,
+    `door-mountains` and `themes-hero`. The four doors went when the homepage
+    became the plate sequence and `themes-hero` went when the themes index
+    stopped opening on a map — both deliberate, and neither took its purpose
+    with it. *Removing a claim leaves surfaces pointing at it*, five times,
+    and this repository's own rule for it was written about prose.
+
+    THE ABSENCE IS WHAT HAS TO BE TESTED, AND ABSENCE IS NOT IN THE SHIPPED
+    HTML. An unfilled surface renders `ed_slot()`, which prints the page's
+    own label rather than the register key, so a page that asks for
+    `door-coast` and a page that has never heard of it are the same bytes.
+    That is the same reason `c_og_no_hash_motif` is asserted at the source:
+    when the observable is what a page DID NOT do, the shipped output cannot
+    carry it. `picture()` is the one function that serves a register key, so
+    a key no page builder names is a surface no reader can reach.
+
+    Only the authored purposes are checked. The rest are templated per
+    record by `imageslots.resolve()` and their surface is the slot machinery
+    itself, which cannot go missing for one record and not another.
+    """
+    f = os.path.join(ROOT, "data", "image-purposes.json")
+    if not os.path.exists(f):
+        return 0
+    purposes = json.load(open(f, encoding="utf-8")).get("purposes", {})
+    src = open(os.path.join(ROOT, "tools", "lib", "pages.py"),
+               encoding="utf-8").read()
+    n = 0
+    for name, row in sorted(purposes.items()):
+        key = row.get("key") or ""
+        if not key:
+            continue
+        n += 1
+        if key not in src:
+            fail(f"image-purposes.json > {name}: declares register key "
+                 f"{key!r} for {row.get('path')!r} and no page builder asks "
+                 f"picture() for it. The purpose reaches no surface, so a "
+                 f"photograph acquired for it would be published nowhere — "
+                 f"either the surface was removed and the purpose was left, "
+                 f"or the key is not the one the page asks for")
     return n
 
 
