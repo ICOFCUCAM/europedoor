@@ -4020,10 +4020,27 @@ def c_hero_frame():
                 encoding="utf-8").read()
     photo_hero = bool(_register().get("home-hero"))
     if photo_hero:
-        assert 'class="herofull shot"' in html and "<picture>" in html, (
-            "the register holds a homepage hero photograph and the shipped "
-            "page carries neither `.shot` nor a <picture> — the drawing was "
-            "removed and nothing replaced it")
+        # AND `.herofull shot` WAS THE OLD HERO'S CLASS, WHICH IS THE SHAPE
+        # HALF OF THIS ASSERTION COMING BACK. The homepage is a plate
+        # sequence now: the opening is `.sheet-door .opening` and the
+        # photograph goes inside it, so naming the container was a third
+        # spelling of "there is a picture here". What is asserted is the
+        # picture and its own register key, inside the opening — because a
+        # `<picture>` somewhere on the page would also be true of the eight
+        # doors below the fold.
+        i = html.find('class="opening"')
+        seg = html[i:html.find("</div>", i)] if i >= 0 else ""
+        # AND NOT `"home-hero" in seg`, WHICH IS THE ONE-CHARACTER-APART
+        # TRAP THIS FILE ALREADY RECORDS. The REGISTER KEY is `home-hero`
+        # and the FILE STEM comes from the PURPOSE, `homepage-hero`, so the
+        # derivatives are named `homepage-hero.<hash>.avif` and the key is
+        # not a substring of them. Which file the page must reference is
+        # `c_photo_published`'s question and it asks it from the register;
+        # this one asks only whether the opening carries a picture at all.
+        assert "<picture" in seg, (
+            "the register holds a homepage hero photograph and the opening "
+            "carries no <picture> — the drawing was removed and nothing "
+            "replaced it")
     else:
         assert f'viewBox="{vx:.0f} {vy:.0f} {vw:.0f} {vh:.0f}"' in html, (
             "the homepage does not carry the hero viewBox this check just "

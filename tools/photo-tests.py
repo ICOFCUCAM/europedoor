@@ -55,6 +55,11 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 # neither had. `checks.py` owns the rule; a suite that re-implements the
 # thing it is testing is testing its own restatement.
 from checks import credential_shaped, in_url_path     # noqa: E402
+# AND THE SAME ARGUMENT FOR THE FILENAME STEM. `region-hero@austria/tyrol`
+# becomes `region-hero@austria__tyrol` on disk, and which characters fold is
+# a rule that lives in `imageslots`. A suite asserting a photograph is on its
+# page has to name the file the pipeline actually wrote.
+from lib import imageslots                            # noqa: E402
 IMG = os.path.join(ROOT, "assets", "img")
 IMG_DIR = os.path.join(ROOT, "assets", "img")
 REGISTER = os.path.join(ROOT, "data", "images.json")
@@ -872,8 +877,9 @@ def main(argv):
               (b2.stderr or "")[-200:])
         at = os.path.join(ROOT, "site", "europe", "austria", "index.html")
         austria = open(at, encoding="utf-8").read() if os.path.exists(at) else ""
-        check("the band renders on the country it was acquired for",
-              "pageband" in austria)
+        _cstem = imageslots.stem("country-hero@austria")
+        check("the photograph renders on the country it was acquired for",
+              _cstem in austria)
         # AND THE PORTRAIT IS STILL THERE. The band is an addition, not a
         # replacement: the country plate is this family's signature moment
         # and it is what says which country the page is about.
@@ -883,8 +889,8 @@ def main(argv):
         # the markup: `picture()` returns a generated plate when the register
         # has no row, and the band asks the register directly for exactly
         # that reason.
-        check("the band carries a photograph rather than a plate",
-              "<picture" in austria and "pageband" in austria)
+        check("the opening carries a photograph rather than a plate",
+              "<picture" in austria and _cstem in austria)
         # ── AND EVERY OTHER FAMILY THAT OPENS ON ONE ──────────────────
         #
         # Six page families grew a container in one commit and five of them
@@ -926,9 +932,28 @@ def main(argv):
         for purpose, where in FAMILIES:
             f = os.path.join(ROOT, where, "index.html")
             html = open(f, encoding="utf-8").read() if os.path.exists(f) else ""
-            check(f"{purpose.split('@')[0]} renders its band on its own page",
-                  "pageband" in html and "<picture" in html,
-                  f"{where}: {'no file' if not html else 'no band'}")
+            # THE PROMISE IS THAT THE PHOTOGRAPH IS ON THE PAGE IT WAS
+            # ACQUIRED FOR, NOT THAT IT IS IN A CONTAINER CALLED `pageband`.
+            # Two families moved to `head_figure` — the photograph BESIDE
+            # the name rather than in a band above it, with the drawing
+            # moved down to a band of its own — because a band over a head
+            # is a magazine's cover and this is its opening spread. The
+            # assertion went red for a composition that does more of what it
+            # protects, which is the shape-pinning failure this repository
+            # has now counted past a dozen times.
+            #
+            # What is asserted is the photograph, by its own derivative
+            # path, which is the one string that cannot be true of a page
+            # that merely has SOME picture on it.
+            # THE STEM COMES FROM `imageslots`, WHICH IS WHERE THE RULE
+            # LIVES. Guessing it here — folding `@` as well as `/` — is a
+            # second implementation of a filename convention, and this
+            # repository has paid for a second implementation of one fact
+            # seven times, once over a file extension.
+            stem = imageslots.stem(purpose)
+            check(f"{purpose.split('@')[0]} renders on its own page",
+                  "<picture" in html and stem in html,
+                  f"{where}: {'no file' if not html else 'no ' + stem}")
 
         # ── THE ORDER THE WORKFLOW HAS TO RUN THESE IN ──────────────
         #
@@ -1194,8 +1219,15 @@ def main(argv):
         page = os.path.join(scratch, f"cand-{PHOTO_ID}", "index.html")
         check("a candidate page exists", os.path.exists(page))
         drawn = open(page, encoding="utf-8").read() if os.path.exists(page) else ""
+        # `.herofull shot` WAS THE OLD HERO'S CLASS. The homepage is a plate
+        # sequence and its opening is `.sheet-door .opening`, so this named a
+        # container that has not existed since that landed — the third
+        # spelling of "there is a picture here" in this suite, and the one
+        # that matters most: the sheet exists so a person can judge a
+        # candidate INSIDE the real composition, and an assertion that the
+        # sheet drew the real hero has to name something the real hero has.
         check("the candidate page is the real hero",
-              'class="herofull shot"' in drawn)
+              'class="opening"' in drawn and "<picture" in drawn)
         check("the drawing is replaced, not stacked behind the photograph",
               "heroeurope" not in drawn)
         check("the delivery ladder is gone", "image/avif" not in drawn)

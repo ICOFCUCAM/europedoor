@@ -1233,7 +1233,29 @@ def home(data):
     idx = data["cities"]
     images = data.get("images") or {}
 
-    _hero = heroeurope(data)
+    # THE OPENING TAKES A PHOTOGRAPH WHEN ONE IS LICENSED, AND THE PATH TO IT
+    # HAD BEEN GONE SINCE THE PLATE SEQUENCE LANDED. `data/image-purposes.json`
+    # declares `homepage-hero` against the register key `home-hero`, the brief
+    # for it is `docs/hero-brief.md`, and `checks.py` still reads that key in
+    # three places — and nothing on this page asked `picture()` for it. A
+    # purpose that reaches no surface is an acquisition nobody would ever see:
+    # the workflow would fetch it, hash it, register it, pass every gate and
+    # publish a photograph onto a page that does not reference it, which is
+    # exactly the failure `c_photo_published` exists to name and which
+    # `photo-tests.py` reported twelve times.
+    #
+    # A PHOTOGRAPH REPLACES THE DRAWING; IT DOES NOT SIT BEHIND IT. That rule
+    # is already recorded here and it is why this asks the register directly
+    # rather than letting `picture()` fall back: `picture()` returns a
+    # generated plate with no row, which is right on a card and wrong on the
+    # one opening the plate system has been MEASURED unable to carry.
+    #
+    # Nothing on the page changes today. The register holds no `home-hero`,
+    # so the drawn continent is what a reader gets, exactly as now.
+    _hero_row = images.get("home-hero")
+    _hero = (picture(images, "home-hero", w=2400, h=1200,
+                     alt=_hero_row.get("alt", ""), eager=True, sizes="100vw")
+             if _hero_row else heroeurope(data))
 
     # ── 01 · THE DOOR ────────────────────────────────────────────────
     # The wall is paper and the opening is the only dark thing on the
@@ -8702,7 +8724,13 @@ def theme_page(data, t):
         note=f'Coastline from <a href="/sources">Natural Earth</a>, '
              f'public domain.') if len(tpts) >= 2 else ""
 
-    photoband = pageband(data, f"theme:{t['slug']}")
+    # NO `pageband` HERE: THIS FAMILY MOVED TO `head_figure`. The band puts
+    # the photograph ABOVE the head, which is a magazine's cover; the theme
+    # page puts it BESIDE the name, which is its opening spread, and the
+    # drawing moves down to a band of its own. `photoband` was left assigned
+    # and never interpolated when that happened — a dead variable that reads
+    # as a rendered band to anybody grepping for one, and the acquisition
+    # suite grepped for exactly that.
     # ONE ARCHITECTURE, TWO PICTURES. Eleven of the thirteen themes carry a
     # photograph and two do not, and the two without were not a designed
     # state — they were what is left when the band is removed: an overture

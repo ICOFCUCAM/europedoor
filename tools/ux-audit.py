@@ -198,8 +198,32 @@ def s4():
          "views of the map the reader is already looking at. The filters live "
          "on /map, which is one tap away and is where they act.")
 def s5():
-    yield has("/", '<g class="countries"'), "the homepage opens on a drawing of Europe"
-    yield has("/", "herolandg"), "and draws land, not a scatter of dots"
+    # BOTH OF THESE ASSUME THE OPENING IS A DRAWING, AND A PHOTOGRAPH
+    # REPLACES IT. `.shot` is added only when the register holds `home-hero`
+    # and `heroeurope()` is not called at all — so on the first end-to-end
+    # acquisition these went red for a page that had got what it was waiting
+    # for. That is the same failure `c_hero_frame` records one file over, and
+    # it is the eleventh assertion here to pin a shape rather than a promise.
+    #
+    # The promise is that the homepage opens on EUROPE rather than on a
+    # scatter of dots or a form — which a photograph of a European place
+    # satisfies exactly as the drawing does, and which the branch chosen by
+    # the register decides. Both halves still fail on the thing they protect:
+    # a homepage that opens on neither.
+    # AND `has()` RETURNS A TUPLE, WHICH IS ALWAYS TRUTHY. The first version
+    # wrote `_drawn or _shot` over two `has()` calls and got back the FIRST
+    # tuple every time — so the assertion reported the drawing missing on a
+    # page carrying a photograph, which is the state it was rewritten to
+    # allow. Same family as the `cssRules` empty-list-is-truthy trap that
+    # made the dead-rule scanner examine nothing and report clean.
+    _home = page("/")
+    _drawn = '<g class="countries"' in _home and "herolandg" in _home
+    _shot = "<picture" in _home and 'class="opening"' in _home
+    _how = "drawn" if _drawn else ("photographed" if _shot else "neither")
+    yield (_drawn or _shot,
+           f"the homepage opens on Europe — {_how}")
+    yield (_drawn or _shot,
+           f"and on land rather than a scatter of dots — {_how}")
     yield has("/", 'href="/map"'), "and opens the real map"
     # The requirement is still checked — at the surface that serves it.
     for layer in ("nature", "history", "food", "coast"):

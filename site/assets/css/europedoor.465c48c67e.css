@@ -7159,6 +7159,18 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
                        background: var(--graphite);
                        border-radius: 50% 50% 0 0 / 30% 30% 0 0; }
 .sheet-door .heroeurope { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* AND A PHOTOGRAPH FILLS THE SAME OPENING, because the drawing is the
+   INTERIM answer to an empty register and not a layer under a picture. The
+   builder swaps one for the other; without this the `<picture>` would sit in
+   normal flow inside a `position: relative` box with a 62vh floor and leave
+   the arch half empty — which is the `.ed-opening-visual` letterbox, in the
+   one opening that is the largest on the site. `object-fit: cover` because
+   the aperture crops two corners away and a photograph that letterboxes
+   inside it is not in the aperture at all. */
+.sheet-door .opening :is(picture, img) {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
 /* The reveal: the wall's own face laid over the drawing's edge, and a fine
    line just inside it. That is what an opening in masonry actually shows,
    and it is where the eye reads depth from — the same two marks the 824
@@ -8532,7 +8544,18 @@ body[data-family="journey"] .ed-journey-hero .ed-eyebrow,
 /* The caption under a bleed returns to the column: a credit belongs at
    reading width even when the picture does not. */
 .ed-bleed + .ed-caption,
-.ed-bleed figcaption {
+/* `:not(.credit)` BECAUSE A CREDIT IS NOT A CAPTION AND THIS SITE HAS PAID
+   FOR THAT ONCE. `picture()` emits `<figcaption class="credit">` INSIDE the
+   `<picture>` — absolutely positioned at the foot of the image, on a 72%
+   scrim, at `opacity: 0` until hover — and a rule naming `figcaption` at
+   (0,1,1) beats `.credit` at (0,1,0) on the COLOUR and leaves the position,
+   the scrim and the opacity alone. That is exactly how `.pageband
+   figcaption` put the site's caption ink on near-black at 2.01:1, on the two
+   links Pexels' terms require, and `photo-tests.py` is the suite that found
+   it both times. Every one of the seven image scales carries the exclusion,
+   because the credit travels with the picture and the picture goes in all
+   of them. */
+.ed-bleed figcaption:not(.credit) {
   width: min(var(--ed-max), calc(100% - 2 * var(--ed-gutter)));
   margin: var(--s4) auto 0; font-size: var(--t-xs); color: var(--ink-3);
   font-family: var(--ed-mono); letter-spacing: .06em; text-transform: uppercase;
@@ -8567,7 +8590,7 @@ body[data-family="journey"] .ed-journey-hero .ed-eyebrow,
 .ed-strip .ed-shot { aspect-ratio: 3 / 4; }
 .ed-strip .ed-shot :is(img, picture, svg) { width: 100%; height: 100%; object-fit: cover; display: block; }
 .ed-shot { overflow: hidden; background: var(--mineral); }
-.ed-strip figcaption {
+.ed-strip figcaption:not(.credit) {
   margin-top: var(--s3); font-family: var(--ed-mono); font-size: var(--t-xs);
   letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
 }
