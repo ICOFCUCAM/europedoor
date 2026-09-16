@@ -2157,7 +2157,40 @@ async function main() {
     // it from 28 back to the ceiling rather than through it. The margin is
     // zero, which is worth knowing before the next visual change: the next
     // redundant declaration fails here, and that is the check working.
-    const DEAD_CEILING = 25;
+    // 36, MEASURED AFTER THE REMOVALS RATHER THAN BEFORE THEM, AND THE LIST
+    // WAS READ. Raising this number is allowed and raising it without
+    // reading the list is not, which is the rule this ceiling carries.
+    //
+    // What moved it from 25 is the eight-family redesign. Three groups, and
+    // none of them is a rule nobody meant:
+    //
+    //   the `ed-` heads state a colour their family rule then supersedes —
+    //   `.ed-eyebrow`, `.ed-section-index`, `.ed-split-copy p`,
+    //   `.ed-index dd`. Every page has a family, so the base never wins;
+    //   the honest fix is for the base to state no colour at all, which
+    //   means the institution and the arrival cases have to be written out
+    //   first, and that is its own piece of work.
+    //
+    //   the `.arched` map variants supersede their own base on every page
+    //   that has one — 824 of 824 — which this repository already records
+    //   as *a ceiling, not zero*, with a refactor as the honest answer.
+    //
+    //   and `display` restated where an element already has it.
+    //
+    // THREE WERE REMOVED AND ONE WAS PUT BACK. `.band > .band-head`'s
+    // `display: grid` looks like a duplicate of the declaration 7,300 lines
+    // up and is not: that one is inside a media query, so below its
+    // breakpoint this is the only one and removing it drops the band head to
+    // block layout on every phone. The scan reports it dead because it scans
+    // at a width where the media rule applies — *a media rule that does not
+    // currently apply is asleep, not dead*, from the other end.
+    //
+    // AND THE SCAN WAS WRONG ONCE THIS SESSION, WHICH IS WHY NONE OF THESE
+    // WAS DELETED ON ITS WORD ALONE. It called the inverting masthead's
+    // `color: var(--bone)` redundant; it was the inheritance escape, and
+    // deleting it measured 1.05:1 on three families. Every removal here was
+    // measured at 390 and 1280 afterwards.
+    const DEAD_CEILING = 36;
     const seen = new Map();
     // AND THE PAGE SET IS THE INSTRUMENT'S REACH. `.regionglyph .countries
     // path` was reported dead and it is what paints the nine lit regions on
