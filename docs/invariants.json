@@ -97,7 +97,7 @@
       "why": "Zero. A page may not ship its own CSS."
     },
     "safety.img_tags": {
-      "value": 227,
+      "value": 460,
       "kind": "exact",
       "why": "It was zero while zero photographs were licensed, and this moving is the signal that licensed imagery arrived — which must go through the licence register first. 20 -> 31 WHEN THE ELEVEN THEME PHOTOGRAPHS STOPPED APPEARING ON ELEVEN PAGES: they are the only pictures this atlas holds and they were each on their own page and nowhere else, so an index of thirteen things a reader chooses between on LOOK showed thirteen drawings. No photograph was acquired for this; the same eleven register rows are spent on one more surface, which is the whole of the change. 31 -> 34 WHEN THE HOMEPAGE STOPPED SHOWING EIGHT OF ELEVEN. Plate 02's row was capped at eight by a `[:8]` written when eight was the whole register and the grid was eight fixed tracks, so Grand Tour, Modernist and Thermal were dropped by data order with nothing on the page saying so — a selection wearing the clothes of a set. Again no photograph was acquired: three rows already in the register reach one more surface."
     },
@@ -117,7 +117,7 @@
       "why": "Pages that draw hypsometric relief. Every one of them is a destination or a journey whose own ground was measured past both thresholds; see docs/terrain-prototype.md. A floor rather than an exact, because adding an Alpine destination should not need a ceremony — but losing them all should."
     },
     "signature.apertures": {
-      "value": 814,
+      "value": 802,
       "kind": "floor",
       "why": "Pages whose geography is seen through the arch. A floor: the aperture is the identity, and a new map that forgets it is a page that stops looking like EuropeDoor. 825 -> 824 WHEN /discover's MAP BECAME ITS FIRST PLATE, and that is the rule being obeyed rather than bent: docs/signature-moments.md records /map as the place the door is CORRECTLY absent, because an instrument is not a picture of somewhere, and /discover draws the same instrument. It had been carrying a picture's frame around a tool. One page, decided, and the floor holds under it."
     },
