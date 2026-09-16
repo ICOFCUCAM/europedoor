@@ -7030,6 +7030,75 @@ def c_photo_safe_area():
     return n
 
 
+@check("every declared container is a class some renderer emits")
+def c_container_is_emitted():
+    """A CROP BOX DECLARED AGAINST A COMPONENT NOTHING RENDERS IS A NUMBER
+    ABOUT NOTHING, AND FOUR OF THE TEN TEMPLATED SLOTS WERE THAT.
+
+    `c_photo_safe_area` recomputes the arithmetic and browser-checks.js
+    measures the box, and between them they were supposed to make drift
+    impossible. Neither asks the prior question — is this selector a thing
+    this site emits at all — and the answer for `.card-art.frame` was no:
+    every `.card-art` on the site is `card-art card-map`, and the `frame`
+    variant left when the story opening became a bleed and a place became a
+    strip tile. `theme-hero` and `country-hero` named `.pageband`, which is
+    real and is what five OTHER families use; these two render
+    `head_figure()`, which emits `.headshot`.
+
+    The measuring end cannot catch it. Those elements render only when the
+    register holds a photograph, so a selector that matches nothing today is
+    indistinguishable from a selector that is simply waiting — which is
+    exactly why commit 39's reach guard had to group by component rather
+    than fail per page. **The absence is what has to be tested and absence
+    is not in the shipped HTML**, so this is asserted at the SOURCE, the same
+    reasoning as `c_purpose_reaches` and `c_og_no_hash_motif`.
+
+    Read out of `class="..."` attributes rather than by substring, because a
+    class named only in a comment is the instrument-reads-its-own-
+    documentation fault this repository has recorded six times.
+    """
+    # THE FIRST VERSION COLLECTED TOKENS AND COULD NOT FAIL ON THE CASE THAT
+    # MOTIVATED IT. `.card-art.frame` is two classes that are each emitted
+    # somewhere and are never emitted TOGETHER — every `.card-art` on the
+    # site is `card-art card-map` — so a set of bare tokens said yes. A
+    # compound selector is a claim about one element, so the attribute
+    # groupings are kept and each compound is tested against them whole.
+    # Proved red on exactly that selector.
+    emitted = []
+    for mod in ("pages.py", "render.py"):
+        src = open(os.path.join(ROOT, "tools", "lib", mod), encoding="utf-8").read()
+        for attr in re.findall(r'class="([^"]*)"', src):
+            # an f-string placeholder is not a class name, and dropping it
+            # leaves the literal classes beside it, which are still a real
+            # grouping of an element this site emits
+            emitted.append({t for t in attr.split()
+                            if "{" not in t and "}" not in t})
+    spec = json.load(open(os.path.join(ROOT, "data", "image-purposes.json"),
+                          encoding="utf-8"))
+    crops = dict(spec.get("purposes", {}))
+    crops.update(spec.get("slots", {}))
+    n = 0
+    for name, pur in sorted(crops.items()):
+        con = pur.get("container") or {}
+        if con.get("unmeasurable") or not con.get("selector"):
+            continue
+        for part in con["selector"].split():
+            want = set(re.findall(r'\.([A-Za-z0-9_-]+)', part))
+            if not want:
+                continue
+            n += 1
+            if any(want <= group for group in emitted):
+                continue
+            fail(f"image-purposes.json > {name}: the container names "
+                 f"'{part}' and no renderer emits an element carrying "
+                 f"{sorted(want)} together. A crop box declared against a "
+                 f"component nothing renders is a number about nothing — "
+                 f"and it cannot be caught by measuring, because a "
+                 f"photograph slot that renders nothing today looks exactly "
+                 f"the same")
+    return n
+
+
 @check("a registered photograph appears on the page its purpose claims")
 def c_photo_published():
     """The register cannot claim a surface it does not reach.

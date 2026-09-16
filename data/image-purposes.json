@@ -674,8 +674,7 @@
         "min_aspect": 1.778,
         "min_at": "declared",
         "max_aspect": 1.778,
-        "max_at": "declared",
-        "declared": "`.card-art` is aspect-ratio 16/9 at every width and `.frame` adds only a border, so this container is measurable by arithmetic rather than in Chromium — the one photograph container on the site that is."
+        "max_at": "declared"
       },
       "safe_area": {
         "width": 0.936,
@@ -694,17 +693,16 @@
       "max_aspect": 2.1,
       "note": "A human moment that could be the opening frame of this particular long read — not a landmark, and not a generic European scene that would serve any of the nine. Without a photograph this container draws the story's own places on the atlas, which is a real claim about the piece, so a photograph here replaces something honest and has to be better than it. A STORY IS NOT A PLACE: its picture may never be drawn from a hash, which is the rule this container exists to hold.",
       "container": {
-        "selector": ".card-art.frame",
-        "min_aspect": 1.778,
-        "min_at": "declared",
-        "max_aspect": 1.778,
-        "max_at": "declared",
-        "declared": "`.card-art` is aspect-ratio 16/9 at every width and `.frame` adds only a border, so this container is measurable by arithmetic rather than in Chromium."
+        "selector": ".ed-bleed.ed-bleed-tall",
+        "min_aspect": 1.333,
+        "min_at": "320x640",
+        "max_aspect": 2.333,
+        "max_at": "834x640"
       },
       "safe_area": {
-        "width": 0.847,
-        "height": 0.844,
-        "frame": 0.714
+        "width": 0.635,
+        "height": 0.643,
+        "frame": 0.408
       },
       "search": [
         "quiet European village",
@@ -729,17 +727,16 @@
       "max_aspect": 2.2,
       "note": "What a whole country feels like, above its name. Never a single famous landmark and never a city skyline: a landmark is a place INSIDE the country and the capital has its own role. Fifty of these are seen one after another by a reader moving through /countries, so the SET is part of the brief exactly as it is for the four doors — different light, different season and different palette between neighbours. THE BAND IS AN ADDITION AND NOT A REPLACEMENT: the country portrait stays exactly where it is, because it is this family's signature moment and it is the thing that says which country the page is about. With no photograph there is no band at all, which is today's page unchanged — a slot waiting for a picture is honest and three hundred pixels of it is a hole.",
       "container": {
-        "selector": ".pageband",
-        "min_aspect": 1.778,
-        "min_at": "declared",
-        "max_aspect": 2.333,
-        "max_at": "declared",
-        "declared": "`.pageband` is aspect-ratio 16/9 below 62rem and 21/9 above it, at every width, with nothing beside it deciding its height. ONE CLASS SERVES EVERY FAMILY that opens on a photograph, so the crop rule is written once and every container that uses it is measurable by the same arithmetic — which `.placeband-art` is not, because its height is the height of the map next to it."
+        "selector": ".headshot",
+        "min_aspect": 0.941,
+        "min_at": "320x640",
+        "max_aspect": 1.129,
+        "max_at": "980x640"
       },
       "safe_area": {
-        "width": 0.808,
-        "height": 0.643,
-        "frame": 0.52
+        "width": 0.428,
+        "height": 1.0,
+        "frame": 0.428
       }
     },
     "region-hero": {
@@ -878,17 +875,16 @@
       "max_aspect": 2.1,
       "note": "A theme is an ARGUMENT about Europe rather than a place in it — Medieval Europe, Thermal Europe — so the photograph is the argument's subject caught once: a guild square, a bathhouse, a painted ceiling. The page draws the theme's eight stops as a constellation beneath, which is the reach; this is the substance.",
       "container": {
-        "selector": ".pageband",
-        "min_aspect": 1.778,
-        "min_at": "declared",
-        "max_aspect": 2.333,
-        "max_at": "declared",
-        "declared": "`.pageband` is aspect-ratio 16/9 below 62rem and 21/9 above it, at every width, with nothing beside it deciding its height. ONE CLASS SERVES EVERY FAMILY that opens on a photograph, so the crop rule is written once and every container that uses it is measurable by the same arithmetic — which `.placeband-art` is not, because its height is the height of the map next to it."
+        "selector": ".headshot",
+        "min_aspect": 0.692,
+        "min_at": "320x640",
+        "max_aspect": 1.333,
+        "max_at": "760x640"
       },
       "safe_area": {
-        "width": 0.847,
-        "height": 0.643,
-        "frame": 0.544
+        "width": 0.33,
+        "height": 1.0,
+        "frame": 0.33
       },
       "search": [
         "{name}",

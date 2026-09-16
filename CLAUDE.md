@@ -4359,6 +4359,68 @@ generated, and fails CI when stale.
 
 
 
+**THE TEN TEMPLATED SLOTS DECLARED A CROP BOX EACH AND FOUR NAMED THE WRONG
+COMPONENT — AND THE FILE SAID SO IN A FIELD NOBODY READ.** Every slot's
+`min_at` and `max_at` read the literal string **`"declared"`**, where a purpose
+carries a viewport like `320x900`. That is the whole finding in one word: the
+five that were right were right because somebody read the stylesheet, and the
+four that were wrong had nothing to catch them, because `browser-checks.js`
+never held one slot in its list and `c_photo_safe_area` recomputes arithmetic
+from the numbers rather than asking what they are about.
+
+| slot | declared | renders | measured |
+|---|---|---|---|
+| theme-hero | `.pageband` | `.headshot` in `.ed-opening-visual` | 0.692 – 1.333 |
+| country-hero | `.pageband` | `.headshot` in `.pagehead.opening` | 0.941 – 1.129 |
+| story-hero | `.card-art.frame` | `.ed-bleed.ed-bleed-tall` | 1.333 – 2.333 |
+| place-hero | `.card-art.frame` | `.card-art.frame` — **correct** | 16/9, from the stylesheet |
+
+The five `.pageband` families (macro, region, interest, journey, category) are
+right: `pageband()` emits that figure and the stylesheet gives it `16/9` below
+62rem and `21/9` above, which is exactly the 1.778 – 2.333 declared. They have
+still never been measured, because `pageband()` returns nothing at all without
+a photograph and none of those five families has one.
+
+**A CHECK THAT CANNOT FAIL ON THE CASE THAT MOTIVATED IT IS THE FAULT IT WAS
+WRITTEN TO CATCH.** `c_container_is_emitted` asks the prior question nothing
+asked — is this selector a thing this site emits — and its first version
+collected class TOKENS. `card-art` is emitted and `frame` is emitted, and the
+defect was that they are never emitted TOGETHER: every `.card-art` on the
+built site is `card-art card-map`. A set of bare tokens said yes. **A compound
+selector is a claim about one element**, so the attribute groupings are kept
+and each compound is tested whole. Read out of `class="..."` rather than by
+substring, because a class named only in a comment is the
+instrument-reads-its-own-documentation fault recorded six times above.
+
+**AND IT IMMEDIATELY REFUSED ONE OF THE FOUR "CORRECTIONS".** `place-hero` was
+moved to `.ed-strip .ed-shot` on the evidence that a place photograph appears
+as a strip tile on its destination's page — and the check said `.card-art.frame`
+IS emitted, by `pages.py` line 6834, on the place's own page. Both are true:
+**that key renders in two containers at once**, 16/9 on the page the purpose is
+FOR and 3/4 in the strip beside it, and the register has one field for it. The
+declaration follows the purpose's own surface and the reuse is undeclared —
+which is the same shape as a theme photograph appearing at 182px on the
+homepage's plate 02 and full-bleed through the window on plate 03. **A
+photograph is cropped by every surface it appears on and the register declares
+one.** Recorded, not closed.
+
+**AND `.headshot` PROVED COMMIT 39's GROUPING PRINCIPLE WRONG IN GENERAL.**
+That commit grouped surfaces by selector and asserted two purposes on one
+component may not declare two boxes, "because a crop box is a property of the
+component". True of `.iheroart`, whose own rule is `aspect-ratio: 4/3`; false
+of a component sized by its parent. Measured: `.headshot` is **0.692 – 1.333**
+inside a theme page's `.ed-opening-visual` and **0.941 – 1.129** inside a
+country page's `.pagehead.opening` — one class, two real boxes, because the
+class sets no ratio of its own and the two families put it in different grids.
+The assertion was green and unsound, which is the landmine this file already
+records about a pinned heading, so it is gone. Nothing is lost: the group
+measures the UNION over every path its purposes declare, so two families whose
+real boxes differ produce a union wider than either declaration and the two
+bounds fail and name it. **The union is both the stronger test and the honest
+one** — the remedy it points at is separate selectors, not one number.
+
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

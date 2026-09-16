@@ -5448,15 +5448,23 @@ async function main() {
       g.of.push(of_);
       const u = pathOf.get(of_);
       if (u && !g.urls.includes(u)) g.urls.push(u);
-      /* TWO PURPOSES ON ONE COMPONENT MAY NOT DECLARE TWO BOXES. One
-       * measurement is about to be compared with both, so a disagreement
-       * here is a claim this check would otherwise silently pick a side in. */
-      ok(g.want.min_aspect === con.min_aspect
-         && g.want.max_aspect === con.max_aspect,
-         `${of_} and ${g.of[0]} both declare the container ${sel} and give it `
-         + `different boxes (${con.min_aspect}-${con.max_aspect} against `
-         + `${g.want.min_aspect}-${g.want.max_aspect}). A crop box is a `
-         + `property of the component, so one of the two is wrong`);
+      /* AND THE EQUALITY ASSERTION THAT USED TO SIT HERE WAS TRUE TODAY AND
+       * UNSOUND IN GENERAL. It said two purposes naming one component may
+       * not declare two boxes, "because a crop box is a property of the
+       * component" — which holds for `.iheroart`, whose own rule is
+       * `aspect-ratio: 4/3`, and fails for a component sized by its parent.
+       * Measured: `.headshot` is 0.692-1.333 inside a theme page's
+       * `.ed-opening-visual` and 0.941-1.129 inside a country page's
+       * `.pagehead.opening` — one class, two real boxes, because the class
+       * sets no ratio of its own and the two families put it in different
+       * grids. An assertion that is green today and wrong in principle is
+       * the landmine this repository keeps recording, so it is gone.
+       *
+       * Nothing is lost: the group measures the UNION over every path its
+       * purposes declare, so two families whose real boxes differ produce a
+       * union wider than either declaration and the two bounds below fail
+       * and name it. The union is the stronger test AND the honest one —
+       * the remedy it points at is separate selectors, not one number. */
     }
     ok(groups.size > 0,
        "no purpose in data/image-purposes.json declares a measurable "
