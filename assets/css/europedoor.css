@@ -671,7 +671,12 @@ body[data-accent="heritage"] {
    preference's value — the `accent-color` bug one file over. And `:root` is
    a pseudo-class at (0,1,0) where `body` is a type selector at (0,0,1), so
    a `:root` base would out-specify every world override below it. */
-body { --pine-ink: var(--pine); }
+/* AND OLIVE HAS THE SAME PROBLEM, which makes this a pattern rather than a
+   special case: an accent spent as INK is a different rung from the same
+   accent spent as a MARK, because ink is read against the ground and a mark
+   is drawn on it. The institution monument's kicker named `--olive`
+   directly — #687044, 3.66 on graphite — on nineteen pages. */
+body { --pine-ink: var(--pine); --olive-ink: var(--olive); }
 body.area-countries { --door: var(--cobalt);      --door-dark: var(--cobalt-2);
                       --door-mark: var(--mineral); }
 body[data-accent="territory"] { --door: var(--ochre-deep);
@@ -695,7 +700,7 @@ body[data-accent="natural"] { --door: var(--olive-2); --door-dark: var(--olive);
      the wordmark, the current-section marker and every `ed-eyebrow` were
      below AA on about forty pages in this preference. One token, declared
      on `body` above, redefined here. */
-  body { --pine-ink: var(--pine-air); }
+  body { --pine-ink: var(--pine-air); --olive-ink: var(--olive-lift); }
   body.area-stories, body.area-events, body.area-experiences {
     --door:      var(--terracotta-lift);
     --door-dark: var(--terracotta-lift-2);
@@ -729,11 +734,18 @@ body[data-accent="natural"] { --door: var(--olive-2); --door-dark: var(--olive);
   body.area-countries,
   body[data-accent="movement"] {
     --door:      var(--cobalt-air);
-    --door-dark: var(--cobalt-lift);
+    --door-dark: var(--cobalt-air);
   }
+  /* `--door-dark` MEANS "THE READABLE RUNG", AND IN THIS WORLD THAT IS THE
+     LIGHTER ONE. The name says the opposite and these two were written to
+     the name: ochre-deep is 4.53 on bone and 3.73 on graphite, cobalt-lift
+     is 4.23. Both were invisible to every check until `.kicker` moved from
+     `--door` to `--door-dark`, because `--door` was already lifted here and
+     `--door-dark` had no reader. A token nobody reads is a token nobody has
+     measured. */
   body[data-accent="territory"] {
     --door:      var(--ochre);
-    --door-dark: var(--ochre-deep);
+    --door-dark: var(--ochre);
   }
   body[data-accent="human"] {
     --door:      var(--terracotta-lift);
@@ -752,7 +764,9 @@ body[data-accent="natural"] { --door: var(--olive-2); --door-dark: var(--olive);
    page is in that position today; the rule is here so none ever is. */
 body[data-world="intelligence"] {
   --door:      var(--cobalt-air);
-  --door-dark: var(--cobalt-lift);
+  /* Graphite in both preferences, so the readable rung is the lighter one
+     here too — cobalt-lift measured 4.23 on /discover's own kicker. */
+  --door-dark: var(--cobalt-air);
   /* The instrument world is graphite in BOTH preferences on purpose, so its
      pine has to lift here as well as under the media query. */
   --pine-ink:  var(--pine-air);
@@ -7841,6 +7855,21 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
   align-items: center;
   padding-block: clamp(4.5rem, 10vw, 9.375rem) clamp(4rem, 8vw, 7.5rem);
 }
+/* AND THE SPLIT WAITS UNTIL BOTH COLUMNS HAVE ROOM, WHICH IS NOT WHERE THE
+   PHONE RULE ENDS. Measured on /journeys: at 704 the opening is one column
+   of 672 and the standfirst sets on four lines; at 834 it becomes two and
+   column one is 302, which is EIGHT. Nothing about the content changed,
+   only the track sizing — which is what the head-range scan exists to say,
+   and it said it about five heads.
+   834 is the width this repository already records as "the width that finds
+   a two-column layout collapsing a column just above its own breakpoint",
+   and the contact sheet takes `--tablet` for exactly that reason. The
+   picture's 18rem floor plus the gap is most of a 786-pixel column, so the
+   type gets what is left. 64rem is where there is enough for both, and it
+   is a breakpoint this stylesheet already has. */
+@media (min-width: 52rem) and (max-width: 64rem) {
+  .ed-opening { grid-template-columns: minmax(0, 1fr); }
+}
 .ed-opening-copy { max-width: 40.625rem; }
 /* THE EYEBROW IS THE MONO FACE, WHICH IS THE ONE TYPOGRAPHIC MOVE HERE THAT
    IS NOT ON THE EXISTING SCALE'S TERMS. A kicker on this site is the sans at
@@ -8698,7 +8727,7 @@ main { --ed-gutter: 0px; counter-reset: band; }
 }
 .pagehead:not(.index):not(.overture):not(.instrument):not(.essayhead):not(.opening) > .kicker {
   font-family: var(--ed-mono); font-size: var(--t-xs); letter-spacing: .16em;
-  color: var(--olive); margin-bottom: var(--s6);
+  color: var(--olive-ink); margin-bottom: var(--s6);
 }
 .pagehead:not(.index):not(.overture):not(.instrument):not(.essayhead):not(.opening) > h1 {
   font-size: var(--ed-display-1); line-height: .96; letter-spacing: -.04em;
