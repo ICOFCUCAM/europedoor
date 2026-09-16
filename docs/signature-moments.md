@@ -35,11 +35,18 @@ Counted across the built site, not estimated:
 | motion | 12 | 12 | 9 |
 | **experience category** | **10** | **0** | **1** |
 | story | 9 | 9 | 0 |
-| home | 1 | 0 | 1 |
+| home | 1 | 1 | 0 |
 | **/map** | **1** | **0** | **0** |
 
 Five families carry no aperture. Two of those are correct and stay that way;
 three are gaps. That distinction is the whole content of this document.
+
+The *arched* column counts the arch, which is the only aperture that was a
+shape when this table was written. **Home now carries a second that is not a
+shape**: plate 03's photograph is fixed to the viewport and the band clips
+it, so the aperture is the band's own rectangle and the reader moves past it
+rather than looking through it. It is counted nowhere here on purpose — a
+column that counted both would say the two are the same kind of thing.
 
 ---
 
@@ -417,11 +424,61 @@ on decoration while removing usable continent. **Aperture: absent, on
 purpose.** The door is what you look through to see Europe; here you are
 already inside.
 
-### Home — blocked, not undesigned
+### Home — 1 page — *the way in* — SIX PLATES
 
-The hero is a placeholder and must stay one until the licensed photograph
-clears the seven-question gate in `docs/hero-brief.md`. Nothing in this
-document authorises work on it.
+This entry read **blocked, not undesigned** for the life of that sentence:
+*the hero is a placeholder and must stay one until the licensed photograph
+clears the seven-question gate, and nothing in this document authorises work
+on it.* Every clause of that was true when it was written and three of them
+have since stopped being. The page is a sequence of six numbered plates; the
+opening is a drawn continent on this atlas's own conformal conic, which is
+not a placeholder but the one picture no competitor can reproduce; plate 03
+carries a licensed photograph that came through the gate rather than round
+it; and the owner has since asked for the page to be taken further. **A rule
+whose reason has expired is not a rule**, which this repository has recorded
+once already about a media query and is recording here about a document.
+
+1. **Emotional promise** — a continent, and a way in. Not a product, not a
+   search box, not a list of what the site can do.
+2. **Signature moment** — the door, cut at the largest size the arch appears
+   anywhere, with Europe lit inside it and graphite beyond. The masthead
+   stands on the limestone wall above the opening rather than on the
+   picture.
+3. **Geography** — plate 01 is the whole continent as a drawing; plate 04 is
+   one route framed on its own extent; plate 05 is the fifty as names. Three
+   different geographic registers on one page, which is the argument against
+   drawing the same Europe three times.
+4. **Imagery** — plate 03, and it is the only photograph on the page. One
+   picture at full bleed beats eight at card size, which is the measurement
+   that emptied this page of eleven abstract plates.
+5. **Hierarchy** — the act number is the only running furniture. Each plate
+   sets its own type, ground and margins, so the sequence reads as plates
+   rather than as sections.
+6. **Interaction** — the sentence box on plate 02, and a link out of every
+   plate. No filter, no legend, no count on the opening.
+7. **Aperture** — **two, and deliberately not the same one.** Plate 01 is
+   the explicit arch. Plate 03 is a **window**: the photograph is fixed to
+   the viewport and the band is `clip-path: inset(0)`, so the picture stands
+   still and the page is drawn past it. Both are openings onto Europe and
+   neither is the other's repeat, which is the whole content of *recognition,
+   not repetition* — a second arch four plates down would have been the
+   signature as wallpaper.
+8. **Data** — the counts are derived and sit below the fold. The colophon
+   names the projection with its four angles and the datasets behind every
+   drawing on the page.
+9. **NOT on it** — a hash-drawn landscape anywhere, a card grid, a dot the
+   page cannot name, a count on the opening, and any claim about a
+   photograph the register does not hold.
+
+**Why the window rather than a third arch, and why not parallax.** A window
+is an aperture the reader moves past; an arch is one they look through.
+Plate 03's subject is a place they have not been, so the picture holding
+still while the wall travels is the reading. Parallax would move the
+photograph *slower* than the page, which is a different claim — that the
+picture is far away — and it needs a scroll listener on a page that loads no
+JavaScript. `background-attachment: fixed` would have done neither, because
+iOS Safari ignores it. The mechanism and the six properties that destroy it
+silently are in `CLAUDE.md`, and `browser-checks.js` proves it by scrolling.
 
 ---
 
