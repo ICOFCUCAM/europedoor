@@ -3980,6 +3980,103 @@ the track overrules it, so the box could not grow and the browser broke the
 word instead. It held at 60px and stopped holding at 108, because min-content
 is computed at the current size.
 
+**THE PHOTOGRAPH IS A WINDOW, AND `overflow: hidden` CANNOT MAKE ONE.** Plate
+03 was a 76vh box with the picture absolutely positioned inside it — which is
+a large card, because a full-bleed photograph that scrolls with the page is
+just a picture in a box. A window stays still while the wall moves past it, so
+the picture is fixed to the VIEWPORT and the band is `clip-path: inset(0)`:
+the band's own rectangle is the aperture and the photograph is revealed
+through it. Three alternatives each fail, and the reasons are the whole
+argument for this one:
+
+| | |
+|---|---|
+| `background-attachment: fixed` | iOS Safari ignores it outright, so the effect would exist on a desk and silently not exist for half the readership |
+| a scroll listener translating the picture | that is parallax, which is a DIFFERENT effect — parallax moves the picture slower, a window does not move it at all — and it needs JavaScript on a page whose only `<script>` is the inert JSON-LD block |
+| `overflow: hidden` on the band | **does not clip a fixed descendant at all**, because a fixed box is laid out against the viewport rather than against any scrolling ancestor. `clip-path` clips descendants whatever their position, which is precisely why it is the one property that does this |
+
+**AND SIX PROPERTIES KILL IT SILENTLY.** `transform`, `filter`,
+`backdrop-filter`, `perspective`, `will-change` naming any of those, and
+`contain` each make an element a containing block for FIXED descendants — so
+one of them anywhere between `<body>` and the picture resolves `position:
+fixed` against that element instead of the viewport, and the picture goes back
+to scrolling with the page. **Nothing reports a fault**: every box is still
+the right size in the right place, `getComputedStyle` still says `fixed`, and
+every contrast, layout, count and weight check goes on passing. This
+stylesheet already carries three of the six elsewhere — `backdrop-filter` on
+the masthead, `filter: drop-shadow` on two map layers — so it is not
+hypothetical. The chain is html → body → main → `.sheet-landscape` →
+`.shotfull`, and `main` carries `z-index: 1`, which makes a stacking context
+and is NOT a containing block for fixed. `browser-checks.js` walks that chain
+and names the element that broke it, then proves the promise the only way a
+promise about scrolling can be proved: it scrolls three hundred pixels and
+asserts the picture did not move. Proved red with `main { transform:
+translateZ(0) }` — the picture moved 300px against a 300px scroll, and
+`position` still read `fixed`, which is exactly why the position assertion
+alone is not enough.
+
+**`svh`, NOT `vh`, AND THE HEIGHT IS OVER 100 ON PURPOSE.** `vh` is the LARGE
+viewport, so a phone's toolbars growing and shrinking mid-scroll would resize
+the band underneath a picture that is standing still — the one movement this
+effect cannot have. 110 rather than 100 because the reveal needs scroll
+distance to happen in.
+
+**AND THE TINT GOES INSIDE THE FIXED ELEMENT.** As a pseudo-element of the
+band the scrim was absolutely positioned against a 110svh box that scrolls, so
+it would crawl across a photograph that is not moving and the gradient a
+letter sits on would depend on how far down the page that letter had
+travelled. Fixed with the picture, the tint is a property of the viewport
+exactly as the picture is, so the ink meets the same ground at every scroll
+position.
+
+**THE INSTRUMENT WRITTEN TO MEASURE TYPE OVER THAT PHOTOGRAPH HAD BEEN READING
+PAST THE END OF ITS OWN SCREENSHOT FOR THE LIFE OF THE PLATE, AND ONE NaN
+DEFEATED BOTH THE MEASUREMENT AND THE GUARD WRITTEN TO CATCH A DEFEATED
+MEASUREMENT.** `page.screenshot()` without `fullPage` photographs the VIEWPORT;
+plate 03 opens 1,818 pixels below the fold, so the headline sat at y=2301–2447
+of a 900-pixel image. Every index was past the end of the pixel data,
+`A.data[i]` was `undefined`, and `Math.abs(undefined - undefined)` is NaN — so
+`NaN < 40` is false, the *no glyph paints here* test never fired, and every
+out-of-bounds pixel was **counted as a glyph**, which satisfied the reach
+guard; and `NaN < worst` is false too, so `worst` stayed Infinity and the
+ratio passed. That is the year band's own recorded failure — *a sampler that
+reads outside its own image reports the canvas* — arriving through the one
+hole its guard did not cover, because **the guard counted pixels rather than
+asserting the rectangle was inside the picture.** Three more things about it
+were wrong and every one of them passed:
+
+- **One frame cannot hold four elements.** Scrolling the plate to the middle
+  puts the headline and the standfirst in shot and pushes the licence credit
+  21 pixels past the bottom edge, so a single pair of screenshots measures two
+  elements and fails the reach guard on a third for a reason that is about the
+  instrument. Each element is scrolled into its own frame now.
+- **Hiding the element hid its scrim.** `visibility: hidden` is right while
+  every measured element paints nothing of its own and wrong the moment one
+  carries a tint: hiding the credit hid the scrim the credit exists to sit on,
+  so the *ground* shot was the bare photograph and the instrument reported the
+  defect the scrim had already fixed — **2.00:1 against a real 10.39**. The
+  ground a glyph is painted over includes whatever its own box paints, so the
+  INK is removed and the box is left standing.
+- **And `color: transparent` reads back as `rgba(0,0,0,0)`**, so the
+  foreground has to be captured before it is removed or every ratio collapses
+  to about 1:1 — a failure that looks exactly like the defect being measured.
+
+**IT MEASURED FOR THE FIRST TIME AND THE LICENCE CREDIT WAS AT 2.07:1.** Bone
+on rgb(160,170,181), the pale sky at the top of the mountain, on the one
+element Pexels' terms require to be there. The band's scrim runs at 100 degrees
+and is transparent at the right BY DESIGN — that is what keeps the photograph a
+photograph rather than a dark panel — and the credit sits bottom-right, which
+is exactly where the tint runs out. So it carries its own, the way `.credit`
+already does on every other photographic surface here, and the size is
+arithmetic on the worst case a photograph can present: a pure white frame, with
+graphite at 72% compositing to rgb(76,83,82) and bone on that measuring
+**6.90:1 whatever the picture does**. 72% rather than a figure picked by eye
+because `.credit` already argued for 72%, and a second number would be a second
+decision about one thing. Measured on the real photograph: 2.07 → 10.39. The
+call to action and the credit are both in the measured set now — they were
+outside it while the instrument could not see anything at all.
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

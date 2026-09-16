@@ -2370,74 +2370,228 @@ async function main() {
     // which is the one surface on the homepage where type stands over a
     // PHOTOGRAPH — exactly the case a token-based ratio cannot answer and
     // this instrument exists for.
-    const SEL = [[".sheet-landscape .mega", 3.0], [".sheet-landscape .lede", 4.5]];
-    const withType = (await page.screenshot()).toString("base64");
-    await page.evaluate((sels) => {
-      sels.forEach((s) => document.querySelectorAll(s)
-        .forEach((e) => { e.style.visibility = "hidden"; }));
-    }, SEL.map(([s]) => s));
-    const noType = (await page.screenshot()).toString("base64");
-    const measured = await page.evaluate(async ({ a, b, sels }) => {
-      const load = (d) => new Promise((res) => {
-        const i = new Image(); i.onload = () => res(i); i.src = "data:image/png;base64," + d;
-      });
-      const grab = async (d) => {
-        const img = await load(d);
-        const c = document.createElement("canvas");
-        c.width = img.width; c.height = img.height;
-        c.getContext("2d").drawImage(img, 0, 0);
-        return c.getContext("2d").getImageData(0, 0, img.width, img.height);
-      };
-      const A = await grab(a), B = await grab(b);
-      const lum = (r, g, bl) => {
-        const f = (v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
-        return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(bl);
-      };
-      const out = [];
-      for (const sel of sels) {
-        const e = document.querySelector(sel);
-        if (!e) { out.push({ sel, missing: true }); continue; }
-        const r = e.getBoundingClientRect();
-        const col = getComputedStyle(e).color;
+    //
+    // Measure where the GLYPHS are, not where the box is: shoot the page
+    // twice, with the ink and without, and a pixel that differs is a pixel
+    // a glyph paints. Scanning the rectangle instead reads the bright
+    // ground in the gutter past the last letter as a failure of the type.
+    //
+    // FOUR THINGS ABOUT THIS INSTRUMENT WERE WRONG AND EACH ONE PASSED.
+    //
+    // 1 · IT WAS READING PAST THE END OF ITS OWN SCREENSHOT. Plate 03 is
+    //     1,818 pixels below the fold and `page.screenshot()` without
+    //     `fullPage` photographs the VIEWPORT, so the type sat at
+    //     y=2301..2447 of a 900-pixel image. Every index was past the end
+    //     of the pixel data, `A.data[i]` was `undefined`, and
+    //     `Math.abs(undefined - undefined)` is NaN — so `NaN < 40` is false
+    //     and the "no glyph paints here" test never fired, which meant
+    //     every out-of-bounds pixel was COUNTED as a glyph and satisfied
+    //     the reach guard; and `NaN < worst` is false too, so `worst`
+    //     stayed Infinity and the ratio passed. One NaN defeated the
+    //     measurement and the guard written to catch a defeated
+    //     measurement, in the same loop. That is the year band's own
+    //     recorded failure — a sampler that reads outside its own image
+    //     reports the canvas — arriving through the one hole its guard did
+    //     not cover, because the guard counted PIXELS rather than asserting
+    //     the rectangle was IN the picture. Both now.
+    //
+    // 2 · ONE FRAME CANNOT HOLD FOUR ELEMENTS. Scrolling the plate to the
+    //     middle puts the headline and the standfirst in shot and pushes
+    //     the licence credit 21 pixels past the bottom edge — so a single
+    //     pair of screenshots would have measured two elements and failed
+    //     the reach guard on a third for a reason that is about the
+    //     instrument rather than the page. Each element is scrolled into
+    //     its own frame and shot there.
+    //
+    // 3 · HIDING THE ELEMENT HID ITS SCRIM. `visibility: hidden` was right
+    //     while every measured element painted nothing of its own, and
+    //     wrong the moment one carried a tint: hiding the credit hid the
+    //     scrim the credit exists to sit on, so the "ground" shot was the
+    //     bare photograph and the instrument reported the defect the scrim
+    //     had already fixed — 2.00:1 against a real 10.39. The ground a
+    //     glyph is painted over includes whatever its own box paints, so
+    //     the ink is removed and the box is left standing.
+    //
+    // 4 · AND `color: transparent` IS READ BACK AS rgba(0,0,0,0), so the
+    //     foreground has to be captured BEFORE it is removed or every ratio
+    //     collapses to about 1:1 — a failure that looks exactly like the
+    //     defect being measured.
+    const SEL = [[".sheet-landscape .mega", 3.0], [".sheet-landscape .lede", 4.5],
+                 [".sheet-landscape .go", 4.5], [".sheet-landscape .sheetcred", 4.5]];
+    for (const [sel, floor] of SEL) {
+      const there = await page.evaluate((s) => {
+        const e = document.querySelector(s);
+        if (!e) return false;
+        e.scrollIntoView({ block: "center" });
+        return true;
+      }, sel);
+      ok(there, `${sel} is not on the homepage to measure`);
+      if (!there) continue;
+      await page.waitForTimeout(250);
+      const withType = (await page.screenshot()).toString("base64");
+      await page.evaluate((s) => {
+        const e = document.querySelector(s);
+        e.dataset.edInk = getComputedStyle(e).color;
+        e.style.setProperty("color", "transparent", "important");
+        e.querySelectorAll("*").forEach((k) =>
+          k.style.setProperty("color", "transparent", "important"));
+      }, sel);
+      const noType = (await page.screenshot()).toString("base64");
+      const r = await page.evaluate(async ({ a, b, s }) => {
+        const load = (d) => new Promise((res) => {
+          const i = new Image(); i.onload = () => res(i); i.src = "data:image/png;base64," + d;
+        });
+        const grab = async (d) => {
+          const img = await load(d);
+          const c = document.createElement("canvas");
+          c.width = img.width; c.height = img.height;
+          c.getContext("2d").drawImage(img, 0, 0);
+          return c.getContext("2d").getImageData(0, 0, img.width, img.height);
+        };
+        const A = await grab(a), B = await grab(b);
+        const lum = (r, g, bl) => {
+          const f = (v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(bl);
+        };
+        const e = document.querySelector(s);
+        const rc = e.getBoundingClientRect();
+        const col = e.dataset.edInk || getComputedStyle(e).color;
         let fg = [255, 255, 255], al = 1;
         const m = col.match(/color\(srgb ([\d.]+) ([\d.]+) ([\d.]+)(?: \/ ([\d.]+))?\)/);
         if (m) { fg = [m[1] * 255, m[2] * 255, m[3] * 255]; al = m[4] ? +m[4] : 1; }
         else { const n = (col.match(/[\d.]+/g) || []).map(Number); fg = n.slice(0, 3); al = n[3] === undefined ? 1 : n[3]; }
-        let worst = Infinity, at = null, painted = 0;
         const dpr = A.width / innerWidth;
-        for (let y = Math.round(r.top * dpr); y < Math.round(r.bottom * dpr); y++) {
-          for (let x = Math.round(r.left * dpr); x < Math.round(r.right * dpr); x++) {
-            const i = (y * A.width + x) * 4;
-            const d = Math.abs(A.data[i] - B.data[i]) + Math.abs(A.data[i + 1] - B.data[i + 1])
-                    + Math.abs(A.data[i + 2] - B.data[i + 2]);
-            if (d < 40) continue;             // no glyph paints here
-            painted++;
-            const g = [B.data[i], B.data[i + 1], B.data[i + 2]];
-            const Lb = lum(g[0], g[1], g[2]);
-            const Lf = lum(fg[0] * al + g[0] * (1 - al), fg[1] * al + g[1] * (1 - al),
-                           fg[2] * al + g[2] * (1 - al));
-            const cr = (Math.max(Lf, Lb) + 0.05) / (Math.min(Lf, Lb) + 0.05);
-            if (cr < worst) { worst = cr; at = [x, y, g]; }
+        const inside = rc.top >= 0 && rc.left >= 0
+                    && Math.round(rc.bottom * dpr) <= A.height
+                    && Math.round(rc.right * dpr) <= A.width;
+        let worst = Infinity, at = null, painted = 0;
+        if (inside) {
+          for (let y = Math.round(rc.top * dpr); y < Math.round(rc.bottom * dpr); y++) {
+            for (let x = Math.round(rc.left * dpr); x < Math.round(rc.right * dpr); x++) {
+              const i = (y * A.width + x) * 4;
+              const d = Math.abs(A.data[i] - B.data[i]) + Math.abs(A.data[i + 1] - B.data[i + 1])
+                      + Math.abs(A.data[i + 2] - B.data[i + 2]);
+              if (d < 40) continue;             // no glyph paints here
+              painted++;
+              const g = [B.data[i], B.data[i + 1], B.data[i + 2]];
+              const Lb = lum(g[0], g[1], g[2]);
+              const Lf = lum(fg[0] * al + g[0] * (1 - al), fg[1] * al + g[1] * (1 - al),
+                             fg[2] * al + g[2] * (1 - al));
+              const cr = (Math.max(Lf, Lb) + 0.05) / (Math.min(Lf, Lb) + 0.05);
+              if (cr < worst) { worst = cr; at = [x, y, g]; }
+            }
           }
         }
-        out.push({ sel, worst, at, painted });
-      }
-      return out;
-    }, { a: withType, b: noType, sels: SEL.map(([s]) => s) });
-    for (const [sel, floor] of SEL) {
-      const r = measured.find((x) => x.sel === sel);
-      ok(r && !r.missing, `${sel} is not on the homepage to measure`);
-      if (!r || r.missing) continue;
+        return { worst, at, painted, inside,
+                 rect: [Math.round(rc.top), Math.round(rc.bottom)],
+                 shot: [A.width, A.height] };
+      }, { a: withType, b: noType, s: sel });
+      ok(r.inside,
+         `${sel} sits at y=${r.rect.join("..")} and the screenshot is ` +
+         `${r.shot.join("x")} — the sample landed OUTSIDE its own image, so ` +
+         "every reading from it is of undefined pixels");
+      if (!r.inside) continue;
       // A count of the glyph pixels, because a diff that finds none reports
       // Infinity and passes — the same shape as a suite that stops counting.
       ok(r.painted > 400,
          `${sel}: only ${r.painted} glyph pixels found — the two shots did ` +
          "not differ, so this measured nothing and would pass on anything");
       ok(r.worst >= floor,
-         `${sel} over the drawn hero measures ${r.worst.toFixed(2)}:1 at its ` +
+         `${sel} over the photograph measures ${r.worst.toFixed(2)}:1 at its ` +
          `worst glyph pixel, under the ${floor}:1 floor — ground ` +
          `rgb(${(r.at || [])[2]}) at ${(r.at || []).slice(0, 2)}`);
     }
+  }
+
+  // ── the photograph is a window, and a window is proved by scrolling ─
+  //
+  // Plate 03 is a full-bleed photograph fixed to the VIEWPORT and clipped by
+  // the band, so the picture stands still and the page is drawn past it.
+  // Six CSS properties silently destroy that: `transform`, `filter`,
+  // `backdrop-filter`, `perspective`, `will-change` naming any of them, and
+  // `contain`. Each makes an element a containing block for FIXED
+  // descendants, so `position: fixed` resolves against that element instead
+  // of the viewport — the picture starts scrolling with the page again and
+  // NOTHING reports a fault, because every box is still the right size in
+  // the right place and every contrast, layout and count check goes on
+  // passing. The stylesheet already carries three of those six properties
+  // elsewhere (`backdrop-filter` on the masthead, `filter: drop-shadow` on
+  // two map layers), so this is not a hypothetical.
+  //
+  // Three assertions, because the first two are the cause and the third is
+  // the promise. Walking the chain names WHICH element broke it, which a
+  // measurement alone cannot; scrolling and re-measuring is the only proof
+  // that the effect a reader gets is the effect that was written — the same
+  // reasoning as the label metrics, where the model cannot check itself and
+  // the browser's own geometry is the instrument.
+  for (const w of [1280, 390]) {
+    await page.setViewportSize({ width: w, height: w === 1280 ? 900 : 844 });
+    await page.goto(base + "/", { waitUntil: "networkidle" });
+    const r = await page.evaluate(() => {
+      const band = document.querySelector(".sheet-landscape");
+      if (!band) return { missing: true };
+      const pic = band.querySelector(".shotfull");
+      if (!pic) return { nopic: true };
+      const NAMES = { transform: "transform", filter: "filter",
+                      backdropFilter: "backdrop-filter", perspective: "perspective",
+                      willChange: "will-change", contain: "contain" };
+      const IDLE = { transform: "none", filter: "none", backdropFilter: "none",
+                     perspective: "none", willChange: "auto", contain: "none" };
+      const blockers = [];
+      for (let e = pic; e && e !== document.documentElement; e = e.parentElement) {
+        const c = getComputedStyle(e);
+        for (const k of Object.keys(NAMES)) {
+          if (c[k] && c[k] !== IDLE[k]) {
+            const cls = String(e.className || "").trim();
+            blockers.push(e.tagName.toLowerCase()
+              + (cls ? "." + cls.split(/\s+/).join(".") : "")
+              + ` sets ${NAMES[k]}: ${c[k]}`);
+          }
+        }
+      }
+      const pos = getComputedStyle(pic).position;
+      const clip = getComputedStyle(band).clipPath;
+      // The reveal itself: put the band in view, note where the picture is,
+      // scroll a third of a screen, and ask again.
+      band.scrollIntoView({ block: "center" });
+      const img = pic.querySelector("img") || pic;
+      const before = img.getBoundingClientRect();
+      const y0 = scrollY;
+      scrollBy(0, 300);
+      const after = img.getBoundingClientRect();
+      return { position: pos, clip, blockers,
+               scrolled: scrollY - y0,
+               moved: Math.round(Math.abs(after.top - before.top)),
+               covers: Math.round(before.width) >= innerWidth
+                    && Math.round(before.height) >= innerHeight };
+    });
+    ok(!r.missing && !r.nopic,
+       `${w}: the homepage has no plate-03 photograph to measure — ` +
+       `${r.missing ? "no .sheet-landscape" : "no .shotfull inside it"}`);
+    if (r.missing || r.nopic) continue;
+    ok(r.position === "fixed",
+       `${w}: the plate-03 picture computes position: ${r.position}, not ` +
+       "fixed — it is a panel that scrolls, not a window");
+    ok(r.clip && r.clip !== "none",
+       `${w}: the plate-03 band has clip-path: ${r.clip} — `+
+       "`overflow: hidden` does NOT clip a fixed descendant, because a fixed " +
+       "box is laid out against the viewport rather than against any " +
+       "scrolling ancestor, so without the clip the picture is loose over " +
+       "the whole page");
+    ok(r.blockers.length === 0,
+       `${w}: ${r.blockers.length} element(s) between <body> and the ` +
+       "plate-03 picture make a containing block for fixed descendants, " +
+       "which turns it into an absolute box silently — " + r.blockers.join("; "));
+    ok(r.scrolled > 0,
+       `${w}: the page did not scroll (${r.scrolled}px), so the reveal was ` +
+       "not exercised and the measurement below means nothing");
+    ok(r.moved <= 1,
+       `${w}: the plate-03 picture moved ${r.moved}px while the page ` +
+       `scrolled ${r.scrolled}px — it is travelling with the page rather ` +
+       "than standing still behind it");
+    ok(r.covers,
+       `${w}: the plate-03 picture does not fill the viewport, so the band ` +
+       "clips an undersized picture and the window shows the ground through it");
   }
 
   // ── an accent on every row is a texture, and the rule named classes ─

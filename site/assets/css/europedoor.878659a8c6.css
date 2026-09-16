@@ -7229,18 +7229,73 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    has already shipped once. The picture covers this ground completely; the
    ground is what the type is readable against when the picture does not
    arrive. */
-.sheet-landscape { grid-template-columns: 1fr; padding: 0; min-height: 76vh;
+/* THE PICTURE IS A WINDOW, NOT A PANEL — A FIXED-POSITION REVEAL CLIPPED BY
+   THE BAND, AND EVERY PART OF THAT SENTENCE IS LOAD-BEARING.
+
+   The plate used to be a 76vh box with the photograph absolutely positioned
+   inside it: the picture scrolled with the page like any other element, and
+   a full-bleed photograph that scrolls is a large card. What a window does
+   is stay still while the wall moves past it, and that is what this is —
+   the photograph is fixed to the VIEWPORT and the band clips it, so the
+   band's own rectangle is the aperture and the picture is revealed through
+   it as the reader scrolls.
+
+   `clip-path` is the mechanism and it is chosen over three alternatives
+   that each fail:
+
+   - `background-attachment: fixed` is the obvious one and iOS Safari
+     ignores it outright, so the effect would exist on a desk and silently
+     not exist on the phone half of the readership.
+   - a scroll listener translating the picture is parallax: it needs
+     JavaScript on a page that loads none (its only <script> is the inert
+     JSON-LD block), it runs on every scroll frame, and it is a different
+     effect — parallax MOVES the picture slower, a window does not move it
+     at all.
+   - `overflow: hidden` on the band does NOT clip a fixed descendant, because
+     a fixed box is laid out against the viewport rather than against any
+     scrolling ancestor. `clip-path` clips descendants whatever their
+     position, which is precisely why it is the one property that does this.
+
+   THE CONSTRAINT THAT KILLS IT SILENTLY: `transform`, `filter`,
+   `backdrop-filter`, `perspective`, `will-change` of any of those, and
+   `contain` each make an element a containing block for FIXED descendants.
+   Put any one of them on this band, on the picture wrapper, or on anything
+   between them and <body>, and `position: fixed` quietly becomes
+   `position: absolute` — the picture goes back to scrolling with the page
+   and nothing anywhere reports a fault, because every box is still the
+   right size in the right place. The chain here is html → body → main →
+   .sheet-landscape → .shotfull and it is clean today (`main` carries
+   `z-index: 1`, which makes a stacking context and is NOT a containing
+   block for fixed). `browser-checks.js` walks that chain on the built page
+   and asserts all six are none, and then proves the promise the only way a
+   promise about scrolling can be proved: it scrolls, and asserts the
+   picture's rectangle did not move.
+
+   `svh` rather than `vh` because a phone's toolbars grow and shrink as the
+   reader scrolls: `vh` is the LARGE viewport and the band would resize
+   mid-scroll, which is the one movement this effect cannot have. The height
+   is over 100 so there is scroll distance to reveal through. */
+.sheet-landscape { grid-template-columns: 1fr; padding: 0; min-height: 110svh;
                    align-content: end; border-bottom: 0;
-                   background: var(--graphite); }
-.sheet-landscape .shotfull { position: absolute; inset: 0; }
+                   background: var(--graphite);
+                   clip-path: inset(0); }
+.sheet-landscape .shotfull { position: fixed; inset: 0; z-index: 0; }
 .sheet-landscape .shotfull picture,
 .sheet-landscape .shotfull img { display: block; width: 100%; height: 100%;
                                  object-fit: cover; }
 /* A SCRIM IS WHAT MAKES THE CONTRAST A PROPERTY OF THE DESIGN RATHER THAN
    OF THE PICTURE. The homepage already learned this once, on type over a
    drawing of Europe: measured letter by letter the standfirst ran 4.36:1
-   over lit parchment while every token-based check reported it fine. */
-.sheet-landscape::after { content: ""; position: absolute; inset: 0;
+   over lit parchment while every token-based check reported it fine.
+
+   AND THE TINT GOES INSIDE THE FIXED ELEMENT, NOT ON THE BAND. As a
+   pseudo-element of the band it was absolutely positioned against the band
+   — 110svh tall and scrolling — so it would crawl across a photograph that
+   is standing still, and the gradient a letter sits on would depend on how
+   far down the page that letter had travelled. Fixed with the picture, the
+   tint is a property of the viewport exactly as the picture is, so the ink
+   meets the same ground at every scroll position. */
+.sheet-landscape .shotfull::after { content: ""; position: absolute; inset: 0;
   background: linear-gradient(100deg,
     color-mix(in srgb, var(--graphite) 82%, transparent) 0%,
     color-mix(in srgb, var(--graphite) 58%, transparent) 38%,
@@ -7269,6 +7324,25 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .sheetcred { position: absolute; right: var(--s5); bottom: var(--s5); margin: 0;
              font-family: var(--text); font-size: var(--t-xs); letter-spacing: .2em;
              text-transform: uppercase; }
+/* THE LICENCE CREDIT MEASURED 2.07:1 AND NOTHING COULD SEE IT, because the
+   instrument written to measure type over this photograph had been reading
+   past the end of its own screenshot for the life of the plate. Fixing the
+   sampler measured the credit for the first time: bone on rgb(160,170,181),
+   the pale sky at the top of the mountain, on the one element Pexels'
+   licence requires to be there.
+   The band's scrim runs at 100 degrees and is TRANSPARENT at the right by
+   design — that is what keeps the photograph a photograph rather than a
+   dark panel — and the credit sits bottom-right, which is exactly where the
+   tint runs out. So it carries its own, the way `.credit` already does on
+   every other photographic surface here, and for the same reason: a scrim
+   is what makes the ratio a property of the DESIGN rather than of the
+   picture. The arithmetic is the worst case a photograph can present, a
+   pure white frame — graphite at 72% composites to rgb(76,83,82) and bone
+   on that is 6.90:1, whatever the picture does. 72% rather than a figure
+   picked by eye because `.credit` already argued for 72% and a second
+   number would be a second decision about one thing. */
+.sheet-landscape .sheetcred { padding: 3px 8px;
+  background: color-mix(in srgb, var(--graphite) 72%, transparent); }
 
 /* 04 · the journey — a paper plate: pale ground, an ink route, named stops */
 .sheet-journey { grid-template-columns: minmax(0, 38%) minmax(0, 1fr); }
