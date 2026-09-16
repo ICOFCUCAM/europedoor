@@ -1995,6 +1995,55 @@ and a country encyclopedia is one 11px kicker changing hue — terracotta on
 `area-stories`, cobalt on `area-countries`. The accent system is not broken; it
 is doing almost no work. See `docs/design-direction-audit.md`.
 
+**AN ACCENT SPENT AS INK IS A DIFFERENT RUNG FROM THE SAME ACCENT SPENT AS A
+MARK**, because ink is read against the ground and a mark is drawn on it.
+`--pine-ink` and `--olive-ink` carry that, declared above the dark block and
+lifted inside it. And **`--door-dark` means "the readable rung", which in the
+dark world is the LIGHTER one** — the name says the opposite and three blocks
+were written to the name, so ochre-deep measured 3.73 on graphite and
+cobalt-lift 4.23. Both had been invisible to every check until `.kicker` moved
+from `--door` to `--door-dark`: `--door` was already lifted there and
+`--door-dark` had no reader. **A token nobody reads is a token nobody has
+measured.**
+
+**`--door` IS THE ACCENT AND `--door-dark` IS THE ACCENT AS TEXT, AND A KICKER
+IS TEXT.** The two exist because a colour that gets DRAWN and a colour that
+gets READ are different requirements — the same split recorded for the
+signature, where `--signature` is the mark and `--door` is anything that is
+words. The ground swap to the owner's near-white paper is what exposed it:
+terracotta-2 measured 4.16 against #F8F6EF where it cleared on #F3F0E6. **A
+lighter page makes every accent's ratio worse.**
+
+**A TWO-COLUMN OPENING MUST NOT SPLIT BEFORE THERE IS ROOM FOR TWO.** Measured
+on /journeys: at 704 the opening is one column of 672 and the standfirst sets
+on four lines; at 834 it becomes two, column one is 302, and the same 226
+characters take EIGHT. Nothing about the content changed, only the track
+sizing — which is what the head-range scan exists to say, and it said it about
+five heads at once. 834 is already recorded here as *the width that finds a
+two-column layout collapsing a column just above its own breakpoint*.
+
+**A CLAMP'S FLOOR IS A DECISION ABOUT EVERY WIDTH BELOW WHERE THE MIDDLE TERM
+TAKES OVER, AND THAT WIDTH IS ARITHMETIC RATHER THAN INTUITION.**
+"Kunsthistorisches" at 48px does not fit the 288 pixels a 320-wide screen
+gives, so the opening h1 broke mid-word — the fault `overflow-wrap` is a last
+resort FOR and not a design. Dropping the floor a step fixed that and took ten
+pixels off the headline on every phone and every tablet, because 6.8vw does
+not pass 48px until 706. The floor is itself width-aware now:
+`min(--t-4xl, 12vw)` is 38.4 at 320, 46.8 at 390 and 48 from 400 up, so the
+one screen that breaks gets a smaller headline and nothing else moves by more
+than a pixel. **The arithmetic was done after the change rather than before
+it**, which is the whole reason the first attempt was wrong.
+
+**A SAMPLER THAT READS OUTSIDE ITS OWN IMAGE REPORTS THE CANVAS.**
+`screenshot()` without `fullPage` photographs the VIEWPORT, and /events grew
+by one band until the year band sat at y=905 on a 900-pixel page — so the
+baseline "measured" 1.00:1 on a line that measures 9.36, at both widths, and
+would have gone on doing so for any change that made the page one band taller.
+That is the aperture sampler's own recorded failure in a check written after
+it and without its guard. Both now: scroll it into the shot, and assert the
+sample landed inside the image — because a ratio computed from transparent
+black looks exactly like a ratio reporting a real defect.
+
 **A COLOUR SIZED ON ONE GROUND IS A COLOUR THAT FAILS ON THE OTHER, AND
 SEVENTY OF ONE BROWSER RUN'S 116 FAILURES WERE THAT.** `--pine` is #0F433E:
 4.93 on bone paper and **1.74 on graphite**. The moment the masthead stopped

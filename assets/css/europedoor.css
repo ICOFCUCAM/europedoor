@@ -7790,7 +7790,23 @@ body {
      repository. One opening size, one section size, one row size, and the
      reading step under them: a system is what a set of components have in
      common, not what each of them declares. */
-  --ed-display-1: clamp(var(--t-4xl), 6.8vw, var(--t-7xl));
+  /* THE FLOOR IS THE STEP BELOW, BECAUSE OF ONE WORD. `--t-4xl` is 48px
+     and "Kunsthistorisches" needs more than the 288 pixels a 320-wide
+     screen gives — so the opening h1 broke mid-word there, which is the
+     rendering fault `overflow-wrap` exists to be a LAST resort for and not
+     a design. The scan's own message says it: overflow-wrap is right; the
+     size or the measure is what is wrong when it fires.
+     THE FIRST VERSION DROPPED THE FLOOR TO `--t-3xl` FLAT AND THAT WAS
+     WRONG BY 380 PIXELS OF VIEWPORT. 6.8vw does not pass 48px until 706, so
+     a flat 38 floor took ten pixels off the headline on every phone and
+     every tablet to fix a word that only breaks at 320. The arithmetic was
+     done after the change rather than before it.
+     The floor is itself width-aware: `min(--t-4xl, 12vw)` is 38.4 at 320
+     where the word has to fit, 46.8 at 390 where it does not, and 48 from
+     400 up — so the one screen that breaks gets a smaller headline and
+     nothing else moves by more than a pixel. No new scale value: the floor
+     is the step that was already there, reached only where it is needed. */
+  --ed-display-1: clamp(min(var(--t-4xl), 12vw), 6.8vw, var(--t-7xl));
   --ed-display-2: clamp(var(--t-3xl), 5vw, var(--t-6xl));
   --ed-display-3: clamp(var(--t-2xl), 3vw, var(--t-4xl));
   --ed-read:      clamp(var(--t-md), 1.5vw, var(--t-xl));
