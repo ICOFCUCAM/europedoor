@@ -7167,9 +7167,21 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    one opening that is the largest on the site. `object-fit: cover` because
    the aperture crops two corners away and a photograph that letterboxes
    inside it is not in the aperture at all. */
+/* NO `display: block` HERE, and the fifth dead one found on a photograph
+   container. An absolutely positioned box is BLOCKIFIED by the layout — the
+   declaration restates what `position: absolute` above it already computes,
+   so it can never change a pixel. Every one of the five was found in the
+   first run where a photograph actually rendered in that container: the
+   register filled `home-hero` in run #32 and this opening drew a `<picture>`
+   for the first time in its life, one browser-check failure of 2,039. *A
+   code path nothing exercises is a code path nothing checks* — and nothing
+   here is deleted on the scan's word alone, so it was verified the way this
+   repository requires: the homepage shot at 1280 and at 390 against the real
+   71-photograph register, with and without the declaration, BYTE-IDENTICAL
+   at both widths. */
 .sheet-door .opening :is(picture, img) {
   position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: cover; display: block;
+  object-fit: cover;
 }
 /* The reveal: the wall's own face laid over the drawing's edge, and a fine
    line just inside it. That is what an opening in masonry actually shows,
