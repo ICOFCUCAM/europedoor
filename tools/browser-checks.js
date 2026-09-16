@@ -2190,8 +2190,107 @@ async function main() {
     // `color: var(--bone)` redundant; it was the inheritance escape, and
     // deleting it measured 1.05:1 on three families. Every removal here was
     // measured at 390 and 1280 afterwards.
-    const DEAD_CEILING = 36;
+    // THE SCAN INHERITED ITS VIEWPORT AND ITS POINTER FROM WHATEVER RAN
+    // BEFORE IT, AND BOTH CHANGE ITS ANSWER. It reported 37 against a
+    // ceiling of 36 in a run where no stylesheet byte had moved; rerun
+    // standalone on the identical build it said 34, and the three extra
+    // were `.staged .now` and two `:hover, :focus-visible` rules. A `:hover`
+    // selector matches NOTHING when the pointer is nowhere, so the scan
+    // skipped those rules entirely — and matched them, and judged them, in a
+    // suite where an earlier check had left the mouse on a card. **Where the
+    // mouse was last put is not an input to a stylesheet audit.** So the
+    // scan takes its own page, which no earlier check can have touched.
+    //
+    // AND IT SCANS BOTH WIDTHS, WHICH IS THIS CHECK'S OWN PRINCIPLE FINALLY
+    // APPLIED. Its comment already says *a media rule that does not
+    // currently apply is asleep, not dead*, and says it specifically about
+    // `.band > .band-head`'s `display: grid` — which is a duplicate at 1280
+    // and the only declaration below the breakpoint. The principle was
+    // written down and the scan went on judging at one width, so that rule
+    // and two others were counted dead while being load-bearing on every
+    // phone. A rule alive at ANY width is alive, which is exactly the union
+    // the scan already does across PAGES, extended to the axis the comment
+    // was about. Measured: 34 dead at 1280, 34 at 390, and only 31 at both —
+    // the three that leave at each width are the asleep ones, named.
+    //
+    // THE NUMBER MOVED 36 -> 35 AND EVERY PART OF THAT WAS READ. Two rules
+    // LEFT because the scan stopped calling an asleep rule dead
+    // (`.band > .band-head` and `.storylead, .storysm`, both `display`,
+    // both the only declaration below the breakpoint). Three ENTERED
+    // because scanning at 390 put the `@media (max-width: 44rem)` block in
+    // this scan's reach for the first time. Two more ENTERED with the theme
+    // page and were then REMOVED, because they were real: `display: block`
+    // on the photograph inside an opening, restating what a grid item
+    // already computes — which is the third and fourth time a dead
+    // `display: block` has been found on a photograph container here, each
+    // time in the first run where a photograph was actually rendered.
+    // AND A CEILING IS THE WRONG INSTRUMENT, BECAUSE THE NUMBER MOVES.
+    // With the pointer and the viewport both fixed, two consecutive runs on
+    // one build still read 34 of 332 rules examined and 35 of 334 — the
+    // REACH varies, so the population differs rather than the verdicts.
+    // A ceiling on a quantity that jitters does not merely fail at random:
+    // it teaches whoever hits it to re-run until green, which is how a real
+    // dead rule gets through. And this check's own comment already said the
+    // LIST is the thing — *raising this number is allowed and raising it
+    // without reading the list is not* — which makes the count a proxy for
+    // a set somebody was asked to read by hand.
+    //
+    // So the set is written down. A rule NOT on it fails and is named; a
+    // run that happens to find one fewer still passes, because a subset is
+    // not a regression. That is jitter-immune, it says exactly what is new,
+    // and it turns an instruction to a human into code.
+    //
+    // Every entry was read. Two rules LEFT the old count because the scan
+    // stopped calling an asleep rule dead — `.band > .band-head` and
+    // `.storylead, .storysm`, both `display`, both the only declaration
+    // below the breakpoint. Three ENTERED because scanning at 390 put the
+    // `@media (max-width: 44rem)` block in this scan's reach for the first
+    // time. Two more entered with the theme page and were REMOVED from the
+    // stylesheet, because they were real: `display: block` on the
+    // photograph inside an opening, restating what a grid item already
+    // computes — the third and fourth dead `display: block` found on a
+    // photograph container here, each in the first run where a photograph
+    // actually rendered.
+    const WIDTHS = [[1280, 900], [390, 844]];
+    const DEAD_KNOWN = new Set([
+      ".band > .band-head > .lede {color}",
+      ".band-head {display}",
+      ".card {display}",
+      ".credit {opacity}",
+      ".doorgo {opacity}",
+      ".ed-eyebrow {color}",
+      ".ed-index dd {color}",
+      ".ed-opening-visual svg {display}",
+      ".ed-section-index {color}",
+      ".ed-split-copy p {color}",
+      ".leg .hop {color}",
+      ".locator svg {display}",
+      ".masthead {color}",
+      ".minidot circle {opacity}",
+      ".minidot.here circle {opacity}",
+      ".minimap figcaption {color}",
+      ".minimap {color}",
+      ".minimap.arched .context path {fill}",
+      ".minimap.arched .context path {stroke}",
+      ".minimap.arched .minidot.here circle {fill}",
+      ".minimap.arched figcaption {color}",
+      ".minimap.arched.atlas .lyr-destinations .minidot.here circle {fill,stroke}",
+      ".minimap.arched.atlas .lyr-labels .minilabel {fill,stroke}",
+      ".minimap.arched.atlas .lyr-land .countries path {fill,stroke}",
+      ".minimap.arched.atlas .lyr-ocean rect {fill}",
+      ".nav a[aria-current=\"page\"] {color}",
+      ".navsearch {color}",
+      ".plate {display}",
+      ".portrait svg {display}",
+      ".reasons .rt {color}",
+      ".route .hop {color}",
+      ".route .leg-nights {color}",
+      ".scalebar text {fill}",
+      ".sheet-atlas {color}",
+      ".staged .now {color}",
+    ]);
     const seen = new Map();
+    const dsp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
     // AND THE PAGE SET IS THE INSTRUMENT'S REACH. `.regionglyph .countries
     // path` was reported dead and it is what paints the nine lit regions on
     // /countries — a whole family this scan had never visited, so a rule that
@@ -2202,15 +2301,32 @@ async function main() {
     // lower the count, which was the first guess and was wrong: a rule that
     // matched no element anywhere in the old set was not counted at all, and
     // a new page can make it match and still not win.
+    for (const [vw, vh] of WIDTHS) {
+    await dsp.setViewportSize({ width: vw, height: vh });
     for (const u of ["/", "/europe/austria", "/europe/austria/tyrol",
                      "/europe/austria/tyrol/innsbruck",
                      "/journeys/the-alpine-grand-tour", "/discover/nordic",
                      "/events/oct", "/beyond-the-obvious", "/map", "/plan",
                      "/stories", "/themes", "/countries",
                      "/interests/mountains", "/europe-in/by-rail",
+                     // AND THE ONE FAMILY THAT CARRIES A PHOTOGRAPH HAD
+                     // NEVER BEEN SCANNED. Widening to 390 made
+                     // `.credit {opacity}` visible to this scan for the
+                     // first time — the phone rule that reveals the licence
+                     // credit, which is `opacity: 0` until hover on a desk —
+                     // and it was reported dead because not one of the
+                     // seventeen pages here carries a `.credit` where the
+                     // rule decides anything. Measured on a real theme page
+                     // it is 1 at 390 and 0 at 1280, which is the rule
+                     // working. That is this check's own recorded finding
+                     // about `.regionglyph .countries path`: a rule measured
+                     // only where it loses looks like a rule that wins
+                     // nowhere, and a ceiling raised for that is a ceiling
+                     // raised for a gap in the scan.
+                     "/themes/mountain-europe",
                      "/search", "/fund"]) {
-      await page.goto(base + u, { waitUntil: "load" });
-      const rows = await page.evaluate(() => {
+      await dsp.goto(base + u, { waitUntil: "load" });
+      const rows = await dsp.evaluate(() => {
         const PROPS = ["fill", "stroke", "display", "color",
                        "background-color", "opacity", "visibility"];
         const sheet = [...document.styleSheets]
@@ -2284,19 +2400,23 @@ async function main() {
         seen.set(k, (seen.get(k) || false) || won);
       }
     }
+    }
+    await dsp.close();
     const dead = [...seen.entries()].filter(([, won]) => !won).map(([k]) => k);
     ok(seen.size > 100,
        `the dead-rule scan examined only ${seen.size} rules — it has stopped ` +
        "walking the stylesheet, which is exactly how its first version " +
        "reported a clean result while collecting nothing");
-    // THE WHOLE LIST, NOT THE FIRST FOUR. Raising this ceiling is allowed
-    // and raising it without reading the list is not — and for the life of
-    // this check the failure printed four names out of two dozen, so the
-    // list it demands you read was the one thing it would not show you.
-    ok(dead.length <= DEAD_CEILING,
-       `${dead.length} stylesheet rules match elements and change none of ` +
-       `them, above the ceiling of ${DEAD_CEILING}:\n    ` +
-       dead.join(";\n    "));
+    // THE WHOLE LIST, NOT THE FIRST FOUR. For the life of this check the
+    // failure printed four names out of two dozen, so the list it demanded
+    // you read was the one thing it would not show you.
+    const fresh = dead.filter((d) => !DEAD_KNOWN.has(d));
+    ok(fresh.length === 0,
+       `${fresh.length} stylesheet rule(s) match elements and change none of ` +
+       `them at ${WIDTHS.map(([w]) => w).join(" or ")}, and are not on the ` +
+       `known list (${dead.length} dead of ${seen.size} examined). Read them, ` +
+       `then either fix them or add them to DEAD_KNOWN with the reason:\n    ` +
+       fresh.join(";\n    "));
   }
   await page.setViewportSize({ width: 1280, height: 900 });
 

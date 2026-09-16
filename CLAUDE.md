@@ -4144,6 +4144,59 @@ is the owner's, because the key is a repository secret and because nothing
 here may acquire a real photograph unasked.
 
 
+**THE DEAD-RULE SCAN WAS MEASURING WHERE THE MOUSE HAD BEEN LEFT.** It
+reported 37 rules against a ceiling of 36 in a run where **no stylesheet byte
+had moved**, and rerun standalone on the identical build it said 34 — with the
+34 an exact subset. The three extra were `.staged .now` and two `:hover,
+:focus-visible` rules, and the mechanism is that **a `:hover` selector matches
+nothing when the pointer is nowhere**: standalone the scan skipped those rules
+entirely, and in the suite an earlier check had left the mouse on a card, so
+they matched, were judged, and counted. The scan was using the suite's shared
+page and inheriting its pointer AND its viewport. It takes its own page now.
+
+**AND IT SCANNED ONE WIDTH WHILE ITS OWN COMMENT ARGUED ABOUT THE OTHER.**
+That comment says, specifically about `.band > .band-head`'s `display: grid`,
+that *a media rule that does not currently apply is asleep, not dead* — and
+the scan went on counting that rule dead, because it never looked at 390.
+Measured: 34 dead at 1280, 34 at 390, **31 at both**. The principle was
+written down and never implemented, which is *a rule stated once and applied
+to one of its call sites* arriving in the instrument rather than in the
+stylesheet. Both widths now, and a rule alive at either is alive — the same
+union the scan already did across PAGES, on the axis the comment was about.
+
+**AND ITS PAGE SET HELD NO PAGE CARRYING A PHOTOGRAPH.** Widening to 390 put
+the `@media (max-width: 44rem)` block in the scan's reach for the first time
+and reported `.credit {opacity}` dead — the rule that reveals the licence
+credit on a phone. Measured on a real theme page it is **1 at 390 and 0 at
+1280**, which is the rule working: not one of the seventeen scanned pages
+carries a `.credit` where it decides anything. That is this check's own
+recorded finding about `.regionglyph .countries path` — a rule measured only
+where it loses looks like a rule that wins nowhere, and a ceiling raised for
+that is a ceiling raised for a gap in the scan. `/themes/mountain-europe` is
+in the set now, and it immediately found two real ones: **`display: block` on
+the photograph inside an opening**, restating what a grid item already
+computes. That is the **third and fourth dead `display: block` found on a
+photograph container here**, each in the first run where a photograph actually
+rendered — *a code path nothing exercises is a code path nothing checks*,
+about a measuring device. Removed, and verified by byte-identical screenshots
+at 1280 and 390 on both pages, because nothing here is deleted on the scan's
+word alone.
+
+**AND THEN THE COUNT WAS THE WRONG INSTRUMENT, BECAUSE IT JITTERS.** With the
+pointer and the viewport both pinned, consecutive runs on one build read **34
+of 332 rules examined and 35 of 334** — the REACH varies, so the population
+differs rather than the verdicts. A ceiling on a quantity that moves does not
+merely fail at random: **it teaches whoever hits it to re-run until green**,
+which is how a real dead rule gets through, and it is the mirror of *a green
+run that has stopped counting is worse than a red one*. The check's own
+comment already said the LIST was the thing — *raising this number is allowed
+and raising it without reading the list is not* — which makes a count a proxy
+for a set somebody was asked to read by hand. The 35 are written down by name
+now: a rule NOT on the list fails and is named, a run that finds one fewer
+still passes because a subset is not a regression. Proved red by adding one
+redundant declaration, which was named alone against a printed 36-of-335.
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

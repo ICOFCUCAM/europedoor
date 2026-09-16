@@ -8043,8 +8043,15 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
   overflow: hidden; background: var(--paper-3);
   display: grid; grid-template-rows: 1fr;
 }
+/* AND `display: block` HERE WAS DEAD, WHICH THIS FILE ALREADY RECORDS
+   ABOUT TWO OTHER PHOTOGRAPH RULES. `.ed-opening-visual` is a grid, so its
+   items are blockified and the declaration restates what the box already
+   computes. It survived because the scan had never visited a page with a
+   photograph in an opening — the register held none when these were
+   written, and *a code path nothing exercises is a code path nothing
+   checks*. Found in the run that gave the scan a theme page. */
 .ed-opening-visual :is(img, picture) {
-  width: 100%; height: 100%; display: block; object-fit: cover;
+  width: 100%; height: 100%; object-fit: cover;
 }
 /* AND A DRAWING IS NOT A PHOTOGRAPH, WHICH `object-fit` CANNOT SAY.
    `object-fit: cover` does nothing to an inline `<svg>` — the property
@@ -8768,7 +8775,7 @@ body[data-family="journey"] .ed-journey-hero .ed-eyebrow,
 .ed-opening-visual > figure,
 .ed-opening-visual .headshot { margin: 0; width: 100%; height: 100%; }
 .ed-opening-visual .headshot picture,
-.ed-opening-visual .headshot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ed-opening-visual .headshot img { width: 100%; height: 100%; object-fit: cover; }
 
 /* THE META ROW IS A LINE, NOT A SECTION. `.headmeta` was given
    `.ed-section` when the heads moved, which pads it by up to 140px top and
