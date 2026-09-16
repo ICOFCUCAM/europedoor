@@ -5617,8 +5617,11 @@ body[data-hero] .masthead { position: sticky; }
 /* 1.0, not 1.6. On a 3.6-unit dot a 1.6-unit ring is nearly half the mark
    again, so at reading size the ring competed with the dot and a map of 130
    places read as a field of buttons. A ring separates; it does not announce. */
-.minimap.arched.atlas .lyr-destinations .minidot circle { fill: var(--atlas-hereline);
-  stroke: var(--atlas-land); stroke-width: 1; paint-order: stroke; }
+/* The destination layer's own fill and hairline moved UP to
+   `.minimap.arched .minidot circle` when that rule was taught to follow its
+   ground, so restating them here changed nothing — which the dead-rule scan
+   said in the run after. What is kept is the `here` mark's heavier hairline,
+   because that is this layer's and not the base's. */
 .minimap.arched.atlas .lyr-destinations .minidot.here circle { fill: var(--pine-deep);
   stroke: var(--atlas-land); stroke-width: 2; paint-order: stroke; }
 /* AND THE LAST STOP STAYS HOLLOW. This rule lost to the one above the moment
@@ -8654,6 +8657,14 @@ body[data-family="journey"] .ed-journey-hero .ed-eyebrow,
    increments, and the number is drawn in the margin. */
 main { --ed-gutter: 0px; counter-reset: band; }
 .band { counter-increment: band; }
+/* `display: grid` LOOKS LIKE A DUPLICATE OF `.band-head` FURTHER UP AND IS
+   NOT: that one is INSIDE a media query, so below its breakpoint this is the
+   only declaration and removing it drops the band head to block layout on
+   every phone. The dead-rule scan reports it dead because it scans at a
+   width where the media rule applies — which is the scan's own recorded
+   limit, *a media rule that does not currently apply is asleep, not dead*,
+   read from the other end. Kept, and this comment is why the next person
+   should not try it either. */
 .band > .band-head {
   display: grid;
   grid-template-columns: minmax(6rem, .22fr) minmax(0, 1fr);
@@ -8848,7 +8859,9 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    different arrangement. */
 .pagehead.index.ed-opening h1 { margin: 0 0 var(--s6); }
 .pagehead.index.ed-opening .lede { margin-top: 0; }
-.pagehead.index.ed-opening .iherofoot { margin-top: var(--s6); display: grid; gap: var(--s5); }
+/* `display: grid` is on `.iherofoot` already; this variant only moves the
+   margin and the gap. */
+.pagehead.index.ed-opening .iherofoot { margin-top: var(--s6); gap: var(--s5); }
 
 /* =========================================================
    THE TWO REMAINING HEAD ROLES TAKE THE SYSTEM'S TYPE

@@ -4879,7 +4879,25 @@ async function main() {
           return 0.2126 * f(p[0]) + 0.7152 * f(p[1]) + 0.0722 * f(p[2]);
         };
         const at = (px, py) => lum(x.getImageData(px, py, 1, 1).data);
-        return { base: at(pts.x, pts.base), page: at(pts.x, pts.y) };
+        // A STROKE IS CENTRED ON ITS GEOMETRIC LINE, SO IT LANDS BETWEEN
+        // DEVICE PIXELS. `b.y + 66 * (b.height / 104)` is where the line IS;
+        // a 2px non-scaling stroke straddles it, and which row comes back
+        // solid depends on where that lands in the device grid — row 971 at
+        // 1280 and row 501 at 390, one either side of the same arithmetic.
+        // Sampling one exact row therefore read the line at one width and an
+        // anti-aliased blend at the other, and reported 1.54 for a line that
+        // measures 8.26 where it is solid.
+        //
+        // The aperture check already answers this: look for the greatest
+        // step from the ground within a small window, because that is what a
+        // cut edge IS. A reader sees whichever row is solid.
+        const page = at(pts.x, pts.y);
+        let base = page;
+        for (let dy = -2; dy <= 2; dy++) {
+          const v = at(pts.x, pts.base + dy);
+          if (Math.abs(v - page) > Math.abs(base - page)) base = v;
+        }
+        return { base, page };
       }, { d: shot, pts: box });
       await yp.close();
       const cr = (Math.max(got.base, got.page) + 0.05) /
