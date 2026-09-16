@@ -391,31 +391,12 @@ jobs:
             --branch "${{ steps.push.outputs.branch }}" > /tmp/pr-body.md
           TITLE="Photograph: ${{ inputs.purpose }} (${{ inputs.provider }} ${{ inputs.photo_id }})"
           BRANCH="${{ steps.push.outputs.branch }}"
-          # THE BRANCH IS ALREADY PUSHED BY THE TIME THIS RUNS, so a
-          # refusal here must not read as "the acquisition failed". The
-          # repository setting "Allow GitHub Actions to create and approve
-          # pull requests" is a hard block on GITHUB_TOKEN opening one,
-          # independent of `pull-requests: write` in the permissions block
-          # above — so a correctly configured workflow can do every piece of
-          # real work and fall over on the last line. Everything is on the
-          # branch either way, and the log says where.
-          if ! gh pr create \
-            --title "$TITLE" \
-            --body-file /tmp/pr-body.md \
-            --head "$BRANCH" \
-            --base "${{ github.ref_name }}"; then
-            echo
-            echo "── THE PULL REQUEST WAS REFUSED AND THE WORK IS SAFE ──"
-            echo "Everything acquired is on the branch: $BRANCH"
-            echo "Open it by hand here:"
-            echo "  https://github.com/${{ github.repository }}/compare/${{ github.ref_name }}...$BRANCH?expand=1"
-            echo
-            echo "The usual cause is Settings -> Actions -> General ->"
-            echo "Workflow permissions -> 'Allow GitHub Actions to create and"
-            echo "approve pull requests', which is a separate switch from the"
-            echo "permissions this workflow requests."
-            exit 1
-          fi
+          # ONE IMPLEMENTATION, IN A SCRIPT THAT CAN BE READ AND TESTED.
+          # This block lived here and again in the other job, so its
+          # diagnostic had to be right twice and was wrong twice. See
+          # scripts/images/open_pr.sh for what it now prints and why.
+          bash scripts/images/open_pr.sh "$TITLE" /tmp/pr-body.md \
+            "$BRANCH" "${{ github.ref_name }}" "${{ github.repository }}"
 
 
       # ── AND THEN IT MERGES ITSELF ────────────────────────────────────
@@ -835,31 +816,12 @@ jobs:
             --branch "${{ steps.push.outputs.branch }}" > /tmp/pr-body.md
           TITLE="Photographs: ${{ steps.push.outputs.count }} acquired"
           BRANCH="${{ steps.push.outputs.branch }}"
-          # THE BRANCH IS ALREADY PUSHED BY THE TIME THIS RUNS, so a
-          # refusal here must not read as "the acquisition failed". The
-          # repository setting "Allow GitHub Actions to create and approve
-          # pull requests" is a hard block on GITHUB_TOKEN opening one,
-          # independent of `pull-requests: write` in the permissions block
-          # above — so a correctly configured workflow can do every piece of
-          # real work and fall over on the last line. Everything is on the
-          # branch either way, and the log says where.
-          if ! gh pr create \
-            --title "$TITLE" \
-            --body-file /tmp/pr-body.md \
-            --head "$BRANCH" \
-            --base "${{ github.ref_name }}"; then
-            echo
-            echo "── THE PULL REQUEST WAS REFUSED AND THE WORK IS SAFE ──"
-            echo "Everything acquired is on the branch: $BRANCH"
-            echo "Open it by hand here:"
-            echo "  https://github.com/${{ github.repository }}/compare/${{ github.ref_name }}...$BRANCH?expand=1"
-            echo
-            echo "The usual cause is Settings -> Actions -> General ->"
-            echo "Workflow permissions -> 'Allow GitHub Actions to create and"
-            echo "approve pull requests', which is a separate switch from the"
-            echo "permissions this workflow requests."
-            exit 1
-          fi
+          # ONE IMPLEMENTATION, IN A SCRIPT THAT CAN BE READ AND TESTED.
+          # This block lived here and again in the other job, so its
+          # diagnostic had to be right twice and was wrong twice. See
+          # scripts/images/open_pr.sh for what it now prints and why.
+          bash scripts/images/open_pr.sh "$TITLE" /tmp/pr-body.md \
+            "$BRANCH" "${{ github.ref_name }}" "${{ github.repository }}"
 
       # ── AND THEN IT MERGES ITSELF ────────────────────────────────────
       #
