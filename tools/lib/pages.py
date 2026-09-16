@@ -1414,9 +1414,20 @@ def home(data):
   {marginnote('Landscapes', 'Cultures', 'Languages', 'A shared horizon')}"""
 
     # ── 05 · THE ATLAS ───────────────────────────────────────────────
-    # The count is the event and the names are the evidence. On the pine
-    # ground, which is the one plate here that is not paper: an atlas's
-    # contents page is traditionally the one printed on colour.
+    # The count is the event and the names are the evidence.
+    #
+    # THIS SAID "on the pine ground, which is the one plate here that is not
+    # paper: an atlas's contents page is traditionally the one printed on
+    # colour" — and the pine went, for the reason written out in the
+    # stylesheet: there are no dark pages here, and a solid pine field
+    # across a whole plate is a dark page with a light one above and below
+    # it. The plate keeps a GROUND, because a plate that says "this is the
+    # record" should not be the same paper as the plate before it; it takes
+    # the surface step instead, which is what a surface step is for. A
+    # comment describing a design that was deliberately removed is the
+    # expired-reason fault this repository keeps finding, and the reason it
+    # is corrected here rather than deleted is that the removal is the
+    # interesting half.
     clist = "".join(
         f'<a href="{urls.country(c)}">{esc(c["name"])}</a>'
         for c in sorted(data["countries"].values(), key=lambda c: c["name"]))

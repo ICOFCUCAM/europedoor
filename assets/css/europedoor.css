@@ -8066,6 +8066,26 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
    fit, which is the same letterbox this component was just fixed for, now
    arriving from the empty state rather than from the filled one. */
 .ed-opening-visual:has(> .ed-slot) { min-height: 0; background: none; }
+/* AND THAT FIXED THE CONTAINER'S FLOOR AND LEFT THE SLOT'S OWN PROPORTION
+   STANDING. The rule was written on `.ed-slot-wide` and applied to
+   `.ed-slot-wide`; the other three variants kept an `aspect-ratio`, which
+   is the photograph's proportion and therefore the thing the rule exists to
+   refuse. Measured on the two openings that carry a square slot: 682 x 511
+   with the brief in the bottom third, **361 pixels of `--paper-3`, 71% of
+   the box**, which is proportionally worse than the 581-pixel case the rule
+   was written for. The fourteen call sites that forgot the motif, and the
+   three label families that took neither of the two passes written for
+   exactly them — a rule stated once and applied to one of its call sites.
+
+   THE DISTINCTION THE RULE DID NOT MAKE IS WHERE THE SLOT IS. In a STRIP a
+   portrait slot renders 240 x 320 and its proportion is what makes the
+   strip a row of like things: eight tiles that each shrink to their own
+   caption is not a strip, it is a ragged list. 1,930 of those across 634
+   pages stay exactly as they are. In an OPENING a slot is alone, nothing
+   is beside it to be ragged against, and sizing it to a picture nobody has
+   licensed is reserving a hole. Same figure as the wide slot, because it is
+   the same question — the brief plus air. */
+.ed-opening-visual > .ed-slot { aspect-ratio: auto; min-height: 13rem; }
 .ed-opening-visual svg { width: 100%; height: auto; display: block; }
 /* AN `<svg>` SIZED IN PERCENT STILL CONTRIBUTES 300 PIXELS TO INTRINSIC
    SIZING. That is the SVG default intrinsic width, and a grid track sized
