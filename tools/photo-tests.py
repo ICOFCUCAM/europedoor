@@ -55,6 +55,11 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 # neither had. `checks.py` owns the rule; a suite that re-implements the
 # thing it is testing is testing its own restatement.
 from checks import credential_shaped, in_url_path     # noqa: E402
+# AND THE SAME ARGUMENT FOR THE FILENAME STEM. `region-hero@austria/tyrol`
+# becomes `region-hero@austria__tyrol` on disk, and which characters fold is
+# a rule that lives in `imageslots`. A suite asserting a photograph is on its
+# page has to name the file the pipeline actually wrote.
+from lib import imageslots                            # noqa: E402
 IMG = os.path.join(ROOT, "assets", "img")
 IMG_DIR = os.path.join(ROOT, "assets", "img")
 REGISTER = os.path.join(ROOT, "data", "images.json")
@@ -375,6 +380,34 @@ def main(argv):
           not slugs, "these would stop the commit: " + ", ".join(slugs[:3]))
     check("and the slug this actually failed on is forty characters",
           len(SLUG) == 40, f"it is {len(SLUG)}")
+
+    # AND A PLACE IS DECLARED WITH SLASHES AND WRITTEN WITH UNDERSCORES,
+    # WHICH IS WHAT STOPPED FIVE REAL ACQUISITIONS.
+    #
+    # The registry declares `austria/salzburg-and-the-lakes/salzburg/
+    # hohensalzburg`; a file stem cannot hold a slash, so the register
+    # writes `austria__salzburg-and-the-lakes__salzburg__hohensalzburg`.
+    # The scan split the registry's target on every non-word character, so
+    # the declared identifier became four short tokens and none of them was
+    # collected, while the stem arrived as one 56-character run with
+    # nothing to match it against. Run 26 registered 2,201 photographs,
+    # passed every other gate and died on 86 of these; nothing was pushed,
+    # so all of it was lost, five dispatches running.
+    #
+    # ONE NORMALISER, BOTH SIDES — the planner's diacritics rule, in a
+    # credential scan, with separators instead of accents. Asserted on the
+    # real ones, because the thing that broke was real.
+    for real in ("austria__salzburg-and-the-lakes__salzburg__hohensalzburg",
+                 "albania__tirana-and-the-south__gjirokaster",
+                 "austria__salzburg-and-the-lakes__salzburg__mirabell-gardens"):
+        body = f'"file": "place-hero@{real}"'
+        check(f"a place stem is an identifier, not a credential ({len(real)} chars)",
+              not credential_shaped(body, next(keyish.finditer(body))), real)
+    # AND THE SLASHED SPELLING IS STILL ONE. Normalising must work in both
+    # directions or it has only moved which side is wrong.
+    body = '"key": "place:austria/salzburg-and-the-lakes/salzburg/hohensalzburg"'
+    check("and so is the spelling the registry itself declares",
+          not any(credential_shaped(body, m) for m in keyish.finditer(body)))
 
     # AND AN UNDECLARED SLUG IS NOT ONE. The exclusion is a lookup in the
     # registry, not a judgement about shape, so a token that merely LOOKS
@@ -844,8 +877,9 @@ def main(argv):
               (b2.stderr or "")[-200:])
         at = os.path.join(ROOT, "site", "europe", "austria", "index.html")
         austria = open(at, encoding="utf-8").read() if os.path.exists(at) else ""
-        check("the band renders on the country it was acquired for",
-              "pageband" in austria)
+        _cstem = imageslots.stem("country-hero@austria")
+        check("the photograph renders on the country it was acquired for",
+              _cstem in austria)
         # AND THE PORTRAIT IS STILL THERE. The band is an addition, not a
         # replacement: the country plate is this family's signature moment
         # and it is what says which country the page is about.
@@ -855,8 +889,8 @@ def main(argv):
         # the markup: `picture()` returns a generated plate when the register
         # has no row, and the band asks the register directly for exactly
         # that reason.
-        check("the band carries a photograph rather than a plate",
-              "<picture" in austria and "pageband" in austria)
+        check("the opening carries a photograph rather than a plate",
+              "<picture" in austria and _cstem in austria)
         # ── AND EVERY OTHER FAMILY THAT OPENS ON ONE ──────────────────
         #
         # Six page families grew a container in one commit and five of them
@@ -898,9 +932,28 @@ def main(argv):
         for purpose, where in FAMILIES:
             f = os.path.join(ROOT, where, "index.html")
             html = open(f, encoding="utf-8").read() if os.path.exists(f) else ""
-            check(f"{purpose.split('@')[0]} renders its band on its own page",
-                  "pageband" in html and "<picture" in html,
-                  f"{where}: {'no file' if not html else 'no band'}")
+            # THE PROMISE IS THAT THE PHOTOGRAPH IS ON THE PAGE IT WAS
+            # ACQUIRED FOR, NOT THAT IT IS IN A CONTAINER CALLED `pageband`.
+            # Two families moved to `head_figure` — the photograph BESIDE
+            # the name rather than in a band above it, with the drawing
+            # moved down to a band of its own — because a band over a head
+            # is a magazine's cover and this is its opening spread. The
+            # assertion went red for a composition that does more of what it
+            # protects, which is the shape-pinning failure this repository
+            # has now counted past a dozen times.
+            #
+            # What is asserted is the photograph, by its own derivative
+            # path, which is the one string that cannot be true of a page
+            # that merely has SOME picture on it.
+            # THE STEM COMES FROM `imageslots`, WHICH IS WHERE THE RULE
+            # LIVES. Guessing it here — folding `@` as well as `/` — is a
+            # second implementation of a filename convention, and this
+            # repository has paid for a second implementation of one fact
+            # seven times, once over a file extension.
+            stem = imageslots.stem(purpose)
+            check(f"{purpose.split('@')[0]} renders on its own page",
+                  "<picture" in html and stem in html,
+                  f"{where}: {'no file' if not html else 'no ' + stem}")
 
         # ── THE ORDER THE WORKFLOW HAS TO RUN THESE IN ──────────────
         #
@@ -1166,8 +1219,15 @@ def main(argv):
         page = os.path.join(scratch, f"cand-{PHOTO_ID}", "index.html")
         check("a candidate page exists", os.path.exists(page))
         drawn = open(page, encoding="utf-8").read() if os.path.exists(page) else ""
+        # `.herofull shot` WAS THE OLD HERO'S CLASS. The homepage is a plate
+        # sequence and its opening is `.sheet-door .opening`, so this named a
+        # container that has not existed since that landed — the third
+        # spelling of "there is a picture here" in this suite, and the one
+        # that matters most: the sheet exists so a person can judge a
+        # candidate INSIDE the real composition, and an assertion that the
+        # sheet drew the real hero has to name something the real hero has.
         check("the candidate page is the real hero",
-              'class="herofull shot"' in drawn)
+              'class="opening"' in drawn and "<picture" in drawn)
         check("the drawing is replaced, not stacked behind the photograph",
               "heroeurope" not in drawn)
         check("the delivery ladder is gone", "image/avif" not in drawn)
@@ -1341,6 +1401,51 @@ def main(argv):
         check("and it stopped rather than carrying on to the next entry",
               "door-history" not in out.split("not about one candidate")[0]
               .split("door-food")[-1])
+
+        # ── THE FILL STAGE PLANS AND NEVER ACQUIRES ──────────────────
+        #
+        # `fill.py` is the hosted desk's own button, moved into the workflow
+        # so it can be dispatched without a browser. Its whole job is to
+        # write a PLAN: it must not download, must not register, and must
+        # not name a photograph twice — the register refuses one id against
+        # two purposes at the far end, so a plan containing such a pair
+        # wastes the tranche it exists to collect.
+        planj = os.path.join(tempfile.gettempdir(), "ed-fill-plan.json")
+        before_reg = open(REGISTER, encoding="utf-8").read()
+        r = sh([sys.executable, "scripts/images/fill.py", "--provider", "pexels",
+                "--take", "6", "--out", planj], env)
+        out = r.stdout + r.stderr
+        check("fill plans a tranche against the provider", r.returncode == 0,
+              out[-600:])
+        rows = json.load(open(planj, encoding="utf-8")) if os.path.exists(planj) else []
+        check("and it wrote a plan the batch loop can read",
+              bool(rows) and all({"purpose", "photo_id", "alt"} <= set(x) for x in rows),
+              repr(rows[:2]))
+        check("no purpose is planned twice",
+              len({x["purpose"] for x in rows}) == len(rows))
+        check("no provider id is planned twice — the register refuses that pair",
+              len({x["photo_id"] for x in rows}) == len(rows))
+        check("every planned entry carries the photographer's own description",
+              all(x["alt"].strip() for x in rows))
+        # THE REGISTER AND THE WORKING TREE ARE UNTOUCHED. Planning is a
+        # decision about what to ask for; `acquire.py` is the only thing
+        # here that may write one down. UNTOUCHED MEANS UNCHANGED RATHER
+        # THAN EMPTY — the desk suite already had to learn that, the day
+        # eleven photographs merged.
+        check("planning writes nothing into the register",
+              open(REGISTER, encoding="utf-8").read() == before_reg)
+        # AND IT REFUSES A SURFACE THAT ALREADY HOLDS ONE. Re-offering a
+        # filled surface is proposing to replace a photograph somebody
+        # accepted, which is a different act.
+        _held = set()
+        for _k, _row in json.loads(before_reg).get("images", {}).items():
+            _held.add(_row.get("purpose") or _k)
+        check("and it never plans a surface the register already holds",
+              not ({x["purpose"] for x in rows} & _held),
+              f"held={sorted(_held)[:4]}")
+        check("the fill stage runs the same loop rather than a second one",
+              "scripts/images/fill.py" in wf and
+              wf.count("scripts/images/batch.sh") >= 2)
 
         check("the workflow calls the one loop rather than holding a copy",
               "scripts/images/batch.sh" in wf)

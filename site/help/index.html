@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27;; style-src &#x27;self&#x27;; img-src &#x27;self&#x27; data:; font-src &#x27;self&#x27;; connect-src &#x27;self&#x27;; form-action &#x27;self&#x27;; base-uri &#x27;none&#x27;">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="theme-color" content="#3251da" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#2948d1" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F8F6EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07100F" media="(prefers-color-scheme: dark)">
 <title>Help · EuropeDoor</title>
 <meta name="description" content="How to use EuropeDoor: finding a place, planning a journey, what the facts are worth, and where saved places live.">
 <link rel="canonical" href="https://europedoor.com/help">
@@ -16,10 +16,16 @@
 <meta property="og:url" content="https://europedoor.com/help">
 <meta property="og:site_name" content="EuropeDoor">
 
-<link rel="stylesheet" href="/assets/css/europedoor.055931e2ed.css">
+<link rel="stylesheet" href="/assets/css/europedoor.fb6229bd86.css">
 <link rel="icon" href="/assets/door.49fb8a56f2.svg" type="image/svg+xml">
+<!-- ON EVERY PAGE, NOT ONLY ON /stories. Feed discovery is a browser and
+     reader convention that looks at the document it is given, and a reader
+     who wants to follow this desk is as likely to be standing on a
+     destination page as on the index. One document, one feed, declared in
+     the one place that emits <head>. -->
+<link rel="alternate" type="application/atom+xml" href="/stories/feed.xml" title="EuropeDoor stories">
 </head>
-<body class="area-none" data-world="discover">
+<body class="ed-page ed-family-institutional area-none" data-family="institutional" data-world="discover">
 <a class="skip" href="#main">Skip to content</a>
 <header class="masthead">
   <div class="masthead-in">
@@ -69,21 +75,21 @@
     <p>Because none is licensed yet, and the register that would hold one is empty. What you
     see instead is geography: a country drawn from its own outline, a journey drawn as its
     route, a tag drawn as every destination carrying it. Where there is nothing real to draw,
-    the illustration is generated from the place's own name — no licence to expire, no stock
-    library, and no risk of publishing somebody's holiday photograph.
+    the illustration is generated from the place&#8217;s own name — no licence to expire, no stock
+    library, and no risk of publishing somebody&#8217;s holiday photograph.
     <a href="/sources">Where the geography comes from →</a></p>
     <h3 id="currency">Why are the local-currency figures marked indicative?</h3>
     <p>Because they are. The rates are recorded by hand, dated on this page, rounded hard, and
     not refreshed automatically. They exist so that "€90 a day" in Norway means something to
-    you before you arrive — not so that you can budget to the krone. Your bank's rate will be
+    you before you arrive — not so that you can budget to the krone. Your bank&#8217;s rate will be
     worse than the one used here, and the date will keep getting older until there is a live
     feed and somebody paying for it.</p>
     <h3>Where did my saved places go?</h3>
     <p>They live in the browser you saved them in and nowhere else. A different browser, a
     private window or cleared site data means an empty list — which is the cost of not having
     an account system, and we think it is the right trade for now.</p>
-    <h3>Why is my country's page thin?</h3>
-    <p>Italy, Norway, Spain, France and Greece are written deepest: between 67 and 86 recorded destinations, places and things to do each, where the median country holds 7. The rest are at a solid first pass, and <a href="/sources/freshness">the freshness board</a> says when each country's practical facts were last checked.</p>
+    <h3>Why is my country&#8217;s page thin?</h3>
+    <p>Italy, Norway, Spain, France and Greece are written deepest: between 67 and 86 recorded destinations, places and things to do each, where the median country holds 7. The rest are at a solid first pass, and <a href="/sources/freshness">the freshness board</a> says when each country&#8217;s practical facts were last checked.</p>
   </div>
   <aside class="rail">
     <h2 class="mini">Currency rates</h2>

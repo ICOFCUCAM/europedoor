@@ -1,13 +1,13 @@
 # §4 — The frontend, audited before it is designed
 
 Measured on the running build. No new component architecture is proposed here;
-this is what the 1,072 pages are actually made of, so that any future visual
+this is what the pages are actually made of, so that any future visual
 work touches the small number of things that generate them rather than the
 pages themselves.
 
 The headline finding, and it reframes the section:
 
-> **This is not an application with a thousand routes. It is 1,067 documents
+> **This is not an application with a thousand routes. It is a set of documents
 > and five applications.** 453 pages load no JavaScript at all; 613 load one
 > file, and only to draw a save button. Five pages carry the entire
 > client-side product.
@@ -32,7 +32,7 @@ Twenty-two page families and twenty-one one-off pages produce everything.
 | fund · sources · index pages | 21 | |
 
 **Five families generate 83% of the site.** A change to `city_page()` moves
-319 pages; a change to `render.section()` moves all 1,072. That ratio is the
+319 pages; a change to `render.section()` moves every one of them. That ratio is the
 whole reason the European Future migration was one commit rather than a
 project.
 
@@ -41,7 +41,7 @@ project.
 | | |
 |---|---|
 | functions that emit `<!doctype html>` | **1** (`render.page`) |
-| mastheads per page | **exactly 1.0**, across 1,072 pages |
+| mastheads per page | **exactly 1.0**, on every page |
 | footers per page | **exactly 1.0** |
 | inline `<style>` blocks | **0** |
 | stylesheets | **1**, 64 KB |
@@ -143,29 +143,47 @@ counter. A green run that has stopped counting is worse than a red one.
 
 ### The primitives that generate the site
 
-Measured by how much of the site each one actually appears on:
+**THE FIGURES ARE NOT COPIED HERE, AND THE VERSION THAT WAS COPIED HAD ALL
+MOVED.** This section used to carry a table of instance counts and
+percentages typed into the document — `card` at 23%, `plate` at 78%, `note`
+on 1,014 pages — against a register that recomputes the same quantity on
+every build. By the time anybody read them `card` was 6%, `plate` was ZERO
+because every abstract plate has come off the pages, and the page total the
+percentages were of had moved three times. Two measurements of one quantity,
+one generated and one typed, is the arrangement this repository has paid for
+more than once; the generated one is `primitives.reach` in
+`docs/invariants.json`, it carries a FLOOR per primitive so a family cannot
+quietly grow its own component set, and CI fails when it is stale.
 
-| primitive | instances | on % of pages |
-|---|---:|---:|
-| `kicker`, `masthead`, `pagehead`, `crumbs` | 7,590 | **100%** |
-| `row` / `rows` | 11,378 | **91%** |
-| `note` | 1,014 | 81% |
-| `card` | 6,087 | **23%** — was published as 78%; the matcher counted `card-art` because a hyphen is a word boundary |
-| `plate` (the generated illustration) | 2,377 | 78% |
-| `band` | 6,508 | 76% |
-| `facts` | 784 | 73% |
-| `split` / `rail` | 1,362 | 64% |
-| `btn` | 1,480 | 58% |
-| `chip` | 2,163 | 52% |
-| `scorebar` | 2,952 | 34% |
-| `minimap` | 386 | 36% |
-| `sectionnav` | 319 | 30% |
+The snapshot below is from that register rather than from a hand count, and
+the shape is what matters rather than the digits:
 
-**Eleven primitives account for essentially every pixel.** Restyling `row`,
-`band` restyles three quarters of the site (`card` reaches 23%, not the 78% this
-document published before the matcher was corrected); restyling the four
-100% primitives restyles all of it. That is the lever, and it is why §4 should
-never contain the phrase "redesign 1,072 pages".
+| primitive | on % of pages |
+|---:|---:|
+| `kicker` | 100% |
+| `masthead` | 100% |
+| `crumbs` | 100% |
+| `pagehead` | 99% |
+| `row` | 89% |
+| `note` | 82% |
+| `band` | 76% |
+| `facts` | 76% |
+| `btn` | 64% |
+| `chip` | 52% |
+| `card` | 6% |
+
+**Two primitives are on literally every page, two more on all but a handful,
+and eleven cover the site.** The handful is named rather than rounded away:
+the homepage has no `pagehead`, because its head is the hero, and the two
+pages with no `crumbs` are the homepage and the 404, which is where a
+breadcrumb has nothing to say. Restyling `row` or `band` restyles three
+quarters of the site; restyling the four at the top restyles all of it. That is the lever, and it is why §4 should never contain
+the phrase "redesign every page".
+
+**And `plate` is no longer on this list at all.** It reached 78% of pages
+when this document was written and it reaches none: the abstract plate came
+off one family at a time, each with its own measurement, and it is now
+exclusively the social-card language. See `docs/gap-assessment.md` §3.4.
 
 ## 4.6 The two worlds, classified
 
@@ -231,9 +249,9 @@ can ever decide to remove.
 |---|---|
 | a new component library | eleven primitives already cover 100% of the site and are measured |
 | a CSS framework | one 64 KB stylesheet, 13 font sizes, 6 breakpoints, 2 shadows |
-| a JS framework | 1,067 of 1,072 pages are documents; five are applications, and each is one file |
+| a JS framework | all but five pages are documents; five are applications, and each is one file |
 | a build step for the frontend | there is no bundler and no `package.json`; adding one adds a thing that breaks |
-| per-page redesign | changing `render.section()` changes 1,072 pages; changing a page changes one |
+| per-page redesign | changing `render.section()` changes every page; changing a page changes one |
 | a design-token package | tokens live in one `:root` block, checked against `docs/palette.json` for contrast |
 | hydration or client routing | the fastest page is the one that is already HTML |
 

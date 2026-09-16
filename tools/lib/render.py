@@ -16,6 +16,7 @@ import hashlib
 import html
 import json
 import os
+import re
 from urllib.parse import urlsplit
 
 from .i18n import Strings
@@ -25,6 +26,13 @@ from .i18n import Strings
 T = Strings("en")
 
 SITE_NAME = "EuropeDoor"
+# THE ORIGIN, ONCE. It was typed as a literal in six places — the sitemap,
+# four JSON-LD blocks and the publisher record — and the Atom feed would have
+# been the seventh. A canonical URL is a claim to a machine that cannot check
+# it, and six copies of a claim are six chances for one of them to say
+# something else the day the domain moves. `docs/brand-lock.md` says it does
+# not move; that is a reason to write it once, not a reason not to.
+ORIGIN = "https://europedoor.com"
 SITE_TAGLINE = "Open the door to Europe."
 # The operating company is not incorporated yet. Nothing on this site may
 # name an entity that does not exist; see docs/legal-position.md.
@@ -744,7 +752,7 @@ def photo(images, key, *, w, h, alt="", eager=False, sizes="100vw"):
 
 
 def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed=None,
-            fallback_motif=None):
+            fallback_motif=None, credit=True):
     """A photograph for `key` if we hold one, otherwise a generated plate.
 
     Callers never branch on whether an image exists — they ask for one and
@@ -788,9 +796,21 @@ def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed
     parts = urlsplit(row["licence_url"])
     provider_url = f"{parts.scheme}://{parts.netloc}"
     link = ' rel="noopener" target="_blank"'
-    credit = (f'Photo by <a href="{esc(row["source"])}"{link}>'
-              f'{esc(row["photographer"])}</a> on '
-              f'<a href="{esc(provider_url)}"{link}>{esc(row["licence"])}</a>')
+    # A CREDIT IS A LINK, SO A PICTURE CARRYING ONE CANNOT GO INSIDE A LINK.
+    # An `<a>` may not contain an `<a>`: the parser closes the outer one at
+    # the inner, so a thumbnail wrapped in a link came apart into three
+    # siblings and a row of eight rendered as four pairs. It was latent on
+    # the four homepage doors for the life of that band as well — they wrap
+    # `picture()` in an `<a>` too, and with the register empty it returns a
+    # plate with no credit, so nothing ever exercised it. A code path nothing
+    # exercises is a code path nothing checks.
+    #
+    # `credit=False` is for a caller that places the attribution itself.
+    # It does not make the credit optional: Pexels' terms require it, and a
+    # caller that turns it off here owes one somewhere a reader can see.
+    credit_html = (f'Photo by <a href="{esc(row["source"])}"{link}>'
+                   f'{esc(row["photographer"])}</a> on '
+                   f'<a href="{esc(provider_url)}"{link}>{esc(row["licence"])}</a>')
     return (
         f"<picture>"
         f'<source type="image/avif" srcset="{esc(srcset("avif"))}" sizes="{esc(sizes)}">'
@@ -800,8 +820,8 @@ def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed
         f'loading="{"eager" if eager else "lazy"}" '
         f'fetchpriority="{"high" if eager else "auto"}" decoding="async" '
         f'class="photo {focal_class(fx, fy)}">'
-        f'<figcaption class="credit">{credit}</figcaption>'
-        f"</picture>"
+        + (f'<figcaption class="credit">{credit_html}</figcaption>' if credit else "")
+        + "</picture>"
     )
 
 
@@ -906,20 +926,50 @@ FOOTER_NAV = [row for _, rows in FOOTER_GROUPS for row in rows]
 # element that appears on all 1,033 pages; the strip touching it is the first
 # thing a reader sees and the only part of the page we were not colouring.
 #
-# TWO VALUES, BECAUSE THE BAR IS TRANSLUCENT. It is `--cobalt-deep` at 96%
+# TWO VALUES, BECAUSE THE BAR IS TRANSLUCENT. It is `--pine-deep` at 96%
 # over whatever ground is behind it, and the ground differs by world: the
 # DISCOVER world in the light preference is limestone, and DISCOVER-dark and
 # INTELLIGENCE in both preferences are graphite. Composited:
 #
-#   #2a4ad9 at 96% over limestone #f7f6f3  ->  #3251da
-#   #2a4ad9 at 96% over graphite  #101214  ->  #2948d1
+# AND THEY WERE TYPED, SO THE PALETTE CHANGE LEFT THEM BEHIND. Bone & Pine
+# moved the bar from cobalt to `--pine-deep` and these two stayed at the old
+# composites, so every Android phone showed a blue strip directly above a
+# green masthead — on all 1,034 pages, until the browser suite sampled the
+# painted bar and named both values. That is the `vercel.json`/`HEADERS`
+# arrangement working, and it is also the reason not to have the arrangement
+# at all where the value can simply be computed: a hex that must equal a
+# composite of two other hexes is a second implementation of them.
 #
-# These are stated here and asserted in the browser suite against the colour
-# Chromium actually paints, in both worlds and both preferences — the same
-# arrangement `vercel.json` has against `render.HEADERS`, for the same
-# reason: two places that must agree, and a check on the drift.
-THEME_COLOR_LIGHT = "#3251da"
-THEME_COLOR_DARK = "#2948d1"
+# Composited here from `docs/palette.json`, which is the register every
+# other colour claim on this site is recomputed from, so moving a token
+# moves the address bar with it and the suite's assertion becomes a check on
+# the ARITHMETIC rather than on somebody's memory.
+_REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+with open(os.path.join(_REPO, "docs", "palette.json"), encoding="utf-8") as _f:
+    _PALETTE = json.load(_f)
+
+
+def _over(fg, bg, a):
+    """`fg` at opacity `a` composited over `bg`, both as #rrggbb."""
+    f = [int(fg[i:i + 2], 16) for i in (1, 3, 5)]
+    b = [int(bg[i:i + 2], 16) for i in (1, 3, 5)]
+    return "#" + "".join(f"{round(a * f[i] + (1 - a) * b[i]):02x}" for i in range(3))
+
+
+_HEX = {k: v["hex"] for k, v in _PALETTE["tokens"].items()}
+# AND THE MASTHEAD STOPPED BEING A BAND OF SIGNATURE COLOUR, so the strip
+# above it had to stop being one too. The non-home redesign made the bar the
+# page's own paper — pine is spent on the mark and the current section rather
+# than on the field behind all seven — and these two went on compositing
+# `pine-deep`, so every Android phone showed a dark green strip above a cream
+# page. The browser suite named both values in one run, which is the same
+# assertion catching the same class of drift for the second time.
+#
+# The masthead paints `--paper` at 92% over the page, and the page is
+# `--paper`: so the composite IS paper, in whichever preference. No blend is
+# needed and stating one would be a third implementation of a colour.
+THEME_COLOR_LIGHT = _HEX["bone-light"]
+THEME_COLOR_DARK = _HEX["graphite"]
 
 
 def theme_color_meta(world):
@@ -1097,7 +1147,7 @@ def og_key(seed, motif):
 def og_tags(seed, motif, alt):
     key = og_key(seed, motif)
     OG_WANTED[key] = (seed, motif)
-    url = f"https://europedoor.com/assets/og/{key}.png"
+    url = f"{ORIGIN}/assets/og/{key}.png"
     return (f'<meta property="og:image" content="{url}">'
             f'<meta property="og:image:width" content="{OG_W}">'
             f'<meta property="og:image:height" content="{OG_H}">'
@@ -1132,7 +1182,7 @@ def og_tags(seed, motif, alt):
 # A wrong rich result is worse than none: it is a claim, machine-readable,
 # republished by somebody who cannot check it.
 
-LD_PUBLISHER = {"@type": "Organization", "name": SITE_NAME, "url": "https://europedoor.com"}
+LD_PUBLISHER = {"@type": "Organization", "name": SITE_NAME, "url": ORIGIN}
 
 
 def ld(*blocks):
@@ -1159,7 +1209,7 @@ def ld_breadcrumb(trail):
     for i, (label, href) in enumerate(trail, start=1):
         item = {"@type": "ListItem", "position": i, "name": label}
         if href:
-            item["item"] = "https://europedoor.com" + href
+            item["item"] = ORIGIN + href
         items.append(item)
     return {"@context": "https://schema.org", "@type": "BreadcrumbList",
             "itemListElement": items}
@@ -1168,7 +1218,7 @@ def ld_breadcrumb(trail):
 def ld_place(kind, *, name, url, description, lat=None, lon=None, within=None,
              extra=None):
     out = {"@context": "https://schema.org", "@type": kind,
-           "name": name, "url": "https://europedoor.com" + url,
+           "name": name, "url": ORIGIN + url,
            "description": description}
     if lat is not None:
         out["geo"] = {"@type": "GeoCoordinates", "latitude": lat, "longitude": lon}
@@ -1185,7 +1235,7 @@ def ld_place(kind, *, name, url, description, lat=None, lon=None, within=None,
 
 
 def ld_within(kind, name, url):
-    return {"@type": kind, "name": name, "url": "https://europedoor.com" + url}
+    return {"@type": kind, "name": name, "url": ORIGIN + url}
 
 
 # The two worlds. A surface belongs to one of them and does not blend.
@@ -1208,7 +1258,31 @@ WORLDS = ("discover", "intelligence")
 # cultural accent is bound by the nav area the shell already sets. Only
 # heritage — the pages about how this project knows what it claims — needs
 # saying out loud, because those pages have no nav area of their own.
-ACCENTS = ("", "heritage")
+# EIGHT ACCENTS, NOT TWO, AND THE MEASUREMENT IS WHY.
+#
+# `docs/palette.json` declares the accent at five per cent of a screen and
+# the browser suite measures it at 0.3 — the one number in the ratio that
+# disagrees with its instruction, and the design-direction audit's finding
+# with a figure under it: "terracotta and atlantic are the entire
+# art-directional difference between a magazine story and a country
+# encyclopedia, and they are spent on an 11px kicker."
+#
+# Two accents over nine `area-` classes could not do better than that: 897 of
+# the site's pages are one area, so binding colour there paints most of the
+# atlas one colour whatever the hue. The family is the right grain and this
+# is the hook that has it.
+#
+# The hues are an EXTENSION of the four this palette already had rather than
+# a replacement for them — pine is the signature and is bound into a dozen
+# contrast claims and the masthead — and they are generated in OKLCH at even
+# hue steps so the set reads as a system rather than as eight picks. Every
+# one clears 4.5 on limestone as text, carries a 3:1 graphic step and a
+# ground tint that still holds its own ink at 4.7.
+# THE OWNER'S FAMILY TABLE, and the names are what the colour MEANS rather
+# than what it is: a region is territorial, a destination is human, a journey
+# is movement, a fund project is natural. The eight colour-named accents this
+# replaces were a wheel, and a wheel is a theme.
+ACCENTS = ("", "heritage", "territory", "human", "movement", "natural")
 
 
 # ── content-addressed assets ─────────────────────────────────────────
@@ -1271,6 +1345,61 @@ def asset_map():
     return out
 
 
+# ── typography: the apostrophe ─────────────────────────────────────────
+#
+# 2,165 STRAIGHT APOSTROPHES ON 722 PAGES. Every possessive and every
+# contraction on a site whose whole voice is a display serif was set with a
+# typewriter quote — `atlas's`, `Europe's`, `Brunelleschi's`. It is the
+# oldest tell of type nobody attended to, and it is the same family as the
+# underline through every descender and the 224 pixels above the footer:
+# nobody decided it, so it defaulted.
+#
+# THE PASS RUNS ON THE WHOLE DOCUMENT AND ONLY IN TEXT. Doing it inside
+# `esc()` would corrupt every attribute and every URL that function also
+# escapes; doing it at 37 call sites would miss the 38th. So it walks the
+# emitted HTML, skips anything between `<` and `>`, and skips the contents
+# of script, style, code and pre outright — the JSON-LD block and the inert
+# data blocks are scripts, and a code sample means the character it prints.
+#
+# NARROW ON PURPOSE: only an apostrophe with a word character on both sides,
+# which is every possessive and every contraction and nothing else. A
+# leading apostrophe ('90s) and a quotation mark both need to know which end
+# they are, and this atlas writes neither.
+_SKIP = ("script", "style", "code", "pre", "textarea")
+
+
+def curl(html):
+    out, i, n = [], 0, len(html)
+    skip_until = None
+    while i < n:
+        lt = html.find("<", i)
+        if lt < 0:
+            out.append(html[i:] if skip_until else _curl_text(html[i:]))
+            break
+        chunk = html[i:lt]
+        out.append(chunk if skip_until else _curl_text(chunk))
+        gt = html.find(">", lt)
+        if gt < 0:
+            out.append(html[lt:])
+            break
+        tag = html[lt:gt + 1]
+        out.append(tag)
+        name = tag[1:].split()[0].lower().rstrip(">/") if len(tag) > 1 else ""
+        if skip_until:
+            if name == "/" + skip_until:
+                skip_until = None
+        elif name in _SKIP and not tag.endswith("/>"):
+            skip_until = name
+        i = gt + 1
+    return "".join(out)
+
+
+def _curl_text(t):
+    if "&#x27;" not in t and "'" not in t:
+        return t
+    return re.sub(r"(?<=\w)(?:&#x27;|')(?=\w)", "&#8217;", t)
+
+
 def page(title, body, *, path, description, trail=None, area=None, head_extra="", scripts=(), wide=False, ld_blocks=(), og=None, world="discover", accent="", hero=False):
     if world not in WORLDS:
         raise ValueError(f"{path}: unknown world {world!r}; it is one of {WORLDS}")
@@ -1309,7 +1438,7 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
         + "</div>"
         for head, rows in FOOTER_GROUPS)
     full_title = title if title == SITE_NAME else f"{title} · {SITE_NAME}"
-    return f"""<!doctype html>
+    return curl(f"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1319,17 +1448,23 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 {theme_color_meta(world)}
 <title>{esc(full_title)}</title>
 <meta name="description" content="{esc(description)}">
-<link rel="canonical" href="https://europedoor.com{esc(path)}">
+<link rel="canonical" href="{ORIGIN}{esc(path)}">
 <meta property="og:title" content="{esc(full_title)}">
 <meta property="og:description" content="{esc(description)}">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://europedoor.com{esc(path)}">
+<meta property="og:url" content="{ORIGIN}{esc(path)}">
 <meta property="og:site_name" content="{esc(SITE_NAME)}">
 {og_tags(*og) if og else ''}
 <link rel="stylesheet" href="{asset("css/europedoor.css")}">
 <link rel="icon" href="{asset("door.svg")}" type="image/svg+xml">
+<!-- ON EVERY PAGE, NOT ONLY ON /stories. Feed discovery is a browser and
+     reader convention that looks at the document it is given, and a reader
+     who wants to follow this desk is as likely to be standing on a
+     destination page as on the index. One document, one feed, declared in
+     the one place that emits <head>. -->
+<link rel="alternate" type="application/atom+xml" href="/stories/feed.xml" title="EuropeDoor stories">
 {ld(*ld_blocks)}{head_extra}</head>
-<body class="area-{esc(area or 'none')}" data-world="{world}"{f' data-accent="{accent}"' if accent else ''}{' data-hero' if hero else ''}>
+<body class="ed-page ed-family-{ed_family(path)} area-{esc(area or 'none')}" data-family="{ed_family(path)}" data-world="{world}"{f' data-accent="{accent}"' if accent else ''}{' data-hero' if hero else ''}>
 <a class="skip" href="#main">{esc(T("skip"))}</a>
 <header class="masthead">
   <div class="masthead-in">
@@ -1357,10 +1492,11 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 </footer>
 {scripts_html}</body>
 </html>
-"""
+""")
 
 
-def section(title, body, *, id=None, lede=None, more=None, stage=None, tone=None):
+def section(title, body, *, id=None, lede=None, more=None, stage=None, tone=None,
+            opens=False):
     """A band.
 
     `stage` prints a small step marker above the heading. It exists for the
@@ -1371,6 +1507,14 @@ def section(title, body, *, id=None, lede=None, more=None, stage=None, tone=None
     """
     idattr = f' id="{esc(id)}"' if id else ""
     toneattr = f" tone-{esc(tone)}" if tone else ""
+    # `opens` MARKS A CHANGE OF MOVEMENT, and it exists because the rhythm was
+    # one constant. Measured across the built site: a destination page runs
+    # eight bands with every gap at 104px and every head the same size in the
+    # same place, a country page six — a table of contents rendered as a page.
+    # A destination is not eight peers: what is here, how you reach it, what
+    # to do once you have decided, and where the record came from. Space and
+    # a rule are the only things that can say so without adding a word.
+    toneattr += " opens" if opens else ""
     stagehtml = f'<p class="stage">{esc(stage)}</p>' if stage else ""
     ledehtml = f'<p class="lede">{esc(lede)}</p>' if lede else ""
     morehtml = f'<p class="more"><a href="{esc(more[1])}">{esc(more[0])} →</a></p>' if more else ""
@@ -1379,6 +1523,26 @@ def section(title, body, *, id=None, lede=None, more=None, stage=None, tone=None
   {body}
   {morehtml}
 </section>"""
+
+
+# ONE BAND HEAD, FOR EVERY FAMILY AT ONCE.
+#
+# `section()` is on three-quarters of the pages here and it prints a small
+# h2 with a lede under it, left-aligned, identical on all of them — so the
+# 2036 grammar applied to the OPENINGS and stopped at the first band, and a
+# reader met a magazine head followed by six of the old ones. The
+# alternative was rewriting nine hundred call sites.
+#
+# The band's head takes the section grammar instead: the title at display
+# size with its lede beside it rather than under it, and an index down the
+# left. THE INDEX IS DERIVED FROM POSITION — a number typed per call site
+# is a number that is wrong the day somebody reorders the page, which is
+# this repository's most repeated finding about counts — so the stylesheet
+# counts them with a CSS counter and the markup carries none.
+#
+# `stage` is untouched. It is the homepage's named progression and the
+# homepage is out of scope.
+SECTION_GRAMMAR = True
 
 
 def card(href, kicker, title, blurb, *, seed=None, meta="", tall=False, motif=None,
@@ -1442,3 +1606,413 @@ def jsondata(id, obj):
     # Only `</` can end the block early; escaping it is the whole requirement.
     payload = payload.replace("</", "<\\/")
     return f'<script type="application/json" id="{esc(id)}">{payload}</script>'
+
+
+# ============================================================
+# THE 2036 PAGE SYSTEM — EIGHT FAMILIES, ONE GRAMMAR
+#
+# The brief's own finding, and it is the right one: several families had
+# converged on kicker -> h1 -> lede -> rows, and the answer is NOT to
+# redesign forty-seven pages independently. It is to build eight families
+# and map every page into one of them, so the site reads as one institution
+# with different rooms.
+#
+# These are primitives in the sense the eleven already here are: a page
+# builder composes them and changing one changes every page that uses it.
+# They do not replace `section()`, `card()` or `row()` — a family that is
+# already right keeps what it has, and this is the grammar a family adopts
+# when it is rebuilt.
+# ============================================================
+
+ED_FAMILIES = ("atlas", "arrival", "discovery", "journey", "editorial",
+               "time", "instrument", "institutional")
+
+
+def ed_family(path):
+    """Which of the eight rooms a page is in, from its own route.
+
+    ONE TABLE, AND NO PAGE BUILDER CHANGES. Forty-seven builders each
+    passing a family string is forty-seven chances for two pages in one
+    family to disagree, and this repository has that failure recorded about
+    the fourteen call sites that forgot to pass a motif. The route is what a
+    family IS — /europe/<country>/<region>/<city> is an arrival because of
+    where it sits, not because somebody typed "arrival" — so it is derived.
+
+    Order matters twice. `/discover/` is the Discovery family and
+    `/discover/<macro>` is a macro region, which the brief puts in Atlas;
+    and `/experiences/<category>/<sub>` is a Time page while
+    `/experiences/<category>` is Discovery.
+    """
+    p = "/" + (path or "").strip("/")
+    seg = [s for s in p.split("/") if s]
+    if not seg:
+        return "institutional"
+    head = seg[0]
+
+    if head == "europe":
+        # /europe/<country> · /europe/<c>/<region>      -> atlas
+        # /europe/<c>/<r>/<city> · .../place/<x>        -> arrival
+        return "arrival" if len(seg) >= 4 else "atlas"
+    if head == "countries":
+        return "atlas"
+    if head == "discover":
+        return "discovery" if len(seg) == 1 else "atlas"
+    if head == "experiences":
+        return "time" if len(seg) >= 3 else "discovery"
+    if head in ("interests", "themes", "europe-in"):
+        return "discovery"
+    if head == "journeys":
+        return "journey"
+    if head == "stories":
+        return "editorial"
+    if head == "events":
+        return "time"
+    if head in ("map", "plan", "search", "my-europe"):
+        return "instrument"
+    return "institutional"
+
+
+def ed_section_head(number, label, title, lede="", hid=""):
+    """A numbered section head: the index beside the title, not above it.
+
+    `hid` GOES ON THE HEADING, AND LEAVING IT OUT BROKE TWO THINGS AT ONCE.
+    `section()` emitted `<h2 id="...">` and every caller that moved to this
+    head kept its `aria-labelledby` and its entry in the page's own contents
+    row — so a destination page pointed at `#why-visit`, which no longer
+    existed anywhere in the document. The section claimed a label it did not
+    have, and the jump nav linked to nothing: the browser suite died on
+    `document.querySelector(h)` returning null rather than reporting a
+    failure, which is the one shape of regression a suite cannot describe.
+
+    Neither half is visible in any count. A dangling `aria-labelledby` is not
+    a missing name in the markup, it is a name that resolves to nothing, and a
+    jump link to a missing id scrolls nowhere and raises nothing.
+    """
+    return (
+        '<header class="ed-section-head">'
+        f'<div><p class="ed-section-index">{esc(str(number))} · {esc(label)}</p></div>'
+        f'<div><h2 class="ed-section-title"'
+        + (f' id="{esc(hid)}"' if hid else "")
+        + f'>{esc(title)}</h2>'
+        + (f'<p class="ed-intro">{esc(lede)}</p>' if lede else "")
+        + "</div></header>"
+    )
+
+
+def ed_photo(images, key, *, w=1800, h=1000, alt="", eager=False,
+             ratio="wide", seed=None, motif=None, credit=True):
+    """A large photograph, through the pipeline that owns provenance.
+
+    IT NEVER TAKES A URL, which is the whole point of routing it here:
+    `picture()` is the one function that knows whether the register holds a
+    photograph for this key, emits the AVIF/WebP/JPEG ladder at five widths
+    when it does, and draws the plate when it does not. A component that
+    took `src` would be a second way into the library with none of the
+    gate behind it.
+
+    AND IT DOES NOT RETURN AN EMPTY STRING WHEN THE REGISTER IS EMPTY. The
+    brief's version does, which would leave 826 of 837 surfaces as a hole in
+    the page — and this repository has already measured that a slot waiting
+    for a picture is honest and three hundred pixels of it is a hole. The
+    interim answer is the drawing, exactly as it is everywhere else.
+    """
+    cls = {"wide": "ed-photo-wide", "landscape": "ed-photo-landscape",
+           "portrait": "ed-photo-portrait"}.get(ratio, "ed-photo-wide")
+    inner = picture(images, key, w=w, h=h, alt=alt, eager=eager,
+                    sizes="(max-width: 52rem) 100vw, 70vw",
+                    fallback_seed=seed or key, fallback_motif=motif,
+                    credit=credit)
+    return f'<figure class="ed-photo {cls}">{inner}</figure>'
+
+
+def ed_opening(*, eyebrow, title, intro="", visual="", family="atlas"):
+    """The stage every rebuilt family opens on: type beside a picture.
+
+    `family` is on the SECTION as well as the body, because a page can hold
+    a second opening — a journey inside an atlas page — and the grammar has
+    to follow the content rather than the document.
+    """
+    return (
+        f'<section class="ed-opening ed-family-{esc(family)}">'
+        '<div class="ed-opening-copy">'
+        f'<p class="ed-eyebrow">{esc(eyebrow)}</p>'
+        f'<h1>{esc(title)}</h1>'
+        + (f'<p class="ed-intro">{esc(intro)}</p>' if intro else "")
+        + "</div>"
+        f'<div class="ed-opening-visual">{visual}</div>'
+        "</section>"
+    )
+
+
+def ed_split(*, title, body, media="", reverse=False):
+    """Copy and a picture, alternating sides down a page."""
+    return (
+        '<section class="ed-section">'
+        f'<div class="ed-split{" reverse" if reverse else ""}">'
+        f'<div class="ed-split-copy"><h2>{esc(title)}</h2>{body}</div>'
+        f'<div class="ed-split-media">{media}</div>'
+        "</div></section>"
+    )
+
+
+def ed_rows(rows, *, numbered=True):
+    """An index as a set of rules, not a grid of cards.
+
+    THE NUMBER IS DERIVED AND NEVER PASSED. The brief's version takes a
+    `number` per row, which is a figure typed into data — and a figure typed
+    into data is the figure that was true two hundred destinations ago, which
+    is this repository's most repeated finding about counts. It is the row's
+    position, formatted here.
+    """
+    out = []
+    for i, row in enumerate(rows, 1):
+        num = f"{i:02d}" if numbered else ""
+        # A SUBLINE IS PART OF THE ROW AND A FLAG IS NOT PROSE. The brief's
+        # row carries a title and a meta; every index on this site also has
+        # a sentence that says what distinguishes this one from the fifty
+        # under it, and three of them carry a travel advisory, which is a
+        # STATE rather than a word and has its own tone.
+        sub = (f'<p class="rowsub">{esc(row["sub"])}</p>'
+               if row.get("sub") else "")
+        flag = (f' <span class="tag advisory">{esc(row["flag"])}</span>'
+                if row.get("flag") else "")
+        out.append(
+            f'<a class="ed-row" href="{esc(row["href"])}">'
+            f'<span class="ed-row-number">{num}</span>'
+            f'<div><h3>{esc(row["title"])}{flag}</h3>{sub}</div>'
+            f'<span class="ed-row-meta">{esc(row.get("meta", ""))}</span>'
+            '<span class="ed-row-arrow" aria-hidden="true">&#8594;</span>'
+            "</a>")
+    return '<div class="ed-rows">' + "".join(out) + "</div>"
+
+
+# ============================================================
+# PHOTOGRAPHY AS A CONTENT LAYER — SEVEN SCALES
+#
+# The failure these replace is not "too few photographs", it is every
+# photograph the same size in the same box. Each of these is a different
+# editorial job, and every one of them routes through `picture()`, which is
+# the one function that knows whether the register holds a photograph for a
+# key — so each draws the interim illustration until the library fills and
+# none is a second way into the image system with the licence gate missing.
+# ============================================================
+
+def held(images, key):
+    """Does the register hold a photograph for this surface?
+
+    THE INTERIM FOR AN ABSENT PHOTOGRAPH IS NOT ALWAYS A DRAWING. `picture()`
+    returns a generated plate when the register has no row, which is right on
+    a card — a reader gets the best thing available and the library becomes
+    adoptable one photograph at a time. It is wrong for the scales below.
+
+    This site measured that once and acted on it: 189 `.card-art` elements
+    and every one is a map, zero abstract plates on any page, because forty
+    hash-drawn landscapes in a column is placeholder art doing a picture's
+    job. A strip of eight plates or a full-bleed one would put that straight
+    back, at the largest sizes on the site, on every family at once.
+
+    So the big scales ASK. A composition that would be carried by a
+    photograph renders when there is one and is omitted when there is not,
+    and the page composes around its absence rather than filling it. That is
+    the homepage doors' own rule — a slot waiting for a picture is honest,
+    three hundred pixels of it is a hole — applied to seven more scales.
+    """
+    return bool((images or {}).get(key))
+
+
+def held_any(images, keys):
+    """The subset of these surfaces the register actually holds."""
+    return [k for k in keys if held(images, k)]
+
+
+# THE SLOTS ARE DECLARED, SO AN EMPTY ONE CAN SAY WHAT BELONGS IN IT.
+#
+# The first version of the scales below returned "" when the register held
+# nothing, to keep hash-drawn landscapes off the page — a measured decision
+# this repository already made once, 189 `.card-art` elements and every one
+# a map. That is right about the plate and wrong about the hole: with 826
+# of 837 surfaces empty it meant the redesign could not be SEEN, and a
+# composition nobody can look at cannot be judged.
+#
+# A DECLARED PLACEHOLDER IS NEITHER. It is not a photograph and never
+# pretends to be one: no <img>, no register row, nothing for the licence
+# gate to refuse. It is the slot's own brief, rendered where the slot is —
+# the purpose, what the picture must be OF, and the size it must be — which
+# is exactly what `docs/image-purposes.json` already declares and what the
+# directive asks for in its own words: mark the slot clearly and identify
+# the required acquisition. The page composes, a reader sees the shape of
+# the design, and the acquisition list is the page itself.
+_SLOTNOTES = None
+
+
+def slot_brief(key):
+    """The one-line brief for an unfilled surface, from the declarations."""
+    global _SLOTNOTES
+    if _SLOTNOTES is None:
+        _SLOTNOTES = {}
+        try:
+            import json as _json
+            import os as _os
+            # `render` HAS NO ROOT AND NEVER NEEDED ONE. Every other path
+            # in this module is a URL; this is the first file it reads, so
+            # the repository is derived from the module's own location
+            # rather than from a constant somebody has to keep true.
+            here = _os.path.dirname(_os.path.abspath(__file__))
+            root = _os.path.dirname(_os.path.dirname(here))
+            path = _os.path.join(root, "desk", "registry.json")
+            with open(path, encoding="utf-8") as fh:
+                doc = _json.load(fh)
+            slots = doc.get("slots", {})
+            for row in doc.get("purposes", []):
+                spec = dict(slots.get(row.get("slot") or "", {}))
+                spec.update({k: v for k, v in row.items() if v is not None})
+                _SLOTNOTES[row["key"]] = spec
+        except Exception:                                    # noqa: BLE001
+            _SLOTNOTES = {}
+    return _SLOTNOTES.get(key) or {}
+
+
+def ed_slot(key, *, shape="wide", label=""):
+    """An empty surface, saying what belongs in it.
+
+    THE FIRST SENTENCE OF THE NOTE AND NOT THE WHOLE NOTE. A slot's brief is
+    written for somebody reading the JSON and runs to a paragraph; rendered
+    whole it would be the page. The desk already learned this — its own slot
+    note pushed the search box nine hundred pixels down — and the answer is
+    the same: the first sentence is the hint.
+    """
+    spec = slot_brief(key)
+    note = (spec.get("note") or "").strip()
+    first = note.split(". ")[0].rstrip(".") if note else ""
+    want = ""
+    if spec.get("min_width"):
+        want = f'{spec["min_width"]}px {spec.get("orientation") or "landscape"}'
+    cls = {"wide": "ed-slot-wide", "tall": "ed-slot-tall",
+           "portrait": "ed-slot-portrait", "square": "ed-slot-square"}.get(
+        shape, "ed-slot-wide")
+    return (
+        f'<div class="ed-slot {cls}" role="note" '
+        f'aria-label="A photograph is not yet licensed for this surface">'
+        f'<p class="ed-slot-key">Photograph · {esc(label or key)}</p>'
+        + (f'<p class="ed-slot-note">{esc(first)}</p>' if first else "")
+        + (f'<p class="ed-slot-spec">{esc(want)}</p>' if want else "")
+        + "</div>")
+
+
+def ed_bleed(images, key, *, alt, seed=None, motif=None, caption="",
+             shape="tall", eager=False, only_if_held=True):
+    """A picture that leaves the column. Used for a change of movement.
+
+    It is the one image scale that is not inside the measure, which is what
+    makes it read as a transition rather than as another illustration: the
+    page stops, the continent or the city is the whole width, and the page
+    resumes. `margin-inline: calc(50% - 50vw)` rather than a second wrapper,
+    because a full-bleed element that needs its parent to cooperate is an
+    element every caller can get wrong.
+    """
+    if only_if_held and not held(images, key):
+        return ed_slot(key, shape="wide", label=alt or key)
+    cls = {"tall": "ed-bleed-tall", "deep": "ed-bleed-deep"}.get(shape, "ed-bleed-tall")
+    inner = picture(images, key, w=2400, h=1030, alt=alt, eager=eager,
+                    sizes="100vw", fallback_seed=seed or key,
+                    fallback_motif=motif)
+    cap = f'<figcaption class="ed-caption">{esc(caption)}</figcaption>' if caption else ""
+    return f'<figure class="ed-bleed {cls}">{inner}</figure>{cap}'
+
+
+def ed_feature(images, key, *, title, body, alt, seed=None, motif=None,
+               right=False, level=3, eager=False, only_if_held=False):
+    """A dominant picture with its own words beside it.
+
+    ASYMMETRIC ON PURPOSE — 1.35 against .65, not a half-and-half split. Two
+    equal columns read as a layout; an unequal pair reads as a picture that
+    has something to say about it. `right` alternates the side down a page,
+    which is what stops three features in a row becoming a pattern.
+    """
+    if only_if_held and not held(images, key):
+        return ed_slot(key, shape="square", label=alt or key)
+    inner = picture(images, key, w=1600, h=1200, alt=alt, eager=eager,
+                    sizes="(max-width: 52rem) 100vw, 55vw",
+                    fallback_seed=seed or key, fallback_motif=motif)
+    h = f"h{level}"
+    return (
+        f'<div class="ed-feature{" right" if right else ""}">'
+        f'<figure class="ed-feature-media">{inner}</figure>'
+        f'<div class="ed-feature-say"><{h}>{esc(title)}</{h}>{body}</div>'
+        "</div>")
+
+
+def ed_strip(images, items, *, limit=8):
+    """A horizontal sequence: a visual journey rather than a grid.
+
+    `items` are dicts of key, alt, label and optionally href. It SCROLLS
+    rather than wrapping, because a sequence is read along — wrapping it
+    into rows turns an order into a grid, which is the thing this whole
+    system is replacing.
+    """
+    out = []
+    for it in items[:limit]:
+        if not held(images, it["key"]):
+            label = esc(it.get("label", ""))
+            if it.get("href"):
+                label = f'<a href="{esc(it["href"])}">{label}</a>'
+            out.append(
+                '<figure>'
+                + ed_slot(it["key"], shape="portrait", label=it.get("label", ""))
+                + f'<figcaption>{label}</figcaption></figure>')
+            continue
+        inner = picture(images, it["key"], w=900, h=1200, alt=it.get("alt", ""),
+                        sizes="(max-width: 52rem) 60vw, 18rem",
+                        fallback_seed=it.get("seed") or it["key"],
+                        fallback_motif=it.get("motif"))
+        label = esc(it.get("label", ""))
+        if it.get("href"):
+            label = f'<a href="{esc(it["href"])}">{label}</a>'
+        out.append(f'<figure><div class="ed-shot">{inner}</div>'
+                   f'<figcaption>{label}</figcaption></figure>')
+    return f'<div class="ed-strip">{"".join(out)}</div>' if out else ""
+
+
+def ed_mosaic(images, items, *, limit=3):
+    """One dominant picture and two beside it. Never four equal tiles."""
+    if len(items) < 3:
+        # A MOSAIC IS A COMPOSITION OF THREE, and two pictures in a
+        # three-cell grid is a grid with a hole in it. Below three it is not
+        # a smaller mosaic, it is a different component's job.
+        return ""
+    out = []
+    for i, it in enumerate(items[:limit]):
+        big = i == 0
+        if not held(images, it["key"]):
+            out.append(ed_slot(it["key"], shape="square",
+                               label=it.get("label", "")))
+            continue
+        inner = picture(images, it["key"], w=1400 if big else 800,
+                        h=1400 if big else 800, alt=it.get("alt", ""),
+                        sizes="(max-width: 52rem) 100vw, "
+                              + ("40vw" if big else "28vw"),
+                        fallback_seed=it.get("seed") or it["key"],
+                        fallback_motif=it.get("motif"))
+        out.append(f'<div class="ed-shot">{inner}</div>')
+    return f'<div class="ed-mosaic-3">{"".join(out)}</div>' if out else ""
+
+
+def ed_declare(images, key, *, statement, alt, seed=None, motif=None,
+               only_if_held=True):
+    """A typographic statement over a picture — the directive's own diagram.
+
+    THE SCRIM IS NOT AN EFFECT, it is what makes the contrast a property of
+    the design rather than of the photograph. This site has measured that
+    once already, on the homepage hero: type over a drawing measured 4.36:1
+    on the lit parchment of Iberia, under AA, because a ratio against a
+    TOKEN is not the ratio a reader gets. 72% graphite composites to
+    rgb(71,71,71) and bone on that is 9.2:1 whatever the picture does.
+    """
+    if only_if_held and not held(images, key):
+        return ed_slot(key, shape="wide", label=alt or key)
+    inner = picture(images, key, w=2400, h=1400, alt=alt,
+                    sizes="100vw", fallback_seed=seed or key,
+                    fallback_motif=motif)
+    return (f'<figure class="ed-declare">{inner}'
+            f'<figcaption class="ed-declare-say"><p>{esc(statement)}</p>'
+            f"</figcaption></figure>")

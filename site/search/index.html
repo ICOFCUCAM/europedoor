@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27;; style-src &#x27;self&#x27;; img-src &#x27;self&#x27; data:; font-src &#x27;self&#x27;; connect-src &#x27;self&#x27;; form-action &#x27;self&#x27;; base-uri &#x27;none&#x27;">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="theme-color" content="#2948d1">
+<meta name="theme-color" content="#07100F">
 <title>Search · EuropeDoor</title>
 <meta name="description" content="Search every country, region, city, journey, theme, story and project on EuropeDoor — in your browser, with nothing sent anywhere.">
 <link rel="canonical" href="https://europedoor.com/search">
@@ -15,10 +15,16 @@
 <meta property="og:url" content="https://europedoor.com/search">
 <meta property="og:site_name" content="EuropeDoor">
 
-<link rel="stylesheet" href="/assets/css/europedoor.055931e2ed.css">
+<link rel="stylesheet" href="/assets/css/europedoor.fb6229bd86.css">
 <link rel="icon" href="/assets/door.49fb8a56f2.svg" type="image/svg+xml">
+<!-- ON EVERY PAGE, NOT ONLY ON /stories. Feed discovery is a browser and
+     reader convention that looks at the document it is given, and a reader
+     who wants to follow this desk is as likely to be standing on a
+     destination page as on the index. One document, one feed, declared in
+     the one place that emits <head>. -->
+<link rel="alternate" type="application/atom+xml" href="/stories/feed.xml" title="EuropeDoor stories">
 </head>
-<body class="area-none" data-world="intelligence">
+<body class="ed-page ed-family-instrument area-none" data-family="instrument" data-world="intelligence">
 <a class="skip" href="#main">Skip to content</a>
 <header class="masthead">
   <div class="masthead-in">
@@ -48,10 +54,12 @@
   <div class="field">
     <label for="q">Search Europe</label>
     <input type="text" id="q" name="q" autocomplete="off" autofocus
-           placeholder="quiet beaches in september · medieval castles near prague · cheap mountains">
+           placeholder="quiet beaches in september">
     <p class="small">It reads more than words: <em>cheap</em> and <em>quiet</em> filter,
     a month narrows to places that are good in it, and <em>near Prague</em> means within
-    300 kilometres of Prague. Whatever it understood is shown back to you as chips.</p>
+    300 kilometres of Prague — so <em>medieval castles near Prague</em> and
+    <em>cheap mountains</em> both work. Whatever it understood is shown back to you as
+    chips.</p>
   </div>
 </form>
 <div class="chips" id="searchunderstood" aria-live="polite"></div>

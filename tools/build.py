@@ -197,6 +197,7 @@ def build():
         if p.endswith("index.html")
     ]
     write("/sitemap.xml", P.sitemap(canonical))
+    write("/stories/feed.xml", P.stories_feed(d))
     # ── social cards ─────────────────────────────────────────────────
     #
     # Deterministic, content-addressed, and cached in assets/og/ because they
@@ -251,7 +252,7 @@ def build():
     card_note = f", {len(wanted)} cards"
     if made or pruned:
         card_note += f" ({made} rendered, {pruned} pruned)"
-    print(f"{len(written)} pages + api + sitemap{card_note} + {geo_n} geometry files → site/")
+    print(f"{len(written)} pages + api + sitemap + feed{card_note} + {geo_n} geometry files → site/")
     return d, written
 
 

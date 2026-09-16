@@ -343,7 +343,7 @@ await t("fits() refuses an original too small to derive from", () => {
  * `--serif` for `--display`, in twelve rules, silently replacing the right
  * font on most of the largest headings on the site — and this desk was
  * written afterwards and had two of its own: `--sea` where the token is
- * `--cobalt`, leaving the running step's tick painting whatever it inherits,
+ * `--pine`, leaving the running step's tick painting whatever it inherits,
  * and `--paper` where it is `--limestone`, on both textareas including the
  * one control here that must be read in full before it is approved.
  *

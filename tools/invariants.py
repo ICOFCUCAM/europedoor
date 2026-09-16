@@ -58,6 +58,21 @@ def _css():
     return re.sub(r"/\*.*?\*/", "", css, flags=re.S)
 
 
+def _ochre():
+    """The golds the palette register declares, as a lookup.
+
+    THE EXCLUSION IS A LOOKUP, NEVER A SHAPE — the sentence this repository
+    already wrote about the credential scan. Loosening the gold arithmetic
+    until ochre passed would loosen it until a brass passed too, so the
+    arithmetic is untouched and the register names which golds are the
+    territorial accent.
+    """
+    pal = json.load(open(os.path.join(ROOT, "docs", "palette.json"),
+                         encoding="utf-8"))
+    return {t["hex"].lower() for name, t in pal["tokens"].items()
+            if name.startswith("ochre")}
+
+
 def _size_of(value):
     """The type size a declaration states, with the --z compensation removed.
 
@@ -98,8 +113,19 @@ def measure():
     route_hash = hashlib.sha256("\n".join(routes).encode()).hexdigest()[:16]
 
     prim_floor = {}
+    # AND THE 2036 SYSTEM'S OWN PRIMITIVES ARE TRACKED HERE TOO, from the
+    # commit that introduced them. A migration moves reach from one set to
+    # another, and a register that counts only the set being LEFT reads every
+    # step of it as a loss — so the eight families' grammar has a floor of
+    # its own and the two numbers can be read against each other. `ed-row`
+    # and `row` are both counted: a page that moved is one that fell on the
+    # first list and rose on the second, and a page that simply stopped
+    # listing anything falls on both, which is the failure this exists to
+    # catch and the only reading the old register could not tell apart.
     for prim in ("kicker", "masthead", "pagehead", "crumbs", "row", "card",
-                 "band", "note", "facts", "btn", "chip"):
+                 "band", "note", "facts", "btn", "chip",
+                 "ed-opening", "ed-section", "ed-row", "ed-eyebrow",
+                 "ed-photo", "ed-split"):
         # \b is the wrong boundary for a CSS class name, because a hyphen is
         # a word boundary: `\bcard\b` matched `class="card-art frame"`, and
         # `\brow\b` matches `rowsub` and `rowmeta`. The card floor of 0.785
@@ -188,6 +214,21 @@ def measure():
                        "and a hole in default-src 'none'. 2036 does not require "
                        "a new typeface."},
             "css.font_sizes": {
+                # AND 18 IS FOR THE COUNT ON THE ATLAS PLATE. The homepage
+                # is a plate sequence now, and its fifth plate makes the
+                # number of countries the single largest typographic event
+                # on the site: `50` set at clamp(5rem, 11vw, 11rem) beside
+                # `European countries.` at a third of it. That contrast IS
+                # the plate — a tracked 11px label against a 176px numeral
+                # is the editorial rhythm the design direction asked for,
+                # and it is the one value on this page that no existing step
+                # reaches: --t-6xl is 4.75rem, less than half of it.
+                #
+                # Every other new declaration on that page was made to reuse
+                # a clamp that already existed rather than invent one, which
+                # is why this moved by one rather than by six: the first
+                # version of the sequence declared six bespoke clamps and
+                # the register was right to refuse them.
                 # A COMPENSATION CONSTANT FOR A COORDINATE SYSTEM IS NOT A
                 # TYPE SIZE, and the stylesheet has said so since the map
                 # labels were fixed: `calc(11px / var(--z))` draws an 11px
@@ -203,16 +244,57 @@ def measure():
                               re.findall(r"font-size:\s*([^;]+);", css)}),
                 "kind": "ceiling",
                 "why": "A ceiling, not a target. The sibling repository measures "
-                       "418; that is what happens without a line. It moved to "
-                       "16 for the essay hed, and for nothing else: the design "
-                       "audit's central finding is that eleven of twelve "
-                       "rendered families place an identically-sized h1 at an "
-                       "identical vertical position, and no size that already "
-                       "existed could stop that. The same commit's other five "
-                       "candidate type values — a serif leading, a tighter "
-                       "hed, a deck clamp one decimal off one already in the "
-                       "file — were snapped back to what the site had, and no "
-                       "reader could name the difference."},
+                       "418; that is what happens without a line. "
+                       "IT IS 17 FOR THE PLACE PAGE'S PHONE HEAD, and that is "
+                       "the one case where the ceiling should move rather than "
+                       "the design: a place name is routinely a single long "
+                       "compound noun — Kunsthistorisches, Jugendstilsenteret, "
+                       "Elbphilharmonie — and at the overture's own floor it "
+                       "does not fit a phone, so four of them were cut in half "
+                       "mid-word. `min-width: min-content` fixes the box and "
+                       "not the screen; the only sizes already declared that "
+                       "fit are 24px, which is a section head, on the family "
+                       "whose whole role is that the name is the event. The "
+                       "value is an existing STEP of the scale (--t-2xl) "
+                       "declared in a new place, not a seventeenth step. "
+                       "It was 16 for "
+                       "the essay hed and for nothing else: the design audit's "
+                       "central finding is that eleven of twelve rendered "
+                       "families place an identically-sized h1 at an identical "
+                       "vertical position, and no size that already existed "
+                       "could stop that. "
+                       "AND FOR TWO COMMITS THIS REASON WAS TRUE OF NOTHING. "
+                       "The value was snapped back to 15 and the hed was left "
+                       "declaring `clamp(--t-3xl, 5.2vw, --t-5xl)` — the base "
+                       "h1 rule copied out character for character, a "
+                       "declaration restating what the element already "
+                       "inherits, which is the redundancy the dead-rule scan "
+                       "exists to find. The one difference the family claimed "
+                       "did nothing, and this register carried the argument "
+                       "for a size that was not being spent. The hed takes the "
+                       "--t-6xl ceiling now and the sixteenth size is real: a "
+                       "story title is a SENTENCE where an overture's is a "
+                       "name, so it cannot borrow the hero clamp the overture "
+                       "borrowed, and every other value in the rule — the "
+                       "5.2vw rate, the 1.12 leading, the -.022em — is the "
+                       "site\'s own. The same commit\'s first version also "
+                       "moved the leading to 1.06 and the rate to 6.2vw; both "
+                       "went red here, both were wrong, and both came out."
+                       " AND IT IS 22 FOR THE 2036 PAGE SYSTEM: four "
+                       "values for eight page families. The brief writes nine "
+                       "clamps, one per component, each a few pixels from its "
+                       "neighbour, and nine arbitrary clamps is a second type "
+                       "scale wearing the first one's clothes — which is how "
+                       "the sibling repository reached 418. --ed-display-1 is "
+                       "every opening, every hero and every institutional head; "
+                       "--ed-display-2 is every section title, split and arrival; "
+                       "--ed-display-3 is every row and route stop; --ed-read is "
+                       "the standfirst under all of them. A system is what a set "
+                       "of components have in COMMON, not what each of them "
+                       "declares, and the two bare steps the first draft also "
+                       "spent were folded in rather than counted — the second "
+                       "of them a narrow-screen override restating what its own "
+                       "clamp already computes at that width."},
             "css.font_weights": {
                 "value": len(set(re.findall(r"font-weight:\s*([^;]+);", css))),
                 "kind": "ceiling", "why": "Four is enough for an editorial system."},
@@ -245,10 +327,24 @@ def measure():
                               if 90 <= int(h[1:3], 16) <= 215
                               and abs(int(h[1:3], 16) - int(h[3:5], 16)) < 55
                               and int(h[3:5], 16) - int(h[5:7], 16) > 45
-                              and int(h[1:3], 16) - int(h[5:7], 16) > 70]),
+                              and int(h[1:3], 16) - int(h[5:7], 16) > 70
+                              and h.lower() not in _ochre()]),
                 "kind": "exact",
-                "why": "Zero. Gold says luxury, premium, wealth; this product "
-                       "has to say Europe, discovery, movement, intelligence."},
+                "why": "Zero golds OUTSIDE the declared ochre family, which "
+                       "is not the same row it was. It counted every gold and "
+                       "read zero, because European Future had none; the "
+                       "owner's palette then named ochre #C49A52 as the "
+                       "TERRITORIAL accent for the regions and the events "
+                       "calendar, so three arrived at once and the honest "
+                       "reading is 3, not a moved ceiling. Recording 3 would "
+                       "put a number here and no rule: a fourth gold pasted "
+                       "in would keep it at 3 only by luck. So the count is "
+                       "of golds the register does not declare, it stays at "
+                       "zero, and the register is where a new one has to be "
+                       "argued for. Gold still says luxury, premium, wealth; "
+                       "what changed is that a ground and a kicker on two "
+                       "families is not a gold button, and the two brasses "
+                       "#8a6d34 and #c2a165 stay out by value."},
             "css.lime": {
                 "value": len(re.findall(r":\s*#c8ff4d", css, re.I))
                          + len(re.findall(r"--lime:", css)),
@@ -281,9 +377,26 @@ def measure():
             "safety.img_tags": {
                 "value": sum(b.count("<img") for b in bodies.values()),
                 "kind": "exact",
-                "why": "Zero today, because zero photographs are licensed. This "
-                       "moving is the signal that licensed imagery arrived — "
-                       "which must go through the licence register first."},
+                "why": "It was zero while zero photographs were licensed, and "
+                       "this moving is the signal that licensed imagery arrived "
+                       "— which must go through the licence register first. "
+                       "20 -> 31 WHEN THE ELEVEN THEME PHOTOGRAPHS STOPPED "
+                       "APPEARING ON ELEVEN PAGES: they are the only pictures "
+                       "this atlas holds and they were each on their own page "
+                       "and nowhere else, so an index of thirteen things a "
+                       "reader chooses between on LOOK showed thirteen "
+                       "drawings. No photograph was acquired for this; the "
+                       "same eleven register rows are spent on one more "
+                       "surface, which is the whole of the change. "
+                       "31 -> 34 WHEN THE HOMEPAGE STOPPED SHOWING EIGHT OF "
+                       "ELEVEN. Plate 02's row was capped at eight by a "
+                       "`[:8]` written when eight was the whole register and "
+                       "the grid was eight fixed tracks, so Grand Tour, "
+                       "Modernist and Thermal were dropped by data order with "
+                       "nothing on the page saying so — a selection wearing "
+                       "the clothes of a set. Again no photograph was "
+                       "acquired: three rows already in the register reach "
+                       "one more surface."},
             # The homepage is the flagship page and the one most likely to
             # gain weight, because every good idea wants to live on it. It
             # already carried a 2.6x regression unnoticed: a commit that cut
@@ -297,30 +410,36 @@ def measure():
                                        if os.path.relpath(k, OUT) == "index.html")) / 1024),
                 "kind": "ceiling",
                 "why": "The homepage's rendered HTML in KB. A ceiling, not a "
-                       "target: it is allowed to move, deliberately, in a diff "
-                       "somebody reads. It is here because a 2.6x regression on "
-                       "this page passed every other gate in silence. "
-                       "119 -> 146 ON PURPOSE: the body was eight abstract "
-                       "plates over 'Find your kind of Europe' and three more "
-                       "over the journeys — eleven purple gradients in a "
-                       "column under an atlas hero, which is placeholder art "
-                       "doing a picture's job, and the plate system was "
-                       "already measured as unable to carry a hero. Each tile "
-                       "now draws its OWN destinations lit on one shared "
-                       "silhouette: Mountains is the Alps, the Pyrenees, the "
-                       "Carpathians and the Scandes; History is almost the "
-                       "whole continent; and that difference is what the tile "
-                       "exists to say. The plates cost 14.7 KB and came out; "
-                       "894 dots and one lod0 coastline went in. All of them "
-                       "and never a selection, so the count on the tile is the "
-                       "number of dots on it and a reader can check. "
-                       "121 -> 136 ON PURPOSE: the doors that replaced those "
-                       "tiles were written for a photograph and the register "
-                       "is empty, so the band rendered as four blocks of type "
-                       "— the one part of the homepage whose job is to make "
-                       "somebody want to go somewhere, doing it entirely in "
-                       "words. The drawing is back under the four headings, "
-                       "and it is the same 512 dots the tiles carried."},
+                       "target: it may move, deliberately, in a diff "
+                       "somebody reads. It is here because a 2.6x "
+                       "regression on this page passed every other gate "
+                       "in silence.\n"
+                       "  25 -> 109  the drawn hero: Europe on its own "
+                       "conic, relief, rivers, the ground beyond.\n"
+                       "  119 -> 146 eleven abstract plates out, the "
+                       "data in: every destination carrying each tag.\n"
+                       "  121 -> 136 the four doors got their drawing "
+                       "back; 146 -> 122 when they became photograph "
+                       "slots sized to their content.\n"
+                       "  122 -> 123 the Atom feed, declared in the one "
+                       "function that emits <head>.\n"
+                       "  123 -> 129 the body glyphs got a cartography: "
+                       "water, frontiers, and the land beyond the 52°E "
+                       "cut so the continent stops ending in a "
+                       "knife-straight diagonal through Russia. 5 KB of "
+                       "anonymous rings, emitted once and cloned by "
+                       "every glyph on the page.\n"
+                       "  129 -> 130 the homepage journey rows got the stops "
+                       "in order and the trip's rhythm bar.\n"
+                       "  141 -> 146 plate 02 stopped showing eight of the "
+                       "eleven licensed theme photographs and the tiles grew "
+                       "from 134px to 182px. Three more <picture> ladders is "
+                       "the whole of it; the pictures themselves are files a "
+                       "reader fetches, not bytes in this document. A page "
+                       "whose brief is more photography paying five "
+                       "kilobytes of markup for three more photographs is "
+                       "the trade this ceiling exists to make visible rather "
+                       "than to forbid."},
             "weight.max_page_kb": {
                 "value": round(max(len(b) for b in bodies.values()) / 1024),
                 "kind": "ceiling",
@@ -368,7 +487,14 @@ def measure():
                 "kind": "floor",
                 "why": "Pages whose geography is seen through the arch. A floor: "
                        "the aperture is the identity, and a new map that forgets "
-                       "it is a page that stops looking like EuropeDoor."},
+                       "it is a page that stops looking like EuropeDoor. "
+                       "825 -> 824 WHEN /discover's MAP BECAME ITS FIRST PLATE, "
+                       "and that is the rule being obeyed rather than bent: "
+                       "docs/signature-moments.md records /map as the place the "
+                       "door is CORRECTLY absent, because an instrument is not a "
+                       "picture of somewhere, and /discover draws the same "
+                       "instrument. It had been carrying a picture's frame around "
+                       "a tool. One page, decided, and the floor holds under it."},
             "plates.page_share": {
                 "value": round(sum(1 for b in bodies.values()
                                    if re.search(r'class="[^"]*(?<![\w-])plate(?![\w-])', b))
@@ -394,7 +520,17 @@ def measure():
                        "that quietly stops using one has grown its own "
                        "components and the design system has forked without "
                        "anybody deciding — which is the failure this floor "
-                       "exists to catch. A family that stops using one ON "
+                       "exists to catch. AND /discover MOVED THREE OF THEM, "
+                       "which is Decision 2 of the Discover rebuild: the page "
+                       "carried seventeen outlined chips for the interests and "
+                       "nine macro cards and six motion cards beneath them — "
+                       "border, fill, radius and shadow spent over and over on "
+                       "one-word tags, on the page whose whole subject is how to "
+                       "choose. The chips became type at reading size and the "
+                       "cards became rows and printed queries. card 0.060 to "
+                       "0.059, band 0.757 to 0.756, chip 0.521 to 0.520 — one "
+                       "page each, which is what a single family leaving a "
+                       "primitive looks like. A family that stops using one ON "
                        "PURPOSE is the other thing that moves it, and the "
                        "difference is whether the drop is recorded here in the "
                        "same commit with the composition that caused it. The "
@@ -535,7 +671,7 @@ def measure():
                        "thousandth because one page in 1,034 composes without "
                        "them: the index is seventeen rows and a shared "
                        "silhouette, ordered by reach, and it carries no note "
-                       "panel, no facts table and no chip row."},
+                       "panel, no facts table and no chip row. AND THE 2036 PAGE SYSTEM IS A MIGRATION, which is what these numbers do from here: /countries moved its fifty rows from `row` to `ed-row` and the old figure fell by one page, 0.888 to 0.887, while the new one rose from nothing. Six ed- primitives are counted from this commit so the transfer is visible as a transfer — a register watching only the set being left reads every step of a deliberate migration as a loss, and cannot tell it from a family that quietly stopped listing anything at all. AND THE DISCOVERY FAMILY TOOK `pagehead` ONE PAGE, 0.230 to 0.229: /interests was the last index still opening on the old head — a kicker, an h1 and a lede over seventeen drawings of the same continent, with no photograph anywhere on a page whose subject is what you are travelling FOR. It opens on `ed-opening` now, carrying the `interests-hero` purpose that was declared and unreached, and the seventeen shapes keep their section because reach is the one argument no single tag page can make."},
         },
     }
 

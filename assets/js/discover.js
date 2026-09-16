@@ -190,7 +190,21 @@
     var out = el("discover-results");
     if (!wants.length && !constraints.month && !constraints.budget &&
         !constraints.quiet && !constraints.rail) {
-      out.innerHTML = "";
+      /* AT REST THE PLATE SAYS WHAT IT IS SHOWING, WHICH IS EVERYTHING.
+       * It used to be cleared to nothing, which was fine while the results
+       * sat inside the band that produced them and is a hole now that they
+       * have a plate of their own: present-but-empty says "we have this"
+       * and then does not. The figure is the atlas's own length, so it
+       * cannot drift from what the map has lit. */
+      /* AND THE FIGURE HAS TO EXPLAIN ITSELF, because the head of this
+       * page states 319 and this states 313. Advisory countries are
+       * stripped from atlas.json at build time, so Discover cannot offer
+       * them — a reader who sees both numbers is owed the reason rather
+       * than left to think one of them is wrong. */
+      out.innerHTML = '<p class="lede atrest">Nothing chosen yet, so all ' +
+        ATLAS.cities.length + ' places Discover can offer are lit — ' +
+        'countries under travel advice are not among them. Pick something ' +
+        'above and what is left appears here, each row saying why.</p>';
       el("discover-count").textContent =
         "Choose what you are travelling for. Europe will narrow itself.";
       light(null);
@@ -298,13 +312,20 @@
     'including <a href="/method#discoverability">discoverability</a>.</p>';
   }
 
+  /* THE SEVENTEEN ARE IN THE MARKUP AND THIS BINDS TO THEM.
+   *
+   * It used to WRITE them, into an empty div, so a reader with no
+   * JavaScript met the page's whole subject as blank space — on the one
+   * page whose subject is how to choose. Worse, the same seventeen were
+   * also printed lower down as a static chip index, so the page carried two
+   * interest surfaces built from two code paths that could disagree about
+   * the count. One surface, rendered by the build, upgraded here.
+   *
+   * It binds to whatever carries `data-interest` rather than to a class, so
+   * the look of the control is the stylesheet's business and this file has
+   * no opinion about it. */
   function chips() {
     var box = el("discover-interests");
-    box.innerHTML = ATLAS.interests.map(function (i) {
-      return '<button type="button" class="chip pick" data-interest="' + i.slug +
-        '" aria-pressed="false"><span aria-hidden="true">' + i.icon + "</span> " +
-        i.name + "</button>";
-    }).join("");
     box.querySelectorAll("[data-interest]").forEach(function (b) {
       b.addEventListener("click", function () {
         var slug = b.getAttribute("data-interest");

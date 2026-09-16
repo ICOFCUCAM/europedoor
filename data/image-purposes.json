@@ -231,6 +231,52 @@
         "height": 0.867,
         "frame": 0.55
       }
+    },
+    "themes-hero": {
+      "role": "cultural-scene",
+      "key": "themes-hero",
+      "path": "/themes",
+      "surface": "The opening of the themes index — a wide editorial image beside the headline.",
+      "min_width": 2000,
+      "orientation": "landscape",
+      "min_aspect": 1.3,
+      "max_aspect": 2.1,
+      "note": "A way of SEEING Europe rather than a place in it: a reader looking at something old, a hand on a stone, a room full of people who came for the same reason. Never a landmark portrait and never a map — the page's whole argument is that a theme crosses borders, so a picture of one border is the opposite of it.",
+      "container": {
+        "selector": ".iheroart.shot",
+        "min_aspect": 1.333,
+        "min_at": "980x640",
+        "max_aspect": 1.5,
+        "max_at": "360x640"
+      },
+      "safe_area": {
+        "width": 0.635,
+        "height": 0.867,
+        "frame": 0.55
+      }
+    },
+    "interests-hero": {
+      "role": "human-life",
+      "key": "interests-hero",
+      "path": "/interests",
+      "surface": "The opening of the interests index — a wide editorial image beside the headline.",
+      "min_width": 2000,
+      "orientation": "landscape",
+      "min_aspect": 1.3,
+      "max_aspect": 2.1,
+      "note": "Somebody travelling FOR something: walking, eating, listening, swimming. A person or their hands in the frame, because the seventeen tags on this page are reasons rather than places. Never an empty landscape, which is what every other index here already opens on.",
+      "container": {
+        "selector": ".iheroart.shot",
+        "min_aspect": 1.333,
+        "min_at": "980x640",
+        "max_aspect": 1.5,
+        "max_at": "360x640"
+      },
+      "safe_area": {
+        "width": 0.635,
+        "height": 0.867,
+        "frame": 0.55
+      }
     }
   },
   "$roles": "TWELVE ROLES, and a purpose instantiates one. A role is the vocabulary — what a picture of this kind is FOR, what must be in frame, what must survive the crop, and what disqualifies a candidate that passes every number. A purpose is an instance: one surface, one page, one register key. Roles are declared before photographs exist because that is this repository's standing rule for anything externally governed, and because an undirected slot is how a library fills up with pictures nobody chose. THREE ROLES HAVE NO PURPOSE TODAY and each says why: two carry a trigger naming the design decision that would create one, and accommodation is REFUSED outright with the reason. A role with neither is a dead motif wearing the clothes of vocabulary — the exact failure plate-variation.py exists to catch one family over. EVERY ROLE CARRIES ITS OWN SEARCH CONCEPTS, and that is what makes this a vocabulary rather than a list of sizes. A brief arrived proposing an eighteen-family photographic taxonomy — country signature, capital, natural landscape, architecture broken into Gothic and Baroque and Byzantine, food, people and local life, journey, transport, seasonal, quiet, night, aerial, detail, weather, regional identity — and read against this file it is THIS BLOCK with its search terms written out. Twelve roles already say what a picture of each kind is for, what must be in frame, what must survive the crop and what disqualifies a candidate that passes every number; what none of them said is what to TYPE. A second vocabulary beside this one would be a second answer to 'what kind of picture is this', which is the failure this repository has recorded four times in other forms. `{name}` is substituted with the surface's own subject, so a destination's concepts are that destination's and thirteen searches are one decision. NINE MORE ROLES ARRIVED WITH A TAXONOMY BRIEF AND NONE OF THEM HAS A PURPOSE. country-signature, capital-city, transport, seasonal, quiet-ground, night, aerial, atmosphere and regional-identity are declared because the vocabulary belongs before the surface — that is this file's standing rule and the reason `roles` exists at all — and every one of them carries a TRIGGER naming the container that would create a purpose for it. Two of those triggers are the largest families on this site with no photograph anywhere: fifty country pages and 129 region pages. A role with neither a purpose nor a trigger is a dead motif wearing the clothes of vocabulary, and checks.py refuses one.",
@@ -320,7 +366,8 @@
       "refuses": "A crowd photographed as a crowd. A staged 'traditional costume' set-up. Anything a tourist board commissioned.",
       "purposes_today": [
         "events-hero",
-        "theme-hero"
+        "theme-hero",
+        "themes-hero"
       ],
       "search": [
         "European festival",
@@ -387,7 +434,9 @@
       "crop": "Depends on the surface. No purpose instantiates this yet.",
       "brief": "This is the role most likely to produce a photograph that reads as stock, because the stock libraries are full of exactly this shot done badly. The test: could this person be anywhere in the world? If yes, it fails — the place must be doing as much work as the person.",
       "refuses": "A model release look. A back-of-head traveller gazing at a view. A couple laughing at a map.",
-      "purposes_today": [],
+      "purposes_today": [
+        "interests-hero"
+      ],
       "trigger": "A purpose exists for this the day a destination page grows a second image slot below its opening, which is a composition decision that has not been made. Declaring a slot for it sooner would put a hole on 319 pages — see docs/first-class-audit.md, Finding 3.",
       "search": [
         "locals walking street",

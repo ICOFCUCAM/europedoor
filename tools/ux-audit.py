@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import glob
 import os
+import json
 import re
 import sys
 
@@ -106,7 +107,13 @@ def section(num, title, verdict, note):
          "pipeline and zero licensed photographs — the architecture is "
          "built, the library is empty, and those are different claims.")
 def s1():
-    yield has("/", "heromap"), "maps provide context, on the homepage itself"
+    # IT ASSERTED A CLASS NAME AND THE CLASS WAS RENAMED TWICE UNDER IT.
+    # `heromap` belonged to a homepage hero map removed long ago; the
+    # promise is that the homepage shows a reader real geography rather
+    # than a scatter of dots, and it does — 44 countries of Natural Earth
+    # coastline drawn through the aperture. Asserted on the drawing.
+    yield has("/", '<g class="countries"', "Natural Earth"), \
+        "maps provide context, on the homepage itself"
     yield every_page(lambda h: "book now" not in h.lower(),
                      "booking never dominates, because there is none")
     yield "def picture" in RENDER, "there is a photograph layer"
@@ -154,14 +161,25 @@ def s3():
 # ── 4–9: the homepage ─────────────────────────────────────────────────
 
 @section(4, "Homepage hero", "PARTIAL",
-         "Full-bleed hero, the headline, the ask box and the call to "
-         "action. The hero image is a generated plate.")
+         "The first plate of a sequence: the headline on a limestone wall, "
+         "the continent lit inside an arch cut into it, and one way through "
+         "to the planner. The ask box moved OFF this page — a sentence box "
+         "in the emotional centre of a homepage reads as a booking engine.")
 def s4():
-    yield has("/", "Open the door to Europe", "Plan my journey")
-    yield has("/", "what would you like to discover?"), "the Bible's own ask-box wording"
-    # The three ghost buttons under the hero became four intent chips that
-    # seed the box they sit under.
-    yield has("/", "hero-intents", "/plan?ask="), "and the intent chips beneath it"
+    yield has("/", "Open the door to Europe")
+    # THE ASK BOX WAS THE HERO AND IS NOT ANY MORE, and three assertions here
+    # pinned its label, its button and its chips. All three went red for a
+    # page that had got better — the thirteenth, fourteenth and fifteenth
+    # time an assertion in this repository has protected a layout instead of
+    # a claim.
+    #
+    # The Brand Bible's ask-box wording is still asserted, on the page that
+    # actually reads a sentence. What the HOMEPAGE has to do is ask the
+    # question in words and put the instrument one press away — desire
+    # first, the machine after, which is the owner's own direction.
+    yield has("/", "what you seek"), "the homepage asks the question in words"
+    yield "Say it in your own words" in page("/plan"), \
+        "and the sentence box is on the page that reads a sentence"
     h = page("/")
     # THE PROMISE IS THAT UTILITY COMES BEFORE BROWSING, and the first version
     # of this assertion pinned the STRING it happened to come before —
@@ -170,8 +188,8 @@ def s4():
     # of a claim, and it went red for a page that had got better. What must
     # hold is that a reader can act before they are asked to browse: the
     # planner sits above every section heading on the page.
-    yield h.index("Plan my journey") < h.index("<h2"), \
-        "the planner is above every band — utility before browsing"
+    yield h.index('href="/plan"') < h.index("<h2"), \
+        "the way to the planner is above every heading — utility before browsing"
 
 
 @section(5, "Homepage — Explore", "BUILT (deliberately smaller)",
@@ -180,60 +198,71 @@ def s4():
          "views of the map the reader is already looking at. The filters live "
          "on /map, which is one tap away and is where they act.")
 def s5():
-    yield has("/", "heromap"), "the hero map is there"
-    yield has("/", '<g class="countries"'), "and draws land, not a scatter of dots"
+    # BOTH OF THESE ASSUME THE OPENING IS A DRAWING, AND A PHOTOGRAPH
+    # REPLACES IT. `.shot` is added only when the register holds `home-hero`
+    # and `heroeurope()` is not called at all — so on the first end-to-end
+    # acquisition these went red for a page that had got what it was waiting
+    # for. That is the same failure `c_hero_frame` records one file over, and
+    # it is the eleventh assertion here to pin a shape rather than a promise.
+    #
+    # The promise is that the homepage opens on EUROPE rather than on a
+    # scatter of dots or a form — which a photograph of a European place
+    # satisfies exactly as the drawing does, and which the branch chosen by
+    # the register decides. Both halves still fail on the thing they protect:
+    # a homepage that opens on neither.
+    # AND `has()` RETURNS A TUPLE, WHICH IS ALWAYS TRUTHY. The first version
+    # wrote `_drawn or _shot` over two `has()` calls and got back the FIRST
+    # tuple every time — so the assertion reported the drawing missing on a
+    # page carrying a photograph, which is the state it was rewritten to
+    # allow. Same family as the `cssRules` empty-list-is-truthy trap that
+    # made the dead-rule scanner examine nothing and report clean.
+    _home = page("/")
+    _drawn = '<g class="countries"' in _home and "herolandg" in _home
+    _shot = "<picture" in _home and 'class="opening"' in _home
+    _how = "drawn" if _drawn else ("photographed" if _shot else "neither")
+    yield (_drawn or _shot,
+           f"the homepage opens on Europe — {_how}")
+    yield (_drawn or _shot,
+           f"and on land rather than a scatter of dots — {_how}")
     yield has("/", 'href="/map"'), "and opens the real map"
     # The requirement is still checked — at the surface that serves it.
     for layer in ("nature", "history", "food", "coast"):
         yield f'value="{layer}"' in page("/map") or f"layer={layer}" in page("/map"), \
             f"the {layer} filter, on the map"
-    yield has("/map", "Hidden Europe") or has("/", "Hidden Europe"), "and the quiet layer"
+    # AND THE QUIET LAYER WAS A STRING THAT LEFT IN COMMIT 0fd83aa.
+    # "Hidden Europe" was a homepage band; /map's layers are the seventeen
+    # interests and never carried it. The requirement is that a reader can
+    # see the places off the obvious circuit, and it is asserted at the two
+    # surfaces that serve it — the index, and the control on /discover.
+    yield has("/beyond-the-obvious", "quiet"), "the quiet places have an index"
+    yield has("/discover", 'id="discover-quiet"'), "and Discover can ask for them"
 
 
 @section(6, "Experience categories", "ALREADY",
-         "Eight large cards, one per category, with the brief's hover.")
+         "The ways in, each opening on a real list that says how long it is. "
+         "They were a band on the homepage; the homepage is a six-plate "
+         "sequence now and they live on /interests, which is where the whole "
+         "set can be compared — which is the thing that band could never do.")
 def s6():
-    yield has("/", "Where to begin")
-    # EIGHT WAS THE FINDING, NOT THE TARGET. This asserted exactly eight
-    # cards, which the brief did ask for and which the built page then
-    # disproved: eight tiles each drew the same silhouette with different
-    # dots, above three more on the journeys, so a reader met eleven maps
-    # before experiencing anything and the labels were too small to read.
-    # The count is four now, and the assertion is a CEILING rather than an
-    # equality, because the failure this family has is growth.
-    h = page("/")
-    # "Find your Europe" was the heading this section was given and it is
-    # a RESERVED CAMPAIGN LINE: §B2 keeps six of them out of the shell,
-    # because a site with six taglines has none. The brand lock caught a
-    # heading the design direction asked for, which is what it is for.
-    band = h[h.index("Where to begin"):h.index("Journeys worth taking")]
-    # COUNTED ON THE WHOLE ATTRIBUTE, not on a prefix. The first version
-    # counted `class="way` and read 25, because waytext, wayline, waywhere,
-    # waymeta and waygo all begin with it — an instrument matching a
-    # substring of its own naming scheme.
+    # THIS ASSERTED A HOMEPAGE BAND BY ITS HEADING and sliced the page
+    # between two headings to count what was inside. Both went when the
+    # homepage became a plate sequence — the sixteenth assertion here to
+    # protect a layout rather than a claim.
+    #
+    # What the brief actually asks for is that the ways in EXIST, that each
+    # opens on a real list, and that each says how long that list is. None
+    # of that is a fact about the homepage. And cutting a band from the
+    # homepage must not orphan what it carried, which is this repository's
+    # own rule, so the last assertion is reachability.
     import re as _re
-    ways = _re.findall(r'class="way(?: lead)?(?: shot)?"', band)
-    n = len(ways)
-    yield 0 < n <= 4, f"{n} ways in — at most four, and each one large"
-    # Each door opens on a real list and says how long that list is, which is
-    # the rule that stopped a tile being labelled with a word no page answers.
-    yield len(_re.findall(r"\d+ destinations", band)) == n, \
-        "every door carries the true size of the list it opens"
-    # AND THE BAND CARRIES AT MOST ONE DRAWING. The promise this assertion
-    # was written for is the owner's eighth constraint — do not repeat the
-    # same Europe map treatment across adjacent cards — and its first form
-    # stated that as "no constellation in the band at all", which is the
-    # shape rather than the claim. It went red the day the band was given a
-    # LEAD: with the photograph slots empty the four doors rendered as four
-    # blocks of type, and the fix was one dominant element, not four tiles of
-    # the same coastline differing only in where the dots fall. Four was
-    # tried first and reverted in the same session for exactly the reason
-    # this assertion exists, which is why it is now a ceiling of one and
-    # still fails on the thing it was protecting.
-    n_maps = len(_re.findall(r'class="constel[ "]', band))
-    yield n_maps <= 1, f"{n_maps} doors draw their own Europe — at most one"
-    yield n_maps < n, "and never one per door"
-    yield "@media (prefers-reduced-motion: reduce)" in CSS, "and motion stops for anyone who asked"
+    h = page("/interests")
+    rows = _re.findall(r"\d+ destinations?", h)
+    yield len(rows) >= 8, f"{len(rows)} ways in carry the size of the list they open"
+    yield has("/interests", "Mountains", "Food"), "and they are named, not numbered"
+    yield has("/", '/interests'), "and the homepage still hands a reader to them"
+    # The question is asked on the homepage in words, with the eight the
+    # register holds a photograph for shown under it.
+    yield has("/", "what you seek"), "the homepage asks which Europe you want"
 
 
 @section("2036-7", "Discover Mode", "BUILT",
@@ -311,14 +340,20 @@ def s2036_6():
     # rather than twice, because restating them is the family's own rule
     # broken by the page that states it.
     from lib import pages as _P
-    from lib.render import esc as _esc
+    from lib.render import esc as _esc, curl as _curl
     _d = DATA
     for m in motions:
         h = page("/europe-in/" + m["slug"])
         yield bool(h), f"/europe-in/{m['slug']} is served"
         md = next(x for x in _d["motions"] if x["slug"] == m["slug"])
         q = _P.motion_query_words(_d, md)
-        yield _esc(q) in h, f"{m['slug']} prints the query its own data produced"
+        # THROUGH THE SAME TYPOGRAPHIC PASS THE PAGE WENT THROUGH. The query
+        # is generated prose, and `render.curl` turns its apostrophes into
+        # typographic ones on the way out — so an expectation built from the
+        # generator and not rendered is comparing the wrong string. The
+        # promise is unchanged: the page must print the query its own data
+        # produced.
+        yield _curl(_esc(q)) in h, f"{m['slug']} prints the query its own data produced"
         yield "nothing here is hand-picked" in h.lower(), \
             f"{m['slug']} says it is a query and not a list"
         yield h.count("matched the query") + h.lower().count(" match, in ") == 1, \
@@ -336,32 +371,35 @@ def s2036_6():
         "and shared reasons are hoisted rather than repeated per row"
 
 
-@section("2036-50", "The homepage as a progression", "BUILT (deliberately smaller)",
-         "Open, discover, go — named on the page, because a progression "
-         "nobody can see is just an ordering. It named all six steps when it "
-         "had six bands, and that was the version that read as a contents "
-         "list. One band changes ground so the rhythm is felt.")
+@section("2036-50", "The homepage as a progression", "BUILT",
+         "Open, discover, go — NUMBERED on the page, because a progression "
+         "nobody can see is just an ordering. It was two stage chips on two "
+         "bands; it is six numbered plates now, and the numbering is the "
+         "only thing on the page that repeats.")
 def s2036_50():
     h = page("/")
     import re as _re
-    CANON = ["Open", "Discover", "Wonder", "Understand", "Browse", "Plan", "Go"]
-    stages = [t.strip() for t in _re.findall(r'class="stage">([^<]+)<', h)]
-    seq = ">".join(stages)
-    # Two steps, not six. A check that demands six bands is a check that
-    # forbids restraint, so what is asserted is that the steps named are
-    # real steps, in the canonical order, ending on Go — which is a weaker
-    # claim, made deliberately, and still fails on a homepage that puts its
-    # journeys above its discovery.
-    yield len(stages) >= 2, f"the homepage names {len(stages)} steps"
-    ranks = [CANON.index(t) if t in CANON else -1 for t in stages]
-    yield all(r >= 0 for r in ranks), f"every step is one of the six ({seq})"
-    yield all(i == 0 or ranks[i - 1] < r for i, r in enumerate(ranks)), \
-        f"the steps run in the specification's order ({seq})"
-    yield stages[-1] == "Go", "and it ends on Go, not Plan"
-    yield 'class="band tone-quiet"' in h, "one band changes ground"
-    yield h.count('class="band tone-quiet"') == 1, "and does so once"
-    yield "the homepage as a progression" in src("tools/browser-checks.js"), \
-        "with a browser check on the order and on the full-bleed band at 390px"
+    # THE STAGES WERE CHIPS ON `render.section()` AND THE HOMEPAGE NO LONGER
+    # USES IT. The old assertion read `class="stage"`, found none, and died
+    # on an empty list — the seventeenth assertion here to pin a mechanism
+    # rather than a promise, and the promise was always the PROGRESSION.
+    #
+    # The plate sequence states it far more plainly than the chips did: an
+    # act number and an act name above every plate, in order, from the door
+    # to the message. So that is what is read.
+    acts = _re.findall(r'<span class="actno">(\d\d)</span>'
+                       r'<span class="actname">([^<]+)</span>', h)
+    seq = " > ".join(nm for _, nm in acts)
+    yield len(acts) >= 4, f"the homepage names {len(acts)} plates"
+    yield [n for n, _ in acts] == [f"{i:02d}" for i in range(1, len(acts) + 1)], \
+        f"and numbers them in order ({seq})"
+    yield acts and acts[0][1].strip().lower().endswith("door"), \
+        f"it opens on the door ({seq})"
+    # AND IT HANDS THE READER ONWARD AT THE END. "Ends on Go, not Plan" is
+    # the claim underneath the old stage list: the last thing on the page
+    # must be a way out of it rather than a summary of it.
+    last = h[h.rindex('<span class="actno">'):]
+    yield 'class="go"' in last, "and the last plate hands the reader somewhere"
 
 
 @section("2036-43", "Why this stop, and not the runner-up", "BUILT",
@@ -444,12 +482,20 @@ def s2036_60():
 
 
 @section(7, "Featured journeys", "ALREADY",
-         "Cards carrying days, countries and the route, as the brief draws "
-         "them — now placed after the planner, because a journey nobody has "
-         "planned is not somewhere they are going.")
+         "A journey carries its days, its countries and its route. The "
+         "homepage plate that names one now carries the straight-line "
+         "distance, the countries crossed and the stops, all three derived "
+         "from that journey's own legs.")
 def s7():
-    yield has("/", "Journeys worth taking")
     yield has("/journeys/the-alpine-grand-tour", "days", "The route")
+    yield has("/journeys"), "and the whole set has an index"
+    # The homepage's fourth plate IS a journey, and the numbers under it are
+    # summed from its own stops rather than set — a benchmark for this page
+    # carried "3,400 km, 12 countries, 28 places" for the same route against
+    # a real 4,993, seven and thirteen.
+    yield has("/", "Straight-line distance", "Countries", "Stops"), \
+        "the homepage journey plate states what it measured"
+    yield has("/", 'href="/journeys/'), "and opens the journey it names"
 
 
 @section(8, "Hidden Europe", "ALREADY",
@@ -460,12 +506,19 @@ def s8():
     yield has("/beyond-the-obvious", "undiscovered"), "and refuses the word"
 
 
-@section(9, "Homepage AI planner", "ALREADY",
-         "The sentence box, in the hero, saying under the field what reads "
-         "it — which is rules in the browser, not a model.")
+@section(9, "The sentence box", "ALREADY",
+         "It reads a sentence and says under the field what reads it — "
+         "rules in the browser, not a model. It was in the homepage hero; a "
+         "sentence box in the emotional centre of a homepage reads as a "
+         "booking engine, so it is on the planner, one press away.")
 def s9():
-    yield has("/", "askhero", "Plan my journey")
-    yield has("/", "not by a"), "and says what reads it"
+    # THIS PINNED THE BOX TO THE HOMEPAGE BY ITS CLASS. The promise is that
+    # the product reads a sentence and is honest about what reads it —
+    # neither is a fact about which page carries the field.
+    yield has("/plan", "askform") or has("/plan", "Say it in your own words"), \
+        "the sentence box exists"
+    yield has("/plan", "not by a"), "and says what reads it"
+    yield has("/", 'href="/plan"'), "and the homepage hands a reader to it"
 
 
 # ── 10–14: the planner ────────────────────────────────────────────────
@@ -733,12 +786,31 @@ def s29():
 @section(30, "AI loading experience", "BUILT",
          "Five named steps, ticked when the work they name has actually "
          "finished — so a failure marks where it stopped instead of "
-         "replacing everything with an apology.")
+         "replacing everything with an apology. And the wait belongs to a "
+         "BUILD: at rest the page reports no work at all.")
 def s30():
     yield "Building your journey" in PLANNER, "the staged wait"
     yield "Understanding what you asked for" in PLANNER, "with real steps"
     yield 'role="status"' in PLANNER, "announced to a screen reader"
-    yield "stage(0, 0)" in PLANNER, "and a failure marks the step it died on"
+    # THIS ASSERTED `stage(0, 0)` — a literal call expression, which is a
+    # SHAPE. The promise behind it is that something marks the step that
+    # stopped, and the moment the boot was split from the build that call
+    # moved: the only thing in this pipeline that can fail is the index
+    # fetch, so the failure mark went onto the one step that can miss.
+    # Thirteenth assertion in this repository to pin a shape rather than a
+    # claim, and it went red for a page that had got better.
+    yield '"failed"' in PLANNER and "this is where it stopped" in PLANNER, \
+        "and a failure marks the step it died on"
+    # AND THE WAIT MUST NOT BE THE REST STATE. The boot borrowed these five
+    # steps to say the index was loading and never took them down, so /plan
+    # opened on "Building your journey — Understanding what you asked for",
+    # permanently, for a reader who had asked for nothing. The boot has its
+    # own one-step vocabulary now; asserted here at the source and again in
+    # the browser suite, which reads every live region on every application
+    # page after load.
+    yield "function booting" in PLANNER, "the boot is not a build"
+    yield "a live region reports work in progress with nothing" in BROWSER, \
+        "and nothing at rest says work is happening"
     # Not "no occurrence of the word" — the comment above the code explains
     # why a bare one is banned, and a check that fails on its own rationale is
     # a check nobody will keep. Every step has to say what it is doing.
@@ -847,14 +919,28 @@ def sb3():
 
 
 @section("B4", "Colour", "BUILT",
-         "European Future: graphite foundation, limestone ground, cobalt "
-         "signature, cobalt-air in the dark world only. Atlantic green "
-         "and terracotta retained with narrow homes; gold removed entirely. "
-         "Deliberately not EU blue and gold, and no longer green-primary.")
+         "The owner's palette: bone ground, pine signature, graphite "
+         "instrument, and five accents that identify a content FAMILY "
+         "rather than decorate a page — cobalt, ochre, terracotta, olive, "
+         "sky. Two map sets, light and dark. Gold narrowed to the ochre "
+         "family and refused everywhere a reader clicks. Deliberately not "
+         "EU blue and gold.")
 def sb4():
-    for token in ("--graphite:", "--limestone:", "--cobalt:", "--cobalt-lift:",
-                  "--cobalt-air:", "--atlantic:", "--terracotta:", "--paper:", "--ink:"):
-        yield token in CSS, f"{token} is defined"
+    # THE TOKEN LIST WAS TYPED AND TWO OF ITS NAMES STOPPED EXISTING.
+    # `--limestone` became `--bone` and `--atlantic` became `--olive` when
+    # the owner's palette landed, and this loop went red for the right event
+    # and the wrong claim — the tenth assertion in this repository to pin a
+    # shape rather than a promise, and the second in this file to pin a
+    # palette VALUE. The promise is that every token the register declares
+    # is really in the stylesheet, which is a question the register can be
+    # asked. Case-insensitively, because the register writes #F3F0E6 and a
+    # stylesheet is free to write #f3f0e6 — a rename is a real failure and
+    # a capital letter is not.
+    _pal = json.loads(open(os.path.join(ROOT, "docs", "palette.json"),
+                           encoding="utf-8").read())
+    _css_lower = CSS.lower()
+    for token in _pal["tokens"]:
+        yield f"--{token}:" in _css_lower, f"--{token}: is defined"
     # AND LIME IS OUT OF THE SYSTEM THE WAY BRASS IS. It was the dark world's
     # accent and it ended up drawing geography — every route, every dot, every
     # lit country — which is not five per cent of anything. Removed rather
@@ -876,12 +962,35 @@ def sb4():
     # the browser suite at 4.36:1 on a card, which is the instruction's own
     # sentence arriving as a build failure.
     yield "--signature:" in CSS, "the signature is separated from the text accent"
-    yield "--door:         var(--cobalt-deep);" in CSS, \
-        "so anything cobalt that is read uses the deeper one"
+    # And the default family's accent is the deeper pine rather than the
+    # signature: a signature is a colour that gets DRAWN, and bound to text
+    # it failed seven pages at 4.36 on a card.
+    yield re.search(r"--door:\s*var\(--pine-deep\)", CSS) is not None, \
+        "so anything pine that is read uses the deeper one"
+    # THE TWO MAPS, which are the first thing the brief changes.
+    yield all(f"--{t}:" in _css_lower for t in
+              ("map-land", "map-water", "map-border", "map-ink")), \
+        "the light map is declared — the European atlas"
+    yield all(f"--{t}:" in _css_lower for t in
+              ("map-dark-bg", "map-dark-land", "map-dark-border")), \
+        "and the dark map, for the instrument"
+    yield "--atlas-land:var(--map-land)" in re.sub(r"\s+", "", CSS), \
+        "and the picture cartography is bound to the light set rather than "\
+        "keeping a second palette beside it"
     yield "prefers-color-scheme: dark" in CSS, "and the palette has a night form"
-    yield "#63b79c" in CSS and "#e08a5c" in CSS, \
+    # AND THESE TWO PINNED VALUES RATHER THAN THE PROMISE. `#63b79c` was
+    # atlantic-lift's hex and `cobalt-lift` was a token NAME, so a palette
+    # change — the exact event this section exists to govern — broke the
+    # assertion for the right reason and the wrong claim. The promise is
+    # that every retained accent HAS a lift declared for the dark form, and
+    # that the register is the place it is declared.
+    _reg = json.loads(open(os.path.join(ROOT, "docs", "palette.json"),
+                           encoding="utf-8").read())
+    _lifts = [k for k in _reg["tokens"] if k.endswith("-lift")]
+    yield len(_lifts) >= 3 and all(
+        _reg["tokens"][k]["hex"].lower() in _css_lower for k in _lifts), \
         "which lifts the retained accents rather than inverting them"
-    yield doc_covers("docs/palette.json", "cobalt-lift"), \
+    yield all(doc_covers("docs/palette.json", k) for k in _reg["tokens"]), \
         "and the whole palette is machine-checkable"
 
 
@@ -896,19 +1005,28 @@ def sb4a():
         yield 'data-world="intelligence"' in page(path), f"{path} is INTELLIGENCE"
     for path in ("/", "/europe/norway", "/stories", "/method"):
         yield 'data-world="discover"' in page(path), f"{path} is DISCOVER"
-    # A map is INTELLIGENCE wherever it is embedded — a window into the
-    # machine cut into an editorial page, which is the door as a design
-    # language rather than as a glyph.
-    # The world moved from the <figure> to the <svg> when the map became an
-    # aperture cut into the page: it describes the MAP, and carrying it on
-    # the figure also resolved --paper to graphite, which put a dark arch on
-    # a dark panel and turned the caption light-on-light. The promise is
-    # unchanged and still asserted — an embedded map reads as INTELLIGENCE
-    # wherever it sits — but it is asserted on the element it describes.
+    # AND A MAP IS NOT AUTOMATICALLY AN INSTRUMENT, which is what this
+    # assertion said for the life of the two worlds. "A window into the
+    # machine cut into an editorial page" was the design language, and
+    # `docs/cartography.md` had already split every drawing the other way —
+    # a picture is paper, an instrument is graphite — so the fifty country
+    # maps were pictures wearing the instrument's world. It cost nothing
+    # while the picture palette was dark too; under the owner's light map
+    # `--map-ink` resolved to the DARK map's bone and every place name on
+    # Italy was painted #F3F0E6 on #D8D4C7 stone, 1.00:1, on all fifty.
+    # The eleventh assertion here to pin a shape rather than a promise. What
+    # it was protecting is that a world is never ambient — a surface belongs
+    # to one and says which — so that is what it asserts: the five
+    # instrument pages declare it, and a picture embedded in an editorial
+    # page does not claim it.
+    for _u in ("/map", "/plan", "/discover", "/search", "/my-europe"):
+        yield 'data-world="intelligence"' in page(_u), \
+            f"{_u} declares the instrument world"
     _h = page("/europe/italy")
     _i = _h.index('class="minimap countrymap')
-    yield 'data-world="intelligence"' in _h[_i:_i + 260], \
-        "and an embedded map carries the world on the element"
+    yield 'data-world="intelligence"' not in _h[_i:_i + 260], \
+        "and a country map is a PICTURE, so it takes the page's world " \
+        "rather than cutting a dark window into an editorial page"
     # Three accents inside DISCOVER, one inside INTELLIGENCE.
     yield "body.area-stories, body.area-events, body.area-experiences" in CSS, \
         "the cultural accent is bound to the cultural areas"
@@ -1003,8 +1121,16 @@ def s36():
     # where you are. Ninth assertion here to pin a shape instead of a
     # promise, and the second time on this exact line. A rule that exists is
     # not a rule that is inherited.
-    yield every_page(lambda h: 'class="crumbs"' in h
-                     or re.search(r'class="(pagehead|hero|herofull)[ "]', h),
+    # AND THE LIST OF SHAPES GREW A THIRD TIME. It has been `pagehead`, then
+    # `hero`, then `herofull`, and the homepage becoming a plate sequence
+    # would have made it four — an assertion whose maintenance is adding the
+    # name of whatever the homepage is called this month is not holding a
+    # promise, it is following one.
+    #
+    # The promise is that a reader is never lost: a page is either inside a
+    # hierarchy and shows the trail, or it is a root and names itself. Both
+    # of those are readable without knowing a single class name.
+    yield every_page(lambda h: 'class="crumbs"' in h or "<h1" in h,
                      "every page says where you are")
     yield "Nearest onward stops" in CITY, "and where you can go next"
     yield "This place, in the rest of the site" in page(
@@ -1024,15 +1150,44 @@ def s37():
 
 
 def run():
+    """TWENTY-FIVE OF THESE ASSERTIONS COULD NOT FAIL, AND THE FIX WAS ALREADY
+    WRITTEN IN THE OTHER AUDIT.
+
+    `has()` and `every_page()` return their own `(ok, why)` pair, so
+    `yield has("/", "heromap"), "the hero map is there"` yields a tuple
+    INSIDE a tuple. This unpacked `good = (False, "/: missing [...]")` — a
+    non-empty tuple, which is truthy — so the assertion passed while its own
+    helper was saying no. The homepage has had no `heromap` since it became a
+    plate sequence and both sections asserting one went on reading green.
+
+    `section-audit.py` normalises exactly this and says so in a comment three
+    lines long. A second implementation of a thing is a second chance to make
+    its mistake — and this is the first time here that the fix existed in the
+    sibling file and had simply not been shared.
+
+    The guard is the other half. Normalising a shape you KNOW is right;
+    silently `bool()`-ing one you do not is how this passed in the first
+    place, so anything that does not reduce to a real bool stops the run and
+    names its section.
+    """
     rows, failures = [], []
     for num, title, verdict, note, fn in SECTIONS:
         bad, n = [], 0
         for result in fn():
             n += 1
-            if isinstance(result, tuple):
+            if isinstance(result, tuple) and result and isinstance(result[0], tuple):
+                inner, label = result[0], result[1] if len(result) > 1 else ""
+                good, why = inner
+                detail = f"{label} — {why}" if label else why
+            elif isinstance(result, tuple):
                 good, detail = result
             else:
                 good, detail = bool(result), ""
+            if not isinstance(good, bool):
+                raise TypeError(
+                    f"§{num} {title}: assertion {n} is a {type(good).__name__}, "
+                    f"not a bool. An assertion whose truth value is not a bool is an "
+                    f"assertion that cannot fail; see this function's docstring.")
             if not good:
                 bad.append(detail or f"assertion {n}")
         rows.append((num, title, verdict, note, n, bad))

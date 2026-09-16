@@ -13,17 +13,30 @@ solvable by more code.
 
 ## 1. What is built and holds
 
-Seven suites, all green, run on every commit:
+Eleven suites, all green, run on every commit. **NO TOTALS HERE, AND THAT IS
+THE SECOND VERSION OF THIS TABLE.** The first carried one per row — 72 static
+checks, 905 browser assertions, 74 on the acquisition pipeline — and by the
+time anybody read them they were 103, about 1,790, and 157, with four suites
+missing from the list entirely. `CLAUDE.md`'s own gate list made this
+decision already, in as many words: *no counts here on purpose, every total
+here grew during a single session, and this list spent weeks understating the
+static and browser suites by a wide margin while looking authoritative.* Each
+command prints its own total; a document that copies one is a document that
+is wrong within a week.
 
 | suite | what it holds |
 |---|---|
-| `checks.py` | 72 static checks, ~128,000 things examined |
-| `browser-checks.js` | 905 assertions in Chromium, including contrast and target size |
-| `section-audit.py` | 1,366 assertions against the two specifications |
-| `ux-audit.py` | 374 assertions against the design brief and the Brand Bible |
-| `invariants.py` | 28 things a visual change may not move silently |
-| `plate-variation.py` | 7 motif families, none more alike than recorded |
-| `photo-tests.py` | 74 checks on the acquisition pipeline, against a stub provider |
+| `checks.py` | the static checks: the data, the shipped HTML, the licences, the palette |
+| `browser-checks.js` | Chromium: contrast, target size, focus, the painted pixel, and no family scrolling sideways |
+| `section-audit.py` | every spec section asserted against the real build |
+| `ux-audit.py` | the design brief and the Brand Bible |
+| `invariants.py` | what a visual change may not move silently |
+| `plate-variation.py` | the motif families, none more alike than recorded |
+| `photo-tests.py` | the acquisition pipeline and its batch loop, against a stub provider |
+| `desk-tests.py` | the local Media Desk: the sign-in, and what the browser may send |
+| `hosted-desk-tests.js` | the hosted desk: signed sessions, signed thumbnails, the dispatch |
+| `desk-render.js` | the hosted desk's screens and its basket, at 1280 and 390 |
+| `build.py check` | the validator, which refuses a record before any of the above runs |
 
 One page shell. One stylesheet. Eleven primitives. Zero webfonts, zero inline
 styles, zero `<img>` tags outside the register, zero third-party requests. A
@@ -34,7 +47,7 @@ the pages are built so it can.
 
 | gap | measured before | now |
 |---|---|---|
-| Abstract plates on index families | 1,718 on 227 pages | 860 on 209 pages |
+| Abstract plates on index families | 1,718 on 227 pages | **none on any page** — see §3.4 |
 | The seventeen interest pages | 728 plates, list truncated at 60 | an opening drawing and the whole set as rows |
 | `/beyond-the-obvious` | 130 plates under its own map | rows |
 | `/fund` | 12 plates | rows |
@@ -85,20 +98,38 @@ be seeded, because a directory of businesses that have not claimed their
 entry is the thing this project refuses to publish. Stories and journeys are
 about a day of writing each and the honest position is that they are behind.
 
-### 3.4 Eight hundred and sixty plates remain — A DECISION, NOT A BUG
+### 3.4 CLOSED — no page draws an abstract plate any more
 
-| family | plates | pages | per page |
-|---|---:|---:|---:|
-| country and region pages | 699 | 180 | 3.9 |
-| month pages | 54 | 10 | 5.4 |
-| macro region pages | 50 | 9 | 5.6 |
-| motion pages | 45 | 9 | 5.0 |
+This section used to read *"eight hundred and sixty plates remain — a
+decision, not a bug"*, over a table of 699 on the country and region pages,
+54 on the months, 50 on the macros and 45 on the motions. Every one of those
+came off, one family at a time, each with its own measurement written where
+the change was made: the homepage's eleven in a column, the seventeen
+interest pages' forty-three, the stories index, `/journeys`, `/europe-in`,
+`/themes`, and finally the country pages, where the six destination cards
+were 207 cards drawing 146 motifs and **France drew five skylines out of
+six**.
 
-None of these is a wall. Four cards in a grid of like things is the case a
-card was designed for, and the measured failure has always been density:
-eleven in a column on the homepage, forty-three on an interest page. **The
-line is drawn at density rather than at the plate**, and it moves the day
-photographs exist for destinations, not before.
+Measured on the built site: **189 `.card-art` elements, and every one of them
+is a map.** Zero abstract plates on any page.
+
+Two things follow, and both had gone unrecorded:
+
+- **`c_one_plate_per_thing` had stopped counting.** It read the shipped HTML
+  for a `.card-art` holding a plate, found none, and reported green — the
+  failure this repository already records about the browser suite, in its own
+  check suite. The promise is unchanged and its surface moved: a plate is
+  still drawn 785 times, on the social cards, and `assets/og/cards.json` maps
+  each content-addressed card to the seed it came from, so "one record, one
+  picture" is now checkable exactly rather than by comparing markup. It also
+  carries a floor on the pages, so *no page draws a plate* is a stated rule
+  rather than a thing that happens to be true.
+- **The plate system is now exclusively the social-card language.** That is a
+  defensible place for it and was never decided: a card is rendered inside
+  somebody else's product, where an illustration drawn from what the place is
+  beats no picture at all, and it is the one surface nobody here ever looks
+  at. `render.plate()` — the SVG renderer — has no live caller and is kept as
+  the reference the raster is checked against.
 
 ### 3.5 What is deliberately not built
 

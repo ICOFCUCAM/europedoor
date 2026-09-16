@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27;; style-src &#x27;self&#x27;; img-src &#x27;self&#x27; data:; font-src &#x27;self&#x27;; connect-src &#x27;self&#x27;; form-action &#x27;self&#x27;; base-uri &#x27;none&#x27;">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="theme-color" content="#3251da" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#2948d1" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F8F6EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07100F" media="(prefers-color-scheme: dark)">
 <title>Privacy · EuropeDoor</title>
 <meta name="description" content="EuropeDoor collects no personal data, sets no cookies and loads no third-party scripts. What that means, and what will change when accounts exist.">
 <link rel="canonical" href="https://europedoor.com/privacy">
@@ -16,10 +16,16 @@
 <meta property="og:url" content="https://europedoor.com/privacy">
 <meta property="og:site_name" content="EuropeDoor">
 
-<link rel="stylesheet" href="/assets/css/europedoor.055931e2ed.css">
+<link rel="stylesheet" href="/assets/css/europedoor.fb6229bd86.css">
 <link rel="icon" href="/assets/door.49fb8a56f2.svg" type="image/svg+xml">
+<!-- ON EVERY PAGE, NOT ONLY ON /stories. Feed discovery is a browser and
+     reader convention that looks at the document it is given, and a reader
+     who wants to follow this desk is as likely to be standing on a
+     destination page as on the index. One document, one feed, declared in
+     the one place that emits <head>. -->
+<link rel="alternate" type="application/atom+xml" href="/stories/feed.xml" title="EuropeDoor stories">
 </head>
-<body class="area-none" data-world="discover">
+<body class="ed-page ed-family-institutional area-none" data-family="institutional" data-world="discover">
 <a class="skip" href="#main">Skip to content</a>
 <header class="masthead">
   <div class="masthead-in">
@@ -55,11 +61,11 @@
     <h2>What we collect today: nothing</h2>
     <p>No account system, no sign-in, no email capture, no contact form, no comments. The
     Journey Planner runs in your browser and the plan is never sent anywhere. My Europe
-    stores your saved places in your own browser's local storage, which we cannot read.</p>
+    stores your saved places in your own browser&#8217;s local storage, which we cannot read.</p>
     <p>There is no third-party analytics script on this site, no advertising network, no
-    social tracking pixel, no embedded video, no web font loaded from someone else's server
+    social tracking pixel, no embedded video, no web font loaded from someone else&#8217;s server
     and no map tile provider. Every byte served comes from this domain. You can verify that
-    in your browser's network tab in about ten seconds, which is a better assurance than this
+    in your browser&#8217;s network tab in about ten seconds, which is a better assurance than this
     paragraph.</p>
 
     <h2>What a server necessarily sees</h2>
@@ -89,7 +95,7 @@
   </div>
   <aside class="rail">
     <h2 class="mini">Cookies</h2>
-    <p>This site sets none. Not a consent banner's worth, not one. <a href="/cookies">The
+    <p>This site sets none. Not a consent banner&#8217;s worth, not one. <a href="/cookies">The
     detail →</a></p>
     <h2 class="mini">Local storage</h2>
     <p>My Europe uses <code>localStorage</code> under this origin. It never leaves your

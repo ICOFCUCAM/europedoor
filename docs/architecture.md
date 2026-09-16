@@ -115,7 +115,7 @@ python3 tools/build.py check      validate data, render nothing
 python3 tools/build.py stats      what is in the dataset
 python3 tools/checks.py           23 checks, ~36,000 things examined
 node tools/browser-checks.js      320 checks in Chromium, incl. accessibility
-python3 tools/section-audit.py    the 99 spec sections, 1,080 assertions
+python3 tools/section-audit.py    every spec section, asserted against the build
 python3 tools/content-report.py   dataset coverage against the spec's targets
 ```
 

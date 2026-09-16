@@ -20,8 +20,8 @@
   --ink-2: #4a5158;
   --ink-3: #767d84;
   --rule: #e0ddd4;
-  --cobalt: #3157ff;
-  --cobalt-deep: #2440c8;
+  --pine: #3157ff;
+  --pine-deep: #2440c8;
   --terracotta: #a4491f;
   --atlantic: #1f5f4a;
   --radius: 4px;
@@ -48,10 +48,10 @@ body {
 h1, h2, h3 { font-family: var(--display); font-weight: 600; line-height: 1.15;
              margin: 0; letter-spacing: -0.01em; }
 p { margin: 0 0 var(--s3); }
-a { color: var(--cobalt-deep); }
+a { color: var(--pine-deep); }
 button { font: inherit; }
 
-:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--pine); outline-offset: 2px; }
 
 .lede { color: var(--ink-2); max-width: 42rem; }
 .hint { color: var(--ink-3); font-size: 13px; margin: var(--s2) 0 0; }
@@ -71,10 +71,10 @@ input, select {
   width: 100%; padding: .6rem .7rem; font: inherit; color: var(--ink);
   background: #fff; border: 1px solid var(--rule); border-radius: var(--radius);
 }
-input:focus, select:focus { border-color: var(--cobalt); }
+input:focus, select:focus { border-color: var(--pine); }
 .gate button[type=submit], .go {
   margin-top: var(--s4); padding: .6rem 1.1rem; border: 0; cursor: pointer;
-  border-radius: var(--radius); background: var(--cobalt-deep);
+  border-radius: var(--radius); background: var(--pine-deep);
   color: var(--limestone); font-weight: 600;
 }
 .gate button[type=submit] { width: 100%; }
@@ -117,7 +117,7 @@ input:focus, select:focus { border-color: var(--cobalt); }
 }
 .find button[type=submit] {
   padding: .6rem 1.2rem; border: 0; cursor: pointer; border-radius: var(--radius);
-  background: var(--cobalt-deep); color: var(--limestone); font-weight: 600;
+  background: var(--pine-deep); color: var(--limestone); font-weight: 600;
 }
 .needs { color: var(--ink-2); font-size: 13px; margin: var(--s4) 0 0;
          padding-top: var(--s3); border-top: 1px solid var(--rule); }

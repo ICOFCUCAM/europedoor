@@ -162,7 +162,7 @@ the migration re-toned an information architecture rather than replacing one.
 
 | surface | treatment |
 |---|---|
-| masthead | one, sticky, `color-mix` on `--paper` at 88% with a backdrop blur; exactly 1.0 per page across 1,072 |
+| masthead | one, sticky, `color-mix` on `--paper` at 88% with a backdrop blur; exactly 1.0 per page, on every page |
 | breadcrumbs | on 100% of pages, and every JSON-LD `BreadcrumbList` is checked against the visible one |
 | section nav | 319 destination pages; scrolls rather than wraps, asserted in Chromium |
 | bottom navigation | phone only, below 44rem; `--thumbbar` is its height and four other offsets derive from it |

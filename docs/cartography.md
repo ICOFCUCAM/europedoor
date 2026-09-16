@@ -11,7 +11,7 @@
 This matters more here than it would elsewhere, because the reference plate
 is **itself generated**: its coastline, its rivers, its region boundaries and
 its relief are an image model's idea of Portugal, not Portugal. Copying any
-of it would put invented geography on 1,033 pages under the same aperture
+of it would put invented geography on every page under the same aperture
 that carries the real thing, and a reader has no way to tell the two apart.
 
 What the reference is for: palette, the four-step water, the type hierarchy,
@@ -279,7 +279,7 @@ style comes in as a declaration of which class each layer paints through and
 knows nothing about geography.
 
 **Nothing in the renderer emits a colour.** A `style="…"` attribute anywhere
-would force `style-src` open on all 1,033 pages, which is why there is not one
+would force `style-src` open on every page, which is why there is not one
 in this repository. `checks.py` asserts the stylesheet carries a rule for
 every layer the renderer can draw, so a layer cannot be added and silently
 render as nothing — the failure this codebase has made three times on
@@ -307,7 +307,7 @@ fill while the two are one path.
 The stack is declared in `geo.LAYERS` and walked by `pages.plate_stack()`.
 Four of the fourteen have no data. **They are not stubs that draw something
 plausible**: a layer whose dataset is absent emits nothing at all, not even an
-empty group, because an empty `<g class="terrain">` on 1,033 pages is a claim
+empty group, because an empty `<g class="terrain">` on every page is a claim
 that the map has terrain and simply had none here. `terrain_paths()`,
 `hillshade_paths()` and `hydrology_paths()` exist, return nothing today, and
 **raise loudly** the moment their file appears without them being written.

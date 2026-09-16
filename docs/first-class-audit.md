@@ -64,31 +64,76 @@ so 699px of the screen is content. The figure below is the number of those
 
 | surface | first visual at | picture on the first screen |
 |---|---:|---:|
-| map | 418 | 53% |
-| homepage | 233 | 40% |
-| journey | 541 | 35% |
-| region | 563 | 32% |
-| quiet | 566 | 32% |
-| interest | 574 | 31% |
-| story | 545 | 30% |
-| country | 591 | 28% |
-| motion | 620 | 24% |
-| stories | 630 | 23% |
-| theme | 640 | 21% |
-| 404 | 655 | 19% |
-| themes | 663 | 18% |
-| events | 490 | 12% |
-| journeys | 742 | **7%** |
-| countries | 764 | **3%** |
-| **destination** | 795 | **0%** |
-| experiences | 807 | **0%** |
-| discover | 1702 | **0%** |
-| experience category | none on the page | **0%** |
-| plan · search · my-europe | none on the page | **0%** |
+| map | 418 | 56% |
+| country | 415 | 52% |
+| month | 433 | 50% |
+| my-europe | 478 | 48% |
+| macro | 459 | 48% |
+| fund project | 426 | 42% |
+| motion | 515 | 39% |
+| stories | 536 | 37% |
+| homepage | 233 | 37% |
+| quiet | 566 | 37% |
+| category | 230 | 36% |
+| europe-in | 549 | 36% |
+| interests | 549 | 36% |
+| subcategory | 259 | 36% |
+| themes | 541 | 36% |
+| story | 520 | 35% |
+| events | 490 | 34% |
+| place | 506 | 34% |
+| journey | 599 | 32% |
+| 404 | 358 | 32% |
+| countries | 488 | 32% |
+| interest | 390 | 32% |
+| journeys | 488 | 32% |
+| region | 462 | 30% |
+| destination | 443 | 28% |
+| theme | 159 | 27% |
+| discover | 649 | 26% |
+| experiences | none on the page | **0%** |
+| plan | none on the page | **0%** |
+| search | none on the page | **0%** |
 
-**Seven of twenty-three surfaces have no picture on the first screen at all,
-and five more have under a fifth of it.** Twelve of twenty-three — just over
-half — are effectively type to the fold.
+**RE-MEASURED, AND THE TABLE ABOVE IS THE CURRENT ONE.** It read seven of
+twenty-three surfaces with no picture on the first screen at all and five
+more under a fifth of it — twelve of twenty-three, just over half,
+effectively type to the fold. It is now **three of thirty with none, and none
+under a fifth**: `/plan` and `/search` are instruments whose opening is the
+control they exist to be, and `/experiences` carries a recorded refusal of a
+map that survives re-checking. The median share is 35.6%, against 24% when
+this was first measured.
+
+**AND THE TABLE GREW BY THREE BECAUSE THE INSTRUMENT HAD NEVER REACHED THEM.**
+`tools/lib/families.js` is the one list `opening.js` and `contact-sheet.js`
+both read, and it carried twenty-seven rendered families. Enumerated against
+the built site by page depth, three templates were missing — the month page
+under `/events` (12 pages), the sub-category page under an experience
+category (39) and a fund project page (12), 63 pages in all. In every one of
+the three the family's INDEX was on the list and the page it indexes was not,
+which is the shape of the omission: the index is the surface somebody names.
+A family's index and its leaf are different templates with different heads and
+different jobs, which is exactly why this list already carried an `interest`
+beside `interests` and a `theme` beside `themes`.
+
+Two of the three measured well on the first run — the month page is the
+second-strongest opening on the site at 50%, and the sub-category page 36%.
+**The third, a fund project page, had no figure anywhere on it at any
+width**: the register whose entire argument is that each entry is a real
+thing in a real place with a named local partner was the last DISCOVER
+surface opening on type alone. Nothing had ever photographed or measured it.
+*An instrument that cannot reach a family cannot find a defect in it.*
+
+It is answered. What the register holds about a place is its COUNTRY and no
+finer position, so that is what is drawn and nothing else: the project page
+opens on its own country at the country's own size, and the index on the nine
+lit together. **0% → 42%**, first visual at 426. And the index took the reach
+head rather than a fifth arch — a sea panel with nine countries lit is the
+glyph `/experiences/food` already draws, in a doorway, and this audit has
+already removed two openings for being a continent with a different number of
+marks on it.
+
+The original reading, kept because the measurement is the record:
 
 **A CORRECTION.** The first version of this table said twenty-one of
 twenty-two surfaces "show a visitor nothing but type", and that was wrong.
@@ -102,14 +147,19 @@ twenty-three, not twenty-one of twenty-two, and the right measure is how
 many pixels of the first screen are a picture rather than where the first
 one starts.
 
-The three that matter most:
+The three that mattered most, and what each of them is now:
 
-- **The destination page is 0%**, on 319 pages, and it is the richest family
-  in the product. Its first 795 pixels are a kicker, a 38px name, a lede, a
-  metadata line, three interest chips and three numbered reasons to go.
-- **The experience category page has no picture anywhere on it, at any
-  scroll position, at any width.**
-- **`/discover` reaches its first drawing at 1,702** — under a filter row.
+- **The destination page was 0%**, on 319 pages, and it is the richest
+  family in the product. Its first 795 pixels were a kicker, a 38px name, a
+  lede, a metadata line, three interest chips and three numbered reasons to
+  go. The view moved into the opening and the record moved after it: 443,
+  28%.
+- **The experience category page had no picture anywhere on it, at any
+  scroll position, at any width.** It draws its own reach now — the
+  countries its invitations are spread across, filled — at 230, 36%.
+- **`/discover` reached its first drawing at 1,702** under a filter row, and
+  the drawing did not exist below 1024px at all. It leads with the continent
+  now: 649, 26%.
 
 And the destination page's order is not the fault. Name, what the place is,
 why go, then where it is, is exactly the sequence the brief asks for — 
@@ -138,6 +188,48 @@ What the contact sheet adds is the half that measurement could not see:
 element that *is* on every one of them — the cobalt masthead — is the most
 repeated object in the product. One shell, one stylesheet and eleven
 primitives are an engineering achievement. They are not a design.
+
+**AND THE OTHER HALF OF THE CLAIM HAD NEVER BEEN MEASURED AT ALL.** The
+finding is about a COMPOSITION and everything above is about an h1: the
+sentence says the page is the same page, and the evidence only ever covered
+the first 250 pixels of it. `tools/composition.js` reads the rest — the
+ordered sequence of band shapes under the head, in the vocabulary the eleven
+primitives actually emit (rows, cards, figure, facts, list, note, a band of
+prose), with consecutive repeats collapsed because three `rows` bands and one
+are the same composition holding different amounts of content.
+
+**29 distinct body shapes over 47 families.** The clusters, largest first:
+
+| families | shape |
+|---:|---|
+| 8 | `HEAD rows` — experiences, journeys, stories, themes, interests, search, for businesses, tourism boards |
+| 5 | `HEAD list` — category, subcategory, about, accessibility, help |
+| 5 | `HEAD note list` — plan, contact, privacy, terms, cookies |
+| 3 | `HEAD rows note` — interest, europe-in, facet |
+| 2 | `HEAD figure rows note` — motion, quiet |
+| 2 | `HEAD figure note` — map, my-europe |
+| 1 each | the remaining 22 |
+
+The eight in the largest cluster are the families whose subject genuinely IS
+a list, plus two prose pages that are also lists. That is a shape doing its
+job, not a shape nobody chose. What the number says is that the claim as
+written — one composition, 1,033 times — is no longer true of the body, and
+the heads have gone with it:
+
+| | at 1280 |
+|---|---|
+| h1 sizes in use | 30 (instrument), 60 (index), 76 (overture) |
+| h1 top | 136–745 |
+| head height | 82–1018 |
+| share of the head's own width its content reaches | 60%–144% |
+
+Against the original reading of 60px at 150–312 on seventeen of twenty-two.
+The four heads at 60% are overtures with nothing beside the name, which is
+the role working as written; the four past 100% are carrying a drawing wider
+than the type. **This is a reported measurement and not a gate**, for the
+same reason `opening.js` is not one: a threshold on "distinct shapes" is a
+number to satisfy by shuffling bands, and the fault it exists to find is a
+page that is dull.
 
 ### Finding 3 — The homepage decays monotonically after the hero
 
@@ -343,18 +435,62 @@ Written as the work landed, so the audit and the record do not drift.
 | 20 | five sub-category pages selected on the wrong word | 39 wrong listings of 401; Monasteries 22 → 4 |
 | 21 | the country pages got an action, in the Stay layer's grammar | 50 pages with none → 44 hand-offs |
 | 22 | and building it found the planner could not be handed a name | 77 of 313 destinations unnameable → 0 |
+| 23 | an instrument for the first screen, so Finding 1 is re-measurable | measured once by hand → `tools/opening.js` |
+| 24 | an overture's name was an index label's size on nine families | h1 38px → 48 at 390 |
+| 25 | the country page's record moved after its portrait | first figure 591 → 415; 33.6% → 52% |
+| 26 | the country portrait never ran the phone collision pass | 32 overlapping label pairs on 18 of 50 plates → 0 |
+| 27 | the index opening's actions and note moved after the figure | countries 740 → 488; journeys 718 → 488 |
+| 28 | a page claimed its nine shapes were drawn to one frame | 10 viewBoxes → the sentence the drawing supports |
+| 29 | the kicker rule named two classes rather than the situation | 6 accent kickers inside a link on the homepage → 0 |
+| 30 | the motion index draws the answer each query produced | /europe-in 0% → 20%, then 36% |
+| 31 | half of every row on two indexes was empty in the middle | 49% and 48% interior gap → 3% |
+| 32 | one row shape for the three indexes that draw their set | two layouts → one |
+| 33 | the aperture check was sampling pixels outside its own shot | /events/oct 1.12:1 reported against a real 17.37 |
+| 34 | 213 of 319 destinations printed a word cut in half | `[:150]…` → `first_sentence()`, and a check on the shipped HTML |
+| 35 | all 129 region maps drew the identical window | 2,916 km on every one → 1,117 at the floor, 27 framed on their own |
+| 36 | the plates drew the fade the hero had measured away | 25 of 319 destinations dimmed past half → 6 |
+| 37 | the contact sheet named one family wrong and missed four | 23 of 27 covered → 34 pages in three sets, from one list |
+| 38 | 196 drawings were hidden on a phone behind a dead rule | region, macro and journey cards blank → drawn |
+| 39 | the record moved after the picture on the other two families | destination 574 → 443; region 585 → 438 |
+| 40 | the four doors rendered 3 + 1 between the two breakpoints | 30 grids measured, 1 with a mostly-empty last row → 0 |
+| 41 | the planner opened on a progress panel for work nobody asked for | 7 live regions at rest, 1 claiming work → 0 |
+| 42 | three templates the instruments had never reached | 27 families on the list → 30, and 63 pages that had never been measured |
+| 43 | the Fund family had no geography at all | project page 0% of the phone's first screen → 42% |
+| 44 | a place put its coordinates between the sentence and the view | desk 31.6% → 38.9%; first figure 634 → 572 |
+| 45 | Finding 2's other half, which had never been measured | one composition asserted → 29 body shapes over 47 families |
+| 46 | the editorial desk had no feed | nine dated essays, no way to follow them → /stories/feed.xml |
+| 47 | a check that had stopped counting, and a document 860 plates stale | 0 of 785 records examined → 785 |
+| 48 | the check that found Longyearbyen, blind since the atlas skin | 0 dots of 1,293 → 1,293 |
+| 49 | thirty-three pages never reached the head-role check | 1,001 heads of 1,034 → 1,033 |
+| 50 | a headline ran off the right edge of a phone, at the design width | /place +7px at 390, +77 at 320 → 0 at every width, on every family |
 
-**Finding 1, re-measured**: seven surfaces with no picture on the phone's
-first screen became six, and `/stories` and `/my-europe` both gained one.
+**Finding 1, re-measured three times**: seven surfaces with no picture on
+the phone's first screen became six, then three of twenty-seven, and now
+**three of thirty, with none under a fifth** — all three of them an
+instrument or a recorded refusal. The median share is 24% → 35.6%. The table
+grew by three because `tools/lib/families.js` had never carried a month
+page, a sub-category page or a fund project page, and the last of those was
+the find: no figure anywhere on it, at any width, on the register whose
+whole argument is that each entry is a real thing in a real place.
+`tools/opening.js` is the instrument, so this number can be checked in a
+minute rather than re-audited by hand.
 **Finding 2**: five families now open on something no other family does —
-`/experiences`, `/stories`, `/interests`, `/my-europe`, `/discover`.
+`/experiences`, `/stories`, `/interests`, `/my-europe`, `/discover` — and
+the other half of the finding, which is about the BODY and had never been
+measured at all, reads **29 distinct shapes over 47 families**, three h1
+sizes and head tops from 136 to 745. `tools/composition.js` is that
+instrument.
 **Finding 3**: the homepage's second screen is a strip rather than four
 holes, and the transition from the continent to the form has air in it.
+Measured band by band at 1280, the page is not monotonic: hero 91% ink,
+doors 99%, journeys 13%, stories 7%, close 5% — a loud opening, a loud
+second screen and three quiet bands, which is rhythm rather than decay.
 
 **Still open**, and each blocked on something that is not design work: the
-destination page has no photograph and its order is already correct; the
-experience category page has no picture anywhere and no honest source for
-one; `/plan` and `/search` are instruments and read as instruments.
+destination page has no photograph and its order is already correct;
+`/experiences` has no picture on its first screen and a recorded refusal of
+the only one it could draw; `/plan` and `/search` are instruments and read
+as instruments.
 
 **The experience category page was taken up and put down again, twice.** It
 is the family Part 3 records as reading like a tourism database, so the

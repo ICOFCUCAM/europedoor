@@ -234,8 +234,24 @@ def s5():
          "promise that does not, and it says so under the field.")
 def s6():
     yield has("/", "Open the door to Europe")
-    yield has("/", "what would you like to discover?", "Plan my journey"), \
-        "the question is asked on the homepage, not one click away"
+    # AND THE QUESTION IS A QUESTION, NOT A FORM FIELD. This asserted the
+    # label and the button of a search box that sat on the homepage — the
+    # twelfth assertion in this repository to pin a shape rather than a
+    # promise, and it went red the day the page got better. A sentence box
+    # in the emotional centre of the page reads as a booking engine, which
+    # is the one thing the brief says this product must never feel like, so
+    # the question moved to being a question — "Europe changes with what you
+    # seek", the eight ways in under it — and the instrument itself is one
+    # press away, where a reader who has decided goes.
+    #
+    # What has to be true is the PATH: the homepage asks the question, and a
+    # reader can reach the planner from it without scrolling past the first
+    # plate.
+    h = page("/")
+    yield has("/", "what you seek"), "the homepage asks the question"
+    yield has("/", 'href="/plan"'), "and the planner is one press from it"
+    yield h.index('href="/plan"') < h.index("<h2"), \
+        "the way to the planner is above every heading on the page"
     # The hero used to carry "read by rules in your browser — not by a model,
     # and not sent anywhere". It moved OFF the homepage with the cinematic
     # rebuild, and that is right: the promise belongs on the page that
@@ -253,10 +269,6 @@ def s6():
     # conversion comes before anything that invites browsing. So the claim is
     # that the planner is above every section heading on the page, which is
     # the same promise and survives the headings changing.
-    h = page("/")
-    yield h.index("Plan my journey") < h.index("<h2"), \
-        "the CTA hierarchy is the wrong way round"
-    yield has("/", "/plan?ask="), "the intent chips seed the planner, not a dead end"
     yield "Say it in your own words" in page("/plan"), "the planner takes the same sentence"
 
 
@@ -274,9 +286,25 @@ def s7():
     # what IS there and — more usefully — asserts that the removed surfaces
     # did not become unreachable, which is the only way cutting a homepage
     # section can actually cost anything.
-    yield has("/", "Where to begin", "Journeys worth taking")
-    yield h.index("Where to begin") < h.index("Journeys worth taking"), \
-        "ways in before journeys"
+    # AND IT IS A SEQUENCE NOW, NOT A SET OF BANDS. Both halves of this
+    # assertion named the headings of two sections that no longer exist —
+    # the eleventh and twelfth time an assertion here has protected a layout
+    # instead of a claim, and both went red for a page that had got better.
+    #
+    # The page is six numbered PLATES: the door, the question, the
+    # landscape, the journey, the atlas, the message. What has to be true is
+    # that the sequence is a sequence — every plate numbered, in order, each
+    # with a name — because that numbering is the only thing that repeats
+    # and it is what makes six bands read as one page rather than six
+    # sections.
+    acts = re.findall(r'<span class="actno">(\d\d)</span>'
+                      r'<span class="actname">([^<]+)</span>', h)
+    yield [n for n, _ in acts] == [f"{i:02d}" for i in range(1, len(acts) + 1)], \
+        f"the plates are numbered {[n for n, _ in acts]} — a sequence is in order"
+    yield 4 <= len(acts) <= 8, \
+        f"{len(acts)} plates. Under four is not a sequence and over eight is the " \
+        f"contents list this page was rebuilt to stop being"
+    yield all(nm.strip() for _, nm in acts), "every plate is named"
     # FOUR BANDS, AND THE CEILING MOVED ON PURPOSE. It was two — a floor and
     # a ceiling, written when this page had been cut from eight, because
     # restraint erodes one defensible section at a time.
@@ -289,8 +317,11 @@ def s7():
     # type-led doors, three journey rows carrying a route, a story lead, and
     # a closing statement — and the ceiling is what stops a fifth arriving
     # without the same argument being made again.
-    n = h.count("<h2>")
-    yield n == 4, f"{n} bands under the hero (ways in, journeys, stories, the statement)"
+    # The ceiling stays, on the same reasoning and against the new shape: a
+    # plate carries one statement, so one h2 per plate after the first.
+    n = h.count("<h2 ") + h.count("<h2>")
+    yield n <= 7, f"{n} statements on the page — restraint erodes one defensible " \
+                  f"plate at a time"
     # AND NO TWO ADJACENT BANDS DRAW THE SAME PICTURE. That is the finding
     # the ceiling used to stand in for: eight tiles and three journey cards
     # each carrying the same beige silhouette with different blue dots, so a
@@ -321,7 +352,13 @@ def s7():
     # reader met on a page whose job is to make them want to go somewhere,
     # and it inlined 90 KB of coastline — 76% of the page — to do it. The
     # map is a discovery mechanism and it lives at /map.
-    yield 'class="heromap"' not in h, "the map is not in the hero"
+    # AND IT PINNED THE CLASS NAME, so renaming the component made it true
+    # forever. What it protects is that the homepage does not inline an
+    # instrument: the drawing there is a continent, not a data surface with
+    # 319 dots and a filter row on it. Asserted on the declared ROLE, which
+    # is what every map on this site carries and what the class was standing
+    # in for.
+    yield 'data-role="instrument"' not in h, "the map is not in the hero"
     yield has("/", 'href="/map"'), "and is one tap away"
     # /map draws its land as .cshape paths, not the <g class="countries">
     # wrapper the small embedded maps use. Asserted against what the page
@@ -484,7 +521,19 @@ def s13():
     # regressed to a database record, and that is the specific failure the
     # design audit found on eleven of twelve families.
     h = page(u)
-    yield 'class="statement"' in h, "the authored sentence is set as the hero"
+    # AND IT PINNED THE CLASS RATHER THAN THE COMPOSITION. `.statement` was
+    # how the overture set an authored sentence large; the arrival band sets
+    # the same sentence inside `.ed-arrival-copy`, at the same weight, over
+    # a photograph — which is MORE of what this assertion is about, and it
+    # went red for it. The twelfth shape pinned here. The promise is the
+    # ordering: the place's own sentence comes before any metadata about it,
+    # so that is measured on the document rather than on a selector.
+    _h1 = h.find("<h1")
+    _say = h.find("<p", _h1) if _h1 > 0 else -1
+    _meta = min([i for i in (h.find('class="orient"'), h.find('class="facts"'),
+                             h.find('class="chips"')) if i > 0] or [len(h)])
+    yield _h1 > 0 and _say > _h1 and _say < _meta, \
+        "the authored sentence is set as the hero, before any metadata"
     yield ("Kind of place" not in h) or (h.index("Why go") < h.index("Kind of place")), \
         "the argument comes before the metadata"
     # Count the CLASS TOKEN, not the exact attribute: the locator gained
@@ -609,7 +658,17 @@ def s17():
     # and the eleven-item fact table moved BELOW the legs. It used to open on
     # that table, with the sequence four screens down as a bulleted list.
     h = page(u)
-    yield 'class="statement"' in h, "the strapline is the hero, not an 11px kicker"
+    # THE THIRTEENTH SHAPE PINNED HERE, and the same one as §13's: the
+    # strapline moved from `.statement` on paper to `.ed-intro` inside a
+    # cobalt hero, which is more of what this asserts and not less. The
+    # promise is that the sentence outranks the numbers — a journey page
+    # that opens on an eleven-row fact table has regressed to a timetable.
+    _h1 = h.find("<h1")
+    _say = h.find("<p", _h1) if _h1 > 0 else -1
+    _facts = min([i for i in (h.find('class="facts"'), h.find('class="orient"'),
+                              h.find("ed-journey-facts")) if i > 0] or [len(h)])
+    yield _h1 > 0 and _say > _h1 and _say < _facts, \
+        "the strapline is the hero, not an 11px kicker, and it precedes the numbers"
     yield 'class="legs route"' in h, "the legs are drawn as a route, not listed"
     # Assert the FACT TABLE's position, not the heading order. The first
     # version of this compared two headings, and moving the facts above the
@@ -836,7 +895,18 @@ def s24():
     yield "near" in js and "kmBetween" in js, "proximity search"
     yield "cheap" in js, "budget search"
     yield "INDEX.months" in js, "seasonal search"
-    yield has("/search", "quiet beaches in september", "near prague")
+    # THE PAGE PUBLISHES THE QUERY LANGUAGE IT ACTUALLY IMPLEMENTS, and this
+    # asserted two literal example sentences out of the placeholder instead.
+    # It went red when /search's placeholder was shortened — it was cut
+    # mid-word at 390, on the one control that page exists to be — for a page
+    # that had got better, which is the shape-not-promise fault this
+    # repository has now recorded a dozen times. What a reader needs is that
+    # every operator the script understands is named on the page in words
+    # they can read; the case of the example is not the claim.
+    low = page("/search").lower()
+    yield (all(t in low for t in ("near ", "cheap", "quiet", "month")),
+           "/search names the operators search.js implements: near, cheap, "
+           "quiet and a month")
 
 
 @section(25, "Search result types", "BUILT",

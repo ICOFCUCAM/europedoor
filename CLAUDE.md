@@ -14,7 +14,8 @@ Via Europa. Take their architecture and drop their branding section. See
 
 | doing | read |
 |---|---|
-| **the mandate: what a first-class gateway to Europe would be, and where this one is not** | **`docs/first-class-audit.md`** — 27 surfaces rendered at 1280 and 390 and then measured. Three findings: on a phone 12 of 23 surfaces are effectively type to the fold, seven of them with no picture on the first screen at all (CORRECTED — the first version said 21 of 22 and was reading where the first figure STARTS rather than how much of the screen it fills); the site has one composition rendered 1,033 times; the homepage decays monotonically after the hero. The eight benchmark sites are BLOCKED by the egress proxy and the benchmark half is labelled second-hand |
+| **the mandate: what a first-class gateway to Europe would be, and where this one is not** | **`docs/first-class-audit.md`** — 27 surfaces rendered at 1280 and 390 and then measured. Three findings, and Finding 1 is now closed on the numbers: it read 12 of 23 surfaces effectively type to the fold with seven showing no picture at all, and reads **3 of 30 with none and none under a fifth**, median share 24% → 35.6% (CORRECTED twice — the first version said 21 of 22 and was reading where the first figure STARTS rather than how much of the screen it fills). `tools/opening.js` is the instrument, so the number is checkable in a minute. **Finding 2's other half is measured too** — it says the page is the same page and its evidence only ever covered the first 250 pixels: `tools/composition.js` reads the band sequence under the head and finds **29 distinct body shapes over 47 families**, and three h1 sizes at tops 136–745 where the original reading was one size at 150–312. The eight benchmark sites are BLOCKED by the egress proxy and the benchmark half is labelled second-hand |
+| **the eight page families, and what each room does differently** | **`docs/non-home-redesign.md`** — the non-home redesign answered A-J. The eight rooms derived from the route, the three helpers that were forcing one grammar, the seven image scales, 1,626 declared surfaces, and the defects only rendering found |
 | **the design language — what makes a page EuropeDoor with the logo removed, and which movements each family takes** | **`docs/design-language.md`** — the ARCHITECT step. Five marks that could not have been made by anybody else, the six-movement composition grammar per family, the three head roles, what the language forbids, and how a change is proved |
 | **anything at all — read this first, every session** | **`docs/instruction.md`** — the standing instruction. Part 1 is how work is done here (audit first, deviate with numbers, STOP on licensing, never invent data, prove every check can fail). Part 2 is the visual instruction: **European Future**, the two worlds, the palette, the 60/25/10/5 ratio and the measured contrast limits. `docs/palette.json` is the checkable form |
 | **the transformation brief, and the three decisions waiting on the owner** | **`docs/EUROPEDOOR_2036_TRANSFORMATION.md`** — the 2036 audit, what to keep/replace/redesign, and a five-phase roadmap. Phases B and C are unblocked; A waits on a map-licensing decision |
@@ -1554,6 +1555,26 @@ asserts the referral is a 24px target with a real name, that the disclosure is
 requests off this origin — which is also the answer to how it behaves on a
 slow network: there is nothing to be slow.
 
+**AND THEN THE SAME FAULT ONE LEVEL UP: THE LIST WAS TWENTY URLs TYPED BY
+HAND.** Adding Chamonix fixed the STATE that list was missing and left the
+shape of the list alone — twenty-six page shapes had never been scanned in
+either colour scheme, among them a macro region, a theme, a motion, a month,
+a sub-category, a fund project, a facet list, the four legal pages, the
+public API, contact, help and the manifesto. It reads `tools/lib/families.js`
+now, which is the one list of rendered families and is enumerated against the
+built site, plus the three entries that are a STATE rather than a family
+(Chamonix with its Stay layer, a second place page, the freshness board).
+The suite gained close to four hundred and fifty assertions, and the first run found eight graphics on
+`/method` **claiming `role="img"` and hiding themselves** — an image with no
+name, on the one page whose subject is how a number is arrived at. Nothing
+was broken for a reader, which is why nothing had ever gone red: `aria-hidden`
+wins in practice, so the markup was a contradiction rather than a barrier.
+Hidden is the right answer rather than a label, because `.distnum` beside it
+prints the same drawing in words. **A graphic is named or it is hidden, and
+never both** — asserted now, with the element named in the message, because
+"svg without a name" on a page with eleven of them is a failure message with
+no measurement in it.
+
 **No photograph, and it is a licence position rather than an aesthetic one.**
 This is the family where a photograph does work type cannot — you choose where
 to sleep partly on what the place looks like at seven in the morning — and the
@@ -1973,6 +1994,233 @@ position**, and the entire art-directional difference between a magazine story
 and a country encyclopedia is one 11px kicker changing hue — terracotta on
 `area-stories`, cobalt on `area-countries`. The accent system is not broken; it
 is doing almost no work. See `docs/design-direction-audit.md`.
+
+**AN ACCENT SPENT AS INK IS A DIFFERENT RUNG FROM THE SAME ACCENT SPENT AS A
+MARK**, because ink is read against the ground and a mark is drawn on it.
+`--pine-ink` and `--olive-ink` carry that, declared above the dark block and
+lifted inside it. And **`--door-dark` means "the readable rung", which in the
+dark world is the LIGHTER one** — the name says the opposite and three blocks
+were written to the name, so ochre-deep measured 3.73 on graphite and
+cobalt-lift 4.23. Both had been invisible to every check until `.kicker` moved
+from `--door` to `--door-dark`: `--door` was already lifted there and
+`--door-dark` had no reader. **A token nobody reads is a token nobody has
+measured.**
+
+**`--door` IS THE ACCENT AND `--door-dark` IS THE ACCENT AS TEXT, AND A KICKER
+IS TEXT.** The two exist because a colour that gets DRAWN and a colour that
+gets READ are different requirements — the same split recorded for the
+signature, where `--signature` is the mark and `--door` is anything that is
+words. The ground swap to the owner's near-white paper is what exposed it:
+terracotta-2 measured 4.16 against #F8F6EF where it cleared on #F3F0E6. **A
+lighter page makes every accent's ratio worse.**
+
+**A TWO-COLUMN OPENING MUST NOT SPLIT BEFORE THERE IS ROOM FOR TWO.** Measured
+on /journeys: at 704 the opening is one column of 672 and the standfirst sets
+on four lines; at 834 it becomes two, column one is 302, and the same 226
+characters take EIGHT. Nothing about the content changed, only the track
+sizing — which is what the head-range scan exists to say, and it said it about
+five heads at once. 834 is already recorded here as *the width that finds a
+two-column layout collapsing a column just above its own breakpoint*.
+
+**A CLAMP'S FLOOR IS A DECISION ABOUT EVERY WIDTH BELOW WHERE THE MIDDLE TERM
+TAKES OVER, AND THAT WIDTH IS ARITHMETIC RATHER THAN INTUITION.**
+"Kunsthistorisches" at 48px does not fit the 288 pixels a 320-wide screen
+gives, so the opening h1 broke mid-word — the fault `overflow-wrap` is a last
+resort FOR and not a design. Dropping the floor a step fixed that and took ten
+pixels off the headline on every phone and every tablet, because 6.8vw does
+not pass 48px until 706. The floor is itself width-aware now:
+`min(--t-4xl, 12vw)` is 38.4 at 320, 46.8 at 390 and 48 from 400 up, so the
+one screen that breaks gets a smaller headline and nothing else moves by more
+than a pixel. **The arithmetic was done after the change rather than before
+it**, which is the whole reason the first attempt was wrong.
+
+**A SAMPLER THAT READS OUTSIDE ITS OWN IMAGE REPORTS THE CANVAS.**
+`screenshot()` without `fullPage` photographs the VIEWPORT, and /events grew
+by one band until the year band sat at y=905 on a 900-pixel page — so the
+baseline "measured" 1.00:1 on a line that measures 9.36, at both widths, and
+would have gone on doing so for any change that made the page one band taller.
+That is the aperture sampler's own recorded failure in a check written after
+it and without its guard. Both now: scroll it into the shot, and assert the
+sample landed inside the image — because a ratio computed from transparent
+black looks exactly like a ratio reporting a real defect.
+
+**A COLOUR SIZED ON ONE GROUND IS A COLOUR THAT FAILS ON THE OTHER, AND
+SEVENTY OF ONE BROWSER RUN'S 116 FAILURES WERE THAT.** `--pine` is #0F433E:
+4.93 on bone paper and **1.74 on graphite**. The moment the masthead stopped
+being a band of signature colour and became the page's own paper, every
+wordmark and every current-section marker was below AA for a reader in the
+dark preference — and the family accents were the same fault one layer over,
+with `--ed-terracotta`, `--ed-ochre` and `--ed-olive` naming raw hexes that
+read 3.51, 3.66 and 2.98 on graphite. `--door` is the token that already
+carries *this family's accent, in this world*, and its lifts were measured
+against graphite when they were written; naming the hex was a second
+implementation that knew about one ground. Pine as ink is `--pine-ink`,
+declared on `body` and never `:root`, because a `var()` resolves where the
+DECLARATION lives.
+
+**AND BINDING A FAMILY ACCENT TO THE WORLD BROKE THE ONE BAND THAT IS DARK IN
+BOTH.** The arrival head is graphite whatever the preference, so `--door-dark`
+handed it the LIGHT preference's dark terracotta on a dark ground: 2.12:1, the
+same defect arrived at from the other side, in the commit that fixed it. A
+band that is dark whatever the preference needs a colour that is light
+whatever the preference, and the rule saying so has to out-specify the family
+rule — `body[data-family=…] :is(.ed-eyebrow, …)` is (0,2,1).
+
+**A PAGE HAS ONE GUTTER, AND A COMPONENT LAYER QUIETLY ADDED A SECOND.**
+`main` already pads the document — 24px at 1280, 16 on a phone — and every ed-
+component then computed `100% - 2 * --ed-gutter` INSIDE that, so a band sat at
+75px where an h1 on an older family sat at 24 and the masthead sat at 16. The
+browser suite reports it as the masthead disagreeing with the words under it,
+which is a true report of a real inconsistency naming the wrong half: it is
+the component layer that is indented, not the masthead that is out.
+
+**`1fr` IS NOT `minmax(0, 1fr)`, AND AN `<svg>` SIZED IN PERCENT STILL
+CONTRIBUTES 300 PIXELS TO INTRINSIC SIZING.** A `1fr` track has an automatic
+minimum and never shrinks below its items' max-content; the SVG default
+intrinsic width is 300. So a phone column came out 304.609 inside a 288-pixel
+page and dragged the h1, the eyebrow and the intro out with it, and the place
+family scrolled sideways. **`min(100%, min-content)` does not resolve on a
+floor**: a percentage in `min-width` resolves against the containing block,
+and the containing block is a track being sized BY this item, so the
+constraint is circular and the browser treats the percentage as indefinite.
+That form works for a `max-width` on a measure, where the container is already
+sized, and not for a floor on the thing doing the sizing. The track takes the
+zero floor and the heading takes `overflow-wrap: break-word`, which breaks
+ONLY where the alternative is overflow — so the 108px mid-word break that
+floor was written to prevent does not come back at any width where the word
+fits, and at 320, where it does not fit, a broken word beats a page a reader
+cannot put back.
+
+**A STROKE IN USER UNITS IS NOT A STROKE IN PIXELS, AND THE FIX FOR THAT WAS
+MADE AT ONE WIDTH TWICE.** The year band already records it — *1px was not
+enough … the ratio a reader gets is the ratio of the pixel* — and the same 1.5
+that reads at 1280 is sub-pixel at 390 under `preserveAspectRatio="none"`, so
+the baseline sampled 1.00:1 on a phone, on the chart whose caption says "above
+the line is what is on". `vector-effect: non-scaling-stroke` states the width
+in device pixels at every size. The aperture's reveal had it too: 1.4 units
+measured 2.69 against a token computing 4.4.
+
+**AND THE REVEAL WENT WITH THE GROUND, BOTH HALVES OF IT.** The wall's face
+was struck in `--bone` and the wall became `--paper` — #F3F0E6 against
+#F8F6EF is a step of 1.058, the *rounding error with a token name* this file
+refuses for a surface ladder, drawn here as a line nobody can see. The cut
+edge takes the map's own border ink at full opacity, which is the colour that
+already separates a frontier from the land it is drawn on.
+
+**A DERIVED META VALUE FOLLOWS THE THING IT DESCRIBES OR IT IS A SECOND
+IMPLEMENTATION OF IT.** `theme-color` composited `pine-deep` over the ground,
+correctly, until the masthead became paper — and then every Android phone
+showed a dark green strip above a cream page. The masthead paints `--paper`
+over a page that IS `--paper`, so the composite is paper and no blend is
+needed; stating one would be a third implementation of a colour.
+
+**A SUITE THAT CRASHES HAS STOPPED COUNTING, AND IT TAKES THE REST OF THE
+SUITE WITH IT.** The browser run died forty minutes in on
+`document.querySelector(h)` returning null — a destination's contents row
+linked to `#why-visit` and no element in the document carried that id.
+`section()` emitted `<h2 id="...">` and `ed_section_head()` did not, so every
+family that moved to the new head kept a jump target and an
+`aria-labelledby` pointing at a heading that had stopped existing. Neither
+half is visible in any count: a dangling `aria-labelledby` is not a missing
+name in the markup, it is a name that resolves to nothing and the browser
+hands the element its content instead, so the section reads as labelled and
+is not. This file already says a green run that has stopped counting is worse
+than a red one; a run that ENDS on a TypeError reports no failure and leaves
+every later check unrun, which is the same fault louder. `c_fragments_resolve`
+costs a second, says which page and which fragment, and found a second one in
+its first run — `/experiences` pointed at `#kinds`, and neither of the two
+bands that answer "how this list is cut" carried it.
+
+**AN F-STRING EXPRESSION CANNOT CONTAIN A COMMENT**, which this file already
+records about a paragraph that tried to go into emitted markup. It applies to
+a keyword argument inside an f-string too: the reason for an anchor's name
+went beside `more=(...)` and the build stopped with *"f-string expression part
+cannot include '#'"*. A reason belongs in the function that composes the page.
+
+**THE EYE FINDS A DEFECT AND IT DOES NOT CONFIRM ONE, AND THAT CUTS BOTH
+WAYS ON A CONTACT SHEET.** The phone sheet showed the masthead navigation
+apparently struck through the wordmark on six of twelve families — a
+collision, in the component this file already records two narrow-width fixes
+for. Measured in Chromium at 390 the wordmark occupies y=12 to y=45 and the
+navigation starts at y=53, and what the thumbnail showed was a 273-pixel
+wordmark LINK whose text sits at its left, read at a twelfth of scale. Same
+finding as the masthead's own colour, where sampling the pixels said cobalt on
+every page while a screen-shot-sized reading said graphite.
+
+**TWO COMPONENTS CAN EACH PAY FOR THE SAME GAP.** `voids.js` reported 304
+pixels before a section heading on /interests/mountains — the largest single
+hole on the site — and it was not a composition fault: the head pays 178
+pixels of its own bottom padding and the band then pays 115 more. Neither is
+wrong alone; charging both when they are adjacent is the margin-doubling this
+file already records about `main` and the footer, which summed to 224 pixels
+of empty page on every page. `.headmeta` is part of the HEAD, so the band
+after it is still the band after the head — the first version looked at the
+immediate sibling rather than at what that sibling is. 18,216 empty pixels of
+239,404 to 17,411 of 238,950.
+
+**A FAMILY ACCENT CAN PAINT A LABEL THE COLOUR OF ITS OWN GROUND.**
+`body[data-family="journey"] :is(.ed-eyebrow, .ed-section-index)` is (0,2,1)
+and `.ed-journey-hero .ed-eyebrow` is (0,2,0), so the family colour won on the
+one element that sits ON the accent: cobalt type on a cobalt field, 1.00:1.
+That is the masthead focus ring one element over and the `--focus` token one
+file over, and the answer is the same all three times — the thing INVERTS
+rather than recolours, and the rule saying so has to out-specify the one that
+made it a family colour.
+
+**TWO TRANSLUCENT LAYERS OVER ONE ANOTHER ARE A THIRD TONE.** The journey
+hero's route drawing gave its land and the ground beyond it the same 22% bone,
+and they OVERLAP — the ground beyond is drawn across the whole frame and
+Europe on top of it — so Europe came out at 39% against a 22% rectangle that
+read as a pasted panel with a hard edge. The hero's own black-fringe finding,
+where two levels of detail of one coast were stacked and the disagreement read
+as a drop shadow.
+
+**A FRAMED DRAWING WAS REFUSED THE DATA-CUT FADE BY A FLAG RATHER THAN BY A
+MEASUREMENT.** `not (frame and pts)` reads "a framed glyph is a small window
+and the cut is outside it", which is true and is not the same as never: the
+Arctic-to-Mediterranean journey runs 69°N to 38°N so its frame IS the whole
+canvas. The fade's gradients are `userSpaceOnUse` and a framed viewBox is a
+WINDOW on those same coordinates rather than a transform of them, so what
+decides is whether the window reaches the cut — arithmetic on the viewBox, not
+a flag on the caller.
+
+**`height: 100%` AGAINST A `min-height` PARENT RESOLVES TO `auto`**, because
+the percentage has no definite height to be a percentage of. A photograph sat
+at its intrinsic height inside a slot sized by a clamp, with a band of
+`--paper-3` under it. A grid row stretches its item by default, so the box
+became a grid and the child fills whatever the min-height resolved to without
+asking for a percentage.
+
+**A NAME GENERATED INTO A SENTENCE CANNOT BE THE SUBJECT OF A VERB, AND A
+COUNT CANNOT ASSUME A PLURAL.** "What mountains looks like here" — seventeen
+tags, some plural, some a compound with an ampersand, no conjugation right for
+all of them. "1 destination, the same ones the drawing above plots" — a region
+holds one to eight. Both branches get written, or the name becomes a noun
+phrase and a derived count carries the sentence.
+
+**A NAME IN A META ROW IS NOT A BYLINE.** The story head printed the author
+bare among the desk, the reading time and the date, so the fourth token was a
+proper noun among three facts. The section audit caught it on all nine stories
+in the run that shipped the head, and nothing a contact sheet or a count could
+see: the name is present, placed and legible. The claim was never that the
+author is on the page.
+
+**A DECLARED SLOT IS SIZED TO WHAT IT SAYS, NOT TO THE PHOTOGRAPH THAT WILL
+REPLACE IT.** `ed_slot()` renders the purpose key, the first sentence of the
+brief and the native width and orientation wanted; an opening's floor is
+written for a picture, so an empty slot in one left a band of `--paper-3` with
+a hairline above it. And `ed_photo()` is the wrong helper for an opening: it
+falls back to a generated PLATE, which is placeholder art doing a picture's
+job and says nothing about what is missing. `photo() or ed_slot()` marks the
+surface and names the acquisition. **1,626 declared surfaces across 479
+pages** — `grep -ro 'class="ed-slot ' site --include=index.html | wc -l`.
+
+**EIGHT ROOMS, DERIVED FROM THE ROUTE.** `render.ed_family()` is the one table
+mapping a path to ATLAS, ARRIVAL, DISCOVERY, JOURNEY, EDITORIAL, TIME,
+INSTRUMENT or INSTITUTION, and no page builder passes a family string —
+forty-seven builders each passing one is forty-seven chances for two pages in
+one family to disagree, which is the fourteen-call-sites-forgot-the-motif
+failure waiting to happen again. See `docs/non-home-redesign.md`.
 
 **Look to find, count to conclude.** A contact sheet of forty plates suggested
 skylines were about 38% of them; measured across every destination they are
@@ -2575,6 +2823,37 @@ Belgium four of five, Bosnia and Herzegovina four towers out of four.
 `plate-variation.py` cannot see it — it measures duplication across the
 corpus and this is duplication on one screen. And the page draws the real
 geography four hundred pixels above them.
+
+**AND THAT WAS THE LAST ONE, WHICH MADE A CHECK STOP COUNTING.** Measured
+across the built site: **189 `.card-art` elements and every one is a map** —
+zero abstract plates on any page. `c_one_plate_per_thing` read the shipped
+HTML for a `.card-art` holding a plate, so it has been examining nothing and
+reporting green, which is the failure this file already records about the
+browser suite, arriving in the static suite. The promise did not change and
+its surface did: a plate is still drawn 785 times on the social cards, and
+`assets/og/cards.json` maps each content-addressed card to the seed it came
+from, so *one record, one picture* is checkable exactly instead of by
+comparing markup. It carries a floor on the pages too, because *no page
+draws a plate* should be a rule rather than a thing that happens to be true.
+**The plate system is now exclusively the social-card language** — the one
+surface nobody here ever looks at, rendered inside somebody else's product,
+where an illustration drawn from what the place IS beats no picture at all.
+
+**AND A SECOND CHECK WAS BLIND, FOUND BY READING THE COLUMN OF COUNTS.**
+`checks.py` prints how many things each check examined, and two of the
+hundred read zero. The other one is the check that found Longyearbyen drawn
+at y = −317 on a viewBox starting at 0 — a dot outside its own frame, on an
+empty sea, with nothing on the page saying a place was missing. It matched
+the literal string `pointsmap arched"><svg`, which requires `arched` to be
+the LAST class on the figure, and the cartography skin added ` atlas` after
+it: from that commit the check examined **0 dots on a site with 130 region
+maps** and reported green. Matched on the class LIST now, which is what a
+class attribute is, with a floor that fails when it stops finding the family
+— 1,293 dots, all inside their frames. **A count is only evidence if
+somebody reads it**, and `c_cut_word` was returning the number of ellipses
+it found, which ought to be zero, so a healthy check reading every page on
+the site printed "(0)" and looked exactly like the two broken ones. It
+counts pages.
 
 **A CHART'S CAPTION NAMED A LINE THAT MEASURED 1.16:1.** The year band says
 "above the line is what is on" and the axis was `--rule` — the hairline
@@ -3281,7 +3560,7 @@ matches every slot instance. That list was written when the register was
 empty and every `-hero@` file on disk was a stub the suite had just made. The
 moment real photographs carried those names, a green suite run swept 165
 licensed derivatives out of `assets/img`, and the only thing that noticed was
-`checks.py` failing on 147 pages referencing files that were no longer there.
+`checks.py` failing on every page referencing files that were no longer there.
 **The restored register is the authority on what belongs**: anything it names
 is somebody's licensed photograph, and a suite that writes into the
 repository owns taking out only what it put in.
@@ -3296,6 +3575,627 @@ it AGREES with its source**, so the first asserts PUBLISHED if and only if
 the register holds that purpose, in both directions; and **untouched means
 unchanged, not empty**, so the second compares against the state read at the
 start, whatever that state was. Proved red three ways.
+
+**THE READING TYPE WAS A DOCUMENTATION SCALE.** Measured on a destination
+page: 5,226 of its ~6,700 characters at 15px or under, 2,606 of those at 13 or
+under, against a 76px h1 — and the stylesheet spent 99 of its font-size
+declarations on the two smallest steps and four on the body. Body 15 → 17,
+secondary 13 → 15, captions 12 → 13. **`--t-lg` did not move**: it is a length
+in a 1,120-unit viewBox and `LABEL_METRICS` carries a width model fitted at
+that size.
+
+**And a label scale is not a reading scale.** `--t-sm` served both, so the
+rise also enlarged the masthead navigation and three meta lines — uppercase at
+.06em is a third wider at 15 than at 13, and "200 DESTINATIONS" stopped fitting
+beside EXPLORE on a 240px door. Those five rules take the caption step.
+
+**Raising it broke five things at narrow widths and the browser suite found
+every one.** A `min-width: min-content` floor on the overture h1 — added to
+stop four headlines being cut mid-word — pushed the place page 53px off a
+320px screen uncapped; `19 DAYS · 5 COUNTRIES · MODERATE` was `nowrap` and
+fitted at 13 and not at 15; "Travel regions" cannot fit a third of 288px; and
+both sentence boxes were wider than the placeholder that teaches them.
+
+**A MEASURE MAY NEVER BE NARROWER THAN ITS LONGEST WORD.** `14ch` is a
+character count wearing a length's clothes — a `ch` is the width of a zero —
+so Elbphilharmonie measured 214px inside a 210px box and dropped its last
+glyph onto a line of its own, on four pages of 1,033. `min(100%, min-content)`.
+
+**A MARK IN USER UNITS IS A DIFFERENT SIZE ON EVERY FRAMED DRAWING.**
+`glyph_view()` fits the frame to the route, so the three journeys on the
+homepage are drawn at 1000, 422 and 340 units and rendered at the same 690
+pixels: a 5-unit dot came out 3.4px on one row and 10.1 on the next, and the
+route stroke 3px against 9px. The build normalises the frame away and the
+family states its own size; framed strokes are `non-scaling-stroke`.
+
+**THIRTY COUNTRY PLATES NAMED A MOUNTAIN AND MOST NAMED A FOREIGN ONE.**
+`summit_points` returns the highest peaks IN FRAME and a country plate frames
+its neighbours, so the tallest thing on screen is usually across the border:
+Austria named Triglav, Switzerland named Mont Blanc, Croatia named three peaks
+and none was Croatian. A summit must be on the subject now — `NameGround`'s own
+test — and 13 of 50 name one, Austria's being Grossglockner.
+
+**And the model cannot check itself, so the browser does.** A check reads every
+country portrait with `isPointInFill`, which is a different implementation of
+the same question. Its first run found GREECE set with its middle in the
+Aegean: `LABEL_METRICS` is a fitted UPPER envelope, so the modelled box and the
+drawn one differ by a few units and on a fragmented coast that is land against
+water. The middle is three samples now, not one — 43 portraits named to 39, all
+true where the old 43 were measured by the model that placed them.
+
+**A CONTROL A READER CANNOT SEE THE EDGE OF.** The homepage ask field painted
+`rgb(247,246,243)` on a body of `rgb(247,246,243)` with a transparent border:
+present, labelled, keyboard-reachable, no edge. It was right inside the hero,
+where paper on graphite is a field, and moved to the light band keeping the
+fill — the same move its own LABEL made, which was found at 1.00:1 and fixed
+while the fill was left. A browser check crosses every control's edge pixel by
+pixel against the 3:1 of WCAG 1.4.11, and found four more: `--rule` is the
+hairline between two list rows and it bounded every form field on the site, so
+the planner's days, budget and month each read **1.43:1**.
+
+**EVERY POSSESSIVE WAS A TYPEWRITER APOSTROPHE** — 2,165 of them, on two pages in three.
+Curled at the data loader, not in the renderer: the first version ran on the
+emitted HTML, which skips `<script>`, so the page said Europe’s and the JSON-LD
+breadcrumb beside it said Europe's and `checks.py` failed on exactly the
+promise it exists to hold. One representation, and never in a slug or a URL.
+
+**One paragraph in ten ended on a single word** — 106 widows of 998 multi-line
+paragraphs. `text-wrap: pretty` on running text; `balance` stays on headings.
+
+**EIGHT SECTIONS AT ONE GAP READ AS EIGHT EQUAL CLAIMS.** The section rhythm is
+a single constant, so a destination page ran eight bands 104px apart with every
+head the same size in the same place. `render.section(opens=True)` marks a
+change of movement with a rule and more air. And `mini` did not mean small:
+scoped to a note and a rail it left 587 of 1,288 headings at full section size,
+every one of them a fact under a head.
+
+**A CAPTION SAYS WHAT THE PICTURE IS; A SOURCE NOTE SAYS WHERE IT CAME FROM.**
+They were one paragraph, so on a place page 199 pixels of caption sat under a
+127-pixel drawing. The scale of the projection and the size of the frame are
+facts about the instrument, not about the place. 852 of 917 figcaptions carry
+the two tiers; the rest are two-word locator labels and photo credits. The
+sizes sit on the SPANS — four containers set a caption's size and
+`.placeband figcaption` is the same specificity as `.minimap figcaption` and
+further down the file.
+
+**A THIRD OF THE HERO WAS CROPPED AWAY ON A WIDE MONITOR.** `slice` is right —
+the frame is 1120×800 where every other map is 1000×780 — but the drawing's
+width is capped at the column while its height fills a hero whose floor is
+43vw, so the taller the window the more of the WIDTH goes: 1,078 units shown at
+1280, 961 at 1920 where AZERBAIJAN was sliced, and 721 at 2560. Bounded at
+1,050, the margin the frame was given. **The dusk was checked against the names
+and cleared**: it dims a name and its ground together, so all fifteen measure
+1.95–2.13:1 in light or shadow.
+
+**THE BODY MAPS HAD NO WATER, NO COAST AND CRACKS THROUGH THE LAND.** The glyph
+family was one flat silhouette on the page's own paper: no sea, so a bay and
+the margin were the same colour; lod0 rings simplified per country, so
+independently thinned neighbours left white cracks; and the 52°E cut ran raw.
+`.card-map` had painted water since the cartography split and this family never
+got it.
+
+**RULES AND SPACE, NOT A CARD — and two surfaces were the last holdouts.**
+Border, fill, radius and shadow each say "separate object, placed here by a
+system", and three surfaces had already given that up. The rail kept all four
+on every family that carries one, and the Europe Experience Score was a card inside a `tone-quiet`
+band whose fill is within a step of its own.
+
+**`tools/voids.js` measures empty page per family**, and is NOT a gate on
+`opening.js`'s reason: a ceiling on empty page is satisfied by tightening the
+section rhythm, and the 104px between two bands is not a hole. Its first
+version read `h2/p/li/figure` and reported 1,702px on a destination page
+against a real 804 — the score bars are divs and it could not see them.
+
+**THE OWNER'S PALETTE, AND THE FIRST THING IT CHANGES IS THE MAPS.** Bone
+`#F3F0E6`, pine `#0F433E`, graphite `#07100F`, and five accents that identify a
+content FAMILY rather than decorate a page. The brief is explicit about the
+half that is easy to get wrong — *"I would NOT make every page colorful. This
+is critical"* and *"UI = restrained, PHOTOGRAPHY = rich, MAPS = precise,
+TYPOGRAPHY = dramatic"* — so an eight-hue wheel with a tinted ground and a
+gradient ribbon per family was generated in OKLCH, measured, shipped and
+removed one commit later, because it is the site the second sentence names.
+
+**There are two map sets now and a drawing takes one of them by what it IS.**
+The light map is the European atlas: `#D8D4C7` land on `#DDE8E7` water, which
+is **1.18 against each other and that is the point** — a printed atlas is
+stone on pale water and the COASTLINE is what separates them, so the ink went
+up as the tone step came down. The dark map is the instrument and the hero:
+`#F3F0E6` continent on `#07100F` at 16.90, where the coast needs no stroke at
+all and `#B9C1BA` is a faint internal frontier at 1.62. *Notice: no olive.*
+
+**AND THE APERTURE STOPPED BEING MEASURABLE THE MOMENT THE WATER WENT PALE.**
+*Light wall, dark opening* was the whole reading, and on an inland frame there
+is now no water in the opening: bone wall, stone opening, **1.10:1**, which
+the browser suite failed Austria and Chamonix on and was right to. It cannot
+be fixed by tuning the land — two tones a reader is meant to read as one
+material are always close, which is the point of the atlas being drawn on one
+stone. So the door is read by its REVEAL, and the reveal is the map's own
+border ink: 4.41 against the wall, 3.39 against the land, from `#68716E` at
+full opacity where graphite at 55% composited to 2.49. **One value in both
+preferences**, where there used to be two, because the opening is pale in
+either now.
+
+**THE OCEAN RAMP HAD TO GO WITH THE WATER, OR THE SWAMP COMES BACK AS A
+HALO.** Four steps of near-black navy — the shore band under every coast, the
+rivers and lakes on 824 plates, the hero's own Atlantic — left alone under the
+light map drew a dark blue fringe round every pale coastline: the exact
+treatment the brief objects to, surviving as an outline after the fill had
+been fixed. One hue at 175, saturation rising with depth, and **the deep step
+is sized by what it has to do rather than by how a sea looks**: a river is a
+line on the LAND, so `#346F6A` is 3.90 on the stone. Found on a contact sheet
+of twelve families, which is the only instrument that could see it.
+
+**GOLD IS NARROWED TO WHAT IT WAS PROTECTING RATHER THAN DELETED.** The old
+rule refused every gold by arithmetic, and the reason was what gold SAYS. The
+owner's palette then names ochre `#C49A52` as the territorial accent for the
+regions and the events calendar, which is a different job from a gold button.
+So: the two brasses stay out **by value**, the arithmetic is **untouched** —
+loosening it until ochre passed would loosen it until a brass passed, which is
+the credential scan's own lesson — the register declares which golds are the
+ochre family, and **no gold may be `--sea`, `--sea-dark`, `--signature` or the
+primary action**. That last clause is not decoration: `.btn { background:
+var(--door) }` was one late line that gave every family its own button colour,
+and on the regions that button was gold. `css.gold` counts golds the register
+does not declare, so it is still zero and a fourth one has to be argued for.
+
+**A DISTINCT PAIR IS TOLD APART BY HUE *OR* BY LUMINANCE.** The block was
+written because a contrast ratio cannot see hue — the advisory red and the
+cultural accent sat fourteen degrees apart at identical lightness and measured
+1.22. Asked only for hue, it then refused the owner's own ochre and terracotta
+at 22 degrees, which are not remotely the same colour: 0.355 of luminance
+against 0.207, **1.57 against each other**. A hue floor alone would have
+refused a real distinction and then been lowered until it refused nothing. The
+disjunction is still red on the pair that created it, which fails both.
+
+**TWO STRAY `*/` HAD EACH BEEN SWALLOWING THE RULE AFTER IT.** An edit closed
+a comment one line early, twice, and the continuation prose then sat in the
+stylesheet as raw text — which a CSS parser reads as the start of a selector
+until it finds a `{`. So the next whole rule was consumed into an invalid
+selector and dropped: `.essay { --measure: 38rem }`, the entire measure of the
+story family, and `.minilabel.here { font-weight: 700 }`, which is how a map
+says which place you are reading about. **Nothing counts a dropped rule** —
+not the dead-rule scan, which walks rules the browser parsed, and not the
+invariant register, which counts declarations. A four-line scan for a `*/`
+outside a comment finds both in a second.
+
+**AN INSTRUMENT THAT READS ITS OWN DOCUMENTATION AS CODE IS WRONG, AND SIX
+PLACES DID IT INDEPENDENTLY.** This file already records it about the
+font-size count. Within an hour of the palette landing it happened twice more:
+the paragraph recording that `#6f4f11` had been REMOVED was read as a gold
+still in the stylesheet, and the paragraph recording that `.btn` had stopped
+taking `--door` was read as the rule itself. `bare_css()` is the one
+implementation now, and `css_hex()` beside it — **a token that points at
+another token is not a missing token**, which six checks reported as
+"`--atlas-sea` is not declared in the stylesheet" the moment the cartography
+was bound to the owner's map set.
+
+**AND THE UX AUDIT PINNED TWO TOKEN NAMES THAT STOPPED EXISTING.**
+`--limestone` became `--bone` and `--atlantic` became `--olive`, so §B4 went
+red for the right event and the wrong claim — the tenth assertion here to pin
+a shape rather than a promise. It reads the register's own token list now, and
+case-insensitively, because a rename is a real failure and a capital letter is
+not.
+
+**THE HERO WAS THE DARK MAP DRAWN WITH THE LIGHT MAP'S LAND.** It painted
+`--atlas-land`, which is right on pale water and reads as grey-brown on
+near-black, so the one picture on the site was a dim continent in the dark.
+Rebound rather than restated — six rules downstream mix against that token, so
+setting the fill alone would have drawn a bone continent with a coastline
+computed from a colour no longer in the picture. **Two things only rendering
+found**: the context land beyond the atlas came up to 30% of bone and became
+*quieter Europe*, which is the exact reading the graphite ground replaced; and
+the shore band, blurred and pale, drew a hard-edged bright wedge over Russia
+that looks like a beam somebody left on. **On a dark map a shore band is a
+shadow, not a highlight** — the lit-aura failure this stylesheet already
+records, arrived at from the other side.
+
+**THE 2036 PAGE SYSTEM: EIGHT FAMILIES, ONE GRAMMAR, AND NOT FORTY-SEVEN
+REDESIGNS.** The owner's brief makes the finding this repository had already
+half-made — several families had converged on kicker → h1 → lede → rows — and
+draws the right conclusion from it: build eight rooms and map every page into
+one, so the site reads as one institution rather than as forty-seven
+templates. Atlas, Arrival, Discovery, Journey, Editorial, Time, Instrument,
+Institutional.
+
+**THE FAMILY IS DERIVED FROM THE ROUTE, so no page builder changed.**
+`render.ed_family(path)` is one table. Forty-seven builders each passing a
+family string is forty-seven chances for two pages in one family to disagree,
+which is the failure this repository already has recorded about the fourteen
+call sites that forgot to pass a motif — and a family is what a route IS:
+`/europe/<c>/<r>/<city>` is an arrival because of where it sits. Order
+matters twice, because `/discover/` is Discovery and `/discover/<macro>` is a
+macro region, and `/experiences/<cat>/<sub>` is Time while
+`/experiences/<cat>` is Discovery.
+
+**THE PRIMITIVES ARE THE BRIEF'S AND THE DEPARTURES ARE MEASURED.** Three of
+them:
+
+| | |
+|---|---|
+| `ed_photo` returns the drawing, never "" | the brief's version returns an empty string with no photograph, which would leave 826 of 837 surfaces as a hole. *A slot waiting for a picture is honest and three hundred pixels of one is a hole* — already measured, on the homepage doors |
+| `ed_rows` derives the number | the brief passes `number` per row, and a figure typed into data is the figure that was true two hundred destinations ago |
+| `ed_photo` takes a register key, never a URL | `picture()` is the one function that knows whether the register holds one; a component that took `src` would be a second way into the library with none of the licence gate behind it |
+
+**FOUR NEW TYPE VALUES FOR EIGHT FAMILIES, WHERE THE BRIEF WRITES NINE
+CLAMPS.** Each of its components carries its own, a few pixels from its
+neighbour — and nine arbitrary clamps is a second type scale wearing the
+first one's clothes, which is how the sibling repository reached 418 font
+sizes. `--ed-display-1` is every opening, hero and institutional head;
+`--ed-display-2` every section title, split and arrival; `--ed-display-3`
+every row and route stop; `--ed-read` the standfirst under all of them. **No
+new breakpoint**: the brief's 850 and 520 are 52rem and 44rem, which this
+stylesheet already has, and the register refused a seventh once. **No new
+line-height**: the eight the site had already cover it.
+
+**THE `--ed-*` LAYER IS ONE-DIRECTIONAL AND A CHECK PROVES IT.** The brief
+writes its components against `--ed-` names and this stylesheet's register
+refuses a second NAME for a colour — *a second name for one colour is two
+colours waiting to disagree*, which is why `--atlas-context` was deleted. It
+refuses an unresolvable `var()` harder still. Between those two, an alias
+that can be PROVED not to diverge is the smaller fault: every `--ed-` colour
+is a bare `var()` of a registered token and never a literal. **On `body`
+rather than `:root`**, because a `var()` resolves where the declaration lives
+and the world tokens are set on `body[data-world]` — the `accent-color` bug,
+forty lines from the note about it.
+
+**AND THE PRIMITIVE FLOORS ARE ON THE PROMISE RATHER THAN THE CLASS NAME.**
+`ed-opening` is a page head, `ed-arrival` is a page head, `ed-journey-hero`
+is a page head, `ed-eyebrow` is a kicker, `ed-row` is a row. A floor counting
+only the old spelling read the migration as *a page family has grown its own
+components* — which is the exact thing it exists to catch, reported about a
+page that had just stopped doing it. Three head checks and one reach check
+had to learn it, one family at a time, each discovered by a build failing on
+fifty or three hundred pages at once.
+
+**THE THIRTEENTH AND FOURTEENTH SHAPES PINNED.** §13 required
+`class="statement"` on a destination and §17 on a journey — and both went red
+for compositions that do MORE of what they protect, the arrival band and the
+cobalt hero. Both measure document order now: the place's own sentence before
+any metadata, the strapline before the numbers. Proved red.
+
+**AND THE INVARIANT FAILURE MESSAGE LEADS WITH THE MEASUREMENT AGAIN.**
+`primitives.reach` carries every deliberate move that figure has ever made,
+correctly, and printed all four thousand words of it on each of sixteen
+sub-keys: a run reporting three one-page migrations printed twelve thousand
+words, and the three numbers that diagnose it were in the first line of each.
+*A failure message with no measurement in it cannot be diagnosed*, and the
+corollary is that a measurement buried in an essay is not in the message
+either.
+
+**THE LIBRARY HAS ELEVEN PHOTOGRAPHS BECAUSE A CREDENTIAL SCAN COULD NOT
+SPELL A PLACE, AND FIVE ACQUISITIONS WERE THROWN AWAY ONE AFTER ANOTHER.**
+
+Runs 24 to 28 were dispatched by the owner and every one of them failed. They
+were not failing to acquire: run 26's own log reads *"every registered
+photograph still hashes to what was recorded (2,201)"* and *"a registered
+photograph appears on the page its purpose claims (1,136)"*. It fetched,
+verified by id, hashed, derived the ladder, completed the provenance and
+passed every gate on the list — and then died on **86 identical failures**,
+all of them the pre-commit credential scan, naming place slugs:
+
+    austria__salzburg-and-the-lakes__salzburg__hohensalzburg    56 chars
+    albania__tirana-and-the-south__gjirokaster                  42
+    austria__salzburg-and-the-lakes__salzburg__mirabell-gardens 59
+
+**The registry declares a place with SLASHES and a file stem cannot hold
+one.** `desk/registry.json` has
+`austria/salzburg-and-the-lakes/salzburg/hohensalzburg`; `derive.py` writes
+`austria__salzburg-...`. The scan split the registry's target on every
+non-word character, so the declared identifier became four short tokens and
+not one of them reached the forty-character floor to be collected — while the
+stem arrived as a single 56-character run with nothing to match it against.
+The exclusion was a lookup, correctly, and the two sides were written in
+different alphabets.
+
+**THE RULE IS ONE NORMALISER, BOTH SIDES.** That sentence is already in this
+file, about the planner: it lowercased the sentence and not the names, so a
+quarter of the atlas could not be typed into its own search box. Same fault,
+in a credential scan, with separators instead of accents. Fourth time this
+one rule has stopped a real acquisition, and the first where the two
+disagreeing copies were a *separator*.
+
+**AND THE TRANCHE IS PUSHED BEFORE THE GATES RUN NOW.** `batch.sh` learned
+this at the level of one candidate — run 23 lost eighteen finished
+acquisitions to a nineteenth that was a PNG — and the same failure one level
+up cost thousands, where the thing ending the sitting was not even about a
+photograph: run 28 died on a sentence in `CLAUDE.md` that said *a page count*,
+a prose check about documentation discarding a day of acquisition. A red gate
+costs a pull request somebody has to fix, which is recoverable and visible; it
+used to cost the whole sitting, which is neither. The merge step still
+requires the gates, so nothing reaches the default branch unchecked — what
+changed is that the WORK survives a failure.
+
+**`stage: fill` IS THE DESK'S OWN BUTTON, DISPATCHABLE.** The hosted Media
+Desk has had *Fill the library* since the basket was built and it works; it
+is also a second Vercel project somebody has to be signed in to, and eleven
+photographs against 837 surfaces says nobody pressed it fourteen times.
+`scripts/images/fill.py` is that decision inside the workflow, where the key
+is: it reads the registry, takes the empty surfaces round-robin across
+families, searches, and writes a PLAN. It does not download, does not hash,
+does not register and does not build a derivative — `acquire.py` does all of
+that and `batch.sh` runs it once per entry. `photo-tests.py` asserts the
+boundary: a plan with no purpose twice, no provider id twice, every entry
+carrying the photographer's own description, no surface the register already
+holds, and **the register and the working tree unchanged**, because planning
+is deciding what to ask for and only the acquisition may write one down.
+
+**THE NON-HOME REDESIGN: EIGHT ROOMS, AND THE HELPERS WERE WHAT FORCED THE
+GRAMMAR.** The directive's central finding is that changing a page's colours,
+spacing and card styles produces another variation of the same site, and that
+the fix is to redesign the presentation layer rather than decorate it. Three
+helpers were doing the forcing and all three changed rather than their call
+sites:
+
+| helper | was | is |
+|---|---|---|
+| `render.section()` | a small h2 with a lede under it, on three-quarters of the pages | the title at display size with its lede beside it and a **CSS counter** down the left, because a number typed per call site is wrong the day somebody reorders a page |
+| `render.indexhero()` | a 60px h1 in a narrow column beside a 4:3 figure, on five indexes | the 2036 opening, keeping the three classes that are read as promises |
+| `.pagehead` with no role | the institutional family, looking exactly like a travel page | a typographic monument — the head selected by what it is NOT, so a fourth role token cannot drift out of step with itself |
+
+**THE MASTHEAD WAS THE LARGEST SINGLE REASON TWELVE FAMILIES READ AS ONE.** A
+solid pine band across every document meant the first 63 pixels were identical
+and the most saturated thing in frame, whatever changed underneath. It is the
+page's own paper now, with pine spent on the mark and the current section, and
+it inverts **only where there is a picture under it** — keyed with `:has()` on
+the composition rather than on the family, because /journeys is family
+`journey` and opens on bone, and the first version put a graphite scrim and a
+white wordmark on a cream index.
+
+**SEVEN IMAGE SCALES, BECAUSE THE FAILURE WAS NEVER "TOO FEW PHOTOGRAPHS".**
+It was every photograph the same size in the same 16/9 card. A bleed leaves
+the column and is a change of movement; a feature is asymmetric at 1.35 against
+.65, because two equal columns read as a layout and an unequal pair reads as a
+picture with something to say; a strip SCROLLS rather than wrapping, because
+wrapping an order into rows turns a sequence into a grid; a mosaic is one
+dominant picture and two beside it and returns nothing below three, since two
+in a three-cell grid is a grid with a hole; a declaration is type over a
+picture behind a scrim that makes the ratio a property of the design.
+
+**AND EACH FAMILY'S SEQUENCE IS ITS OWN SET.** A country's strip is its
+destinations, a destination's is its places, a journey's is its legs in order,
+a theme's is its eight stops — every one built from slots this product already
+declares, which is "use the actual existing images" read as "use the actual
+existing declarations". **The keys were wrong on all four**: they built
+`destination:<target>` and the register writes `city:<target>`, so not one
+could ever have matched even after the library fills. Found because an empty
+slot can print its own brief and three of them printed nothing.
+
+**A DECLARED SLOT IS NEITHER A PHOTOGRAPH NOR A HOLE.** 826 of 837 surfaces
+are empty, so a redesign built around photography could not be *seen*:
+returning nothing kept the page honest and made the composition invisible, and
+a hash-drawn landscape would put back the exact thing this site measured out —
+189 `.card-art` elements and every one a map. The slot prints the surface's own
+brief from `desk/registry.json`: which surface, what the picture must be of,
+and how large. No `<img>`, no register row, nothing for the licence gate to
+refuse, and **the acquisition list is the page itself**. It is sized to what it
+SAYS rather than to the bleed's 21:9 — 581 pixels of mineral with three lines
+at the bottom is the hole it exists to remove — and the photograph that
+replaces it takes the full proportion back.
+
+**A `minmax(0, …)` TRACK SHRINKS BELOW ITS CONTENT, and at 108px that reads as
+a broken name.** "Kunsthistorisches Museum" came out as *Kunsthistoris / ches
+Museum*. The h1 asks for `min-width: min-content` — the fix this stylesheet
+already recorded, a `ch` being the width of a zero — and an explicit 0 floor on
+the track overrules it, so the box could not grow and the browser broke the
+word instead. It held at 60px and stopped holding at 108, because min-content
+is computed at the current size.
+
+**THE PHOTOGRAPH IS A WINDOW, AND `overflow: hidden` CANNOT MAKE ONE.** Plate
+03 was a 76vh box with the picture absolutely positioned inside it — which is
+a large card, because a full-bleed photograph that scrolls with the page is
+just a picture in a box. A window stays still while the wall moves past it, so
+the picture is fixed to the VIEWPORT and the band is `clip-path: inset(0)`:
+the band's own rectangle is the aperture and the photograph is revealed
+through it. Three alternatives each fail, and the reasons are the whole
+argument for this one:
+
+| | |
+|---|---|
+| `background-attachment: fixed` | iOS Safari ignores it outright, so the effect would exist on a desk and silently not exist for half the readership |
+| a scroll listener translating the picture | that is parallax, which is a DIFFERENT effect — parallax moves the picture slower, a window does not move it at all — and it needs JavaScript on a page whose only `<script>` is the inert JSON-LD block |
+| `overflow: hidden` on the band | **does not clip a fixed descendant at all**, because a fixed box is laid out against the viewport rather than against any scrolling ancestor. `clip-path` clips descendants whatever their position, which is precisely why it is the one property that does this |
+
+**AND SIX PROPERTIES KILL IT SILENTLY.** `transform`, `filter`,
+`backdrop-filter`, `perspective`, `will-change` naming any of those, and
+`contain` each make an element a containing block for FIXED descendants — so
+one of them anywhere between `<body>` and the picture resolves `position:
+fixed` against that element instead of the viewport, and the picture goes back
+to scrolling with the page. **Nothing reports a fault**: every box is still
+the right size in the right place, `getComputedStyle` still says `fixed`, and
+every contrast, layout, count and weight check goes on passing. This
+stylesheet already carries three of the six elsewhere — `backdrop-filter` on
+the masthead, `filter: drop-shadow` on two map layers — so it is not
+hypothetical. The chain is html → body → main → `.sheet-landscape` →
+`.shotfull`, and `main` carries `z-index: 1`, which makes a stacking context
+and is NOT a containing block for fixed. `browser-checks.js` walks that chain
+and names the element that broke it, then proves the promise the only way a
+promise about scrolling can be proved: it scrolls three hundred pixels and
+asserts the picture did not move. Proved red with `main { transform:
+translateZ(0) }` — the picture moved 300px against a 300px scroll, and
+`position` still read `fixed`, which is exactly why the position assertion
+alone is not enough.
+
+**`svh`, NOT `vh`, AND THE HEIGHT IS OVER 100 ON PURPOSE.** `vh` is the LARGE
+viewport, so a phone's toolbars growing and shrinking mid-scroll would resize
+the band underneath a picture that is standing still — the one movement this
+effect cannot have. 110 rather than 100 because the reveal needs scroll
+distance to happen in.
+
+**AND THE TINT GOES INSIDE THE FIXED ELEMENT.** As a pseudo-element of the
+band the scrim was absolutely positioned against a 110svh box that scrolls, so
+it would crawl across a photograph that is not moving and the gradient a
+letter sits on would depend on how far down the page that letter had
+travelled. Fixed with the picture, the tint is a property of the viewport
+exactly as the picture is, so the ink meets the same ground at every scroll
+position.
+
+**THE INSTRUMENT WRITTEN TO MEASURE TYPE OVER THAT PHOTOGRAPH HAD BEEN READING
+PAST THE END OF ITS OWN SCREENSHOT FOR THE LIFE OF THE PLATE, AND ONE NaN
+DEFEATED BOTH THE MEASUREMENT AND THE GUARD WRITTEN TO CATCH A DEFEATED
+MEASUREMENT.** `page.screenshot()` without `fullPage` photographs the VIEWPORT;
+plate 03 opens 1,818 pixels below the fold, so the headline sat at y=2301–2447
+of a 900-pixel image. Every index was past the end of the pixel data,
+`A.data[i]` was `undefined`, and `Math.abs(undefined - undefined)` is NaN — so
+`NaN < 40` is false, the *no glyph paints here* test never fired, and every
+out-of-bounds pixel was **counted as a glyph**, which satisfied the reach
+guard; and `NaN < worst` is false too, so `worst` stayed Infinity and the
+ratio passed. That is the year band's own recorded failure — *a sampler that
+reads outside its own image reports the canvas* — arriving through the one
+hole its guard did not cover, because **the guard counted pixels rather than
+asserting the rectangle was inside the picture.** Three more things about it
+were wrong and every one of them passed:
+
+- **One frame cannot hold four elements.** Scrolling the plate to the middle
+  puts the headline and the standfirst in shot and pushes the licence credit
+  21 pixels past the bottom edge, so a single pair of screenshots measures two
+  elements and fails the reach guard on a third for a reason that is about the
+  instrument. Each element is scrolled into its own frame now.
+- **Hiding the element hid its scrim.** `visibility: hidden` is right while
+  every measured element paints nothing of its own and wrong the moment one
+  carries a tint: hiding the credit hid the scrim the credit exists to sit on,
+  so the *ground* shot was the bare photograph and the instrument reported the
+  defect the scrim had already fixed — **2.00:1 against a real 10.39**. The
+  ground a glyph is painted over includes whatever its own box paints, so the
+  INK is removed and the box is left standing.
+- **And `color: transparent` reads back as `rgba(0,0,0,0)`**, so the
+  foreground has to be captured before it is removed or every ratio collapses
+  to about 1:1 — a failure that looks exactly like the defect being measured.
+
+**IT MEASURED FOR THE FIRST TIME AND THE LICENCE CREDIT WAS AT 2.07:1.** Bone
+on rgb(160,170,181), the pale sky at the top of the mountain, on the one
+element Pexels' terms require to be there. The band's scrim runs at 100 degrees
+and is transparent at the right BY DESIGN — that is what keeps the photograph a
+photograph rather than a dark panel — and the credit sits bottom-right, which
+is exactly where the tint runs out. So it carries its own, the way `.credit`
+already does on every other photographic surface here, and the size is
+arithmetic on the worst case a photograph can present: a pure white frame, with
+graphite at 72% compositing to rgb(76,83,82) and bone on that measuring
+**6.90:1 whatever the picture does**. 72% rather than a figure picked by eye
+because `.credit` already argued for 72%, and a second number would be a second
+decision about one thing. Measured on the real photograph: 2.07 → 10.39. The
+call to action and the credit are both in the measured set now — they were
+outside it while the instrument could not see anything at all.
+
+
+**A ROW THAT SHOWS EIGHT OF ELEVEN AND SAYS NOTHING IS A SELECTION.** Plate
+02's photograph row was `[:8]` — a cap written when eight was the whole of
+what the register held and the grid was eight fixed tracks, so it read as a
+statement about the layout. The comment directly above it already said the
+opposite: *the register decides which eight … it grows to the full thirteen
+as the library fills and the layout does not change.* Eleven themes carry a
+photograph now and Grand Tour, Modernist and Thermal were dropped by data
+order, silently, on the plate whose sentence is that the continent reorders
+itself around what you seek. **The code had stopped matching its own
+comment.** The register decides and the grid follows the count:
+`repeat(auto-fill, minmax(10rem, 1fr))` — `auto-fill` rather than
+`auto-fit`, because `auto-fit` collapses the empty tracks and stretches a
+short last row to full width, so eleven tiles come out as eight small
+pictures and three large ones. **The floor is the NAME under the tile, not
+the picture**: RENAISSANCE is 115px of uppercase tracked at .16em and this
+row has already overflowed once on exactly that, while eleven across 1,152px
+would be 90px each, which is the contact strip the rule above it rejects. Six
+and five, at 182px against the 134 they replaced, and two media rules pinning
+four and two columns are gone because auto-fill already answers them.
+
+**AND THE CREDIT UNDER IT WAS A LIST SET TO A PROSE MEASURE.** `max-width:
+62ch` capped eleven photographers' names at 513px inside a 1,152px row: three
+lines of commas in the left 45% with 639 pixels of empty plate beside them,
+and the credit the longest paragraph in its own band. This file already
+records the identical fault about a middot list of place names broken at
+544px inside a 948px column — a measure exists so the eye can find the next
+line of a sentence, and nobody reads a credit line as a sentence. **Deleting
+the local rule was not the fix**: this is a `<p>`, and `p { max-width:
+var(--measure) }` then capped it at 544, four lines from the comment saying a
+measure is the wrong idea here. `max-width: none` is a declaration, not the
+absence of one.
+
+**A RULE STATED ONCE AND APPLIED TO ONE OF ITS FOUR CALL SITES.** *A declared
+slot is sized to what it SAYS, not to the photograph that will replace it* is
+written out on `.ed-slot-wide`, whose 21:9 left 581 pixels of mineral with
+three lines at the bottom — and it was applied to `.ed-slot-wide`.
+`.ed-slot-tall`, `.ed-slot-square` and `.ed-slot-portrait` kept an
+`aspect-ratio`, which is the photograph's proportion and therefore the exact
+thing the rule refuses. Measured on the two openings carrying a square slot:
+**682 × 511 with the brief in the bottom third, 361 pixels of `--paper-3`,
+71% of the box** — proportionally worse than the case the rule was written
+for. The container's floor had already been fixed one line above
+(`.ed-opening-visual:has(> .ed-slot) { min-height: 0 }`), so half the job was
+done and **the half left standing was the visible half.**
+
+**THE DISTINCTION THE RULE DID NOT MAKE IS WHERE THE SLOT IS.** In a STRIP a
+portrait slot renders 240 × 320 and its proportion is what makes the strip a
+row of like things — eight tiles that each shrink to their own caption is not
+a strip, it is a ragged list — so every one of those is untouched
+(`grep -ro 'ed-slot ed-slot-portrait' site --include=index.html | wc -l`). In an OPENING the slot is alone, nothing is beside it to be ragged
+against, and reserving a picture nobody has licensed is reserving a hole.
+511px → 208px, empty ground 361px → 58px, `voids.js` unmoved.
+
+**THE LIBRARY IS THE BINDING CONSTRAINT AND NO AMOUNT OF LAYOUT FIXES IT.**
+Eleven photographs against 1,626 declared surfaces. The homepage now spends
+every one of them twice — eleven at 182px on plate 02 and one at full bleed
+through the window on plate 03 — and there is no third place to put them that
+would not be the same eleven a third time. `docs/gap-assessment.md` already
+says this in general; it is worth saying again at the point somebody asks why
+a touristic site has so few pictures. **The next photograph is a
+`workflow_dispatch` of `photograph.yml` with `stage: fill`**, which plans
+every empty surface round-robin across families, acquires by id, hashes,
+derives, registers, gates and merges itself on green. It is one action and it
+is the owner's, because the key is a repository secret and because nothing
+here may acquire a real photograph unasked.
+
+
+**THE DEAD-RULE SCAN WAS MEASURING WHERE THE MOUSE HAD BEEN LEFT.** It
+reported 37 rules against a ceiling of 36 in a run where **no stylesheet byte
+had moved**, and rerun standalone on the identical build it said 34 — with the
+34 an exact subset. The three extra were `.staged .now` and two `:hover,
+:focus-visible` rules, and the mechanism is that **a `:hover` selector matches
+nothing when the pointer is nowhere**: standalone the scan skipped those rules
+entirely, and in the suite an earlier check had left the mouse on a card, so
+they matched, were judged, and counted. The scan was using the suite's shared
+page and inheriting its pointer AND its viewport. It takes its own page now.
+
+**AND IT SCANNED ONE WIDTH WHILE ITS OWN COMMENT ARGUED ABOUT THE OTHER.**
+That comment says, specifically about `.band > .band-head`'s `display: grid`,
+that *a media rule that does not currently apply is asleep, not dead* — and
+the scan went on counting that rule dead, because it never looked at 390.
+Measured: 34 dead at 1280, 34 at 390, **31 at both**. The principle was
+written down and never implemented, which is *a rule stated once and applied
+to one of its call sites* arriving in the instrument rather than in the
+stylesheet. Both widths now, and a rule alive at either is alive — the same
+union the scan already did across PAGES, on the axis the comment was about.
+
+**AND ITS PAGE SET HELD NO PAGE CARRYING A PHOTOGRAPH.** Widening to 390 put
+the `@media (max-width: 44rem)` block in the scan's reach for the first time
+and reported `.credit {opacity}` dead — the rule that reveals the licence
+credit on a phone. Measured on a real theme page it is **1 at 390 and 0 at
+1280**, which is the rule working: not one of the seventeen scanned pages
+carries a `.credit` where it decides anything. That is this check's own
+recorded finding about `.regionglyph .countries path` — a rule measured only
+where it loses looks like a rule that wins nowhere, and a ceiling raised for
+that is a ceiling raised for a gap in the scan. `/themes/mountain-europe` is
+in the set now, and it immediately found two real ones: **`display: block` on
+the photograph inside an opening**, restating what a grid item already
+computes. That is the **third and fourth dead `display: block` found on a
+photograph container here**, each in the first run where a photograph actually
+rendered — *a code path nothing exercises is a code path nothing checks*,
+about a measuring device. Removed, and verified by byte-identical screenshots
+at 1280 and 390 on both pages, because nothing here is deleted on the scan's
+word alone.
+
+**AND THEN THE COUNT WAS THE WRONG INSTRUMENT, BECAUSE IT JITTERS.** With the
+pointer and the viewport both pinned, consecutive runs on one build read **34
+of 332 rules examined and 35 of 334** — the REACH varies, so the population
+differs rather than the verdicts. A ceiling on a quantity that moves does not
+merely fail at random: **it teaches whoever hits it to re-run until green**,
+which is how a real dead rule gets through, and it is the mirror of *a green
+run that has stopped counting is worse than a red one*. The check's own
+comment already said the LIST was the thing — *raising this number is allowed
+and raising it without reading the list is not* — which makes a count a proxy
+for a set somebody was asked to read by hand. The 35 are written down by name
+now: a rule NOT on the list fails and is named, a run that finds one fewer
+still passes because a subset is not a regression. Proved red by adding one
+redundant declaration, which was named alone against a printed 36-of-335.
+
 
 ## Gates
 
@@ -3315,7 +4215,8 @@ the rest.
     python3 tools/invariants.py --check       what a visual change may not move
     python3 tools/plate-variation.py --check  the plates have not got more alike
     python3 tools/photo-tests.py              the acquisition pipeline
-                                              and its batch loop, against a stub provider
+                                              its batch loop and its fill planner,
+                                              against a stub provider
     python3 tools/desk-tests.py               the Media Desk: the sign-in, and what the browser may send
     node tools/hosted-desk-tests.js           the HOSTED desk: signed sessions, signed thumbnails, the dispatch
     node tools/desk-render.js                 the HOSTED desk's screens and its basket, at 1280 and 390
@@ -3367,12 +4268,40 @@ made to print `computed-display`, the box and the child count; the first line
 of that output ended it. Every other count in this repository is in its
 message for the same reason.
 
+**Two more that are deliberately not gates, and answer the two halves of the
+mandate's first two findings.** `node tools/opening.js` measures how much of
+the first screen is a picture, per family, at 390 and (`--wide`) at 1280;
+`node tools/composition.js` measures the band sequence UNDER the head, the
+h1's size and position, and how much of its own width each head reaches.
+Neither has a threshold and neither can fail, for the same reason: the fault
+they exist to find is a page that is DULL, and a number to satisfy is
+satisfied by shuffling bands. Both read `tools/lib/families.js`, which is the
+one list of rendered families and is enumerated against the built site — a
+template missing from it is a family no instrument here can see, which is how
+the fund project page shipped at 0% picture for the life of the family.
+
+**And a third, on the same reasoning.** `node tools/voids.js` measures bands
+over 90px with nothing painted in them, per family, at 1280 or (`--phone`) at
+390. It reports and cannot fail: the fault it looks for is an outlier — a
+296px column beside a picture, a standfirst alone in the right half — and the
+section rhythm it would otherwise punish is what says two bands are separate.
+
 **And one that is deliberately not a gate.** `node tools/contact-sheet.js`
 puts one page per family in a single image. `--dark` shoots the dark
-colour-scheme preference, `--phone` shoots 390px, and `--more` shoots the
-twelve families the default set leaves out — macro, place, facet, interest,
-experiences, category, how-it-works, fund, method, about, manifesto,
-sources. Each of those three found a defect the whole gate suite was green
+colour-scheme preference, `--phone` shoots 390px, `--tablet` shoots 834, and
+`--set=N` pages through the whole list twelve at a time (`--more` is
+`--set=2`). **834 is the width that finds a two-column layout collapsing a
+column just above its own breakpoint** — two heads and the four doors on
+/how-it-works were each wrong only between the breakpoints, and invisible at
+both the widths everything else is shot at. **The list
+is `tools/lib/families.js` and both this and `opening.js` read it**, because
+the sheet used to type its own and the two disagreed: it carried
+`["macro", "/countries/"]` — the countries INDEX under the macro family's
+name — so no macro page had ever been on a contact sheet, and neither had a
+story, a theme, `/journeys`, `/interests`, `/europe-in`, `/events`,
+`/discover`, `/search`, `/my-europe` or the 404. Its own comment said "every
+family is in one field of view" while it covered 23 of 27 and named one of
+them wrong. Each of those three found a defect the whole gate suite was green
 on. **It refuses to draw a page that is not 200**: the second sheet
 photographed a 404 as a blank white cell, which is the same failure as a
 suite that stops counting — the output still looks like a result. A sheet cannot fail, and a gate

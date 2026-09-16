@@ -20,6 +20,51 @@ const path = require("path");
 const ROOT = path.join(__dirname, "..");
 const OUT = path.join(ROOT, "site");
 
+// THE REGISTER IS WHERE A COLOUR IS DECIDED, and this suite used to carry
+// copies: a literal `#8398ff` for the INTELLIGENCE accent, two hue bounds
+// typed into a ternary, and a "blue > red + 40" test for the signature
+// family. All three are claims about cobalt, and all three would have gone
+// silently wrong the day the signature stopped being cobalt — an instrument
+// that cannot survive the change it exists to police.
+const PALETTE = JSON.parse(fs.readFileSync(
+  path.join(ROOT, "docs", "palette.json"), "utf8"));
+
+/* ONE CLASSIFIER, BUILT FROM THE REGISTER, USED BY EVERY CHECK THAT ASKS
+ * "WHAT FAMILY IS THIS COLOUR IN".
+ *
+ * Two checks asked it with a HUE WINDOW and both broke on the same palette
+ * change: the ratio reported the signature at 0.1% because pine (174.2) and
+ * the owner's map water (174.5) are three tenths of a degree apart, and the
+ * kicker probe asked whether a label is "in the accent" by the signature
+ * band, which is a different question wearing the same numbers. A second
+ * implementation of a thing is a second chance to make its mistake — sixth
+ * occurrence here, and this one is the fix rather than the occurrence.
+ *
+ * `SWATCH` is every declared token with the family the register puts it in;
+ * `familyOf` returns that family for a painted colour, or "" when the colour
+ * is further than `max_distance` from every token, which is what a
+ * photograph, a blend or a shadow is. */
+const SWATCH = (() => {
+  const out = [];
+  for (const [family, names] of Object.entries(PALETTE.ratio.$families)) {
+    if (!Array.isArray(names)) continue;
+    for (const nm of names) out.push({ family, hex: PALETTE.tokens[nm].hex });
+  }
+  return out;
+})();
+const MAXD = PALETTE.ratio.$families.max_distance;
+
+function rgbOf(v) {
+  const m = String(v).match(/\d+/g);
+  if (m && m.length >= 3) return m.slice(0, 3).map(Number);
+  const h = String(v).replace("#", "");
+  return h.length === 6 ? [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)) : null;
+}
+function sameColour(a, b, tol = 2) {
+  const x = rgbOf(a), y = rgbOf(b);
+  return !!x && !!y && x.every((v, i) => Math.abs(v - y[i]) <= tol);
+}
+
 const TYPES = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -752,8 +797,21 @@ async function main() {
   // The surface that answers "I don't know where I want to go", and the
   // only one on the site where every recommendation has to justify itself.
   await page.goto(base + "/discover", { waitUntil: "networkidle" });
-  ok(await page.locator("#discover-interests .chip.pick").count() >= 16,
-     "the interest chips did not render from the Atlas");
+  // IT PINNED THE LOOK OF THE CONTROL AND THE LOOK WAS THE THING THAT
+  // CHANGED. `.chip.pick` was the outlined pill; Decision 2 made the
+  // seventeen large type, and the assertion went red for a page that had
+  // got better — the twelfth shape pinned instead of a promise here. What
+  // matters is that seventeen interests are on the page as real controls a
+  // reader can press, so it reads `data-interest`, which is the contract
+  // the application binds to, and asserts the control rather than its skin.
+  {
+    const picks = page.locator("#discover-interests [data-interest]");
+    ok(await picks.count() >= 16,
+       `Discover offers ${await picks.count()} interests to choose from`);
+    ok(await page.locator('#discover-interests button[aria-pressed]').count()
+       === await picks.count(),
+       "every interest is a button that reports whether it is pressed");
+  }
   ok(await page.locator("#discover-results .row").count() === 0,
      "Discover Mode showed results before anything was chosen");
 
@@ -908,22 +966,33 @@ async function main() {
   // weaker assertion than the one it replaces, deliberately: a check that
   // demands six bands is a check that forbids restraint.
   await page.goto(base + "/", { waitUntil: "networkidle" });
-  const CANON = ["Open", "Discover", "Wonder", "Understand", "Browse", "Plan", "Go"];
-  const stages = await page.locator(".stage").allTextContents();
-  const seq = stages.join(">");
-  ok(stages.length >= 2, `the homepage names ${stages.length} steps`);
-  const ranks = stages.map((t) => CANON.indexOf(t.trim()));
-  ok(ranks.every((r) => r >= 0),
-     `the homepage names a step that is not in the progression: ${seq}`);
-  ok(ranks.every((r, i) => i === 0 || ranks[i - 1] < r),
-     `the progression is out of order: ${seq}`);
-  // It still ends on Go: the last thing the homepage asks for is a journey.
-  ok(stages[stages.length - 1].trim() === "Go",
-     `the homepage ends on ${stages[stages.length - 1]} rather than Go`);
-  // The wonder band changes ground, so the rhythm is felt rather than
-  // merely intended — and it must not blow out the page at any width.
-  ok(await page.locator(".band.tone-quiet").count() === 1,
-     "the wonder band is missing or duplicated");
+  // THE PROGRESSION IS NUMBERED NOW, NOT CHIPPED. This read `.stage`, which
+  // `render.section()` emits and which the homepage stopped using when it
+  // became a plate sequence — so it found an empty list and died on
+  // `stages[-1].trim()`, taking the whole suite down before check one.
+  // Eighteenth assertion here to pin a mechanism rather than a promise.
+  const acts = await page.locator(".actmark").evaluateAll((els) => els.map((e) => [
+    e.querySelector(".actno") ? e.querySelector(".actno").textContent.trim() : "",
+    e.querySelector(".actname") ? e.querySelector(".actname").textContent.trim() : ""]));
+  const seq = acts.map((a) => a[1]).join(" > ");
+  ok(acts.length >= 4, `the homepage names ${acts.length} plates (${seq})`);
+  ok(acts.every((a, i) => a[0] === String(i + 1).padStart(2, "0")),
+     `the plates are not numbered in order: ${acts.map((a) => a[0]).join(",")}`);
+  ok(acts.length > 0 && /door/i.test(acts[0][1]),
+     `the sequence opens on ${acts.length ? acts[0][1] : "nothing"} rather than the door`);
+  // AND IT HANDS THE READER ONWARD AT THE END, which is what "ends on Go"
+  // was claiming. The last plate carries a link out of the page.
+  ok(await page.locator("section:last-of-type .go").count() >= 1,
+     "the last plate does not hand the reader anywhere");
+  // One plate changes ground, so the rhythm is felt rather than merely
+  // intended. It was `.band.tone-quiet`; it is the atlas plate now.
+  const grounds = await page.locator("main section").evaluateAll((els) => {
+    const seen = new Set();
+    for (const e of els) seen.add(getComputedStyle(e).backgroundColor);
+    return Array.from(seen);
+  });
+  ok(grounds.length >= 2,
+     `every plate is on the same ground (${grounds.join(", ")}) — no rhythm`);
   for (const w of [1280, 390]) {
     await page.setViewportSize({ width: w, height: 900 });
     const over = await page.evaluate(() =>
@@ -1599,6 +1668,52 @@ async function main() {
     await bp.close();
   }
 
+  // ── AN INSTRUMENT AT REST REPORTS NO WORK IN PROGRESS ──────────────
+  // /plan opened on a panel headed "Building your journey" with
+  // "Understanding what you asked for" marked as happening now, and it
+  // stayed there for as long as the page was open. Nothing was being built:
+  // the boot borrowed the build's five-step progress report to say the index
+  // was loading, ticked the first step when it arrived, and never took it
+  // down. A reader who had asked for nothing was shown a machine working on
+  // their behalf, permanently stuck on step two.
+  //
+  // The promise is the one thing a live region owes: what it says is true at
+  // the moment it says it. Measured across every live region visible at rest
+  // on all 44 families, /plan was the only one claiming work in progress —
+  // the other six say what they actually are ("Nothing saved yet", "Choose
+  // what you are travelling for"). So this reads every ARIA live region on
+  // every application page after load and nothing else, and fails on a
+  // progressive verb of work.
+  //
+  // It counts the regions it read, because a page that has stopped
+  // publishing a live region at all would pass this silently, and an empty
+  // scan that reports clean is the failure this suite already records twice.
+  {
+    const REST = ["/plan", "/discover", "/search", "/my-europe", "/map"];
+    const WORKING = /\b(building|loading|scoring|estimating|working|calculating|please wait|one moment)\b/i;
+    let regions = 0;
+    for (const u of REST) {
+      const rp = await page.goto(base + u, { waitUntil: "load" });
+      if (!rp || rp.status() !== 200) { ok(false, `${u} did not load`); continue; }
+      // networkidle would hide exactly the defect this is about: the index
+      // fetch is what the panel was reporting, and the panel survived it.
+      await page.waitForTimeout(1500);
+      const found = await page.evaluate(() =>
+        [...document.querySelectorAll("[role=status], [aria-live], .staged")]
+          .filter((e) => e.getClientRects().length)
+          .map((e) => e.textContent.replace(/\s+/g, " ").trim()));
+      regions += found.length;
+      for (const t of found) {
+        ok(!WORKING.test(t),
+           `${u} at rest: a live region reports work in progress with nothing ` +
+           `asked for — "${t.slice(0, 110)}"`);
+      }
+    }
+    ok(regions >= 4,
+       `the at-rest scan found only ${regions} live regions across ` +
+       `${REST.length} application pages — it has stopped finding them`);
+  }
+
   // ── THE PLANNER DRAWS THE ROUTE IT BUILT ───────────────────────────
   // The most complex thing on this site had no geography in its output at
   // all: a summary table, a budget verdict and a column of stops, on a
@@ -2042,8 +2157,140 @@ async function main() {
     // it from 28 back to the ceiling rather than through it. The margin is
     // zero, which is worth knowing before the next visual change: the next
     // redundant declaration fails here, and that is the check working.
-    const DEAD_CEILING = 25;
+    // 36, MEASURED AFTER THE REMOVALS RATHER THAN BEFORE THEM, AND THE LIST
+    // WAS READ. Raising this number is allowed and raising it without
+    // reading the list is not, which is the rule this ceiling carries.
+    //
+    // What moved it from 25 is the eight-family redesign. Three groups, and
+    // none of them is a rule nobody meant:
+    //
+    //   the `ed-` heads state a colour their family rule then supersedes —
+    //   `.ed-eyebrow`, `.ed-section-index`, `.ed-split-copy p`,
+    //   `.ed-index dd`. Every page has a family, so the base never wins;
+    //   the honest fix is for the base to state no colour at all, which
+    //   means the institution and the arrival cases have to be written out
+    //   first, and that is its own piece of work.
+    //
+    //   the `.arched` map variants supersede their own base on every page
+    //   that has one — 824 of 824 — which this repository already records
+    //   as *a ceiling, not zero*, with a refactor as the honest answer.
+    //
+    //   and `display` restated where an element already has it.
+    //
+    // THREE WERE REMOVED AND ONE WAS PUT BACK. `.band > .band-head`'s
+    // `display: grid` looks like a duplicate of the declaration 7,300 lines
+    // up and is not: that one is inside a media query, so below its
+    // breakpoint this is the only one and removing it drops the band head to
+    // block layout on every phone. The scan reports it dead because it scans
+    // at a width where the media rule applies — *a media rule that does not
+    // currently apply is asleep, not dead*, from the other end.
+    //
+    // AND THE SCAN WAS WRONG ONCE THIS SESSION, WHICH IS WHY NONE OF THESE
+    // WAS DELETED ON ITS WORD ALONE. It called the inverting masthead's
+    // `color: var(--bone)` redundant; it was the inheritance escape, and
+    // deleting it measured 1.05:1 on three families. Every removal here was
+    // measured at 390 and 1280 afterwards.
+    // THE SCAN INHERITED ITS VIEWPORT AND ITS POINTER FROM WHATEVER RAN
+    // BEFORE IT, AND BOTH CHANGE ITS ANSWER. It reported 37 against a
+    // ceiling of 36 in a run where no stylesheet byte had moved; rerun
+    // standalone on the identical build it said 34, and the three extra
+    // were `.staged .now` and two `:hover, :focus-visible` rules. A `:hover`
+    // selector matches NOTHING when the pointer is nowhere, so the scan
+    // skipped those rules entirely — and matched them, and judged them, in a
+    // suite where an earlier check had left the mouse on a card. **Where the
+    // mouse was last put is not an input to a stylesheet audit.** So the
+    // scan takes its own page, which no earlier check can have touched.
+    //
+    // AND IT SCANS BOTH WIDTHS, WHICH IS THIS CHECK'S OWN PRINCIPLE FINALLY
+    // APPLIED. Its comment already says *a media rule that does not
+    // currently apply is asleep, not dead*, and says it specifically about
+    // `.band > .band-head`'s `display: grid` — which is a duplicate at 1280
+    // and the only declaration below the breakpoint. The principle was
+    // written down and the scan went on judging at one width, so that rule
+    // and two others were counted dead while being load-bearing on every
+    // phone. A rule alive at ANY width is alive, which is exactly the union
+    // the scan already does across PAGES, extended to the axis the comment
+    // was about. Measured: 34 dead at 1280, 34 at 390, and only 31 at both —
+    // the three that leave at each width are the asleep ones, named.
+    //
+    // THE NUMBER MOVED 36 -> 35 AND EVERY PART OF THAT WAS READ. Two rules
+    // LEFT because the scan stopped calling an asleep rule dead
+    // (`.band > .band-head` and `.storylead, .storysm`, both `display`,
+    // both the only declaration below the breakpoint). Three ENTERED
+    // because scanning at 390 put the `@media (max-width: 44rem)` block in
+    // this scan's reach for the first time. Two more ENTERED with the theme
+    // page and were then REMOVED, because they were real: `display: block`
+    // on the photograph inside an opening, restating what a grid item
+    // already computes — which is the third and fourth time a dead
+    // `display: block` has been found on a photograph container here, each
+    // time in the first run where a photograph was actually rendered.
+    // AND A CEILING IS THE WRONG INSTRUMENT, BECAUSE THE NUMBER MOVES.
+    // With the pointer and the viewport both fixed, two consecutive runs on
+    // one build still read 34 of 332 rules examined and 35 of 334 — the
+    // REACH varies, so the population differs rather than the verdicts.
+    // A ceiling on a quantity that jitters does not merely fail at random:
+    // it teaches whoever hits it to re-run until green, which is how a real
+    // dead rule gets through. And this check's own comment already said the
+    // LIST is the thing — *raising this number is allowed and raising it
+    // without reading the list is not* — which makes the count a proxy for
+    // a set somebody was asked to read by hand.
+    //
+    // So the set is written down. A rule NOT on it fails and is named; a
+    // run that happens to find one fewer still passes, because a subset is
+    // not a regression. That is jitter-immune, it says exactly what is new,
+    // and it turns an instruction to a human into code.
+    //
+    // Every entry was read. Two rules LEFT the old count because the scan
+    // stopped calling an asleep rule dead — `.band > .band-head` and
+    // `.storylead, .storysm`, both `display`, both the only declaration
+    // below the breakpoint. Three ENTERED because scanning at 390 put the
+    // `@media (max-width: 44rem)` block in this scan's reach for the first
+    // time. Two more entered with the theme page and were REMOVED from the
+    // stylesheet, because they were real: `display: block` on the
+    // photograph inside an opening, restating what a grid item already
+    // computes — the third and fourth dead `display: block` found on a
+    // photograph container here, each in the first run where a photograph
+    // actually rendered.
+    const WIDTHS = [[1280, 900], [390, 844]];
+    const DEAD_KNOWN = new Set([
+      ".band > .band-head > .lede {color}",
+      ".band-head {display}",
+      ".card {display}",
+      ".credit {opacity}",
+      ".doorgo {opacity}",
+      ".ed-eyebrow {color}",
+      ".ed-index dd {color}",
+      ".ed-opening-visual svg {display}",
+      ".ed-section-index {color}",
+      ".ed-split-copy p {color}",
+      ".leg .hop {color}",
+      ".locator svg {display}",
+      ".masthead {color}",
+      ".minidot circle {opacity}",
+      ".minidot.here circle {opacity}",
+      ".minimap figcaption {color}",
+      ".minimap {color}",
+      ".minimap.arched .context path {fill}",
+      ".minimap.arched .context path {stroke}",
+      ".minimap.arched .minidot.here circle {fill}",
+      ".minimap.arched figcaption {color}",
+      ".minimap.arched.atlas .lyr-destinations .minidot.here circle {fill,stroke}",
+      ".minimap.arched.atlas .lyr-labels .minilabel {fill,stroke}",
+      ".minimap.arched.atlas .lyr-land .countries path {fill,stroke}",
+      ".minimap.arched.atlas .lyr-ocean rect {fill}",
+      ".nav a[aria-current=\"page\"] {color}",
+      ".navsearch {color}",
+      ".plate {display}",
+      ".portrait svg {display}",
+      ".reasons .rt {color}",
+      ".route .hop {color}",
+      ".route .leg-nights {color}",
+      ".scalebar text {fill}",
+      ".sheet-atlas {color}",
+      ".staged .now {color}",
+    ]);
     const seen = new Map();
+    const dsp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
     // AND THE PAGE SET IS THE INSTRUMENT'S REACH. `.regionglyph .countries
     // path` was reported dead and it is what paints the nine lit regions on
     // /countries — a whole family this scan had never visited, so a rule that
@@ -2054,15 +2301,32 @@ async function main() {
     // lower the count, which was the first guess and was wrong: a rule that
     // matched no element anywhere in the old set was not counted at all, and
     // a new page can make it match and still not win.
+    for (const [vw, vh] of WIDTHS) {
+    await dsp.setViewportSize({ width: vw, height: vh });
     for (const u of ["/", "/europe/austria", "/europe/austria/tyrol",
                      "/europe/austria/tyrol/innsbruck",
                      "/journeys/the-alpine-grand-tour", "/discover/nordic",
                      "/events/oct", "/beyond-the-obvious", "/map", "/plan",
                      "/stories", "/themes", "/countries",
                      "/interests/mountains", "/europe-in/by-rail",
+                     // AND THE ONE FAMILY THAT CARRIES A PHOTOGRAPH HAD
+                     // NEVER BEEN SCANNED. Widening to 390 made
+                     // `.credit {opacity}` visible to this scan for the
+                     // first time — the phone rule that reveals the licence
+                     // credit, which is `opacity: 0` until hover on a desk —
+                     // and it was reported dead because not one of the
+                     // seventeen pages here carries a `.credit` where the
+                     // rule decides anything. Measured on a real theme page
+                     // it is 1 at 390 and 0 at 1280, which is the rule
+                     // working. That is this check's own recorded finding
+                     // about `.regionglyph .countries path`: a rule measured
+                     // only where it loses looks like a rule that wins
+                     // nowhere, and a ceiling raised for that is a ceiling
+                     // raised for a gap in the scan.
+                     "/themes/mountain-europe",
                      "/search", "/fund"]) {
-      await page.goto(base + u, { waitUntil: "load" });
-      const rows = await page.evaluate(() => {
+      await dsp.goto(base + u, { waitUntil: "load" });
+      const rows = await dsp.evaluate(() => {
         const PROPS = ["fill", "stroke", "display", "color",
                        "background-color", "opacity", "visibility"];
         const sheet = [...document.styleSheets]
@@ -2136,19 +2400,23 @@ async function main() {
         seen.set(k, (seen.get(k) || false) || won);
       }
     }
+    }
+    await dsp.close();
     const dead = [...seen.entries()].filter(([, won]) => !won).map(([k]) => k);
     ok(seen.size > 100,
        `the dead-rule scan examined only ${seen.size} rules — it has stopped ` +
        "walking the stylesheet, which is exactly how its first version " +
        "reported a clean result while collecting nothing");
-    // THE WHOLE LIST, NOT THE FIRST FOUR. Raising this ceiling is allowed
-    // and raising it without reading the list is not — and for the life of
-    // this check the failure printed four names out of two dozen, so the
-    // list it demands you read was the one thing it would not show you.
-    ok(dead.length <= DEAD_CEILING,
-       `${dead.length} stylesheet rules match elements and change none of ` +
-       `them, above the ceiling of ${DEAD_CEILING}:\n    ` +
-       dead.join(";\n    "));
+    // THE WHOLE LIST, NOT THE FIRST FOUR. For the life of this check the
+    // failure printed four names out of two dozen, so the list it demanded
+    // you read was the one thing it would not show you.
+    const fresh = dead.filter((d) => !DEAD_KNOWN.has(d));
+    ok(fresh.length === 0,
+       `${fresh.length} stylesheet rule(s) match elements and change none of ` +
+       `them at ${WIDTHS.map(([w]) => w).join(" or ")}, and are not on the ` +
+       `known list (${dead.length} dead of ${seen.size} examined). Read them, ` +
+       `then either fix them or add them to DEAD_KNOWN with the reason:\n    ` +
+       fresh.join(";\n    "));
   }
   await page.setViewportSize({ width: 1280, height: 900 });
 
@@ -2217,75 +2485,537 @@ async function main() {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(base + "/", { waitUntil: "networkidle" });
     await page.waitForTimeout(400);
-    const SEL = [[".herobody h1", 3.0], [".herobody .lede", 4.5]];
-    const withType = (await page.screenshot()).toString("base64");
-    await page.evaluate((sels) => {
-      sels.forEach((s) => document.querySelectorAll(s)
-        .forEach((e) => { e.style.visibility = "hidden"; }));
-    }, SEL.map(([s]) => s));
-    const noType = (await page.screenshot()).toString("base64");
-    const measured = await page.evaluate(async ({ a, b, sels }) => {
-      const load = (d) => new Promise((res) => {
-        const i = new Image(); i.onload = () => res(i); i.src = "data:image/png;base64," + d;
-      });
-      const grab = async (d) => {
-        const img = await load(d);
-        const c = document.createElement("canvas");
-        c.width = img.width; c.height = img.height;
-        c.getContext("2d").drawImage(img, 0, 0);
-        return c.getContext("2d").getImageData(0, 0, img.width, img.height);
-      };
-      const A = await grab(a), B = await grab(b);
-      const lum = (r, g, bl) => {
-        const f = (v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
-        return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(bl);
-      };
-      const out = [];
-      for (const sel of sels) {
-        const e = document.querySelector(sel);
-        if (!e) { out.push({ sel, missing: true }); continue; }
-        const r = e.getBoundingClientRect();
-        const col = getComputedStyle(e).color;
+    // `.herobody` WAS THE DRAWN HERO'S TYPE AND THE PLATE SEQUENCE REPLACED
+    // IT, so this measured nothing and said so. The successor is plate 03,
+    // which is the one surface on the homepage where type stands over a
+    // PHOTOGRAPH — exactly the case a token-based ratio cannot answer and
+    // this instrument exists for.
+    //
+    // Measure where the GLYPHS are, not where the box is: shoot the page
+    // twice, with the ink and without, and a pixel that differs is a pixel
+    // a glyph paints. Scanning the rectangle instead reads the bright
+    // ground in the gutter past the last letter as a failure of the type.
+    //
+    // FOUR THINGS ABOUT THIS INSTRUMENT WERE WRONG AND EACH ONE PASSED.
+    //
+    // 1 · IT WAS READING PAST THE END OF ITS OWN SCREENSHOT. Plate 03 is
+    //     1,818 pixels below the fold and `page.screenshot()` without
+    //     `fullPage` photographs the VIEWPORT, so the type sat at
+    //     y=2301..2447 of a 900-pixel image. Every index was past the end
+    //     of the pixel data, `A.data[i]` was `undefined`, and
+    //     `Math.abs(undefined - undefined)` is NaN — so `NaN < 40` is false
+    //     and the "no glyph paints here" test never fired, which meant
+    //     every out-of-bounds pixel was COUNTED as a glyph and satisfied
+    //     the reach guard; and `NaN < worst` is false too, so `worst`
+    //     stayed Infinity and the ratio passed. One NaN defeated the
+    //     measurement and the guard written to catch a defeated
+    //     measurement, in the same loop. That is the year band's own
+    //     recorded failure — a sampler that reads outside its own image
+    //     reports the canvas — arriving through the one hole its guard did
+    //     not cover, because the guard counted PIXELS rather than asserting
+    //     the rectangle was IN the picture. Both now.
+    //
+    // 2 · ONE FRAME CANNOT HOLD FOUR ELEMENTS. Scrolling the plate to the
+    //     middle puts the headline and the standfirst in shot and pushes
+    //     the licence credit 21 pixels past the bottom edge — so a single
+    //     pair of screenshots would have measured two elements and failed
+    //     the reach guard on a third for a reason that is about the
+    //     instrument rather than the page. Each element is scrolled into
+    //     its own frame and shot there.
+    //
+    // 3 · HIDING THE ELEMENT HID ITS SCRIM. `visibility: hidden` was right
+    //     while every measured element painted nothing of its own, and
+    //     wrong the moment one carried a tint: hiding the credit hid the
+    //     scrim the credit exists to sit on, so the "ground" shot was the
+    //     bare photograph and the instrument reported the defect the scrim
+    //     had already fixed — 2.00:1 against a real 10.39. The ground a
+    //     glyph is painted over includes whatever its own box paints, so
+    //     the ink is removed and the box is left standing.
+    //
+    // 4 · AND `color: transparent` IS READ BACK AS rgba(0,0,0,0), so the
+    //     foreground has to be captured BEFORE it is removed or every ratio
+    //     collapses to about 1:1 — a failure that looks exactly like the
+    //     defect being measured.
+    const SEL = [[".sheet-landscape .mega", 3.0], [".sheet-landscape .lede", 4.5],
+                 [".sheet-landscape .go", 4.5], [".sheet-landscape .sheetcred", 4.5]];
+    for (const [sel, floor] of SEL) {
+      const there = await page.evaluate((s) => {
+        const e = document.querySelector(s);
+        if (!e) return false;
+        e.scrollIntoView({ block: "center" });
+        return true;
+      }, sel);
+      ok(there, `${sel} is not on the homepage to measure`);
+      if (!there) continue;
+      await page.waitForTimeout(250);
+      const withType = (await page.screenshot()).toString("base64");
+      await page.evaluate((s) => {
+        const e = document.querySelector(s);
+        e.dataset.edInk = getComputedStyle(e).color;
+        e.style.setProperty("color", "transparent", "important");
+        e.querySelectorAll("*").forEach((k) =>
+          k.style.setProperty("color", "transparent", "important"));
+      }, sel);
+      const noType = (await page.screenshot()).toString("base64");
+      const r = await page.evaluate(async ({ a, b, s }) => {
+        const load = (d) => new Promise((res) => {
+          const i = new Image(); i.onload = () => res(i); i.src = "data:image/png;base64," + d;
+        });
+        const grab = async (d) => {
+          const img = await load(d);
+          const c = document.createElement("canvas");
+          c.width = img.width; c.height = img.height;
+          c.getContext("2d").drawImage(img, 0, 0);
+          return c.getContext("2d").getImageData(0, 0, img.width, img.height);
+        };
+        const A = await grab(a), B = await grab(b);
+        const lum = (r, g, bl) => {
+          const f = (v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(bl);
+        };
+        const e = document.querySelector(s);
+        const rc = e.getBoundingClientRect();
+        const col = e.dataset.edInk || getComputedStyle(e).color;
         let fg = [255, 255, 255], al = 1;
         const m = col.match(/color\(srgb ([\d.]+) ([\d.]+) ([\d.]+)(?: \/ ([\d.]+))?\)/);
         if (m) { fg = [m[1] * 255, m[2] * 255, m[3] * 255]; al = m[4] ? +m[4] : 1; }
         else { const n = (col.match(/[\d.]+/g) || []).map(Number); fg = n.slice(0, 3); al = n[3] === undefined ? 1 : n[3]; }
-        let worst = Infinity, at = null, painted = 0;
         const dpr = A.width / innerWidth;
-        for (let y = Math.round(r.top * dpr); y < Math.round(r.bottom * dpr); y++) {
-          for (let x = Math.round(r.left * dpr); x < Math.round(r.right * dpr); x++) {
-            const i = (y * A.width + x) * 4;
-            const d = Math.abs(A.data[i] - B.data[i]) + Math.abs(A.data[i + 1] - B.data[i + 1])
-                    + Math.abs(A.data[i + 2] - B.data[i + 2]);
-            if (d < 40) continue;             // no glyph paints here
-            painted++;
-            const g = [B.data[i], B.data[i + 1], B.data[i + 2]];
-            const Lb = lum(g[0], g[1], g[2]);
-            const Lf = lum(fg[0] * al + g[0] * (1 - al), fg[1] * al + g[1] * (1 - al),
-                           fg[2] * al + g[2] * (1 - al));
-            const cr = (Math.max(Lf, Lb) + 0.05) / (Math.min(Lf, Lb) + 0.05);
-            if (cr < worst) { worst = cr; at = [x, y, g]; }
+        const inside = rc.top >= 0 && rc.left >= 0
+                    && Math.round(rc.bottom * dpr) <= A.height
+                    && Math.round(rc.right * dpr) <= A.width;
+        let worst = Infinity, at = null, painted = 0;
+        if (inside) {
+          for (let y = Math.round(rc.top * dpr); y < Math.round(rc.bottom * dpr); y++) {
+            for (let x = Math.round(rc.left * dpr); x < Math.round(rc.right * dpr); x++) {
+              const i = (y * A.width + x) * 4;
+              const d = Math.abs(A.data[i] - B.data[i]) + Math.abs(A.data[i + 1] - B.data[i + 1])
+                      + Math.abs(A.data[i + 2] - B.data[i + 2]);
+              if (d < 40) continue;             // no glyph paints here
+              painted++;
+              const g = [B.data[i], B.data[i + 1], B.data[i + 2]];
+              const Lb = lum(g[0], g[1], g[2]);
+              const Lf = lum(fg[0] * al + g[0] * (1 - al), fg[1] * al + g[1] * (1 - al),
+                             fg[2] * al + g[2] * (1 - al));
+              const cr = (Math.max(Lf, Lb) + 0.05) / (Math.min(Lf, Lb) + 0.05);
+              if (cr < worst) { worst = cr; at = [x, y, g]; }
+            }
           }
         }
-        out.push({ sel, worst, at, painted });
-      }
-      return out;
-    }, { a: withType, b: noType, sels: SEL.map(([s]) => s) });
-    for (const [sel, floor] of SEL) {
-      const r = measured.find((x) => x.sel === sel);
-      ok(r && !r.missing, `${sel} is not on the homepage to measure`);
-      if (!r || r.missing) continue;
+        return { worst, at, painted, inside,
+                 rect: [Math.round(rc.top), Math.round(rc.bottom)],
+                 shot: [A.width, A.height] };
+      }, { a: withType, b: noType, s: sel });
+      ok(r.inside,
+         `${sel} sits at y=${r.rect.join("..")} and the screenshot is ` +
+         `${r.shot.join("x")} — the sample landed OUTSIDE its own image, so ` +
+         "every reading from it is of undefined pixels");
+      if (!r.inside) continue;
       // A count of the glyph pixels, because a diff that finds none reports
       // Infinity and passes — the same shape as a suite that stops counting.
       ok(r.painted > 400,
          `${sel}: only ${r.painted} glyph pixels found — the two shots did ` +
          "not differ, so this measured nothing and would pass on anything");
       ok(r.worst >= floor,
-         `${sel} over the drawn hero measures ${r.worst.toFixed(2)}:1 at its ` +
+         `${sel} over the photograph measures ${r.worst.toFixed(2)}:1 at its ` +
          `worst glyph pixel, under the ${floor}:1 floor — ground ` +
          `rgb(${(r.at || [])[2]}) at ${(r.at || []).slice(0, 2)}`);
     }
   }
+
+  // ── the photograph is a window, and a window is proved by scrolling ─
+  //
+  // Plate 03 is a full-bleed photograph fixed to the VIEWPORT and clipped by
+  // the band, so the picture stands still and the page is drawn past it.
+  // Six CSS properties silently destroy that: `transform`, `filter`,
+  // `backdrop-filter`, `perspective`, `will-change` naming any of them, and
+  // `contain`. Each makes an element a containing block for FIXED
+  // descendants, so `position: fixed` resolves against that element instead
+  // of the viewport — the picture starts scrolling with the page again and
+  // NOTHING reports a fault, because every box is still the right size in
+  // the right place and every contrast, layout and count check goes on
+  // passing. The stylesheet already carries three of those six properties
+  // elsewhere (`backdrop-filter` on the masthead, `filter: drop-shadow` on
+  // two map layers), so this is not a hypothetical.
+  //
+  // Three assertions, because the first two are the cause and the third is
+  // the promise. Walking the chain names WHICH element broke it, which a
+  // measurement alone cannot; scrolling and re-measuring is the only proof
+  // that the effect a reader gets is the effect that was written — the same
+  // reasoning as the label metrics, where the model cannot check itself and
+  // the browser's own geometry is the instrument.
+  for (const w of [1280, 390]) {
+    await page.setViewportSize({ width: w, height: w === 1280 ? 900 : 844 });
+    await page.goto(base + "/", { waitUntil: "networkidle" });
+    const r = await page.evaluate(() => {
+      const band = document.querySelector(".sheet-landscape");
+      if (!band) return { missing: true };
+      const pic = band.querySelector(".shotfull");
+      if (!pic) return { nopic: true };
+      const NAMES = { transform: "transform", filter: "filter",
+                      backdropFilter: "backdrop-filter", perspective: "perspective",
+                      willChange: "will-change", contain: "contain" };
+      const IDLE = { transform: "none", filter: "none", backdropFilter: "none",
+                     perspective: "none", willChange: "auto", contain: "none" };
+      const blockers = [];
+      for (let e = pic; e && e !== document.documentElement; e = e.parentElement) {
+        const c = getComputedStyle(e);
+        for (const k of Object.keys(NAMES)) {
+          if (c[k] && c[k] !== IDLE[k]) {
+            const cls = String(e.className || "").trim();
+            blockers.push(e.tagName.toLowerCase()
+              + (cls ? "." + cls.split(/\s+/).join(".") : "")
+              + ` sets ${NAMES[k]}: ${c[k]}`);
+          }
+        }
+      }
+      const pos = getComputedStyle(pic).position;
+      const clip = getComputedStyle(band).clipPath;
+      // The reveal itself: put the band in view, note where the picture is,
+      // scroll a third of a screen, and ask again.
+      band.scrollIntoView({ block: "center" });
+      const img = pic.querySelector("img") || pic;
+      const before = img.getBoundingClientRect();
+      const y0 = scrollY;
+      scrollBy(0, 300);
+      const after = img.getBoundingClientRect();
+      return { position: pos, clip, blockers,
+               scrolled: scrollY - y0,
+               moved: Math.round(Math.abs(after.top - before.top)),
+               covers: Math.round(before.width) >= innerWidth
+                    && Math.round(before.height) >= innerHeight };
+    });
+    ok(!r.missing && !r.nopic,
+       `${w}: the homepage has no plate-03 photograph to measure — ` +
+       `${r.missing ? "no .sheet-landscape" : "no .shotfull inside it"}`);
+    if (r.missing || r.nopic) continue;
+    ok(r.position === "fixed",
+       `${w}: the plate-03 picture computes position: ${r.position}, not ` +
+       "fixed — it is a panel that scrolls, not a window");
+    ok(r.clip && r.clip !== "none",
+       `${w}: the plate-03 band has clip-path: ${r.clip} — `+
+       "`overflow: hidden` does NOT clip a fixed descendant, because a fixed " +
+       "box is laid out against the viewport rather than against any " +
+       "scrolling ancestor, so without the clip the picture is loose over " +
+       "the whole page");
+    ok(r.blockers.length === 0,
+       `${w}: ${r.blockers.length} element(s) between <body> and the ` +
+       "plate-03 picture make a containing block for fixed descendants, " +
+       "which turns it into an absolute box silently — " + r.blockers.join("; "));
+    ok(r.scrolled > 0,
+       `${w}: the page did not scroll (${r.scrolled}px), so the reveal was ` +
+       "not exercised and the measurement below means nothing");
+    ok(r.moved <= 1,
+       `${w}: the plate-03 picture moved ${r.moved}px while the page ` +
+       `scrolled ${r.scrolled}px — it is travelling with the page rather ` +
+       "than standing still behind it");
+    ok(r.covers,
+       `${w}: the plate-03 picture does not fill the viewport, so the band ` +
+       "clips an undersized picture and the window shows the ground through it");
+  }
+
+  // ── an accent on every row is a texture, and the rule named classes ─
+  //
+  // A kicker says what KIND of thing is being read. One per head answers
+  // that; inside a repeated item it answers nothing, because every sibling
+  // carries the same signal — which is "never explain the constraint back"
+  // arriving in colour, and on /themes it inverted the hierarchy it sat in.
+  // That was fixed as `.row .kicker, .card .kicker`, which names two classes
+  // rather than the situation, so it reached neither family on the HOMEPAGE:
+  // measured here across nine surfaces, every index came back at zero accent
+  // kickers inside a link and the homepage came back at SIX — three journey
+  // rows carrying their country chain in cobalt uppercase above a serif
+  // name, and three story cards carrying their desk. The chain is the
+  // journey's own route, which is content rather than a label, and it was
+  // the brightest thing in the row on the one page that opens the site.
+  //
+  // The situation is the rule now: a kicker inside a LINK labels one item in
+  // a set, a kicker outside one labels the page or the band. This reads the
+  // colour the browser PAINTS rather than the selector, because the defect
+  // was invisible to a selector — two correct rules that matched nothing.
+  for (const u of ["/", "/journeys/", "/themes/", "/interests/", "/stories/",
+                   "/countries/", "/beyond-the-obvious/"]) {
+    const r = await page.goto(base + u, { waitUntil: "load" });
+    if (!r || r.status() !== 200) continue;
+    const k = await page.evaluate(({ SWATCH, MAXD }) => {
+      const srgb = (c) => (c <= 0.04045 ? c / 12.92
+                                        : Math.pow((c + 0.055) / 1.055, 2.4));
+      const oklab = (R, G, B) => {
+        const r = srgb(R), g = srgb(G), b = srgb(B);
+        const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+        const m2 = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+        const s2 = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+        return [0.2104542553 * l + 0.7936177850 * m2 - 0.0040720468 * s2,
+                1.9779984951 * l - 2.4285922050 * m2 + 0.4505937099 * s2,
+                0.0259040371 * l + 0.7827717662 * m2 - 0.8086757660 * s2];
+      };
+      const marks = SWATCH.map((t) => ({
+        family: t.family,
+        lab: oklab(parseInt(t.hex.slice(1, 3), 16) / 255,
+                   parseInt(t.hex.slice(3, 5), 16) / 255,
+                   parseInt(t.hex.slice(5, 7), 16) / 255),
+      }));
+      const familyOf = (rgb) => {
+        const lab = oklab(rgb[0] / 255, rgb[1] / 255, rgb[2] / 255);
+        let best = "", bd = Infinity;
+        for (const m of marks) {
+          const dl = lab[0] - m.lab[0], da = lab[1] - m.lab[1],
+                db = lab[2] - m.lab[2];
+          const dist = dl * dl + da * da + db * db;
+          if (dist < bd) { bd = dist; best = m.family; }
+        }
+        return Math.sqrt(bd) > MAXD ? "" : best;
+      };
+      // `.actname` IS A KICKER. The plate sequence labels each band with one
+      // — THE DOOR, THE QUESTION — and carries no `.kicker` at all, so this
+      // probe examined zero elements on the homepage and its own
+      // stopped-finding guard fired. The promise is about a label painted
+      // in the accent inside a link, and an act name is that kind of label.
+      // AND `.ed-eyebrow` IS A KICKER TOO. The non-home redesign gave eight
+      // families a new opening whose label is `ed-eyebrow`, so /countries
+      // carried no `.kicker` at all and this probe's own stopped-finding
+      // guard fired — correctly, about a page that had got better. A check
+      // on a class name is a check on a shape; the promise is about a label
+      // painted in the accent inside a link.
+      const all = [...document.querySelectorAll(
+        ".kicker, .actname, .ed-eyebrow, .ed-section-index")];
+      const hot = all.filter((e) => {
+        // AN ACCENT IS A FAMILY, NOT A HUE WINDOW. This tested `blue > red +
+        // 40`, which is a claim about cobalt rather than about the accent —
+        // so the day the signature became pine it matched nothing and the
+        // check reported every page clean. Rewritten as a hue band it then
+        // read the SIGNATURE's window, which the owner's palette made
+        // three tenths of a degree from the water's. The register says
+        // which family a colour is in; the question here is whether the
+        // label is painted in one of the two families that ARE accents.
+        const f = familyOf(getComputedStyle(e).color.match(/\d+/g).map(Number));
+        return f === "accent" || f === "pine";
+      });
+      const inLink = hot.filter((e) => e.closest("a"));
+      return { all: all.length,
+               bad: inLink.map((e) => e.textContent.trim().slice(0, 40)) };
+    }, { SWATCH, MAXD });
+    checked++;
+    ok(k.all > 0, `${u}: no kicker at all — this check has stopped finding ` +
+       `the element it is about`);
+    ok(k.bad.length === 0,
+       `${u}: ${k.bad.length} of ${k.all} kickers are painted in the accent ` +
+       `inside a link — "${k.bad[0]}". A signal every sibling carries is a ` +
+       `texture, not an accent, and it makes the label brighter than the ` +
+       `name under it`);
+  }
+
+  // ── a head that is worse in the middle of its own range ────────────
+  //
+  // Two commits found the same fault at the same width in two different
+  // heads, and neither was visible at 390 or at 1280. The country portrait
+  // head splits into two columns at 52rem with the door on an `auto` track,
+  // so at 834 the type column was 174 pixels and the tagline set on five
+  // lines of three words. The instrument head is `auto 1fr auto`, and a grid
+  // hands an `auto` track its max-content before an `fr` track takes what is
+  // left, so /plan's title had 127 pixels and set 43 characters on FIVE
+  // lines — against one at 704, where the head has not split yet, and two at
+  // 1280.
+  //
+  // THE PROMISE IS RELATIVE, BECAUSE AN ABSOLUTE ONE IS WRONG. "Tyrol & the
+  // West" sets on two lines at every width from 390 to 1600 and that is the
+  // overture's own design — a narrow measure and air above it, where the
+  // name is the event. Eight characters per line is not a defect there. What
+  // IS a defect is a head that takes two more lines at some width than at
+  // both a narrower and a wider one: nothing about the content changed, only
+  // the track sizing, and a layout that is worse in the middle of its range
+  // than at either end is a sizing fault rather than a design.
+  //
+  // Both elements, because the two faults landed on different ones: the
+  // instrument's was its `h1` and the country's was its tagline.
+  {
+    const WIDTHS = [390, 704, 834, 900, 1024, 1280, 1600];
+    const seen = new Map();
+    for (const vw of WIDTHS) {
+      const hp = await browser.newPage({ viewport: { width: vw, height: 900 } });
+      for (const u of ["/", "/countries", "/europe/austria",
+                       "/europe/austria/tyrol",
+                       "/europe/austria/tyrol/innsbruck", "/journeys",
+                       "/journeys/the-alpine-grand-tour", "/themes",
+                       "/interests/mountains", "/europe-in/northern-lights",
+                       "/events", "/beyond-the-obvious", "/map", "/plan",
+                       "/search", "/discover", "/my-europe", "/experiences"]) {
+        const r = await hp.goto(base + u, { waitUntil: "load" });
+        if (!r || r.status() !== 200) continue;
+        const d = await hp.evaluate(() => {
+          const out = {};
+          // `.ed-intro` IS THE REDESIGN'S STANDFIRST, WHICH IS WHAT
+          // `.statement` WAS. The scan measures how many lines a head's
+          // largest elements take at each width, and the eight rebuilt
+          // families carry their standfirst in `.ed-intro` — so counting
+          // only `.statement` asked about a class most heads no longer
+          // have. The promise is about the head's own type, not about one
+          // spelling of it.
+          for (const sel of ["h1", ".statement", ".ed-intro"]) {
+            // THE HEAD IS NO LONGER ONLY `.pagehead`. Eight families open
+            // on `ed-opening`, `ed-arrival`, `ed-journey-hero` or
+            // `ed-story-opening`, so this scan collected 11 elements of the
+            // 20 its own reach assertion asks for — it had stopped finding
+            // most of the heads it is about, which is exactly what that
+            // assertion exists to say.
+            // AND THE HOMEPAGE'S HEAD IS A SHEET, NOT A `pagehead`. It is
+            // the one family that opens on an act rather than on a page
+            // head — `.sheet-door` carries the `h1.mega` — so adding the
+            // eight redesigned head shapes took the scan from 11 to 19 and
+            // left it one under its own floor of 20. A scan that cannot see
+            // the largest heading on the most-visited page is not measuring
+            // the thing it is about.
+            const el = document.querySelector(
+              ":is(.pagehead, .ed-opening, .ed-arrival, .ed-journey-hero, " +
+              ".ed-story-opening, .ed-institution, .sheet) " + sel);
+            if (!el) continue;
+            const lh = parseFloat(getComputedStyle(el).lineHeight);
+            out[sel] = { lines: Math.max(1, Math.round(
+              el.getBoundingClientRect().height / lh)),
+              chars: el.textContent.trim().length };
+          }
+          return out;
+        });
+        for (const [sel, v] of Object.entries(d)) {
+          const k = u + " " + sel;
+          if (!seen.has(k)) seen.set(k, {});
+          seen.get(k)[vw] = v;
+        }
+      }
+      await hp.close();
+    }
+    // AGAINST THE BEST NARROWER AND THE BEST WIDER, not the immediate
+    // neighbours. A fault can ramp: the country tagline set 3 lines at 704,
+    // 5 at 834 and 4 at 900, so comparing with the neighbour on each side
+    // misses it while the shape — worse in the middle than at either end —
+    // is exactly the same.
+    let worst = null, bad = 0;
+    for (const [k, m] of seen) {
+      const at = (w) => (m[w] ? m[w].lines : null);
+      for (let i = 1; i < WIDTHS.length - 1; i++) {
+        const c = m[WIDTHS[i]];
+        if (!c) continue;
+        const below = WIDTHS.slice(0, i).map(at).filter((v) => v !== null);
+        const above = WIDTHS.slice(i + 1).map(at).filter((v) => v !== null);
+        if (!below.length || !above.length) continue;
+        const a = Math.min(...below), e = Math.min(...above);
+        if (c.lines >= a + 2 && c.lines >= e + 2) {
+          bad++;
+          const gap = Math.min(c.lines - a, c.lines - e);
+          if (!worst || gap > worst.gap) {
+            worst = { gap, k, vw: WIDTHS[i], c, a: { lines: a },
+                      e: { lines: e }, wa: "any narrower", we: "any wider" };
+          }
+        }
+      }
+    }
+    checked++;
+    ok(seen.size > 20,
+       `the head-range scan collected only ${seen.size} elements — it has ` +
+       "stopped finding the heads it is about");
+    ok(bad === 0, worst
+      ? `${bad} head(s) take two or more extra lines in the middle of their ` +
+        `own range: ${worst.k} at ${worst.vw}px sets ${worst.c.chars} ` +
+        `characters on ${worst.c.lines} lines, against ${worst.a.lines} at ` +
+        `${worst.wa} and ${worst.e.lines} at ${worst.we}. Nothing about the ` +
+        `content changed, only the track sizing.`
+      : "no head is worse in the middle of its range");
+  }
+
+  // ── an option that does not fit the box it closes into ─────────────
+  //
+  // The planner's spending style read `{name} — {note}` and "Generous —
+  // Well-reviewed hotels, restaurants that book out, flights and
+  // first-class rail where it saves a day." is 118 characters: 810 pixels
+  // in a 325-pixel field. A `<select>` clips without an ellipsis, so a
+  // reader was shown forty per cent of their own choice and it did not even
+  // look like a truncation.
+  //
+  // THE LINE IS HAND-WRITTEN ENUM AGAINST A LIST OF RECORDS. `#start` and
+  // `#end` carry 314 real destinations and the longest is "Gura Humorului &
+  // the painted monasteries, Romania" — the only repair available there is
+  // truncating a place name, which this atlas refuses, and opening the
+  // select is what a reader does to read the list. A list somebody TYPED
+  // has no such excuse: every option in it is copy, and copy that does not
+  // fit its control is copy in the wrong place. Thirty is the line and
+  // every enum on the site is under five.
+  for (const [vw, vh] of [[1280, 900], [390, 800]]) {
+    const sp = await browser.newPage({ viewport: { width: vw, height: vh } });
+    for (const u of ["/plan", "/discover", "/events", "/search"]) {
+      const r = await sp.goto(base + u, { waitUntil: "load" });
+      if (!r || r.status() !== 200) continue;
+      const over = await sp.evaluate(() => {
+        const out = [];
+        for (const s of document.querySelectorAll("select")) {
+          if (s.options.length > 30) continue;      // a list of records
+          const cs = getComputedStyle(s);
+          // the arrow the UA draws, plus the field's own padding
+          const box = s.clientWidth - parseFloat(cs.paddingLeft)
+                    - parseFloat(cs.paddingRight) - 28;
+          const m = document.createElement("span");
+          m.style.cssText = "position:absolute;visibility:hidden;white-space:pre;font:" + cs.font;
+          document.body.appendChild(m);
+          for (const o of s.options) {
+            m.textContent = o.textContent;
+            const w = m.getBoundingClientRect().width;
+            if (w > box) out.push([s.id || s.name, o.textContent.slice(0, 40),
+                                   Math.round(w), Math.round(box)]);
+          }
+          m.remove();
+        }
+        return out;
+      });
+      checked++;
+      ok(over.length === 0,
+         `${u} at ${vw}: ${over.length} hand-written option(s) wider than the ` +
+         `select they close into — #${(over[0] || [])[0]} "${(over[0] || [])[1]}" ` +
+         `needs ${(over[0] || [])[2]}px in ${(over[0] || [])[3]}px. A select ` +
+         `clips without an ellipsis, so the reader is shown part of their own ` +
+         `choice and it does not look like a truncation.`);
+    }
+    await sp.close();
+  }
+
+  // ── a placeholder that does not fit the box it is in ───────────────
+  //
+  // The homepage's own placeholder was cut mid-word at 390 and was fixed;
+  // /search's was not, and it is the one control that page exists to be. It
+  // carried three examples joined by middots — 84 characters — and rendered
+  // as "quiet beaches in september · medieva". A rule that exists is not a
+  // rule that is inherited.
+  //
+  // MEASURED AGAINST THE BOX, NOT COUNTED IN CHARACTERS. A character ceiling
+  // is a proxy for a width and would be wrong the day the face or the
+  // padding changes; the honest test is to put the placeholder in the field
+  // as a value and ask the browser whether the field has to scroll. An input
+  // is a scroll container, which is why the clipped-text check cannot see
+  // this: scrolling is the right answer inside one, and a HINT nobody can
+  // read is not.
+  await page.setViewportSize({ width: 390, height: 800 });
+  for (const u of ["/", "/search", "/plan"]) {
+    await page.goto(base + u, { waitUntil: "load" });
+    const cut = await page.evaluate(() => {
+      const out = [];
+      for (const el of document.querySelectorAll("input[placeholder], textarea[placeholder]")) {
+        const ph = el.getAttribute("placeholder");
+        if (!ph) continue;
+        const was = el.value;
+        el.value = ph;
+        const over = el.scrollWidth - el.clientWidth;
+        el.value = was;
+        // A textarea wraps, so only a single-line field can cut sideways.
+        if (el.tagName === "INPUT" && over > 1) out.push([ph, over]);
+      }
+      return out;
+    });
+    checked++;
+    ok(cut.length === 0,
+       `${u} at 390: ${cut.length} placeholder(s) wider than the field — ` +
+       `"${(cut[0] || [""])[0]}" overflows by ${(cut[0] || [0, 0])[1]}px. A hint ` +
+       `a reader cannot read is worse than no hint, and it is in the one ` +
+       `control these pages exist to be.`);
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
 
   // ── a divider with nothing on the other side of it ─────────────────
   //
@@ -2481,6 +3211,34 @@ async function main() {
       // pixel. The door still reads there, on its cut edge at 3.55, which is
       // exactly why this had to be split — the reveal was carrying a plate
       // the step was being credited for.
+      // AND THE FIGURE HAS TO BE IN THE PICTURE BEING SAMPLED. This shoots
+      // the VIEWPORT and then reads pixels at the figure's own box, and
+      // nothing checked that the two overlap: on /events/oct the arch sits
+      // at y=750 in a 720-tall viewport, so every sample fell off the bottom
+      // of the canvas, `getImageData` handed back transparent black for both
+      // points, and the check reported 1.12:1 — a red run measuring nothing,
+      // which is the green-run-that-stopped-counting failure with the sign
+      // flipped. It surfaced when an overture's h1 grew and pushed the month
+      // map below the fold: the drawing never changed.
+      //
+      // Scroll it into view, then shoot, then read the box — in that order,
+      // because the box is read page-side after the screenshot and a rect
+      // taken before a scroll describes a different picture.
+      //
+      // A QUARTER DOWN, NOT CENTRED. `scrollIntoView({block:"center"})` puts
+      // the figure's MIDDLE at the middle of the viewport, and the crown is
+      // what this measures: on /beyond-the-obvious, whose arch is taller
+      // than the viewport, that put its top at y=-81 and the sampler read
+      // off the top of the canvas instead of off the bottom — the same fault
+      // in the other direction, and it reported 2.98:1 against a real 17.37.
+      // A quarter down clears the sticky masthead and leaves the crown and
+      // the sixteen pixels under it inside the shot at any figure height.
+      await pg.evaluate(() => {
+        const f = document.querySelector("figure.minimap.arched");
+        if (!f) return;
+        window.scrollBy(0, f.getBoundingClientRect().top
+                           - Math.round(innerHeight * 0.25));
+      });
       const shot = (await pg.screenshot()).toString("base64");
       const px = await pg.evaluate(async (d) => {
         const fig = document.querySelector("figure.minimap.arched svg");
@@ -2517,8 +3275,20 @@ async function main() {
           const v = cr2(p2, out);
           if (v > best) { best = v; cut = p2; }
         }
-        return { out, cut, in: at(cx, Math.min(c.height - 1, top + 16)) };
+        return { out, cut, in: at(cx, Math.min(c.height - 1, top + 16)),
+                 // The sample window, so a failure can be told apart from a
+                 // sampler that missed the figure. A failure message with no
+                 // measurement in it cannot be diagnosed.
+                 win: [cx, top, c.width, c.height] };
       }, shot);
+      if (px) {
+        const [sx, sy, sw, sh] = px.win;
+        ok(sx >= 0 && sx < sw && sy - 6 >= 0 && sy + 16 < sh,
+           `${u} in ${scheme}: the aperture sampler read outside the image — ` +
+           `x=${sx} y=${sy} on a ${sw}x${sh} shot. Every sample would come ` +
+           `back transparent black and the ratio would be about the canvas, ` +
+           `not about the door.`);
+      }
       if (px) {
         const stepPx = ratio(px.out, px.in);
         const edgePx = ratio(px.out, px.cut);
@@ -2698,6 +3468,319 @@ async function main() {
   }
   await page.setViewportSize({ width: 1280, height: 900 });
 
+  // ── a heading is not cut in half ───────────────────────────────────
+  //
+  // A WORD BROKEN MID-WORD IS A RENDERING FAULT, AND IT HAS HAPPENED TWICE.
+  // `overflow-wrap: break-word` is right and stays — a headline running off
+  // the right edge is worse, and hyphenation is refused because an English
+  // dictionary breaks Norwegian compounds wrongly. What is wrong when it
+  // fires is the SIZE or the MEASURE.
+  //
+  // First: `.overture h1` is held at 14ch, which is a character count wearing
+  // a length's clothes — a `ch` is the width of a zero — so Elbphilharmonie
+  // measured 214px inside a 210px box and dropped its last glyph onto a line
+  // of its own, on four pages. Then the fix for that was capped with
+  // `min(100%, min-content)` to stop a 320px screen scrolling, which is
+  // INVALID CSS: an intrinsic keyword is not allowed inside a math function,
+  // so the declaration was dropped, min-width computed to 0 and the four
+  // broke again. Nothing saw it — the overflow sweep passed BECAUSE the fix
+  // was off — and it was found by looking at a contact sheet.
+  //
+  // A HYPHENATED WORD BREAKING AT ITS HYPHEN IS CORRECT TYPOGRAPHY, not a
+  // fault: the break is where the author put one. Only a break inside an
+  // unbroken run of letters counts.
+  {
+    const { ALL } = require("./lib/families.js");
+    const CUT = [];
+    let looked = 0;
+    for (const w of [320, 390]) {
+      await page.setViewportSize({ width: w, height: 844 });
+      for (const [name, u] of ALL) {
+        const res = await page.goto(base + u, { waitUntil: "load" });
+        if (!res || res.status() !== 200) continue;
+        looked++;
+        const bad = await page.evaluate(() => {
+          const out = [];
+          const rg = document.createRange();
+          for (const h of document.querySelectorAll("main :is(h1,h2,h3)")) {
+            for (const n of h.childNodes) {
+              if (n.nodeType !== 3) continue;
+              let i = 0;
+              for (const word of n.textContent.split(/(\s+)/)) {
+                if (word.trim() && !/[-‐‑]/.test(word.slice(1, -1))) {
+                  rg.setStart(n, i); rg.setEnd(n, i + word.length);
+                  const tops = new Set([...rg.getClientRects()]
+                    .filter((r) => r.width > 0).map((r) => Math.round(r.top)));
+                  if (tops.size > 1) out.push(word);
+                }
+                i += word.length;
+              }
+            }
+          }
+          return out;
+        });
+        for (const word of bad) CUT.push(`${name} at ${w}: "${word}"`);
+      }
+    }
+    await page.setViewportSize({ width: 1280, height: 900 });
+    ok(CUT.length === 0,
+       `${CUT.length} heading word(s) cut in half: ${CUT.slice(0, 6).join(", ")}. `
+       + "overflow-wrap is right; the size or the measure is what is wrong when "
+       + "it fires.");
+    ok(looked >= 80,
+       `only ${looked} pages were examined for a cut heading across two widths `
+       + "— the family list or the h1 selector has stopped matching");
+  }
+
+  // ── a country on the instrument is drawn, not merely declared ──────
+  //
+  // `docs/palette.json` declares --map-context against --map-sea at 1.35
+  // with the reason written out — "a country outside the subject is still
+  // drawn; 1.24 is not quiet, it is absent" — and `checks.py` recomputes it
+  // from the token hexes, so it has been green since it was written. The
+  // DATA-CUT FADE paints on top of both and nothing measured the result.
+  //
+  // A SEPARATION BETWEEN TWO TOKENS SAYS NOTHING ABOUT WHETHER EITHER IS
+  // PAINTED. That sentence is already in this repository, about /discover
+  // drawing fifty countries with `fill: none` under a rule that declared
+  // 1.8. This is the same fault through a different mechanism: the tokens
+  // were right and an overlay put Armenia at 1.06 against the sea.
+  //
+  // Sampled inside each real polygon, because a bounding-box centre is in
+  // the Adriatic for Italy and in the Aegean for Greece — a bounding box is
+  // not a country, which this atlas has now learned three times.
+  {
+    /* ON /map, WHERE THE CLAIM IS SHARPEST. /discover draws the same fade
+       and took the same cap, but its countries are context rather than
+       links — the page is a filter, not a navigator — so the one page where
+       every country is a door is the one asserted. */
+    for (const u of ["/map"]) {
+      await page.setViewportSize({ width: 1280, height: 1400 });
+      await page.goto(base + u, { waitUntil: "networkidle" });
+      await page.waitForTimeout(400);
+      const shot = (await page.screenshot({ fullPage: true })).toString("base64");
+      const m = await page.evaluate(async (d) => {
+        const img = await new Promise((r) => {
+          const i = new Image(); i.onload = () => r(i); i.src = "data:image/png;base64," + d; });
+        const c = document.createElement("canvas");
+        c.width = img.width; c.height = img.height;
+        c.getContext("2d").drawImage(img, 0, 0);
+        const D = c.getContext("2d").getImageData(0, 0, img.width, img.height);
+        const dpr = D.width / innerWidth;
+        const lum = (r, g, bl) => { const f = (v) => { v /= 255;
+          return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(bl); };
+        const at = (x, y) => { const i = ((Math.round(y) * D.width) + Math.round(x)) * 4;
+          return lum(D.data[i], D.data[i + 1], D.data[i + 2]); };
+        const ratio = (a, b) => { const [h, l] = [a, b].sort((x, y) => y - x);
+          return (h + 0.05) / (l + 0.05); };
+        const svg = document.querySelector(".europemap svg") || document.querySelector("svg.europemap");
+        if (!svg) return null;
+        const sr = svg.getBoundingClientRect();
+        /* Mid-Atlantic: sea on every frame this atlas draws. */
+        const sea = at((sr.left + sr.width * 0.12) * dpr, (sr.top + scrollY + sr.height * 0.55) * dpr);
+        const pt = svg.createSVGPoint();
+        const bad = []; let seen = 0;
+        for (const s of document.querySelectorAll(".europemap .cshape")) {
+          const path = s.tagName === "path" ? s : s.querySelector("path");
+          if (!path) continue;
+          const bb = path.getBBox();
+          if (bb.width < 2 || bb.height < 2) continue;
+          let inside = null;
+          for (let gy = 1; gy < 8 && !inside; gy++)
+            for (let gx = 1; gx < 8 && !inside; gx++) {
+              pt.x = bb.x + bb.width * gx / 8; pt.y = bb.y + bb.height * gy / 8;
+              if (path.isPointInFill(pt)) inside = [pt.x, pt.y];
+            }
+          if (!inside) continue;
+          seen++;
+          const t = path.getScreenCTM();
+          const sx = t.a * inside[0] + t.c * inside[1] + t.e;
+          const sy = t.b * inside[0] + t.d * inside[1] + t.f;
+          const r = ratio(at(sx * dpr, (sy + scrollY) * dpr), sea);
+          if (r < 1.35) {
+            const ti = s.querySelector("title");
+            bad.push(`${ti ? ti.textContent.trim() : "?"} ${r.toFixed(2)}`);
+          }
+        }
+        return { seen, bad };
+      }, shot);
+      ok(m !== null, `${u}: no instrument map to measure`);
+      if (!m) continue;
+      ok(m.bad.length === 0,
+         `${u}: ${m.bad.length} country/countries painted under the 1.35 that `
+         + `docs/palette.json declares against the sea — ${m.bad.join(", ")}. `
+         + "The tokens clear it; the data-cut fade paints on top of them, and a "
+         + "separation between two tokens says nothing about whether either is "
+         + "painted.");
+      ok(m.seen >= 40,
+         `${u}: only ${m.seen} countries were sampled — the shapes or their `
+         + "fills have been renamed and this check is reporting on nothing");
+    }
+    await page.setViewportSize({ width: 1280, height: 900 });
+  }
+
+  // ── a control a reader can see the edge of ─────────────────────────
+  //
+  // THE HOMEPAGE'S ASK FIELD PAINTED rgb(247,246,243) ON A BODY OF
+  // rgb(247,246,243), with a transparent border. Present, labelled,
+  // keyboard-reachable, correctly sized, and no edge at all — the one
+  // control that page exists to be. It was right while the form sat INSIDE
+  // the hero, where paper on graphite is a field; it moved out to the light
+  // band and kept the fill. Its own LABEL had made the same move and gone
+  // limestone on limestone at 1.00:1, and that half was found and fixed
+  // while the fill was left behind.
+  //
+  // Nothing could see it. A field has no text of its own, so every contrast
+  // assertion here had nothing to measure; the dead-rule scan is happy
+  // because the rule applies and does change something; and at thumbnail
+  // size a pale field on a pale page looks like a field.
+  //
+  // WCAG 1.4.11 puts a user-interface component's boundary at 3:1, and the
+  // only honest way to ask is the pixels: a control may be bounded by a
+  // border, a fill, an underline or a shadow, and a declaration check would
+  // have to know all four. So the strip that crosses each edge is read, and
+  // the question is whether ANY step along it reaches 3:1.
+  {
+    const FORMS = ["/", "/search", "/plan", "/discover", "/my-europe"];
+    let seen = 0;
+    for (const u of FORMS) {
+      await page.goto(base + u, { waitUntil: "networkidle" });
+      await page.waitForTimeout(200);
+      const shot = (await page.screenshot()).toString("base64");
+      const weak = await page.evaluate(async (d) => {
+        const img = await new Promise((res) => {
+          const i = new Image(); i.onload = () => res(i); i.src = "data:image/png;base64," + d;
+        });
+        const c = document.createElement("canvas");
+        c.width = img.width; c.height = img.height;
+        c.getContext("2d").drawImage(img, 0, 0);
+        const D = c.getContext("2d").getImageData(0, 0, img.width, img.height);
+        const dpr = D.width / innerWidth;
+        const lum = (r, g, b) => { const f = (v) => { v /= 255;
+          return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+        const at = (x, y) => { const i = ((y * D.width) + x) * 4;
+          return lum(D.data[i], D.data[i + 1], D.data[i + 2]); };
+        const step = (a, b) => { const [hi, lo] = [a, b].sort((x, y) => y - x);
+          return (hi + 0.05) / (lo + 0.05); };
+        const out = [];
+        for (const e of document.querySelectorAll("input:not([type=hidden]), textarea, select")) {
+          const r = e.getBoundingClientRect();
+          if (r.width < 8 || r.height < 8) continue;
+          if (getComputedStyle(e).visibility === "hidden") continue;
+          if (r.top < 0 || r.bottom > innerHeight || r.left < 6 || r.right > innerWidth - 6) continue;
+          /* Four crossings: left, right, top, bottom. A control bounded on
+             one side only — a ruled field — passes, because that is a real
+             and deliberate boundary and a reader sees it. */
+          const mx = Math.round((r.left + r.width / 2) * dpr);
+          const my = Math.round((r.top + r.height / 2) * dpr);
+          const cross = [
+            [Math.round((r.left - 5) * dpr), my, Math.round((r.left + 3) * dpr), my],
+            [Math.round((r.right + 5) * dpr), my, Math.round((r.right - 3) * dpr), my],
+            [mx, Math.round((r.top - 5) * dpr), mx, Math.round((r.top + 3) * dpr)],
+            [mx, Math.round((r.bottom + 5) * dpr), mx, Math.round((r.bottom - 3) * dpr)],
+          ];
+          let best = 1;
+          for (const [ox, oy, ix, iy] of cross) {
+            if (ox < 0 || oy < 0 || ix < 0 || iy < 0
+                || ox >= D.width || ix >= D.width || oy >= D.height || iy >= D.height) continue;
+            /* The strongest pixel anywhere across the edge, not just the two
+               ends: a 2px rule sits between them. */
+            const ax = Math.sign(ix - ox), ay = Math.sign(iy - oy);
+            const n = Math.max(Math.abs(ix - ox), Math.abs(iy - oy));
+            const outside = at(ox, oy);
+            for (let k = 0; k <= n; k++)
+              best = Math.max(best, step(outside, at(ox + ax * k, oy + ay * k)));
+          }
+          if (best < 3.0)
+            out.push(`${e.tagName.toLowerCase()}${e.id ? "#" + e.id : ""} at ${best.toFixed(2)}:1`);
+        }
+        return out;
+      }, shot);
+      seen++;
+      ok(weak.length === 0,
+         `${u}: ${weak.length} form control(s) whose edge does not reach 3:1 `
+         + `against what is behind it — ${weak.join(", ")}. A field a reader `
+         + `cannot see the edge of is the homepage's own ask box, which `
+         + `painted the page's exact colour with a transparent border.`);
+    }
+    ok(seen === FORMS.length,
+       `only ${seen} of ${FORMS.length} form pages were examined`);
+  }
+
+  // ── a country plate names its OWN mountain ─────────────────────────
+  //
+  // A SINGLE TRIANGLE WITH A HEIGHT READS AS THIS COUNTRY'S MOUNTAIN, and
+  // thirty of the fifty portraits named somebody else's. `summit_points`
+  // returns the highest peaks in FRAME and a country plate frames its
+  // neighbours, so the tallest thing on screen is usually across the border:
+  // Austria named Triglav, which is Slovenian, Switzerland named Mont Blanc,
+  // Germany named Finsteraarhorn, Greece named Musala, and Croatia named
+  // three peaks of which none was Croatian.
+  //
+  // THE MODEL CANNOT CHECK ITSELF. The build decides this with a ray-cast
+  // against the same rings it draws, so a static check re-running it would
+  // only ever agree — the instrument fault this repository already records
+  // three times. `isPointInFill` is the browser asking the rendered path,
+  // which is a different implementation of the same question, and it is what
+  // the one-off measurement behind the country-name rule used.
+  //
+  // The subject's own name is asserted here too, for the same reason and with
+  // the same instrument: nine portraits once set it entirely on a neighbour.
+  {
+    const PLATES = ["/europe/austria", "/europe/switzerland", "/europe/germany",
+                    "/europe/croatia", "/europe/greece", "/europe/slovakia",
+                    "/europe/hungary", "/europe/france", "/europe/italy",
+                    "/europe/norway", "/europe/portugal", "/europe/turkiye"];
+    let checked = 0;
+    for (const u of PLATES) {
+      await page.goto(base + u, { waitUntil: "load" });
+      const off = await page.evaluate(() => {
+        const svg = document.querySelector("figure.minimap.portrait svg");
+        if (!svg) return null;
+        const here = svg.querySelector("path.here") || svg.querySelector(".countries path.here");
+        if (!here) return null;
+        /* A MARK'S POINT IS WHERE IT POINTS. A peak is drawn as a triangle
+           AROUND its coordinate, so the bounding box's centre is a little
+           north of the summit itself — and on Sněžka, whose summit is
+           literally the Czech-Polish frontier, that 0.8 units is the whole
+           question. Either the box's middle or its foot being on the country
+           is enough; a peak that is actually in the next country, like
+           Triglav on Austria's plate, is sixty units away and fails both. */
+        const inside = (el) => {
+          const b = el.getBBox();
+          const p = svg.createSVGPoint();
+          p.x = b.x + b.width / 2;
+          for (const y of [b.y + b.height / 2, b.y + b.height]) {
+            p.y = y;
+            if (here.isPointInFill(p)) return true;
+          }
+          return false;
+        };
+        const bad = [];
+        /* THE MARK, NOT THE LABEL. A peak's name is set beside its triangle,
+           and a printed atlas lets a name run over a neighbour — that is the
+           country name's own rule. What must be on this country is the
+           TRIANGLE. Testing the label's box instead reported Zugspitze off
+           Germany, which is where the build had just correctly put it. */
+        for (const t of svg.querySelectorAll("path.peak"))
+          if (!inside(t)) bad.push(`peak "${(t.querySelector("title") || {}).textContent || "?"}"`);
+        for (const t of svg.querySelectorAll("text.cname"))
+          if (!inside(t)) bad.push(`name "${t.textContent.trim()}"`);
+        return bad;
+      });
+      if (off === null) continue;
+      checked++;
+      ok(off.length === 0,
+         `${u} sets ${off.length} label(s) off its own country: ${off.join(", ")}`);
+    }
+    ok(checked >= 10,
+       `only ${checked} of ${PLATES.length} country portraits were examined — `
+       + "the plate or its subject path has been renamed and this check has "
+       + "stopped looking at anything");
+  }
+
   // ── the signature does not eat the content ─────────────────────────
   //
   // THE APERTURE WAS DELETING THE NAMES IT EXISTS TO FRAME.
@@ -2794,19 +3877,47 @@ async function main() {
                    "/europe/greece/athens-and-the-peloponnese/hydra"]) {
     await page.goto(base + u, { waitUntil: "load" });
     const a = await page.evaluate(() => {
-      const r = document.querySelector(".arrivalhead .reasons");
-      const v = document.querySelector(".placeband-map figure.minimap");
-      const land = document.querySelector(".placeband-map .countries path");
-      const sea = document.querySelector(".placeband-map .archground");
+      const top = (e) => (e ? e.getBoundingClientRect().top + scrollY : null);
+      const r = document.querySelector(".reasons");
+      const v = document.querySelector("figure.minimap");
+      const land = document.querySelector(".countries path");
+      const sea = document.querySelector(".archground");
+      // The place's own sentence, wherever the composition puts it.
+      const say = document.querySelector(
+        ".ed-arrival-copy p, .arrivalhead .statement, .arrivalhead p");
+      const onward = document.querySelector("#onward, [id='onward']");
+      const stay = document.querySelector("#stay, [id='stay']");
       return {
-        reasons: r ? r.getBoundingClientRect().top + scrollY : null,
-        view: v ? v.getBoundingClientRect().top + scrollY : null,
+        reasons: top(r), view: top(v), say: top(say),
+        onward: top(onward), stay: top(stay),
         land: land && getComputedStyle(land).fill,
         sea: sea && getComputedStyle(sea).fill,
       };
     });
-    ok(a.reasons !== null && a.view !== null && a.reasons < a.view,
-       `${u}: the reasons are not above the view (${a.reasons} / ${a.view})`);
+    // THE ARGUMENT COMES BEFORE THE TRANSACTION, AND THE VIEW IS NOW IN THE
+    // HEAD. This asserted `.arrivalhead .reasons` above `.placeband-map`,
+    // which was the order when the view was a band BELOW the head — and the
+    // arrival composition puts the map in the opening with the place's name
+    // and its own sentence over it, so the reasons follow at 1065 where the
+    // drawing starts at 275. That is a deliberate change and this assertion
+    // is deliberately weaker for it: it no longer says where the drawing is.
+    //
+    // What it says instead is the part that was always the point. The
+    // place's own sentence — its one-line argument — must be at or above the
+    // view rather than below it, so a reader meets what this place IS before
+    // they read the instrument; and the reasons must come before anything
+    // transactional, which is the order `docs/ux-specification.md` has
+    // asserted by id since before the Stay layer existed.
+    ok(a.say !== null && a.view !== null && a.say <= a.view + 1,
+       `${u}: the place's own sentence is below the view (${a.say} / ` +
+       `${a.view}) — a reader meets the instrument before they are told ` +
+       `what the place is`);
+    for (const [k, what] of [["stay", "the Stay layer"],
+                             ["onward", "the onward stops"]])
+      if (a[k] !== null)
+        ok(a.reasons !== null && a.reasons < a[k],
+           `${u}: the reasons are not above ${what} (${a.reasons} / ` +
+           `${a[k]}) — the argument has to come before the transaction`);
     ok(a.view !== null && a.view < 900,
        `${u}: the view starts at ${a.view}, below the first screen`);
     ok(a.land && a.land !== "none" && a.land !== a.sea,
@@ -2931,6 +4042,10 @@ async function main() {
     });
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
   };
+  const CR = (a, b) => {
+    const [h, l] = [LUM(a), LUM(b)].sort((m, n) => n - m);
+    return (h + 0.05) / (l + 0.05);
+  };
   const worldProbe = () => ({
     world: document.body.dataset.world || "discover",
     accent: document.body.dataset.accent || "",
@@ -2971,8 +4086,28 @@ async function main() {
       // than a promise. The promise is that INTELLIGENCE has ONE accent, it
       // is readable on the card as well as the ground, and it is not the
       // colour that ended up drawing continents.
-      ok(/131,\s*152,\s*255|#8398ff/i.test(r.door),
-         `${scheme} ${url}: the INTELLIGENCE accent is ${r.door}, not cobalt-air`);
+      // AND IT WAS PINNED BY ITS LITERAL VALUE, which is the sixth
+      // assertion in this suite to protect a number rather than a promise.
+      // The promise is that INTELLIGENCE has ONE accent and it is the
+      // register's declared one; the register is where that is decided.
+      // THE INSTRUMENT'S ACCENT IS COBALT, AND THIS PINNED A HEX FROM
+      // BEFORE THE OWNER'S PALETTE. It asserted `pine-air` — the previous
+      // system's dark accent — and the brief that replaced it says in as
+      // many words that the instrument is "Graphite + Bone + Cobalt". So
+      // the check went red for the right event and the wrong claim, which
+      // is the shape this repository has now recorded eleven times.
+      // Read from the register rather than typed, so a rename moves the
+      // assertion with the colour: the promise is that the instrument world
+      // carries a COBALT accent and is therefore told apart from DISCOVER,
+      // not that it carries one particular rung of that family.
+      {
+        const cob = Object.entries(PALETTE.tokens)
+          .filter(([k]) => /^cobalt(-|$)/.test(k)).map(([, v]) => v.hex);
+        ok(cob.some((h) => sameColour(r.door, h)),
+           `${scheme} ${url}: the INTELLIGENCE accent is ${r.door}, and the ` +
+           `owner's palette gives the instrument cobalt — none of ` +
+           `${cob.join(", ")}`);
+      }
       ok(!r.limeAnywhere, `${scheme} ${url}: electric lime is painted — ${r.limeAnywhere}`);
     }
 
@@ -2988,8 +4123,14 @@ async function main() {
       if (want === "cultural") {
         // --door is a custom property, so it comes back as the authored
         // value — a hex — not as the rgb() a computed colour would give.
-        ok(/#a4491f|#e08a5c|164,\s*73,\s*31|224,\s*138,\s*92/i.test(r.door),
-           `${scheme} ${url}: the cultural accent is ${r.door}, not terracotta`);
+        // AND THIS ONE TYPED FOUR SPELLINGS OF TWO HEXES. `terracotta-2`
+        // moved from #a4491f to #a6573a with the owner's palette and the
+        // regex went on naming the old one. The register is the list.
+        const terra = Object.entries(PALETTE.tokens)
+          .filter(([k]) => /^terracotta(-|$)/.test(k)).map(([, v]) => v.hex);
+        ok(terra.some((h) => sameColour(r.door, h)),
+           `${scheme} ${url}: the cultural accent is ${r.door}, and it has ` +
+           `to be one of the terracotta family — ${terra.join(", ")}`);
       }
     }
 
@@ -3014,9 +4155,25 @@ async function main() {
     // in the light scheme the page around it is not. It still fails if a
     // map stops being an INTELLIGENCE component, and it now also fails if
     // the wall goes dark — which the old version could not see.
+    // AND THEN THE OWNER'S PALETTE MADE A COUNTRY PORTRAIT A PICTURE.
+    // `docs/cartography.md` splits every drawing on what it IS — a picture
+    // is warm paper, pale water and an ink coast; an instrument is graphite
+    // — and a country's reference map is a picture. It carried
+    // `data-world="intelligence"` anyway, which resolved `--map-ink` to the
+    // DARK map's bone on a pale continent and measured Italy's own labels
+    // at 1.00:1. So the attribute came off, correctly, and this assertion
+    // went red for the right event and the wrong claim. Twelfth time.
+    //
+    // What it protects is that there IS a drawing: the figure still holds
+    // the land this page is about. `.atlas` was the obvious replacement and
+    // is wrong — a country portrait is `.minimap .countrymap .arched` and
+    // the atlas skin is a different family with the same pale ground, which
+    // is the same confusion that scoped a map-mark fix to `.atlas` and
+    // missed every country plate.
     await w.goto(base + "/europe/italy", { waitUntil: "load" });
-    ok(await w.locator('.countrymap svg[data-world="intelligence"]').count() === 1,
-       "the country map drawing is not an INTELLIGENCE component");
+    ok(await w.locator(".countrymap .lyr-land, .countrymap .countries").count() >= 1,
+       "the country portrait has no land layer — it has stopped being a " +
+       "drawing of anywhere");
     const ap = await w.evaluate(() => {
       const g = document.querySelector(".countrymap .archground");
       const fig = document.querySelector(".countrymap");
@@ -3034,8 +4191,19 @@ async function main() {
                panel: getComputedStyle(fig).backgroundColor,
                wall: wall || getComputedStyle(document.body).backgroundColor };
     });
-    ok(ap.ground && LUM(ap.ground) < 0.06,
-       `the opening is not dark (${ap.ground})`);
+    // AND "DARK OPENING" STOPPED BEING TRUE WHEN THE WATER WENT PALE.
+    // The owner's light map is #D8D4C7 land on #DDE8E7 water — stone on
+    // pale water, with the COASTLINE separating them — so an opening whose
+    // luminance must be under 0.06 is an opening from the previous palette.
+    // This file already records the consequence one check over: the
+    // aperture is read by its REVEAL now, and that is measured on the
+    // painted pixel by `c_aperture` rather than on a token here.
+    // What survives is the half that is still true and still worth
+    // protecting: the opening and the wall must not be the same thing.
+    ok(ap.ground && ap.wall && CR(ap.ground, ap.wall) >= 1.1,
+       `the opening and the wall are the same tone — opening ${ap.ground}, ` +
+       `wall ${ap.wall}. A door is a step or a cut edge, and this is the ` +
+       `step; the cut edge is measured on the painted pixel elsewhere`);
     // The figure must paint NOTHING. That is the whole difference between an
     // aperture and a panel: the corners outside the arch have to show the
     // page through, and any background on the figure fills them back in —
@@ -3243,20 +4411,30 @@ async function main() {
   // on every page shape, in both colour schemes. The audit that matters —
   // somebody using a screen reader daily — is named as missing on
   // /accessibility rather than implied by a green tick here.
+  // AND THE LIST WAS TWENTY PAGES TYPED BY HAND, WHICH LEFT TWENTY-SIX PAGE
+  // SHAPES NEVER SCANNED IN EITHER COLOUR SCHEME — a macro region, a theme,
+  // a motion, a month, a sub-category, a fund project, a facet list, the
+  // four legal pages, the public API, contact, help and the manifesto among
+  // them. That is the same fault as the four overflow assertions that each
+  // named their pages, and as the family list that had never carried a fund
+  // project page: a hand-typed list of surfaces is a list of the surfaces
+  // somebody thought of. `tools/lib/families.js` is the one list of rendered
+  // families and is enumerated against the built site, so a template that
+  // exists is a template this scan opens.
+  //
+  // The extras below are STATES rather than families, which is the one thing
+  // that list cannot hold.
   const a11yPages = [
-    "/", "/discover", "/countries", "/europe/norway", "/europe/norway/fjord-norway/bergen",
-    "/europe/norway/fjord-norway/bergen/place/bryggen", "/plan", "/search", "/map",
-    "/journeys/the-alpine-grand-tour", "/experiences", "/experiences/nature",
-    "/stories/the-last-forest", "/events/oct", "/fund", "/privacy", "/accessibility",
-    "/my-europe", "/sources/freshness",
-    // THE STAY EXEMPLAR WAS NOT IN THIS LIST AND ITS TEXT HAD NEVER BEEN
-    // MEASURED. The destination shape was represented by Bergen, which has
-    // no accommodation context, so the two quietest paragraphs on the new
-    // section — who holds the rooms, and the affiliate disclosure — were
-    // never contrast-checked in either colour scheme. That is the thumb-bar
-    // failure again: the suite measured five items and nothing else. A page
-    // shape is not represented by a page that does not have the thing.
+    ...require("./lib/families.js").ALL.map(([, url]) => url),
+    // THE STAY EXEMPLAR. The destination shape was represented by Bergen,
+    // which has no accommodation context, so the two quietest paragraphs on
+    // that section — who holds the rooms, and the affiliate disclosure —
+    // were never contrast-checked in either colour scheme.
     "/europe/france/alps-and-east/chamonix",
+    // A place page that is not the one families.js picks, and the freshness
+    // board, which is a table nothing else in this suite opens.
+    "/europe/norway/fjord-norway/bergen/place/bryggen",
+    "/sources/freshness",
   ];
 
   const a11yProbe = () => {
@@ -3338,8 +4516,20 @@ async function main() {
       const text = (a.textContent || "").trim() || a.getAttribute("aria-label") || a.querySelector("svg[aria-label]");
       if (!text) out.emptyLinks.push(a.getAttribute("href") || "(no href)");
     }
+    // A GRAPHIC IS NAMED OR IT IS HIDDEN, AND NEVER BOTH. `role="img"`
+    // announces a meaningful image and `aria-hidden` removes it, so the two
+    // together are an image with no name; in practice aria-hidden wins, so
+    // nothing is broken for a reader and nothing goes red either — which is
+    // why eight of them sat on /method until this scan was pointed at every
+    // family instead of at twenty typed URLs. The message names the element,
+    // because "svg without a name" on a page with eleven of them is a
+    // failure message with no measurement in it.
     for (const g of document.querySelectorAll('svg[role="img"]')) {
-      if (!g.getAttribute("aria-label") && !g.querySelector("title")) out.noAlt.push("svg without a name");
+      const who = `<svg class="${(g.getAttribute("class") || "(none)")}">`;
+      if (g.getAttribute("aria-hidden") === "true")
+        out.noAlt.push(`${who} claims role="img" and hides itself`);
+      else if (!g.getAttribute("aria-label") && !g.querySelector("title"))
+        out.noAlt.push(`${who} has role="img" and no name`);
     }
     if (!document.querySelector("main")) out.issues.push("no <main> landmark");
     if (!document.querySelector('nav[aria-label]')) out.issues.push("no labelled nav");
@@ -3422,6 +4612,18 @@ async function main() {
    *
    * Both widths, because the two passes are different rules: 1280 is where
    * the placement decides, 390 is where the enlargement re-decides.
+   *
+   * AND THE SAMPLE REPRESENTED THE PORTRAIT WITH TWO PLATES THAT DID NOT
+   * HAVE THE THING. /europe/armenia and /europe/cyprus were here because a
+   * country name once landed on top of whatever was at the middle of the
+   * country — and neither of them carries a physical name, so neither could
+   * ever have shown the defect underneath: the portrait was the fifth
+   * drawing that names things and the only one that never ran
+   * `phone_declutter`. Measured across all fifty at 390: **32 overlapping
+   * pairs on 18 plates**, the worst "Mount Ararat 5,137 m" through "PONTIC
+   * MOUNTAINS" by 158 pixels, and zero at 1280 — size was right and
+   * arrangement was never asked. Türkiye, Ukraine and Switzerland are the
+   * three deepest, so the sample now contains the case.
    */
   for (const [vw, vh] of [[1280, 900], [390, 800]]) {
     const lc = await browser.newPage({ viewport: { width: vw, height: vh } });
@@ -3435,6 +4637,9 @@ async function main() {
                      "/europe/armenia/yerevan-and-ararat/yerevan",
                      "/europe/armenia",
                      "/europe/cyprus",
+                     "/europe/turkiye",
+                     "/europe/ukraine",
+                     "/europe/switzerland",
                      "/journeys/the-alpine-grand-tour",
                      "/europe-in/islands",
                      "/europe/italy/north-italy"]) {
@@ -3503,14 +4708,29 @@ async function main() {
                    "/experiences/food/", "/method/", "/beyond-the-obvious/",
                    "/events/"];
     const rc = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-    const tot = { limestone: 0, graphite: 0, water: 0, cobalt: 0, accent: 0 };
+    /* A HUE BAND CANNOT SEPARATE THE SIGNATURE FROM THE SEA ANY MORE.
+     * pine is at hue 174.2 and the owner's map water at 174.5 — three
+     * tenths of a degree — so the water window swallowed the masthead and
+     * this instrument reported the signature at 0.1% against a declared 10.
+     * The bands were already DATA rather than a ternary, which is the only
+     * reason the reading could be diagnosed at all, and data was not
+     * enough: two overlapping windows are two windows whichever file they
+     * live in.
+     * A pixel is classified by the TOKEN IT IS NEAREST TO now, in OKLab,
+     * and the register says which family each token belongs to. A lookup,
+     * never a shape. Pixels further than max_distance from every token are
+     * neither — a photograph, a blend, a shadow — and are left out of the
+     * denominator rather than called paper. SWATCH and MAXD are built once
+     * at the top of this file, because two checks ask this question and two
+     * implementations of it is how both hue windows got written. */
+    const tot = { limestone: 0, graphite: 0, water: 0, pine: 0, accent: 0 };
     const per = [];
     let px = 0;
     for (const u of PAGES) {
       const r = await rc.goto(base + u, { waitUntil: "load" });
       if (!r || r.status() !== 200) continue;
       const buf = await rc.screenshot();
-      const got = await rc.evaluate(async (b64) => {
+      const got = await rc.evaluate(async ({ b64, SWATCH, MAXD }) => {
         const img = new Image();
         img.src = "data:image/png;base64," + b64;
         await img.decode();
@@ -3519,37 +4739,53 @@ async function main() {
         const x = c.getContext("2d");
         x.drawImage(img, 0, 0);
         const d = x.getImageData(0, 0, c.width, c.height).data;
-        const out = { limestone: 0, graphite: 0, water: 0, cobalt: 0, accent: 0 };
+        // AND THE BUCKET THE CLASSIFIER WRITES MUST BE ONE THIS DECLARES.
+        // The palette rename moved the signature from `cobalt` to `pine` in
+        // the classifier below and left this line saying `cobalt`, so
+        // `out.pine++` was `undefined++` — NaN. NaN propagated into the
+        // total, `px || 1` is 1 because NaN is falsy, and every share came
+        // back as a raw pixel count wearing a percent sign: "limestone
+        // 956561700.0%". The assertion under it fails loudly on a NaN now,
+        // because a share that is not a number is not a small share. The
+        // buckets are built FROM the register here, so the two cannot
+        // disagree at all.
+        const srgb = (c) => (c <= 0.04045 ? c / 12.92
+                                          : Math.pow((c + 0.055) / 1.055, 2.4));
+        const oklab = (R, G, B) => {
+          const r = srgb(R), g = srgb(G), b = srgb(B);
+          const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+          const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+          const s2 = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+          return [0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s2,
+                  1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s2,
+                  0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s2];
+        };
+        const marks = SWATCH.map((t) => ({
+          family: t.family,
+          lab: oklab(parseInt(t.hex.slice(1, 3), 16) / 255,
+                     parseInt(t.hex.slice(3, 5), 16) / 255,
+                     parseInt(t.hex.slice(5, 7), 16) / 255),
+        }));
+        const out = { limestone: 0, graphite: 0, water: 0, pine: 0, accent: 0 };
+        const NAME = { bone: "limestone", graphite: "graphite", pine: "pine",
+                       water: "water", accent: "accent" };
+        let other = 0;
         for (let i = 0; i < d.length; i += 4) {
-          const R = d[i] / 255, G = d[i + 1] / 255, B = d[i + 2] / 255;
-          const mx = Math.max(R, G, B), mn = Math.min(R, G, B);
-          const l = (mx + mn) / 2, dl = mx - mn;
-          if (dl < 0.10) { out[l > 0.55 ? "limestone" : "graphite"]++; continue; }
-          let h = mx === R ? ((G - B) / dl) % 6
-                : mx === G ? (B - R) / dl + 2 : (R - G) / dl + 4;
-          h *= 60; if (h < 0) h += 360;
-          // WATER IS NOT THE SIGNATURE, AND THE FIRST VERSION COUNTED IT AS
-          // ONE. Everything blue went into a single bucket and cobalt came
-          // back at 16.6% against a declared 10 — a finding about the
-          // masthead that was mostly the Atlantic. The two families do not
-          // overlap: the ocean ramp and the atlas water run 202-205 degrees
-          // of hue and every cobalt runs 228-230, so 218 separates them
-          // cleanly and --map-land, at 215, is already a neutral by chroma.
-          // Split, cobalt measures 7.0 and sits UNDER its budget on all
-          // twelve pages.
-          // THE LOWER BOUND, WHICH THIS TERNARY DROPPED. Water is 185 to
-          // 218 degrees and cobalt is 218 to 270; everything else — and
-          // "everything else" is mostly the warm end, terracotta at 20 —
-          // is the accent. Written as `h < 218 ? water : ...` the first
-          // clause swallowed every warm hue on the site, so the run
-          // reported the accent at 0.00% on all twelve pages and water 0.3
-          // high. The condition that was correct in the prototype lost a
-          // bound when it was compressed.
-          out[h >= 185 && h < 218 ? "water"
-              : h >= 218 && h <= 270 ? "cobalt" : "accent"]++;
+          const lab = oklab(d[i] / 255, d[i + 1] / 255, d[i + 2] / 255);
+          let best = null, bd = Infinity;
+          for (const m of marks) {
+            const dl = lab[0] - m.lab[0], da = lab[1] - m.lab[1],
+                  db = lab[2] - m.lab[2];
+            const dist = dl * dl + da * da + db * db;
+            if (dist < bd) { bd = dist; best = m; }
+          }
+          if (Math.sqrt(bd) > MAXD) { other++; continue; }
+          out[NAME[best.family]]++;
         }
+        out.$other = other;
         return out;
-      }, buf.toString("base64"));
+      }, { b64: buf.toString("base64"), SWATCH, MAXD });
+      delete got.$other;   // counted, and deliberately not in the denominator
       const pn = Object.values(got).reduce((a, b) => a + b, 0) || 1;
       per.push([u, 100 * got.accent / pn]);
       for (const k of Object.keys(tot)) { tot[k] += got[k]; px += got[k]; }
@@ -3561,6 +4797,10 @@ async function main() {
     const say = Object.entries(pc)
       .map(([k, v]) => `${k} ${v.toFixed(1)}%`).join(", ");
     ok(px > 0, "the palette-ratio measurement examined no pixels at all");
+    ok(Object.values(pc).every(Number.isFinite),
+       `the palette-ratio measurement produced a share that is not a number ` +
+       `(${say}). A bucket the classifier writes is not one the counter ` +
+       `declares, so its count is NaN and every other share is divided by it`);
     ok(pc.limestone >= 45 && pc.limestone <= 78,
        `limestone paints ${pc.limestone.toFixed(1)}% of the measured pages ` +
        `and the ratio makes it the ground at 60 (${say}). Outside 45-78 the ` +
@@ -3568,8 +4808,8 @@ async function main() {
     ok(pc.graphite >= 8,
        `graphite paints ${pc.graphite.toFixed(1)}% (${say}). It is the ink, ` +
        `the dark world and every map opening — below 8 one of those has gone`);
-    ok(pc.cobalt <= 13,
-       `cobalt paints ${pc.cobalt.toFixed(1)}% of the measured pages and the ` +
+    ok(pc.pine <= 13,
+       `the signature paints ${pc.pine.toFixed(1)}% of the measured pages and the ` +
        `ratio gives it 10 (${say}). A continent drawn in the signature is a ` +
        `network diagram, which is the association the cartography split ` +
        `exists to escape. The ceiling is 13 rather than 24 because water is ` +
@@ -3657,6 +4897,57 @@ async function main() {
     }
   }
 
+
+  /* ── NOT ONE PAGE SCROLLS SIDEWAYS, ON EVERY FAMILY, AT EVERY PHONE ──
+   *
+   * There were four overflow assertions in this suite and every one of them
+   * named a page by hand: the homepage's full-bleed band, a populated
+   * /my-europe, /map, and the clipping sweep's list of eighteen. None of
+   * them is a place page, so the place family scrolled sideways at 390 — the
+   * width every gate here runs at — and nothing said so.
+   *
+   * What it was: Europe writes `Jugendstilsenteret`, `Kunsthistorisches` and
+   * `Groeningemuseum`, an h1 is set at 76px, and a word longer than the
+   * column ran off the right edge. Measured before the fix: Groeningemuseum
+   * 381 units of word in a 336-pixel box at 390, pushing the document 7px
+   * sideways; 37 at 360 and 77 at 320. And separately the country door,
+   * sized by height on a frame held to a constant 1.299, is always 312
+   * pixels wide against a 288-pixel column at 320.
+   *
+   * THE LIST IS `tools/lib/families.js`, which is the one list of rendered
+   * families and is enumerated against the built site. A hand-typed list is
+   * how three templates went unmeasured until a fund project page was found
+   * shipping at 0% picture, and it is how this went unmeasured too.
+   *
+   * 360 is in the widths because the fault was 7px at 390 and 37 at 360: a
+   * defect that is one pixel under the threshold at the design width is a
+   * defect somebody will call a rounding error.
+   */
+  {
+    const FAM = require("./lib/families.js").ALL;
+    for (const W of [320, 360, 390]) {
+      const op = await browser.newPage({ viewport: { width: W, height: 900 } });
+      const hits = [];
+      let seen = 0;
+      for (const [name, url] of FAM) {
+        const r = await op.goto(base + url, { waitUntil: "load" });
+        if (!r || r.status() !== 200) continue;
+        seen++;
+        const over = await op.evaluate(() =>
+          document.documentElement.scrollWidth
+          - document.documentElement.clientWidth);
+        if (over > 1) hits.push(`${name} +${over}px`);
+      }
+      await op.close();
+      checked += seen;
+      ok(seen >= 40,
+         `the sideways-scroll sweep read only ${seen} families at ${W} — it ` +
+         `has stopped finding them`);
+      ok(hits.length === 0,
+         `${hits.length} of ${seen} families scroll sideways at ${W}px: ` +
+         `${hits.slice(0, 5).join(", ")}. A reader cannot put the page back.`);
+    }
+  }
 
   /* A PLACEHOLDER A READER CANNOT READ IS A TUTORIAL WITH ITS LAST LINE
    * MISSING.
@@ -3757,74 +5048,90 @@ async function main() {
     }
   }
 
-  /* THE DOORS STRIP WITH ONE, TWO AND THREE PHOTOGRAPHS — A STATE NOTHING
-   * COULD SEE.
+  /* THE PHOTOGRAPH ROW AT EVERY LENGTH THE LIBRARY CAN REACH.
    *
-   * "The strip is composed at every step rather than only when all four are
-   * licensed" is the argument for four slots instead of one band image, and
-   * it was written into the stylesheet and never rendered. With stand-in
-   * pictures injected into the live page — `img-src 'self' data:` allows a
-   * data URI, so the state can be reached without touching the register —
-   * the strip jumped from 304px to 522 the moment the FIRST picture landed,
-   * and the three unfilled doors became 522px tall with two hundred pixels
-   * of flat teal above their type. The hole this band was emptied of,
-   * reintroduced by one acquisition, and worse than before because an empty
-   * door now sat beside a filled one. The heading size was per-door too, so
-   * two sizes appeared side by side with nothing to explain the difference
-   * but which slot happened to be filled first.
+   * This was written against the homepage's four-door strip, which had four
+   * photograph slots and a rule saying "the strip is composed at every step
+   * rather than only when all four are licensed". Rendered with stand-in
+   * pictures it jumped 304px to 522 the moment the FIRST one landed and the
+   * three unfilled doors became holes.
    *
-   * The register holds no photographs, so this is a code path nothing
-   * exercises — which is how the focal point shipped as a style attribute
-   * the CSP forbids. It has an instrument on it now.
+   * THE STRIP IS GONE — the plate sequence replaced it — AND THE SUITE
+   * CRASHED ON ITS ABSENCE rather than reporting it: `.wayin` was null,
+   * `getBoundingClientRect` threw, and every assertion after this point in
+   * the file never ran. That is the second time in two runs a missing
+   * element has taken the whole gate dark, which is worse than a red one
+   * because nobody reads a run that did not finish.
+   *
+   * The promise outlived the component. Plate 02 draws one thumbnail per
+   * theme that HOLDS a photograph, and its own comment makes the same claim:
+   * "It grows to the full thirteen as the library fills and the layout does
+   * not change." That is testable without touching the register — remove
+   * tiles and re-measure — and it is a live claim rather than a vacuous one,
+   * because the row got it wrong this morning: a grid item's automatic
+   * minimum is its min-content, so RENAISSANCE refused its track and three
+   * tile widths appeared in a row of eight equal columns.
    */
   {
     const dp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    const r0 = await dp.goto(base + "/", { waitUntil: "load" });
     const seen = [];
-    for (let n = 0; n <= 4; n++) {
-      const r = await dp.goto(base + "/", { waitUntil: "load" });
-      if (!r || r.status() !== 200) break;
-      await dp.evaluate((n) => {
-        const svg = (c) => "data:image/svg+xml;utf8," + encodeURIComponent(
-          `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000">` +
-          `<rect width="1600" height="1000" fill="${c}"/></svg>`);
-        const cs = ["#5b6b4a", "#2e5d7a", "#7a5b3a", "#6b3a4a"];
-        [...document.querySelectorAll(".way")].slice(0, n).forEach((w, i) => {
-          w.classList.add("shot");
-          const pic = document.createElement("picture");
-          const im = document.createElement("img");
-          im.className = "photo"; im.src = svg(cs[i]); im.alt = "";
-          pic.appendChild(im);
-          w.insertBefore(pic, w.firstChild);
-        });
-      }, n);
-      await dp.waitForTimeout(120);
-      seen.push(await dp.evaluate(() => ({
-        h: Math.round(document.querySelector(".wayin").getBoundingClientRect().height),
-        sizes: [...new Set([...document.querySelectorAll(".way h3")]
-          .map((h) => Math.round(parseFloat(getComputedStyle(h).fontSize))))],
-      })));
+    if (r0 && r0.status() === 200) {
+      const full = await dp.locator(".qtile").count();
+      for (let drop = 0; drop < Math.min(4, full); drop++) {
+        await dp.goto(base + "/", { waitUntil: "load" });
+        await dp.evaluate((d) => {
+          const t = [...document.querySelectorAll(".qtile")];
+          t.slice(t.length - d).forEach((x) => x.remove());
+        }, drop);
+        await dp.waitForTimeout(80);
+        seen.push(await dp.evaluate(() => {
+          const t = [...document.querySelectorAll(".qtile")];
+          const box = (e) => e.getBoundingClientRect();
+          return {
+            n: t.length,
+            widths: [...new Set(t.map((x) => Math.round(box(x).width)))],
+            imgH: [...new Set(t.map((x) => Math.round(box(x.querySelector("img")).height)))],
+            nameTops: [...new Set(t.map((x) => Math.round(box(x.querySelector(".qname")).top)))],
+            // THE NUMBER OF ROWS IS THE GRID'S ANSWER, NOT THIS CHECK'S. It
+            // used to be `ceil(n / 8)`, which was the same hard-coded eight
+            // the builder carried — so when the row stopped showing eight of
+            // eleven and the grid became `auto-fill`, this went red for a
+            // page that had got better. Twelfth assertion here to pin a
+            // shape rather than a promise. The promise is that a name too
+            // wide for its track does not push its own tile down, which is
+            // exactly "the names in a row share a baseline" — so the rows
+            // are counted from the PICTURES, which cannot go ragged, and the
+            // baselines are compared against that.
+            picTops: [...new Set(t.map((x) => Math.round(box(x.querySelector("img")).top)))],
+            sizes: [...new Set(t.map((x) =>
+              Math.round(parseFloat(getComputedStyle(x.querySelector(".qname")).fontSize))))],
+          };
+        }));
+      }
     }
     await dp.close();
-    if (seen.length === 5) {
-      for (let n = 0; n <= 3; n++) {
-        checked++;
-        ok(seen[n].h === seen[0].h,
-           `the doors strip is ${seen[n].h}px with ${n} of four photographs and ` +
-           `${seen[0].h}px with none. Until every door has one the strip keeps ` +
-           `the height its type needs, or the first acquisition turns the other ` +
-           `three into holes`);
-      }
-      for (let n = 0; n <= 4; n++) {
-        checked++;
-        ok(seen[n].sizes.length === 1,
-           `the doors carry ${seen[n].sizes.length} heading sizes with ${n} of ` +
-           `four photographs (${seen[n].sizes.join(", ")}px). Four names a reader ` +
-           `compares have one size, whichever slot happened to be filled first`);
-      }
+    checked++;
+    ok(seen.length >= 2,
+       `the photograph row was not found on the homepage — it examined ${seen.length} ` +
+       `states, and this check has already once gone dark on a component that left`);
+    for (const st of seen) {
       checked++;
-      ok(seen[4].h > seen[0].h,
-         `the completed strip is ${seen[4].h}px and the empty one ${seen[0].h} — ` +
-         `with four photographs it takes the photograph's height`);
+      ok(st.widths.length === 1 && st.imgH.length === 1,
+         `with ${st.n} photographs the row draws ${st.widths.length} tile widths ` +
+         `(${st.widths.join(", ")}px) and ${st.imgH.length} picture heights ` +
+         `(${st.imgH.join(", ")}px). Every tile is one slot in one row, whatever ` +
+         `the library happens to hold`);
+      checked++;
+      ok(st.nameTops.length === st.picTops.length,
+         `with ${st.n} photographs the pictures sit on ${st.picTops.length} row(s) ` +
+         `(${st.picTops.join(", ")}) and the names on ${st.nameTops.length} baselines ` +
+         `(${st.nameTops.join(", ")}) — a name too wide for its track pushes its own ` +
+         `tile down and the row goes ragged`);
+      checked++;
+      ok(st.sizes.length === 1,
+         `with ${st.n} photographs the names carry ${st.sizes.length} sizes ` +
+         `(${st.sizes.join(", ")}px). Things a reader compares have one size`);
     }
   }
 
@@ -3849,13 +5156,31 @@ async function main() {
       const r = await yp.goto(base + u, { waitUntil: "load" });
       if (!r || r.status() !== 200) { await yp.close(); continue; }
       await yp.waitForTimeout(150);
+      // SCROLL IT INTO THE SHOT FIRST. `screenshot()` without `fullPage`
+      // photographs the VIEWPORT, and the year band sits at y=905 on a
+      // 900-pixel page — so every sample landed outside the image and came
+      // back as the canvas, which reads 1.00:1 whatever the drawing does.
+      // The check reported the baseline invisible at both widths on a band
+      // whose line measures 9.36, and it would have gone on doing that for
+      // any change that made /events one band taller. That is the aperture
+      // sampler's own recorded failure, in a check written after it and
+      // without its guard.
+      await yp.locator(".ybars").first().scrollIntoViewIfNeeded();
+      await yp.waitForTimeout(120);
       const box = await yp.evaluate(() => {
         const e = document.querySelector(".ybars");
         if (!e) return null;
         const b = e.getBoundingClientRect();
         // BASE is 66 of the 104-unit viewBox; the box scales vertically.
+        // The arithmetic was right all along — with the band in the shot,
+        // `b.y + 66 * (b.height / 104)` lands on the stroke at both widths.
+        // An offset was tried and moved the sample OFF it, which is worth
+        // recording: when a sampler reports 1.00 the first question is
+        // whether it is looking at the drawing at all, not whether it is
+        // looking a pixel too high.
         return { x: Math.round(b.x + 4), y: Math.round(b.y + 4),
-                 base: Math.round(b.y + 66 * (b.height / 104)) };
+                 base: Math.round(b.y + 66 * (b.height / 104)),
+                 h: Math.round(window.innerHeight) };
       });
       if (!box) { checked++; ok(false, `${u} at ${W}: no year band`); await yp.close(); continue; }
       const shot = (await yp.screenshot()).toString("base64");
@@ -3873,12 +5198,36 @@ async function main() {
           return 0.2126 * f(p[0]) + 0.7152 * f(p[1]) + 0.0722 * f(p[2]);
         };
         const at = (px, py) => lum(x.getImageData(px, py, 1, 1).data);
-        return { base: at(pts.x, pts.base), page: at(pts.x, pts.y) };
+        // A STROKE IS CENTRED ON ITS GEOMETRIC LINE, SO IT LANDS BETWEEN
+        // DEVICE PIXELS. `b.y + 66 * (b.height / 104)` is where the line IS;
+        // a 2px non-scaling stroke straddles it, and which row comes back
+        // solid depends on where that lands in the device grid — row 971 at
+        // 1280 and row 501 at 390, one either side of the same arithmetic.
+        // Sampling one exact row therefore read the line at one width and an
+        // anti-aliased blend at the other, and reported 1.54 for a line that
+        // measures 8.26 where it is solid.
+        //
+        // The aperture check already answers this: look for the greatest
+        // step from the ground within a small window, because that is what a
+        // cut edge IS. A reader sees whichever row is solid.
+        const page = at(pts.x, pts.y);
+        let base = page;
+        for (let dy = -2; dy <= 2; dy++) {
+          const v = at(pts.x, pts.base + dy);
+          if (Math.abs(v - page) > Math.abs(base - page)) base = v;
+        }
+        return { base, page };
       }, { d: shot, pts: box });
       await yp.close();
       const cr = (Math.max(got.base, got.page) + 0.05) /
                  (Math.min(got.base, got.page) + 0.05);
       checked++;
+      // A sampler that reads outside its own image reports the canvas. Say
+      // so, rather than reporting the drawing.
+      ok(box.base < box.h && box.y >= 0,
+         `${u} at ${W}: the year-band sampler read outside the shot — ` +
+         `baseline at ${box.base} on a ${box.h}px viewport. Every sample ` +
+         `comes back as the canvas and the ratio is about nothing`);
       ok(cr >= 3.0,
          `${u} at ${W}: the year band's baseline measures ${cr.toFixed(2)}:1 ` +
          `against the page on the painted pixel. The caption says "above the ` +

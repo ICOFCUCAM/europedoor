@@ -16,6 +16,7 @@ comment on each explaining which.
 from __future__ import annotations
 
 import glob
+import importlib
 import hashlib
 import html.parser
 import colorsys
@@ -45,6 +46,46 @@ OUT = os.path.join(ROOT, "site")
 VOID = {"meta", "link", "br", "img", "input", "hr", "source", "col", "area", "base", "wbr"}
 FAILURES = []
 CHECKS = []
+
+
+def bare_css(css):
+    """The stylesheet with its comments removed.
+
+    AN INSTRUMENT THAT READS ITS OWN DOCUMENTATION AS CODE IS WRONG. This
+    file already records that about the font-size count — a comment saying
+    "the first version wrote font-size: 26px" was itself counted as a
+    seventeenth size — and it happened twice more within an hour of the
+    owner's palette landing: the paragraph recording that #6f4f11 was
+    REMOVED from a family binding was read as a gold still in the
+    stylesheet, and the paragraph recording that `.btn { background:
+    var(--door) }` had been taken out was read as the rule itself. Six
+    places did this independently; this is the one implementation.
+    """
+    return re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+
+
+def css_hex(css, token, _depth=0):
+    """The literal hex a token resolves to, following var() hops.
+
+    A TOKEN THAT POINTS AT ANOTHER TOKEN IS NOT A MISSING TOKEN. Six checks
+    read a palette value with `--name\s*:\s*(#......)` and every one of
+    them reported "--atlas-sea is not declared in the stylesheet" the moment
+    the picture cartography was bound to the owner's map set — which is
+    true of the pattern and false of the stylesheet. The declaration is read
+    through as many hops as it takes, and the FIRST declaration wins, because
+    that is the :root one and the rebindings below it are a world's own.
+    """
+    bare = bare_css(css)
+    m = re.search(re.escape(token) + r"\s*:\s*([^;]+);", bare)
+    if not m:
+        return None
+    value = m.group(1).strip()
+    if re.fullmatch(r"#[0-9a-fA-F]{6}", value):
+        return value
+    hop = re.fullmatch(r"var\(\s*(--[a-z0-9-]+)\s*\)", value)
+    if hop and _depth < 6:
+        return css_hex(css, hop.group(1), _depth + 1)
+    return None
 
 
 def check(name):
@@ -143,9 +184,38 @@ def credential_shaped(body, m, stems=()):
         before = body[max(0, m.start() - 40):m.start()]
         if "sha256" in before or "hash" in before:
             return False
-    if tok in declared_slugs():
+    if tok in declared_slugs() or _canon(tok) in declared_slugs():
         return False
     return True
+
+
+def _canon(tok):
+    """One spelling for an identifier, whatever separator wrote it.
+
+    THE REGISTRY DECLARES A PLACE AS `austria/salzburg-and-the-lakes/
+    salzburg/hohensalzburg` AND THE REGISTER WRITES IT AS
+    `austria__salzburg-and-the-lakes__salzburg__hohensalzburg`, because a
+    file stem cannot contain a slash. The scan splits on everything that is
+    not a word character, so the registry's four-part target became four
+    short tokens — none of them long enough to collect — while the file stem
+    arrived as ONE 56-character run with nothing to match it against.
+
+    That is what stopped runs 24 to 28. Run 26 fetched, verified, hashed,
+    derived and registered **2,201 photographs** across every family, passed
+    every other gate, and died on 86 identical failures naming place slugs:
+    Hohensalzburg, Gjirokastër, the Mirabell Gardens. Nothing was pushed, so
+    all of it was thrown away — five times, which is why this product has
+    eleven photographs against 837 declared surfaces.
+
+    THE RULE IS ONE NORMALISER, BOTH SIDES. The planner's own diacritics fix
+    records that sentence: it lowercased the sentence and not the names, so
+    a quarter of the atlas could not be typed into it. Same failure, in a
+    credential scan, with separators instead of accents. A hyphen is kept
+    because it is inside the declared identifier; everything else that can
+    separate one becomes a single underscore, on the token and on the
+    registry alike, so the two are compared in the same alphabet.
+    """
+    return re.sub(r"[^A-Za-z0-9-]+", "_", tok).strip("_")
 
 
 _SLUGS = None
@@ -168,10 +238,18 @@ def declared_slugs():
         if os.path.exists(f):
             doc = json.load(open(f, encoding="utf-8"))
             for row in doc.get("purposes", []):
-                text = " ".join(str(row.get(k) or "")
-                                for k in ("purpose", "path", "target", "key"))
-                _SLUGS |= {t for t in re.split(r"[^A-Za-z0-9_-]+", text)
-                           if len(t) >= 40}
+                for k in ("purpose", "path", "target", "key"):
+                    text = str(row.get(k) or "")
+                    if not text:
+                        continue
+                    # THE WHOLE IDENTIFIER, NOT ONLY ITS PARTS. Splitting
+                    # first threw away exactly the thing a file stem is: one
+                    # run with the separators removed.
+                    whole = _canon(text)
+                    if len(whole) >= 40:
+                        _SLUGS.add(whole)
+                    _SLUGS |= {t for t in re.split(r"[^A-Za-z0-9_-]+", text)
+                               if len(t) >= 40}
     return _SLUGS
 
 
@@ -1837,25 +1915,107 @@ def c_instruction():
             ha, hb = _hue(tok[a]["hex"]), _hue(tok[b]["hex"])
             d = abs(ha - hb) % 360.0
             d = min(d, 360.0 - d)
-            if d < dis["min_hue_degrees"]:
+            # HUE OR LIGHTNESS, BECAUSE EITHER ONE TELLS TWO COLOURS APART
+            # AND THE FIRST VERSION ASKED ONLY FOR HUE. The owner's palette
+            # names ochre (#C49A52, hue 38) and terracotta (#B9684A, hue 16)
+            # as the territorial and the architectural accent, which is 22
+            # degrees against a floor of 25 — and they are not remotely the
+            # same colour, because ochre is 0.355 of luminance and
+            # terracotta is 0.207 and the pair measures 1.57 against each
+            # other. A hue floor alone would have refused a real distinction
+            # and then been lowered until it refused nothing.
+            #
+            # The pair that created this block fails BOTH: #a32a1e against
+            # #a4491f is fourteen degrees apart AND 1.22, which is the
+            # definition of the same colour. So the rule is a disjunction
+            # rather than a weaker hue floor, and it is still red on the
+            # thing it was written for — proved by putting those two hexes
+            # back in.
+            r = _ratio(tok[a]["hex"], tok[b]["hex"])
+            if d < dis["min_hue_degrees"] and r < dis["min_ratio"]:
                 fail(f"{a} ({tok[a]['hex']}, hue {ha:.0f}) and {b} "
                      f"({tok[b]['hex']}, hue {hb:.0f}) are {d:.0f} degrees "
-                     f"apart and the register asks for "
-                     f"{dis['min_hue_degrees']} — a contrast ratio cannot see "
-                     f"this, which is how they stayed the same colour")
+                     f"apart and measure {r:.2f} against each other; the "
+                     f"register asks for {dis['min_hue_degrees']} degrees OR "
+                     f"{dis['min_ratio']} of ratio, and neither holds — a "
+                     f"contrast ratio alone cannot see the first of those, "
+                     f"which is how an advisory and an accent stayed the "
+                     f"same colour")
             n += 1
 
     if sum(pal["ratio"][k] for k in pal["ratio"] if not k.startswith("$")) != 100:
         fail("the palette ratio does not add to 100")
-    n += 1
 
-    # Gold is out of the system entirely, and this is the assertion that keeps
-    # it out: no token in the palette, and no rule in the stylesheet, may be a
-    # gold or brass. Gold says luxury, premium, heritage, wealth. The product
-    # has to say Europe, discovery, movement, intelligence, culture, future.
-    if not pal.get("gold", "").startswith("None"):
-        fail("docs/palette.json no longer states that there is no gold")
-    css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"), encoding="utf-8").read()
+    # A FAMILY IS A CLAIM ABOUT WHICH COLOURS ARE WHICH, and the ratio's
+    # classifier used to carry two HUE WINDOWS to answer it. That worked
+    # while the signature was cobalt at 229 degrees and the water at 202,
+    # and it stopped working the moment the owner's palette put pine at
+    # 174.2 and the map water at 174.5 — three tenths of a degree, so the
+    # water window swallowed the masthead and the run reported the
+    # signature at 0.1% against a declared 10. The windows were already
+    # DATA rather than a ternary, which is the only reason that reading
+    # could be diagnosed; data was not enough, because two overlapping
+    # windows are two windows whichever file they live in.
+    #
+    # A pixel is classified by the token it is NEAREST to now, so what this
+    # asserts is that the lookup is COMPLETE: every declared token belongs
+    # to exactly one family, and every family names only declared tokens.
+    # A token in no family is a colour the instrument counts as nothing;
+    # a token in two is a share counted twice.
+    fam = pal["ratio"].get("$families")
+    if not fam:
+        fail("docs/palette.json declares no ratio families — the classifier "
+             "is carrying typed hue windows again, and the last pair of "
+             "those could not tell the signature from the sea")
+    else:
+        if not isinstance(fam.get("max_distance"), (int, float)):
+            fail("the ratio families declare no max_distance, so a "
+                 "photograph's pixels would be assigned to whichever token "
+                 "they happen to be least unlike")
+        seen = {}
+        for family, names in fam.items():
+            if not isinstance(names, list):
+                continue
+            for name in names:
+                if name not in tok:
+                    fail(f"the ratio family {family!r} names {name!r}, which "
+                         f"is not a declared token")
+                if name in seen:
+                    fail(f"{name} is in two ratio families ({seen[name]} and "
+                         f"{family}), so its pixels are counted twice")
+                seen[name] = family
+                n += 1
+        for name in tok:
+            if name not in seen:
+                fail(f"palette token {name} is in no ratio family, so every "
+                     f"pixel painted in it is counted as nothing and the "
+                     f"shares under it are wrong by however much of the "
+                     f"screen it covers")
+            n += 1
+
+    # GOLD IS ADMITTED AS A GROUND AND A MARK, AND THE RULE THAT REFUSED IT
+    # IS NARROWED RATHER THAN DELETED.
+    #
+    # The old assertion was "no token and no rule may be a gold", by
+    # arithmetic, and the reason was what gold SAYS: luxury, premium,
+    # heritage, wealth, where this product has to say Europe, discovery,
+    # movement, intelligence, culture, future. The owner's palette names
+    # ochre (#C49A52) as the TERRITORIAL accent — the regions and the events
+    # calendar — and that is a different job from a gold button: a ground and
+    # a kicker on two families, and never the thing a reader clicks.
+    #
+    # So the refusal now names what it was protecting. Two brasses stay out
+    # BY VALUE, because they were the previous system's luxury livery and
+    # nothing in the owner's table replaces them. And no gold may be the
+    # interactive colour, the focus ring or the mark, which is where "premium
+    # travel brand" would actually arrive — asserted below, not stated.
+    if "#8a6d34" not in pal.get("gold", "").lower() or \
+            "#c2a165" not in pal.get("gold", "").lower():
+        fail("docs/palette.json no longer names the two brasses that stay "
+             "out by value; a narrowed rule that stops naming what it "
+             "removed is a deleted rule")
+    css = bare_css(open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
+                        encoding="utf-8").read())
     if re.search(r"--(brass|gold)\s*:", css):
         fail("assets/css/europedoor.css defines a gold or brass token; "
              "European Future has no gold")
@@ -1871,30 +2031,100 @@ def c_instruction():
     if "--lime:" in css or re.search(r":\s*#c8ff4d", css, re.I):
         fail("assets/css/europedoor.css still declares electric lime; it was "
              "removed rather than rehomed, like the brass")
-    for hexv, token in re.findall(r"(#[0-9a-fA-F]{6})", css) and \
-            [(m, m) for m in re.findall(r"#[0-9a-fA-F]{6}", css)]:
+    for brass in ("#8a6d34", "#c2a165"):
+        if re.search(brass, css, re.I):
+            fail(f"assets/css/europedoor.css contains {brass}, one of the "
+                 f"two brasses the previous system was stripped of")
+        n += 1
+
+    # THE ADMITTED SET IS A LOOKUP, NEVER A SHAPE. A gold is a mid-lightness
+    # saturated yellow — red high, green close behind, blue far back — and
+    # that arithmetic catches both brasses, ochre, ochre-deep and any gold a
+    # future hand pastes in. Loosening the arithmetic until ochre passes
+    # would loosen it until a brass passes too, which is the same mistake
+    # this file records about the credential scan's hyphen pattern. So the
+    # arithmetic stays exactly as it was and the register declares WHICH
+    # golds are the territorial accent, by hex, with a role each.
+    admitted = {t["hex"].lower() for name, t in tok.items()
+                if name.startswith("ochre")}
+    if not admitted:
+        fail("docs/palette.json declares no ochre family, so every gold in "
+             "the stylesheet is unaccounted for")
+    for hexv in set(re.findall(r"#[0-9a-fA-F]{6}", css)):
         r_, g_, b_ = (int(hexv[i:i + 2], 16) for i in (1, 3, 5))
-        # A gold is a mid-lightness, saturated yellow: red high, green close
-        # behind, blue far back. This catches #8a6d34 and #c2a165, the two
-        # brasses that were in the previous system, without catching the
-        # limestone ground (which is barely saturated) or terracotta (whose
-        # green sits far below its red).
-        if 90 <= r_ <= 215 and abs(r_ - g_) < 55 and (g_ - b_) > 45 and (r_ - b_) > 70:
-            fail(f"assets/css/europedoor.css still contains a gold: {hexv}")
+        if 90 <= r_ <= 215 and abs(r_ - g_) < 55 and (g_ - b_) > 45 \
+                and (r_ - b_) > 70 and hexv.lower() not in admitted:
+            fail(f"assets/css/europedoor.css contains a gold the register "
+                 f"does not declare: {hexv}. The ochre family is "
+                 f"{', '.join(sorted(admitted))}; a gold outside it is the "
+                 f"luxury livery arriving by the back door")
     n += 2
+
+    # AND NO GOLD ON AN ACTION, A LINK, A FOCUS RING OR THE MARK. That is the
+    # sentence the old blanket refusal was really making, and it is the half
+    # that could not be inferred from a list of hexes: ochre is admitted as a
+    # GROUND and a kicker, so the thing to assert is that it never becomes
+    # the colour a reader clicks. `--sea` is the interactive colour on every
+    # world (links, focus rings, controls) and `--signature` is the mark; a
+    # family rebinds `--door`, which is editorial, and for one commit `.btn`
+    # took `--door` — so the region family's primary button was a gold one
+    # and the whole reason for the split had been undone in a late rule.
+    for prop in ("--sea", "--sea-dark", "--signature"):
+        for value in re.findall(rf"{re.escape(prop)}\s*:\s*([^;]+);", css):
+            value = value.strip()
+            m = re.match(r"var\(\s*(--[a-z0-9-]+)", value)
+            if m:
+                name = m.group(1)[2:]
+                if name in tok:
+                    value = tok[name]["hex"]
+            if not value.startswith("#") or len(value) != 7:
+                continue
+            r_, g_, b_ = (int(value[i:i + 2], 16) for i in (1, 3, 5))
+            if 90 <= r_ <= 215 and abs(r_ - g_) < 55 and (g_ - b_) > 45 \
+                    and (r_ - b_) > 70:
+                fail(f"{prop} resolves to {value}, which is a gold. Ochre is "
+                     f"a ground and a mark and never the colour a reader "
+                     f"clicks")
+            n += 1
+    # `.btn` is the primary action and takes the interactive colour, not the
+    # family's. A rule binding its background to `--door` is how that got
+    # lost once already.
+    if re.search(r"\.btn\s*\{[^}]*background:\s*var\(--door", css):
+        fail("the primary action takes var(--door), so it is a different "
+             "colour on every family — including a gold one on the regions. "
+             "A control stays one colour across the site")
+    n += 1
 
     doc = os.path.join(ROOT, "docs", "instruction.md")
     if not os.path.exists(doc) or os.path.getsize(doc) < 4000:
         fail("docs/instruction.md is missing or a stub")
     else:
         body = open(doc, encoding="utf-8").read()
-        for token in ("#101214", "#F7F6F3", "#3157FF", "#8398FF", "#14483C", "#A4491F"):
-            if token not in body:
-                fail(f"docs/instruction.md does not name {token}")
+        # AND THE SIX HEXES WERE TYPED HERE, so a palette change had to be
+        # made in three places and the third was this check. They are read
+        # from the register now — one implementation, the same repair this
+        # file has already made for the font-size count and for
+        # credential_shaped().
+        # THE INSTRUCTION NAMES THE OWNER'S OWN PALETTE, AND NOTHING ELSE.
+        # This tuple was the previous system's six — limestone, atlantic,
+        # pine-air — and two of those tokens no longer exist, so the check
+        # died with a KeyError rather than failing: an instrument that
+        # crashes reports nothing about the thing it guards. It is the three
+        # the brief calls the most important, plus every accent that names a
+        # family, plus both map sets, because a palette document that does
+        # not state the maps is not this product's palette document.
+        NAMED = ("bone", "mineral", "pine", "pine-deep", "graphite", "ink",
+                 "cobalt", "sky", "terracotta", "ochre", "olive",
+                 "map-land", "map-water", "map-border", "map-ink",
+                 "map-dark-bg", "map-dark-land", "map-dark-border")
+        for name in NAMED:
+            token = tok[name]["hex"].upper()
+            if token not in body.upper():
+                fail(f"docs/instruction.md does not name {token} ({name})")
             n += 1
         # The readable table and the register must agree on the values the
         # instruction reasons about by name.
-        for name in ("graphite", "limestone", "cobalt", "cobalt-air", "atlantic", "terracotta"):
+        for name in NAMED:
             if tok[name]["hex"].upper() not in body.upper():
                 fail(f"docs/instruction.md and docs/palette.json disagree about {name}")
             n += 1
@@ -2447,15 +2677,29 @@ def c_frontend():
     # ended on three journey cards and up to three theme cards, all opening
     # on a gradient chosen by the hash of a slug, on the family whose whole
     # argument is that a motion is not a place.
+    # AND A FLOOR IS ON THE PROMISE, NOT ON THE CLASS NAME. The 2036 page
+    # system replaces three of these with its own: `ed-opening` IS a page
+    # head, `ed-eyebrow` IS a kicker, `ed-row` IS a row. A floor that counts
+    # only the old spelling reads a migration as a family growing its own
+    # components — which is the exact thing it exists to catch, reported
+    # about a page that had just stopped doing it. Each floor names every
+    # class that satisfies it, so the promise survives the migration and a
+    # family that drops the idea altogether still fails.
     FLOORS = {"kicker": 0.99, "masthead": 0.99, "pagehead": 0.99, "crumbs": 0.99,
               "row": 0.85, "card": 0.05, "band": 0.70, "note": 0.70}
+    ALSO = {"pagehead": ("ed-opening", "ed-arrival", "ed-journey-hero",
+                         "ed-story-opening", "ed-institution"),
+            "kicker": ("ed-eyebrow", "ed-section-index"),
+            "row": ("ed-row",), "band": ("ed-section",)}
     total = 0
     hits = {k: 0 for k in FLOORS}
     for path in site_files():
         body = open(path, encoding="utf-8").read()
         total += 1
         for prim in FLOORS:
-            if re.search(r'class="[^"]*(?<![\w-])' + prim + r'(?![\w-])', body):
+            names = (prim,) + ALSO.get(prim, ())
+            if any(re.search(r'class="[^"]*(?<![\w-])' + nm + r'(?![\w-])', body)
+                   for nm in names):
                 hits[prim] += 1
     for prim, floor in FLOORS.items():
         got = hits[prim] / total
@@ -2465,10 +2709,30 @@ def c_frontend():
         n += 1
 
     # 4. The scale stays small.
-    sizes = set(re.findall(r"font-size:\s*([^;]+);", css))
-    if len(sizes) > 20:
+    #
+    # AND THIS WAS A SECOND IMPLEMENTATION OF A COUNT THAT ALREADY EXISTED,
+    # which is the seventh time that has cost something here. `invariants.py`
+    # learned twice what this copy never did: it strips comments (`_css`), because
+    # this stylesheet's style is long notes naming the failure behind each
+    # rule and one of them quotes a `font-size: 26px` that was refused; and
+    # it removes the `calc(X / var(--z))` compensation, because a constant
+    # correcting for a scaled viewBox is not a typographic choice. This copy
+    # counted the prose as a size and counted `11px` and its own compensated
+    # form as two, so giving the scale bar the fix every other label family
+    # has failed the build on a size nobody added. One implementation.
+    inv = importlib.import_module("invariants")
+    sizes = {inv._size_of(v)
+             for v in re.findall(r"font-size:\s*([^;]+);", inv._css())}
+    # 24 RATHER THAN 20, AND THE FOUR ARE THE 2036 SYSTEM'S WHOLE SCALE.
+    # Eight page families, four display values: an opening, a section, a row
+    # and the reading step under them. The brief wrote nine clamps, one per
+    # component, each a few pixels from its neighbour — and nine arbitrary
+    # clamps is a second type scale wearing the first one's clothes, which
+    # is how the sibling repository reached 418. The ceiling moves by what
+    # was actually added and no further.
+    if len(sizes) > 24:
         fail(f"{len(sizes)} distinct font-size values; the audit measured 13 and the "
-             f"sibling repository measured 418")
+             f"sibling repository measured 418: " + ", ".join(sorted(sizes)))
     bps = set(re.findall(r"@media[^{]*\(m(?:in|ax)-width:\s*([^)]+)\)", css))
     if len(bps) > 10:
         fail(f"{len(bps)} breakpoints; the audit measured 6")
@@ -2578,6 +2842,21 @@ def c_invariants():
         return 0
     with open(path, encoding="utf-8") as fh:
         want = json.load(fh)["invariants"]
+    # THE MEASUREMENT FIRST, THEN AS MUCH REASON AS A PERSON WILL READ.
+    # `primitives.reach` carries a four-thousand-word reason — every
+    # deliberate move this figure has ever made, which is exactly what it
+    # should carry, and it is printed in full on every one of the sixteen
+    # sub-keys it can fail on. A run reporting three one-page migrations
+    # printed twelve thousand words, and the three numbers that diagnose it
+    # were in the first line of each. This file's own rule is that a failure
+    # message with no measurement in it cannot be diagnosed; the corollary
+    # is that a measurement buried in an essay is not in the message either.
+    # The register keeps the whole reason and `--check` prints its opening.
+    def _why(spec):
+        w = " ".join(spec.get("why", "").split())
+        return w if len(w) <= 240 else w[:240].rsplit(" ", 1)[0] + \
+            " … (the rest of the reason is in docs/invariants.json)"
+
     n = 0
     for name, spec in sorted(want.items()):
         now = got.get(name, {}).get("value")
@@ -2588,15 +2867,15 @@ def c_invariants():
             for k, v in exp.items():
                 if now.get(k, 0) < v:
                     fail(f"invariant {name}.{k} fell to {now.get(k)} from {v} — "
-                         f"{spec['why']}")
+                         f"{_why(spec)}")
                 n += 1
         elif kind == "ceiling":
             if now > exp:
-                fail(f"invariant {name} rose to {now} above {exp} — {spec['why']}")
+                fail(f"invariant {name} rose to {now} above {exp} — {_why(spec)}")
             n += 1
         else:
             if now != exp:
-                fail(f"invariant {name} is {now!r}, recorded {exp!r} — {spec['why']}")
+                fail(f"invariant {name} is {now!r}, recorded {exp!r} — {_why(spec)}")
             n += 1
     return n
 
@@ -2970,12 +3249,29 @@ def c_map_dots_in_frame():
     # No amount of looking at the other 129 region maps would have found it.
     # What found it was asserting the thing a map must be true of: the
     # subject is inside the picture. One of 191 failed.
+    #
+    # AND IT MATCHED AN EXACT CLASS STRING, SO IT HAS BEEN BLIND SINCE THE
+    # CARTOGRAPHY SKIN SHIPPED. The pattern was `pointsmap arched"><svg`,
+    # which requires `arched` to be the LAST class on the figure; the atlas
+    # palette added ` atlas` after it, and from that commit this check
+    # examined nothing and reported green. Measured: 0 dots, on a site with
+    # 130 region maps. That is the second check in this file found examining
+    # nothing in one sweep, and the reason both were found is that the run
+    # prints a count per check and somebody read the column.
+    #
+    # Matched on the class LIST now, which is what a class attribute is, and
+    # it asserts its own reach — a floor derived from the region maps the
+    # build actually wrote rather than typed, so it cannot go stale the way
+    # the pattern did.
     n = 0
+    figs = 0
     for f in site_files():
         html = open(f, encoding="utf-8").read()
-        for m in re.finditer(r'pointsmap arched"><svg viewBox="0 0 ([\d.]+) ([\d.]+)"'
-                             r'(.*?)</svg>', html, re.S):
-            w, h, frag = float(m.group(1)), float(m.group(2)), m.group(3)
+        for m in re.finditer(
+                r'<figure class="([^"]*\bpointsmap\b[^"]*)"[^>]*>\s*'
+                r'<svg viewBox="0 0 ([\d.]+) ([\d.]+)"(.*?)</svg>', html, re.S):
+            figs += 1
+            w, h, frag = float(m.group(2)), float(m.group(3)), m.group(4)
             for c in re.finditer(r'<circle cx="([\d.-]+)" cy="([\d.-]+)"', frag):
                 x, y = float(c.group(1)), float(c.group(2))
                 if not (0 <= x <= w and 0 <= y <= h):
@@ -2983,6 +3279,10 @@ def c_map_dots_in_frame():
                          f"{w:.0f}x{h:.0f} frame — outside the picture, so it "
                          f"is not drawn and nothing says it is missing")
                 n += 1
+    if figs < 100:
+        fail(f"the dot-in-frame check found only {figs} point maps — it has "
+             f"stopped matching the markup, which is exactly how it spent the "
+             f"life of the atlas skin reporting zero")
     return n
 
 
@@ -3260,7 +3560,12 @@ def c_map_roles():
     # illustration must carry the atlas skin, and an instrument must not.
     # Declaring a role and then styling the other way is worse than not
     # declaring one, because it reads as a decision.
-    pat = re.compile(r'<(?:figure|a|svg)[^>]*class="([^"]*(?:minimap|heromap|'
+    # `heromap` was renamed to `instrmap` when the map became /discover's
+    # first plate. A pattern naming a class that no longer exists is a check
+    # that quietly stops examining a family — this file already records two
+    # that did exactly that and reported green — so the count below is a
+    # floor as well as an assertion.
+    pat = re.compile(r'<(?:figure|a|svg)[^>]*class="([^"]*(?:minimap|instrmap|'
                      r'europemap)[^"]*)"[^>]*>')
     n = illus = instr = 0
     for path in site_files():
@@ -3414,7 +3719,13 @@ def c_terrain():
     css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
                encoding="utf-8").read()
     css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
-    base = (0xdd, 0xd9, 0xcf)                    # --atlas-land
+    # AND THE LAND TONE WAS A COPY. `base` was three bytes typed here, so a
+    # palette change moved the fills the stylesheet declares and left the
+    # check asserting a mix of the OLD ground — the same class of fault as
+    # the six hexes this file used to type for docs/instruction.md. It is
+    # read from the stylesheet now; the constant is the approved FRACTION.
+    _land = css_hex(css, "--atlas-land").lstrip("#")
+    base = tuple(int(_land[i:i + 2], 16) for i in (0, 2, 4))
     for lo, _hi, hexcol, _why in C.HYPSOMETRIC:
         if lo == 0:
             continue
@@ -3709,10 +4020,27 @@ def c_hero_frame():
                 encoding="utf-8").read()
     photo_hero = bool(_register().get("home-hero"))
     if photo_hero:
-        assert 'class="herofull shot"' in html and "<picture>" in html, (
-            "the register holds a homepage hero photograph and the shipped "
-            "page carries neither `.shot` nor a <picture> — the drawing was "
-            "removed and nothing replaced it")
+        # AND `.herofull shot` WAS THE OLD HERO'S CLASS, WHICH IS THE SHAPE
+        # HALF OF THIS ASSERTION COMING BACK. The homepage is a plate
+        # sequence now: the opening is `.sheet-door .opening` and the
+        # photograph goes inside it, so naming the container was a third
+        # spelling of "there is a picture here". What is asserted is the
+        # picture and its own register key, inside the opening — because a
+        # `<picture>` somewhere on the page would also be true of the eight
+        # doors below the fold.
+        i = html.find('class="opening"')
+        seg = html[i:html.find("</div>", i)] if i >= 0 else ""
+        # AND NOT `"home-hero" in seg`, WHICH IS THE ONE-CHARACTER-APART
+        # TRAP THIS FILE ALREADY RECORDS. The REGISTER KEY is `home-hero`
+        # and the FILE STEM comes from the PURPOSE, `homepage-hero`, so the
+        # derivatives are named `homepage-hero.<hash>.avif` and the key is
+        # not a substring of them. Which file the page must reference is
+        # `c_photo_published`'s question and it asks it from the register;
+        # this one asks only whether the opening carries a picture at all.
+        assert "<picture" in seg, (
+            "the register holds a homepage hero photograph and the opening "
+            "carries no <picture> — the drawing was removed and nothing "
+            "replaced it")
     else:
         assert f'viewBox="{vx:.0f} {vy:.0f} {vw:.0f} {vh:.0f}"' in html, (
             "the homepage does not carry the hero viewBox this check just "
@@ -4096,6 +4424,169 @@ def c_score_median():
 
 
 @check("no drawing quietly omits a place it is drawn from")
+@check("a picture plate fades by the derived reach, not by a typed one")
+def c_cut_reach():
+    """`dusk_reach()` was derived and `cartography.datacut()` typed it again.
+
+    The fade over the 52°E and 33°N data cuts had its widths chosen by eye —
+    330 units east, 130 south — and the hero's own measurement replaced them
+    with a width DERIVED from the outermost destination, because a ramp that
+    swallows Baku is the fault the fade exists to avoid, arrived at from the
+    other side. That measurement never reached the plates: 330 and 130 were
+    typed into `cartography.datacut()`, so every region, theme, motion,
+    story, country portrait and destination plate went on drawing the wide
+    one. Measured over all 319 destinations, as the opacity the ramp paints
+    at each one's own position: 25 dimmed past half against 6.
+
+    THE SPLIT IS PICTURE AGAINST INSTRUMENT AND IT IS DELIBERATE. /map and
+    /discover keep the wide reach and say so — their marks are drawn above
+    the fade, the ground is graphite, and the ramp is atmosphere. A plate is
+    a picture OF somewhere and its ground is the subject, which is why
+    Baku & the Caspian rendered as a uniform dark field with one dot on it.
+
+    Asserted on the shipped SVG rather than on the call sites: both endpoints
+    sit WEST of the 52°E meridian — `eb` units and `ea` units — so the ramp
+    spans `eb - ea` and reaches full opacity `ea` short of the cut, which an
+    SVG gradient then pads eastward over it. That is readable off the markup.
+    A source check would pass the day somebody adds a fifth caller.
+    """
+    import math
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from lib import pages as _P
+    eb, ea, _sb, _sa = _P.dusk_reach()
+    want = eb - ea
+    n = 0
+    pat = re.compile(r'<linearGradient id="cut-[^"]*-e"[^>]*'
+                     r'x1="([-\d.]+)" y1="([-\d.]+)" '
+                     r'x2="([-\d.]+)" y2="([-\d.]+)"')
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        if "datacut" not in h:
+            continue
+        for m in pat.finditer(h):
+            x1, y1, x2, y2 = (float(v) for v in m.groups())
+            got = math.hypot(x2 - x1, y2 - y1)
+            n += 1
+            if abs(got - want) > 0.5:
+                fail(f"{canonical_of(f)}: a picture plate's eastern data-cut "
+                     f"ramp is {got:.0f} projection units wide and the reach "
+                     f"derived from the outermost destination is {want:.0f}. "
+                     f"A width typed into the renderer is a width nothing "
+                     f"re-derives when a destination moves.")
+    if n < 100:
+        fail(f"c_cut_reach examined only {n} picture-plate ramps — it has "
+             f"stopped finding the family it is about.")
+    return n
+
+
+@check("no page prints a word cut in half")
+def c_cut_word():
+    """`first_sentence()` exists, and the page it was written for did not use it.
+
+    The helper carries its own reason: `text[:140] + "…"` cut "…and cost less
+    than the equivalent flight if booked early. Coastal Norway…" on 400 place
+    pages, "a truncation mid-clause that reads as a rendering fault rather
+    than as a summary. A sentence boundary is the one place a text can be cut
+    without looking broken."
+
+    The destination page's "Getting there" panel kept
+    `getting_around[:150] + "…"` — the exact expression that helper replaced,
+    one screen from the helper. Measured on the data: 30 of the 50 countries
+    are cut mid-WORD at 150 characters, so **213 of 319 destination pages**
+    printed "Rural France needs a car; the re…". A rule that exists is not a
+    rule that is inherited, which this repository has now recorded of a
+    label family, a collision pass and a truncation.
+
+    THE CHECK IS ON THE SHIPPED HTML, NOT ON THE CALL SITES, because the next
+    one will be written somewhere this list has never heard of. A `<span
+    class="mono">` is exempt and is the only exemption: a SHA-256 shown as
+    its first twelve characters is a prefix rather than a sentence, and it is
+    checked against the class rather than by pattern because a looser rule is
+    how a real truncation gets back in.
+    """
+    # AND THE COUNT IS PAGES, NOT ELLIPSES. It used to report how many
+    # ellipses it found, which is a quantity that ought to be zero — so a
+    # check reading all 1,034 pages printed "(0)" and read, in the column
+    # this suite prints, exactly like a check that has stopped matching the
+    # markup. Two of those were found in one sweep of that column; an
+    # instrument that looks like one of them while being healthy is a
+    # instrument that gets the real ones ignored.
+    n = 0
+    mono = re.compile(r'<span class="mono">.*?</span>', re.S)
+    for f in site_files():
+        n += 1
+        h = mono.sub(" ", open(f, encoding="utf-8").read())
+        for m in re.finditer(r"(\w{0,20})…", h):
+            word = m.group(1)
+            if word and word[-1].isalnum():
+                fail(f"{canonical_of(f)} prints \"{word}…\" — an ellipsis "
+                     f"inside a word. A text cut at a fixed character count "
+                     f"reads as a rendering fault; `first_sentence()` cuts at "
+                     f"the one boundary that does not.")
+    return n
+
+
+@check("a page claiming one frame draws one frame")
+def c_same_frame():
+    """"Drawn to the same frame so the nine can be compared" was not true.
+
+    /countries, /themes and /interests each close with a sentence saying
+    their row glyphs are drawn to one frame, which is the whole argument for
+    having them: a knot is an argument about one corner of Europe and a
+    scatter is one about the whole of it, and neither reading survives nine
+    drawings at nine scales. Measured on the shipped HTML by reading the
+    viewBox off every `.constel` svg:
+
+        /themes      13 glyphs, 1 viewBox
+        /interests   17 glyphs, 1 viewBox
+        /countries   10 glyphs, 10 viewBoxes
+
+    The drawing on /countries is RIGHT and the sentence was wrong.
+    `region_glyph` carries a recorded refusal — all nine at the continental
+    extent is nine identical pictures of Europe with a different corner lit,
+    which is the homepage's eleven-maps failure on the page directly under
+    it — so the band frames on its own members and the sentence now says so.
+
+    A CLAIM ABOUT A DRAWING IS CHECKED AGAINST THE DRAWING. This one is
+    exactly the /map projection failure: three renderers were made to agree
+    and no check read the prose. Both directions, because a sentence that
+    outlives the thing it describes is the other half of the same defect —
+    and whitespace is collapsed first, because a line break between "same"
+    and "frame" is what defeated the projection check for a year.
+    """
+    n = pages = 0
+    pat = re.compile(r'<svg class="constel[^"]*" viewBox="([^"]+)"')
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        vbs = pat.findall(h)
+        if len(vbs) < 2:
+            continue
+        pages += 1
+        n += len(vbs)
+        says = "drawn to the same frame" in " ".join(
+            re.sub(r"<[^>]+>", " ", h).split())
+        same = len(set(vbs)) == 1
+        if says and not same:
+            fail(f"{canonical_of(f)}: the page says its shapes are drawn to "
+                 f"the same frame and its {len(vbs)} glyphs carry "
+                 f"{len(set(vbs))} different viewBoxes — "
+                 f"{sorted(set(vbs))[:3]}. Nine drawings at nine scales "
+                 f"cannot be compared, which is what the sentence promises.")
+        if same and not says:
+            fail(f"{canonical_of(f)}: {len(vbs)} glyphs share one viewBox "
+                 f"({vbs[0]}) and nothing on the page says so. Comparability "
+                 f"is the reason for one frame and a reader cannot see a "
+                 f"viewBox.")
+    # ITS OWN REACH. The pattern reads a class and a viewBox in one fixed
+    # order, so a renderer that emits the attributes the other way round
+    # would leave this green while examining nothing — which is the dead-rule
+    # scanner's own first run, and the reason that one asserts its reach too.
+    if pages < 3:
+        fail(f"c_same_frame examined only {pages} pages carrying more than "
+             f"one glyph — it has stopped finding the family it is about.")
+    return n
+
+
 def c_offframe():
     # A CIRCLE OUTSIDE THE viewBox RENDERS AS NOTHING AND REPORTS NOTHING —
     # the same class as a <use> of an id that is not on the page, and
@@ -4285,7 +4776,8 @@ def c_cartography_palette():
         return n
 
     def hexof(token):
-        m = re.search(re.escape(token) + r"\s*:\s*(#[0-9a-fA-F]{6})\s*;", css)
+        m = re.search(re.escape(token) + r"\s*:\s*(#[0-9a-fA-F]{6})\s*;",
+                      bare_css(css))
         return m.group(1) if m else None
 
     def lum(hexv):
@@ -4713,6 +5205,161 @@ def c_published_projection():
     return n
 
 
+VOID_TAGS = frozenset("area base br col embed hr img input link meta source "
+                     "track wbr".split())
+
+
+def _element_text(html, cls):
+    """The visible text of the first element carrying `cls`, children included.
+
+    Written for the index-extent check, which used to slice to the first
+    `</div>` and therefore read only as far as a head's first CHILD.
+
+    PARSED RATHER THAN COUNTED. The obvious repair is to balance `<` and
+    `</` from the opening tag, and it is wrong on this site's own markup:
+    an SVG is full of `<path …/>` and a `<br>` in a headline is void, so a
+    depth counter that treats either as an open never returns to zero and
+    the "element" becomes the rest of the page — an instrument that fails
+    OPEN, which is worse than the one it replaced.
+    """
+    from html.parser import HTMLParser
+
+    class Grab(HTMLParser):
+        def __init__(self):
+            super().__init__(convert_charrefs=True)
+            self.depth = 0
+            self.out = []
+            self.done = False
+
+        def handle_starttag(self, tag, attrs):
+            if tag in VOID_TAGS or self.done:
+                return
+            if self.depth:
+                self.depth += 1
+            elif cls in dict(attrs).get("class", "").split():
+                self.depth = 1
+
+        def handle_endtag(self, tag):
+            if self.depth:
+                self.depth -= 1
+                if not self.depth:
+                    self.done = True
+
+        def handle_data(self, data):
+            if self.depth:
+                self.out.append(data)
+
+    g = Grab()
+    g.feed(html)
+    return " ".join(g.out)
+
+
+@check("the stories feed is the register, and every page declares it")
+def c_stories_feed():
+    """A FEED IS A MACHINE-READABLE CLAIM REPUBLISHED BY PEOPLE WHO CANNOT
+    CHECK IT, which is the sentence already written about the JSON-LD, and
+    the reason the same shape of check applies here: an entry that says
+    something `data/stories.json` does not say will be read by an aggregator
+    that has no way of knowing.
+
+    So every field is asserted against the register rather than against the
+    generator — title, desk, both dates, standfirst — and the feed's own
+    `updated` must be the newest story's, because a feed whose timestamp does
+    not move is a feed readers stop polling.
+
+    AND IT IS PARSED RATHER THAN GREPPED. An unescaped ampersand in a
+    standfirst is a feed no reader will open, and it produces a file that
+    every substring assertion passes.
+    """
+    import xml.etree.ElementTree as ET
+    NS = "{http://www.w3.org/2005/Atom}"
+    d = D.load()
+    path = os.path.join(OUT, "stories", "feed.xml")
+    if not os.path.exists(path):
+        fail("site/stories/feed.xml was not built")
+        return 0
+    try:
+        root = ET.parse(path).getroot()
+    except ET.ParseError as e:
+        fail(f"stories/feed.xml is not well-formed XML: {e}")
+        return 0
+
+    want = {s["slug"]: s for s in d["stories"]}
+    entries = root.findall(NS + "entry")
+    n = 0
+    if len(entries) != len(want):
+        fail(f"the feed carries {len(entries)} entries and the register holds "
+             f"{len(want)} stories")
+    seen = []
+    for e in entries:
+        eid = (e.findtext(NS + "id") or "")
+        slug = eid.rsplit("/", 1)[-1]
+        seen.append(slug)
+        st = want.get(slug)
+        if not st:
+            fail(f"the feed carries an entry for {slug!r}, which is not a story")
+            continue
+        n += 1
+        page_path = os.path.join(OUT, "stories", slug, "index.html")
+        if not os.path.exists(page_path):
+            fail(f"the feed links {slug!r} and no such page was built")
+        for label, got, expect in (
+                ("title", e.findtext(NS + "title"), st["title"]),
+                ("summary", e.findtext(NS + "summary"), st["standfirst"]),
+                ("published", e.findtext(NS + "published"), st["published"] + "T00:00:00Z"),
+                ("updated", e.findtext(NS + "updated"), st["updated"] + "T00:00:00Z"),
+                ("author", e.findtext(f"{NS}author/{NS}name"), st["author"])):
+            if got != expect:
+                fail(f"the feed's {label} for {slug!r} is {got!r}, the register "
+                     f"says {expect!r}")
+        cat = e.find(NS + "category")
+        if cat is None or cat.get("term") != st["section"]:
+            fail(f"the feed files {slug!r} to "
+                 f"{cat.get('term') if cat is not None else None!r}, the "
+                 f"register says {st['section']!r}")
+    # NEWEST FIRST, because a feed read as a list is read in the order it is
+    # written and every reader that does not sort will show the oldest essay
+    # as the news.
+    order = [s for s in sorted(want.values(), key=lambda x: (x["updated"], x["slug"]),
+                               reverse=True)]
+    if seen and seen != [s["slug"] for s in order]:
+        fail(f"the feed is not newest first: it opens with {seen[0]!r}")
+    newest = max(s["updated"] for s in want.values())
+    if root.findtext(NS + "updated") != newest + "T00:00:00Z":
+        fail(f"the feed's own updated is {root.findtext(NS + 'updated')!r} and "
+             f"the newest story is {newest}")
+    # `if not element` IS FALSE FOR AN ELEMENT WITH NO CHILDREN, which is
+    # every <link/> ever written, so the obvious spelling of this assertion
+    # fails on a feed that is correct. `is None` is the one that asks the
+    # question.
+    if root.find(f'{NS}link[@rel="self"]') is None:
+        fail("the feed does not say where it lives (no rel=self link)")
+    # IT CLAIMS ONLY WHAT THE REGISTER HOLDS, AND THE VOCABULARY IS THE
+    # ASSERTION. The first version grepped the file for "rating", "price" and
+    # "sponsor" — and a standfirst reads "public transport, priced as public
+    # transport", so a correct feed failed on a word in an essay. What this
+    # promises is about ELEMENTS, not about prose: a tag outside this set is a
+    # claim nothing in data/stories.json can fill, and `<content>` in
+    # particular is a second copy of nine paragraphs of editorial in a second
+    # format, which is a second thing to go stale.
+    allowed = {"feed", "title", "subtitle", "id", "updated", "link", "rights",
+               "entry", "published", "category", "author", "name", "summary"}
+    for el in root.iter():
+        tag = el.tag.replace(NS, "")
+        if tag not in allowed:
+            fail(f"the feed carries a <{tag}> element, which is outside what "
+                 f"the register can fill")
+
+    # AND A FEED NOBODY CAN FIND IS NOT A FEED. Declared in the one place that
+    # emits <head>, so this is a floor on every page rather than on /stories.
+    missing = [rel(f) for f in site_files()
+               if 'type="application/atom+xml"' not in open(f, encoding="utf-8").read()]
+    if missing:
+        fail(f"{len(missing)} pages do not declare the feed, e.g. {missing[0]}")
+    n += len(site_files())
+    return n
+
+
 @check("an index states the extent of its own set, and the number is the real one")
 def c_index_extent():
     # AN INDEX EXISTS TO SAY HOW BIG A SET IS, AND FIVE OF EIGHT DID NOT.
@@ -4747,8 +5394,26 @@ def c_index_extent():
             fail(f"{url}: index is missing")
             continue
         h = open(path, encoding="utf-8").read()
-        i = h.find('class="pagehead')
-        head = re.sub(r"<[^>]+>", " ", h[i:h.find("</div>", i)]) if i >= 0 else ""
+        # THE SLICE RAN TO THE FIRST `</div>`, WHICH IS A SHAPE. A page head
+        # with no nested element ends at its own closing tag, and every index
+        # had one when this was written; they do not now — `.iherotext`,
+        # `.reach` and `.headmeta` are all children of a head — so the slice
+        # ended at the first CHILD's closing tag and the check was reading a
+        # fraction of the element it names. It passed on /countries by luck,
+        # because the lede happens to sit inside the child that closes first.
+        #
+        # See `_element_text`: parsed, not sliced and not bracket-counted.
+        # AND THE 2036 SYSTEM'S OPENING IS A HEAD. `.ed-opening` carries the
+        # eyebrow, the h1 and the standfirst in one element, which is what a
+        # `pagehead` is; a check that knows only the old class reads the new
+        # one as a page with no head at all, which is this repository's most
+        # repeated fault and would have said so about a page that had got
+        # better. Both, joined, because a family mid-migration has one or the
+        # other and the promise is about the page.
+        head = " ".join(_element_text(h, c) for c in
+                        ("pagehead", "ed-opening", "ed-arrival",
+                         "ed-journey-hero", "ed-story-opening",
+                         "ed-institution"))
         nums = {int(x) for x in re.findall(r"\b(\d{1,5})\b", head)}
         n += 1
         if size not in nums:
@@ -4759,51 +5424,75 @@ def c_index_extent():
 
 @check("one thing, one picture — a plate is never chosen twice for the same record")
 def c_one_plate_per_thing():
-    # THE SAME PLACE HAD TWO LANDSCAPES DEPENDING ON WHICH PAGE YOU MET IT ON.
-    #
-    # `card()` takes an optional `motif`; without one, plate_shapes() picks
-    # from the seed. Fourteen of the twenty call sites passed no motif —
-    # including every destination card on a country page and a region page,
-    # while the quiet index passed one. So Hallstatt drew its own topography
-    # on /beyond-the-obvious and whatever the hash of its slug happened to
-    # choose everywhere else.
-    #
-    # Measured before the fix: 272 of 319 destinations, 15 of 17 journeys and
-    # 11 of 13 themes were drawn one way on one page and another way on the
-    # next. The rule already existed for stories — "a story is not a place,
-    # and its picture may not be drawn from a hash" — and this is the same
-    # failure across every other record that knows what it is.
-    #
-    # The plate is content-addressed, so two pictures also means two cached
-    # PNGs and two social cards for one thing.
-    #
-    # Asserted against the SHIPPED HTML by comparing the plate each page drew
-    # for a given seed. A source check on the call sites would pass the day
-    # somebody adds a fifteenth.
-    seen = {}
-    n = 0
-    for path in site_files():
-        h = open(path, encoding="utf-8").read()
-        # every plate carries its seed's identity in the gradient/clip ids
+    """THE SAME PLACE HAD TWO LANDSCAPES DEPENDING ON WHICH PAGE YOU MET IT ON.
+
+    `card()` takes an optional `motif`; without one, `plate_shapes()` picks
+    from the seed. Fourteen of the twenty call sites passed no motif — every
+    destination card on a country page and a region page among them, while
+    the quiet index passed one — so Hallstatt drew its own topography on
+    /beyond-the-obvious and whatever the hash of its slug chose everywhere
+    else. Measured before the fix: 272 of 319 destinations, 15 of 17 journeys
+    and 11 of 13 themes.
+
+    AND THIS CHECK HAD STOPPED COUNTING. It read the shipped HTML for a
+    `.card-art` holding a plate, which was the right subject when it was
+    written and is not one the site has any more: every abstract plate has
+    come off the pages, one family at a time, for the reason recorded on each
+    — the homepage, /journeys, /europe-in, the stories index, the seventeen
+    interest pages, the country pages. Measured now: **189 `.card-art`
+    elements on the whole site and every one of them is a map**, so this
+    returned zero and passed, for an unknown number of builds. A green run
+    that has stopped counting is worse than a red one, because nobody looks
+    at it — this file records that about the browser suite and it had
+    happened here.
+
+    THE PROMISE IS UNCHANGED AND ITS SURFACE MOVED. A plate is still drawn
+    785 times, on the one surface a reader never sees from here: the social
+    card, rendered inside somebody else's product. "One record, one picture"
+    is exactly as true there, and it is checkable exactly — `assets/og/
+    cards.json` is written by the build and maps each content-addressed card
+    to the seed and motif it was rendered from, so a record with two cards is
+    a record drawn two ways.
+
+    It counts what it examined and fails at zero, because that is the failure
+    this check has already had.
+    """
+    path = os.path.join(ROOT, "assets", "og", "cards.json")
+    if not os.path.exists(path):
+        fail("assets/og/cards.json was not written; the social cards cannot "
+             "be checked against the records they are cards for")
+        return 0
+    cards = json.load(open(path, encoding="utf-8"))
+    by_seed = {}
+    for key, (seed, motif) in cards.items():
+        by_seed.setdefault(seed, []).append((key, motif))
+    for seed, drawn in sorted(by_seed.items()):
+        if len(drawn) > 1:
+            fail(f"{seed} has {len(drawn)} social cards, drawn "
+                 f"{', '.join(sorted(m for _k, m in drawn))}. One record, one "
+                 f"picture — a landscape chosen by hash on one page and by "
+                 f"what the place is on another is two things to a reader and "
+                 f"two cards to a crawler.")
+    if not by_seed:
+        fail("the plate check examined no records at all — it has lost its "
+             "subject, which is how it passed silently once already")
+    # AND THE PAGES MUST STILL BE FREE OF THEM. The plates came off the pages
+    # deliberately and one family at a time; this is the floor that says so,
+    # rather than leaving "no page draws a plate" as a thing that happens to
+    # be true. A plate names its own gradient after the seed's hash, so the
+    # id is the identity in the shipped markup.
+    on_pages = 0
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
         for m in re.finditer(r'<div class="card-art[^"]*">(.*?)</div>', h, re.S):
-            art = m.group(1)
-            # A plate names its own gradient and clip after the seed's hash,
-            # so the id IS the record's identity in the shipped markup.
-            key = re.search(r'id="sky([a-z0-9]+)"', art)
-            if not key:
-                continue
-            n += 1
-            k = key.group(1)
-            # the drawing itself, with the identity stripped back out
-            draw = art.replace(k, "")
-            if k in seen and seen[k][0] != draw:
-                fail(f"{canonical_of(path)}: the plate for {k} is not the "
-                     f"plate {seen[k][1]} drew for it. One record, one "
-                     f"picture — a landscape chosen by hash on one page and "
-                     f"by what the place is on another is two things to a "
-                     f"reader and two social cards to a crawler.")
-            seen.setdefault(k, (draw, canonical_of(path)))
-    return n
+            if re.search(r'id="sky[a-z0-9]+"', m.group(1)):
+                on_pages += 1
+    if on_pages:
+        fail(f"{on_pages} abstract plates are drawn on pages. They came off "
+             f"one family at a time, each with a measurement: a plate is a "
+             f"picture of nowhere standing in for a sentence, and the "
+             f"social card is the one surface it belongs on.")
+    return len(by_seed)
 
 
 @check("a story's picture is never drawn from a hash, on any page")
@@ -4901,6 +5590,55 @@ def c_og_never_hashed():
     return n
 
 
+@check("the portrait cap in the stylesheet is the portraits' own proportion")
+def c_portrait_cap():
+    """A NUMBER IN THE STYLESHEET THAT IS A FACT ABOUT THE DRAWINGS.
+
+    The country door is sized by HEIGHT, so that fifty countries hang at one
+    height and only the shape inside differs — which is the whole claim that
+    figure makes. Its frame is held to a constant proportion, so a fixed
+    height is also a fixed width, and at 15rem that is 312 pixels: at a
+    320-pixel viewport the column is 288 and every country page scrolled
+    sideways by 8.
+
+    The phone rule caps it by arithmetic — the column, divided by the frame's
+    proportion — and that divisor is the second copy of a number the build
+    already owns. This is the assertion that keeps the two the same, because
+    a cap written for a 1.299 frame is silently wrong on a 1.6 one and the
+    only symptom is a page that scrolls sideways on the narrowest phone.
+    """
+    css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
+               encoding="utf-8").read()
+    m = re.search(r"\.portrait svg \{ height: min\([^,]+, "
+                  r"calc\(\(100vw - 2 \* var\(--s4\)\) / ([\d.]+)\)\); \}", css)
+    if not m:
+        fail("the phone portrait rule no longer caps the door by the frame's "
+             "proportion; at 320 the door is wider than the column")
+        return 0
+    assumed = float(m.group(1))
+    n = 0
+    worst = (0.0, "")
+    for f in glob.glob(os.path.join(OUT, "europe", "*", "index.html")):
+        h = open(f, encoding="utf-8").read()
+        v = re.search(r'<figure class="[^"]*\bportrait\b[^"]*"[^>]*>\s*'
+                      r'<svg viewBox="0 0 ([\d.]+) ([\d.]+)"', h)
+        if not v:
+            continue
+        n += 1
+        ratio = float(v.group(1)) / float(v.group(2))
+        if ratio > worst[0]:
+            worst = (ratio, rel(f))
+    if n < 40:
+        fail(f"the portrait cap check found only {n} portraits — it has "
+             f"stopped matching the markup")
+    elif worst[0] > assumed + 0.001:
+        fail(f"the stylesheet caps the country door at a frame of {assumed} "
+             f"and {worst[1]} draws {worst[0]:.3f}. The door is sized by "
+             f"height, so a wider frame is a wider door: at 320 it will run "
+             f"past the column and scroll the page sideways.")
+    return n
+
+
 @check("every page head declares what kind of page it is")
 def c_pagehead_role():
     # TWENTY-ONE OF TWENTY-TWO FAMILIES PLACED AN IDENTICAL h1 IN AN
@@ -4933,13 +5671,55 @@ def c_pagehead_role():
         "/api-docs", "/experiences/join", "/for-businesses",
         "/for-tourism-boards", "/sources/freshness",
     }
+    # AND A PAGE WITH NO HEAD AT ALL WAS SILENTLY SKIPPED, WHICH IS THE HOLE
+    # THIS CHECK EXISTS TO CLOSE. Two of them, measured: the pattern read
+    # `<div class="pagehead`, and `indexhero` emits a `<header>` — so the
+    # twenty-three index heroes were never examined, every one of them
+    # correctly declaring `index`. And nine story pages carried a
+    # free-standing `.essayhead` rather than a `pagehead` variant, so the
+    # family that most needs a declared role had none and nothing said so.
+    # A page whose head this cannot find is now named or it fails, which is
+    # the same rule the prose list below already states.
+    NO_HEAD = {
+        # The homepage's head IS the hero: the masthead stands on the
+        # limestone wall above an arch cut at the largest size it appears
+        # anywhere, and a `pagehead` under it would be a second one.
+        "/",
+    }
     ROLES = ("overture", "index", "instrument")
     n = 0
     for path in site_files():
         r = canonical_of(path)
         h = open(path, encoding="utf-8").read()
-        m = re.search(r'<div class="pagehead([^"]*)"', h)
+        m = re.search(r'<(?:div|header) class="pagehead([^"]*)"', h)
         if not m:
+            # THE 2036 OPENING DECLARES ITS ROLE AS A FAMILY, not as one of
+            # the three head roles, and that is the same promise one level
+            # up: `ed-family-atlas` on the section and `data-family` on the
+            # body say what KIND of page this is, which is what the three
+            # roles were a first approximation of. A page that carries one
+            # is not a page with no head.
+            # `ed-arrival` IS THE ARRIVAL FAMILY'S HEAD. The brief gives the
+            # destination pages a band rather than a stage — a photograph
+            # full-bleed with the name set into its foot — which is a head
+            # that happens not to be called one.
+            # EACH FAMILY'S HEAD IS ITS OWN SHAPE, which is the point of
+            # the eight rooms: a story opens on a publication's index line
+            # and an institutional page on a typographic monument, and
+            # neither is a `pagehead`. What they share is the promise —
+            # every page declares what kind of page it is.
+            if re.search(r'class="ed-opening ed-family-([a-z]+)"', h) or \
+                    any(f'class="{c}"' in h for c in
+                        ("ed-arrival", "ed-journey-hero", "ed-story-opening",
+                         "ed-institution")):
+                n += 1
+                continue
+            if r not in NO_HEAD:
+                fail(f"{r}: no page head at all. Every page declares what kind "
+                     f"of page it is through the `pagehead` primitive, or it "
+                     f"is named in this check with the reason — a family that "
+                     f"grows its own head is a family with no role, which is "
+                     f"how twenty-one of them ended up sharing one.")
             continue
         n += 1
         got = [x for x in ROLES if x in m.group(1)]
@@ -6027,6 +6807,53 @@ def c_titles_unique():
                  f"kicker that tells them apart")
         else:
             seen[t] = f
+    return n
+
+
+@check("every in-page link and every aria-labelledby resolves to an id on the page")
+def c_fragments_resolve():
+    """A LINK TO A MISSING ID SCROLLS NOWHERE AND RAISES NOTHING.
+
+    The destination page's contents row linked to `#why-visit` and the
+    section under it claimed `aria-labelledby="why-visit"` — and no element
+    in the document carried that id. `section()` used to emit
+    `<h2 id="...">`; `ed_section_head()` did not, so every family that moved
+    to the new head kept a label and a jump target pointing at a heading that
+    had stopped existing.
+
+    NEITHER HALF IS VISIBLE IN ANY COUNT. A dangling `aria-labelledby` is not
+    a missing name in the markup, it is a name that resolves to nothing, and
+    the browser hands the element its content instead — so the section reads
+    as labelled and is not. A jump link to a missing id scrolls nowhere.
+
+    It was found by the BROWSER SUITE DYING: `document.querySelector(h)`
+    returned null and the run ended on a TypeError forty minutes in, with no
+    failure reported and every later check unrun. That is worse than a red
+    run, which is this repository's own standing complaint about a green one
+    that has stopped counting — a suite that crashes has stopped counting
+    too, and it takes the rest of the suite with it. A static check costs a
+    second and says which page and which fragment.
+
+    `#` and `#top` are the two fragments that legitimately resolve to the
+    document rather than to an element.
+    """
+    n = 0
+    for f in sorted(site_files()):
+        html = open(f, encoding="utf-8").read()
+        ids = set(re.findall(r'\sid="([^"]+)"', html))
+        rel = "/" + os.path.relpath(os.path.dirname(f), OUT)
+        for frag in set(re.findall(r'href="#([^"]+)"', html)):
+            n += 1
+            if frag not in ids:
+                fail(f"{rel} links to #{frag} and nothing on the page carries "
+                     f"that id — the link scrolls nowhere and raises nothing")
+        for ref in set(re.findall(r'aria-labelledby="([^"]+)"', html)):
+            for one in ref.split():
+                n += 1
+                if one not in ids:
+                    fail(f"{rel} has aria-labelledby={one!r} and nothing on "
+                         f"the page carries that id — the element reads as "
+                         f"labelled and is not")
     return n
 
 

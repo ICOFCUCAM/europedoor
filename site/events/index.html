@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27;; style-src &#x27;self&#x27;; img-src &#x27;self&#x27; data:; font-src &#x27;self&#x27;; connect-src &#x27;self&#x27;; form-action &#x27;self&#x27;; base-uri &#x27;none&#x27;">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="theme-color" content="#3251da" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#2948d1" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F8F6EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07100F" media="(prefers-color-scheme: dark)">
 <title>Events · EuropeDoor</title>
 <meta name="description" content="The recurring European year: festivals, markets, pilgrimages and seasonal events, month by month, filterable by category.">
 <link rel="canonical" href="https://europedoor.com/events">
@@ -16,10 +16,16 @@
 <meta property="og:url" content="https://europedoor.com/events">
 <meta property="og:site_name" content="EuropeDoor">
 
-<link rel="stylesheet" href="/assets/css/europedoor.055931e2ed.css">
+<link rel="stylesheet" href="/assets/css/europedoor.fb6229bd86.css">
 <link rel="icon" href="/assets/door.49fb8a56f2.svg" type="image/svg+xml">
+<!-- ON EVERY PAGE, NOT ONLY ON /stories. Feed discovery is a browser and
+     reader convention that looks at the document it is given, and a reader
+     who wants to follow this desk is as likely to be standing on a
+     destination page as on the index. One document, one feed, declared in
+     the one place that emits <head>. -->
+<link rel="alternate" type="application/atom+xml" href="/stories/feed.xml" title="EuropeDoor stories">
 </head>
-<body class="area-events" data-world="discover">
+<body class="ed-page ed-family-time area-events" data-family="time" data-world="discover">
 <a class="skip" href="#main">Skip to content</a>
 <header class="masthead">
   <div class="masthead-in">
@@ -37,7 +43,7 @@
 <main id="main" class="">
 
 <nav class="crumbs" aria-label="Breadcrumb"><a href="/discover">Europe</a><span class="sep" aria-hidden="true">/</span><span aria-current="page">Events</span></nav>
-<header class="pagehead index"><p class="kicker">The European year</p><h1>What is on, and when.</h1><p class="lede">150 recurring fixtures — festivals, markets, pilgrimages, harvests and the handful of natural events worth planning a year around. These are the annual, dependable ones. Dated listings for a given year need a live events feed, which is Stage 2.</p></header>
+<section class="ed-opening ed-family-time"><div class="ed-opening-copy"><p class="ed-eyebrow">The European year</p><h1>What is on, and when.</h1><p class="ed-intro">150 recurring fixtures — festivals, markets, pilgrimages, harvests and the handful of natural events worth planning a year around. The annual, dependable ones.</p></div><div class="ed-opening-visual"><div class="ed-slot ed-slot-square" role="note" aria-label="A photograph is not yet licensed for this surface"><p class="ed-slot-key">Photograph · The European year</p><p class="ed-slot-note">A European gathering in progress — a procession, a market, a festival crowd at dusk</p><p class="ed-slot-spec">2000px landscape</p></div></div></section>
 <!-- NO DRAWING IN THE OPENING, AND THAT IS THE ONE EXCEPTION. Four of the
      five indexes put their subject in the arch beside the headline; this
      family's subject is TIME, and the year band under this head is a
@@ -108,7 +114,7 @@
         0 countries in their quieter shoulder</p>
         <div class="hopbar"><span class="w50"></span></div></div>
         <p class="rowmeta">Where to go in December →</p></a></div>
-<p class="small">Every fixture is on its month's page, with the category filter
+<p class="small">Every fixture is on its month&#8217;s page, with the category filter
 beside it — 150 of them across 8 categories. They are the
 annual, dependable ones; a dated listing for a given year needs a live events
 feed, which is Stage 2.</p>
