@@ -227,9 +227,31 @@ def declared_slugs():
     `desk/registry.json` is written by `tools/desk-registry.py` from the same
     `imageslots.resolve()` the acquisition uses, is committed, and
     `c_desk_registry` fails when it is stale — so it cannot drift from the
-    purposes a photograph can actually be acquired for. Only tokens long
-    enough to reach the scan's own floor are collected; a shorter one was
-    never going to be looked at.
+    purposes a photograph can actually be acquired for.
+
+    AND THE LENGTH FLOOR WAS APPLIED ON THE WRONG SIDE OF THE NORMALISER,
+    WHICH IS THE OTHER HALF OF THE BUG THAT STOPPED RUNS 24 TO 28 AND WAS
+    NOT FIXED WITH IT. `_canon` collapses every separator to ONE underscore
+    so both spellings are compared alike — and `derive.py` writes a file
+    stem with TWO, so the canonical form is always SHORTER than the token
+    that has to match it. Then this filtered the declarations by the length
+    of that shorter form:
+
+        derive.py writes   austria__tyrol__innsbruck__goldenes-dachl   41
+        its canon          austria_tyrol_innsbruck_goldenes-dachl      38
+        registry target    austria/tyrol/innsbruck/goldenes-dachl
+        its canon          austria_tyrol_innsbruck_goldenes-dachl      38
+
+    41 is long enough to be scanned and 38 is too short to be DECLARED, so
+    the floor discarded exactly the declaration the scan needed and the
+    Goldenes Dachl was reported as a credential seventeen times. Run 31
+    acquired sixty photographs, passed everything else, and died on it.
+
+    The floor is on the raw text now, where the scan's own floor is, and the
+    canonical form is collected whatever length it comes out — a set of two
+    or three thousand declared identifiers is not a cost, and a key is still
+    not in it. *One normaliser, both sides* was right and incomplete: a test
+    APPLIED to a normalised value has to be normalised with it.
     """
     global _SLUGS
     if _SLUGS is None:
@@ -245,9 +267,18 @@ def declared_slugs():
                     # THE WHOLE IDENTIFIER, NOT ONLY ITS PARTS. Splitting
                     # first threw away exactly the thing a file stem is: one
                     # run with the separators removed.
-                    whole = _canon(text)
-                    if len(whole) >= 40:
-                        _SLUGS.add(whole)
+                    # NO FLOOR ON THE CANONICAL FORM AT ALL, and moving it
+                    # to the raw text was not enough either: the registry's
+                    # `target` is 38 characters BOTH WAYS, and the stem that
+                    # has to match it is 41 only because `derive.py` doubles
+                    # every separator. There is no length of the declaration
+                    # that predicts the length of the token, so any floor
+                    # here is a guess. It cost nothing to drop: a declared
+                    # identifier shorter than the scan's own floor can never
+                    # be matched by a raw token anyway, and the one way it
+                    # CAN be reached — a longer token whose canon is short —
+                    # is precisely the case this exists for.
+                    _SLUGS.add(_canon(text))
                     _SLUGS |= {t for t in re.split(r"[^A-Za-z0-9_-]+", text)
                                if len(t) >= 40}
     return _SLUGS
@@ -7051,6 +7082,61 @@ def c_photo_published():
                  f"claims a surface it does not reach — either the key is not "
                  f"the one that page asks picture() for, or the surface never "
                  f"asks at all")
+    return n
+
+
+@check("every declared purpose reaches a surface, photograph or not")
+def c_purpose_reaches():
+    """A PURPOSE WHOSE SURFACE WAS DELETED IS INVISIBLE UNTIL SOMEBODY BUYS
+    A PHOTOGRAPH FOR IT.
+
+    `c_photo_published` asks whether a REGISTERED photograph appears on the
+    page its purpose claims, which is the right question and can only be
+    asked about a purpose the register already holds. With eleven theme
+    heroes registered it examined eleven surfaces and said nothing about the
+    other 828 — so five purposes whose pages had stopped referencing them sat
+    green through every local run, and were found by run 31, which acquired
+    sixty photographs, passed every other gate and died on them.
+
+    The five were `door-coast`, `door-food`, `door-history`,
+    `door-mountains` and `themes-hero`. The four doors went when the homepage
+    became the plate sequence and `themes-hero` went when the themes index
+    stopped opening on a map — both deliberate, and neither took its purpose
+    with it. *Removing a claim leaves surfaces pointing at it*, five times,
+    and this repository's own rule for it was written about prose.
+
+    THE ABSENCE IS WHAT HAS TO BE TESTED, AND ABSENCE IS NOT IN THE SHIPPED
+    HTML. An unfilled surface renders `ed_slot()`, which prints the page's
+    own label rather than the register key, so a page that asks for
+    `door-coast` and a page that has never heard of it are the same bytes.
+    That is the same reason `c_og_no_hash_motif` is asserted at the source:
+    when the observable is what a page DID NOT do, the shipped output cannot
+    carry it. `picture()` is the one function that serves a register key, so
+    a key no page builder names is a surface no reader can reach.
+
+    Only the authored purposes are checked. The rest are templated per
+    record by `imageslots.resolve()` and their surface is the slot machinery
+    itself, which cannot go missing for one record and not another.
+    """
+    f = os.path.join(ROOT, "data", "image-purposes.json")
+    if not os.path.exists(f):
+        return 0
+    purposes = json.load(open(f, encoding="utf-8")).get("purposes", {})
+    src = open(os.path.join(ROOT, "tools", "lib", "pages.py"),
+               encoding="utf-8").read()
+    n = 0
+    for name, row in sorted(purposes.items()):
+        key = row.get("key") or ""
+        if not key:
+            continue
+        n += 1
+        if key not in src:
+            fail(f"image-purposes.json > {name}: declares register key "
+                 f"{key!r} for {row.get('path')!r} and no page builder asks "
+                 f"picture() for it. The purpose reaches no surface, so a "
+                 f"photograph acquired for it would be published nowhere — "
+                 f"either the surface was removed and the purpose was left, "
+                 f"or the key is not the one the page asks for")
     return n
 
 

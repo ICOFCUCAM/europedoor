@@ -207,104 +207,6 @@
    ]
   },
   {
-   "purpose": "door-coast",
-   "slot": null,
-   "target": null,
-   "key": "door-coast",
-   "path": "/",
-   "surface": "The Coast & islands door on the homepage — a large editorial card under “Find your Europe”.",
-   "role": "landscape",
-   "min_width": 1600,
-   "orientation": "landscape",
-   "min_aspect": 1.2,
-   "max_aspect": 1.9,
-   "note": "Where land ends. A cliff, a harbour or an island shore with the sea doing the work. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own.",
-   "search": [
-    "fjord landscape",
-    "alpine mountains",
-    "coastal cliffs",
-    "rolling hills",
-    "vineyard landscape",
-    "northern forest",
-    "glacier landscape",
-    "volcanic landscape",
-    "Arctic landscape",
-    "Mediterranean coast"
-   ]
-  },
-  {
-   "purpose": "door-food",
-   "slot": null,
-   "target": null,
-   "key": "door-food",
-   "path": "/",
-   "surface": "The Food & wine door on the homepage — a large editorial card under “Find your Europe”.",
-   "role": "food",
-   "min_width": 1600,
-   "orientation": "landscape",
-   "min_aspect": 1.2,
-   "max_aspect": 1.9,
-   "note": "A table, a market or a vineyard that could only be where it is. Never a styled plate on a board. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own.",
-   "search": [
-    "European food market",
-    "traditional European dish",
-    "village bakery",
-    "vineyard harvest",
-    "food preparation kitchen",
-    "market stall produce"
-   ]
-  },
-  {
-   "purpose": "door-history",
-   "slot": null,
-   "target": null,
-   "key": "door-history",
-   "path": "/",
-   "surface": "The Historic cities door on the homepage — a large editorial card under “Find your Europe”.",
-   "role": "architecture",
-   "min_width": 1600,
-   "orientation": "landscape",
-   "min_aspect": 1.2,
-   "max_aspect": 1.9,
-   "note": "A lived-in old street, not a monument. Somebody's Tuesday in a two-thousand-year-old city. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own.",
-   "search": [
-    "medieval street",
-    "old town square",
-    "castle",
-    "Gothic cathedral",
-    "Baroque facade",
-    "Romanesque church",
-    "European boulevard",
-    "historic city square"
-   ]
-  },
-  {
-   "purpose": "door-mountains",
-   "slot": null,
-   "target": null,
-   "key": "door-mountains",
-   "path": "/",
-   "surface": "The Mountains door on the homepage — a large editorial card under “Find your Europe”.",
-   "role": "landscape",
-   "min_width": 1600,
-   "orientation": "landscape",
-   "min_aspect": 1.2,
-   "max_aspect": 1.9,
-   "note": "An alpine morning above cloud — a valley floor against the wall over it, not a summit portrait. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own.",
-   "search": [
-    "fjord landscape",
-    "alpine mountains",
-    "coastal cliffs",
-    "rolling hills",
-    "vineyard landscape",
-    "northern forest",
-    "glacier landscape",
-    "volcanic landscape",
-    "Arctic landscape",
-    "Mediterranean coast"
-   ]
-  },
-  {
    "purpose": "events-hero",
    "slot": null,
    "target": null,
@@ -434,28 +336,6 @@
     "European village evening",
     "empty street dawn",
     "quiet cafe Europe"
-   ]
-  },
-  {
-   "purpose": "themes-hero",
-   "slot": null,
-   "target": null,
-   "key": "themes-hero",
-   "path": "/themes",
-   "surface": "The opening of the themes index — a wide editorial image beside the headline.",
-   "role": "cultural-scene",
-   "min_width": 2000,
-   "orientation": "landscape",
-   "min_aspect": 1.3,
-   "max_aspect": 2.1,
-   "note": "A way of SEEING Europe rather than a place in it: a reader looking at something old, a hand on a stone, a room full of people who came for the same reason. Never a landmark portrait and never a map — the page's whole argument is that a theme crosses borders, so a picture of one border is the opposite of it.",
-   "search": [
-    "European festival",
-    "folk musicians",
-    "craft workshop",
-    "village market",
-    "local traditions Europe",
-    "street procession"
    ]
   },
   {

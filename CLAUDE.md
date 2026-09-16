@@ -4197,6 +4197,74 @@ still passes because a subset is not a regression. Proved red by adding one
 redundant declaration, which was named alone against a printed 36-of-335.
 
 
+**RUN 31 ACQUIRED SIXTY PHOTOGRAPHS, PASSED EVERYTHING ELSE, AND THREW ALL
+SIXTY AWAY OVER THREE CHARACTERS.** The desk's own *Fill the library* button
+dispatches `stage: batch`, and `batch` gated BEFORE it pushed — so the tranche
+died in `checks.py` with the push step three steps below it. Two causes, both
+invisible to every local run.
+
+**THE LENGTH FLOOR WAS ON THE WRONG SIDE OF THE NORMALISER, WHICH IS THE OTHER
+HALF OF THE BUG THAT STOPPED RUNS 24–28.** `_canon()` collapses every
+separator to ONE underscore so a registry target and a file stem are compared
+in the same alphabet — and `derive.py` writes a stem with TWO, so **the
+canonical form is always shorter than the token that has to match it.** The
+declarations were then filtered by the length of that shorter form:
+
+| | |
+|---|---:|
+| `derive.py` writes | `austria__tyrol__innsbruck__goldenes-dachl` — **41** |
+| its canon | `austria_tyrol_innsbruck_goldenes-dachl` — 38 |
+| the registry declares | `austria/tyrol/innsbruck/goldenes-dachl` — 38 |
+
+41 is long enough to be SCANNED and 38 is too short to be DECLARED, so the
+floor discarded exactly the declaration the scan needed. There is no length of
+a declaration that predicts the length of its token, so any floor there is a
+guess: it is gone, and the canonical form is collected whatever it measures.
+*One normaliser, both sides* was right and incomplete — **a test applied to a
+normalised value has to be normalised with it.**
+
+**AND FIVE PURPOSES POINTED AT SURFACES THAT HAD BEEN DELETED.** `door-coast`,
+`door-food`, `door-history`, `door-mountains` and `themes-hero` appear nowhere
+in `site/` at all: the four doors went when the homepage became the plate
+sequence, `themes-hero` went when the themes index stopped opening on a map,
+and neither removal took its purpose with it. *Removing a claim leaves
+surfaces pointing at it*, five times, in a repository whose own rule that is.
+
+**IT PASSED EVERY LOCAL RUN BECAUSE `c_photo_published` CAN ONLY ASK ABOUT A
+PURPOSE THE REGISTER ALREADY HOLDS.** Eleven theme heroes were registered, so
+it examined eleven surfaces and said nothing about the other 828 — the
+empty-register fault again, and the check cannot be fixed into seeing it,
+because the question it asks needs a photograph to exist. `c_purpose_reaches`
+asks the other question: does a page builder ask `picture()` for this key at
+all. **The absence is what has to be tested and absence is not in the shipped
+HTML** — an unfilled surface renders `ed_slot()`, which prints the page's own
+label rather than the register key, so a page that asks for `door-coast` and a
+page that has never heard of it are the same bytes. That is why this one is
+asserted at the SOURCE, exactly as `c_og_no_hash_motif` is.
+
+The five are deleted rather than restored, because both removals were
+deliberate and recorded. `purposes_today` is derived, so it is re-derived
+rather than edited; `architecture` and `food` lost their only purpose and take
+a **trigger** rather than a refusal, because the argument each serves is real
+and unbuilt — a role nothing reaches is dead vocabulary only when nothing
+would ever create one.
+
+**AND `batch` PUSHES BEFORE IT GATES NOW, WHICH IS THE THIRD PLACE THIS RULE
+HAS HAD TO BE LEARNED.** `batch.sh` learned it for one candidate (run 23 lost
+eighteen acquisitions to a nineteenth that was a PNG); `fill` learned it for a
+tranche; **the job the Media Desk actually dispatches never did.** A red gate
+costs a pull request somebody has to fix, which is recoverable and visible; it
+used to cost the sitting, which is neither. Nothing reaches the default branch
+unchecked — the gates still run and the merge step is still skipped when they
+fail.
+
+**AND REORDERING FOR ONE PROMISE ALMOST DROPPED ANOTHER.** The first version
+moved the push above the gates and left the credential scan below it — turning
+a PRE-COMMIT guard into a report filed after the key had already reached the
+remote. `fill` had the right order all along. The scan goes in front of the
+push in both.
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

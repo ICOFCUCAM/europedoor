@@ -25,98 +25,6 @@
         "frame": 0.148
       }
     },
-    "door-mountains": {
-      "role": "landscape",
-      "key": "door-mountains",
-      "path": "/",
-      "surface": "The Mountains door on the homepage — a large editorial card under “Find your Europe”.",
-      "min_width": 1600,
-      "orientation": "landscape",
-      "min_aspect": 1.2,
-      "max_aspect": 1.9,
-      "note": "An alpine morning above cloud — a valley floor against the wall over it, not a summit portrait. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own.",
-      "container": {
-        "selector": ".way.shot",
-        "min_aspect": 0.464,
-        "min_at": "980x1100",
-        "max_aspect": 1.923,
-        "max_at": "760x640"
-      },
-      "safe_area": {
-        "width": 0.244,
-        "height": 0.624,
-        "frame": 0.152
-      }
-    },
-    "door-coast": {
-      "role": "landscape",
-      "key": "door-coast",
-      "path": "/",
-      "surface": "The Coast & islands door on the homepage — a large editorial card under “Find your Europe”.",
-      "min_width": 1600,
-      "orientation": "landscape",
-      "min_aspect": 1.2,
-      "max_aspect": 1.9,
-      "note": "Where land ends. A cliff, a harbour or an island shore with the sea doing the work. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own.",
-      "container": {
-        "selector": ".way.shot",
-        "min_aspect": 0.464,
-        "min_at": "980x1100",
-        "max_aspect": 1.923,
-        "max_at": "760x640"
-      },
-      "safe_area": {
-        "width": 0.244,
-        "height": 0.624,
-        "frame": 0.152
-      }
-    },
-    "door-history": {
-      "role": "architecture",
-      "key": "door-history",
-      "path": "/",
-      "surface": "The Historic cities door on the homepage — a large editorial card under “Find your Europe”.",
-      "min_width": 1600,
-      "orientation": "landscape",
-      "min_aspect": 1.2,
-      "max_aspect": 1.9,
-      "note": "A lived-in old street, not a monument. Somebody's Tuesday in a two-thousand-year-old city. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own.",
-      "container": {
-        "selector": ".way.shot",
-        "min_aspect": 0.464,
-        "min_at": "980x1100",
-        "max_aspect": 1.923,
-        "max_at": "760x640"
-      },
-      "safe_area": {
-        "width": 0.244,
-        "height": 0.624,
-        "frame": 0.152
-      }
-    },
-    "door-food": {
-      "role": "food",
-      "key": "door-food",
-      "path": "/",
-      "surface": "The Food & wine door on the homepage — a large editorial card under “Find your Europe”.",
-      "min_width": 1600,
-      "orientation": "landscape",
-      "min_aspect": 1.2,
-      "max_aspect": 1.9,
-      "note": "A table, a market or a vineyard that could only be where it is. Never a styled plate on a board. These four sit side by side, so a set that reads as four photographs from one stock search fails the brief even when each one passes on its own.",
-      "container": {
-        "selector": ".way.shot",
-        "min_aspect": 0.464,
-        "min_at": "980x1100",
-        "max_aspect": 1.923,
-        "max_at": "760x640"
-      },
-      "safe_area": {
-        "width": 0.244,
-        "height": 0.624,
-        "frame": 0.152
-      }
-    },
     "journeys-hero": {
       "role": "journey-atmosphere",
       "key": "journeys-hero",
@@ -232,29 +140,6 @@
         "frame": 0.55
       }
     },
-    "themes-hero": {
-      "role": "cultural-scene",
-      "key": "themes-hero",
-      "path": "/themes",
-      "surface": "The opening of the themes index — a wide editorial image beside the headline.",
-      "min_width": 2000,
-      "orientation": "landscape",
-      "min_aspect": 1.3,
-      "max_aspect": 2.1,
-      "note": "A way of SEEING Europe rather than a place in it: a reader looking at something old, a hand on a stone, a room full of people who came for the same reason. Never a landmark portrait and never a map — the page's whole argument is that a theme crosses borders, so a picture of one border is the opposite of it.",
-      "container": {
-        "selector": ".iheroart.shot",
-        "min_aspect": 1.333,
-        "min_at": "980x640",
-        "max_aspect": 1.5,
-        "max_at": "360x640"
-      },
-      "safe_area": {
-        "width": 0.635,
-        "height": 0.867,
-        "frame": 0.55
-      }
-    },
     "interests-hero": {
       "role": "human-life",
       "key": "interests-hero",
@@ -337,8 +222,6 @@
       "refuses": "Golden hour on more than one door in the same set. A hiker in silhouette on a ridge. A road disappearing into the distance.",
       "purposes_today": [
         "countries-hero",
-        "door-coast",
-        "door-mountains",
         "macro-hero"
       ],
       "search": [
@@ -366,8 +249,7 @@
       "refuses": "A crowd photographed as a crowd. A staged 'traditional costume' set-up. Anything a tourist board commissioned.",
       "purposes_today": [
         "events-hero",
-        "theme-hero",
-        "themes-hero"
+        "theme-hero"
       ],
       "search": [
         "European festival",
@@ -388,9 +270,7 @@
       "crop": "Same four-abreast strip as landscape; must read at 320px.",
       "brief": "A market or a cellar rather than a plated dish. A plated dish is a restaurant's photograph and this atlas lists no restaurants; a counter is a place's photograph. Warm ground, real light, no overhead flat-lay.",
       "refuses": "A flat-lay. A styled plate on a rustic board. Anything shot on a white background. Hands holding a coffee cup.",
-      "purposes_today": [
-        "door-food"
-      ],
+      "purposes_today": [],
       "search": [
         "European food market",
         "traditional European dish",
@@ -398,7 +278,8 @@
         "vineyard harvest",
         "food preparation kitchen",
         "market stall produce"
-      ]
+      ],
+      "trigger": "A purpose exists for this the day a surface argues about the table. It had one — the Food & wine door — and the door went with the other three when the homepage became the plate sequence. `/experiences/food` is the obvious candidate and is refused a photograph today for a different reason, recorded in docs/signature-moments.md: forty-eight dots over Europe would say food is everywhere, which is true and is not an insight. A photograph would answer that where the map cannot, so this is the next role likely to gain a purpose."
     },
     "architecture": {
       "does": "Built Europe as the subject: the Historic cities door, and any surface whose argument is what people built.",
@@ -410,9 +291,7 @@
       "crop": "Four-abreast strip; must read at 320px.",
       "brief": "Two thousand years, still lived in. A street somebody walks down to get somewhere, not a monument photographed as a monument.",
       "refuses": "An empty square at dawn shot to remove people. A cathedral interior with a wide-angle bulge. Anything symmetrical to the centre line.",
-      "purposes_today": [
-        "door-history"
-      ],
+      "purposes_today": [],
       "search": [
         "medieval street",
         "old town square",
@@ -422,7 +301,8 @@
         "Romanesque church",
         "European boulevard",
         "historic city square"
-      ]
+      ],
+      "trigger": "A purpose exists for this the day a surface argues about what people BUILT. It had one — the Historic cities door on the homepage — and the door went when that page became the plate sequence, because a lead door carrying its own picture is a fifth image of Europe on a page that opens on the largest one on the site. The role is kept rather than deleted because the argument it serves is real and unbuilt: a destination or country page whose opening is a street in use rather than a map would instantiate it unchanged."
     },
     "human-life": {
       "does": "A person or people, at the scale of a life rather than a portrait: the evidence that a place is inhabited.",
