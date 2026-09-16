@@ -51,6 +51,16 @@
      something that is not a surface. The step is real now and the link colour
      moved to keep its claim, which is the right way round. */
   --graphite-3:   #18211f;
+  /* THE WHITE STRIP IS PUNCTUATION, NOT PAPER, and that is how this token
+     and the one below it live together. The rule under `--bone` says "never
+     #fff" and it is right about a page GROUND: a whole document in white is
+     a screen. A strip is a different job — it is the rest between two
+     photographic bands, and what it does is make the picture before it
+     STOP rather than fade into more cream. So the rule is narrowed to what
+     it was protecting rather than deleted, exactly as the gold was:
+     `--bone` stays the paper and may never be white, `--white` may never be
+     a page or body ground, and `checks.py` asserts both directions. */
+  --white:   #FFFFFF;   /* the cut between bands. --ink on it is 15.9:1 */
   --bone:    #F3F0E6;   /* never #fff: white is a screen, limestone is paper.
                                 Kept from the previous system rather than replaced with
                                 a warmer ivory — the ground was the part of the old
@@ -7312,7 +7322,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    `position: absolute` — the picture goes back to scrolling with the page
    and nothing anywhere reports a fault, because every box is still the
    right size in the right place. The chain here is html → body → main →
-   .sheet-landscape → .shotfull and it is clean today (`main` carries
+   .sheet-discovery → .shotfull and it is clean today (`main` carries
    `z-index: 1`, which makes a stacking context and is NOT a containing
    block for fixed). `browser-checks.js` walks that chain on the built page
    and asserts all six are none, and then proves the promise the only way a
@@ -7323,13 +7333,13 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    reader scrolls: `vh` is the LARGE viewport and the band would resize
    mid-scroll, which is the one movement this effect cannot have. The height
    is over 100 so there is scroll distance to reveal through. */
-.sheet-landscape { grid-template-columns: 1fr; padding: 0; min-height: 110svh;
+.sheet-discovery { grid-template-columns: 1fr; padding: 0; min-height: 110svh;
                    align-content: end; border-bottom: 0;
                    background: var(--graphite);
                    clip-path: inset(0); }
-.sheet-landscape .shotfull { position: fixed; inset: 0; z-index: 0; }
-.sheet-landscape .shotfull picture,
-.sheet-landscape .shotfull img { display: block; width: 100%; height: 100%;
+.sheet-discovery .shotfull { position: fixed; inset: 0; z-index: 0; }
+.sheet-discovery .shotfull picture,
+.sheet-discovery .shotfull img { display: block; width: 100%; height: 100%;
                                  object-fit: cover; }
 /* A SCRIM IS WHAT MAKES THE CONTRAST A PROPERTY OF THE DESIGN RATHER THAN
    OF THE PICTURE. The homepage already learned this once, on type over a
@@ -7343,14 +7353,14 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    far down the page that letter had travelled. Fixed with the picture, the
    tint is a property of the viewport exactly as the picture is, so the ink
    meets the same ground at every scroll position. */
-.sheet-landscape .shotfull::after { content: ""; position: absolute; inset: 0;
+.sheet-discovery .shotfull::after { content: ""; position: absolute; inset: 0;
   background: linear-gradient(100deg,
     color-mix(in srgb, var(--graphite) 82%, transparent) 0%,
     color-mix(in srgb, var(--graphite) 58%, transparent) 38%,
     color-mix(in srgb, var(--graphite) 16%, transparent) 72%,
     transparent 100%); }
-.sheet-landscape > * { position: relative; z-index: 2; }
-.sheet-landscape .sheettext { padding: var(--s8) var(--page-gutter); max-width: 44rem; }
+.sheet-discovery > * { position: relative; z-index: 2; }
+.sheet-discovery .sheettext { padding: var(--s8) var(--page-gutter); max-width: 44rem; }
 /* THE PLATE SETS ITS OWN INK *AND* STILL NAMES THE CHILDREN THAT HAVE ONE.
    The list missed the two CONTAINERS — `.actmark` and `.marginnote`
    inherited the page's graphite onto a graphite ground at 1.00:1, with only
@@ -7360,14 +7370,14 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    matching rule beats inheritance at any specificity, so the standfirst
    went dark on a near-black plate the moment the override was removed. A
    declared colour is overridden, never inherited away. */
-.sheet-landscape { color: var(--bone); }
-.sheet-landscape .mega, .sheet-landscape .lede,
-.sheet-landscape .go, .sheet-landscape .actno, .sheet-landscape .actname,
-.sheet-landscape .marginnote span, .sheet-landscape .sheetcred,
-.sheet-landscape .sheetcred a { color: var(--bone); }
-.sheet-landscape .actno { border-bottom-color: color-mix(in srgb, var(--bone) 50%, transparent); }
-.sheet-landscape .gomark::before { background: none; }
-.sheet-landscape .actmark { position: absolute; top: var(--s6);
+.sheet-discovery { color: var(--bone); }
+.sheet-discovery .mega, .sheet-discovery .lede,
+.sheet-discovery .go, .sheet-discovery .actno, .sheet-discovery .actname,
+.sheet-discovery .marginnote span, .sheet-discovery .sheetcred,
+.sheet-discovery .sheetcred a { color: var(--bone); }
+.sheet-discovery .actno { border-bottom-color: color-mix(in srgb, var(--bone) 50%, transparent); }
+.sheet-discovery .gomark::before { background: none; }
+.sheet-discovery .actmark { position: absolute; top: var(--s6);
                             left: var(--page-gutter); margin: 0; }
 .sheetcred { position: absolute; right: var(--s5); bottom: var(--s5); margin: 0;
              font-family: var(--text); font-size: var(--t-xs); letter-spacing: .2em;
@@ -7389,7 +7399,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    on that is 6.90:1, whatever the picture does. 72% rather than a figure
    picked by eye because `.credit` already argued for 72% and a second
    number would be a second decision about one thing. */
-.sheet-landscape .sheetcred { padding: 3px 8px;
+.sheet-discovery .sheetcred { padding: 3px 8px;
   background: color-mix(in srgb, var(--graphite) 72%, transparent); }
 
 /* 04 · the journey — a paper plate: pale ground, an ink route, named stops */
@@ -9162,3 +9172,137 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    width where the word fits — and at 320, where it does not fit, a broken
    word beats a page a reader cannot put back. */
 .ed-opening h1 { overflow-wrap: break-word; }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   THE HOMEPAGE'S EIGHT PLATES — the rhythm is the design
+   ═══════════════════════════════════════════════════════════════════
+   photograph → WHITE → photograph → GRAPHITE → WHITE → photograph →
+   PINE → WHITE. The old sequence was paper, paper, photograph, paper,
+   paper, paper: six plates that differed in what they CONTAINED and not
+   in what they WERE, which is the design-direction finding this
+   stylesheet keeps re-making one level up from the h1. Alternating the
+   ground is what makes eight bands read as one composed page.        */
+
+/* ── the rests ───────────────────────────────────────────────────── */
+.sheet-white { background: var(--white); color: var(--ink); }
+.sheet-white .mega, .sheet-white .actno, .sheet-white .actname { color: var(--ink); }
+.sheet-white .lede { color: var(--ink-2); }
+.sheet-white .actno { border-bottom-color: var(--rule); }
+.sheet-white .marginnote span { color: var(--ink-3); }
+
+/* ── the navigation layer ────────────────────────────────────────── */
+/* GRAPHITE, AND EVERY COLOUR ON IT MOVED IN THE SAME EDIT. This plate
+   was `--paper-2`, and the comment forty lines up records what happened
+   the last time its ground moved without its type: fifty country names
+   at 1.14:1, the whole index invisible. Ground and ink are one change. */
+.sheet-atlas { background: var(--graphite); color: var(--bone); }
+.sheet-atlas .mega, .sheet-atlas .actno, .sheet-atlas .actname,
+.sheet-atlas .go, .sheet-atlas .countrycols a { color: var(--bone); }
+.sheet-atlas .lede { color: var(--mineral); }
+.sheet-atlas .actno { border-bottom-color: var(--mineral); }
+.sheet-atlas .countrycols a:hover { color: var(--cobalt-air); }
+.sheet-atlas .countrycols { border-top-color: color-mix(in srgb, var(--bone) 24%, transparent); }
+/* THE MAP'S REAL CLASS NAMES, READ OFF THE SHIPPED MARKUP. The first
+   version styled `.land`, `.context` and `.lit`, which this drawing does
+   not emit — so a graphite plate carried a bone map on a bone sea and the
+   whole instrument was invisible against itself. `constellation()` emits
+   `glyph-sea`, `glyph-beyond`, `glyph-land`, `glyph-bounds` and
+   `constel-lit circle`, and guessing at a selector is how a rule joins the
+   dead-rule scan's list rather than the design. */
+.atlasplate { grid-column: 1 / -1; }
+.atlasplate .constel { width: 100%; height: auto; display: block;
+                       max-height: 72vh; }
+.constel-atlas .glyph-sea { fill: var(--graphite); }
+.constel-atlas .glyph-beyond { fill: color-mix(in srgb, var(--bone) 9%, transparent); }
+.constel-atlas .glyph-land { fill: color-mix(in srgb, var(--bone) 20%, transparent); }
+.constel-atlas .glyph-bounds { fill: none;
+  stroke: color-mix(in srgb, var(--bone) 26%, transparent); stroke-width: 1;
+  vector-effect: non-scaling-stroke; }
+.constel-atlas .constel-lit circle { fill: var(--cobalt-air); r: 2.6; }
+
+/* ── the year ────────────────────────────────────────────────────── */
+.sheet-year { background: var(--pine); color: var(--bone);
+              grid-template-columns: minmax(0, 36%) minmax(0, 1fr);
+              gap: var(--s6) var(--s7); align-items: center; }
+.sheet-year .mega, .sheet-year .actno, .sheet-year .actname,
+.sheet-year .go { color: var(--bone); }
+.sheet-year .lede { color: color-mix(in srgb, var(--bone) 82%, transparent); }
+.sheet-year .actno { border-bottom-color: color-mix(in srgb, var(--bone) 50%, transparent); }
+.yearwrap { min-width: 0; }
+
+/* ── the two photographic rows ───────────────────────────────────── */
+/* A TILE IS A PICTURE WITH A NAME ON IT, which is the one shape a card
+   earns: these are chosen on LOOK, which is the test `docs/…` sets for
+   when a card is right and a row is not. */
+.drow { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+        gap: var(--s4); }
+.dtile, .jtile { position: relative; display: block; text-decoration: none;
+                 overflow: hidden; color: var(--bone); }
+.dtile :is(picture, img), .jtile :is(picture, img) {
+  width: 100%; height: 100%; object-fit: cover; }
+.dtile { aspect-ratio: 3 / 4; }
+.dtile::after, .jtile::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(transparent 38%, color-mix(in srgb, var(--graphite) 82%, transparent)); }
+.dwhere, .dname, .jkind, .jname, .jstops { position: relative; z-index: 2;
+  display: block; color: var(--bone); }
+.dwhere, .jkind { font-family: var(--text); font-size: var(--t-xs);
+  letter-spacing: .12em; text-transform: uppercase; }
+/* 1.12 rather than the 1.05 this first asked for: the register holds
+   eight line-heights and a ninth is a second type scale arriving one
+   value at a time. `css.line_heights` caught it in the first run. */
+.dname, .jname { font-family: var(--display); font-size: var(--t-xl); line-height: 1.12; }
+/* ONE STACK, NOT THREE OFFSETS. The first version placed each span with
+   its own `bottom` in `em`, and an em resolves against the element's OWN
+   font-size — so a 5.4em offset on an 11px kicker is 59px and a 2.6em
+   offset on a 32px name is 83px, and the name sat ABOVE the kicker it was
+   meant to sit under. Measured on the built page: the two overlapped
+   exactly. A stack cannot have that fault. */
+.dtext, .jtext { position: absolute; left: var(--s4); right: var(--s4);
+                 bottom: var(--s4); z-index: 2; display: grid; gap: var(--s1); }
+.dtile:hover .dname, .jtile:hover .jname { color: var(--cobalt-air); }
+
+.jrow { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+        gap: var(--s4); }
+.jtile { aspect-ratio: 4 / 5; }
+.jtile .jstops { font-family: var(--text); font-size: var(--t-xs);
+  color: color-mix(in srgb, var(--bone) 82%, transparent); }
+.dwrap, .jwrap { grid-column: 1 / -1; display: grid; gap: var(--s3); }
+/* THE DISCOVERY PLATE IS FULL-BLEED, so its rows carry the gutter the
+   plate does not. Without this the last tile ran off the right edge —
+   Minsk was cut in half at 1280. */
+.sheet-discovery .dwrap { padding: 0 var(--page-gutter) var(--s6); }
+
+@media (max-width: 52rem) {
+  .sheet-year { grid-template-columns: 1fr; }
+}
+
+
+/* ── the atlas plate's own layout ─────────────────────────────────── */
+/* THE OLD PLATE WAS A HUGE NUMERAL BESIDE A SENTENCE and its `.sheettext`
+   was a two-column grid to hold them. This plate is a statement beside a
+   map, and that inherited grid split the head from its lede and set the
+   lede in a hundred-pixel column — two words a line, on the plate whose
+   subject is the whole continent. A layout inherited from a composition
+   that was removed is the expired-reason fault, in a grid. */
+.sheet-atlas { grid-template-columns: minmax(0, 32%) minmax(0, 1fr);
+               align-items: start; }
+.sheet-atlas .sheettext { grid-template-columns: 1fr; gap: var(--s5);
+                          align-content: start; }
+.atlasplate { grid-column: 2; }
+/* AND THE LIST IS THE FOOT OF THE PLATE, full width, in columns wide
+   enough for the names it holds. At five columns inside a 32% track
+   "North Macedonia", "United Kingdom" and "Bosnia and Herzegovina" each
+   broke across two lines and the columns collided — an index whose
+   entries do not fit its own measure, which is the exact fault the
+   comment above `.countrycols` already records once. `auto-fill` on a
+   real minimum lets the count follow the width instead. */
+.sheet-atlas .countrycols { grid-column: 1 / -1; columns: auto 11rem;
+  border-left: 0; border-top: 1px solid color-mix(in srgb, var(--bone) 22%, transparent);
+  padding-left: 0; padding-top: var(--s5); }
+.sheet-atlas .countrycols a { color: var(--bone); }
+
+@media (max-width: 62rem) {
+  .sheet-atlas { grid-template-columns: 1fr; }
+  .atlasplate { grid-column: 1; }
+}

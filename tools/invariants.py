@@ -377,7 +377,14 @@ def measure():
             "safety.img_tags": {
                 "value": sum(b.count("<img") for b in bodies.values()),
                 "kind": "exact",
-                "why": "It was zero while zero photographs were licensed, and "
+                "why": "AND IT WENT DOWN, 1149 -> 1143, WHICH IS THE SAME "
+                       "SIGNAL READ BACKWARDS. The homepage's eight-plate "
+                       "rebuild replaced a row of eleven theme thumbnails "
+                       "with five destinations and three journeys, so six "
+                       "`<img>` left the most-seen page. A ceiling would have "
+                       "said nothing; an exact says a picture stopped being "
+                       "drawn and asks whether that was meant. It was. "
+                       "It was zero while zero photographs were licensed, and "
                        "this moving is the signal that licensed imagery arrived "
                        "— which must go through the licence register first. "
                        "20 -> 31 WHEN THE ELEVEN THEME PHOTOGRAPHS STOPPED "
@@ -409,7 +416,16 @@ def measure():
                 "value": round(len(next(b for k, b in bodies.items()
                                        if os.path.relpath(k, OUT) == "index.html")) / 1024),
                 "kind": "ceiling",
-                "why": "The homepage's rendered HTML in KB. A ceiling, not a "
+                "why": "57 -> 68 FOR THE EIGHT-PLATE REBUILD, and eleven KB "
+                       "of it is one drawing. The graphite atlas plate puts "
+                       "the real continent and all 319 destinations on the "
+                       "page, which is the band's whole argument — the map "
+                       "is the navigation layer and the photographs are the "
+                       "emotional one, so the map has to be a map rather "
+                       "than a picture of one. The photographs cost almost "
+                       "nothing by comparison: a `<picture>` is a few "
+                       "hundred bytes of markup whatever the file weighs.\n"
+                       "The homepage's rendered HTML in KB. A ceiling, not a "
                        "target: it may move, deliberately, in a diff "
                        "somebody reads. It is here because a 2.6x "
                        "regression on this page passed every other gate "
