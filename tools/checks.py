@@ -4047,44 +4047,65 @@ def c_hero_frame():
     # And the shipped page must actually carry that viewBox, because both
     # numbers above are read from the source rather than from the HTML.
     #
-    # UNLESS A PHOTOGRAPH FILLS THE HERO, IN WHICH CASE THERE IS NO DRAWING
-    # TO ASSERT ANYTHING ABOUT. A photograph REPLACES the drawing — `.shot`
-    # is added only when the register holds the file and `heroeurope()` is
-    # not called at all — so this line failed on the first end-to-end
-    # acquisition, which is the ninth assertion in this repository to pin a
-    # SHAPE rather than a promise. The promise is: whichever of the two the
-    # homepage carries, it carries one of them and the page says which. Both
-    # halves still fail on the thing this was written for, because the
-    # branch is chosen by the register rather than by this check.
+    # AND THE PHOTOGRAPH BRANCH WAS THE TENTH ASSERTION HERE TO PIN A SHAPE.
+    # Its first version asked for `.herofull.shot`; its second asked for a
+    # `<picture>` inside `class="opening"`. Both are spellings of *where the
+    # photograph lives*, and the homepage has now moved it twice — the plate
+    # sequence put it in the opening, and the gallery put the ATLAS in the
+    # opening and the photograph on a full-bleed plate of its own. Each time
+    # the check failed for a page that had got better.
+    #
+    # THE PROMISE HAS ONLY EVER BEEN ONE SENTENCE: *a photograph REPLACES the
+    # drawing; it does not sit behind it.* The failure it was written for is
+    # the continent drawn OVER a picture, with the picture showing through
+    # every gap in the coastline — which is a claim about one CONTAINER
+    # holding both, and says nothing about which container that is. So:
+    # whichever the homepage carries, the drawing carries its own viewBox,
+    # the registered photograph is somewhere on the page, and no element
+    # holds the two of them at once. All three still fail on the thing this
+    # was written for.
     html = open(os.path.join(ROOT, "site", "index.html"),
                 encoding="utf-8").read()
-    photo_hero = bool(_register().get("home-hero"))
-    if photo_hero:
-        # AND `.herofull shot` WAS THE OLD HERO'S CLASS, WHICH IS THE SHAPE
-        # HALF OF THIS ASSERTION COMING BACK. The homepage is a plate
-        # sequence now: the opening is `.sheet-door .opening` and the
-        # photograph goes inside it, so naming the container was a third
-        # spelling of "there is a picture here". What is asserted is the
-        # picture and its own register key, inside the opening — because a
-        # `<picture>` somewhere on the page would also be true of the eight
-        # doors below the fold.
-        i = html.find('class="opening"')
-        seg = html[i:html.find("</div>", i)] if i >= 0 else ""
-        # AND NOT `"home-hero" in seg`, WHICH IS THE ONE-CHARACTER-APART
+    drawn = html.find('class="heroeurope"')
+    if drawn >= 0:
+        assert f'viewBox="{vx:.0f} {vy:.0f} {vw:.0f} {vh:.0f}"' in html, (
+            "the homepage draws the hero continent and does not carry the "
+            "viewBox this check just asserted two things about")
+        # The drawing's own subtree, walked rather than guessed: a `<picture>`
+        # inside it is the stacking this rule exists to refuse.
+        depth, i, end = 0, drawn, len(html)
+        while i < end:
+            a = html.find("<div", i)
+            b = html.find("</div>", i)
+            if b < 0:
+                break
+            if 0 <= a < b:
+                depth += 1
+                i = a + 4
+                continue
+            depth -= 1
+            i = b + 6
+            if depth <= 0:
+                end = i
+                break
+        assert "<picture" not in html[drawn:end], (
+            "the homepage draws the continent and a <picture> is inside the "
+            "same element — a photograph REPLACES the drawing, it does not "
+            "sit behind it, and every gap in the coastline shows the picture "
+            "through")
+        n += 1
+    if _register().get("home-hero"):
+        # AND NOT `"home-hero" in html`, WHICH IS THE ONE-CHARACTER-APART
         # TRAP THIS FILE ALREADY RECORDS. The REGISTER KEY is `home-hero`
         # and the FILE STEM comes from the PURPOSE, `homepage-hero`, so the
         # derivatives are named `homepage-hero.<hash>.avif` and the key is
         # not a substring of them. Which file the page must reference is
         # `c_photo_published`'s question and it asks it from the register;
-        # this one asks only whether the opening carries a picture at all.
-        assert "<picture" in seg, (
-            "the register holds a homepage hero photograph and the opening "
-            "carries no <picture> — the drawing was removed and nothing "
-            "replaced it")
-    else:
-        assert f'viewBox="{vx:.0f} {vy:.0f} {vw:.0f} {vh:.0f}"' in html, (
-            "the homepage does not carry the hero viewBox this check just "
-            "asserted two things about")
+        # this one asks only that the licensed hero reaches the page at all.
+        assert "<picture" in html, (
+            "the register holds a homepage hero photograph and the page "
+            "carries no <picture> anywhere — it was acquired, hashed, "
+            "registered and never published")
     n += 1
     return n
 
@@ -6200,18 +6221,22 @@ def c_hero_dusk_reach():
     """
     h = open(os.path.join(OUT, "index.html"), encoding="utf-8").read()
 
-    # A PHOTOGRAPH REPLACES THE DRAWING, AND A FADE OVER A DATA CUT IS A
-    # PROPERTY OF THE DRAWING. With `home-hero` in the register the homepage
-    # draws no continent, has no data cut and needs no fade, so there is
-    # nothing here to measure — and this check failed on the first end-to-end
-    # acquisition asking for two gradients that correctly do not exist. It
-    # asserts the ABSENCE in that case, because "no fade" and "no drawing"
-    # must not be allowed to look the same.
-    if _register().get("home-hero"):
-        assert "heroeurope" not in h, (
-            "the register holds a hero photograph and the homepage still "
-            "carries the drawn continent — a photograph REPLACES the drawing, "
-            "it does not sit behind it")
+    # A FADE OVER A DATA CUT IS A PROPERTY OF THE DRAWING, SO THE DRAWING IS
+    # WHAT THIS BRANCHES ON. Its first version branched on the REGISTER —
+    # "if a hero photograph exists, the continent must be gone" — which was
+    # true of the one composition that existed on the day it was written and
+    # is a claim about where the photograph lives, not about the fade. The
+    # gallery homepage carries both: the atlas is plate 01 and the licensed
+    # photograph is the full-bleed window on plate 02, two surfaces, neither
+    # behind the other. `c_hero_frame` owns *not stacked*, which is the real
+    # promise; this one measures the fade wherever the drawing is, and
+    # asserts the ABSENCE of an orphan gradient where it is not — because
+    # "no fade" and "no drawing" must not be allowed to look the same.
+    if "heroeurope" not in h:
+        assert 'id="heroedge"' not in h and 'id="herofootg"' not in h, (
+            "the homepage draws no continent and still ships the two "
+            "data-cut gradients — a fade with nothing under it is a "
+            "rendering instruction for a picture that is not there")
         return 1
 
     def grad(gid):

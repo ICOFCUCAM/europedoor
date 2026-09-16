@@ -7168,16 +7168,14 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
            text-transform: uppercase; }
 .go:hover .golabel { color: var(--door); }
 .go:hover .gomark { opacity: 1; }
-/* THE MARGIN, which is what a plate has and a section does not. Tracked
-   capitals against the outer edge, where a printed sheet carries its series
-   and its projection. aria-hidden and unlinked: it is the sheet's own
-   furniture, not something a reader is asked to read. */
-.marginnote { position: absolute; top: var(--s8); right: var(--s5);
-              display: grid; gap: var(--s4); text-align: right; margin: 0;
-              max-width: 7rem; }
-.marginnote span { font-family: var(--text); font-size: var(--t-xs);
-                   letter-spacing: .26em; text-transform: uppercase;
-                   color: var(--ink-3); line-height: 1.5; }
+/* THE MARGIN NOTE IS GONE, and the reason is the picture that replaced
+   the room it lived in. It was tracked capitals against the plate's outer
+   edge — a printed sheet's series and its projection — and it was absolutely
+   positioned at the top right of the door, which is where the atlas now is.
+   Set over a near-black drawing its three lines measured about 1.5:1 and its
+   middle line, the projection's own angles, was stated again in the colophon
+   at the foot of the page. Deleted rather than moved: a plate that carries a
+   full-bleed continent does not have a margin to put furniture in. */
 
 /* 01 · the door — the wall is paper and the opening is the only dark thing */
 .sheet-door { grid-template-columns: minmax(0, 44%) minmax(0, 1fr);
@@ -7362,9 +7360,9 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .sheet-discovery > * { position: relative; z-index: 2; }
 .sheet-discovery .sheettext { padding: var(--s8) var(--page-gutter); max-width: 44rem; }
 /* THE PLATE SETS ITS OWN INK *AND* STILL NAMES THE CHILDREN THAT HAVE ONE.
-   The list missed the two CONTAINERS — `.actmark` and `.marginnote`
-   inherited the page's graphite onto a graphite ground at 1.00:1, with only
-   their spans lifted — so the plate declares its ink and they inherit it.
+   The list missed the CONTAINERS — `.actmark` inherited the page's graphite
+   onto a graphite ground at 1.00:1, with only its spans lifted — so the
+   plate declares its ink and they inherit it.
    Replacing the list with that inheritance was the obvious next step and it
    is WRONG: `.lede` has its own `color: var(--ink-2)` at (0,1,0), and a
    matching rule beats inheritance at any specificity, so the standfirst
@@ -7373,7 +7371,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .sheet-discovery { color: var(--bone); }
 .sheet-discovery .mega, .sheet-discovery .lede,
 .sheet-discovery .go, .sheet-discovery .actno, .sheet-discovery .actname,
-.sheet-discovery .marginnote span, .sheet-discovery .sheetcred,
+.sheet-discovery .sheetcred,
 .sheet-discovery .sheetcred a { color: var(--bone); }
 .sheet-discovery .actno { border-bottom-color: color-mix(in srgb, var(--bone) 50%, transparent); }
 .sheet-discovery .gomark::before { background: none; }
@@ -7509,7 +7507,6 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
   .sheet-door { padding-right: var(--page-gutter); }
   .sheet-door .sheettext { padding: 0 0 var(--s6); }
   .sheet-door .opening { min-height: 52vh; }
-  .marginnote { display: none; }
   .goright { position: static; flex-direction: row; }
   .goright .gomark { transform: none; }
   .countrycols { columns: 3; border-left: 0; padding-left: 0;
@@ -9175,134 +9172,320 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
 
 
 /* ═══════════════════════════════════════════════════════════════════
-   THE HOMEPAGE'S EIGHT PLATES — the rhythm is the design
+   THE HOMEPAGE — THE QUIET GALLERY
    ═══════════════════════════════════════════════════════════════════
-   photograph → WHITE → photograph → GRAPHITE → WHITE → photograph →
-   PINE → WHITE. The old sequence was paper, paper, photograph, paper,
-   paper, paper: six plates that differed in what they CONTAINED and not
-   in what they WERE, which is the design-direction finding this
-   stylesheet keeps re-making one level up from the h1. Alternating the
-   ground is what makes eight bands read as one composed page.        */
+   WHITE IS THE GROUND HERE AND THAT IS A DECISION, NOT A DEFAULT. The
+   token comment on `--bone` says "never #fff: white is a screen,
+   limestone is paper", and it is right about a page a reader READS —
+   1,033 of them are bone and stay bone. This one page is a gallery: its
+   job is to hold photographs, and a gallery hangs work on a white wall
+   precisely so the wall contributes nothing. Narrowed to what it was
+   protecting rather than deleted, exactly as the gold was: `--bone`
+   remains the paper of the site, `--white` is the wall of this room, and
+   `checks.py` asserts that no OTHER page takes it.
 
-/* ── the rests ───────────────────────────────────────────────────── */
-.sheet-white { background: var(--white); color: var(--ink); }
-.sheet-white .mega, .sheet-white .actno, .sheet-white .actname { color: var(--ink); }
-.sheet-white .lede { color: var(--ink-2); }
-.sheet-white .actno { border-bottom-color: var(--rule); }
-.sheet-white .marginnote span { color: var(--ink-3); }
+   The room is type-led. Colour appears only as a mark — a kicker, a rule,
+   a lit dot on the map — never as a field, which is the owner's own
+   sentence: UI restrained, PHOTOGRAPHY rich, MAPS precise, TYPOGRAPHY
+   dramatic.                                                             */
 
-/* ── the navigation layer ────────────────────────────────────────── */
-/* GRAPHITE, AND EVERY COLOUR ON IT MOVED IN THE SAME EDIT. This plate
-   was `--paper-2`, and the comment forty lines up records what happened
-   the last time its ground moved without its type: fifty country names
-   at 1.14:1, the whole index invisible. Ground and ink are one change. */
-.sheet-atlas { background: var(--graphite); color: var(--bone); }
-.sheet-atlas .mega, .sheet-atlas .actno, .sheet-atlas .actname,
-.sheet-atlas .go, .sheet-atlas .countrycols a { color: var(--bone); }
-.sheet-atlas .lede { color: var(--mineral); }
-.sheet-atlas .actno { border-bottom-color: var(--mineral); }
-.sheet-atlas .countrycols a:hover { color: var(--cobalt-air); }
-.sheet-atlas .countrycols { border-top-color: color-mix(in srgb, var(--bone) 24%, transparent); }
-/* THE MAP'S REAL CLASS NAMES, READ OFF THE SHIPPED MARKUP. The first
-   version styled `.land`, `.context` and `.lit`, which this drawing does
-   not emit — so a graphite plate carried a bone map on a bone sea and the
-   whole instrument was invisible against itself. `constellation()` emits
-   `glyph-sea`, `glyph-beyond`, `glyph-land`, `glyph-bounds` and
-   `constel-lit circle`, and guessing at a selector is how a rule joins the
-   dead-rule scan's list rather than the design. */
-.atlasplate { grid-column: 1 / -1; }
-.atlasplate .constel { width: 100%; height: auto; display: block;
-                       max-height: 72vh; }
-.constel-atlas .glyph-sea { fill: var(--graphite); }
-.constel-atlas .glyph-beyond { fill: color-mix(in srgb, var(--bone) 9%, transparent); }
-.constel-atlas .glyph-land { fill: color-mix(in srgb, var(--bone) 20%, transparent); }
-.constel-atlas .glyph-bounds { fill: none;
-  stroke: color-mix(in srgb, var(--bone) 26%, transparent); stroke-width: 1;
-  vector-effect: non-scaling-stroke; }
-.constel-atlas .constel-lit circle { fill: var(--cobalt-air); r: 2.6; }
+.sheet-gal { background: var(--white); color: var(--ink);
+             padding: 11vh var(--page-gutter); border-bottom: 0;
+             display: block; }
+.sheet-gal .actno, .sheet-gal .actname { color: var(--ink-3); }
+.sheet-gal .actno { border-bottom-color: var(--rule); }
+.sheet-gal .mega { color: var(--ink); }
+.sheet-gal .lede { color: var(--ink-2); }
+.galwrap { max-width: 76rem; margin: 0 auto; }
 
-/* ── the year ────────────────────────────────────────────────────── */
-.sheet-year { background: var(--pine); color: var(--bone);
-              grid-template-columns: minmax(0, 36%) minmax(0, 1fr);
-              gap: var(--s6) var(--s7); align-items: center; }
-.sheet-year .mega, .sheet-year .actno, .sheet-year .actname,
-.sheet-year .go { color: var(--bone); }
-.sheet-year .lede { color: color-mix(in srgb, var(--bone) 82%, transparent); }
-.sheet-year .actno { border-bottom-color: color-mix(in srgb, var(--bone) 50%, transparent); }
-.yearwrap { min-width: 0; }
+/* ── 01 the door: type left, the atlas right ─────────────────────── */
+/* AND THE ATLAS IS A RECTANGLE, WHICH IS THE ONE PLACE ON THIS SITE THE
+   APERTURE IS DELIBERATELY ABSENT. The arch is cut on 824 plates, every
+   social card and every embedded map, and `docs/signature-moments.md`
+   already records where it is CORRECTLY missing — /map, the facet pages,
+   the interest pages — with the same reason each time: *a signature
+   applied to everything is wallpaper*. This panel is the largest drawing
+   of Europe anywhere in the product, held beside the page's own headline
+   on a white wall; cutting it makes the continent a decoration of its
+   own frame, and the two corners the arch removes are Iceland and the
+   Caucasus. The door in the headline is the door; it does not also have
+   to be drawn round the picture.
 
-/* ── the two photographic rows ───────────────────────────────────── */
-/* A TILE IS A PICTURE WITH A NAME ON IT, which is the one shape a card
-   earns: these are chosen on LOOK, which is the test `docs/…` sets for
-   when a card is right and a row is not. */
-.drow { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-        gap: var(--s4); }
-.dtile, .jtile { position: relative; display: block; text-decoration: none;
-                 overflow: hidden; color: var(--bone); }
-.dtile :is(picture, img), .jtile :is(picture, img) {
-  width: 100%; height: 100%; object-fit: cover; }
-.dtile { aspect-ratio: 3 / 4; }
-.dtile::after, .jtile::after { content: ""; position: absolute; inset: 0;
-  background: linear-gradient(transparent 38%, color-mix(in srgb, var(--graphite) 82%, transparent)); }
-.dwhere, .dname, .jkind, .jname, .jstops { position: relative; z-index: 2;
-  display: block; color: var(--bone); }
-.dwhere, .jkind { font-family: var(--text); font-size: var(--t-xs);
-  letter-spacing: .12em; text-transform: uppercase; }
-/* 1.12 rather than the 1.05 this first asked for: the register holds
-   eight line-heights and a ninth is a second type scale arriving one
-   value at a time. `css.line_heights` caught it in the first run. */
-.dname, .jname { font-family: var(--display); font-size: var(--t-xl); line-height: 1.12; }
-/* ONE STACK, NOT THREE OFFSETS. The first version placed each span with
-   its own `bottom` in `em`, and an em resolves against the element's OWN
-   font-size — so a 5.4em offset on an 11px kicker is 59px and a 2.6em
-   offset on a 32px name is 83px, and the name sat ABOVE the kicker it was
-   meant to sit under. Measured on the built page: the two overlapped
-   exactly. A stack cannot have that fault. */
-.dtext, .jtext { position: absolute; left: var(--s4); right: var(--s4);
-                 bottom: var(--s4); z-index: 2; display: grid; gap: var(--s1); }
-.dtile:hover .dname, .jtile:hover .jname { color: var(--cobalt-air); }
+   NO `.reveal` EITHER. The reveal exists to say where a cut edge is, and
+   there is no cut: on a white wall a graphite rectangle states its own
+   boundary at 16.9:1, which is the highest separation in the palette. */
+.sheet-door.sheet-gal { padding-top: 8vh; }
+.sheet-door .doorgrid { max-width: 76rem; margin: 0 auto; display: grid;
+  grid-template-columns: minmax(0, 46%) minmax(0, 1fr); gap: 5vw;
+  align-items: center; }
+/* THE PANEL IS THE DRAWING'S OWN PROPORTION, and that is arithmetic
+   rather than taste. `preserveAspectRatio="slice"` crops whatever the box
+   does not match, and the frame is 1120x800 — so a 1.05 box showed 840 of
+   the 1120 units and put the eastern dusk, a 320-unit band that belongs at
+   the far edge, across the right THIRD of the picture. It read as a shaft
+   of light somebody had left on. Given its own ratio the panel crops
+   nothing, the fade sits where the geometry puts it, and the composition
+   is the one the drawing was composed for. */
+.sheet-door .op { position: relative; overflow: hidden;
+  aspect-ratio: 1120 / 800; }
 
-.jrow { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-        gap: var(--s4); }
-.jtile { aspect-ratio: 4 / 5; }
-.jtile .jstops { font-family: var(--text); font-size: var(--t-xs);
-  color: color-mix(in srgb, var(--bone) 82%, transparent); }
-.dwrap, .jwrap { grid-column: 1 / -1; display: grid; gap: var(--s3); }
-/* THE DISCOVERY PLATE IS FULL-BLEED, so its rows carry the gutter the
-   plate does not. Without this the last tile ran off the right edge —
-   Minsk was cut in half at 1280. */
-.sheet-discovery .dwrap { padding: 0 var(--page-gutter) var(--s6); }
+/* NO FRAME, AND THAT IS WHY THE DRAWING CHANGES MAP SET RATHER THAN
+   LOSING A BACKGROUND. `heroeurope()` is the DARK map — #F3F0E6 continent
+   on #07100F at 16.90 — and a dark map needs its ground: take the black
+   box away and a bone continent on a white wall measures 1.04 and simply
+   is not there. The two map sets exist for exactly this, and the brief
+   decides between them by what the drawing IS: a picture is warm paper,
+   pale water and an ink coast; an instrument is graphite. Held on a white
+   gallery wall beside the page's own headline, this is a picture.
 
-@media (max-width: 52rem) {
-  .sheet-year { grid-template-columns: 1fr; }
+   So the sea is the WALL. Nothing paints water here at all — the same
+   move `.constel-atlas` makes one plate down, and the reason a map figure
+   paints no background is already written in this file: the page showing
+   through is the difference between an aperture and a panel. Here there
+   is no aperture either, so the page showing through is the whole ground.
+
+   REBOUND, NOT RESTATED. `--atlas-land` is the one declaration: the
+   coast, the frontiers, the rivers, the lakes and the hover lift are all
+   `color-mix`ed against it, so switching the token switches eight rules
+   that were never touched. Four things do NOT derive from it and each is
+   named below, because each was written to be read against graphite. */
+.sheet-door .op .heroeurope { --atlas-land: var(--map-land); }
+/* THE GROUND BEYOND THE ATLAS. On graphite it is the graphite — invisible,
+   because the sea is the same near-black and Asia only has to stop the
+   continent reading as an island. On a white wall the same value is a
+   black mass twice the size of Europe, and the honest equivalent is the
+   faintest stone in the palette: present, unreadable as countries,
+   nothing to click. AND A THIRD OF IT RATHER THAN A FLAT TINT, because the
+   dusk does not reach this layer — its mask is the atlas's own land, so
+   Asia and the Sahara keep full strength where Europe is dissolving, and
+   at `--bone-2` the Sahara came out a slab the size of Iberia with the
+   continent fading away above it. */
+.sheet-door .op .heroeurope .lyr-beyond path {
+  fill: color-mix(in srgb, var(--mineral) 30%, transparent); }
+/* THE SHORE BAND, BACK TO BEING WATER. Its own comment records the two
+   failures on either side of this: `--ocean-shallow` blurred nine units
+   gave Iceland a LIT AURA, and on the dark map the same pale band read as
+   a beam of light over Russia — so it was taken to the deep step at a
+   third, which is a SHADOW, and a shadow round every coast on a white
+   wall is the swamp the owner's brief objects to. Shallow, at a quarter:
+   on paper a shore band is shallower water, which is the convention it
+   was drawn for before the ground went black. */
+.sheet-door .op .heroeurope .lyr-coastal-water use {
+  fill: color-mix(in srgb, var(--ocean-shallow) 26%, transparent); }
+/* THE DUSK DISSOLVES THE CONTINENT INTO WHATEVER THE GROUND IS, and the
+   ground is now the wall. Left as graphite it drew the fault this whole
+   panel exists to remove — a dark wedge fanning out of the north-east that
+   reads as a beam somebody left on, because a black ramp over a white page
+   is a shape rather than a fade. The stops carry their own opacity; only
+   the colour moves, in one place, so the ground and the light that turns
+   the atlas into it still cannot drift apart. */
+.sheet-door .op .heroeurope #heroedge stop,
+.sheet-door .op .heroeurope #herofootg stop { stop-color: var(--white); }
+/* AND THE NAMES ARE INK ON STONE. Graphite at 48% is a third-weight name
+   on a bone continent and it is 1.3:1 on this one. The map's own ink, at
+   the same relative weight: found when looked for, never met before the
+   shape it names. */
+.sheet-door .op .heroeurope .lyr-labels .cname {
+  fill: color-mix(in srgb, var(--map-ink) 58%, transparent); }
+/* The drawing fills the panel. `.heroeurope`'s base rule insets it from
+   the right of a full-bleed hero that no longer exists — `width: min(78%,
+   62rem)` — so without this it would sit in the right 78% of its own box
+   with a graphite strip beside it. */
+.sheet-door .op .heroeurope { position: absolute; inset: 0;
+                              width: 100%; height: 100%;
+                              margin-left: 0;
+                              -webkit-mask-image: none; mask-image: none; }
+.sheet-door .op .heroeurope svg { width: 100%; height: 100%;
+                                  max-height: none; }
+/* NO SECOND CLAMP AND NO NINTH LINE-HEIGHT. The door's headline and the
+   closing statement each wanted their own — 6.2vw here and 8vw at the end,
+   with a .9 leading under the last one — and three clamps a few pixels
+   apart is a second type scale wearing the first one's clothes, which is
+   how the sibling repository reached 418 font sizes. `.sheet .mega` is
+   already `clamp(--t-4xl, 7vw, --t-6xl)` at line-height .96 and it is the
+   plate headline; a room that needs its own scale value is a decoration. */
+/* A GRID OF FOUR, NOT A WRAPPING FLEX ROW. At 46% of 1280 the four
+   figures did not fit on one line, so "17 JOURNEYS" dropped alone onto a
+   second row and left a hole the width of three columns. Four derived
+   numbers are a set and read as one. */
+.figrow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--s4); margin-top: var(--s6); padding-top: var(--s5);
+  border-top: 1px solid var(--rule); }
+.figrow div b { display: block; font-family: var(--display); font-weight: 400;
+  font-size: var(--t-2xl); line-height: 1; }
+.figrow div span { font-family: var(--text); font-size: var(--t-xs);
+  letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
+
+/* ── the one window ──────────────────────────────────────────────── */
+/* A WINDOW IS NOT THE WHOLE WALL, AND MEASURING IT IS WHAT SAID SO. The
+   first version was the viewport: `position: fixed; inset: 0`, the picture
+   standing still while the band scrolled past, with the headline over it
+   behind a scrim. The effect was right and the CROP was indefensible —
+   measured over the twenty viewports the suite sweeps, the box ran 0.356
+   at 320x900 to 3.125 at 2000x640, which guarantees **9%** of a
+   photograph's frame. This site refuses a purpose under 12% and its own
+   sentence for that number is *a slot that destroys whatever is put in
+   it*. A full-bleed responsive picture cannot clear it at any source
+   range: the arithmetic is 0.114 x (min/max) before the source is even
+   chosen.
+
+   So the aperture states its own proportion and fits inside the viewport
+   rather than filling it. 16:9 on a wall, 4:5 on a phone, and nothing in
+   between — two ratios, so the box is 0.800 to 1.778 and the guaranteed
+   frame is 36%. The photograph is still fixed and still does not move;
+   what changed is that the wall is now visible around it, which is what a
+   window in a wall looks like. `clip-path` is still the one property that
+   clips a fixed descendant — see the note on the six properties that kill
+   this silently.
+
+   AND THE WORDS CAME OFF THE PICTURE. Bone type over an unlicensed
+   photograph is a contrast ratio that is a property of the picture rather
+   than of the design, which is why it needed a scrim at all; with the wall
+   around the window there is somewhere honest to put them. The label sits
+   under the work, in ink, on white — which is what a gallery does, and it
+   is the same decision `.gi` already made one plate down. No scrim, no
+   bone, no gradient, and the licence credit reads at 15.9:1 whatever the
+   photograph turns out to be. */
+/* THE CLIP BELONGS TO THE APERTURE, NOT TO THE WALL. A fixed picture is
+   painted wherever the clipped region meets the viewport, so while the band
+   is on screen at all the picture sits in the middle of it — which put the
+   label, correctly placed at the foot of the band, straight back over the
+   photograph it exists to sit beside. Clipping the band's own bottom third
+   fixed that and took the band's BACKGROUND and the label with it: a
+   `clip-path` clips the element, not only its fixed descendants, so the
+   caption was cut away entirely and the page showed through where the wall
+   should be. Found by looking at the second screenshot; no count moves.
+
+   So the aperture is its own box. `.shotclip` is an absolutely positioned
+   opening in the top of the wall — the one element that carries the clip —
+   and its lower edge sweeping down across the standing picture is a window
+   closing, which is the movement this plate is for. The wall keeps its own
+   paper and the label is on it. */
+.sheet-bleed { padding: 0 0 11vh; border-bottom: 0; display: block;
+               position: relative; min-height: 128svh;
+               background: var(--white); color: var(--ink); }
+.sheet-bleed > .actmark { padding-inline: var(--page-gutter); }
+.sheet-bleed .shotclip { position: absolute; inset: 0 0 auto 0;
+                         height: 118svh; clip-path: inset(0); z-index: 0; }
+.sheet-bleed .shotfull { position: fixed; z-index: 0;
+  aspect-ratio: 4 / 5;
+  width: min(100vw, 80svh);
+  left: 50%; margin-left: max(-50vw, -40svh);
+  top: 50%;  margin-top: max(-62.5vw, -50svh); }
+@media (min-width: 52rem) {
+  .sheet-bleed .shotfull {
+    aspect-ratio: 16 / 9;
+    width: min(100vw, 177.78svh);
+    margin-left: max(-50vw, -88.89svh);
+    margin-top: max(-28.125vw, -50svh); }
 }
+.sheet-bleed .shotfull :is(picture, img) { display: block; width: 100%;
+  height: 100%; object-fit: cover; }
+.sheet-bleed > * { position: relative; z-index: 2; }
+/* THE LABEL ARRIVES AFTER THE WORK, which is the whole reason the band is
+   150svh: the window opens, the photograph stands still for a screen and a
+   half while the wall moves past it, and then the wall carries its own
+   caption. A label level with the picture would be a caption on a card. */
+.sheet-bleed .sheettext { margin-top: 124svh; padding: 0 var(--page-gutter);
+                          max-width: 44rem; }
+/* STATIC, AND THAT WORD IS THE WHOLE FIX. `.sheetcred` is absolutely
+   positioned at the foot of a plate, which is right where the credit sits
+   over a picture; here it is a line of the wall label and it kept the
+   `position` while taking a new margin — so it laid out against the section
+   and sat 24px outside the gutter every other line on the plate uses. A
+   rule that changes two properties of a four-property component achieves
+   one thing, which this stylesheet already records about `.credit`. */
+.sheet-bleed .sheetcred { position: static; margin: var(--s5) 0 0;
+  padding: 0 var(--page-gutter);
+  font-size: var(--t-xs); color: var(--ink-3); max-width: none; }
+.sheet-bleed .sheetcred a { color: var(--ink-2); text-decoration: underline;
+  text-underline-offset: .16em; }
 
+/* ── the gallery grid ────────────────────────────────────────────── */
+/* A GRID, NOT A SCRIM. In the other directions the name sat ON the
+   picture behind a gradient; here it sits UNDER it, in the margin, the
+   way a gallery labels a work. That is the whole difference between a
+   card and a plate, and it is why this room can hold four pictures
+   without reading as a catalogue. */
+.galgrid { display: grid; grid-template-columns: repeat(4, 1fr);
+           gap: var(--s5); margin-top: var(--s7); }
+.gi { display: block; text-decoration: none; color: inherit; }
+.gi :is(picture, img) { display: block; width: 100%; aspect-ratio: 3 / 4;
+                        object-fit: cover; }
+.gi .giwhere { display: block; font-family: var(--text); font-size: var(--t-xs);
+  letter-spacing: .13em; text-transform: uppercase; color: var(--ink-3);
+  margin-top: var(--s3); }
+.gi .giname { display: block; font-family: var(--display); font-size: var(--t-xl);
+  line-height: 1.12; margin-top: var(--s1); }
+.gi:hover .giname { color: var(--door); }
 
-/* ── the atlas plate's own layout ─────────────────────────────────── */
-/* THE OLD PLATE WAS A HUGE NUMERAL BESIDE A SENTENCE and its `.sheettext`
-   was a two-column grid to hold them. This plate is a statement beside a
-   map, and that inherited grid split the head from its lede and set the
-   lede in a hundred-pixel column — two words a line, on the plate whose
-   subject is the whole continent. A layout inherited from a composition
-   that was removed is the expired-reason fault, in a grid. */
-.sheet-atlas { grid-template-columns: minmax(0, 32%) minmax(0, 1fr);
-               align-items: start; }
-.sheet-atlas .sheettext { grid-template-columns: 1fr; gap: var(--s5);
-                          align-content: start; }
-.atlasplate { grid-column: 2; }
-/* AND THE LIST IS THE FOOT OF THE PLATE, full width, in columns wide
-   enough for the names it holds. At five columns inside a 32% track
-   "North Macedonia", "United Kingdom" and "Bosnia and Herzegovina" each
-   broke across two lines and the columns collided — an index whose
-   entries do not fit its own measure, which is the exact fault the
-   comment above `.countrycols` already records once. `auto-fill` on a
-   real minimum lets the count follow the width instead. */
-.sheet-atlas .countrycols { grid-column: 1 / -1; columns: auto 11rem;
-  border-left: 0; border-top: 1px solid color-mix(in srgb, var(--bone) 22%, transparent);
-  padding-left: 0; padding-top: var(--s5); }
-.sheet-atlas .countrycols a { color: var(--bone); }
+/* ── journeys as rows ────────────────────────────────────────────── */
+.jrows { margin-top: var(--s7); border-top: 1px solid var(--rule); }
+.jr { display: grid; grid-template-columns: 13rem minmax(0, 1fr) auto;
+      gap: var(--s6); align-items: center; padding: var(--s5) 0;
+      border-bottom: 1px solid var(--rule); text-decoration: none; color: inherit; }
+.jr :is(picture, img) { display: block; width: 100%; aspect-ratio: 16 / 10;
+                        object-fit: cover; }
+.jr .jrname { display: block; font-family: var(--display); font-size: var(--t-2xl);
+              line-height: 1.12; }
+.jr .jrstops { display: block; font-family: var(--text); font-size: var(--t-sm);
+               color: var(--ink-3); margin-top: var(--s2); }
+.jr .jrgo { font-family: var(--text); font-size: var(--t-xs); letter-spacing: .14em;
+            text-transform: uppercase; color: var(--door); white-space: nowrap; }
+.jr:hover .jrname { color: var(--door); }
+
+/* ── the atlas, pale and precise ─────────────────────────────────── */
+/* THE MAP IS AN INSTRUMENT AND THIS ROOM DRAWS IT PALE. The graphite
+   version belongs to the dark world; on a white wall the same drawing
+   reads as an engraving, which is what "MAPS = precise" asks for. */
+.atlasplate { margin-top: var(--s7); }
+.atlasplate .constel { width: 100%; height: auto; display: block; max-height: 74vh; }
+.constel-atlas .glyph-sea { fill: none; }
+.constel-atlas .glyph-beyond { fill: var(--bone-2); }
+.constel-atlas .glyph-land { fill: var(--mineral); }
+.constel-atlas .glyph-bounds { fill: none; stroke: #b9b2a0; stroke-width: 1;
+                               vector-effect: non-scaling-stroke; }
+.constel-atlas .constel-lit circle { fill: var(--cobalt); r: 2.4; }
+.constel-atlas .mapcut { display: none; }
+.sheet-gal .countrycols { columns: auto 11rem; column-gap: var(--s6);
+  border-left: 0; border-top: 1px solid var(--rule); padding-left: 0;
+  padding-top: var(--s5); margin-top: var(--s6); }
+.sheet-gal .countrycols a { color: var(--ink-2); }
+
+/* ── stories, and the year ───────────────────────────────────────── */
+.strow { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s8);
+         margin-top: var(--s7); }
+.st1 { display: block; text-decoration: none; color: inherit; }
+.st1 :is(picture, img) { display: block; width: 100%; aspect-ratio: 4 / 3;
+                         object-fit: cover; }
+.st1 .stdesk { display: block; font-family: var(--text); font-size: var(--t-xs);
+  letter-spacing: .13em; text-transform: uppercase; color: var(--door);
+  margin-top: var(--s3); }
+.st1 .sttitle { display: block; font-family: var(--display); font-size: var(--t-2xl);
+  line-height: 1.12; margin-top: var(--s2); }
+.st1:hover .sttitle { color: var(--door); }
+.sheet-quiet { background: var(--bone); }
+.yearwrap { margin-top: var(--s7); min-width: 0; }
+
+/* ── the last room ───────────────────────────────────────────────── */
+.sheet-end { text-align: center; padding: 15vh var(--page-gutter); }
+.sheet-end .lede { margin: var(--s5) auto var(--s6); max-width: 42ch; }
+.sheet-end .sheettext { justify-items: center; }
 
 @media (max-width: 62rem) {
-  .sheet-atlas { grid-template-columns: 1fr; }
-  .atlasplate { grid-column: 1; }
+  .sheet-door .doorgrid { grid-template-columns: 1fr; }
+  /* FOUR TRACKS IN 358px IS 89px EACH, and DESTINATIONS is 104. The four
+     figures are still one set; two rows of two is the same set, read. */
+  .figrow { grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: var(--s5) var(--s4); }
+  .galgrid { grid-template-columns: repeat(2, 1fr); }
+  .strow { grid-template-columns: 1fr; }
+  .jr { grid-template-columns: 8rem minmax(0, 1fr); }
+  .jr .jrgo { display: none; }
 }
+@media (max-width: 44rem) {
+  .galgrid { grid-template-columns: 1fr 1fr; gap: var(--s4); }
+  .figrow { gap: var(--s5); }
+}
+
+.sheet-door.sheet-gal { position: relative; padding-bottom: 9vh; }

@@ -403,7 +403,15 @@ def measure():
                        "nothing on the page saying so — a selection wearing "
                        "the clothes of a set. Again no photograph was "
                        "acquired: three rows already in the register reach "
-                       "one more surface."},
+                       "one more surface. "
+                       "1143 -> 1145 WHEN THE HOMEPAGE'S GALLERY GREW BY "
+                       "TWO. The door's panel gave its photograph back to the "
+                       "window on plate 02 and the map took its place, and "
+                       "plate 03 went from four destinations to five — one "
+                       "per macro region, which is the rule the band already "
+                       "had and not a number anybody picked. Every one of "
+                       "those is a register row this library already holds; "
+                       "nothing was acquired for it."},
             # The homepage is the flagship page and the one most likely to
             # gain weight, because every good idea wants to live on it. It
             # already carried a 2.6x regression unnoticed: a commit that cut
@@ -455,7 +463,26 @@ def measure():
                        "whose brief is more photography paying five "
                        "kilobytes of markup for three more photographs is "
                        "the trade this ceiling exists to make visible rather "
-                       "than to forbid."},
+                       "than to forbid.\n"
+                       "  68 -> 152 THE HERO IS THE ATLAS AGAIN, at the "
+                       "owner's direction, and it is the expensive drawing "
+                       "rather than the cheap one. The door's right-hand "
+                       "panel held `constellation()` — 319 dots on a lod0 "
+                       "silhouette, about 12 KB — and a diagram is what that "
+                       "is: it says how many destinations there are and "
+                       "nothing about Europe. `heroeurope()` is the lod1 "
+                       "coastline thinned to 1.8 units, four hypsometric "
+                       "bands, rank-3 rivers and lakes, fifty country paths "
+                       "that are fifty links, the ground beyond the atlas and "
+                       "two fades over the data cuts: 42.6 + 25.3 + 9.5 + 6 "
+                       "KB, and the itemisation is in CLAUDE.md where it was "
+                       "written the first time this number moved for the same "
+                       "drawing. It is the single most expensive thing on the "
+                       "site and it is the one picture of Europe no competitor "
+                       "can reproduce — a licensed stock photograph is by "
+                       "definition a thing anyone can also license. The trade "
+                       "is stated rather than hidden, which is the whole job "
+                       "of a ceiling somebody has to raise in a diff."},
             "weight.max_page_kb": {
                 "value": round(max(len(b) for b in bodies.values()) / 1024),
                 "kind": "ceiling",
@@ -497,7 +524,16 @@ def measure():
                        "measured past both thresholds; see "
                        "docs/terrain-prototype.md. A floor rather than an "
                        "exact, because adding an Alpine destination should "
-                       "not need a ceremony — but losing them all should."},
+                       "not need a ceremony — but losing them all should. "
+                       "241 -> 242 WHEN THE HOMEPAGE DREW THE ATLAS AGAIN: "
+                       "the door's right-hand panel went from a dot "
+                       "constellation to `heroeurope()`, which carries the "
+                       "four bands, so the most-seen page on the site is the "
+                       "242nd. The credit follows the drawing rather than the "
+                       "request — `cartography.credited()` reads the rendered "
+                       "terrain markup — so the colophon at the foot of the "
+                       "page names GMTED2010 and ETOPO1 because the layer is "
+                       "there, not because a builder asked for it."},
             "signature.apertures": {
                 "value": sum(1 for b in bodies.values() if 'clip-path="url(#arch-' in b),
                 "kind": "floor",
