@@ -4973,6 +4973,17 @@ async function main() {
             widths: [...new Set(t.map((x) => Math.round(box(x).width)))],
             imgH: [...new Set(t.map((x) => Math.round(box(x.querySelector("img")).height)))],
             nameTops: [...new Set(t.map((x) => Math.round(box(x.querySelector(".qname")).top)))],
+            // THE NUMBER OF ROWS IS THE GRID'S ANSWER, NOT THIS CHECK'S. It
+            // used to be `ceil(n / 8)`, which was the same hard-coded eight
+            // the builder carried — so when the row stopped showing eight of
+            // eleven and the grid became `auto-fill`, this went red for a
+            // page that had got better. Twelfth assertion here to pin a
+            // shape rather than a promise. The promise is that a name too
+            // wide for its track does not push its own tile down, which is
+            // exactly "the names in a row share a baseline" — so the rows
+            // are counted from the PICTURES, which cannot go ragged, and the
+            // baselines are compared against that.
+            picTops: [...new Set(t.map((x) => Math.round(box(x.querySelector("img")).top)))],
             sizes: [...new Set(t.map((x) =>
               Math.round(parseFloat(getComputedStyle(x.querySelector(".qname")).fontSize))))],
           };
@@ -4992,14 +5003,15 @@ async function main() {
          `(${st.imgH.join(", ")}px). Every tile is one slot in one row, whatever ` +
          `the library happens to hold`);
       checked++;
-      ok(st.nameTops.length <= Math.ceil(st.n / 8),
-         `with ${st.n} photographs the names sit on ${st.nameTops.length} baselines ` +
-         `(${st.nameTops.join(", ")}) across ${Math.ceil(st.n / 8)} row(s) — a name ` +
-         `too wide for its track pushes its own tile down and the row goes ragged`);
+      ok(st.nameTops.length === st.picTops.length,
+         `with ${st.n} photographs the pictures sit on ${st.picTops.length} row(s) ` +
+         `(${st.picTops.join(", ")}) and the names on ${st.nameTops.length} baselines ` +
+         `(${st.nameTops.join(", ")}) — a name too wide for its track pushes its own ` +
+         `tile down and the row goes ragged`);
       checked++;
       ok(st.sizes.length === 1,
          `with ${st.n} photographs the names carry ${st.sizes.length} sizes ` +
-         `(${st.sizes.join(", ")}px). Eight things a reader compares have one size`);
+         `(${st.sizes.join(", ")}px). Things a reader compares have one size`);
     }
   }
 
