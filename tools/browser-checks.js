@@ -5384,48 +5384,158 @@ async function main() {
    * source frame is guaranteed visible, and the four doors 14%. An
    * off-centre composition is unusable in either.
    */
+  /* AND THE LIST OF SURFACES IS DERIVED, BECAUSE A TYPED ONE WENT ON
+   * REPORTING GREEN ABOUT SIX SURFACES OUT OF SEVEN.
+   *
+   * The list was three entries typed by hand. Two of the three named an
+   * element the site no longer has: `.way`, which left when the four
+   * homepage doors became the plate sequence, and `.herofull`, which left
+   * in the same commit — `homepage-hero` renders inside `.opening` on
+   * plate 01. A selector that matches nothing has no aspect ratio, so `lo`
+   * stayed Infinity and `hi` stayed -Infinity, and `Infinity >= min` and
+   * `-Infinity <= max` are BOTH true: two green assertions per run, about
+   * nothing, for the life of the plate sequence.
+   *
+   * That is this repository's own recorded failure twice over — the check
+   * matching `pointsmap arched"><svg` that examined 0 dots on a site with
+   * 130 region maps, and the one-plate-per-thing check that read zero once
+   * the last abstract plate came off. Both were found by READING THE COLUMN
+   * OF COUNTS, which does not exist here: `ok()` counts an assertion made,
+   * and an assertion about an empty set counts exactly like one about a
+   * page.
+   *
+   * THE THIRD ENTRY WAS WORSE THAN THE TWO THAT MATCHED NOTHING, BECAUSE IT
+   * MATCHED AND MEASURED THE WRONG STATE. `.iheroart` holds the drawing
+   * until a photograph replaces it, and the check added `.shot` — the class
+   * the build adds — WITHOUT taking the drawing out. Measured both ways at
+   * twenty viewports:
+   *
+   *     .iheroart with the drawing in it    1.333 – 1.500
+   *     .iheroart with a photograph in it   0.692 – 1.500
+   *
+   * so the declared floor of 1.333 was a fact about the page as it is and
+   * not about the page a photograph makes, and the guaranteed frame it
+   * produced — 55% — was nearly double the real 29%. *A code path nothing
+   * exercises is a code path nothing checks*, about the one measurement
+   * whose entire subject is a state the register has never been in.
+   *
+   * So: the SET comes from the declarations, and the SIMULATION is the
+   * whole substitution rather than half of it — the drawing and any empty
+   * slot come out, a picture goes in, and `.shot` goes on. Surfaces are
+   * grouped by SELECTOR, because a crop box is a property of a component
+   * rather than of a page: `.iheroart.shot` exists on /journeys and not yet
+   * on /experiences or /stories, whose openings render no figure at all
+   * until a photograph exists, and measuring the component once is the only
+   * way to say anything true about either. Each group asserts its own
+   * REACH, so a selector that matches nothing on any of its pages fails and
+   * names them instead of satisfying both bounds by having no value. */
   {
     const purposes = JSON.parse(fs.readFileSync(
       path.join(__dirname, "..", "data", "image-purposes.json"), "utf8")).purposes;
-    const BOX = [
-      { url: "/", sel: ".herofull", drop: ".heroeurope", of: "homepage-hero" },
-      { url: "/", sel: ".way", drop: null, of: "door-mountains" },
-      { url: "/journeys/", sel: ".iheroart", drop: null, of: "journeys-hero" },
-    ];
+    /* the registry is where a surface's PATH is declared, and it is
+     * generated and stale-checked; a second copy typed here is the fault
+     * above in a different field. */
+    const regrows = JSON.parse(fs.readFileSync(
+      path.join(__dirname, "..", "desk", "registry.json"), "utf8")).purposes;
+    const pathOf = new Map(regrows.map((r) => [r.purpose, r.path]));
+    const groups = new Map();
+    for (const [of_, v] of Object.entries(purposes)) {
+      const con = v.container;
+      if (!con || !con.selector || con.unmeasurable) continue;
+      const sel = con.selector.replace(/\.shot\b/g, "").trim();
+      if (!groups.has(sel)) groups.set(sel, { sel, want: con, of: [], urls: [] });
+      const g = groups.get(sel);
+      g.of.push(of_);
+      const u = pathOf.get(of_);
+      if (u && !g.urls.includes(u)) g.urls.push(u);
+      /* TWO PURPOSES ON ONE COMPONENT MAY NOT DECLARE TWO BOXES. One
+       * measurement is about to be compared with both, so a disagreement
+       * here is a claim this check would otherwise silently pick a side in. */
+      ok(g.want.min_aspect === con.min_aspect
+         && g.want.max_aspect === con.max_aspect,
+         `${of_} and ${g.of[0]} both declare the container ${sel} and give it `
+         + `different boxes (${con.min_aspect}-${con.max_aspect} against `
+         + `${g.want.min_aspect}-${g.want.max_aspect}). A crop box is a `
+         + `property of the component, so one of the two is wrong`);
+    }
+    ok(groups.size > 0,
+       "no purpose in data/image-purposes.json declares a measurable "
+       + "container, so the crop-box measurement has nothing to measure and "
+       + "the safe-area arithmetic in checks.py is unchecked against the "
+       + "real page");
     const WS = [320, 390, 480, 760, 834, 980, 1280, 1440, 1800, 2000];
     const HS = [640, 900];
-    for (const b of BOX) {
-      const want = purposes[b.of] && purposes[b.of].container;
-      if (!want) { ok(false, `${b.of} declares no container`); continue; }
+    for (const g of groups.values()) {
+      ok(g.urls.length > 0,
+         `${g.of.join(", ")} declare the container ${g.sel} and `
+         + `desk/registry.json gives none of them a path, so there is no `
+         + `page on which to measure the box`);
+      if (!g.urls.length) continue;
       let lo = Infinity, hi = -Infinity, loAt = "", hiAt = "";
-      for (const w of WS) for (const h of HS) {
+      let boxes = 0, loaded = 0;
+      for (const url of g.urls) for (const w of WS) for (const h of HS) {
         const bp = await browser.newPage({ viewport: { width: w, height: h } });
-        const r = await bp.goto(base + b.url, { waitUntil: "load" });
+        const r = await bp.goto(base + url, { waitUntil: "load" });
         if (!r || r.status() !== 200) { await bp.close(); continue; }
-        await bp.evaluate(([sel, drop]) => {
-          if (drop) for (const e of document.querySelectorAll(drop)) e.remove();
-          for (const e of document.querySelectorAll(sel)) e.classList.add("shot");
-        }, [b.sel, b.drop]);
+        loaded++;
+        /* THE SUBSTITUTION IS THE WHOLE ONE. `.shot` is the class the build
+         * adds; the drawing and the empty slot are what a photograph
+         * REPLACES, and a box measured around either is a box no photograph
+         * will ever be in. The stand-in carries real dimensions so the
+         * figure is not laid out as a broken image — measured with and
+         * without a loading source, the numbers are identical, and the one
+         * that cannot be argued with is the one that loads. */
+        await bp.evaluate((sel) => {
+          for (const e of document.querySelectorAll(sel)) {
+            e.classList.add("shot");
+            for (const k of e.querySelectorAll(".ed-slot, svg, .constel")) k.remove();
+            if (!e.querySelector("picture")) {
+              const pic = document.createElement("picture");
+              const img = document.createElement("img");
+              img.width = 2000; img.height = 1200; img.alt = "";
+              img.src = "data:image/svg+xml;charset=utf8," + encodeURIComponent(
+                '<svg xmlns="http://www.w3.org/2000/svg" width="2000" '
+                + 'height="1200"><rect width="2000" height="1200" '
+                + 'fill="#888"/></svg>');
+              pic.appendChild(img);
+              e.appendChild(pic);
+            }
+          }
+        }, g.sel);
         const got = await bp.evaluate((sel) => [...document.querySelectorAll(sel)]
           .map((e) => e.getBoundingClientRect())
           .filter((r) => r.width > 4 && r.height > 4)
-          .map((r) => r.width / r.height), b.sel);
+          .map((r) => r.width / r.height), g.sel);
         await bp.close();
+        boxes += got.length;
         for (const a of got) {
           if (a < lo) { lo = a; loAt = `${w}x${h}`; }
           if (a > hi) { hi = a; hiAt = `${w}x${h}`; }
         }
       }
-      checked++;
+      /* THE REACH FIRST, because both bounds below are satisfied by an
+       * empty set and neither says so. The message carries the numbers that
+       * separate the three ways this fails — the pages did not load, they
+       * loaded and the selector matched nothing, or it matched something
+       * too small to be a picture. */
+      const want = g.want;
+      ok(boxes > 0,
+         `${g.of.join(", ")}: the container ${g.sel} matched no box larger `
+         + `than 4px on ${g.urls.join(", ")} at any of `
+         + `${g.urls.length * WS.length * HS.length} viewports (${loaded} `
+         + `loaded). Its declared box is being asserted against nothing: an `
+         + `empty set satisfies the floor and the ceiling at once, because `
+         + `Infinity >= ${want.min_aspect} and -Infinity <= `
+         + `${want.max_aspect} are both true`);
+      if (boxes === 0) continue;
       ok(lo >= want.min_aspect - 0.02,
-         `${b.of}: the container measures ${lo.toFixed(3)} at ${loAt} and the ` +
-         `file declares a floor of ${want.min_aspect}. A box narrower than ` +
-         `declared crops more width than the safe area allows`);
-      checked++;
+         `${g.of.join(", ")}: the container measures ${lo.toFixed(3)} at ` +
+         `${loAt} and the file declares a floor of ${want.min_aspect}. A box ` +
+         `narrower than declared crops more width than the safe area allows`);
       ok(hi <= want.max_aspect + 0.02,
-         `${b.of}: the container measures ${hi.toFixed(3)} at ${hiAt} and the ` +
-         `file declares a ceiling of ${want.max_aspect}. A box wider than ` +
-         `declared crops more height than the safe area allows`);
+         `${g.of.join(", ")}: the container measures ${hi.toFixed(3)} at ` +
+         `${hiAt} and the file declares a ceiling of ${want.max_aspect}. A ` +
+         `box wider than declared crops more height than the safe area allows`);
     }
   }
 

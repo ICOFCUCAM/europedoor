@@ -4265,6 +4265,100 @@ remote. `fill` had the right order all along. The scan goes in front of the
 push in both.
 
 
+**THE CROP-BOX MEASUREMENT WAS ASSERTING NOTHING ABOUT SIX OF ITS SEVEN
+SURFACES, AND THE SEVENTH WAS MEASURING A STATE A PHOTOGRAPH REMOVES.**
+`checks.py` owns the safe-area arithmetic and `browser-checks.js` owns the
+measurement, and the comment on each says the other exists so that *neither
+can drift without the other noticing*. The measuring end had a list of three
+entries typed by hand, and it had drifted on all three.
+
+Two named elements the site no longer has. `.way` left when the four
+homepage doors became the plate sequence; `.herofull` left in the same
+commit, and `homepage-hero` renders inside `.opening` on plate 01. **A
+selector that matches nothing has no aspect ratio**, so `lo` stayed
+`Infinity` and `hi` stayed `-Infinity` — and `Infinity >= min_aspect` and
+`-Infinity <= max_aspect` are BOTH true. Two green assertions per run, about
+nothing, for the life of the plate sequence.
+
+That is this repository's own recorded failure twice over: the check matching
+`pointsmap arched"><svg` that examined 0 dots on a site with 130 region maps,
+and `c_one_plate_per_thing` reading zero once the last abstract plate came
+off. Both of those were caught by **reading the column of counts**, which
+does not exist here — `ok()` counts an assertion MADE, and an assertion about
+an empty set counts exactly like one about a page.
+
+**AND THE THIRD ENTRY WAS WORSE THAN THE TWO THAT MATCHED NOTHING, BECAUSE IT
+MATCHED AND MEASURED THE WRONG STATE.** `.iheroart` holds the drawing until a
+photograph replaces it. The check added `.shot` — the class the build adds —
+and left the drawing where it was, so it measured the box with the thing a
+photograph removes still inside it:
+
+| `.iheroart` at twenty viewports | | |
+|---|---|---|
+| with the drawing in it | 1.333 – 1.500 | what was declared |
+| with a photograph in it | 0.692 – 1.500 | what a photograph gets |
+
+So the declared floor was a fact about the page as it is rather than the page
+a photograph makes, and the guaranteed frame it produced — **55%** — was
+nearly double the real **29%**. *A code path nothing exercises is a code path
+nothing checks*, about the one measurement whose entire subject is a state the
+register has never been in. The simulation is the whole substitution now: the
+drawing and any empty slot come out, a picture goes in, `.shot` goes on.
+
+**THE SET IS DERIVED AND THE GROUPING IS BY COMPONENT.** Every purpose that
+declares a container is measured, on the path `desk/registry.json` gives it,
+so a purpose deleted with its surface leaves no entry behind and a new one is
+measured the day it is declared. Surfaces group by SELECTOR because **a crop
+box is a property of a component rather than of a page** — `.iheroart.shot`
+exists on `/journeys` and not yet on `/experiences` or `/stories`, whose
+openings render no figure at all until a photograph exists, and measuring the
+component once is the only way to say anything true about either. Two
+purposes on one component may not declare two boxes, which is asserted rather
+than silently picked between. Each group asserts its own REACH.
+
+Re-measured, and three of the seven had moved to a different component
+entirely — `events`, `countries` and `interests` went from `indexhero()` to
+`ed_opening()` and their container is `.ed-opening-visual`:
+
+| | container | frame |
+|---|---|---|
+| homepage-hero | `.opening` 0.615 – 2.801 | 15% → **17%** |
+| journeys / experiences / stories | `.iheroart.shot` 0.692 – 1.500 | 55% → **29%** |
+| events / countries / interests | `.ed-opening-visual` 0.692 – 1.643 | 55% → **26%** |
+
+All three clear the 12% floor, so nothing about the design has to change —
+what changes is that the numbers are now about boxes that exist.
+
+**AND THE TEMPLATED SLOTS ARE THE SAME FAULT AT A HUNDRED TIMES THE SCALE,
+WHICH IS THE NEXT COMMIT RATHER THAN THIS ONE.** `checks.py` computes a safe
+area for the ten `slots` as well, and the typed list never held one of them,
+so not one has ever been measured. Seven declare `.pageband`, which the built site does not
+contain at all — `grep -rlo 'class="pageband' site --include=index.html | wc -l`
+is zero — and two declare `.card-art.frame`, where
+`grep -rho 'class="card-art[^"]*"' site --include=index.html | sort -u`
+returns `class="card-art card-map"` and nothing else. The eleven licensed
+theme photographs render in `.ed-opening-visual > figure.headshot` and their
+declared box describes a component that was removed. It is recorded here
+rather than fixed in the same commit because it needs its own measurement
+pass over nine families, and because a check that reports a known gap without
+failing is a gate people stop running.
+
+**AND THE SISTER SUITE'S FIXTURES WERE A SECOND DECLARATION OF WHICH PURPOSES
+EXIST.** `tools/hosted-desk-tests.js` named `door-coast` and `door-food` in
+four tests, and both purposes were deleted with the doors. `specOf()` then
+refused them at entry ONE — so the assertions about entry TWO, about a
+surface ticked twice, and about one photograph on two surfaces were every one
+pre-empted by a refusal none of them was written for. **A suite whose subject
+is the batch boundary stopped reaching the batch boundary**, and reported four
+honest failures naming the wrong thing. `photo-tests.py` had the identical
+fixtures and was repaired in the commit that deleted the purposes; this file
+was not looked at — *a rule stated once and applied to one of its call sites*,
+in the commit that wrote that sentence down. The two fixtures come out of
+`desk/registry.json` now, which is the same document `specOf()` consults, is
+generated, and fails CI when stale.
+
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
