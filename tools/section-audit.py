@@ -89,6 +89,14 @@ def doc_covers(doc, *needles):
     return (not missing, f"{doc} missing {missing}" if missing else f"recorded in {doc}")
 
 
+# A rate a reader could act on: a number against a night, or a "from" price.
+# Never the bare word — see the call site in §13 for what that cost.
+NIGHTLY_RATE = re.compile(
+    r"\d[\d,.]*\s*(?:/|per\s+)\s*night\b"     # 120/night, 120 per night
+    r"|\bfrom\s*[\u20ac$\u00a3]\s?\d",             # From €120
+    re.I)
+
+
 def every_page(pred, label="the rule"):
     bad = [f for f in ALL_HTML if not pred(open(f, encoding="utf-8").read())]
     return (not bad, f"{len(bad)} pages fail: {label} (e.g. {os.path.relpath(bad[0], OUT) if bad else ''})")
@@ -512,7 +520,24 @@ def s13():
     yield ("earns nothing" in page(ex) or "may earn a commission" in page(ex)), \
         "the disclosure is present in whichever state the credential puts us in"
     # And the whole point: no invented inventory reached the page.
-    yield every_page(lambda h: "From \u20ac" not in h and "/night" not in h), \
+    # A NIGHTLY RATE IS A NUMBER AND A WORD, NOT A SUBSTRING. This read
+    # `"/night" not in h`, which is the `cell` caught `cellar` failure in a
+    # different file: run 39 acquired sixty photographs, passed everything
+    # else, and died here on eight pages because the Paris photograph's
+    # credit links to
+    # `pexels.com/photo/nighttime-cityscape-of-modern-parisian-skyline-.../`
+    # and "nighttime" begins with "night". The assertion was right about the
+    # promise and wrong about how to test it — and it had only ever read
+    # pages carrying no photograph credit, so nothing could have found it
+    # until a photographer wrote the word.
+    #
+    # What the section actually promises is that no invented inventory
+    # reached the page, so the test is a RATE: a number against a night, or
+    # a "from" price. The word boundary is the same repair `matches_sub`
+    # made for its own stems — `night\b` cannot match `nighttime` — and the
+    # digit is what makes it a price rather than a mention of the dark.
+    yield every_page(lambda h: not NIGHTLY_RATE.search(h),
+                     "no page prints a nightly rate"), \
         "no page prints a nightly rate"
     yield "minimap" in page(u), "the destination carries a map"
     # The composition itself, asserted: the authored sentence is the hero and
