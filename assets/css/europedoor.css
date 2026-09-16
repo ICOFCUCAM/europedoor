@@ -4623,7 +4623,25 @@ body[data-hero] .masthead { position: sticky; }
  * it is; a generated horizon shown silently next to real geography invites
  * a reader to take it for a photograph. */
 .placeband { margin: var(--s8) 0 0; display: grid; gap: var(--s4); }
-.placeband-art .plate, .placeband-art picture { display: block; width: 100%;
+/* NO `display` HERE, AND NO `.plate` EITHER — the sixth dead `display` on a
+   photograph container, and the first found in a rule that a LATER one had
+   quietly taken over. `.ed-arrival-media :is(picture, img)` sets the same
+   property four thousand lines further down and wins, because the 2036
+   arrival band now wraps this figure: the declaration was not written wrong,
+   it was superseded by a composition that arrived after it. Removing it
+   leaves the computed value at `block`, which is what makes it redundant
+   rather than unreachable.
+   The `.plate` half went for the other reason. The band used to be
+   [generated plate | map] and the illustration was removed — `pages.py` says
+   so where it composes this — so that selector has matched nothing since:
+   `grep -rho 'class="placeband-art"><[a-z]*' site --include=index.html`
+   returns `picture` sixteen times and a plate never. The dead-rule scan
+   cannot see it, because a comma-joined selector is kept alive by whichever
+   half still matches.
+   Measured on Dürnstein, Vienna and Hallstatt at 1280 and 390, with the
+   declaration and without: byte-identical, the figure, the picture and the
+   image all unmoved. */
+.placeband-art picture { width: 100%;
   height: 100%; object-fit: cover; border-radius: var(--radius); }
 .placeband-art { aspect-ratio: 16 / 9; overflow: hidden; border-radius: var(--radius); }
 .placeband-map .minimap { margin: 0; }
@@ -7732,7 +7750,15 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .openingsay { display: grid; gap: var(--s4); justify-items: start; min-width: 0; }
 .openingsay .statement { margin: 0; }
 .headshot { margin: 0; position: relative; }
-.headshot picture { display: block; }
+/* `.headshot picture { display: block }` was removed unprompted, which is the
+   only one of these six that was not found by a failing gate. It is the same
+   redundancy as the rule above and as the global `picture` rule's own
+   comment: the `<img>` below carries the layout and is already blockified, so
+   the wrapper's display decides nothing. Measured across both families it
+   renders in — three theme pages and three country pages, at 1280 and at
+   390 — byte-identical every time, on all thirty pages it matches. Left
+   alone it would have failed the run that put a photograph on whichever
+   theme page the dead-rule scan reads. */
 .headshot img { width: 100%; height: 100%; object-fit: cover; display: block;
                 aspect-ratio: 4 / 3; }
 @media (min-width: 60rem) {
