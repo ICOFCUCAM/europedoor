@@ -4617,6 +4617,99 @@ rebuilt. A comment claiming an assertion that does not exist is worse than no
 comment, because it is read as evidence.
 
 
+**A ROOM WHOSE GROUND IS WHITE IN BOTH PREFERENCES NEEDS INK THAT IS DARK IN
+BOTH, AND TWO OF THEM TOOK `--ink`.** The gallery wall is `--white` whatever
+the system is set to, and `--ink` is bone in the dark preference — so the
+homepage's own `<h1>Open the door to Europe.</h1>` measured **1.14:1** for a
+reader whose system is dark, and `Europe is not a checklist.` on the next
+plate measured the same. The h2 and the lede were saved **by accident**, by
+`.sheet-gal .mega { color: var(--ink) }` resolving to the same wrong value
+they had already inherited — which is exactly why the dead-rule scan kept
+reporting those two colour rules as changing nothing. **They were redundant
+in the light preference and the only thing standing between the dark one and
+this defect, and they were not enough.** `.sheet-paper` on /discover has done
+it correctly since it was written: a band binds the eleven tokens rather than
+naming `--ink`, because a `var()` resolves where the DECLARATION lives.
+1.14 → 18.04, and the redundant rules went with the fix rather than before it.
+
+**THE LIVING ATLAS SEQUENCE WAS BUILT, MEASURED AND REMOVED.**
+`heroeurope()`'s own comment said the first frame of each featured country
+carries `href` and *"the others carry `data-href` and are fetched by the
+ENHANCEMENT the first time they are shown"*. There is no enhancement: this
+page's only `<script>` is the inert JSON-LD block, so the held-back frames
+were never fetched and never shown, and `.herophoto image { opacity: 0 }`
+read as a dead rule for the right reason — the only elements it applied to
+had no `href` to draw. That is the `data-rotate` failure, found this time by
+an instrument rather than by reading.
+
+**Writing the rotator was costed and refused on the numbers.** The sequence
+is a country's own photograph followed by its photographed DESTINATIONS, and
+the register holds destination photographs inside exactly ONE of the six
+featured countries — France has four frames and the other five have one
+each. An enhancement would put the first JavaScript on the homepage to
+cross-fade one country, which is the trade the nine restraint marks were
+removed over. The trigger is the library: when several featured countries
+hold photographed destinations it is about forty lines and two lines of
+markup.
+
+**THE PICTURE IS BOUNDED AND THE WINDOW IS NOT, SO NINETY PIXELS OF WALL
+SHOWED THROUGH THE OPENING.** Plate 03's photograph is capped at 16/9 of the
+viewport width — deliberately, because a viewport-filling slot guaranteed 9%
+of a photograph's frame at some window shapes against 35.5% for this one — so
+at 1280×900 it is 1280×720 inside an aperture 900 tall on screen, with the
+band's white above and below it, and at 390 a 4:5 picture in an 844-tall
+window. Filling the viewport puts the crop box back to 9%, which is a licence
+cost rather than a layout one. **The opening paints its own ground instead:
+light wall, dark opening, and what a gallery does with a picture smaller than
+its frame is MOUNT it.** The assertion moved with it — *the picture fills the
+window* was true while it was `inset: 0` and stopped being true the moment
+the crop box was measured, so what is held now is that the gap is the
+OPENING's ground and not the wall's, measured as the step between the two.
+
+**A CLASS NAME ALREADY IN THE STYLESHEET IS A RULE YOU INHERIT SILENTLY, AND
+THE STYLESHEET HELD 85 IDENTICAL DUPLICATED RULES.** `.doorgo` is the first
+half: it belongs to the homepage's four doors, which reveal their go-link on
+hover at `opacity: 0`, so two links closing /experiences were present,
+placed, sized, keyboard-reachable and painted at zero alpha — and
+`getComputedStyle` reads `opacity: 1` ON the link, because the zero is two
+elements up. The browser suite now focuses every link on every family and
+asks `checkVisibility({ checkOpacity: true })`; it focuses FIRST, because a
+hover-revealed link is a pattern this site ships and every one of those
+reveals on `:focus-visible` too.
+
+The second half is the mechanism behind three defects in one session: a
+selector declared twice with an identical body, where the later copy wins and
+the earlier is invisible. 85 of them. **Removing the EARLIER copy is a
+cascade no-op by construction** — the later still applies and everything
+between them loses to it exactly as before — and it was proved rather than
+argued: sixteen pages shot at 1280 and 390 before and after, 32 of 32
+byte-identical.
+
+**AND THE DEAD-RULE SCAN NAMES DECLARATIONS RATHER THAN RULES.** It reported
+`.featlead {display,color}` and the first deletion pass removed the whole
+rule, taking `text-decoration: none` with it — the homepage's two story links
+came back underlined at both widths. The before-and-after screenshots are the
+only reason that is a sentence here rather than a defect.
+
+**FIVE ASSERTIONS WERE READING NOTHING, AND BOTH WERE FOUND THE SAME WAY.**
+`.sheet-landscape` does not exist — the window plate was renamed
+`.sheet-bleed` — so four contrast assertions and the one that proves the
+picture stands still while the page scrolls had been dark since the rename.
+And `.qtile`, the homepage's row of theme photographs, appears on ZERO pages
+and in no page builder: its check has been printing *"it examined 0 states"*
+since the homepage became the plate sequence — its own guard working, and
+nobody reading the number — and its five stylesheet rules sat in the file the
+whole time. **A count is only evidence if somebody reads it**, which this file
+already says, about a different check, for the same reason. The check moved
+to /discover's `.moswrap`, which is the same promise in a stronger form.
+
+**AND A COMMENT CLAIMED AN ASSERTION THAT DOES NOT EXIST.** Beside the white
+wall: *"`checks.py` asserts that no OTHER page takes it"*. There is no such
+check in that file or in any other suite, and /discover has taken `--white`
+for its three rests since it was rebuilt with nothing going red. A comment
+claiming evidence is read as evidence.
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
