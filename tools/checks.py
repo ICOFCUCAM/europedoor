@@ -3181,6 +3181,44 @@ def c_status_page():
     return 3
 
 
+@check("no page ships map geometry it never draws")
+def c_unused_geometry():
+    """`constel_defs()` inlines the shared silhouette once so every drawing on
+    a page can `<use>` it. A page that emits it and clones it zero times is
+    shipping the continent as dead weight.
+
+    THIS HAS HAPPENED TWICE AND ONLY ONE OF THEM WAS CAUGHT. /experiences was
+    emitting the silhouette with nothing using it — 13,791 bytes, a third of
+    the page — and the coastline-credit check found it, because that check
+    asks whether a page DRAWING land credits its source. The inverse has no
+    subject: a page that draws nothing is a page that check is silent about.
+    So /themes shipped **18,812 bytes, 37% of the document**, from the commit
+    where thirteen licensed photographs replaced the thirteen drawings and
+    the defs were left behind.
+
+    The count is the number of clones, not the number of bytes, because the
+    fault is *nothing uses this* rather than *this is large*.
+    """
+    n = 0
+    for f in site_files():
+        body = open(f, encoding="utf-8").read()
+        if 'class="constel-defs"' not in body:
+            continue
+        n += 1
+        uses = body.count("#constel-eu") + body.count("#constel-beyond")
+        if uses == 0:
+            i = body.find('<svg class="constel-defs"')
+            j = body.find("</svg>", i)
+            cost = (j - i) if j > i else 0
+            fail(f"{rel(f)} inlines the shared silhouette ({cost:,} bytes, "
+                 f"{round(100.0 * cost / max(1, len(body)))}% of the page) and "
+                 f"clones it zero times")
+    if n == 0:
+        fail("no page emits constel-defs at all — this check has stopped "
+             "finding the thing it is about")
+    return n
+
+
 @check("a promise about every destination page is kept by every destination page")
 def c_kept_promises():
     """/beyond-the-obvious names what this site will say instead of calling a

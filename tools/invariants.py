@@ -523,7 +523,8 @@ def measure():
                 "value": round(len(next(b for k, b in bodies.items()
                                        if os.path.relpath(k, OUT) == "index.html")) / 1024),
                 "kind": "ceiling",
-                "why": "57 -> 68 FOR THE EIGHT-PLATE REBUILD, and eleven KB "
+                "why": "AND 147 -> 129 WHEN THE HOMEPAGE STOPPED SHIPPING A CONTINENT IT NEVER DREW. `constel_defs()` inlines one thinned lod0 silhouette so that thirteen glyphs cost ONE coastline, and the homepage referenced neither id it provides — it draws its hero from `#heroland` and its own `#lz-*` rings. 18,806 bytes, 12% of the most-visited page on the site, for the life of the plate sequence. Sixteen pages had it: /themes at 37%, /experiences, /plan, nine macro pages and three motion pages, about 301 KB in all. Nineteen call sites emit the defs and TWO of them guard the call, which is the fourteen-call-sites-forgot-the-motif shape exactly — so the strip is in `page()`, where a caller cannot get half of it right because a caller no longer does any of it, and `c_unused_geometry` fails on any page that emits the block and clones it zero times. A ceiling going DOWN is a saving being locked in: this number exists because a page once shipped 90 KB of coastline under a map and every gate stayed green. "
+                       "57 -> 68 FOR THE EIGHT-PLATE REBUILD, and eleven KB "
                        "of it is one drawing. The graphite atlas plate puts "
                        "the real continent and all 319 destinations on the "
                        "page, which is the band's whole argument — the map "

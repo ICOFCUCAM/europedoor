@@ -1457,6 +1457,29 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
         raise ValueError(f"{path}: unknown world {world!r}; it is one of {WORLDS}")
     if accent not in ACCENTS:
         raise ValueError(f"{path}: unknown accent {accent!r}; it is one of {ACCENTS}")
+    # SIXTEEN PAGES SHIPPED THE CONTINENT AND CLONED IT ZERO TIMES.
+    #
+    # `constel_defs()` inlines one thinned lod0 silhouette so that thirteen
+    # theme glyphs cost ONE coastline. Nineteen call sites emit it and TWO of
+    # them guard the call — `if facetart`, `if qshown` — which is the
+    # fourteen-call-sites-forgot-the-motif shape exactly: two callers proving
+    # the guard is needed while seventeen do not have it. Measured on the
+    # built site, 18,806 bytes each on the homepage (12% of it), /themes
+    # (37%), /experiences, /plan, nine macro pages and three motion pages —
+    # about 301 KB of geometry nobody draws, on a site where page weight is
+    # an invariant BECAUSE a page once shipped 90 KB of coastline under a map
+    # and every gate stayed green.
+    #
+    # The strip is here rather than at the call sites for the reason `plate()`
+    # takes its own transform: a caller cannot get half of it right, because a
+    # caller no longer does any of it. It is a pure subtraction — the block is
+    # `<svg class="constel-defs" width="0" height="0">`, paints nothing, and
+    # is removed only when the document references neither id it provides.
+    if 'class="constel-defs"' in body and "#constel-eu" not in body \
+            and "#constel-beyond" not in body:
+        i = body.index('<svg class="constel-defs"')
+        j = body.index("</svg>", i) + len("</svg>")
+        body = body[:i] + body[j:]
     # A LINK THE THUMB BAR ALSO CARRIES IS MARKED, and the set is derived
     # from BOTTOM_NAV rather than typed here, because a hand-listed copy of
     # another list is a list that is wrong one commit after somebody edits
