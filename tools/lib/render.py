@@ -751,6 +751,37 @@ def photo(images, key, *, w, h, alt="", eager=False, sizes="100vw"):
                    eager=eager, sizes=sizes)
 
 
+def photo_href(images, key, width):
+    """One derivative's URL, for a surface that cannot hold a <picture>.
+
+    `picture()` is the only way a photograph reaches an HTML page and that
+    stays true: it emits the whole ladder, the focal anchor and the credit
+    the licence requires. An SVG `<image>` can hold none of those — it is a
+    single href — so the Living Atlas, which clips a photograph to a
+    country's own boundary, needs the URL on its own.
+
+    IT TAKES A REGISTER KEY AND NEVER A URL, which is the whole point. The
+    row is looked up here, exactly as `picture()` looks it up, so a caller
+    cannot name a file the register does not hold — the rule that stopped
+    `ed_photo` taking a `src` and becoming a second way into the library
+    with none of the licence gate behind it. An unknown key returns "" and
+    the caller draws nothing, which is the same answer `picture()` gives by
+    falling back.
+
+    JPEG rather than the AVIF the ladder leads with: `<image>` has no
+    `<source>` and therefore no negotiation, so the one format every
+    browser that renders SVG can decode is the honest choice. The step is
+    the nearest one at or above the width asked for, and the name carries
+    the original's hash, so the URL cannot change without the photograph
+    changing — which is what the immutable header on /assets/ promises.
+    """
+    row = (images or {}).get(key)
+    if not row:
+        return ""
+    step = min((n for n in IMAGE_WIDTHS if n >= width), default=max(IMAGE_WIDTHS))
+    return f"{IMAGE_HOST}/assets/img/{row['file']}.{row['version']}-{step}.jpg"
+
+
 def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed=None,
             fallback_motif=None, credit=True):
     """A photograph for `key` if we hold one, otherwise a generated plate.

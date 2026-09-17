@@ -22,7 +22,7 @@ from .render import (LD_PUBLISHER, ORIGIN, SITE_NAME, SITE_TAGLINE, arch_rim, ca
                      page, photo, picture, plate, section, arch_clip, arch_edge,
                      ed_opening, ed_photo, ed_rows, ed_section_head, ed_split,
                      ed_bleed, ed_declare, ed_feature, ed_mosaic, ed_strip, held,
-                     ed_slot)
+                     ed_slot, photo_href)
 from .score import city_scores, country_scores, discoverability
 
 HOME = ("Europe", "/discover")
@@ -443,7 +443,236 @@ def cut_fade(idprefix, w, h, reach=None, cls="mapcut", top=1.0):
     )
 
 
-def heroeurope(data):
+# ONE PATTERN FOR THE LAND MARKUP, AND THERE WERE TWO.
+#
+# `geo.landmass()` emits a country as `<path … d="…"><title>Name</title>`,
+# and the hero reads that back twice — once to build `NameGround`, which is
+# every country's real polygon, and once to order the names by drawn area.
+# Both were written as the literal `<path d="…">`, and the day the land
+# paths gained an `id` so the Living Atlas could clip a photograph to a
+# country with a `<use>` rather than a second copy of its ring, one of them
+# was widened and the other was not: the first returned fifty shapes and the
+# second returned fifty indices into a list of ZERO, and the build stopped
+# on an IndexError two hundred lines from either.
+#
+# Before that it was worse than a crash. With BOTH narrow, the name layer
+# was simply empty — fifteen country names left the most-seen page on the
+# site and nothing failed, because an unlabelled drawing and a drawing whose
+# labels all missed look identical. *A second implementation of a thing is a
+# second chance to make its mistake*, and the answer on this repeat is the
+# one that worked the last three times: stop having a second implementation.
+LAND_PATH = re.compile(
+    r'<path[^>]*\sd="([^"]*)"[^>]*><title>([^<]*)</title></path>')
+
+
+# ── THE LIVING PHOTOGRAPHIC ATLAS ────────────────────────────────────
+#
+# THE COUNTRY'S OWN BOUNDARY IS THE APERTURE. Every other photographic
+# surface on this site is a rectangle — a bleed, a strip tile, a window —
+# and that is right for a photograph standing on its own. On the hero it
+# would be a picture BESIDE a map, which is what every travel product
+# already is. Clipped to the country it belongs to, the same photograph
+# becomes geography: you read WHERE before you read WHAT, and the door in
+# the headline is the shape of France.
+#
+# NOTHING HERE IS A SECOND CARTOGRAPHY. The clip is `geo.landmass()` run
+# for one slug with the hero's own parameters, so the outline of the
+# aperture is the same path, from the same file, at the same thinning as
+# the country drawn under it — a second copy would drift by a tenth of a
+# unit and show as a fringe, which is the black-fringe failure this
+# drawing already records about two levels of detail stacked.
+#
+# AND IT IS NOT A SECOND WAY INTO THE LIBRARY. Every frame is a REGISTER
+# KEY resolved by `render.photo_href()`, which reads the same row
+# `picture()` reads; a component that took a URL would be a photograph
+# with none of the licence gate behind it. The credit each frame needs —
+# the photographer, their page, and the prominent link to the provider
+# that Pexels' guidelines require — is generated from that row and shown
+# with the frame it belongs to.
+#
+# THE SET IS DERIVED, AND THE TWO RULES ARE THE ONES THIS PAGE ALREADY
+# HAS. One per macro region, because this atlas holds no ranking and
+# refuses one on /for-businesses in those words — the question is where
+# will you go, so the answer is SPREAD. And an advisory country is never
+# offered, because /api/atlas.json is stripped of them at build time and a
+# derived selection is not automatically an honest one.
+#
+# WHICH country per macro region is decided by the LIBRARY rather than by
+# taste: the one with the most photographed destinations, ties broken
+# alphabetically. That is a measurement of what we can actually show, and
+# it moves on its own as the register fills.
+LIVING_MAX = 6
+LIVING_FRAMES = 5
+
+
+def living_atlas(data, images, doc):
+    """The featured countries, their geometry, and their photographs.
+
+    Returns a list of dicts in cycle order. Each carries the clip path, the
+    box to draw the photograph in, and the frames — the country's own
+    picture first, then its photographed destinations in the atlas's own
+    order, each with the line that says what it is and the credit its
+    licence requires.
+    """
+    macro_of = {}
+    for m in data.get("macros", []):
+        for cs in (m.get("countries") or []):
+            macro_of[cs if isinstance(cs, str) else cs.get("slug")] = m["slug"]
+
+    shots = {}
+    for cid, e in data["cities"].items():
+        key = "city:" + cid
+        if key in images:
+            shots.setdefault(cid.split("/")[0], []).append((cid, e, key))
+
+    # AND THE APERTURE HAS TO BE BIG ENOUGH TO HOLD A PICTURE, WHICH IS A
+    # MEASUREMENT AND NOT A PREFERENCE. The first version of this ranked on
+    # the library alone — most photographed destinations, one per macro
+    # region — and returned Croatia, Austria, Belgium, Finland, Armenia and
+    # Estonia. Every one of those is a true answer to the question it was
+    # asked and four of them are 34 to 70 units across on a 1,120-unit
+    # frame: a photograph clipped into Belgium renders about 40 pixels wide
+    # at 1280 and is a smudge with a coastline. That is the map-label
+    # failure in another family — placed, correct, and not resolvable into
+    # anything a reader can read.
+    #
+    # So the first filter is the DRAWN AREA of the country in this frame,
+    # which is the same quantity `min_units` already uses one function over,
+    # and the set is the largest such country per macro region.
+    #
+    # AND THE LIBRARY DECIDES THE SEQUENCE, NOT THE CAST — which is the
+    # second thing measuring changed. Requiring a photographed DESTINATION
+    # to be featured returned six countries nobody would open an atlas on,
+    # because the 65 city photographs the register holds are clustered where
+    # the round-robin happened to reach and every large, familiar country
+    # has none: Portugal, Türkiye, Norway, Spain, Italy, Greece, Germany and
+    # the United Kingdom are all at zero. Every one of them has its OWN
+    # photograph, so every one of them can be an aperture today; what varies
+    # is how many frames it cycles through. A country with one photograph
+    # shows one and a country with five shows five, and the sequence grows on
+    # its own as `stage: fill` reaches the rest.
+    #
+    # AREA RATHER THAN THE BOUNDING BOX, and the box is what the first
+    # version measured. Portugal's box is the widest in Europe because it
+    # contains the Azores and Madeira — 265 units of mostly Atlantic — so
+    # ranking on it put a sliver and two island groups at the top of the
+    # cast. A BOUNDING BOX IS NOT A COUNTRY, which is the rule this
+    # repository already had about placing a name on one, arriving here
+    # about choosing which country to photograph at all.
+    area = {}
+    paths = {}
+    for c in data["countries"].values():
+        slug = c["slug"]
+        if ("country:" + slug) not in images:
+            continue
+        if (c.get("advisory") or {}).get("level"):
+            continue
+        if macro_of.get(slug) is None:
+            continue
+        # THE SAME PATH, NOT A COPY OF IT. `only` draws one country with the
+        # hero's own thinning, so the aperture and the country under it are
+        # the identical geometry — a second simplification would differ by a
+        # tenth of a unit and show as a fringe along every frontier, which is
+        # this drawing's own recorded failure about two levels of detail
+        # stacked.
+        _ctx, ours = geo.landmass(MAPPROJ, HERO_VIEW, doc=doc, thin_units=1.8,
+                                  min_units=6.0, only={slug})
+        d = "".join(re.findall(r'<path[^>]*\sd="([^"]*)"', ours))
+        if not d:
+            continue
+        a = 0.0
+        for sub in d.split("Z"):
+            nums = [float(v) for v in re.findall(r"-?\d+(?:\.\d+)?", sub)]
+            pts = list(zip(nums[0::2], nums[1::2]))
+            if len(pts) < 3:
+                continue
+            a += abs(sum(pts[i][0] * pts[i - 1][1] - pts[i - 1][0] * pts[i][1]
+                         for i in range(len(pts)))) / 2.0
+        paths[slug] = d
+        area[slug] = a
+
+    best = {}
+    for c in data["countries"].values():
+        slug = c["slug"]
+        if slug not in area:
+            continue
+        mac = macro_of[slug]
+        cur = best.get(mac)
+        if cur is None or (-area[slug], slug) < (-area[cur["slug"]], cur["slug"]):
+            best[mac] = c
+    feat = {c["slug"] for c in sorted(
+        best.values(), key=lambda c: (-area[c["slug"]], c["slug"]))[:LIVING_MAX]}
+
+    # EVERY COUNTRY THAT HAS A PHOTOGRAPH IS AN APERTURE, AND ALL FIFTY DO.
+    # The first version lit six and left forty-four in stone, which reads as
+    # six countries that matter and forty-four that do not — the opposite of
+    # what an atlas says. The brief asked for the rest to borrow a picture
+    # from somewhere else if they had none; none of them has to, because the
+    # library already holds a photograph OF each one. Borrowing would have
+    # been the first claim on this site that a picture is of a place it is
+    # not of, which the register exists to make impossible.
+    #
+    # WHAT THE SIX ARE IS THE SEQUENCE, NOT THE CAST. A featured country
+    # cycles through its own destinations; every other one shows the single
+    # photograph it has, and gains a sequence on the build after `stage:
+    # fill` reaches its destinations. So the difference between them is a
+    # fact about the register rather than a decision about the countries.
+    chosen = sorted((c for c in data["countries"].values()
+                     if c["slug"] in area),
+                    key=lambda c: (-area[c["slug"]], c["slug"]))
+
+    out = []
+    for c in chosen:
+        slug = c["slug"]
+        d = paths[slug]
+        # THE IMAGE EXTENT IS THE WHOLE BOUNDING BOX, islands included, and
+        # that is the opposite decision from the one above for a different
+        # reason: the picture is CLIPPED to the country, so anything the
+        # rectangle does not cover is a piece of the country drawn in stone
+        # beside a piece drawn in photograph. `slice` then crops the source
+        # to fill it, exactly as `object-fit: cover` does everywhere else.
+        nums = [float(v) for v in re.findall(r"-?\d+(?:\.\d+)?", d)]
+        xs, ys = nums[0::2], nums[1::2]
+        if not xs or not ys:
+            continue
+        box = (min(xs), min(ys), max(xs) - min(xs), max(ys) - min(ys))
+
+        # THE STEP IS THE COUNTRY'S OWN DRAWN WIDTH, and asking for one
+        # number for fifty apertures is how a homepage ships two megabytes.
+        # The drawing is about one CSS pixel per unit at 1920, so a country
+        # 60 units wide is 60px and wants the 480 step at twice that for a
+        # retina screen; Türkiye is 252 and wants 800. The ladder's smallest
+        # rung is 480 and most of these countries need a third of it, which
+        # is a real finding and the trigger for a smaller step — recorded
+        # rather than answered by inventing one here, because a sixth rung
+        # is a decision about every purpose on the site.
+        want = max(box[2], box[3]) * 2.0
+
+        def frame(key, name, line, url, _w=want):
+            row = images.get(key) or {}
+            return {"key": key, "name": name, "line": line, "url": url,
+                    "href": photo_href(images, key, _w),
+                    "alt": row.get("alt", ""),
+                    "photographer": row.get("photographer", ""),
+                    "source": row.get("source", ""),
+                    "licence": row.get("licence", ""),
+                    "licence_url": row.get("licence_url", "")}
+
+        frames = [frame("country:" + slug, c["name"],
+                        c.get("tagline") or "", urls.country(c))]
+        if slug in feat:
+            for cid, e, key in shots.get(slug, [])[:LIVING_FRAMES - 1]:
+                frames.append(frame(key, e["city"]["name"],
+                                    e["city"].get("summary") or "",
+                                    urls.city(e["country"], e["region"],
+                                              e["city"])))
+        out.append({"slug": slug, "name": c["name"], "href": urls.country(c),
+                    "d": d, "box": box, "frames": frames,
+                    "featured": slug in feat})
+    return out
+
+
+def heroeurope(data, featured=(), beyond_ground=True):
     """Europe, entire, seen through the doorway. The homepage's picture.
 
     THE HOMEPAGE WAS THE LEAST EUROPEDOOR PAGE ON THE SITE. Stripped of its
@@ -528,8 +757,47 @@ def heroeurope(data):
     # the fifty countries is an SVG <a> to its own page now, with its name as
     # the accessible name — no dot, no label, no filter and no count, so it is
     # still the cover of the atlas rather than the index.
+    # AND EACH COUNTRY'S PATH CARRIES AN ID, so the Living Atlas can clip a
+    # photograph to it with a `<use>` instead of a second copy of the ring.
+    # Forty-one clipPaths holding real path data would be the 43 KB of
+    # country geometry on this page twice — the exact cost the frontier pass
+    # exists to avoid.
+    # NOT `ground`: THAT NAME IS TAKEN, three hundred lines down, by the
+    # `NameGround` this function builds to test whether a country name sits
+    # on its own polygon — and a NameGround is always truthy, so a parameter
+    # called `ground` was False at the top of the function and True by the
+    # time the dusk was emitted. Russia vanished correctly and the fade that
+    # existed only for Russia went on being drawn, which is a state no
+    # caller can ask for. Second shadowed name in this session; the first
+    # was `ident` in geo.landmass, where the loop variable of the same name
+    # made the callback a string.
+    #
+    # THE COUNTRIES THE DATA CUT RUNS THROUGH, DERIVED FROM THE GEOMETRY
+    # RATHER THAN NAMED. data/geo/ stops at 52°E, and exactly one country
+    # this atlas writes about has land on both sides of it. With a ground to
+    # dissolve into that is what the dusk is for; with no ground it is a
+    # fragment occupying the whole north-east of the picture, and the fade
+    # that hides its edge is a pale wash over a third of the drawing. So the
+    # groundless hero drops it — the country keeps its page, its link from
+    # every other surface and its advisory, and this one picture does not
+    # draw a shape whose eastern side is a decision about a download.
+    # READ OFF THE DOCUMENT'S OWN BBOX, never the number 52 typed here: the
+    # bound lives in scripts/map/process.py and travels with the file, so a
+    # wider fetch later moves this on its own instead of leaving a constant
+    # that used to be true.
+    _east = doc.get("bbox", [0, 0, 1e9, 0])[2]
+    cut = {ent.get("slug") for ent in doc["countries"].values()
+           if ent.get("atlas") and any(
+               ring[i] >= _east - 0.02
+               for ring in ent["rings"] for i in range(0, len(ring), 2))}
     ctx, land = geo.landmass(MAPPROJ, view, doc=doc,
+                             drop=() if beyond_ground else cut,
                              thin_units=1.8, min_units=6.0,
+                             # CONTEXT ENTRIES CARRY NO SLUG — they are the land outside
+                             # this atlas, which has no page and therefore
+                             # no photograph and nothing to clip.
+                             path_id=lambda ent: ("lz-" + ent["slug"]
+                                                  if ent.get("slug") else ""),
                              link=lambda ent: urls.country_by_slug(ent["slug"]))
 
     # ONE PATH PER GROUP, NOT ONE PER COUNTRY, and it is not a saving.
@@ -643,8 +911,7 @@ def heroeurope(data):
     # NameGround at module level, because there are TWO drawings on this site
     # that set a country's name across it and for the life of both only this
     # one had them. See the class.
-    ground = NameGround([m_.group(1) for m_ in re.finditer(
-        r'<path d="([^"]*)"><title>([^<]*)</title></path>', land)])
+    ground = NameGround([m_.group(1) for m_ in LAND_PATH.finditer(land)])
     shapes = ground.shapes
     CROSS_OK = NameGround.CROSS_OK
 
@@ -695,14 +962,30 @@ def heroeurope(data):
     # more recognisable — so sixteen is the ceiling and the rest of the
     # continent is read from its shape, which is what the shape is for.
     NAME_MAX = 16
+    # AND THE PATTERN TOLERATES ATTRIBUTES BEFORE `d`, WHICH IT DID NOT.
+    # It was the literal `<path d="..."><title>`, and the day the land paths
+    # gained an `id` — so the Living Atlas could clip a photograph to a
+    # country with a `<use>` instead of a second copy of its ring — the
+    # regex matched nothing and all fifteen country names left the hero in
+    # silence. Nothing failed: the layer was simply empty, which is the same
+    # shape as the check that matched `pointsmap arched"><svg` and examined
+    # zero dots on a site with 130 region maps. A pattern pinned to the
+    # exact attribute order of markup somebody else emits is a pattern that
+    # breaks on an attribute nobody thought about, so this one asks for the
+    # attribute it needs and ignores the rest — and the assertion under the
+    # loop says the layer found countries at all.
     order_ = []
-    for idx, m in enumerate(re.finditer(
-            r'<path d="([^"]*)"><title>([^<]*)</title></path>', land)):
+    for idx, m in enumerate(LAND_PATH.finditer(land)):
         spot = _dpath(m.group(1))
         if spot:
             order_.append(((spot[3][2] - spot[3][0]) * (spot[3][3] - spot[3][1]),
                            idx, m, spot))
     order_.sort(key=lambda t: -t[0])
+    assert order_, (
+        "the hero's name layer read no country out of the land markup. The "
+        "pattern above has stopped matching what geo.landmass() emits, and "
+        "an empty layer looks exactly like a drawing that was always "
+        "unlabelled")
     names = []
     for _area, idx, m, spot in order_:
         if len(names) >= NAME_MAX:
@@ -976,18 +1259,22 @@ def heroeurope(data):
         f'<svg viewBox="{view[0]:.0f} {view[1]:.0f} {vw:.0f} {vh:.0f}"'
         f' preserveAspectRatio="xMidYMid slice" role="group"'
         f' aria-label="Europe, drawn: every country is a link to its own page">'
-        f'<defs><linearGradient id="heroedge" gradientUnits="userSpaceOnUse"'
+        f'<defs>'
+        # AND THE TWO GRADIENTS GO WITH THE LAYER THAT REFERENCES THEM. An
+        # orphan gradient is what `c_hero_dusk_reach` refuses in the other
+        # direction — "no fade" and "no drawing" must not look the same —
+        # and a `<defs>` full of ramps nothing paints is 900 bytes of
+        # rendering instruction for a picture that is not there.
+        + ((f'<linearGradient id="heroedge" gradientUnits="userSpaceOnUse"'
         f' x1="{ex1:.1f}" y1="{ey1:.1f}" x2="{ex2:.1f}" y2="{ey2:.1f}">'
         f'{_dusk()}</linearGradient>'
         f'<radialGradient id="herofootg" gradientUnits="userSpaceOnUse"'
         f' cx="{ax:.1f}" cy="{ay:.1f}" r="{r33:.1f}">'
-        f'{_dusk(foot0, foot1)}</radialGradient>'
-
-
+        f'{_dusk(foot0, foot1)}</radialGradient>') if beyond_ground else '')
         # The mask that keeps the dusk on the land and off the water. The
         # Caspian, the Aral and the Sea of Azov are the far-eastern water this
         # picture has, and an unmasked overlay would paint all three graphite.
-        f'<mask id="herodim" maskUnits="userSpaceOnUse"'
+        + f'<mask id="herodim" maskUnits="userSpaceOnUse"'
         f' x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}" height="{vh:.0f}">'
         # WIDER IN THE MASK THAN IN THE DRAWING, on purpose. The land is
         # stroked at 1.4 units to close the seams between neighbours, and a
@@ -998,7 +1285,7 @@ def heroeurope(data):
         # exactly where the picture must not have one.
         f'<use href="#heroctx" fill="#fff" stroke="#fff" stroke-width="3"/>'
         f'<use href="#heroland" fill="#fff" stroke="#fff" stroke-width="3"/>'
-        f'</mask>'
+        + f'</mask>'
         # RELIEF ONLY WHERE THIS ATLAS GOES. Anatolia and the Atlas mountains
         # are real ground and this file holds them, and drawn at the weight the
         # Alps are drawn at they took the right-hand third of the picture: the
@@ -1059,9 +1346,19 @@ def heroeurope(data):
         # the dusk painted on top instead, the atlas simply covers it where
         # the atlas exists and the dusk turns the atlas into it where it does
         # not. Nothing to cross-fade and no edge to hide.
+        # JUST EUROPE, WHERE THE CALLER ASKS FOR IT. `lyr-beyond` is Asia
+        # and Africa out to the Yenisei, and `heroctxg` is every non-atlas
+        # neighbour; both exist because *Europe is not an island* — a
+        # continent ending at 52°E on a graphite ground reads as a coastline
+        # and then as a rendering fault. On the gallery hero there is no
+        # ground: the sea is the white wall, so there is no water for an
+        # edge to read as, and what the two layers actually contributed was
+        # a grey mass filling the right third of the picture with the dusk
+        # spread across it. The rule has not changed — it was about a
+        # drawing with a painted ocean, and this one has none.
         + ('<g class="lyr lyr-beyond" aria-hidden="true">'
            + "".join(f'<path d="{d}"/>' for d in beyond)
-           + '</g>' if beyond else "")
+           + '</g>' if (beyond and beyond_ground) else "")
         # OPACITY ON THE GROUP, NOT ON THE PAINT, and that is the whole fix.
         #
         # The seams between two independently simplified neighbours have to be
@@ -1076,8 +1373,8 @@ def heroeurope(data):
         # the group is not, which looks identical where nothing overlaps and
         # correct where things do.
         + f'<g class="lyr lyr-coastal-water" aria-hidden="true">'
-        f'<use href="#heroctx" filter="url(#heroshore)"/>'
-        f'<use href="#heroland" filter="url(#heroshore)"/></g>'
+        + (f'<use href="#heroctx" filter="url(#heroshore)"/>' if beyond_ground else "")
+        + f'<use href="#heroland" filter="url(#heroshore)"/></g>'
         # AND THE COAST IS HEAVIER THAN A FRONTIER, for 27 bytes. A coastline
         # is where land meets sea and a frontier is a line drawn on land, and
         # until now both were the same stroke: the hierarchy every atlas has
@@ -1093,12 +1390,43 @@ def heroeurope(data):
         # is — the land path's own edge — and this is how that edge is given
         # its weight, which is a rendering technique rather than a layer.
         + f'<g class="herocoast" aria-hidden="true">'
-        f'<use href="#heroctx"/><use href="#heroland"/></g>'
+        + (f'<use href="#heroctx"/>' if beyond_ground else "")
+        + f'<use href="#heroland"/></g>'
         + f'<g class="lyr lyr-land">'
-        + f'<g class="heroctxg" aria-hidden="true">{ctx}</g>'
+        + (f'<g class="heroctxg" aria-hidden="true">{ctx}</g>' if beyond_ground else "")
         + f'<g class="herolandg">{land}</g></g>'
         + (f'<g class="lyr lyr-terrain" aria-hidden="true"'
            f' mask="url(#herolandmask)">{relief}</g>' if relief else "")
+        # ── THE LIVING PHOTOGRAPHIC ATLAS, ABOVE THE GROUND AND UNDER
+        # EVERYTHING THAT DESCRIBES IT. The frontiers, the rivers, the
+        # country names and the dusk are all drawn over the photograph, so a
+        # picture inside France is still bounded by France's own line and
+        # still carries the name — which is what stops it being a
+        # photograph pasted on a map and makes it the country FILLED.
+        #
+        # ONE href AND THE REST HELD BACK. Six countries with up to five
+        # frames each is thirty photographs, and a homepage that requests
+        # thirty pictures before a reader has moved is the weight failure
+        # this page already has an invariant for. The first frame of each
+        # country carries `href` and is what a reader with no JavaScript
+        # sees for ever; the others carry `data-href` and are fetched by the
+        # enhancement the first time they are shown. Six requests at rest.
+        + (('<defs>' + "".join(
+            f'<clipPath id="lzc-{f["slug"]}" clipPathUnits="userSpaceOnUse">'
+            f'<use href="#lz-{f["slug"]}"/></clipPath>' for f in featured)
+           + '</defs>'
+           + '<g class="herophoto" data-lz aria-hidden="true">' + "".join(
+               f'<g class="lzc" data-country="{f["slug"]}"'
+               + (' data-on' if i == 0 else '') + '>' + "".join(
+                   f'<image class="lzf"{" data-on" if j == 0 else ""}'
+                   f' clip-path="url(#lzc-{f["slug"]})"'
+                   f' x="{f["box"][0]:.1f}" y="{f["box"][1]:.1f}"'
+                   f' width="{f["box"][2]:.1f}" height="{f["box"][3]:.1f}"'
+                   f' preserveAspectRatio="xMidYMid slice"'
+                   f' {"href" if j == 0 else "data-href"}="{esc(fr["href"])}"/>'
+                   for j, fr in enumerate(f["frames"]) if fr["href"])
+               + '</g>' for i, f in enumerate(featured))
+           + '</g>') if featured else "")
         # ORDER: terrain, then water, then the frontiers over both. Water is
         # a separate visual layer and must never inherit land shading — a
         # river under the relief would be tinted by the band it crosses and
@@ -1152,11 +1480,19 @@ def heroeurope(data):
         # left edge, over open Atlantic, behind the headline. The southern cut
         # is only visible where it crosses LAND, so masking it to land costs
         # nothing and removes that edge.
-        + f'<g class="herodusk" aria-hidden="true">'
+        # AND THE EASTERN RECT IS MASKED TO THE LAND WHERE THERE IS NO
+        # GROUND. It is unmasked on the drawn hero on purpose — the water
+        # has to dissolve with the land it surrounds, or the shadow stops
+        # at every coastline and the ground beyond begins on a hard
+        # diagonal. With no ground and no painted sea there is nothing for
+        # it to abut and nothing outside the land for it to dim, so an
+        # unmasked rect is a wash over a white page: the fade's only job
+        # here is to stop Russia ending on a straight line at 52°E.
+        + ('' if not beyond_ground else f'<g class="herodusk" aria-hidden="true">'
         + f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
         f' height="{vh:.0f}" fill="url(#heroedge)"/>'
         + f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
-        f' height="{vh:.0f}" mask="url(#herodim)" fill="url(#herofootg)"/></g>'
+        f' height="{vh:.0f}" mask="url(#herodim)" fill="url(#herofootg)"/></g>')
         + f'</svg></div>'
     )
 
@@ -1272,8 +1608,60 @@ def home(data):
     # signature applied to everything is wallpaper* — `docs/
     # signature-moments.md` says so, and question 2 for this surface is
     # answered by the picture rather than by its edge.
-    _heromap = heroeurope(data)
+    # THE LIVING ATLAS: the featured countries, their clip and their frames.
+    # `doc` is the same europe-lod1 document the drawing itself reads, loaded
+    # once here and handed down, because a second load is a second chance for
+    # the aperture and the country under it to be different geometry.
+    _lz = living_atlas(data, images, geo.load("europe-lod1.json"))
+    _heromap = heroeurope(data, featured=_lz, beyond_ground=False)
     _hero_row = images.get("home-hero")
+
+    # THE PANEL IS THE SAME STATE, WRITTEN OUT. One active country and one
+    # active frame drive the aperture, the name, the line under it, the link
+    # and the credit — so there are not five components to keep in step,
+    # there is one state and five readings of it. Every frame is in the
+    # markup, which is what makes the no-JavaScript answer the FIRST frame of
+    # the first country rather than nothing: the enhancement moves a
+    # `data-on` attribute and fetches the picture it just revealed.
+    #
+    # AND THE CREDIT TRAVELS WITH THE FRAME. Pexels' guidelines ask for the
+    # photographer credited with a link to the photo's own page and a
+    # prominent link to Pexels, and `picture()` derives both from the
+    # register row. An SVG `<image>` can hold neither — it is one href — so
+    # the credit for whichever frame is showing is here, generated from the
+    # same row, and it changes with the picture it describes.
+    _lzrows = []
+    for _i, _f in enumerate(_lz):
+        for _j, _fr in enumerate(_f["frames"]):
+            if not _fr["href"]:
+                continue
+            _on = " data-on" if (_i == 0 and _j == 0) else ""
+            _prov = _fr["licence_url"].split("/")[0:3]
+            _prov = "/".join(_prov) if len(_prov) == 3 else _fr["licence_url"]
+            _cred = ""
+            if _fr["photographer"] and _fr["source"]:
+                _cred = (f'<span class="lzcred">Photograph '
+                         f'<a href="{esc(_fr["source"])}" rel="noopener" '
+                         f'target="_blank">{esc(_fr["photographer"])}</a> · '
+                         f'<a href="{esc(_prov)}" rel="noopener" '
+                         f'target="_blank">{esc(_fr["licence"])}</a></span>')
+            _lzrows.append(
+                f'<li class="lzitem" data-country="{_f["slug"]}"'
+                f' data-frame="{_j}"{_on}>'
+                # THE COUNTRY IS THE KICKER AND THE FRAME IS THE NAME —
+                # except on the country's own photograph, where they are the
+                # same word and the panel read "TÜRKIYE / Türkiye". A frame
+                # that IS the country says what it is instead.
+                f'<span class="lzwhere">'
+                f'{esc("The country" if _j == 0 else _f["name"])}</span>'
+                f'<a class="lzname" href="{_fr["url"]}">{esc(_fr["name"])}</a>'
+                + (f'<span class="lzline">{esc(_fr["line"])}</span>'
+                   if _fr["line"] else "")
+                + _cred + '</li>')
+    _lzpanel = (f'<div class="lzpanel">'
+                f'<p class="lzkick">Currently exploring</p>'
+                f'<ul class="lzlist">{"".join(_lzrows)}</ul></div>'
+                if _lzrows else "")
 
     # ── 01 · THE DOOR ────────────────────────────────────────────────
     # The wall is paper and the opening is the only dark thing on the
@@ -1297,7 +1685,10 @@ def home(data):
       <div><b>{len(data["journeys"])}</b><span>Journeys</span></div>
     </div>
   </div>
+  <div class="doorside">
   <div class="op">{_heromap}</div>
+  {_lzpanel}
+  </div>
   </div>"""
 
     # THE SET THIS ROOM HANGS — derived, and two of the three rules are

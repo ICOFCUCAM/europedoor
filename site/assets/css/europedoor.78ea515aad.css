@@ -9214,10 +9214,47 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    NO `.reveal` EITHER. The reveal exists to say where a cut edge is, and
    there is no cut: on a white wall a graphite rectangle states its own
    boundary at 16.9:1, which is the highest separation in the palette. */
-.sheet-door.sheet-gal { padding-top: 8vh; }
-.sheet-door .doorgrid { max-width: 76rem; margin: 0 auto; display: grid;
-  grid-template-columns: minmax(0, 46%) minmax(0, 1fr); gap: 5vw;
-  align-items: center; }
+.sheet-door.sheet-gal { padding-top: 8vh; padding-inline: 0; }
+/* NOT `--page-gutter`, WHICH IS THE THING THAT CENTRES EVERY OTHER PLATE
+   ON 72rem. It computes `max(1.5rem, 50vw - 36rem)`, so subtracting twice
+   it gives back exactly the 72rem measure this plate is trying to escape:
+   at 1920 the gutter is 384 and `100% - 2 x 384` is 1,152, which capped
+   the drawing at 657px on a screen half as wide again as the one it had
+   already fitted. A plate with its own measure needs its own margin. */
+.sheet-door.sheet-gal > .actmark {
+  width: min(100% - 8vw, 88rem); max-width: none; margin-inline: auto; }
+/* 42% RATHER THAN 46%, AND THE FOUR PERCENT IS THE APERTURES. The
+   featured countries are clipped photographs at the scale the continent
+   gives them — France is 144 units of a 1,120-unit frame — so every pixel
+   the drawing gains is a pixel of picture. The headline still fits: "Open
+   the door" sets at 420px against a 470px column at 1280. */
+/* THE PLATE HAS ITS OWN MEASURE, AND IT IS WIDER THAN THE PAGE'S. Held
+   inside the 76rem the rest of the gallery uses, the whole continent was
+   617px at 1280 and the featured countries were 40 to 90px across —
+   placed, correct, and too small to read as photographs, which is the
+   map-label failure in another family. Bleeding the drawing off the right
+   edge fixed the size and broke the composition: the picture ran out of
+   the page and AZERBAIJAN was cut in half by the viewport. A margin on
+   both sides is what the reference does and what the eye reads as a
+   composed page rather than a cropped one.
+   88rem, because a plate whose subject is a continent is the one surface
+   here that earns a wider measure — 1,232 at 1280 and 1,408 at 1920 — and
+   the column split is 40/60, which is the reference's own. */
+.sheet-door .doorgrid { display: grid;
+  grid-template-columns: minmax(0, 40%) minmax(0, 1fr); gap: 3%;
+  align-items: center;
+  width: min(100% - 8vw, 88rem); max-width: none; margin-inline: auto; }
+/* AND THE HEADLINE IS A STEP OF THE SCALE RATHER THAN A SHARE OF THE
+   VIEWPORT, because the column it sits in is neither. `.sheet .mega` is
+   `clamp(--t-4xl, 7vw, --t-6xl)`, which is right for a headline that owns
+   the page width and wrong for one in a 27rem column: at 1280 it is 90px
+   and "Open the door" measures 500 against 432, so the line broke after
+   "the" and left "door" alone. A smaller clamp only moves the width at
+   which that happens — 5.2vw fits at 1280 and breaks again at 1600. The
+   column is a fixed measure, so the type is a fixed step: --t-5xl sets
+   "Open the door" at 340px and it fits at every width there is. No new
+   value; the `<br>` in the copy is what decides the two lines. */
+.sheet-door h1.mega { font-size: var(--t-5xl); }
 /* THE PANEL IS THE DRAWING'S OWN PROPORTION, and that is arithmetic
    rather than taste. `preserveAspectRatio="slice"` crops whatever the box
    does not match, and the frame is 1120x800 — so a 1.05 box showed 840 of
@@ -9226,8 +9263,19 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    of light somebody had left on. Given its own ratio the panel crops
    nothing, the fade sits where the geometry puts it, and the composition
    is the one the drawing was composed for. */
+.sheet-door .doorside { display: grid; gap: var(--s5); align-content: start;
+                        min-width: 0; }
+/* THE WINDOW IS FITTED TO WHAT IS DRAWN, NOT TO THE FRAME IT IS DRAWN IN.
+   `HERO_VIEW` is 1120x800 and it is sized for the hero that carries Asia,
+   Africa and Russia out to the data cut; with those gone the land occupies
+   x 29-1004 and y 74-691 — 974 x 617, which is 1.58 — and a sixth of the
+   box is empty page. `preserveAspectRatio="slice"` is what makes fitting
+   it free: give the panel the LAND's ratio and the drawing scales up to
+   cover, cropping 57 units off the top and the bottom, both of which are
+   empty sea. Measured, that stops 17 units short of the northernmost drawn
+   land. The horizontal half is on `.heroeurope` below. */
 .sheet-door .op { position: relative; overflow: hidden;
-  aspect-ratio: 1120 / 800; }
+  aspect-ratio: 974 / 617; }
 
 /* NO FRAME, AND THAT IS WHY THE DRAWING CHANGES MAP SET RATHER THAN
    LOSING A BACKGROUND. `heroeurope()` is the DARK map — #F3F0E6 continent
@@ -9281,17 +9329,76 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    the atlas into it still cannot drift apart. */
 .sheet-door .op .heroeurope #heroedge stop,
 .sheet-door .op .heroeurope #herofootg stop { stop-color: var(--white); }
-/* AND THE NAMES ARE INK ON STONE. Graphite at 48% is a third-weight name
-   on a bone continent and it is 1.3:1 on this one. The map's own ink, at
-   the same relative weight: found when looked for, never met before the
-   shape it names. */
+/* ── THE LIVING PHOTOGRAPHIC ATLAS ───────────────────────────────── */
+/* THE COUNTRY IS THE APERTURE. A photograph clipped to France's own
+   boundary is not a picture beside a map, it is the country filled — you
+   read WHERE before you read WHAT — and the door in the headline becomes
+   the shape of the country. Everything that describes the geography is
+   drawn OVER it: the frontier still bounds it, the name is still set
+   across it, and the dusk still dims it where the data stops. */
+.herophoto image { opacity: 0; transition: opacity .9s ease; }
+.herophoto image[data-on] { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .herophoto image { transition: none; }
+}
+/* THE PHOTOGRAPH IS NOT A CLICK TARGET AND THE COUNTRY UNDER IT IS. Every
+   layer above the land on this drawing is `pointer-events: none` for the
+   same reason — each one has a fill and swallowed the click in turn — and
+   a rule that has to be overridden is a rule that will be got wrong
+   again, so this one says it for itself. */
+.herophoto { pointer-events: none; }
+/* ONE STATE, FIVE READINGS OF IT. The list holds every frame and shows
+   one; the enhancement moves `data-on` and the panel follows, because
+   there is nothing else here for it to fall out of step with. */
+.lzpanel { margin-top: var(--s5); display: grid; gap: var(--s3); }
+.lzkick { font-family: var(--text); font-size: var(--t-xs);
+  letter-spacing: .22em; text-transform: uppercase; color: var(--ink-3);
+  margin: 0; }
+.lzlist { list-style: none; margin: 0; padding: 0; }
+.lzitem { display: none; }
+.lzitem[data-on] { display: grid; gap: var(--s2); }
+.lzwhere { font-family: var(--text); font-size: var(--t-xs);
+  letter-spacing: .14em; text-transform: uppercase; color: var(--door); }
+.lzname { font-family: var(--display); font-size: var(--t-2xl);
+  line-height: 1.12; color: inherit; text-decoration: none;
+  justify-self: start; }
+.lzname:hover { color: var(--door); }
+.lzline { font-family: var(--display); font-size: var(--t-base);
+  line-height: 1.5; color: var(--ink-2); max-width: 44ch; }
+.lzcred { font-family: var(--text); font-size: var(--t-xs);
+  color: var(--ink-3); }
+.lzcred a { color: var(--ink-2); text-decoration: underline;
+  text-underline-offset: .16em; }
+
+/* AND THE NAMES ARE INK ON A PAPER HALO, WHICH THE PHOTOGRAPHS FORCED.
+   Graphite at 48% is a third-weight name on a bone continent and 1.3:1 on
+   this one, so the first version here took the map's own ink at 58%. That
+   was right on stone and gone the moment the countries filled with
+   photographs: a name is now set over a picture nobody has seen, so its
+   contrast is a property of the picture rather than of the design — the
+   same finding as the hero's scrim, arriving on fifteen labels. The
+   answer is the one the 824 plates already use for a name crossing a
+   coastline: ink with a halo of the page, `paint-order: stroke` so the
+   halo is painted UNDER the glyph rather than over it. Full ink now,
+   because a third-weight name inside a halo is a smudge. */
 .sheet-door .op .heroeurope .lyr-labels .cname {
-  fill: color-mix(in srgb, var(--map-ink) 58%, transparent); }
+  fill: var(--map-ink);
+  paint-order: stroke;
+  stroke: color-mix(in srgb, var(--white) 82%, transparent);
+  stroke-width: 3.2; stroke-linejoin: round; }
 /* The drawing fills the panel. `.heroeurope`'s base rule insets it from
    the right of a full-bleed hero that no longer exists — `width: min(78%,
    62rem)` — so without this it would sit in the right 78% of its own box
    with a graphite strip beside it. */
-.sheet-door .op .heroeurope { position: absolute; inset: 0;
+/* 104% AND ANCHORED LEFT, which is the horizontal half of the fit. The
+   panel's own `aspect-ratio` crops the empty sea north and south; this
+   takes the dead sea east of Azerbaijan, which `slice` cannot do at the
+   same time because it crops one axis or the other. 108% was the first
+   number and it cut AZERBAIJAN's own label in half — the drawn land ends
+   at x=1004 and the NAME reaches about 1024, so a crop fitted to the
+   geometry cut the type that describes it. The crop has to clear the
+   LABELS, not the coastline: at 104% the window ends at 1075.
+.sheet-door .op .heroeurope { position: absolute; inset: 0 auto 0 0;
                               width: 100%; height: 100%;
                               margin-left: 0;
                               -webkit-mask-image: none; mask-image: none; }
@@ -9304,12 +9411,18 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    how the sibling repository reached 418 font sizes. `.sheet .mega` is
    already `clamp(--t-4xl, 7vw, --t-6xl)` at line-height .96 and it is the
    plate headline; a room that needs its own scale value is a decoration. */
-/* A GRID OF FOUR, NOT A WRAPPING FLEX ROW. At 46% of 1280 the four
-   figures did not fit on one line, so "17 JOURNEYS" dropped alone onto a
-   second row and left a hole the width of three columns. Four derived
-   numbers are a set and read as one. */
-.figrow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--s4); margin-top: var(--s6); padding-top: var(--s5);
+/* TWO ROWS OF TWO, BECAUSE FOUR TRACKS DO NOT FIT THE COLUMN THIS PAGE
+   GIVES THEM. It was a wrapping flex row first and "17 JOURNEYS" dropped
+   alone onto a second line, leaving a hole three columns wide; four equal
+   tracks fixed that at 46% of 1280 and stopped fitting the moment the
+   column went to 42% to give the apertures their four per cent —
+   DESTINATIONS is 104px of tracked uppercase in a 109px track, so it ran
+   straight through JOURNEYS. A `minmax` floor only moves the overlap into
+   a scroll. Four derived numbers are a set either way, and two rows of two
+   is the same set read rather than clipped — which is what the phone rule
+   already did at 44rem for exactly this reason. */
+.figrow { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s5) var(--s4); margin-top: var(--s6); padding-top: var(--s5);
   border-top: 1px solid var(--rule); }
 .figrow div b { display: block; font-family: var(--display); font-weight: 400;
   font-size: var(--t-2xl); line-height: 1; }
@@ -9474,10 +9587,6 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
 
 @media (max-width: 62rem) {
   .sheet-door .doorgrid { grid-template-columns: 1fr; }
-  /* FOUR TRACKS IN 358px IS 89px EACH, and DESTINATIONS is 104. The four
-     figures are still one set; two rows of two is the same set, read. */
-  .figrow { grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: var(--s5) var(--s4); }
   .galgrid { grid-template-columns: repeat(2, 1fr); }
   .strow { grid-template-columns: 1fr; }
   .jr { grid-template-columns: 8rem minmax(0, 1fr); }
