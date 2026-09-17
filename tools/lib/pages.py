@@ -12434,139 +12434,319 @@ def events_month_page(data, month):
 # ── beyond the obvious ────────────────────────────────────────────────
 
 def quiet_page(data):
+    """The Counter-Atlas: seven plates, and the corner with the most quiet
+    places is not the quietest corner.
+
+    THE PAGE'S OWN POSITION WAS THE SMALLEST THING ON IT. *No page on this
+    site tells you a place is undiscovered* is this product's sharpest
+    editorial line and it sat in a `.note` at the very bottom, under 130
+    rows and six swaps, at caption size — the /stories fault where the
+    reason a family looks the way it does was printed smaller than
+    everything it explains. It is a band now, and so is the refusal that
+    comes before it.
+
+    THE BRIEF GOT EVERY FIGURE RIGHT. 130 quiet destinations, 44 countries,
+    and all nine macro-region counts — 19, 7, 6, 15, 15, 41, 18, 2, 7 —
+    checked against the build. That is worth recording because the /events
+    brief had one out by one, and it means the argument can be taken at
+    face value and the work is in what the numbers do not say.
+
+    AND WHAT THEY DO NOT SAY IS THE POINT. Nine counts alone read *go to the
+    Mediterranean*, which is the opposite of what this page argues: the
+    Mediterranean has 41 because it holds 94 destinations. As a SHARE of
+    each corner's own set the order changes — the Baltic States is 58% quiet
+    and the Mediterranean 44%, against 41% for the Atlas as a whole. That is
+    /events' *the busiest month is the least characteristic*, one family
+    over, and it is derived on every build. See `docs/beyond-redesign.md`.
+
+    TWENTY-SEVEN OF THE 130 CARRY A PHOTOGRAPH AND THE PAGE DREW EIGHT.
+    Nothing is acquired here. The corners band spends the nine the page
+    already picks at a scale a reader can judge a place from, and says how
+    many of the 130 the register actually holds, because a page arguing that
+    Sifnos is a real alternative to Santorini with nothing to look at is the
+    fault that took 130 hash-drawn plates off it, unanswered on the other
+    side.
+    """
+    images = data.get("images")
     quiet = [n for n in data["cities"].values() if n["city"].get("quiet")]
     quiet.sort(key=lambda n: (n["country"]["name"], n["city"]["name"]))
-    # ONE HUNDRED AND THIRTY ABSTRACT PLATES ON ONE PAGE, directly under a
-    # map whose whole argument is WHERE these places are. The map answers
-    # the question and the grid beneath it answered nothing: a hash-drawn
-    # landscape per destination, 130 of them, on the page that exists to say
-    # a Galician fishing town gets the same treatment as Paris. A
-    # destination here is chosen on where it is and what it is like, and
-    # neither of those is a look, which is the test a card has to pass.
-    # A HUNDRED AND THIRTY ROWS IN ONE COLUMN, FIFTEEN THOUSAND PIXELS LONG.
-    #
-    # Sorted by country with nothing marking where one ended, which is the
-    # order this page had and could not show — the interest pages had exactly
-    # this and were grouped by macro region for exactly this reason. The
-    # drawing above is the argument, a distribution across the continent, and
-    # the list under it then asked a reader to scroll a hundred and thirty
-    # names to find out which part of Europe any of them is in.
-    #
-    # Grouped by macro region, in the taxonomy's own order, so the list has
-    # the same nine divisions the picture above it has.
+    total = len(data["cities"])
+    ncountry = len({n["country"]["slug"] for n in quiet})
+
+    # ONE PASS, AND EVERY FIGURE ON THIS PAGE COMES OUT OF IT.
     by_macro = {}
     for n in quiet:
         by_macro.setdefault(_macro_of(data, n["country"]["slug"]), []).append(n)
-    rows = "".join(
-        f'<div class="rowgroup"><p class="rowgrouphead">{esc(m["name"])}'
-        f'<span class="rowgroupn">{len(by_macro[m["slug"]])}</span></p>'
-        + "".join(
-            f'<a class="row" href="{urls.city(n["country"], n["region"], n["city"])}">'
-            f'<div><h3>{esc(n["city"]["name"])}</h3>'
-            f'<p class="rowsub">{esc(n["city"]["summary"])}</p></div>'
-            f'<p class="rowmeta">{esc(n["country"]["name"])} · '
-            f'{esc(n["region"]["name"])}</p></a>'
-            for n in by_macro[m["slug"]])
-        + "</div>"
-        for m in data["macros"] if m["slug"] in by_macro)
-    # THE ARGUMENT OF THIS PAGE IS A DISTRIBUTION, AND IT WAS PROSE.
-    #
-    # "Too many visitors in the same eleven places" is a claim about where
-    # people are NOT. The quiet tag is on 89 destinations in 40 countries and
-    # the page listed them as cards, which shows how many and not where —
-    # and where is the entire point: the alternative to Santorini is not "a
-    # quieter island", it is a specific set of dots spread across a
-    # continent that a reader can see is nowhere near the eleven places.
+    allmacro = {}
+    for n in data["cities"].values():
+        allmacro.setdefault(_macro_of(data, n["country"]["slug"]), []).append(n)
+
+    def key(n):
+        return (f'city:{n["country"]["slug"]}/{n["region"]["slug"]}'
+                f'/{n["city"]["slug"]}')
+
+    shot = [n for n in quiet if held(images, key(n))]
+
+    # ── 01 · BEYOND THE OBVIOUS ──────────────────────────────────────
+    # THE DRAWING IS THE OPENING, AND THERE IS NO PHOTOGRAPH HERE ON
+    # PURPOSE. The register declares no hero for this family, and the one
+    # that could be acquired for it is by definition a generic European
+    # scene — which is the exact thing a page refusing the phrase "hidden
+    # gems" cannot open on. What this page has and no stock library has is
+    # the distribution: 130 dots spread across a continent that a reader
+    # can see is nowhere near the eleven places.
     qpts = [(*project(n["city"]["lat"], n["city"]["lon"]),
              urls.city(n["country"], n["region"], n["city"]), n["city"]["name"])
             for n in quiet]
     quietmap = pointsmap(
         qpts, "quiet",
         f'Every destination carrying the quiet tag: {len(quiet)} of '
-        f'{len(data["cities"])}, in '
-        f'{len({n["country"]["slug"] for n in quiet})} countries. The tag is '
-        f'editorial and we will be wrong sometimes.',
+        f'{total}, in {ncountry} countries. The tag is editorial and we '
+        f'will be wrong sometimes.',
         f'Map of the {len(quiet)} destinations tagged quiet',
         note=f'Names are dropped where they would overlap; every dot is a link. '
              f'Coastline from <a href="/sources">Natural Earth</a>, public '
              f'domain.'
              + offframe_line([project(n["city"]["lat"], n["city"]["lon"])
                               for n in quiet], data)) if len(qpts) >= 2 else ""
+    btopen = f"""
+  <div class="pagehead index">
+    <p class="kicker">Responsible travel, stated plainly</p>
+    <h1 class="mega">Beyond the obvious.</h1>
+    {head_extent([(len(quiet), "quiet destinations"),
+                  (ncountry, "countries"),
+                  (len(by_macro), "corners of Europe")])}
+    <p class="lede">Europe&rsquo;s problem is not too many visitors; it is too
+    many visitors in the same eleven places in the same six weeks. Every part
+    of this platform is built to push the other way &mdash; the Planner
+    rewards shoulder months, the Atlas gives a Galician fishing town the same
+    page template as Paris, and these {len(quiet)} places are where it would
+    send you instead.</p>
+  </div>
+  {quietmap}"""
 
+    # ── 02 · NOT HIDDEN GEMS ─────────────────────────────────────────
+    # THE REFUSAL COMES BEFORE THE LIST, because a reader about to be handed
+    # 130 places tagged "quiet" needs to know what the tag claims and what
+    # it does not. It is a different band from THE RULE at 06: this one says
+    # what we will not write, that one says what we write instead — and the
+    # brief separates them for the same reason.
+    hidden = f"""
+  <div class="sheettext">
+    <h2 class="mega">The alternative is not
+    <em class="lit">hidden gems</em>.</h2>
+    <p class="lede">Publishing a place as undiscovered is how it stops being
+    one. So there is no secret list here and no ranking of it: there is an
+    editorial tag, on {len(quiet)} of {total} destinations, meaning a place
+    with the goods and without the crowd. It is a judgement, it is stated as
+    one, and we will be wrong sometimes.</p>
+    <p class="note">Every one of them is an ordinary page in the same Atlas,
+    written to the same template as Paris. That is the whole mechanism: not a
+    different product for quieter places, the same product, applied evenly.</p>
+  </div>"""
+
+    # ── 03 · ONE FROM EACH CORNER ────────────────────────────────────
+    # NOT THE FIRST EIGHT OF 130. The list is sorted by country, so the
+    # first eight would be Albania and Andorra — a claim about the alphabet
+    # rather than about Europe. One per macro region, in the taxonomy's own
+    # order, which is the same nine divisions the drawing above is an
+    # argument about and the same nine the set below is grouped into.
+    picks = [by_macro[m["slug"]][0] for m in data["macros"]
+             if m["slug"] in by_macro]
+    lead = [n for n in picks if held(images, key(n))][:3]
+    rest = [n for n in picks if n not in lead]
+    mosaic = ed_mosaic(images, [
+        {"key": key(n), "alt": n["city"]["name"], "label": n["city"]["name"]}
+        for n in lead]) if len(lead) >= 3 else ""
+    strip = ed_strip(images, [
+        {"key": key(n), "alt": n["city"]["name"], "label": n["city"]["name"],
+         "href": urls.city(n["country"], n["region"], n["city"]),
+         "note": n["country"]["name"]}
+        for n in rest], limit=len(rest))
+    corners = f"""
+  <div class="sheettext">
+    <h2 class="mega">One from each corner of the continent.</h2>
+    <p class="lede">The first quiet destination in each of the
+    {numword(len(picks))} macro regions &mdash; not the first
+    {numword(len(picks))} of {len(quiet)}, which would be a claim about the
+    alphabet. A reader choosing between Santorini and Sifnos is choosing
+    partly on what the place looks like, and this is the page that asks for
+    exactly that swap.</p>
+  </div>
+  {mosaic}
+  {strip}
+  <p class="small">{len(shot)} of these {len(quiet)} destinations carry a
+  photograph in the register today, so most of this page is words and a map.
+  That is a licensing position rather than a design one: a picture is bought
+  one at a time, and the ones that exist are spent here rather than held
+  back.</p>"""
+
+    # ── 04 · 130 PLACES, NINE CORNERS ────────────────────────────────
+    # THE COUNT IS THE OBVIOUS NUMBER AND IT ARGUES THE WRONG WAY. Nine
+    # counts alone say "go to the Mediterranean", because the Mediterranean
+    # holds 41 — and it holds 41 because it holds 94 destinations. The share
+    # of each corner's OWN set is the number that answers the question this
+    # page asks, and it reorders the nine. Both are printed, because the
+    # count is what a reader came for and the share is what it means.
+    share_all = 100.0 * len(quiet) / total if total else 0
+    groups = []
+    for m in data["macros"]:
+        if m["slug"] not in by_macro:
+            continue
+        got = by_macro[m["slug"]]
+        alln = len(allmacro.get(m["slug"], ()))
+        pct = round(100.0 * len(got) / alln) if alln else 0
+        groups.append(
+            f'<div class="rowgroup"><p class="rowgrouphead">{esc(m["name"])}'
+            f'<span class="rowgroupn">{len(got)}</span>'
+            f'<span class="qshare">{pct}% of its own destinations</span></p>'
+            + "".join(
+                f'<a class="row quietrow" '
+                f'href="{urls.city(n["country"], n["region"], n["city"])}">'
+                f'<div><h3>{esc(n["city"]["name"])}</h3>'
+                f'<p class="rowsub">{esc(n["city"]["summary"])}</p></div>'
+                f'<p class="rowmeta">{esc(n["country"]["name"])} &middot; '
+                f'{esc(n["region"]["name"])}</p></a>'
+                for n in got)
+            + "</div>")
+    ranked = sorted(
+        ((round(100.0 * len(by_macro[m["slug"]]) / len(allmacro[m["slug"]])),
+          len(by_macro[m["slug"]]), m["name"])
+         for m in data["macros"]
+         if m["slug"] in by_macro and allmacro.get(m["slug"])),
+        reverse=True)
+    most = max(((len(by_macro[m["slug"]]), m["name"]) for m in data["macros"]
+                if m["slug"] in by_macro))
+    quietset = f"""
+  <div class="sheettext">
+    <h2 class="mega">{len(quiet)} places, {numword(len(by_macro))} corners.</h2>
+    <p class="lede">Grouped geographically rather than ranked, so the
+    alternative does not become another popularity list. Each corner carries
+    two figures: how many quiet destinations it holds, and what share of its
+    own destinations those are &mdash; and the two disagree.
+    {esc(most[1])} holds the most at {most[0]}, because it holds the most
+    destinations of any corner; {esc(ranked[0][2])} is the quietest at
+    {ranked[0][0]}% against {share_all:.0f}% for the Atlas as a whole.</p>
+  </div>
+  <div class="rows">{"".join(groups)}</div>"""
+
+    # ── 05 · SIX STRAIGHT SWAPS ──────────────────────────────────────
+    # THE SIX ARE AUTHORED AND THAT IS LEGITIMATE — they are editorial
+    # judgements about pressure and season, which is the work, not measured
+    # claims dressed as one. Nothing here derives a swap from the dataset,
+    # because a great-circle distance and a quiet flag cannot say that
+    # Kvarner is what somebody wanted from Dubrovnik.
     swaps = "".join(
-        f"""<div class="row"><div><h3>{esc(a)}</h3><p class="rowsub">{esc(why)}</p></div>
-        <p class="rowmeta">try {esc(b)}</p></div>"""
+        f'<div class="row swaprow">'
+        f'<div><p class="kicker">Instead of</p><h3>{esc(a)}</h3>'
+        f'<p class="rowsub">{esc(why)}</p></div>'
+        f'<div class="swapto"><p class="kicker">Try</p><h3>{esc(b)}</h3></div>'
+        f'</div>'
         for a, b, why in [
-            ("Paris in July", "Paris in October", "Same city, half the queue, and the light is better."),
-            ("The Amalfi Coast in August", "Puglia's Adriatic side in June", "A coast that still belongs to the people who live on it."),
-            ("Santorini at sunset", "Naxos or Sifnos, any evening", "The Cyclades without the cruise schedule."),
-            ("Dubrovnik in high summer", "The Kvarner islands in May", "Walled towns exist all down that coast."),
-            ("Reykjavík's Golden Circle", "The Westfjords", "Six hours further and a different country."),
-            ("Barcelona in August", "Girona and the Empordà", "An hour by train from the thing everyone else is queueing for."),
-        ]
-    )
-    # THE ALTERNATIVE TO SANTORINI HAS TO BE SEEN TO BE AN ALTERNATIVE.
+            ("Paris in July", "Paris in October",
+             "Same city, half the queue, and the light is better."),
+            ("The Amalfi Coast in August", "Puglia's Adriatic side in June",
+             "A coast that still belongs to the people who live on it."),
+            ("Santorini at sunset", "Naxos or Sifnos, any evening",
+             "The Cyclades without the cruise schedule."),
+            ("Dubrovnik in high summer", "The Kvarner islands in May",
+             "Walled towns exist all down that coast."),
+            ("Reykjavík's Golden Circle", "The Westfjords",
+             "Six hours further and a different country."),
+            ("Barcelona in August", "Girona and the Empordà",
+             "An hour by train from the thing everyone else is queueing for."),
+        ])
+    swapband = f"""
+  <div class="sheettext">
+    <h2 class="mega">Six straight swaps.</h2>
+    <p class="lede">Same idea, different pressure. Two of the six are the same
+    place at a different time of year, which is the cheapest swap there is and
+    the one the Planner already weights for.</p>
+  </div>
+  <div class="rows swaps">{swaps}</div>"""
+
+    # ── 06 · THE RULE ────────────────────────────────────────────────
+    # A REFUSAL NOBODY CAN CHECK IS A SLOGAN, and this band's three promises
+    # had never been checked. Two of them are kept on every one of the
+    # destination pages — "When to come" and "Getting there" are section
+    # headings on all of them. THE THIRD IS NOT BUILT: an experience record
+    # carries a slug, a name, a kind, a band and a summary, and no operator;
+    # the Stay layer publishes that we list neither hotels nor restaurants
+    # and refuses a ranking outright. So the sentence has been promising
+    # something this site does not do anywhere.
     #
-    # This page's whole argument is that a Galician fishing town deserves the
-    # same page as Paris, and it made that argument with a map, a hundred and
-    # thirty names and six typed swaps. A reader deciding between Santorini
-    # and Sifnos is deciding partly on what the place looks like, and this is
-    # the page that asks them to make exactly that swap with nothing to look
-    # at — which is the fault that took 130 hash-drawn plates off it, still
-    # unanswered on the other side.
-    #
-    # NOT THE FIRST EIGHT. The list is sorted by country, so the first eight
-    # would be Albania and Andorra — a claim about the alphabet rather than
-    # about Europe. One per macro region, in the taxonomy's own order, which
-    # is the same nine divisions the list below is grouped into and the same
-    # spread the drawing above is an argument about.
-    _qpick = [by_macro[m["slug"]][0] for m in data["macros"]
-              if m["slug"] in by_macro]
-    _qshots = ed_strip(data.get("images"), [
-        {"key": f"city:{n['country']['slug']}/{n['region']['slug']}/{n['city']['slug']}",
-         "alt": n["city"]["name"], "label": n["city"]["name"],
-         "href": urls.city(n["country"], n["region"], n["city"])}
-        for n in _qpick], limit=9)
-    if _qshots:
-        _qshots = ('<section class="ed-section">'
-                   + ed_section_head("Instead",
-                       "One from each corner of the continent",
-                       f"The first quiet destination in each of the "
-                       f"{numword(len(_qpick))} macro regions — not the first "
-                       f"eight of {len(quiet)}, which would be a claim about "
-                       f"the alphabet.")
-                   + _qshots + "</section>")
+    # It is stated as unbuilt with what it would take, rather than quietly
+    # deleted — the /my-europe futures grammar and /plan's refusals, and the
+    # standing rule that recording a mistake beats removing the evidence
+    # of it.
+    rule = f"""
+  <div class="sheettext">
+    <h2 class="mega">The rule we hold ourselves to.</h2>
+    <p class="lede">No page on this site tells you a place is undiscovered.
+    Publishing that sentence is what ends it. What we will say instead is
+    three things &mdash; and two of them are on every one of the {total}
+    destination pages, which is what makes them checkable rather than a
+    slogan.</p>
+  </div>
+  <div class="rows">
+    <a class="row" href="/europe/albania/tirana-and-the-south/gjirokaster">
+    <div><h3>When to come</h3><p class="rowsub">The months a place is at its
+    best and the ones it is quieter in, as a section on every one of the
+    {total} destination pages.</p></div>
+    <p class="rowmeta">Kept</p></a>
+    <a class="row" href="/europe/albania/tirana-and-the-south/gjirokaster">
+    <div><h3>How to arrive without a car</h3><p class="rowsub">Getting there,
+    and getting near where there is no direct route &mdash; a section on every
+    one of them too.</p></div>
+    <p class="rowmeta">Kept</p></a>
+    <div class="row"><div><h3>Who locally is worth your money</h3>
+    <p class="rowsub">Named people and businesses, chosen and checked rather
+    than ranked. It needs an operator field nothing here holds, and a way to
+    choose that is not a ranking.</p></div>
+    <p class="rowmeta">Not built</p></div>
+  </div>
+  <p class="note">The third is written here rather than removed. It has been
+  on this page since the rule was, and an experience record carries a name, a
+  kind and a summary and no operator &mdash; while <a href="/for-businesses">
+  /for-businesses</a> publishes that there is nothing in this index that could
+  carry a boost. Saying so is the only honest version of the sentence until
+  somebody builds it.</p>"""
+
+    # ── 07 · LEAVE THE OBVIOUS BEHIND ───────────────────────────────
+    # `.istart` IS REUSED RATHER THAN DUPLICATED. It is /interests' closing
+    # band — a statement, a lede and two links on a narrow measure — and a
+    # second rule with an identical body is the duplicate this stylesheet
+    # removed eighty-five of. Two users is not yet the three that earns a
+    # neutral name; a third gets one rather than a fourth copy.
+    leave = """
+  <div class="istart">
+    <h2 class="mega">Leave the obvious behind.</h2>
+    <p class="lede">Not because the famous places are wrong &mdash; they are
+    famous for reasons. Because Europe is larger than the eleven places
+    everyone already knows, and the rest of it has pages too.</p>
+    <p class="keepgo"><a class="btn" href="/discover">Find a quiet place</a>
+    <a class="storygo" href="/plan">Or plan around the crowds &rarr;</a></p>
+  </div>"""
+
+    PLATES = [("btopen gal", "Beyond the obvious", btopen, "beyond-the-obvious"),
+              ("hidden pine", "Not hidden gems", hidden, "not-hidden-gems"),
+              ("corners gal", "One from each corner", corners, "corners"),
+              ("quietset paper", "The set", quietset, "the-set"),
+              ("swaps gal", "Six straight swaps", swapband, "swaps"),
+              ("rule pine", "The rule", rule, "the-rule"),
+              ("leave gal", "Leave the obvious behind", leave, "leave")]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Beyond the obvious", None)])}
-<div class="pagehead index">
-  <p class="kicker">Responsible travel, stated plainly</p>
-  <h1>Beyond the obvious.</h1>
-  <p class="lede">Europe's problem is not too many visitors; it is too many visitors in the same
-  eleven places in the same six weeks. Every part of this platform is built to push the other
-  way — the Planner rewards shoulder months, the Atlas gives a Galician fishing town the same
-  page template as Paris, and these {len(quiet)} places are where it would send you
-  instead.</p>
-</div>
-{quietmap}
-{_qshots}
-{section(f"{len(quiet)} places we would send you instead", f'<div class="rows">{rows}</div>',
-         lede="Tagged quiet in the dataset: places with the goods and without the crowd. The tag is editorial and we will be wrong sometimes.")}
-{section("Six straight swaps", f'<div class="rows">{swaps}</div>',
-         lede="Same idea, different pressure.")}
-<div class="note">
-  <h2 class="mini">The rule we hold ourselves to</h2>
-  <p>No page on this site tells you a place is undiscovered. Publishing that sentence is what
-  ends it. What we will say is when to come, how to arrive without a car where that is possible,
-  and who locally is worth your money.</p>
-</div>
+{plate_sequence(PLATES)}
 """
     return "/beyond-the-obvious/index.html", page(
         "Beyond the obvious", body, path="/beyond-the-obvious", area=None,
+        hero=True,
         description="Europe's quieter alternatives, shoulder-season travel and straight swaps for the eleven places everyone goes at once.",
     )
 
-
 # ── my europe ─────────────────────────────────────────────────────────
+
 
 def my_europe_page(data):
     """The private atlas: what you kept, drawn, and what the browser holds.

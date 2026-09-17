@@ -3181,6 +3181,57 @@ def c_status_page():
     return 3
 
 
+@check("a promise about every destination page is kept by every destination page")
+def c_kept_promises():
+    """/beyond-the-obvious names what this site will say instead of calling a
+    place undiscovered, and two of the three are claims about the Atlas.
+
+    A REFUSAL NOBODY CAN CHECK IS A SLOGAN, and this one had never been
+    checked in either direction. The band published three promises — when to
+    come, how to arrive without a car, and who locally is worth your money —
+    and the third is not built anywhere: an experience record carries a slug,
+    a name, a kind, a band and a summary and no operator, and /for-businesses
+    publishes that there is nothing in this index that could carry a boost.
+    It is stated as unbuilt on the page.
+
+    The other two are stated as kept on EVERY destination page, which is a
+    claim to a reader about 319 documents. So it is asserted rather than
+    measured once: the day a destination template drops "When to come", the
+    page that promises it goes red instead of quietly becoming false. That is
+    `c_published_projection`'s rule — a name in a comment is history and a
+    name on a page is a claim.
+    """
+    promises = ("When to come", "Getting there")
+    pages = [f for f in site_files()
+             if rel(f).count("/") == 5 and rel(f).startswith("/europe/")]
+    if len(pages) < 200:
+        fail(f"only {len(pages)} destination pages found — this check has "
+             f"stopped finding the family it is about")
+        return 0
+    n = 0
+    for f in pages:
+        body = open(f, encoding="utf-8").read()
+        for promise in promises:
+            n += 1
+            if promise not in body:
+                fail(f"{rel(f)} does not carry {promise!r}, and "
+                     f"/beyond-the-obvious publishes that every destination "
+                     f"page does")
+    band = open(os.path.join(OUT, "beyond-the-obvious", "index.html"),
+                encoding="utf-8").read()
+    for promise in ("When to come", "How to arrive without a car"):
+        n += 1
+        if promise not in band:
+            fail(f"/beyond-the-obvious has stopped naming {promise!r}, so the "
+                 f"check that it is kept is asserting nothing")
+    n += 1
+    if "Not built" not in band:
+        fail("/beyond-the-obvious no longer marks the third promise unbuilt. "
+             "Either somebody built it — in which case say so here — or the "
+             "page has gone back to promising it")
+    return n
+
+
 @check("no page horizontally overflows on a phone by construction")
 def c_no_fixed_widths():
     # Not a rendering test — a source test for the two things that have

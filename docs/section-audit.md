@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**101 sections · 39 partial · 31 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1367 assertions · 0 failing**
+**101 sections · 39 partial · 31 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1368 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -91,7 +91,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 77 | Destination discovery algorithm | BUILT | 3 | The specification's weighting, with popularity's 10% reallocated to content quality because we have no traffic and would otherwise be inventing a number. |
 | 78 | Diversity algorithm | BUILT | 3 | Three big cities in a row start pushing the fourth choice towards the alternative, and the pressure builds rather than switching on. |
 | 79 | Seasonal engine | BUILT | 52 | Peak, shoulder and off for every country, a month page that answers where to go, and season as 15% of the planner's score. |
-| 80 | Crowd-aware discovery | PARTIAL | 2 | The specification says not to manufacture crowd data, so we have not. The quiet tag is editorial and labelled as editorial; there is no busy/moderate/quiet indicator pretending to be measured. |
+| 80 | Crowd-aware discovery | PARTIAL | 3 | The specification says not to manufacture crowd data, so we have not. The quiet tag is editorial and labelled as editorial; there is no busy/moderate/quiet indicator pretending to be measured. |
 | 81 | Responsible travel | BUILT | 3 | In the mechanism, not only the copy: shoulder months score up, quiet places score up, and no page calls anywhere undiscovered. |
 | 82 | Brand personality | RECORDED | 2 | Intelligent, welcoming, culturally careful — and specifically not a booking engine, which the whole product is arranged around. |
 | 83 | Visual direction | PARTIAL | 4 | Editorial, map-led, generous whitespace, one type scale. The specification asks for large photography and the containers now exist on every family that opens on one; what is in them is whatever has been licensed, and the rest of the site is drawn. |

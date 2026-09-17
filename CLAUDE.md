@@ -23,6 +23,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **/plan — an instrument rather than a form, and the guard a runtime `<img>` walks straight past** | **`docs/plan-redesign.md`** — the source audit, the seven bands, the three of the brief's asks that collide with recorded findings, the twelve defects only rendering found (nine of them faults already recorded in another family and three of those recorded in the commit before), and the per-leg photograph: `render.credit_html` is one implementation because `checks.py` cannot see an `<img>` a script writes |
 | **/my-europe — a private atlas, and the save kind the app did not know** | **`docs/my-europe-redesign.md`** — the source audit, the six save kinds against the five the sort knew, why `Itinerary` looked dead and is not, the brief's three kinds of memory measured as six, the monumental opening refused by the instrument-head measurement, and the three defects only rendering found. Nothing about how this page stores anything changed |
 | **/interests — the useful tags are not the biggest, and the nine it had no picture of were the nine it recommends** | **`docs/interests-redesign.md`** — the source audit, eighteen photographs of which nine were spent, `INTEREST_BANDS` read as the three visual scales, the concentration measurement the ledger's own sentence was hiding, the two of the brief's asks that are refused, and the four defects only rendering found — one of them /stories' nested anchor, reproduced a commit after it was recorded |
+| **/beyond-the-obvious — the counter-atlas, and the corner with the most quiet places is not the quietest corner** | **`docs/beyond-redesign.md`** — the source audit, the count that argues the wrong way against the share that argues the right one, the rule's three promises measured against the built site (two kept, one not built anywhere), the seven plates, and the two defects only rendering found — plus the correction of a finding this file published three commits ago |
 | **the eight page families, and what each room does differently** | **`docs/non-home-redesign.md`** — the non-home redesign answered A-J. The eight rooms derived from the route, the three helpers that were forcing one grammar, the seven image scales, 1,626 declared surfaces, and the defects only rendering found |
 | **the design language — what makes a page EuropeDoor with the logo removed, and which movements each family takes** | **`docs/design-language.md`** — the ARCHITECT step. Five marks that could not have been made by anybody else, the six-movement composition grammar per family, the three head roles, what the language forbids, and how a change is proved |
 | **anything at all — read this first, every session** | **`docs/instruction.md`** — the standing instruction. Part 1 is how work is done here (audit first, deviate with numbers, STOP on licensing, never invent data, prove every check can fail). Part 2 is the visual instruction: **European Future**, the two worlds, the palette, the 60/25/10/5 ratio and the measured contrast limits. `docs/palette.json` is the checkable form |
@@ -5460,11 +5461,21 @@ you have not chosen yet*. That is /themes' 204-pixel continent and the
 `.card-art` letterbox a third time: **nothing counts a cap.** 1152 × 899 at
 1280 after.
 
-**AND `.sheet-pine` SETS NO `display`, SO BOTH PINE BANDS LANDED IN A 40%
-TRACK.** Third occurrence of that repair in three commits — /stories' feature
-band shipped at 205 × 154 of photograph at 1280 and /events' year chart fell
-from 1,152 pixels to 619. `.sheet-gal` ends `display: block` and no other
-room does, so a composition that is one child of a `.sheet` states its own.
+**AND THE PARAGRAPH THAT STOOD HERE WAS WRONG, WHICH IS THE POINT OF
+LEAVING IT.** It said *`.sheet-pine` sets no `display`, so both pine bands
+landed in a 40% track*, called it the third occurrence in three commits, and
+went into a commit message and into this file. **`.sheet-pine` has ended
+`display: block` since the commit that introduced it**, and so do
+`.sheet-gal` and `.sheet-bleed`; only `.sheet-paper` and `.sheet-quiet` do
+not. /stories' feature band at 205 × 154 and /events' year chart at 619 were
+both **paper**, which is exactly what made "a paper or pine composition lands
+in the 40% track" look true — a correct diagnosis of two cases, generalised
+one room too far and then repeated as evidence. Seven declarations on
+/my-europe, five on /interests and six on /beyond-the-obvious restated what
+their room already computes; all eighteen are gone and twelve screenshots
+across six pages at 1280 and 390 are **byte-identical** before and after.
+`grep -n '^\.sheet-pine' -A 6` is the whole check and it takes a second.
+*A comment claiming evidence is read as evidence* — and so is a finding.
 **`sheet-kinds` was already emitted by /experiences with no rule anywhere**,
 found by grepping the stylesheet AND the built site, which is the lesson
 `.sheet-year` cost one commit earlier; `c_plate_class_owner` now fails on it
@@ -5561,6 +5572,57 @@ nothing. **A selector that matches nothing on the page that declares it is
 invisible to a check that asks the question site-wide.** Both declarations
 follow their page now: countries 26% claimed against a measured **55%**,
 interests 26% → **47%**.
+
+
+**THE COUNT ARGUES THE WRONG WAY AND THE PAGE PRINTED ONLY THE COUNT.**
+/beyond-the-obvious groups its 130 quiet destinations into nine corners of
+Europe, and the nine counts alone say **go to the Mediterranean** — it holds
+41, three times the next corner. That is the opposite of what the page argues
+and it is an artefact: the Mediterranean holds 41 because it holds **94
+destinations**. As a share of each corner's own set the order changes — the
+**Baltic States is 58% quiet** and Eastern Europe 25%, against 41% for the
+Atlas as a whole, and the Mediterranean is 44%, barely above average. *The
+busiest month is the least characteristic*, one family over. Both figures are
+on the group head now, the count because it is what a reader came for and the
+share because it is what the count means, and both are derived.
+
+**AND THE RULE HAD THREE PROMISES, ONE OF WHICH THIS SITE DOES NOT KEEP
+ANYWHERE.** *No page on this site tells you a place is undiscovered … what we
+will say is when to come, how to arrive without a car where that is possible,
+and who locally is worth your money.* Measured against the built site: **When
+to come** and **Getting there** are section headings on all 319 destination
+pages, so two are kept and checkable. The third is not built at all — an
+experience record carries a slug, a name, a kind, a band and a summary and
+**no operator**, the Stay layer publishes that we list neither hotels nor
+restaurants and refuses a ranking, and /for-businesses publishes that there is
+nothing in this index that could carry a boost. *A refusal nobody can check is
+a slogan*, and this one had never been checked. It is stated as unbuilt with
+what it would take, rather than quietly deleted.
+
+**AND THE PAGE'S OWN POSITION WAS THE SMALLEST THING ON IT** — a `.note` at
+the very bottom, under 130 rows and six swaps, at caption size. It is two
+bands now, because the refusal (*the alternative is not hidden gems*) and what
+we write instead are two statements rather than one said twice.
+
+**`.rowmeta` IS `white-space: nowrap`, AND PROSE IN IT RAN 831 PIXELS OFF THE
+PAGE.** The rule band's third row put its explanation in the metadata column —
+the slot that carries a country and a region everywhere else on this site — so
+the document scrolled sideways by **223px at 1280 and 263 at 834**. That is
+`19 DAYS · 5 COUNTRIES · MODERATE` exactly, and **the phone-overflow check
+could not see it because it is a check about phones**: at 390 and 320 the row
+stacks and there is no overflow at all. Prose goes in the subline; the meta
+says *Kept* or *Not built*. **And a swap is a pair whose second half was also
+typeset as metadata** — *Naxos or Sifnos, any evening*, the one thing the band
+exists to say, sat in the region-name slot. Both halves are headings now.
+
+**NO PHOTOGRAPH IN THE OPENING, AND IT IS A REFUSAL RATHER THAN A GAP.** The
+register declares no hero for this family, and the one that could be acquired
+is by definition a generic European scene — the exact thing a page refusing
+the phrase *hidden gems* cannot open on. 27 of the 130 carry a photograph and
+the page spends nine, one per corner, because **27 of 130 is a fact about the
+library rather than about Europe** and presenting it as a selection is what
+this page refuses. The corner with none shows its slot, which names the
+acquisition. **Nothing was acquired.**
 
 
 ## Gates

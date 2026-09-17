@@ -913,7 +913,20 @@ def measure():
                        "did not move: the seventeen are still "
                        "rows and the eight narrow ones are rows "
                        "too, so what left is the head rather "
-                       "than the list."},
+                       "than the list. "
+                       "AND /beyond-the-obvious IS THE SEVENTH, one "
+                       "page each: band 0.767 -> 0.766 and "
+                       "ed-section 0.833 -> 0.832. It was a "
+                       "`pagehead index`, a map, a strip and two "
+                       "`section()` bands with the page's own "
+                       "editorial position in a `.note` at the "
+                       "bottom at caption size; it is a "
+                       "seven-plate sequence now, and the head "
+                       "stayed — the opening plate declares "
+                       "`pagehead index` and states the extent. "
+                       "`row` did not move: the 130 are still rows "
+                       "grouped by macro region and the six swaps "
+                       "are rows too."},
         },
     }
 

@@ -1673,7 +1673,21 @@ def s79():
          "not. The quiet tag is editorial and labelled as editorial; there "
          "is no busy/moderate/quiet indicator pretending to be measured.")
 def s80():
-    yield has("/beyond-the-obvious", "Tagged quiet in the dataset")
+    # THE FIRST VERSION PINNED THE LEDE'S EXACT WORDS — "Tagged quiet in the
+    # dataset" — which was a `section()` lede, so it went red the day that
+    # band became a plate and said the same thing at more length. That is
+    # this repository's most repeated assertion fault: it protected a
+    # SENTENCE where the promise is that the tag is declared EDITORIAL, is
+    # admitted to be fallible, and is counted rather than asserted.
+    yield has("/beyond-the-obvious", "editorial", "we will be wrong sometimes")
+    # THE FIGURE IS DERIVED HERE TOO, because a check that types 130 is a
+    # check that was true two hundred destinations ago — the same rule the
+    # page it is asserting about follows.
+    nquiet = sum(1 for n in DATA["cities"].values() if n["city"].get("quiet"))
+    h = page("/beyond-the-obvious")
+    yield (f"{nquiet} of {NCITY}" in h or
+           (f"{nquiet}" in h and f"{NCITY}" in h),
+           f"and it states how many of the Atlas carry the tag ({nquiet} of {NCITY})")
     yield every_page(lambda h: "busy right now" not in h.lower()
                      and "crowd level" not in h.lower(), "nothing claims live crowding")
 

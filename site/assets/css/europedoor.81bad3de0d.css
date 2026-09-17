@@ -7669,7 +7669,25 @@ body { position: relative; overflow-x: hidden; }
    `:root { --ed-ink: var(--ink) }` would resolve the light world's ink and
    inherit that one number into the instrument. This stylesheet has already
    shipped that bug once, in `accent-color`, and the note is forty lines from
-   here. */
+   here.
+
+   AND `body` IS NOT FAR ENOUGH DOWN, WHICH IS THE SAME BUG ONE LEVEL IN.
+   The two aliases that pointed at a token a ROOM rebinds — `--ed-pine`
+   (`--pine-ink`, rebound in seven places) and `--ed-ink` (`--ink`, eight)
+   — resolved at `body` and could not follow the room. `.sheet-gal` is a
+   white wall in BOTH preferences: it sets `--paper-3` to `--mineral` and
+   `--pine-ink` back to the dark `--pine` for exactly that reason, and
+   `--ed-pine` had already resolved to the dark preference's `--pine-air`
+   at `body`. So an empty photograph slot's own surface name rendered
+   **#7fbfa1 on #D8D4C7 — 1.43:1**, light mint on light stone, for a
+   dark-preference reader: the `accent-color` bug a third time, arriving
+   through an alias rather than through `:root`.
+
+   An alias is admitted here only when it can be PROVED not to diverge,
+   and a token any room rebinds cannot be. Those two are gone and their
+   nine consumers read `--pine-ink` and `--ink` directly — one token,
+   resolved where it is used. The eight that remain alias palette values
+   no room touches, which is what makes them provable. */
 body {
   /* PINE AS INK, WHICH IS A DIFFERENT COLOUR IN EACH PREFERENCE.
      `--pine` is #0F433E — 4.93 on bone paper and **1.74 on graphite**, so
@@ -7689,10 +7707,8 @@ body {
   --ed-bone:        var(--bone);
   --ed-paper:       var(--bone-light);
   --ed-mineral:     var(--mineral);
-  --ed-pine:        var(--pine-ink);
   --ed-pine-deep:   var(--pine-deep);
   --ed-graphite:    var(--graphite);
-  --ed-ink:         var(--ink);
   --ed-cobalt:      var(--cobalt);
   --ed-sky:         var(--sky);
   --ed-terracotta:  var(--terracotta);
@@ -7821,7 +7837,7 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
 .ed-eyebrow {
   font-family: var(--ed-mono); font-size: var(--t-xs); line-height: 1;
   letter-spacing: .16em; text-transform: uppercase;
-  color: var(--ed-pine); margin: 0 0 var(--s6);
+  color: var(--pine-ink); margin: 0 0 var(--s6);
 }
 /* ONE NEW TYPE SIZE IN THE WHOLE SYSTEM, AND IT IS THE TOP OF THE SCALE.
    The brief's opening runs to 108px where --t-6xl stops at 76, and
@@ -7919,7 +7935,7 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
   width: min(var(--ed-max), calc(100% - 2 * var(--ed-gutter)));
   margin-inline: auto;
   padding-block: clamp(4.375rem, 9vw, 8.75rem);
-  border-top: 1px solid color-mix(in srgb, var(--ed-ink) 18%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
 }
 /* TWO COMPONENTS EACH PAYING FOR THE SAME GAP. Measured on /interests/
    mountains at 1280: the head ends its content at y=664, pays 178 pixels of
@@ -7942,7 +7958,7 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
 }
 .ed-section-index {
   font-family: var(--ed-mono); font-size: var(--t-xs); letter-spacing: .12em;
-  text-transform: uppercase; color: var(--ed-pine); margin: 0;
+  text-transform: uppercase; color: var(--pine-ink); margin: 0;
 }
 /* ONE COUNTER FOR BOTH BAND SHAPES, BECAUSE TWO NUMBERING SYSTEMS ON ONE PAGE
    PRINTED THE SAME NUMBER TWICE ON 753 PAGES. `main` resets `band` and every
@@ -8035,18 +8051,18 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
 }
 
 /* ── THE ROW INDEX ───────────────────────────────────────── */
-.ed-rows { border-top: 1px solid color-mix(in srgb, var(--ed-ink) 20%, transparent); }
+.ed-rows { border-top: 1px solid color-mix(in srgb, var(--ink) 20%, transparent); }
 .ed-row {
   display: grid;
   grid-template-columns: 4.5rem minmax(0, 1fr) minmax(7.5rem, .35fr) 2rem;
   gap: var(--s5); align-items: center; padding: var(--s6) 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--ed-ink) 14%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
   color: inherit; text-decoration: none;
   transition: padding .35s var(--ed-ease), background .35s var(--ed-ease);
 }
 .ed-row:hover, .ed-row:focus-visible { padding-inline: var(--s5); background: var(--ed-paper); }
 @media (prefers-reduced-motion: reduce) { .ed-row { transition: none; } }
-.ed-row-number { font-family: var(--ed-mono); font-size: var(--t-xs); color: var(--ed-pine); }
+.ed-row-number { font-family: var(--ed-mono); font-size: var(--t-xs); color: var(--pine-ink); }
 /* THE LEVEL IS THE OUTLINE AND THE CLASS IS THE LOOK, so the selector takes
    both levels a row's name is emitted at. `ed_rows(level=4)` exists for one
    caller — /countries nests its country rows inside a macro region's `<h3>`
@@ -8061,7 +8077,7 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
   font-family: var(--ed-mono); font-size: var(--t-xs); text-transform: uppercase;
   letter-spacing: .1em; color: var(--ink-3);
 }
-.ed-row-arrow { font-size: var(--t-lg); color: var(--ed-pine); }
+.ed-row-arrow { font-size: var(--t-lg); color: var(--pine-ink); }
 
 /* ── THE MOSAIC ──────────────────────────────────────────── */
 .ed-mosaic { display: grid; grid-template-columns: 1.25fr .75fr; gap: var(--ed-gap); }
@@ -8692,7 +8708,7 @@ main { --ed-gutter: 0px; counter-reset: band; }
 .band > .band-head::before {
   content: "0" counter(band);
   font-family: var(--ed-mono); font-size: var(--t-xs); letter-spacing: .12em;
-  color: var(--ed-pine); padding-top: .55em;
+  color: var(--pine-ink); padding-top: .55em;
 }
 .band > .band-head > h2 {
   grid-column: 2; font-family: var(--ed-serif); font-weight: 400;
@@ -8846,7 +8862,7 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
 .ed-slot p { margin: 0; max-width: 46ch; }
 .ed-slot-key {
   font-family: var(--ed-mono); font-size: var(--t-xs); letter-spacing: .12em;
-  text-transform: uppercase; color: var(--ed-pine);
+  text-transform: uppercase; color: var(--pine-ink);
 }
 .ed-slot-note {
   font-family: var(--ed-sans); font-size: var(--t-sm); line-height: 1.5;
@@ -11445,16 +11461,17 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .sheet-readgo { padding-block: 12vh; }
 
 /* ── MY EUROPE: THE PRIVATE ATLAS ────────────────────────────────────── */
-/* `.sheet-pine` BINDS TOKENS AND SETS NO `display`, exactly like
-   `.sheet-paper`, so both pine bands here would inherit `.sheet`'s
-   `minmax(0, 40%) minmax(0, 1fr)` and put their head in the 40% track. That
-   is the same repair /events and /stories each needed in the two commits
-   before this one — third occurrence, and the rule is now written where a
-   fourth will find it: a ROOM contributes ground, ink and rhythm; the
-   composition inside it does the layout. */
-.sheet-meatlas, .sheet-privacy, .sheet-melist,
-.sheet-mefuture, .sheet-mekinds, .sheet-mebuild { display: block; }
-.sheet-meopen { display: block; padding-block: 8vh 6vh; }
+/* THE FIRST VERSION GAVE ALL SEVEN OF THESE `display: block` AND NONE OF
+   THEM NEEDED IT. `.sheet-gal`, `.sheet-pine` and `.sheet-bleed` all end
+   `display: block`; only `.sheet-paper` and `.sheet-quiet` do not, and
+   every band on this page is `gal` or `pine`. /stories' feature band at
+   205 x 154 and /events' year chart at 619 were both `paper` — which is
+   what made "a paper or pine composition lands in the 40% track" look
+   true when it was written here, and it went into a commit message and
+   into CLAUDE.md before anybody grepped `.sheet-pine`. Removed, and the
+   pages proved byte-identical at 1280 and 390 before and after, because
+   nothing here is deleted on an argument alone. */
+.sheet-meopen { padding-block: 8vh 6vh; }
 .sheet-meatlas, .sheet-melist, .sheet-mekinds,
 .sheet-mefuture, .sheet-privacy { padding-block: 9vh; }
 .sheet-mebuild { padding-block: 13vh; }
@@ -11705,18 +11722,20 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    an explicit visual distinction between broad and narrow that is read off
    a sentence rather than picked to make a layout work.
 
-   THREE OF THESE PLATES STATE THEIR OWN `display`, AND THAT IS THE THIRD
-   COMMIT RUNNING TO NEED IT. `.sheet` is `grid-template-columns: minmax(0,
-   40%) minmax(0, 1fr)` and only `.sheet-gal` ends `display: block`, so a
-   `paper` or `pine` composition that is one child of a sheet lands in the
-   40% track: /stories' feature band shipped at 205 x 154 of photograph at
-   1280 and /events' year chart fell from 1,152 pixels to 619. */
-.sheet-iopen { display: block; padding-block: 7vh 0; }
-.sheet-firstact, .sheet-reach, .sheet-istart { display: block; }
+   ONE OF THESE PLATES STATES ITS OWN `display` AND THE FIRST VERSION GAVE
+   IT TO SIX. `.sheet` is `grid-template-columns: minmax(0, 40%) minmax(0,
+   1fr)`, and `.sheet-gal`, `.sheet-pine` and `.sheet-bleed` all end
+   `display: block` — only `.sheet-paper` and `.sheet-quiet` do not. So
+   `.sheet-reach` is the one that needs it and the other five restated what
+   their room already computes. /stories' feature band at 205 x 154 and
+   /events' year chart at 619 were both `paper`, which is what made "a
+   paper or pine composition" look true; checking `.sheet-pine` takes one
+   grep and was not done for three commits. */
+.sheet-iopen { padding-block: 7vh 0; }
 .sheet-firstact { padding-block: 12vh; }
-.sheet-lenses { display: block; padding-block: 10vh; }
-.sheet-reach { padding-block: 10vh; }
-.sheet-narrow, .sheet-smallfilter { display: block; padding-block: 10vh; }
+.sheet-lenses { padding-block: 10vh; }
+.sheet-reach { display: block; padding-block: 10vh; }
+.sheet-narrow, .sheet-smallfilter { padding-block: 10vh; }
 .sheet-istart { padding-block: 13vh; }
 
 /* ── 01 the opening ──────────────────────────────────────────────── */
@@ -11787,4 +11806,78 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 @media (max-width: 52rem) {
   .narrowgrid { grid-template-columns: minmax(0, 1fr); }
   .ibleed { aspect-ratio: 16 / 9; }
+}
+
+/* ═══ /beyond-the-obvious — THE COUNTER-ATLAS ════════════════════════
+   Seven plates. The page's own editorial position — *no page on this site
+   tells you a place is undiscovered* — used to be a `.note` at the very
+   bottom at caption size, under 130 rows and six swaps: the reason a family
+   looks the way it does, printed smaller than everything it explains. It is
+   two bands now, because the refusal and what we write instead are two
+   different statements and the brief separates them for the same reason.
+
+   ONE PLATE STATES ITS OWN `display`, AND THE THREE COMMITS BEFORE THIS
+   ONE OVERSTATED THAT. `.sheet` is `minmax(0, 40%) minmax(0, 1fr)`, and
+   `.sheet-gal`, `.sheet-pine` AND `.sheet-bleed` all end `display: block`
+   — only `.sheet-paper` and `.sheet-quiet` do not. So a `paper` band is the
+   one that lands in the 40% track, which is what /stories' feature band and
+   /events' year chart both were; a `pine` band was never at risk, and the
+   note saying otherwise was written from the symptom rather than checked
+   against the rule. `grep -n '^\.sheet-pine' -A 6` is the whole check and
+   it takes a second. */
+.sheet-btopen { padding-block: 7vh 0; }
+.sheet-hidden, .sheet-rule { padding-block: 12vh; }
+.sheet-corners { padding-block: 10vh; }
+.sheet-quietset { display: block; padding-block: 10vh; }
+.sheet-swaps { padding-block: 10vh; }
+.sheet-leave { padding-block: 13vh; }
+
+/* ── 01 the counter-atlas ────────────────────────────────────────── */
+/* NO PHOTOGRAPH HERE, AND IT IS A REFUSAL RATHER THAN A GAP. The register
+   declares no hero for this family, and the one that could be acquired is
+   by definition a generic European scene — the exact thing a page refusing
+   the phrase "hidden gems" cannot open on. What this page has and no stock
+   library has is the distribution. */
+.sheet-btopen .pointsmap { margin-top: var(--s7); }
+.sheet-btopen .pagehead.index { margin-bottom: 0; }
+
+/* ── 02 the refusal, 06 the rule ─────────────────────────────────── */
+.sheet-hidden .lit, .sheet-rule .lit { font-style: normal; color: var(--door-dark); }
+.sheet-hidden .note, .sheet-rule .note { margin-top: var(--s6); max-width: 42rem; }
+.sheet-rule .rows { margin-top: var(--s7); }
+
+/* ── 03 one from each corner ─────────────────────────────────────── */
+.sheet-corners .ed-mosaic-3 { margin-top: var(--s7); }
+.sheet-corners .ed-strip { margin-top: var(--s6); }
+.sheet-corners .small { margin-top: var(--s6); max-width: 44rem; }
+
+/* ── 04 the set ──────────────────────────────────────────────────── */
+/* THE COUNT ARGUES THE WRONG WAY AND THE SHARE ARGUES THE RIGHT ONE, so
+   both are on the group head and the share is the quieter of the two: a
+   reader came for "how many", and what it MEANS is the second thing they
+   read rather than the first. The Mediterranean holds 41 of the 130 and
+   that is because it holds 94 destinations; the Baltic States is 58% of
+   its own set and holds 7. */
+.qshare { display: block; font-size: var(--t-xs); letter-spacing: .06em;
+          text-transform: uppercase; color: var(--ink-3); font-weight: 400; }
+
+/* ── 05 the swaps ────────────────────────────────────────────────── */
+/* A SWAP IS A PAIR AND A PAIR IS TWO COLUMNS. The old row put the
+   alternative in `.rowmeta` — the slot that carries a country and a region
+   everywhere else on this site — so the one thing the band exists to say
+   was typeset as metadata. Both halves are a heading now, and the second
+   sits in its own track so the eye reads across rather than down. */
+/* NO `display: grid` HERE — `.row` ALREADY IS ONE, and the dead-rule scan
+   named it in the first run after this band shipped. Seventh redundant
+   `display` on this stylesheet's record; what this rule actually decides is
+   the two tracks and how they align. */
+.rows.swaps .row.swaprow { align-items: start;
+                           grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+                           gap: var(--s5) var(--s7); }
+.swaprow h3 { margin: 0; font-size: var(--ed-display-3); }
+.swaprow .kicker { color: var(--ink-3); }
+.swaprow .swapto .kicker { color: var(--door); }
+
+@media (max-width: 52rem) {
+  .rows.swaps .row.swaprow { grid-template-columns: minmax(0, 1fr); }
 }
