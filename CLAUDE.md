@@ -14,6 +14,7 @@ Via Europa. Take their architecture and drop their branding section. See
 
 | doing | read |
 |---|---|
+| **ANY page redesign — read this before writing a line of CSS** | **`docs/redesign-doctrine.md`** — *preserve the information, reinterpret the presentation.* The existing content is authoritative and the existing visual structure is not. Inspect, then write a content architecture, then compose — in that order. The two per-page audits, why photography is structural rather than decorative, and `tools/monotony.js`, which measures the share of a page taken by one repeated component because nothing here counted repetition and forty-two identical rows passed every green gate |
 | **the mandate: what a first-class gateway to Europe would be, and where this one is not** | **`docs/first-class-audit.md`** — 27 surfaces rendered at 1280 and 390 and then measured. Three findings, and Finding 1 is now closed on the numbers: it read 12 of 23 surfaces effectively type to the fold with seven showing no picture at all, and reads **3 of 30 with none and none under a fifth**, median share 24% → 35.6% (CORRECTED twice — the first version said 21 of 22 and was reading where the first figure STARTS rather than how much of the screen it fills). `tools/opening.js` is the instrument, so the number is checkable in a minute. **Finding 2's other half is measured too** — it says the page is the same page and its evidence only ever covered the first 250 pixels: `tools/composition.js` reads the band sequence under the head and finds **29 distinct body shapes over 47 families**, and three h1 sizes at tops 136–745 where the original reading was one size at 150–312. The eight benchmark sites are BLOCKED by the egress proxy and the benchmark half is labelled second-hand |
 | **/experiences — the third instrument, and why it is photography rather than a map** | **`docs/experiences-redesign.md`** — the source audit, the image-coverage audit, the twelve bands of the brief mapped onto what this atlas actually holds, the two that are refused, and the seven defects only rendering found. 311 photographs, and on this one page the library was never the constraint |
 | **/journeys — movement rather than a list, and where the family's own photograph went** | **`docs/journeys-redesign.md`** — the source audit, the seventeen routes drawn at once as the opening, the three paces derived from measured kilometres a day rather than named, the two things the brief asks for that are refused with their triggers, and the five defects only rendering found |
@@ -23,6 +24,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **/plan — an instrument rather than a form, and the guard a runtime `<img>` walks straight past** | **`docs/plan-redesign.md`** — the source audit, the seven bands, the three of the brief's asks that collide with recorded findings, the twelve defects only rendering found (nine of them faults already recorded in another family and three of those recorded in the commit before), and the per-leg photograph: `render.credit_html` is one implementation because `checks.py` cannot see an `<img>` a script writes |
 | **/my-europe — a private atlas, and the save kind the app did not know** | **`docs/my-europe-redesign.md`** — the source audit, the six save kinds against the five the sort knew, why `Itinerary` looked dead and is not, the brief's three kinds of memory measured as six, the monumental opening refused by the instrument-head measurement, and the three defects only rendering found. Nothing about how this page stores anything changed |
 | **/interests — the useful tags are not the biggest, and the nine it had no picture of were the nine it recommends** | **`docs/interests-redesign.md`** — the source audit, eighteen photographs of which nine were spent, `INTEREST_BANDS` read as the three visual scales, the concentration measurement the ledger's own sentence was hiding, the two of the brief's asks that are refused, and the four defects only rendering found — one of them /stories' nested anchor, reproduced a commit after it was recorded |
+| **/themes — a thematic geography, and the page drew none of the thirteen shapes its own sentence described** | **`docs/themes-redesign.md`** — the first page redesigned under the doctrine and the page that caused it. The `head_figure` contract one of its three callers never honoured, the `c_same_frame` gap that made *says and draws nothing* invisible, the three band scales derived from how many of the nine corners a theme crosses, the four defects only rendering found — including the `object-fit: cover` that was refused on licence grounds — and 37% of the page as one repeated component becoming 18% |
 | **/europe-in — the computed atlas, and the printed query was narrower than the query that ran** | **`docs/europe-in-redesign.md`** — the source audit, the 537 tag applications a region tag adds, the two live pages that publish two numbers for one word, the overlap measured at 0 of 66 pairs sharing half, the two of the brief's asks that are refused, and the five defects only rendering found. Zero photographs became eleven and a motion may still not have one of its own |
 | **/beyond-the-obvious — the counter-atlas, and the corner with the most quiet places is not the quietest corner** | **`docs/beyond-redesign.md`** — the source audit, the count that argues the wrong way against the share that argues the right one, the rule's three promises measured against the built site (two kept, one not built anywhere), the seven plates, and the two defects only rendering found — plus the correction of a finding this file published three commits ago |
 | **the eight page families, and what each room does differently** | **`docs/non-home-redesign.md`** — the non-home redesign answered A-J. The eight rooms derived from the route, the three helpers that were forcing one grammar, the seven image scales, 1,626 declared surfaces, and the defects only rendering found |
@@ -5727,6 +5729,117 @@ second `.motilenm` declaration eight lines below the first, which is the
 duplicated selector this stylesheet removed 85 of, made in the hour after
 the comment recording that.
 
+
+**NOTHING HERE COUNTED REPETITION, AND THAT IS HOW A PAGE COULD BE A CMS
+LISTING AND PASS EVERY GATE.** The owner read several finished redesigns and
+said the same thing about each: *keep the existing page, add premium CSS and
+components around it, add a few visual elements, call it a redesign.* He was
+right, and the reason is measurable: this suite checks contrast, weight,
+overflow, reach, coverage, provenance and correctness, and a page can be
+perfect on all of them while being forty-two rows of one component — which
+`/experiences` was, and the stories index was nine three-column grids each
+holding one card, and `/interests` was 728 abstract plates. Every gate was
+green through all of it.
+
+`tools/monotony.js` measures it: the share of a page's own height taken by
+the single most repeated component, where a repeated component is three or
+more siblings agreeing on their class attribute **and on their children's
+class attributes**. That second half is what makes it an instrument rather
+than a count — six `section class="band"` siblings on a country page share a
+class and hold six different compositions, and the first version reported
+that page at 76%; thirteen theme rows share their inner shape too, and that
+difference IS the difference between a composition and a listing. Three
+earlier definitions were each wrong in a way that looked right: class tokens
+anywhere on the page put every plate page at 99% `sheet` (the room wrapper);
+summing the heights of siblings reported /macro at 144% and /map at 762%,
+because nine cards in a three-column grid sit three rows deep and an
+instrument's layers overlap, so what is wanted is the vertical UNION; and
+counting what a reader cannot scroll to put /map at 789%, because its text
+twin — the alternative naming fifty countries and 319 destinations — is laid
+out from y=2,087 to y=18,355 inside a 2,665-pixel document and clipped for
+sighted readers. **A share over 100% is an instrument saying it does not know
+what it is dividing by.**
+
+Measured, the worst offenders were mostly pages nobody had redesigned:
+/countries 63% (nine identical macro bands), an experience category 62% (48
+invites), a motion page 54% (38 rows), /for-businesses 51%, a macro region
+49%, a facet page 46%, /fund 45%, /search 42%. **A long list is sometimes the
+right answer** — an index whose subject is 130 places is a list — so the
+report prints the next two components beside the first: a page at 60% with
+two other bands is a list with a frame round it, and a page at 60% with
+nothing else is the fault. The ceiling is the current worst and comes down in
+a diff as each page is recomposed, which is the invariant register's
+discipline applied to composition.
+
+**AND THE DOCTRINE IS IN THE REPOSITORY RATHER THAN IN A SESSION.**
+`docs/redesign-doctrine.md` carries it: *preserve the information,
+reinterpret the presentation* — the existing content is authoritative, the
+existing visual structure is not. Inspect first and write no CSS; then a
+content architecture answering what the page is about, what single idea the
+visitor should take, and which content must NOT become a card; then compose.
+Photography is structural — a photograph carries the meaning of its section
+(a country's geometry with the picture clipped into it, a journey's landscape
+sequence along the route) or it is decoration under the existing sections.
+And **"premium" is not a brief**: it is satisfied by rounded cards,
+gradients, shadows and hover animations, none of which this product wants.
+
+
+**/themes DREW NONE OF THE THIRTEEN SHAPES ITS OWN CLOSING SENTENCE
+DESCRIBED, AND THE HELPER'S DOCSTRING HAD STATED THE CONTRACT.**
+`head_figure()` prefers a photograph and falls back to the drawing, and it
+says in as many words: *the drawing is never lost — the caller emits it below
+with `moved_drawing()` when a photograph took its place.* Three callers use
+it; the country page honours that, the theme page honours that, and **the
+themes index never called `moved_drawing` at all.** So from the commit where
+the thirteenth theme photograph landed, every glyph was built and discarded
+while the note under the list went on promising *"each shape beside a theme
+is that theme's own eight places … drawn to the same frame so the thirteen
+can be compared"* and crediting Natural Earth for land nobody drew. That is
+the fourteen-call-sites-forgot-the-motif shape in a helper with a two-call
+contract.
+
+**AND `c_same_frame` COULD NOT SEE IT.** That check skipped any page carrying
+fewer than two `.constel` glyphs, so *says and draws nothing* — the strongest
+form of the defect it exists for — was the one form outside its reach. Both
+directions now, proved red by removing the drawings and green by restoring
+them.
+
+**THE THIRTEEN ARE NOT THIRTEEN ROWS, AND THE SCALE OF EACH IS DERIVED FROM
+ITS REACH.** A theme holds a photograph, a geography, an authored summary,
+eight places and a reach: that is a composition, and `.row` was the shape of
+the LIST rather than of the content. A theme crossing a **majority of the
+nine corners of Europe** takes the wide band (geography-led, 736 × 574 with
+its caption beside it), three or four corners the feature (picture-led at
+745 × 496 against a narrow type column), and the one theme that is an
+argument about a single corner takes an intimate one. Majority of nine is
+five, so it falls 6 / 6 / 1 — and the single tight band is Renaissance
+Europe, precisely the knot this page's closing sentence is about, so **the
+layout argues what the sentence says instead of captioning it.** The side
+alternates because a magazine alternates: six identical wide bands in a
+column is a listing with a bigger component. `tools/monotony.js` measured the
+change — the largest repeated component went from **37% to 18%**, with the
+next two at 16 and 15.
+
+**AND THE REPAIR THAT WOULD HAVE LOOKED BEST ON SCREEN WAS REFUSED ON
+LICENCE GROUNDS.** The picture-led band measured say 507 + map 280 against a
+photograph of 496 — 290 pixels of empty page under a picture-led band's own
+picture — and the obvious fix is `object-fit: cover`. That CROPS, and
+`theme-hero` declares one container (`.headshot`, on the theme page) while
+this index is a second, undeclared surface: *a photograph is cropped by every
+surface it appears on and the register declares one* is already recorded here
+as an open gap, and the fix would have widened it into a crop nobody has
+measured, on the one axis `c_photo_safe_area` exists to guard. The map moved
+out of the spanned column instead.
+
+**A 76px HEADLINE IN A 359px COLUMN STRANDS ITS LAST WORD**, which /journeys
+already recorded in a 461px one: `--ed-display-2` is 64px at 1280 and "Sacred
+Europe" needs about 380, so two of the six feature bands broke their name
+while the six wide bands — 745px of type column — did not. And **the wide
+plate was 1,152 × 899**, because the frame is 1000×780 and a full column is
+899 pixels tall; it cannot be cropped to a letterbox, since an SVG with no
+`preserveAspectRatio` letterboxes inside a wider box rather than filling it,
+which is the `.card-art` finding from the other side.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
@@ -5744,6 +5857,7 @@ the rest.
     python3 tools/content-report.py --write   what is missing, against the spec's targets
     python3 tools/invariants.py --check       what a visual change may not move
     python3 tools/plate-variation.py --check  the plates have not got more alike
+    node tools/monotony.js --check           no page is one component and little else
     python3 tools/photo-tests.py              the acquisition pipeline
                                               its batch loop and its fill planner,
                                               against a stub provider

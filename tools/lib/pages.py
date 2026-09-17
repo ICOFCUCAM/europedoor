@@ -10702,105 +10702,223 @@ def constellation(pts, extra="", route=False, frame=False, cut=False,
 
 
 def themes_index(data):
-    """Thirteen themes, shown by how far each one reaches.
+    """Five plates, and the page drew none of the thirteen shapes its own
+    closing sentence describes.
 
-    "8 PLACES" WAS ON ALL THIRTEEN CARDS AND IS NOT INFORMATION. Every theme
-    in this dataset holds exactly eight stops, so the one figure the card grid
-    printed was a constant wearing the clothes of a measurement. That is the
-    /europe-in failure one family over: a number that is not the set\'s own
-    extent reads as one.
+    `head_figure()` prefers a photograph and falls back to the drawing, and
+    its docstring states the contract: *the drawing is never lost — the
+    caller emits it below with `moved_drawing()` when a photograph took its
+    place.* Three callers use it. The country page honours that, the theme
+    page honours that, and **this index never called `moved_drawing` at
+    all** — so from the commit where the thirteenth theme photograph landed,
+    every glyph was built and discarded, and the note under the list went on
+    saying:
 
-    What actually separates them is REACH. Renaissance Europe is Italy, France
-    and Belgium; Thermal Europe is the United Kingdom, Hungary, Iceland,
-    Finland, Bulgaria, Azerbaijan and Georgia. Three countries against seven is
-    the difference between a corner of the continent and an argument that
-    crosses the whole of it, and the grid showed neither — it showed a
-    generated landscape, and a theme is not a place: it has no coastline, no
-    topography and no season, which is the same reason the twelve motions lost
-    theirs.
+        Each shape beside a theme is that theme's own eight places on the
+        continent, drawn to the same frame so the thirteen can be compared:
+        a knot is an argument about one corner of Europe, a scatter is one
+        about the whole of it. Drawn from Natural Earth 1:110m admin 0
+        countries, public domain.
 
-    So the row carries the eight destinations and the count of countries.
+    A promise of a drawing beside each theme, on a page with none, crediting
+    Natural Earth for land nobody drew — the inverse of *a page that draws
+    land names where the land came from*. That is the
+    fourteen-call-sites-forgot-the-motif shape in a helper with a two-call
+    contract, and `c_same_frame` could not see it: it skipped any page
+    carrying fewer than two glyphs, so *says and draws nothing* was outside
+    its reach.
 
-    A COMMA WAS THE FIRST SEPARATOR AND THREE PLACE NAMES CONTAIN ONE.
-    "Victoria, Gozo", "Mestia, Svaneti" and "Nida, Curonian Spit" are single
-    destinations in this atlas, so Island Europe\'s eight places read as nine
-    and Mountain Europe\'s as nine — a list that miscounts itself, on the one
-    index whose whole argument is a count. The comma was chosen to stop the
-    list reading as a route, which the middot on /journeys deliberately does;
-    what actually distinguishes the two families is the ROUTE LINE under a
-    journey\'s stops, and a theme has none — the same absence the theme page
-    makes its point out of by drawing these dots with no path between them.
+    THE SHAPES ARE THE OPENING NOW, drawn to one frame where they can be
+    compared, and the photographs stay in the rows — which is the register
+    spent on the surface where a reader is choosing between thirteen things
+    on LOOK. Both bands are complete in their own register: the shapes are
+    the reach, the rows are the places.
+
+    AND THE REACH HAD A SECOND AXIS NOBODY PRINTED. The page states how many
+    countries a theme crosses, 3 to 8. It also crosses 2 to 6 of the nine
+    **corners of Europe**, and that is the closing sentence as a number:
+    Renaissance Europe is two corners, Medieval and Island Europe are six.
+    Between them the thirteen reach 88 of the 319 destinations, 37 of the 50
+    countries and all nine corners — against /europe-in's twelve queries,
+    which reach the whole Atlas, because a theme is an authored set of eight
+    and a motion is a query over everything. See `docs/themes-redesign.md`.
     """
     idx = data["cities"]
-    # THE CONSTELLATION, WHICH IS THE WHOLE ARGUMENT DRAWN.
-    #
-    # The card grid was replaced with rows and the rows were a wall of small
-    # grey text — a generic list traded for a generic grid, which is two
-    # defaults and no art direction. A contact sheet of twelve families made
-    # that unarguable: eleven of them open with a kicker, a serif h1, a lede
-    # and a large arched map in the same position, and this index was one of
-    # the two cells that were simply text.
-    #
-    # What distinguishes thirteen themes is REACH, and reach is a shape. So
-    # each row draws its own eight destinations on a coarse silhouette of the
-    # continent: Renaissance Europe is a tight knot over Italy and France,
-    # Thermal Europe is a line from Iceland to the Caucasus. You see the
-    # difference before you read a word, which is the thing a list of country
-    # names cannot do.
-    #
-    # NOT AN APERTURE. It is 150 units wide and there are thirteen of them on
-    # one page; the door at that size, thirteen times, is the signature as
-    # wallpaper, which is the failure the events band already refused. This
-    # is a glyph, not a window.
-    #
-    # The silhouette is emitted ONCE and every row is a <use> of it, so
-    # thirteen constellations cost one coastline and 104 dots.
-    silhouette = constel_defs()
+    images = data.get("images")
 
-    # DERIVED, because the note under the list states it. Every theme holds
-    # eight stops today; a hard-coded eight in the prose is the figure that
-    # was true two hundred destinations ago, which this repository has
-    # already shipped once.
-    sizes = sorted({len(t["stops"]) for t in data["themes"]})
-    say = numword
-
-    held = (f"every one of these holds {say(sizes[0])}" if len(sizes) == 1
-            else f"they hold between {say(sizes[0])} and {say(sizes[-1])}")
-    rows = []
+    # ── ONE PASS ─────────────────────────────────────────────────────
+    facts = {}
+    allstops, allctry, allmacro = set(), set(), set()
     for t in data["themes"]:
-        countries, places = [], []
+        countries, places, pts = [], [], []
         for stop in t["stops"]:
             n = idx[stop["city"]]
-            cn = n["country"]["name"]
-            if cn not in countries:
-                countries.append(cn)
-            places.append(esc(n["city"]["name"]))
-        glyph = constellation(
-            [project(idx[st["city"]]["city"]["lat"], idx[st["city"]]["city"]["lon"])
-             for st in t["stops"]], extra=" constel-theme")
-        rows.append(
-            f'<a class="row themerow" href="/themes/{t["slug"]}">'
-            # THE PHOTOGRAPH IF THERE IS ONE, AND THE DRAWING IF THERE IS NOT.
-            # Eleven of the thirteen themes are the only licensed photographs
-            # this atlas holds, and until now they appeared on exactly eleven
-            # pages — their own. An index of thirteen things the reader is
-            # choosing between on LOOK is the one place a photograph does work
-            # the drawing cannot, and the reach the glyph argues is still one
-            # click away on the page itself.
-            f'<div class="rowart">'
-            f'{head_figure(data, "theme:" + t["slug"], glyph, alt_fallback=t["name"], credit=False, eager=False)}'
-            f'</div>'
-            f'<div><p class="kicker">{esc(t["strapline"])}</p>'
-            f'<h2>{esc(t["name"])}</h2>'
-            f'<p class="rowsub">{" · ".join(places)}</p>'
-            f'<p class="rowmeta">{len(countries)} '
-            f'{"countries" if len(countries) != 1 else "country"}</p></div></a>')
+            if n["country"]["name"] not in countries:
+                countries.append(n["country"]["name"])
+            places.append(n["city"]["name"])
+            pts.append(project(n["city"]["lat"], n["city"]["lon"]))
+            allstops.add(stop["city"])
+        macros = {_macro_of(data, idx[s["city"]]["country"]["slug"])
+                  for s in t["stops"]}
+        allctry |= {idx[s["city"]]["country"]["name"] for s in t["stops"]}
+        allmacro |= macros
+        facts[t["slug"]] = {"countries": countries, "places": places,
+                            "pts": pts, "ncorner": len(macros)}
+
+    # NEAR-DISJOINT, MEASURED. Thirteen authored sets of eight could overlap
+    # heavily and a reader cannot tell by looking; 15 of the 78 pairs share a
+    # stop and the worst shares three — Florence, Rome and Venice, between
+    # Renaissance Europe and the Grand Tour, which is a real relationship
+    # rather than a duplication.
+    shared, worst = 0, (0, "", "")
+    ts = data["themes"]
+    for a in range(len(ts)):
+        for b in range(a + 1, len(ts)):
+            k = len({x["city"] for x in ts[a]["stops"]}
+                    & {x["city"] for x in ts[b]["stops"]})
+            if k:
+                shared += 1
+            if k > worst[0]:
+                worst = (k, ts[a]["name"], ts[b]["name"])
+    npairs = len(ts) * (len(ts) - 1) // 2
+
+    # DERIVED, because the note states it. Every theme holds eight stops
+    # today; a hard-coded eight in the prose is the figure that was true two
+    # hundred destinations ago, which this repository has already shipped.
+    sizes = sorted({len(t["stops"]) for t in data["themes"]})
+    held_say = (f"every one of these holds {numword(sizes[0])}"
+                if len(sizes) == 1
+                else f"they hold between {numword(sizes[0])} and "
+                     f"{numword(sizes[-1])}")
+
+    # ── 01 · SAME FRAME, DIFFERENT ARGUMENT ──────────────────────────
+    tiles = []
+    for t in data["themes"]:
+        f = facts[t["slug"]]
+        tiles.append(
+            f'<a class="thtile" href="/themes/{t["slug"]}">'
+            f'{constellation(f["pts"], extra=" constel-theme")}'
+            f'<span class="thtilen">{f["ncorner"]} of '
+            f'{len(data["macros"])} corners</span>'
+            f'<span class="thtilenm">{esc(t["name"])}</span>'
+            f'<span class="thtilep">{n_of(len(f["countries"]), "country")}'
+            f'</span></a>')
+    thopen = f"""
+  <div class="pagehead index">
+    <p class="kicker">Discovery without a map of borders</p>
+    <h1 class="mega">Europe, organised by what you came for.</h1>
+    {head_extent([(len(data["themes"]), "themes"),
+                  (len(allstops), "destinations"),
+                  (len(allmacro), "corners of Europe")])}
+    <p class="lede">Medieval Europe is not a country. Neither is sacred Europe, or Viking
+    Europe, or the Europe you reach only by train. {numword(len(data['themes']), cap=True)}
+    of them cut across the Atlas, and each place under one of them stays linked to the
+    country it is actually in.</p>
+  </div>
+  {constel_defs()}
+  <div class="thgrid">{"".join(tiles)}</div>
+  <p class="small">Each shape is that theme&rsquo;s own {numword(sizes[0])} places on the
+  continent, drawn to the same frame so the {numword(len(data['themes']))} can be
+  compared: a knot is an argument about one corner of Europe, a scatter is one about the
+  whole of it. {geo.sources_line(geo.load("europe-lod0.json"))}</p>"""
+
+    # ── 02 · CROSS-BORDER EUROPE ─────────────────────────────────────
+    thcross = f"""
+  <div class="sheettext">
+    <h2 class="mega">A theme is a <em class="lit">crossing</em>, not a
+    country.</h2>
+    <p class="lede">Between them the {numword(len(data['themes']))} reach
+    {len(allstops)} of the {len(idx)} destinations, {len(allctry)} of the
+    {len(data['countries'])} countries and all {numword(len(allmacro))} corners of
+    Europe &mdash; and each one is a different crossing rather than a slice of the
+    same map. Reach runs from {numword(min(f['ncorner'] for f in facts.values()))}
+    corners to {numword(max(f['ncorner'] for f in facts.values()))}.</p>
+    <p class="note">They are also near-disjoint, which a reader cannot see by
+    looking: {shared} of the {npairs} pairs share a destination at all, and the most
+    any two share is {numword(worst[0])} &mdash; {esc(worst[1])} and
+    {esc(worst[2])}, which is a real relationship rather than a duplication. The
+    {len(data['motions'])} queries on <a href="/europe-in">Europe in Motion</a> reach
+    every destination in the Atlas; these {numword(len(data['themes']))} reach a
+    quarter of it, because a query runs over everything and a theme is
+    {numword(sizes[0])} places somebody chose.</p>
+  </div>"""
+
+    # ── 03 · THIRTEEN ARGUMENTS ──────────────────────────────────────
+    #
+    # NOT THIRTEEN ROWS, AND NOT THIRTEEN CARDS. The owner read the first
+    # version of this page and named the fault exactly: *keep the existing
+    # page, add premium CSS and components around it, call it a redesign.*
+    # The thirteen themes had been a card grid, then rows, then rows with a
+    # photograph — three presentations of one list, and the list was the
+    # layout every time. `docs/redesign-doctrine.md` is the rule that came
+    # out of it and `tools/monotony.js` is the instrument: nothing here had
+    # ever counted repetition, so a page could be thirteen identical
+    # siblings and pass every gate.
+    #
+    # A theme holds a photograph, a geography, an authored summary, eight
+    # places and a reach. That is a composition, so each theme gets one —
+    # and THE COMPOSITION'S SCALE FOLLOWS THE THEME'S REACH, which is what
+    # makes the layout argue what the closing sentence says rather than
+    # captioning it. A theme crossing a MAJORITY of the nine corners of
+    # Europe gets the wide band; three or four corners the feature; and the
+    # one theme that is an argument about a single corner gets an intimate
+    # one. Majority of nine is five — a threshold rather than a taste — and
+    # it falls 6 / 6 / 1, with Renaissance Europe alone at the bottom,
+    # which is precisely the knot the sentence is about.
+    #
+    # NO NUMBERS ON THEM. A numeral would claim an order the data does not
+    # have — the same caveat this page already publishes about the eight
+    # places — and a second numbering inside a plate sequence is the
+    # 753-page double-numbering fault.
+    #
+    # THE MAP IS THE CONSTANT AND THE PICTURE IS THE VARIABLE. Every
+    # argument draws on the same continental frame, because reach is what
+    # separates the thirteen and `region_glyph`'s recorded refusal applies:
+    # framed on its own extent, each becomes a picture of a different place
+    # and the thirteen stop being comparable at all.
+    majority = len(data["macros"]) // 2 + 1
+    args = []
+    for k, t in enumerate(data["themes"]):
+        f = facts[t["slug"]]
+        scale = ("wide" if f["ncorner"] >= majority
+                 else "feat" if f["ncorner"] >= 3 else "tight")
+        # THE SIDE ALTERNATES, AND THAT IS WHAT MAKES A SEQUENCE A SEQUENCE.
+        # Six identical wide bands in a column is a listing with a bigger
+        # component, which is the fault one level up; a magazine alternates
+        # because the eye needs the rhythm to read a run of spreads as one
+        # argument rather than as a stack.
+        flip = " arg-flip" if k % 2 else ""
+        key = "theme:" + t["slug"]
+        shot = (f'<figure class="argshot">'
+                f'{picture(images, key, w=1600, h=1200, alt=(images or {}).get(key, {}).get("alt") or t["name"], sizes="(max-width: 52rem) 92vw, 46vw", credit=False)}'
+                f'</figure>' if held(images, key) else
+                f'<figure class="argshot">'
+                f'{ed_slot(key, shape="wide", label=t["name"])}</figure>')
+        args.append(
+            f'<article class="arg arg-{scale}{flip}">'
+            f'<figure class="argmap">'
+            f'{constellation(f["pts"], extra=" constel-theme")}'
+            f'<figcaption><span class="capmain">'
+            f'{n_of(len(f["places"]), "place")} across '
+            f'{n_of(len(f["countries"]), "country")}.</span>'
+            f'<span class="capsrc">{f["ncorner"]} of '
+            f'{len(data["macros"])} corners of Europe, on the same frame as '
+            f'the other {numword(len(data["themes"]) - 1)}.</span>'
+            f'</figcaption></figure>'
+            f'{shot}'
+            f'<div class="argsay">'
+            f'<p class="kicker">{esc(t["strapline"])}</p>'
+            f'<h2><a href="/themes/{t["slug"]}">{esc(t["name"])}</a></h2>'
+            f'<p class="lede">{esc(t["summary"])}</p>'
+            f'<p class="argplaces">{" &middot; ".join(esc(p) for p in f["places"])}</p>'
+            f'{golink("/themes/" + t["slug"], "Follow " + t["name"])}'
+            f'</div></article>')
     # THE ROWS OWE THEIR ATTRIBUTION AND PAY IT ONCE, under the list. The
     # photograph inside a row carries no figcaption, because a credit's own
     # links inside a row's link split the anchor — so the container pays,
     # exactly as the homepage's row of eight does. The licence asks for the
     # photographer and the provider, not for one caption per thumbnail.
-    _imgs = data.get("images") or {}
+    _imgs = images or {}
     _shot = [t for t in data["themes"] if ("theme:" + t["slug"]) in _imgs]
     themecred = ""
     if _shot:
@@ -10810,32 +10928,63 @@ def themes_index(data):
             for t in _shot))
         _n = len(data["themes"]) - len(_shot)
         themecred = (f'<p class="sheetcred rowcred">Photographs by {_who} on Pexels.'
-                     + (f' The {numword(_n)} without one draw their own places instead.'
-                        if _n else "") + '</p>')
+                     + (f' The {numword(_n)} without one carry their own places '
+                        f'instead.' if _n else "") + '</p>')
+    nwide = sum(1 for t in data["themes"]
+                if facts[t["slug"]]["ncorner"] >= majority)
+    ntight = sum(1 for t in data["themes"]
+                 if facts[t["slug"]]["ncorner"] < 3)
+    thirteen = f"""
+  <div class="sheettext">
+    <h2 class="mega">{numword(len(data['themes']), cap=True)} arguments about
+    Europe.</h2>
+    <p class="lede">Each one is a photograph of what it feels like, a map of where it
+    is and the sentence it makes. {held_say.capitalize()}, so the number of places is
+    not what separates them &mdash; what separates them is how far they cross, and the
+    <em>size</em> of each argument below is that reach: {numword(nwide)} of them cross a
+    majority of the {numword(len(data['macros']))} corners of Europe and
+    {"one" if ntight == 1 else numword(ntight)} is an argument about a single
+    corner.</p>
+  </div>
+  <div class="args">{"".join(args)}</div>
+  {themecred}"""
+
+    # ── 04 · THEME, THEN PLANNER ─────────────────────────────────────
+    thplan = f"""
+  <div class="sheettext">
+    <h2 class="mega">A theme is not an itinerary.</h2>
+    <p class="lede">The places under each theme are <em>not</em> in travelling order, and
+    the theme pages draw them with no path between them on purpose. Renaissance Europe is
+    three countries and the Grand Tour is four; Thermal Europe runs from Iceland to the
+    Caucasus, and reading it top to bottom would be a fortnight of flights.</p>
+    <p class="note">Put the ones you want into the <a href="/plan">Planner</a> and it
+    orders them by real distance, prices the days and says where the long legs are.
+    That is the difference between an argument about Europe and a trip through it.</p>
+  </div>"""
+
+    # ── 05 · OPEN THE DOOR ───────────────────────────────────────────
+    thclose = f"""
+  <div class="istart">
+    <h2 class="mega">Come for one thing.</h2>
+    <p class="lede">Then find that the continent is organised around it &mdash; and that
+    every place under a theme is still an ordinary page in the same Atlas, written to the
+    same template as Paris.</p>
+    <p class="keepgo"><a class="btn" href="/discover">Find your kind of Europe</a>
+    <a class="storygo" href="/countries">Or open the atlas &rarr;</a></p>
+  </div>"""
+
+    PLATES = [("thopen gal", "Same frame, different argument", thopen, "themes"),
+              ("thcross pine", "Cross-border Europe", thcross, "crossing"),
+              ("thargs gal", "Thirteen arguments", thirteen, "arguments"),
+              ("thplan pine", "Theme, then Planner", thplan, "planner"),
+              ("thclose gal", "Open the door", thclose, "open")]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Themes", None)])}
-<div class="pagehead index">
-  <p class="kicker">Discovery without a map of borders</p>
-  <h1>Europe, organised by what you came for.</h1>
-  <p class="lede">Medieval Europe is not a country. Neither is sacred Europe, or Viking Europe,
-  or the Europe you reach only by train. {len(data['themes'])} of them cut across the Atlas,
-  and each place under one of them stays linked to the country it is actually in.</p>
-</div>
-{silhouette}
-<div class="rows">{"".join(rows)}</div>
-{themecred}
-<p class="small">Each shape beside a theme is that theme\u2019s own eight places on the
-continent, drawn to the same frame so the thirteen can be compared: a knot is an
-argument about one corner of Europe, a scatter is one about the whole of it.
-{geo.sources_line(geo.load("europe-lod0.json"))}
-The places under each theme are not in travelling order, and
-the number beside them is how many countries the theme crosses rather than how
-many places it holds — {held}. For an order that
-respects distance, put the ones you want into the <a href="/plan">Planner</a>.</p>
+{plate_sequence(PLATES)}
 """
     return "/themes/index.html", page(
         "Themes", body, path="/themes", area="countries",
-        accent="territory",
+        accent="territory", hero=True,
         description="Cross-border ways into Europe: medieval, sacred, Viking, alpine, maritime and rail Europe, each a real sequence of places.",
     )
 

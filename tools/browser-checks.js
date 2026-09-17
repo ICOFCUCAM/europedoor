@@ -4837,6 +4837,18 @@ async function main() {
    * the ground stops being the ground, and the accent eats the page.
    */
   {
+    /* /europe-in IS ABSENT AND THAT HID A REAL FINDING. The scan reported
+     * `.thtile {display,color}` dead on /themes, and `.motile` on
+     * /europe-in carries the identical three declarations for the identical
+     * reason — a grid item is blockified by the layout and `a { color:
+     * inherit }` already applies — and was never reported, because no page
+     * in this list has ever held one. *A rule measured only where it loses
+     * looks like a rule that wins nowhere* is already recorded here; a rule
+     * measured NOWHERE looks exactly like a rule that is fine, which is
+     * worse. Widening the list is its own commit with its own triage: the
+     * three index families take the population from 381 rules to 506 and
+     * the dead list from 42 to 71, with 31 fresh, and a ceiling raised
+     * without reading the list is a ceiling raised for a gap in the scan. */
     const PAGES = ["/", "/europe/austria/", "/europe/norway/fjord-norway/bergen/",
                    "/themes/", "/journeys/", "/stories/", "/map/", "/plan/",
                    "/experiences/food/", "/method/", "/beyond-the-obvious/",

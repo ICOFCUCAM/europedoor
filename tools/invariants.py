@@ -950,7 +950,27 @@ def measure():
                        "`pagehead index` and states the extent. "
                        "`row` did not move: the 130 are still rows "
                        "grouped by macro region and the six swaps "
-                       "are rows too."},
+                       "are rows too."
+                       "  0.769 -> 0.768 WHEN /themes STOPPED BEING THIRTEEN "
+                       "ROWS. The owner read the first version of that page "
+                       "and named the fault: keep the existing page, add "
+                       "premium CSS and components round it, call it a "
+                       "redesign. A theme holds a photograph, a geography, "
+                       "an authored summary, eight places and a reach — that "
+                       "is a composition, and `.row` was the shape of the "
+                       "LIST rather than of the content. So thirteen rows "
+                       "became thirteen argument bands at three scales "
+                       "derived from reach, and this floor moved by one "
+                       "page. THAT IS THE FLOOR WORKING RATHER THAN BEING "
+                       "OVERRULED: it exists to catch a family growing its "
+                       "own components without anybody deciding, and this is "
+                       "the deciding. `.arg` is a PAGE component and not a "
+                       "twelfth primitive — it appears on one page, like "
+                       "`.motile`, `.narrowrow` and `.qshare` — and *no new "
+                       "primitive until repeated structure has actually "
+                       "emerged* still holds. `tools/monotony.js` measured "
+                       "the change: 37% of the page was thirteen identical "
+                       "siblings and the largest group is now 18%."},
         },
     }
 

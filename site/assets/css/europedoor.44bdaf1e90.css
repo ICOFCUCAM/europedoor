@@ -11912,7 +11912,11 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    measured as too small and the 288 it settled on. */
 .mogrid { display: grid; gap: var(--s6) var(--s5); margin-top: var(--s7);
           grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
-.motile { display: block; text-decoration: none; color: inherit; }
+/* Same two dead declarations as `.thtile`, by the same argument: a grid item
+   is blockified by the layout and `a { color: inherit }` already applies.
+   Found on /themes and fixed in both places, because the scan cannot see
+   this one — /europe-in is not in its page list. */
+.motile { text-decoration: none; }
 .motile .constel { width: 100%; }
 .motilen { display: block; font-family: var(--mono); font-size: var(--t-sm);
            color: var(--door); font-variant-numeric: tabular-nums;
@@ -11970,7 +11974,14 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .moshot > figcaption { margin-top: var(--s2); font-size: var(--t-xs);
                        letter-spacing: .04em; text-transform: uppercase;
                        color: var(--ink-3); }
-.mocuts .motionrow h2 { margin: 0; font-size: var(--ed-display-3); }
+/* NO FONT-SIZE HERE. The first version raised the name to
+   `--ed-display-3`, which is the 2036 `.ed-row` step — and this is a `.row`,
+   whose own rule sets `--t-md` for every heading in the primitive that
+   covers 86% of the site. /interests' photographic rows take the primitive's
+   size and so does /themes, so an override here was a third row convention
+   rather than a fix: eleven primitives cover the site because changing one
+   changes every page, and a page that wants its own step is a page growing
+   its own component set. */
 .mocuts .motionrow h2 a { text-decoration: none; }
 .mocuts .motionrow h2 a:hover, .mocuts .motionrow h2 a:focus-visible
   { text-decoration: underline; }
@@ -12019,4 +12030,194 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 @media (max-width: 52rem) {
   .mocuts .motionrow { grid-template-columns: minmax(0, 1fr); }
   .mobar { grid-template-columns: minmax(0, 1fr); gap: var(--s2); }
+}
+
+
+/* ═══ /themes — THE THEMATIC ATLAS ═══════════════════════════════════
+ *
+ * Five plates. The thirteen shapes are the opening and the thirteen
+ * photographs stay in the rows, because each band is complete in its own
+ * register: the shapes are the reach and the rows are the places.
+ *
+ * NO `display` ON ANY `sheet-` CLASS HERE. `.sheet-gal` and `.sheet-pine`
+ * both end `display: block`; only `.sheet-paper` and `.sheet-quiet` do not,
+ * and this page uses neither.
+ */
+
+/* ── 01 the thirteen, on one frame ───────────────────────────────── */
+/* THREE ACROSS RATHER THAN /europe-in's FOUR, and the reason is the subject.
+   There the tile carries a count and the shapes are read as a set; here the
+   subject is REACH, and /themes itself measured a 204-pixel continent as
+   too small and settled on 18rem. Three across at 1280 is 368px a tile, so
+   a knot over Italy and a line from Iceland to the Caucasus are told apart
+   before a word is read — which is what the closing sentence claims and what
+   this page drew none of for the life of the thirteenth photograph.
+
+   `auto-fill`, not `auto-fit`: auto-fit collapses the empty tracks and
+   stretches a short last row, so thirteen tiles would come out as twelve
+   small pictures and one wide one. */
+/* `min(20rem, 100%)` AND NOT A BARE 20rem. A 320px floor is wider than the
+   288px a 320px screen gives, so the tile rendered 320 inside 288 and the
+   document scrolled sideways by 32 — /europe-in's 15rem floor is 240 and
+   never met it. The percentage resolves against the grid container's own
+   content box, which is definite here; that is NOT the circular case this
+   stylesheet records, where a percentage floor was put on the ITEM doing
+   the track sizing. */
+.thgrid { display: grid; gap: var(--s6) var(--s5); margin-top: var(--s7);
+          grid-template-columns:
+            repeat(auto-fill, minmax(min(20rem, 100%), 1fr)); }
+/* NO `display` AND NO `color` HERE, AND BOTH WERE DEAD. `.thtile` is an
+   `<a>` inside `.thgrid`, which is a grid, so the box is BLOCKIFIED BY THE
+   LAYOUT — the seventh occurrence of that finding on this stylesheet's
+   record — and `a { color: inherit }` at the top of the file already sets
+   the colour. The dead-rule scan named both in the first run after this page
+   shipped. `.motile` on /europe-in carried the identical three declarations
+   and was NOT reported, because /europe-in is not in the scan's page list:
+   a rule measured NOWHERE looks exactly like a rule that is fine, which is
+   the other end of this check's own recorded finding about a rule measured
+   only where it loses. Both are fixed here; widening the page list is its
+   own commit with its own triage. Verified the way this repository requires
+   rather than on the scan's word: /themes and /europe-in shot at 1280 and
+   390 with the declarations and without, 4 of 4 byte-identical. */
+.thtile { text-decoration: none; }
+.thtile .constel { width: 100%; }
+.thtilen { display: block; font-family: var(--mono); font-size: var(--t-sm);
+           color: var(--door); font-variant-numeric: tabular-nums;
+           margin-top: var(--s2); }
+.thtilenm { display: block; font-family: var(--display);
+            font-size: var(--ed-display-3); line-height: 1.12;
+            min-height: 1.12em; margin-top: var(--s1); }
+.thtilep { display: block; font-size: var(--t-xs); letter-spacing: .06em;
+           text-transform: uppercase; color: var(--ink-3);
+           margin-top: var(--s2); }
+.thtile:hover .thtilenm, .thtile:focus-visible .thtilenm
+  { text-decoration: underline; }
+.thtile:hover .constel-lit circle { fill: var(--pine-deep); }
+.sheet-thopen .small { margin-top: var(--s6); max-width: 46rem; }
+
+/* ── 02 the crossing, 04 the planner ────────────────────────────── */
+.sheet-thcross .lit, .sheet-thplan .lit
+  { font-style: normal; color: var(--door-dark); }
+.sheet-thcross .note, .sheet-thplan .note
+  { margin-top: var(--s6); max-width: 44rem; }
+
+/* ── 03 thirteen arguments ──────────────────────────────────────── */
+/* NOT THIRTEEN ROWS AND NOT THIRTEEN CARDS. A theme holds a photograph, a
+   geography, an authored summary, eight places and a reach — that is a
+   composition, so each theme gets one, and the COMPOSITION'S SCALE FOLLOWS
+   THE REACH. A theme crossing a majority of the nine corners of Europe takes
+   the wide band, three or four corners the feature, and the one theme that
+   is an argument about a single corner takes an intimate one. The layout
+   therefore argues what this page's closing sentence says instead of
+   captioning it.
+
+   Three grids rather than one with modifiers, because the three ARE
+   different compositions: wide leads with the geography across the column,
+   feature sets the picture against the type, and tight is type-led with the
+   map at a glyph's size beside it. */
+.args { display: grid; gap: var(--s9); margin-top: var(--s8); }
+.arg { display: grid; gap: var(--s5) var(--s7); align-items: start; }
+.arg h2 { margin: 0; font-size: var(--ed-display-2); line-height: 1.12; }
+.arg h2 a { text-decoration: none; }
+.arg h2 a:hover, .arg h2 a:focus-visible { text-decoration: underline; }
+.argmap { margin: 0; }
+.argmap .constel { width: 100%; }
+.argshot { margin: 0; }
+.argshot img { display: block; width: 100%; height: auto; }
+/* A LIST OF PLACE NAMES IS NOT PROSE AND MUST NOT TAKE A MEASURE. `p {
+   max-width: var(--measure) }` broke a middot list of European place names
+   at 544px inside a 948px column once already; a measure exists so the eye
+   can find the next line of a SENTENCE, and nobody reads a list of eight
+   towns as one. */
+.argplaces { max-width: none; color: var(--ink-2); font-size: var(--t-sm);
+             margin: var(--s4) 0 0; }
+.argsay .lede { max-width: 34rem; }
+.argsay .go { margin-top: var(--s5); }
+
+/* wide — the geography leads, across the whole column */
+/* CAPPED AT 46rem, BECAUSE THE FRAME IS 1000x780 AND A FULL COLUMN IS 899
+   PIXELS TALL. Measured: the continent at 1152 wide drew 899 tall with eight
+   dots on it, which is a wall rather than a leading picture — and the
+   drawing cannot be cropped to a letterbox, because an SVG with no
+   `preserveAspectRatio` letterboxes inside a wider box instead of filling
+   it, which is the `.card-art` finding from the other side. 736 x 574 is a
+   picture; 1152 x 899 is a page. */
+.arg-wide { grid-template-columns: minmax(0, 1.35fr) minmax(0, .65fr);
+            grid-template-areas: "map map" "say shot"; }
+.arg-wide .argmap { grid-area: map; }
+.arg-wide .argsay { grid-area: say; }
+.arg-wide .argshot { grid-area: shot; }
+.arg-wide.arg-flip { grid-template-areas: "map map" "shot say";
+                     grid-template-columns: minmax(0, .65fr) minmax(0, 1.35fr); }
+/* AND THE CAPTION SITS BESIDE THE PLATE RATHER THAN UNDER IT, because a
+   736px drawing capped inside a 1,152px column otherwise leaves 416 pixels
+   of empty page to its right and reads as a row that did not finish. A plate
+   with its caption alongside is what a printed atlas does, and it is the
+   same reason the index head puts the extent beside the name instead of
+   under it.
+   ONLY WHERE THERE IS ROOM FOR BOTH: the plate is capped at 736px, so the
+   caption's track is the column minus 736 minus the gap — at an 834px
+   viewport that is 18 pixels, and the caption overflowed the document by 84
+   on six bands. The `.arg` phone rule collapses the band to one column and
+   said nothing about this nested grid, which is a rule applied to one of its
+   call sites. 64rem is an existing breakpoint with twelve `min-width` uses,
+   so this adds none: the register holds six and refused a seventh. */
+.arg-wide .argmap { display: grid; gap: var(--s5); }
+
+/* feature — the picture against the type, the geography as a band beneath */
+/* NO SPANNED COLUMN AND NO `object-fit: cover`, AND THE SECOND HALF IS A
+   LICENCE POSITION RATHER THAN A LAYOUT ONE. The first version had the
+   photograph span two rows against the words and the map, which measured
+   say 507 + map 280 against a picture of 496 — 290 pixels of empty page
+   under the picture in a picture-led band — and the obvious repair was to
+   let the picture cover its column. That crops it, and `theme-hero` declares
+   ONE container (`.headshot`, on the theme page) while this index is a
+   SECOND, undeclared surface: a crop nobody has measured is exactly what
+   `c_photo_safe_area` exists to stop, and this repository already records
+   that a photograph is cropped by every surface it appears on while the
+   register declares one. So the map moves out of the spanned column into a
+   band of its own, both columns end where their content ends, and no
+   undeclared surface can destroy a frame. */
+.arg-feat { grid-template-columns: minmax(0, 1.35fr) minmax(0, .65fr);
+            grid-template-areas: "shot say" "map map"; }
+.arg-feat .argshot { grid-area: shot; }
+.arg-feat .argsay { grid-area: say; }
+.arg-feat .argmap { grid-area: map; max-width: 30rem; }
+.arg-feat.arg-flip { grid-template-columns: minmax(0, .65fr) minmax(0, 1.35fr);
+                     grid-template-areas: "say shot" "map map"; }
+/* A 76px HEADLINE IN A 359px COLUMN STRANDS ITS LAST WORD, and /journeys
+   already recorded the same arithmetic in a 461px one. `--ed-display-2` is
+   64px at 1280 and "Sacred Europe" needs about 380 of a 359px track, so two
+   of the six feature bands broke their name while the wide bands — 745px of
+   type column — did not. The proportion is the feature scale doing what it
+   is for: the PICTURE is the subject, which makes the type column narrow by
+   design, so the name takes the section step rather than the opening one. */
+.arg-feat h2 { font-size: var(--ed-display-3); }
+
+/* tight — an argument about one corner, composed as one */
+.arg-tight { grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+             grid-template-areas: "map say" "shot say";
+             max-width: 60rem; }
+.arg-tight .argmap { grid-area: map; }
+.arg-tight .argsay { grid-area: say; }
+.arg-tight .argshot { grid-area: shot; }
+.arg-tight h2 { font-size: var(--ed-display-3); }
+
+.sheet-thargs .sheetcred { margin-top: var(--s8); }
+
+@media (min-width: 64rem) {
+  .arg-wide .argmap { align-items: end; gap: var(--s6);
+                      grid-template-columns: minmax(0, 46rem) minmax(0, 1fr); }
+}
+
+@media (max-width: 52rem) {
+  /* ONE COLUMN, AND THE ORDER IS THE ARGUMENT'S ORDER. `grid-template-areas`
+     is what places these, so a phone rule that only changed the column count
+     would leave the areas naming tracks that no longer exist. */
+  .arg, .arg-wide, .arg-feat, .arg-tight,
+  .arg-wide.arg-flip, .arg-feat.arg-flip {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "map" "shot" "say";
+    max-width: none;
+  }
 }

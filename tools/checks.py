@@ -4866,11 +4866,30 @@ def c_same_frame():
     and whitespace is collapsed first, because a line break between "same"
     and "frame" is what defeated the projection check for a year.
     """
-    n = pages = 0
+    n = pages = said = 0
     pat = re.compile(r'<svg class="constel[^"]*" viewBox="([^"]+)"')
     for f in site_files():
         h = open(f, encoding="utf-8").read()
         vbs = pat.findall(h)
+        # SAYS AND DRAWS NOTHING WAS OUTSIDE THIS CHECK'S REACH, and /themes
+        # spent a commit there. `head_figure()` prefers a photograph and
+        # falls back to the drawing, and the day the thirteenth theme
+        # photograph landed every glyph was built and discarded — while the
+        # note under the list went on promising "each shape beside a theme
+        # … drawn to the same frame so the thirteen can be compared" and
+        # crediting Natural Earth for land nobody drew. The two-glyph floor
+        # skipped the page entirely, so the strongest form of the defect
+        # this check exists for was the one form it could not see.
+        flat = " ".join(re.sub(r"<[^>]+>", " ", h).split())
+        claims = "drawn to the same frame" in flat
+        if claims:
+            said += 1
+            n += 1
+            if len(vbs) < 2:
+                fail(f"{canonical_of(f)}: says its shapes are drawn to the "
+                     f"same frame and draws {len(vbs)} of them. A page that "
+                     f"promises a comparison and shows nothing to compare "
+                     f"is worse than one that shows neither")
         if len(vbs) < 2:
             continue
         pages += 1
@@ -4896,6 +4915,10 @@ def c_same_frame():
     if pages < 3:
         fail(f"c_same_frame examined only {pages} pages carrying more than "
              f"one glyph — it has stopped finding the family it is about.")
+    if said < 1:
+        fail("no page claims its shapes are drawn to the same frame — the "
+             "half of this check that reads the PROSE has stopped finding "
+             "the sentence it is about.")
     return n
 
 
