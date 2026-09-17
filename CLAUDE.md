@@ -23,6 +23,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **/plan — an instrument rather than a form, and the guard a runtime `<img>` walks straight past** | **`docs/plan-redesign.md`** — the source audit, the seven bands, the three of the brief's asks that collide with recorded findings, the twelve defects only rendering found (nine of them faults already recorded in another family and three of those recorded in the commit before), and the per-leg photograph: `render.credit_html` is one implementation because `checks.py` cannot see an `<img>` a script writes |
 | **/my-europe — a private atlas, and the save kind the app did not know** | **`docs/my-europe-redesign.md`** — the source audit, the six save kinds against the five the sort knew, why `Itinerary` looked dead and is not, the brief's three kinds of memory measured as six, the monumental opening refused by the instrument-head measurement, and the three defects only rendering found. Nothing about how this page stores anything changed |
 | **/interests — the useful tags are not the biggest, and the nine it had no picture of were the nine it recommends** | **`docs/interests-redesign.md`** — the source audit, eighteen photographs of which nine were spent, `INTEREST_BANDS` read as the three visual scales, the concentration measurement the ledger's own sentence was hiding, the two of the brief's asks that are refused, and the four defects only rendering found — one of them /stories' nested anchor, reproduced a commit after it was recorded |
+| **/europe-in — the computed atlas, and the printed query was narrower than the query that ran** | **`docs/europe-in-redesign.md`** — the source audit, the 537 tag applications a region tag adds, the two live pages that publish two numbers for one word, the overlap measured at 0 of 66 pairs sharing half, the two of the brief's asks that are refused, and the five defects only rendering found. Zero photographs became eleven and a motion may still not have one of its own |
 | **/beyond-the-obvious — the counter-atlas, and the corner with the most quiet places is not the quietest corner** | **`docs/beyond-redesign.md`** — the source audit, the count that argues the wrong way against the share that argues the right one, the rule's three promises measured against the built site (two kept, one not built anywhere), the seven plates, and the two defects only rendering found — plus the correction of a finding this file published three commits ago |
 | **the eight page families, and what each room does differently** | **`docs/non-home-redesign.md`** — the non-home redesign answered A-J. The eight rooms derived from the route, the three helpers that were forcing one grammar, the seven image scales, 1,626 declared surfaces, and the defects only rendering found |
 | **the design language — what makes a page EuropeDoor with the logo removed, and which movements each family takes** | **`docs/design-language.md`** — the ARCHITECT step. Five marks that could not have been made by anybody else, the six-movement composition grammar per family, the three head roles, what the language forbids, and how a change is proved |
@@ -5624,6 +5625,107 @@ library rather than about Europe** and presenting it as a selection is what
 this page refuses. The corner with none shows its slot, which names the
 acquisition. **Nothing was acquired.**
 
+
+
+**THE ONE FAMILY WHOSE WHOLE CREDIBILITY CLAIM IS THAT A PAGE PRINTS WHAT
+PRODUCED IT WAS PRINTING SOMETHING NARROWER.** `motion_match` reads
+`set(city.interests) | set(region.interests)`, so a destination is returned
+when **its region** carries the tag — and the printed query said *"any
+destination tagged Islands"* and said nothing about the region. The gap is
+not cosmetic: **62 of the 86 results for Food and Wine are there on their
+region's tags rather than their own**, 58 of 150 for Coast, 52 of 115 for
+Mountains, and across the seventeen interests the propagating reading gives
+**1,679 tag applications against 1,142** — 47% more. It returns **Nicosia**
+(own tags history, food, cities) for *Europe's coastlines*, because its
+region is "Nicosia & the South Coast", and **Tartu**, a mainland university
+town, for *Europe's islands*. That is `cell` catching `cellar` one family
+over: the page published its rule honestly and a reader who checked would
+find something the rule did not describe.
+
+**AND TWO LIVE PAGES PUBLISHED TWO NUMBERS FOR ONE WORD.**
+`/interests/mountains` says *63 destinations* and `/europe-in/mountains`
+says *115 match* — both derived, both correct under their own reading, and
+for the life of both families neither said which reading it was. **The
+engine is unchanged**: a region tag is a real fact about the ground around a
+place and nine other surfaces read the same union, so narrowing it is a
+data-semantics decision for the owner and carries a trigger (a `propagates`
+flag per interest). What changed is the sentence — five words in the query,
+the mechanism hoisted once by `motion_tag_note()`, and the /interests
+reconciliation named. `c_motion_query_breadth` asserts **both halves**,
+because either alone goes quietly wrong: the page must state the mechanism,
+AND `motion_match` must still have the mechanism the page states. Narrow the
+engine and every page keeps a sentence that has become false in the other
+direction, which no count anywhere would see.
+
+**THE TWELVE SHAPES WERE ONE PER ROW, 1,152 PIXELS APART.** This family's
+signature moment is the query drawn as a shape and its argument is that the
+twelve shapes DIFFER — which is a comparison, and a comparison at one
+drawing per screen cannot be made. That is /themes' 204-pixel-continent
+finding on the other axis: there the drawing was too small to read, here it
+was too far from the drawing it is being compared with. They are a grid in
+the opening now, 270px a tile at 1280, and **the overlap is measured rather
+than asserted**: no two of the twelve share more than **49%** of their
+results and **0 of the 66 pairs** share half.
+
+**AND NOBODY HAD CROSSED THE TWELVE WITH EACH OTHER.** Twelve differing
+shapes still read as twelve boxes, so the other half of the claim is that
+they overlap: every one of the 319 destinations satisfies at least one, the
+commonest number to satisfy is four (111 destinations), and **Narvik
+satisfies eight**. The bars are a share of the largest group rather than of
+the Atlas, because eight groups summing to 319 would put the largest at 35%
+of its track and read as a share of the continent.
+`c_motion_distribution` asserts the scaling, the labels and the sum **with
+no reference to the generator** — recomputing the distribution means
+re-running the twelve queries, and an instrument that re-runs the model can
+only ever agree with it.
+
+**A MOTION MAY NOT HAVE A PHOTOGRAPH OF ITS OWN, AND BOTH DERIVATIONS OF
+THE ONE IT MAY HAVE WERE WRONG FIRST.** The register rightly declares no
+`motion:` purpose: a motion has no coastline, no topography and no season,
+so a picture of one is a picture of nowhere — the refusal that took twelve
+plates off this index. What it can spend is a photograph of a destination
+the query returned. Ordering by *fewest of the other eleven* picked the
+region-only members — Nicosia for the coastlines, Tartu for the islands —
+which are the weakest in the set; adding *direct member first* then picked
+**Baku** for the medieval world, whose registered photograph is the Flame
+Towers. **A destination whose own tag list is most nearly just what the
+query asks for** is the characteristic member: Mostar, Blagaj, Kuressaare on
+Saaremaa. Advisory countries are excluded because a derived point is not
+automatically an honest one — the first rule offered Belovezhskaya Pushcha,
+in Belarus. `by-rail` has twenty results and none photographed, so it shows
+its slot. 0 `<img>` to 11, and **nothing was acquired.**
+
+**A COMMENT IN EMITTED MARKUP SHIPS — AND THIS ONE TRIPPED THE CHECK IT WAS
+WRITTEN ABOUT.** The reason the projection is *not* named on /europe-in went
+into the page as an HTML comment, and it contained the words "conformal
+conic": `c_published_projection` reads the shipped HTML only, correctly, and
+failed four times on a paragraph explaining why those words are not on the
+page. Third occurrence of that rule here. A reason belongs in the source
+that writes the page.
+
+**A DESCENDANT SELECTOR WRITTEN FOR ONE FIGCAPTION REPAINTED THE LICENCE
+CREDIT, AND ONLY THE BROWSER SUITE COULD SEE IT.** `picture()` emits Pexels'
+two required links as a `<figcaption class="credit">` INSIDE the
+`<picture>`, absolutely positioned on a 72% graphite scrim whose arithmetic
+gives 6.90:1 whatever the photograph is. `.moshot figcaption` — written for
+the row's own caption, *"Zagreb, Croatia — one of the 309"* — is (0,2,0)
+against `.credit`'s (0,1,0), so it repainted the credit `--ink-3` and left
+its position, its scrim and its opacity alone: **3.56:1 in both preferences,
+on the two links the licence requires**, two failures of 9,709. That is the
+`.pageband figcaption` defect this stylesheet already records, reproduced
+two hundred lines from the paragraph recording it — *a rule that changes two
+properties of a six-property component achieves exactly one thing, and here
+that thing was the defect.* A child combinator cannot reach inside the
+`<picture>`.
+
+**AND THE CLOSE WAS A FOURTH CLASS WITH THE SAME BODY.** `.istart` is the
+close shape /interests introduced and /beyond-the-obvious already reuses —
+`display: grid; justify-items: start; max-width: 46rem` and a 38rem lede.
+Written here as `.moask`, measured at a 361px lede against the shared
+shape's 608, and **deleted rather than tuned**. The same hour produced a
+second `.motilenm` declaration eight lines below the first, which is the
+duplicated selector this stylesheet removed 85 of, made in the hour after
+the comment recording that.
 
 ## Gates
 

@@ -14516,7 +14516,66 @@ def motion_query_words(data, m):
     out = and_list(parts) + "."
     if not wants:
         out = "every destination " + out
-    return out[0].upper() + out[1:]
+    out = out[0].upper() + out[1:]
+    if wants:
+        # THE PRINTED QUERY WAS NARROWER THAN THE QUERY THAT RAN, ON THE ONE
+        # FAMILY WHOSE WHOLE RULE IS THAT A PAGE PRINTS WHAT PRODUCED IT.
+        #
+        # `motion_match` reads `set(city.interests) | set(region.interests)`,
+        # so a destination is returned when ITS REGION carries the tag. The
+        # sentence said "any destination tagged Islands" and said nothing
+        # about the region, and the gap is not small: 62 of the 86 results
+        # for Food and Wine are there on their region's tags rather than
+        # their own, and 58 of the 150 for Coast. It returns **Nicosia**,
+        # whose own tags are history, food and cities and which is inland,
+        # because the region is "Nicosia & the South Coast"; and **Tartu**,
+        # a mainland university town, for Islands, because its region is
+        # "The Islands & the South".
+        #
+        # That is the `cell` catching `cellar` failure exactly: the page
+        # published its rule honestly, and a reader who checked would find
+        # something the rule did not describe. The engine is not changed
+        # here — a region tag is a real fact about the ground around a place
+        # and 537 tag applications across nine other surfaces depend on the
+        # union — what changes is that the sentence now says so, once, at
+        # the end, rather than inside each clause. `docs/europe-in-redesign.md`
+        # carries the per-tag propagation question and its trigger.
+        # AND THE CLAUSE IS SHORT BECAUSE NINE OF THE TWELVE CARRY IT. The
+        # first version spelled the whole mechanism out and produced the
+        # same 130 characters on nine rows of one page, which is *never
+        # explain the constraint back* — a reason shared by every result
+        # belongs hoisted once above the list, and only what distinguishes
+        # a row belongs in the row. So the query says the thing that is
+        # true of this query, and `motion_tag_note()` says the mechanism
+        # once per page.
+        # And the ALL case needs different words from the ANY case: under
+        # `all_interests` a destination qualifies when its own tags and its
+        # region's, taken together, cover every term — so "its own tag or
+        # its region's" would be a claim about one tag on a query about two.
+        out = out[:-1] + (
+            " \u2014 own tags and region\u2019s counting together."
+            if m.get("all_interests") and len(wants) > 1
+            else " \u2014 its own tag or its region\u2019s.")
+    return out
+
+
+def motion_tag_note():
+    """The mechanism behind the tag clause, stated once per page.
+
+    Nine of the twelve queries read a destination's own tags and its
+    region's together, and the clause on each says so in five words. This
+    is the sentence that explains it, hoisted — and it also reconciles the
+    two numbers this site publishes for one word: /interests counts a tag
+    on the DESTINATION (Mountains, 63) and a motion counts it on the
+    destination or its region (115). Both are derived, both are live, and
+    for the life of both families neither said which it was.
+    """
+    return ("A destination\u2019s own tags and its region\u2019s count "
+            "together here, so a place in a region tagged for something is "
+            "returned whether or not it carries the tag itself. That is why "
+            "a motion\u2019s count can be larger than the same tag\u2019s "
+            "count on <a href=\"/interests\">Interests</a>, which reads the "
+            "destination only.")
 
 
 def motion_page(data, m):
@@ -14608,6 +14667,7 @@ def motion_page(data, m):
         f'{"countries" if ncountries != 1 else "country"}'
         + (f'; the {len(shown)} below are at most two per country.'
            if len(hits) != len(shown) else ', and all of them are below.')
+        + (" " + motion_tag_note() if m.get("interests") else "")
         + '</p>'
     )
 
@@ -14747,91 +14807,365 @@ def motion_page(data, m):
 
 
 def motion_index(data):
-    """Twelve queries, printed as queries.
+    """The Computed Atlas: six plates, and the printed query was narrower
+    than the query that ran.
 
-    THE FAMILY'S WHOLE ARGUMENT WAS THE ONE THING THE INDEX DID NOT SHOW.
-    Every `/europe-in/*` page prints the query that made it — that is the
-    rule this family exists to demonstrate, and `checks.py` asserts it on all
-    twelve. The index showed twelve generated landscapes instead, one per
-    query, and the query nowhere.
+    THE FAMILY'S WHOLE CREDIBILITY CLAIM IS THAT EVERY PAGE PRINTS WHAT
+    PRODUCED IT, and for the life of the family the sentence said "any
+    destination tagged Islands" while `motion_match` read
+    `set(city.interests) | set(region.interests)`. The gap is not
+    cosmetic: **62 of the 86 results for Food and Wine are there on their
+    region's tags rather than their own**, 58 of 150 for Coast, 52 of 115
+    for Mountains — 537 tag applications across the seventeen interests,
+    47% more than the destination-only reading. It returns **Nicosia**,
+    which is inland, for Europe's coastlines, because its region is
+    "Nicosia & the South Coast"; and **Tartu**, a mainland university
+    town, for Europe's islands. That is `cell` catching `cellar` exactly:
+    the page published its rule honestly and a reader who checked would
+    find something the rule did not describe.
 
-    **A motion is not a place.** It has no coastline, no topography and no
-    season of its own, so a plate drawn for one is a picture of nowhere
-    standing in for a sentence — the same failure as the stories index, one
-    family over, and the rule written for it applies here word for word: the
-    alternative to a hash-drawn landscape is not a better hash.
+    AND IT MEANT TWO LIVE PAGES PUBLISHED TWO NUMBERS FOR ONE WORD.
+    /interests/mountains says *63 destinations*; /europe-in/mountains says
+    *115 match*. Both derived, both correct under their own reading, and
+    neither said which reading it was. The engine is unchanged — a region
+    tag is a real fact about the ground around a place, and nine other
+    surfaces depend on the union — what changed is that the query says so
+    in five words and `motion_tag_note()` says the mechanism once.
 
-    So the picture goes and the query arrives, generated by the same
-    `motion_query_words()` the twelve pages use, so the index cannot state a
-    query the page it links to would not.
+    THE TWELVE SHAPES WERE ONE PER ROW, 1,152 PIXELS APART. The family's
+    signature moment is the query drawn as a shape, and the argument is
+    that the twelve shapes DIFFER — which is a comparison, and a
+    comparison laid out vertically at one drawing per screen cannot be
+    made. That is /themes' own finding about a 204-pixel continent, one
+    axis over. They are a grid in the opening now, on one frame, and the
+    rows carry the sentence and a photograph instead. See
+    `docs/europe-in-redesign.md`.
+
+    ZERO PHOTOGRAPHS, AND A MOTION MAY NOT HAVE ONE OF ITS OWN. The
+    register declares no `motion:` purpose and must not: a motion has no
+    coastline, no topography and no season, so a picture of one is a
+    picture of nowhere — the refusal that took the twelve plates off this
+    index. What it CAN spend is a photograph of a destination the query
+    returned, and eleven of the twelve have one. The pick is derived: a
+    member on its OWN tags rather than its region's, then the one fewest
+    of the other eleven queries also return, then never a key already
+    spent. `by-rail` has 20 results and none photographed, so it shows its
+    slot and names the acquisition. Nothing was acquired.
     """
-    # AND THE ANSWER IS DRAWN, WHICH IS A THIRD OPTION THE REFUSAL ABOVE
-    # NEVER CONSIDERED. What was refused is a PLATE — an abstract landscape
-    # picked from the hash of a slug, a picture of nowhere standing in for a
-    # sentence — and that refusal still holds word for word. This is not
-    # that. The motion PAGE's own signature moment, recorded one function
-    # over, is "the query drawn as a shape: everywhere above 63 north is
-    # eight lit points across Iceland, Norway, Sweden and Finnish Lapland,
-    # and you see the latitude before you read it" — and the index that
-    # introduces the twelve drew none of it.
+    images = data.get("images")
+    total = len(data["cities"])
+
+    # ── ONE PASS, AND EVERY FIGURE ON THIS PAGE COMES OUT OF IT ──────
+    sets, facts = {}, {}
+    for m in data["motions"]:
+        hits = [cid for cid, n in sorted(data["cities"].items())
+                if motion_match(data, m, cid, n)[0]]
+        sets[m["slug"]] = hits
+        facts[m["slug"]] = {
+            "n": len(hits),
+            "ncountry": len({data["cities"][c]["country"]["slug"] for c in hits}),
+            "pct": round(100.0 * len(hits) / total) if total else 0,
+            "pts": [project(data["cities"][c]["city"]["lat"],
+                            data["cities"][c]["city"]["lon"]) for c in hits],
+        }
+
+    # HOW MANY OF THE TWELVE EACH DESTINATION SATISFIES. The twelve are not
+    # a partition and nobody had said so: the union is the whole Atlas, the
+    # commonest destination is in four of them, and one is in eight.
+    degree = {cid: sum(1 for h in sets.values() if cid in h)
+              for cid in data["cities"]}
+    dist = {}
+    for k in degree.values():
+        dist[k] = dist.get(k, 0) + 1
+    reached = sum(1 for k in degree.values() if k)
+    # DERIVED, because "the commonest satisfies four" is a figure that was
+    # true on the day it was typed — the /themes "8 PLACES" fault in prose.
+    commonest = max(dist.items(), key=lambda kv: (kv[1], -kv[0]))[0]
+    most = max(degree.items(), key=lambda kv: (kv[1], kv[0]))
+    mostname = data["cities"][most[0]]["city"]["name"]
+    mostin = [m["name"] for m in data["motions"] if most[0] in sets[m["slug"]]]
+
+    # THE OVERLAP, MEASURED, because "same frame, different Europe" is an
+    # assertion until somebody runs the arithmetic. No two of the twelve
+    # share more than 48% of their results and 0 of the 66 pairs share half.
+    worst = (0.0, "", "")
+    over = 0
+    slugs = [m["slug"] for m in data["motions"]]
+    for a in range(len(slugs)):
+        for b in range(a + 1, len(slugs)):
+            x, y = set(sets[slugs[a]]), set(sets[slugs[b]])
+            j = len(x & y) / len(x | y) if (x | y) else 0.0
+            if j > 0.5:
+                over += 1
+            if j > worst[0]:
+                worst = (j, slugs[a], slugs[b])
+    name_of = {m["slug"]: m["name"] for m in data["motions"]}
+
+    # THE PHOTOGRAPH IS A DESTINATION THE QUERY RETURNED ON ITS OWN TAGS.
     #
-    # It is computed from the query, by the same `motion_match` that produces
-    # the count beside it, so the drawing cannot state a set the page it
-    # links to would not — the same contract the printed query already has.
-    # And it is the shape that separates them: autumn lights 309 dots and is
-    # nearly the whole continent, rail is a corridor, the islands are a rim,
-    # above 63 north is the far north and nothing else. Twelve rows of type
-    # cannot be compared; twelve shapes can, which is the argument /themes
-    # and /interests already make with the same primitive.
+    # Ordering by "fewest of the twelve" alone picked Nicosia for the coast
+    # and Tartu for the islands — the region-only members, which are the
+    # WEAKEST members of the set and the ones a reader would read as a
+    # mistake. A direct member, then the one whose own tags are most nearly
+    # just what the query asks for, then fewest of the other eleven, is the
+    # picture that is both characteristic of the cut and specific to it.
+    # Advisory countries are excluded because a derived point is not
+    # automatically an honest one, and a key already spent is skipped
+    # because one photograph on two records is *one thing, one picture* from
+    # the other end.
+    def direct(m, n):
+        wants = m.get("interests", [])
+        if not wants:
+            return True
+        own = set(n["city"]["interests"])
+        hit = [w for w in wants if w in own]
+        return len(hit) == len(wants) if m.get("all_interests") else bool(hit)
+
+    def tagshare(m, n):
+        """How much of a destination's own tag list this query asks for.
+
+        ORDERING BY SPECIFICITY ALONE PUT THE MODERN CITY ON THE MEDIEVAL
+        QUERY. "Fewest of the other eleven" is a good tie-break and a poor
+        primary key: it rewards a place that is in few cuts for any reason,
+        so `medieval` drew Baku (architecture, history, food, cities — the
+        register's photograph is the Flame Towers) and `sacred` drew Garni.
+        A destination whose own tags are most nearly JUST what the query
+        asks for is the characteristic member: Mostar for the medieval
+        world, Blagaj for the sacred places, Kuressaare on Saaremaa for the
+        islands. Measured against the alternative on all twelve, three picks
+        improve and none gets worse than a wash.
+        """
+        wants = set(m.get("interests", []))
+        own = set(n["city"]["interests"])
+        return len(wants & own) / len(own) if own else 0.0
+
+    spent = set()
+    for m in data["motions"]:
+        cands = [c for c in sets[m["slug"]]
+                 if held(images, "city:" + c) and c not in spent
+                 and not data["cities"][c]["country"].get("advisory")
+                 and direct(m, data["cities"][c])]
+        cands.sort(key=lambda c: (-tagshare(m, data["cities"][c]),
+                                  degree[c], c))
+        facts[m["slug"]]["shot"] = cands[0] if cands else None
+        if cands:
+            spent.add(cands[0])
+    nshot = sum(1 for f in facts.values() if f["shot"])
+
+    # ── 01 · EUROPE IN MOTION ────────────────────────────────────────
+    # THE TWELVE SHAPES, ON ONE FRAME, WHERE THEY CAN BE COMPARED. Autumn
+    # is 97% of the continent, rail is a corridor up Norway and through the
+    # Alps, the islands are a rim and above 63° north is the far north and
+    # nothing else — and that difference is the whole argument of the page.
+    # The mark size follows the count exactly as it does on /interests:
+    # three hundred dots at a theme's radius is a blue mass with the
+    # coastline lost under it, which says "a lot" and nothing else.
+    tiles = []
+    for m in data["motions"]:
+        f = facts[m["slug"]]
+        dense = " constel-dense" if len(f["pts"]) > 60 else ""
+        tiles.append(
+            f'<a class="motile" href="/europe-in/{m["slug"]}">'
+            f'{constellation(f["pts"], extra=" constel-theme" + dense)}'
+            f'<span class="motilen">{f["n"]}</span>'
+            f'<span class="motilenm">{esc(m["name"])}</span>'
+            f'<span class="motilep">{f["pct"]}% of the Atlas &middot; '
+            f'{n_of(f["ncountry"], "country")}</span></a>')
+    moopen = f"""
+  <div class="pagehead index">
+    <p class="kicker">Europe in Motion</p>
+    <h1 class="mega">The continent, cut a dozen different ways.</h1>
+    {head_extent([(len(data["motions"]), "queries"),
+                  (total, "destinations"),
+                  (len({n["country"]["slug"] for n in data["cities"].values()}),
+                   "countries")])}
+    <p class="lede">Not categories. {numword(len(data['motions']), cap=True)} queries, each run
+    against all {total} destinations on every build, and each page prints the query that
+    made it. A list somebody curated by hand looks identical to one a query produced
+    &mdash; on the day it ships, and never again.</p>
+  </div>
+  {constel_defs()}
+  <div class="mogrid">{"".join(tiles)}</div>
+  <p class="small">Each shape is the destinations that query actually matched, drawn to
+  the same frame so the {numword(len(data['motions']))} can be compared &mdash; computed by
+  the same pass that produced the number on it, so a drawing here cannot show a set the
+  page it links to would not. Marks are smaller above sixty results, because three
+  hundred dots at one radius is a mass rather than a shape.
+  {geo.sources_line(geo.load("europe-lod0.json"))}</p>"""
+
+    # ── 02 · THE QUESTION ────────────────────────────────────────────
+    # THE PAGE'S OWN POSITION WAS A CAPTION-SIZE NOTE AT THE BOTTOM, under
+    # twelve rows, in a grey panel titled "Why this is not a set of tags" —
+    # the /beyond-the-obvious fault, where the reason a family looks the way
+    # it does is printed smaller than everything it explains.
+    moq = f"""
+  <div class="sheettext">
+    <h2 class="mega">A tag tells you what carries a
+    <em class="lit">label</em>.</h2>
+    <p class="lede">These ask questions the tags cannot answer on their own. Which places
+    have their <em>quieter</em> season in autumn rather than merely tolerating it. Which
+    lie above 63&deg; north. Which score highly for
+    <a href="/method#discoverability">discoverability</a> and are small enough to be
+    villages rather than cities. The query is the product, and it is the thing printed on
+    the page.</p>
+    <p class="note">There is no field for naming a destination in a motion, so one cannot
+    quietly become a hand-picked list; and a query matching nothing fails the build rather
+    than shipping an empty page with a good headline on it.</p>
+  </div>"""
+
+    # ── 03 · TWELVE CUTS ────────────────────────────────────────────
     rows = []
     for m in data["motions"]:
-        hits = [x for cid, x in data["cities"].items()
-                if motion_match(data, m, cid, x)[0]]
-        n = len(hits)
-        pts = [project(x["city"]["lat"], x["city"]["lon"]) for x in hits]
-        # The mark size follows the count, exactly as it does on /interests:
-        # three hundred dots at a theme's radius is a solid blue mass with the
-        # coastline lost under it, which says "a lot" and nothing else — and
-        # the whole argument of this page is that the shapes differ.
-        dense = " constel-dense" if len(pts) > 60 else ""
-        glyph = constellation(pts, extra=" constel-theme" + dense) if pts else ""
+        f = facts[m["slug"]]
+        if f["shot"]:
+            n = data["cities"][f["shot"]]
+            shot = (f'<figure class="moshot">'
+                    f'{picture(images, "city:" + f["shot"], w=900, h=700, alt=n["city"]["name"], sizes="(max-width: 52rem) 90vw, 20rem")}'
+                    f'<figcaption>{esc(n["city"]["name"])}, '
+                    f'{esc(n["country"]["name"])} &mdash; one of the '
+                    f'{f["n"]}</figcaption></figure>')
+        else:
+            shot = (f'<figure class="moshot">'
+                    f'{ed_slot("city:" + sets[m["slug"]][0], shape="square", label=m["name"])}'
+                    f'</figure>')
         rows.append(
-            f'<a class="row themerow motionrow" href="/europe-in/{m["slug"]}">'
-            f'<div class="rowart">{glyph}</div>'
-            f'<div><p class="kicker">{n_of(n, "destination")}</p>'
-            f'<h2>{esc(m["name"])}</h2>'
+            f'<div class="row motionrow">{shot}'
+            f'<div><p class="kicker">{n_of(f["n"], "destination")} &middot; '
+            f'{n_of(f["ncountry"], "country")} &middot; {f["pct"]}% of the Atlas</p>'
+            f'<h2><a href="/europe-in/{m["slug"]}">{esc(m["name"])}</a></h2>'
             f'<p class="rowsub">{esc(m["strapline"])}</p>'
-            f'<p class="motionq">{esc(motion_query_words(data, m))}</p></div></a>')
+            f'<p class="motionq">{esc(motion_query_words(data, m))}</p></div></div>')
+    # NOT `ed_section_head()` HERE, AND THE REASON IS ALREADY WRITTEN ON IT:
+    # `.ed-section` increments the same `band` counter a plate's `actmark`
+    # numbers from, so one inside a plate sequence is the two-numbering-
+    # systems collision that printed "01" twice on 753 pages. A plate states
+    # its own head, which is what every other plate on this site does.
+    mocuts = f"""
+  <div class="sheettext">
+    <h2 class="mega">{numword(len(data['motions']), cap=True)} cuts, and each one
+    prints its own query.</h2>
+    <p class="lede">The query is on the left of every row and the result is the
+    number beside it. The photograph is a destination that query returned &mdash; on
+    its <em>own</em> tags rather than its region&rsquo;s, and the one whose tag list
+    is most nearly just what the query asks for, so the picture is of this cut
+    rather than of Europe. The register holds one for {numword(nshot)} of the
+    {numword(len(data['motions']))}.</p>
+  </div>
+  <div class="rows mocuts">{"".join(rows)}</div>"""
+
+    # ── 04 · NOT TWELVE BUCKETS ─────────────────────────────────────
+    # NOBODY HAD CROSSED THE TWELVE WITH EACH OTHER. The shapes differ, and
+    # a reader can still read twelve shapes as twelve boxes — so the other
+    # half of "same frame, different Europe" is that they OVERLAP: the union
+    # is the whole Atlas, the commonest destination is in four of them, and
+    # Narvik is in eight. A chart is a claim, so both series are asserted
+    # against the dataset in `checks.py`.
+    top = max(dist.values())
+    # The width is a `.w0`-`.w100` utility class, not a `style` attribute —
+    # a style attribute would force `style-src` open on all 1,034 pages,
+    # which `checks.py` refuses. And the number sits at the END of its own
+    # bar, which is /plan's own finding: a value six hundred pixels from the
+    # thing it measures is not labelled.
+    bars = "".join(
+        f'<div class="mobar">'
+        f'<span class="mobarlab">{k} '
+        f'{"query" if k == 1 else "queries"}</span>'
+        f'<span class="mobartr"><span class="mobarfill '
+        f'w{round(100.0 * dist[k] / top)}"></span>'
+        f'<span class="mobarn">{dist[k]}</span></span></div>'
+        for k in sorted(dist))
+    mooverlap = f"""
+  <div class="sheettext">
+    <h2 class="mega">Not {numword(len(data['motions']))} buckets.</h2>
+    <p class="lede">The {numword(len(data['motions']))} are readings of one continent
+    rather than divisions of it. {"Every one" if reached == total else numword(reached, cap=True)}
+    of the {total} destinations satisfies at least one of them, the commonest number to
+    satisfy is {numword(commonest)}, and
+    {esc(mostname)} satisfies {numword(most[1])} &mdash;
+    {esc(and_list(mostin))}.</p>
+  </div>
+  <figure class="mobars">
+    {bars}
+    <figcaption><span class="capmain">Destinations by how many of the
+    {numword(len(data['motions']))} queries return them.</span>
+    <span class="capsrc">Bars are a share of the largest group
+    ({top}), not of the {total}. Counted on every build by the same
+    {len(data['motions'])} queries the pages run.</span></figcaption>
+  </figure>
+  <p class="note">No two of the {numword(len(data['motions']))} share more than
+  {round(worst[0] * 100)}% of their results &mdash; the closest pair is
+  {esc(name_of[worst[1]])} and {esc(name_of[worst[2]])} &mdash; and
+  {"none" if not over else str(over)} of the
+  {len(slugs) * (len(slugs) - 1) // 2} pairs share half. That is the
+  difference between twelve questions and twelve labels, and it is
+  arithmetic rather than a claim.</p>"""
+
+    # ── 05 · METHOD ─────────────────────────────────────────────────
+    # THE PROJECTION IS NAMED IN ONE PLACE AND THIS IS NOT IT. A page naming
+    # a Lambert conformal conic has to state its four angles in the same
+    # sentence, because /map named the right projection on the wrong
+    # parallels for six commits and no check read the prose. Naming it here
+    # would be a second copy of that claim on a page whose subject is a
+    # query rather than a drawing, so the note credits the data and links to
+    # the page that publishes the projection.
+    #
+    # AND THIS REASON WAS FIRST WRITTEN AS AN HTML COMMENT, WHICH SHIPS.
+    # `c_published_projection` reads the shipped HTML and found the words
+    # "conformal conic" in the paragraph explaining why they are not on the
+    # page — the third time a comment in emitted markup has cost something
+    # here, and the first where the comment tripped the check it was written
+    # about. A reason belongs in the source that writes the page.
+    momethod = f"""
+  <div class="sheettext">
+    <h2 class="mega">How a cut is made.</h2>
+    <p class="lede">A motion is a declared query &mdash; interests, months, a latitude, a
+    <a href="/method#discoverability">discoverability</a> floor, a nights ceiling &mdash;
+    evaluated against every destination in the Atlas on every build. Nothing is stored
+    against a motion and nothing is chosen by hand.</p>
+    <p class="note">{motion_tag_note()}</p>
+    <p class="note">Coastline and country outlines from
+    <a href="/sources">Natural Earth</a>, public domain, drawn on the
+    projection <a href="/map">the map</a> publishes. The scoring is
+    published in full at <a href="/method">the method</a>.</p>
+  </div>"""
+
+    # ── 06 · ASK A BETTER QUESTION ──────────────────────────────────
+    moask = f"""
+  <!-- `.istart` RATHER THAN A FOURTH CLASS WITH THE SAME BODY. /interests
+       introduced this close shape and /beyond-the-obvious already reuses
+       it; a third copy of `display: grid; justify-items: start` under a new
+       name is the duplicated rule this stylesheet removed 85 of, and the
+       first version of this band had one. -->
+  <div class="istart">
+    <h2 class="mega">Ask a better question.</h2>
+    <p class="lede">These {numword(len(data['motions']))} are the questions we found worth
+    asking. Discover Mode takes yours &mdash; any combination of the
+    {len(data["interests"])} interests, a month, a budget and a pace &mdash; and the
+    Planner turns the answer into an order you can travel in.</p>
+    <p class="keepgo"><a class="btn" href="/discover">Open Discover Mode</a>
+    <a class="storygo" href="/plan">Or build a route &rarr;</a></p>
+  </div>"""
+
+    # THE ACTMARK NAMED WHAT THE KICKER UNDER IT ALREADY SAID. Rendered,
+    # plate 01 read "01 — EUROPE IN MOTION" and then, eight pixels below,
+    # "EUROPE IN MOTION" again — two identical labels stacked, which is the
+    # 753-page double-numbering fault in words rather than digits. The
+    # actmark names what the plate DRAWS and the kicker names the family.
+    PLATES = [("moopen gal", "Same frame, different Europe", moopen,
+               "europe-in-motion"),
+              ("moq pine", "The question", moq, "the-question"),
+              ("mocuts gal", "Twelve cuts", mocuts, "twelve-cuts"),
+              ("mooverlap paper", "Not twelve buckets", mooverlap, "overlap"),
+              ("momethod pine", "Method", momethod, "method"),
+              ("moask gal", "Ask a better question", moask, "ask")]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Europe in Motion", None)])}
-<div class="pagehead index">
-  <p class="kicker">Europe in Motion</p>
-  <h1>The continent, cut a dozen different ways.</h1>
-  <p class="lede">Not categories. {len(data['motions'])} queries, each run against all
-  {len(data['cities'])} destinations on every build, and each page prints the query that
-  made it. A list somebody curated by hand looks identical to one a query produced — on
-  the day it ships, and never again.</p>
-</div>
-{constel_defs()}
-<div class="rows">{"".join(rows)}</div>
-<p class="small">The shape beside each query is the destinations that query
-actually matched, drawn to the same frame so the {numword(len(data['motions']))} can be
-compared — computed by the same pass that produced the number beside it, so a
-drawing here cannot show a set the page it links to would not.
-{geo.sources_line(geo.load("europe-lod0.json"))}</p>
-
-<div class="note mt7">
-  <h2 class="mini">Why this is not a set of tags</h2>
-  <p>A tag page tells you what carries a label. These ask questions the tags cannot answer on
-  their own: which places have their <em>quieter</em> season in autumn, which lie above 63°
-  north, which score highly for <a href="/method#discoverability">discoverability</a> and are
-  small enough to be villages. The query is the product.</p>
-</div>
+{plate_sequence(PLATES)}
 """
     return "/europe-in/index.html", page(
         "Europe in Motion", body, path="/europe-in", area="discover",
-        accent="territory",
-        description=f"A dozen ways to cut the continent — each a real query run against all {len(data['cities'])} destinations on every build, with the query printed on the page.",
+        accent="territory", hero=True,
+        description=f"A dozen ways to cut the continent — each a real query run against all {total} destinations on every build, with the query printed on the page.",
         og=("motion:index", "peaks", "Europe in Motion"),
         ld_blocks=[ld_breadcrumb([("Europe", "/discover"),
                                   ("Europe in Motion", "/europe-in")])],

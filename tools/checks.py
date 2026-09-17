@@ -7604,6 +7604,162 @@ def c_credit_scrim():
     return n
 
 
+
+@check("a motion prints the query that ran, not a narrower one")
+def c_motion_query_breadth():
+    """THE ONE FAMILY WHOSE WHOLE CREDIBILITY CLAIM IS THAT A PAGE PRINTS
+    WHAT PRODUCED IT WAS PRINTING SOMETHING NARROWER.
+
+    `motion_match` reads `set(city.interests) | set(region.interests)`, so a
+    destination is returned when ITS REGION carries the tag. The printed
+    query said "any destination tagged Islands" and said nothing about the
+    region — and the gap is 537 tag applications, 47% more than the
+    destination-only reading. It returns **Nicosia**, which is inland, for
+    Europe's coastlines, because its region is "Nicosia & the South Coast";
+    and **Tartu**, a mainland university town, for Europe's islands. A
+    reader who checked the published rule would find something the rule did
+    not describe, which is `cell` catching `cellar` one family over.
+
+    TWO HALVES, BECAUSE EITHER ONE ALONE GOES QUIETLY WRONG.
+
+    The page must state the mechanism — asserted on the shipped HTML of
+    every motion whose query carries a tag term, read out of
+    `data/motions.json` rather than out of the generator, because a check
+    that re-runs the generator can only ever agree with it.
+
+    And the ENGINE must still have the mechanism the page states. If
+    somebody narrows `motion_match` to the destination's own tags, every
+    page keeps a sentence that has become false in the other direction —
+    the failure this repository records as *removing a claim leaves surfaces
+    pointing at it*, and no count anywhere would see it.
+    """
+    n = 0
+    src = open(os.path.join(ROOT, "tools", "lib", "pages.py"),
+               encoding="utf-8").read()
+    body = src[src.index("def motion_match("):src.index("def and_list(")]
+    n += 1
+    if 'set(t["interests"]) | set(r["interests"])' not in body:
+        fail("motion_match no longer reads a destination's tags together "
+             "with its region's, and every motion page still prints a "
+             "sentence saying it does")
+    motions = json.load(open(os.path.join(ROOT, "data", "motions.json"),
+                             encoding="utf-8"))["motions"]
+    tagged = [m for m in motions if m.get("interests")]
+    n += 1
+    if not tagged:
+        fail("no motion carries an interest term — this check has stopped "
+             "finding the thing it is about")
+    for m in tagged:
+        f = os.path.join(OUT, "europe-in", m["slug"], "index.html")
+        if not os.path.exists(f):
+            fail(f"/europe-in/{m['slug']} is not built")
+            continue
+        html = open(f, encoding="utf-8").read()
+        n += 1
+        if "its own tag or its region" not in html \
+                and "own tags and region" not in html:
+            fail(f"/europe-in/{m['slug']} prints a tag query with no word "
+                 f"about the region. The query reads a destination's tags "
+                 f"AND its region's, so the printed sentence is narrower "
+                 f"than the one that ran")
+        n += 1
+        # And the mechanism once, not per clause: nine of the twelve carry
+        # the short clause, so spelling the whole thing out in each is the
+        # boilerplate `never explain the constraint back` refuses.
+        if html.count("count’s together") + html.count(
+                "count together") != 1:
+            fail(f"/europe-in/{m['slug']} states the tag mechanism "
+                 f"{html.count('count together')} times; it belongs hoisted "
+                 f"once above the results, not repeated per clause")
+    idx = os.path.join(OUT, "europe-in", "index.html")
+    if os.path.exists(idx):
+        html = open(idx, encoding="utf-8").read()
+        n += 1
+        if "count together" not in html:
+            fail("/europe-in states nine tag queries and never says a "
+                 "destination's tags and its region's count together")
+        n += 1
+        # THE TWO NUMBERS THIS SITE PUBLISHES FOR ONE WORD. /interests reads
+        # the destination only (Mountains, 63) and a motion reads the
+        # destination or its region (115). Both are live and derived, and
+        # for the life of both families neither said which it was.
+        if "/interests" not in html.split("count together", 1)[1][:400]:
+            fail("/europe-in says the tag mechanism and does not say why a "
+                 "motion's count can exceed the same tag's count on "
+                 "/interests — the two numbers are both published and the "
+                 "reconciliation is the point of the sentence")
+    return n
+
+
+@check("the distribution chart is scaled by the series it is labelled with")
+def c_motion_distribution():
+    """A CHART IS A CLAIM, AND THIS ONE IS THE ARGUMENT THAT THE TWELVE ARE
+    NOT TWELVE BUCKETS.
+
+    The bars are destinations by how many of the twelve queries return
+    them, scaled against the largest group rather than against the Atlas —
+    eight groups summing to 319 would put the largest at 35% of its track
+    and read as a share of the continent, which is a different claim.
+
+    Asserted on the shipped page with NO reference to the generator, which
+    is deliberate: recomputing the distribution means re-running the twelve
+    queries, and an instrument that re-runs the model can only ever agree
+    with it. What is checkable without the model is everything around it —
+    the widest bar is the track, every other bar is its own share of that
+    widest, the groups sum to the destination total the page prints, and
+    the labels run 1..n with no gaps. A correct label over a drawing scaled
+    from the wrong array still reads as a finished chart, and this catches
+    exactly that.
+    """
+    f = os.path.join(OUT, "europe-in", "index.html")
+    if not os.path.exists(f):
+        fail("/europe-in is not built")
+        return 0
+    html = open(f, encoding="utf-8").read()
+    if 'class="mobars"' not in html:
+        fail("/europe-in draws no distribution chart — the band arguing that "
+             "the twelve overlap has lost its evidence")
+        return 0
+    block = html.split('class="mobars"', 1)[1].split("</figure>", 1)[0]
+    widths = [int(x) for x in re.findall(r'class="mobarfill w(\d+)"', block)]
+    counts = [int(x) for x in re.findall(r'class="mobarn">(\d+)<', block)]
+    labels = [int(x) for x in
+              re.findall(r'class="mobarlab">(\d+)\s*quer', block)]
+    n = 1
+    if not widths or len(widths) != len(counts) or len(labels) != len(widths):
+        fail(f"/europe-in: {len(widths)} bar(s), {len(counts)} count(s) and "
+             f"{len(labels)} label(s) — every group carries all three")
+        return n
+    n += 1
+    if max(widths) != 100:
+        fail(f"/europe-in: the widest bar is {max(widths)}% and must be 100 — "
+             f"the scale is the largest group, so that group IS the track")
+    top = max(counts)
+    for lab, c, w in zip(labels, counts, widths):
+        n += 1
+        want = round(100.0 * c / top)
+        if w != want:
+            fail(f"/europe-in: the group satisfying {lab} of the queries "
+                 f"holds {c} against a largest of {top} and draws {w}%, "
+                 f"where the scale gives {want}%")
+    n += 1
+    if labels != list(range(min(labels), min(labels) + len(labels))):
+        fail(f"/europe-in: the chart's groups are {labels} — a distribution "
+             f"with a gap in it is a bar missing rather than a group that "
+             f"is empty")
+    m = re.search(r"of the (\d+) destinations satisfies at least one", html)
+    n += 1
+    if not m:
+        fail("/europe-in does not state how much of the Atlas the twelve "
+             "queries reach between them")
+    elif sum(counts) != int(m.group(1)):
+        fail(f"/europe-in: the chart's groups sum to {sum(counts)} and the "
+             f"page says the twelve reach {m.group(1)} destinations. Every "
+             f"destination is in exactly one group, so the two are the same "
+             f"number or one of them is wrong")
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0

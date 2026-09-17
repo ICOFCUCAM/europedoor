@@ -11881,3 +11881,142 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 @media (max-width: 52rem) {
   .rows.swaps .row.swaprow { grid-template-columns: minmax(0, 1fr); }
 }
+
+
+/* ═══ /europe-in — THE COMPUTED ATLAS ════════════════════════════════
+ *
+ * Six plates. The rooms do the grounds and the rhythm; what is here is the
+ * two things this family has that no other does — twelve shapes laid out
+ * where they can be compared, and a query set in the mono face because a
+ * machine produced it.
+ *
+ * NO `display` ON ANY `sheet-` CLASS HERE. `.sheet-gal` and `.sheet-pine`
+ * both end `display: block` and `.sheet-paper` does not, so exactly one of
+ * these six needs it — which is the correction this stylesheet already
+ * carries after eighteen redundant declarations were removed from three
+ * page blocks in one pass.
+ */
+
+/* ── 01 the twelve, on one frame ─────────────────────────────────── */
+/* THE SHAPES WERE ONE PER ROW, 1,152 PIXELS APART. The family's signature
+   moment is the query drawn as a shape and its argument is that the twelve
+   shapes DIFFER — which is a comparison, and a comparison at one drawing
+   per screen cannot be made. That is /themes' own 204-pixel-continent
+   finding on the other axis: there the drawing was too small to read, here
+   it was too far from the drawing it is being compared with.
+
+   `auto-fill` rather than `auto-fit`: auto-fit collapses the empty tracks
+   and stretches a short last row to full width, so twelve tiles in a
+   four-column grid would come out as eight small pictures and four large
+   ones. Four across at 1280 is 270px a tile, against the 204 that page
+   measured as too small and the 288 it settled on. */
+.mogrid { display: grid; gap: var(--s6) var(--s5); margin-top: var(--s7);
+          grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
+.motile { display: block; text-decoration: none; color: inherit; }
+.motile .constel { width: 100%; }
+.motilen { display: block; font-family: var(--mono); font-size: var(--t-sm);
+           color: var(--door); font-variant-numeric: tabular-nums;
+           margin-top: var(--s2); }
+/* 1.12, NOT 1.2 — A NINTH LINE-HEIGHT IS A NINTH DECISION ABOUT ONE THING.
+   The register holds eight and refused the ninth in the run that introduced
+   it, which is the same guard that caught `line-height: 1.24` a hundredth
+   from the existing 1.25 on /countries. 1.12 is the value every other
+   display heading at this step already takes. */
+/* AND THE NAME RESERVES ITS SECOND LINE SO THE META LINE ALIGNS ACROSS A
+   ROW. Seven of the twelve names wrap and five do not, so the percentage
+   under them landed at two different heights in every row of four and the
+   grid read as misaligned rather than as twelve tiles. A grid row cannot
+   align the third element of twelve independent tiles; reserving the line
+   can, and two lines is what a name here actually takes.
+   ONE RULE, NOT TWO — the first version added `min-height` as a second
+   `.motilenm` declaration eight lines down, which is the duplicated
+   selector this stylesheet removed 85 of, made in the hour after the
+   comment recording that. */
+.motilenm { display: block; font-family: var(--display);
+            font-size: var(--ed-display-3); line-height: 1.12;
+            min-height: 2.24em; margin-top: var(--s1); }
+.motilep { display: block; font-size: var(--t-xs); letter-spacing: .06em;
+           text-transform: uppercase; color: var(--ink-3);
+           margin-top: var(--s2); }
+.motile:hover .motilenm, .motile:focus-visible .motilenm
+  { text-decoration: underline; }
+.motile:hover .constel-lit circle { fill: var(--pine-deep); }
+.sheet-moopen .small { margin-top: var(--s6); max-width: 46rem; }
+
+/* ── 03 twelve cuts ─────────────────────────────────────────────── */
+/* `.motionrow` CARRIED NO TRACKS OF ITS OWN AND NEVER HAD TO: it was
+   always emitted as `row themerow motionrow`, so the 15rem drawing column
+   came from the theme family. With a photograph in that slot instead of a
+   132-unit glyph the borrowed width is wrong, and borrowing it at all was
+   a second family's rule deciding this one's layout. */
+.mocuts .motionrow { grid-template-columns: 20rem minmax(0, 1fr);
+                     align-items: start; }
+.moshot { margin: 0; }
+.moshot img, .moshot picture { display: block; width: 100%; height: auto; }
+/* `>` AND NOT A DESCENDANT, BECAUSE THE OTHER FIGCAPTION IN HERE IS THE
+   LICENCE CREDIT. `picture()` emits Pexels' two required links as a
+   `<figcaption class="credit">` INSIDE the `<picture>`, absolutely
+   positioned on a 72% graphite scrim whose arithmetic gives 6.90:1 whatever
+   the photograph is. `.moshot figcaption` is (0,2,0) and `.credit` is
+   (0,1,0), so a descendant selector written for the row's own caption
+   repainted the credit `--ink-3` and left its position, its scrim and its
+   opacity alone — 3.56:1 in BOTH preferences, on the two links the licence
+   requires. That is the `.pageband figcaption` defect this stylesheet
+   already records, reproduced by a rule two hundred lines from the
+   paragraph recording it, and the browser suite was the only instrument
+   that could see it: a rule that changes two properties of a six-property
+   component achieves exactly one thing, and here that thing was the
+   defect. A child combinator cannot reach inside the `<picture>`. */
+.moshot > figcaption { margin-top: var(--s2); font-size: var(--t-xs);
+                       letter-spacing: .04em; text-transform: uppercase;
+                       color: var(--ink-3); }
+.mocuts .motionrow h2 { margin: 0; font-size: var(--ed-display-3); }
+.mocuts .motionrow h2 a { text-decoration: none; }
+.mocuts .motionrow h2 a:hover, .mocuts .motionrow h2 a:focus-visible
+  { text-decoration: underline; }
+
+/* ── 04 not twelve buckets ──────────────────────────────────────── */
+/* A SHARE OF THE LARGEST GROUP, NOT OF THE ATLAS. Eight groups summing to
+   319 would put the largest at 35% of its track and read as a share of the
+   continent, which is a different claim; and the number sits at the END of
+   its own bar, which is /plan's own finding — a value six hundred pixels
+   from the thing it measures is not labelled. The width is a `.w0`-`.w100`
+   utility class, because a `style` attribute would force `style-src` open
+   on all 1,034 pages. */
+.sheet-mooverlap { display: block; }
+.mobars { margin: var(--s7) 0 0; display: grid; gap: var(--s3); }
+.mobar { display: grid; grid-template-columns: 9rem minmax(0, 1fr);
+         align-items: center; gap: var(--s4); }
+.mobarlab { font-size: var(--t-xs); letter-spacing: .06em;
+            text-transform: uppercase; color: var(--ink-3); }
+/* THE NUMBER IS AT THE END OF ITS OWN BAR AND THE ROOM FOR IT IS RESERVED.
+   /plan's weighting bars put the value at the end of the bar rather than at
+   the end of the track, because a value six hundred pixels from the thing it
+   measures is not labelled — and there the largest bar is 30% of its track,
+   so the number had somewhere to go. Here the largest group IS the track at
+   100%, so the first version pushed "111" 23 pixels off the right edge of a
+   390px screen and 15 off an 834 one. A percentage width resolves against
+   the CONTENT box, so padding on the container is what makes 100% mean "all
+   of the bar area" rather than "all of the row". */
+.mobartr { display: flex; align-items: center; gap: var(--s3);
+           padding-right: 3.5rem; }
+.mobarfill { flex: 0 0 auto; height: .7rem; min-width: 2px;
+             background: var(--signature); }
+.mobarn { font-family: var(--mono); font-size: var(--t-sm);
+          color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.mobars figcaption { margin-top: var(--s5); }
+.sheet-mooverlap .note { margin-top: var(--s6); max-width: 46rem; }
+
+/* ── 05 method, 06 the close ────────────────────────────────────── */
+/* THE CLOSE HAS NO RULE HERE, and that is the point: `.istart` is the close
+   shape /interests introduced and /beyond-the-obvious already reuses, so a
+   third declaration of `display: grid; justify-items: start; max-width:
+   46rem` under a `.moask` name would be the duplicated rule this stylesheet
+   removed 85 of — written, measured at a 361px lede against the shared
+   shape's 608, and deleted rather than tuned. */
+.sheet-momethod .note { margin-top: var(--s5); max-width: 44rem; }
+
+@media (max-width: 52rem) {
+  .mocuts .motionrow { grid-template-columns: minmax(0, 1fr); }
+  .mobar { grid-template-columns: minmax(0, 1fr); gap: var(--s2); }
+}
