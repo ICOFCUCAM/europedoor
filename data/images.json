@@ -82350,6 +82350,1656 @@
         }
       },
       "version": "0442db6e62"
+    },
+    "city:italy/north-italy/verona": {
+      "purpose": "destination-hero@italy/north-italy/verona",
+      "publication_path": "/europe/italy/north-italy/verona",
+      "file": "destination-hero@italy__north-italy__verona",
+      "original": "photographs/destination-hero@italy__north-italy__verona.original.jpg",
+      "alt": "Stunning aerial view of Verona cityscape, featuring the Adige River winding through historic architecture under a clear blue sky.",
+      "provider": "pexels",
+      "provider_photo_id": "39315116",
+      "photographer": "Michael",
+      "photographer_url": "https://www.pexels.com/@michael-756151728",
+      "source": "https://www.pexels.com/photo/aerial-view-of-verona-with-adige-river-39315116/",
+      "original_url": "https://images.pexels.com/photos/39315116/pexels-photo-39315116.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-17",
+      "acquired_at": "2026-09-17T22:22:35Z",
+      "sha256": "180bf8e657221779f00338d7fd85840111d30090e4b8e7c71e57f24a1dd2f8eb",
+      "bytes": 4505690,
+      "width": 6000,
+      "height": 4000,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "180bf8e657",
+        "source_sha256": "180bf8e657221779f00338d7fd85840111d30090e4b8e7c71e57f24a1dd2f8eb",
+        "source_width": 6000,
+        "source_height": 4000,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-17T22:22:40Z"
+      },
+      "derivatives": {
+        "destination-hero@italy__north-italy__verona.180bf8e657-480.avif": {
+          "sha256": "61363b97f61957f1f799b67be914d15dea02c36767a4576da02f8d2e167cfe01",
+          "bytes": 13523,
+          "width": 480,
+          "height": 320
+        },
+        "destination-hero@italy__north-italy__verona.180bf8e657-480.webp": {
+          "sha256": "5009ecb00badc69d1ad9dd3eec96219dea6f186bb5679ee6225fea52c60eebc1",
+          "bytes": 27276,
+          "width": 480,
+          "height": 320
+        },
+        "destination-hero@italy__north-italy__verona.180bf8e657-480.jpg": {
+          "sha256": "bb6be608e39ff804c072289ee8a9ea4e576ddebb3837727719f090d82f49ea0e",
+          "bytes": 36829,
+          "width": 480,
+          "height": 320
+        },
+        "destination-hero@italy__north-italy__verona.180bf8e657-800.avif": {
+          "sha256": "671454f45acbbaf094eb522cbeabdd55e5369d79691e3c815dbc1757dec68f1f",
+          "bytes": 37728,
+          "width": 800,
+          "height": 533
+        },
+        "destination-hero@italy__north-italy__verona.180bf8e657-800.webp": {
+          "sha256": "ce5cb79c837c8561898d81df24be4552a55a2499f6924da3b5418bae6344ee8a",
+          "bytes": 76216,
+          "width": 800,
+          "height": 533
+        },
+        "destination-hero@italy__north-italy__verona.180bf8e657-800.jpg": {
+          "sha256": "9b80b3323f737aa983f2b9f078f33a8e1a926676dcf719d7ee730818e4ac166d",
+          "bytes": 100651,
+          "width": 800,
+          "height": 533
+        },
+        "destination-hero@italy__north-italy__verona.180bf8e657-1260.avif": {
+          "sha256": "34d6891dceb6d8d46aab8b368dfd384ef6fd5e8c07d1c7ae147623698edec1dc",
+          "bytes": 89182,
+          "width": 1260,
+          "height": 840
+        },
+        "destination-hero@italy__north-italy__verona.180bf8e657-1260.webp": {
+          "sha256": "df4052abf3b91323203e36453a3c3bcc6ea2724d0161655048473b146b691d51",
+          "bytes": 183670,
+          "width": 1260,
+          "height": 840
+        },
+        "destination-hero@italy__north-italy__verona.180bf8e657-1260.jpg": {
+          "sha256": "3091778c5e13fd82b38d4c9c78f769c6b597053b70b79091b159938468fb743b",
+          "bytes": 243717,
+          "width": 1260,
+          "height": 840
+        },
+        "destination-hero@italy__north-italy__verona.180bf8e657-1800.avif": {
+          "sha256": "a21bf3b5c85c6e4a92ed33a90cc93cb4102f9af16cb828b1e8b523240e818e55",
+          "bytes": 186052,
+          "width": 1800,
+          "height": 1200
+        },
+        "destination-hero@italy__north-italy__verona.180bf8e657-1800.webp": {
+          "sha256": "949c42b4900c4bcd9609389a5e7e76688ff1c9bd3c4c6d7b96e43d00e103e868",
+          "bytes": 372296,
+          "width": 1800,
+          "height": 1200
+        },
+        "destination-hero@italy__north-italy__verona.180bf8e657-1800.jpg": {
+          "sha256": "3bd8203cb4835d5916b715f5505527ac918fbc90c935b93a213b2adb570229a1",
+          "bytes": 496472,
+          "width": 1800,
+          "height": 1200
+        },
+        "destination-hero@italy__north-italy__verona.180bf8e657-2400.avif": {
+          "sha256": "eec8b6d005ad2682cc2ef74aebb6530e1619bd449b8047b695e4e7b9f384a8a4",
+          "bytes": 333814,
+          "width": 2400,
+          "height": 1600
+        },
+        "destination-hero@italy__north-italy__verona.180bf8e657-2400.webp": {
+          "sha256": "2970f7798bfdf52f33d14f2196b800b29b4f4c3503d2b0150356c2438a2a0cde",
+          "bytes": 659308,
+          "width": 2400,
+          "height": 1600
+        },
+        "destination-hero@italy__north-italy__verona.180bf8e657-2400.jpg": {
+          "sha256": "8fb8f7a9846fa3d6ba5f83ab9ac61203bb2f8fd6473bec6691e2d9d570e358c5",
+          "bytes": 883930,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "180bf8e657"
+    },
+    "place:italy/rome-and-lazio/rome/pantheon": {
+      "purpose": "place-hero@italy/rome-and-lazio/rome/pantheon",
+      "publication_path": "/europe/italy/rome-and-lazio/rome/place/pantheon",
+      "file": "place-hero@italy__rome-and-lazio__rome__pantheon",
+      "original": "photographs/place-hero@italy__rome-and-lazio__rome__pantheon.original.jpg",
+      "alt": "Detailed view of the Pantheon in Rome, showcasing ancient Roman architectural magnificence.",
+      "provider": "pexels",
+      "provider_photo_id": "19260328",
+      "photographer": "Ömer Gülen",
+      "photographer_url": "https://www.pexels.com/@omergulen",
+      "source": "https://www.pexels.com/photo/tympanum-of-pantheon-in-rome-19260328/",
+      "original_url": "https://images.pexels.com/photos/19260328/pexels-photo-19260328.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-17",
+      "acquired_at": "2026-09-17T22:22:41Z",
+      "sha256": "c070023433dd57fe8286b966a8d9dce7e441e5eacb4e6471a0209bc1c77db2ba",
+      "bytes": 2853713,
+      "width": 6000,
+      "height": 4000,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "c070023433",
+        "source_sha256": "c070023433dd57fe8286b966a8d9dce7e441e5eacb4e6471a0209bc1c77db2ba",
+        "source_width": 6000,
+        "source_height": 4000,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-17T22:22:45Z"
+      },
+      "derivatives": {
+        "place-hero@italy__rome-and-lazio__rome__pantheon.c070023433-480.avif": {
+          "sha256": "83aa0a1fb40211a603563aba53293ec67e8ac4488bc0bd6b03ad68b6fa7dc9d1",
+          "bytes": 14248,
+          "width": 480,
+          "height": 320
+        },
+        "place-hero@italy__rome-and-lazio__rome__pantheon.c070023433-480.webp": {
+          "sha256": "da47cce0345d5c0a4e1c07c2beebe17bab06cfeb6f5dba2c191fa5bc10071e8e",
+          "bytes": 28676,
+          "width": 480,
+          "height": 320
+        },
+        "place-hero@italy__rome-and-lazio__rome__pantheon.c070023433-480.jpg": {
+          "sha256": "aad0911cf5464f454f85291fb14eb9e6a93e9be307154518109636211ae07bc6",
+          "bytes": 39013,
+          "width": 480,
+          "height": 320
+        },
+        "place-hero@italy__rome-and-lazio__rome__pantheon.c070023433-800.avif": {
+          "sha256": "8d04c00b5719b40c1bf16e1df136c0f85c87149c8effa0b68d114cd5a6237ef8",
+          "bytes": 35204,
+          "width": 800,
+          "height": 533
+        },
+        "place-hero@italy__rome-and-lazio__rome__pantheon.c070023433-800.webp": {
+          "sha256": "4c8b952746f518eb3b6df8a0f91ab0d6a2d170c6daded7ff30018b7424c1c060",
+          "bytes": 70400,
+          "width": 800,
+          "height": 533
+        },
+        "place-hero@italy__rome-and-lazio__rome__pantheon.c070023433-800.jpg": {
+          "sha256": "f396a34abeab018dff90708090e3920266681537694d7c2d9dde974e86dc18c2",
+          "bytes": 100474,
+          "width": 800,
+          "height": 533
+        },
+        "place-hero@italy__rome-and-lazio__rome__pantheon.c070023433-1260.avif": {
+          "sha256": "250ee6858846e7eba251914f33e20f24309db845767a967b7c777585a93fc73d",
+          "bytes": 78293,
+          "width": 1260,
+          "height": 840
+        },
+        "place-hero@italy__rome-and-lazio__rome__pantheon.c070023433-1260.webp": {
+          "sha256": "94c302d22f1c7dfbdafcb55c85f9a80552403e6d2c18ecf66e024d0e50b72dcd",
+          "bytes": 156664,
+          "width": 1260,
+          "height": 840
+        },
+        "place-hero@italy__rome-and-lazio__rome__pantheon.c070023433-1260.jpg": {
+          "sha256": "4fc0909d43d19b567594a5647b4a902dae0e12ea58b7d3055faeb6bf22c4e577",
+          "bytes": 230133,
+          "width": 1260,
+          "height": 840
+        },
+        "place-hero@italy__rome-and-lazio__rome__pantheon.c070023433-1800.avif": {
+          "sha256": "fde182e96302d740b72d51e5ee0c05d2a912536872df7a9fc3b80ec1f389e5b1",
+          "bytes": 144294,
+          "width": 1800,
+          "height": 1200
+        },
+        "place-hero@italy__rome-and-lazio__rome__pantheon.c070023433-1800.webp": {
+          "sha256": "8fe35379949721bba7693758544217502adc714ed4efa4da8efff2379e0c9b7b",
+          "bytes": 283600,
+          "width": 1800,
+          "height": 1200
+        },
+        "place-hero@italy__rome-and-lazio__rome__pantheon.c070023433-1800.jpg": {
+          "sha256": "c6c86e97b879f01f9f72b837fa029829851f2e233f0d9227cffa214f17c14d4c",
+          "bytes": 430551,
+          "width": 1800,
+          "height": 1200
+        },
+        "place-hero@italy__rome-and-lazio__rome__pantheon.c070023433-2400.avif": {
+          "sha256": "f72483d48abe452aab9f1bab2b2f4d9c4473977ea3d1443f3914da0dc52209e4",
+          "bytes": 232564,
+          "width": 2400,
+          "height": 1600
+        },
+        "place-hero@italy__rome-and-lazio__rome__pantheon.c070023433-2400.webp": {
+          "sha256": "9f13ed6eee3aa7d0036afaedc6f370655ba6e8e3ca19b4bcbfd58ed89fc7cc8f",
+          "bytes": 440822,
+          "width": 2400,
+          "height": 1600
+        },
+        "place-hero@italy__rome-and-lazio__rome__pantheon.c070023433-2400.jpg": {
+          "sha256": "8a885338e94cf9c06544c1daa4017da9412623e9413a131886177331ffb1a5b2",
+          "bytes": 702729,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "c070023433"
+    },
+    "city:italy/rome-and-lazio/civita-di-bagnoregio": {
+      "purpose": "destination-hero@italy/rome-and-lazio/civita-di-bagnoregio",
+      "publication_path": "/europe/italy/rome-and-lazio/civita-di-bagnoregio",
+      "file": "destination-hero@italy__rome-and-lazio__civita-di-bagnoregio",
+      "original": "photographs/destination-hero@italy__rome-and-lazio__civita-di-bagnoregio.original.jpg",
+      "alt": "A breathtaking view of Civita di Bagnoregio perched on a hilltop, showcasing Italy's stunning landscape.",
+      "provider": "pexels",
+      "provider_photo_id": "32175370",
+      "photographer": "Andrea Mosti",
+      "photographer_url": "https://www.pexels.com/@andreamostiphotography",
+      "source": "https://www.pexels.com/photo/scenic-view-of-civita-di-bagnoregio-by-day-32175370/",
+      "original_url": "https://images.pexels.com/photos/32175370/pexels-photo-32175370.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-17",
+      "acquired_at": "2026-09-17T22:22:46Z",
+      "sha256": "ef85b72c87eb36aafcc59ce597fc98e1a198945132358c6ceb27b6303460e50d",
+      "bytes": 6399433,
+      "width": 6612,
+      "height": 4408,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "ef85b72c87",
+        "source_sha256": "ef85b72c87eb36aafcc59ce597fc98e1a198945132358c6ceb27b6303460e50d",
+        "source_width": 6612,
+        "source_height": 4408,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-17T22:22:51Z"
+      },
+      "derivatives": {
+        "destination-hero@italy__rome-and-lazio__civita-di-bagnoregio.ef85b72c87-480.avif": {
+          "sha256": "377a114724eb5e821377b1b6e106f7e4ced8cd92f1b109b40cbca51105d8e79d",
+          "bytes": 8995,
+          "width": 480,
+          "height": 320
+        },
+        "destination-hero@italy__rome-and-lazio__civita-di-bagnoregio.ef85b72c87-480.webp": {
+          "sha256": "5d96d28cc4876bfdf9ab86740a8a2f4fceb03c4cae681527fa21a6efe97e775e",
+          "bytes": 14160,
+          "width": 480,
+          "height": 320
+        },
+        "destination-hero@italy__rome-and-lazio__civita-di-bagnoregio.ef85b72c87-480.jpg": {
+          "sha256": "4e20ac4bf89c84a2c3738c3410493714ed9bb5c40bd189327e713a93d0bde71f",
+          "bytes": 23586,
+          "width": 480,
+          "height": 320
+        },
+        "destination-hero@italy__rome-and-lazio__civita-di-bagnoregio.ef85b72c87-800.avif": {
+          "sha256": "b1d32965b28a1b59cc724e046e55906a0ae0c904e7e563f440af3ebe6e532a81",
+          "bytes": 22044,
+          "width": 800,
+          "height": 533
+        },
+        "destination-hero@italy__rome-and-lazio__civita-di-bagnoregio.ef85b72c87-800.webp": {
+          "sha256": "b90b66cffd393b149853a739306f64acbb1da5d8c5d126fe9418f3821ac53cfe",
+          "bytes": 36104,
+          "width": 800,
+          "height": 533
+        },
+        "destination-hero@italy__rome-and-lazio__civita-di-bagnoregio.ef85b72c87-800.jpg": {
+          "sha256": "66ae3d79f03ba58e449a3196e14ce920494ee830efe7968146c74ade30a3ad9c",
+          "bytes": 60855,
+          "width": 800,
+          "height": 533
+        },
+        "destination-hero@italy__rome-and-lazio__civita-di-bagnoregio.ef85b72c87-1260.avif": {
+          "sha256": "b7a26526441720d619014afce0f1cff0ad1e3145449b341aefc16a4b8875c996",
+          "bytes": 49701,
+          "width": 1260,
+          "height": 840
+        },
+        "destination-hero@italy__rome-and-lazio__civita-di-bagnoregio.ef85b72c87-1260.webp": {
+          "sha256": "dc2d8fa3c23523d963c0ebb045aa84d8b6786f66754f71a238a9e4a9b7fc53d1",
+          "bytes": 84248,
+          "width": 1260,
+          "height": 840
+        },
+        "destination-hero@italy__rome-and-lazio__civita-di-bagnoregio.ef85b72c87-1260.jpg": {
+          "sha256": "eaab15f0f81a3f208d72c1a848a5f55c84bc46713789099754961443c43b4e92",
+          "bytes": 144099,
+          "width": 1260,
+          "height": 840
+        },
+        "destination-hero@italy__rome-and-lazio__civita-di-bagnoregio.ef85b72c87-1800.avif": {
+          "sha256": "713fa1d210d691a810a1c404571b187f9719b88bfc45dcbf44877ffcdf535014",
+          "bytes": 98316,
+          "width": 1800,
+          "height": 1200
+        },
+        "destination-hero@italy__rome-and-lazio__civita-di-bagnoregio.ef85b72c87-1800.webp": {
+          "sha256": "2b5d80e6be02936d8e9524507384e82b30581a1e9302227e77328cc9af8fcf12",
+          "bytes": 167684,
+          "width": 1800,
+          "height": 1200
+        },
+        "destination-hero@italy__rome-and-lazio__civita-di-bagnoregio.ef85b72c87-1800.jpg": {
+          "sha256": "06e524648d8aee665f74a7b16af5e33ea528c986f561c280e48eddae3090eb1e",
+          "bytes": 298013,
+          "width": 1800,
+          "height": 1200
+        },
+        "destination-hero@italy__rome-and-lazio__civita-di-bagnoregio.ef85b72c87-2400.avif": {
+          "sha256": "8d9daa346de4eb32525d1df73566537ff906cc1900b118a2af32f9808fc2c3d6",
+          "bytes": 174794,
+          "width": 2400,
+          "height": 1600
+        },
+        "destination-hero@italy__rome-and-lazio__civita-di-bagnoregio.ef85b72c87-2400.webp": {
+          "sha256": "76774766fa72f117c920633aac2498881897217b4020d60177b6a18e304a527d",
+          "bytes": 303336,
+          "width": 2400,
+          "height": 1600
+        },
+        "destination-hero@italy__rome-and-lazio__civita-di-bagnoregio.ef85b72c87-2400.jpg": {
+          "sha256": "b32cfc4147a4dcbef392145a7e43ab6178df71c5c3b086646fa2900c412a9572",
+          "bytes": 560787,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "ef85b72c87"
+    },
+    "place:italy/rome-and-lazio/rome/roman-forum": {
+      "purpose": "place-hero@italy/rome-and-lazio/rome/roman-forum",
+      "publication_path": "/europe/italy/rome-and-lazio/rome/place/roman-forum",
+      "file": "place-hero@italy__rome-and-lazio__rome__roman-forum",
+      "original": "photographs/place-hero@italy__rome-and-lazio__rome__roman-forum.original.jpg",
+      "alt": "Discover the stunning aerial view of ancient Roman architecture in Rome's historic cityscape.",
+      "provider": "pexels",
+      "provider_photo_id": "13829382",
+      "photographer": "Aleksandra Żmuda",
+      "photographer_url": "https://www.pexels.com/@aleksandra-zmuda-9516327",
+      "source": "https://www.pexels.com/photo/aerial-photography-of-concrete-buildings-in-rome-13829382/",
+      "original_url": "https://images.pexels.com/photos/13829382/pexels-photo-13829382.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-17",
+      "acquired_at": "2026-09-17T22:22:52Z",
+      "sha256": "120c910fa30fbe7da7d2f5e6ae0d17233554993d65234e1f84931d29d3132252",
+      "bytes": 2190133,
+      "width": 6000,
+      "height": 4000,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "120c910fa3",
+        "source_sha256": "120c910fa30fbe7da7d2f5e6ae0d17233554993d65234e1f84931d29d3132252",
+        "source_width": 6000,
+        "source_height": 4000,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-17T22:22:57Z"
+      },
+      "derivatives": {
+        "place-hero@italy__rome-and-lazio__rome__roman-forum.120c910fa3-480.avif": {
+          "sha256": "8da4b55127876af505e6f144217fc8826f7388a1f379c461742e87d239749198",
+          "bytes": 12361,
+          "width": 480,
+          "height": 320
+        },
+        "place-hero@italy__rome-and-lazio__rome__roman-forum.120c910fa3-480.webp": {
+          "sha256": "27f96a70e8937a621b99bd317ac03518171d9f50ceb788ad4f72973d64b694e4",
+          "bytes": 23460,
+          "width": 480,
+          "height": 320
+        },
+        "place-hero@italy__rome-and-lazio__rome__roman-forum.120c910fa3-480.jpg": {
+          "sha256": "3691047eb60c650cdd530fd3e66a6f20035c1bab445f86f0818902fa4fad770e",
+          "bytes": 34397,
+          "width": 480,
+          "height": 320
+        },
+        "place-hero@italy__rome-and-lazio__rome__roman-forum.120c910fa3-800.avif": {
+          "sha256": "7aef772fd510d6e7c7775ea1551376ae745cdb0505f1ed1906650c6712ce7d07",
+          "bytes": 29567,
+          "width": 800,
+          "height": 533
+        },
+        "place-hero@italy__rome-and-lazio__rome__roman-forum.120c910fa3-800.webp": {
+          "sha256": "982c1e2f149cf0d0aa04fc9d8dd6cc91ba3b503674b0f7f54ee65b0a25be93f2",
+          "bytes": 56662,
+          "width": 800,
+          "height": 533
+        },
+        "place-hero@italy__rome-and-lazio__rome__roman-forum.120c910fa3-800.jpg": {
+          "sha256": "e3f2a82794926956edbdd1beb5003861559922b09d31821135d7f90ccbbd5b04",
+          "bytes": 84827,
+          "width": 800,
+          "height": 533
+        },
+        "place-hero@italy__rome-and-lazio__rome__roman-forum.120c910fa3-1260.avif": {
+          "sha256": "c7c08c62918afce2b6872c39dd0c01b9b724e43b74e24384d99cf7661c348f36",
+          "bytes": 63743,
+          "width": 1260,
+          "height": 840
+        },
+        "place-hero@italy__rome-and-lazio__rome__roman-forum.120c910fa3-1260.webp": {
+          "sha256": "ca48101c171bc97b5b7608d7b81eb311d5090fd5eb7da467632073bf407d61f6",
+          "bytes": 121244,
+          "width": 1260,
+          "height": 840
+        },
+        "place-hero@italy__rome-and-lazio__rome__roman-forum.120c910fa3-1260.jpg": {
+          "sha256": "637e5b598c627cb9cca2982344ea536ff885bba1bab4eb07d5f78dd89a8d493d",
+          "bytes": 185726,
+          "width": 1260,
+          "height": 840
+        },
+        "place-hero@italy__rome-and-lazio__rome__roman-forum.120c910fa3-1800.avif": {
+          "sha256": "186497210ccc5a29bf7deff09db9f623dfa81bc2415f21db87c2ba03d843674e",
+          "bytes": 116591,
+          "width": 1800,
+          "height": 1200
+        },
+        "place-hero@italy__rome-and-lazio__rome__roman-forum.120c910fa3-1800.webp": {
+          "sha256": "836db5914a84c4319aa3e41904831a620db3cb7b9082b1db6b66359afd2090e5",
+          "bytes": 214036,
+          "width": 1800,
+          "height": 1200
+        },
+        "place-hero@italy__rome-and-lazio__rome__roman-forum.120c910fa3-1800.jpg": {
+          "sha256": "52f4c202be35ffe9125819612f060c60aa6cd1b60c4801c6b47493d23ecfe289",
+          "bytes": 341711,
+          "width": 1800,
+          "height": 1200
+        },
+        "place-hero@italy__rome-and-lazio__rome__roman-forum.120c910fa3-2400.avif": {
+          "sha256": "693474b54555226728825bea5b975dc6f44a54646acfdd8c3ad06ef9a61971a7",
+          "bytes": 185430,
+          "width": 2400,
+          "height": 1600
+        },
+        "place-hero@italy__rome-and-lazio__rome__roman-forum.120c910fa3-2400.webp": {
+          "sha256": "5222692603ee8a41593a5075463162f0a16ebc24f94242854a43a37ff0ae4a01",
+          "bytes": 319972,
+          "width": 2400,
+          "height": 1600
+        },
+        "place-hero@italy__rome-and-lazio__rome__roman-forum.120c910fa3-2400.jpg": {
+          "sha256": "3f2c7419e07cf814a4a8a8df62b94f2d9930fa43847ca968bc3d7360b173ab6b",
+          "bytes": 552357,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "120c910fa3"
+    },
+    "city:italy/rome-and-lazio/orvieto": {
+      "purpose": "destination-hero@italy/rome-and-lazio/orvieto",
+      "publication_path": "/europe/italy/rome-and-lazio/orvieto",
+      "file": "destination-hero@italy__rome-and-lazio__orvieto",
+      "original": "photographs/destination-hero@italy__rome-and-lazio__orvieto.original.jpg",
+      "alt": "A detailed miniature depiction of Orvieto's unique architecture, showcasing medieval Italian design elements.",
+      "provider": "pexels",
+      "provider_photo_id": "39126202",
+      "photographer": "Ivor Forrest",
+      "photographer_url": "https://www.pexels.com/@ivor-forrest",
+      "source": "https://www.pexels.com/photo/detailed-miniature-model-of-orvieto-architecture-39126202/",
+      "original_url": "https://images.pexels.com/photos/39126202/pexels-photo-39126202.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-17",
+      "acquired_at": "2026-09-17T22:22:58Z",
+      "sha256": "060d2d224854855177624198639e189fd53b76d22ac4058250e3bc3911595bbe",
+      "bytes": 7640872,
+      "width": 7952,
+      "height": 4472,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "060d2d2248",
+        "source_sha256": "060d2d224854855177624198639e189fd53b76d22ac4058250e3bc3911595bbe",
+        "source_width": 7952,
+        "source_height": 4472,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-17T22:23:03Z"
+      },
+      "derivatives": {
+        "destination-hero@italy__rome-and-lazio__orvieto.060d2d2248-480.avif": {
+          "sha256": "9ce8dc6362b16efd74b34eddcb2176861f4220171ffe8a8daa9d56828316e3cc",
+          "bytes": 11710,
+          "width": 480,
+          "height": 270
+        },
+        "destination-hero@italy__rome-and-lazio__orvieto.060d2d2248-480.webp": {
+          "sha256": "a9993994e05affd5a2a0ee34b5a4b0298f839e628f870a3740799445fdebd3a1",
+          "bytes": 22598,
+          "width": 480,
+          "height": 270
+        },
+        "destination-hero@italy__rome-and-lazio__orvieto.060d2d2248-480.jpg": {
+          "sha256": "c98127e5b20a018a47e4b35777efd60664875d90a59caecea6c508fa6b3984f9",
+          "bytes": 32334,
+          "width": 480,
+          "height": 270
+        },
+        "destination-hero@italy__rome-and-lazio__orvieto.060d2d2248-800.avif": {
+          "sha256": "fbc35bf9daf1d5904ce9aa3dbd1a9c0928ea2d4e1899dd6bf5803e34a62f2748",
+          "bytes": 26713,
+          "width": 800,
+          "height": 450
+        },
+        "destination-hero@italy__rome-and-lazio__orvieto.060d2d2248-800.webp": {
+          "sha256": "8ce88d743266859262fabc2ec072b73dab3861f9fdac738514cc073895fb7dc4",
+          "bytes": 50298,
+          "width": 800,
+          "height": 450
+        },
+        "destination-hero@italy__rome-and-lazio__orvieto.060d2d2248-800.jpg": {
+          "sha256": "fa7f2cd4a4889f7f07f0cc787f5b54fd7414d59ed45e0a09b45c78ddffeeb4e5",
+          "bytes": 75981,
+          "width": 800,
+          "height": 450
+        },
+        "destination-hero@italy__rome-and-lazio__orvieto.060d2d2248-1260.avif": {
+          "sha256": "da3c3c96582e9593010a9cfbe713c0fec20f6d75f5f45048946ff3ef9e68e854",
+          "bytes": 55257,
+          "width": 1260,
+          "height": 709
+        },
+        "destination-hero@italy__rome-and-lazio__orvieto.060d2d2248-1260.webp": {
+          "sha256": "1bafed72654dcd8687b8647d895872410b14ea61d16f6d31d39bbbe996a44edb",
+          "bytes": 101376,
+          "width": 1260,
+          "height": 709
+        },
+        "destination-hero@italy__rome-and-lazio__orvieto.060d2d2248-1260.jpg": {
+          "sha256": "b4947c836266f36b8485e959383602e580ae1871ca50b55e9e7f320043e9a207",
+          "bytes": 164623,
+          "width": 1260,
+          "height": 709
+        },
+        "destination-hero@italy__rome-and-lazio__orvieto.060d2d2248-1800.avif": {
+          "sha256": "b41d53bf7a93cb3cdfc8d6e3609d44ed99743c05341c6546bef2bc7727a6981b",
+          "bytes": 100218,
+          "width": 1800,
+          "height": 1012
+        },
+        "destination-hero@italy__rome-and-lazio__orvieto.060d2d2248-1800.webp": {
+          "sha256": "d74b898d0807bc034fdf1812aa1e02015c3b0c69555c8ca73ac9c1c057f11944",
+          "bytes": 185286,
+          "width": 1800,
+          "height": 1012
+        },
+        "destination-hero@italy__rome-and-lazio__orvieto.060d2d2248-1800.jpg": {
+          "sha256": "202a3c75c3e5f7be2e6ee541c6c4f5253b7ff3077a2636d14ad5119ad65e3330",
+          "bytes": 315394,
+          "width": 1800,
+          "height": 1012
+        },
+        "destination-hero@italy__rome-and-lazio__orvieto.060d2d2248-2400.avif": {
+          "sha256": "7399215156589dfcf7d54d54d211f1438bc91d14476c43bfcff2308e475656c2",
+          "bytes": 173937,
+          "width": 2400,
+          "height": 1350
+        },
+        "destination-hero@italy__rome-and-lazio__orvieto.060d2d2248-2400.webp": {
+          "sha256": "65a036f7e499e4b58373d35725141bb1ccf65a83b6a2f563abc7e239145b8f21",
+          "bytes": 340956,
+          "width": 2400,
+          "height": 1350
+        },
+        "destination-hero@italy__rome-and-lazio__orvieto.060d2d2248-2400.jpg": {
+          "sha256": "9bb966f1ca8fc414931dcc47edca730db2b832cd0985a3f3001c772255bc4dcb",
+          "bytes": 562348,
+          "width": 2400,
+          "height": 1350
+        }
+      },
+      "version": "060d2d2248"
+    },
+    "place:italy/rome-and-lazio/rome/testaccio-market": {
+      "purpose": "place-hero@italy/rome-and-lazio/rome/testaccio-market",
+      "publication_path": "/europe/italy/rome-and-lazio/rome/place/testaccio-market",
+      "file": "place-hero@italy__rome-and-lazio__rome__testaccio-market",
+      "original": "photographs/place-hero@italy__rome-and-lazio__rome__testaccio-market.original.jpg",
+      "alt": "Lively street scene near Mercato del Pesce in Venice with people strolling and shopping under a bright sky.",
+      "provider": "pexels",
+      "provider_photo_id": "39345460",
+      "photographer": "Helena Jankovičová Kováčová",
+      "photographer_url": "https://www.pexels.com/@helen1",
+      "source": "https://www.pexels.com/photo/bustling-venetian-market-street-scene-39345460/",
+      "original_url": "https://images.pexels.com/photos/39345460/pexels-photo-39345460.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-17",
+      "acquired_at": "2026-09-17T22:23:04Z",
+      "sha256": "f84113c0a4de6d87777a61ce784f1292442f42600b6a8cc4bbc7592826802553",
+      "bytes": 4971506,
+      "width": 6182,
+      "height": 4121,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "f84113c0a4",
+        "source_sha256": "f84113c0a4de6d87777a61ce784f1292442f42600b6a8cc4bbc7592826802553",
+        "source_width": 6182,
+        "source_height": 4121,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-17T22:23:10Z"
+      },
+      "derivatives": {
+        "place-hero@italy__rome-and-lazio__rome__testaccio-market.f84113c0a4-480.avif": {
+          "sha256": "880335ed31cccbde75a8c9355027014d14cfbd8a9fd7daf4f485792c9c05b076",
+          "bytes": 20708,
+          "width": 480,
+          "height": 320
+        },
+        "place-hero@italy__rome-and-lazio__rome__testaccio-market.f84113c0a4-480.webp": {
+          "sha256": "92bfc041bec691a17e42b352272fbeab230acbc5122e0ec54c54a550c7b55812",
+          "bytes": 42620,
+          "width": 480,
+          "height": 320
+        },
+        "place-hero@italy__rome-and-lazio__rome__testaccio-market.f84113c0a4-480.jpg": {
+          "sha256": "26409aee7244dfedaccd2802367be745f1551b06b110359c4778f027c2be56eb",
+          "bytes": 52807,
+          "width": 480,
+          "height": 320
+        },
+        "place-hero@italy__rome-and-lazio__rome__testaccio-market.f84113c0a4-800.avif": {
+          "sha256": "5cf195ff51aefcb55d831ef12daf34352a376c24bcd84ba3e083e545a95355c0",
+          "bytes": 53752,
+          "width": 800,
+          "height": 533
+        },
+        "place-hero@italy__rome-and-lazio__rome__testaccio-market.f84113c0a4-800.webp": {
+          "sha256": "1f00944c7571fb3a7ae2076468f3a3267a2a64e1691ac436f743298957ed2738",
+          "bytes": 107610,
+          "width": 800,
+          "height": 533
+        },
+        "place-hero@italy__rome-and-lazio__rome__testaccio-market.f84113c0a4-800.jpg": {
+          "sha256": "c34c16debe135909c8c124ad8ab3d4ad466149b06d61d68c86b0ddeeeaf40c1c",
+          "bytes": 137601,
+          "width": 800,
+          "height": 533
+        },
+        "place-hero@italy__rome-and-lazio__rome__testaccio-market.f84113c0a4-1260.avif": {
+          "sha256": "5413310fc7f466df1ad2883470a653301ecf9851681bc5b30a54603734fa4b4c",
+          "bytes": 120971,
+          "width": 1260,
+          "height": 840
+        },
+        "place-hero@italy__rome-and-lazio__rome__testaccio-market.f84113c0a4-1260.webp": {
+          "sha256": "b368a5be3ff18b6a4572f29cc658bcd006b6bf487034b87a167c1557d04bddb0",
+          "bytes": 248020,
+          "width": 1260,
+          "height": 840
+        },
+        "place-hero@italy__rome-and-lazio__rome__testaccio-market.f84113c0a4-1260.jpg": {
+          "sha256": "a42fb3eb727e6de99e496e9dafba92d8153eae211e0f4a235ea83847d19d3953",
+          "bytes": 319164,
+          "width": 1260,
+          "height": 840
+        },
+        "place-hero@italy__rome-and-lazio__rome__testaccio-market.f84113c0a4-1800.avif": {
+          "sha256": "945b04c4c0b4500b15084afd438cad196a25d1637f406f00d25c8837855984a7",
+          "bytes": 228833,
+          "width": 1800,
+          "height": 1200
+        },
+        "place-hero@italy__rome-and-lazio__rome__testaccio-market.f84113c0a4-1800.webp": {
+          "sha256": "45106dc41693e801c37e1a8995f8716191bb080a600fcd4ff3a5f068042040e8",
+          "bytes": 467106,
+          "width": 1800,
+          "height": 1200
+        },
+        "place-hero@italy__rome-and-lazio__rome__testaccio-market.f84113c0a4-1800.jpg": {
+          "sha256": "3e843dc46ba27106d2c1285b917ad160fd7978eacc678463a2b583b2e1ad46cc",
+          "bytes": 615469,
+          "width": 1800,
+          "height": 1200
+        },
+        "place-hero@italy__rome-and-lazio__rome__testaccio-market.f84113c0a4-2400.avif": {
+          "sha256": "c8fd5f36062ab02920b0eaf561ff34a18a261b6fc363a83ed263965a9a4bec9b",
+          "bytes": 376808,
+          "width": 2400,
+          "height": 1600
+        },
+        "place-hero@italy__rome-and-lazio__rome__testaccio-market.f84113c0a4-2400.webp": {
+          "sha256": "bebe088724d26649a36a9ff83b4e67dbea3dee7b7adcbc5e88734f471ac4fb3d",
+          "bytes": 762952,
+          "width": 2400,
+          "height": 1600
+        },
+        "place-hero@italy__rome-and-lazio__rome__testaccio-market.f84113c0a4-2400.jpg": {
+          "sha256": "a7b95851994c37fc588775714da085d13b9bb562621d9bafbdc553b5cf88b0cd",
+          "bytes": 1035972,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "f84113c0a4"
+    },
+    "city:italy/rome-and-lazio/rome": {
+      "purpose": "destination-hero@italy/rome-and-lazio/rome",
+      "publication_path": "/europe/italy/rome-and-lazio/rome",
+      "file": "destination-hero@italy__rome-and-lazio__rome",
+      "original": "photographs/destination-hero@italy__rome-and-lazio__rome.original.jpg",
+      "alt": "Captivating wide-angle shot of Rome's iconic Colosseum with a serene sunset backdrop.",
+      "provider": "pexels",
+      "provider_photo_id": "15562413",
+      "photographer": "Görkem Özdemir",
+      "photographer_url": "https://www.pexels.com/@gorkem-ozdemir-455899646",
+      "source": "https://www.pexels.com/photo/the-colosseum-rome-italy-15562413/",
+      "original_url": "https://images.pexels.com/photos/15562413/pexels-photo-15562413.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-17",
+      "acquired_at": "2026-09-17T22:23:11Z",
+      "sha256": "01e9474cb5d7c4b1313554aead3738b22648faa9cdd6a5e6554bf9e020e8e20f",
+      "bytes": 22940663,
+      "width": 16144,
+      "height": 10111,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "01e9474cb5",
+        "source_sha256": "01e9474cb5d7c4b1313554aead3738b22648faa9cdd6a5e6554bf9e020e8e20f",
+        "source_width": 16144,
+        "source_height": 10111,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-17T22:23:23Z"
+      },
+      "derivatives": {
+        "destination-hero@italy__rome-and-lazio__rome.01e9474cb5-480.avif": {
+          "sha256": "afe5f83697dd762086b3e78627c3b36b36213dfe6d68597dce0add0970d8e58f",
+          "bytes": 15735,
+          "width": 480,
+          "height": 301
+        },
+        "destination-hero@italy__rome-and-lazio__rome.01e9474cb5-480.webp": {
+          "sha256": "1eadcd90b26489abdbef28a65ec6439b693f0bc5af585b6cd13199e825065b2a",
+          "bytes": 31222,
+          "width": 480,
+          "height": 301
+        },
+        "destination-hero@italy__rome-and-lazio__rome.01e9474cb5-480.jpg": {
+          "sha256": "399eed37112bdaf43fe9b4eb6138853f7c7f0eedc61235c9ec5f7db0e0382061",
+          "bytes": 40757,
+          "width": 480,
+          "height": 301
+        },
+        "destination-hero@italy__rome-and-lazio__rome.01e9474cb5-800.avif": {
+          "sha256": "d5bfc3622acfb8c5ff1ca7d0c6666c283d0ad08385fca0dc7640c726bd6dcc72",
+          "bytes": 40882,
+          "width": 800,
+          "height": 501
+        },
+        "destination-hero@italy__rome-and-lazio__rome.01e9474cb5-800.webp": {
+          "sha256": "1435b0d7dc8b13e7ee7ae621397e4b1fd090615c868b28285b4ade0f0d1a8e5d",
+          "bytes": 83862,
+          "width": 800,
+          "height": 501
+        },
+        "destination-hero@italy__rome-and-lazio__rome.01e9474cb5-800.jpg": {
+          "sha256": "6faff8d6d473ff990c53c8bd3e873e433a0842452c431153c81868d6549ec12c",
+          "bytes": 108226,
+          "width": 800,
+          "height": 501
+        },
+        "destination-hero@italy__rome-and-lazio__rome.01e9474cb5-1260.avif": {
+          "sha256": "c925d53c1c3ce7050880e718ade6a1822e1a289b22c1c3734b60ac2ce27cdfc8",
+          "bytes": 97835,
+          "width": 1260,
+          "height": 789
+        },
+        "destination-hero@italy__rome-and-lazio__rome.01e9474cb5-1260.webp": {
+          "sha256": "fa2cb7edbc89c023171ce245983d8813d739e25263c0fd9bed06f810d1c0f860",
+          "bytes": 197538,
+          "width": 1260,
+          "height": 789
+        },
+        "destination-hero@italy__rome-and-lazio__rome.01e9474cb5-1260.jpg": {
+          "sha256": "747979c4cd5666c074ab48c9038da397721a26124c8b75a0caf598c8e4cff093",
+          "bytes": 259645,
+          "width": 1260,
+          "height": 789
+        },
+        "destination-hero@italy__rome-and-lazio__rome.01e9474cb5-1800.avif": {
+          "sha256": "c05fde5bc3aae0426345ab0e2b8d4b41ed13f2156ad0a6eb6eb4fd8488bc0b68",
+          "bytes": 193659,
+          "width": 1800,
+          "height": 1127
+        },
+        "destination-hero@italy__rome-and-lazio__rome.01e9474cb5-1800.webp": {
+          "sha256": "a5ff1dec74e8ca4888a6ecd64b33bb9d4c2ac8c93f134849ad8cff50eca6ed45",
+          "bytes": 391070,
+          "width": 1800,
+          "height": 1127
+        },
+        "destination-hero@italy__rome-and-lazio__rome.01e9474cb5-1800.jpg": {
+          "sha256": "c27797121437b7239464c0dcf66d204cef9e044abd67a0c65046dcabc1a186db",
+          "bytes": 512090,
+          "width": 1800,
+          "height": 1127
+        },
+        "destination-hero@italy__rome-and-lazio__rome.01e9474cb5-2400.avif": {
+          "sha256": "b7cc8ec9a7c0301d31a12c2e5034d4c8c65c1af5a8bc8b72dd5b2a299d340425",
+          "bytes": 334950,
+          "width": 2400,
+          "height": 1503
+        },
+        "destination-hero@italy__rome-and-lazio__rome.01e9474cb5-2400.webp": {
+          "sha256": "1e78407176b4efd8bae8cfa24f96ed656fb69f8704f6d6608d5bd2822dcb32ad",
+          "bytes": 661022,
+          "width": 2400,
+          "height": 1503
+        },
+        "destination-hero@italy__rome-and-lazio__rome.01e9474cb5-2400.jpg": {
+          "sha256": "cdfcfdb54b03e77382c8ea04894728b934d01a15794d3cb22b0e2eb0603622e3",
+          "bytes": 881960,
+          "width": 2400,
+          "height": 1503
+        }
+      },
+      "version": "01e9474cb5"
+    },
+    "place:italy/south-italy-and-islands/alghero/neptunes-grotto": {
+      "purpose": "place-hero@italy/south-italy-and-islands/alghero/neptunes-grotto",
+      "publication_path": "/europe/italy/south-italy-and-islands/alghero/place/neptunes-grotto",
+      "file": "place-hero@italy__south-italy-and-islands__alghero__neptunes-grotto",
+      "original": "photographs/place-hero@italy__south-italy-and-islands__alghero__neptunes-grotto.original.jpg",
+      "alt": "Explore the rugged coastline of Alghero, Sardinia with its historic architecture and waves crashing on rocky shores.",
+      "provider": "pexels",
+      "provider_photo_id": "19207101",
+      "photographer": "Efrem  Efre",
+      "photographer_url": "https://www.pexels.com/@efrem-efre-2786187",
+      "source": "https://www.pexels.com/photo/beach-19207101/",
+      "original_url": "https://images.pexels.com/photos/19207101/pexels-photo-19207101.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-17",
+      "acquired_at": "2026-09-17T22:23:24Z",
+      "sha256": "3e9c3707c46f56e8c6f310729e5898dc850d3ceb6ca4acebae31594a4fff1a02",
+      "bytes": 2961493,
+      "width": 6960,
+      "height": 4640,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "3e9c3707c4",
+        "source_sha256": "3e9c3707c46f56e8c6f310729e5898dc850d3ceb6ca4acebae31594a4fff1a02",
+        "source_width": 6960,
+        "source_height": 4640,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-17T22:23:29Z"
+      },
+      "derivatives": {
+        "place-hero@italy__south-italy-and-islands__alghero__neptunes-grotto.3e9c3707c4-480.avif": {
+          "sha256": "b232fe23ea50829d66f0ad5f99ec7330e114eebbbde6b57149d921de3a870dee",
+          "bytes": 13174,
+          "width": 480,
+          "height": 320
+        },
+        "place-hero@italy__south-italy-and-islands__alghero__neptunes-grotto.3e9c3707c4-480.webp": {
+          "sha256": "4ca5cc2ae060687f16b696433f634fc5b9afe5dc8b4624c1fc997673d56f36b3",
+          "bytes": 25688,
+          "width": 480,
+          "height": 320
+        },
+        "place-hero@italy__south-italy-and-islands__alghero__neptunes-grotto.3e9c3707c4-480.jpg": {
+          "sha256": "2884ce053da219fe023c2d71ef02f5a4a6ae17fcd0216038a81abb5b498a4476",
+          "bytes": 36826,
+          "width": 480,
+          "height": 320
+        },
+        "place-hero@italy__south-italy-and-islands__alghero__neptunes-grotto.3e9c3707c4-800.avif": {
+          "sha256": "675c1422e283ecafccd9afe859b406708830931db6e6323f9f73af7a8af73367",
+          "bytes": 32749,
+          "width": 800,
+          "height": 533
+        },
+        "place-hero@italy__south-italy-and-islands__alghero__neptunes-grotto.3e9c3707c4-800.webp": {
+          "sha256": "7fd0e3f17032eba4d55310bad8dc928b538f953c26275d2388bec39862a9bbce",
+          "bytes": 60510,
+          "width": 800,
+          "height": 533
+        },
+        "place-hero@italy__south-italy-and-islands__alghero__neptunes-grotto.3e9c3707c4-800.jpg": {
+          "sha256": "8a2500d14b1de110597f0375c7e653c7411d0570fe329c78c5f72ecbdd1d3b06",
+          "bytes": 91295,
+          "width": 800,
+          "height": 533
+        },
+        "place-hero@italy__south-italy-and-islands__alghero__neptunes-grotto.3e9c3707c4-1260.avif": {
+          "sha256": "76cea94429ce3de235abee70abaec61da7d8f81ebb7ebd78fb85057d46c55d40",
+          "bytes": 70133,
+          "width": 1260,
+          "height": 840
+        },
+        "place-hero@italy__south-italy-and-islands__alghero__neptunes-grotto.3e9c3707c4-1260.webp": {
+          "sha256": "d3edf2f35550643baa4ebe7b74bd99e9ab0537ad2cc9fcaad4e93a2a77677a04",
+          "bytes": 124394,
+          "width": 1260,
+          "height": 840
+        },
+        "place-hero@italy__south-italy-and-islands__alghero__neptunes-grotto.3e9c3707c4-1260.jpg": {
+          "sha256": "7200163c7820578b1653c87441a8265008a2e4eac6e049a1923d1ff9b1434baf",
+          "bytes": 199986,
+          "width": 1260,
+          "height": 840
+        },
+        "place-hero@italy__south-italy-and-islands__alghero__neptunes-grotto.3e9c3707c4-1800.avif": {
+          "sha256": "14361dc3e94054f943260250dcf8387c893f65092e795c89f44c1922c96e9ab1",
+          "bytes": 126388,
+          "width": 1800,
+          "height": 1200
+        },
+        "place-hero@italy__south-italy-and-islands__alghero__neptunes-grotto.3e9c3707c4-1800.webp": {
+          "sha256": "d3670a81fb0cb72c5b3632a56fb06a9e7b9e8165f8786a9585c7481f9f2bc7f8",
+          "bytes": 214014,
+          "width": 1800,
+          "height": 1200
+        },
+        "place-hero@italy__south-italy-and-islands__alghero__neptunes-grotto.3e9c3707c4-1800.jpg": {
+          "sha256": "05bc2bd945ba469757422563b3ab9d3d618e82405958b6b1b70402a806c36835",
+          "bytes": 364948,
+          "width": 1800,
+          "height": 1200
+        },
+        "place-hero@italy__south-italy-and-islands__alghero__neptunes-grotto.3e9c3707c4-2400.avif": {
+          "sha256": "5a51b864e6850de470a25db44f6f191bf039bd935cea88b2fe2440d4498b53ac",
+          "bytes": 197562,
+          "width": 2400,
+          "height": 1600
+        },
+        "place-hero@italy__south-italy-and-islands__alghero__neptunes-grotto.3e9c3707c4-2400.webp": {
+          "sha256": "1c146422148734f2ccdae5291d60fa101f37a5a7af75ce7e2cbbd9125d853181",
+          "bytes": 319340,
+          "width": 2400,
+          "height": 1600
+        },
+        "place-hero@italy__south-italy-and-islands__alghero__neptunes-grotto.3e9c3707c4-2400.jpg": {
+          "sha256": "6d527844809d5e099979df515b747b5560763451394a67fbde413ae5aa9e9764",
+          "bytes": 587617,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "3e9c3707c4"
+    },
+    "city:italy/south-italy-and-islands/alghero": {
+      "purpose": "destination-hero@italy/south-italy-and-islands/alghero",
+      "publication_path": "/europe/italy/south-italy-and-islands/alghero",
+      "file": "destination-hero@italy__south-italy-and-islands__alghero",
+      "original": "photographs/destination-hero@italy__south-italy-and-islands__alghero.original.jpg",
+      "alt": "Picturesque view of Alghero's waterfront with historic architecture and vibrant skyline under a clear sky.",
+      "provider": "pexels",
+      "provider_photo_id": "16112384",
+      "photographer": "Efrem  Efre",
+      "photographer_url": "https://www.pexels.com/@efrem-efre-2786187",
+      "source": "https://www.pexels.com/photo/skyline-of-alghero-with-view-of-the-alghero-cathedral-in-the-middle-sardinia-italy-16112384/",
+      "original_url": "https://images.pexels.com/photos/16112384/pexels-photo-16112384.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-17",
+      "acquired_at": "2026-09-17T22:23:30Z",
+      "sha256": "208f6e5e42aaa95a7a23236b453015298348460d5084c487acf5b9b9b4f01436",
+      "bytes": 4399302,
+      "width": 6960,
+      "height": 4640,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "208f6e5e42",
+        "source_sha256": "208f6e5e42aaa95a7a23236b453015298348460d5084c487acf5b9b9b4f01436",
+        "source_width": 6960,
+        "source_height": 4640,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-17T22:23:35Z"
+      },
+      "derivatives": {
+        "destination-hero@italy__south-italy-and-islands__alghero.208f6e5e42-480.avif": {
+          "sha256": "e25b7bfa2adea41038278083dcdf6caffdb31bfdf25760afee70e3fef1c5e20c",
+          "bytes": 15268,
+          "width": 480,
+          "height": 320
+        },
+        "destination-hero@italy__south-italy-and-islands__alghero.208f6e5e42-480.webp": {
+          "sha256": "50a9dee7cf9eee7076e3bf27bd5cda9e0452026966ddfb065e661071fb90c0bd",
+          "bytes": 31566,
+          "width": 480,
+          "height": 320
+        },
+        "destination-hero@italy__south-italy-and-islands__alghero.208f6e5e42-480.jpg": {
+          "sha256": "7525504924c295453c43e07051bfe956b57fc7d40c7ae6d48570ea2cf24c91bf",
+          "bytes": 41425,
+          "width": 480,
+          "height": 320
+        },
+        "destination-hero@italy__south-italy-and-islands__alghero.208f6e5e42-800.avif": {
+          "sha256": "85135bea5e18a624b10cf088e9bf961b8418dcbc6a21f16febeefd35a37dc8b2",
+          "bytes": 37492,
+          "width": 800,
+          "height": 533
+        },
+        "destination-hero@italy__south-italy-and-islands__alghero.208f6e5e42-800.webp": {
+          "sha256": "82addc59f098c80bfd53578930c75fef28a0e5f2d8fbb148ae9f7f6e492c5f6d",
+          "bytes": 75324,
+          "width": 800,
+          "height": 533
+        },
+        "destination-hero@italy__south-italy-and-islands__alghero.208f6e5e42-800.jpg": {
+          "sha256": "fd2edd74a01b07ef9303e85a1c71b58eeda54576624989ecdd0bfd756cb89e83",
+          "bytes": 104055,
+          "width": 800,
+          "height": 533
+        },
+        "destination-hero@italy__south-italy-and-islands__alghero.208f6e5e42-1260.avif": {
+          "sha256": "ccb6d24a8984cae1075bce8135048f357e5b7d1b18ca8c782afdc60d49a40caa",
+          "bytes": 79919,
+          "width": 1260,
+          "height": 840
+        },
+        "destination-hero@italy__south-italy-and-islands__alghero.208f6e5e42-1260.webp": {
+          "sha256": "6d8d44c969e18733ba1638dfc223229e4bbd66d9b833c038f413c726b0b1ec01",
+          "bytes": 161978,
+          "width": 1260,
+          "height": 840
+        },
+        "destination-hero@italy__south-italy-and-islands__alghero.208f6e5e42-1260.jpg": {
+          "sha256": "cfe6f98f41a90489fb6f0ca1e1f909946d2592e23b3dfb1054f8f11f2807e079",
+          "bytes": 232892,
+          "width": 1260,
+          "height": 840
+        },
+        "destination-hero@italy__south-italy-and-islands__alghero.208f6e5e42-1800.avif": {
+          "sha256": "6b3d379db30bfcd93894b423cf816dc8cd901caecb5e807e726c7e78d314d14b",
+          "bytes": 146953,
+          "width": 1800,
+          "height": 1200
+        },
+        "destination-hero@italy__south-italy-and-islands__alghero.208f6e5e42-1800.webp": {
+          "sha256": "42954609412803ae73c1d702ce56cd80f42075a7dec9dd9ef66cdf8d65977148",
+          "bytes": 294382,
+          "width": 1800,
+          "height": 1200
+        },
+        "destination-hero@italy__south-italy-and-islands__alghero.208f6e5e42-1800.jpg": {
+          "sha256": "113bf2155aa3933d32e9a61f721f5b454e8ef3e212d27352b32070562fc84cd8",
+          "bytes": 436938,
+          "width": 1800,
+          "height": 1200
+        },
+        "destination-hero@italy__south-italy-and-islands__alghero.208f6e5e42-2400.avif": {
+          "sha256": "67549b35b696e88728f56eca69d12ba5bb337776019f68d459d1b31c1cbf9f5d",
+          "bytes": 234727,
+          "width": 2400,
+          "height": 1600
+        },
+        "destination-hero@italy__south-italy-and-islands__alghero.208f6e5e42-2400.webp": {
+          "sha256": "f75b864e5811cd3753cec23c46549917a4169e95098038c30333841de3459d38",
+          "bytes": 473230,
+          "width": 2400,
+          "height": 1600
+        },
+        "destination-hero@italy__south-italy-and-islands__alghero.208f6e5e42-2400.jpg": {
+          "sha256": "94be489cf3d4237f5eb7133d34d3b9187af86c810e7eed20ce539e69fb0fc82e",
+          "bytes": 724954,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "208f6e5e42"
+    },
+    "place:italy/south-italy-and-islands/lecce/santa-croce-lecce": {
+      "purpose": "place-hero@italy/south-italy-and-islands/lecce/santa-croce-lecce",
+      "publication_path": "/europe/italy/south-italy-and-islands/lecce/place/santa-croce-lecce",
+      "file": "place-hero@italy__south-italy-and-islands__lecce__santa-croce-lecce",
+      "original": "photographs/place-hero@italy__south-italy-and-islands__lecce__santa-croce-lecce.original.jpg",
+      "alt": "This ornate Baroque facade of the Basilica di Santa Croce in Lecce showcases intricate details and elaborate sculptures.",
+      "provider": "pexels",
+      "provider_photo_id": "37952366",
+      "photographer": "merwak. raw",
+      "photographer_url": "https://www.pexels.com/@merwak-raw-399619273",
+      "source": "https://www.pexels.com/photo/ornate-facade-of-basilica-in-lecce-italy-37952366/",
+      "original_url": "https://images.pexels.com/photos/37952366/pexels-photo-37952366.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-17",
+      "acquired_at": "2026-09-17T22:23:36Z",
+      "sha256": "f1172a3f87a20d4a5624674f327058aa56a6cfaa0c96e9c469297cc3c1cef180",
+      "bytes": 2290717,
+      "width": 6000,
+      "height": 4000,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "f1172a3f87",
+        "source_sha256": "f1172a3f87a20d4a5624674f327058aa56a6cfaa0c96e9c469297cc3c1cef180",
+        "source_width": 6000,
+        "source_height": 4000,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-17T22:23:42Z"
+      },
+      "derivatives": {
+        "place-hero@italy__south-italy-and-islands__lecce__santa-croce-lecce.f1172a3f87-480.avif": {
+          "sha256": "4facaa130d5aada8b620b4c2849a6bda4348fdf1dbc1dfde4fc3c10a594f83a3",
+          "bytes": 15855,
+          "width": 480,
+          "height": 320
+        },
+        "place-hero@italy__south-italy-and-islands__lecce__santa-croce-lecce.f1172a3f87-480.webp": {
+          "sha256": "6f82dbbe25b42b4abe24e7f03a184e2439ae1916eff3df94ffd42b95e3549fbd",
+          "bytes": 29602,
+          "width": 480,
+          "height": 320
+        },
+        "place-hero@italy__south-italy-and-islands__lecce__santa-croce-lecce.f1172a3f87-480.jpg": {
+          "sha256": "2779785ae149d5d0b60fe04d6b9ed03c66fa481f0787b427cb764bcdd90c50fb",
+          "bytes": 38898,
+          "width": 480,
+          "height": 320
+        },
+        "place-hero@italy__south-italy-and-islands__lecce__santa-croce-lecce.f1172a3f87-800.avif": {
+          "sha256": "df768c8642715c74aecb9160b2f44c5b27da110e3b948f8e8621dc253ae6904d",
+          "bytes": 39049,
+          "width": 800,
+          "height": 533
+        },
+        "place-hero@italy__south-italy-and-islands__lecce__santa-croce-lecce.f1172a3f87-800.webp": {
+          "sha256": "36300991a4c71347278afe21d691f06dc58fb1b908d9289f9bfe664fe3cca99c",
+          "bytes": 71624,
+          "width": 800,
+          "height": 533
+        },
+        "place-hero@italy__south-italy-and-islands__lecce__santa-croce-lecce.f1172a3f87-800.jpg": {
+          "sha256": "fc910413e3611fddb4efa8edb39488e063976ff44021e85560670ab19672b93e",
+          "bytes": 99443,
+          "width": 800,
+          "height": 533
+        },
+        "place-hero@italy__south-italy-and-islands__lecce__santa-croce-lecce.f1172a3f87-1260.avif": {
+          "sha256": "add6c033faa256150baec2ffc8ff786ddd747b8aa3b40df596774d0a4ddafbc6",
+          "bytes": 83930,
+          "width": 1260,
+          "height": 840
+        },
+        "place-hero@italy__south-italy-and-islands__lecce__santa-croce-lecce.f1172a3f87-1260.webp": {
+          "sha256": "e6829ff8f3d22b95b55c34269c3cdc19ad47f640f992c5500822196cfac05908",
+          "bytes": 146682,
+          "width": 1260,
+          "height": 840
+        },
+        "place-hero@italy__south-italy-and-islands__lecce__santa-croce-lecce.f1172a3f87-1260.jpg": {
+          "sha256": "1a1e1b45ff7b096f14f4185e84731be34abea64ebe42e91bee7244ededa2095f",
+          "bytes": 219198,
+          "width": 1260,
+          "height": 840
+        },
+        "place-hero@italy__south-italy-and-islands__lecce__santa-croce-lecce.f1172a3f87-1800.avif": {
+          "sha256": "7cd332a935853fe2899d3a5571cdbce2cef5f38bb7b92ce06ad7b27dc71713ff",
+          "bytes": 146645,
+          "width": 1800,
+          "height": 1200
+        },
+        "place-hero@italy__south-italy-and-islands__lecce__santa-croce-lecce.f1172a3f87-1800.webp": {
+          "sha256": "82b4ea35cdb62df6d42209839dbad20d06858248ff7e5e067f837efb36066b7d",
+          "bytes": 243954,
+          "width": 1800,
+          "height": 1200
+        },
+        "place-hero@italy__south-italy-and-islands__lecce__santa-croce-lecce.f1172a3f87-1800.jpg": {
+          "sha256": "9c8d0b1349a979b17aa305bac32370e47f628ee8166d5f244b8657ccbb4b8550",
+          "bytes": 395702,
+          "width": 1800,
+          "height": 1200
+        },
+        "place-hero@italy__south-italy-and-islands__lecce__santa-croce-lecce.f1172a3f87-2400.avif": {
+          "sha256": "98e523a52208e3a121edcd9ca8a0567a262035ae914510585e5a56d1f133ac01",
+          "bytes": 226225,
+          "width": 2400,
+          "height": 1600
+        },
+        "place-hero@italy__south-italy-and-islands__lecce__santa-croce-lecce.f1172a3f87-2400.webp": {
+          "sha256": "e7019597011cc8728dc0bff857988376c96da76e94badf5752b3d1550a735dba",
+          "bytes": 356574,
+          "width": 2400,
+          "height": 1600
+        },
+        "place-hero@italy__south-italy-and-islands__lecce__santa-croce-lecce.f1172a3f87-2400.jpg": {
+          "sha256": "659bdbf417a832b2fe2d029717b92feb348140e0fd1b659119904fa744f133b3",
+          "bytes": 628347,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "f1172a3f87"
+    },
+    "city:italy/south-italy-and-islands/lecce": {
+      "purpose": "destination-hero@italy/south-italy-and-islands/lecce",
+      "publication_path": "/europe/italy/south-italy-and-islands/lecce",
+      "file": "destination-hero@italy__south-italy-and-islands__lecce",
+      "original": "photographs/destination-hero@italy__south-italy-and-islands__lecce.original.jpg",
+      "alt": "Charming white buildings with ornate balconies in a sunlit Italian street.",
+      "provider": "pexels",
+      "provider_photo_id": "30433307",
+      "photographer": "AXP Photography",
+      "photographer_url": "https://www.pexels.com/@axp-photography-500641970",
+      "source": "https://www.pexels.com/photo/scenic-street-view-of-traditional-italian-architecture-30433307/",
+      "original_url": "https://images.pexels.com/photos/30433307/pexels-photo-30433307.jpeg",
+      "licence": "Pexels",
+      "licence_url": "https://www.pexels.com/license/",
+      "terms_read_on": "2026-09-10",
+      "terms_evidence": [
+        "pexels.https-www-pexels-com-api-documentation.2026-09-10.txt",
+        "pexels.https-www-pexels-com-license.2026-09-10.txt"
+      ],
+      "fetched": "2026-09-17",
+      "acquired_at": "2026-09-17T22:23:43Z",
+      "sha256": "b306bb1a67b4e1aa7d0ae2ed418929b1465e6de5713b2bc51ac8b81d469a430d",
+      "bytes": 4005598,
+      "width": 6000,
+      "height": 4000,
+      "focal": [
+        50,
+        50
+      ],
+      "processing": {
+        "tool": "Pillow 12.3.0",
+        "version_tag": "b306bb1a67",
+        "source_sha256": "b306bb1a67b4e1aa7d0ae2ed418929b1465e6de5713b2bc51ac8b81d469a430d",
+        "source_width": 6000,
+        "source_height": 4000,
+        "widths": [
+          480,
+          800,
+          1260,
+          1800,
+          2400
+        ],
+        "skipped_widths": [],
+        "formats": [
+          "avif",
+          "webp",
+          "jpg"
+        ],
+        "quality": {
+          "avif": 50,
+          "webp": 78,
+          "jpg": 82
+        },
+        "resample": "LANCZOS",
+        "generated_at": "2026-09-17T22:23:48Z"
+      },
+      "derivatives": {
+        "destination-hero@italy__south-italy-and-islands__lecce.b306bb1a67-480.avif": {
+          "sha256": "b8466cf3f9f021995128ef742533f2be8b05db3622c59c2ca794d74b725da2de",
+          "bytes": 15059,
+          "width": 480,
+          "height": 320
+        },
+        "destination-hero@italy__south-italy-and-islands__lecce.b306bb1a67-480.webp": {
+          "sha256": "5618ab2e53dd971aa19db159c15615196dcc96eb74c95c9e11d6a0e408cd391f",
+          "bytes": 30528,
+          "width": 480,
+          "height": 320
+        },
+        "destination-hero@italy__south-italy-and-islands__lecce.b306bb1a67-480.jpg": {
+          "sha256": "1760e9dfa9f9b359fb8dd79059cf0453a9c35845dcf077ccb15075ea11f57e4e",
+          "bytes": 42340,
+          "width": 480,
+          "height": 320
+        },
+        "destination-hero@italy__south-italy-and-islands__lecce.b306bb1a67-800.avif": {
+          "sha256": "ab555e72a7947b3a674ca049f122558294119035a7e938f06d20145cf0f69cbd",
+          "bytes": 38707,
+          "width": 800,
+          "height": 533
+        },
+        "destination-hero@italy__south-italy-and-islands__lecce.b306bb1a67-800.webp": {
+          "sha256": "8a851ebbcb87b19be37773a7f8744a8dd7a98a2fed3b7d3384496faab37d9d31",
+          "bytes": 75720,
+          "width": 800,
+          "height": 533
+        },
+        "destination-hero@italy__south-italy-and-islands__lecce.b306bb1a67-800.jpg": {
+          "sha256": "1ee1e7fb459151942982ccad3efd7a414961401ae759dc999a19bbf02d3d9010",
+          "bytes": 108520,
+          "width": 800,
+          "height": 533
+        },
+        "destination-hero@italy__south-italy-and-islands__lecce.b306bb1a67-1260.avif": {
+          "sha256": "8e17d3e99114da032158c8bd02f1c1b6abe869833c621119208aa946a5d3f2a0",
+          "bytes": 87032,
+          "width": 1260,
+          "height": 840
+        },
+        "destination-hero@italy__south-italy-and-islands__lecce.b306bb1a67-1260.webp": {
+          "sha256": "2e416d1dfdbbbfb33c0666f86502f6b4a04f1d2c69550dbb2aafd15e8906d247",
+          "bytes": 167886,
+          "width": 1260,
+          "height": 840
+        },
+        "destination-hero@italy__south-italy-and-islands__lecce.b306bb1a67-1260.jpg": {
+          "sha256": "940fc1accd2ee1150fdeb0dae0d84ad1ebea09d11af26ad10e83b256c11af258",
+          "bytes": 247040,
+          "width": 1260,
+          "height": 840
+        },
+        "destination-hero@italy__south-italy-and-islands__lecce.b306bb1a67-1800.avif": {
+          "sha256": "f4d2e17b8371a079b874cfbca623160628f1fd7ba4679a47d6d3eb0358afb185",
+          "bytes": 160718,
+          "width": 1800,
+          "height": 1200
+        },
+        "destination-hero@italy__south-italy-and-islands__lecce.b306bb1a67-1800.webp": {
+          "sha256": "8f25afbfb62b1640484ad78d363a3169c7a885d8f72338be685ad3ed805a40ab",
+          "bytes": 305566,
+          "width": 1800,
+          "height": 1200
+        },
+        "destination-hero@italy__south-italy-and-islands__lecce.b306bb1a67-1800.jpg": {
+          "sha256": "b1b49d258db9f9d3d10e7ce5bfcad74f051c6f4d7506f02086096467ceec87e4",
+          "bytes": 470614,
+          "width": 1800,
+          "height": 1200
+        },
+        "destination-hero@italy__south-italy-and-islands__lecce.b306bb1a67-2400.avif": {
+          "sha256": "16a7d66c81a1d48a2a51c5f1a1d58fd796f02b8718b172cc75f3f075066744ce",
+          "bytes": 263665,
+          "width": 2400,
+          "height": 1600
+        },
+        "destination-hero@italy__south-italy-and-islands__lecce.b306bb1a67-2400.webp": {
+          "sha256": "b77380e9142c3bac51b0f8f1f4f75096796d51660838fb7da182fbccb0b8fd89",
+          "bytes": 498150,
+          "width": 2400,
+          "height": 1600
+        },
+        "destination-hero@italy__south-italy-and-islands__lecce.b306bb1a67-2400.jpg": {
+          "sha256": "fd83b5eb3df0f4f589f28cc08c2d8b251ff94558fc53d9fc06cc26fd64198f4a",
+          "bytes": 797397,
+          "width": 2400,
+          "height": 1600
+        }
+      },
+      "version": "b306bb1a67"
     }
   }
 }
