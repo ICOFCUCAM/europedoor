@@ -5250,6 +5250,69 @@ and the third changed the wrong element, and the dead-rule scan is the only
 instrument here that looks for either. The decoration belongs on the thing
 that is decorated.
 
+**`Read the story` WAS AT `opacity: 0` ON EVERY DESK, AND THE GUARD ASKED
+THE QUESTION OF THE LINK.** The /stories ledger lead's call to action was
+`class="doorgo"` — the homepage doors' hover-reveal — put there by the
+commit that wrote the paragraph recording what that class had already cost
+on /experiences. Measured in Chromium: **544 × 33 at 1280 with computed
+`opacity: 0` and `checkVisibility` false**, `opacity: 1` at 390, because the
+only thing restoring it is a `max-width: 60rem` rule written for a phone. It
+was the ONLY `.doorgo` on the built site. **And the sweep that exists for
+exactly this passed it, correctly**: `.storylead` IS the anchor and the
+anchor is visible, while the `<p>` inside it carries the alpha —
+`checkVisibility` is false when the element or an ANCESTOR is transparent,
+so asking it of every link cannot see a transparent CHILD, and the walk that
+names the culprit starts at the link and goes up. **The guard was written
+for the element that is the link, and a class carrying an unexpected zero is
+not always the link.** A second sweep walks in: every descendant of a
+visible link that holds its own words and paints nothing with focus on the
+link. Proved red and green on the shipped page — 51 links, 0 hits as
+shipped, 1 named with an injected zero.
+
+**AND THE FEATURE STORY WAS REFUSED NEXT DOOR TO THE QUESTION IT ASKS.**
+*The lead cannot be the photographic one* is about the LEDGER: it leads on
+the newest piece, a date rather than a judgement, and the newest is filed to
+Adventure where the register holds nothing. A feature asks which piece can
+carry a photograph at size, which is a fact about the register and not a
+ranking of the writing — so the two coexist, exactly as the brief's own
+architecture separates its band 3 from its band 4. The ledger leads
+typographically on Adventure; the feature carries **the newest photographed
+piece the ledger has not already led on**, which is *The ferry is the
+attraction*. Both derived, so the day Adventure is photographed the ledger
+keeps its lead and the feature moves down one rather than drawing one piece
+twice. The `pics` row drops the feature and states both figures: seven carry
+a photograph, six are in the row, and the sentence says why.
+
+**AND THE LEDE STATED ITS OWN EXTENT AND THEN NAMED SIX OF NINE.** *"Nine
+desks — people, history, food, faith, nature and culture"*, with the count
+generated and the list typed, so **Places, Travel and Adventure were absent
+from the one sentence that introduces the publication.** `pop_line`'s shape
+in a list rather than a field, with a derived figure beside it that
+disagrees. **That is also where the brief's desk band lands, because a chip
+is a FILTER**: this page loads no JavaScript and no per-desk page exists, so
+ten chips would be ten controls that do nothing — `data-rotate` again.
+Naming the desks is what the chips were for, and a name in the head is an
+extent rather than a directory.
+
+**A COMPOSITION THAT IS ONE CHILD OF A `.sheet` LANDS IN ITS 40% TRACK.**
+`.sheet` is `grid-template-columns: minmax(0, 40%) minmax(0, 1fr)`, so the
+feature's first version rendered **205 × 154 of photograph beside 137 pixels
+of type at 1280**, the h2 one word per line, the second track empty. /plan
+already recorded it — *`.sheettext` is a one-column grid and /plan's bands
+are `display: block`* — and it arrived here in a commit whose own comment
+says *the band contributes its room and its rhythm and nothing else*. A rule
+stated and applied to none of its call sites.
+
+**AND `.ed-feature-media` HAD NEVER HELD A `<figure>`.** There is no global
+`figure { margin: 0 }` here — only `.ed-strip figure` and `.geoart figure` —
+so the UA's 40 pixels either side ate **80 pixels at every width**: 278 of
+photograph inside a 358-pixel column at 390. /stories is the first caller of
+`.ed-feature` anywhere on the site, so the one thing a media box has to do
+had never been exercised. *A code path nothing exercises is a code path
+nothing checks*, about a component the 2036 brief declared and nothing used,
+and the fix belongs on the primitive: the next band must not have to know
+which element the last one chose. 752 × 564 at 1280 after.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

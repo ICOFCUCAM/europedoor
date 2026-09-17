@@ -10879,15 +10879,33 @@ def stories_index(data):
     # bleed leaves the column and is a change of movement, which is the one
     # of the seven image scales that says "this is the page, and here is
     # what it is about" without saying it about an essay.
+    # AND THE LEDE NAMED SIX DESKS OF NINE, NEXT TO A DERIVED "NINE".
+    # It read "nine desks — people, history, food, faith, nature and
+    # culture", with the count generated and the list typed, so the sentence
+    # stated its own extent and then silently dropped Places, Travel and
+    # Adventure. That is `pop_line`'s shape in a list rather than a field:
+    # coverage that looks like a policy, and a third of the set missing from
+    # the one sentence that introduces it. Both halves are derived now, so a
+    # tenth desk arrives in the prose on the build that adds it.
+    #
+    # THE BRIEF'S DESK BAND IS ANSWERED HERE RATHER THAN AS A ROOM. It asks
+    # for a chip index under the opening, and a chip is a FILTER: this page
+    # loads no JavaScript (its only `<script>` is the inert JSON-LD block)
+    # and no per-desk page exists, so nine chips would be nine controls that
+    # do nothing — `data-rotate`, which shipped 232 bytes of copy on the
+    # homepage for the life of a band waiting for a rotator nobody wrote.
+    # Naming the desks is what the chips were actually FOR, and a name in
+    # the head is an extent rather than a directory.
+    desknames = ", ".join(x.lower() for x in sections[:-1]) + \
+        " and " + sections[-1].lower()
     open_ = f"""
   <div class="storyopen">
     <h1 class="mega">A continent is people before it is
     <em class="lit">places</em>.</h1>
     <p class="lede">{numword(len(data['stories']), cap=True)} pieces across
-    {numword(len(sections))} desks &mdash; people, history, food, faith,
-    nature and culture. Every story links into the Atlas, and every Atlas
-    page a story touches links back, so reading and planning are the same
-    motion.</p>
+    {numword(len(sections))} desks &mdash; {desknames}. Every story links
+    into the Atlas, and every Atlas page a story touches links back, so
+    reading and planning are the same motion.</p>
   </div>
   <figure class="storybleed">{photo(images, "stories-hero", w=2400, h=1200,
       eager=True, sizes="100vw",
@@ -10922,7 +10940,7 @@ def stories_index(data):
     {esc(lead["published"])}</p>
     <h3>{esc(lead["title"])}</h3>
     <p class="rowsub">{esc(lead["standfirst"])}</p>
-    <p class="doorgo">Read the story &rarr;</p></div></a>
+    <p class="storygo">Read the story &rarr;</p></div></a>
   <div class="rows">{"".join(
       f'<a class="row storyrow" href="{urls.story(s)}">'
       f'<div><p class="kicker">{esc(s["section"])}</p>'
@@ -10935,6 +10953,48 @@ def stories_index(data):
   above this one: {numword(len(sections))} headings over one item each is the
   taxonomy as the layout, and it is the shape this page was built as and
   threw away.</p>"""
+
+    # ── THE FEATURE ──────────────────────────────────────────────────
+    # THE BRIEF ASKS FOR A FEATURE STORY AND THIS PAGE HAD REFUSED THE
+    # QUESTION NEXT DOOR TO IT. The recorded refusal is *the lead cannot be
+    # the photographic one* — the ledger leads on the NEWEST piece, which is
+    # a date rather than a judgement, and the newest is filed to Adventure
+    # where the register holds nothing. That is still true and it is about
+    # the LEDGER. A feature is a different question: which piece can carry a
+    # photograph at size, which is a fact about the register and not a
+    # ranking of the writing.
+    #
+    # So the two coexist, which is what the brief's own architecture does:
+    # the ledger leads TYPOGRAPHICALLY on the newest, and the feature band
+    # carries the newest piece the register holds a photograph of and the
+    # ledger has not already led on. Today that is `The ferry is the
+    # attraction`. Both are derived, so the day Adventure is photographed
+    # the ledger keeps its lead and the feature moves down one rather than
+    # drawing the same piece twice — which is the *same set printed twice*
+    # fault this page already avoided once by refusing a lead band.
+    feat = next((st for st in byline
+                 if st is not lead and held(images, "story:" + st["slug"])), None)
+    # NO NEW COMPONENT: `.ed-feature` IS THE SCALE THIS BAND IS. The seven
+    # image scales already hold it — *a feature is asymmetric at 1.35
+    # against .65, because two equal columns read as a layout and an unequal
+    # pair reads as a picture with something to say* — and that is the
+    # prototype's 54/46 stated as a proportion rather than a percentage.
+    # *No new primitive until repeated structure has actually emerged*, and
+    # what emerged here is a user for one that was already written.
+    feature = "" if not feat else f"""
+  <div class="ed-feature">
+    <figure class="ed-feature-media">{picture(images, "story:" + feat["slug"],
+        w=1600, h=1200, sizes="(min-width: 62rem) 62vw, 100vw",
+        alt=feat["title"])}</figure>
+    <div class="ed-feature-say">
+      <p class="kicker">{esc(feat["section"])} &middot; {esc(feat["reading"])}
+      &middot; {esc(feat["published"])}</p>
+      <h2>{esc(feat["title"])}</h2>
+      <p>{esc(feat["standfirst"])}</p>
+      <p><a class="storygo" href="{urls.story(feat)}">Read the story
+      &rarr;</a></p>
+    </div>
+  </div>"""
 
     # ── 03 · THE IDEA ────────────────────────────────────────────────
     # THE PAGE'S OWN SENTENCE, PROMOTED FROM A FOOTNOTE TO A ROOM. It was
@@ -10988,7 +11048,15 @@ def stories_index(data):
     # browser suite found **21 links painting nothing even with focus on
     # them** — `picture:focus-within .credit` could no longer reach them.
     # So `credit=False`, and the attribution is paid once under the row.
-    shots = [st for st in byline if held(images, "story:" + st["slug"])]
+    # AND THE FEATURE IS NOT DRAWN TWICE. `photographed` is the register's
+    # claim and stays the whole seven; `shots` is what this row DRAWS, which
+    # is the seven less the one the feature band has already given the full
+    # proportion to. A tile repeating a picture four bands after it was the
+    # subject of its own band is the *same set printed twice* fault, and the
+    # band's own figures are derived so the sentence cannot state a count
+    # the row does not show.
+    photographed = [st for st in byline if held(images, "story:" + st["slug"])]
+    shots = [st for st in photographed if st is not feat]
     pics = "".join(
         '<figure class="picstory">'
         + f'<a class="picgo" href="{urls.story(st)}">'
@@ -11015,12 +11083,13 @@ def stories_index(data):
     picband = f"""
   <div class="sheettext">
     <h2 class="mega">Photographed.</h2>
-    <p class="lede">{numword(len(shots), cap=True)} of the
+    <p class="lede">{numword(len(photographed), cap=True)} of the
     {numword(len(data['stories']))} carry a photograph somebody took of what
-    the piece is about. The other {numword(len(data['stories']) - len(shots))}
-    carry the places they are set in, and will carry a photograph the day
-    there is one to carry &mdash; the page does not change, only the
-    register does.</p>
+    the piece is about. {("The newest of them is the feature above, so here "
+    "are the other " + numword(len(shots)) + ". ") if feat else ""}The
+    {numword(len(data['stories']) - len(photographed))} without one carry the
+    places they are set in, and will carry a photograph the day there is one
+    to carry &mdash; the page does not change, only the register does.</p>
   </div>
   <div class="storypics">{pics}</div>
   <p class="sheetcred rowcred">Photographs by {picwho} on Pexels.</p>"""
@@ -11088,6 +11157,7 @@ def stories_index(data):
   </div>"""
 
     PLATES = [("open gal", "The desk", open_, "the-opening"),
+              ("feature paper", "The feature", feature, "the-feature"),
               ("ledger gal quiet", "Everything filed", ledger, "the-desk"),
               ("idea pine", "A story is not a place", idea, "the-idea"),
               ("pics gal", "Photographed", picband, "photographed"),

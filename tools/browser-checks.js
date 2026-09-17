@@ -5194,6 +5194,110 @@ async function main() {
        `on this site can report.`);
   }
 
+  /* AND THE ZERO IS NOT ALWAYS ON THE LINK. THE SWEEP ABOVE WALKS
+   * ANCESTORS; THIS ONE WALKS IN.
+   *
+   * `.doorgo` is the homepage doors' hover-reveal — `opacity: 0` at rest,
+   * restored by `.door:hover` and by a `max-width: 60rem` rule — and the
+   * commit that documented what it cost on /experiences put the same class
+   * on the /stories ledger lead's call to action. Measured in Chromium:
+   * `Read the story` at 1280 is 544 x 33 with computed `opacity: 0` and
+   * `checkVisibility` false, and `opacity: 1` at 390. So the one call to
+   * action on the editorial ledger existed for phones and painted nothing
+   * on every desk.
+   *
+   * THE SWEEP ABOVE PASSED IT, CORRECTLY, AND THAT IS THE FINDING.
+   * `.storylead` IS the anchor and the anchor is visible; the `<p>` inside
+   * it is what carries the alpha. `checkVisibility` on an element is false
+   * when the element or an ANCESTOR is transparent, so asking it of every
+   * link cannot see a transparent child, and the ancestor walk that names
+   * the culprit starts at the link and goes up. The guard was written for
+   * the element that is the link, and a class carrying an unexpected zero
+   * is not always the link.
+   *
+   * IT ASKS ONLY OF ELEMENTS THAT HOLD THEIR OWN WORDS, because those are
+   * the ones a reader loses: an element with element children is a box and
+   * its text belongs to something deeper. And it FOCUSES the link first,
+   * for the same reason the sweep above does — a hover-revealed child is a
+   * pattern this site ships and every one of those reveals on
+   * `:focus-visible` too. */
+  {
+    const FAM = require("./lib/families.js").ALL;
+    const ip = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    const inhits = [];
+    let infams = 0, inwords = 0;
+    for (const [name, url] of FAM) {
+      const r = await ip.goto(base + url, { waitUntil: "load" });
+      if (!r || r.status() !== 200) continue;
+      infams++;
+      /* The fast pass focuses each link once and collects the transparent
+       * text-bearing children under it; the slow pass waits out that
+       * element's own transition and asks again, which is the two-pass
+       * shape the sweep above needed for exactly the same reason. */
+      const n = await ip.evaluate(() => {
+        window.__IL = [];
+        const links = [...document.querySelectorAll("main a[href], footer a[href]")]
+          .filter(a => a.checkVisibility() && !a.closest("[aria-hidden='true']"));
+        for (const a of links) {
+          a.focus();
+          for (const e of a.querySelectorAll("*")) {
+            if (e.children.length) continue;
+            if (!(e.textContent || "").trim()) continue;
+            if (e.closest("[aria-hidden='true']")) continue;
+            if (!e.checkVisibility()) continue;
+            if (!e.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }))
+              window.__IL.push(e);
+          }
+        }
+        window.__ILN = links.length;
+        return window.__IL.length;
+      });
+      inwords += await ip.evaluate(() => window.__ILN);
+      for (let i = 0; i < n; i++) {
+        const bad = await ip.evaluate(async (i) => {
+          const e = window.__IL[i];
+          const a = e.closest("a[href]");
+          if (a) a.focus();
+          const anims = [];
+          for (let x = e; x && x !== document.documentElement; x = x.parentElement)
+            anims.push(...x.getAnimations());
+          await Promise.race([
+            Promise.all(anims.map(z => z.finished.catch(() => {}))),
+            new Promise(r => setTimeout(r, 400)),
+          ]);
+          if (e.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }))
+            return null;
+          let z = e, at = "";
+          while (z && z !== document.documentElement) {
+            if (getComputedStyle(z).opacity === "0") {
+              at = z.tagName.toLowerCase() +
+                   (z.className ? "." + z.className.toString().trim().split(/\s+/)[0] : "");
+              break;
+            }
+            z = z.parentElement;
+          }
+          const cls = e.className ? "." + e.className.toString().trim().split(/\s+/)[0] : e.tagName.toLowerCase();
+          return `${cls} "${(e.textContent || "").trim().slice(0, 24)}" — zero alpha on ${at || "something this walk did not find"}`;
+        }, i);
+        if (bad) inhits.push(`${name}: ${bad}`);
+      }
+    }
+    await ip.close();
+    checked += inwords;
+    ok(infams >= 40,
+       `the transparent-child sweep read only ${infams} families — it has ` +
+       `stopped finding them`);
+    ok(inwords >= 500,
+       `the transparent-child sweep looked inside only ${inwords} links ` +
+       `across ${infams} families — it has stopped finding them`);
+    ok(inhits.length === 0,
+       `${inhits.length} element(s) inside a link hold words and paint ` +
+       `nothing even with focus on the link: ` +
+       `${inhits.slice(0, 6).join(" | ")}. The link is visible and its own ` +
+       `words are not, which is why asking the question of the link cannot ` +
+       `find this.`);
+  }
+
   /* A PLACEHOLDER A READER CANNOT READ IS A TUTORIAL WITH ITS LAST LINE
    * MISSING.
    *

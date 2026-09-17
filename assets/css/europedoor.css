@@ -8524,7 +8524,18 @@ body[data-family="journey"] .ed-journey-hero .ed-eyebrow,
 }
 .ed-feature.right { grid-template-columns: minmax(0, .65fr) minmax(0, 1.35fr); }
 .ed-feature.right .ed-feature-media { order: 2; }
-.ed-feature-media { aspect-ratio: 4 / 3; overflow: hidden; background: var(--mineral); }
+/* `margin: 0` BECAUSE THE UA GIVES A `<figure>` 40 PIXELS EITHER SIDE, AND
+   THIS PRIMITIVE HAD NEVER HELD ONE. `.ed-feature` was declared with the
+   2036 rooms and /stories is its first caller anywhere on the site, so the
+   one thing a media box has to do — fill its own track — had never been
+   exercised. Measured before: 358 - 80 = **278 pixels of photograph inside
+   a 358-pixel column** at 390, and 288 - 80 = 208 at 320, the same 80 at
+   every width. *A code path nothing exercises is a code path nothing
+   checks*, about a declared component rather than a renderer, and the fix
+   belongs on the primitive rather than on the caller: the next band to use
+   it must not have to know which element the last one chose. */
+.ed-feature-media { aspect-ratio: 4 / 3; overflow: hidden; margin: 0;
+                    background: var(--mineral); }
 .ed-feature-media :is(img, picture, svg) { width: 100%; height: 100%; object-fit: cover; display: block; }
 .ed-feature-say h3, .ed-feature-say h2 {
   font-family: var(--ed-serif); font-weight: 400;
@@ -11294,6 +11305,24 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    the third changed the wrong element, and only the scan looks for either.
    The decoration belongs on the thing that is decorated. */
 .picgo { text-decoration: none; }
+
+/* AND THE LEAD'S CALL TO ACTION WAS `.doorgo`, WHICH IS AN `opacity: 0`.
+   That class belongs to the homepage's four doors and reveals on hover;
+   this file already carries the paragraph recording what it cost on
+   /experiences, and the commit that wrote that paragraph put the same class
+   on this page's ledger lead. Measured in Chromium: `Read the story` is
+   544 x 33 at 1280 with computed `opacity: 0` and `checkVisibility` false,
+   and `opacity: 1` at 390 — because the only thing that restores it is a
+   `max-width: 60rem` rule written for a phone. So the one call to action on
+   the editorial ledger existed for phones and was invisible on every desk.
+
+   THE BROWSER SUITE ASKS THIS OF EVERY LINK AND THE ZERO WAS ON A CHILD.
+   `.storylead` IS the anchor and it is visible; the `<p>` inside it is what
+   carries the alpha, so `checkVisibility` on the link is true and the words
+   inside it paint nothing. The guard was written for the element that is
+   the link, and a class carrying an unexpected zero is not always the link
+   — which is the whole reason the check now walks INTO a link as well. */
+.storygo { margin: var(--s3) 0 0; color: var(--door); font-size: var(--t-lg); }
 .picstory :is(picture, img) { display: block; width: 100%; height: auto;
                               aspect-ratio: 16 / 9; object-fit: cover; }
 /* 16/9 AND NOT WIDER, because `data/image-purposes.json` declares ONE
@@ -11370,6 +11399,39 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    collision on this page's own run, after `.sendsay`, `.closesay` and a
    duplicated `.deskart figcaption`. Grep the stylesheet before naming a
    composition. */
+/* THE FEATURE BAND, AND `.ed-feature` IS THE WHOLE COMPOSITION. The band
+   contributes its room and its rhythm and nothing else: the 1.35/.65
+   asymmetry, the 4/3 media box and the type are the seven image scales'
+   own feature, written once and used here for the first time. `paper`
+   rather than `gal` because the picture is the subject and a white wall
+   behind a photograph is a gallery hang, which this page already spends on
+   the six tiles four bands down — two identical rooms either side of the
+   ledger would read as one long room with a list dropped into it.
+
+   ALIGNED END RATHER THAN CENTRE, which `.ed-feature` already sets: the
+   standfirst and the call to action sit on the photograph's bottom edge, so
+   the picture's mass is the thing that carries the band and the words read
+   as a caption with authority rather than as a column beside a panel. */
+/* AND THE BAND HAD TO BE BLOCK, WHICH THE COMMENT ABOVE SAID AND THE FIRST
+   VERSION DID NOT DO. `.sheet` is `grid-template-columns: minmax(0, 40%)
+   minmax(0, 1fr)`, so a composition that is ONE child lands in the 40%
+   track and then splits itself 1.35/.65 inside it: measured at 1280, the
+   photograph came out **205 x 154 beside 137 pixels of type**, with the
+   h2 setting one word per line and the second track empty. That is
+   /plan's own recorded fault — *`.sheettext` is a one-column grid and
+   /plan's bands are `display: block`* — arriving in the commit that quoted
+   the sentence "the band contributes its room and its rhythm and nothing
+   else" without implementing it. A rule stated and applied to none of its
+   call sites. */
+.sheet-feature { display: block; padding-block: 10vh; }
+.sheet-feature .ed-feature-say .kicker { color: var(--door); }
+@media (max-width: 52rem) {
+  /* A 1.35/.65 split at 390 gives the words 96 pixels. Two rows, the
+     picture keeping its own proportion, which is the same repair the hero
+     took below 52rem and for the same arithmetic. */
+  .sheet-feature .ed-feature { grid-template-columns: minmax(0, 1fr); }
+}
+
 .sheet-readgo { padding-block: 12vh; }
 
 /* ── 06 the feed: an action, not a note ──────────────────────────── */
