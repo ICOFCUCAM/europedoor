@@ -293,3 +293,164 @@ Every line that is not satisfied says so.
 `/europe-in/<motion>` measures **54%**, 38 `row` siblings, which is the worst
 figure on the site now that /countries has come down, and it is the page whose
 whole credibility claim is that it prints what produced it.
+
+---
+
+## 10 · The motion PAGE, recomposed — and the row-level claim that stayed false
+
+Part 9 closed the index and named the motion page as the open fault:
+**54%, thirty-eight `.row` siblings of a 6,894-pixel page, with no second
+component at all**, which is `tools/monotony.js`'s own diagnostic for a page
+that is a list and nothing else. It was the worst figure on the site once
+/countries came down.
+
+### Inspect
+
+The page held a head, the answer drawn as a dot map, the query note, a
+hoisted shared clause, a strip of eight photographs, up to 91 rows, a
+journeys band, a themes band and the onward note. Measured at 1280:
+
+| | |
+|---|---:|
+| a row | 1,232 × 97 |
+| its summary, a sentence of prose | **1,120 pixels on one line** |
+| the rows band | 3,694 px of a 7,497-px page |
+| rows printing a distinguishing clause on /europe-in/after-dark | **0 of 38** |
+
+### The finding: §2's fix was half a fix
+
+Part 2 measured that `motion_match` reads the UNION of a destination's own
+interests and its region's — 537 extra tag applications, 47% more than the
+destination-only reading — and fixed **the sentence the page prints.** Every
+**row** went on saying *tagged Islands*. For Tartu, a mainland university
+town in the region "Tartu & South Estonia", that is not true of the
+destination at all.
+
+Measured on the shown sets:
+
+| motion | on its own tags | on its region's |
+|---|---:|---:|
+| Europe's islands | 10 | **15** |
+| Europe's coastlines | 31 | 25 |
+| the mountains | 35 | 24 |
+| the sacred world | 36 | 19 |
+| winter | 13 | 12 |
+| after dark | 30 | 8 |
+| the medieval world | 64 | 3 |
+
+**On a majority of one page's rows the claim was about the wrong record**,
+on the one family whose whole credibility claim is that a page prints what
+produced it.
+
+### Recompose: one mechanism, twelve queries
+
+`motion_match` says which side the tag came from, and the list is **grouped
+by the clause each result satisfied** — hoist what every result shares,
+group by what is left. The groups come out of the query rather than out of a
+taxonomy somebody chose:
+
+| motion | groups |
+|---|---|
+| Europe's islands | 15 in a region tagged Islands · 10 tagged Islands |
+| autumn | 42 October · 26 September · 15 November · 8 September and October |
+| the medieval world | 51 carrying both · 8 · 5 · 3 |
+| the table | 15 · 11 · 3 · 3 |
+
+**A GROUP OF ONE IS NOT A GROUP, IT IS A ROW WITH A HEADING**, which is the
+nine-desks-one-story layout the stories index was thrown away for. The first
+test was the MEAN group size and it let a tail through: hidden villages
+splits 22, 14, 9, 8, 6, 3, 1, 1, 1 — a mean of 7.2 and three sections
+holding one row each. The test is every group now, and two of the twelve
+keep their list: hidden villages, whose clause is a discoverability SCORE
+with a tail of values held by one destination each, and the northern lights,
+eight destinations at eight distinct latitudes.
+
+**And the list that stays a list is ordered by the clause that would have
+grouped it**, largest run first, where both had been alphabetical by
+country — *the order a reader is given is alphabetical by a key they cannot
+see*. Ordered by the run's own SIZE rather than by the clause string,
+because "scores 97" sorting before "scores 84" is an accident of decimal
+notation.
+
+### And the list sets in two columns, which fixes a measure as well as a height
+
+`.row .rowsub` carries `max-width: none`, and the reason written on that rule
+is exact and about a different content type: *`.rowsub` is a `<p>` holding a
+middot-separated list of place names … nobody reads a list of names end to
+start, they scan it.* A destination's SUMMARY is prose, and **140 characters
+on one line** is the fault a measure exists to prevent. The generalisation
+was one family too far. Two columns give about 68 characters.
+
+| | before | after |
+|---|---:|---:|
+| /europe-in/after-dark | 7,497 px | 6,133 |
+| its rows band | 3,694 | ~2,200 |
+| its summary measure | 1,120 px | 509 |
+| **monotony** | **54%**, nothing else | **31%**, 8% behind it |
+| /europe-in/autumn | 10,080 | 8,912 |
+
+### Three defects the work found
+
+**A CHECK PINNED A SOURCE SPELLING — the twelfth in this repository to pin a
+shape rather than a promise.** `c_motion_query_breadth` required the literal
+`set(t["interests"]) | set(r["interests"])` in `motion_match`, and went red
+the moment that line became `own, near = …` followed by `own | near` so the
+clause could say which side it came from — which is MORE of what the check
+exists to protect, not less. The engine half is behavioural now: at least
+one destination must be returned whose region carries the tag while it does
+not, re-running the engine against the destination's own interest list read
+from the data. Proved red by narrowing `tags = own | near` to `tags = own`.
+
+**THE GROUP HEAD DISAGREED WITH ITS OWN PRONOUN.** The first version set the
+clause in the heading: *"42 destinations, in its quieter shoulder season in
+October"*. The clause is written about one destination, so a plural subject
+disagrees with the pronoun inside it. The count is the heading and the clause
+is a `.whyall` line under it — which is the component whose entire job is *a
+clause true of every result in this set*, already on this page twice, so the
+group needs no second grammar.
+
+**AND THE ROW'S HEADING LEVEL HAD TO FOLLOW THE GROUPING.** *The level is the
+outline and the class is the look*: a row's name is an h2 where the LIST IS
+THE PAGE and an h3 inside a band whose own h2 is the level above it. Both
+states exist on this family now — a grouped page puts each list inside a
+section with a heading, so a row there is an h3, and the two ungrouped pages
+keep h2. Read off `grouped` rather than passed per call site, which is the
+fourteen-call-sites-forgot-the-motif failure not repeated.
+
+### CONTENT PRESERVATION
+
+- [x] every content item retained — every match, every clause, every
+      summary, the map, the strip, the query note, both related bands
+- [x] existing counts retained and derived — and each group's count is new
+- [x] existing links retained
+- [x] existing destinations retained
+- [x] existing relationships retained
+- [x] existing functionality retained — this page loads no JavaScript
+- [x] existing data loaders reused — `motion_match` is the same engine and
+      still reads both tag sources; only the clause it emits changed
+- [x] existing map engine reused
+- [x] existing image and provenance system reused — **nothing was acquired**
+
+### DESIGN TRANSFORMATION
+
+- [x] the page has a new composition — groups derived from the query
+- [x] the existing structure was not merely reskinned — the grouping is the
+      query's own axis, and the row-level claim is now true
+- [x] the opening communicates the page's purpose
+- [x] the content hierarchy was reconsidered
+- [x] photography has an editorial role — unchanged from Part 5
+- [x] the map or the data has a meaningful visual role
+- [x] the sections have different visual rhythms — 2 to 4 groups, sized by
+      the data
+- [x] the page does not read as a CMS listing — 54% → 31%
+- [x] the page has a memorable signature moment — the query drawn as a
+      shape, and now the answer split by how it qualified
+
+### Recorded and not closed
+
+**/europe-in/hidden-villages is 58% and keeps its list.** Its clause is a
+discoverability score, and the honest grouping would be a BAND over that
+number — authoring a classification on a derived measurement, which the Data
+Integrity Rule permits and /journeys' three paces are precedent for. It is a
+separate decision with its own thresholds to justify, so the page is ordered
+by the score instead and the figure is recorded rather than hidden.

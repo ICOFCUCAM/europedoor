@@ -9025,16 +9025,77 @@ def category_page(data, cat, sub=None):
     # Mikulov, Copenhagen, Bordeaux — the order becomes legible, and the
     # first thing a reader gets is the discriminator they are actually
     # scanning for on a page that spans twenty-six countries.
-    rows = "".join(
-        f"""<li class="invite"><a href="{urls.city(it['country'], it['region'], it['city'])}">
+    # AND THE SAME GUARD WAS APPLIED TO ONE OF TWO FIELDS. The paragraph
+    # above says the kind is printed only where it distinguishes, and the
+    # BAND was printed unconditionally beside it — so /experiences/luxury
+    # said "high" on all five of its invitations and /experiences/food said
+    # "low" thirty times and "moderate" eighteen, with no "high" anywhere.
+    # That is *never explain the constraint back*, in the field next to the
+    # one it was written for.
+    #
+    # AND IT WAS PRINTING THE RAW SLUG. `data/taxonomy.json` gives each
+    # budget band a NAME and a note — Frugal, Comfortable, Generous, each
+    # with a sentence — and both invite call sites printed `low`,
+    # `moderate`, `high`. An enum value is an identifier for a program;
+    # every other surface on this site that shows a budget shows the name.
+    bandname = {b["slug"]: b["name"] for b in data["taxonomy"]["budgets"]}
+    bandnote = {b["slug"]: b["note"] for b in data["taxonomy"]["budgets"]}
+
+    def _invites(part, withband):
+        ilvl = "h3" if bgrouped else "h2"
+        return "".join(
+            f"""<li class="invite"><a href="{urls.city(it['country'], it['region'], it['city'])}">
         <p class="invite-where">{esc(it['city']['name'])}, {esc(it['country']['name'])}"""
-        + (f" · {esc(kindname.get(it['exp']['kind'], it['exp']['kind']))}"
-           if len(kindsin) > 1 else "")
-        + f""" · {esc(it['exp']['band'])}</p>
-        <h2>{esc(it['exp']['name'])}</h2>
+            + (f" · {esc(kindname.get(it['exp']['kind'], it['exp']['kind']))}"
+               if len(kindsin) > 1 else "")
+            + (f" · {esc(bandname.get(it['exp']['band'], it['exp']['band']))}"
+               if withband else "")
+            + f"""</p>
+        <{ilvl}>{esc(it['exp']['name'])}</{ilvl}>
         <p class="invite-sum">{esc(it['exp']['summary'])}</p></a></li>"""
-        for it in chosen
-    )
+            for it in part)
+
+    # THE LIST HAD NO STRUCTURE AND `tools/monotony.js` SAID SO: 48
+    # `.invite` siblings, 4,065 pixels of a 7,142-pixel page, **with no
+    # second component at all** — the report's own diagnostic for a page
+    # that is a list and nothing else, and the worst figure left on the site
+    # once /countries and the motion pages came down.
+    #
+    # WHAT AN INVITATION COSTS IS THE ONE EXCLUSIVE AXIS THESE RECORDS
+    # CARRY. The sub-categories cannot group this list and that refusal is
+    # already recorded: six of Food's 48 are in no sub-category and eight
+    # are in two, so the grouping would need a bucket the page has no name
+    # for and would print some invitations twice. A band is one per record,
+    # it is a real decision a reader makes, and the distribution is itself
+    # the finding — **nothing in Food & drink or in Culture is generous at
+    # all**, 0 of 48 and 0 of 52, where Luxury is 5 of 5.
+    #
+    # And the group's hoisted line is the taxonomy's own note rather than a
+    # sentence written here, so a page cannot describe a band differently
+    # from the planner that spends it.
+    bandsin = {}
+    for it in chosen:
+        bandsin.setdefault(it["exp"]["band"], []).append(it)
+    order = [b["slug"] for b in data["taxonomy"]["budgets"]]
+    bgrouped = len(bandsin) > 1 and all(
+        len(v) >= GROUP_MIN for v in bandsin.values())
+    if bgrouped:
+        # FRUGAL FIRST, WHICH IS THE TAXONOMY'S OWN ORDER rather than
+        # largest first. A motion's groups are unordered clauses and take
+        # the largest; a budget band is a SCALE, and printing Comfortable
+        # above Frugal because there are more of them would be sorting an
+        # ordered axis by population.
+        rows = "".join(
+            f'<section class="invband">'
+            f'<h2 class="mini">{n_of(len(bandsin[b]), "experience")}</h2>'
+            f'<p class="whyall"><span>{esc(bandname[b])}</span> '
+            f'{esc(bandnote[b])}</p>'
+            f'<ol class="invites">{_invites(bandsin[b], False)}</ol>'
+            f'</section>'
+            for b in order if b in bandsin)
+    else:
+        rows = (f'<ol class="invites">{_invites(chosen, len(bandsin) > 1)}</ol>'
+                if chosen else "")
     subcards = ""
     if not sub and cat.get("subs"):
         counts = {sb["slug"]: len(C.select(items, cat, sb)) for sb in cat["subs"]}
@@ -9221,12 +9282,12 @@ def category_page(data, cat, sub=None):
      over. THE QUERY IS THE PROOF, AND PROOF GOES UNDER THE THING IT
      PROVES: the rule now sits below the list, beside the sub-category
      rulenote, which was already there and is the same kind of sentence. -->
-<ol class="invites">{rows or empty_state(
+{rows or empty_state(
       "Nothing matches this rule yet.",
       "The rule is printed below and is the same one every other list on "
       "this site is built from. An empty list is better than a padded one, "
       "and widening the rule until something fell in would make every other "
-      "list on the site mean less.")}</ol>
+      "list on the site mean less.")}
 {f'<p class="listrule">How this list is built: {esc(C.rule_text(cat))}</p>' if not sub else ""}
 {rulenote}
 """
@@ -9793,6 +9854,11 @@ def experience_kind_page(data, kind, name):
     # reason, and a subscript like ["experience_kinds"] puts quotes inside the
     # expression where that regex sees them as the reason itself.
     nkinds = numword(len(data["taxonomy"]["experience_kinds"]))
+    # THE BAND'S NAME RATHER THAN ITS SLUG, which the category page one
+    # function up records at length: `data/taxonomy.json` gives each budget
+    # band a name and a note, and both invite call sites printed the
+    # identifier.
+    bandname = {b["slug"]: b["name"] for b in data["taxonomy"]["budgets"]}
     # The kind is not printed on a kind page: every row on it is that kind
     # by definition, which is the constraint explained back.
     rows = "".join(
@@ -9800,7 +9866,7 @@ def experience_kind_page(data, kind, name):
         <h2>{esc(it['exp']['name'])}</h2>
         <p class="invite-sum">{esc(it['exp']['summary'])}</p>
         <p class="invite-where">{esc(it['city']['name'])}, {esc(it['country']['name'])}
-        · {esc(it['exp']['band'])}</p></a></li>"""
+        · {esc(bandname.get(it['exp']['band'], it['exp']['band']))}</p></a></li>"""
         for it in items
     )
     body = f"""
@@ -14848,10 +14914,27 @@ def search_page(data):
 # plus the journeys and themes that match, is the opposite of thin — but the
 # number matters, and it is small on purpose.
 
+# A SECTION HOLDING FEWER THAN THREE IS A HEADING OVER A ROW, and three is
+# the smallest number for which "group" is the right word. The case it
+# excludes is real in both families that read it: the northern lights are
+# eight destinations at eight distinct latitudes, which would be eight
+# headings over one row each — the nine-desks-one-story layout the stories
+# index was thrown away for — and /experiences/history holds exactly one
+# generous invitation among thirty.
+#
+# ONE NUMBER, because two families decide the same question and *a second
+# implementation of a thing is a second chance to make its mistake*. What
+# each family groups BY is its own: a motion groups by the clause its query
+# matched, a category by what an invitation costs. The floor is the shared
+# part and it is the only shared part.
+GROUP_MIN = 3
+
+
 def motion_match(data, m, cid, n):
     """Does one destination satisfy one motion? Returns (bool, reasons)."""
     c, r, t = n["country"], n["region"], n["city"]
-    tags = set(t["interests"]) | set(r["interests"])
+    own, near = set(t["interests"]), set(r["interests"])
+    tags = own | near
     why = []
 
     wants = m.get("interests", [])
@@ -14860,12 +14943,35 @@ def motion_match(data, m, cid, n):
         if m.get("all_interests"):
             if len(hit) != len(wants):
                 return False, []
-            why.append("carries " + and_list(
-                [data["interests"][w]["name"] for w in wants]))
         else:
             if not hit:
                 return False, []
-            why.append("tagged " + and_list([data["interests"][w]["name"] for w in hit]))
+        # THE ROW-LEVEL CLAIM WAS THE ONE HALF OF THIS THAT STAYED FALSE.
+        # The previous commit measured that `tags` is the UNION of a
+        # destination's own interests and its region's — 537 extra tag
+        # applications across the seventeen interests — and fixed the
+        # sentence the PAGE prints. Every ROW went on saying "tagged
+        # Islands", which for Tartu, a mainland university town in the
+        # region "Tartu & South Estonia", is not true of the destination at
+        # all: its region carries the tag. **Measured on the shown sets: 15
+        # of the 25 on Europe's islands, 25 of 56 on the coastlines, 24 of
+        # 59 on the mountains and 19 of 55 on the sacred world qualify on
+        # their region rather than on themselves.** On the one family whose
+        # whole credibility claim is that a page prints what produced it, a
+        # majority of one page's rows made a claim about the wrong record.
+        # The clause says which side it came from now, and the page groups
+        # the list by it so the clause is hoisted once per group rather than
+        # restated on every row.
+        mine = [w for w in hit if w in own]
+        theirs = [w for w in hit if w not in own]
+        nm = lambda ws: and_list([data["interests"][w]["name"] for w in ws])
+        verb = "carries" if m.get("all_interests") else "tagged"
+        if mine and theirs:
+            why.append(f"{verb} {nm(mine)}, in a region tagged {nm(theirs)}")
+        elif mine:
+            why.append(f"{verb} {nm(mine)}")
+        else:
+            why.append(f"in a region tagged {nm(theirs)}")
 
     months = m.get("months", [])
     if months:
@@ -15049,21 +15155,130 @@ def motion_page(data, m):
     # built on. On the hidden-villages page every row said "not the capital
     # and editorially quiet", which is a restatement of the query the reader
     # is already reading two inches above. A clause true of every result is
-    # hoisted into the query note; each row keeps only what distinguishes it.
-    common = [c for c in (shown[0][1] if shown else [])
-              if all(c in w for _n, w in shown)]
-    rows = "".join(
-        f"""<a class="row" href="{urls.city(n['country'], n['region'], n['city'])}">
-        <div><h2>{esc(n['city']['name'])}</h2>
+    # hoisted; each row keeps only what distinguishes it.
+    #
+    # AND THE LIST IS GROUPED BY THAT DISTINGUISHING CLAUSE, WHICH IS ONE
+    # MECHANISM FOR ALL TWELVE QUERIES. This page measured **54% one
+    # component** — thirty-eight `.row` siblings with no second component at
+    # all, which is `tools/monotony.js`'s own diagnostic for a page that is
+    # a list and nothing else. The list is the right answer here, because
+    # the page IS the result of a query; what was missing was any structure
+    # inside it, and the structure the data already holds is WHY each
+    # result is in the set.
+    #
+    # `motion_match` returns the clauses each destination satisfied. Hoist
+    # the ones every result shares, group by what is left, and the groups
+    # come out of the query rather than out of a taxonomy somebody chose:
+    #
+    #     islands          10 tagged Islands · 15 in a region tagged Islands
+    #     autumn           42 October · 26 September · 15 November · 8 both
+    #     hidden villages  22 scoring 97 · 14 scoring 84 · 9 scoring 90 · …
+    #     the coast        31 tagged Coast & beaches · 25 in a region tagged
+    #
+    # The interest split is the sharpest of them and it is the previous
+    # commit's own finding one level down: `motion_match` reads the union of
+    # a destination's own interests and its region's, so **15 of the 25 on
+    # Europe's islands are there on their region's tags** — Tartu is a
+    # mainland university town in "Tartu & South Estonia". That commit fixed
+    # the sentence the PAGE prints and left every ROW claiming "tagged
+    # Islands", which is a statement about the wrong record. The clause says
+    # which side it came from now, so the grouping falls out of it.
+    #
+    # A GROUP OF ONE IS NOT A GROUP, IT IS A ROW WITH A HEADING — which is
+    # the nine-desks-one-story layout the stories index was thrown away for.
+    # The northern lights are eight destinations at eight distinct
+    # latitudes, so grouping them would produce eight headings over one row
+    # each; the page keeps its list. The test is the mean group size, and
+    # three is the smallest number for which "group" is the right word.
+    def _vary(why, common):
+        return tuple(c for c in why if c not in common)
+
+    common_all = [c for c in (shown[0][1] if shown else [])
+                  if all(c in w for _n, w in shown)]
+    buckets = {}
+    for n, why in shown:
+        buckets.setdefault(_vary(why, common_all), []).append((n, why))
+    # EVERY GROUP, NOT THE AVERAGE. The first test was the mean group size
+    # and it let a tail through: hidden villages splits 22, 14, 9, 8, 6, 3,
+    # 1, 1, 1 — a mean of 7.2 and three sections holding one row each, which
+    # is the exact case the floor was written for. A heading over one row
+    # carries nothing the row does not.
+    grouped = len(buckets) > 1 and all(
+        len(v) >= GROUP_MIN for v in buckets.values())
+
+    # THE LEVEL IS THE OUTLINE AND THE CLASS IS THE LOOK, which this
+    # stylesheet records about the `row` shape: a row's name is an h2 where
+    # the LIST IS THE PAGE and an h3 inside a band whose own h2 is the level
+    # above it. Both states exist on this family now — a grouped page puts
+    # each list inside a section with its own heading, so a row there is an
+    # h3, and the two ungrouped pages keep h2 because the list is still the
+    # page. Reading it off `grouped` rather than passing it per call site is
+    # the fourteen-call-sites-forgot-the-motif failure not repeated.
+    lvl = "h3" if grouped else "h2"
+
+    def _rows(part):
+        common = [c for c in (part[0][1] if part else [])
+                  if all(c in w for _n, w in part)]
+        body = "".join(
+            f"""<a class="row" href="{urls.city(n['country'], n['region'], n['city'])}">
+        <div><{lvl}>{esc(n['city']['name'])}</{lvl}>
         <p class="rowsub">{esc(n['city']['summary'])}</p>
         {f'<p class="whythis">{esc(and_list([c for c in why if c not in common]))}.</p>'
-         if [c for c in why if c not in common] else ""}</div>
+             if [c for c in why if c not in common] else ""}</div>
         <p class="rowmeta">{esc(n['country']['name'])}<br><span class="small">
         {nights_line(n['city'])}</span></p></a>"""
-        for n, why in shown
-    )
-    shared_note = (f'<p class="whyall"><span>All of them</span> {esc(and_list(common))}.</p>'
-                   if common else "")
+            for n, why in part)
+        return common, body
+
+    blocks, shared_note = [], ""
+    if not grouped:
+        # AND THE LIST THAT STAYS A LIST IS ORDERED BY THE CLAUSE THAT WOULD
+        # HAVE GROUPED IT. Two of the twelve keep their list — hidden
+        # villages, whose clause is a discoverability SCORE with a long tail
+        # of values held by one destination each, and the northern lights,
+        # which are eight destinations at eight distinct latitudes. Both
+        # were sorted alphabetically by country, which is *the order a
+        # reader is given is alphabetical by a key they cannot see*: the
+        # runs are together now, largest first, so the quietest villages
+        # lead the page whose whole argument is the score. Ordered by the
+        # bucket's own SIZE rather than by the clause string, because
+        # "scores 97" sorting before "scores 84" is an accident of decimal
+        # notation.
+        shown.sort(key=lambda x: (-len(buckets[_vary(x[1], common_all)]),
+                                  _vary(x[1], common_all),
+                                  x[0]["country"]["name"], x[0]["city"]["name"]))
+        common, body = _rows(shown)
+        shared_note = (f'<p class="whyall"><span>All of them</span> '
+                       f'{esc(and_list(common))}.</p>' if common else "")
+        blocks.append(f'<div class="rows molist">{body}</div>')
+    else:
+        # LARGEST GROUP FIRST, because most of the answer is the answer. The
+        # alternative is the order the clauses happened to be built in,
+        # which is *the order a reader is given is alphabetical by a key
+        # they cannot see* in another costume.
+        shared_note = (f'<p class="whyall"><span>All of them</span> '
+                       f'{esc(and_list(common_all))}.</p>' if common_all else "")
+        for vary, part in sorted(buckets.items(), key=lambda kv: (-len(kv[1]), kv[0])):
+            # THE GROUP'S OWN HOISTED LINE, IN THE PAGE'S EXISTING
+            # VOCABULARY. `_rows` already computes what every row in a set
+            # shares, and inside a group that is the whole varying clause —
+            # so the group head is the count and `.whyall` is the clause,
+            # which is the component whose entire job is *a clause true of
+            # every result in this set*, already on this page twice. The
+            # first version set the clause IN the heading and produced
+            # "42 destinations, in its quieter shoulder season in October":
+            # the clause is written about one destination, so a plural
+            # subject disagrees with its own pronoun. A count as the
+            # heading and the clause under it says the same thing and needs
+            # no second grammar.
+            _c, body = _rows(part)
+            blocks.append(
+                f'<section class="moqual">'
+                f'<h2 class="mini">{n_of(len(part), "destination")}</h2>'
+                + (f'<p class="whyall"><span>All of them</span> '
+                   f'{esc(and_list(_c))}.</p>' if _c else "")
+                + f'<div class="rows molist">{body}</div></section>')
+    rows = "".join(blocks)
 
     # THE ANSWER TO THE QUERY, AS A SHAPE.
     #
@@ -15219,7 +15434,7 @@ def motion_page(data, m):
 {querynote}
 {shared_note}
 {_mstrip}
-<div class="rows">{rows}</div>
+{rows}
 
 {section("Journeys that go this way", f'<div class="rows journeyrows">{jrelated}</div>') if jrows else ""}
 {section("Themes that run through it", f'<div class="rows">{trelated}</div>') if trows else ""}

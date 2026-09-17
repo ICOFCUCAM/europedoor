@@ -6000,6 +6000,102 @@ capped at 24rem with `width: auto`, which keeps the proportion the rhythm is
 about; holding it back to 1.282 below the breakpoint would reintroduce the
 fault at the width most readers are at.
 
+**THE MOTION PAGE'S ROW-LEVEL CLAIM STAYED FALSE AFTER THE SENTENCE WAS
+FIXED, AND THE LIST HAD NO STRUCTURE AT ALL.** /europe-in/‹motion› measured
+**54%, thirty-eight `.row` siblings with no second component** — the worst
+figure on the site once /countries came down. The previous commit measured
+that `motion_match` reads the UNION of a destination's own interests and its
+region's and fixed the sentence the PAGE prints; every ROW went on saying
+*tagged Islands*, which for Tartu — a mainland university town in the region
+"Tartu & South Estonia" — is a claim about the wrong record. Measured on the
+shown sets: **15 of the 25 on Europe's islands**, 25 of 56 on the
+coastlines, 24 of 59 on the mountains, 19 of 55 on the sacred world and 12
+of 25 on winter qualify on their region rather than on themselves.
+
+**ONE MECHANISM FOR ALL TWELVE QUERIES: the list is grouped by the clause
+each result satisfied.** Hoist what every result shares, group by what is
+left, and the groups come out of the query rather than out of a taxonomy
+somebody chose — islands 15/10, autumn 42 October / 26 September / 15
+November / 8 both, the medieval world 51/8/5/3. **A GROUP OF ONE IS NOT A
+GROUP, IT IS A ROW WITH A HEADING**, and the first test was the MEAN group
+size, which let a tail through: hidden villages splits 22, 14, 9, 8, 6, 3,
+1, 1, 1 — a mean of 7.2 and three sections holding one row each. Every group
+must hold three now, so two of the twelve keep their list and are **ordered
+by the run that would have grouped them**, largest first, where both had
+been alphabetical by country. Ordered by the run's own SIZE rather than the
+clause string, because "scores 97" sorting before "scores 84" is an accident
+of decimal notation. 54% → **31%**, with 8% behind it.
+
+**AND THE LIST SETS IN TWO COLUMNS, WHICH FIXED A MEASURE AS WELL AS A
+HEIGHT.** A motion row is 1,232 × 97 at 1280 and its summary — a sentence of
+prose — occupied **1,120 pixels on one line**, because `.row .rowsub` carries
+`max-width: none`. The reason written on that rule is exact and about a
+different content type: *`.rowsub` is a `<p>` holding a middot-separated
+list of place names … nobody reads a list of names end to start, they scan
+it.* A destination's SUMMARY is prose and 140 characters on one line is what
+a measure exists to prevent; the generalisation was one family too far. Two
+columns give 68 characters, and the page falls 7,497 → 6,133 pixels.
+
+**A CHECK PINNED A SOURCE SPELLING — the twelfth here to pin a shape rather
+than a promise.** `c_motion_query_breadth` required the literal
+`set(t["interests"]) | set(r["interests"])` and went red the moment that line
+became `own, near = …` followed by `own | near` so the clause could say which
+side it came from, which is MORE of what the check protects. The engine half
+is behavioural now: at least one destination must be returned whose region
+carries the tag while it does not. Proved red by narrowing it.
+
+**And the group head disagreed with its own pronoun.** *"42 destinations, in
+its quieter shoulder season in October"* — the clause is written about one
+destination, so a plural subject disagrees with the pronoun inside it. The
+count is the heading and the clause is the `.whyall` line under it, which is
+the component whose entire job is *a clause true of every result in this
+set*. **And the row's heading level follows the grouping**: h3 inside a
+group whose own h2 is above it, h2 on the two pages where the list is still
+the page, read off `grouped` rather than passed per call site.
+
+**AN EXPERIENCE CATEGORY PRINTED THE SPEND BAND ON EVERY ROW AND THE KIND
+ONLY WHERE IT DISTINGUISHED — THE SAME GUARD, APPLIED TO ONE OF TWO FIELDS
+SITTING NEXT TO EACH OTHER.** The builder's own comment records why the kind
+is conditional (*on /experiences/food every row said CELLAR & VINEYARD or
+FOOD & TABLE forty-eight times … never explain the constraint back*) and the
+band beside it was unconditional, so **/experiences/luxury said "high" on all
+five of its invitations** and food said "low" thirty times with no "high"
+anywhere on the page. **And it was printing the raw slug**: `taxonomy.json`
+gives each band a NAME and a note — Frugal, Comfortable, Generous — and both
+invite call sites, plus the kind page, printed `low`/`moderate`/`high`. An
+enum value is an identifier for a program.
+
+**WHAT AN INVITATION COSTS IS THE ONE EXCLUSIVE AXIS THOSE RECORDS CARRY**,
+and the list had no structure at all: 48 `.invite` siblings, **51% with no
+second component**, the worst figure left on the site. The sub-categories
+cannot group it and that refusal was already recorded — six of Food's 48 are
+in no sub-category and eight are in two — where a band is one per record. The
+distribution is itself the finding: **nothing in Food & drink or in Culture is
+generous at all**, 0 of 48 and 0 of 52, where Luxury is 5 of 5. The hoisted
+line is the taxonomy's own note, so a page cannot describe a band differently
+from the planner that spends it. **Frugal first, which is the taxonomy's order
+rather than largest first** — a motion's groups are unordered clauses and take
+the largest; a budget band is a SCALE, and printing Comfortable above Frugal
+because there are more of them would be sorting an ordered axis by
+population. 51% → **36%**, and the sub-category page 31% → **16%**.
+
+**AND `columns` PACKS WHERE A GRID ALIGNS, WHICH THIS FAMILY HAD ALREADY
+LEARNED ONE LEVEL UP.** The invitations were already two columns and a GRID,
+whose row is as tall as its tallest item: 48 of them took **4,065 pixels**
+where twenty-four rows of the tallest need about 3,384 — seven hundred pixels
+paid for the difference between a one-line summary and a three-line one,
+twenty-four times. The /experiences index recorded exactly this about its
+eight category panoramas.
+
+**ONE FLOOR, TWO FAMILIES.** `GROUP_MIN` is 3 — a section holding fewer than
+three is a heading over a row — read by the motion pages and by the category
+pages, because *a second implementation of a thing is a second chance to make
+its mistake*. What each family groups BY is its own: a motion groups by the
+clause its query matched, a category by what an invitation costs. Three of the
+eight categories keep one flat list under it (nature 11/15/**2**, history
+18/11/**1**, luxury one band) and keep the band on the row, because there it
+distinguishes.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

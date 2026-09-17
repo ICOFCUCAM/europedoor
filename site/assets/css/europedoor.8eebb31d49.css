@@ -2222,9 +2222,17 @@ a .kicker { color: var(--ink-3); }
    invitation IS a top-level item of this page, so h2 is what it was all
    along; the size is set here because a heading's level is its place in the
    document and not its size. */
-.invite h2 { font-size: var(--t-md); line-height: 1.25;
+/* AND :is(h2, h3) SINCE THE LIST GAINED GROUPS. The paragraph above is
+   still right about the ungrouped case and stopped being the only case: a
+   category whose invitations split into budget bands puts each list inside
+   a section with its own h2, so an invitation there is an h3 — *the level
+   is the outline and the class is the look*, which is why the size lives
+   on the class. Three of the eight categories keep one flat list and keep
+   h2. */
+.invite :is(h2, h3) { font-size: var(--t-md); line-height: 1.25;
              margin: 0 0 var(--s2); color: var(--ink); font-weight: 700; }
-.invite a:hover h2, .invite a:focus-visible h2 { color: var(--door); }
+.invite a:hover :is(h2, h3),
+.invite a:focus-visible :is(h2, h3) { color: var(--door); }
 .invite-sum { margin: 0; color: var(--ink-2); max-width: 46ch; }
 /* THE PLACE IS THE KICKER, so it takes the kicker's ink rather than the
    footnote's. It was --ink-3 when it sat at the bottom of the entry as the
@@ -2235,6 +2243,24 @@ a .kicker { color: var(--ink-3); }
    which this stylesheet has already recorded once on /journeys. */
 .invite-where { margin: 0 0 var(--s1); font-size: var(--t-xs); letter-spacing: .08em;
                 text-transform: uppercase; color: var(--ink-2); }
+/* ── what an invitation costs ──────────────────────────────── */
+/* THE LIST HAD NO STRUCTURE AND THAT WAS THE WHOLE FAULT: 48 `.invite`
+   siblings, 4,065 pixels of a 7,142-pixel page, **with no second component
+   at all**, which is `tools/monotony.js`'s own diagnostic for a page that
+   is a list and nothing else — and the worst figure left on the site once
+   /countries and the motion pages came down.
+
+   The sub-categories cannot group it and that refusal is recorded: six of
+   Food's 48 are in no sub-category and eight are in two. A budget band is
+   one per record, and the distribution is itself the finding — nothing in
+   Food & drink or in Culture is generous at all, 0 of 48 and 0 of 52,
+   where Luxury is 5 of 5. The hoisted line is the taxonomy's own note, so
+   a page cannot describe a band differently from the planner that spends
+   it. */
+.invband { margin-top: var(--s7); }
+.invband > .mini { margin: 0 0 var(--s3); }
+.invband .invites { margin-top: var(--s5); }
+
 /* The selection rule, under the list it selected — a band with its own
    heading used to stand in front of it. */
 .listrule { margin: var(--s7) 0 0; max-width: 60ch; font-size: var(--t-sm);
@@ -2262,8 +2288,16 @@ a .kicker { color: var(--ink-3); }
    caption on that one sub-category rather than on the set. */
 .sublinks.shares + .small { margin-top: var(--s5); }
 @media (min-width: 62rem) {
-  .invites { grid-template-columns: repeat(2, minmax(0, 1fr));
-             column-gap: var(--s8); }
+  /* `columns` PACKS WHERE A GRID ALIGNS, and these entries differ by a line
+     of summary. Measured on /experiences/food: 48 invitations in a
+     two-column GRID took 4,065 pixels where twenty-four rows of the tallest
+     item need about 3,384 — nearly seven hundred pixels paid for the
+     difference between a one-line summary and a three-line one, twenty-four
+     times. That is the /experiences finding about its eight category
+     panoramas, one level down on the same family. Column-major order is
+     correct because the list is sorted by country and read down. */
+  .invites { display: block; columns: 2; column-gap: var(--s8); }
+  .invite { break-inside: avoid; margin-bottom: var(--s6); }
 }
 
 /* ── the map ──────────────────────────────────────────────── */
@@ -12372,3 +12406,47 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 /* ── 04 what this drawing is ──────────────────────────────────────── */
 .sheet-mapsay .lit { font-style: normal; color: var(--door-dark); }
 .sheet-mapsay .note { margin-top: var(--s5); max-width: 46rem; }
+
+/* ═══ /europe-in/‹motion› — the answer, split by how it qualified ══════ */
+/* THE WORST MONOTONY FIGURE ON THE SITE AFTER /countries CAME DOWN: 54%,
+   thirty-eight `.row` siblings of a 6,894-pixel page, with **no second
+   component at all** — which is this instrument's own diagnostic for a page
+   that is a list and nothing else. The list is the right answer here (the
+   page IS the result of a query) and what was missing is any structure
+   inside it.
+
+   TWO GROUPS, DERIVED, WHERE BOTH EXIST. `motion_match` reads the union of
+   a destination's own interests and its region's, so 15 of the 25 on
+   Europe's islands are there on their region's tags — Tartu, a mainland
+   university town in "Tartu & South Estonia". The clause is hoisted once
+   per group instead of restated on every row, which is this family's own
+   rule (*never explain the constraint back*) applied one level down. */
+.moqual { margin-top: var(--s7); }
+.moqual > .mini { margin: 0 0 var(--s3); }
+
+/* AND THE LIST SETS IN TWO COLUMNS, WHICH FIXES A MEASURE AS WELL AS A
+   HEIGHT. Measured at 1280 a motion row is 1,232 x 97 and its summary — a
+   sentence of prose — occupies **1,120 pixels on one line**, because
+   `.row .rowsub` carries `max-width: none`. The reason written on that rule
+   is exact and it is about a different content type: *`.rowsub` is a <p>
+   holding a middot-separated list of place names … nobody reads a list of
+   names end to start, they scan it.* A destination's SUMMARY is prose, and
+   140 characters on one line is the fault a measure exists to prevent —
+   the generalisation was one family too far. Two columns give about 68
+   characters, which is the line a reader can follow, and the band falls
+   from 3,694 pixels to about 2,200.
+
+   `columns` rather than a grid, for the reason /experiences recorded: a
+   grid row is as tall as its tallest item, and these rows differ by a line
+   of summary. Column-major order is correct because the list is sorted by
+   country and read down. */
+@media (min-width: 62rem) {
+  .molist { columns: 2; column-gap: var(--s7); }
+  .molist .row { break-inside: avoid; }
+  /* A COLUMN RULE IS NOT A ROW RULE. `.rows` draws a border along its top
+     and each row along its bottom; in two columns the top border would run
+     over both columns once and read as a rule belonging to the left one
+     only. The rows' own bottom borders are the separation, exactly as they
+     are in one column. */
+  .molist { border-top: 0; }
+}

@@ -289,6 +289,9 @@ page at 50% with nothing else is the fault.
 | page | largest repeated | next two | audit |
 |---|---:|---|---|
 | /countries | 25% | 20%, 8% | `docs/countries-redesign.md` Part 8 |
+| /europe-in/‹motion› | 31% | 8% | `docs/europe-in-redesign.md` §10 |
+| /experiences/‹category› | 36% | 20% | `docs/experiences-redesign.md` Part 8 |
+| /experiences/‹cat›/‹sub› | 16% | 15%, 6% | the same pass |
 | /europe-in | 36% | 12%, 2% | `docs/europe-in-redesign.md` Part 9 |
 | /interests | 33% | 16% | `docs/interests-redesign.md` Part 8 |
 | /journeys | 33% | 5%, 4% | `docs/journeys-redesign.md` Part 8 |
@@ -305,12 +308,12 @@ page at 50% with nothing else is the fault.
 its defence: everything that made it an instrument was inside two closed
 `<details>`, and a box a reader cannot scroll to is outside the measurement.
 
-**Three pages are still open and each is named rather than glossed:**
+**The three that were open, and where they stand.** Two are closed in the same session that named them; the third is named rather than glossed:
 
 | page | share | and | the recorded position |
 |---|---:|---|---|
-| /europe-in/‹motion› | 54% | 38 × `row`, nothing else | the worst figure on the site |
-| /experiences/‹category› | 51% | 48 × `invite`, **no second component** | geography is refused there and the sub-category grouping is refused by the data; the exclusive axis those records carry has not been looked at |
+| ~~/europe-in/‹motion›~~ | ~~54%~~ **31%** | 30 × `row`, then 8% | **closed** — grouped by the clause each result satisfied, `docs/europe-in-redesign.md` §10 |
+| ~~/experiences/‹category›~~ | ~~51%~~ **36%** | 30 × `invite`, then 20% | **closed** — grouped by what an invitation costs, `docs/experiences-redesign.md` Part 8 |
 | /how-it-works | 52% | 3 × `band`, then 20% and 12% | a prose page, and three bands with two other components is a composition |
 
 And five more the instrument lists that nobody has redesigned:

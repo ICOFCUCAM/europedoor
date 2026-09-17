@@ -49,9 +49,18 @@ const MT = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript",
 // 63 -> 55: /countries' nine macro bands became three rhythms derived from
 // each region's own shape in kilometres (4 portrait / 3 upright / 2
 // panoramic), and the page's largest repeated composition is 25% with the
-// next two at 20 and 8. The new worst is a motion page at 54%, so the
-// ceiling is that figure and the next recomposition moves it again.
-const CEILING = 0.55;
+// next two at 20 and 8.
+//
+// 55 -> 52: a motion page's thirty-eight rows became two groups derived
+// from the clause each result satisfied — 31% with 8% behind it. And an
+// experience category's forty-eight invitations became budget bands (36%
+// with 20% behind it, and its sub-category page 31% -> 16%), so the worst
+// left is /how-it-works at 52%: three bands with 20% and 12% behind them,
+// which is a composition by this report's own diagnostic rather than a
+// listing. The pages above it in the table are all ones nobody has
+// redesigned — /for-businesses 51%, a macro region 48%, a facet page 46%,
+// /fund 45%, /search 42%.
+const CEILING = 0.52;
 
 const srv = http.createServer((q, r) => {
   let p = decodeURIComponent(q.url.split("?")[0]);

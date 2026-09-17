@@ -229,3 +229,140 @@ that is a list and nothing else. `docs/signature-moments.md` refuses geography
 there and the sub-category grouping is refused by the data (6 of 48 in no sub,
 8 in two); what has NOT been looked at is the one exclusive axis those records
 carry. Recorded here rather than ticked.
+
+---
+
+## Part 8 — the category page, recomposed; and the guard applied to one of two fields
+
+Part 7 named this as the open fault and it was the worst figure left on the
+site once /countries and the motion pages came down: **51%, forty-eight
+`.invite` siblings, 4,065 pixels of a 7,142-pixel page, with no second
+component at all.**
+
+### Inspect
+
+The page holds a photoband, an index head with the reach glyph, four
+sub-category bars, a strip of eight photographed towns, the invitations, and
+the selection rule under them. An invitation carries a slug, a name, a kind,
+a **band** and a summary — and the destination it happens in.
+
+Measured across the eight categories:
+
+| category | n | countries | bands | subs |
+|---|---:|---:|---|---|
+| family | 131 | 42 | 85 low / 46 moderate | none declared |
+| adventure | 124 | 44 | 74 / 46 / 4 | 5 |
+| culture | 52 | 27 | 33 / 19 / **0** | 5 |
+| food | 48 | 26 | 30 / 18 / **0** | 4 |
+| faith | 42 | 23 | 30 / 12 / 0 | 4 |
+| history | 30 | 21 | 18 / 11 / 1 | 6 |
+| nature | 28 | 18 | 11 / 15 / 2 | 4 |
+| luxury | 5 | 2 | **5 high** | none |
+
+### Two findings before any layout
+
+**THE SAME GUARD WAS APPLIED TO ONE OF TWO FIELDS.** The builder's own
+comment says the KIND is printed only where it distinguishes — *on
+/experiences/food every row said CELLAR & VINEYARD or FOOD & TABLE
+forty-eight times, which is this atlas's own rule broken by the family that
+has the longest lists: never explain the constraint back* — and the BAND sat
+next to it, printed unconditionally. So **/experiences/luxury said "high" on
+all five of its invitations**, and food said "low" thirty times and
+"moderate" eighteen with no "high" anywhere on the page.
+
+**AND IT WAS PRINTING THE RAW SLUG.** `data/taxonomy.json` gives each budget
+band a NAME and a note — Frugal, Comfortable, Generous, each with a sentence
+— and both invite call sites printed `low`, `moderate`, `high`. An enum value
+is an identifier for a program, and every other surface on this site that
+shows a budget shows the name. The kind page had it too.
+
+### Recompose
+
+**What an invitation costs is the one exclusive axis these records carry.**
+The sub-categories cannot group this list and that refusal is already
+recorded in Part 3: six of Food's 48 are in no sub-category and eight are in
+two, so the grouping would need a bucket the page has no name for and would
+print some invitations twice. A band is one per record, it is a real decision
+a reader makes, and **the distribution is itself the finding**: nothing in
+Food & drink or in Culture is generous at all, 0 of 48 and 0 of 52, where
+Luxury is 5 of 5.
+
+The group's hoisted line is **the taxonomy's own note**, so a page cannot
+describe a band differently from the planner that spends it.
+
+**FRUGAL FIRST, WHICH IS THE TAXONOMY'S ORDER RATHER THAN LARGEST FIRST.** A
+motion's groups are unordered clauses and take the largest; a budget band is
+a SCALE, and printing Comfortable above Frugal because there are more of them
+would be sorting an ordered axis by population.
+
+**And the floor is one number for two families.** A section holding fewer
+than three is a heading over a row — `GROUP_MIN`, read by the motion pages
+and by this one, because *a second implementation of a thing is a second
+chance to make its mistake*. What each family groups BY is its own. Three of
+the eight categories keep one flat list under it: nature (11 / 15 / **2**),
+history (18 / 11 / **1**) and luxury (one band), and those keep the band on
+the row because there it distinguishes.
+
+### And `columns` packs where a grid aligns
+
+The invitations were already two columns — and a GRID, whose row is as tall
+as its tallest item. Measured on /experiences/food: 48 invitations took
+**4,065 pixels** where twenty-four rows of the tallest need about 3,384;
+nearly seven hundred pixels paid for the difference between a one-line
+summary and a three-line one, twenty-four times. That is Part 5's own finding
+about the eight category panoramas, one level down on the same family.
+
+| | before | after |
+|---|---:|---:|
+| /experiences/food | 7,142 px | 7,218 |
+| an invitation | 580 × 141 | 580 × 113 |
+| its summary | 3 lines | 2 |
+| **monotony, category** | **51%**, nothing else | **36%**, 20% behind it |
+| **monotony, sub-category** | 31% | **16%**, 15% and 6% behind it |
+
+The page is 76 pixels taller: the two group heads and their notes cost more
+than the packing saves on this category, and on the sub-category pages the
+packing wins outright.
+
+### And the heading level follows the grouping
+
+*The level is the outline and the class is the look.* `.invite h2` carries a
+recorded reason — *each invitation IS a top-level item of this page, and the
+browser suite caught a skipped heading level on two of them* — which is still
+right about the ungrouped case and stopped being the only case. A grouped
+category puts each list inside a section with its own h2, so an invitation
+there is an h3; the three flat categories keep h2. The size lives on the
+class, so `:is(h2, h3)`.
+
+### CONTENT PRESERVATION
+
+- [x] every invitation retained — every name, summary, kind, band, place
+- [x] existing counts retained and derived — and each band's count is new
+- [x] existing links retained
+- [x] existing destinations retained
+- [x] existing relationships retained
+- [x] existing functionality retained
+- [x] existing data loaders reused — `categories.select`, `all_experiences`,
+      and the budget vocabulary is `data/taxonomy.json`'s rather than a
+      second list written here
+- [x] existing map engine reused — the reach glyph is unchanged, and the
+      category map stays REFUSED per Part 3
+- [x] existing image and provenance system reused — **nothing was acquired**
+
+### DESIGN TRANSFORMATION
+
+- [x] the page has a new composition — budget bands where there was one list
+- [x] the existing card/grid structure was not merely reskinned — the grid
+      became packed columns for a measured reason, and the grouping is the
+      records' own axis
+- [x] the opening communicates the page's purpose
+- [x] the content hierarchy was reconsidered
+- [x] photography has an editorial role — unchanged: the photoband and the
+      strip of eight towns, because an experience has no photograph of its
+      own here and the town it happens in does
+- [x] the map or the data has a meaningful visual role
+- [x] the sections have different visual rhythms
+- [x] the page does not read as a CMS listing — 51% → 36%
+- [x] the page has a memorable signature moment — the category drawn as its
+      own spread across Europe, and now *nothing here is generous* said by
+      the absence of a band rather than in a sentence

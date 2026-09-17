@@ -7656,17 +7656,37 @@ def c_motion_query_breadth():
     the failure this repository records as *removing a claim leaves surfaces
     pointing at it*, and no count anywhere would see it.
     """
+    # AND THE ENGINE HALF WAS PINNING A SOURCE SPELLING. It required the
+    # literal `set(t["interests"]) | set(r["interests"])` in
+    # `motion_match`, which is a shape and not a promise — the TWELFTH
+    # assertion in this repository to do that. It went red the moment that
+    # line became `own, near = set(...), set(...)` followed by `own | near`
+    # so the clause each row prints could say WHICH side it came from,
+    # which is more of what the check exists to protect, not less.
+    #
+    # The promise is behavioural: the engine must still return a
+    # destination whose REGION carries the tag while the destination itself
+    # does not. Re-running the engine is the right instrument for that —
+    # the independent half is the destination's own interest list, read
+    # from the data — and it now also asserts the page SHOWS that case,
+    # because the clause is per row rather than per page.
     n = 0
-    src = open(os.path.join(ROOT, "tools", "lib", "pages.py"),
-               encoding="utf-8").read()
-    body = src[src.index("def motion_match("):src.index("def and_list(")]
-    n += 1
-    if 'set(t["interests"]) | set(r["interests"])' not in body:
-        fail("motion_match no longer reads a destination's tags together "
-             "with its region's, and every motion page still prints a "
-             "sentence saying it does")
+    d = D.load()
     motions = json.load(open(os.path.join(ROOT, "data", "motions.json"),
                              encoding="utf-8"))["motions"]
+    wide = 0
+    for m in [x for x in motions if x.get("interests")]:
+        wants = set(m["interests"])
+        for cid, node in d["cities"].items():
+            ok, _why = P.motion_match(d, m, cid, node)
+            if ok and not (wants & set(node["city"]["interests"])):
+                wide += 1
+    n += 1
+    if not wide:
+        fail("no motion returns a destination that qualifies on its "
+             "REGION's tags alone, so `motion_match` has been narrowed to "
+             "a destination's own interests while every motion page still "
+             "prints a sentence saying it reads both")
     tagged = [m for m in motions if m.get("interests")]
     n += 1
     if not tagged:
