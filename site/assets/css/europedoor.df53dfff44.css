@@ -6204,7 +6204,17 @@ body[data-hero] .masthead { position: sticky; }
 /* 46rem WAS THE WHOLE SCREEN. Rendered at 1280 it was a 736-pixel continent
    filling the fold with nothing on it, which is a picture of the emptiness
    shouting about it. 30rem is a glyph you read in one look. */
-.minemap .constel { display: block; width: min(30rem, 100%); }
+/* 30rem WAS WRITTEN FOR A DRAWING UNDER A HEAD AND THIS ONE IS A BAND'S
+   SUBJECT. The cap rendered it **480 pixels wide inside a 1,152-pixel band
+   at 1280, and the same 480 at 834** — the page's one instrument at 42% of
+   its own room, on the family whose signature moment it is. That is
+   /themes' glyph measured at 204 pixels for the whole of Europe, one family
+   over: a size that was right for a figure beside prose and wrong the
+   moment the figure became the argument. It takes the column now, like
+   every other family's subject drawing — the seventeen routes on /journeys
+   and the year band on /events both run the full width for the same
+   reason. Its own proportion is 1000/780 and nothing is cropped. */
+.minemap .constel { display: block; width: 100%; }
 /* AND IT CAME OUT PARCHMENT ON GRAPHITE. `.constel` defaults to
    --atlas-land, which is the PICTURE half of the cartography split, and
    this page is data-world="intelligence" — an instrument. Pictures are
@@ -11433,6 +11443,47 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 }
 
 .sheet-readgo { padding-block: 12vh; }
+
+/* ── MY EUROPE: THE PRIVATE ATLAS ────────────────────────────────────── */
+/* `.sheet-pine` BINDS TOKENS AND SETS NO `display`, exactly like
+   `.sheet-paper`, so both pine bands here would inherit `.sheet`'s
+   `minmax(0, 40%) minmax(0, 1fr)` and put their head in the 40% track. That
+   is the same repair /events and /stories each needed in the two commits
+   before this one — third occurrence, and the rule is now written where a
+   fourth will find it: a ROOM contributes ground, ink and rhythm; the
+   composition inside it does the layout. */
+.sheet-meatlas, .sheet-privacy, .sheet-melist,
+.sheet-mefuture, .sheet-mekinds, .sheet-mebuild { display: block; }
+.sheet-meopen { display: block; padding-block: 8vh 6vh; }
+.sheet-meatlas, .sheet-melist, .sheet-mekinds,
+.sheet-mefuture, .sheet-privacy { padding-block: 9vh; }
+.sheet-mebuild { padding-block: 13vh; }
+
+/* THE DEVICE LINE IS A STATE AND NOT A BADGE. No border box, no radius, no
+   fill — the four things that say "separate object, placed here by a
+   system" — because what it reports is a property of the page a reader is
+   already on. The dot is the only mark: `--door` at reading size, which is
+   the accent AS TEXT rather than as a drawn thing. */
+.mestatus { display: flex; align-items: center; gap: var(--s3);
+            margin: var(--s5) 0 0; font-size: var(--t-sm);
+            color: var(--ink-2); }
+.medot { width: .5rem; height: .5rem; border-radius: 50%;
+         background: var(--door); flex: none; }
+
+/* A KIND IS A ROW AND THE COUNT IS ITS MEASURE. `.row` and `.rowmeta` do
+   the work; what this adds is the one thing a saved-kind row needs and a
+   destination row does not — a figure that may be ABSENT, because an
+   itinerary is built rather than chosen and has no population to count. */
+.mekind .rowmeta { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* THE CLOSE SETS ITS MEASURE ON THE PROSE, which is /events' own recorded
+   reason: `.closesay` caps the whole band at 32rem and /plan measured that
+   as a statement 512 pixels wide inside a 1,152-pixel band, centred inside
+   its own cap and therefore off-centre in the room. */
+.mebuild { text-align: center; }
+.mebuild .mega { margin-inline: auto; max-width: 26ch; }
+.mebuild .lede { margin-inline: auto; max-width: 48ch; }
+.mebuild .keepgo { margin-top: var(--s7); align-items: center; }
 
 /* ── THE EUROPEAN CALENDAR ATLAS ─────────────────────────────────────── */
 /* `.sheet-gal` ENDS `display: block` AND `.sheet-paper` DOES NOT, so the

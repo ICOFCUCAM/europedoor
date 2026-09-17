@@ -21,6 +21,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **/countries — geography first, and the country as its own aperture** | **`docs/countries-redesign.md`** — the source audit, the image-coverage audit (60 relevant photographs and the page drew one), why the brief's strongest idea was already a mechanism here, the seven plates, and the seven defects only rendering found. 41 of 50 countries can be an aperture and nine cannot — six have no outline in this dataset and three are advisory |
 | **/events — the year as an instrument, and the month that is busiest is the least characteristic** | **`docs/events-redesign.md`** — the source audit, the eight filters built and discarded on every build, the month-by-kind cross-tab nobody had run, the two of the brief's bands that are one band, and the threshold that called 2-of-4 a finding. 150 fixtures, and the library was never the constraint either |
 | **/plan — an instrument rather than a form, and the guard a runtime `<img>` walks straight past** | **`docs/plan-redesign.md`** — the source audit, the seven bands, the three of the brief's asks that collide with recorded findings, the twelve defects only rendering found (nine of them faults already recorded in another family and three of those recorded in the commit before), and the per-leg photograph: `render.credit_html` is one implementation because `checks.py` cannot see an `<img>` a script writes |
+| **/my-europe — a private atlas, and the save kind the app did not know** | **`docs/my-europe-redesign.md`** — the source audit, the six save kinds against the five the sort knew, why `Itinerary` looked dead and is not, the brief's three kinds of memory measured as six, the monumental opening refused by the instrument-head measurement, and the three defects only rendering found. Nothing about how this page stores anything changed |
 | **the eight page families, and what each room does differently** | **`docs/non-home-redesign.md`** — the non-home redesign answered A-J. The eight rooms derived from the route, the three helpers that were forcing one grammar, the seven image scales, 1,626 declared surfaces, and the defects only rendering found |
 | **the design language — what makes a page EuropeDoor with the logo removed, and which movements each family takes** | **`docs/design-language.md`** — the ARCHITECT step. Five marks that could not have been made by anybody else, the six-movement composition grammar per family, the three head roles, what the language forbids, and how a change is proved |
 | **anything at all — read this first, every session** | **`docs/instruction.md`** — the standing instruction. Part 1 is how work is done here (audit first, deviate with numbers, STOP on licensing, never invent data, prove every check can fail). Part 2 is the visual instruction: **European Future**, the two worlds, the palette, the 60/25/10/5 ratio and the measured contrast limits. `docs/palette.json` is the checkable form |
@@ -5411,6 +5412,70 @@ a real centred close /discover and /experiences share and sits in
 is not**, which is the invariant register's own rule applied to a class
 name. Proved red both ways — a composition class on a second family, and a
 declared exception nothing reaches.
+
+**/my-europe KNEW FIVE SAVE KINDS AND THE SITE OFFERS SIX, AND THE MISSING
+ONE SORTED FIRST.** `my-europe.js` orders a reader's collection with
+`ORDER = ["Itinerary", "Place", "Journey", "Theme", "Story"]`, and
+`data-kind="Experience"` is on **197 save buttons** and appears nowhere in
+that list — so `ORDER.indexOf` returned **−1** and every saved experience was
+placed in FRONT of everything, ahead of `Itinerary` at index 0. **A kind the
+application does not know is not dropped and does not throw; it is sorted
+first by accident**, which is exactly why nothing ever looked broken. The
+counts off the built site are Place 893, Experience 197, Journey 17, Theme
+13, Story 9 — and Itinerary **0**.
+
+**AND `Itinerary` WAS THE OPPOSITE SUSPICION, WHICH IS WHY IT WAS CHECKED
+RATHER THAN REMOVED.** Zero pages offer it, which is the exact shape of *a
+motif nothing reaches is dead code that looks like vocabulary* — and
+`planner.js:1755` pushes `kind: "Itinerary"` when a reader saves a route the
+Planner has just built. It is real, it stays, and it stays first, because it
+is the only one of the six the reader MADE rather than chose. Checking a
+suspicion is what stopped a wrong repair.
+
+**THREE KINDS OF MEMORY ARE SIX.** The brief's sentence is the good half —
+*places tell you where, journeys tell you how, stories tell you why* — and
+naming three of six is the `pop_line` shape, a taxonomy that omits part of
+its own set reading as a policy. The band keeps the grammar and covers all
+six with a derived count each (574, 197, 17, 13, 9, and *built by the
+Planner*), because a figure typed there is the figure that was true two
+hundred destinations ago. **And that band IS the empty state**: a
+server-rendered page cannot know whether a `localStorage` list is empty, so a
+band that appeared only in one state would need JavaScript to decide it — and
+*nothing saved* is answered by saying what there is and where it is, which a
+reader with a full list wants too.
+
+**THE BRIEF'S MONUMENTAL OPENING IS REFUSED BY A MEASUREMENT THIS SITE
+ALREADY HOLDS.** *An instrument's title is a label, because the page is the
+tool*, from a head pushing the instrument to y=436 on /plan, 449 on /map and
+460 on /search. All five INTELLIGENCE pages carry `pagehead instrument` and
+the register asserts exactly one role per head. What the brief actually asks
+for — personal and considered rather than a dashboard — is what the seven
+bands do, and it does not need a 60px h1 to do it.
+
+**`.minemap .constel` WAS CAPPED AT 30rem, SO THE PAGE'S CENTRAL INSTRUMENT
+DREW AT 480px IN A 1,152px BAND** — 42% of its own room, on the one drawing
+whose caption says *the emptiness is honest, you can see how much of Europe
+you have not chosen yet*. That is /themes' 204-pixel continent and the
+`.card-art` letterbox a third time: **nothing counts a cap.** 1152 × 899 at
+1280 after.
+
+**AND `.sheet-pine` SETS NO `display`, SO BOTH PINE BANDS LANDED IN A 40%
+TRACK.** Third occurrence of that repair in three commits — /stories' feature
+band shipped at 205 × 154 of photograph at 1280 and /events' year chart fell
+from 1,152 pixels to 619. `.sheet-gal` ends `display: block` and no other
+room does, so a composition that is one child of a `.sheet` states its own.
+**`sheet-kinds` was already emitted by /experiences with no rule anywhere**,
+found by grepping the stylesheet AND the built site, which is the lesson
+`.sheet-year` cost one commit earlier; `c_plate_class_owner` now fails on it
+without anybody remembering to look.
+
+**AND NOTHING ABOUT HOW THIS PAGE STORES ANYTHING CHANGED.** The three
+`localStorage` keys, the four runtime hooks (`#minemap`, `#minecap`, `#mine`,
+`#dna`), the drawing and the empty containers are what they were — the brief
+asked for the presentation layer and for the saved entries to stay real data
+rather than decorative mock rows, and a placeholder inside `#mine` is the one
+thing that would have made this page lie.
+
 
 ## Gates
 

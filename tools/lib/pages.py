@@ -12397,61 +12397,212 @@ def quiet_page(data):
 # ── my europe ─────────────────────────────────────────────────────────
 
 def my_europe_page(data):
-    """The list you are building — and, until this commit, a page that never
-    drew it.
+    """The private atlas: what you kept, drawn, and what the browser holds.
 
-    AN EMPTY STATE IS THE STATE THIS PAGE SHIPS IN. The list is empty until
-    a reader saves something, so the first thing every visitor sees here is
-    the empty case, and it was a heading, a paragraph and three bordered
-    boxes on graphite — no picture, on the one page in the product whose
-    subject is a set of PLACES.
+    THE PAGE WAS A HEAD, A DRAWING, TWO EMPTY CONTAINERS AND A FOOTNOTE.
+    27,245 bytes, no photograph, no plate sequence, and the three things the
+    owner's brief cares most about — the three kinds of memory, the future,
+    and the privacy position — were one `.note` paragraph between them. The
+    drawing and the local-first architecture were already right and are
+    kept exactly as they were.
 
-    So it draws the continent with nothing on it, and every saved place
-    lights a mark. That is the signature moment this family did not have,
-    and it is the honest shape of the emptiness rather than an apology for
-    it: a reader can see how much of Europe they have not chosen.
+    AND THE SAVE VOCABULARY HAD DRIFTED. `my-europe.js` sorts a collection
+    by `ORDER = ["Itinerary", "Place", "Journey", "Theme", "Story"]`, and
+    the built site offers **six** kinds: `Experience` is savable from 197
+    buttons and appears nowhere in that list, so `ORDER.indexOf` returns
+    **-1** and every saved experience sorts in front of everything else. A
+    kind the app does not know is a kind the app sorts first by accident.
 
-    Server-rendered, so the silhouette is there with JavaScript off and the
-    page does not reflow when the script arrives. The marks come from
-    `/api/atlas.json`, which this page already fetches for the travel
-    profile and which already carries each destination's projected x and y —
-    the same numbers every drawing on this site is made of, so a saved dot
-    lands exactly where /map puts it. The dependency is declared in
-    data/contracts.json, because coupling is fine and silent coupling is
-    not.
+    `Itinerary` was the opposite suspicion and it was wrong: it is offered
+    on zero PAGES and `planner.js` creates one at runtime, so it is real and
+    checking is what stopped a wrong repair. See `docs/my-europe-redesign.md`.
+
+    THE BRIEF ASKS FOR A MONUMENTAL OPENING AND THE HEAD ROLE REFUSES IT.
+    *An instrument's title is a label, because the page is the tool* — the
+    measurement behind that is a head pushing the instrument to y=436 on
+    /plan, 449 on /map and 460 on /search, half the first screen of a tool
+    spent on a magazine headline. All five INTELLIGENCE pages carry
+    `pagehead instrument`, including /plan and /discover as rebuilt in this
+    same series. What the brief actually wants — a page that feels personal
+    and considered rather than like a dashboard — is what the bands do.
     """
+    # WHAT CAN BE SAVED, COUNTED FROM THE DATA THAT MAKES THE BUTTONS. Six
+    # kinds, and the brief names three. Naming three would hide half of what
+    # the product stores, which is the `pop_line` shape: a taxonomy that
+    # omits part of its own set reads as a policy. The brief's sentence is
+    # the good half and it survives — *places tell you where, journeys tell
+    # you how, stories tell you why* — it just has to cover six.
+    cities = data["cities"]
+    nplace = len(cities) + sum(len(n["city"].get("places") or [])
+                               for n in cities.values())
+    nexp = sum(len(n["city"].get("experiences") or []) for n in cities.values())
+    KINDS = [
+        ("Place", nplace, "/countries",
+         "Where. Every destination and every place inside one."),
+        ("Experience", nexp, "/experiences",
+         "What. The things worth crossing a country for."),
+        ("Journey", len(data["journeys"]), "/journeys",
+         "How. Routes already worked out, stop by stop."),
+        ("Theme", len(data["themes"]), "/themes",
+         "Why, across the continent. One argument, eight places."),
+        ("Story", len(data["stories"]), "/stories",
+         "Why, in one place. The piece that made you look."),
+        ("Itinerary", None, "/plan",
+         "Yours. What the Planner builds when you ask it a question."),
+    ]
+    kindrows = "".join(
+        f'<a class="row mekind" href="{esc(u)}">'
+        f'<div><h3>{esc(k)}</h3><p class="rowsub">{esc(w)}</p></div>'
+        f'<p class="rowmeta">{("" if n is None else f"{n:,}")}<br>'
+        f'<span class="small">{"built by the Planner" if n is None else "to choose from"}'
+        f'</span></p></a>'
+        for k, n, u, w in KINDS)
+
+    # ── 01 · MY EUROPE ───────────────────────────────────────────────
+    meopen = """
+  <div class="pagehead instrument">
+    <p class="kicker">My Europe</p>
+    <h1>The list you are building.</h1>
+    <p class="lede">Saved places, experiences, journeys, themes and stories.
+    This lives in your browser and nowhere else &mdash; there is no account,
+    no server, no email address, and nothing to leak. When accounts arrive,
+    this list will be importable into one; it will never be silently
+    uploaded.</p>
+  </div>
+  <p class="mestatus"><span class="medot" aria-hidden="true"></span>Stored on
+  this device</p>"""
+
+    # ── 02 · YOUR MAP ────────────────────────────────────────────────
+    # THE DRAWING AND ITS ROOM ARE UNCHANGED, AND THE ROOM IS DARK ON
+    # PURPOSE. The brief asks for no *swampy* dark map and it is right about
+    # that — the cartography split answers it, because this is an INSTRUMENT
+    # and instruments are graphite while pictures are paper. Its own
+    # prototype keeps the map band dark for the same reason. What the split
+    # forbids is the navy swamp the five raw hexes used to be, which went
+    # when the instruments got their palette.
+    meatlas = f"""
+  <div class="sheettext">
+    <h2 class="mega">Your Europe, drawn.</h2>
+    <p class="lede">Saved places become a personal atlas. The map is not
+    decoration: it is the geographic memory of what you chose to keep, and
+    the emptiness is honest &mdash; you can see how much of Europe you have
+    not chosen yet.</p>
+  </div>
+  {constel_defs()}
+  <figure class="minemap" id="minemap">
+    {constellation([], cut=True)}
+    <figcaption><span class="capwhat" id="minecap">Nothing on it yet. Every
+    place you save is drawn here.</span>
+    <span class="capsrc">{geo.sources_line(geo.load("europe-lod0.json"))}
+    Nothing about this list leaves your browser to draw it: the outline ships
+    with the page and the coordinates come from the same public index every
+    map here is built from.</span></figcaption>
+  </figure>"""
+
+    # ── 03 · THE LIST ────────────────────────────────────────────────
+    # THE TWO RUNTIME CONTAINERS, UNTOUCHED. `#mine` is the collections and
+    # `#dna` is the travel profile, both written by `my-europe.js` from
+    # localStorage. A server-rendered placeholder inside either would be a
+    # decorative mock entry, which is the one thing the brief asks not to
+    # happen to this page.
+    melist = """
+  <div class="sheettext">
+    <h2 class="mega">What you kept.</h2>
+    <p class="lede">Grouped into collections you name yourself. Nothing here
+    was suggested, ranked or promoted; it is what you pressed save on.</p>
+  </div>
+  <div id="mine" aria-live="polite"></div>
+  <div id="dna"></div>"""
+
+    # ── 04 · KINDS OF MEMORY ─────────────────────────────────────────
+    # AND THIS IS THE EMPTY STATE, WHICH IS THE STATE THE PAGE SHIPS IN.
+    # *Nothing saved* is answered by saying what there is and where it is,
+    # rather than by an apology or a single "start exploring" button: a
+    # reader who has saved nothing wants the door, and a reader who has
+    # saved plenty still wants to know what else is savable.
+    mekinds = f"""
+  <div class="sheettext">
+    <h2 class="mega">Six kinds of memory.</h2>
+    <p class="lede">My Europe is deliberately broader than a wishlist. A
+    place tells you where, an experience what, a journey how, and a theme or
+    a story why. Every one of these carries a save button on its own page,
+    and the count is what there is to choose from.</p>
+  </div>
+  <div class="rows mekinds">{kindrows}</div>"""
+
+    # ── 05 · WHERE THIS GOES NEXT ────────────────────────────────────
+    # THE THREE ARE A SET RATHER THAN A SENTENCE, and each names the one
+    # thing it needs, because *a refusal nobody can check is a slogan*.
+    mefuture = """
+  <div class="sheettext">
+    <h2 class="mega">A list that could travel with you.</h2>
+    <p class="lede">The local-first version is the one that exists. Each of
+    these is real work rather than a switch, and each names what it would
+    take &mdash; so that the reason this page is simple stays checkable.</p>
+  </div>
+  <div class="rows mekinds">
+    <div class="row mekind"><div><h3>Sync across devices</h3>
+    <p class="rowsub">The same list on a phone and a desk.</p></div>
+    <p class="rowmeta">Needs<br><span class="small">an account, a backend and
+    a data controller</span></p></div>
+    <div class="row mekind"><div><h3>A list you can share</h3>
+    <p class="rowsub">A public address for a collection you made.</p></div>
+    <p class="rowmeta">Needs<br><span class="small">a server, and a decision
+    about what a shared link exposes</span></p></div>
+    <div class="row mekind"><div><h3>Straight into the Planner</h3>
+    <p class="rowsub">A saved list handed over as must-visit stops.</p></div>
+    <p class="rowmeta">Needs<br><span class="small">no backend &mdash; this
+    one is the nearest</span></p></div>
+  </div>"""
+
+    # ── 06 · PRIVACY ─────────────────────────────────────────────────
+    # PRIVACY AS A BAND RATHER THAN A FOOTNOTE IS THE BRIEF'S BEST IDEA AND
+    # IT IS ALSO THIS PRODUCT'S POSITION ALREADY. What the band may not do
+    # is say it twice: the opening states it in one line and this states the
+    # mechanism, which is the *never explain the constraint back* rule
+    # applied to a promise rather than to a filter.
+    privacy = """
+  <div class="sheettext">
+    <h2 class="mega">Private is not a footnote.</h2>
+    <p class="lede">Three keys in this browser's own storage and nothing
+    else: the saved list, the collections you named, and the travel profile
+    the sliders set. No request carries them. No identifier is attached to
+    them. Clearing your browser data deletes them, because there is nowhere
+    else they exist &mdash; which is the cost of the promise and is stated
+    rather than hidden.</p>
+    <p class="note">The whole of this page's JavaScript is one file you can
+    read, and what it may do is bounded by the same Content-Security-Policy
+    every other page here ships: no third-party origin, nothing inline.</p>
+  </div>"""
+
+    # ── 07 · BUILD YOUR EUROPE ───────────────────────────────────────
+    build = """
+  <div class="mebuild">
+    <h2 class="mega">Build your Europe.</h2>
+    <p class="lede">Find something. Keep it. Come back to it. Put it next to
+    another place and see what the two of them make. The continent stops
+    being a catalogue and starts being a map you drew.</p>
+    <p class="keepgo"><a class="btn" href="/discover">Start with a question</a>
+    <a class="storygo" href="/countries">Or open the atlas &rarr;</a></p>
+  </div>"""
+
+    PLATES = [("meopen gal", "My Europe", meopen, "my-europe"),
+              ("meatlas pine", "Your map", meatlas, "your-map"),
+              ("melist gal", "What you kept", melist, "what-you-kept"),
+              ("mekinds gal quiet", "Kinds of memory", mekinds, "kinds"),
+              ("mefuture gal", "Where this goes", mefuture, "whats-next"),
+              ("privacy pine", "Privacy", privacy, "privacy"),
+              ("mebuild gal", "Build your Europe", build, "build")]
     body = f"""
 {crumbs([("Europe", "/discover"), ("My Europe", None)])}
-<div class="pagehead instrument">
-  <p class="kicker">My Europe</p>
-  <h1>The list you are building.</h1>
-  <p class="lede">Saved places, saved journeys, saved stories. This lives in your browser and
-  nowhere else — there is no account, no server, no email address, and nothing to leak. When
-  accounts arrive, this list will be importable into one; it will never be silently uploaded.</p>
-</div>
-{constel_defs()}
-<figure class="minemap" id="minemap">
-  {constellation([], cut=True)}
-  <figcaption><span id="minecap">Nothing on it yet. Every place you save is drawn here.</span>
-  {geo.sources_line(geo.load("europe-lod0.json"))} Nothing about this list leaves your
-  browser to draw it: the outline ships with the page and the coordinates come from the
-  same public index every map here is built from.</figcaption>
-</figure>
-<div id="mine" aria-live="polite"></div>
-<div id="dna"></div>
-<div class="note">
-  <h2 class="mini">Where this goes next</h2>
-  <p>The account version adds sync across devices, a shareable public list, and the ability to
-  hand a saved list straight to the Planner as a set of must-visit stops. All three need a
-  backend, a privacy notice and a data controller — see <a href="/how-it-works">how it works</a>.</p>
-</div>
+{plate_sequence(PLATES)}
 """
     return "/my-europe/index.html", page(
-        "My Europe", body, path="/my-europe", area=None,
+        "My Europe", body, path="/my-europe", area=None, hero=True,
         description="Your saved European places, journeys and stories — stored in your own browser, with no account and no server.",
         scripts=["/assets/js/my-europe.js"],
         # INTELLIGENCE — personalisation and saved journeys
-        world="intelligence"
+        world="intelligence",
     )
 
 
