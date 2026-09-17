@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**101 sections · 39 partial · 31 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1368 assertions · 0 failing**
+**101 sections · 39 partial · 31 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1370 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -20,7 +20,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 7 | Homepage sections | BUILT (deliberately smaller) | 15 | Three bands: the hero over a real map of Europe, the eight ways in, the journeys. The specification's geography index and its hero-map filter row were REMOVED from this page — both still exist as pages, and both are linked from every page's masthead or footer. |
 | 8 | Hidden Europe | BUILT | 2 | A quiet tag, a page that collects it, and a rule that we never call anywhere undiscovered. |
 | 9 | Stories | PARTIAL | 81 | The desk exists, the index is grouped by desk, every article carries a byline, a publication date and tags, and every story links into the Atlas both ways. Nine of the specification's hundred are written. |
-| 10 | Plan your Europe | PARTIAL | 8 | Ten of the eleven inputs are taken and every one of them moves the answer. Mobility requirements are the eleventh, and are named as unsupported rather than silently dropped — we hold no step-free access data, so a field for it would be a field that lies. |
+| 10 | Plan your Europe | PARTIAL | 10 | Ten of the eleven inputs are taken and every one of them moves the answer — by the form AND by the sentence, which was the half this verdict asserted and did not have. Mobility requirements are the eleventh, and are named as unsupported rather than silently dropped — we hold no step-free access data, so a field for it would be a field that lies. |
 | 11 | Country page | BUILT | 5 | URL shape as specified, and every section on the list except visa and emergency information, which are refused as unverified. |
 | 12 | Region page | BUILT | 4 | Every travel region has one, and it aggregates the destinations, places, experiences and journeys beneath it rather than being a list of city links. |
 | 13 | Destination page | PARTIAL | 14 | Seventeen of the twenty sections, travel tips now among them. The Stay layer is built on one exemplar: Chamonix offers a base and a referral, the other 318 still say honestly that they list nothing. |

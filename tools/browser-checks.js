@@ -185,6 +185,91 @@ async function main() {
     ok(!coast.includes(banned) && !alps.includes(banned), `planner routed into ${banned}`);
   }
 
+  // ── the sentence box must report the plan, not the parse ───────────
+  // /plan ships the claim that it "shows you exactly what it understood,
+  // naming anything it could not take account of rather than quietly
+  // dropping it". It was composing that readback from the PARSE while the
+  // route beside it came from something else, and `plan()` runs four lines
+  // before the readback is built, so every disagreement was already known
+  // and thrown away. Three shipped, and none is visible to any static
+  // check: the readback is composed at runtime, so a page that reports its
+  // plan and a page that reports its parse are the same bytes until
+  // somebody types a sentence.
+  async function askFor(sentence) {
+    await page.goto(base + "/plan", { waitUntil: "networkidle" });
+    await page.fill("#ask", sentence);
+    await page.click("#askform button[type=submit]");
+    await page.waitForSelector("#result .note h3");
+    const money = await page.locator("#result .result-summary dd").first().textContent();
+    return {
+      // .first(), because the result carries three `.note` blocks — the
+      // readback, the what-if rail and the budget line — and a strict
+      // locator resolving to several is how this suite died once before.
+      say: (await page.locator("#result .note").first().innerText()).replace(/\s+/g, " "),
+      days: await page.locator("#days").inputValue(),
+      people: await page.locator("#travellers").inputValue(),
+      cost: parseInt(money.replace(/[^0-9]/g, ""), 10),
+    };
+  }
+
+  // 1. THE PARTY SIZE, WHICH IS THE EXPENSIVE ONE. `applyAsk` never set
+  //    form.travellers, so the cost model multiplied food, transport and
+  //    activities by the control's default of one while the page said "for
+  //    4". The cost model itself is careful — a double is not twice a
+  //    single, so the second traveller adds 55% of a room and everything
+  //    else scales linearly — which makes total(n)/total(1) land between
+  //    1 + 0.55(n-1) and n. Asserted as that BAND rather than as a figure,
+  //    because a number typed here is a second copy of the cost model.
+  // The FORM path's party size is already asserted further down, with the
+  // same cost band — which is the whole shape of this defect: the tested
+  // path worked and the untested one did not. A code path nothing
+  // exercises is a code path nothing checks.
+  const askOne = await askFor("Ten days in Italy starting in Rome");
+  const four = await askFor("Ten days in Italy starting in Rome for 4 people");
+  ok(four.people === "4",
+     `the sentence named four travellers and the form carried ${four.people}: ` +
+     "a party size that does not reach readForm is a cost for somebody else");
+  ok(/for <?4|for 4/.test(four.say) || four.say.includes("for 4"),
+     "the readback did not state the party size it planned for");
+  const ratio = four.cost / askOne.cost;
+  ok(ratio >= 1 + 0.55 * 3 - 0.15 && ratio <= 4 + 0.15,
+     `four travellers cost ${ratio.toFixed(2)}x one traveller (EUR ${askOne.cost} ` +
+     `to EUR ${four.cost}). The cost model scales beds by 1+0.55(n-1) and ` +
+     "everything else by n, so the ratio has to sit between 2.65 and 4. " +
+     "Outside that band the party size is reaching the page and not the money.");
+
+  // 2. THE DAY FLOOR. A trip shorter than the planner builds is clamped,
+  //    and the clamp has to be named rather than applied behind a number
+  //    the page has already printed.
+  const short = await askFor("2 days in Vienna");
+  ok(short.days === "3",
+     `"2 days" left the day field at ${short.days}, so the floor moved`);
+  ok(/You said .*2 days.* and the route below is .*3/.test(short.say),
+     "the planner clamped a two-day request to three and did not say so. " +
+     "It printed the number the reader typed beside a route of a different " +
+     "length: " + short.say.slice(0, 200));
+
+  // 3. THE NAMED GEOGRAPHY, which is the dishonest one, because it was not
+  //    silence but a false statement. plan() honours a named country only
+  //    where four destinations sit inside it, and 12 of the 47 countries in
+  //    the index hold fewer — so "A week in Slovakia" planned the whole
+  //    continent under the words "within Slovakia".
+  const askThin = await askFor("A week in Slovakia in June");
+  ok(!/within .*Slovakia/.test(askThin.say),
+     "the readback claimed the route was held within Slovakia. The planner " +
+     "drops a geography holding fewer than four destinations, so that " +
+     "sentence describes a route through six countries: " + askThin.say.slice(0, 200));
+  ok(/You named .*Slovakia.* not held to it/.test(askThin.say),
+     "the planner dropped the named geography and did not name the drop. " +
+     "opts.geoTooNarrow is computed on every run for exactly this: " +
+     askThin.say.slice(0, 200));
+  // And a country with enough to plan inside keeps its constraint, or the
+  // fix above would have been satisfied by never honouring a geography.
+  const wide = await askFor("Twelve days in Italy in June");
+  ok(/within .*Italy/.test(wide.say),
+     "Italy holds far more than four destinations and the readback stopped " +
+     "claiming the route is inside it: " + wide.say.slice(0, 200));
+
   // ── the planner inputs the specification asks for ──────────────────
   // Every one of these was added because §10 lists it as an input. An
   // input that renders but does not change the answer is decoration, so

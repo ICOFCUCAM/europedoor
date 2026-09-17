@@ -6096,6 +6096,91 @@ eight categories keep one flat list under it (nature 11/15/**2**, history
 18/11/**1**, luxury one band) and keep the band on the row, because there it
 distinguishes.
 
+
+**A READBACK THAT REPORTS THE PARSE RATHER THAN THE PLAN IS NOT A READBACK,
+AND THIS PAGE'S WHOLE CLAIM IS THAT IT IS ONE.** /plan ships the sentence
+that it *"shows you exactly what it understood, naming anything it could not
+take account of rather than quietly dropping it"*, and `section-audit.py`
+published the matching verdict: *ten of the eleven inputs are taken and every
+one of them moves the answer.* True of the FORM and false of the sentence box
+in three places. `goFromSentence` calls `plan(opts)` **four lines before** it
+composes `readbackHtml(got)`, so every disagreement was already known and the
+readback was handed the wrong object:
+
+| you typed | the page said | the plan did |
+|---|---|---|
+| `for 4 people` | "for 4" | priced one person |
+| `2 days in Vienna` | "2 days" | built three |
+| `A week in Slovakia` | "within Slovakia" | planned the whole continent |
+
+**The party size was the expensive one.** `applyAsk` set days, budget, month,
+style, pace, start and interests and never `form.travellers`, so `readForm`
+read the control's default of one. The cost model is careful — a double is not
+twice a single, so the second traveller adds 55% of a room and everything else
+scales linearly — and all of it was spent on the wrong number: measured in
+Chromium on one sentence with and without four people, **€1,491 against
+€4,958**, accommodation ×2.65 exactly and food, transport and activities ×4. A
+party of four saw a total **70% under its own cost**, on the one number in this
+product a reader could act on and be wrong about.
+
+**The geography was the dishonest one, because it was not silence but a false
+statement.** `plan()` honours a named country only where four destinations sit
+inside it, and **12 of the 47 countries in the planner index hold fewer** —
+Monaco, San Marino and Vatican City one; Slovakia, Montenegro, Cyprus, Kosovo,
+North Macedonia and Azerbaijan three. `opts.geoTooNarrow` was set for exactly
+this and **read nowhere**, which is `kindfilters` and `data-rotate` again.
+
+**And the browser suite already asserted the party size — through the FORM,
+with the same cost band.** *A code path nothing exercises is a code path
+nothing checks*, and here the exercised path was right and the unexercised one
+was wrong, in the same function. `DAY_MIN`, `DAY_MAX`, `PARTY_MIN` and
+`PARTY_MAX` are declared once and asserted against **the `min` and `max` the
+form actually ships**, because comparing four typed copies to each other goes
+green the moment somebody types the same number twice — the dispatch cap
+exactly. See `docs/plan-redesign.md`.
+
+**AND TWO OF THE THREE NEW CHECKS WERE GREEN ON THE STATE THEY EXIST TO
+REFUSE, BOTH FOUND BY MUTATION.** The flag scan asserts that every constraint
+the planner computes is read back — and the paragraph in `planner.js`
+explaining that `opts.geoTooNarrow` was *read nowhere* contains those words, so
+deleting the real read left it passing. **Seventh occurrence of an instrument
+reading the documentation of code as code, and the first where the check and
+the comment that defeated it were written in the same commit.** `bare_js()`
+now does for a script what `bare_css()` does for the stylesheet, stepping over
+string literals rather than stripping them because `https://` inside one is not
+a comment, and its output is asserted to still parse. The other: replacing
+`applyAsk`'s condition with `if (false)` left the words `form.travellers` in
+place and the check green — a shape rather than a promise, in a check written
+against that, so the static half says only what it can and its message names
+the instrument that owns the rest. **A check is not proved by passing; it is
+proved by failing on the thing it is about.**
+
+**AND A SPECIFICATION ARRIVING AGAIN IS AN AUDIT RATHER THAN A BUILD.** §1–13
+of the product specification are already absorbed and asserted section by
+section — `tools/section-audit.py` tracks every one of them with a published
+verdict and its own assertions, and CI fails when one stops being true —
+run `python3 tools/section-audit.py --check` for the totals, which is the
+rule this sentence broke on its first draft by copying them here. So the
+answer to "what is the gap" is generated rather than argued: §5's navigation is
+the specified nine items in the specified order, §11's essential information is
+every field on its list except visa and emergency, **which are refused as
+unverified** with `docs/legal-position.md` behind them, and the traveller types
+are seven with a route, two derived by published rule, and accessibility needs
+held nowhere at all. **The gap the audit did NOT know was the one above**,
+because §10's assertions proved the arithmetic exists — `bedFactor` is in the
+file — which is not the claim that the input reaches it.
+
+**AND ONE CONTENT GAP IS RECORDED RATHER THAN INVENTED: NO JOURNEY HERE IS
+SHORTER THAN A FORTNIGHT.** The seventeen run 14 to 34 days, median 19, and the
+specification asks for a seven-day one by name. The data does not agree with
+the shape of the index: **282 of 319 destinations are a complete trip in three
+nights or fewer** and 181 in a single night, every one authored per destination
+in `nights`. A journey is an authored editorial record — legs, nights, a
+summary and a route — so four short journeys are a writing task and not a
+derivation, and inventing them would be authoring a measurement. The planner
+answers a weekend today ("weekend" parses to three days, "long weekend" to
+four), and the trigger for the index is somebody writing them.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

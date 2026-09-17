@@ -434,9 +434,11 @@ def s9():
 
 @section(10, "Plan your Europe", "PARTIAL",
          "Ten of the eleven inputs are taken and every one of them moves the "
-         "answer. Mobility requirements are the eleventh, and are named as "
-         "unsupported rather than silently dropped — we hold no step-free "
-         "access data, so a field for it would be a field that lies.")
+         "answer — by the form AND by the sentence, which was the half this "
+         "verdict asserted and did not have. Mobility requirements are the "
+         "eleventh, and are named as unsupported rather than silently "
+         "dropped \u2014 we hold no step-free access data, so a field for it "
+         "would be a field that lies.")
 def s10():
     yield has("/plan", "Days", "Total budget", "Travelling in", "Spending style",
               "Pace", "Start from", "End near", "Travellers", "Accommodation",
@@ -452,6 +454,18 @@ def s10():
     yield "savedIds" in js, "saved places are favoured"
     yield "planner inputs the specification asks for" in src("tools/browser-checks.js"), \
         "and Chromium checks each of them end to end"
+    # AN INPUT REACHES THE ARITHMETIC BY TWO PATHS AND ONLY ONE WAS EVER
+    # ASSERTED. This section's own verdict claimed every input moves the
+    # answer, and the assertions above prove the arithmetic EXISTS —
+    # `bedFactor` is in the file — which is not the same claim. The party
+    # size arrived through the form and not through the sentence box:
+    # `applyAsk` never set `form.travellers`, so "for 4 people" was read
+    # back as understood and priced for one, EUR 1,491 against EUR 4,958 on
+    # a ten-day Italian route. The thirteenth assertion here to pin a shape
+    # rather than a promise, and the shape it pinned was in the right file.
+    yield "form.travellers" in js, "the sentence box delivers the party size, not only the form"
+    yield "readbackHtml(got, opts)" in js, \
+        "and the readback reports the plan that ran rather than the sentence read"
 
 
 # ── 11–18: the Atlas, places, experiences, journeys ───────────────────

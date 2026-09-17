@@ -48,6 +48,51 @@ FAILURES = []
 CHECKS = []
 
 
+def bare_js(js):
+    """A script with its comments removed.
+
+    THE SEVENTH TIME AN INSTRUMENT HERE HAS READ THE DOCUMENTATION OF CODE
+    AS CODE, and the first where the check and the comment it tripped over
+    were written in the same commit. `c_plan_reports_what_it_ran` asserts
+    that every constraint `planner.js` computes for a reader is also read
+    back — `opts.geoTooNarrow` was set once and consumed nowhere — and the
+    paragraph explaining that failure says the words `opts.geoTooNarrow`.
+    So the scan counted the comment as the missing read and went green on
+    the state it exists to refuse. Proved by mutation: deleting the real
+    read left the check passing.
+
+    `bare_css` already carries this argument for the stylesheet. Strings are
+    stepped over rather than stripped, because `https://` inside one is not
+    the start of a comment and a URL in a quoted string is ordinary code.
+    """
+    out = []
+    i, n = 0, len(js)
+    quote = None
+    while i < n:
+        c = js[i]
+        if quote:
+            out.append(c)
+            if c == "\\" and i + 1 < n:
+                out.append(js[i + 1]); i += 2; continue
+            if c == quote:
+                quote = None
+            i += 1
+            continue
+        if c in "\"'`":
+            quote = c; out.append(c); i += 1; continue
+        if c == "/" and i + 1 < n and js[i + 1] == "*":
+            j = js.find("*/", i + 2)
+            i = n if j < 0 else j + 2
+            out.append(" ")
+            continue
+        if c == "/" and i + 1 < n and js[i + 1] == "/":
+            j = js.find("\n", i)
+            i = n if j < 0 else j
+            continue
+        out.append(c); i += 1
+    return "".join(out)
+
+
 def bare_css(css):
     """The stylesheet with its comments removed.
 
@@ -411,6 +456,180 @@ def c_plan_constants():
             fail("/plan prints the weight %r as %d%% and draws its bar at a "
                  "different width: correct labels over a drawing scaled from "
                  "the wrong array still reads as a finished chart" % (nm, pct))
+    return n
+
+
+@check("the day and party bounds the planner enforces are the bounds the form publishes")
+def c_plan_bounds_published():
+    """THE BOUNDS THE PLANNER ENFORCES MUST BE THE BOUNDS THE CONTROL
+    PUBLISHES.
+
+    `planner.js` clamps the day count and the party size in two places
+    each, and the form publishes its own `min` and `max` on the two number
+    fields — four typed copies of two decisions. That is the dispatch cap
+    exactly: three of four copies were raised to sixty and the one that was
+    a gate was left at thirty, and the whole sitting was spent before
+    anything said no.
+
+    Asserted between the DECLARATION and the ATTRIBUTE rather than between
+    the copies, because comparing the copies to each other goes green the
+    moment somebody types the same number twice. The attribute is what a
+    reader's own browser enforces before any script runs, so it is the half
+    that cannot be argued with.
+    """
+    n = 0
+    js = bare_js(open(os.path.join(ROOT, "assets", "js", "planner.js"),
+                      encoding="utf-8").read())
+    want = {}
+    for name in ("DAY_MIN", "DAY_MAX", "PARTY_MIN", "PARTY_MAX"):
+        m = re.search(r"\b%s\s*=\s*(\d+)" % name, js)
+        if not m:
+            fail("planner.js no longer declares %s, so the day and party "
+                 "bounds are typed numbers again and nothing compares them "
+                 "with the form the reader actually uses" % name)
+        else:
+            want[name] = int(m.group(1))
+    # Every clamp OF THESE TWO QUANTITIES must read the declaration. Scoped
+    # to the statements that clamp a day count or a party size, because the
+    # first version matched any nested Math.max/Math.min and flagged
+    # `Math.max(1, Math.min(14, r[i].nights + by))` — the per-leg nights
+    # nudge, a real clamp of a different quantity. An instrument that
+    # reports a true thing about the wrong subject is the fault this file
+    # records about a caption it could not tell from a credit.
+    for label, pat, names in (
+            ("the day count", r"(?:form\.days\.value\s*=|\bdays:)[^;\n]*",
+             ("DAY_MIN", "DAY_MAX")),
+            ("the party size", r"(?:form\.travellers\.value\s*=|\btravellers:)"
+                               r"(?:[^;]|\n)*?\)\)", ("PARTY_MIN", "PARTY_MAX"))):
+        for stmt in re.findall(pat, js):
+            if "Math.max" not in stmt and "Math.min" not in stmt:
+                continue
+            n += 1
+            bare = re.findall(r"Math\.(?:max|min)\(\s*(\d+)", stmt)
+            if bare:
+                fail("planner.js clamps %s with the literal %s where it "
+                     "should read %s or %s. A number typed beside the "
+                     "declaration is the copy that gets left behind: %s"
+                     % (label, ", ".join(bare), names[0], names[1],
+                        " ".join(stmt.split())[:90]))
+            elif not any(nm in stmt for nm in names):
+                fail("planner.js clamps %s without reading %s or %s, so the "
+                     "bound the form publishes and the bound the script "
+                     "enforces are two decisions again: %s"
+                     % (label, names[0], names[1],
+                        " ".join(stmt.split())[:90]))
+    if len(want) == 4:
+        html = open(os.path.join(ROOT, "site", "plan", "index.html"),
+                    encoding="utf-8").read()
+        for field, lo, hi in (("days", "DAY_MIN", "DAY_MAX"),
+                              ("travellers", "PARTY_MIN", "PARTY_MAX")):
+            m = re.search(r'<input[^>]*name="%s"[^>]*>' % field, html)
+            n += 1
+            if not m:
+                fail("/plan no longer ships a %s field, so the planner's "
+                     "%s/%s bounds are enforced by script only and a reader "
+                     "cannot see them" % (field, lo, hi))
+                continue
+            tag = m.group(0)
+            for attr, key in (("min", lo), ("max", hi)):
+                a = re.search(r'\b%s="(\d+)"' % attr, tag)
+                n += 1
+                if not a:
+                    fail("/plan's %s field publishes no %s, while planner.js "
+                         "clamps to %s=%d. A clamp a reader cannot see is the "
+                         "silent-adjustment fault this page is written against"
+                         % (field, attr, key, want[key]))
+                elif int(a.group(1)) != want[key]:
+                    fail("/plan's %s field publishes %s=%s and planner.js "
+                         "clamps at %s=%d. The control and the code disagree "
+                         "about what this planner will build."
+                         % (field, attr, a.group(1), key, want[key]))
+    return n
+
+
+@check("the planner reports the plan it ran, not the sentence it read")
+def c_plan_reports_what_it_ran():
+    """A READBACK THAT REPORTS THE PARSE RATHER THAN THE PLAN IS NOT A
+    READBACK, AND THIS PAGE'S WHOLE CLAIM IS THAT IT IS ONE.
+
+    /plan ships the sentence: it "shows you exactly what it understood,
+    naming anything it could not take account of rather than quietly
+    dropping it". `readbackHtml` was handed `got` — the parse — while
+    `plan()` was handed `opts`, what actually ran, and `goFromSentence`
+    calls the plan FOUR LINES BEFORE it composes the readback, so every
+    disagreement was already known and thrown away. Three of them shipped:
+
+        you typed        the page said       the plan did
+        for 4 people     "for 4"             priced one person
+        2 days           "2 days"            built 3
+        in Slovakia      "within Slovakia"   planned all of Europe
+
+    The party size was the expensive one. `applyAsk` never set
+    `form.travellers`, so `costOf` multiplied food, transport and
+    activities by the control's default of one: measured on "Ten days in
+    Italy starting in Rome for 4 people", the total was EUR 1,491 against a
+    real EUR 4,958 — 70% under, on the one number in this product a reader
+    could act on and be wrong about.
+
+    The geography was the dishonest one, because it was not silence but a
+    false statement, and `opts.geoTooNarrow` was set for exactly this and
+    read NOWHERE — `kindfilters` and `data-rotate` again, a constraint
+    computed on every run and discarded.
+
+    Asserted at the SOURCE, because none of it is in the shipped HTML: the
+    readback is composed at runtime, and a page that reports its plan and a
+    page that reports its parse are the same bytes until somebody types a
+    sentence. The browser suite drives the three sentences; this asserts the
+    wiring that makes them possible, so the two cannot drift apart.
+    """
+    n = 0
+    # Comments stripped: the paragraph in planner.js explaining that
+    # `opts.geoTooNarrow` was read NOWHERE contains those words, and the
+    # first version of this scan counted that sentence as the read and went
+    # green on the exact state it refuses. See bare_js.
+    js = bare_js(open(os.path.join(ROOT, "assets", "js", "planner.js"),
+                      encoding="utf-8").read())
+    # 1. The readback has to be given the plan's own object, and be called
+    #    with it.
+    n += 1
+    if not re.search(r"function readbackHtml\(\s*got\s*,\s*opts\s*\)", js):
+        fail("planner.js's readbackHtml no longer takes the plan's opts, so "
+             "it can only report what the sentence said and not what the "
+             "route below it actually is")
+    n += 1
+    if not re.search(r"readbackHtml\(\s*got\s*,\s*opts\s*\)", js):
+        fail("planner.js composes the readback without handing it the opts "
+             "the plan ran on: the argument exists and the call site does "
+             "not use it, which is the parsed-echoed-and-dropped fault in "
+             "the instrument written to catch it")
+    # 2. Every constraint the plan computes for the reader must be read.
+    #    `opts.geoTooNarrow` was assigned once and consumed nowhere.
+    for flag in sorted(set(re.findall(r"opts\.(\w+)\s*=\s*true", js))):
+        n += 1
+        reads = len(re.findall(r"(?:ran|opts)\.%s\b" % flag, js))
+        if reads < 2:
+            fail("planner.js sets opts.%s and never reads it. A constraint "
+                 "computed on every run and discarded is the kindfilters "
+                 "failure, and on this page it is worse: the reader is told "
+                 "the constraint was honoured." % flag)
+    # 3. The party size must reach the plan, or the cost is for somebody
+    #    else. THIS HALF IS A WIRING CLAIM AND NOT THE PROMISE: a mutation
+    #    proved it — replacing applyAsk's condition with `if (false)` left
+    #    the words `form.travellers` in place and this check green, which is
+    #    pinning a shape rather than a promise, in a check written against
+    #    that. What the party size actually has to do is change the money,
+    #    and only a browser can see that: `browser-checks.js` types the same
+    #    sentence with and without "for 4 people" and asserts the total
+    #    moves by the factor the cost model declares. Kept here because a
+    #    field applyAsk does not set is a fault a second later, and the
+    #    message says which instrument owns the rest.
+    n += 1
+    m = re.search(r"function applyAsk\(got\) \{(.*?)\n  \}", js, re.S)
+    if not m or "form.travellers" not in m.group(1):
+        fail("planner.js's applyAsk does not set form.travellers, so a party "
+             "size the sentence understood cannot reach readForm and the "
+             "cost is computed for one person while the page says otherwise. "
+             "The behavioural half of this is in browser-checks.js.")
     return n
 
 
