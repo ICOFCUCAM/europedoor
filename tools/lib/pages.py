@@ -22,7 +22,7 @@ from .render import (LD_PUBLISHER, ORIGIN, SITE_NAME, SITE_TAGLINE, arch_rim, ca
                      page, photo, picture, plate, section, arch_clip, arch_edge,
                      ed_opening, ed_photo, ed_rows, ed_section_head, ed_split,
                      ed_bleed, ed_declare, ed_feature, ed_mosaic, ed_strip, held,
-                     ed_slot, photo_href)
+                     ed_slot, photo_href, credit_html)
 from .score import city_scores, country_scores, discoverability
 
 HOME = ("Europe", "/discover")
@@ -5569,6 +5569,26 @@ def journey_page(data, j):
 def planner_api(data):
     """The compact index the browser plans against. Advisory countries are
     excluded here rather than in the UI, so no client bug can route into one."""
+    # A LEG CARRIES ITS PLACE'S OWN PHOTOGRAPH WHERE THE REGISTER HOLDS ONE,
+    # AND THE STOPS ARE NOT KNOWN AT BUILD TIME. `planner.js` chooses them in
+    # the reader's browser from their own sentence, so a build-time set of
+    # named stop pictures would be a FAKE RESULT — the fault `data/motions.json`
+    # is validated against one family over, where a curated list wearing the
+    # clothes of a query looks identical on the day it ships.
+    #
+    # What is honest is the URL travelling with the destination: the register
+    # holds a `city:` photograph for 63 of the 313 the planner can route
+    # through, so a fifth of legs carry a picture and four fifths carry none,
+    # which is the declared-slot honesty this site already practises. NEVER a
+    # generated plate — the plate system is exclusively the social-card
+    # language now, and every `.card-art` on this site is a map.
+    #
+    # `photo_href` TAKES A REGISTER KEY AND NEVER A URL, which is what keeps
+    # this from becoming a second way into the library with none of the
+    # licence gate behind it, and an unknown key returns "" so the row simply
+    # has no `shot`. 640 rather than the ladder's widest: a leg tile renders
+    # about 320 across, and this is a single `src` with no negotiation.
+    images = data.get("images") or {}
     cities = []
     for cid, n in sorted(data["cities"].items()):
         c, r, t = n["country"], n["region"], n["city"]
@@ -5623,6 +5643,26 @@ def planner_api(data):
             "quiet": bool(t.get("quiet")),
             "checked": bool(c.get("checked")),
         })
+        # ABSENT RATHER THAN NULL, because present-but-empty says "we have
+        # this" and then does not — the rule `checks.py` already enforces on
+        # JSON-LD. 250 of 313 rows carry no key at all.
+        _shot = photo_href(images, "city:" + cid, 640)
+        if _shot:
+            _row = images["city:" + cid]
+            cities[-1]["shot"] = _shot
+            cities[-1]["shotAlt"] = _row.get("alt") or t["name"]
+            # AND THE CREDIT TRAVELS WITH THE PICTURE, COMPOSED BY THE ONE
+            # FUNCTION THAT KNOWS THE RULE. Pexels' terms, recorded verbatim
+            # in the gate, require "a prominent link to Pexels on any page
+            # showing a Pexels photo, and the photographer credited as
+            # 'Photo by <name> on Pexels' linking to that photo's page" — and
+            # `checks.py` cannot see an `<img>` a script writes at runtime,
+            # so the guard that refuses an unregistered file on a published
+            # page has no reach here at all. Composing the sentence in
+            # JavaScript instead would be a second implementation of a
+            # LICENCE obligation, which is the one place this repository has
+            # already learned not to have one.
+            cities[-1]["shotCredit"] = credit_html(_row)
     journeys = [
         {
             "slug": j["slug"], "name": j["name"], "days": j["days"],
@@ -5652,7 +5692,69 @@ def planner_api(data):
     }
 
 
+# THE SIX WEIGHTS, DECLARED ONCE AND CHECKED AGAINST THE CODE THAT USES
+# THEM. `assets/js/planner.js` implements the scoring; this page publishes
+# it. Two implementations of one fact is a second chance to make its
+# mistake — seven times in this repository, once over a file extension — so
+# `checks.py` reads the weight block out of the script and asserts these are
+# the same numbers. The percentages are also the `.wN` utility classes the
+# bars take, which is why they are integers rather than fractions: a bar
+# whose width is not the figure beside it is a finished-looking chart about
+# nothing, which the year band already records.
+# WHERE EACH SPENDING STYLE SITS IN A DESTINATION'S OWN RECORDED DAILY
+# BAND. `planner.js` holds this as `STYLE_DAILY = {low: 0, moderate: .5,
+# high: 1}` and it is the whole of what a style IS: the bottom, the middle
+# or the top of the range this atlas already records for that place. The
+# band published it as three sentences and no number, which made the one
+# measurable thing about it invisible — so the figure is derived from the
+# 313 planning destinations here and the POSITION is declared once, read by
+# both, and asserted equal in `checks.py`. A second copy of 0.5 is a second
+# chance for the page and the planner to disagree about what "comfortable"
+# means, which is the dispatch cap's own lesson at a sixth of the stakes.
+PLAN_STYLE_POS = {"low": 0.0, "moderate": 0.5, "high": 1.0}
+
+PLAN_WEIGHTS = (
+    ("Your interests", 30,
+     "how many of the things you are travelling for it actually carries"),
+    ("Things to do", 20,
+     "whether it has experiences recorded against those interests, rather "
+     "than a tag and nothing behind it"),
+    ("The month you named", 15,
+     "peak, shoulder or off \u2014 never zero, because nowhere here is "
+     "closed"),
+    ("Atlas connectivity", 10,
+     "how reachable it is from the rest of the Atlas. Reachability, not "
+     "step-free access, which we hold no data for"),
+    ("Content quality", 20,
+     "how much of the place this atlas has actually written. It carries "
+     "the specification's popularity weight as well, because we hold no "
+     "visitor numbers for anywhere"),
+    ("Novelty", 5,
+     "quiet places, and countries not already in your route"),
+)
+
+
 def planner_page(data):
+    """Seven plates: the desk, the controls, the result, the engine, the
+    spending styles, the refusals, the close.
+
+    THE PAGE WAS A FORM AND THE INSTRUMENT SAID SO. `tools/opening.js` names
+    three families that open with no picture at all and this was one of them —
+    0% at 1280 and 0% at 390, on the page that is this product's own
+    instrument and the one a reader arrives on having decided to travel.
+    2,703 pixels at 1280: a 30px label, a sentence box, twelve fields,
+    seventeen checkboxes and four hundred words of method.
+
+    WHAT DID NOT CHANGE IS THE METHOD OR ITS POSITION. The weights are the
+    ones `assets/js/planner.js` implements, verified against the code rather
+    than against the page describing it, and they stay UNDER the tool: the
+    comment this function used to carry says why, and the brief that asked
+    for a two-column shell was asking for the arrangement this page already
+    removed. What changed is that six numbers are drawn instead of listed.
+
+    See `docs/plan-redesign.md` for the four collisions and the one
+    measurement.
+    """
     interests = "".join(
         f"""<label><input type="checkbox" name="interest" value="{esc(i['slug'])}">
         <span aria-hidden="true">{esc(i['icon'])}</span> {esc(i['name'])}</label>"""
@@ -5677,193 +5779,446 @@ def planner_page(data):
     # forty per cent of their own choice, cut mid-word, at every width. A
     # `<select>` clips without an ellipsis, so it does not even look like a
     # truncation — it looks like the label.
-    #
-    # The taxonomy already holds `name` and `note` as two fields, which is
-    # the right shape; the page was joining them. The option is the name and
-    # the notes go under the method, beside the button that runs it, which
-    # is where this page already puts how the planner scores. Nothing is
-    # lost — every note is still on the page, and now it can be read.
     budgets = "".join(
         f'<option value="{esc(b["slug"])}"{" selected" if b["slug"] == "moderate" else ""}>'
         f'{esc(b["name"])}</option>'
         for b in data["taxonomy"]["budgets"]
     )
-    budget_notes = "".join(
-        f'<li><strong>{esc(b["name"])}</strong> — {esc(b["note"])}</li>'
-        for b in data["taxonomy"]["budgets"]
-    )
-    body = f"""
-{crumbs([("Europe", "/discover"), ("Plan", None)])}
-{constel_defs()}
-{jsondata("europedoor-glyphview-cases",
-          [f"{len(pts)}:" + glyph_view(pts) for pts in GLYPHVIEW_CASES])}
-<div class="pagehead instrument">
-  <p class="kicker">Journey Planner</p>
-  <h1>Twelve days, €2,500, history and mountains.</h1>
-  {head_extent([(len(data['cities']), 'destinations scored'),
-                (len(data['countries']), 'countries'),
-                (len(data['journeys']), 'routes already built')])}
-  <p class="lede">Say what you have and what you like — in a sentence, or in the form below.</p>
-</div>
 
-<form class="form ask" id="askform">
-  <div class="field">
-    <label for="ask">Say it in your own words</label>
-    <textarea id="ask" name="ask" rows="2"
-      placeholder="I have 12 days and €2,500, starting in Lisbon, and I love history, mountains and food."></textarea>
-  </div>
-  <div class="askfoot">
-    <div class="hero-actions mt0">
-      <button class="btn" type="submit">Read that and build it</button>
+    # ── 01 · THE DESK ────────────────────────────────────────────────
+    #
+    # THE MONUMENTALITY COMES FROM THE DRAWING, NOT FROM THE TYPE. The brief
+    # opens on a 155-pixel headline over a map with the form below it, which
+    # is the composition a measurement here already removed: the head pushed
+    # this instrument to y=436, so half the first screen of a TOOL was a
+    # magazine headline and four or five lines of prose. An instrument's
+    # title is a label because the page IS the tool, and `checks.py`
+    # requires exactly one head role. So the head keeps `instrument` and the
+    # picture is what fills the screen: the control set into the continent.
+    #
+    # AND THE PICTURE IS THIS PAGE'S OWN, WHICH TOOK THREE TRIES TO GET
+    # RIGHT. 313 dots on a continent is what /discover already draws, and
+    # *an index opening that is a continent with a different number of dots
+    # on it is not a different opening* — 319 against 313 is the same
+    # picture. What only THIS page holds is the six destinations it REFUSES:
+    # Ukraine, Belarus and Russia are stripped from the planning index at
+    # build time, so the planner scores 313 of 319. That is the one map on
+    # this site whose subject is an editorial position rather than a set of
+    # places, it is the sentence this page already publishes — "route you
+    # into a country under a travel advisory: those are excluded from the
+    # planning index entirely" — and it is drawn rather than only written.
+    planned, refused = [], []
+    for cid, n in sorted(data["cities"].items()):
+        x, y = project(n["city"]["lat"], n["city"]["lon"])
+        (refused if n["country"].get("advisory") else planned).append(
+            (x, y, cid, n))
+    advnames = sorted({n["country"]["name"] for _x, _y, _c, n in refused})
+    # AND THE GROUND BEYOND THE ATLAS IS NOT DRAWN HERE, WHICH IS A
+    # MEASUREMENT RATHER THAN A PREFERENCE. `landmass` returns the context
+    # land first — every landmass in a box that contains Europe, clipped to
+    # that box — and it is a HERO device: *Europe is not an island*, and the
+    # graphite it is drawn on absorbs its straight edges completely. /map and
+    # /discover keep it for exactly that reason, and the same slab on the
+    # same projection is invisible there: measured on /map's own pixels, the
+    # dusk over 52°E is near-black and Iran and Iraq are gone.
+    # This band is the one light drawing that shows the whole eastern cut
+    # inside its own frame with open water beyond it, and `--atlas-far`
+    # (#C3BFB2) is DARKER than the water (#DDE8E7) rather than lighter — so
+    # the fragment came out as a warm slab with three straight edges sitting
+    # in the sea south-east of Baku, probed and named as Iran and Iraq
+    # clipped at 52°E. The wide fade hides it and takes the ground out from
+    # under Baku and Tbilisi with it, which is the fault `dusk_reach` exists
+    # to stop and is why every caller passes it. So the layer that has no
+    # claim to make here is the one that goes: this drawing's subject is 313
+    # destinations and the six it refuses, and nothing outside the atlas is
+    # part of that sentence.
+    _dctx, dland = geo.landmass(MAPPROJ, (0, 0, MAP_W, MAP_H))
+    deskmap = (
+        # A MAP DECLARES WHETHER IT IS AN ILLUSTRATION OR AN INSTRUMENT,
+        # and `checks.py` asserts it on every one. This is an
+        # `illustration`: it draws the planning population and the six it
+        # refuses, and nothing on it is a link, a filter or a legend — the
+        # instruments are /map and /discover, where a country is a door.
+        # AND THE `atlas` CLASS IS PART OF THAT DECLARATION. An
+        # illustration must carry it, because the skin is what the role
+        # MEANS on this site — warm paper and Atlantic water rather than
+        # land on a near-black ground — and `checks.py` refuses an
+        # illustration without it. Every `.atlas` rule in the stylesheet is
+        # qualified by `.minimap.arched`, so it paints nothing here and the
+        # picture's palette arrives through the band's own token binding;
+        # verified by byte-identical screenshots at 1280 and 390.
+        f'<svg class="instrmap atlas" data-role="illustration" '
+        f'viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true" '
+        # `meet` RATHER THAN `slice`, AND THE LETTERBOX IS INVISIBLE BY
+        # CONSTRUCTION. A map figure paints no background and this band's
+        # paper IS `--map-water`, so the bands `meet` leaves above and below
+        # the drawing are the drawing's own ocean. `slice` would crop the
+        # Caucasus and the Atlantic off a column narrower than the frame,
+        # which is what a full-bleed ground was doing here in three tries.
+        f'focusable="false" preserveAspectRatio="xMidYMid meet">'
+        # AND THE LAND CARRIES AN ID, BECAUSE THE RESULT'S ROUTE FIGURE
+        # CLONES IT. `constel_defs()` emits one thinned lod0 silhouette with
+        # no frontiers, which is the right picture for a 132-pixel theme
+        # glyph and a blank field for a 400-km inland route: measured on a
+        # three-stop Vienna route, the figure was 736 pixels of flat stone
+        # with a green zigzag on it and no coast, no frontier and nothing to
+        # place it by. This page already ships the country rings — the desk
+        # draws forty-eight of them — so the route figure clones THOSE and
+        # gets every frontier for the cost of a `<use>`, which is the same
+        # 27-byte trick the hero uses for its own boundaries.
+        f'<g id="deskland">{dland}</g>'
+        f'{cut_fade("desk", MAP_W, MAP_H, dusk_reach())}'
+        + "".join(f'<circle class="pdot" cx="{x:.1f}" cy="{y:.1f}" r="3.4"/>'
+                  for x, y, _c, _n in planned)
+        + "".join(f'<circle class="pdot out" cx="{x:.1f}" cy="{y:.1f}" r="3.4"/>'
+                  for x, y, _c, _n in refused)
+        + "</svg>")
+
+    desk = f"""
+  <div class="deskwrap">
+  <div class="deskform">
+    <div class="pagehead instrument">
+      <p class="kicker">The European Journey Planner</p>
+      <h1>Twelve days, &euro;2,500, history and mountains.</h1>
+      {head_extent([(len(planned), 'destinations scored'),
+                    (len(data['countries']), 'countries'),
+                    (len(data['journeys']), 'routes already built')])}
     </div>
-    <p class="small mb0">The planner reads the whole Atlas, scores every destination
-    against you, then builds a route that respects distance instead of teleporting
-    between highlights. It is read by rules in your browser — not by a model, and not
-    sent anywhere — and it shows you exactly what it understood, naming anything it
-    could not take account of rather than quietly dropping it.</p>
-  </div>
-</form>
-
-<div class="planform">
-  <div>
-    <form class="form" id="planner">
-      <div class="form-row">
-        <div class="field">
-          <label for="days">Days</label>
-          <input type="number" id="days" name="days" min="3" max="45" value="12" inputmode="numeric">
-        </div>
-        <div class="field">
-          <label for="budget">Total budget (€, per person)</label>
-          <input type="number" id="budget" name="budget" min="200" step="50" value="2500" inputmode="numeric">
-        </div>
-        <div class="field">
-          <label for="month">Travelling in</label>
-          <select id="month" name="month">{months}</select>
-        </div>
+    <form class="form ask" id="askform">
+      <div class="field">
+        <label for="ask">Say it in your own words</label>
+        <textarea id="ask" name="ask" rows="2"
+          placeholder="I have 12 days and &euro;2,500, starting in Lisbon, and I love history, mountains and food."></textarea>
       </div>
-      <div class="form-row">
-        <div class="field">
-          <label for="style">Spending style</label>
-          <select id="style" name="style">{budgets}</select>
-        </div>
-        <div class="field">
-          <label for="pace">Pace</label>
-          <select id="pace" name="pace">
-            <option value="slow">Slow — fewer places, longer stays</option>
-            <option value="balanced" selected>Balanced</option>
-            <option value="fast">Fast — see as much as possible</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="start">Start from</label>
-          <select id="start" name="start"><option value="">Anywhere that fits</option></select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="field">
-          <label for="end">End near</label>
-          <select id="end" name="end"><option value="">Wherever it gets to</option></select>
-        </div>
-        <div class="field">
-          <label for="travellers">Travellers</label>
-          <input type="number" id="travellers" name="travellers" min="1" max="12" value="1" inputmode="numeric">
-        </div>
-        <div class="field">
-          <label for="accommodation">Accommodation</label>
-          <select id="accommodation" name="accommodation">
-            <option value="mixed" selected>Mixed — whatever suits the place</option>
-            <option value="guesthouse">Guesthouses and small places</option>
-            <option value="hotel">Hotels</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="field">
-          <label for="transport">Getting between</label>
-          <select id="transport" name="transport">
-            <option value="any" selected>Whatever is quickest</option>
-            <option value="rail">Rail and ferry, no flights</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="currency">Show costs in</label>
-          <select id="currency" name="currency">{curoptions}</select>
-        </div>
-        <div class="field">
-          <p class="fieldhead">Places you saved</p>
-          <label class="inlinecheck"><input type="checkbox" id="saved" name="saved">
-          Favour the ones in My Europe</label>
-        </div>
-      </div>
-      <fieldset class="fieldset">
-        <legend>What are you travelling for?</legend>
-        <div class="checks">{interests}</div>
-      </fieldset>
       <div class="hero-actions mt0">
-        <button class="btn" type="submit">Build the itinerary</button>
-        <button class="btn ghost" type="button" id="again">Give me a different one</button>
+        <button class="btn" type="submit">Read that and build it</button>
       </div>
+      <p class="small mb0">The planner reads the whole Atlas, scores every
+      destination against you, then builds a route that respects distance
+      instead of teleporting between highlights. It is read by rules in your
+      browser &mdash; not by a model, and not sent anywhere &mdash; and it
+      shows you exactly what it understood, naming anything it could not take
+      account of rather than quietly dropping it.</p>
     </form>
-    <div id="result" aria-live="polite"></div>
   </div>
-</div>
+  <figure class="deskart">{deskmap}
+    <figcaption><span class="capwhat">Every destination the planner scores,
+    at once. The {numword(len(refused))} it will not &mdash;
+    {n_of(len(refused), "destination")} in {and_list(advnames)} &mdash;
+    are drawn dark: a country under a travel advisory is stripped from the
+    planning index at build time rather than hidden in the
+    interface.</span> <span class="capsrc">{geo.sources_line(geo.load("europe-lod0.json"))}</span></figcaption>
+  </figure>
+  </div>"""
 
-<!-- HOW IT DECIDES CAME OUT OF THE RAIL AND WENT UNDER THE TOOL.
-     Four hundred words of scoring weights in a right-hand column, level
-     with the twelve fields and seventeen checkboxes a reader is filling
-     in — two things competing for the same attention, and the form
-     squeezed into two thirds of the page to make room for an essay
-     nobody reads while they are typing. The form takes the full measure
-     now and the method sits under it, which is also where a reader asks
-     the question: they run it, they look at the answer, and THEN they
-     want to know why it chose that. Proof goes under the thing it
-     proves, which is the rule the motion pages already publish. -->
-<div class="planmethod">
-  <div class="methodcols">
-    <h2 class="mini">How it decides</h2>
-    <p>Every destination is scored out of one, on a published weighting:</p>
-    <ul>
-      <li><strong>30%</strong> how many of your interests it carries</li>
-      <li><strong>20%</strong> whether it has things to actually do that match them</li>
-      <li><strong>15%</strong> the month you named — peak, shoulder or off, never zero</li>
-      <li><strong>10%</strong> how connected it is to the rest of the Atlas</li>
-      <li><strong>20%</strong> how much of it we have actually written</li>
-      <li><strong>5%</strong> novelty: quiet places, and countries not yet in your route</li>
-    </ul>
-    <p class="small">The specification this came from allocates 10% to popularity. We have no
-    traffic and no licensed visitor data, so that term would be a number we invented wearing a
-    percentage sign. Its weight moved to content quality, which is measurable. And
-    "accessibility" there means <em>reachability</em> — we hold no step-free access data at
-    all, and <a href="/accessibility">say so</a>.</p>
-    <p>Then: distance penalises each next stop so the route stops wandering; three big cities
-    in a row start to push the fourth choice towards the alternative; nights come from the
-    range on each destination page; and anything above what your budget can afford per day is
-    damped.</p>
-    <h2 class="mini">What the spending styles mean</h2>
-    <ul>{budget_notes}</ul>
-    <h2 class="mini">What it will not do</h2>
-    <p>It will not book anything, price a real hotel, or route you into a country under a
-    travel advisory — those are excluded from the planning index entirely.</p>
-    <p class="small">Estimates are editorial, not quotes. Check <a href="/sources">sources and
-    corrections</a>. The route above is drawn from the coordinates in the Atlas
-    rather than from any road or rail geometry, on the same Lambert conformal conic
-    as every other map here — standard parallels {geo.LCC_P1:.0f}°N and
-    {geo.LCC_P2:.0f}°N, origin {geo.LCC_LAT0:.0f}°N, central meridian
-    {geo.LCC_LON0:.0f}°E. {geo.sources_line(geo.load("europe-lod0.json"))}</p>
+    # ── 02 · THE CONTROLS ────────────────────────────────────────────
+    # THE FORM TAKES THE FULL MEASURE, which is the other half of the
+    # decision that moved the method out of the rail. Twelve fields and
+    # seventeen checkboxes squeezed into two thirds of the page to make room
+    # for an essay is two things competing for one attention.
+    controls = f"""
+  <div class="sheettext">
+    <h2 class="mega">Or tell it precisely.</h2>
+    <p class="lede">The same planner, said in fields rather than in a
+    sentence. Nothing here is required: every one of them has a default the
+    Atlas can work from.</p>
   </div>
-</div>
-"""
+  <form class="form planctl" id="planner">
+    <div class="form-row">
+      <div class="field">
+        <label for="days">Days</label>
+        <input type="number" id="days" name="days" min="3" max="45" value="12" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="budget">Total budget (&euro;, per person)</label>
+        <input type="number" id="budget" name="budget" min="200" step="50" value="2500" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="month">Travelling in</label>
+        <select id="month" name="month">{months}</select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="style">Spending style</label>
+        <select id="style" name="style">{budgets}</select>
+      </div>
+      <div class="field">
+        <label for="pace">Pace</label>
+        <select id="pace" name="pace">
+          <option value="slow">Slow &mdash; fewer places, longer stays</option>
+          <option value="balanced" selected>Balanced</option>
+          <option value="fast">Fast &mdash; see as much as possible</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="start">Start from</label>
+        <select id="start" name="start"><option value="">Anywhere that fits</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="end">End near</label>
+        <select id="end" name="end"><option value="">Wherever it gets to</option></select>
+      </div>
+      <div class="field">
+        <label for="travellers">Travellers</label>
+        <input type="number" id="travellers" name="travellers" min="1" max="12" value="1" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="accommodation">Accommodation</label>
+        <select id="accommodation" name="accommodation">
+          <option value="mixed" selected>Mixed &mdash; whatever suits the place</option>
+          <option value="guesthouse">Guesthouses and small places</option>
+          <option value="hotel">Hotels</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="transport">Getting between</label>
+        <select id="transport" name="transport">
+          <option value="any" selected>Whatever is quickest</option>
+          <option value="rail">Rail and ferry, no flights</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="currency">Show costs in</label>
+        <select id="currency" name="currency">{curoptions}</select>
+      </div>
+      <div class="field">
+        <p class="fieldhead">Places you saved</p>
+        <label class="inlinecheck"><input type="checkbox" id="saved" name="saved">
+        Favour the ones in My Europe</label>
+      </div>
+    </div>
+    <fieldset class="fieldset">
+      <legend>What are you travelling for?</legend>
+      <div class="checks">{interests}</div>
+    </fieldset>
+    <div class="hero-actions mt0">
+      <button class="btn" type="submit">Build the itinerary</button>
+      <button class="btn ghost" type="button" id="again">Give me a different one</button>
+    </div>
+  </form>"""
+
+    # ── 03 · THE RESULT ──────────────────────────────────────────────
+    # PRESENT-BUT-EMPTY SAYS "WE HAVE THIS" AND THEN DOES NOT, so the plate
+    # states what will appear here rather than leaving a hole above the
+    # method. /discover's response plate had the same problem and took the
+    # same answer: at rest it says what it IS showing.
+    result = """
+  <div class="sheettext">
+    <h2 class="mega">Your Europe, assembled.</h2>
+    <p class="lede">The planner is not trying to find every highlight. It is
+    trying to make one coherent route out of what you said matters.</p>
+  </div>
+  <div id="result" aria-live="polite"></div>
+  <p class="note atrest" id="atrest">Nothing has been built yet. When you run
+  it, this is where the route appears &mdash; the stops in order, the nights on
+  each, the straight-line distance between them, what every choice was made
+  for, and an estimate you can argue with. You can move a stop, change its
+  nights, drop it or add one, and every number above recomputes from your
+  version rather than from the planner&rsquo;s.</p>"""
+
+    # ── 04 · THE ENGINE ──────────────────────────────────────────────
+    #
+    # THE WEIGHTS ARE DRAWN AND THEY ARE READ OUT OF ONE PLACE. Six numbers
+    # in a bulleted list is the "block of explanatory text" the brief
+    # objects to, and it is right: this is the page's whole claim to being
+    # an instrument rather than a recommendation, and a claim states itself
+    # better as a proportion than as a percentage sign.
+    #
+    # A CHART IS A CLAIM, so the bars are scaled by the series they are
+    # labelled with and the figures are the ones `planner.js` implements.
+    # The year band already records what happens otherwise: correct labels
+    # over a drawing scaled from the wrong array still reads as a finished
+    # chart.
+    engine = f"""
+  <div class="sheettext">
+    <h2 class="mega">A published method, not a mysterious recommendation.</h2>
+    <p class="lede">Every destination is scored out of one, on a weighting
+    this page publishes and the planner in your browser implements. Distance
+    then shapes the sequence.</p>
+  </div>
+  <dl class="weights">{"".join(
+      f'<div class="wrow"><dt>{esc(name)}</dt>'
+      f'<dd><span class="wbar w{pct}"></span><b>{pct}%</b></dd>'
+      f'<p class="wsay">{esc(say)}</p></div>'
+      for name, pct, say in PLAN_WEIGHTS)}</dl>
+  <p class="small plannote">The specification this came from allocates 10% to
+  popularity. We have no traffic and no licensed visitor data, so that term
+  would be a number we invented wearing a percentage sign. Its weight moved
+  to content quality, which is measurable. And &ldquo;accessibility&rdquo;
+  there means <em>reachability</em> &mdash; we hold no step-free access data
+  at all, and <a href="/accessibility">say so</a>.</p>
+  <p class="small plannote">Then: distance penalises each next stop so the
+  route stops wandering; three big cities in a row start to push the fourth
+  choice towards the alternative; nights come from the range on each
+  destination page; and anything above what your budget can afford per day is
+  damped.</p>"""
+
+    # ── 05 · SPENDING STYLE ──────────────────────────────────────────
+    # AND THE FIGURE IS THE MEDIAN ACROSS THE PLANNING POPULATION, with the
+    # spread beside it, because a median alone reads as a price. Derived
+    # from the same `daily` field the planner costs a night from, on the
+    # same 313 destinations the desk draws — never authored, and it moves
+    # on the next build when a destination's band is edited.
+    def _at(pos):
+        # `daily_eur` IS THE FIELD AND IT IS ON THE COUNTRY, NOT THE CITY.
+        # Two wrong readings in a row, and both raised rather than shipping
+        # a number — `daily` is the name atlas.json publishes it under, and
+        # a destination inherits its country's band, which is exactly what
+        # `planner.js` reads back out of `city.daily`. So the median is over
+        # the 313 DESTINATIONS through their countries' bands, which is the
+        # population the planner actually costs a night from.
+        v = sorted(round(c["country"]["daily_eur"][0]
+                         + (c["country"]["daily_eur"][1]
+                            - c["country"]["daily_eur"][0]) * pos)
+                   for c in data["cities"].values()
+                   if not c["country"].get("advisory")
+                   and c["country"].get("daily_eur"))
+        return v[len(v) // 2], v[0], v[-1]
+
+    stylerows = "".join(
+        '<div class="styleway"><p class="kicker">'
+        + ("%02d / " % i) + esc(b["name"]).upper() + "</p>"
+        + "<h3>" + esc(b["name"]) + "</h3>"
+        + '<p class="styleat"><b>&euro;' + str(_at(PLAN_STYLE_POS[b["slug"]])[0])
+        + "</b> a day, typically</p>"
+        + '<p class="stylesay">' + esc(b["note"]) + "</p>"
+        + '<p class="stylerange">'
+        + ("the bottom of each place\u2019s own recorded band"
+           if PLAN_STYLE_POS[b["slug"]] == 0.0
+           else "the top of it" if PLAN_STYLE_POS[b["slug"]] == 1.0
+           else "the middle of it")
+        + " &mdash; &euro;" + str(_at(PLAN_STYLE_POS[b["slug"]])[1])
+        + " to &euro;" + str(_at(PLAN_STYLE_POS[b["slug"]])[2])
+        + " across the " + str(len(planned)) + "</p></div>"
+        for i, b in enumerate(data["taxonomy"]["budgets"], 1))
+    styles = f"""
+  <div class="sheettext">
+    <h2 class="mega">Choose your way of travelling.</h2>
+    <p class="lede">Three editorial planning assumptions, from the
+    Atlas&rsquo;s own taxonomy. A style is a <em>position</em> in the daily
+    band this atlas already records for each place &mdash; which is why the figures
+    below are medians with their spread beside them rather than prices. They
+    are not hotel quotes and nothing here books anything.</p>
+  </div>
+  <div class="styles">{stylerows}</div>"""
+
+    # ── 06 · WHAT IT WILL NOT DO ─────────────────────────────────────
+    # THE REFUSALS ARE THIS PAGE'S INSTITUTIONAL VOICE AND THEY ARE KEPT
+    # VERBATIM. The brief agrees with every one of them, which is worth
+    # noting: it asked for no fake booking functionality and this page has
+    # published the sentence since before the brief arrived.
+    # AND A BAND WHOSE SUBJECT IS A LIST OF REFUSALS HAD ONE SENTENCE IN
+    # IT. 787 pixels for a headline, a lede and a note in the left half —
+    # the hole this page had on four bands — on the band that carries the
+    # product's whole position. Six refusals, and **not one is written here
+    # for the first place**: each is already published on this site and the
+    # row says where, so the band is a contents page for a promise rather
+    # than a new claim. A refusal nobody can check is a slogan.
+    refusals = [
+        ("It will not book anything",
+         "There is no basket, no payment and no availability anywhere in this "
+         "product. The page that says what EuropeDoor is publishes the "
+         "sentence \u201cNot an OTA\u201d and means it.", "/about"),
+        ("It will not price a hotel",
+         "This atlas holds no rooms, no rates and no availability. Where a "
+         "destination page hands you to a provider it is a referral and says "
+         "so, in both of its two states.", "/for-businesses"),
+        ("It will not route you into an advisory country",
+         "Ukraine, Russia and Belarus keep a page carrying the warning and "
+         "are stripped from the planning index at build time rather than "
+         "hidden in the interface.", "/help"),
+        ("It will not tell you the weather",
+         "No weather data and no forecast for anywhere. A \u201crainy day "
+         "plan\u201d built from nothing would be a guess with a confident "
+         "face on it.", None),
+        ("It will not promise step-free access",
+         "The connectivity term in the weighting above means "
+         "<em>reachability</em>. We hold no step-free access data at all.",
+         "/accessibility"),
+        ("It will not give you a road distance",
+         "Every distance here is a straight line between two coordinates. "
+         "There is no road and no rail geometry in this repository, so the "
+         "time is \u201cabout\u201d and the error runs in both directions.",
+         "/method"),
+    ]
+    refrows = "".join(
+        '<div class="rrow"><dt>' + esc(name) + "</dt><dd>" + why
+        + ("" if not href
+           else ' <a href="' + href + '">Where we say so</a>')
+        + "</dd></div>"
+        for name, why, href in refusals)
+    wont = f"""
+  <div class="sheettext">
+    <h2 class="mega">What it will not do.</h2>
+    <p class="lede">Six of them, and every one is a sourcing position rather
+    than a feature nobody has built yet. Each says where this site publishes
+    it, because a refusal nobody can check is a slogan.</p>
+  </div>
+  <dl class="refusals">{refrows}</dl>
+  <p class="note plannote">Estimates are editorial, not quotes. Check <a href="/sources">sources
+  and corrections</a>. The route is drawn from the coordinates in the Atlas
+  rather than from any road or rail geometry, on the same Lambert conformal
+  conic as every other map here &mdash; standard parallels {geo.LCC_P1:.0f}°N
+  and {geo.LCC_P2:.0f}°N, origin {geo.LCC_LAT0:.0f}°N, central
+  meridian {geo.LCC_LON0:.0f}°E.</p>"""
+
+    # ── 07 · COMPOSE THE JOURNEY ─────────────────────────────────────
+    # A CLASS NAME ALREADY IN THE STYLESHEET IS A RULE YOU INHERIT
+    # SILENTLY, AND THE SECOND NAME WAS TAKEN TOO.
+    # The first version of this band borrowed `.sendsay`, which is
+    # /journeys' own closing composition — a centred statement over a
+    # PHOTOGRAPH behind a 72% graphite scrim — and its rule is
+    # `.sendsay .mega, .sendsay .lede { color: var(--bone) }`. On a white
+    # wall that is bone on white, about 1.1:1: the last thing this page says
+    # was present, placed, centred and unreadable. This repository recorded
+    # exactly that about `.doorgo` two commits ago and it happened again
+    # here. The band owns its own name and declares no colour at all, so the
+    # room's ink is whatever the room binds. And `.closesay` — the obvious
+    # second choice — is ALSO already declared, by the closing band on the
+    # homepage and /discover, at `max-width: 32rem`: the statement came out
+    # 512 pixels wide inside a 1,152-pixel band, centred inside its own cap
+    # and therefore off-centre in the room. Two collisions in one band, from
+    # the two most obvious names, with nothing in any suite that could see
+    # either. Grep the stylesheet before naming a composition.
+    close = f"""
+  <div class="composesay">
+    <h2 class="mega">Do not just choose places.<br>Compose the journey.</h2>
+    <p class="lede">Start with what you have. Say what you like. The Atlas
+    draws the line between them.</p>
+    <p class="keepgo">{golink('#askform', 'Back to the desk')}
+    {golink('/journeys', 'Or take one already built')}</p>
+  </div>"""
+
+    PLATES = [("desk paper", "The desk", desk, "the-desk"),
+              ("planctls gal", "The controls", controls, "the-controls"),
+              ("planres gal quiet", "The result", result, "the-result"),
+              ("engine pine", "The engine", engine, "the-engine"),
+              ("styles gal", "Spending style", styles, "spending-style"),
+              ("wont gal quiet", "What it will not do", wont, "what-it-wont-do"),
+              ("close gal", "Compose the journey", close, "compose")]
+    body = (crumbs([("Europe", "/discover"), ("Plan", None)])
+            + constel_defs()
+            + jsondata("europedoor-glyphview-cases",
+                       [f"{len(pts)}:" + glyph_view(pts) for pts in GLYPHVIEW_CASES])
+            + "\n".join(
+                f'<section class="sheet {" ".join("sheet-" + p for p in slug.split())}" '
+                f'id="{anchor}">{actmark(i, name)}{inner}</section>'
+                for i, (slug, name, inner, anchor)
+                in enumerate([p for p in PLATES if p[2]], 1)))
+
     return "/plan/index.html", page(
-        "Plan a journey", body, path="/plan", area="plan",
+        "Plan a journey", body, path="/plan", area="plan", hero=True,
         description="Tell EuropeDoor your days, budget and interests and it builds a European itinerary with real distances, real night counts and a cost estimate.",
         scripts=["/assets/js/planner.js"],
         # INTELLIGENCE — the planner: journey construction
         world="intelligence"
     )
 
-
-# Named on every destination page, and honestly empty. A scraped hotel list
-# would take an afternoon and would be the first unverified thing on the site.
 def stay_section(data, c, r, t, cid):
     """Where to stay, as an EuropeDoor answer rather than an OTA one.
 
@@ -13343,6 +13698,25 @@ def discover_page(data):
     # left: it simply continues into the page and the key is set in its
     # ocean. That is the difference between a map ON a plate and a map that
     # IS one.
+    # AND THE GROUND BEYOND THE ATLAS IS NOT DRAWN HERE, WHICH IS A
+    # MEASUREMENT RATHER THAN A PREFERENCE. `landmass` returns the context
+    # land first — every landmass in a box that contains Europe, clipped to
+    # that box — and it is a HERO device: *Europe is not an island*, and the
+    # graphite it is drawn on absorbs its straight edges completely. /map and
+    # /discover keep it for exactly that reason, and the same slab on the
+    # same projection is invisible there: measured on /map's own pixels, the
+    # dusk over 52°E is near-black and Iran and Iraq are gone.
+    # This band is the one light drawing that shows the whole eastern cut
+    # inside its own frame with open water beyond it, and `--atlas-far`
+    # (#C3BFB2) is DARKER than the water (#DDE8E7) rather than lighter — so
+    # the fragment came out as a warm slab with three straight edges sitting
+    # in the sea south-east of Baku, probed and named as Iran and Iraq
+    # clipped at 52°E. The wide fade hides it and takes the ground out from
+    # under Baku and Tbilisi with it, which is the fault `dusk_reach` exists
+    # to stop and is why every caller passes it. So the layer that has no
+    # claim to make here is the one that goes: this drawing's subject is 313
+    # destinations and the six it refuses, and nothing outside the atlas is
+    # part of that sentence.
     dctx, dland = geo.landmass(MAPPROJ, (0, 0, MAP_W, MAP_H))
     mapsvg = (f'<svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true">'
               f'<rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>'

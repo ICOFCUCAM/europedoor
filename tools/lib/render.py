@@ -751,6 +751,32 @@ def photo(images, key, *, w, h, alt="", eager=False, sizes="100vw"):
                    eager=eager, sizes=sizes)
 
 
+def credit_html(row):
+    """The attribution Pexels' terms require, from one register row.
+
+    ONE IMPLEMENTATION, BECAUSE THIS ONE IS A LICENCE OBLIGATION. It lived
+    inside `picture()` while `picture()` was the only way a photograph
+    reached a reader. The planner broke that: `planner.js` writes an `<img>`
+    for a leg whose stop the register holds a photograph of, and a runtime
+    `<img>` is invisible to `checks.py`'s output-side guard — the one that
+    refuses a published page referencing a file with no register row. So a
+    second copy of this rule in JavaScript would be *a second chance to make
+    its mistake* in the worst place this repository has one: nothing here
+    would go red, and the breach would be of somebody else's terms.
+
+    Both targets come from the row rather than from a provider table:
+    `source` is the photo's own page, and the provider link is the ORIGIN of
+    `licence_url`, so https://www.pexels.com/license/ gives
+    https://www.pexels.com — the example the guideline itself uses.
+    """
+    parts = urlsplit(row["licence_url"])
+    provider_url = f"{parts.scheme}://{parts.netloc}"
+    link = ' rel="noopener" target="_blank"'
+    return (f'Photo by <a href="{esc(row["source"])}"{link}>'
+            f'{esc(row["photographer"])}</a> on '
+            f'<a href="{esc(provider_url)}"{link}>{esc(row["licence"])}</a>')
+
+
 def photo_href(images, key, width):
     """One derivative's URL, for a surface that cannot hold a <picture>.
 
@@ -824,9 +850,6 @@ def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed
     # https://www.pexels.com/license/ gives https://www.pexels.com — the
     # example the guideline itself uses. Nothing is authored per provider,
     # which is what keeps a second provider from needing a second renderer.
-    parts = urlsplit(row["licence_url"])
-    provider_url = f"{parts.scheme}://{parts.netloc}"
-    link = ' rel="noopener" target="_blank"'
     # A CREDIT IS A LINK, SO A PICTURE CARRYING ONE CANNOT GO INSIDE A LINK.
     # An `<a>` may not contain an `<a>`: the parser closes the outer one at
     # the inner, so a thumbnail wrapped in a link came apart into three
@@ -839,9 +862,7 @@ def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed
     # `credit=False` is for a caller that places the attribution itself.
     # It does not make the credit optional: Pexels' terms require it, and a
     # caller that turns it off here owes one somewhere a reader can see.
-    credit_html = (f'Photo by <a href="{esc(row["source"])}"{link}>'
-                   f'{esc(row["photographer"])}</a> on '
-                   f'<a href="{esc(provider_url)}"{link}>{esc(row["licence"])}</a>')
+    credit = credit and credit_html(row)
     return (
         f"<picture>"
         f'<source type="image/avif" srcset="{esc(srcset("avif"))}" sizes="{esc(sizes)}">'
@@ -851,7 +872,7 @@ def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed
         f'loading="{"eager" if eager else "lazy"}" '
         f'fetchpriority="{"high" if eager else "auto"}" decoding="async" '
         f'class="photo {focal_class(fx, fy)}">'
-        + (f'<figcaption class="credit">{credit_html}</figcaption>' if credit else "")
+        + (f'<figcaption class="credit">{credit}</figcaption>' if credit else "")
         + "</picture>"
     )
 

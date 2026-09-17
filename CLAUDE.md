@@ -17,6 +17,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **the mandate: what a first-class gateway to Europe would be, and where this one is not** | **`docs/first-class-audit.md`** — 27 surfaces rendered at 1280 and 390 and then measured. Three findings, and Finding 1 is now closed on the numbers: it read 12 of 23 surfaces effectively type to the fold with seven showing no picture at all, and reads **3 of 30 with none and none under a fifth**, median share 24% → 35.6% (CORRECTED twice — the first version said 21 of 22 and was reading where the first figure STARTS rather than how much of the screen it fills). `tools/opening.js` is the instrument, so the number is checkable in a minute. **Finding 2's other half is measured too** — it says the page is the same page and its evidence only ever covered the first 250 pixels: `tools/composition.js` reads the band sequence under the head and finds **29 distinct body shapes over 47 families**, and three h1 sizes at tops 136–745 where the original reading was one size at 150–312. The eight benchmark sites are BLOCKED by the egress proxy and the benchmark half is labelled second-hand |
 | **/experiences — the third instrument, and why it is photography rather than a map** | **`docs/experiences-redesign.md`** — the source audit, the image-coverage audit, the twelve bands of the brief mapped onto what this atlas actually holds, the two that are refused, and the seven defects only rendering found. 311 photographs, and on this one page the library was never the constraint |
 | **/journeys — movement rather than a list, and where the family's own photograph went** | **`docs/journeys-redesign.md`** — the source audit, the seventeen routes drawn at once as the opening, the three paces derived from measured kilometres a day rather than named, the two things the brief asks for that are refused with their triggers, and the five defects only rendering found |
+| **/plan — an instrument rather than a form, and the guard a runtime `<img>` walks straight past** | **`docs/plan-redesign.md`** — the source audit, the seven bands, the three of the brief's asks that collide with recorded findings, the twelve defects only rendering found (nine of them faults already recorded in another family and three of those recorded in the commit before), and the per-leg photograph: `render.credit_html` is one implementation because `checks.py` cannot see an `<img>` a script writes |
 | **the eight page families, and what each room does differently** | **`docs/non-home-redesign.md`** — the non-home redesign answered A-J. The eight rooms derived from the route, the three helpers that were forcing one grammar, the seven image scales, 1,626 declared surfaces, and the defects only rendering found |
 | **the design language — what makes a page EuropeDoor with the logo removed, and which movements each family takes** | **`docs/design-language.md`** — the ARCHITECT step. Five marks that could not have been made by anybody else, the six-movement composition grammar per family, the three head roles, what the language forbids, and how a change is proved |
 | **anything at all — read this first, every session** | **`docs/instruction.md`** — the standing instruction. Part 1 is how work is done here (audit first, deviate with numbers, STOP on licensing, never invent data, prove every check can fail). Part 2 is the visual instruction: **European Future**, the two worlds, the palette, the 60/25/10/5 ratio and the measured contrast limits. `docs/palette.json` is the checkable form |
@@ -4857,6 +4858,166 @@ the acquisition suite down with it. **Every other band on that page is already
 guarded** — `if inner` in the plate loop drops an empty one — and this was the
 one that could never produce an empty string, because it died first. The
 crash-stops-counting fault arriving in a page BUILDER rather than in a gate.
+
+
+**THREE CLASS-NAME COLLISIONS ON ONE PAGE, FROM THE TWO MOST OBVIOUS NAMES,
+AND THERE IS NO GUARD.** *A class name already in the stylesheet is a rule
+you inherit silently* is recorded above about `.doorgo`, whose `opacity: 0`
+made two links on /experiences present, placed, sized, keyboard-reachable
+and painted at zero alpha. /plan's closing band hit it twice in a row:
+`.sendsay` is /journeys' close — a centred statement over a photograph
+behind a 72% graphite scrim — and sets `color: var(--bone)` on its own
+heading and lede, so on a white wall the last thing the page says measured
+about **1.1:1**; `.closesay`, the obvious second choice, is the closing band
+on the homepage and /discover at `max-width: 32rem`, so the statement came
+out 512 pixels wide inside a 1,152-pixel band, centred inside its own cap
+and therefore off-centre in the room. The third was a `.deskart figcaption`
+rule written twice with an identical body eighty lines apart — one of the 85
+duplicated rules the previous commit removed, reintroduced within the hour.
+**Grep the stylesheet before naming a composition.**
+
+**A RUNTIME `<img>` IS INVISIBLE TO THE GUARD THAT REFUSES AN UNREGISTERED
+FILE, WHICH MAKES IT THE WORST PLACE IN THIS PRODUCT FOR A SECOND
+IMPLEMENTATION.** `checks.py` reads the shipped HTML for a page referencing
+a photograph with no register row. `planner.js` writes an `<img>` for a leg
+whose stop the register holds a picture of — 63 of the 313 destinations the
+planner can route through — and that check has no reach there at all. So
+composing Pexels' attribution in JavaScript would have been a second copy of
+a **licence obligation** with nothing on either end able to go red, and the
+breach would be of somebody else's terms. `render.credit_html(row)` was
+lifted out of `picture()` and is the one implementation: `picture()` calls
+it, `planner_api()` calls it, and the fragment travels in the index as
+`cities.shotCredit` beside `shot` and `shotAlt`, each declared in
+`data/contracts.json` with its reason. The terms are the gate's own recorded
+answer, verbatim — *"make sure to show a prominent link to Pexels … Always
+credit our photographers when possible (e.g. 'Photo by John Doe on Pexels'
+with a link to the photo page on Pexels)"* — and each leg tile carries both
+links. `atlas.json` 317,645 → 346,303 bytes, 9.0%, recorded.
+
+**`--atlas-*` IS A ROLE THAT RESOLVES PER WORLD AND `--map-*` IS THE
+PALETTE, AND A COMMENT CLAIMING THE SECOND WAS WRITTEN OVER THE FIRST.**
+`.planmap .constel` — the planner's own route figure — carries the sentence
+*"this is a picture inside an instrument, and it takes the picture's
+palette"* and painted `background: var(--atlas-sea)`. That figure only ever
+renders on /plan and /my-europe, both INTELLIGENCE, so for the life of the
+rule it took the instrument's near-black: invisible while those pages were
+dark throughout, and a black slab the moment /plan's bands became bone.
+Measured on the built result, the svg's own background computed
+`rgb(7,16,15)` inside a band of `rgb(248,246,239)`. That is the /journeys
+`--map-sea` finding from the other end — there a token that does not exist
+fell back to transparent; here a token that does exist resolved to the other
+set, and only one of the two is visible to a scan for an unresolvable
+`var()`.
+
+**A SOURCE RULE REACHES A `<use>` CLONE ONLY WHERE THE SELECTOR MATCHES THE
+CLONE'S OWN POSITION, WHICH REFINES WHAT THIS FILE HAD SETTLED.** The
+planner's route figure clones /plan's country rings — `#constel-eu` is one
+thinned lod0 silhouette with no internal boundaries, right for a 132-pixel
+theme glyph and 736 pixels of flat stone with a green zigzag on it for a
+three-stop route that never leaves central Europe. Measured, the `<use>`
+computed `rgb(216,212,199)`: the fill `.planmap`'s own rule sets, where
+`.instrmap .countries path` would have given it the ink coast. Writing
+`.planmap .constel .countries path` did not reach it either. What draws
+every boundary is the anti-aliased edge between two adjacent country fills,
+one device pixel at every frame — and **two strokes were tried and both are
+refused**, because `stroke` is inherited and `vector-effect` is not, and
+`glyphView` frames 340 to 1,000 units so a user-unit stroke is three times
+wider on a city break than on a continental crossing.
+
+**A SCRIM THAT RUNS DIAGONALLY IS WEAKEST AT A CORNER OF THE COLUMN IT
+EXISTS TO COVER, AND A PALE WASH CANNOT SAVE DARK INK.** /plan's first
+composition held the drawing as the band's full-bleed ground with the form
+over it. Measured with the column's words removed, the ground ran **0.055 to
+0.789 of luminance at 1280 and 0.007 to 0.789 at 390**: the head read on
+flat water and the prose, the button and the extent figures sat on bare
+drawing over 313 cobalt dots, the h1's `#141716` at **1.81:1** at 1280 and
+**1.02:1** at 390, on a form. Moving the wash onto the form fixed the ratio
+at every height and cost half the continent — Iberia, Ireland, Britain,
+France and western Norway under an opaque panel, the dots showing through
+the ramp as a field the eye keeps trying to resolve, and a terminator down
+the middle of Europe that nothing in the drawing had drawn. **So the overlap
+went instead**: two tracks, no scrim, and the band's paper IS `--map-water`,
+so the drawing's own ocean and the band's ground are one colour and there is
+no seam to see. 14.41:1 for the title, 11.43 for the kicker and the prose,
+4.72 for the label, by construction. **And the first sampler hid the scrim
+it was measuring** — `visibility: hidden` on the column hides its own
+`::before`, so the run reported the ground the scrim exists to replace,
+which is this instrument's own recorded failure inside the instrument
+written to find it.
+
+**AN `aspect-ratio` ON A CONTAINER THAT ALSO HOLDS PROSE IS A PROPORTION
+SHARED WITH THE PROSE.** `.deskart { aspect-ratio: 1000/780 }` sat on the
+`<figure>`, which includes its caption: measured at 390 the figure was
+390×304 and the caption took 231 of it, so **the whole of Europe rendered 73
+pixels tall** on the band that says the planner works across the continent.
+
+**THE CONTEXT LAND IS A HERO DEVICE AND THE GRAPHITE IS WHAT MAKES IT
+WORK.** A warm slab with three straight edges sat in the sea south-east of
+Baku on /plan's desk drawing. The eye said "a clipped fragment of a country
+with no destinations"; `isPointInFill` said **Georgia, Armenia, Azerbaijan
+and Türkiye** — the Caucasus, correctly drawn, whose eastern side is the
+52°E cut `dusk_reach()` deliberately does not hide so Baku and Tbilisi keep
+their ground. *The eye finds a defect and it does not confirm one.* A
+tighter grid found the real one: **Iran and Iraq, in the CONTEXT layer**,
+clipped into a slab. /map and /discover keep that layer and the same slab on
+the same projection is invisible there, because near-black absorbs its
+straight edges — and `--atlas-far` (`#C3BFB2`) is DARKER than the light
+map's water rather than lighter. The wide fade hides it and takes the ground
+out from under Baku with it, so the layer with no claim to make on this
+drawing is the one that goes.
+
+**"NOTHING HAS BEEN BUILT YET" UNDER A BUILT ITINERARY.** `#atrest` was new
+and `planner.js` had never heard of the id, so the sentence stayed on the
+page under four legs, a cost breakdown and a route map — *removing a claim
+leaves surfaces pointing at it*, arrived at from the other side.
+`#result:not(:empty) ~ .atrest { display: none }` decides it from the DOM
+rather than from a flag somebody has to clear: the sentence shows if and
+only if the element it describes is empty, and it cannot drift because the
+condition IS the thing it is about.
+
+**A CHART WHOSE VALUE SAT SIX HUNDRED PIXELS FROM ITS BAR.** *A chart on
+which four of seven series cannot be seen is the wrong track* was a share of
+319 on an 80-pixel track; this is the same fault inverted. /plan's weighting
+bars had a `minmax(0, 1fr)` track — 896 pixels at 1280 — and a bar is a
+share of ONE HUNDRED, so the largest weight can never exceed 30% of it:
+"Your interests" drew 245px and its "30%" sat at x=1,167. The scaling did
+not move, because *the bars are still scaled by the series they are labelled
+with* and a share-of-the-largest version would read as 100%. The number
+moved, to the end of the bar it belongs to. And **the two constants are
+declared once now** — `PLAN_WEIGHTS` sums to 100 and `PLAN_STYLE_POS` is
+asserted equal to `planner.js`'s own `STYLE_DAILY`, because a second copy of
+0.5 is a second chance for the page and the planner to disagree about what
+"comfortable" means.
+
+**A SPENDING STYLE IS A POSITION IN A PLACE'S OWN BAND, AND THE BAND
+PUBLISHED THREE SENTENCES AND NO NUMBER.** `STYLE_DAILY` is
+`{low: 0, moderate: .5, high: 1}` — the bottom, the middle or the top of the
+daily range this atlas already records for each destination — which is the
+one measurable thing about the three styles and was invisible. €60, €105 and
+€150 now, each a median over the 313 with its spread beside it, derived on
+every build. *The Data Integrity Rule in both directions on one band*: the
+three names are editorial and every figure is derived. **And the field is
+`daily_eur` on the COUNTRY** — two wrong readings in a row, `daily` (which
+is the name `atlas.json` publishes it under) and then the city, and both
+raised rather than shipping a number, which is the right way round.
+
+**A BAND WHOSE SUBJECT IS A LIST OF REFUSALS HAD ONE SENTENCE IN IT.** 787
+pixels for a headline, a lede and a note in the left half, on the band that
+carries this product's whole position. Six refusals now — no booking, no
+hotel price, no advisory routing, no weather, no step-free promise, no road
+distance — and **not one is written there for the first place**: each is
+already published on this site and the row says where, because a refusal
+nobody can check is a slogan.
+
+**AND FOUR BANDS PUT THEIR HEAD IN THE LEFT HALF.** `.sheettext` is a
+one-column grid, which is right on /discover where each plate's text is one
+of two tracks, and /plan's bands are `display: block` — so the h2 took its
+own measure and the lede sat UNDER it at 361 pixels inside a 1,152-pixel
+band. `render.section()` had already answered this for three quarters of the
+site: the title at display size with its lede beside it. 1.1 against .9
+rather than equal halves, because two equal columns read as a layout and an
+unequal pair reads as a statement with a note on it, which is the feature
+scale's own argument at 1.35/.65.
 
 
 ## Gates

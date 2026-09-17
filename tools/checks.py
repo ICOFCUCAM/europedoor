@@ -344,6 +344,76 @@ class Structure(html.parser.HTMLParser):
 
 # ── the checks ────────────────────────────────────────────────────────
 
+@check("the planner's own two constants are declared once")
+def c_plan_constants():
+    """THE PAGE AND THE PLANNER MUST AGREE ABOUT WHAT A STYLE IS.
+
+    Two numbers decide what /plan publishes and what `planner.js` does, and
+    both used to be typed twice. The weighting is the page's whole claim to
+    being an instrument rather than a recommendation; the style position is
+    the whole of what "comfortable" means — the middle of a place's own
+    recorded daily band. A second copy of 0.5 is a second chance for the
+    sentence and the arithmetic to disagree, which is the dispatch cap's own
+    lesson: four typed copies of one number, and the one that was a gate was
+    the one left behind.
+
+    Asserted against `planner.js`'s source rather than against a second
+    table here, because the planner is the implementation and the page is
+    the claim about it.
+    """
+    n = 0
+    js = open(os.path.join(ROOT, "assets", "js", "planner.js"),
+              encoding="utf-8").read()
+    # THE STYLE POSITIONS, BOTH DIRECTIONS.
+    m = re.search(r"var STYLE_DAILY = \{([^}]*)\}", js)
+    if not m:
+        fail("planner.js no longer declares STYLE_DAILY, so nothing can "
+             "check that /plan publishes the same spending styles it uses")
+    else:
+        got = dict(re.findall(r"(\w+)\s*:\s*([0-9.]+)", m.group(1)))
+        want = {k: repr(v) for k, v in P.PLAN_STYLE_POS.items()}
+        for k, v in P.PLAN_STYLE_POS.items():
+            n += 1
+            if k not in got:
+                fail("pages.PLAN_STYLE_POS declares the spending style %r "
+                     "and planner.js's STYLE_DAILY does not: /plan would "
+                     "publish a figure for a style the planner cannot cost"
+                     % k)
+            elif abs(float(got[k]) - v) > 1e-9:
+                fail("the spending style %r sits at %s of a place's daily "
+                     "band in planner.js and /plan publishes it at %s. The "
+                     "page's median is arithmetic on the wrong position."
+                     % (k, got[k], v))
+        for k in got:
+            n += 1
+            if k not in P.PLAN_STYLE_POS:
+                fail("planner.js costs the spending style %r and "
+                     "pages.PLAN_STYLE_POS does not know about it, so /plan "
+                     "publishes two of three assumptions" % k)
+    # THE WEIGHTING IS A PARTITION, and a chart of a partition that does not
+    # sum to one is a chart of something else.
+    tot = sum(pct for _nm, pct, _say in P.PLAN_WEIGHTS)
+    n += 1
+    if tot != 100:
+        fail("/plan draws its scoring weights as shares of one hundred and "
+             "they sum to %d. The bars are a partition or they are not a "
+             "partition." % tot)
+    # AND EVERY FIGURE IS ON THE SHIPPED PAGE, because a chart's labels can
+    # be right over a drawing scaled from the wrong array.
+    flat = " ".join(open(os.path.join(OUT, "plan", "index.html"),
+                         encoding="utf-8").read().split())
+    for nm, pct, _say in P.PLAN_WEIGHTS:
+        n += 1
+        if "%d%%" % pct not in flat or esc(nm) not in flat:
+            fail("/plan does not print the weight %r at %d%%, which the "
+                 "planner implements" % (nm, pct))
+        if ('class="wbar w%d"' % pct) not in flat:
+            fail("/plan prints the weight %r as %d%% and draws its bar at a "
+                 "different width: correct labels over a drawing scaled from "
+                 "the wrong array still reads as a finished chart" % (nm, pct))
+    return n
+
+
 @check("the dataset loads and validates")
 def c_data():
     d = D.load()
@@ -2549,8 +2619,39 @@ def c_api():
                     continue
                 with open(path, encoding="utf-8") as fh:
                     doc = json.load(fh)
+                # A FIELD THAT IS ABSENT BY DESIGN NEEDS A DIFFERENT
+                # ASSERTION FROM A FIELD THAT IS ABSENT BY ACCIDENT, and
+                # `_dig` reads ONE representative row. `cities.shot` is the
+                # URL of a destination's photograph and the register holds
+                # one for 63 of 313, with the key omitted on the rest
+                # because present-but-empty says "we have this" and then
+                # does not — so whether it is "there" depends on which row
+                # comes first, and in `photo-tests.py`, which rebuilds
+                # against an EMPTIED register, it is on no row at all. That
+                # is the empty-register fault this repository has now
+                # recorded five times, arriving in the contract checker.
+                #
+                # So a `?` prefix declares the field conditional, and the
+                # assertion moves to where the absence IS visible: the
+                # producer's own source. `tools/lib/pages.py` writes every
+                # index here, and a field it stops naming is a dependency
+                # that has silently gone — which is the same reasoning
+                # `c_purpose_reaches` and `c_og_no_hash_motif` are asserted
+                # at the source for. The promise is unchanged and it is
+                # checkable in both states.
+                produced = open(os.path.join(ROOT, "tools", "lib", "pages.py"),
+                                encoding="utf-8").read()
                 for field, why in fields.items():
-                    if _dig(doc, field) is None:
+                    cond = field.startswith("?")
+                    field = field.lstrip("?")
+                    if cond:
+                        leaf = field.split(".")[-1]
+                        if f'"{leaf}"' not in produced:
+                            fail(f"{con['consumer']} depends on {endpoint} -> "
+                                 f"{field}, declared conditional, and nothing in "
+                                 f"tools/lib/pages.py writes the key {leaf!r} any "
+                                 f"more ({why[:60]})")
+                    elif _dig(doc, field) is None:
                         fail(f"{con['consumer']} depends on {endpoint} -> {field}, "
                              f"which is not there ({why[:60]})")
                     if not why:
