@@ -573,7 +573,24 @@
     return '<figure class="planmap">' +
       '<svg class="constel" viewBox="' + glyphView(pts) + '" role="img" ' +
       'aria-label="The route this planner built: ' + attr_(names) + '">' +
-      '<use href="#constel-eu"/>' +
+      /* THE FRONTIERS COME FROM THE DESK'S OWN DRAWING. `#constel-eu` is
+       * one thinned lod0 silhouette with no internal boundaries — right for
+       * a theme glyph at 132 pixels and a blank stone field for a route
+       * that never leaves central Europe. /plan already ships the country
+       * rings in plate 01, so this clones them. The clone is PAINTED BY
+       * INHERITANCE from the `<use>` — measured, it computes the fill
+       * `.planmap .constel > use` sets and not the ink coast
+       * `.instrmap .countries path` gives the source, because a source rule
+       * reaches a clone only where the selector matches the CLONE's own
+       * position and this one sits inside `.planmap`. Every frontier is the
+       * one-pixel edge between two adjacent country fills; the stylesheet
+       * records the two strokes that were tried and refused.
+       * The fallback is not decoration: this script is loaded by /plan
+       * alone today, and a figure that renders nothing because a band was
+       * renamed is the kind of silent absence that ships. */
+      '<use href="' +
+      (document.getElementById("deskland") ? "#deskland" : "#constel-eu") +
+      '"/>' +
       '<polyline class="constel-route case" points="' + d + '"/>' +
       '<polyline class="constel-route" points="' + d + '"/>' +
       '<g class="constel-lit">' + dots + "</g></svg>" +
@@ -1277,22 +1294,45 @@
       var controls =
         '<p class="legedit">' +
         '<button type="button" class="linkish" data-move="' + i + '" data-dir="-1"' +
-          (i === 0 ? " disabled" : "") + ' aria-label="Move ' + city.name + ' earlier">↑ earlier</button>' +
+          (i === 0 ? " disabled" : "") + ' aria-label="Move ' + attr_(city.name) + ' earlier">↑ earlier</button>' +
         '<button type="button" class="linkish" data-move="' + i + '" data-dir="1"' +
-          (i === route.length - 1 ? " disabled" : "") + ' aria-label="Move ' + city.name + ' later">↓ later</button>' +
+          (i === route.length - 1 ? " disabled" : "") + ' aria-label="Move ' + attr_(city.name) + ' later">↓ later</button>' +
         '<button type="button" class="linkish" data-nights="' + i + '" data-by="-1"' +
-          (st.nights <= 1 ? " disabled" : "") + ' aria-label="One night fewer in ' + city.name + '">− night</button>' +
+          (st.nights <= 1 ? " disabled" : "") + ' aria-label="One night fewer in ' + attr_(city.name) + '">− night</button>' +
         '<button type="button" class="linkish" data-nights="' + i + '" data-by="1"' +
-          ' aria-label="One night more in ' + city.name + '">+ night</button>' +
+          ' aria-label="One night more in ' + attr_(city.name) + '">+ night</button>' +
         '<button type="button" class="linkish drop" data-drop="' + i + '"' +
-          (route.length <= 2 ? " disabled" : "") + ' aria-label="Remove ' + city.name + ' from the route">× remove</button>' +
+          (route.length <= 2 ? " disabled" : "") + ' aria-label="Remove ' + attr_(city.name) + ' from the route">× remove</button>' +
         '<button type="button" class="linkish" data-add="' + i + '"' +
           ' aria-expanded="false" aria-controls="addpanel' + i + '"' +
-          ' aria-label="Add a stop after ' + city.name + '">+ stop after</button>' +
+          ' aria-label="Add a stop after ' + attr_(city.name) + '">+ stop after</button>' +
         "</p>" +
         '<div class="addstop" id="addpanel' + i + '" hidden></div>';
 
-      legs += '<li class="leg"><div class="leg-when">' + when + '</div><div>' +
+      /* A LEG CARRIES ITS STOP'S OWN PHOTOGRAPH WHERE THE REGISTER HOLDS
+       * ONE, WHICH IS A FIFTH OF THEM. `city.shot` is the URL of one
+       * derivative, written into /api/atlas.json at build time by
+       * `render.photo_href`, and `city.shotCredit` is the attribution
+       * Pexels' terms require, composed by `render.credit_html` — the one
+       * function that knows that rule. It is NOT composed here: this
+       * `<img>` is written at runtime, so `checks.py`'s guard against a
+       * published page referencing an unregistered file cannot see it at
+       * all, and a second implementation of a LICENCE obligation is the one
+       * this repository has already learned not to have.
+       *
+       * Absent on four legs in five, and nothing stands in for it — no
+       * generated plate, because the plate system is exclusively the
+       * social-card language now and every .card-art on this site is a map.
+       */
+      var pic = city.shot
+        ? '<figure class="legshot"><img src="' + city.shot + '" alt="' +
+          attr_(city.shotAlt || city.name) + '" loading="lazy" decoding="async" ' +
+          'width="800" height="450" class="photo">' +
+          '<figcaption class="credit">' + city.shotCredit + "</figcaption></figure>"
+        : "";
+
+      legs += '<li class="leg' + (pic ? " haspic" : "") +
+              '"><div class="leg-when">' + when + '</div><div>' +
               hop +
               '<h3><a href="' + city.url + '">' + city.name + "</a> <span class=\"small\">· " +
               city.country + " · " + city.region + "</span></h3>" +
@@ -1300,7 +1340,7 @@
               legWhy(city, allBits[i], shared, sharedRate ? "" : allRates[i]) +
               '<ul class="daylist">' + dayHtml + "</ul>" + forcedNote + altHtml +
               controls +
-              "</div></li>";
+              "</div>" + pic + "</li>";
       day = last + 1;
     }
 

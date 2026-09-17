@@ -751,6 +751,63 @@ def photo(images, key, *, w, h, alt="", eager=False, sizes="100vw"):
                    eager=eager, sizes=sizes)
 
 
+def credit_html(row):
+    """The attribution Pexels' terms require, from one register row.
+
+    ONE IMPLEMENTATION, BECAUSE THIS ONE IS A LICENCE OBLIGATION. It lived
+    inside `picture()` while `picture()` was the only way a photograph
+    reached a reader. The planner broke that: `planner.js` writes an `<img>`
+    for a leg whose stop the register holds a photograph of, and a runtime
+    `<img>` is invisible to `checks.py`'s output-side guard — the one that
+    refuses a published page referencing a file with no register row. So a
+    second copy of this rule in JavaScript would be *a second chance to make
+    its mistake* in the worst place this repository has one: nothing here
+    would go red, and the breach would be of somebody else's terms.
+
+    Both targets come from the row rather than from a provider table:
+    `source` is the photo's own page, and the provider link is the ORIGIN of
+    `licence_url`, so https://www.pexels.com/license/ gives
+    https://www.pexels.com — the example the guideline itself uses.
+    """
+    parts = urlsplit(row["licence_url"])
+    provider_url = f"{parts.scheme}://{parts.netloc}"
+    link = ' rel="noopener" target="_blank"'
+    return (f'Photo by <a href="{esc(row["source"])}"{link}>'
+            f'{esc(row["photographer"])}</a> on '
+            f'<a href="{esc(provider_url)}"{link}>{esc(row["licence"])}</a>')
+
+
+def photo_href(images, key, width):
+    """One derivative's URL, for a surface that cannot hold a <picture>.
+
+    `picture()` is the only way a photograph reaches an HTML page and that
+    stays true: it emits the whole ladder, the focal anchor and the credit
+    the licence requires. An SVG `<image>` can hold none of those — it is a
+    single href — so the Living Atlas, which clips a photograph to a
+    country's own boundary, needs the URL on its own.
+
+    IT TAKES A REGISTER KEY AND NEVER A URL, which is the whole point. The
+    row is looked up here, exactly as `picture()` looks it up, so a caller
+    cannot name a file the register does not hold — the rule that stopped
+    `ed_photo` taking a `src` and becoming a second way into the library
+    with none of the licence gate behind it. An unknown key returns "" and
+    the caller draws nothing, which is the same answer `picture()` gives by
+    falling back.
+
+    JPEG rather than the AVIF the ladder leads with: `<image>` has no
+    `<source>` and therefore no negotiation, so the one format every
+    browser that renders SVG can decode is the honest choice. The step is
+    the nearest one at or above the width asked for, and the name carries
+    the original's hash, so the URL cannot change without the photograph
+    changing — which is what the immutable header on /assets/ promises.
+    """
+    row = (images or {}).get(key)
+    if not row:
+        return ""
+    step = min((n for n in IMAGE_WIDTHS if n >= width), default=max(IMAGE_WIDTHS))
+    return f"{IMAGE_HOST}/assets/img/{row['file']}.{row['version']}-{step}.jpg"
+
+
 def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed=None,
             fallback_motif=None, credit=True):
     """A photograph for `key` if we hold one, otherwise a generated plate.
@@ -793,9 +850,6 @@ def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed
     # https://www.pexels.com/license/ gives https://www.pexels.com — the
     # example the guideline itself uses. Nothing is authored per provider,
     # which is what keeps a second provider from needing a second renderer.
-    parts = urlsplit(row["licence_url"])
-    provider_url = f"{parts.scheme}://{parts.netloc}"
-    link = ' rel="noopener" target="_blank"'
     # A CREDIT IS A LINK, SO A PICTURE CARRYING ONE CANNOT GO INSIDE A LINK.
     # An `<a>` may not contain an `<a>`: the parser closes the outer one at
     # the inner, so a thumbnail wrapped in a link came apart into three
@@ -808,9 +862,7 @@ def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed
     # `credit=False` is for a caller that places the attribution itself.
     # It does not make the credit optional: Pexels' terms require it, and a
     # caller that turns it off here owes one somewhere a reader can see.
-    credit_html = (f'Photo by <a href="{esc(row["source"])}"{link}>'
-                   f'{esc(row["photographer"])}</a> on '
-                   f'<a href="{esc(provider_url)}"{link}>{esc(row["licence"])}</a>')
+    credit = credit and credit_html(row)
     return (
         f"<picture>"
         f'<source type="image/avif" srcset="{esc(srcset("avif"))}" sizes="{esc(sizes)}">'
@@ -820,7 +872,7 @@ def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed
         f'loading="{"eager" if eager else "lazy"}" '
         f'fetchpriority="{"high" if eager else "auto"}" decoding="async" '
         f'class="photo {focal_class(fx, fy)}">'
-        + (f'<figcaption class="credit">{credit_html}</figcaption>' if credit else "")
+        + (f'<figcaption class="credit">{credit}</figcaption>' if credit else "")
         + "</picture>"
     )
 
@@ -1405,6 +1457,29 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
         raise ValueError(f"{path}: unknown world {world!r}; it is one of {WORLDS}")
     if accent not in ACCENTS:
         raise ValueError(f"{path}: unknown accent {accent!r}; it is one of {ACCENTS}")
+    # SIXTEEN PAGES SHIPPED THE CONTINENT AND CLONED IT ZERO TIMES.
+    #
+    # `constel_defs()` inlines one thinned lod0 silhouette so that thirteen
+    # theme glyphs cost ONE coastline. Nineteen call sites emit it and TWO of
+    # them guard the call — `if facetart`, `if qshown` — which is the
+    # fourteen-call-sites-forgot-the-motif shape exactly: two callers proving
+    # the guard is needed while seventeen do not have it. Measured on the
+    # built site, 18,806 bytes each on the homepage (12% of it), /themes
+    # (37%), /experiences, /plan, nine macro pages and three motion pages —
+    # about 301 KB of geometry nobody draws, on a site where page weight is
+    # an invariant BECAUSE a page once shipped 90 KB of coastline under a map
+    # and every gate stayed green.
+    #
+    # The strip is here rather than at the call sites for the reason `plate()`
+    # takes its own transform: a caller cannot get half of it right, because a
+    # caller no longer does any of it. It is a pure subtraction — the block is
+    # `<svg class="constel-defs" width="0" height="0">`, paints nothing, and
+    # is removed only when the document references neither id it provides.
+    if 'class="constel-defs"' in body and "#constel-eu" not in body \
+            and "#constel-beyond" not in body:
+        i = body.index('<svg class="constel-defs"')
+        j = body.index("</svg>", i) + len("</svg>")
+        body = body[:i] + body[j:]
     # A LINK THE THUMB BAR ALSO CARRIES IS MARKED, and the set is derived
     # from BOTTOM_NAV rather than typed here, because a hand-listed copy of
     # another list is a list that is wrong one commit after somebody edits
@@ -1774,7 +1849,7 @@ def ed_split(*, title, body, media="", reverse=False):
     )
 
 
-def ed_rows(rows, *, numbered=True):
+def ed_rows(rows, *, numbered=True, level=3):
     """An index as a set of rules, not a grid of cards.
 
     THE NUMBER IS DERIVED AND NEVER PASSED. The brief's version takes a
@@ -1782,7 +1857,18 @@ def ed_rows(rows, *, numbered=True):
     into data is the figure that was true two hundred destinations ago, which
     is this repository's most repeated finding about counts. It is the row's
     position, formatted here.
+
+    AND `level` IS THE OUTLINE WHERE THE CLASS IS THE LOOK, which is the
+    rule `card()` already takes an argument for. A row's name is an `<h3>`
+    wherever the band's own `<h2>` is the level above it, and that is every
+    caller but one: /countries nests its fifty country rows under a macro
+    region's `<h3>`, so there they are `<h4>`. Nothing in WCAG fails on a
+    flattened outline, which is why the site had a sixth of its pages
+    starting at h3 with no h2 above them; what it costs is a reader
+    navigating by heading being told two things are siblings when one is
+    inside the other.
     """
+    h = f"h{max(2, min(6, int(level)))}"
     out = []
     for i, row in enumerate(rows, 1):
         num = f"{i:02d}" if numbered else ""
@@ -1798,7 +1884,7 @@ def ed_rows(rows, *, numbered=True):
         out.append(
             f'<a class="ed-row" href="{esc(row["href"])}">'
             f'<span class="ed-row-number">{num}</span>'
-            f'<div><h3>{esc(row["title"])}{flag}</h3>{sub}</div>'
+            f'<div><{h}>{esc(row["title"])}{flag}</{h}>{sub}</div>'
             f'<span class="ed-row-meta">{esc(row.get("meta", ""))}</span>'
             '<span class="ed-row-arrow" aria-hidden="true">&#8594;</span>'
             "</a>")

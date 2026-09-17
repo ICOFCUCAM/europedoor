@@ -662,7 +662,7 @@ def distance_bands(doc, slug, proj, near=0.6, mid=1.3):
 
 
 def landmass(proj, view, doc=None, highlight=None, pad=40.0, bands=None,
-             thin_units=0.0, min_units=0.0, link=None, only=None):
+             thin_units=0.0, min_units=0.0, link=None, only=None, path_id=None, drop=None):
     """Land under a small map, clipped to the window it is drawn in.
 
     `view` is (x, y, w, h) in the projection's own pixel space — the same
@@ -684,11 +684,20 @@ def landmass(proj, view, doc=None, highlight=None, pad=40.0, bands=None,
     # whole continent nine times would be the right picture at nine times the
     # bytes, and page weight is an invariant here for a reason.
     only = None if only is None else set(only)
+    # `drop` REMOVES A COUNTRY FROM A DRAWING WITHOUT REMOVING IT FROM THE
+    # ATLAS. The gallery hero uses it for the one country this file holds a
+    # FRAGMENT of: data/geo/ is cut at 52°E, which runs through the middle of
+    # Russia, so what that picture would draw is a shape the data ends in
+    # rather than a country. Everywhere else it is drawn and faded, because
+    # everywhere else there is a ground for it to dissolve into.
+    drop = set(drop or ())
     x, y, w, h = view
     box = (x - pad, y - pad, x + w + pad, y + h + pad)
     ctx, ours = [], []
     for ident, ent in sorted(doc["countries"].items()):
         if only is not None and ent.get("slug") not in only:
+            continue
+        if ent.get("slug") in drop:
             continue
         parts = []
         for ring in ent["rings"]:
@@ -738,7 +747,21 @@ def landmass(proj, view, doc=None, highlight=None, pad=40.0, bands=None,
             # derived, like everything else here, and not a list somebody
             # typed.
             cls = bands.get(ent.get("slug"), "")
-        el = (f'<path{f" class={chr(34)}{cls}{chr(34)}" if cls else ""} '
+        # AN ID WHERE THE CALLER ASKS FOR ONE, and it is a way of NOT
+        # repeating geometry. The homepage clips a photograph to each
+        # country's own outline, and a `<clipPath>` holding a copy of the
+        # path would be the 43 KB of country rings on the page a second
+        # time — which is the exact cost the frontier pass avoids by being
+        # a `<use>` of the land. With an id the clip is `<use href="#...">`
+        # and costs about forty bytes. A `<use>` of a GROUP inside a
+        # clipPath renders as nothing in Chromium, which this repository
+        # has already lost the hero's relief to; a `<use>` of a PATH is
+        # what that failure's own fix points at.
+        # NOT `ident`: that is the loop variable holding the country's own
+        # key three lines up, and shadowing it made this a string call.
+        _pid = path_id(ent) if path_id else ""
+        _id = f' id="{_pid}"' if _pid else ""
+        el = (f'<path{_id}{f" class={chr(34)}{cls}{chr(34)}" if cls else ""} '
               f'd="{"".join(parts)}"><title>{_esc(ent["name"])}</title></path>')
         # A COUNTRY CAN BE A WAY IN, WHERE THE CALLER SAYS SO. `link` takes
         # the entry and returns an href or "": the shape is then the link and

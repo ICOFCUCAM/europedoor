@@ -20,6 +20,32 @@ jobs:
         with:
           python-version: "3.11"
 
+      # PILLOW, BECAUSE THE DESK SUITE MAKES A REAL JPEG AND THIS WORKFLOW
+      # HAS BEEN RED ON EVERY RUN SINCE IT STARTED DOING SO.
+      # `desk-tests.py` builds its stub through `photo-tests.py:_jpeg`, whose
+      # own comment says the bytes are *generated rather than committed so
+      # the suite carries no binary* — and generating a JPEG needs an
+      # encoder. `photograph.yml` installs pillow for exactly this reason;
+      # this workflow never learned, so `ModuleNotFoundError: No module
+      # named 'PIL'` has ended the run at the desk step on main's last four
+      # merges (#304, #305, #310, #311).
+      #
+      # AND IT IS NOT ONE FAILING GATE, IT IS EVERY GATE AFTER IT. The step
+      # sits above section-audit, ux-audit and all four staleness checks, so
+      # a red desk step means none of those has run on main for days — which
+      # is the sister repository's own recorded lesson: *because it is the
+      # FIRST step, its failure skips every step after it. A red suite there
+      # means CI has validated nothing at all.* A gate that cannot run is
+      # worse than a gate that fails, because the log still ends in one
+      # error and looks like one problem.
+      #
+      # `pillow` alone rather than `pillow-avif-plugin` too: this workflow
+      # runs neither `photo-tests.py` nor an acquisition, so nothing here
+      # encodes AVIF. The derivative ladder is `photograph.yml`'s job and
+      # that workflow installs both.
+      - name: Pillow, for the desk suite's generated JPEG
+        run: python3 -m pip install --quiet pillow
+
       - name: Validate the dataset
         run: python3 tools/build.py check
 

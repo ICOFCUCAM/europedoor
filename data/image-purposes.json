@@ -6,46 +6,46 @@
       "role": "hero",
       "key": "home-hero",
       "path": "/",
-      "surface": "The full-bleed opening of the homepage, with the masthead over it and the headline beside it.",
+      "surface": "The window on the homepage: a photograph fixed to the viewport, standing still inside an aperture cut in the white wall while the wall scrolls past it, with the label on the paper beneath.",
       "min_width": 2400,
       "orientation": "landscape",
       "min_aspect": 1.5,
       "max_aspect": 1.9,
-      "note": "docs/hero-brief.md holds the editorial brief. The plate system was MEASURED as unable to carry this surface, which is the whole argument for licensing a photograph at all — so a photograph that reads as generic stock fails the brief even when it passes every number here. THE FLOOR WAS 1.6 AND IT REFUSED FIFTEEN OF FIFTEEN. Every landscape result of the first real search measured 1.50, which is 3:2, the native aspect of essentially every camera a stock photographer owns — so the one purpose on this site that asked for 1.6 was asking for a crop rather than a photograph, and refused the whole library. It was also backwards for its own brief: the brief wants a strong 21:9 desktop crop AND a viable portrait crop out of the SAME frame, and a narrower source has more room for both, not less. Cropping 3:2 to 21:9 keeps 64% of the height; cropping 2.6:1 to 3:4 keeps 29% of the width. 1.5 is what every other purpose here already asks for. AND THE CEILING WAS 2.6, WHICH WAS THE SAME MISTAKE AT THE OTHER END. The container this sits in was measured for the first time and swings 0.435 to 2.326 — at 320x900 the block is a tall portrait and at a wide desktop it is a band. A 2.6:1 source in a 0.435 container shows 17% of its own width, so the ceiling admitted a shape that cannot survive the narrow end AND that, by this file's own note, essentially no stock photographer supplies. 1.9 costs nothing real and takes the guaranteed frame from 11% to 15%. AND BOTH OF THOSE NUMBERS WERE ABOUT A BOX THAT NO LONGER EXISTS. `.herofull` left the homepage when the plate sequence landed and this purpose renders inside `.opening` on plate 01; the measurement that produced 0.435-2.326 went on passing only because a selector matching nothing has no aspect ratio, and an empty set satisfies a floor and a ceiling at once. Re-measured on the real container at twenty viewports: 0.615 at 320x900 to 2.801 at 980x640, which is a WIDER swing and still a better guarantee, because the narrow end rose further than the wide end did. The frame is 17%, against the 15% this note claims above. The source range is unchanged: the argument for 1.5-1.9 was about what stock photographers supply and what a 21:9 and a 3:4 crop each cost, and none of that depended on the container.",
+      "note": "docs/hero-brief.md holds the editorial brief. The plate system was MEASURED as unable to carry this surface, which is the whole argument for licensing a photograph at all — so a photograph that reads as generic stock fails the brief even when it passes every number here. THE FLOOR WAS 1.6 AND IT REFUSED FIFTEEN OF FIFTEEN. Every landscape result of the first real search measured 1.50, which is 3:2, the native aspect of essentially every camera a stock photographer owns — so the one purpose on this site that asked for 1.6 was asking for a crop rather than a photograph, and refused the whole library. It was also backwards for its own brief: the brief wants a strong 21:9 desktop crop AND a viable portrait crop out of the SAME frame, and a narrower source has more room for both, not less. Cropping 3:2 to 21:9 keeps 64% of the height; cropping 2.6:1 to 3:4 keeps 29% of the width. 1.5 is what every other purpose here already asks for. AND THE CEILING WAS 2.6, WHICH WAS THE SAME MISTAKE AT THE OTHER END. The container this sits in was measured for the first time and swings 0.435 to 2.326 — at 320x900 the block is a tall portrait and at a wide desktop it is a band. A 2.6:1 source in a 0.435 container shows 17% of its own width, so the ceiling admitted a shape that cannot survive the narrow end AND that, by this file's own note, essentially no stock photographer supplies. 1.9 costs nothing real and takes the guaranteed frame from 11% to 15%. AND BOTH OF THOSE NUMBERS WERE ABOUT A BOX THAT NO LONGER EXISTS. `.herofull` left the homepage when the plate sequence landed and this purpose renders inside `.opening` on plate 01; the measurement that produced 0.435-2.326 went on passing only because a selector matching nothing has no aspect ratio, and an empty set satisfies a floor and a ceiling at once. Re-measured on the real container at twenty viewports: 0.615 at 320x900 to 2.801 at 980x640, which is a WIDER swing and still a better guarantee, because the narrow end rose further than the wide end did. The frame is 17%, against the 15% this note claims above. The source range is unchanged: the argument for 1.5-1.9 was about what stock photographers supply and what a 21:9 and a 3:4 crop each cost, and none of that depended on the container. AND THE THIRD CONTAINER, MEASURED RATHER THAN ASSUMED. The gallery homepage opens on the drawn atlas — the owner's direction, and the one picture of Europe no competitor can reproduce — so this photograph moved to the window on plate 02. Its first version was the viewport itself (position: fixed; inset: 0), which measured 0.356 at 320x900 to 3.125 at 2000x640 and guarantees 9% of a frame: below this file's own 12% floor, and unfixable at any source range, because a full-bleed responsive box is 0.114 x (min/max) before a photograph is chosen. A full-bleed picture cannot host a declared purpose here. So the aperture states its own proportion and fits inside the viewport instead of filling it — 16:9 on a wall, 4:5 on a phone, nothing between — and the box is 0.800 to 1.778 for a guaranteed frame of 36%. The source range is untouched: 1.5-1.9 was an argument about what stock photographers supply and what a 21:9 and a 3:4 crop each cost, and none of it depended on the container.",
       "container": {
-        "selector": ".opening",
-        "min_aspect": 0.615,
-        "min_at": "320x900",
-        "max_aspect": 2.801,
-        "max_at": "980x640"
+        "selector": ".shotclip .shotfull",
+        "min_aspect": 0.8,
+        "min_at": "320x640",
+        "max_aspect": 1.778,
+        "max_at": "1800x900"
       },
       "safe_area": {
-        "width": 0.324,
-        "height": 0.536,
-        "frame": 0.173
+        "width": 0.421,
+        "height": 0.844,
+        "frame": 0.355
       }
     },
     "journeys-hero": {
       "role": "journey-atmosphere",
       "key": "journeys-hero",
       "path": "/journeys",
-      "surface": "The opening of the journeys index — a wide editorial image beside the headline.",
+      "surface": "The CLOSE of the journeys index — type over the picture behind a scrim, under the question the page ends on. It was the OPENING until the seventeen routes drawn at once became that; a photograph replaces a drawing rather than sitting behind one, and the drawn continent is the picture no competitor can make.",
       "min_width": 2000,
       "orientation": "landscape",
       "min_aspect": 1.3,
       "max_aspect": 2.1,
       "note": "A road, a rail line or a pass with distance in it: the feeling of crossing a border on purpose. Never a map, and never a single landmark. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening.",
       "container": {
-        "selector": ".iheroart.shot",
-        "min_aspect": 0.692,
+        "selector": ".send",
+        "min_aspect": 0.635,
         "min_at": "320x640",
-        "max_aspect": 1.5,
-        "max_at": "760x640"
+        "max_aspect": 2.381,
+        "max_at": "1280x640"
       },
       "safe_area": {
-        "width": 0.33,
-        "height": 0.867,
-        "frame": 0.286
+        "width": 0.302,
+        "height": 0.546,
+        "frame": 0.165
       }
     },
     "experiences-hero": {
@@ -59,16 +59,16 @@
       "max_aspect": 2.1,
       "note": "Somebody DOING the thing — hands, a workshop, a kitchen, a boat. A person at work in a real place, not a posed portrait and not an empty interior. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening.",
       "container": {
-        "selector": ".iheroart.shot",
-        "min_aspect": 0.692,
-        "min_at": "320x640",
-        "max_aspect": 1.5,
-        "max_at": "760x640"
+        "selector": ".xshot",
+        "min_aspect": 0.731,
+        "min_at": "834x900",
+        "max_aspect": 1.501,
+        "max_at": "1280x640"
       },
       "safe_area": {
-        "width": 0.33,
-        "height": 0.867,
-        "frame": 0.286
+        "width": 0.348,
+        "height": 0.866,
+        "frame": 0.301
       }
     },
     "stories-hero": {
@@ -82,16 +82,16 @@
       "max_aspect": 2.1,
       "note": "A human moment that could be the opening frame of a long read. Faces are welcome; a landmark is not. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening.",
       "container": {
-        "selector": ".iheroart.shot",
-        "min_aspect": 0.692,
+        "selector": ".storybleed",
+        "min_aspect": 1.778,
         "min_at": "320x640",
-        "max_aspect": 1.5,
-        "max_at": "760x640"
+        "max_aspect": 2.333,
+        "max_at": "1024x640"
       },
       "safe_area": {
-        "width": 0.33,
-        "height": 0.867,
-        "frame": 0.286
+        "width": 0.847,
+        "height": 0.557,
+        "frame": 0.472
       }
     },
     "events-hero": {
@@ -128,16 +128,16 @@
       "max_aspect": 2.1,
       "note": "One country seen whole from the ground: a valley, a coast or a plain with enough of it in frame that the eye reads a country rather than a spot. Never an aerial, never a flag, never a monument, and never a composite of several places — the page's argument is that Europe is fifty separate countries, and a picture that could be anywhere argues the opposite. The drawing it replaces is the fifty drawn as fifty, so a photograph has to be at least as specific as that. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening.",
       "container": {
-        "selector": ".ed-opening-visual",
-        "min_aspect": 0.692,
-        "min_at": "320x640",
-        "max_aspect": 1.643,
-        "max_at": "980x640"
+        "selector": ".atlasopen",
+        "min_aspect": 1.333,
+        "min_at": "768x640",
+        "max_aspect": 1.5,
+        "max_at": "360x640"
       },
       "safe_area": {
-        "width": 0.33,
-        "height": 0.791,
-        "frame": 0.261
+        "width": 0.635,
+        "height": 0.867,
+        "frame": 0.55
       }
     },
     "interests-hero": {
@@ -151,16 +151,16 @@
       "max_aspect": 2.1,
       "note": "Somebody travelling FOR something: walking, eating, listening, swimming. A person or their hands in the frame, because the seventeen tags on this page are reasons rather than places. Never an empty landscape, which is what every other index here already opens on.",
       "container": {
-        "selector": ".ed-opening-visual",
-        "min_aspect": 0.692,
+        "selector": ".ibleed",
+        "min_aspect": 1.778,
         "min_at": "320x640",
-        "max_aspect": 1.643,
-        "max_at": "980x640"
+        "max_aspect": 2.333,
+        "max_at": "1024x640"
       },
       "safe_area": {
-        "width": 0.33,
-        "height": 0.791,
-        "frame": 0.261
+        "width": 0.847,
+        "height": 0.557,
+        "frame": 0.472
       }
     }
   },

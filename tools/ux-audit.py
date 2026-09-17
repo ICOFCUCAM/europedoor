@@ -177,7 +177,11 @@ def s4():
     # actually reads a sentence. What the HOMEPAGE has to do is ask the
     # question in words and put the instrument one press away — desire
     # first, the machine after, which is the owner's own direction.
-    yield has("/", "what you seek"), "the homepage asks the question in words"
+    # ON THE CLOSING PLATE'S OWN LABEL, not on the places lede — that band is
+    # omitted for a register with no destination photograph, so the old needle
+    # asserted the size of the library. See tools/section-audit.py.
+    yield has("/", "Say it in your own words"), \
+        "the homepage asks the question in words"
     yield "Say it in your own words" in page("/plan"), \
         "and the sentence box is on the page that reads a sentence"
     h = page("/")
@@ -262,7 +266,8 @@ def s6():
     yield has("/", '/interests'), "and the homepage still hands a reader to them"
     # The question is asked on the homepage in words, with the eight the
     # register holds a photograph for shown under it.
-    yield has("/", "what you seek"), "the homepage asks which Europe you want"
+    yield has("/", "Say it in your own words"), \
+        "the homepage asks which Europe you want"
 
 
 @section("2036-7", "Discover Mode", "BUILT",
@@ -493,9 +498,29 @@ def s7():
     # summed from its own stops rather than set — a benchmark for this page
     # carried "3,400 km, 12 countries, 28 places" for the same route against
     # a real 4,993, seven and thirteen.
-    yield has("/", "Straight-line distance", "Countries", "Stops"), \
+    # AND BOTH ARE GUARDED ON THE PLATE EXISTING, because it is built from a
+    # journey whose stop the register holds a photograph of and is omitted
+    # when it holds none — so unguarded these asserted the size of the
+    # library rather than what the plate says. `photo-tests.py` builds that
+    # state deliberately, with one row, to prove an acquisition does not break
+    # the audits. The claim is unchanged wherever the plate is drawn, which is
+    # every state this product will ship in.
+    # ON THE BAND'S OWN LIST, NOT ON ITS PLATE CLASS. `sheet-crossing` is in
+    # the page whenever the plate loop emits the section, and the loop emits
+    # it whenever `inner` is non-empty — so the class was the wrong witness:
+    # it reads true in the stub state and the guard did nothing. `jrows` is
+    # what the band is BUILT from and what the two needles below live beside.
+    # AND `has()` RETURNS A TUPLE, SO THE GUARD WAS ALWAYS TRUE. `(bool, msg)`
+    # is a non-empty tuple whatever the bool is, so `not _jp` was constantly
+    # False and the guard fired never — the same fault as the dead-rule
+    # scanner recursing into an EMPTY `cssRules` list because an empty list is
+    # truthy. A container standing in for the boolean inside it.
+    _jp = has("/", 'class="jrows"')[0]
+    yield (not _jp) or has("/", "Straight-line distance", "Countries",
+                           "Stops"), \
         "the homepage journey plate states what it measured"
-    yield has("/", 'href="/journeys/'), "and opens the journey it names"
+    yield (not _jp) or has("/", 'href="/journeys/'), \
+        "and opens the journey it names"
 
 
 @section(8, "Hidden Europe", "ALREADY",

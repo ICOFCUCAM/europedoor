@@ -344,6 +344,76 @@ class Structure(html.parser.HTMLParser):
 
 # ── the checks ────────────────────────────────────────────────────────
 
+@check("the planner's own two constants are declared once")
+def c_plan_constants():
+    """THE PAGE AND THE PLANNER MUST AGREE ABOUT WHAT A STYLE IS.
+
+    Two numbers decide what /plan publishes and what `planner.js` does, and
+    both used to be typed twice. The weighting is the page's whole claim to
+    being an instrument rather than a recommendation; the style position is
+    the whole of what "comfortable" means — the middle of a place's own
+    recorded daily band. A second copy of 0.5 is a second chance for the
+    sentence and the arithmetic to disagree, which is the dispatch cap's own
+    lesson: four typed copies of one number, and the one that was a gate was
+    the one left behind.
+
+    Asserted against `planner.js`'s source rather than against a second
+    table here, because the planner is the implementation and the page is
+    the claim about it.
+    """
+    n = 0
+    js = open(os.path.join(ROOT, "assets", "js", "planner.js"),
+              encoding="utf-8").read()
+    # THE STYLE POSITIONS, BOTH DIRECTIONS.
+    m = re.search(r"var STYLE_DAILY = \{([^}]*)\}", js)
+    if not m:
+        fail("planner.js no longer declares STYLE_DAILY, so nothing can "
+             "check that /plan publishes the same spending styles it uses")
+    else:
+        got = dict(re.findall(r"(\w+)\s*:\s*([0-9.]+)", m.group(1)))
+        want = {k: repr(v) for k, v in P.PLAN_STYLE_POS.items()}
+        for k, v in P.PLAN_STYLE_POS.items():
+            n += 1
+            if k not in got:
+                fail("pages.PLAN_STYLE_POS declares the spending style %r "
+                     "and planner.js's STYLE_DAILY does not: /plan would "
+                     "publish a figure for a style the planner cannot cost"
+                     % k)
+            elif abs(float(got[k]) - v) > 1e-9:
+                fail("the spending style %r sits at %s of a place's daily "
+                     "band in planner.js and /plan publishes it at %s. The "
+                     "page's median is arithmetic on the wrong position."
+                     % (k, got[k], v))
+        for k in got:
+            n += 1
+            if k not in P.PLAN_STYLE_POS:
+                fail("planner.js costs the spending style %r and "
+                     "pages.PLAN_STYLE_POS does not know about it, so /plan "
+                     "publishes two of three assumptions" % k)
+    # THE WEIGHTING IS A PARTITION, and a chart of a partition that does not
+    # sum to one is a chart of something else.
+    tot = sum(pct for _nm, pct, _say in P.PLAN_WEIGHTS)
+    n += 1
+    if tot != 100:
+        fail("/plan draws its scoring weights as shares of one hundred and "
+             "they sum to %d. The bars are a partition or they are not a "
+             "partition." % tot)
+    # AND EVERY FIGURE IS ON THE SHIPPED PAGE, because a chart's labels can
+    # be right over a drawing scaled from the wrong array.
+    flat = " ".join(open(os.path.join(OUT, "plan", "index.html"),
+                         encoding="utf-8").read().split())
+    for nm, pct, _say in P.PLAN_WEIGHTS:
+        n += 1
+        if "%d%%" % pct not in flat or esc(nm) not in flat:
+            fail("/plan does not print the weight %r at %d%%, which the "
+                 "planner implements" % (nm, pct))
+        if ('class="wbar w%d"' % pct) not in flat:
+            fail("/plan prints the weight %r as %d%% and draws its bar at a "
+                 "different width: correct labels over a drawing scaled from "
+                 "the wrong array still reads as a finished chart" % (nm, pct))
+    return n
+
+
 @check("the dataset loads and validates")
 def c_data():
     d = D.load()
@@ -479,6 +549,67 @@ def c_links():
             if href not in served:
                 fail(f"{rel(f)}: dead link to {href}")
     return n
+
+
+# THE FIVE RECORDED CLASS-NAME COLLISIONS HAD NO GUARD, AND THE RULE
+# WRITTEN FOR THEM READS THE WRONG FILE.
+#
+# `.doorgo`, `.sendsay`, `.closesay`, `.sheet-send` and a duplicated
+# `.deskart figcaption` each shipped a composition that silently inherited
+# somebody else's rule — two links at zero alpha on /experiences, bone on a
+# white wall on /plan, a centred statement 512 pixels wide inside a
+# 1,152-pixel band. The answer recorded each time is *grep the stylesheet
+# before naming a composition*, and it is half an answer: **a plate class
+# can be emitted by a page builder and styled by nothing at all**, so the
+# grep returns zero and the name is still taken.
+#
+# /events proved it. `sheet-year` had no rule in the stylesheet and the
+# homepage's plate 07 has emitted it since the homepage became a plate
+# sequence, so a `display: block` written for the calendar's year chart
+# landed on the homepage too — and the dead-rule scan then reported that
+# declaration DEAD, because on the homepage the plate is already block.
+#
+# THE ROOMS ARE SHARED ON PURPOSE AND EVERYTHING ELSE IS NOT. `gal`, `paper`,
+# `pine`, `quiet` and `bleed` bind tokens and are meant to be reused; a
+# composition class is one family's layout. A second family wanting one is
+# not forbidden — `.sheet-keep` is a real centred close that /discover and
+# /experiences share — it just has to be DECLARED, which is the same shape
+# as the dead-rule scan's named list: moving one is allowed, moving one
+# silently is not.
+SHEET_ROOMS = {"sheet-gal", "sheet-paper", "sheet-pine", "sheet-quiet",
+               "sheet-bleed"}
+SHEET_SHARED = {
+    # class: why two families may both emit it
+    "sheet-keep": "the centred close /discover and /experiences share, with "
+                  "its own rules for the measure and the headline clamp",
+}
+
+
+@check("no two page families quietly share a plate composition")
+def c_plate_class_owner():
+    fams = {}
+    for f in site_files():
+        body = open(f, encoding="utf-8").read()
+        url = rel(f)
+        fam = url.split("/")[1] if url.count("/") > 1 else "home"
+        for m in re.finditer(r'class="sheet ((?:sheet-[a-z-]+ ?)+)"', body):
+            for c in m.group(1).split():
+                if c not in SHEET_ROOMS:
+                    fams.setdefault(c, set()).add(fam)
+    for c, fs in sorted(fams.items()):
+        if len(fs) > 1 and c not in SHEET_SHARED:
+            fail(f"the plate class .{c} is emitted by {len(fs)} families "
+                 f"({', '.join(sorted(fs))}) and is declared by none — a "
+                 f"composition class belongs to one family, and a name with "
+                 f"no rule in the stylesheet still reads as free to the grep "
+                 f"that is supposed to prevent this. Rename it, or add it to "
+                 f"SHEET_SHARED with the reason two families want it.")
+    for c in SHEET_SHARED:
+        if c not in fams:
+            fail(f"SHEET_SHARED declares .{c} and no page emits it — a "
+                 f"declared exception nothing reaches is a rule nobody has "
+                 f"tested")
+    return len(fams)
 
 
 @check("no page leaks an unrendered template expression")
@@ -2549,8 +2680,39 @@ def c_api():
                     continue
                 with open(path, encoding="utf-8") as fh:
                     doc = json.load(fh)
+                # A FIELD THAT IS ABSENT BY DESIGN NEEDS A DIFFERENT
+                # ASSERTION FROM A FIELD THAT IS ABSENT BY ACCIDENT, and
+                # `_dig` reads ONE representative row. `cities.shot` is the
+                # URL of a destination's photograph and the register holds
+                # one for 63 of 313, with the key omitted on the rest
+                # because present-but-empty says "we have this" and then
+                # does not — so whether it is "there" depends on which row
+                # comes first, and in `photo-tests.py`, which rebuilds
+                # against an EMPTIED register, it is on no row at all. That
+                # is the empty-register fault this repository has now
+                # recorded five times, arriving in the contract checker.
+                #
+                # So a `?` prefix declares the field conditional, and the
+                # assertion moves to where the absence IS visible: the
+                # producer's own source. `tools/lib/pages.py` writes every
+                # index here, and a field it stops naming is a dependency
+                # that has silently gone — which is the same reasoning
+                # `c_purpose_reaches` and `c_og_no_hash_motif` are asserted
+                # at the source for. The promise is unchanged and it is
+                # checkable in both states.
+                produced = open(os.path.join(ROOT, "tools", "lib", "pages.py"),
+                                encoding="utf-8").read()
                 for field, why in fields.items():
-                    if _dig(doc, field) is None:
+                    cond = field.startswith("?")
+                    field = field.lstrip("?")
+                    if cond:
+                        leaf = field.split(".")[-1]
+                        if f'"{leaf}"' not in produced:
+                            fail(f"{con['consumer']} depends on {endpoint} -> "
+                                 f"{field}, declared conditional, and nothing in "
+                                 f"tools/lib/pages.py writes the key {leaf!r} any "
+                                 f"more ({why[:60]})")
+                    elif _dig(doc, field) is None:
                         fail(f"{con['consumer']} depends on {endpoint} -> {field}, "
                              f"which is not there ({why[:60]})")
                     if not why:
@@ -3017,6 +3179,95 @@ def c_status_page():
         if phrase not in s:
             fail(f"/how-it-works no longer has the {phrase!r} section")
     return 3
+
+
+@check("no page ships map geometry it never draws")
+def c_unused_geometry():
+    """`constel_defs()` inlines the shared silhouette once so every drawing on
+    a page can `<use>` it. A page that emits it and clones it zero times is
+    shipping the continent as dead weight.
+
+    THIS HAS HAPPENED TWICE AND ONLY ONE OF THEM WAS CAUGHT. /experiences was
+    emitting the silhouette with nothing using it — 13,791 bytes, a third of
+    the page — and the coastline-credit check found it, because that check
+    asks whether a page DRAWING land credits its source. The inverse has no
+    subject: a page that draws nothing is a page that check is silent about.
+    So /themes shipped **18,812 bytes, 37% of the document**, from the commit
+    where thirteen licensed photographs replaced the thirteen drawings and
+    the defs were left behind.
+
+    The count is the number of clones, not the number of bytes, because the
+    fault is *nothing uses this* rather than *this is large*.
+    """
+    n = 0
+    for f in site_files():
+        body = open(f, encoding="utf-8").read()
+        if 'class="constel-defs"' not in body:
+            continue
+        n += 1
+        uses = body.count("#constel-eu") + body.count("#constel-beyond")
+        if uses == 0:
+            i = body.find('<svg class="constel-defs"')
+            j = body.find("</svg>", i)
+            cost = (j - i) if j > i else 0
+            fail(f"{rel(f)} inlines the shared silhouette ({cost:,} bytes, "
+                 f"{round(100.0 * cost / max(1, len(body)))}% of the page) and "
+                 f"clones it zero times")
+    if n == 0:
+        fail("no page emits constel-defs at all — this check has stopped "
+             "finding the thing it is about")
+    return n
+
+
+@check("a promise about every destination page is kept by every destination page")
+def c_kept_promises():
+    """/beyond-the-obvious names what this site will say instead of calling a
+    place undiscovered, and two of the three are claims about the Atlas.
+
+    A REFUSAL NOBODY CAN CHECK IS A SLOGAN, and this one had never been
+    checked in either direction. The band published three promises — when to
+    come, how to arrive without a car, and who locally is worth your money —
+    and the third is not built anywhere: an experience record carries a slug,
+    a name, a kind, a band and a summary and no operator, and /for-businesses
+    publishes that there is nothing in this index that could carry a boost.
+    It is stated as unbuilt on the page.
+
+    The other two are stated as kept on EVERY destination page, which is a
+    claim to a reader about 319 documents. So it is asserted rather than
+    measured once: the day a destination template drops "When to come", the
+    page that promises it goes red instead of quietly becoming false. That is
+    `c_published_projection`'s rule — a name in a comment is history and a
+    name on a page is a claim.
+    """
+    promises = ("When to come", "Getting there")
+    pages = [f for f in site_files()
+             if rel(f).count("/") == 5 and rel(f).startswith("/europe/")]
+    if len(pages) < 200:
+        fail(f"only {len(pages)} destination pages found — this check has "
+             f"stopped finding the family it is about")
+        return 0
+    n = 0
+    for f in pages:
+        body = open(f, encoding="utf-8").read()
+        for promise in promises:
+            n += 1
+            if promise not in body:
+                fail(f"{rel(f)} does not carry {promise!r}, and "
+                     f"/beyond-the-obvious publishes that every destination "
+                     f"page does")
+    band = open(os.path.join(OUT, "beyond-the-obvious", "index.html"),
+                encoding="utf-8").read()
+    for promise in ("When to come", "How to arrive without a car"):
+        n += 1
+        if promise not in band:
+            fail(f"/beyond-the-obvious has stopped naming {promise!r}, so the "
+                 f"check that it is kept is asserting nothing")
+    n += 1
+    if "Not built" not in band:
+        fail("/beyond-the-obvious no longer marks the third promise unbuilt. "
+             "Either somebody built it — in which case say so here — or the "
+             "page has gone back to promising it")
+    return n
 
 
 @check("no page horizontally overflows on a phone by construction")
@@ -4047,44 +4298,65 @@ def c_hero_frame():
     # And the shipped page must actually carry that viewBox, because both
     # numbers above are read from the source rather than from the HTML.
     #
-    # UNLESS A PHOTOGRAPH FILLS THE HERO, IN WHICH CASE THERE IS NO DRAWING
-    # TO ASSERT ANYTHING ABOUT. A photograph REPLACES the drawing — `.shot`
-    # is added only when the register holds the file and `heroeurope()` is
-    # not called at all — so this line failed on the first end-to-end
-    # acquisition, which is the ninth assertion in this repository to pin a
-    # SHAPE rather than a promise. The promise is: whichever of the two the
-    # homepage carries, it carries one of them and the page says which. Both
-    # halves still fail on the thing this was written for, because the
-    # branch is chosen by the register rather than by this check.
+    # AND THE PHOTOGRAPH BRANCH WAS THE TENTH ASSERTION HERE TO PIN A SHAPE.
+    # Its first version asked for `.herofull.shot`; its second asked for a
+    # `<picture>` inside `class="opening"`. Both are spellings of *where the
+    # photograph lives*, and the homepage has now moved it twice — the plate
+    # sequence put it in the opening, and the gallery put the ATLAS in the
+    # opening and the photograph on a full-bleed plate of its own. Each time
+    # the check failed for a page that had got better.
+    #
+    # THE PROMISE HAS ONLY EVER BEEN ONE SENTENCE: *a photograph REPLACES the
+    # drawing; it does not sit behind it.* The failure it was written for is
+    # the continent drawn OVER a picture, with the picture showing through
+    # every gap in the coastline — which is a claim about one CONTAINER
+    # holding both, and says nothing about which container that is. So:
+    # whichever the homepage carries, the drawing carries its own viewBox,
+    # the registered photograph is somewhere on the page, and no element
+    # holds the two of them at once. All three still fail on the thing this
+    # was written for.
     html = open(os.path.join(ROOT, "site", "index.html"),
                 encoding="utf-8").read()
-    photo_hero = bool(_register().get("home-hero"))
-    if photo_hero:
-        # AND `.herofull shot` WAS THE OLD HERO'S CLASS, WHICH IS THE SHAPE
-        # HALF OF THIS ASSERTION COMING BACK. The homepage is a plate
-        # sequence now: the opening is `.sheet-door .opening` and the
-        # photograph goes inside it, so naming the container was a third
-        # spelling of "there is a picture here". What is asserted is the
-        # picture and its own register key, inside the opening — because a
-        # `<picture>` somewhere on the page would also be true of the eight
-        # doors below the fold.
-        i = html.find('class="opening"')
-        seg = html[i:html.find("</div>", i)] if i >= 0 else ""
-        # AND NOT `"home-hero" in seg`, WHICH IS THE ONE-CHARACTER-APART
+    drawn = html.find('class="heroeurope"')
+    if drawn >= 0:
+        assert f'viewBox="{vx:.0f} {vy:.0f} {vw:.0f} {vh:.0f}"' in html, (
+            "the homepage draws the hero continent and does not carry the "
+            "viewBox this check just asserted two things about")
+        # The drawing's own subtree, walked rather than guessed: a `<picture>`
+        # inside it is the stacking this rule exists to refuse.
+        depth, i, end = 0, drawn, len(html)
+        while i < end:
+            a = html.find("<div", i)
+            b = html.find("</div>", i)
+            if b < 0:
+                break
+            if 0 <= a < b:
+                depth += 1
+                i = a + 4
+                continue
+            depth -= 1
+            i = b + 6
+            if depth <= 0:
+                end = i
+                break
+        assert "<picture" not in html[drawn:end], (
+            "the homepage draws the continent and a <picture> is inside the "
+            "same element — a photograph REPLACES the drawing, it does not "
+            "sit behind it, and every gap in the coastline shows the picture "
+            "through")
+        n += 1
+    if _register().get("home-hero"):
+        # AND NOT `"home-hero" in html`, WHICH IS THE ONE-CHARACTER-APART
         # TRAP THIS FILE ALREADY RECORDS. The REGISTER KEY is `home-hero`
         # and the FILE STEM comes from the PURPOSE, `homepage-hero`, so the
         # derivatives are named `homepage-hero.<hash>.avif` and the key is
         # not a substring of them. Which file the page must reference is
         # `c_photo_published`'s question and it asks it from the register;
-        # this one asks only whether the opening carries a picture at all.
-        assert "<picture" in seg, (
-            "the register holds a homepage hero photograph and the opening "
-            "carries no <picture> — the drawing was removed and nothing "
-            "replaced it")
-    else:
-        assert f'viewBox="{vx:.0f} {vy:.0f} {vw:.0f} {vh:.0f}"' in html, (
-            "the homepage does not carry the hero viewBox this check just "
-            "asserted two things about")
+        # this one asks only that the licensed hero reaches the page at all.
+        assert "<picture" in html, (
+            "the register holds a homepage hero photograph and the page "
+            "carries no <picture> anywhere — it was acquired, hashed, "
+            "registered and never published")
     n += 1
     return n
 
@@ -4594,11 +4866,30 @@ def c_same_frame():
     and whitespace is collapsed first, because a line break between "same"
     and "frame" is what defeated the projection check for a year.
     """
-    n = pages = 0
+    n = pages = said = 0
     pat = re.compile(r'<svg class="constel[^"]*" viewBox="([^"]+)"')
     for f in site_files():
         h = open(f, encoding="utf-8").read()
         vbs = pat.findall(h)
+        # SAYS AND DRAWS NOTHING WAS OUTSIDE THIS CHECK'S REACH, and /themes
+        # spent a commit there. `head_figure()` prefers a photograph and
+        # falls back to the drawing, and the day the thirteenth theme
+        # photograph landed every glyph was built and discarded — while the
+        # note under the list went on promising "each shape beside a theme
+        # … drawn to the same frame so the thirteen can be compared" and
+        # crediting Natural Earth for land nobody drew. The two-glyph floor
+        # skipped the page entirely, so the strongest form of the defect
+        # this check exists for was the one form it could not see.
+        flat = " ".join(re.sub(r"<[^>]+>", " ", h).split())
+        claims = "drawn to the same frame" in flat
+        if claims:
+            said += 1
+            n += 1
+            if len(vbs) < 2:
+                fail(f"{canonical_of(f)}: says its shapes are drawn to the "
+                     f"same frame and draws {len(vbs)} of them. A page that "
+                     f"promises a comparison and shows nothing to compare "
+                     f"is worse than one that shows neither")
         if len(vbs) < 2:
             continue
         pages += 1
@@ -4624,6 +4915,10 @@ def c_same_frame():
     if pages < 3:
         fail(f"c_same_frame examined only {pages} pages carrying more than "
              f"one glyph — it has stopped finding the family it is about.")
+    if said < 1:
+        fail("no page claims its shapes are drawn to the same frame — the "
+             "half of this check that reads the PROSE has stopped finding "
+             "the sentence it is about.")
     return n
 
 
@@ -6200,18 +6495,41 @@ def c_hero_dusk_reach():
     """
     h = open(os.path.join(OUT, "index.html"), encoding="utf-8").read()
 
-    # A PHOTOGRAPH REPLACES THE DRAWING, AND A FADE OVER A DATA CUT IS A
-    # PROPERTY OF THE DRAWING. With `home-hero` in the register the homepage
-    # draws no continent, has no data cut and needs no fade, so there is
-    # nothing here to measure — and this check failed on the first end-to-end
-    # acquisition asking for two gradients that correctly do not exist. It
-    # asserts the ABSENCE in that case, because "no fade" and "no drawing"
-    # must not be allowed to look the same.
-    if _register().get("home-hero"):
-        assert "heroeurope" not in h, (
-            "the register holds a hero photograph and the homepage still "
-            "carries the drawn continent — a photograph REPLACES the drawing, "
-            "it does not sit behind it")
+    # A FADE OVER A DATA CUT IS A PROPERTY OF THE DRAWING, SO THE DRAWING IS
+    # WHAT THIS BRANCHES ON. Its first version branched on the REGISTER —
+    # "if a hero photograph exists, the continent must be gone" — which was
+    # true of the one composition that existed on the day it was written and
+    # is a claim about where the photograph lives, not about the fade. The
+    # gallery homepage carries both: the atlas is plate 01 and the licensed
+    # photograph is the full-bleed window on plate 02, two surfaces, neither
+    # behind the other. `c_hero_frame` owns *not stacked*, which is the real
+    # promise; this one measures the fade wherever the drawing is, and
+    # asserts the ABSENCE of an orphan gradient where it is not — because
+    # "no fade" and "no drawing" must not be allowed to look the same.
+    # AND THE BRANCH IS ON THE FADE, WHICH IS WHAT THIS CHECK MEASURES.
+    # Its first version branched on the REGISTER — if a hero photograph
+    # exists the continent must be gone — and its second on the DRAWING.
+    # Both are claims about something else. The gallery hero draws the
+    # continent and NO fade: it carries no ground beyond the atlas and
+    # drops the one country the 52°E cut runs through, so there is no cut
+    # inside the picture and nothing to ramp into. A fade that does not
+    # exist extinguishes nothing, which is this check's promise satisfied
+    # rather than skipped.
+    #
+    # THE ABSENCE IS STILL ASSERTED FROM BOTH ENDS, because "no fade" and
+    # "no drawing" must not look the same: with no gradients there must be
+    # no layer referencing one, and with a ground drawn there must be a
+    # fade over it. Each half fails on the thing it was written for.
+    has_grad = 'id="heroedge"' in h or 'id="herofootg"' in h
+    if not has_grad:
+        assert "herodusk" not in h, (
+            "the homepage draws the dusk layer and ships neither gradient, "
+            "so its two rectangles fall back to the SVG default and paint "
+            "solid black over the continent")
+        assert "lyr-beyond" not in h, (
+            "the homepage draws the ground beyond the atlas and no fade "
+            "over the data cut, so the continent ends on a straight line "
+            "through real land — the rendering fault the fade exists for")
         return 1
 
     def grad(gid):
@@ -7306,6 +7624,225 @@ def c_credit_scrim():
              f"design rather than of the picture, so it is the scrim that "
              f"moves, not the floor")
 
+    return n
+
+
+
+@check("a motion prints the query that ran, not a narrower one")
+def c_motion_query_breadth():
+    """THE ONE FAMILY WHOSE WHOLE CREDIBILITY CLAIM IS THAT A PAGE PRINTS
+    WHAT PRODUCED IT WAS PRINTING SOMETHING NARROWER.
+
+    `motion_match` reads `set(city.interests) | set(region.interests)`, so a
+    destination is returned when ITS REGION carries the tag. The printed
+    query said "any destination tagged Islands" and said nothing about the
+    region — and the gap is 537 tag applications, 47% more than the
+    destination-only reading. It returns **Nicosia**, which is inland, for
+    Europe's coastlines, because its region is "Nicosia & the South Coast";
+    and **Tartu**, a mainland university town, for Europe's islands. A
+    reader who checked the published rule would find something the rule did
+    not describe, which is `cell` catching `cellar` one family over.
+
+    TWO HALVES, BECAUSE EITHER ONE ALONE GOES QUIETLY WRONG.
+
+    The page must state the mechanism — asserted on the shipped HTML of
+    every motion whose query carries a tag term, read out of
+    `data/motions.json` rather than out of the generator, because a check
+    that re-runs the generator can only ever agree with it.
+
+    And the ENGINE must still have the mechanism the page states. If
+    somebody narrows `motion_match` to the destination's own tags, every
+    page keeps a sentence that has become false in the other direction —
+    the failure this repository records as *removing a claim leaves surfaces
+    pointing at it*, and no count anywhere would see it.
+    """
+    # AND THE ENGINE HALF WAS PINNING A SOURCE SPELLING. It required the
+    # literal `set(t["interests"]) | set(r["interests"])` in
+    # `motion_match`, which is a shape and not a promise — the TWELFTH
+    # assertion in this repository to do that. It went red the moment that
+    # line became `own, near = set(...), set(...)` followed by `own | near`
+    # so the clause each row prints could say WHICH side it came from,
+    # which is more of what the check exists to protect, not less.
+    #
+    # The promise is behavioural: the engine must still return a
+    # destination whose REGION carries the tag while the destination itself
+    # does not. Re-running the engine is the right instrument for that —
+    # the independent half is the destination's own interest list, read
+    # from the data — and it now also asserts the page SHOWS that case,
+    # because the clause is per row rather than per page.
+    n = 0
+    d = D.load()
+    motions = json.load(open(os.path.join(ROOT, "data", "motions.json"),
+                             encoding="utf-8"))["motions"]
+    wide = 0
+    for m in [x for x in motions if x.get("interests")]:
+        wants = set(m["interests"])
+        for cid, node in d["cities"].items():
+            ok, _why = P.motion_match(d, m, cid, node)
+            if ok and not (wants & set(node["city"]["interests"])):
+                wide += 1
+    n += 1
+    if not wide:
+        fail("no motion returns a destination that qualifies on its "
+             "REGION's tags alone, so `motion_match` has been narrowed to "
+             "a destination's own interests while every motion page still "
+             "prints a sentence saying it reads both")
+    tagged = [m for m in motions if m.get("interests")]
+    n += 1
+    if not tagged:
+        fail("no motion carries an interest term — this check has stopped "
+             "finding the thing it is about")
+    for m in tagged:
+        f = os.path.join(OUT, "europe-in", m["slug"], "index.html")
+        if not os.path.exists(f):
+            fail(f"/europe-in/{m['slug']} is not built")
+            continue
+        html = open(f, encoding="utf-8").read()
+        n += 1
+        if "its own tag or its region" not in html \
+                and "own tags and region" not in html:
+            fail(f"/europe-in/{m['slug']} prints a tag query with no word "
+                 f"about the region. The query reads a destination's tags "
+                 f"AND its region's, so the printed sentence is narrower "
+                 f"than the one that ran")
+        n += 1
+        # And the mechanism once, not per clause: nine of the twelve carry
+        # the short clause, so spelling the whole thing out in each is the
+        # boilerplate `never explain the constraint back` refuses.
+        if html.count("count’s together") + html.count(
+                "count together") != 1:
+            fail(f"/europe-in/{m['slug']} states the tag mechanism "
+                 f"{html.count('count together')} times; it belongs hoisted "
+                 f"once above the results, not repeated per clause")
+    idx = os.path.join(OUT, "europe-in", "index.html")
+    if os.path.exists(idx):
+        html = open(idx, encoding="utf-8").read()
+        n += 1
+        if "count together" not in html:
+            fail("/europe-in states nine tag queries and never says a "
+                 "destination's tags and its region's count together")
+        n += 1
+        # THE TWO NUMBERS THIS SITE PUBLISHES FOR ONE WORD. /interests reads
+        # the destination only (Mountains, 63) and a motion reads the
+        # destination or its region (115). Both are live and derived, and
+        # for the life of both families neither said which it was.
+        if "/interests" not in html.split("count together", 1)[1][:400]:
+            fail("/europe-in says the tag mechanism and does not say why a "
+                 "motion's count can exceed the same tag's count on "
+                 "/interests — the two numbers are both published and the "
+                 "reconciliation is the point of the sentence")
+    return n
+
+
+@check("the distribution chart is scaled by the series it is labelled with")
+def c_motion_distribution():
+    """A CHART IS A CLAIM, AND THIS ONE IS THE ARGUMENT THAT THE TWELVE ARE
+    NOT TWELVE BUCKETS.
+
+    The bars are destinations by how many of the twelve queries return
+    them, scaled against the largest group rather than against the Atlas —
+    eight groups summing to 319 would put the largest at 35% of its track
+    and read as a share of the continent, which is a different claim.
+
+    Asserted on the shipped page with NO reference to the generator, which
+    is deliberate: recomputing the distribution means re-running the twelve
+    queries, and an instrument that re-runs the model can only ever agree
+    with it. What is checkable without the model is everything around it —
+    the widest bar is the track, every other bar is its own share of that
+    widest, the groups sum to the destination total the page prints, and
+    the labels run 1..n with no gaps. A correct label over a drawing scaled
+    from the wrong array still reads as a finished chart, and this catches
+    exactly that.
+    """
+    f = os.path.join(OUT, "europe-in", "index.html")
+    if not os.path.exists(f):
+        fail("/europe-in is not built")
+        return 0
+    html = open(f, encoding="utf-8").read()
+    if 'class="mobars"' not in html:
+        fail("/europe-in draws no distribution chart — the band arguing that "
+             "the twelve overlap has lost its evidence")
+        return 0
+    block = html.split('class="mobars"', 1)[1].split("</figure>", 1)[0]
+    widths = [int(x) for x in re.findall(r'class="mobarfill w(\d+)"', block)]
+    counts = [int(x) for x in re.findall(r'class="mobarn">(\d+)<', block)]
+    labels = [int(x) for x in
+              re.findall(r'class="mobarlab">(\d+)\s*quer', block)]
+    n = 1
+    if not widths or len(widths) != len(counts) or len(labels) != len(widths):
+        fail(f"/europe-in: {len(widths)} bar(s), {len(counts)} count(s) and "
+             f"{len(labels)} label(s) — every group carries all three")
+        return n
+    n += 1
+    if max(widths) != 100:
+        fail(f"/europe-in: the widest bar is {max(widths)}% and must be 100 — "
+             f"the scale is the largest group, so that group IS the track")
+    top = max(counts)
+    for lab, c, w in zip(labels, counts, widths):
+        n += 1
+        want = round(100.0 * c / top)
+        if w != want:
+            fail(f"/europe-in: the group satisfying {lab} of the queries "
+                 f"holds {c} against a largest of {top} and draws {w}%, "
+                 f"where the scale gives {want}%")
+    n += 1
+    if labels != list(range(min(labels), min(labels) + len(labels))):
+        fail(f"/europe-in: the chart's groups are {labels} — a distribution "
+             f"with a gap in it is a bar missing rather than a group that "
+             f"is empty")
+    m = re.search(r"of the (\d+) destinations satisfies at least one", html)
+    n += 1
+    if not m:
+        fail("/europe-in does not state how much of the Atlas the twelve "
+             "queries reach between them")
+    elif sum(counts) != int(m.group(1)):
+        fail(f"/europe-in: the chart's groups sum to {sum(counts)} and the "
+             f"page says the twelve reach {m.group(1)} destinations. Every "
+             f"destination is in exactly one group, so the two are the same "
+             f"number or one of them is wrong")
+    return n
+
+
+
+@check("no page carries the same id twice")
+def c_unique_ids():
+    """A DUPLICATE `id` IS INVALID HTML AND NOTHING HERE CAUGHT IT.
+
+    /map's plate 02 was given the anchor `layers`, which is a good name for
+    a band of layer controls and is already the `id` of the interest filter
+    container that `map.js` binds to. `plate_sequence()` turns an anchor into
+    an `id` on the `<section>`, so the page shipped two elements carrying
+    `id="layers"`: `document.getElementById` returns the first, a fragment
+    link is ambiguous, and `aria-labelledby` resolves to whichever the
+    parser saw first. The browser suite did not report a failure — it DIED,
+    on a strict locator resolving to two elements, which is the shape of
+    regression a suite cannot describe and this repository has already
+    recorded twice.
+
+    `c_fragments_resolve` asks whether every fragment finds AN element; this
+    asks whether every id names exactly one, which is the question that was
+    missing. Cheap: one parse per page.
+    """
+    n = dupes = 0
+    for f in site_files():
+        html = open(f, encoding="utf-8").read()
+        seen, bad = set(), []
+        for m in re.finditer(r'\sid="([^"]+)"', html):
+            i = m.group(1)
+            if i in seen:
+                bad.append(i)
+            seen.add(i)
+        n += len(seen)
+        if bad:
+            dupes += 1
+            fail(f"{canonical_of(f)} carries {len(set(bad))} duplicated "
+                 f"id(s): {', '.join(sorted(set(bad))[:5])}. "
+                 f"getElementById returns the first, a fragment link is "
+                 f"ambiguous and aria-labelledby resolves to whichever the "
+                 f"parser saw first")
+    if not n:
+        fail("no page carries an id at all — this check has stopped finding "
+             "the thing it is about")
     return n
 
 

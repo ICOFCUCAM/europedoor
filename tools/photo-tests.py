@@ -528,7 +528,89 @@ def main(argv):
             keep.add(os.path.basename(row["original"]))
         keep |= set(row.get("derivatives") or {})
 
+    # ── THE SUITE RUNS AGAINST AN EMPTY LIBRARY ──────────────────────
+    #
+    # AND THAT IS THE ONLY STATE ITS SEVENTEEN ACQUISITION BLOCKS DESCRIBE.
+    # Every one of them acquires for a real declared purpose — the homepage
+    # hero, a country, a region, a journey, an interest, a macro region, a
+    # story, a place — and `acquire.py` refuses a purpose the register
+    # already fills, correctly, because *a surface changing its picture is
+    # an editorial act*. So the day the library filled, 41 of 169
+    # assertions went red at once and not one of them was about the
+    # pipeline: `an approved id acquires` reported
+    # "homepage-hero is already filled by pexels 39491968".
+    #
+    # THE EMPTY-REGISTER FAULT, FOR THE FIFTH TIME, AND AT THE SCALE THAT
+    # MAKES THE SHAPE OBVIOUS. The three earlier instances were each patched
+    # where they showed — a per-block register restore, an assertion rewritten
+    # from "nothing is registered" to "unchanged", a `reg_now == {}` — and
+    # each patch was true of one block. A per-purpose escape was written for
+    # two of them and immediately found the second half of the same fault:
+    # freeing the ROW is not enough, because a file name comes from the
+    # purpose, so the acquisition wrote its stub over
+    # `photographs/homepage-hero.original.jpg` — a licensed original, in the
+    # one directory that exists to be evidence — and the restored register
+    # then named a hash of bytes that were gone. `keep` protects a file from
+    # being DELETED and says nothing about it being overwritten.
+    #
+    # So the isolation is the whole library rather than a list of purposes.
+    # The register becomes empty, `photographs/` and `assets/img/` move
+    # aside, and `cleanup()` puts all three back. **A directory rename cannot
+    # lose bytes**, which is the property that matters here: every file under
+    # those two paths is either somebody's licensed photograph or derived
+    # from one, and this repository's own rule is that a suite which writes
+    # into it owns taking out only what it put in. Nothing is copied, nothing
+    # is hashed, and the real library is untouched for the whole run.
+    BAK = ".photo-tests-bak"
+    ISOLATED = []
+    # THE STATE THIS SUITE STARTED FROM, which under isolation is EMPTY and
+    # is NOT `reg_backup`. Three blocks inside the run put the register back
+    # so the blocks after them are not refused "already filled by" — and all
+    # three wrote `reg_backup`, which was the empty register on the day they
+    # were written and is 311 licensed photographs now. So the PNG block
+    # restored the whole real library into the middle of a run that had just
+    # emptied it, and every acquisition after it was refused: 50 failures of
+    # 169, every one correct and none about the pipeline. **A backup is not
+    # a baseline** — `cleanup()` wants the former and a block in the middle
+    # of a run wants the latter, and they were the same variable.
+    EMPTY = []
+
+    def isolate():
+        """Move the real library aside and start the run on an empty one."""
+        for d in (os.path.join(ROOT, "photographs"), IMG):
+            bak = d + BAK
+            if os.path.isdir(bak):          # a previous run died mid-flight
+                shutil.rmtree(d, ignore_errors=True)
+                os.rename(bak, d)
+            if os.path.isdir(d):
+                os.rename(d, bak)
+                ISOLATED.append((bak, d))
+            os.makedirs(d, exist_ok=True)
+        doc = json.loads(reg_backup)
+        doc["images"] = {}
+        EMPTY.append(json.dumps(doc, indent=2, ensure_ascii=False) + "\n")
+        with open(REGISTER, "w", encoding="utf-8") as fh:
+            fh.write(EMPTY[0])
+
+    def restore_library():
+        for bak, d in ISOLATED:
+            if os.path.isdir(bak):
+                shutil.rmtree(d, ignore_errors=True)
+                os.rename(bak, d)
+        ISOLATED.clear()
+
     def cleanup():
+        # THE REGISTER GOES BACK FIRST AND THE LIBRARY LAST, and the order is
+        # the whole of it. Everything between these two — the `made` list and
+        # the prefix sweep below — was written to take the suite's own stubs
+        # out of the REAL directories, and under isolation those stubs live in
+        # a working directory that `restore_library()` deletes wholesale. Run
+        # the library restore first and `for f in made: os.remove(f)` deletes
+        # the licensed original that has just been put back at that same
+        # absolute path: `photographs/homepage-hero.original.jpg`, gone, with
+        # the register above naming its hash. Measured — that is exactly what
+        # the run before this one did. Last, both loops are no-ops over an
+        # empty directory, which is what they should be.
         with open(REGISTER, "w", encoding="utf-8") as fh:
             fh.write(reg_backup)
         with open(INVARIANTS, "w", encoding="utf-8") as fh:
@@ -579,10 +661,15 @@ def main(argv):
         #
         # This is the "site/ is deleted on every build" rule arriving from the
         # other side: a test that builds owns putting the build back.
+        restore_library()
         subprocess.run([sys.executable, os.path.join(ROOT, "tools", "build.py")],
                        cwd=ROOT, capture_output=True)
 
     try:
+        # THE FIRST THING, AND INSIDE THE `try` so `cleanup()` always undoes
+        # it. Everything below is written against an empty library; the real
+        # one is moved aside for the duration.
+        isolate()
         A = ["scripts/images/acquire.py", "--provider", "pexels"]
         A2 = list(A)
 
@@ -762,7 +849,7 @@ def main(argv):
         # the end and the blocks inside it did not have to until one of them
         # acquired for a surface it did not own.
         with open(REGISTER, "w", encoding="utf-8") as fh:
-            fh.write(reg_backup)
+            fh.write(EMPTY[0])
         for d in (os.path.join(ROOT, "photographs"), IMG):
             if not os.path.isdir(d):
                 continue
@@ -1228,15 +1315,36 @@ def main(argv):
         # that matters most: the sheet exists so a person can judge a
         # candidate INSIDE the real composition, and an assertion that the
         # sheet drew the real hero has to name something the real hero has.
+        # AND `class="opening"` WAS THE FOURTH SPELLING, on a comment recording
+        # the third. `home-hero` renders on plate 02 — the WINDOW — which is
+        # the container data/image-purposes.json declares and has declared
+        # since the crop box was measured. The opening on plate 01 draws the
+        # continent and keeps drawing it.
         check("the candidate page is the real hero",
-              'class="opening"' in drawn and "<picture" in drawn)
-        check("the drawing is replaced, not stacked behind the photograph",
-              "heroeurope" not in drawn)
+              'class="shotclip"' in drawn and "<picture" in drawn)
+        # AND THE TWO PICTURES COEXIST BY DESIGN, so the promise is not that
+        # the drawing is gone. *A photograph replaces the drawing* was true
+        # while both were the same surface; on a plate sequence the opening is
+        # the continent and the window is the photograph, and what has to hold
+        # is that the candidate went into the WINDOW rather than over the
+        # drawing — which is the defect the original sentence was written for,
+        # restated about the composition that exists.
+        _op = drawn.find('class="op"')
+        _win = drawn.find('class="shotclip"')
+        check("the candidate is in the window, not over the drawing",
+              _op >= 0 and _win > _op,
+              f"op at {_op}, window at {_win}")
         check("the delivery ladder is gone", "image/avif" not in drawn)
         check("the preview is what renders",
               f'src="/previews/candidate-{PHOTO_ID}.jpg"' in drawn)
+        # AND THE WINDOW WRITES ITS OWN CREDIT, because it passes
+        # `credit=False` to `picture()` — so "Photo by", which is the
+        # figcaption's wording, is not on this surface and never was. The band
+        # says "Photograph <name> · <licence>". What the licence requires is
+        # the photographer and the provider, and the assertion names the words
+        # the page actually carries.
         check("the credit the provider requires is still on it",
-              "Photo by" in drawn and "Stub Photographer" in drawn)
+              "Photograph" in drawn and "Stub Photographer" in drawn)
         check("the focal anchor survived the substitution",
               'class="photo f-cc"' in drawn)
         check("the preview was fetched",
@@ -1299,7 +1407,12 @@ def main(argv):
         shutil.rmtree(scratch + "-3", ignore_errors=True)
 
         # ── 19. the workflow opens a PR and offers only cleared providers ─
-        check("the workflow creates a pull request", "gh pr create" in wf)
+        # AND `gh pr create` MOVED INTO `scripts/images/open_pr.sh`, one
+        # implementation for two jobs, recorded there. An assertion on the
+        # command is an assertion on where it is typed; what has to hold is
+        # that the workflow opens one.
+        check("the workflow creates a pull request",
+              "open_pr.sh" in wf or "gh pr create" in wf)
         check("the workflow has both stages",
               "stage == 'discover'" in wf and "stage == 'acquire'" in wf)
         check("discovery produces the contact sheet",
@@ -1332,9 +1445,13 @@ def main(argv):
         # counted it as a skip, and reported two skips where it expected
         # one. A test whose whole subject is the SKIP could not tell a
         # deliberate refusal from an accidental one, which is the same fault
-        # as a test that cannot fail. The block owns its own starting state.
+        # as a test that cannot fail. The block owns its own starting state,
+        # and that state is the BASELINE rather than the backup: `reg_backup`
+        # was the empty register when this line was written and is 311
+        # licensed photographs now, so restoring it here refused every entry
+        # in the plan as "already filled by".
         with open(REGISTER, "w", encoding="utf-8") as fh:
-            fh.write(reg_backup)
+            fh.write(EMPTY[0])
         plan = os.path.join(tempfile.gettempdir(), "ed-batch-plan.tsv")
         skips = os.path.join(tempfile.gettempdir(), "ed-batch-skips.tsv")
         made += [plan, skips]
@@ -1478,8 +1595,31 @@ def main(argv):
         # so handing it the whole plan would kill the step on the first skip.
         check("and the PR body is built from the purposes that arrived",
               "/tmp/took.txt" in wf and "--skipped /tmp/skipped.txt" in wf)
+        # AND THIS ONE PINNED A COMMAND RATHER THAN THE PROMISE, AND THEN
+        # RAISED INSTEAD OF FAILING. `gh pr create` moved into
+        # `scripts/images/open_pr.sh` — deliberately, and recorded there as
+        # one implementation rather than two — so `wf.index()` threw a
+        # ValueError and the whole suite ended on a traceback, which reports
+        # no failure and leaves every later assertion unrun. Twelfth
+        # assertion here to protect a spelling instead of a claim, and the
+        # first to take the suite down with it.
+        #
+        # Two repairs, not one. It reads the STEPS rather than the raw text,
+        # because the first `tools/checks.py` in this file is in a comment on
+        # line 41 and an instrument that reads the documentation of code as
+        # code is wrong — recorded six times above. And a marker it cannot
+        # find is a FAILURE that names what it looked for, never an
+        # exception.
+        wf_steps = "\n".join(l for l in wf.splitlines()
+                              if not l.lstrip().startswith("#"))
+        gate_at = wf_steps.find("python3 tools/checks.py")
+        pr_at = min((i for i in (wf_steps.find("open_pr.sh"),
+                                 wf_steps.find("gh pr create")) if i >= 0),
+                    default=-1)
         check("the workflow runs the gates before opening the PR",
-              wf.index("tools/checks.py") < wf.index("gh pr create"))
+              gate_at >= 0 and pr_at >= 0 and gate_at < pr_at,
+              f"checks.py at {gate_at}, the PR step at {pr_at} "
+              f"(-1 means the step was not found at all)")
     finally:
         cleanup()
 

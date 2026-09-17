@@ -226,7 +226,24 @@
   }
   var colls = readColls();
 
-  var ORDER = ["Itinerary", "Place", "Journey", "Theme", "Story"];
+  /* SIX KINDS, AND `Experience` WAS MISSING FROM FIVE.
+   *
+   * The built site offers six save kinds and this list held five:
+   * `data-kind="Experience"` is on 197 buttons and appeared nowhere here,
+   * so `ORDER.indexOf` returned **-1** for every saved experience and the
+   * sort put them in FRONT of everything — ahead of `Itinerary`, which is
+   * index 0. A kind the app does not know is not dropped; it is sorted
+   * first by accident, which is why nothing ever looked broken.
+   *
+   * `Itinerary` was the opposite suspicion and checking it is what stopped
+   * a wrong repair: it is offered on zero PAGES, which reads as dead
+   * vocabulary until you find `planner.js` creating one at runtime when a
+   * reader saves a route it built. It is real and it stays.
+   *
+   * The order is the order the page names them in: where, what, how, why
+   * across the continent, why in one place — and an itinerary first,
+   * because it is the only one the reader made rather than chose. */
+  var ORDER = ["Itinerary", "Place", "Experience", "Journey", "Theme", "Story"];
 
   function rowHtml(x, i) {
     var opts = ['<option value="">Everything else</option>'].concat(

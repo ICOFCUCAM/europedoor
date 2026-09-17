@@ -8,6 +8,7 @@ test without a build directory existing.
 from __future__ import annotations
 
 import hashlib
+import itertools
 import math
 import re
 from urllib.parse import quote
@@ -22,7 +23,7 @@ from .render import (LD_PUBLISHER, ORIGIN, SITE_NAME, SITE_TAGLINE, arch_rim, ca
                      page, photo, picture, plate, section, arch_clip, arch_edge,
                      ed_opening, ed_photo, ed_rows, ed_section_head, ed_split,
                      ed_bleed, ed_declare, ed_feature, ed_mosaic, ed_strip, held,
-                     ed_slot)
+                     ed_slot, photo_href, credit_html)
 from .score import city_scores, country_scores, discoverability
 
 HOME = ("Europe", "/discover")
@@ -397,6 +398,9 @@ def dusk_reach(data=None):
     return out
 
 
+_CUT_N = itertools.count(1)
+
+
 def cut_fade(idprefix, w, h, reach=None, cls="mapcut", top=1.0):
     """The two data cuts, faded, for an instrument that draws the atlas.
 
@@ -413,6 +417,26 @@ def cut_fade(idprefix, w, h, reach=None, cls="mapcut", top=1.0):
     so a horizontal fade placed on the Tunisian end leaves the cut showing
     right across Anatolia. Both come from the projection's own constants.
     """
+    # THE ID IS UNIQUE PER EMISSION, AND IT WAS NOT.
+    #
+    # Two callers pass the prefix "ih" — the index hero and `constellation()`
+    # — so /stories, which draws both, shipped `id="ihedge"` and
+    # `id="ihfoot"` TWICE. Invalid HTML: `getElementById` returns the first,
+    # a fragment link is ambiguous, and the second `url(#ihedge)` resolves to
+    # the FIRST drawing's gradient. On /stories the two gradients happened to
+    # be identical — both take their coordinates from the projection rather
+    # than from the viewBox — so nothing looked wrong, which is luck and not
+    # design: the moment two drawings on one page pass a different `reach` or
+    # `top`, the second silently takes the first's geometry.
+    #
+    # The defs CANNOT be hoisted and shared, which is the obvious repair:
+    # `.datacut stop` and `.reachhead .datacut stop` colour the stops by
+    # ANCESTOR, so a hoisted `<defs>` would take the wrong colour or none —
+    # the recorded fault this function already has, from the other end. So
+    # the id carries a counter. A prefix chosen per caller would be a guard
+    # whoever adds the next drawing gets to choose, and `c_unique_ids` found
+    # this one rather than anybody remembering.
+    idprefix = f"{idprefix}{next(_CUT_N)}"
     eb, ea, sb, sa = reach or (330.0, 30.0, 130.0, 4.0)
     ex1, ey1, ex2, ey2 = cut_band(70.0, 40.0, 52.0, eb, ea)
     ax, ay = MAPPROJ.apex()
@@ -443,7 +467,236 @@ def cut_fade(idprefix, w, h, reach=None, cls="mapcut", top=1.0):
     )
 
 
-def heroeurope(data):
+# ONE PATTERN FOR THE LAND MARKUP, AND THERE WERE TWO.
+#
+# `geo.landmass()` emits a country as `<path … d="…"><title>Name</title>`,
+# and the hero reads that back twice — once to build `NameGround`, which is
+# every country's real polygon, and once to order the names by drawn area.
+# Both were written as the literal `<path d="…">`, and the day the land
+# paths gained an `id` so the Living Atlas could clip a photograph to a
+# country with a `<use>` rather than a second copy of its ring, one of them
+# was widened and the other was not: the first returned fifty shapes and the
+# second returned fifty indices into a list of ZERO, and the build stopped
+# on an IndexError two hundred lines from either.
+#
+# Before that it was worse than a crash. With BOTH narrow, the name layer
+# was simply empty — fifteen country names left the most-seen page on the
+# site and nothing failed, because an unlabelled drawing and a drawing whose
+# labels all missed look identical. *A second implementation of a thing is a
+# second chance to make its mistake*, and the answer on this repeat is the
+# one that worked the last three times: stop having a second implementation.
+LAND_PATH = re.compile(
+    r'<path[^>]*\sd="([^"]*)"[^>]*><title>([^<]*)</title></path>')
+
+
+# ── THE LIVING PHOTOGRAPHIC ATLAS ────────────────────────────────────
+#
+# THE COUNTRY'S OWN BOUNDARY IS THE APERTURE. Every other photographic
+# surface on this site is a rectangle — a bleed, a strip tile, a window —
+# and that is right for a photograph standing on its own. On the hero it
+# would be a picture BESIDE a map, which is what every travel product
+# already is. Clipped to the country it belongs to, the same photograph
+# becomes geography: you read WHERE before you read WHAT, and the door in
+# the headline is the shape of France.
+#
+# NOTHING HERE IS A SECOND CARTOGRAPHY. The clip is `geo.landmass()` run
+# for one slug with the hero's own parameters, so the outline of the
+# aperture is the same path, from the same file, at the same thinning as
+# the country drawn under it — a second copy would drift by a tenth of a
+# unit and show as a fringe, which is the black-fringe failure this
+# drawing already records about two levels of detail stacked.
+#
+# AND IT IS NOT A SECOND WAY INTO THE LIBRARY. Every frame is a REGISTER
+# KEY resolved by `render.photo_href()`, which reads the same row
+# `picture()` reads; a component that took a URL would be a photograph
+# with none of the licence gate behind it. The credit each frame needs —
+# the photographer, their page, and the prominent link to the provider
+# that Pexels' guidelines require — is generated from that row and shown
+# with the frame it belongs to.
+#
+# THE SET IS DERIVED, AND THE TWO RULES ARE THE ONES THIS PAGE ALREADY
+# HAS. One per macro region, because this atlas holds no ranking and
+# refuses one on /for-businesses in those words — the question is where
+# will you go, so the answer is SPREAD. And an advisory country is never
+# offered, because /api/atlas.json is stripped of them at build time and a
+# derived selection is not automatically an honest one.
+#
+# WHICH country per macro region is decided by the LIBRARY rather than by
+# taste: the one with the most photographed destinations, ties broken
+# alphabetically. That is a measurement of what we can actually show, and
+# it moves on its own as the register fills.
+LIVING_MAX = 6
+LIVING_FRAMES = 5
+
+
+def living_atlas(data, images, doc):
+    """The featured countries, their geometry, and their photographs.
+
+    Returns a list of dicts in cycle order. Each carries the clip path, the
+    box to draw the photograph in, and the frames — the country's own
+    picture first, then its photographed destinations in the atlas's own
+    order, each with the line that says what it is and the credit its
+    licence requires.
+    """
+    macro_of = {}
+    for m in data.get("macros", []):
+        for cs in (m.get("countries") or []):
+            macro_of[cs if isinstance(cs, str) else cs.get("slug")] = m["slug"]
+
+    shots = {}
+    for cid, e in data["cities"].items():
+        key = "city:" + cid
+        if key in images:
+            shots.setdefault(cid.split("/")[0], []).append((cid, e, key))
+
+    # AND THE APERTURE HAS TO BE BIG ENOUGH TO HOLD A PICTURE, WHICH IS A
+    # MEASUREMENT AND NOT A PREFERENCE. The first version of this ranked on
+    # the library alone — most photographed destinations, one per macro
+    # region — and returned Croatia, Austria, Belgium, Finland, Armenia and
+    # Estonia. Every one of those is a true answer to the question it was
+    # asked and four of them are 34 to 70 units across on a 1,120-unit
+    # frame: a photograph clipped into Belgium renders about 40 pixels wide
+    # at 1280 and is a smudge with a coastline. That is the map-label
+    # failure in another family — placed, correct, and not resolvable into
+    # anything a reader can read.
+    #
+    # So the first filter is the DRAWN AREA of the country in this frame,
+    # which is the same quantity `min_units` already uses one function over,
+    # and the set is the largest such country per macro region.
+    #
+    # AND THE LIBRARY DECIDES THE SEQUENCE, NOT THE CAST — which is the
+    # second thing measuring changed. Requiring a photographed DESTINATION
+    # to be featured returned six countries nobody would open an atlas on,
+    # because the 65 city photographs the register holds are clustered where
+    # the round-robin happened to reach and every large, familiar country
+    # has none: Portugal, Türkiye, Norway, Spain, Italy, Greece, Germany and
+    # the United Kingdom are all at zero. Every one of them has its OWN
+    # photograph, so every one of them can be an aperture today; what varies
+    # is how many frames it cycles through. A country with one photograph
+    # shows one and a country with five shows five, and the sequence grows on
+    # its own as `stage: fill` reaches the rest.
+    #
+    # AREA RATHER THAN THE BOUNDING BOX, and the box is what the first
+    # version measured. Portugal's box is the widest in Europe because it
+    # contains the Azores and Madeira — 265 units of mostly Atlantic — so
+    # ranking on it put a sliver and two island groups at the top of the
+    # cast. A BOUNDING BOX IS NOT A COUNTRY, which is the rule this
+    # repository already had about placing a name on one, arriving here
+    # about choosing which country to photograph at all.
+    area = {}
+    paths = {}
+    for c in data["countries"].values():
+        slug = c["slug"]
+        if ("country:" + slug) not in images:
+            continue
+        if (c.get("advisory") or {}).get("level"):
+            continue
+        if macro_of.get(slug) is None:
+            continue
+        # THE SAME PATH, NOT A COPY OF IT. `only` draws one country with the
+        # hero's own thinning, so the aperture and the country under it are
+        # the identical geometry — a second simplification would differ by a
+        # tenth of a unit and show as a fringe along every frontier, which is
+        # this drawing's own recorded failure about two levels of detail
+        # stacked.
+        _ctx, ours = geo.landmass(MAPPROJ, HERO_VIEW, doc=doc, thin_units=1.8,
+                                  min_units=6.0, only={slug})
+        d = "".join(re.findall(r'<path[^>]*\sd="([^"]*)"', ours))
+        if not d:
+            continue
+        a = 0.0
+        for sub in d.split("Z"):
+            nums = [float(v) for v in re.findall(r"-?\d+(?:\.\d+)?", sub)]
+            pts = list(zip(nums[0::2], nums[1::2]))
+            if len(pts) < 3:
+                continue
+            a += abs(sum(pts[i][0] * pts[i - 1][1] - pts[i - 1][0] * pts[i][1]
+                         for i in range(len(pts)))) / 2.0
+        paths[slug] = d
+        area[slug] = a
+
+    best = {}
+    for c in data["countries"].values():
+        slug = c["slug"]
+        if slug not in area:
+            continue
+        mac = macro_of[slug]
+        cur = best.get(mac)
+        if cur is None or (-area[slug], slug) < (-area[cur["slug"]], cur["slug"]):
+            best[mac] = c
+    feat = {c["slug"] for c in sorted(
+        best.values(), key=lambda c: (-area[c["slug"]], c["slug"]))[:LIVING_MAX]}
+
+    # EVERY COUNTRY THAT HAS A PHOTOGRAPH IS AN APERTURE, AND ALL FIFTY DO.
+    # The first version lit six and left forty-four in stone, which reads as
+    # six countries that matter and forty-four that do not — the opposite of
+    # what an atlas says. The brief asked for the rest to borrow a picture
+    # from somewhere else if they had none; none of them has to, because the
+    # library already holds a photograph OF each one. Borrowing would have
+    # been the first claim on this site that a picture is of a place it is
+    # not of, which the register exists to make impossible.
+    #
+    # WHAT THE SIX ARE IS THE SEQUENCE, NOT THE CAST. A featured country
+    # cycles through its own destinations; every other one shows the single
+    # photograph it has, and gains a sequence on the build after `stage:
+    # fill` reaches its destinations. So the difference between them is a
+    # fact about the register rather than a decision about the countries.
+    chosen = sorted((c for c in data["countries"].values()
+                     if c["slug"] in area),
+                    key=lambda c: (-area[c["slug"]], c["slug"]))
+
+    out = []
+    for c in chosen:
+        slug = c["slug"]
+        d = paths[slug]
+        # THE IMAGE EXTENT IS THE WHOLE BOUNDING BOX, islands included, and
+        # that is the opposite decision from the one above for a different
+        # reason: the picture is CLIPPED to the country, so anything the
+        # rectangle does not cover is a piece of the country drawn in stone
+        # beside a piece drawn in photograph. `slice` then crops the source
+        # to fill it, exactly as `object-fit: cover` does everywhere else.
+        nums = [float(v) for v in re.findall(r"-?\d+(?:\.\d+)?", d)]
+        xs, ys = nums[0::2], nums[1::2]
+        if not xs or not ys:
+            continue
+        box = (min(xs), min(ys), max(xs) - min(xs), max(ys) - min(ys))
+
+        # THE STEP IS THE COUNTRY'S OWN DRAWN WIDTH, and asking for one
+        # number for fifty apertures is how a homepage ships two megabytes.
+        # The drawing is about one CSS pixel per unit at 1920, so a country
+        # 60 units wide is 60px and wants the 480 step at twice that for a
+        # retina screen; Türkiye is 252 and wants 800. The ladder's smallest
+        # rung is 480 and most of these countries need a third of it, which
+        # is a real finding and the trigger for a smaller step — recorded
+        # rather than answered by inventing one here, because a sixth rung
+        # is a decision about every purpose on the site.
+        want = max(box[2], box[3]) * 2.0
+
+        def frame(key, name, line, url, _w=want):
+            row = images.get(key) or {}
+            return {"key": key, "name": name, "line": line, "url": url,
+                    "href": photo_href(images, key, _w),
+                    "alt": row.get("alt", ""),
+                    "photographer": row.get("photographer", ""),
+                    "source": row.get("source", ""),
+                    "licence": row.get("licence", ""),
+                    "licence_url": row.get("licence_url", "")}
+
+        frames = [frame("country:" + slug, c["name"],
+                        c.get("tagline") or "", urls.country(c))]
+        if slug in feat:
+            for cid, e, key in shots.get(slug, [])[:LIVING_FRAMES - 1]:
+                frames.append(frame(key, e["city"]["name"],
+                                    e["city"].get("summary") or "",
+                                    urls.city(e["country"], e["region"],
+                                              e["city"])))
+        out.append({"slug": slug, "name": c["name"], "href": urls.country(c),
+                    "d": d, "box": box, "frames": frames,
+                    "featured": slug in feat})
+    return out
+
+
+def heroeurope(data, featured=(), beyond_ground=True):
     """Europe, entire, seen through the doorway. The homepage's picture.
 
     THE HOMEPAGE WAS THE LEAST EUROPEDOOR PAGE ON THE SITE. Stripped of its
@@ -528,8 +781,47 @@ def heroeurope(data):
     # the fifty countries is an SVG <a> to its own page now, with its name as
     # the accessible name — no dot, no label, no filter and no count, so it is
     # still the cover of the atlas rather than the index.
+    # AND EACH COUNTRY'S PATH CARRIES AN ID, so the Living Atlas can clip a
+    # photograph to it with a `<use>` instead of a second copy of the ring.
+    # Forty-one clipPaths holding real path data would be the 43 KB of
+    # country geometry on this page twice — the exact cost the frontier pass
+    # exists to avoid.
+    # NOT `ground`: THAT NAME IS TAKEN, three hundred lines down, by the
+    # `NameGround` this function builds to test whether a country name sits
+    # on its own polygon — and a NameGround is always truthy, so a parameter
+    # called `ground` was False at the top of the function and True by the
+    # time the dusk was emitted. Russia vanished correctly and the fade that
+    # existed only for Russia went on being drawn, which is a state no
+    # caller can ask for. Second shadowed name in this session; the first
+    # was `ident` in geo.landmass, where the loop variable of the same name
+    # made the callback a string.
+    #
+    # THE COUNTRIES THE DATA CUT RUNS THROUGH, DERIVED FROM THE GEOMETRY
+    # RATHER THAN NAMED. data/geo/ stops at 52°E, and exactly one country
+    # this atlas writes about has land on both sides of it. With a ground to
+    # dissolve into that is what the dusk is for; with no ground it is a
+    # fragment occupying the whole north-east of the picture, and the fade
+    # that hides its edge is a pale wash over a third of the drawing. So the
+    # groundless hero drops it — the country keeps its page, its link from
+    # every other surface and its advisory, and this one picture does not
+    # draw a shape whose eastern side is a decision about a download.
+    # READ OFF THE DOCUMENT'S OWN BBOX, never the number 52 typed here: the
+    # bound lives in scripts/map/process.py and travels with the file, so a
+    # wider fetch later moves this on its own instead of leaving a constant
+    # that used to be true.
+    _east = doc.get("bbox", [0, 0, 1e9, 0])[2]
+    cut = {ent.get("slug") for ent in doc["countries"].values()
+           if ent.get("atlas") and any(
+               ring[i] >= _east - 0.02
+               for ring in ent["rings"] for i in range(0, len(ring), 2))}
     ctx, land = geo.landmass(MAPPROJ, view, doc=doc,
+                             drop=() if beyond_ground else cut,
                              thin_units=1.8, min_units=6.0,
+                             # CONTEXT ENTRIES CARRY NO SLUG — they are the land outside
+                             # this atlas, which has no page and therefore
+                             # no photograph and nothing to clip.
+                             path_id=lambda ent: ("lz-" + ent["slug"]
+                                                  if ent.get("slug") else ""),
                              link=lambda ent: urls.country_by_slug(ent["slug"]))
 
     # ONE PATH PER GROUP, NOT ONE PER COUNTRY, and it is not a saving.
@@ -568,6 +860,106 @@ def heroeurope(data):
     # geometry, and the anchors inside the clone are inert — a shadow tree is
     # not in the tab order.
     land = f'<g id="heroland">{land}</g>'
+
+    # ── THE GRATICULE ────────────────────────────────────────────────
+    # A PRINTED ATLAS SHOWS ITS OWN PROJECTION, and this drawing publishes
+    # its four angles in the colophon and drew nothing. Under a conic a
+    # meridian is a straight radial line from the cone apex and a parallel
+    # is a circular arc about it — so the graticule is not decoration here,
+    # it is the one mark that makes the projection visible rather than
+    # merely stated. Sampled through `MAPPROJ` rather than drawn as arcs,
+    # so it cannot disagree with the geometry it is laid over: if the
+    # projection ever moves again, this moves with it.
+    #
+    # Ten degrees, which is the interval the EU's own pan-European sheets
+    # use at this extent, and a hairline in the water's own tone: a reader
+    # should find it when they look for it and never meet it first.
+    _grat = []
+    for _lon in range(-30, 51, 10):
+        _pts = [MAPPROJ.xy(_la / 2.0, _lon) for _la in range(60, 161, 4)]
+        _grat.append("M" + "L".join(f"{x:.1f} {y:.1f}" for x, y in _pts))
+    for _lat in range(30, 81, 10):
+        _pts = [MAPPROJ.xy(_lat, _lo / 2.0) for _lo in range(-70, 111, 4)]
+        _grat.append("M" + "L".join(f"{x:.1f} {y:.1f}" for x, y in _pts))
+    graticule = ('<g class="herograt" aria-hidden="true">'
+                 + "".join(f'<path d="{d}"/>' for d in _grat) + '</g>')
+
+    # ── THE SEA NAMES ────────────────────────────────────────────────
+    # `data/geo/marine-lod1.json` holds twenty-one of them with a real
+    # coordinate each, and `cartography.water_points()` has projected them
+    # for the plates since the cartography split. The hero — the one
+    # drawing on this site whose subject is the whole continent, and the
+    # one with the most open water in it — named none.
+    #
+    # THE SET IS CHOSEN BY HOW MUCH SEA IS AROUND THE NAME, which is a
+    # measurement rather than a list: the distance from the label's own
+    # point to the nearest drawn coastline. A sea name wants open water, so
+    # the Strait of Gibraltar and the Bristol Channel — real entries, and
+    # nine units from land — are exactly the ones a printed sheet leaves
+    # out at this scale. Six, because the water here is the page and a
+    # seventh name starts to read as a legend.
+    #
+    # THE ATLANTIC IS NOT AMONG THEM AND IS NOT INVENTED. The reference
+    # sheet names it; this dataset does not hold it, and typing a
+    # coordinate for it here would be authoring geography, which is the one
+    # thing this repository refuses in every other form.
+    #
+    # AND A SEA IS NAMED WHERE THIS DRAWING DRAWS LAND ON BOTH SIDES OF IT,
+    # which is the rule a ceiling on the room was a poor proxy for. Ranked
+    # on room alone the two roomiest seas in this picture are the WHITE SEA
+    # at 60 units and the CASPIAN at 30 — for the reason that their shores
+    # are Russia and Kazakhstan, and this hero draws neither. A ceiling
+    # caught the White Sea and let the Caspian through, because Azerbaijan
+    # is close enough on one side; what actually distinguishes a sea this
+    # drawing can name is that the reader can see what encloses it. Land
+    # east AND west, within a reach of its own room: the North Sea has the
+    # British Isles and Denmark, the Mediterranean has Iberia and Greece,
+    # the Black Sea has Bulgaria and Georgia, and the Caspian has one
+    # shore. The floor is the same question from the other end — the
+    # Strait of Gibraltar and the Bristol Channel are real entries at 0.8
+    # units, and are exactly what a printed sheet leaves out at this scale.
+    LABEL_ROOM = 12.0
+    LABEL_REACH = 170.0
+    _coast = []
+    for _m in LAND_PATH.finditer(land):
+        _n = [float(v) for v in re.findall(r"-?\d+(?:\.\d+)?", _m.group(1))]
+        _coast.extend(zip(_n[0::2], _n[1::2]))
+    _lx1 = max((cx for cx, _cy in _coast), default=view[0] + vw)
+    _ly0 = min((cy for _cx, cy in _coast), default=view[1])
+    _seas = []
+    for _x, _y, _nm in cartography.water_points(
+            lambda la, lo: MAPPROJ.xy(la, lo), view):
+        if not (view[0] < _x < view[0] + vw and view[1] < _y < view[1] + vh):
+            continue
+        _room = min((math.hypot(_x - cx, _y - cy) for cx, cy in _coast),
+                    default=0.0)
+        if _room < LABEL_ROOM:
+            continue
+        # AND NOT WHERE THE PICTURE ITSELF RUNS OUT. Two tests failed on
+        # the WHITE SEA and the CASPIAN before this one: a ceiling on the
+        # room caught the first and not the second, and counting the
+        # countries that face a sea caught neither, because Azerbaijan's
+        # coast wraps right round the Caspian's label and Finland, Sweden
+        # and Norway are all within reach of the White Sea's. What those
+        # two actually have in common is the thing a reader sees: their far
+        # shore is Russia and Kazakhstan, and the drawn land simply STOPS
+        # a few units beyond the name. `data/geo/` is cut at 52°E and at
+        # 72.5°N, and this hero drops the one country the eastern cut runs
+        # through — so a label within its own reach of the drawing's
+        # northern or eastern extreme is a label with nothing behind it.
+        # South and west the drawing ends in the Atlantic and in the
+        # Mediterranean's own southern shore, which is a decision rather
+        # than a data cut, so the test is on those two edges only.
+        if (_x > _lx1 - LABEL_REACH * 0.55) or (_y < _ly0 + LABEL_REACH * 0.4):
+            continue
+        _seas.append((_room, _x, _y, _nm))
+    _seas.sort(reverse=True)
+    seanames = ('<g class="lyr lyr-water-labels" aria-hidden="true">'
+                + "".join(
+                    f'<text class="seaname" text-anchor="middle"'
+                    f' x="{x:.1f}" y="{y:.1f}">{esc(nm)}</text>'
+                    for _r, x, y, nm in _seas[:6]) + '</g>') if _seas else ""
+
     # AND THE RELIEF, which is the whole reason this is worth doing. Every
     # destination plate on this site carries hypsometric bands and the front
     # door carried a flat silhouette — the plainest map on the site, on the
@@ -643,8 +1035,7 @@ def heroeurope(data):
     # NameGround at module level, because there are TWO drawings on this site
     # that set a country's name across it and for the life of both only this
     # one had them. See the class.
-    ground = NameGround([m_.group(1) for m_ in re.finditer(
-        r'<path d="([^"]*)"><title>([^<]*)</title></path>', land)])
+    ground = NameGround([m_.group(1) for m_ in LAND_PATH.finditer(land)])
     shapes = ground.shapes
     CROSS_OK = NameGround.CROSS_OK
 
@@ -695,14 +1086,30 @@ def heroeurope(data):
     # more recognisable — so sixteen is the ceiling and the rest of the
     # continent is read from its shape, which is what the shape is for.
     NAME_MAX = 16
+    # AND THE PATTERN TOLERATES ATTRIBUTES BEFORE `d`, WHICH IT DID NOT.
+    # It was the literal `<path d="..."><title>`, and the day the land paths
+    # gained an `id` — so the Living Atlas could clip a photograph to a
+    # country with a `<use>` instead of a second copy of its ring — the
+    # regex matched nothing and all fifteen country names left the hero in
+    # silence. Nothing failed: the layer was simply empty, which is the same
+    # shape as the check that matched `pointsmap arched"><svg` and examined
+    # zero dots on a site with 130 region maps. A pattern pinned to the
+    # exact attribute order of markup somebody else emits is a pattern that
+    # breaks on an attribute nobody thought about, so this one asks for the
+    # attribute it needs and ignores the rest — and the assertion under the
+    # loop says the layer found countries at all.
     order_ = []
-    for idx, m in enumerate(re.finditer(
-            r'<path d="([^"]*)"><title>([^<]*)</title></path>', land)):
+    for idx, m in enumerate(LAND_PATH.finditer(land)):
         spot = _dpath(m.group(1))
         if spot:
             order_.append(((spot[3][2] - spot[3][0]) * (spot[3][3] - spot[3][1]),
                            idx, m, spot))
     order_.sort(key=lambda t: -t[0])
+    assert order_, (
+        "the hero's name layer read no country out of the land markup. The "
+        "pattern above has stopped matching what geo.landmass() emits, and "
+        "an empty layer looks exactly like a drawing that was always "
+        "unlabelled")
     names = []
     for _area, idx, m, spot in order_:
         if len(names) >= NAME_MAX:
@@ -976,18 +1383,22 @@ def heroeurope(data):
         f'<svg viewBox="{view[0]:.0f} {view[1]:.0f} {vw:.0f} {vh:.0f}"'
         f' preserveAspectRatio="xMidYMid slice" role="group"'
         f' aria-label="Europe, drawn: every country is a link to its own page">'
-        f'<defs><linearGradient id="heroedge" gradientUnits="userSpaceOnUse"'
+        f'<defs>'
+        # AND THE TWO GRADIENTS GO WITH THE LAYER THAT REFERENCES THEM. An
+        # orphan gradient is what `c_hero_dusk_reach` refuses in the other
+        # direction — "no fade" and "no drawing" must not look the same —
+        # and a `<defs>` full of ramps nothing paints is 900 bytes of
+        # rendering instruction for a picture that is not there.
+        + ((f'<linearGradient id="heroedge" gradientUnits="userSpaceOnUse"'
         f' x1="{ex1:.1f}" y1="{ey1:.1f}" x2="{ex2:.1f}" y2="{ey2:.1f}">'
         f'{_dusk()}</linearGradient>'
         f'<radialGradient id="herofootg" gradientUnits="userSpaceOnUse"'
         f' cx="{ax:.1f}" cy="{ay:.1f}" r="{r33:.1f}">'
-        f'{_dusk(foot0, foot1)}</radialGradient>'
-
-
+        f'{_dusk(foot0, foot1)}</radialGradient>') if beyond_ground else '')
         # The mask that keeps the dusk on the land and off the water. The
         # Caspian, the Aral and the Sea of Azov are the far-eastern water this
         # picture has, and an unmasked overlay would paint all three graphite.
-        f'<mask id="herodim" maskUnits="userSpaceOnUse"'
+        + f'<mask id="herodim" maskUnits="userSpaceOnUse"'
         f' x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}" height="{vh:.0f}">'
         # WIDER IN THE MASK THAN IN THE DRAWING, on purpose. The land is
         # stroked at 1.4 units to close the seams between neighbours, and a
@@ -996,9 +1407,16 @@ def heroeurope(data):
         # a unit of parchment uncovered along every edge. Along the 52°E cut
         # — a straight line 700 units long — that is a bright hairline
         # exactly where the picture must not have one.
-        f'<use href="#heroctx" fill="#fff" stroke="#fff" stroke-width="3"/>'
-        f'<use href="#heroland" fill="#fff" stroke="#fff" stroke-width="3"/>'
-        f'</mask>'
+        # AND THE CONTEXT CLONE GOES WITH THE CONTEXT. `#heroctx` is only
+        # emitted when the ground beyond the atlas is drawn, and a `<use>`
+        # of an id that is not on the page renders as nothing and reports
+        # nothing — which `checks.py` is right to refuse, because the one
+        # thing worse than a missing layer is a missing layer that looks
+        # like a decision.
+        + (f'<use href="#heroctx" fill="#fff" stroke="#fff" stroke-width="3"/>'
+           if beyond_ground else "")
+        + f'<use href="#heroland" fill="#fff" stroke="#fff" stroke-width="3"/>'
+        + f'</mask>'
         # RELIEF ONLY WHERE THIS ATLAS GOES. Anatolia and the Atlas mountains
         # are real ground and this file holds them, and drawn at the weight the
         # Alps are drawn at they took the right-hand third of the picture: the
@@ -1059,9 +1477,19 @@ def heroeurope(data):
         # the dusk painted on top instead, the atlas simply covers it where
         # the atlas exists and the dusk turns the atlas into it where it does
         # not. Nothing to cross-fade and no edge to hide.
+        # JUST EUROPE, WHERE THE CALLER ASKS FOR IT. `lyr-beyond` is Asia
+        # and Africa out to the Yenisei, and `heroctxg` is every non-atlas
+        # neighbour; both exist because *Europe is not an island* — a
+        # continent ending at 52°E on a graphite ground reads as a coastline
+        # and then as a rendering fault. On the gallery hero there is no
+        # ground: the sea is the white wall, so there is no water for an
+        # edge to read as, and what the two layers actually contributed was
+        # a grey mass filling the right third of the picture with the dusk
+        # spread across it. The rule has not changed — it was about a
+        # drawing with a painted ocean, and this one has none.
         + ('<g class="lyr lyr-beyond" aria-hidden="true">'
            + "".join(f'<path d="{d}"/>' for d in beyond)
-           + '</g>' if beyond else "")
+           + '</g>' if (beyond and beyond_ground) else "")
         # OPACITY ON THE GROUP, NOT ON THE PAINT, and that is the whole fix.
         #
         # The seams between two independently simplified neighbours have to be
@@ -1076,8 +1504,8 @@ def heroeurope(data):
         # the group is not, which looks identical where nothing overlaps and
         # correct where things do.
         + f'<g class="lyr lyr-coastal-water" aria-hidden="true">'
-        f'<use href="#heroctx" filter="url(#heroshore)"/>'
-        f'<use href="#heroland" filter="url(#heroshore)"/></g>'
+        + (f'<use href="#heroctx" filter="url(#heroshore)"/>' if beyond_ground else "")
+        + f'<use href="#heroland" filter="url(#heroshore)"/></g>'
         # AND THE COAST IS HEAVIER THAN A FRONTIER, for 27 bytes. A coastline
         # is where land meets sea and a frontier is a line drawn on land, and
         # until now both were the same stroke: the hierarchy every atlas has
@@ -1093,12 +1521,60 @@ def heroeurope(data):
         # is — the land path's own edge — and this is how that edge is given
         # its weight, which is a rendering technique rather than a layer.
         + f'<g class="herocoast" aria-hidden="true">'
-        f'<use href="#heroctx"/><use href="#heroland"/></g>'
+        + (f'<use href="#heroctx"/>' if beyond_ground else "")
+        + f'<use href="#heroland"/></g>'
         + f'<g class="lyr lyr-land">'
-        + f'<g class="heroctxg" aria-hidden="true">{ctx}</g>'
+        + (f'<g class="heroctxg" aria-hidden="true">{ctx}</g>' if beyond_ground else "")
         + f'<g class="herolandg">{land}</g></g>'
         + (f'<g class="lyr lyr-terrain" aria-hidden="true"'
            f' mask="url(#herolandmask)">{relief}</g>' if relief else "")
+        # ── THE LIVING PHOTOGRAPHIC ATLAS, ABOVE THE GROUND AND UNDER
+        # EVERYTHING THAT DESCRIBES IT. The frontiers, the rivers, the
+        # country names and the dusk are all drawn over the photograph, so a
+        # picture inside France is still bounded by France's own line and
+        # still carries the name — which is what stops it being a
+        # photograph pasted on a map and makes it the country FILLED.
+        #
+        # ONE FRAME PER COUNTRY, AND THE SEQUENCE WAS BUILT, MEASURED AND
+        # REMOVED. The comment that stood here said the first frame carries
+        # `href` and "the others carry `data-href` and are fetched by the
+        # ENHANCEMENT the first time they are shown". There is no
+        # enhancement: this page's only `<script>` is the inert JSON-LD
+        # block, so the held-back frames were never fetched and never shown,
+        # and `.herophoto image { opacity: 0 }` read as a dead rule because
+        # the only elements it applied to had no `href` to draw. That is the
+        # `data-rotate` failure — bytes shipped on the most-visited page
+        # waiting for a rotator nobody wrote — found this time by the
+        # dead-rule scan rather than by reading.
+        #
+        # WRITING THE ROTATOR WAS COSTED AND REFUSED ON THE NUMBERS. The
+        # sequence is a country's own photograph followed by its photographed
+        # DESTINATIONS, and the register holds destination photographs inside
+        # exactly one of the featured countries: France has four frames and
+        # the other five have one each. So an enhancement would put the first
+        # JavaScript on the homepage to cross-fade one country, which is not
+        # a trade this page should make — the same reasoning that built,
+        # measured and removed the nine restraint marks.
+        #
+        # The trigger is the library. When the register holds photographed
+        # destinations inside several featured countries the sequence is
+        # worth ~40 lines of enhancement, and the markup to carry it is two
+        # lines here.
+        + (('<defs>' + "".join(
+            f'<clipPath id="lzc-{f["slug"]}" clipPathUnits="userSpaceOnUse">'
+            f'<use href="#lz-{f["slug"]}"/></clipPath>' for f in featured)
+           + '</defs>'
+           + '<g class="herophoto" aria-hidden="true">' + "".join(
+               f'<g class="lzc" data-country="{f["slug"]}">' + "".join(
+                   f'<image class="lzf"'
+                   f' clip-path="url(#lzc-{f["slug"]})"'
+                   f' x="{f["box"][0]:.1f}" y="{f["box"][1]:.1f}"'
+                   f' width="{f["box"][2]:.1f}" height="{f["box"][3]:.1f}"'
+                   f' preserveAspectRatio="xMidYMid slice"'
+                   f' href="{esc(fr["href"])}"/>'
+                   for j, fr in enumerate(f["frames"]) if fr["href"] and j == 0)
+               + '</g>' for f in featured)
+           + '</g>') if featured else "")
         # ORDER: terrain, then water, then the frontiers over both. Water is
         # a separate visual layer and must never inherit land shading — a
         # river under the relief would be tinted by the band it crosses and
@@ -1113,6 +1589,7 @@ def heroeurope(data):
         # over it. `aria-hidden`, because the accessible name of each country
         # is already on its link and a screen reader should not hear fifty
         # countries twice.
+        + (seanames if not beyond_ground else "")
         + (f'<g class="lyr lyr-labels" aria-hidden="true">{names}</g>'
            if names else "")
         # THE DUSK, LAST AND OVER EVERYTHING THE ATLAS DREW. Two rectangles
@@ -1152,13 +1629,52 @@ def heroeurope(data):
         # left edge, over open Atlantic, behind the headline. The southern cut
         # is only visible where it crosses LAND, so masking it to land costs
         # nothing and removes that edge.
-        + f'<g class="herodusk" aria-hidden="true">'
+        # AND THE EASTERN RECT IS MASKED TO THE LAND WHERE THERE IS NO
+        # GROUND. It is unmasked on the drawn hero on purpose — the water
+        # has to dissolve with the land it surrounds, or the shadow stops
+        # at every coastline and the ground beyond begins on a hard
+        # diagonal. With no ground and no painted sea there is nothing for
+        # it to abut and nothing outside the land for it to dim, so an
+        # unmasked rect is a wash over a white page: the fade's only job
+        # here is to stop Russia ending on a straight line at 52°E.
+        + ('' if not beyond_ground else f'<g class="herodusk" aria-hidden="true">'
         + f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
         f' height="{vh:.0f}" fill="url(#heroedge)"/>'
         + f'<rect x="{view[0]:.0f}" y="{view[1]:.0f}" width="{vw:.0f}"'
-        f' height="{vh:.0f}" mask="url(#herodim)" fill="url(#herofootg)"/></g>'
+        f' height="{vh:.0f}" mask="url(#herodim)" fill="url(#herofootg)"/></g>')
         + f'</svg></div>'
     )
+
+
+def plate_sequence(plates, anchor=None):
+    """The bands of a plate page, numbered by what is DRAWN.
+
+    Five pages compose a plate sequence and each spelled this line itself —
+    the homepage, /journeys, /experiences, /plan and now /stories, the last
+    of them in a fourth spelling producing the same bytes. *A second
+    implementation of a thing is a second chance to make its mistake*, and
+    this one already has a mistake worth not repeating: **the number comes
+    from the rendered sequence, not from the declared list.**
+    `enumerate(PLATES, 1)` filtered afterwards numbers first and filters
+    second, so an omitted band leaves a hole — with a register holding one
+    photograph the homepage printed 01, 02, 05, 06, 07, 08, which
+    `section-audit.py` failed on in the one state that produces it. *The
+    selector that COUNTS is the selector that DRAWS*, which this repository
+    records about two CSS counters and is equally true of a number composed
+    in Python.
+
+    A plate is `(classes, name, inner)` or `(classes, name, inner, anchor)`;
+    with no anchor of its own it takes `act<n>`, which is how the homepage
+    numbers its own.
+    """
+    out = []
+    for i, plate in enumerate([p for p in plates if p[2]], 1):
+        slug, name, inner = plate[0], plate[1], plate[2]
+        at = plate[3] if len(plate) > 3 else f"act{i}"
+        cls = " ".join("sheet-" + c for c in slug.split())
+        out.append(f'<section class="sheet {cls}" id="{at}">'
+                   f"{actmark(i, name)}{inner}</section>")
+    return "\n".join(out)
 
 
 def actmark(n, name):
@@ -1186,18 +1702,6 @@ def golink(href, label, cls=""):
             f'<span class="gomark" aria-hidden="true"></span>'
             f'<span class="golabel">{esc(label)}</span></a>')
 
-
-def marginnote(*lines):
-    """The right-hand margin of an atlas plate.
-
-    Tracked capitals set small against the outer edge, which is where a
-    printed plate carries its sheet number, its projection and its series.
-    It is decoration in the strict sense — `aria-hidden`, no link, nothing a
-    reader needs — and it is the cheapest thing on the page that says this is
-    a plate rather than a web section.
-    """
-    return ('<p class="marginnote" aria-hidden="true">'
-            + "".join(f"<span>{esc(l)}</span>" for l in lines) + "</p>")
 
 
 def home(data):
@@ -1252,10 +1756,84 @@ def home(data):
     #
     # Nothing on the page changes today. The register holds no `home-hero`,
     # so the drawn continent is what a reader gets, exactly as now.
+    # THE MAP IS IN THE HERO, AT THE OWNER'S DIRECTION, AND THE REASONING
+    # IT OVERRULES IS KEPT RATHER THAN DELETED. `section-audit.py` §7
+    # records why it was taken out: it made a data surface the first thing
+    # a reader met on a page whose job is to make them want to go
+    # somewhere, and it inlined 90 KB of coastline to do it. Both halves
+    # are answered rather than ignored — this is `constellation()`, the
+    # same 12 KB drawing the body plates use, not the 90 KB instrument,
+    # and it carries no filter row, no legend and no `data-role`, which is
+    # what that assertion actually pins. What changed is the judgement
+    # about what belongs first, and that judgement is the owner's.
+    #
+    # The photograph did not lose its surface: `home-hero` is the
+    # full-bleed window on plate 02, which is the largest a picture gets
+    # anywhere on this site. A purpose that stops reaching a surface is
+    # the failure `c_purpose_reaches` exists to name.
+    #
+    # AND IT IS THE ATLAS, NOT THE CONSTELLATION. The first version of this
+    # panel drew `constellation()` — 319 dots on a silhouette — because it
+    # is the cheap drawing the body plates use. That is a DIAGRAM: it says
+    # how many destinations there are and nothing about Europe. The thing
+    # a reader is being handed the door to is the continent itself, with
+    # its relief, its rivers, its frontiers and its countries named, and
+    # this repository draws exactly one of those. It costs bytes and the
+    # ceiling moves deliberately, which is what `weight.home_kb` is for.
+    #
+    # AND THE PANEL IS A RECTANGLE. The aperture is the signature and it
+    # is on 824 plates, every social card and every embedded map; on the
+    # one surface that is already the largest picture on the site, cutting
+    # it again makes the drawing a decoration of its own frame. *A
+    # signature applied to everything is wallpaper* — `docs/
+    # signature-moments.md` says so, and question 2 for this surface is
+    # answered by the picture rather than by its edge.
+    # THE LIVING ATLAS: the featured countries, their clip and their frames.
+    # `doc` is the same europe-lod1 document the drawing itself reads, loaded
+    # once here and handed down, because a second load is a second chance for
+    # the aperture and the country under it to be different geometry.
+    _lz = living_atlas(data, images, geo.load("europe-lod1.json"))
+    _heromap = heroeurope(data, featured=_lz, beyond_ground=False)
     _hero_row = images.get("home-hero")
-    _hero = (picture(images, "home-hero", w=2400, h=1200,
-                     alt=_hero_row.get("alt", ""), eager=True, sizes="100vw")
-             if _hero_row else heroeurope(data))
+
+    # THE PANEL IS THE SAME STATE, WRITTEN OUT. One active country and one
+    # active frame drive the aperture, the name, the line under it, the link
+    # and the credit — so there are not five components to keep in step,
+    # there is one state and five readings of it. Every frame is in the
+    # markup, which is what makes the no-JavaScript answer the FIRST frame of
+    # the first country rather than nothing: the enhancement moves a
+    # `data-on` attribute and fetches the picture it just revealed.
+    #
+    # AND THE CREDIT TRAVELS WITH THE FRAME. Pexels' guidelines ask for the
+    # photographer credited with a link to the photo's own page and a
+    # prominent link to Pexels, and `picture()` derives both from the
+    # register row. An SVG `<image>` can hold neither — it is one href — so
+    # the credit for whichever frame is showing is here, generated from the
+    # same row, and it changes with the picture it describes.
+    # NO CREDIT ON THE HERO, AT THE OWNER'S DIRECTION, AND THE OBLIGATION
+    # DOES NOT GO AWAY WITH IT.
+    #
+    # This was a "Currently exploring" panel and then a line naming
+    # forty-one photographers, which at the sizes a credit is set in ran to
+    # seven lines under the picture — a second thing to read on the one
+    # plate whose job is to be looked at. Both are off.
+    #
+    # What cannot be off is the credit itself. Pexels' guidelines are
+    # quoted in docs/data-licenses/photo-providers.json with the archived
+    # page behind them: *"Whenever you are doing an API request make sure to
+    # show a prominent link to Pexels"* and *"Always credit our
+    # photographers when possible"*. That is a licence condition on every
+    # photograph in the register, not a design preference, and this site
+    # refuses a photograph whose provenance is incomplete in four places.
+    #
+    # So the credit moves to the COLOPHON at the foot of the sheet, beside
+    # the line that names Natural Earth and the elevation surveys — which is
+    # exactly what a colophon is for — and it is one sentence rather than
+    # forty-one names, because each of these photographs is already
+    # credited by `picture()` on its own country's page, with the
+    # photographer, their profile and the licence. The link to Pexels is on
+    # the page the photographs are on, which is what the guideline asks.
+    _lzpanel = ""
 
     # ── 01 · THE DOOR ────────────────────────────────────────────────
     # The wall is paper and the opening is the only dark thing on the
@@ -1265,197 +1843,326 @@ def home(data):
     # a graphite arch inside it: the one thing the page exists to show,
     # invisible against its own ground.
     door = f"""
+  <div class="doorgrid">
   <div class="sheettext">
-    <h1 class="mega">Open<br>the door<br>to Europe.</h1>
+    <h1 class="mega">Open the door<br>to <em class="lit">Europe</em>.</h1>
     <p class="lede">{numword(ncountries, cap=True)} countries. {numword(nregions)} travel
     regions. A continent of living cultures, extraordinary places and endless
     ways to belong.</p>
     {golink('/plan', 'Begin your journey')}
+    <div class="figrow">
+      <div><b>{ncountries}</b><span>Countries</span></div>
+      <div><b>{nregions}</b><span>Travel regions</span></div>
+      <div><b>{ncities}</b><span>Destinations</span></div>
+      <div><b>{len(data["journeys"])}</b><span>Journeys</span></div>
+    </div>
   </div>
-  <div class="opening">{_hero}<span class="reveal" aria-hidden="true"></span></div>
-  {marginnote('More than a map',
-              f'{geo.LCC_LAT0:g}° N  {geo.LCC_LON0:g}° E',
-              'A continent of possibility')}"""
+  <div class="doorside">
+  <div class="op">{_heromap}</div>
+  {_lzpanel}
+  </div>
+  </div>"""
 
-    # ── 02 · THE QUESTION ────────────────────────────────────────────
-    # THE SEQUENCE DROPPED THE ONE CONTROL THE HOMEPAGE IS REQUIRED TO
-    # CARRY, and the browser suite died on check one rather than reporting
-    # it: `page.fill("#homeask")` timed out, the run threw, and the ~1,500
-    # assertions after it — every one of Discover's among them — never ran.
-    # A missing element is a CRASH in that suite and a red line in this one,
-    # so the whole gate went dark on a regression it was written to name.
+    # THE SET THIS ROOM HANGS — derived, and two of the three rules are
+    # refusals rather than preferences.
     #
-    # The plate is called The question and its headline is "Europe changes
-    # with what you seek", so the box belongs here rather than back on the
-    # door: the tiles are eight pre-formed answers to that question and the
-    # sentence box is the open one. The door keeps its link to the planner.
-    # Eight photographs at thumbnail size, each one the picture the theme
-    # it links to opens on. THE REGISTER DECIDES WHICH EIGHT: a theme with
-    # no licensed photograph is not in this row, because a row of eight
-    # where two are empty frames is a row that says the library is thin.
-    # It grows to the full thirteen as the library fills and the layout
-    # does not change, which is the same property the four doors had.
-    # AND `[:8]` MADE THAT COMMENT FALSE THE DAY AN ELEVENTH WAS LICENSED.
-    # The cap was written when eight was the whole of what the register
-    # held and the grid was eight fixed tracks, so it read as a statement
-    # about the layout. Eleven themes carry a photograph now and three of
-    # them — Grand Tour, Modernist, Thermal — were dropped by data order,
-    # silently, on the plate whose sentence is that the continent reorders
-    # itself around what you seek. A row that shows eight of eleven and
-    # says nothing is a SELECTION wearing the clothes of a set, which is
-    # the rule this atlas already holds about picking twelve mountain
-    # destinations. The register decides, and the grid follows the count
-    # rather than the count following the grid.
-    shot_themes = [t for t in data["themes"] if ("theme:" + t["slug"]) in images]
-    def _tile(t):
-        key = "theme:" + t["slug"]
-        pic = picture(images, key, w=560, h=560, alt=images[key]["alt"],
-                      sizes="9rem", credit=False)
-        nm = esc(t["name"].replace(" Europe", ""))
-        return (f'<a class="qtile" href="{urls.theme(t)}">{pic}'
-                f'<span class="qname">{nm}</span></a>')
-    tiles = "".join(_tile(t) for t in shot_themes)
-    # THE ROW OWES ITS ATTRIBUTION and pays it once. Eight figcaptions under
-    # eight thumbnails is noise; the licence asks for the photographer and
-    # the provider, not for a caption per frame.
-    qcredit = ("Photographs by " + ", ".join(
-        f'<a href="{esc(images["theme:" + t["slug"]]["source"])}" rel="noopener" '
-        f'target="_blank">{esc(images["theme:" + t["slug"]]["photographer"])}</a>'
-        for t in shot_themes) + " on Pexels.")
-    question = f"""
+    # ONE PER MACRO REGION, NOT "THE BEST FIVE". This atlas holds no
+    # ranking and refuses one on `/for-businesses` in those words. The
+    # question is where will you go, so the answer is SPREAD.
+    #
+    # AND AN ADVISORY COUNTRY IS NEVER OFFERED. The first build of this
+    # plate put MINSK on the homepage: Belarus carries `advisory.level:
+    # avoid` and is stripped from `/api/atlas.json` at build time. A
+    # derived selection is not automatically an honest one.
+    macro_of = {}
+    for m in data.get("macros", []):
+        for cs in (m.get("countries") or []):
+            macro_of[cs if isinstance(cs, str) else cs.get("slug")] = m["slug"]
+    seen_macro, picks = set(), []
+    for cid, e in idx.items():
+        if ("city:" + cid) not in images:
+            continue
+        if (e["country"].get("advisory") or {}).get("level"):
+            continue
+        mac = macro_of.get(cid.split("/")[0])
+        if mac is None or mac in seen_macro:
+            continue
+        seen_macro.add(mac)
+        picks.append((cid, e))
+    picks = picks[:5]
+
+    def _phot(keys):
+        """One credit line for a row, paid once. The licence asks for the
+        photographer and the provider, not a caption per frame."""
+        # A KEY THE REGISTER DOES NOT HOLD IS SKIPPED, NOT A KeyError. Every
+        # caller passes the keys of a band it has already filtered, so this
+        # is unreachable on the real register — and `contact_sheet.py` builds
+        # this page with a register holding ONE row, which is the state the
+        # whole credit line exists to describe honestly. A credit names the
+        # photographs that are ON the page; a key with no row is a photograph
+        # that is not.
+        out, seen = [], set()
+        for k in keys:
+            if k not in images:
+                continue
+            nm = images[k]["photographer"]
+            if nm in seen:
+                continue
+            seen.add(nm)
+            out.append(f'<a href="{esc(images[k]["source"])}" rel="noopener" '
+                       f'target="_blank">{esc(nm)}</a>')
+        return ('<p class="sheetcred rowcred">Photographs by '
+                + ", ".join(out) + " on Pexels.</p>") if out else ""
+
+    # ── 02 · THE WINDOW ──────────────────────────────────────────────
+    # THE ONE FULL-BLEED PICTURE ON THE PAGE, and it is the window: fixed
+    # to the viewport while the wall scrolls past it. A gallery has one
+    # wall you walk up to, and a quiet room earns exactly one of these.
+    window = ""
+    if _hero_row:
+        _cl = data["home"]["closing"]
+        window = f"""
+  <div class="shotclip"><div class="shotfull">{picture(images, "home-hero", w=2400, h=1400,
+      alt=_hero_row["alt"], sizes="100vw", credit=False, eager=True)}</div></div>
   <div class="sheettext">
-    <h2 class="mega">Europe<br>changes with<br>what you seek.</h2>
+    <h2 class="mega">{esc(_cl["head"]).replace(" is not", "<br>is not")}</h2>
+    <p class="lede">{esc(_cl["body"])}</p>
+    {golink('/beyond-the-obvious', 'Beyond the obvious')}
   </div>
-  <div class="sheetside">
-    <p class="lede">Mountains or coastlines. Cities or quiet places. Food, culture,
-    history or the wild. There is no single Europe: choose your instinct, and the
-    continent reorders itself around it.</p>
+  <p class="sheetcred">Photograph <a href="{esc(_hero_row["source"])}" rel="noopener"
+  target="_blank">{esc(_hero_row["photographer"])}</a> · {esc(_hero_row["licence"])}</p>"""
+
+    # ── 03 · THE PLACES ──────────────────────────────────────────────
+    # A FEATURE, NOT A CONTACT STRIP. Five equal tiles 211 pixels wide
+    # with a name under each is the eight-equal-tiles failure this
+    # repository has already measured twice, at five: nothing in the row
+    # is the subject, so the eye reads a catalogue of content types and
+    # moves on. `docs/non-home-redesign.md` declares the scale that fixes
+    # it — a feature is asymmetric at 1.35 against .65, "because two equal
+    # columns read as a layout and an unequal pair reads as a picture with
+    # something to say" — and this is the one band on the homepage with
+    # five real photographs to spend on it.
+    #
+    # So the first destination is the picture and the other four are the
+    # list beside it. Which one leads is not a judgement: `picks` is one
+    # destination per macro region in the atlas's own order, and the lead
+    # is simply the first of them.
+    #
+    # AND THE SEARCH FORM CAME OFF THIS PLATE. It was a tool dropped into
+    # the middle of a gallery — an input 243 pixels wide with its own
+    # placeholder clipped, between a headline about looking at places and
+    # the places themselves. It is the one interactive thing on this page
+    # and it belongs where an invitation belongs, which is the end: it is
+    # on plate 08 now, beside the closing statement.
+    # AND THE BAND IS OMITTED WHEN THERE IS NOTHING TO LEAD IT WITH. `picks`
+    # is one photographed destination per macro region, so it is EMPTY for a
+    # register holding none — which was every register before the first
+    # tranche merged, and is the register `contact_sheet.py` builds when it
+    # renders this page once per candidate: it swaps in ONE row so the sheet
+    # shows that candidate and nothing else. `picks[0]` then raised
+    # IndexError and took the whole acquisition suite down with it, which is
+    # the crash-stops-counting fault this file records twice, arriving in a
+    # page BUILDER rather than in a gate. Every other band here is already
+    # guarded — `if inner` in the plate loop drops an empty one — and this is
+    # the one that could not produce an empty string because it died first.
+    places = ""
+    if picks:
+        _lead, _rest = picks[0], picks[1:5]
+        _lc, _le = _lead
+        placerows = "".join(
+            f'<a class="pl" href="{urls.city(e["country"], e["region"], e["city"])}">'
+            f'<span class="plshot">'
+            f'{picture(images, "city:" + cid, w=400, h=400, credit=False, alt=images["city:" + cid]["alt"], sizes="7rem")}'
+            f'</span>'
+            f'<span class="pltext">'
+            f'<span class="plwhere">{esc(e["country"]["name"])}</span>'
+            f'<span class="plname">{esc(e["city"]["name"])}</span></span>'
+            f'<span class="plgo" aria-hidden="true">→</span></a>'
+            for cid, e in _rest)
+        places = f"""
+      <div class="galwrap">
+      <div class="sheettext">
+        <h2 class="mega">One destination from<br>each corner of the continent.</h2>
+        <p class="lede">Europe changes with what you seek — mountains or coastlines,
+        cities or quiet places. Every one of these is the first place this atlas
+        would send you in its corner of the continent.</p>
+      </div>
+      <div class="feat">
+        <a class="featlead" href="{urls.city(_le["country"], _le["region"], _le["city"])}">
+          {picture(images, "city:" + _lc, w=1200, h=1500, credit=False,
+                   alt=images["city:" + _lc]["alt"],
+                   sizes="(min-width: 62rem) 46vw, 92vw")}
+          <span class="featwhere">{esc(_le["country"]["name"])}</span>
+          <span class="featname">{esc(_le["city"]["name"])}</span>
+          <span class="featline">{esc(_le["city"].get("summary", ""))}</span>
+        </a>
+        <div class="featlist">{placerows}</div>
+      </div>
+      {_phot(["city:" + c for c, _e in picks[:5]])}
+      </div>"""
+
+    # ── 04 · THE CROSSING ────────────────────────────────────────────
+    # A JOURNEY'S PICTURE IS ONE OF ITS OWN STOPS, NOT ITS `journey-hero`.
+    # The automated fill searches the role's first concept and got
+    # railways: three of the nine journey photographs are the same
+    # commuter station at Geesthacht and not one is about its journey.
+    # The Media Desk's own note names that trade — nothing looks at the
+    # photograph before it is live. So this takes the picture it can
+    # defend: a destination ON the route.
+    #
+    # AND IT SAYS WHAT IT MEASURED. Every distance here is a haversine
+    # between two coordinates; for a year the journey pages printed that
+    # as the journey. "Straight line" is the correction, and §7 asserts it.
+    jrows, jkeys = [], []
+    for j in data["journeys"]:
+        if len(jrows) == 3:
+            break
+        stops = [idx[l["city"]] for l in j["legs"] if l["city"] in idx]
+        shot = next(("city:" + l["city"] for l in j["legs"]
+                     if ("city:" + l["city"]) in images), None)
+        if not shot or len(stops) < 2:
+            continue
+        jkeys.append(shot)
+        names = " · ".join(esc(e["city"]["name"]) for e in stops[:4])
+        if len(stops) > 4:
+            names += f" · +{len(stops) - 4} more"
+        jrows.append(
+            f'<a class="jr" href="{urls.journey(j)}">'
+            f'{picture(images, shot, w=900, h=560, credit=False, alt=images[shot]["alt"], sizes="13rem")}'
+            f'<span><span class="jrname">{esc(j["name"])}</span>'
+            f'<span class="jrstops">{names}</span></span>'
+            f'<span class="jrgo">View →</span></a>')
+    crossing = ""
+    if jrows:
+        jf = data["journeys"][0]
+        jl = [idx[l["city"]]["city"] for l in jf["legs"] if l["city"] in idx]
+        jkm = int(round(sum(haversine(jl[i], jl[i + 1]) for i in range(len(jl) - 1))))
+        jfacts = [(f"{jkm:,} km", "Straight-line distance"), (str(len(jl)), "Stops")]
+        crossing = f"""
+  <div class="galwrap">
+  <div class="sheettext">
+    <h2 class="mega">Europe reveals itself<br>when you move through it.</h2>
+    <dl class="figures">{"".join(
+        f'<div><dd>{esc(v)}</dd><dt>{esc(k)}</dt></div>' for v, k in jfacts)}</dl>
+    <p class="lede">Measured on {esc(jf["name"])}. Every distance here is a straight
+    line between two coordinates — the ground route is longer.</p>
+  </div>
+  <div class="jrows">{"".join(jrows)}</div>
+  {_phot(jkeys[:3])}
+  </div>"""
+
+    # ── 05 · THE ATLAS ───────────────────────────────────────────────
+    # PALE AND PRECISE. The graphite instrument belongs to the dark world;
+    # on a white wall the same drawing reads as an engraving, which is
+    # what "MAPS = precise" asks for. Every dot is a destination this
+    # atlas holds, and the count beside it is the number of dots.
+    # NO SECOND DRAWING HERE. The map moved to the hero, and two copies of
+    # one continent on one page is the fault §7 already names — eleven
+    # maps, and a reader who stopped seeing destinations at all.
+    clist = "".join(
+        f'<a href="{urls.country(c)}">{esc(c["name"])}</a>'
+        for c in sorted(data["countries"].values(), key=lambda c: c["name"]))
+    atlas = f"""
+  <div class="galwrap">
+  <div class="sheettext">
+    <h2 class="mega">One continent.<br>{numword(ncountries, cap=True)} doors.</h2>
+    <p class="lede">Every country has its own way in — {ncities} places drawn
+    on one projection, the same file as every other map here.</p>
+    {golink('/map', 'Open the map')}
+  </div>
+  <div class="countrycols">{clist}</div>
+  </div>"""
+
+    # ── 06 · THE READING ─────────────────────────────────────────────
+    # A CONTENTS PAGE WITH A LEAD, WHICH IS WHAT NINE ESSAYS ARE.
+    #
+    # This band showed TWO stories as two 4:3 photographs side by side —
+    # a card grid, and the exact shape `/stories` was rebuilt out of:
+    # "nine essays are a contents page: one list, newest first, the desk as
+    # a kicker on the piece it belongs to". It also showed two of nine,
+    # silently, which is a selection wearing the clothes of a set — the
+    # same `[:8]` failure plate 02 already records one band over.
+    #
+    # So: the newest story is the LEAD and carries the one photograph, at
+    # the width a lead deserves, with its standfirst; every other story is
+    # a line — desk, title, reading time — and all nine are here. The
+    # pictures the register holds for the other six are not spent, and that
+    # is the point: a contents page that illustrated every line would be
+    # the grid again with smaller pictures.
+    _st = sorted(data.get("stories", []),
+                 key=lambda x: x.get("published", ""), reverse=True)
+    reading = ""
+    if _st:
+        _lead_st = next((x for x in _st if ("story:" + x["slug"]) in images),
+                        _st[0])
+        _others = [x for x in _st if x["slug"] != _lead_st["slug"]]
+        _leadshot = (picture(images, "story:" + _lead_st["slug"], w=1400, h=933,
+                             credit=False,
+                             alt=images["story:" + _lead_st["slug"]]["alt"],
+                             sizes="(min-width: 62rem) 52vw, 92vw")
+                     if ("story:" + _lead_st["slug"]) in images else "")
+        _rows = "".join(
+            f'<a class="rd" href="/stories/{esc(x["slug"])}">'
+            f'<span class="rddesk">{esc(x.get("section", "Story"))}</span>'
+            f'<span class="rdtitle">{esc(x["title"])}</span>'
+            f'<span class="rdmin">{esc(x.get("reading", ""))}</span></a>'
+            for x in _others)
+        reading = f"""
+  <div class="galwrap">
+  <div class="sheettext">
+    <h2 class="mega">Read the continent<br>differently.</h2>
+  </div>
+  <div class="lead">
+    <a class="leadshot" href="/stories/{esc(_lead_st["slug"])}" aria-label="{esc(_lead_st["title"])}">{_leadshot}</a>
+    <div class="leadtext">
+      <p class="rddesk">{esc(_lead_st.get("section", "Story"))} · {esc(_lead_st.get("reading", ""))}</p>
+      <h3 class="leadtitle"><a href="/stories/{esc(_lead_st["slug"])}">{esc(_lead_st["title"])}</a></h3>
+      <p class="leadstand">{esc(_lead_st.get("standfirst", ""))}</p>
+    </div>
+  </div>
+  <div class="rdlist">{_rows}</div>
+  {_phot(["story:" + _lead_st["slug"]])}
+  </div>"""
+
+    # ── 07 · THE YEAR ────────────────────────────────────────────────
+    # THE EVENTS FAMILY'S OWN CHART RATHER THAN FOUR SEASON CARDS. A
+    # photograph captioned "Winter" would be an authored claim about a
+    # picture taken somewhere else, on a page whose every other figure is
+    # derived. The chart says what this atlas actually argues: October is
+    # one of the thinnest months for what is ON and the deepest for
+    # countries in their quieter shoulder — and a row of four seasonal
+    # cards would have drawn the opposite.
+    year = f"""
+  <div class="galwrap">
+  <div class="sheettext">
+    <h2 class="mega">Every month opens<br>a different Europe.</h2>
+    <p class="lede">What is on, and where the crowds are not. The bar above the line
+    is the fixtures this atlas holds that month; the bar below is how many countries
+    are in their quieter shoulder.</p>
+    {golink('/events', 'Open the calendar')}
+  </div>
+  <div class="yearwrap">{year_band(data)}</div>
+  </div>"""
+
+    # ── 08 · THE MESSAGE ─────────────────────────────────────────────
+    closing = data["home"]["closing"]
+    # AND THE ASK IS HERE, at the end, where an invitation belongs. It was
+    # in the middle of plate 03 — a tool between a headline about looking
+    # at places and the places themselves, with its own placeholder clipped
+    # by the button beside it. A reader who has come down eight plates has
+    # seen what this atlas is; this is the sentence that hands it to them.
+    message = f"""
+  <div class="sheettext">
+    <h2 class="mega">Open<br>the door.</h2>
+    <p class="lede">Find the Europe waiting beyond the obvious itinerary.</p>
     <form class="askhero" action="/plan" method="get">
       <label for="homeask">Say it in your own words.</label>
       <input type="text" id="homeask" name="ask" autocomplete="off"
              placeholder="Somewhere quiet, in October.">
       <button class="btn" type="submit">Plan my journey</button>
     </form>
-  </div>
-  <div class="qwrap">
-    <div class="qrow">{tiles}</div>
-    <p class="sheetcred rowcred">{qcredit}</p>
-  </div>
-  {golink("/interests", 'Explore by interest', cls=' goright')}"""
-
-    # ── 03 · THE LANDSCAPE ───────────────────────────────────────────
-    # The one full-bleed photographic plate. It is a THEME rather than a
-    # destination because a theme is what the register actually holds a
-    # photograph for, and the picture on this plate is the picture that page
-    # opens on — the same file, doing the same job, one level up.
-    # THE LANDSCAPE PLATE IS CHOSEN, NOT TAKEN. `next(...)` returned the
-    # first theme in data order that happened to hold a photograph, which is
-    # Sacred Europe — a basilica against a white sky, under white type. The
-    # plate's job is a landscape, so the preference is stated and the
-    # fallback is whatever the register holds.
-    LANDSCAPE_FIRST = ("mountain-europe", "island-europe", "rail-europe")
-    byslug = {t["slug"]: t for t in data["themes"]}
-    land = next((byslug[sl] for sl in LANDSCAPE_FIRST
-                 if sl in byslug and ("theme:" + sl) in images), None)
-    if land is None:
-        land = next((t for t in data["themes"]
-                     if ("theme:" + t["slug"]) in images), None)
-    landscape = ""
-    if land:
-        row = images["theme:" + land["slug"]]
-        bigpic = picture(images, "theme:" + land["slug"], w=2400, h=1200,
-                         alt=row["alt"], sizes="100vw")
-        landscape = f"""
-  <div class="shotfull">{bigpic}</div>
-  <div class="sheettext over">
-    <h2 class="mega">{esc(land["name"].replace(" Europe", ""))}<br>Europe</h2>
-    <p class="lede">{esc(land["strapline"])}. {esc(land["summary"].split(". ")[0])}.</p>
-    {golink(urls.theme(land), "Explore " + land["name"].lower())}
-  </div>
-  {marginnote('Higher', 'Further', 'Closer to what matters')}
-  <p class="sheetcred">Photograph <a href="{esc(row["source"])}" rel="noopener"
-  target="_blank">{esc(row["photographer"])}</a> · {esc(row["licence"])}</p>"""
-
-    # ── 04 · THE JOURNEY ─────────────────────────────────────────────
-    # A paper plate: pale ground, an ink route, the stops named, the seas
-    # named, a compass and a scale. Every number under it is the sum of the
-    # haversines between this journey's own stops.
-    jrn = next((j for j in data["journeys"]
-                if j["slug"] == "arctic-to-mediterranean"), data["journeys"][0])
-    legs = [idx[l["city"]]["city"] for l in jrn["legs"]]
-    hops = [haversine(legs[i], legs[i + 1]) for i in range(len(legs) - 1)]
-    total = int(round(sum(hops)))
-    jc = []
-    for l in jrn["legs"]:
-        nm = data["countries"][l["city"].split("/")[0]]["name"]
-        if nm not in jc:
-            jc.append(nm)
-    # The stops a plate this size can NAME. Thirteen names on one frame is a
-    # list with a coastline behind it, so every other one is dropped and
-    # keeps its dot — the same bargain every map on this site strikes, and
-    # the names it keeps are the ends and the capitals between them.
-    keep = {0, len(legs) - 1}
-    keep |= {i for i, c in enumerate(legs) if c.get("city_type") == "capital"}
-    names = [c["name"] if i in keep else "" for i, c in enumerate(legs)]
-    jpts = [project(c["lat"], c["lon"]) for c in legs]
-    facts = [(f"{total:,} km", "Straight-line distance"),
-             (str(len(jc)), "Countries"), (str(len(legs)), "Stops")]
-    journey = f"""
-  <div class="sheettext">
-    <h2 class="mega">{esc(jrn["name"].replace(" to ", "<br>to ")).replace("&lt;br&gt;", "<br>")}</h2>
-    <p class="lede">{esc(jrn["strapline"])}. {esc(" → ".join(jc))}.</p>
-    <dl class="figures">{"".join(
-        f'<div><dd>{esc(v)}</dd><dt>{esc(k)}</dt></div>' for v, k in facts)}</dl>
-    {golink(urls.journey(jrn), 'Explore the journey')}
-  </div>
-  <div class="paperplate">{constellation(
-      jpts, extra=" constel-paper", route=True, frame=True, mark=7, term=11,
-      labels=names)}</div>
-  {marginnote('Landscapes', 'Cultures', 'Languages', 'A shared horizon')}"""
-
-    # ── 05 · THE ATLAS ───────────────────────────────────────────────
-    # The count is the event and the names are the evidence.
-    #
-    # THIS SAID "on the pine ground, which is the one plate here that is not
-    # paper: an atlas's contents page is traditionally the one printed on
-    # colour" — and the pine went, for the reason written out in the
-    # stylesheet: there are no dark pages here, and a solid pine field
-    # across a whole plate is a dark page with a light one above and below
-    # it. The plate keeps a GROUND, because a plate that says "this is the
-    # record" should not be the same paper as the plate before it; it takes
-    # the surface step instead, which is what a surface step is for. A
-    # comment describing a design that was deliberately removed is the
-    # expired-reason fault this repository keeps finding, and the reason it
-    # is corrected here rather than deleted is that the removal is the
-    # interesting half.
-    clist = "".join(
-        f'<a href="{urls.country(c)}">{esc(c["name"])}</a>'
-        for c in sorted(data["countries"].values(), key=lambda c: c["name"]))
-    atlas = f"""
-  <div class="sheettext">
-    <p class="hugecount"><span class="hc">{ncountries}</span></p>
-    <div class="hugesay">
-      <h2 class="mega">European<br>countries.</h2>
-      <p class="lede">Every country has its own door into the continent. Behind each
-      one: its regions, its destinations, its journeys and its stories.</p>
-      {golink('/countries', 'Browse all countries')}
-    </div>
-  </div>
-  <div class="countrycols">{clist}</div>
-  {golink('/map', 'View on map', cls=' goright')}"""
-
-    # ── 06 · THE MESSAGE ─────────────────────────────────────────────
-    closing = data["home"]["closing"]
-    message = f"""
-  <div class="sheettext">
-    <h2 class="mega">{esc(closing["head"]).replace(" is not", "<br>is not")}</h2>
-  </div>
-  <div class="sheetside">
-    <p class="lede">{esc(closing["body"])}</p>
-    {golink('/discover', 'Keep exploring')}
-  </div>
-  {marginnote('Same roads', 'A different you')}"""
-
+    {golink('/discover', esc(closing["cta"]))}
+  </div>"""
     # THE SHEET'S OWN SOURCES, in the margin voice, at the foot of the last
     # plate. The page draws land on two plates and relief on one, and the
     # standing rule is that a page which draws land names where the land came
@@ -1467,7 +2174,28 @@ def home(data):
     # The benchmark this sequence is drawn against carries no such line. It
     # is an illustration; this is a published atlas, and the difference is
     # exactly this sentence.
-    relief = (" " + cartography.RELIEF_CREDIT) if "lyr-terrain" in _hero else ""
+    relief = (" " + cartography.RELIEF_CREDIT) if "lyr-terrain" in _heromap else ""
+    # NO SOURCE CREDIT FOR THE PHOTOGRAPHS ON THIS PAGE, AT THE OWNER'S
+    # DIRECTION, AND THE PROVENANCE IS UNTOUCHED.
+    #
+    # The colophon names Natural Earth and the two elevation surveys
+    # because a page that DRAWS land names where the land came from — that
+    # rule is about geographic data and it stands. A sentence naming the
+    # photographs' upstream marketplace is a different thing: it is a
+    # supplier's name on the composition, and the owner's instruction is
+    # that a supplier is not part of this product's visual identity.
+    #
+    # SOURCE PROVENANCE IS INVISIBLE INFRASTRUCTURE UNLESS A SPECIFIC
+    # REQUIREMENT PUTS IT ON A PARTICULAR SURFACE. Every record is kept:
+    # `data/images.json` holds the photographer, their profile, the source
+    # page, the licence and its URL, the SHA-256 of the bytes as served and
+    # the date they were fetched; `checks.py` still refuses a published
+    # page referencing a file with no row and still re-hashes every
+    # original; the licence gate still refuses an acquisition before it
+    # opens a socket. What changed is where that record is PUBLISHED, and
+    # the answer is /sources, which is the page this site already built for
+    # exactly this question and which every map credit already points at.
+
     colophon = (
         f'<p class="sheetsource">Coastline, frontiers, rivers and lakes from '
         f'<a href="/sources">Natural Earth</a>, public domain, on a Lambert '
@@ -1477,16 +2205,45 @@ def home(data):
         f'other map here.{relief} <a href="/map">Open the map →</a></p>')
     message += colophon
 
-    PLATES = [("door", "The door", door),
-              ("question", "The question", question),
-              ("landscape", "The landscape", landscape),
-              ("journey", "The journey", journey),
-              ("atlas", "The atlas", atlas),
-              ("message", "The message", message)]
-    body = "\n".join(
-        f'<section class="sheet sheet-{slug}" id="act{i}">{actmark(i, name)}{inner}</section>'
-        for i, (slug, name, inner) in enumerate(PLATES, 1) if inner)
-    body = constel_defs() + body
+    # EIGHT PLATES, AND THE RHYTHM IS THE DESIGN. The sequence alternates
+    # what a band IS rather than what it contains: photograph, white,
+    # photograph, graphite, white, photograph, pine, white. The old sequence
+    # was paper, paper, photograph, paper, paper, paper — six plates that
+    # differed in content and not in kind, which is the design-direction
+    # finding this repository keeps re-making one level up from the h1.
+    #
+    # The white strips are what make it read. They are the rests: a reader
+    # comes off a full-bleed photograph onto a page that is suddenly, plainly
+    # white, and the picture behind them stops instead of fading into more
+    # cream. Photography is the emotional layer and the graphite atlas is the
+    # navigation one — the two are deliberately never adjacent.
+    # EIGHT ROOMS IN ONE GALLERY. The rhythm here is not colour — it is
+    # SCALE. A quiet room alternates what a band asks of the eye: type,
+    # then one picture you walk up to, then four hung in a line, then a
+    # list you read, then an engraving, then two essays, then a chart,
+    # then a sentence. The owner's own instruction is the argument: UI
+    # restrained, PHOTOGRAPHY rich, MAPS precise, TYPOGRAPHY dramatic —
+    # so colour appears as a mark and never as a field, and the white
+    # wall contributes nothing on purpose.
+    PLATES = [("door gal", "The door", door),
+              ("bleed", "The window", window),
+              ("places gal", "The places", places),
+              ("crossing gal quiet", "The crossing", crossing),
+              ("atlas gal", "The atlas", atlas),
+              ("reading gal quiet", "The reading", reading),
+              ("year gal", "The year", year),
+              ("end gal", "The message", message)]
+    # THE NUMBER COMES FROM THE RENDERED SEQUENCE, NOT FROM THE DECLARED LIST.
+    # `enumerate(PLATES, 1) if inner` numbers first and filters second, so an
+    # omitted band leaves a hole: with a register holding one photograph the
+    # places, crossing and atlas plates return "" and the page printed 01, 02,
+    # 05, 06, 07, 08 — which `section-audit.py` failed on, correctly, in the
+    # one state that produces it. **The selector that COUNTS is the selector
+    # that DRAWS**, which this repository already records about two CSS
+    # counters; the same sentence is true of a number composed in Python.
+    # Latent on the real register, where all eight bands render — and latent
+    # is not fixed: the day a band is legitimately empty the sequence lies.
+    body = constel_defs() + plate_sequence(PLATES)
 
     return "/index.html", page(
         SITE_NAME, body, path="/", area=None, hero=True,
@@ -1509,31 +2266,239 @@ def home(data):
 # ── atlas ─────────────────────────────────────────────────────────────
 
 def countries_index(data):
-    """Nine macro regions, each shown as the countries it is made of.
+    """The European Atlas: the continent, then a country, then the index.
 
-    IT WAS THE PAGE ABOUT EUROPE WITH NO EUROPE ON IT. Nine headings and fifty
-    rows of name, tagline and a count — the atlas index as a contents list,
-    which is the shape of the data standing in for a design. Measured across
-    the built page, the median horizontal band used 44% of the column and 64%
-    of bands used under 60%; the argument is not that the space was empty, it
-    is that a reader choosing a region of Europe was never shown one.
+    *Discover = Let Europe answer. Countries = Know the continent.* The
+    brief's grammar is CONTINENT -> MAP -> COUNTRY -> INDEX -> REGIONS ->
+    PHOTOGRAPHIC ATLAS -> FINAL, and its instruction is a refusal:
+    *"Countries is not a directory of 50 destinations. It is EuropeDoor's
+    living digital atlas: geography first, country second, photography
+    third, index fourth. The map provides authority, photography provides
+    emotion, and the index provides navigation. Build those as distinct
+    layers and do not collapse them into generic cards."*
 
-    Each band now opens on its own members drawn on the shared silhouette, so
-    the Nordics and the Caucasus are told apart before a word is read — the
-    same move that rebuilt /themes and the homepage tiles, on the family that
-    needed it most and had waited longest.
+    THE LIBRARY WAS NOT THE CONSTRAINT AND THE MARGIN WAS THE WIDEST YET.
+    The register holds a photograph of every one of the fifty countries, one
+    of each of the nine macro regions, and the index's own hero — sixty
+    pictures relevant to this page — and the page drew ONE. That is the
+    /experiences finding and the /stories finding a third time, on the
+    family with the most photographs available and the fewest shown.
+    Nothing was acquired; see `docs/countries-redesign.md`.
 
-    THE COUNTS MOVED OFF THE ROWS AND INTO THE BAND. "6 regions · 25 cities"
-    on each of fifty rows is fifty measurements a reader cannot hold; what
-    separates the nine bands is how much of this atlas each one is, and that
-    is one number per band, derived here rather than typed.
+    AND THE BRIEF'S STRONGEST IDEA WAS ALREADY BUILT. *"The actual country
+    polygon should become the visual focus … so the country itself becomes
+    the aperture."* `heroeurope()` has clipped a photograph into a country's
+    own path since the Living Atlas; `country_door()` is that at the
+    country's own extent, which is the one thing the homepage could not do —
+    its own measurement says a photograph clipped into Belgium on a
+    continental frame *"renders about 40 pixels wide and is a smudge with a
+    coastline."*
+
+    WHAT IS KEPT: the nine macro bands. The brief flattens /countries into
+    one list of fifty, and flattening is the single thing that would cost
+    this page something it already has — each band drawing its own members
+    on its own frame is what tells the Nordics from the Caucasus before a
+    word is read, and it is the measurement that rebuilt this family. So the
+    sequence is the brief's and the grouping is kept.
     """
+    images = data.get("images") or {}
+    cs = data["countries"]
+    nreg = sum(len(c["regions"]) for c in cs.values())
+
+    # ── WHICH COUNTRY GETS THE LARGE DOOR, DERIVED RATHER THAN CHOSEN.
+    # A "selected country" in the brief is a hover state, and this page
+    # loads no JavaScript — its only <script> is the inert JSON-LD block. So
+    # the selection is a measurement instead, and the measurable question is
+    # the one /journeys already asks about its featured route: which is the
+    # one this atlas can actually SHOW. Counted over the register, France
+    # carries 37 photographs of itself, its regions, its cities and its
+    # places against Croatia's 18 and Austria's 17. The figure is printed,
+    # so a reader can see it is a count rather than a preference, and it
+    # moves on its own as `stage: fill` reaches the rest.
+    shot_count = {}
+    for k in images:
+        if ":" not in k:
+            continue
+        fam, tgt = k.split(":", 1)
+        if fam in ("country", "region", "city", "place"):
+            shot_count[tgt.split("/")[0]] = shot_count.get(tgt.split("/")[0], 0) + 1
+    doors = []
+    for slug, n in sorted(shot_count.items(), key=lambda kv: (-kv[1], kv[0])):
+        c = cs.get(slug)
+        if c is None:
+            continue
+        m = country_door(data, images, c, brief=(not doors))
+        if m:
+            doors.append((c, n, m))
+    lead = doors[0] if doors else None
+
+    # ── HOW MANY DOORS THE PHOTOGRAPHIC BAND DRAWS, BOUNDED BY BYTES.
+    # All 41 drawable doors together are 628 KB of inlined geometry against a
+    # `weight.max_page_kb` ceiling of 441, so the whole set is not a layout
+    # question at all — it is 187 KB over the largest page this site is
+    # allowed to serve. The costliest single door is Norway at 62 KB, and the
+    # first version of this comment said Russia at 107: RUSSIA IS ADVISORY AND
+    # `country_door` REFUSES IT, so the number quoted as the reason for the
+    # budget was the size of a door that is never drawn. A count picked by eye
+    # would be taste; the budget is the quantity that actually binds, so the
+    # band takes doors in the derived order until it has spent DOOR_BAND_KB,
+    # and the page states how many that turned out to be. The set therefore
+    # grows when the geometry gets cheaper and shrinks when it does not, which
+    # is the right way round — and it SKIPS rather than stops, so Finland (9
+    # photographs, an expensive coast) is passed over and Bulgaria, Albania
+    # and Armenia get in behind it.
+    band, spent = [], 0
+    for c, n, m in doors[1:]:
+        if spent + len(m) > DOOR_BAND_KB * 1024:
+            continue
+        band.append((c, n, m))
+        spent += len(m)
+
+    # ── 01 · THE CONTINENT ───────────────────────────────────────────
+    # TWO CALLS FOR TWO DRAWINGS, AND ONE STRING IN TWO PLACES SHIPPED TWO
+    # IDENTICAL GRADIENT IDS. `region_glyph` at the full extent emits
+    # `cut_fade`, whose ids carry a build-wide counter precisely so two
+    # drawings on one page cannot collide — and a counter cannot help when
+    # the SAME emitted string is interpolated twice. It was invisible while
+    # the register holds `countries-hero`, because then plate 01 draws the
+    # photograph and the fallback is never used; `photo-tests.py` frees that
+    # purpose to acquire against its stub, rebuilt, and `c_unique_ids`
+    # reported `rg2edge` and `rg2foot` twice on this page. *A code path
+    # nothing exercises is a code path nothing checks*, and the one thing
+    # that exercises this one is the gate suite for photographs. Two calls
+    # cost 40 KB only in the state where two continental drawings are what
+    # the page has anyway.
+    open_ = f"""
+  <div class="sheettext">
+    {head_extent([(len(cs), "countries"), (nreg, "travel regions"),
+                  (len(data['cities']), "cities")])}
+    <h1 class="mega">Europe, country by country.</h1>
+    <p class="lede">{numword(len(data['macros']), cap=True)} regions,
+    {len(cs)} countries, {nreg} travel regions and {len(data['cities'])}
+    cities &mdash; every one of them written here rather than imported.</p>
+  </div>
+  <div class="atlasopen">{photo(images, "countries-hero", w=2000, h=1500,
+      sizes="(min-width: 62rem) 52vw, 100vw") or region_glyph(list(cs))}</div>"""
+
+    # ── 02 · THE MAP ─────────────────────────────────────────────────
+    # AND THE CUT IS SAID RATHER THAN HIDDEN. At the continental extent
+    # Russia arrives with the 52°E data cut in it — a straight slant across
+    # the top right, which is the rendering fault `constel_defs` drops the
+    # whole context to avoid and the hero spends 320 units of fade on.
+    # Neither escape is available here: the sliced ring is a MEMBER rather
+    # than context, and reframing cannot lose it without losing the
+    # Caucasus. The number is read off the dataset's own bbox.
+    lim = (geo.load("europe-lod1.json") or {}).get("bbox", [None, None, None])[2]
+    cutsay = (f" Russia's outline stops at {lim:.0f}&deg;E, where this atlas's "
+              f"map data ends, not at a border.") if lim is not None else ""
+    themap = f"""
+  <div class="sheettext">
+    <h2 class="mega">Where the countries sit.</h2>
+    <p class="lede">A geographic beginning before the alphabetical one. Each
+    of the {len(cs)} countries is drawn on its own, so the frontiers are the
+    picture.{cutsay}</p>
+  </div>
+  <div class="atlasmap">{region_glyph(list(cs))}</div>
+  <p class="actions">
+    <a class="btn" href="/map">Open the map</a>
+    <a class="btn ghost" href="/discover">Start from what you like</a>
+  </p>"""
+
+    # ── 03 · THE COUNTRY AS THE APERTURE ─────────────────────────────
+    door = ""
+    if lead:
+        c, n, m = lead
+        door = f"""
+  <div class="sheettext">
+    <h2 class="mega">Every country is a door.</h2>
+    <p class="lede">{esc(c['name'])} drawn on its own frontier with a
+    photograph of it inside the outline. Not a picture beside a map: the
+    country is the aperture, which is the one thing this atlas can draw that
+    a list of names cannot.</p>
+  </div>
+  {m}
+  <div class="doorsay">
+    <p class="kicker">{esc(c['name'])}</p>
+    <p class="dsay">{esc(c['tagline'])}</p>
+    <p class="small">{esc(c['name'])} is the country this atlas can show
+    best: the register holds {n_of(n, 'photograph')} of it, its regions, its
+    cities and its places, against {band[0][1] if band else 0} for the next.
+    That is a count rather than a preference, and it moves as the library
+    fills. {n_of(len(doors), 'country')} can be drawn this way today;
+    {numword(len(cs) - len(doors))} cannot, and the reason is geometry rather
+    than choice &mdash; six of them have no outline in this dataset at all
+    and are drawn as a ringed point, and three carry a travel advisory and
+    are never lit.</p>
+    <p class="actions"><a class="btn" href="{urls.country(c)}">Open
+    {esc(c['name'])}</a></p>
+  </div>"""
+
+    # ── 04 · THE INDEX ───────────────────────────────────────────────
+    # THE UTILITY LAYER, AND IT IS TYPE. *The index provides navigation* —
+    # so it is fifty names a reader can scan and nothing else: no picture,
+    # no count, no tagline. Nineteen initials rather than twenty-six,
+    # because that is how many the fifty names actually start with, and an
+    # A-Z that prints ten empty letters is a shape standing in for a set.
+    groups = {}
+    for c in sorted(cs.values(), key=lambda x: x["name"]):
+        groups.setdefault(c["name"][0].upper(), []).append(c)
+    azrows = "".join(
+        f'<div class="azgroup"><p class="azletter">{esc(k)}</p><ul class="azlist">'
+        + "".join(f'<li><a href="{urls.country(c)}">{esc(c["name"])}</a>'
+                  + (' <span class="azwarn">advisory</span>'
+                     if (c.get("advisory") or {}).get("level") else "")
+                  + '</li>' for c in v)
+        + '</ul></div>' for k, v in sorted(groups.items()))
+    # AND THIS BAND IS THE PAGE'S HEAD. A plate sequence has no room for a
+    # stage above its opening, so the head is the band that introduces the
+    # set — /journeys and /experiences settled that one family over. The
+    # index IS the set here, literally, so it is the honest place for the
+    # extent: *an index exists to say how big a set is*, and every figure is
+    # derived rather than typed.
+    azband = f"""
+  <div class="pagehead index">
+    <p class="kicker">The European Atlas</p>
+    <h2 class="mega">The index.</h2>
+    <p class="lede">All {len(cs)} countries, alphabetically, under the
+    {numword(len(groups))} letters they actually start with &mdash; not
+    twenty-six, because ten of those begin nothing. Behind them:
+    {nreg} travel regions and {len(data['cities'])} cities.</p>
+  </div>
+  <div class="azindex">{azrows}</div>"""
+
+    # ── 05 · THE NINE REGIONS ────────────────────────────────────────
+    # AND THE NINE MACRO PHOTOGRAPHS CAME ON. Each of the nine appeared on
+    # exactly one page — its own — and the band whose entire subject is
+    # those nine regions drew none of them. Same finding as the fifty, one
+    # level up.
+    #
+    # THEN THE BAND WAS 63% OF THE PAGE, AND `tools/monotony.js` IS THE ONLY
+    # THING HERE THAT COULD SAY SO. Nine regions that differ by 12x in
+    # destinations, 6.6x in extent and 14x in photographs, drawn as nine
+    # identical 1,250-pixel compositions — the worst figure on the site, on
+    # a page already redesigned once, because the page-level recomposition
+    # kept this band's shape and only moved it. That is exactly the fault
+    # the owner named when he added the second doctrine rule: *do not
+    # optimise for visual consistency at the expense of editorial
+    # difference*, which replaces card monotony with band monotony.
+    #
+    # SO THE COMPOSITION IS THE REGION'S OWN SHAPE. `macro_shape` measures
+    # it in kilometres and the three rhythms are its two natural boundaries
+    # — taller than wide, wider than tall, and more than twice as wide as
+    # tall. The nine fall 4 / 3 / 2, so the band carries three rhythms
+    # rather than one and the largest repeated composition is four.
+    #
+    # ORIENTATION RATHER THAN SCALE, AND THAT IS THE DEPARTURE FROM
+    # /themes. That page derives three band SIZES from a theme's reach,
+    # which is a claim about importance; a region is not more important for
+    # being wide. Nothing here is drawn larger than anything else — what
+    # changes is which way up each region is, which is a fact about the
+    # ground and the one thing nine boxes of one shape cannot say.
     blocks = []
     for m in data["macros"]:
-        rows = []
-        mcity = 0
-        for cs in m["countries"]:
-            c = data["countries"][cs]
+        rows, mcity = [], 0
+        for slug in m["countries"]:
+            c = cs[slug]
             ncity = sum(len(r["cities"]) for r in c["regions"])
             mcity += ncity
             rows.append({"href": urls.country(c), "title": c["name"],
@@ -1541,105 +2506,136 @@ def countries_index(data):
                          "meta": f"{n_of(len(c['regions']), 'region')} · "
                                  f"{n_of(ncity, 'city')}",
                          "flag": "advisory" if c.get("advisory") else ""})
-        # THE NINE BANDS KEEP THEIR GLYPHS AND TAKE THE SYSTEM'S ROWS.
-        # The brief's /countries is opening -> the continent -> one flat list
-        # of fifty, and flattening is the one thing that would cost this page
-        # something it already has: each band's own members drawn on their own
-        # frame is what tells the Nordics from the Caucasus before a word is
-        # read, and it is the measurement that rebuilt this family. So the
-        # sequence is the brief's and the grouping is kept — the rows inside
-        # each band are `ed_rows` now, which is where the upgrade actually
-        # lands.
+        kw, kh, asp = macro_shape(data, m)
+        shape = ("mac-pan" if asp >= MACRO_WIDE
+                 else "mac-up" if asp >= 1.0 else "mac-por")
+        # AND THE MEASUREMENT IS PRINTED, because a composition a reader
+        # cannot check is decoration that happens to vary. The eyebrow
+        # carries the extent that chose the rhythm beside the two counts,
+        # rounded to ten kilometres rather than to the kilometre — a
+        # haversine box across a region is not accurate to a kilometre and
+        # printing one would be a precision this figure does not have.
+        # AND THE THREE RHYTHMS ARE NOT NAMED ON THE PAGE. "Panoramic" is a
+        # word about the layout, and a reader who is told the Mediterranean
+        # is 3,600 km across and 1,310 deep can see which way up it is
+        # without the page explaining its own grid back to them — which is
+        # *never explain the constraint back*, and the sentence under the
+        # nine states the rule once.
+        # AND THE CREDIT IS THE STANDARD ONE, because these pictures are not
+        # inside a link. `.credit` is `picture()`'s own figcaption, revealed
+        # on hover and on `:focus-visible` — which is how every photograph on
+        # this site that CAN carry one does, and it is what the owner's
+        # standing position asks for: provenance is invisible infrastructure
+        # unless a legal requirement wants it visible on that surface. The
+        # aggregated `sheetcred rowcred` line exists for the other case, a
+        # picture wrapped in an `<a>`, where an anchor inside an anchor ends
+        # the outer one and the reveal rule loses its subject. Here the link
+        # is on the heading, so there is no nesting and nothing to aggregate.
+        pic = photo(images, "macro:" + m["slug"], w=1200, h=900,
+                    sizes="(min-width: 62rem) 26vw, 92vw")
+        # AND THE GLYPH IS FRAMED ON THE REGION'S OWN PROPORTION. Passing no
+        # aspect holds it to the canvas's 1.282, which measured 42% padding
+        # on Eastern Europe and 3% on the Caucasus: the drawing carries the
+        # shape the composition is derived from, or the composition is
+        # arguing about something the picture does not show. A DRAWING is
+        # free to be reshaped where a photograph is not — a derived
+        # proportion on `macro:` would be a crop on a surface the register
+        # does not declare, which is what /themes refused `object-fit:
+        # cover` for.
         blocks.append(
-            f"""<section class="band macroband" id="{esc(m['slug'])}">
-            <div class="bandtop">
-            <div class="band-head"><p class="ed-eyebrow">{n_of(len(m['countries']), 'country')} · {n_of(mcity, 'destination')}</p>
-            <h2><a href="{urls.macro(m)}" class="nodec">{esc(m['name'])}</a></h2>
-            <p class="lede">{esc(m['blurb'])}</p></div>
-            <figure class="bandart">{region_glyph(m["countries"], macro_frame(data, m))}</figure>
-            </div>
-            {ed_rows(rows)}</section>"""
-        )
-    # THE PAGE ABOUT FIFTY COUNTRIES OPENED ON NONE OF THEM. Nine bands each
-    # carrying a regional glyph is three densities from the second band down
-    # and one density at the top: a kicker, a headline and a lede, then
-    # straight into the set. Every other index here now opens on its own
-    # subject at size, and the subject of this one is the continent divided —
-    # not Europe as a silhouette, which is what the glyphs below draw, but
-    # Europe as the fifty separate countries this atlas has written about,
-    # each one its own tile with a frontier around it. It is the only place
-    # on the site where that drawing appears, and it says the h1 in a
-    # picture.
-    #
-    # AND THE CUT IS SAID RATHER THAN HIDDEN. At the continental extent
-    # Russia arrives with the 52°E data cut in it — a straight slant across
-    # the top right of the opening, which is the rendering fault
-    # `constel_defs` drops the whole context to avoid and the homepage hero
-    # spends 320 units of fade on. Neither escape is available here: the
-    # sliced ring is a MEMBER rather than context, and reframing cannot lose
-    # it without losing the Caucasus, whose easternmost destination projects
-    # within a hundred units of the cut. The atlas already has an answer for
-    # exactly this, one family over — the Russia portrait cannot fix the
-    # picture either, so it says so under the drawing. The number is read off
-    # the dataset's own bbox rather than typed.
-    heroart = region_glyph(list(data["countries"]))
-    lim = (geo.load("europe-lod1.json") or {}).get("bbox", [None, None, None])[2]
-    cutsay = (f" Russia's outline stops at {lim:.0f}°E, where this atlas's map "
-              f"data ends, not at a border.") if lim is not None else ""
-    # THE 2036 SEQUENCE: A MAP, THEN THE CONTINENT DIVIDED, THEN THE ROWS.
-    # The brief's /countries opens on the stage, states where the countries
-    # sit, and then lets a reader choose one — which is the order a person
-    # actually uses an atlas in, and it is not the order this page had. What
-    # it does NOT do is flatten the nine macro regions into one list of
-    # fifty: each band drawing its own members on its own frame is what tells
-    # the Nordics from the Caucasus before a word is read, and that is the
-    # measurement that rebuilt this family in the first place. So the
-    # sequence is the brief's and the grouping is kept.
+            f'<section class="macroband {shape}" id="{esc(m["slug"])}">'
+            f'<div class="macrotop">'
+            f'<div class="macrosay">'
+            f'<p class="ed-eyebrow">{n_of(len(m["countries"]), "country")} · '
+            f'{n_of(mcity, "destination")} · '
+            f'{round(kw, -1):,.0f}&thinsp;×&thinsp;{round(kh, -1):,.0f}&thinsp;km</p>'
+            f'<h3><a href="{urls.macro(m)}" class="nodec">{esc(m["name"])}</a></h3>'
+            f'<p class="rowsub">{esc(m["blurb"])}</p></div>'
+            f'<figure class="macroshot">{pic}</figure>'
+            f'<figure class="macroart">'
+            f'{region_glyph(m["countries"], macro_frame(data, m), aspect="own")}'
+            f'</figure>'
+            f'</div>{ed_rows(rows, level=4)}</section>')
+    # AND THE NINE ARE NINE DRAWINGS RATHER THAN ONE, WHICH WAS TESTED AND
+    # REFUSED. The obvious composition for a partition is to draw it once —
+    # fifty countries on one continent with the nine groups told apart —
+    # and it cannot be drawn honestly here. Telling nine areas apart on one
+    # drawing needs nine tones, the owner's palette refuses an eight-hue
+    # wheel in as many words (*"I would NOT make every page colorful. This
+    # is critical"*), and nine steps inside the atlas's one stone are the
+    # *rounding error with a token name* this repository already refuses for
+    # a surface ladder. The seams cannot carry it either: a region boundary
+    # is where two member groups meet and this atlas holds country rings
+    # rather than topology, so a stroke on a group strokes every internal
+    # frontier at region weight. Nine frames is what the data supports.
+    widths = sorted((macro_shape(data, m)[2], m["name"]) for m in data["macros"])
+    regband = f"""
+  <div class="sheettext">
+    <h2 class="mega">The {numword(len(data['macros']))} regions.</h2>
+    <p class="lede">Editorial travel regions rather than administrative
+    ones: they group places that feel like each other and are usually
+    visited together. Each is drawn on its own ground at its own proportion,
+    because that is what separates them before a word is read &mdash;
+    {esc(widths[-1][1])} measures nearly three times as wide as it is deep
+    and {esc(widths[0][1])} is the other way up, and the two had been drawn
+    as the same shape.</p>
+  </div>
+  <div class="macrostack">{''.join(blocks)}</div>"""
+
+    # ── 06 · THE PHOTOGRAPHIC ATLAS ──────────────────────────────────
+    atlasband = ""
+    if band:
+        atlasband = f"""
+  <div class="sheettext">
+    <h2 class="mega">{numword(len(band) + 1, cap=True)} of them, filled.</h2>
+    <p class="lede">The same drawing at a smaller size, {numword(len(band))}
+    more times. Every outline is the country's own and every photograph is of
+    the country inside it &mdash; taken in the order of how much of each one
+    this atlas can show, skipping the ones whose outline is too expensive to
+    inline rather than stopping at a number somebody chose.</p>
+  </div>
+  <div class="doorstack">{''.join(m for _c, _n, m in band)}</div>"""
+
+    # ── 07 · WHICH DOOR ──────────────────────────────────────────────
+    close = f"""
+  <div class="atlassay">
+    <h2 class="mega">Which door will you open?</h2>
+    <p class="lede">{len(cs)} countries, {nreg} travel regions and
+    {len(data['cities'])} cities, every one of them written here. Start from
+    the continent, or from what you like.</p>
+    <p class="actions">
+      <a class="btn" href="/map">Open the map</a>
+      <a class="btn ghost" href="/discover">Start from what you like</a>
+    </p>
+  </div>"""
+
+    # THE PLATE SLUGS ARE UNIQUE ON PURPOSE. `sheet-open` is /stories', and
+    # *a class name already in the stylesheet is a rule you inherit
+    # silently* — the finding that cost four collisions in one run and has
+    # no guard. Every name here was grepped against the stylesheet before it
+    # was written, and three were changed for it: `sheet-door` is the
+    # homepage's opening plate with 29 rules, `doorgrid` is that plate's own
+    # grid, and `macroband` is KEPT because its one rule is this family's.
+    PLATES = [("atlasopen gal", "The continent", open_, "the-continent"),
+              ("atlasmap paper", "Where they sit", themap, "the-map"),
+              ("aperture gal", "The country as the door", door, "the-door"),
+              ("az gal quiet", "The index", azband, "the-index"),
+              ("regions gal", "The nine regions", regband, "the-regions"),
+              ("filled paper", "Filled", atlasband, "filled"),
+              ("atlasclose gal", "Which door", close, "which-door")]
+
     body = f"""
 {crumbs([("Europe", "/discover"), ("Atlas", None)])}
 {constel_defs()}
-{ed_opening(
-    eyebrow="The Atlas",
-    title="Europe, country by country.",
-    intro=f"{numword(len(data['macros']), cap=True)} regions, "
-          f"{len(data['countries'])} countries, "
-          f"{sum(len(c['regions']) for c in data['countries'].values())} travel regions "
-          f"and {len(data['cities'])} cities — every one of them written here rather "
-          f"than imported.",
-    visual=photo(data.get("images"), "countries-hero", w=2000, h=1500,
-                 sizes="(min-width: 52rem) 58vw, 100vw") or heroart,
-    family="atlas")}
-
-<section class="ed-section">
-{ed_section_head("The continent", "Where the countries sit",
-                 "A geographic beginning before the alphabetical one. Each of "
-                 f"the {len(data['countries'])} countries is drawn on its own, so "
-                 f"the frontiers are the picture.{cutsay}")}
-{heroart}
-<p class="actions">
-  <a class="btn" href="/map">Open the map</a>
-  <a class="btn ghost" href="/discover">Start from what you like</a>
-</p>
-</section>
-
-<section class="ed-section">
-{ed_section_head("The Atlas", "Choose a country",
-                 "The regions below are editorial travel regions rather than "
-                 "administrative ones: they group places that feel like each "
-                 "other and are usually visited together.")}
-{''.join(blocks)}
-</section>
-<p class="small">The shape beside each region is the countries that region is made
-of, framed on its own ground rather than on the continent: the drawing changes
-scale between bands, so what tells the Nordics from the Baltic States is the
-shape of the region and not its share of one map. A macro region is the one
-grouping in this atlas with real borders behind it — a travel region is a set of
-destinations and is shown as those destinations rather than given a boundary it
-does not have. {geo.sources_line(geo.load("europe-lod0.json"))}</p>
+{plate_sequence(PLATES)}
+<p class="small">A macro region is the one grouping in this atlas with real
+borders behind it &mdash; a travel region is a set of destinations and is shown
+as those destinations rather than given a boundary it does not have.
+{geo.sources_line(geo.load("europe-lod0.json"))}</p>
 """
     return "/countries/index.html", page(
-        "Countries", body, path="/countries", area="countries",
-        description="Every country in Europe, grouped into nine travel regions, each opening onto its regions, cities and experiences.",
+        "Countries", body, path="/countries", area="countries", hero=True,
+        description="Every country in Europe, drawn on its own frontier with a photograph of it inside the outline, grouped into nine travel regions.",
     )
 
 
@@ -3875,148 +4871,320 @@ def _macro_of(data, country_slug):
 
 
 def interests_index(data, ranking):
-    """Seventeen ways to travel, compared — a family that had no index at all.
+    """The Interest Atlas: seven plates, and the three scales are the page's
+    own published judgement rather than a styling choice.
 
-    SEVENTEEN PAGES SHIPPED AND `/interests/` WAS A SERVER AUTOINDEX. Nothing
-    linked to it, which is exactly why no check caught it: the link checker
-    validates links that exist, and a missing index is an absence. A reader
-    who trimmed a URL, or who followed a search result to the directory, got
-    Apache's own file listing with the site's masthead nowhere on it.
+    THE PAGE WAS AN OPENING, A STRIP OF EIGHT AND A LEDGER. 93,206 bytes and
+    nine photographs of the eighteen the register holds for this family —
+    every one of the seventeen tags has one, and so does the index. That is
+    the /experiences finding for the fourth family running: *the pictures
+    were already bought and were being spent on one strip.* Nothing is
+    acquired here. All eighteen are on the page now, each exactly once.
 
-    And the absence cost something real. Every interest page draws its own
-    tag — every destination carrying it, on the shared silhouette — and the
-    reason written into that page is "so the seventeen can be compared". They
-    could not be. A reader could see Mountains, then navigate away and see
-    Islands, and hold two pictures in their head.
+    AND THE ALLOCATION IS `INTEREST_BANDS`, WHICH THIS FAMILY ALREADY
+    PUBLISHES. Every interest page prints one of three judgements about its
+    own tag — at or above 40% of the Atlas it *barely narrows Europe*,
+    between 15 and 40 it *narrows Europe usefully*, below 15 it is *one of
+    the narrowest tags in this atlas*. Those three sentences are the three
+    visual scales: two at feature size, seven in a strip, eight with their
+    own pictures at the narrow end. The brief asks for an explicit visual
+    distinction between broad and narrow interests and this is that
+    distinction derived from the sentence the family already writes, rather
+    than a threshold picked to make a layout work.
 
-    So the index is the comparison, and it is the one thing seventeen
-    separate pages cannot do. THE SHAPES ARE THE ARGUMENT: History is 200
-    destinations in 47 countries and covers almost the whole continent;
-    Festivals is three places in three countries. You see the difference
-    before you read a number, which is the /themes finding one family over,
-    and the silhouette is emitted ONCE with every row a <use> of it.
+    THE BRIEF'S REACH BAR IS REFUSED, AND SO IS ITS INTERACTIVE MAP.
 
-    ORDERED BY REACH, NOT ALPHABETICALLY. The ranking already exists — the
-    interest pages take it to print "the eighth widest of 17 tags" — and it
-    is the only order that makes the page an argument rather than a list.
-    Every row carries the judgement the individual page makes about its own
-    tag, from the same INTEREST_BANDS table, so the index cannot say
-    something the page it links to would not.
+    A bar would be the THIRD drawing of one number: the row already prints
+    the percentage, and the seventeen glyphs are drawn to one frame for
+    exactly this reason — *a knot is an argument about one corner of Europe,
+    a scatter is one about the whole of it* — so reach is the one thing this
+    page has never needed a second representation of. /journeys records what
+    happens when a band draws the same measurement twice on two grids.
+
+    And *select an interest and the map becomes its geography* is a control.
+    This page loads no JavaScript at all, so a selector here would be the
+    chip that filters nothing and the `data-rotate` copy nobody ever read.
+    The seventeen ARE the interest atlas, drawn at once, which is the one
+    thing seventeen separate pages cannot do and is why the ledger band
+    carries both names.
+
+    WHAT THE LEDGER WAS MISSING IS THE SECOND AXIS, AND THE SENTENCE IT
+    ALREADY PRINTED HID IT. *Greece, Italy and Spain carry the most of it*
+    is 26% of History between them and *Norway, Switzerland and Germany
+    carry the most of it* is 73% of Slow rail — two sentences of identical
+    shape, one of which is barely a fact and one of which is the whole tag.
+    That is the `8 PLACES` failure, in prose instead of a number. The share
+    is printed now, so a row says something different from the row above it.
+
+    And the share is the evidence under the brief's own closing argument:
+    the eight narrow tags put a median 51% of themselves into three
+    countries against 33% for the nine broad ones. A narrow filter does not
+    only shorten the list, it points at a corner of the continent — which is
+    what *a small filter can open a large door* means, measured.
     """
+    images = data.get("images")
     idx = data["cities"]
     total = len(idx)
     silhouette = constel_defs()
     by_slug = {i["slug"]: i for i in data["taxonomy"]["interests"]}
-    rows = []
-    drawn = []
+
+    # ONE PASS OVER THE ATLAS, AND EVERY FIGURE ON THIS PAGE COMES OUT OF
+    # IT. A second walk for the narrow band would be a second chance for the
+    # two halves of one page to disagree about what Festivals is.
+    facts = {}
     for slug in ranking:
-        i = by_slug[slug]
         cities = [c for c in idx.values() if slug in c["city"]["interests"]]
-        ncountry = len({c["country"]["slug"] for c in cities})
-        pct = round(100.0 * len(cities) / total) if total else 0
-        # THE JUDGEMENT SENTENCE WAS A CONSTANT ON FIVE ROWS AT A TIME.
-        # The first version printed INTEREST_BANDS here, which is three
-        # sentences for seventeen tags — so History and Food carried the
-        # same words, and so did Architecture and Wild nature, four rows
-        # apart. That is the /themes failure exactly, reproduced by the
-        # commit that was written to avoid it: "8 PLACES" was on all
-        # thirteen cards because every theme holds eight, and a sentence
-        # that is true of five rows is not telling a reader which row they
-        # are reading. The band belongs on the tag's OWN page, where it is
-        # a judgement about one thing and there is nothing to compare it to.
-        #
-        # What differs, and is the thing somebody scanning actually wants,
-        # is WHERE. The three countries carrying the most of each tag are
-        # different for almost every one of the seventeen — Mountains is
-        # Switzerland, Austria, France and Islands is Greece, Croatia,
-        # Italy — and it is derived, so it cannot drift from the set.
         tally = {}
         for c in cities:
             tally[c["country"]["name"]] = tally.get(c["country"]["name"], 0) + 1
-        lead = [nm for nm, _ in sorted(tally.items(), key=lambda kv: (-kv[1], kv[0]))[:3]]
-        where = (and_list(lead) + (" carry the most of it" if len(lead) > 1
-                                   else " carries all of it")
-                 if lead else "Nothing carries it yet.")
-        pts = [project(c["city"]["lat"], c["city"]["lon"]) for c in cities]
-        drawn.extend(pts)
+        top = sorted(tally.items(), key=lambda kv: (-kv[1], kv[0]))[:3]
+        facts[slug] = {
+            "name": by_slug[slug]["name"],
+            "cities": cities,
+            "n": len(cities),
+            "ncountry": len(tally),
+            "pct": round(100.0 * len(cities) / total) if total else 0,
+            "lead": [nm for nm, _ in top],
+            # The share of the tag its three strongest countries hold. Never
+            # a share of the ATLAS: that is the reach figure beside it, and
+            # two percentages in one line that mean different things is how
+            # a reader stops reading either.
+            "top3": (round(100.0 * sum(v for _, v in top) / len(cities))
+                     if cities else 0),
+            "pts": [project(c["city"]["lat"], c["city"]["lon"]) for c in cities],
+        }
+
+    # THE THREE BANDS ARE READ OFF `INTEREST_BANDS` RATHER THAN SLICED BY
+    # POSITION. `ranking[:3]` would be a layout deciding an argument, and it
+    # would silently stop agreeing with the seventeen pages the day a tag
+    # crosses 40%. The floors are the table's own.
+    def _band(pct):
+        for k, (floor, _) in enumerate(INTEREST_BANDS):
+            if pct >= floor:
+                return k
+        return len(INTEREST_BANDS) - 1
+
+    wide = [s for s in ranking if _band(facts[s]["pct"]) == 0]
+    mid = [s for s in ranking if _band(facts[s]["pct"]) == 1]
+    narrow = [s for s in ranking if _band(facts[s]["pct"]) == 2]
+
+    drawn = []
+    rows = []
+    for slug in ranking:
+        f = facts[slug]
+        drawn.extend(f["pts"])
         # THE MARK SIZE HAS TO FOLLOW THE COUNT. `.constel-theme` was sized
         # for a theme's EIGHT stops; two hundred dots at that radius is a
-        # solid blue mass with the coastline lost under it, which says "a
-        # lot" and nothing else — and the whole argument of this page is
-        # that you can see the difference between the shapes.
-        dense = " constel-dense" if len(pts) > 60 else ""
-        glyph = constellation(pts, extra=" constel-theme" + dense)
-        # THE SHAPE COMES FIRST, AND THE THREE COUNTS ARE ONE LINE. A gap
-        # AFTER the last element is a margin; a gap BETWEEN two of them is a
-        # hole, and this row had 571 pixels of hole. With the drawing on the
-        # left and one text block beside it, the only empty space left is the
-        # ragged right edge of a short line, which is what a ragged right
-        # edge is. The destination count was a third column standing alone at
-        # the far edge and is a count like the other two, so it joins them.
+        # solid mass with the coastline lost under it, which says "a lot"
+        # and nothing else — and the whole argument of this band is that you
+        # can see the difference between the shapes.
+        dense = " constel-dense" if len(f["pts"]) > 60 else ""
+        glyph = constellation(f["pts"], extra=" constel-theme" + dense)
+        where = (f'{and_list(f["lead"])} hold {f["top3"]}% of it'
+                 if len(f["lead"]) > 1 else
+                 (f'{f["lead"][0]} holds all of it' if f["lead"]
+                  else "Nothing carries it yet."))
         rows.append(
             f'<a class="row themerow interestrow" href="{urls.interest(slug)}">'
             f'<div class="rowart">{glyph}</div>'
-            f'<div><p class="kicker">{n_of(len(cities), "destination")} · '
-            f'{pct}% of the Atlas · {n_of(ncountry, "country")}</p>'
-            f'<h2>{esc(i["name"])}</h2>'
+            f'<div><p class="kicker">{n_of(f["n"], "destination")} &middot; '
+            f'{f["pct"]}% of the Atlas &middot; {n_of(f["ncountry"], "country")}</p>'
+            f'<h3>{esc(f["name"])}</h3>'
             f'<p class="rowsub">{esc(where)}</p></div></a>')
-    # THE SEVENTEEN GLYPHS ARE A GEOGRAPHY AND THIS FAMILY'S SUBJECT IS NOT.
+
+    def _median(xs):
+        xs = sorted(xs)
+        if not xs:
+            return 0
+        h = len(xs) // 2
+        return xs[h] if len(xs) % 2 else round((xs[h - 1] + xs[h]) / 2)
+
+    midconc = _median([facts[s]["top3"] for s in wide + mid])
+    narrowconc = _median([facts[s]["top3"] for s in narrow])
+
+    # ── 01 · INTERESTS ───────────────────────────────────────────────
+    hero = photo(images, "interests-hero", w=2400, h=1200, eager=True,
+                 sizes="100vw",
+                 alt="A European street seen down its own length.")
+    iopen = f"""
+  <div class="iopen">
+    <h1 class="mega">{numword(len(ranking), cap=True)} ways to cross a
+    <em class="lit">continent</em>.</h1>
+    <p class="lede">Not a list of everything Europe has. {numword(len(ranking),
+    cap=True)} tags that each narrow {total:,} destinations to a set worth
+    reading &mdash; and the useful ones are not the biggest. History covers
+    almost the whole Atlas and tells you very little; the narrow ones are
+    where a filter earns its place.</p>
+  </div>
+  <figure class="ibleed">{hero or ed_slot("interests-hero", shape="wide",
+      label="What you are travelling for")}</figure>"""
+
+    # ── 02 · THE QUESTION ────────────────────────────────────────────
+    # A STATEMENT BAND SAYS ONE THING AND DOES NOT EXPLAIN THE PAGE BACK.
+    # The opening has already said what the seventeen are; this says why
+    # they exist at all, which is the only thing left to say before the
+    # reader meets them.
+    firstact = """
+  <div class="sheettext">
+    <h2 class="mega">Interest is the first act of discovery.</h2>
+    <p class="lede">A tag here is an instrument rather than a label. Each one
+    changes the geographic field: the destinations carrying it become the
+    shape of your Europe, and two of them together become a much smaller and
+    much more particular one.</p>
+  </div>"""
+
+    # ── 03 · THE WIDE END ────────────────────────────────────────────
+    # THE FEATURE SCALE IS THE ONE THE SEVEN IMAGE SCALES ALREADY HOLD —
+    # 1.35 against .65, because two equal columns read as a layout and an
+    # unequal pair reads as a picture with something to say. No new
+    # component, and the alternation is what stops two features reading as
+    # a pattern.
+    def _say(slug):
+        f = facts[slug]
+        return (f'<p class="kicker">{n_of(f["n"], "destination")} &middot; '
+                f'{f["pct"]}% of the Atlas &middot; '
+                f'{n_of(f["ncountry"], "country")}</p>'
+                f'<p class="rowsub">{esc(and_list(f["lead"]))} hold '
+                f'{f["top3"]}% of it.</p>'
+                f'<p>{esc(INTEREST_BANDS[0][1])}</p>'
+                f'{golink(urls.interest(slug), "Open " + f["name"].lower())}')
+
+    feats = "".join(
+        ed_feature(images, f"interest:{s}", title=facts[s]["name"],
+                   body=_say(s), alt=facts[s]["name"], right=bool(k % 2),
+                   level=3)
+        for k, s in enumerate(wide))
+    midstrip = ed_strip(images, [
+        {"key": f"interest:{s}", "alt": facts[s]["name"],
+         "label": facts[s]["name"], "href": urls.interest(s),
+         "note": f'{facts[s]["n"]} destinations · {facts[s]["pct"]}%'}
+        for s in mid], limit=len(mid))
+    lenses = f"""
+  <div class="sheettext">
+    <h2 class="mega">The wide end.</h2>
+    <p class="lede">{numword(len(wide), cap=True)} tags sit above
+    {INTEREST_BANDS[0][0]}% of the Atlas, and this family's own judgement of
+    them is that as a filter each barely narrows Europe. They are worth
+    seeing rather than worth filtering by &mdash; which is why they are the
+    pictures here and the narrow ones are the list at the end.</p>
+  </div>
+  {feats}
+  <p class="small">Below them, {numword(len(mid))} more between
+  {INTEREST_BANDS[1][0]} and {INTEREST_BANDS[0][0]}% of the Atlas: the band
+  where, in this family's own words, a tag narrows Europe usefully without
+  emptying it.</p>
+  {midstrip}"""
+
+    # ── 04 · THE INTEREST ATLAS ──────────────────────────────────────
+    ledger = f"""
+  <div class="pagehead index">
+    <p class="kicker">The interest atlas</p>
+    <h2 class="mega">Every question makes a different Europe.</h2>
+    {head_extent([(len(ranking), "ways to travel"),
+                  (total, "destinations"),
+                  (len({c["country"]["slug"] for c in idx.values()}), "countries")])}
+  </div>
+  {silhouette}
+  <div class="rows">{"".join(rows)}</div>
+  <p class="small">Each shape is that tag&rsquo;s own destinations on the
+  continent, drawn to the same frame so the {numword(len(ranking))} can be
+  compared: a knot is an argument about one corner of Europe, a scatter is one
+  about the whole of it. The order is reach &mdash; how much of the Atlas each
+  tag carries &mdash; rather than alphabetical, and the sentence under each
+  name is the share its three strongest countries hold, which is a different
+  question from reach and disagrees with it more often than not.
+  {geo.sources_line(geo.load("europe-lod0.json"))}{offframe_line(drawn, data, listed=False)}
+  Two of them can be combined in <a href="/discover">Discover Mode</a>, which
+  is where a narrow tag does its real work.</p>"""
+
+    # ── 05 · THE NARROW END ──────────────────────────────────────────
+    # AND THIS IS WHERE THE REST OF THE LIBRARY GOES. Eight tags, eight
+    # photographs, none of which had ever been on this page: the strip took
+    # the widest eight and the narrow end of the family — the half the page
+    # argues is the useful half — was the half with no picture at all.
+    # A ROW IS NOT AN `<a>` WHEN IT HOLDS A PHOTOGRAPH, AND THIS COMMIT
+    # REPRODUCED /stories' OWN DEFECT BEFORE IT WAS CAUGHT. `picture()`
+    # emits the Pexels credit as a `<figcaption class="credit">` INSIDE
+    # the `<picture>`, and that credit is two anchors — so wrapping the
+    # whole row in one made an `<a>` inside an `<a>`, which the HTML parser
+    # is specified to resolve by CLOSING the outer one. Chromium's
+    # error recovery then reopens it around each following run, so eight
+    # rows measured as TWENTY-FOUR in the browser and the band rendered
+    # 4,594 pixels tall. Nothing in the markup looks wrong and no count
+    # sees it: the emitted HTML contains exactly eight.
     #
-    # A tag answers what you are travelling FOR, and the page answered it in
-    # seventeen drawings of the same continent with a different number of
-    # marks on it — which is the index-opening finding exactly, arriving
-    # seventeen times down one page instead of once across six pages. The
-    # shapes stay, because reach IS the argument this index makes and no
-    # single tag page can make it. What was missing is the other half: what
-    # any of it LOOKS like.
-    #
-    # The strip is the tag's own photograph, the same `interest:` purpose the
-    # seventeen pages already declare, so nothing new is invented and the
-    # slots that are empty say which photograph they are waiting for. Eight
-    # of the seventeen, in the page's own order, which is reach — the strip
-    # scrolls, and a strip of seventeen is a grid that has been rotated.
-    _istrip = ed_strip(data.get("images"), [
-        {"key": f"interest:{slug}", "alt": by_slug[slug]["name"],
-         "label": by_slug[slug]["name"], "href": urls.interest(slug)}
-        for slug in ranking], limit=8)
+    # So the picture is a figure, the NAME is the link, and the two links
+    # the licence requires sit in a credit that is inside no anchor at all.
+    # Found by rendering, in the commit after the one that wrote the rule
+    # down — *a rule recorded is not a rule inherited*.
+    narrowcards = "".join(
+        f'<div class="row narrowrow">'
+        f'<figure class="narrowshot">{picture(images, "interest:" + s, w=900, h=700, alt=facts[s]["name"], sizes="(max-width: 52rem) 90vw, 22rem") if held(images, "interest:" + s) else ed_slot("interest:" + s, shape="square", label=facts[s]["name"])}</figure>'
+        f'<div><p class="kicker">{n_of(facts[s]["n"], "destination")} &middot; '
+        f'{facts[s]["pct"]}% of the Atlas</p>'
+        f'<h3><a href="{urls.interest(s)}">{esc(facts[s]["name"])}</a></h3>'
+        f'<p class="rowsub">{esc(and_list(facts[s]["lead"]))} hold '
+        f'{facts[s]["top3"]}% of it.</p></div></div>'
+        for s in narrow)
+    narrowband = f"""
+  <div class="sheettext">
+    <h2 class="mega">The narrow end.</h2>
+    <p class="lede">{numword(len(narrow), cap=True)} tags under
+    {INTEREST_BANDS[1][0]}% of the Atlas. A short list is a gap in the
+    writing as much as it is a fact about Europe &mdash; and it is also the
+    only end of this family where choosing one changes where you would go.</p>
+  </div>
+  <div class="rows narrowgrid">{narrowcards}</div>"""
+
+    # ── 06 · A SMALL FILTER ──────────────────────────────────────────
+    # THE STATEMENT CARRIES ITS OWN EVIDENCE, because a claim about filters
+    # made on a page that publishes the numbers is checkable in the line
+    # under it. Festivals is excluded from neither figure and named in both
+    # directions: three destinations in three countries is 100% in its top
+    # three by arithmetic, which is the small-sample trap /events already
+    # recorded — a median rather than a mean is what stops one row of three
+    # deciding a sentence about eight.
+    smallfilter = f"""
+  <div class="sheettext">
+    <h2 class="mega">A small filter can open a large door.</h2>
+    <p class="lede">History covers {facts[ranking[0]]["pct"]}% of the Atlas
+    and therefore tells you almost nothing about where to go next. The narrow
+    tags do the opposite, and it is measurable: the {numword(len(narrow))} of
+    them put a median {narrowconc}% of themselves into three countries,
+    against {midconc}% for the {numword(len(wide) + len(mid))} above them. A
+    narrow filter does not only shorten the list &mdash; it points at a corner
+    of the continent.</p>
+    <p class="note">The median rather than the average, because Festivals is
+    {facts["festivals"]["n"] if "festivals" in facts else 3} destinations in
+    as many countries and any share computed on three rows is a fact about
+    the sample. Every figure on this page is counted on the build.</p>
+  </div>"""
+
+    # ── 07 · OPEN A DOOR ─────────────────────────────────────────────
+    istart = """
+  <div class="istart">
+    <h2 class="mega">Start with what you care about.</h2>
+    <p class="lede">Choose an interest and see where it lives. Follow it into
+    a destination, a story, an experience or a journey &mdash; or put two of
+    them together and watch most of Europe fall away.</p>
+    <p class="keepgo"><a class="btn" href="/discover">Combine two interests</a>
+    <a class="storygo" href="/countries">Or open the atlas &rarr;</a></p>
+  </div>"""
+
+    PLATES = [("iopen gal", "Ways to travel", iopen, "ways-to-travel"),
+              ("firstact pine", "The question", firstact, "the-question"),
+              ("lenses gal", "The wide end", lenses, "wide"),
+              ("reach paper", "The interest atlas", ledger, "reach"),
+              ("narrow gal quiet", "The narrow end", narrowband, "narrow"),
+              ("smallfilter gal", "A small filter", smallfilter, "small-filter"),
+              ("istart pine", "Start here", istart, "start")]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Ways to travel", None)])}
-{ed_opening(
-    eyebrow="What you are travelling for",
-    title="Seventeen ways to cross a continent.",
-    intro=f"Not a list of everything Europe has. {numword(len(ranking), cap=True)} tags "
-          f"that each narrow {numword(total)} destinations to a set worth reading — and the "
-          f"useful ones are not the biggest. History covers almost the whole Atlas and "
-          f"tells you very little; the narrow ones are where a filter earns its place.",
-    visual=photo(data.get("images"), "interests-hero", w=2000, h=1200,
-                 sizes="(min-width: 52rem) 58vw, 100vw")
-           or ed_slot("interests-hero", shape="square",
-                      label="What you are travelling for"),
-    family="discovery")}
-{(f'<section class="ed-section">'
-  + ed_section_head("The seventeen",
-                    "What each one is a picture of",
-                    "The widest eight, in the order this page argues them.")
-  + _istrip + "</section>") if _istrip else ""}
-<section class="ed-section">
-{ed_section_head("Reach",
-                 "How much of the Atlas each one carries",
-                 "Every destination with the tag, drawn on one frame.")}
-{silhouette}
-<div class="rows">{"".join(rows)}</div>
-<p class="small">Each shape is that tag\u2019s own destinations on the continent, drawn
-to the same frame so the {numword(len(ranking))} can be compared: a knot is an argument
-about one corner of Europe, a scatter is one about the whole of it.
-{geo.sources_line(geo.load("europe-lod0.json"))}{offframe_line(drawn, data, listed=False)}
-The order is reach \u2014 how much of the Atlas each tag carries \u2014 rather than
-alphabetical, and the sentence under each name is the same judgement its own page
-makes. Two of them can be combined in
-<a href="/discover">Discover Mode</a>, which is where a narrow tag does its real work.</p>
-</section>
+{plate_sequence(PLATES)}
 """
     return "/interests/index.html", page(
         "Ways to travel", body, path="/interests", area="countries",
-        accent="natural",
+        accent="natural", hero=True,
         description="Seventeen ways into Europe — history, food, mountains, islands, "
                     "sacred places, rail — each one drawn as the destinations that carry it.",
     )
@@ -4192,135 +5360,390 @@ def interest_page(data, i, ranking):
 # ── journeys ──────────────────────────────────────────────────────────
 
 def journeys_index(data):
-    """Seventeen journeys, shown as routes rather than as cards.
+    """THE EUROPEAN JOURNEY ATLAS — movement drawn, and the drawing already
+    existed.
 
-    THE INDEX SHOWED EVERYTHING ABOUT A JOURNEY EXCEPT THE JOURNEY. Four
-    across, each a generated plate over a name, a truncated summary and
-    "19 DAYS · 5 COUNTRIES · MODERATE" — and four abstract landscapes in a
-    row read as a family rather than as four trips. The one thing that makes
-    a journey a journey, and the one thing this atlas holds in full, is the
-    ORDERED SEQUENCE OF PLACES. It was the only thing not on the page.
+    Four pages, four instruments, one institution: /discover is the
+    instrument, /countries is the atlas, /experiences is photography, and
+    this one asks how you want to MOVE. `docs/journeys-redesign.md` is the
+    audit — what the page held, what the register holds, and which of the
+    brief's bands are derived rather than authored.
 
-    Eight of the nine indexes were the same 280px card grid; that finding is
-    recorded in docs/design-direction-audit.md as the h1 finding one level up.
-    A card is the right shape for a set of like things a reader is choosing
-    between on look. A journey is not chosen on look: it is chosen on where it
-    goes, how long it takes and how hard it is, and all three of those are
-    text.
+    IT WAS SEVENTEEN IDENTICAL ROWS, AND EVERY ONE OF THEM WAS GOOD. A
+    strapline kicker, the name, the stops in order, a `hopbar` laid end to
+    end as the trip's own rhythm, the facts, and a route glyph framed on
+    that journey's own extent — no two of the seventeen lines are alike,
+    which is the test the homepage's four doors failed and this one passes.
+    The row was itself a repair: this index used to be four abstract plates
+    across. The fault is the sum. Measured on the built page at 1280: 5,095
+    pixels, one photograph, 5.9% of the page area, one shape seventeen
+    times.
 
-    So it is the `row` primitive — already on 86% of pages, so this is not a
-    new component — carrying the stops in order, and a route line that is the
-    same `hopbar` the journey page draws, laid end to end instead of stacked.
-    A reader sees the shape of the trip: many short segments is a slow local
-    circuit, three long ones is a continental haul.
+    AND THE FAMILY'S OWN SIGNATURE DRAWING WAS BUILT ON EVERY BUILD AND
+    THROWN AWAY. `heroart` composes all seventeen routes at once on one
+    conformal conic — casings first and then cores, so a crossing does not
+    break a line — and handed it to `indexhero(art=…)`, which prefers `img`
+    when the register holds one. The register holds `journeys-hero`. So the
+    one picture no other travel product can make was assembled and
+    discarded, and what a reader met instead was a stock photograph of a
+    train. It is the opening now, at size, which is what this family's
+    opening is FOR.
     """
+    images = data.get("images") or {}
+    idx = data["cities"]
+    js = data["journeys"]
+
+    def legcities(j):
+        return [idx[l["city"]] for l in j["legs"]]
+
+    def pts_of(j):
+        return [project(n["city"]["lat"], n["city"]["lon"]) for n in legcities(j)]
+
+    def km_of(j):
+        cs = [n["city"] for n in legcities(j)]
+        return sum(haversine(cs[i], cs[i + 1]) for i in range(len(cs) - 1))
+
+    def countries_of(j):
+        out = []
+        for n in legcities(j):
+            if n["country"]["name"] not in out:
+                out.append(n["country"]["name"])
+        return out
+
+    def credit(keys):
+        """One credit per band, paid once — the homepage's own rule, and
+        never on the opening: that surface is the composition and the
+        register is where the record lives."""
+        out, seen = [], set()
+        for k in keys:
+            row = images.get(k)
+            if not row or row["photographer"] in seen:
+                continue
+            seen.add(row["photographer"])
+            out.append(f'<a href="{esc(row["source"])}" rel="noopener" '
+                       f'target="_blank">{esc(row["photographer"])}</a>')
+        return ('<p class="sheetcred rowcred">Photographs by '
+                + ", ".join(out) + " on Pexels.</p>") if out else ""
+
+    # ── 01 · THE ROAD ────────────────────────────────────────────────
+    # ALL SEVENTEEN AT ONCE, AND THE CASINGS BEFORE THE CORES. Seventeen
+    # routes cross each other constantly, and a per-route casing lays the
+    # next route's cream stroke over the last one's cobalt — a line that
+    # breaks wherever another passes. Both passes over the whole set, which
+    # is how a printed map plates a network.
+    routepts = [pts_of(j) for j in js]
+    allroutes = "".join(
+        '<polyline class="constel-route case" points="'
+        + " ".join(f"{x:.0f},{y:.0f}" for x, y in pts) + '"/>'
+        for pts in routepts) + "".join(
+        '<polyline class="constel-route" points="'
+        + " ".join(f"{x:.0f},{y:.0f}" for x, y in pts) + '"/>'
+        for pts in routepts)
+    allmap = (f'<svg class="constel allroutes" viewBox="0 0 {MAP_W} {MAP_H}" '
+              f'preserveAspectRatio="xMidYMid meet" '
+              f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
+              f'{cut_fade("ih", MAP_W, MAP_H, dusk_reach(), cls="datacut")}'
+              f'{allroutes}</svg>')
+    stops_all = {l["city"] for j in js for l in j["legs"]}
+    road = f"""
+  <div class="sheettext">
+    <p class="kicker">The European Journey Atlas</p>
+    <h1 class="mega">Europe is<br>a <em class="lit">journey</em>.</h1>
+    <p class="lede">Not a line between two points. {numword(len(js), cap=True)}
+    routes, {len(stops_all)} stops, every one of them a real place in this
+    atlas and every leg a real distance. Drawn here all at once, on the
+    projection every other map on this site uses.</p>
+    {golink('#the-routes', 'Read the seventeen')}
+  </div>
+  <figure class="roadart">{allmap}
+    <figcaption>Every line is one of the {numword(len(js))}, drawn from its own
+    stops. {geo.sources_line(geo.load("europe-lod0.json"))}{datacut_line()}</figcaption>
+  </figure>"""
+
+    # ── 02 · THE SEVENTEEN ───────────────────────────────────────────
     rows = []
-    for j in data["journeys"]:
-        countries, stops, hops = [], [], []
-        prev = None
-        for leg in j["legs"]:
-            n = data["cities"][leg["city"]]
-            cn = n["country"]["name"]
-            if cn not in countries:
-                countries.append(cn)
-            stops.append(esc(n["city"]["name"]))
-            if prev is not None:
-                hops.append(haversine(prev, n["city"]))
-            prev = n["city"]
-        # THE SEGMENTS ARE A SHARE OF THE WHOLE TRIP, not of its longest leg.
-        # The journey page scales each hop against the longest one, because
-        # there the question is "which of these days is the long one". Here
-        # the bar is the whole route in one line, so a segment is its share of
-        # the total distance and the line reads as the trip's own rhythm.
+    for i, j in enumerate(js, 1):
+        cs = legcities(j)
+        stops = [esc(n["city"]["name"]) for n in cs]
+        hops = [haversine(cs[k]["city"], cs[k + 1]["city"])
+                for k in range(len(cs) - 1)]
         total = sum(hops)
+        # THE SEGMENTS ARE A SHARE OF THE WHOLE TRIP, not of its longest leg.
+        # The journey page asks which of these days is the long one; here the
+        # bar is the whole route in one line, so the shape is the trip's own
+        # rhythm rather than a comparison between trips.
         segs = "".join(
             f'<span class="w{max(1, int(round(km / total * 100)))}"></span>'
             for km in hops) if total else ""
-        # AND THE ROUTE IS DRAWN. Seventeen rows of kicker, name, dot-separated
-        # stops and a thin bar is a spreadsheet: the page told a reader
-        # everything about a journey except where it goes, which is the one
-        # question a journey is chosen on and the one this atlas can answer
-        # in a picture. The homepage was showing three journeys better than
-        # the journeys index showed seventeen.
-        #
-        # No two of these seventeen lines are alike — Arctic to Mediterranean
-        # is the length of Europe, the Iberian Circle is a loop in one corner,
-        # the Baltic Crossing is four capitals in a square — so this is the
-        # one family where a drawing per row differentiates rather than
-        # repeats. That is the test the homepage's four doors failed and this
-        # one passes.
-        route = constellation(
-            [project(data["cities"][l["city"]]["city"]["lat"],
-                     data["cities"][l["city"]]["city"]["lon"]) for l in j["legs"]],
-            route=True, frame=True, mark=19)
+        route = constellation(pts_of(j), route=True, frame=True, mark=19)
         rows.append(
             f'<a class="row journeyrow" href="{urls.journey(j)}">'
-            f'<div><p class="kicker">{esc(j["strapline"])}</p>'
+            f'<div><p class="kicker"><span class="jno">{i:02d}</span>'
+            f'{esc(j["strapline"])}</p>'
             f'<h2>{esc(j["name"])}</h2>'
             f'<p class="rowsub">{" · ".join(stops)}</p>'
             f'<span class="hopbar route" aria-hidden="true">{segs}</span>'
-            f'<p class="rowmeta jfacts">{n_of(j["days"], "day")} · {n_of(len(countries), "country")}'
-            f' · {esc(j["difficulty"])}</p></div>'
-            f'<div class="jart">{route}</div></a>')
-    # THE OPENING IS EVERY ROUTE AT ONCE, and no other travel product can
-    # draw it: seventeen real sequences of real places on one conformal
-    # conic, so a reader sees the reach of the whole set before reading a
-    # word. It is the family's own subject at size, which is what an index
-    # hero is for — and it is the honest stand-in until a photograph lands in
-    # the slot beside it, because a plate here would be a picture of nowhere.
-    # THE CASINGS FIRST, ALL OF THEM, THEN THE CORES. Seventeen routes cross
-    # each other constantly, and a per-route casing would lay the next
-    # route's cream stroke over the previous route's cobalt one — a line that
-    # breaks wherever another passes. Both passes over the whole set, which
-    # is how a printed map plates a network.
-    routepts = [[project(data["cities"][l["city"]]["city"]["lat"],
-                         data["cities"][l["city"]]["city"]["lon"])
-                 for l in j["legs"]] for j in data["journeys"]]
-    allroutes = "".join(
-        f'<polyline class="constel-route case" points="'
-        + " ".join(f"{x:.0f},{y:.0f}" for x, y in pts) + '"/>'
-        for pts in routepts) + "".join(
-        f'<polyline class="constel-route" points="'
-        + " ".join(f"{x:.0f},{y:.0f}" for x, y in pts) + '"/>'
-        for pts in routepts)
-    # `slice` rather than the default `meet`. The frame is 4:3 and the map is
-    # 1000x780, which is 1.28 — close enough that slicing crops a few units of
-    # open sea and far enough that letterboxing left the continent floating in
-    # black margins with the arch cutting nothing. A drawing in an opening
-    # should fill the opening; that is what the homepage hero had to learn.
-    heroart = (f'<svg class="constel allroutes" viewBox="0 0 {MAP_W} {MAP_H}" '
-               f'preserveAspectRatio="xMidYMid slice" '
-               f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
-               f'{cut_fade("ih", MAP_W, MAP_H, dusk_reach(), cls="datacut")}'
-               f'{allroutes}</svg>')
-    body = f"""
-{crumbs([("Europe", "/discover"), ("Journeys", None)])}
-{constel_defs()}
-{indexhero(
-    kicker="European Journeys",
-    title="Routes that cross borders on purpose.",
-    lede=f"{len(data['journeys'])} routes, each a real sequence with real distances: "
-         f"every stop links back into the Atlas, and the nights add up to the days on "
-         f"the tin. Take one as written, or open it in the Planner and bend it to the "
-         f"time you actually have.",
-    art=heroart,
-    img=photo(data.get("images"), "journeys-hero", w=2000, h=1200,
-              sizes="(min-width: 60rem) 52vw, 100vw"),
-    actions='<a class="btn" href="/plan">Build your own</a>'
-            '<a class="btn ghost" href="/map">See them on the map</a>',
-    note="Every line above is one of the seventeen, drawn from its own stops."
-         + datacut_line())}
-<div class="rows journeyrows">{"".join(rows)}</div>
-<p class="small">The shape beside each route is where it goes, drawn on the same
-projection as every other map here. {geo.sources_line(geo.load("europe-lod0.json"))}
-Every stop above is a place in the Atlas, in the order the
-route takes it. The line under each is that journey's own legs end to end —
-its share of the whole distance, so the shape is the trip's rhythm rather
-than a comparison between trips. Distances are straight lines between
-coordinates; what they mean on the ground is on the journey's own page.</p>
-"""
+            f'<p class="rowmeta jfacts">{n_of(j["days"], "day")} · '
+            f'{n_of(len(countries_of(j)), "country")} · {esc(j["difficulty"])}</p>'
+            f'</div><div class="jart">{route}</div></a>')
+    # THIS BAND IS THE PAGE'S HEAD, and /experiences settled the reason one
+    # family over: a plate sequence has no room for a stage above the
+    # opening, so the head is the band that introduces the SET. It is the
+    # `pagehead` primitive rather than a fourth spelling of one, it declares
+    # `index` because the page is a set, and it states the extent, because
+    # an index exists to say how big a set is and five of eight once did not.
+    # The count is derived; a figure typed here is the figure that was true
+    # two hundred destinations ago.
+    seventeen = f"""
+  <div class="pagehead index">
+    <h2 class="mega">Routes worth<br>remembering.</h2>
+    <p class="lede">All {len(js)} of them, and a journey is not chosen on
+    look, so none of these is a card. Each row carries where it goes, in
+    order, and the line under it is that route's own legs end to end —
+    its share of the whole distance, so the shape is the trip's rhythm.</p>
+  </div>
+  <div class="rows journeyrows">{"".join(rows)}</div>
+  <p class="small">The shape beside each route is where it goes, on the same
+  projection as every other map here. Distances are straight lines between
+  coordinates; what they mean on the ground is on the journey's own page.</p>"""
+
+    # ── 03 · THE CREED ───────────────────────────────────────────────
+    creed = """
+  <div class="sheettext creedsay">
+    <h2 class="mega">The destination is<br>one moment in<br>the journey.</h2>
+    <p class="lede">The landscape changes outside the window. The language
+    shifts, then the architecture, then the table. A border stops being a
+    line and becomes a day.</p>
+  </div>"""
+
+    # ── 04 · THE FEATURED JOURNEY ────────────────────────────────────
+    # A JOURNEY'S PICTURE IS ONE OF ITS OWN STOPS, NOT ITS `journey-hero`.
+    # The automated fill searched the role's first concept and got railways:
+    # three of the nine journey photographs are the same commuter station at
+    # Geesthacht and not one is about its journey. The homepage already takes
+    # the picture it can defend and this page takes the same one — which also
+    # decides WHICH journey is featured, because the one this atlas can show
+    # best is the one it holds the most photographs of. Ties go to the
+    # journey crossing the most countries, and the page says so.
+    def shots_of(j):
+        return [l["city"] for l in j["legs"] if ("city:" + l["city"]) in images]
+
+    feat = max(js, key=lambda j: (len(shots_of(j)), len(countries_of(j))))
+    fshots = shots_of(feat)
+    fcs = legcities(feat)
+    featured = ""
+    if fshots:
+        lead = fshots[0]
+        leadleg = next(l for l in feat["legs"] if l["city"] == lead)
+        rest = fshots[1:4]
+        strip = "".join(
+            f'<a class="fsh" href="{urls.city(idx[c]["country"], idx[c]["region"], idx[c]["city"])}">'
+            + picture(images, "city:" + c, w=800, h=1000, credit=False,
+                      alt=images["city:" + c]["alt"],
+                      sizes="(min-width: 52rem) 16vw, 44vw")
+            + f'<span class="fshname">{esc(idx[c]["city"]["name"])}</span></a>'
+            for c in rest)
+        featured = f"""
+  <figure class="featshot">
+    {picture(images, "city:" + lead, w=2000, h=1200, credit=False,
+             alt=images["city:" + lead]["alt"], sizes="(min-width: 52rem) 52vw, 100vw")}
+    <figcaption>{esc(idx[lead]["city"]["name"])}, {esc(idx[lead]["country"]["name"])}
+    &mdash; day {leadleg["day_number"]} of {feat["days"]}</figcaption>
+  </figure>
+  <div class="sheettext">
+    <p class="kicker">Featured &mdash; the journey this atlas can show best</p>
+    <h2 class="mega">{esc(feat["name"])}</h2>
+    <p class="lede">{esc(feat["summary"])}</p>
+    <p class="jfacts">{n_of(feat["days"], "day")} &middot;
+    {n_of(len(countries_of(feat)), "country")} &middot;
+    {int(round(km_of(feat))):,} km in a straight line</p>
+    {golink(urls.journey(feat), "Follow this route")}
+  </div>
+  <div class="fstrip">{strip}</div>
+  {credit(["city:" + c for c in fshots[:4]])}"""
+
+    # ── 05 · THE RHYTHM ──────────────────────────────────────────────
+    # THE FOUR MOVEMENTS ARE DERIVED RATHER THAN NAMED. The brief asks for
+    # Arrive, Cross, Pause and Continue, which is a true thing to say about
+    # journeys in general and a claim no record here carries. A leg DOES
+    # carry `nights`, and that is the same idea measured: a stop of one night
+    # is a crossing and a stop of three is a stay. So the band draws one real
+    # journey's own legs at their own lengths and the movements are that
+    # journey's shape rather than four words about the idea of one.
+    #
+    # AND IT IS A DIFFERENT CLAIM FROM THE ROW ABOVE. The index bar is a
+    # share of the DISTANCE and this is a share of the NIGHTS — the rhythm of
+    # the road against the rhythm of the nights, which is why a journey with
+    # eight legs and nineteen days is not eight equal blocks.
+    def movement(nights):
+        return ("a crossing" if nights <= 1 else
+                "a stop" if nights == 2 else "a stay")
+
+    nights_total = sum(l["nights"] for l in feat["legs"]) or 1
+    nightbar = "".join(
+        f'<span class="w{max(1, int(round(l["nights"] / nights_total * 100)))}"></span>'
+        for l in feat["legs"])
+    beats = "".join(
+        f'<div class="beat">'
+        f'<span class="beatno">{k:02d}</span>'
+        f'<span class="beatname">{esc(idx[l["city"]]["city"]["name"])}</span>'
+        f'<span class="beatkind">{n_of(l["nights"], "night")} &mdash; {movement(l["nights"])}</span>'
+        f'<span class="beatwhy">{esc(l.get("why", ""))}</span></div>'
+        for k, l in enumerate(feat["legs"], 1))
+    rhythm = f"""
+  <div class="sheettext">
+    <h2 class="mega">Arrive. Cross.<br>Pause. Continue.</h2>
+    <p class="lede">One journey's own legs, at their own lengths. A leg
+    carries nights, so the movement is measured rather than named: one night
+    is a crossing, two is a stop, three or more is a stay. This is
+    {esc(feat["name"])} &mdash; {n_of(nights_total, "night")} over
+    {n_of(len(feat["legs"]), "leg")}.</p>
+  </div>
+  <figure class="nightfig">
+    <span class="hopbar route nights" aria-hidden="true">{nightbar}</span>
+    <figcaption>Eight legs, each drawn at its share of the {nights_total}
+    nights &mdash; a share of the WHOLE trip rather than of its longest leg,
+    because the question here is the trip's rhythm.</figcaption>
+  </figure>
+  <div class="beats">{beats}</div>"""
+
+    # ── 06 · THE STORIES ON THESE ROADS ──────────────────────────────
+    # THE SET IS DERIVED AND THE RULE IS PRINTED. A story carries a validated
+    # `places` field; the ones that name a place these seventeen routes pass
+    # through are the essays that happen ON them, which is a relation this
+    # atlas holds rather than an editorial guess about which essays are
+    # "about travel". It SCROLLS, because `ed_strip` is the component for a
+    # sequence and because showing three of six would be a selection wearing
+    # the clothes of a set.
+    MIDDOT = "\u00a0\u00b7 "
+    onroad = []
+    for s in sorted(data["stories"], key=lambda s: s.get("published", ""),
+                    reverse=True):
+        hits = [p for p in (s.get("places") or []) if p in stops_all]
+        if hits and held(images, "story:" + s["slug"]):
+            onroad.append((s, hits))
+    tales = ""
+    if onroad:
+        tales = f"""
+  <div class="sheettext">
+    <h2 class="mega">Between the<br>destinations.</h2>
+    <p class="lede">The {numword(len(onroad))} essays that name a place these
+    routes pass through. A station, a ferry, a pass, a table &mdash; the part
+    of a journey that is not a destination.</p>
+    {golink('/stories', 'Every story')}
+  </div>
+  {ed_strip(images, [
+      {"key": "story:" + s["slug"], "alt": images["story:" + s["slug"]]["alt"],
+       "label": s["title"], "href": urls.story(s),
+       "note": idx[h[0]]["city"]["name"] + MIDDOT + (s.get("section") or "")}
+      for s, h in onroad], limit=8)}
+  {credit(["story:" + s["slug"] for s, _ in onroad])}"""
+
+    # ── 07 · THE PACE ────────────────────────────────────────────────
+    # A MEASUREMENT WITH A CLASSIFICATION ON TOP, WHICH IS THE ONLY HONEST
+    # ORDER. The brief names Slow, Deep and Grand. No journey record carries
+    # a pace: `type` is `route` on all seventeen and `creator` is
+    # `EuropeDoor editorial` on all seventeen, so neither can cut anything.
+    # What the data holds is straight-line kilometres per day, which runs
+    # from 30 to 319 and separates cleanly. The rule that cut it is printed,
+    # exactly as every /europe-in page prints the query that made it — and
+    # the figure says STRAIGHT LINE, because every distance here is a
+    # haversine and this atlas holds no road or rail geometry.
+    # THE LAST BAND HAS NO CEILING AND SAYS SO. The first version used a
+    # sentinel of 10^9 as the loop's upper bound and then printed it: "under
+    # 1000000000 km a day", on the page, as a claim to a reader. A bound that
+    # exists for the arithmetic is not a bound that belongs in a sentence.
+    PACE = (("Slow", 50, "under 50 km a day",
+             "Short hops, long stays. The road is the smallest part of the "
+             "day."),
+            ("Deep", 110, "50 to 110 km a day",
+             "One region, taken properly. Far enough to change the language, "
+             "not far enough to lose the thread."),
+            ("Grand", None, "over 110 km a day",
+             "A continent in one sequence. The distance is the argument."))
+    paced = {p[0]: [] for p in PACE}
+    for j in js:
+        rate = km_of(j) / max(1, j["days"])
+        for name, cap, _rule, _say in PACE:
+            if cap is None or rate < cap:
+                paced[name].append((rate, j))
+                break
+    pacerows = "".join(
+        f'<div class="pace">'
+        f'<p class="kicker">{numword(len(paced[name]), cap=True)} of '
+        f'{numword(len(js))}</p>'
+        f'<h3>{esc(name)}</h3>'
+        f'<p class="pacerule">{esc(rule)}</p>'
+        f'<p class="pacesay">{esc(say)}</p>'
+        f'<ul class="pacelist">' + "".join(
+            f'<li><a href="{urls.journey(j)}">{esc(j["name"])}</a>'
+            f'<span>{int(round(rate))} km/day</span></li>'
+            for rate, j in sorted(paced[name])) + '</ul></div>'
+        for name, cap, rule, say in PACE if paced[name])
+    pace = f"""
+  <div class="sheettext">
+    <h2 class="mega">There is more<br>than one way.</h2>
+    <p class="lede">Cut by straight-line kilometres a day, which is the only
+    pace this atlas can measure: it holds no road and no rail geometry, so
+    every distance here is a line between two coordinates and the real figure
+    is higher. The names are editorial; the number is not.</p>
+  </div>
+  <div class="paces">{pacerows}</div>"""
+
+    # ── 08 · THE ROAD AHEAD ──────────────────────────────────────────
+    # THE FAMILY'S OWN HERO PHOTOGRAPH, SPENT ON THE CLOSE. `journeys-hero`
+    # is a licensed picture of a train through a forest and the register had
+    # been claiming a surface this page stopped reaching the moment the
+    # opening became the drawn continent — `c_photo_published` said so in the
+    # first run after the rebuild, which is the check earning its place.
+    # The opening is not where it goes back: *a photograph replaces the
+    # drawing, it does not sit behind it*, and the drawn seventeen-route
+    # continent is the one picture no competitor can reproduce. The close is
+    # where a picture does work type cannot — "where will the road take you"
+    # over a line going into trees — so the band is a declaration: type over
+    # the picture behind a scrim that makes the ratio a property of the
+    # DESIGN. 72% graphite composites to rgb(76,83,82) and bone on that is
+    # 6.90:1 whatever the photograph turns out to be, which is the same
+    # arithmetic `.credit` and `ed_declare` already argued once each.
+    # Not `ed_declare` itself: that composes a statement and nothing else,
+    # and this band has to carry the two links the page ends on.
+    sendshot = picture(images, "journeys-hero", w=2400, h=1400,
+                       alt=images["journeys-hero"]["alt"], sizes="100vw") \
+        if held(images, "journeys-hero") else ""
+    # THE LITERAL CLASS NAME STANDS ALONE IN THE SOURCE, because
+    # `c_container_is_emitted` reads `class="..."` out of this file and drops
+    # any token carrying an f-string placeholder. Written
+    # `class="send{' shot' if ... }"` the one token is `send{'`, which is
+    # dropped whole, so the check reported that nothing on this site emits
+    # `.send` — correctly, about a string it could not parse. A class the
+    # instrument cannot see is a class the crop-box declaration cannot name.
+    _shot = "shot" if sendshot else ""
+    ahead = f"""
+  <div class="send {_shot}">{sendshot}
+    <div class="sendsay">
+      <h2 class="mega">Where will the<br>road take you?</h2>
+      <p class="lede">Take one as written, or open it in the Planner and bend
+      it to the time you actually have. Every stop above is a place in the
+      Atlas, and every one of them has a page.</p>
+      <p class="keepgo">{golink('/plan', 'Build your own route')}
+      {golink('/map', 'See them all on the map')}</p>
+    </div>
+  </div>"""
+
+    PLATES = [("road gal", "The road", road, "the-road"),
+              ("jindex gal quiet", "The seventeen", seventeen, "the-routes"),
+              ("creed pine", "Why journey", creed, "why-journey"),
+              ("feat gal", "The featured route", featured, "featured"),
+              ("rhythm gal quiet", "The rhythm", rhythm, "the-rhythm"),
+              ("jtales gal", "On these roads", tales, "on-these-roads"),
+              ("pace gal quiet", "The pace", pace, "the-pace"),
+              ("send", "The road ahead", ahead, "the-road-ahead")]
+    body = (crumbs([("Europe", "/discover"), ("Journeys", None)])
+            + constel_defs()
+            + plate_sequence(PLATES))
+
     return "/journeys/index.html", page(
-        "Journeys", body, path="/journeys", area="journeys",
+        "Journeys", body, path="/journeys", area="journeys", hero=True,
         accent="movement",
         description="Curated multi-country routes across Europe — Arctic to Baltic, Atlantic to Mediterranean, the Alpine grand tour and more.",
     )
@@ -4603,6 +6026,26 @@ def journey_page(data, j):
 def planner_api(data):
     """The compact index the browser plans against. Advisory countries are
     excluded here rather than in the UI, so no client bug can route into one."""
+    # A LEG CARRIES ITS PLACE'S OWN PHOTOGRAPH WHERE THE REGISTER HOLDS ONE,
+    # AND THE STOPS ARE NOT KNOWN AT BUILD TIME. `planner.js` chooses them in
+    # the reader's browser from their own sentence, so a build-time set of
+    # named stop pictures would be a FAKE RESULT — the fault `data/motions.json`
+    # is validated against one family over, where a curated list wearing the
+    # clothes of a query looks identical on the day it ships.
+    #
+    # What is honest is the URL travelling with the destination: the register
+    # holds a `city:` photograph for 63 of the 313 the planner can route
+    # through, so a fifth of legs carry a picture and four fifths carry none,
+    # which is the declared-slot honesty this site already practises. NEVER a
+    # generated plate — the plate system is exclusively the social-card
+    # language now, and every `.card-art` on this site is a map.
+    #
+    # `photo_href` TAKES A REGISTER KEY AND NEVER A URL, which is what keeps
+    # this from becoming a second way into the library with none of the
+    # licence gate behind it, and an unknown key returns "" so the row simply
+    # has no `shot`. 640 rather than the ladder's widest: a leg tile renders
+    # about 320 across, and this is a single `src` with no negotiation.
+    images = data.get("images") or {}
     cities = []
     for cid, n in sorted(data["cities"].items()):
         c, r, t = n["country"], n["region"], n["city"]
@@ -4657,6 +6100,26 @@ def planner_api(data):
             "quiet": bool(t.get("quiet")),
             "checked": bool(c.get("checked")),
         })
+        # ABSENT RATHER THAN NULL, because present-but-empty says "we have
+        # this" and then does not — the rule `checks.py` already enforces on
+        # JSON-LD. 250 of 313 rows carry no key at all.
+        _shot = photo_href(images, "city:" + cid, 640)
+        if _shot:
+            _row = images["city:" + cid]
+            cities[-1]["shot"] = _shot
+            cities[-1]["shotAlt"] = _row.get("alt") or t["name"]
+            # AND THE CREDIT TRAVELS WITH THE PICTURE, COMPOSED BY THE ONE
+            # FUNCTION THAT KNOWS THE RULE. Pexels' terms, recorded verbatim
+            # in the gate, require "a prominent link to Pexels on any page
+            # showing a Pexels photo, and the photographer credited as
+            # 'Photo by <name> on Pexels' linking to that photo's page" — and
+            # `checks.py` cannot see an `<img>` a script writes at runtime,
+            # so the guard that refuses an unregistered file on a published
+            # page has no reach here at all. Composing the sentence in
+            # JavaScript instead would be a second implementation of a
+            # LICENCE obligation, which is the one place this repository has
+            # already learned not to have one.
+            cities[-1]["shotCredit"] = credit_html(_row)
     journeys = [
         {
             "slug": j["slug"], "name": j["name"], "days": j["days"],
@@ -4686,7 +6149,69 @@ def planner_api(data):
     }
 
 
+# THE SIX WEIGHTS, DECLARED ONCE AND CHECKED AGAINST THE CODE THAT USES
+# THEM. `assets/js/planner.js` implements the scoring; this page publishes
+# it. Two implementations of one fact is a second chance to make its
+# mistake — seven times in this repository, once over a file extension — so
+# `checks.py` reads the weight block out of the script and asserts these are
+# the same numbers. The percentages are also the `.wN` utility classes the
+# bars take, which is why they are integers rather than fractions: a bar
+# whose width is not the figure beside it is a finished-looking chart about
+# nothing, which the year band already records.
+# WHERE EACH SPENDING STYLE SITS IN A DESTINATION'S OWN RECORDED DAILY
+# BAND. `planner.js` holds this as `STYLE_DAILY = {low: 0, moderate: .5,
+# high: 1}` and it is the whole of what a style IS: the bottom, the middle
+# or the top of the range this atlas already records for that place. The
+# band published it as three sentences and no number, which made the one
+# measurable thing about it invisible — so the figure is derived from the
+# 313 planning destinations here and the POSITION is declared once, read by
+# both, and asserted equal in `checks.py`. A second copy of 0.5 is a second
+# chance for the page and the planner to disagree about what "comfortable"
+# means, which is the dispatch cap's own lesson at a sixth of the stakes.
+PLAN_STYLE_POS = {"low": 0.0, "moderate": 0.5, "high": 1.0}
+
+PLAN_WEIGHTS = (
+    ("Your interests", 30,
+     "how many of the things you are travelling for it actually carries"),
+    ("Things to do", 20,
+     "whether it has experiences recorded against those interests, rather "
+     "than a tag and nothing behind it"),
+    ("The month you named", 15,
+     "peak, shoulder or off \u2014 never zero, because nowhere here is "
+     "closed"),
+    ("Atlas connectivity", 10,
+     "how reachable it is from the rest of the Atlas. Reachability, not "
+     "step-free access, which we hold no data for"),
+    ("Content quality", 20,
+     "how much of the place this atlas has actually written. It carries "
+     "the specification's popularity weight as well, because we hold no "
+     "visitor numbers for anywhere"),
+    ("Novelty", 5,
+     "quiet places, and countries not already in your route"),
+)
+
+
 def planner_page(data):
+    """Seven plates: the desk, the controls, the result, the engine, the
+    spending styles, the refusals, the close.
+
+    THE PAGE WAS A FORM AND THE INSTRUMENT SAID SO. `tools/opening.js` names
+    three families that open with no picture at all and this was one of them —
+    0% at 1280 and 0% at 390, on the page that is this product's own
+    instrument and the one a reader arrives on having decided to travel.
+    2,703 pixels at 1280: a 30px label, a sentence box, twelve fields,
+    seventeen checkboxes and four hundred words of method.
+
+    WHAT DID NOT CHANGE IS THE METHOD OR ITS POSITION. The weights are the
+    ones `assets/js/planner.js` implements, verified against the code rather
+    than against the page describing it, and they stay UNDER the tool: the
+    comment this function used to carry says why, and the brief that asked
+    for a two-column shell was asking for the arrangement this page already
+    removed. What changed is that six numbers are drawn instead of listed.
+
+    See `docs/plan-redesign.md` for the four collisions and the one
+    measurement.
+    """
     interests = "".join(
         f"""<label><input type="checkbox" name="interest" value="{esc(i['slug'])}">
         <span aria-hidden="true">{esc(i['icon'])}</span> {esc(i['name'])}</label>"""
@@ -4711,193 +6236,442 @@ def planner_page(data):
     # forty per cent of their own choice, cut mid-word, at every width. A
     # `<select>` clips without an ellipsis, so it does not even look like a
     # truncation — it looks like the label.
-    #
-    # The taxonomy already holds `name` and `note` as two fields, which is
-    # the right shape; the page was joining them. The option is the name and
-    # the notes go under the method, beside the button that runs it, which
-    # is where this page already puts how the planner scores. Nothing is
-    # lost — every note is still on the page, and now it can be read.
     budgets = "".join(
         f'<option value="{esc(b["slug"])}"{" selected" if b["slug"] == "moderate" else ""}>'
         f'{esc(b["name"])}</option>'
         for b in data["taxonomy"]["budgets"]
     )
-    budget_notes = "".join(
-        f'<li><strong>{esc(b["name"])}</strong> — {esc(b["note"])}</li>'
-        for b in data["taxonomy"]["budgets"]
-    )
-    body = f"""
-{crumbs([("Europe", "/discover"), ("Plan", None)])}
-{constel_defs()}
-{jsondata("europedoor-glyphview-cases",
-          [f"{len(pts)}:" + glyph_view(pts) for pts in GLYPHVIEW_CASES])}
-<div class="pagehead instrument">
-  <p class="kicker">Journey Planner</p>
-  <h1>Twelve days, €2,500, history and mountains.</h1>
-  {head_extent([(len(data['cities']), 'destinations scored'),
-                (len(data['countries']), 'countries'),
-                (len(data['journeys']), 'routes already built')])}
-  <p class="lede">Say what you have and what you like — in a sentence, or in the form below.</p>
-</div>
 
-<form class="form ask" id="askform">
-  <div class="field">
-    <label for="ask">Say it in your own words</label>
-    <textarea id="ask" name="ask" rows="2"
-      placeholder="I have 12 days and €2,500, starting in Lisbon, and I love history, mountains and food."></textarea>
-  </div>
-  <div class="askfoot">
-    <div class="hero-actions mt0">
-      <button class="btn" type="submit">Read that and build it</button>
+    # ── 01 · THE DESK ────────────────────────────────────────────────
+    #
+    # THE MONUMENTALITY COMES FROM THE DRAWING, NOT FROM THE TYPE. The brief
+    # opens on a 155-pixel headline over a map with the form below it, which
+    # is the composition a measurement here already removed: the head pushed
+    # this instrument to y=436, so half the first screen of a TOOL was a
+    # magazine headline and four or five lines of prose. An instrument's
+    # title is a label because the page IS the tool, and `checks.py`
+    # requires exactly one head role. So the head keeps `instrument` and the
+    # picture is what fills the screen: the control set into the continent.
+    #
+    # AND THE PICTURE IS THIS PAGE'S OWN, WHICH TOOK THREE TRIES TO GET
+    # RIGHT. 313 dots on a continent is what /discover already draws, and
+    # *an index opening that is a continent with a different number of dots
+    # on it is not a different opening* — 319 against 313 is the same
+    # picture. What only THIS page holds is the six destinations it REFUSES:
+    # Ukraine, Belarus and Russia are stripped from the planning index at
+    # build time, so the planner scores 313 of 319. That is the one map on
+    # this site whose subject is an editorial position rather than a set of
+    # places, it is the sentence this page already publishes — "route you
+    # into a country under a travel advisory: those are excluded from the
+    # planning index entirely" — and it is drawn rather than only written.
+    planned, refused = [], []
+    for cid, n in sorted(data["cities"].items()):
+        x, y = project(n["city"]["lat"], n["city"]["lon"])
+        (refused if n["country"].get("advisory") else planned).append(
+            (x, y, cid, n))
+    advnames = sorted({n["country"]["name"] for _x, _y, _c, n in refused})
+    # AND THE GROUND BEYOND THE ATLAS IS NOT DRAWN HERE, WHICH IS A
+    # MEASUREMENT RATHER THAN A PREFERENCE. `landmass` returns the context
+    # land first — every landmass in a box that contains Europe, clipped to
+    # that box — and it is a HERO device: *Europe is not an island*, and the
+    # graphite it is drawn on absorbs its straight edges completely. /map and
+    # /discover keep it for exactly that reason, and the same slab on the
+    # same projection is invisible there: measured on /map's own pixels, the
+    # dusk over 52°E is near-black and Iran and Iraq are gone.
+    # This band is the one light drawing that shows the whole eastern cut
+    # inside its own frame with open water beyond it, and `--atlas-far`
+    # (#C3BFB2) is DARKER than the water (#DDE8E7) rather than lighter — so
+    # the fragment came out as a warm slab with three straight edges sitting
+    # in the sea south-east of Baku, probed and named as Iran and Iraq
+    # clipped at 52°E. The wide fade hides it and takes the ground out from
+    # under Baku and Tbilisi with it, which is the fault `dusk_reach` exists
+    # to stop and is why every caller passes it. So the layer that has no
+    # claim to make here is the one that goes: this drawing's subject is 313
+    # destinations and the six it refuses, and nothing outside the atlas is
+    # part of that sentence.
+    _dctx, dland = geo.landmass(MAPPROJ, (0, 0, MAP_W, MAP_H))
+    deskmap = (
+        # A MAP DECLARES WHETHER IT IS AN ILLUSTRATION OR AN INSTRUMENT,
+        # and `checks.py` asserts it on every one. This is an
+        # `illustration`: it draws the planning population and the six it
+        # refuses, and nothing on it is a link, a filter or a legend — the
+        # instruments are /map and /discover, where a country is a door.
+        # AND THE `atlas` CLASS IS PART OF THAT DECLARATION. An
+        # illustration must carry it, because the skin is what the role
+        # MEANS on this site — warm paper and Atlantic water rather than
+        # land on a near-black ground — and `checks.py` refuses an
+        # illustration without it. Every `.atlas` rule in the stylesheet is
+        # qualified by `.minimap.arched`, so it paints nothing here and the
+        # picture's palette arrives through the band's own token binding;
+        # verified by byte-identical screenshots at 1280 and 390.
+        f'<svg class="instrmap atlas" data-role="illustration" '
+        f'viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true" '
+        # `meet` RATHER THAN `slice`, AND THE LETTERBOX IS INVISIBLE BY
+        # CONSTRUCTION. A map figure paints no background and this band's
+        # paper IS `--map-water`, so the bands `meet` leaves above and below
+        # the drawing are the drawing's own ocean. `slice` would crop the
+        # Caucasus and the Atlantic off a column narrower than the frame,
+        # which is what a full-bleed ground was doing here in three tries.
+        f'focusable="false" preserveAspectRatio="xMidYMid meet">'
+        # AND THE LAND CARRIES AN ID, BECAUSE THE RESULT'S ROUTE FIGURE
+        # CLONES IT. `constel_defs()` emits one thinned lod0 silhouette with
+        # no frontiers, which is the right picture for a 132-pixel theme
+        # glyph and a blank field for a 400-km inland route: measured on a
+        # three-stop Vienna route, the figure was 736 pixels of flat stone
+        # with a green zigzag on it and no coast, no frontier and nothing to
+        # place it by. This page already ships the country rings — the desk
+        # draws forty-eight of them — so the route figure clones THOSE and
+        # gets every frontier for the cost of a `<use>`, which is the same
+        # 27-byte trick the hero uses for its own boundaries.
+        f'<g id="deskland">{dland}</g>'
+        f'{cut_fade("desk", MAP_W, MAP_H, dusk_reach())}'
+        + "".join(f'<circle class="pdot" cx="{x:.1f}" cy="{y:.1f}" r="3.4"/>'
+                  for x, y, _c, _n in planned)
+        + "".join(f'<circle class="pdot out" cx="{x:.1f}" cy="{y:.1f}" r="3.4"/>'
+                  for x, y, _c, _n in refused)
+        + "</svg>")
+
+    desk = f"""
+  <div class="deskwrap">
+  <div class="deskform">
+    <div class="pagehead instrument">
+      <p class="kicker">The European Journey Planner</p>
+      <h1>Twelve days, &euro;2,500, history and mountains.</h1>
+      {head_extent([(len(planned), 'destinations scored'),
+                    (len(data['countries']), 'countries'),
+                    (len(data['journeys']), 'routes already built')])}
     </div>
-    <p class="small mb0">The planner reads the whole Atlas, scores every destination
-    against you, then builds a route that respects distance instead of teleporting
-    between highlights. It is read by rules in your browser — not by a model, and not
-    sent anywhere — and it shows you exactly what it understood, naming anything it
-    could not take account of rather than quietly dropping it.</p>
-  </div>
-</form>
-
-<div class="planform">
-  <div>
-    <form class="form" id="planner">
-      <div class="form-row">
-        <div class="field">
-          <label for="days">Days</label>
-          <input type="number" id="days" name="days" min="3" max="45" value="12" inputmode="numeric">
-        </div>
-        <div class="field">
-          <label for="budget">Total budget (€, per person)</label>
-          <input type="number" id="budget" name="budget" min="200" step="50" value="2500" inputmode="numeric">
-        </div>
-        <div class="field">
-          <label for="month">Travelling in</label>
-          <select id="month" name="month">{months}</select>
-        </div>
+    <form class="form ask" id="askform">
+      <div class="field">
+        <label for="ask">Say it in your own words</label>
+        <textarea id="ask" name="ask" rows="2"
+          placeholder="I have 12 days and &euro;2,500, starting in Lisbon, and I love history, mountains and food."></textarea>
       </div>
-      <div class="form-row">
-        <div class="field">
-          <label for="style">Spending style</label>
-          <select id="style" name="style">{budgets}</select>
-        </div>
-        <div class="field">
-          <label for="pace">Pace</label>
-          <select id="pace" name="pace">
-            <option value="slow">Slow — fewer places, longer stays</option>
-            <option value="balanced" selected>Balanced</option>
-            <option value="fast">Fast — see as much as possible</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="start">Start from</label>
-          <select id="start" name="start"><option value="">Anywhere that fits</option></select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="field">
-          <label for="end">End near</label>
-          <select id="end" name="end"><option value="">Wherever it gets to</option></select>
-        </div>
-        <div class="field">
-          <label for="travellers">Travellers</label>
-          <input type="number" id="travellers" name="travellers" min="1" max="12" value="1" inputmode="numeric">
-        </div>
-        <div class="field">
-          <label for="accommodation">Accommodation</label>
-          <select id="accommodation" name="accommodation">
-            <option value="mixed" selected>Mixed — whatever suits the place</option>
-            <option value="guesthouse">Guesthouses and small places</option>
-            <option value="hotel">Hotels</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="field">
-          <label for="transport">Getting between</label>
-          <select id="transport" name="transport">
-            <option value="any" selected>Whatever is quickest</option>
-            <option value="rail">Rail and ferry, no flights</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="currency">Show costs in</label>
-          <select id="currency" name="currency">{curoptions}</select>
-        </div>
-        <div class="field">
-          <p class="fieldhead">Places you saved</p>
-          <label class="inlinecheck"><input type="checkbox" id="saved" name="saved">
-          Favour the ones in My Europe</label>
-        </div>
-      </div>
-      <fieldset class="fieldset">
-        <legend>What are you travelling for?</legend>
-        <div class="checks">{interests}</div>
-      </fieldset>
       <div class="hero-actions mt0">
-        <button class="btn" type="submit">Build the itinerary</button>
-        <button class="btn ghost" type="button" id="again">Give me a different one</button>
+        <button class="btn" type="submit">Read that and build it</button>
       </div>
+      <p class="small mb0">The planner reads the whole Atlas, scores every
+      destination against you, then builds a route that respects distance
+      instead of teleporting between highlights. It is read by rules in your
+      browser &mdash; not by a model, and not sent anywhere &mdash; and it
+      shows you exactly what it understood, naming anything it could not take
+      account of rather than quietly dropping it.</p>
     </form>
-    <div id="result" aria-live="polite"></div>
   </div>
-</div>
+  <figure class="deskart">{deskmap}
+    <figcaption><span class="capwhat">Every destination the planner scores,
+    at once. The {numword(len(refused))} it will not &mdash;
+    {n_of(len(refused), "destination")} in {and_list(advnames)} &mdash;
+    are drawn dark: a country under a travel advisory is stripped from the
+    planning index at build time rather than hidden in the
+    interface.</span> <span class="capsrc">{geo.sources_line(geo.load("europe-lod0.json"))}</span></figcaption>
+  </figure>
+  </div>"""
 
-<!-- HOW IT DECIDES CAME OUT OF THE RAIL AND WENT UNDER THE TOOL.
-     Four hundred words of scoring weights in a right-hand column, level
-     with the twelve fields and seventeen checkboxes a reader is filling
-     in — two things competing for the same attention, and the form
-     squeezed into two thirds of the page to make room for an essay
-     nobody reads while they are typing. The form takes the full measure
-     now and the method sits under it, which is also where a reader asks
-     the question: they run it, they look at the answer, and THEN they
-     want to know why it chose that. Proof goes under the thing it
-     proves, which is the rule the motion pages already publish. -->
-<div class="planmethod">
-  <div class="methodcols">
-    <h2 class="mini">How it decides</h2>
-    <p>Every destination is scored out of one, on a published weighting:</p>
-    <ul>
-      <li><strong>30%</strong> how many of your interests it carries</li>
-      <li><strong>20%</strong> whether it has things to actually do that match them</li>
-      <li><strong>15%</strong> the month you named — peak, shoulder or off, never zero</li>
-      <li><strong>10%</strong> how connected it is to the rest of the Atlas</li>
-      <li><strong>20%</strong> how much of it we have actually written</li>
-      <li><strong>5%</strong> novelty: quiet places, and countries not yet in your route</li>
-    </ul>
-    <p class="small">The specification this came from allocates 10% to popularity. We have no
-    traffic and no licensed visitor data, so that term would be a number we invented wearing a
-    percentage sign. Its weight moved to content quality, which is measurable. And
-    "accessibility" there means <em>reachability</em> — we hold no step-free access data at
-    all, and <a href="/accessibility">say so</a>.</p>
-    <p>Then: distance penalises each next stop so the route stops wandering; three big cities
-    in a row start to push the fourth choice towards the alternative; nights come from the
-    range on each destination page; and anything above what your budget can afford per day is
-    damped.</p>
-    <h2 class="mini">What the spending styles mean</h2>
-    <ul>{budget_notes}</ul>
-    <h2 class="mini">What it will not do</h2>
-    <p>It will not book anything, price a real hotel, or route you into a country under a
-    travel advisory — those are excluded from the planning index entirely.</p>
-    <p class="small">Estimates are editorial, not quotes. Check <a href="/sources">sources and
-    corrections</a>. The route above is drawn from the coordinates in the Atlas
-    rather than from any road or rail geometry, on the same Lambert conformal conic
-    as every other map here — standard parallels {geo.LCC_P1:.0f}°N and
-    {geo.LCC_P2:.0f}°N, origin {geo.LCC_LAT0:.0f}°N, central meridian
-    {geo.LCC_LON0:.0f}°E. {geo.sources_line(geo.load("europe-lod0.json"))}</p>
+    # ── 02 · THE CONTROLS ────────────────────────────────────────────
+    # THE FORM TAKES THE FULL MEASURE, which is the other half of the
+    # decision that moved the method out of the rail. Twelve fields and
+    # seventeen checkboxes squeezed into two thirds of the page to make room
+    # for an essay is two things competing for one attention.
+    controls = f"""
+  <div class="sheettext">
+    <h2 class="mega">Or tell it precisely.</h2>
+    <p class="lede">The same planner, said in fields rather than in a
+    sentence. Nothing here is required: every one of them has a default the
+    Atlas can work from.</p>
   </div>
-</div>
-"""
+  <form class="form planctl" id="planner">
+    <div class="form-row">
+      <div class="field">
+        <label for="days">Days</label>
+        <input type="number" id="days" name="days" min="3" max="45" value="12" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="budget">Total budget (&euro;, per person)</label>
+        <input type="number" id="budget" name="budget" min="200" step="50" value="2500" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="month">Travelling in</label>
+        <select id="month" name="month">{months}</select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="style">Spending style</label>
+        <select id="style" name="style">{budgets}</select>
+      </div>
+      <div class="field">
+        <label for="pace">Pace</label>
+        <select id="pace" name="pace">
+          <option value="slow">Slow &mdash; fewer places, longer stays</option>
+          <option value="balanced" selected>Balanced</option>
+          <option value="fast">Fast &mdash; see as much as possible</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="start">Start from</label>
+        <select id="start" name="start"><option value="">Anywhere that fits</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="end">End near</label>
+        <select id="end" name="end"><option value="">Wherever it gets to</option></select>
+      </div>
+      <div class="field">
+        <label for="travellers">Travellers</label>
+        <input type="number" id="travellers" name="travellers" min="1" max="12" value="1" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="accommodation">Accommodation</label>
+        <select id="accommodation" name="accommodation">
+          <option value="mixed" selected>Mixed &mdash; whatever suits the place</option>
+          <option value="guesthouse">Guesthouses and small places</option>
+          <option value="hotel">Hotels</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="transport">Getting between</label>
+        <select id="transport" name="transport">
+          <option value="any" selected>Whatever is quickest</option>
+          <option value="rail">Rail and ferry, no flights</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="currency">Show costs in</label>
+        <select id="currency" name="currency">{curoptions}</select>
+      </div>
+      <div class="field">
+        <p class="fieldhead">Places you saved</p>
+        <label class="inlinecheck"><input type="checkbox" id="saved" name="saved">
+        Favour the ones in My Europe</label>
+      </div>
+    </div>
+    <fieldset class="fieldset">
+      <legend>What are you travelling for?</legend>
+      <div class="checks">{interests}</div>
+    </fieldset>
+    <div class="hero-actions mt0">
+      <button class="btn" type="submit">Build the itinerary</button>
+      <button class="btn ghost" type="button" id="again">Give me a different one</button>
+    </div>
+  </form>"""
+
+    # ── 03 · THE RESULT ──────────────────────────────────────────────
+    # PRESENT-BUT-EMPTY SAYS "WE HAVE THIS" AND THEN DOES NOT, so the plate
+    # states what will appear here rather than leaving a hole above the
+    # method. /discover's response plate had the same problem and took the
+    # same answer: at rest it says what it IS showing.
+    result = """
+  <div class="sheettext">
+    <h2 class="mega">Your Europe, assembled.</h2>
+    <p class="lede">The planner is not trying to find every highlight. It is
+    trying to make one coherent route out of what you said matters.</p>
+  </div>
+  <div id="result" aria-live="polite"></div>
+  <p class="note atrest" id="atrest">Nothing has been built yet. When you run
+  it, this is where the route appears &mdash; the stops in order, the nights on
+  each, the straight-line distance between them, what every choice was made
+  for, and an estimate you can argue with. You can move a stop, change its
+  nights, drop it or add one, and every number above recomputes from your
+  version rather than from the planner&rsquo;s.</p>"""
+
+    # ── 04 · THE ENGINE ──────────────────────────────────────────────
+    #
+    # THE WEIGHTS ARE DRAWN AND THEY ARE READ OUT OF ONE PLACE. Six numbers
+    # in a bulleted list is the "block of explanatory text" the brief
+    # objects to, and it is right: this is the page's whole claim to being
+    # an instrument rather than a recommendation, and a claim states itself
+    # better as a proportion than as a percentage sign.
+    #
+    # A CHART IS A CLAIM, so the bars are scaled by the series they are
+    # labelled with and the figures are the ones `planner.js` implements.
+    # The year band already records what happens otherwise: correct labels
+    # over a drawing scaled from the wrong array still reads as a finished
+    # chart.
+    engine = f"""
+  <div class="sheettext">
+    <h2 class="mega">A published method, not a mysterious recommendation.</h2>
+    <p class="lede">Every destination is scored out of one, on a weighting
+    this page publishes and the planner in your browser implements. Distance
+    then shapes the sequence.</p>
+  </div>
+  <dl class="weights">{"".join(
+      f'<div class="wrow"><dt>{esc(name)}</dt>'
+      f'<dd><span class="wbar w{pct}"></span><b>{pct}%</b></dd>'
+      f'<p class="wsay">{esc(say)}</p></div>'
+      for name, pct, say in PLAN_WEIGHTS)}</dl>
+  <p class="small plannote">The specification this came from allocates 10% to
+  popularity. We have no traffic and no licensed visitor data, so that term
+  would be a number we invented wearing a percentage sign. Its weight moved
+  to content quality, which is measurable. And &ldquo;accessibility&rdquo;
+  there means <em>reachability</em> &mdash; we hold no step-free access data
+  at all, and <a href="/accessibility">say so</a>.</p>
+  <p class="small plannote">Then: distance penalises each next stop so the
+  route stops wandering; three big cities in a row start to push the fourth
+  choice towards the alternative; nights come from the range on each
+  destination page; and anything above what your budget can afford per day is
+  damped.</p>"""
+
+    # ── 05 · SPENDING STYLE ──────────────────────────────────────────
+    # AND THE FIGURE IS THE MEDIAN ACROSS THE PLANNING POPULATION, with the
+    # spread beside it, because a median alone reads as a price. Derived
+    # from the same `daily` field the planner costs a night from, on the
+    # same 313 destinations the desk draws — never authored, and it moves
+    # on the next build when a destination's band is edited.
+    def _at(pos):
+        # `daily_eur` IS THE FIELD AND IT IS ON THE COUNTRY, NOT THE CITY.
+        # Two wrong readings in a row, and both raised rather than shipping
+        # a number — `daily` is the name atlas.json publishes it under, and
+        # a destination inherits its country's band, which is exactly what
+        # `planner.js` reads back out of `city.daily`. So the median is over
+        # the 313 DESTINATIONS through their countries' bands, which is the
+        # population the planner actually costs a night from.
+        v = sorted(round(c["country"]["daily_eur"][0]
+                         + (c["country"]["daily_eur"][1]
+                            - c["country"]["daily_eur"][0]) * pos)
+                   for c in data["cities"].values()
+                   if not c["country"].get("advisory")
+                   and c["country"].get("daily_eur"))
+        return v[len(v) // 2], v[0], v[-1]
+
+    stylerows = "".join(
+        '<div class="styleway"><p class="kicker">'
+        + ("%02d / " % i) + esc(b["name"]).upper() + "</p>"
+        + "<h3>" + esc(b["name"]) + "</h3>"
+        + '<p class="styleat"><b>&euro;' + str(_at(PLAN_STYLE_POS[b["slug"]])[0])
+        + "</b> a day, typically</p>"
+        + '<p class="stylesay">' + esc(b["note"]) + "</p>"
+        + '<p class="stylerange">'
+        + ("the bottom of each place\u2019s own recorded band"
+           if PLAN_STYLE_POS[b["slug"]] == 0.0
+           else "the top of it" if PLAN_STYLE_POS[b["slug"]] == 1.0
+           else "the middle of it")
+        + " &mdash; &euro;" + str(_at(PLAN_STYLE_POS[b["slug"]])[1])
+        + " to &euro;" + str(_at(PLAN_STYLE_POS[b["slug"]])[2])
+        + " across the " + str(len(planned)) + "</p></div>"
+        for i, b in enumerate(data["taxonomy"]["budgets"], 1))
+    styles = f"""
+  <div class="sheettext">
+    <h2 class="mega">Choose your way of travelling.</h2>
+    <p class="lede">Three editorial planning assumptions, from the
+    Atlas&rsquo;s own taxonomy. A style is a <em>position</em> in the daily
+    band this atlas already records for each place &mdash; which is why the figures
+    below are medians with their spread beside them rather than prices. They
+    are not hotel quotes and nothing here books anything.</p>
+  </div>
+  <div class="styles">{stylerows}</div>"""
+
+    # ── 06 · WHAT IT WILL NOT DO ─────────────────────────────────────
+    # THE REFUSALS ARE THIS PAGE'S INSTITUTIONAL VOICE AND THEY ARE KEPT
+    # VERBATIM. The brief agrees with every one of them, which is worth
+    # noting: it asked for no fake booking functionality and this page has
+    # published the sentence since before the brief arrived.
+    # AND A BAND WHOSE SUBJECT IS A LIST OF REFUSALS HAD ONE SENTENCE IN
+    # IT. 787 pixels for a headline, a lede and a note in the left half —
+    # the hole this page had on four bands — on the band that carries the
+    # product's whole position. Six refusals, and **not one is written here
+    # for the first place**: each is already published on this site and the
+    # row says where, so the band is a contents page for a promise rather
+    # than a new claim. A refusal nobody can check is a slogan.
+    refusals = [
+        ("It will not book anything",
+         "There is no basket, no payment and no availability anywhere in this "
+         "product. The page that says what EuropeDoor is publishes the "
+         "sentence \u201cNot an OTA\u201d and means it.", "/about"),
+        ("It will not price a hotel",
+         "This atlas holds no rooms, no rates and no availability. Where a "
+         "destination page hands you to a provider it is a referral and says "
+         "so, in both of its two states.", "/for-businesses"),
+        ("It will not route you into an advisory country",
+         "Ukraine, Russia and Belarus keep a page carrying the warning and "
+         "are stripped from the planning index at build time rather than "
+         "hidden in the interface.", "/help"),
+        ("It will not tell you the weather",
+         "No weather data and no forecast for anywhere. A \u201crainy day "
+         "plan\u201d built from nothing would be a guess with a confident "
+         "face on it.", None),
+        ("It will not promise step-free access",
+         "The connectivity term in the weighting above means "
+         "<em>reachability</em>. We hold no step-free access data at all.",
+         "/accessibility"),
+        ("It will not give you a road distance",
+         "Every distance here is a straight line between two coordinates. "
+         "There is no road and no rail geometry in this repository, so the "
+         "time is \u201cabout\u201d and the error runs in both directions.",
+         "/method"),
+    ]
+    refrows = "".join(
+        '<div class="rrow"><dt>' + esc(name) + "</dt><dd>" + why
+        + ("" if not href
+           else ' <a href="' + href + '">Where we say so</a>')
+        + "</dd></div>"
+        for name, why, href in refusals)
+    wont = f"""
+  <div class="sheettext">
+    <h2 class="mega">What it will not do.</h2>
+    <p class="lede">Six of them, and every one is a sourcing position rather
+    than a feature nobody has built yet. Each says where this site publishes
+    it, because a refusal nobody can check is a slogan.</p>
+  </div>
+  <dl class="refusals">{refrows}</dl>
+  <p class="note plannote">Estimates are editorial, not quotes. Check <a href="/sources">sources
+  and corrections</a>. The route is drawn from the coordinates in the Atlas
+  rather than from any road or rail geometry, on the same Lambert conformal
+  conic as every other map here &mdash; standard parallels {geo.LCC_P1:.0f}°N
+  and {geo.LCC_P2:.0f}°N, origin {geo.LCC_LAT0:.0f}°N, central
+  meridian {geo.LCC_LON0:.0f}°E.</p>"""
+
+    # ── 07 · COMPOSE THE JOURNEY ─────────────────────────────────────
+    # A CLASS NAME ALREADY IN THE STYLESHEET IS A RULE YOU INHERIT
+    # SILENTLY, AND THE SECOND NAME WAS TAKEN TOO.
+    # The first version of this band borrowed `.sendsay`, which is
+    # /journeys' own closing composition — a centred statement over a
+    # PHOTOGRAPH behind a 72% graphite scrim — and its rule is
+    # `.sendsay .mega, .sendsay .lede { color: var(--bone) }`. On a white
+    # wall that is bone on white, about 1.1:1: the last thing this page says
+    # was present, placed, centred and unreadable. This repository recorded
+    # exactly that about `.doorgo` two commits ago and it happened again
+    # here. The band owns its own name and declares no colour at all, so the
+    # room's ink is whatever the room binds. And `.closesay` — the obvious
+    # second choice — is ALSO already declared, by the closing band on the
+    # homepage and /discover, at `max-width: 32rem`: the statement came out
+    # 512 pixels wide inside a 1,152-pixel band, centred inside its own cap
+    # and therefore off-centre in the room. Two collisions in one band, from
+    # the two most obvious names, with nothing in any suite that could see
+    # either. Grep the stylesheet before naming a composition.
+    close = f"""
+  <div class="composesay">
+    <h2 class="mega">Do not just choose places.<br>Compose the journey.</h2>
+    <p class="lede">Start with what you have. Say what you like. The Atlas
+    draws the line between them.</p>
+    <p class="keepgo">{golink('#askform', 'Back to the desk')}
+    {golink('/journeys', 'Or take one already built')}</p>
+  </div>"""
+
+    PLATES = [("desk paper", "The desk", desk, "the-desk"),
+              ("planctls gal", "The controls", controls, "the-controls"),
+              ("planres gal quiet", "The result", result, "the-result"),
+              ("engine pine", "The engine", engine, "the-engine"),
+              ("styles gal", "Spending style", styles, "spending-style"),
+              ("wont gal quiet", "What it will not do", wont, "what-it-wont-do"),
+              ("close gal", "Compose the journey", close, "compose")]
+    body = (crumbs([("Europe", "/discover"), ("Plan", None)])
+            + constel_defs()
+            + jsondata("europedoor-glyphview-cases",
+                       [f"{len(pts)}:" + glyph_view(pts) for pts in GLYPHVIEW_CASES])
+            + plate_sequence(PLATES))
+
     return "/plan/index.html", page(
-        "Plan a journey", body, path="/plan", area="plan",
+        "Plan a journey", body, path="/plan", area="plan", hero=True,
         description="Tell EuropeDoor your days, budget and interests and it builds a European itinerary with real distances, real night counts and a cost estimate.",
         scripts=["/assets/js/planner.js"],
         # INTELLIGENCE — the planner: journey construction
         world="intelligence"
     )
 
-
-# Named on every destination page, and honestly empty. A scraped hotel list
-# would take an afternoon and would be the first unverified thing on the site.
 def stay_section(data, c, r, t, cid):
     """Where to stay, as an EuropeDoor answer rather than an OTA one.
 
@@ -5263,6 +7037,172 @@ def countrymap(data, c):
         f'<a href="/map?c={esc(c["slug"])}">Open {esc(c["name"])} on the full map →</a>'
         f'</span></figcaption></figure>'
     )
+
+
+# The fewest vertices an outline needs to be a country's SHAPE rather than a
+# stand-in for a point. Twenty reproduces the six countries this atlas
+# already draws as a ringed point and admits the seventh, Luxembourg.
+COUNTRY_DOOR_POINTS = 20
+
+# HOW MUCH INLINED GEOMETRY THE PHOTOGRAPHIC BAND MAY SPEND, and this is the
+# one number on this page that is art direction rather than a derivation —
+# recorded as such, the way `DUSK_CEILING` is. All 41 drawable doors are
+# 636 KB together and Russia's outline alone is 107, so the band cannot be
+# "all of them" and a COUNT picked by eye would be taste dressed as a rule.
+# The budget is the quantity that actually binds: `weight.max_page_kb` is a
+# ceiling somebody has to raise in a diff, and the reader also pays for one
+# photograph request per door at the ladder's 480 step. So the band takes
+# doors in the derived order until the budget is spent and the page states
+# how many that turned out to be — which means the set grows on its own when
+# the geometry gets cheaper rather than when somebody edits a number.
+DOOR_BAND_KB = 90
+
+
+def country_door(data, images, c, w=900, h=560, brief=True):
+    """A country with its own photograph inside its own frontier.
+
+    THE BRIEF'S STRONGEST IDEA, AND THE MECHANISM WAS ALREADY BUILT. The
+    /countries directive asks that *"the actual country polygon on the
+    EPSG:3034 map should become the visual focus. The photograph can then
+    transition inside France's geographic boundary … so the country itself
+    becomes the aperture. This also connects beautifully with the EuropeDoor
+    name."* `heroeurope()` has drawn exactly that on the homepage since the
+    Living Atlas: a `<clipPath>` from the country's own drawn path and an
+    SVG `<image>` clipped to it. The same directive says not to invent an
+    image system, and this is what that instruction is FOR — the aperture
+    here is the clip, not a second one.
+
+    SO THE DOOR IS THE FRONTIER, AND THERE IS NO ARCH ON IT. Every other
+    map on this site is seen through the elliptical aperture, and
+    `docs/signature-moments.md` asks question 2 before a family gets one:
+    this drawing's signature moment IS an aperture — the country's own
+    outline, with a photograph of the country through it. Cutting an ellipse
+    over that would be two doors on one picture, which is the wallpaper the
+    aperture's own rule warns about.
+
+    AND THE FRAME IS THE COUNTRY'S OWN, WHICH IS THE DEPARTURE FROM THE
+    HOMEPAGE. That page draws its apertures on one continental frame and its
+    own recorded measurement says why only six of them are legible there: *a
+    photograph clipped into Belgium renders about 40 pixels wide at 1280 and
+    is a smudge with a coastline.* At roughly a pixel per unit Luxembourg is
+    eight. That is a property of the FRAME rather than of the idea — framed
+    on its own extent, as the fifty country portraits and the nine macro
+    glyphs already are, Luxembourg fills its tile exactly as Türkiye fills
+    its own. Same geometry as `countrymap()` uses, for the same reason it
+    gives: a second simplification would differ by a tenth of a unit and
+    show as a fringe along every frontier.
+
+    Returns "" for a country with no polygon and for one with no photograph,
+    because a door has to have both — Monaco and Vatican City have no
+    outline at any scale in this dataset and cannot be drawn as one.
+    """
+    key = "country:" + c["slug"]
+    if key not in (images or {}):
+        return ""
+    # AND AN ADVISORY COUNTRY IS NOT LIT, which is `living_atlas`'s own
+    # filter and the planner's. Ukraine, Russia and Belarus keep a page
+    # carrying the warning; a photographic celebration of one on the atlas
+    # index would be the opposite of that position, stated by the same site.
+    if (c.get("advisory") or {}).get("level"):
+        return ""
+    doc = geo.country(c["slug"])
+    if not doc or not doc.get("bbox"):
+        return ""
+    bbox = geo.principal_frame(doc, c["slug"])[0] or list(doc["bbox"])
+    proj = geo.Projection(bbox, w, h, pad=0.05)
+    ctx, land = geo.landmass(proj, (0, 0, w, h), doc=doc, highlight=c["slug"])
+    here = re.findall(r'<path[^>]*class="[^"]*\bhere\b[^"]*"[^>]*\sd="([^"]*)"',
+                      land)
+    if not here:
+        return ""
+    d = here[0]
+    nums = [float(v) for v in re.findall(r"-?\d+(?:\.\d+)?", d)]
+    xs, ys = nums[0::2], nums[1::2]
+    # AND A COUNTRY THE ATLAS DRAWS AS A POINT CANNOT BE A DOOR. The first
+    # version drew whatever outline came back, which for Monaco is FOUR
+    # points filling 659 x 480 units — a quadrilateral with a photograph in
+    # it, labelled Monaco. That is *a bounding box is not a country*
+    # arriving through the geometry rather than through a label.
+    #
+    # THE FLOOR IS MEASURED ON THE OUTLINE THIS DRAWING ACTUALLY USES, and
+    # the first attempt borrowed a test that does not apply here: asking
+    # `geo.landmass` for the country at `min_units=60` on the CONTINENTAL
+    # frame is how `constel_defs` and `region_glyph` decide what to draw,
+    # and it dropped Luxembourg — which is 5.6 units wide there and full
+    # size here, because this frame is the country's own. *A rule measured
+    # only where it loses looks like a rule that wins nowhere.*
+    #
+    # Measured at this frame, the vertex counts are 4, 7, 7, 12, 13, then
+    # 21, 33, 51 — so a floor of twenty reproduces exactly the six
+    # countries this repository already records as *having no polygon at
+    # 1:50m and drawn as a ringed point*, and admits Luxembourg, whose
+    # 21-point outline is its real shape rather than a stand-in. Two
+    # independent derivations agreeing on the same six is the evidence for
+    # the number; one of them alone would be a threshold picked to get an
+    # answer.
+    if len(xs) < COUNTRY_DOOR_POINTS or not ys:
+        return ""
+    # THE IMAGE EXTENT IS THE SUBJECT'S WHOLE BOX and `slice` crops the
+    # source into it, exactly as `object-fit: cover` does everywhere else
+    # and exactly as the Living Atlas does — anything the rectangle misses
+    # is a piece of the country drawn in stone beside a piece drawn in
+    # photograph.
+    bx, by = min(xs), min(ys)
+    bw, bh = max(xs) - bx, max(ys) - by
+    # The step is the drawn width of the subject rather than one number for
+    # every country, which is the Living Atlas's own reasoning: this is a
+    # 900-unit frame in a column about 1,150 wide, so the subject is close
+    # to its own unit count in CSS pixels and wants twice that for a retina
+    # screen.
+    href = photo_href(images, key, max(bw, bh) * 2.0)
+    if not href:
+        return ""
+    row = (images or {}).get(key) or {}
+    ident = "cd" + re.sub(r"[^a-z0-9]", "", c["slug"])[:16]
+    return (
+        f'<figure class="countrydoor">'
+        f'<svg class="instrmap atlas" data-role="illustration"'
+        f' viewBox="0 0 {w} {h}" role="img"'
+        f' aria-label="{esc(c["name"])} drawn on its own frontier, filled with a '
+        f'photograph of it">'
+        f'<defs><clipPath id="{ident}" clipPathUnits="userSpaceOnUse">'
+        f'<path d="{d}"/></clipPath></defs>'
+        f'<rect class="lyr lyr-ocean" x="0" y="0" width="{w}" height="{h}"/>'
+        f'<g class="lyr lyr-land">{ctx}{land}</g>'
+        f'<image class="cdshot" clip-path="url(#{ident})"'
+        f' x="{bx:.1f}" y="{by:.1f}" width="{bw:.1f}" height="{bh:.1f}"'
+        f' preserveAspectRatio="xMidYMid slice" href="{esc(href)}"'
+        f' aria-hidden="true"/>'
+        # THE FRONTIER GOES OVER THE PHOTOGRAPH, which is what stops it
+        # being a picture pasted on a map and makes it the country FILLED —
+        # the Living Atlas's own sentence, and the reason the line is drawn
+        # from the identical path the clip uses rather than from a copy.
+        f'<path class="cdedge" d="{d}" aria-hidden="true"/>'
+        f'</svg>'
+        # NEVER EXPLAIN THE CONSTRAINT BACK. The first version gave every
+        # tile the same two sentences — *"<Country>, filled with a photograph
+        # of it and bounded by its own frontier, the outline is the
+        # aperture"* and *"Coastline and borders from Natural Earth"* — so a
+        # band of ten said one thing ten times and the only word that
+        # differed was the country's name. That is this site's own rule
+        # broken by a band of this site's own making: a reason shared by
+        # every result is hoisted once above the set and each row carries
+        # what separates it. The LEAD door keeps the sentence, because there
+        # it is the explanation rather than a repetition of one.
+        #
+        # AND THE ALT TEXT IS NOT A CAPTION. It was being printed under the
+        # picture as prose — *"Aerial view of a mountainous coastal landscape
+        # with lush greenery and scattered houses"* — which is written for a
+        # reader who cannot see the photograph and says the same thing twice
+        # to everybody who can.
+        + (f'<figcaption><span class="capsay">{esc(c["name"])}, filled with a '
+           f'photograph of it and bounded by its own frontier — the '
+           f'outline is the aperture.</span><span class="capsrc">'
+           f'Coastline and borders from <a href="/sources">Natural Earth</a>, '
+           f'public domain.</span></figcaption>' if brief else
+           f'<figcaption><span class="capsay">{esc(c["name"])}</span>'
+           f'</figcaption>')
+        + '</figure>')
 
 
 def first_sentence(text):
@@ -6824,12 +8764,47 @@ def place_page(data, c, r, t, pl):
     # is the orientation they lack. The caption says exactly that, because a
     # map captioned "Bryggen" that is actually a map of Bergen would be the
     # kind of small lie this repository refuses everywhere else.
-    has_photo = bool((data.get("images") or {}).get(f"place:{cid}/{pl['slug']}"))
+    # AND THE DRAWING WAS DISCARDED THE DAY A PHOTOGRAPH ARRIVED, WHICH THE
+    # PARAGRAPH TWENTY LINES DOWN FORBIDS IN AS MANY WORDS: *THE OPENING
+    # KEEPS THE MAP … the strip is where the photographs go.* This was
+    # `photograph if has_photo else minimap(...)` — an either/or that threw
+    # the map away — and it was invisible while no `place:` purpose was
+    # filled. Two photograph batches merged and **forty place pages lost
+    # their geography entirely**: no minimap, no arch, no relief, and with
+    # them the caption that says *there is no honest map of a building but
+    # there is an honest map of where the building is*, which is exactly the
+    # orientation a reader who arrived from a search lacks.
+    #
+    # `head_figure`/`moved_drawing` is the site's own answer and its
+    # docstring states it: *the drawing is never lost — the caller emits it
+    # below with `moved_drawing()` when a photograph took its place.* The
+    # country page honours it, the theme page honours it, the themes index
+    # never called it (fixed one commit ago) and **this family is the
+    # fourth caller and had its own if/else instead**. A photograph of the
+    # building is better in the opening than a map of the town around it, so
+    # the photograph stays where `place-hero` declares it and the drawing
+    # moves to a band with its caption.
+    #
+    # The container stays `.card-art frame`, which is what
+    # `data/image-purposes.json` declares and what `c_photo_safe_area`
+    # measures — the crop box does not move, only what is under it.
+    pkey = f"place:{cid}/{pl['slug']}"
+    has_photo = bool((data.get("images") or {}).get(pkey))
+    placemap = minimap(data, t, span="auto", about=pl["name"])
     placeart = (f'<div class="card-art frame">'
-                + picture(data["images"], f"place:{cid}/{pl['slug']}", w=1260, h=540,
+                + picture(data["images"], pkey, w=1260, h=540,
                           alt=f"{pl['name']}, {t['name']}", eager=True,
                           sizes="(min-width: 76rem) 76rem, 100vw")
-                + '</div>') if has_photo else minimap(data, t, span="auto", about=pl["name"])
+                + '</div>') if has_photo else placemap
+    placewhere = moved_drawing(
+        data, pkey, placemap if has_photo else "",
+        f"There is no honest map of a building at this atlas's scale — the "
+        f"projection's finest unit is about four kilometres — and there is an "
+        # NO `esc()` HERE: `section()` escapes its own title and lede, and
+        # the first version double-escaped four place names into '&amp;amp;'.
+        # `checks.py` caught it in the run that introduced it.
+        f"honest map of where {pl['name']} is. The photograph above is the "
+        f"place; this is {t['name']} around it.")
 
     # THE THINNEST PAGE ON THE CONTACT SHEET, AND THIS IS THE FAMILY WITH
     # THE MOST DECLARED SURFACES BEHIND IT. 255 `place:` purposes exist and
@@ -6894,6 +8869,7 @@ def place_page(data, c, r, t, pl):
   <p class="orient">Give it {esc(pl['duration'])} · {esc(SEASON_NAMES[pl['season']])} ·
   <span class="mono">{pl["lat"]:.3f}°N, {pl["lon"]:.3f}°E</span></p>
 </div>
+{placewhere}
 
 <section class="practical" aria-label="Practical">
   <div>
@@ -7085,16 +9061,77 @@ def category_page(data, cat, sub=None):
     # Mikulov, Copenhagen, Bordeaux — the order becomes legible, and the
     # first thing a reader gets is the discriminator they are actually
     # scanning for on a page that spans twenty-six countries.
-    rows = "".join(
-        f"""<li class="invite"><a href="{urls.city(it['country'], it['region'], it['city'])}">
+    # AND THE SAME GUARD WAS APPLIED TO ONE OF TWO FIELDS. The paragraph
+    # above says the kind is printed only where it distinguishes, and the
+    # BAND was printed unconditionally beside it — so /experiences/luxury
+    # said "high" on all five of its invitations and /experiences/food said
+    # "low" thirty times and "moderate" eighteen, with no "high" anywhere.
+    # That is *never explain the constraint back*, in the field next to the
+    # one it was written for.
+    #
+    # AND IT WAS PRINTING THE RAW SLUG. `data/taxonomy.json` gives each
+    # budget band a NAME and a note — Frugal, Comfortable, Generous, each
+    # with a sentence — and both invite call sites printed `low`,
+    # `moderate`, `high`. An enum value is an identifier for a program;
+    # every other surface on this site that shows a budget shows the name.
+    bandname = {b["slug"]: b["name"] for b in data["taxonomy"]["budgets"]}
+    bandnote = {b["slug"]: b["note"] for b in data["taxonomy"]["budgets"]}
+
+    def _invites(part, withband):
+        ilvl = "h3" if bgrouped else "h2"
+        return "".join(
+            f"""<li class="invite"><a href="{urls.city(it['country'], it['region'], it['city'])}">
         <p class="invite-where">{esc(it['city']['name'])}, {esc(it['country']['name'])}"""
-        + (f" · {esc(kindname.get(it['exp']['kind'], it['exp']['kind']))}"
-           if len(kindsin) > 1 else "")
-        + f""" · {esc(it['exp']['band'])}</p>
-        <h2>{esc(it['exp']['name'])}</h2>
+            + (f" · {esc(kindname.get(it['exp']['kind'], it['exp']['kind']))}"
+               if len(kindsin) > 1 else "")
+            + (f" · {esc(bandname.get(it['exp']['band'], it['exp']['band']))}"
+               if withband else "")
+            + f"""</p>
+        <{ilvl}>{esc(it['exp']['name'])}</{ilvl}>
         <p class="invite-sum">{esc(it['exp']['summary'])}</p></a></li>"""
-        for it in chosen
-    )
+            for it in part)
+
+    # THE LIST HAD NO STRUCTURE AND `tools/monotony.js` SAID SO: 48
+    # `.invite` siblings, 4,065 pixels of a 7,142-pixel page, **with no
+    # second component at all** — the report's own diagnostic for a page
+    # that is a list and nothing else, and the worst figure left on the site
+    # once /countries and the motion pages came down.
+    #
+    # WHAT AN INVITATION COSTS IS THE ONE EXCLUSIVE AXIS THESE RECORDS
+    # CARRY. The sub-categories cannot group this list and that refusal is
+    # already recorded: six of Food's 48 are in no sub-category and eight
+    # are in two, so the grouping would need a bucket the page has no name
+    # for and would print some invitations twice. A band is one per record,
+    # it is a real decision a reader makes, and the distribution is itself
+    # the finding — **nothing in Food & drink or in Culture is generous at
+    # all**, 0 of 48 and 0 of 52, where Luxury is 5 of 5.
+    #
+    # And the group's hoisted line is the taxonomy's own note rather than a
+    # sentence written here, so a page cannot describe a band differently
+    # from the planner that spends it.
+    bandsin = {}
+    for it in chosen:
+        bandsin.setdefault(it["exp"]["band"], []).append(it)
+    order = [b["slug"] for b in data["taxonomy"]["budgets"]]
+    bgrouped = len(bandsin) > 1 and all(
+        len(v) >= GROUP_MIN for v in bandsin.values())
+    if bgrouped:
+        # FRUGAL FIRST, WHICH IS THE TAXONOMY'S OWN ORDER rather than
+        # largest first. A motion's groups are unordered clauses and take
+        # the largest; a budget band is a SCALE, and printing Comfortable
+        # above Frugal because there are more of them would be sorting an
+        # ordered axis by population.
+        rows = "".join(
+            f'<section class="invband">'
+            f'<h2 class="mini">{n_of(len(bandsin[b]), "experience")}</h2>'
+            f'<p class="whyall"><span>{esc(bandname[b])}</span> '
+            f'{esc(bandnote[b])}</p>'
+            f'<ol class="invites">{_invites(bandsin[b], False)}</ol>'
+            f'</section>'
+            for b in order if b in bandsin)
+    else:
+        rows = (f'<ol class="invites">{_invites(chosen, len(bandsin) > 1)}</ol>'
+                if chosen else "")
     subcards = ""
     if not sub and cat.get("subs"):
         counts = {sb["slug"]: len(C.select(items, cat, sb)) for sb in cat["subs"]}
@@ -7281,12 +9318,12 @@ def category_page(data, cat, sub=None):
      over. THE QUERY IS THE PROOF, AND PROOF GOES UNDER THE THING IT
      PROVES: the rule now sits below the list, beside the sub-category
      rulenote, which was already there and is the same kind of sentence. -->
-<ol class="invites">{rows or empty_state(
+{rows or empty_state(
       "Nothing matches this rule yet.",
       "The rule is printed below and is the same one every other list on "
       "this site is built from. An empty list is better than a padded one, "
       "and widening the rule until something fell in would make every other "
-      "list on the site mean less.")}</ol>
+      "list on the site mean less.")}
 {f'<p class="listrule">How this list is built: {esc(C.rule_text(cat))}</p>' if not sub else ""}
 {rulenote}
 """
@@ -7361,178 +9398,479 @@ def sample_names(items, n=3):
 
 
 def experiences_index(data):
+    """THE EUROPEAN EXPERIENCE ATLAS — photography first, and the subject is
+    what says so.
+
+    Three pages, three instruments, one institution. /discover asks what you
+    are looking for and answers with an instrument; /countries asks where it
+    is and answers with geography; this one asks what you want to DO, and the
+    only honest answer to that is a picture. `docs/experiences-redesign.md`
+    is the audit behind it — what the page held, what the register holds, and
+    which of the brief's twelve bands are refused and why.
+
+    IT WAS FORTY-TWO ROWS OF ONE COMPONENT. A photograph, a strip of eight
+    categories, and then 24 experiences, 8 category bars and 10 kind bars —
+    every one of them a `.row`. Nothing in it was wrong: the bars are a real
+    comparison (Family holds 131 entries and Luxury holds 5) and putting the
+    experiences before the taxonomy was itself a repair. The fault is the
+    sum. A page about what a place FEELS like was made entirely of type,
+    which is the data's shape as the layout — the finding that rebuilt
+    /journeys, /europe-in, /themes and the stories index, arriving last on
+    the family that could least afford it.
+
+    AND THE LIBRARY IS NOT THE CONSTRAINT HERE, WHICH IS WORTH SAYING ONCE.
+    The standing answer to "why does a travel site have so few pictures" is
+    the register, and on this page it does not apply: all eight categories,
+    all nine macro regions and the hero are held, and every one of the ten
+    kinds happens in a destination this atlas holds a photograph of. Nothing
+    is acquired for this page. The pictures were already bought and were
+    being spent on one strip.
+    """
     from .data import all_experiences
+    from . import categories as C
+    images = data.get("images") or {}
     kinds = data["taxonomy"]["experience_kinds"]
     items = all_experiences(data["countries"])
+    macros = data["taxonomy"]["macros"]
+    macname = {m["slug"]: m["name"] for m in macros}
+    idx = {(e["country"]["slug"], e["city"]["slug"]): cid
+           for cid, e in data["cities"].items()}
+
     counts = {}
     for it in items:
         counts[it["exp"]["kind"]] = counts.get(it["exp"]["kind"], 0) + 1
-    from . import categories as C
+    catn = {c["slug"]: len(C.select(items, c)) for c in data["categories"]}
+    bycat = sorted(data["categories"], key=lambda c: -catn[c["slug"]])
 
-    def taste(sel):
-        names = sample_names(sel)
-        return ('<p class="taste">' + "".join(
-            f"<span>{esc(x)}</span>" for x in names) + "</p>") if names else ""
+    def cid_of(it):
+        return idx.get((it["country"]["slug"], it["city"]["slug"]))
 
-    # EIGHTEEN IDENTICAL BORDERED BOXES, TWICE. Border, fill, radius and
-    # shadow each say "separate object", and spending all four on every tile
-    # of an eighteen-tile page spends them on nothing: the grid read as one
-    # texture, and what actually separates these rows — that Family holds 131
-    # entries and Luxury holds 5 — was four characters of kicker type.
+    def credit(keys):
+        """One credit line per band, paid once — the homepage's own rule.
+
+        The licence asks for the photographer and the provider; it does not
+        ask for a caption under every frame, and eight of them down one band
+        is the provenance layer becoming the visual identity. Never on the
+        opening: that surface is the composition and the register is where
+        the record lives.
+        """
+        out, seen = [], set()
+        for k in keys:
+            row = images.get(k)
+            if not row or row["photographer"] in seen:
+                continue
+            seen.add(row["photographer"])
+            out.append(f'<a href="{esc(row["source"])}" rel="noopener" '
+                       f'target="_blank">{esc(row["photographer"])}</a>')
+        return ('<p class="sheetcred rowcred">Photographs by '
+                + ", ".join(out) + " on Pexels.</p>") if out else ""
+
+    # ── 01 · THE INVITATION ──────────────────────────────────────────
+    # THE PHOTOGRAPH BREAKS THE COLUMN, which is the one move that makes
+    # this page's opening not the twenty-two others'. Every index here
+    # opens on a picture INSIDE the measure; this one runs past the right
+    # gutter and is cut on the diagonal, so the first thing a reader meets
+    # is a frame the page could not contain.
+    _hero = photo(images, "experiences-hero", w=2000, h=1400, eager=True,
+                  sizes="(min-width: 52rem) 58vw, 100vw")
+    invite = f"""
+  <div class="sheettext">
+    <h1 class="mega">What do you<br>want to <em class="lit">experience?</em></h1>
+    <p class="lede">Europe is not one journey. It is {len(items)} ways to be
+    there — to walk, taste, watch, row, pray, listen and go and look at
+    something. Every one of them is a real, named thing in a real place, run
+    by somebody this atlas names.</p>
+    {golink('#the-field', 'Choose a way to be there')}
+  </div>
+  <figure class="xshot">{_hero}</figure>"""
+
+    # ── 02 · THE FIELD ───────────────────────────────────────────────
+    # THE TYPE IS THE NAVIGATION AND THE SLIVER IS THE ARGUMENT.
     #
-    # The count is the subject, so the count is drawn. A bar is scaled to the
-    # LARGEST IN ITS OWN GROUP rather than to the total, and that is a
-    # measured decision rather than a convenience: an experience carries ONE
-    # kind and ANY NUMBER of categories, so the ten kinds sum to 197 and the
-    # eight categories sum to 493 memberships over the same 197 experiences.
-    # A bar labelled as a share of the whole would read 250% down the
-    # category column. Both figures are derived here and the note under them
-    # says which is which.
-    def barrow(href, n, biggest, name, blurb, sel):
-        pct = 0 if not biggest else round(100.0 * n / biggest, 1)
-        return (f'<a class="row barrow" href="{href}">'
-                f'<div><h3>{esc(name)}</h3>'
-                + (f'<p class="rowsub">{esc(blurb)}</p>' if blurb else "")
-                + taste(sel)
-                + f'</div><div class="barside">'
-                f'<p class="rowmeta">{n} listed</p>'
-                # THE BAR IS `hopbar` AND THE WIDTHS ARE THE .w0-.w100 SCALE,
-                # because both already exist: a journey's legs and the score
-                # bars draw proportions exactly this way, and this is the
-                # third of them rather than the first. No new primitive until
-                # repeated structure has actually emerged — it has.
-                + f'<span class="hopbar" aria-hidden="true">'
-                  f'<span class="w{int(round(pct))}"></span></span>'
-                + '</div></a>')
-
-    # THE EIGHT CATEGORIES ARE THE ONLY THING ON THIS PAGE WITH A PURPOSE
-    # DECLARED FOR IT, and the index that introduces them showed none of
-    # them. Eight `category:` surfaces exist in the registry and are reached
-    # by the eight category pages; the index reached none, so the page a
-    # reader meets the family on was eighteen bars and twenty-four lines of
-    # prose. Largest first, which is the order the bars below are in — the
-    # strip and the rows must not argue about which category is which.
-    _xstrip = ed_strip(data.get("images"), [
-        {"key": f"category:{cat['slug']}", "alt": cat["name"],
-         "label": cat["name"], "href": urls.category(cat["slug"])}
-        for cat in sorted(data["categories"],
-                          key=lambda c: -len(C.select(items, c)))], limit=8)
-    # THE "HOW THIS LIST IS CUT" LINK NAMED THE SECOND OF THE TWO BANDS THAT
-    # ANSWER IT, AND NEITHER CARRIED THE ID. The question is answered by the
-    # categories AND the kinds — what an experience is about and what you
-    # physically do — and the categories come first, so that is where a reader
-    # following the link should land. The id is named for the question rather
-    # than for one of its two answers, and the anchor is emitted by the same
-    # call that draws the band, so the two cannot drift.
-    catn = {cat["slug"]: len(C.select(items, cat)) for cat in data["categories"]}
-    catbig = max(catn.values()) if catn else 0
-    catcards = [
-        barrow(urls.category(cat["slug"]), catn[cat["slug"]], catbig,
-               cat["name"], cat["blurb"], C.select(items, cat))
-        for cat in sorted(data["categories"], key=lambda c: -catn[c["slug"]])
-    ]
-    # NO BLURB, BECAUSE IT WAS THE SAME SENTENCE TEN TIMES. Every kind tile
-    # carried "Grouped by what you actually do rather than by what it is
-    # about", which is a fact about the axis and not about the kind — the
-    # boilerplate this atlas's own rule forbids, hoisted into the section
-    # lede where one copy of it belongs. `blurb=None` is the pattern the
-    # homepage's eight ways-in tiles already use.
-    kindbig = max(counts.values()) if counts else 0
-    cards = [
-        barrow(urls.experience_kind(k), counts.get(k, 0), kindbig, name, None,
-               [it for it in items if it["exp"]["kind"] == k])
-        for k, name in sorted(kinds.items(), key=lambda kv: -counts.get(kv[0], 0))
-    ]
-    rows = "".join(
-        f"""<a class="row" href="{urls.city(it['country'], it['region'], it['city'])}">
-        <div><h3>{esc(it['exp']['name'])}</h3>
-        <p class="rowsub">{esc(it['exp']['summary'])}</p></div>
-        <p class="rowmeta">{esc(it['city']['name'])} · {esc(it['country']['name'])}</p></a>"""
-        for it in items[:24]
-    )
-    # NO DRAWING ON THIS OPENING, AND THE REASON IS THE BRIEF'S OWN.
+    # The brief asks for an index of enormous editorial words rather than a
+    # card grid, and names a vocabulary — WILD, SLOW, CULTURAL — that this
+    # atlas does not hold. It holds ten KINDS, which are what somebody
+    # physically does, and they are EXCLUSIVE: every experience has exactly
+    # one and the ten sum to all 197, so every number on this band is a
+    # count of the whole rather than a share of an overlap.
     #
-    # It opened on 197 dots at the full extent, which says "a lot of them"
-    # and nothing about what any of them IS — and it was the same continent,
-    # in the same arch, in the same position, as /stories, /countries,
-    # /interests and the 404. Six index openings drawn as one silhouette
-    # with a different number of marks on it is the map catalogue this
-    # product must not be, and at opening size the difference between 197
-    # dots and 130 is not a difference a reader perceives.
-    #
-    # A map answers WHERE, and where is not this family's question. The
-    # subject is what people DO, and the thing no competitor can say is
-    # already in the lede: every listing carries the name of who runs it and
-    # the tier of checking it has passed. The kinds and the categories are
-    # drawn below, as bars, where the shape is a real comparison.
-    #
-    # `img` stays. When a photograph of the experience-action role is
-    # licensed it fills the slot and replaces nothing, which is what
-    # indexhero does with an empty art and a filled img.
-    body = f"""
-{crumbs([("Europe", "/discover"), ("Experiences", None)])}
+    # Each row carries a narrow crop of a destination where that kind
+    # actually happens — not an illustration of the idea, a photograph of a
+    # place the row leads to. A destination is used once, so ten rows are
+    # ten places; where a kind's only photographed destination is already
+    # spent the row is type alone, which is honest and is what an empty
+    # register looks like on a page that does not pretend otherwise.
+    used, sliver = set(), {}
+    for k in sorted(kinds, key=lambda k: -counts.get(k, 0)):
+        for it in items:
+            if it["exp"]["kind"] != k:
+                continue
+            cid = cid_of(it)
+            if not cid or cid in used or ("city:" + cid) not in images:
+                continue
+            used.add(cid)
+            sliver[k] = (cid, it)
+            break
+    kindrows = []
+    for i, k in enumerate(sorted(kinds, key=lambda k: -counts.get(k, 0)), 1):
+        shot, where = "", ""
+        if k in sliver:
+            cid, it = sliver[k]
+            shot = picture(images, "city:" + cid, w=600, h=800, credit=False,
+                           alt=images["city:" + cid]["alt"], sizes="9rem")
+            where = (f'<span class="kindwhere">{esc(it["city"]["name"])}</span>')
+        kindrows.append(
+            # A GRID'S TRACKS ARE POSITIONAL AND THE FIRST VERSION HAD THE
+            # NAME AND THE PICTURE THE WRONG WAY ROUND. `3rem 9.5rem 1fr
+            # 7rem` with the markup ordered number, name, picture put
+            # "Walk or hike" in a 152-pixel column and the photograph in
+            # the 768-pixel one — a 1,024-pixel-tall crop, ten times, and
+            # a band 11,127 pixels long. The order here IS the layout.
+            f'<a class="kindrow" href="{urls.experience_kind(k)}">'
+            f'<span class="kindno">{i:02d}</span>'
+            f'<span class="kindart">{shot}</span>'
+            f'<span class="kindname">{esc(kinds[k])}</span>'
+            f'<span class="kindmeta"><span class="kindn">{counts.get(k, 0)}</span>'
+            f'{where}</span></a>')
+    field = f"""
+  <div class="pagehead index">
+    <p class="kicker">The European Experience Atlas</p>
+    <h2 class="mega">Choose a way to be there.</h2>
+    <p class="lede">{numword(len(kinds), cap=True)} kinds, and they do not
+    overlap: each of the {len(items)} experiences has exactly one, so every
+    count below is a count of the whole. A cellar visit and a cathedral are
+    both sacred to somebody and only one of them is a walk.</p>
+  </div>
+  <div class="kinds">{"".join(kindrows)}</div>
+  {credit(["city:" + c for c, _ in sliver.values()])}"""
 
-{indexhero(
-    kicker="Local Experiences",
-    title="What people actually do here.",
-    lede=f"{len(items)} experiences across the Atlas, in {numword(len(data['taxonomy']['experience_kinds']))} kinds. Anything a business "
-         f"lists carries the name of who runs it and the tier of checking it has passed — "
-         f"an unchecked listing says so on its face rather than hiding behind a star "
-         f"rating.",
-    img=photo(data.get("images"), "experiences-hero", w=2000, h=1200,
-              sizes="(min-width: 60rem) 52vw, 100vw"),
-    actions='<a class="btn" href="/experiences/join">List your experience</a>'
-            '<a class="btn ghost" href="/for-businesses">For businesses</a>')}
-<!-- listed=False on the off-frame note: the drawing plots every place in
-     the Atlas with an experience, and the body under it shows twenty-four
-     of the 197 — so "that place is in the list below" pointed at a list
-     that does not hold the place it names. Found by the check written for
-     the 404, on a page the 404's own fix would have walked past. -->
-<!-- "Recently added" WAS A CLAIM THE DATA CANNOT SUPPORT. An experience
-     carries a slug, a name, a kind, a band and a summary, and no date of
-     any sort, so these 24 were simply the first 24 the loader returned in
-     country order — Austria to Croatia, called recent. A false ordering is
-     worse than none, because a reader takes it for a signal. -->
-{(f'<section class="ed-section">'
-  + ed_section_head("What they are about",
-                    f"{numword(len(data['categories']), cap=True)} categories",
-                    "Largest first — the same order the bars below are in.")
-  + _xstrip + "</section>") if _xstrip else ""}
-{section("Twenty-four of them", f'<div class="rows">{rows}</div>',
-         lede="What people actually do, in country order — there is no date on an "
-              "experience here, so this is a sample and not a recency. Every one is a "
-              "real, named thing in a real place, and every one links to the page of "
-              "the place it happens in.",
-         more=("How this list is cut", "#how-its-cut"))}
+    # ── 03 · EUROPE, EXPERIENCED ─────────────────────────────────────
+    # The cinematic plate. `ed_declare` already composes type over a
+    # photograph behind a scrim that makes the ratio a property of the
+    # design rather than of the picture — 72% graphite composites to
+    # rgb(71,71,71) and bone on that is 9.2:1 whatever the frame turns out
+    # to be. The picture is the largest category's own.
+    _big = bycat[0]
+    declare = ed_declare(
+        images, f"category:{_big['slug']}",
+        statement="Europe reveals itself when you do something in it.",
+        alt=images.get(f"category:{_big['slug']}", {}).get("alt", ""),
+        only_if_held=True) if held(images, f"category:{_big['slug']}") else ""
 
-<!-- THE TWO AXES CAME AFTER THE EXPERIENCES, and the order is the whole
-     change. The page opened on eighteen taxonomy rows — eight categories,
-     then ten kinds, both as bar charts — so a reader met the information
-     architecture before a single thing anybody does. That is design to the
-     data's shape rather than to the reader's purpose, and this page's own
-     head says its subject is "what people actually do here".
-     The bars are kept: Family holds 131 entries and Luxury holds 5, and
-     that difference is real and is the argument for having two axes at all.
-     They are now the answer to "how is this list cut", asked after the
-     list. -->
-{section(f"{numword(len(data['categories'])).capitalize()} categories", '<div class="rows">' + "".join(catcards) + "</div>",
-         id="how-its-cut", tone="quiet",
-         lede=f"What an experience is about, largest first. An experience may be in "
-              f"several of these at once — {len(data['categories'])} categories hold "
-              f"{sum(catn.values())} memberships across {len(items)} experiences — so each "
-              f"bar is drawn against the largest category rather than against the total. "
-              f"Each row carries three of its own entries, and each category page prints the "
-              f"rule that built it.")}
-{section(f"{numword(len(kinds)).capitalize()} kinds", '<div class="rows">' + "".join(cards) + "</div>",
-         tone="quiet",
-         lede=f"The other axis: what you physically do. A cellar visit and a cathedral are "
-              f"both sacred to somebody; only one of them is a walk. These do not overlap — "
-              f"every experience has exactly one kind, and the {len(kinds)} of them account "
-              f"for all {sum(counts.values())}.")}
-"""
+    # ── 04 · WHERE IT HAPPENS ────────────────────────────────────────
+    # GEOGRAPHY IS THE SECOND INSTRUMENT HERE, NOT THE FIRST, and it is the
+    # LIGHT atlas rather than the graphite one — which is the whole of what
+    # keeps this page from being /discover with different words. The dark
+    # instrument belongs to the tool; this is a picture of where a thing
+    # can be done.
+    #
+    # `docs/signature-moments.md` refuses a map on the experience CATEGORY
+    # pages, and the reason survives re-checking: 48 dots scattered over
+    # Europe say "food is everywhere", which is true and is not an insight.
+    # That refusal is about a category. This is the whole family at once,
+    # and what it says is the thing the rows cannot: 172 of 319 destinations
+    # hold one, and the 147 that do not are not a gap in Europe, they are a
+    # gap in this atlas.
+    withx = {}
+    for it in items:
+        cid = cid_of(it)
+        if cid:
+            withx[cid] = data["cities"][cid]
+    xpts = [(*project(n["city"]["lat"], n["city"]["lon"]),
+             urls.city(n["country"], n["region"], n["city"]), n["city"]["name"])
+            for n in withx.values()]
+    xmap = pointsmap(
+        xpts, "exp",
+        f'{len(withx)} of {len(data["cities"])} destinations hold at least one '
+        f'experience. The {len(data["cities"]) - len(withx)} that do not are a '
+        f'gap in this atlas rather than in Europe.',
+        f'Map of the {len(withx)} destinations that hold an experience',
+        note='Names are dropped where they would overlap; every dot is a link. '
+             'Coastline from <a href="/sources">Natural Earth</a>, public '
+             'domain.'
+             + offframe_line([(p[0], p[1]) for p in xpts], data, listed=False)
+    ) if len(xpts) >= 2 else ""
+    geoband = f"""
+  <div class="sheettext">
+    <h2 class="mega">Where Europe<br>meets the doing.</h2>
+    <p class="lede">The same continent as the instrument on /discover, drawn
+    the other way: pale ground, ink coast, one mark per place. A map answers
+    where, and where is the second question on this page rather than the
+    first.</p>
+    {golink('/map', 'Open the full map')}
+  </div>
+  <div class="geoart">{xmap}</div>"""
+
+    # ── 05 · SAME FEELING, DIFFERENT EUROPE ──────────────────────────
+    # KIND BY MACRO REGION, AND THE AXIS WAS CHOSEN BY MEASURING BOTH.
+    # Two thirds of every experience in the atlas is `family` or
+    # `adventure`, so their regional breakdown says EVERYWHERE — the exact
+    # non-insight the category map is refused for. The kinds are exclusive
+    # and the answer changes: the water is the Nordics, the sacred sites
+    # are the Mediterranean, the cellars are the south. Each group carries
+    # the macro region's own photograph, which the register holds for all
+    # nine.
+    pairs, pkeys = [], []
+    for k in sorted(kinds, key=lambda k: -counts.get(k, 0)):
+        if len(pairs) == 4:
+            break
+        tally, names = {}, {}
+        for it in items:
+            if it["exp"]["kind"] != k:
+                continue
+            ms = it["country"].get("macro_slug")
+            if not ms:
+                continue
+            tally[ms] = tally.get(ms, 0) + 1
+            names.setdefault(ms, []).append(it["city"]["name"])
+        if not tally:
+            continue
+        top = max(tally, key=lambda m: tally[m])
+        # A KIND WHOSE BIGGEST REGION IS A THIRD OF IT IS NOT A CLAIM ABOUT
+        # A REGION. The band exists to say where something concentrates, so
+        # a kind spread evenly across nine corners is left off rather than
+        # printed with a number that reads as a finding.
+        if tally[top] * 3 < counts.get(k, 0):
+            continue
+        # ONE PICTURE PER THING, AND THE FIRST VERSION DREW TWO TILES FROM
+        # ONE FILE. The obvious photograph for "the water is the Nordics" is
+        # `macro:nordic` — and the museums are the Nordics too, and the
+        # cellars and the tables are both the Mediterranean, so four tiles
+        # came out as two photographs side by side twice. That reads as a
+        # rendering fault rather than as a composition, and it is this
+        # repository's own `one thing, one picture` arriving from the other
+        # end: not one record with two pictures, one picture on two records.
+        #
+        # So the tile takes a DESTINATION inside the group where the register
+        # holds one — which is more specific anyway, because "11 of 25 on the
+        # water are in the Nordics" is better illustrated by a place on that
+        # water than by a photograph of the region in general. The macro's own
+        # picture is the fallback, and either way a key already spent is
+        # skipped rather than drawn twice.
+        shot = None
+        for it in items:
+            if it["exp"]["kind"] != k or it["country"].get("macro_slug") != top:
+                continue
+            cid = cid_of(it)
+            if cid and ("city:" + cid) in images and ("city:" + cid) not in pkeys:
+                shot = "city:" + cid
+                break
+        if shot is None and held(images, "macro:" + top) \
+                and ("macro:" + top) not in pkeys:
+            shot = "macro:" + top
+        if shot is None:
+            continue
+        pkeys.append(shot)
+        seen, where = set(), []
+        for nm in names[top]:
+            if nm not in seen:
+                seen.add(nm)
+                where.append(nm)
+        pairs.append(
+            f'<a class="pairrow" href="{urls.experience_kind(k)}">'
+            f'<span class="pairart">'
+            + picture(images, shot, w=1000, h=750, credit=False,
+                      alt=images[shot]["alt"],
+                      sizes="(min-width: 52rem) 30vw, 92vw")
+            + f'</span><span class="pairsay">'
+              f'<span class="pairkind">{esc(kinds[k])}</span>'
+              f'<span class="pairmac">{esc(macname[top])}</span>'
+              f'<span class="pairn">{tally[top]} of {counts.get(k, 0)}</span>'
+              f'<span class="pairwhere">'
+              f'{esc(" · ".join(where[:5]))}'
+            + (f' · +{len(where) - 5} more' if len(where) > 5 else "")
+            + '</span></span></a>')
+    samefeeling = f"""
+  <div class="sheettext">
+    <h2 class="mega">Same feeling.<br>Different Europe.</h2>
+    <p class="lede">Where each kind actually concentrates, counted rather
+    than chosen. A kind whose largest corner holds under a third of it is
+    not on this band — a number that is true everywhere is not a finding.</p>
+  </div>
+  <div class="pairs">{"".join(pairs)}</div>
+  {credit(pkeys)}""" if pairs else ""
+
+    # ── 06 · WHAT THEY ARE ABOUT ─────────────────────────────────────
+    # THE EIGHT CATEGORIES AT FOUR SCALES. The brief asks for an image
+    # rhythm — large, narrow, panoramic, intimate — rather than eight of
+    # one size, and the reason is this repository's own: every photograph
+    # the same size in the same 16/9 box is what made the old page's one
+    # strip read as a contact sheet. The order is largest first, the same
+    # order the bars below are in, because the strip and the rows must not
+    # argue about which category is which.
+    # AND THE TILE NAMES THREE REAL EXPERIENCES, which is how the 197 stay
+    # on the page at all. The old index printed 24 of them as rows; this
+    # one printed none, and a page whose whole subject is what people
+    # actually do had stopped naming a single thing anybody does. Three per
+    # category is 24 again, in the band that says what the categories ARE
+    # — the `ed_strip` repair applied here: the tile takes the sentence and
+    # the second band goes.
+    #
+    # THE LABEL IS UNDER THE PICTURE RATHER THAN ON IT. A name over a
+    # photograph needs a scrim, and a scrim over three lines of sample
+    # names is a caption pretending to be a picture. Under it, in the
+    # margin, is how a gallery labels a work — which is `.gi`'s own rule
+    # and the reason this page can hang eight photographs without reading
+    # as a catalogue.
+    xtiles, xkeys = [], []
+    SCALES = ("wide", "tall", "pan", "close")
+    for i, cat in enumerate(bycat):
+        key = f"category:{cat['slug']}"
+        if not held(images, key):
+            continue
+        xkeys.append(key)
+        names = sample_names(C.select(items, cat))
+        xtiles.append(
+            f'<a class="xt xt-{SCALES[i % len(SCALES)]}" '
+            f'href="{urls.category(cat["slug"])}">'
+            + picture(images, key, w=1600, h=1200, credit=False,
+                      alt=images[key]["alt"],
+                      sizes="(min-width: 52rem) 46vw, 92vw")
+            + f'<span class="xtsay"><span class="xtn">{catn[cat["slug"]]} listed</span>'
+              f'<span class="xtname">{esc(cat["name"])}</span>'
+            + (f'<span class="xtaste">{esc(" · ".join(names))}</span>'
+               if names else "")
+            + '</span></a>')
+    about = f"""
+  <div class="sheettext">
+    <h2 class="mega">What they<br>are about.</h2>
+    <p class="lede">The other axis, and this one overlaps on purpose: an
+    experience may be in several at once, so {len(data["categories"])}
+    categories hold {sum(catn.values())} memberships across {len(items)}
+    experiences. Largest first.</p>
+  </div>
+  <div class="xstrip">{"".join(xtiles)}</div>
+  {credit(xkeys)}""" if xtiles else ""
+
+    # ── 07 · THE STORIES ─────────────────────────────────────────────
+    # An experience is a thing you book and a story is the reason you would.
+    # `.galgrid` is the gallery grid the homepage already uses — the name
+    # UNDER the picture, in the margin, the way a gallery labels a work,
+    # which is the whole difference between a card and a plate.
+    st = [s for s in sorted(data["stories"],
+                            key=lambda s: s.get("published", ""), reverse=True)
+          if held(images, "story:" + s["slug"])]
+    tales = ""
+    if len(st) >= 3:
+        skeys = ["story:" + s["slug"] for s in st[:3]]
+        tiles = "".join(
+            f'<a class="gi" href="{urls.story(s)}">'
+            + picture(images, "story:" + s["slug"], w=1200, h=1600,
+                      credit=False, alt=images["story:" + s["slug"]]["alt"],
+                      sizes="(min-width: 52rem) 30vw, 92vw")
+            + (f'<span class="giwhere">{esc(s["section"])}</span>'
+               if s.get("section") else "")
+            + f'<span class="giname">{esc(s["title"])}</span>'
+              f'<span class="giline">{esc(s.get("standfirst", ""))}</span></a>'
+            for s in st[:3])
+        tales = f"""
+  <div class="galwrap">
+  <div class="sheettext">
+    <h2 class="mega">Why anybody<br>goes at all.</h2>
+    <p class="lede">An experience is a thing you can book. A story is the
+    reason you would. {len(data["stories"])} of them, and every place either
+    one names has a page here.</p>
+    {golink('/stories', 'Every story')}
+  </div>
+  <div class="tales">{tiles}</div>
+  {credit(skeys)}
+  </div>"""
+
+    # ── 07 · THE PLACES ──────────────────────────────────────────────
+    # THE CINEMATIC STRIP, AND `ed_strip` ALREADY IS ONE. It SCROLLS rather
+    # than wrapping, because a sequence is read along and wrapping an order
+    # into rows turns it into a grid — the rule that primitive was written
+    # with. What the brief asks for here is a horizontal run of large
+    # photographs with the type beside them, which is that component with
+    # this band's own set in it.
+    #
+    # AND THE SET IS THE ONE THING ONLY THIS PAGE CAN SHOW: destinations
+    # that hold an experience AND a photograph, with the number of
+    # experiences each holds as the note. The library has 65 photographed
+    # destinations and this band takes ten that no earlier band on the page
+    # has spent, because `there is no third place to put them that would
+    # not be the same eleven a third time` is this repository's own warning
+    # and the way past it is to have more of them rather than to reuse.
+    nx = {}
+    for it in items:
+        cid = cid_of(it)
+        if cid:
+            nx[cid] = nx.get(cid, 0) + 1
+    fresh = [cid for cid in sorted(nx, key=lambda c: (-nx[c], c))
+             if ("city:" + cid) in images and cid not in used]
+    strip = ed_strip(images, [
+        {"key": "city:" + cid, "alt": images["city:" + cid]["alt"],
+         "label": data["cities"][cid]["city"]["name"],
+         "href": urls.city(data["cities"][cid]["country"],
+                           data["cities"][cid]["region"],
+                           data["cities"][cid]["city"]),
+         "note": f'{nx[cid]} experience{"s" if nx[cid] != 1 else ""} · '
+                 f'{data["cities"][cid]["country"]["name"]}'}
+        for cid in fresh], limit=10)
+    places = f"""
+  <div class="sheettext">
+    <h2 class="mega">Ten places<br>it happens in.</h2>
+    <p class="lede">The destinations that hold the most of them and that this
+    atlas holds a photograph of — {len(nx)} of {len(data["cities"])} hold at
+    least one, and {len([c for c in nx if ("city:" + c) in images])} of those
+    are photographed. Read along.</p>
+  </div>
+  {strip}
+  {credit(["city:" + c for c in fresh[:10]])}""" if strip else ""
+
+    # ── 08 · THE BARS WERE THE SAME TWO AXES A SECOND TIME ───────────
+    # DELETED, AND `docs/experiences-redesign.md` SAID TO KEEP THEM.
+    # That audit was written before the page was rendered and it was wrong
+    # for the reason this repository keeps recording: eight category bars
+    # under eight category PHOTOGRAPHS, and ten kind bars under ten kind
+    # ROWS, is one set printed twice to say two things — and here the
+    # second printing said less than the first, because the picture and
+    # the place are what the bar cannot carry.
+    #
+    # What the bars had that nothing else did was the category blurb, the
+    # three sample experiences and the visual proportion. The samples moved
+    # onto the tile, which is the `ed_strip` repair; the blurbs live on the
+    # eight category pages and the section audit asserts them there; and
+    # the proportion is 131 against 5 printed on the tiles in largest-first
+    # order, which a reader can read. 3,086 pixels of page, and the two
+    # numbers that were the argument for two axes are still on it.
+    # ── 09 · THE DOOR ────────────────────────────────────────────────
+    # ONE APERTURE ON THE PAGE, AND IT IS THE MAP. The brief asks for a
+    # photographic aperture in band 11 and a circular one at the close, and
+    # this page already cuts the door once — on the geography, which is how
+    # this atlas draws it everywhere else. Three doors in one document is
+    # the signature as wallpaper, which is the rule `docs/signature-moments.md`
+    # states and this page would be the first to break.
+    #
+    # ANYTHING A BUSINESS LISTS CARRIES THE NAME OF WHO RUNS IT, and that
+    # sentence had been buried in the old head's lede. It is the one claim
+    # here no competitor makes, so it closes the page instead.
+    door = f"""
+  <div class="sheettext">
+    <h2 class="mega">You do not need<br>another list.</h2>
+    <p class="lede">Anything a business lists here carries the name of who
+    runs it and the tier of checking it has passed — an unchecked listing says
+    so on its face rather than hiding behind a star rating. Nothing on this
+    page is paid for, and nothing on it can be.</p>
+    <p class="keepgo">{golink('/experiences/join', 'List your experience')}
+    {golink('/for-businesses', 'What we check, and what we refuse')}</p>
+  </div>"""
+
+    PLATES = [("invite gal", "The invitation", invite, "the-invitation"),
+              ("kinds gal", "The field", field, "the-field"),
+              ("declare", "Europe, experienced", declare, "experienced"),
+              ("geo gal", "Where it happens", geoband, "where-it-happens"),
+              ("pairs gal quiet", "Same feeling", samefeeling, "same-feeling"),
+              ("about gal", "What they are about", about, "how-its-cut"),
+              ("strip gal quiet", "The places", places, "the-places"),
+              ("tales pine", "The stories", tales, "the-stories"),
+              ("keep gal", "The door", door, "the-door")]
+    body = (crumbs([("Europe", "/discover"), ("Experiences", None)])
+            + constel_defs()
+            + plate_sequence(PLATES))
+
     return "/experiences/index.html", page(
-        "Experiences", body, path="/experiences", area="experiences",
-        
+        "Experiences", body, path="/experiences", area="experiences", hero=True,
         description="Guides, kitchens, cellars, boats and museums across Europe — every listing named, tiered and checked.",
     )
 
@@ -7552,6 +9890,11 @@ def experience_kind_page(data, kind, name):
     # reason, and a subscript like ["experience_kinds"] puts quotes inside the
     # expression where that regex sees them as the reason itself.
     nkinds = numword(len(data["taxonomy"]["experience_kinds"]))
+    # THE BAND'S NAME RATHER THAN ITS SLUG, which the category page one
+    # function up records at length: `data/taxonomy.json` gives each budget
+    # band a name and a note, and both invite call sites printed the
+    # identifier.
+    bandname = {b["slug"]: b["name"] for b in data["taxonomy"]["budgets"]}
     # The kind is not printed on a kind page: every row on it is that kind
     # by definition, which is the constraint explained back.
     rows = "".join(
@@ -7559,7 +9902,7 @@ def experience_kind_page(data, kind, name):
         <h2>{esc(it['exp']['name'])}</h2>
         <p class="invite-sum">{esc(it['exp']['summary'])}</p>
         <p class="invite-where">{esc(it['city']['name'])}, {esc(it['country']['name'])}
-        · {esc(it['exp']['band'])}</p></a></li>"""
+        · {esc(bandname.get(it['exp']['band'], it['exp']['band']))}</p></a></li>"""
         for it in items
     )
     body = f"""
@@ -7992,6 +10335,69 @@ def macro_frame(data, macro):
     return pts
 
 
+# A region is taller than it is wide, roughly balanced, or more than twice as
+# wide as tall. Two boundaries, both of them descriptions rather than fitted
+# numbers — 1 is "which way up is it" and 2 is "twice as wide as tall", and
+# the nine fall 3 / 4 / 2 under them. The alternative was a threshold read off
+# the gaps in these nine values, which is a number chosen to produce an answer
+# and stops being true the day a country moves between regions.
+MACRO_WIDE = 2.0
+
+
+def macro_shape(data, macro):
+    """How wide a macro region is against how tall, in kilometres.
+
+    THE NINE REGIONS WERE NINE IDENTICAL BANDS AND `glyph_view` SAID WHY IN
+    ITS OWN COMMENT: *held to the canvas proportion, so a set of glyphs is a
+    set of boxes of the same shape and only the geography inside them
+    differs.* That is visual consistency bought with editorial difference —
+    the owner's second doctrine rule, written as a decision in the function
+    that implements it, one commit before the rule arrived. Measured, the
+    nine regions of this atlas run from 0.63 (the Baltic States, 346 km wide
+    and 546 tall) to 2.75 (the Mediterranean at 3,605 x 1,311 and the
+    Caucasus at 1,965 x 714), and all nine were drawn at 1.282 and composed
+    identically.
+
+    KILOMETRES RATHER THAN PROJECTED UNITS, because the projection is
+    conformal and a conic's units are not the same length at 35 N and 65 N —
+    the Nordics measured against the Mediterranean in canvas units is the
+    scale-error finding arriving in a layout decision. Haversine on the
+    region's own destinations, which is every other distance in this product.
+
+    THE PADDED BOX IS NOT THE SHAPE. `glyph_view` adds a third of the
+    region's own size as context before it frames, which pulls every aspect
+    toward 1: the same nine measure 0.75 to 1.69 padded against 0.63 to 2.75
+    raw. The padding is a drawing convention and the shape is the
+    geography, so the composition is decided on the geography.
+
+    AND THE COUNT IS DELIBERATELY NOT WHAT DECIDES. Destinations per region
+    run 8 to 94, which looks like the obvious scale and argues something
+    false: Eastern Europe holds 8 because THREE OF ITS FOUR COUNTRIES CARRY
+    A TRAVEL ADVISORY, so a size derived from it would print an advisory
+    artefact as an editorial judgement. That is /beyond-the-obvious's own
+    finding — *the count argues the wrong way* — and photograph coverage is
+    refused for a second reason: this page already spends that measurement
+    on which country gets the large door, and a band drawing one measurement
+    twice is what /journeys recorded.
+    """
+    pts = []
+    for cs in macro["countries"]:
+        c = data["countries"].get(cs)
+        if not c:
+            continue
+        for r in c["regions"]:
+            for t in r["cities"]:
+                pts.append((t["lat"], t["lon"]))
+    if len(pts) < 2:
+        return 0.0, 0.0, 1.0
+    lats = [p[0] for p in pts]
+    lons = [p[1] for p in pts]
+    mlat, mlon = sum(lats) / len(lats), sum(lons) / len(lons)
+    w = haversine({"lat": mlat, "lon": min(lons)}, {"lat": mlat, "lon": max(lons)})
+    h = haversine({"lat": min(lats), "lon": mlon}, {"lat": max(lats), "lon": mlon})
+    return w, h, (w / h if h else 1.0)
+
+
 def indexhero(*, kicker, title, lede, art="", img="", actions="", note=""):
     """The editorial opening five indexes now share.
 
@@ -8084,7 +10490,7 @@ def indexhero(*, kicker, title, lede, art="", img="", actions="", note=""):
         f'<div class="ed-opening-visual">{figure}</div></header>')
 
 
-def region_glyph(members, frame=None, min_span=0.0):
+def region_glyph(members, frame=None, min_span=0.0, aspect=None):
     """A macro region as the countries it is made of, on the shared silhouette.
 
     THE ATLAS INDEX IS THE PAGE ABOUT COUNTRIES AND IT DREW NONE. /countries
@@ -8142,7 +10548,17 @@ def region_glyph(members, frame=None, min_span=0.0):
     # two-city story does. A SINGLE COUNTRY does — Luxembourg framed on its
     # own two destinations is a frame in which Europe is unrecognisable, and
     # the silhouette is the whole reason the glyph works.
-    view = (glyph_view(frame, min_span=min_span) if frame
+    # AND THE FRAME TAKES THE REGION'S OWN PROPORTION WHERE THE CALLER KNOWS
+    # IT. `glyph_view` holds every frame to the canvas's 1.282 unless asked
+    # otherwise, and its comment states the reason as a benefit: *a set of
+    # glyphs is a set of boxes of the same shape and only the geography
+    # inside them differs.* Measured on the nine macro regions, that box was
+    # 42% padding for Eastern Europe and 3% for the Caucasus, and it drew a
+    # 2.75 region and a 0.63 one identically. A drawing costs nothing to
+    # reshape — unlike a photograph, where a derived proportion would be an
+    # undeclared crop — so a caller that has measured its subject's shape
+    # passes it and the frame is the geography.
+    view = (glyph_view(frame, min_span=min_span, aspect=aspect) if frame
             else f"0 0 {MAP_W} {MAP_H}")
     # The data cut only where the drawing is at the full extent: a framed
     # glyph is a window on one region and the cut is not in it.
@@ -8339,7 +10755,25 @@ def glyph_view(pts, pad_frac=0.34, min_pad=90.0, min_span=340.0,
     # another. A journey row is a wide band and a route is usually wide, so
     # framing one at 1.28 makes a tall picture beside a short paragraph and
     # four hundred pixels of nothing under it.
-    want = aspect or (MAP_W / MAP_H)
+    #
+    # AND `aspect="own"` IS NO HOLD AT ALL, which is what the nine macro
+    # regions needed and what the paragraph above was refusing them. The
+    # hold is why nine regions running 0.54 to 3.21 on this projection were
+    # nine boxes of one shape — the fault the doctrine's second rule names —
+    # and the first repair passed each region's measured aspect as `want`.
+    # THAT DID NOTHING FOR THE ONE REGION IT WAS WRITTEN FOR: the hold only
+    # ever GROWS the short axis, the Mediterranean's padded box is already
+    # 986 of a 1,000-unit canvas, so growing width to reach 2.75 clamped at
+    # the canvas and the emitted frame came back at 1.30 — the whole
+    # continent with a corner lit, which is this function's own recorded
+    # failure. There is nothing to grow toward on the widest set in the
+    # atlas; the honest frame is the padded box as measured, which keeps the
+    # `min_pad` legibility floor and keeps the shape the projection actually
+    # draws.
+    if aspect == "own":
+        want = w / h
+    else:
+        want = aspect or (MAP_W / MAP_H)
     if w / h < want:
         grow = (h * want - w) / 2
         x0, x1 = x0 - grow, x1 + grow
@@ -8562,105 +10996,223 @@ def constellation(pts, extra="", route=False, frame=False, cut=False,
 
 
 def themes_index(data):
-    """Thirteen themes, shown by how far each one reaches.
+    """Five plates, and the page drew none of the thirteen shapes its own
+    closing sentence describes.
 
-    "8 PLACES" WAS ON ALL THIRTEEN CARDS AND IS NOT INFORMATION. Every theme
-    in this dataset holds exactly eight stops, so the one figure the card grid
-    printed was a constant wearing the clothes of a measurement. That is the
-    /europe-in failure one family over: a number that is not the set\'s own
-    extent reads as one.
+    `head_figure()` prefers a photograph and falls back to the drawing, and
+    its docstring states the contract: *the drawing is never lost — the
+    caller emits it below with `moved_drawing()` when a photograph took its
+    place.* Three callers use it. The country page honours that, the theme
+    page honours that, and **this index never called `moved_drawing` at
+    all** — so from the commit where the thirteenth theme photograph landed,
+    every glyph was built and discarded, and the note under the list went on
+    saying:
 
-    What actually separates them is REACH. Renaissance Europe is Italy, France
-    and Belgium; Thermal Europe is the United Kingdom, Hungary, Iceland,
-    Finland, Bulgaria, Azerbaijan and Georgia. Three countries against seven is
-    the difference between a corner of the continent and an argument that
-    crosses the whole of it, and the grid showed neither — it showed a
-    generated landscape, and a theme is not a place: it has no coastline, no
-    topography and no season, which is the same reason the twelve motions lost
-    theirs.
+        Each shape beside a theme is that theme's own eight places on the
+        continent, drawn to the same frame so the thirteen can be compared:
+        a knot is an argument about one corner of Europe, a scatter is one
+        about the whole of it. Drawn from Natural Earth 1:110m admin 0
+        countries, public domain.
 
-    So the row carries the eight destinations and the count of countries.
+    A promise of a drawing beside each theme, on a page with none, crediting
+    Natural Earth for land nobody drew — the inverse of *a page that draws
+    land names where the land came from*. That is the
+    fourteen-call-sites-forgot-the-motif shape in a helper with a two-call
+    contract, and `c_same_frame` could not see it: it skipped any page
+    carrying fewer than two glyphs, so *says and draws nothing* was outside
+    its reach.
 
-    A COMMA WAS THE FIRST SEPARATOR AND THREE PLACE NAMES CONTAIN ONE.
-    "Victoria, Gozo", "Mestia, Svaneti" and "Nida, Curonian Spit" are single
-    destinations in this atlas, so Island Europe\'s eight places read as nine
-    and Mountain Europe\'s as nine — a list that miscounts itself, on the one
-    index whose whole argument is a count. The comma was chosen to stop the
-    list reading as a route, which the middot on /journeys deliberately does;
-    what actually distinguishes the two families is the ROUTE LINE under a
-    journey\'s stops, and a theme has none — the same absence the theme page
-    makes its point out of by drawing these dots with no path between them.
+    THE SHAPES ARE THE OPENING NOW, drawn to one frame where they can be
+    compared, and the photographs stay in the rows — which is the register
+    spent on the surface where a reader is choosing between thirteen things
+    on LOOK. Both bands are complete in their own register: the shapes are
+    the reach, the rows are the places.
+
+    AND THE REACH HAD A SECOND AXIS NOBODY PRINTED. The page states how many
+    countries a theme crosses, 3 to 8. It also crosses 2 to 6 of the nine
+    **corners of Europe**, and that is the closing sentence as a number:
+    Renaissance Europe is two corners, Medieval and Island Europe are six.
+    Between them the thirteen reach 88 of the 319 destinations, 37 of the 50
+    countries and all nine corners — against /europe-in's twelve queries,
+    which reach the whole Atlas, because a theme is an authored set of eight
+    and a motion is a query over everything. See `docs/themes-redesign.md`.
     """
     idx = data["cities"]
-    # THE CONSTELLATION, WHICH IS THE WHOLE ARGUMENT DRAWN.
-    #
-    # The card grid was replaced with rows and the rows were a wall of small
-    # grey text — a generic list traded for a generic grid, which is two
-    # defaults and no art direction. A contact sheet of twelve families made
-    # that unarguable: eleven of them open with a kicker, a serif h1, a lede
-    # and a large arched map in the same position, and this index was one of
-    # the two cells that were simply text.
-    #
-    # What distinguishes thirteen themes is REACH, and reach is a shape. So
-    # each row draws its own eight destinations on a coarse silhouette of the
-    # continent: Renaissance Europe is a tight knot over Italy and France,
-    # Thermal Europe is a line from Iceland to the Caucasus. You see the
-    # difference before you read a word, which is the thing a list of country
-    # names cannot do.
-    #
-    # NOT AN APERTURE. It is 150 units wide and there are thirteen of them on
-    # one page; the door at that size, thirteen times, is the signature as
-    # wallpaper, which is the failure the events band already refused. This
-    # is a glyph, not a window.
-    #
-    # The silhouette is emitted ONCE and every row is a <use> of it, so
-    # thirteen constellations cost one coastline and 104 dots.
-    silhouette = constel_defs()
+    images = data.get("images")
 
-    # DERIVED, because the note under the list states it. Every theme holds
-    # eight stops today; a hard-coded eight in the prose is the figure that
-    # was true two hundred destinations ago, which this repository has
-    # already shipped once.
-    sizes = sorted({len(t["stops"]) for t in data["themes"]})
-    say = numword
-
-    held = (f"every one of these holds {say(sizes[0])}" if len(sizes) == 1
-            else f"they hold between {say(sizes[0])} and {say(sizes[-1])}")
-    rows = []
+    # ── ONE PASS ─────────────────────────────────────────────────────
+    facts = {}
+    allstops, allctry, allmacro = set(), set(), set()
     for t in data["themes"]:
-        countries, places = [], []
+        countries, places, pts = [], [], []
         for stop in t["stops"]:
             n = idx[stop["city"]]
-            cn = n["country"]["name"]
-            if cn not in countries:
-                countries.append(cn)
-            places.append(esc(n["city"]["name"]))
-        glyph = constellation(
-            [project(idx[st["city"]]["city"]["lat"], idx[st["city"]]["city"]["lon"])
-             for st in t["stops"]], extra=" constel-theme")
-        rows.append(
-            f'<a class="row themerow" href="/themes/{t["slug"]}">'
-            # THE PHOTOGRAPH IF THERE IS ONE, AND THE DRAWING IF THERE IS NOT.
-            # Eleven of the thirteen themes are the only licensed photographs
-            # this atlas holds, and until now they appeared on exactly eleven
-            # pages — their own. An index of thirteen things the reader is
-            # choosing between on LOOK is the one place a photograph does work
-            # the drawing cannot, and the reach the glyph argues is still one
-            # click away on the page itself.
-            f'<div class="rowart">'
-            f'{head_figure(data, "theme:" + t["slug"], glyph, alt_fallback=t["name"], credit=False, eager=False)}'
-            f'</div>'
-            f'<div><p class="kicker">{esc(t["strapline"])}</p>'
-            f'<h2>{esc(t["name"])}</h2>'
-            f'<p class="rowsub">{" · ".join(places)}</p>'
-            f'<p class="rowmeta">{len(countries)} '
-            f'{"countries" if len(countries) != 1 else "country"}</p></div></a>')
+            if n["country"]["name"] not in countries:
+                countries.append(n["country"]["name"])
+            places.append(n["city"]["name"])
+            pts.append(project(n["city"]["lat"], n["city"]["lon"]))
+            allstops.add(stop["city"])
+        macros = {_macro_of(data, idx[s["city"]]["country"]["slug"])
+                  for s in t["stops"]}
+        allctry |= {idx[s["city"]]["country"]["name"] for s in t["stops"]}
+        allmacro |= macros
+        facts[t["slug"]] = {"countries": countries, "places": places,
+                            "pts": pts, "ncorner": len(macros)}
+
+    # NEAR-DISJOINT, MEASURED. Thirteen authored sets of eight could overlap
+    # heavily and a reader cannot tell by looking; 15 of the 78 pairs share a
+    # stop and the worst shares three — Florence, Rome and Venice, between
+    # Renaissance Europe and the Grand Tour, which is a real relationship
+    # rather than a duplication.
+    shared, worst = 0, (0, "", "")
+    ts = data["themes"]
+    for a in range(len(ts)):
+        for b in range(a + 1, len(ts)):
+            k = len({x["city"] for x in ts[a]["stops"]}
+                    & {x["city"] for x in ts[b]["stops"]})
+            if k:
+                shared += 1
+            if k > worst[0]:
+                worst = (k, ts[a]["name"], ts[b]["name"])
+    npairs = len(ts) * (len(ts) - 1) // 2
+
+    # DERIVED, because the note states it. Every theme holds eight stops
+    # today; a hard-coded eight in the prose is the figure that was true two
+    # hundred destinations ago, which this repository has already shipped.
+    sizes = sorted({len(t["stops"]) for t in data["themes"]})
+    held_say = (f"every one of these holds {numword(sizes[0])}"
+                if len(sizes) == 1
+                else f"they hold between {numword(sizes[0])} and "
+                     f"{numword(sizes[-1])}")
+
+    # ── 01 · SAME FRAME, DIFFERENT ARGUMENT ──────────────────────────
+    tiles = []
+    for t in data["themes"]:
+        f = facts[t["slug"]]
+        tiles.append(
+            f'<a class="thtile" href="/themes/{t["slug"]}">'
+            f'{constellation(f["pts"], extra=" constel-theme")}'
+            f'<span class="thtilen">{f["ncorner"]} of '
+            f'{len(data["macros"])} corners</span>'
+            f'<span class="thtilenm">{esc(t["name"])}</span>'
+            f'<span class="thtilep">{n_of(len(f["countries"]), "country")}'
+            f'</span></a>')
+    thopen = f"""
+  <div class="pagehead index">
+    <p class="kicker">Discovery without a map of borders</p>
+    <h1 class="mega">Europe, organised by what you came for.</h1>
+    {head_extent([(len(data["themes"]), "themes"),
+                  (len(allstops), "destinations"),
+                  (len(allmacro), "corners of Europe")])}
+    <p class="lede">Medieval Europe is not a country. Neither is sacred Europe, or Viking
+    Europe, or the Europe you reach only by train. {numword(len(data['themes']), cap=True)}
+    of them cut across the Atlas, and each place under one of them stays linked to the
+    country it is actually in.</p>
+  </div>
+  {constel_defs()}
+  <div class="thgrid">{"".join(tiles)}</div>
+  <p class="small">Each shape is that theme&rsquo;s own {numword(sizes[0])} places on the
+  continent, drawn to the same frame so the {numword(len(data['themes']))} can be
+  compared: a knot is an argument about one corner of Europe, a scatter is one about the
+  whole of it. {geo.sources_line(geo.load("europe-lod0.json"))}</p>"""
+
+    # ── 02 · CROSS-BORDER EUROPE ─────────────────────────────────────
+    thcross = f"""
+  <div class="sheettext">
+    <h2 class="mega">A theme is a <em class="lit">crossing</em>, not a
+    country.</h2>
+    <p class="lede">Between them the {numword(len(data['themes']))} reach
+    {len(allstops)} of the {len(idx)} destinations, {len(allctry)} of the
+    {len(data['countries'])} countries and all {numword(len(allmacro))} corners of
+    Europe &mdash; and each one is a different crossing rather than a slice of the
+    same map. Reach runs from {numword(min(f['ncorner'] for f in facts.values()))}
+    corners to {numword(max(f['ncorner'] for f in facts.values()))}.</p>
+    <p class="note">They are also near-disjoint, which a reader cannot see by
+    looking: {shared} of the {npairs} pairs share a destination at all, and the most
+    any two share is {numword(worst[0])} &mdash; {esc(worst[1])} and
+    {esc(worst[2])}, which is a real relationship rather than a duplication. The
+    {len(data['motions'])} queries on <a href="/europe-in">Europe in Motion</a> reach
+    every destination in the Atlas; these {numword(len(data['themes']))} reach a
+    quarter of it, because a query runs over everything and a theme is
+    {numword(sizes[0])} places somebody chose.</p>
+  </div>"""
+
+    # ── 03 · THIRTEEN ARGUMENTS ──────────────────────────────────────
+    #
+    # NOT THIRTEEN ROWS, AND NOT THIRTEEN CARDS. The owner read the first
+    # version of this page and named the fault exactly: *keep the existing
+    # page, add premium CSS and components around it, call it a redesign.*
+    # The thirteen themes had been a card grid, then rows, then rows with a
+    # photograph — three presentations of one list, and the list was the
+    # layout every time. `docs/redesign-doctrine.md` is the rule that came
+    # out of it and `tools/monotony.js` is the instrument: nothing here had
+    # ever counted repetition, so a page could be thirteen identical
+    # siblings and pass every gate.
+    #
+    # A theme holds a photograph, a geography, an authored summary, eight
+    # places and a reach. That is a composition, so each theme gets one —
+    # and THE COMPOSITION'S SCALE FOLLOWS THE THEME'S REACH, which is what
+    # makes the layout argue what the closing sentence says rather than
+    # captioning it. A theme crossing a MAJORITY of the nine corners of
+    # Europe gets the wide band; three or four corners the feature; and the
+    # one theme that is an argument about a single corner gets an intimate
+    # one. Majority of nine is five — a threshold rather than a taste — and
+    # it falls 6 / 6 / 1, with Renaissance Europe alone at the bottom,
+    # which is precisely the knot the sentence is about.
+    #
+    # NO NUMBERS ON THEM. A numeral would claim an order the data does not
+    # have — the same caveat this page already publishes about the eight
+    # places — and a second numbering inside a plate sequence is the
+    # 753-page double-numbering fault.
+    #
+    # THE MAP IS THE CONSTANT AND THE PICTURE IS THE VARIABLE. Every
+    # argument draws on the same continental frame, because reach is what
+    # separates the thirteen and `region_glyph`'s recorded refusal applies:
+    # framed on its own extent, each becomes a picture of a different place
+    # and the thirteen stop being comparable at all.
+    majority = len(data["macros"]) // 2 + 1
+    args = []
+    for k, t in enumerate(data["themes"]):
+        f = facts[t["slug"]]
+        scale = ("wide" if f["ncorner"] >= majority
+                 else "feat" if f["ncorner"] >= 3 else "tight")
+        # THE SIDE ALTERNATES, AND THAT IS WHAT MAKES A SEQUENCE A SEQUENCE.
+        # Six identical wide bands in a column is a listing with a bigger
+        # component, which is the fault one level up; a magazine alternates
+        # because the eye needs the rhythm to read a run of spreads as one
+        # argument rather than as a stack.
+        flip = " arg-flip" if k % 2 else ""
+        key = "theme:" + t["slug"]
+        shot = (f'<figure class="argshot">'
+                f'{picture(images, key, w=1600, h=1200, alt=(images or {}).get(key, {}).get("alt") or t["name"], sizes="(max-width: 52rem) 92vw, 46vw", credit=False)}'
+                f'</figure>' if held(images, key) else
+                f'<figure class="argshot">'
+                f'{ed_slot(key, shape="wide", label=t["name"])}</figure>')
+        args.append(
+            f'<article class="arg arg-{scale}{flip}">'
+            f'<figure class="argmap">'
+            f'{constellation(f["pts"], extra=" constel-theme")}'
+            f'<figcaption><span class="capmain">'
+            f'{n_of(len(f["places"]), "place")} across '
+            f'{n_of(len(f["countries"]), "country")}.</span>'
+            f'<span class="capsrc">{f["ncorner"]} of '
+            f'{len(data["macros"])} corners of Europe, on the same frame as '
+            f'the other {numword(len(data["themes"]) - 1)}.</span>'
+            f'</figcaption></figure>'
+            f'{shot}'
+            f'<div class="argsay">'
+            f'<p class="kicker">{esc(t["strapline"])}</p>'
+            f'<h2><a href="/themes/{t["slug"]}">{esc(t["name"])}</a></h2>'
+            f'<p class="lede">{esc(t["summary"])}</p>'
+            f'<p class="argplaces">{" &middot; ".join(esc(p) for p in f["places"])}</p>'
+            f'{golink("/themes/" + t["slug"], "Follow " + t["name"])}'
+            f'</div></article>')
     # THE ROWS OWE THEIR ATTRIBUTION AND PAY IT ONCE, under the list. The
     # photograph inside a row carries no figcaption, because a credit's own
     # links inside a row's link split the anchor — so the container pays,
     # exactly as the homepage's row of eight does. The licence asks for the
     # photographer and the provider, not for one caption per thumbnail.
-    _imgs = data.get("images") or {}
+    _imgs = images or {}
     _shot = [t for t in data["themes"] if ("theme:" + t["slug"]) in _imgs]
     themecred = ""
     if _shot:
@@ -8670,32 +11222,63 @@ def themes_index(data):
             for t in _shot))
         _n = len(data["themes"]) - len(_shot)
         themecred = (f'<p class="sheetcred rowcred">Photographs by {_who} on Pexels.'
-                     + (f' The {numword(_n)} without one draw their own places instead.'
-                        if _n else "") + '</p>')
+                     + (f' The {numword(_n)} without one carry their own places '
+                        f'instead.' if _n else "") + '</p>')
+    nwide = sum(1 for t in data["themes"]
+                if facts[t["slug"]]["ncorner"] >= majority)
+    ntight = sum(1 for t in data["themes"]
+                 if facts[t["slug"]]["ncorner"] < 3)
+    thirteen = f"""
+  <div class="sheettext">
+    <h2 class="mega">{numword(len(data['themes']), cap=True)} arguments about
+    Europe.</h2>
+    <p class="lede">Each one is a photograph of what it feels like, a map of where it
+    is and the sentence it makes. {held_say.capitalize()}, so the number of places is
+    not what separates them &mdash; what separates them is how far they cross, and the
+    <em>size</em> of each argument below is that reach: {numword(nwide)} of them cross a
+    majority of the {numword(len(data['macros']))} corners of Europe and
+    {"one" if ntight == 1 else numword(ntight)} is an argument about a single
+    corner.</p>
+  </div>
+  <div class="args">{"".join(args)}</div>
+  {themecred}"""
+
+    # ── 04 · THEME, THEN PLANNER ─────────────────────────────────────
+    thplan = f"""
+  <div class="sheettext">
+    <h2 class="mega">A theme is not an itinerary.</h2>
+    <p class="lede">The places under each theme are <em>not</em> in travelling order, and
+    the theme pages draw them with no path between them on purpose. Renaissance Europe is
+    three countries and the Grand Tour is four; Thermal Europe runs from Iceland to the
+    Caucasus, and reading it top to bottom would be a fortnight of flights.</p>
+    <p class="note">Put the ones you want into the <a href="/plan">Planner</a> and it
+    orders them by real distance, prices the days and says where the long legs are.
+    That is the difference between an argument about Europe and a trip through it.</p>
+  </div>"""
+
+    # ── 05 · OPEN THE DOOR ───────────────────────────────────────────
+    thclose = f"""
+  <div class="istart">
+    <h2 class="mega">Come for one thing.</h2>
+    <p class="lede">Then find that the continent is organised around it &mdash; and that
+    every place under a theme is still an ordinary page in the same Atlas, written to the
+    same template as Paris.</p>
+    <p class="keepgo"><a class="btn" href="/discover">Find your kind of Europe</a>
+    <a class="storygo" href="/countries">Or open the atlas &rarr;</a></p>
+  </div>"""
+
+    PLATES = [("thopen gal", "Same frame, different argument", thopen, "themes"),
+              ("thcross pine", "Cross-border Europe", thcross, "crossing"),
+              ("thargs gal", "Thirteen arguments", thirteen, "arguments"),
+              ("thplan pine", "Theme, then Planner", thplan, "planner"),
+              ("thclose gal", "Open the door", thclose, "open")]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Themes", None)])}
-<div class="pagehead index">
-  <p class="kicker">Discovery without a map of borders</p>
-  <h1>Europe, organised by what you came for.</h1>
-  <p class="lede">Medieval Europe is not a country. Neither is sacred Europe, or Viking Europe,
-  or the Europe you reach only by train. {len(data['themes'])} of them cut across the Atlas,
-  and each place under one of them stays linked to the country it is actually in.</p>
-</div>
-{silhouette}
-<div class="rows">{"".join(rows)}</div>
-{themecred}
-<p class="small">Each shape beside a theme is that theme\u2019s own eight places on the
-continent, drawn to the same frame so the thirteen can be compared: a knot is an
-argument about one corner of Europe, a scatter is one about the whole of it.
-{geo.sources_line(geo.load("europe-lod0.json"))}
-The places under each theme are not in travelling order, and
-the number beside them is how many countries the theme crosses rather than how
-many places it holds — {held}. For an order that
-respects distance, put the ones you want into the <a href="/plan">Planner</a>.</p>
+{plate_sequence(PLATES)}
 """
     return "/themes/index.html", page(
         "Themes", body, path="/themes", area="countries",
-        accent="territory",
+        accent="territory", hero=True,
         description="Cross-border ways into Europe: medieval, sacred, Viking, alpine, maritime and rail Europe, each a real sequence of places.",
     )
 
@@ -8857,148 +11440,354 @@ def theme_page(data, t):
 # ── stories ───────────────────────────────────────────────────────────
 
 def stories_index(data):
-    # NINE THREE-COLUMN GRIDS, EACH CONTAINING ONE CARD.
-    #
-    # The page was built from the DESK TAXONOMY rather than from what a
-    # reader is doing. Nine desks, one story each, so nine <h2> bands and
-    # nine grids of one — a 280px card alone in a 1,168px row with 888
-    # pixels of white beside it, nine times, over 5,792 pixels of page. The
-    # rule this repository already states is "design to purpose, not to data
-    # shape", and the shape of the data was the whole layout.
-    #
-    # AND EVERY ONE OF THEM DREW AN ILLUSTRATION CHOSEN BY HASH. The other
-    # rule this repository already states is that a story is not a place and
-    # its picture may not be drawn from a hash — that is why the story PAGE
-    # opens on a storymap of its own validated places. The index went on
-    # picking a landscape from the slug for all nine, which is the same
-    # failure the rule was written for, one page over.
-    #
-    # Nine essays is a contents page. The desk becomes a kicker on the piece
-    # it belongs to, which is what it always was — a property of the story,
-    # not a heading over one — and the date and the reading time are what a
-    # reader actually chooses on.
+    """The European editorial desk: nine essays, and the pictures spent.
+
+    THE PAGE WAS A HEAD, ONE PHOTOGRAPH, ONE LEAD AND EIGHT IDENTICAL ROWS,
+    and every repair that got it there was right. It was nine three-column
+    grids each holding one card — the desk taxonomy as the layout, 5,792
+    pixels — and then a contents page with an empty middle third, and then a
+    lead with its own constellation over eight rows. What was left is the
+    sum: one shape eight times, on 31,851 bytes, with **one `<img>` where
+    the register holds eight**.
+
+    That is /experiences' finding word for word, on the family whose
+    material is writing: *the pictures were already bought and were being
+    spent on one strip.* `stories-hero` plus seven `story:` rows is eight
+    photographs available to this page and it drew one. Nothing is acquired
+    by this rebuild. See `docs/stories-redesign.md` for the source audit,
+    the coverage audit, the brief's nine bands mapped onto what the data
+    holds, and the four bands the data refuses with the count behind each.
+    """
     sections = sorted({s["section"] for s in data["stories"]})
     byline = sorted(data["stories"],
                     key=lambda s: (s["published"], s["title"]), reverse=True)
-    # AND THE CONTENTS PAGE LEFT ITS MIDDLE THIRD EMPTY. Rewriting nine
-    # one-card grids as one list was right and only half the job: what
-    # replaced the nine hash-drawn landscapes was nothing at all, so the row
-    # ran a title and a standfirst down the left and a date 550 pixels away on
-    # the right. Measured on the built page, the median horizontal band used
-    # 46% of the column.
-    #
-    # A STORY'S PICTURE IS ITS OWN PLACES, WHICH IS THE RULE THAT REMOVED THE
-    # PLATES RATHER THAN AN EXCEPTION TO IT. The story page already opens on
-    # exactly that, drawn from the validated `places` field; this is the same
-    # derivation at glyph size. It cannot be wrong about its subject because
-    # it is made of it — and it is the one thing that tells these nine apart
-    # before a word is read. "The languages with no relatives" is San
-    # Sebastián, Budapest, Helsinki and Tbilisi, corner to corner; "the city
-    # rebuilt from paintings" is Warsaw, Dresden and Rotterdam, a knot. That
-    # difference IS the piece.
-    #
-    # Not the hash, and not a photograph either: the register holds none, and
-    # a story is the family where an illustration of nowhere did real damage
-    # — the essay about the last unlogged forest in Europe opened on tower
-    # blocks for a year.
+    images = data.get("images") or {}
     idx = data["cities"]
-    def glyph(s):
-        pts = []
-        for cid in s.get("places") or ():
+
+    def pts_of(st):
+        out = []
+        for cid in st.get("places") or ():
             n = idx.get(cid)
             if n:
-                pts.append(project(n["city"]["lat"], n["city"]["lon"]))
+                out.append(project(n["city"]["lat"], n["city"]["lon"]))
+        return out
+
+    def glyph(st):
         # A story that names no place gets no drawing, on the destination
         # page's rule: nothing in its place rather than something invented.
+        pts = pts_of(st)
         return constellation(pts, extra=" constel-theme", frame=True,
-                             mark=14) if pts else ""
-    # A LEAD, AND THEN THE REST. Nine identical rows with a 132px grey Europe
-    # at the right-hand end is a contents page with a decoration on it: the
-    # glyph was too small to name a place, the text stopped at a third of the
-    # column, and the newest piece looked exactly like the ninth. An index of
-    # nine essays has room to say which one to read first, and the answer is
-    # the newest — a date, not a judgement.
-    #
-    # The lead's own places are drawn at size, which is the treatment the
-    # story page and the homepage both already use for this family. The other
-    # eight keep the row, and lose the glyph: at 132px it said nothing, and
-    # eight of them said nothing eight times.
-    # THE OPENING DRAWS EVERY PLACE THE NINE PIECES ARE SET IN. That is the
-    # family's own subject at size and it is the same derivation the story
-    # page and the homepage already use — never a plate, which is the rule
-    # this family exists to demonstrate.
-    allplaces = []
-    for st in byline:
-        for cid in st.get("places") or ():
-            if cid in idx:
-                allplaces.append(project(idx[cid]["city"]["lat"], idx[cid]["city"]["lon"]))
+                             cut=True, mark=14) if pts else ""
+
     lead, rest = byline[0], byline[1:]
-    desks = (
-        f'<a class="storylead storyleadwide" href="{urls.story(lead)}">'
-        f'<div class="storyart">{glyph(lead)}</div>'
-        f'<div><p class="kicker">{esc(lead["section"])} · {esc(lead["reading"])} · '
-        f'{esc(lead["published"])}</p>'
-        f'<h2>{esc(lead["title"])}</h2>'
-        f'<p class="rowsub">{esc(lead["standfirst"])}</p>'
-        f'<p class="doorgo">Read the story →</p></div></a>'
-        '<div class="rows">' + "".join(
-            f'<a class="row storyrow" href="{urls.story(s)}">'
-            f'<div><p class="kicker">{esc(s["section"])}</p>'
-            f'<h2>{esc(s["title"])}</h2>'
-            f'<p class="rowsub">{esc(s["standfirst"])}</p></div>'
-            f'<p class="rowmeta">{esc(s["published"])}<br>'
-            f'<span class="small">{esc(s["reading"])}</span></p></a>'
-            for s in rest
-        ) + "</div>")
-    # NO DRAWING HERE EITHER, AND FOR A SHARPER REASON.
+
+    # ── 01 · THE DESK ────────────────────────────────────────────────
+    # THE OPENING PHOTOGRAPH BELONGS TO THE PAGE AND NOT TO A STORY.
+    # `stories-hero` is a Liechtenstein village — a picture of Europe's
+    # people and their ground, which is exactly what the headline claims and
+    # exactly NOT a claim about any of the nine. Putting it behind a story's
+    # title would be the hash-drawn landscape in a different costume: a
+    # generic picture standing in for a specific piece, which is the fault
+    # this family exists to demonstrate against.
     #
-    # This is the one family on the site whose material is WRITING, and it
-    # opened on the same continent as five other indexes with a different
-    # number of dots on it — the places nine essays happen to be set in,
-    # which is a fact about the essays and not an argument about any of
-    # them.
+    # So it is a BLEED under the head rather than a panel beside it — a
+    # bleed leaves the column and is a change of movement, which is the one
+    # of the seven image scales that says "this is the page, and here is
+    # what it is about" without saying it about an essay.
+    # AND THE LEDE NAMED SIX DESKS OF NINE, NEXT TO A DERIVED "NINE".
+    # It read "nine desks — people, history, food, faith, nature and
+    # culture", with the count generated and the list typed, so the sentence
+    # stated its own extent and then silently dropped Places, Travel and
+    # Adventure. That is `pop_line`'s shape in a list rather than a field:
+    # coverage that looks like a policy, and a third of the set missing from
+    # the one sentence that introduces it. Both halves are derived now, so a
+    # tenth desk arrives in the prose on the build that adds it.
     #
-    # The page already refuses a picture per story on exactly this ground:
-    # "a story is not a place, and a landscape chosen for it by chance once
-    # put tower blocks above an essay on the last unlogged forest in
-    # Europe." A scatter of nine stories' places is that rule's own
-    # loophole — not chosen by a hash, and still a picture of nothing in
-    # particular standing in front of nine pieces of writing. The lead piece
-    # keeps its own storymap, which IS about one essay, and it comes up the
-    # page now that nothing is in front of it.
+    # THE BRIEF'S DESK BAND IS ANSWERED HERE RATHER THAN AS A ROOM. It asks
+    # for a chip index under the opening, and a chip is a FILTER: this page
+    # loads no JavaScript (its only `<script>` is the inert JSON-LD block)
+    # and no per-desk page exists, so nine chips would be nine controls that
+    # do nothing — `data-rotate`, which shipped 232 bytes of copy on the
+    # homepage for the life of a band waiting for a rotator nobody wrote.
+    # Naming the desks is what the chips were actually FOR, and a name in
+    # the head is an extent rather than a directory.
+    desknames = ", ".join(x.lower() for x in sections[:-1]) + \
+        " and " + sections[-1].lower()
+    open_ = f"""
+  <div class="storyopen">
+    <h1 class="mega">A continent is people before it is
+    <em class="lit">places</em>.</h1>
+    <p class="lede">{numword(len(data['stories']), cap=True)} pieces across
+    {numword(len(sections))} desks &mdash; {desknames}. Every story links
+    into the Atlas, and every Atlas page a story touches links back, so
+    reading and planning are the same motion.</p>
+  </div>
+  <figure class="storybleed">{photo(images, "stories-hero", w=2400, h=1200,
+      eager=True, sizes="100vw",
+      alt="A village under snowcapped mountains in Liechtenstein.")}</figure>"""
+
+    # ── 02 · THE LEDGER ──────────────────────────────────────────────
+    # ALL NINE, PRINTED ONCE. The lead is the ledger's first entry at size
+    # rather than a band of its own: two bands, one of them "read this
+    # first" and the other "here are all nine", would print the same set
+    # twice to say two things — the fault 220 place pages had, where a strip
+    # and the rows underneath were the same places. One set, one band, and
+    # the newest piece is given the weight.
+    #
+    # And the lead is the NEWEST, which is a date rather than a judgement.
+    # That is why the opening above is not photographic today: the newest
+    # piece is `The long walk nobody finishes`, filed to Adventure, and the
+    # register holds no photograph for it. Choosing the newest PHOTOGRAPHED
+    # piece instead would be an editorial judgement wearing a rule's
+    # clothes, and this page already refused that once.
+    ledger = f"""
+  <div class="pagehead index">
+    <p class="kicker">The desk</p>
+    <h2 class="mega">Everything filed, newest first.</h2>
+    {head_extent([(len(data['stories']), 'pieces'),
+                  (len(sections), 'desks'),
+                  (len({c for st in data['stories'] for c in (st.get('places') or ())}),
+                   'places written about')])}
+  </div>
+  <a class="storylead storyleadwide" href="{urls.story(lead)}">
+    <div class="storyart">{glyph(lead)}</div>
+    <div><p class="kicker">{esc(lead["section"])} &middot; {esc(lead["reading"])} &middot;
+    {esc(lead["published"])}</p>
+    <h3>{esc(lead["title"])}</h3>
+    <p class="rowsub">{esc(lead["standfirst"])}</p>
+    <p class="storygo">Read the story &rarr;</p></div></a>
+  <div class="rows">{"".join(
+      f'<a class="row storyrow" href="{urls.story(s)}">'
+      f'<div><p class="kicker">{esc(s["section"])}</p>'
+      f'<h3>{esc(s["title"])}</h3>'
+      f'<p class="rowsub">{esc(s["standfirst"])}</p></div>'
+      f'<p class="rowmeta">{esc(s["published"])}<br>'
+      f'<span class="small">{esc(s["reading"])}</span></p></a>'
+      for s in rest)}</div>
+  <p class="note">One piece per desk, which is why there is no band of desks
+  above this one: {numword(len(sections))} headings over one item each is the
+  taxonomy as the layout, and it is the shape this page was built as and
+  threw away.</p>"""
+
+    # ── THE FEATURE ──────────────────────────────────────────────────
+    # THE BRIEF ASKS FOR A FEATURE STORY AND THIS PAGE HAD REFUSED THE
+    # QUESTION NEXT DOOR TO IT. The recorded refusal is *the lead cannot be
+    # the photographic one* — the ledger leads on the NEWEST piece, which is
+    # a date rather than a judgement, and the newest is filed to Adventure
+    # where the register holds nothing. That is still true and it is about
+    # the LEDGER. A feature is a different question: which piece can carry a
+    # photograph at size, which is a fact about the register and not a
+    # ranking of the writing.
+    #
+    # So the two coexist, which is what the brief's own architecture does:
+    # the ledger leads TYPOGRAPHICALLY on the newest, and the feature band
+    # carries the newest piece the register holds a photograph of and the
+    # ledger has not already led on. Today that is `The ferry is the
+    # attraction`. Both are derived, so the day Adventure is photographed
+    # the ledger keeps its lead and the feature moves down one rather than
+    # drawing the same piece twice — which is the *same set printed twice*
+    # fault this page already avoided once by refusing a lead band.
+    feat = next((st for st in byline
+                 if st is not lead and held(images, "story:" + st["slug"])), None)
+    # NO NEW COMPONENT: `.ed-feature` IS THE SCALE THIS BAND IS. The seven
+    # image scales already hold it — *a feature is asymmetric at 1.35
+    # against .65, because two equal columns read as a layout and an unequal
+    # pair reads as a picture with something to say* — and that is the
+    # prototype's 54/46 stated as a proportion rather than a percentage.
+    # *No new primitive until repeated structure has actually emerged*, and
+    # what emerged here is a user for one that was already written.
+    feature = "" if not feat else f"""
+  <div class="ed-feature">
+    <figure class="ed-feature-media">{picture(images, "story:" + feat["slug"],
+        w=1600, h=1200, sizes="(min-width: 62rem) 62vw, 100vw",
+        alt=feat["title"])}</figure>
+    <div class="ed-feature-say">
+      <p class="kicker">{esc(feat["section"])} &middot; {esc(feat["reading"])}
+      &middot; {esc(feat["published"])}</p>
+      <h2>{esc(feat["title"])}</h2>
+      <p>{esc(feat["standfirst"])}</p>
+      <p><a class="storygo" href="{urls.story(feat)}">Read the story
+      &rarr;</a></p>
+    </div>
+  </div>"""
+
+    # ── 03 · THE IDEA ────────────────────────────────────────────────
+    # THE PAGE'S OWN SENTENCE, PROMOTED FROM A FOOTNOTE TO A ROOM. It was
+    # the last paragraph on the page, at caption size, under a source note.
+    # It is the reason this family looks the way it does and the reason
+    # seven of these nine have a photograph and two do not, so it is the
+    # thing a reader should meet before the pictures rather than after them.
+    idea = """
+  <div class="storyidea">
+    <h2 class="mega">A story is not a place.</h2>
+    <p class="lede">A landscape chosen by chance once put tower blocks above
+    an essay on the last unlogged forest in Europe. So a piece here is
+    illustrated by a photograph somebody took of the thing it is about, or
+    by the places it is set in drawn on the atlas, or by nothing &mdash;
+    and never by a picture picked from the hash of its own name.</p>
+  </div>"""
+
+    # ── 04 · THE PICTURES ────────────────────────────────────────────
+    # SEVEN OF THE NINE, AT SIZE, EACH LINKED TO ITS OWN PIECE. This is
+    # where the library goes. A story's photograph belongs to that story, so
+    # nothing here is generic and nothing is reused: the seven keys are
+    # `story:<slug>` and the two pieces without one are absent from the band
+    # rather than filled with something else.
+    #
+    # `columns` RATHER THAN A GRID, which is /experiences' own measured
+    # reason one family over: a grid row is as tall as its tallest item, so
+    # a long title beside a short one pays for the difference on every row.
+    # Column-major is right here because the order is the ledger's own,
+    # newest first, down the left.
+    #
+    # AND EACH TILE CARRIES A DESK AND A TITLE AND NOT THE STANDFIRST.
+    # The first version repeated the standfirst verbatim from the ledger two
+    # bands up — *the same set printed twice to say two things*, which is
+    # the fault 220 place pages had where a strip and the rows under it were
+    # the same places. A title under a photograph is a CAPTION and names
+    # what the picture is of; a second copy of the sentence is a second
+    # contents list.
+    #
+    # The alternative was tried on paper and refused: putting the seven
+    # photographs into the ledger's own rows and deleting this band halves
+    # the page and makes every picture a row-sized thumbnail, which is what
+    # /journeys' index already measured as saying nothing. The brief asks
+    # for both and is right to — *photography at editorially meaningful
+    # moments, while the main nine-story ledger remains typographic.*
+    #
+    # AND A CREDIT IS A LINK, SO THE PICTURE CANNOT GO INSIDE ONE. The first
+    # version wrapped `photo()` in the tile's `<a>`, and `picture()`'s
+    # figcaption carries the two links Pexels' terms require: an `<a>` may
+    # not contain an `<a>`, so the parser closed the tile at the inner one
+    # and reparented the credit out of the `<picture>` it belongs to. The
+    # browser suite found **21 links painting nothing even with focus on
+    # them** — `picture:focus-within .credit` could no longer reach them.
+    # So `credit=False`, and the attribution is paid once under the row.
+    # AND THE FEATURE IS NOT DRAWN TWICE. `photographed` is the register's
+    # claim and stays the whole seven; `shots` is what this row DRAWS, which
+    # is the seven less the one the feature band has already given the full
+    # proportion to. A tile repeating a picture four bands after it was the
+    # subject of its own band is the *same set printed twice* fault, and the
+    # band's own figures are derived so the sentence cannot state a count
+    # the row does not show.
+    photographed = [st for st in byline if held(images, "story:" + st["slug"])]
+    shots = [st for st in photographed if st is not feat]
+    pics = "".join(
+        '<figure class="picstory">'
+        + f'<a class="picgo" href="{urls.story(st)}">'
+        + picture(images, "story:" + st["slug"], w=1600, h=900,
+                  sizes="(min-width: 62rem) 46vw, 100vw",
+                  alt=st["title"], credit=False)
+        + f'<p class="kicker">{esc(st["section"])}</p>'
+        f'<h3>{esc(st["title"])}</h3></a>'
+        + "</figure>"
+        for st in shots)
+    # AND THE BAND PAYS ITS ATTRIBUTION ONCE, which is what every other row
+    # of pictures on this site already does — the homepage's row of eight,
+    # the destination rail, the country and theme strips, five call sites
+    # spelling `sheetcred rowcred`. Seven credits under seven tiles is the
+    # accent-on-every-row failure in a licence line: the provenance is the
+    # same kind of fact on all seven, so stating it per tile states nothing
+    # that distinguishes them and puts somebody else's brand seven times
+    # into a page that is EuropeDoor's. Once, under the row, with each
+    # photographer linked to the photograph's own page.
+    picwho = ", ".join(dict.fromkeys(
+        f'<a href="{esc(images["story:" + st["slug"]]["source"])}" rel="noopener"'
+        f' target="_blank">{esc(images["story:" + st["slug"]]["photographer"])}</a>'
+        for st in shots))
+    picband = f"""
+  <div class="sheettext">
+    <h2 class="mega">Photographed.</h2>
+    <p class="lede">{numword(len(photographed), cap=True)} of the
+    {numword(len(data['stories']))} carry a photograph somebody took of what
+    the piece is about. {("The newest of them is the feature above, so here "
+    "are the other " + numword(len(shots)) + ". ") if feat else ""}The
+    {numword(len(data['stories']) - len(photographed))} without one carry the
+    places they are set in, and will carry a photograph the day there is one
+    to carry &mdash; the page does not change, only the register does.</p>
+  </div>
+  <div class="storypics">{pics}</div>
+  <p class="sheetcred rowcred">Photographs by {picwho} on Pexels.</p>"""
+
+    # ── 05 · WHERE THEY HAPPEN ───────────────────────────────────────
+    # THE DRAWING IS HERE RATHER THAN AT THE TOP, AND THAT IS THE PAGE'S
+    # OWN RECORDED REFUSAL KEPT RATHER THAN OVERTURNED. As an OPENING, a
+    # scatter of nine stories' places is a picture of nothing in particular
+    # standing in front of nine pieces of writing — not chosen by a hash,
+    # and still not about any of them. As the band that says *reading and
+    # planning are the same motion*, the same drawing is about exactly one
+    # thing: which parts of the Atlas these essays reach into.
+    allpts = [p for st in byline for p in pts_of(st)]
+    touched = sorted({c for st in data["stories"] for c in (st.get("places") or ())
+                      if c in idx},
+                     key=lambda c: idx[c]["city"]["name"])
+    inplace = f"""
+  <div class="sheettext">
+    <h2 class="mega">Where they happen.</h2>
+    <p class="lede">Every place the {numword(len(data['stories']))} pieces are
+    set in, lit at once. Each of them has a page in the Atlas, and each of
+    those pages links back to the essay &mdash; which is the whole of what
+    this desk is for.</p>
+  </div>
+  <figure class="storyplaces">
+    {constellation(allpts, extra=" constel-theme", cut=True, mark=5)}
+    <figcaption><span class="capwhat">The
+    {n_of(len(touched), "destination")} the nine essays are set in, on the
+    same projection as every other map here. Named in the
+    ledger above and on each piece.</span>
+    <span class="capsrc">{geo.sources_line(geo.load("europe-lod0.json"))}</span></figcaption>
+  </figure>"""
+
+    # ── 06 · THE FEED ────────────────────────────────────────────────
+    # THE ONE THING A DESK OWES ITS READERS THAT THIS ONE DID NOT HAVE.
+    # Nine dated, authored essays, a public JSON API and a sitemap — and no
+    # way at all to be told when a tenth arrives. It was a `.note.onward`,
+    # which wears the interactive colour and is deliberately rare; the Stay
+    # layer already composes an ACTION — a rule, the sentence saying what it
+    # will do, and the action beside it, with no border box, radius, shadow
+    # or fill — so this takes that grammar rather than inventing a second.
+    feed = """
+  <div class="storyfeed">
+    <p class="storysay">An Atom feed of every story, newest first, with the
+    desk it was filed to and the standfirst as written. No tracking
+    parameter, no email address, and nothing to sign up to. It is declared in
+    the shell of every page for a reader whose browser looks for one, and
+    said here in words for a reader whose browser does not.</p>
+    <p class="keepgo"><a class="btn" href="/stories/feed.xml">Follow the desk</a></p>
+  </div>"""
+
+    # ── 07 · THE DOOR ────────────────────────────────────────────────
+    # NOT `.sheet-send`, WHICH IS /journeys' CLOSE — a graphite band built
+    # to carry a photograph behind a 72% scrim. Naming this plate `send`
+    # gave a bone publication's last words light type on near-black. Fourth
+    # class-name collision on this page's own run, after `.sendsay`,
+    # `.closesay` and a duplicated `.deskart figcaption`.
+    send = f"""
+  <div class="composesay">
+    <h2 class="mega">Read one. Then go.</h2>
+    <p class="lede">Every piece ends where it is set, and every place it
+    names is a page you can plan from.</p>
+    <p class="keepgo">{golink('#the-desk', 'Back to the ledger')}
+    {golink('/discover', 'Or open the Atlas')}</p>
+  </div>"""
+
+    PLATES = [("open gal", "The desk", open_, "the-opening"),
+              ("feature paper", "The feature", feature, "the-feature"),
+              ("ledger gal quiet", "Everything filed", ledger, "the-desk"),
+              ("idea pine", "A story is not a place", idea, "the-idea"),
+              ("pics gal", "Photographed", picband, "photographed"),
+              ("inplace gal quiet", "Where they happen", inplace, "where-they-happen"),
+              ("feed gal", "The feed", feed, "the-feed"),
+              ("readgo gal", "Read one, then go", send, "read-one")]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Stories", None)])}
 {constel_defs()}
-{indexhero(
-    kicker="Stories",
-    title="A continent is people before it is places.",
-    lede=f"{len(data['stories'])} pieces across {len(sections)} desks — people, history, "
-         f"food, faith, nature and culture. Every story links into the Atlas, and every "
-         f"Atlas page that a story touches links back, so reading and planning are the "
-         f"same motion.",
-    img=photo(data.get("images"), "stories-hero", w=2000, h=1200,
-              sizes="(min-width: 60rem) 52vw, 100vw"))}
-{desks}
-<!-- THE ONE THING A DESK OWES ITS READERS THAT THIS ONE DID NOT HAVE. Nine
-     dated, authored essays, a public JSON API, a sitemap — and no way at all
-     to be told when a tenth arrives. The link is declared in the shell for
-     every reader whose browser or reader looks for it, and stated here in
-     words for every reader who does not have one. -->
-<p class="note onward"><a href="/stories/feed.xml">Follow the desk &rarr;</a>
-An Atom feed of every story, newest first, with the desk it was filed to and
-the standfirst as written. No tracking parameter, no email address, and
-nothing to sign up to.</p>
-<p class="small">The shape above the lead piece is the places it is about, drawn
-on the same projection as every other map here — and the same reason there is no
-other picture on this page: a story is not a place, and a landscape chosen for it
-by chance once put tower blocks above an essay on the last unlogged forest in
-Europe. Coastline from <a href="/sources">Natural Earth</a>, public domain.</p>
+{plate_sequence(PLATES)}
 """
     return "/stories/index.html", page(
-        "Stories", body, path="/stories", area="stories",
+        "Stories", body, path="/stories", area="stories", hero=True,
         description="Editorial from across Europe: people, history, food, faith, nature and culture, each linked into the Atlas.",
     )
-
 
 def story_page(data, s):
     # THE ESSAY HEAD IS A `pagehead` VARIANT, like the other five family
@@ -9161,7 +11950,7 @@ def project(lat, lon):
     return MAPPROJ.xy(lat, lon)
 
 
-def maplist(data):
+def maplist(data, flat=False):
     """The map, as a list — the accessible alternative the UI specification
     asks for.
 
@@ -9205,12 +11994,25 @@ def maplist(data):
     blocks.insert(0, f'<h3>Every country <span class="small">'
                      f'{len(data["countries"])}</span></h3>'
                      f'<ul class="stack cols">{countries}</ul>')
+    # AND IT IS A BAND NOW RATHER THAN A DISCLOSURE, on the one page where
+    # it is the most complete content there is. The docstring above argues
+    # that a text version nobody sighted ever sees is a text version that
+    # rots, and a closed `<details>` is most of the way to that: fifty
+    # countries and all 319 destinations with coordinates, grouped by macro
+    # region, behind a summary line. `aria-describedby` still points at it,
+    # a visible equivalent is strictly better than a hidden one, and the
+    # only thing lost is the summary — which is now the band's own head.
+    intro = (f'<p class="small">The map above is a picture and cannot be read '
+             f'out. This is the same data as text, with coordinates, and it '
+             f'is the accessible alternative \u2014 not a reduced version of '
+             f'it.</p>')
+    if flat:
+        return (f'<div class="maplist maptwin" id="maplist">{intro}'
+                f'{"".join(blocks)}</div>')
     return (f'<details class="maplist" id="maplist">'
             f'<summary>Every place on this map, as a list '
             f'({len(data["cities"])} places, grouped by region)</summary>'
-            f'<p class="small">The map above is a picture and cannot be read out. This is the '
-            f'same data as text, with coordinates, and it is the accessible alternative — not '
-            f'a reduced version of it.</p>{"".join(blocks)}</details>')
+            f'{intro}{"".join(blocks)}</details>')
 
 
 def map_page(data):
@@ -9377,116 +12179,210 @@ def map_page(data):
     projprobe = [[lat, lon, round(MAPPROJ.xy(lat, lon)[0], 6),
                   round(MAPPROJ.xy(lat, lon)[1], 6)]
                  for lat in (35.0, 52.25, 71.0) for lon in (-24.0, 10.0, 44.0)]
-    body = f"""
-{crumbs([("Europe", "/discover"), ("Map", None)])}
-<div class="pagehead instrument">
-  <p class="kicker">The map</p>
-  <h1>Europe, and everything we hold in it.</h1>
-  {head_extent([(len(data['countries']), 'countries'),
-                (len(data['cities']), 'destinations'),
-                (len(placedots), 'places')])}
-  <p class="lede">Click a country to go into it.</p>
-</div>
-<div class="mapstage">
-<div class="mapmain">
-<div class="mapzoom">
-  <button type="button" class="zbtn" id="zoomin" aria-label="Zoom in">+</button>
-  <button type="button" class="zbtn" id="zoomout" aria-label="Zoom out">−</button>
-  <button type="button" class="zbtn wide" id="zoomreset">Whole of Europe</button>
-  <span class="small" id="zoomwhere" aria-live="polite"></span>
-</div>
-<div class="mapwrap">
-<svg viewBox="0 0 {MAP_W} {MAP_H}" id="europemap" class="europemap" data-role="instrument" role="img" aria-describedby="maplist" aria-label="Map of Europe showing every country, destination and place in the Atlas">
-<rect width="{MAP_W}" height="{MAP_H}" fill="none"/>
-<g id="context" class="context" aria-hidden="true">{''.join(context)}</g>
-<g id="countries" class="countries">{''.join(shapes)}</g>
-<g id="detail" class="countries"></g>
-{cut_fade('map', MAP_W, MAP_H, dusk_reach())}
-<g id="nogeo" class="nogeo">{''.join(nogeo)}</g>
-<g id="route"></g>
-<g id="regions" hidden display="none"></g>
-<g id="places" hidden display="none">{''.join(placedots)}</g>
-<g id="dots">{''.join(dots)}</g>
-</svg>
-</div>
-<p class="small" id="routenote"></p>
-</div>
-<aside class="mapside">
-  <div id="countrypanel" class="countrypanel" hidden aria-live="polite"></div>
-  <div id="mappopup" class="mappopup" hidden aria-live="polite"></div>
-</aside>
-</div>
-
-<details class="maptools">
-  <summary>Layers, overlays and how to read the map</summary>
-  <div class="maphint">
+    # ── 01 · THE INSTRUMENT ──────────────────────────────────────────
+    #
+    # THE MAP WAS ALREADY THE HERO AND EVERYTHING THAT MAKES IT AN
+    # INSTRUMENT WAS BEHIND A CLOSED DISCLOSURE. `<details class="maptools">`
+    # held the legend, how to read the drawing, the four geography layers,
+    # all seventeen interest filters, the journey overlay, the distance
+    # origin and the live count — so a reader met a map they could only
+    # click, under a four-word lede. The owner's brief is *make the map the
+    # actual instrument*, and the controls ARE the instrument.
+    #
+    # `.mapstage` and every id map.js binds to survive exactly as they were:
+    # the stage still gains `.withpanel` only while the panel or popup is
+    # open, so the drawing is full width the rest of the time, which is the
+    # behaviour that rule was written for.
+    mapopen = f"""
+  <div class="pagehead instrument">
+    <p class="kicker">The map</p>
+    <h1>Europe, and everything we hold in it.</h1>
+    {head_extent([(len(data['countries']), 'countries'),
+                  (len(data['cities']), 'destinations'),
+                  (len(placedots), 'places')])}
+    <p class="lede">Every country we write about, every destination in it and every place
+    inside those &mdash; one drawing, drawn from public-domain geometry we host ourselves.
+    Click a country to open it; click again to go into it.</p>
+  </div>
+  <div class="mapstage">
+  <div class="mapmain">
+  <div class="mapzoom">
+    <button type="button" class="zbtn" id="zoomin" aria-label="Zoom in">+</button>
+    <button type="button" class="zbtn" id="zoomout" aria-label="Zoom out">&minus;</button>
+    <button type="button" class="zbtn wide" id="zoomreset">Whole of Europe</button>
+    <span class="small" id="zoomwhere" aria-live="polite"></span>
+  </div>
+  <div class="mapwrap">
+  <svg viewBox="0 0 {MAP_W} {MAP_H}" id="europemap" class="europemap" data-role="instrument" role="img" aria-describedby="maplist" aria-label="Map of Europe showing every country, destination and place in the Atlas">
+  <rect width="{MAP_W}" height="{MAP_H}" fill="none"/>
+  <g id="context" class="context" aria-hidden="true">{''.join(context)}</g>
+  <g id="countries" class="countries">{''.join(shapes)}</g>
+  <g id="detail" class="countries"></g>
+  {cut_fade('map', MAP_W, MAP_H, dusk_reach())}
+  <g id="nogeo" class="nogeo">{''.join(nogeo)}</g>
+  <g id="route"></g>
+  <g id="regions" hidden display="none"></g>
+  <g id="places" hidden display="none">{''.join(placedots)}</g>
+  <g id="dots">{''.join(dots)}</g>
+  </svg>
+  </div>
+  <p class="small" id="routenote"></p>
+  </div>
+  <aside class="mapside">
+    <div id="countrypanel" class="countrypanel" hidden aria-live="polite"></div>
+    <div id="mappopup" class="mappopup" hidden aria-live="polite"></div>
+  </aside>
+  </div>
+  <div class="mapkey">
     <ul class="legend">
-      <li><span class="sw land"></span> A country in the Atlas — click it to open the panel,
-        click again to go to its page</li>
+      <li><span class="sw land"></span> A country in the Atlas &mdash; click it to open the
+        panel, click again to go to its page</li>
       <li><span class="sw ctx"></span> Land outside the Atlas, drawn so the coast has a far
         shore</li>
       <li><span class="sw dest"></span> A destination we have written</li>
-      <li><span class="sw ring"></span> A country too small to draw at this scale — Monaco and
-        Vatican City, and four more at the widest zoom</li>
+      <li><span class="sw ring"></span> A country too small to draw at this scale &mdash;
+        Monaco and Vatican City, and four more at the widest zoom</li>
     </ul>
-    <p class="small">Drag to pan, scroll or use + and − to zoom. Zooming past 1.6× loads a finer
-    coastline; opening a country loads that country's own.</p>
+    <p class="small mapread">Drag to pan, scroll or use + and &minus; to zoom. Zooming past
+    1.6&times; loads a finer coastline; opening a country loads that country&rsquo;s
+    own.</p>
+  </div>"""
+
+    # ── 02 · WHAT YOU CAN ASK IT ─────────────────────────────────────
+    #
+    # THE CONTROLS ARE OUT OF THE DISCLOSURE AND THE HEAD SAYS WHAT THEY
+    # DO. /discover already settled this one family over: the instructions
+    # belong beside the control they describe, and "Choose what you are
+    # travelling for" 950 pixels above the chips it describes was the fault
+    # that moved it. The legend moves with them, because a key is part of
+    # reading the drawing rather than a footnote to it.
+    mapask = f"""
+  <div class="sheettext">
+    <h2 class="mega">One map, several questions.</h2>
+    <p class="lede">The drawing answers a different question depending on what you switch
+    on. Nothing here is a filter over a search result &mdash; every layer is geometry or
+    data this Atlas already holds, drawn into the same projection as the dots.</p>
   </div>
-  <div class="maplayers">
-    <fieldset id="geolayers">
-      <legend class="mini">Geography</legend>
-      <label><input type="checkbox" name="geo" value="borders" checked> Borders</label>
-      <label><input type="checkbox" name="geo" value="regions"> Regions</label>
-      <label><input type="checkbox" name="geo" value="cities" checked> Destinations</label>
-      <label><input type="checkbox" name="geo" value="places"> Places ({len(placedots)})</label>
-    </fieldset>
-  </div>
-  <p class="mini">What each destination is for</p>
-  <div class="checks" id="layers">{filters}</div>
-  <div class="form-row mw34">
-    <div class="field">
-      <label for="journeylayer">Draw a journey over it</label>
-      <select id="journeylayer"><option value="">None</option>{joptions}</select>
+  <div class="askgrid">
+    <div class="askset">
+      <p class="mini">What is drawn</p>
+      <fieldset id="geolayers">
+        <legend class="visually-hidden">Geography</legend>
+        <label><input type="checkbox" name="geo" value="borders" checked> Borders</label>
+        <label><input type="checkbox" name="geo" value="regions"> Regions</label>
+        <label><input type="checkbox" name="geo" value="cities" checked> Destinations</label>
+        <label><input type="checkbox" name="geo" value="places"> Places ({len(placedots)})</label>
+      </fieldset>
     </div>
-    <div class="field">
-      <label for="mapfrom">Measure distances from</label>
-      <select id="mapfrom"><option value="">Nowhere in particular</option>{fromoptions}</select>
+    <div class="askset">
+      <p class="mini">What each destination is for</p>
+      <div class="checks" id="layers">{filters}</div>
+      <p class="small" id="mapcount"></p>
+    </div>
+    <div class="askset">
+      <p class="mini">Over the top of it</p>
+      <div class="field">
+        <label for="journeylayer">Draw a journey over it</label>
+        <select id="journeylayer"><option value="">None</option>{joptions}</select>
+      </div>
+      <div class="field">
+        <label for="mapfrom">Measure distances from</label>
+        <select id="mapfrom"><option value="">Nowhere in particular</option>{fromoptions}</select>
+      </div>
+      <p class="note">A distance here is a straight line between two coordinates. This atlas
+      holds no road and no rail geometry, so it is a floor on the journey and never the
+      journey.</p>
     </div>
   </div>
-  <p class="small" id="mapcount"></p>
-</details>
 {jsondata("europedoor-journeys", jdata)}
 {jsondata("europedoor-mapinfo", info)}
 {jsondata("europedoor-countries", cinfo)}
 {jsondata("europedoor-projection", projinfo)}
-{jsondata("europedoor-projection-probe", projprobe)}
-<div class="note">
-  <h2 class="mini">What this drawing is and is not</h2>
-  <p>The land comes from <strong>{esc(attribution)}</strong>, which is in the public domain and
-  which we host ourselves: the file your browser drew this from is on our own servers, fetched
-  once by a script in this repository, hashed, and committed. There is no map account behind it
-  and no per-view bill, and that is a deliberate architectural choice rather than a stage we
-  have not reached yet.</p>
-  <p>It is a <strong>cartographic</strong> source, not a legal one. It is built to look right at
-  a stated scale, and at the scale of a whole continent a border is a line a few kilometres
-  wide. Do not read a disputed frontier off this map. Two countries in the Atlas — Monaco and
-  Vatican City — have no shape here at all, because at 1:50 million they are smaller than a
-  pixel; they are drawn as a ringed point instead of a polygon we made up.
-  <a href="/method#map">How the map is built</a>.</p>
-  <p>Projection: a <strong>Lambert conformal conic</strong> on the angles the EU publishes
-  pan-European maps at — standard parallels {geo.LCC_P1:g}°N and {geo.LCC_P2:g}°N, origin
-  {geo.LCC_LAT0:g}°N, central meridian {geo.LCC_LON0:g}°E. Conformal means shape is preserved
-  everywhere: a country is the shape it is, at any latitude on this map. Regions are shown by
-  the destinations that belong to them, not as boundaries — we hold which region a place is in,
-  and we do not hold region geometry.</p>
-</div>
+{jsondata("europedoor-projection-probe", projprobe)}"""
 
-{maplist(data)}
+    # ── 03 · EVERYTHING WE HOLD, IN WORDS ────────────────────────────
+    #
+    # THE MOST COMPLETE INDEX ON THIS SITE WAS BEHIND A SUMMARY LINE. Fifty
+    # countries and all 319 destinations with their coordinates, grouped by
+    # macro region — the map's own `aria-describedby` target, and the
+    # control WCAG 2.5.8 requires for the twenty countries that draw
+    # between 3.6 and 12 pixels wide. It is a band now: the alternative
+    # still exists for assistive technology and a sighted reader can use it
+    # too, which is what the helper's own docstring asks for.
+    maptwin = f"""
+  <div class="sheettext">
+    <h2 class="mega">Everything on the map, in words.</h2>
+    <p class="lede">{len(data['countries'])} countries and {len(data['cities'])}
+    destinations, grouped by region, each with the coordinates the dot was drawn from.
+    Searchable with ctrl-F, which the drawing is not.</p>
+  </div>
+  {maplist(data, flat=True)}"""
+
+    # ── 04 · WHAT THIS DRAWING IS AND IS NOT ─────────────────────────
+    #
+    # PROMOTED FROM A `.note` AT CAPTION SIZE AT THE FOOT OF THE PAGE. This
+    # is the cartographic position of the whole product and the one place on
+    # the site allowed to name the projection — and it was printed smaller
+    # than everything it explains, which is the fault /beyond-the-obvious
+    # and /themes both had.
+    mapsay = f"""
+  <div class="sheettext">
+    <h2 class="mega">A <em class="lit">cartographic</em> source, not a legal
+    one.</h2>
+    <p class="lede">The land comes from {esc(attribution)}, which is in the public domain
+    and which we host ourselves: the file your browser drew this from is on our own
+    servers, fetched once by a script in this repository, hashed, and committed. There is
+    no map account behind it and no per-view bill, and that is a deliberate architectural
+    choice rather than a stage we have not reached yet.</p>
+    <p class="note">It is built to look right at a stated scale, and at the scale of a
+    whole continent a border is a line a few kilometres wide. <strong>Do not read a
+    disputed frontier off this map.</strong> Two countries in the Atlas &mdash; Monaco and
+    Vatican City &mdash; have no shape here at all, because at 1:50 million they are
+    smaller than a pixel; they are drawn as a ringed point instead of a polygon we made
+    up. <a href="/method#map">How the map is built</a>.</p>
+    <!-- THE DEGREE SIGN IS THE CHARACTER AND NOT `&deg;`. `c_published_projection`
+         reads the shipped HTML for "35\u00b0" within the sentence that names
+         the conic, and the entity is five characters that are not that one:
+         rewriting this paragraph with `&deg;` failed all four angles at once
+         on the one page allowed to state them. -->
+    <p class="note">Projection: a Lambert conformal conic on the angles the EU publishes
+    pan-European maps at &mdash; standard parallels {geo.LCC_P1:g}\u00b0N and
+    {geo.LCC_P2:g}\u00b0N, origin {geo.LCC_LAT0:g}\u00b0N, central meridian
+    {geo.LCC_LON0:g}\u00b0E. Conformal means shape is preserved everywhere: a country is
+    the shape it is, at any latitude on this map. Regions are shown by the destinations
+    that belong to them, not as boundaries &mdash; we hold which region a place is in, and
+    we do not hold region geometry.</p>
+  </div>"""
+
+    # ── 05 · GO IN ───────────────────────────────────────────────────
+    mapgo = f"""
+  <div class="istart">
+    <h2 class="mega">Go in anywhere.</h2>
+    <p class="lede">Every dot and every country on this drawing is a page. Or start from
+    what you are travelling for and let the instrument narrow the continent for you.</p>
+    <p class="keepgo"><a class="btn" href="/discover">Open Discover Mode</a>
+    <a class="storygo" href="/countries">Or open the atlas &rarr;</a></p>
+  </div>"""
+
+    PLATES = [("mapopen", "The map", mapopen, "map"),
+              # NOT "layers" — `id="layers"` IS THE INTEREST FILTER CONTAINER
+              # AND map.js BINDS TO IT. A plate's anchor becomes an `id` on
+              # the `<section>`, so naming this one after what it holds put
+              # two elements with one id on the page: invalid HTML, and the
+              # browser suite died on an ambiguous locator rather than
+              # reporting a failure. `c_unique_ids` now fails on it directly.
+              ("mapask paper", "What you can ask it", mapask, "ask-it"),
+              ("maptwin gal", "Everything we hold", maptwin, "in-words"),
+              ("mapsay pine", "What this drawing is", mapsay, "integrity"),
+              ("mapgo gal", "Go in anywhere", mapgo, "go")]
+    body = f"""
+{crumbs([("Europe", "/discover"), ("Map", None)])}
+{plate_sequence(PLATES)}
 """
     return "/map/index.html", page(
         "Map", body, path="/map", area="countries",
         description="A point map of every city in the EuropeDoor Atlas, filterable by what you travel for. No third-party tiles.",
-        scripts=["/assets/js/map.js"], wide=True,
+        scripts=["/assets/js/map.js"], wide=True, hero=True,
         # INTELLIGENCE — route intelligence
         world="intelligence"
     )
@@ -9609,84 +12505,288 @@ def year_band(data, here=None):
 
 
 def events_page(data):
+    """The European Calendar Atlas: the year as an instrument, not a listing.
+
+    THE PAGE WAS RIGHT AND IT STOPPED AFTER THREE BANDS. `ed_opening` over
+    the year band over twelve month rows, 16,849 bytes, and a closing
+    `<p class="small">` that said there were eight categories and never named
+    one of them. Everything in it was correct — the catalogue of 197 rows and
+    the twelve identical chips were both already thrown away, and the year
+    band is this family's signature — so what is added here is what the data
+    holds and the page did not print.
+
+    AND EIGHT FILTERS WERE BUILT AND DISCARDED ON EVERY BUILD. `kindfilters`
+    was composed in this function from the eight kinds and their counts, and
+    the body f-string never mentioned it: the variable at the old line 11830
+    was dead where the identical one in `events_month_page` is the month
+    page's own control. *An ignored argument is dead code that looks like a
+    decision*, and it is the reason the brief's event-character band was
+    missing — the eight were counted, rendered and thrown away.
+
+    THE YEAR HAS A MEASURED CHARACTER AND NOBODY HAD CROSS-TABBED IT. The
+    owner's prototype asks for a FIXED POINTS ledger and fills it with six
+    authored groupings — *Winter traditions*, *Spring awakenings*, *Harvest
+    Europe*, *The winter threshold*. Those are the right instinct with no
+    data behind them, and the data says it better: crossing 150 fixtures by
+    month and kind, December is 9/14 markets, February 10/13 cultural, April
+    9/15 religious, June 10/20 seasonal and September 8/16 food. **And July
+    is the busiest month and the least characteristic of the twelve** — 28
+    fixtures with no kind above 43% — where February has half as many and
+    77% of them are one thing. That is a second argument to sit beside the
+    shoulder one, and both are derived.
+
+    See `docs/events-redesign.md`.
+    """
     names = data["taxonomy"]["month_names"]
-    by_month = {m: [] for m in data["taxonomy"]["months"]}
+    ms = data["taxonomy"]["months"]
+    by_month = {m: [] for m in ms}
     for c in data["countries"].values():
         for f in c["festivals"]:
             by_month[f["month"]].append((f, c))
-    # THE INDEX PRINTED THE WHOLE YEAR AND RAN TO FIFTEEN SCREENS.
+    shoulder = {m: sum(1 for c in data["countries"].values()
+                       if not c.get("advisory")
+                       and m in (c.get("season") or {}).get("shoulder", []))
+                for m in ms}
+    total = sum(len(v) for v in by_month.values())
+    images = data.get("images") or {}
+
+    # ── 01 · THE YEAR ────────────────────────────────────────────────
+    # THE HERO IS THE PHOTOGRAPH AND THE HEADLINE, WHICH IS WHAT IT WAS.
+    # `events-hero` is in the register, so this family already opens on a
+    # picture rather than on a slot — one of the seven that does.
     #
-    # Twelve <h2> bands, one per month, each holding every fixture in it:
-    # 197 rows, 14,875 pixels, and no reader has ever reached December. It is
-    # the catalogue failure in its purest form — the shape of the data as the
-    # whole layout — and it was worse here than anywhere, because the family's
-    # subject is TIME and the one thing the page could not show was the year.
+    # AND `ed_opening` ESCAPES ITS INTRO, so an HTML entity ships as the five
+    # characters a reader sees: the first render printed `&mdash;` on the
+    # page. The raw f-strings in this file take `&mdash;` because they ARE
+    # markup; a helper's keyword argument takes the character. The reason for
+    # that is written here rather than beside the argument, because **an
+    # f-string expression cannot contain a comment** — this file records that
+    # twice already and the build stopped on it a third time, on the line
+    # below. AND THE ESCAPE `\u2014` FAILED FOR THE SAME FAMILY OF REASON:
+    # an f-string expression may not contain a BACKSLASH either, so the
+    # character is written as itself.
+    evopen = f"""
+  {ed_opening(
+      eyebrow="The European year",
+      title="What is on, and when.",
+      intro=f"{total} recurring fixtures — festivals, markets, "
+            f"pilgrimages, harvests and the handful of natural events worth "
+            f"planning a year around. The annual, dependable ones.",
+      visual=photo(images, "events-hero", w=2000, h=1200,
+                   sizes="(min-width: 52rem) 58vw, 100vw")
+             or ed_slot("events-hero", shape="square",
+                        label="The European year"),
+      family="time")}"""
+
+    # ── 02 · THE EUROPEAN YEAR ───────────────────────────────────────
+    # THE EXTENT LIVES HERE, ON THE BAND THAT INTRODUCES THE SET, WHICH IS
+    # WHERE A PLATE SEQUENCE PUTS IT. /journeys, /experiences, /stories and
+    # /countries each settled that once: there is no room for a stage above
+    # an opening, so the head is the band that states how big the set is.
     #
-    # The year band above already answers "when should I go", which is the
-    # question an events index exists for. So the twelve months are twelve
-    # entries rather than twelve dumps: how many fixed points, how many
-    # countries are in their quieter shoulder, and a link to the month, which
-    # is where the fixtures and their filter live. Every figure is derived.
-    #
+    # NO DRAWING IN THE OPENING AND NO APERTURE ON THIS ONE. The year band
+    # is a twelve-column chart that has to run the full width to be read at
+    # all, and the door is how this atlas draws GEOGRAPHY — twelve little
+    # arches would be the signature as wallpaper. `docs/signature-moments.md`
+    # question 6.
+    kinds = {}
+    for v in by_month.values():
+        for f, _ in v:
+            kinds[f["kind"]] = kinds.get(f["kind"], 0) + 1
+    year = f"""
+  <div class="pagehead index">
+    <p class="kicker">The European year</p>
+    <h2 class="mega">A year is another way to map Europe.</h2>
+    {head_extent([(total, 'recurring fixtures'),
+                  (len(ms), 'months'),
+                  (len(kinds), 'kinds of fixture')])}
+  </div>
+  <div class="yearwrap">{year_band(data)}</div>"""
+
+    # ── 03 · MONTH ───────────────────────────────────────────────────
     # NO SELECTION. "The three best festivals in June" would be a ranking
     # this atlas does not hold, and three rows out of twenty-eight presented
     # as a taste is a ranking wearing a smaller hat. The count is the taste.
-    shoulder = {m: sum(1 for c in data["countries"].values()
-                       if m in (c.get("season") or {}).get("shoulder", []))
-                for m in data["taxonomy"]["months"]}
     most = max((len(v) for v in by_month.values()), default=1) or 1
     monthrows = "".join(
         f"""<a class="row monthrow" href="/events/{esc(m)}">
-        <div><h2>{esc(names[m])}</h2>
-        <p class="rowsub">{len(by_month[m])} fixed point{"" if len(by_month[m]) == 1 else "s"} ·
+        <div><h3>{esc(names[m])}</h3>
+        <p class="rowsub">{len(by_month[m])} fixed point{"" if len(by_month[m]) == 1 else "s"} &middot;
         {shoulder[m]} countr{"y" if shoulder[m] == 1 else "ies"} in their quieter shoulder</p>
         <div class="hopbar"><span class="w{min(100, round(len(by_month[m]) / most * 100 / 5) * 5)}"></span></div></div>
-        <p class="rowmeta">Where to go in {esc(names[m])} →</p></a>"""
-        for m in data["taxonomy"]["months"]
-    )
-    blocks = [f'<div class="rows monthrows">{monthrows}</div>']
-    # The twelve chips this replaces were the same width and the same weight
-    # whether the month held 3 fixtures or 28. See year_band().
-    jump = year_band(data)
-    total = sum(len(v) for v in by_month.values())
-    kindcounts = {}
-    for v in by_month.values():
-        for f, _ in v:
-            kindcounts[f["kind"]] = kindcounts.get(f["kind"], 0) + 1
-    kindfilters = "".join(
-        f'<label><input type="checkbox" name="eventkind" value="{esc(k)}"> '
-        f'{esc(EVENT_KIND_NAMES[k])} ({n})</label>'
-        for k, n in sorted(kindcounts.items(), key=lambda kv: -kv[1])
-    )
+        <p class="rowmeta">Where to go in {esc(names[m])} &rarr;</p></a>"""
+        for m in ms)
+    months = f"""
+  <div class="sheettext">
+    <h2 class="mega">Twelve doors.</h2>
+    <p class="lede">Each month is a different Europe. The bar is what is on;
+    the sentence beside it is how much of the continent is in its quieter
+    shoulder that month, which is the number this atlas thinks you should
+    travel by.</p>
+  </div>
+  <div class="rows monthrows">{monthrows}</div>"""
+
+    # ── 04 · WHAT A MONTH IS MADE OF ─────────────────────────────────
+    # THE BRIEF ASKS FOR A FIXED POINTS LEDGER AND FOR AN EVENT CHARACTER
+    # BAND, AND THEY ARE TWO VIEWS OF ONE CROSS-TAB — so they are one band.
+    # Printing the eight kinds with their counts and then the five decisive
+    # months separately would be the same table twice on one page, which is
+    # the fault 220 place pages had where a strip and the rows under it were
+    # the same places. One band, both axes: each kind's own peak month
+    # beside its count, and the months where one character actually holds.
+    #
+    # AND A LEDGER OF THE 150 IS THE CATALOGUE THIS PAGE ALREADY THREW
+    # AWAY — 197 rows and 14,875 pixels, with no reader ever reaching
+    # December. Every fixture is on its month's page, behind the filter that
+    # belongs there.
+    kindtab = {}
+    for m in ms:
+        for f, _ in by_month[m]:
+            kindtab.setdefault(f["kind"], {})[m] = \
+                kindtab.setdefault(f["kind"], {}).get(m, 0) + 1
+    charrows = "".join(
+        f'<div class="row charrow"><div>'
+        f'<h3>{esc(EVENT_KIND_NAMES[k])}</h3>'
+        f'<p class="rowsub">Most of them in {esc(names[peak])} '
+        f'&mdash; {kindtab[k][peak]} of the {n}.</p>'
+        f'<div class="hopbar"><span class="w'
+        f'{min(100, round(n / max(kinds.values()) * 100 / 5) * 5)}"></span></div>'
+        f'</div><p class="rowmeta">{n}<br>'
+        f'<span class="small">fixture{"" if n == 1 else "s"}</span></p></div>'
+        for k, n in sorted(kinds.items(), key=lambda kv: -kv[1])
+        for peak in [max(kindtab[k], key=lambda m: (kindtab[k][m], -ms.index(m)))])
+    # THE DECISIVE MONTHS ARE A MEASUREMENT AND THE THRESHOLD IS STATED.
+    # Half or more of a month's fixtures being one kind is the line, and it
+    # is printed rather than implied — a fraction a reader cannot check is a
+    # claim rather than a finding. Five months clear it and July does not,
+    # which is the point of the sentence above them.
+    # AND "HALF OR MORE" IS SATISFIED BY 2 OF 4. The first version reported
+    # EIGHT decisive months, because March (3 of 6), May (2 of 4) and
+    # November (2 of 4) clear a share threshold on a handful of fixtures —
+    # arithmetically true and editorially empty, which is the small-sample
+    # form of *a count that is not the set's own extent reads as one*. A
+    # month also has to hold at least an average month's worth of the year
+    # for a share of it to mean anything, and the average is DERIVED rather
+    # than picked: 150/12 is 12.5, which admits February, April, June,
+    # September and December and excludes exactly the three that were noise.
+    mean = total / len(ms)
+    dom = {}
+    for m in ms:
+        tot = len(by_month[m])
+        if tot < mean:
+            continue
+        cnt = {}
+        for f, _ in by_month[m]:
+            cnt[f["kind"]] = cnt.get(f["kind"], 0) + 1
+        k = max(cnt, key=lambda x: (cnt[x], x))
+        if cnt[k] * 2 >= tot:
+            dom[m] = (k, cnt[k], tot)
+    busiest = max(ms, key=lambda m: len(by_month[m]))
+    bcnt = {}
+    for f, _ in by_month[busiest]:
+        bcnt[f["kind"]] = bcnt.get(f["kind"], 0) + 1
+    bshare = max(bcnt.values()) / len(by_month[busiest])
+    character = f"""
+  <div class="sheettext">
+    <h2 class="mega">What a month is made of.</h2>
+    <p class="lede">{numword(len(kinds), cap=True)} kinds of fixture across
+    the {total}, and each one has a month it belongs to.
+    {numword(len(dom), cap=True)} months are decisive &mdash; they hold at
+    least an average month's share of the year and half or more of what is
+    on is one kind:
+    {", ".join(f"{names[m]} is {EVENT_KIND_NAMES[k].lower()} "
+               f"({c} of {t})" for m, (k, c, t) in dom.items())}.</p>
+    <p class="note">And the busiest month is the least characteristic.
+    {esc(names[busiest])} holds {len(by_month[busiest])} fixtures, more than
+    any other, and no single kind is more than
+    {round(bshare * 100)}% of them &mdash; where
+    {esc(names[min(dom, key=lambda m: -dom[m][1] / dom[m][2])])} has
+    {len(by_month[min(dom, key=lambda m: -dom[m][1] / dom[m][2])])} and
+    {round(max(c / t for _, (_, c, t) in dom.items()) * 100)}% of those are
+    one thing. A crowded month is not the same as a month with a character,
+    which is the whole reason this band is not a ranking.</p>
+  </div>
+  <div class="rows charrows">{charrows}</div>"""
+
+    # ── 05 · THE SHOULDER ────────────────────────────────────────────
+    # THE PHOTOGRAPH BELONGS TO THE ARGUMENT AND THE ARGUMENT IS ALREADY
+    # WRITTEN. The brief asks for a photographic *Go when Europe breathes*
+    # band, and the register holds a picture for exactly one piece of writing
+    # that makes this case: `The case for going in October`. So the band is
+    # that essay, with its own photograph, rather than a generic autumn
+    # landscape standing in for a sentence — which is this site's oldest
+    # rule about pictures and stories.
+    #
+    # AND THE FIGURE IS DERIVED, BECAUSE THE BRIEF'S WAS WRONG. It asks for
+    # "26 countries in their quieter shoulder in October" and the dataset
+    # says 25 — advisory countries are excluded, which is why. A number
+    # typed into a design is the number that was true on the day it was
+    # typed; this one is counted on every build.
+    peakm = max(ms, key=lambda m: shoulder[m])
+    oct_story = next((st for st in data["stories"]
+                      if held(images, "story:" + st["slug"])
+                      and peakm in st["title"].lower()), None)
+    shoulderband = f"""
+  <div class="sheettext">
+    <p class="kicker">Beyond the headline</p>
+    <h2 class="mega">Go when Europe breathes.</h2>
+    <p class="lede">The calendar is not only a list of things to attend. It
+    is how you find out when a place becomes quieter, slower and more
+    available. {esc(names[peakm])} is the thinnest month on the bar above
+    and the deepest below it: {shoulder[peakm]} of the
+    {sum(1 for c in data['countries'].values() if not c.get('advisory'))}
+    countries this atlas writes about are in their quieter shoulder.</p>
+  </div>""" + ("" if not oct_story else f"""
+  <div class="ed-feature">
+    <figure class="ed-feature-media">{picture(
+        images, "story:" + oct_story["slug"], w=1600, h=1200,
+        sizes="(min-width: 62rem) 62vw, 100vw",
+        alt=oct_story["title"])}</figure>
+    <div class="ed-feature-say">
+      <p class="kicker">{esc(oct_story["section"])} &middot;
+      {esc(oct_story["reading"])}</p>
+      <h3>{esc(oct_story["title"])}</h3>
+      <p>{esc(oct_story["standfirst"])}</p>
+      <p><a class="storygo" href="{urls.story(oct_story)}">Read the story
+      &rarr;</a></p>
+    </div>
+  </div>""")
+
+    # ── 06 · OPEN A DOOR ─────────────────────────────────────────────
+    # `.sheet-door` IS TAKEN — 29 rules, the homepage's own opening — so the
+    # close is `pickmonth`. *A class name already in the stylesheet is a
+    # rule you inherit silently*, and grepping first is what that rule
+    # actually asks for.
+    pick = f"""
+  <div class="pickmonth">
+    <h2 class="mega">Choose a month. Open a door.</h2>
+    <p class="lede">Every fixture sits on its month's page with the kind
+    filter beside it, and every month names the countries that are quiet
+    then. The calendar is where a journey starts, not where it ends.</p>
+    <p class="keepgo"><a class="btn" href="/events/{esc(peakm)}">What is on in
+    {esc(names[peakm])}</a>
+    <a class="storygo" href="/plan">Or open the Planner &rarr;</a></p>
+  </div>"""
+
+    # `year` WOULD HAVE COLLIDED WITH THE HOMEPAGE'S PLATE 07, WHICH EMITS
+    # `sheet-year` AND HAS NO RULE OF ITS OWN. Grepping the stylesheet —
+    # which is what *grep the stylesheet before naming a composition* asks
+    # for — returned zero, because a plate class can be emitted by a page
+    # builder and styled by nothing. **The built site is the other half of
+    # that grep**, and `checks.py` now asks it on every build.
+    PLATES = [("evopen gal", "The European year", evopen, "what-is-on"),
+              ("euyear paper", "The year", year, "the-year"),
+              ("months gal quiet", "Twelve doors", months, "the-months"),
+              ("character gal", "What a month is made of", character,
+               "the-character"),
+              ("shoulder paper", "The shoulder", shoulderband, "the-shoulder"),
+              ("pickmonth gal", "Open a door", pick, "open-a-door")]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Events", None)])}
-{ed_opening(
-    eyebrow="The European year",
-    title="What is on, and when.",
-    intro=f"{total} recurring fixtures — festivals, markets, pilgrimages, harvests and "
-          f"the handful of natural events worth planning a year around. The annual, "
-          f"dependable ones.",
-    visual=photo(data.get("images"), "events-hero", w=2000, h=1200,
-                 sizes="(min-width: 52rem) 58vw, 100vw")
-           or ed_slot("events-hero", shape="square", label="The European year"),
-    family="time")}
-<!-- NO DRAWING IN THE OPENING, AND THAT IS THE ONE EXCEPTION. Four of the
-     five indexes put their subject in the arch beside the headline; this
-     family's subject is TIME, and the year band under this head is a
-     twelve-column chart that has to run the full width to be read at all —
-     the same reason it is not an aperture. Squeezing it into a 4:3 opening
-     would be the signature applied for its own sake. So the hero is type
-     until a photograph lands in its slot, and the chart immediately under
-     it is the dominant visual the section needs. -->
-{jump}
-{''.join(blocks)}
-<p class="small">Every fixture is on its month's page, with the category filter
-beside it — {total} of them across {len(kindcounts)} categories. They are the
-annual, dependable ones; a dated listing for a given year needs a live events
-feed, which is Stage 2.</p>
+{plate_sequence(PLATES)}
 """
     return "/events/index.html", page(
-        "Events", body, path="/events", area="events",
+        "Events", body, path="/events", area="events", hero=True,
         description="The recurring European year: festivals, markets, pilgrimages and seasonal events, month by month, filterable by category.",
     )
 
@@ -9884,196 +12984,527 @@ def events_month_page(data, month):
 # ── beyond the obvious ────────────────────────────────────────────────
 
 def quiet_page(data):
+    """The Counter-Atlas: seven plates, and the corner with the most quiet
+    places is not the quietest corner.
+
+    THE PAGE'S OWN POSITION WAS THE SMALLEST THING ON IT. *No page on this
+    site tells you a place is undiscovered* is this product's sharpest
+    editorial line and it sat in a `.note` at the very bottom, under 130
+    rows and six swaps, at caption size — the /stories fault where the
+    reason a family looks the way it does was printed smaller than
+    everything it explains. It is a band now, and so is the refusal that
+    comes before it.
+
+    THE BRIEF GOT EVERY FIGURE RIGHT. 130 quiet destinations, 44 countries,
+    and all nine macro-region counts — 19, 7, 6, 15, 15, 41, 18, 2, 7 —
+    checked against the build. That is worth recording because the /events
+    brief had one out by one, and it means the argument can be taken at
+    face value and the work is in what the numbers do not say.
+
+    AND WHAT THEY DO NOT SAY IS THE POINT. Nine counts alone read *go to the
+    Mediterranean*, which is the opposite of what this page argues: the
+    Mediterranean has 41 because it holds 94 destinations. As a SHARE of
+    each corner's own set the order changes — the Baltic States is 58% quiet
+    and the Mediterranean 44%, against 41% for the Atlas as a whole. That is
+    /events' *the busiest month is the least characteristic*, one family
+    over, and it is derived on every build. See `docs/beyond-redesign.md`.
+
+    TWENTY-SEVEN OF THE 130 CARRY A PHOTOGRAPH AND THE PAGE DREW EIGHT.
+    Nothing is acquired here. The corners band spends the nine the page
+    already picks at a scale a reader can judge a place from, and says how
+    many of the 130 the register actually holds, because a page arguing that
+    Sifnos is a real alternative to Santorini with nothing to look at is the
+    fault that took 130 hash-drawn plates off it, unanswered on the other
+    side.
+    """
+    images = data.get("images")
     quiet = [n for n in data["cities"].values() if n["city"].get("quiet")]
     quiet.sort(key=lambda n: (n["country"]["name"], n["city"]["name"]))
-    # ONE HUNDRED AND THIRTY ABSTRACT PLATES ON ONE PAGE, directly under a
-    # map whose whole argument is WHERE these places are. The map answers
-    # the question and the grid beneath it answered nothing: a hash-drawn
-    # landscape per destination, 130 of them, on the page that exists to say
-    # a Galician fishing town gets the same treatment as Paris. A
-    # destination here is chosen on where it is and what it is like, and
-    # neither of those is a look, which is the test a card has to pass.
-    # A HUNDRED AND THIRTY ROWS IN ONE COLUMN, FIFTEEN THOUSAND PIXELS LONG.
-    #
-    # Sorted by country with nothing marking where one ended, which is the
-    # order this page had and could not show — the interest pages had exactly
-    # this and were grouped by macro region for exactly this reason. The
-    # drawing above is the argument, a distribution across the continent, and
-    # the list under it then asked a reader to scroll a hundred and thirty
-    # names to find out which part of Europe any of them is in.
-    #
-    # Grouped by macro region, in the taxonomy's own order, so the list has
-    # the same nine divisions the picture above it has.
+    total = len(data["cities"])
+    ncountry = len({n["country"]["slug"] for n in quiet})
+
+    # ONE PASS, AND EVERY FIGURE ON THIS PAGE COMES OUT OF IT.
     by_macro = {}
     for n in quiet:
         by_macro.setdefault(_macro_of(data, n["country"]["slug"]), []).append(n)
-    rows = "".join(
-        f'<div class="rowgroup"><p class="rowgrouphead">{esc(m["name"])}'
-        f'<span class="rowgroupn">{len(by_macro[m["slug"]])}</span></p>'
-        + "".join(
-            f'<a class="row" href="{urls.city(n["country"], n["region"], n["city"])}">'
-            f'<div><h3>{esc(n["city"]["name"])}</h3>'
-            f'<p class="rowsub">{esc(n["city"]["summary"])}</p></div>'
-            f'<p class="rowmeta">{esc(n["country"]["name"])} · '
-            f'{esc(n["region"]["name"])}</p></a>'
-            for n in by_macro[m["slug"]])
-        + "</div>"
-        for m in data["macros"] if m["slug"] in by_macro)
-    # THE ARGUMENT OF THIS PAGE IS A DISTRIBUTION, AND IT WAS PROSE.
-    #
-    # "Too many visitors in the same eleven places" is a claim about where
-    # people are NOT. The quiet tag is on 89 destinations in 40 countries and
-    # the page listed them as cards, which shows how many and not where —
-    # and where is the entire point: the alternative to Santorini is not "a
-    # quieter island", it is a specific set of dots spread across a
-    # continent that a reader can see is nowhere near the eleven places.
+    allmacro = {}
+    for n in data["cities"].values():
+        allmacro.setdefault(_macro_of(data, n["country"]["slug"]), []).append(n)
+
+    def key(n):
+        return (f'city:{n["country"]["slug"]}/{n["region"]["slug"]}'
+                f'/{n["city"]["slug"]}')
+
+    shot = [n for n in quiet if held(images, key(n))]
+
+    # ── 01 · BEYOND THE OBVIOUS ──────────────────────────────────────
+    # THE DRAWING IS THE OPENING, AND THERE IS NO PHOTOGRAPH HERE ON
+    # PURPOSE. The register declares no hero for this family, and the one
+    # that could be acquired for it is by definition a generic European
+    # scene — which is the exact thing a page refusing the phrase "hidden
+    # gems" cannot open on. What this page has and no stock library has is
+    # the distribution: 130 dots spread across a continent that a reader
+    # can see is nowhere near the eleven places.
     qpts = [(*project(n["city"]["lat"], n["city"]["lon"]),
              urls.city(n["country"], n["region"], n["city"]), n["city"]["name"])
             for n in quiet]
     quietmap = pointsmap(
         qpts, "quiet",
         f'Every destination carrying the quiet tag: {len(quiet)} of '
-        f'{len(data["cities"])}, in '
-        f'{len({n["country"]["slug"] for n in quiet})} countries. The tag is '
-        f'editorial and we will be wrong sometimes.',
+        f'{total}, in {ncountry} countries. The tag is editorial and we '
+        f'will be wrong sometimes.',
         f'Map of the {len(quiet)} destinations tagged quiet',
         note=f'Names are dropped where they would overlap; every dot is a link. '
              f'Coastline from <a href="/sources">Natural Earth</a>, public '
              f'domain.'
              + offframe_line([project(n["city"]["lat"], n["city"]["lon"])
                               for n in quiet], data)) if len(qpts) >= 2 else ""
+    btopen = f"""
+  <div class="pagehead index">
+    <p class="kicker">Responsible travel, stated plainly</p>
+    <h1 class="mega">Beyond the obvious.</h1>
+    {head_extent([(len(quiet), "quiet destinations"),
+                  (ncountry, "countries"),
+                  (len(by_macro), "corners of Europe")])}
+    <p class="lede">Europe&rsquo;s problem is not too many visitors; it is too
+    many visitors in the same eleven places in the same six weeks. Every part
+    of this platform is built to push the other way &mdash; the Planner
+    rewards shoulder months, the Atlas gives a Galician fishing town the same
+    page template as Paris, and these {len(quiet)} places are where it would
+    send you instead.</p>
+  </div>
+  {quietmap}"""
 
+    # ── 02 · NOT HIDDEN GEMS ─────────────────────────────────────────
+    # THE REFUSAL COMES BEFORE THE LIST, because a reader about to be handed
+    # 130 places tagged "quiet" needs to know what the tag claims and what
+    # it does not. It is a different band from THE RULE at 06: this one says
+    # what we will not write, that one says what we write instead — and the
+    # brief separates them for the same reason.
+    hidden = f"""
+  <div class="sheettext">
+    <h2 class="mega">The alternative is not
+    <em class="lit">hidden gems</em>.</h2>
+    <p class="lede">Publishing a place as undiscovered is how it stops being
+    one. So there is no secret list here and no ranking of it: there is an
+    editorial tag, on {len(quiet)} of {total} destinations, meaning a place
+    with the goods and without the crowd. It is a judgement, it is stated as
+    one, and we will be wrong sometimes.</p>
+    <p class="note">Every one of them is an ordinary page in the same Atlas,
+    written to the same template as Paris. That is the whole mechanism: not a
+    different product for quieter places, the same product, applied evenly.</p>
+  </div>"""
+
+    # ── 03 · ONE FROM EACH CORNER ────────────────────────────────────
+    # NOT THE FIRST EIGHT OF 130. The list is sorted by country, so the
+    # first eight would be Albania and Andorra — a claim about the alphabet
+    # rather than about Europe. One per macro region, in the taxonomy's own
+    # order, which is the same nine divisions the drawing above is an
+    # argument about and the same nine the set below is grouped into.
+    picks = [by_macro[m["slug"]][0] for m in data["macros"]
+             if m["slug"] in by_macro]
+    lead = [n for n in picks if held(images, key(n))][:3]
+    rest = [n for n in picks if n not in lead]
+    mosaic = ed_mosaic(images, [
+        {"key": key(n), "alt": n["city"]["name"], "label": n["city"]["name"]}
+        for n in lead]) if len(lead) >= 3 else ""
+    strip = ed_strip(images, [
+        {"key": key(n), "alt": n["city"]["name"], "label": n["city"]["name"],
+         "href": urls.city(n["country"], n["region"], n["city"]),
+         "note": n["country"]["name"]}
+        for n in rest], limit=len(rest))
+    corners = f"""
+  <div class="sheettext">
+    <h2 class="mega">One from each corner of the continent.</h2>
+    <p class="lede">The first quiet destination in each of the
+    {numword(len(picks))} macro regions &mdash; not the first
+    {numword(len(picks))} of {len(quiet)}, which would be a claim about the
+    alphabet. A reader choosing between Santorini and Sifnos is choosing
+    partly on what the place looks like, and this is the page that asks for
+    exactly that swap.</p>
+  </div>
+  {mosaic}
+  {strip}
+  <p class="small">{len(shot)} of these {len(quiet)} destinations carry a
+  photograph in the register today, so most of this page is words and a map.
+  That is a licensing position rather than a design one: a picture is bought
+  one at a time, and the ones that exist are spent here rather than held
+  back.</p>"""
+
+    # ── 04 · 130 PLACES, NINE CORNERS ────────────────────────────────
+    # THE COUNT IS THE OBVIOUS NUMBER AND IT ARGUES THE WRONG WAY. Nine
+    # counts alone say "go to the Mediterranean", because the Mediterranean
+    # holds 41 — and it holds 41 because it holds 94 destinations. The share
+    # of each corner's OWN set is the number that answers the question this
+    # page asks, and it reorders the nine. Both are printed, because the
+    # count is what a reader came for and the share is what it means.
+    share_all = 100.0 * len(quiet) / total if total else 0
+    groups = []
+    for m in data["macros"]:
+        if m["slug"] not in by_macro:
+            continue
+        got = by_macro[m["slug"]]
+        alln = len(allmacro.get(m["slug"], ()))
+        pct = round(100.0 * len(got) / alln) if alln else 0
+        groups.append(
+            f'<div class="rowgroup"><p class="rowgrouphead">{esc(m["name"])}'
+            f'<span class="rowgroupn">{len(got)}</span>'
+            f'<span class="qshare">{pct}% of its own destinations</span></p>'
+            + "".join(
+                f'<a class="row quietrow" '
+                f'href="{urls.city(n["country"], n["region"], n["city"])}">'
+                f'<div><h3>{esc(n["city"]["name"])}</h3>'
+                f'<p class="rowsub">{esc(n["city"]["summary"])}</p></div>'
+                f'<p class="rowmeta">{esc(n["country"]["name"])} &middot; '
+                f'{esc(n["region"]["name"])}</p></a>'
+                for n in got)
+            + "</div>")
+    ranked = sorted(
+        ((round(100.0 * len(by_macro[m["slug"]]) / len(allmacro[m["slug"]])),
+          len(by_macro[m["slug"]]), m["name"])
+         for m in data["macros"]
+         if m["slug"] in by_macro and allmacro.get(m["slug"])),
+        reverse=True)
+    most = max(((len(by_macro[m["slug"]]), m["name"]) for m in data["macros"]
+                if m["slug"] in by_macro))
+    quietset = f"""
+  <div class="sheettext">
+    <h2 class="mega">{len(quiet)} places, {numword(len(by_macro))} corners.</h2>
+    <p class="lede">Grouped geographically rather than ranked, so the
+    alternative does not become another popularity list. Each corner carries
+    two figures: how many quiet destinations it holds, and what share of its
+    own destinations those are &mdash; and the two disagree.
+    {esc(most[1])} holds the most at {most[0]}, because it holds the most
+    destinations of any corner; {esc(ranked[0][2])} is the quietest at
+    {ranked[0][0]}% against {share_all:.0f}% for the Atlas as a whole.</p>
+  </div>
+  <div class="rows">{"".join(groups)}</div>"""
+
+    # ── 05 · SIX STRAIGHT SWAPS ──────────────────────────────────────
+    # THE SIX ARE AUTHORED AND THAT IS LEGITIMATE — they are editorial
+    # judgements about pressure and season, which is the work, not measured
+    # claims dressed as one. Nothing here derives a swap from the dataset,
+    # because a great-circle distance and a quiet flag cannot say that
+    # Kvarner is what somebody wanted from Dubrovnik.
     swaps = "".join(
-        f"""<div class="row"><div><h3>{esc(a)}</h3><p class="rowsub">{esc(why)}</p></div>
-        <p class="rowmeta">try {esc(b)}</p></div>"""
+        f'<div class="row swaprow">'
+        f'<div><p class="kicker">Instead of</p><h3>{esc(a)}</h3>'
+        f'<p class="rowsub">{esc(why)}</p></div>'
+        f'<div class="swapto"><p class="kicker">Try</p><h3>{esc(b)}</h3></div>'
+        f'</div>'
         for a, b, why in [
-            ("Paris in July", "Paris in October", "Same city, half the queue, and the light is better."),
-            ("The Amalfi Coast in August", "Puglia's Adriatic side in June", "A coast that still belongs to the people who live on it."),
-            ("Santorini at sunset", "Naxos or Sifnos, any evening", "The Cyclades without the cruise schedule."),
-            ("Dubrovnik in high summer", "The Kvarner islands in May", "Walled towns exist all down that coast."),
-            ("Reykjavík's Golden Circle", "The Westfjords", "Six hours further and a different country."),
-            ("Barcelona in August", "Girona and the Empordà", "An hour by train from the thing everyone else is queueing for."),
-        ]
-    )
-    # THE ALTERNATIVE TO SANTORINI HAS TO BE SEEN TO BE AN ALTERNATIVE.
+            ("Paris in July", "Paris in October",
+             "Same city, half the queue, and the light is better."),
+            ("The Amalfi Coast in August", "Puglia's Adriatic side in June",
+             "A coast that still belongs to the people who live on it."),
+            ("Santorini at sunset", "Naxos or Sifnos, any evening",
+             "The Cyclades without the cruise schedule."),
+            ("Dubrovnik in high summer", "The Kvarner islands in May",
+             "Walled towns exist all down that coast."),
+            ("Reykjavík's Golden Circle", "The Westfjords",
+             "Six hours further and a different country."),
+            ("Barcelona in August", "Girona and the Empordà",
+             "An hour by train from the thing everyone else is queueing for."),
+        ])
+    swapband = f"""
+  <div class="sheettext">
+    <h2 class="mega">Six straight swaps.</h2>
+    <p class="lede">Same idea, different pressure. Two of the six are the same
+    place at a different time of year, which is the cheapest swap there is and
+    the one the Planner already weights for.</p>
+  </div>
+  <div class="rows swaps">{swaps}</div>"""
+
+    # ── 06 · THE RULE ────────────────────────────────────────────────
+    # A REFUSAL NOBODY CAN CHECK IS A SLOGAN, and this band's three promises
+    # had never been checked. Two of them are kept on every one of the
+    # destination pages — "When to come" and "Getting there" are section
+    # headings on all of them. THE THIRD IS NOT BUILT: an experience record
+    # carries a slug, a name, a kind, a band and a summary, and no operator;
+    # the Stay layer publishes that we list neither hotels nor restaurants
+    # and refuses a ranking outright. So the sentence has been promising
+    # something this site does not do anywhere.
     #
-    # This page's whole argument is that a Galician fishing town deserves the
-    # same page as Paris, and it made that argument with a map, a hundred and
-    # thirty names and six typed swaps. A reader deciding between Santorini
-    # and Sifnos is deciding partly on what the place looks like, and this is
-    # the page that asks them to make exactly that swap with nothing to look
-    # at — which is the fault that took 130 hash-drawn plates off it, still
-    # unanswered on the other side.
-    #
-    # NOT THE FIRST EIGHT. The list is sorted by country, so the first eight
-    # would be Albania and Andorra — a claim about the alphabet rather than
-    # about Europe. One per macro region, in the taxonomy's own order, which
-    # is the same nine divisions the list below is grouped into and the same
-    # spread the drawing above is an argument about.
-    _qpick = [by_macro[m["slug"]][0] for m in data["macros"]
-              if m["slug"] in by_macro]
-    _qshots = ed_strip(data.get("images"), [
-        {"key": f"city:{n['country']['slug']}/{n['region']['slug']}/{n['city']['slug']}",
-         "alt": n["city"]["name"], "label": n["city"]["name"],
-         "href": urls.city(n["country"], n["region"], n["city"])}
-        for n in _qpick], limit=9)
-    if _qshots:
-        _qshots = ('<section class="ed-section">'
-                   + ed_section_head("Instead",
-                       "One from each corner of the continent",
-                       f"The first quiet destination in each of the "
-                       f"{numword(len(_qpick))} macro regions — not the first "
-                       f"eight of {len(quiet)}, which would be a claim about "
-                       f"the alphabet.")
-                   + _qshots + "</section>")
+    # It is stated as unbuilt with what it would take, rather than quietly
+    # deleted — the /my-europe futures grammar and /plan's refusals, and the
+    # standing rule that recording a mistake beats removing the evidence
+    # of it.
+    rule = f"""
+  <div class="sheettext">
+    <h2 class="mega">The rule we hold ourselves to.</h2>
+    <p class="lede">No page on this site tells you a place is undiscovered.
+    Publishing that sentence is what ends it. What we will say instead is
+    three things &mdash; and two of them are on every one of the {total}
+    destination pages, which is what makes them checkable rather than a
+    slogan.</p>
+  </div>
+  <div class="rows">
+    <a class="row" href="/europe/albania/tirana-and-the-south/gjirokaster">
+    <div><h3>When to come</h3><p class="rowsub">The months a place is at its
+    best and the ones it is quieter in, as a section on every one of the
+    {total} destination pages.</p></div>
+    <p class="rowmeta">Kept</p></a>
+    <a class="row" href="/europe/albania/tirana-and-the-south/gjirokaster">
+    <div><h3>How to arrive without a car</h3><p class="rowsub">Getting there,
+    and getting near where there is no direct route &mdash; a section on every
+    one of them too.</p></div>
+    <p class="rowmeta">Kept</p></a>
+    <div class="row"><div><h3>Who locally is worth your money</h3>
+    <p class="rowsub">Named people and businesses, chosen and checked rather
+    than ranked. It needs an operator field nothing here holds, and a way to
+    choose that is not a ranking.</p></div>
+    <p class="rowmeta">Not built</p></div>
+  </div>
+  <p class="note">The third is written here rather than removed. It has been
+  on this page since the rule was, and an experience record carries a name, a
+  kind and a summary and no operator &mdash; while <a href="/for-businesses">
+  /for-businesses</a> publishes that there is nothing in this index that could
+  carry a boost. Saying so is the only honest version of the sentence until
+  somebody builds it.</p>"""
+
+    # ── 07 · LEAVE THE OBVIOUS BEHIND ───────────────────────────────
+    # `.istart` IS REUSED RATHER THAN DUPLICATED. It is /interests' closing
+    # band — a statement, a lede and two links on a narrow measure — and a
+    # second rule with an identical body is the duplicate this stylesheet
+    # removed eighty-five of. Two users is not yet the three that earns a
+    # neutral name; a third gets one rather than a fourth copy.
+    leave = """
+  <div class="istart">
+    <h2 class="mega">Leave the obvious behind.</h2>
+    <p class="lede">Not because the famous places are wrong &mdash; they are
+    famous for reasons. Because Europe is larger than the eleven places
+    everyone already knows, and the rest of it has pages too.</p>
+    <p class="keepgo"><a class="btn" href="/discover">Find a quiet place</a>
+    <a class="storygo" href="/plan">Or plan around the crowds &rarr;</a></p>
+  </div>"""
+
+    PLATES = [("btopen gal", "Beyond the obvious", btopen, "beyond-the-obvious"),
+              ("hidden pine", "Not hidden gems", hidden, "not-hidden-gems"),
+              ("corners gal", "One from each corner", corners, "corners"),
+              ("quietset paper", "The set", quietset, "the-set"),
+              ("swaps gal", "Six straight swaps", swapband, "swaps"),
+              ("rule pine", "The rule", rule, "the-rule"),
+              ("leave gal", "Leave the obvious behind", leave, "leave")]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Beyond the obvious", None)])}
-<div class="pagehead index">
-  <p class="kicker">Responsible travel, stated plainly</p>
-  <h1>Beyond the obvious.</h1>
-  <p class="lede">Europe's problem is not too many visitors; it is too many visitors in the same
-  eleven places in the same six weeks. Every part of this platform is built to push the other
-  way — the Planner rewards shoulder months, the Atlas gives a Galician fishing town the same
-  page template as Paris, and these {len(quiet)} places are where it would send you
-  instead.</p>
-</div>
-{quietmap}
-{_qshots}
-{section(f"{len(quiet)} places we would send you instead", f'<div class="rows">{rows}</div>',
-         lede="Tagged quiet in the dataset: places with the goods and without the crowd. The tag is editorial and we will be wrong sometimes.")}
-{section("Six straight swaps", f'<div class="rows">{swaps}</div>',
-         lede="Same idea, different pressure.")}
-<div class="note">
-  <h2 class="mini">The rule we hold ourselves to</h2>
-  <p>No page on this site tells you a place is undiscovered. Publishing that sentence is what
-  ends it. What we will say is when to come, how to arrive without a car where that is possible,
-  and who locally is worth your money.</p>
-</div>
+{plate_sequence(PLATES)}
 """
     return "/beyond-the-obvious/index.html", page(
         "Beyond the obvious", body, path="/beyond-the-obvious", area=None,
+        hero=True,
         description="Europe's quieter alternatives, shoulder-season travel and straight swaps for the eleven places everyone goes at once.",
     )
 
-
 # ── my europe ─────────────────────────────────────────────────────────
 
+
 def my_europe_page(data):
-    """The list you are building — and, until this commit, a page that never
-    drew it.
+    """The private atlas: what you kept, drawn, and what the browser holds.
 
-    AN EMPTY STATE IS THE STATE THIS PAGE SHIPS IN. The list is empty until
-    a reader saves something, so the first thing every visitor sees here is
-    the empty case, and it was a heading, a paragraph and three bordered
-    boxes on graphite — no picture, on the one page in the product whose
-    subject is a set of PLACES.
+    THE PAGE WAS A HEAD, A DRAWING, TWO EMPTY CONTAINERS AND A FOOTNOTE.
+    27,245 bytes, no photograph, no plate sequence, and the three things the
+    owner's brief cares most about — the three kinds of memory, the future,
+    and the privacy position — were one `.note` paragraph between them. The
+    drawing and the local-first architecture were already right and are
+    kept exactly as they were.
 
-    So it draws the continent with nothing on it, and every saved place
-    lights a mark. That is the signature moment this family did not have,
-    and it is the honest shape of the emptiness rather than an apology for
-    it: a reader can see how much of Europe they have not chosen.
+    AND THE SAVE VOCABULARY HAD DRIFTED. `my-europe.js` sorts a collection
+    by `ORDER = ["Itinerary", "Place", "Journey", "Theme", "Story"]`, and
+    the built site offers **six** kinds: `Experience` is savable from 197
+    buttons and appears nowhere in that list, so `ORDER.indexOf` returns
+    **-1** and every saved experience sorts in front of everything else. A
+    kind the app does not know is a kind the app sorts first by accident.
 
-    Server-rendered, so the silhouette is there with JavaScript off and the
-    page does not reflow when the script arrives. The marks come from
-    `/api/atlas.json`, which this page already fetches for the travel
-    profile and which already carries each destination's projected x and y —
-    the same numbers every drawing on this site is made of, so a saved dot
-    lands exactly where /map puts it. The dependency is declared in
-    data/contracts.json, because coupling is fine and silent coupling is
-    not.
+    `Itinerary` was the opposite suspicion and it was wrong: it is offered
+    on zero PAGES and `planner.js` creates one at runtime, so it is real and
+    checking is what stopped a wrong repair. See `docs/my-europe-redesign.md`.
+
+    THE BRIEF ASKS FOR A MONUMENTAL OPENING AND THE HEAD ROLE REFUSES IT.
+    *An instrument's title is a label, because the page is the tool* — the
+    measurement behind that is a head pushing the instrument to y=436 on
+    /plan, 449 on /map and 460 on /search, half the first screen of a tool
+    spent on a magazine headline. All five INTELLIGENCE pages carry
+    `pagehead instrument`, including /plan and /discover as rebuilt in this
+    same series. What the brief actually wants — a page that feels personal
+    and considered rather than like a dashboard — is what the bands do.
     """
+    # WHAT CAN BE SAVED, COUNTED FROM THE DATA THAT MAKES THE BUTTONS. Six
+    # kinds, and the brief names three. Naming three would hide half of what
+    # the product stores, which is the `pop_line` shape: a taxonomy that
+    # omits part of its own set reads as a policy. The brief's sentence is
+    # the good half and it survives — *places tell you where, journeys tell
+    # you how, stories tell you why* — it just has to cover six.
+    cities = data["cities"]
+    nplace = len(cities) + sum(len(n["city"].get("places") or [])
+                               for n in cities.values())
+    nexp = sum(len(n["city"].get("experiences") or []) for n in cities.values())
+    KINDS = [
+        ("Place", nplace, "/countries",
+         "Where. Every destination and every place inside one."),
+        ("Experience", nexp, "/experiences",
+         "What. The things worth crossing a country for."),
+        ("Journey", len(data["journeys"]), "/journeys",
+         "How. Routes already worked out, stop by stop."),
+        ("Theme", len(data["themes"]), "/themes",
+         "Why, across the continent. One argument, eight places."),
+        ("Story", len(data["stories"]), "/stories",
+         "Why, in one place. The piece that made you look."),
+        ("Itinerary", None, "/plan",
+         "Yours. What the Planner builds when you ask it a question."),
+    ]
+    kindrows = "".join(
+        f'<a class="row mekind" href="{esc(u)}">'
+        f'<div><h3>{esc(k)}</h3><p class="rowsub">{esc(w)}</p></div>'
+        f'<p class="rowmeta">{("" if n is None else f"{n:,}")}<br>'
+        f'<span class="small">{"built by the Planner" if n is None else "to choose from"}'
+        f'</span></p></a>'
+        for k, n, u, w in KINDS)
+
+    # ── 01 · MY EUROPE ───────────────────────────────────────────────
+    meopen = """
+  <div class="pagehead instrument">
+    <p class="kicker">My Europe</p>
+    <h1>The list you are building.</h1>
+    <p class="lede">Saved places, experiences, journeys, themes and stories.
+    This lives in your browser and nowhere else &mdash; there is no account,
+    no server, no email address, and nothing to leak. When accounts arrive,
+    this list will be importable into one; it will never be silently
+    uploaded.</p>
+  </div>
+  <p class="mestatus"><span class="medot" aria-hidden="true"></span>Stored on
+  this device</p>"""
+
+    # ── 02 · YOUR MAP ────────────────────────────────────────────────
+    # THE DRAWING AND ITS ROOM ARE UNCHANGED, AND THE ROOM IS DARK ON
+    # PURPOSE. The brief asks for no *swampy* dark map and it is right about
+    # that — the cartography split answers it, because this is an INSTRUMENT
+    # and instruments are graphite while pictures are paper. Its own
+    # prototype keeps the map band dark for the same reason. What the split
+    # forbids is the navy swamp the five raw hexes used to be, which went
+    # when the instruments got their palette.
+    meatlas = f"""
+  <div class="sheettext">
+    <h2 class="mega">Your Europe, drawn.</h2>
+    <p class="lede">Saved places become a personal atlas. The map is not
+    decoration: it is the geographic memory of what you chose to keep, and
+    the emptiness is honest &mdash; you can see how much of Europe you have
+    not chosen yet.</p>
+  </div>
+  {constel_defs()}
+  <figure class="minemap" id="minemap">
+    {constellation([], cut=True)}
+    <figcaption><span class="capwhat" id="minecap">Nothing on it yet. Every
+    place you save is drawn here.</span>
+    <span class="capsrc">{geo.sources_line(geo.load("europe-lod0.json"))}
+    Nothing about this list leaves your browser to draw it: the outline ships
+    with the page and the coordinates come from the same public index every
+    map here is built from.</span></figcaption>
+  </figure>"""
+
+    # ── 03 · THE LIST ────────────────────────────────────────────────
+    # THE TWO RUNTIME CONTAINERS, UNTOUCHED. `#mine` is the collections and
+    # `#dna` is the travel profile, both written by `my-europe.js` from
+    # localStorage. A server-rendered placeholder inside either would be a
+    # decorative mock entry, which is the one thing the brief asks not to
+    # happen to this page.
+    melist = """
+  <div class="sheettext">
+    <h2 class="mega">What you kept.</h2>
+    <p class="lede">Grouped into collections you name yourself. Nothing here
+    was suggested, ranked or promoted; it is what you pressed save on.</p>
+  </div>
+  <div id="mine" aria-live="polite"></div>
+  <div id="dna"></div>"""
+
+    # ── 04 · KINDS OF MEMORY ─────────────────────────────────────────
+    # AND THIS IS THE EMPTY STATE, WHICH IS THE STATE THE PAGE SHIPS IN.
+    # *Nothing saved* is answered by saying what there is and where it is,
+    # rather than by an apology or a single "start exploring" button: a
+    # reader who has saved nothing wants the door, and a reader who has
+    # saved plenty still wants to know what else is savable.
+    mekinds = f"""
+  <div class="sheettext">
+    <h2 class="mega">Six kinds of memory.</h2>
+    <p class="lede">My Europe is deliberately broader than a wishlist. A
+    place tells you where, an experience what, a journey how, and a theme or
+    a story why. Every one of these carries a save button on its own page,
+    and the count is what there is to choose from.</p>
+  </div>
+  <div class="rows mekinds">{kindrows}</div>"""
+
+    # ── 05 · WHERE THIS GOES NEXT ────────────────────────────────────
+    # THE THREE ARE A SET RATHER THAN A SENTENCE, and each names the one
+    # thing it needs, because *a refusal nobody can check is a slogan*.
+    mefuture = """
+  <div class="sheettext">
+    <h2 class="mega">A list that could travel with you.</h2>
+    <p class="lede">The local-first version is the one that exists. Each of
+    these is real work rather than a switch, and each names what it would
+    take &mdash; so that the reason this page is simple stays checkable.</p>
+  </div>
+  <div class="rows mekinds">
+    <div class="row mekind"><div><h3>Sync across devices</h3>
+    <p class="rowsub">The same list on a phone and a desk.</p></div>
+    <p class="rowmeta">Needs<br><span class="small">an account, a backend and
+    a data controller</span></p></div>
+    <div class="row mekind"><div><h3>A list you can share</h3>
+    <p class="rowsub">A public address for a collection you made.</p></div>
+    <p class="rowmeta">Needs<br><span class="small">a server, and a decision
+    about what a shared link exposes</span></p></div>
+    <div class="row mekind"><div><h3>Straight into the Planner</h3>
+    <p class="rowsub">A saved list handed over as must-visit stops.</p></div>
+    <p class="rowmeta">Needs<br><span class="small">no backend &mdash; this
+    one is the nearest</span></p></div>
+  </div>"""
+
+    # ── 06 · PRIVACY ─────────────────────────────────────────────────
+    # PRIVACY AS A BAND RATHER THAN A FOOTNOTE IS THE BRIEF'S BEST IDEA AND
+    # IT IS ALSO THIS PRODUCT'S POSITION ALREADY. What the band may not do
+    # is say it twice: the opening states it in one line and this states the
+    # mechanism, which is the *never explain the constraint back* rule
+    # applied to a promise rather than to a filter.
+    privacy = """
+  <div class="sheettext">
+    <h2 class="mega">Private is not a footnote.</h2>
+    <p class="lede">Three keys in this browser's own storage and nothing
+    else: the saved list, the collections you named, and the travel profile
+    the sliders set. No request carries them. No identifier is attached to
+    them. Clearing your browser data deletes them, because there is nowhere
+    else they exist &mdash; which is the cost of the promise and is stated
+    rather than hidden.</p>
+    <p class="note">The whole of this page's JavaScript is one file you can
+    read, and what it may do is bounded by the same Content-Security-Policy
+    every other page here ships: no third-party origin, nothing inline.</p>
+  </div>"""
+
+    # ── 07 · BUILD YOUR EUROPE ───────────────────────────────────────
+    build = """
+  <div class="mebuild">
+    <h2 class="mega">Build your Europe.</h2>
+    <p class="lede">Find something. Keep it. Come back to it. Put it next to
+    another place and see what the two of them make. The continent stops
+    being a catalogue and starts being a map you drew.</p>
+    <p class="keepgo"><a class="btn" href="/discover">Start with a question</a>
+    <a class="storygo" href="/countries">Or open the atlas &rarr;</a></p>
+  </div>"""
+
+    PLATES = [("meopen gal", "My Europe", meopen, "my-europe"),
+              ("meatlas pine", "Your map", meatlas, "your-map"),
+              ("melist gal", "What you kept", melist, "what-you-kept"),
+              ("mekinds gal quiet", "Kinds of memory", mekinds, "kinds"),
+              ("mefuture gal", "Where this goes", mefuture, "whats-next"),
+              ("privacy pine", "Privacy", privacy, "privacy"),
+              ("mebuild gal", "Build your Europe", build, "build")]
     body = f"""
 {crumbs([("Europe", "/discover"), ("My Europe", None)])}
-<div class="pagehead instrument">
-  <p class="kicker">My Europe</p>
-  <h1>The list you are building.</h1>
-  <p class="lede">Saved places, saved journeys, saved stories. This lives in your browser and
-  nowhere else — there is no account, no server, no email address, and nothing to leak. When
-  accounts arrive, this list will be importable into one; it will never be silently uploaded.</p>
-</div>
-{constel_defs()}
-<figure class="minemap" id="minemap">
-  {constellation([], cut=True)}
-  <figcaption><span id="minecap">Nothing on it yet. Every place you save is drawn here.</span>
-  {geo.sources_line(geo.load("europe-lod0.json"))} Nothing about this list leaves your
-  browser to draw it: the outline ships with the page and the coordinates come from the
-  same public index every map here is built from.</figcaption>
-</figure>
-<div id="mine" aria-live="polite"></div>
-<div id="dna"></div>
-<div class="note">
-  <h2 class="mini">Where this goes next</h2>
-  <p>The account version adds sync across devices, a shareable public list, and the ability to
-  hand a saved list straight to the Planner as a set of must-visit stops. All three need a
-  backend, a privacy notice and a data controller — see <a href="/how-it-works">how it works</a>.</p>
-</div>
+{plate_sequence(PLATES)}
 """
     return "/my-europe/index.html", page(
-        "My Europe", body, path="/my-europe", area=None,
+        "My Europe", body, path="/my-europe", area=None, hero=True,
         description="Your saved European places, journeys and stories — stored in your own browser, with no account and no server.",
         scripts=["/assets/js/my-europe.js"],
         # INTELLIGENCE — personalisation and saved journeys
-        world="intelligence"
+        world="intelligence",
     )
 
 
@@ -10715,6 +14146,60 @@ def sources_page(data):
              "SHA-256 of the exact bytes. No map account, no key, no "
              "third-party tile server, and nothing traced by hand.")
 
+    # ── THE PHOTOGRAPHS, AS A CATALOGUE RATHER THAN AS A BADGE ──────
+    #
+    # SOURCE PROVENANCE IS INVISIBLE INFRASTRUCTURE UNLESS A SPECIFIC
+    # REQUIREMENT PUTS IT ON A PARTICULAR SURFACE, and this is the surface.
+    # The rule the owner set is that a supplier's name is not part of this
+    # product's visual identity: a photograph's upstream marketplace does
+    # not belong on the composition it appears in, and the page every
+    # credit on this site already points at is where the question is
+    # answered once, in full, for every photograph in the library.
+    #
+    # BUILT FROM THE REGISTER, exactly as the geography table is built from
+    # the rows inside each data/geo/ document — so it cannot drift from
+    # what is actually published, and a photograph acquired tomorrow
+    # appears here on the next build without anybody editing a page. Each
+    # photographer is named once and links to the work; the provider links
+    # to the licence the work was taken under.
+    photos = data.get("images") or {}
+    by_prov = {}
+    for key, row in sorted(photos.items()):
+        who = (row.get("photographer") or "").strip()
+        src = row.get("source") or ""
+        lic = (row.get("licence") or "").strip()
+        if not who or not src or not lic:
+            continue
+        by_prov.setdefault((lic, row.get("licence_url") or ""), {})
+        by_prov[(lic, row.get("licence_url") or "")].setdefault(who, src)
+    provrows = []
+    for (lic, licurl), people in sorted(by_prov.items()):
+        names = ", ".join(
+            f'<a href="{esc(src)}" rel="noopener" target="_blank">{esc(who)}</a>'
+            for who, src in sorted(people.items()))
+        provrows.append(
+            f'<div class="row"><div><h3>{esc(lic)}</h3>'
+            f'<p class="rowsub">{names}</p></div>'
+            f'<p class="rowmeta">{n_of(len(people), "photographer")}</p>'
+            f'</div>')
+    npho = sum(len(p) for p in by_prov.values())
+    photosec = section(
+        "Who took the photographs",
+        f'<div class="rows">{"".join(provrows)}</div>'
+        f'<p class="small">Every photograph on this site is stored here, on '
+        f'this origin, under a filename that is the SHA-256 of the bytes as '
+        f'they were served: nothing is hotlinked, and loading a page on '
+        f'EuropeDoor reaches no other server. The register behind this table '
+        f'records, for each one, the photographer, their profile, the page it '
+        f'came from, the licence and its URL, that hash and the date it was '
+        f'taken — and the build refuses a photograph that is missing any of '
+        f'them, and refuses a page that references a file the register does '
+        f'not hold.</p>',
+        id="photographs",
+        lede=f"{n_of(npho, 'photographer')}, named once each. A photograph is "
+             f"credited where it is the subject; a composition made of "
+             f"forty-one of them credits them here.") if provrows else ""
+
     body = f"""
 {crumbs([("Europe", "/discover"), ("Sources & corrections", None)])}
 <div class="pagehead">
@@ -10770,6 +14255,7 @@ def sources_page(data):
 </div>
 
 {geodata}
+{photosec}
 """
     return "/sources/index.html", page(
         "Sources & corrections", body, path="/sources", area=None,
@@ -11464,10 +14950,27 @@ def search_page(data):
 # plus the journeys and themes that match, is the opposite of thin — but the
 # number matters, and it is small on purpose.
 
+# A SECTION HOLDING FEWER THAN THREE IS A HEADING OVER A ROW, and three is
+# the smallest number for which "group" is the right word. The case it
+# excludes is real in both families that read it: the northern lights are
+# eight destinations at eight distinct latitudes, which would be eight
+# headings over one row each — the nine-desks-one-story layout the stories
+# index was thrown away for — and /experiences/history holds exactly one
+# generous invitation among thirty.
+#
+# ONE NUMBER, because two families decide the same question and *a second
+# implementation of a thing is a second chance to make its mistake*. What
+# each family groups BY is its own: a motion groups by the clause its query
+# matched, a category by what an invitation costs. The floor is the shared
+# part and it is the only shared part.
+GROUP_MIN = 3
+
+
 def motion_match(data, m, cid, n):
     """Does one destination satisfy one motion? Returns (bool, reasons)."""
     c, r, t = n["country"], n["region"], n["city"]
-    tags = set(t["interests"]) | set(r["interests"])
+    own, near = set(t["interests"]), set(r["interests"])
+    tags = own | near
     why = []
 
     wants = m.get("interests", [])
@@ -11476,12 +14979,35 @@ def motion_match(data, m, cid, n):
         if m.get("all_interests"):
             if len(hit) != len(wants):
                 return False, []
-            why.append("carries " + and_list(
-                [data["interests"][w]["name"] for w in wants]))
         else:
             if not hit:
                 return False, []
-            why.append("tagged " + and_list([data["interests"][w]["name"] for w in hit]))
+        # THE ROW-LEVEL CLAIM WAS THE ONE HALF OF THIS THAT STAYED FALSE.
+        # The previous commit measured that `tags` is the UNION of a
+        # destination's own interests and its region's — 537 extra tag
+        # applications across the seventeen interests — and fixed the
+        # sentence the PAGE prints. Every ROW went on saying "tagged
+        # Islands", which for Tartu, a mainland university town in the
+        # region "Tartu & South Estonia", is not true of the destination at
+        # all: its region carries the tag. **Measured on the shown sets: 15
+        # of the 25 on Europe's islands, 25 of 56 on the coastlines, 24 of
+        # 59 on the mountains and 19 of 55 on the sacred world qualify on
+        # their region rather than on themselves.** On the one family whose
+        # whole credibility claim is that a page prints what produced it, a
+        # majority of one page's rows made a claim about the wrong record.
+        # The clause says which side it came from now, and the page groups
+        # the list by it so the clause is hoisted once per group rather than
+        # restated on every row.
+        mine = [w for w in hit if w in own]
+        theirs = [w for w in hit if w not in own]
+        nm = lambda ws: and_list([data["interests"][w]["name"] for w in ws])
+        verb = "carries" if m.get("all_interests") else "tagged"
+        if mine and theirs:
+            why.append(f"{verb} {nm(mine)}, in a region tagged {nm(theirs)}")
+        elif mine:
+            why.append(f"{verb} {nm(mine)}")
+        else:
+            why.append(f"in a region tagged {nm(theirs)}")
 
     months = m.get("months", [])
     if months:
@@ -11580,7 +15106,66 @@ def motion_query_words(data, m):
     out = and_list(parts) + "."
     if not wants:
         out = "every destination " + out
-    return out[0].upper() + out[1:]
+    out = out[0].upper() + out[1:]
+    if wants:
+        # THE PRINTED QUERY WAS NARROWER THAN THE QUERY THAT RAN, ON THE ONE
+        # FAMILY WHOSE WHOLE RULE IS THAT A PAGE PRINTS WHAT PRODUCED IT.
+        #
+        # `motion_match` reads `set(city.interests) | set(region.interests)`,
+        # so a destination is returned when ITS REGION carries the tag. The
+        # sentence said "any destination tagged Islands" and said nothing
+        # about the region, and the gap is not small: 62 of the 86 results
+        # for Food and Wine are there on their region's tags rather than
+        # their own, and 58 of the 150 for Coast. It returns **Nicosia**,
+        # whose own tags are history, food and cities and which is inland,
+        # because the region is "Nicosia & the South Coast"; and **Tartu**,
+        # a mainland university town, for Islands, because its region is
+        # "The Islands & the South".
+        #
+        # That is the `cell` catching `cellar` failure exactly: the page
+        # published its rule honestly, and a reader who checked would find
+        # something the rule did not describe. The engine is not changed
+        # here — a region tag is a real fact about the ground around a place
+        # and 537 tag applications across nine other surfaces depend on the
+        # union — what changes is that the sentence now says so, once, at
+        # the end, rather than inside each clause. `docs/europe-in-redesign.md`
+        # carries the per-tag propagation question and its trigger.
+        # AND THE CLAUSE IS SHORT BECAUSE NINE OF THE TWELVE CARRY IT. The
+        # first version spelled the whole mechanism out and produced the
+        # same 130 characters on nine rows of one page, which is *never
+        # explain the constraint back* — a reason shared by every result
+        # belongs hoisted once above the list, and only what distinguishes
+        # a row belongs in the row. So the query says the thing that is
+        # true of this query, and `motion_tag_note()` says the mechanism
+        # once per page.
+        # And the ALL case needs different words from the ANY case: under
+        # `all_interests` a destination qualifies when its own tags and its
+        # region's, taken together, cover every term — so "its own tag or
+        # its region's" would be a claim about one tag on a query about two.
+        out = out[:-1] + (
+            " \u2014 own tags and region\u2019s counting together."
+            if m.get("all_interests") and len(wants) > 1
+            else " \u2014 its own tag or its region\u2019s.")
+    return out
+
+
+def motion_tag_note():
+    """The mechanism behind the tag clause, stated once per page.
+
+    Nine of the twelve queries read a destination's own tags and its
+    region's together, and the clause on each says so in five words. This
+    is the sentence that explains it, hoisted — and it also reconciles the
+    two numbers this site publishes for one word: /interests counts a tag
+    on the DESTINATION (Mountains, 63) and a motion counts it on the
+    destination or its region (115). Both are derived, both are live, and
+    for the life of both families neither said which it was.
+    """
+    return ("A destination\u2019s own tags and its region\u2019s count "
+            "together here, so a place in a region tagged for something is "
+            "returned whether or not it carries the tag itself. That is why "
+            "a motion\u2019s count can be larger than the same tag\u2019s "
+            "count on <a href=\"/interests\">Interests</a>, which reads the "
+            "destination only.")
 
 
 def motion_page(data, m):
@@ -11606,21 +15191,130 @@ def motion_page(data, m):
     # built on. On the hidden-villages page every row said "not the capital
     # and editorially quiet", which is a restatement of the query the reader
     # is already reading two inches above. A clause true of every result is
-    # hoisted into the query note; each row keeps only what distinguishes it.
-    common = [c for c in (shown[0][1] if shown else [])
-              if all(c in w for _n, w in shown)]
-    rows = "".join(
-        f"""<a class="row" href="{urls.city(n['country'], n['region'], n['city'])}">
-        <div><h2>{esc(n['city']['name'])}</h2>
+    # hoisted; each row keeps only what distinguishes it.
+    #
+    # AND THE LIST IS GROUPED BY THAT DISTINGUISHING CLAUSE, WHICH IS ONE
+    # MECHANISM FOR ALL TWELVE QUERIES. This page measured **54% one
+    # component** — thirty-eight `.row` siblings with no second component at
+    # all, which is `tools/monotony.js`'s own diagnostic for a page that is
+    # a list and nothing else. The list is the right answer here, because
+    # the page IS the result of a query; what was missing was any structure
+    # inside it, and the structure the data already holds is WHY each
+    # result is in the set.
+    #
+    # `motion_match` returns the clauses each destination satisfied. Hoist
+    # the ones every result shares, group by what is left, and the groups
+    # come out of the query rather than out of a taxonomy somebody chose:
+    #
+    #     islands          10 tagged Islands · 15 in a region tagged Islands
+    #     autumn           42 October · 26 September · 15 November · 8 both
+    #     hidden villages  22 scoring 97 · 14 scoring 84 · 9 scoring 90 · …
+    #     the coast        31 tagged Coast & beaches · 25 in a region tagged
+    #
+    # The interest split is the sharpest of them and it is the previous
+    # commit's own finding one level down: `motion_match` reads the union of
+    # a destination's own interests and its region's, so **15 of the 25 on
+    # Europe's islands are there on their region's tags** — Tartu is a
+    # mainland university town in "Tartu & South Estonia". That commit fixed
+    # the sentence the PAGE prints and left every ROW claiming "tagged
+    # Islands", which is a statement about the wrong record. The clause says
+    # which side it came from now, so the grouping falls out of it.
+    #
+    # A GROUP OF ONE IS NOT A GROUP, IT IS A ROW WITH A HEADING — which is
+    # the nine-desks-one-story layout the stories index was thrown away for.
+    # The northern lights are eight destinations at eight distinct
+    # latitudes, so grouping them would produce eight headings over one row
+    # each; the page keeps its list. The test is the mean group size, and
+    # three is the smallest number for which "group" is the right word.
+    def _vary(why, common):
+        return tuple(c for c in why if c not in common)
+
+    common_all = [c for c in (shown[0][1] if shown else [])
+                  if all(c in w for _n, w in shown)]
+    buckets = {}
+    for n, why in shown:
+        buckets.setdefault(_vary(why, common_all), []).append((n, why))
+    # EVERY GROUP, NOT THE AVERAGE. The first test was the mean group size
+    # and it let a tail through: hidden villages splits 22, 14, 9, 8, 6, 3,
+    # 1, 1, 1 — a mean of 7.2 and three sections holding one row each, which
+    # is the exact case the floor was written for. A heading over one row
+    # carries nothing the row does not.
+    grouped = len(buckets) > 1 and all(
+        len(v) >= GROUP_MIN for v in buckets.values())
+
+    # THE LEVEL IS THE OUTLINE AND THE CLASS IS THE LOOK, which this
+    # stylesheet records about the `row` shape: a row's name is an h2 where
+    # the LIST IS THE PAGE and an h3 inside a band whose own h2 is the level
+    # above it. Both states exist on this family now — a grouped page puts
+    # each list inside a section with its own heading, so a row there is an
+    # h3, and the two ungrouped pages keep h2 because the list is still the
+    # page. Reading it off `grouped` rather than passing it per call site is
+    # the fourteen-call-sites-forgot-the-motif failure not repeated.
+    lvl = "h3" if grouped else "h2"
+
+    def _rows(part):
+        common = [c for c in (part[0][1] if part else [])
+                  if all(c in w for _n, w in part)]
+        body = "".join(
+            f"""<a class="row" href="{urls.city(n['country'], n['region'], n['city'])}">
+        <div><{lvl}>{esc(n['city']['name'])}</{lvl}>
         <p class="rowsub">{esc(n['city']['summary'])}</p>
         {f'<p class="whythis">{esc(and_list([c for c in why if c not in common]))}.</p>'
-         if [c for c in why if c not in common] else ""}</div>
+             if [c for c in why if c not in common] else ""}</div>
         <p class="rowmeta">{esc(n['country']['name'])}<br><span class="small">
         {nights_line(n['city'])}</span></p></a>"""
-        for n, why in shown
-    )
-    shared_note = (f'<p class="whyall"><span>All of them</span> {esc(and_list(common))}.</p>'
-                   if common else "")
+            for n, why in part)
+        return common, body
+
+    blocks, shared_note = [], ""
+    if not grouped:
+        # AND THE LIST THAT STAYS A LIST IS ORDERED BY THE CLAUSE THAT WOULD
+        # HAVE GROUPED IT. Two of the twelve keep their list — hidden
+        # villages, whose clause is a discoverability SCORE with a long tail
+        # of values held by one destination each, and the northern lights,
+        # which are eight destinations at eight distinct latitudes. Both
+        # were sorted alphabetically by country, which is *the order a
+        # reader is given is alphabetical by a key they cannot see*: the
+        # runs are together now, largest first, so the quietest villages
+        # lead the page whose whole argument is the score. Ordered by the
+        # bucket's own SIZE rather than by the clause string, because
+        # "scores 97" sorting before "scores 84" is an accident of decimal
+        # notation.
+        shown.sort(key=lambda x: (-len(buckets[_vary(x[1], common_all)]),
+                                  _vary(x[1], common_all),
+                                  x[0]["country"]["name"], x[0]["city"]["name"]))
+        common, body = _rows(shown)
+        shared_note = (f'<p class="whyall"><span>All of them</span> '
+                       f'{esc(and_list(common))}.</p>' if common else "")
+        blocks.append(f'<div class="rows molist">{body}</div>')
+    else:
+        # LARGEST GROUP FIRST, because most of the answer is the answer. The
+        # alternative is the order the clauses happened to be built in,
+        # which is *the order a reader is given is alphabetical by a key
+        # they cannot see* in another costume.
+        shared_note = (f'<p class="whyall"><span>All of them</span> '
+                       f'{esc(and_list(common_all))}.</p>' if common_all else "")
+        for vary, part in sorted(buckets.items(), key=lambda kv: (-len(kv[1]), kv[0])):
+            # THE GROUP'S OWN HOISTED LINE, IN THE PAGE'S EXISTING
+            # VOCABULARY. `_rows` already computes what every row in a set
+            # shares, and inside a group that is the whole varying clause —
+            # so the group head is the count and `.whyall` is the clause,
+            # which is the component whose entire job is *a clause true of
+            # every result in this set*, already on this page twice. The
+            # first version set the clause IN the heading and produced
+            # "42 destinations, in its quieter shoulder season in October":
+            # the clause is written about one destination, so a plural
+            # subject disagrees with its own pronoun. A count as the
+            # heading and the clause under it says the same thing and needs
+            # no second grammar.
+            _c, body = _rows(part)
+            blocks.append(
+                f'<section class="moqual">'
+                f'<h2 class="mini">{n_of(len(part), "destination")}</h2>'
+                + (f'<p class="whyall"><span>All of them</span> '
+                   f'{esc(and_list(_c))}.</p>' if _c else "")
+                + f'<div class="rows molist">{body}</div></section>')
+    rows = "".join(blocks)
 
     # THE ANSWER TO THE QUERY, AS A SHAPE.
     #
@@ -11672,6 +15366,7 @@ def motion_page(data, m):
         f'{"countries" if ncountries != 1 else "country"}'
         + (f'; the {len(shown)} below are at most two per country.'
            if len(hits) != len(shown) else ', and all of them are below.')
+        + (" " + motion_tag_note() if m.get("interests") else "")
         + '</p>'
     )
 
@@ -11775,7 +15470,7 @@ def motion_page(data, m):
 {querynote}
 {shared_note}
 {_mstrip}
-<div class="rows">{rows}</div>
+{rows}
 
 {section("Journeys that go this way", f'<div class="rows journeyrows">{jrelated}</div>') if jrows else ""}
 {section("Themes that run through it", f'<div class="rows">{trelated}</div>') if trows else ""}
@@ -11811,91 +15506,365 @@ def motion_page(data, m):
 
 
 def motion_index(data):
-    """Twelve queries, printed as queries.
+    """The Computed Atlas: six plates, and the printed query was narrower
+    than the query that ran.
 
-    THE FAMILY'S WHOLE ARGUMENT WAS THE ONE THING THE INDEX DID NOT SHOW.
-    Every `/europe-in/*` page prints the query that made it — that is the
-    rule this family exists to demonstrate, and `checks.py` asserts it on all
-    twelve. The index showed twelve generated landscapes instead, one per
-    query, and the query nowhere.
+    THE FAMILY'S WHOLE CREDIBILITY CLAIM IS THAT EVERY PAGE PRINTS WHAT
+    PRODUCED IT, and for the life of the family the sentence said "any
+    destination tagged Islands" while `motion_match` read
+    `set(city.interests) | set(region.interests)`. The gap is not
+    cosmetic: **62 of the 86 results for Food and Wine are there on their
+    region's tags rather than their own**, 58 of 150 for Coast, 52 of 115
+    for Mountains — 537 tag applications across the seventeen interests,
+    47% more than the destination-only reading. It returns **Nicosia**,
+    which is inland, for Europe's coastlines, because its region is
+    "Nicosia & the South Coast"; and **Tartu**, a mainland university
+    town, for Europe's islands. That is `cell` catching `cellar` exactly:
+    the page published its rule honestly and a reader who checked would
+    find something the rule did not describe.
 
-    **A motion is not a place.** It has no coastline, no topography and no
-    season of its own, so a plate drawn for one is a picture of nowhere
-    standing in for a sentence — the same failure as the stories index, one
-    family over, and the rule written for it applies here word for word: the
-    alternative to a hash-drawn landscape is not a better hash.
+    AND IT MEANT TWO LIVE PAGES PUBLISHED TWO NUMBERS FOR ONE WORD.
+    /interests/mountains says *63 destinations*; /europe-in/mountains says
+    *115 match*. Both derived, both correct under their own reading, and
+    neither said which reading it was. The engine is unchanged — a region
+    tag is a real fact about the ground around a place, and nine other
+    surfaces depend on the union — what changed is that the query says so
+    in five words and `motion_tag_note()` says the mechanism once.
 
-    So the picture goes and the query arrives, generated by the same
-    `motion_query_words()` the twelve pages use, so the index cannot state a
-    query the page it links to would not.
+    THE TWELVE SHAPES WERE ONE PER ROW, 1,152 PIXELS APART. The family's
+    signature moment is the query drawn as a shape, and the argument is
+    that the twelve shapes DIFFER — which is a comparison, and a
+    comparison laid out vertically at one drawing per screen cannot be
+    made. That is /themes' own finding about a 204-pixel continent, one
+    axis over. They are a grid in the opening now, on one frame, and the
+    rows carry the sentence and a photograph instead. See
+    `docs/europe-in-redesign.md`.
+
+    ZERO PHOTOGRAPHS, AND A MOTION MAY NOT HAVE ONE OF ITS OWN. The
+    register declares no `motion:` purpose and must not: a motion has no
+    coastline, no topography and no season, so a picture of one is a
+    picture of nowhere — the refusal that took the twelve plates off this
+    index. What it CAN spend is a photograph of a destination the query
+    returned, and eleven of the twelve have one. The pick is derived: a
+    member on its OWN tags rather than its region's, then the one fewest
+    of the other eleven queries also return, then never a key already
+    spent. `by-rail` has 20 results and none photographed, so it shows its
+    slot and names the acquisition. Nothing was acquired.
     """
-    # AND THE ANSWER IS DRAWN, WHICH IS A THIRD OPTION THE REFUSAL ABOVE
-    # NEVER CONSIDERED. What was refused is a PLATE — an abstract landscape
-    # picked from the hash of a slug, a picture of nowhere standing in for a
-    # sentence — and that refusal still holds word for word. This is not
-    # that. The motion PAGE's own signature moment, recorded one function
-    # over, is "the query drawn as a shape: everywhere above 63 north is
-    # eight lit points across Iceland, Norway, Sweden and Finnish Lapland,
-    # and you see the latitude before you read it" — and the index that
-    # introduces the twelve drew none of it.
+    images = data.get("images")
+    total = len(data["cities"])
+
+    # ── ONE PASS, AND EVERY FIGURE ON THIS PAGE COMES OUT OF IT ──────
+    sets, facts = {}, {}
+    for m in data["motions"]:
+        hits = [cid for cid, n in sorted(data["cities"].items())
+                if motion_match(data, m, cid, n)[0]]
+        sets[m["slug"]] = hits
+        facts[m["slug"]] = {
+            "n": len(hits),
+            "ncountry": len({data["cities"][c]["country"]["slug"] for c in hits}),
+            "pct": round(100.0 * len(hits) / total) if total else 0,
+            "pts": [project(data["cities"][c]["city"]["lat"],
+                            data["cities"][c]["city"]["lon"]) for c in hits],
+        }
+
+    # HOW MANY OF THE TWELVE EACH DESTINATION SATISFIES. The twelve are not
+    # a partition and nobody had said so: the union is the whole Atlas, the
+    # commonest destination is in four of them, and one is in eight.
+    degree = {cid: sum(1 for h in sets.values() if cid in h)
+              for cid in data["cities"]}
+    dist = {}
+    for k in degree.values():
+        dist[k] = dist.get(k, 0) + 1
+    reached = sum(1 for k in degree.values() if k)
+    # DERIVED, because "the commonest satisfies four" is a figure that was
+    # true on the day it was typed — the /themes "8 PLACES" fault in prose.
+    commonest = max(dist.items(), key=lambda kv: (kv[1], -kv[0]))[0]
+    most = max(degree.items(), key=lambda kv: (kv[1], kv[0]))
+    mostname = data["cities"][most[0]]["city"]["name"]
+    mostin = [m["name"] for m in data["motions"] if most[0] in sets[m["slug"]]]
+
+    # THE OVERLAP, MEASURED, because "same frame, different Europe" is an
+    # assertion until somebody runs the arithmetic. No two of the twelve
+    # share more than 48% of their results and 0 of the 66 pairs share half.
+    worst = (0.0, "", "")
+    over = 0
+    slugs = [m["slug"] for m in data["motions"]]
+    for a in range(len(slugs)):
+        for b in range(a + 1, len(slugs)):
+            x, y = set(sets[slugs[a]]), set(sets[slugs[b]])
+            j = len(x & y) / len(x | y) if (x | y) else 0.0
+            if j > 0.5:
+                over += 1
+            if j > worst[0]:
+                worst = (j, slugs[a], slugs[b])
+    name_of = {m["slug"]: m["name"] for m in data["motions"]}
+
+    # THE PHOTOGRAPH IS A DESTINATION THE QUERY RETURNED ON ITS OWN TAGS.
     #
-    # It is computed from the query, by the same `motion_match` that produces
-    # the count beside it, so the drawing cannot state a set the page it
-    # links to would not — the same contract the printed query already has.
-    # And it is the shape that separates them: autumn lights 309 dots and is
-    # nearly the whole continent, rail is a corridor, the islands are a rim,
-    # above 63 north is the far north and nothing else. Twelve rows of type
-    # cannot be compared; twelve shapes can, which is the argument /themes
-    # and /interests already make with the same primitive.
+    # Ordering by "fewest of the twelve" alone picked Nicosia for the coast
+    # and Tartu for the islands — the region-only members, which are the
+    # WEAKEST members of the set and the ones a reader would read as a
+    # mistake. A direct member, then the one whose own tags are most nearly
+    # just what the query asks for, then fewest of the other eleven, is the
+    # picture that is both characteristic of the cut and specific to it.
+    # Advisory countries are excluded because a derived point is not
+    # automatically an honest one, and a key already spent is skipped
+    # because one photograph on two records is *one thing, one picture* from
+    # the other end.
+    def direct(m, n):
+        wants = m.get("interests", [])
+        if not wants:
+            return True
+        own = set(n["city"]["interests"])
+        hit = [w for w in wants if w in own]
+        return len(hit) == len(wants) if m.get("all_interests") else bool(hit)
+
+    def tagshare(m, n):
+        """How much of a destination's own tag list this query asks for.
+
+        ORDERING BY SPECIFICITY ALONE PUT THE MODERN CITY ON THE MEDIEVAL
+        QUERY. "Fewest of the other eleven" is a good tie-break and a poor
+        primary key: it rewards a place that is in few cuts for any reason,
+        so `medieval` drew Baku (architecture, history, food, cities — the
+        register's photograph is the Flame Towers) and `sacred` drew Garni.
+        A destination whose own tags are most nearly JUST what the query
+        asks for is the characteristic member: Mostar for the medieval
+        world, Blagaj for the sacred places, Kuressaare on Saaremaa for the
+        islands. Measured against the alternative on all twelve, three picks
+        improve and none gets worse than a wash.
+        """
+        wants = set(m.get("interests", []))
+        own = set(n["city"]["interests"])
+        return len(wants & own) / len(own) if own else 0.0
+
+    spent = set()
+    for m in data["motions"]:
+        cands = [c for c in sets[m["slug"]]
+                 if held(images, "city:" + c) and c not in spent
+                 and not data["cities"][c]["country"].get("advisory")
+                 and direct(m, data["cities"][c])]
+        cands.sort(key=lambda c: (-tagshare(m, data["cities"][c]),
+                                  degree[c], c))
+        facts[m["slug"]]["shot"] = cands[0] if cands else None
+        if cands:
+            spent.add(cands[0])
+    nshot = sum(1 for f in facts.values() if f["shot"])
+
+    # ── 01 · EUROPE IN MOTION ────────────────────────────────────────
+    # THE TWELVE SHAPES, ON ONE FRAME, WHERE THEY CAN BE COMPARED. Autumn
+    # is 97% of the continent, rail is a corridor up Norway and through the
+    # Alps, the islands are a rim and above 63° north is the far north and
+    # nothing else — and that difference is the whole argument of the page.
+    # The mark size follows the count exactly as it does on /interests:
+    # three hundred dots at a theme's radius is a blue mass with the
+    # coastline lost under it, which says "a lot" and nothing else.
+    tiles = []
+    for m in data["motions"]:
+        f = facts[m["slug"]]
+        dense = " constel-dense" if len(f["pts"]) > 60 else ""
+        tiles.append(
+            f'<a class="motile" href="/europe-in/{m["slug"]}">'
+            f'{constellation(f["pts"], extra=" constel-theme" + dense)}'
+            f'<span class="motilen">{f["n"]}</span>'
+            f'<span class="motilenm">{esc(m["name"])}</span>'
+            f'<span class="motilep">{f["pct"]}% of the Atlas &middot; '
+            f'{n_of(f["ncountry"], "country")}</span></a>')
+    moopen = f"""
+  <div class="pagehead index">
+    <p class="kicker">Europe in Motion</p>
+    <h1 class="mega">The continent, cut a dozen different ways.</h1>
+    {head_extent([(len(data["motions"]), "queries"),
+                  (total, "destinations"),
+                  (len({n["country"]["slug"] for n in data["cities"].values()}),
+                   "countries")])}
+    <p class="lede">Not categories. {numword(len(data['motions']), cap=True)} queries, each run
+    against all {total} destinations on every build, and each page prints the query that
+    made it. A list somebody curated by hand looks identical to one a query produced
+    &mdash; on the day it ships, and never again.</p>
+  </div>
+  {constel_defs()}
+  <div class="mogrid">{"".join(tiles)}</div>
+  <p class="small">Each shape is the destinations that query actually matched, drawn to
+  the same frame so the {numword(len(data['motions']))} can be compared &mdash; computed by
+  the same pass that produced the number on it, so a drawing here cannot show a set the
+  page it links to would not. Marks are smaller above sixty results, because three
+  hundred dots at one radius is a mass rather than a shape.
+  {geo.sources_line(geo.load("europe-lod0.json"))}</p>"""
+
+    # ── 02 · THE QUESTION ────────────────────────────────────────────
+    # THE PAGE'S OWN POSITION WAS A CAPTION-SIZE NOTE AT THE BOTTOM, under
+    # twelve rows, in a grey panel titled "Why this is not a set of tags" —
+    # the /beyond-the-obvious fault, where the reason a family looks the way
+    # it does is printed smaller than everything it explains.
+    moq = f"""
+  <div class="sheettext">
+    <h2 class="mega">A tag tells you what carries a
+    <em class="lit">label</em>.</h2>
+    <p class="lede">These ask questions the tags cannot answer on their own. Which places
+    have their <em>quieter</em> season in autumn rather than merely tolerating it. Which
+    lie above 63&deg; north. Which score highly for
+    <a href="/method#discoverability">discoverability</a> and are small enough to be
+    villages rather than cities. The query is the product, and it is the thing printed on
+    the page.</p>
+    <p class="note">There is no field for naming a destination in a motion, so one cannot
+    quietly become a hand-picked list; and a query matching nothing fails the build rather
+    than shipping an empty page with a good headline on it.</p>
+  </div>"""
+
+    # ── 03 · TWELVE CUTS ────────────────────────────────────────────
     rows = []
     for m in data["motions"]:
-        hits = [x for cid, x in data["cities"].items()
-                if motion_match(data, m, cid, x)[0]]
-        n = len(hits)
-        pts = [project(x["city"]["lat"], x["city"]["lon"]) for x in hits]
-        # The mark size follows the count, exactly as it does on /interests:
-        # three hundred dots at a theme's radius is a solid blue mass with the
-        # coastline lost under it, which says "a lot" and nothing else — and
-        # the whole argument of this page is that the shapes differ.
-        dense = " constel-dense" if len(pts) > 60 else ""
-        glyph = constellation(pts, extra=" constel-theme" + dense) if pts else ""
+        f = facts[m["slug"]]
+        if f["shot"]:
+            n = data["cities"][f["shot"]]
+            shot = (f'<figure class="moshot">'
+                    f'{picture(images, "city:" + f["shot"], w=900, h=700, alt=n["city"]["name"], sizes="(max-width: 52rem) 90vw, 20rem")}'
+                    f'<figcaption>{esc(n["city"]["name"])}, '
+                    f'{esc(n["country"]["name"])} &mdash; one of the '
+                    f'{f["n"]}</figcaption></figure>')
+        else:
+            shot = (f'<figure class="moshot">'
+                    f'{ed_slot("city:" + sets[m["slug"]][0], shape="square", label=m["name"])}'
+                    f'</figure>')
         rows.append(
-            f'<a class="row themerow motionrow" href="/europe-in/{m["slug"]}">'
-            f'<div class="rowart">{glyph}</div>'
-            f'<div><p class="kicker">{n_of(n, "destination")}</p>'
-            f'<h2>{esc(m["name"])}</h2>'
+            f'<div class="row motionrow">{shot}'
+            f'<div><p class="kicker">{n_of(f["n"], "destination")} &middot; '
+            f'{n_of(f["ncountry"], "country")} &middot; {f["pct"]}% of the Atlas</p>'
+            f'<h2><a href="/europe-in/{m["slug"]}">{esc(m["name"])}</a></h2>'
             f'<p class="rowsub">{esc(m["strapline"])}</p>'
-            f'<p class="motionq">{esc(motion_query_words(data, m))}</p></div></a>')
+            f'<p class="motionq">{esc(motion_query_words(data, m))}</p></div></div>')
+    # NOT `ed_section_head()` HERE, AND THE REASON IS ALREADY WRITTEN ON IT:
+    # `.ed-section` increments the same `band` counter a plate's `actmark`
+    # numbers from, so one inside a plate sequence is the two-numbering-
+    # systems collision that printed "01" twice on 753 pages. A plate states
+    # its own head, which is what every other plate on this site does.
+    mocuts = f"""
+  <div class="sheettext">
+    <h2 class="mega">{numword(len(data['motions']), cap=True)} cuts, and each one
+    prints its own query.</h2>
+    <p class="lede">The query is on the left of every row and the result is the
+    number beside it. The photograph is a destination that query returned &mdash; on
+    its <em>own</em> tags rather than its region&rsquo;s, and the one whose tag list
+    is most nearly just what the query asks for, so the picture is of this cut
+    rather than of Europe. The register holds one for {numword(nshot)} of the
+    {numword(len(data['motions']))}.</p>
+  </div>
+  <div class="rows mocuts">{"".join(rows)}</div>"""
+
+    # ── 04 · NOT TWELVE BUCKETS ─────────────────────────────────────
+    # NOBODY HAD CROSSED THE TWELVE WITH EACH OTHER. The shapes differ, and
+    # a reader can still read twelve shapes as twelve boxes — so the other
+    # half of "same frame, different Europe" is that they OVERLAP: the union
+    # is the whole Atlas, the commonest destination is in four of them, and
+    # Narvik is in eight. A chart is a claim, so both series are asserted
+    # against the dataset in `checks.py`.
+    top = max(dist.values())
+    # The width is a `.w0`-`.w100` utility class, not a `style` attribute —
+    # a style attribute would force `style-src` open on all 1,034 pages,
+    # which `checks.py` refuses. And the number sits at the END of its own
+    # bar, which is /plan's own finding: a value six hundred pixels from the
+    # thing it measures is not labelled.
+    bars = "".join(
+        f'<div class="mobar">'
+        f'<span class="mobarlab">{k} '
+        f'{"query" if k == 1 else "queries"}</span>'
+        f'<span class="mobartr"><span class="mobarfill '
+        f'w{round(100.0 * dist[k] / top)}"></span>'
+        f'<span class="mobarn">{dist[k]}</span></span></div>'
+        for k in sorted(dist))
+    mooverlap = f"""
+  <div class="sheettext">
+    <h2 class="mega">Not {numword(len(data['motions']))} buckets.</h2>
+    <p class="lede">The {numword(len(data['motions']))} are readings of one continent
+    rather than divisions of it. {"Every one" if reached == total else numword(reached, cap=True)}
+    of the {total} destinations satisfies at least one of them, the commonest number to
+    satisfy is {numword(commonest)}, and
+    {esc(mostname)} satisfies {numword(most[1])} &mdash;
+    {esc(and_list(mostin))}.</p>
+  </div>
+  <figure class="mobars">
+    {bars}
+    <figcaption><span class="capmain">Destinations by how many of the
+    {numword(len(data['motions']))} queries return them.</span>
+    <span class="capsrc">Bars are a share of the largest group
+    ({top}), not of the {total}. Counted on every build by the same
+    {len(data['motions'])} queries the pages run.</span></figcaption>
+  </figure>
+  <p class="note">No two of the {numword(len(data['motions']))} share more than
+  {round(worst[0] * 100)}% of their results &mdash; the closest pair is
+  {esc(name_of[worst[1]])} and {esc(name_of[worst[2]])} &mdash; and
+  {"none" if not over else str(over)} of the
+  {len(slugs) * (len(slugs) - 1) // 2} pairs share half. That is the
+  difference between twelve questions and twelve labels, and it is
+  arithmetic rather than a claim.</p>"""
+
+    # ── 05 · METHOD ─────────────────────────────────────────────────
+    # THE PROJECTION IS NAMED IN ONE PLACE AND THIS IS NOT IT. A page naming
+    # a Lambert conformal conic has to state its four angles in the same
+    # sentence, because /map named the right projection on the wrong
+    # parallels for six commits and no check read the prose. Naming it here
+    # would be a second copy of that claim on a page whose subject is a
+    # query rather than a drawing, so the note credits the data and links to
+    # the page that publishes the projection.
+    #
+    # AND THIS REASON WAS FIRST WRITTEN AS AN HTML COMMENT, WHICH SHIPS.
+    # `c_published_projection` reads the shipped HTML and found the words
+    # "conformal conic" in the paragraph explaining why they are not on the
+    # page — the third time a comment in emitted markup has cost something
+    # here, and the first where the comment tripped the check it was written
+    # about. A reason belongs in the source that writes the page.
+    momethod = f"""
+  <div class="sheettext">
+    <h2 class="mega">How a cut is made.</h2>
+    <p class="lede">A motion is a declared query &mdash; interests, months, a latitude, a
+    <a href="/method#discoverability">discoverability</a> floor, a nights ceiling &mdash;
+    evaluated against every destination in the Atlas on every build. Nothing is stored
+    against a motion and nothing is chosen by hand.</p>
+    <p class="note">{motion_tag_note()}</p>
+    <p class="note">Coastline and country outlines from
+    <a href="/sources">Natural Earth</a>, public domain, drawn on the
+    projection <a href="/map">the map</a> publishes. The scoring is
+    published in full at <a href="/method">the method</a>.</p>
+  </div>"""
+
+    # ── 06 · ASK A BETTER QUESTION ──────────────────────────────────
+    moask = f"""
+  <!-- `.istart` RATHER THAN A FOURTH CLASS WITH THE SAME BODY. /interests
+       introduced this close shape and /beyond-the-obvious already reuses
+       it; a third copy of `display: grid; justify-items: start` under a new
+       name is the duplicated rule this stylesheet removed 85 of, and the
+       first version of this band had one. -->
+  <div class="istart">
+    <h2 class="mega">Ask a better question.</h2>
+    <p class="lede">These {numword(len(data['motions']))} are the questions we found worth
+    asking. Discover Mode takes yours &mdash; any combination of the
+    {len(data["interests"])} interests, a month, a budget and a pace &mdash; and the
+    Planner turns the answer into an order you can travel in.</p>
+    <p class="keepgo"><a class="btn" href="/discover">Open Discover Mode</a>
+    <a class="storygo" href="/plan">Or build a route &rarr;</a></p>
+  </div>"""
+
+    # THE ACTMARK NAMED WHAT THE KICKER UNDER IT ALREADY SAID. Rendered,
+    # plate 01 read "01 — EUROPE IN MOTION" and then, eight pixels below,
+    # "EUROPE IN MOTION" again — two identical labels stacked, which is the
+    # 753-page double-numbering fault in words rather than digits. The
+    # actmark names what the plate DRAWS and the kicker names the family.
+    PLATES = [("moopen gal", "Same frame, different Europe", moopen,
+               "europe-in-motion"),
+              ("moq pine", "The question", moq, "the-question"),
+              ("mocuts gal", "Twelve cuts", mocuts, "twelve-cuts"),
+              ("mooverlap paper", "Not twelve buckets", mooverlap, "overlap"),
+              ("momethod pine", "Method", momethod, "method"),
+              ("moask gal", "Ask a better question", moask, "ask")]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Europe in Motion", None)])}
-<div class="pagehead index">
-  <p class="kicker">Europe in Motion</p>
-  <h1>The continent, cut a dozen different ways.</h1>
-  <p class="lede">Not categories. {len(data['motions'])} queries, each run against all
-  {len(data['cities'])} destinations on every build, and each page prints the query that
-  made it. A list somebody curated by hand looks identical to one a query produced — on
-  the day it ships, and never again.</p>
-</div>
-{constel_defs()}
-<div class="rows">{"".join(rows)}</div>
-<p class="small">The shape beside each query is the destinations that query
-actually matched, drawn to the same frame so the {numword(len(data['motions']))} can be
-compared — computed by the same pass that produced the number beside it, so a
-drawing here cannot show a set the page it links to would not.
-{geo.sources_line(geo.load("europe-lod0.json"))}</p>
-
-<div class="note mt7">
-  <h2 class="mini">Why this is not a set of tags</h2>
-  <p>A tag page tells you what carries a label. These ask questions the tags cannot answer on
-  their own: which places have their <em>quieter</em> season in autumn, which lie above 63°
-  north, which score highly for <a href="/method#discoverability">discoverability</a> and are
-  small enough to be villages. The query is the product.</p>
-</div>
+{plate_sequence(PLATES)}
 """
     return "/europe-in/index.html", page(
         "Europe in Motion", body, path="/europe-in", area="discover",
-        accent="territory",
-        description=f"A dozen ways to cut the continent — each a real query run against all {len(data['cities'])} destinations on every build, with the query printed on the page.",
+        accent="territory", hero=True,
+        description=f"A dozen ways to cut the continent — each a real query run against all {total} destinations on every build, with the query printed on the page.",
         og=("motion:index", "peaks", "Europe in Motion"),
         ld_blocks=[ld_breadcrumb([("Europe", "/discover"),
                                   ("Europe in Motion", "/europe-in")])],
@@ -12017,29 +15986,107 @@ def discover_page(data):
     # left: it simply continues into the page and the key is set in its
     # ocean. That is the difference between a map ON a plate and a map that
     # IS one.
+    # AND THE GROUND BEYOND THE ATLAS IS NOT DRAWN HERE, WHICH IS A
+    # MEASUREMENT RATHER THAN A PREFERENCE. `landmass` returns the context
+    # land first — every landmass in a box that contains Europe, clipped to
+    # that box — and it is a HERO device: *Europe is not an island*, and the
+    # graphite it is drawn on absorbs its straight edges completely. /map and
+    # /discover keep it for exactly that reason, and the same slab on the
+    # same projection is invisible there: measured on /map's own pixels, the
+    # dusk over 52°E is near-black and Iran and Iraq are gone.
+    # This band is the one light drawing that shows the whole eastern cut
+    # inside its own frame with open water beyond it, and `--atlas-far`
+    # (#C3BFB2) is DARKER than the water (#DDE8E7) rather than lighter — so
+    # the fragment came out as a warm slab with three straight edges sitting
+    # in the sea south-east of Baku, probed and named as Iran and Iraq
+    # clipped at 52°E. The wide fade hides it and takes the ground out from
+    # under Baku and Tbilisi with it, which is the fault `dusk_reach` exists
+    # to stop and is why every caller passes it. So the layer that has no
+    # claim to make here is the one that goes: this drawing's subject is 313
+    # destinations and the six it refuses, and nothing outside the atlas is
+    # part of that sentence.
     dctx, dland = geo.landmass(MAPPROJ, (0, 0, MAP_W, MAP_H))
     mapsvg = (f'<svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true">'
               f'<rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>'
               f'{dctx}{dland}{cut_fade("disc", MAP_W, MAP_H, dusk_reach())}'
               f'{"".join(dots)}</svg>')
 
+    # ── THE PHOTOGRAPHIC RESPONSE ────────────────────────────────────
+    # A MAP ANSWERS *WHERE* AND A PHOTOGRAPH ANSWERS *WHAT IT IS LIKE*, and
+    # this page had only the first. The instrument re-lights the continent
+    # and then hands the reader a list of names: true, checkable, and no
+    # answer at all to the question the plate above it asks.
+    #
+    # ONE PER MACRO REGION, IN THE ATLAS'S OWN ORDER, AND THE COUNT IS THE
+    # SET'S OWN EXTENT. The first version walked the destinations sorted by
+    # id and took the first photographed one in each macro, which put all
+    # seven tiles in countries A to E — a row that reads as a spread across
+    # the continent while being a spread across one end of the alphabet.
+    # The macros are walked in the taxonomy's own order now, so the row
+    # sweeps the continent the way /countries does, and the lede states how
+    # many of the nine corners hold a photograph TODAY rather than implying
+    # all of them do: a number that is not the set's own extent reads as
+    # one, which is this atlas's own finding about /europe-in.
+    #
+    # AND THE TILES ANSWER THE INSTRUMENT. Each carries `data-city`, the
+    # same join the dots use, so a destination that falls out of the chosen
+    # set goes QUIET rather than away — the map's own rule, applied on the
+    # band that exists to be the picture the map cannot draw. Nothing is
+    # added to the contract: `city.id` is already declared for the dots.
+    images = data.get("images") or {}
+    first_in_macro = {}
+    for cid, e in sorted(data["cities"].items()):
+        if ("city:" + cid) not in images:
+            continue
+        if (e["country"].get("advisory") or {}).get("level"):
+            continue
+        first_in_macro.setdefault(e["country"].get("macro_slug"), (cid, e))
+    macros = data["taxonomy"]["macros"]
+    shots = [first_in_macro[m["slug"]] for m in macros
+             if m["slug"] in first_in_macro]
+
+    def _mostile(cid, e):
+        return (f'<a class="mos" data-city="{esc(cid)}" '
+                f'href="{urls.city(e["country"], e["region"], e["city"])}">'
+                f'{picture(images, "city:" + cid, w=1000, h=1000, credit=False, alt=images["city:" + cid]["alt"], sizes="(min-width: 62rem) 30vw, 92vw")}'
+                f'<span class="moscopy">'
+                f'<span class="moswhere">{esc(e["country"]["name"])}</span>'
+                f'<span class="mosname">{esc(e["city"]["name"])}</span></span></a>')
+
+    # THE LEAD IS A SIBLING OF THE REST RATHER THAN A CELL AMONG THEM,
+    # because a dominant tile that is a cell has to be told how many rows
+    # to span and the count is data. See `.moswrap` in the stylesheet.
+    mosaic = (_mostile(*shots[0])
+              + '<div class="mosrest">'
+              + "".join(_mostile(cid, e) for cid, e in shots[1:])
+              + '</div>') if shots else ""
+
     body = f"""
 {crumbs([("Europe", "/discover"), ("Discover", None)])}
 
+<section class="sheet sheet-ask sheet-paper sheet-white" id="discover-open">
+  {actmark(1, "Discover")}
+  <div class="asktext">
+    <h1 class="mega">What are you<br><em class="lit">looking for?</em></h1>
+    <p class="lede">Do not begin with a destination. Begin with a curiosity — a landscape, a
+    season, a culture, a road — and let the continent answer. Nothing here is submitted:
+    the whole Atlas is already in your browser.</p>
+    {head_extent([(len(data['cities']), 'destinations'),
+                  (len(data['countries']), 'countries'),
+                  (len(data['taxonomy']['interests']), 'things to travel for')])}
+  </div>
+</section>
+
 <section class="sheet sheet-instrument" id="discover-mode">
-  {actmark(1, "The instrument")}
+  {actmark(2, "The instrument")}
   <div class="instrkey">
     <div class="pagehead instrument">
-      <p class="kicker">Discover</p>
-      <h1>Where will Europe take you?</h1>
-      {head_extent([(len(data['cities']), 'destinations'),
-                    (len(data['countries']), 'countries'),
-                    (len(data['taxonomy']['interests']), 'things to travel for')])}
+      <p class="kicker">The European instrument</p>
+      <h2>Let Europe answer.</h2>
     </div>
     <p class="keyhead">Say what you are travelling for.</p>
     <div class="picks" id="discover-interests">{interest_words}</div>
-    <p class="keynote">Pick as many as you like. Nothing is submitted — the whole Atlas is
-    already in your browser, and the continent re-lights as you choose.
+    <p class="keynote">Pick as many as you like. The continent re-lights as you choose.
     <a href="/interests">Every tag also has its own page</a>.</p>
   </div>
 
@@ -12075,10 +16122,22 @@ def discover_page(data):
   </div>
 </section>
 
-<section class="sheet sheet-result" id="discover-result">
-  {actmark(2, "The result")}
+<section class="sheet sheet-response sheet-paper" id="discover-response">
+  {actmark(3, "Your Europe")}
   <div class="sheettext">
-    <h2>What is left</h2>
+    <h2 class="mega">Start here.</h2>
+    <p class="lede">One destination from each corner of the continent &mdash;
+    {len(shots)} of the {len(macros)} this atlas divides Europe into, because a corner
+    appears here only once it holds a licensed photograph. What the map says in position,
+    these say in weather and light.</p>
+  </div>
+  <div class="moswrap" id="discover-shots">{mosaic}</div>
+</section>
+
+<section class="sheet sheet-result sheet-paper sheet-white" id="discover-result">
+  {actmark(4, "The result")}
+  <div class="sheettext">
+    <h2 class="mega">What is left.</h2>
     <p class="lede">Ranked by the terms you chose and nothing else. Each row says why it is
     on the list — the actual terms that fired, not "recommended for you".</p>
     {golink("/method", "How the ranking works")}
@@ -12088,10 +16147,10 @@ def discover_page(data):
 
 {constel_defs()}
 
-<section class="sheet sheet-where" id="discover-where">
-  {actmark(3, "By where it is")}
+<section class="sheet sheet-where sheet-paper" id="discover-where">
+  {actmark(5, "By where it is")}
   <div class="sheettext">
-    <h2>Nine regions, by shared ground</h2>
+    <h2 class="mega">Europe, by region.</h2>
     <p class="lede">Grouped by shared coast, shared mountain range and shared history rather
     than by alphabet. Each one draws its own member countries, so a region is a shape before
     it is a name.</p>
@@ -12100,10 +16159,10 @@ def discover_page(data):
   <div class="rows whererows">{macro_rows}</div>
 </section>
 
-<section class="sheet sheet-motion" id="discover-motion">
-  {actmark(4, "Europe in motion")}
+<section class="sheet sheet-motion sheet-pine" id="discover-motion">
+  {actmark(6, "Europe in questions")}
   <div class="sheettext">
-    <h2>Twelve ways to cut the continent</h2>
+    <h2 class="mega">Sometimes you know<br>the question before<br>you know the place.</h2>
     <p class="lede">Each one is a query run against every destination on every build, not a
     list somebody chose. The query is printed under the name, and it is the same query the
     page itself prints.</p>
@@ -12112,17 +16171,17 @@ def discover_page(data):
   <div class="qqlist">{motion_lines}</div>
 </section>
 
-<section class="sheet sheet-month" id="discover-month-band">
-  {actmark(5, "By month")}
+<section class="sheet sheet-month sheet-paper sheet-white" id="discover-month-band">
+  {actmark(7, "Europe in time")}
   <div class="sheettext">
-    <h2>And the year itself</h2>
+    <h2 class="mega">And the year itself.</h2>
     <p class="lede">What is on, and which countries are in their quieter shoulder — which is
     usually where you should be going. The two disagree, and the disagreement is the point.</p>
     {golink("/events", "The whole European year")}
   </div>
   <div class="monthside">{year_band(data)}</div>
   <div class="note qualify">
-    <h2 class="mini">What "off the obvious circuit" means, exactly</h2>
+    <h3 class="mini">What "off the obvious circuit" means, exactly</h3>
     <p>It is a computed score, not a mood. A place scores higher for not being a capital, for
     being marked quiet by an editor who knows the region, for having no curated route through
     it, for not being tagged with the things a continent is famous for, and for sitting in a
@@ -12133,6 +16192,17 @@ def discover_page(data):
     crowding presented as evidence is the thing this project exists not to do.
     {quiet} places carry the editorial quiet tag; <a href="/beyond-the-obvious">Beyond the
     obvious</a> collects them.</p>
+  </div>
+</section>
+
+<section class="sheet sheet-keep sheet-paper sheet-white" id="discover-end">
+  {actmark(8, "Keep looking")}
+  <div class="sheettext">
+    <h2 class="mega">Keep<br><em class="lit">looking.</em></h2>
+    <p class="lede">There is always another road, another city, another landscape, another
+    door. {len(data['cities'])} of them are written up here, and the atlas is a third
+    finished.</p>
+    {golink("/beyond-the-obvious", "Beyond the obvious")}
   </div>
 </section>
 """
