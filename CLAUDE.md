@@ -4796,6 +4796,27 @@ cheap and it is the only form of this that cannot lose bytes the repository is
 the evidence for. Found because the run left the working tree dirty and the
 static suite was run on it rather than only on the build.
 
+**A 76px HEADLINE IN A 461px COLUMN STRANDS ITS LAST WORD AND
+`text-wrap: balance` CANNOT HELP.** Measured at 1280: "The Adriatic Run"
+needs 486 units of glyph and the featured band's type column gives 461, so it
+must break — and 364 + 122 is the best split balance can find, because the
+heading is three words and the last one is short. The browser suite reported
+it as *balance being overridden*, which is a true report of a real defect
+naming the wrong cause: balance IS applied and is doing its job. **The
+proportion is the feature scale doing what it is for** — a feature is
+asymmetric at 1.35 against .65 so the PICTURE is the subject, which makes the
+type column narrow BY DESIGN — so the name takes the section step rather than
+the opening one. `--ed-display-2` is already spent as a font-size in eight
+rules, so no type value is added, and at 1280 the name sets on one line.
+
+**And a reason stated on one of two rules is a reason applied to one of
+them.** `.journeyrow .jfacts` carries the comment *"`.row .rowmeta` already
+sets `--ink-3` and every `.jfacts` is one, so restating it is a declaration
+that changes nothing"* — and the base `.jfacts` rule four thousand lines down
+put the declaration straight back. The dead-rule scan named it in the first
+run after /journeys was rebuilt. This stylesheet's most repeated shape,
+arriving inside one property of one component.
+
 **AND THE ART-DIRECTION SHEET WAS THREE REDESIGNS BEHIND, IN THE ONE
 ARTEFACT WHOSE JOB IS TO SHOW A PERSON THE REAL COMPOSITION.**
 `contact_sheet.py` renders the actual homepage once per candidate so somebody

@@ -10525,6 +10525,20 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
               grid-template-columns: minmax(0, 1fr) minmax(0, 40%);
               gap: var(--s6) var(--s8); }
 .sheet-feat > .actmark { grid-column: 1 / -1; }
+/* A 76px HEADLINE IN A 461px COLUMN STRANDS ITS LAST WORD, AND
+   `text-wrap: balance` CANNOT HELP. Measured at 1280: "The Adriatic Run"
+   needs 486 units of glyph and the column gives 461, so it must break — and
+   the best split balance can find is 364 + 122, because the heading is three
+   words and the last one is short. The browser suite reported it as balance
+   being overridden, which is a true report of a real defect naming the wrong
+   cause: balance IS applied and is doing its job.
+   This is the feature scale's own proportion doing what it is for. A feature
+   is asymmetric at 1.35 against .65 so the PICTURE is the subject, which
+   makes the type column narrow by design — so the name takes the section
+   step rather than the opening one. `--ed-display-2` is already spent as a
+   font-size in eight rules, so no type value is added; at 1280 it is 64px
+   and the name sets on one line. */
+.sheet-feat .mega { font-size: var(--ed-display-2); }
 .featshot { margin: 0; min-width: 0; }
 .featshot :is(picture, img) { display: block; width: 100%;
                               aspect-ratio: 4 / 3; object-fit: cover; }
@@ -10552,9 +10566,15 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .fshname { font-family: var(--display); font-size: var(--t-lg); }
 .fsh:hover .fshname { color: var(--door); }
 .sheet-feat .rowcred { grid-column: 1 / -1; }
+/* NO `color`, AND THE RULE FOUR THOUSAND LINES UP ALREADY SAID SO. Its own
+   comment — "`.row .rowmeta` already sets --ink-3 and every .jfacts is one,
+   so restating it is a declaration that changes nothing" — was written about
+   the journeyrow variant, and this base rule put the declaration straight
+   back. A reason stated on one of two rules is a reason applied to one of
+   them, which is this stylesheet's most repeated shape. The dead-rule scan
+   named it in the first run after /journeys was rebuilt. */
 .jfacts { font-family: var(--text); font-size: var(--t-xs);
-          letter-spacing: .13em; text-transform: uppercase;
-          color: var(--ink-3); }
+          letter-spacing: .13em; text-transform: uppercase; }
 
 /* ── 05 the rhythm ────────────────────────────────────────────────── */
 /* THE BEATS ARE SIZED BY NIGHTS AND THE INDEX BAR IS SIZED BY DISTANCE, and
