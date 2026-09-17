@@ -2299,10 +2299,6 @@ main ul.stack, main ol.stack { max-width: var(--measure); padding-left: var(--s5
 main ul.stack li, main ol.stack li { margin-bottom: var(--s3); }
 main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 
-/* ── the search link in the masthead ──────────────────────────────── */
-.navsearch { color: var(--door); }
-.navsearch span { font-size: 1.1em; line-height: 1; }
-
 /* ── the hero map ─────────────────────────────────────────────────── */
 .hero { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s7); align-items: center; }
 /* The hero map is an INTELLIGENCE figure on a DISCOVER page, which is the
@@ -6544,128 +6540,6 @@ body[data-hero] .masthead { position: sticky; }
                  stroke-linejoin: round; stroke-linecap: round; }
 .constel-route.case { stroke: var(--atlas-here); stroke-width: 10; opacity: .92; }
 .waygo { color: var(--door); font-weight: 600; white-space: nowrap; }
-
-/* A journey is a row, because a journey is chosen on where it goes in order.
- * The route drawing sits BESIDE the text as the explanation rather than
- * standing in for it — three small cards each carrying a continent-wide
- * squiggle was three more maps in the eleven. */
-.jrows { border-top: 1px solid var(--rule); }
-/* 13rem drew the whole continent 132 pixels wide, which is the tiny-label
- * failure this page was rebuilt to remove, one section down. A route is
- * the explanation of a journey and it has to be readable to explain
- * anything: at 22rem the Arctic-to-Mediterranean line is a line. */
-.jrow {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 28rem);
-  gap: var(--s7);
-  /* START, not centre. A 250-pixel block of type centred against a 530-pixel
-     picture leaves 140 above and 140 below, and centring slop reads as a
-     mistake where a shared top edge reads as a decision. */
-  align-items: stretch; padding: var(--s6) 0; border-bottom: 1px solid var(--rule);
-  text-decoration: none; color: inherit;
-}
-/* THE VOID UNDER THE TYPE IS STRUCTURE, NOT SLOP. A journey row is 237px of
-   type beside a 374px picture, so something has to give: centring the type
-   leaves 68 above and 68 below and reads as a mistake, and leaving it at the
-   top leaves 224 in one piece. The row's last line is its facts and its call,
-   and a facts line sitting on the picture's bottom edge is what a printed
-   page does with a caption — so the block holds the top and the meta holds
-   the floor. Nothing was added to fill it. */
-.jrowtext { display: flex; flex-direction: column; }
-/* The rhythm bar goes to the floor WITH the facts, because it is one of them:
-   how the trip is paced belongs beside how long it is, not floating a hundred
-   pixels above it. */
-.jrowtext .hopbar { margin-top: auto; }
-.jrowtext .jrowmeta { padding-top: var(--s1); }
-/* THE COLUMNS WERE THE WRONG WAY ROUND FOR THE CONTENT IN THEM. `1fr 22rem`
-   gave a three-word title, a six-word line and a meta row 784 pixels and gave
-   the drawing 352 — so two thirds of every row was a short headline with four
-   hundred pixels of nothing after it, and the one thing a journey is chosen
-   on was a thumbnail. A journey is chosen on where it goes in order, so the
-   route takes the width and the type takes a measure that suits its length. */
-.jrow h3 { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); line-height: 1.12;
-           margin: 0 0 var(--s2); }
-.jrowsub { color: var(--ink-3); margin: 0 0 var(--s4); max-width: 52ch; }
-/* The stops, in order. A middot list rather than a measure: this is a
-   sequence to scan, not prose to read. */
-.jrowstops { font-size: var(--t-sm); line-height: 1.5; color: var(--ink-2);
-             margin: 0 0 var(--s3); max-width: none; }
-.jrow .hopbar { margin-bottom: var(--s4); }
-.jrowmeta {
-  display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4);
-  font-size: var(--t-xs); letter-spacing: .06em; text-transform: uppercase;
-  color: var(--ink-3); margin: 0;
-}
-/* .constel is a 132px glyph — the size it is on a theme row, where it is a
- * mark rather than a drawing. A journey's route has to be READ, so this
- * one takes the column it was given. Same SVG, same viewBox, different
- * job: the failure one section up was eight of these at glyph size being
- * asked to carry a category. */
-.jrowart { align-self: center; }
-.jrowart .constel { width: 100%; }
-/* Marks sized for a 352px drawing, not for the 132px thumbnail this was.
-   A 9-unit dot on a framed route is a blob that hides the stop it marks; the
-   hairline is the ground's own tone, so a stop separates from the water and
-   from the land without a second colour. */
-.jrowart .constel:not(.framed) .constel-lit circle { r: 5px; stroke: var(--atlas-sea);
-                               stroke-width: 2; }
-/* The two ends of the line, in the transit convention: a ring whose core is
-   the ground, so a terminal reads as a station and a stop between them reads
-   as a stop. */
-.jrowart .constel:not(.framed) .constel-lit circle.term { r: 8px; fill: var(--atlas-land);
-                                    stroke: var(--pine); stroke-width: 5; }
-/* AND A STROKE HAS THE SAME FAULT AS A RADIUS. 4.5 user units is 3 pixels on
-   a 1000-unit frame and 9 on a 340-unit one, so the Hanseatic Arc's route was
-   three times the weight of the Arctic one in the same band. A framed drawing
-   wants a line of constant WEIGHT, which is what non-scaling-stroke is: the
-   stroke-width becomes CSS pixels and the frame stops deciding it. */
-.constel.framed .constel-route { vector-effect: non-scaling-stroke; }
-.jrowart .constel-route { stroke-width: 4.5; }
-.jrowart .constel-route.case { stroke-width: 9; stroke: var(--atlas-land);
-                               opacity: .55; }
-.jrow:hover h3, .jrow:focus-visible h3 { color: var(--door); }
-/* A LEAD JOURNEY AT SIZE WAS TRIED AND MEASURED OUT. Three identical rows
-   give the band three medium elements and no dominant one, which is the
-   shape every section under the hero has — so the first of the three, which
-   crosses seven countries from 69°N to 38°N, was given a 34rem column.
-   Rendered, that is the fault it was meant to fix: a route is FRAMED on its
-   own extent, and the Arctic-to-Mediterranean extent is tall, so a wider
-   column makes a 490-pixel picture beside 140 pixels of type and three
-   hundred pixels of empty row under it. The thing that makes each of these
-   legible — its own frame — is what stops one of them being the wide
-   element. Three rows, kept. */
-
-/* Stories: one lead with its own places drawn at size, two beside it. */
-.storyband { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--s6);
-             align-items: start;
-             border-top: 1px solid var(--rule); padding-top: var(--s6); }
-.storylead, .storysm { display: block; text-decoration: none; }
-.storylead :is(h2, h3) { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl)); line-height: 1.12;
-                margin: 0 0 var(--s3); }
-/* The lead story's own places, at the size the journeys' routes are:
- * this is the section's one dominant visual, and at 132px it was a
- * grey smudge losing to two headlines beside it. */
-.storyart { margin-bottom: var(--s4); }
-/* 26rem was too far the other way: a pale continent with six dots on it,
- * mostly empty, losing to two headlines beside it. 18rem is a MARK — the
- * shape of where the piece is set — which is the job, and the journeys'
- * routes stay the largest drawing on the page because a route is the one
- * thing here that has to be read rather than recognised. */
-/* THE LEAD STORY'S PICTURE IS THE LEAD'S. 18rem was set when this drawing
-   was one of nine in a column; it is one of one now, at the top of a band,
-   and held to 288px in a 440px column it left a third of the row empty
-   beside it — the same measured gap that rebuilt this index. */
-/* AND THE LEAD'S PICTURE WAS STACKED ABOVE ITS TYPE IN A COLUMN TWICE ITS
-   WIDTH. Measured on the built homepage: `.storyart` is 663 pixels wide, the
-   drawing inside it caps at 26rem — 416 — and the headline starts 332 pixels
-   below the top of the band. So the lead story, the one piece this section
-   exists to lead with, began a third of a screen lower than the two
-   secondary headlines beside it, with 247 pixels of empty paper to the right
-   of its own picture.
-   The stories index already answered this one row over: `.storyleadwide` is
-   a drawing and its type SIDE BY SIDE. Same composition here, at the width
-   this column has — which also puts all three headlines on one line, which
-   is what makes a lead read as a lead. */
-.storyart .constel { width: 100%; max-width: 26rem; }
 @media (min-width: 64rem) {
   .storylead { display: grid; grid-template-columns: 20rem minmax(0, 1fr);
                gap: 0 var(--s5); align-items: start;
@@ -6676,59 +6550,6 @@ body[data-hero] .masthead { position: sticky; }
   .storyart { margin-bottom: 0; grid-row: 1 / span 4; }
   .storyart .constel { max-width: none; }
 }
-.storyart .constel:not(.framed) .constel-lit circle { r: 14px; }
-.storysm { padding-bottom: var(--s5); border-bottom: 1px solid var(--rule); margin-bottom: var(--s5); }
-.storysm:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
-.storysm :is(h2, h3) { margin: 0 0 var(--s2); }
-.storylead:hover :is(h2, h3), .storysm:hover :is(h2, h3),
-.storylead:focus-visible :is(h2, h3), .storysm:focus-visible :is(h2, h3) { color: var(--door); }
-
-/* THE CLOSING STATEMENT REPLACED A ROW OF COUNTS. "319 destinations · 17
- * journeys · 50 countries" is the database introducing itself, and it was
- * the last thing on the page — so the reader left having been told the size
- * of the index rather than what it is for. The counts are still here, in the
- * quiet line, because they are true and checkable; they are no longer the
- * argument. */
-/* AND THE SECOND VERSION WAS 44rem OF CENTRED PROSE OVER A DEAD GAP. Rendered
- * at 1280 the band was a headline, two centred lines, a button, then a long
- * centred technical note and about 150 pixels of nothing before the footer —
- * the last thing a reader sees on the page that matters most, and the one
- * shape on the homepage that says "the content ran out". Centring is what a
- * page does when it has not decided where the emphasis is.
- *
- * The statement is a statement now: left, at display size, on the measure
- * prose actually wants. The counts come out of the quiet line and become the
- * one thing on the page that is allowed to be a number — the atlas's EXTENT,
- * beside the argument rather than under it, so the band has two things in it
- * and no gap to fill. They are still derived and still checkable. */
-.closing { margin: var(--s9) 0 0; border-top: 1px solid var(--rule);
-           padding-top: var(--s7); }
-.closein { display: grid; grid-template-columns: minmax(0, 1fr) auto;
-           gap: var(--s7) var(--s8); align-items: start; }
-.closesay { max-width: 32rem; }
-.closing h2 {
-              margin: 0 0 var(--s4); }
-.closebody { color: var(--ink-2); font-size: var(--t-md); margin: 0 0 var(--s5); }
-.closego { margin: 0; }
-
-/* The extent, as a definition list, because that is what it is: three terms
- * and the size of each. Tabular figures so the three numbers line up on their
- * own right edge — they are read as a column, not as three sentences. */
-.closeextent { display: grid; gap: var(--s4); margin: 0; text-align: right; }
-.closeextent div { display: grid; gap: var(--s1); }
-.closeextent dt { font-size: var(--t-xs); letter-spacing: .09em;
-                  text-transform: uppercase; color: var(--ink-3); }
-/* No new type size: the extent takes the same clamp the section heads take,
- * because a number that is the size of a heading IS a heading here. A
- * seventeenth size was refused. */
-/* No `color` here: the number already inherits --ink, and restating it is a
-   declaration that changes nothing — the dead-rule scan says so. */
-.closeextent dd { margin: 0; font-family: var(--display);
-                  font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
-                  font-variant-numeric: tabular-nums; }
-
-.colophon { color: var(--ink-3); font-size: var(--t-sm);
-            margin: var(--s7) 0 0; max-width: 44rem; }
 
 @media (max-width: 52rem) {
   /* The extent goes under the statement and lies down: three tall serif
@@ -6750,79 +6571,6 @@ body[data-hero] .masthead { position: sticky; }
   .jrowart { max-width: 20rem; }
 }
 
-/* THE PLANNER BAND WAS POSITION TWO ON THE PAGE AND IT READ AS A FORM.
- *
- * Under the hero sat a shouty uppercase label, an input, a button, four grey
- * pills and FIVE LINES of projection prose — standard parallels, central
- * meridian, the elevation survey. Technically true and the second thing a
- * reader met, which is the "it led with structure" failure the hero was
- * rebuilt to fix, reappearing one band down. The credit moved to the foot of
- * the page, where a credit belongs and where every check that requires it is
- * equally satisfied.
- *
- * And the chips were `--paper-2` pills with a `--rule` border, which is the
- * shape this stylesheet uses for something INERT. These are the fastest way
- * into the product. They keep the primitive and take the ink they deserve. */
-.closing .sourcenote { margin-top: var(--s5); }
-
-/* ── THE INDEXES THAT SHOWED EVERYTHING EXCEPT THE THING ──────────────
- *
- * /journeys was seventeen rows of kicker, name, dot-separated stops, a thin
- * bar and three right-aligned facts. Every one identical, no drawing
- * anywhere — and the HOMEPAGE was showing three journeys better than the
- * journeys index showed seventeen, because the homepage drew their routes.
- *
- * A journey is chosen on where it goes. That is the one question this atlas
- * can answer in a picture and the one the index refused to. No two of the
- * seventeen lines are alike — Arctic to Mediterranean is the length of
- * Europe, the Iberian Circle is a loop in one corner — so this is the family
- * where a drawing per row DIFFERENTIATES rather than repeats, which is the
- * test the homepage's four doors failed and this one passes. */
-/* The name was --t-lg, a hair above the stops list under it, so seventeen
- * journeys had seventeen quiet headings. An index's rows are its subject. */
-.journeyrows .row { grid-template-columns: minmax(0, 1fr) 15rem; align-items: center; }
-.journeyrow :is(h2, h3) { font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
-                 line-height: 1.12; margin: 0 0 var(--s2); }
-.journeyrow:hover :is(h2, h3), .journeyrow:focus-visible :is(h2, h3) { color: var(--door); }
-.jart .constel { width: 100%; }
-.jart .constel:not(.framed) .constel-lit circle { r: 11px; }
-.jart .constel-route { stroke-width: 8; }
-/* No `color`: `.row .rowmeta` already sets --ink-3 and every .jfacts is
-   one, so restating it is a declaration that changes nothing. It only became
-   visible when the dead-rule scan started visiting a motion page. */
-.journeyrow .jfacts {
-  text-align: left; margin: var(--s3) 0 0; font-size: var(--t-xs);
-  letter-spacing: .06em; text-transform: uppercase;
-}
-
-/* And /stories was nine of the same row with a 132px grey Europe at the end
- * of each: too small to name a place, and eight of them saying nothing eight
- * times. The lead is the newest piece — a date, not a judgement — with its
- * own places drawn at size; the other eight are the row without the glyph. */
-/* No border-top: the opening above already closes with one, and two rules
- * with a gap between them reads as a mistake rather than as a division. */
-/* No `color: inherit`: `a { color: inherit }` is the global rule at the top
- * of this file, and restating it here is the redundancy the dead-rule scan
- * exists to find — a declaration that matches its element and changes
- * nothing, which reads as a decision and is not one. */
-/* AND NO `display: grid` EITHER, for the same reason one paragraph up:
-   `.storylead` already sets it and this element carries both classes, so
-   the declaration matched its element and changed nothing. The dead-rule
-   scan found it the run after /stories lost its opening drawing, which is
-   when the two hover rules it had been carrying started winning and this
-   one took their place at the ceiling. */
-.storyleadwide {
-  grid-template-columns: 22rem minmax(0, 1fr); gap: var(--s6);
-  align-items: center; text-decoration: none;
-  padding: var(--s6) 0;
-}
-.storyleadwide :is(h2, h3) {
-  font-size: clamp(var(--t-xl), 3vw, var(--t-2xl));
-  line-height: 1.12; margin: 0 0 var(--s3);
-}
-.storyleadwide .rowsub { max-width: 52ch; }
-.storyleadwide:hover :is(h2, h3), .storyleadwide:focus-visible :is(h2, h3) { color: var(--door); }
-
 @media (max-width: 52rem) {
   .journeyrows .row, .storyleadwide { grid-template-columns: 1fr; gap: var(--s4); }
   /* And the facts line wraps. nowrap is a promise the line can keep only at
@@ -6840,133 +6588,6 @@ body[data-hero] .masthead { position: sticky; }
   .jart .constel { width: min(22rem, 100%); }
 }
 
-/* ── THE EDITORIAL INDEX OPENING ──────────────────────────────────────
- *
- * Five indexes opened identically — kicker, 60px serif h1, lede in the
- * right-hand column, a rule, then rows — and then ran straight into a
- * two-column list with a right-aligned meta column. That is the
- * design-direction finding at its plainest: a shared template is not a
- * shared experience, and these five were the clearest case of it on the
- * site.
- *
- * An index opens on its own subject now, at size, BESIDE the type rather
- * than under it. The art is a photograph where the register holds one and
- * the family's own drawing where it does not — every route at once for the
- * journeys, the year as a chart for the events. Never a generated plate:
- * that is the measurement that took eleven of them off the homepage.
- *
- * THE PHOTOGRAPH SLOT IS THE POINT OF THE LAYOUT AND IT IS EMPTY TODAY. The
- * composition is designed for the no-image state rather than degraded into
- * it: the drawing holds the right-hand column at the same proportion a
- * photograph will, so the day a row lands in data/images.json nothing on the
- * page moves except what is inside that frame. */
-/* A VARIANT OF `pagehead`, sharing its role and its measure. */
-/* No `display: grid`: `.pagehead.index` already sets it and every `.ihero`
-   is one — a variant of that head rather than a head of its own, which is
-   the whole reason it is called a variant. */
-.pagehead.ihero {
-  gap: var(--s7); align-items: center;
-  padding: var(--s6) 0 var(--s7); border-bottom: 1px solid var(--rule); max-width: none;
-}
-.pagehead.ihero.wide { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-                       grid-template-rows: 1fr auto auto 1fr;
-                       row-gap: var(--s6); }
-/* EXPLICIT, BECAUSE THE PHONE ORDER NOW DIFFERS FROM THE DESK ONE. In
-   document order the actions and the note follow the picture, so a phone
-   meets the drawing before them; on a desk they belong under the lede in
-   column one, and auto-flow would put them in column two under the arch.
-   The two `1fr` rows above and below the pair are what keeps the group
-   centred against a figure taller than it — with two auto rows the leftover
-   height is split BETWEEN them, which on the country head rendered 350
-   pixels of white between the tagline and the chips. The slack belongs
-   outside the group. */
-.pagehead.ihero.wide > .iherotext { grid-column: 1; grid-row: 2; }
-.pagehead.ihero.wide > .iherofoot { grid-column: 1; grid-row: 3; }
-.pagehead.ihero.wide > .iheroart  { grid-column: 2; grid-row: 1 / -1;
-                                    align-self: center; }
-/* The foot is its own stack, so the space above it is the grid's row-gap
-   and the space inside it is this gap — one of each, rather than a margin
-   on the chips that the row-gap then adds to. */
-.iherofoot { display: grid; gap: var(--s4); justify-items: start; }
-/* A SEPARATOR BELONGS TO THE RELATIONSHIP, NOT THE ELEMENT, and this one had
- * been written as a property of the head. Every index hero draws a rule under
- * itself to part the opening from the set below it — right on twenty-one
- * families and wrong on the 404, whose drawing IS the body: the rendered page
- * showed a hairline across the column and then two hundred and seventy pixels
- * of nothing above the footer, on the one page a reader arrives at having
- * already failed to find something. Nothing counts an empty band, and no
- * check reads a divider for what is on the other side of it. */
-main > .pagehead:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
-.iherotext h1 {
-  font-size: clamp(var(--t-3xl), 5.2vw, var(--t-5xl));
-  line-height: 1.12; margin: 0 0 var(--s4);
-}
-/* No `color`: `.lede` already resolves to --ink-2, and the scan reads a
- * restatement of an inherited value as a rule that changes nothing. */
-.iherotext .lede { font-size: var(--t-md); max-width: 42ch; margin: 0; }
-.iherofoot .chips { margin: 0; }
-.iherofoot .small { margin: 0; color: var(--ink-3); }
-
-/* The aperture, once per page rather than once per card. An index opening is
- * exactly where the signature belongs — it is the one large drawing on the
- * page — and it is the same curve, from the same numbers, as the 824 plates
- * and the hero. */
-.iheroart {
-  margin: 0; aspect-ratio: 4 / 3; overflow: hidden;
-  border-radius: 50% 50% 0 0 / 34% 34% 0 0;
-  /* The opening is a map, so its ground is the Atlantic rather than the
-     dark world's paper. Graphite made five index openings a black tile with
-     a grey continent and acid marks on it; the plates two clicks away have
-     been cream land on this water since the cartography split. One
-     cartography, whatever the drawing is embedded in. */
-  background: var(--atlas-sea);
-}
-.iheroart .constel, .iheroart svg { width: 100%; height: 100%; }
-.iheroart.shot picture, .iheroart.shot img {
-  display: block; width: 100%; height: 100%; object-fit: cover;
-}
-/* Every route at once: seventeen real sequences on one continent, which is a
- * picture no other travel product can draw. The land is quiet and the lines
- * carry it, because the subject is the reach of the set rather than Europe. */
-/* THE OPENING IS THE ATLAS AT INDEX SIZE. It was a dark ground with a grey
- * continent on it and whatever the dark world's accent happened to be lit on
- * top, which is how 172 experience dots came out cobalt on graphite —
- * present, correct, counted and invisible — and then acid green when that
- * was fixed. Neither was a decision about a MAP. Cream land on the
- * Atlantic, marks in the signature, and every mark carries a hairline of
- * the land so it separates from the water it may be sitting beside. */
-.iheroart .constel-lit circle { fill: var(--pine); r: 9px;
-  stroke: var(--atlas-here); stroke-width: 1.8; }
-/* r:9, not the theme row's 22. A glyph's radius is fitted to a 132px mark
- * and this frame is five times that, so the same class rendered dots the
- * size of small countries. Eleven units is not eleven pixels, again. */
-/* THE ATLAS INDEX OPENS ON THE FIFTY, AND ITS FILL IS COBALT ON GRAPHITE.
- * `.regionglyph .countries path` is --door, which is right on a limestone
- * band and is the `.minidot .hit` failure on the opening's dark ground:
- * present, correct, counted and not there. Third time a colour has been
- * carried onto this ground unchanged.
- *
- * NOT LIME EITHER, AND THAT IS THE ARGUMENT RATHER THAN A SAVING. The other
- * three openings light a SUBSET — seventeen routes, 172 experiences, the
- * places nine essays are set in — and lime is what says "these ones". Here
- * the subset is every country there is, so lighting it states nothing and
- * draws one flat blob. Paper countries with the shadow between them say the
- * thing the page is for: the continent is fifty separate places, and the
- * frontier is the picture. It is the hero's reading at index size, light
- * falling on Europe.
- *
- * non-scaling-stroke because this is a 1,000-unit viewBox scaled into a
- * 600-pixel box, and a scaled hairline is the frontier-is-a-worm failure
- * already shipped once here, one screen from the rule that documents it. */
-.iheroart .regionglyph .countries path {
-  fill: var(--atlas-here);
-  stroke: var(--atlas-coast); stroke-width: 1.1;
-  vector-effect: non-scaling-stroke;
-}
-.allroutes { fill: var(--atlas-land); }
-.allroutes .constel-route { stroke-width: 4; }
-.allroutes .constel-route.case { stroke-width: 9; }
-
 @media (max-width: 60rem) {
   .pagehead.ihero.wide { grid-template-columns: 1fr;
                          grid-template-rows: none; gap: var(--s5); }
@@ -6978,24 +6599,7 @@ main > .pagehead:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom
   .pagehead.ihero.wide > .iheroart { grid-column: auto; grid-row: auto; }
   .iheroart { aspect-ratio: 3 / 2; }
 }
-
-/* The planner's method, under the tool rather than beside it. Four hundred
- * words of scoring weights level with the fields a reader is filling in is
- * two things competing for one attention, and it squeezed the form into two
- * thirds of the page to make room. Under the tool is also where the question
- * is asked: run it, look at the answer, then ask why it chose that. */
-.planmethod { border-top: 1px solid var(--rule); margin-top: var(--s7); padding-top: var(--s6); }
-.methodcols { columns: 2; column-gap: var(--s7); }
-.methodcols > * { break-inside: avoid; }
-.methodcols h2 { margin-top: 0; }
 @media (max-width: 60rem) { .methodcols { columns: 1; } }
-
-/* The planner's fields take the whole measure. `.split` was 1.7fr / 1fr with
- * the method in the second column; the method moved under the tool and the
- * grid kept both columns, so the form ran in two thirds of the page with a
- * third of nothing beside it — removing something can leave the same hole
- * that adding the wrong thing does. */
-.planform > div { max-width: none; }
 
 /* ── PRINT ─────────────────────────────────────────────────────────
  *
@@ -7051,89 +6655,7 @@ main > .pagehead:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom
   .minimap, .plate, .constel, .yearband, .europemap {
     print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }
-
-/* ── the country band ───────────────────────────────────────────────── */
-/* FIFTY COUNTRY PAGES WERE THE LARGEST FAMILY ON THIS SITE WITH NO
-   PHOTOGRAPH ANYWHERE — seven thousand pixels each, and the page a reader
-   most often reaches from a search for "Austria travel". The band is what a
-   whole country feels like, above its name.
-
-   IT IS AN ADDITION AND NOT A REPLACEMENT. The country portrait stays
-   exactly where it is: it is this family's signature moment and it is the
-   thing that says which country this page is about. And with no photograph
-   there is no band at all — no empty frame, no plate — which is the
-   homepage's own finding, that a slot waiting for a picture is honest and
-   three hundred pixels of one is a hole.
-
-   THE ASPECT IS DECLARED AT EVERY WIDTH AND NOTHING BESIDE IT DECIDES ITS
-   HEIGHT, which is what makes this crop checkable by arithmetic where
-   `.placeband-art` is not: that one is as tall as the map next to it, so its
-   crop is decided by a neighbour and can be neither art-directed nor
-   checked. 16/9 below 62rem and 21/9 above it gives a guaranteed 52% of a
-   source frame, against the homepage hero's 15%. */
-.pageband {
-  margin: 0 0 var(--s6);
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  border-radius: var(--radius);
-  background: var(--paper-2);
-}
 @media (min-width: 62rem) { .pageband { aspect-ratio: 21 / 9; } }
-.pageband picture,
-.pageband img { display: block; width: 100%; height: 100%; object-fit: cover; }
-/* A RULE THAT CHANGES TWO PROPERTIES OF AN ELEMENT GOVERNED BY SIX IS NOT A
-   DIFFERENT DESIGN, IT IS A BROKEN ONE — and this one shipped on the first
-   real acquisition. It said "the credit belongs under the picture and never
-   over it" and set `margin-top` and `color` to say so. `.credit` is
-   `position: absolute` at the foot of the picture, on a near-black scrim, at
-   `opacity: 0` until hover; `.pageband figcaption` is (0,1,1) against
-   `.credit`'s (0,1,0), so the COLOUR was overridden and the position, the
-   scrim and the opacity were not. The result was the site's caption ink —
-   `--ink-2`, a dark grey for a light page — laid on 55% black: **2.01:1**,
-   on the two links Pexels' terms require, on every family that opens on a
-   photograph. `margin-top` on an absolutely positioned element does nothing
-   at all, so the rule achieved exactly one thing and that thing was the
-   defect.
-
-   AND "UNDER THE PICTURE" WAS NOT AVAILABLE TO IT. `picture()` emits the
-   figcaption INSIDE the `<picture>`, and `.pageband` is an `aspect-ratio`
-   box with `overflow: hidden` — so a static caption in there is clipped
-   away entirely rather than moved below. The rule was describing a layout
-   the markup cannot produce. One credit design, everywhere, is what this
-   stylesheet is for; the exception is deleted rather than completed. */
-
-/* ══ THE HOMEPAGE IS A PLATE SEQUENCE ═══════════════════════════════════
- *
- * IT WAS A STACK OF SECTIONS AND EVERY PROPOSAL FOR REPLACING IT WAS THE
- * SAME STACK WITH THE BLOCKS MOVED. Four page concepts and four grammars
- * were rendered from the real data before the fault was named, and the
- * fault was never the styling: nav, hero, rule, text, cards, map, text,
- * cards — the spatial grammar repeated, so the page read as a
- * content-management template whatever was in it.
- *
- * What replaced it is six numbered PLATES, each a band rather than a
- * viewport, each with its own identity and its own margins: monumental,
- * typographic, photographic, cartographic, typographic, empty. The act
- * number is the only thing that repeats, which is what makes six bands read
- * as one sequence rather than as six sections.
- *
- * NO CARDS ANYWHERE ON IT. Border, fill, radius and shadow each say
- * "separate object, placed here by a system", and this page has none of the
- * four. What separates two plates is a rule, a change of ground, or air. */
-/* A PLATE IS THE WIDTH OF THE SHEET, NOT OF THE COLUMN. `main` is capped at
-   --page and padded, which is right for every reading page and wrong for a
-   sequence of plates: the first render put a 176px headline in a 230px
-   column with an empty right half, because the plate's own grid was being
-   laid out inside a box already two gutters narrower than the window. The
-   homepage carries `data-hero`, which is the body attribute the single
-   stylesheet already reacts to — never a second shell. */
-body[data-hero] main { max-width: none; padding: 0; }
-/* THE BREADCRUMB LOST ITS GUTTER WHEN THE MAIN WENT FULL-BLEED. A plate
-   pads itself with --page-gutter; the crumbs are not in a plate, so on the
-   two plate-sequence pages they started at pixel zero, hard against the
-   window edge, while every word under them sat on the gutter. Nothing
-   counts a gutter. */
-body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 
 .sheet { position: relative; display: grid; gap: var(--s6) var(--s8);
          padding: var(--s8) var(--page-gutter) var(--s8);
@@ -7238,48 +6760,19 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .sheet-question .askhero label { font-family: var(--text); font-size: var(--t-xs);
         letter-spacing: .16em; text-transform: uppercase; color: var(--ink-3); }
 
-/* 02 · the question — eight photographs at thumbnail size */
-/* THE ROW SPANS THE PLATE, AND EIGHT NAMES BLEW OUT EIGHT TRACKS.
-
-   It sat inside `.sheetside`, the plate's right column — 619px at 1280, so
-   eight columns of 66.9px. A grid item's automatic minimum size is its
-   MIN-CONTENT, and `.qtile` never said otherwise, so RENAISSANCE (115px of
-   tracked uppercase) and MOUNTAIN (87px) refused to shrink and overflowed
-   their tracks: three tile widths in a row of eight equal columns, two
-   pictures larger than the other six and two names on a lower baseline.
-   Every track was exactly 1fr and the computed style said so, which is why
-   reading the rule could not find it.
-
-   `min-width: 0` is the guard and it is not the fix. The fix is that eight
-   photographs at 67px is a contact strip rather than a row of ways in, so
-   the row spans both columns of the plate and each tile gets ~135px. */
-.qwrap { grid-column: 1 / -1; display: grid; gap: var(--s4); width: 100%; }
-/* AND EIGHT TRACKS WERE A NUMBER RATHER THAN A RULE. The row is every
-   theme the register holds a photograph for, which was eight when this was
-   written and is eleven now — so three were dropped by the builder to fit
-   the grid, which is the grid deciding the content. `auto-fill` at a
-   minimum tile size lets the count decide instead: it holds one row while
-   the tiles stay above the floor and takes a second when they would not,
-   and the floor is what makes a tile a way in rather than a contact strip.
-   `auto-fill` rather than `auto-fit` because `auto-fit` collapses the empty
-   tracks and stretches a short last row to full width — eleven tiles would
-   come out as eight small ones and three large.
-   THE FLOOR IS 10rem RATHER THAN A SMALLER ONE BECAUSE THE NAME UNDER THE
-   TILE SETS THE FLOOR, NOT THE PICTURE. `RENAISSANCE` is 115px of uppercase
-   tracked at .16em and this row has already overflowed once on exactly
-   that; and eleven tiles across 1,152px would be 90px each, which is the
-   contact strip the paragraph above rejected. At 10rem the plate holds six
-   and the row is six and five with the pictures at 178px — a third larger
-   than the eight it replaced, on a page whose brief is more photography
-   rather than more frames. */
-.qrow { display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-        gap: var(--s3) var(--s3); width: 100%; }
-.qtile { text-decoration: none; color: inherit; display: grid; gap: var(--s2);
-         min-width: 0; }
-.qtile img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
-.qname { font-family: var(--text); font-size: var(--t-xs); letter-spacing: .16em;
-         text-transform: uppercase; color: var(--ink-3); }
-.qtile:hover .qname { color: var(--door); }
+/* 02 · the question — the eight-photograph row is GONE, and so is this.
+   `.qwrap`, `.qrow`, `.qtile` and `.qname` were the homepage's row of theme
+   photographs. It left when the homepage became the plate sequence: the
+   class appears on ZERO pages and in no page builder, and the rules sat
+   here for the life of the sequence with the browser suite's own check
+   reporting "it examined 0 states" — its guard working, and nobody reading
+   the number. The finding those comments recorded is worth keeping and is
+   kept where it applies, on the row that replaced it: a grid item's
+   automatic minimum is its MIN-CONTENT, so RENAISSANCE at 115px of tracked
+   uppercase refused its 1fr track and three tile widths appeared in a row
+   of eight equal columns. `min-width: 0` is the guard; the fix is that
+   eight photographs at 67px is a contact strip. The check moved to
+   /discover's `.moswrap`, which is the same promise in a stronger form. */
 .goright { position: absolute; top: var(--s8); right: var(--page-gutter);
            flex-direction: row-reverse; }
 .goright .gomark { transform: scaleX(-1); }
@@ -7557,7 +7050,6 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    comment saying a measure is the wrong idea here. */
 .rowcred { position: static; font-size: var(--t-xs); letter-spacing: .04em;
            text-transform: none; color: var(--ink-3); margin: 0; max-width: none; }
-.qtile picture { position: relative; }
 /* One name is longer than any column this plate can give it. A hyphenated
    break mid-word is what an index does; the alternative is a sixth column
    nobody can read. */
@@ -7681,7 +7173,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
            grid-auto-rows: clamp(9rem, 14vw, 13rem); gap: var(--s3); }
 .mosrest .mos:last-child:nth-child(odd) { grid-column: span 2; }
 .mos { position: relative; overflow: hidden; display: block;
-       text-decoration: none; color: var(--white); }
+       text-decoration: none; color: inherit; }
 .mos :is(picture, img) { display: block; width: 100%; height: 100%;
                          object-fit: cover; }
 /* A PLACE THAT DROPS OUT GOES QUIET, IT DOES NOT GO AWAY — the map's own
@@ -9359,13 +8851,49 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    sentence: UI restrained, PHOTOGRAPHY rich, MAPS precise, TYPOGRAPHY
    dramatic.                                                             */
 
-.sheet-gal { background: var(--white); color: var(--ink);
-             padding: 11vh var(--page-gutter); border-bottom: 0;
-             display: block; }
+/* A ROOM WHOSE GROUND IS WHITE IN BOTH PREFERENCES NEEDS INK THAT IS DARK
+   IN BOTH, AND THIS ONE TOOK `--ink`. In the dark preference `--ink` is
+   bone, so the wall stayed white and the words went pale: measured on the
+   shipped page, the homepage's own `<h1>Open the door to Europe.</h1>` at
+   **1.14:1** and the act mark beside it at 1.14 — on the page that opens
+   the site, for a reader whose system is set to dark. The h2 and the lede
+   were saved by accident, by `.sheet-gal .mega { color: var(--ink) }`
+   resolving to the same wrong value they had already inherited, which is
+   why the dead-rule scan reports those two colour rules as changing
+   nothing: they are redundant in the light preference and were the only
+   thing standing between the dark one and this defect, and they were not
+   enough.
+
+   `.sheet-paper` on /discover has done this correctly since it was
+   written — it rebinds the eleven tokens rather than naming `--ink` — and
+   the reason is stated there: a `var()` resolves where the DECLARATION
+   lives, so a band may bind its own world. This room is the same
+   mechanism, and now with the same explicit values rather than with the
+   world's.
+
+   THE COLOUR RULES BELOW ARE GONE RATHER THAN CORRECTED. Once the tokens
+   are bound, `color: var(--ink)` on the h2 is the value it already
+   inherits — the redundancy the scan was right about. */
+.sheet-gal {
+  --paper:        var(--white);
+  --paper-2:      var(--bone-light);
+  --paper-3:      var(--mineral);
+  --ink:          #141716;
+  --ink-2:        #3b443a;
+  --ink-3:        #5d675b;
+  --rule:         #cfcbbb;
+  --sea:          var(--pine-deep);
+  --sea-dark:     #173528;
+  --signature:    var(--pine);
+  --door:         var(--pine-deep);
+  --door-dark:    var(--pine-deep);
+  --pine-ink:     var(--pine);
+  --provenance:   var(--olive);
+  background: var(--white); color: var(--ink);
+  padding: 11vh var(--page-gutter); border-bottom: 0;
+  display: block; }
 .sheet-gal .actno, .sheet-gal .actname { color: var(--ink-3); }
 .sheet-gal .actno { border-bottom-color: var(--rule); }
-.sheet-gal .mega { color: var(--ink); }
-.sheet-gal .lede { color: var(--ink-2); }
 .galwrap { max-width: 76rem; margin: 0 auto; }
 
 /* ── 01 the door: type left, the atlas right ─────────────────────── */
@@ -9391,8 +8919,17 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    at 1920 the gutter is 384 and `100% - 2 x 384` is 1,152, which capped
    the drawing at 657px on a screen half as wide again as the one it had
    already fitted. A plate with its own measure needs its own margin. */
+/* AND THE GUTTER HAS A FLOOR, BECAUSE 8vw IS NARROWER THAN THE PAGE'S OWN
+   GUTTER ON A PHONE. At 320 it is 25.6px against the masthead's 32, so the
+   headline started at 13px where the wordmark above it started at 16 —
+   eight pixels of disagreement on the one page that opens the site, which is
+   the defect this stylesheet already records about `.masthead-in` being left
+   on the desk's gutter. Nothing moves above 400px, where 8vw passes two
+   gutters. The act mark and the grid state the same measure because they ARE
+   the same measure: the sheet number sits above the frame and on its edge. */
 .sheet-door.sheet-gal > .actmark {
-  width: min(100% - 8vw, 88rem); max-width: none; margin-inline: auto; }
+  width: min(100% - max(8vw, 2 * var(--s4)), 88rem);
+  max-width: none; margin-inline: auto; }
 /* 42% RATHER THAN 46%, AND THE FOUR PERCENT IS THE APERTURES. The
    featured countries are clipped photographs at the scale the continent
    gives them — France is 144 units of a 1,120-unit frame — so every pixel
@@ -9413,7 +8950,8 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
 .sheet-door .doorgrid { display: grid;
   grid-template-columns: minmax(0, 40%) minmax(0, 1fr); gap: 3%;
   align-items: center;
-  width: min(100% - 8vw, 88rem); max-width: none; margin-inline: auto; }
+  width: min(100% - max(8vw, 2 * var(--s4)), 88rem);
+  max-width: none; margin-inline: auto; }
 /* AND THE HEADLINE IS A STEP OF THE SCALE RATHER THAN A SHARE OF THE
    VIEWPORT, because the column it sits in is neither. `.sheet .mega` is
    `clamp(--t-4xl, 7vw, --t-6xl)`, which is right for a headline that owns
@@ -9551,78 +9089,6 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    follows a caption or a list: on plate 03 it sat on the lead's own
    summary and on 06 against the last row's baseline. */
 .sheet-gal .rowcred { margin-top: var(--s6); }
-
-/* AND THE NAMES ARE INK ON A PAPER HALO, WHICH THE PHOTOGRAPHS FORCED.
-   Graphite at 48% is a third-weight name on a bone continent and 1.3:1 on
-   this one, so the first version here took the map's own ink at 58%. That
-   was right on stone and gone the moment the countries filled with
-   photographs: a name is now set over a picture nobody has seen, so its
-   contrast is a property of the picture rather than of the design — the
-   same finding as the hero's scrim, arriving on fifteen labels. The
-   answer is the one the 824 plates already use for a name crossing a
-   coastline: ink with a halo of the page, `paint-order: stroke` so the
-   halo is painted UNDER the glyph rather than over it. Full ink now,
-   because a third-weight name inside a halo is a smudge. */
-.sheet-door .op .heroeurope .lyr-labels .cname {
-  fill: var(--map-ink);
-  paint-order: stroke;
-  stroke: color-mix(in srgb, var(--white) 82%, transparent);
-  stroke-width: 3.2; stroke-linejoin: round; }
-/* The drawing fills the panel. `.heroeurope`'s base rule insets it from
-   the right of a full-bleed hero that no longer exists — `width: min(78%,
-   62rem)` — so without this it would sit in the right 78% of its own box
-   with a graphite strip beside it. */
-/* 104% AND ANCHORED LEFT, which is the horizontal half of the fit. The
-   panel's own `aspect-ratio` crops the empty sea north and south; this
-   takes the dead sea east of Azerbaijan, which `slice` cannot do at the
-   same time because it crops one axis or the other. 108% was the first
-   number and it cut AZERBAIJAN's own label in half — the drawn land ends
-   at x=1004 and the NAME reaches about 1024, so a crop fitted to the
-   geometry cut the type that describes it. The crop has to clear the
-   LABELS, not the coastline: at 104% the window ends at 1075.
-.sheet-door .op .heroeurope { position: absolute; inset: 0 auto 0 0;
-                              width: 100%; height: 100%;
-                              margin-left: 0;
-                              -webkit-mask-image: none; mask-image: none; }
-.sheet-door .op .heroeurope svg { width: 100%; height: 100%;
-                                  max-height: none; }
-/* NO SECOND CLAMP AND NO NINTH LINE-HEIGHT. The door's headline and the
-   closing statement each wanted their own — 6.2vw here and 8vw at the end,
-   with a .9 leading under the last one — and three clamps a few pixels
-   apart is a second type scale wearing the first one's clothes, which is
-   how the sibling repository reached 418 font sizes. `.sheet .mega` is
-   already `clamp(--t-4xl, 7vw, --t-6xl)` at line-height .96 and it is the
-   plate headline; a room that needs its own scale value is a decoration. */
-/* TWO ROWS OF TWO, BECAUSE FOUR TRACKS DO NOT FIT THE COLUMN THIS PAGE
-   GIVES THEM. It was a wrapping flex row first and "17 JOURNEYS" dropped
-   alone onto a second line, leaving a hole three columns wide; four equal
-   tracks fixed that at 46% of 1280 and stopped fitting the moment the
-   column went to 42% to give the apertures their four per cent —
-   DESTINATIONS is 104px of tracked uppercase in a 109px track, so it ran
-   straight through JOURNEYS. A `minmax` floor only moves the overlap into
-   a scroll. Four derived numbers are a set either way, and two rows of two
-   is the same set read rather than clipped — which is what the phone rule
-   already did at 44rem for exactly this reason. */
-/* FOUR ACROSS IN ONE ROW, WHICH IS THE REFERENCE'S OWN SETTING, and the
-   thing that makes it fit is that the LABEL is allowed to wrap. Two rows
-   of two was the answer while the labels were `nowrap` and DESTINATIONS
-   ran through JOURNEYS; the reference sets TRAVEL / REGIONS on two lines
-   under its own figure and reads as one row of four regardless. The
-   figures are a set and a single row is what says so. */
-.figrow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--s5); margin-top: var(--s6); padding-top: var(--s5);
-  border-top: 1px solid var(--rule); }
-.figrow div b { display: block; font-family: var(--display); font-weight: 400;
-  font-size: var(--t-2xl); line-height: 1; }
-/* .08em RATHER THAN .14, AND IT IS ARITHMETIC. Four tracks of a 471px
-   column are 108px each, and DESTINATIONS is eleven characters of
-   uppercase: at .14em it measures 104 and at .08 it measures 93. The
-   first repair was `overflow-wrap: break-word`, which fits by breaking
-   the word — DESTINATIO / NS — and a word cut in half is a rendering
-   fault this repository already has a check for. Tracking is the thing
-   that was chosen by eye, so tracking is the thing that moves. */
-.figrow div span { font-family: var(--text); font-size: var(--t-xs);
-  letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
 
 /* ── 03 the places: a feature ────────────────────────────────────── */
 /* ASYMMETRIC AT 1.35 AGAINST .65, which is the scale
@@ -10505,8 +9971,14 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
       border-bottom: 1px solid var(--rule); text-decoration: none; color: inherit; }
 .jr :is(picture, img) { display: block; width: 100%; aspect-ratio: 16 / 10;
                         object-fit: cover; }
+/* AND A JOURNEY'S NAME BREAKS RATHER THAN PUSHING THE PAGE SIDEWAYS.
+   "Scandinavia to Central Europe" has a min-content of 147px and the text
+   column at 320 is 128, so the homepage scrolled three pixels sideways —
+   the same arithmetic as the place page's `Kunsthistorisches`, and the same
+   answer: `break-word` breaks ONLY where the alternative is overflow, so
+   nothing moves at any width where the word fits. */
 .jr .jrname { display: block; font-family: var(--display); font-size: var(--t-2xl);
-              line-height: 1.12; }
+              line-height: 1.12; overflow-wrap: break-word; }
 .jr .jrstops { display: block; font-family: var(--text); font-size: var(--t-sm);
                color: var(--ink-3); margin-top: var(--s2); }
 .jr .jrgo { font-family: var(--text); font-size: var(--t-xs); letter-spacing: .14em;
@@ -10581,7 +10053,11 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 }
 @media (max-width: 44rem) {
   .pl { grid-template-columns: 4rem minmax(0, 1fr) auto; }
-  .figrow { gap: var(--s5); }
+  /* THE FOUR COUNTS DO NOT FIT FOUR COLUMNS ON A PHONE. "Journeys" is 75px
+     of tracked uppercase and a 320 screen gives each column 54, so the last
+     label ran 7 pixels off the page — a sideways scroll on the homepage. */
+  .figrow { grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: var(--s5); }
 }
 
 .sheet-door.sheet-gal { position: relative; padding-bottom: 9vh; }
@@ -10637,8 +10113,17 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    the count is the extent, and the sliver is a photograph of a place that
    kind actually happens in — not an illustration of the idea. */
 .kinds { border-top: 1px solid var(--rule); margin-top: var(--s7); }
+/* AND THE SLIVER WAS A THUMBNAIL AT THE FAR RIGHT. The photograph is the
+   argument on this page, so it goes next to the number rather than in the
+   gutter after the name: ten portrait crops down the left read as a column
+   of windows, which is what makes the band photography rather than a list
+   with pictures on it.
+   THE TRACKS ARE DECLARED HERE AND NOT AT THE END OF THE FILE. The first
+   correction was appended after the two media blocks, so it beat both of
+   them at every width and the row ran 49 pixels off a 320 screen — which
+   is a trap this stylesheet already records once, in the same words. */
 .kindrow { display: grid; align-items: center; gap: var(--s5);
-  grid-template-columns: 3.5rem minmax(0, 1fr) 7rem 9rem;
+  grid-template-columns: 3rem 9.5rem minmax(0, 1fr) 7rem;
   border-bottom: 1px solid var(--rule); text-decoration: none;
   color: inherit; padding: var(--s4) 0; transition: padding .2s ease; }
 .kindrow:hover, .kindrow:focus-visible { padding-left: var(--s4); }
@@ -10665,7 +10150,8 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 /* ── 03 the declaration ───────────────────────────────────────────── */
 .sheet-declare { display: block; padding: 0; border-bottom: 0;
                  background: var(--graphite); }
-.sheet-declare > .actmark { padding: 6vh var(--page-gutter) var(--s5); }
+.sheet-declare > .actmark { padding: 6vh var(--page-gutter) var(--s5);
+                            color: #9aa3a0; }
 .sheet-declare .actno, .sheet-declare .actname { color: #9aa3a0; }
 .sheet-declare .actno { border-bottom-color: rgba(243,240,230,.2); }
 .sheet-declare .ed-declare { min-height: min(72vh, 44rem); }
@@ -10777,8 +10263,9 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
      pixels for a number, a display-size name, a picture and two figures,
      and the picture is the one of the four that says nothing a reader
      cannot get by following the link. */
-  .kindrow { grid-template-columns: 2.2rem minmax(0, 1fr) auto; }
+  .kindrow { grid-template-columns: 2.2rem minmax(0, 1fr) minmax(0, 5.5rem); }
   .kindmeta { grid-column: 3; }
+  .kindwhere { overflow-wrap: break-word; }
   .kindart { display: none; }
 }
 
@@ -10841,13 +10328,6 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
   .sheet-kinds .pagehead .mega { grid-row: 2; grid-column: 1; }
   .sheet-kinds .pagehead .lede { grid-row: 2; grid-column: 2; }
 }
-
-/* AND THE SLIVER WAS A THUMBNAIL AT THE FAR RIGHT. The photograph is the
-   argument on this page, so it goes next to the number rather than in the
-   gutter after the name: ten portrait crops down the left read as a column
-   of windows, which is what makes the band photography rather than a list
-   with pictures on it. */
-.kindrow { grid-template-columns: 3rem 9.5rem minmax(0, 1fr) 7rem; }
 
 /* THE FOUR SCALES LEFT 1,400 PIXELS OF WHITE. A two-column grid makes a row
    as tall as its tallest item, so a 21:9 panorama beside a 3:4 portrait

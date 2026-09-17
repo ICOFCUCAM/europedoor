@@ -2019,7 +2019,7 @@ def home(data):
     <h2 class="mega">Read the continent<br>differently.</h2>
   </div>
   <div class="lead">
-    <a class="leadshot" href="/stories/{esc(_lead_st["slug"])}">{_leadshot}</a>
+    <a class="leadshot" href="/stories/{esc(_lead_st["slug"])}" aria-label="{esc(_lead_st["title"])}">{_leadshot}</a>
     <div class="leadtext">
       <p class="rddesk">{esc(_lead_st.get("section", "Story"))} · {esc(_lead_st.get("reading", ""))}</p>
       <h3 class="leadtitle"><a href="/stories/{esc(_lead_st["slug"])}">{esc(_lead_st["title"])}</a></h3>

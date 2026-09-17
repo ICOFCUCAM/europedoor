@@ -1523,7 +1523,12 @@ async function main() {
     "/about", "/how-it-works", "/sources", "/for-businesses", "/my-europe", "/search",
   ];
   for (const url of sample) {
-    await phone.goto(base + url, { waitUntil: "domcontentloaded" });
+    /* `domcontentloaded` MEASURED A PAGE THAT WAS NOT LAID OUT YET, and it
+     * failed on one region page in twenty-five with a 2,058-pixel overflow
+     * that is 0 when the same page at the same width is measured after
+     * load. A check that jitters teaches whoever hits it to re-run until
+     * green, which is how a real overflow gets through. */
+    await phone.goto(base + url, { waitUntil: "load" });
     const over = await phone.evaluate(() =>
       document.documentElement.scrollWidth - document.documentElement.clientWidth
     );
@@ -2536,8 +2541,8 @@ async function main() {
     //     foreground has to be captured BEFORE it is removed or every ratio
     //     collapses to about 1:1 — a failure that looks exactly like the
     //     defect being measured.
-    const SEL = [[".sheet-landscape .mega", 3.0], [".sheet-landscape .lede", 4.5],
-                 [".sheet-landscape .go", 4.5], [".sheet-landscape .sheetcred", 4.5]];
+    const SEL = [[".sheet-bleed .mega", 3.0], [".sheet-bleed .lede", 4.5],
+                 [".sheet-bleed .go", 4.5], [".sheet-bleed .sheetcred", 4.5]];
     for (const [sel, floor] of SEL) {
       const there = await page.evaluate((s) => {
         const e = document.querySelector(s);
@@ -2648,7 +2653,7 @@ async function main() {
     await page.setViewportSize({ width: w, height: w === 1280 ? 900 : 844 });
     await page.goto(base + "/", { waitUntil: "networkidle" });
     const r = await page.evaluate(() => {
-      const band = document.querySelector(".sheet-landscape");
+      const band = document.querySelector(".sheet-bleed");
       if (!band) return { missing: true };
       const pic = band.querySelector(".shotfull");
       if (!pic) return { nopic: true };
@@ -2687,7 +2692,7 @@ async function main() {
     });
     ok(!r.missing && !r.nopic,
        `${w}: the homepage has no plate-03 photograph to measure — ` +
-       `${r.missing ? "no .sheet-landscape" : "no .shotfull inside it"}`);
+       `${r.missing ? "no .sheet-bleed" : "no .shotfull inside it"}`);
     if (r.missing || r.nopic) continue;
     ok(r.position === "fixed",
        `${w}: the plate-03 picture computes position: ${r.position}, not ` +
@@ -4513,7 +4518,20 @@ async function main() {
       if (!labelled) out.unlabelled.push(f.outerHTML.slice(0, 60));
     }
     for (const a of document.querySelectorAll("a")) {
-      const text = (a.textContent || "").trim() || a.getAttribute("aria-label") || a.querySelector("svg[aria-label]");
+      /* AN `<img alt>` INSIDE A LINK IS A NAME, and this probe did not know
+       * it: the accessible-name algorithm walks the subtree and an image's
+       * alternative text is part of it. So the homepage's story lead — a
+       * `<picture>` inside an `<a>`, alt written by the photographer — was
+       * reported as a link with no discernible text. It was the right
+       * finding for the wrong reason: the name existed and it was the
+       * PICTURE's description rather than the story's, so a reader heard
+       * "A picturesque view of a Swiss village at twilight" and had to
+       * guess where the link went. The page carries an `aria-label` now and
+       * the probe counts an alt, because otherwise it fires on every
+       * image-only link on the site. */
+      const text = (a.textContent || "").trim() || a.getAttribute("aria-label")
+        || a.querySelector("svg[aria-label]")
+        || [...a.querySelectorAll("img[alt]")].some(i => i.getAttribute("alt").trim());
       if (!text) out.emptyLinks.push(a.getAttribute("href") || "(no href)");
     }
     // A GRAPHIC IS NAMED OR IT IS HIDDEN, AND NEVER BOTH. `role="img"`
@@ -5003,10 +5021,41 @@ async function main() {
           .filter(a => a.checkVisibility() && !a.closest("[aria-hidden='true']"));
         return window.__L.length;
       });
-      for (let i = 0; i < n; i++) {
-        const bad = await op.evaluate((i) => {
+      /* TWO PASSES, AND THE FIRST RUN OF THIS CHECK WAS WRONG BECAUSE IT
+       * HAD ONLY ONE. A reveal is a TRANSITION — `.credit` runs
+       * `opacity .16s ease` — so the used value the instant after
+       * `focus()` is still zero, and the first run reported 182 links at
+       * zero alpha on every photograph credit on the site. Every one of
+       * them reveals correctly: `picture:focus-within .credit` has been
+       * there since the credit was written. The instrument was measuring
+       * the frame before the animation rather than the state.
+       *
+       * Waiting on every link would cost 3,591 waits. So the fast pass
+       * collects candidates and the slow pass waits for the element's own
+       * animations to finish and asks again — which is the state a reader
+       * actually gets, and it is derived from the transition rather than
+       * from a number somebody picked. */
+      const cand = await op.evaluate((n) => {
+        const out = [];
+        for (let i = 0; i < n; i++) {
           const a = window.__L[i];
           a.focus();
+          if (!a.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }))
+            out.push(i);
+        }
+        return out;
+      }, n);
+      for (const i of cand) {
+        const bad = await op.evaluate(async (i) => {
+          const a = window.__L[i];
+          a.focus();
+          const anims = [];
+          for (let e = a; e && e !== document.documentElement; e = e.parentElement)
+            anims.push(...e.getAnimations());
+          await Promise.race([
+            Promise.all(anims.map(x => x.finished.catch(() => {}))),
+            new Promise(r => setTimeout(r, 400)),
+          ]);
           if (a.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return null;
           let e = a, zero = "";
           while (e && e !== document.documentElement) {
@@ -5163,39 +5212,52 @@ async function main() {
    * tile widths appeared in a row of eight equal columns.
    */
   {
+    /* THE COMPONENT THIS CHECK WAS WRITTEN FOR HAS LEFT THE SITE. It read
+     * `.qtile`, the homepage's row of theme photographs, and measured the
+     * promise that every tile is one slot in one row whatever the library
+     * holds. `.qtile` appears on ZERO pages and in no page builder — the
+     * homepage became the plate sequence and the row went with it — and the
+     * check has been reporting "it examined 0 states" ever since, which is
+     * its own guard working and nobody reading it. Its five stylesheet rules
+     * were left behind too and are deleted in this commit.
+     *
+     * The promise did not leave with the component. `.moswrap` on /discover
+     * is the same claim in a stronger form: the composition follows the
+     * COUNT, so the set can grow as the library fills and no cell is ever
+     * left empty. That is testable the same way — remove tiles and
+     * re-measure — and it is a live claim rather than a vacuous one, because
+     * the first version of that grid typed four columns and stranded two
+     * tiles on a third row beside two empty cells.
+     */
     const dp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-    const r0 = await dp.goto(base + "/", { waitUntil: "load" });
+    const r0 = await dp.goto(base + "/discover", { waitUntil: "load" });
     const seen = [];
     if (r0 && r0.status() === 200) {
-      const full = await dp.locator(".qtile").count();
+      const full = await dp.locator(".mosrest .mos").count();
       for (let drop = 0; drop < Math.min(4, full); drop++) {
-        await dp.goto(base + "/", { waitUntil: "load" });
+        await dp.goto(base + "/discover", { waitUntil: "load" });
         await dp.evaluate((d) => {
-          const t = [...document.querySelectorAll(".qtile")];
+          const t = [...document.querySelectorAll(".mosrest .mos")];
           t.slice(t.length - d).forEach((x) => x.remove());
         }, drop);
         await dp.waitForTimeout(80);
         seen.push(await dp.evaluate(() => {
-          const t = [...document.querySelectorAll(".qtile")];
           const box = (e) => e.getBoundingClientRect();
+          const rest = document.querySelector(".mosrest");
+          const t = [...rest.querySelectorAll(".mos")];
+          const lead = document.querySelector(".moswrap > .mos");
           return {
             n: t.length,
             widths: [...new Set(t.map((x) => Math.round(box(x).width)))],
-            imgH: [...new Set(t.map((x) => Math.round(box(x.querySelector("img")).height)))],
-            nameTops: [...new Set(t.map((x) => Math.round(box(x.querySelector(".qname")).top)))],
-            // THE NUMBER OF ROWS IS THE GRID'S ANSWER, NOT THIS CHECK'S. It
-            // used to be `ceil(n / 8)`, which was the same hard-coded eight
-            // the builder carried — so when the row stopped showing eight of
-            // eleven and the grid became `auto-fill`, this went red for a
-            // page that had got better. Twelfth assertion here to pin a
-            // shape rather than a promise. The promise is that a name too
-            // wide for its track does not push its own tile down, which is
-            // exactly "the names in a row share a baseline" — so the rows
-            // are counted from the PICTURES, which cannot go ragged, and the
-            // baselines are compared against that.
-            picTops: [...new Set(t.map((x) => Math.round(box(x.querySelector("img")).top)))],
-            sizes: [...new Set(t.map((x) =>
-              Math.round(parseFloat(getComputedStyle(x.querySelector(".qname")).fontSize))))],
+            heights: [...new Set(t.map((x) => Math.round(box(x).height)))],
+            /* A HOLE IS A ROW THE LAST TILE DOES NOT REACH THE END OF.
+             * With an odd number of smalls the last one spans both
+             * columns, so the right-hand block's own right edge is the
+             * right edge of its last tile — whatever the count. */
+            gap: Math.round(box(rest).right - box(t[t.length - 1]).right),
+            /* AND THE LEAD IS AS TALL AS THE GRID BESIDE IT. That is what
+             * `grid-row: 1 / -1` could not do and a sibling grid can. */
+            leadDelta: Math.round(box(lead).height - box(rest).height),
           };
         }));
       }
@@ -5203,26 +5265,27 @@ async function main() {
     await dp.close();
     checked++;
     ok(seen.length >= 2,
-       `the photograph row was not found on the homepage — it examined ${seen.length} ` +
-       `states, and this check has already once gone dark on a component that left`);
+       `the photographic response was not found on /discover — it examined ` +
+       `${seen.length} states, and this check has already once gone dark on a ` +
+       `component that left`);
     for (const st of seen) {
       checked++;
-      ok(st.widths.length === 1 && st.imgH.length === 1,
-         `with ${st.n} photographs the row draws ${st.widths.length} tile widths ` +
-         `(${st.widths.join(", ")}px) and ${st.imgH.length} picture heights ` +
-         `(${st.imgH.join(", ")}px). Every tile is one slot in one row, whatever ` +
-         `the library happens to hold`);
+      ok(st.widths.length === 1 || st.n <= 1,
+         `with ${st.n} tiles the response draws ${st.widths.length} widths ` +
+         `(${st.widths.join(", ")}px). Every small tile is one slot`);
       checked++;
-      ok(st.nameTops.length === st.picTops.length,
-         `with ${st.n} photographs the pictures sit on ${st.picTops.length} row(s) ` +
-         `(${st.picTops.join(", ")}) and the names on ${st.nameTops.length} baselines ` +
-         `(${st.nameTops.join(", ")}) — a name too wide for its track pushes its own ` +
-         `tile down and the row goes ragged`);
+      ok(st.gap <= 1,
+         `with ${st.n} tiles the last one stops ${st.gap}px short of the ` +
+         `grid's right edge — that gap is an empty cell, which is the fault ` +
+         `this composition exists to make impossible at every count`);
       checked++;
-      ok(st.sizes.length === 1,
-         `with ${st.n} photographs the names carry ${st.sizes.length} sizes ` +
-         `(${st.sizes.join(", ")}px). Things a reader compares have one size`);
+      ok(Math.abs(st.leadDelta) <= 2,
+         `with ${st.n} tiles the lead is ${st.leadDelta}px taller than the ` +
+         `grid beside it. The lead has no height of its own: it stretches to ` +
+         `whatever the rest resolve to, which is the whole reason they are a ` +
+         `separate grid`);
     }
+
   }
 
   /* THE YEAR BAND'S CAPTION NAMES A LINE, MEASURED ON THE PAINTED PIXEL.
