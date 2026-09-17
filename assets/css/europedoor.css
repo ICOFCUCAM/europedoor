@@ -6955,8 +6955,6 @@ body[data-hero] .masthead { position: sticky; }
 .sheet-atlas { background: var(--paper-2); color: var(--ink);
                grid-template-columns: minmax(0, 34%) minmax(0, 1fr);
                gap: var(--s6) var(--s7); align-items: start; }
-.sheet-atlas .mega, .sheet-atlas .lede, .sheet-atlas .go,
-.sheet-atlas .actno, .sheet-atlas .actname { color: var(--ink); }
 .sheet-atlas .lede { color: var(--ink-2); }
 .sheet-atlas .actno { border-bottom-color: var(--ink-3); }
 .sheet-atlas .gomark::before { background: none; }
@@ -8894,6 +8892,23 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
   display: block; }
 .sheet-gal .actno, .sheet-gal .actname { color: var(--ink-3); }
 .sheet-gal .actno { border-bottom-color: var(--rule); }
+/* FOUR REDUNDANT DECLARATIONS REMOVED, AND THE SCAN NAMES DECLARATIONS
+   RATHER THAN RULES — which the first attempt at this got wrong. It read
+   "`.featlead {display,color}`" and deleted the whole rule, taking
+   `text-decoration: none` with it, and the homepage's two story links came
+   back underlined at both widths. The shots caught it, which is the only
+   reason this paragraph is not a defect.
+   What is gone: `.sheet-atlas`'s five-selector `color: var(--ink)`, which
+   restated what the room hands down once `.sheet-gal` binds its own tokens;
+   `display: block` on `.featlead` and `.leadshot`, restating what a grid
+   item already computes — the fifth and sixth dead `display: block` on a
+   photograph container found here, each by the same scan; and `color:
+   inherit` on `.leadtitle a`, restating the row's own inheritance. The
+   `text-decoration: none` on both links stays, because a link's underline
+   is not inherited from anything. Proved rather than argued: sixteen pages
+   shot at 1280 and at 390 before and after, byte-identical. */
+.featlead { text-decoration: none; }
+.leadtitle a { text-decoration: none; }
 .galwrap { max-width: 76rem; margin: 0 auto; }
 
 /* ── 01 the door: type left, the atlas right ─────────────────────── */
@@ -9064,11 +9079,11 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    the shape of the country. Everything that describes the geography is
    drawn OVER it: the frontier still bounds it, the name is still set
    across it, and the dusk still dims it where the data stops. */
-.herophoto image { opacity: 0; transition: opacity .9s ease; }
-.herophoto image[data-on] { opacity: 1; }
-@media (prefers-reduced-motion: reduce) {
-  .herophoto image { transition: none; }
-}
+/* THE CROSS-FADE WENT WITH THE SEQUENCE IT WAS WRITTEN FOR. These two
+   rules were reported dead by the scan and they were: the only images
+   they applied to carried `data-href` and no `href`, so there was
+   nothing to fade. `pages.heroeurope` says why the frames are gone and
+   what the trigger for bringing them back is. */
 /* THE PHOTOGRAPH IS NOT A CLICK TARGET AND THE COUNTRY UNDER IT IS. Every
    layer above the land on this drawing is `pointer-events: none` for the
    same reason — each one has a fill and swallowed the click in turn — and
@@ -9109,7 +9124,6 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
 .feat { display: grid;
         grid-template-columns: minmax(0, 1.35fr) minmax(0, .65fr);
         gap: var(--s8); margin-top: var(--s7); align-items: start; }
-.featlead { display: block; text-decoration: none; color: inherit; }
 .featlead :is(picture, img) { display: block; width: 100%;
                               aspect-ratio: 4 / 5; max-height: 34rem;
                               object-fit: cover; }
@@ -9151,13 +9165,11 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    one is a line, and all nine are here. */
 .lead { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
         gap: var(--s8); align-items: center; margin-top: var(--s7); }
-.leadshot { display: block; }
 .leadshot :is(picture, img) { width: 100%; aspect-ratio: 3 / 2;
                               object-fit: cover; }
 .leadtext { display: grid; gap: var(--s3); min-width: 0; }
 .leadtitle { font-family: var(--display); font-size: var(--t-3xl);
              line-height: 1.12; margin: 0; }
-.leadtitle a { color: inherit; text-decoration: none; }
 .leadtitle a:hover { color: var(--door); }
 .leadstand { font-family: var(--display); font-size: var(--t-base);
              line-height: 1.55; color: var(--ink-2); margin: 0;
@@ -9892,8 +9904,28 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    and its lower edge sweeping down across the standing picture is a window
    closing, which is the movement this plate is for. The wall keeps its own
    paper and the label is on it. */
+/* THE SAME FAULT AS `.sheet-gal`, ONE BAND OVER. This room's ground is
+   `--white` in both colour-scheme preferences and it took `--ink`, which in
+   the dark one is bone — so `Europe is not a checklist.` measured 1.14:1 for
+   a reader whose system is set to dark, on the homepage, beside the h1 that
+   had exactly the same defect. A room whose ground does not follow the
+   preference needs ink that does not either, and the tokens are bound here
+   rather than named: a `var()` resolves where the DECLARATION lives. */
 .sheet-bleed { padding: 0 0 11vh; border-bottom: 0; display: block;
                position: relative; min-height: 128svh;
+               --paper:     var(--white);
+               --paper-2:   var(--bone-light);
+               --paper-3:   var(--mineral);
+               --ink:       #141716;
+               --ink-2:     #3b443a;
+               --ink-3:     #5d675b;
+               --rule:      #cfcbbb;
+               --sea:       var(--pine-deep);
+               --sea-dark:  #173528;
+               --signature: var(--pine);
+               --door:      var(--pine-deep);
+               --door-dark: var(--pine-deep);
+               --pine-ink:  var(--pine);
                background: var(--white); color: var(--ink); }
 .sheet-bleed > .actmark { padding-inline: var(--page-gutter); }
 .sheet-bleed .shotclip { position: absolute; inset: 0 0 auto 0;

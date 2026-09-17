@@ -1511,28 +1511,45 @@ def heroeurope(data, featured=(), beyond_ground=True):
         # still carries the name — which is what stops it being a
         # photograph pasted on a map and makes it the country FILLED.
         #
-        # ONE href AND THE REST HELD BACK. Six countries with up to five
-        # frames each is thirty photographs, and a homepage that requests
-        # thirty pictures before a reader has moved is the weight failure
-        # this page already has an invariant for. The first frame of each
-        # country carries `href` and is what a reader with no JavaScript
-        # sees for ever; the others carry `data-href` and are fetched by the
-        # enhancement the first time they are shown. Six requests at rest.
+        # ONE FRAME PER COUNTRY, AND THE SEQUENCE WAS BUILT, MEASURED AND
+        # REMOVED. The comment that stood here said the first frame carries
+        # `href` and "the others carry `data-href` and are fetched by the
+        # ENHANCEMENT the first time they are shown". There is no
+        # enhancement: this page's only `<script>` is the inert JSON-LD
+        # block, so the held-back frames were never fetched and never shown,
+        # and `.herophoto image { opacity: 0 }` read as a dead rule because
+        # the only elements it applied to had no `href` to draw. That is the
+        # `data-rotate` failure — bytes shipped on the most-visited page
+        # waiting for a rotator nobody wrote — found this time by the
+        # dead-rule scan rather than by reading.
+        #
+        # WRITING THE ROTATOR WAS COSTED AND REFUSED ON THE NUMBERS. The
+        # sequence is a country's own photograph followed by its photographed
+        # DESTINATIONS, and the register holds destination photographs inside
+        # exactly one of the featured countries: France has four frames and
+        # the other five have one each. So an enhancement would put the first
+        # JavaScript on the homepage to cross-fade one country, which is not
+        # a trade this page should make — the same reasoning that built,
+        # measured and removed the nine restraint marks.
+        #
+        # The trigger is the library. When the register holds photographed
+        # destinations inside several featured countries the sequence is
+        # worth ~40 lines of enhancement, and the markup to carry it is two
+        # lines here.
         + (('<defs>' + "".join(
             f'<clipPath id="lzc-{f["slug"]}" clipPathUnits="userSpaceOnUse">'
             f'<use href="#lz-{f["slug"]}"/></clipPath>' for f in featured)
            + '</defs>'
-           + '<g class="herophoto" data-lz aria-hidden="true">' + "".join(
-               f'<g class="lzc" data-country="{f["slug"]}"'
-               + (' data-on' if i == 0 else '') + '>' + "".join(
-                   f'<image class="lzf"{" data-on" if j == 0 else ""}'
+           + '<g class="herophoto" aria-hidden="true">' + "".join(
+               f'<g class="lzc" data-country="{f["slug"]}">' + "".join(
+                   f'<image class="lzf"'
                    f' clip-path="url(#lzc-{f["slug"]})"'
                    f' x="{f["box"][0]:.1f}" y="{f["box"][1]:.1f}"'
                    f' width="{f["box"][2]:.1f}" height="{f["box"][3]:.1f}"'
                    f' preserveAspectRatio="xMidYMid slice"'
-                   f' {"href" if j == 0 else "data-href"}="{esc(fr["href"])}"/>'
-                   for j, fr in enumerate(f["frames"]) if fr["href"])
-               + '</g>' for i, f in enumerate(featured))
+                   f' href="{esc(fr["href"])}"/>'
+                   for j, fr in enumerate(f["frames"]) if fr["href"] and j == 0)
+               + '</g>' for f in featured)
            + '</g>') if featured else "")
         # ORDER: terrain, then water, then the frontiers over both. Water is
         # a separate visual layer and must never inherit land shading — a

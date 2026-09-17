@@ -2257,8 +2257,29 @@ async function main() {
     // photograph container here, each in the first run where a photograph
     // actually rendered.
     const WIDTHS = [[1280, 900], [390, 844]];
+    //
+    // AND FOUR ENTERED BECAUSE THE PLATE SEQUENCE MADE THE BASE RULE THE
+    // SUPERSEDED ONE, which is the case this comment already describes as
+    // legitimate — a base rule beaten by a variant on every page that has
+    // one, where the honest fix is a refactor rather than a deletion. The
+    // hero's shore band and its country names are both stated on
+    // `.heroeurope` and then restated on `.sheet-door .op .heroeurope`,
+    // because the picture's ground changed when the plate's wall did and
+    // the drawing exists on exactly one page today: `--ocean-deep` at 34%
+    // against `--ocean-shallow` at 26%, and a 48% graphite name against the
+    // map's own ink with a white halo. Deleting the base would leave the
+    // next caller of `heroeurope()` with no shore and black names.
+    // `.sheet {display}` is the same shape one level up: `display: grid` is
+    // the plate's own default and every `.sheet-*` variant that exists sets
+    // its own, so the grid is what a plate with no variant would get and
+    // there is not one yet. `.doorgo {opacity}` is the fourth, and it is
+    // the reveal on the homepage's four doors — measured dead because the
+    // pointer is nowhere, which is this scan's own recorded finding.
     const DEAD_KNOWN = new Set([
       ".band > .band-head > .lede {color}",
+      ".heroeurope .lyr-coastal-water use {fill}",
+      ".heroeurope .lyr-labels .cname {fill}",
+      ".sheet {display}",
       ".band-head {display}",
       ".card {display}",
       ".credit {opacity}",
@@ -2675,7 +2696,18 @@ async function main() {
         }
       }
       const pos = getComputedStyle(pic).position;
-      const clip = getComputedStyle(band).clipPath;
+      /* THE APERTURE IS `.shotclip` AND NOT THE BAND, and the band is what
+       * this read when it was repointed off the class that no longer
+       * exists. The stylesheet says why: a clip on the band clipped the
+       * band's OWN background and its label away, so the opening is its own
+       * absolutely positioned box in the top of the wall — which is also
+       * what makes its lower edge sweeping down across the standing picture
+       * read as a window closing. The promise is unchanged: something
+       * between the viewport and the picture has to carry a clip, because
+       * `overflow: hidden` cannot clip a fixed descendant. */
+      const cliphost = band.querySelector(".shotclip") || band;
+      const clip = getComputedStyle(cliphost).clipPath;
+      const ap = cliphost.getBoundingClientRect();
       // The reveal itself: put the band in view, note where the picture is,
       // scroll a third of a screen, and ask again.
       band.scrollIntoView({ block: "center" });
@@ -2687,8 +2719,19 @@ async function main() {
       return { position: pos, clip, blockers,
                scrolled: scrollY - y0,
                moved: Math.round(Math.abs(after.top - before.top)),
-               covers: Math.round(before.width) >= innerWidth
-                    && Math.round(before.height) >= innerHeight };
+               /* AND IT FILLS THE APERTURE RATHER THAN THE VIEWPORT.
+                * The first version asked for the whole screen, which was
+                * true while the picture was `inset: 0` — and the crop-box
+                * measurement then bounded it deliberately, because a
+                * viewport-filling slot guaranteed only 9% of a
+                * photograph's frame at some window shapes and this one
+                * guarantees 35.5%. So the question is whether the window
+                * is full, not whether the screen is: a gap here is the
+                * wall showing through the opening. */
+               covers: Math.round(before.width) >= Math.round(ap.width) - 1
+                    && Math.round(before.height) >= Math.round(ap.height) - 1,
+               ap: [Math.round(ap.width), Math.round(ap.height)],
+               pic: [Math.round(before.width), Math.round(before.height)] };
     });
     ok(!r.missing && !r.nopic,
        `${w}: the homepage has no plate-03 photograph to measure — ` +
@@ -2698,7 +2741,7 @@ async function main() {
        `${w}: the plate-03 picture computes position: ${r.position}, not ` +
        "fixed — it is a panel that scrolls, not a window");
     ok(r.clip && r.clip !== "none",
-       `${w}: the plate-03 band has clip-path: ${r.clip} — `+
+       `${w}: the plate-03 aperture has clip-path: ${r.clip} — `+
        "`overflow: hidden` does NOT clip a fixed descendant, because a fixed " +
        "box is laid out against the viewport rather than against any " +
        "scrolling ancestor, so without the clip the picture is loose over " +
@@ -2715,8 +2758,10 @@ async function main() {
        `scrolled ${r.scrolled}px — it is travelling with the page rather ` +
        "than standing still behind it");
     ok(r.covers,
-       `${w}: the plate-03 picture does not fill the viewport, so the band ` +
-       "clips an undersized picture and the window shows the ground through it");
+       `${w}: the plate-03 picture is ${(r.pic || []).join("x")} inside an ` +
+       `aperture of ${(r.ap || []).join("x")} — the window shows the wall ` +
+       `through it. A gap here is a measurement, which is why both boxes ` +
+       `are in the message`);
   }
 
   // ── an accent on every row is a texture, and the rule named classes ─
@@ -5250,6 +5295,15 @@ async function main() {
             n: t.length,
             widths: [...new Set(t.map((x) => Math.round(box(x).width)))],
             heights: [...new Set(t.map((x) => Math.round(box(x).height)))],
+            /* A WIDE TILE IS THE COMPOSITION, NOT A DEFECT, and the first
+             * version of this assertion refused the thing it was written to
+             * protect. Where the smalls are an odd number the LAST one spans
+             * both columns, because that is the one case a two-column block
+             * would otherwise leave a cell empty in. So the promise is not
+             * "one width": it is that every tile is either one slot or two,
+             * and only the last may be two. */
+            wide: t.map((x, i) => Math.round(box(x).width) > Math.round(box(t[0]).width) + 2
+                                  ? i : -1).filter((i) => i >= 0),
             /* A HOLE IS A ROW THE LAST TILE DOES NOT REACH THE END OF.
              * With an odd number of smalls the last one spans both
              * columns, so the right-hand block's own right edge is the
@@ -5270,9 +5324,12 @@ async function main() {
        `component that left`);
     for (const st of seen) {
       checked++;
-      ok(st.widths.length === 1 || st.n <= 1,
+      ok(st.widths.length <= 2 && st.wide.every((i) => i === st.n - 1),
          `with ${st.n} tiles the response draws ${st.widths.length} widths ` +
-         `(${st.widths.join(", ")}px). Every small tile is one slot`);
+         `(${st.widths.join(", ")}px) and the wide one(s) are at ` +
+         `${st.wide.join(", ") || "none"} of ${st.n - 1}. Every tile is one ` +
+         `slot or two, and only the last may be two — which is the rule that ` +
+         `makes the block hole-free at an odd count`);
       checked++;
       ok(st.gap <= 1,
          `with ${st.n} tiles the last one stops ${st.gap}px short of the ` +
