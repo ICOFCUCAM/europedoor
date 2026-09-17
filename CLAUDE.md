@@ -18,6 +18,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **/experiences — the third instrument, and why it is photography rather than a map** | **`docs/experiences-redesign.md`** — the source audit, the image-coverage audit, the twelve bands of the brief mapped onto what this atlas actually holds, the two that are refused, and the seven defects only rendering found. 311 photographs, and on this one page the library was never the constraint |
 | **/journeys — movement rather than a list, and where the family's own photograph went** | **`docs/journeys-redesign.md`** — the source audit, the seventeen routes drawn at once as the opening, the three paces derived from measured kilometres a day rather than named, the two things the brief asks for that are refused with their triggers, and the five defects only rendering found |
 | **/stories — an editorial desk, and the pictures it already owned** | **`docs/stories-redesign.md`** — the source audit, the eight photographs the register held while the page drew one, the brief's nine bands mapped onto a 1:1 desk taxonomy and 34 tags used once each, and the four class-name collisions one page's run produced with no guard anywhere |
+| **/countries — geography first, and the country as its own aperture** | **`docs/countries-redesign.md`** — the source audit, the image-coverage audit (60 relevant photographs and the page drew one), why the brief's strongest idea was already a mechanism here, the seven plates, and the seven defects only rendering found. 41 of 50 countries can be an aperture and nine cannot — six have no outline in this dataset and three are advisory |
 | **/plan — an instrument rather than a form, and the guard a runtime `<img>` walks straight past** | **`docs/plan-redesign.md`** — the source audit, the seven bands, the three of the brief's asks that collide with recorded findings, the twelve defects only rendering found (nine of them faults already recorded in another family and three of those recorded in the commit before), and the per-leg photograph: `render.credit_html` is one implementation because `checks.py` cannot see an `<img>` a script writes |
 | **the eight page families, and what each room does differently** | **`docs/non-home-redesign.md`** — the non-home redesign answered A-J. The eight rooms derived from the route, the three helpers that were forcing one grammar, the seven image scales, 1,626 declared surfaces, and the defects only rendering found |
 | **the design language — what makes a page EuropeDoor with the logo removed, and which movements each family takes** | **`docs/design-language.md`** — the ARCHITECT step. Five marks that could not have been made by anybody else, the six-movement composition grammar per family, the three head roles, what the language forbids, and how a change is proved |
@@ -5159,6 +5160,95 @@ to catch, arriving in the commit that rebuilt the pages it measures.
 `.xshot` is 0.731–1.501 (frame 30.1%) and `.storybleed` is 1.778–2.333
 (frame 47.2%); both clear the 12% floor.
 
+
+**/countries DREW ONE PHOTOGRAPH WITH SIXTY IN THE REGISTER FOR IT, AND THE
+BRIEF'S STRONGEST IDEA WAS ALREADY A MECHANISM HERE.** The page was an
+`ed_opening()` over a 4:3 figure with nine macro bands under it. The register
+holds a photograph of every one of the fifty countries, of each of the nine
+macro regions and of the index itself — sixty pictures whose subject IS this
+page — and it spent one. Third family in a row on the same finding: *the
+pictures were already bought and were being spent on one surface.* 1 `<img>`
+to 10, plus 10 SVG `<image>`, and **nothing was acquired.**
+
+**THE COUNTRY IS THE APERTURE, AND `living_atlas` HAD ALREADY BUILT THAT
+CLIP-PATH AND MEASURED IT OUT.** The brief asks for the photograph to appear
+*inside France's geographic boundary* so the country itself becomes the door —
+which is the one thing this atlas can draw that no competitor can, and which
+the homepage tried and refused on its own numbers: *a photograph clipped into
+Belgium renders about 40 pixels wide at 1280 and is a smudge with a
+coastline.* **The frame was the variable, not the idea.** `country_door()` is
+the same clip on the country's OWN extent, so Estonia fills its tile exactly
+as France fills its own. **41 of 50 can be drawn this way and nine cannot, and
+the nine are geometry rather than taste** — six have no polygon at 1:50m at
+all and three are advisory. The page says so rather than quietly showing 41.
+
+**AND THE FUNCTION'S OWN COMMENT OVERSTATED IT BY NINE**, reading *"every
+country that has a photograph is an aperture, and all fifty do"* above two
+filters that remove exactly those nine. *The code had stopped matching its own
+comment*, in the direction that reads as evidence.
+
+**THE BYTE BUDGET WAS RIGHT AND ITS STATED REASON NAMED A DOOR THAT IS NEVER
+DRAWN.** All 41 drawable doors are **628 KB** of inlined geometry against a
+`weight.max_page_kb` of 441, so the whole set is 187 KB over the largest page
+this site may serve — a real constraint, and `DOOR_BAND_KB` spends 90 KB of it
+and lets the page state how many that turned out to be, because a count picked
+by eye would be taste. The comment justified it with *"Russia's outline alone
+is 107 KB"*, and **Russia is advisory, so `country_door()` refuses it before
+any geometry is read**: the costliest door that actually exists is Norway at
+62 KB. The budget SKIPS rather than stops, so Finland — nine photographs and
+an expensive coast — is passed over and Bulgaria, Albania and Armenia get in
+behind it.
+
+**NINE SILENT INCREMENTS OF THE SECTION COUNTER WERE ON THIS PAGE.** The macro
+regions were `<section class="band macroband">` with the head inside a
+`.bandtop` wrapper, so `.band > .band-head::before` never matched them and the
+two numbered sections after them would have printed "010" and "011". That is
+*the selector that COUNTS is the selector that DRAWS*, recorded one commit
+earlier and live here the whole time; `primitives.reach.band` 0.768 → 0.767 is
+the repair rather than a family growing its own components.
+
+**THREE CLASS-NAME COLLISIONS, AND THIS TIME THE STYLESHEET WAS GREPPED
+FIRST.** `.sheet-door` is the homepage's opening with 29 rules, `.doorgrid`
+already exists twice, `.sheet-open` is shared with /stories — all three the
+obvious names for these compositions. Five pages in a row have now hit *a
+class name already in the stylesheet is a rule you inherit silently*, and this
+is the first where it cost a rename instead of a defect. **And the first
+rename went to the wrong occurrence**: `.doorgrid` at line 1822 is the
+homepage's, line 2477 is this family's, so a grep returning two matches still
+needs the right one read.
+
+**A BLACK SEA ON EVERY APERTURE.** `.instrmap svg { background: none }` is
+correct — *a map figure must paint no background* — so a new figure's own
+`<rect class="lyr lyr-ocean">` had nothing to fill it and took the SVG
+default. The plates escape it because they carry the cartography skin: **a new
+figure inherits the geometry rules and not the paint**, which is the ten
+unreached `<stop>` elements one component over.
+
+**AND THREE MORE THE FIRST RUN CAUGHT, EACH BY A GUARD THIS FILE ARGUES FOR.**
+`--warn-ink` has never existed (the token is `--warn`), found by the
+unresolvable-`var()` scan. A `line-height: 1.24` one hundredth from the
+existing 1.25 took `css.line_heights` to nine against a ceiling of eight — *a
+rounding error with a token name*. And `data-role="illustration"` was put on
+the `<figure>` where the check reads the `<svg>`. Then ten identical captions,
+ten identical source notes and ten identical alt texts, which is *never
+explain the constraint back*: `brief=` puts the sentence on the lead door and
+the bare country name on the other nine.
+
+**A CLASS MOVED FROM THE LINK TO ITS FIGURE AND THREE OF ITS FOUR
+DECLARATIONS STAYED BEHIND — TWO DEAD, AND THE THIRD UNDERLINED SEVEN
+HEADLINES.** `.picstory` on /stories was an `<a>` until the credit's own two
+links made a nested anchor illegal; the fix put the class on the `<figure>`
+and the anchor inside it, and left `display: block` (a `<figure>` already
+computes it), `color: inherit` (`a { color: inherit }` already does it) and
+**`text-decoration: none` on a box that is not a link**, while the UA's
+`underline` went on applying to the anchor's own subtree. Measured by serving
+the stylesheet with and without an override: **the seven story titles in the
+photographed band were underlined**, 34px of display serif with a rule
+through it, shipped by the commit that fixed the credit. **A dead declaration
+was the SYMPTOM rather than the fault** — two of the three changed nothing
+and the third changed the wrong element, and the dead-rule scan is the only
+instrument here that looks for either. The decoration belongs on the thing
+that is decorated.
 
 ## Gates
 

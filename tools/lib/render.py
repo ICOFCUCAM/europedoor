@@ -1826,7 +1826,7 @@ def ed_split(*, title, body, media="", reverse=False):
     )
 
 
-def ed_rows(rows, *, numbered=True):
+def ed_rows(rows, *, numbered=True, level=3):
     """An index as a set of rules, not a grid of cards.
 
     THE NUMBER IS DERIVED AND NEVER PASSED. The brief's version takes a
@@ -1834,7 +1834,18 @@ def ed_rows(rows, *, numbered=True):
     into data is the figure that was true two hundred destinations ago, which
     is this repository's most repeated finding about counts. It is the row's
     position, formatted here.
+
+    AND `level` IS THE OUTLINE WHERE THE CLASS IS THE LOOK, which is the
+    rule `card()` already takes an argument for. A row's name is an `<h3>`
+    wherever the band's own `<h2>` is the level above it, and that is every
+    caller but one: /countries nests its fifty country rows under a macro
+    region's `<h3>`, so there they are `<h4>`. Nothing in WCAG fails on a
+    flattened outline, which is why the site had a sixth of its pages
+    starting at h3 with no h2 above them; what it costs is a reader
+    navigating by heading being told two things are siblings when one is
+    inside the other.
     """
+    h = f"h{max(2, min(6, int(level)))}"
     out = []
     for i, row in enumerate(rows, 1):
         num = f"{i:02d}" if numbered else ""
@@ -1850,7 +1861,7 @@ def ed_rows(rows, *, numbered=True):
         out.append(
             f'<a class="ed-row" href="{esc(row["href"])}">'
             f'<span class="ed-row-number">{num}</span>'
-            f'<div><h3>{esc(row["title"])}{flag}</h3>{sub}</div>'
+            f'<div><{h}>{esc(row["title"])}{flag}</{h}>{sub}</div>'
             f'<span class="ed-row-meta">{esc(row.get("meta", ""))}</span>'
             '<span class="ed-row-arrow" aria-hidden="true">&#8594;</span>'
             "</a>")

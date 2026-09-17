@@ -404,7 +404,7 @@ def measure():
             "safety.img_tags": {
                 "value": sum(b.count("<img") for b in bodies.values()),
                 "kind": "exact",
-                "why": "AND /stories SPENT THE SEVEN IT ALREADY HELD, "
+                "why": "AND /countries SPENT THE NINE MACRO PHOTOGRAPHS AND TEN APERTURES, 1196 -> 1205. The register holds a photograph of every one of the fifty countries, one of each of the nine macro regions and the index's own hero — sixty pictures relevant to this page — and the page drew ONE. The nine macro photographs each appeared on exactly one page, their own, while the band whose whole subject is those nine regions drew none of them. Nine came on here; the ten country apertures are SVG `<image>` rather than `<img>` and this figure does not count them. Nothing was acquired. AND /stories SPENT THE SEVEN IT ALREADY HELD, "
                        "1189 -> 1196. The index drew one `<img>` while the "
                        "register held eight for it — `stories-hero` and "
                        "seven `story:` rows — which is the /experiences "
@@ -853,7 +853,32 @@ def measure():
                        "plate sequence has no room for a stage above "
                        "its opening. `row` did not move either, because "
                        "the seventeen are still rows: what left is the "
-                       "head, not the list."},
+                       "head, not the list. "
+                       "AND THE ATLAS TOOK THREE MORE, TWO OF THEM THE "
+                       "SAME MIGRATION AND ONE OF THEM A DEFECT THIS "
+                       "FILE ALREADY RECORDS. /countries was an "
+                       "`ed_opening()` over a 4:3 figure with nine "
+                       "macro bands under it; it is a seven-plate "
+                       "sequence now, so ed-opening 0.454 -> 0.453 and "
+                       "ed-section 0.835 -> 0.834 — one page each, the "
+                       "fifth family to make the same move, and the "
+                       "head did not go: the A-Z band declares "
+                       "`pagehead index` and states the extent, which "
+                       "is where a plate sequence puts it. "
+                       "`band` 0.768 -> 0.767 IS THE INTERESTING ONE, "
+                       "because it is a repair rather than a "
+                       "migration: the nine macro regions were "
+                       "`<section class=\"band macroband\">` with "
+                       "their head inside a `.bandtop` wrapper, so "
+                       "`.band > .band-head::before` never matched "
+                       "them — NINE SILENT INCREMENTS of the counter "
+                       "that numbers every other section on the site, "
+                       "which is the *selector that COUNTS is the "
+                       "selector that DRAWS* failure this file records "
+                       "one commit over, and it was on /countries. "
+                       "Dropping `band` from those nine is what fixes "
+                       "it: they are plate bands now and they neither "
+                       "count nor draw an index."},
         },
     }
 

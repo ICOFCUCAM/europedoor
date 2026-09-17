@@ -2242,31 +2242,204 @@ def home(data):
 # ── atlas ─────────────────────────────────────────────────────────────
 
 def countries_index(data):
-    """Nine macro regions, each shown as the countries it is made of.
+    """The European Atlas: the continent, then a country, then the index.
 
-    IT WAS THE PAGE ABOUT EUROPE WITH NO EUROPE ON IT. Nine headings and fifty
-    rows of name, tagline and a count — the atlas index as a contents list,
-    which is the shape of the data standing in for a design. Measured across
-    the built page, the median horizontal band used 44% of the column and 64%
-    of bands used under 60%; the argument is not that the space was empty, it
-    is that a reader choosing a region of Europe was never shown one.
+    *Discover = Let Europe answer. Countries = Know the continent.* The
+    brief's grammar is CONTINENT -> MAP -> COUNTRY -> INDEX -> REGIONS ->
+    PHOTOGRAPHIC ATLAS -> FINAL, and its instruction is a refusal:
+    *"Countries is not a directory of 50 destinations. It is EuropeDoor's
+    living digital atlas: geography first, country second, photography
+    third, index fourth. The map provides authority, photography provides
+    emotion, and the index provides navigation. Build those as distinct
+    layers and do not collapse them into generic cards."*
 
-    Each band now opens on its own members drawn on the shared silhouette, so
-    the Nordics and the Caucasus are told apart before a word is read — the
-    same move that rebuilt /themes and the homepage tiles, on the family that
-    needed it most and had waited longest.
+    THE LIBRARY WAS NOT THE CONSTRAINT AND THE MARGIN WAS THE WIDEST YET.
+    The register holds a photograph of every one of the fifty countries, one
+    of each of the nine macro regions, and the index's own hero — sixty
+    pictures relevant to this page — and the page drew ONE. That is the
+    /experiences finding and the /stories finding a third time, on the
+    family with the most photographs available and the fewest shown.
+    Nothing was acquired; see `docs/countries-redesign.md`.
 
-    THE COUNTS MOVED OFF THE ROWS AND INTO THE BAND. "6 regions · 25 cities"
-    on each of fifty rows is fifty measurements a reader cannot hold; what
-    separates the nine bands is how much of this atlas each one is, and that
-    is one number per band, derived here rather than typed.
+    AND THE BRIEF'S STRONGEST IDEA WAS ALREADY BUILT. *"The actual country
+    polygon should become the visual focus … so the country itself becomes
+    the aperture."* `heroeurope()` has clipped a photograph into a country's
+    own path since the Living Atlas; `country_door()` is that at the
+    country's own extent, which is the one thing the homepage could not do —
+    its own measurement says a photograph clipped into Belgium on a
+    continental frame *"renders about 40 pixels wide and is a smudge with a
+    coastline."*
+
+    WHAT IS KEPT: the nine macro bands. The brief flattens /countries into
+    one list of fifty, and flattening is the single thing that would cost
+    this page something it already has — each band drawing its own members
+    on its own frame is what tells the Nordics from the Caucasus before a
+    word is read, and it is the measurement that rebuilt this family. So the
+    sequence is the brief's and the grouping is kept.
     """
+    images = data.get("images") or {}
+    cs = data["countries"]
+    nreg = sum(len(c["regions"]) for c in cs.values())
+
+    # ── WHICH COUNTRY GETS THE LARGE DOOR, DERIVED RATHER THAN CHOSEN.
+    # A "selected country" in the brief is a hover state, and this page
+    # loads no JavaScript — its only <script> is the inert JSON-LD block. So
+    # the selection is a measurement instead, and the measurable question is
+    # the one /journeys already asks about its featured route: which is the
+    # one this atlas can actually SHOW. Counted over the register, France
+    # carries 37 photographs of itself, its regions, its cities and its
+    # places against Croatia's 18 and Austria's 17. The figure is printed,
+    # so a reader can see it is a count rather than a preference, and it
+    # moves on its own as `stage: fill` reaches the rest.
+    shot_count = {}
+    for k in images:
+        if ":" not in k:
+            continue
+        fam, tgt = k.split(":", 1)
+        if fam in ("country", "region", "city", "place"):
+            shot_count[tgt.split("/")[0]] = shot_count.get(tgt.split("/")[0], 0) + 1
+    doors = []
+    for slug, n in sorted(shot_count.items(), key=lambda kv: (-kv[1], kv[0])):
+        c = cs.get(slug)
+        if c is None:
+            continue
+        m = country_door(data, images, c, brief=(not doors))
+        if m:
+            doors.append((c, n, m))
+    lead = doors[0] if doors else None
+
+    # ── HOW MANY DOORS THE PHOTOGRAPHIC BAND DRAWS, BOUNDED BY BYTES.
+    # All 41 drawable doors together are 628 KB of inlined geometry against a
+    # `weight.max_page_kb` ceiling of 441, so the whole set is not a layout
+    # question at all — it is 187 KB over the largest page this site is
+    # allowed to serve. The costliest single door is Norway at 62 KB, and the
+    # first version of this comment said Russia at 107: RUSSIA IS ADVISORY AND
+    # `country_door` REFUSES IT, so the number quoted as the reason for the
+    # budget was the size of a door that is never drawn. A count picked by eye
+    # would be taste; the budget is the quantity that actually binds, so the
+    # band takes doors in the derived order until it has spent DOOR_BAND_KB,
+    # and the page states how many that turned out to be. The set therefore
+    # grows when the geometry gets cheaper and shrinks when it does not, which
+    # is the right way round — and it SKIPS rather than stops, so Finland (9
+    # photographs, an expensive coast) is passed over and Bulgaria, Albania
+    # and Armenia get in behind it.
+    band, spent = [], 0
+    for c, n, m in doors[1:]:
+        if spent + len(m) > DOOR_BAND_KB * 1024:
+            continue
+        band.append((c, n, m))
+        spent += len(m)
+
+    # ── 01 · THE CONTINENT ───────────────────────────────────────────
+    heroart = region_glyph(list(cs))
+    open_ = f"""
+  <div class="sheettext">
+    {head_extent([(len(cs), "countries"), (nreg, "travel regions"),
+                  (len(data['cities']), "cities")])}
+    <h1 class="mega">Europe, country by country.</h1>
+    <p class="lede">{numword(len(data['macros']), cap=True)} regions,
+    {len(cs)} countries, {nreg} travel regions and {len(data['cities'])}
+    cities &mdash; every one of them written here rather than imported.</p>
+  </div>
+  <div class="atlasopen">{photo(images, "countries-hero", w=2000, h=1500,
+      sizes="(min-width: 62rem) 52vw, 100vw") or heroart}</div>"""
+
+    # ── 02 · THE MAP ─────────────────────────────────────────────────
+    # AND THE CUT IS SAID RATHER THAN HIDDEN. At the continental extent
+    # Russia arrives with the 52°E data cut in it — a straight slant across
+    # the top right, which is the rendering fault `constel_defs` drops the
+    # whole context to avoid and the hero spends 320 units of fade on.
+    # Neither escape is available here: the sliced ring is a MEMBER rather
+    # than context, and reframing cannot lose it without losing the
+    # Caucasus. The number is read off the dataset's own bbox.
+    lim = (geo.load("europe-lod1.json") or {}).get("bbox", [None, None, None])[2]
+    cutsay = (f" Russia's outline stops at {lim:.0f}&deg;E, where this atlas's "
+              f"map data ends, not at a border.") if lim is not None else ""
+    themap = f"""
+  <div class="sheettext">
+    <h2 class="mega">Where the countries sit.</h2>
+    <p class="lede">A geographic beginning before the alphabetical one. Each
+    of the {len(cs)} countries is drawn on its own, so the frontiers are the
+    picture.{cutsay}</p>
+  </div>
+  <div class="atlasmap">{heroart}</div>
+  <p class="actions">
+    <a class="btn" href="/map">Open the map</a>
+    <a class="btn ghost" href="/discover">Start from what you like</a>
+  </p>"""
+
+    # ── 03 · THE COUNTRY AS THE APERTURE ─────────────────────────────
+    door = ""
+    if lead:
+        c, n, m = lead
+        door = f"""
+  <div class="sheettext">
+    <h2 class="mega">Every country is a door.</h2>
+    <p class="lede">{esc(c['name'])} drawn on its own frontier with a
+    photograph of it inside the outline. Not a picture beside a map: the
+    country is the aperture, which is the one thing this atlas can draw that
+    a list of names cannot.</p>
+  </div>
+  {m}
+  <div class="doorsay">
+    <p class="kicker">{esc(c['name'])}</p>
+    <p class="dsay">{esc(c['tagline'])}</p>
+    <p class="small">{esc(c['name'])} is the country this atlas can show
+    best: the register holds {n_of(n, 'photograph')} of it, its regions, its
+    cities and its places, against {band[0][1] if band else 0} for the next.
+    That is a count rather than a preference, and it moves as the library
+    fills. {n_of(len(doors), 'country')} can be drawn this way today;
+    {numword(len(cs) - len(doors))} cannot, and the reason is geometry rather
+    than choice &mdash; six of them have no outline in this dataset at all
+    and are drawn as a ringed point, and three carry a travel advisory and
+    are never lit.</p>
+    <p class="actions"><a class="btn" href="{urls.country(c)}">Open
+    {esc(c['name'])}</a></p>
+  </div>"""
+
+    # ── 04 · THE INDEX ───────────────────────────────────────────────
+    # THE UTILITY LAYER, AND IT IS TYPE. *The index provides navigation* —
+    # so it is fifty names a reader can scan and nothing else: no picture,
+    # no count, no tagline. Nineteen initials rather than twenty-six,
+    # because that is how many the fifty names actually start with, and an
+    # A-Z that prints ten empty letters is a shape standing in for a set.
+    groups = {}
+    for c in sorted(cs.values(), key=lambda x: x["name"]):
+        groups.setdefault(c["name"][0].upper(), []).append(c)
+    azrows = "".join(
+        f'<div class="azgroup"><p class="azletter">{esc(k)}</p><ul class="azlist">'
+        + "".join(f'<li><a href="{urls.country(c)}">{esc(c["name"])}</a>'
+                  + (' <span class="azwarn">advisory</span>'
+                     if (c.get("advisory") or {}).get("level") else "")
+                  + '</li>' for c in v)
+        + '</ul></div>' for k, v in sorted(groups.items()))
+    # AND THIS BAND IS THE PAGE'S HEAD. A plate sequence has no room for a
+    # stage above its opening, so the head is the band that introduces the
+    # set — /journeys and /experiences settled that one family over. The
+    # index IS the set here, literally, so it is the honest place for the
+    # extent: *an index exists to say how big a set is*, and every figure is
+    # derived rather than typed.
+    azband = f"""
+  <div class="pagehead index">
+    <p class="kicker">The European Atlas</p>
+    <h2 class="mega">The index.</h2>
+    <p class="lede">All {len(cs)} countries, alphabetically, under the
+    {numword(len(groups))} letters they actually start with &mdash; not
+    twenty-six, because ten of those begin nothing. Behind them:
+    {nreg} travel regions and {len(data['cities'])} cities.</p>
+  </div>
+  <div class="azindex">{azrows}</div>"""
+
+    # ── 05 · THE NINE REGIONS ────────────────────────────────────────
+    # AND THE NINE MACRO PHOTOGRAPHS CAME ON. Each of the nine appeared on
+    # exactly one page — its own — and the band whose entire subject is
+    # those nine regions drew none of them. Same finding as the fifty, one
+    # level up.
     blocks = []
     for m in data["macros"]:
-        rows = []
-        mcity = 0
-        for cs in m["countries"]:
-            c = data["countries"][cs]
+        rows, mcity = [], 0
+        for slug in m["countries"]:
+            c = cs[slug]
             ncity = sum(len(r["cities"]) for r in c["regions"])
             mcity += ncity
             rows.append({"href": urls.country(c), "title": c["name"],
@@ -2274,105 +2447,94 @@ def countries_index(data):
                          "meta": f"{n_of(len(c['regions']), 'region')} · "
                                  f"{n_of(ncity, 'city')}",
                          "flag": "advisory" if c.get("advisory") else ""})
-        # THE NINE BANDS KEEP THEIR GLYPHS AND TAKE THE SYSTEM'S ROWS.
-        # The brief's /countries is opening -> the continent -> one flat list
-        # of fifty, and flattening is the one thing that would cost this page
-        # something it already has: each band's own members drawn on their own
-        # frame is what tells the Nordics from the Caucasus before a word is
-        # read, and it is the measurement that rebuilt this family. So the
-        # sequence is the brief's and the grouping is kept — the rows inside
-        # each band are `ed_rows` now, which is where the upgrade actually
-        # lands.
+        # AND THE CREDIT IS THE STANDARD ONE, because these pictures are not
+        # inside a link. `.credit` is `picture()`'s own figcaption, revealed
+        # on hover and on `:focus-visible` — which is how every photograph on
+        # this site that CAN carry one does, and it is what the owner's
+        # standing position asks for: provenance is invisible infrastructure
+        # unless a legal requirement wants it visible on that surface. The
+        # aggregated `sheetcred rowcred` line exists for the other case, a
+        # picture wrapped in an `<a>`, where an anchor inside an anchor ends
+        # the outer one and the reveal rule loses its subject. Here the link
+        # is on the heading, so there is no nesting and nothing to aggregate.
+        pic = photo(images, "macro:" + m["slug"], w=1200, h=900,
+                    sizes="(min-width: 62rem) 26vw, 92vw")
         blocks.append(
-            f"""<section class="band macroband" id="{esc(m['slug'])}">
-            <div class="bandtop">
-            <div class="band-head"><p class="ed-eyebrow">{n_of(len(m['countries']), 'country')} · {n_of(mcity, 'destination')}</p>
-            <h2><a href="{urls.macro(m)}" class="nodec">{esc(m['name'])}</a></h2>
-            <p class="lede">{esc(m['blurb'])}</p></div>
-            <figure class="bandart">{region_glyph(m["countries"], macro_frame(data, m))}</figure>
-            </div>
-            {ed_rows(rows)}</section>"""
-        )
-    # THE PAGE ABOUT FIFTY COUNTRIES OPENED ON NONE OF THEM. Nine bands each
-    # carrying a regional glyph is three densities from the second band down
-    # and one density at the top: a kicker, a headline and a lede, then
-    # straight into the set. Every other index here now opens on its own
-    # subject at size, and the subject of this one is the continent divided —
-    # not Europe as a silhouette, which is what the glyphs below draw, but
-    # Europe as the fifty separate countries this atlas has written about,
-    # each one its own tile with a frontier around it. It is the only place
-    # on the site where that drawing appears, and it says the h1 in a
-    # picture.
-    #
-    # AND THE CUT IS SAID RATHER THAN HIDDEN. At the continental extent
-    # Russia arrives with the 52°E data cut in it — a straight slant across
-    # the top right of the opening, which is the rendering fault
-    # `constel_defs` drops the whole context to avoid and the homepage hero
-    # spends 320 units of fade on. Neither escape is available here: the
-    # sliced ring is a MEMBER rather than context, and reframing cannot lose
-    # it without losing the Caucasus, whose easternmost destination projects
-    # within a hundred units of the cut. The atlas already has an answer for
-    # exactly this, one family over — the Russia portrait cannot fix the
-    # picture either, so it says so under the drawing. The number is read off
-    # the dataset's own bbox rather than typed.
-    heroart = region_glyph(list(data["countries"]))
-    lim = (geo.load("europe-lod1.json") or {}).get("bbox", [None, None, None])[2]
-    cutsay = (f" Russia's outline stops at {lim:.0f}°E, where this atlas's map "
-              f"data ends, not at a border.") if lim is not None else ""
-    # THE 2036 SEQUENCE: A MAP, THEN THE CONTINENT DIVIDED, THEN THE ROWS.
-    # The brief's /countries opens on the stage, states where the countries
-    # sit, and then lets a reader choose one — which is the order a person
-    # actually uses an atlas in, and it is not the order this page had. What
-    # it does NOT do is flatten the nine macro regions into one list of
-    # fifty: each band drawing its own members on its own frame is what tells
-    # the Nordics from the Caucasus before a word is read, and that is the
-    # measurement that rebuilt this family in the first place. So the
-    # sequence is the brief's and the grouping is kept.
+            f'<section class="macroband" id="{esc(m["slug"])}">'
+            f'<div class="macrotop">'
+            f'<div class="macrosay">'
+            f'<p class="ed-eyebrow">{n_of(len(m["countries"]), "country")} · '
+            f'{n_of(mcity, "destination")}</p>'
+            f'<h3><a href="{urls.macro(m)}" class="nodec">{esc(m["name"])}</a></h3>'
+            f'<p class="rowsub">{esc(m["blurb"])}</p></div>'
+            f'<figure class="macroshot">{pic}</figure>'
+            f'<figure class="macroart">'
+            f'{region_glyph(m["countries"], macro_frame(data, m))}</figure>'
+            f'</div>{ed_rows(rows, level=4)}</section>')
+    regband = f"""
+  <div class="sheettext">
+    <h2 class="mega">The {numword(len(data['macros']))} regions.</h2>
+    <p class="lede">Editorial travel regions rather than administrative
+    ones: they group places that feel like each other and are usually
+    visited together. The shape beside each is the countries that region is
+    made of, framed on its own ground rather than on the continent.</p>
+  </div>
+  <div class="macrostack">{''.join(blocks)}</div>"""
+
+    # ── 06 · THE PHOTOGRAPHIC ATLAS ──────────────────────────────────
+    atlasband = ""
+    if band:
+        atlasband = f"""
+  <div class="sheettext">
+    <h2 class="mega">{numword(len(band) + 1, cap=True)} of them, filled.</h2>
+    <p class="lede">The same drawing at a smaller size, {numword(len(band))}
+    more times. Every outline is the country's own and every photograph is of
+    the country inside it &mdash; taken in the order of how much of each one
+    this atlas can show, skipping the ones whose outline is too expensive to
+    inline rather than stopping at a number somebody chose.</p>
+  </div>
+  <div class="doorstack">{''.join(m for _c, _n, m in band)}</div>"""
+
+    # ── 07 · WHICH DOOR ──────────────────────────────────────────────
+    close = f"""
+  <div class="atlassay">
+    <h2 class="mega">Which door will you open?</h2>
+    <p class="lede">{len(cs)} countries, {nreg} travel regions and
+    {len(data['cities'])} cities, every one of them written here. Start from
+    the continent, or from what you like.</p>
+    <p class="actions">
+      <a class="btn" href="/map">Open the map</a>
+      <a class="btn ghost" href="/discover">Start from what you like</a>
+    </p>
+  </div>"""
+
+    # THE PLATE SLUGS ARE UNIQUE ON PURPOSE. `sheet-open` is /stories', and
+    # *a class name already in the stylesheet is a rule you inherit
+    # silently* — the finding that cost four collisions in one run and has
+    # no guard. Every name here was grepped against the stylesheet before it
+    # was written, and three were changed for it: `sheet-door` is the
+    # homepage's opening plate with 29 rules, `doorgrid` is that plate's own
+    # grid, and `macroband` is KEPT because its one rule is this family's.
+    PLATES = [("atlasopen gal", "The continent", open_, "the-continent"),
+              ("atlasmap paper", "Where they sit", themap, "the-map"),
+              ("aperture gal", "The country as the door", door, "the-door"),
+              ("az gal quiet", "The index", azband, "the-index"),
+              ("regions gal", "The nine regions", regband, "the-regions"),
+              ("filled paper", "Filled", atlasband, "filled"),
+              ("atlasclose gal", "Which door", close, "which-door")]
+
     body = f"""
 {crumbs([("Europe", "/discover"), ("Atlas", None)])}
 {constel_defs()}
-{ed_opening(
-    eyebrow="The Atlas",
-    title="Europe, country by country.",
-    intro=f"{numword(len(data['macros']), cap=True)} regions, "
-          f"{len(data['countries'])} countries, "
-          f"{sum(len(c['regions']) for c in data['countries'].values())} travel regions "
-          f"and {len(data['cities'])} cities — every one of them written here rather "
-          f"than imported.",
-    visual=photo(data.get("images"), "countries-hero", w=2000, h=1500,
-                 sizes="(min-width: 52rem) 58vw, 100vw") or heroart,
-    family="atlas")}
-
-<section class="ed-section">
-{ed_section_head("The continent", "Where the countries sit",
-                 "A geographic beginning before the alphabetical one. Each of "
-                 f"the {len(data['countries'])} countries is drawn on its own, so "
-                 f"the frontiers are the picture.{cutsay}")}
-{heroart}
-<p class="actions">
-  <a class="btn" href="/map">Open the map</a>
-  <a class="btn ghost" href="/discover">Start from what you like</a>
-</p>
-</section>
-
-<section class="ed-section">
-{ed_section_head("The Atlas", "Choose a country",
-                 "The regions below are editorial travel regions rather than "
-                 "administrative ones: they group places that feel like each "
-                 "other and are usually visited together.")}
-{''.join(blocks)}
-</section>
-<p class="small">The shape beside each region is the countries that region is made
-of, framed on its own ground rather than on the continent: the drawing changes
-scale between bands, so what tells the Nordics from the Baltic States is the
-shape of the region and not its share of one map. A macro region is the one
-grouping in this atlas with real borders behind it — a travel region is a set of
-destinations and is shown as those destinations rather than given a boundary it
-does not have. {geo.sources_line(geo.load("europe-lod0.json"))}</p>
+{plate_sequence(PLATES)}
+<p class="small">A macro region is the one grouping in this atlas with real
+borders behind it &mdash; a travel region is a set of destinations and is shown
+as those destinations rather than given a boundary it does not have.
+{geo.sources_line(geo.load("europe-lod0.json"))}</p>
 """
     return "/countries/index.html", page(
-        "Countries", body, path="/countries", area="countries",
-        description="Every country in Europe, grouped into nine travel regions, each opening onto its regions, cities and experiences.",
+        "Countries", body, path="/countries", area="countries", hero=True,
+        description="Every country in Europe, drawn on its own frontier with a photograph of it inside the outline, grouped into nine travel regions.",
     )
 
 
@@ -6604,6 +6766,172 @@ def countrymap(data, c):
     )
 
 
+# The fewest vertices an outline needs to be a country's SHAPE rather than a
+# stand-in for a point. Twenty reproduces the six countries this atlas
+# already draws as a ringed point and admits the seventh, Luxembourg.
+COUNTRY_DOOR_POINTS = 20
+
+# HOW MUCH INLINED GEOMETRY THE PHOTOGRAPHIC BAND MAY SPEND, and this is the
+# one number on this page that is art direction rather than a derivation —
+# recorded as such, the way `DUSK_CEILING` is. All 41 drawable doors are
+# 636 KB together and Russia's outline alone is 107, so the band cannot be
+# "all of them" and a COUNT picked by eye would be taste dressed as a rule.
+# The budget is the quantity that actually binds: `weight.max_page_kb` is a
+# ceiling somebody has to raise in a diff, and the reader also pays for one
+# photograph request per door at the ladder's 480 step. So the band takes
+# doors in the derived order until the budget is spent and the page states
+# how many that turned out to be — which means the set grows on its own when
+# the geometry gets cheaper rather than when somebody edits a number.
+DOOR_BAND_KB = 90
+
+
+def country_door(data, images, c, w=900, h=560, brief=True):
+    """A country with its own photograph inside its own frontier.
+
+    THE BRIEF'S STRONGEST IDEA, AND THE MECHANISM WAS ALREADY BUILT. The
+    /countries directive asks that *"the actual country polygon on the
+    EPSG:3034 map should become the visual focus. The photograph can then
+    transition inside France's geographic boundary … so the country itself
+    becomes the aperture. This also connects beautifully with the EuropeDoor
+    name."* `heroeurope()` has drawn exactly that on the homepage since the
+    Living Atlas: a `<clipPath>` from the country's own drawn path and an
+    SVG `<image>` clipped to it. The same directive says not to invent an
+    image system, and this is what that instruction is FOR — the aperture
+    here is the clip, not a second one.
+
+    SO THE DOOR IS THE FRONTIER, AND THERE IS NO ARCH ON IT. Every other
+    map on this site is seen through the elliptical aperture, and
+    `docs/signature-moments.md` asks question 2 before a family gets one:
+    this drawing's signature moment IS an aperture — the country's own
+    outline, with a photograph of the country through it. Cutting an ellipse
+    over that would be two doors on one picture, which is the wallpaper the
+    aperture's own rule warns about.
+
+    AND THE FRAME IS THE COUNTRY'S OWN, WHICH IS THE DEPARTURE FROM THE
+    HOMEPAGE. That page draws its apertures on one continental frame and its
+    own recorded measurement says why only six of them are legible there: *a
+    photograph clipped into Belgium renders about 40 pixels wide at 1280 and
+    is a smudge with a coastline.* At roughly a pixel per unit Luxembourg is
+    eight. That is a property of the FRAME rather than of the idea — framed
+    on its own extent, as the fifty country portraits and the nine macro
+    glyphs already are, Luxembourg fills its tile exactly as Türkiye fills
+    its own. Same geometry as `countrymap()` uses, for the same reason it
+    gives: a second simplification would differ by a tenth of a unit and
+    show as a fringe along every frontier.
+
+    Returns "" for a country with no polygon and for one with no photograph,
+    because a door has to have both — Monaco and Vatican City have no
+    outline at any scale in this dataset and cannot be drawn as one.
+    """
+    key = "country:" + c["slug"]
+    if key not in (images or {}):
+        return ""
+    # AND AN ADVISORY COUNTRY IS NOT LIT, which is `living_atlas`'s own
+    # filter and the planner's. Ukraine, Russia and Belarus keep a page
+    # carrying the warning; a photographic celebration of one on the atlas
+    # index would be the opposite of that position, stated by the same site.
+    if (c.get("advisory") or {}).get("level"):
+        return ""
+    doc = geo.country(c["slug"])
+    if not doc or not doc.get("bbox"):
+        return ""
+    bbox = geo.principal_frame(doc, c["slug"])[0] or list(doc["bbox"])
+    proj = geo.Projection(bbox, w, h, pad=0.05)
+    ctx, land = geo.landmass(proj, (0, 0, w, h), doc=doc, highlight=c["slug"])
+    here = re.findall(r'<path[^>]*class="[^"]*\bhere\b[^"]*"[^>]*\sd="([^"]*)"',
+                      land)
+    if not here:
+        return ""
+    d = here[0]
+    nums = [float(v) for v in re.findall(r"-?\d+(?:\.\d+)?", d)]
+    xs, ys = nums[0::2], nums[1::2]
+    # AND A COUNTRY THE ATLAS DRAWS AS A POINT CANNOT BE A DOOR. The first
+    # version drew whatever outline came back, which for Monaco is FOUR
+    # points filling 659 x 480 units — a quadrilateral with a photograph in
+    # it, labelled Monaco. That is *a bounding box is not a country*
+    # arriving through the geometry rather than through a label.
+    #
+    # THE FLOOR IS MEASURED ON THE OUTLINE THIS DRAWING ACTUALLY USES, and
+    # the first attempt borrowed a test that does not apply here: asking
+    # `geo.landmass` for the country at `min_units=60` on the CONTINENTAL
+    # frame is how `constel_defs` and `region_glyph` decide what to draw,
+    # and it dropped Luxembourg — which is 5.6 units wide there and full
+    # size here, because this frame is the country's own. *A rule measured
+    # only where it loses looks like a rule that wins nowhere.*
+    #
+    # Measured at this frame, the vertex counts are 4, 7, 7, 12, 13, then
+    # 21, 33, 51 — so a floor of twenty reproduces exactly the six
+    # countries this repository already records as *having no polygon at
+    # 1:50m and drawn as a ringed point*, and admits Luxembourg, whose
+    # 21-point outline is its real shape rather than a stand-in. Two
+    # independent derivations agreeing on the same six is the evidence for
+    # the number; one of them alone would be a threshold picked to get an
+    # answer.
+    if len(xs) < COUNTRY_DOOR_POINTS or not ys:
+        return ""
+    # THE IMAGE EXTENT IS THE SUBJECT'S WHOLE BOX and `slice` crops the
+    # source into it, exactly as `object-fit: cover` does everywhere else
+    # and exactly as the Living Atlas does — anything the rectangle misses
+    # is a piece of the country drawn in stone beside a piece drawn in
+    # photograph.
+    bx, by = min(xs), min(ys)
+    bw, bh = max(xs) - bx, max(ys) - by
+    # The step is the drawn width of the subject rather than one number for
+    # every country, which is the Living Atlas's own reasoning: this is a
+    # 900-unit frame in a column about 1,150 wide, so the subject is close
+    # to its own unit count in CSS pixels and wants twice that for a retina
+    # screen.
+    href = photo_href(images, key, max(bw, bh) * 2.0)
+    if not href:
+        return ""
+    row = (images or {}).get(key) or {}
+    ident = "cd" + re.sub(r"[^a-z0-9]", "", c["slug"])[:16]
+    return (
+        f'<figure class="countrydoor">'
+        f'<svg class="instrmap atlas" data-role="illustration"'
+        f' viewBox="0 0 {w} {h}" role="img"'
+        f' aria-label="{esc(c["name"])} drawn on its own frontier, filled with a '
+        f'photograph of it">'
+        f'<defs><clipPath id="{ident}" clipPathUnits="userSpaceOnUse">'
+        f'<path d="{d}"/></clipPath></defs>'
+        f'<rect class="lyr lyr-ocean" x="0" y="0" width="{w}" height="{h}"/>'
+        f'<g class="lyr lyr-land">{ctx}{land}</g>'
+        f'<image class="cdshot" clip-path="url(#{ident})"'
+        f' x="{bx:.1f}" y="{by:.1f}" width="{bw:.1f}" height="{bh:.1f}"'
+        f' preserveAspectRatio="xMidYMid slice" href="{esc(href)}"'
+        f' aria-hidden="true"/>'
+        # THE FRONTIER GOES OVER THE PHOTOGRAPH, which is what stops it
+        # being a picture pasted on a map and makes it the country FILLED —
+        # the Living Atlas's own sentence, and the reason the line is drawn
+        # from the identical path the clip uses rather than from a copy.
+        f'<path class="cdedge" d="{d}" aria-hidden="true"/>'
+        f'</svg>'
+        # NEVER EXPLAIN THE CONSTRAINT BACK. The first version gave every
+        # tile the same two sentences — *"<Country>, filled with a photograph
+        # of it and bounded by its own frontier, the outline is the
+        # aperture"* and *"Coastline and borders from Natural Earth"* — so a
+        # band of ten said one thing ten times and the only word that
+        # differed was the country's name. That is this site's own rule
+        # broken by a band of this site's own making: a reason shared by
+        # every result is hoisted once above the set and each row carries
+        # what separates it. The LEAD door keeps the sentence, because there
+        # it is the explanation rather than a repetition of one.
+        #
+        # AND THE ALT TEXT IS NOT A CAPTION. It was being printed under the
+        # picture as prose — *"Aerial view of a mountainous coastal landscape
+        # with lush greenery and scattered houses"* — which is written for a
+        # reader who cannot see the photograph and says the same thing twice
+        # to everybody who can.
+        + (f'<figcaption><span class="capsay">{esc(c["name"])}, filled with a '
+           f'photograph of it and bounded by its own frontier — the '
+           f'outline is the aperture.</span><span class="capsrc">'
+           f'Coastline and borders from <a href="/sources">Natural Earth</a>, '
+           f'public domain.</span></figcaption>' if brief else
+           f'<figcaption><span class="capsay">{esc(c["name"])}</span>'
+           f'</figcaption>')
+        + '</figure>')
+
+
 def first_sentence(text):
     """The first sentence, whole.
 
@@ -10659,8 +10987,7 @@ def stories_index(data):
     # and reparented the credit out of the `<picture>` it belongs to. The
     # browser suite found **21 links painting nothing even with focus on
     # them** — `picture:focus-within .credit` could no longer reach them.
-    # `credit=False` and the attribution composed OUTSIDE the link by
-    # `render.credit_html`, which is the one implementation of that rule.
+    # So `credit=False`, and the attribution is paid once under the row.
     shots = [st for st in byline if held(images, "story:" + st["slug"])]
     pics = "".join(
         '<figure class="picstory">'
@@ -10670,9 +10997,21 @@ def stories_index(data):
                   alt=st["title"], credit=False)
         + f'<p class="kicker">{esc(st["section"])}</p>'
         f'<h3>{esc(st["title"])}</h3></a>'
-        + f'<figcaption class="piccred">{credit_html(images["story:" + st["slug"]])}</figcaption>'
         + "</figure>"
         for st in shots)
+    # AND THE BAND PAYS ITS ATTRIBUTION ONCE, which is what every other row
+    # of pictures on this site already does — the homepage's row of eight,
+    # the destination rail, the country and theme strips, five call sites
+    # spelling `sheetcred rowcred`. Seven credits under seven tiles is the
+    # accent-on-every-row failure in a licence line: the provenance is the
+    # same kind of fact on all seven, so stating it per tile states nothing
+    # that distinguishes them and puts somebody else's brand seven times
+    # into a page that is EuropeDoor's. Once, under the row, with each
+    # photographer linked to the photograph's own page.
+    picwho = ", ".join(dict.fromkeys(
+        f'<a href="{esc(images["story:" + st["slug"]]["source"])}" rel="noopener"'
+        f' target="_blank">{esc(images["story:" + st["slug"]]["photographer"])}</a>'
+        for st in shots))
     picband = f"""
   <div class="sheettext">
     <h2 class="mega">Photographed.</h2>
@@ -10683,7 +11022,8 @@ def stories_index(data):
     there is one to carry &mdash; the page does not change, only the
     register does.</p>
   </div>
-  <div class="storypics">{pics}</div>"""
+  <div class="storypics">{pics}</div>
+  <p class="sheetcred rowcred">Photographs by {picwho} on Pexels.</p>"""
 
     # ── 05 · WHERE THEY HAPPEN ───────────────────────────────────────
     # THE DRAWING IS HERE RATHER THAN AT THE TOP, AND THAT IS THE PAGE'S

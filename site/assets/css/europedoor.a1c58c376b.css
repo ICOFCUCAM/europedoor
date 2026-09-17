@@ -8037,7 +8037,13 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
 .ed-row:hover, .ed-row:focus-visible { padding-inline: var(--s5); background: var(--ed-paper); }
 @media (prefers-reduced-motion: reduce) { .ed-row { transition: none; } }
 .ed-row-number { font-family: var(--ed-mono); font-size: var(--t-xs); color: var(--ed-pine); }
-.ed-row h3 {
+/* THE LEVEL IS THE OUTLINE AND THE CLASS IS THE LOOK, so the selector takes
+   both levels a row's name is emitted at. `ed_rows(level=4)` exists for one
+   caller — /countries nests its country rows inside a macro region's `<h3>`
+   — and a rule reading only `h3` would have left those fifty names at the
+   browser's default size on the atlas index. Same fix as the `:is(h2, h3)`
+   pass that moved a sixth of the site off a flattened outline. */
+.ed-row :is(h3, h4) {
   font-family: var(--ed-serif); font-weight: 400;
   font-size: var(--ed-display-3); margin: 0;
 }
@@ -11273,8 +11279,21 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    every row. Column-major is right here because the order is the ledger's,
    newest first, down the left. */
 .storypics { columns: 2; column-gap: var(--s8); margin-top: var(--s7); }
-.picstory { display: block; break-inside: avoid; text-decoration: none;
-            color: inherit; margin: 0 0 var(--s8); }
+.picstory { break-inside: avoid; margin: 0 0 var(--s8); }
+/* THE TILE STOPPED BEING THE LINK AND THREE OF ITS FOUR DECLARATIONS STAYED
+   BEHIND, AND ONE OF THE THREE WAS VISIBLE. `.picstory` was an `<a>` and
+   became a `<figure>` when the credit's own two links forced the anchor
+   inside it. `display: block` then restated what a `<figure>` already
+   computes and `color: inherit` restated `a { color: inherit }`, so the
+   dead-rule scan named both — and `text-decoration: none` was the third,
+   sitting on a box that is not a link while the UA's `underline` applied to
+   the anchor's own subtree. Measured by serving the stylesheet with and
+   without an override: THE SEVEN STORY TITLES IN THIS BAND WERE UNDERLINED,
+   in a family whose h3 is 34px of display serif. A dead declaration is the
+   SYMPTOM here rather than the fault — two of the three changed nothing and
+   the third changed the wrong element, and only the scan looks for either.
+   The decoration belongs on the thing that is decorated. */
+.picgo { text-decoration: none; }
 .picstory :is(picture, img) { display: block; width: 100%; height: auto;
                               aspect-ratio: 16 / 9; object-fit: cover; }
 /* 16/9 AND NOT WIDER, because `data/image-purposes.json` declares ONE
@@ -11291,11 +11310,18 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    painting nothing even with focus on them**: present, placed, sized,
    keyboard-reachable and unseeable, on the attribution a licence requires.
    This repository already records the same trap on a thumbnail row.
-   So the credit sits UNDER the tile, outside the link, always visible —
-   which is the better answer for a licence anyway, since the standard
-   `.credit` is hover-revealed and this one never is. */
-.piccred { margin: var(--s2) 0 0; font-size: var(--t-xs); color: var(--ink-3); }
-.piccred a { color: inherit; }
+   THE FIRST FIX PUT SEVEN ALWAYS-VISIBLE CREDITS UNDER SEVEN TILES, which
+   removed the defect and answered a question nobody had asked: it made
+   somebody else's brand a repeating element of a EuropeDoor page. The
+   owner's standing position is that provenance is invisible infrastructure
+   unless a legal requirement asks for it on that particular surface, and
+   the site had already answered this five times — `sheetcred rowcred`,
+   once under the row, on the homepage's eight, the destination rail and
+   the country, theme and macro strips. Seven identical credit lines are
+   the *accent on every row of a list* failure in a licence line: the
+   provenance is the same kind of fact on all seven, so per-tile it states
+   nothing that distinguishes them. No `.piccred` rule survives; the band
+   takes the class the other five already use. */
 .picstory .kicker { margin: var(--s4) 0 var(--s2); }
 .picstory h3 { font-family: var(--display); font-size: var(--t-3xl);
                line-height: 1.12; margin: 0 0 var(--s3); }
@@ -11363,4 +11389,157 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 @media (max-width: 62rem) {
   .storypics { columns: 1; }
   .storybleed { aspect-ratio: 16 / 9; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   /countries — THE EUROPEAN ATLAS
+   Seven plates: the continent, the map, the country as a door, the index,
+   the nine regions, the photographic atlas, the closing door. The brief's
+   own grammar, and its own refusal: *the map provides authority, photography
+   provides emotion, and the index provides navigation. Build those as
+   distinct layers and do not collapse them into generic cards.*
+
+   EVERY CLASS BELOW WAS GREPPED AGAINST THIS FILE FIRST. `sheet-door` is the
+   homepage's opening plate and carries 29 rules; `doorgrid` is that plate's
+   own grid. Both were reached for here and both were renamed. That check
+   takes a second and there is no automated guard for it — the four
+   collisions /plan and /stories produced are all recorded above.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 01 the continent ─────────────────────────────────────────────────── */
+.sheet-atlasopen { display: grid; gap: var(--s7);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; }
+.sheet-atlasopen .sheettext { align-content: center; }
+/* A DECLARED BOX RATHER THAN THE PHOTOGRAPH'S OWN PROPORTION, because the
+   crop box is measured and asserted: `countries-hero` declares
+   `.ed-opening-visual` at 0.692–1.643 and this container has to stay inside
+   a band the arithmetic can hold. 4/3 down to one column, where the picture
+   is above the words and a tall crop would push them off the screen. */
+.atlasopen { aspect-ratio: 4 / 3; overflow: hidden; position: relative; }
+.atlasopen :is(picture, img, svg) { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── 02 the map ───────────────────────────────────────────────────────── */
+/* THE DRAWING IS THE BAND AND THE TYPE IS ABOVE IT, which is the opposite
+   arrangement from every other plate here and is what the brief asks for:
+   *a large light European map, not the dark instrument treatment, on an
+   almost-white field*. Capped by VIEWPORT HEIGHT rather than by a fixed
+   number — /map already records that capping a continent by its column
+   buys empty page either side, and the reverse (capping by height alone)
+   letterboxes the drawing inside a full-width wrap. Both, so neither. */
+.atlasmap { margin: var(--s6) auto 0; width: 100%;
+  max-width: min(100%, calc(72vh * 1000 / 780)); }
+.atlasmap .constel { width: 100%; height: auto; }
+.sheet-atlasmap .actions { margin-top: var(--s6); }
+
+/* ── 03 the country as the door ───────────────────────────────────────── */
+/* THE COUNTRY'S OWN OUTLINE IS THE APERTURE, so there is no arch on it.
+   `docs/signature-moments.md` asks question 2 before a family gets a door:
+   this drawing's signature moment IS one — a photograph of the country seen
+   through the country — and cutting an ellipse over that is two doors on one
+   picture, which is the wallpaper the aperture's own rule warns about. */
+.sheet-aperture { display: grid; gap: var(--s7);
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, .65fr); align-items: center; }
+.sheet-aperture .sheettext { grid-column: 1 / -1; }
+.countrydoor { margin: 0; }
+.countrydoor .instrmap { width: 100%; height: auto; }
+/* AND THE SEA HAD NO FILL, SO IT WAS BLACK. `.instrmap svg { background:
+   none }` is right — a map figure must paint no background, which is what
+   makes an aperture an aperture rather than a panel — so the water is a
+   drawn rect, and a drawn rect no rule reaches takes the SVG default. That
+   default is black, *the one colour this palette does not contain*, which
+   this stylesheet already records about a `<stop>`. Ten countries came out
+   as photographs floating on night. `--atlas-sea` resolves per world and
+   these plates are pictures, so it is the light map's pale water. */
+.countrydoor .lyr-ocean { fill: var(--atlas-sea); }
+.countrydoor figcaption { margin-top: var(--s3); }
+/* The frontier goes OVER the photograph, which is what stops it being a
+   picture pasted on a map and makes it the country FILLED — the Living
+   Atlas's own sentence. Non-scaling, because `country_door` frames each
+   country on its own extent and a user-unit stroke is a different weight on
+   every one of them: Luxembourg's frame is a fiftieth of Türkiye's. */
+.cdedge { fill: none; stroke: var(--map-border); stroke-width: 1.6;
+  vector-effect: non-scaling-stroke; }
+.doorsay { align-self: center; }
+/* 1.25 RATHER THAN A VALUE CHOSEN FOR THIS LINE. The register holds eight
+   line-heights and `css.line_heights` caught a ninth in the run that
+   introduced it — 1.24, a hundredth from one the site already has, which is
+   the *rounding error with a token name* this stylesheet refuses for a
+   surface ladder arriving in the type scale. */
+.doorsay .dsay { font-family: var(--display); font-size: var(--t-2xl);
+  line-height: 1.25; margin: var(--s2) 0 var(--s4); }
+.doorsay .small { margin: 0 0 var(--s5); }
+
+/* ── 04 the index ─────────────────────────────────────────────────────── */
+/* TYPE AND NOTHING ELSE. *The index provides navigation* — so no picture, no
+   count per row, no tagline: fifty names a reader scans. `columns` rather
+   than a grid because the groups are wildly uneven (S holds seven, D holds
+   one) and a grid row is as tall as its tallest cell, which is the 1,400
+   pixels of empty page the /experiences categories paid before they moved
+   to columns. */
+.azindex { columns: 4; column-gap: var(--s6); margin-top: var(--s6); }
+.azgroup { break-inside: avoid; margin: 0 0 var(--s5); }
+.azletter { font-family: var(--display); font-size: var(--t-2xl);
+  line-height: 1; margin: 0 0 var(--s2); color: var(--door); }
+.azlist { list-style: none; margin: 0; padding: 0; }
+.azlist li { margin: 0 0 var(--s1); }
+.azlist a { text-decoration: none; }
+.azlist a:hover { text-decoration: underline; text-underline-offset: .18em; }
+/* `--warn`, NOT `--warn-ink`. The second name does not exist, and the
+   unresolvable-`var()` check named it in the first run — the guard this
+   stylesheet already carries three paragraphs about, catching a fourth
+   instance of the same thing in the commit that writes one more. */
+.azwarn { font-size: var(--t-xs); letter-spacing: .06em;
+  text-transform: uppercase; color: var(--warn); }
+
+/* ── 05 the nine regions ──────────────────────────────────────────────── */
+/* THE PHOTOGRAPH, THE GLYPH AND THE WORDS ARE THREE TRACKS, and the first
+   version had no rule at all so all three stacked: the band measured 18,773
+   pixels of a 30,759-pixel page, with each macro photograph rendering 812
+   pixels tall because nothing had told it a proportion. That is 59% of the
+   page in one band — the fault this repository has twice thrown a page away
+   for, arriving through an absent rule rather than a wrong one. */
+.macrostack { margin-top: var(--s6); }
+.macroband { padding: var(--s6) 0; border-top: 1px solid var(--rule); }
+.macroband:first-child { border-top: 0; }
+.macrotop { display: grid; gap: var(--s5); align-items: center;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, .95fr) minmax(0, .7fr); }
+.macrosay h3 { font-family: var(--display); font-size: var(--t-3xl);
+  line-height: 1.12; margin: var(--s1) 0 var(--s2); }
+.macrosay .rowsub { margin: 0; color: var(--ink-2); font-size: var(--t-sm); }
+.macroshot { margin: 0; aspect-ratio: 3 / 2; overflow: hidden; position: relative; }
+.macroshot :is(picture, img) { width: 100%; height: 100%; object-fit: cover; }
+.macroart { margin: 0; }
+.macroart .constel { width: 100%; height: auto; }
+
+/* ── 06 the photographic atlas ────────────────────────────────────────── */
+/* TWO ACROSS, BECAUSE THE SUBJECT IS THE OUTLINE. One per row is the stack
+   the first version shipped — 4,669 pixels for ten doors — and four across
+   makes Luxembourg's frontier a squiggle: each of these is framed on its
+   OWN extent, so the tile width is the country's whole width, and the thing
+   a reader is meant to read is the shape. */
+.doorstack { display: grid; gap: var(--s5) var(--s5); margin-top: var(--s6);
+  grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* ── 07 which door ────────────────────────────────────────────────────── */
+.atlassay { text-align: center; }
+.atlassay .lede { margin-inline: auto; }
+.atlassay .actions { justify-content: center; }
+
+@media (max-width: 62rem) {
+  .azindex { columns: 3; }
+  .macrotop { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .macrosay { grid-column: 1 / -1; }
+}
+@media (max-width: 52rem) {
+  /* A TWO-COLUMN OPENING MUST NOT SPLIT BEFORE THERE IS ROOM FOR TWO —
+     measured on /journeys at 834, where the same 226 characters went from
+     four lines to eight the moment column one became 302 pixels. */
+  .sheet-atlasopen, .sheet-aperture { grid-template-columns: minmax(0, 1fr); }
+  .doorstack { grid-template-columns: minmax(0, 1fr); }
+  .azindex { columns: 2; }
+  .macrotop { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 44rem) {
+  .azindex { columns: 2; }
+  .atlasopen { aspect-ratio: 3 / 2; }
 }

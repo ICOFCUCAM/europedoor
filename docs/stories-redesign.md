@@ -199,3 +199,26 @@ serving the old HTML resolves to a filename that no longer exists and lays
 out unstyled. A number obtained that way would be a measurement of nothing,
 which is the failure this repository records about a sampler reading outside
 its own image.
+
+**AND THE FIX FOR THE NESTED ANCHOR LEFT THREE OF THE TILE'S FOUR
+DECLARATIONS BEHIND, ONE OF WHICH A READER COULD SEE.** `.picstory` was an
+`<a>` carrying `display: block`, `break-inside: avoid`, `text-decoration:
+none`, `color: inherit` and a margin. Making the credit's own two links legal
+moved the class onto the `<figure>` and put the anchor inside it — and the
+declarations stayed on the class:
+
+| declaration | after the move |
+|---|---|
+| `break-inside: avoid`, `margin` | still the tile's, correct |
+| `display: block` | a `<figure>` already computes it — **dead** |
+| `color: inherit` | `a { color: inherit }` already does it — **dead** |
+| `text-decoration: none` | on a box that is not a link, while the UA's `underline` applies to the anchor's subtree |
+
+The dead-rule scan named the first two and the third is the one that mattered:
+measured by serving the stylesheet with and without an override, **the seven
+story titles in the photographed band were underlined** — 34px of display
+serif with a rule through it, in the commit that fixed the credit. A dead
+declaration is the **symptom** here rather than the fault: two of the three
+changed nothing and the third changed the wrong element, and only the scan
+looks for either. `.picgo { text-decoration: none }` puts the decoration on
+the thing that is decorated.
