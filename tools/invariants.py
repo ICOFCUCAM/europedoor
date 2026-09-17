@@ -447,6 +447,17 @@ def measure():
                        "the page where two were, for one `<img>` fewer. A "
                        "contents page that illustrated every line would be "
                        "the grid again with smaller pictures. "
+                       "1151 -> 1179 WHEN /experiences BECAME THE EXPERIENCE "
+                       "ATLAS. Twenty-eight photographs on one page: the "
+                       "opening, ten destinations down the kind index, four "
+                       "under `same feeling`, eight categories, ten in the "
+                       "strip and three stories — and NOT ONE WAS ACQUIRED "
+                       "FOR IT. The register held all of them and the page "
+                       "before this spent exactly one, on a head, with a "
+                       "strip of eight under it. The standing answer to why a "
+                       "travel site has so few pictures is the library, and "
+                       "this is the one page where that was not the "
+                       "constraint: the pictures were already bought. "
                        "1144 -> 1151 WHEN /discover ANSWERED ITS OWN "
                        "QUESTION IN PICTURES. The instrument re-lit the "
                        "continent and then handed the reader a list of "
@@ -597,7 +608,18 @@ def measure():
                        "door is CORRECTLY absent, because an instrument is not a "
                        "picture of somewhere, and /discover draws the same "
                        "instrument. It had been carrying a picture's frame around "
-                       "a tool. One page, decided, and the floor holds under it."},
+                       "a tool. One page, decided, and the floor holds under it. "
+                       "753 -> 754 WHEN /experiences GOT ITS GEOGRAPHY BACK, "
+                       "and it is the same rule read the other way. The index "
+                       "had NO drawing: it used to open on 197 dots at the "
+                       "full extent, in the same arch in the same position as "
+                       "/stories and /countries, and that was correctly "
+                       "removed. What it has now is not an opening, it is the "
+                       "fifth band of nine — a picture of where a thing can be "
+                       "DONE, on the light map set, answering a question the "
+                       "rows underneath it cannot. The door belongs on it "
+                       "because it is a picture of somewhere, which is exactly "
+                       "the test /discover's map fails."},
             "plates.page_share": {
                 "value": round(sum(1 for b in bodies.values()
                                    if re.search(r'class="[^"]*(?<![\w-])plate(?![\w-])', b))
@@ -774,7 +796,22 @@ def measure():
                        "thousandth because one page in 1,034 composes without "
                        "them: the index is seventeen rows and a shared "
                        "silhouette, ordered by reach, and it carries no note "
-                       "panel, no facts table and no chip row. AND THE 2036 PAGE SYSTEM IS A MIGRATION, which is what these numbers do from here: /countries moved its fifty rows from `row` to `ed-row` and the old figure fell by one page, 0.888 to 0.887, while the new one rose from nothing. Six ed- primitives are counted from this commit so the transfer is visible as a transfer — a register watching only the set being left reads every step of a deliberate migration as a loss, and cannot tell it from a family that quietly stopped listing anything at all. AND `row` FELL 0.887 TO 0.769 WHEN 255 PLACE PAGES STOPPED PRINTING ONE SET TWICE: the other places in the town were a strip of pictures AND a band of rows carrying the sentence each picture could not, adjacent, on 220 of the 255 — both numbered 01, because the typed section index and the CSS band counter were two numbering systems on one page. The tile carries the sentence now and the second band is gone, so pages with no other list lost their last row. A removal of duplication, not a family growing its own components. AND THE DISCOVERY FAMILY TOOK `pagehead` ONE PAGE, 0.230 to 0.229: /interests was the last index still opening on the old head — a kicker, an h1 and a lede over seventeen drawings of the same continent, with no photograph anywhere on a page whose subject is what you are travelling FOR. It opens on `ed-opening` now, carrying the `interests-hero` purpose that was declared and unreached, and the seventeen shapes keep their section because reach is the one argument no single tag page can make."},
+                       "panel, no facts table and no chip row. AND THE 2036 PAGE SYSTEM IS A MIGRATION, which is what these numbers do from here: /countries moved its fifty rows from `row` to `ed-row` and the old figure fell by one page, 0.888 to 0.887, while the new one rose from nothing. Six ed- primitives are counted from this commit so the transfer is visible as a transfer — a register watching only the set being left reads every step of a deliberate migration as a loss, and cannot tell it from a family that quietly stopped listing anything at all. AND `row` FELL 0.887 TO 0.769 WHEN 255 PLACE PAGES STOPPED PRINTING ONE SET TWICE: the other places in the town were a strip of pictures AND a band of rows carrying the sentence each picture could not, adjacent, on 220 of the 255 — both numbered 01, because the typed section index and the CSS band counter were two numbering systems on one page. The tile carries the sentence now and the second band is gone, so pages with no other list lost their last row. A removal of duplication, not a family growing its own components. AND THE DISCOVERY FAMILY TOOK `pagehead` ONE PAGE, 0.230 to 0.229: /interests was the last index still opening on the old head — a kicker, an h1 and a lede over seventeen drawings of the same continent, with no photograph anywhere on a page whose subject is what you are travelling FOR. It opens on `ed-opening` now, carrying the `interests-hero` purpose that was declared and unreached, and the seventeen shapes keep their section because reach is the one argument no single tag page can make."
+                       "AND THE EXPERIENCE ATLAS COST FIVE OF THEM ONE "
+                       "PAGE EACH, WHICH IS ONE FAMILY OF ONE. /experiences "
+                       "was forty-two `.row`s: 24 experiences, 8 category "
+                       "bars and 10 kind bars, plus the `.band`, `.btn`, "
+                       "`.ed-section` and `.ed-eyebrow` that came with "
+                       "`indexhero()` and `section()`. It is nine plates now "
+                       "and it uses none of those — the plate sequence is "
+                       "`actmark` and `.sheettext`, which is the same "
+                       "vocabulary the homepage and /discover already use, so "
+                       "this is not a family growing its own components. "
+                       "row/band 0.769 -> 0.768, btn 0.642 -> 0.641, "
+                       "ed-section 0.836 -> 0.835, ed-eyebrow 0.781 -> 0.780. "
+                       "One page each is what a single index leaving a "
+                       "primitive looks like, and the composition that caused "
+                       "it is in the same commit."},
         },
     }
 

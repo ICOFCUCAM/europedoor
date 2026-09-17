@@ -15,6 +15,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | doing | read |
 |---|---|
 | **the mandate: what a first-class gateway to Europe would be, and where this one is not** | **`docs/first-class-audit.md`** — 27 surfaces rendered at 1280 and 390 and then measured. Three findings, and Finding 1 is now closed on the numbers: it read 12 of 23 surfaces effectively type to the fold with seven showing no picture at all, and reads **3 of 30 with none and none under a fifth**, median share 24% → 35.6% (CORRECTED twice — the first version said 21 of 22 and was reading where the first figure STARTS rather than how much of the screen it fills). `tools/opening.js` is the instrument, so the number is checkable in a minute. **Finding 2's other half is measured too** — it says the page is the same page and its evidence only ever covered the first 250 pixels: `tools/composition.js` reads the band sequence under the head and finds **29 distinct body shapes over 47 families**, and three h1 sizes at tops 136–745 where the original reading was one size at 150–312. The eight benchmark sites are BLOCKED by the egress proxy and the benchmark half is labelled second-hand |
+| **/experiences — the third instrument, and why it is photography rather than a map** | **`docs/experiences-redesign.md`** — the source audit, the image-coverage audit, the twelve bands of the brief mapped onto what this atlas actually holds, the two that are refused, and the seven defects only rendering found. 311 photographs, and on this one page the library was never the constraint |
 | **the eight page families, and what each room does differently** | **`docs/non-home-redesign.md`** — the non-home redesign answered A-J. The eight rooms derived from the route, the three helpers that were forcing one grammar, the seven image scales, 1,626 declared surfaces, and the defects only rendering found |
 | **the design language — what makes a page EuropeDoor with the logo removed, and which movements each family takes** | **`docs/design-language.md`** — the ARCHITECT step. Five marks that could not have been made by anybody else, the six-movement composition grammar per family, the three head roles, what the language forbids, and how a change is proved |
 | **anything at all — read this first, every session** | **`docs/instruction.md`** — the standing instruction. Part 1 is how work is done here (audit first, deviate with numbers, STOP on licensing, never invent data, prove every check can fail). Part 2 is the visual instruction: **European Future**, the two worlds, the palette, the 60/25/10/5 ratio and the measured contrast limits. `docs/palette.json` is the checkable form |
@@ -4500,6 +4501,120 @@ the register holds eight. Both were caught in the same run — the first by the
 unresolvable-`var()` check, the second by `css.line_heights` — which is the
 whole argument for those two guards existing.
 
+
+
+**THREE PAGES, THREE INSTRUMENTS, AND /experiences WAS FORTY-TWO ROWS OF ONE
+COMPONENT.** /discover asks what you are looking for and answers with an
+instrument; /countries asks where it is and answers with geography; this one
+asks what you want to DO, and the only honest answer to that is a photograph.
+What it had was one photograph, a strip of eight, and then 24 experiences, 8
+category bars and 10 kind bars — every one of them a `.row`. Nothing in it was
+wrong: the bars are a real comparison and putting the experiences before the
+taxonomy was itself a repair. The fault is the sum, and it is the data's shape
+as the layout — the finding that rebuilt /journeys, /europe-in, /themes and the
+stories index, arriving last on the family that could least afford it.
+
+**AND THE LIBRARY WAS NOT THE CONSTRAINT, WHICH IS WORTH SAYING ONCE.** The
+standing answer to "why does a travel site have so few pictures" is the
+register, and on this page it does not apply: 311 photographs are licensed,
+including all eight categories, all nine macro regions, the hero and 65
+destinations, and every one of the ten kinds happens somewhere this atlas holds
+a picture of. Nothing was acquired. The pictures were already bought and were
+being spent on one strip. 1 photograph to 28, and the page is 32.1% photograph
+at 1280 and 45.6% at 390 against /discover's 5.2%.
+
+**TWO OF THE BRIEF'S TWELVE BANDS ARE REFUSED AND EACH SAYS WHY.** *Seasons*
+is four authored claims: an experience record carries a slug, a name, a kind, a
+band and a summary, and **no season and no month on any of the 197**. The
+nearby temptation is worse than the refusal — the destinations carry month
+data, so the band could be built from WHERE the thing happens and labelled as
+though it were about the thing, which is the `pop_line` failure, where coverage
+that depends on a different field being present looks like a policy. The
+trigger is a `season` field on the experience record. And *choose your Europe*
+is the same ten kinds a third time: the index band already prints all ten with
+their counts and a place, so a natural-language restatement of them is the
+fault this file records about a place page printing one set as a strip and
+again as rows.
+
+**KIND BY MACRO REGION, AND THE AXIS WAS CHOSEN BY MEASURING BOTH.** Two
+thirds of every experience here is `family` or `adventure` — 131 and 124 of 197
+— so their regional breakdown says EVERYWHERE, which is true and is not an
+insight, and is the exact sentence `docs/signature-moments.md` refuses a
+category map for. The KINDS are exclusive and the answer changes: the water is
+the Nordics (11 of 25), the sacred sites are the Mediterranean (8 of 13), the
+wildlife is the Nordics (6 of 10). A kind whose largest corner holds under a
+third of it is left off the band rather than printed with a number that reads
+as a finding.
+
+**A CLASS NAME ALREADY IN THE STYLESHEET IS A RULE YOU INHERIT SILENTLY.**
+This file records the rule against a second NAME for one colour twice.
+`.doorgo` is the other end of it — one name for two things — and it had no
+guard at all. The name belongs to the homepage's four doors, which reveal
+their go-link on hover: `opacity: 0` at rest, declared hundreds of lines above
+the composition that reused it. So the two links closing /experiences were
+present, placed, sized, keyboard-reachable and painted at zero alpha, and
+**nothing on this site could see it**: `getComputedStyle` reads `visibility:
+visible` and `opacity: 1` on the link itself, because the zero is two elements
+up; the contrast sweep reads declared colours and the ratio was right; the
+clipping scan asks whether an element holds more text than it shows and it
+showed all of it; the layout sweep measured 732 x 21 in the right place. Only
+walking the ancestor chain for the composited alpha finds it.
+
+The browser suite now focuses **every link on every family** and asks
+`checkVisibility({ checkOpacity: true })`. It focuses first on purpose: a
+hover-revealed link is a real pattern this site ships — the four doors, the
+licence credit on a photograph — and every one of those reveals on
+`:focus-visible` too, because a link a keyboard reaches has to become visible
+when it does. So one test admits the pattern and refuses the accident.
+
+**AND THE PINE ROOM LOST TO THE WHITE ONE.** The stories plate was given both
+`sheet-gal` and `sheet-pine`: the first paints `--white`, the second rebinds
+the world's ink to bone, and both are (0,1,0) with `.sheet-gal` further down
+the file. Bone on white, every word on the band, at about 1.1:1 — the fourth
+specificity collision in this stylesheet that rendered as *the thing is simply
+not there*. The answer is the same every time: not a third class, but stop
+asking two rules to agree.
+
+**A GRID'S TRACKS ARE POSITIONAL AND THE MARKUP ORDER IS THE LAYOUT.**
+`3rem 9.5rem 1fr 7rem` with the kind rows written number, name, picture put
+"Walk or hike" in a 152-pixel column and the photograph in the 768-pixel one:
+a 1,024-pixel-tall crop, ten times, and a band **11,127 pixels long**.
+
+**TWO TILES DREW ONE PHOTOGRAPH, WHICH IS *ONE THING, ONE PICTURE* FROM THE
+OTHER END.** The obvious picture for "the water is the Nordics" is
+`macro:nordic` — and the museums are the Nordics too, and the cellars and the
+tables are both the Mediterranean, so four tiles came out as two photographs
+side by side twice. Not one record with two pictures; one picture on two
+records. The tile takes a photographed DESTINATION inside the group instead,
+which is more specific anyway, and a key already spent is skipped.
+
+**AND `columns` PACKS WHERE A GRID ALIGNS.** The eight categories are drawn at
+four scales — large, narrow, panoramic, intimate — and a two-column grid makes
+a row as tall as its tallest item, so a 21:9 panorama beside a 3:4 portrait
+paid 340 pixels of empty page for the difference, four times down the band.
+1,400 pixels. `columns: 2` with `break-inside: avoid` is the whole fix, and the
+column-major order is correct here because it is largest-first down the left.
+
+**LAZY IMAGES DO NOT LOAD FOR A FULL-PAGE SCREENSHOT.** `loading="lazy"` keys
+on the viewport and `fullPage` stitches without scrolling, so every picture
+below the fold photographs as an empty box — and an empty box under a scrim
+looks exactly like a photograph that is not there. The first sheet of this page
+showed eight grey rectangles and was read as eight missing photographs; the
+register held all eight. Any instrument that shoots a page taller than the
+viewport has to scroll it first.
+
+**AND THE STYLESHEET SHIPPED 1,813 DUPLICATED LINES IN HEAD.** An edit wrote
+the whole plate-and-discover region twice with 50 KB of other rules between the
+copies, so the later copy silently overrode every rule written between them —
+which is why `.sheet-response { display: block }` had lost. A second, 85-line
+copy of *the one window* was found the same way. Both were asserted
+byte-identical before deletion and the homepage was shot at 1280 and 390 before
+and after, **byte-identical at both widths**, because nothing here is deleted
+on a scan's word alone. A comment beside the white wall claimed `checks.py`
+asserts no other page takes `--white`; **no such check exists, in that file or
+in any other suite**, and /discover has taken it for three rests since it was
+rebuilt. A comment claiming an assertion that does not exist is worse than no
+comment, because it is read as evidence.
 
 
 ## Gates

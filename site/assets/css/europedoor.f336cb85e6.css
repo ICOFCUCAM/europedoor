@@ -9624,91 +9624,6 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
 .figrow div span { font-family: var(--text); font-size: var(--t-xs);
   letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
 
-/* ── the one window ──────────────────────────────────────────────── */
-/* A WINDOW IS NOT THE WHOLE WALL, AND MEASURING IT IS WHAT SAID SO. The
-   first version was the viewport: `position: fixed; inset: 0`, the picture
-   standing still while the band scrolled past, with the headline over it
-   behind a scrim. The effect was right and the CROP was indefensible —
-   measured over the twenty viewports the suite sweeps, the box ran 0.356
-   at 320x900 to 3.125 at 2000x640, which guarantees **9%** of a
-   photograph's frame. This site refuses a purpose under 12% and its own
-   sentence for that number is *a slot that destroys whatever is put in
-   it*. A full-bleed responsive picture cannot clear it at any source
-   range: the arithmetic is 0.114 x (min/max) before the source is even
-   chosen.
-
-   So the aperture states its own proportion and fits inside the viewport
-   rather than filling it. 16:9 on a wall, 4:5 on a phone, and nothing in
-   between — two ratios, so the box is 0.800 to 1.778 and the guaranteed
-   frame is 36%. The photograph is still fixed and still does not move;
-   what changed is that the wall is now visible around it, which is what a
-   window in a wall looks like. `clip-path` is still the one property that
-   clips a fixed descendant — see the note on the six properties that kill
-   this silently.
-
-   AND THE WORDS CAME OFF THE PICTURE. Bone type over an unlicensed
-   photograph is a contrast ratio that is a property of the picture rather
-   than of the design, which is why it needed a scrim at all; with the wall
-   around the window there is somewhere honest to put them. The label sits
-   under the work, in ink, on white — which is what a gallery does, and it
-   is the same decision `.gi` already made one plate down. No scrim, no
-   bone, no gradient, and the licence credit reads at 15.9:1 whatever the
-   photograph turns out to be. */
-/* THE CLIP BELONGS TO THE APERTURE, NOT TO THE WALL. A fixed picture is
-   painted wherever the clipped region meets the viewport, so while the band
-   is on screen at all the picture sits in the middle of it — which put the
-   label, correctly placed at the foot of the band, straight back over the
-   photograph it exists to sit beside. Clipping the band's own bottom third
-   fixed that and took the band's BACKGROUND and the label with it: a
-   `clip-path` clips the element, not only its fixed descendants, so the
-   caption was cut away entirely and the page showed through where the wall
-   should be. Found by looking at the second screenshot; no count moves.
-
-   So the aperture is its own box. `.shotclip` is an absolutely positioned
-   opening in the top of the wall — the one element that carries the clip —
-   and its lower edge sweeping down across the standing picture is a window
-   closing, which is the movement this plate is for. The wall keeps its own
-   paper and the label is on it. */
-.sheet-bleed { padding: 0 0 11vh; border-bottom: 0; display: block;
-               position: relative; min-height: 128svh;
-               background: var(--white); color: var(--ink); }
-.sheet-bleed > .actmark { padding-inline: var(--page-gutter); }
-.sheet-bleed .shotclip { position: absolute; inset: 0 0 auto 0;
-                         height: 118svh; clip-path: inset(0); z-index: 0; }
-.sheet-bleed .shotfull { position: fixed; z-index: 0;
-  aspect-ratio: 4 / 5;
-  width: min(100vw, 80svh);
-  left: 50%; margin-left: max(-50vw, -40svh);
-  top: 50%;  margin-top: max(-62.5vw, -50svh); }
-@media (min-width: 52rem) {
-  .sheet-bleed .shotfull {
-    aspect-ratio: 16 / 9;
-    width: min(100vw, 177.78svh);
-    margin-left: max(-50vw, -88.89svh);
-    margin-top: max(-28.125vw, -50svh); }
-}
-.sheet-bleed .shotfull :is(picture, img) { display: block; width: 100%;
-  height: 100%; object-fit: cover; }
-.sheet-bleed > * { position: relative; z-index: 2; }
-/* THE LABEL ARRIVES AFTER THE WORK, which is the whole reason the band is
-   150svh: the window opens, the photograph stands still for a screen and a
-   half while the wall moves past it, and then the wall carries its own
-   caption. A label level with the picture would be a caption on a card. */
-.sheet-bleed .sheettext { margin-top: 124svh; padding: 0 var(--page-gutter);
-                          max-width: 44rem; }
-/* STATIC, AND THAT WORD IS THE WHOLE FIX. `.sheetcred` is absolutely
-   positioned at the foot of a plate, which is right where the credit sits
-   over a picture; here it is a line of the wall label and it kept the
-   `position` while taking a new margin — so it laid out against the section
-   and sat 24px outside the gutter every other line on the plate uses. A
-   rule that changes two properties of a four-property component achieves
-   one thing, which this stylesheet already records about `.credit`. */
-.sheet-bleed .sheetcred { position: static; margin: var(--s5) 0 0;
-  padding: 0 var(--page-gutter);
-  font-size: var(--t-xs); color: var(--ink-3); max-width: none; }
-.sheet-bleed .sheetcred a { color: var(--ink-2); text-decoration: underline;
-  text-underline-offset: .16em; }
-
 /* ── 03 the places: a feature ────────────────────────────────────── */
 /* ASYMMETRIC AT 1.35 AGAINST .65, which is the scale
    docs/non-home-redesign.md declares and the reason it gives: two equal
@@ -10670,3 +10585,286 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 }
 
 .sheet-door.sheet-gal { position: relative; padding-bottom: 9vh; }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   /experiences — THE EUROPEAN EXPERIENCE ATLAS
+   ═══════════════════════════════════════════════════════════════════
+   THREE PAGES, THREE INSTRUMENTS, ONE INSTITUTION. /discover is the
+   instrument and is graphite; /countries is the atlas and is geography;
+   this one asks what you want to DO and the only honest answer to that is
+   a photograph. `docs/experiences-redesign.md` holds the audit.
+
+   IT TAKES THE GALLERY ROOM RATHER THAN GROWING A SECOND ONE. The white
+   wall was written for the homepage and the comment above it says
+   `checks.py` asserts no other page takes it — WHICH IT NEVER DID, in
+   this file or in any other suite. A comment claiming an assertion that
+   does not exist is worse than no comment, because it is read as evidence:
+   /discover has taken `--white` for its three rests since it was rebuilt
+   and nothing anywhere went red. The wall is the room for a plate sequence
+   that hangs photographs, and that is now two pages rather than one.
+
+   WHAT SEPARATES THIS FROM THE HOMEPAGE IS NOT THE GROUND, IT IS WHAT IS
+   ON IT. The gallery is type-led with colour only as a mark; this page is
+   picture-led, and the brief's own number is 45–60% of the visual area.
+   The rooms are the same white and the rhythm is the opposite. */
+
+/* ── 01 the invitation: the picture leaves the page ───────────────── */
+/* EVERY INDEX HERE OPENS ON A PICTURE INSIDE THE MEASURE, and that is the
+   whole of why twenty-two families read as one. This one runs past the
+   right gutter and is cut on the diagonal, so the first thing a reader
+   meets is a frame the page could not contain. The negative margin is the
+   page gutter exactly — not a number picked to look right — so the
+   photograph reaches the window edge at every width and no further. */
+.sheet-invite { display: grid;
+  grid-template-columns: minmax(0, 42%) minmax(0, 1fr);
+  gap: var(--s6) var(--s8); align-items: center; }
+.sheet-invite > .actmark { grid-column: 1 / -1; }
+.xshot { margin: 0; margin-right: calc(-1 * var(--page-gutter));
+         align-self: stretch; min-height: min(62vh, 38rem);
+         clip-path: polygon(9% 0, 100% 0, 100% 86%, 82% 100%, 0 100%, 0 12%);
+         background: var(--mineral); }
+.xshot :is(picture, img) { display: block; width: 100%; height: 100%;
+                           object-fit: cover; }
+.sheet-invite h1.mega { margin: 0; }
+.sheet-invite .lit { font-style: normal; color: var(--pine-ink); }
+
+/* ── 02 the field: the type IS the navigation ─────────────────────── */
+/* NO CARD GRID, AND THE ROW IS NOT A `.row` EITHER. `.row` carries a name
+   and a sentence at reading size, which is right for a list you read and
+   wrong for an index you choose from: ten of them was the old page's whole
+   second half. The name is at display size, the number is the position,
+   the count is the extent, and the sliver is a photograph of a place that
+   kind actually happens in — not an illustration of the idea. */
+.kinds { border-top: 1px solid var(--rule); margin-top: var(--s7); }
+.kindrow { display: grid; align-items: center; gap: var(--s5);
+  grid-template-columns: 3.5rem minmax(0, 1fr) 7rem 9rem;
+  border-bottom: 1px solid var(--rule); text-decoration: none;
+  color: inherit; padding: var(--s4) 0; transition: padding .2s ease; }
+.kindrow:hover, .kindrow:focus-visible { padding-left: var(--s4); }
+.kindno { font-family: var(--text); font-size: var(--t-xs);
+  font-variant-numeric: tabular-nums; letter-spacing: .12em;
+  color: var(--door); }
+.kindname { font-family: var(--display); font-size: var(--t-3xl);
+             line-height: 1.12; }
+.kindrow:hover .kindname { color: var(--door); }
+/* THE SLIVER IS 3:4 AND IT IS THE ROW'S HEIGHT, which is what makes ten of
+   them read as a column of windows rather than as ten thumbnails: the
+   picture is taller than the type beside it, so the eye reads down the
+   pictures and across to the names. */
+.kindart { display: block; }
+.kindart :is(picture, img) { display: block; width: 100%; aspect-ratio: 3 / 4;
+                             object-fit: cover; }
+.kindmeta { display: grid; gap: var(--s1); justify-items: end;
+            text-align: right; }
+.kindn { font-family: var(--display); font-size: var(--t-xl);
+         font-variant-numeric: tabular-nums; }
+.kindwhere { font-family: var(--text); font-size: var(--t-xs);
+  letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+
+/* ── 03 the declaration ───────────────────────────────────────────── */
+.sheet-declare { display: block; padding: 0; border-bottom: 0;
+                 background: var(--graphite); }
+.sheet-declare > .actmark { padding: 6vh var(--page-gutter) var(--s5); }
+.sheet-declare .actno, .sheet-declare .actname { color: #9aa3a0; }
+.sheet-declare .actno { border-bottom-color: rgba(243,240,230,.2); }
+.sheet-declare .ed-declare { min-height: min(72vh, 44rem); }
+
+/* ── 04 where it happens: the light atlas ─────────────────────────── */
+/* THE OTHER DRAWING. /discover is graphite because it is a tool; this is
+   the picture family's palette — pale stone on pale water with an ink
+   coast — and the difference between the two is the single thing that
+   stops this page being that one with different words. */
+.sheet-geo { display: grid; align-items: center;
+             grid-template-columns: minmax(0, 34%) minmax(0, 1fr);
+             gap: var(--s6) var(--s8); }
+.sheet-geo > .actmark { grid-column: 1 / -1; }
+.geoart { min-width: 0; }
+.geoart figure { margin: 0; }
+
+/* ── 05 same feeling, different Europe ────────────────────────────── */
+.sheet-pairs { display: block; }
+.pairs { display: grid; gap: var(--s6);
+         grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+         margin-top: var(--s7); }
+.pairrow { display: grid; gap: var(--s4); text-decoration: none;
+           color: inherit; align-content: start; }
+.pairart :is(picture, img) { display: block; width: 100%; aspect-ratio: 4 / 3;
+                             object-fit: cover; }
+.pairsay { display: grid; gap: var(--s2); }
+.pairkind { font-family: var(--display); font-size: var(--t-xl);
+            line-height: 1.12; }
+.pairrow:hover .pairkind { color: var(--door); }
+.pairmac { font-family: var(--text); font-size: var(--t-xs);
+  letter-spacing: .12em; text-transform: uppercase; color: var(--door); }
+.pairn { font-family: var(--text); font-size: var(--t-sm);
+         font-variant-numeric: tabular-nums; color: var(--ink-3); }
+.pairwhere { font-size: var(--t-sm); color: var(--ink-2); }
+
+/* ── 06 what they are about: four scales, not eight of one ────────── */
+/* EVERY PHOTOGRAPH THE SAME SIZE IN THE SAME BOX IS A CONTACT SHEET, and
+   that is what the old page's one strip was. The rhythm is the brief's —
+   large, narrow, panoramic, intimate — and it is stated as four aspect
+   ratios on a two-column grid rather than as eight typed spans, so the
+   band is right at any number of categories the register fills. */
+.sheet-about { display: block; }
+.xstrip { display: grid; gap: var(--s5);
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          align-items: start; margin-top: var(--s7); }
+.xt { display: grid; gap: var(--s3); text-decoration: none;
+      color: inherit; }
+.xt :is(picture, img) { display: block; width: 100%; height: 100%;
+                        object-fit: cover; }
+.xt-wide  :is(picture, img) { aspect-ratio: 4 / 3; }
+.xt-tall  :is(picture, img) { aspect-ratio: 3 / 4; }
+.xt-pan   :is(picture, img) { aspect-ratio: 21 / 9; }
+.xt-close :is(picture, img) { aspect-ratio: 1 / 1; }
+/* THE LABEL IS UNDER THE PICTURE, IN THE MARGIN, WHICH IS HOW A GALLERY
+   LABELS A WORK — `.gi`'s own rule, and the reason this band can hang
+   eight photographs without reading as a catalogue. It started ON the
+   picture behind a scrim, which is right for a name alone and wrong the
+   moment the tile also carries three sample experiences: a scrim over
+   three lines of names is a caption pretending to be a picture. No scrim
+   is needed at all once the type is on paper, which is also one fewer
+   contrast that depends on what the photograph turns out to be. */
+.xtsay { display: grid; gap: var(--s1); }
+.xtn { font-family: var(--text); font-size: var(--t-xs);
+       font-variant-numeric: tabular-nums; letter-spacing: .13em;
+       text-transform: uppercase; color: var(--ink-3); }
+.xtname { font-family: var(--display); font-size: var(--t-2xl);
+          line-height: 1.12; }
+.xt:hover .xtname { color: var(--door); }
+.xtaste { font-size: var(--t-sm); color: var(--ink-2); }
+
+/* ── 07 the stories: a gallery label, never a card ────────────────── */
+.sheet-tales { display: block; }
+.gi .giline { display: block; font-size: var(--t-sm); color: inherit;
+              opacity: .8; margin-top: var(--s2); max-width: 34ch; }
+
+/* ── 09 the door ──────────────────────────────────────────────────── */
+/* `.doorgo` WAS ALREADY TAKEN, AND THAT IS A DIFFERENT FAULT FROM THE ONE
+   THIS FILE KEEPS RECORDING. The rule against a second NAME for one thing
+   is written down here twice; this is one name for two things. The
+   homepage's four doors reveal their go-link on hover — `opacity: 0` at
+   rest, declared far above and restored by `.door:hover` — so the two links
+   closing this page were present, placed, sized, keyboard-reachable and
+   painted at zero alpha. Every count was right and the DOM said
+   `visibility: visible`.
+   Found by walking the ancestor chain for opacity rather than by looking:
+   `checkVisibility({checkOpacity: true})` is false and nothing else in the
+   computed style says why, which is why the browser suite now asks that
+   question of every link on the page. */
+.keepgo { display: flex; flex-wrap: wrap; gap: var(--s5) var(--s7);
+          justify-content: center; max-width: none; }
+
+@media (max-width: 62rem) {
+  .kindrow { grid-template-columns: 2.5rem 7rem minmax(0, 1fr) 5.5rem; }
+  .sheet-geo { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 52rem) {
+  /* THE PICTURE STOPS LEAVING THE PAGE WHEN THERE IS ONE COLUMN, because a
+     diagonal cut across a full-width photograph is a crop rather than a
+     composition — the thing it is cut against is the right gutter, and on
+     a phone there is no room to the right of anything. */
+  .sheet-invite { grid-template-columns: minmax(0, 1fr); }
+  .xshot { margin-right: 0; clip-path: none; min-height: 0;
+           aspect-ratio: 4 / 5; }
+  .xstrip { grid-template-columns: minmax(0, 1fr); }
+  .xt :is(picture, img) { aspect-ratio: 4 / 3; }
+}
+@media (max-width: 44rem) {
+  /* THE SLIVER COMES OFF BEFORE THE NAME DOES. At 390 the row has 358
+     pixels for a number, a display-size name, a picture and two figures,
+     and the picture is the one of the four that says nothing a reader
+     cannot get by following the link. */
+  .kindrow { grid-template-columns: 2.2rem minmax(0, 1fr) auto; }
+  .kindmeta { grid-column: 3; }
+  .kindart { display: none; }
+}
+
+/* ── /experiences, second pass: what rendering found ──────────────── */
+/* THE PINE ROOM LOST TO THE WHITE ONE, AND THE BAND WENT BONE-ON-WHITE.
+   The stories plate was given both `sheet-gal` and `sheet-pine`: the first
+   paints `--white`, the second rebinds the world's tokens to the pine
+   ground, and the two are both (0,1,0) with `.sheet-gal` further down the
+   file. So the ink was correctly bone and the ground was white — every
+   word on the band at about 1.1:1, present, placed and unreadable. This
+   stylesheet already records three of these; the answer is the same one
+   every time, which is not to add a third class but to stop asking two
+   rules to agree. `sheet-gal` came off the slug and the pine room states
+   its own room geometry. */
+.sheet-tales { padding: 11vh var(--page-gutter); border-bottom: 0; }
+.sheet-tales .actno, .sheet-tales .actname { color: #9ab3ac; }
+.sheet-tales .actno { border-bottom-color: rgba(243,240,230,.2); }
+.sheet-tales .rowcred { margin-top: var(--s6); }
+/* AND THE HOMEPAGE'S GALLERY GRID IS COLUMN-FLOW, which is right for three
+   tiles whose captions are one line and wrong here: `grid-auto-flow:
+   column` put all three in one row whose height was the PICTURE's, so the
+   three standfirsts overflowed the grid box and the credit paragraph
+   underneath was drawn straight through them. A composition is not a
+   component — the tile is `.gi` because a gallery label under a picture is
+   exactly what these are, and the grid around it is this band's own. */
+.tales { display: grid; gap: var(--s6);
+         grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+         align-items: start; margin-top: var(--s7); }
+.tales .gi { display: grid; align-content: start; }
+
+/* THE HEAD'S LEDE SITS BESIDE ITS TITLE ON A BLOCK PLATE. `.sheettext` is
+   one column, which is right where a picture is beside it and leaves the
+   right two-thirds of a full-width band empty — measured at 350 pixels of
+   nothing under `Same feeling. Different Europe.` A head is a title and a
+   sentence about it, and on a band with nothing beside them they belong on
+   one line. */
+@media (min-width: 62rem) {
+  .sheet-pairs > .sheettext, .sheet-about > .sheettext,
+  .sheet-tales > .galwrap > .sheettext {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+    column-gap: var(--s8); align-items: end; }
+  .sheet-pairs > .sheettext > .mega, .sheet-about > .sheettext > .mega,
+  .sheet-tales > .galwrap > .sheettext > .mega { grid-row: 1; }
+}
+
+/* THE FIELD'S HEAD WAS THE INDEX HEAD IN A BAND THAT IS NOT AN INDEX.
+   `.pagehead.index` sets the extent beside the name, which is a two-column
+   rule — and on a block plate it put the kicker alone in the left half and
+   left 45% of the band empty above the rows. The role is still `index`,
+   because that is what this page IS and `checks.py` reads the role rather
+   than the geometry; what changes is that the head stacks here. */
+.sheet-kinds { display: block; }
+.sheet-kinds .pagehead { display: grid; gap: var(--s4); max-width: none;
+                         margin: 0; }
+.sheet-kinds .pagehead h2 { margin: 0; }
+@media (min-width: 62rem) {
+  .sheet-kinds .pagehead { grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+    column-gap: var(--s8); align-items: end; }
+  .sheet-kinds .pagehead .kicker { grid-column: 1 / -1; }
+  .sheet-kinds .pagehead .mega { grid-row: 2; grid-column: 1; }
+  .sheet-kinds .pagehead .lede { grid-row: 2; grid-column: 2; }
+}
+
+/* AND THE SLIVER WAS A THUMBNAIL AT THE FAR RIGHT. The photograph is the
+   argument on this page, so it goes next to the number rather than in the
+   gutter after the name: ten portrait crops down the left read as a column
+   of windows, which is what makes the band photography rather than a list
+   with pictures on it. */
+.kindrow { grid-template-columns: 3rem 9.5rem minmax(0, 1fr) 7rem; }
+
+/* THE FOUR SCALES LEFT 1,400 PIXELS OF WHITE. A two-column grid makes a row
+   as tall as its tallest item, so a 21:9 panorama beside a 3:4 portrait
+   pays 340 pixels of empty page for the difference — four times down the
+   band. Columns pack instead of aligning, which is the whole reason a
+   gallery hangs work in columns and not in rows, and `break-inside: avoid`
+   is what keeps a tile whole. The order becomes column-major and that is
+   correct here: largest first down the left, which is the order the bars
+   below are in. */
+.xstrip { display: block; columns: 2; column-gap: var(--s5); }
+.xt { break-inside: avoid; margin-bottom: var(--s5); }
+@media (max-width: 52rem) { .xstrip { columns: 1; } }
+
+/* ── 07 the places: the cinematic strip ───────────────────────────── */
+/* `ed_strip` IS THE COMPONENT AND IT SCROLLS, which is what makes ten
+   photographs a sequence rather than a grid — the rule that primitive was
+   written with. The band only has to be a block and to give the strip its
+   own air; the tiles, the captions and the overflow are the primitive's. */
+.sheet-strip { display: block; }
+.sheet-strip .ed-strip { margin-top: var(--s7); }

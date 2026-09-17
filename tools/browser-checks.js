@@ -4949,6 +4949,96 @@ async function main() {
     }
   }
 
+  /* A LINK AT ZERO ALPHA IS PRESENT, PLACED, SIZED, KEYBOARD-REACHABLE AND
+   * NOT THERE — AND EVERY COUNT ON THIS SITE SAYS IT IS FINE.
+   *
+   * /experiences closed on two links that paint nothing. `.doorgo` already
+   * existed: it belongs to the homepage's four doors, where the go-link is
+   * revealed on hover, and `opacity: 0` is declared hundreds of lines above
+   * the composition that reused the name. So the class was a rule the new
+   * band inherited silently. This file already records the rule against a
+   * second NAME for one colour; this is one name for two things, which is
+   * the same fault from the other end and has no guard at all.
+   *
+   * Nothing could see it. `getComputedStyle` says `visibility: visible` and
+   * `opacity: 1` ON THE LINK — the zero is two elements up, so a check that
+   * reads the element's own style passes. The contrast sweep reads declared
+   * colours and the ratio was correct. The clipping scan asks whether an
+   * element holds more text than it shows and it showed all of it. The
+   * layout sweep measured 732 x 21 in the right place. Only walking the
+   * ancestor chain for the composited alpha finds it, which is exactly what
+   * `checkVisibility({ checkOpacity: true })` does.
+   *
+   * AND A HIDDEN LINK IS NOT AUTOMATICALLY A DEFECT, which is why the test
+   * FOCUSES it first. Hover-revealed navigation is a real pattern and this
+   * site ships it: the four doors, the licence credit on a photograph. Every
+   * one of those reveals on `:focus-visible` as well, because a link a
+   * keyboard reaches has to become visible when it does — so focusing each
+   * link and then asking is one test that admits the pattern and refuses the
+   * accident. A link that is still invisible with focus on it is a link
+   * nobody can use by any route.
+   *
+   * THE LIST IS `tools/lib/families.js` — the one list of rendered families,
+   * enumerated against the built site — because a hand-typed list is how the
+   * fund project page shipped at 0% picture and how this would go unmeasured
+   * on the next family that reuses a name.
+   */
+  {
+    const FAM = require("./lib/families.js").ALL;
+    const op = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    const hits = [];
+    let seen = 0, links = 0;
+    for (const [name, url] of FAM) {
+      const r = await op.goto(base + url, { waitUntil: "load" });
+      if (!r || r.status() !== 200) continue;
+      seen++;
+      /* THE ELEMENT IS FOUND, FOCUSED AND ASKED, one at a time, because
+       * `:focus-visible` applies to exactly one element at a time and a
+       * batch evaluation would ask about the reveal of a link nothing is
+       * focused on. `aria-hidden` and `display: none` links are skipped:
+       * a thumb-bar duplicate below its breakpoint is not a defect, and
+       * `checkVisibility` without `checkOpacity` is the test for that. */
+      const n = await op.evaluate(() => {
+        window.__L = [...document.querySelectorAll("main a[href], footer a[href]")]
+          .filter(a => a.checkVisibility() && !a.closest("[aria-hidden='true']"));
+        return window.__L.length;
+      });
+      for (let i = 0; i < n; i++) {
+        const bad = await op.evaluate((i) => {
+          const a = window.__L[i];
+          a.focus();
+          if (a.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return null;
+          let e = a, zero = "";
+          while (e && e !== document.documentElement) {
+            if (getComputedStyle(e).opacity === "0") {
+              zero = e.tagName.toLowerCase() +
+                     (e.className ? "." + e.className.toString().trim().split(/\s+/)[0] : "");
+              break;
+            }
+            e = e.parentElement;
+          }
+          return `${(a.textContent || a.getAttribute("aria-label") || "?").trim().slice(0, 28)}`
+                 + ` — zero alpha on ${zero || "an ancestor this walk did not find"}`;
+        }, i);
+        if (bad) hits.push(`${name}: ${bad}`);
+      }
+      links += n;
+    }
+    await op.close();
+    checked += links;
+    ok(seen >= 40,
+       `the invisible-link sweep read only ${seen} families — it has stopped ` +
+       `finding them`);
+    ok(links >= 500,
+       `the invisible-link sweep examined only ${links} links across ${seen} ` +
+       `families — it has stopped finding them`);
+    ok(hits.length === 0,
+       `${hits.length} link(s) of ${links} paint nothing even with focus on ` +
+       `them: ${hits.slice(0, 6).join(" | ")}. Present, placed, sized, ` +
+       `keyboard-reachable and unseeable — which is the one fault no count ` +
+       `on this site can report.`);
+  }
+
   /* A PLACEHOLDER A READER CANNOT READ IS A TUTORIAL WITH ITS LAST LINE
    * MISSING.
    *

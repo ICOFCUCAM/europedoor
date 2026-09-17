@@ -8018,178 +8018,483 @@ def sample_names(items, n=3):
 
 
 def experiences_index(data):
+    """THE EUROPEAN EXPERIENCE ATLAS — photography first, and the subject is
+    what says so.
+
+    Three pages, three instruments, one institution. /discover asks what you
+    are looking for and answers with an instrument; /countries asks where it
+    is and answers with geography; this one asks what you want to DO, and the
+    only honest answer to that is a picture. `docs/experiences-redesign.md`
+    is the audit behind it — what the page held, what the register holds, and
+    which of the brief's twelve bands are refused and why.
+
+    IT WAS FORTY-TWO ROWS OF ONE COMPONENT. A photograph, a strip of eight
+    categories, and then 24 experiences, 8 category bars and 10 kind bars —
+    every one of them a `.row`. Nothing in it was wrong: the bars are a real
+    comparison (Family holds 131 entries and Luxury holds 5) and putting the
+    experiences before the taxonomy was itself a repair. The fault is the
+    sum. A page about what a place FEELS like was made entirely of type,
+    which is the data's shape as the layout — the finding that rebuilt
+    /journeys, /europe-in, /themes and the stories index, arriving last on
+    the family that could least afford it.
+
+    AND THE LIBRARY IS NOT THE CONSTRAINT HERE, WHICH IS WORTH SAYING ONCE.
+    The standing answer to "why does a travel site have so few pictures" is
+    the register, and on this page it does not apply: all eight categories,
+    all nine macro regions and the hero are held, and every one of the ten
+    kinds happens in a destination this atlas holds a photograph of. Nothing
+    is acquired for this page. The pictures were already bought and were
+    being spent on one strip.
+    """
     from .data import all_experiences
+    from . import categories as C
+    images = data.get("images") or {}
     kinds = data["taxonomy"]["experience_kinds"]
     items = all_experiences(data["countries"])
+    macros = data["taxonomy"]["macros"]
+    macname = {m["slug"]: m["name"] for m in macros}
+    idx = {(e["country"]["slug"], e["city"]["slug"]): cid
+           for cid, e in data["cities"].items()}
+
     counts = {}
     for it in items:
         counts[it["exp"]["kind"]] = counts.get(it["exp"]["kind"], 0) + 1
-    from . import categories as C
+    catn = {c["slug"]: len(C.select(items, c)) for c in data["categories"]}
+    bycat = sorted(data["categories"], key=lambda c: -catn[c["slug"]])
 
-    def taste(sel):
-        names = sample_names(sel)
-        return ('<p class="taste">' + "".join(
-            f"<span>{esc(x)}</span>" for x in names) + "</p>") if names else ""
+    def cid_of(it):
+        return idx.get((it["country"]["slug"], it["city"]["slug"]))
 
-    # EIGHTEEN IDENTICAL BORDERED BOXES, TWICE. Border, fill, radius and
-    # shadow each say "separate object", and spending all four on every tile
-    # of an eighteen-tile page spends them on nothing: the grid read as one
-    # texture, and what actually separates these rows — that Family holds 131
-    # entries and Luxury holds 5 — was four characters of kicker type.
+    def credit(keys):
+        """One credit line per band, paid once — the homepage's own rule.
+
+        The licence asks for the photographer and the provider; it does not
+        ask for a caption under every frame, and eight of them down one band
+        is the provenance layer becoming the visual identity. Never on the
+        opening: that surface is the composition and the register is where
+        the record lives.
+        """
+        out, seen = [], set()
+        for k in keys:
+            row = images.get(k)
+            if not row or row["photographer"] in seen:
+                continue
+            seen.add(row["photographer"])
+            out.append(f'<a href="{esc(row["source"])}" rel="noopener" '
+                       f'target="_blank">{esc(row["photographer"])}</a>')
+        return ('<p class="sheetcred rowcred">Photographs by '
+                + ", ".join(out) + " on Pexels.</p>") if out else ""
+
+    # ── 01 · THE INVITATION ──────────────────────────────────────────
+    # THE PHOTOGRAPH BREAKS THE COLUMN, which is the one move that makes
+    # this page's opening not the twenty-two others'. Every index here
+    # opens on a picture INSIDE the measure; this one runs past the right
+    # gutter and is cut on the diagonal, so the first thing a reader meets
+    # is a frame the page could not contain.
+    _hero = photo(images, "experiences-hero", w=2000, h=1400, eager=True,
+                  sizes="(min-width: 52rem) 58vw, 100vw")
+    invite = f"""
+  <div class="sheettext">
+    <h1 class="mega">What do you<br>want to <em class="lit">experience?</em></h1>
+    <p class="lede">Europe is not one journey. It is {len(items)} ways to be
+    there — to walk, taste, watch, row, pray, listen and go and look at
+    something. Every one of them is a real, named thing in a real place, run
+    by somebody this atlas names.</p>
+    {golink('#the-field', 'Choose a way to be there')}
+  </div>
+  <figure class="xshot">{_hero}</figure>"""
+
+    # ── 02 · THE FIELD ───────────────────────────────────────────────
+    # THE TYPE IS THE NAVIGATION AND THE SLIVER IS THE ARGUMENT.
     #
-    # The count is the subject, so the count is drawn. A bar is scaled to the
-    # LARGEST IN ITS OWN GROUP rather than to the total, and that is a
-    # measured decision rather than a convenience: an experience carries ONE
-    # kind and ANY NUMBER of categories, so the ten kinds sum to 197 and the
-    # eight categories sum to 493 memberships over the same 197 experiences.
-    # A bar labelled as a share of the whole would read 250% down the
-    # category column. Both figures are derived here and the note under them
-    # says which is which.
-    def barrow(href, n, biggest, name, blurb, sel):
-        pct = 0 if not biggest else round(100.0 * n / biggest, 1)
-        return (f'<a class="row barrow" href="{href}">'
-                f'<div><h3>{esc(name)}</h3>'
-                + (f'<p class="rowsub">{esc(blurb)}</p>' if blurb else "")
-                + taste(sel)
-                + f'</div><div class="barside">'
-                f'<p class="rowmeta">{n} listed</p>'
-                # THE BAR IS `hopbar` AND THE WIDTHS ARE THE .w0-.w100 SCALE,
-                # because both already exist: a journey's legs and the score
-                # bars draw proportions exactly this way, and this is the
-                # third of them rather than the first. No new primitive until
-                # repeated structure has actually emerged — it has.
-                + f'<span class="hopbar" aria-hidden="true">'
-                  f'<span class="w{int(round(pct))}"></span></span>'
-                + '</div></a>')
-
-    # THE EIGHT CATEGORIES ARE THE ONLY THING ON THIS PAGE WITH A PURPOSE
-    # DECLARED FOR IT, and the index that introduces them showed none of
-    # them. Eight `category:` surfaces exist in the registry and are reached
-    # by the eight category pages; the index reached none, so the page a
-    # reader meets the family on was eighteen bars and twenty-four lines of
-    # prose. Largest first, which is the order the bars below are in — the
-    # strip and the rows must not argue about which category is which.
-    _xstrip = ed_strip(data.get("images"), [
-        {"key": f"category:{cat['slug']}", "alt": cat["name"],
-         "label": cat["name"], "href": urls.category(cat["slug"])}
-        for cat in sorted(data["categories"],
-                          key=lambda c: -len(C.select(items, c)))], limit=8)
-    # THE "HOW THIS LIST IS CUT" LINK NAMED THE SECOND OF THE TWO BANDS THAT
-    # ANSWER IT, AND NEITHER CARRIED THE ID. The question is answered by the
-    # categories AND the kinds — what an experience is about and what you
-    # physically do — and the categories come first, so that is where a reader
-    # following the link should land. The id is named for the question rather
-    # than for one of its two answers, and the anchor is emitted by the same
-    # call that draws the band, so the two cannot drift.
-    catn = {cat["slug"]: len(C.select(items, cat)) for cat in data["categories"]}
-    catbig = max(catn.values()) if catn else 0
-    catcards = [
-        barrow(urls.category(cat["slug"]), catn[cat["slug"]], catbig,
-               cat["name"], cat["blurb"], C.select(items, cat))
-        for cat in sorted(data["categories"], key=lambda c: -catn[c["slug"]])
-    ]
-    # NO BLURB, BECAUSE IT WAS THE SAME SENTENCE TEN TIMES. Every kind tile
-    # carried "Grouped by what you actually do rather than by what it is
-    # about", which is a fact about the axis and not about the kind — the
-    # boilerplate this atlas's own rule forbids, hoisted into the section
-    # lede where one copy of it belongs. `blurb=None` is the pattern the
-    # homepage's eight ways-in tiles already use.
-    kindbig = max(counts.values()) if counts else 0
-    cards = [
-        barrow(urls.experience_kind(k), counts.get(k, 0), kindbig, name, None,
-               [it for it in items if it["exp"]["kind"] == k])
-        for k, name in sorted(kinds.items(), key=lambda kv: -counts.get(kv[0], 0))
-    ]
-    rows = "".join(
-        f"""<a class="row" href="{urls.city(it['country'], it['region'], it['city'])}">
-        <div><h3>{esc(it['exp']['name'])}</h3>
-        <p class="rowsub">{esc(it['exp']['summary'])}</p></div>
-        <p class="rowmeta">{esc(it['city']['name'])} · {esc(it['country']['name'])}</p></a>"""
-        for it in items[:24]
-    )
-    # NO DRAWING ON THIS OPENING, AND THE REASON IS THE BRIEF'S OWN.
+    # The brief asks for an index of enormous editorial words rather than a
+    # card grid, and names a vocabulary — WILD, SLOW, CULTURAL — that this
+    # atlas does not hold. It holds ten KINDS, which are what somebody
+    # physically does, and they are EXCLUSIVE: every experience has exactly
+    # one and the ten sum to all 197, so every number on this band is a
+    # count of the whole rather than a share of an overlap.
     #
-    # It opened on 197 dots at the full extent, which says "a lot of them"
-    # and nothing about what any of them IS — and it was the same continent,
-    # in the same arch, in the same position, as /stories, /countries,
-    # /interests and the 404. Six index openings drawn as one silhouette
-    # with a different number of marks on it is the map catalogue this
-    # product must not be, and at opening size the difference between 197
-    # dots and 130 is not a difference a reader perceives.
-    #
-    # A map answers WHERE, and where is not this family's question. The
-    # subject is what people DO, and the thing no competitor can say is
-    # already in the lede: every listing carries the name of who runs it and
-    # the tier of checking it has passed. The kinds and the categories are
-    # drawn below, as bars, where the shape is a real comparison.
-    #
-    # `img` stays. When a photograph of the experience-action role is
-    # licensed it fills the slot and replaces nothing, which is what
-    # indexhero does with an empty art and a filled img.
-    body = f"""
-{crumbs([("Europe", "/discover"), ("Experiences", None)])}
+    # Each row carries a narrow crop of a destination where that kind
+    # actually happens — not an illustration of the idea, a photograph of a
+    # place the row leads to. A destination is used once, so ten rows are
+    # ten places; where a kind's only photographed destination is already
+    # spent the row is type alone, which is honest and is what an empty
+    # register looks like on a page that does not pretend otherwise.
+    used, sliver = set(), {}
+    for k in sorted(kinds, key=lambda k: -counts.get(k, 0)):
+        for it in items:
+            if it["exp"]["kind"] != k:
+                continue
+            cid = cid_of(it)
+            if not cid or cid in used or ("city:" + cid) not in images:
+                continue
+            used.add(cid)
+            sliver[k] = (cid, it)
+            break
+    kindrows = []
+    for i, k in enumerate(sorted(kinds, key=lambda k: -counts.get(k, 0)), 1):
+        shot, where = "", ""
+        if k in sliver:
+            cid, it = sliver[k]
+            shot = picture(images, "city:" + cid, w=600, h=800, credit=False,
+                           alt=images["city:" + cid]["alt"], sizes="9rem")
+            where = (f'<span class="kindwhere">{esc(it["city"]["name"])}</span>')
+        kindrows.append(
+            # A GRID'S TRACKS ARE POSITIONAL AND THE FIRST VERSION HAD THE
+            # NAME AND THE PICTURE THE WRONG WAY ROUND. `3rem 9.5rem 1fr
+            # 7rem` with the markup ordered number, name, picture put
+            # "Walk or hike" in a 152-pixel column and the photograph in
+            # the 768-pixel one — a 1,024-pixel-tall crop, ten times, and
+            # a band 11,127 pixels long. The order here IS the layout.
+            f'<a class="kindrow" href="{urls.experience_kind(k)}">'
+            f'<span class="kindno">{i:02d}</span>'
+            f'<span class="kindart">{shot}</span>'
+            f'<span class="kindname">{esc(kinds[k])}</span>'
+            f'<span class="kindmeta"><span class="kindn">{counts.get(k, 0)}</span>'
+            f'{where}</span></a>')
+    field = f"""
+  <div class="pagehead index">
+    <p class="kicker">The European Experience Atlas</p>
+    <h2 class="mega">Choose a way to be there.</h2>
+    <p class="lede">{numword(len(kinds), cap=True)} kinds, and they do not
+    overlap: each of the {len(items)} experiences has exactly one, so every
+    count below is a count of the whole. A cellar visit and a cathedral are
+    both sacred to somebody and only one of them is a walk.</p>
+  </div>
+  <div class="kinds">{"".join(kindrows)}</div>
+  {credit(["city:" + c for c, _ in sliver.values()])}"""
 
-{indexhero(
-    kicker="Local Experiences",
-    title="What people actually do here.",
-    lede=f"{len(items)} experiences across the Atlas, in {numword(len(data['taxonomy']['experience_kinds']))} kinds. Anything a business "
-         f"lists carries the name of who runs it and the tier of checking it has passed — "
-         f"an unchecked listing says so on its face rather than hiding behind a star "
-         f"rating.",
-    img=photo(data.get("images"), "experiences-hero", w=2000, h=1200,
-              sizes="(min-width: 60rem) 52vw, 100vw"),
-    actions='<a class="btn" href="/experiences/join">List your experience</a>'
-            '<a class="btn ghost" href="/for-businesses">For businesses</a>')}
-<!-- listed=False on the off-frame note: the drawing plots every place in
-     the Atlas with an experience, and the body under it shows twenty-four
-     of the 197 — so "that place is in the list below" pointed at a list
-     that does not hold the place it names. Found by the check written for
-     the 404, on a page the 404's own fix would have walked past. -->
-<!-- "Recently added" WAS A CLAIM THE DATA CANNOT SUPPORT. An experience
-     carries a slug, a name, a kind, a band and a summary, and no date of
-     any sort, so these 24 were simply the first 24 the loader returned in
-     country order — Austria to Croatia, called recent. A false ordering is
-     worse than none, because a reader takes it for a signal. -->
-{(f'<section class="ed-section">'
-  + ed_section_head("What they are about",
-                    f"{numword(len(data['categories']), cap=True)} categories",
-                    "Largest first — the same order the bars below are in.")
-  + _xstrip + "</section>") if _xstrip else ""}
-{section("Twenty-four of them", f'<div class="rows">{rows}</div>',
-         lede="What people actually do, in country order — there is no date on an "
-              "experience here, so this is a sample and not a recency. Every one is a "
-              "real, named thing in a real place, and every one links to the page of "
-              "the place it happens in.",
-         more=("How this list is cut", "#how-its-cut"))}
+    # ── 03 · EUROPE, EXPERIENCED ─────────────────────────────────────
+    # The cinematic plate. `ed_declare` already composes type over a
+    # photograph behind a scrim that makes the ratio a property of the
+    # design rather than of the picture — 72% graphite composites to
+    # rgb(71,71,71) and bone on that is 9.2:1 whatever the frame turns out
+    # to be. The picture is the largest category's own.
+    _big = bycat[0]
+    declare = ed_declare(
+        images, f"category:{_big['slug']}",
+        statement="Europe reveals itself when you do something in it.",
+        alt=images.get(f"category:{_big['slug']}", {}).get("alt", ""),
+        only_if_held=True) if held(images, f"category:{_big['slug']}") else ""
 
-<!-- THE TWO AXES CAME AFTER THE EXPERIENCES, and the order is the whole
-     change. The page opened on eighteen taxonomy rows — eight categories,
-     then ten kinds, both as bar charts — so a reader met the information
-     architecture before a single thing anybody does. That is design to the
-     data's shape rather than to the reader's purpose, and this page's own
-     head says its subject is "what people actually do here".
-     The bars are kept: Family holds 131 entries and Luxury holds 5, and
-     that difference is real and is the argument for having two axes at all.
-     They are now the answer to "how is this list cut", asked after the
-     list. -->
-{section(f"{numword(len(data['categories'])).capitalize()} categories", '<div class="rows">' + "".join(catcards) + "</div>",
-         id="how-its-cut", tone="quiet",
-         lede=f"What an experience is about, largest first. An experience may be in "
-              f"several of these at once — {len(data['categories'])} categories hold "
-              f"{sum(catn.values())} memberships across {len(items)} experiences — so each "
-              f"bar is drawn against the largest category rather than against the total. "
-              f"Each row carries three of its own entries, and each category page prints the "
-              f"rule that built it.")}
-{section(f"{numword(len(kinds)).capitalize()} kinds", '<div class="rows">' + "".join(cards) + "</div>",
-         tone="quiet",
-         lede=f"The other axis: what you physically do. A cellar visit and a cathedral are "
-              f"both sacred to somebody; only one of them is a walk. These do not overlap — "
-              f"every experience has exactly one kind, and the {len(kinds)} of them account "
-              f"for all {sum(counts.values())}.")}
-"""
+    # ── 04 · WHERE IT HAPPENS ────────────────────────────────────────
+    # GEOGRAPHY IS THE SECOND INSTRUMENT HERE, NOT THE FIRST, and it is the
+    # LIGHT atlas rather than the graphite one — which is the whole of what
+    # keeps this page from being /discover with different words. The dark
+    # instrument belongs to the tool; this is a picture of where a thing
+    # can be done.
+    #
+    # `docs/signature-moments.md` refuses a map on the experience CATEGORY
+    # pages, and the reason survives re-checking: 48 dots scattered over
+    # Europe say "food is everywhere", which is true and is not an insight.
+    # That refusal is about a category. This is the whole family at once,
+    # and what it says is the thing the rows cannot: 172 of 319 destinations
+    # hold one, and the 147 that do not are not a gap in Europe, they are a
+    # gap in this atlas.
+    withx = {}
+    for it in items:
+        cid = cid_of(it)
+        if cid:
+            withx[cid] = data["cities"][cid]
+    xpts = [(*project(n["city"]["lat"], n["city"]["lon"]),
+             urls.city(n["country"], n["region"], n["city"]), n["city"]["name"])
+            for n in withx.values()]
+    xmap = pointsmap(
+        xpts, "exp",
+        f'{len(withx)} of {len(data["cities"])} destinations hold at least one '
+        f'experience. The {len(data["cities"]) - len(withx)} that do not are a '
+        f'gap in this atlas rather than in Europe.',
+        f'Map of the {len(withx)} destinations that hold an experience',
+        note='Names are dropped where they would overlap; every dot is a link. '
+             'Coastline from <a href="/sources">Natural Earth</a>, public '
+             'domain.'
+             + offframe_line([(p[0], p[1]) for p in xpts], data, listed=False)
+    ) if len(xpts) >= 2 else ""
+    geoband = f"""
+  <div class="sheettext">
+    <h2 class="mega">Where Europe<br>meets the doing.</h2>
+    <p class="lede">The same continent as the instrument on /discover, drawn
+    the other way: pale ground, ink coast, one mark per place. A map answers
+    where, and where is the second question on this page rather than the
+    first.</p>
+    {golink('/map', 'Open the full map')}
+  </div>
+  <div class="geoart">{xmap}</div>"""
+
+    # ── 05 · SAME FEELING, DIFFERENT EUROPE ──────────────────────────
+    # KIND BY MACRO REGION, AND THE AXIS WAS CHOSEN BY MEASURING BOTH.
+    # Two thirds of every experience in the atlas is `family` or
+    # `adventure`, so their regional breakdown says EVERYWHERE — the exact
+    # non-insight the category map is refused for. The kinds are exclusive
+    # and the answer changes: the water is the Nordics, the sacred sites
+    # are the Mediterranean, the cellars are the south. Each group carries
+    # the macro region's own photograph, which the register holds for all
+    # nine.
+    pairs, pkeys = [], []
+    for k in sorted(kinds, key=lambda k: -counts.get(k, 0)):
+        if len(pairs) == 4:
+            break
+        tally, names = {}, {}
+        for it in items:
+            if it["exp"]["kind"] != k:
+                continue
+            ms = it["country"].get("macro_slug")
+            if not ms:
+                continue
+            tally[ms] = tally.get(ms, 0) + 1
+            names.setdefault(ms, []).append(it["city"]["name"])
+        if not tally:
+            continue
+        top = max(tally, key=lambda m: tally[m])
+        # A KIND WHOSE BIGGEST REGION IS A THIRD OF IT IS NOT A CLAIM ABOUT
+        # A REGION. The band exists to say where something concentrates, so
+        # a kind spread evenly across nine corners is left off rather than
+        # printed with a number that reads as a finding.
+        if tally[top] * 3 < counts.get(k, 0):
+            continue
+        # ONE PICTURE PER THING, AND THE FIRST VERSION DREW TWO TILES FROM
+        # ONE FILE. The obvious photograph for "the water is the Nordics" is
+        # `macro:nordic` — and the museums are the Nordics too, and the
+        # cellars and the tables are both the Mediterranean, so four tiles
+        # came out as two photographs side by side twice. That reads as a
+        # rendering fault rather than as a composition, and it is this
+        # repository's own `one thing, one picture` arriving from the other
+        # end: not one record with two pictures, one picture on two records.
+        #
+        # So the tile takes a DESTINATION inside the group where the register
+        # holds one — which is more specific anyway, because "11 of 25 on the
+        # water are in the Nordics" is better illustrated by a place on that
+        # water than by a photograph of the region in general. The macro's own
+        # picture is the fallback, and either way a key already spent is
+        # skipped rather than drawn twice.
+        shot = None
+        for it in items:
+            if it["exp"]["kind"] != k or it["country"].get("macro_slug") != top:
+                continue
+            cid = cid_of(it)
+            if cid and ("city:" + cid) in images and ("city:" + cid) not in pkeys:
+                shot = "city:" + cid
+                break
+        if shot is None and held(images, "macro:" + top) \
+                and ("macro:" + top) not in pkeys:
+            shot = "macro:" + top
+        if shot is None:
+            continue
+        pkeys.append(shot)
+        seen, where = set(), []
+        for nm in names[top]:
+            if nm not in seen:
+                seen.add(nm)
+                where.append(nm)
+        pairs.append(
+            f'<a class="pairrow" href="{urls.experience_kind(k)}">'
+            f'<span class="pairart">'
+            + picture(images, shot, w=1000, h=750, credit=False,
+                      alt=images[shot]["alt"],
+                      sizes="(min-width: 52rem) 30vw, 92vw")
+            + f'</span><span class="pairsay">'
+              f'<span class="pairkind">{esc(kinds[k])}</span>'
+              f'<span class="pairmac">{esc(macname[top])}</span>'
+              f'<span class="pairn">{tally[top]} of {counts.get(k, 0)}</span>'
+              f'<span class="pairwhere">'
+              f'{esc(" · ".join(where[:5]))}'
+            + (f' · +{len(where) - 5} more' if len(where) > 5 else "")
+            + '</span></span></a>')
+    samefeeling = f"""
+  <div class="sheettext">
+    <h2 class="mega">Same feeling.<br>Different Europe.</h2>
+    <p class="lede">Where each kind actually concentrates, counted rather
+    than chosen. A kind whose largest corner holds under a third of it is
+    not on this band — a number that is true everywhere is not a finding.</p>
+  </div>
+  <div class="pairs">{"".join(pairs)}</div>
+  {credit(pkeys)}""" if pairs else ""
+
+    # ── 06 · WHAT THEY ARE ABOUT ─────────────────────────────────────
+    # THE EIGHT CATEGORIES AT FOUR SCALES. The brief asks for an image
+    # rhythm — large, narrow, panoramic, intimate — rather than eight of
+    # one size, and the reason is this repository's own: every photograph
+    # the same size in the same 16/9 box is what made the old page's one
+    # strip read as a contact sheet. The order is largest first, the same
+    # order the bars below are in, because the strip and the rows must not
+    # argue about which category is which.
+    # AND THE TILE NAMES THREE REAL EXPERIENCES, which is how the 197 stay
+    # on the page at all. The old index printed 24 of them as rows; this
+    # one printed none, and a page whose whole subject is what people
+    # actually do had stopped naming a single thing anybody does. Three per
+    # category is 24 again, in the band that says what the categories ARE
+    # — the `ed_strip` repair applied here: the tile takes the sentence and
+    # the second band goes.
+    #
+    # THE LABEL IS UNDER THE PICTURE RATHER THAN ON IT. A name over a
+    # photograph needs a scrim, and a scrim over three lines of sample
+    # names is a caption pretending to be a picture. Under it, in the
+    # margin, is how a gallery labels a work — which is `.gi`'s own rule
+    # and the reason this page can hang eight photographs without reading
+    # as a catalogue.
+    xtiles, xkeys = [], []
+    SCALES = ("wide", "tall", "pan", "close")
+    for i, cat in enumerate(bycat):
+        key = f"category:{cat['slug']}"
+        if not held(images, key):
+            continue
+        xkeys.append(key)
+        names = sample_names(C.select(items, cat))
+        xtiles.append(
+            f'<a class="xt xt-{SCALES[i % len(SCALES)]}" '
+            f'href="{urls.category(cat["slug"])}">'
+            + picture(images, key, w=1600, h=1200, credit=False,
+                      alt=images[key]["alt"],
+                      sizes="(min-width: 52rem) 46vw, 92vw")
+            + f'<span class="xtsay"><span class="xtn">{catn[cat["slug"]]} listed</span>'
+              f'<span class="xtname">{esc(cat["name"])}</span>'
+            + (f'<span class="xtaste">{esc(" · ".join(names))}</span>'
+               if names else "")
+            + '</span></a>')
+    about = f"""
+  <div class="sheettext">
+    <h2 class="mega">What they<br>are about.</h2>
+    <p class="lede">The other axis, and this one overlaps on purpose: an
+    experience may be in several at once, so {len(data["categories"])}
+    categories hold {sum(catn.values())} memberships across {len(items)}
+    experiences. Largest first.</p>
+  </div>
+  <div class="xstrip">{"".join(xtiles)}</div>
+  {credit(xkeys)}""" if xtiles else ""
+
+    # ── 07 · THE STORIES ─────────────────────────────────────────────
+    # An experience is a thing you book and a story is the reason you would.
+    # `.galgrid` is the gallery grid the homepage already uses — the name
+    # UNDER the picture, in the margin, the way a gallery labels a work,
+    # which is the whole difference between a card and a plate.
+    st = [s for s in sorted(data["stories"],
+                            key=lambda s: s.get("published", ""), reverse=True)
+          if held(images, "story:" + s["slug"])]
+    tales = ""
+    if len(st) >= 3:
+        skeys = ["story:" + s["slug"] for s in st[:3]]
+        tiles = "".join(
+            f'<a class="gi" href="{urls.story(s)}">'
+            + picture(images, "story:" + s["slug"], w=1200, h=1600,
+                      credit=False, alt=images["story:" + s["slug"]]["alt"],
+                      sizes="(min-width: 52rem) 30vw, 92vw")
+            + (f'<span class="giwhere">{esc(s["section"])}</span>'
+               if s.get("section") else "")
+            + f'<span class="giname">{esc(s["title"])}</span>'
+              f'<span class="giline">{esc(s.get("standfirst", ""))}</span></a>'
+            for s in st[:3])
+        tales = f"""
+  <div class="galwrap">
+  <div class="sheettext">
+    <h2 class="mega">Why anybody<br>goes at all.</h2>
+    <p class="lede">An experience is a thing you can book. A story is the
+    reason you would. {len(data["stories"])} of them, and every place either
+    one names has a page here.</p>
+    {golink('/stories', 'Every story')}
+  </div>
+  <div class="tales">{tiles}</div>
+  {credit(skeys)}
+  </div>"""
+
+    # ── 07 · THE PLACES ──────────────────────────────────────────────
+    # THE CINEMATIC STRIP, AND `ed_strip` ALREADY IS ONE. It SCROLLS rather
+    # than wrapping, because a sequence is read along and wrapping an order
+    # into rows turns it into a grid — the rule that primitive was written
+    # with. What the brief asks for here is a horizontal run of large
+    # photographs with the type beside them, which is that component with
+    # this band's own set in it.
+    #
+    # AND THE SET IS THE ONE THING ONLY THIS PAGE CAN SHOW: destinations
+    # that hold an experience AND a photograph, with the number of
+    # experiences each holds as the note. The library has 65 photographed
+    # destinations and this band takes ten that no earlier band on the page
+    # has spent, because `there is no third place to put them that would
+    # not be the same eleven a third time` is this repository's own warning
+    # and the way past it is to have more of them rather than to reuse.
+    nx = {}
+    for it in items:
+        cid = cid_of(it)
+        if cid:
+            nx[cid] = nx.get(cid, 0) + 1
+    fresh = [cid for cid in sorted(nx, key=lambda c: (-nx[c], c))
+             if ("city:" + cid) in images and cid not in used]
+    strip = ed_strip(images, [
+        {"key": "city:" + cid, "alt": images["city:" + cid]["alt"],
+         "label": data["cities"][cid]["city"]["name"],
+         "href": urls.city(data["cities"][cid]["country"],
+                           data["cities"][cid]["region"],
+                           data["cities"][cid]["city"]),
+         "note": f'{nx[cid]} experience{"s" if nx[cid] != 1 else ""} · '
+                 f'{data["cities"][cid]["country"]["name"]}'}
+        for cid in fresh], limit=10)
+    places = f"""
+  <div class="sheettext">
+    <h2 class="mega">Ten places<br>it happens in.</h2>
+    <p class="lede">The destinations that hold the most of them and that this
+    atlas holds a photograph of — {len(nx)} of {len(data["cities"])} hold at
+    least one, and {len([c for c in nx if ("city:" + c) in images])} of those
+    are photographed. Read along.</p>
+  </div>
+  {strip}
+  {credit(["city:" + c for c in fresh[:10]])}""" if strip else ""
+
+    # ── 08 · THE BARS WERE THE SAME TWO AXES A SECOND TIME ───────────
+    # DELETED, AND `docs/experiences-redesign.md` SAID TO KEEP THEM.
+    # That audit was written before the page was rendered and it was wrong
+    # for the reason this repository keeps recording: eight category bars
+    # under eight category PHOTOGRAPHS, and ten kind bars under ten kind
+    # ROWS, is one set printed twice to say two things — and here the
+    # second printing said less than the first, because the picture and
+    # the place are what the bar cannot carry.
+    #
+    # What the bars had that nothing else did was the category blurb, the
+    # three sample experiences and the visual proportion. The samples moved
+    # onto the tile, which is the `ed_strip` repair; the blurbs live on the
+    # eight category pages and the section audit asserts them there; and
+    # the proportion is 131 against 5 printed on the tiles in largest-first
+    # order, which a reader can read. 3,086 pixels of page, and the two
+    # numbers that were the argument for two axes are still on it.
+    # ── 09 · THE DOOR ────────────────────────────────────────────────
+    # ONE APERTURE ON THE PAGE, AND IT IS THE MAP. The brief asks for a
+    # photographic aperture in band 11 and a circular one at the close, and
+    # this page already cuts the door once — on the geography, which is how
+    # this atlas draws it everywhere else. Three doors in one document is
+    # the signature as wallpaper, which is the rule `docs/signature-moments.md`
+    # states and this page would be the first to break.
+    #
+    # ANYTHING A BUSINESS LISTS CARRIES THE NAME OF WHO RUNS IT, and that
+    # sentence had been buried in the old head's lede. It is the one claim
+    # here no competitor makes, so it closes the page instead.
+    door = f"""
+  <div class="sheettext">
+    <h2 class="mega">You do not need<br>another list.</h2>
+    <p class="lede">Anything a business lists here carries the name of who
+    runs it and the tier of checking it has passed — an unchecked listing says
+    so on its face rather than hiding behind a star rating. Nothing on this
+    page is paid for, and nothing on it can be.</p>
+    <p class="keepgo">{golink('/experiences/join', 'List your experience')}
+    {golink('/for-businesses', 'What we check, and what we refuse')}</p>
+  </div>"""
+
+    PLATES = [("invite gal", "The invitation", invite, "the-invitation"),
+              ("kinds gal", "The field", field, "the-field"),
+              ("declare", "Europe, experienced", declare, "experienced"),
+              ("geo gal", "Where it happens", geoband, "where-it-happens"),
+              ("pairs gal quiet", "Same feeling", samefeeling, "same-feeling"),
+              ("about gal", "What they are about", about, "how-its-cut"),
+              ("strip gal quiet", "The places", places, "the-places"),
+              ("tales pine", "The stories", tales, "the-stories"),
+              ("keep gal", "The door", door, "the-door")]
+    body = (crumbs([("Europe", "/discover"), ("Experiences", None)])
+            + constel_defs()
+            + "\n".join(
+                f'<section class="sheet {" ".join("sheet-" + p for p in slug.split())}" '
+                f'id="{anchor}">{actmark(i, name)}{inner}</section>'
+                for i, (slug, name, inner, anchor) in enumerate(PLATES, 1)
+                if inner))
+
     return "/experiences/index.html", page(
-        "Experiences", body, path="/experiences", area="experiences",
-        
+        "Experiences", body, path="/experiences", area="experiences", hero=True,
         description="Guides, kitchens, cellars, boats and museums across Europe — every listing named, tiered and checked.",
     )
 
