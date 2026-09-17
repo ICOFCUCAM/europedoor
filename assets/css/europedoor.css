@@ -6955,7 +6955,6 @@ body[data-hero] .masthead { position: sticky; }
 .sheet-atlas { background: var(--paper-2); color: var(--ink);
                grid-template-columns: minmax(0, 34%) minmax(0, 1fr);
                gap: var(--s6) var(--s7); align-items: start; }
-.sheet-atlas .lede { color: var(--ink-2); }
 .sheet-atlas .actno { border-bottom-color: var(--ink-3); }
 .sheet-atlas .gomark::before { background: none; }
 .sheet-atlas .sheettext { grid-template-columns: auto minmax(0, 1fr);
@@ -8890,7 +8889,6 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
   background: var(--white); color: var(--ink);
   padding: 11vh var(--page-gutter); border-bottom: 0;
   display: block; }
-.sheet-gal .actno, .sheet-gal .actname { color: var(--ink-3); }
 .sheet-gal .actno { border-bottom-color: var(--rule); }
 /* FOUR REDUNDANT DECLARATIONS REMOVED, AND THE SCAN NAMES DECLARATIONS
    RATHER THAN RULES — which the first attempt at this got wrong. It read
@@ -8909,6 +8907,12 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    shot at 1280 and at 390 before and after, byte-identical. */
 .featlead { text-decoration: none; }
 .leadtitle a { text-decoration: none; }
+/* AND TWO MORE WENT WITH THEM, FOR THE SAME REASON ONE LEVEL DOWN.
+   `.sheet-atlas .lede { color: var(--ink-2) }` and `.sheet-gal .actno,
+   .actname { color: var(--ink-3) }` restate what the base rules for a lede
+   and an act mark already give, once the room hands down its own tokens
+   rather than the world's. They were invisible while `.sheet-gal` named
+   `--ink`, because then they were the only thing saying the right value. */
 .galwrap { max-width: 76rem; margin: 0 auto; }
 
 /* ── 01 the door: type left, the atlas right ─────────────────────── */
@@ -9928,8 +9932,24 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
                --pine-ink:  var(--pine);
                background: var(--white); color: var(--ink); }
 .sheet-bleed > .actmark { padding-inline: var(--page-gutter); }
+/* AND THE OPENING PAINTS ITS OWN GROUND, BECAUSE THE PICTURE IS BOUNDED
+   AND THE WINDOW IS NOT. The photograph is capped at 16/9 of the viewport
+   width — deliberately, because a viewport-filling slot guaranteed only 9%
+   of a photograph's frame at some window shapes and this one guarantees
+   35.5% — so at 1280x900 it is 1280x720 inside an aperture 900 tall on
+   screen, and ninety pixels of the WALL showed through the window above and
+   below it. Measured in the first honest run of the check that asks
+   whether the window is full, after it was repointed off a class that had
+   stopped existing; visible in one screenshot, and nothing else could see
+   it because every box was the right size in the right place.
+   Filling the viewport instead would put the crop box back to 9%, which is
+   a licence cost rather than a layout one. So the opening is a dark
+   opening: `light wall, dark opening` is this atlas's whole reading of an
+   aperture, and what a gallery does with a picture smaller than its frame
+   is mount it. The step is measured in the browser suite. */
 .sheet-bleed .shotclip { position: absolute; inset: 0 0 auto 0;
-                         height: 118svh; clip-path: inset(0); z-index: 0; }
+                         height: 118svh; clip-path: inset(0); z-index: 0;
+                         background: var(--graphite); }
 .sheet-bleed .shotfull { position: fixed; z-index: 0;
   aspect-ratio: 4 / 5;
   width: min(100vw, 80svh);

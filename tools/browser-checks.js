@@ -2728,8 +2728,27 @@ async function main() {
                 * guarantees 35.5%. So the question is whether the window
                 * is full, not whether the screen is: a gap here is the
                 * wall showing through the opening. */
-               covers: Math.round(before.width) >= Math.round(ap.width) - 1
-                    && Math.round(before.height) >= Math.round(ap.height) - 1,
+               /* AND THE WINDOW IS MOUNTED RATHER THAN FULL. The first
+                * version asked the picture to fill the viewport, which was
+                * true while it was `inset: 0` — and the crop-box
+                * measurement then bounded it deliberately, because a
+                * viewport-filling slot guaranteed only 9% of a
+                * photograph's frame at some window shapes against 35.5%
+                * for this one. So the picture is narrower or shorter than
+                * the opening by design, and the promise is not that there
+                * is no gap: it is that the gap is the OPENING's own
+                * ground and not the wall's. Light wall, dark opening is
+                * this atlas's whole reading of an aperture, and a gallery
+                * mounts a picture smaller than its frame rather than
+                * leaving the wall showing through. Measured as the step
+                * between the two grounds, which is the same instrument
+                * the arch's reveal is held to.
+                * The WIDTH still has to reach, because a mount down the
+                * sides of a landscape is a hole beside it rather than a
+                * mount under it. */
+               wide: Math.round(before.width) >= Math.round(ap.width) - 1,
+               wall: getComputedStyle(band).backgroundColor,
+               mount: getComputedStyle(cliphost).backgroundColor,
                ap: [Math.round(ap.width), Math.round(ap.height)],
                pic: [Math.round(before.width), Math.round(before.height)] };
     });
@@ -2757,11 +2776,24 @@ async function main() {
        `${w}: the plate-03 picture moved ${r.moved}px while the page ` +
        `scrolled ${r.scrolled}px — it is travelling with the page rather ` +
        "than standing still behind it");
-    ok(r.covers,
+    ok(r.wide,
        `${w}: the plate-03 picture is ${(r.pic || []).join("x")} inside an ` +
-       `aperture of ${(r.ap || []).join("x")} — the window shows the wall ` +
-       `through it. A gap here is a measurement, which is why both boxes ` +
-       `are in the message`);
+       `aperture of ${(r.ap || []).join("x")} — it does not reach the sides, ` +
+       `so the opening shows ground beside the picture rather than under it`);
+    {
+      const px = (c) => (String(c).match(/\d+/g) || [0, 0, 0]).slice(0, 3).map(Number);
+      const lum = (c) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92
+        : Math.pow((v + 0.055) / 1.055, 2.4); };
+        return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); };
+      const a = lum(px(r.wall)), b2 = lum(px(r.mount));
+      const step = (Math.max(a, b2) + 0.05) / (Math.min(a, b2) + 0.05);
+      checked++;
+      ok(step >= 3,
+         `${w}: the plate-03 opening measures ${step.toFixed(2)}:1 against the ` +
+         `wall around it — ${r.mount} inside ${r.wall}. The picture is bounded ` +
+         `on purpose, so what shows above and below it has to read as the ` +
+         `opening's own ground: light wall, dark opening, or it is a hole`);
+    }
   }
 
   // ── an accent on every row is a texture, and the rule named classes ─
