@@ -178,3 +178,49 @@ now fails on this automatically.
 | a photograph | the register holds no `my-europe` purpose, and inventing one would put a stock European scene on the page whose subject is the reader's own choices. The drawing IS the picture here |
 | a second map | one arch per page. The saved atlas is the signature moment and a second would be the wallpaper its own rule warns about |
 | a share button | band 05 says what it would need. A link that exposes a reader's list is a decision about somebody else's data, not a feature |
+
+
+---
+
+## Part 8 — the doctrine audit
+
+`docs/redesign-doctrine.md` arrived after this page shipped, so both of its
+audits are filled in here from the evidence above rather than from memory.
+Every line that is not satisfied says so.
+
+**Monotony**, measured at 1280: **10%**, six `row mekind` siblings, the lowest figure of any page rebuilt under the brief. The page's central instrument is a drawing and its saved entries are written by the application at runtime, so there is very little repeated markup to measure.
+
+### CONTENT PRESERVATION
+
+- [x] every important existing content item retained
+- [x] existing counts retained and derived — all six save kinds, each with
+      its own figure
+- [x] existing links retained
+- [x] existing destinations retained
+- [x] existing relationships retained
+- [x] **existing functionality retained, and this is the load-bearing line on
+      this page** — the three `localStorage` keys and the four runtime hooks
+      (`#minemap`, `#minecap`, `#mine`, `#dna`) are exactly what they were,
+      and a placeholder inside `#mine` is the one thing that would have made
+      this page lie
+- [x] existing data loaders reused
+- [x] existing map engine reused
+- [x] existing image and provenance system reused
+
+### DESIGN TRANSFORMATION
+
+- [x] the page has a new composition — seven plates
+- [x] the existing card/grid structure was not merely reskinned
+- [x] the opening communicates the page's purpose
+- [x] the content hierarchy was reconsidered
+- [x] photography has an editorial role
+- [x] the map or the data has a meaningful visual role — 1,152 x 899 where the
+      page's own instrument had been capped at 480px in a 1,152px band
+- [x] the sections have different visual rhythms
+- [x] the page does not read as a CMS listing
+- [x] the page has a memorable signature moment — the emptiness is honest
+
+### Notes, including what this audit does not claim
+
+**The monumental opening stays refused**, on a measurement this site already
+holds: an instrument's title is a label, because the page is the tool.

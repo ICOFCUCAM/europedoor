@@ -226,3 +226,56 @@ one photographed destination per macro region and `contact_sheet.py` renders
 the page with a register holding ONE row, so it is empty there by design.
 Every other band on that page is guarded by `if inner` in the plate loop; this
 was the one that could never return an empty string because it died first.
+
+
+---
+
+## Part 8 — the doctrine audit
+
+`docs/redesign-doctrine.md` arrived after this page shipped, so both of its
+audits are filled in here from the evidence above rather than from memory.
+Every line that is not satisfied says so.
+
+**Monotony**, measured at 1280: **33%**, seventeen `row journeyrow` siblings, next two 5% and 4%. The highest figure of the pages rebuilt under the brief, and the subject of the page is a set of seventeen journeys, so the list is not the fault; what the second figure says is that there is little else, and the opening — all seventeen routes drawn at once — is what carries the page.
+
+### CONTENT PRESERVATION
+
+- [x] every important existing content item retained — every journey in the
+      dataset (the count is `docs/content-report.md`'s, and derived on the
+      page), every stop in order, every derived distance
+- [x] existing counts retained and derived — including the extent, which the
+      page had never stated
+- [x] existing links retained
+- [x] existing destinations retained
+- [x] existing relationships retained — a leg is a relation and the routes
+      are drawn from it
+- [x] existing functionality retained
+- [x] existing data loaders reused — `glyph_view`, `route_line`, `haversine`
+- [x] existing map engine reused — the seventeen routes are the family's own
+      signature drawing, which was built on every build and thrown away
+- [x] existing image and provenance system reused — 1 `<img>` to 10, and
+      **nothing was acquired**
+
+### DESIGN TRANSFORMATION
+
+- [x] the page has a new composition
+- [x] the existing card/grid structure was not merely reskinned
+- [x] the opening communicates the page's purpose — movement, drawn
+- [x] the content hierarchy was reconsidered
+- [x] photography has an editorial role — `journeys-hero` carries the CLOSE
+      as a declaration, because a photograph replaces a drawing and does not
+      sit behind it
+- [x] the map or the data has a meaningful visual role
+- [x] the sections have different visual rhythms
+- [x] the page does not read as a CMS listing
+- [x] the page has a memorable signature moment
+
+### Notes, including what this audit does not claim
+
+**33% is worth re-reading rather than defending.** Seventeen rows each
+carrying a route drawing, a name, a pace and its stops in order is a
+composition repeated seventeen times, which is what this instrument is for —
+and it is also what the page IS. The honest next question is whether the three
+paces (derived from measured kilometres a day) should set three rhythms the
+way /countries' nine regions now do. Recorded with that as the trigger, not
+ticked.

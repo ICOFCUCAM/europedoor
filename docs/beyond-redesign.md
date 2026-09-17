@@ -152,3 +152,53 @@ after — because nothing here is deleted on an argument alone.
 | a photographic hero | see Part 4; and the corners band spends what the register actually holds |
 | all 27 photographed quiet places as a band | 27 of 130 is a fact about the library, not about Europe, and presenting it as a selection is what this page refuses. The nine picks are editorial — one per corner — and the corner with no photograph shows its slot, which names the acquisition |
 | a derived swap | a great-circle distance and a quiet flag cannot say that Kvarner is what somebody wanted from Dubrovnik. The six are authored editorial judgements and are the work |
+
+
+---
+
+## Part 8 — the doctrine audit
+
+`docs/redesign-doctrine.md` arrived after this page shipped, so both of its
+audits are filled in here from the evidence above rather than from memory.
+Every line that is not satisfied says so.
+
+**Monotony**, measured at 1280: **18%**, forty-one `row quietrow` siblings, with two more `quietrow` groups at 9% and 8% — the nine corners, each its own group. An index whose subject is 130 places is a list, and the grouping is what stops it being one list.
+
+### CONTENT PRESERVATION
+
+- [x] every important existing content item retained — 130 quiet
+      destinations, nine corners, six swaps, the rule
+- [x] existing counts retained and derived — and the SHARE was added beside
+      the count, because the count argues the wrong way
+- [x] existing links retained
+- [x] existing destinations retained
+- [x] existing relationships retained
+- [x] existing functionality retained
+- [x] existing data loaders reused
+- [x] existing map engine reused
+- [x] existing image and provenance system reused — nine photographs of 27
+      available, one per corner, and **nothing was acquired**
+
+### DESIGN TRANSFORMATION
+
+- [x] the page has a new composition
+- [x] the existing card/grid structure was not merely reskinned
+- [x] the opening communicates the page's purpose
+- [x] the content hierarchy was reconsidered — the page's own position was a
+      caption-size note at the very bottom and is two bands
+- [ ] **photography has an editorial role — PARTLY.** There is no hero, and
+      that is a refusal rather than a gap: the photograph that could be
+      acquired for this family is by definition a generic European scene,
+      which is the exact thing a page refusing the phrase *hidden gems*
+      cannot open on
+- [x] the map or the data has a meaningful visual role
+- [x] the sections have different visual rhythms
+- [x] the page does not read as a CMS listing
+- [x] the page has a memorable signature moment
+
+### Notes, including what this audit does not claim
+
+**One of the rule's three promises is still not built anywhere** — *who
+locally is worth your money* — and it is stated as unbuilt with what it would
+take rather than quietly deleted. *A refusal nobody can check is a slogan*,
+and that one had never been checked until this page was rebuilt.

@@ -14,7 +14,7 @@ Via Europa. Take their architecture and drop their branding section. See
 
 | doing | read |
 |---|---|
-| **ANY page redesign — read this before writing a line of CSS** | **`docs/redesign-doctrine.md`** — *preserve the information, reinterpret the presentation.* The existing content is authoritative and the existing visual structure is not. Inspect, then write a content architecture, then compose — in that order. The two per-page audits, why photography is structural rather than decorative, and `tools/monotony.js`, which measures the share of a page taken by one repeated component because nothing here counted repetition and forty-two identical rows passed every green gate |
+| **ANY page redesign — read this before writing a line of CSS** | **`docs/redesign-doctrine.md`** — *preserve the information, reinterpret the presentation.* The existing content is authoritative and the existing visual structure is not. Inspect, then write a content architecture, then compose — in that order. The two per-page audits, why photography is structural rather than decorative, and `tools/monotony.js`, which measures the share of a page taken by one repeated component because nothing here counted repetition and forty-two identical rows passed every green gate. It also carries the second rule — **do not optimise for visual consistency at the expense of editorial difference**, because a site where every page is four editorial bands scores beautifully on monotony and is band monotony — the Inspect → Understand → Recompose → Preserve → Audit sequence, the eleven things a recomposition proves rather than claims, the thirteen page grammars, and why /themes and /map are reference implementations of the METHOD and never of the layout |
 | **the mandate: what a first-class gateway to Europe would be, and where this one is not** | **`docs/first-class-audit.md`** — 27 surfaces rendered at 1280 and 390 and then measured. Three findings, and Finding 1 is now closed on the numbers: it read 12 of 23 surfaces effectively type to the fold with seven showing no picture at all, and reads **3 of 30 with none and none under a fifth**, median share 24% → 35.6% (CORRECTED twice — the first version said 21 of 22 and was reading where the first figure STARTS rather than how much of the screen it fills). `tools/opening.js` is the instrument, so the number is checkable in a minute. **Finding 2's other half is measured too** — it says the page is the same page and its evidence only ever covered the first 250 pixels: `tools/composition.js` reads the band sequence under the head and finds **29 distinct body shapes over 47 families**, and three h1 sizes at tops 136–745 where the original reading was one size at 150–312. The eight benchmark sites are BLOCKED by the egress proxy and the benchmark half is labelled second-hand |
 | **/experiences — the third instrument, and why it is photography rather than a map** | **`docs/experiences-redesign.md`** — the source audit, the image-coverage audit, the twelve bands of the brief mapped onto what this atlas actually holds, the two that are refused, and the seven defects only rendering found. 311 photographs, and on this one page the library was never the constraint |
 | **/journeys — movement rather than a list, and where the family's own photograph went** | **`docs/journeys-redesign.md`** — the source audit, the seventeen routes drawn at once as the opening, the three paces derived from measured kilometres a day rather than named, the two things the brief asks for that are refused with their triggers, and the five defects only rendering found |
@@ -5910,6 +5910,95 @@ colour the stops by ANCESTOR, so a hoisted `<defs>` takes the wrong colour or
 none, which is this function's own recorded fault from the other end. The id
 carries a counter instead; a prefix chosen per caller would be a guard
 whoever adds the next drawing gets to choose.
+
+**THE WORST MONOTONY FIGURE ON THE SITE WAS A PAGE ALREADY REDESIGNED, AND
+`glyph_view`'s OWN COMMENT STATED THE DOCTRINE'S SECOND RULE AS A DESIGN
+DECISION.** /countries measured **63%** — nine `macroband` siblings, 11,300
+pixels of an 18,569-pixel page — one commit after the page-level
+recomposition, because that pass kept the biggest band's shape and only moved
+it. The docstring says so: *WHAT IS KEPT: the nine macro bands*, which is
+right about the GROUPING and was applied to the SHAPE.
+
+Measured across the nine: destinations 8 to 94, extent 546 km to 3,605,
+photographs in the register 4 to 56, own proportion **0.63 to 2.75** — and
+**proportion as drawn, 1.282, nine times.** `glyph_view` explains the last
+one itself: *"held to the canvas proportion, so a set of glyphs is a set of
+boxes of the same shape and only the geography inside them differs"* —
+**do not optimise for visual consistency at the expense of editorial
+difference, written as a decision in the function that implements it**, one
+commit before the owner added that rule. That box was 42% padding for Eastern
+Europe and 3% for the Caucasus.
+
+`macro_shape()` measures each region in kilometres and the composition is its
+own shape. Two boundaries that are descriptions rather than fitted numbers —
+taller than wide, wider than tall, more than twice as wide as tall — and the
+nine fall **4 portrait / 3 upright / 2 panoramic**. **63% → 25%**, next two
+20% and 8%, and the monotony ceiling came down 63 → 55 in the same diff.
+
+**ORIENTATION RATHER THAN SCALE, WHICH IS THE DEPARTURE FROM /themes.** That
+page derives three band SIZES from a theme's reach, which is a claim about
+importance; a region is not more important for being wide, and nothing here is
+drawn larger than anything else. *One method reused as a template is band
+monotony* — the rule cuts both ways, and the owner's own instruction is to
+copy the reference implementations' METHOD and never their layout.
+
+**Three measurements were taken and refused, and each refusal is the finding.**
+The COUNT argues the wrong way: Eastern Europe holds 8 destinations because
+**three of its four countries carry a travel advisory**, so a size derived
+from it prints an advisory artefact as an editorial judgement —
+/beyond-the-obvious's own sentence one family over. PHOTOGRAPH COVERAGE is a
+real 14× spread and this page already spends it on which country gets the
+large door, and a band drawing one measurement twice is what /journeys
+recorded. And **the partition cannot be drawn once**: nine areas on one
+continent need nine tones, the owner's palette refuses an eight-hue wheel in
+as many words, nine steps inside the atlas's one stone are the *rounding error
+with a token name*, and a seam needs topology this atlas does not hold — it
+holds country rings, so a stroke on a group strokes every internal frontier at
+region weight. Nine frames is what the data supports.
+
+**AND THE FIRST REPAIR DID NOTHING FOR THE ONE REGION IT WAS WRITTEN FOR.**
+Passing each region's measured aspect to `glyph_view` looked complete: the
+hold only ever GROWS the short axis, the Mediterranean's padded box is already
+986 units of a 1,000-unit canvas, so growing width toward 2.75 clamped at the
+canvas and the emitted frame came back at **1.30 — the whole continent with a
+corner lit**, which is that function's own recorded failure. `aspect="own"` is
+no hold at all. **And the isotropic pad is why the drawn spread is narrower
+than the geographic one** — a third of the region's own size on every side
+pulls every aspect toward 1, so the nine measure 0.54–3.21 raw on this
+projection and 0.86–1.69 padded; the pad floor is a legibility floor for a
+region the size of the Baltic States, so it stays and the CLASSIFICATION is
+done on the geography rather than on the frame.
+
+**AND ONE UNCONDITIONAL RULE WAS WRITTEN TWICE, TWO SCREENS FROM THE
+PARAGRAPH RECORDING THE LAST 85.** The portrait glyph's height cap went into
+the 62rem block and into its complement with an identical body — two media
+ranges that between them cover every width, which is a rule that is
+unconditional, written twice.
+
+**AND ONE EMITTED STRING IN TWO PLACES SHIPPED TWO IDENTICAL GRADIENT IDS,
+FOUND BY THE GATE SUITE FOR PHOTOGRAPHS.** `region_glyph` at the full extent
+emits `cut_fade`, whose ids carry a build-wide counter precisely so two
+drawings on one page cannot collide — and **a counter cannot help when the
+same emitted string is interpolated twice.** /countries built its continental
+drawing once into `heroart` and used it in plate 01's fallback and in plate
+02. It is invisible while the register holds `countries-hero`, because then
+plate 01 draws the photograph and the fallback is never reached;
+`photo-tests.py` frees that purpose to acquire against its stub, rebuilt, and
+`c_unique_ids` reported `rg2edge` and `rg2foot` twice. *A code path nothing
+exercises is a code path nothing checks* — and the only thing that exercises
+this one is the suite whose subject is something else entirely. Two calls, so
+each emission takes its own number; proved on the state that broke it.
+
+**A RHYTHM WRITTEN AT (0,2,0) BEAT THE 62rem BLOCK AT EVERY WIDTH**, which is
+the trap this stylesheet already records twice: a phone drew the Baltic States
+**115 pixels wide inside a three-track grid** and the document scrolled
+sideways by 66px at 390. Both rhythms live inside `@media (min-width: 62rem)`
+now, because a rhythm is a statement about a wide column, and no breakpoint
+was added. Then a full-width portrait drawing measured 358 × 564 at 390 —
+*the full-width glyph at 600 made /interests 11,972 pixels tall* — so it is
+capped at 24rem with `width: auto`, which keeps the proportion the rhythm is
+about; holding it back to 1.282 below the breakpoint would reintroduce the
+fault at the width most readers are at.
 
 ## Gates
 

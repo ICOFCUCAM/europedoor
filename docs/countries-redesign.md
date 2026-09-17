@@ -261,3 +261,202 @@ room for a stage above its opening, so `checks.py` failed on *no page head*
 and *no extent* — the same pair /journeys and /experiences already answered.
 The A–Z band carries `<div class="pagehead index">` and states the derived
 count, because *an index exists to say how big a set is*.
+
+---
+
+## Part 8 — the retrospective doctrine pass, and the page it was already on
+
+`docs/redesign-doctrine.md` arrived after this page shipped, and the first
+thing `tools/monotony.js` measured was **/countries at 63%, the worst figure
+on the site** — nine `macroband` siblings, 11,300 pixels of an 18,569-pixel
+page, on a page that had just been redesigned. Part 6 above records the
+page-level recomposition as done, and it was; what it did not do was look
+inside the biggest band. The docstring says so in as many words —
+**WHAT IS KEPT: the nine macro bands** — and the reasoning there is right
+about the GROUPING and was applied to the SHAPE, which are different
+questions.
+
+### Inspect
+
+Each of the nine held an eyebrow, a name, a blurb, a photograph, a glyph and
+its member countries as `ed_rows`. All nine held exactly that, in exactly
+that arrangement, at exactly one size.
+
+Measured across the nine:
+
+| | spread |
+|---|---|
+| destinations | 8 (Eastern Europe) to 94 (the Mediterranean) — **12×** |
+| extent | 546 km (the Baltic States) to 3,605 (the Mediterranean) — **6.6×** |
+| member countries | 2 to 9 |
+| photographs in the register | 4 (Britain & Ireland) to 56 (Western Europe) — **14×** |
+| **own proportion, in km** | **0.63 to 2.75** |
+| own proportion, on this projection | 0.54 to 3.21 |
+| proportion as DRAWN | 1.282, nine times |
+
+### Understand
+
+`glyph_view` states the reason for the last row itself: *"held to the canvas
+proportion, so a set of glyphs is a set of boxes of the same shape and only
+the geography inside them differs."* **That is the owner's second doctrine
+rule written as a design decision in the function that implements it** — do
+not optimise for visual consistency at the expense of editorial difference —
+one commit before the rule arrived. Measured, that box was **42% padding for
+Eastern Europe and 3% for the Caucasus.**
+
+### Recompose
+
+**`macro_shape()` measures each region in kilometres and the composition is
+its own shape.** Three rhythms at two boundaries that are descriptions rather
+than fitted numbers — taller than wide, wider than tall, and more than twice
+as wide as tall — and the nine fall **4 / 3 / 2**:
+
+| rhythm | regions | the composition |
+|---|---|---|
+| portrait | the Baltic States, Western Europe, Eastern Europe, Britain & Ireland | the drawing tall at the end of the row |
+| upright | the Nordics, Alpine & Central, the Adriatic & Balkans | the three-track band this family already had, kept |
+| panoramic | the Mediterranean, the Caucasus & the Bosphorus | the drawing across the whole column, the words and the photograph sharing the foot, the members in two columns |
+
+**ORIENTATION RATHER THAN SCALE, WHICH IS THE DEPARTURE FROM /themes.** That
+page derives three band SIZES from a theme's reach, which is a claim about
+importance. A region is not more important for being wide, and nothing here
+is drawn larger than anything else: what changes is which way up each region
+is. *One method reused as a template is band monotony* — the rule cuts both
+ways, and copying the reference implementation's layout is the thing it
+forbids.
+
+**63% → 25%**, with the next two components at 20% and 8%. The monotony
+ceiling came down 63 → 55 in the same diff; the new worst is a motion page.
+
+### Three things were measured and refused
+
+**The count is not what decides.** Destinations per region run 8 to 94 and
+look like the obvious scale. Eastern Europe holds 8 because **three of its
+four countries carry a travel advisory**, so a size derived from that figure
+prints an advisory artefact as an editorial judgement. That is
+/beyond-the-obvious's own finding — *the count argues the wrong way* — one
+family over.
+
+**Photograph coverage is not either.** It is a real 14× spread and this page
+already spends that measurement on which country gets the large door; a band
+drawing one measurement twice is what /journeys recorded about its rhythm
+bar and its leg grid.
+
+**And the partition cannot be drawn once.** The obvious composition for nine
+groups that tile a continent is one drawing with the nine told apart, and it
+is not available: nine areas need nine tones, the owner's palette refuses an
+eight-hue wheel in as many words (*"I would NOT make every page colorful.
+This is critical"*), and nine steps inside the atlas's one stone are the
+*rounding error with a token name* this repository refuses for a surface
+ladder. The seams cannot carry it either — a region boundary is where two
+member groups meet, and this atlas holds country rings rather than topology,
+so a stroke on a group strokes every internal frontier at region weight.
+**Nine frames is what the data supports**, which is also why the nine were
+nine frames in the first place.
+
+### Four defects only rendering found
+
+**THE FIRST REPAIR DID NOTHING FOR THE ONE REGION IT WAS WRITTEN FOR.**
+Passing each region's measured aspect to `glyph_view` as `want` looked
+complete and was not: the hold only ever GROWS the short axis, the
+Mediterranean's padded box is already 986 units of a 1,000-unit canvas, so
+growing width toward 2.75 clamped at the canvas and the emitted frame came
+back at **1.30 — the whole continent with a corner lit**, which is this
+function's own recorded failure. `aspect="own"` is no hold at all: the frame
+is the padded box as measured, and the nine now run 0.86 to 1.69.
+
+**AND THE PAD IS WHY THE DRAWN SPREAD IS NARROWER THAN THE GEOGRAPHIC ONE.**
+`glyph_view` adds a third of the region's own size as context before it
+frames, isotropically, which pulls every aspect toward 1: the same nine
+measure 0.54–3.21 raw on this projection and 0.86–1.69 padded. The padding is
+a drawing convention and the pad floor is a legibility floor for a region the
+size of the Baltic States, so it stays and the classification is done on the
+geography rather than on the frame.
+
+**AND ONE EMITTED STRING IN TWO PLACES SHIPPED TWO IDENTICAL GRADIENT IDS.**
+`region_glyph` at the full extent emits `cut_fade`, whose ids carry a
+build-wide counter so two drawings on one page cannot collide — and a counter
+cannot help when the SAME string is interpolated twice. `heroart` was built
+once and used in plate 01's fallback and in plate 02. Invisible while the
+register holds `countries-hero`; `photo-tests.py` frees that purpose to
+acquire against its stub, rebuilt, and `c_unique_ids` reported `rg2edge` and
+`rg2foot` twice. Two calls now, and it is proved on the state that broke it:
+with the row removed the page emits rg1 and rg2 and no id anywhere repeats.
+
+**A RHYTHM WRITTEN AT (0,2,0) BEAT THE 62rem BLOCK AT EVERY WIDTH.**
+`.mac-por .macrotop` against the existing block's `.macrotop` — the trap this
+stylesheet already records twice — so a phone drew the Baltic States **115
+pixels wide inside a three-track grid** and the document scrolled sideways by
+66px at 390 and 101 at 320. Both rhythms live inside `@media (min-width:
+62rem)` now, because a rhythm is a statement about a wide column. No new
+breakpoint; the register refused a seventh once.
+
+**AND A FULL-WIDTH PORTRAIT DRAWING IS MORE THAN HALF A PHONE SCREEN.** At
+390 an 0.63 drawing across the column is 358 × 564 — the *full-width glyph at
+600 made /interests 11,972 pixels tall* finding. Capped at 24rem with `width:
+auto`, which keeps the region's own proportion: holding it back to 1.282
+below the breakpoint would be the fault this band was recomposed for,
+reintroduced at the width most readers are at.
+
+**AND THE PANORAMIC BAND WAS 2,375 PIXELS BEFORE ITS FOOT WAS SPLIT.** All
+three parts full width put a 494-pixel 21:9 photograph under a 670-pixel
+drawing. A wide drawing over a two-column foot is 2,051, and neither half is
+alone in a half-empty row. The page ran 18,569 → 19,791 at 1280 and 28,198 →
+28,945 at 390, +6.6% and +2.6%, which is what three rhythms cost.
+
+**AND ONE UNCONDITIONAL RULE WAS WRITTEN TWICE.** The portrait glyph's height
+cap went into the 62rem block and into its complement with an identical body —
+two media ranges that between them cover every width, which is a rule that is
+simply unconditional written twice. This stylesheet removed 85 duplicated
+selectors one session ago and the sentence recording that was two screens
+away. One base rule.
+
+### CONTENT PRESERVATION
+
+- [x] every important existing content item retained — nine names, nine
+      blurbs, nine photographs, nine glyphs, fifty country rows with their
+      taglines and their region and city counts, every advisory flag
+- [x] existing counts retained and derived — and one added, the extent in km
+- [x] existing links retained — nine macro links, fifty country links
+- [x] existing destinations retained
+- [x] existing relationships retained — the macro → country grouping is
+      `data/taxonomy.json` unchanged
+- [x] existing functionality retained — this page loads no JavaScript
+- [x] existing data loaders reused — `macro_frame`, `region_glyph`, `photo`,
+      `ed_rows`
+- [x] existing map engine reused — `glyph_view` gained one parameter value
+- [x] existing image and provenance system reused — **nothing was acquired**,
+      and no photograph's proportion changed, because a derived crop on
+      `macro:` would be a surface the register does not declare
+
+### DESIGN TRANSFORMATION
+
+- [x] the page has a new composition — three rhythms where there was one
+- [x] the existing structure was not merely reskinned — the arrangement is
+      derived per region rather than restyled
+- [x] the opening communicates the page's purpose — unchanged, and it already did
+- [x] the content hierarchy was reconsidered
+- [x] photography has an editorial role — unchanged; the photograph is the
+      one element a derived proportion may not touch, and that is recorded
+- [x] the map or the data has a meaningful visual role — the frame IS the
+      measurement now
+- [x] the sections have different visual rhythms — 4 / 3 / 2
+- [x] the page does not read as a CMS listing — 63% → 25%
+- [x] the page has a memorable signature moment — the country as its own
+      aperture, unchanged, plus the Mediterranean drawn as a strip and the
+      Baltic States as a window
+
+### The eleven-point pass
+
+1. content preservation — above, and `checks.py` 113/113
+2. visual hierarchy — three rhythms, measured band heights 664–2,051 at 1280
+3. monotony — 63% → **25%**, next two 20% and 8%; ceiling 63 → 55
+4. photography — nine photographs, unchanged proportions, nothing acquired
+5. geographic meaning — the frame is the region's own padded box, 0.86–1.69
+6. responsive — 1280 / 834 / 390 / 320, overflow 0 at all four
+7. accessibility — the browser suite
+8. provenance — `c_photo_safe_area`, `c_container_is_emitted`, the register
+   untouched
+9. interaction — none on this page by design
+10. browser behaviour — the full suite, run alone
+11. regression — the invariant register, and the monotony ceiling in the diff

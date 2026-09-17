@@ -420,3 +420,54 @@ drawing them again here is the signature as wallpaper, and the route this
 page is about does not exist until the reader presses the button. **So the
 route line is drawn where the route exists**, in plate 03, on /plan's own
 country rings.
+
+
+---
+
+## Part 8 — the doctrine audit
+
+`docs/redesign-doctrine.md` arrived after this page shipped, so both of its
+audits are filled in here from the evidence above rather than from memory.
+Every line that is not satisfied says so.
+
+**Monotony**, measured at 1280: **11%**, six `wrow` siblings, with `rrow` at 7% and `styleway` at 5%. Three components sharing the page, and the page's subject is a form rather than a set.
+
+### CONTENT PRESERVATION
+
+- [x] every important existing content item retained
+- [x] existing counts retained and derived — and the three spending styles
+      gained a number each, medians over the 313 with their spread
+- [x] existing links retained
+- [x] existing destinations retained
+- [x] existing relationships retained
+- [x] **existing functionality retained** — every `planner.js` hook, and
+      `PLAN_STYLE_POS` is asserted equal to that file's own `STYLE_DAILY` so
+      the page and the planner cannot disagree about what "comfortable" means
+- [x] existing data loaders reused
+- [x] existing map engine reused
+- [x] existing image and provenance system reused — and
+      `render.credit_html()` became the ONE implementation of Pexels'
+      attribution, because a runtime `<img>` is invisible to the guard that
+      refuses an unregistered file
+
+### DESIGN TRANSFORMATION
+
+- [x] the page has a new composition
+- [x] the existing card/grid structure was not merely reskinned
+- [x] the opening communicates the page's purpose
+- [x] the content hierarchy was reconsidered
+- [x] photography has an editorial role — a photograph per leg, written by
+      the planner at runtime with its licence links
+- [x] the map or the data has a meaningful visual role
+- [x] the sections have different visual rhythms
+- [x] the page does not read as a CMS listing
+- [x] the page has a memorable signature moment
+
+### Notes, including what this audit does not claim
+
+**The monumental opening stays refused** on the instrument-head
+measurement, and the two-column shell stays refused because proof goes under
+the thing it proves. The band whose subject is a list of refusals now carries
+six, and **not one of them is written there for the first place**: each is
+already published on this site and the row says where, because a refusal
+nobody can check is a slogan.

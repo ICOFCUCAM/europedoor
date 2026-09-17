@@ -334,3 +334,52 @@ Measured after both repairs, with no horizontal overflow at any width:
 |---|---|---|---|---|
 | the feature's picture | 752 × 564 | 514 × 385 | 358 × 269 | 288 × 216 |
 | its words | 362 | 247 | 358 | 288 |
+
+
+---
+
+## Part 10 — the doctrine audit
+
+`docs/redesign-doctrine.md` arrived after this page shipped, so both of its
+audits are filled in here from the evidence above rather than from memory.
+Every line that is not satisfied says so.
+
+**Monotony**, measured at 1280: **16%**, six `picstory` siblings, with `row storyrow` at 11% behind it. Two components sharing the page is the shape this instrument reads as a composition.
+
+### CONTENT PRESERVATION
+
+- [x] every important existing content item retained — 9 stories, every
+      standfirst, every desk, every reading time and date
+- [x] existing counts retained and derived — nine desks, and the lede names
+      all nine after a run where it named six
+- [x] existing links retained
+- [x] existing destinations retained — a story's `places` field still draws
+      its storymap
+- [x] existing relationships retained
+- [x] existing functionality retained
+- [x] existing data loaders reused
+- [x] existing map engine reused
+- [x] existing image and provenance system reused — 1 `<img>` to 8, and
+      **nothing was acquired**
+
+### DESIGN TRANSFORMATION
+
+- [x] the page has a new composition — seven plates
+- [x] the existing card/grid structure was not merely reskinned — a head and
+      eight identical rows became a ledger and a feature
+- [x] the opening communicates the page's purpose
+- [x] the content hierarchy was reconsidered — the ledger leads by DATE and
+      the feature is chosen by the register, and the two are derived so they
+      cannot draw one piece twice
+- [x] photography has an editorial role
+- [x] the map or the data has a meaningful visual role
+- [x] the sections have different visual rhythms
+- [x] the page does not read as a CMS listing
+- [x] the page has a memorable signature moment
+
+### Notes, including what this audit does not claim
+
+**The desk band stays refused and the reason is a count**: nine desks and
+nine stories is a 1:1 mapping, which is literally the layout this page was
+built as and threw away. A chip would be a filter on a page that loads no
+JavaScript.

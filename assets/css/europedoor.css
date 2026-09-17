@@ -11678,6 +11678,87 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .macroshot :is(picture, img) { width: 100%; height: 100%; object-fit: cover; }
 .macroart { margin: 0; }
 .macroart .constel { width: 100%; height: auto; }
+/* A PORTRAIT REGION IS CAPPED RATHER THAN RESHAPED, AT EVERY WIDTH. At 1280
+   Eastern Europe's 0.75 drawing in a .55fr track is fine and at 390 the same
+   drawing across the column is 358 by 564 — more than half a screen for one
+   region's glyph, the *full-width glyph at 600 made /interests 11,972 pixels
+   tall* finding. `width: auto` under a height cap keeps the region's own
+   proportion, which is the whole point of the rhythm; holding it back to the
+   canvas's 1.282 would be the fault this band was recomposed for,
+   reintroduced at the width most readers are at. ONE RULE, because the first
+   version wrote the identical body inside both the 62rem block and its
+   complement — two media ranges that between them cover every width, which
+   is a rule that is simply unconditional, written twice. This stylesheet
+   removed 85 duplicated selectors one session ago. */
+.mac-por .macroart .constel {
+  max-height: 24rem; width: auto; margin-inline: auto; }
+
+/* THREE RHYTHMS, AND WHICH ONE A REGION TAKES IS ITS OWN SHAPE IN
+   KILOMETRES. The nine bands above were one composition nine times —
+   `tools/monotony.js` measured them at 63% of the page, the worst figure
+   on the site — and `macro_shape` is what says they are not nine like
+   things: the Mediterranean is 3,605 km wide and 1,311 deep, the Baltic
+   States 346 by 546. Taller than wide, wider than tall, and more than
+   twice as wide as tall: two boundaries that are descriptions rather than
+   fitted numbers, and the nine fall 4 / 3 / 2. 63% to 25%.
+
+   NOTHING IS DRAWN LARGER THAN ANYTHING ELSE. /themes derives three band
+   SIZES from a theme's reach, which is a claim about importance; a region
+   is not more important for being wide, so what changes here is where the
+   drawing sits and which way up it is. That distinction is the whole
+   reason this is not that page's layout copied — *do not optimise for
+   visual consistency at the expense of editorial difference* cuts the
+   other way too, and one method reused as a template is band monotony.
+
+   AND BOTH RHYTHMS LIVE INSIDE THE DESK BREAKPOINT, which is the trap this
+   stylesheet already records twice: `.mac-por .macrotop` is (0,2,0) and the
+   62rem block's `.macrotop` is (0,1,0), so the first version won at every
+   width and a phone drew the Baltic States 115 pixels wide in a three-track
+   grid. A rhythm is a statement about a wide column; below 62rem there is
+   one column and the stack is the answer, which is what the existing block
+   already says. No new breakpoint — the register refused a seventh once. */
+@media (min-width: 62rem) {
+  /* A PANORAMIC REGION RUNS THE FULL COLUMN, because a 2.75 drawing in a
+     third of 1,152px is 420 wide and 153 tall — a strip you cannot read a
+     coastline in — and the same drawing across the column is 1,152 by 419.
+     ITS WORDS AND ITS PHOTOGRAPH THEN SHARE THE FOOT rather than stacking:
+     the first version put all three full width and the Mediterranean band
+     measured 2,375 pixels, with a 494-pixel 21:9 photograph under a
+     670-pixel drawing. A wide drawing over a two-column foot is 400 pixels
+     shorter and neither half is alone in a half-empty row, which is the
+     finding /journeys recorded when it gave one row a 34rem column and got
+     300 pixels of nothing beside it. */
+  .mac-pan .macrotop {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+    grid-template-areas: "art art" "say shot"; align-items: start; }
+  .mac-pan .macroart { grid-area: art; }
+  .mac-pan .macrosay { grid-area: say; }
+  .mac-pan .macroshot { grid-area: shot; }
+  /* AND ITS MEMBERS SET IN TWO COLUMNS, because a full-width band above a
+     single column of two to nine rows is the empty-half-band this
+     stylesheet already records four times. `columns` packs where a grid
+     aligns — the /experiences finding — so a two-row and a nine-row region
+     both fill what they are given. */
+  .mac-pan .ed-rows { columns: 2; column-gap: var(--s6); }
+  .mac-pan .ed-row { break-inside: avoid; }
+
+  /* AN UPRIGHT REGION IS THE THREE-TRACK BAND THIS FAMILY ALREADY HAD, and
+     it is kept rather than restyled: a roughly square drawing beside a
+     roughly square photograph beside the words is what that arrangement is
+     FOR, and three of the nine are genuinely that. Only the drawing's own
+     frame changed, from the canvas's 1.282 to the region's. */
+
+  /* A PORTRAIT REGION PUTS ITS DRAWING TALL AT THE END OF THE ROW, because
+     Eastern Europe at 0.65 in a 1.282 box was 42% padding — measured — and
+     the same geometry in a narrow tall track is the region and almost no
+     sea. The photograph stays 3:2 on every rhythm: a proportion derived
+     per region would be a crop on a surface `data/image-purposes.json`
+     declares once, which is the licence position /themes refused
+     `object-fit: cover` on. */
+  .mac-por .macrotop {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, .55fr);
+    align-items: end; }
+}
 
 /* ── 06 the photographic atlas ────────────────────────────────────────── */
 /* TWO ACROSS, BECAUSE THE SUBJECT IS THE OUTLINE. One per row is the stack

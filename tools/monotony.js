@@ -45,7 +45,13 @@ const MT = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript",
 // the invariant register's discipline applied to composition. A ceiling set
 // at where the work should END would be red for a fortnight, and a gate that
 // is red for a fortnight is a gate people stop running.
-const CEILING = 0.63;
+//
+// 63 -> 55: /countries' nine macro bands became three rhythms derived from
+// each region's own shape in kilometres (4 portrait / 3 upright / 2
+// panoramic), and the page's largest repeated composition is 25% with the
+// next two at 20 and 8. The new worst is a motion page at 54%, so the
+// ceiling is that figure and the next recomposition moves it again.
+const CEILING = 0.55;
 
 const srv = http.createServer((q, r) => {
   let p = decodeURIComponent(q.url.split("?")[0]);

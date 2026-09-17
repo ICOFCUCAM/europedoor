@@ -176,3 +176,54 @@ declaration follows the page now: 26% claimed against a measured **55%**, and
 | a dark map | the cartography split already decides it — a picture is paper and an instrument is graphite, and these glyphs are pictures |
 | a new taxonomy or a second geographic calculation | the brief asks for neither, and the page takes `ranking`, `project()` and `constellation()` exactly as the seventeen tag pages do |
 | a ranking of interests | the order is reach, which is a measurement, and the page says so |
+
+
+---
+
+## Part 8 — the doctrine audit
+
+`docs/redesign-doctrine.md` arrived after this page shipped, so both of its
+audits are filled in here from the evidence above rather than from memory.
+Every line that is not satisfied says so.
+
+**Monotony**, measured at 1280: **33%**, seventeen `row themerow interes` siblings, with `row narrowrow` at 16% behind it. Joint highest of the rebuilt pages, and the same reading as /journeys: the subject is a set of seventeen and the list is not the fault, but the figure is worth re-reading rather than defended.
+
+### CONTENT PRESERVATION
+
+- [x] every important existing content item retained — 17 tags, every count
+- [x] existing counts retained and derived — and the concentration share was
+      ADDED, because the page ordered by reach and printed neither
+- [x] existing links retained
+- [x] existing destinations retained
+- [x] existing relationships retained
+- [x] existing functionality retained
+- [x] existing data loaders reused — `INTEREST_BANDS` is the family's own
+      published judgement and it is what allocates the three scales
+- [x] existing map engine reused — and the interactive map is REFUSED, on a
+      page whose only `<script>` is the inert JSON-LD block
+- [x] existing image and provenance system reused — all eighteen photographs
+      on the page, each exactly once, and **nothing was acquired**
+
+### DESIGN TRANSFORMATION
+
+- [x] the page has a new composition
+- [x] the existing card/grid structure was not merely reskinned
+- [x] the opening communicates the page's purpose
+- [x] the content hierarchy was reconsidered — the nine narrow tags, which
+      the page argues are the useful half, had had no picture at all
+- [x] photography has an editorial role
+- [x] the map or the data has a meaningful visual role
+- [x] the sections have different visual rhythms — three, from `INTEREST_BANDS`
+- [x] the page does not read as a CMS listing
+- [x] the page has a memorable signature moment — the seventeen tags drawn to
+      one frame, which is the one thing seventeen separate pages cannot do
+
+### Notes, including what this audit does not claim
+
+**A second measurement was taken and deliberately not shipped** — share of
+each country's own destinations — because Turkiye is 5 of 5 for history and a
+measure that reports 100% on five rows is the small-sample trap. It carries a
+trigger rather than a refusal.
+
+**And the interest PAGE is not covered by this audit.**
+`/interests/<tag>` measures 17% with its next two at 13% and 11%.

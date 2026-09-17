@@ -175,3 +175,57 @@ and at 1280 it is under it — and the remaining gap is the kind index, which
 is ten portrait crops beside ten names. Inflating those boxes to reach a
 number would be designing to the number, which the brief itself says is not
 the point; the figure is recorded rather than chased.
+
+
+---
+
+## Part 7 — the doctrine audit
+
+`docs/redesign-doctrine.md` arrived after this page shipped, so both of its
+audits are filled in here from the evidence above rather than from memory.
+Every line that is not satisfied says so.
+
+**Monotony**, measured at 1280: **19%**, ten `kindrow` siblings, with the next two at 5% and 3%. Below the ceiling and the second figure is the diagnostic: a page at 19% with two other components is a composition rather than a listing.
+
+### CONTENT PRESERVATION
+
+- [x] every important existing content item retained — 197 experiences, 8
+      categories, 10 kinds, every summary
+- [x] existing counts retained and derived — Part 1 lists each
+- [x] existing links retained
+- [x] existing destinations retained
+- [x] existing relationships retained — kind x macro region is a cross-tab of
+      data that was already there, not a new relation
+- [x] existing functionality retained — this page loads no JavaScript
+- [x] existing data loaders reused — `all_experiences`, `categories.select`
+- [x] existing map engine reused — `region_glyph`, and the category map is
+      REFUSED rather than drawn (Part 3)
+- [x] existing image and provenance system reused — 1 photograph to 28, and
+      **nothing was acquired**
+
+### DESIGN TRANSFORMATION
+
+- [x] the page has a new composition — plate sequence
+- [x] the existing card/grid structure was not merely reskinned — 42 rows of
+      one component became eight plates
+- [x] the opening communicates the page's purpose
+- [x] the content hierarchy was reconsidered — the experiences precede the
+      taxonomy
+- [x] photography has an editorial role — the only honest answer to *what do
+      you want to DO* is a photograph, and the register held 311
+- [x] the map or the data has a meaningful visual role — kind x macro, and
+      the axis was chosen by measuring both
+- [x] the sections have different visual rhythms
+- [x] the page does not read as a CMS listing
+- [x] the page has a memorable signature moment — the eight categories at
+      four scales
+
+### Notes, including what this audit does not claim
+
+**The category page is a separate fault and is NOT closed by this.**
+`/experiences/<category>` measures **51%**, 48 `invite` siblings, **with no
+second component at all** — which is the report's own diagnostic for a page
+that is a list and nothing else. `docs/signature-moments.md` refuses geography
+there and the sub-category grouping is refused by the data (6 of 48 in no sub,
+8 in two); what has NOT been looked at is the one exclusive axis those records
+carry. Recorded here rather than ticked.

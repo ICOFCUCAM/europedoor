@@ -2355,7 +2355,19 @@ def countries_index(data):
         spent += len(m)
 
     # ── 01 · THE CONTINENT ───────────────────────────────────────────
-    heroart = region_glyph(list(cs))
+    # TWO CALLS FOR TWO DRAWINGS, AND ONE STRING IN TWO PLACES SHIPPED TWO
+    # IDENTICAL GRADIENT IDS. `region_glyph` at the full extent emits
+    # `cut_fade`, whose ids carry a build-wide counter precisely so two
+    # drawings on one page cannot collide — and a counter cannot help when
+    # the SAME emitted string is interpolated twice. It was invisible while
+    # the register holds `countries-hero`, because then plate 01 draws the
+    # photograph and the fallback is never used; `photo-tests.py` frees that
+    # purpose to acquire against its stub, rebuilt, and `c_unique_ids`
+    # reported `rg2edge` and `rg2foot` twice on this page. *A code path
+    # nothing exercises is a code path nothing checks*, and the one thing
+    # that exercises this one is the gate suite for photographs. Two calls
+    # cost 40 KB only in the state where two continental drawings are what
+    # the page has anyway.
     open_ = f"""
   <div class="sheettext">
     {head_extent([(len(cs), "countries"), (nreg, "travel regions"),
@@ -2366,7 +2378,7 @@ def countries_index(data):
     cities &mdash; every one of them written here rather than imported.</p>
   </div>
   <div class="atlasopen">{photo(images, "countries-hero", w=2000, h=1500,
-      sizes="(min-width: 62rem) 52vw, 100vw") or heroart}</div>"""
+      sizes="(min-width: 62rem) 52vw, 100vw") or region_glyph(list(cs))}</div>"""
 
     # ── 02 · THE MAP ─────────────────────────────────────────────────
     # AND THE CUT IS SAID RATHER THAN HIDDEN. At the continental extent
@@ -2386,7 +2398,7 @@ def countries_index(data):
     of the {len(cs)} countries is drawn on its own, so the frontiers are the
     picture.{cutsay}</p>
   </div>
-  <div class="atlasmap">{heroart}</div>
+  <div class="atlasmap">{region_glyph(list(cs))}</div>
   <p class="actions">
     <a class="btn" href="/map">Open the map</a>
     <a class="btn ghost" href="/discover">Start from what you like</a>
@@ -2459,6 +2471,29 @@ def countries_index(data):
     # exactly one page — its own — and the band whose entire subject is
     # those nine regions drew none of them. Same finding as the fifty, one
     # level up.
+    #
+    # THEN THE BAND WAS 63% OF THE PAGE, AND `tools/monotony.js` IS THE ONLY
+    # THING HERE THAT COULD SAY SO. Nine regions that differ by 12x in
+    # destinations, 6.6x in extent and 14x in photographs, drawn as nine
+    # identical 1,250-pixel compositions — the worst figure on the site, on
+    # a page already redesigned once, because the page-level recomposition
+    # kept this band's shape and only moved it. That is exactly the fault
+    # the owner named when he added the second doctrine rule: *do not
+    # optimise for visual consistency at the expense of editorial
+    # difference*, which replaces card monotony with band monotony.
+    #
+    # SO THE COMPOSITION IS THE REGION'S OWN SHAPE. `macro_shape` measures
+    # it in kilometres and the three rhythms are its two natural boundaries
+    # — taller than wide, wider than tall, and more than twice as wide as
+    # tall. The nine fall 4 / 3 / 2, so the band carries three rhythms
+    # rather than one and the largest repeated composition is four.
+    #
+    # ORIENTATION RATHER THAN SCALE, AND THAT IS THE DEPARTURE FROM
+    # /themes. That page derives three band SIZES from a theme's reach,
+    # which is a claim about importance; a region is not more important for
+    # being wide. Nothing here is drawn larger than anything else — what
+    # changes is which way up each region is, which is a fact about the
+    # ground and the one thing nine boxes of one shape cannot say.
     blocks = []
     for m in data["macros"]:
         rows, mcity = [], 0
@@ -2471,6 +2506,21 @@ def countries_index(data):
                          "meta": f"{n_of(len(c['regions']), 'region')} · "
                                  f"{n_of(ncity, 'city')}",
                          "flag": "advisory" if c.get("advisory") else ""})
+        kw, kh, asp = macro_shape(data, m)
+        shape = ("mac-pan" if asp >= MACRO_WIDE
+                 else "mac-up" if asp >= 1.0 else "mac-por")
+        # AND THE MEASUREMENT IS PRINTED, because a composition a reader
+        # cannot check is decoration that happens to vary. The eyebrow
+        # carries the extent that chose the rhythm beside the two counts,
+        # rounded to ten kilometres rather than to the kilometre — a
+        # haversine box across a region is not accurate to a kilometre and
+        # printing one would be a precision this figure does not have.
+        # AND THE THREE RHYTHMS ARE NOT NAMED ON THE PAGE. "Panoramic" is a
+        # word about the layout, and a reader who is told the Mediterranean
+        # is 3,600 km across and 1,310 deep can see which way up it is
+        # without the page explaining its own grid back to them — which is
+        # *never explain the constraint back*, and the sentence under the
+        # nine states the rule once.
         # AND THE CREDIT IS THE STANDARD ONE, because these pictures are not
         # inside a link. `.credit` is `picture()`'s own figcaption, revealed
         # on hover and on `:focus-visible` — which is how every photograph on
@@ -2483,25 +2533,52 @@ def countries_index(data):
         # is on the heading, so there is no nesting and nothing to aggregate.
         pic = photo(images, "macro:" + m["slug"], w=1200, h=900,
                     sizes="(min-width: 62rem) 26vw, 92vw")
+        # AND THE GLYPH IS FRAMED ON THE REGION'S OWN PROPORTION. Passing no
+        # aspect holds it to the canvas's 1.282, which measured 42% padding
+        # on Eastern Europe and 3% on the Caucasus: the drawing carries the
+        # shape the composition is derived from, or the composition is
+        # arguing about something the picture does not show. A DRAWING is
+        # free to be reshaped where a photograph is not — a derived
+        # proportion on `macro:` would be a crop on a surface the register
+        # does not declare, which is what /themes refused `object-fit:
+        # cover` for.
         blocks.append(
-            f'<section class="macroband" id="{esc(m["slug"])}">'
+            f'<section class="macroband {shape}" id="{esc(m["slug"])}">'
             f'<div class="macrotop">'
             f'<div class="macrosay">'
             f'<p class="ed-eyebrow">{n_of(len(m["countries"]), "country")} · '
-            f'{n_of(mcity, "destination")}</p>'
+            f'{n_of(mcity, "destination")} · '
+            f'{round(kw, -1):,.0f}&thinsp;×&thinsp;{round(kh, -1):,.0f}&thinsp;km</p>'
             f'<h3><a href="{urls.macro(m)}" class="nodec">{esc(m["name"])}</a></h3>'
             f'<p class="rowsub">{esc(m["blurb"])}</p></div>'
             f'<figure class="macroshot">{pic}</figure>'
             f'<figure class="macroart">'
-            f'{region_glyph(m["countries"], macro_frame(data, m))}</figure>'
+            f'{region_glyph(m["countries"], macro_frame(data, m), aspect="own")}'
+            f'</figure>'
             f'</div>{ed_rows(rows, level=4)}</section>')
+    # AND THE NINE ARE NINE DRAWINGS RATHER THAN ONE, WHICH WAS TESTED AND
+    # REFUSED. The obvious composition for a partition is to draw it once —
+    # fifty countries on one continent with the nine groups told apart —
+    # and it cannot be drawn honestly here. Telling nine areas apart on one
+    # drawing needs nine tones, the owner's palette refuses an eight-hue
+    # wheel in as many words (*"I would NOT make every page colorful. This
+    # is critical"*), and nine steps inside the atlas's one stone are the
+    # *rounding error with a token name* this repository already refuses for
+    # a surface ladder. The seams cannot carry it either: a region boundary
+    # is where two member groups meet and this atlas holds country rings
+    # rather than topology, so a stroke on a group strokes every internal
+    # frontier at region weight. Nine frames is what the data supports.
+    widths = sorted((macro_shape(data, m)[2], m["name"]) for m in data["macros"])
     regband = f"""
   <div class="sheettext">
     <h2 class="mega">The {numword(len(data['macros']))} regions.</h2>
     <p class="lede">Editorial travel regions rather than administrative
     ones: they group places that feel like each other and are usually
-    visited together. The shape beside each is the countries that region is
-    made of, framed on its own ground rather than on the continent.</p>
+    visited together. Each is drawn on its own ground at its own proportion,
+    because that is what separates them before a word is read &mdash;
+    {esc(widths[-1][1])} measures nearly three times as wide as it is deep
+    and {esc(widths[0][1])} is the other way up, and the two had been drawn
+    as the same shape.</p>
   </div>
   <div class="macrostack">{''.join(blocks)}</div>"""
 
@@ -10156,6 +10233,69 @@ def macro_frame(data, macro):
     return pts
 
 
+# A region is taller than it is wide, roughly balanced, or more than twice as
+# wide as tall. Two boundaries, both of them descriptions rather than fitted
+# numbers — 1 is "which way up is it" and 2 is "twice as wide as tall", and
+# the nine fall 3 / 4 / 2 under them. The alternative was a threshold read off
+# the gaps in these nine values, which is a number chosen to produce an answer
+# and stops being true the day a country moves between regions.
+MACRO_WIDE = 2.0
+
+
+def macro_shape(data, macro):
+    """How wide a macro region is against how tall, in kilometres.
+
+    THE NINE REGIONS WERE NINE IDENTICAL BANDS AND `glyph_view` SAID WHY IN
+    ITS OWN COMMENT: *held to the canvas proportion, so a set of glyphs is a
+    set of boxes of the same shape and only the geography inside them
+    differs.* That is visual consistency bought with editorial difference —
+    the owner's second doctrine rule, written as a decision in the function
+    that implements it, one commit before the rule arrived. Measured, the
+    nine regions of this atlas run from 0.63 (the Baltic States, 346 km wide
+    and 546 tall) to 2.75 (the Mediterranean at 3,605 x 1,311 and the
+    Caucasus at 1,965 x 714), and all nine were drawn at 1.282 and composed
+    identically.
+
+    KILOMETRES RATHER THAN PROJECTED UNITS, because the projection is
+    conformal and a conic's units are not the same length at 35 N and 65 N —
+    the Nordics measured against the Mediterranean in canvas units is the
+    scale-error finding arriving in a layout decision. Haversine on the
+    region's own destinations, which is every other distance in this product.
+
+    THE PADDED BOX IS NOT THE SHAPE. `glyph_view` adds a third of the
+    region's own size as context before it frames, which pulls every aspect
+    toward 1: the same nine measure 0.75 to 1.69 padded against 0.63 to 2.75
+    raw. The padding is a drawing convention and the shape is the
+    geography, so the composition is decided on the geography.
+
+    AND THE COUNT IS DELIBERATELY NOT WHAT DECIDES. Destinations per region
+    run 8 to 94, which looks like the obvious scale and argues something
+    false: Eastern Europe holds 8 because THREE OF ITS FOUR COUNTRIES CARRY
+    A TRAVEL ADVISORY, so a size derived from it would print an advisory
+    artefact as an editorial judgement. That is /beyond-the-obvious's own
+    finding — *the count argues the wrong way* — and photograph coverage is
+    refused for a second reason: this page already spends that measurement
+    on which country gets the large door, and a band drawing one measurement
+    twice is what /journeys recorded.
+    """
+    pts = []
+    for cs in macro["countries"]:
+        c = data["countries"].get(cs)
+        if not c:
+            continue
+        for r in c["regions"]:
+            for t in r["cities"]:
+                pts.append((t["lat"], t["lon"]))
+    if len(pts) < 2:
+        return 0.0, 0.0, 1.0
+    lats = [p[0] for p in pts]
+    lons = [p[1] for p in pts]
+    mlat, mlon = sum(lats) / len(lats), sum(lons) / len(lons)
+    w = haversine({"lat": mlat, "lon": min(lons)}, {"lat": mlat, "lon": max(lons)})
+    h = haversine({"lat": min(lats), "lon": mlon}, {"lat": max(lats), "lon": mlon})
+    return w, h, (w / h if h else 1.0)
+
+
 def indexhero(*, kicker, title, lede, art="", img="", actions="", note=""):
     """The editorial opening five indexes now share.
 
@@ -10248,7 +10388,7 @@ def indexhero(*, kicker, title, lede, art="", img="", actions="", note=""):
         f'<div class="ed-opening-visual">{figure}</div></header>')
 
 
-def region_glyph(members, frame=None, min_span=0.0):
+def region_glyph(members, frame=None, min_span=0.0, aspect=None):
     """A macro region as the countries it is made of, on the shared silhouette.
 
     THE ATLAS INDEX IS THE PAGE ABOUT COUNTRIES AND IT DREW NONE. /countries
@@ -10306,7 +10446,17 @@ def region_glyph(members, frame=None, min_span=0.0):
     # two-city story does. A SINGLE COUNTRY does — Luxembourg framed on its
     # own two destinations is a frame in which Europe is unrecognisable, and
     # the silhouette is the whole reason the glyph works.
-    view = (glyph_view(frame, min_span=min_span) if frame
+    # AND THE FRAME TAKES THE REGION'S OWN PROPORTION WHERE THE CALLER KNOWS
+    # IT. `glyph_view` holds every frame to the canvas's 1.282 unless asked
+    # otherwise, and its comment states the reason as a benefit: *a set of
+    # glyphs is a set of boxes of the same shape and only the geography
+    # inside them differs.* Measured on the nine macro regions, that box was
+    # 42% padding for Eastern Europe and 3% for the Caucasus, and it drew a
+    # 2.75 region and a 0.63 one identically. A drawing costs nothing to
+    # reshape — unlike a photograph, where a derived proportion would be an
+    # undeclared crop — so a caller that has measured its subject's shape
+    # passes it and the frame is the geography.
+    view = (glyph_view(frame, min_span=min_span, aspect=aspect) if frame
             else f"0 0 {MAP_W} {MAP_H}")
     # The data cut only where the drawing is at the full extent: a framed
     # glyph is a window on one region and the cut is not in it.
@@ -10503,7 +10653,25 @@ def glyph_view(pts, pad_frac=0.34, min_pad=90.0, min_span=340.0,
     # another. A journey row is a wide band and a route is usually wide, so
     # framing one at 1.28 makes a tall picture beside a short paragraph and
     # four hundred pixels of nothing under it.
-    want = aspect or (MAP_W / MAP_H)
+    #
+    # AND `aspect="own"` IS NO HOLD AT ALL, which is what the nine macro
+    # regions needed and what the paragraph above was refusing them. The
+    # hold is why nine regions running 0.54 to 3.21 on this projection were
+    # nine boxes of one shape — the fault the doctrine's second rule names —
+    # and the first repair passed each region's measured aspect as `want`.
+    # THAT DID NOTHING FOR THE ONE REGION IT WAS WRITTEN FOR: the hold only
+    # ever GROWS the short axis, the Mediterranean's padded box is already
+    # 986 of a 1,000-unit canvas, so growing width to reach 2.75 clamped at
+    # the canvas and the emitted frame came back at 1.30 — the whole
+    # continent with a corner lit, which is this function's own recorded
+    # failure. There is nothing to grow toward on the widest set in the
+    # atlas; the honest frame is the padded box as measured, which keeps the
+    # `min_pad` legibility floor and keeps the shape the projection actually
+    # draws.
+    if aspect == "own":
+        want = w / h
+    else:
+        want = aspect or (MAP_W / MAP_H)
     if w / h < want:
         grow = (h * want - w) / 2
         x0, x1 = x0 - grow, x1 + grow

@@ -197,3 +197,50 @@ to one family. A second family wanting one is not forbidden and has to be
 is allowed; moving one silently is not, which is the invariant register's own
 rule applied to a class name. Proved red both ways — a composition class on
 a second family, and a declared exception nothing reaches.
+
+
+---
+
+## Part 7 — the doctrine audit
+
+`docs/redesign-doctrine.md` arrived after this page shipped, so both of its
+audits are filled in here from the evidence above rather than from memory.
+Every line that is not satisfied says so.
+
+**Monotony**, measured at 1280: **18%**, twelve `row monthrow` siblings, with `row charrow` at 12%. The year band is the page's subject and it is a chart rather than a repeated component, so it does not appear in this measurement at all.
+
+### CONTENT PRESERVATION
+
+- [x] every important existing content item retained — 150 fixtures, 12
+      months, 8 kinds
+- [x] existing counts retained and derived — including the shoulder figure,
+      which the brief had as 26 and the dataset says is 25
+- [x] existing links retained
+- [x] existing destinations retained
+- [x] existing relationships retained
+- [x] existing functionality retained — `events.js` still filters
+- [x] existing data loaders reused
+- [x] existing map engine reused — and the year band deliberately carries NO
+      aperture, because twelve little arches is the signature as wallpaper
+- [x] existing image and provenance system reused
+
+### DESIGN TRANSFORMATION
+
+- [x] the page has a new composition
+- [x] the existing card/grid structure was not merely reskinned — twelve
+      identical pills became a year instrument
+- [x] the opening communicates the page's purpose
+- [x] the content hierarchy was reconsidered — two of the brief's bands are
+      one band, because they are two views of one cross-tab
+- [x] photography has an editorial role
+- [x] the map or the data has a meaningful visual role — the chart is the page
+- [x] the sections have different visual rhythms
+- [x] the page does not read as a CMS listing
+- [x] the page has a memorable signature moment — October is thin above the
+      line and deep below it, and that disagreement is the family's argument
+
+### Notes, including what this audit does not claim
+
+**The month page is not covered by this audit.** `/events/<month>` measures
+21% with `row event` at 16% behind it, which is a list with a frame round it
+and is the right shape for a month.
