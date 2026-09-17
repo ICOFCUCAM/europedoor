@@ -510,7 +510,12 @@ def s7():
     # it whenever `inner` is non-empty — so the class was the wrong witness:
     # it reads true in the stub state and the guard did nothing. `jrows` is
     # what the band is BUILT from and what the two needles below live beside.
-    _jp = has("/", 'class="jrows"')
+    # AND `has()` RETURNS A TUPLE, SO THE GUARD WAS ALWAYS TRUE. `(bool, msg)`
+    # is a non-empty tuple whatever the bool is, so `not _jp` was constantly
+    # False and the guard fired never — the same fault as the dead-rule
+    # scanner recursing into an EMPTY `cssRules` list because an empty list is
+    # truthy. A container standing in for the boolean inside it.
+    _jp = has("/", 'class="jrows"')[0]
     yield (not _jp) or has("/", "Straight-line distance", "Countries",
                            "Stops"), \
         "the homepage journey plate states what it measured"

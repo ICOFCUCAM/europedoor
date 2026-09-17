@@ -58,19 +58,30 @@ DEFAULT_OUT = os.path.join(acquire.ROOT, ".cache", "contact")
 # real page, so a purpose whose surface has no renderer wired here is REFUSED
 # rather than drawn as a homepage with the wrong photograph in it — which
 # would look exactly like a finished review and be about nothing.
-RENDERABLE = {"homepage-hero", "door-mountains", "door-coast",
-              "door-history", "door-food"}
+# AND THE FOUR DOORS WERE DELETED WITH THE COMPOSITION THAT HELD THEM. The
+# homepage became a plate sequence, `door-coast`, `door-food`, `door-history`
+# and `door-mountains` were removed from data/image-purposes.json, and this
+# set kept naming them — so `specOf()` would refuse every one at entry and a
+# sheet asked for a door would report a purpose that does not exist rather
+# than a surface that cannot be drawn. *Removing a claim leaves surfaces
+# pointing at it*, fifth time, in the one artefact whose entire job is to
+# show a person the real composition before a photograph is bought.
+RENDERABLE = {"homepage-hero"}
 
 # WHERE ON THE PAGE EACH PURPOSE LIVES, because a sheet that shoots the top of
 # the page for a surface four screens down is a finished-looking review of
 # nothing. The doors are on the same page as the hero, which is why they can
 # be drawn at all; they just have to be scrolled to.
+# AND `.herofull` LEFT IN THE SAME COMMIT. `home-hero` renders on plate 02 —
+# the WINDOW, fixed to the viewport while the wall scrolls past it — which is
+# the container data/image-purposes.json has declared all along. The opening
+# on plate 01 draws the continent and keeps drawing it: the two are different
+# plates and coexist by design, so *a photograph replaces the drawing* is
+# true of a page this site no longer has. Third spelling of where the hero
+# lives in this file's history, and the first that names what the register
+# declares.
 SURFACE = {
-    "homepage-hero": ".herofull",
-    "door-mountains": ".wayin",
-    "door-coast": ".wayin",
-    "door-history": ".wayin",
-    "door-food": ".wayin",
+    "homepage-hero": ".shotclip",
 }
 
 

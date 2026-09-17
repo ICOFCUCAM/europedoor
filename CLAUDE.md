@@ -4796,6 +4796,36 @@ cheap and it is the only form of this that cannot lose bytes the repository is
 the evidence for. Found because the run left the working tree dirty and the
 static suite was run on it rather than only on the build.
 
+**AND THE ART-DIRECTION SHEET WAS THREE REDESIGNS BEHIND, IN THE ONE
+ARTEFACT WHOSE JOB IS TO SHOW A PERSON THE REAL COMPOSITION.**
+`contact_sheet.py` renders the actual homepage once per candidate so somebody
+can judge a photograph inside the page before it is bought. Its `RENDERABLE`
+set still named `door-coast`, `door-food`, `door-history` and
+`door-mountains` — four purposes deleted with the composition that held them
+— and `SURFACE` mapped the hero to `.herofull`, gone in the same commit. The
+suite's own assertions then named `class="opening"`, **the fourth spelling of
+where the hero lives, written in a comment recording the third.** `home-hero`
+renders on plate 02, the WINDOW, which is the container
+`data/image-purposes.json` has declared since the crop box was measured.
+
+**And one promise had to be restated rather than repointed.** *A photograph
+replaces the drawing; it does not sit behind it* was true while both were the
+same surface. On a plate sequence the opening draws the continent and the
+window carries the photograph: two plates, coexisting by design. So the
+assertion is no longer "the drawing is gone" — it is that the candidate went
+into the window rather than over the drawing, which is the defect the
+original sentence was written for, stated about the page that exists. The
+window also writes its own credit (`credit=False` to `picture()`), so "Photo
+by" — the figcaption's wording — was never on that surface.
+
+**AND A GUARD ON A TUPLE IS ALWAYS TRUE.** `has()` returns
+`(bool, message)`, so `_jp = has("/", 'class="jrows"')` is a non-empty tuple
+whatever the bool inside it is: `not _jp` was constantly False and the guard
+written to make two assertions conditional fired never. Same fault as the
+dead-rule scanner recursing into an EMPTY `cssRules` list because an empty
+list is truthy — a container standing in for the boolean inside it, and the
+message it printed was about the assertion it was meant to be guarding.
+
 **AND THE HOMEPAGE'S OWN BUILDER CRASHED ON AN EMPTY PICK LIST, IN THE ONE
 CALLER THAT MAKES ONE.** `picks` is one photographed destination per macro
 region, so it is empty for a register holding none — which was every register

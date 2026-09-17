@@ -1315,15 +1315,36 @@ def main(argv):
         # that matters most: the sheet exists so a person can judge a
         # candidate INSIDE the real composition, and an assertion that the
         # sheet drew the real hero has to name something the real hero has.
+        # AND `class="opening"` WAS THE FOURTH SPELLING, on a comment recording
+        # the third. `home-hero` renders on plate 02 — the WINDOW — which is
+        # the container data/image-purposes.json declares and has declared
+        # since the crop box was measured. The opening on plate 01 draws the
+        # continent and keeps drawing it.
         check("the candidate page is the real hero",
-              'class="opening"' in drawn and "<picture" in drawn)
-        check("the drawing is replaced, not stacked behind the photograph",
-              "heroeurope" not in drawn)
+              'class="shotclip"' in drawn and "<picture" in drawn)
+        # AND THE TWO PICTURES COEXIST BY DESIGN, so the promise is not that
+        # the drawing is gone. *A photograph replaces the drawing* was true
+        # while both were the same surface; on a plate sequence the opening is
+        # the continent and the window is the photograph, and what has to hold
+        # is that the candidate went into the WINDOW rather than over the
+        # drawing — which is the defect the original sentence was written for,
+        # restated about the composition that exists.
+        _op = drawn.find('class="op"')
+        _win = drawn.find('class="shotclip"')
+        check("the candidate is in the window, not over the drawing",
+              _op >= 0 and _win > _op,
+              f"op at {_op}, window at {_win}")
         check("the delivery ladder is gone", "image/avif" not in drawn)
         check("the preview is what renders",
               f'src="/previews/candidate-{PHOTO_ID}.jpg"' in drawn)
+        # AND THE WINDOW WRITES ITS OWN CREDIT, because it passes
+        # `credit=False` to `picture()` — so "Photo by", which is the
+        # figcaption's wording, is not on this surface and never was. The band
+        # says "Photograph <name> · <licence>". What the licence requires is
+        # the photographer and the provider, and the assertion names the words
+        # the page actually carries.
         check("the credit the provider requires is still on it",
-              "Photo by" in drawn and "Stub Photographer" in drawn)
+              "Photograph" in drawn and "Stub Photographer" in drawn)
         check("the focal anchor survived the substitution",
               'class="photo f-cc"' in drawn)
         check("the preview was fetched",
@@ -1386,7 +1407,12 @@ def main(argv):
         shutil.rmtree(scratch + "-3", ignore_errors=True)
 
         # ── 19. the workflow opens a PR and offers only cleared providers ─
-        check("the workflow creates a pull request", "gh pr create" in wf)
+        # AND `gh pr create` MOVED INTO `scripts/images/open_pr.sh`, one
+        # implementation for two jobs, recorded there. An assertion on the
+        # command is an assertion on where it is typed; what has to hold is
+        # that the workflow opens one.
+        check("the workflow creates a pull request",
+              "open_pr.sh" in wf or "gh pr create" in wf)
         check("the workflow has both stages",
               "stage == 'discover'" in wf and "stage == 'acquire'" in wf)
         check("discovery produces the contact sheet",
