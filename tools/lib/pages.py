@@ -11783,84 +11783,288 @@ def year_band(data, here=None):
 
 
 def events_page(data):
+    """The European Calendar Atlas: the year as an instrument, not a listing.
+
+    THE PAGE WAS RIGHT AND IT STOPPED AFTER THREE BANDS. `ed_opening` over
+    the year band over twelve month rows, 16,849 bytes, and a closing
+    `<p class="small">` that said there were eight categories and never named
+    one of them. Everything in it was correct — the catalogue of 197 rows and
+    the twelve identical chips were both already thrown away, and the year
+    band is this family's signature — so what is added here is what the data
+    holds and the page did not print.
+
+    AND EIGHT FILTERS WERE BUILT AND DISCARDED ON EVERY BUILD. `kindfilters`
+    was composed in this function from the eight kinds and their counts, and
+    the body f-string never mentioned it: the variable at the old line 11830
+    was dead where the identical one in `events_month_page` is the month
+    page's own control. *An ignored argument is dead code that looks like a
+    decision*, and it is the reason the brief's event-character band was
+    missing — the eight were counted, rendered and thrown away.
+
+    THE YEAR HAS A MEASURED CHARACTER AND NOBODY HAD CROSS-TABBED IT. The
+    owner's prototype asks for a FIXED POINTS ledger and fills it with six
+    authored groupings — *Winter traditions*, *Spring awakenings*, *Harvest
+    Europe*, *The winter threshold*. Those are the right instinct with no
+    data behind them, and the data says it better: crossing 150 fixtures by
+    month and kind, December is 9/14 markets, February 10/13 cultural, April
+    9/15 religious, June 10/20 seasonal and September 8/16 food. **And July
+    is the busiest month and the least characteristic of the twelve** — 28
+    fixtures with no kind above 43% — where February has half as many and
+    77% of them are one thing. That is a second argument to sit beside the
+    shoulder one, and both are derived.
+
+    See `docs/events-redesign.md`.
+    """
     names = data["taxonomy"]["month_names"]
-    by_month = {m: [] for m in data["taxonomy"]["months"]}
+    ms = data["taxonomy"]["months"]
+    by_month = {m: [] for m in ms}
     for c in data["countries"].values():
         for f in c["festivals"]:
             by_month[f["month"]].append((f, c))
-    # THE INDEX PRINTED THE WHOLE YEAR AND RAN TO FIFTEEN SCREENS.
+    shoulder = {m: sum(1 for c in data["countries"].values()
+                       if not c.get("advisory")
+                       and m in (c.get("season") or {}).get("shoulder", []))
+                for m in ms}
+    total = sum(len(v) for v in by_month.values())
+    images = data.get("images") or {}
+
+    # ── 01 · THE YEAR ────────────────────────────────────────────────
+    # THE HERO IS THE PHOTOGRAPH AND THE HEADLINE, WHICH IS WHAT IT WAS.
+    # `events-hero` is in the register, so this family already opens on a
+    # picture rather than on a slot — one of the seven that does.
     #
-    # Twelve <h2> bands, one per month, each holding every fixture in it:
-    # 197 rows, 14,875 pixels, and no reader has ever reached December. It is
-    # the catalogue failure in its purest form — the shape of the data as the
-    # whole layout — and it was worse here than anywhere, because the family's
-    # subject is TIME and the one thing the page could not show was the year.
+    # AND `ed_opening` ESCAPES ITS INTRO, so an HTML entity ships as the five
+    # characters a reader sees: the first render printed `&mdash;` on the
+    # page. The raw f-strings in this file take `&mdash;` because they ARE
+    # markup; a helper's keyword argument takes the character. The reason for
+    # that is written here rather than beside the argument, because **an
+    # f-string expression cannot contain a comment** — this file records that
+    # twice already and the build stopped on it a third time, on the line
+    # below. AND THE ESCAPE `\u2014` FAILED FOR THE SAME FAMILY OF REASON:
+    # an f-string expression may not contain a BACKSLASH either, so the
+    # character is written as itself.
+    evopen = f"""
+  {ed_opening(
+      eyebrow="The European year",
+      title="What is on, and when.",
+      intro=f"{total} recurring fixtures — festivals, markets, "
+            f"pilgrimages, harvests and the handful of natural events worth "
+            f"planning a year around. The annual, dependable ones.",
+      visual=photo(images, "events-hero", w=2000, h=1200,
+                   sizes="(min-width: 52rem) 58vw, 100vw")
+             or ed_slot("events-hero", shape="square",
+                        label="The European year"),
+      family="time")}"""
+
+    # ── 02 · THE EUROPEAN YEAR ───────────────────────────────────────
+    # THE EXTENT LIVES HERE, ON THE BAND THAT INTRODUCES THE SET, WHICH IS
+    # WHERE A PLATE SEQUENCE PUTS IT. /journeys, /experiences, /stories and
+    # /countries each settled that once: there is no room for a stage above
+    # an opening, so the head is the band that states how big the set is.
     #
-    # The year band above already answers "when should I go", which is the
-    # question an events index exists for. So the twelve months are twelve
-    # entries rather than twelve dumps: how many fixed points, how many
-    # countries are in their quieter shoulder, and a link to the month, which
-    # is where the fixtures and their filter live. Every figure is derived.
-    #
+    # NO DRAWING IN THE OPENING AND NO APERTURE ON THIS ONE. The year band
+    # is a twelve-column chart that has to run the full width to be read at
+    # all, and the door is how this atlas draws GEOGRAPHY — twelve little
+    # arches would be the signature as wallpaper. `docs/signature-moments.md`
+    # question 6.
+    kinds = {}
+    for v in by_month.values():
+        for f, _ in v:
+            kinds[f["kind"]] = kinds.get(f["kind"], 0) + 1
+    year = f"""
+  <div class="pagehead index">
+    <p class="kicker">The European year</p>
+    <h2 class="mega">A year is another way to map Europe.</h2>
+    {head_extent([(total, 'recurring fixtures'),
+                  (len(ms), 'months'),
+                  (len(kinds), 'kinds of fixture')])}
+  </div>
+  <div class="yearwrap">{year_band(data)}</div>"""
+
+    # ── 03 · MONTH ───────────────────────────────────────────────────
     # NO SELECTION. "The three best festivals in June" would be a ranking
     # this atlas does not hold, and three rows out of twenty-eight presented
     # as a taste is a ranking wearing a smaller hat. The count is the taste.
-    shoulder = {m: sum(1 for c in data["countries"].values()
-                       if m in (c.get("season") or {}).get("shoulder", []))
-                for m in data["taxonomy"]["months"]}
     most = max((len(v) for v in by_month.values()), default=1) or 1
     monthrows = "".join(
         f"""<a class="row monthrow" href="/events/{esc(m)}">
-        <div><h2>{esc(names[m])}</h2>
-        <p class="rowsub">{len(by_month[m])} fixed point{"" if len(by_month[m]) == 1 else "s"} ·
+        <div><h3>{esc(names[m])}</h3>
+        <p class="rowsub">{len(by_month[m])} fixed point{"" if len(by_month[m]) == 1 else "s"} &middot;
         {shoulder[m]} countr{"y" if shoulder[m] == 1 else "ies"} in their quieter shoulder</p>
         <div class="hopbar"><span class="w{min(100, round(len(by_month[m]) / most * 100 / 5) * 5)}"></span></div></div>
-        <p class="rowmeta">Where to go in {esc(names[m])} →</p></a>"""
-        for m in data["taxonomy"]["months"]
-    )
-    blocks = [f'<div class="rows monthrows">{monthrows}</div>']
-    # The twelve chips this replaces were the same width and the same weight
-    # whether the month held 3 fixtures or 28. See year_band().
-    jump = year_band(data)
-    total = sum(len(v) for v in by_month.values())
-    kindcounts = {}
-    for v in by_month.values():
-        for f, _ in v:
-            kindcounts[f["kind"]] = kindcounts.get(f["kind"], 0) + 1
-    kindfilters = "".join(
-        f'<label><input type="checkbox" name="eventkind" value="{esc(k)}"> '
-        f'{esc(EVENT_KIND_NAMES[k])} ({n})</label>'
-        for k, n in sorted(kindcounts.items(), key=lambda kv: -kv[1])
-    )
+        <p class="rowmeta">Where to go in {esc(names[m])} &rarr;</p></a>"""
+        for m in ms)
+    months = f"""
+  <div class="sheettext">
+    <h2 class="mega">Twelve doors.</h2>
+    <p class="lede">Each month is a different Europe. The bar is what is on;
+    the sentence beside it is how much of the continent is in its quieter
+    shoulder that month, which is the number this atlas thinks you should
+    travel by.</p>
+  </div>
+  <div class="rows monthrows">{monthrows}</div>"""
+
+    # ── 04 · WHAT A MONTH IS MADE OF ─────────────────────────────────
+    # THE BRIEF ASKS FOR A FIXED POINTS LEDGER AND FOR AN EVENT CHARACTER
+    # BAND, AND THEY ARE TWO VIEWS OF ONE CROSS-TAB — so they are one band.
+    # Printing the eight kinds with their counts and then the five decisive
+    # months separately would be the same table twice on one page, which is
+    # the fault 220 place pages had where a strip and the rows under it were
+    # the same places. One band, both axes: each kind's own peak month
+    # beside its count, and the months where one character actually holds.
+    #
+    # AND A LEDGER OF THE 150 IS THE CATALOGUE THIS PAGE ALREADY THREW
+    # AWAY — 197 rows and 14,875 pixels, with no reader ever reaching
+    # December. Every fixture is on its month's page, behind the filter that
+    # belongs there.
+    kindtab = {}
+    for m in ms:
+        for f, _ in by_month[m]:
+            kindtab.setdefault(f["kind"], {})[m] = \
+                kindtab.setdefault(f["kind"], {}).get(m, 0) + 1
+    charrows = "".join(
+        f'<div class="row charrow"><div>'
+        f'<h3>{esc(EVENT_KIND_NAMES[k])}</h3>'
+        f'<p class="rowsub">Most of them in {esc(names[peak])} '
+        f'&mdash; {kindtab[k][peak]} of the {n}.</p>'
+        f'<div class="hopbar"><span class="w'
+        f'{min(100, round(n / max(kinds.values()) * 100 / 5) * 5)}"></span></div>'
+        f'</div><p class="rowmeta">{n}<br>'
+        f'<span class="small">fixture{"" if n == 1 else "s"}</span></p></div>'
+        for k, n in sorted(kinds.items(), key=lambda kv: -kv[1])
+        for peak in [max(kindtab[k], key=lambda m: (kindtab[k][m], -ms.index(m)))])
+    # THE DECISIVE MONTHS ARE A MEASUREMENT AND THE THRESHOLD IS STATED.
+    # Half or more of a month's fixtures being one kind is the line, and it
+    # is printed rather than implied — a fraction a reader cannot check is a
+    # claim rather than a finding. Five months clear it and July does not,
+    # which is the point of the sentence above them.
+    # AND "HALF OR MORE" IS SATISFIED BY 2 OF 4. The first version reported
+    # EIGHT decisive months, because March (3 of 6), May (2 of 4) and
+    # November (2 of 4) clear a share threshold on a handful of fixtures —
+    # arithmetically true and editorially empty, which is the small-sample
+    # form of *a count that is not the set's own extent reads as one*. A
+    # month also has to hold at least an average month's worth of the year
+    # for a share of it to mean anything, and the average is DERIVED rather
+    # than picked: 150/12 is 12.5, which admits February, April, June,
+    # September and December and excludes exactly the three that were noise.
+    mean = total / len(ms)
+    dom = {}
+    for m in ms:
+        tot = len(by_month[m])
+        if tot < mean:
+            continue
+        cnt = {}
+        for f, _ in by_month[m]:
+            cnt[f["kind"]] = cnt.get(f["kind"], 0) + 1
+        k = max(cnt, key=lambda x: (cnt[x], x))
+        if cnt[k] * 2 >= tot:
+            dom[m] = (k, cnt[k], tot)
+    busiest = max(ms, key=lambda m: len(by_month[m]))
+    bcnt = {}
+    for f, _ in by_month[busiest]:
+        bcnt[f["kind"]] = bcnt.get(f["kind"], 0) + 1
+    bshare = max(bcnt.values()) / len(by_month[busiest])
+    character = f"""
+  <div class="sheettext">
+    <h2 class="mega">What a month is made of.</h2>
+    <p class="lede">{numword(len(kinds), cap=True)} kinds of fixture across
+    the {total}, and each one has a month it belongs to.
+    {numword(len(dom), cap=True)} months are decisive &mdash; they hold at
+    least an average month's share of the year and half or more of what is
+    on is one kind:
+    {", ".join(f"{names[m]} is {EVENT_KIND_NAMES[k].lower()} "
+               f"({c} of {t})" for m, (k, c, t) in dom.items())}.</p>
+    <p class="note">And the busiest month is the least characteristic.
+    {esc(names[busiest])} holds {len(by_month[busiest])} fixtures, more than
+    any other, and no single kind is more than
+    {round(bshare * 100)}% of them &mdash; where
+    {esc(names[min(dom, key=lambda m: -dom[m][1] / dom[m][2])])} has
+    {len(by_month[min(dom, key=lambda m: -dom[m][1] / dom[m][2])])} and
+    {round(max(c / t for _, (_, c, t) in dom.items()) * 100)}% of those are
+    one thing. A crowded month is not the same as a month with a character,
+    which is the whole reason this band is not a ranking.</p>
+  </div>
+  <div class="rows charrows">{charrows}</div>"""
+
+    # ── 05 · THE SHOULDER ────────────────────────────────────────────
+    # THE PHOTOGRAPH BELONGS TO THE ARGUMENT AND THE ARGUMENT IS ALREADY
+    # WRITTEN. The brief asks for a photographic *Go when Europe breathes*
+    # band, and the register holds a picture for exactly one piece of writing
+    # that makes this case: `The case for going in October`. So the band is
+    # that essay, with its own photograph, rather than a generic autumn
+    # landscape standing in for a sentence — which is this site's oldest
+    # rule about pictures and stories.
+    #
+    # AND THE FIGURE IS DERIVED, BECAUSE THE BRIEF'S WAS WRONG. It asks for
+    # "26 countries in their quieter shoulder in October" and the dataset
+    # says 25 — advisory countries are excluded, which is why. A number
+    # typed into a design is the number that was true on the day it was
+    # typed; this one is counted on every build.
+    peakm = max(ms, key=lambda m: shoulder[m])
+    oct_story = next((st for st in data["stories"]
+                      if held(images, "story:" + st["slug"])
+                      and peakm in st["title"].lower()), None)
+    shoulderband = f"""
+  <div class="sheettext">
+    <p class="kicker">Beyond the headline</p>
+    <h2 class="mega">Go when Europe breathes.</h2>
+    <p class="lede">The calendar is not only a list of things to attend. It
+    is how you find out when a place becomes quieter, slower and more
+    available. {esc(names[peakm])} is the thinnest month on the bar above
+    and the deepest below it: {shoulder[peakm]} of the
+    {sum(1 for c in data['countries'].values() if not c.get('advisory'))}
+    countries this atlas writes about are in their quieter shoulder.</p>
+  </div>""" + ("" if not oct_story else f"""
+  <div class="ed-feature">
+    <figure class="ed-feature-media">{picture(
+        images, "story:" + oct_story["slug"], w=1600, h=1200,
+        sizes="(min-width: 62rem) 62vw, 100vw",
+        alt=oct_story["title"])}</figure>
+    <div class="ed-feature-say">
+      <p class="kicker">{esc(oct_story["section"])} &middot;
+      {esc(oct_story["reading"])}</p>
+      <h3>{esc(oct_story["title"])}</h3>
+      <p>{esc(oct_story["standfirst"])}</p>
+      <p><a class="storygo" href="{urls.story(oct_story)}">Read the story
+      &rarr;</a></p>
+    </div>
+  </div>""")
+
+    # ── 06 · OPEN A DOOR ─────────────────────────────────────────────
+    # `.sheet-door` IS TAKEN — 29 rules, the homepage's own opening — so the
+    # close is `pickmonth`. *A class name already in the stylesheet is a
+    # rule you inherit silently*, and grepping first is what that rule
+    # actually asks for.
+    pick = f"""
+  <div class="pickmonth">
+    <h2 class="mega">Choose a month. Open a door.</h2>
+    <p class="lede">Every fixture sits on its month's page with the kind
+    filter beside it, and every month names the countries that are quiet
+    then. The calendar is where a journey starts, not where it ends.</p>
+    <p class="keepgo"><a class="btn" href="/events/{esc(peakm)}">What is on in
+    {esc(names[peakm])}</a>
+    <a class="storygo" href="/plan">Or open the Planner &rarr;</a></p>
+  </div>"""
+
+    # `year` WOULD HAVE COLLIDED WITH THE HOMEPAGE'S PLATE 07, WHICH EMITS
+    # `sheet-year` AND HAS NO RULE OF ITS OWN. Grepping the stylesheet —
+    # which is what *grep the stylesheet before naming a composition* asks
+    # for — returned zero, because a plate class can be emitted by a page
+    # builder and styled by nothing. **The built site is the other half of
+    # that grep**, and `checks.py` now asks it on every build.
+    PLATES = [("evopen gal", "The European year", evopen, "what-is-on"),
+              ("euyear paper", "The year", year, "the-year"),
+              ("months gal quiet", "Twelve doors", months, "the-months"),
+              ("character gal", "What a month is made of", character,
+               "the-character"),
+              ("shoulder paper", "The shoulder", shoulderband, "the-shoulder"),
+              ("pickmonth gal", "Open a door", pick, "open-a-door")]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Events", None)])}
-{ed_opening(
-    eyebrow="The European year",
-    title="What is on, and when.",
-    intro=f"{total} recurring fixtures — festivals, markets, pilgrimages, harvests and "
-          f"the handful of natural events worth planning a year around. The annual, "
-          f"dependable ones.",
-    visual=photo(data.get("images"), "events-hero", w=2000, h=1200,
-                 sizes="(min-width: 52rem) 58vw, 100vw")
-           or ed_slot("events-hero", shape="square", label="The European year"),
-    family="time")}
-<!-- NO DRAWING IN THE OPENING, AND THAT IS THE ONE EXCEPTION. Four of the
-     five indexes put their subject in the arch beside the headline; this
-     family's subject is TIME, and the year band under this head is a
-     twelve-column chart that has to run the full width to be read at all —
-     the same reason it is not an aperture. Squeezing it into a 4:3 opening
-     would be the signature applied for its own sake. So the hero is type
-     until a photograph lands in its slot, and the chart immediately under
-     it is the dominant visual the section needs. -->
-{jump}
-{''.join(blocks)}
-<p class="small">Every fixture is on its month's page, with the category filter
-beside it — {total} of them across {len(kindcounts)} categories. They are the
-annual, dependable ones; a dated listing for a given year needs a live events
-feed, which is Stage 2.</p>
+{plate_sequence(PLATES)}
 """
     return "/events/index.html", page(
-        "Events", body, path="/events", area="events",
+        "Events", body, path="/events", area="events", hero=True,
         description="The recurring European year: festivals, markets, pilgrimages and seasonal events, month by month, filterable by category.",
     )
 

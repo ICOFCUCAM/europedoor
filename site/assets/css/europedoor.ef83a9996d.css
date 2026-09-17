@@ -11434,6 +11434,44 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 
 .sheet-readgo { padding-block: 12vh; }
 
+/* ── THE EUROPEAN CALENDAR ATLAS ─────────────────────────────────────── */
+/* `.sheet-gal` ENDS `display: block` AND `.sheet-paper` DOES NOT, so the
+   two `paper` bands here inherit `.sheet`'s `minmax(0, 40%) minmax(0, 1fr)`
+   and put their head in the 40% track. That is the fault /stories' feature
+   band shipped with one commit ago, measured there as a 205-pixel
+   photograph at 1280, and both of these bands need the full width for the
+   same reason: the year band is a twelve-column chart that cannot be read
+   in 40% of a page, and the shoulder band's composition provides its own
+   two tracks. A room contributes ground, ink and rhythm; the composition
+   inside it does the layout. */
+.sheet-euyear, .sheet-shoulder { display: block; }
+.sheet-euyear { padding-block: 9vh; }
+.sheet-shoulder { padding-block: 10vh; }
+.sheet-evopen, .sheet-months, .sheet-character { padding-block: 9vh; }
+.sheet-pickmonth { padding-block: 13vh; }
+
+/* THE CHARACTER ROWS ARE `.row` AND NOT A NEW PRIMITIVE, and they are
+   `<div>` rather than `<a>` because there is nowhere for them to go: this
+   atlas has no per-kind page, and a row that looks like navigation and
+   leads nowhere is the chip-that-filters-nothing one band over. The bar is
+   the `hopbar` every other count on this site is drawn with, against the
+   largest kind rather than against the total — eight kinds summing to 150
+   would put `cultural` at 26% and read as a share of the year, where what
+   the row is comparing is one kind against another. */
+.charrow { cursor: default; }
+.charrow .hopbar { margin-top: var(--s3); }
+
+/* THE CLOSE IS ITS OWN NAME BECAUSE BOTH OBVIOUS ONES ARE TAKEN.
+   `.sheet-door` is the homepage's opening (29 rules) and `.closesay` is the
+   homepage's and /discover's close at `max-width: 32rem`, which /plan
+   already recorded as a statement 512 pixels wide inside a 1,152-pixel band,
+   centred inside its own cap and therefore off-centre in the room. This one
+   sets the measure on the PROSE and lets the heading have the band. */
+.pickmonth { text-align: center; }
+.pickmonth .mega { margin-inline: auto; max-width: 30ch; }
+.pickmonth .lede { margin-inline: auto; max-width: 46ch; }
+.pickmonth .keepgo { margin-top: var(--s7); align-items: center; }
+
 /* ── 06 the feed: an action, not a note ──────────────────────────── */
 /* IT WAS A `.note.onward`, which wears the interactive colour and is
    deliberately rare — 62 of them once made `c_note_tones` fail with "it

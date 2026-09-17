@@ -19,6 +19,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **/journeys — movement rather than a list, and where the family's own photograph went** | **`docs/journeys-redesign.md`** — the source audit, the seventeen routes drawn at once as the opening, the three paces derived from measured kilometres a day rather than named, the two things the brief asks for that are refused with their triggers, and the five defects only rendering found |
 | **/stories — an editorial desk, and the pictures it already owned** | **`docs/stories-redesign.md`** — the source audit, the eight photographs the register held while the page drew one, the brief's nine bands mapped onto a 1:1 desk taxonomy and 34 tags used once each, and the four class-name collisions one page's run produced with no guard anywhere |
 | **/countries — geography first, and the country as its own aperture** | **`docs/countries-redesign.md`** — the source audit, the image-coverage audit (60 relevant photographs and the page drew one), why the brief's strongest idea was already a mechanism here, the seven plates, and the seven defects only rendering found. 41 of 50 countries can be an aperture and nine cannot — six have no outline in this dataset and three are advisory |
+| **/events — the year as an instrument, and the month that is busiest is the least characteristic** | **`docs/events-redesign.md`** — the source audit, the eight filters built and discarded on every build, the month-by-kind cross-tab nobody had run, the two of the brief's bands that are one band, and the threshold that called 2-of-4 a finding. 150 fixtures, and the library was never the constraint either |
 | **/plan — an instrument rather than a form, and the guard a runtime `<img>` walks straight past** | **`docs/plan-redesign.md`** — the source audit, the seven bands, the three of the brief's asks that collide with recorded findings, the twelve defects only rendering found (nine of them faults already recorded in another family and three of those recorded in the commit before), and the per-leg photograph: `render.credit_html` is one implementation because `checks.py` cannot see an `<img>` a script writes |
 | **the eight page families, and what each room does differently** | **`docs/non-home-redesign.md`** — the non-home redesign answered A-J. The eight rooms derived from the route, the three helpers that were forcing one grammar, the seven image scales, 1,626 declared surfaces, and the defects only rendering found |
 | **the design language — what makes a page EuropeDoor with the logo removed, and which movements each family takes** | **`docs/design-language.md`** — the ARCHITECT step. Five marks that could not have been made by anybody else, the six-movement composition grammar per family, the three head roles, what the language forbids, and how a change is proved |
@@ -5312,6 +5313,104 @@ had never been exercised. *A code path nothing exercises is a code path
 nothing checks*, about a component the 2036 brief declared and nothing used,
 and the fix belongs on the primitive: the next band must not have to know
 which element the last one chose. 752 × 564 at 1280 after.
+
+**/events COMPUTED EIGHT FILTERS AND THREW THEM AWAY ON EVERY BUILD.**
+`kindfilters` was composed inside `events_page` from the eight kinds and
+their counts and the body f-string never mentioned it — the identical
+variable in `events_month_page` IS that page's control, and this one was
+dead. *An ignored argument is dead code that looks like a decision*, and it
+is exactly why the brief's event-character band was missing: **the eight
+were counted, rendered and discarded**, while the page closed on a
+`<p class="small">` saying there were eight categories without naming one.
+
+**AND NOBODY HAD CROSSED THE 150 FIXTURES BY MONTH AND KIND.** The brief
+asks for a FIXED POINTS ledger and fills it with six authored groupings —
+*Winter traditions*, *Spring awakenings*, *Harvest Europe* — which is the
+right instinct with nothing behind it. Measured, the data says it better:
+February is 10/13 cultural, April 9/15 religious, June 10/20 seasonal,
+September 8/16 food, December 9/14 market. **And the busiest month is the
+least characteristic** — July holds 28, more than any other, and no kind
+reaches 43% of them, where February holds thirteen and 77% are one thing. A
+crowded month is not a month with a character, which is a second argument
+beside the shoulder one and is derived rather than written.
+
+**"HALF OR MORE" IS SATISFIED BY 2 OF 4.** The first threshold reported
+EIGHT decisive months, because March (3 of 6), May (2 of 4) and November (2
+of 4) clear a share test on a handful of fixtures: arithmetically true,
+editorially empty, and the small-sample form of *a count that is not the
+set's own extent reads as one*. A month also has to hold at least an average
+month's worth of the year, and **the average is derived rather than picked**
+— 150/12 is 12.5, which admits exactly the five real ones and excludes
+exactly the three that were noise.
+
+**AND THE BRIEF'S OWN SHOULDER FIGURE WAS OUT BY ONE.** It asks for *26
+countries in their quieter shoulder in October*; the dataset says **25**,
+because the three advisory countries are excluded. *A number typed into a
+design is the number that was true on the day it was typed* — this one is
+counted on every build, against the 47 countries this atlas writes about.
+
+**TWO OF THE BRIEF'S BANDS ARE ONE BAND, BECAUSE THEY ARE TWO VIEWS OF ONE
+CROSS-TAB.** FIXED POINTS and EVENT CHARACTER printed separately is the same
+table twice on one page — the fault 220 place pages had. One band carries
+both axes: each kind's count with its own peak month, and the months where
+one character holds. **The rows are `<div>` and not `<a>`**, because this
+atlas has no per-kind page and a row that looks like navigation and leads
+nowhere is the chip-that-filters-nothing one family over. **And the bar is
+against the largest KIND rather than the total**: eight kinds summing to 150
+would put `cultural` at 26% and read as a share of the year, where what the
+row compares is one kind against another.
+
+**AND AN F-STRING EXPRESSION CANNOT CONTAIN A COMMENT — NOR A BACKSLASH.**
+`ed_opening` escapes its intro, so `&mdash;` shipped as the five characters
+a reader sees; writing the reason for that fix beside the keyword argument
+stopped the build with *"f-string expression part cannot include '#'"*,
+which this file already records twice. The escape `\u2014` then failed with
+*"cannot include a backslash"*. The character is written as itself and the
+reason lives in the function above it. **A rule recorded twice is not a rule
+inherited**, which is the third occurrence of that sentence about this one
+construct.
+
+**`.sheet-gal` ENDS `display: block` AND `.sheet-paper` DOES NOT.** Both
+`paper` bands on /events would otherwise inherit `.sheet`'s `minmax(0, 40%)
+minmax(0, 1fr)` and put their head in the 40% track — /stories' feature band
+shipped with exactly that one commit earlier, a 205-pixel photograph at
+1280. The year band is a twelve-column chart that cannot be read in 40% of a
+page. And **both obvious names for the close were taken**: `.sheet-door` is
+the homepage's opening (29 rules) and `.closesay` is the close /plan already
+recorded as a statement 512 pixels wide inside a 1,152-pixel band. Grepped
+first, named `pickmonth`.
+
+**A CLASS NAME WITH NO RULE IN THE STYLESHEET IS STILL TAKEN, AND THAT IS THE
+OTHER HALF OF A RULE THIS FILE RECORDS FIVE TIMES.** *Grep the stylesheet
+before naming a composition* was written after `.doorgo`, `.sendsay`,
+`.closesay`, `.sheet-send` and a duplicated `.deskart figcaption`. It was
+done for all six of /events' plate names and `.sheet-year` came back with
+**zero rules** — and **the homepage's plate 07 has emitted `sheet-year`
+since the homepage became a plate sequence**, styled by nothing, because the
+class names the band and its room does the work. So a `display: block`
+written for the calendar's year chart landed on the homepage too. **The
+built site is the other half of that grep.**
+
+**AND THE DEAD-RULE SCAN REPORTED THAT DECLARATION DEAD, WHICH IS HOW THE
+COLLISION WAS FOUND.** Its page list carries `/events/oct` and not
+`/events`, so the only page it could measure the rule on was the homepage,
+where the plate is already block. Measured on /events: without the
+declaration `.sheet-year` computes `grid`, the year chart falls from
+**1,152 pixels to 619**, its head from 1,152 to 461 and the shoulder
+photograph from 752 to 392. *A rule measured only where it loses looks like
+a rule that wins nowhere* — fourth occurrence, fourth time the answer is a
+page.
+
+**THE GUARD IS A CHECK NOW RATHER THAN A SENTENCE.** `c_plate_class_owner`
+reads the built site for every `sheet-` class and the families that emit it.
+The five ROOMS — `gal`, `paper`, `pine`, `quiet`, `bleed` — bind tokens and
+are shared by design; a COMPOSITION class belongs to one family. A second
+family wanting one is not forbidden and has to be declared: `.sheet-keep` is
+a real centred close /discover and /experiences share and sits in
+`SHEET_SHARED` with its reason. **Moving one is allowed; moving one silently
+is not**, which is the invariant register's own rule applied to a class
+name. Proved red both ways — a composition class on a second family, and a
+declared exception nothing reaches.
 
 ## Gates
 

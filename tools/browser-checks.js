@@ -2332,7 +2332,17 @@ async function main() {
     for (const u of ["/", "/europe/austria", "/europe/austria/tyrol",
                      "/europe/austria/tyrol/innsbruck",
                      "/journeys/the-alpine-grand-tour", "/discover/nordic",
-                     "/events/oct", "/beyond-the-obvious", "/map", "/plan",
+                     // AND IT READ `/events/oct` AND NEVER `/events`, so
+                     // the index's own two `display: block` bands were
+                     // measured only on the HOMEPAGE, where `.sheet-year`
+                     // is already `sheet-gal` and block — and reported
+                     // dead. Removing them on /events takes the year chart
+                     // from 1,152 pixels to 619 and the shoulder
+                     // photograph from 752 to 392. *A rule measured only
+                     // where it loses looks like a rule that wins
+                     // nowhere*, for the fourth time, and for the fourth
+                     // time the answer is a page.
+                     "/events", "/events/oct", "/beyond-the-obvious", "/map", "/plan",
                      "/stories", "/themes", "/countries",
                      "/interests/mountains", "/europe-in/by-rail",
                      // AND THE ONE FAMILY THAT CARRIES A PHOTOGRAPH HAD

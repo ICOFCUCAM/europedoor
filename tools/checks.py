@@ -551,6 +551,67 @@ def c_links():
     return n
 
 
+# THE FIVE RECORDED CLASS-NAME COLLISIONS HAD NO GUARD, AND THE RULE
+# WRITTEN FOR THEM READS THE WRONG FILE.
+#
+# `.doorgo`, `.sendsay`, `.closesay`, `.sheet-send` and a duplicated
+# `.deskart figcaption` each shipped a composition that silently inherited
+# somebody else's rule — two links at zero alpha on /experiences, bone on a
+# white wall on /plan, a centred statement 512 pixels wide inside a
+# 1,152-pixel band. The answer recorded each time is *grep the stylesheet
+# before naming a composition*, and it is half an answer: **a plate class
+# can be emitted by a page builder and styled by nothing at all**, so the
+# grep returns zero and the name is still taken.
+#
+# /events proved it. `sheet-year` had no rule in the stylesheet and the
+# homepage's plate 07 has emitted it since the homepage became a plate
+# sequence, so a `display: block` written for the calendar's year chart
+# landed on the homepage too — and the dead-rule scan then reported that
+# declaration DEAD, because on the homepage the plate is already block.
+#
+# THE ROOMS ARE SHARED ON PURPOSE AND EVERYTHING ELSE IS NOT. `gal`, `paper`,
+# `pine`, `quiet` and `bleed` bind tokens and are meant to be reused; a
+# composition class is one family's layout. A second family wanting one is
+# not forbidden — `.sheet-keep` is a real centred close that /discover and
+# /experiences share — it just has to be DECLARED, which is the same shape
+# as the dead-rule scan's named list: moving one is allowed, moving one
+# silently is not.
+SHEET_ROOMS = {"sheet-gal", "sheet-paper", "sheet-pine", "sheet-quiet",
+               "sheet-bleed"}
+SHEET_SHARED = {
+    # class: why two families may both emit it
+    "sheet-keep": "the centred close /discover and /experiences share, with "
+                  "its own rules for the measure and the headline clamp",
+}
+
+
+@check("no two page families quietly share a plate composition")
+def c_plate_class_owner():
+    fams = {}
+    for f in site_files():
+        body = open(f, encoding="utf-8").read()
+        url = rel(f)
+        fam = url.split("/")[1] if url.count("/") > 1 else "home"
+        for m in re.finditer(r'class="sheet ((?:sheet-[a-z-]+ ?)+)"', body):
+            for c in m.group(1).split():
+                if c not in SHEET_ROOMS:
+                    fams.setdefault(c, set()).add(fam)
+    for c, fs in sorted(fams.items()):
+        if len(fs) > 1 and c not in SHEET_SHARED:
+            fail(f"the plate class .{c} is emitted by {len(fs)} families "
+                 f"({', '.join(sorted(fs))}) and is declared by none — a "
+                 f"composition class belongs to one family, and a name with "
+                 f"no rule in the stylesheet still reads as free to the grep "
+                 f"that is supposed to prevent this. Rename it, or add it to "
+                 f"SHEET_SHARED with the reason two families want it.")
+    for c in SHEET_SHARED:
+        if c not in fams:
+            fail(f"SHEET_SHARED declares .{c} and no page emits it — a "
+                 f"declared exception nothing reaches is a rule nobody has "
+                 f"tested")
+    return len(fams)
+
+
 @check("no page leaks an unrendered template expression")
 def c_leaks():
     # A f-string that never got interpolated ships as literal Python. It has
