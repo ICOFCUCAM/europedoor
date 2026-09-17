@@ -2372,7 +2372,13 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
    with the dots still green because they are styled by their own class.
    It is the clone trap and the two specificity collisions this stylesheet
    already records, arriving through a rename. */
-.instrmap { display: block; position: relative; text-decoration: none; }
+/* NO `display: block` HERE, BECAUSE THE LAYOUT ALREADY BLOCKIFIES IT.
+   Measured on both users: the `<a>` on /discover and the `<svg>` on /plan
+   each sit in a `display: grid` parent, so each is a grid item and computes
+   `block` with or without the declaration. That is the sixth blockified-box
+   finding on this stylesheet's record, after the four on photograph
+   containers and the one on `.wbar`. */
+.instrmap { position: relative; text-decoration: none; }
 /* THE MAP, WHAT IT SAYS, AND WHAT NARROWS IT ARE ONE STACK.
    The count was auto-placed into column one, so "114 places fit, in 32
    countries" sat at the foot of the controls rather than under the drawing
@@ -4275,7 +4281,7 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
 /* The colour that was here is inherited from .herofull and the dead-rule
    scan said so; what this selector really decides is the measure. */
 .herofull h1 { max-width: 14ch;
-               font-size: clamp(var(--t-4xl), 7vw, var(--t-6xl)); }
+               font-size: clamp(min(var(--t-4xl), 12.8vw), 7vw, var(--t-6xl)); }
 .herofull .lede { color: color-mix(in srgb, var(--bone) 88%, transparent);
                   max-width: 34rem; }
 
@@ -4491,7 +4497,7 @@ body[data-hero] .masthead { position: sticky; }
    right answer there: a headline running off the edge is the worst of the
    three. */
 .overture h1 { max-width: 14ch; min-width: min-content;
-               font-size: clamp(var(--t-4xl), 7vw, var(--t-6xl)); }
+               font-size: clamp(min(var(--t-4xl), 12.8vw), 7vw, var(--t-6xl)); }
 /* The authored sentence, at display scale. It was a .lede — 17px grey body
  * copy — which is how the best-written thing on the page ended up looking
  * like a caption. 66 to 144 characters across the atlas, median 103, so the
@@ -6711,12 +6717,65 @@ body[data-hero] .masthead { position: sticky; }
 /* EXTREME TYPE CONTRAST is the whole editorial argument: an 11px tracked
    label against a 120px display serif, and nothing in between competing
    with either. No new size is introduced — both ends already exist. */
+/* AND THE FLOOR IS WIDTH-AWARE, BECAUSE A 48px FLOOR IS A DECISION ABOUT
+   EVERY SCREEN NARROWER THAN 686. `overflow-wrap: anywhere` on a plate head
+   let `recommendation.` break mid-word at 320 — which stopped /plan
+   scrolling sideways and produced the fault `overflow-wrap` is a LAST
+   RESORT for, and the browser suite said so in those words: *overflow-wrap
+   is right; the size or the measure is what is wrong when it fires.*
+   The arithmetic, done BEFORE the change rather than after it, which is
+   the whole reason the overture h1's first floor was wrong: the word
+   measures 320 pixels of glyph at 48px inside a 288-pixel column, so it
+   fits at 43.2 — 13.5vw at 320.
+   AND 13.5 WAS THE EXACT BOUNDARY, WHICH IS NOT A FIT. Measured after the
+   change, the word came out 288.0 against a box of 288.0 and broke anyway:
+   a word wraps when it does not FIT, and equal is not smaller. That is *a
+   floor one page from its threshold*, which this repository already records
+   about a palette ratio — the arithmetic was right and was solved for
+   equality rather than for clearance. 12.8vw is 40.96px at 320, the word
+   measures 273.1 in 288, and the headroom is 14.9 pixels rather than none.
+   `min(--t-4xl, 12.8vw)` reaches the full 48 at 375 and above, so one
+   screen gets a headline seven pixels smaller and nothing else moves by a
+   pixel. Same repair as `--ed-display-1`'s.
+   AND ALL FIVE USERS OF THAT CLAMP TAKE IT, not the one that failed:
+   `.herofull h1`, `.overture h1`, `.sheet-ask .mega` and `.sheet-keep .mega`
+   carry the identical declaration and therefore the identical 48px floor at
+   every width below 686. *A rule stated once and applied to one of its call
+   sites* is this repository's most repeated fault, and `css.font_sizes`
+   caught the half-measure in the same run — two spellings of one size is a
+   twenty-fifth value against a ceiling of 24. */
 .sheet .mega { font-family: var(--display); font-weight: 400; margin: 0;
-               font-size: clamp(var(--t-4xl), 7vw, var(--t-6xl));
+               font-size: clamp(min(var(--t-4xl), 12.8vw), 7vw, var(--t-6xl));
                line-height: .96; letter-spacing: -.02em; }
 .sheet .lede { font-family: var(--display); font-size: var(--t-md); line-height: 1.55;
                max-width: 38ch; margin: 0; }
-.sheettext { display: grid; gap: var(--s5); justify-items: start; }
+/* AND THE TRACK NEEDS THE ZERO FLOOR, BECAUSE `overflow-wrap: break-word`
+   DOES NOT REDUCE A MIN-CONTENT CONTRIBUTION. Measured at 320: /plan's
+   engine head is "A published method, not a mysterious recommendation." and
+   "recommendation." is 320 pixels of glyph at the 48px floor, so the
+   implicit `auto` track took that as its minimum and the h2 rendered 320
+   wide inside a 288-pixel band — the page scrolled sideways by 16 and the
+   browser suite caught both halves of it. `break-word` breaks a line and
+   `overflow-wrap: anywhere` is the one that shrinks min-content, which is
+   the distinction this stylesheet had not yet had to make: the heading
+   already carries `break-word`, and what it needed was a track that can
+   shrink so the break has somewhere to happen. That is the same repair the
+   place family's h1 took, on the other side of the same rule. */
+.sheettext { display: grid; grid-template-columns: minmax(0, 1fr);
+             gap: var(--s5); justify-items: start; }
+/* AND THE FLOOR IS THE ITEM'S MIN-CONTENT, NOT THE TRACK'S — WHICH IS WHAT
+   `justify-items: start` MEANS. Flooring the track at zero was necessary
+   and not sufficient: a `start`-aligned item is sized fit-content, and
+   fit-content never goes below the item's own min-content, so the heading
+   stayed 320 wide inside a 288-pixel band and /plan went on scrolling
+   sideways by 16 at 320. `overflow-wrap: break-word` cannot help, because
+   it decides where a LINE breaks and says nothing about intrinsic size;
+   `anywhere` is the one value that lets a soft wrap opportunity count
+   toward min-content, which is the distinction this stylesheet had not had
+   to make before. It changes no line that already fits: measured on
+   /discover and /experiences at 1280, 834, 390 and 320, every `.sheettext`
+   box and every head inside one is unchanged to the pixel. */
+.sheettext > :is(h1, h2) { overflow-wrap: anywhere; }
 .sheetside { display: grid; gap: var(--s6); justify-items: start; }
 /* THE ONE LINK SHAPE ON THE PAGE: a drawn mark, a rule, a tracked label.
    `.waygo`'s bare arrow reads as a button that has lost its box, and this
@@ -7155,7 +7214,7 @@ body[data-hero] .masthead { position: sticky; }
 .sheet-ask { display: block; padding-block: 12vh 10vh; }
 .asktext { max-width: 62rem; display: grid; gap: var(--s5);
            justify-items: start; }
-.sheet-ask .mega { font-size: clamp(var(--t-4xl), 7vw, var(--t-6xl));
+.sheet-ask .mega { font-size: clamp(min(var(--t-4xl), 12.8vw), 7vw, var(--t-6xl));
                    line-height: .96; letter-spacing: -.02em; margin: 0; }
 /* PINE, NOT OCHRE. The homepage lights one word of its headline in the
    territorial accent; this page lights one word in the instrument's own
@@ -7170,7 +7229,7 @@ body[data-hero] .masthead { position: sticky; }
    set in the same voice. 8vw and a .9 leading were the first version and
    both were a new value — a twenty-fifth size and a ninth line-height —
    for a difference nobody would have named. */
-.sheet-keep .mega { font-size: clamp(var(--t-4xl), 7vw, var(--t-6xl));
+.sheet-keep .mega { font-size: clamp(min(var(--t-4xl), 12.8vw), 7vw, var(--t-6xl));
                     line-height: .96; margin: 0; }
 .sheet-keep .lede { margin-inline: auto; }
 
@@ -10458,16 +10517,30 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    left 45% of the band empty above the rows. The role is still `index`,
    because that is what this page IS and `checks.py` reads the role rather
    than the geometry; what changes is that the head stacks here. */
-.sheet-kinds { display: block; }
-.sheet-kinds .pagehead { display: grid; gap: var(--s4); max-width: none;
-                         margin: 0; }
-.sheet-kinds .pagehead h2 { margin: 0; }
+/* AND IT IS THE PLATE'S RULE NOW RATHER THAN THIS FAMILY'S, BECAUSE THE
+   STRUCTURE HAS APPEARED THREE TIMES. /experiences wrote it, /journeys'
+   seventeen band needs it, /stories' ledger needs it — and *no new
+   primitive until repeated structure has actually emerged* cuts both ways:
+   three users is emerged, and a second rule with an identical body is the
+   duplicate this stylesheet removed 85 of one commit ago. The one thing
+   that stays family-specific is /plan's desk head, which stacks to a SINGLE
+   column because it sits in a 34rem form track — a different requirement,
+   with its own measurement beside it.
+   Proved the way this repository requires: /experiences shot at 1280 and
+   390 before and after, byte-identical at both widths. */
+.sheet > .pagehead.index { display: grid; gap: var(--s4); max-width: none;
+                           margin: 0; }
+.sheet > .pagehead.index h2 { margin: 0; }
 @media (min-width: 62rem) {
-  .sheet-kinds .pagehead { grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+  .sheet > .pagehead.index {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
     column-gap: var(--s8); align-items: end; }
-  .sheet-kinds .pagehead .kicker { grid-column: 1 / -1; }
-  .sheet-kinds .pagehead .mega { grid-row: 2; grid-column: 1; }
-  .sheet-kinds .pagehead .lede { grid-row: 2; grid-column: 2; }
+  .sheet > .pagehead.index .kicker { grid-column: 1 / -1; }
+  .sheet > .pagehead.index .mega { grid-row: 2; grid-column: 1; }
+  .sheet > .pagehead.index .lede { grid-row: 2; grid-column: 2; }
+  .sheet > .pagehead.index .headextent { grid-row: 2; grid-column: 2;
+                                         justify-content: start;
+                                         text-align: left; }
 }
 
 /* THE FOUR SCALES LEFT 1,400 PIXELS OF WHITE. A two-column grid makes a row
@@ -10766,8 +10839,15 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
               --atlas-land:     var(--map-land);
               --atlas-far:      #C3BFB2;
               --atlas-coast:    #3D4441;
-              --atlas-frontier: var(--map-border);
-              color: var(--ink); }
+              --atlas-frontier: var(--map-border); }
+/* AND THE ROOM'S INK IS NOT RESTATED HERE. `.sheet-paper` ends
+   `background: var(--paper); color: var(--ink)` and that is the room's own
+   job; `.sheet-desk` is (0,1,0) and later, so repeating the same
+   declaration did nothing except make `.sheet-paper`'s invisible to the
+   dead-rule scan — which then reported the rule that makes every word on
+   /discover's six light bands readable as dead, because /plan is the only
+   page in its list that carries one. The redundancy was mine and it is the
+   half that could be removed without widening the instrument. */
 /* THE FORM AND THE CONTINENT CANNOT BOTH HAVE THE LEFT HALF OF THE BAND.
    Held as a full-bleed GROUND the drawing was 1,280 pixels of Europe and
    half of it was under the wash the type needs — Iberia, Ireland, Britain,
@@ -10789,7 +10869,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
             display: grid; align-items: center;
             grid-template-columns: min(34rem, 44%) minmax(0, 1fr); }
 .deskart { position: relative; margin: 0; align-self: stretch; display: grid; }
-.deskart svg { display: block; width: 100%; height: 100%; }
+.deskart svg { width: 100%; height: 100%; }
 /* AND THE CAPTION IS BACK UNDER THE PICTURE, because the picture has an
    "under" again. It was hidden while the drawing was the band's ground —
    there was nowhere to put a caption except on Europe — and every other map
@@ -10839,7 +10919,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    because the role is about the TITLE being a label rather than about how
    many columns it sits in. */
 .sheet-desk .pagehead { padding: 0; margin: 0 0 var(--s5); border-bottom: 0;
-                        display: grid; grid-template-columns: minmax(0, 1fr);
+                        grid-template-columns: minmax(0, 1fr);
                         gap: var(--s3); }
 .sheet-desk .pagehead .kicker { max-width: none; }
 /* AND THE RUNNING FURNITURE SITS ON THE FORM'S GUTTER, NOT ON THE PAGE'S.
@@ -10883,14 +10963,14 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    that moved the method out of the rail: twelve fields and seventeen
    checkboxes squeezed into two thirds of the page to make room for an essay
    is two things competing for one attention. */
-.sheet-planctls { display: block; }
+
 .planctl { margin-top: var(--s7); max-width: none; }
 
 /* ── 03 the result ────────────────────────────────────────────────── */
 /* PRESENT-BUT-EMPTY SAYS "WE HAVE THIS" AND THEN DOES NOT. At rest the
    plate says what will appear, and the sentence is removed by the script the
    moment it has something real to put there. */
-.sheet-planres { display: block; }
+
 .sheet-planres #result { margin-top: var(--s7); }
 /* "NOTHING HAS BEEN BUILT YET" UNDER A BUILT ITINERARY. `#atrest` is new in
    this composition and `planner.js` has never heard of the id, so the
@@ -10958,7 +11038,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    scaled from one array and labelled from another. That is the year band's
    own recorded failure, where correct labels over a drawing scaled from the
    wrong series still read as a finished chart. */
-.sheet-engine { display: block; }
+
 .weights { margin: var(--s7) 0 0; display: grid; gap: 0; }
 .wrow { display: grid; grid-template-columns: 14rem minmax(0, 1fr);
         gap: var(--s4) var(--s6); align-items: baseline;
@@ -10981,8 +11061,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    What moves is the number, to the end of the bar it belongs to, so the
    remainder to its right is the other seventy per cent and says so. */
 .wrow dd { margin: 0; display: flex; gap: var(--s4); align-items: center; }
-.wbar { display: block; height: 3px; background: var(--door);
-        flex: 0 0 auto; }
+.wbar { height: 3px; background: var(--door); flex: 0 0 auto; }
 .wrow dd b { font-family: var(--text); font-size: var(--t-lg);
              font-variant-numeric: tabular-nums; }
 /* THE SENTENCE UNDER THE FIGURE, ACROSS BOTH COLUMNS. A weight is a number
@@ -11020,7 +11099,6 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
   .sheet-engine .plannote { max-width: none; }
   .sheet-engine .weights + .plannote { grid-column: 1; }
 }
-.sheet-engine { grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 62rem) {
   .sheet-engine { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
                   column-gap: var(--s8); align-items: start; }
@@ -11032,7 +11110,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    measured at 834, where an `auto-fit` grid of three wraps to 2 + 1 and
    leaves four hundred pixels of empty page beside the third. A set of three
    reads as three or it reads as a list. */
-.sheet-styles { display: block; }
+
 .styles { margin-top: var(--s7); display: grid; gap: var(--s7);
           grid-template-columns: minmax(0, 1fr); align-items: start; }
 @media (min-width: 62rem) {
@@ -11058,7 +11136,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
               font-size: var(--t-xs); }
 
 /* ── 06 what it will not do ──────────────────────────────────────── */
-.sheet-wont { display: block; }
+
 .sheet-wont .note { margin-top: var(--s7); }
 
 /* SIX REFUSALS AS ROWS, AND THE SHAPE IS THE WEIGHTS' OWN MINUS THE BAR.
@@ -11086,7 +11164,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .sheet-wont .plannote { max-width: 40rem; }
 
 /* ── 07 compose the journey ──────────────────────────────────────── */
-.sheet-close { display: block; padding-block: 14vh; }
+.sheet-close { padding-block: 14vh; }
 /* THE CENTRED CLOSE, AND IT DECLARES NO COLOUR. `.sendsay` is the same
    SHAPE on /journeys and sets `--bone` on its own heading and lede, because
    there the statement stands on a photograph behind a 72% graphite scrim.
@@ -11125,4 +11203,164 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
   .deskart figcaption { padding-inline: var(--page-gutter); }
   .deskform { margin-inline: var(--page-gutter); padding: var(--s6) 0 var(--s7); }
   .wrow { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   /stories — THE EUROPEAN EDITORIAL DESK
+   ═══════════════════════════════════════════════════════════════════
+   Seven plates. The page was a head, one photograph, one lead and eight
+   identical rows: one shape eight times, with **one `<img>` where the
+   register holds eight**. That is /experiences' finding on the family
+   whose material is writing — the pictures were already bought and were
+   being spent on one surface — and nothing here is acquired.
+   See docs/stories-redesign.md for the audit and the four bands the data
+   refuses with the count behind each. */
+
+/* ── 01 the desk: a broadsheet masthead ──────────────────────────── */
+/* THE OPENING IS NOT THE OTHER THREE FAMILIES' OPENING. /plan sets its
+   title beside its argument, /experiences sets type beside a diagonal
+   picture, /journeys sets a head beside the drawn continent. This one is a
+   masthead: the claim across the full measure at display size, the extent
+   under it in a single narrow column, and then the photograph leaving the
+   page entirely. A bleed is a change of movement, which is what a front
+   page does after its own name. */
+.storyopen { display: grid; gap: var(--s5); justify-items: start;
+             grid-template-columns: minmax(0, 1fr); }
+.storyopen h1.mega { margin: 0; }
+.storyopen .lit { font-style: normal; color: var(--terracotta-2); }
+.storyopen .lede { max-width: 38rem; }
+/* AND THE PHOTOGRAPH BELONGS TO THE PAGE RATHER THAN TO A STORY.
+   `stories-hero` is a Liechtenstein village — a picture of Europe's people
+   and their ground, which is what the headline claims and is emphatically
+   not a claim about any of the nine. Behind a story's title it would be the
+   hash-drawn landscape in a different costume: a generic picture standing
+   in for a specific piece, which is the fault this family exists to
+   demonstrate against. So it is a bleed under the head and it carries no
+   title at all. */
+.storybleed { margin: var(--s7) calc(-1 * var(--page-gutter)) 0;
+              aspect-ratio: 21 / 9; overflow: hidden; position: relative;
+              background: var(--paper-3); }
+.storybleed :is(picture, img) { display: block; width: 100%; height: 100%;
+                                object-fit: cover; }
+
+/* ── 02 the ledger ───────────────────────────────────────────────── */
+/* THE ROWS ARE THE PAGE'S OWN AND THEY ARE KEPT. `.storylead`,
+   `.storyleadwide`, `.rows` and `.row.storyrow` were the right repair and
+   the brief agrees with them in writing — *the main nine-story ledger
+   remains typographic* — so this band adds a head and an extent and
+   changes nothing else. A band that is already right is not redesigned to
+   prove the page was. */
+.sheet-ledger .pagehead { margin-bottom: var(--s7); }
+.sheet-ledger .note { margin-top: var(--s7); max-width: 40rem; }
+
+/* ── 03 the idea: a pull quote ───────────────────────────────────── */
+/* A PRINCIPLE IS ONE SENTENCE AND IT IS NOT A SECTION HEAD WITH A LEDE
+   BESIDE IT. The engine on /plan and the creed on /journeys are both pine
+   rooms and both set a title against an argument; this is a page's
+   editorial position, so it hangs like a quote: the claim at display size
+   on a narrow measure with air round it, and the reasoning under it rather
+   than beside it. It was the last paragraph on the old page, at caption
+   size, under a source note — the reason this family looks the way it does,
+   printed smaller than everything it explains. */
+.storyidea { display: grid; gap: var(--s6); max-width: 46rem; }
+.storyidea h2.mega { margin: 0; max-width: 28rem; }
+.storyidea .lede { max-width: 36rem; }
+
+/* ── 04 photographed ─────────────────────────────────────────────── */
+/* `columns` RATHER THAN A GRID, which is /experiences' own measured reason
+   one family over: a grid row is as tall as its tallest item, so a
+   three-line standfirst beside a one-line one pays for the difference on
+   every row. Column-major is right here because the order is the ledger's,
+   newest first, down the left. */
+.storypics { columns: 2; column-gap: var(--s8); margin-top: var(--s7); }
+.picstory { display: block; break-inside: avoid; text-decoration: none;
+            color: inherit; margin: 0 0 var(--s8); }
+.picstory :is(picture, img) { display: block; width: 100%; height: auto;
+                              aspect-ratio: 16 / 9; object-fit: cover; }
+/* 16/9 AND NOT WIDER, because `data/image-purposes.json` declares ONE
+   container per purpose and this is a second surface for a `story-hero`,
+   whose declared box is 1.5 to 2.1. A proportion inside the declared range
+   is the honest reuse; the register still describes one box, which is the
+   open finding this repository records rather than closes. */
+/* A CREDIT IS A LINK, SO A PICTURE CARRYING ONE CANNOT GO INSIDE A LINK.
+   `.picstory` was an `<a>` wrapping `photo()`, whose figcaption holds the
+   two links Pexels' terms require — and an `<a>` may not contain an `<a>`,
+   so the parser closed the tile at the inner one and reparented the
+   credit out of the `<picture>` it belongs to. `picture:focus-within
+   .credit` then could not reach it, and the browser suite found **21 links
+   painting nothing even with focus on them**: present, placed, sized,
+   keyboard-reachable and unseeable, on the attribution a licence requires.
+   This repository already records the same trap on a thumbnail row.
+   So the credit sits UNDER the tile, outside the link, always visible —
+   which is the better answer for a licence anyway, since the standard
+   `.credit` is hover-revealed and this one never is. */
+.piccred { margin: var(--s2) 0 0; font-size: var(--t-xs); color: var(--ink-3); }
+.piccred a { color: inherit; }
+.picstory .kicker { margin: var(--s4) 0 var(--s2); }
+.picstory h3 { font-family: var(--display); font-size: var(--t-3xl);
+               line-height: 1.12; margin: 0 0 var(--s3); }
+.picstory .rowsub { margin: 0; color: var(--ink-2); font-size: var(--t-sm); }
+.picstory:hover h3 { color: var(--door); }
+
+/* ── 05 where they happen ────────────────────────────────────────── */
+/* THE DRAWING IS HERE RATHER THAN AT THE TOP, WHICH KEEPS THE PAGE'S OWN
+   RECORDED REFUSAL RATHER THAN OVERTURNING IT. As an opening, a scatter of
+   nine stories' places is a picture of nothing in particular standing in
+   front of nine pieces of writing — not chosen by a hash, and still not
+   about any of them. As the band that says reading and planning are the
+   same motion, the same drawing is about exactly one thing. */
+.storyplaces { margin: var(--s7) 0 0; }
+/* NO `display: block` — `.constel { display: block }` is the family's own
+   rule six hundred lines up, and two rules setting one value is the pair
+   the dead-rule scan names both halves of. */
+.storyplaces .constel { width: min(100%, 60rem);
+                        margin-inline: auto; height: auto;
+                        background: var(--atlas-sea); }
+.storyplaces figcaption { margin-top: var(--s4); }
+/* A MARK IN USER UNITS IS A DIFFERENT SIZE AT EVERY WIDTH, and this drawing
+   is the widest thing on the page. `constel-theme` carries `r: 22px` —
+   right on /themes, where the mark had to come DOWN as the drawing went up
+   and the frame is a row's own — and at 960 pixels across a 1,000-unit
+   viewBox that renders each of the 33 places **42 pixels wide**. The figure
+   states its own size, which is the rule the build already follows for
+   every framed drawing: 4.5 units is 8.6 pixels at 1280 and 9 units is 6.4
+   at 390, because the scale runs 0.96 to 0.36 across the same viewBox. */
+/* AND IT HAS TO OUT-SPECIFY THE RULE IT IS CORRECTING.
+   `.constel-theme:not(.framed) .constel-lit circle` is (0,3,1); the obvious
+   `.storyplaces .constel-lit circle` is (0,2,1) and loses, which rendered
+   as the change simply not being there — the fourth specificity collision
+   on this page's run. `.quietart` made the same correction for the same
+   reason six hundred lines up and reached the same specificity. */
+.storyplaces .constel-theme .constel-lit circle { r: 9px; }
+@media (min-width: 62rem) {
+  .storyplaces .constel-theme .constel-lit circle { r: 4.5px; }
+}
+
+/* ── 07 read one, then go ────────────────────────────────────────── */
+/* NOT `.sheet-send`, WHICH IS /journeys' CLOSE — a graphite band carrying a
+   photograph behind a 72% scrim. Naming the plate `send` gave this page
+   that ground inside a room declared white, so the last thing it says was
+   light type on near-black in a bone publication. Fourth class-name
+   collision on this page's own run, after `.sendsay`, `.closesay` and a
+   duplicated `.deskart figcaption`. Grep the stylesheet before naming a
+   composition. */
+.sheet-readgo { padding-block: 12vh; }
+
+/* ── 06 the feed: an action, not a note ──────────────────────────── */
+/* IT WAS A `.note.onward`, which wears the interactive colour and is
+   deliberately rare — 62 of them once made `c_note_tones` fail with "it
+   has become the default again by the back door". The Stay layer already
+   composes an action: a rule, the sentence saying what it will do, and the
+   action beside it, with no border box, radius, shadow or fill. */
+.storyfeed { display: grid; gap: var(--s5) var(--s8); align-items: start;
+             border-top: 1px solid var(--rule); padding-top: var(--s6); }
+.storysay { margin: 0; color: var(--ink-2); max-width: 44rem; }
+.storyfeed .keepgo { margin: 0; }
+
+@media (min-width: 62rem) {
+  .storyfeed { grid-template-columns: minmax(0, 1fr) auto; }
+}
+@media (max-width: 62rem) {
+  .storypics { columns: 1; }
+  .storybleed { aspect-ratio: 16 / 9; }
 }

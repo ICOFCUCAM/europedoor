@@ -1622,6 +1622,37 @@ def heroeurope(data, featured=(), beyond_ground=True):
     )
 
 
+def plate_sequence(plates, anchor=None):
+    """The bands of a plate page, numbered by what is DRAWN.
+
+    Five pages compose a plate sequence and each spelled this line itself —
+    the homepage, /journeys, /experiences, /plan and now /stories, the last
+    of them in a fourth spelling producing the same bytes. *A second
+    implementation of a thing is a second chance to make its mistake*, and
+    this one already has a mistake worth not repeating: **the number comes
+    from the rendered sequence, not from the declared list.**
+    `enumerate(PLATES, 1)` filtered afterwards numbers first and filters
+    second, so an omitted band leaves a hole — with a register holding one
+    photograph the homepage printed 01, 02, 05, 06, 07, 08, which
+    `section-audit.py` failed on in the one state that produces it. *The
+    selector that COUNTS is the selector that DRAWS*, which this repository
+    records about two CSS counters and is equally true of a number composed
+    in Python.
+
+    A plate is `(classes, name, inner)` or `(classes, name, inner, anchor)`;
+    with no anchor of its own it takes `act<n>`, which is how the homepage
+    numbers its own.
+    """
+    out = []
+    for i, plate in enumerate([p for p in plates if p[2]], 1):
+        slug, name, inner = plate[0], plate[1], plate[2]
+        at = plate[3] if len(plate) > 3 else f"act{i}"
+        cls = " ".join("sheet-" + c for c in slug.split())
+        out.append(f'<section class="sheet {cls}" id="{at}">'
+                   f"{actmark(i, name)}{inner}</section>")
+    return "\n".join(out)
+
+
 def actmark(n, name):
     """The running furniture of a plate sequence: a number, a rule, a name.
 
@@ -2188,12 +2219,7 @@ def home(data):
     # counters; the same sentence is true of a number composed in Python.
     # Latent on the real register, where all eight bands render — and latent
     # is not fixed: the day a band is legitimately empty the sequence lies.
-    _drawn = [(slug, name, inner) for slug, name, inner in PLATES if inner]
-    body = "\n".join(
-        f'<section class="sheet {" ".join("sheet-" + p for p in slug.split())}" '
-        f'id="act{i}">{actmark(i, name)}{inner}</section>'
-        for i, (slug, name, inner) in enumerate(_drawn, 1))
-    body = constel_defs() + body
+    body = constel_defs() + plate_sequence(PLATES)
 
     return "/index.html", page(
         SITE_NAME, body, path="/", area=None, hero=True,
@@ -5279,11 +5305,7 @@ def journeys_index(data):
               ("send", "The road ahead", ahead, "the-road-ahead")]
     body = (crumbs([("Europe", "/discover"), ("Journeys", None)])
             + constel_defs()
-            + "\n".join(
-                f'<section class="sheet {" ".join("sheet-" + p for p in slug.split())}" '
-                f'id="{anchor}">{actmark(i, name)}{inner}</section>'
-                for i, (slug, name, inner, anchor)
-                in enumerate([p for p in PLATES if p[2]], 1)))
+            + plate_sequence(PLATES))
 
     return "/journeys/index.html", page(
         "Journeys", body, path="/journeys", area="journeys", hero=True,
@@ -6205,11 +6227,7 @@ def planner_page(data):
             + constel_defs()
             + jsondata("europedoor-glyphview-cases",
                        [f"{len(pts)}:" + glyph_view(pts) for pts in GLYPHVIEW_CASES])
-            + "\n".join(
-                f'<section class="sheet {" ".join("sheet-" + p for p in slug.split())}" '
-                f'id="{anchor}">{actmark(i, name)}{inner}</section>'
-                for i, (slug, name, inner, anchor)
-                in enumerate([p for p in PLATES if p[2]], 1)))
+            + plate_sequence(PLATES))
 
     return "/plan/index.html", page(
         "Plan a journey", body, path="/plan", area="plan", hero=True,
@@ -9151,11 +9169,7 @@ def experiences_index(data):
               ("keep gal", "The door", door, "the-door")]
     body = (crumbs([("Europe", "/discover"), ("Experiences", None)])
             + constel_defs()
-            + "\n".join(
-                f'<section class="sheet {" ".join("sheet-" + p for p in slug.split())}" '
-                f'id="{anchor}">{actmark(i, name)}{inner}</section>'
-                for i, (slug, name, inner, anchor)
-                in enumerate([p for p in PLATES if p[2]], 1)))
+            + plate_sequence(PLATES))
 
     return "/experiences/index.html", page(
         "Experiences", body, path="/experiences", area="experiences", hero=True,
@@ -10483,148 +10497,272 @@ def theme_page(data, t):
 # ── stories ───────────────────────────────────────────────────────────
 
 def stories_index(data):
-    # NINE THREE-COLUMN GRIDS, EACH CONTAINING ONE CARD.
-    #
-    # The page was built from the DESK TAXONOMY rather than from what a
-    # reader is doing. Nine desks, one story each, so nine <h2> bands and
-    # nine grids of one — a 280px card alone in a 1,168px row with 888
-    # pixels of white beside it, nine times, over 5,792 pixels of page. The
-    # rule this repository already states is "design to purpose, not to data
-    # shape", and the shape of the data was the whole layout.
-    #
-    # AND EVERY ONE OF THEM DREW AN ILLUSTRATION CHOSEN BY HASH. The other
-    # rule this repository already states is that a story is not a place and
-    # its picture may not be drawn from a hash — that is why the story PAGE
-    # opens on a storymap of its own validated places. The index went on
-    # picking a landscape from the slug for all nine, which is the same
-    # failure the rule was written for, one page over.
-    #
-    # Nine essays is a contents page. The desk becomes a kicker on the piece
-    # it belongs to, which is what it always was — a property of the story,
-    # not a heading over one — and the date and the reading time are what a
-    # reader actually chooses on.
+    """The European editorial desk: nine essays, and the pictures spent.
+
+    THE PAGE WAS A HEAD, ONE PHOTOGRAPH, ONE LEAD AND EIGHT IDENTICAL ROWS,
+    and every repair that got it there was right. It was nine three-column
+    grids each holding one card — the desk taxonomy as the layout, 5,792
+    pixels — and then a contents page with an empty middle third, and then a
+    lead with its own constellation over eight rows. What was left is the
+    sum: one shape eight times, on 31,851 bytes, with **one `<img>` where
+    the register holds eight**.
+
+    That is /experiences' finding word for word, on the family whose
+    material is writing: *the pictures were already bought and were being
+    spent on one strip.* `stories-hero` plus seven `story:` rows is eight
+    photographs available to this page and it drew one. Nothing is acquired
+    by this rebuild. See `docs/stories-redesign.md` for the source audit,
+    the coverage audit, the brief's nine bands mapped onto what the data
+    holds, and the four bands the data refuses with the count behind each.
+    """
     sections = sorted({s["section"] for s in data["stories"]})
     byline = sorted(data["stories"],
                     key=lambda s: (s["published"], s["title"]), reverse=True)
-    # AND THE CONTENTS PAGE LEFT ITS MIDDLE THIRD EMPTY. Rewriting nine
-    # one-card grids as one list was right and only half the job: what
-    # replaced the nine hash-drawn landscapes was nothing at all, so the row
-    # ran a title and a standfirst down the left and a date 550 pixels away on
-    # the right. Measured on the built page, the median horizontal band used
-    # 46% of the column.
-    #
-    # A STORY'S PICTURE IS ITS OWN PLACES, WHICH IS THE RULE THAT REMOVED THE
-    # PLATES RATHER THAN AN EXCEPTION TO IT. The story page already opens on
-    # exactly that, drawn from the validated `places` field; this is the same
-    # derivation at glyph size. It cannot be wrong about its subject because
-    # it is made of it — and it is the one thing that tells these nine apart
-    # before a word is read. "The languages with no relatives" is San
-    # Sebastián, Budapest, Helsinki and Tbilisi, corner to corner; "the city
-    # rebuilt from paintings" is Warsaw, Dresden and Rotterdam, a knot. That
-    # difference IS the piece.
-    #
-    # Not the hash, and not a photograph either: the register holds none, and
-    # a story is the family where an illustration of nowhere did real damage
-    # — the essay about the last unlogged forest in Europe opened on tower
-    # blocks for a year.
+    images = data.get("images") or {}
     idx = data["cities"]
-    def glyph(s):
-        pts = []
-        for cid in s.get("places") or ():
+
+    def pts_of(st):
+        out = []
+        for cid in st.get("places") or ():
             n = idx.get(cid)
             if n:
-                pts.append(project(n["city"]["lat"], n["city"]["lon"]))
+                out.append(project(n["city"]["lat"], n["city"]["lon"]))
+        return out
+
+    def glyph(st):
         # A story that names no place gets no drawing, on the destination
         # page's rule: nothing in its place rather than something invented.
+        pts = pts_of(st)
         return constellation(pts, extra=" constel-theme", frame=True,
-                             mark=14) if pts else ""
-    # A LEAD, AND THEN THE REST. Nine identical rows with a 132px grey Europe
-    # at the right-hand end is a contents page with a decoration on it: the
-    # glyph was too small to name a place, the text stopped at a third of the
-    # column, and the newest piece looked exactly like the ninth. An index of
-    # nine essays has room to say which one to read first, and the answer is
-    # the newest — a date, not a judgement.
-    #
-    # The lead's own places are drawn at size, which is the treatment the
-    # story page and the homepage both already use for this family. The other
-    # eight keep the row, and lose the glyph: at 132px it said nothing, and
-    # eight of them said nothing eight times.
-    # THE OPENING DRAWS EVERY PLACE THE NINE PIECES ARE SET IN. That is the
-    # family's own subject at size and it is the same derivation the story
-    # page and the homepage already use — never a plate, which is the rule
-    # this family exists to demonstrate.
-    allplaces = []
-    for st in byline:
-        for cid in st.get("places") or ():
-            if cid in idx:
-                allplaces.append(project(idx[cid]["city"]["lat"], idx[cid]["city"]["lon"]))
+                             cut=True, mark=14) if pts else ""
+
     lead, rest = byline[0], byline[1:]
-    desks = (
-        f'<a class="storylead storyleadwide" href="{urls.story(lead)}">'
-        f'<div class="storyart">{glyph(lead)}</div>'
-        f'<div><p class="kicker">{esc(lead["section"])} · {esc(lead["reading"])} · '
-        f'{esc(lead["published"])}</p>'
-        f'<h2>{esc(lead["title"])}</h2>'
-        f'<p class="rowsub">{esc(lead["standfirst"])}</p>'
-        f'<p class="doorgo">Read the story →</p></div></a>'
-        '<div class="rows">' + "".join(
-            f'<a class="row storyrow" href="{urls.story(s)}">'
-            f'<div><p class="kicker">{esc(s["section"])}</p>'
-            f'<h2>{esc(s["title"])}</h2>'
-            f'<p class="rowsub">{esc(s["standfirst"])}</p></div>'
-            f'<p class="rowmeta">{esc(s["published"])}<br>'
-            f'<span class="small">{esc(s["reading"])}</span></p></a>'
-            for s in rest
-        ) + "</div>")
-    # NO DRAWING HERE EITHER, AND FOR A SHARPER REASON.
+
+    # ── 01 · THE DESK ────────────────────────────────────────────────
+    # THE OPENING PHOTOGRAPH BELONGS TO THE PAGE AND NOT TO A STORY.
+    # `stories-hero` is a Liechtenstein village — a picture of Europe's
+    # people and their ground, which is exactly what the headline claims and
+    # exactly NOT a claim about any of the nine. Putting it behind a story's
+    # title would be the hash-drawn landscape in a different costume: a
+    # generic picture standing in for a specific piece, which is the fault
+    # this family exists to demonstrate against.
     #
-    # This is the one family on the site whose material is WRITING, and it
-    # opened on the same continent as five other indexes with a different
-    # number of dots on it — the places nine essays happen to be set in,
-    # which is a fact about the essays and not an argument about any of
-    # them.
+    # So it is a BLEED under the head rather than a panel beside it — a
+    # bleed leaves the column and is a change of movement, which is the one
+    # of the seven image scales that says "this is the page, and here is
+    # what it is about" without saying it about an essay.
+    open_ = f"""
+  <div class="storyopen">
+    <h1 class="mega">A continent is people before it is
+    <em class="lit">places</em>.</h1>
+    <p class="lede">{numword(len(data['stories']), cap=True)} pieces across
+    {numword(len(sections))} desks &mdash; people, history, food, faith,
+    nature and culture. Every story links into the Atlas, and every Atlas
+    page a story touches links back, so reading and planning are the same
+    motion.</p>
+  </div>
+  <figure class="storybleed">{photo(images, "stories-hero", w=2400, h=1200,
+      eager=True, sizes="100vw",
+      alt="A village under snowcapped mountains in Liechtenstein.")}</figure>"""
+
+    # ── 02 · THE LEDGER ──────────────────────────────────────────────
+    # ALL NINE, PRINTED ONCE. The lead is the ledger's first entry at size
+    # rather than a band of its own: two bands, one of them "read this
+    # first" and the other "here are all nine", would print the same set
+    # twice to say two things — the fault 220 place pages had, where a strip
+    # and the rows underneath were the same places. One set, one band, and
+    # the newest piece is given the weight.
     #
-    # The page already refuses a picture per story on exactly this ground:
-    # "a story is not a place, and a landscape chosen for it by chance once
-    # put tower blocks above an essay on the last unlogged forest in
-    # Europe." A scatter of nine stories' places is that rule's own
-    # loophole — not chosen by a hash, and still a picture of nothing in
-    # particular standing in front of nine pieces of writing. The lead piece
-    # keeps its own storymap, which IS about one essay, and it comes up the
-    # page now that nothing is in front of it.
+    # And the lead is the NEWEST, which is a date rather than a judgement.
+    # That is why the opening above is not photographic today: the newest
+    # piece is `The long walk nobody finishes`, filed to Adventure, and the
+    # register holds no photograph for it. Choosing the newest PHOTOGRAPHED
+    # piece instead would be an editorial judgement wearing a rule's
+    # clothes, and this page already refused that once.
+    ledger = f"""
+  <div class="pagehead index">
+    <p class="kicker">The desk</p>
+    <h2 class="mega">Everything filed, newest first.</h2>
+    {head_extent([(len(data['stories']), 'pieces'),
+                  (len(sections), 'desks'),
+                  (len({c for st in data['stories'] for c in (st.get('places') or ())}),
+                   'places written about')])}
+  </div>
+  <a class="storylead storyleadwide" href="{urls.story(lead)}">
+    <div class="storyart">{glyph(lead)}</div>
+    <div><p class="kicker">{esc(lead["section"])} &middot; {esc(lead["reading"])} &middot;
+    {esc(lead["published"])}</p>
+    <h3>{esc(lead["title"])}</h3>
+    <p class="rowsub">{esc(lead["standfirst"])}</p>
+    <p class="doorgo">Read the story &rarr;</p></div></a>
+  <div class="rows">{"".join(
+      f'<a class="row storyrow" href="{urls.story(s)}">'
+      f'<div><p class="kicker">{esc(s["section"])}</p>'
+      f'<h3>{esc(s["title"])}</h3>'
+      f'<p class="rowsub">{esc(s["standfirst"])}</p></div>'
+      f'<p class="rowmeta">{esc(s["published"])}<br>'
+      f'<span class="small">{esc(s["reading"])}</span></p></a>'
+      for s in rest)}</div>
+  <p class="note">One piece per desk, which is why there is no band of desks
+  above this one: {numword(len(sections))} headings over one item each is the
+  taxonomy as the layout, and it is the shape this page was built as and
+  threw away.</p>"""
+
+    # ── 03 · THE IDEA ────────────────────────────────────────────────
+    # THE PAGE'S OWN SENTENCE, PROMOTED FROM A FOOTNOTE TO A ROOM. It was
+    # the last paragraph on the page, at caption size, under a source note.
+    # It is the reason this family looks the way it does and the reason
+    # seven of these nine have a photograph and two do not, so it is the
+    # thing a reader should meet before the pictures rather than after them.
+    idea = """
+  <div class="storyidea">
+    <h2 class="mega">A story is not a place.</h2>
+    <p class="lede">A landscape chosen by chance once put tower blocks above
+    an essay on the last unlogged forest in Europe. So a piece here is
+    illustrated by a photograph somebody took of the thing it is about, or
+    by the places it is set in drawn on the atlas, or by nothing &mdash;
+    and never by a picture picked from the hash of its own name.</p>
+  </div>"""
+
+    # ── 04 · THE PICTURES ────────────────────────────────────────────
+    # SEVEN OF THE NINE, AT SIZE, EACH LINKED TO ITS OWN PIECE. This is
+    # where the library goes. A story's photograph belongs to that story, so
+    # nothing here is generic and nothing is reused: the seven keys are
+    # `story:<slug>` and the two pieces without one are absent from the band
+    # rather than filled with something else.
+    #
+    # `columns` RATHER THAN A GRID, which is /experiences' own measured
+    # reason one family over: a grid row is as tall as its tallest item, so
+    # a long title beside a short one pays for the difference on every row.
+    # Column-major is right here because the order is the ledger's own,
+    # newest first, down the left.
+    #
+    # AND EACH TILE CARRIES A DESK AND A TITLE AND NOT THE STANDFIRST.
+    # The first version repeated the standfirst verbatim from the ledger two
+    # bands up — *the same set printed twice to say two things*, which is
+    # the fault 220 place pages had where a strip and the rows under it were
+    # the same places. A title under a photograph is a CAPTION and names
+    # what the picture is of; a second copy of the sentence is a second
+    # contents list.
+    #
+    # The alternative was tried on paper and refused: putting the seven
+    # photographs into the ledger's own rows and deleting this band halves
+    # the page and makes every picture a row-sized thumbnail, which is what
+    # /journeys' index already measured as saying nothing. The brief asks
+    # for both and is right to — *photography at editorially meaningful
+    # moments, while the main nine-story ledger remains typographic.*
+    #
+    # AND A CREDIT IS A LINK, SO THE PICTURE CANNOT GO INSIDE ONE. The first
+    # version wrapped `photo()` in the tile's `<a>`, and `picture()`'s
+    # figcaption carries the two links Pexels' terms require: an `<a>` may
+    # not contain an `<a>`, so the parser closed the tile at the inner one
+    # and reparented the credit out of the `<picture>` it belongs to. The
+    # browser suite found **21 links painting nothing even with focus on
+    # them** — `picture:focus-within .credit` could no longer reach them.
+    # `credit=False` and the attribution composed OUTSIDE the link by
+    # `render.credit_html`, which is the one implementation of that rule.
+    shots = [st for st in byline if held(images, "story:" + st["slug"])]
+    pics = "".join(
+        '<figure class="picstory">'
+        + f'<a class="picgo" href="{urls.story(st)}">'
+        + picture(images, "story:" + st["slug"], w=1600, h=900,
+                  sizes="(min-width: 62rem) 46vw, 100vw",
+                  alt=st["title"], credit=False)
+        + f'<p class="kicker">{esc(st["section"])}</p>'
+        f'<h3>{esc(st["title"])}</h3></a>'
+        + f'<figcaption class="piccred">{credit_html(images["story:" + st["slug"]])}</figcaption>'
+        + "</figure>"
+        for st in shots)
+    picband = f"""
+  <div class="sheettext">
+    <h2 class="mega">Photographed.</h2>
+    <p class="lede">{numword(len(shots), cap=True)} of the
+    {numword(len(data['stories']))} carry a photograph somebody took of what
+    the piece is about. The other {numword(len(data['stories']) - len(shots))}
+    carry the places they are set in, and will carry a photograph the day
+    there is one to carry &mdash; the page does not change, only the
+    register does.</p>
+  </div>
+  <div class="storypics">{pics}</div>"""
+
+    # ── 05 · WHERE THEY HAPPEN ───────────────────────────────────────
+    # THE DRAWING IS HERE RATHER THAN AT THE TOP, AND THAT IS THE PAGE'S
+    # OWN RECORDED REFUSAL KEPT RATHER THAN OVERTURNED. As an OPENING, a
+    # scatter of nine stories' places is a picture of nothing in particular
+    # standing in front of nine pieces of writing — not chosen by a hash,
+    # and still not about any of them. As the band that says *reading and
+    # planning are the same motion*, the same drawing is about exactly one
+    # thing: which parts of the Atlas these essays reach into.
+    allpts = [p for st in byline for p in pts_of(st)]
+    touched = sorted({c for st in data["stories"] for c in (st.get("places") or ())
+                      if c in idx},
+                     key=lambda c: idx[c]["city"]["name"])
+    inplace = f"""
+  <div class="sheettext">
+    <h2 class="mega">Where they happen.</h2>
+    <p class="lede">Every place the {numword(len(data['stories']))} pieces are
+    set in, lit at once. Each of them has a page in the Atlas, and each of
+    those pages links back to the essay &mdash; which is the whole of what
+    this desk is for.</p>
+  </div>
+  <figure class="storyplaces">
+    {constellation(allpts, extra=" constel-theme", cut=True, mark=5)}
+    <figcaption><span class="capwhat">The
+    {n_of(len(touched), "destination")} the nine essays are set in, on the
+    same projection as every other map here. Named in the
+    ledger above and on each piece.</span>
+    <span class="capsrc">{geo.sources_line(geo.load("europe-lod0.json"))}</span></figcaption>
+  </figure>"""
+
+    # ── 06 · THE FEED ────────────────────────────────────────────────
+    # THE ONE THING A DESK OWES ITS READERS THAT THIS ONE DID NOT HAVE.
+    # Nine dated, authored essays, a public JSON API and a sitemap — and no
+    # way at all to be told when a tenth arrives. It was a `.note.onward`,
+    # which wears the interactive colour and is deliberately rare; the Stay
+    # layer already composes an ACTION — a rule, the sentence saying what it
+    # will do, and the action beside it, with no border box, radius, shadow
+    # or fill — so this takes that grammar rather than inventing a second.
+    feed = """
+  <div class="storyfeed">
+    <p class="storysay">An Atom feed of every story, newest first, with the
+    desk it was filed to and the standfirst as written. No tracking
+    parameter, no email address, and nothing to sign up to. It is declared in
+    the shell of every page for a reader whose browser looks for one, and
+    said here in words for a reader whose browser does not.</p>
+    <p class="keepgo"><a class="btn" href="/stories/feed.xml">Follow the desk</a></p>
+  </div>"""
+
+    # ── 07 · THE DOOR ────────────────────────────────────────────────
+    # NOT `.sheet-send`, WHICH IS /journeys' CLOSE — a graphite band built
+    # to carry a photograph behind a 72% scrim. Naming this plate `send`
+    # gave a bone publication's last words light type on near-black. Fourth
+    # class-name collision on this page's own run, after `.sendsay`,
+    # `.closesay` and a duplicated `.deskart figcaption`.
+    send = f"""
+  <div class="composesay">
+    <h2 class="mega">Read one. Then go.</h2>
+    <p class="lede">Every piece ends where it is set, and every place it
+    names is a page you can plan from.</p>
+    <p class="keepgo">{golink('#the-desk', 'Back to the ledger')}
+    {golink('/discover', 'Or open the Atlas')}</p>
+  </div>"""
+
+    PLATES = [("open gal", "The desk", open_, "the-opening"),
+              ("ledger gal quiet", "Everything filed", ledger, "the-desk"),
+              ("idea pine", "A story is not a place", idea, "the-idea"),
+              ("pics gal", "Photographed", picband, "photographed"),
+              ("inplace gal quiet", "Where they happen", inplace, "where-they-happen"),
+              ("feed gal", "The feed", feed, "the-feed"),
+              ("readgo gal", "Read one, then go", send, "read-one")]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Stories", None)])}
 {constel_defs()}
-{indexhero(
-    kicker="Stories",
-    title="A continent is people before it is places.",
-    lede=f"{len(data['stories'])} pieces across {len(sections)} desks — people, history, "
-         f"food, faith, nature and culture. Every story links into the Atlas, and every "
-         f"Atlas page that a story touches links back, so reading and planning are the "
-         f"same motion.",
-    img=photo(data.get("images"), "stories-hero", w=2000, h=1200,
-              sizes="(min-width: 60rem) 52vw, 100vw"))}
-{desks}
-<!-- THE ONE THING A DESK OWES ITS READERS THAT THIS ONE DID NOT HAVE. Nine
-     dated, authored essays, a public JSON API, a sitemap — and no way at all
-     to be told when a tenth arrives. The link is declared in the shell for
-     every reader whose browser or reader looks for it, and stated here in
-     words for every reader who does not have one. -->
-<p class="note onward"><a href="/stories/feed.xml">Follow the desk &rarr;</a>
-An Atom feed of every story, newest first, with the desk it was filed to and
-the standfirst as written. No tracking parameter, no email address, and
-nothing to sign up to.</p>
-<p class="small">The shape above the lead piece is the places it is about, drawn
-on the same projection as every other map here — and the same reason there is no
-other picture on this page: a story is not a place, and a landscape chosen for it
-by chance once put tower blocks above an essay on the last unlogged forest in
-Europe. Coastline from <a href="/sources">Natural Earth</a>, public domain.</p>
+{plate_sequence(PLATES)}
 """
     return "/stories/index.html", page(
-        "Stories", body, path="/stories", area="stories",
+        "Stories", body, path="/stories", area="stories", hero=True,
         description="Editorial from across Europe: people, history, food, faith, nature and culture, each linked into the Atlas.",
     )
-
 
 def story_page(data, s):
     # THE ESSAY HEAD IS A `pagehead` VARIANT, like the other five family

@@ -2350,6 +2350,35 @@ async function main() {
                      // nowhere, and a ceiling raised for that is a ceiling
                      // raised for a gap in the scan.
                      "/themes/mountain-europe",
+                     // AND THREE OF THE FOUR INDEXES THE ROOM SYSTEM WAS
+                     // BUILT FOR ARE STILL NOT IN THIS LIST, WHICH IS
+                     // MEASURED AND DEFERRED RATHER THAN UNKNOWN. It
+                     // carries `/discover/nordic` — a macro REGION page —
+                     // and no `/discover`, no `/experiences`, no
+                     // `/journeys`. The cost showed up as a false verdict:
+                     // the only page here that has ever carried a
+                     // `.sheet-paper` band is /plan, where `.sheet-desk`
+                     // used to set the same colour later at the same
+                     // specificity, so `.sheet-paper {color}` was reported
+                     // dead — and removing it in the browser turns every
+                     // word on /discover's six light bands from
+                     // rgb(20,23,22) to rgb(243,240,230). Bone on bone, on
+                     // six bands of the page this room system was written
+                     // for. That is this check's own recorded finding for
+                     // the third time, after `.regionglyph .countries path`
+                     // and `.credit {opacity}`: a rule measured only where
+                     // it loses looks like a rule that wins nowhere — and
+                     // the reason nothing here is deleted on this scan's
+                     // word alone.
+                     //
+                     // Adding the three takes the population from 381 rules
+                     // to 506 and the dead list from 42 to 71, with 31
+                     // fresh — ten of them `.sheet-X { display: block }`
+                     // restating `.sheet-gal`, the rest needing to be read
+                     // one at a time. That is its own commit with its own
+                     // triage rather than a widening smuggled into a page
+                     // build, which is how `c_photo_safe_area`'s ten
+                     // templated slots were handled for the same reason.
                      "/search", "/fund"]) {
       await dsp.goto(base + u, { waitUntil: "load" });
       const rows = await dsp.evaluate(() => {

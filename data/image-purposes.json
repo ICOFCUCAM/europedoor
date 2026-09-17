@@ -59,16 +59,16 @@
       "max_aspect": 2.1,
       "note": "Somebody DOING the thing — hands, a workshop, a kitchen, a boat. A person at work in a real place, not a posed portrait and not an empty interior. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening.",
       "container": {
-        "selector": ".iheroart.shot",
-        "min_aspect": 0.692,
-        "min_at": "320x640",
-        "max_aspect": 1.5,
-        "max_at": "760x640"
+        "selector": ".xshot",
+        "min_aspect": 0.731,
+        "min_at": "834x900",
+        "max_aspect": 1.501,
+        "max_at": "1280x640"
       },
       "safe_area": {
-        "width": 0.33,
-        "height": 0.867,
-        "frame": 0.286
+        "width": 0.348,
+        "height": 0.866,
+        "frame": 0.301
       }
     },
     "stories-hero": {
@@ -82,16 +82,16 @@
       "max_aspect": 2.1,
       "note": "A human moment that could be the opening frame of a long read. Faces are welcome; a landmark is not. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening.",
       "container": {
-        "selector": ".iheroart.shot",
-        "min_aspect": 0.692,
+        "selector": ".storybleed",
+        "min_aspect": 1.778,
         "min_at": "320x640",
-        "max_aspect": 1.5,
-        "max_at": "760x640"
+        "max_aspect": 2.333,
+        "max_at": "1024x640"
       },
       "safe_area": {
-        "width": 0.33,
-        "height": 0.867,
-        "frame": 0.286
+        "width": 0.847,
+        "height": 0.557,
+        "frame": 0.472
       }
     },
     "events-hero": {

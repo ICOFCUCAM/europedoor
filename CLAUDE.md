@@ -17,6 +17,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **the mandate: what a first-class gateway to Europe would be, and where this one is not** | **`docs/first-class-audit.md`** — 27 surfaces rendered at 1280 and 390 and then measured. Three findings, and Finding 1 is now closed on the numbers: it read 12 of 23 surfaces effectively type to the fold with seven showing no picture at all, and reads **3 of 30 with none and none under a fifth**, median share 24% → 35.6% (CORRECTED twice — the first version said 21 of 22 and was reading where the first figure STARTS rather than how much of the screen it fills). `tools/opening.js` is the instrument, so the number is checkable in a minute. **Finding 2's other half is measured too** — it says the page is the same page and its evidence only ever covered the first 250 pixels: `tools/composition.js` reads the band sequence under the head and finds **29 distinct body shapes over 47 families**, and three h1 sizes at tops 136–745 where the original reading was one size at 150–312. The eight benchmark sites are BLOCKED by the egress proxy and the benchmark half is labelled second-hand |
 | **/experiences — the third instrument, and why it is photography rather than a map** | **`docs/experiences-redesign.md`** — the source audit, the image-coverage audit, the twelve bands of the brief mapped onto what this atlas actually holds, the two that are refused, and the seven defects only rendering found. 311 photographs, and on this one page the library was never the constraint |
 | **/journeys — movement rather than a list, and where the family's own photograph went** | **`docs/journeys-redesign.md`** — the source audit, the seventeen routes drawn at once as the opening, the three paces derived from measured kilometres a day rather than named, the two things the brief asks for that are refused with their triggers, and the five defects only rendering found |
+| **/stories — an editorial desk, and the pictures it already owned** | **`docs/stories-redesign.md`** — the source audit, the eight photographs the register held while the page drew one, the brief's nine bands mapped onto a 1:1 desk taxonomy and 34 tags used once each, and the four class-name collisions one page's run produced with no guard anywhere |
 | **/plan — an instrument rather than a form, and the guard a runtime `<img>` walks straight past** | **`docs/plan-redesign.md`** — the source audit, the seven bands, the three of the brief's asks that collide with recorded findings, the twelve defects only rendering found (nine of them faults already recorded in another family and three of those recorded in the commit before), and the per-leg photograph: `render.credit_html` is one implementation because `checks.py` cannot see an `<img>` a script writes |
 | **the eight page families, and what each room does differently** | **`docs/non-home-redesign.md`** — the non-home redesign answered A-J. The eight rooms derived from the route, the three helpers that were forcing one grammar, the seven image scales, 1,626 declared surfaces, and the defects only rendering found |
 | **the design language — what makes a page EuropeDoor with the logo removed, and which movements each family takes** | **`docs/design-language.md`** — the ARCHITECT step. Five marks that could not have been made by anybody else, the six-movement composition grammar per family, the three head roles, what the language forbids, and how a change is proved |
@@ -5018,6 +5019,145 @@ site: the title at display size with its lede beside it. 1.1 against .9
 rather than equal halves, because two equal columns read as a layout and an
 unequal pair reads as a statement with a note on it, which is the feature
 scale's own argument at 1.35/.65.
+
+
+**/stories DREW ONE PHOTOGRAPH WHILE THE REGISTER HELD EIGHT FOR IT.**
+`stories-hero` and seven `story:` rows, and the index spent one — which is
+the /experiences finding word for word on the family whose material is
+writing: *the pictures were already bought and were being spent on one
+surface.* Nothing was acquired. 1 `<img>` to 8, 31,851 bytes to 53,278,
+a head and eight identical rows to seven plates.
+
+**AND THE BRIEF'S DESK BAND IS REFUSED BY A COUNT: NINE DESKS AND NINE
+STORIES IS A 1:1 MAPPING.** A band of desks is nine headings over one item
+each, which is literally the layout this page was built as and threw away.
+Three more of its asks go the same way: `author` is "EuropeDoor editorial"
+on all nine so a byline band prints one name nine times; 36 tags across the
+nine and 34 used exactly once, so a tag index is a scatter with no
+structure; and the nine run 5 to 9 minutes, which is not a choice a reader
+makes. **And the lead cannot be the photographic one**: the page picks its
+lead by DATE and says why — *a date, not a judgement* — and the newest piece
+is filed to Adventure, one of the two the register holds nothing for. So the
+opening carries the page's own photograph and no story's title, and it
+becomes photographic on its own the day the register holds Adventure.
+
+**FOUR CLASS-NAME COLLISIONS ON ONE PAGE'S RUN, AND THERE IS NO GUARD.**
+This file already records `.doorgo`, whose `opacity: 0` made two links on
+/experiences present, placed, sized, keyboard-reachable and painted at zero
+alpha. Building /plan and /stories produced four more, every one from an
+obvious name: `.sendsay` (/journeys' close, bone on a white wall at about
+1.1:1), `.closesay` (the homepage's close at `max-width: 32rem`, so a
+centred statement came out 512 pixels wide inside a 1,152-pixel band),
+`.sheet-send` (/journeys' graphite photograph band, so a bone publication's
+last words rendered on near-black), and a `.deskart figcaption` rule written
+twice with an identical body eighty lines apart — one of the 85 duplicates
+the previous commit removed, reintroduced within the hour. Not one is
+visible to any suite here. **Grep the stylesheet before naming a
+composition.**
+
+**A RULE MEASURED ONLY WHERE IT LOSES LOOKS LIKE A RULE THAT WINS NOWHERE,
+FOR THE THIRD TIME — AND THE THIRD TIME THE ANSWER WAS A PAGE.** The
+dead-rule scan reported `.sheet-paper {color}` dead. Removing it in the
+browser turns every word on /discover's six light bands from
+`rgb(20,23,22)` to `rgb(243,240,230)`: bone on bone, on the page the whole
+room system was written for. The scan's page list carries
+`/discover/nordic` — a macro REGION page — and no `/discover`, no
+`/experiences` and no `/journeys`, so the only page in it that has ever
+held a `.sheet-paper` band is /plan, where `.sheet-desk` set the same
+colour later at the same specificity. **The redundancy was mine and it is
+the half that could be removed without widening the instrument**; adding the
+three indexes takes the population from 381 rules to 506 and the dead list
+from 42 to 71, with 31 fresh, which is its own commit with its own triage
+and is recorded in the check rather than done here.
+
+**AND ELEVEN DECLARATIONS WERE DEAD BECAUSE A ROOM ALREADY SAID THEM.**
+`.sheet-gal` ends `display: block`, so `.sheet-planctls`, `.sheet-planres`,
+`.sheet-styles`, `.sheet-wont` and `.sheet-close` each restated it; a base
+`.sheet-engine { grid-template-columns }` made `.sheet-pine { display }`
+unable to move a pixel, because `display: block` and a one-column grid
+render identically with one child per row; `.deskart svg { display: block }`
+and `.instrmap { display: block }` were two rules setting one value, so the
+scan named both; `.wbar` is a flex item and `.instrmap` is a grid item on
+both its users, so each is **blockified by the layout** — the fifth and
+sixth of that finding on this stylesheet's record.
+
+**`overflow-wrap: break-word` DOES NOT REDUCE A MIN-CONTENT CONTRIBUTION,
+AND `justify-items: start` PINS AN ITEM AT ITS OWN MIN-CONTENT.** /plan
+scrolled sideways by 16 pixels at 320: "A published method, not a mysterious
+recommendation." and the word `recommendation.` is 320 pixels of glyph at
+the 48px clamp floor, so `.sheettext`'s implicit `auto` track took that as
+its minimum and the h2 rendered 320 wide inside a 288-pixel band. Flooring
+the track at `minmax(0, 1fr)` was necessary and not sufficient, because a
+`start`-aligned item is sized fit-content and fit-content never goes below
+its own min-content. **`anywhere` is the one value that lets a soft wrap
+opportunity count toward min-content**, which is the distinction this
+stylesheet had not had to make. Proved surgical: every `.sheettext` box and
+every head inside one on /discover and /experiences is identical to the
+pixel at 1280, 834, 390 and 320, and the single line that changed in the
+whole matrix is /plan at 320 going from 16 pixels over to 0.
+
+**AND THE INDEX HEAD INSIDE A PLATE IS ONE RULE NOW.** `.pagehead.index` is
+a three-column head — the extent beside the name — which on a block plate
+puts the kicker alone in the left half and starts the title at x=400.
+/experiences wrote its own override; /journeys and /stories needed the same
+one. *No new primitive until repeated structure has actually emerged* cuts
+both ways: three users is emerged, and a second rule with an identical body
+is the duplicate this stylesheet removed 85 of one commit ago.
+`.sheet > .pagehead.index`, with /experiences shot at four widths before and
+after and every box identical. /plan's desk head keeps its own rule, because
+it stacks to a SINGLE column inside a 34rem form track.
+
+
+**FIVE PAGES COMPOSED A PLATE SEQUENCE AND EACH SPELLED THE SAME LINE
+ITSELF.** The homepage, /journeys, /experiences and /plan wrote one form and
+/stories arrived as a fifth in a fourth spelling producing the same bytes.
+`pages.plate_sequence()` is the one implementation now, and what it carries
+is the mistake worth not repeating: **the number comes from the rendered
+sequence, not from the declared list.** `enumerate(PLATES, 1)` filtered
+afterwards numbers first and filters second, so an omitted band leaves a
+hole — with a register holding one photograph the homepage printed 01, 02,
+05, 06, 07, 08. *The selector that COUNTS is the selector that DRAWS*, which
+this file records about two CSS counters and is equally true of a number
+composed in Python.
+
+
+**AN `<a>` INSIDE AN `<a>` IS NOT NESTED — THE PARSER CLOSES THE FIRST ONE,
+AND THE RULE THAT REVEALS THE LICENCE CREDIT LOST ITS SUBJECT.** `picture()`
+emits the Pexels credit as a `<figcaption class="credit">` INSIDE the
+`<picture>`, at `opacity: 0` until `picture:focus-within`. /stories made each
+picture tile a link, so the credit's two anchors sat inside one — and the HTML
+parser is specified to end the outer `<a>` at the inner one, which made them
+siblings of the tile rather than descendants of it. **21 links of 3,685
+painted nothing even with focus on them**, on the two links Pexels' terms
+require. That is `.doorgo` from the other end: there a class carried an
+`opacity: 0` nobody expected, here the rule that clears it stopped having
+anything to match, and `getComputedStyle` reads `opacity: 1` ON the link
+either way. The tile is a `<figure>` with `credit=False` inside the link and
+the credit in a `<figcaption>` outside it — which is also more visible than a
+credit revealed on hover.
+
+**A CLAMP SOLVED FOR EQUALITY IS NOT A CLAMP THAT FITS.** `.sheet .mega`'s
+floor was made width-aware to stop `recommendation.` breaking mid-word at 320,
+and the arithmetic was done BEFORE the change — 320 pixels of glyph at 48px
+inside a 288-pixel column, so 43.2px, so 13.5vw — which is the repair this
+file already records for the overture h1. It was still wrong: measured after,
+the word came out **288.0 against a box of 288.0** and broke anyway, because a
+word wraps when it does not FIT and equal is not smaller. *A floor one page
+from its threshold is a check that fails without saying anything*, recorded
+here about a palette ratio and true of a type clamp identically. 12.8vw is
+40.96px at 320 and the headroom is 14.9 pixels rather than none; the floor
+reaches the full 48 at 375. **All five users of that clamp take it**, because
+one of them is the reason the other four have the declaration at all.
+
+**AND TWO DECLARED CROP BOXES NAMED A CONTAINER NEITHER PAGE EMITS ANY
+MORE.** `experiences-hero` and `stories-hero` both declared `.iheroart`,
+which is `indexhero()`'s figure, and neither index calls `indexhero()` since
+it became a plate sequence. *A selector that matches nothing has no aspect
+ratio*, so the sweep reported no box larger than 4px at any of 40 viewports —
+the green-assertion-about-nothing fault the crop-box measurement was rebuilt
+to catch, arriving in the commit that rebuilt the pages it measures.
+`.xshot` is 0.731–1.501 (frame 30.1%) and `.storybleed` is 1.778–2.333
+(frame 47.2%); both clear the 12% floor.
 
 
 ## Gates
