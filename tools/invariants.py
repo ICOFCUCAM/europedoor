@@ -671,7 +671,8 @@ def measure():
                        "request — `cartography.credited()` reads the rendered "
                        "terrain markup — so the colophon at the foot of the "
                        "page names GMTED2010 and ETOPO1 because the layer is "
-                       "there, not because a builder asked for it."},
+                       "there, not because a builder asked for it. "
+                       "AND 226 -> 262 WHEN THE PLACE PAGE STOPPED THROWING ITS DRAWING AWAY. A place page opened on `photograph if has_photo else minimap(...)` — an either/or — while its own comment twenty lines down says THE OPENING KEEPS THE MAP and *the strip is where the photographs go*. It was invisible while no `place:` purpose was filled; two photograph batches merged and forty place pages lost their geography entirely, relief included, along with the caption saying there is no honest map of a building but there is an honest map of where the building is. `head_figure`/`moved_drawing` is the site's own contract and this was its fourth caller with a private if/else: the photograph keeps the opening `place-hero` declares and the drawing moves to a band below. The figure is higher than the 242 this branch had because a photographed place page now carries BOTH, where before it carried one. Nothing was acquired for it. "},
             "signature.apertures": {
                 "value": sum(1 for b in bodies.values() if 'clip-path="url(#arch-' in b),
                 "kind": "floor",
@@ -695,7 +696,8 @@ def measure():
                        "DONE, on the light map set, answering a question the "
                        "rows underneath it cannot. The door belongs on it "
                        "because it is a picture of somewhere, which is exactly "
-                       "the test /discover's map fails."},
+                       "the test /discover's map fails. "
+                       "AND 714 -> 818 WHEN THE PLACE PAGE STOPPED THROWING ITS DRAWING AWAY, which is the same repair read on the other invariant. Forty place pages had lost their arch outright to a photograph, and every photographed place page now carries the picture in its opening and the map in a band below — so the floor rises past where it stood before those photographs merged rather than recovering to it."},
             "plates.page_share": {
                 "value": round(sum(1 for b in bodies.values()
                                    if re.search(r'class="[^"]*(?<![\w-])plate(?![\w-])', b))

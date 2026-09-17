@@ -8764,12 +8764,47 @@ def place_page(data, c, r, t, pl):
     # is the orientation they lack. The caption says exactly that, because a
     # map captioned "Bryggen" that is actually a map of Bergen would be the
     # kind of small lie this repository refuses everywhere else.
-    has_photo = bool((data.get("images") or {}).get(f"place:{cid}/{pl['slug']}"))
+    # AND THE DRAWING WAS DISCARDED THE DAY A PHOTOGRAPH ARRIVED, WHICH THE
+    # PARAGRAPH TWENTY LINES DOWN FORBIDS IN AS MANY WORDS: *THE OPENING
+    # KEEPS THE MAP … the strip is where the photographs go.* This was
+    # `photograph if has_photo else minimap(...)` — an either/or that threw
+    # the map away — and it was invisible while no `place:` purpose was
+    # filled. Two photograph batches merged and **forty place pages lost
+    # their geography entirely**: no minimap, no arch, no relief, and with
+    # them the caption that says *there is no honest map of a building but
+    # there is an honest map of where the building is*, which is exactly the
+    # orientation a reader who arrived from a search lacks.
+    #
+    # `head_figure`/`moved_drawing` is the site's own answer and its
+    # docstring states it: *the drawing is never lost — the caller emits it
+    # below with `moved_drawing()` when a photograph took its place.* The
+    # country page honours it, the theme page honours it, the themes index
+    # never called it (fixed one commit ago) and **this family is the
+    # fourth caller and had its own if/else instead**. A photograph of the
+    # building is better in the opening than a map of the town around it, so
+    # the photograph stays where `place-hero` declares it and the drawing
+    # moves to a band with its caption.
+    #
+    # The container stays `.card-art frame`, which is what
+    # `data/image-purposes.json` declares and what `c_photo_safe_area`
+    # measures — the crop box does not move, only what is under it.
+    pkey = f"place:{cid}/{pl['slug']}"
+    has_photo = bool((data.get("images") or {}).get(pkey))
+    placemap = minimap(data, t, span="auto", about=pl["name"])
     placeart = (f'<div class="card-art frame">'
-                + picture(data["images"], f"place:{cid}/{pl['slug']}", w=1260, h=540,
+                + picture(data["images"], pkey, w=1260, h=540,
                           alt=f"{pl['name']}, {t['name']}", eager=True,
                           sizes="(min-width: 76rem) 76rem, 100vw")
-                + '</div>') if has_photo else minimap(data, t, span="auto", about=pl["name"])
+                + '</div>') if has_photo else placemap
+    placewhere = moved_drawing(
+        data, pkey, placemap if has_photo else "",
+        f"There is no honest map of a building at this atlas's scale — the "
+        f"projection's finest unit is about four kilometres — and there is an "
+        # NO `esc()` HERE: `section()` escapes its own title and lede, and
+        # the first version double-escaped four place names into '&amp;amp;'.
+        # `checks.py` caught it in the run that introduced it.
+        f"honest map of where {pl['name']} is. The photograph above is the "
+        f"place; this is {t['name']} around it.")
 
     # THE THINNEST PAGE ON THE CONTACT SHEET, AND THIS IS THE FAMILY WITH
     # THE MOST DECLARED SURFACES BEHIND IT. 255 `place:` purposes exist and
@@ -8834,6 +8869,7 @@ def place_page(data, c, r, t, pl):
   <p class="orient">Give it {esc(pl['duration'])} · {esc(SEASON_NAMES[pl['season']])} ·
   <span class="mono">{pl["lat"]:.3f}°N, {pl["lon"]:.3f}°E</span></p>
 </div>
+{placewhere}
 
 <section class="practical" aria-label="Practical">
   <div>
