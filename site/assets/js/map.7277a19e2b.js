@@ -655,8 +655,32 @@
     var counts = [];
     if (d.p) counts.push(d.p + (d.p === 1 ? " place" : " places"));
     if (d.e) counts.push(d.e + (d.e === 1 ? " experience" : " experiences"));
+    /* THE PICTURE, WHERE THE REGISTER HOLDS ONE. This popup is the surface a
+     * reader uses to CHOOSE a destination and it showed every fact about a
+     * place except what it looks like — while `city:<id>` had a licensed
+     * photograph for a third of them, already resolved by the build and
+     * already spent on the planner's leg tiles.
+     *
+     * `d.sh` is a URL this build wrote from a register KEY, and `d.sc` is the
+     * attribution composed by `render.credit_html` — the one function that
+     * knows Pexels' rule, which requires a prominent link to Pexels and the
+     * photographer credited with a link to the photo page. It is carried
+     * rather than composed here for the reason the planner records: a second
+     * implementation of a LICENCE obligation is the one thing this repository
+     * has already learned not to have, and a breach would be of somebody
+     * else's terms. Inserted as HTML because it IS pre-escaped markup from
+     * that function; everything else in this popup goes through `esc`.
+     *
+     * `loading="lazy"` is wrong here — the popup opens on a click and the
+     * picture is the thing the click was for. */
+    var shot = d.sh
+      ? '<figure class="mapshot"><img src="' + esc(d.sh) + '" alt="' +
+        esc(d.sa || d.n) + '" width="640" height="360" decoding="async">' +
+        '<figcaption class="credit">' + d.sc + "</figcaption></figure>"
+      : "";
     popup.innerHTML =
       '<button class="mappopup-close" type="button" aria-label="Close">×</button>' +
+      shot +
       '<p class="kicker">' + esc(d.r) + " · " + esc(d.c) + "</p>" +
       '<h2 class="mini">' + esc(d.n) + "</h2>" +
       "<p>" + esc(d.s) + "</p>" +

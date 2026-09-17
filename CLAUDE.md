@@ -6181,6 +6181,137 @@ derivation, and inventing them would be authoring a measurement. The planner
 answers a weekend today ("weekend" parses to three days, "long weekend" to
 four), and the trigger for the index is somebody writing them.
 
+
+**THE INSTRUMENT HAD FIVE OF THE POPUP'S SIX FIELDS AND NONE OF ITS
+PICTURES.** /map's popup prints a destination's name, country, region,
+summary and link off the baked `mapinfo` block, and the register holds a
+photograph for **105 of the 319** — which the one page whose whole job is
+opening a destination showed none of. The three fields are the derivative
+URL, the photographer's own alt and the fragment `render.credit_html`
+composes: **46,505 raw bytes and 10,045 over the wire**, measured by gzipping
+the page with the fields and without, and `weight.max_page_kb` moved 444 →
+489 with that arithmetic in the register. **The credit is carried rather than
+composed in the browser** because it is a licence obligation with exactly one
+implementation here — the same reason the planner receives
+`cities.shotCredit` — and it is shown at `opacity: 1` rather than revealed on
+hover, because a popup is transient and a credit nobody can reach is not a
+credit. Reading it out of `/api/atlas.json` instead would trade 10 KB against
+a 350 KB fetch to show one picture.
+
+**/search PRINTED 550 AND SHIPPED 1,064.** The head was a hand-assembled sum
+of SEVEN collections and `search_api` writes TWELVE kinds, so the page
+understated its own index by **514 records** — all 255 places, all 197
+experiences, the seventeen interests, the thirty-six categories and the nine
+corners of Europe — on the one page whose entire subject is the extent of an
+index. The resting state listed the same seven under a sentence promising
+"every kind is browsable without searching at all", which is the `pop_line`
+shape: a list that omits part of its own set reads as a policy. Both are
+derived from the rows the browser filters now.
+
+**AND THE REPAIR PUT THE PAGE OVER THE MONOTONY CEILING — 56% AGAINST 52,
+twelve rows of one component on a 1,783-pixel page.** Shortening the list is
+the one fix this page cannot take. What the count-sorted list threw away is
+that the twelve are not flat: five of them NEST — nine corners of Europe, 50
+countries, 130 regions, 319 destinations, 255 places — and seven cut ACROSS
+that. Sorting by size put Places above Countries, which is arithmetically
+true and says the wrong thing about a nested atlas. Two bands, **56% →
+31%**, and the chain is a classification while every count beside it is a
+measurement. **And taking the plural verbatim matters on exactly one row**:
+lower-casing a heading and re-capitalising its first letter printed *"Regions
+of europe"*, which is pluralising-by-adding-an-s one fault over.
+
+**`stops_at` WAS DERIVED, COUNTED AND DROPPED FOR THE LIFE OF THE GRAPH, AND
+THE FLOOR WRITTEN TO CATCH EXACTLY THAT COULD NOT SEE IT.** `gathers` shipped
+at zero once and the repair was a count per relationship in
+`/api/graph.json` and a floor on each in `checks.py`. That floor was **a
+hand-typed list of the NINE relationships that happened to be non-zero the
+day it was written** — and `journey stops_at place` reads `leg.get("places")`,
+a field **none of the 121 legs in this dataset has ever carried**, so it
+emitted nothing, and the counts block could not show it because it was built
+from the edges that were EMITTED. **A floor over the keys that are PRESENT is
+blind to exactly the case a floor exists for.** `pages.GRAPH_RELATIONSHIPS` is
+the one declaration now: `graph_api` seeds its counts from it so a zero is
+published rather than absent, raises on an edge type the table does not
+declare, and `checks.py` reads that table rather than naming nine
+relationships a second time. Each row carries a `floor` or an `awaiting`
+sentence naming the authored field that would create it. Proved red five
+ways, including the two that are about the instrument: a relationship at zero
+omitted rather than published, and one declared as awaiting that starts
+emitting.
+
+**AND IT IS NOT DERIVED FROM THE LEG'S DESTINATION, WHICH IS THE AVAILABLE
+SHORTCUT.** A journey passing through Vienna does not stop at the
+Kunsthistorisches. Asserting it does would author an editorial claim out of a
+containment fact, which is the Data Integrity Rule, and it is why this
+relationship waits on somebody writing the field rather than being filled in.
+
+**AND 96 PLACE PAGES HAD ALREADY MADE THAT CLAIM IN PROSE.** `back[cid]
+["journeys"]` is every journey with a leg in the TOWN, and the place page
+headed it **"Journeys that stop here"** — so the Alpine Grand Tour, which has
+a night in Chamonix and says nothing about the Mer de Glace, was published as
+stopping at a glacier. The links were right, the journeys were right, and
+only the heading was wrong, which is the half no count reads; `section-audit`
+asserted the literal string, so the audit was green ON the defect. The
+heading names the destination now — *"Journeys through Chamonix"*, the form
+the region page has always used for the same relation one level up — with a
+lede saying what is not held. `c_journey_claim_subject` is on the **promise
+rather than the wording**: a page may name a place as the subject of a
+journey relation only when the graph holds a journey-to-place edge, read off
+the published count, so it relaxes by itself the day `stops_at` is real.
+Proved red on all 96.
+
+**94 OF 150 RECURRING FIXTURES WERE INVISIBLE TO THE KNOWLEDGE GRAPH.** A
+festival is held on the COUNTRY and 56 of them name a city, and the edge was
+only emitted inside the per-destination loop — so /events published 150 and
+the graph knew 56, which is the `pop_line` shape arriving in an index rather
+than in a sentence. Both edges are drawn now, because both are true and they
+answer different questions; `part_of` and `located_in` already target two
+entity types each, so one relationship with two targets is this document's
+own idiom. `happens_in` 56 → 206. **And the guard is the exact form rather
+than the floor**: every fixture must produce a country edge, because a round
+number below the current count goes on passing when half of them stop being
+drawn.
+
+**NINE ASSERTIONS IN THE SECTION AUDIT READ `x in SPEC or True`.** §36's
+subject is whether the specification's thirty-two entities exist in the
+model, and nine of its assertions were True whatever the model held — the
+`c_photo_safe_area`-matching-nothing failure with the tell written into the
+source. Each entity is counted off the running data now, or named as held
+under another shape, or named as refused **against the promise that refuses
+it** — and three of those refusals were pointed at the wrong file or the
+wrong wording on the first run, which is the point of asserting them. 12
+assertions → 28. §37 read **BUILT** while its own summary named place →
+journey; it is PARTIAL, and its assertions read the published graph rather
+than a page heading. 4 → 13.
+
+**AND EIGHT OF THE NINE STORIES HAD A DERIVABLE JOURNEY AND LINKED NONE.**
+§34 asks an article record for "Related journeys"; measured, the nine stories
+have one to six journeys with a leg in a destination they are written about,
+and every story page linked zero. **Both ends of this relation are
+destinations** — a story's `places` and a journey's legs — so nothing is
+manufactured by drawing it, which is exactly what separates it from the edge
+the graph publishes at zero. The heading was written honestly the first time
+for once: *"Journeys through these places … They are not about the story."*
+And an authored **SEO title is refused** rather than added: the headline, the
+tab title and the og:title are one string, and a second name for one thing is
+two names waiting to disagree.
+
+**A CHECK APPENDED AFTER `main()` IS DEFINED AND NEVER REGISTERED, AND THE
+RUN STILL SAYS EVERY CHECK PASSED.** Sixty lines of new check went on the end
+of `checks.py`, below `if __name__ == "__main__": main()`, so the decorator
+ran after the suite had finished: the run reported every check passing on the
+same total as before, with no error anywhere. That is *a green run that
+has stopped counting* arriving through the file's own layout rather than
+through a shadowed variable. **Read the total, not the word.**
+
+**AND THE CHECK'S FIRST DRAFT BROKE THIS FILE'S MOST REPEATED RULE.** "Ortisei
+& the Dolomites" is `&amp;` in the shipped HTML and `&` in the record, so five
+correct pages were reported as making the claim the check exists to refuse.
+*One normaliser, both sides* — fifth occurrence, and the first inside a check
+written in the same hour as the paragraph recording the fourth. The heading is
+unescaped rather than the name escaped, because what a reader gets is the
+unescaped form and that is the thing being judged.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

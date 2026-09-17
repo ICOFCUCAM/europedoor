@@ -8756,6 +8756,21 @@ def place_page(data, c, r, t, pl):
     others = [x for x in t.get("places", []) if x is not pl]
     cid = f"{c['slug']}/{r['slug']}/{t['slug']}"
     b = data["back"][cid]
+    # "JOURNEYS THAT STOP HERE" WAS A CLAIM ABOUT THE PLACE AND THE EDGE IS
+    # ABOUT THE DESTINATION. `back[cid]["journeys"]` is every journey with a
+    # leg in this TOWN, and this is a place page: the Alpine Grand Tour has a
+    # leg in Chamonix and says nothing about the Mer de Glace, so 96 place
+    # pages asserted that a route stops at a cable car, a cathedral or a
+    # glacier on the strength of it visiting the town. That is an editorial
+    # claim manufactured out of a containment fact — the same thing
+    # `graph_api` refuses when it declines to derive `stops_at` from the
+    # places of a leg's destination, and the same shape as `cell` catching
+    # `cellar`: the rule is published honestly and a reader who checked would
+    # find it describes something else.
+    #
+    # The heading names the destination, which is what the edge runs to, and
+    # the lede says what is not held. "Journeys through <name>" is the form
+    # the region page has always used for the same relation one level up.
     jrows = "".join(
         f"""<a class="row" href="{urls.journey(j)}">
         <div><h3>{esc(j['name'])}</h3><p class="rowsub">{esc(j['strapline'])}</p></div>
@@ -8932,7 +8947,10 @@ def place_page(data, c, r, t, pl):
              lede="Experiences tied to this place, and how each one is tied to it — "
                   "standing on it, starting from it, or looking at it.") if doing else ""}
     {_pstrip}
-    {section("Journeys that stop here", f'<div class="rows">{jrows}</div>') if jrows else ""}
+    {section("Journeys through " + t["name"], f'<div class="rows">{jrows}</div>',
+             lede="These routes have a night in " + t["name"] + ". Whether a "
+                  "traveller on one of them comes here is not something this "
+                  "atlas holds — no journey leg names its places.") if jrows else ""}
   </div>
 </div>
 {section("The record", facts, tone="quiet",
@@ -11867,6 +11885,36 @@ def story_page(data, s):
     # head; nothing a contact sheet or a count could see, because the name is
     # present, placed and legible. The claim was never that the author is on
     # the page, it is that the reader can tell it IS the author.
+    # AND A STORY NAMED DESTINATIONS THAT JOURNEYS PASS THROUGH AND LINKED
+    # NONE OF THEM. §34 of the specification asks an article record for
+    # "Related journeys"; measured against the built site, eight of the nine
+    # stories have one to six journeys with a leg in a destination the story
+    # is written about, and every story page linked zero. The relation needs
+    # no authored field and manufactures nothing — a story's `places` are
+    # destinations and a journey's legs are destinations, so both ends of
+    # this are the same entity, which is exactly what `stops_at` is NOT and
+    # why that one waits instead.
+    #
+    # The heading says what the relation is rather than what a reader might
+    # hope it is: a journey through Mostar is not a journey about the bridge.
+    # That distinction is the one this session already had to repair on 96
+    # place pages, and writing the honest heading first is cheaper than
+    # writing it twice.
+    seenj, jrows = set(), ""
+    for cid in s.get("places", []):
+        for j in data["back"].get(cid, {}).get("journeys", []):
+            if j["slug"] in seenj:
+                continue
+            seenj.add(j["slug"])
+            jrows += (f'<a class="row" href="{urls.journey(j)}">'
+                      f'<div><h3>{esc(j["name"])}</h3>'
+                      f'<p class="rowsub">{esc(j["strapline"])}</p></div>'
+                      f'<p class="rowmeta">{j["days"]} days</p></a>')
+    jband = section(
+        "Journeys through these places", f'<div class="rows">{jrows}</div>',
+        lede="Routes with a night in one of the destinations this piece is "
+             "written about. They are not about the story.") if jrows else ""
+
     body = f"""
 {crumbs([("Europe", "/discover"), ("Stories", "/stories"), (s["title"], None)])}
 <article class="essay">
@@ -11888,6 +11936,7 @@ def story_page(data, s):
      data-label="{esc(s['title'])}" data-url="/stories/{esc(s['slug'])}">Save to My Europe</button></p>
 </div>
 </article>
+{jband}
 """
     return f"/stories/{s['slug']}/index.html", page(
         s["title"], body, path=f"/stories/{s['slug']}", area="stories",
@@ -12030,6 +12079,7 @@ def maplist(data, flat=False):
 
 
 def map_page(data):
+    images = data.get("images") or {}
     dots, info, placedots = [], {}, []
     for cid, n in sorted(data["cities"].items()):
         c, r, t = n["country"], n["region"], n["city"]
@@ -12053,6 +12103,36 @@ def map_page(data):
             "p": len(t.get("places", [])), "e": len(t.get("experiences", [])),
             "adv": bool(c.get("advisory")),
         }
+        # AND THE PHOTOGRAPH, WHICH THE REGISTER HELD FOR 103 OF THESE AND
+        # THIS SURFACE SPENT ON NONE. The popup's own comment listed what it
+        # carries — "name, region, a sentence, the distance, and a way in" —
+        # five things, and the specification's map popup asks for six. The
+        # missing one is the picture, and the picture was already bought:
+        # `city:<cid>` is a register key this build resolves for the planner's
+        # leg tiles, so the most-used surface in the product for CHOOSING a
+        # destination showed every fact about a place except what it looks
+        # like. Fifth family on *the pictures were already bought and were
+        # being spent on one surface*, and nothing is acquired for it.
+        #
+        # THE DIFFERENCE FROM THE PLANNER IS WHERE THE URL LIVES, AND IT IS
+        # THE BETTER HALF. `planner.js` fetches atlas.json and writes an
+        # `<img>` at runtime, so `checks.py`'s guard against a published page
+        # referencing an unregistered file has no reach there — which is why
+        # the credit is carried rather than composed in JavaScript. /map
+        # BAKES its data into an inert `application/json` block, so this URL
+        # is in the shipped HTML and that guard can see it. The credit still
+        # travels with the picture, composed by `credit_html` — the one
+        # function that knows Pexels' rule — because a second implementation
+        # of a licence obligation is the one thing this repository has
+        # already learned not to have.
+        _mshot = photo_href(images, "city:" + cid, 640)
+        if _mshot:
+            _mrow = images["city:" + cid]
+            # ABSENT RATHER THAN NULL on the 210 with no photograph, because
+            # present-but-empty says "we have this" and then does not.
+            info[cid]["sh"] = _mshot
+            info[cid]["sa"] = _mrow.get("alt") or t["name"]
+            info[cid]["sc"] = credit_html(_mrow)
         for pl in t.get("places", []):
             px, py = project(pl["lat"], pl["lon"])
             placedots.append(
@@ -14494,6 +14574,50 @@ def sitemap(paths):
 
 # ── search ────────────────────────────────────────────────────────────
 
+# EVERY RELATIONSHIP THE GRAPH CAN EMIT, DECLARED — INCLUDING THE ONES AT
+# ZERO. `gathers` shipped at zero for one build because the derivation read
+# `theme["places"]` where a theme's destinations are `stops`, and the repair
+# was a count per relationship in the document and a floor on each in
+# `checks.py`. That floor was a hand-typed list of the NINE relationships
+# that happened to be non-zero on the day it was written, and `stops_at` was
+# not one of them: a journey leg's `places` field has never existed on any of
+# the 121 legs in this dataset, so `journey stops_at place` has been derived,
+# counted and dropped for the life of the graph, and the counts block could
+# not show it because it was built from the edges that were EMITTED.
+#
+# A FLOOR OVER THE KEYS THAT ARE PRESENT IS BLIND TO EXACTLY THE CASE IT
+# EXISTS FOR — a relationship that was already zero. So the vocabulary is
+# declared here, `graph_api` seeds its counts from this table so a zero is
+# published rather than absent, and `checks.py` reads this table rather than
+# naming nine relationships a second time. Each row carries either a `floor`,
+# which fails when the count falls under it, or an `awaiting` sentence naming
+# the authored field that would create it — the trigger-rather-than-refusal
+# shape the image roles already use, because a relationship nothing reaches
+# is dead vocabulary only when nothing would ever create one.
+#
+# `stops_at` is NOT derived from the places of a leg's destination, which is
+# the available shortcut: a journey passing through Vienna does not stop at
+# the Kunsthistorisches, and asserting that it does would author an editorial
+# claim out of a containment fact. That is the Data Integrity Rule, and it is
+# why this relationship waits on somebody writing the field.
+GRAPH_RELATIONSHIPS = {
+    "part_of":      {"says": "the nesting: a country in a corner of Europe, a region in a country, a destination in a region", "floor": 400},
+    "located_in":   {"says": "a place or an experience inside its destination", "floor": 400},
+    "near":         {"says": "the six nearest destinations, by the planner's own haversine", "floor": 1500},
+    "includes":     {"says": "a journey's legs, in order, with the nights", "floor": 100},
+    "serves":       {"says": "a transport node and the destination it serves", "floor": 200},
+    "gathers":      {"says": "a theme and the destinations it argues for", "floor": 50},
+    "about":        {"says": "a story and the destinations it is written about", "floor": 20},
+    "happens_in":   {"says": "a recurring fixture, the country it is held on and the destination it names where it names one", "floor": 140},
+    "available_at": {"says": "an experience and the place you stand on, start from or look at it from", "floor": 10},
+    "stops_at":     {"says": "a journey and the places on one of its legs",
+                     "awaiting": "a `places` list on a journey leg. None of the 121 "
+                                 "legs in this dataset carries one, and it may not be "
+                                 "derived from the leg destination's own places — a "
+                                 "journey through a city does not stop at everything in it"},
+}
+
+
 def graph_api(data):
     """§2.14 — every relationship in the atlas, as one traversable index.
 
@@ -14528,6 +14652,20 @@ def graph_api(data):
 
     for slug, c in sorted(data["countries"].items()):
         edge("country", slug, "part_of", "macro", c["macro_slug"])
+        # A FIXTURE IS HELD ON THE COUNTRY AND THE EDGE WAS ONLY EMITTED
+        # WHERE IT NAMED A DESTINATION. 56 of the 150 recurring fixtures in
+        # this atlas name a city; the other 94 are a national or regional
+        # thing with no single town behind them, and the graph said nothing
+        # about them at all — so /events published 150 and the knowledge
+        # graph knew 56, which is the `pop_line` shape in an index rather
+        # than in a sentence. Both edges are drawn now, because both are
+        # true and they answer different questions: which country is this on,
+        # and which town is it in. `part_of` and `located_in` already target
+        # two entity types each, so one relationship with two targets is this
+        # document's own idiom rather than a new one.
+        for f in c.get("festivals", []):
+            edge("event", f"{slug}#{f['name']}", "happens_in", "country", slug,
+                 month=f["month"])
         for r in c["regions"]:
             rid = f"{slug}/{r['slug']}"
             edge("region", rid, "part_of", "country", slug)
@@ -14594,9 +14732,20 @@ def graph_api(data):
         for km, mid in near:
             edge("destination", cid, "near", "destination", mid, km=round(km))
 
-    kinds = {}
+    # Seeded from the declared vocabulary, so a relationship the derivation
+    # emits none of is published as 0 rather than omitted. The other
+    # direction is asserted too: a relationship this function emits and the
+    # table does not declare stops the build, because a new edge type with
+    # no floor and no trigger is the state `stops_at` was in.
+    kinds = {rel: 0 for rel in GRAPH_RELATIONSHIPS}
     for row in E:
-        kinds[row[2]] = kinds.get(row[2], 0) + 1
+        if row[2] not in kinds:
+            raise SystemExit(
+                f"graph_api emits the relationship {row[2]!r} and "
+                f"GRAPH_RELATIONSHIPS does not declare it: it would ship with "
+                f"no floor and no trigger, which is how `stops_at` stayed at "
+                f"zero for the life of the graph")
+        kinds[row[2]] += 1
 
     return "/api/graph.json", {
         "generated": "build",
@@ -14837,10 +14986,75 @@ def search_api(data):
     }
 
 
+# WHERE EACH KIND IN THE INDEX CAN BE BROWSED WITHOUT SEARCHING. Declared
+# beside the kinds rather than inside the page, because the resting state's
+# own sentence promises it — "every kind is browsable without searching at
+# all" — and a kind added to the index with no entry here makes that sentence
+# false. `c_search_states_its_index` fails on a kind the index holds and this
+# table does not.
+#
+# Places are the one that is not an index page: 255 of them and no /places,
+# so the honest browse surface is /map, whose own layer toggle is labelled
+# "Places (255)" and draws every one. Pointing it at a destination page
+# instead would send a reader to one of 125.
+# The third member is the kind's position in the Atlas's CONTAINMENT CHAIN,
+# or None where the kind crosses it. A corner of Europe holds countries, a
+# country holds regions, a region holds destinations, a destination holds
+# places — that nesting is what every URL on this site is made of and what
+# `/api/graph.json` derives its `contains` edges from. Everything else is a
+# set drawn ACROSS it: an experience belongs to a destination, a journey
+# crosses countries, a theme ignores borders altogether.
+#
+# THIS IS A CLASSIFICATION AND THE COUNTS BESIDE IT ARE MEASUREMENTS, which
+# is the Data Integrity Rule in both directions on one table: the chain is
+# editorial and the extent of each rung is counted off the index on every
+# build. Sorting the twelve by size instead put Places above Countries — 255
+# against 50 — which is arithmetically true and says the wrong thing about a
+# nested atlas, and left the page twelve rows of one component at 56%.
+_SEARCH_BROWSE = {
+    "Region of Europe": ("/countries", "The nine corners the Atlas is grouped into", 1),
+    "Country": ("/countries", "Every country the Atlas holds a page for", 2),
+    "Region": ("/countries", "Groupings by coast, range and shared history", 3),
+    "City": ("/discover", "Cities, villages, valleys, islands and sites", 4),
+    "Place": ("/map", "Museums, castles, peaks and sites, drawn as a map layer", 5),
+    "Experience": ("/experiences", "Things to do, each one attached to a place", None),
+    "Category": ("/experiences", "The eight kinds of experience and their sub-categories", None),
+    "Interest": ("/interests", "The seventeen tags, and how far each narrows Europe", None),
+    "Journey": ("/journeys", "Cross-border routes, in order, with the nights counted", None),
+    "Theme": ("/themes", "Ways through Europe that ignore its borders", None),
+    "Fund project": ("/fund", "The public register of work worth putting something back into", None),
+    "Story": ("/stories", "The editorial desk, each piece linked into the Atlas", None),
+}
+
+
 def search_page(data):
-    n = (len(data["countries"]) + sum(len(c["regions"]) for c in data["countries"].values())
-         + len(data["cities"]) + len(data["journeys"]) + len(data["themes"])
-         + len(data["stories"]) + len(data["fund"]))
+    # THE HEAD SAID 550 AND THE INDEX IT SHIPS HOLDS 1,064.
+    #
+    # That figure was a hand-assembled sum of SEVEN collections — countries,
+    # regions, cities, journeys, themes, stories, fund — and `search_api`
+    # writes TWELVE kinds. So the page understated its own index by 514
+    # records: all 255 places, all 197 experiences, the seventeen interests,
+    # the thirty-six categories and the nine macro regions. *A number that is
+    # not the set's own extent is worse than none, because it reads as one* —
+    # this repository's own line about /europe-in printing 319 where the set
+    # was 12, arriving on the one page whose entire subject is the size of an
+    # index.
+    #
+    # And the resting state under it listed those same seven kinds beneath a
+    # sentence reading "every kind is browsable without searching at all",
+    # which is the `pop_line` shape: a list that omits part of its own set
+    # reads as a policy rather than as an omission.
+    #
+    # Both are derived from the index now — the same rows the browser
+    # filters, counted by the function that builds them — so a kind added to
+    # `search_api` appears here on the next build instead of waiting for
+    # somebody to remember two places.
+    # `search_api` returns (path, document) — the pair the build writes —
+    # so the rows come out of its second member. Calling it here rather than
+    # re-deriving the counts is the whole point: a second implementation of
+    # one fact is a second chance for the page and the index to disagree.
+    rows = search_api(data)[1]["rows"]
+    n = len(rows)
     # A SEARCH PAGE AT REST WAS A BOX AND 280 PIXELS OF NOTHING.
     #
     # It said "550 records indexed" in the head and then showed a reader none
@@ -14858,22 +15072,29 @@ def search_page(data):
     # It sits INSIDE #results, so the first keystroke replaces it. A resting
     # state that survives the first query is a resting state a reader has to
     # dismiss.
-    kinds = [
-        (len(data["countries"]), "countries", "/countries",
-         "Every country the Atlas holds a page for"),
-        (sum(len(c["regions"]) for c in data["countries"].values()),
-         "travel regions", "/countries", "Groupings by coast, range and shared history"),
-        (len(data["cities"]), "destinations", "/discover",
-         "Cities, villages, valleys, islands and sites"),
-        (len(data["journeys"]), "journeys", "/journeys",
-         "Cross-border routes, in order, with the nights counted"),
-        (len(data["themes"]), "themes", "/themes",
-         "Ways through Europe that ignore its borders"),
-        (len(data["stories"]), "stories", "/stories",
-         "The editorial desk, each piece linked into the Atlas"),
-        (len(data["fund"]), "Fund projects", "/fund",
-         "The public register of work worth putting something back into"),
-    ]
+    # Every kind the index holds, largest first, each with the count the
+    # index itself carries and the surface it can be browsed from.
+    bykind = {}
+    for r in rows:
+        bykind[r["k"]] = bykind.get(r["k"], 0) + 1
+    # THE PLURAL IS TAKEN VERBATIM, BECAUSE ONE OF THE TWELVE CARRIES A
+    # PROPER NOUN. Lower-casing the name and re-capitalising its first letter
+    # is the obvious way to normalise a heading and it printed "Regions of
+    # europe" — the same class of fault as pluralising by adding an s in the
+    # browser, which is what `_KIND_PLURAL` exists to have already fixed.
+    def band(want_spine):
+        # The spine keeps the NESTING's own order; what crosses it is
+        # largest first, because nothing orders those seven but their size.
+        picked = [(k, cnt) for k, cnt in bykind.items()
+                  if k in _SEARCH_BROWSE
+                  and (_SEARCH_BROWSE[k][2] is not None) == want_spine]
+        picked.sort(key=lambda kc: _SEARCH_BROWSE[kc[0]][2] if want_spine else -kc[1])
+        return [(cnt, _KIND_PLURAL.get(k, k + "s"),
+                 _SEARCH_BROWSE[k][0], _SEARCH_BROWSE[k][1])
+                for k, cnt in picked]
+
+    spine, across = band(True), band(False)
+    kinds = spine + across
     # AND THE BAR BESIDE EACH COUNT CAME OFF. "A chart on which four of
     # seven series cannot be seen is the wrong track, not the wrong data" is
     # this repository's own line about this exact element, and the repair it
@@ -14891,17 +15112,38 @@ def search_page(data):
     # primitive appears has a band heading over it, and the results that
     # replace this state announce themselves with an h2 too — so the resting
     # state and the state it becomes have the same shape.
+    # AND THE LEDE NAMED EIGHT OF THE TWELVE KINDS IT INTRODUCES.
+    # "countries, regions, destinations, places, journeys, themes, stories
+    # and projects" left out experiences, interests, categories and the nine
+    # corners of Europe — `pop_line`'s shape in a list rather than in a
+    # field, on the page whose subject is the extent of an index. Twelve
+    # names is not a sentence either, and "the kinds are below" is a claim
+    # about the page around it that the first keystroke makes false, because
+    # the resting state is what the results replace. So the lede states the
+    # NUMBER of kinds, derived, and the band under it names every one.
+    # TWELVE ROWS OF ONE COMPONENT ON A 1,783-PIXEL PAGE MEASURED 56% AGAINST
+    # A CEILING OF 52, and shortening the list is the one repair this page
+    # cannot take: its whole subject is the extent of the index. The two
+    # bands are the structure the count-sorted list threw away, and they
+    # each say something a flat list cannot — the spine is where a reader
+    # goes DOWN, and the rest is where a reader goes ACROSS.
+    def rows_html(items, level):
+        return ('<div class="rows">' + "".join(
+            f'<a class="row" href="{href}">'
+            f'<div><h{level}>{esc(label)}</h{level}>'
+            f'<p class="rowsub">{esc(what)}</p></div>'
+            f'<p class="rowmeta">{count:,}</p></a>'
+            for count, label, href, what in items) + "</div>")
+
     atrest = ('<h2>What is in the index</h2>'
-              '<p class="lede">Everything below is searchable from the box '
-              'above, and every kind is browsable without searching at all.</p>'
-              '<div class="rows">'
-              + "".join(
-                  f'<a class="row" href="{href}">'
-                  f'<div><h3>{esc(label[:1].upper() + label[1:])}</h3>'
-                  f'<p class="rowsub">{esc(what)}</p></div>'
-                  f'<p class="rowmeta">{count:,}</p></a>'
-                  for count, label, href, what in kinds)
-              + "</div>")
+              '<p class="lede">Everything here is searchable from the box '
+              'above, and every kind is browsable without searching at all. '
+              f'{len(spine)} of them nest inside one another; the other '
+              f'{len(across)} cut across that.</p>'
+              '<h3 class="mini">The Atlas, from the outside in</h3>'
+              + rows_html(spine, 4)
+              + '<h3 class="mini">And what crosses it</h3>'
+              + rows_html(across, 4))
 
     body = f"""
 {crumbs([("Europe", "/discover"), ("Search", None)])}
@@ -14909,9 +15151,9 @@ def search_page(data):
   <p class="kicker">Search</p>
   <h1>Find it.</h1>
   {head_extent([(n, 'records indexed')])}
-  <p class="lede">Everything on EuropeDoor — countries, regions, destinations, places,
-  journeys, themes, stories and projects — in one index that runs in your browser.
-  Nothing you type is sent anywhere, and nobody can buy a position in it.</p>
+  <p class="lede">Everything on EuropeDoor — {len(kinds)} kinds of record — in one
+  index that runs in your browser. Nothing you type is sent anywhere, and nobody
+  can buy a position in it.</p>
 </div>
 <form class="form" id="searchform" role="search">
   <div class="field">

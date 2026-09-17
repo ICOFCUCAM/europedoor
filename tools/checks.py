@@ -2672,15 +2672,60 @@ def c_schema():
                 if kind in ids and ident not in ids[kind]:
                     fail(f"/api/graph.json: {kind} {ident!r} does not exist")
             n += 1
-        floors = {"part_of": 400, "located_in": 400, "near": 1500, "includes": 100,
-                  "serves": 200, "gathers": 50, "about": 20, "happens_in": 40,
-                  "available_at": 10}
-        for rel, floor in floors.items():
-            got = g["relationships"].get(rel, 0)
-            if got < floor:
+        # THE FLOOR USED TO BE NINE RELATIONSHIPS TYPED HERE, and it was a
+        # second declaration of which relationships exist — written from the
+        # ones that happened to be non-zero the day it was written. So
+        # `stops_at` had no floor, shipped at 0 for the life of the graph and
+        # was absent from the counts block rather than showing as a zero. A
+        # floor over the keys that are PRESENT is blind to exactly the case a
+        # floor exists for. `pages.GRAPH_RELATIONSHIPS` is the one
+        # declaration; this reads it, and asserts both directions.
+        declared = P.GRAPH_RELATIONSHIPS
+        for rel, spec in declared.items():
+            n += 1
+            got = g["relationships"].get(rel)
+            if got is None:
+                fail(f"/api/graph.json declares the relationship {rel!r} and "
+                     f"publishes no count for it — a relationship at zero must "
+                     f"read as 0 rather than be absent, which is how this one "
+                     f"stayed invisible")
+                continue
+            floor = spec.get("floor")
+            if floor is None:
+                # A relationship with no floor must say what would create it,
+                # and must not have quietly started working: the day it does,
+                # this goes red and asks for a floor.
+                if not spec.get("awaiting"):
+                    fail(f"the relationship {rel!r} declares neither a floor nor "
+                         f"the authored field that would create it, so nothing "
+                         f"can tell a deliberate zero from a broken derivation")
+                elif got:
+                    fail(f"the relationship {rel!r} is declared as awaiting "
+                         f"{spec['awaiting'][:60]}… and now emits {got} edges — "
+                         f"it needs a floor rather than a trigger")
+            elif got < floor:
                 fail(f"/api/graph.json has {got} {rel!r} edges and this atlas has "
                      f"{floor}+ — a relationship that drops to zero is what nobody notices")
+        # A FLOOR IS A PROXY AND THIS ONE HAS AN EXACT FORM. Every recurring
+        # fixture is held on a country, so every fixture must produce a
+        # country edge — where a round number below the current count would
+        # go on passing if half of them stopped being drawn. 94 of the 150
+        # were invisible to this document for the life of the graph because
+        # the edge was only emitted inside the per-destination loop.
+        fixtures = sum(len(c.get("festivals", [])) for c in d["countries"].values())
+        drawn = sum(1 for e in g["edges"]
+                    if e[2] == "happens_in" and e[3] == "country")
+        n += 1
+        if drawn != fixtures:
+            fail(f"/api/graph.json draws {drawn} event-to-country edges and this "
+                 f"atlas holds {fixtures} recurring fixtures — a fixture that is "
+                 f"not on a destination is still on a country")
+        for rel in g["relationships"]:
             n += 1
+            if rel not in declared:
+                fail(f"/api/graph.json publishes the relationship {rel!r} and "
+                     f"pages.GRAPH_RELATIONSHIPS does not declare it: it has no "
+                     f"floor and no trigger")
         # A weight is a measurement or it is absent. There is no relevance
         # score, because nobody computed one from anything.
         for row in g["edges"]:
@@ -8062,6 +8107,75 @@ def c_unique_ids():
     if not n:
         fail("no page carries an id at all — this check has stopped finding "
              "the thing it is about")
+    return n
+
+
+
+@check("a page relates a journey to the thing the graph actually relates it to")
+def c_journey_claim_subject():
+    """A PLACE PAGE SAID "Journeys that stop here" AND THE EDGE WAS ABOUT THE TOWN.
+
+    `back[cid]["journeys"]` is every journey with a leg in this destination.
+    On a place page that became a claim about the place: the Alpine Grand
+    Tour has a night in Chamonix and says nothing about the Mer de Glace, and
+    96 of the 255 place pages asserted the route stops at a glacier on the
+    strength of it visiting the valley. Nothing could see it — the links were
+    right, the journeys were right, and only the heading was wrong, which is
+    the half no count reads.
+
+    `graph_api` already refuses to manufacture that edge: `stops_at` exists
+    in the vocabulary, is published at 0, and waits on a `places` list being
+    written on a journey leg. So the promise here is one sentence — **a page
+    may name a place as the subject of a journey relation only when the graph
+    holds an edge from a journey to a place** — and it is checked against the
+    published count rather than against a heading this check happens to know,
+    because a check that greps for the old wording is satisfied by any new
+    wording that makes the same claim.
+    """
+    n = 0
+    gpath = os.path.join(OUT, "api", "graph.json")
+    with open(gpath, encoding="utf-8") as fh:
+        stops = json.load(fh)["relationships"].get("stops_at", 0)
+    from lib import urls as U
+    d = D.load()
+    for cid, node in d["cities"].items():
+        c, r, t = node["country"], node["region"], node["city"]
+        for pl in t.get("places", []):
+            path = os.path.join(OUT, *U.place(c, r, t, pl).strip("/").split("/"),
+                                "index.html")
+            if not os.path.exists(path):
+                continue
+            body = open(path, encoding="utf-8").read()
+            if "/journeys/" not in body:
+                continue
+            n += 1
+            # The heading that stands over the journey links. A place page
+            # linking journeys must name the DESTINATION in it while the
+            # graph holds no journey-to-place edge; the day `stops_at` is
+            # real, the place's own name becomes available and this relaxes
+            # by itself rather than by somebody editing the check.
+            m = re.findall(r"<h2[^>]*>([^<]*[Jj]ourney[^<]*)</h2>", body)
+            if not m:
+                fail(f"{U.place(c, r, t, pl)} links a journey under no heading "
+                     f"naming one, so nothing says what the relation is")
+                continue
+            # ONE NORMALISER, BOTH SIDES — this repository's most repeated
+            # rule, and the first draft of this check broke it. "Ortisei &
+            # the Dolomites" is `&amp;` in the shipped HTML and `&` in the
+            # record, so five correct pages were reported as making the claim
+            # the check exists to refuse. The heading is unescaped rather
+            # than the name escaped, because what a reader gets is the
+            # unescaped form and that is the thing being judged.
+            head = html.unescape(" ".join(m))
+            if stops == 0 and t["name"] not in head:
+                fail(f"{U.place(c, r, t, pl)} heads its journeys "
+                     f"{head.strip()!r} — the edge behind them runs to "
+                     f"{t['name']}, and /api/graph.json holds {stops} "
+                     f"journey-to-place edges, so the place cannot be the "
+                     f"subject of that sentence")
+    if n == 0:
+        fail("no place page links a journey — this check has stopped "
+             "examining the family it was written for")
     return n
 
 

@@ -2579,6 +2579,29 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
 .mappopup p:last-child { margin-bottom: 0; }
 .mappopup-close { position: absolute; top: var(--s2); right: var(--s3); border: 0; background: none; font-size: var(--t-lg); line-height: 1; cursor: pointer; color: var(--ink-3); }
 .mappopup-close:hover { color: var(--door); }
+/* THE PHOTOGRAPH IN A DESTINATION POPUP, AND ITS CREDIT IS VISIBLE RATHER
+   THAN REVEALED.
+
+   `.credit` is `opacity: 0` until `picture:hover` or `picture:focus-within`,
+   which is right on a page-sized photograph a reader is already looking at
+   and WRONG here twice. This markup is a `<figure>`, not a `<picture>`, so
+   neither selector can ever match it — the credit would have been present,
+   placed, sized, on its measured scrim and painted at zero alpha on every
+   desktop, which is `.doorgo` exactly, and this time the invisible thing is
+   a LICENCE OBLIGATION rather than a link. And a popup is opened and closed
+   in a few seconds: a credit a reader has to hover to find is a credit
+   nobody sees. /stories reached the same conclusion from the other side —
+   moving the credit out of the anchor "is also more visible than a credit
+   revealed on hover".
+
+   The scrim underneath is `.credit`'s own 72%, which composites to
+   rgb(71,71,71) and carries white at 9.2:1 whatever the photograph turns out
+   to be. Reused rather than restated, because a second number would be a
+   second decision about one thing. */
+.mapshot { position: relative; margin: 0 0 var(--s3); }
+.mapshot img { display: block; width: 100%; height: auto; border-radius: var(--radius); }
+.mapshot .credit { opacity: 1; }
+
 .europemap .placedot circle { fill: var(--door); opacity: .5; }
 .europemap .placedot:hover circle { opacity: 1; }
 

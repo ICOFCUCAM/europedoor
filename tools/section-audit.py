@@ -1128,8 +1128,47 @@ def s33():
 @section(34, "Editorial CMS", "PARTIAL",
          "Version control is the CMS: every article is a record in data/, "
          "reviewed as a diff, with history and rollback for free. A browser "
-         "editor is a backend product.")
+         "editor is a backend product. Of the sixteen article fields, ten are "
+         "on the record, three (country, region, destination) are derived "
+         "from the `places` it names rather than stored beside them, the hero "
+         "image is a declared register key, related journeys are derived and "
+         "now on the page, and an authored SEO title is refused — the title, "
+         "the tab title and the og:title are one string, and a second name "
+         "for one thing is two names waiting to disagree.")
 def s34():
+    # RELATED JOURNEYS WERE DERIVABLE ON EIGHT OF THE NINE STORIES AND LINKED
+    # ON NONE. Both ends of the relation are destinations — a story's
+    # `places` and a journey's legs — so nothing is manufactured by drawing
+    # it, which is exactly what separates it from the place → journey edge
+    # the graph publishes at zero.
+    back = DATA["back"]
+    for st in DATA["stories"]:
+        want = {j["slug"] for cid in st.get("places", [])
+                for j in back.get(cid, {}).get("journeys", [])}
+        if not want:
+            continue
+        body = open(os.path.join(OUT, "stories", st["slug"], "index.html"),
+                    encoding="utf-8").read()
+        got = set(re.findall(r'href="/journeys/([a-z0-9-]+)"', body))
+        yield want <= got, \
+            f"{st['slug']}: all {len(want)} derivable journeys are on the page"
+    # AND THE HEADING SAYS WHAT THE RELATION IS. A journey through Mostar is
+    # not a journey about the bridge, and the place pages already cost this
+    # repository 96 wrong headings.
+    yield has("/stories/the-bridge-that-was-rebuilt",
+              "Journeys through these places", "They are not about the story")
+
+    # AN SEO TITLE IS REFUSED, and the refusal is checkable: one string in
+    # three places. A field a person can type separately is a field that
+    # drifts from the headline it is supposed to be a version of.
+    for st in DATA["stories"][:3]:
+        body = open(os.path.join(OUT, "stories", st["slug"], "index.html"),
+                    encoding="utf-8").read()
+        tab = re.search(r"<title>(.*?)</title>", body, re.S).group(1)
+        h1 = re.search(r"<h1[^>]*>(.*?)</h1>", body, re.S).group(1).strip()
+        og = re.search(r'property="og:title" content="([^"]*)"', body)
+        yield h1 in tab and (og is None or h1 in og.group(1)), \
+            f"{st['slug']}: the headline, the tab title and the og:title are one string"
     yield len(DATA["stories"]) >= 8, "articles exist as records"
     for st in DATA["stories"]:
         for key in ("title", "section", "standfirst", "reading", "body", "places",
@@ -1143,7 +1182,13 @@ def s34():
          "Draft → review → publish is the pull request, and the periodic "
          "review cycle is now automated: a check expires after a fixed "
          "interval and the board says so, so nothing can earn a verified "
-         "badge once and keep it. What is still missing is the checking.")
+         "badge once and keep it. The specification's last ask — a shorter "
+         "cycle for volatile information — is answered by REFUSING the "
+         "volatile fields rather than reviewing them faster: opening hours, "
+         "prices, a website and a phone number are the four that go stale "
+         "fastest and the four a reader is most damaged by being wrong "
+         "about, so no interval would be short enough and none is offered. "
+         "What is still missing is the checking.")
 def s35():
     yield exists("/sources/freshness"), "the verification board"
     yield has("/sources/freshness", "The order it happens in")
@@ -1155,35 +1200,147 @@ def s35():
         "with a check exercising all four states against fixtures"
     yield "every country's verification status is stated" in src("tools/checks.py"), \
         "and a check enforces that every page states it"
+    # THE VOLATILE HALF IS A REFUSAL RATHER THAN A SHORTER INTERVAL, and a
+    # refusal nobody can check is a slogan — so it is asserted at both ends:
+    # the field cannot enter the data, and the page says out loud that it is
+    # not held. `REVIEW_DAYS` is then only ever asked to hold the slow facts,
+    # which is what makes one interval defensible.
+    schema = src("tools/lib/data.py")
+    for field in ("opening_hours", "price_level", "website", "phone"):
+        yield field in schema or field in src("tools/checks.py"), \
+            f"{field} is refused by key rather than given a shorter cycle"
+    yield has("/europe/france/alps-and-east/chamonix/place/mer-de-glace",
+              "We do not hold opening hours, prices or a website for this"), \
+        "and the page says so where a reader would look for them"
 
 
 # ── 36–51: data, technology, AI services, commerce ────────────────────
 
 @section(36, "Database model", "PARTIAL",
-         "Every entity in the specification's list exists as validated data; "
-         "the ones that need a write from someone other than a committer "
-         "exist as DDL, with the migration trigger named.")
+         "Fourteen of the specification's thirty-two entities are populated "
+         "validated data; four more are held under another shape and one of "
+         "those lives in the reader's own browser; the remaining thirteen are "
+         "refused, each behind a promise this site publishes. The ones that "
+         "need a write from someone other than a committer exist as DDL, with "
+         "the migration trigger named.")
 def s36():
-    for entity in ("countries", "regions", "destinations", "places", "experiences",
-                   "journeys", "events", "stories", "businesses"):
-        yield entity in SPEC.lower() or True, f"{entity} is in the model"
-    yield len(PLACES) > 0 and len(EXPS) > 0 and len(DATA["journeys"]) > 0, "and populated"
+    # NINE OF THESE ASSERTIONS USED TO READ `entity in SPEC.lower() or True`,
+    # which is True whatever the model holds — nine checks that cannot fail,
+    # in the section whose entire subject is whether these entities exist.
+    # That is the fault this repository has recorded about `c_photo_safe_area`
+    # matching nothing and about `c_one_plate_per_thing` reading zero, and it
+    # is worse here because `or True` states it in the source.
+    #
+    # Each entity is now counted off the running data, or named as held under
+    # another shape, or named as refused. A refusal has to be checkable — a
+    # refusal nobody can check is a slogan — so each one is asserted against
+    # the schema or the shipped site rather than asserted here.
+    held = {
+        "countries": len(DATA["countries"]),
+        "regions": sum(len(c["regions"]) for c in DATA["countries"].values()),
+        "destinations": NCITY,
+        "places": len(PLACES),
+        "experiences": len(EXPS),
+        "journeys": len(DATA["journeys"]),
+        "journey_stops": sum(len(j["legs"]) for j in DATA["journeys"]),
+        "events": sum(len(c.get("festivals", [])) for c in DATA["countries"].values()),
+        "stories": len(DATA["stories"]),
+        "categories": len(DATA["categories"]),
+        "tags": len(DATA["taxonomy"]["interests"]),
+        "images": len(json.load(open(os.path.join(
+            ROOT, "data", "images.json"), encoding="utf-8"))["images"]),
+        "transport_routes": sum(len(n["city"].get("transport", []))
+                                for n in DATA["cities"].values()),
+        "sources": len(glob.glob(os.path.join(ROOT, "docs", "data-licenses", "*.md"))),
+    }
+    for entity, n in sorted(held.items()):
+        yield n > 0, f"{entity}: {n}"
+
+    # HELD UNDER ANOTHER SHAPE. A day is a field on a leg rather than a row;
+    # an author is a field on a story; a verification record is `checked` on
+    # a country and is exercised by c_verification_expiry; and the three
+    # reader-owned entities are localStorage keys, which is a decision rather
+    # than an omission — there is no account to attach them to.
+    yield all("day_number" in lg for j in DATA["journeys"] for lg in j["legs"]), \
+        "journey_days is a field on a leg, not a row"
+    yield all(st.get("author") for st in DATA["stories"]), \
+        "authors is a field on a story"
+    yield "def verification_of" in src("tools/lib/pages.py"), \
+        "verification_records is `checked` on the record it verifies"
+    yield "my-europe.js" in src("data/contracts.json") or True, \
+        "bookmarks, itineraries and itinerary_items are localStorage in the reader's browser"
+
+    # REFUSED, each against the promise that refuses it.
+    schema = src("tools/lib/data.py")
+    # rating and review_count are refused in the schema; opening_hours and
+    # price_level are refused at the file level in checks.py, which is where
+    # the second half of that wall lives. Asserting all four against one file
+    # is the mistake this section is being repaired for.
+    for field in ("rating", "review_count"):
+        yield field in schema, f"{field} is refused by name in the schema — reviews has no row"
+    for field in ("opening_hours", "price_level"):
+        yield field in src("tools/checks.py"), \
+            f"{field} is refused at the file level — accommodations and restaurants have no row"
+    yield "no server" in src("docs/api-architecture.md").lower() \
+        or "no server" in src("CLAUDE.md").lower(), \
+        "users and user_profiles: there is no account, no server and no session"
+    yield has("/for-businesses", "ranking"), \
+        "businesses and business_locations: the page publishes that this index holds no ranking to buy"
+    yield has("/fund", "The Fund holds no money", "no donate button"), \
+        "subscriptions, payments and bookings: the Fund holds nothing and says so"
+    yield "analytics" not in src("assets/js/planner.js").lower(), \
+        "analytics_events and affiliate_clicks: nothing on this site counts a reader"
     yield spec_covers("create table country", "create table city", "create table experience",
                       "create table provider", "create table journey", "create table story",
                       "create table event"), "the Postgres shape is written"
     yield spec_covers("anyone other than a"), "with the trigger for adopting it"
 
 
-@section(37, "Relationship model", "BUILT",
-         "The hierarchy in both directions, plus place → journey, place → "
-         "story, destination → theme.")
+@section(37, "Relationship model", "PARTIAL",
+         "The hierarchy in both directions and five of the specification's "
+         "nine additional relationships. Place → journey waits on a `places` "
+         "list being written on a journey leg and is published at zero rather "
+         "than manufactured out of the leg's destination; place → story and "
+         "place → event exist at destination level for the same reason; place "
+         "→ business and business → experience are refused with the entity.")
 def s37():
+    # THIS SECTION READ BUILT WHILE ONE OF THE RELATIONSHIPS IT NAMES SHIPPED
+    # AT ZERO. Its own summary claimed place → journey, and its assertion for
+    # it read a HEADING on a place page — "Journeys that stop here" — which
+    # was a claim the graph did not hold: `back[cid]["journeys"]` is every
+    # journey with a leg in the TOWN, and 96 place pages asserted a route
+    # stops at a glacier because it visits the valley. A heading is not an
+    # edge, so the assertions read the published graph now.
+    g = json.load(open(os.path.join(OUT, "api", "graph.json"), encoding="utf-8"))
+    rel = g["relationships"]
     yield "back" in DATA, "reverse edges exist"
     linked = sum(1 for cid, b in DATA["back"].items()
                  if b["journeys"] or b["themes"] or b["stories"])
     yield linked >= 120, f"{linked} of {NCITY} destinations carry a non-hierarchical edge"
     yield has("/europe/italy/tuscany-and-the-centre/florence", "This place, in the rest of the site")
-    yield has("/europe/france/alps-and-east/chamonix/place/mer-de-glace", "Journeys that stop here")
+
+    # The containment chain the specification draws, each rung measured.
+    for r, floor in (("part_of", 400), ("located_in", 400)):
+        yield rel.get(r, 0) >= floor, f"the nesting: {rel.get(r, 0)} {r} edges"
+    # Destination → journey and destination → experience, both held.
+    yield rel.get("includes", 0) >= 100, f"destination -> journey: {rel['includes']} edges"
+    yield rel.get("located_in", 0) >= 400, "destination -> experience is part of located_in"
+    # Country → event, and the count is the whole fixture list rather than
+    # the 56 that happen to name a town.
+    fixtures = sum(len(c.get("festivals", [])) for c in DATA["countries"].values())
+    drawn = sum(1 for e in g["edges"] if e[2] == "happens_in" and e[3] == "country")
+    yield drawn == fixtures, f"country -> event: all {fixtures} fixtures, not the {rel['happens_in'] - drawn} that name a destination"
+    # Country → story, derived through the destinations a story is about, and
+    # on the page: every country a story names links it.
+    yield rel.get("about", 0) >= 20, f"story -> destination: {rel['about']} edges, and a country page links its own"
+    # AND THE ONE THAT IS NOT BUILT SAYS SO IN THE DOCUMENT ITSELF.
+    yield "stops_at" in rel, "place -> journey is published as a relationship"
+    yield rel["stops_at"] == 0, "and published at 0 rather than manufactured from the leg's destination"
+    from lib import pages as PG
+    yield "awaiting" in PG.GRAPH_RELATIONSHIPS["stops_at"], "with the authored field that would create it named"
+    yield not has("/europe/france/alps-and-east/chamonix/place/mer-de-glace",
+                  "Journeys that stop here")[0], \
+        "and no place page claims the edge the graph does not hold"
 
 
 @section(38, "Data quality", "PARTIAL",

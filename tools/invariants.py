@@ -633,7 +633,27 @@ def measure():
                        "the markup of two plates with heads on them. The "
                        "drawing itself did not change by a byte: the ceiling "
                        "is here to catch a template inlining geometry across "
-                       "a family, and this is prose."},
+                       "a family, and this is prose."
+                       "  444 -> 489 WHEN THE POPUP GOT THE PHOTOGRAPH IT "
+                       "HAD FIVE OF SIX FIELDS FOR. /map's popup already "
+                       "printed the name, the country, the region, the "
+                       "summary and the link, off the baked `mapinfo` block "
+                       "— and the register holds a photograph for 105 of the "
+                       "319, which the instrument showed none of. The three "
+                       "fields are the derivative URL, the alt the "
+                       "photographer wrote and the credit fragment "
+                       "`render.credit_html` composes: 46,505 raw bytes and "
+                       "10,045 over the wire, measured by gzipping the page "
+                       "with the fields and without. The credit is carried "
+                       "rather than composed in the browser because it is a "
+                       "licence obligation and this product has exactly one "
+                       "implementation of it — the same reason the planner "
+                       "receives `cities.shotCredit` instead of building it. "
+                       "Reading it out of `/api/atlas.json` instead would "
+                       "trade 10 KB against a 350 KB fetch to show one "
+                       "picture, so the bytes are the cheap half of that "
+                       "trade. The raw figure is what this ceiling measures "
+                       "and the compressed one is what a reader pays."},
             # A CEILING, not a floor, and the direction is the point. The
             # rule is that a visual earns its position — so what needs
             # guarding is plates SPREADING back onto pages that do not need
