@@ -446,7 +446,22 @@ def measure():
                        "and every other story is a line, so all nine are on "
                        "the page where two were, for one `<img>` fewer. A "
                        "contents page that illustrated every line would be "
-                       "the grid again with smaller pictures."},
+                       "the grid again with smaller pictures. "
+                       "1144 -> 1151 WHEN /discover ANSWERED ITS OWN "
+                       "QUESTION IN PICTURES. The instrument re-lit the "
+                       "continent and then handed the reader a list of "
+                       "names: a map says WHERE and it cannot say what a "
+                       "place is like, which is the one thing somebody who "
+                       "has just chosen `Mountains` wants to know. Seven "
+                       "destinations, one per macro region that holds a "
+                       "licensed photograph, and the tiles carry the same "
+                       "`data-city` the dots do so a place that drops out "
+                       "of the chosen set goes quiet rather than away. "
+                       "Nothing was acquired for it: seven register rows "
+                       "this library already holds reach one more surface, "
+                       "and the number is seven rather than nine because "
+                       "two corners of the continent hold no photograph "
+                       "yet — which the lede states rather than implies."},
             # The homepage is the flagship page and the one most likely to
             # gain weight, because every good idea wants to live on it. It
             # already carried a 2.6x regression unnoticed: a commit that cut

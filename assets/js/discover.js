@@ -163,17 +163,27 @@
    * written: atlas.json is stripped of advisory countries at build time, so
    * they cannot appear in `scored`. They keep their dot and their own class.
    */
-  var DOTS = null;
+  /* AND THE PHOTOGRAPHS ARE THE SAME JOIN. The mosaic under the instrument
+   * is one destination per macro region, and it carries `data-city` for
+   * exactly the reason the dots do — so the band that exists to say what a
+   * place is LIKE answers the panel instead of standing beside it. A tile
+   * that falls out dims its PICTURE and keeps its name: it is still a link
+   * a reader may follow, and taking its label below AA to say "not this
+   * one" spends the wrong half. Two sets, one loop, because a second
+   * implementation of a thing is a second chance to make its mistake. */
+  var DOTS = null, MOS = [];
   function light(ids) {
     if (DOTS === null) {
-      var map = el("discover-map");
+      var map = el("discover-map"), shots = el("discover-shots");
       DOTS = map ? [].slice.call(map.querySelectorAll("[data-city]")) : [];
+      MOS = shots ? [].slice.call(shots.querySelectorAll("[data-city]")) : [];
     }
     if (!DOTS.length) return;
     var on = null;
     if (ids) { on = {}; for (var i = 0; i < ids.length; i++) on[ids[i]] = 1; }
-    for (var j = 0; j < DOTS.length; j++) {
-      var d = DOTS[j];
+    var all = DOTS.concat(MOS);
+    for (var j = 0; j < all.length; j++) {
+      var d = all[j];
       d.classList.toggle("lit", !!on && !!on[d.getAttribute("data-city")]);
       d.classList.toggle("unlit", !!on && !on[d.getAttribute("data-city")]);
     }

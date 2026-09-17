@@ -12735,23 +12735,82 @@ def discover_page(data):
               f'{dctx}{dland}{cut_fade("disc", MAP_W, MAP_H, dusk_reach())}'
               f'{"".join(dots)}</svg>')
 
+    # ── THE PHOTOGRAPHIC RESPONSE ────────────────────────────────────
+    # A MAP ANSWERS *WHERE* AND A PHOTOGRAPH ANSWERS *WHAT IT IS LIKE*, and
+    # this page had only the first. The instrument re-lights the continent
+    # and then hands the reader a list of names: true, checkable, and no
+    # answer at all to the question the plate above it asks.
+    #
+    # ONE PER MACRO REGION, IN THE ATLAS'S OWN ORDER, AND THE COUNT IS THE
+    # SET'S OWN EXTENT. The first version walked the destinations sorted by
+    # id and took the first photographed one in each macro, which put all
+    # seven tiles in countries A to E — a row that reads as a spread across
+    # the continent while being a spread across one end of the alphabet.
+    # The macros are walked in the taxonomy's own order now, so the row
+    # sweeps the continent the way /countries does, and the lede states how
+    # many of the nine corners hold a photograph TODAY rather than implying
+    # all of them do: a number that is not the set's own extent reads as
+    # one, which is this atlas's own finding about /europe-in.
+    #
+    # AND THE TILES ANSWER THE INSTRUMENT. Each carries `data-city`, the
+    # same join the dots use, so a destination that falls out of the chosen
+    # set goes QUIET rather than away — the map's own rule, applied on the
+    # band that exists to be the picture the map cannot draw. Nothing is
+    # added to the contract: `city.id` is already declared for the dots.
+    images = data.get("images") or {}
+    first_in_macro = {}
+    for cid, e in sorted(data["cities"].items()):
+        if ("city:" + cid) not in images:
+            continue
+        if (e["country"].get("advisory") or {}).get("level"):
+            continue
+        first_in_macro.setdefault(e["country"].get("macro_slug"), (cid, e))
+    macros = data["taxonomy"]["macros"]
+    shots = [first_in_macro[m["slug"]] for m in macros
+             if m["slug"] in first_in_macro]
+
+    def _mostile(cid, e):
+        return (f'<a class="mos" data-city="{esc(cid)}" '
+                f'href="{urls.city(e["country"], e["region"], e["city"])}">'
+                f'{picture(images, "city:" + cid, w=1000, h=1000, credit=False, alt=images["city:" + cid]["alt"], sizes="(min-width: 62rem) 30vw, 92vw")}'
+                f'<span class="moscopy">'
+                f'<span class="moswhere">{esc(e["country"]["name"])}</span>'
+                f'<span class="mosname">{esc(e["city"]["name"])}</span></span></a>')
+
+    # THE LEAD IS A SIBLING OF THE REST RATHER THAN A CELL AMONG THEM,
+    # because a dominant tile that is a cell has to be told how many rows
+    # to span and the count is data. See `.moswrap` in the stylesheet.
+    mosaic = (_mostile(*shots[0])
+              + '<div class="mosrest">'
+              + "".join(_mostile(cid, e) for cid, e in shots[1:])
+              + '</div>') if shots else ""
+
     body = f"""
 {crumbs([("Europe", "/discover"), ("Discover", None)])}
 
+<section class="sheet sheet-ask sheet-paper sheet-white" id="discover-open">
+  {actmark(1, "Discover")}
+  <div class="asktext">
+    <h1 class="mega">What are you<br><em class="lit">looking for?</em></h1>
+    <p class="lede">Do not begin with a destination. Begin with a curiosity — a landscape, a
+    season, a culture, a road — and let the continent answer. Nothing here is submitted:
+    the whole Atlas is already in your browser.</p>
+    {head_extent([(len(data['cities']), 'destinations'),
+                  (len(data['countries']), 'countries'),
+                  (len(data['taxonomy']['interests']), 'things to travel for')])}
+  </div>
+</section>
+
 <section class="sheet sheet-instrument" id="discover-mode">
-  {actmark(1, "The instrument")}
+  {actmark(2, "The instrument")}
   <div class="instrkey">
     <div class="pagehead instrument">
-      <p class="kicker">Discover</p>
-      <h1>Where will Europe take you?</h1>
-      {head_extent([(len(data['cities']), 'destinations'),
-                    (len(data['countries']), 'countries'),
-                    (len(data['taxonomy']['interests']), 'things to travel for')])}
+      <p class="kicker">The European instrument</p>
+      <h2>Let Europe answer.</h2>
     </div>
     <p class="keyhead">Say what you are travelling for.</p>
     <div class="picks" id="discover-interests">{interest_words}</div>
-    <p class="keynote">Pick as many as you like. Nothing is submitted — the whole Atlas is
-    already in your browser, and the continent re-lights as you choose.
+    <p class="keynote">Pick as many as you like. The continent re-lights as you choose.
     <a href="/interests">Every tag also has its own page</a>.</p>
   </div>
 
@@ -12787,10 +12846,22 @@ def discover_page(data):
   </div>
 </section>
 
-<section class="sheet sheet-result" id="discover-result">
-  {actmark(2, "The result")}
+<section class="sheet sheet-response sheet-paper" id="discover-response">
+  {actmark(3, "Your Europe")}
   <div class="sheettext">
-    <h2>What is left</h2>
+    <h2 class="mega">Start here.</h2>
+    <p class="lede">One destination from each corner of the continent &mdash;
+    {len(shots)} of the {len(macros)} this atlas divides Europe into, because a corner
+    appears here only once it holds a licensed photograph. What the map says in position,
+    these say in weather and light.</p>
+  </div>
+  <div class="moswrap" id="discover-shots">{mosaic}</div>
+</section>
+
+<section class="sheet sheet-result sheet-paper sheet-white" id="discover-result">
+  {actmark(4, "The result")}
+  <div class="sheettext">
+    <h2 class="mega">What is left.</h2>
     <p class="lede">Ranked by the terms you chose and nothing else. Each row says why it is
     on the list — the actual terms that fired, not "recommended for you".</p>
     {golink("/method", "How the ranking works")}
@@ -12800,10 +12871,10 @@ def discover_page(data):
 
 {constel_defs()}
 
-<section class="sheet sheet-where" id="discover-where">
-  {actmark(3, "By where it is")}
+<section class="sheet sheet-where sheet-paper" id="discover-where">
+  {actmark(5, "By where it is")}
   <div class="sheettext">
-    <h2>Nine regions, by shared ground</h2>
+    <h2 class="mega">Europe, by region.</h2>
     <p class="lede">Grouped by shared coast, shared mountain range and shared history rather
     than by alphabet. Each one draws its own member countries, so a region is a shape before
     it is a name.</p>
@@ -12812,10 +12883,10 @@ def discover_page(data):
   <div class="rows whererows">{macro_rows}</div>
 </section>
 
-<section class="sheet sheet-motion" id="discover-motion">
-  {actmark(4, "Europe in motion")}
+<section class="sheet sheet-motion sheet-pine" id="discover-motion">
+  {actmark(6, "Europe in questions")}
   <div class="sheettext">
-    <h2>Twelve ways to cut the continent</h2>
+    <h2 class="mega">Sometimes you know<br>the question before<br>you know the place.</h2>
     <p class="lede">Each one is a query run against every destination on every build, not a
     list somebody chose. The query is printed under the name, and it is the same query the
     page itself prints.</p>
@@ -12824,17 +12895,17 @@ def discover_page(data):
   <div class="qqlist">{motion_lines}</div>
 </section>
 
-<section class="sheet sheet-month" id="discover-month-band">
-  {actmark(5, "By month")}
+<section class="sheet sheet-month sheet-paper sheet-white" id="discover-month-band">
+  {actmark(7, "Europe in time")}
   <div class="sheettext">
-    <h2>And the year itself</h2>
+    <h2 class="mega">And the year itself.</h2>
     <p class="lede">What is on, and which countries are in their quieter shoulder — which is
     usually where you should be going. The two disagree, and the disagreement is the point.</p>
     {golink("/events", "The whole European year")}
   </div>
   <div class="monthside">{year_band(data)}</div>
   <div class="note qualify">
-    <h2 class="mini">What "off the obvious circuit" means, exactly</h2>
+    <h3 class="mini">What "off the obvious circuit" means, exactly</h3>
     <p>It is a computed score, not a mood. A place scores higher for not being a capital, for
     being marked quiet by an editor who knows the region, for having no curated route through
     it, for not being tagged with the things a continent is famous for, and for sitting in a
@@ -12845,6 +12916,17 @@ def discover_page(data):
     crowding presented as evidence is the thing this project exists not to do.
     {quiet} places carry the editorial quiet tag; <a href="/beyond-the-obvious">Beyond the
     obvious</a> collects them.</p>
+  </div>
+</section>
+
+<section class="sheet sheet-keep sheet-paper sheet-white" id="discover-end">
+  {actmark(8, "Keep looking")}
+  <div class="sheettext">
+    <h2 class="mega">Keep<br><em class="lit">looking.</em></h2>
+    <p class="lede">There is always another road, another city, another landscape, another
+    door. {len(data['cities'])} of them are written up here, and the atlas is a third
+    finished.</p>
+    {golink("/beyond-the-obvious", "Beyond the obvious")}
   </div>
 </section>
 """
