@@ -308,7 +308,20 @@ def measure():
                        "fixed measure needs type that is a fixed step, and "
                        "--t-5xl is a rung the scale already has — an existing "
                        "STEP declared in a new place, which is the argument "
-                       "the 24px entry above makes, not a twenty-third step."},
+                       "the 24px entry above makes, not a twenty-third step.\n"
+                       "AND 24 FOR THE TWO LEADS. Plates 03 and 06 each became "
+                       "a composition with a subject — one destination at "
+                       "feature size beside four rows, one essay at lead size "
+                       "above a contents list — and a lead needs a size "
+                       "between the section head above it and the rows beside "
+                       "it or it is not leading anything. --t-3xl is the rung "
+                       "the scale already has there and was already spent as "
+                       "the FLOOR of three clamps; this is the same value "
+                       "declared bare, in two rules, and not a new step. The "
+                       "alternative was --t-2xl, which is the size of the "
+                       "rows themselves — a lead the same size as the list it "
+                       "leads is the card grid these two plates stopped "
+                       "being."},
             "css.font_weights": {
                 "value": len(set(re.findall(r"font-weight:\s*([^;]+);", css))),
                 "kind": "ceiling", "why": "Four is enough for an editorial system."},
@@ -425,7 +438,15 @@ def measure():
                        "per macro region, which is the rule the band already "
                        "had and not a number anybody picked. Every one of "
                        "those is a register row this library already holds; "
-                       "nothing was acquired for it."},
+                       "nothing was acquired for it. "
+                       "1145 -> 1144 WHEN THE READING BECAME A CONTENTS PAGE. "
+                       "It showed two of nine stories as two photographs side "
+                       "by side — a card grid, and a selection wearing the "
+                       "clothes of a set. The newest carries the one picture "
+                       "and every other story is a line, so all nine are on "
+                       "the page where two were, for one `<img>` fewer. A "
+                       "contents page that illustrated every line would be "
+                       "the grid again with smaller pictures."},
             # The homepage is the flagship page and the one most likely to
             # gain weight, because every good idea wants to live on it. It
             # already carried a 2.6x regression unnoticed: a commit that cut

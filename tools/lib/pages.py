@@ -1852,31 +1852,58 @@ def home(data):
   target="_blank">{esc(_hero_row["photographer"])}</a> · {esc(_hero_row["licence"])}</p>"""
 
     # ── 03 · THE PLACES ──────────────────────────────────────────────
-    # A GRID, AND THE NAME SITS UNDER THE PICTURE RATHER THAN ON IT. That
-    # is the whole difference between a card and a plate: a gallery labels
-    # a work in the margin, which is why this room can hold four
-    # photographs without reading as a catalogue of content types.
-    gal = "".join(
-        f'<a class="gi" href="{urls.city(e["country"], e["region"], e["city"])}">'
-        f'{picture(images, "city:" + cid, w=900, h=1200, credit=False, alt=images["city:" + cid]["alt"], sizes="(min-width: 62rem) 18vw, 45vw")}'
-        f'<span class="giwhere">{esc(e["country"]["name"])}</span>'
-        f'<span class="giname">{esc(e["city"]["name"])}</span></a>'
-        for cid, e in picks[:5])
+    # A FEATURE, NOT A CONTACT STRIP. Five equal tiles 211 pixels wide
+    # with a name under each is the eight-equal-tiles failure this
+    # repository has already measured twice, at five: nothing in the row
+    # is the subject, so the eye reads a catalogue of content types and
+    # moves on. `docs/non-home-redesign.md` declares the scale that fixes
+    # it — a feature is asymmetric at 1.35 against .65, "because two equal
+    # columns read as a layout and an unequal pair reads as a picture with
+    # something to say" — and this is the one band on the homepage with
+    # five real photographs to spend on it.
+    #
+    # So the first destination is the picture and the other four are the
+    # list beside it. Which one leads is not a judgement: `picks` is one
+    # destination per macro region in the atlas's own order, and the lead
+    # is simply the first of them.
+    #
+    # AND THE SEARCH FORM CAME OFF THIS PLATE. It was a tool dropped into
+    # the middle of a gallery — an input 243 pixels wide with its own
+    # placeholder clipped, between a headline about looking at places and
+    # the places themselves. It is the one interactive thing on this page
+    # and it belongs where an invitation belongs, which is the end: it is
+    # on plate 08 now, beside the closing statement.
+    _lead, _rest = picks[0], picks[1:5]
+    _lc, _le = _lead
+    placerows = "".join(
+        f'<a class="pl" href="{urls.city(e["country"], e["region"], e["city"])}">'
+        f'<span class="plshot">'
+        f'{picture(images, "city:" + cid, w=400, h=400, credit=False, alt=images["city:" + cid]["alt"], sizes="7rem")}'
+        f'</span>'
+        f'<span class="pltext">'
+        f'<span class="plwhere">{esc(e["country"]["name"])}</span>'
+        f'<span class="plname">{esc(e["city"]["name"])}</span></span>'
+        f'<span class="plgo" aria-hidden="true">→</span></a>'
+        for cid, e in _rest)
     places = f"""
   <div class="galwrap">
   <div class="sheettext">
     <h2 class="mega">One destination from<br>each corner of the continent.</h2>
     <p class="lede">Europe changes with what you seek — mountains or coastlines,
-    cities or quiet places. Say what you are after and the continent reorders
-    itself around it.</p>
-    <form class="askhero" action="/plan" method="get">
-      <label for="homeask">Say it in your own words.</label>
-      <input type="text" id="homeask" name="ask" autocomplete="off"
-             placeholder="Somewhere quiet, in October.">
-      <button class="btn" type="submit">Plan my journey</button>
-    </form>
+    cities or quiet places. Every one of these is the first place this atlas
+    would send you in its corner of the continent.</p>
   </div>
-  <div class="galgrid">{gal}</div>
+  <div class="feat">
+    <a class="featlead" href="{urls.city(_le["country"], _le["region"], _le["city"])}">
+      {picture(images, "city:" + _lc, w=1200, h=1500, credit=False,
+               alt=images["city:" + _lc]["alt"],
+               sizes="(min-width: 62rem) 46vw, 92vw")}
+      <span class="featwhere">{esc(_le["country"]["name"])}</span>
+      <span class="featname">{esc(_le["city"]["name"])}</span>
+      <span class="featline">{esc(_le["city"].get("summary", ""))}</span>
+    </a>
+    <div class="featlist">{placerows}</div>
+  </div>
   {_phot(["city:" + c for c, _e in picks[:5]])}
   </div>"""
 
@@ -1953,23 +1980,54 @@ def home(data):
   </div>"""
 
     # ── 06 · THE READING ─────────────────────────────────────────────
-    shot_stories = [st for st in data.get("stories", [])
-                    if ("story:" + st["slug"]) in images][:2]
+    # A CONTENTS PAGE WITH A LEAD, WHICH IS WHAT NINE ESSAYS ARE.
+    #
+    # This band showed TWO stories as two 4:3 photographs side by side —
+    # a card grid, and the exact shape `/stories` was rebuilt out of:
+    # "nine essays are a contents page: one list, newest first, the desk as
+    # a kicker on the piece it belongs to". It also showed two of nine,
+    # silently, which is a selection wearing the clothes of a set — the
+    # same `[:8]` failure plate 02 already records one band over.
+    #
+    # So: the newest story is the LEAD and carries the one photograph, at
+    # the width a lead deserves, with its standfirst; every other story is
+    # a line — desk, title, reading time — and all nine are here. The
+    # pictures the register holds for the other six are not spent, and that
+    # is the point: a contents page that illustrated every line would be
+    # the grid again with smaller pictures.
+    _st = sorted(data.get("stories", []),
+                 key=lambda x: x.get("published", ""), reverse=True)
     reading = ""
-    if shot_stories:
-        cards = "".join(
-            f'<a class="st1" href="/stories/{esc(st["slug"])}">'
-            f'{picture(images, "story:" + st["slug"], w=1200, h=900, credit=False, alt=images["story:" + st["slug"]]["alt"], sizes="(min-width: 62rem) 36vw, 90vw")}'
-            f'<span class="stdesk">{esc(st.get("desk", "Story"))}</span>'
-            f'<span class="sttitle">{esc(st["title"])}</span></a>'
-            for st in shot_stories)
+    if _st:
+        _lead_st = next((x for x in _st if ("story:" + x["slug"]) in images),
+                        _st[0])
+        _others = [x for x in _st if x["slug"] != _lead_st["slug"]]
+        _leadshot = (picture(images, "story:" + _lead_st["slug"], w=1400, h=933,
+                             credit=False,
+                             alt=images["story:" + _lead_st["slug"]]["alt"],
+                             sizes="(min-width: 62rem) 52vw, 92vw")
+                     if ("story:" + _lead_st["slug"]) in images else "")
+        _rows = "".join(
+            f'<a class="rd" href="/stories/{esc(x["slug"])}">'
+            f'<span class="rddesk">{esc(x.get("section", "Story"))}</span>'
+            f'<span class="rdtitle">{esc(x["title"])}</span>'
+            f'<span class="rdmin">{esc(x.get("reading", ""))}</span></a>'
+            for x in _others)
         reading = f"""
   <div class="galwrap">
   <div class="sheettext">
     <h2 class="mega">Read the continent<br>differently.</h2>
   </div>
-  <div class="strow">{cards}</div>
-  {_phot(["story:" + st["slug"] for st in shot_stories])}
+  <div class="lead">
+    <a class="leadshot" href="/stories/{esc(_lead_st["slug"])}">{_leadshot}</a>
+    <div class="leadtext">
+      <p class="rddesk">{esc(_lead_st.get("section", "Story"))} · {esc(_lead_st.get("reading", ""))}</p>
+      <h3 class="leadtitle"><a href="/stories/{esc(_lead_st["slug"])}">{esc(_lead_st["title"])}</a></h3>
+      <p class="leadstand">{esc(_lead_st.get("standfirst", ""))}</p>
+    </div>
+  </div>
+  <div class="rdlist">{_rows}</div>
+  {_phot(["story:" + _lead_st["slug"]])}
   </div>"""
 
     # ── 07 · THE YEAR ────────────────────────────────────────────────
@@ -1994,10 +2052,21 @@ def home(data):
 
     # ── 08 · THE MESSAGE ─────────────────────────────────────────────
     closing = data["home"]["closing"]
+    # AND THE ASK IS HERE, at the end, where an invitation belongs. It was
+    # in the middle of plate 03 — a tool between a headline about looking
+    # at places and the places themselves, with its own placeholder clipped
+    # by the button beside it. A reader who has come down eight plates has
+    # seen what this atlas is; this is the sentence that hands it to them.
     message = f"""
   <div class="sheettext">
     <h2 class="mega">Open<br>the door.</h2>
     <p class="lede">Find the Europe waiting beyond the obvious itinerary.</p>
+    <form class="askhero" action="/plan" method="get">
+      <label for="homeask">Say it in your own words.</label>
+      <input type="text" id="homeask" name="ask" autocomplete="off"
+             placeholder="Somewhere quiet, in October.">
+      <button class="btn" type="submit">Plan my journey</button>
+    </form>
     {golink('/discover', esc(closing["cta"]))}
   </div>"""
     # THE SHEET'S OWN SOURCES, in the margin voice, at the foot of the last
