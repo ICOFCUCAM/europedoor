@@ -29,23 +29,23 @@
       "role": "journey-atmosphere",
       "key": "journeys-hero",
       "path": "/journeys",
-      "surface": "The opening of the journeys index — a wide editorial image beside the headline.",
+      "surface": "The CLOSE of the journeys index — type over the picture behind a scrim, under the question the page ends on. It was the OPENING until the seventeen routes drawn at once became that; a photograph replaces a drawing rather than sitting behind one, and the drawn continent is the picture no competitor can make.",
       "min_width": 2000,
       "orientation": "landscape",
       "min_aspect": 1.3,
       "max_aspect": 2.1,
       "note": "A road, a rail line or a pass with distance in it: the feeling of crossing a border on purpose. Never a map, and never a single landmark. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening.",
       "container": {
-        "selector": ".iheroart.shot",
-        "min_aspect": 0.692,
+        "selector": ".send",
+        "min_aspect": 0.635,
         "min_at": "320x640",
-        "max_aspect": 1.5,
-        "max_at": "760x640"
+        "max_aspect": 2.381,
+        "max_at": "1280x640"
       },
       "safe_area": {
-        "width": 0.33,
-        "height": 0.867,
-        "frame": 0.286
+        "width": 0.302,
+        "height": 0.546,
+        "frame": 0.165
       }
     },
     "experiences-hero": {

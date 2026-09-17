@@ -256,7 +256,18 @@ def s6():
     # reader can reach the planner from it without scrolling past the first
     # plate.
     h = page("/")
-    yield has("/", "what you seek"), "the homepage asks the question"
+    # AND THE SENTENCE ASSERTED IS ONE NO REGISTER SIZE CAN REMOVE. "what you
+    # seek" lives in the lede of the PLACES plate, which renders one
+    # photographed destination per macro region and is therefore omitted
+    # entirely for a register holding none — so this assertion was about how
+    # many photographs are licensed rather than about whether the homepage
+    # asks. `photo-tests.py` builds exactly that state, one row, to prove the
+    # audits survive an acquisition, and four assertions failed there for a
+    # page that was behaving correctly. The ask is on the closing plate, in
+    # the label of the one control this page carries, on every state: a
+    # stronger claim, because it names the element that cannot disappear.
+    yield has("/", "Say it in your own words"), \
+        "the homepage asks the question"
     yield has("/", 'href="/plan"'), "and the planner is one press from it"
     yield h.index('href="/plan"') < h.index("<h2"), \
         "the way to the planner is above every heading on the page"

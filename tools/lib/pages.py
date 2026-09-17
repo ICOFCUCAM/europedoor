@@ -1839,8 +1839,17 @@ def home(data):
     def _phot(keys):
         """One credit line for a row, paid once. The licence asks for the
         photographer and the provider, not a caption per frame."""
+        # A KEY THE REGISTER DOES NOT HOLD IS SKIPPED, NOT A KeyError. Every
+        # caller passes the keys of a band it has already filtered, so this
+        # is unreachable on the real register — and `contact_sheet.py` builds
+        # this page with a register holding ONE row, which is the state the
+        # whole credit line exists to describe honestly. A credit names the
+        # photographs that are ON the page; a key with no row is a photograph
+        # that is not.
         out, seen = [], set()
         for k in keys:
+            if k not in images:
+                continue
             nm = images[k]["photographer"]
             if nm in seen:
                 continue
@@ -1890,39 +1899,52 @@ def home(data):
     # the places themselves. It is the one interactive thing on this page
     # and it belongs where an invitation belongs, which is the end: it is
     # on plate 08 now, beside the closing statement.
-    _lead, _rest = picks[0], picks[1:5]
-    _lc, _le = _lead
-    placerows = "".join(
-        f'<a class="pl" href="{urls.city(e["country"], e["region"], e["city"])}">'
-        f'<span class="plshot">'
-        f'{picture(images, "city:" + cid, w=400, h=400, credit=False, alt=images["city:" + cid]["alt"], sizes="7rem")}'
-        f'</span>'
-        f'<span class="pltext">'
-        f'<span class="plwhere">{esc(e["country"]["name"])}</span>'
-        f'<span class="plname">{esc(e["city"]["name"])}</span></span>'
-        f'<span class="plgo" aria-hidden="true">→</span></a>'
-        for cid, e in _rest)
-    places = f"""
-  <div class="galwrap">
-  <div class="sheettext">
-    <h2 class="mega">One destination from<br>each corner of the continent.</h2>
-    <p class="lede">Europe changes with what you seek — mountains or coastlines,
-    cities or quiet places. Every one of these is the first place this atlas
-    would send you in its corner of the continent.</p>
-  </div>
-  <div class="feat">
-    <a class="featlead" href="{urls.city(_le["country"], _le["region"], _le["city"])}">
-      {picture(images, "city:" + _lc, w=1200, h=1500, credit=False,
-               alt=images["city:" + _lc]["alt"],
-               sizes="(min-width: 62rem) 46vw, 92vw")}
-      <span class="featwhere">{esc(_le["country"]["name"])}</span>
-      <span class="featname">{esc(_le["city"]["name"])}</span>
-      <span class="featline">{esc(_le["city"].get("summary", ""))}</span>
-    </a>
-    <div class="featlist">{placerows}</div>
-  </div>
-  {_phot(["city:" + c for c, _e in picks[:5]])}
-  </div>"""
+    # AND THE BAND IS OMITTED WHEN THERE IS NOTHING TO LEAD IT WITH. `picks`
+    # is one photographed destination per macro region, so it is EMPTY for a
+    # register holding none — which was every register before the first
+    # tranche merged, and is the register `contact_sheet.py` builds when it
+    # renders this page once per candidate: it swaps in ONE row so the sheet
+    # shows that candidate and nothing else. `picks[0]` then raised
+    # IndexError and took the whole acquisition suite down with it, which is
+    # the crash-stops-counting fault this file records twice, arriving in a
+    # page BUILDER rather than in a gate. Every other band here is already
+    # guarded — `if inner` in the plate loop drops an empty one — and this is
+    # the one that could not produce an empty string because it died first.
+    places = ""
+    if picks:
+        _lead, _rest = picks[0], picks[1:5]
+        _lc, _le = _lead
+        placerows = "".join(
+            f'<a class="pl" href="{urls.city(e["country"], e["region"], e["city"])}">'
+            f'<span class="plshot">'
+            f'{picture(images, "city:" + cid, w=400, h=400, credit=False, alt=images["city:" + cid]["alt"], sizes="7rem")}'
+            f'</span>'
+            f'<span class="pltext">'
+            f'<span class="plwhere">{esc(e["country"]["name"])}</span>'
+            f'<span class="plname">{esc(e["city"]["name"])}</span></span>'
+            f'<span class="plgo" aria-hidden="true">→</span></a>'
+            for cid, e in _rest)
+        places = f"""
+      <div class="galwrap">
+      <div class="sheettext">
+        <h2 class="mega">One destination from<br>each corner of the continent.</h2>
+        <p class="lede">Europe changes with what you seek — mountains or coastlines,
+        cities or quiet places. Every one of these is the first place this atlas
+        would send you in its corner of the continent.</p>
+      </div>
+      <div class="feat">
+        <a class="featlead" href="{urls.city(_le["country"], _le["region"], _le["city"])}">
+          {picture(images, "city:" + _lc, w=1200, h=1500, credit=False,
+                   alt=images["city:" + _lc]["alt"],
+                   sizes="(min-width: 62rem) 46vw, 92vw")}
+          <span class="featwhere">{esc(_le["country"]["name"])}</span>
+          <span class="featname">{esc(_le["city"]["name"])}</span>
+          <span class="featline">{esc(_le["city"].get("summary", ""))}</span>
+        </a>
+        <div class="featlist">{placerows}</div>
+      </div>
+      {_phot(["city:" + c for c, _e in picks[:5]])}
+      </div>"""
 
     # ── 04 · THE CROSSING ────────────────────────────────────────────
     # A JOURNEY'S PICTURE IS ONE OF ITS OWN STOPS, NOT ITS `journey-hero`.
@@ -2156,10 +2178,21 @@ def home(data):
               ("reading gal quiet", "The reading", reading),
               ("year gal", "The year", year),
               ("end gal", "The message", message)]
+    # THE NUMBER COMES FROM THE RENDERED SEQUENCE, NOT FROM THE DECLARED LIST.
+    # `enumerate(PLATES, 1) if inner` numbers first and filters second, so an
+    # omitted band leaves a hole: with a register holding one photograph the
+    # places, crossing and atlas plates return "" and the page printed 01, 02,
+    # 05, 06, 07, 08 — which `section-audit.py` failed on, correctly, in the
+    # one state that produces it. **The selector that COUNTS is the selector
+    # that DRAWS**, which this repository already records about two CSS
+    # counters; the same sentence is true of a number composed in Python.
+    # Latent on the real register, where all eight bands render — and latent
+    # is not fixed: the day a band is legitimately empty the sequence lies.
+    _drawn = [(slug, name, inner) for slug, name, inner in PLATES if inner]
     body = "\n".join(
         f'<section class="sheet {" ".join("sheet-" + p for p in slug.split())}" '
         f'id="act{i}">{actmark(i, name)}{inner}</section>'
-        for i, (slug, name, inner) in enumerate(PLATES, 1) if inner)
+        for i, (slug, name, inner) in enumerate(_drawn, 1))
     body = constel_defs() + body
 
     return "/index.html", page(
@@ -4866,135 +4899,394 @@ def interest_page(data, i, ranking):
 # ── journeys ──────────────────────────────────────────────────────────
 
 def journeys_index(data):
-    """Seventeen journeys, shown as routes rather than as cards.
+    """THE EUROPEAN JOURNEY ATLAS — movement drawn, and the drawing already
+    existed.
 
-    THE INDEX SHOWED EVERYTHING ABOUT A JOURNEY EXCEPT THE JOURNEY. Four
-    across, each a generated plate over a name, a truncated summary and
-    "19 DAYS · 5 COUNTRIES · MODERATE" — and four abstract landscapes in a
-    row read as a family rather than as four trips. The one thing that makes
-    a journey a journey, and the one thing this atlas holds in full, is the
-    ORDERED SEQUENCE OF PLACES. It was the only thing not on the page.
+    Four pages, four instruments, one institution: /discover is the
+    instrument, /countries is the atlas, /experiences is photography, and
+    this one asks how you want to MOVE. `docs/journeys-redesign.md` is the
+    audit — what the page held, what the register holds, and which of the
+    brief's bands are derived rather than authored.
 
-    Eight of the nine indexes were the same 280px card grid; that finding is
-    recorded in docs/design-direction-audit.md as the h1 finding one level up.
-    A card is the right shape for a set of like things a reader is choosing
-    between on look. A journey is not chosen on look: it is chosen on where it
-    goes, how long it takes and how hard it is, and all three of those are
-    text.
+    IT WAS SEVENTEEN IDENTICAL ROWS, AND EVERY ONE OF THEM WAS GOOD. A
+    strapline kicker, the name, the stops in order, a `hopbar` laid end to
+    end as the trip's own rhythm, the facts, and a route glyph framed on
+    that journey's own extent — no two of the seventeen lines are alike,
+    which is the test the homepage's four doors failed and this one passes.
+    The row was itself a repair: this index used to be four abstract plates
+    across. The fault is the sum. Measured on the built page at 1280: 5,095
+    pixels, one photograph, 5.9% of the page area, one shape seventeen
+    times.
 
-    So it is the `row` primitive — already on 86% of pages, so this is not a
-    new component — carrying the stops in order, and a route line that is the
-    same `hopbar` the journey page draws, laid end to end instead of stacked.
-    A reader sees the shape of the trip: many short segments is a slow local
-    circuit, three long ones is a continental haul.
+    AND THE FAMILY'S OWN SIGNATURE DRAWING WAS BUILT ON EVERY BUILD AND
+    THROWN AWAY. `heroart` composes all seventeen routes at once on one
+    conformal conic — casings first and then cores, so a crossing does not
+    break a line — and handed it to `indexhero(art=…)`, which prefers `img`
+    when the register holds one. The register holds `journeys-hero`. So the
+    one picture no other travel product can make was assembled and
+    discarded, and what a reader met instead was a stock photograph of a
+    train. It is the opening now, at size, which is what this family's
+    opening is FOR.
     """
+    images = data.get("images") or {}
+    idx = data["cities"]
+    js = data["journeys"]
+
+    def legcities(j):
+        return [idx[l["city"]] for l in j["legs"]]
+
+    def pts_of(j):
+        return [project(n["city"]["lat"], n["city"]["lon"]) for n in legcities(j)]
+
+    def km_of(j):
+        cs = [n["city"] for n in legcities(j)]
+        return sum(haversine(cs[i], cs[i + 1]) for i in range(len(cs) - 1))
+
+    def countries_of(j):
+        out = []
+        for n in legcities(j):
+            if n["country"]["name"] not in out:
+                out.append(n["country"]["name"])
+        return out
+
+    def credit(keys):
+        """One credit per band, paid once — the homepage's own rule, and
+        never on the opening: that surface is the composition and the
+        register is where the record lives."""
+        out, seen = [], set()
+        for k in keys:
+            row = images.get(k)
+            if not row or row["photographer"] in seen:
+                continue
+            seen.add(row["photographer"])
+            out.append(f'<a href="{esc(row["source"])}" rel="noopener" '
+                       f'target="_blank">{esc(row["photographer"])}</a>')
+        return ('<p class="sheetcred rowcred">Photographs by '
+                + ", ".join(out) + " on Pexels.</p>") if out else ""
+
+    # ── 01 · THE ROAD ────────────────────────────────────────────────
+    # ALL SEVENTEEN AT ONCE, AND THE CASINGS BEFORE THE CORES. Seventeen
+    # routes cross each other constantly, and a per-route casing lays the
+    # next route's cream stroke over the last one's cobalt — a line that
+    # breaks wherever another passes. Both passes over the whole set, which
+    # is how a printed map plates a network.
+    routepts = [pts_of(j) for j in js]
+    allroutes = "".join(
+        '<polyline class="constel-route case" points="'
+        + " ".join(f"{x:.0f},{y:.0f}" for x, y in pts) + '"/>'
+        for pts in routepts) + "".join(
+        '<polyline class="constel-route" points="'
+        + " ".join(f"{x:.0f},{y:.0f}" for x, y in pts) + '"/>'
+        for pts in routepts)
+    allmap = (f'<svg class="constel allroutes" viewBox="0 0 {MAP_W} {MAP_H}" '
+              f'preserveAspectRatio="xMidYMid meet" '
+              f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
+              f'{cut_fade("ih", MAP_W, MAP_H, dusk_reach(), cls="datacut")}'
+              f'{allroutes}</svg>')
+    stops_all = {l["city"] for j in js for l in j["legs"]}
+    road = f"""
+  <div class="sheettext">
+    <p class="kicker">The European Journey Atlas</p>
+    <h1 class="mega">Europe is<br>a <em class="lit">journey</em>.</h1>
+    <p class="lede">Not a line between two points. {numword(len(js), cap=True)}
+    routes, {len(stops_all)} stops, every one of them a real place in this
+    atlas and every leg a real distance. Drawn here all at once, on the
+    projection every other map on this site uses.</p>
+    {golink('#the-routes', 'Read the seventeen')}
+  </div>
+  <figure class="roadart">{allmap}
+    <figcaption>Every line is one of the {numword(len(js))}, drawn from its own
+    stops. {geo.sources_line(geo.load("europe-lod0.json"))}{datacut_line()}</figcaption>
+  </figure>"""
+
+    # ── 02 · THE SEVENTEEN ───────────────────────────────────────────
     rows = []
-    for j in data["journeys"]:
-        countries, stops, hops = [], [], []
-        prev = None
-        for leg in j["legs"]:
-            n = data["cities"][leg["city"]]
-            cn = n["country"]["name"]
-            if cn not in countries:
-                countries.append(cn)
-            stops.append(esc(n["city"]["name"]))
-            if prev is not None:
-                hops.append(haversine(prev, n["city"]))
-            prev = n["city"]
-        # THE SEGMENTS ARE A SHARE OF THE WHOLE TRIP, not of its longest leg.
-        # The journey page scales each hop against the longest one, because
-        # there the question is "which of these days is the long one". Here
-        # the bar is the whole route in one line, so a segment is its share of
-        # the total distance and the line reads as the trip's own rhythm.
+    for i, j in enumerate(js, 1):
+        cs = legcities(j)
+        stops = [esc(n["city"]["name"]) for n in cs]
+        hops = [haversine(cs[k]["city"], cs[k + 1]["city"])
+                for k in range(len(cs) - 1)]
         total = sum(hops)
+        # THE SEGMENTS ARE A SHARE OF THE WHOLE TRIP, not of its longest leg.
+        # The journey page asks which of these days is the long one; here the
+        # bar is the whole route in one line, so the shape is the trip's own
+        # rhythm rather than a comparison between trips.
         segs = "".join(
             f'<span class="w{max(1, int(round(km / total * 100)))}"></span>'
             for km in hops) if total else ""
-        # AND THE ROUTE IS DRAWN. Seventeen rows of kicker, name, dot-separated
-        # stops and a thin bar is a spreadsheet: the page told a reader
-        # everything about a journey except where it goes, which is the one
-        # question a journey is chosen on and the one this atlas can answer
-        # in a picture. The homepage was showing three journeys better than
-        # the journeys index showed seventeen.
-        #
-        # No two of these seventeen lines are alike — Arctic to Mediterranean
-        # is the length of Europe, the Iberian Circle is a loop in one corner,
-        # the Baltic Crossing is four capitals in a square — so this is the
-        # one family where a drawing per row differentiates rather than
-        # repeats. That is the test the homepage's four doors failed and this
-        # one passes.
-        route = constellation(
-            [project(data["cities"][l["city"]]["city"]["lat"],
-                     data["cities"][l["city"]]["city"]["lon"]) for l in j["legs"]],
-            route=True, frame=True, mark=19)
+        route = constellation(pts_of(j), route=True, frame=True, mark=19)
         rows.append(
             f'<a class="row journeyrow" href="{urls.journey(j)}">'
-            f'<div><p class="kicker">{esc(j["strapline"])}</p>'
+            f'<div><p class="kicker"><span class="jno">{i:02d}</span>'
+            f'{esc(j["strapline"])}</p>'
             f'<h2>{esc(j["name"])}</h2>'
             f'<p class="rowsub">{" · ".join(stops)}</p>'
             f'<span class="hopbar route" aria-hidden="true">{segs}</span>'
-            f'<p class="rowmeta jfacts">{n_of(j["days"], "day")} · {n_of(len(countries), "country")}'
-            f' · {esc(j["difficulty"])}</p></div>'
-            f'<div class="jart">{route}</div></a>')
-    # THE OPENING IS EVERY ROUTE AT ONCE, and no other travel product can
-    # draw it: seventeen real sequences of real places on one conformal
-    # conic, so a reader sees the reach of the whole set before reading a
-    # word. It is the family's own subject at size, which is what an index
-    # hero is for — and it is the honest stand-in until a photograph lands in
-    # the slot beside it, because a plate here would be a picture of nowhere.
-    # THE CASINGS FIRST, ALL OF THEM, THEN THE CORES. Seventeen routes cross
-    # each other constantly, and a per-route casing would lay the next
-    # route's cream stroke over the previous route's cobalt one — a line that
-    # breaks wherever another passes. Both passes over the whole set, which
-    # is how a printed map plates a network.
-    routepts = [[project(data["cities"][l["city"]]["city"]["lat"],
-                         data["cities"][l["city"]]["city"]["lon"])
-                 for l in j["legs"]] for j in data["journeys"]]
-    allroutes = "".join(
-        f'<polyline class="constel-route case" points="'
-        + " ".join(f"{x:.0f},{y:.0f}" for x, y in pts) + '"/>'
-        for pts in routepts) + "".join(
-        f'<polyline class="constel-route" points="'
-        + " ".join(f"{x:.0f},{y:.0f}" for x, y in pts) + '"/>'
-        for pts in routepts)
-    # `slice` rather than the default `meet`. The frame is 4:3 and the map is
-    # 1000x780, which is 1.28 — close enough that slicing crops a few units of
-    # open sea and far enough that letterboxing left the continent floating in
-    # black margins with the arch cutting nothing. A drawing in an opening
-    # should fill the opening; that is what the homepage hero had to learn.
-    heroart = (f'<svg class="constel allroutes" viewBox="0 0 {MAP_W} {MAP_H}" '
-               f'preserveAspectRatio="xMidYMid slice" '
-               f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
-               f'{cut_fade("ih", MAP_W, MAP_H, dusk_reach(), cls="datacut")}'
-               f'{allroutes}</svg>')
-    body = f"""
-{crumbs([("Europe", "/discover"), ("Journeys", None)])}
-{constel_defs()}
-{indexhero(
-    kicker="European Journeys",
-    title="Routes that cross borders on purpose.",
-    lede=f"{len(data['journeys'])} routes, each a real sequence with real distances: "
-         f"every stop links back into the Atlas, and the nights add up to the days on "
-         f"the tin. Take one as written, or open it in the Planner and bend it to the "
-         f"time you actually have.",
-    art=heroart,
-    img=photo(data.get("images"), "journeys-hero", w=2000, h=1200,
-              sizes="(min-width: 60rem) 52vw, 100vw"),
-    actions='<a class="btn" href="/plan">Build your own</a>'
-            '<a class="btn ghost" href="/map">See them on the map</a>',
-    note="Every line above is one of the seventeen, drawn from its own stops."
-         + datacut_line())}
-<div class="rows journeyrows">{"".join(rows)}</div>
-<p class="small">The shape beside each route is where it goes, drawn on the same
-projection as every other map here. {geo.sources_line(geo.load("europe-lod0.json"))}
-Every stop above is a place in the Atlas, in the order the
-route takes it. The line under each is that journey's own legs end to end —
-its share of the whole distance, so the shape is the trip's rhythm rather
-than a comparison between trips. Distances are straight lines between
-coordinates; what they mean on the ground is on the journey's own page.</p>
-"""
+            f'<p class="rowmeta jfacts">{n_of(j["days"], "day")} · '
+            f'{n_of(len(countries_of(j)), "country")} · {esc(j["difficulty"])}</p>'
+            f'</div><div class="jart">{route}</div></a>')
+    # THIS BAND IS THE PAGE'S HEAD, and /experiences settled the reason one
+    # family over: a plate sequence has no room for a stage above the
+    # opening, so the head is the band that introduces the SET. It is the
+    # `pagehead` primitive rather than a fourth spelling of one, it declares
+    # `index` because the page is a set, and it states the extent, because
+    # an index exists to say how big a set is and five of eight once did not.
+    # The count is derived; a figure typed here is the figure that was true
+    # two hundred destinations ago.
+    seventeen = f"""
+  <div class="pagehead index">
+    <h2 class="mega">Routes worth<br>remembering.</h2>
+    <p class="lede">All {len(js)} of them, and a journey is not chosen on
+    look, so none of these is a card. Each row carries where it goes, in
+    order, and the line under it is that route's own legs end to end —
+    its share of the whole distance, so the shape is the trip's rhythm.</p>
+  </div>
+  <div class="rows journeyrows">{"".join(rows)}</div>
+  <p class="small">The shape beside each route is where it goes, on the same
+  projection as every other map here. Distances are straight lines between
+  coordinates; what they mean on the ground is on the journey's own page.</p>"""
+
+    # ── 03 · THE CREED ───────────────────────────────────────────────
+    creed = """
+  <div class="sheettext creedsay">
+    <h2 class="mega">The destination is<br>one moment in<br>the journey.</h2>
+    <p class="lede">The landscape changes outside the window. The language
+    shifts, then the architecture, then the table. A border stops being a
+    line and becomes a day.</p>
+  </div>"""
+
+    # ── 04 · THE FEATURED JOURNEY ────────────────────────────────────
+    # A JOURNEY'S PICTURE IS ONE OF ITS OWN STOPS, NOT ITS `journey-hero`.
+    # The automated fill searched the role's first concept and got railways:
+    # three of the nine journey photographs are the same commuter station at
+    # Geesthacht and not one is about its journey. The homepage already takes
+    # the picture it can defend and this page takes the same one — which also
+    # decides WHICH journey is featured, because the one this atlas can show
+    # best is the one it holds the most photographs of. Ties go to the
+    # journey crossing the most countries, and the page says so.
+    def shots_of(j):
+        return [l["city"] for l in j["legs"] if ("city:" + l["city"]) in images]
+
+    feat = max(js, key=lambda j: (len(shots_of(j)), len(countries_of(j))))
+    fshots = shots_of(feat)
+    fcs = legcities(feat)
+    featured = ""
+    if fshots:
+        lead = fshots[0]
+        leadleg = next(l for l in feat["legs"] if l["city"] == lead)
+        rest = fshots[1:4]
+        strip = "".join(
+            f'<a class="fsh" href="{urls.city(idx[c]["country"], idx[c]["region"], idx[c]["city"])}">'
+            + picture(images, "city:" + c, w=800, h=1000, credit=False,
+                      alt=images["city:" + c]["alt"],
+                      sizes="(min-width: 52rem) 16vw, 44vw")
+            + f'<span class="fshname">{esc(idx[c]["city"]["name"])}</span></a>'
+            for c in rest)
+        featured = f"""
+  <figure class="featshot">
+    {picture(images, "city:" + lead, w=2000, h=1200, credit=False,
+             alt=images["city:" + lead]["alt"], sizes="(min-width: 52rem) 52vw, 100vw")}
+    <figcaption>{esc(idx[lead]["city"]["name"])}, {esc(idx[lead]["country"]["name"])}
+    &mdash; day {leadleg["day_number"]} of {feat["days"]}</figcaption>
+  </figure>
+  <div class="sheettext">
+    <p class="kicker">Featured &mdash; the journey this atlas can show best</p>
+    <h2 class="mega">{esc(feat["name"])}</h2>
+    <p class="lede">{esc(feat["summary"])}</p>
+    <p class="jfacts">{n_of(feat["days"], "day")} &middot;
+    {n_of(len(countries_of(feat)), "country")} &middot;
+    {int(round(km_of(feat))):,} km in a straight line</p>
+    {golink(urls.journey(feat), "Follow this route")}
+  </div>
+  <div class="fstrip">{strip}</div>
+  {credit(["city:" + c for c in fshots[:4]])}"""
+
+    # ── 05 · THE RHYTHM ──────────────────────────────────────────────
+    # THE FOUR MOVEMENTS ARE DERIVED RATHER THAN NAMED. The brief asks for
+    # Arrive, Cross, Pause and Continue, which is a true thing to say about
+    # journeys in general and a claim no record here carries. A leg DOES
+    # carry `nights`, and that is the same idea measured: a stop of one night
+    # is a crossing and a stop of three is a stay. So the band draws one real
+    # journey's own legs at their own lengths and the movements are that
+    # journey's shape rather than four words about the idea of one.
+    #
+    # AND IT IS A DIFFERENT CLAIM FROM THE ROW ABOVE. The index bar is a
+    # share of the DISTANCE and this is a share of the NIGHTS — the rhythm of
+    # the road against the rhythm of the nights, which is why a journey with
+    # eight legs and nineteen days is not eight equal blocks.
+    def movement(nights):
+        return ("a crossing" if nights <= 1 else
+                "a stop" if nights == 2 else "a stay")
+
+    nights_total = sum(l["nights"] for l in feat["legs"]) or 1
+    nightbar = "".join(
+        f'<span class="w{max(1, int(round(l["nights"] / nights_total * 100)))}"></span>'
+        for l in feat["legs"])
+    beats = "".join(
+        f'<div class="beat">'
+        f'<span class="beatno">{k:02d}</span>'
+        f'<span class="beatname">{esc(idx[l["city"]]["city"]["name"])}</span>'
+        f'<span class="beatkind">{n_of(l["nights"], "night")} &mdash; {movement(l["nights"])}</span>'
+        f'<span class="beatwhy">{esc(l.get("why", ""))}</span></div>'
+        for k, l in enumerate(feat["legs"], 1))
+    rhythm = f"""
+  <div class="sheettext">
+    <h2 class="mega">Arrive. Cross.<br>Pause. Continue.</h2>
+    <p class="lede">One journey's own legs, at their own lengths. A leg
+    carries nights, so the movement is measured rather than named: one night
+    is a crossing, two is a stop, three or more is a stay. This is
+    {esc(feat["name"])} &mdash; {n_of(nights_total, "night")} over
+    {n_of(len(feat["legs"]), "leg")}.</p>
+  </div>
+  <figure class="nightfig">
+    <span class="hopbar route nights" aria-hidden="true">{nightbar}</span>
+    <figcaption>Eight legs, each drawn at its share of the {nights_total}
+    nights &mdash; a share of the WHOLE trip rather than of its longest leg,
+    because the question here is the trip's rhythm.</figcaption>
+  </figure>
+  <div class="beats">{beats}</div>"""
+
+    # ── 06 · THE STORIES ON THESE ROADS ──────────────────────────────
+    # THE SET IS DERIVED AND THE RULE IS PRINTED. A story carries a validated
+    # `places` field; the ones that name a place these seventeen routes pass
+    # through are the essays that happen ON them, which is a relation this
+    # atlas holds rather than an editorial guess about which essays are
+    # "about travel". It SCROLLS, because `ed_strip` is the component for a
+    # sequence and because showing three of six would be a selection wearing
+    # the clothes of a set.
+    MIDDOT = "\u00a0\u00b7 "
+    onroad = []
+    for s in sorted(data["stories"], key=lambda s: s.get("published", ""),
+                    reverse=True):
+        hits = [p for p in (s.get("places") or []) if p in stops_all]
+        if hits and held(images, "story:" + s["slug"]):
+            onroad.append((s, hits))
+    tales = ""
+    if onroad:
+        tales = f"""
+  <div class="sheettext">
+    <h2 class="mega">Between the<br>destinations.</h2>
+    <p class="lede">The {numword(len(onroad))} essays that name a place these
+    routes pass through. A station, a ferry, a pass, a table &mdash; the part
+    of a journey that is not a destination.</p>
+    {golink('/stories', 'Every story')}
+  </div>
+  {ed_strip(images, [
+      {"key": "story:" + s["slug"], "alt": images["story:" + s["slug"]]["alt"],
+       "label": s["title"], "href": urls.story(s),
+       "note": idx[h[0]]["city"]["name"] + MIDDOT + (s.get("section") or "")}
+      for s, h in onroad], limit=8)}
+  {credit(["story:" + s["slug"] for s, _ in onroad])}"""
+
+    # ── 07 · THE PACE ────────────────────────────────────────────────
+    # A MEASUREMENT WITH A CLASSIFICATION ON TOP, WHICH IS THE ONLY HONEST
+    # ORDER. The brief names Slow, Deep and Grand. No journey record carries
+    # a pace: `type` is `route` on all seventeen and `creator` is
+    # `EuropeDoor editorial` on all seventeen, so neither can cut anything.
+    # What the data holds is straight-line kilometres per day, which runs
+    # from 30 to 319 and separates cleanly. The rule that cut it is printed,
+    # exactly as every /europe-in page prints the query that made it — and
+    # the figure says STRAIGHT LINE, because every distance here is a
+    # haversine and this atlas holds no road or rail geometry.
+    # THE LAST BAND HAS NO CEILING AND SAYS SO. The first version used a
+    # sentinel of 10^9 as the loop's upper bound and then printed it: "under
+    # 1000000000 km a day", on the page, as a claim to a reader. A bound that
+    # exists for the arithmetic is not a bound that belongs in a sentence.
+    PACE = (("Slow", 50, "under 50 km a day",
+             "Short hops, long stays. The road is the smallest part of the "
+             "day."),
+            ("Deep", 110, "50 to 110 km a day",
+             "One region, taken properly. Far enough to change the language, "
+             "not far enough to lose the thread."),
+            ("Grand", None, "over 110 km a day",
+             "A continent in one sequence. The distance is the argument."))
+    paced = {p[0]: [] for p in PACE}
+    for j in js:
+        rate = km_of(j) / max(1, j["days"])
+        for name, cap, _rule, _say in PACE:
+            if cap is None or rate < cap:
+                paced[name].append((rate, j))
+                break
+    pacerows = "".join(
+        f'<div class="pace">'
+        f'<p class="kicker">{numword(len(paced[name]), cap=True)} of '
+        f'{numword(len(js))}</p>'
+        f'<h3>{esc(name)}</h3>'
+        f'<p class="pacerule">{esc(rule)}</p>'
+        f'<p class="pacesay">{esc(say)}</p>'
+        f'<ul class="pacelist">' + "".join(
+            f'<li><a href="{urls.journey(j)}">{esc(j["name"])}</a>'
+            f'<span>{int(round(rate))} km/day</span></li>'
+            for rate, j in sorted(paced[name])) + '</ul></div>'
+        for name, cap, rule, say in PACE if paced[name])
+    pace = f"""
+  <div class="sheettext">
+    <h2 class="mega">There is more<br>than one way.</h2>
+    <p class="lede">Cut by straight-line kilometres a day, which is the only
+    pace this atlas can measure: it holds no road and no rail geometry, so
+    every distance here is a line between two coordinates and the real figure
+    is higher. The names are editorial; the number is not.</p>
+  </div>
+  <div class="paces">{pacerows}</div>"""
+
+    # ── 08 · THE ROAD AHEAD ──────────────────────────────────────────
+    # THE FAMILY'S OWN HERO PHOTOGRAPH, SPENT ON THE CLOSE. `journeys-hero`
+    # is a licensed picture of a train through a forest and the register had
+    # been claiming a surface this page stopped reaching the moment the
+    # opening became the drawn continent — `c_photo_published` said so in the
+    # first run after the rebuild, which is the check earning its place.
+    # The opening is not where it goes back: *a photograph replaces the
+    # drawing, it does not sit behind it*, and the drawn seventeen-route
+    # continent is the one picture no competitor can reproduce. The close is
+    # where a picture does work type cannot — "where will the road take you"
+    # over a line going into trees — so the band is a declaration: type over
+    # the picture behind a scrim that makes the ratio a property of the
+    # DESIGN. 72% graphite composites to rgb(76,83,82) and bone on that is
+    # 6.90:1 whatever the photograph turns out to be, which is the same
+    # arithmetic `.credit` and `ed_declare` already argued once each.
+    # Not `ed_declare` itself: that composes a statement and nothing else,
+    # and this band has to carry the two links the page ends on.
+    sendshot = picture(images, "journeys-hero", w=2400, h=1400,
+                       alt=images["journeys-hero"]["alt"], sizes="100vw") \
+        if held(images, "journeys-hero") else ""
+    # THE LITERAL CLASS NAME STANDS ALONE IN THE SOURCE, because
+    # `c_container_is_emitted` reads `class="..."` out of this file and drops
+    # any token carrying an f-string placeholder. Written
+    # `class="send{' shot' if ... }"` the one token is `send{'`, which is
+    # dropped whole, so the check reported that nothing on this site emits
+    # `.send` — correctly, about a string it could not parse. A class the
+    # instrument cannot see is a class the crop-box declaration cannot name.
+    _shot = "shot" if sendshot else ""
+    ahead = f"""
+  <div class="send {_shot}">{sendshot}
+    <div class="sendsay">
+      <h2 class="mega">Where will the<br>road take you?</h2>
+      <p class="lede">Take one as written, or open it in the Planner and bend
+      it to the time you actually have. Every stop above is a place in the
+      Atlas, and every one of them has a page.</p>
+      <p class="keepgo">{golink('/plan', 'Build your own route')}
+      {golink('/map', 'See them all on the map')}</p>
+    </div>
+  </div>"""
+
+    PLATES = [("road gal", "The road", road, "the-road"),
+              ("jindex gal quiet", "The seventeen", seventeen, "the-routes"),
+              ("creed pine", "Why journey", creed, "why-journey"),
+              ("feat gal", "The featured route", featured, "featured"),
+              ("rhythm gal quiet", "The rhythm", rhythm, "the-rhythm"),
+              ("jtales gal", "On these roads", tales, "on-these-roads"),
+              ("pace gal quiet", "The pace", pace, "the-pace"),
+              ("send", "The road ahead", ahead, "the-road-ahead")]
+    body = (crumbs([("Europe", "/discover"), ("Journeys", None)])
+            + constel_defs()
+            + "\n".join(
+                f'<section class="sheet {" ".join("sheet-" + p for p in slug.split())}" '
+                f'id="{anchor}">{actmark(i, name)}{inner}</section>'
+                for i, (slug, name, inner, anchor)
+                in enumerate([p for p in PLATES if p[2]], 1)))
+
     return "/journeys/index.html", page(
-        "Journeys", body, path="/journeys", area="journeys",
+        "Journeys", body, path="/journeys", area="journeys", hero=True,
         accent="movement",
         description="Curated multi-country routes across Europe — Arctic to Baltic, Atlantic to Mediterranean, the Alpine grand tour and more.",
     )
@@ -8507,8 +8799,8 @@ def experiences_index(data):
             + "\n".join(
                 f'<section class="sheet {" ".join("sheet-" + p for p in slug.split())}" '
                 f'id="{anchor}">{actmark(i, name)}{inner}</section>'
-                for i, (slug, name, inner, anchor) in enumerate(PLATES, 1)
-                if inner))
+                for i, (slug, name, inner, anchor)
+                in enumerate([p for p in PLATES if p[2]], 1)))
 
     return "/experiences/index.html", page(
         "Experiences", body, path="/experiences", area="experiences", hero=True,

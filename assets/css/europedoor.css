@@ -10295,6 +10295,60 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .keepgo { display: flex; flex-wrap: wrap; gap: var(--s5) var(--s7);
           justify-content: center; max-width: none; }
 
+/* ── 08 the road ahead ────────────────────────────────────────────── */
+/* THE CLOSE IS A DECLARATION, WHICH IS ONE OF THE SEVEN IMAGE SCALES AND
+   NOT A NEW ONE. The band carries the family's own hero photograph with the
+   question set over it, and everything about the ratio is arithmetic rather
+   than a property of the picture: graphite at 72% composites to
+   rgb(76,83,82) over ANY frame, including a pure white one, and bone on that
+   is 6.90:1. That figure is `.credit`'s and `.ed-declare`'s, unchanged,
+   because a second number here would be a second decision about one thing.
+   The ground is graphite rather than the white the other gallery plates take,
+   so the band is legible before the photograph decodes and stays legible if
+   the register ever loses it — an empty `.send` is a dark closing panel and
+   never a white one with bone type on it. */
+.sheet-send { padding: 0; display: block; border-bottom: 0;
+              position: relative; background: var(--graphite);
+              color: var(--bone); }
+.sheet-send > .actmark { position: absolute; z-index: 2; inset: 6vh auto auto 0;
+                         padding-inline: var(--page-gutter); margin: 0; }
+.sheet-send .actno { color: var(--ochre); border-bottom-color: var(--ochre); }
+.sheet-send .actname { color: var(--bone); }
+/* AND THE BAND IS SIZED FROM ITS WIDTH, BECAUSE A CROP BOX IS THE ONLY
+   THING THAT DECIDES WHAT A PHOTOGRAPH KEEPS. Sized `min(84vh, 46rem)` with
+   `16vh` of padding the box ran 0.435 at 320x900 to 3.720 at 2000x640 —
+   measured at the twenty viewports `browser-checks.js` uses — and the safe
+   area that gives is `0.619 x (0.435 / 3.720)`, which is **7% of a
+   photograph's frame guaranteed visible**. `checks.py` refuses under 12%,
+   and it refuses for a reason this repository has already paid: the
+   homepage hero ran 8.6x and left 7%, and a slot that swings destroys
+   whatever is put in it. A height in `vh` swings with the viewport's OTHER
+   axis, so the aspect moves twice; a height in `vw` is a constant ratio by
+   construction, and the padding follows it for the same reason — with `vh`
+   padding the 640-high and 900-high runs disagreed about every box. 0.635 to
+   2.381, and 7% becomes 16%. */
+.send { position: relative; display: grid; place-items: center;
+        min-height: max(42vw, 28rem); overflow: hidden;
+        padding: clamp(4rem, 9vw, 9rem) var(--page-gutter)
+                 clamp(3rem, 6vw, 6rem); }
+.send :is(picture, img) { position: absolute; inset: 0; width: 100%;
+                          height: 100%; object-fit: cover; }
+.send.shot::after { content: ""; position: absolute; inset: 0;
+  background: color-mix(in srgb, var(--graphite) 72%, transparent); }
+/* AND THE CREDIT GOES ABOVE THE SCRIM, NOT UNDER IT. `.credit` is
+   `position: absolute` with `z-index: auto`, so it shares this stacking
+   context with `.send.shot::after` and paints BEFORE it — the band's own
+   72% graphite would then sit on top of the two links Pexels' terms require,
+   over the credit's own scrim, and the 9.2:1 that scrim was sized for would
+   be a ratio about a different ground. The credit keeps its own arithmetic
+   by being lifted out of the wash rather than by anything being retuned. */
+.send .credit { z-index: 2; }
+.sendsay { position: relative; z-index: 1; display: grid; gap: var(--s5);
+           justify-items: center; text-align: center; }
+.sendsay .mega, .sendsay .lede { color: var(--bone); }
+.sendsay .lede { max-width: 34rem; }
+.sendsay .go { color: var(--bone); }
+
 @media (max-width: 62rem) {
   .kindrow { grid-template-columns: 2.5rem 7rem minmax(0, 1fr) 5.5rem; }
   .sheet-geo { grid-template-columns: minmax(0, 1fr); }
@@ -10400,3 +10454,188 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    own air; the tiles, the captions and the overflow are the primitive's. */
 .sheet-strip { display: block; }
 .sheet-strip .ed-strip { margin-top: var(--s7); }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   /journeys — THE EUROPEAN JOURNEY ATLAS
+   ═══════════════════════════════════════════════════════════════════
+   FOUR PAGES, FOUR INSTRUMENTS, ONE INSTITUTION. /discover is graphite and
+   is a tool; /countries is geography; /experiences is photography; this one
+   is MOVEMENT, and what it draws is the line. `docs/journeys-redesign.md`
+   holds the audit.
+
+   It takes the gallery room, which is now three pages rather than one, and
+   what separates them is not the ground: the homepage is type-led, the
+   experience atlas is picture-led, and this one is line-led. Every plate
+   here either draws a route or counts one. */
+
+/* ── 01 the road: seventeen routes at once ────────────────────────── */
+/* `meet` RATHER THAN `slice`, AND THAT IS THE WHOLE DIFFERENCE BETWEEN A
+   NETWORK AND A CROP. The index hero sliced this drawing because it sat in
+   a 4:3 arch and a few units of open sea were the only cost. Here it is the
+   opening at full size and the routes run to Tromsø, Santiago, Athens and
+   Ephesus: slicing takes the ends off the network, and the ends are where
+   the argument is. Fitted, and the frame is the drawing's own 1000x780. */
+.sheet-road { display: grid; align-items: center;
+              grid-template-columns: minmax(0, 38%) minmax(0, 1fr);
+              gap: var(--s6) var(--s8); }
+.sheet-road > .actmark { grid-column: 1 / -1; }
+.roadart { margin: 0; min-width: 0; display: grid; gap: var(--s4); }
+/* AN UNRESOLVABLE `var()` IS NOT A MISSING VALUE, IT IS A DIFFERENT ONE, and
+   this one made the data-cut fade the only thing painting sea. `--map-sea` is
+   the name `docs/palette.json` uses; the stylesheet's token is `--atlas-sea`,
+   so the declaration was invalid at computed-value time and `background-color`
+   — which does not inherit — fell back to `transparent`. The drawing itself
+   paints no ocean; the panel does. So the seventeen routes sat on the band's
+   own white, with `cut_fade()`'s two ramps painting `--atlas-sea` at rising
+   opacity over the east and the south: measured, rgb(255,255,255) off Iberia
+   and rgb(221,232,231) in the Black Sea, on one drawing. The fade exists to
+   stop a straight data cut reading as a rendering fault and, with nothing
+   under it, WAS one. */
+.roadart .constel { width: 100%; height: auto; display: block;
+                    background: var(--atlas-sea); }
+.roadart figcaption { font-size: var(--t-xs); color: var(--ink-3);
+                      max-width: none; }
+.sheet-road h1.mega { margin: 0; }
+.sheet-road .lit { font-style: normal; color: var(--pine-ink); }
+
+/* ── 02 the seventeen ─────────────────────────────────────────────── */
+.sheet-jindex { display: block; }
+.sheet-jindex .rows { margin-top: var(--s7); }
+/* THE NUMBER IS THE POSITION AND THE STRAPLINE IS THE CAPTION, which is the
+   act mark's own reading one component down. It sits inside the kicker
+   rather than in a track of its own, because a fifth grid column for two
+   digits is a column that has to be answered at every width. */
+.jno { font-variant-numeric: tabular-nums; color: var(--ink-3);
+       margin-right: var(--s3); }
+
+/* ── 03 the creed ─────────────────────────────────────────────────── */
+/* THE ONE BAND THAT IS NOT PAPER, and it is a sentence rather than a room:
+   no picture, no list, no link. A manifesto that carries a call to action is
+   an advertisement. */
+.sheet-creed { display: block; padding: 14vh var(--page-gutter);
+               border-bottom: 0; }
+.sheet-creed .actno, .sheet-creed .actname { color: #9ab3ac; }
+.sheet-creed .actno { border-bottom-color: rgba(243,240,230,.2); }
+.creedsay { max-width: 54rem; }
+.creedsay .lede { max-width: 34rem; margin-left: auto; }
+
+/* ── 04 the featured route ────────────────────────────────────────── */
+.sheet-feat { display: grid; align-items: center;
+              grid-template-columns: minmax(0, 1fr) minmax(0, 40%);
+              gap: var(--s6) var(--s8); }
+.sheet-feat > .actmark { grid-column: 1 / -1; }
+.featshot { margin: 0; min-width: 0; }
+.featshot :is(picture, img) { display: block; width: 100%;
+                              aspect-ratio: 4 / 3; object-fit: cover; }
+.featshot figcaption { margin-top: var(--s3); font-size: var(--t-xs);
+                       color: var(--ink-3); max-width: none; }
+/* THE STRIP SPANS BOTH COLUMNS, because it is the rest of the route rather
+   than an illustration of the half it sits under. */
+/* A STRIP SCROLLS RATHER THAN WRAPPING, and `auto-fit` is how it wraps.
+   These are the featured route's own stops IN ORDER, so the strip has the
+   same job `.ed-strip` has and had the fault that component's comment names:
+   wrapping an order into rows turns a sequence into a grid. Three tiles made
+   three columns at 1280 and 2 + 1 at 390 — a grid with a hole in the
+   bottom-right, which is the reading `ed_mosaic` refuses below three items
+   for the same reason. `grid-auto-flow: column` with an overflow scroller
+   keeps Split, Mostar and Dubrovnik in the order the route visits them at
+   every width. */
+.fstrip { grid-column: 1 / -1; display: grid; gap: var(--s5);
+          grid-auto-flow: column; grid-auto-columns: minmax(10rem, 1fr);
+          overflow-x: auto; scroll-snap-type: x proximity;
+          padding-bottom: var(--s3); margin-top: var(--s6); }
+.fstrip > * { scroll-snap-align: start; }
+.fsh { display: grid; gap: var(--s3); text-decoration: none; color: inherit; }
+.fsh :is(picture, img) { display: block; width: 100%; aspect-ratio: 3 / 4;
+                         object-fit: cover; }
+.fshname { font-family: var(--display); font-size: var(--t-lg); }
+.fsh:hover .fshname { color: var(--door); }
+.sheet-feat .rowcred { grid-column: 1 / -1; }
+.jfacts { font-family: var(--text); font-size: var(--t-xs);
+          letter-spacing: .13em; text-transform: uppercase;
+          color: var(--ink-3); }
+
+/* ── 05 the rhythm ────────────────────────────────────────────────── */
+/* THE BEATS ARE SIZED BY NIGHTS AND THE INDEX BAR IS SIZED BY DISTANCE, and
+   that is why both are on the page: the rhythm of the road against the
+   rhythm of the nights. A journey with eight legs and nineteen days is not
+   eight equal blocks, and the only way to see that is to draw it.
+   `flex-grow` on the `.wN` scale the score bars already use, so the row is
+   the journey's own proportions and adds no length unit. */
+.sheet-rhythm { display: block; }
+/* THE BAR CARRIES THE PROPORTION AND THE LEGS CARRY THE WORDS. The first
+   version put a `.wN` class on each beat and let them flex: `.wN` sets a
+   WIDTH and a flex item with a basis ignores it, so the eight legs came out
+   eight equal blocks — which is the thing this band's own sentence says a
+   journey is not. And even sized correctly, eight cells of 140 pixels
+   cannot hold a name and a sentence. So the shape is one line, the same
+   `hopbar` the index row uses for DISTANCE, here for NIGHTS. */
+/* TWO DRAWINGS OF THE SAME EIGHT THINGS, ON DIFFERENT GRIDS, TOUCHING.
+   The bar is the journey's rhythm — eight segments at their share of the
+   eighteen nights — and the legs under it are a five-across grid of equal
+   tracks, so segment three does not sit over Piran and never can. Adjacent
+   and unaligned, the bar read as a mis-drawn header for the grid rather than
+   as the measurement it is. Two things separate them: the bar becomes a
+   captioned FIGURE, so it states what it draws the way every chart on this
+   site does, and the cards' own rule drops from a 2px accent to the page's
+   hairline — the segments and the card tops were the same weight in the same
+   colour, which is what invited the alignment. Nothing counts a rule that
+   reads as a promise it cannot keep. */
+.nightfig { margin: var(--s7) 0 0; display: grid; gap: var(--s3); }
+.nightfig figcaption { font-size: var(--t-xs); color: var(--ink-3);
+                       max-width: 44rem; }
+.beats { display: grid; gap: var(--s5);
+         grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+         margin-top: var(--s7); align-items: start; }
+.beat { display: grid; gap: var(--s2); align-content: start;
+        padding-top: var(--s4); border-top: 1px solid var(--rule); }
+.beatno { font-family: var(--text); font-size: var(--t-xs);
+          font-variant-numeric: tabular-nums; letter-spacing: .12em;
+          color: var(--ink-3); }
+.beatname { font-family: var(--display); font-size: var(--t-xl);
+            line-height: 1.12; }
+.beatkind { font-family: var(--text); font-size: var(--t-xs);
+            letter-spacing: .1em; text-transform: uppercase;
+            color: var(--door); }
+.beatwhy { font-size: var(--t-sm); color: var(--ink-2); }
+
+/* ── 06 on these roads ────────────────────────────────────────────── */
+.sheet-jtales { display: block; }
+.sheet-jtales .ed-strip { margin-top: var(--s7); }
+
+/* ── 07 the pace ──────────────────────────────────────────────────── */
+.sheet-pace { display: block; }
+/* THREE OR ONE, NEVER TWO — because there are exactly three paces and an
+   `auto-fit` grid of three wraps to 2 + 1 the moment the track floor stops
+   fitting. Measured at 834, which is already recorded here as the width that
+   finds a two-column layout collapsing a column just above its own
+   breakpoint: Slow and Deep sat side by side and Grand dropped under Slow
+   with four hundred pixels of empty page beside it. A set of three is not a
+   set that reflows — it reads as three or it reads as a list. */
+.paces { display: grid; gap: var(--s7);
+         grid-template-columns: minmax(0, 1fr);
+         margin-top: var(--s7); align-items: start; }
+@media (min-width: 62rem) {
+  .paces { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.pace { display: grid; gap: var(--s3); align-content: start;
+        border-top: 1px solid var(--rule); padding-top: var(--s5); }
+.pace h3 { font-family: var(--display); font-size: var(--t-3xl);
+           line-height: 1.12; margin: 0; }
+.pacerule { font-family: var(--text); font-size: var(--t-xs);
+            letter-spacing: .12em; text-transform: uppercase;
+            color: var(--door); margin: 0; }
+.pacesay { margin: 0; color: var(--ink-2); max-width: none; }
+.pacelist { list-style: none; margin: var(--s3) 0 0; padding: 0;
+            display: grid; gap: var(--s2); }
+.pacelist li { display: flex; justify-content: space-between; gap: var(--s4);
+               align-items: baseline; font-size: var(--t-sm);
+               border-bottom: 1px solid var(--rule); padding-bottom: var(--s2); }
+.pacelist span { font-variant-numeric: tabular-nums; color: var(--ink-3);
+                 white-space: nowrap; }
+
+@media (max-width: 62rem) {
+  .sheet-road, .sheet-feat { grid-template-columns: minmax(0, 1fr); }
+  .creedsay .lede { margin-left: 0; }
+}

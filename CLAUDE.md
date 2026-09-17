@@ -16,6 +16,7 @@ Via Europa. Take their architecture and drop their branding section. See
 |---|---|
 | **the mandate: what a first-class gateway to Europe would be, and where this one is not** | **`docs/first-class-audit.md`** — 27 surfaces rendered at 1280 and 390 and then measured. Three findings, and Finding 1 is now closed on the numbers: it read 12 of 23 surfaces effectively type to the fold with seven showing no picture at all, and reads **3 of 30 with none and none under a fifth**, median share 24% → 35.6% (CORRECTED twice — the first version said 21 of 22 and was reading where the first figure STARTS rather than how much of the screen it fills). `tools/opening.js` is the instrument, so the number is checkable in a minute. **Finding 2's other half is measured too** — it says the page is the same page and its evidence only ever covered the first 250 pixels: `tools/composition.js` reads the band sequence under the head and finds **29 distinct body shapes over 47 families**, and three h1 sizes at tops 136–745 where the original reading was one size at 150–312. The eight benchmark sites are BLOCKED by the egress proxy and the benchmark half is labelled second-hand |
 | **/experiences — the third instrument, and why it is photography rather than a map** | **`docs/experiences-redesign.md`** — the source audit, the image-coverage audit, the twelve bands of the brief mapped onto what this atlas actually holds, the two that are refused, and the seven defects only rendering found. 311 photographs, and on this one page the library was never the constraint |
+| **/journeys — movement rather than a list, and where the family's own photograph went** | **`docs/journeys-redesign.md`** — the source audit, the seventeen routes drawn at once as the opening, the three paces derived from measured kilometres a day rather than named, the two things the brief asks for that are refused with their triggers, and the five defects only rendering found |
 | **the eight page families, and what each room does differently** | **`docs/non-home-redesign.md`** — the non-home redesign answered A-J. The eight rooms derived from the route, the three helpers that were forcing one grammar, the seven image scales, 1,626 declared surfaces, and the defects only rendering found |
 | **the design language — what makes a page EuropeDoor with the logo removed, and which movements each family takes** | **`docs/design-language.md`** — the ARCHITECT step. Five marks that could not have been made by anybody else, the six-movement composition grammar per family, the three head roles, what the language forbids, and how a change is proved |
 | **anything at all — read this first, every session** | **`docs/instruction.md`** — the standing instruction. Part 1 is how work is done here (audit first, deviate with numbers, STOP on licensing, never invent data, prove every check can fail). Part 2 is the visual instruction: **European Future**, the two worlds, the palette, the 60/25/10/5 ratio and the measured contrast limits. `docs/palette.json` is the checkable form |
@@ -4708,6 +4709,103 @@ wall: *"`checks.py` asserts that no OTHER page takes it"*. There is no such
 check in that file or in any other suite, and /discover has taken `--white`
 for its three rests since it was rebuilt with nothing going red. A comment
 claiming evidence is read as evidence.
+
+
+**THE JOURNEY ATLAS, AND AN UNRESOLVABLE `var()` MADE THE DATA-CUT FADE THE
+ONLY THING PAINTING SEA.** /journeys was `indexhero()` over seventeen rows —
+the right rows, and the family's own signature drawing was built on every
+build and thrown away, because `indexhero` prefers a photograph and the
+seventeen routes at once were never asked for. They are the opening now. And
+the panel that holds them took `background: var(--map-sea)`, which is the
+name `docs/palette.json` uses where the stylesheet's token is `--atlas-sea`:
+the declaration is invalid at computed-value time, `background-color` does
+not inherit, and the panel fell back to `transparent`. **The drawing paints
+no ocean of its own — the panel does** — so the routes sat on the band's
+white and `cut_fade()`'s two ramps were the only sea on the picture.
+Measured on the pixels: rgb(255,255,255) off Iberia and rgb(221,232,231) in
+the Black Sea, on one drawing. The fade exists to stop a straight data cut
+reading as a rendering fault and, with nothing under it, **was one**. Nothing
+counts a background that is not there; a four-line scan for a `var()` with no
+declaration finds it in a second, and this stylesheet already carries the
+paragraph saying so.
+
+**TWO DRAWINGS OF THE SAME EIGHT THINGS, ON DIFFERENT GRIDS, TOUCHING.** The
+rhythm band draws one journey's legs twice: a bar whose eight segments are
+their share of the whole trip, and under it a five-across grid of equal
+tracks. Segment three does not sit over Piran and never can. Both drew the
+same 2px accent rule twenty pixels apart, so the bar read as a mis-drawn
+header for the grid rather than as the measurement it is. The bar is a
+captioned `<figure>` now — stating what it draws, the way every chart here
+does — and the cards' rule is the page's hairline. **Nothing counts a rule
+that reads as a promise it cannot keep.**
+
+**AND THE REGISTER WAS CLAIMING A SURFACE THE PAGE HAD STOPPED REACHING.**
+`journeys-hero` is a licensed photograph of a train in a forest and the old
+index opened on it; the moment the opening became the drawn continent nothing
+asked for that key, and `c_photo_published` said so in the first run after the
+rebuild — the check earning its place on exactly the fault it was written for.
+It does not go back into the opening: *a photograph replaces the drawing, it
+does not sit behind it*, and the drawn continent is the one picture here no
+competitor can reproduce. It carries the CLOSE instead, as a declaration —
+type over the picture behind a scrim, 72% graphite compositing to
+rgb(76,83,82) and bone on that measuring 6.90:1 whatever the frame turns out
+to be, which is `.credit`'s own arithmetic rather than a second number for one
+decision. Ten `<img>` where the page drew one, and **nothing was acquired.**
+
+**A PLATE SEQUENCE HAS NO ROOM FOR A STAGE ABOVE ITS OPENING, SO THE HEAD IS
+THE BAND THAT INTRODUCES THE SET.** /journeys had no `pagehead` at all and
+stated no extent, and `checks.py` failed on both. /experiences had already
+settled it one family over. The seventeen band declares `index` and states
+the count, derived — because *an index exists to say how big a set is*, and a
+figure typed there is the figure that was true two hundred destinations ago.
+
+**AND THE PACE SENTINEL WAS PRINTED AS A CLAIM.** The last of the three paces
+has no ceiling, and the first version used `10**9` as the loop's upper bound
+and then set it in the sentence: *"under 1000000000 km a day"*, on the page,
+to a reader. **A bound that exists for the arithmetic is not a bound that
+belongs in a sentence.** The three names are editorial and the number is
+derived, which is the Data Integrity Rule in both directions on one band.
+
+**THE GATE SUITE CRASHED THE DAY THE HOMEPAGE HERO WAS FILLED, AND THAT IS
+THE EMPTY-REGISTER FAULT FOR THE FOURTH TIME.** `photo-tests.py` runs against
+the LIVE register and `acquire.py` refuses a purpose the register already
+fills, so the block that acquires a PNG for `homepage-hero` stopped acquiring
+the moment run #32 put a real photograph there. Its own `returncode == 0`
+assertion caught that — and the very next line opened the file the acquisition
+had not written, so the **suite ended on a traceback instead of on one
+failure**, leaving every later block unrun. A run that ends on a `TypeError`
+reports no failure, which this file already records about the browser suite;
+the same sentence now applies to the gate that guards photographs. **A block
+that must SUCCEED owns its starting state**, so it frees the purpose first and
+`cleanup()` restores the whole register from the backup it already held.
+
+**AND FREEING THE ROW WAS NOT ENOUGH, BECAUSE A FILE NAME COMES FROM THE
+PURPOSE.** The first version of that fix restored only the register — so the
+acquisition it enabled wrote its stub straight over
+`photographs/homepage-hero.original.jpg` and
+`photographs/country-hero@austria.original.jpg`, two licensed originals, in
+the one directory that exists to be evidence. `cleanup()` then put the
+register back, so it named a SHA-256 of bytes that were no longer in the
+repository, and `checks.py` said exactly that: *"the file is not the file that
+was acquired"* and *"the original is not in the repository"*. `keep` protects
+a file from being DELETED and says nothing about it being overwritten, which
+is the sister failure to the run that swept 165 licensed derivatives out of
+`assets/img` — same suite, same directory, opposite verb. **A test that frees
+a surface moves its files aside and `cleanup()` moves them back**: a rename is
+cheap and it is the only form of this that cannot lose bytes the repository is
+the evidence for. Found because the run left the working tree dirty and the
+static suite was run on it rather than only on the build.
+
+**AND THE HOMEPAGE'S OWN BUILDER CRASHED ON AN EMPTY PICK LIST, IN THE ONE
+CALLER THAT MAKES ONE.** `picks` is one photographed destination per macro
+region, so it is empty for a register holding none — which was every register
+before the first tranche merged, and is the register `contact_sheet.py` builds
+when it renders this page once per candidate: it swaps in ONE row so the sheet
+shows that candidate and nothing else. `picks[0]` raised IndexError and took
+the acquisition suite down with it. **Every other band on that page is already
+guarded** — `if inner` in the plate loop drops an empty one — and this was the
+one that could never produce an empty string, because it died first. The
+crash-stops-counting fault arriving in a page BUILDER rather than in a gate.
 
 
 ## Gates
