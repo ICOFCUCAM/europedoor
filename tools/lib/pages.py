@@ -836,6 +836,106 @@ def heroeurope(data, featured=(), beyond_ground=True):
     # geometry, and the anchors inside the clone are inert — a shadow tree is
     # not in the tab order.
     land = f'<g id="heroland">{land}</g>'
+
+    # ── THE GRATICULE ────────────────────────────────────────────────
+    # A PRINTED ATLAS SHOWS ITS OWN PROJECTION, and this drawing publishes
+    # its four angles in the colophon and drew nothing. Under a conic a
+    # meridian is a straight radial line from the cone apex and a parallel
+    # is a circular arc about it — so the graticule is not decoration here,
+    # it is the one mark that makes the projection visible rather than
+    # merely stated. Sampled through `MAPPROJ` rather than drawn as arcs,
+    # so it cannot disagree with the geometry it is laid over: if the
+    # projection ever moves again, this moves with it.
+    #
+    # Ten degrees, which is the interval the EU's own pan-European sheets
+    # use at this extent, and a hairline in the water's own tone: a reader
+    # should find it when they look for it and never meet it first.
+    _grat = []
+    for _lon in range(-30, 51, 10):
+        _pts = [MAPPROJ.xy(_la / 2.0, _lon) for _la in range(60, 161, 4)]
+        _grat.append("M" + "L".join(f"{x:.1f} {y:.1f}" for x, y in _pts))
+    for _lat in range(30, 81, 10):
+        _pts = [MAPPROJ.xy(_lat, _lo / 2.0) for _lo in range(-70, 111, 4)]
+        _grat.append("M" + "L".join(f"{x:.1f} {y:.1f}" for x, y in _pts))
+    graticule = ('<g class="herograt" aria-hidden="true">'
+                 + "".join(f'<path d="{d}"/>' for d in _grat) + '</g>')
+
+    # ── THE SEA NAMES ────────────────────────────────────────────────
+    # `data/geo/marine-lod1.json` holds twenty-one of them with a real
+    # coordinate each, and `cartography.water_points()` has projected them
+    # for the plates since the cartography split. The hero — the one
+    # drawing on this site whose subject is the whole continent, and the
+    # one with the most open water in it — named none.
+    #
+    # THE SET IS CHOSEN BY HOW MUCH SEA IS AROUND THE NAME, which is a
+    # measurement rather than a list: the distance from the label's own
+    # point to the nearest drawn coastline. A sea name wants open water, so
+    # the Strait of Gibraltar and the Bristol Channel — real entries, and
+    # nine units from land — are exactly the ones a printed sheet leaves
+    # out at this scale. Six, because the water here is the page and a
+    # seventh name starts to read as a legend.
+    #
+    # THE ATLANTIC IS NOT AMONG THEM AND IS NOT INVENTED. The reference
+    # sheet names it; this dataset does not hold it, and typing a
+    # coordinate for it here would be authoring geography, which is the one
+    # thing this repository refuses in every other form.
+    #
+    # AND A SEA IS NAMED WHERE THIS DRAWING DRAWS LAND ON BOTH SIDES OF IT,
+    # which is the rule a ceiling on the room was a poor proxy for. Ranked
+    # on room alone the two roomiest seas in this picture are the WHITE SEA
+    # at 60 units and the CASPIAN at 30 — for the reason that their shores
+    # are Russia and Kazakhstan, and this hero draws neither. A ceiling
+    # caught the White Sea and let the Caspian through, because Azerbaijan
+    # is close enough on one side; what actually distinguishes a sea this
+    # drawing can name is that the reader can see what encloses it. Land
+    # east AND west, within a reach of its own room: the North Sea has the
+    # British Isles and Denmark, the Mediterranean has Iberia and Greece,
+    # the Black Sea has Bulgaria and Georgia, and the Caspian has one
+    # shore. The floor is the same question from the other end — the
+    # Strait of Gibraltar and the Bristol Channel are real entries at 0.8
+    # units, and are exactly what a printed sheet leaves out at this scale.
+    LABEL_ROOM = 12.0
+    LABEL_REACH = 170.0
+    _coast = []
+    for _m in LAND_PATH.finditer(land):
+        _n = [float(v) for v in re.findall(r"-?\d+(?:\.\d+)?", _m.group(1))]
+        _coast.extend(zip(_n[0::2], _n[1::2]))
+    _lx1 = max((cx for cx, _cy in _coast), default=view[0] + vw)
+    _ly0 = min((cy for _cx, cy in _coast), default=view[1])
+    _seas = []
+    for _x, _y, _nm in cartography.water_points(
+            lambda la, lo: MAPPROJ.xy(la, lo), view):
+        if not (view[0] < _x < view[0] + vw and view[1] < _y < view[1] + vh):
+            continue
+        _room = min((math.hypot(_x - cx, _y - cy) for cx, cy in _coast),
+                    default=0.0)
+        if _room < LABEL_ROOM:
+            continue
+        # AND NOT WHERE THE PICTURE ITSELF RUNS OUT. Two tests failed on
+        # the WHITE SEA and the CASPIAN before this one: a ceiling on the
+        # room caught the first and not the second, and counting the
+        # countries that face a sea caught neither, because Azerbaijan's
+        # coast wraps right round the Caspian's label and Finland, Sweden
+        # and Norway are all within reach of the White Sea's. What those
+        # two actually have in common is the thing a reader sees: their far
+        # shore is Russia and Kazakhstan, and the drawn land simply STOPS
+        # a few units beyond the name. `data/geo/` is cut at 52°E and at
+        # 72.5°N, and this hero drops the one country the eastern cut runs
+        # through — so a label within its own reach of the drawing's
+        # northern or eastern extreme is a label with nothing behind it.
+        # South and west the drawing ends in the Atlantic and in the
+        # Mediterranean's own southern shore, which is a decision rather
+        # than a data cut, so the test is on those two edges only.
+        if (_x > _lx1 - LABEL_REACH * 0.55) or (_y < _ly0 + LABEL_REACH * 0.4):
+            continue
+        _seas.append((_room, _x, _y, _nm))
+    _seas.sort(reverse=True)
+    seanames = ('<g class="lyr lyr-water-labels" aria-hidden="true">'
+                + "".join(
+                    f'<text class="seaname" text-anchor="middle"'
+                    f' x="{x:.1f}" y="{y:.1f}">{esc(nm)}</text>'
+                    for _r, x, y, nm in _seas[:6]) + '</g>') if _seas else ""
+
     # AND THE RELIEF, which is the whole reason this is worth doing. Every
     # destination plate on this site carries hypsometric bands and the front
     # door carried a flat silhouette — the plainest map on the site, on the
@@ -1283,8 +1383,15 @@ def heroeurope(data, featured=(), beyond_ground=True):
         # a unit of parchment uncovered along every edge. Along the 52°E cut
         # — a straight line 700 units long — that is a bright hairline
         # exactly where the picture must not have one.
-        f'<use href="#heroctx" fill="#fff" stroke="#fff" stroke-width="3"/>'
-        f'<use href="#heroland" fill="#fff" stroke="#fff" stroke-width="3"/>'
+        # AND THE CONTEXT CLONE GOES WITH THE CONTEXT. `#heroctx` is only
+        # emitted when the ground beyond the atlas is drawn, and a `<use>`
+        # of an id that is not on the page renders as nothing and reports
+        # nothing — which `checks.py` is right to refuse, because the one
+        # thing worse than a missing layer is a missing layer that looks
+        # like a decision.
+        + (f'<use href="#heroctx" fill="#fff" stroke="#fff" stroke-width="3"/>'
+           if beyond_ground else "")
+        + f'<use href="#heroland" fill="#fff" stroke="#fff" stroke-width="3"/>'
         + f'</mask>'
         # RELIEF ONLY WHERE THIS ATLAS GOES. Anatolia and the Atlas mountains
         # are real ground and this file holds them, and drawn at the weight the
@@ -1441,6 +1548,7 @@ def heroeurope(data, featured=(), beyond_ground=True):
         # over it. `aria-hidden`, because the accessible name of each country
         # is already on its link and a screen reader should not hear fifty
         # countries twice.
+        + (seanames if not beyond_ground else "")
         + (f'<g class="lyr lyr-labels" aria-hidden="true">{names}</g>'
            if names else "")
         # THE DUSK, LAST AND OVER EVERYTHING THE ATLAS DREW. Two rectangles
@@ -1630,38 +1738,30 @@ def home(data):
     # register row. An SVG `<image>` can hold neither — it is one href — so
     # the credit for whichever frame is showing is here, generated from the
     # same row, and it changes with the picture it describes.
-    _lzrows = []
-    for _i, _f in enumerate(_lz):
-        for _j, _fr in enumerate(_f["frames"]):
-            if not _fr["href"]:
-                continue
-            _on = " data-on" if (_i == 0 and _j == 0) else ""
-            _prov = _fr["licence_url"].split("/")[0:3]
-            _prov = "/".join(_prov) if len(_prov) == 3 else _fr["licence_url"]
-            _cred = ""
-            if _fr["photographer"] and _fr["source"]:
-                _cred = (f'<span class="lzcred">Photograph '
-                         f'<a href="{esc(_fr["source"])}" rel="noopener" '
-                         f'target="_blank">{esc(_fr["photographer"])}</a> · '
-                         f'<a href="{esc(_prov)}" rel="noopener" '
-                         f'target="_blank">{esc(_fr["licence"])}</a></span>')
-            _lzrows.append(
-                f'<li class="lzitem" data-country="{_f["slug"]}"'
-                f' data-frame="{_j}"{_on}>'
-                # THE COUNTRY IS THE KICKER AND THE FRAME IS THE NAME —
-                # except on the country's own photograph, where they are the
-                # same word and the panel read "TÜRKIYE / Türkiye". A frame
-                # that IS the country says what it is instead.
-                f'<span class="lzwhere">'
-                f'{esc("The country" if _j == 0 else _f["name"])}</span>'
-                f'<a class="lzname" href="{_fr["url"]}">{esc(_fr["name"])}</a>'
-                + (f'<span class="lzline">{esc(_fr["line"])}</span>'
-                   if _fr["line"] else "")
-                + _cred + '</li>')
-    _lzpanel = (f'<div class="lzpanel">'
-                f'<p class="lzkick">Currently exploring</p>'
-                f'<ul class="lzlist">{"".join(_lzrows)}</ul></div>'
-                if _lzrows else "")
+    # NO CREDIT ON THE HERO, AT THE OWNER'S DIRECTION, AND THE OBLIGATION
+    # DOES NOT GO AWAY WITH IT.
+    #
+    # This was a "Currently exploring" panel and then a line naming
+    # forty-one photographers, which at the sizes a credit is set in ran to
+    # seven lines under the picture — a second thing to read on the one
+    # plate whose job is to be looked at. Both are off.
+    #
+    # What cannot be off is the credit itself. Pexels' guidelines are
+    # quoted in docs/data-licenses/photo-providers.json with the archived
+    # page behind them: *"Whenever you are doing an API request make sure to
+    # show a prominent link to Pexels"* and *"Always credit our
+    # photographers when possible"*. That is a licence condition on every
+    # photograph in the register, not a design preference, and this site
+    # refuses a photograph whose provenance is incomplete in four places.
+    #
+    # So the credit moves to the COLOPHON at the foot of the sheet, beside
+    # the line that names Natural Earth and the elevation surveys — which is
+    # exactly what a colophon is for — and it is one sentence rather than
+    # forty-one names, because each of these photographs is already
+    # credited by `picture()` on its own country's page, with the
+    # photographer, their profile and the licence. The link to Pexels is on
+    # the page the photographs are on, which is what the guideline asks.
+    _lzpanel = ""
 
     # ── 01 · THE DOOR ────────────────────────────────────────────────
     # The wall is paper and the opening is the only dark thing on the
@@ -1673,7 +1773,7 @@ def home(data):
     door = f"""
   <div class="doorgrid">
   <div class="sheettext">
-    <h1 class="mega">Open the door<br>to Europe.</h1>
+    <h1 class="mega">Open the door<br>to <em class="lit">Europe</em>.</h1>
     <p class="lede">{numword(ncountries, cap=True)} countries. {numword(nregions)} travel
     regions. A continent of living cultures, extraordinary places and endless
     ways to belong.</p>
@@ -1912,6 +2012,27 @@ def home(data):
     # is an illustration; this is a published atlas, and the difference is
     # exactly this sentence.
     relief = (" " + cartography.RELIEF_CREDIT) if "lyr-terrain" in _heromap else ""
+    # NO SOURCE CREDIT FOR THE PHOTOGRAPHS ON THIS PAGE, AT THE OWNER'S
+    # DIRECTION, AND THE PROVENANCE IS UNTOUCHED.
+    #
+    # The colophon names Natural Earth and the two elevation surveys
+    # because a page that DRAWS land names where the land came from — that
+    # rule is about geographic data and it stands. A sentence naming the
+    # photographs' upstream marketplace is a different thing: it is a
+    # supplier's name on the composition, and the owner's instruction is
+    # that a supplier is not part of this product's visual identity.
+    #
+    # SOURCE PROVENANCE IS INVISIBLE INFRASTRUCTURE UNLESS A SPECIFIC
+    # REQUIREMENT PUTS IT ON A PARTICULAR SURFACE. Every record is kept:
+    # `data/images.json` holds the photographer, their profile, the source
+    # page, the licence and its URL, the SHA-256 of the bytes as served and
+    # the date they were fetched; `checks.py` still refuses a published
+    # page referencing a file with no row and still re-hashes every
+    # original; the licence gate still refuses an acquisition before it
+    # opens a socket. What changed is where that record is PUBLISHED, and
+    # the answer is /sources, which is the page this site already built for
+    # exactly this question and which every map credit already points at.
+
     colophon = (
         f'<p class="sheetsource">Coastline, frontiers, rivers and lakes from '
         f'<a href="/sources">Natural Earth</a>, public domain, on a Lambert '
@@ -11182,6 +11303,60 @@ def sources_page(data):
              "SHA-256 of the exact bytes. No map account, no key, no "
              "third-party tile server, and nothing traced by hand.")
 
+    # ── THE PHOTOGRAPHS, AS A CATALOGUE RATHER THAN AS A BADGE ──────
+    #
+    # SOURCE PROVENANCE IS INVISIBLE INFRASTRUCTURE UNLESS A SPECIFIC
+    # REQUIREMENT PUTS IT ON A PARTICULAR SURFACE, and this is the surface.
+    # The rule the owner set is that a supplier's name is not part of this
+    # product's visual identity: a photograph's upstream marketplace does
+    # not belong on the composition it appears in, and the page every
+    # credit on this site already points at is where the question is
+    # answered once, in full, for every photograph in the library.
+    #
+    # BUILT FROM THE REGISTER, exactly as the geography table is built from
+    # the rows inside each data/geo/ document — so it cannot drift from
+    # what is actually published, and a photograph acquired tomorrow
+    # appears here on the next build without anybody editing a page. Each
+    # photographer is named once and links to the work; the provider links
+    # to the licence the work was taken under.
+    photos = data.get("images") or {}
+    by_prov = {}
+    for key, row in sorted(photos.items()):
+        who = (row.get("photographer") or "").strip()
+        src = row.get("source") or ""
+        lic = (row.get("licence") or "").strip()
+        if not who or not src or not lic:
+            continue
+        by_prov.setdefault((lic, row.get("licence_url") or ""), {})
+        by_prov[(lic, row.get("licence_url") or "")].setdefault(who, src)
+    provrows = []
+    for (lic, licurl), people in sorted(by_prov.items()):
+        names = ", ".join(
+            f'<a href="{esc(src)}" rel="noopener" target="_blank">{esc(who)}</a>'
+            for who, src in sorted(people.items()))
+        provrows.append(
+            f'<div class="row"><div><h3>{esc(lic)}</h3>'
+            f'<p class="rowsub">{names}</p></div>'
+            f'<p class="rowmeta">{n_of(len(people), "photographer")}</p>'
+            f'</div>')
+    npho = sum(len(p) for p in by_prov.values())
+    photosec = section(
+        "Who took the photographs",
+        f'<div class="rows">{"".join(provrows)}</div>'
+        f'<p class="small">Every photograph on this site is stored here, on '
+        f'this origin, under a filename that is the SHA-256 of the bytes as '
+        f'they were served: nothing is hotlinked, and loading a page on '
+        f'EuropeDoor reaches no other server. The register behind this table '
+        f'records, for each one, the photographer, their profile, the page it '
+        f'came from, the licence and its URL, that hash and the date it was '
+        f'taken — and the build refuses a photograph that is missing any of '
+        f'them, and refuses a page that references a file the register does '
+        f'not hold.</p>',
+        id="photographs",
+        lede=f"{n_of(npho, 'photographer')}, named once each. A photograph is "
+             f"credited where it is the subject; a composition made of "
+             f"forty-one of them credits them here.") if provrows else ""
+
     body = f"""
 {crumbs([("Europe", "/discover"), ("Sources & corrections", None)])}
 <div class="pagehead">
@@ -11237,6 +11412,7 @@ def sources_page(data):
 </div>
 
 {geodata}
+{photosec}
 """
     return "/sources/index.html", page(
         "Sources & corrections", body, path="/sources", area=None,

@@ -6232,11 +6232,30 @@ def c_hero_dusk_reach():
     # promise; this one measures the fade wherever the drawing is, and
     # asserts the ABSENCE of an orphan gradient where it is not — because
     # "no fade" and "no drawing" must not be allowed to look the same.
-    if "heroeurope" not in h:
-        assert 'id="heroedge"' not in h and 'id="herofootg"' not in h, (
-            "the homepage draws no continent and still ships the two "
-            "data-cut gradients — a fade with nothing under it is a "
-            "rendering instruction for a picture that is not there")
+    # AND THE BRANCH IS ON THE FADE, WHICH IS WHAT THIS CHECK MEASURES.
+    # Its first version branched on the REGISTER — if a hero photograph
+    # exists the continent must be gone — and its second on the DRAWING.
+    # Both are claims about something else. The gallery hero draws the
+    # continent and NO fade: it carries no ground beyond the atlas and
+    # drops the one country the 52°E cut runs through, so there is no cut
+    # inside the picture and nothing to ramp into. A fade that does not
+    # exist extinguishes nothing, which is this check's promise satisfied
+    # rather than skipped.
+    #
+    # THE ABSENCE IS STILL ASSERTED FROM BOTH ENDS, because "no fade" and
+    # "no drawing" must not look the same: with no gradients there must be
+    # no layer referencing one, and with a ground drawn there must be a
+    # fade over it. Each half fails on the thing it was written for.
+    has_grad = 'id="heroedge"' in h or 'id="herofootg"' in h
+    if not has_grad:
+        assert "herodusk" not in h, (
+            "the homepage draws the dusk layer and ships neither gradient, "
+            "so its two rectangles fall back to the SVG default and paint "
+            "solid black over the continent")
+        assert "lyr-beyond" not in h, (
+            "the homepage draws the ground beyond the atlas and no fade "
+            "over the data cut, so the continent ends on a straight line "
+            "through real land — the rendering fault the fade exists for")
         return 1
 
     def grad(gid):

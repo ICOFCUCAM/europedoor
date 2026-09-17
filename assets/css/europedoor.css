@@ -9329,6 +9329,26 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    the atlas into it still cannot drift apart. */
 .sheet-door .op .heroeurope #heroedge stop,
 .sheet-door .op .heroeurope #herofootg stop { stop-color: var(--white); }
+/* THE SEA NAMES, IN THE WATER COLOUR AND NOT IN INK. That is
+   `cartography.DECIDED`'s own sentence for this layer, written before
+   anything drew it: "sea and ocean names in widely tracked uppercase, in
+   the water colour rather than in ink. An area, not a point, which is why
+   it is tracked and why it carries no mark." The tracking is what makes a
+   name read as a REGION of water rather than as a label pinned to a spot,
+   and it is why these carry no dot where a destination would. */
+.seaname { font-family: var(--text); font-size: var(--t-xs);
+  letter-spacing: .34em; text-transform: uppercase;
+  fill: color-mix(in srgb, var(--ocean-deep) 52%, transparent); }
+/* AND THE ONE LIT WORD IN THE HEADLINE. Ochre is this palette's
+   territorial accent — the colour of the regions and of the calendar —
+   and `Europe` is the territory. `--ochre-deep-2` rather than `--ochre`:
+   the plain ochre measures 2.28 on bone and is declared as a GROUND, and
+   a headline is read. 6.57 on the wall, which is a step darker than the
+   body text it sits above rather than a highlight shouting at it. */
+.sheet-door h1 .lit { font-style: normal; color: var(--ochre-deep-2); }
+.sheet-gal .actno { color: var(--ochre-deep-2);
+                    border-bottom-color: var(--ochre); }
+
 /* ── THE LIVING PHOTOGRAPHIC ATLAS ───────────────────────────────── */
 /* THE COUNTRY IS THE APERTURE. A photograph clipped to France's own
    boundary is not a picture beside a map, it is the country filled — you
@@ -9347,28 +9367,15 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    a rule that has to be overridden is a rule that will be got wrong
    again, so this one says it for itself. */
 .herophoto { pointer-events: none; }
-/* ONE STATE, FIVE READINGS OF IT. The list holds every frame and shows
-   one; the enhancement moves `data-on` and the panel follows, because
-   there is nothing else here for it to fall out of step with. */
-.lzpanel { margin-top: var(--s5); display: grid; gap: var(--s3); }
-.lzkick { font-family: var(--text); font-size: var(--t-xs);
-  letter-spacing: .22em; text-transform: uppercase; color: var(--ink-3);
-  margin: 0; }
-.lzlist { list-style: none; margin: 0; padding: 0; }
-.lzitem { display: none; }
-.lzitem[data-on] { display: grid; gap: var(--s2); }
-.lzwhere { font-family: var(--text); font-size: var(--t-xs);
-  letter-spacing: .14em; text-transform: uppercase; color: var(--door); }
-.lzname { font-family: var(--display); font-size: var(--t-2xl);
-  line-height: 1.12; color: inherit; text-decoration: none;
-  justify-self: start; }
-.lzname:hover { color: var(--door); }
-.lzline { font-family: var(--display); font-size: var(--t-base);
-  line-height: 1.5; color: var(--ink-2); max-width: 44ch; }
-.lzcred { font-family: var(--text); font-size: var(--t-xs);
-  color: var(--ink-3); }
-.lzcred a { color: var(--ink-2); text-decoration: underline;
-  text-underline-offset: .16em; }
+/* THE CREDIT, AND NOTHING ELSE UNDER THE PICTURE. A "currently
+   exploring" panel lived here — kicker, country, destination, sentence —
+   and it came off at the owner's direction: a readout under the one plate
+   whose job is to be looked at is a second thing to read. The credit
+   cannot come off with it, because Pexels' guidelines require the
+   photographer and a link to Pexels wherever their work is shown, and an
+   SVG `<image>` cannot carry a figcaption. One line, in the caption ink,
+   the way the gallery row below already credits its own eleven. */
+.lzcred { margin: var(--s4) 0 0; max-width: none; }
 
 /* AND THE NAMES ARE INK ON A PAPER HALO, WHICH THE PHOTOGRAPHS FORCED.
    Graphite at 48% is a third-weight name on a bone continent and 1.3:1 on
@@ -9421,13 +9428,26 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    a scroll. Four derived numbers are a set either way, and two rows of two
    is the same set read rather than clipped — which is what the phone rule
    already did at 44rem for exactly this reason. */
-.figrow { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--s5) var(--s4); margin-top: var(--s6); padding-top: var(--s5);
+/* FOUR ACROSS IN ONE ROW, WHICH IS THE REFERENCE'S OWN SETTING, and the
+   thing that makes it fit is that the LABEL is allowed to wrap. Two rows
+   of two was the answer while the labels were `nowrap` and DESTINATIONS
+   ran through JOURNEYS; the reference sets TRAVEL / REGIONS on two lines
+   under its own figure and reads as one row of four regardless. The
+   figures are a set and a single row is what says so. */
+.figrow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--s5); margin-top: var(--s6); padding-top: var(--s5);
   border-top: 1px solid var(--rule); }
 .figrow div b { display: block; font-family: var(--display); font-weight: 400;
   font-size: var(--t-2xl); line-height: 1; }
+/* .08em RATHER THAN .14, AND IT IS ARITHMETIC. Four tracks of a 471px
+   column are 108px each, and DESTINATIONS is eleven characters of
+   uppercase: at .14em it measures 104 and at .08 it measures 93. The
+   first repair was `overflow-wrap: break-word`, which fits by breaking
+   the word — DESTINATIO / NS — and a word cut in half is a rendering
+   fault this repository already has a check for. Tracking is the thing
+   that was chosen by eye, so tracking is the thing that moves. */
 .figrow div span { font-family: var(--text); font-size: var(--t-xs);
-  letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
+  letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
 
 /* ── the one window ──────────────────────────────────────────────── */
 /* A WINDOW IS NOT THE WHOLE WALL, AND MEASURING IT IS WHAT SAID SO. The

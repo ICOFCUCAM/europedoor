@@ -294,7 +294,21 @@ def measure():
                        "declares, and the two bare steps the first draft also "
                        "spent were folded in rather than counted — the second "
                        "of them a narrow-screen override restating what its own "
-                       "clamp already computes at that width."},
+                       "clamp already computes at that width.\n"
+                       "AND IT IS 23 FOR THE DOOR'S HEADLINE, WHICH IS A STEP "
+                       "OF THE SCALE RATHER THAN A SHARE OF THE VIEWPORT. "
+                       "Every other plate headline is clamp(--t-4xl, 7vw, "
+                       "--t-6xl), which is right for type that owns the page "
+                       "width; the door's sits in a fixed column beside the "
+                       "atlas, so at 1280 the 7vw term is 90px and \"Open the "
+                       "door\" measures 500 against 432 — the line broke after "
+                       "\"the\" and left \"door\" alone. A smaller clamp only "
+                       "moves the width at which that happens: 5.2vw fits at "
+                       "1280 and breaks again at 1600. A column that is a "
+                       "fixed measure needs type that is a fixed step, and "
+                       "--t-5xl is a rung the scale already has — an existing "
+                       "STEP declared in a new place, which is the argument "
+                       "the 24px entry above makes, not a twenty-third step."},
             "css.font_weights": {
                 "value": len(set(re.findall(r"font-weight:\s*([^;]+);", css))),
                 "kind": "ceiling", "why": "Four is enough for an editorial system."},
@@ -482,7 +496,8 @@ def measure():
                        "can reproduce — a licensed stock photograph is by "
                        "definition a thing anyone can also license. The trade "
                        "is stated rather than hidden, which is the whole job "
-                       "of a ceiling somebody has to raise in a diff."},
+                       "of a ceiling somebody has to raise in a diff."
+                       "  152 -> 148 WHEN THE HERO BECAME THE LIVING ATLAS. It reads as a saving and it is a swap: the ground beyond the continent, the non-atlas neighbours, the one country the 52°E cut runs through and both data-cut fades came off — about 25 KB — and forty-one clipped photographs went on for about 9. The pictures themselves are files a reader fetches rather than bytes in this document, and the clip is a `<use>` of the land path the drawing already carries rather than a second copy of 43 KB of country rings. What this ceiling cannot see is that the page now asks for 41 photographs at the 480 step, which is about 950 KB of images: the ladder's smallest rung is 480 and most of these countries render under 150px, so a sixth rung would halve it. Recorded rather than answered here, because a smaller step is a decision about every purpose on the site."},
             "weight.max_page_kb": {
                 "value": round(max(len(b) for b in bodies.values()) / 1024),
                 "kind": "ceiling",
