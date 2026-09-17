@@ -22,6 +22,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **/events — the year as an instrument, and the month that is busiest is the least characteristic** | **`docs/events-redesign.md`** — the source audit, the eight filters built and discarded on every build, the month-by-kind cross-tab nobody had run, the two of the brief's bands that are one band, and the threshold that called 2-of-4 a finding. 150 fixtures, and the library was never the constraint either |
 | **/plan — an instrument rather than a form, and the guard a runtime `<img>` walks straight past** | **`docs/plan-redesign.md`** — the source audit, the seven bands, the three of the brief's asks that collide with recorded findings, the twelve defects only rendering found (nine of them faults already recorded in another family and three of those recorded in the commit before), and the per-leg photograph: `render.credit_html` is one implementation because `checks.py` cannot see an `<img>` a script writes |
 | **/my-europe — a private atlas, and the save kind the app did not know** | **`docs/my-europe-redesign.md`** — the source audit, the six save kinds against the five the sort knew, why `Itinerary` looked dead and is not, the brief's three kinds of memory measured as six, the monumental opening refused by the instrument-head measurement, and the three defects only rendering found. Nothing about how this page stores anything changed |
+| **/interests — the useful tags are not the biggest, and the nine it had no picture of were the nine it recommends** | **`docs/interests-redesign.md`** — the source audit, eighteen photographs of which nine were spent, `INTEREST_BANDS` read as the three visual scales, the concentration measurement the ledger's own sentence was hiding, the two of the brief's asks that are refused, and the four defects only rendering found — one of them /stories' nested anchor, reproduced a commit after it was recorded |
 | **the eight page families, and what each room does differently** | **`docs/non-home-redesign.md`** — the non-home redesign answered A-J. The eight rooms derived from the route, the three helpers that were forcing one grammar, the seven image scales, 1,626 declared surfaces, and the defects only rendering found |
 | **the design language — what makes a page EuropeDoor with the logo removed, and which movements each family takes** | **`docs/design-language.md`** — the ARCHITECT step. Five marks that could not have been made by anybody else, the six-movement composition grammar per family, the three head roles, what the language forbids, and how a change is proved |
 | **anything at all — read this first, every session** | **`docs/instruction.md`** — the standing instruction. Part 1 is how work is done here (audit first, deviate with numbers, STOP on licensing, never invent data, prove every check can fail). Part 2 is the visual instruction: **European Future**, the two worlds, the palette, the 60/25/10/5 ratio and the measured contrast limits. `docs/palette.json` is the checkable form |
@@ -5475,6 +5476,91 @@ without anybody remembering to look.
 asked for the presentation layer and for the saved entries to stay real data
 rather than decorative mock rows, and a placeholder inside `#mine` is the one
 thing that would have made this page lie.
+
+
+**/interests HELD EIGHTEEN PHOTOGRAPHS AND DREW NINE, AND THE NINE IT DREW
+WERE THE WRONG NINE.** The register carries one for each of the seventeen
+tags and one for the index. The page spent a hero and a strip of the widest
+eight — so the nine it never drew were the NARROW end, which is the half this
+page exists to argue is the useful half. **The family had a picture of
+everything it says is too broad to filter by and none of what it
+recommends.** Fourth family running on *the pictures were already bought and
+were being spent on one strip*, and **nothing was acquired.** All eighteen are
+on it now, each exactly once.
+
+**AND THE THREE SCALES ARE `INTEREST_BANDS`, WHICH THIS FAMILY HAS PUBLISHED
+ON ALL SEVENTEEN OF ITS OWN PAGES SINCE THEY WERE WRITTEN.** At or above 40%
+of the Atlas a tag *barely narrows Europe*, between 15 and 40 it *narrows
+usefully*, below 15 it is *one of the narrowest here* — which is 2, 7 and 8,
+and therefore two at feature size, seven in a strip and eight with their own
+pictures. `ranking[:3]` would have been a layout deciding an argument, and
+would have stopped agreeing with the seventeen pages the day a tag crossed a
+floor. The brief asks for an explicit visual distinction between broad and
+narrow; this is that distinction read off a sentence the page already writes.
+
+**A SENTENCE OF ONE SHAPE MEANT 22% ON ONE ROW AND 73% ON ANOTHER.** *Greece,
+Italy and Spain carry the most of it* is 26% of History between them; *Norway,
+Switzerland and Germany carry the most of it* is **73%** of Slow travel by
+rail, and *France, Spain and Norway* is **22%** of Big cities. Identical
+shape, opposite content — the `8 PLACES` failure in prose rather than in a
+number. **Reach and concentration are different questions and the page ordered
+by one and printed neither**: Big cities is 74 destinations in 41 countries
+and Coast & beaches is 92 in 29, because a coast is a fact about geography.
+The share is on every row now, and it is the evidence under the brief's own
+closing claim — the eight narrow tags put a **median 51%** of themselves into
+three countries against **33%** for the nine above them. The median rather
+than the mean, because Festivals is three destinations in three countries and
+100% computed on three rows is a fact about the sample.
+
+**AND A SECOND MEASUREMENT WAS TAKEN AND DELIBERATELY NOT SHIPPED.** Asked as
+a share of each country's OWN destinations, **fifteen of seventeen** strongest
+countries change — Mountains reads Norway by count and Switzerland at 60% by
+share. It is not on the page because Türkiye is 5 of 5 for history, and a
+measure that reports 100% on five rows is the small-sample trap with a
+different sign. Recorded with its trigger rather than published.
+
+**THE REACH BAR AND THE INTERACTIVE MAP ARE BOTH REFUSED.** A bar would be the
+THIRD drawing of one number — the row prints the percentage and the seventeen
+glyphs are drawn to one frame precisely so reach is visible — and /journeys
+records what happens when a band draws one measurement twice on two grids. And
+*select an interest and the map becomes its geography* is a control on a page
+whose only `<script>` is the inert JSON-LD block: the chip that filters
+nothing, and `data-rotate` again. The seventeen ARE the interest atlas, drawn
+at once, which is the one thing seventeen separate pages cannot do.
+
+**AN `<a>` INSIDE AN `<a>` IS NOT NESTED — AND THIS COMMIT REPRODUCED
+/stories' DEFECT ONE COMMIT AFTER IT WAS WRITTEN DOWN.** `picture()` emits the
+Pexels credit as a `<figcaption class="credit">` inside the `<picture>` and
+that credit is two anchors, so a row that was an `<a>` wrapping one had its
+outer anchor CLOSED by the parser at the inner one — and Chromium's error
+recovery reopened it around each following run. **Eight rows measured as
+twenty-four in the browser and the band rendered 4,594 pixels tall**, while
+the emitted HTML contained exactly eight, so no count here could see it. The
+picture is a `<figure>`, the name is the link, and the licence's two links sit
+inside no anchor. 4,594 → 2,763. **And the dead declaration came straight
+behind it**: with the row a `<div>`, `.row { text-decoration: none }` sits on
+a box that is not a link and the UA underline lands on the name instead — 34px
+of display serif with a rule through it, which is `.picstory` exactly. *A rule
+recorded is not a rule inherited.*
+
+**A CROP-BOX MEASUREMENT TAKEN BEFORE LAYOUT SETTLES REPORTS A BOX THAT DOES
+NOT EXIST.** The first sweep read `.ibleed` at 0.314–2.333, guaranteeing 13.5%
+of a photograph's frame, and `.atlasopen` at 0.200–1.961 at 10.2%. Both are
+impossible — each container states an `aspect-ratio` — and two animation
+frames later they read **1.778–2.333** and **1.333–1.500**. That is *a sampler
+that reads outside its own image reports the canvas* in another costume, and
+what it costs is specific: it sends somebody to fix a layout that is right.
+
+**AND `countries-hero` DECLARED A CONTAINER ITS OWN PAGE HAD STOPPED
+EMITTING.** `.ed-opening-visual` is nowhere on /countries since it became a
+plate sequence; the hero renders in `.atlasopen`. `c_container_is_emitted`
+passed it because that selector IS emitted — on /events and /interests — and
+the browser sweep groups by selector and measures the union over its purposes'
+paths, so two live paths kept the group green and the third contributed
+nothing. **A selector that matches nothing on the page that declares it is
+invisible to a check that asks the question site-wide.** Both declarations
+follow their page now: countries 26% claimed against a measured **55%**,
+interests 26% → **47%**.
 
 
 ## Gates

@@ -4770,148 +4770,320 @@ def _macro_of(data, country_slug):
 
 
 def interests_index(data, ranking):
-    """Seventeen ways to travel, compared — a family that had no index at all.
+    """The Interest Atlas: seven plates, and the three scales are the page's
+    own published judgement rather than a styling choice.
 
-    SEVENTEEN PAGES SHIPPED AND `/interests/` WAS A SERVER AUTOINDEX. Nothing
-    linked to it, which is exactly why no check caught it: the link checker
-    validates links that exist, and a missing index is an absence. A reader
-    who trimmed a URL, or who followed a search result to the directory, got
-    Apache's own file listing with the site's masthead nowhere on it.
+    THE PAGE WAS AN OPENING, A STRIP OF EIGHT AND A LEDGER. 93,206 bytes and
+    nine photographs of the eighteen the register holds for this family —
+    every one of the seventeen tags has one, and so does the index. That is
+    the /experiences finding for the fourth family running: *the pictures
+    were already bought and were being spent on one strip.* Nothing is
+    acquired here. All eighteen are on the page now, each exactly once.
 
-    And the absence cost something real. Every interest page draws its own
-    tag — every destination carrying it, on the shared silhouette — and the
-    reason written into that page is "so the seventeen can be compared". They
-    could not be. A reader could see Mountains, then navigate away and see
-    Islands, and hold two pictures in their head.
+    AND THE ALLOCATION IS `INTEREST_BANDS`, WHICH THIS FAMILY ALREADY
+    PUBLISHES. Every interest page prints one of three judgements about its
+    own tag — at or above 40% of the Atlas it *barely narrows Europe*,
+    between 15 and 40 it *narrows Europe usefully*, below 15 it is *one of
+    the narrowest tags in this atlas*. Those three sentences are the three
+    visual scales: two at feature size, seven in a strip, eight with their
+    own pictures at the narrow end. The brief asks for an explicit visual
+    distinction between broad and narrow interests and this is that
+    distinction derived from the sentence the family already writes, rather
+    than a threshold picked to make a layout work.
 
-    So the index is the comparison, and it is the one thing seventeen
-    separate pages cannot do. THE SHAPES ARE THE ARGUMENT: History is 200
-    destinations in 47 countries and covers almost the whole continent;
-    Festivals is three places in three countries. You see the difference
-    before you read a number, which is the /themes finding one family over,
-    and the silhouette is emitted ONCE with every row a <use> of it.
+    THE BRIEF'S REACH BAR IS REFUSED, AND SO IS ITS INTERACTIVE MAP.
 
-    ORDERED BY REACH, NOT ALPHABETICALLY. The ranking already exists — the
-    interest pages take it to print "the eighth widest of 17 tags" — and it
-    is the only order that makes the page an argument rather than a list.
-    Every row carries the judgement the individual page makes about its own
-    tag, from the same INTEREST_BANDS table, so the index cannot say
-    something the page it links to would not.
+    A bar would be the THIRD drawing of one number: the row already prints
+    the percentage, and the seventeen glyphs are drawn to one frame for
+    exactly this reason — *a knot is an argument about one corner of Europe,
+    a scatter is one about the whole of it* — so reach is the one thing this
+    page has never needed a second representation of. /journeys records what
+    happens when a band draws the same measurement twice on two grids.
+
+    And *select an interest and the map becomes its geography* is a control.
+    This page loads no JavaScript at all, so a selector here would be the
+    chip that filters nothing and the `data-rotate` copy nobody ever read.
+    The seventeen ARE the interest atlas, drawn at once, which is the one
+    thing seventeen separate pages cannot do and is why the ledger band
+    carries both names.
+
+    WHAT THE LEDGER WAS MISSING IS THE SECOND AXIS, AND THE SENTENCE IT
+    ALREADY PRINTED HID IT. *Greece, Italy and Spain carry the most of it*
+    is 26% of History between them and *Norway, Switzerland and Germany
+    carry the most of it* is 73% of Slow rail — two sentences of identical
+    shape, one of which is barely a fact and one of which is the whole tag.
+    That is the `8 PLACES` failure, in prose instead of a number. The share
+    is printed now, so a row says something different from the row above it.
+
+    And the share is the evidence under the brief's own closing argument:
+    the eight narrow tags put a median 51% of themselves into three
+    countries against 33% for the nine broad ones. A narrow filter does not
+    only shorten the list, it points at a corner of the continent — which is
+    what *a small filter can open a large door* means, measured.
     """
+    images = data.get("images")
     idx = data["cities"]
     total = len(idx)
     silhouette = constel_defs()
     by_slug = {i["slug"]: i for i in data["taxonomy"]["interests"]}
-    rows = []
-    drawn = []
+
+    # ONE PASS OVER THE ATLAS, AND EVERY FIGURE ON THIS PAGE COMES OUT OF
+    # IT. A second walk for the narrow band would be a second chance for the
+    # two halves of one page to disagree about what Festivals is.
+    facts = {}
     for slug in ranking:
-        i = by_slug[slug]
         cities = [c for c in idx.values() if slug in c["city"]["interests"]]
-        ncountry = len({c["country"]["slug"] for c in cities})
-        pct = round(100.0 * len(cities) / total) if total else 0
-        # THE JUDGEMENT SENTENCE WAS A CONSTANT ON FIVE ROWS AT A TIME.
-        # The first version printed INTEREST_BANDS here, which is three
-        # sentences for seventeen tags — so History and Food carried the
-        # same words, and so did Architecture and Wild nature, four rows
-        # apart. That is the /themes failure exactly, reproduced by the
-        # commit that was written to avoid it: "8 PLACES" was on all
-        # thirteen cards because every theme holds eight, and a sentence
-        # that is true of five rows is not telling a reader which row they
-        # are reading. The band belongs on the tag's OWN page, where it is
-        # a judgement about one thing and there is nothing to compare it to.
-        #
-        # What differs, and is the thing somebody scanning actually wants,
-        # is WHERE. The three countries carrying the most of each tag are
-        # different for almost every one of the seventeen — Mountains is
-        # Switzerland, Austria, France and Islands is Greece, Croatia,
-        # Italy — and it is derived, so it cannot drift from the set.
         tally = {}
         for c in cities:
             tally[c["country"]["name"]] = tally.get(c["country"]["name"], 0) + 1
-        lead = [nm for nm, _ in sorted(tally.items(), key=lambda kv: (-kv[1], kv[0]))[:3]]
-        where = (and_list(lead) + (" carry the most of it" if len(lead) > 1
-                                   else " carries all of it")
-                 if lead else "Nothing carries it yet.")
-        pts = [project(c["city"]["lat"], c["city"]["lon"]) for c in cities]
-        drawn.extend(pts)
+        top = sorted(tally.items(), key=lambda kv: (-kv[1], kv[0]))[:3]
+        facts[slug] = {
+            "name": by_slug[slug]["name"],
+            "cities": cities,
+            "n": len(cities),
+            "ncountry": len(tally),
+            "pct": round(100.0 * len(cities) / total) if total else 0,
+            "lead": [nm for nm, _ in top],
+            # The share of the tag its three strongest countries hold. Never
+            # a share of the ATLAS: that is the reach figure beside it, and
+            # two percentages in one line that mean different things is how
+            # a reader stops reading either.
+            "top3": (round(100.0 * sum(v for _, v in top) / len(cities))
+                     if cities else 0),
+            "pts": [project(c["city"]["lat"], c["city"]["lon"]) for c in cities],
+        }
+
+    # THE THREE BANDS ARE READ OFF `INTEREST_BANDS` RATHER THAN SLICED BY
+    # POSITION. `ranking[:3]` would be a layout deciding an argument, and it
+    # would silently stop agreeing with the seventeen pages the day a tag
+    # crosses 40%. The floors are the table's own.
+    def _band(pct):
+        for k, (floor, _) in enumerate(INTEREST_BANDS):
+            if pct >= floor:
+                return k
+        return len(INTEREST_BANDS) - 1
+
+    wide = [s for s in ranking if _band(facts[s]["pct"]) == 0]
+    mid = [s for s in ranking if _band(facts[s]["pct"]) == 1]
+    narrow = [s for s in ranking if _band(facts[s]["pct"]) == 2]
+
+    drawn = []
+    rows = []
+    for slug in ranking:
+        f = facts[slug]
+        drawn.extend(f["pts"])
         # THE MARK SIZE HAS TO FOLLOW THE COUNT. `.constel-theme` was sized
         # for a theme's EIGHT stops; two hundred dots at that radius is a
-        # solid blue mass with the coastline lost under it, which says "a
-        # lot" and nothing else — and the whole argument of this page is
-        # that you can see the difference between the shapes.
-        dense = " constel-dense" if len(pts) > 60 else ""
-        glyph = constellation(pts, extra=" constel-theme" + dense)
-        # THE SHAPE COMES FIRST, AND THE THREE COUNTS ARE ONE LINE. A gap
-        # AFTER the last element is a margin; a gap BETWEEN two of them is a
-        # hole, and this row had 571 pixels of hole. With the drawing on the
-        # left and one text block beside it, the only empty space left is the
-        # ragged right edge of a short line, which is what a ragged right
-        # edge is. The destination count was a third column standing alone at
-        # the far edge and is a count like the other two, so it joins them.
+        # solid mass with the coastline lost under it, which says "a lot"
+        # and nothing else — and the whole argument of this band is that you
+        # can see the difference between the shapes.
+        dense = " constel-dense" if len(f["pts"]) > 60 else ""
+        glyph = constellation(f["pts"], extra=" constel-theme" + dense)
+        where = (f'{and_list(f["lead"])} hold {f["top3"]}% of it'
+                 if len(f["lead"]) > 1 else
+                 (f'{f["lead"][0]} holds all of it' if f["lead"]
+                  else "Nothing carries it yet."))
         rows.append(
             f'<a class="row themerow interestrow" href="{urls.interest(slug)}">'
             f'<div class="rowart">{glyph}</div>'
-            f'<div><p class="kicker">{n_of(len(cities), "destination")} · '
-            f'{pct}% of the Atlas · {n_of(ncountry, "country")}</p>'
-            f'<h2>{esc(i["name"])}</h2>'
+            f'<div><p class="kicker">{n_of(f["n"], "destination")} &middot; '
+            f'{f["pct"]}% of the Atlas &middot; {n_of(f["ncountry"], "country")}</p>'
+            f'<h3>{esc(f["name"])}</h3>'
             f'<p class="rowsub">{esc(where)}</p></div></a>')
-    # THE SEVENTEEN GLYPHS ARE A GEOGRAPHY AND THIS FAMILY'S SUBJECT IS NOT.
+
+    def _median(xs):
+        xs = sorted(xs)
+        if not xs:
+            return 0
+        h = len(xs) // 2
+        return xs[h] if len(xs) % 2 else round((xs[h - 1] + xs[h]) / 2)
+
+    midconc = _median([facts[s]["top3"] for s in wide + mid])
+    narrowconc = _median([facts[s]["top3"] for s in narrow])
+
+    # ── 01 · INTERESTS ───────────────────────────────────────────────
+    hero = photo(images, "interests-hero", w=2400, h=1200, eager=True,
+                 sizes="100vw",
+                 alt="A European street seen down its own length.")
+    iopen = f"""
+  <div class="iopen">
+    <h1 class="mega">{numword(len(ranking), cap=True)} ways to cross a
+    <em class="lit">continent</em>.</h1>
+    <p class="lede">Not a list of everything Europe has. {numword(len(ranking),
+    cap=True)} tags that each narrow {total:,} destinations to a set worth
+    reading &mdash; and the useful ones are not the biggest. History covers
+    almost the whole Atlas and tells you very little; the narrow ones are
+    where a filter earns its place.</p>
+  </div>
+  <figure class="ibleed">{hero or ed_slot("interests-hero", shape="wide",
+      label="What you are travelling for")}</figure>"""
+
+    # ── 02 · THE QUESTION ────────────────────────────────────────────
+    # A STATEMENT BAND SAYS ONE THING AND DOES NOT EXPLAIN THE PAGE BACK.
+    # The opening has already said what the seventeen are; this says why
+    # they exist at all, which is the only thing left to say before the
+    # reader meets them.
+    firstact = """
+  <div class="sheettext">
+    <h2 class="mega">Interest is the first act of discovery.</h2>
+    <p class="lede">A tag here is an instrument rather than a label. Each one
+    changes the geographic field: the destinations carrying it become the
+    shape of your Europe, and two of them together become a much smaller and
+    much more particular one.</p>
+  </div>"""
+
+    # ── 03 · THE WIDE END ────────────────────────────────────────────
+    # THE FEATURE SCALE IS THE ONE THE SEVEN IMAGE SCALES ALREADY HOLD —
+    # 1.35 against .65, because two equal columns read as a layout and an
+    # unequal pair reads as a picture with something to say. No new
+    # component, and the alternation is what stops two features reading as
+    # a pattern.
+    def _say(slug):
+        f = facts[slug]
+        return (f'<p class="kicker">{n_of(f["n"], "destination")} &middot; '
+                f'{f["pct"]}% of the Atlas &middot; '
+                f'{n_of(f["ncountry"], "country")}</p>'
+                f'<p class="rowsub">{esc(and_list(f["lead"]))} hold '
+                f'{f["top3"]}% of it.</p>'
+                f'<p>{esc(INTEREST_BANDS[0][1])}</p>'
+                f'{golink(urls.interest(slug), "Open " + f["name"].lower())}')
+
+    feats = "".join(
+        ed_feature(images, f"interest:{s}", title=facts[s]["name"],
+                   body=_say(s), alt=facts[s]["name"], right=bool(k % 2),
+                   level=3)
+        for k, s in enumerate(wide))
+    midstrip = ed_strip(images, [
+        {"key": f"interest:{s}", "alt": facts[s]["name"],
+         "label": facts[s]["name"], "href": urls.interest(s),
+         "note": f'{facts[s]["n"]} destinations · {facts[s]["pct"]}%'}
+        for s in mid], limit=len(mid))
+    lenses = f"""
+  <div class="sheettext">
+    <h2 class="mega">The wide end.</h2>
+    <p class="lede">{numword(len(wide), cap=True)} tags sit above
+    {INTEREST_BANDS[0][0]}% of the Atlas, and this family's own judgement of
+    them is that as a filter each barely narrows Europe. They are worth
+    seeing rather than worth filtering by &mdash; which is why they are the
+    pictures here and the narrow ones are the list at the end.</p>
+  </div>
+  {feats}
+  <p class="small">Below them, {numword(len(mid))} more between
+  {INTEREST_BANDS[1][0]} and {INTEREST_BANDS[0][0]}% of the Atlas: the band
+  where, in this family's own words, a tag narrows Europe usefully without
+  emptying it.</p>
+  {midstrip}"""
+
+    # ── 04 · THE INTEREST ATLAS ──────────────────────────────────────
+    ledger = f"""
+  <div class="pagehead index">
+    <p class="kicker">The interest atlas</p>
+    <h2 class="mega">Every question makes a different Europe.</h2>
+    {head_extent([(len(ranking), "ways to travel"),
+                  (total, "destinations"),
+                  (len({c["country"]["slug"] for c in idx.values()}), "countries")])}
+  </div>
+  {silhouette}
+  <div class="rows">{"".join(rows)}</div>
+  <p class="small">Each shape is that tag&rsquo;s own destinations on the
+  continent, drawn to the same frame so the {numword(len(ranking))} can be
+  compared: a knot is an argument about one corner of Europe, a scatter is one
+  about the whole of it. The order is reach &mdash; how much of the Atlas each
+  tag carries &mdash; rather than alphabetical, and the sentence under each
+  name is the share its three strongest countries hold, which is a different
+  question from reach and disagrees with it more often than not.
+  {geo.sources_line(geo.load("europe-lod0.json"))}{offframe_line(drawn, data, listed=False)}
+  Two of them can be combined in <a href="/discover">Discover Mode</a>, which
+  is where a narrow tag does its real work.</p>"""
+
+    # ── 05 · THE NARROW END ──────────────────────────────────────────
+    # AND THIS IS WHERE THE REST OF THE LIBRARY GOES. Eight tags, eight
+    # photographs, none of which had ever been on this page: the strip took
+    # the widest eight and the narrow end of the family — the half the page
+    # argues is the useful half — was the half with no picture at all.
+    # A ROW IS NOT AN `<a>` WHEN IT HOLDS A PHOTOGRAPH, AND THIS COMMIT
+    # REPRODUCED /stories' OWN DEFECT BEFORE IT WAS CAUGHT. `picture()`
+    # emits the Pexels credit as a `<figcaption class="credit">` INSIDE
+    # the `<picture>`, and that credit is two anchors — so wrapping the
+    # whole row in one made an `<a>` inside an `<a>`, which the HTML parser
+    # is specified to resolve by CLOSING the outer one. Chromium's
+    # error recovery then reopens it around each following run, so eight
+    # rows measured as TWENTY-FOUR in the browser and the band rendered
+    # 4,594 pixels tall. Nothing in the markup looks wrong and no count
+    # sees it: the emitted HTML contains exactly eight.
     #
-    # A tag answers what you are travelling FOR, and the page answered it in
-    # seventeen drawings of the same continent with a different number of
-    # marks on it — which is the index-opening finding exactly, arriving
-    # seventeen times down one page instead of once across six pages. The
-    # shapes stay, because reach IS the argument this index makes and no
-    # single tag page can make it. What was missing is the other half: what
-    # any of it LOOKS like.
-    #
-    # The strip is the tag's own photograph, the same `interest:` purpose the
-    # seventeen pages already declare, so nothing new is invented and the
-    # slots that are empty say which photograph they are waiting for. Eight
-    # of the seventeen, in the page's own order, which is reach — the strip
-    # scrolls, and a strip of seventeen is a grid that has been rotated.
-    _istrip = ed_strip(data.get("images"), [
-        {"key": f"interest:{slug}", "alt": by_slug[slug]["name"],
-         "label": by_slug[slug]["name"], "href": urls.interest(slug)}
-        for slug in ranking], limit=8)
+    # So the picture is a figure, the NAME is the link, and the two links
+    # the licence requires sit in a credit that is inside no anchor at all.
+    # Found by rendering, in the commit after the one that wrote the rule
+    # down — *a rule recorded is not a rule inherited*.
+    narrowcards = "".join(
+        f'<div class="row narrowrow">'
+        f'<figure class="narrowshot">{picture(images, "interest:" + s, w=900, h=700, alt=facts[s]["name"], sizes="(max-width: 52rem) 90vw, 22rem") if held(images, "interest:" + s) else ed_slot("interest:" + s, shape="square", label=facts[s]["name"])}</figure>'
+        f'<div><p class="kicker">{n_of(facts[s]["n"], "destination")} &middot; '
+        f'{facts[s]["pct"]}% of the Atlas</p>'
+        f'<h3><a href="{urls.interest(s)}">{esc(facts[s]["name"])}</a></h3>'
+        f'<p class="rowsub">{esc(and_list(facts[s]["lead"]))} hold '
+        f'{facts[s]["top3"]}% of it.</p></div></div>'
+        for s in narrow)
+    narrowband = f"""
+  <div class="sheettext">
+    <h2 class="mega">The narrow end.</h2>
+    <p class="lede">{numword(len(narrow), cap=True)} tags under
+    {INTEREST_BANDS[1][0]}% of the Atlas. A short list is a gap in the
+    writing as much as it is a fact about Europe &mdash; and it is also the
+    only end of this family where choosing one changes where you would go.</p>
+  </div>
+  <div class="rows narrowgrid">{narrowcards}</div>"""
+
+    # ── 06 · A SMALL FILTER ──────────────────────────────────────────
+    # THE STATEMENT CARRIES ITS OWN EVIDENCE, because a claim about filters
+    # made on a page that publishes the numbers is checkable in the line
+    # under it. Festivals is excluded from neither figure and named in both
+    # directions: three destinations in three countries is 100% in its top
+    # three by arithmetic, which is the small-sample trap /events already
+    # recorded — a median rather than a mean is what stops one row of three
+    # deciding a sentence about eight.
+    smallfilter = f"""
+  <div class="sheettext">
+    <h2 class="mega">A small filter can open a large door.</h2>
+    <p class="lede">History covers {facts[ranking[0]]["pct"]}% of the Atlas
+    and therefore tells you almost nothing about where to go next. The narrow
+    tags do the opposite, and it is measurable: the {numword(len(narrow))} of
+    them put a median {narrowconc}% of themselves into three countries,
+    against {midconc}% for the {numword(len(wide) + len(mid))} above them. A
+    narrow filter does not only shorten the list &mdash; it points at a corner
+    of the continent.</p>
+    <p class="note">The median rather than the average, because Festivals is
+    {facts["festivals"]["n"] if "festivals" in facts else 3} destinations in
+    as many countries and any share computed on three rows is a fact about
+    the sample. Every figure on this page is counted on the build.</p>
+  </div>"""
+
+    # ── 07 · OPEN A DOOR ─────────────────────────────────────────────
+    istart = """
+  <div class="istart">
+    <h2 class="mega">Start with what you care about.</h2>
+    <p class="lede">Choose an interest and see where it lives. Follow it into
+    a destination, a story, an experience or a journey &mdash; or put two of
+    them together and watch most of Europe fall away.</p>
+    <p class="keepgo"><a class="btn" href="/discover">Combine two interests</a>
+    <a class="storygo" href="/countries">Or open the atlas &rarr;</a></p>
+  </div>"""
+
+    PLATES = [("iopen gal", "Ways to travel", iopen, "ways-to-travel"),
+              ("firstact pine", "The question", firstact, "the-question"),
+              ("lenses gal", "The wide end", lenses, "wide"),
+              ("reach paper", "The interest atlas", ledger, "reach"),
+              ("narrow gal quiet", "The narrow end", narrowband, "narrow"),
+              ("smallfilter gal", "A small filter", smallfilter, "small-filter"),
+              ("istart pine", "Start here", istart, "start")]
     body = f"""
 {crumbs([("Europe", "/discover"), ("Ways to travel", None)])}
-{ed_opening(
-    eyebrow="What you are travelling for",
-    title="Seventeen ways to cross a continent.",
-    intro=f"Not a list of everything Europe has. {numword(len(ranking), cap=True)} tags "
-          f"that each narrow {numword(total)} destinations to a set worth reading — and the "
-          f"useful ones are not the biggest. History covers almost the whole Atlas and "
-          f"tells you very little; the narrow ones are where a filter earns its place.",
-    visual=photo(data.get("images"), "interests-hero", w=2000, h=1200,
-                 sizes="(min-width: 52rem) 58vw, 100vw")
-           or ed_slot("interests-hero", shape="square",
-                      label="What you are travelling for"),
-    family="discovery")}
-{(f'<section class="ed-section">'
-  + ed_section_head("The seventeen",
-                    "What each one is a picture of",
-                    "The widest eight, in the order this page argues them.")
-  + _istrip + "</section>") if _istrip else ""}
-<section class="ed-section">
-{ed_section_head("Reach",
-                 "How much of the Atlas each one carries",
-                 "Every destination with the tag, drawn on one frame.")}
-{silhouette}
-<div class="rows">{"".join(rows)}</div>
-<p class="small">Each shape is that tag\u2019s own destinations on the continent, drawn
-to the same frame so the {numword(len(ranking))} can be compared: a knot is an argument
-about one corner of Europe, a scatter is one about the whole of it.
-{geo.sources_line(geo.load("europe-lod0.json"))}{offframe_line(drawn, data, listed=False)}
-The order is reach \u2014 how much of the Atlas each tag carries \u2014 rather than
-alphabetical, and the sentence under each name is the same judgement its own page
-makes. Two of them can be combined in
-<a href="/discover">Discover Mode</a>, which is where a narrow tag does its real work.</p>
-</section>
+{plate_sequence(PLATES)}
 """
     return "/interests/index.html", page(
         "Ways to travel", body, path="/interests", area="countries",
-        accent="natural",
+        accent="natural", hero=True,
         description="Seventeen ways into Europe — history, food, mountains, islands, "
                     "sacred places, rail — each one drawn as the destinations that carry it.",
     )

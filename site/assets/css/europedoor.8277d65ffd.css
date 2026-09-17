@@ -11694,3 +11694,97 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
   .azindex { columns: 2; }
   .atlasopen { aspect-ratio: 3 / 2; }
 }
+
+/* ═══ /interests — THE INTEREST ATLAS ═════════════════════════════════
+   Seven plates. The three visual scales are `INTEREST_BANDS`, which this
+   family has published on all seventeen of its own pages since they were
+   written: at or above 40% of the Atlas a tag barely narrows Europe,
+   between 15 and 40 it narrows usefully, below 15 it is one of the
+   narrowest here. So the widest two are the FEATURE scale, the middle
+   seven are a STRIP and the eight narrow ones carry their own pictures —
+   an explicit visual distinction between broad and narrow that is read off
+   a sentence rather than picked to make a layout work.
+
+   THREE OF THESE PLATES STATE THEIR OWN `display`, AND THAT IS THE THIRD
+   COMMIT RUNNING TO NEED IT. `.sheet` is `grid-template-columns: minmax(0,
+   40%) minmax(0, 1fr)` and only `.sheet-gal` ends `display: block`, so a
+   `paper` or `pine` composition that is one child of a sheet lands in the
+   40% track: /stories' feature band shipped at 205 x 154 of photograph at
+   1280 and /events' year chart fell from 1,152 pixels to 619. */
+.sheet-iopen { display: block; padding-block: 7vh 0; }
+.sheet-firstact, .sheet-reach, .sheet-istart { display: block; }
+.sheet-firstact { padding-block: 12vh; }
+.sheet-lenses { display: block; padding-block: 10vh; }
+.sheet-reach { padding-block: 10vh; }
+.sheet-narrow, .sheet-smallfilter { display: block; padding-block: 10vh; }
+.sheet-istart { padding-block: 13vh; }
+
+/* ── 01 the opening ──────────────────────────────────────────────── */
+.iopen { display: grid; gap: var(--s5); justify-items: start;
+         max-width: 44rem; }
+.iopen h1.mega { margin: 0; }
+/* THE LIT WORD TAKES THE FAMILY'S OWN ACCENT AND NOT A NEW ONE.
+   `area-countries` is what this page declares, so `--door` is already the
+   colour this family reads in, in both worlds — naming a hex here is the
+   second implementation that measured 1.74:1 on graphite the last time it
+   was done. */
+.iopen .lit { font-style: normal; color: var(--door); }
+.iopen .lede { max-width: 38rem; }
+/* A HERO THAT LEAVES THE COLUMN IS A CHANGE OF MOVEMENT RATHER THAN A
+   SECOND ILLUSTRATION, which is the bleed's whole argument in the seven
+   image scales. 21:9 on a desk and 16:9 on a phone, exactly as /stories'
+   own bleed is sized, because a 21:9 crop of a street at 390 is a letterbox
+   with nothing in it. */
+.ibleed { margin: var(--s7) calc(-1 * var(--page-gutter)) 0;
+          aspect-ratio: 21 / 9; overflow: hidden; position: relative;
+          background: var(--paper-3); }
+.ibleed :is(picture, img) { display: block; width: 100%; height: 100%;
+                            object-fit: cover; }
+
+/* ── 03 the wide end ─────────────────────────────────────────────── */
+.sheet-lenses .ed-feature { margin-top: var(--s7); }
+.sheet-lenses .ed-feature-say .kicker { color: var(--door); }
+.sheet-lenses .small { margin-top: var(--s7); max-width: 42rem; }
+
+/* ── 05 the narrow end ───────────────────────────────────────────── */
+/* A ROW WITH A PICTURE IN IT, NOT A CARD. Border, fill, radius and shadow
+   each say "separate object, placed here by a system", and this is the
+   argument the page has been making for four bands: these eight are the
+   useful end of the family. The picture is the row's first cell and the
+   rule under it is the page's own hairline.
+
+   TWO ACROSS RATHER THAN FOUR, because the whole point of the band is that
+   you can see what a narrow interest LOOKS like — eight tiles across a
+   1,152px column is the contact strip this stylesheet has already rejected
+   once, at 90 pixels a picture. */
+.narrowgrid { margin-top: var(--s7); display: grid; gap: var(--s6) var(--s7);
+              grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.narrowgrid .row.narrowrow { display: grid; gap: var(--s4);
+                             grid-template-columns: minmax(0, 1fr);
+                             align-content: start; padding: 0 0 var(--s5);
+                             border-bottom: 1px solid var(--rule); }
+.narrowshot { aspect-ratio: 4 / 3; overflow: hidden; background: var(--paper-3); }
+.narrowshot :is(picture, img) { display: block; width: 100%; height: 100%;
+                                object-fit: cover; }
+.narrowrow h3 { margin: 0; font-size: var(--ed-display-3); }
+/* THE DECORATION BELONGS ON THE THING THAT IS DECORATED. `.row` sets
+   `text-decoration: none` on ITSELF, which was right while every row on
+   this site was the anchor; here the row is a `<div>` — because a row
+   wrapping a photograph's own licence credit is an `<a>` inside an `<a>`,
+   and the parser closes the outer one — so the UA underline applies to the
+   name instead, 34px of display serif with a rule through it. That is the
+   `.picstory` defect on /stories, which shipped underlined for a commit. */
+.narrowrow h3 a { text-decoration: none; }
+.narrowrow h3 a:hover, .narrowrow h3 a:focus-visible { text-decoration: underline; }
+.narrowrow .kicker { color: var(--door); }
+
+/* ── 07 the door ─────────────────────────────────────────────────── */
+.istart { display: grid; gap: var(--s5); justify-items: start;
+          max-width: 46rem; }
+.istart h2.mega { margin: 0; }
+.istart .lede { max-width: 38rem; }
+
+@media (max-width: 52rem) {
+  .narrowgrid { grid-template-columns: minmax(0, 1fr); }
+  .ibleed { aspect-ratio: 16 / 9; }
+}

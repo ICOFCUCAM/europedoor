@@ -128,16 +128,16 @@
       "max_aspect": 2.1,
       "note": "One country seen whole from the ground: a valley, a coast or a plain with enough of it in frame that the eye reads a country rather than a spot. Never an aerial, never a flag, never a monument, and never a composite of several places — the page's argument is that Europe is fifty separate countries, and a picture that could be anywhere argues the opposite. The drawing it replaces is the fifty drawn as fifty, so a photograph has to be at least as specific as that. These open the indexes on the menu bar and are seen in sequence by anyone walking it, so a set that reads as one stock search fails even when each passes alone. A count typed here is the count that was true before the next index got an opening.",
       "container": {
-        "selector": ".ed-opening-visual",
-        "min_aspect": 0.692,
-        "min_at": "320x640",
-        "max_aspect": 1.643,
-        "max_at": "980x640"
+        "selector": ".atlasopen",
+        "min_aspect": 1.333,
+        "min_at": "768x640",
+        "max_aspect": 1.5,
+        "max_at": "360x640"
       },
       "safe_area": {
-        "width": 0.33,
-        "height": 0.791,
-        "frame": 0.261
+        "width": 0.635,
+        "height": 0.867,
+        "frame": 0.55
       }
     },
     "interests-hero": {
@@ -151,16 +151,16 @@
       "max_aspect": 2.1,
       "note": "Somebody travelling FOR something: walking, eating, listening, swimming. A person or their hands in the frame, because the seventeen tags on this page are reasons rather than places. Never an empty landscape, which is what every other index here already opens on.",
       "container": {
-        "selector": ".ed-opening-visual",
-        "min_aspect": 0.692,
+        "selector": ".ibleed",
+        "min_aspect": 1.778,
         "min_at": "320x640",
-        "max_aspect": 1.643,
-        "max_at": "980x640"
+        "max_aspect": 2.333,
+        "max_at": "1024x640"
       },
       "safe_area": {
-        "width": 0.33,
-        "height": 0.791,
-        "frame": 0.261
+        "width": 0.847,
+        "height": 0.557,
+        "frame": 0.472
       }
     }
   },
