@@ -24,6 +24,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **/plan — an instrument rather than a form, and the guard a runtime `<img>` walks straight past** | **`docs/plan-redesign.md`** — the source audit, the seven bands, the three of the brief's asks that collide with recorded findings, the twelve defects only rendering found (nine of them faults already recorded in another family and three of those recorded in the commit before), and the per-leg photograph: `render.credit_html` is one implementation because `checks.py` cannot see an `<img>` a script writes |
 | **/my-europe — a private atlas, and the save kind the app did not know** | **`docs/my-europe-redesign.md`** — the source audit, the six save kinds against the five the sort knew, why `Itinerary` looked dead and is not, the brief's three kinds of memory measured as six, the monumental opening refused by the instrument-head measurement, and the three defects only rendering found. Nothing about how this page stores anything changed |
 | **/interests — the useful tags are not the biggest, and the nine it had no picture of were the nine it recommends** | **`docs/interests-redesign.md`** — the source audit, eighteen photographs of which nine were spent, `INTEREST_BANDS` read as the three visual scales, the concentration measurement the ledger's own sentence was hiding, the two of the brief's asks that are refused, and the four defects only rendering found — one of them /stories' nested anchor, reproduced a commit after it was recorded |
+| **/map — the instrument, and everything that made it one was behind a closed disclosure** | **`docs/map-redesign.md`** — the fault that is the opposite of every other page's: monotony does not list /map at all, and all seventeen interest filters, the four layers, the journey overlay, the distance origin, the legend and the 50-country 319-destination twin were inside two closed `<details>`. Five plates, all 22 map.js hooks asserted intact, and the key that said a destination is pine while the drawing drew it cobalt |
 | **/themes — a thematic geography, and the page drew none of the thirteen shapes its own sentence described** | **`docs/themes-redesign.md`** — the first page redesigned under the doctrine and the page that caused it. The `head_figure` contract one of its three callers never honoured, the `c_same_frame` gap that made *says and draws nothing* invisible, the three band scales derived from how many of the nine corners a theme crosses, the four defects only rendering found — including the `object-fit: cover` that was refused on licence grounds — and 37% of the page as one repeated component becoming 18% |
 | **/europe-in — the computed atlas, and the printed query was narrower than the query that ran** | **`docs/europe-in-redesign.md`** — the source audit, the 537 tag applications a region tag adds, the two live pages that publish two numbers for one word, the overlap measured at 0 of 66 pairs sharing half, the two of the brief's asks that are refused, and the five defects only rendering found. Zero photographs became eleven and a motion may still not have one of its own |
 | **/beyond-the-obvious — the counter-atlas, and the corner with the most quiet places is not the quietest corner** | **`docs/beyond-redesign.md`** — the source audit, the count that argues the wrong way against the share that argues the right one, the rule's three promises measured against the built site (two kept, one not built anywhere), the seven plates, and the two defects only rendering found — plus the correction of a finding this file published three commits ago |
@@ -5839,6 +5840,76 @@ plate was 1,152 × 899**, because the frame is 1000×780 and a full column is
 899 pixels tall; it cannot be cropped to a letterbox, since an SVG with no
 `preserveAspectRatio` letterboxes inside a wider box rather than filling it,
 which is the `.card-art` finding from the other side.
+
+
+**/map's FAULT WAS THE OPPOSITE OF EVERY OTHER PAGE'S: `tools/monotony.js`
+DOES NOT LIST IT AT ALL, BECAUSE EVERYTHING THAT MADE IT AN INSTRUMENT WAS
+BEHIND A CLOSED DISCLOSURE.** `<details class="maptools">` held the legend,
+how to read the drawing, the four geography layers, **all seventeen interest
+filters**, the journey overlay, the distance origin and the live count; a
+second `<details>` held the text twin, which is the most complete index on
+this site — fifty countries and all 319 destinations with coordinates,
+grouped by macro region, the map's own `aria-describedby` target and the
+control WCAG 2.5.8 requires for the twenty countries that draw between 3.6
+and 12 pixels wide. A reader met a map they could only click, under a
+four-word lede, with one `<h2>` on the whole page. Both are bands now.
+
+**AND THE CONSTRAINT THAT PUT THEM IN A DISCLOSURE IS INHERITED RATHER THAN
+GUESSED.** The browser suite's own comment records why: *the first layout put
+thirteen interest filters and two selects between the headline and the
+drawing and a 1280×1000 laptop opened the page called "the map" with no map
+on it.* So the controls are BELOW the drawing, measured — the map starts at
+y=526 at 1280 and the controls at y=1528 — and the suite asserts that
+ordering instead of opening a disclosure, which is the eleventh assertion
+here to stop pinning a shape. All twenty-two ids `map.js` binds to are
+asserted present on the built page, because a recomposition that breaks the
+application is not a redesign.
+
+**A KEY THAT NAMES THE WRONG COLOUR IS WORSE THAN NO KEY, AND TAKING IT OUT
+OF THE DISCLOSURE IS WHAT PROVED IT.** `.legend .sw.dest` is `var(--sea)`
+and the map paints its dots `var(--sea)` too — the same token and two
+different colours, because **a `var()` resolves where the DECLARATION
+lives**: inside the graphite map figure `--sea` is cobalt-air and inside a
+light band it is pine-deep. Measured on the shipped page the drawing painted
+`rgb(64,118,231)` and the key beside it showed `rgb(7,48,43)`. Nothing counts
+a swatch, so it was invisible for as long as the key sat behind a summary
+line. **The fix is not a hard-coded hex** — the key sits in the same band as
+its drawing, where every token it reads resolves exactly as the drawing's
+does, which is also where a key belongs; and the browser suite reads the
+computed paint off BOTH ends, because the declaration is the same string in
+both places and comparing declarations would agree with itself.
+
+**AND `&deg;` IS NOT `°`.** Rewriting the projection paragraph with the HTML
+entity failed all four angles at once on the one page allowed to state them:
+`c_published_projection` reads the shipped HTML for "35°" inside the sentence
+that names the conic, and the entity is five characters that are not that
+one. The degree sign is the character.
+
+
+**A DUPLICATE `id` IS INVALID HTML AND NOTHING HERE CAUGHT IT, AND THE CHECK
+WRITTEN FOR IT FOUND A SECOND CASE IN ITS FIRST RUN.** /map's plate 02 was
+given the anchor `layers` — a good name for a band of layer controls, and
+already the `id` of the interest filter container `map.js` binds to. A
+plate's anchor becomes an `id` on the `<section>`, so the page shipped two
+elements carrying `id="layers"`, and the browser suite did not report a
+failure: it **died**, on a strict locator resolving to two elements, which is
+the shape of regression a suite cannot describe. `c_fragments_resolve` asks
+whether every fragment finds AN element; `c_unique_ids` asks whether every id
+names exactly one, which is the question that was missing.
+
+Its first run found `ihedge` and `ihfoot` twice on /stories. Two callers pass
+the prefix `"ih"` to `cut_fade()` — the index hero and `constellation()` —
+and /stories draws both, so the second `url(#ihedge)` resolved to the FIRST
+drawing's gradient. On that page the two gradients happened to be identical,
+because both take their coordinates from the projection rather than from the
+viewBox, **so nothing looked wrong — which is luck and not design**: the
+moment two drawings on one page pass a different `reach` or `top`, the second
+silently takes the first's geometry. The defs cannot be hoisted and shared,
+which is the obvious repair — `.datacut stop` and `.reachhead .datacut stop`
+colour the stops by ANCESTOR, so a hoisted `<defs>` takes the wrong colour or
+none, which is this function's own recorded fault from the other end. The id
+carries a counter instead; a prefix chosen per caller would be a guard
+whoever adds the next drawing gets to choose.
 
 ## Gates
 

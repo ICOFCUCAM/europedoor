@@ -8,6 +8,7 @@ test without a build directory existing.
 from __future__ import annotations
 
 import hashlib
+import itertools
 import math
 import re
 from urllib.parse import quote
@@ -397,6 +398,9 @@ def dusk_reach(data=None):
     return out
 
 
+_CUT_N = itertools.count(1)
+
+
 def cut_fade(idprefix, w, h, reach=None, cls="mapcut", top=1.0):
     """The two data cuts, faded, for an instrument that draws the atlas.
 
@@ -413,6 +417,26 @@ def cut_fade(idprefix, w, h, reach=None, cls="mapcut", top=1.0):
     so a horizontal fade placed on the Tunisian end leaves the cut showing
     right across Anatolia. Both come from the projection's own constants.
     """
+    # THE ID IS UNIQUE PER EMISSION, AND IT WAS NOT.
+    #
+    # Two callers pass the prefix "ih" — the index hero and `constellation()`
+    # — so /stories, which draws both, shipped `id="ihedge"` and
+    # `id="ihfoot"` TWICE. Invalid HTML: `getElementById` returns the first,
+    # a fragment link is ambiguous, and the second `url(#ihedge)` resolves to
+    # the FIRST drawing's gradient. On /stories the two gradients happened to
+    # be identical — both take their coordinates from the projection rather
+    # than from the viewBox — so nothing looked wrong, which is luck and not
+    # design: the moment two drawings on one page pass a different `reach` or
+    # `top`, the second silently takes the first's geometry.
+    #
+    # The defs CANNOT be hoisted and shared, which is the obvious repair:
+    # `.datacut stop` and `.reachhead .datacut stop` colour the stops by
+    # ANCESTOR, so a hoisted `<defs>` would take the wrong colour or none —
+    # the recorded fault this function already has, from the other end. So
+    # the id carries a counter. A prefix chosen per caller would be a guard
+    # whoever adds the next drawing gets to choose, and `c_unique_ids` found
+    # this one rather than anybody remembering.
+    idprefix = f"{idprefix}{next(_CUT_N)}"
     eb, ea, sb, sa = reach or (330.0, 30.0, 130.0, 4.0)
     ex1, ey1, ex2, ey2 = cut_band(70.0, 40.0, 52.0, eb, ea)
     ax, ay = MAPPROJ.apex()
@@ -11656,7 +11680,7 @@ def project(lat, lon):
     return MAPPROJ.xy(lat, lon)
 
 
-def maplist(data):
+def maplist(data, flat=False):
     """The map, as a list — the accessible alternative the UI specification
     asks for.
 
@@ -11700,12 +11724,25 @@ def maplist(data):
     blocks.insert(0, f'<h3>Every country <span class="small">'
                      f'{len(data["countries"])}</span></h3>'
                      f'<ul class="stack cols">{countries}</ul>')
+    # AND IT IS A BAND NOW RATHER THAN A DISCLOSURE, on the one page where
+    # it is the most complete content there is. The docstring above argues
+    # that a text version nobody sighted ever sees is a text version that
+    # rots, and a closed `<details>` is most of the way to that: fifty
+    # countries and all 319 destinations with coordinates, grouped by macro
+    # region, behind a summary line. `aria-describedby` still points at it,
+    # a visible equivalent is strictly better than a hidden one, and the
+    # only thing lost is the summary — which is now the band's own head.
+    intro = (f'<p class="small">The map above is a picture and cannot be read '
+             f'out. This is the same data as text, with coordinates, and it '
+             f'is the accessible alternative \u2014 not a reduced version of '
+             f'it.</p>')
+    if flat:
+        return (f'<div class="maplist maptwin" id="maplist">{intro}'
+                f'{"".join(blocks)}</div>')
     return (f'<details class="maplist" id="maplist">'
             f'<summary>Every place on this map, as a list '
             f'({len(data["cities"])} places, grouped by region)</summary>'
-            f'<p class="small">The map above is a picture and cannot be read out. This is the '
-            f'same data as text, with coordinates, and it is the accessible alternative — not '
-            f'a reduced version of it.</p>{"".join(blocks)}</details>')
+            f'{intro}{"".join(blocks)}</details>')
 
 
 def map_page(data):
@@ -11872,116 +11909,210 @@ def map_page(data):
     projprobe = [[lat, lon, round(MAPPROJ.xy(lat, lon)[0], 6),
                   round(MAPPROJ.xy(lat, lon)[1], 6)]
                  for lat in (35.0, 52.25, 71.0) for lon in (-24.0, 10.0, 44.0)]
-    body = f"""
-{crumbs([("Europe", "/discover"), ("Map", None)])}
-<div class="pagehead instrument">
-  <p class="kicker">The map</p>
-  <h1>Europe, and everything we hold in it.</h1>
-  {head_extent([(len(data['countries']), 'countries'),
-                (len(data['cities']), 'destinations'),
-                (len(placedots), 'places')])}
-  <p class="lede">Click a country to go into it.</p>
-</div>
-<div class="mapstage">
-<div class="mapmain">
-<div class="mapzoom">
-  <button type="button" class="zbtn" id="zoomin" aria-label="Zoom in">+</button>
-  <button type="button" class="zbtn" id="zoomout" aria-label="Zoom out">−</button>
-  <button type="button" class="zbtn wide" id="zoomreset">Whole of Europe</button>
-  <span class="small" id="zoomwhere" aria-live="polite"></span>
-</div>
-<div class="mapwrap">
-<svg viewBox="0 0 {MAP_W} {MAP_H}" id="europemap" class="europemap" data-role="instrument" role="img" aria-describedby="maplist" aria-label="Map of Europe showing every country, destination and place in the Atlas">
-<rect width="{MAP_W}" height="{MAP_H}" fill="none"/>
-<g id="context" class="context" aria-hidden="true">{''.join(context)}</g>
-<g id="countries" class="countries">{''.join(shapes)}</g>
-<g id="detail" class="countries"></g>
-{cut_fade('map', MAP_W, MAP_H, dusk_reach())}
-<g id="nogeo" class="nogeo">{''.join(nogeo)}</g>
-<g id="route"></g>
-<g id="regions" hidden display="none"></g>
-<g id="places" hidden display="none">{''.join(placedots)}</g>
-<g id="dots">{''.join(dots)}</g>
-</svg>
-</div>
-<p class="small" id="routenote"></p>
-</div>
-<aside class="mapside">
-  <div id="countrypanel" class="countrypanel" hidden aria-live="polite"></div>
-  <div id="mappopup" class="mappopup" hidden aria-live="polite"></div>
-</aside>
-</div>
-
-<details class="maptools">
-  <summary>Layers, overlays and how to read the map</summary>
-  <div class="maphint">
+    # ── 01 · THE INSTRUMENT ──────────────────────────────────────────
+    #
+    # THE MAP WAS ALREADY THE HERO AND EVERYTHING THAT MAKES IT AN
+    # INSTRUMENT WAS BEHIND A CLOSED DISCLOSURE. `<details class="maptools">`
+    # held the legend, how to read the drawing, the four geography layers,
+    # all seventeen interest filters, the journey overlay, the distance
+    # origin and the live count — so a reader met a map they could only
+    # click, under a four-word lede. The owner's brief is *make the map the
+    # actual instrument*, and the controls ARE the instrument.
+    #
+    # `.mapstage` and every id map.js binds to survive exactly as they were:
+    # the stage still gains `.withpanel` only while the panel or popup is
+    # open, so the drawing is full width the rest of the time, which is the
+    # behaviour that rule was written for.
+    mapopen = f"""
+  <div class="pagehead instrument">
+    <p class="kicker">The map</p>
+    <h1>Europe, and everything we hold in it.</h1>
+    {head_extent([(len(data['countries']), 'countries'),
+                  (len(data['cities']), 'destinations'),
+                  (len(placedots), 'places')])}
+    <p class="lede">Every country we write about, every destination in it and every place
+    inside those &mdash; one drawing, drawn from public-domain geometry we host ourselves.
+    Click a country to open it; click again to go into it.</p>
+  </div>
+  <div class="mapstage">
+  <div class="mapmain">
+  <div class="mapzoom">
+    <button type="button" class="zbtn" id="zoomin" aria-label="Zoom in">+</button>
+    <button type="button" class="zbtn" id="zoomout" aria-label="Zoom out">&minus;</button>
+    <button type="button" class="zbtn wide" id="zoomreset">Whole of Europe</button>
+    <span class="small" id="zoomwhere" aria-live="polite"></span>
+  </div>
+  <div class="mapwrap">
+  <svg viewBox="0 0 {MAP_W} {MAP_H}" id="europemap" class="europemap" data-role="instrument" role="img" aria-describedby="maplist" aria-label="Map of Europe showing every country, destination and place in the Atlas">
+  <rect width="{MAP_W}" height="{MAP_H}" fill="none"/>
+  <g id="context" class="context" aria-hidden="true">{''.join(context)}</g>
+  <g id="countries" class="countries">{''.join(shapes)}</g>
+  <g id="detail" class="countries"></g>
+  {cut_fade('map', MAP_W, MAP_H, dusk_reach())}
+  <g id="nogeo" class="nogeo">{''.join(nogeo)}</g>
+  <g id="route"></g>
+  <g id="regions" hidden display="none"></g>
+  <g id="places" hidden display="none">{''.join(placedots)}</g>
+  <g id="dots">{''.join(dots)}</g>
+  </svg>
+  </div>
+  <p class="small" id="routenote"></p>
+  </div>
+  <aside class="mapside">
+    <div id="countrypanel" class="countrypanel" hidden aria-live="polite"></div>
+    <div id="mappopup" class="mappopup" hidden aria-live="polite"></div>
+  </aside>
+  </div>
+  <div class="mapkey">
     <ul class="legend">
-      <li><span class="sw land"></span> A country in the Atlas — click it to open the panel,
-        click again to go to its page</li>
+      <li><span class="sw land"></span> A country in the Atlas &mdash; click it to open the
+        panel, click again to go to its page</li>
       <li><span class="sw ctx"></span> Land outside the Atlas, drawn so the coast has a far
         shore</li>
       <li><span class="sw dest"></span> A destination we have written</li>
-      <li><span class="sw ring"></span> A country too small to draw at this scale — Monaco and
-        Vatican City, and four more at the widest zoom</li>
+      <li><span class="sw ring"></span> A country too small to draw at this scale &mdash;
+        Monaco and Vatican City, and four more at the widest zoom</li>
     </ul>
-    <p class="small">Drag to pan, scroll or use + and − to zoom. Zooming past 1.6× loads a finer
-    coastline; opening a country loads that country's own.</p>
+    <p class="small mapread">Drag to pan, scroll or use + and &minus; to zoom. Zooming past
+    1.6&times; loads a finer coastline; opening a country loads that country&rsquo;s
+    own.</p>
+  </div>"""
+
+    # ── 02 · WHAT YOU CAN ASK IT ─────────────────────────────────────
+    #
+    # THE CONTROLS ARE OUT OF THE DISCLOSURE AND THE HEAD SAYS WHAT THEY
+    # DO. /discover already settled this one family over: the instructions
+    # belong beside the control they describe, and "Choose what you are
+    # travelling for" 950 pixels above the chips it describes was the fault
+    # that moved it. The legend moves with them, because a key is part of
+    # reading the drawing rather than a footnote to it.
+    mapask = f"""
+  <div class="sheettext">
+    <h2 class="mega">One map, several questions.</h2>
+    <p class="lede">The drawing answers a different question depending on what you switch
+    on. Nothing here is a filter over a search result &mdash; every layer is geometry or
+    data this Atlas already holds, drawn into the same projection as the dots.</p>
   </div>
-  <div class="maplayers">
-    <fieldset id="geolayers">
-      <legend class="mini">Geography</legend>
-      <label><input type="checkbox" name="geo" value="borders" checked> Borders</label>
-      <label><input type="checkbox" name="geo" value="regions"> Regions</label>
-      <label><input type="checkbox" name="geo" value="cities" checked> Destinations</label>
-      <label><input type="checkbox" name="geo" value="places"> Places ({len(placedots)})</label>
-    </fieldset>
-  </div>
-  <p class="mini">What each destination is for</p>
-  <div class="checks" id="layers">{filters}</div>
-  <div class="form-row mw34">
-    <div class="field">
-      <label for="journeylayer">Draw a journey over it</label>
-      <select id="journeylayer"><option value="">None</option>{joptions}</select>
+  <div class="askgrid">
+    <div class="askset">
+      <p class="mini">What is drawn</p>
+      <fieldset id="geolayers">
+        <legend class="visually-hidden">Geography</legend>
+        <label><input type="checkbox" name="geo" value="borders" checked> Borders</label>
+        <label><input type="checkbox" name="geo" value="regions"> Regions</label>
+        <label><input type="checkbox" name="geo" value="cities" checked> Destinations</label>
+        <label><input type="checkbox" name="geo" value="places"> Places ({len(placedots)})</label>
+      </fieldset>
     </div>
-    <div class="field">
-      <label for="mapfrom">Measure distances from</label>
-      <select id="mapfrom"><option value="">Nowhere in particular</option>{fromoptions}</select>
+    <div class="askset">
+      <p class="mini">What each destination is for</p>
+      <div class="checks" id="layers">{filters}</div>
+      <p class="small" id="mapcount"></p>
+    </div>
+    <div class="askset">
+      <p class="mini">Over the top of it</p>
+      <div class="field">
+        <label for="journeylayer">Draw a journey over it</label>
+        <select id="journeylayer"><option value="">None</option>{joptions}</select>
+      </div>
+      <div class="field">
+        <label for="mapfrom">Measure distances from</label>
+        <select id="mapfrom"><option value="">Nowhere in particular</option>{fromoptions}</select>
+      </div>
+      <p class="note">A distance here is a straight line between two coordinates. This atlas
+      holds no road and no rail geometry, so it is a floor on the journey and never the
+      journey.</p>
     </div>
   </div>
-  <p class="small" id="mapcount"></p>
-</details>
 {jsondata("europedoor-journeys", jdata)}
 {jsondata("europedoor-mapinfo", info)}
 {jsondata("europedoor-countries", cinfo)}
 {jsondata("europedoor-projection", projinfo)}
-{jsondata("europedoor-projection-probe", projprobe)}
-<div class="note">
-  <h2 class="mini">What this drawing is and is not</h2>
-  <p>The land comes from <strong>{esc(attribution)}</strong>, which is in the public domain and
-  which we host ourselves: the file your browser drew this from is on our own servers, fetched
-  once by a script in this repository, hashed, and committed. There is no map account behind it
-  and no per-view bill, and that is a deliberate architectural choice rather than a stage we
-  have not reached yet.</p>
-  <p>It is a <strong>cartographic</strong> source, not a legal one. It is built to look right at
-  a stated scale, and at the scale of a whole continent a border is a line a few kilometres
-  wide. Do not read a disputed frontier off this map. Two countries in the Atlas — Monaco and
-  Vatican City — have no shape here at all, because at 1:50 million they are smaller than a
-  pixel; they are drawn as a ringed point instead of a polygon we made up.
-  <a href="/method#map">How the map is built</a>.</p>
-  <p>Projection: a <strong>Lambert conformal conic</strong> on the angles the EU publishes
-  pan-European maps at — standard parallels {geo.LCC_P1:g}°N and {geo.LCC_P2:g}°N, origin
-  {geo.LCC_LAT0:g}°N, central meridian {geo.LCC_LON0:g}°E. Conformal means shape is preserved
-  everywhere: a country is the shape it is, at any latitude on this map. Regions are shown by
-  the destinations that belong to them, not as boundaries — we hold which region a place is in,
-  and we do not hold region geometry.</p>
-</div>
+{jsondata("europedoor-projection-probe", projprobe)}"""
 
-{maplist(data)}
+    # ── 03 · EVERYTHING WE HOLD, IN WORDS ────────────────────────────
+    #
+    # THE MOST COMPLETE INDEX ON THIS SITE WAS BEHIND A SUMMARY LINE. Fifty
+    # countries and all 319 destinations with their coordinates, grouped by
+    # macro region — the map's own `aria-describedby` target, and the
+    # control WCAG 2.5.8 requires for the twenty countries that draw
+    # between 3.6 and 12 pixels wide. It is a band now: the alternative
+    # still exists for assistive technology and a sighted reader can use it
+    # too, which is what the helper's own docstring asks for.
+    maptwin = f"""
+  <div class="sheettext">
+    <h2 class="mega">Everything on the map, in words.</h2>
+    <p class="lede">{len(data['countries'])} countries and {len(data['cities'])}
+    destinations, grouped by region, each with the coordinates the dot was drawn from.
+    Searchable with ctrl-F, which the drawing is not.</p>
+  </div>
+  {maplist(data, flat=True)}"""
+
+    # ── 04 · WHAT THIS DRAWING IS AND IS NOT ─────────────────────────
+    #
+    # PROMOTED FROM A `.note` AT CAPTION SIZE AT THE FOOT OF THE PAGE. This
+    # is the cartographic position of the whole product and the one place on
+    # the site allowed to name the projection — and it was printed smaller
+    # than everything it explains, which is the fault /beyond-the-obvious
+    # and /themes both had.
+    mapsay = f"""
+  <div class="sheettext">
+    <h2 class="mega">A <em class="lit">cartographic</em> source, not a legal
+    one.</h2>
+    <p class="lede">The land comes from {esc(attribution)}, which is in the public domain
+    and which we host ourselves: the file your browser drew this from is on our own
+    servers, fetched once by a script in this repository, hashed, and committed. There is
+    no map account behind it and no per-view bill, and that is a deliberate architectural
+    choice rather than a stage we have not reached yet.</p>
+    <p class="note">It is built to look right at a stated scale, and at the scale of a
+    whole continent a border is a line a few kilometres wide. <strong>Do not read a
+    disputed frontier off this map.</strong> Two countries in the Atlas &mdash; Monaco and
+    Vatican City &mdash; have no shape here at all, because at 1:50 million they are
+    smaller than a pixel; they are drawn as a ringed point instead of a polygon we made
+    up. <a href="/method#map">How the map is built</a>.</p>
+    <!-- THE DEGREE SIGN IS THE CHARACTER AND NOT `&deg;`. `c_published_projection`
+         reads the shipped HTML for "35\u00b0" within the sentence that names
+         the conic, and the entity is five characters that are not that one:
+         rewriting this paragraph with `&deg;` failed all four angles at once
+         on the one page allowed to state them. -->
+    <p class="note">Projection: a Lambert conformal conic on the angles the EU publishes
+    pan-European maps at &mdash; standard parallels {geo.LCC_P1:g}\u00b0N and
+    {geo.LCC_P2:g}\u00b0N, origin {geo.LCC_LAT0:g}\u00b0N, central meridian
+    {geo.LCC_LON0:g}\u00b0E. Conformal means shape is preserved everywhere: a country is
+    the shape it is, at any latitude on this map. Regions are shown by the destinations
+    that belong to them, not as boundaries &mdash; we hold which region a place is in, and
+    we do not hold region geometry.</p>
+  </div>"""
+
+    # ── 05 · GO IN ───────────────────────────────────────────────────
+    mapgo = f"""
+  <div class="istart">
+    <h2 class="mega">Go in anywhere.</h2>
+    <p class="lede">Every dot and every country on this drawing is a page. Or start from
+    what you are travelling for and let the instrument narrow the continent for you.</p>
+    <p class="keepgo"><a class="btn" href="/discover">Open Discover Mode</a>
+    <a class="storygo" href="/countries">Or open the atlas &rarr;</a></p>
+  </div>"""
+
+    PLATES = [("mapopen", "The map", mapopen, "map"),
+              # NOT "layers" — `id="layers"` IS THE INTEREST FILTER CONTAINER
+              # AND map.js BINDS TO IT. A plate's anchor becomes an `id` on
+              # the `<section>`, so naming this one after what it holds put
+              # two elements with one id on the page: invalid HTML, and the
+              # browser suite died on an ambiguous locator rather than
+              # reporting a failure. `c_unique_ids` now fails on it directly.
+              ("mapask paper", "What you can ask it", mapask, "ask-it"),
+              ("maptwin gal", "Everything we hold", maptwin, "in-words"),
+              ("mapsay pine", "What this drawing is", mapsay, "integrity"),
+              ("mapgo gal", "Go in anywhere", mapgo, "go")]
+    body = f"""
+{crumbs([("Europe", "/discover"), ("Map", None)])}
+{plate_sequence(PLATES)}
 """
     return "/map/index.html", page(
         "Map", body, path="/map", area="countries",
         description="A point map of every city in the EuropeDoor Atlas, filterable by what you travel for. No third-party tiles.",
-        scripts=["/assets/js/map.js"], wide=True,
+        scripts=["/assets/js/map.js"], wide=True, hero=True,
         # INTELLIGENCE — route intelligence
         world="intelligence"
     )

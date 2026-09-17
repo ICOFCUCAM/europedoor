@@ -619,7 +619,21 @@ def measure():
                        "70 degrees north to x=1024 at 40 degrees south of it, "
                        "a straight diagonal through Russia that reads as a "
                        "rendering fault, and it had been on the instrument "
-                       "since the instrument was drawn."},
+                       "since the instrument was drawn."
+                       "  441 -> 444 WHEN /map BECAME THE INSTRUMENT RATHER "
+                       "THAN A MAP WITH A DISCLOSURE UNDER IT. Everything "
+                       "that makes that page an instrument was inside a "
+                       "closed `<details>` — the legend, how to read the "
+                       "drawing, the four geography layers, all seventeen "
+                       "interest filters, the journey overlay, the distance "
+                       "origin and the live count — and the text twin, which "
+                       "is the most complete index on this site, was inside a "
+                       "second one. Both are bands now, and the three "
+                       "kilobytes are the markup of a `<details>` becoming "
+                       "the markup of two plates with heads on them. The "
+                       "drawing itself did not change by a byte: the ceiling "
+                       "is here to catch a template inlining geometry across "
+                       "a family, and this is prose."},
             # A CEILING, not a floor, and the direction is the point. The
             # rule is that a visual earns its position — so what needs
             # guarding is plates SPREADING back onto pages that do not need

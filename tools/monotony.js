@@ -114,12 +114,15 @@ const srv = http.createServer((q, r) => {
               // A BOX A READER CANNOT SCROLL TO IS NOT PART OF THE PAGE, and
               // /map is the case that needs it: its text twin — the
               // alternative naming all fifty countries and all 319
-              // destinations — is laid out from y=2,087 to y=18,355 inside a
-              // 2,665px document, because it is clipped for sighted readers
-              // and read by assistive technology. Counting it reported /map
-              // at 789%. The twin is correct and this instrument's subject
-              // is composition, so what is outside the scrollable page is
-              // outside the measurement.
+              // destinations — measured from y=2,087 to y=18,355 inside a
+              // 2,665px document, because it sits inside a CLOSED
+              // `<details>` whose children Chromium still lays out.
+              // Counting it reported /map at 789%. (It is a disclosure and
+              // not `display: none`, deliberately: a text version nobody
+              // sighted ever sees is a text version that rots. The first
+              // version of this comment said "clipped", which is a wrong
+              // reason recorded as evidence.) What is outside the scrollable
+              // page is outside the measurement.
               if (r.top + window.scrollY > docH) continue;
               // SAME CLASS IS NOT ENOUGH — SAME INNER SHAPE IS. Six
               // `section class="band"` siblings on a country page share a

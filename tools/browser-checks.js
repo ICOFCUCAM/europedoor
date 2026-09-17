@@ -1306,15 +1306,62 @@ async function main() {
 
   // ── the map ────────────────────────────────────────────────────────
   //
-  // The controls live in a closed <details> under the map, because the first
-  // layout put thirteen interest filters and two selects between the headline
-  // and the drawing and a 1280x1000 laptop opened the page called "the map"
-  // with no map on it. Opening it is now a real user action, so the check
-  // performs it rather than assuming it.
+  // THIS ASSERTED THE DISCLOSURE AND THE DISCLOSURE WAS THE DEFECT. The
+  // controls used to live in a closed <details> under the drawing, and this
+  // check opened it with `.maptools > summary` before touching anything —
+  // which made the shape of the page a precondition of the assertion rather
+  // than the assertion. The controls are a band of their own now, because
+  // they ARE the instrument and a reader met a map they could only click.
+  //
+  // The reason the <details> existed is still true and is still honoured:
+  // the first layout put the filters and two selects BETWEEN the headline
+  // and the drawing, so a 1280x1000 laptop opened the page called "the map"
+  // with no map on it. The controls are below the drawing, not above it, and
+  // that is what the added assertion pins — the map is in the first screen
+  // and the controls are reachable without opening anything.
   await page.goto(base + "/map", { waitUntil: "networkidle" });
   const dots = await page.locator("#dots .dot").count();
   ok(dots > 200, `map drew only ${dots} cities`);
-  await page.locator(".maptools > summary").click();
+  const mapTop = await page.locator("#europemap").evaluate(
+    (e) => e.getBoundingClientRect().top + window.scrollY);
+  const ctlTop = await page.locator("#layers").evaluate(
+    (e) => e.getBoundingClientRect().top + window.scrollY);
+  ok(mapTop < 900,
+     `the drawing starts at y=${Math.round(mapTop)} on the page called "the map"`);
+  ok(ctlTop > mapTop,
+     `the controls start at y=${Math.round(ctlTop)} and the drawing at ` +
+     `y=${Math.round(mapTop)} — the filters are above the map again`);
+  ok(await page.locator('#layers input[value="winter"]').isVisible(),
+     "an interest filter is not reachable without opening a disclosure");
+
+  /* A KEY'S SWATCH MUST PAINT WHAT THE DRAWING PAINTS, AND ONE OF THE THREE
+   * DID NOT. `.legend .sw.dest` is `var(--sea)` and the map's dots are
+   * `var(--sea)` too — the same token and two different colours, because a
+   * `var()` resolves where the DECLARATION lives: inside the graphite map
+   * figure `--sea` is cobalt-air and inside a light band it is pine-deep. So
+   * the key said a destination is pine while the drawing drew it cobalt:
+   * rgb(7,48,43) against a painted rgb(64,118,231). **A key that names the
+   * wrong colour is worse than no key**, and it was invisible for as long as
+   * the key sat inside a closed <details> — nothing counts a swatch.
+   *
+   * This reads the computed paint off BOTH ends, which is the only honest
+   * instrument: the declaration is the same string in both places, so
+   * comparing declarations would agree with itself. The fix was to put the
+   * key in the same band as its drawing rather than to hard-code a hex. */
+  for (const [sw, drawn, what] of [
+    [".legend .sw.land", "#europemap .countries path", "a country in the Atlas"],
+    [".legend .sw.ctx", "#europemap #context path", "land outside the Atlas"],
+    [".legend .sw.dest", "#europemap .dot circle", "a destination"],
+  ]) {
+    const a = await page.locator(sw).evaluate(
+      (e) => getComputedStyle(e).backgroundColor);
+    const b2 = await page.locator(drawn).first().evaluate(
+      (e) => getComputedStyle(e).fill);
+    ok(a === b2,
+       `the key says ${what} is ${a} and the map draws it ${b2}. A key that ` +
+       `names the wrong colour is worse than no key`);
+  }
+
   await page.check('#layers input[value="winter"]');
   await page.waitForTimeout(120);
   const lit = await page.locator("#dots .dot:not(.off)").count();
@@ -1391,7 +1438,6 @@ async function main() {
 
   // Map popups, the places layer and distance from a chosen origin.
   await page.goto(base + "/map", { waitUntil: "networkidle" });
-  await page.locator(".maptools > summary").click();
   await page.selectOption("#mapfrom", { index: 5 });
   await page.locator("#dots .dot").nth(40).click();
   await page.waitForSelector("#mappopup:not([hidden])");

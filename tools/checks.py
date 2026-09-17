@@ -7783,6 +7783,49 @@ def c_motion_distribution():
     return n
 
 
+
+@check("no page carries the same id twice")
+def c_unique_ids():
+    """A DUPLICATE `id` IS INVALID HTML AND NOTHING HERE CAUGHT IT.
+
+    /map's plate 02 was given the anchor `layers`, which is a good name for
+    a band of layer controls and is already the `id` of the interest filter
+    container that `map.js` binds to. `plate_sequence()` turns an anchor into
+    an `id` on the `<section>`, so the page shipped two elements carrying
+    `id="layers"`: `document.getElementById` returns the first, a fragment
+    link is ambiguous, and `aria-labelledby` resolves to whichever the
+    parser saw first. The browser suite did not report a failure — it DIED,
+    on a strict locator resolving to two elements, which is the shape of
+    regression a suite cannot describe and this repository has already
+    recorded twice.
+
+    `c_fragments_resolve` asks whether every fragment finds AN element; this
+    asks whether every id names exactly one, which is the question that was
+    missing. Cheap: one parse per page.
+    """
+    n = dupes = 0
+    for f in site_files():
+        html = open(f, encoding="utf-8").read()
+        seen, bad = set(), []
+        for m in re.finditer(r'\sid="([^"]+)"', html):
+            i = m.group(1)
+            if i in seen:
+                bad.append(i)
+            seen.add(i)
+        n += len(seen)
+        if bad:
+            dupes += 1
+            fail(f"{canonical_of(f)} carries {len(set(bad))} duplicated "
+                 f"id(s): {', '.join(sorted(set(bad))[:5])}. "
+                 f"getElementById returns the first, a fragment link is "
+                 f"ambiguous and aria-labelledby resolves to whichever the "
+                 f"parser saw first")
+    if not n:
+        fail("no page carries an id at all — this check has stopped finding "
+             "the thing it is about")
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0

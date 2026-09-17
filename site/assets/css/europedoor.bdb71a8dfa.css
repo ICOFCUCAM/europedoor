@@ -12221,3 +12221,73 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
     max-width: none;
   }
 }
+
+
+/* ═══ /map — THE INSTRUMENT ══════════════════════════════════════════
+ *
+ * THE MAP WAS ALREADY THE HERO AND EVERYTHING THAT MAKES IT AN INSTRUMENT
+ * WAS BEHIND A CLOSED DISCLOSURE: the legend, how to read the drawing, the
+ * four geography layers, all seventeen interest filters, the journey
+ * overlay, the distance origin and the live count. A reader met a map they
+ * could only click, under a four-word lede. The controls ARE the instrument,
+ * so they are a band of their own with a head that says what they do —
+ * which is /discover's own finding one family over, where the instructions
+ * moved to the control they describe.
+ *
+ * `.mapstage`, `.mapmain`, `.mapside`, `.mapwrap` and `.mapzoom` are
+ * untouched: the stage still gains `.withpanel` from map.js only while the
+ * panel or the popup is open, so the drawing is full width the rest of the
+ * time. Every one of the eighteen ids the application binds to is in the
+ * same place it was.
+ */
+
+/* ── 01 the instrument ─────────────────────────────────────────────── */
+/* THE KEY BELONGS WITH ITS DRAWING, AND MOVING IT OUT OF THE DISCLOSURE IS
+   WHAT PROVED IT. `.legend .sw.dest` is `var(--sea)` and the map paints its
+   dots `var(--sea)` too — the same token, and two different colours,
+   because a `var()` resolves where the DECLARATION lives: inside the
+   graphite map figure `--sea` is cobalt-air, and inside a light `paper`
+   band it is pine-deep. Measured on the shipped page, the drawing painted
+   `rgb(64,118,231)` and the key beside it in the controls band showed
+   `rgb(7,48,43)`. **A key that names the wrong colour is worse than no
+   key** — it is the /map projection prose one element over, and it was
+   invisible for as long as the key sat inside a closed `<details>`.
+   The fix is not a hard-coded hex: the key sits in the same band as the
+   drawing, where every token it reads resolves exactly as the drawing's
+   does. That is also where a key belongs. */
+.sheet-mapopen { display: block; }
+.mapkey { display: grid; gap: var(--s5) var(--s7); margin-top: var(--s5);
+          grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr)); }
+.mapkey .legend { margin: 0; }
+.mapread { margin: 0; max-width: 46rem; }
+
+/* ── 02 what you can ask it ───────────────────────────────────────── */
+/* THREE SETS, AND THEY ARE THREE DIFFERENT QUESTIONS rather than three
+   columns of one control panel: what is DRAWN, what each destination is
+   FOR, and what is laid over the top. A single grid of twenty-three
+   controls is the chip wall the brief refuses; three named sets is an
+   instrument's front panel. */
+.sheet-mapask { display: block; }
+.askgrid { display: grid; gap: var(--s7); margin-top: var(--s7);
+           grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr)); }
+.askset > .mini { margin: 0 0 var(--s3); }
+.askset fieldset { border: 0; padding: 0; margin: 0; }
+.askset fieldset label { display: flex; align-items: center; gap: var(--s2);
+                         min-height: 24px; }
+.askset .field { margin-top: var(--s4); }
+.askset .note { margin-top: var(--s5); }
+.askset .legend { margin: 0; }
+.askset .checks { margin: 0; }
+.askgrid #mapcount { margin-top: var(--s4); }
+
+/* ── 03 everything we hold, in words ──────────────────────────────── */
+/* NO BORDER, NO FILL, NO RADIUS. `.maplist` is a bordered panel because it
+   was a disclosure sitting in the flow of a page; as a band it is the
+   band's own content, and the four things that say "separate object placed
+   here by a system" are exactly what this composition does without. */
+.maptwin { margin: var(--s7) 0 0; padding: 0; border: 0; background: none; }
+.maptwin > .small { max-width: 46rem; }
+
+/* ── 04 what this drawing is ──────────────────────────────────────── */
+.sheet-mapsay .lit { font-style: normal; color: var(--door-dark); }
+.sheet-mapsay .note { margin-top: var(--s5); max-width: 46rem; }
