@@ -279,3 +279,115 @@ and it is also what the page IS. The honest next question is whether the three
 paces (derived from measured kilometres a day) should set three rhythms the
 way /countries' nine regions now do. Recorded with that as the trigger, not
 ticked.
+
+## §16–22 audited, and an extent that was silent about its own coverage
+
+The specification's journey and AI sections are already absorbed, section by
+section, with a verdict each. What the audit did not say is the other axis.
+
+**§16 — the journey object.** Twenty of its twenty-one fields are on the
+record: `slug`, `name`, `strapline`, `days`, `legs` (which is Destinations and
+the day-by-day at once), `start`, `end`, `difficulty`, `months`, `budget`,
+`transport`, `interests`, `accommodation`, `creator`, `pack`, `summary`, with
+Countries and Regions derived from the legs, the map drawn, Images in the
+register and Related derived into `/api/graph.json`. **Booking links are the
+one refusal**, and they are refused with everything else commercial.
+
+**§18 — all four Grand European Journeys exist by name**, and one matches its
+example sequence exactly:
+
+| | the specification's sequence | ours |
+|---|---|---|
+| Arctic to Mediterranean | 7 countries | **the same 7**, 34 days against 30 |
+| Mediterranean Arc | Spain → France → Monaco → Italy → Slovenia → Croatia → Greece | Spain → France → Italy → Greece |
+| Atlantic to Mediterranean | Portugal → … → Slovenia → Croatia → Greece | Portugal → Spain → France → Italy |
+| European Heritage Route | 8 countries incl. France | 7, without France |
+
+Slovenia, Croatia, Greece and France are not missing from the product —
+Slovenia is on two journeys, Croatia three, Greece five, France four — they
+are on *different* journeys, and the Adriatic coast has one of its own. **So
+the §18 discrepancy is distribution rather than absence**, for four of the
+five; Monaco is on none.
+
+### The measurement §18's verdict did not carry
+
+**The seventeen reach 29 of the fifty countries. Twenty-one are on no journey
+at all, and only three of those carry a travel advisory.** The other
+eighteen — Iceland, Ireland, Albania, Bulgaria, Georgia, Armenia, Azerbaijan,
+Cyprus, Malta, Luxembourg, Andorra, Liechtenstein, Monaco, San Marino,
+Vatican City, Kosovo, North Macedonia, Moldova — have a country page,
+destinations, experiences and photographs, and no route through them.
+
+The verdict said *"all four the specification names, plus thirteen more, the
+widest crossing seven countries"*, which is true, derived, and an **extent**.
+An extent can be entirely true while the map has a hole in it, and this one
+was: nothing on the index said a reader looking for Iceland would not find a
+journey. The lede states it now — *seventeen routes, 76 stops across 29 of
+the 50 countries* — derived from the legs, so writing a journey through
+Iceland moves the number on the next build rather than leaving a sentence
+that was accurate once.
+
+### And `has()` could be defeated by a line wrap, on every assertion in the file
+
+The new claim wrapped between "the" and "50" in the generated f-string and the
+assertion failed on a page that carried the sentence. That is
+`c_published_projection`'s recorded failure — *an instrument a line break can
+defeat is reading the file rather than the claim* — and it was true of **every
+assertion in `section-audit.py`**, because all of them were raw substring
+searches against emitted HTML whose line breaks are the page builder's rather
+than anything a reader sees. Whitespace is collapsed on both sides now.
+Collapsing can only widen a match, so nothing that passed could newly fail;
+what it removes is a way for an assertion to fail while its claim is present,
+and a way for one to pass while it is absent.
+
+### §19–22: the AI sections, and where ours is the stronger answer
+
+**§19's flagship example sentence is the case the previous commit fixed.** It
+reads *"I have €2,500 and 12 days … travelling with my wife and starting in
+Oslo"*, and "my wife" is one of the phrases `parseAsk` turns into two
+travellers — the field that reached the page and not the money. Run verbatim
+now, the planner extracts all five things the specification lists (budget,
+duration, travellers, start, three interests) and then **refuses**:
+
+> We could not build a journey we would stand behind — €4,618 against a
+> budget of €2,500. That is not a plan you can take. Widen the budget,
+> shorten the trip, or choose guesthouses and rail.
+
+Before the fix that sentence returned a confident twelve-day plan at €2,622
+"for 2", priced for one. **The specification's own flagship example was
+mis-priced by the defect**, and the honest answer to it is a refusal.
+
+That also made the suite's own helper fragile: reading `.result-summary`
+straight would wait thirty seconds and die on a locator rather than fail with
+a sentence, which is the crash-stops-counting rule. A refusal is a valid
+answer and is handled as one, and the cost-band assertion first checks it has
+two priced plans to compare.
+
+**§21's volatile-data contract is fully implemented and ours is stronger
+twice.** It asks every volatile datum to carry Source, Last verified,
+Confidence and an expiry; `verification_of()` returns all four — and
+**`confidence` is DERIVED from the source kind and the age of the check, with
+the validator refusing an authored one**, because a field a person can type is
+a field somebody will type "high" into. And there are **four states rather
+than two**: "never checked" and "checked, now due again" are different
+problems with different fixes.
+
+**And §21's list of things an AI must not invent is answered at the schema
+rather than at the prompt.** `opening_hours`, `price_level`, `website`,
+`rating`, `review_count` and `phone` are refused by key on every editorial
+record; visa and emergency information are refused as unverified with
+`docs/legal-position.md` behind them; `stay.inventory()` returns nothing, so
+there is no availability to invent; there is no road or rail geometry, so a
+schedule cannot be stated and every distance says "in a straight line". **A
+refusal at the data layer beats a rule at the model layer**: an instruction
+not to invent a price is only as good as the model's compliance, and a field
+that does not exist cannot be invented from.
+
+**§19 calls the planner "the flagship" and ours is rules rather than a
+model**, which is a recorded position and not an omission: *"read by rules in
+your browser, not by a model, and not sent anywhere — that is why it can show
+you exactly what it understood."* The last clause is the whole argument. A
+rules engine can report its own reasoning, name the constraint it dropped and
+print the query that produced the answer; a model can be asked to and cannot
+be held to it. §22's assistant needs accounts, a stored itinerary and a
+model, all three blocked, and is deferred rather than pretended.

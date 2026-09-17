@@ -5445,13 +5445,27 @@ def journeys_index(data):
               f'{cut_fade("ih", MAP_W, MAP_H, dusk_reach(), cls="datacut")}'
               f'{allroutes}</svg>')
     stops_all = {l["city"] for j in js for l in j["legs"]}
+    # AN INDEX STATES ITS EXTENT, AND THE HONEST EXTENT OF A JOURNEY SYSTEM
+    # IS HOW MUCH OF THE CONTINENT IT REACHES. Seventeen routes and 76 stops
+    # are both derived and both true, and neither of them says that a reader
+    # looking for Iceland, Ireland, Bulgaria or Georgia will not find a
+    # journey through it: the seventeen touch 29 of the fifty countries, and
+    # only three of the twenty-one they miss carry a travel advisory. The
+    # specification names four multi-country journeys and this atlas has all
+    # four, which is the measurement the section audit already records — and
+    # it is an extent rather than a coverage, so it can be entirely true
+    # while the map has a hole in it. Derived, so writing a journey through
+    # Iceland moves the number on the next build rather than leaving a
+    # sentence that was accurate once.
+    reached = {idx[cid]["country"]["slug"] for cid in stops_all if cid in idx}
     road = f"""
   <div class="sheettext">
     <p class="kicker">The European Journey Atlas</p>
     <h1 class="mega">Europe is<br>a <em class="lit">journey</em>.</h1>
     <p class="lede">Not a line between two points. {numword(len(js), cap=True)}
-    routes, {len(stops_all)} stops, every one of them a real place in this
-    atlas and every leg a real distance. Drawn here all at once, on the
+    routes, {len(stops_all)} stops across {len(reached)} of the
+    {len(data["countries"])} countries, every one of them a real place in
+    this atlas and every leg a real distance. Drawn here all at once, on the
     projection every other map on this site uses.</p>
     {golink('#the-routes', 'Read the seventeen')}
   </div>

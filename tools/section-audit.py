@@ -71,10 +71,29 @@ ALL_HTML = sorted(glob.glob(os.path.join(OUT, "**", "*.html"), recursive=True))
 
 
 def has(path, *needles):
+    """Does the shipped page carry each of these claims?
+
+    WHITESPACE IS COLLAPSED FIRST, BECAUSE AN INSTRUMENT A LINE BREAK CAN
+    DEFEAT IS READING THE FILE RATHER THAN THE CLAIM. `c_published_projection`
+    lost a year to exactly this: the homepage named a Lambert conformal conic
+    and the generated paragraph wrapped between "conformal" and "conic", so
+    the substring was not there to find and the check never fired on a page
+    that was stating the old projection's name. Every one of the assertions
+    in this file was a raw substring search against emitted HTML, where the
+    line breaks are the page builder's f-strings rather than anything a
+    reader sees — §18's new coverage claim wrapped between "the" and "50" and
+    failed on a page carrying the sentence.
+
+    Collapsing can only ever widen a match, so no assertion that passed
+    before can fail because of this; what it removes is a way for one to
+    pass while the claim is absent, and a way for one to fail while the
+    claim is present.
+    """
     h = page(path)
     if not h:
         return (False, f"{path} is not served at all")
-    missing = [n for n in needles if n not in h]
+    flat = " ".join(h.split())
+    missing = [n for n in needles if " ".join(n.split()) not in flat]
     return (not missing, f"{path}: missing {missing}" if missing else f"{path} carries all {len(needles)}")
 
 
@@ -759,7 +778,10 @@ def s17():
 
 @section(18, "Multi-country journeys", "BUILT",
          "All four the specification names, plus thirteen more, the widest "
-         "crossing seven countries.")
+         "crossing seven countries \u2014 and the index now states the other "
+         "axis, because an extent can be entirely true while the map has a "
+         "hole in it: the seventeen reach 29 of the fifty countries, and only "
+         "three of the twenty-one they miss carry a travel advisory.")
 def s18():
     slugs = {j["slug"] for j in DATA["journeys"]}
     yield "atlantic-to-the-mediterranean" in slugs, "Atlantic to Mediterranean"
@@ -769,6 +791,19 @@ def s18():
     widest = max(len({DATA["cities"][l["city"]]["country"]["slug"] for l in j["legs"]})
                  for j in DATA["journeys"])
     yield widest >= 7, f"the widest journey crosses {widest} countries"
+    # AN EXTENT IS NOT A COVERAGE, and this section's own verdict said
+    # "the widest crossing seven countries" — true, derived, and silent
+    # about the reader who comes looking for Iceland, Ireland, Bulgaria or
+    # Georgia and finds no journey through any of them. Asserted as the
+    # page stating a fraction of the countries it holds, computed from the
+    # legs, rather than as a figure here: a number typed into an audit is
+    # the number that was true on the day it was typed, and writing a
+    # journey through Iceland has to move it on the next build.
+    reached = len({DATA["cities"][l["city"]]["country"]["slug"]
+                   for j in DATA["journeys"] for l in j["legs"]
+                   if l["city"] in DATA["cities"]})
+    yield has("/journeys", f"{reached} of the {len(DATA['countries'])} countries"), \
+        "the index states how much of the continent the routes reach"
 
 
 # ── 19–27: the planner, AI, map, search, My Europe, reviews ───────────

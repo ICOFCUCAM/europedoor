@@ -200,8 +200,20 @@ async function main() {
     await page.fill("#ask", sentence);
     await page.click("#askform button[type=submit]");
     await page.waitForSelector("#result .note h3");
-    const money = await page.locator("#result .result-summary dd").first().textContent();
+    // A REFUSAL IS A VALID ANSWER AND MUST NOT LOOK LIKE A HANG. The
+    // planner declines to build a trip it cannot fund — "EUR 4,618 against
+    // a budget of EUR 2,500. That is not a plan you can take." — and the
+    // specification's own flagship sentence (EUR 2,500, twelve days, "my
+    // wife") is exactly that case now the party size reaches the
+    // arithmetic. Reading `.result-summary` straight would wait thirty
+    // seconds and die on a locator instead of failing with a sentence,
+    // which is the crash-stops-counting fault in the instrument.
+    const priced = await page.locator("#result .result-summary dd").count();
+    const money = priced
+      ? await page.locator("#result .result-summary dd").first().textContent()
+      : "0";
     return {
+      priced: priced > 0,
       // .first(), because the result carries three `.note` blocks — the
       // readback, the what-if rail and the budget line — and a strict
       // locator resolving to several is how this suite died once before.
@@ -231,6 +243,10 @@ async function main() {
      "a party size that does not reach readForm is a cost for somebody else");
   ok(/for <?4|for 4/.test(four.say) || four.say.includes("for 4"),
      "the readback did not state the party size it planned for");
+  ok(askOne.priced && four.priced,
+     "one of the two party-size sentences was refused on budget, so the cost " +
+     "band below has nothing to compare. Both must produce a priced plan for " +
+     "this assertion to mean anything.");
   const ratio = four.cost / askOne.cost;
   ok(ratio >= 1 + 0.55 * 3 - 0.15 && ratio <= 4 + 0.15,
      `four travellers cost ${ratio.toFixed(2)}x one traveller (EUR ${askOne.cost} ` +

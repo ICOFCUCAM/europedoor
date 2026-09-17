@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**101 sections · 39 partial · 31 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1370 assertions · 0 failing**
+**101 sections · 39 partial · 31 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1371 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -28,7 +28,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 15 | Experience system | BUILT | 23 | The specification's eight categories and their sub-categories — Renaissance was the one it named that we did not have — each page printing the rule that built its list, and every sub-category actually listing something. |
 | 16 | Journey system | BUILT | 188 | Every field on the specification's journey object except booking links, which are blocked with everything else commercial. |
 | 17 | Journey page | BUILT | 7 | Overview, map, route, transport, accommodation, budget, season, packing, the experiences the route passes and what you will be eating — plus a named curator and a way into the planner. |
-| 18 | Multi-country journeys | BUILT | 5 | All four the specification names, plus thirteen more, the widest crossing seven countries. |
+| 18 | Multi-country journeys | BUILT | 6 | All four the specification names, plus thirteen more, the widest crossing seven countries — and the index now states the other axis, because an extent can be entirely true while the map has a hole in it: the seventeen reach 29 of the fifty countries, and only three of the twenty-one they miss carry a travel advisory. |
 | 19 | AI journey planner — input | PARTIAL | 11 | The extraction the specification describes is built and runs on rules in the browser. The model is specified, with its prompts, and not built — the discipline had to exist first. |
 | 20 | AI planner output | BUILT | 10 | Summary, route, the five-line expenditure breakdown, and a day-by-day with alternatives — plus, on every hop, an estimated time, and one hoisted sentence saying the estimate is wrong in both directions because there is no road or rail geometry here. |
 | 21 | AI safety and reliability | PARTIAL | 4 | The refusals are built; the model that would need them is not. Volatile fields are refused at the schema level, which is stronger than a prompt. |
