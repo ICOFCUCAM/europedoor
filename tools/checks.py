@@ -5078,6 +5078,50 @@ def c_cut_reach():
     return n
 
 
+@check("a line break in a heading is not a word boundary")
+def c_break_word_boundary():
+    """`<br>` breaks a LINE; it does not separate two words.
+
+    Every plate heading on this site is typeset by hand, and all of them were
+    written `One destination from<br>each corner` — so the heading's text
+    content read *"One destination fromeach corner"*, and that is what a
+    screen reader announces and what anything resolving one of these as an
+    accessible name is handed. Measured across the built site before the fix:
+    28 occurrences in 26 distinct headings on 5 pages, including the homepage's
+    own h1 (*"Open the doorto Europe."*) and every one of its eight plates.
+    Invisible to every instrument here — the markup is valid, the heading is
+    present, the contrast is right and the pixels are correct, because a space
+    immediately before a break collapses at the end of the line.
+
+    THE FIRST VERSION OF THIS CHECK READ THE MARKUP AND UNDERCOUNTED ITS OWN
+    SUBJECT. Testing the two characters either side of the `<br>` in the HTML
+    cannot see `Keep<br><em class="lit">looking.</em>`, which reads
+    "Keeplooking." and has a `<` on one side — 26 against a real 28, and the
+    two it missed are on /discover and /search. That is *an instrument that
+    reads the markup rather than the claim*, which this repository records
+    about a line break defeating the projection check. So the break becomes a
+    sentinel, every other tag is stripped, and what is tested is the text.
+    """
+    import re as _re
+    SENT = "\x00"
+    join = _re.compile(r"\S" + SENT + r"\S")
+    bad, n = [], 0
+    for f in site_files():
+        html = open(f, encoding="utf-8").read()
+        for m in _re.finditer(r"<(h1|h2|h3)[^>]*>(.*?)</\1>", html, _re.S):
+            n += 1
+            t = _re.sub(r"<[^>]+>", "", _re.sub(r"<br\s*/?>", SENT, m.group(2)))
+            if join.search(t):
+                bad.append(f"{f}: {t.replace(SENT, chr(124))[:70]}")
+    if bad:
+        fail(f"{len(bad)} heading(s) run two words together at a line break — "
+             f"the text content is what is announced: " + "; ".join(sorted(set(bad))[:6]))
+    if n < 3000:
+        fail(f"c_break_word_boundary examined only {n} headings — it has "
+             f"stopped finding them.")
+    return n
+
+
 @check("no page prints a word cut in half")
 def c_cut_word():
     """`first_sentence()` exists, and the page it was written for did not use it.

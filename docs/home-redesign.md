@@ -55,7 +55,15 @@ nothing is the right answer.
 composition was solved against a constraint that no longer exists, and every
 band which reads as thin reads that way for the same reason.
 
-## FINDING 2 — SEVEN OF EIGHT HEADINGS RUN TOGETHER IN TEXT
+## FINDING 2 — EVERY HEADING ON THE PAGE RUNS TOGETHER IN TEXT
+
+**CORRECTED: this section read SEVEN OF EIGHT and the answer is eight of
+eight, and the eighth is the h1.** The first version listed the seven `<h2>`
+plate headings and left out `Open the door<br>to Europe.`, which reads
+*"Open the doorto Europe."* — the largest type on the site and the page's
+own accessible heading. A finding that lists its instances and then states a
+count is a finding whose count came from the list rather than from a
+measurement.
 
 Every plate heading is typeset by hand with a bare `<br>`:
 
@@ -68,10 +76,32 @@ Every plate heading is typeset by hand with a bare `<br>`:
     Open<br>the door.
 
 `<br>` is a line break and not a word boundary, so the text content of the
-first is **`Europeis not a checklist`**. A screen reader announces the
+second is **`Europeis not a checklist`**. A screen reader announces the
 run-together word, and anything resolving one of these as an accessible name
 gets the same. It is invisible to every instrument here: the markup is valid,
-the heading is present, the contrast is right and the pixels are correct.
+the heading is present, the contrast is right and the pixels are correct —
+**a space immediately before a break collapses at the end of the line**,
+which is both why nothing rendered wrong and why the repair costs nothing.
+
+**AND THE MECHANISM IS SITE-WIDE, SO THE REPAIR IS.** Measured on the built
+site: **28 occurrences in 26 distinct headings on five pages** — this page's
+eight, /journeys' seven, /experiences' seven, /discover's three and /search's
+two, plus the manifesto's closing couplet, which is not a heading and reads
+*"opens the way.Come discover"*. One of the eight here is composed rather than
+typed: `esc(head).replace(" is not", "<br>is not")`, a replace that **deletes
+the space it breaks at**, which is the only one of the 28 a search for `<br>`
+in the source would have found sitting next to a letter on purpose.
+
+**AND THE CHECK WRITTEN FOR IT UNDERCOUNTED ITS OWN SUBJECT, BY READING THE
+MARKUP.** Testing the two characters either side of the break in the HTML
+cannot see `Keep<br><em class="lit">looking.</em>` — which reads
+*"Keeplooking."* and has a `<` on one side. 26 against a real 28, and the two
+it missed were the /discover and /search openings. That is *an instrument a
+line break can defeat is reading the file rather than the claim*, which this
+repository already records about the projection check, arriving in a check
+written about line breaks. `c_break_word_boundary` turns the break into a
+sentinel, strips every other tag and tests the TEXT; it reads 19,400 headings
+and was proved red by putting one break back.
 
 And underneath it, a hand-typed break in a heading is **typesetting by hand
 in a stylesheet that already balances headings** — `text-wrap: balance` is on
@@ -103,4 +133,23 @@ change somebody preferred.
 
 ## Baseline
 
-Recorded in the commit that takes it, so the deltas afterwards are checkable.
+Every figure below is the homepage as shipped at commit `f89e0b81`, so each
+later commit's delta is checkable rather than asserted.
+
+| instrument | homepage, before |
+|---|---|
+| `monotony.js` | **6%** — the largest repeated component is three journey rows, 9,053 px of a page the instrument reads as 150,883 px. The site's ceiling is 52% and this page has never been near it: the homepage's fault was never repetition |
+| `opening.js` at 390 | **72%** of the first screen is picture; the first figure starts at y=178 and the h1 is 60 px at y=264 |
+| `opening.js` at 1280 | **85.5%**; figure at y=90, h1 60 px at y=251 |
+| `voids.js` | **no band over 90 px with nothing painted in it**, at either width |
+| bytes | 131,975, of which plate 01 is 91,176 (69%) |
+| photographs | 51 of the register's 826 rows, and three of the eight plates draw none |
+
+**Monotony at 6% is the measurement that says what this page's work is NOT.**
+Every other page rebuilt in this arc was a listing — /countries at 63%,
+/experiences at 62%, a motion page at 54%. This one is eight distinct
+compositions already, so the doctrine's first rule does not apply here and
+the second one does: *do not optimise for visual consistency at the expense
+of editorial difference.* What the page is short of is not variety of shape.
+It is that three of its eight plates hold no picture while the register holds
+826.

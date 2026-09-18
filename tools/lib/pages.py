@@ -1846,7 +1846,7 @@ def home(data):
     door = f"""
   <div class="doorgrid">
   <div class="sheettext">
-    <h1 class="mega">Open the door<br>to <em class="lit">Europe</em>.</h1>
+    <h1 class="mega">Open the door <br>to <em class="lit">Europe</em>.</h1>
     <p class="lede">{numword(ncountries, cap=True)} countries. {numword(nregions)} travel
     regions. A continent of living cultures, extraordinary places and endless
     ways to belong.</p>
@@ -1926,7 +1926,7 @@ def home(data):
   <div class="shotclip"><div class="shotfull">{picture(images, "home-hero", w=2400, h=1400,
       alt=_hero_row["alt"], sizes="100vw", credit=False, eager=True)}</div></div>
   <div class="sheettext">
-    <h2 class="mega">{esc(_cl["head"]).replace(" is not", "<br>is not")}</h2>
+    <h2 class="mega">{esc(_cl["head"]).replace(" is not", " <br>is not")}</h2>
     <p class="lede">{esc(_cl["body"])}</p>
     {golink('/beyond-the-obvious', 'Beyond the obvious')}
   </div>
@@ -1983,7 +1983,7 @@ def home(data):
         places = f"""
       <div class="galwrap">
       <div class="sheettext">
-        <h2 class="mega">One destination from<br>each corner of the continent.</h2>
+        <h2 class="mega">One destination from <br>each corner of the continent.</h2>
         <p class="lede">Europe changes with what you seek — mountains or coastlines,
         cities or quiet places. Every one of these is the first place this atlas
         would send you in its corner of the continent.</p>
@@ -2042,7 +2042,7 @@ def home(data):
         crossing = f"""
   <div class="galwrap">
   <div class="sheettext">
-    <h2 class="mega">Europe reveals itself<br>when you move through it.</h2>
+    <h2 class="mega">Europe reveals itself <br>when you move through it.</h2>
     <dl class="figures">{"".join(
         f'<div><dd>{esc(v)}</dd><dt>{esc(k)}</dt></div>' for v, k in jfacts)}</dl>
     <p class="lede">Measured on {esc(jf["name"])}. Every distance here is a straight
@@ -2066,7 +2066,7 @@ def home(data):
     atlas = f"""
   <div class="galwrap">
   <div class="sheettext">
-    <h2 class="mega">One continent.<br>{numword(ncountries, cap=True)} doors.</h2>
+    <h2 class="mega">One continent. <br>{numword(ncountries, cap=True)} doors.</h2>
     <p class="lede">Every country has its own way in — {ncities} places drawn
     on one projection, the same file as every other map here.</p>
     {golink('/map', 'Open the map')}
@@ -2111,7 +2111,7 @@ def home(data):
         reading = f"""
   <div class="galwrap">
   <div class="sheettext">
-    <h2 class="mega">Read the continent<br>differently.</h2>
+    <h2 class="mega">Read the continent <br>differently.</h2>
   </div>
   <div class="lead">
     <a class="leadshot" href="/stories/{esc(_lead_st["slug"])}" aria-label="{esc(_lead_st["title"])}">{_leadshot}</a>
@@ -2136,7 +2136,7 @@ def home(data):
     year = f"""
   <div class="galwrap">
   <div class="sheettext">
-    <h2 class="mega">Every month opens<br>a different Europe.</h2>
+    <h2 class="mega">Every month opens <br>a different Europe.</h2>
     <p class="lede">What is on, and where the crowds are not. The bar above the line
     is the fixtures this atlas holds that month; the bar below is how many countries
     are in their quieter shoulder.</p>
@@ -2154,7 +2154,7 @@ def home(data):
     # seen what this atlas is; this is the sentence that hands it to them.
     message = f"""
   <div class="sheettext">
-    <h2 class="mega">Open<br>the door.</h2>
+    <h2 class="mega">Open <br>the door.</h2>
     <p class="lede">Find the Europe waiting beyond the obvious itinerary.</p>
     <form class="askhero" action="/plan" method="get">
       <label for="homeask">Say it in your own words.</label>
@@ -5465,7 +5465,7 @@ def journeys_index(data):
     road = f"""
   <div class="sheettext">
     <p class="kicker">The European Journey Atlas</p>
-    <h1 class="mega">Europe is<br>a <em class="lit">journey</em>.</h1>
+    <h1 class="mega">Europe is <br>a <em class="lit">journey</em>.</h1>
     <p class="lede">Not a line between two points. {numword(len(js), cap=True)}
     routes, {len(stops_all)} stops across {len(reached)} of the
     {len(data["countries"])} countries, every one of them a real place in
@@ -5514,7 +5514,7 @@ def journeys_index(data):
     # two hundred destinations ago.
     seventeen = f"""
   <div class="pagehead index">
-    <h2 class="mega">Routes worth<br>remembering.</h2>
+    <h2 class="mega">Routes worth <br>remembering.</h2>
     <p class="lede">All {len(js)} of them, and a journey is not chosen on
     look, so none of these is a card. Each row carries where it goes, in
     order, and the line under it is that route's own legs end to end —
@@ -5528,7 +5528,7 @@ def journeys_index(data):
     # ── 03 · THE CREED ───────────────────────────────────────────────
     creed = """
   <div class="sheettext creedsay">
-    <h2 class="mega">The destination is<br>one moment in<br>the journey.</h2>
+    <h2 class="mega">The destination is <br>one moment in <br>the journey.</h2>
     <p class="lede">The landscape changes outside the window. The language
     shifts, then the architecture, then the table. A border stops being a
     line and becomes a day.</p>
@@ -5610,7 +5610,7 @@ def journeys_index(data):
         for k, l in enumerate(feat["legs"], 1))
     rhythm = f"""
   <div class="sheettext">
-    <h2 class="mega">Arrive. Cross.<br>Pause. Continue.</h2>
+    <h2 class="mega">Arrive. Cross. <br>Pause. Continue.</h2>
     <p class="lede">One journey's own legs, at their own lengths. A leg
     carries nights, so the movement is measured rather than named: one night
     is a crossing, two is a stop, three or more is a stay. This is
@@ -5644,7 +5644,7 @@ def journeys_index(data):
     if onroad:
         tales = f"""
   <div class="sheettext">
-    <h2 class="mega">Between the<br>destinations.</h2>
+    <h2 class="mega">Between the <br>destinations.</h2>
     <p class="lede">The {numword(len(onroad))} essays that name a place these
     routes pass through. A station, a ferry, a pass, a table &mdash; the part
     of a journey that is not a destination.</p>
@@ -5700,7 +5700,7 @@ def journeys_index(data):
         for name, cap, rule, say in PACE if paced[name])
     pace = f"""
   <div class="sheettext">
-    <h2 class="mega">There is more<br>than one way.</h2>
+    <h2 class="mega">There is more <br>than one way.</h2>
     <p class="lede">Cut by straight-line kilometres a day, which is the only
     pace this atlas can measure: it holds no road and no rail geometry, so
     every distance here is a line between two coordinates and the real figure
@@ -5739,7 +5739,7 @@ def journeys_index(data):
     ahead = f"""
   <div class="send {_shot}">{sendshot}
     <div class="sendsay">
-      <h2 class="mega">Where will the<br>road take you?</h2>
+      <h2 class="mega">Where will the <br>road take you?</h2>
       <p class="lede">Take one as written, or open it in the Planner and bend
       it to the time you actually have. Every stop above is a place in the
       Atlas, and every one of them has a page.</p>
@@ -6663,7 +6663,7 @@ def planner_page(data):
     # either. Grep the stylesheet before naming a composition.
     close = f"""
   <div class="composesay">
-    <h2 class="mega">Do not just choose places.<br>Compose the journey.</h2>
+    <h2 class="mega">Do not just choose places. <br>Compose the journey.</h2>
     <p class="lede">Start with what you have. Say what you like. The Atlas
     draws the line between them.</p>
     <p class="keepgo">{golink('#askform', 'Back to the desk')}
@@ -9570,7 +9570,7 @@ def experiences_index(data):
                   sizes="(min-width: 52rem) 58vw, 100vw")
     invite = f"""
   <div class="sheettext">
-    <h1 class="mega">What do you<br>want to <em class="lit">experience?</em></h1>
+    <h1 class="mega">What do you <br>want to <em class="lit">experience?</em></h1>
     <p class="lede">Europe is not one journey. It is {len(items)} ways to be
     there — to walk, taste, watch, row, pray, listen and go and look at
     something. Every one of them is a real, named thing in a real place, run
@@ -9687,7 +9687,7 @@ def experiences_index(data):
     ) if len(xpts) >= 2 else ""
     geoband = f"""
   <div class="sheettext">
-    <h2 class="mega">Where Europe<br>meets the doing.</h2>
+    <h2 class="mega">Where Europe <br>meets the doing.</h2>
     <p class="lede">The same continent as the instrument on /discover, drawn
     the other way: pale ground, ink coast, one mark per place. A map answers
     where, and where is the second question on this page rather than the
@@ -9777,7 +9777,7 @@ def experiences_index(data):
             + '</span></span></a>')
     samefeeling = f"""
   <div class="sheettext">
-    <h2 class="mega">Same feeling.<br>Different Europe.</h2>
+    <h2 class="mega">Same feeling. <br>Different Europe.</h2>
     <p class="lede">Where each kind actually concentrates, counted rather
     than chosen. A kind whose largest corner holds under a third of it is
     not on this band — a number that is true everywhere is not a finding.</p>
@@ -9828,7 +9828,7 @@ def experiences_index(data):
             + '</span></a>')
     about = f"""
   <div class="sheettext">
-    <h2 class="mega">What they<br>are about.</h2>
+    <h2 class="mega">What they <br>are about.</h2>
     <p class="lede">The other axis, and this one overlaps on purpose: an
     experience may be in several at once, so {len(data["categories"])}
     categories hold {sum(catn.values())} memberships across {len(items)}
@@ -9861,7 +9861,7 @@ def experiences_index(data):
         tales = f"""
   <div class="galwrap">
   <div class="sheettext">
-    <h2 class="mega">Why anybody<br>goes at all.</h2>
+    <h2 class="mega">Why anybody <br>goes at all.</h2>
     <p class="lede">An experience is a thing you can book. A story is the
     reason you would. {len(data["stories"])} of them, and every place either
     one names has a page here.</p>
@@ -9904,7 +9904,7 @@ def experiences_index(data):
         for cid in fresh], limit=10)
     places = f"""
   <div class="sheettext">
-    <h2 class="mega">Ten places<br>it happens in.</h2>
+    <h2 class="mega">Ten places <br>it happens in.</h2>
     <p class="lede">The destinations that hold the most of them and that this
     atlas holds a photograph of — {len(nx)} of {len(data["cities"])} hold at
     least one, and {len([c for c in nx if ("city:" + c) in images])} of those
@@ -9942,7 +9942,7 @@ def experiences_index(data):
     # here no competitor makes, so it closes the page instead.
     door = f"""
   <div class="sheettext">
-    <h2 class="mega">You do not need<br>another list.</h2>
+    <h2 class="mega">You do not need <br>another list.</h2>
     <p class="lede">Anything a business lists here carries the name of who
     runs it and the tier of checking it has passed — an unchecked listing says
     so on its face rather than hiding behind a star rating. Nothing on this
@@ -14175,7 +14175,7 @@ def manifesto_page(data):
 </div>
 
 <div class="manifesto">{verse}
-  <p class="manifesto-close">EuropeDoor opens the way.<br>Come discover what lies beyond.</p>
+  <p class="manifesto-close">EuropeDoor opens the way. <br>Come discover what lies beyond.</p>
 </div>
 
 <div class="mt7">
@@ -16467,7 +16467,7 @@ def discover_page(data):
 <section class="sheet sheet-ask sheet-paper sheet-white" id="discover-open">
   {actmark(1, "Discover")}
   <div class="asktext">
-    <h1 class="mega">What are you<br><em class="lit">looking for?</em></h1>
+    <h1 class="mega">What are you <br><em class="lit">looking for?</em></h1>
     <p class="lede">Do not begin with a destination. Begin with a curiosity — a landscape, a
     season, a culture, a road — and let the continent answer. Nothing here is submitted:
     the whole Atlas is already in your browser.</p>
@@ -16562,7 +16562,7 @@ def discover_page(data):
 <section class="sheet sheet-motion sheet-pine" id="discover-motion">
   {actmark(6, "Europe in questions")}
   <div class="sheettext">
-    <h2 class="mega">Sometimes you know<br>the question before<br>you know the place.</h2>
+    <h2 class="mega">Sometimes you know <br>the question before <br>you know the place.</h2>
     <p class="lede">Each one is a query run against every destination on every build, not a
     list somebody chose. The query is printed under the name, and it is the same query the
     page itself prints.</p>
@@ -16598,7 +16598,7 @@ def discover_page(data):
 <section class="sheet sheet-keep sheet-paper sheet-white" id="discover-end">
   {actmark(8, "Keep looking")}
   <div class="sheettext">
-    <h2 class="mega">Keep<br><em class="lit">looking.</em></h2>
+    <h2 class="mega">Keep <br><em class="lit">looking.</em></h2>
     <p class="lede">There is always another road, another city, another landscape, another
     door. {len(data['cities'])} of them are written up here, and the atlas is a third
     finished.</p>
