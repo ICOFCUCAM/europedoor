@@ -679,7 +679,8 @@ def measure():
                        "trade 10 KB against a 350 KB fetch to show one "
                        "picture, so the bytes are the cheap half of that "
                        "trade. The raw figure is what this ceiling measures "
-                       "and the compressed one is what a reader pays."},
+                       "and the compressed one is what a reader pays."
+                       "  489 -> 581 WHEN THE REGISTER REACHED EVERY DESTINATION, AND NOTHING ABOUT THIS PAGE CHANGED. The popup carries the derivative URL, the photographer's alt and the credit for each destination the register holds a picture of, and that went from 105 to 319 when eight acquisition batches merged into the default branch. Measured on the shipped page, `mapinfo` is 253,111 bytes of 597,481 and what a reader pays is 125 KB compressed. The ceiling is raised rather than argued with, because the trade was decided at 105 and this is the same trade at three times the coverage — but it is recorded rather than rounded up, because the per-destination photograph fields are now the largest single thing on the largest page on the site, and the next honest move is a second index rather than a bigger document."},
             # A CEILING, not a floor, and the direction is the point. The
             # rule is that a visual earns its position — so what needs
             # guarding is plates SPREADING back onto pages that do not need
