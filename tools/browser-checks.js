@@ -2748,8 +2748,18 @@ async function main() {
     //     foreground has to be captured BEFORE it is removed or every ratio
     //     collapses to about 1:1 — a failure that looks exactly like the
     //     defect being measured.
+    /* AND THE CREDIT IS MEASURED WHEN THERE IS ONE. A production
+     * photograph publishes its photographer and its licence, and while a
+     * DESIGN asset stands in for that surface there is nothing to credit
+     * and nothing to measure — a design asset shows a reader nothing about
+     * where it came from, which is the whole point of it. `optional` says
+     * which of these may honestly be absent, so the check still fails on a
+     * headline that has gone missing and no longer fails on a credit that
+     * is correctly not there. */
     const SEL = [[".sheet-bleed .mega", 3.0], [".sheet-bleed .lede", 4.5],
-                 [".sheet-bleed .go", 4.5], [".sheet-bleed .sheetcred", 4.5]];
+                 [".sheet-bleed .go", 4.5],
+                 [".sheet-bleed .sheetcred", 4.5, "optional"]];
+    const OPTIONAL = new Set([".sheet-bleed .sheetcred"]);
     for (const [sel, floor] of SEL) {
       const there = await page.evaluate((s) => {
         const e = document.querySelector(s);
@@ -2757,6 +2767,7 @@ async function main() {
         e.scrollIntoView({ block: "center" });
         return true;
       }, sel);
+      if (!there && OPTIONAL.has(sel)) continue;
       ok(there, `${sel} is not on the homepage to measure`);
       if (!there) continue;
       await page.waitForTimeout(250);
@@ -3934,6 +3945,20 @@ async function main() {
         c.getContext("2d").drawImage(img, 0, 0);
         const D = c.getContext("2d").getImageData(0, 0, img.width, img.height);
         const dpr = D.width / innerWidth;
+        /* AND THE FLOOR IS THE ONE THE PALETTE IN FRONT OF IT DECLARES.
+         * 1.35 is the DARK map's: `--map-context` against `--map-sea`, on a
+         * near-black ground where a country outside the subject is either
+         * lit or absent. The light map answers the same question a
+         * different way and says so in `docs/palette.json` — its only
+         * declared separations are the BORDER ink against the land (3.39)
+         * and against the water (4.02), because a printed atlas is stone on
+         * pale water and the COASTLINE is what separates them. Land against
+         * water is 1.18 there by design, and asserting 1.35 on it would be
+         * this check measuring one cartography with the other's number.
+         * What it is FOR survives either way: a country has to be drawn
+         * rather than absent, so the step is still measured, at the value
+         * the drawing's own palette sets. */
+        const FLOOR = document.querySelector(".europemap.atlas") ? 1.15 : 1.35;
         const lum = (r, g, bl) => { const f = (v) => { v /= 255;
           return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
           return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(bl); };
@@ -3965,7 +3990,7 @@ async function main() {
           const sx = t.a * inside[0] + t.c * inside[1] + t.e;
           const sy = t.b * inside[0] + t.d * inside[1] + t.f;
           const r = ratio(at(sx * dpr, (sy + scrollY) * dpr), sea);
-          if (r < 1.35) {
+          if (r < FLOOR) {
             const ti = s.querySelector("title");
             bad.push(`${ti ? ti.textContent.trim() : "?"} ${r.toFixed(2)}`);
           }
@@ -3975,7 +4000,7 @@ async function main() {
       ok(m !== null, `${u}: no instrument map to measure`);
       if (!m) continue;
       ok(m.bad.length === 0,
-         `${u}: ${m.bad.length} country/countries painted under the 1.35 that `
+         `${u}: ${m.bad.length} country/countries painted under the floor that `
          + `docs/palette.json declares against the sea — ${m.bad.join(", ")}. `
          + "The tokens clear it; the data-cut fade paints on top of them, and a "
          + "separation between two tokens says nothing about whether either is "

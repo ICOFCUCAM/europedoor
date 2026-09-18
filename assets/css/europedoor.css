@@ -2491,7 +2491,7 @@ a .kicker { color: var(--ink-3); }
   overflow-x: auto; max-width: min(100%, calc(88vh * 1.282)); margin-inline: auto;
 }
 .europemap { width: 100%; height: auto; display: block; min-width: 34rem; }
-.europemap .dot circle { fill: var(--sea); opacity: .78; transition: opacity .15s ease, r .15s ease; }
+.europemap .dot circle { fill: var(--cobalt); opacity: .8; transition: opacity .15s ease, r .15s ease; }
 .europemap .dot:hover circle { fill: var(--door); opacity: 1; r: 7; }
 .europemap .dot.advisory circle { fill: var(--warn); opacity: .5; }
 .europemap .dot.off circle { opacity: .07; }
@@ -2745,7 +2745,7 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
 .mapshot img { display: block; width: 100%; height: auto; border-radius: var(--radius); }
 .mapshot .credit { opacity: 1; }
 
-.europemap .placedot circle { fill: var(--door); opacity: .5; }
+.europemap .placedot circle { fill: var(--cobalt); opacity: .42; }
 .europemap .placedot:hover circle { opacity: 1; }
 
 /* ── the land ────────────────────────────────────────────────────────
@@ -2845,7 +2845,9 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
    `--map-sea` through `.mapcut`, which is a different mechanism because it
    is a different drawing. */
 .datacut stop { stop-color: var(--atlas-sea); }
-.europemap .context path { fill: var(--atlas-far); stroke: none; }
+.europemap .context path { fill: var(--atlas-land);
+  stroke: color-mix(in srgb, var(--atlas-coast) 32%, transparent);
+  stroke-width: calc(0.8px / var(--z)); }
 /* ── /map IS DRAWN AS AN ATLAS ───────────────────────────────────── */
 /* THE FIVE CARTOGRAPHIC ROLES ARE REBOUND RATHER THAN RESTATED, which is
    what /plan's desk drawing already does one file over: the fills below
@@ -2863,7 +2865,18 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
    the whole atlas the least atlas-like thing on the site. It is a picture
    you can operate, so it takes the picture's palette and keeps every
    control. */
-.europemap.atlas {
+/* AND THE BINDING IS ON THE BAND, NOT ON THE DRAWING, BECAUSE THE KEY HAS
+   TO RESOLVE WHERE THE DRAWING DOES. `.legend .sw.land` is
+   `var(--atlas-land)` and so is the map — the same token, and two different
+   colours, because a `var()` resolves where the DECLARATION lives: inside
+   the figure it was the light atlas and in the band beside it the world's
+   dark set, so the key named `#F3F0E6` while the map painted `#D8D4C7`.
+   That is this page's own recorded finding about `--sea`, reproduced by the
+   commit that fixed the drawing. The band declares the palette once and
+   everything inside it — the drawing, the key, the swatches — reads the
+   same five roles. `.europemap.atlas` keeps the class, because that is what
+   declares WHAT THE DRAWING IS and what `checks.py` reads. */
+.sheet-mapopen {
   --atlas-sea:      var(--map-water);
   --atlas-land:     var(--map-land);
   --atlas-far:      #C3BFB2;
@@ -2891,12 +2904,6 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
    plates settled this years ago — same fill, a lighter coastline, because
    the difference that IS real is how much we know about it — and the fade
    over the cut is what says where the data stops. */
-.europemap.atlas .context path { fill: var(--atlas-land);
-  stroke: color-mix(in srgb, var(--atlas-coast) 32%, transparent);
-  stroke-width: calc(0.8px / var(--z)); }
-.europemap.atlas .countries path {
-  stroke: color-mix(in srgb, var(--atlas-frontier) 58%, transparent);
-  stroke-width: calc(0.8px / var(--z)); }
 /* WHICH WAY IS NORTH, AND WHY IT IS NOT AN ARROW. `pages.MAPPROJ` is a
    Lambert conformal conic with a cone constant of 0.7753, so grid north
    turns away from true north by `n x (lon - 10)`: -27.1 degrees over
@@ -2927,19 +2934,30 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
    last thing in the drawing now, and `pointer-events: none` keeps every dot
    and every country reachable underneath them. */
 .europemap :is(.lyr-labels, .lyr-water-labels) { pointer-events: none; }
+/* AND THEY COME OFF BELOW 44rem. A label is sized in VIEWBOX UNITS and the
+   browser scales the viewBox to its container: 11 units in a 1000-unit frame
+   is 7.0 pixels at 390 — not small type, type that does not resolve into
+   glyphs, which is the measurement that took the map labels off narrow
+   screens on eight hundred pages. The country names clear it; the sea names
+   do not, and a sea keeps its water either way. */
+@media (max-width: 44rem) { .europemap .lyr-water-labels { display: none; } }
 .europemap .lyr-water-labels .seaname { font-size: calc(11px / var(--z));
   fill: color-mix(in srgb, var(--ocean-deep) 58%, transparent); }
-/* AND THE DOTS TAKE THE GEOGRAPHIC ACCENT RATHER THAN THE WORLD'S. `--sea`
-   is the INTELLIGENCE world's cobalt-air, sized for a near-black ground; on
-   pale stone it is a wash. `--cobalt` is the token this palette declares as
-   the geographic accent and measures at 5.68 on bone. */
-.europemap.atlas .dot circle { fill: var(--cobalt); }
-.europemap.atlas .placedot circle { fill: var(--cobalt); opacity: .42; }
+/* THE DOTS TOOK THE GEOGRAPHIC ACCENT AND THE BASE RULE TOOK IT WITH THEM.
+   `--sea` is the INTELLIGENCE world's cobalt-air, sized for a near-black
+   ground; on pale stone it is a wash, so these moved to `--cobalt`, the
+   token this palette declares as the geographic accent and measures at 5.68
+   on bone. It was written as an `.atlas` override and the dead-rule scan
+   named all three base rules the next run: there is exactly ONE `.europemap`
+   on this site and it always carries `.atlas`, so a variant is not a variant,
+   it is the rule with a second copy underneath. Same finding as `every
+   minimap is arched`, three rules over. */
 .europemap.atlas .cshape:hover path,
 .europemap.atlas .cshape.on path { fill: var(--pine); stroke: var(--pine-deep); }
 .europemap .countries path {
-  fill: var(--atlas-land); stroke: var(--atlas-frontier);
-  stroke-width: calc(1px / var(--z)); stroke-linejoin: round;
+  fill: var(--atlas-land);
+  stroke: color-mix(in srgb, var(--atlas-frontier) 58%, transparent);
+  stroke-width: calc(0.8px / var(--z)); stroke-linejoin: round;
 }
 .europemap.noborders .countries path { stroke: none; }
 .europemap .cshape { cursor: pointer; }
@@ -3012,8 +3030,11 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
 .legend li { display: flex; gap: var(--s3); align-items: baseline; margin-bottom: var(--s2); }
 .legend .sw { flex: 0 0 auto; width: 1rem; height: 1rem; border-radius: 3px; border: 1px solid var(--atlas-coast); }
 .legend .sw.land { background: var(--atlas-land); }
-.legend .sw.ctx { background: var(--atlas-far); }
-.legend .sw.dest { background: var(--sea); border-radius: 50%; border-color: var(--sea); width: .75rem; height: .75rem; }
+/* THE GROUND BEYOND IS THE SAME LAND NOW, so the swatch is too — the
+   difference the key describes is a lighter coastline rather than a tone. */
+.legend .sw.ctx { background: var(--atlas-land);
+                  border-color: color-mix(in srgb, var(--atlas-coast) 32%, transparent); }
+.legend .sw.dest { background: var(--cobalt); border-radius: 50%; border-color: var(--cobalt); width: .75rem; height: .75rem; }
 .legend .sw.ring { background: var(--atlas-land); border-radius: 50%; border-color: var(--ink-3); border-width: 2px; width: .8rem; height: .8rem; }
 /* Land under the small maps. The country map is the middle rung of
  * Europe -> country -> region -> destination, and before there was geometry
