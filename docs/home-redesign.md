@@ -895,3 +895,22 @@ authoring a measurement, which is the one thing this repository never does.
 *separate object, placed here by a system*, and this page has no boxes at all —
 which is why the one link shape here is a drawn mark, a rule and a tracked
 label. The close takes that shape.
+
+## Home 18/30 — the seven the browser found in plates 03 and 04
+
+The static suite, the invariant register and both audits were green on the two
+recomposed bands. The browser suite was not, and every one of the seven is a
+class of fault this repository already has a name for.
+
+| | |
+|---|---|
+| `.featname {display,color}`, `.crossart > :is(picture,img) {display}`, `.crossroute .constel {display}` | **a grid item is blockified by the layout**, and `color` restated what `.featsay` already binds. The seventh, eighth and ninth dead `display` on a photograph container found here, each in the first run where a photograph actually rendered in it |
+| the window picture moved 230px at 1280 and 261px at 390 | the measurement, not the picture. The wall carries the plate mark and the aperture is cut BELOW it, so a scroll to the top of the *band* begins 230 pixels before the sticky box engages — and the picture travels those 230 with the wall, exactly as it should. **The aperture is where the standing starts**, so the check scrolls the clip host |
+| `<a>` "The Nordics / Copenhagen" at 1.14:1 | **an element that paints no text of its own may not claim an ink.** Every word inside the tile is in `.featsay`, which binds bone on its own scrim; bone on the anchor as well made an element whose ground is the wall's white claim a colour it never paints. That is the plate mark on the opening one band over, in the run that fixed it |
+| the homepage scrolls sideways by 15px at 320 | the journey rows. The index is `aria-hidden` decoration and its track plus its gap is **56 pixels of a 288-pixel phone** — the order is already the order, so the ordinal comes off below 44rem and the picture and the words keep the row |
+
+Bisected rather than guessed: hiding each band in turn named `.sheet-crossing`,
+then each element in turn named `.jrows` and all three `.jr` rows. The only
+elements whose boxes reached past 320 were `<use>` clones inside an SVG, which
+is clipped and contributes nothing — *the eye finds a defect and it does not
+confirm one*, applied to an overflow probe.

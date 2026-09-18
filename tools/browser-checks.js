@@ -2924,8 +2924,16 @@ async function main() {
        * the band can begin after the standing has ended and report the
        * picture travelling when it has simply finished. `start` is where
        * the standing starts, which is the only place this promise can
-       * honestly be measured from. */
-      band.scrollIntoView({ block: "start" });
+       * honestly be measured from.
+       *
+       * AND THE BAND'S START IS NOT THE OPENING'S. The wall carries the
+       * plate mark and the aperture is cut BELOW it, so a scroll to the top
+       * of the band begins 230 pixels before the sticky box engages — and
+       * the picture then travels those 230 with the wall, exactly as it
+       * should, and the measurement calls that a panel. The aperture is
+       * where the standing starts, which is why this scrolls the clip host
+       * rather than the section. */
+      cliphost.scrollIntoView({ block: "start" });
       const img = pic.querySelector("img") || pic;
       const before = img.getBoundingClientRect();
       const y0 = scrollY;

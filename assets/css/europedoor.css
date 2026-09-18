@@ -9520,7 +9520,13 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    band, with the head ending 295 pixels before the picture began. A
    feature's picture is the tallest thing in its band or it is a thumbnail
    with ambitions. */
-.featlead { position: relative; display: grid; color: var(--bone); }
+/* AND THE LINK ITSELF TAKES NO INK. Every word inside it is in `.featsay`,
+   which binds bone on its own scrim; setting bone on the anchor as well made
+   an element whose ground is the wall's white claim a colour it never
+   paints, and the contrast sweep read it at 1.14:1 — correctly, by its own
+   method, about an element that is not there. That is the plate mark on the
+   opening again, one band over, in the run that fixed it. */
+.featlead { position: relative; display: grid; }
 .featlead :is(picture, img) { grid-area: 1 / 1; display: block; width: 100%;
                               height: 100%; min-height: 30rem;
                               object-fit: cover; }
@@ -9540,8 +9546,8 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
 .featwhere { display: block; font-family: var(--text); font-size: var(--t-xs);
   letter-spacing: .13em; text-transform: uppercase;
   color: color-mix(in srgb, var(--bone) 82%, transparent); }
-.featname { display: block; font-family: var(--display);
-  font-size: var(--t-3xl); line-height: 1.12; color: var(--bone); }
+.featname { font-family: var(--display);
+  font-size: var(--t-3xl); line-height: 1.12; }
 .featline { display: block; font-family: var(--display);
   font-size: var(--t-base); line-height: 1.5;
   color: color-mix(in srgb, var(--bone) 88%, transparent);
@@ -10560,7 +10566,11 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
          margin-inline: calc(-1 * var(--page-gutter)); }
 .crosstext { padding-left: var(--page-gutter); min-width: 0; }
 .crossart { position: relative; display: grid; margin: 0; }
-.crossart > :is(picture, img) { grid-area: 1 / 1; display: block;
+/* NO `display: block` — A GRID ITEM IS BLOCKIFIED BY THE LAYOUT, and this
+   is the seventh and eighth time that declaration has been written on a
+   photograph container here and found dead in the first run where a
+   photograph actually rendered in it. */
+.crossart > :is(picture, img) { grid-area: 1 / 1;
   width: 100%; height: 100%; object-fit: cover; }
 .crossart picture > img { width: 100%; height: 100%; object-fit: cover; }
 /* AND IT NEEDS A STACKING ORDER, NOT ONLY A CELL. Two grid items sharing
@@ -10577,8 +10587,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    fit (`meet`), so a 0.62 drawing inside a 443x1643 column is fitted by
    width and centred — which is what is wanted — and asking for the full
    height only makes the box taller without making the drawing bigger. */
-.crossroute .constel { width: 100%; height: auto; max-height: 100%;
-                       display: block; }
+.crossroute .constel { width: 100%; height: auto; max-height: 100%; }
 /* A ROUTE OVER A PHOTOGRAPH HAS NO GROUND IT CAN PREDICT, so the casing is
    the ground's own dark and the core is bone — the same rule every printed
    map answers this with, and the same one `route_line` was written for.
@@ -10794,6 +10803,14 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 }
 @media (max-width: 44rem) {
   .pl { grid-template-columns: 4rem minmax(0, 1fr) auto; }
+  /* AND THE ORDINAL COMES OFF A 288-PIXEL ROW. The index is `aria-hidden`
+     decoration — the order is already the order — and its track plus its
+     gap is 56 pixels of a 288-pixel phone, which is what pushed the
+     journey rows' own content off the screen: measured at 320, the
+     homepage scrolled sideways by 15 and all three rows contributed. The
+     picture and the words are the row; the number is not. */
+  .jr { grid-template-columns: 7rem minmax(0, 1fr); }
+  .jrno { display: none; }
   /* THE FOUR COUNTS DO NOT FIT FOUR COLUMNS ON A PHONE. "Journeys" is 75px
      of tracked uppercase and a 320 screen gives each column 54, so the last
      label ran 7 pixels off the page — a sideways scroll on the homepage. */
