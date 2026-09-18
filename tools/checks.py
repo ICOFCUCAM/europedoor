@@ -18,6 +18,7 @@ from __future__ import annotations
 import glob
 import importlib
 import hashlib
+import html
 import html.parser
 import colorsys
 import json
@@ -30,6 +31,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from lib import ads as ADS
 from lib import data as D
 from lib import pages as P
 from lib import score as S
@@ -8231,14 +8233,26 @@ def c_img_dimensions():
     if bad:
         fail(f"{len(bad)} of {n} images ship with no intrinsic size, so the "
              f"page reflows when they arrive: {bad[0]}")
-    # A FLOOR, BECAUSE THIS CHECK'S SUBJECT IS A THING THE REGISTER CREATES.
-    # With an empty library it examined zero images and reported green, which
-    # is the failure this file records about the dot sweep and
-    # `c_one_plate_per_thing` — an assertion about an empty set counts
-    # exactly like one about a page.
-    if n < 100:
-        fail(f"only {n} images on the whole site — this check has stopped "
-             f"finding them, and a sweep of nothing reports no defect")
+    # A FLOOR DERIVED FROM THE REGISTER, BECAUSE THE FIRST ONE WAS A CLAIM
+    # ABOUT THE PRODUCT'S CONTENTS WEARING A CLAIM ABOUT THIS CHECK'S REACH.
+    # It read `if n < 100`, which is true of the site as it ships and false
+    # of the site `photo-tests.py` builds: that suite frees purposes and
+    # acquires against a stub, so its build legitimately carries eighteen
+    # images, and the gate suite that guards photographs went red on the
+    # commit that added this floor. That is the *empty-register fault* for
+    # the fifth time on this record, and the same shape as the desk suite's
+    # `reg_now == {}`.
+    #
+    # What a floor here can honestly say is that every registered photograph
+    # reaches a page, which is a quantity the register decides: an empty
+    # register means no images, and a check with no subject is not a check
+    # that has stopped working.
+    rows = len(json.load(open(os.path.join(ROOT, "data", "images.json"),
+                              encoding="utf-8"))["images"])
+    if n < rows:
+        fail(f"{n} images on the site against {rows} registered photographs "
+             f"— either this check has stopped finding them or a licensed "
+             f"photograph reaches no page")
     return n
 
 
@@ -8271,6 +8285,210 @@ def c_captions():
                          f"track. WCAG 2.2 AA asks for captions on time-based "
                          f"media, and this site had none at all until now")
                 i = h.find(tag, i + 1)
+    return n
+
+
+@check("nothing on this site is advertising, and nothing looks as though it is waiting to be")
+def c_ads_off():
+    """§2, §11, §28, §29 and §33 of the advertising specification, measured.
+
+    THE MARKER IS WHAT IS TESTED, NEVER THE WORDS. /for-businesses publishes
+    the whole disclosure vocabulary — it is the page an advertiser reads — and
+    the Stay layer's own disclosure carries the word *sponsored* on 319
+    destination pages because a referral under a partner credential has to. A
+    check greping for "Sponsored" would therefore fail on two surfaces that
+    are correct and could never be made to pass, which is the shape of guard
+    somebody deletes. `class="adband` and `data-placement=` are emitted by
+    `render.ad_slot()` and by nothing else, so they are the honest subject.
+
+    AND ZERO BYTES IS THE ASSERTION rather than "hidden". A hidden container
+    still reserves markup, still ships a class a stylesheet can size, and
+    still gives the next person somewhere to put a height. The brief asks
+    that the normal layout close the space; an empty string is the only
+    version of that a static check can hold, and `browser-checks.js`
+    measures the other half — every family at 0.0000 of layout shift.
+    """
+    marked = [rel(f) for f in site_files()
+              if 'class="adband' in open(f, encoding="utf-8").read()
+              or "data-placement=" in open(f, encoding="utf-8").read()]
+    if marked:
+        fail(f"{len(marked)} page(s) carry an advertising slot while the "
+             f"registry says nothing is serving: {marked[:3]}")
+    # §32's launch checklist, as fourteen assertions rather than a paragraph.
+    # Nine things must EXIST and five must be FALSE, and the five are what
+    # makes this more than a feature flag: one flag is never the whole gate,
+    # which is the sister repository's own recorded lesson about a `status`
+    # field that went inert.
+    reg = ADS.load()
+    if ADS.entity():
+        fail("data/advertising.json names an operating entity, and "
+             "docs/legal-position.md records that none is incorporated")
+    if reg["serving"].get("enabled"):
+        fail("serving.enabled is true: switching advertising on is a pull "
+             "request, not a field somebody flips")
+    on = [k for k, v in ADS.flags().items() if v]
+    if on:
+        fail(f"advertising flags are set: {on}")
+    live = [p["slug"] for p in ADS.placements() if p.get("enabled")]
+    if live:
+        fail(f"placements are enabled: {live}")
+    lit = [x["slug"] for x in ADS.surfaces() if x.get("enabled")]
+    if lit:
+        fail(f"surfaces are enabled: {lit}")
+    if reg["events"].get("firing"):
+        fail("events.firing is true, and there is no analytics pipeline in "
+             "this product to receive an impression")
+    if reg["planner"].get("may_influence"):
+        fail("the registry says advertising may influence the Guide, which "
+             "is the one separation §9 exists for")
+    if reg["revenue_models"]["implemented"]:
+        fail(f"a revenue model is implemented: "
+             f"{reg['revenue_models']['implemented']}")
+    if reg["revenue_models"].get("payment_provider"):
+        fail("a payment provider is declared, which is out of scope in the "
+             "brief and behind the entity gate here")
+    for table in ("advertisers", "campaigns", "creatives"):
+        if reg[table]:
+            fail(f"{table} is not empty while nothing may serve")
+    if ADS.may_serve():
+        fail("ads.may_serve() is true with no campaign, which means the "
+             "five conditions have stopped being conditions")
+    if ADS.served():
+        fail(f"{len(ADS.served())} campaign(s) would render")
+    # The nine that must EXIST, because a registry that has quietly lost its
+    # tables reports the same green as one that is correctly switched off —
+    # which is this file's own *a green run that has stopped counting*.
+    if len(ADS.placements()) != 9:
+        fail(f"{len(ADS.placements())} placements declared, and §5 names nine")
+    if len(ADS.statuses()) != 9:
+        fail(f"{len(ADS.statuses())} campaign statuses, and §4 names nine")
+    if len(reg["targeting"]["dimensions"]) != 6:
+        fail("§6 names six targeting dimensions")
+    if len(ADS.flags()) != 5:
+        fail("§26 names five feature flags")
+    if len(reg["phases"]) != 4:
+        fail("§26 names four phases")
+    if len(reg["events"]["names"]) != 5:
+        fail("§16 names five analytics events")
+    if len(reg["revenue_models"]["supported_later"]) != 6:
+        fail("§20 names six revenue models")
+    if not ADS.disclosures():
+        fail("no disclosure vocabulary, so nothing constrains what a paid "
+             "band may call itself")
+    if not ADS.refused_networks():
+        fail("the third-party network refusal has emptied itself")
+    # And the write methods refuse rather than returning a falsy value
+    # nobody checks: a write that quietly does nothing is a write somebody
+    # builds a UI on top of.
+    for fn, what in ((ADS.create_campaign, "create"),
+                     (ADS.approve_campaign, "approve")):
+        try:
+            fn("x") if what == "approve" else fn(slug="x")
+        except PermissionError:
+            pass
+        else:
+            fail(f"ads.{what}_campaign() did not refuse")
+    return len(site_files())
+
+
+@check("the wall between editorial and commerce says the same thing on the page and in the mechanism")
+def c_ads_wall():
+    """/for-businesses' own procedure: if the wall moves, it moves in public.
+
+    BOTH DIRECTIONS, because either drifting alone is the failure. A page can
+    keep a promise the mechanism has stopped keeping — which is what the
+    sentence *paid tiers buy presentation on directory surfaces* became the
+    moment nine editorial placements were declared — and a mechanism can be
+    quietly stricter than the page a reader is reading, which is worse,
+    because then the published position is the looser of the two.
+
+    It also asserts the page states the sentence it REPLACED. A wall that
+    moves without saying what it used to say has not moved in public.
+    """
+    h = open(os.path.join(OUT, "for-businesses", "index.html"),
+             encoding="utf-8").read()
+    # AND THE TYPOGRAPHIC APOSTROPHE IS THE THIRD NORMALISER THIS COMPARISON
+    # NEEDED. The data loader curls every possessive — 2,165 of them, and a
+    # check already fails when one ships straight — so *a destination's
+    # score* in the registry reaches the page as *destination\u2019s*, and the
+    # two would never meet. One representation, both sides: this reads the
+    # page's own form back to the registry's.
+    def flatten(t):
+        return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", t))
+                      ).lower().replace("\u2019", "'").replace("\u2014", "-")
+
+    flat = flatten(h)
+    w = ADS.wall()
+    n = 0
+    for field in ("position", "surfaces", "replaced"):
+        n += 1
+        want = flatten(w[field]).strip().rstrip(".")
+        if want not in flat:
+            fail(f"/for-businesses does not state the wall's {field}: "
+                 f"{want[:70]!r}")
+    if w["published_on"] != "/for-businesses":
+        fail(f"the registry says the wall is published on "
+             f"{w['published_on']!r} and this check reads /for-businesses")
+    # AND EVERY PLACEMENT IS NAMED ON THAT PAGE, because a declared slot
+    # nobody can read about is an architecture with no disclosure.
+    for pl in ADS.placements():
+        n += 1
+        if flatten(pl["name"]) not in flat:
+            fail(f"/for-businesses does not name the placement "
+                 f"{pl['name']!r}, so the architecture is unpublished")
+    return n
+
+
+@check("a paid placement may never wear an editorial word, and no ad network is named anywhere")
+def c_ads_separation():
+    """§8, §17, §18, §21 and §25's separation, asserted where it can be.
+
+    Three promises with three different subjects. **The disclosure
+    vocabulary is closed**, so a campaign cannot invent one — and the four
+    words §17 refuses by name are refused in the registry rather than in a
+    comment, because the guard has to be the thing `creative_problems()`
+    reads. **No third-party ad host may be named** in any page or any
+    script, which is the same form as the commercial-map-host refusal this
+    repository already runs: adopting one changes the security posture of
+    every page, so it cannot arrive as a tag somebody added. **And
+    `planner.js` may not know the registry exists** — §9 asks that the Guide
+    and the commercial layer be independent, and independence is
+    demonstrated by the recommendation code having no reference to reach.
+    """
+    reg = ADS.load()
+    n = 0
+    for word in reg["disclosure_refused"]:
+        n += 1
+        if word in ADS.disclosures():
+            fail(f"{word!r} is both a refused word and a declared "
+                 f"disclosure, which is the vocabulary agreeing with nobody")
+    for key in ADS.refused_campaign_keys():
+        n += 1
+        if f'"{key}"' in json.dumps(reg["entities"]["campaigns"]):
+            fail(f"the campaign entity declares {key!r}, which §8 refuses: "
+                 f"a field a ranking could read is a ranking waiting to be "
+                 f"written")
+    hosts = [h.lower() for h in ADS.refused_networks()]
+    for path in site_files() + [os.path.join(ROOT, "assets", "js", f)
+                                for f in sorted(os.listdir(
+                                    os.path.join(ROOT, "assets", "js")))]:
+        body = open(path, encoding="utf-8").read().lower()
+        n += 1
+        for host in hosts:
+            if host in body:
+                fail(f"{rel(path) if path.startswith(OUT) else path} names "
+                     f"the advertising host {host!r}. An external network "
+                     f"needs a script origin and an image origin, so "
+                     f"adopting one is an owner's decision about all "
+                     f"{len(site_files())} pages rather than a build step")
+    js = bare_js(open(os.path.join(ROOT, "assets", "js", "planner.js"),
+                      encoding="utf-8").read())
+    n += 1
+    for token in ("advertising", "adslot", "sponsor", "campaign"):
+        if token in js.lower():
+            fail(f"planner.js refers to {token!r}. §9 asks that the Guide "
+                 f"and the commercial layer be independent, and a "
+                 f"recommendation engine that can see a campaign is not")
     return n
 
 

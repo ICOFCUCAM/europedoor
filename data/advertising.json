@@ -1,0 +1,481 @@
+{
+  "$comment": "THE COMMERCIAL LAYER, BUILT AND DORMANT. Advertising infrastructure now, advertising display later — §1 of the advertising specification, and this file is the whole of it. Nine placements, nine campaign statuses, six targeting dimensions, five feature flags, five event names, six revenue models, and tables with nothing in them. Nothing serves and nothing can be made to serve by setting one field: see `serving`, `flags` and tools/lib/ads.py. The map of §1-33 against what is built is docs/advertising.md. The wall between editorial and commerce is published at /for-businesses and its position is stated here so the two cannot drift.",
+  "serving": {
+    "enabled": false,
+    "entity": null,
+    "gate": "There is no operating entity. docs/legal-position.md section 3 records it as not yet incorporated, nothing on this site takes a payment, and an advertising contract is a contract. Until an entity exists there is nobody for an advertiser to pay and nobody to be liable for what a placement says.",
+    "$comment": "ONE FLAG IS NEVER THE WHOLE GATE. `ads.may_serve()` requires FIVE independent things: an entity, this switch, the surface's own switch, the placement's own switch, and a signed insertion order on the campaign. The specification asks for `ADVERTISING_ENABLED=false` in the environment; this is a field in a committed registry instead, which is stronger — an environment variable can be flipped without a commit, a review or a diff, and this cannot. The sister repository records what one word costs: its `status: 'active'` became inert the day a real ladder was built, and guarding the wrong word is worse than guarding nothing.",
+    "slot_position": "After the page's own content and before the footer: outside the editorial sequence, and never numbered.",
+    "slot_position_why": "A PAID BAND INSIDE A NUMBERED SEQUENCE IS AN ADVERTISEMENT WEARING A MOVEMENT'S CLOTHES, which is exactly what §17 refuses. Five pages here are plate sequences whose furniture is a number, a rule and a name, and `plate_sequence()` numbers by what is DRAWN — so a placement added to that list would take an act number and read as one of the page's own movements. It sits after the sequence instead. And the position is one field rather than nine: nine copies of one sentence is the desk registry's own 590-copies-of-one-brief fault, and nine chances for two surfaces to disagree about where a paid band goes."
+  },
+  "flags": {
+    "$comment": "§26's five flags, so that monetisation can be activated gradually rather than all at once. Each is read independently by `ads.may_serve()`; a placement whose flag is false cannot serve even with everything else true.",
+    "ADVERTISING_ENABLED": false,
+    "SPONSORED_SEARCH_ENABLED": false,
+    "SPONSORED_MAP_ENABLED": false,
+    "SPONSORED_CONTENT_ENABLED": false,
+    "BUSINESS_ADVERTISING_ENABLED": false
+  },
+  "phases": [
+    {
+      "phase": 1,
+      "name": "Everything off",
+      "flags": [],
+      "state": "current"
+    },
+    {
+      "phase": 2,
+      "name": "Partner Spotlight only",
+      "flags": [
+        "ADVERTISING_ENABLED"
+      ],
+      "requires": "An operating entity, one signed insertion order, and a creative that can clear the licence register."
+    },
+    {
+      "phase": 3,
+      "name": "Business campaigns",
+      "flags": [
+        "BUSINESS_ADVERTISING_ENABLED"
+      ],
+      "requires": "Claimable business profiles, which need authentication — the same gate as every account feature here."
+    },
+    {
+      "phase": 4,
+      "name": "Sponsored search and map",
+      "flags": [
+        "SPONSORED_SEARCH_ENABLED",
+        "SPONSORED_MAP_ENABLED"
+      ],
+      "requires": "An answer to the two objections recorded against those placements below. Last on purpose."
+    }
+  ],
+  "wall": {
+    "position": "Paid placement buys a declared slot. It never buys Atlas ranking, Journey Planner weighting, a place in a curated journey, a destination's score, a search result's order, or one word of editorial copy.",
+    "surfaces": "Declared slots on editorial surfaces, and the directory. Every one of them is off.",
+    "published_on": "/for-businesses",
+    "replaced": "Paid tiers buy presentation on directory surfaces.",
+    "moved": "2026-09-18",
+    "$comment": "A WALL WITH NO PROCEDURE IS A SLOGAN, and /for-businesses has carried the procedure since before this file existed: if that wall ever moves, it moves in public, on this page. It moved there in the same commit as this line. `checks.py` asserts the page and this position agree IN BOTH DIRECTIONS, because either drifting alone is the failure: a page can keep a promise the mechanism has stopped keeping, and a mechanism can be quietly stricter than the page a reader is reading."
+  },
+  "entities": {
+    "$comment": "§4's three tables plus §5's placements, with the fields the specification names. Kept as a declared shape as well as as data, so that a form, a validator and a future database all have one thing to be checked against — and so that a reader can see what is being asked for without reading the validator.",
+    "advertisers": [
+      "id",
+      "business_id",
+      "name",
+      "status",
+      "contact_email",
+      "created_at",
+      "updated_at"
+    ],
+    "campaigns": [
+      "id",
+      "advertiser_id",
+      "name",
+      "status",
+      "campaign_type",
+      "start_at",
+      "end_at",
+      "budget",
+      "currency",
+      "daily_budget",
+      "insertion_order",
+      "targets",
+      "created_at",
+      "updated_at"
+    ],
+    "creatives": [
+      "id",
+      "campaign_id",
+      "type",
+      "headline",
+      "description",
+      "image_url",
+      "destination_url",
+      "cta_label",
+      "disclosure_label",
+      "metadata",
+      "created_at",
+      "updated_at"
+    ],
+    "ad_placements": [
+      "id",
+      "name",
+      "placement_type",
+      "page_type",
+      "position",
+      "enabled",
+      "max_items",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "statuses": [
+    "draft",
+    "pending_review",
+    "approved",
+    "scheduled",
+    "active",
+    "paused",
+    "completed",
+    "rejected",
+    "cancelled"
+  ],
+  "transitions": {
+    "$comment": "§14. A business may never publish advertising instantly, so the only route to `active` runs through a review somebody performed. A transition this table does not name is refused by the validator rather than by a convention.",
+    "draft": [
+      "pending_review",
+      "cancelled"
+    ],
+    "pending_review": [
+      "approved",
+      "rejected",
+      "cancelled"
+    ],
+    "approved": [
+      "scheduled",
+      "cancelled"
+    ],
+    "scheduled": [
+      "active",
+      "cancelled"
+    ],
+    "active": [
+      "paused",
+      "completed",
+      "cancelled"
+    ],
+    "paused": [
+      "active",
+      "completed",
+      "cancelled"
+    ],
+    "rejected": [
+      "draft"
+    ],
+    "completed": [],
+    "cancelled": [],
+    "rejected_requires": "reason"
+  },
+  "creative_types": [
+    "image",
+    "card",
+    "story",
+    "experience",
+    "journey",
+    "destination"
+  ],
+  "creative_types_refused": {
+    "video": "§4 says video is not required for V1 and it is not declared. This site ships no time-based media at all — zero `<video>` and zero `<audio>` across 1,032 pages — and the captions guard exists in advance of the first one. A video creative would be the first, and it would arrive from an advertiser."
+  },
+  "targeting": {
+    "$comment": "§6 and §7: contextual relevance rather than surveillance. A campaign may target these six and nothing else, and the vocabulary is closed because 'do not build invasive behavioural advertising' is only checkable if somebody has written down what is allowed.",
+    "dimensions": [
+      "country",
+      "region",
+      "destination",
+      "experience_category",
+      "travel_interest",
+      "language"
+    ],
+    "language_note": "Declared and unreachable today. `i18n.SHIP_THRESHOLD` is 1.0 and one locale is at 100%, so there is no second language to target. It stays declared because the dimension is right and the trigger is a second locale shipping.",
+    "context_from": "the path, via ads.context_for(), which reads the same route table render.ed_family() reads — so a campaign's context and a page's family cannot disagree.",
+    "refused_dimensions": {
+      "$comment": "§22. Refused as a vocabulary rather than as advice, and worth noting that there is nothing in this product to build them FROM: no account, no session, no cookie, no analytics, and three localStorage keys that never leave the browser.",
+      "categories": [
+        "health",
+        "religion",
+        "politics",
+        "sexual_orientation",
+        "financial",
+        "ethnicity",
+        "biometric",
+        "behavioural_profile",
+        "retargeting_segment"
+      ]
+    }
+  },
+  "placements": [
+    {
+      "slug": "homepage_partner_spotlight",
+      "name": "Partner Spotlight",
+      "placement_type": "band",
+      "page_type": "homepage",
+      "disclosure": "Sponsored",
+      "max_items": 1,
+      "enabled": false,
+      "flag": "ADVERTISING_ENABLED",
+      "brief": "One band. A destination or an experience, presented by a named partner, at the scale of an editorial band rather than a banner.",
+      "may_never": "Appear above the opening, appear more than once, or be the page's own subject."
+    },
+    {
+      "slug": "country_featured_partner",
+      "name": "Featured in this country",
+      "placement_type": "rows",
+      "page_type": "country",
+      "disclosure": "Partner",
+      "max_items": 3,
+      "enabled": false,
+      "flag": "BUSINESS_ADVERTISING_ENABLED",
+      "brief": "Businesses in the country a reader is already looking at, in the row shape the rest of the site uses.",
+      "may_never": "Sit inside the country's own destination list, or be counted in any figure the page states about its own extent."
+    },
+    {
+      "slug": "region_featured_partner",
+      "name": "Featured in this region",
+      "placement_type": "rows",
+      "page_type": "region",
+      "disclosure": "Partner",
+      "max_items": 3,
+      "enabled": false,
+      "flag": "BUSINESS_ADVERTISING_ENABLED",
+      "brief": "The same product one level down, where a reader has narrowed to a group of destinations.",
+      "may_never": "Sit inside the region's own destination list, or alter which destinations the region page shows."
+    },
+    {
+      "slug": "destination_featured_partner",
+      "name": "Featured accommodation",
+      "placement_type": "card",
+      "page_type": "destination",
+      "disclosure": "Sponsored",
+      "max_items": 1,
+      "enabled": false,
+      "flag": "BUSINESS_ADVERTISING_ENABLED",
+      "brief": "Where a reader who has decided to come is looking for somewhere to sleep.",
+      "may_never": "Carry a rating, a review count, a nightly price or an availability state — this atlas holds none of those for anywhere in Europe and a paid placement is not a source. It may not replace the Stay layer's reading or appear before it."
+    },
+    {
+      "slug": "experience_featured_partner",
+      "name": "Sponsored experience",
+      "placement_type": "card",
+      "page_type": "experience",
+      "disclosure": "Sponsored",
+      "max_items": 1,
+      "enabled": false,
+      "flag": "BUSINESS_ADVERTISING_ENABLED",
+      "brief": "One experience, on a page about that kind of experience, from an operator who runs it.",
+      "may_never": "Appear inside the organic list, or be ordered among organic invitations."
+    },
+    {
+      "slug": "journey_partner",
+      "name": "Sponsored journey",
+      "placement_type": "band",
+      "page_type": "journey",
+      "disclosure": "Sponsored",
+      "max_items": 1,
+      "enabled": false,
+      "flag": "SPONSORED_CONTENT_ENABLED",
+      "brief": "A partner presents a route. The route is theirs and is labelled as theirs.",
+      "may_never": "Be one of the seventeen authored journeys, appear in /journeys' own count, or enter the Planner's index. A curated journey is an editorial record and is not for sale — /for-businesses has published that since before this file existed."
+    },
+    {
+      "slug": "story_partner",
+      "name": "Sponsored story",
+      "placement_type": "band",
+      "page_type": "stories",
+      "disclosure": "Paid editorial",
+      "max_items": 1,
+      "enabled": false,
+      "flag": "SPONSORED_CONTENT_ENABLED",
+      "brief": "Branded editorial, labelled as branded editorial, written by or with a partner.",
+      "may_never": "Appear in the nine desks, carry a desk kicker, be led on by the ledger, or be counted among the stories the index says it holds. Its disclosure is the strongest of the three on purpose: a paid article that reads as editorial is the one format both this brief and this product refuse outright."
+    },
+    {
+      "slug": "search_sponsored_result",
+      "name": "Sponsored search result",
+      "placement_type": "band",
+      "page_type": "search",
+      "disclosure": "Sponsored",
+      "max_items": 1,
+      "enabled": false,
+      "flag": "SPONSORED_SEARCH_ENABLED",
+      "brief": "A relevant partner under the results, clearly separated from them.",
+      "may_never": "Replace an organic result, be ordered among organic results, or alter the result count the page states.",
+      "objection": "Recorded rather than decided, and it is what has to be answered before this flag flips. /search's whole subject is the extent of an index and the order of its results. A paid row is either ordered among the organic ones, which is buying an ordering, or it is not a result at all — in which case it is a band on a page a reader came to in order to leave quickly."
+    },
+    {
+      "slug": "map_sponsored_result",
+      "name": "Sponsored map result",
+      "placement_type": "marker",
+      "page_type": "map",
+      "disclosure": "Sponsored",
+      "max_items": 1,
+      "enabled": false,
+      "flag": "SPONSORED_MAP_ENABLED",
+      "brief": "A distinguishable sponsored marker beside the organic ones.",
+      "may_never": "Look like a destination, enter the text alternative as a destination, or be counted among the 319.",
+      "objection": "Recorded rather than decided. A mark on a map here is drawn only where the page can name it — 176 of 176 across the fifty country plates — and a paid pin is a dot whose reason for existing the page cannot state. Twenty countries draw between 3.6 and 12 pixels wide on the instrument, so 'visually distinguishable' is a measurement somebody has to make before this can ship."
+    }
+  ],
+  "surfaces": [
+    {
+      "slug": "homepage",
+      "path": "/",
+      "enabled": false
+    },
+    {
+      "slug": "country",
+      "path": "/europe/<c>",
+      "enabled": false
+    },
+    {
+      "slug": "region",
+      "path": "/europe/<c>/<r>",
+      "enabled": false
+    },
+    {
+      "slug": "destination",
+      "path": "/europe/<c>/<r>/<d>",
+      "enabled": false
+    },
+    {
+      "slug": "experience",
+      "path": "/experiences/<cat>",
+      "enabled": false
+    },
+    {
+      "slug": "journey",
+      "path": "/journeys/<j>",
+      "enabled": false
+    },
+    {
+      "slug": "stories",
+      "path": "/stories",
+      "enabled": false
+    },
+    {
+      "slug": "search",
+      "path": "/search",
+      "enabled": false
+    },
+    {
+      "slug": "map",
+      "path": "/map",
+      "enabled": false
+    }
+  ],
+  "planner": {
+    "$comment": "§9. The Guide and the commercial layer are two independent systems, and the check that holds it reads the script: `planner.js` may not reference this registry at all, and /plan's six published weights must be unchanged. A sponsored block beside a planned route is permitted by §9 and would be labelled 'Sponsored partner', and it is not built — the honest place for a partner beside a route is the destination page the route names, which is `destination_featured_partner` above.",
+    "may_influence": false,
+    "label_if_ever_shown": "Sponsored partner"
+  },
+  "disclosures": [
+    "Sponsored",
+    "Partner",
+    "Paid editorial"
+  ],
+  "disclosure_refused": {
+    "$comment": "§17 and §18. These are the words that must never label a paid placement, because each of them claims a judgement somebody bought.",
+    "words": [
+      "Recommended",
+      "Popular",
+      "Top choice",
+      "Best",
+      "Editor's pick",
+      "Featured choice"
+    ]
+  },
+  "provenance_labels": {
+    "$comment": "§18's three, which must stay distinct. They map onto the four claim origins /manifesto already publishes — Verified, Editorial, Computed, Community — so this is an existing published taxonomy rather than a second one.",
+    "paid": "Sponsored",
+    "editorial": "EuropeDoor Editorial",
+    "algorithmic": "Recommended by EuropeDoor Guide"
+  },
+  "events": {
+    "$comment": "§16. Declared so that the schema is fixed in advance — behaviour nobody recorded is gone — and firing nowhere. Stronger than asked: this site runs no analytics of any kind, so there is nothing to suppress rather than something switched off.",
+    "names": [
+      "ad_impression",
+      "ad_click",
+      "ad_view",
+      "campaign_started",
+      "campaign_completed"
+    ],
+    "firing": false
+  },
+  "revenue_models": {
+    "$comment": "§20. Declared as a list so that no single model is hard-coded, and none implemented. No payment provider is integrated and none may be without explicit approval; the entity gate is in front of all of them.",
+    "supported_later": [
+      "fixed_campaign",
+      "cost_per_click",
+      "cost_per_impression",
+      "sponsored_listing",
+      "subscription",
+      "package"
+    ],
+    "implemented": [],
+    "payment_provider": null
+  },
+  "refusals": {
+    "campaign_keys": [
+      "rank",
+      "boost",
+      "weight",
+      "score",
+      "priority",
+      "relevance",
+      "featured_in_planner",
+      "recommendation",
+      "guide_weight"
+    ],
+    "why": "An advertiser may not buy an ordering. §8 says so and this is that sentence as a data structure: there is no field on a campaign a ranking could read, so no code path can be written that reads one. The same five words have been refused on every place and experience record in data/countries/ since before this brief arrived, in the schema and again at the file level.",
+    "creative_file": "REFUSED FOR NOW, and for the licence register rather than for taste. No image ships here without a photographer, a source, a licence, a date and the SHA-256 of the bytes as served — data/images.json is that register and checks.py refuses a published page referencing a file with no row. An advertiser's artwork arrives with a brand guideline instead. `image_url` stays in the declared shape because the shape is right; it is refused in DATA until the register can express 'granted to us by this advertiser under this insertion order, on this date', at which point a creative is an image like any other and clears the same gate as a photograph.",
+    "third_party_networks": [
+      "pagead2.googlesyndication.com",
+      "googlesyndication.com",
+      "googletagservices.com",
+      "googletagmanager.com",
+      "doubleclick.net",
+      "adservice.google.com",
+      "ib.adnxs.com",
+      "adnxs.com",
+      "adsrvr.org",
+      "static.criteo.net",
+      "criteo.com",
+      "cdn.taboola.com",
+      "taboola.com",
+      "outbrain.com",
+      "connect.facebook.net",
+      "facebook.net",
+      "amazon-adsystem.com",
+      "rubiconproject.com",
+      "pubmatic.com",
+      "openx.net",
+      "adform.net",
+      "smartadserver.com",
+      "teads.tv",
+      "sharethrough.com",
+      "quantserve.com",
+      "scorecardresearch.com"
+    ],
+    "third_party_why": "§21. This site serves `default-src 'none'` with no `'unsafe-inline'` in any directive and `img-src 'self' data:`. An external network needs a script origin and an image origin, so adopting one changes the security posture of all 1,032 pages to serve a revenue mechanism. That is an owner's decision about the product rather than a build step, and the hosts are listed by name so that nobody makes it by adding a tag. Declared as HOSTNAMES rather than as brand tokens: a bare token is matched by ordinary prose and by ordinary code — `readForm` contains `adform` — and a check that reports a false positive on the repository's own planner is a check somebody switches off. That is the same rule `checks.py` states on its commercial-map-host list, and the same failure as a sub-category keyword matching `cellar` on `cell`.",
+    "formats": [
+      "pop-up",
+      "popup",
+      "interstitial",
+      "autoplay",
+      "sticky overlay",
+      "auto-refresh",
+      "fake editorial",
+      "fake recommendation"
+    ],
+    "formats_why": "§2 and §33. Refused as a vocabulary: a placement declares its `placement_type` from the closed list the nine placements use, and there is no value in that list for any of these."
+  },
+  "creative_rules": {
+    "$comment": "§30. A creative is text and a URL, and both are validated. An advertiser may never supply markup or a script, which is enforced by there being no field that could carry one and by refusing the characters that would smuggle one into a field that carries words.",
+    "url_scheme": "https",
+    "url_host_must_be_declared": true,
+    "refused_in_text": [
+      "<",
+      "javascript:",
+      "data:",
+      "on=",
+      "srcdoc",
+      "\\u003c"
+    ],
+    "max_headline": 80,
+    "max_description": 200
+  },
+  "advertisers": [],
+  "campaigns": [],
+  "creatives": []
+}

@@ -13,6 +13,7 @@ import math
 import re
 from urllib.parse import quote
 
+from . import ads as ADS
 from . import cartography
 from . import geo
 from . import stay as staylib
@@ -23,7 +24,7 @@ from .render import (LD_PUBLISHER, ORIGIN, SITE_NAME, SITE_TAGLINE, arch_rim, ca
                      page, photo, picture, plate, section, arch_clip, arch_edge,
                      ed_opening, ed_photo, ed_rows, ed_section_head, ed_split,
                      ed_bleed, ed_declare, ed_feature, ed_mosaic, ed_strip, held,
-                     ed_slot, photo_href, credit_html)
+                     ed_slot, photo_href, credit_html, ad_slot)
 from .score import city_scores, country_scores, discoverability
 
 HOME = ("Europe", "/discover")
@@ -2243,7 +2244,7 @@ def home(data):
     # counters; the same sentence is true of a number composed in Python.
     # Latent on the real register, where all eight bands render — and latent
     # is not fixed: the day a band is legitimately empty the sequence lies.
-    body = constel_defs() + plate_sequence(PLATES)
+    body = constel_defs() + plate_sequence(PLATES) + ad_slot("/")
 
     return "/index.html", page(
         SITE_NAME, body, path="/", area=None, hero=True,
@@ -4241,6 +4242,7 @@ def country_page(data, c):
               "from, and when it was last checked. The score says what this "
               "country is for, not how good it is — it is useful once you are "
               "already interested and is not a reason to be.")}
+{ad_slot(urls.country(c))}
 """
     return f"/europe/{c['slug']}/index.html", page(
         c["name"], body, path=urls.country(c), area="countries",
@@ -4403,6 +4405,7 @@ def region_page(data, c, r):
   every region page is how two copies of a fact start disagreeing.
   <a href="{urls.country(c)}">{esc(c['name'])} →</a></p>
 </div>
+{ad_slot(urls.region(c, r))}
 """
     # AND THE FOURTH: Vatican City is a travel region holding a destination
     # called Vatican City, in a country called Vatican City — so the region
@@ -4748,6 +4751,7 @@ def city_page(data, c, r, t):
         "already interested, and it is not a reason to be.")}
 {edges}
 {stickycta(data, c, r, t)}
+{ad_slot(urls.city(c, r, t))}
 """
     return f"/europe/{c['slug']}/{r['slug']}/{t['slug']}/index.html", page(
         f"{t['name']}, {c['name']}", body, path=urls.city(c, r, t), area="countries",
@@ -6001,6 +6005,7 @@ def journey_page(data, j):
        data-label="{esc(j['name'])}" data-url="{urls.journey(j)}">Save to My Europe</button></p>
   </aside>
 </div>
+{ad_slot(urls.journey(j))}
 """
     legs_ld = []
     for leg in j["legs"]:
@@ -9415,6 +9420,7 @@ def category_page(data, cat, sub=None):
       "list on the site mean less.")}
 {f'<p class="listrule">How this list is built: {esc(C.rule_text(cat))}</p>' if not sub else ""}
 {rulenote}
+{ad_slot(path)}
 """
     return f"{path}/index.html", page(
         title, body, path=path, area="experiences",
@@ -10086,6 +10092,58 @@ def business_page(data):
         <p class="rowmeta">{esc(p['city'])}, {esc(data['countries'][p['country']]['name'])}</p></div>"""
         for p in provs
     )
+    # THE ARCHITECTURE IS PUBLISHED WHERE THE PEOPLE WHO NEED IT ARE. An ad
+    # slot with no advertiser renders nothing anywhere on the site — zero
+    # bytes, no container, no placeholder, which is the opposite of
+    # `ed_slot()` and for the opposite reason: there the reader is an editor
+    # and the acquisition list is the page, here the reader is a traveller
+    # and a reserved box is this product advertising that it would like to
+    # carry advertising. So the only surface that states the commercial layer
+    # is the directory page, which is the one an advertiser reads.
+    #
+    # Every figure is derived from data/advertising.json, so a product that
+    # is switched on cannot be switched on quietly: it says so here.
+    adrows = "".join(
+        f'<div class="row"><div><p class="kicker">{esc(pl["disclosure"])}</p>'
+        f'<h3>{esc(pl["name"])}</h3>'
+        f'<p class="rowsub">{esc(pl["brief"])}</p>'
+        f'<p class="small">Never: {esc(pl["may_never"])}</p></div>'
+        f'<p class="rowmeta">{esc(pl["page_type"])}<br>'
+        f'<span class="small">{"running" if pl.get("enabled") else "off"}</span></p></div>'
+        for pl in ADS.placements()
+    )
+    adobject = "".join(
+        f'<div class="row"><div><h3>{esc(pl["name"])}</h3>'
+        f'<p class="rowsub">{esc(pl["objection"])}</p></div>'
+        f'<p class="rowmeta">{esc(pl["page_type"])}</p></div>'
+        for pl in ADS.placements() if pl.get("objection")
+    )
+    adconds = "".join(
+        f'<div class="row"><div><h3 class="mini">{esc(label_)}</h3></div>'
+        f'<p class="rowmeta">{"yes" if v else "no"}</p></div>'
+        for label_, v in ADS.conditions()
+    )
+    adstatus = "".join(
+        f'<div class="row"><div><h3 class="mini">{esc(k)}</h3></div>'
+        f'<p class="rowmeta">{esc(v)}</p></div>'
+        for k, v in ADS.status()
+    )
+    # AN F-STRING EXPRESSION CANNOT HOLD A TRIPLE-QUOTED F-STRING, which is
+    # the same construct this file already records about a comment and a
+    # backslash. The band is composed here and interpolated as one name.
+    adband = section(
+        "The commercial layer, and why none of it is running",
+        '<div class="rows">' + adstatus + "</div>"
+        + '<h3 class="mini">The nine declared placements</h3>'
+        + '<div class="rows">' + adrows + "</div>"
+        + '<h3 class="mini">Every condition between a campaign and a reader</h3>'
+        + '<div class="rows">' + adconds + "</div>",
+        lede=("Nine placements, nine surfaces, and a campaign table with nothing "
+              "in it. Switching one on takes " + str(len(ADS.conditions()))
+              + " separate conditions rather than a flag, and they are listed "
+              "under the placements below because a count typed into a sentence "
+              "is a count that disagrees with the mechanism a commit later."),
+        id="advertising", opens=True)
     body = f"""
 {crumbs([("Europe", "/discover"), ("For businesses", None)])}
 <div class="pagehead">
@@ -10104,11 +10162,31 @@ def business_page(data):
   </div>
   <aside class="rail">
     <h2 class="mini">The wall between editorial and commerce</h2>
-    <p>Paid tiers buy presentation on directory surfaces. They never buy Atlas ranking,
-    Journey Planner weighting, or a place in a curated journey. If that wall ever moves, it
-    moves in public, on this page.</p>
+    <p>{esc(ADS.wall()["position"])}</p>
+    <p class="small">{esc(ADS.wall()["surfaces"])} This wall moved on
+    {esc(ADS.wall()["moved"].split(":")[0])}, and this page is where it moved: it used to read
+    <em>{esc(ADS.wall()["replaced"].rstrip("."))}</em>. What did not move is the
+    substance — ranking, weighting, curation, scores, result order and copy were never for
+    sale and are not now.</p>
     <h2 class="mini">Claiming a profile</h2>
     <p>Not open yet — same reason as <a href="/experiences/join">listings</a>.</p>
+  </aside>
+</div>
+{adband}
+<div class="split">
+  <div>
+    <h2>What a paid placement may never do</h2>
+    <p>{esc(ADS.load()["refusals"]["why"])}</p>
+    <p class="small">There is no field on a campaign a ranking could read, so no code path
+    can be written that reads one: {esc(", ".join(ADS.load()["refusals"]["campaign_keys"]))}
+    are refused by name in the validator and again in the checks. A creative
+    <strong>image</strong> is refused too, and for the register rather than for taste —
+    nothing ships here without a photographer, a source, a licence, a date and the hash of
+    the bytes, and an advertiser&#8217;s artwork arrives with a brand guideline instead.</p>
+  </div>
+  <aside class="rail">
+    <h2 class="mini">Two surfaces with an objection attached rather than a veto</h2>
+    <div class="rows">{adobject}</div>
   </aside>
 </div>
 """
@@ -11994,6 +12072,7 @@ def story_page(data, s):
 </div>
 </article>
 {jband}
+{ad_slot("/stories/" + s["slug"])}
 """
     return f"/stories/{s['slug']}/index.html", page(
         s["title"], body, path=f"/stories/{s['slug']}", area="stories",
@@ -12529,6 +12608,7 @@ def map_page(data):
     body = f"""
 {crumbs([("Europe", "/discover"), ("Map", None)])}
 {plate_sequence(PLATES)}
+{ad_slot("/map")}
 """
     return "/map/index.html", page(
         "Map", body, path="/map", area="countries",
@@ -15234,6 +15314,7 @@ def search_page(data):
 <div id="results" aria-live="polite">{atrest}</div>
 <noscript><p class="small">Search needs JavaScript. The
 <a href="/countries">Atlas</a> is fully browsable without it.</p></noscript>
+{ad_slot("/search")}
 """
     return "/search/index.html", page(
         "Search", body, path="/search", area=None,

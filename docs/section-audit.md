@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**101 sections · 40 partial · 30 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1427 assertions · 0 failing**
+**102 sections · 40 partial · 30 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1 built, and nothing is serving · 1450 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -111,6 +111,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 97 | MVP acceptance criteria | PARTIAL | 16 | Twelve of the fourteen visitor criteria pass. The two that do not are the account: a saved journey survives in this browser, not across devices. |
 | 98 | The first build — twelve modules | PARTIAL | 13 | Ten of the twelve ship. Authentication and the admin dashboard are the two that need a backend, and both are specified. |
 | 99 | Product north star | BUILT | 5 | Vision, mission and promise, on the site rather than in a deck — and the manifesto is a page a reader can open, with the trust architecture underneath it on the same page. |
+| AD | The commercial layer — advertising specification §1–33 | BUILT, and nothing is serving | 23 | Advertising infrastructure now, advertising display later. Twenty-six of the thirty-three sections are built, four are declared and off with an objection or a trigger attached, one is partial and one is a measured departure from the letter. docs/advertising.md carries the section-by-section map and the evaluation. |
 
 ## What the verdicts mean
 

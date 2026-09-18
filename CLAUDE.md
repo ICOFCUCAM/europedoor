@@ -6557,6 +6557,80 @@ and under §53's own floor of ten, so this repository had been reporting
 against the looser of two numbers one document publishes. Both framings are
 now in the report, and neither is a code change.
 
+**THE COMMERCIAL LAYER IS BUILT AND NOTHING IS SERVING, AND THE NUMBER OF
+GATES BETWEEN A CAMPAIGN AND A READER WAS TYPED IN THREE PLACES AND WRONG IN
+ALL THREE.** The advertising specification's thirty-three sections are mapped
+in `docs/advertising.md` — twenty-six built, four declared and off with an
+objection or a trigger attached, one partial, one a measured departure. The
+registry is `data/advertising.json`, the service is `tools/lib/ads.py`, the
+seam into a page is `render.ad_slot(path)`, and **an off slot emits zero
+bytes**: no container, no placeholder, no reserved height, which is the
+OPPOSITE of `ed_slot()` and for the opposite reason — there the reader is an
+editor and the declared photograph surface IS the acquisition list, here the
+reader is a traveller and a reserved advertising box on a page with no
+advertiser is this product advertising that it would like to carry
+advertising. The marker is what `checks.py` tests and never the words,
+because /for-businesses publishes the whole disclosure vocabulary and the
+Stay layer's own disclosure carries *sponsored* on every destination page
+that has one: a guard on the word would fail two surfaces that are correct
+and could never be made to pass.
+
+`ads.py`'s docstring said **five conditions**, /for-businesses' lede said
+"five separate conditions" and listed five, and `may_serve()` tested
+**eight** — the two per-placement flags and the campaign's own status were in
+the mechanism and in neither sentence. That is the dispatch cap exactly, and
+`/map` printing the old projection's name for a year. `ads.conditions()` is
+the one declaration now, `may_serve()` is `all()` over it, the page prints
+the LIST rather than a count, and `tools/ad-tests.py` reads that list and
+proves **each entry alone refuses** — so a condition added tomorrow is
+proved tomorrow, where a typed five would quietly stop covering the set.
+
+**A BRAND TOKEN IS NOT A HOSTNAME, AND `readForm` CONTAINS `adform`.** The
+third-party network refusal was declared as twenty-one bare tokens and the
+check reading them required a dot, so **nineteen of the twenty-one were never
+tested** and appending `doubleclick.net` to a script left it green — the
+mutation that proved the guard was caught by the OUTBOUND-LINK check
+instead, on a page, where this one has no reach. Removing the filter then
+failed `planner.js` on `readForm`, which is `cell` catching `cellar` one
+family over. `checks.py`'s commercial-map-host refusal settled this years ago
+and says why on its own list: *hostnames rather than a vague substring,
+because a page that says "the map" is not a violation and a check that cannot
+tell the difference gets switched off.* Twenty-six hostnames now, proved red
+on a script.
+
+**AND TWO OF THE SIX TARGETING DIMENSIONS RETURNED NO MATCH IN SILENCE.**
+`context_for()` reads a path, so it answers country, region, destination and
+experience category. `travel_interest` is a property of the destination
+record rather than of the path and `language` needs a second locale reaching
+`SHIP_THRESHOLD`, so a campaign targeting either returned False from
+`_targets_match` — correct behaviour, and indistinguishable from a target
+that simply did not match this page, which is `opts.geoTooNarrow` computed
+and read nowhere. Both stay declared because the brief's vocabulary is right;
+both raise with their own trigger named now.
+
+**The simulated ON state lives in memory and never on disk.** A suite that
+edits the registry it is testing can leave the repository in the state its
+own failure produced — the Media Desk's suite learned the harder version,
+renaming two licensed originals aside and having a later run overwrite them.
+`ad-tests.py` swaps `ads._cache`, so there is nothing to restore, and its
+last block asserts the registry's bytes and the built site are unchanged by
+the run. **Nothing to restore is stronger than restoring carefully.**
+
+**And the wall moved, in public, on the page whose own sentence is the
+procedure.** /for-businesses has published *if that wall ever moves, it moves
+in public, on this page* since before the registry existed, and the brief's
+nine placements are every one of them editorial. So the position is now
+*paid placement buys a declared slot*, the page states the sentence it
+replaced, and `checks.py` asserts the page and the registry agree **in both
+directions** — a page can keep a promise the mechanism has stopped keeping,
+and a mechanism can be quietly stricter than the page a reader is reading,
+which is worse, because then the published position is the looser of the two.
+The substance did not move: ranking, weighting, curation, scores, result
+order and editorial copy were never for sale and are not now.
+`tools/monotony.js` read /for-businesses at 51% before this and reads 27%
+after, because the page gained three bands that are not its provider list.
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
@@ -6575,6 +6649,8 @@ the rest.
     python3 tools/invariants.py --check       what a visual change may not move
     python3 tools/plate-variation.py --check  the plates have not got more alike
     node tools/monotony.js --check           no page is one component and little else
+    python3 tools/ad-tests.py                 the commercial layer: the OFF state,
+                                              and a simulated ON in memory
     python3 tools/photo-tests.py              the acquisition pipeline
                                               its batch loop and its fill planner,
                                               against a stub provider

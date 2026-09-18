@@ -2239,6 +2239,86 @@ def s99():
 
 # ──────────────────────────────────────────────────────────────────────
 
+@section("AD", "The commercial layer — advertising specification §1–33",
+         "BUILT, and nothing is serving",
+         "Advertising infrastructure now, advertising display later. Twenty-six "
+         "of the thirty-three sections are built, four are declared and off "
+         "with an objection or a trigger attached, one is partial and one is a "
+         "measured departure from the letter. docs/advertising.md carries the "
+         "section-by-section map and the evaluation.")
+def sAD():
+    # THE VERDICT IS THE EASY HALF. What these assertions have to catch is
+    # the state where the architecture exists, the document says it is off,
+    # and something is quietly on — so every one of them reads the running
+    # mechanism or the shipped HTML rather than the prose that describes it.
+    from lib import ads as ADS
+    yield exists("/for-businesses"), \
+        "the architecture is published on the page an advertiser reads"
+    yield ADS.entity() is None, "no operating entity, so nobody can be paid"
+    yield ADS.may_serve() is False, "and nothing may serve"
+    yield ADS.served() == [], "so nothing renders anywhere"
+    yield len(ADS.placements()) == 9, "§5's nine placements are declared"
+    yield not any(p.get("enabled") for p in ADS.placements()), \
+        "and every one of them is off"
+    yield len(ADS.flags()) == 5 and not any(ADS.flags().values()), \
+        "§26's five flags exist and none is set"
+    # §11 and §33 read on the built site rather than in the registry,
+    # because *removing a claim leaves surfaces pointing at it* and the
+    # registry is the claim. The marker is what is tested and never the
+    # words: /for-businesses publishes the whole disclosure vocabulary.
+    yield every_page(lambda h: 'class="adband' not in h,
+                     "no page carries an advertising band")
+    yield every_page(lambda h: "data-placement=" not in h,
+                     "and none reserves space for one")
+    # §8. The refusal predates this brief by months and is enforced in the
+    # schema and again at the file level, which is why the campaign table
+    # gets its own copy rather than a shared list.
+    yield all(k not in json.dumps(ADS.load()["entities"]["campaigns"])
+              for k in ("rank", "boost", "featured", "promoted")), \
+        "a campaign carries no field a ranking could read"
+    yield has("/for-businesses", "never buys Atlas ranking"), \
+        "and the page says so in the wall's own sentence"
+    # §9. Independence is demonstrated by the recommendation code having
+    # nothing to reach, not by a sentence saying the two are separate.
+    yield "advertising" not in src("assets/js/planner.js").lower(), \
+        "planner.js has never heard of the commercial layer"
+    yield ADS.load()["planner"]["may_influence"] is False
+    # §14. A business may never publish advertising instantly.
+    yield ADS.may_transition("draft", "active") is False, \
+        "draft cannot jump to active"
+    yield ADS.may_transition("draft", "pending_review") is True
+    # §16 and §22. Stronger than asked: there is no analytics of any kind
+    # here, so there is nothing to suppress and no profile to target from.
+    yield ADS.load()["events"]["firing"] is False, "no event fires"
+    yield len(ADS.load()["targeting"]["dimensions"]) == 6 and \
+        all(d in ("country", "region", "destination",
+                  "experience_category", "travel_interest", "language")
+            for d in ADS.load()["targeting"]["dimensions"]), \
+        "six contextual dimensions and not one of them is about a person"
+    # §20 and §12/13. The two deferrals name what they wait on rather
+    # than being absent: both need authentication, which is the gate every
+    # account feature in this product sits behind.
+    yield ADS.load()["revenue_models"]["payment_provider"] is None, \
+        "no payment provider"
+    yield doc_covers("docs/advertising.md", "DEFERRED"), \
+        "the admin interface and the dashboard are recorded as deferred"
+    yield doc_covers("docs/advertising.md", "objection"), \
+        "and the map and search placements carry an objection to answer"
+    # §30. A creative is text and a URL; there is no field that could
+    # carry a script, and the characters that would smuggle one into a
+    # field that carries words are refused.
+    yield ADS.creative_problems({}) != [], \
+        "an empty creative is refused rather than drawn"
+    yield any("not https" in p for p in ADS.creative_problems(
+        {"type": "card", "destination_url": "http://example.org/x",
+         "disclosure_label": "Sponsored"})), \
+        "a non-https destination is refused"
+    # §21. Adopting a network changes the security posture of every page,
+    # so it is an owner's decision rather than a build step.
+    yield len(ADS.refused_networks()) >= 15, \
+        "every named third-party network is refused by name"
+
+
 def label(num):
     return str(num)
 

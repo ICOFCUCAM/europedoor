@@ -213,10 +213,36 @@
    * so backspacing to nothing returns the page you arrived on. */
   var AT_REST = out.innerHTML;
 
+  /* AND RESTORING IT WHEN IT IS ALREADY THERE IS NOT FREE. `run("")` fires
+   * once on load, so the band was rewritten with BYTE-IDENTICAL markup every
+   * time this page opened: twelve links and every piece of DOM state on them
+   * destroyed and recreated for no change at all.
+   *
+   * The browser suite found it the moment the loading placeholder came out,
+   * and the way it found it is the interesting half. The sweep enumerates
+   * every link on the page at `load`, focuses each one and asks whether it
+   * paints — and with the placeholder in place there were no browse links AT
+   * LOAD to enumerate, because the band had already been replaced by one grey
+   * line. So the placeholder was hiding those twelve links from the
+   * INSTRUMENT as well as from the reader, and removing it reported them as
+   * twelve links that paint nothing: `checkVisibility()` is false on a
+   * detached node, and the walk up the ancestors finds no transparent parent
+   * because there is no longer a chain to the document.
+   *
+   * A reader never saw that, because the replacement is identical and
+   * instant. What a reader COULD see is focus lost from a row they had
+   * tabbed into while the index was still arriving. Either way the write is
+   * the fault: the band is restored only when it is not already the thing on
+   * screen. */
+  var showing = "rest";
+
   function run(qraw) {
     var q = norm(qraw.trim());
     if (q.length < 2) {
-      out.innerHTML = AT_REST;
+      if (showing !== "rest") {
+        out.innerHTML = AT_REST;
+        showing = "rest";
+      }
       return;
     }
     var mods = parseQuery(q);
@@ -355,6 +381,7 @@
           }).join("") + "</div>";
       });
 
+    showing = "hits";
     out.innerHTML = "<h2>" + hits.length + (hits.length === 1 ? " result" : " results") +
       (hits.length > shown.length ? " — showing the first " + shown.length : "") +
       "</h2>" + body;
