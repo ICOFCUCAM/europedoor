@@ -2818,9 +2818,20 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
    size is the same declaration the region names use rather than a
    seventeenth. The FILL is further down, next to the rule that was beating
    it. */
+/* AND THIS ONE IS A FIXED PX INSIDE A SCALED viewBox, WHICH IS THE THIRD
+   TIME. `.countrymap .rlabel text` directly above takes `calc(15px /
+   var(--z))` and the paragraph beside `--z` records why: `.peakname`,
+   `.fname` and `.sname` were written after that pass, inherited none of it,
+   and rendered Monte Rosa at 5.1 pixels at 390. This rule was written
+   beneath the one that takes the compensation and did not take it, so the
+   nine macro region maps drew their country names at SIX PIXELS at 390 —
+   measured, on /discover/nordic, /discover/mediterranean and
+   /discover/western among them. A rule that exists is not a rule that is
+   inherited. Above 44rem `--z` is 1 and this is the same 15px it always
+   was. */
 .macromap .mmlabel {
   fill: color-mix(in srgb, var(--bone) 92%, transparent);
-  font-family: var(--display); font-size: 15px; font-weight: 700;
+  font-family: var(--display); font-size: calc(15px / var(--z)); font-weight: 700;
   paint-order: stroke; stroke: var(--atlas-sea); stroke-width: 3; stroke-linejoin: round;
 }
 .countrymap .rlabel:hover text { fill: var(--sea); }
@@ -5568,7 +5579,18 @@ body[data-hero] .masthead { position: sticky; }
    labels off narrow screens on eight hundred pages. The countries keep their
    shape, their link and their accessible name. */
 @media (max-width: 44rem) {
-  .heroeurope .lyr-labels { display: none; }
+  .heroeurope .lyr-labels,
+  /* AND THE WATER LABELS ARE A SECOND FAMILY THAT NEVER TOOK THIS RULE.
+     The five sea names sit in `.lyr-water-labels`, a different layer, added
+     after the pass above was written — so at 390 the fifteen country names
+     came off exactly as intended and NORTH SEA, MEDITERRANEAN SEA, BLACK
+     SEA, TYRRHENIAN SEA and BAY OF BISCAY stayed, measured at FIVE PIXELS
+     TALL. That is this repository's own sentence about `.peakname`,
+     `.fname` and `.sname`: a label family added after the two passes that
+     fix exactly this took neither. `--t-xs` is smaller than the countries'
+     `--t-lg`, so the family that was left behind is the one that renders
+     smallest. */
+  .heroeurope .lyr-water-labels { display: none; }
 }
 
 /* The place names on an atlas plate: ink on a paper halo, so a name stays

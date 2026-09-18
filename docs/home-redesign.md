@@ -394,3 +394,61 @@ qualifier is the one number a reader could act on and be wrong about. It reads
 called — **proved red by deleting the qualifier**, which named the page and
 the missing needle.
 
+## THE HERO'S SEA NAMES RENDERED AT FIVE PIXELS, AND A THIRD FAMILY AT SIX
+
+The hero's fifteen country names come off below 44rem exactly as the
+stylesheet says they do — `--t-lg` is a length in a 1,120-unit viewBox, and at
+390 that is a third of a pixel per unit. Measured at 390 with the browser's
+own laid-out boxes, **five labels were still drawn, all at 5 pixels**:
+
+    NORTH SEA · MEDITERRANEAN SEA · BLACK SEA · TYRRHENIAN SEA · BAY OF BISCAY
+
+They sit in `.lyr-water-labels`, a **second layer** the phone rule never
+named — it hides `.lyr-labels` — and `.seaname` is `--t-xs`, smaller than the
+countries' `--t-lg`, so the family that was left behind is the one that
+renders smallest. That is this repository's own sentence about `.peakname`,
+`.fname` and `.sname`: *a label family added after the two passes that fix
+exactly this took neither.*
+
+**And sweeping every SVG label on 27 pages found a third.** `.mmlabel`, on the
+nine macro region maps, is `font-size: 15px` — a fixed px inside a scaled
+viewBox — written **directly beneath** `.countrymap .rlabel text`, which takes
+`calc(15px / var(--z))` and carries the paragraph explaining why. It rendered
+*Denmark*, *Finland*, *Iceland*, *Greece*, *Portugal*, *Belgium* and *France*
+at **6 pixels** at 390. Above 44rem `--z` is 1, so the fix is provably the
+same 15px it always was: /discover/nordic is **byte-identical at 1280** and
+differs only at 390.
+
+### And the check for it asked about one class on a site with six families
+
+`figure.minimap text.minilabel` is the family the 9px floor was written for,
+and it cannot see `.cname`, `.seaname`, `.mmlabel`, `.peakname`, `.fname` or
+`.sname`. The sweep now asserts the promise on **every `<text>` a map draws**,
+whatever its class, at 390, measured by the browser's own laid-out box rather
+than by a font-size — because a font-size in an SVG is in user units and that
+is the whole family of defects. 31 labels across 15 pages, with its own reach
+floor, because *a check reading zero looks exactly like a healthy one in the
+column of counts.*
+
+## AND ONE THING WAS MEASURED AND NOT CHANGED: THE PLATE MARK ON A CENTRED BAND
+
+Seven bands across six pages centre their composition and leave the plate
+number at the left — `/` act8, `/discover` discover-end, `/journeys`
+the-road-ahead, `/experiences` the-door, `/plan` compose, `/stories` read-one,
+`/my-europe` build, drifts of 82 to 456 pixels against a head with equal
+margins either side.
+
+**The first measurement of this was wrong and said eleven.** It compared the
+mark's x against the head's x, which reports a *feature* band — where the head
+sits in the second track and a mark at the band's left edge is correct — as
+the same defect. Testing for equal margins gives seven.
+
+**And seven is a taste, not a defect.** A plate mark is a folio: a page number
+in a book does not move because the page is centred, and all 71 marks on this
+site sit at the same x. Forcing them to follow the composition is optimising
+for visual consistency, which the doctrine's second rule refuses. Recorded
+with its measurement and left alone; the trigger is somebody deciding the mark
+is a caption rather than a folio, and then it is **one** declaration of "this
+plate is centred" read by both rules — not the six composition classes that
+each centre in their own way today.
+

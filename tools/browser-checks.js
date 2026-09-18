@@ -3695,6 +3695,67 @@ async function main() {
   // names still SHOWS its dots on a phone, so the dots are counted as the
   // browser draws them — laid out, not display:none, not zero-sized — and
   // only figures that carry names are asked.
+  // AND THE CHECK ABOVE ASKS ABOUT ONE CLASS ON A SITE WITH SIX LABEL
+  // FAMILIES, WHICH IS HOW TWO MORE OF THEM SHIPPED UNREADABLE.
+  //
+  // `figure.minimap text.minilabel` is the family the 9px floor was written
+  // for. It cannot see `.cname` (the hero's country names), `.seaname` (its
+  // five sea names), `.mmlabel` (the nine macro maps), `.peakname`,
+  // `.fname` or `.sname`. Measured at 390 before this block existed:
+  //
+  //     NORTH SEA, MEDITERRANEAN SEA, BLACK SEA, TYRRHENIAN SEA,
+  //     BAY OF BISCAY                            5px, on the homepage
+  //     Denmark, Finland, Iceland, Greece, ...    6px, on nine macro pages
+  //
+  // The hero's country names come off below 44rem exactly as designed and
+  // the water labels sat in `.lyr-water-labels`, a second layer the rule
+  // never named; `.mmlabel` was written directly beneath
+  // `.countrymap .rlabel text`, which takes `calc(15px / var(--z))`, and did
+  // not take it. *A rule that exists is not a rule that is inherited*, for
+  // the third and fourth time in this stylesheet.
+  //
+  // SO THE PROMISE IS ASSERTED ON EVERY `<text>` A MAP DRAWS, whatever its
+  // class: if a reader can see it at 390 it resolves into glyphs. The
+  // instrument is the browser's own laid-out box rather than a font-size,
+  // because a font-size in an SVG is in user units and the whole family of
+  // defects is that those are not pixels.
+  const LABELFAM_PAGES = ["/", "/map", "/discover", "/discover/nordic",
+                          "/discover/mediterranean", "/countries", "/journeys",
+                          "/themes/mountain-europe", "/interests/mountains",
+                          "/europe/austria", "/europe/austria/tyrol",
+                          "/europe/austria/tyrol/innsbruck",
+                          "/journeys/the-alpine-grand-tour",
+                          "/europe-in/northern-lights", "/beyond-the-obvious"];
+  {
+    await page.setViewportSize({ width: 390, height: 844 });
+    let examined = 0;
+    for (const u of LABELFAM_PAGES) {
+      await page.goto(base + u, { waitUntil: "load" });
+      const r = await page.evaluate(() => {
+        let n = 0; const bad = [];
+        for (const t of document.querySelectorAll("svg text")) {
+          const st = getComputedStyle(t);
+          if (st.display === "none" || st.visibility === "hidden") continue;
+          const b = t.getBoundingClientRect();
+          if (!b.width || !b.height) continue;
+          n++;
+          if (b.height < 9) bad.push(`${(t.getAttribute("class") || "(none)")} ` +
+                                     `"${t.textContent.trim().slice(0, 20)}" ${b.height.toFixed(1)}px`);
+        }
+        return { n, bad };
+      });
+      examined += r.n;
+      ok(r.bad.length === 0,
+         `${u} at 390 draws ${r.bad.length} map label(s) under 9px — type that ` +
+         `does not resolve into glyphs: ${r.bad.slice(0, 4).join("; ")}`);
+    }
+    // A check reading zero looks exactly like a healthy one in the column of
+    // counts, which this repository has now found twice.
+    ok(examined >= 20,
+       `the label-legibility sweep laid out only ${examined} SVG text elements ` +
+       `across ${LABELFAM_PAGES.length} pages — it has stopped finding them.`);
+  }
+
   const MAPWIDTH_PAGES = ["/europe/austria/tyrol/innsbruck", "/europe/austria",
                           "/europe/austria/tyrol", "/journeys/the-alpine-grand-tour",
                           "/europe-in/northern-lights", "/events/oct",
