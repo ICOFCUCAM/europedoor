@@ -153,3 +153,80 @@ the second one does: *do not optimise for visual consistency at the expense
 of editorial difference.* What the page is short of is not variety of shape.
 It is that three of its eight plates hold no picture while the register holds
 826.
+
+## PLATE 05 — THE ALPHABET WAS THE LAYOUT, ON THE BAND THAT SAYS ONE CONTINENT
+
+`One continent. Fifty doors.` over fifty country names, A to Z, in five
+columns. 2,527 bytes, 51 links, no other structure — and an alphabet is a
+finding aid for a reader who already knows the name, which is not the reader
+a homepage has.
+
+**FINDING 1 in §above was right that this band draws no picture and wrong
+about the remedy.** It read *"it lists fifty country names as text links, and
+draws none of the fifty country photographs the register holds"*, which is
+true and led toward putting fifty photographs on it. Measured on the built
+page, **plate 01 already draws 41 of them** — a photograph clipped into each
+country's own outline, 41 SVG `<image>` elements inside 123 clip paths, and
+the largest thing on the site. So the fault was never that the pictures are
+missing from the page. It is that the page draws 41 of the fifty as pictures
+at the top, lists the fifty as names four plates down, and **says nothing
+about the difference.**
+
+| | plate 01 | plate 05 |
+|---|---|---|
+| countries drawn as a picture | 41 | 0 |
+| countries linked | 43 | 50 |
+| the seven only this band reaches | — | Andorra, Liechtenstein, Malta, Monaco, Russia, San Marino, Vatican City |
+
+**And the reason for the nine is derived rather than typed.** `living_atlas`
+refuses a country with no photograph, a travel advisory, no macro region, or
+no outline at `min_units=6.0`: six are too small to draw at that scale
+(Andorra, Liechtenstein, Malta, Monaco, San Marino, Vatican City) and three
+carry an advisory (Belarus, Russia, Ukraine). The clause is **hoisted once
+under the list**, not marked on nine rows, which is this atlas's own rule
+about never explaining the constraint back.
+
+**AND `living_atlas` CARRIES THE SAME OVERSTATED COMMENT `country_door()`
+DID.** *"EVERY COUNTRY THAT HAS A PHOTOGRAPH IS AN APERTURE, AND ALL FIFTY
+DO"*, written directly above two filters that remove exactly nine. That
+sentence is already recorded in `docs/countries-redesign.md` about the other
+function that clips a photograph into a country — **two functions, one
+claim, both overstating it by nine** — which is *the code had stopped
+matching its own comment*, in the direction that reads as evidence.
+
+### The nine corners, and the measurement that was refused
+
+The fifty are grouped by the nine macro regions — this atlas's own partition,
+authored in `data/taxonomy.json`, already the structure of `/countries`. A
+grouping is a CLASSIFICATION and is the editorial work; what was refused is a
+number.
+
+**Destinations per country run 28 to 1** — France 28, Spain 27, Greece,
+Italy and Norway 25, against Monaco, San Marino and Vatican City at one — a
+real 28× spread, derived, and **it argues about the wrong subject.** France
+holds 28 because somebody wrote 28; `docs/content-report.md` puts this
+atlas's content at about a third written. Printing it beside fifty names
+publishes a writing-progress artefact as an editorial judgement, which is
+/beyond-the-obvious's own finding (*the corner with the most quiet places is
+not the quietest corner*) and the reason /countries sizes nothing by it
+either.
+
+### Four defects only rendering found
+
+| | |
+|---|---|
+| `columns: auto 12rem` | packed **five** columns at 1280 and left the fifth holding one group with two thirds of it empty. Nine corners want three columns of three, which is the data's own count rather than whatever a track width produces |
+| the first breakpoint was 62rem | so a **834-wide tablet fell to two columns and measured 1,611px against 1,214 at 1280** — a narrower screen paying four hundred more pixels for the same fifty names. That is the fault 834 is on the contact sheet to find, and 52rem is the breakpoint that already exists |
+| one column on a phone | 2,481px at 390 against the 900 the alphabet took. Two columns, 1,701 |
+| the lede | printed *"50 countries, 130 travel regions"* under a heading that spells **Fifty** — one quantity in two representations on one screen — and both figures are plate 01's own lede. Its second sentence was *"the corner is the link above each list"*, an instruction for something a reader can see. What is left is the one fact the band adds: **a corner is itself somewhere to go** |
+
+### And the class it replaced had exactly one user
+
+`.countrycols` reached one page, so its nine declarations are dead the moment
+this band changed — deleted, and provably a no-op rather than a
+screenshot-verified one, because nothing in the built site carries the class
+and no element matches. **Its two recorded findings are kept as prose**: the
+bone-on-bone index at 1.14:1, and *a declared colour is overridden, never
+inherited away*, which is exactly the mistake `.dcorner a` can make the next
+time this plate's paper moves.
+

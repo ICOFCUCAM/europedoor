@@ -7148,14 +7148,18 @@ body[data-hero] .masthead { position: sticky; }
    three times, and the dead-rule scan could not see it either: the rule
    matches and does change something — it changes fifty links to the colour
    of the paper they are on. */
-.countrycols { columns: 5; column-gap: var(--s5); font-family: var(--display);
-               font-size: var(--t-sm); line-height: 2;
-               border-left: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
-               padding-left: var(--s6); }
-.countrycols a { display: block; text-decoration: none; color: var(--ink);
-                 opacity: .88; break-inside: avoid; }
-.countrycols a:hover { opacity: 1; text-decoration: underline;
-                       text-underline-offset: .18em; }
+/* AND THE CLASS THOSE TWO PARAGRAPHS ARE ABOUT IS GONE, WHICH IS WHY THEY
+   ARE STILL HERE. `.countrycols` was the homepage's fifty country names, A
+   to Z in five columns, and it had exactly one user; the band is grouped by
+   the nine corners now (`.doorindex` / `.dcorner`, in the plate region
+   below) because an alphabet is the shape of the data as the layout on a
+   band whose heading says ONE CONTINENT. The declarations are deleted —
+   nothing in the built site carries the class, so no element matches and the
+   removal is a no-op by construction rather than by screenshot — and the
+   findings are not, because the successor can make both mistakes: a
+   DECLARED COLOUR IS OVERRIDDEN, NEVER INHERITED AWAY, so `.dcorner a`
+   setting its own ink is the thing to check against the plate's ground when
+   this plate's paper next moves. */
 .sheet-atlas .goright { bottom: var(--s6); top: auto; }
 
 /* 06 · the message — a plate with almost nothing on it */
@@ -7177,9 +7181,6 @@ body[data-hero] .masthead { position: sticky; }
   .sheet-door .opening { min-height: 52vh; }
   .goright { position: static; flex-direction: row; }
   .goright .gomark { transform: none; }
-  .countrycols { columns: 3; border-left: 0; padding-left: 0;
-                 border-top: 1px solid color-mix(in srgb, var(--bone) 22%, transparent);
-                 padding-top: var(--s5); }
   .sheet-atlas .sheettext { grid-template-columns: 1fr; }
 }
 @media (max-width: 44rem) {
@@ -7190,7 +7191,6 @@ body[data-hero] .masthead { position: sticky; }
      thumbnail size nothing sees one — this repository has already shipped
      that defect once, the other way round. The floor follows `main`. */
   :root { --page-gutter: max(var(--s4), calc(50vw - 36rem)); }
-  .countrycols { columns: 2; }
   /* THREE `auto` TRACKS ARE THREE MIN-CONTENTS, AND THE JOURNEY PLATE RAN
      THE HOMEPAGE FIVE PIXELS OFF A 320px SCREEN. "4,993 km", "7 countries"
      and "13 stops" with labels tracked at .22em need 301px and the column
@@ -7216,10 +7216,6 @@ body[data-hero] .masthead { position: sticky; }
    comment saying a measure is the wrong idea here. */
 .rowcred { position: static; font-size: var(--t-xs); letter-spacing: .04em;
            text-transform: none; color: var(--ink-3); margin: 0; max-width: none; }
-/* One name is longer than any column this plate can give it. A hyphenated
-   break mid-word is what an index does; the alternative is a sixth column
-   nobody can read. */
-.countrycols a { hyphens: auto; }
 
 /* ══ /discover — five plates ═══════════════════════════════════════════
    DISCOVER MUST LEAD WITH DISCOVERY, NOT WITH CONTROLS. The page was
@@ -10252,10 +10248,58 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
                                vector-effect: non-scaling-stroke; }
 .constel-atlas .constel-lit circle { fill: var(--cobalt); r: 2.4; }
 .constel-atlas .mapcut { display: none; }
-.sheet-gal .countrycols { columns: auto 11rem; column-gap: var(--s6);
-  border-left: 0; border-top: 1px solid var(--rule); padding-left: 0;
-  padding-top: var(--s5); margin-top: var(--s6); }
-.sheet-gal .countrycols a { color: var(--ink-2); }
+
+/* THE FIFTY DOORS, GROUPED BY THE NINE CORNERS OF EUROPE.
+   This replaced `.countrycols` on the homepage: fifty names A to Z in five
+   columns, which is the shape of the data as the layout on the one band
+   whose heading says ONE CONTINENT. An alphabet is a finding aid for a
+   reader who already knows the name.
+
+   `columns` RATHER THAN A GRID, because the nine groups hold two to nine
+   countries each and a grid row is as tall as its tallest item — the
+   /experiences finding, where a 21:9 panorama beside a 3:4 portrait paid
+   340 pixels of empty page four times down one band. `break-inside: avoid`
+   is what makes a group a unit; without it the Mediterranean's nine names
+   split across a column boundary and the corner's own heading is orphaned
+   from half its list.
+
+   NO BORDER, NO FILL, NO RADIUS AND NO SHADOW on a group. Those four are
+   what say "separate object, placed here by a system", and nine of them in
+   one band is the card grid this page measured out. A corner is told from
+   its neighbour by its heading and the space above it. */
+.doorindex { columns: 2; column-gap: var(--s6);
+  border-top: 1px solid var(--rule); padding-top: var(--s5);
+  margin-top: var(--s6); font-family: var(--display); }
+/* THREE COLUMNS FOR NINE CORNERS, AND THE COUNT IS THE DATA'S.
+   `columns: auto 12rem` packed five at 1280 and left the fifth holding one
+   group with two thirds of it empty — the corners are nine, so three
+   columns of three is the partition rather than whatever a track width
+   happens to produce. And a column count is a statement about a wide
+   column: below 62rem it is two, which is what `.countrycols` did here
+   before, because nine groups in one column measured 2,481 pixels at 390
+   against the 900 the alphabet took. No new breakpoint.
+
+   AND 52rem RATHER THAN 62rem, WHICH THE FIRST VERSION GOT WRONG AT THE ONE
+   WIDTH THIS REPOSITORY ALREADY WATCHES. At 62rem a 834-wide tablet fell to
+   two columns and the band measured 1,611 pixels against 1,214 at 1280 — a
+   narrower screen paying four hundred more pixels for the same fifty names,
+   which is the two-column-layout-collapsing-just-above-its-own-breakpoint
+   fault that 834 is on the contact sheet to find. Three columns of 250px
+   hold "Bosnia and Herzegovina" at this size. */
+@media (min-width: 52rem) { .doorindex { columns: 3; } }
+.dcorner { break-inside: avoid; margin-bottom: var(--s5); }
+.dcorner h3 { font-size: var(--t-xs); font-family: var(--text);
+  letter-spacing: .08em; text-transform: uppercase; color: var(--door-dark);
+  margin: 0 0 var(--s2); }
+.dcorner h3 a { color: inherit; text-decoration: none; }
+.dcorner h3 a:hover { text-decoration: underline;
+  text-underline-offset: .2em; }
+.dcorner a { display: block; text-decoration: none; color: var(--ink-2);
+  line-height: 1.5; }
+.dcorner > a:hover { color: var(--ink); text-decoration: underline;
+  text-underline-offset: .2em; }
+/* The hoisted clause under the list, not on nine rows. */
+.doornote { margin-top: var(--s5); max-width: 46rem; color: var(--ink-3); }
 
 /* ── stories, and the year ───────────────────────────────────────── */
 .strow { display: grid;

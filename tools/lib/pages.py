@@ -2060,18 +2060,68 @@ def home(data):
     # NO SECOND DRAWING HERE. The map moved to the hero, and two copies of
     # one continent on one page is the fault §7 already names — eleven
     # maps, and a reader who stopped seeing destinations at all.
-    clist = "".join(
-        f'<a href="{urls.country(c)}">{esc(c["name"])}</a>'
-        for c in sorted(data["countries"].values(), key=lambda c: c["name"]))
+    # FIFTY EQUAL NAMES IN AN ALPHABET IS THE SHAPE OF THE DATA AS THE
+    # LAYOUT, on the one band whose heading says ONE CONTINENT. The band was
+    # `.countrycols` — every country, A to Z, in five columns, 51 links and
+    # no other structure — and an alphabet is a finding aid for a reader who
+    # already knows the name, which is not the reader a homepage has.
+    #
+    # The nine corners are this atlas's own partition, authored in
+    # `data/taxonomy.json` and the structure of /countries, so grouping by
+    # them is a CLASSIFICATION rather than a measurement and it makes the
+    # band say what its heading says.
+    #
+    # AND THE COUNT WAS MEASURED AND REFUSED AS THE DIFFERENTIATOR. The
+    # destinations per country run 28 (France) to 1 (Monaco, San Marino,
+    # Vatican City), which is a real 28x spread and is a fact about how much
+    # of this atlas has been WRITTEN rather than about the countries:
+    # `docs/content-report.md` puts the content at about a third. Printing it
+    # beside fifty names would publish a writing-progress artefact as an
+    # editorial judgement, which is /beyond-the-obvious's own recorded
+    # finding (the corner with the most quiet places is not the quietest
+    # corner) and the reason /countries sizes nothing by it either.
+    macro_of = {}
+    for m in data.get("macros", []):
+        for cs in (m.get("countries") or []):
+            macro_of[cs if isinstance(cs, str) else cs.get("slug")] = m["slug"]
+    _by_macro = {}
+    for c in sorted(data["countries"].values(), key=lambda c: c["name"]):
+        _by_macro.setdefault(macro_of.get(c["slug"]), []).append(c)
+    corners = "".join(
+        f'<div class="dcorner">'
+        f'<h3><a href="{urls.macro(m)}">{esc(m["name"])}</a></h3>'
+        + "".join(f'<a href="{urls.country(c)}">{esc(c["name"])}</a>'
+                  for c in _by_macro.get(m["slug"], []))
+        + "</div>"
+        for m in data.get("macros", []))
+
+    # AND THE TWO BANDS DIFFER BY NINE, WHICH NOTHING ON THE PAGE SAID.
+    # Plate 01 draws a photograph clipped into the outline of every country
+    # `living_atlas` can draw one in — 41 of the fifty — and this band is the
+    # complete set, so a reader met 41 pictures at the top, fifty names four
+    # plates down, and no account of the difference. That is the /journeys
+    # caption promising a note that had been removed, arrived at from the
+    # other side. The clause is HOISTED once under the list rather than
+    # marked on nine rows, which is this atlas's own rule about never
+    # explaining the constraint back, and both figures are derived.
+    _drawn = {r["slug"] for r in _lz}
+    _missing = [c for c in data["countries"].values() if c["slug"] not in _drawn]
+    _nadvisory = sum(1 for c in _missing if (c.get("advisory") or {}).get("level"))
+    _nsmall = len(_missing) - _nadvisory
     atlas = f"""
   <div class="galwrap">
   <div class="sheettext">
     <h2 class="mega">One continent. <br>{numword(ncountries, cap=True)} doors.</h2>
-    <p class="lede">Every country has its own way in — {ncities} places drawn
-    on one projection, the same file as every other map here.</p>
+    <p class="lede">{numword(len(data.get("macros", [])), cap=True)} corners of
+    the continent, each with a page of its own, and every country sits in
+    one.</p>
     {golink('/map', 'Open the map')}
   </div>
-  <div class="countrycols">{clist}</div>
+  <div class="doorindex">{corners}</div>
+  <p class="small doornote">The picture at the top of this page opens
+  {len(_lz)} of them: the {numword(len(_missing))} it does not are
+  {numword(_nsmall)} too small to draw at that scale and {numword(_nadvisory)}
+  carrying a travel advisory, which keep their page and the warning on it.</p>
   </div>"""
 
     # ── 06 · THE READING ─────────────────────────────────────────────
