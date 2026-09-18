@@ -1909,20 +1909,40 @@ def home(data):
         return photo_credits(images, keys)
 
     # ── 02 · THE WINDOW ──────────────────────────────────────────────
-    # THE ONE FULL-BLEED PICTURE ON THE PAGE, and it is the window: fixed
-    # to the viewport while the wall scrolls past it. A gallery has one
-    # wall you walk up to, and a quiet room earns exactly one of these.
+    # THE ONE FULL-BLEED PICTURE ON THE PAGE, and it is the window: it
+    # stands still while the wall scrolls past it. A gallery has one wall
+    # you walk up to, and a quiet room earns exactly one of these.
+    #
+    # AND THE WORDS ARE ON THE PICTURE NOW, WHICH TOOK A SCREEN AND A
+    # QUARTER OF EMPTY PAGE OUT OF THE MIDDLE OF THE HOMEPAGE. The label
+    # used to arrive after the work: `margin-top: 124svh` put it on the
+    # wall below the opening, on the reasoning that a caption level with
+    # the picture is a caption on a card. The reasoning is right about a
+    # CAPTION and this is not one — "Europe is not a checklist." is the
+    # page's closing argument, and an argument separated from its evidence
+    # by 1,116 pixels of white is two bands where one was meant. Measured
+    # on the built page at 1280x900 the band ran 1,622 pixels for one
+    # photograph and four lines of type.
+    #
+    # So it is a DECLARATION, which is a scale this repository already
+    # declares and had spent nowhere on this page: type over a picture
+    # behind a scrim that makes the contrast a property of the design
+    # rather than of the photograph. The credit stays on the wall below,
+    # because it is a licence obligation and not part of the argument.
     window = ""
     if _hero_row:
         _cl = data["home"]["closing"]
         window = f"""
-  <div class="shotclip"><div class="shotfull">{picture(images, "home-hero", w=2400, h=1400,
-      alt=_hero_row["alt"], sizes="100vw", credit=False, eager=True)}</div></div>
-  <div class="sheettext">
-    <h2 class="mega">{esc(_cl["head"]).replace(" is not", " <br>is not")}</h2>
-    <p class="lede">{esc(_cl["body"])}</p>
-    {golink('/beyond-the-obvious', 'Beyond the obvious')}
-  </div>
+  <div class="shotclip"><div class="shotstand">
+    <div class="shotfull">{picture(images, "home-hero", w=2400, h=1400,
+        alt=_hero_row["alt"], sizes="100vw", credit=False, eager=True)}
+      <div class="shotsay"><div class="shotsay-in">
+        <h2 class="mega">{esc(_cl["head"]).replace(" is not", " <br>is not")}</h2>
+        <p class="lede">{esc(_cl["body"])}</p>
+        {golink('/beyond-the-obvious', 'Beyond the obvious')}
+      </div></div>
+    </div>
+  </div></div>
   <p class="sheetcred">Photograph <a href="{esc(_hero_row["source"])}" rel="noopener"
   target="_blank">{esc(_hero_row["photographer"])}</a> · {esc(_hero_row["licence"])}</p>"""
 

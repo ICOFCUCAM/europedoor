@@ -10131,8 +10131,8 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    had exactly the same defect. A room whose ground does not follow the
    preference needs ink that does not either, and the tokens are bound here
    rather than named: a `var()` resolves where the DECLARATION lives. */
-.sheet-bleed { padding: 0 0 11vh; border-bottom: 0; display: block;
-               position: relative; min-height: 128svh;
+.sheet-bleed { padding: 0 0 var(--s7); border-bottom: 0; display: block;
+               position: relative;
                --paper:     var(--white);
                --paper-2:   var(--bone-light);
                --paper-3:   var(--mineral);
@@ -10147,7 +10147,16 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
                --door-dark: var(--pine-deep);
                --pine-ink:  var(--pine);
                background: var(--white); color: var(--ink); }
-.sheet-bleed > .actmark { padding-inline: var(--page-gutter); }
+/* AND THE PLATE MARK WAS NEAR-BLACK ON THE OPENING. `.actmark` is
+   `--ink-3` on the wall's own paper, which is right on every other plate
+   and wrong on the only one whose first screen is the opening rather than
+   the wall: measured on the built page it sat at the top of the band, at
+   z-index 2, over graphite. The mark belongs to the WALL and the opening
+   starts at the top of the band, so the mark sits on the opening and takes
+   the opening's ink. */
+.sheet-bleed > .actmark { padding-inline: var(--page-gutter);
+  position: absolute; inset: var(--s5) 0 auto 0; z-index: 3;
+  color: color-mix(in srgb, var(--bone) 72%, transparent); }
 /* AND THE OPENING PAINTS ITS OWN GROUND, BECAUSE THE PICTURE IS BOUNDED
    AND THE WINDOW IS NOT. The photograph is capped at 16/9 of the viewport
    width — deliberately, because a viewport-filling slot guaranteed only 9%
@@ -10163,14 +10172,57 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    opening: `light wall, dark opening` is this atlas's whole reading of an
    aperture, and what a gallery does with a picture smaller than its frame
    is mount it. The step is measured in the browser suite. */
-.sheet-bleed .shotclip { position: absolute; inset: 0 0 auto 0;
-                         height: 118svh; clip-path: inset(0); z-index: 0;
+/* AND THE PICTURE STANDS STILL BY STICKING RATHER THAN BY BEING FIXED,
+   WHICH IS THE SAME EFFECT WITHOUT THE LANDMINE. `position: fixed` inside
+   a `clip-path` is two undefined-in-practice behaviours stacked on one
+   composition. The first is written down two screens up: six properties —
+   transform, filter, backdrop-filter, perspective, will-change and
+   contain — each make an ancestor a containing block for FIXED
+   descendants, so one of them anywhere between <body> and the picture
+   turns the window into a panel that scrolls, silently, with every box
+   still the right size in the right place. The second is worse because it
+   is not in that list: the CSS Masking specification says a `clip-path`
+   other than `none` ITSELF creates a containing block for fixed
+   descendants, Chromium does not do that and other engines do — so the
+   one element this composition requires to carry a clip is an element
+   that, read strictly, cancels the positioning it exists to clip. A
+   construction whose correctness depends on which half of a specification
+   an engine implements is not a construction.
+
+   `position: sticky` is defined identically everywhere, is clipped by an
+   ancestor's clip-path exactly as any in-flow box is, is constrained to
+   its own container by the spec rather than by a guard, and needs no
+   containing-block reasoning at all. So the opening is an in-flow box
+   again, the standing frame is one viewport tall and sticks to the top of
+   it, and the picture is centred inside THAT.
+
+   The picture's own box does not move by a pixel: `.shotclip .shotfull`
+   is a declared crop container in `data/image-purposes.json`, measured at
+   0.800–1.778 for a guaranteed frame of 35.5%, and the whole point of
+   that measurement is that a layout change which would ruin the first
+   photograph anybody licenses fails in the commit that causes it.
+   `.shotstand` is exactly the viewport, so every `vw` and `svh` in the
+   offsets below means what it meant against the viewport. */
+.sheet-bleed .shotclip { position: relative; height: 140svh;
+                         clip-path: inset(0); z-index: 0;
                          background: var(--graphite); }
-.sheet-bleed .shotfull { position: fixed; z-index: 0;
-  aspect-ratio: 4 / 5;
-  width: min(100vw, 80svh);
-  left: 50%; margin-left: max(-50vw, -40svh);
-  top: 50%;  margin-top: max(-62.5vw, -50svh); }
+.sheet-bleed .shotstand { position: sticky; top: 0; height: 100svh; }
+/* AND THE PHONE BOX WENT FROM 4:5 TO 2:3, WHICH COSTS SIX POINTS OF CROP
+   GUARANTEE AND BUYS BACK THE PICTURE. Measured at 390x844 with the words
+   on the photograph: the picture was 390x488 inside an 844-tall opening,
+   so 356 pixels of the first screen were the MOUNT and the declaration
+   covered 330 of the 488 that were left — 158 pixels of visible
+   photograph, on the one full-bleed picture on the page. A taller box
+   fixes both ends at once: 390x585 leaves 129 of mount either side and
+   295 of photograph above the words. The crop arithmetic follows honestly
+   rather than being left to describe the old box — container 0.667-1.778
+   against a 1.5-1.9 source is a guaranteed frame of 29.6% where 0.800 gave
+   35.5%, and the floor this repository refuses below is 12%. */
+.sheet-bleed .shotfull { position: absolute; z-index: 0;
+  aspect-ratio: 2 / 3;
+  width: min(100vw, 66.67svh);
+  left: 50%; margin-left: max(-50vw, -33.33svh);
+  top: 50%;  margin-top: max(-75vw, -50svh); }
 @media (min-width: 52rem) {
   .sheet-bleed .shotfull {
     aspect-ratio: 16 / 9;
@@ -10178,15 +10230,48 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
     margin-left: max(-50vw, -88.89svh);
     margin-top: max(-28.125vw, -50svh); }
 }
+/* THE DECLARATION: type ON the photograph, and the scrim is what makes
+   the ratio a property of the design rather than of the picture. The
+   arithmetic is `.credit`'s own and not a second decision about one
+   thing: the worst case a photograph can present is a white frame, the
+   room's ground at 72% composites over white to rgb(76,83,82), and bone
+   on that measures 6.90:1 whatever the frame turns out to be.
+
+   IT IS A FLAT WASH THE SIZE OF THE WORDS, WITH THE RAMP ABOVE IT. A
+   gradient under the type would be weakest exactly where the type runs
+   out — the failure /plan already recorded about a diagonal scrim — and
+   the alpha a glyph is painted over would then depend on how many lines
+   the sentence happens to take. So the box the words are in carries the
+   full 72% and the ramp is a separate strip above it, in five stops
+   because a two-stop ramp has a crease at each end and the eye draws a
+   line along it. */
+.sheet-bleed .shotsay { position: absolute; inset: auto 0 0 0; z-index: 2;
+  padding: var(--s6) var(--page-gutter) var(--s7);
+  --paper: var(--graphite);
+  --door: var(--bone);
+  --door-dark: var(--bone);
+  color: var(--bone);
+  background: color-mix(in srgb, var(--graphite) 72%, transparent); }
+.sheet-bleed .shotsay::before { content: ""; position: absolute;
+  inset: auto 0 100% 0; height: 13svh; pointer-events: none;
+  background: linear-gradient(to top,
+    color-mix(in srgb, var(--graphite) 72%, transparent) 0%,
+    color-mix(in srgb, var(--graphite) 65%, transparent) 18%,
+    color-mix(in srgb, var(--graphite) 46%, transparent) 40%,
+    color-mix(in srgb, var(--graphite) 24%, transparent) 62%,
+    color-mix(in srgb, var(--graphite) 8%, transparent) 82%,
+    transparent 100%); }
+.sheet-bleed .shotsay-in { display: grid; gap: var(--s5); justify-items: start;
+  max-width: 44rem; }
+@media (max-width: 52rem) {
+  .sheet-bleed .shotsay { padding: var(--s5) var(--page-gutter) var(--s6); }
+  .sheet-bleed .shotsay-in { gap: var(--s4); }
+}
+.sheet-bleed .shotsay :is(.mega, .lede) { color: var(--bone); }
 .sheet-bleed .shotfull :is(picture, img) { display: block; width: 100%;
   height: 100%; object-fit: cover; }
 .sheet-bleed > * { position: relative; z-index: 2; }
-/* THE LABEL ARRIVES AFTER THE WORK, which is the whole reason the band is
-   150svh: the window opens, the photograph stands still for a screen and a
-   half while the wall moves past it, and then the wall carries its own
-   caption. A label level with the picture would be a caption on a card. */
-.sheet-bleed .sheettext { margin-top: 124svh; padding: 0 var(--page-gutter);
-                          max-width: 44rem; }
+
 /* STATIC, AND THAT WORD IS THE WHOLE FIX. `.sheetcred` is absolutely
    positioned at the foot of a plate, which is right where the credit sits
    over a picture; here it is a line of the wall label and it kept the

@@ -660,3 +660,72 @@ licence gate*. **Recorded and referred rather than acted on**: the design
 question (a supplier's name on the composition) is real and the answer is not
 mine to pick, because it has a licence consequence.
 
+
+## Home 14/30 — the window says its own words, and the wall lost a screen and a quarter
+
+`margin-top: 124svh`. That is what stood between "Europe is not a checklist."
+and the photograph it is about, and the reasoning written above it was right
+about a caption and wrong about this: *the label arrives after the work … a
+label level with the picture would be a caption on a card.* True of a
+caption. This is not one — it is the page's closing argument, and an argument
+separated from its evidence by 1,116 pixels of white paper is two bands where
+one was meant. Measured on the built page at 1280x900 the plate ran **1,622
+pixels** for one photograph and four lines of type.
+
+It is a **declaration** now, which is a scale `docs/non-home-redesign.md`
+already declares and this page had spent nowhere: type over a picture behind
+a scrim that makes the contrast a property of the design rather than of the
+photograph. 1,622 → **1,353** at 1280, 1,492 → **1,275** at 390, and the
+whole document 10,334 → 10,066.
+
+**The scrim is a flat wash the size of the words, with the ramp above it.**
+A gradient under the type is weakest exactly where the type runs out — the
+diagonal-scrim failure /plan already records — and the alpha a glyph is
+painted over would then depend on how many lines the sentence happens to
+take. So the box the words are in carries the full 72% and the ramp is a
+separate strip above it, in five stops because a two-stop ramp has a crease
+at each end and the eye draws a line along it. The arithmetic is `.credit`'s
+own rather than a second decision about one thing: the worst case a
+photograph can present is a white frame, graphite at 72% composites over
+white to `rgb(76,83,82)`, and bone on that is **6.90:1** whatever the picture
+turns out to be.
+
+**AND THE PICTURE STANDS STILL BY STICKING RATHER THAN BY BEING FIXED.**
+`position: fixed` inside a `clip-path` stacks two undefined-in-practice
+behaviours on one composition. The first is already written down: six
+properties — transform, filter, backdrop-filter, perspective, will-change,
+contain — each make an ancestor a containing block for fixed descendants, so
+one of them anywhere between `<body>` and the picture turns the window into a
+panel that scrolls, silently, with every box still the right size in the
+right place. The second is worse because it is not on that list: **the CSS
+Masking specification says a `clip-path` other than `none` itself creates a
+containing block for fixed descendants.** Chromium does not do that; other
+engines do. So the one element this composition requires to carry a clip is,
+read strictly, the element that cancels the positioning it exists to clip —
+and every instrument in this repository runs in Chromium, which is the half
+where it works.
+
+`position: sticky` is defined identically everywhere, is clipped by an
+ancestor's clip-path exactly as any in-flow box is, is constrained to its own
+container by the specification rather than by a guard, and needs no
+containing-block reasoning at all. The opening is an in-flow box again, the
+standing frame is one viewport tall and sticks to the top of it, and the
+picture is centred inside that.
+
+**The phone box went 4:5 → 2:3, and that is the one thing this cost.**
+Measured at 390x844 with the words on the photograph: the picture was 390x488
+inside an 844-tall opening, so **356 pixels of the first screen were the
+mount** and the declaration covered 330 of the 488 that were left — 158
+pixels of visible photograph, on the one full-bleed picture on the page. A
+taller box fixes both ends at once: 390x585 leaves 129 of mount either side
+and 295 of photograph above the words. The crop arithmetic follows honestly
+rather than being left describing the old box — container **0.667–1.778**
+against a 1.5–1.9 source is a guaranteed frame of **29.6%** where 0.800 gave
+35.5%, against a floor of 12%. Re-measured in Chromium at the same twenty
+viewports the browser sweep uses.
+
+**And the plate mark was near-black on the opening.** `.actmark` is `--ink-3`
+on the wall's own paper, which is right on every other plate and wrong on the
+only one whose first screen is the opening rather than the wall: it sat at the
+top of the band, at z-index 2, over graphite. Nothing counts a mark that is
+the colour of what is behind it.
