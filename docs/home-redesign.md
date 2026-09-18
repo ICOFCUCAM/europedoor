@@ -1115,3 +1115,107 @@ them.** A `@media (max-width: 34rem)` block would have been a seventh
 breakpoint, and the two-column rule already covers 320; `line-height: 1.06`
 and `1.16` would have been a ninth and a tenth where the register holds
 eight, and `1.12` was already in the set for both.
+
+## Home 21 — one ground, two ends, and the refinement pass
+
+**THE HEADER TAKES THE FOOTER'S BINDING, IN ONE SELECTOR.** The brief is
+that the two are ends of one architectural object — *same colour, not same
+weight* — so `.footer, .masthead` bind the same thirteen tokens and
+everything that differs between them is SIZE and AIR rather than palette. A
+second copy of that binding would be two chances to disagree, drifting one
+token at a time, which this repository has recorded seven times about a
+predicate, a number, a URL and a file extension.
+
+**AND THE PINE BAND IS NOT WHAT CAME BACK.** A solid pine masthead was
+measured as the largest single reason twelve families read as one page — the
+first 63 pixels identical and *the most saturated thing in frame* whatever
+changed underneath — and the recorded fix was *stop spending a saturated
+colour there, not stop having a surface*. Graphite is a neutral: it costs
+the family accents nothing and it is the ground the INTELLIGENCE world and
+the footer are already built on. Measured on the painted pixel at 1280, in
+both colour-scheme preferences, on four families:
+
+| | light page | dark page |
+|---|---|---|
+| the band composites to | `rgb(30,38,36)` | `rgb(16,25,23)` |
+| navigation ink | **9.30:1** | **10.76:1** |
+| wordmark, and the focus ring | **13.56:1** | **15.70:1** |
+
+against 4.63 and 5.84 on the old cobalt band, and against the **1.74** this
+file records for pine on graphite. Nothing had to be restated to get there:
+`--pine-ink` is bound to bone, so `.masthead .wordmark` resolves correctly
+with no new rule, and the focus ring already reads `--ink`, which is *the
+one colour guaranteed to read on this band in every preference*.
+
+**AND THE REVEAL TURNED OVER WITH THE GROUND.** On a pale bar the fine line
+inside the cut is the wall's own tone; on a dark one it is light, because
+two near-blacks are always about 1:1 — the aperture's own finding. It is the
+footer's top edge upside down, struck at the same 26%.
+
+**`theme-color` MOVED FOR THE FOURTH TIME, WHICH IS THE ASSERTION WORKING.**
+A derived meta value follows the thing it describes or it is a second
+implementation of it. The bar is graphite in both preferences now, so the
+*light* value stopped being a light value: what changes between them is no
+longer the bar but what is UNDER it, and a 94% band composites differently
+over bone paper than over graphite. `#1e2624` and `#0f1817`.
+
+### The refinement pass
+
+**THE DENSITY WAS THE FAULT AND THE STRUCTURE WAS RIGHT.** Five columns of
+`--t-sm` links two pixels apart under a heading with `--s1` beneath it read
+as a sitemap. Every number went up one rung of a ladder that already existed:
+links `--t-sm` → `--t-base`, row gap `--s2` → `--s3`, column gaps `--s6/--s5`
+→ `--s7/--s6`, the band's own padding `--s8/--s5` → `--s9/--s6`. **The column
+head gained a rule**, which is what a printed index does and which says a
+column *starts* rather than that a word happens to be above a list.
+
+**THE STATEMENT LEFT THE MARK'S ROW, BECAUSE TWO COLUMNS MADE IT NARROWER AS
+THE WINDOW GOT WIDER.** `minmax(0, auto)` sizes the first track to the
+wordmark, and the wordmark is set in `--ed-display-3`, which is a clamp on
+the viewport — so at 1440 the mark took more of the row than at 1280 and the
+brand line beside it went **410 wide on one line to 382 on two**. A sentence
+that breaks on the largest screens is the opposite of what it is for, and no
+`max-width` fixes a track being eaten from the left. One column: the mark,
+then *Open the door to Europe.* at display size with the rest as a note under
+it — 704 at every width from 1024 up, one line.
+
+**THE SIX EXTERNAL SERVICES SAY SO BEFORE THE CLICK DOES.** Every other link
+in this footer stays inside the Atlas and these six leave it, so the
+difference is stated in the type rather than left to a hostname in a status
+bar. `aria-hidden` on the mark, because `target="_blank"` already carries it
+for assistive technology and a glyph announced after each of six rows is the
+constraint explained back.
+
+**THE DISCLOSURE WAS ORDINARY FOOTER COPY AT THE FOOT OF A COLUMN.** It is
+the sentence that keeps the commercial and the editorial apart — this
+product's whole position on the six links above it — and as the sixth
+paragraph of the third column it read as more of the list. It is its own
+band with its own label between the monument and the legal strip, where a
+publication puts a note about its own conduct. The heading is a LABEL rather
+than an `<h2>`, because the homepage asserts its own heading count.
+
+**THE BRIEF'S FIGURE FOR THE APERTURE WAS BELOW WHAT WAS ALREADY THERE.** It
+asked for the mark to be *substantially larger, perhaps 56–72px*, against a
+mark already drawn at 96. The instruction is followed and the number is not:
+140 × 76 is where it stops reading as a glyph after a sentence and starts
+reading as the door the sentence is about.
+
+**And the close is two paragraphs rather than a `<br>`.** The first sentence
+is what this atlas refuses and the second is what it asks for; a line break
+makes them one three-line block where the turn between them is the point.
+`--s9` above and below, so it reads as a page of its own rather than as the
+band after the columns.
+
+**MEASURED AT SIX WIDTHS, NO WRAPPED LINK AND NO OVERFLOW — AND THE ONE
+THING THAT IS TIGHT IS RECORDED RATHER THAN FIXED.** At 1024 the five
+columns are 146px each and four of the thirty entries set on two lines
+(*Beyond the obvious*, *The European year*, *Sources & corrections*, *For
+tourism boards*). At 1280 and above none do. Raising the five-column
+threshold would need a **seventh breakpoint**, which the register refuses —
+and two-line entries in a five-column index are what a printed index does,
+where a three-column desktop would be the thing the brief explicitly rules
+out.
+
+**One label was not taken from the brief.** It lists */events* as *Europe in
+the year*; the page's own head says **The European year**, and a second name
+for one thing is two names waiting to disagree. The existing label stands.

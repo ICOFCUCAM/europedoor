@@ -32,48 +32,61 @@
     "records about a chip that filters nothing and an attribute nobody",
     "reads. It is here so the absence is written down rather than forgotten."
   ],
-  "disclosure": "Separate services, run by the people behind EuropeDoor and by partners. They are not editorial recommendations and nothing here is ranked or paid for a place in the Atlas.",
+  "disclosure": "Some services are operated by the people behind EuropeDoor or by partners. They are separate from the editorial Atlas, they are not editorial recommendations, and nothing here is ranked or paid for a place in the Atlas.",
   "services": [
     {
-      "slug": "fly", "label": "Fly",
+      "slug": "fly",
+      "label": "Fly",
       "line": "Flights through EuropeDoor's flight partners",
       "state": "unbuilt",
       "why": "no flight partner is declared. The trigger is a partner with terms somebody has read."
     },
     {
-      "slug": "buy-a-home", "label": "Buy a home",
+      "slug": "buy-a-home",
+      "label": "Buy a home",
       "line": "European property",
-      "host": "re.flyttgo.com", "href": "https://re.flyttgo.com/",
+      "host": "re.flyttgo.com",
+      "href": "https://re.flyttgo.com/",
       "state": "live"
     },
     {
-      "slug": "move", "label": "Move",
-      "line": "Relocation and logistics",
-      "host": "www.flyttgo.com", "href": "https://www.flyttgo.com/",
+      "slug": "move",
+      "label": "Move",
+      "line": "Relocation & logistics",
+      "host": "www.flyttgo.com",
+      "href": "https://www.flyttgo.com/",
       "state": "live"
     },
     {
-      "slug": "drive", "label": "Book a car",
-      "line": "A car for the journey",
-      "host": "www.flyttgo.com", "href": "https://www.flyttgo.com/",
+      "slug": "drive",
+      "label": "Book a car",
+      "line": "Car for the journey",
+      "host": "www.flyttgo.com",
+      "href": "https://www.flyttgo.com/",
       "state": "live"
     },
     {
-      "slug": "protect", "label": "Online security",
-      "line": "Digital privacy and risk",
-      "host": "www.myprivacyos.com", "href": "https://www.myprivacyos.com/",
+      "slug": "protect",
+      "label": "Online security",
+      "line": "Digital privacy & risk",
+      "host": "www.myprivacyos.com",
+      "href": "https://www.myprivacyos.com/",
       "state": "live"
     },
     {
-      "slug": "africa", "label": "Visit Africa",
+      "slug": "africa",
+      "label": "Visit Africa",
       "line": "Beyond the continent",
-      "host": "afrinkong.com", "href": "https://afrinkong.com/",
+      "host": "afrinkong.com",
+      "href": "https://afrinkong.com/",
       "state": "live"
     },
     {
-      "slug": "sell-a-company", "label": "Sell a company",
-      "line": "Exit and acquisition",
-      "host": "exit.sovereigndo.com", "href": "https://exit.sovereigndo.com/",
+      "slug": "sell-a-company",
+      "label": "Sell a company",
+      "line": "Exit & acquisition",
+      "host": "exit.sovereigndo.com",
+      "href": "https://exit.sovereigndo.com/",
       "state": "live"
     }
   ]

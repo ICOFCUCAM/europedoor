@@ -1186,16 +1186,29 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
    the difference between furniture and the page. It is a neutral, so it
    costs the family accents nothing, and it is bound per world, so the
    INTELLIGENCE pages get their own rung rather than the light world's. */
+/* AND `--paper-2` NOW RESOLVES TO GRAPHITE-2, because the binding above
+   redefines it ON this element. The declaration did not change by a
+   character and what it paints did, which is the whole argument for binding
+   a ladder rather than naming a hex: the bar is still the next rung up from
+   its own ground, a step of 1.09, which is the difference between furniture
+   and the page — it is simply a different ladder now. */
 .masthead { background: color-mix(in srgb, var(--paper-2) 94%, transparent);
+            color: var(--ink);
             position: sticky; }
 /* THE EDGE IS A REVEAL RATHER THAN A BORDER, which is this atlas's own way
    of saying that two surfaces are at different depths. Every plate cuts its
    aperture and then draws two things at the cut: the wall's face over the
    drawing's edge, and a fine line just inside it. One hairline says "a
    border"; two say "an edge", and the bar stops floating on the page. */
+/* AND THE REVEAL HAD TO TURN OVER WITH THE GROUND. On a pale bar the fine
+   line just inside the cut is the WALL's own tone laid over the page; on a
+   dark one it is light, because a reveal is where the eye reads depth and a
+   near-black line on near-black is the *two near-blacks are always about
+   1:1* finding this atlas already records about the aperture. It is the
+   footer's own top edge, upside down, struck at the same 26%. */
 .masthead::after { content: ""; position: absolute; inset: auto 0 -2px 0;
                    height: 1px; pointer-events: none;
-                   background: color-mix(in srgb, var(--paper) 72%, transparent); }
+                   background: color-mix(in srgb, var(--bone) 26%, transparent); }
 .masthead-in { max-width: var(--page); margin: 0 auto; padding: var(--s5); display: flex; align-items: center; gap: var(--s5); justify-content: space-between; }
 /* THE BAR TOOK THE AIR A 76px HEADLINE UNDER IT IMPLIES. 58 pixels is a
    toolbar; this is the masthead of a publication. --s3 to --s5 is 58 -> 82
@@ -2024,9 +2037,29 @@ a .kicker { color: var(--ink-3); }
    one preference and near-black on graphite in the other. On the five
    INTELLIGENCE pages this changes nothing, which is correct — a colophon is
    a colophon on every page of the edition. */
-.footer { background: var(--paper); color: var(--ink);
-          border-top: 0;
-          --paper:      var(--graphite);
+/* ── ONE GROUND, TWO ENDS ──────────────────────────────────────────────
+   THE HEADER IS THE ENTRANCE AND THE FOOTER IS THE OTHER SIDE OF THE SAME
+   DOOR, so they take one binding rather than two: same colour, opposite
+   weight. The header is quiet, precise and navigational; the footer is
+   large, editorial and conclusive, and everything that differs between them
+   is SIZE and AIR rather than palette.
+
+   IT IS ONE SELECTOR BECAUSE TWO WOULD BE TWO CHANCES TO DISAGREE. This
+   repository has recorded that seven times about a predicate, a number, a
+   URL and a file extension; a thirteen-token colour binding copied into a
+   second rule is the same shape at its worst, because the two would drift
+   one token at a time and nothing counts a token that is right in one band
+   and wrong in the other.
+
+   AND THE PINE BAND IS NOT WHAT IS COMING BACK. A solid pine masthead was
+   measured as the largest single reason twelve families read as one page —
+   the first 63 pixels identical and THE MOST SATURATED THING IN FRAME
+   whatever changed underneath — and the fix was recorded as *stop spending
+   a saturated colour there, not stop having a surface*. Graphite is a
+   neutral: it costs the family accents nothing, it is the ground the
+   INTELLIGENCE world and the footer are already built on, and every ratio
+   below is one the footer has been shipping since it was written. */
+.footer, .masthead { --paper:      var(--graphite);
           --paper-2:    var(--graphite-2);
           --paper-3:    var(--graphite-3);
           --ink:        var(--bone);
@@ -2039,6 +2072,7 @@ a .kicker { color: var(--ink-3); }
           --door:       var(--cobalt-lift);
           --door-dark:  var(--cobalt-lift);
           --pine-ink:   var(--bone); }
+.footer { background: var(--paper); color: var(--ink); border-top: 0; }
 /* AND THE TOP EDGE IS THE MASTHEAD'S EDGE UPSIDE DOWN. One hairline says
    "a border"; the wall's face and a fine line just inside it say "two
    surfaces at different depths", which is what the aperture draws at every
@@ -2047,16 +2081,24 @@ a .kicker { color: var(--ink-3); }
 .footer::before { content: ""; position: absolute; inset: -1px 0 auto 0;
                   height: 1px; pointer-events: none;
                   background: color-mix(in srgb, var(--bone) 26%, transparent); }
-.footer-in { max-width: var(--page); margin: 0 auto; padding: var(--s8) var(--s5) var(--s7); }
+.footer-in { max-width: var(--page); margin: 0 auto;
+             padding: var(--s9) var(--s6) var(--s7); }
 /* THE MARK AND THE NAME AT THE SIZE A COLOPHON SETS THEM. `--ed-display-3`
    rather than a new value: the scale already has four display steps and a
    fifth for one band is a second type scale wearing the first one's
    clothes. */
-.colophon { display: grid; gap: var(--s5) var(--s8); align-items: start;
-            margin: 0 0 var(--s6); }
-@media (min-width: 60rem) {
-  .colophon { grid-template-columns: minmax(0, auto) minmax(0, 1fr); }
-}
+/* AND THE STATEMENT LEFT THE MARK'S ROW, BECAUSE THE TWO COLUMNS MADE IT
+   NARROWER AS THE WINDOW GOT WIDER. `minmax(0, auto)` sizes the first track
+   to the wordmark, and the wordmark is set in `--ed-display-3`, which is a
+   clamp on the viewport — so at 1440 the mark took more of the row than at
+   1280 and the statement beside it went 410 wide on one line to 382 on two.
+   A brand line that breaks on the LARGEST screens is the opposite of the
+   thing it is for, and no amount of tuning a `max-width` fixes a track that
+   is being eaten from the left. One column: the mark, then the statement at
+   its own measure, which is also what the brief asked for — more authority
+   and more width. */
+.colophon { display: grid; gap: var(--s5); align-items: start;
+            margin: 0 0 var(--s7); }
 .footmark { display: inline-flex; align-items: center; gap: .34em;
             text-decoration: none; color: var(--ink);
             font-family: var(--display); font-size: var(--ed-display-3);
@@ -2076,7 +2118,17 @@ a .kicker { color: var(--ink-3); }
 .footer-extent { font-size: var(--t-xs); letter-spacing: .1em;
                  text-transform: uppercase; color: var(--ink-3);
                  max-width: none; margin: 0 0 var(--s7); }
-.footer-lede { font-family: var(--display); font-size: var(--t-lg); max-width: 34rem; }
+/* THE BRAND STATEMENT IS TWO SENTENCES AND WAS SET AS ONE. As a single
+   34rem paragraph at `--t-lg` it read as a footer description — the thing
+   every travel product has — rather than as the sentence this whole atlas
+   is named after. The opening line takes the display step and stands
+   alone; the rest is the note under it, at reading size and reading width.
+   The paragraph is still ONE element, because the two halves are one
+   sentence to anything that reads the document rather than looks at it. */
+.footer-lede { max-width: 52rem; display: grid; gap: var(--s4); }
+.fled-a { font-family: var(--display); font-size: var(--ed-display-3);
+          line-height: 1.12; letter-spacing: -0.02em; color: var(--ink); }
+.fled-b { font-size: var(--t-base); color: var(--ink-2); max-width: 36rem; }
 /* TWENTY LINKS IN ONE FLAT ROW, ON ALL 1,033 PAGES. Every one the same
    weight and the same size, wrapping into two lines of near-identical text,
    so the register of this site — a published method, a source register, an
@@ -2085,9 +2137,15 @@ a .kicker { color: var(--ink-3); }
    in no order. Four groups, laid out as columns, each link on its own line:
    a name in a column is found by reading down one list of five, not by
    scanning a paragraph of twenty. */
+/* AND THE DENSITY WAS THE REAL FAULT, NOT THE STRUCTURE. The five columns
+   were right and read as a sitemap: `--t-sm` links two pixels apart under a
+   heading with `--s1` beneath it, five tracks sharing `--s5`. An
+   institutional index is not a dense list — it is a set of short lists with
+   room to be read one at a time. Every number below went up one rung of a
+   ladder that already existed rather than to a new value. */
 .footer-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
-              gap: var(--s6) var(--s5); margin: var(--s6) 0 var(--s7);
-              font-size: var(--t-sm); align-items: start; }
+              gap: var(--s7) var(--s6); margin: var(--s7) 0 var(--s8);
+              font-size: var(--t-base); align-items: start; }
 /* FIVE COLUMNS, AND TWO OF THEM ARE NOT LISTS OF LINKS — which is the whole
    composition rather than a wider grid. Four identical lists side by side is
    the 280px card grid this site already threw away, one component down: the
@@ -2102,9 +2160,16 @@ a .kicker { color: var(--ink-3); }
                   minmax(0, .82fr) minmax(0, 1.15fr);
                 gap: var(--s6) var(--s6); }
 }
-.fgroup { display: grid; gap: var(--s2); align-content: start; }
-.fghead { font-size: var(--t-xs); letter-spacing: .1em; text-transform: uppercase;
-          color: var(--ink-3); margin: 0 0 var(--s1); }
+.fgroup { display: grid; gap: var(--s3); align-content: start; }
+/* THE HEAD IS A COLUMN HEAD, SO IT CARRIES A RULE. An index in a printed
+   atlas separates its heading from its entries with a line, and here it
+   does a second job: five uppercase labels at caption size on a dark ground
+   are five quiet things in a row, and the rule is what says a column STARTS
+   rather than that a word happens to be above a list. It is the band's own
+   `--rule`, which is the hairline this footer already uses twice. */
+.fghead { font-size: var(--t-xs); letter-spacing: .12em; text-transform: uppercase;
+          color: var(--ink-3); margin: 0 0 var(--s4);
+          padding-bottom: var(--s3); border-bottom: 1px solid var(--rule); }
 .footer-nav a { text-decoration: none; color: var(--ink-2); }
 .footer-nav a:hover, .footer-nav a:focus-visible { color: var(--door); }
 /* THE EXTERNAL REGISTER. Every row leaves this origin, so every row says
@@ -2112,15 +2177,21 @@ a .kicker { color: var(--ink-3); }
    column reads as more of the Atlas, which is exactly the confusion the
    commercial wall exists to prevent. The line is the disambiguation, not
    decoration. */
-.fgroup-go .gorow { display: grid; gap: 1px; padding: 2px 0; }
-.goline { font-size: var(--t-xs); color: var(--ink-3); }
+.fgroup-go .gorow { display: grid; gap: 2px; }
+/* AND THE OUTWARD MARK, WHICH IS THE ONE THING THIS COLUMN HAS TO SAY THAT
+   THE OTHER FOUR DO NOT. Every other link in this footer stays inside the
+   Atlas and these six leave it, so the difference is stated in the type
+   rather than left to a hostname in a status bar. `aria-hidden` because
+   `target="_blank"` already carries it for assistive technology, and a
+   glyph announced after each of six rows is the constraint explained back.
+   Quieter than the label and tight against it: it is a property of the
+   name, not a second column. */
+.goout { font-size: var(--t-sm); color: var(--ink-3); margin-left: .28em;
+         vertical-align: .08em; }
+.gorow:hover .goout, .gorow:focus-visible .goout { color: var(--door); }
+.goline { font-size: var(--t-sm); color: var(--ink-3); }
 .fgroup-go .gorow:hover .goline,
 .fgroup-go .gorow:focus-visible .goline { color: var(--ink-2); }
-/* ONE DISCLOSURE FOR THE COLUMN, NOT ONE PER ROW. Six copies of the same
-   sentence is `never explain the constraint back` — a reason shared by
-   every row is hoisted once above the set. */
-.godis { font-size: var(--t-xs); color: var(--ink-3); margin: var(--s3) 0 0;
-         max-width: 24rem; }
 /* THE LAST COLUMN IS A SENTENCE. It carries the one thing a footer can say
    that a list cannot: that the thing above it keeps changing. */
 .staysay { font-family: var(--display); font-size: var(--ed-display-3);
@@ -2142,33 +2213,74 @@ a .kicker { color: var(--ink-3); }
    the difference between a frame and a repeat. The arch is the signature
    struck by `arch_path()` rather than a second drawing of it, sitting on
    the type as an opening rather than beside it as a logo. */
-.footclose { display: grid; justify-items: center; gap: var(--s5);
-             padding: var(--s8) 0 var(--s7); margin: 0 0 var(--s6);
+/* AND IT IS THE CLOSING PAGE OF A BOOK RATHER THAN ANOTHER FOOTER
+   COMPONENT, which is a statement about AIR before it is one about size.
+   The first version gave it `--s8` above and `--s7` below and the rule
+   directly over it, so the monument read as the band after the columns;
+   `--s9` on both sides and a full rung of space under the statement is what
+   makes it a page of its own. */
+.footclose { display: grid; justify-items: center; gap: var(--s6);
+             padding: var(--s9) 0; margin: 0 0 var(--s7);
              border-top: 1px solid var(--rule); text-align: center; }
 .footsay { font-family: var(--display); color: var(--ink);
            font-size: var(--ed-display-2); line-height: 1.12;
            letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
-.footarch { width: 96px; height: 52px; }
+/* TWO PARAGRAPHS, NOT A `<br>`. The first sentence is what this atlas
+   refuses and the second is what it asks for, and a line break makes them
+   one three-line block where the turn between them is the point. The gap
+   is smaller than the grid's own, because they are still one statement. */
+.footsay-b { margin-top: calc(var(--s5) - var(--s6)); }
+/* THE SIGNATURE CONCLUDING THE SITE, AND THE BRIEF'S OWN FIGURE WAS BELOW
+   WHAT WAS ALREADY THERE — it asked for "substantially larger, perhaps
+   56–72px" against a mark already drawn at 96. The instruction is followed
+   and the number is not: 140 is where it stops reading as a glyph after a
+   sentence and starts reading as the door the sentence is about. */
+.footarch { width: 140px; height: 76px; }
 /* STROKED AND UNFILLED, because at the end of a document the door is an
    opening rather than an object. `non-scaling-stroke` for the reason this
    stylesheet records about every framed drawing: a stroke in user units is
    a different width at every rendered size. */
 .footarch path { fill: none; stroke: var(--ink-3); stroke-width: 1.4;
                  vector-effect: non-scaling-stroke; }
-.footer-legal { font-size: var(--t-xs); color: var(--ink-3); max-width: 46rem; }
+/* AND THE DISCLAIMER STOPPED COMPETING WITH THE MANIFESTO ABOVE IT. Four
+   lines at `--t-xs` on the default leading is a block; the same four at
+   1.55 is a note. */
+.footer-legal { font-size: var(--t-xs); color: var(--ink-3); max-width: 46rem;
+                line-height: 1.55; }
 /* THE THIN FINAL LINE, and the register is in it rather than in a column of
    its own. Privacy, terms, cookies and the accessibility statement are what
    a reader needs when something is wrong: in the document, in the tab order
    and one click from all 1,032 pages, and not a fifth of the footer's
    weight, which would say they are a fifth of what this is. */
-.footline { display: flex; flex-wrap: wrap; align-items: baseline;
-            gap: var(--s2) var(--s5); margin: var(--s6) 0 0;
+/* ── the institutional note ───────────────────────────────────────────
+   THE DISCLOSURE WAS ORDINARY FOOTER COPY AT THE FOOT OF A COLUMN. It is
+   the sentence that keeps the commercial and the editorial apart, which is
+   this product's whole position on the six links above it — and set as the
+   sixth paragraph of the third column it read as more of the list. It is
+   its own band with its own label now, between the monument and the legal
+   strip, where a printed publication puts a note about its own conduct.
+   The heading is a LABEL rather than an `<h2>`: the homepage asserts its
+   own heading count and a footer is not a band of the page. */
+.footnote-band { display: grid; gap: var(--s3); max-width: 46rem;
+                 margin: 0 0 var(--s6); }
+.fnhead { font-size: var(--t-xs); letter-spacing: .12em; text-transform: uppercase;
+          color: var(--ink-2); margin: 0; }
+.fnnote { font-size: var(--t-sm); color: var(--ink-3); line-height: 1.55;
+          max-width: 46rem; margin: 0; }
+/* THE LEGAL STRIP IS TWO LEVELS RATHER THAN ONE ROW, because the strap and
+   the four pages are not the same kind of thing and a single baseline made
+   them one run of small grey text with a © at the end of it. The strap says
+   what this publication is; the four say where to go when something is
+   wrong; the notice sits opposite both. */
+.footline { display: flex; flex-wrap: wrap; align-items: end;
+            justify-content: space-between; gap: var(--s3) var(--s6);
+            margin: var(--s7) 0 0;
             padding: var(--s5) 0 0; border-top: 1px solid var(--rule);
             font-size: var(--t-xs); color: var(--ink-3); }
+.footline-l { display: grid; gap: var(--s3); }
 .footstrap { text-transform: uppercase; letter-spacing: .12em;
              color: var(--ink-2); margin: 0; }
-.footlegal-nav { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4);
-                 margin-right: auto; }
+.footlegal-nav { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); }
 .footlegal-nav a { text-decoration: none; color: var(--ink-3); }
 .footlegal-nav a:hover, .footlegal-nav a:focus-visible { color: var(--door); }
 .footcopy { margin: 0; }

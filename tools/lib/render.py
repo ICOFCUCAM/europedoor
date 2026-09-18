@@ -1254,7 +1254,15 @@ def _over(top, under, alpha):
                          for a, b in zip(t, u))
 
 
-THEME_COLOR_LIGHT = _over(_HEX["bone-2"], _HEX["bone-light"], 0.94)
+#
+# AND A FOURTH TIME, WHEN THE HEADER AND THE FOOTER BECAME TWO ENDS OF ONE
+# OBJECT. The bar binds the graphite ladder now — the same thirteen tokens
+# the footer binds, in one selector — so `--paper-2` resolves to
+# `graphite-2` on both, and the LIGHT value stopped being a light value.
+# What changes between the two preferences is no longer the bar but what is
+# UNDER it: bone paper in the light world, graphite in the dark one, and a
+# 94% band composites differently over each. Two grounds, one top colour.
+THEME_COLOR_LIGHT = _over(_HEX["graphite-2"], _HEX["bone-light"], 0.94)
 THEME_COLOR_DARK = _over(_HEX["graphite-2"], _HEX["graphite"], 0.94)
 
 
@@ -1763,11 +1771,22 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
                     # nofollow noopener and a new tab, because this is the
                     # only kind of link on this site that leaves the origin
                     # and `checks.py` asserts both on every one of them.
+                    #
+                    # AND THE MARK SAYS SO BEFORE THE CLICK DOES. Every
+                    # other link in this footer stays inside the Atlas;
+                    # these six do not, and a reader is entitled to know
+                    # which is which without reading a hostname in a status
+                    # bar. `aria-hidden` because `target="_blank"` already
+                    # tells assistive technology the same thing, and a
+                    # glyph read aloud as "north east arrow" after every
+                    # one of six rows is the constraint explained back.
                     f'<a class="gorow" href="{esc(svc["href"])}" '
                     'rel="nofollow noopener" target="_blank">'
-                    f'{esc(svc["label"])}<span class="goline">{esc(svc["line"])}</span></a>'
+                    f'<span class="gotitle">{esc(svc["label"])}'
+                    '<span class="goout" aria-hidden="true">↗</span></span>'
+                    f'<span class="goline">{esc(svc["line"])}</span></a>'
                     for svc in _gf["services"])
-                + f'<p class="godis">{esc(_gf["disclosure"])}</p></div>')
+                + "</div>")
     _cols.append(
         '<div class="fgroup fgroup-stay">'
         f'<p class="fghead">{esc(T("footer.col.stay"))}</p>'
@@ -1831,18 +1850,25 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
       <a class="footmark" href="/" aria-label="{esc(SITE_NAME)}, home">
         {MARK}<span class="footmark-text">europedoor</span>
       </a>
-      <p class="footer-lede">{esc(T("footer.lede"))}</p>
+      <p class="footer-lede"><span class="fled-a">{esc(T("footer.lede.a"))}</span><span class="fled-b">{esc(T("footer.lede.b"))}</span></p>
     </div>
     <p class="footer-extent">{extent_line()}</p>
     <nav class="footer-nav" aria-label="{esc(T("nav.aria.footer"))}">{footer_nav}</nav>
     <div class="footclose">
-      <p class="footsay">{esc(T("footer.close.a"))}<br>{esc(T("footer.close.b"))}</p>
+      <p class="footsay">{esc(T("footer.close.a"))}</p>
+      <p class="footsay footsay-b">{esc(T("footer.close.b"))}</p>
       {_foot_arch()}
+    </div>
+    <div class="footnote-band">
+      <p class="fnhead">{esc(T("footer.services.head"))}</p>
+      <p class="fnnote">{esc(go_further()["disclosure"])}</p>
     </div>
     <p class="footer-legal">{esc(T("footer.legal", operator=OPERATOR))}</p>
     <div class="footline">
-      <p class="footstrap">{esc(T("footer.strap"))}</p>
-      <nav class="footlegal-nav" aria-label="{esc(T("nav.aria.legal"))}">{legal_nav}</nav>
+      <div class="footline-l">
+        <p class="footstrap">{esc(T("footer.strap"))}</p>
+        <nav class="footlegal-nav" aria-label="{esc(T("nav.aria.legal"))}">{legal_nav}</nav>
+      </div>
       <p class="footcopy">&copy; {esc(SITE_NAME)}</p>
     </div>
   </div>
