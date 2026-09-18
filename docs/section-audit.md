@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**101 sections · 40 partial · 30 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1417 assertions · 0 failing**
+**101 sections · 40 partial · 30 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1427 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -66,13 +66,13 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 52 | Europe Atlas Pass | DEFERRED | 1 | Needs partner coverage that does not exist. Nothing implies it. |
 | 53 | Admin dashboard | PARTIAL | 4 | An admin dashboard needs authentication and a backend. The figures it would show are computed at build time and committed instead — which puts the gaps in a diff, where a dashboard cannot. |
 | 54 | Admin key metrics | PARTIAL | 2 | Content metrics are computed and published. Traffic, users and revenue metrics need traffic, users and revenue. |
-| 55 | Moderation | DEFERRED | 2 | There is no user-generated content to moderate, and the specification's own sequencing puts moderation with reviews. |
+| 55 | Moderation | DEFERRED | 4 | There is no user-generated content to moderate, and the specification's own sequencing puts moderation with reviews. |
 | 56 | Fraud prevention | DEFERRED | 319 | Nothing to defraud yet: no reviews, no bookings, no accounts, no money. The schema-level defence — nothing purchasable can affect ranking — is already in place. |
-| 57 | Accessibility | PARTIAL | 8 | WCAG 2.2 AA is the target and a real subset is enforced in a browser, in both colour schemes, on every build. What is missing is named on the page: a screen-reader audit, and access data about the places themselves. |
+| 57 | Accessibility | PARTIAL | 10 | WCAG 2.2 AA is the target and a real subset is enforced in a browser, in both colour schemes, on every build. What is missing is named on the page: a screen-reader audit, and access data about the places themselves. |
 | 58 | Internationalisation | PARTIAL | 6 | Interface strings are out of the code and in data catalogues, with coverage measured. No language ships until it is complete — a half-translated site is worse than an English one. |
 | 59 | Currency | PARTIAL | 6 | Local currency alongside euros on every country page, from a dated, rounded, hand-recorded table. A live feed with timestamps per rate needs a provider. |
 | 60 | Privacy | BUILT | 4 | Nothing is collected, nothing is set, nothing is loaded from another origin — and the page says how to verify that rather than asking to be believed. |
-| 61 | Security | PARTIAL | 13 | Much of the list is about a backend that does not exist. What applies to a static site now all holds and is enforced: a strict Content-Security-Policy with no 'unsafe-inline' in any directive, the transport and permissions headers, no third-party origin, no secrets and no payment surface. |
+| 61 | Security | PARTIAL | 15 | Much of the list is about a backend that does not exist. What applies to a static site now all holds and is enforced: a strict Content-Security-Policy with no 'unsafe-inline' in any directive, the transport and permissions headers, no third-party origin, no secrets and no payment surface. |
 | 62 | User roles | DEFERRED | 1 | Eleven roles, all of which need authentication. Two exist in practice today: a visitor, and a committer. |
 | 63 | Analytics | DEFERRED | 2 | No analytics runs. The event schema is fixed in advance because behaviour you did not record is gone, and the privacy rule is fixed with it. |
 | 64 | North star metric | RECORDED | 2 | Meaningfully planned journeys per active user, not page views. |
@@ -108,8 +108,8 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 94 | The ultimate AI experience | PARTIAL | 7 | The sentence in the specification's example parses today and returns a routed, costed, day-by-day itinerary. What it does not do is write prose about it, and it will not until the retrieval discipline in §21 is enforceable against a model. |
 | 95 | The strategic moat | PARTIAL | 3 | The knowledge graph and the structured content are real and growing. The business network, preference data and tourism-board relationships all need the entity. |
 | 96 | Final product principle | BUILT | 2 | Discovery over booking, stated on the site rather than kept internal — and enforced by there being nothing to book. |
-| 97 | MVP acceptance criteria | PARTIAL | 14 | Twelve of the fourteen visitor criteria pass. The two that do not are the account: a saved journey survives in this browser, not across devices. |
-| 98 | The first build — twelve modules | PARTIAL | 11 | Ten of the twelve ship. Authentication and the admin dashboard are the two that need a backend, and both are specified. |
+| 97 | MVP acceptance criteria | PARTIAL | 16 | Twelve of the fourteen visitor criteria pass. The two that do not are the account: a saved journey survives in this browser, not across devices. |
+| 98 | The first build — twelve modules | PARTIAL | 13 | Ten of the twelve ship. Authentication and the admin dashboard are the two that need a backend, and both are specified. |
 | 99 | Product north star | BUILT | 5 | Vision, mission and promise, on the site rather than in a deck — and the manifesto is a page a reader can open, with the trust architecture underneath it on the same page. |
 
 ## What the verdicts mean

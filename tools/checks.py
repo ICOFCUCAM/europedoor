@@ -8184,6 +8184,38 @@ def c_journey_claim_subject():
     return n
 
 
+@check("time-based media carries captions, and today there is none")
+def c_captions():
+    """§57 asks for "captions where appropriate" and nothing here is
+    appropriate: the built site contains no `<video>` and no `<audio>`.
+
+    A requirement satisfied by absence is the easiest kind to lose, because
+    the day somebody embeds a clip there is nothing to go red — the same
+    shape as every "code path nothing exercises" failure on this record,
+    written in advance for once rather than after. So the guard is here
+    while the count is zero, and it fails on the first media element that
+    ships without a captions track.
+
+    It counts PAGES rather than media, because a check reporting `(0)` looks
+    exactly like the two this repository found examining nothing.
+    """
+    n = 0
+    for path in site_files():
+        n += 1
+        h = open(path, encoding="utf-8").read()
+        for tag in ("<video", "<audio"):
+            i = h.find(tag)
+            while i != -1:
+                end = h.find(">" if tag + ">" in h[i:i + 400] else "</", i)
+                block_ = h[i:h.find("</" + tag[1:] + ">", i) + 8] if ("</" + tag[1:] + ">") in h[i:] else h[i:i + 400]
+                if 'kind="captions"' not in block_ and 'kind="subtitles"' not in block_:
+                    fail(f"{canonical_of(path)}: a {tag[1:]} element with no captions "
+                         f"track. WCAG 2.2 AA asks for captions on time-based "
+                         f"media, and this site had none at all until now")
+                i = h.find(tag, i + 1)
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0

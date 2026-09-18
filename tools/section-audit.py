@@ -1629,7 +1629,19 @@ def s54():
          "specification's own sequencing puts moderation with reviews.")
 def s55():
     yield spec_covers("moderation"), "recorded"
-    yield True, "no user-generated content exists to moderate"
+    # `yield True, "no user-generated content exists to moderate"` stood here,
+    # which is §36's nine `or True` assertions by a shorter route: it stated
+    # the claim the whole verdict rests on and could not fail. The claim IS
+    # measurable, and the measurement is stronger than the sentence — nothing
+    # on this site accepts a submission, so there is no route by which content
+    # could arrive to be moderated. Measured on the built site there is one
+    # `action` anywhere and it is a GET to /plan, which is navigation.
+    yield every_page(lambda h: 'method="post"' not in h.lower(),
+                     "no page accepts a submission")
+    yield every_page(lambda h: 'action="http' not in h,
+                     "no form posts to another origin")
+    yield has("/experiences/join", "Applications are not open yet"), \
+        "and the one surface that would collect it says it is not open"
 
 
 @section(56, "Fraud prevention", "DEFERRED",
@@ -1654,6 +1666,15 @@ def s57():
     for probe in ("contrast", "headingSkips", "unlabelled", "emptyLinks", "reducedMotion", "skip"):
         yield probe in bc, f"the suite checks {probe}"
     yield "colorScheme" in bc, "in both colour schemes"
+    # THE SPECIFICATION NAMES SEVEN REQUIREMENTS AND THIS ASSERTED FIVE.
+    # Keyboard navigation was covered in the suite and not claimed here, and
+    # "captions where appropriate" was satisfied by there being no
+    # time-based media at all — which is the easiest kind of requirement to
+    # lose, because absence goes red on nothing. Both are stated now.
+    yield ":focus-visible" in bc and "checkVisibility" in bc, \
+        "keyboard focus is measured on the painted pixels, not the declaration"
+    yield "time-based media carries captions" in src("tools/checks.py"), \
+        "and captions are guarded before the first video rather than after"
     yield has("/accessibility", "WCAG 2.2", "What is not yet done", "screen reader")
 
 
@@ -1725,7 +1746,20 @@ def s61():
         yield name in hdr, f"_headers sets {name}"
     yield "frame-ancestors" not in r.split("CSP_META = ")[1].split("\n")[0], \
         "and frame-ancestors is not in the meta policy, where browsers ignore it"
-    yield True, "no secret is committed: there is nothing to authenticate against"
+    # `yield True` stood here too, on the strongest security claim in the
+    # audit. The promise is not that nobody has typed a key — that is a hope,
+    # and it is what this repository has already had three real acquisitions
+    # stopped by. It is that a REGISTERED gate refuses a committed credential,
+    # and that the key exists only as a reference.
+    ck = src("tools/checks.py")
+    yield "credential_shaped(" in ck and \
+        "no photograph enters without its licence verified" in ck, \
+        "a registered check refuses a committed credential"
+    wf = src(".github/workflows/photograph.yml")
+    yield "${{ secrets.PEXELS_API_KEY }}" in wf, \
+        "and the key reaches the workflow as a secret reference"
+    yield re.search(r"PEXELS_API_KEY:\s*[A-Za-z0-9_-]{20,}", wf) is None, \
+        "and never as a literal"
     yield doc_covers("docs/legal-position.md", "Data protection"), "the position is recorded"
 
 
@@ -2129,17 +2163,46 @@ def s97():
     yield "Say it in your own words" in page("/plan"), "7. ask the planner"
     yield "function dayPlan" in src("assets/js/planner.js"), "8. receive a coherent itinerary"
     yield 'id="planner"' in page("/plan"), "9. modify it"
-    yield "saveplan" in src("assets/js/planner.js"), "10. save it (locally)"
+    # THE VERDICT SAYS TWELVE OF FOURTEEN PASS AND ALL FOURTEEN ASSERTIONS
+    # WERE GREEN, so the two that do not were invisible to the audit that
+    # publishes the count — the §36 fault stated as a disagreement between a
+    # verdict and its own evidence. Both are the account, and both halves are
+    # observable: the mechanism is browser storage, and the page has to SAY
+    # so. A criterion met locally on a page that implies an account is the
+    # failure worth catching; the missing backend is already recorded.
+    yield "saveplan" in src("assets/js/planner.js"), "10. save it — in this browser"
+    yield has("/my-europe", "lives in your browser and nowhere else",
+              "there is no account"), \
+        "10b. and the page says the list is local rather than an account"
     yield "shareplan" in src("assets/js/planner.js"), "11. share it"
     yield exists("/for-businesses"), "12. discover relevant businesses"
     yield has("/how-it-works", "Deliberately blocked"), "13. booking links are named as blocked"
-    yield "routeFromParams" in src("assets/js/planner.js"), "14. return later and retrieve it"
+    yield "routeFromParams" in src("assets/js/planner.js"), \
+        "14. return later and retrieve it, from the link or from this browser"
+    # The two needles are separate because the row's own markup puts "Needs"
+    # and what it needs in different elements — `has()` collapses whitespace
+    # and does not strip tags, which is the right trade and is worth knowing
+    # before writing a needle that spans a `<br>`.
+    yield has("/my-europe", "Sync across devices",
+              "an account, a backend and a data controller"), \
+        "14b. and retrieval on a second device is named as not built"
 
 
 @section(98, "The first build — twelve modules", "PARTIAL",
          "Ten of the twelve ship. Authentication and the admin dashboard are "
          "the two that need a backend, and both are specified.")
 def s98():
+    # MODULE 01 IS AUTHENTICATION AND HAD NO ASSERTION AT ALL: an audit naming
+    # twelve modules, examining eleven, and the one it never examined is one
+    # of the two its own verdict says do not ship. That is §36's nine
+    # unfailable assertions arriving as an omission rather than as a literal,
+    # and an omission is the harder of the two to see — nothing reads as
+    # wrong, the section simply says less than it claims. A refusal is
+    # asserted against the promise that refuses it, exactly as §36's are.
+    yield has("/how-it-works", "Accounts", "designed, not built"), \
+        "01. authentication is named as designed and not built"
+    yield doc_covers("docs/legal-position.md", "Entity — open, and blocking"), \
+        "01. and against the gap every blocked module traces to"
     yield NCOUNTRY > 0, "02. the Europe database"
     yield exists("/europe/norway/fjord-norway"), "03. country/region/destination pages"
     yield len(PLACES) > 0 and len(EXPS) > 0, "04. place and experience system"
@@ -2150,7 +2213,13 @@ def s98():
     yield len(DATA["stories"]) > 0, "09. editorial"
     yield exists("/for-businesses"), "10. business directory"
     yield exists("/my-europe"), "11. My Europe"
-    yield bool(src("docs/content-report.md")), "12. the admin figures, as a report"
+    # AND MODULE 12 READ `bool(src(...))`, which cannot tell "the figures ship
+    # as a committed report" from "the dashboard shipped": a file existing is
+    # not a claim about what stands in for what.
+    yield bool(src("docs/content-report.md")) and \
+        has("/how-it-works", "designed, not built")[0], \
+        "12. the admin figures ship as a committed report, and the dashboard " \
+        "is named as not built"
 
 
 @section(99, "Product north star", "BUILT",

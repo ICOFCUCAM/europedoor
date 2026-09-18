@@ -6392,6 +6392,98 @@ Tromsø and Lofoten — which is the seven-day-journey content gap one family
 over, and inventing a Norwegian Fjord Journey to satisfy a diagram would be
 authoring an editorial record.
 
+
+**EIGHTEEN VERDICTS CHECKED AND EIGHTEEN SURVIVED, WHICH IS WORTH RECORDING
+BECAUSE THE LAST TWO ROUNDS DID NOT.** §53–70 of the specification is mostly
+a backend: an admin dashboard, moderation, fraud prevention, eleven user
+roles, analytics, a contributor programme. Every one is already tracked with
+a verdict that says what needs an account, a server or a socket — so the work
+was falsifying the ones that make a positive claim rather than building.
+
+**§59's was the falsifiable one and it is exactly true.** "Local currency
+alongside euros on every country page, from a dated, rounded, hand-recorded
+table" — measured, all fifty carry a euro figure and the pairing reads
+*"Typical day €115–260 per person ≈ kr1,320–2,990 indicative"*. The table
+declares all ten currencies the specification names plus fourteen more, with
+`as_of` and a note saying a bank's rate will be worse and the date will get
+older; `planner.js` spends it. **The table is read rather than computed and
+discarded**, which was the suspicion worth checking, because this repository
+has now found that shape four times.
+
+**§57 NAMES SEVEN REQUIREMENTS AND THE AUDIT ASSERTED FIVE.** Keyboard
+navigation was measured in the browser and simply never claimed here. And
+**"captions where appropriate" was satisfied by there being no time-based
+media at all** — zero `<video>` and zero `<audio>` on the built site — which
+is the easiest kind of requirement to lose, because absence goes red on
+nothing and the day somebody embeds a clip there is no subject for a check.
+So the guard exists while the count is still zero, written in advance for
+once rather than after the fifth occurrence: it fails on the first media
+element that ships without a captions track, and it counts PAGES rather than
+media, because a check reporting `(0)` looks exactly like the two this
+repository found examining nothing. Proved red on an injected `<video>`.
+
+**§58 SHIPS ONE LANGUAGE OF ELEVEN AND THAT IS THE MECHANISM WORKING.**
+`SHIP_THRESHOLD` is 1.0 and `fr.json` holds 16 of the 57 interface strings,
+so French is a demonstration rather than a locale and the build will not emit
+it. A half-translated language is worse than an untranslated one, and the
+threshold is what makes that a rule rather than an intention. The
+specification's *"do not hard-code text"* applies to the interface chrome,
+which is in `data/strings/`; editorial copy stays beside the thing it
+describes.
+
+**AN AUDIT CAN DISAGREE WITH ITS OWN EVIDENCE AND STAY GREEN, AND §71–99 HAD
+THAT TWICE.** Twenty-nine sections of the specification arrived and
+twenty-seven of their verdicts survived being re-measured — §76 and §77 are
+absorbed with their refusals published on the pages themselves (/method's
+*"Two dimensions this refuses to compute"* for Accessibility and Romance, and
+/plan's *"it carries the specification's popularity weight as well, because we
+hold no visitor numbers for anywhere"*), §79's peak/shoulder is authored on all
+fifty countries with **off derived as the complement**, and §80 is this atlas's
+own published position rather than an unbuilt feature. What did not survive was
+the arithmetic of two sections against their own assertions.
+
+**§97 PUBLISHED "TWELVE OF THE FOURTEEN PASS" AND ALL FOURTEEN ASSERTIONS WERE
+GREEN.** The two that do not pass are the account, and the audit had no way to
+say so: `saveplan` exists and `routeFromParams` exists, which is true of a
+product with an account and true of one without. Both halves are observable —
+the mechanism is browser storage and **the page has to SAY so** — so the
+criteria now also read /my-europe's own *"lives in your browser and nowhere
+else … there is no account"* and its *"Sync across devices · an account, a
+backend and a data controller"*. A criterion met locally on a page that implies
+an account is the failure worth catching; the missing backend was already
+recorded.
+
+**AND §98 NAMED TWELVE MODULES, EXAMINED ELEVEN, AND THE ONE IT NEVER EXAMINED
+WAS AUTHENTICATION — one of the two its own verdict says do not ship.** That is
+§36's nine `or True` assertions arriving as an *omission* rather than as a
+literal, and an omission is the harder of the two to see: nothing reads as
+wrong, the section simply says less than it claims. The refusal is asserted
+against the promise that refuses it, exactly as §36's are — /how-it-works'
+Accounts row and `docs/legal-position.md`'s entity gap. And module 12 read
+`bool(src("docs/content-report.md"))`, which cannot tell *the figures ship as a
+committed report* from *the dashboard shipped*: **a file existing is not a claim
+about what stands in for what.**
+
+**TWO ASSERTIONS WERE THE LITERAL `yield True`, AND ONE OF THEM CARRIED THE
+STRONGEST SECURITY CLAIM IN THE AUDIT.** §55 asserted *"no user-generated
+content exists to moderate"* and §61 *"no secret is committed"*. Both claims
+are measurable and both measurements are stronger than the sentences: **nothing
+on this site accepts a submission** — zero `method="post"` anywhere, one
+`action` on the whole built site and it is a GET to /plan, which is navigation
+— so there is no route by which content could arrive; and the security promise
+is not that nobody typed a key, which is a hope and is what three real
+acquisitions were already stopped by, but that a **registered** gate refuses a
+committed credential and the key reaches the workflow only as
+`${{ secrets.PEXELS_API_KEY }}`. Proved red four ways: an injected `<form
+method="POST">`, a literal key in the workflow, /my-europe claiming an account,
+and /how-it-works renaming its Accounts row — because *a check is not proved by passing; it is proved by failing on the thing it is about*.
+
+**AND A NEEDLE MAY NOT SPAN AN ELEMENT.** `has()` collapses whitespace and
+does not strip tags — the right trade, and the reason is written on it — so
+*"Needs an account, a backend and a data controller"* failed on a row whose
+markup puts *Needs* and what it needs in different elements. Two needles, not
+one sentence.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
