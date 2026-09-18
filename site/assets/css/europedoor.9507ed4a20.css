@@ -10361,7 +10361,22 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .sheet-end .sheettext { justify-items: center; }
 
 @media (max-width: 62rem) {
+  /* AND STACKED, THE CONTINENT GOES FIRST.
+     Measured at 390 with the opening probe repaired: the homepage's first
+     screen was the masthead, the plate mark, a 60px headline, a three-line
+     lede, a link, a rule and four counts — 4.4% picture, and the drawing
+     began at y=812 of an 844-tall screen. The page whose own sentence is
+     "the homepage leads with Europe" led with type on the width most
+     readers are at, and the mandate this site is audited against calls a
+     page that is type to the fold the thing to fix.
+     Side by side the type is already first for a reader of a
+     left-to-right page, so this changes nothing above 62rem; stacked, DOM
+     order is reading order and the drawing was last. `order` rather than
+     moving the markup, because the tab order and the accessible reading
+     order should stay the composition's: the h1 still names the page
+     before the picture is described. */
   .sheet-door .doorgrid { grid-template-columns: 1fr; }
+  .sheet-door .doorside { order: -1; }
   .feat, .lead { grid-template-columns: minmax(0, 1fr); gap: var(--s6); }
   .rdlist { grid-template-columns: minmax(0, 1fr); }
   .jr { grid-template-columns: 8rem minmax(0, 1fr); }

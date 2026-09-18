@@ -485,3 +485,27 @@ y=812 of an 844-tall screen. That is the next commit, not this one: this one
 is the instrument, and mixing the two would mean measuring a change with the
 device that was wrong about it.
 
+## AND STACKED, THE CONTINENT GOES FIRST
+
+With the instrument repaired, the homepage at 390 measured **4.4% picture**:
+the masthead, the plate mark, a 60px headline, a three-line lede, a link, a
+rule and four counts, with the drawing beginning at y=812 of an 844-tall
+screen. The page whose own sentence is *the homepage leads with Europe* led
+with type at the width most readers are at.
+
+Below 62rem the two columns stack, and DOM order is reading order, so the
+drawing was last. `.sheet-door .doorside { order: -1 }` inside that block —
+`order` rather than moving the markup, because the tab order and the
+accessible reading order should stay the composition's: the h1 still names
+the page before the picture is described.
+
+| the homepage at 390 | before | after |
+|---|---|---|
+| picture share of the first screen | 4.4% | **31.4%** |
+| the first figure begins at | y=812 | **y=264** |
+| the h1 begins at | y=264 | y=513 |
+
+**Side by side the type is already first for a reader of a left-to-right
+page**, so nothing above 62rem changes — proved rather than argued: the
+homepage at 1280 is **byte-identical** before and after, and only 390 differs.
+
