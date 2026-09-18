@@ -27,6 +27,31 @@ so that number stays at the illustrative records until operators can claim one.
 **Stories** and **journeys** are editorial work at roughly a day each, and the
 honest position is that they are behind rather than automatable.
 
+## Against the seed's own shape (Build Package v1 §53)
+
+§53 states the first dataset as a density rather than a total. The two
+framings are not the same claim, and the sums above are the kinder one.
+
+| per destination | now | §53 asks | §67's own sums imply |
+|---|---:|---:|---:|
+| Places | 0.80 | 10–30 | 6.7 |
+| Experiences | 0.62 | 5–15 | 2.0 |
+
+Two things follow. **§67 and §53 disagree** — 1,000 places over 150
+destinations is 6.7 each, under §53's floor of ten — so a report against
+§67 alone is a report against the looser of the two. And the gap is
+wider on this axis than on the other:
+
+- places are **26%** of the MVP total and **8%** of the seed's own floor
+- experiences are **66%** of the total and **12%** of the floor
+
+The destination count met its target and the place count did not, which
+is the whole of the difference: a sum divided by a met denominator
+reads as progress.
+
+Neither number is a code change. Both are the same editorial work the
+sums above describe, counted the way the seed counts it.
+
 ## Where the dataset is thin
 
 ### Countries with no places — 34

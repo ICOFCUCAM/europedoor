@@ -379,7 +379,25 @@
   form.addEventListener("submit", function (e) { e.preventDefault(); schedule(); });
   input.addEventListener("input", schedule);
 
-  out.innerHTML = '<p class="small">Loading the index…</p>';
+  /* AND THE LINE THE COMMENT ABOVE SAYS WAS REMOVED WAS STILL HERE, 168
+   * LINES BELOW IT. `AT_REST` captures the band and restores it, which is
+   * the half that got written; this line threw it away first, so the page
+   * rendered its full 1,185-pixel index breakdown, replaced it with one
+   * grey line on load, and put it back when the fetch resolved. Measured
+   * in Chromium: `#results` 25px at 72ms with `readyState` already
+   * complete, 1,185px the instant /api/search.json arrived, **CLS 0.3025**
+   * on the one page of thirty that shifts at all — and delaying the index
+   * by 400ms moved the jump to 448ms, which is what proves the fetch is
+   * the trigger rather than parsing.
+   *
+   * A LOADING STATE OVER A COMPLETE PAGE IS A REGRESSION DRESSED AS
+   * FEEDBACK. It is honest only where the reader is actually waiting for
+   * something they asked for, which is the `?q=` arrival: there the band
+   * is not the answer to their question and saying so beats showing it. */
+  var pending = new URLSearchParams(location.search).get("q");
+  if (pending) {
+    out.innerHTML = '<p class="small">Searching for ' + escape_(pending) + '…</p>';
+  }
   fetch("/api/search.json")
     .then(function (r) { return r.json(); })
     .then(function (j) {

@@ -13932,7 +13932,7 @@ def how_it_works_page(data):
         ) + "</div>"
 
     built = table([
-        ("Europe Atlas", f"{len(data['countries'])} countries, {sum(len(c['regions']) for c in data['countries'].values())} regions, {len(data['cities'])} cities, all generated from one dataset", "built"),
+        ("The Atlas", f"{len(data['countries'])} countries, {sum(len(c['regions']) for c in data['countries'].values())} regions, {len(data['cities'])} cities, all generated from one dataset", "built"),
         ("Journey Planner", "Runs in the browser against the whole Atlas; scores fit, respects distance, estimates cost", "built"),
         ("European Journeys", f"{len(data['journeys'])} curated cross-border routes with validated night counts", "built"),
         ("Themes", f"{len(data['themes'])} experience-first routes that ignore borders", "built"),

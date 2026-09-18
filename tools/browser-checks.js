@@ -5242,6 +5242,101 @@ async function main() {
     }
   }
 
+  /* NOTHING HERE HAD EVER MEASURED A LAYOUT SHIFT, AND ONE PAGE OF THIRTY
+   * WAS AT 0.3025.
+   *
+   * §49 of the Build Package asks for "excellent Core Web Vitals" and this
+   * repository measures BYTES — `weight.home_kb` and `weight.max_page_kb`
+   * are ceilings and they are the whole of what any gate here knew about
+   * performance. Bytes are not movement: a page can be 26 KB and still
+   * throw its own content down the screen after it has painted.
+   *
+   * Measured across every family at 1280: twenty-nine of thirty are
+   * EXACTLY 0.0000, which is what a static site with `width`/`height` on
+   * all 1,617 of its `<img>` and 64 `aspect-ratio` declarations should be
+   * — and /search was 0.3025, past the 0.25 that Google calls poor.
+   * `search.js` replaced the build's own 1,185-pixel index breakdown with
+   * `<p class="small">Loading the index…</p>` and put it back when the
+   * fetch resolved: `#results` 25px at 72ms with `readyState` already
+   * complete, 1,185px the instant /api/search.json arrived, 266 pixels of
+   * push that sent the footer off the fold. Delaying the index by 400ms
+   * moved the jump to 448ms, which is what proves the FETCH is the trigger
+   * rather than the parse.
+   *
+   * AND THE LINE THAT DID IT SAT 168 LINES BELOW A COMMENT SAYING IT HAD
+   * BEEN REMOVED. `AT_REST` captures the band and restores it — the half
+   * that got written — and the assignment that threw it away first was
+   * left standing. A loading state over a complete page is a regression
+   * dressed as feedback, and it is honest only where the reader is waiting
+   * for something they asked for, which is the `?q=` arrival.
+   *
+   * THE CEILING IS 0.02 RATHER THAN 0.1. Google's "good" is 0.1, and a
+   * threshold a site is nowhere near is a threshold that admits a real
+   * regression: every family here is at zero, so the honest ceiling is
+   * "essentially zero" and the number a reader would notice is far above
+   * it. The message names the ELEMENT that moved and its box before and
+   * after, because a CLS figure with no element in it cannot be diagnosed.
+   */
+  {
+    const FAM = require("./lib/families.js").ALL;
+    // Its own page, because `PerformanceObserver` with `buffered: true`
+    // reports the shifts of whatever this page has already loaded — the
+    // dead-rule scan's recorded failure, where a shared page carried the
+    // pointer position of an earlier check into this one.
+    const cp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await cp.addInitScript(() => {
+      window.__cls = 0;
+      window.__shifts = [];
+      new PerformanceObserver((l) => {
+        for (const e of l.getEntries()) {
+          if (e.hadRecentInput) continue;
+          window.__cls += e.value;
+          for (const s of e.sources || []) {
+            const n = s.node;
+            window.__shifts.push({
+              v: e.value,
+              el: n && n.tagName
+                ? n.tagName.toLowerCase() + (n.id ? "#" + n.id : "") +
+                  (n.className ? "." + String(n.className).split(" ").slice(0, 2).join(".") : "")
+                : "(anonymous)",
+              was: s.previousRect
+                ? `y${Math.round(s.previousRect.y)}+${Math.round(s.previousRect.height)}` : "-",
+              now: s.currentRect
+                ? `y${Math.round(s.currentRect.y)}+${Math.round(s.currentRect.height)}` : "-",
+            });
+          }
+        }
+      }).observe({ type: "layout-shift", buffered: true });
+    });
+    const shifty = [];
+    let seenCls = 0;
+    for (const [name, url] of FAM) {
+      const r = await cp.goto(base + url, { waitUntil: "load" });
+      if (!r || r.status() !== 200) continue;
+      seenCls++;
+      // Long enough for a fetch to land and re-render: the defect this was
+      // written for happened at 90ms with the index served locally and at
+      // 448ms with it delayed, and a reader on a real network is slower
+      // than either.
+      await cp.evaluate(() => new Promise((res) => setTimeout(res, 700)));
+      const v = await cp.evaluate(() => ({ cls: window.__cls, shifts: window.__shifts }));
+      if (v.cls > 0.02) {
+        const worst = v.shifts.sort((a, b) => b.v - a.v)[0];
+        shifty.push(`${name} ${v.cls.toFixed(4)}` +
+                    (worst ? ` (${worst.el} ${worst.was} -> ${worst.now})` : ""));
+      }
+    }
+    await cp.close();
+    checked += seenCls;
+    ok(seenCls >= 40,
+       `the layout-shift sweep read only ${seenCls} families — it has ` +
+       `stopped finding them, and a sweep of nothing reports no shift`);
+    ok(shifty.length === 0,
+       `${shifty.length} of ${seenCls} families shift after painting: ` +
+       `${shifty.slice(0, 6).join("; ")}. Content that moves once a reader ` +
+       `has started reading it is the one performance fault bytes cannot see.`);
+  }
+
   /* A LINK AT ZERO ALPHA IS PRESENT, PLACED, SIZED, KEYBOARD-REACHABLE AND
    * NOT THERE — AND EVERY COUNT ON THIS SITE SAYS IT IS FINE.
    *

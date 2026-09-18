@@ -142,6 +142,45 @@ def main():
     w("**Stories** and **journeys** are editorial work at roughly a day each, and the")
     w("honest position is that they are behind rather than automatable.")
     w("")
+    # A TOTAL UNDERSTATES A DENSITY GAP WHENEVER THE DENOMINATOR MET ITS OWN
+    # TARGET. Build Package v1 §53 states the seed as a shape rather than a
+    # sum — 10 to 30 places and 5 to 15 experiences PER DESTINATION — and
+    # this table reported only sums, so "Places: 26% of MVP" was true and
+    # read as three-quarters of the way there on the wrong axis: 319
+    # destinations (target 150, met) hold 0.8 places each against a floor of
+    # 10. And the specification disagrees with itself: §67 asks for 1,000
+    # places over 150 destinations, which is 6.7 each and below §53's own
+    # floor, so this repository has been reporting against the looser of two
+    # numbers the same document publishes.
+    dest = len(d["cities"])
+    npl, nex = len(D.all_places(d["countries"])), len(D.all_experiences(d["countries"]))
+    w("## Against the seed's own shape (Build Package v1 §53)")
+    w("")
+    w("§53 states the first dataset as a density rather than a total. The two")
+    w("framings are not the same claim, and the sums above are the kinder one.")
+    w("")
+    w("| per destination | now | §53 asks | §67's own sums imply |")
+    w("|---|---:|---:|---:|")
+    w(f"| Places | {npl / dest:.2f} | 10–30 | {1000 / 150:.1f} |")
+    w(f"| Experiences | {nex / dest:.2f} | 5–15 | {300 / 150:.1f} |")
+    w("")
+    w("Two things follow. **§67 and §53 disagree** — 1,000 places over 150")
+    w("destinations is 6.7 each, under §53's floor of ten — so a report against")
+    w("§67 alone is a report against the looser of the two. And the gap is")
+    w("wider on this axis than on the other:")
+    w("")
+    w(f"- places are **{round(100 * npl / 1000)}%** of the MVP total and "
+      f"**{round(100 * (npl / dest) / 10)}%** of the seed's own floor")
+    w(f"- experiences are **{round(100 * nex / 300)}%** of the total and "
+      f"**{round(100 * (nex / dest) / 5)}%** of the floor")
+    w("")
+    w("The destination count met its target and the place count did not, which")
+    w("is the whole of the difference: a sum divided by a met denominator")
+    w("reads as progress.")
+    w("")
+    w("Neither number is a code change. Both are the same editorial work the")
+    w("sums above describe, counted the way the seed counts it.")
+    w("")
     w("## Where the dataset is thin")
     w("")
     for name, items in g.items():

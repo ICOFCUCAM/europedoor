@@ -726,7 +726,23 @@ def c_head():
 def c_brand():
     # docs/brand-lock.md exists because incoming strategy documents keep
     # arriving with a different name on them. This is the enforcement.
-    banned = ["Europe Atlas ·", "Europia", "Via Europa", "Eurovia", "Europe Unbound",
+    # AND THE FIRST ENTRY WAS A GUARD ON A PUNCTUATION MARK. It read
+    # "Europe Atlas ·" — the name plus the middot a page title happens to
+    # put after it — so a page shipping the bare phrase as a NAME passed,
+    # and one did: /how-it-works listed a built feature as
+    # `<h3>Europe Atlas</h3>`, which is the exact string this check exists
+    # to refuse, on a shipped page, for the life of that band. That is the
+    # `fetch.py` blocked-list failure in the brand lock: **a guard on a
+    # label is a guard whoever renames the product gets to choose**, and
+    # here the choice was whether to type a middot after it.
+    #
+    # The bare phrase is refused now, because the site calls this dataset
+    # "the Atlas" 597 times and had exactly one place where it spelled it
+    # as a product name. A naming DISCUSSION belongs in
+    # docs/brand-lock.md, which is not a page and is not scanned — and a
+    # page that needs to explain the name can say "the name proposed by
+    # an incoming strategy document", which is what it means.
+    banned = ["Europe Atlas", "Europia", "Via Europa", "Eurovia", "Europe Unbound",
               "europedoor.example",
               # One word, always. The space turns a product name into a
               # generic phrase, and a generic phrase is unregistrable — which
@@ -8181,6 +8197,48 @@ def c_journey_claim_subject():
     if n == 0:
         fail("no place page links a journey — this check has stopped "
              "examining the family it was written for")
+    return n
+
+
+@check("no image ships without its intrinsic size")
+def c_img_dimensions():
+    """An `<img>` with no width and height reserves nothing until it loads.
+
+    THE STATIC HALF OF A LAYOUT SHIFT. §49 of Build Package v1 asks for
+    "excellent Core Web Vitals" and nothing in this repository had ever
+    measured one: `weight.home_kb` and `weight.max_page_kb` are ceilings on
+    BYTES, and bytes say nothing about whether a page throws its own content
+    down the screen after painting. The browser suite measures the effect
+    now — every family at 1280, and twenty-nine of thirty are exactly
+    0.0000 — and this is the cause: a box whose size the browser can compute
+    from the markup cannot move when its bytes arrive.
+
+    It is asserted here as well as there because the two are different
+    questions. This one is true of a page nobody has rendered, costs
+    milliseconds, and names the file; the browser's answer costs a browser
+    and catches the shifts an attribute cannot prevent — the one that
+    motivated it was a script replacing a complete 1,185-pixel band with a
+    one-line loading state and putting it back.
+    """
+    bad, n = [], 0
+    for f in site_files():
+        body = open(f, encoding="utf-8").read()
+        for m in re.finditer(r"<img\b[^>]*>", body):
+            n += 1
+            t = m.group(0)
+            if "width=" not in t or "height=" not in t:
+                bad.append(f"{rel(f)}: {t[:90]}")
+    if bad:
+        fail(f"{len(bad)} of {n} images ship with no intrinsic size, so the "
+             f"page reflows when they arrive: {bad[0]}")
+    # A FLOOR, BECAUSE THIS CHECK'S SUBJECT IS A THING THE REGISTER CREATES.
+    # With an empty library it examined zero images and reported green, which
+    # is the failure this file records about the dot sweep and
+    # `c_one_plate_per_thing` — an assertion about an empty set counts
+    # exactly like one about a page.
+    if n < 100:
+        fail(f"only {n} images on the whole site — this check has stopped "
+             f"finding them, and a sweep of nothing reports no defect")
     return n
 
 

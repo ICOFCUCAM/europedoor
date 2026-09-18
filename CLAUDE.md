@@ -6484,6 +6484,79 @@ does not strip tags — the right trade, and the reason is written on it — so
 markup puts *Needs* and what it needs in different elements. Two needles, not
 one sentence.
 
+**BUILD PACKAGE v1 ARRIVED AGAIN AND ITS FIRST SENTENCE IS THE ONE THING THAT
+CANNOT BE TAKEN.** It proposes freezing the product as *Europe Atlas*, with
+the name provisional pending domain and trademark checks. The caution is
+right and the conclusion is already this repository's: `docs/brand-lock.md`
+locks EuropeDoor, the section audit has carried §1.1 as **LOCKED** since the
+first specification proposed the same rename, and the trademark position is
+recorded rather than assumed — EUROPEDOOR is in use in the doors trade, so no
+®, no ™, nothing announced. **A later document does not get to rename a
+product.** Its §2 was already audited field by field in
+`docs/schema-mapping.md`; its §18, §27, §35–36 and §38–39 are
+`docs/frontend-architecture.md`, `docs/api-architecture.md`, §40 and §60–61.
+
+**AND THE CHECK THAT REFUSES THAT NAME WAS A GUARD ON A PUNCTUATION MARK.**
+`c_brand`'s banned list read **`"Europe Atlas ·"`** — the name plus the middot
+a page title happens to put after it — so the bare phrase passed, and
+/how-it-works shipped `<h3>Europe Atlas</h3>` as the name of a built feature,
+on a page listing what is built, for the life of that band. That is the
+`fetch.py` blocked-list failure inside the brand lock: **a guard on a label is
+a guard whoever renames the product gets to choose**, and here the choice was
+whether to type a middot. The bare phrase is refused now — the site calls this
+dataset *the Atlas* 597 times and had exactly one place where it spelled it as
+a product name — and a naming discussion belongs in `docs/brand-lock.md`,
+which is not a page and is not scanned. Proved red on the string that was
+shipping.
+
+**NOTHING HERE HAD EVER MEASURED A LAYOUT SHIFT, AND ONE PAGE OF THIRTY WAS
+AT 0.3025.** §49 asks for "excellent Core Web Vitals"; the only performance
+gates in this repository are ceilings on BYTES, and **bytes are not
+movement** — a page can be 26 KB and still throw its own content down the
+screen after it has painted. Measured across every family at 1280,
+twenty-nine of thirty are **exactly 0.0000**, which is what a static site
+with `width`/`height` on all 1,617 of its images and 64 `aspect-ratio`
+declarations should be. /search was **0.3025**, past the 0.25 that reads as
+poor.
+
+`search.js` replaced the build's own 1,185-pixel index breakdown with
+`<p class="small">Loading the index…</p>` and put it back when the fetch
+resolved: `#results` 25px at 72ms **with `readyState` already complete**,
+1,185px the instant `/api/search.json` arrived, 266 pixels of push that sent
+the footer off the fold. **Delaying the index by 400ms moved the jump to
+448ms, which is what proves the fetch is the trigger rather than the parse.**
+
+**And the line that did it sat 168 lines below a comment saying it had been
+removed.** `AT_REST` captures the band and restores it — the half that got
+written — and the assignment that threw it away first was left standing, which
+is `.picstory` exactly: the repair addressed the cousin and left the cause.
+**A loading state over a complete page is a regression dressed as feedback**,
+and it is honest only where the reader is waiting for something they asked
+for, which is the `?q=` arrival. 0.3025 → 0.0000.
+
+**THE CEILING IS 0.02 RATHER THAN GOOGLE'S 0.1**, because a threshold a site
+is nowhere near is a threshold that admits a real regression: every family
+here is at zero, so the honest ceiling is *essentially zero*. The sweep takes
+its own page — `buffered: true` reports whatever that page already loaded,
+which is the dead-rule scan's recorded failure — carries a reach floor, and
+names the ELEMENT that moved with its box before and after, because a CLS
+figure with no element in it cannot be diagnosed. The cause is asserted
+statically beside it: **no image ships without its intrinsic size**, 1,617 of
+1,617, with its own floor because an assertion about an empty set counts
+exactly like one about a page.
+
+**AND §53 STATES THE SEED AS A DENSITY WHERE THE REPORT WAS COUNTING SUMS.**
+10–30 places and 5–15 experiences *per destination*, against 0.80 and 0.62
+measured. `docs/content-report.md` reported only totals, so *places: 26% of
+MVP* was true and read as most of the way there on the wrong axis — **a sum
+divided by a met denominator reads as progress**, and the destination count
+met its target while the place count did not. On the seed's own floor places
+are **8%** and experiences **12%**. **And the specification disagrees with
+itself**: §67 asks for 1,000 places over 150 destinations, which is 6.7 each
+and under §53's own floor of ten, so this repository had been reporting
+against the looser of two numbers one document publishes. Both framings are
+now in the report, and neither is a code change.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
