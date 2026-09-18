@@ -83,6 +83,12 @@ def check(name, cond, detail=""):
 
 PHOTO_ID = "2014422"
 PHOTO2_ID = "3110000"
+# A THIRD PHOTOGRAPH, SHAPED FOR THE HERO, BECAUSE A REPLACEMENT NEEDS
+# TWO CANDIDATES FOR ONE SURFACE. The second stub is 2600x1300 — 2.0,
+# outside the homepage hero's 1.5-1.9 — so it can never stand in for
+# a photograph replacing that one, and a test of `--replace` written
+# with it would be a test of the aspect refusal wearing another name.
+PHOTO3_ID = "4200002"
 STUB = {}
 
 
@@ -193,6 +199,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return self._json(body)
         if self.path.startswith("/photos/" + PHOTO2_ID):
             return self._json(STUB["meta2"])
+        if self.path.startswith("/photos/" + PHOTO3_ID):
+            return self._json(STUB["meta3"])
         # EVERY FAMILY NEEDS ITS OWN ID, because one photograph may not fill
         # two surfaces and the register refuses it in both directions.
         want = self.path.split("/photos/")[-1].split("?")[0]
@@ -200,6 +208,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
             body = dict(STUB["meta2"])
             body["id"] = int(want)
             return self._json(body)
+        if self.path.startswith("/original3.jpg"):
+            self.send_response(200)
+            self.send_header("Content-Type", "image/jpeg")
+            self.send_header("Content-Length", str(len(STUB["jpeg3"])))
+            self.end_headers()
+            self.wfile.write(STUB["jpeg3"])
+            return
         if self.path.startswith("/original2.jpg"):
             self.send_response(200)
             self.send_header("Content-Type", "image/jpeg")
@@ -482,6 +497,9 @@ def main(argv):
     # so exercising a slot instance needs its own id and its own bytes.
     STUB["jpeg2"] = _jpeg(2600, 1300)
     STUB["extra"] = {}
+    # 1.793, inside the hero's 1.5-1.9, and different bytes from STUB["jpeg"]
+    # so the two acquisitions cannot be confused by their hashes.
+    STUB["jpeg3"] = _jpeg(2600, 1450)
     STUB["png"] = _png(2600, 1400)
     # A PNG SIGNATURE WITH NO IHDR, which is the case that must still be
     # refused now that a real PNG is accepted: the signature says PNG and the
@@ -504,6 +522,15 @@ def main(argv):
         "photographer_url": "https://www.pexels.com/@stub2",
         "alt": "a second generated test pattern",
         "src": {"original": base + "/original2.jpg",
+                "large2x": base + "/preview.jpg"},
+    }
+    STUB["meta3"] = {
+        "id": int(PHOTO3_ID), "width": 2600, "height": 1450,
+        "url": "https://www.pexels.com/photo/stub-4200002/",
+        "photographer": "Third Stub Photographer",
+        "photographer_url": "https://www.pexels.com/@stub3",
+        "alt": "a third generated test pattern",
+        "src": {"original": base + "/original3.jpg",
                 "large2x": base + "/preview.jpg"},
     }
     env = {"PEXELS_API_BASE": base, "PEXELS_API_KEY": "stub-key-not-a-secret"}
@@ -1264,6 +1291,114 @@ def main(argv):
               "stub-key-not-a-secret" not in b.stdout)
         b2 = run(["scripts/images/pr_body.py", "--purpose", "chamonix-destination"], {})
         check("a PR body for a purpose nothing filled fails", b2.returncode != 0)
+
+        # ── 14b. a surface changes its picture in ONE act ───────────
+        #
+        # A SWAP USED TO COST TWO, AND THE PRODUCT WAS DEGRADED BETWEEN THEM.
+        # `acquire.py` refuses to take over a surface the register already
+        # holds, and its only escape was "remove that row deliberately" — a
+        # commit that unregisters the outgoing photograph, then a dispatch
+        # that fetches the incoming one. Between the two the surface has no
+        # picture at all, and on the homepage `if _hero_row` drops the whole
+        # window band rather than drawing a hole. `--replace` is the same
+        # decision as one act, in the shape `--second-purpose` already set
+        # for the mirror rule.
+        #
+        # THIS BLOCK OWNS ITS STARTING STATE AND PUTS IT BACK. A test that
+        # left `home-hero` holding a different photograph would break every
+        # block after it for a reason that is about the test, which is the
+        # fault this suite has already recorded about a batch inheriting the
+        # register every block above it wrote.
+        before = json.load(open(REGISTER, encoding="utf-8"))["images"]["home-hero"]
+        old_derivs = sorted((before.get("derivatives") or {}))
+        A3 = ["scripts/images/acquire.py", "--provider", "pexels",
+              "--photo-id", PHOTO3_ID, "--purpose", "homepage-hero",
+              "--alt", "a third test pattern, replacing the first"]
+        r = run(A3, env)
+        check("a different id for a filled surface is still refused",
+              r.returncode != 0, (r.stdout + r.stderr)[-300:])
+        check("and the refusal names the id to pass to --replace",
+              PHOTO_ID in (r.stdout + r.stderr)
+              and "--replace" in (r.stdout + r.stderr))
+        check("and nothing was written",
+              str(json.load(open(REGISTER, encoding="utf-8"))
+                  ["images"]["home-hero"]["provider_photo_id"]) == PHOTO_ID)
+
+        # NAMING THE WRONG OUTGOING PHOTOGRAPH IS A HARD FAILURE, not a skip:
+        # a caller who is wrong about what a surface holds is wrong about
+        # which surface they are changing, and the next candidate in a batch
+        # would be wrong in the same way.
+        r = run(A3 + ["--replace", PHOTO2_ID], env)
+        check("--replace naming the wrong photograph is refused",
+              r.returncode == 1, f"exit {r.returncode}")
+        check("and the refusal says what the surface actually holds",
+              PHOTO_ID in (r.stdout + r.stderr))
+        check("and nothing was written for the wrong --replace",
+              str(json.load(open(REGISTER, encoding="utf-8"))
+                  ["images"]["home-hero"]["provider_photo_id"]) == PHOTO_ID)
+
+        r = run(A3 + ["--replace", PHOTO_ID], env)
+        check("--replace naming the right photograph lets it through",
+              r.returncode == 0, (r.stdout + r.stderr)[-400:])
+        swapped = json.load(open(REGISTER, encoding="utf-8"))["images"]["home-hero"]
+        check("the surface now holds the incoming photograph",
+              str(swapped["provider_photo_id"]) == PHOTO3_ID
+              and swapped["photographer"] == "Third Stub Photographer")
+        check("and its provenance is the incoming photograph's, not a patch "
+              "of the outgoing one's",
+              swapped["sha256"] != before["sha256"]
+              and swapped["source"] != before["source"])
+        # THE RETIRED PHOTOGRAPH'S FILES GO WITH ITS ROW. A derivative is
+        # named for the version tag of the bytes it came from, so the
+        # incoming set is a different set and the outgoing one is left on
+        # disk referenced by nothing — somebody else's photograph sitting in
+        # a repository with no row recording why.
+        left = [d for d in old_derivs
+                if os.path.exists(os.path.join(ROOT, "assets", "img", d))]
+        check("and the retired derivatives are gone", not left, str(left[:3]))
+        # AND THE LADDER HAS TO BE BUILT BEFORE ANYTHING ELSE READS THE
+        # REGISTER. `acquire.py` writes `processing: None, derivatives: None`
+        # on purpose — a half-registered photograph must never look valid —
+        # so the register is INVALID between the two scripts, and the next
+        # acquisition loads it and says so. That is the contract working; the
+        # test has to honour it rather than discover it.
+        d = run(["scripts/images/derive.py", "homepage-hero"], {})
+        check("the incoming ladder builds", d.returncode == 0,
+              (d.stderr or "")[-200:])
+        new_derivs = sorted(json.load(open(REGISTER, encoding="utf-8"))
+                            ["images"]["home-hero"]["derivatives"] or {})
+        check("and it is a different set of files from the retired one",
+              new_derivs and not set(new_derivs) & set(old_derivs))
+
+        # AND BACK, WHICH ALSO PROVES THE ESCAPE IS NOT ONE-WAY.
+        r = run(["scripts/images/acquire.py", "--provider", "pexels",
+                 "--photo-id", PHOTO_ID, "--purpose", "homepage-hero",
+                 "--alt", before["alt"], "--replace", PHOTO3_ID], env)
+        check("the surface can be put back the same way", r.returncode == 0,
+              (r.stdout + r.stderr)[-300:])
+        d = run(["scripts/images/derive.py", "homepage-hero"], {})
+        check("and the restored ladder rebuilds", d.returncode == 0,
+              (d.stderr or "")[-200:])
+        restored = json.load(open(REGISTER, encoding="utf-8"))["images"]["home-hero"]
+        check("the register is back to the photograph this block found",
+              str(restored["provider_photo_id"]) == PHOTO_ID
+              and restored["sha256"] == before["sha256"]
+              and sorted(restored.get("derivatives") or {}) == old_derivs)
+        check("and every restored derivative is on disk",
+              all(os.path.exists(os.path.join(ROOT, "assets", "img", d2))
+                  for d2 in old_derivs))
+        check("and the swapped-in photograph's files left with its row",
+              not [d2 for d2 in new_derivs
+                   if os.path.exists(os.path.join(ROOT, "assets", "img", d2))])
+        # A REPLACEMENT OF NOTHING IS A CALLER WHO IS WRONG ABOUT THE
+        # SURFACE, and it is refused for the same reason as naming the wrong
+        # id: silence would let a typo in the purpose read as a swap.
+        r = run(["scripts/images/acquire.py", "--provider", "pexels",
+                 "--photo-id", PHOTO3_ID, "--purpose", "chamonix-destination",
+                 "--alt", "a third test pattern on an empty surface",
+                 "--replace", PHOTO_ID], env)
+        check("--replace on a surface that holds nothing is refused",
+              r.returncode == 1, f"exit {r.returncode}")
 
         # ── 15. discovery writes a manifest, and it ranks nothing ────
         #

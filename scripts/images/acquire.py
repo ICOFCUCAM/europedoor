@@ -444,6 +444,10 @@ def main(argv):
     ap.add_argument("--second-purpose", action="store_true",
                     help="this photograph is already in the register for a "
                          "DIFFERENT purpose and that is intended")
+    ap.add_argument("--replace", metavar="PHOTO_ID",
+                    help="the provider photo id this surface holds today and "
+                         "that this acquisition is deliberately replacing. It "
+                         "must be named, not merely allowed.")
     args = ap.parse_args(argv)
 
     ok, why = cleared(args.provider)
@@ -464,13 +468,55 @@ def main(argv):
     # A PURPOSE HOLDS ONE PHOTOGRAPH. Re-acquiring the SAME id for the same
     # purpose is a replay and is allowed; a different id silently taking over
     # a surface is the drift this field exists to stop.
+    #
+    # AND THE ESCAPE NAMES WHAT IS LEAVING, WHICH IS THE WHOLE DIFFERENCE
+    # BETWEEN A REPLACEMENT AND A TAKEOVER.
+    #
+    # The refusal below used to say "remove that row deliberately", and that
+    # is a two-step swap: a commit that unregisters the photograph, then a
+    # dispatch that acquires the next one. Between them the surface has no
+    # picture at all — on this site `if _hero_row` drops the whole window
+    # plate rather than drawing a hole — so the product is degraded for as
+    # long as the second step takes, and it stays degraded if the second
+    # step never runs. A swap is one editorial decision and it should cost
+    # one act.
+    #
+    # `--replace` is that act, in the shape `--second-purpose` already set
+    # for the mirror rule: a refusal with a named escape rather than a
+    # warning nobody reads. It does NOT relax anything the gate asks of the
+    # incoming photograph — the provider must still be cleared for this
+    # route, the id must still be fetched by id and come back as the id that
+    # was asked for, and every provenance field is still written from what
+    # the provider returned. What it relaxes is a rule about SURFACES, and
+    # only for a caller who can say which photograph they are retiring.
+    #
+    # NAMING THE WRONG ONE IS A HARD FAILURE RATHER THAN A SKIP. A caller who
+    # believes this surface holds a different photograph is wrong about which
+    # surface they are changing, and the next candidate in a batch would be
+    # wrong in the same way — which is exactly the line this script draws
+    # between exit 3 and exit 1.
+    retiring = None
     existing = reg["images"].get(spec["key"])
     if existing and str(existing.get("provider_photo_id")) != str(args.photo_id):
-        skip(f"{args.purpose} is already filled by "
-                 f"{existing.get('provider')} {existing.get('provider_photo_id')}. "
-                 f"Remove that row deliberately if it is being replaced — a "
-                 f"surface changing its picture is an editorial act, not a "
-                 f"side effect of running this twice.")
+        if not args.replace:
+            skip(f"{args.purpose} is already filled by "
+                 f"{existing.get('provider')} {existing.get('provider_photo_id')} "
+                 f"({existing.get('photographer')}). A surface changing its "
+                 f"picture is an editorial act, not a side effect of running "
+                 f"this twice — pass --replace "
+                 f"{existing.get('provider_photo_id')} if that is what this "
+                 f"is, or remove the row in its own commit.")
+        if str(args.replace) != str(existing.get("provider_photo_id")):
+            sys.exit(
+                f"REFUSED: --replace names {args.replace} and {args.purpose} "
+                f"holds {existing.get('provider')} "
+                f"{existing.get('provider_photo_id')}. Nothing written. A "
+                f"caller who is wrong about what a surface holds is wrong "
+                f"about which surface they are changing.")
+        retiring = existing
+    elif args.replace and not existing:
+        sys.exit(f"REFUSED: --replace names {args.replace} and {args.purpose} "
+                 f"holds nothing. Nothing written.")
 
     # AND ONE PHOTOGRAPH IS NOT AUTOMATICALLY MEANT FOR TWO SURFACES.
     #
@@ -625,6 +671,36 @@ def main(argv):
         json.dump(reg, fh, ensure_ascii=False, indent=2)
         fh.write("\n")
 
+    # AND THE RETIRED PHOTOGRAPH'S FILES GO WITH ITS ROW.
+    #
+    # A derivative is named for the version tag of the bytes it came from, so
+    # the incoming photograph writes a different set and the outgoing set is
+    # left on disk, referenced by nothing. Files under `assets/img` with no
+    # register row are the state `checks.py` refuses from the other end —
+    # a page referencing a file with no row — and this is that state's twin:
+    # a file with no page and no row, which is somebody else's photograph
+    # sitting in a repository with nothing recording why. The ORIGINAL is
+    # named for the purpose rather than the bytes, so the incoming one has
+    # already been written over it; a differing extension is the one case
+    # where the old file survives under its own name.
+    retired = []
+    if retiring:
+        old_orig = os.path.join(ROOT, retiring.get("original") or "")
+        if retiring.get("original") and os.path.abspath(old_orig) != \
+                os.path.abspath(original) and os.path.exists(old_orig):
+            os.remove(old_orig)
+            retired.append(retiring["original"])
+        for name in (retiring.get("derivatives") or {}):
+            f = os.path.join(ROOT, "assets", "img", name)
+            if os.path.exists(f):
+                os.remove(f)
+                retired.append(os.path.join("assets", "img", name))
+
+    if retiring:
+        print(f"retired {retiring.get('provider')} photo "
+              f"{retiring.get('provider_photo_id')} "
+              f"({retiring.get('photographer')}) from {args.purpose}, "
+              f"and {len(retired)} file(s) with it")
     print(f"acquired {args.provider} photo {norm['id']} for {args.purpose}")
     print(f"  photographer  {norm['photographer']}")
     print(f"  source        {norm['page']}")

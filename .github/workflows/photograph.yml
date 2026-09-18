@@ -75,6 +75,18 @@ on:
         description: "acquire only: what the photograph shows, for somebody who cannot see it"
         required: false
         type: string
+      replace:
+        # A SWAP IS ONE EDITORIAL DECISION AND IT SHOULD COST ONE ACT.
+        # acquire.py refuses to take over a surface the register already
+        # holds. Without this input the only way through is a commit that
+        # unregisters the outgoing photograph and then a second dispatch —
+        # and between the two the surface has no picture at all, which on
+        # this site drops a whole band rather than drawing a hole. So the
+        # escape names what is leaving: the id typed here must be the id the
+        # surface holds, or nothing is written.
+        description: "acquire only: the photo id this surface holds today and that this acquisition replaces"
+        required: false
+        type: string
       focal:
         description: "acquire only: focal point as x,y percentages"
         required: false
@@ -267,7 +279,8 @@ jobs:
             --photo-id "${{ inputs.photo_id }}" \
             --purpose "${{ inputs.purpose }}" \
             --alt "${{ inputs.alt }}" \
-            --focal "${{ inputs.focal }}"
+            --focal "${{ inputs.focal }}" \
+            ${{ inputs.replace && format('--replace {0}', inputs.replace) || '' }}
 
       - name: Build the width ladder and complete the provenance
         run: |
