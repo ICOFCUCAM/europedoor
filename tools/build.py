@@ -38,6 +38,9 @@ def write(path, content):
 
 def build():
     d = D.load()
+    # THE STUDIO'S OWN PHOTOGRAPHS, DECLARED ONCE. `picture()` consults this
+    # rather than being handed a second register at forty-seven call sites.
+    R.set_design(d.get("design"))
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     os.makedirs(OUT)
@@ -173,6 +176,28 @@ def build():
             shutil.copy(os.path.join(img_src, name), dst)
             img_n += 1
 
+    # ── THE DESIGN ASSETS, PUBLISHED UNDER THEIR OWN HASH ────────────
+    #
+    # They are the owner's photographs, supplied to direct the composition,
+    # and they never enter `data/images.json`. What they share with a
+    # production photograph is exactly one thing: the URL carries the hash
+    # of the bytes, because `/assets/` is served `immutable` for a year and
+    # a stable URL under that header is a file the browser never asks about
+    # again. Everything else — the ladder, the provenance, the credit — is
+    # production's, and stays there.
+    for _key, a in (d.get("design") or {}).items():
+        src = os.path.join(ROOT, a["file"])
+        if not os.path.exists(src):
+            raise SystemExit(f"design asset {_key}: {a['file']} is not in the "
+                             f"repository. A register that names a file the "
+                             f"build cannot copy is a hole where a picture is")
+        ext = os.path.splitext(a["file"])[1] or ".jpg"
+        dst = os.path.join(OUT, "assets", "img",
+                           f"design.{a['sha256'][:10]}{ext}")
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        shutil.copy(src, dst)
+        img_n += 1
+
     # The map geometry. Published under /api/geo/ rather than /assets/ because
     # it is data the page fetches, not an asset the page references, and
     # because the two directories get different Cache-Control: geometry that
@@ -261,6 +286,9 @@ def build():
 
 def stats():
     d = D.load()
+    # THE STUDIO'S OWN PHOTOGRAPHS, DECLARED ONCE. `picture()` consults this
+    # rather than being handed a second register at forty-seven call sites.
+    R.set_design(d.get("design"))
     ncountry = len(d["countries"])
     nregion = sum(len(c["regions"]) for c in d["countries"].values())
     ncity = len(d["cities"])

@@ -9595,6 +9595,26 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    the credit line under it. The picture is what should give: 34rem is a
    crop of the same photograph, the two columns come out within 30 pixels
    of each other, and nothing is spaced to match anything. */
+/* AND THE HEAD SITS ON THE SAME TWO TRACKS AS THE BAND UNDER IT.
+   Measured at 1280: the columns below are 797 and 411 and their tops and
+   bottoms align exactly — and the head above them was one column, so the
+   headline ran 64 to 887 and the lede sat under it, both of them ending at
+   a width that relates to neither track. Nothing was misaligned in the
+   sense of being a few pixels out; the head simply belonged to a different
+   composition from the band it introduces. The title takes the picture's
+   track and the standfirst takes the list's, so the whole band reads on two
+   columns and the right edge of the lede is the right edge of the list.
+
+   The gap and the ratio are `.feat`'s own values rather than a second pair,
+   because two grids that must line up and state their tracks separately are
+   two grids that will stop lining up. */
+@media (min-width: 62rem) {
+  .sheet-places .sheettext {
+    grid-template-columns: minmax(0, 1.32fr) minmax(0, .68fr);
+    gap: var(--s5) var(--s8); align-items: end; }
+  .sheet-places .sheettext .mega { grid-column: 1; }
+  .sheet-places .sheettext .lede { grid-column: 2; max-width: none; }
+}
 /* THE PICTURE REACHES THE EDGE OF THE PAPER AND THE LABEL SITS ON IT.
    The feature scale is 1.35 against .65 so the photograph is the subject,
    and it was still a picture inside a 76rem measure with its caption set
@@ -9632,6 +9652,16 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
 .featsay { position: absolute; inset: auto 0 0 0; z-index: 2;
   display: grid; justify-items: start; gap: var(--s2);
   padding: var(--s6) var(--s6) var(--s6) var(--page-gutter);
+  /* THE ELEMENT THAT PAINTS THE SCRIM OWNS THE INK ON IT, and for one
+     commit nothing did. `color: var(--bone)` sat on `.featlead` and was
+     taken off because the anchor paints no text of its own and was reading
+     1.14:1 against the wall; `.featname`'s own `color` had been removed the
+     commit before, correctly, as a restatement of the anchor's. Between the
+     two the place name inherited the page's near-black onto a dark scrim
+     over a bright building and was simply not there — two true findings
+     that between them deleted the value. The scrim is the ground, so the
+     scrim declares the ink. */
+  color: var(--bone);
   background: color-mix(in srgb, var(--graphite) 72%, transparent); }
 .featsay::before { content: ""; position: absolute; inset: auto 0 100% 0;
   height: 11svh; pointer-events: none;
@@ -10503,64 +10533,47 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    opening: `light wall, dark opening` is this atlas's whole reading of an
    aperture, and what a gallery does with a picture smaller than its frame
    is mount it. The step is measured in the browser suite. */
-/* AND THE PICTURE STANDS STILL BY STICKING RATHER THAN BY BEING FIXED,
-   WHICH IS THE SAME EFFECT WITHOUT THE LANDMINE. `position: fixed` inside
-   a `clip-path` is two undefined-in-practice behaviours stacked on one
-   composition. The first is written down two screens up: six properties —
-   transform, filter, backdrop-filter, perspective, will-change and
-   contain — each make an ancestor a containing block for FIXED
-   descendants, so one of them anywhere between <body> and the picture
-   turns the window into a panel that scrolls, silently, with every box
-   still the right size in the right place. The second is worse because it
-   is not in that list: the CSS Masking specification says a `clip-path`
-   other than `none` ITSELF creates a containing block for fixed
-   descendants, Chromium does not do that and other engines do — so the
-   one element this composition requires to carry a clip is an element
-   that, read strictly, cancels the positioning it exists to clip. A
-   construction whose correctness depends on which half of a specification
-   an engine implements is not a construction.
+/* THE WINDOW: A FIXED PICTURE, A CLIPPED BAND, AND NOTHING ELSE.
+   The owner's contract, restored and stated here so it cannot be traded
+   away again: the band is `position: relative; clip-path: inset(0)` and at
+   least 110svh; the picture is `position: fixed; inset: 0` with
+   `object-fit: cover`; the words are `position: relative` above it. No
+   JavaScript and no scroll listener. Not `background-attachment: fixed`,
+   which iOS Safari ignores outright — the effect would exist on a desk and
+   silently not exist for half the readership.
 
-   `position: sticky` is defined identically everywhere, is clipped by an
-   ancestor's clip-path exactly as any in-flow box is, is constrained to
-   its own container by the spec rather than by a guard, and needs no
-   containing-block reasoning at all. So the opening is an in-flow box
-   again, the standing frame is one viewport tall and sticks to the top of
-   it, and the picture is centred inside THAT.
+   CRITICAL, AND IT IS WHY THIS COMMENT IS HERE RATHER THAN IN A DOC:
+   nothing on the band, on the picture, or on ANY element between them may
+   set `transform`, `filter`, `backdrop-filter`, `perspective`,
+   `will-change` or `contain`. Each makes an element a containing block for
+   FIXED descendants, which turns the picture into an absolute box and kills
+   the effect in silence — every box still the right size in the right
+   place, `getComputedStyle` still reporting `fixed`. The browser suite
+   walks html -> body -> main -> the band -> the picture and names the
+   element that broke it, then scrolls 300 pixels and asserts the picture
+   did not move, because a promise about scrolling can only be proved by
+   scrolling. To cross-fade several pictures, animate opacity only.
 
-   The picture's own box does not move by a pixel: `.shotclip .shotfull`
-   is a declared crop container in `data/image-purposes.json`, measured at
-   0.800–1.778 for a guaranteed frame of 35.5%, and the whole point of
-   that measurement is that a layout change which would ruin the first
-   photograph anybody licenses fails in the commit that causes it.
-   `.shotstand` is exactly the viewport, so every `vw` and `svh` in the
-   offsets below means what it meant against the viewport. */
-.sheet-bleed .shotclip { position: relative; height: 140svh;
+   `svh` and never `vh`: `vh` is the LARGE viewport, so a phone's toolbars
+   growing and shrinking mid-scroll would resize the band underneath a
+   picture that is standing still — the one movement this effect cannot
+   have. And any tint goes INSIDE the fixed element, so it is a property of
+   the viewport exactly as the picture is; as a pseudo-element of the band
+   it would crawl across a photograph that is not moving.
+
+   THE PICTURE IS END TO END, AND ITS ASPECT IS FLOORED SO A CROP BOX STILL
+   EXISTS. `inset: 0` alone makes the container the raw viewport, which
+   swings 0.356 to 3.125 and guarantees 9% of a photograph's frame —
+   measured, and below the 12% this repository refuses. Flooring the height
+   at 45.45vw caps the box at 2.2 and leaves it filling the viewport at
+   every shape: 0.356-2.200, a guaranteed frame of 12.8%. */
+.sheet-bleed .shotclip { position: relative; min-height: 110svh;
                          clip-path: inset(0); z-index: 0;
                          background: var(--graphite); }
-.sheet-bleed .shotstand { position: sticky; top: 0; height: 100svh; }
-/* AND THE PHONE BOX WENT FROM 4:5 TO 2:3, WHICH COSTS SIX POINTS OF CROP
-   GUARANTEE AND BUYS BACK THE PICTURE. Measured at 390x844 with the words
-   on the photograph: the picture was 390x488 inside an 844-tall opening,
-   so 356 pixels of the first screen were the MOUNT and the declaration
-   covered 330 of the 488 that were left — 158 pixels of visible
-   photograph, on the one full-bleed picture on the page. A taller box
-   fixes both ends at once: 390x585 leaves 129 of mount either side and
-   295 of photograph above the words. The crop arithmetic follows honestly
-   rather than being left to describe the old box — container 0.667-1.778
-   against a 1.5-1.9 source is a guaranteed frame of 29.6% where 0.800 gave
-   35.5%, and the floor this repository refuses below is 12%. */
-.sheet-bleed .shotfull { position: absolute; z-index: 0;
-  aspect-ratio: 2 / 3;
-  width: min(100vw, 66.67svh);
-  left: 50%; margin-left: max(-50vw, -33.33svh);
-  top: 50%;  margin-top: max(-75vw, -50svh); }
-@media (min-width: 52rem) {
-  .sheet-bleed .shotfull {
-    aspect-ratio: 16 / 9;
-    width: min(100vw, 177.78svh);
-    margin-left: max(-50vw, -88.89svh);
-    margin-top: max(-28.125vw, -50svh); }
-}
+.sheet-bleed .shotfull { position: fixed; z-index: 0;
+  left: 0; right: 0;
+  top: 50%; height: max(100svh, 45.45vw);
+  margin-top: calc(max(100svh, 45.45vw) / -2); }
 /* THE DECLARATION: type ON the photograph, and the scrim is what makes
    the ratio a property of the design rather than of the picture. The
    arithmetic is `.credit`'s own and not a second decision about one
@@ -10576,13 +10589,32 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    full 72% and the ramp is a separate strip above it, in five stops
    because a two-stop ramp has a crease at each end and the eye draws a
    line along it. */
-.sheet-bleed .shotsay { position: absolute; inset: auto 0 0 0; z-index: 2;
+/* THE COPY SCROLLS OVER THE STANDING PICTURE, which is the other half of
+   the contract: the picture is fixed and the words are `position:
+   relative`, so the wall moves past the window and the sentence arrives on
+   it. Inside the fixed element they would stand still WITH the photograph,
+   which is a caption on a poster rather than a window being passed. */
+.sheet-bleed .shotsay { position: relative; z-index: 2; margin-top: 62svh;
   padding: var(--s6) var(--page-gutter) var(--s7);
   --paper: var(--graphite);
   --door: var(--bone);
   --door-dark: var(--bone);
   color: var(--bone);
   background: color-mix(in srgb, var(--graphite) 72%, transparent); }
+/* A RAMP AT BOTH ENDS, BECAUSE THE WORDS MOVE AND THE PICTURE DOES NOT.
+   The wash was a flat 72% with a ramp above it and a hard edge below: while
+   it was fixed with the photograph that edge sat off the bottom of the
+   screen, and the moment the copy started scrolling it became a band with a
+   cut across the picture. Same five stops, mirrored. */
+.sheet-bleed .shotsay::after { content: ""; position: absolute;
+  inset: 100% 0 auto 0; height: 13svh; pointer-events: none;
+  background: linear-gradient(to bottom,
+    color-mix(in srgb, var(--graphite) 72%, transparent) 0%,
+    color-mix(in srgb, var(--graphite) 65%, transparent) 18%,
+    color-mix(in srgb, var(--graphite) 46%, transparent) 40%,
+    color-mix(in srgb, var(--graphite) 24%, transparent) 62%,
+    color-mix(in srgb, var(--graphite) 8%, transparent) 82%,
+    transparent 100%); }
 .sheet-bleed .shotsay::before { content: ""; position: absolute;
   inset: auto 0 100% 0; height: 13svh; pointer-events: none;
   background: linear-gradient(to top,
@@ -10672,35 +10704,13 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .crossart > :is(picture, img) { grid-area: 1 / 1;
   width: 100%; height: 100%; object-fit: cover; }
 .crossart picture > img { width: 100%; height: 100%; object-fit: cover; }
-/* AND IT NEEDS A STACKING ORDER, NOT ONLY A CELL. Two grid items sharing
-   `grid-area: 1 / 1` paint in DOM order, which puts this span over the
-   photograph — and it did not: rendered, the line was laid out at the right
-   size in the right place and nothing of it reached a pixel. A replaced
-   element's painting is not the same question as a box's position, and the
-   only instrument that could see the difference was a crop of the column.
-   `z-index` states the order rather than inferring it. */
-.crossroute { grid-area: 1 / 1; display: grid; align-items: center;
-              justify-items: center; pointer-events: none;
-              position: relative; z-index: 1; }
-/* `height: 100%` WOULD LETTERBOX IT. An inline SVG scales its viewBox to
-   fit (`meet`), so a 0.62 drawing inside a 443x1643 column is fitted by
-   width and centred — which is what is wanted — and asking for the full
-   height only makes the box taller without making the drawing bigger. */
-.crossroute .constel { width: 100%; height: auto; max-height: 100%; }
-/* A ROUTE OVER A PHOTOGRAPH HAS NO GROUND IT CAN PREDICT, so the casing is
-   the ground's own dark and the core is bone — the same rule every printed
-   map answers this with, and the same one `route_line` was written for.
-   No land: the continent under this line is a photograph of one of its own
-   stops, and a translucent silhouette over it would be two pictures. */
-.constel-overphoto :is(.glyph-sea, .glyph-beyond, .glyph-land, .glyph-bounds,
-                       .glyph-coast) { fill: none; stroke: none; }
-.constel-overphoto .constel-route.case {
-  stroke: color-mix(in srgb, var(--graphite) 62%, transparent); }
-.constel-overphoto .constel-route:not(.case) { stroke: var(--bone); }
-.constel-overphoto circle { fill: var(--bone);
-  stroke: color-mix(in srgb, var(--graphite) 62%, transparent);
-  stroke-width: 1.5; vector-effect: non-scaling-stroke; }
-.constel-overphoto .datacut stop { stop-color: transparent; }
+/* THE ROUTE OVER THE PHOTOGRAPH IS GONE, ON THE OWNER'S CALL, AND THE
+   RULES GO WITH IT. It was real projected geometry rather than a
+   decorative squiggle, and it was still a diagram drawn over a
+   landscape that is a stop on the same route — the row beside it names
+   every stop in order. `constellation()` and `min_span` keep every
+   other caller; only this band's skin is removed, because a rule with
+   no element is what the dead-rule scan exists to find. */
 .crossart .crosscap { position: absolute; z-index: 2; inset: auto var(--s5) var(--s5) var(--s5);
   font-family: var(--display); font-size: var(--t-base); line-height: 1.5;
   color: var(--bone); padding: var(--s3) var(--s4);

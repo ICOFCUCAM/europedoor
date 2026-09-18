@@ -335,6 +335,14 @@ def site_files():
     return sorted(glob.glob(os.path.join(OUT, "**", "*.html"), recursive=True))
 
 
+def _design_reg():
+    """The design register, read from disk, because checks run standalone."""
+    p = os.path.join(ROOT, "data", "design-assets.json")
+    if not os.path.exists(p):
+        return {}
+    return json.load(open(p, encoding="utf-8")).get("assets", {})
+
+
 def rel(path):
     return "/" + os.path.relpath(path, OUT)
 
@@ -1072,7 +1080,18 @@ def c_images():
     """
     d = D.load()
     images = d["images"]
+    design = d.get("design") or {}
     known = {row["file"] for row in images.values()}
+    # AND THE THIRD STATE IS KNOWN TO THIS CHECK RATHER THAN EXEMPT FROM IT.
+    # A design asset is the owner's own photograph, supplied to direct the
+    # composition; it renders and it never enters `data/images.json`. What
+    # this check is FOR is that no image reaches a reader from nowhere — so
+    # it asks the design register too, and a file in neither still fails.
+    # The production gate is untouched: `design-assets.json` refuses a row
+    # carrying a photographer, a licence, a source or a provider, so a
+    # half-filled production row cannot hide in it.
+    known |= {"design." + a["sha256"][:10] + os.path.splitext(a["file"])[1]
+              for a in design.values()}
     n = 0
     svgs = 0
     for f in site_files():
@@ -4139,6 +4158,72 @@ ATLAS_INSTRUMENTS = {
         "identical dots on the page titled 'Europe, and everything we hold "
         "in it'.",
 }
+
+
+@check("a design asset renders and claims nothing")
+def c_design_assets():
+    """THREE STATES, AND THE ONE IN THE MIDDLE MUST NOT LOOK LIKE THE OTHERS.
+
+    A design asset is the owner's own photograph, supplied to direct the
+    composition. It renders; it never enters `data/images.json`; and a reader
+    is shown NOTHING about where it came from, because provenance is an
+    obligation of the production photograph and this is not one. The failure
+    this guards against runs both ways:
+
+      * a design asset acquiring a photographer, a licence or a source and
+        drifting into production without ever passing the gate — which is why
+        `data.py` refuses those four fields on a design row outright;
+      * and the visitor-facing half — a credit, a licence line or any other
+        metadata appearing on a page BECAUSE an image is a design asset,
+        which is the studio's problem leaking into the product.
+
+    Nothing here touches the production gate. `images.json` still requires a
+    photographer, a source, a licence, the date it was true and the SHA-256
+    of the bytes as served, and the transition into it is unchanged.
+    """
+    design = _design_reg()
+    n = 0
+    reg = json.load(open(os.path.join(ROOT, "data", "images.json"),
+                         encoding="utf-8")).get("images", {})
+    for key, a in sorted(design.items()):
+        n += 1
+        # ONE: the file is in the repository and is the bytes it claims.
+        src = os.path.join(ROOT, a["file"])
+        if not os.path.exists(src):
+            fail(f"design-assets.json > {key}: {a['file']} is not in the "
+                 f"repository")
+            continue
+        got = hashlib.sha256(open(src, "rb").read()).hexdigest()
+        n += 1
+        if got != a["sha256"]:
+            fail(f"design-assets.json > {key}: the file is not the file that "
+                 f"was registered — {got[:12]} against {a['sha256'][:12]}")
+        # TWO: it is nowhere near the production register.
+        n += 1
+        if key in reg or any(r.get("sha256") == a["sha256"]
+                             for r in reg.values()):
+            fail(f"design-assets.json > {key} is also in images.json. A "
+                 f"photograph is a design asset or a production asset; the "
+                 f"transition is the licence gate and it is not a copy")
+        # THREE: nothing it renders tells a reader where it came from.
+        stem = "design." + a["sha256"][:10]
+        for f in site_files():
+            html = open(f, encoding="utf-8").read()
+            if stem not in html:
+                continue
+            n += 1
+            i = html.index(stem)
+            near = html[max(0, i - 1200):i + 1200]
+            for word in ("Photograph ", "Photo by", "class=\"credit\"",
+                         "pexels.com", "licence", "Licence"):
+                if word in near:
+                    fail(f"{rel(f)}: the design asset {key} is rendered with "
+                         f"{word!r} within 1,200 characters of it. A design "
+                         f"asset shows a reader nothing about where it came "
+                         f"from — provenance belongs to the production "
+                         f"photograph, behind the gate")
+                    break
+    return n
 
 
 @check("every map declares whether it is an illustration or an instrument")
@@ -7830,6 +7915,23 @@ def c_photo_published():
                  f"page this site builds")
             continue
         html = open(f, encoding="utf-8").read()
+        # AND A PURPOSE THE STUDIO IS DIRECTING IS DISPLACED, NOT BROKEN.
+        # While a design asset stands in for this key the page draws the
+        # owner's own photograph and the registered one is not on it — which
+        # is exactly what this check exists to catch, and is here a declared
+        # state rather than a drift. So the claim moves to the thing that IS
+        # published: the stand-in has to be on that page, and the registered
+        # photograph is held rather than lost.
+        _stand = next((a for a in (_design_reg() or {}).values()
+                       if a.get("stands_in_for") == key), None)
+        if _stand:
+            n += 1
+            if f"design.{_stand['sha256'][:10]}" not in html:
+                fail(f"design-assets.json stands in for {key} on {path} and "
+                     f"{path} draws neither. A displaced production row and a "
+                     f"design asset that never arrived is a surface with no "
+                     f"picture on it at all")
+            continue
         # AND THE FILES IT REFERENCES MUST BE SERVED. The first version of
         # this check read the HTML and stopped there, so it passed on a
         # homepage that referenced a ladder site/ did not contain — the

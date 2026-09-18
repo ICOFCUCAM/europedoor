@@ -1,0 +1,56 @@
+{
+  "$comment": [
+    "DESIGN ASSETS ARE NOT PRODUCTION PHOTOGRAPHS, AND THAT IS THE WHOLE",
+    "POINT OF THIS FILE.",
+    "",
+    "`data/images.json` is the production register and its gate is strict on",
+    "purpose: no photograph reaches a reader without a photographer, a source,",
+    "a licence, the date it was true and the SHA-256 of the bytes as served.",
+    "That gate was written for images acquired from a provider, and it had",
+    "started to constrain the studio rather than only the product: an image",
+    "the owner supplies to DIRECT the design cannot be acquired by id from",
+    "Pexels, so the strict answer was to refuse it, and refusing it means the",
+    "person deciding what this site looks like cannot put a picture on a page.",
+    "",
+    "So there are three states rather than two:",
+    "  1 DESIGN ASSET      — this file. Supplied for composition, art",
+    "                        direction, crop and responsive testing. It",
+    "                        renders, and it never enters the production",
+    "                        register.",
+    "  2 CANDIDATE         — intended for production and awaiting provenance.",
+    "                        `data/image-purposes.json` already declares what",
+    "                        each surface needs; a candidate is a design asset",
+    "                        with a purpose written against it.",
+    "  3 PRODUCTION ASSET  — in `data/images.json`, with photographer, source,",
+    "                        licence, date and hash, past every existing gate.",
+    "",
+    "WHAT DOES NOT CHANGE: no provenance is ever shown to a visitor because an",
+    "image is a design asset. A design asset carries no credit, no licence",
+    "line and no metadata on the page — the reader sees a photograph. And the",
+    "production gate is untouched: nothing here weakens it, and the transition",
+    "into `data/images.json` still requires every field it has always required.",
+    "",
+    "A row here is deliberately small: the file, what it is a picture of, who",
+    "supplied it, the hash of the bytes in this repository, and the surface it",
+    "is standing in for while the design is being directed."
+  ],
+  "assets": {
+    "london-thames": {
+      "file": "design/london-thames.jpg",
+      "alt": "Tower Bridge over the River Thames at dusk, with the lit towers of the City of London and Canary Wharf behind it",
+      "supplied_by": "owner",
+      "source_type": "user_owned",
+      "note": "Uploaded by the owner to direct the homepage window. Not a production asset: it carries no photographer, no licence and no source of record here, and it must not be moved into data/images.json until it does.",
+      "sha256": "aadd0deab429c135543ee6e7c7e7d865c4903abba50f8c4d5e80792d842c4db4",
+      "bytes": 5165366,
+      "width": 6000,
+      "height": 4000,
+      "stands_in_for": "home-hero",
+      "focal": [
+        50,
+        58
+      ],
+      "stands_in_for_note": "The REGISTER KEY this asset is directing, not the purpose: `picture()` is asked for a key, so the stand-in is declared in the same currency the renderer speaks. While this row exists the homepage window draws this photograph and the production row for the same key is displaced — which `c_photo_published` is told about rather than left to trip over, because a displaced claim that fails silently is worse than one that is written down."
+    }
+  }
+}

@@ -914,3 +914,94 @@ then each element in turn named `.jrows` and all three `.jr` rows. The only
 elements whose boxes reached past 320 were `<use>` clones inside an SVG, which
 is clipped and contributes nothing — *the eye finds a defect and it does not
 confirm one*, applied to an overflow probe.
+
+## Home 19/30 — the window is fixed again, and the studio gets a third state
+
+### The window, to the owner's contract
+
+`position: sticky` was my substitution for `position: fixed`, made against a
+Firefox rendering I could not reproduce in a sandbox that has only Chromium.
+The owner's specification is explicit and it is restored, with its own
+constraints written on the rule rather than in a document: `clip-path:
+inset(0)` on a band of at least 110svh, `position: fixed; inset: 0` on the
+picture, `position: relative` on the copy, `svh` and never `vh`, the tint
+inside the fixed element, no JavaScript, no scroll listener, no
+`background-attachment: fixed` — and **nothing on the band, the picture or
+anything between them may set `transform`, `filter`, `backdrop-filter`,
+`perspective`, `will-change` or `contain`**, each of which makes a containing
+block for fixed descendants and kills the effect in silence.
+
+Measured: the picture's top moves **0 pixels against a 500-pixel scroll**, at
+1280 and at 390.
+
+**The copy scrolls and the picture does not**, which is the half the first
+version had backwards: `.shotsay` was inside the fixed element, so the
+sentence stood still *with* the photograph — a caption on a poster rather than
+a window being passed. And the scrim gained a ramp at both ends: a flat wash
+with a hard lower edge is invisible while it is fixed off the bottom of the
+screen and becomes a cut across the picture the moment it moves.
+
+**End to end costs most of the crop guarantee, and that is stated.** `inset: 0`
+makes the container the raw viewport — 0.356 to 3.125, a guaranteed frame of
+**9%**, below the 12% this repository refuses and the reason a bounded aperture
+was measured in the first place. Flooring the height at 45.45vw caps the box at
+2.2 while it still fills the viewport at every shape: **0.356–2.200, 12.8%**.
+That is a thin margin and any change that lets the box grow past 2.2 puts the
+purpose under the floor, where `c_photo_safe_area` will say so.
+
+### Three states, so the studio is not governed like production
+
+`data/images.json` is strict on purpose and it had started to constrain the
+**studio** rather than only the product: a photograph the owner supplies to
+direct the design cannot be acquired by id from a provider, so the strict
+answer was to refuse it — and refusing it means the person deciding what this
+site looks like cannot put a picture on a page.
+
+| state | where it lives | what it needs | what a reader sees |
+|---|---|---|---|
+| **design asset** | `data/design-assets.json` | a file, an alt, a hash, a source type, a note | a photograph, and nothing else |
+| **candidate** | a design asset with a purpose written against it | the purpose's own numbers | — |
+| **production asset** | `data/images.json` | photographer, source, licence, date, SHA-256 | the photograph and its credit |
+
+Nothing about the production gate moved. What is new is that the two registers
+cannot be confused: `data.py` **refuses a design row that carries a
+photographer, a licence, a source or a provider** — a design asset is not a
+half-filled production row — and `c_design_assets` asserts the file is the
+bytes it claims, that it is in neither the production register nor its hashes,
+and that no page renders it within 1,200 characters of a credit, a licence or a
+provider's name. Proved red on a design row claiming a licence.
+
+**The owner's London photograph is the homepage window.** It ships at
+`design.<hash>.jpg`, because `/assets/` is served `immutable` for a year and a
+stable URL under that header is a file the browser never asks about again. One
+file, no ladder: `derive.py` writes the provenance while it builds one, and
+running it here would make a design asset look like a production one on disk.
+
+**And the displaced credit came off.** The window drew the owner's photograph
+and printed Ana Kenk's name under it — a false attribution, which is worse than
+clutter. The credit belongs to whatever is on the page. `c_photo_published`
+is told about the displacement rather than left to trip over it: while a design
+asset stands in for a key, the stand-in has to be on that page and the
+registered photograph is held rather than lost.
+
+### The three criticisms
+
+- **Section 2 end to end** — done, above.
+- **Section 3, the image does not align with the text.** Measured at 1280: the
+  two columns below are 797 and 411 and their tops and bottoms already aligned
+  exactly; the HEAD was one column, so the headline ran 64→887 and the
+  standfirst sat under it, both ending at a width that relates to neither
+  track. The title takes the picture's track and the standfirst takes the
+  list's, so the band reads on two columns throughout. The gap and the ratio
+  are `.feat`'s own values rather than a second pair.
+- **Section 4's route on the right-hand image** — removed, with its skin, on
+  the owner's call. It was real projected geometry and it was still a diagram
+  drawn over a landscape that is a stop on the same route, with the row beside
+  it naming every stop in order.
+
+**And two true findings between them deleted a value.** `color: var(--bone)`
+came off `.featlead` because the anchor paints no text of its own and read
+1.14:1 against the wall; `.featname`'s own `color` had come off the commit
+before as a restatement of the anchor's. Between them the place name inherited
+the page's near-black onto a dark scrim over a bright building and was not
+there. The element that paints the scrim owns the ink on it.

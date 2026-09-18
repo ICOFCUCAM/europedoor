@@ -710,6 +710,38 @@ def load():
     from . import imageslots
     PURPOSES = _read(os.path.join(DATA, "image-purposes.json")).get("purposes", {})
     images = _read(os.path.join(DATA, "images.json")).get("images", {})
+    # ── DESIGN ASSETS ARE A THIRD STATE, NOT A LOOSER PRODUCTION GATE ──
+    #
+    # `images.json` is the production register and it is strict on purpose:
+    # a photographer, a source, a licence, the date it was true and the hash
+    # of the bytes as served, or the build stops. That gate was written for
+    # images ACQUIRED from a provider, and it had started to constrain the
+    # studio rather than only the product — an image the owner supplies to
+    # DIRECT the design cannot be acquired by id from Pexels, so the strict
+    # answer was to refuse it, and refusing it means the person deciding
+    # what this site looks like cannot put a picture on a page.
+    #
+    # `data/design-assets.json` is that third state. It renders, it never
+    # enters the register, it shows a reader NOTHING about where it came
+    # from, and the transition into production still requires every field
+    # production has always required. See the file's own comment.
+    design = _read(os.path.join(DATA, "design-assets.json")).get("assets", {})
+    _clash = sorted(set(design) & set(images))
+    if _clash:
+        raise SystemExit(
+            f"design-assets.json and images.json both declare {_clash}. A key "
+            f"is either a design asset or a production photograph and the two "
+            f"registers may never disagree about which")
+    for _k, _a in design.items():
+        for _f in ("file", "alt", "sha256", "source_type", "note"):
+            if not _a.get(_f):
+                raise SystemExit(f"design asset {_k} has no {_f}")
+        for _f in ("photographer", "licence", "source", "provider"):
+            if _a.get(_f):
+                raise SystemExit(
+                    f"design asset {_k} carries a `{_f}`. A design asset is "
+                    f"NOT a half-filled production row: provenance belongs in "
+                    f"images.json, behind the gate, or it does not exist")
     seen_purpose = {}
     # EVERY SOURCE A SLOT CAN NAME, IN ONE PLACE.
     #
@@ -1057,6 +1089,7 @@ def load():
         "motions": motions,
         "home": home,
         "images": images,
+        "design": design,
         "taxonomy": tax,
         "interests": interests,
         "countries": countries,

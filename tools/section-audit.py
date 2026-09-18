@@ -147,6 +147,19 @@ def registered_images():
         rows.append(row)
         for name in (row.get("derivatives") or {}):
             names.add(name)
+    # AND THE THIRD STATE IS KNOWN HERE TOO. A design asset is the owner's
+    # own photograph, supplied to direct the composition: it renders, it
+    # never enters this register, and it carries no photographer, source or
+    # licence BY CONSTRUCTION — `data.py` refuses a design row that claims
+    # any of the three. So the licence assertion above is unchanged and
+    # still reads every production row; what this adds is that an `<img>`
+    # the studio put on a page is not reported as an unlicensed photograph.
+    # A file in NEITHER register still fails, which is what this is for.
+    dpath = os.path.join(ROOT, "data", "design-assets.json")
+    if os.path.exists(dpath):
+        for a in json.load(open(dpath, encoding="utf-8")).get("assets", {}).values():
+            names.add("design." + a["sha256"][:10]
+                      + os.path.splitext(a["file"])[1])
     return names, rows
 
 

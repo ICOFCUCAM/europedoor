@@ -1994,21 +1994,35 @@ def home(data):
     # rather than of the photograph. The credit stays on the wall below,
     # because it is a licence obligation and not part of the argument.
     window = ""
-    if _hero_row:
+    _design_hero = (data.get("design") or {})
+    _design_hero = next((a for a in _design_hero.values()
+                         if a.get("stands_in_for") == "home-hero"), None)
+    if _hero_row or _design_hero:
+        # A DESIGN ASSET SHOWS A READER NOTHING ABOUT WHERE IT CAME FROM,
+        # WHICH INCLUDES THE LINE UNDER THE PICTURE. The credit is a licence
+        # obligation of the PRODUCTION photograph, and while the studio is
+        # directing with the owner's own, printing that photographer's name
+        # under a different picture would be a false attribution — worse
+        # than clutter. So the credit belongs to whatever is on the page:
+        # the production row's when the production row is on it, and
+        # nothing at all when it is not.
+        _herocred = "" if _design_hero else (
+            f'<p class="sheetcred">Photograph <a href="{esc(_hero_row["source"])}"'
+            f' rel="noopener" target="_blank">{esc(_hero_row["photographer"])}</a>'
+            f' · {esc(_hero_row["licence"])}</p>')
         _cl = data["home"]["closing"]
         window = f"""
-  <div class="shotclip"><div class="shotstand">
+  <div class="shotclip">
     <div class="shotfull">{picture(images, "home-hero", w=2400, h=1400,
-        alt=_hero_row["alt"], sizes="100vw", credit=False, eager=True)}
+        alt=(_hero_row or {}).get("alt", ""), sizes="100vw", credit=False,
+        eager=True)}</div>
       <div class="shotsay"><div class="shotsay-in">
         <h2 class="mega">{esc(_cl["head"]).replace(" is not", " <br>is not")}</h2>
         <p class="lede">{esc(_cl["body"])}</p>
         {golink('/beyond-the-obvious', 'Beyond the obvious')}
       </div></div>
-    </div>
-  </div></div>
-  <p class="sheetcred">Photograph <a href="{esc(_hero_row["source"])}" rel="noopener"
-  target="_blank">{esc(_hero_row["photographer"])}</a> · {esc(_hero_row["licence"])}</p>"""
+  </div>
+  {_herocred}"""
 
     # ── 03 · THE PLACES ──────────────────────────────────────────────
     # A FEATURE, NOT A CONTACT STRIP. Five equal tiles 211 pixels wide
@@ -2203,6 +2217,12 @@ def home(data):
         # authoring a measurement, which is the one thing this repository
         # never does.
         #
+        # AND THE ROUTE CAME OFF THE PHOTOGRAPH AGAIN, ON THE OWNER'S CALL.
+        # It was real geometry and it was not needed: the picture is a stop
+        # on the route, the row beside it names every stop in order, and a
+        # line drawn over a landscape is a diagram competing with the thing
+        # it is a diagram of. `constellation()` keeps every other caller.
+        #
         # AND THE PHOTOGRAPH UNDER IT IS A STOP ON THAT ROUTE THAT NO ROW IS
         # ALREADY DRAWING. One record, one picture is a rule about a record;
         # one picture twice on one screen is a different fault with the same
@@ -2221,10 +2241,6 @@ def home(data):
     <figure class="crossart">
       {picture(images, _artkey, w=1400, h=1800, credit=False,
                alt=images[_artkey]["alt"], sizes="(min-width: 62rem) 40vw, 100vw")}
-      <span class="crossroute">{constellation(
-          [project(e["city"]["lat"], e["city"]["lon"]) for e in _jstops],
-          route=True, frame=True, aspect=0.62, mark=9, term=14,
-          min_span=150, extra=" constel-overphoto")}</span>
       <figcaption class="crosscap">{esc(_jj["name"])}
         <span>{_jkm:,} km in a straight line · {len(_jstops)} stops</span></figcaption>
     </figure>"""

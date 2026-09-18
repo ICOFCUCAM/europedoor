@@ -858,6 +858,28 @@ def photo_href(images, key, width):
     return f"{IMAGE_HOST}/assets/img/{row['file']}.{row['version']}-{step}.jpg"
 
 
+# THE DESIGN REGISTER, SET ONCE BY THE BUILD.
+#
+# `picture()` is called from forty-seven page builders and is handed the
+# production register; threading a second one through every call site would
+# be forty-seven chances for two of them to disagree about which photograph
+# a surface is directing. It is module state for the same reason `_EXTENT`
+# is: read once, never written by a page, and empty in any tool that does
+# not set it — which is the honest default, because a tool that has not been
+# told about design assets should see the production site.
+DESIGN = {}
+
+
+def set_design(assets):
+    """What the studio is directing with, keyed by the register key it stands in for."""
+    DESIGN.clear()
+    for _key, a in (assets or {}).items():
+        target = a.get("stands_in_for")
+        if not target:
+            continue
+        DESIGN[target] = dict(a, ext=os.path.splitext(a["file"])[1] or ".jpg")
+
+
 def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed=None,
             fallback_motif=None, credit=True):
     """A photograph for `key` if we hold one, otherwise a generated plate.
@@ -866,6 +888,33 @@ def picture(images, key, *, w, h, alt, eager=False, sizes="100vw", fallback_seed
     get the best thing available. That is what makes the whole library
     adoptable one photograph at a time rather than in a big migration.
     """
+    # ── A DESIGN ASSET DIRECTS THE PAGE AND CLAIMS NOTHING ──────────
+    #
+    # The owner supplies a photograph to direct the composition. It is not a
+    # production asset and it is not pretending to be one: no photographer,
+    # no licence, no source, no credit and no metadata reach the reader —
+    # they see a photograph, which is the whole point of giving one to a
+    # designer. `data/design-assets.json` is the register and its own
+    # comment carries the three states; the production gate is untouched.
+    #
+    # ONE FILE, NO LADDER, AND THAT IS DELIBERATE. `derive.py` builds AVIF,
+    # WebP and JPEG at five widths and writes the provenance while it does
+    # it; running it here would make a design asset look like a production
+    # one on disk. A design asset ships as the bytes it was given, at the
+    # URL its own hash makes, and the day it is approved the acquisition
+    # pipeline does the rest.
+    _d = DESIGN.get(key)
+    if _d:
+        fx, fy = _d.get("focal", [50, 50])
+        src = f"{IMAGE_HOST}/assets/img/design.{_d['sha256'][:10]}{_d['ext']}"
+        # AN F-STRING EXPRESSION CANNOT CONTAIN A BACKSLASH, which this
+        # repository already records about a comment and about an em dash.
+        lazy = 'loading="eager" ' if eager else 'loading="lazy" '
+        return (f'<picture><img class="photo {focal_class(fx, fy)}" '
+                f'src="{esc(src)}" width="{_d["width"]}" height="{_d["height"]}" '
+                f'alt="{esc(_d.get("alt") or alt)}" '
+                f'{lazy}decoding="async" '
+                f'sizes="{esc(sizes)}"></picture>')
     row = (images or {}).get(key)
     if not row:
         return plate(fallback_seed or key, w, h, alt, motif=fallback_motif)
