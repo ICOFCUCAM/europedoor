@@ -291,3 +291,60 @@ the finding kept in the stylesheet where the rules were.
 Two content changes across 1,033 rebuilt files, which is what a refactor of a
 shared line should produce: the singular credit, and the year lede.
 
+## PLATE 03 — "EACH CORNER" WAS FIVE OF NINE, AND THE LEDE RANKED THEM
+
+`One destination from each corner of the continent.` over a feature: one lead
+photograph and four rows. **`picks[:5]`** — a cap written when five was what
+the register could fill, reading as a statement about the layout. That is the
+`[:8]` failure plate 02 already records one band over, on the band whose
+heading *is* an extent.
+
+Measured: **all nine corners hold a photographed, non-advisory destination** —
+the Mediterranean 94 of them, Eastern Europe 2 — so the set the heading
+promises exists. The cap is gone and the composition takes the count.
+
+**AND THE LEDE MADE A RANKING CLAIM WITH ITERATION ORDER BEHIND IT.** It read
+*"Every one of these is the first place this atlas would send you in its
+corner of the continent."* The actual rule is: the first destination in each
+corner, **in whatever order the index is stored**, that the register holds a
+photograph of. Tirana is not this atlas's recommendation for the Adriatic; it
+was alphabetically first among the photographed ones. Nothing in this product
+ranks destinations — `/for-businesses` publishes that there is nothing in the
+index that could carry a boost — and a sentence on the homepage saying
+otherwise is the claim that refusal exists for. The lede states the real rule,
+which also states a real property: **the set moves as the library fills.**
+
+**And the order is the taxonomy's now, not the index's** — the Nordics first
+and the Caucasus last, which is the order /countries and the corner index on
+plate 05 already read.
+
+### The label named a country on the band whose claim is a corner
+
+Every row said ESTONIA, IRELAND, BELGIUM — so the one claim the band makes was
+the one thing a reader could not check. The kicker is the corner now, nine
+distinct, which is this atlas's own standard: *the count on the tile is the
+number of dots on it, so a reader can check.*
+
+### A refused repair, with its trigger
+
+| | 1280 |
+|---|---|
+| the lead | 695px |
+| the list | 969px |
+| **empty page under the lead** | **274px** |
+| the lead's rendered picture | 729 × 544, aspect **1.340** |
+
+Before the change the imbalance ran the other way — four rows measured 484px
+against the lead's 695, so 211px sat empty beside the LIST — and it is 274
+now. The obvious repair is to raise `.featlead img`'s `max-height: 34rem` so
+the lead column grows into the gap, and **it is refused**: that cap is what
+crops a 4:5 rule into a 1.340 box, so raising it changes the crop box of an
+**undeclared** surface. `destination-hero` declares one container,
+`.placeband-art`, and already carries `unmeasurable` with a trigger on it;
+`.featlead` is a second surface for the same 313 photographs and the register
+declares one. *A photograph is cropped by every surface it appears on and the
+register declares one* — the open gap this repository already records, and
+widening it on the homepage is the one axis `c_photo_safe_area` exists to
+guard. **Trigger: declare `.featlead` as a second container for `city:` and
+measure it, in the same commit as any change to its crop.**
+

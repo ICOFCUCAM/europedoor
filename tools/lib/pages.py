@@ -1880,6 +1880,8 @@ def home(data):
     for m in data.get("macros", []):
         for cs in (m.get("countries") or []):
             macro_of[cs if isinstance(cs, str) else cs.get("slug")] = m["slug"]
+    macro_order = {m["slug"]: i for i, m in enumerate(data.get("macros", []))}
+    macro_name = {m["slug"]: m["name"] for m in data.get("macros", [])}
     seen_macro, picks = set(), []
     for cid, e in idx.items():
         if ("city:" + cid) not in images:
@@ -1891,7 +1893,15 @@ def home(data):
             continue
         seen_macro.add(mac)
         picks.append((cid, e))
-    picks = picks[:5]
+    # AND THE HEADING SAID "EACH CORNER" WHILE THE BAND DREW FIVE OF NINE.
+    # `picks[:5]` was a cap written when five was what the register could
+    # fill, and it read as a statement about the layout — the `[:8]` failure
+    # plate 02 already records one band over, on the one band whose heading
+    # is an extent. Measured: all nine corners hold a photographed,
+    # non-advisory destination (the Mediterranean 94 of them, Eastern Europe
+    # 2), so the set the heading promises exists. The cap is gone and the
+    # composition takes the count.
+    picks.sort(key=lambda p: macro_order.get(macro_of.get(p[0].split("/")[0]), 99))
 
     def _phot(keys):
         """This band's credit line — `render.photo_credits`, which is one
@@ -1951,7 +1961,7 @@ def home(data):
     # the one that could not produce an empty string because it died first.
     places = ""
     if picks:
-        _lead, _rest = picks[0], picks[1:5]
+        _lead, _rest = picks[0], picks[1:]
         _lc, _le = _lead
         placerows = "".join(
             f'<a class="pl" href="{urls.city(e["country"], e["region"], e["city"])}">'
@@ -1959,7 +1969,7 @@ def home(data):
             f'{picture(images, "city:" + cid, w=400, h=400, credit=False, alt=images["city:" + cid]["alt"], sizes="7rem")}'
             f'</span>'
             f'<span class="pltext">'
-            f'<span class="plwhere">{esc(e["country"]["name"])}</span>'
+            f'<span class="plwhere">{esc(macro_name.get(macro_of.get(cid.split("/")[0]), e["country"]["name"]))}</span>'
             f'<span class="plname">{esc(e["city"]["name"])}</span></span>'
             f'<span class="plgo" aria-hidden="true">→</span></a>'
             for cid, e in _rest)
@@ -1968,21 +1978,21 @@ def home(data):
       <div class="sheettext">
         <h2 class="mega">One destination from <br>each corner of the continent.</h2>
         <p class="lede">Europe changes with what you seek — mountains or coastlines,
-        cities or quiet places. Every one of these is the first place this atlas
-        would send you in its corner of the continent.</p>
+        cities or quiet places. One from each corner: the first in it this atlas
+        holds a photograph of, so the set moves as the library fills.</p>
       </div>
       <div class="feat">
         <a class="featlead" href="{urls.city(_le["country"], _le["region"], _le["city"])}">
           {picture(images, "city:" + _lc, w=1200, h=1500, credit=False,
                    alt=images["city:" + _lc]["alt"],
                    sizes="(min-width: 62rem) 46vw, 92vw")}
-          <span class="featwhere">{esc(_le["country"]["name"])}</span>
+          <span class="featwhere">{esc(macro_name.get(macro_of.get(_lc.split("/")[0]), _le["country"]["name"]))}</span>
           <span class="featname">{esc(_le["city"]["name"])}</span>
           <span class="featline">{esc(_le["city"].get("summary", ""))}</span>
         </a>
         <div class="featlist">{placerows}</div>
       </div>
-      {_phot(["city:" + c for c, _e in picks[:5]])}
+      {_phot(["city:" + c for c, _e in picks])}
       </div>"""
 
     # ── 04 · THE CROSSING ────────────────────────────────────────────
