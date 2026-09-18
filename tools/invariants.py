@@ -168,7 +168,20 @@ def measure():
                        "something real too: every interest page draws its own "
                        "tag and says it does so \"so the seventeen can be "
                        "compared\", and there was nowhere they could be. The "
-                       "index is that comparison, ordered by reach."},
+                       "index is that comparison, ordered by reach."
+                       "  1034 -> 1032 WHEN A SUB-CATEGORY HAD TO EARN ITS "
+                       "PAGE. FACET_MIN is three and its reason is that below "
+                       "it a page is a heading over a list a reader could have "
+                       "seen in full on the page they came from - exactly true "
+                       "of a sub-category, whose parent lists every invitation "
+                       "it holds. Two of the twenty-eight shipped ONE row, and "
+                       "the smaller was worse than thin: /experiences/nature/"
+                       "fjords declares fjord, inlet, calanque, ria and sea "
+                       "loch, NO experience in this atlas mentions a fjord at "
+                       "all, and the page called Fjords held Marseille. "
+                       "Removing a URL is the deliberate act this row exists to "
+                       "make visible, and nothing is orphaned: every entry it "
+                       "selected is already on the parent page."},
             "routes.hash": {
                 "value": route_hash, "kind": "exact",
                 "why": "A visual change must not move a URL. Every inbound link, "
@@ -184,7 +197,20 @@ def measure():
                        "something real too: every interest page draws its own "
                        "tag and says it does so \"so the seventeen can be "
                        "compared\", and there was nowhere they could be. The "
-                       "index is that comparison, ordered by reach."},
+                       "index is that comparison, ordered by reach."
+                       "  1034 -> 1032 WHEN A SUB-CATEGORY HAD TO EARN ITS "
+                       "PAGE. FACET_MIN is three and its reason is that below "
+                       "it a page is a heading over a list a reader could have "
+                       "seen in full on the page they came from - exactly true "
+                       "of a sub-category, whose parent lists every invitation "
+                       "it holds. Two of the twenty-eight shipped ONE row, and "
+                       "the smaller was worse than thin: /experiences/nature/"
+                       "fjords declares fjord, inlet, calanque, ria and sea "
+                       "loch, NO experience in this atlas mentions a fjord at "
+                       "all, and the page called Fjords held Marseille. "
+                       "Removing a URL is the deliberate act this row exists to "
+                       "make visible, and nothing is orphaned: every entry it "
+                       "selected is already on the parent page."},
             "shell.count": {
                 "value": sum(open(os.path.join(ROOT, "tools", "lib", f),
                                   encoding="utf-8").read().count("<!doctype html>")

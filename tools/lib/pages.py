@@ -8592,6 +8592,39 @@ def facets_for(data, c, r, t):
     return out
 
 
+def subs_with_a_page(data, cat):
+    """The sub-categories of this category that have earned a page of their own.
+
+    THE DESTINATION FACETS GOT A FLOOR AND THE SUB-CATEGORIES NEVER DID, AND
+    TWO OF THE TWENTY-EIGHT SHIPPED ONE ROW. `FACET_MIN` is three, and its
+    reason is written above it: below that the page is a heading over a list
+    a reader could have seen in full on the page they came from. That is
+    exactly true here — `/experiences/<cat>` lists every invitation the
+    category holds, so a sub with one entry shows nothing the parent did not.
+
+    **And the smaller of the two was worse than thin: it contained none of
+    what its heading names.** `/experiences/nature/fjords` declares five
+    keywords — fjord, inlet, calanque, ria, sea loch — and **no experience in
+    this atlas mentions a fjord at all**, so the page called Fjords held one
+    entry and it was Marseille, matched on `calanque`. A reader arriving from
+    a search for fjords got a French Mediterranean inlet. The keyword is not
+    the fault and is kept: a calanque is a drowned valley and the
+    classification is editorial. The fault is publishing a page for a subject
+    the atlas holds nothing of, which is what a floor is for.
+
+    `/experiences/history/renaissance` is the other, one entry, Lucca.
+
+    The floor is `FACET_MIN` READ rather than a third three typed — the
+    dispatch cap's own lesson, where four copies of one number disagreed and
+    a sitting was spent before anything said so.
+    """
+    from . import categories as C
+    from .data import all_experiences
+    items = all_experiences(data["countries"])
+    return [sb for sb in cat.get("subs", [])
+            if len(C.select(items, cat, sb)) >= FACET_MIN]
+
+
 def facet_page(data, c, r, t, key, payload):
     name = urls.FACETS[key]
     facetart = ""
@@ -9187,14 +9220,37 @@ def category_page(data, cat, sub=None):
         # its other direction: a drawing that states something untrue is
         # worse than no drawing.
         top = max(counts.values()) or 1
+        # A SUB WITH NO PAGE KEEPS ITS COUNT AND LOSES ITS LINK, which is
+        # this atlas's own answer to a map dot the page cannot name: the
+        # measurement is real and the navigation is not. The count is what
+        # the keyword set actually selects, so dropping the row would hide
+        # the very number that explains why there is no page.
+        withpage = {sb["slug"] for sb in subs_with_a_page(data, cat)}
+        def _sublink(sb):
+            body = f"""{esc(sb['name'])} <span>{counts[sb['slug']]}</span>"""
+            return (f"""<a href="{urls.subcategory(cat['slug'], sb['slug'])}">{body}</a>"""
+                    if sb["slug"] in withpage else f"""<span class="nopage">{body}</span>""")
         subcards = '<ul class="sublinks shares">' + "".join(
-            f"""<li><a href="{urls.subcategory(cat['slug'], sb['slug'])}">"""
-            f"""{esc(sb['name'])} <span>{counts[sb['slug']]}</span></a>"""
+            f"""<li>{_sublink(sb)}"""
             f"""<span class="hopbar" aria-hidden="true"><span class="w"""
             f"""{max(5, round(counts[sb['slug']] / top * 100 / 5) * 5)}"></span>"""
             f"""</span></li>"""
             for sb in cat["subs"]
         ) + "</ul>"
+        # AND THE ROW THAT IS NOT A LINK SAYS SO, derived, or it reads as a
+        # broken one. The sentence names the sub, its count and the floor,
+        # because "some of these are not links" is the constraint explained
+        # back rather than the reason given.
+        nolink = [sb for sb in cat["subs"] if sb["slug"] not in withpage]
+        nonote = ("" if not nolink else
+                  '<p class="small">' + esc(
+                      and_list([f'{sb["name"]} ({counts[sb["slug"]]})' for sb in nolink])
+                      + (" holds" if len(nolink) == 1 else " hold")
+                      + f" fewer than {FACET_MIN} of the {len(items)} experiences in "
+                        f"the Atlas, so it has no page of its own"
+                      + ("" if len(nolink) == 1 else " each")
+                      + ". Everything it selects is already in the list above.")
+                  + "</p>")
         # The overlap is stated where it exists rather than everywhere: a
         # note on a category whose subs happen to partition cleanly would
         # be explaining a constraint that is not operating.
@@ -9203,6 +9259,7 @@ def category_page(data, cat, sub=None):
                          f'are each a share of the largest rather than of the whole: '
                          f'an experience can answer more than one of these, so they '
                          f'sum to {sum(counts.values())} against {len(chosen)}.</p>')
+        subcards += nonote
 
     countries = sorted({it["country"]["name"] for it in chosen})
     # REACH IS THE ARGUMENT AND IT WAS A NUMBER IN A GREY LINE.
@@ -14955,7 +15012,13 @@ def search_api(data):
     for cat in data["categories"]:
         add("Category", cat["name"], cat["blurb"][:70], urls.category(cat["slug"]),
             [cat["name"], cat["blurb"]], 1.3)
-        for sub in cat.get("subs", []):
+        # THE THIRD ENUMERATION OF THE SAME LIST. The build loop emits the
+        # pages, the category page links them, and this index points at
+        # them — so the floor had to reach all three, and the check that
+        # found this one ("points at a page which is not built") is the only
+        # reason the third was not left behind. `subs_with_a_page` is the
+        # one implementation; a fourth caller inherits it for free.
+        for sub in subs_with_a_page(data, cat):
             add("Category", sub["name"], cat["name"],
                 urls.subcategory(cat["slug"], sub["slug"]),
                 [sub["name"]] + sub["keywords"], 1.1)

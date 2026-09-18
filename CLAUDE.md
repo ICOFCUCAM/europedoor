@@ -6312,6 +6312,86 @@ written in the same hour as the paragraph recording the fourth. The heading is
 unescaped rather than the name escaped, because what a reader gets is the
 unescaped form and that is the thing being judged.
 
+
+**A PAGE CALLED FJORDS HELD MARSEILLE, AND THE FLOOR THAT WOULD HAVE REFUSED
+IT WAS ONE FAMILY OVER.** `FACET_MIN` is three, and the reason written above
+it is that below three a page is a heading over a list a reader could have
+seen in full on the page they came from. That is exactly true of a
+sub-category — `/experiences/<cat>` lists every invitation the category holds
+— and **the sub-categories never got a floor at all**, so two of the
+twenty-eight shipped a single row. The smaller was worse than thin:
+`/experiences/nature/fjords` declares five keywords, **no experience in this
+atlas mentions a fjord**, and the page matched one thing on `calanque` — so a
+reader arriving from a search for fjords got a French Mediterranean inlet.
+The keyword is not the fault and is kept, because a calanque is a drowned
+valley and the classification is editorial; the fault is publishing a page
+for a subject the atlas holds nothing of. `/experiences/history/renaissance`
+was the other, one entry, Lucca.
+
+**THE FLOOR IS `FACET_MIN` READ RATHER THAN A THIRD THREE TYPED** — the
+dispatch cap's own lesson, where four copies of one number disagreed and a
+whole sitting was spent before anything said so. **And it had to reach four
+callers, of which the check found the third and the fourth found itself**:
+the build loop emits the pages, the category page links them, `search_api`
+indexes them, and `checks.py` re-derives the expected page count. The search
+index was caught by an existing check — *"points at a page which is not
+built"* — and the count check by the rebuild after it. A fifth caller
+inherits the rule for free.
+
+**AND A SUB WITH NO PAGE KEEPS ITS COUNT AND LOSES ITS LINK**, which is this
+atlas's own answer to a map dot the page cannot name: the measurement is real
+and the navigation is not. Dropping the row would hide the very figure that
+explains why there is no page, so the bar and the number stay and one derived
+sentence says which sub, how many it selects, and against what floor — the
+alternative being a row that reads as a broken link. `routes.count` 1,034 →
+1,032 and `routes.hash` moved, which is the deliberate act those rows exist
+to make visible.
+
+**A VERDICT CAN CONTRADICT A LIVE CHECK AND THE AUDIT STAY GREEN, BECAUSE THE
+ASSERTION PINNED A FUNCTION NAME.** §47 published *"distance and mode are
+computed and stated for every hop"* — and `hop_note` REMOVED the mode, with
+its own docstring recording why ("69 km — a local train or a short drive" for
+a leg that is about 170 km round a mountain range), and `checks.py` carries
+`MODE_CLAIMS`, which fails on any page claiming one. Two sentences in this
+repository, in direct contradiction, both true when written. The assertions
+were `"hop_note" in src(...)` and `"hopNote" in src(...)`: symbols that still
+exist, so nothing could see that their behaviour had reversed. **The
+thirteenth assertion here to pin a shape rather than a promise, and the first
+where the shape was a function's NAME.**
+
+Measured, the honest distinction is clean and checkable both ways: **all
+seventeen journeys carry an authored `transport` list** — rail, ferry, bus,
+cable car, postbus, river boat, bicycle, flight, car, on foot — **and none of
+the 121 legs carries one.** A journey's transport is editorial record; a
+hop's mode is refused because a great circle cannot support it. That is the
+Data Integrity Rule stated as a page family. Proved red by putting a `mode`
+on one leg.
+
+**AND §40's TWELVE URL SHAPES ARE ONE LITERAL MATCH AND ELEVEN EQUIVALENTS,
+WHICH THE VERDICT HAD TO SAY.** The specification writes
+`/europe/norway/bergen`; this atlas writes
+`/europe/norway/fjord-norway/bergen`, because **the region is a real level
+with a page of its own** and the breadcrumb a check already validates names
+it — a URL that skips a level the hierarchy has a page at strands every one
+of those pages off the path and makes the path disagree with the breadcrumb. Measured,
+a two-level URL would collide **zero** times today, which is a fact about
+today and not a reason. The other two are a bare `/europe/` prefix, and
+`routes.hash` exists precisely so a URL cannot move without somebody deciding
+to. Of its four experience routes, `castles` has no surface and should not:
+**one experience in this atlas mentions a castle.**
+
+**AND §41 WAS CHECKED FOR THE FAULT THE LAST ROUND FOUND AND DOES NOT HAVE
+IT.** A destination linking a journey it has no leg from was the suspicion —
+Bergen links none — and the measurement says the atlas is right and the
+suspicion was wrong: **journeys derivable on 76 destinations and linked on
+76, themes 88 of 88, stories 32 of 32, and all 100 facet pages linked from
+their own destination.** Every destination carries at least nine inbound
+links and the median is 26. Bergen has no journey because **no journey in
+this dataset visits western Norway at all** — the three Norwegian routes are
+Tromsø and Lofoten — which is the seven-day-journey content gap one family
+over, and inventing a Norwegian Fjord Journey to satisfy a diagram would be
+authoring an editorial record.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

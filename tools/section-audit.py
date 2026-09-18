@@ -1386,9 +1386,23 @@ def s39():
 
 
 @section(40, "SEO architecture", "BUILT",
-         "The specification's URL shapes including the facet pages, its own "
-         "thin-page warning enforced as a threshold, and structured data on "
-         "every entity — which claims nothing the product does not hold.")
+         "Every surface the specification names exists, its own thin-page "
+         "warning is enforced as a threshold, and structured data is on every "
+         "entity claiming nothing the product does not hold. TWO OF ITS "
+         "TWELVE URL SHAPES DIFFER DELIBERATELY. It writes "
+         "/europe/norway/bergen and this atlas writes "
+         "/europe/norway/fjord-norway/bergen, because the region is a real "
+         "editorial level with a page of its own and a breadcrumb a check "
+         "asserts against the path — a URL that skips a level the hierarchy "
+         "has a page at makes that level unreachable by trimming and makes "
+         "the path disagree with the breadcrumb. It writes "
+         "/europe/experiences/hiking and /europe/journeys/<slug> where this "
+         "site writes /experiences/adventure/hiking and /journeys/<slug>; "
+         "that one is a prefix and nothing else, and `routes.hash` exists so "
+         "a URL cannot move without somebody deciding to move it. Of the four "
+         "experience routes it names, three have a surface and `castles` does "
+         "not: ONE experience in this atlas mentions a castle, so a page for "
+         "it would be the thin page the same document warns against.")
 def s40():
     # JSON-LD is a machine-readable claim republished by people who cannot
     # check it, so a wrong one is worse than none.
@@ -1418,6 +1432,13 @@ def s40():
                          f"no {forbidden} anywhere")
     yield exists("/europe/norway"), "/europe/<country>"
     yield exists("/europe/norway/fjord-norway/bergen"), "/europe/<country>/<region>/<destination>"
+    # THE REASON THE REGION IS IN THE PATH, asserted rather than argued: it
+    # has a page, and the breadcrumb a reader sees names it. A two-level
+    # destination URL would strand 130 pages off the path.
+    yield exists("/europe/norway/fjord-norway"), \
+        "the level the specification's URL skips has a page of its own"
+    yield has("/europe/norway/fjord-norway/bergen", "Fjord Norway"), \
+        "and the breadcrumb names it, which the path has to agree with"
     yield exists("/europe/norway/fjord-norway/bergen/things-to-do"), "a things-to-do facet"
     yield exists("/experiences/adventure/hiking"), "an experience facet"
     yield exists("/journeys/the-alpine-grand-tour"), "a journey URL"
@@ -1501,12 +1522,38 @@ def s46():
 
 
 @section(47, "Transport engine", "PARTIAL",
-         "Distance and mode are computed and stated for every hop and every "
-         "journey. Live timetables and fares need providers.")
+         "A JOURNEY'S TRANSPORT IS AUTHORED AND STATED; A HOP'S MODE IS "
+         "REFUSED. All seventeen journeys carry their own transport list — "
+         "rail, ferry, bus, cable car, postbus, river boat, bicycle, flight, "
+         "car, on foot — written as editorial record, and none of the 121 "
+         "legs carries one, because every distance here is a great circle "
+         "between two coordinates and a mode derived from that is a claim "
+         "about ground this atlas holds no geometry for. Live timetables and "
+         "fares need providers, and aggregating them is the specification's "
+         "own preferred shape rather than operating transport.")
 def s47():
-    yield "hop_note" in src("tools/lib/pages.py"), "mode is stated per hop"
-    yield "hopNote" in src("assets/js/planner.js"), "and in the planner"
-    yield has("/journeys/the-alpine-grand-tour", "Transport")
+    # THIS VERDICT USED TO READ "distance and mode are computed and stated
+    # for every hop", which is the behaviour `hop_note` REMOVED — its own
+    # docstring records the repair ("69 km — a local train or a short drive"
+    # for a leg that is 170 km round a mountain range). The assertions were
+    # `"hop_note" in src(...)`, a symbol that still exists, so the audit was
+    # green while the sentence it publishes had reversed. The thirteenth
+    # assertion here to pin a shape rather than a promise, and the first
+    # where the shape it pinned was a function NAME.
+    yield all(j.get("transport") for j in DATA["journeys"]), \
+        f"all {len(DATA['journeys'])} journeys carry an authored transport list"
+    legs_with_mode = sum(1 for j in DATA["journeys"] for l in j["legs"]
+                         if "transport" in l or "mode" in l)
+    yield legs_with_mode == 0, \
+        f"and {sum(len(j['legs']) for j in DATA['journeys'])} legs carry none"
+    # The page half, on the shipped HTML rather than on the source — which is
+    # how the three surfaces left pointing at the removed claim were found.
+    yield has("/journeys/the-alpine-grand-tour", "Transport"), \
+        "the journey states its own modes"
+    yield has("/journeys/the-alpine-grand-tour", "straight line"), \
+        "and a hop distance says what kind of distance it is"
+    yield "MODE_CLAIMS" in src("tools/checks.py"), \
+        "with a check refusing a mode claim on any page"
 
 
 @section(48, "Booking architecture", "DEFERRED",

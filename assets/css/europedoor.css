@@ -2271,7 +2271,15 @@ a .kicker { color: var(--ink-3); }
             display: flex; flex-wrap: wrap; gap: var(--s3) var(--s5); }
 .sublinks a { text-decoration: none; color: var(--door); font-weight: 600; }
 .sublinks a:hover { text-decoration: underline; }
-.sublinks a span { font-family: var(--mono); color: var(--ink-3); font-weight: 400; }
+/* THE COUNT IS THE SAME MEASUREMENT WHETHER OR NOT THE SUB HAS A PAGE, so
+   it is typeset the same. A sub under FACET_MIN keeps its figure and loses
+   its link — the map dot the page cannot name, one family over — and the
+   only difference a reader should see is that one is not interactive. Split
+   into two rules rather than one `:is()` because `.nopage` also needs the
+   ink that says "not a link", and stating both in one selector would set
+   the link's colour twice. */
+.sublinks :is(a, .nopage) span { font-family: var(--mono); color: var(--ink-3); font-weight: 400; }
+.sublinks .nopage { color: var(--ink-2); font-weight: 600; }
 /* THE SHAPE OF A CATEGORY, drawn from its own sub-counts. Column, so the
    bar sits under the name it measures; a fixed track width so four bars are
    comparable, which is the entire point of drawing them at all. */

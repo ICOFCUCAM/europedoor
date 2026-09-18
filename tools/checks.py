@@ -661,7 +661,12 @@ def c_built():
     expect += 1 + len(d["stories"])
     expect += 2                                   # /plan, /search
     expect += 1 + len(d["taxonomy"]["experience_kinds"]) + 1 + 1   # experiences, kinds, join, business
-    expect += len(d["categories"]) + sum(len(c.get("subs", [])) for c in d["categories"])
+    # A sub earns its page the way a destination facet does, so this term
+    # re-derives the rule rather than counting every declared sub — the same
+    # shape as the `facets_for` term four lines up. Counting declarations
+    # would report a stale build as correct and a correct build as stale.
+    expect += len(d["categories"]) + sum(len(P.subs_with_a_page(d, c))
+                                         for c in d["categories"])
     expect += 1 + len(d["fund"])
     expect += 6                                   # map, events, quiet, my-europe, method, about
     expect += len(d["taxonomy"]["months"])        # /events/<month>
